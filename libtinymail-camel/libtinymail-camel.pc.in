@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+satmode_serverdir=@libexecdir@
+
+Name: libtinymail 
+Description: TinyMail generic library implemented for camel
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -ltinymail-camel-@API_VERSION@
+Cflags: -I${includedir}/libtinymail-camel-@API_VERSION@

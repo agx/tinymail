@@ -1,0 +1,40 @@
+INCLUDES = $(LIBTINYMAILCAMEL_CFLAGS) -I.	\
+	-I$(top_builddir)/libtinymail
+
+lib_LTLIBRARIES = libtinymail-camel-1.0.la 
+
+libtinymail_camel_1_0_headers =			\
+	tny-msg-body.h				\
+	tny-msg-attachment.h			\
+	tny-msg-header.h			\
+	tny-msg.h				\
+	tny-msg-folder.h			\
+	tny-msg-account.h			\
+	tny-camel-session.h
+
+libtinymail_camel_1_0_la_SOURCES = 		\
+	tny-msg-account-priv.h			\
+	$(libtinymail_camel_1_0_headers)	\
+	tny-msg.c				\
+	tny-msg-header.c 			\
+	tny-msg-body.c				\
+	tny-msg-attachment.c			\
+	tny-msg-folder.c			\
+	tny-msg-account.c			\
+	tny-camel-session.c
+
+libtinymail_camel_1_0_la_LIBADD =		\
+	$(LIBTINYMAILCAMEL_LIBS)		\
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
+
+libtinymail_camel_1_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
+libtinymail_camel_1_0include_HEADERS = $(libtinymail_camel_1_0_headers)
+
+%-$(API_VERSION).pc: %.pc
+	cp $< $@
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libtinymail-camel-$(API_VERSION).pc
+EXTRA_DIST = $(pkgconfig_DATA:-$(API_VERSION).pc=.pc.in)
+
+DISTCLEANFILES = $(pkgconfig_DATA)
