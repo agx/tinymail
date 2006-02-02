@@ -37,9 +37,7 @@ static void
 tny_msg_header_set_camel_message_info_priv  (TnyMsgHeaderPriv *priv, CamelMessageInfo *camel_message_info)
 {
 	if (priv->message_info)
-		camel_object_unref (priv->message_info);
-
-	camel_object_ref (camel_message_info);
+		g_free (priv->message_info);
 
 	priv->message_info = camel_message_info;
 

@@ -60,6 +60,36 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 	}
 
+	return;
+}
+
+
+
+static void
+on_header_view_tree_selection_changed (GtkTreeSelection *selection, 
+		gpointer user_data)
+{
+
+	GtkTreeView *header_view = GTK_TREE_VIEW (user_data);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+	TnyMsgHeaderIface *header;
+
+	if (gtk_tree_selection_get_selected (selection, &model, &iter))
+	{
+		GtkTreeModel *header_model;
+		GList *headers;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+			&header, -1);
+
+		g_print ("You selected header: %s\n", 
+			tny_msg_header_iface_get_subject (header));
+
+	}
+
+	return;
 }
 
 int 
@@ -121,14 +151,7 @@ main (int argc, char **argv)
 	gtk_tree_view_append_column (GTK_TREE_VIEW(mailbox_view), column);
 
 	/* header_view columns */
-	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes ("ID", renderer,
-		"text", TNY_MSG_HEADER_LIST_MODEL_ID_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, 0); 
-	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
-	gtk_tree_view_column_set_fixed_width (column, 200);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(header_view), column);
-
+	
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("From", renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
@@ -164,6 +187,12 @@ main (int argc, char **argv)
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_mailbox_view_tree_selection_changed), header_view);
+
+
+	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (header_view));
+	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
+	g_signal_connect (G_OBJECT (select), "changed",
+		G_CALLBACK (on_header_view_tree_selection_changed), header_view);
 
 	gtk_box_pack_start (GTK_BOX (hbox), mailbox_sw, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (hbox), header_sw, FALSE, FALSE, 0);

@@ -59,11 +59,12 @@ tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 {		
 	switch (column) 
 	{
-		case TNY_MSG_HEADER_LIST_MODEL_ID_COLUMN:
 		case TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN:
 		case TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN:
 		case TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN:
 			return G_TYPE_STRING;
+		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
+			return G_TYPE_POINTER;
 		default:
 		return G_TYPE_INVALID;
 	}
@@ -132,9 +133,9 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	
 	switch (column) 
 	{
-		case TNY_MSG_HEADER_LIST_MODEL_ID_COLUMN:
-			g_value_init (value, G_TYPE_INT);
-			g_value_set_string (value, tny_msg_header_iface_get_id (header));
+		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
+			g_value_init (value, G_TYPE_POINTER);
+			g_value_set_pointer (value, header);
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
