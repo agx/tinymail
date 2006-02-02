@@ -50,7 +50,7 @@ tny_msg_folder_iface_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *fol
 }
 
 const TnyMsgIface*
-tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
+tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_message_func (self, header);
 }

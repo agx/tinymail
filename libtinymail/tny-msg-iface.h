@@ -46,6 +46,10 @@ struct _TnyMsgIfaceClass
 	gint (*add_attachment_func)   (TnyMsgIface *self, TnyMsgAttachmentIface *attachment);
 	void (*del_attachment_func)   (TnyMsgIface *self, gint id);
 
+        const TnyMsgFolderIface*
+             (*get_folder_func)       (TnyMsgIface *self);
+        void (*set_folder_func)       (TnyMsgIface *self, const TnyMsgFolderIface *folder);
+
 	void (*set_body_func)         (TnyMsgIface *self, TnyMsgBodyIface *body);
 	void (*set_header_func)       (TnyMsgIface *self, TnyMsgHeaderIface *header);
 };
@@ -59,6 +63,10 @@ const TnyMsgHeaderIface*            tny_msg_iface_get_header       (TnyMsgIface 
 /* Must also set attachment's id (therefore not a const) */
 gint tny_msg_iface_add_attachment   (TnyMsgIface *self, TnyMsgAttachmentIface *attachment);
 void tny_msg_iface_del_attachment   (TnyMsgIface *self, gint id);
+
+const TnyMsgFolderIface*
+               tny_msg_iface_get_folder    (TnyMsgIface *self);
+void           tny_msg_iface_set_folder    (TnyMsgIface *self, const TnyMsgFolderIface *folder);
 
 void tny_msg_iface_set_body         (TnyMsgIface *self, TnyMsgBodyIface *body);
 void tny_msg_iface_set_header       (TnyMsgIface *self, TnyMsgHeaderIface *header);

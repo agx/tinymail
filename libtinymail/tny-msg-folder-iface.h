@@ -44,7 +44,7 @@ struct _TnyMsgFolderIfaceClass
 	void          (*add_folder_func)   (TnyMsgFolderIface *self, TnyMsgFolderIface *folder);
 
 	const TnyMsgIface*  
-                       (*get_message_func)  (TnyMsgFolderIface *self, TnyMsgHeaderIface *header);
+                       (*get_message_func)  (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header);
 	const GList*   (*get_headers_func)  (TnyMsgFolderIface *self);
 
 	const gchar*   (*get_name_func)    (TnyMsgFolderIface *self);
@@ -66,7 +66,7 @@ const GList*   tny_msg_folder_iface_get_folders  (TnyMsgFolderIface *self);
 void           tny_msg_folder_iface_add_folder   (TnyMsgFolderIface *self, TnyMsgFolderIface *folder);
 
 const TnyMsgIface*
-               tny_msg_folder_iface_get_message  (TnyMsgFolderIface *self, TnyMsgHeaderIface *header);
+               tny_msg_folder_iface_get_message  (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header);
 const GList*   tny_msg_folder_iface_get_headers  (TnyMsgFolderIface *self);
 
 const TnyMsgAccountIface*  

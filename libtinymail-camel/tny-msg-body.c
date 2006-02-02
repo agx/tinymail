@@ -44,10 +44,9 @@ tny_msg_body_set_data (TnyMsgBodyIface *self, gchar *data)
 {
 	TnyMsgBodyPriv *priv = TNY_MSG_BODY_GET_PRIVATE (self);
 
-	if (priv->data)
-		g_free (priv->data);
+	/* No allocation in this implementation, the TnyMsg has the allocation */
 
-	priv->data = g_strdup (data);
+	priv->data = data;
 
 	return;
 }
@@ -57,9 +56,6 @@ tny_msg_body_finalize (GObject *object)
 {
 	TnyMsgBody *self = (TnyMsgBody*) object;
 	TnyMsgBodyPriv *priv = TNY_MSG_BODY_GET_PRIVATE (self);
-
-	if (priv->data)
-		g_free (priv->data);
 
 	(*parent_class->finalize) (object);
 

@@ -166,11 +166,11 @@ destroy_cached_value (gpointer data)
 
 
 static const TnyMsgIface*
-tny_msg_folder_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
+tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyMsgIface *message = NULL;
-	const gchar *id = tny_msg_header_iface_get_id (header);
+	const gchar *id = tny_msg_header_iface_get_id (TNY_MSG_HEADER_IFACE (header));
 
 	load_folder (priv);
 
@@ -185,16 +185,24 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
 	
 	if (!message)
 	{
-		CamelException ex;
-		CamelMimeMessage *camel_message = camel_folder_get_message  
-			(priv->folder, (const char *) id, &ex);
+		CamelException *ex = camel_exception_new ();
+		camel_exception_init (ex);
 
-		if (camel_exception_get_id (&ex) == CAMEL_EXCEPTION_NONE)
+		CamelMimeMessage *camel_message = camel_folder_get_message  
+			(priv->folder, (const char *) id, ex);
+
+		if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
 		{
 			message = TNY_MSG_IFACE (tny_msg_new ());
+
+			tny_msg_iface_set_folder (message, self);
+			tny_msg_iface_set_header (message, TNY_MSG_HEADER_IFACE (header));
+
 			_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
 			g_hash_table_insert (priv->cached_msgs, (gpointer)id, message);
 		}
+
+		camel_exception_free (ex);
 	}
 
 	return message;

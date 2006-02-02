@@ -19,6 +19,21 @@
 
 #include <tny-msg-iface.h>
 
+const TnyMsgFolderIface* 
+tny_msg_iface_get_folder (TnyMsgIface *self)
+{
+	return TNY_MSG_IFACE_GET_CLASS (self)->get_folder_func (self);
+}
+
+
+void
+tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
+{
+	TNY_MSG_IFACE_GET_CLASS (self)->set_folder_func (self, folder);
+	return;
+}
+
+
 const GList*
 tny_msg_iface_get_attachments (TnyMsgIface *self)
 {

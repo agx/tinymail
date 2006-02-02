@@ -32,6 +32,8 @@ struct _TnyMsgPriv
 	TnyMsgBodyIface *body;
 
 	GList *attachments;
+
+	TnyMsgFolderIface *folder;
 };
 
 void  _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message);

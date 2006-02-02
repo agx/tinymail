@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <string.h>
+
 #include <gtk/gtk.h>
 
 #include <tny-msg-account-iface.h>
@@ -63,22 +65,86 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	return;
 }
 
+static GtkWidget*
+create_msg_window (TnyMsgIface *msg)
+{
+	TnyMsgHeaderIface *header;
+	GList *attachments;
+	TnyMsgBodyIface *body;
 
+	GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	GtkTextView *textview = GTK_TEXT_VIEW (gtk_text_view_new ());
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (textview);
+	const gchar *text;
+
+	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (msg));
+	body = TNY_MSG_BODY_IFACE (tny_msg_iface_get_body (msg));
+	attachments = (GList*)tny_msg_iface_get_attachments (msg);
+	text = tny_msg_body_iface_get_data (body);
+
+
+	gtk_window_set_title (GTK_WINDOW (window), tny_msg_header_iface_get_subject (header));
+	gtk_text_buffer_set_text (buffer, text, strlen(text));
+
+	gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (textview));
+
+	return window;
+}
+
+
+static void
+on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
+			GtkTreeViewColumn *col,  gpointer userdata)
+{
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+		
+	model = gtk_tree_view_get_model(treeview);
+	
+	if (gtk_tree_model_get_iter(model, &iter, path))
+	{
+		TnyMsgHeaderIface *header;
+		
+
+		GtkWindow *msgwin;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+			&header, -1);
+		
+		if (header)
+		{
+
+			const TnyMsgFolderIface *folder;
+			const TnyMsgIface *msg;
+			const TnyMsgHeaderIface *nheader;
+
+			folder = tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE (header));
+			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
+			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
+
+			g_print ("You activated header: %s\n", 
+				tny_msg_header_iface_get_subject (TNY_MSG_HEADER_IFACE (header)));
+			g_print ("You activated header: %s\n", 
+				tny_msg_header_iface_get_subject (TNY_MSG_HEADER_IFACE (nheader)));
+	
+			msgwin = GTK_WINDOW (create_msg_window (TNY_MSG_IFACE (msg)));
+	
+			gtk_widget_show_all (GTK_WIDGET (msgwin));
+		}
+	}
+}
 
 static void
 on_header_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
 {
-
-	GtkTreeView *header_view = GTK_TREE_VIEW (user_data);
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	TnyMsgHeaderIface *header;
 
 	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
-		GtkTreeModel *header_model;
-		GList *headers;
+		TnyMsgHeaderIface *header;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
@@ -107,14 +173,13 @@ main (int argc, char **argv)
 	GtkTreeSelection *select;
 	gint t = 0, i = 0;
 	TnyMsgAccountIface *account;
-
+	
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
 
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title (GTK_WINDOW (window), "Tiny Mail");
-	g_signal_connect (window, "destroy",
-		G_CALLBACK (gtk_exit), &window);
+
 	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
 	hbox = gtk_hbox_new (FALSE, 8);
 	gtk_container_add (GTK_CONTAINER (window), hbox);
@@ -194,11 +259,19 @@ main (int argc, char **argv)
 	g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_header_view_tree_selection_changed), header_view);
 
+
+	g_signal_connect(G_OBJECT (header_view), "row-activated", 
+		G_CALLBACK (on_header_view_tree_row_activated), header_view);
+
+
 	gtk_box_pack_start (GTK_BOX (hbox), mailbox_sw, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (hbox), header_sw, FALSE, FALSE, 0);
 
 	gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
 	gtk_widget_show_all (GTK_WIDGET(window));
+
+	g_signal_connect (window, "destroy",
+		G_CALLBACK (gtk_exit), &window);
 
 	gtk_main();
 

@@ -42,7 +42,32 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 
 	camel_object_ref (message);
 
+	priv->body = TNY_MSG_BODY_IFACE (tny_msg_body_new ());
+
+	/* TODO: Blah! */
+	tny_msg_body_iface_set_data (priv->body,
+		(gchar*)camel_mime_message_get_subject (message));
+
 	priv->message = message;
+
+	return;
+}
+
+const TnyMsgFolderIface* 
+tny_msg_get_folder (TnyMsgIface *self)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	
+	return (const TnyMsgFolderIface*)priv->folder;
+}
+
+
+void
+tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+
+	priv->folder = (TnyMsgFolderIface*)folder;
 
 	return;
 }
@@ -209,9 +234,14 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_attachments_func = tny_msg_get_attachments;
 	klass->get_body_func = tny_msg_get_body;		
 	klass->get_header_func = tny_msg_get_header;
+	klass->set_header_func = tny_msg_set_header;
+
 	klass->add_attachment_func = tny_msg_add_attachment;
 	klass->del_attachment_func = tny_msg_del_attachment;
 	klass->set_body_func = tny_msg_set_body;
+
+	klass->set_folder_func = tny_msg_set_folder;
+	klass->get_folder_func = tny_msg_get_folder;
 
 	return;
 }
