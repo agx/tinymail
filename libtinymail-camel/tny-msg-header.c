@@ -35,6 +35,8 @@ static GObjectClass *parent_class = NULL;
 #define TNY_MSG_HEADER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_HEADER_TYPE, TnyMsgHeaderPriv))
 
+/* TODO: Remove debugging purpose */
+static gint allocations=0;
 
 static void
 tny_msg_header_set_camel_message_info_priv  (TnyMsgHeaderPriv *priv, CamelMessageInfo *camel_message_info)
@@ -50,8 +52,13 @@ tny_msg_header_set_camel_message_info_priv  (TnyMsgHeaderPriv *priv, CamelMessag
 static void
 unload_msg_header (TnyMsgHeaderPriv *priv)
 {
-	if (priv->message_info)
+	if (priv->message_info) 
+	{
 		camel_message_info_free (priv->message_info);
+		/* TODO: Remove debugging purpose */
+		allocations--;
+		g_print ("Deallocation. Current = %d\n", allocations);
+	}
 
 	priv->message_info = NULL;
 
@@ -66,6 +73,10 @@ load_msg_header (TnyMsgHeaderPriv *priv)
 		CamelFolder *folder = _tny_msg_folder_get_camel_folder (priv->folder);
 		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, priv->id);
 		tny_msg_header_set_camel_message_info_priv (priv, msginfo);
+
+		/* TODO: Remove debugging purpose */
+		allocations++;
+		g_print ("Allocation. Current = %d\n", allocations);
 	}
 
 	return;
@@ -86,14 +97,13 @@ tny_msg_header_get_folder (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 	
-	return (gconstpointer)priv->folder;
+	return priv->folder;
 }
 
 
 void
-tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* folder_in)
+tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* folder)
 {
-	const TnyMsgFolderIface *folder = folder_in;
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
 	priv->folder = (TnyMsgFolderIface*)folder;
@@ -105,7 +115,9 @@ static const gchar*
 tny_msg_header_get_from (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
 	load_msg_header (priv);
+
 	return camel_message_info_from (priv->message_info);
 }
 
@@ -113,7 +125,9 @@ static const gchar*
 tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
 	load_msg_header (priv);
+
 	return camel_message_info_subject (priv->message_info);
 }
 
@@ -122,7 +136,9 @@ static const gchar*
 tny_msg_header_get_to (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
 	load_msg_header (priv);
+
 	return camel_message_info_to (priv->message_info);
 }
 
@@ -130,7 +146,9 @@ static const gchar*
 tny_msg_header_get_id (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
 	load_msg_header (priv);
+
 	return camel_message_info_uid (priv->message_info);
 }
 
@@ -139,17 +157,13 @@ tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
+	unload_msg_header (priv);
+
 	if (priv->id)
-	{
-		if (priv->message_info)
-			camel_message_info_free (priv->message_info);
-
-		priv->message_info = NULL;
-
 		g_free (priv->id);
-	}
 
 	priv->id = g_strdup (id);
+
 	return;
 }
 
@@ -185,10 +199,7 @@ tny_msg_header_uncache (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
-	if (priv->message_info != NULL)
-		camel_message_info_free (priv->message_info);
-
-	priv->message_info = NULL;
+	unload_msg_header (priv);
 
 	return;
 }
@@ -199,10 +210,7 @@ tny_msg_header_finalize (GObject *object)
 	TnyMsgHeader *self = (TnyMsgHeader*) object;
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
 
-	if (priv->message_info)
-		camel_message_info_free (priv->message_info);
-
-	priv->message_info = NULL;
+	unload_msg_header (priv);
 
 	(*parent_class->finalize) (object);
 
