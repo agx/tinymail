@@ -21,21 +21,21 @@
 
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header.h>
-#include <tny-msg-folder-iface.h>
 
 static GObjectClass *parent_class = NULL;
 
+#include "tny-msg-folder-priv.h"
 #include "tny-msg-header-priv.h"
+
+#include <camel/camel-folder.h>
 
 #define TNY_MSG_HEADER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_HEADER_TYPE, TnyMsgHeaderPriv))
 
 
-void
-_tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
+static void
+tny_msg_header_set_camel_message_info_priv  (TnyMsgHeaderPriv *priv, CamelMessageInfo *camel_message_info)
 {
-	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
-
 	if (priv->message_info)
 		camel_object_unref (priv->message_info);
 
@@ -46,24 +46,43 @@ _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *ca
 	return;
 }
 
-const TnyMsgFolderIface* 
+static void
+load_msg_header (TnyMsgHeaderPriv *priv)
+{
+	if (!priv->message_info && priv->folder && priv->id)
+	{
+		CamelFolder *folder = _tny_msg_folder_get_camel_folder (priv->folder);
+		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, priv->id);
+		tny_msg_header_set_camel_message_info_priv (priv, msginfo);
+	}
+
+	return;
+}
+
+void
+_tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
+
+	tny_msg_header_set_camel_message_info_priv (priv, camel_message_info);
+
+	return;
+}
+
+gconstpointer 
 tny_msg_header_get_folder (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 	
-	return priv->folder;
+	return (gconstpointer)priv->folder;
 }
 
 
 void
-tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
+tny_msg_header_set_folder (TnyMsgHeaderIface *self, gconstpointer folder_in)
 {
+	const TnyMsgFolderIface *folder = folder_in;
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-	
-	if (priv->folder)
-		g_object_unref (G_OBJECT (priv->folder));
-
-	g_object_ref (G_OBJECT (folder));
 
 	priv->folder = (TnyMsgFolderIface*)folder;
 
@@ -74,7 +93,7 @@ static const gchar*
 tny_msg_header_get_from (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-	
+	load_msg_header (priv);
 	return camel_message_info_from (priv->message_info);
 }
 
@@ -82,7 +101,7 @@ static const gchar*
 tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-
+	load_msg_header (priv);
 	return camel_message_info_subject (priv->message_info);
 }
 
@@ -91,7 +110,7 @@ static const gchar*
 tny_msg_header_get_to (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-
+	load_msg_header (priv);
 	return camel_message_info_to (priv->message_info);
 }
 
@@ -99,13 +118,23 @@ static const gchar*
 tny_msg_header_get_id (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-
+	load_msg_header (priv);
 	return camel_message_info_uid (priv->message_info);
 }
 
 static void
 tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 {
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	if (priv->id)
+	{
+		if (priv->message_info)
+			camel_object_unref (priv->message_info);
+		g_free (priv->id);
+	}
+
+	priv->id = g_strdup (id);
 	return;
 }
 
@@ -132,9 +161,6 @@ tny_msg_header_finalize (GObject *object)
 {
 	TnyMsgHeader *self = (TnyMsgHeader*) object;
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
-
-	if (priv->folder)
-		g_object_unref (G_OBJECT (priv->folder));
 
 	if (priv->message_info)
 		camel_object_unref (priv->message_info);
@@ -168,6 +194,9 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_to_func = tny_msg_header_set_to;
 	klass->set_subject_func = tny_msg_header_set_subject;
 	
+	klass->set_folder_func = tny_msg_header_set_folder;
+	klass->get_folder_func = tny_msg_header_get_folder;
+
 	klass->has_cache_func = NULL;
 	klass->uncache_func = NULL;
 

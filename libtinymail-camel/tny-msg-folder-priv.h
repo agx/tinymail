@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_HEADER_PRIV_H
-#define TNY_MSG_HEADER_PRIV_H
+#ifndef TNY_MSG_FOLDER_PRIV_H
+#define TNY_MSG_FOLDER_PRIV_H
 
 /* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -19,20 +19,24 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+#include <glib.h>
+#include <camel/camel-folder.h>
+#include <tny-msg-account-iface.h>
+#include <tny-msg-folder-iface.h>
 
-#include <camel/camel.h>
-#include <camel/camel-folder-summary.h>
+typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
 
-typedef struct _TnyMsgHeaderPriv TnyMsgHeaderPriv;
-
-struct _TnyMsgHeaderPriv
+struct _TnyMsgFolderPriv
 {
-	TnyMsgFolderIface *folder;
-	CamelMessageInfo *message_info;
-	gchar *id;
+	GList *cached_hdrs;
+	GHashTable *cached_msgs;
+
+	CamelFolder *folder;
+	gchar *folder_name;
+	TnyMsgAccountIface *account;
+	GList *folders;
 };
 
-void  _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info);
-
+CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);
 
 #endif

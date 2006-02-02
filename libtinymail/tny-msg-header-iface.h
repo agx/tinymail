@@ -46,7 +46,7 @@ struct _TnyMsgHeaderIfaceClass
 	const gchar*   (*get_id_func)             (TnyMsgHeaderIface *self);
 
          
-        gconstpointer       (*get_folder_func)         (TnyMsgHeaderIface *self);
+        gconstpointer  (*get_folder_func)         (TnyMsgHeaderIface *self);
         void           (*set_folder_func)         (TnyMsgHeaderIface *self, gconstpointer folder);
 
 	void           (*set_subject_func)        (TnyMsgHeaderIface *self, const gchar *subject);
