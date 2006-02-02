@@ -17,6 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+
+/* TnyMsgHeader is a proxy for real subject CamelMessageInfo */
+
 #include <glib.h>
 
 #include <tny-msg-header-iface.h>
@@ -40,6 +43,16 @@ tny_msg_header_set_camel_message_info_priv  (TnyMsgHeaderPriv *priv, CamelMessag
 		g_free (priv->message_info);
 
 	priv->message_info = camel_message_info;
+
+	return;
+}
+
+static void
+unload_msg_header (TnyMsgHeaderPriv *priv)
+{
+	if (priv->message_info)
+		g_free (priv->message_info);
+	priv->message_info = NULL;
 
 	return;
 }
@@ -154,6 +167,28 @@ tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 	return;
 }
 
+
+static const gboolean 
+tny_msg_header_has_cache (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	return (priv->message_info != NULL);
+}
+
+static void
+tny_msg_header_uncache (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	if (priv->message_info != NULL)
+		g_free (priv->message_info);
+
+	priv->message_info = NULL;
+
+	return;
+}
+
 static void
 tny_msg_header_finalize (GObject *object)
 {
@@ -195,8 +230,8 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_folder_func = tny_msg_header_set_folder;
 	klass->get_folder_func = tny_msg_header_get_folder;
 
-	klass->has_cache_func = NULL;
-	klass->uncache_func = NULL;
+	klass->has_cache_func = tny_msg_header_has_cache;
+	klass->uncache_func = tny_msg_header_uncache;
 
 	return;
 }
