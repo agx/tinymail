@@ -45,6 +45,9 @@ struct _TnyMsgHeaderIfaceClass
 	const gchar*   (*get_from_func)           (TnyMsgHeaderIface *self);
 	const gchar*   (*get_id_func)             (TnyMsgHeaderIface *self);
 
+         
+        gconstpointer       (*get_folder_func)         (TnyMsgHeaderIface *self);
+        void           (*set_folder_func)         (TnyMsgHeaderIface *self, gconstpointer folder);
 
 	void           (*set_subject_func)        (TnyMsgHeaderIface *self, const gchar *subject);
 	void           (*set_to_func)             (TnyMsgHeaderIface *self, const gchar *to);
@@ -66,6 +69,10 @@ void           tny_msg_header_iface_set_id        (TnyMsgHeaderIface *self, cons
 void           tny_msg_header_iface_set_from      (TnyMsgHeaderIface *self, const gchar *from);
 void           tny_msg_header_iface_set_to        (TnyMsgHeaderIface *self, const gchar *to);
 void           tny_msg_header_iface_set_subject   (TnyMsgHeaderIface *self, const gchar *subject);
+
+
+gconstpointer  tny_msg_header_iface_get_folder    (TnyMsgHeaderIface *self);
+void           tny_msg_header_iface_set_folder    (TnyMsgHeaderIface *self, gconstpointer folder);
 
 void           tny_msg_header_iface_uncache       (TnyMsgHeaderIface *self);
 const gboolean tny_msg_header_iface_has_cache     (TnyMsgHeaderIface *self);

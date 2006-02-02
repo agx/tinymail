@@ -20,6 +20,7 @@
 #include <tny-msg-header-proxy.h>
 #include <tny-msg-header.h>
 #include <tny-msg-header-iface.h>
+#include <tny-msg-folder-iface.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -29,6 +30,37 @@ tny_msg_header_proxy_get_real (TnyMsgHeaderProxy *self)
 	/* TODO: Implement getting the real TnyMsgHeader instance */
 
 	return tny_msg_header_new ();
+}
+
+const TnyMsgFolderIface* 
+tny_msg_header_proxy_get_folder (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
+
+	if (real == NULL)
+	{
+		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
+		TNY_MSG_HEADER_PROXY (self)->real = real;
+	}
+
+	return tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE(real));
+}
+
+
+void
+tny_msg_header_proxy_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
+{
+	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
+
+	if (real == NULL)
+	{
+		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
+		TNY_MSG_HEADER_PROXY (self)->real = real;
+	}
+
+	tny_msg_header_iface_set_folder (TNY_MSG_HEADER_IFACE (real), folder);
+
+	return;
 }
 
 static const gchar*

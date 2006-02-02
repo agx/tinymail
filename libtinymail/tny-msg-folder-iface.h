@@ -22,8 +22,8 @@
 
 #include <glib.h>
 
-#include <tny-msg-header-iface.h>
 #include <tny-msg-iface.h>
+#include <tny-msg-header-iface.h>
 #include <tny-msg-account-iface.h>
 
 G_BEGIN_DECLS
@@ -45,8 +45,9 @@ struct _TnyMsgFolderIfaceClass
 	const GList*  (*get_folders_func)  (TnyMsgFolderIface *self);
 	void          (*add_folder_func)   (TnyMsgFolderIface *self, TnyMsgFolderIface *folder);
 
-	const GList*  (*get_messages_func) (TnyMsgFolderIface *self);
-	const GList*  (*get_headers_func)  (TnyMsgFolderIface *self);
+	const TnyMsgIface*  
+                       (*get_message_func)  (TnyMsgFolderIface *self, TnyMsgHeaderIface *header);
+	const GList*   (*get_headers_func)  (TnyMsgFolderIface *self);
 
 	const gchar*   (*get_name_func)    (TnyMsgFolderIface *self);
 	const gchar*   (*get_id_func)      (TnyMsgFolderIface *self);
@@ -61,12 +62,13 @@ struct _TnyMsgFolderIfaceClass
 	const gboolean (*has_cache_func)   (TnyMsgFolderIface *self);
 };
 
-GType          tny_msg_folder_iface_get_type            (void);
+GType          tny_msg_folder_iface_get_type     (void);
 
 const GList*   tny_msg_folder_iface_get_folders  (TnyMsgFolderIface *self);
 void           tny_msg_folder_iface_add_folder   (TnyMsgFolderIface *self, TnyMsgFolderIface *folder);
 
-const GList*   tny_msg_folder_iface_get_messages (TnyMsgFolderIface *self);
+const TnyMsgIface*
+               tny_msg_folder_iface_get_message  (TnyMsgFolderIface *self, TnyMsgHeaderIface *header);
 const GList*   tny_msg_folder_iface_get_headers  (TnyMsgFolderIface *self);
 
 const TnyMsgAccountIface*  

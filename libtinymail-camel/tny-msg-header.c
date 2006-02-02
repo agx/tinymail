@@ -21,29 +21,61 @@
 
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header.h>
+#include <tny-msg-folder-iface.h>
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyMsgHeaderPriv TnyMsgHeaderPriv;
-
-struct _TnyMsgHeaderPriv
-{
-	gchar *from;
-	gchar *to;
-	gchar *subject;
-	gint id;
-};
+#include "tny-msg-header-priv.h"
 
 #define TNY_MSG_HEADER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_HEADER_TYPE, TnyMsgHeaderPriv))
 
+
+void
+_tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
+
+	if (priv->message_info)
+		camel_object_unref (priv->message_info);
+
+	camel_object_ref (camel_message_info);
+
+	priv->message_info = camel_message_info;
+
+	return;
+}
+
+const TnyMsgFolderIface* 
+tny_msg_header_get_folder (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+	
+	return priv->folder;
+}
+
+
+void
+tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+	
+	if (priv->folder)
+		g_object_unref (G_OBJECT (priv->folder));
+
+	g_object_ref (G_OBJECT (folder));
+
+	priv->folder = (TnyMsgFolderIface*)folder;
+
+	return;
+}
 	
 static const gchar*
 tny_msg_header_get_from (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 	
-	return priv->from;
+	return camel_message_info_from (priv->message_info);
 }
 
 static const gchar*
@@ -51,7 +83,7 @@ tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
-	return priv->subject;
+	return camel_message_info_subject (priv->message_info);
 }
 
 
@@ -60,63 +92,38 @@ tny_msg_header_get_to (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
-	return priv->to;
+	return camel_message_info_to (priv->message_info);
 }
 
-static const gint
+static const gchar*
 tny_msg_header_get_id (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
-	return priv->id;
+	return camel_message_info_uid (priv->message_info);
 }
 
 static void
-tny_msg_header_set_id (TnyMsgHeaderIface *self, gint id)
+tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 {
-	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-
-	priv->id = id;
-
 	return;
 }
 
 static void
 tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
 {
-	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-
-	if (priv->from)
-		g_free (priv->from);
-
-	priv->from = g_strdup (from);
-
 	return;
 }
 
 static void
 tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
 {
-	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-
-	if (priv->to)
-		g_free (priv->to);
-
-	priv->to = g_strdup (to);
-
 	return;
 }
 
 static void
 tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 {
-	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
-
-	if (priv->subject)
-		g_free (priv->subject);
-
-	priv->subject = g_strdup (subject);
-
 	return;
 }
 
@@ -126,14 +133,11 @@ tny_msg_header_finalize (GObject *object)
 	TnyMsgHeader *self = (TnyMsgHeader*) object;
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
 
-	if (priv->from)
-		g_free (priv->from);
+	if (priv->folder)
+		g_object_unref (G_OBJECT (priv->folder));
 
-	if (priv->to)
-		g_free (priv->to);
-
-	if (priv->subject)
-		g_free (priv->subject);
+	if (priv->message_info)
+		camel_object_unref (priv->message_info);
 
 	(*parent_class->finalize) (object);
 
@@ -190,15 +194,11 @@ static void
 tny_msg_header_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMsgHeader *self = (TnyMsgHeader *)instance;
-	TnyMsgHeaderIface *iface = TNY_MSG_HEADER_IFACE (self);
-	/* TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self); */
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
 
-	/* TODO: Remove these default values */
+	priv->folder = NULL;
+	priv->message_info = NULL;
 
-	tny_msg_header_set_from (iface, "From");
-	tny_msg_header_set_to (iface, "To");
-	tny_msg_header_set_subject (iface, "Subject");
-	
 	return;
 }
 

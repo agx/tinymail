@@ -45,6 +45,9 @@ typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
 
 struct _TnyMsgFolderPriv
 {
+	GList *cached_hdrs;
+	GHashTable *cached_msgs;
+
 	CamelFolder *folder;
 	gchar *folder_name;
 	TnyMsgAccountIface *account;
@@ -118,28 +121,92 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyMsgAccountIface *a
 	return;
 }
 
+static void
+add_message_with_uid (gpointer data, gpointer user_data)
+{
+	CamelMessageInfo *msginfo = data;
+	TnyMsgFolderIface *self = user_data;
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (
+		tny_msg_header_new ());
+
+	
+	_tny_msg_header_set_camel_message_info (TNY_MSG_HEADER (header), msginfo);
+	tny_msg_header_iface_set_folder (header, self);
+
+	priv->cached_hdrs = g_list_append (priv->cached_hdrs, header);
+
+	return;
+}
+
 static const GList*
 tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
-
 	load_folder (priv);
 
-	/* TODO: Implement */
+	/* TODO: Cache this on disk, compare it. Don't just cache in memory */
 
-	return NULL;
+	if (!priv->cached_hdrs)
+	{
+		GPtrArray *uids = camel_folder_get_summary (priv->folder);
+		g_ptr_array_foreach (uids, add_message_with_uid, self);
+		camel_folder_free_uids (priv->folder, uids);
+	}
+
+	return priv->cached_hdrs;
 }
 
-static const GList*
-tny_msg_folder_get_messages (TnyMsgFolderIface *self)
+static void
+destroy_cached_key (gpointer data)
+{
+	/* data is a const */
+	return;
+}
+
+
+static void
+destroy_cached_value (gpointer data)
+{
+	/* Data is a TnyMsgIface or a TnyMsgHeaderIface */
+	g_object_unref (G_OBJECT (data));
+	return;
+}
+
+
+static const TnyMsgIface*
+tny_msg_folder_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyMsgIface *message = NULL;
+	const gchar *id = tny_msg_header_iface_get_id (header);
 
 	load_folder (priv);
 
-	/* TODO: Implement */
+	if (!priv->cached_msgs)
+	{
+		priv->cached_msgs = g_hash_table_new_full 
+			(g_str_hash, g_str_equal, destroy_cached_key,
+			destroy_cached_value);
+	} else {
+		message = g_hash_table_lookup (priv->cached_msgs, id);
+	}
+	
+	if (!message)
+	{
+		CamelException ex;
+		CamelMimeMessage *camel_message = camel_folder_get_message  
+			(priv->folder, (const char *) id, &ex);
 
-	return NULL;
+		if (camel_exception_get_id (&ex) == CAMEL_EXCEPTION_NONE)
+		{
+			message = TNY_MSG_IFACE (tny_msg_new ());
+			_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
+			g_hash_table_insert (priv->cached_msgs, (gpointer)id, message);
+		}
+	}
+
+	return message;
 }
 
 
@@ -236,6 +303,7 @@ tny_msg_folder_new (void)
 	return self;
 }
 
+
 static void
 tny_msg_folder_finalize (GObject *object)
 {
@@ -244,6 +312,12 @@ tny_msg_folder_finalize (GObject *object)
 
 	if (priv->folder)
 		camel_object_unref (priv->folder);
+
+	if (priv->cached_msgs)
+		g_hash_table_destroy (priv->cached_msgs);
+
+	if (priv->cached_hdrs)
+		g_list_foreach (priv->cached_hdrs, (GFunc)g_object_unref, NULL);
 
 	(*parent_class->finalize) (object);
 
@@ -257,7 +331,7 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyMsgFolderIfaceClass *klass = (TnyMsgFolderIfaceClass *)g_iface;
 
 	klass->get_headers_func = tny_msg_folder_get_headers;
-	klass->get_messages_func = tny_msg_folder_get_messages;
+	klass->get_message_func = tny_msg_folder_get_message;
 
 	klass->set_id_func = tny_msg_folder_set_id;
 	klass->get_id_func = tny_msg_folder_get_id;
@@ -300,6 +374,8 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->folder = NULL;
 	priv->folders = NULL;
+	priv->cached_hdrs = NULL;
+	priv->cached_msgs = NULL;
 
 	return;
 }

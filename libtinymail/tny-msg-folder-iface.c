@@ -18,6 +18,7 @@
  */
 
 #include <tny-msg-folder-iface.h>
+#include <tny-msg-header-iface.h>
 
 
 const TnyMsgAccountIface*  
@@ -48,10 +49,10 @@ tny_msg_folder_iface_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *fol
 	return;
 }
 
-const GList*
-tny_msg_folder_iface_get_messages (TnyMsgFolderIface *self)
+const TnyMsgIface*
+tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
 {
-	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_messages_func (self);
+	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_message_func (self, header);
 }
 
 const GList*

@@ -27,17 +27,25 @@
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyMsgPriv TnyMsgPriv;
-
-struct _TnyMsgPriv
-{
-	TnyMsgHeaderIface *header;
-	TnyMsgBodyIface *body;
-	GList *attachments;
-};
+#include "tny-msg-priv.h"
 
 #define TNY_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_TYPE, TnyMsgPriv))
+
+void
+_tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
+
+	if (priv->message)
+		camel_object_unref (priv->message);
+
+	camel_object_ref (message);
+
+	priv->message = message;
+
+	return;
+}
 
 static const GList*
 tny_msg_get_attachments (TnyMsgIface *self)
@@ -228,6 +236,12 @@ static void
 tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMsg *self = (TnyMsg *)instance;
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
+
+	priv->message = NULL;
+	priv->body = NULL;
+	priv->attachments = NULL;
+	priv->header = NULL;
 
 	return;
 }

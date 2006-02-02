@@ -30,7 +30,7 @@ static void
 on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
 {
-/*
+
 	GtkTreeView *header_view = GTK_TREE_VIEW (user_data);
 	GtkTreeIter iter;
 	GtkTreeModel *model;
@@ -59,7 +59,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), header_model);
 
 	}
-*/
+
 }
 
 int 

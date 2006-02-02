@@ -18,6 +18,7 @@
  */
 
 #include <tny-msg-header-iface.h>
+#include <tny-msg-folder-iface.h>
 
 const gchar*
 tny_msg_header_iface_get_id (TnyMsgHeaderIface *self)
@@ -42,6 +43,20 @@ const gchar*
 tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
 {
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_to_func (self);
+}
+
+gconstpointer 
+tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_folder_func (self);
+}
+
+
+void
+tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, gconstpointer folder)
+{
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_folder_func (self, folder);
+	return;
 }
 
 void
