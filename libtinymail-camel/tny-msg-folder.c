@@ -112,7 +112,7 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyMsgAccountIface *a
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
 	if (priv->account)
-		g_object_unref (G_OBJECT (account));
+		g_object_unref (G_OBJECT (priv->account));
 
 	g_object_ref (G_OBJECT (account));
 
@@ -124,20 +124,21 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyMsgAccountIface *a
 static void
 add_message_with_uid (gpointer data, gpointer user_data)
 {
-	CamelMessageInfo *msginfo = data;
+	const char *uid = (const char*)data;
 	TnyMsgFolderIface *self = user_data;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (
 		tny_msg_header_new ());
+	CamelMessageInfo *msginfo = camel_folder_get_message_info (priv->folder, uid);
 
-	
 	_tny_msg_header_set_camel_message_info (TNY_MSG_HEADER (header), msginfo);
-	tny_msg_header_iface_set_folder (header, self);
+	//tny_msg_header_iface_set_folder (header, self);
 
 	priv->cached_hdrs = g_list_append (priv->cached_hdrs, header);
 
 	return;
 }
+
 
 static const GList*
 tny_msg_folder_get_headers (TnyMsgFolderIface *self)
@@ -149,7 +150,11 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 
 	if (!priv->cached_hdrs)
 	{
-		GPtrArray *uids = camel_folder_get_summary (priv->folder);
+		GPtrArray *uids = NULL;
+		CamelException ex;
+
+		camel_folder_refresh_info (priv->folder, &ex);
+		uids = camel_folder_get_uids (priv->folder);
 		g_ptr_array_foreach (uids, add_message_with_uid, self);
 		camel_folder_free_uids (priv->folder, uids);
 	}
@@ -312,6 +317,9 @@ tny_msg_folder_finalize (GObject *object)
 
 	if (priv->folder)
 		camel_object_unref (priv->folder);
+
+	if (priv->account)
+		g_object_unref (G_OBJECT (priv->account));
 
 	if (priv->cached_msgs)
 		g_hash_table_destroy (priv->cached_msgs);
