@@ -39,9 +39,9 @@ static GObjectClass *parent_class = NULL;
 static void
 tny_msg_header_set_camel_message_info_priv  (TnyMsgHeaderPriv *priv, CamelMessageInfo *camel_message_info)
 {
-	if (priv->message_info)
-		g_free (priv->message_info);
 
+	/* camel_message_info_ref (camel_message_info); */
+	
 	priv->message_info = camel_message_info;
 
 	return;
@@ -51,7 +51,8 @@ static void
 unload_msg_header (TnyMsgHeaderPriv *priv)
 {
 	if (priv->message_info)
-		g_free (priv->message_info);
+		camel_message_info_free (priv->message_info);
+
 	priv->message_info = NULL;
 
 	return;
@@ -141,7 +142,10 @@ tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 	if (priv->id)
 	{
 		if (priv->message_info)
-			camel_object_unref (priv->message_info);
+			camel_message_info_free (priv->message_info);
+
+		priv->message_info = NULL;
+
 		g_free (priv->id);
 	}
 
@@ -182,7 +186,7 @@ tny_msg_header_uncache (TnyMsgHeaderIface *self)
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
 	if (priv->message_info != NULL)
-		g_free (priv->message_info);
+		camel_message_info_free (priv->message_info);
 
 	priv->message_info = NULL;
 
@@ -196,7 +200,9 @@ tny_msg_header_finalize (GObject *object)
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
 
 	if (priv->message_info)
-		camel_object_unref (priv->message_info);
+		camel_message_info_free (priv->message_info);
+
+	priv->message_info = NULL;
 
 	(*parent_class->finalize) (object);
 
