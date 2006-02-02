@@ -22,6 +22,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <tny-shared.h>
 
 G_BEGIN_DECLS
 
@@ -31,9 +32,6 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG_ACCOUNT_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_ACCOUNT_IFACE_TYPE))
 #define TNY_IS_MSG_ACCOUNT_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_ACCOUNT_IFACE_TYPE))
 #define TNY_MSG_ACCOUNT_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_MSG_ACCOUNT_IFACE_TYPE, TnyMsgAccountIfaceClass))
-
-typedef struct _TnyMsgAccountIface TnyMsgAccountIface;
-typedef struct _TnyMsgAccountIfaceClass TnyMsgAccountIfaceClass;
 
 struct _TnyMsgAccountIfaceClass
 {

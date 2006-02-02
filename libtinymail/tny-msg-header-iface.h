@@ -22,7 +22,6 @@
 
 #include <glib.h>
 #include <glib-object.h>
-
 #include <tny-shared.h>
 
 G_BEGIN_DECLS

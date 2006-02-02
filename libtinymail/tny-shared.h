@@ -22,10 +22,22 @@
 
 G_BEGIN_DECLS
 
+/* I used forward typedefs to make it possible to cross-reference */
+
+typedef struct _TnyMsgIface TnyMsgIface;
+typedef struct _TnyMsgIfaceClass TnyMsgIfaceClass;
 typedef struct _TnyMsgFolderIface TnyMsgFolderIface;
 typedef struct _TnyMsgFolderIfaceClass TnyMsgFolderIfaceClass;
 typedef struct _TnyMsgHeaderIface TnyMsgHeaderIface;
 typedef struct _TnyMsgHeaderIfaceClass TnyMsgHeaderIfaceClass;
+typedef struct _TnyMsgBodyIface TnyMsgBodyIface;
+typedef struct _TnyMsgBodyIfaceClass TnyMsgBodyIfaceClass;
+typedef struct _TnyMsgAttachmentIface TnyMsgAttachmentIface;
+typedef struct _TnyMsgAttachmentIfaceClass TnyMsgAttachmentIfaceClass;
+typedef struct _TnyMsgAccountIface TnyMsgAccountIface;
+typedef struct _TnyMsgAccountIfaceClass TnyMsgAccountIfaceClass;
+typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
+typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
 
 G_END_DECLS
 

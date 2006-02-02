@@ -21,6 +21,7 @@
  */
 
 #include <glib.h>
+#include <tny-shared.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header.h>
 
@@ -32,9 +33,6 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG_PROXY_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_HEADER_PROXY_TYPE))
 #define TNY_IS_MSG_HEADER_PROXY_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_HEADER_PROXY_TYPE))
 #define TNY_MSG_HEADER_PROXY_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_MSG_HEADER_PROXY_TYPE, TnyMsgHeaderProxyClass))
-
-typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
-typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
 
 struct _TnyMsgHeaderProxy 
 {
