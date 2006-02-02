@@ -45,7 +45,7 @@ tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_to_func (self);
 }
 
-gconstpointer 
+const TnyMsgFolderIface* 
 tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 {
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_folder_func (self);
@@ -53,7 +53,7 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 
 
 void
-tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, gconstpointer folder)
+tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
 {
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_folder_func (self, folder);
 	return;

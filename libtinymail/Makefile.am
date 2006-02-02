@@ -3,6 +3,7 @@ INCLUDES = $(LIBTINYMAIL_CFLAGS) -I.
 lib_LTLIBRARIES = libtinymail-1.0.la
 
 libtinymail_1_0_headers = 		\
+	tny-shared.h			\
 	tny-msg-folder-iface.h		\
 	tny-msg-attachment-iface.h   	\
 	tny-msg-body-iface.h         	\

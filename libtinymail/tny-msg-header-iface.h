@@ -23,6 +23,8 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <tny-shared.h>
+
 G_BEGIN_DECLS
 
 #define TNY_MSG_HEADER_IFACE_TYPE             (tny_msg_header_iface_get_type ())
@@ -32,9 +34,6 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG_HEADER_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_HEADER_IFACE_TYPE))
 #define TNY_MSG_HEADER_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_MSG_HEADER_IFACE_TYPE, TnyMsgHeaderIfaceClass))
 
-
-typedef struct _TnyMsgHeaderIface TnyMsgHeaderIface;
-typedef struct _TnyMsgHeaderIfaceClass TnyMsgHeaderIfaceClass;
 
 struct _TnyMsgHeaderIfaceClass
 {
@@ -46,8 +45,9 @@ struct _TnyMsgHeaderIfaceClass
 	const gchar*   (*get_id_func)             (TnyMsgHeaderIface *self);
 
          
-        gconstpointer  (*get_folder_func)         (TnyMsgHeaderIface *self);
-        void           (*set_folder_func)         (TnyMsgHeaderIface *self, gconstpointer folder);
+        const TnyMsgFolderIface*
+                       (*get_folder_func)         (TnyMsgHeaderIface *self);
+        void           (*set_folder_func)         (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
 
 	void           (*set_subject_func)        (TnyMsgHeaderIface *self, const gchar *subject);
 	void           (*set_to_func)             (TnyMsgHeaderIface *self, const gchar *to);
@@ -71,8 +71,9 @@ void           tny_msg_header_iface_set_to        (TnyMsgHeaderIface *self, cons
 void           tny_msg_header_iface_set_subject   (TnyMsgHeaderIface *self, const gchar *subject);
 
 
-gconstpointer  tny_msg_header_iface_get_folder    (TnyMsgHeaderIface *self);
-void           tny_msg_header_iface_set_folder    (TnyMsgHeaderIface *self, gconstpointer folder);
+const TnyMsgFolderIface*
+               tny_msg_header_iface_get_folder    (TnyMsgHeaderIface *self);
+void           tny_msg_header_iface_set_folder    (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
 
 void           tny_msg_header_iface_uncache       (TnyMsgHeaderIface *self);
 const gboolean tny_msg_header_iface_has_cache     (TnyMsgHeaderIface *self);

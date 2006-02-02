@@ -69,7 +69,7 @@ _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *ca
 	return;
 }
 
-gconstpointer 
+const TnyMsgFolderIface* 
 tny_msg_header_get_folder (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
@@ -79,7 +79,7 @@ tny_msg_header_get_folder (TnyMsgHeaderIface *self)
 
 
 void
-tny_msg_header_set_folder (TnyMsgHeaderIface *self, gconstpointer folder_in)
+tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* folder_in)
 {
 	const TnyMsgFolderIface *folder = folder_in;
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));

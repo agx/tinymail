@@ -22,6 +22,7 @@
 
 #include <glib.h>
 
+#include <tny-shared.h>
 #include <tny-msg-iface.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-account-iface.h>
@@ -34,9 +35,6 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG_FOLDER_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_FOLDER_IFACE_TYPE))
 #define TNY_IS_MSG_FOLDER_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_FOLDER_IFACE_TYPE))
 #define TNY_MSG_FOLDER_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_MSG_FOLDER_IFACE_TYPE, TnyMsgFolderIfaceClass))
-
-typedef struct _TnyMsgFolderIface TnyMsgFolderIface;
-typedef struct _TnyMsgFolderIfaceClass TnyMsgFolderIfaceClass;
 
 struct _TnyMsgFolderIfaceClass
 {
