@@ -30,7 +30,9 @@ struct _TnyMsgAccountPriv
 	const gchar *url_string;
 	GList *folders;
 	GetPassFunc get_pass_func;
+	ForgetPassFunc forget_pass_func;
 	gboolean pass_func_set;
+	gboolean forget_pass_func_set;
 	gchar *user, *host, *proto;
 };
 

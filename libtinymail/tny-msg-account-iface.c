@@ -19,6 +19,19 @@
 
 #include <tny-msg-account-iface.h>
 
+void
+tny_msg_account_iface_set_forget_pass_func (TnyMsgAccountIface *self, ForgetPassFunc get_forget_pass_func)
+{
+	TNY_MSG_ACCOUNT_IFACE_GET_CLASS (self)->set_forget_pass_func_func (self, get_forget_pass_func);
+	return;
+}
+
+ForgetPassFunc
+tny_msg_account_iface_get_forget_pass_func (TnyMsgAccountIface *self)
+{
+	return TNY_MSG_ACCOUNT_IFACE_GET_CLASS (self)->get_forget_pass_func_func (self);
+}
+
 const GList*
 tny_msg_account_iface_get_folders (TnyMsgAccountIface *self)
 {

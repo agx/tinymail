@@ -32,6 +32,7 @@
 
 static CamelSessionClass *ms_parent_class;
 static GList *password_funcs = NULL;
+static GList *forget_password_funcs = NULL;
 
 typedef struct
 {
@@ -40,6 +41,64 @@ typedef struct
 	TnyMsgAccountIface *account;
 
 } PrivPassFunc;
+
+typedef struct
+{
+	CamelSession *session;
+	ForgetPassFunc func;
+	TnyMsgAccountIface *account;
+
+} PrivForgetPassFunc;
+
+
+void
+tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, ForgetPassFunc get_forget_pass_func)
+{
+	GList *copy = forget_password_funcs, *mark_del = NULL;
+	PrivForgetPassFunc *pf;
+	CamelSession *me = CAMEL_SESSION (self);
+	gboolean found = FALSE;
+
+	while (copy)
+	{
+		pf = copy->data;
+
+		if (pf->session == NULL || pf->account == NULL)
+		{
+			mark_del = g_list_append (mark_del, copy);
+			continue;
+		}
+
+		if (pf->session == me)
+		{
+			found = TRUE;
+			break;
+		}
+
+		copy = g_list_next (copy);
+	}
+
+	if (!found)
+		pf = g_new0 (PrivForgetPassFunc, 1);
+
+	pf->account = account;
+	pf->func = get_forget_pass_func;
+	pf->session = me;
+
+	if (!found)
+		forget_password_funcs = g_list_append (forget_password_funcs, pf);
+
+	if (mark_del) 
+		while (mark_del)
+		{
+			forget_password_funcs = g_list_remove (forget_password_funcs, mark_del->data);
+			mark_del = g_list_next (mark_del);
+		}
+
+	g_list_free (mark_del);
+
+	self->get_forget_pass_func = get_forget_pass_func;
+}
 
 void
 tny_camel_session_set_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func)
@@ -97,6 +156,12 @@ tny_camel_session_get_pass_func (TnyCamelSession *self)
 	return self->get_pass_func;
 }
 
+ForgetPassFunc 
+tny_camel_session_get_forget_pass_func (TnyCamelSession *self)
+{
+	return self->get_forget_pass_func;
+}
+
 static char *
 tny_camel_session_get_password (CamelSession *session, CamelService *service, const char *domain,
 	      const char *prompt, const char *item, guint32 flags, CamelException *ex)
@@ -130,6 +195,29 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 static void
 tny_camel_session_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
 {
+	GList *copy = forget_password_funcs;
+	ForgetPassFunc func;
+	TnyMsgAccountIface *account;
+	gboolean found = FALSE;
+
+	while (copy)
+	{
+		PrivForgetPassFunc *pf = copy->data;
+
+		if (pf->session == session)
+		{
+			found = TRUE;
+			func = pf->func;
+			account = pf->account;
+			break;
+		}
+
+		copy = g_list_next (copy);
+	}
+
+	if (found)
+		func (account);
+
 	return;
 }
 

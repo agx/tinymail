@@ -159,10 +159,24 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 }
 
 
+static gchar* pwd = NULL;
+
 static gchar*
 get_password (TnyMsgAccountIface *account)
 {
-	return g_strdup (PERSONAL_PASSWORD);
+	if (!pwd)
+		pwd = g_strdup (PERSONAL_PASSWORD);
+
+	return pwd;
+}
+
+
+static gchar*
+forget_password (TnyMsgAccountIface *account)
+{
+	g_print ("Forgetting password\n");
+	memset (pwd, 0, strlen (pwd));
+	g_free (pwd);
 }
 
 static TnyMsgAccountIface*
@@ -173,7 +187,9 @@ create_account (void)
 	tny_msg_account_iface_set_hostname (retval, PERSONAL_HOSTNAME);
 	tny_msg_account_iface_set_user (retval, PERSONAL_USERNAME);
 	tny_msg_account_iface_set_proto (retval, PERSONAL_PROTOCOL);
+
 	tny_msg_account_iface_set_pass_func (retval, get_password);
+	tny_msg_account_iface_set_forget_pass_func (retval, forget_password);
 
 	return retval;
 }

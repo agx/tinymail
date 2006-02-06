@@ -41,6 +41,7 @@ struct _TnyCamelSession
         gboolean interactive;
 
 	GetPassFunc get_pass_func;
+	ForgetPassFunc get_forget_pass_func;
 };
 
 struct _TnyCamelSessionClass
@@ -56,6 +57,10 @@ TnyCamelSession*  tny_camel_session_new           (void);
 
 void              tny_camel_session_set_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func);
 GetPassFunc       tny_camel_session_get_pass_func (TnyCamelSession *self);
+
+
+void              tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, ForgetPassFunc get_forget_pass_func);
+ForgetPassFunc    tny_camel_session_get_forget_pass_func (TnyCamelSession *self);
 
 G_END_DECLS
 

@@ -184,6 +184,19 @@ tny_msg_account_set_pass_func (TnyMsgAccountIface *self, GetPassFunc get_pass_fu
 	return;
 }
 
+void
+tny_msg_account_set_forget_pass_func (TnyMsgAccountIface *self, ForgetPassFunc get_forget_pass_func)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+
+	tny_camel_session_set_forget_pass_func (priv->session, self, get_forget_pass_func);
+	priv->forget_pass_func = get_forget_pass_func;
+	priv->forget_pass_func_set = TRUE;
+
+	return;
+}
+
+
 const gchar*
 tny_msg_account_get_proto (TnyMsgAccountIface *self)
 {
@@ -214,6 +227,14 @@ tny_msg_account_get_pass_func (TnyMsgAccountIface *self)
 	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
 
 	return priv->get_pass_func;
+}
+
+ForgetPassFunc
+tny_msg_account_get_forget_pass_func (TnyMsgAccountIface *self)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+
+	return priv->forget_pass_func;
 }
 
 const CamelService*
@@ -254,7 +275,7 @@ tny_msg_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->user = NULL;
 	priv->host = NULL;
 	priv->proto = NULL;
-
+	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
 	priv->session = tny_camel_session_new ();
 
@@ -292,6 +313,9 @@ tny_msg_account_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->get_pass_func_func = tny_msg_account_get_pass_func;
 	klass->set_pass_func_func = tny_msg_account_set_pass_func;
+
+	klass->get_forget_pass_func_func = tny_msg_account_get_forget_pass_func;
+	klass->set_forget_pass_func_func = tny_msg_account_set_forget_pass_func;
 
 	return;
 }

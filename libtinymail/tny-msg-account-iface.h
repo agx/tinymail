@@ -41,13 +41,15 @@ struct _TnyMsgAccountIfaceClass
 
         void (*set_proto_func)             (TnyMsgAccountIface *self, const gchar *proto);
         void (*set_user_func)              (TnyMsgAccountIface *self, const gchar *user);
-        void (*set_hostname_func)         (TnyMsgAccountIface *self, const gchar *host);
+        void (*set_hostname_func)          (TnyMsgAccountIface *self, const gchar *host);
         void (*set_pass_func_func)         (TnyMsgAccountIface *self, GetPassFunc get_pass_func);
+        void (*set_forget_pass_func_func)  (TnyMsgAccountIface *self, ForgetPassFunc get_forget_pass_func);
 
-        const gchar* (*get_proto_func )   (TnyMsgAccountIface *self);
-        const gchar* (*get_user_func) (TnyMsgAccountIface *self);
-        const gchar* (*get_hostname_func)       (TnyMsgAccountIface *self);
-        GetPassFunc  (*get_pass_func_func) (TnyMsgAccountIface *self);
+        const gchar*    (*get_proto_func )           (TnyMsgAccountIface *self);
+        const gchar*    (*get_user_func)             (TnyMsgAccountIface *self);
+        const gchar*    (*get_hostname_func)         (TnyMsgAccountIface *self);
+        GetPassFunc     (*get_pass_func_func)        (TnyMsgAccountIface *self);
+	ForgetPassFunc  (*get_forget_pass_func_func) (TnyMsgAccountIface *self);
 };
 
 GType        tny_msg_account_iface_get_type        (void);
@@ -62,6 +64,9 @@ const gchar* tny_msg_account_iface_get_proto       (TnyMsgAccountIface *self);
 const gchar* tny_msg_account_iface_get_user        (TnyMsgAccountIface *self);
 const gchar* tny_msg_account_iface_get_hostname    (TnyMsgAccountIface *self);
 GetPassFunc  tny_msg_account_iface_get_pass_func   (TnyMsgAccountIface *self);
+
+void tny_msg_account_iface_set_forget_pass_func           (TnyMsgAccountIface *self, ForgetPassFunc get_forget_pass_func);
+ForgetPassFunc tny_msg_account_iface_get_forget_pass_func (TnyMsgAccountIface *self);
 
 G_END_DECLS
 
