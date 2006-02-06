@@ -159,7 +159,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 }
 
 
-static GetPassFunc
+static gchar*
 get_password (TnyMsgAccountIface *account)
 {
 	return g_strdup (PERSONAL_PASSWORD);

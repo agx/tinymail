@@ -104,6 +104,7 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 	GList *copy = password_funcs;
 	GetPassFunc func;
 	TnyMsgAccountIface *account;
+	gboolean found = FALSE;
 
 	while (copy)
 	{
@@ -111,17 +112,19 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 
 		if (pf->session == session)
 		{
+			found = TRUE;
 			func = pf->func;
 			account = pf->account;
-
 			break;
 		}
 
 		copy = g_list_next (copy);
 	}
 
+	if (found)
+		return func (account);
 
-	return func (account);
+	return NULL;
 }
 
 static void
