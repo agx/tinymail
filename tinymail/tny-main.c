@@ -15,9 +15,9 @@
  * along with self program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#include "/home/pvanhoof/personal.h"
 
 #include <string.h>
-
 #include <gtk/gtk.h>
 
 #include <tny-msg-account-iface.h>
@@ -158,6 +158,26 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 	return;
 }
 
+
+static GetPassFunc
+get_password (TnyMsgAccountIface *account)
+{
+	return g_strdup (PERSONAL_PASSWORD);
+}
+
+static TnyMsgAccountIface*
+create_account (void)
+{
+	TnyMsgAccountIface* retval = TNY_MSG_ACCOUNT_IFACE (tny_msg_account_new ());
+
+	tny_msg_account_iface_set_hostname (retval, PERSONAL_HOSTNAME);
+	tny_msg_account_iface_set_user (retval, PERSONAL_USERNAME);
+	tny_msg_account_iface_set_proto (retval, PERSONAL_PROTOCOL);
+	tny_msg_account_iface_set_pass_func (retval, get_password);
+
+	return retval;
+}
+
 int 
 main (int argc, char **argv)
 {
@@ -242,7 +262,9 @@ main (int argc, char **argv)
 	gtk_tree_view_append_column (GTK_TREE_VIEW(header_view), column);
 
 	mailbox_model = GTK_TREE_MODEL (tny_msg_account_tree_model_new ());
-	account = TNY_MSG_ACCOUNT_IFACE(tny_msg_account_new ());
+
+	account = create_account ();
+
 	tny_msg_account_tree_model_add (TNY_MSG_ACCOUNT_TREE_MODEL 
 		(mailbox_model), account);
 

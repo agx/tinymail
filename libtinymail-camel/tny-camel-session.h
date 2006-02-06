@@ -22,6 +22,8 @@
 
 #include <glib.h>
 #include <camel/camel-session.h>
+#include <tny-shared.h>
+
 
 G_BEGIN_DECLS
 
@@ -35,21 +37,25 @@ typedef struct _TnyCamelSessionClass TnyCamelSessionClass;
 
 struct _TnyCamelSession
 {
-	CamelSession parent_object;
-	gboolean interactive;
+        CamelSession parent_object;
+        gboolean interactive;
+
+	GetPassFunc get_pass_func;
 };
 
 struct _TnyCamelSessionClass
 {
-	CamelSessionClass parent_class;
+        CamelSessionClass parent_class;
+
+        void        (*set_pass_func_func) (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func);
+        GetPassFunc (*get_pass_func_func) (TnyCamelSession *self);
 };
 
-#ifndef TNY_CAMEL_SESSION_C
-extern CamelSession *session;
-#endif
+CamelType         tny_camel_session_get_type      (void);
+TnyCamelSession*  tny_camel_session_new           (void);
 
-CamelType tny_camel_session_get_type    (void);
-void      tny_camel_session_prepare     (void);
+void              tny_camel_session_set_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func);
+GetPassFunc       tny_camel_session_get_pass_func (TnyCamelSession *self);
 
 G_END_DECLS
 

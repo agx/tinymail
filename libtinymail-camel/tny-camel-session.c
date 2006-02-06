@@ -28,21 +28,100 @@
 #include <camel/camel.h>
 #include <camel/camel-filter-driver.h>
 #include <camel/camel-i18n.h>
-
-#define TNY_CAMEL_SESSION_C
 #include <tny-camel-session.h>
-#undef TNY_CAMEL_SESSION_C
 
-#include "/home/pvanhoof/personal.h"
-
-CamelSession *session;
 static CamelSessionClass *ms_parent_class;
+static GList *password_funcs = NULL;
+
+typedef struct
+{
+	CamelSession *session;
+	GetPassFunc func;
+	TnyMsgAccountIface *account;
+
+} PrivPassFunc;
+
+void
+tny_camel_session_set_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func)
+{
+	GList *copy = password_funcs, *mark_del = NULL;
+	PrivPassFunc *pf;
+	CamelSession *me = CAMEL_SESSION (self);
+	gboolean found = FALSE;
+
+	while (copy)
+	{
+		pf = copy->data;
+
+		if (pf->session == NULL || pf->account == NULL)
+		{
+			mark_del = g_list_append (mark_del, copy);
+			continue;
+		}
+
+		if (pf->session == me)
+		{
+			found = TRUE;
+			break;
+		}
+
+		copy = g_list_next (copy);
+	}
+
+	if (!found)
+		pf = g_new0 (PrivPassFunc, 1);
+
+	pf->account = account;
+	pf->func = get_pass_func;
+	pf->session = me;
+
+	if (!found)
+		password_funcs = g_list_append (password_funcs, pf);
+
+
+	if (mark_del) 
+		while (mark_del)
+		{
+			password_funcs = g_list_remove (password_funcs, mark_del->data);
+			mark_del = g_list_next (mark_del);
+		}
+
+	g_list_free (mark_del);
+
+	self->get_pass_func = get_pass_func;
+}
+
+GetPassFunc 
+tny_camel_session_get_pass_func (TnyCamelSession *self)
+{
+	return self->get_pass_func;
+}
 
 static char *
 tny_camel_session_get_password (CamelSession *session, CamelService *service, const char *domain,
 	      const char *prompt, const char *item, guint32 flags, CamelException *ex)
 {
-	return g_strdup(PERSONAL_PASSWORD);
+	GList *copy = password_funcs;
+	GetPassFunc func;
+	TnyMsgAccountIface *account;
+
+	while (copy)
+	{
+		PrivPassFunc *pf = copy->data;
+
+		if (pf->session == session)
+		{
+			func = pf->func;
+			account = pf->account;
+
+			break;
+		}
+
+		copy = g_list_next (copy);
+	}
+
+
+	return func (account);
 }
 
 static void
@@ -59,7 +138,7 @@ tny_camel_session_alert_user (CamelSession *session, CamelSessionAlertType type,
 
 
 CamelFolder *
-mail_tool_uri_to_folder (const char *uri, guint32 flags, CamelException *ex)
+mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, CamelException *ex)
 {
 	CamelURL *url;
 	CamelStore *store = NULL;
@@ -68,11 +147,6 @@ mail_tool_uri_to_folder (const char *uri, guint32 flags, CamelException *ex)
 	char *curi = NULL;
 
 	g_return_val_if_fail (uri != NULL, NULL);
-
-	if (!strncmp (uri, "vtrash:", 7))
-		offset = 7;
-	else if (!strncmp (uri, "vjunk:", 6))
-		offset = 6;
 	
 	url = camel_url_new (uri + offset, ex);
 	if (!url) 
@@ -120,14 +194,15 @@ mail_tool_uri_to_folder (const char *uri, guint32 flags, CamelException *ex)
 static CamelFolder *
 get_folder (CamelFilterDriver *d, const char *uri, void *data, CamelException *ex)
 {
-	return mail_tool_uri_to_folder(uri, 0, ex);
+	CamelSession *session = data;
+	return mail_tool_uri_to_folder(session, uri, 0, ex);
 }
 
 static CamelFilterDriver *
 tny_camel_session_get_filter_driver (CamelSession *session, const char *type, CamelException *ex)
 {
 	CamelFilterDriver *driver = camel_filter_driver_new (session);
-	camel_filter_driver_set_folder_func (driver, get_folder, NULL);
+	camel_filter_driver_set_folder_func (driver, get_folder, session);
 
 	return driver; 
 }
@@ -181,32 +256,38 @@ tny_camel_session_ms_thread_status (CamelSession *session, CamelSessionThreadMsg
 
 
 static void
-tny_camel_session_init (TnyCamelSession *session)
+tny_camel_session_init (TnyCamelSession *instance)
 {
-	g_print ("Critical TODO item at %s\n", __FUNCTION__);
-}
+	CamelSession *session = CAMEL_SESSION (instance);
 
-
-void
-tny_camel_session_prepare (void)
-{
-
-	const gchar *base_directory = "/home/pvanhoof/Temp/tinymail";
-	gchar *camel_dir;
+	gchar *base_directory = g_build_filename (g_get_home_dir (), ".tinymail", NULL);
+	gchar *camel_dir = NULL;
 
 	if (camel_init (base_directory, TRUE) != 0)
-		exit (0);
+	{
+		g_print ("Critical ERROR: Cannot init %d as camel directory\n", base_directory);
+		exit (1);
+	}
 
+	camel_dir = g_build_filename (g_get_home_dir (), ".tinymail", "mail", NULL);
 	camel_provider_init();
-
-	session = CAMEL_SESSION (camel_object_new (TNY_CAMEL_SESSION_TYPE));
-	
-	camel_dir = g_strdup_printf ("%s/mail", base_directory);
 	camel_session_construct (session, camel_dir);
-
 	camel_session_set_online ((CamelSession *) session, TRUE);
 	
 	g_free (camel_dir);
+	g_free (base_directory);
+
+	return;
+}
+
+
+TnyCamelSession*
+tny_camel_session_new (void)
+{
+	TnyCamelSession *retval = TNY_CAMEL_SESSION 
+		(camel_object_new (TNY_CAMEL_SESSION_TYPE));
+	
+	return retval;
 }
 
 
@@ -229,6 +310,9 @@ tny_camel_session_class_init (TnyCamelSessionClass *tny_camel_session_class)
 	camel_session_class->thread_msg_new = tny_camel_session_ms_thread_msg_new;
 	camel_session_class->thread_msg_free = tny_camel_session_ms_thread_msg_free;
 	camel_session_class->thread_status = tny_camel_session_ms_thread_status;
+
+	tny_camel_session_class->get_pass_func_func = tny_camel_session_get_pass_func;
+	tny_camel_session_class->set_pass_func_func = tny_camel_session_set_pass_func;
 }
 
 CamelType

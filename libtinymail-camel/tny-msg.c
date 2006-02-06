@@ -25,6 +25,8 @@
 #include <tny-msg-body.h>
 #include <tny-msg-header.h>
 
+#include <camel/camel-stream-buffer.h>
+
 static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-priv.h"
@@ -36,6 +38,10 @@ void
 _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
+	int tsize, size;
+	CamelStream *stream = camel_stream_mem_new ();
+	GString *gstr = g_string_new("");
+	char buffer [1024];
 
 	if (priv->message)
 		camel_object_unref (priv->message);
@@ -45,9 +51,21 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 	priv->body = TNY_MSG_BODY_IFACE (tny_msg_body_new ());
 
 	/* TODO: Blah! */
-	tny_msg_body_iface_set_data (priv->body,
-		(gchar*)camel_mime_message_get_subject (message));
+	
+	tsize = camel_data_wrapper_decode_to_stream (CAMEL_DATA_WRAPPER (message), 
+			stream);
 
+	while (size > 0)
+	{
+		size = camel_stream_read (stream, buffer, sizeof (buffer));
+		g_print ("%s\n", buffer);
+		gstr = g_string_append (gstr, (const gchar*)buffer);
+	}
+
+	camel_stream_close (stream);
+
+	tny_msg_body_iface_set_data (priv->body, gstr->str);
+	
 	priv->message = message;
 
 	return;

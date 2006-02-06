@@ -24,10 +24,14 @@ typedef struct _TnyMsgAccountPriv TnyMsgAccountPriv;
 
 struct _TnyMsgAccountPriv
 {
+	TnyCamelSession *session;
 	CamelService *service;
 	CamelException *ex;
 	const gchar *url_string;
 	GList *folders;
+	GetPassFunc get_pass_func;
+	gboolean pass_func_set;
+	gchar *user, *host, *proto;
 };
 
 const CamelService*  _tny_msg_account_get_service (TnyMsgAccount *self);

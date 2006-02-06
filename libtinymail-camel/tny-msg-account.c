@@ -18,6 +18,8 @@
  */
 #include <glib.h>
 
+#include <string.h>
+
 #include <tny-msg-account-iface.h>
 #include <tny-msg-account.h>
 #include <tny-msg-folder-iface.h>
@@ -32,8 +34,6 @@
 #include <errno.h>
 
 #include <tny-camel-session.h>
-
-#include "/home/pvanhoof/personal.h"
 
 static GObjectClass *parent_class = NULL;
 
@@ -74,7 +74,8 @@ tny_msg_account_get_folders (TnyMsgAccountIface *self)
 {
 	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
 
-	CamelStore *store = camel_session_get_store (session, priv->url_string, priv->ex);
+	CamelStore *store = camel_session_get_store (CAMEL_SESSION (priv->session), 
+			priv->url_string, priv->ex);
 	CamelFolderInfo *info = camel_store_get_folder_info 
 		(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
 			CAMEL_STORE_FOLDER_INFO_RECURSIVE, priv->ex);
@@ -84,6 +85,135 @@ tny_msg_account_get_folders (TnyMsgAccountIface *self)
 	camel_store_free_folder_info (store, info);
 
 	return priv->folders;
+}
+
+static void 
+reconnect (TnyMsgAccountPriv *priv)
+{
+	if (priv->pass_func_set && priv->proto && priv->user && priv->host)
+	{
+		CamelURL *url = NULL;
+		gchar *proto = g_strdup_printf ("%s://", priv->proto); 
+
+		url = camel_url_new (proto, priv->ex);
+		g_free (proto);
+	
+		camel_url_set_protocol (url, priv->proto); 
+
+
+		camel_url_set_user (url, priv->user);
+		camel_url_set_host (url, priv->host);
+	
+		priv->url_string = camel_url_to_string (url, 0);
+	
+		priv->service = camel_session_get_service 
+			(CAMEL_SESSION (priv->session), priv->url_string, 
+			CAMEL_PROVIDER_STORE, priv->ex);
+	
+		if (priv->service == NULL) {
+			g_print ("couldn't get service %s: %s\n", priv->url_string,
+				   camel_exception_get_description (priv->ex));
+			camel_exception_clear (priv->ex);
+			return;
+		}
+	
+		camel_service_connect (priv->service, priv->ex);
+		camel_url_free (url);
+
+	}
+
+	return;
+}
+
+void
+tny_msg_account_set_proto (TnyMsgAccountIface *self, const gchar *proto)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+	
+	if (priv->proto)
+		g_free (priv->proto);
+
+	priv->proto = g_strdup (proto);
+
+	reconnect (priv);
+
+	return;
+}
+
+void
+tny_msg_account_set_user (TnyMsgAccountIface *self, const gchar *user)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+	
+	if (priv->user)
+		g_free (priv->user);
+
+	priv->user = g_strdup (user);
+
+	reconnect (priv);
+
+	return;
+}
+
+void
+tny_msg_account_set_hostname (TnyMsgAccountIface *self, const gchar *host)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+	
+	if (priv->host)
+		g_free (priv->host);
+
+	priv->host = g_strdup (host);
+
+	reconnect (priv);
+
+	return;
+}
+
+void
+tny_msg_account_set_pass_func (TnyMsgAccountIface *self, GetPassFunc get_pass_func)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+
+	tny_camel_session_set_pass_func (priv->session, self, get_pass_func);
+	priv->get_pass_func = get_pass_func;
+	priv->pass_func_set = TRUE;
+
+	reconnect (priv);
+
+	return;
+}
+
+const gchar*
+tny_msg_account_get_proto (TnyMsgAccountIface *self)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+	
+	return (const gchar*)priv->proto;
+}
+
+const gchar*
+tny_msg_account_get_user (TnyMsgAccountIface *self)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+	
+	return (const gchar*)priv->user;
+}
+
+const gchar*
+tny_msg_account_get_hostname (TnyMsgAccountIface *self)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+	
+	return (const gchar*)priv->host;
+}
+
+GetPassFunc
+tny_msg_account_get_pass_func (TnyMsgAccountIface *self)
+{
+	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
+
+	return priv->get_pass_func;
 }
 
 const CamelService*
@@ -117,40 +247,16 @@ tny_msg_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgAccount *self = (TnyMsgAccount *)instance;
 	TnyMsgAccountPriv *priv = TNY_MSG_ACCOUNT_GET_PRIVATE (self);
 
-	CamelURL *url = NULL;
-
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
 
-	url = camel_url_new (PERSONAL_PROTOCOL "://", priv->ex);
-	camel_url_set_protocol (url, PERSONAL_PROTOCOL);
-	camel_url_set_user (url, PERSONAL_USERNAME);
-	camel_url_set_host (url, PERSONAL_HOSTNAME);
 
-	if (!session)
-		tny_camel_session_prepare ();
+	priv->user = NULL;
+	priv->host = NULL;
+	priv->proto = NULL;
 
-	priv->url_string = camel_url_to_string (url, 0);	
-
-	priv->service = camel_session_get_service 
-		(session, priv->url_string, 
-		CAMEL_PROVIDER_STORE, priv->ex);
-
-	if (priv->service == NULL) {
-		g_print ("couldn't get service %s: %s\n", priv->url_string,
-			   camel_exception_get_description (priv->ex));
-		camel_exception_clear (priv->ex);
-		return;
-	}
-
-	camel_service_connect (priv->service, priv->ex);
-
-	if (camel_exception_get_id (priv->ex) != CAMEL_EXCEPTION_NONE)
-	{
-		g_print ("Camel connection failure (%s)\n", camel_exception_get_description (priv->ex));
-	} else {
-		g_print ("Connected?!\n");
-	}
+	priv->pass_func_set = FALSE;
+	priv->session = tny_camel_session_new ();
 
 	return;
 }
@@ -174,6 +280,18 @@ tny_msg_account_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyMsgAccountIfaceClass *klass = (TnyMsgAccountIfaceClass *)g_iface;
 
 	klass->get_folders_func = tny_msg_account_get_folders;
+
+	klass->get_hostname_func = tny_msg_account_get_hostname;
+	klass->set_hostname_func = tny_msg_account_set_hostname;
+
+	klass->get_proto_func = tny_msg_account_get_proto;
+	klass->set_proto_func = tny_msg_account_set_proto;
+
+	klass->get_user_func = tny_msg_account_get_user;
+	klass->set_user_func = tny_msg_account_set_user;
+
+	klass->get_pass_func_func = tny_msg_account_get_pass_func;
+	klass->set_pass_func_func = tny_msg_account_set_pass_func;
 
 	return;
 }
