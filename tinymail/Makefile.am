@@ -7,7 +7,9 @@ INCLUDES = 								\
 bin_PROGRAMS = tinymail
 
 tinymail_SOURCES = 							\
-	tny-main.c
+	tny-main.c							\
+	tny-account-factory.c						\
+	tny-account-factory.h
 
 tinymail_LDADD = 							\
 	$(TINYMAIL_LIBS)						\
