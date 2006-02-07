@@ -34,12 +34,12 @@ typedef struct _TnyMsgBodyIface TnyMsgBodyIface;
 typedef struct _TnyMsgBodyIfaceClass TnyMsgBodyIfaceClass;
 typedef struct _TnyMsgAttachmentIface TnyMsgAttachmentIface;
 typedef struct _TnyMsgAttachmentIfaceClass TnyMsgAttachmentIfaceClass;
-typedef struct _TnyMsgAccountIface TnyMsgAccountIface;
-typedef struct _TnyMsgAccountIfaceClass TnyMsgAccountIfaceClass;
+typedef struct _TnyAccountIface TnyAccountIface;
+typedef struct _TnyAccountIfaceClass TnyAccountIfaceClass;
 typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
 typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
-typedef gchar* (*GetPassFunc) (TnyMsgAccountIface *self);
-typedef gchar* (*ForgetPassFunc) (TnyMsgAccountIface *self);
+typedef gchar* (*GetPassFunc) (TnyAccountIface *self);
+typedef gchar* (*ForgetPassFunc) (TnyAccountIface *self);
 
 G_END_DECLS
 

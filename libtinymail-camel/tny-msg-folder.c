@@ -23,8 +23,8 @@
 #include <tny-msg-header-iface.h>
 #include <tny-msg.h>
 #include <tny-msg-header.h>
-#include <tny-msg-account-iface.h>
-#include <tny-msg-account.h>
+#include <tny-account-iface.h>
+#include <tny-account.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
@@ -36,7 +36,7 @@
 #include <errno.h>
 
 #include <tny-camel-session.h>
-#include "tny-msg-account-priv.h"
+#include "tny-account-priv.h"
 #include "tny-msg-folder-priv.h"
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
@@ -54,8 +54,8 @@ load_folder (TnyMsgFolderPriv *priv)
 	if (!priv->folder)
 	{
 		CamelException ex;
-		CamelStore *store = (CamelStore*) _tny_msg_account_get_service 
-			(TNY_MSG_ACCOUNT (priv->account));
+		CamelStore *store = (CamelStore*) _tny_account_get_service 
+			(TNY_ACCOUNT (priv->account));
 
 		priv->folder = camel_store_get_folder (store, priv->folder_name, 0, &ex);
 
@@ -91,7 +91,7 @@ tny_msg_folder_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
 	return;
 }
 
-const TnyMsgAccountIface*  
+const TnyAccountIface*  
 tny_msg_folder_get_account (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
@@ -100,11 +100,11 @@ tny_msg_folder_get_account (TnyMsgFolderIface *self)
 }
 
 void
-tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyMsgAccountIface *account)
+tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
-	priv->account = TNY_MSG_ACCOUNT_IFACE (account);
+	priv->account = TNY_ACCOUNT_IFACE (account);
 
 	return;
 }

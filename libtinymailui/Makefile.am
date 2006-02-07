@@ -6,12 +6,12 @@ lib_LTLIBRARIES = libtinymailui-1.0.la
 
 libtinymailui_1_0_headers = 		\
 	tny-msg-header-list-model.h	\
-	tny-msg-account-tree-model.h
+	tny-account-tree-model.h
 
 libtinymailui_1_0_la_SOURCES = 		\
 	$(libtinymailui_1_0_headers)	\
 	tny-msg-header-list-model.c	\
-	tny-msg-account-tree-model.c
+	tny-account-tree-model.c
 
 libtinymailui_1_0_la_LIBADD = 		\
 	$(LIBTINYMAILUI_LIBS)		\

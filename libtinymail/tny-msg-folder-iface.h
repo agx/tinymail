@@ -25,7 +25,7 @@
 #include <tny-shared.h>
 #include <tny-msg-iface.h>
 #include <tny-msg-header-iface.h>
-#include <tny-msg-account-iface.h>
+#include <tny-account-iface.h>
 
 G_BEGIN_DECLS
 
@@ -49,12 +49,12 @@ struct _TnyMsgFolderIfaceClass
 
 	const gchar*   (*get_name_func)    (TnyMsgFolderIface *self);
 	const gchar*   (*get_id_func)      (TnyMsgFolderIface *self);
-	const TnyMsgAccountIface*   
+	const TnyAccountIface*   
                        (*get_account_func) (TnyMsgFolderIface *self);
 
 	void           (*set_name_func)    (TnyMsgFolderIface *self, const gchar *name);
 	void           (*set_id_func)      (TnyMsgFolderIface *self, const gchar *id);
-	void           (*set_account_func) (TnyMsgFolderIface *self, const TnyMsgAccountIface *account);
+	void           (*set_account_func) (TnyMsgFolderIface *self, const TnyAccountIface *account);
 	
 	void           (*uncache_func)     (TnyMsgFolderIface *self);
 	const gboolean (*has_cache_func)   (TnyMsgFolderIface *self);
@@ -69,12 +69,12 @@ const TnyMsgIface*
                tny_msg_folder_iface_get_message  (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header);
 const GList*   tny_msg_folder_iface_get_headers  (TnyMsgFolderIface *self);
 
-const TnyMsgAccountIface*  
+const TnyAccountIface*  
                tny_msg_folder_iface_get_account  (TnyMsgFolderIface *self);
 const gchar*   tny_msg_folder_iface_get_id       (TnyMsgFolderIface *self);
 const gchar*   tny_msg_folder_iface_get_name     (TnyMsgFolderIface *self);
 
-void           tny_msg_folder_iface_set_account  (TnyMsgFolderIface *self, const TnyMsgAccountIface *account);
+void           tny_msg_folder_iface_set_account  (TnyMsgFolderIface *self, const TnyAccountIface *account);
 void           tny_msg_folder_iface_set_id       (TnyMsgFolderIface *self, const gchar *id);
 void           tny_msg_folder_iface_set_name     (TnyMsgFolderIface *self, const gchar *name);
 

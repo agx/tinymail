@@ -20,11 +20,11 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
-#include <tny-msg-account-iface.h>
-#include <tny-msg-account.h>
+#include <tny-account-iface.h>
+#include <tny-account.h>
 
 #include <tny-msg-folder-iface.h>
-#include <tny-msg-account-tree-model.h>
+#include <tny-account-tree-model.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header-list-model.h>
 
@@ -44,7 +44,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		GList *headers;
 
 		gtk_tree_model_get (model, &iter, 
-			TNY_MSG_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
+			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
 
 		g_print ("You selected folder: %s\n", 
@@ -162,7 +162,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 static gchar* pwd = NULL;
 
 static gchar*
-get_password (TnyMsgAccountIface *account)
+get_password (TnyAccountIface *account)
 {
 	if (!pwd)
 		pwd = g_strdup (PERSONAL_PASSWORD);
@@ -172,24 +172,24 @@ get_password (TnyMsgAccountIface *account)
 
 
 static gchar*
-forget_password (TnyMsgAccountIface *account)
+forget_password (TnyAccountIface *account)
 {
 	g_print ("Forgetting password\n");
 	memset (pwd, 0, strlen (pwd));
 	g_free (pwd);
 }
 
-static TnyMsgAccountIface*
+static TnyAccountIface*
 create_account (void)
 {
-	TnyMsgAccountIface* retval = TNY_MSG_ACCOUNT_IFACE (tny_msg_account_new ());
+	TnyAccountIface* retval = TNY_ACCOUNT_IFACE (tny_account_new ());
 
-	tny_msg_account_iface_set_hostname (retval, PERSONAL_HOSTNAME);
-	tny_msg_account_iface_set_user (retval, PERSONAL_USERNAME);
-	tny_msg_account_iface_set_proto (retval, PERSONAL_PROTOCOL);
+	tny_account_iface_set_hostname (retval, PERSONAL_HOSTNAME);
+	tny_account_iface_set_user (retval, PERSONAL_USERNAME);
+	tny_account_iface_set_proto (retval, PERSONAL_PROTOCOL);
 
-	tny_msg_account_iface_set_pass_func (retval, get_password);
-	tny_msg_account_iface_set_forget_pass_func (retval, forget_password);
+	tny_account_iface_set_pass_func (retval, get_password);
+	tny_account_iface_set_forget_pass_func (retval, forget_password);
 
 	return retval;
 }
@@ -208,7 +208,7 @@ main (int argc, char **argv)
 	GtkTreeModel *mailbox_model;
 	GtkTreeSelection *select;
 	gint t = 0, i = 0;
-	TnyMsgAccountIface *account;
+	TnyAccountIface *account;
 	
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
@@ -243,12 +243,12 @@ main (int argc, char **argv)
 	/* mailbox_view columns */
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
-			"text", TNY_MSG_ACCOUNT_TREE_MODEL_NAME_COLUMN, NULL);
+			"text", TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, NULL);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(mailbox_view), column);
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
-			"text", TNY_MSG_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, NULL);
+			"text", TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, NULL);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(mailbox_view), column);
 
 	/* header_view columns */
@@ -277,11 +277,11 @@ main (int argc, char **argv)
 	gtk_tree_view_column_set_fixed_width (column, 200);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(header_view), column);
 
-	mailbox_model = GTK_TREE_MODEL (tny_msg_account_tree_model_new ());
+	mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 
 	account = create_account ();
 
-	tny_msg_account_tree_model_add (TNY_MSG_ACCOUNT_TREE_MODEL 
+	tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
 		(mailbox_model), account);
 
 	gtk_tree_view_set_model (GTK_TREE_VIEW (mailbox_view), mailbox_model);

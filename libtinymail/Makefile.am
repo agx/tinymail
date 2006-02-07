@@ -9,7 +9,7 @@ libtinymail_1_0_headers = 		\
 	tny-msg-body-iface.h         	\
 	tny-msg-header-iface.h		\
 	tny-msg-iface.h			\
-	tny-msg-account-iface.h		\	
+	tny-account-iface.h		\	
 	tny-msg-header-proxy.h
 
 #	tny-msg-folder-proxy.h	
@@ -21,7 +21,7 @@ libtinymail_1_0_la_SOURCES = 		\
 	tny-msg-body-iface.c         	\
 	tny-msg-attachment-iface.c   	\
 	tny-msg-folder-iface.c		\
-	tny-msg-account-iface.c		\
+	tny-account-iface.c		\
 	tny-msg-header-proxy.c	
 
 

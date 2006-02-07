@@ -151,7 +151,9 @@ INCLUDES = \
 bin_PROGRAMS = tinymail
 
 tinymail_SOURCES = \
-	tny-main.c
+	tny-main.c							\
+	tny-account-factory.c						\
+	tny-account-factory.h
 
 
 tinymail_LDADD = \
@@ -170,7 +172,7 @@ CONFIG_CLEAN_FILES =
 bin_PROGRAMS = tinymail$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
-am_tinymail_OBJECTS = tny-main.$(OBJEXT)
+am_tinymail_OBJECTS = tny-main.$(OBJEXT) tny-account-factory.$(OBJEXT)
 tinymail_OBJECTS = $(am_tinymail_OBJECTS)
 tinymail_DEPENDENCIES = \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
@@ -181,7 +183,8 @@ tinymail_LDFLAGS =
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I. -I$(top_builddir)/libtinymail -I$(top_builddir)/libtinymail-camel -I$(top_builddir)/libtinymailui
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/tny-main.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/tny-account-factory.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/tny-main.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -259,6 +262,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tny-account-factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tny-main.Po@am__quote@
 
 .c.o:

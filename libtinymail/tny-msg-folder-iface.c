@@ -21,14 +21,14 @@
 #include <tny-msg-header-iface.h>
 
 
-const TnyMsgAccountIface*  
+const TnyAccountIface*  
 tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_account_func (self);
 }
 
 void
-tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyMsgAccountIface *account)
+tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account)
 {
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_account_func (self, account);
 

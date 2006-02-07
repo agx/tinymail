@@ -38,7 +38,7 @@ typedef struct
 {
 	CamelSession *session;
 	GetPassFunc func;
-	TnyMsgAccountIface *account;
+	TnyAccountIface *account;
 
 } PrivPassFunc;
 
@@ -46,13 +46,13 @@ typedef struct
 {
 	CamelSession *session;
 	ForgetPassFunc func;
-	TnyMsgAccountIface *account;
+	TnyAccountIface *account;
 
 } PrivForgetPassFunc;
 
 
 void
-tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, ForgetPassFunc get_forget_pass_func)
+tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *account, ForgetPassFunc get_forget_pass_func)
 {
 	GList *copy = forget_password_funcs, *mark_del = NULL;
 	PrivForgetPassFunc *pf;
@@ -101,7 +101,7 @@ tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyMsgAccountIfac
 }
 
 void
-tny_camel_session_set_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func)
+tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account, GetPassFunc get_pass_func)
 {
 	GList *copy = password_funcs, *mark_del = NULL;
 	PrivPassFunc *pf;
@@ -168,7 +168,7 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 {
 	GList *copy = password_funcs;
 	GetPassFunc func;
-	TnyMsgAccountIface *account;
+	TnyAccountIface *account;
 	gboolean found = FALSE;
 
 	while (copy)
@@ -197,7 +197,7 @@ tny_camel_session_forget_password (CamelSession *session, CamelService *service,
 {
 	GList *copy = forget_password_funcs;
 	ForgetPassFunc func;
-	TnyMsgAccountIface *account;
+	TnyAccountIface *account;
 	gboolean found = FALSE;
 
 	while (copy)

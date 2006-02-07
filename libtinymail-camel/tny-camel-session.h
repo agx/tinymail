@@ -48,18 +48,18 @@ struct _TnyCamelSessionClass
 {
         CamelSessionClass parent_class;
 
-        void        (*set_pass_func_func) (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func);
+        void        (*set_pass_func_func) (TnyCamelSession *self, TnyAccountIface *account, GetPassFunc get_pass_func);
         GetPassFunc (*get_pass_func_func) (TnyCamelSession *self);
 };
 
 CamelType         tny_camel_session_get_type      (void);
 TnyCamelSession*  tny_camel_session_new           (void);
 
-void              tny_camel_session_set_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, GetPassFunc get_pass_func);
+void              tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account, GetPassFunc get_pass_func);
 GetPassFunc       tny_camel_session_get_pass_func (TnyCamelSession *self);
 
 
-void              tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyMsgAccountIface *account, ForgetPassFunc get_forget_pass_func);
+void              tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *account, ForgetPassFunc get_forget_pass_func);
 ForgetPassFunc    tny_camel_session_get_forget_pass_func (TnyCamelSession *self);
 
 G_END_DECLS

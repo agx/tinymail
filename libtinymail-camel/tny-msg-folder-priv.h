@@ -21,7 +21,7 @@
  */
 #include <glib.h>
 #include <camel/camel-folder.h>
-#include <tny-msg-account-iface.h>
+#include <tny-account-iface.h>
 #include <tny-msg-folder-iface.h>
 
 typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
@@ -33,7 +33,7 @@ struct _TnyMsgFolderPriv
 
 	CamelFolder *folder;
 	gchar *folder_name;
-	TnyMsgAccountIface *account;
+	TnyAccountIface *account;
 	GList *folders;
 };
 
