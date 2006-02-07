@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_ACCOUNT_H
-#define TNY_MSG_ACCOUNT_H
+#ifndef TNY_ACCOUNT_H
+#define TNY_ACCOUNT_H
 
 /* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -25,32 +25,32 @@
 
 #define PERSISTENT_STORAGE_PATH	"/home/pvanhoof/tinymail-camel"
 
-#include <tny-msg-account-iface.h>
+#include <tny-account-iface.h>
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_ACCOUNT_TYPE             (tny_msg_account_get_type ())
-#define TNY_MSG_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_ACCOUNT_TYPE, TnyMsgAccount))
-#define TNY_MSG_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_ACCOUNT_TYPE, TnyMsgAccountClass))
-#define TNY_IS_MSG_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_ACCOUNT_TYPE))
-#define TNY_IS_MSG_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_ACCOUNT_TYPE))
-#define TNY_MSG_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_MSG_ACCOUNT_TYPE, TnyMsgAccountClass))
+#define TNY_ACCOUNT_TYPE             (tny_account_get_type ())
+#define TNY_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_ACCOUNT_TYPE, TnyAccount))
+#define TNY_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_ACCOUNT_TYPE, TnyAccountClass))
+#define TNY_IS_MSG_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_ACCOUNT_TYPE))
+#define TNY_IS_MSG_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_ACCOUNT_TYPE))
+#define TNY_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_ACCOUNT_TYPE, TnyAccountClass))
 
-typedef struct _TnyMsgAccount TnyMsgAccount;
-typedef struct _TnyMsgAccountClass TnyMsgAccountClass;
+typedef struct _TnyAccount TnyAccount;
+typedef struct _TnyAccountClass TnyAccountClass;
 
-struct _TnyMsgAccount
+struct _TnyAccount
 {
 	GObject parent;
 };
 
-struct _TnyMsgAccountClass 
+struct _TnyAccountClass 
 {
 	GObjectClass parent;
 };
 
-GType               tny_msg_account_get_type       (void);
-TnyMsgAccount*      tny_msg_account_new            (void);
+GType               tny_account_get_type       (void);
+TnyAccount*      tny_account_new            (void);
 
 G_END_DECLS
 

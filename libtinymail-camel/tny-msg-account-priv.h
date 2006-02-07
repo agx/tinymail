@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_ACCOUNT_PRIV_H
-#define TNY_MSG_ACCOUNT_PRIV_H
+#ifndef TNY_ACCOUNT_PRIV_H
+#define TNY_ACCOUNT_PRIV_H
 
 /* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -20,9 +20,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-typedef struct _TnyMsgAccountPriv TnyMsgAccountPriv;
+typedef struct _TnyAccountPriv TnyAccountPriv;
 
-struct _TnyMsgAccountPriv
+struct _TnyAccountPriv
 {
 	TnyCamelSession *session;
 	CamelService *service;
@@ -36,8 +36,8 @@ struct _TnyMsgAccountPriv
 	gchar *user, *host, *proto;
 };
 
-const CamelService*  _tny_msg_account_get_service (TnyMsgAccount *self);
-const gchar*         _tny_msg_account_get_url_string (TnyMsgAccount *self);
+const CamelService*  _tny_account_get_service (TnyAccount *self);
+const gchar*         _tny_account_get_url_string (TnyAccount *self);
 
 
 #endif

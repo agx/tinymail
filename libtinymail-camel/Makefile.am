@@ -9,11 +9,11 @@ libtinymail_camel_1_0_headers =			\
 	tny-msg-header.h			\
 	tny-msg.h				\
 	tny-msg-folder.h			\
-	tny-msg-account.h			\
+	tny-account.h				\
 	tny-camel-session.h
 
 libtinymail_camel_1_0_la_SOURCES = 		\
-	tny-msg-account-priv.h			\
+	tny-account-priv.h			\
 	tny-msg-priv.h				\
 	tny-msg-header-priv.h			\
 	tny-msg-folder-priv.h			\
@@ -23,7 +23,7 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-msg-body.c				\
 	tny-msg-attachment.c			\
 	tny-msg-folder.c			\
-	tny-msg-account.c			\
+	tny-account.c				\
 	tny-camel-session.c
 
 libtinymail_camel_1_0_la_LIBADD =		\
