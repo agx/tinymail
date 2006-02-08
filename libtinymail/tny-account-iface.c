@@ -19,6 +19,19 @@
 
 #include <tny-account-iface.h>
 
+const gchar*
+tny_account_iface_get_id (TnyAccountIface *self)
+{
+	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_id_func (self);
+}
+
+void 
+tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
+{
+	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_id_func (self, id);
+	return;
+}
+
 void
 tny_account_iface_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forget_pass_func)
 {

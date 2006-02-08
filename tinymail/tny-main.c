@@ -15,11 +15,11 @@
  * along with self program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include "/home/pvanhoof/personal.h"
 
 #include <string.h>
 #include <gtk/gtk.h>
 
+#include <tny-account-factory.h>
 #include <tny-account-iface.h>
 #include <tny-account.h>
 
@@ -158,42 +158,6 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 	return;
 }
 
-
-static gchar* pwd = NULL;
-
-static gchar*
-get_password (TnyAccountIface *account)
-{
-	if (!pwd)
-		pwd = g_strdup (PERSONAL_PASSWORD);
-
-	return pwd;
-}
-
-
-static gchar*
-forget_password (TnyAccountIface *account)
-{
-	g_print ("Forgetting password\n");
-	memset (pwd, 0, strlen (pwd));
-	g_free (pwd);
-}
-
-static TnyAccountIface*
-create_account (void)
-{
-	TnyAccountIface* retval = TNY_ACCOUNT_IFACE (tny_account_new ());
-
-	tny_account_iface_set_hostname (retval, PERSONAL_HOSTNAME);
-	tny_account_iface_set_user (retval, PERSONAL_USERNAME);
-	tny_account_iface_set_proto (retval, PERSONAL_PROTOCOL);
-
-	tny_account_iface_set_pass_func (retval, get_password);
-	tny_account_iface_set_forget_pass_func (retval, forget_password);
-
-	return retval;
-}
-
 int 
 main (int argc, char **argv)
 {
@@ -208,10 +172,14 @@ main (int argc, char **argv)
 	GtkTreeModel *mailbox_model;
 	GtkTreeSelection *select;
 	gint t = 0, i = 0;
-	TnyAccountIface *account;
-	
+	TnyAccountFactory *account_factory;
+	GList *accounts;
+
+
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
+
+	account_factory = tny_account_factory_new ();
 
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title (GTK_WINDOW (window), "Tiny Mail");
@@ -279,10 +247,18 @@ main (int argc, char **argv)
 
 	mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 
-	account = create_account ();
 
-	tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
-		(mailbox_model), account);
+	accounts = tny_account_factory_get_accounts (account_factory);
+	
+	while (accounts)
+	{
+		TnyAccountIface *account = accounts->data;
+
+		tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
+			(mailbox_model), account);
+
+		accounts = g_list_next (accounts);
+	}
 
 	gtk_tree_view_set_model (GTK_TREE_VIEW (mailbox_view), mailbox_model);
 

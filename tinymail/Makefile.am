@@ -9,7 +9,9 @@ bin_PROGRAMS = tinymail
 tinymail_SOURCES = 							\
 	tny-main.c							\
 	tny-account-factory.c						\
-	tny-account-factory.h
+	tny-account-factory.h						\
+	tny-password-dialog.h						\
+	tny-password-dialog.c
 
 tinymail_LDADD = 							\
 	$(TINYMAIL_LIBS)						\

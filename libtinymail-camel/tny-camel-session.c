@@ -28,7 +28,14 @@
 #include <camel/camel.h>
 #include <camel/camel-filter-driver.h>
 #include <camel/camel-i18n.h>
+#include <camel/camel-store.h>
+#include <camel/camel.h>
+#include <camel/camel-session.h>
+
 #include <tny-camel-session.h>
+
+#include <tny-account.h>
+#include "tny-account-priv.h"
 
 static CamelSessionClass *ms_parent_class;
 static GList *password_funcs = NULL;
@@ -36,7 +43,7 @@ static GList *forget_password_funcs = NULL;
 
 typedef struct
 {
-	CamelSession *session;
+	CamelService *service;
 	GetPassFunc func;
 	TnyAccountIface *account;
 
@@ -44,7 +51,7 @@ typedef struct
 
 typedef struct
 {
-	CamelSession *session;
+	CamelService *service;
 	ForgetPassFunc func;
 	TnyAccountIface *account;
 
@@ -58,18 +65,19 @@ tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *
 	PrivForgetPassFunc *pf;
 	CamelSession *me = CAMEL_SESSION (self);
 	gboolean found = FALSE;
+	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
 
 	while (copy)
 	{
 		pf = copy->data;
 
-		if (pf->session == NULL || pf->account == NULL)
+		if (pf->service == NULL || pf->account == NULL)
 		{
 			mark_del = g_list_append (mark_del, copy);
 			continue;
 		}
 
-		if (pf->session == me)
+		if (pf->service == service)
 		{
 			found = TRUE;
 			break;
@@ -83,7 +91,7 @@ tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *
 
 	pf->account = account;
 	pf->func = get_forget_pass_func;
-	pf->session = me;
+	pf->service = service;
 
 	if (!found)
 		forget_password_funcs = g_list_append (forget_password_funcs, pf);
@@ -97,7 +105,6 @@ tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *
 
 	g_list_free (mark_del);
 
-	self->get_forget_pass_func = get_forget_pass_func;
 }
 
 void
@@ -107,18 +114,20 @@ tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account
 	PrivPassFunc *pf;
 	CamelSession *me = CAMEL_SESSION (self);
 	gboolean found = FALSE;
+	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
 
+	g_print ("Set pass func\n");
 	while (copy)
 	{
 		pf = copy->data;
 
-		if (pf->session == NULL || pf->account == NULL)
+		if (pf->service == NULL || pf->account == NULL)
 		{
 			mark_del = g_list_append (mark_del, copy);
 			continue;
 		}
 
-		if (pf->session == me)
+		if (pf->service == service)
 		{
 			found = TRUE;
 			break;
@@ -132,11 +141,13 @@ tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account
 
 	pf->account = account;
 	pf->func = get_pass_func;
-	pf->session = me;
+	pf->service = service;
 
-	if (!found)
+	if (!found) {
 		password_funcs = g_list_append (password_funcs, pf);
+		g_print ("Set pass func!! %d\n", pf->service);
 
+	}
 
 	if (mark_del) 
 		while (mark_del)
@@ -147,19 +158,6 @@ tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account
 
 	g_list_free (mark_del);
 
-	self->get_pass_func = get_pass_func;
-}
-
-GetPassFunc 
-tny_camel_session_get_pass_func (TnyCamelSession *self)
-{
-	return self->get_pass_func;
-}
-
-ForgetPassFunc 
-tny_camel_session_get_forget_pass_func (TnyCamelSession *self)
-{
-	return self->get_forget_pass_func;
 }
 
 static char *
@@ -170,12 +168,13 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 	GetPassFunc func;
 	TnyAccountIface *account;
 	gboolean found = FALSE;
+	gchar *retval = NULL;
 
 	while (copy)
 	{
 		PrivPassFunc *pf = copy->data;
 
-		if (pf->session == session)
+		if (pf->service == service)
 		{
 			found = TRUE;
 			func = pf->func;
@@ -187,9 +186,13 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 	}
 
 	if (found)
-		return func (account);
+		retval = func (account);
 
-	return NULL;
+	if (!retval)
+		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "");
+
+
+	return retval;
 }
 
 static void
@@ -204,7 +207,7 @@ tny_camel_session_forget_password (CamelSession *session, CamelService *service,
 	{
 		PrivForgetPassFunc *pf = copy->data;
 
-		if (pf->session == session)
+		if (pf->service == service)
 		{
 			found = TRUE;
 			func = pf->func;
@@ -372,13 +375,18 @@ tny_camel_session_init (TnyCamelSession *instance)
 }
 
 
+static TnyCamelSession* the_singleton;
+
 TnyCamelSession*
 tny_camel_session_new (void)
 {
-	TnyCamelSession *retval = TNY_CAMEL_SESSION 
-		(camel_object_new (TNY_CAMEL_SESSION_TYPE));
-	
-	return retval;
+	if (!the_singleton)
+	{
+		the_singleton = TNY_CAMEL_SESSION 
+			(camel_object_new (TNY_CAMEL_SESSION_TYPE));
+	}
+
+	return the_singleton;
 }
 
 
@@ -402,8 +410,9 @@ tny_camel_session_class_init (TnyCamelSessionClass *tny_camel_session_class)
 	camel_session_class->thread_msg_free = tny_camel_session_ms_thread_msg_free;
 	camel_session_class->thread_status = tny_camel_session_ms_thread_status;
 
-	tny_camel_session_class->get_pass_func_func = tny_camel_session_get_pass_func;
 	tny_camel_session_class->set_pass_func_func = tny_camel_session_set_pass_func;
+	tny_camel_session_class->set_forget_pass_func_func = tny_camel_session_set_forget_pass_func;
+
 }
 
 CamelType

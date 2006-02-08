@@ -39,7 +39,7 @@ typedef struct _TnyAccountIfaceClass TnyAccountIfaceClass;
 typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
 typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
 typedef gchar* (*GetPassFunc) (TnyAccountIface *self);
-typedef gchar* (*ForgetPassFunc) (TnyAccountIface *self);
+typedef void (*ForgetPassFunc) (TnyAccountIface *self);
 
 G_END_DECLS
 

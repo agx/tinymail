@@ -90,7 +90,7 @@ tny_account_get_folders (TnyAccountIface *self)
 static void 
 reconnect (TnyAccountPriv *priv)
 {
-	if (priv->pass_func_set && priv->proto && priv->user && priv->host)
+	if (priv->proto && priv->user && priv->host)
 	{
 		CamelURL *url = NULL;
 		gchar *proto = g_strdup_printf ("%s://", priv->proto); 
@@ -100,27 +100,48 @@ reconnect (TnyAccountPriv *priv)
 	
 		camel_url_set_protocol (url, priv->proto); 
 
-
 		camel_url_set_user (url, priv->user);
 		camel_url_set_host (url, priv->host);
 	
+		/* TODO: Free existing service and url string */
 		priv->url_string = camel_url_to_string (url, 0);
 	
 		priv->service = camel_session_get_service 
 			(CAMEL_SESSION (priv->session), priv->url_string, 
 			CAMEL_PROVIDER_STORE, priv->ex);
-	
+
 		if (priv->service == NULL) {
 			g_print ("couldn't get service %s: %s\n", priv->url_string,
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
 			return;
 		}
-	
-		camel_service_connect (priv->service, priv->ex);
-		camel_url_free (url);
 
+		camel_url_free (url);
 	}
+
+	if (priv->service && priv->pass_func_set && priv->user && priv->host)
+	{
+		g_print ("CONNECTING %s\n", camel_service_get_url (priv->service));
+		camel_service_connect (priv->service, priv->ex);
+		
+		g_print ("Connection failure? %s: %s\n", priv->url_string,
+				   camel_exception_get_description (priv->ex));
+	}
+
+	return;
+}
+
+
+void
+tny_account_set_id (TnyAccountIface *self, const gchar *id)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	
+	if (priv->id)
+		g_free (priv->id);
+
+	priv->id = g_strdup (id);
 
 	return;
 }
@@ -196,6 +217,13 @@ tny_account_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forg
 	return;
 }
 
+const gchar*
+tny_account_get_id (TnyAccountIface *self)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	
+	return (const gchar*)priv->id;
+}
 
 const gchar*
 tny_account_get_proto (TnyAccountIface *self)
@@ -271,7 +299,7 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
 
-
+	priv->id = NULL;
 	priv->user = NULL;
 	priv->host = NULL;
 	priv->proto = NULL;
@@ -287,6 +315,18 @@ tny_account_finalize (GObject *object)
 {
 	TnyAccount *self = (TnyAccount *)object;	
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	if (priv->id)
+		g_free (priv->id);
+
+	if (priv->user)
+		g_free (priv->user);
+
+	if (priv->host)
+		g_free (priv->proto);
+
+	if (priv->proto)
+		g_free (priv->proto);
 
 	camel_exception_free (priv->ex);
 
@@ -316,6 +356,9 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->get_forget_pass_func_func = tny_account_get_forget_pass_func;
 	klass->set_forget_pass_func_func = tny_account_set_forget_pass_func;
+
+	klass->set_id_func = tny_account_set_id;
+	klass->get_id_func = tny_account_get_id;
 
 	return;
 }

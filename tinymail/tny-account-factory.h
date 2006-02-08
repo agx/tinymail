@@ -25,7 +25,7 @@
 
 G_BEGIN_DECLS
 
-#define TNY_ACCOUNT_FACTORY_TYPE             (tny_account_get_type ())
+#define TNY_ACCOUNT_FACTORY_TYPE             (tny_account_factory_get_type ())
 #define TNY_ACCOUNT_FACTORY(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_ACCOUNT_FACTORY_TYPE, TnyAccountFactory))
 #define TNY_ACCOUNT_FACTORY_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_ACCOUNT_FACTORY_TYPE, TnyAccountFactoryClass))
 #define TNY_IS_ACCOUNT_FACTORY(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_ACCOUNT_FACTORY_TYPE))
@@ -45,9 +45,11 @@ struct _TnyAccountFactoryClass
 	GObjectClass parent;
 };
 
-GType                   tny_account_factory_get_type       (void);
-TnyAccountFactory*      tny_account_factory_new            (void);
+GType               tny_account_factory_get_type       (void);
+TnyAccountFactory*  tny_account_factory_new            (void);
 
+GList*              tny_account_factory_get_accounts   (TnyAccountFactory *self);
+void                tny_account_factory_add_account    (TnyAccountFactory *self, TnyAccountIface *account);
 
 G_END_DECLS
 
