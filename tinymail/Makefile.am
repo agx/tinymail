@@ -9,6 +9,8 @@ bin_PROGRAMS = tinymail
 tinymail_SOURCES = 							\
 	tny-main.c							\
 	tny-summary-window.c						\
+	tny-msg-window.h						\
+	tny-msg-window.c						\
 	tny-summary-window.h						\
 	tny-account-store.c						\
 	tny-account-store.h						\
