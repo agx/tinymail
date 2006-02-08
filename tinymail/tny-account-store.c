@@ -101,7 +101,7 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
 	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
  */
-GList*
+const GList*
 tny_account_store_get_accounts (TnyAccountStore *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
@@ -142,7 +142,7 @@ tny_account_store_get_accounts (TnyAccountStore *self)
 		}
 	}
 
-	return priv->accounts;
+	return (const GList*) priv->accounts;
 }
 
 void
@@ -153,7 +153,7 @@ tny_account_store_add_account (TnyAccountStore *self, TnyAccountIface *account)
 
 
 TnyAccountStore*
-tny_account_store_new (void)
+tny_account_store_get_instance (void)
 {
 	TnyAccountStore *self = g_object_new (TNY_ACCOUNT_STORE_TYPE, NULL);
 

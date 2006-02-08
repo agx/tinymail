@@ -152,6 +152,8 @@ bin_PROGRAMS = tinymail
 
 tinymail_SOURCES = \
 	tny-main.c							\
+	tny-summary-window.c						\
+	tny-summary-window.h						\
 	tny-account-store.c						\
 	tny-account-store.h						\
 	tny-password-dialog.h						\
@@ -174,8 +176,8 @@ CONFIG_CLEAN_FILES =
 bin_PROGRAMS = tinymail$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
-am_tinymail_OBJECTS = tny-main.$(OBJEXT) tny-account-store.$(OBJEXT) \
-	tny-password-dialog.$(OBJEXT)
+am_tinymail_OBJECTS = tny-main.$(OBJEXT) tny-summary-window.$(OBJEXT) \
+	tny-account-store.$(OBJEXT) tny-password-dialog.$(OBJEXT)
 tinymail_OBJECTS = $(am_tinymail_OBJECTS)
 tinymail_DEPENDENCIES = \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
@@ -188,7 +190,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/tny-account-store.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/tny-main.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/tny-password-dialog.Po
+@AMDEP_TRUE@	./$(DEPDIR)/tny-password-dialog.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/tny-summary-window.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -269,6 +272,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tny-account-store.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tny-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tny-password-dialog.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tny-summary-window.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
