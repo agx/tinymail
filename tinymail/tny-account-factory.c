@@ -17,6 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <string.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gconf/gconf-client.h>
@@ -75,8 +76,23 @@ per_account_get_pass_func (TnyAccountIface *account)
 }
 
 static void
-per_account_forget_pass_func (TnyAccountIface *self)
+per_account_forget_pass_func (TnyAccountIface *account)
 {
+	if (passwords)
+	{
+		const gchar *accountid = tny_account_iface_get_id (account);
+
+		gchar *pwd = g_hash_table_lookup (passwords, accountid);
+
+		if (pwd) 
+		{
+			memset (pwd, 0, strlen (pwd));
+			g_free (pwd);
+			g_hash_table_remove (passwords, accountid);
+		}
+	}
+
+	return;
 }
 
 /*
