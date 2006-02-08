@@ -22,7 +22,7 @@
 #include <gtk/gtk.h>
 #include <gconf/gconf-client.h>
 
-#include <tny-account-factory.h>
+#include <tny-account-store.h>
 #include <tny-password-dialog.h>
 #include <tny-account-iface.h>
 #include <tny-account.h>
@@ -30,16 +30,16 @@
 static GObjectClass *parent_class = NULL;
 
 
-typedef struct _TnyAccountFactoryPriv TnyAccountFactoryPriv;
+typedef struct _TnyAccountStorePriv TnyAccountStorePriv;
 
-struct _TnyAccountFactoryPriv
+struct _TnyAccountStorePriv
 {
 	GConfClient *client;
 	GList *accounts;
 };
 
-#define TNY_ACCOUNT_FACTORY_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ACCOUNT_FACTORY_TYPE, TnyAccountFactoryPriv))
+#define TNY_ACCOUNT_STORE_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ACCOUNT_STORE_TYPE, TnyAccountStorePriv))
 
 
 static GHashTable *passwords;
@@ -102,9 +102,9 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
  */
 GList*
-tny_account_factory_get_accounts (TnyAccountFactory *self)
+tny_account_store_get_accounts (TnyAccountStore *self)
 {
-	TnyAccountFactoryPriv *priv = TNY_ACCOUNT_FACTORY_GET_PRIVATE (self);
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	if (!priv->accounts)
 	{
@@ -146,25 +146,25 @@ tny_account_factory_get_accounts (TnyAccountFactory *self)
 }
 
 void
-tny_account_factory_add_account (TnyAccountFactory *self, TnyAccountIface *account)
+tny_account_store_add_account (TnyAccountStore *self, TnyAccountIface *account)
 {
-	TnyAccountFactoryPriv *priv = TNY_ACCOUNT_FACTORY_GET_PRIVATE (self);
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 }
 
 
-TnyAccountFactory*
-tny_account_factory_new (void)
+TnyAccountStore*
+tny_account_store_new (void)
 {
-	TnyAccountFactory *self = g_object_new (TNY_ACCOUNT_FACTORY_TYPE, NULL);
+	TnyAccountStore *self = g_object_new (TNY_ACCOUNT_STORE_TYPE, NULL);
 
 	return self;
 }
 
 static void
-tny_account_factory_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyAccountFactory *self = (TnyAccountFactory *)instance;
-	TnyAccountFactoryPriv *priv = TNY_ACCOUNT_FACTORY_GET_PRIVATE (self);
+	TnyAccountStore *self = (TnyAccountStore *)instance;
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	priv->client = gconf_client_get_default ();
 
@@ -172,20 +172,20 @@ tny_account_factory_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_account_factory_finalize (GObject *object)
+tny_account_store_finalize (GObject *object)
 {
-	TnyAccountFactory *self = (TnyAccountFactory *)object;	
-	TnyAccountFactoryPriv *priv = TNY_ACCOUNT_FACTORY_GET_PRIVATE (self);
+	TnyAccountStore *self = (TnyAccountStore *)object;	
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	(*parent_class->finalize) (object);
 
 	return;
 }
 
-static TnyAccountFactory *the_singleton = NULL;
+static TnyAccountStore *the_singleton = NULL;
 
 static GObject*
-tny_account_factory_constructor (GType type, guint n_construct_params,
+tny_account_store_constructor (GType type, guint n_construct_params,
 			GObjectConstructParam *construct_params)
 {
 	GObject *object;
@@ -195,7 +195,7 @@ tny_account_factory_constructor (GType type, guint n_construct_params,
 		object = G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_params, construct_params);
 
-		the_singleton = TNY_ACCOUNT_FACTORY (object);
+		the_singleton = TNY_ACCOUNT_STORE (object);
 	}
 	else
 		object = g_object_ref (G_OBJECT (the_singleton));
@@ -205,23 +205,23 @@ tny_account_factory_constructor (GType type, guint n_construct_params,
 
 
 static void 
-tny_account_factory_class_init (TnyAccountFactoryClass *class)
+tny_account_store_class_init (TnyAccountStoreClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_account_factory_finalize;
-	object_class->constructor = tny_account_factory_constructor;
+	object_class->finalize = tny_account_store_finalize;
+	object_class->constructor = tny_account_store_constructor;
 
-	g_type_class_add_private (object_class, sizeof (TnyAccountFactoryPriv));
+	g_type_class_add_private (object_class, sizeof (TnyAccountStorePriv));
 
 	return;
 }
 
 GType 
-tny_account_factory_get_type (void)
+tny_account_store_get_type (void)
 {
 	static GType type = 0;
 
@@ -229,19 +229,19 @@ tny_account_factory_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyAccountFactoryClass),
+		  sizeof (TnyAccountStoreClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_account_factory_class_init,   /* class_init */
+		  (GClassInitFunc) tny_account_store_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyAccountFactory),
+		  sizeof (TnyAccountStore),
 		  0,      /* n_preallocs */
-		  tny_account_factory_instance_init    /* instance_init */
+		  tny_account_store_instance_init    /* instance_init */
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyAccountFactory",
+			"TnyAccountStore",
 			&info, 0);
 	}
 

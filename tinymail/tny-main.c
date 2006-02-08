@@ -19,7 +19,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
-#include <tny-account-factory.h>
+#include <tny-account-store.h>
 #include <tny-account-iface.h>
 #include <tny-account.h>
 
@@ -172,14 +172,14 @@ main (int argc, char **argv)
 	GtkTreeModel *mailbox_model;
 	GtkTreeSelection *select;
 	gint t = 0, i = 0;
-	TnyAccountFactory *account_factory;
+	TnyAccountStore *account_store;
 	GList *accounts;
 
 
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
 
-	account_factory = tny_account_factory_new ();
+	account_store = tny_account_store_new ();
 
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title (GTK_WINDOW (window), "Tiny Mail");
@@ -248,7 +248,7 @@ main (int argc, char **argv)
 	mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 
 
-	accounts = tny_account_factory_get_accounts (account_factory);
+	accounts = tny_account_store_get_accounts (account_store);
 	
 	while (accounts)
 	{
