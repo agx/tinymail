@@ -56,7 +56,7 @@ struct _TnyAccountTreeModelClass
 
 
 GType                   tny_account_tree_model_get_type  (void);
-TnyAccountTreeModel* tny_account_tree_model_new       (void);
+TnyAccountTreeModel*    tny_account_tree_model_new       (void);
 
 void                    tny_account_tree_model_add       (TnyAccountTreeModel *self, TnyAccountIface *account);
 
