@@ -21,6 +21,7 @@
 #include <gtk/gtk.h>
 
 #include <tny-password-dialog.h>
+#include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 #include <tny-account-iface.h>
 #include <tny-account.h>
@@ -190,7 +191,9 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkTreeSelection *select;
 	gint t = 0, i = 0;
 	const GList *accounts;
-	TnyAccountStore *account_store = tny_account_store_get_instance ();
+
+	TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE
+		(tny_account_store_get_instance ());
 
 	gtk_window_set_title (window, "Tinymail");
 	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
@@ -257,7 +260,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 
 
-	accounts = tny_account_store_get_accounts (account_store);
+	accounts = tny_account_store_iface_get_accounts (account_store);
 	
 	while (accounts)
 	{

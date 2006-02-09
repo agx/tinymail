@@ -22,8 +22,6 @@
 
 G_BEGIN_DECLS
 
-/* I used forward typedefs to make it possible to cross-reference */
-
 typedef struct _TnyMsgIface TnyMsgIface;
 typedef struct _TnyMsgIfaceClass TnyMsgIfaceClass;
 typedef struct _TnyMsgFolderIface TnyMsgFolderIface;
@@ -36,6 +34,8 @@ typedef struct _TnyMsgAttachmentIface TnyMsgAttachmentIface;
 typedef struct _TnyMsgAttachmentIfaceClass TnyMsgAttachmentIfaceClass;
 typedef struct _TnyAccountIface TnyAccountIface;
 typedef struct _TnyAccountIfaceClass TnyAccountIfaceClass;
+typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
+typedef struct _TnyAccountStoreIfaceClass TnyAccountStoreIfaceClass;
 typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
 typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
 typedef gchar* (*GetPassFunc) (TnyAccountIface *self);

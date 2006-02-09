@@ -48,9 +48,6 @@ struct _TnyAccountStoreClass
 GType               tny_account_store_get_type       (void);
 TnyAccountStore*    tny_account_store_get_instance   (void);
 
-const GList*        tny_account_store_get_accounts   (TnyAccountStore *self);
-void                tny_account_store_add_account    (TnyAccountStore *self, TnyAccountIface *account);
-
 G_END_DECLS
 
 #endif

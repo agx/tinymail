@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 #include <gconf/gconf-client.h>
 
+#include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 #include <tny-password-dialog.h>
 #include <tny-account-iface.h>
@@ -100,9 +101,10 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	gconftool-2 -s /apps/tinymail/accounts/0/proto -t string imap
 	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
 	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
- */
-const GList*
-tny_account_store_get_accounts (TnyAccountStore *self)
+*/
+
+static const GList*
+tny_account_store_get_accounts (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
@@ -145,10 +147,14 @@ tny_account_store_get_accounts (TnyAccountStore *self)
 	return (const GList*) priv->accounts;
 }
 
-void
-tny_account_store_add_account (TnyAccountStore *self, TnyAccountIface *account)
+static void
+tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	g_print ("TODO adding account\n");
+
+	return;
 }
 
 
@@ -220,6 +226,18 @@ tny_account_store_class_init (TnyAccountStoreClass *class)
 	return;
 }
 
+static void
+tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
+{
+	TnyAccountStoreIfaceClass *klass = (TnyAccountStoreIfaceClass *)g_iface;
+
+	klass->add_account_func = tny_account_store_add_account;
+	klass->get_accounts_func = tny_account_store_get_accounts;
+
+	return;
+}
+
+
 GType 
 tny_account_store_get_type (void)
 {
@@ -240,9 +258,19 @@ tny_account_store_get_type (void)
 		  tny_account_store_instance_init    /* instance_init */
 		};
 
+		static const GInterfaceInfo tny_account_store_iface_info = 
+		{
+		  (GInterfaceInitFunc) tny_account_store_iface_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyAccountStore",
 			&info, 0);
+
+		g_type_add_interface_static (type, TNY_ACCOUNT_STORE_IFACE_TYPE, 
+			&tny_account_store_iface_info);
 	}
 
 	return type;
