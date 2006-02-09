@@ -325,12 +325,12 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
 		G_CALLBACK (on_header_view_tree_row_activated), priv->header_view);
 
-	gtk_box_pack_start (GTK_BOX (hbox), mailbox_sw, FALSE, FALSE, 0);
-	gtk_box_pack_start (GTK_BOX (hbox), header_sw, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (hbox), mailbox_sw, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (hbox), header_sw, TRUE, TRUE, 0);
 
 	gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
 
-	gtk_widget_show_all (GTK_WIDGET(window));
+	gtk_widget_show_all (GTK_WIDGET(hbox));
 
 	return;
 }

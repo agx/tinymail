@@ -18,6 +18,7 @@
 
 
 #include <gtk/gtk.h>
+
 #include <tny-summary-window.h>
 #include <tny-summary-window-iface.h>
 #include <tny-account-store-iface.h>
