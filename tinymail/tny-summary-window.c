@@ -314,7 +314,11 @@ static void
 tny_summary_window_finalize (GObject *object)
 {
 	TnySummaryWindow *self = (TnySummaryWindow *)object;	
-	
+	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
+
+	if (priv->account_store)
+		g_object_unref (G_OBJECT (priv->account_store));
+
 	(*parent_class->finalize) (object);
 
 	return;

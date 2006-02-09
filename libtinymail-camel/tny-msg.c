@@ -147,6 +147,8 @@ tny_msg_add_attachment (TnyMsgIface *self, TnyMsgAttachmentIface *attachment)
 
 	tny_msg_attachment_iface_set_id (attachment, id);
 
+	g_object_ref (G_OBJECT (attachment));
+
 	priv->attachments = g_list_insert_sorted (
 		priv->attachments, 
 		attachment, compare_attachments_by_id);
@@ -182,6 +184,7 @@ tny_msg_set_body (TnyMsgIface *self, TnyMsgBodyIface *body)
 		g_object_unref (G_OBJECT (priv->body));
 
 	g_object_ref (G_OBJECT (body));
+
 	priv->body = body;
 
 	return;
@@ -196,6 +199,7 @@ tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 		g_object_unref (G_OBJECT (priv->header));
 
 	g_object_ref (G_OBJECT (header));
+
 	priv->header = header;
 
 	return;
@@ -228,6 +232,7 @@ tny_msg_finalize (GObject *object)
 			destroy_attachment, NULL);
 
 		g_list_free (priv->attachments);
+
 		priv->attachments = NULL;
 	}
 

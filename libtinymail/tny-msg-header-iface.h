@@ -20,6 +20,17 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* 
+ * Whether or not this type should be implemented using GTypeInterface,
+ * is indeed questionable. Mainly because a lot instances of this type
+ * will be created during the lifetime of the application. GObject 
+ * is known to be rather slow.
+ *
+ * It could easily be done as a more simple C-Interface. But let's first
+ * measure the performance, before starting to make decisions not to utilise
+ * GObject standard techniques.
+ */
+
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-shared.h>

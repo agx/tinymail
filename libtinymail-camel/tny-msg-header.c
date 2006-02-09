@@ -55,6 +55,7 @@ unload_msg_header (TnyMsgHeaderPriv *priv)
 	if (priv->message_info) 
 	{
 		camel_message_info_free (priv->message_info);
+
 		/* TODO: Remove debugging purpose */
 		allocations--;
 		g_print ("Deallocation. Current = %d\n", allocations);
@@ -72,6 +73,7 @@ load_msg_header (TnyMsgHeaderPriv *priv)
 	{
 		CamelFolder *folder = _tny_msg_folder_get_camel_folder (priv->folder);
 		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, priv->id);
+
 		tny_msg_header_set_camel_message_info_priv (priv, msginfo);
 
 		/* TODO: Remove debugging purpose */
@@ -82,7 +84,7 @@ load_msg_header (TnyMsgHeaderPriv *priv)
 	return;
 }
 
-void
+void /* public version of this method */
 _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
@@ -105,6 +107,11 @@ void
 tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* folder)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	/* if (priv->folder)
+		g_object_unref (G_OBJECT (priv->folder));
+
+	   g_object_ref (G_OBJECT (folder) ) */
 
 	priv->folder = (TnyMsgFolderIface*)folder;
 
@@ -170,18 +177,21 @@ tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 static void
 tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
 {
+	g_warning ("%s not implemented\n", __FUNCTION__);
 	return;
 }
 
 static void
 tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
 {
+	g_warning ("%s not implemented\n", __FUNCTION__);
 	return;
 }
 
 static void
 tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 {
+	g_warning ("%s not implemented\n", __FUNCTION__);
 	return;
 }
 
@@ -209,6 +219,9 @@ tny_msg_header_finalize (GObject *object)
 {
 	TnyMsgHeader *self = (TnyMsgHeader*) object;
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (self);
+
+	/* if (priv->folder)
+		g_object_unref (G_OBJECT (priv->folder)); */
 
 	unload_msg_header (priv);
 
