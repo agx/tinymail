@@ -105,6 +105,7 @@ tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *
 
 	g_list_free (mark_del);
 
+	return;
 }
 
 void
@@ -154,6 +155,7 @@ tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account
 
 	g_list_free (mark_del);
 
+	return;
 }
 
 static char *
@@ -301,20 +303,20 @@ tny_camel_session_get_filter_driver (CamelSession *session, const char *type, Ca
 static void 
 my_receive_func(CamelSession *session, struct _CamelSessionThreadMsg *m)
 {
-	g_print ("Receive func\n");
+	return;
 }
 
 static void
 my_free_func (CamelSession *session, struct _CamelSessionThreadMsg *m)
 {
-	g_print ("Free func\n");
+	return;
 }
 
 
 static void 
 my_cancel_func (struct _CamelOperation *op, const char *what, int pc, void *data)
 {
-	g_print ("Cancel func\n");
+	return;
 }
 
 static void *
@@ -336,6 +338,8 @@ static void
 tny_camel_session_ms_thread_msg_free (CamelSession *session, CamelSessionThreadMsg *m)
 {
 	ms_parent_class->thread_msg_free(session, m);
+
+	return;
 }
 
 static void
@@ -390,6 +394,8 @@ static void
 tny_camel_session_finalise (TnyCamelSession *session)
 {
 	g_print ("Critical TODO item at %s\n", __FUNCTION__);
+
+	return;
 }
 
 static void
@@ -409,6 +415,7 @@ tny_camel_session_class_init (TnyCamelSessionClass *tny_camel_session_class)
 	tny_camel_session_class->set_pass_func_func = tny_camel_session_set_pass_func;
 	tny_camel_session_class->set_forget_pass_func_func = tny_camel_session_set_forget_pass_func;
 
+	return;
 }
 
 CamelType
