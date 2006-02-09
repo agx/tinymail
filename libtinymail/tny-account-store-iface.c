@@ -17,7 +17,17 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#ifndef TNY_ACCOUNT_STORE_IFACE_C
+#define TNY_ACCOUNT_STORE_IFACE_C
+#endif
+
 #include <tny-account-store-iface.h>
+
+#ifdef TNY_ACCOUNT_STORE_IFACE_C
+#undef TNY_ACCOUNT_STORE_IFACE_C
+#endif
+
+guint *tny_account_store_iface_signals = NULL;
 
 const GList*
 tny_account_store_iface_get_accounts (TnyAccountStoreIface *self)
@@ -38,10 +48,60 @@ tny_account_store_iface_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
-	if (!initialized) {
-		/* create interface signals here. */
+	if (!initialized) 
+	{
+
+		tny_account_store_iface_signals = g_new0 (guint, LAST_SIGNAL);
+
+		tny_account_store_iface_signals[ACCOUNT_CHANGED] =
+		   g_signal_new ("account_changed",
+			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_changed),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__POINTER,
+			G_TYPE_NONE, 1, TNY_ACCOUNT_STORE_IFACE_TYPE);
+
+		tny_account_store_iface_signals[ACCOUNT_INSERTED] =
+		   g_signal_new ("account_inserted",
+			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_inserted),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__POINTER,
+			G_TYPE_NONE, 1, TNY_ACCOUNT_STORE_IFACE_TYPE);
+
+		tny_account_store_iface_signals[ACCOUNT_REMOVED] =
+		   g_signal_new ("account_removed",
+			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_removed),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__POINTER,
+			G_TYPE_NONE, 1, TNY_ACCOUNT_STORE_IFACE_TYPE);
+
+		tny_account_store_iface_signals[ACCOUNTS_RELOADED] =
+		   g_signal_new ("accounts_reloaded",
+			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, accounts_reloaded),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE, 0);
+
 		initialized = TRUE;
 	}
+
+	return;
+}
+
+static void
+tny_account_store_iface_base_finalize (gpointer g_class)
+{
+	if (tny_account_store_iface_signals)
+		g_free (tny_account_store_iface_signals);
+
+	return;
 }
 
 GType
@@ -54,7 +114,7 @@ tny_account_store_iface_get_type (void)
 		{
 		  sizeof (TnyAccountStoreIfaceClass),
 		  tny_account_store_iface_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
+		  tny_account_store_iface_base_finalize,   /* base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */

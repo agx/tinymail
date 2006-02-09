@@ -378,7 +378,7 @@ tny_camel_session_init (TnyCamelSession *instance)
 static TnyCamelSession* the_singleton;
 
 TnyCamelSession*
-tny_camel_session_new (void)
+tny_camel_session_get_instance (void)
 {
 	if (!the_singleton)
 	{

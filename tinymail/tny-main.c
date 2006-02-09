@@ -41,7 +41,7 @@ main (int argc, char **argv)
 
 	
 	g_signal_connect (window, "destroy",
-		G_CALLBACK (gtk_exit), &window);
+		G_CALLBACK (gtk_exit), 0);
 
 	gtk_main();
 

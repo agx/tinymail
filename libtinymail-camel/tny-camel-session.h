@@ -51,7 +51,7 @@ struct _TnyCamelSessionClass
 };
 
 CamelType         tny_camel_session_get_type      (void);
-TnyCamelSession*  tny_camel_session_new           (void);
+TnyCamelSession*  tny_camel_session_get_instance  (void);
 
 void              tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account, GetPassFunc get_pass_func);
 void              tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *account, ForgetPassFunc get_forget_pass_func);

@@ -33,12 +33,33 @@ G_BEGIN_DECLS
 #define TNY_IS_ACCOUNT_STORE_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_ACCOUNT_STORE_IFACE_TYPE))
 #define TNY_ACCOUNT_STORE_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_ACCOUNT_STORE_IFACE_TYPE, TnyAccountStoreIfaceClass))
 
+enum
+{
+	ACCOUNT_CHANGED,
+	ACCOUNT_INSERTED,
+	ACCOUNT_REMOVED,
+	ACCOUNTS_RELOADED,
+	LAST_SIGNAL
+};
+
+#ifndef TNY_ACCOUNT_STORE_IFACE_C
+extern guint *tny_account_store_iface_signals;
+#endif
+
 struct _TnyAccountStoreIfaceClass
 {
 	GTypeInterface parent;
 
+	/* Signals */
+	void (*account_changed)               (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_inserted)              (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_removed)               (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*accounts_reloaded)             (TnyAccountStoreIface *self);
+
+	/* Methods */
 	const GList*  (*get_accounts_func)    (TnyAccountStoreIface *self);
 	void          (*add_account_func)     (TnyAccountStoreIface *self, TnyAccountIface *account);
+
 
 };
 

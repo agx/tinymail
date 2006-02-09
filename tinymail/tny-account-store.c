@@ -38,13 +38,39 @@ struct _TnyAccountStorePriv
 {
 	GConfClient *client;
 	GList *accounts;
+	guint notify;
 };
 
 #define TNY_ACCOUNT_STORE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ACCOUNT_STORE_TYPE, TnyAccountStorePriv))
 
-
 static GHashTable *passwords;
+
+
+static const GList* tny_account_store_get_accounts (TnyAccountStoreIface *self);
+
+static void
+destroy_account (gpointer data, gpointer user_data)
+{
+	g_object_unref (G_OBJECT (data));
+
+	return;
+}
+
+static void
+destroy_current_accounts (TnyAccountStorePriv *priv)
+{
+	if (priv->accounts) 
+	{
+		g_list_foreach (priv->accounts, destroy_account, NULL);
+
+		g_list_free (priv->accounts);
+
+		priv->accounts = NULL;
+	}
+
+	return;
+}
 
 static gchar* 
 per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
@@ -99,15 +125,61 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	return;
 }
 
-/*
-static void 
-gconf_listener_account_changed (nth account)
+static void
+gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
+			GConfEntry *entry, gpointer user_data)
 {
-	TODO: Update nth account in priv->accounts
+	TnyAccountStoreIface *self = user_data;
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	TODO: inform the instance as an observer
+	gchar *key = g_strdup (entry->key);
+	gchar *ptr = strrchr (key, '/'); ptr++;
+
+	if (!strcmp (ptr, "count"))
+	{
+		/* An account got added, so we simple reload all */
+		destroy_current_accounts (priv);
+		tny_account_store_get_accounts (self);
+	} else 
+	{
+		GList *accounts = priv->accounts;
+		TnyAccountIface *found = NULL;
+		const gchar *val;
+
+		/* Whooo, crazy pointer hocus! */
+		gchar orig = *ptr--; *ptr = '\0';
+
+		while (accounts)
+		{
+			TnyAccountIface *account = accounts->data;
+			const gchar *aid = tny_account_iface_get_id (account);
+			
+			if (strcmp (key, aid)==0)
+			{
+				found = account;
+				break;
+			}
+
+			accounts = g_list_next (accounts);
+		}
+
+		/* pocus! */
+		*ptr = orig; *ptr++;
+
+		val = gconf_value_get_string (entry->value);
+
+		/* phoef! */
+		if (found && strcmp (ptr, "user")==0)
+			tny_account_iface_set_user (found, val);
+		else if (found && strcmp (ptr, "proto")==0)
+			tny_account_iface_set_proto (found, val);
+		else if (found && strcmp (ptr, "hostname")==0)
+			tny_account_iface_set_hostname (found, val);
+	}
+
+	g_free (key);
+	return;
 }
-*/
 
 static const GList*
 tny_account_store_get_accounts (TnyAccountStoreIface *self)
@@ -131,6 +203,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self)
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", i);
 			user = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
+
 			g_free (key);
 			tny_account_iface_set_user (account, user);
 
@@ -151,13 +224,12 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self)
 
 			tny_account_iface_set_pass_func (account, per_account_get_pass_func);
 
-			/* TODO: Add GConf listener on (/apps/tinymail/accounts/%d/*, i) */
-
 			g_object_ref (G_OBJECT (account));
 			priv->accounts = g_list_append (priv->accounts, account);
 		}
 
-		/* TODO: Inform observers */
+		g_signal_emit (self, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+
 	}
 
 	return (const GList*) priv->accounts;
@@ -199,10 +271,10 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
 		count, NULL);
 
-	/* TODO: Add GConf listener on (/apps/tinymail/accounts/%d/*, i) */
-
 	g_object_ref (G_OBJECT (account));
 	priv->accounts = g_list_append (priv->accounts, account);
+
+	g_signal_emit (self, tny_account_store_iface_signals [ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
@@ -222,18 +294,18 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyAccountStore *self = (TnyAccountStore *)instance;
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	/* TODO: Add GConf listener on (/apps/tinymail/accounts/count) */
-
 	priv->client = gconf_client_get_default ();
+
+	gconf_client_add_dir (priv->client, "/apps/tinymail", 
+		GCONF_CLIENT_PRELOAD_RECURSIVE, NULL);
+
+	priv->notify = gconf_client_notify_add (priv->client, 
+		"/apps/tinymail/accounts", gconf_listener_account_changed,
+		self, NULL, NULL);
 
 	return;
 }
 
-static void
-destroy_account (gpointer data, gpointer user_data)
-{
-	g_object_unref (G_OBJECT (data));
-}
 
 static void
 tny_account_store_finalize (GObject *object)
@@ -241,14 +313,11 @@ tny_account_store_finalize (GObject *object)
 	TnyAccountStore *self = (TnyAccountStore *)object;	
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	if (priv->accounts) 
-	{
-		g_list_foreach (priv->accounts, destroy_account, NULL);
 
-		g_list_free (priv->accounts);
+	gconf_client_notify_remove (priv->client, priv->notify);
+	g_object_unref (G_OBJECT (priv->client));
 
-		priv->accounts = NULL;
-	}
+	destroy_current_accounts (priv);
 
 	(*parent_class->finalize) (object);
 

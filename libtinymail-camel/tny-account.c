@@ -303,7 +303,7 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->proto = NULL;
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
-	priv->session = tny_camel_session_new ();
+	priv->session = tny_camel_session_get_instance ();
 
 	return;
 }
