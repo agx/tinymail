@@ -103,9 +103,14 @@ reconnect (TnyAccountPriv *priv)
 		camel_url_set_user (url, priv->user);
 		camel_url_set_host (url, priv->host);
 	
-		/* TODO: Free existing service and url string */
+		if (priv->url_string)
+			g_free (priv->url_string);
+
 		priv->url_string = camel_url_to_string (url, 0);
-	
+
+		if (priv->service)
+			camel_object_unref (CAMEL_OBJECT (priv->service));
+
 		priv->service = camel_session_get_service 
 			(CAMEL_SESSION (priv->session), priv->url_string, 
 			CAMEL_PROVIDER_STORE, priv->ex);

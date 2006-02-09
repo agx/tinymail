@@ -27,7 +27,7 @@ struct _TnyAccountPriv
 	TnyCamelSession *session;
 	CamelService *service;
 	CamelException *ex;
-	const gchar *url_string;
+	gchar *url_string;
 	gchar *id;
 	GList *folders;
 	GetPassFunc get_pass_func;
