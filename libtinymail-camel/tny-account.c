@@ -53,8 +53,6 @@ fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelF
 		TnyMsgFolderIface *iface = TNY_MSG_FOLDER_IFACE (
 			tny_msg_folder_new ());
 
-
-		g_print ("Full name: %s\n", iter->full_name);
 		tny_msg_folder_iface_set_id (iface, iter->full_name);
 		tny_msg_folder_iface_set_account (iface, self);
 
@@ -125,14 +123,9 @@ reconnect (TnyAccountPriv *priv)
 		camel_url_free (url);
 	}
 
-	if (priv->service && priv->pass_func_set && priv->user && priv->host)
-	{
-		g_print ("CONNECTING %s\n", camel_service_get_url (priv->service));
+	if (priv->service && priv->pass_func_set && priv->proto && priv->user && priv->host)
 		camel_service_connect (priv->service, priv->ex);
 		
-		g_print ("Connection failure? %s: %s\n", priv->url_string,
-				   camel_exception_get_description (priv->ex));
-	}
 
 	return;
 }
