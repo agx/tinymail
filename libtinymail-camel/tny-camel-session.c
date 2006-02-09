@@ -186,7 +186,7 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 	}
 
 	if (found)
-		retval = func (account);
+		retval = func (account, prompt);
 
 	if (!retval)
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "");

@@ -22,10 +22,34 @@
 
 static GObjectClass *parent_class = NULL;
 
+typedef struct _TnyPasswordDialogPriv TnyPasswordDialogPriv;
+
+struct _TnyPasswordDialogPriv
+{
+	GtkEntry *pwd_entry;
+	GtkLabel *prompt_label;
+};
+
+#define TNY_PASSWORD_DIALOG_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_PASSWORD_DIALOG_TYPE, TnyPasswordDialogPriv))
+
+
+void
+tny_password_dialog_set_prompt (TnyPasswordDialog *self, const gchar *prompt)
+{
+	TnyPasswordDialogPriv *priv = TNY_PASSWORD_DIALOG_GET_PRIVATE (self);
+
+	gtk_label_set_text (priv->prompt_label, prompt);
+
+	return;
+}
+
 const gchar*
 tny_password_dialog_get_password (TnyPasswordDialog *self)
 {
-	return gtk_entry_get_text (self->pwd_entry);
+	TnyPasswordDialogPriv *priv = TNY_PASSWORD_DIALOG_GET_PRIVATE (self);
+
+	return gtk_entry_get_text (priv->pwd_entry);
 }
 
 
@@ -41,18 +65,28 @@ static void
 tny_password_dialog_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyPasswordDialog *self = (TnyPasswordDialog *)instance;
+	TnyPasswordDialogPriv *priv = TNY_PASSWORD_DIALOG_GET_PRIVATE (self);
 
 	gtk_dialog_add_buttons (GTK_DIALOG (self), GTK_STOCK_OK, GTK_RESPONSE_OK,
 				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
 
 	gtk_window_set_title (GTK_WINDOW (self), "Password input");
 
-	self->pwd_entry = GTK_ENTRY (gtk_entry_new ());
-	gtk_entry_set_visibility (self->pwd_entry, FALSE);
-	gtk_widget_show (GTK_WIDGET (self->pwd_entry));
+	/* TODO: Add key icon or something */
+
+	priv->pwd_entry = GTK_ENTRY (gtk_entry_new ());
+	priv->prompt_label = GTK_LABEL (gtk_label_new (""));
+
+	gtk_entry_set_visibility (priv->pwd_entry, FALSE);
+
+	gtk_widget_show (GTK_WIDGET (priv->pwd_entry));
+	gtk_widget_show (GTK_WIDGET (priv->prompt_label));
 
 	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (self)->vbox), 
-		GTK_WIDGET (self->pwd_entry), TRUE, TRUE, 0);
+		GTK_WIDGET (priv->prompt_label), TRUE, TRUE, 0);
+
+	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (self)->vbox), 
+		GTK_WIDGET (priv->pwd_entry), TRUE, TRUE, 0);
 
 	return;
 }
@@ -77,6 +111,8 @@ tny_password_dialog_class_init (TnyPasswordDialogClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_password_dialog_finalize;
+
+	g_type_class_add_private (object_class, sizeof (TnyPasswordDialogPriv));
 
 	return;
 }

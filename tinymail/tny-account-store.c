@@ -46,7 +46,7 @@ struct _TnyAccountStorePriv
 static GHashTable *passwords;
 
 static gchar* 
-per_account_get_pass_func (TnyAccountIface *account)
+per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
 {
 	gchar *retval = NULL;
 	const gchar *accountid = tny_account_iface_get_id (account);
@@ -60,6 +60,8 @@ per_account_get_pass_func (TnyAccountIface *account)
 	{
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
+		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prompt);
+
 		if (gtk_dialog_run (dialog) == GTK_RESPONSE_OK)
 		{
 			const gchar *pwd = tny_password_dialog_get_password 

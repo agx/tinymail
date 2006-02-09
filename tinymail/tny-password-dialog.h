@@ -38,8 +38,6 @@ typedef struct _TnyPasswordDialogClass TnyPasswordDialogClass;
 struct _TnyPasswordDialog
 {
 	GtkDialog parent;
-
-	GtkEntry *pwd_entry;
 };
 
 struct _TnyPasswordDialogClass
@@ -51,6 +49,7 @@ GType               tny_password_dialog_get_type       (void);
 TnyPasswordDialog*  tny_password_dialog_new            (void);
 
 const gchar*        tny_password_dialog_get_password   (TnyPasswordDialog *self);
+void                tny_password_dialog_set_prompt     (TnyPasswordDialog *self, const gchar *prompt);
 
 G_END_DECLS
 

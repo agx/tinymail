@@ -197,8 +197,9 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 		iter->stamp = TNY_MSG_HEADER_LIST_MODEL (self)->stamp;
 		iter->user_data = child;
 		return TRUE;
-	} else
-		return FALSE;
+	}
+
+	return FALSE;
 }
 
 static void
@@ -212,6 +213,8 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 	header = G_LIST (iter->user_data)->data;
 		
 	tny_msg_header_iface_uncache (header);
+
+	return;
 }
 
 static void
@@ -224,6 +227,7 @@ tny_msg_header_list_model_ref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	header = G_LIST (iter->user_data)->data;
 
+	return;
 }
 
 static void
@@ -241,6 +245,8 @@ tny_msg_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 	iface->iter_nth_child = tny_msg_header_list_model_iter_nth_child;
 	iface->ref_node = tny_msg_header_list_model_ref_node;
 	iface->unref_node = tny_msg_header_list_model_unref_node;
+
+	return;
 }
 
 static void
@@ -286,13 +292,17 @@ tny_msg_header_list_model_class_init (TnyMsgHeaderListModelClass *klass)
 	object_class = (GObjectClass *)klass;
 	parent_class = g_type_class_peek_parent (klass);
 
-	object_class->finalize = tny_msg_header_list_model_finalize;	
+	object_class->finalize = tny_msg_header_list_model_finalize;
+
+	return;
 }
 
 static void
 tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 {
 	self->headers = NULL;
+
+	return;
 }
 
 void
@@ -300,6 +310,7 @@ tny_msg_header_list_model_add (TnyMsgHeaderListModel *self, TnyMsgHeaderIface *h
 {
 	self->headers = g_list_append (self->headers, header);
 	self->length = g_list_length (self->headers);
+
 	return;
 }
 
