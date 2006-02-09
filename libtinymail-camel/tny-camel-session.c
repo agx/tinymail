@@ -116,7 +116,6 @@ tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account
 	gboolean found = FALSE;
 	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
 
-	g_print ("Set pass func\n");
 	while (copy)
 	{
 		pf = copy->data;
@@ -143,11 +142,8 @@ tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account
 	pf->func = get_pass_func;
 	pf->service = service;
 
-	if (!found) {
+	if (!found)
 		password_funcs = g_list_append (password_funcs, pf);
-		g_print ("Set pass func!! %d\n", pf->service);
-
-	}
 
 	if (mark_del) 
 		while (mark_del)

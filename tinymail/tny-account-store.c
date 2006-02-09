@@ -28,8 +28,9 @@
 #include <tny-account-iface.h>
 #include <tny-account.h>
 
-static GObjectClass *parent_class = NULL;
+/* "GConf vs. Camel" account implementation */
 
+static GObjectClass *parent_class = NULL;
 
 typedef struct _TnyAccountStorePriv TnyAccountStorePriv;
 
@@ -99,10 +100,13 @@ per_account_forget_pass_func (TnyAccountIface *account)
 }
 
 /*
-	gconftool-2 -s /apps/tinymail/accounts/count -t int 1
-	gconftool-2 -s /apps/tinymail/accounts/0/proto -t string imap
-	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
-	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
+static void 
+gconf_listener_account_changed (nth account)
+{
+	TODO: Update nth account in priv->accounts
+
+	TODO: inform the instance as an observer
+}
 */
 
 static const GList*
@@ -140,21 +144,65 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self)
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
 			tny_account_iface_set_id (account, key); g_free (key);
 
+			/* 
+			 * Setting the password function must happen after
+			 * setting the host, user and protocol.
+			 */
+
 			tny_account_iface_set_pass_func (account, per_account_get_pass_func);
 
+			/* TODO: Add GConf listener on (/apps/tinymail/accounts/%d/*, i) */
+
+			g_object_ref (G_OBJECT (account));
 			priv->accounts = g_list_append (priv->accounts, account);
 		}
+
+		/* TODO: Inform observers */
 	}
 
 	return (const GList*) priv->accounts;
 }
 
+
 static void
 tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	gchar *key = NULL;
+	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
 
-	g_print ("TODO adding account\n");
+	count++;
+
+/*
+	gconftool-2 -s /apps/tinymail/accounts/count -t int 1
+	gconftool-2 -s /apps/tinymail/accounts/0/proto -t string imap
+	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
+	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
+*/
+
+	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
+	gconf_client_set_string (priv->client, (const gchar*) key, 
+		tny_account_iface_get_hostname (account), NULL);
+	g_free (key); 
+
+	key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", count);
+	gconf_client_set_string (priv->client, (const gchar*) key, 
+		tny_account_iface_get_proto (account), NULL);
+	g_free (key); 
+
+	key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", count);
+	gconf_client_set_string (priv->client, (const gchar*) key, 
+		tny_account_iface_get_user (account), NULL);
+	g_free (key); 
+
+
+	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
+		count, NULL);
+
+	/* TODO: Add GConf listener on (/apps/tinymail/accounts/%d/*, i) */
+
+	g_object_ref (G_OBJECT (account));
+	priv->accounts = g_list_append (priv->accounts, account);
 
 	return;
 }
@@ -174,9 +222,17 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyAccountStore *self = (TnyAccountStore *)instance;
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
+	/* TODO: Add GConf listener on (/apps/tinymail/accounts/count) */
+
 	priv->client = gconf_client_get_default ();
 
 	return;
+}
+
+static void
+destroy_account (gpointer data, gpointer user_data)
+{
+	g_object_unref (G_OBJECT (data));
 }
 
 static void
@@ -184,6 +240,15 @@ tny_account_store_finalize (GObject *object)
 {
 	TnyAccountStore *self = (TnyAccountStore *)object;	
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	if (priv->accounts) 
+	{
+		g_list_foreach (priv->accounts, destroy_account, NULL);
+
+		g_list_free (priv->accounts);
+
+		priv->accounts = NULL;
+	}
 
 	(*parent_class->finalize) (object);
 
