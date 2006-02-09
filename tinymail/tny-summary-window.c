@@ -26,6 +26,9 @@
 #include <tny-account-iface.h>
 #include <tny-account.h>
 
+#include <tny-msg-window-iface.h>
+#include <tny-msg-window.h>
+
 #include <tny-msg-folder-iface.h>
 #include <tny-account-tree-model.h>
 #include <tny-msg-header-iface.h>
@@ -126,33 +129,6 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	return;
 }
 
-static GtkWidget*
-create_msg_window (TnyMsgIface *msg)
-{
-	TnyMsgHeaderIface *header;
-	GList *attachments;
-	TnyMsgBodyIface *body;
-
-	GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	GtkTextView *textview = GTK_TEXT_VIEW (gtk_text_view_new ());
-	GtkTextBuffer *buffer = gtk_text_view_get_buffer (textview);
-	const gchar *text;
-
-	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (msg));
-	body = TNY_MSG_BODY_IFACE (tny_msg_iface_get_body (msg));
-	attachments = (GList*)tny_msg_iface_get_attachments (msg);
-	text = tny_msg_body_iface_get_data (body);
-
-
-	gtk_window_set_title (GTK_WINDOW (window), tny_msg_header_iface_get_subject (header));
-	gtk_text_buffer_set_text (buffer, text, strlen(text));
-
-	gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (textview));
-
-	return window;
-}
-
-
 static void
 on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			GtkTreeViewColumn *col,  gpointer userdata)
@@ -165,9 +141,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	if (gtk_tree_model_get_iter(model, &iter, path))
 	{
 		TnyMsgHeaderIface *header;
-		
-
-		GtkWindow *msgwin;
+		TnyMsgWindowIface *msgwin;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
@@ -189,9 +163,10 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			g_print ("You activated header: %s\n", 
 				tny_msg_header_iface_get_subject (TNY_MSG_HEADER_IFACE (nheader)));
 	
-			msgwin = GTK_WINDOW (create_msg_window (TNY_MSG_IFACE (msg)));
+			msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new ());
+			tny_msg_window_iface_set_msg (msgwin, TNY_MSG_IFACE (msg));
 	
-			gtk_widget_show_all (GTK_WIDGET (msgwin));
+			gtk_widget_show (GTK_WIDGET (msgwin));
 		}
 	}
 }

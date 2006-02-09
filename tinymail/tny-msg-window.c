@@ -17,10 +17,62 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <string.h>
 #include <gtk/gtk.h>
 #include <tny-msg-window.h>
 
 static GObjectClass *parent_class = NULL;
+
+typedef struct _TnyMsgWindowPriv TnyMsgWindowPriv;
+
+struct _TnyMsgWindowPriv
+{
+	TnyMsgIface *msg;
+	GtkTextView *textview;
+};
+
+#define TNY_MSG_WINDOW_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_WINDOW_TYPE, TnyMsgWindowPriv))
+
+
+static void
+reload_msg (TnyMsgWindowIface *self)
+{
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
+
+	TnyMsgHeaderIface *header;
+	GList *attachments;
+	TnyMsgBodyIface *body;
+	const gchar *text;
+
+	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+	body = TNY_MSG_BODY_IFACE (tny_msg_iface_get_body (priv->msg));
+	attachments = (GList*)tny_msg_iface_get_attachments (priv->msg);
+	text = tny_msg_body_iface_get_data (body);
+
+	gtk_window_set_title (GTK_WINDOW (self), tny_msg_header_iface_get_subject (header));
+	gtk_text_buffer_set_text (buffer, text, strlen(text));
+
+	return;
+}
+
+static void 
+tny_msg_window_set_msg (TnyMsgWindowIface *self, TnyMsgIface *msg)
+{
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+
+	if (priv->msg)
+		g_object_unref (G_OBJECT (priv->msg));
+
+	g_object_ref (G_OBJECT (msg));
+
+	priv->msg = msg;
+
+	reload_msg (self);
+
+	return;
+}
 
 
 TnyMsgWindow*
@@ -35,10 +87,13 @@ static void
 tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMsgWindow *self = (TnyMsgWindow *)instance;
-	GtkWindow *window = GTK_WINDOW (self);
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+	
+	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
+	gtk_container_set_border_width (GTK_CONTAINER (self), 8);
+	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->textview));
 
-	gtk_window_set_title (window, "Message");
-	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
+	gtk_widget_show (GTK_WIDGET (priv->textview));
 
 	return;
 }
@@ -53,6 +108,15 @@ tny_msg_window_finalize (GObject *object)
 	return;
 }
 
+static void
+tny_msg_window_iface_init (gpointer g_iface, gpointer iface_data)
+{
+	TnyMsgWindowIfaceClass *klass = (TnyMsgWindowIfaceClass *)g_iface;
+
+	klass->set_msg_func = tny_msg_window_set_msg;
+
+	return;
+}
 
 static void 
 tny_msg_window_class_init (TnyMsgWindowClass *class)
@@ -63,6 +127,8 @@ tny_msg_window_class_init (TnyMsgWindowClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_msg_window_finalize;
+
+	g_type_class_add_private (object_class, sizeof (TnyMsgWindowPriv));
 
 	return;
 }
@@ -87,9 +153,19 @@ tny_msg_window_get_type (void)
 		  tny_msg_window_instance_init    /* instance_init */
 		};
 
+		static const GInterfaceInfo tny_msg_window_iface_info = 
+		{
+		  (GInterfaceInitFunc) tny_msg_window_iface_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (GTK_TYPE_WINDOW,
 			"TnyMsgWindow",
 			&info, 0);
+
+		g_type_add_interface_static (type, TNY_MSG_WINDOW_IFACE_TYPE, 
+			&tny_msg_window_iface_info);
 
 	}
 
