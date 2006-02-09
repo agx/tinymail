@@ -102,7 +102,11 @@ static void
 tny_msg_window_finalize (GObject *object)
 {
 	TnyMsgWindow *self = (TnyMsgWindow *)object;	
-	
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+
+	if (priv->msg)
+		g_object_unref (G_OBJECT (priv->msg));
+
 	(*parent_class->finalize) (object);
 
 	return;
