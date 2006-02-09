@@ -34,11 +34,12 @@ main (int argc, char **argv)
 
 	window = GTK_WINDOW (tny_summary_window_new ());
 
+	gtk_widget_show (GTK_WIDGET (window));
+
 	tny_summary_window_iface_set_account_store (TNY_SUMMARY_WINDOW_IFACE (window),
 		TNY_ACCOUNT_STORE_IFACE (tny_account_store_get_instance ()));
 
-	gtk_widget_show (GTK_WIDGET (window));
-
+	
 	g_signal_connect (window, "destroy",
 		G_CALLBACK (gtk_exit), &window);
 
