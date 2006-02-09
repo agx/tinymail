@@ -46,8 +46,8 @@ struct _TnySummaryWindowClass
 	GtkWindowClass parent_class;
 };
 
-GType               tny_summary_window_get_type       (void);
-TnySummaryWindow*   tny_summary_window_new            (void);
+GType               tny_summary_window_get_type          (void);
+TnySummaryWindow*   tny_summary_window_new               (void);
 
 
 G_END_DECLS

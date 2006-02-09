@@ -19,6 +19,9 @@
 
 #include <gtk/gtk.h>
 #include <tny-summary-window.h>
+#include <tny-summary-window-iface.h>
+#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 
 int 
 main (int argc, char **argv)
@@ -29,6 +32,10 @@ main (int argc, char **argv)
 	g_thread_init (NULL);
 
 	window = GTK_WINDOW (tny_summary_window_new ());
+
+	tny_summary_window_iface_set_account_store (TNY_SUMMARY_WINDOW_IFACE (window),
+		TNY_ACCOUNT_STORE_IFACE (tny_account_store_get_instance ()));
+
 	gtk_widget_show (GTK_WIDGET (window));
 
 	g_signal_connect (window, "destroy",

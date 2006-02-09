@@ -32,10 +32,62 @@
 #include <tny-msg-header-list-model.h>
 
 #include <tny-summary-window.h>
+#include <tny-summary-window-iface.h>
 
 static GObjectClass *parent_class = NULL;
 
 
+typedef struct _TnySummaryWindowPriv TnySummaryWindowPriv;
+
+struct _TnySummaryWindowPriv
+{
+	TnyAccountStoreIface *account_store;
+	GtkTreeView *mailbox_view, *header_view;
+};
+
+#define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_SUMMARY_WINDOW_TYPE, TnySummaryWindowPriv))
+
+static void 
+reload_accounts (TnySummaryWindowPriv *priv)
+{
+	TnyAccountStoreIface *account_store = priv->account_store;
+	GtkTreeModel *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
+	const GList* accounts;
+
+	accounts = tny_account_store_iface_get_accounts (account_store);
+	
+	while (accounts)
+	{
+		TnyAccountIface *account = accounts->data;
+
+		tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
+			(mailbox_model), account);
+
+		accounts = g_list_next (accounts);
+	}
+
+	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), mailbox_model);
+
+	return;
+}
+
+static void
+tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store)
+{
+	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
+
+	if (priv->account_store)
+		g_object_unref (G_OBJECT (priv->account_store));
+
+	g_object_ref (G_OBJECT (account_store));
+
+	priv->account_store = account_store;
+
+	reload_accounts (priv);
+
+	return;
+}
 
 static void
 on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection, 
@@ -179,10 +231,11 @@ static void
 tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnySummaryWindow *self = (TnySummaryWindow *)instance;
+	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
 	GtkWindow *window = GTK_WINDOW (self);
+
+
 	GtkWidget *hbox;
-	GtkWidget *mailbox_view;
-	GtkWidget *header_view;
 	GtkWidget *mailbox_sw;
 	GtkWidget *header_sw;
 	GtkCellRenderer *renderer;
@@ -190,10 +243,6 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkTreeModel *mailbox_model;
 	GtkTreeSelection *select;
 	gint t = 0, i = 0;
-	const GList *accounts;
-
-	TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE
-		(tny_account_store_get_instance ());
 
 	gtk_window_set_title (window, "Tinymail");
 	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
@@ -211,25 +260,27 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (mailbox_sw),
 		                        GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	
-	header_view = gtk_tree_view_new ();
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (header_view), TRUE);
-	gtk_tree_view_set_fixed_height_mode (GTK_TREE_VIEW(header_view), TRUE);
-	mailbox_view = gtk_tree_view_new ();
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (mailbox_view), TRUE);
+	priv->header_view = GTK_TREE_VIEW (gtk_tree_view_new ());
+
+	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (priv->header_view), TRUE);
+	gtk_tree_view_set_fixed_height_mode (GTK_TREE_VIEW(priv->header_view), TRUE);
+
+	priv->mailbox_view = GTK_TREE_VIEW (gtk_tree_view_new ());
+	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (priv->mailbox_view), TRUE);
 	
-	gtk_container_add (GTK_CONTAINER (header_sw), header_view);
-	gtk_container_add (GTK_CONTAINER (mailbox_sw), mailbox_view);
+	gtk_container_add (GTK_CONTAINER (header_sw), GTK_WIDGET (priv->header_view));
+	gtk_container_add (GTK_CONTAINER (mailbox_sw), GTK_WIDGET (priv->mailbox_view));
 
 	/* mailbox_view columns */
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
 			"text", TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, NULL);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(mailbox_view), column);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
 			"text", TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, NULL);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(mailbox_view), column);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
 	/* header_view columns */
 	
@@ -239,7 +290,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_view_column_set_sort_column_id (column, 0);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(header_view), column);
+
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 	
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("To", renderer,
@@ -247,7 +299,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_view_column_set_sort_column_id (column, 0);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(header_view), column);
+
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Subject", renderer,
@@ -255,40 +308,22 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_view_column_set_sort_column_id (column, 0);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(header_view), column);
 
-	mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
+	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->mailbox_view));
 
-	accounts = tny_account_store_iface_get_accounts (account_store);
-	
-	while (accounts)
-	{
-		TnyAccountIface *account = accounts->data;
-
-		tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
-			(mailbox_model), account);
-
-		accounts = g_list_next (accounts);
-	}
-
-	gtk_tree_view_set_model (GTK_TREE_VIEW (mailbox_view), mailbox_model);
-
-	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (mailbox_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect (G_OBJECT (select), "changed",
-		G_CALLBACK (on_mailbox_view_tree_selection_changed), header_view);
+		G_CALLBACK (on_mailbox_view_tree_selection_changed), priv->header_view);
 
-
-	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (header_view));
+	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect (G_OBJECT (select), "changed",
-		G_CALLBACK (on_header_view_tree_selection_changed), header_view);
+		G_CALLBACK (on_header_view_tree_selection_changed), priv->header_view);
 
-
-	g_signal_connect(G_OBJECT (header_view), "row-activated", 
-		G_CALLBACK (on_header_view_tree_row_activated), header_view);
-
+	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
+		G_CALLBACK (on_header_view_tree_row_activated), priv->header_view);
 
 	gtk_box_pack_start (GTK_BOX (hbox), mailbox_sw, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (hbox), header_sw, FALSE, FALSE, 0);
@@ -310,6 +345,15 @@ tny_summary_window_finalize (GObject *object)
 	return;
 }
 
+static void
+tny_summary_window_iface_init (gpointer g_iface, gpointer iface_data)
+{
+	TnySummaryWindowIfaceClass *klass = (TnySummaryWindowIfaceClass *)g_iface;
+
+	klass->set_account_store_func = tny_summary_window_set_account_store;
+
+	return;
+}
 
 static void 
 tny_summary_window_class_init (TnySummaryWindowClass *class)
@@ -320,6 +364,8 @@ tny_summary_window_class_init (TnySummaryWindowClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_summary_window_finalize;
+
+	g_type_class_add_private (object_class, sizeof (TnySummaryWindowPriv));
 
 	return;
 }
@@ -344,9 +390,19 @@ tny_summary_window_get_type (void)
 		  tny_summary_window_instance_init    /* instance_init */
 		};
 
+		static const GInterfaceInfo tny_summary_window_iface_info = 
+		{
+		  (GInterfaceInitFunc) tny_summary_window_iface_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (GTK_TYPE_WINDOW,
 			"TnySummaryWindow",
 			&info, 0);
+
+		g_type_add_interface_static (type, TNY_SUMMARY_WINDOW_IFACE_TYPE, 
+			&tny_summary_window_iface_info);
 
 	}
 
