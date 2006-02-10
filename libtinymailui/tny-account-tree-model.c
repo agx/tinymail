@@ -43,7 +43,8 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 		gtk_tree_store_set (model, &iter,
 			TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
 			tny_msg_folder_iface_get_name (folder),
-			TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 0,
+			TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 
+			tny_msg_folder_iface_get_unread (folder),
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
 

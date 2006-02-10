@@ -56,6 +56,7 @@ struct _TnyMsgFolderIfaceClass
 	void           (*set_id_func)      (TnyMsgFolderIface *self, const gchar *id);
 	void           (*set_account_func) (TnyMsgFolderIface *self, const TnyAccountIface *account);
 	
+	gint           (*get_unread_func)  (TnyMsgFolderIface *self);
 	void           (*uncache_func)     (TnyMsgFolderIface *self);
 	const gboolean (*has_cache_func)   (TnyMsgFolderIface *self);
 };
@@ -78,6 +79,7 @@ void           tny_msg_folder_iface_set_account  (TnyMsgFolderIface *self, const
 void           tny_msg_folder_iface_set_id       (TnyMsgFolderIface *self, const gchar *id);
 void           tny_msg_folder_iface_set_name     (TnyMsgFolderIface *self, const gchar *name);
 
+gint           tny_msg_folder_iface_get_unread    (TnyMsgFolderIface *self);
 void           tny_msg_folder_iface_uncache       (TnyMsgFolderIface *self);
 const gboolean tny_msg_folder_iface_has_cache     (TnyMsgFolderIface *self);
 

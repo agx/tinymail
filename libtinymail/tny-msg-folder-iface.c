@@ -20,6 +20,12 @@
 #include <tny-msg-folder-iface.h>
 #include <tny-msg-header-iface.h>
 
+gint
+tny_msg_folder_iface_get_unread (TnyMsgFolderIface *self)
+{
+	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_unread_func (self);
+}
+
 
 const TnyAccountIface*  
 tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
