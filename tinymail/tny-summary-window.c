@@ -63,7 +63,7 @@ reload_accounts (TnySummaryWindowPriv *priv)
 	while (accounts)
 	{
 		TnyAccountIface *account = accounts->data;
-
+g_print ("Add\n");
 		tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
 			(mailbox_model), account);
 
@@ -76,6 +76,19 @@ reload_accounts (TnySummaryWindowPriv *priv)
 }
 
 static void
+accounts_reloaded (TnyAccountStoreIface *store, gpointer user_data)
+{
+	TnySummaryWindowPriv *priv = user_data;
+
+
+	g_print ("RELOAD\n");
+	reload_accounts (priv);
+	
+	return;
+}
+
+
+static void
 tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store)
 {
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
@@ -86,6 +99,9 @@ tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountSto
 	g_object_ref (G_OBJECT (account_store));
 
 	priv->account_store = account_store;
+
+	g_signal_connect (G_OBJECT (account_store), "accounts_reloaded",
+		G_CALLBACK (accounts_reloaded), priv);
 
 	reload_accounts (priv);
 

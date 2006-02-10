@@ -139,7 +139,10 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	{
 		/* An account got added, so we simple reload all */
 		destroy_current_accounts (priv);
-		tny_account_store_get_accounts (self);
+
+		/* Tell the observers that they should reload */
+		g_signal_emit (self, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+
 	} else 
 	{
 		GList *accounts = priv->accounts;
@@ -227,9 +230,6 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self)
 			g_object_ref (G_OBJECT (account));
 			priv->accounts = g_list_append (priv->accounts, account);
 		}
-
-		g_signal_emit (self, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
-
 	}
 
 	return (const GList*) priv->accounts;
