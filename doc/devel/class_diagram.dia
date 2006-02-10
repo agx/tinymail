@@ -65,13 +65,13 @@
   <dia:layer name="Background" visible="true">
     <dia:object type="UML - Class" version="0" id="O0">
       <dia:attribute name="obj_pos">
-        <dia:point val="20.05,30.05"/>
+        <dia:point val="20.15,30"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="20,30;22.35,32.3"/>
+        <dia:rectangle val="20.1,29.95;22.45,32.25"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="20.05,30.05"/>
+        <dia:point val="20.15,30"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="2.25"/>
@@ -166,13 +166,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O1">
       <dia:attribute name="obj_pos">
-        <dia:point val="32.7,30.1"/>
+        <dia:point val="35.65,27.25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="32.65,30.05;37.05,32.35"/>
+        <dia:rectangle val="35.6,27.2;40,29.5"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="32.7,30.1"/>
+        <dia:point val="35.65,27.25"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="4.2999999999999998"/>
@@ -267,13 +267,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O2">
       <dia:attribute name="obj_pos">
-        <dia:point val="38.25,30.05"/>
+        <dia:point val="36.5,30.3"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="38.2,30;45.4,32.3"/>
+        <dia:rectangle val="36.45,30.25;43.65,32.55"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="38.25,30.05"/>
+        <dia:point val="36.5,30.3"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="7.0999999999999996"/>
@@ -368,13 +368,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O3">
       <dia:attribute name="obj_pos">
-        <dia:point val="23.95,30.05"/>
+        <dia:point val="28.85,28.6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="23.9,30;29.2,32.3"/>
+        <dia:rectangle val="28.8,28.55;34.1,30.85"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="23.95,30.05"/>
+        <dia:point val="28.85,28.6"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="5.1999999999999993"/>
@@ -469,13 +469,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O4">
       <dia:attribute name="obj_pos">
-        <dia:point val="14.35,13.9"/>
+        <dia:point val="14.35,13.95"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="14.3,13.85;28.2,19.75"/>
+        <dia:rectangle val="14.3,13.9;28.2,19.8"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="14.35,13.9"/>
+        <dia:point val="14.35,13.95"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="13.799999999999999"/>
@@ -744,13 +744,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O5">
       <dia:attribute name="obj_pos">
-        <dia:point val="24.35,0.35"/>
+        <dia:point val="26.5,0.15"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="24.3,0.3;33.05,7.8"/>
+        <dia:rectangle val="26.45,0.1;35.2,7.6"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="24.35,0.35"/>
+        <dia:point val="26.5,0.15"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="8.6500000000000004"/>
@@ -1015,13 +1015,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O6">
       <dia:attribute name="obj_pos">
-        <dia:point val="34.1,13.2"/>
+        <dia:point val="34.05,13.25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="34.05,13.15;43.65,17.65"/>
+        <dia:rectangle val="34,13.2;43.6,17.7"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="34.1,13.2"/>
+        <dia:point val="34.05,13.25"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="9.5"/>
@@ -1287,19 +1287,19 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O8">
       <dia:attribute name="obj_pos">
-        <dia:point val="-3.8,2.85"/>
+        <dia:point val="-3.75,2.75"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-3.85,2.8;8.4,8.9"/>
+        <dia:rectangle val="-3.8,2.7;8.45,10.4"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-3.8,2.85"/>
+        <dia:point val="-3.75,2.75"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="12.15"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="6"/>
+        <dia:real val="7.5999999999999996"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#MsgAccountIface#</dia:string>
@@ -1495,6 +1495,52 @@
             <dia:boolean val="false"/>
           </dia:attribute>
         </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#id#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#const gchar*#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#folders#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#GList*#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
       </dia:attribute>
       <dia:attribute name="operations"/>
       <dia:attribute name="template">
@@ -1605,13 +1651,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O10">
       <dia:attribute name="obj_pos">
-        <dia:point val="-4.15,13.9"/>
+        <dia:point val="-4.1,16.95"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-4.2,13.85;8.7,22.95"/>
+        <dia:rectangle val="-4.15,16.9;8.75,26"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-4.15,13.9"/>
+        <dia:point val="-4.1,16.95"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="12.799999999999999"/>
@@ -1986,16 +2032,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O11">
       <dia:attribute name="obj_pos">
-        <dia:point val="2.25,13.9"/>
+        <dia:point val="2.3,16.95"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.45,8.1;3.95,14.7"/>
+        <dia:rectangle val="1.5,9.6;4,17.75"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="2.25,13.9"/>
-        <dia:point val="2.25,12.4"/>
-        <dia:point val="2.275,12.4"/>
-        <dia:point val="2.275,8.85"/>
+        <dia:point val="2.3,16.95"/>
+        <dia:point val="2.3,12.4"/>
+        <dia:point val="2.325,12.4"/>
+        <dia:point val="2.325,10.35"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -2048,16 +2094,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O12">
       <dia:attribute name="obj_pos">
-        <dia:point val="14.35,14.6"/>
+        <dia:point val="14.35,17.65"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="7.9,13.8;14.9,16.2"/>
+        <dia:rectangle val="7.95,16.85;14.9,19.25"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="14.35,14.6"/>
-        <dia:point val="11.545,14.6"/>
-        <dia:point val="11.545,14.6"/>
-        <dia:point val="8.65,14.6"/>
+        <dia:point val="14.35,17.65"/>
+        <dia:point val="11.545,17.65"/>
+        <dia:point val="11.545,17.65"/>
+        <dia:point val="8.7,17.65"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2104,19 +2150,19 @@
         </dia:composite>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O4" connection="3"/>
+        <dia:connection handle="0" to="O4" connection="12"/>
         <dia:connection handle="1" to="O10" connection="4"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O13">
       <dia:attribute name="obj_pos">
-        <dia:point val="34.3,18.5"/>
+        <dia:point val="34.25,18.55"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="34.25,18.45;41.6,21.35"/>
+        <dia:rectangle val="34.2,18.5;41.55,21.4"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="34.3,18.5"/>
+        <dia:point val="34.25,18.55"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="7.25"/>
@@ -2235,15 +2281,15 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O14">
       <dia:attribute name="obj_pos">
-        <dia:point val="24.35,1.05"/>
+        <dia:point val="26.5,0.85"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="20.5,0.25;24.4,14.9"/>
+        <dia:rectangle val="20.5,0.05;26.55,14.95"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="24.35,1.05"/>
-        <dia:point val="21.25,1.05"/>
-        <dia:point val="21.25,13.9"/>
+        <dia:point val="26.5,0.85"/>
+        <dia:point val="21.25,0.85"/>
+        <dia:point val="21.25,13.95"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2292,16 +2338,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O15">
       <dia:attribute name="obj_pos">
-        <dia:point val="34.1,13.9"/>
+        <dia:point val="34.05,13.95"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="27.4,13.1;34.65,15.5"/>
+        <dia:rectangle val="27.4,13.15;34.6,15.55"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="34.1,13.9"/>
-        <dia:point val="31.0062,13.9"/>
-        <dia:point val="31.0062,13.9"/>
-        <dia:point val="28.15,13.9"/>
+        <dia:point val="34.05,13.95"/>
+        <dia:point val="31.0062,13.95"/>
+        <dia:point val="31.0062,13.95"/>
+        <dia:point val="28.15,13.95"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2354,16 +2400,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O16">
       <dia:attribute name="obj_pos">
-        <dia:point val="34.3,19.2"/>
+        <dia:point val="34.25,19.25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="27.4,18.4;34.35,20.8"/>
+        <dia:rectangle val="27.4,18.45;34.3,20.85"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="34.3,19.2"/>
-        <dia:point val="32.3501,19.2"/>
-        <dia:point val="32.3501,19.2"/>
-        <dia:point val="28.15,19.2"/>
+        <dia:point val="34.25,19.25"/>
+        <dia:point val="32.3501,19.25"/>
+        <dia:point val="32.3501,19.25"/>
+        <dia:point val="28.15,19.25"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2416,17 +2462,17 @@
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O17">
       <dia:attribute name="obj_pos">
-        <dia:point val="28.675,7.75"/>
+        <dia:point val="30.825,7.55"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="27.825,7.7;30.8501,30.1"/>
+        <dia:rectangle val="29.975,7.5;31.675,28.65"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="28.675,7.75"/>
-        <dia:point val="28.675,10.6375"/>
+        <dia:point val="30.825,7.55"/>
+        <dia:point val="30.825,10.6375"/>
         <dia:point val="30.8001,10.6375"/>
-        <dia:point val="30.8001,30.05"/>
-        <dia:point val="29.15,30.05"/>
+        <dia:point val="30.8001,28.6"/>
+        <dia:point val="31.45,28.6"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -2448,21 +2494,21 @@
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O5" connection="6"/>
-        <dia:connection handle="1" to="O3" connection="2"/>
+        <dia:connection handle="1" to="O3" connection="1"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O18">
       <dia:attribute name="obj_pos">
-        <dia:point val="21.25,19.7"/>
+        <dia:point val="21.25,19.75"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="20.4,19.65;22.1,30.1"/>
+        <dia:rectangle val="20.4,19.7;22.1,30.05"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="21.25,19.7"/>
+        <dia:point val="21.25,19.75"/>
         <dia:point val="21.25,24.875"/>
-        <dia:point val="21.175,24.875"/>
-        <dia:point val="21.175,30.05"/>
+        <dia:point val="21.275,24.875"/>
+        <dia:point val="21.275,30"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -2488,15 +2534,15 @@
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O19">
       <dia:attribute name="obj_pos">
-        <dia:point val="2.25,22.9"/>
+        <dia:point val="2.3,25.95"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.4,22.85;16.9,30.1"/>
+        <dia:rectangle val="1.45,25.9;16.9,30.1"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="2.25,22.9"/>
-        <dia:point val="2.25,26.475"/>
-        <dia:point val="16.85,26.475"/>
+        <dia:point val="2.3,25.95"/>
+        <dia:point val="2.3,28"/>
+        <dia:point val="16.85,28"/>
         <dia:point val="16.85,30.05"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -2523,13 +2569,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O20">
       <dia:attribute name="obj_pos">
-        <dia:point val="-16,2.45"/>
+        <dia:point val="-17.3,2.35"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-16.05,2.4;-10,5.5"/>
+        <dia:rectangle val="-17.35,2.3;-11.3,5.4"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-16,2.45"/>
+        <dia:point val="-17.3,2.35"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="5.9499999999999993"/>
@@ -2624,16 +2670,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O21">
       <dia:attribute name="obj_pos">
-        <dia:point val="-10.05,3.55"/>
+        <dia:point val="-11.35,3.45"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-10.85,2.85;-3.72929,5.15"/>
+        <dia:rectangle val="-12.15,2.75;-3.67929,5.05"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-10.05,3.55"/>
-        <dia:point val="-10.05,3.55"/>
-        <dia:point val="-3.8,3.55"/>
-        <dia:point val="-3.8,3.55"/>
+        <dia:point val="-11.35,3.45"/>
+        <dia:point val="-11.35,3.45"/>
+        <dia:point val="-3.75,3.45"/>
+        <dia:point val="-3.75,3.45"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2683,13 +2729,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O22">
       <dia:attribute name="obj_pos">
-        <dia:point val="-17.455,6.825"/>
+        <dia:point val="-18.655,6.725"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-17.505,6.775;-10.205,9.875"/>
+        <dia:rectangle val="-18.705,6.675;-11.405,9.775"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-17.455,6.825"/>
+        <dia:point val="-18.655,6.725"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="7.1999999999999993"/>
@@ -2784,16 +2830,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O23">
       <dia:attribute name="obj_pos">
-        <dia:point val="-10.255,7.925"/>
+        <dia:point val="-11.455,7.825"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-10.305,7.125;-3.05,9.55"/>
+        <dia:rectangle val="-11.505,7.025;-3,9.45"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-10.255,7.925"/>
-        <dia:point val="-7.0275,7.925"/>
-        <dia:point val="-7.0275,7.95"/>
-        <dia:point val="-3.8,7.95"/>
+        <dia:point val="-11.455,7.825"/>
+        <dia:point val="-7.6025,7.825"/>
+        <dia:point val="-7.6025,7.85"/>
+        <dia:point val="-3.75,7.85"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -2843,19 +2889,19 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O24">
       <dia:attribute name="obj_pos">
-        <dia:point val="-2.64381,-5.7"/>
+        <dia:point val="-2.59381,-5.65"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-2.69381,-5.75;7.20619,-3.45"/>
+        <dia:rectangle val="-2.64381,-5.7;7.25619,-2.8"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-2.64381,-5.7"/>
+        <dia:point val="-2.59381,-5.65"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="9.7999999999999989"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="2.1999999999999997"/>
+        <dia:real val="2.7999999999999998"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#MsgAccountTreeModel#</dia:string>
@@ -2936,7 +2982,56 @@
         <dia:real val="1"/>
       </dia:attribute>
       <dia:attribute name="attributes"/>
-      <dia:attribute name="operations"/>
+      <dia:attribute name="operations">
+        <dia:composite type="umloperation">
+          <dia:attribute name="name">
+            <dia:string>#add#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="stereotype">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="inheritance_type">
+            <dia:enum val="2"/>
+          </dia:attribute>
+          <dia:attribute name="query">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="parameters">
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#a#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#AccountIface#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="comment">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
       <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
@@ -2944,19 +3039,19 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O25">
       <dia:attribute name="obj_pos">
-        <dia:point val="19.0562,-5.15"/>
+        <dia:point val="26.2562,-7.15"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="19.0062,-5.2;28.2062,-2.9"/>
+        <dia:rectangle val="26.2062,-7.2;35.4062,-3.5"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="19.0562,-5.15"/>
+        <dia:point val="26.2562,-7.15"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="9.0999999999999996"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="2.1999999999999997"/>
+        <dia:real val="3.5999999999999996"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#MsgHeaderListModel#</dia:string>
@@ -3037,7 +3132,104 @@
         <dia:real val="1"/>
       </dia:attribute>
       <dia:attribute name="attributes"/>
-      <dia:attribute name="operations"/>
+      <dia:attribute name="operations">
+        <dia:composite type="umloperation">
+          <dia:attribute name="name">
+            <dia:string>#add#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="stereotype">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="inheritance_type">
+            <dia:enum val="2"/>
+          </dia:attribute>
+          <dia:attribute name="query">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="parameters">
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#hdr#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#MsgHeaderIface#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="comment">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umloperation">
+          <dia:attribute name="name">
+            <dia:string>#inject#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="stereotype">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="inheritance_type">
+            <dia:enum val="2"/>
+          </dia:attribute>
+          <dia:attribute name="query">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="parameters">
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#list#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#GList*#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="comment">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
       <dia:attribute name="template">
         <dia:boolean val="false"/>
       </dia:attribute>
@@ -3045,16 +3237,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O26">
       <dia:attribute name="obj_pos">
-        <dia:point val="2.275,2.85"/>
+        <dia:point val="2.325,2.75"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.475,-4.25;3.975,3.65"/>
+        <dia:rectangle val="1.525,-3.6;4.025,3.55"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="2.275,2.85"/>
-        <dia:point val="2.275,-0.325"/>
-        <dia:point val="2.25619,-0.325"/>
-        <dia:point val="2.25619,-3.5"/>
+        <dia:point val="2.325,2.75"/>
+        <dia:point val="2.325,-0.05"/>
+        <dia:point val="2.30619,-0.05"/>
+        <dia:point val="2.30619,-2.85"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3104,16 +3296,16 @@
     </dia:object>
     <dia:object type="UML - Association" version="0" id="O27">
       <dia:attribute name="obj_pos">
-        <dia:point val="28.675,0.35"/>
+        <dia:point val="30.825,0.15"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="22.8562,-3.7;30.375,1.15"/>
+        <dia:rectangle val="30.025,-4.3;32.525,0.95"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="28.675,0.35"/>
-        <dia:point val="28.675,-1.3"/>
-        <dia:point val="23.6062,-1.3"/>
-        <dia:point val="23.6062,-2.95"/>
+        <dia:point val="30.825,0.15"/>
+        <dia:point val="30.825,-1.7"/>
+        <dia:point val="30.8062,-1.7"/>
+        <dia:point val="30.8062,-3.55"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3163,13 +3355,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O28">
       <dia:attribute name="obj_pos">
-        <dia:point val="-0.955,-11.075"/>
+        <dia:point val="-0.905,-12.225"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-1.005,-11.125;5.545,-8.825"/>
+        <dia:rectangle val="-0.955,-12.275;5.595,-9.975"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-0.955,-11.075"/>
+        <dia:point val="-0.905,-12.225"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="6.4499999999999993"/>
@@ -3264,16 +3456,16 @@
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O29">
       <dia:attribute name="obj_pos">
-        <dia:point val="2.27,-8.875"/>
+        <dia:point val="2.32,-10.025"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.42,-8.925;3.12,-5.65"/>
+        <dia:rectangle val="1.47,-10.075;3.17,-5.6"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="2.27,-8.875"/>
-        <dia:point val="2.27,-7.2875"/>
-        <dia:point val="2.25619,-7.2875"/>
-        <dia:point val="2.25619,-5.7"/>
+        <dia:point val="2.32,-10.025"/>
+        <dia:point val="2.32,-7.8375"/>
+        <dia:point val="2.30619,-7.8375"/>
+        <dia:point val="2.30619,-5.65"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3299,13 +3491,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O30">
       <dia:attribute name="obj_pos">
-        <dia:point val="20.695,-11.075"/>
+        <dia:point val="20.745,-12.175"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="20.645,-11.125;26.545,-8.825"/>
+        <dia:rectangle val="20.695,-12.225;26.595,-9.925"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="20.695,-11.075"/>
+        <dia:point val="20.745,-12.175"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="5.7999999999999998"/>
@@ -3400,16 +3592,16 @@
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O31">
       <dia:attribute name="obj_pos">
-        <dia:point val="5.495,-10.375"/>
+        <dia:point val="5.545,-11.525"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="5.495,-11.075;20.7657,-9.475"/>
+        <dia:rectangle val="5.495,-12.375;20.795,-10.6"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="5.495,-10.375"/>
-        <dia:point val="5.495,-10.375"/>
-        <dia:point val="20.695,-10.375"/>
-        <dia:point val="20.695,-10.375"/>
+        <dia:point val="5.545,-11.525"/>
+        <dia:point val="13.145,-11.525"/>
+        <dia:point val="13.145,-11.475"/>
+        <dia:point val="20.745,-11.475"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -3435,16 +3627,16 @@
     </dia:object>
     <dia:object type="UML - Generalization" version="0" id="O32">
       <dia:attribute name="obj_pos">
-        <dia:point val="23.595,-8.875"/>
+        <dia:point val="23.645,-9.975"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="22.745,-8.925;24.445,-5.1"/>
+        <dia:rectangle val="22.795,-10.025;30.8562,-7.1"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="23.595,-8.875"/>
-        <dia:point val="23.595,-7.0125"/>
-        <dia:point val="23.6062,-7.0125"/>
-        <dia:point val="23.6062,-5.15"/>
+        <dia:point val="23.645,-9.975"/>
+        <dia:point val="23.645,-8.5625"/>
+        <dia:point val="30.8062,-8.5625"/>
+        <dia:point val="30.8062,-7.15"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3470,13 +3662,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O33">
       <dia:attribute name="obj_pos">
-        <dia:point val="7.895,-15.525"/>
+        <dia:point val="9.795,-15.575"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="7.845,-15.575;13.845,-13.275"/>
+        <dia:rectangle val="9.745,-15.625;15.745,-13.325"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="7.895,-15.525"/>
+        <dia:point val="9.795,-15.575"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="5.8999999999999995"/>
@@ -3571,13 +3763,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O34">
       <dia:attribute name="obj_pos">
-        <dia:point val="-18.41,-2.2"/>
+        <dia:point val="-22.41,-5.65"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-18.46,-2.25;-6.96,0.05"/>
+        <dia:rectangle val="-22.46,-5.7;-10.96,-3.4"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-18.41,-2.2"/>
+        <dia:point val="-22.41,-5.65"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="11.4"/>
@@ -3672,15 +3864,15 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O35">
       <dia:attribute name="obj_pos">
-        <dia:point val="-12.71,-2.2"/>
+        <dia:point val="-16.71,-5.65"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-12.76,-15.525;8.345,-2.15"/>
+        <dia:rectangle val="-16.76,-15.575;10.245,-5.6"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-12.71,-2.2"/>
-        <dia:point val="-12.71,-14.825"/>
-        <dia:point val="7.895,-14.825"/>
+        <dia:point val="-16.71,-5.65"/>
+        <dia:point val="-16.71,-14.875"/>
+        <dia:point val="9.795,-14.875"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3708,16 +3900,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O36">
       <dia:attribute name="obj_pos">
-        <dia:point val="-7.01,-1.5"/>
+        <dia:point val="-11.01,-4.95"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-7.06,-5.45;-2.19381,-1.45"/>
+        <dia:rectangle val="-11.06,-5.65;-2.14381,-4.05"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="-7.01,-1.5"/>
-        <dia:point val="-6.3997,-1.5"/>
-        <dia:point val="-6.3997,-5"/>
-        <dia:point val="-2.64381,-5"/>
+        <dia:point val="-11.01,-4.95"/>
+        <dia:point val="-6.3997,-4.95"/>
+        <dia:point val="-6.3997,-4.95"/>
+        <dia:point val="-2.59381,-4.95"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -3746,16 +3938,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O37">
       <dia:attribute name="obj_pos">
-        <dia:point val="10.845,-13.325"/>
+        <dia:point val="9.795,-13.375"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="6.70619,-13.375;13.3502,-4.55"/>
+        <dia:rectangle val="6.75619,-13.425;12.3501,-4.5"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="10.845,-13.325"/>
-        <dia:point val="10.8002,-13.325"/>
-        <dia:point val="10.8002,-5"/>
-        <dia:point val="7.15619,-5"/>
+        <dia:point val="9.795,-13.375"/>
+        <dia:point val="9.8001,-13.375"/>
+        <dia:point val="9.8001,-4.95"/>
+        <dia:point val="7.20619,-4.95"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -3778,22 +3970,22 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O33" connection="6"/>
+        <dia:connection handle="0" to="O33" connection="5"/>
         <dia:connection handle="1" to="O24" connection="4"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O38">
       <dia:attribute name="obj_pos">
-        <dia:point val="10.845,-13.325"/>
+        <dia:point val="15.695,-13.375"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="10.795,-13.375;19.5062,-4"/>
+        <dia:rectangle val="15.645,-13.425;26.7062,-6"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="10.845,-13.325"/>
-        <dia:point val="15.7003,-13.325"/>
-        <dia:point val="15.7003,-4.45"/>
-        <dia:point val="19.0562,-4.45"/>
+        <dia:point val="15.695,-13.375"/>
+        <dia:point val="15.7003,-13.375"/>
+        <dia:point val="15.7003,-6.45"/>
+        <dia:point val="26.2562,-6.45"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -3816,19 +4008,19 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O33" connection="6"/>
+        <dia:connection handle="0" to="O33" connection="7"/>
         <dia:connection handle="1" to="O25" connection="3"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O39">
       <dia:attribute name="obj_pos">
-        <dia:point val="22.84,-15.5"/>
+        <dia:point val="29.94,-15.55"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="22.79,-15.55;33.59,-13.25"/>
+        <dia:rectangle val="29.89,-15.6;40.69,-13.3"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="22.84,-15.5"/>
+        <dia:point val="29.94,-15.55"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="10.699999999999999"/>
@@ -3923,16 +4115,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O40">
       <dia:attribute name="obj_pos">
-        <dia:point val="22.84,-14.8"/>
+        <dia:point val="29.94,-14.85"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.345,-15.5125;22.89,-13.9125"/>
+        <dia:rectangle val="15.245,-15.5625;29.99,-13.9625"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="22.84,-14.8"/>
-        <dia:point val="16.8003,-14.8"/>
-        <dia:point val="16.8003,-14.825"/>
-        <dia:point val="13.795,-14.825"/>
+        <dia:point val="29.94,-14.85"/>
+        <dia:point val="16.8003,-14.85"/>
+        <dia:point val="16.8003,-14.875"/>
+        <dia:point val="15.695,-14.875"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="0"/>
@@ -3961,16 +4153,16 @@
     </dia:object>
     <dia:object type="UML - Dependency" version="0" id="O41">
       <dia:attribute name="obj_pos">
-        <dia:point val="28.19,-13.3"/>
+        <dia:point val="35.29,-13.35"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="27.4731,-13.35;28.8731,-4.7"/>
+        <dia:rectangle val="34.6231,-13.4;36.0231,-6.7"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="28.19,-13.3"/>
-        <dia:point val="28.19,-9.225"/>
-        <dia:point val="28.1562,-9.225"/>
-        <dia:point val="28.1562,-5.15"/>
+        <dia:point val="35.29,-13.35"/>
+        <dia:point val="35.29,-10.25"/>
+        <dia:point val="35.3562,-10.25"/>
+        <dia:point val="35.3562,-7.15"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -3999,14 +4191,14 @@
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O42">
       <dia:attribute name="obj_pos">
-        <dia:point val="8.35,7.95"/>
+        <dia:point val="8.4,7.85"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="8.3,7.1;10.625,29.95"/>
+        <dia:rectangle val="8.35,7;10.625,29.95"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="8.35,7.95"/>
-        <dia:point val="10.5503,7.95"/>
+        <dia:point val="8.4,7.85"/>
+        <dia:point val="10.5503,7.85"/>
         <dia:point val="10.5503,19.1375"/>
         <dia:point val="10.575,19.1375"/>
         <dia:point val="10.575,29.9"/>
@@ -4036,16 +4228,16 @@
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O43">
       <dia:attribute name="obj_pos">
-        <dia:point val="37.925,21.3"/>
+        <dia:point val="37.875,21.35"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="34.8,21.25;38.775,30.15"/>
+        <dia:rectangle val="37.025,21.3;38.725,27.3"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="37.925,21.3"/>
-        <dia:point val="37.925,25.7"/>
-        <dia:point val="34.85,25.7"/>
-        <dia:point val="34.85,30.1"/>
+        <dia:point val="37.875,21.35"/>
+        <dia:point val="37.875,24.3"/>
+        <dia:point val="37.8,24.3"/>
+        <dia:point val="37.8,27.25"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4071,16 +4263,16 @@
     </dia:object>
     <dia:object type="UML - Realizes" version="0" id="O44">
       <dia:attribute name="obj_pos">
-        <dia:point val="43.6,17.6"/>
+        <dia:point val="43.55,17.65"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="41.75,17.55;44.45,30.1"/>
+        <dia:rectangle val="42.7,17.6;44.4,30.35"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="43.6,17.6"/>
-        <dia:point val="43.6,23.825"/>
-        <dia:point val="41.8,23.825"/>
-        <dia:point val="41.8,30.05"/>
+        <dia:point val="43.55,17.65"/>
+        <dia:point val="43.55,23.975"/>
+        <dia:point val="43.6,23.975"/>
+        <dia:point val="43.6,30.3"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4101,24 +4293,24 @@
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O6" connection="7"/>
-        <dia:connection handle="1" to="O2" connection="1"/>
+        <dia:connection handle="1" to="O2" connection="2"/>
       </dia:connections>
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O45">
       <dia:attribute name="obj_pos">
-        <dia:point val="-1.6997,30.0375"/>
+        <dia:point val="-2.8497,31.2375"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-1.7497,29.9875;4.6503,33.0875"/>
+        <dia:rectangle val="-2.8997,31.1875;5.8003,34.8875"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-1.6997,30.0375"/>
+        <dia:point val="-2.8497,31.2375"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="6.2999999999999998"/>
+        <dia:real val="8.5999999999999996"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="3"/>
+        <dia:real val="3.6000000000000001"/>
       </dia:attribute>
       <dia:attribute name="name">
         <dia:string>#CamelSession#</dia:string>
@@ -4198,7 +4390,31 @@
       <dia:attribute name="comment_font_height">
         <dia:real val="1"/>
       </dia:attribute>
-      <dia:attribute name="attributes"/>
+      <dia:attribute name="attributes">
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#instance#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#CamelSession#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
       <dia:attribute name="operations"/>
       <dia:attribute name="template">
         <dia:boolean val="false"/>
@@ -4207,13 +4423,13 @@
     </dia:object>
     <dia:object type="UML - Class" version="0" id="O46">
       <dia:attribute name="obj_pos">
-        <dia:point val="-1.8497,38.0875"/>
+        <dia:point val="-1.8997,38.1375"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="-1.8997,38.0375;4.8003,40.3375"/>
+        <dia:rectangle val="-1.9497,38.0875;4.7503,40.3875"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="-1.8497,38.0875"/>
+        <dia:point val="-1.8997,38.1375"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="6.5999999999999996"/>
@@ -4306,85 +4522,23 @@
       </dia:attribute>
       <dia:attribute name="templates"/>
     </dia:object>
-    <dia:object type="UML - Association" version="0" id="O47">
+    <dia:object type="UML - Realizes" version="0" id="O47">
       <dia:attribute name="obj_pos">
-        <dia:point val="4.6003,33.0375"/>
+        <dia:point val="1.4003,38.1375"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="3.8003,31.35;11.325,36.2375"/>
+        <dia:rectangle val="0.5503,34.7875;2.2503,38.1875"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="4.6003,33.0375"/>
-        <dia:point val="4.6003,34.5625"/>
-        <dia:point val="10.575,34.5625"/>
-        <dia:point val="10.575,32.1"/>
+        <dia:point val="1.4003,38.1375"/>
+        <dia:point val="1.4003,36.4875"/>
+        <dia:point val="1.4503,36.4875"/>
+        <dia:point val="1.4503,34.8375"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
         <dia:enum val="0"/>
         <dia:enum val="1"/>
-      </dia:attribute>
-      <dia:attribute name="autorouting">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:attribute name="name">
-        <dia:string>##</dia:string>
-      </dia:attribute>
-      <dia:attribute name="direction">
-        <dia:enum val="0"/>
-      </dia:attribute>
-      <dia:attribute name="ends">
-        <dia:composite>
-          <dia:attribute name="role">
-            <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="multiplicity">
-            <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="arrow">
-            <dia:boolean val="true"/>
-          </dia:attribute>
-          <dia:attribute name="aggregate">
-            <dia:enum val="0"/>
-          </dia:attribute>
-        </dia:composite>
-        <dia:composite>
-          <dia:attribute name="role">
-            <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="multiplicity">
-            <dia:string>##</dia:string>
-          </dia:attribute>
-          <dia:attribute name="arrow">
-            <dia:boolean val="false"/>
-          </dia:attribute>
-          <dia:attribute name="aggregate">
-            <dia:enum val="2"/>
-          </dia:attribute>
-        </dia:composite>
-      </dia:attribute>
-      <dia:connections>
-        <dia:connection handle="0" to="O45" connection="7"/>
-        <dia:connection handle="1" to="O7" connection="6"/>
-      </dia:connections>
-    </dia:object>
-    <dia:object type="UML - Realizes" version="0" id="O48">
-      <dia:attribute name="obj_pos">
-        <dia:point val="1.4503,38.0875"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.4003,32.9668;1.5503,38.0875"/>
-      </dia:attribute>
-      <dia:attribute name="orth_points">
-        <dia:point val="1.4503,38.0875"/>
-        <dia:point val="1.4503,38.0875"/>
-        <dia:point val="1.4503,33.0375"/>
-        <dia:point val="1.4503,33.0375"/>
-      </dia:attribute>
-      <dia:attribute name="orth_orient">
-        <dia:enum val="0"/>
-        <dia:enum val="1"/>
-        <dia:enum val="0"/>
       </dia:attribute>
       <dia:attribute name="orth_autoroute">
         <dia:boolean val="true"/>
@@ -4403,7 +4557,7 @@
         <dia:connection handle="1" to="O45" connection="6"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="UML - Class" version="0" id="O49">
+    <dia:object type="UML - Class" version="0" id="O48">
       <dia:attribute name="obj_pos">
         <dia:point val="14.0003,38.1625"/>
       </dia:attribute>
@@ -4504,7 +4658,7 @@
       </dia:attribute>
       <dia:attribute name="templates"/>
     </dia:object>
-    <dia:object type="UML - Association" version="0" id="O50">
+    <dia:object type="UML - Association" version="0" id="O49">
       <dia:attribute name="obj_pos">
         <dia:point val="16.8503,38.1625"/>
       </dia:attribute>
@@ -4559,19 +4713,19 @@
         </dia:composite>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O49" connection="1"/>
+        <dia:connection handle="0" to="O48" connection="1"/>
         <dia:connection handle="1" to="O9" connection="6"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="UML - Class" version="0" id="O51">
+    <dia:object type="UML - Class" version="0" id="O50">
       <dia:attribute name="obj_pos">
-        <dia:point val="21.7003,38.1125"/>
+        <dia:point val="21.2503,38.0625"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.6503,38.0625;30.7003,40.3625"/>
+        <dia:rectangle val="21.2003,38.0125;30.2503,40.3125"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="21.7003,38.1125"/>
+        <dia:point val="21.2503,38.0625"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="8.9499999999999993"/>
@@ -4664,18 +4818,18 @@
       </dia:attribute>
       <dia:attribute name="templates"/>
     </dia:object>
-    <dia:object type="UML - Association" version="0" id="O52">
+    <dia:object type="UML - Association" version="0" id="O51">
       <dia:attribute name="obj_pos">
-        <dia:point val="26.1753,38.1125"/>
+        <dia:point val="21.2503,38.0625"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="20.425,31.5;26.9753,39.7125"/>
+        <dia:rectangle val="20.4503,31.45;22.0503,39.6625"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="26.1753,38.1125"/>
-        <dia:point val="26.1753,35.1813"/>
-        <dia:point val="21.175,35.1813"/>
-        <dia:point val="21.175,32.25"/>
+        <dia:point val="21.2503,38.0625"/>
+        <dia:point val="21.2503,35.1312"/>
+        <dia:point val="21.275,35.1312"/>
+        <dia:point val="21.275,32.2"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4719,19 +4873,19 @@
         </dia:composite>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O51" connection="1"/>
+        <dia:connection handle="0" to="O50" connection="0"/>
         <dia:connection handle="1" to="O0" connection="6"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="UML - Class" version="0" id="O53">
+    <dia:object type="UML - Class" version="0" id="O52">
       <dia:attribute name="obj_pos">
-        <dia:point val="31.9503,38.0125"/>
+        <dia:point val="27.2503,35.0625"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.9003,37.9625;40.4003,40.2625"/>
+        <dia:rectangle val="27.2003,35.0125;35.7003,37.3125"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="31.9503,38.0125"/>
+        <dia:point val="27.2503,35.0625"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="8.4000000000000004"/>
@@ -4824,18 +4978,18 @@
       </dia:attribute>
       <dia:attribute name="templates"/>
     </dia:object>
-    <dia:object type="UML - Association" version="0" id="O54">
+    <dia:object type="UML - Association" version="0" id="O53">
       <dia:attribute name="obj_pos">
-        <dia:point val="36.1503,38.0125"/>
+        <dia:point val="31.4503,35.0625"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="25.8,31.5;36.9503,39.6125"/>
+        <dia:rectangle val="30.6503,30.05;32.2503,36.6625"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="36.1503,38.0125"/>
-        <dia:point val="36.1503,33.9625"/>
-        <dia:point val="26.55,33.9625"/>
-        <dia:point val="26.55,32.25"/>
+        <dia:point val="31.4503,35.0625"/>
+        <dia:point val="31.4503,33.9625"/>
+        <dia:point val="31.45,33.9625"/>
+        <dia:point val="31.45,30.8"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -4882,8 +5036,1630 @@
         </dia:composite>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O53" connection="1"/>
+        <dia:connection handle="0" to="O52" connection="1"/>
         <dia:connection handle="1" to="O3" connection="6"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O54">
+      <dia:attribute name="obj_pos">
+        <dia:point val="-2.7,-26.4675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-2.75,-26.5175;2.85,-24.2175"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="-2.7,-26.4675"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="5.5"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.1999999999999997"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#MsgWindow#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes"/>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O55">
+      <dia:attribute name="obj_pos">
+        <dia:point val="6.75,-20.9675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="6.7,-21.0175;14.65,-18.7175"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="6.75,-20.9675"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="7.8499999999999996"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.1999999999999997"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#SummaryWindow#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes"/>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O56">
+      <dia:attribute name="obj_pos">
+        <dia:point val="-8.5,-20.9675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-8.55,-21.0175;-1.35,-18.7175"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="-8.5,-20.9675"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="7.0999999999999996"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.1999999999999997"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#PasswordDialog#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes"/>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O57">
+      <dia:attribute name="obj_pos">
+        <dia:point val="-13.8,-26.4675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-13.85,-26.5175;-5.8,-23.6175"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="-13.8,-26.4675"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="7.9499999999999993"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.7999999999999998"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#MsgWindowIface#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#a020f0"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#a020f0"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes">
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#msg#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#MsgIface#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O58">
+      <dia:attribute name="obj_pos">
+        <dia:point val="4.6,-26.9675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="4.55,-27.0175;16.8,-24.1175"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="4.6,-26.9675"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="12.15"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.7999999999999998"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#SummaryWindowIface#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#a020f0"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#a020f0"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes">
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#account_store#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#AccountStoreIface#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O59">
+      <dia:attribute name="obj_pos">
+        <dia:point val="20.95,-21.3175"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="20.9,-21.3675;29.65,-17.6675"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="20.95,-21.3175"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="8.6500000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="3.6000000000000001"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#AccountStore#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>#singleton#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes">
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#instance#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#AccountStore#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O60">
+      <dia:attribute name="obj_pos">
+        <dia:point val="20.1,-30.9175"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="20.05,-30.9675;30.55,-23.4675"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="20.1,-30.9175"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="10.4"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="7.4000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#MsgAccountIStoreface#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>#Observable#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#0000ff"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#0000ff"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes">
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#account_added#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#signal#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="3"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#account_inserted#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#signal#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="3"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#account_removed#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#signal#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="3"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite type="umlattribute">
+          <dia:attribute name="name">
+            <dia:string>#accounts_reloaded#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#signal#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="value">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="3"/>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="operations">
+        <dia:composite type="umloperation">
+          <dia:attribute name="name">
+            <dia:string>#get_accounts#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="stereotype">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>#GList*#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="inheritance_type">
+            <dia:enum val="2"/>
+          </dia:attribute>
+          <dia:attribute name="query">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="parameters"/>
+        </dia:composite>
+        <dia:composite type="umloperation">
+          <dia:attribute name="name">
+            <dia:string>#add_account#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="stereotype">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="type">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="visibility">
+            <dia:enum val="0"/>
+          </dia:attribute>
+          <dia:attribute name="comment">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="abstract">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="inheritance_type">
+            <dia:enum val="2"/>
+          </dia:attribute>
+          <dia:attribute name="query">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="class_scope">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="parameters">
+            <dia:composite type="umlparameter">
+              <dia:attribute name="name">
+                <dia:string>#a#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="type">
+                <dia:string>#AccountIface#</dia:string>
+              </dia:attribute>
+              <dia:attribute name="value">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="comment">
+                <dia:string>##</dia:string>
+              </dia:attribute>
+              <dia:attribute name="kind">
+                <dia:enum val="0"/>
+              </dia:attribute>
+            </dia:composite>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Realizes" version="0" id="O61">
+      <dia:attribute name="obj_pos">
+        <dia:point val="25.3,-23.5175"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="24.45,-23.5675;26.15,-21.2675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="25.3,-23.5175"/>
+        <dia:point val="25.3,-22.4175"/>
+        <dia:point val="25.275,-22.4175"/>
+        <dia:point val="25.275,-21.3175"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O60" connection="6"/>
+        <dia:connection handle="1" to="O59" connection="1"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Dependency" version="0" id="O62">
+      <dia:attribute name="obj_pos">
+        <dia:point val="14.6,-20.2675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="14.55,-20.9425;21.4,-19.3425"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="14.6,-20.2675"/>
+        <dia:point val="17.775,-20.2675"/>
+        <dia:point val="17.775,-20.2175"/>
+        <dia:point val="20.95,-20.2175"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="draw_arrow">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O55" connection="4"/>
+        <dia:connection handle="1" to="O59" connection="3"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Dependency" version="0" id="O63">
+      <dia:attribute name="obj_pos">
+        <dia:point val="6.75,-20.2675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-0.4,-24.7175;6.8,-19.3675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="6.75,-20.2675"/>
+        <dia:point val="0.05,-20.2675"/>
+        <dia:point val="0.05,-24.2675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="draw_arrow">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O55" connection="3"/>
+        <dia:connection handle="1" to="O54" connection="6"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Realizes" version="0" id="O64">
+      <dia:attribute name="obj_pos">
+        <dia:point val="10.675,-24.1675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="10.625,-24.1675;10.775,-20.8968"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="10.675,-24.1675"/>
+        <dia:point val="10.675,-24.1675"/>
+        <dia:point val="10.675,-20.9675"/>
+        <dia:point val="10.675,-20.9675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O58" connection="6"/>
+        <dia:connection handle="1" to="O55" connection="1"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Dependency" version="0" id="O65">
+      <dia:attribute name="obj_pos">
+        <dia:point val="6.75,-20.2675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-1.47071,-20.9675;6.85,-19.3675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="6.75,-20.2675"/>
+        <dia:point val="6.75,-20.2675"/>
+        <dia:point val="-1.4,-20.2675"/>
+        <dia:point val="-1.4,-20.2675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="draw_arrow">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O55" connection="3"/>
+        <dia:connection handle="1" to="O56" connection="4"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Realizes" version="0" id="O66">
+      <dia:attribute name="obj_pos">
+        <dia:point val="-5.85,-25.7675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-5.85,-26.4675;-2.62929,-24.8675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="-5.85,-25.7675"/>
+        <dia:point val="-5.85,-25.7675"/>
+        <dia:point val="-2.7,-25.7675"/>
+        <dia:point val="-2.7,-25.7675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O57" connection="4"/>
+        <dia:connection handle="1" to="O54" connection="3"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O67">
+      <dia:attribute name="obj_pos">
+        <dia:point val="31.8601,-24.155"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="31.8101,-24.205;37.4101,-21.105"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="31.8601,-24.155"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="5.5"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="3"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#GConfClient#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>#Observable#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#7f7f7f"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#7f7f7f"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes"/>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Dependency" version="0" id="O68">
+      <dia:attribute name="obj_pos">
+        <dia:point val="29.6,-18.6175"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="29.55,-21.605;35.0601,-17.7175"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="29.6,-18.6175"/>
+        <dia:point val="34.6101,-18.6175"/>
+        <dia:point val="34.6101,-21.155"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="draw_arrow">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O59" connection="9"/>
+        <dia:connection handle="1" to="O67" connection="6"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Association" version="0" id="O69">
+      <dia:attribute name="obj_pos">
+        <dia:point val="14.35,15.85"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-10.575,-24.4175;15.65,16.75"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="14.35,15.85"/>
+        <dia:point val="-9.825,15.85"/>
+        <dia:point val="-9.825,-23.6675"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="direction">
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="ends">
+        <dia:composite>
+          <dia:attribute name="role">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="multiplicity">
+            <dia:string>#0 or 1#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="arrow">
+            <dia:boolean val="true"/>
+          </dia:attribute>
+          <dia:attribute name="aggregate">
+            <dia:enum val="0"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite>
+          <dia:attribute name="role">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="multiplicity">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="arrow">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="aggregate">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O4" connection="8"/>
+        <dia:connection handle="1" to="O57" connection="6"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Class" version="0" id="O70">
+      <dia:attribute name="obj_pos">
+        <dia:point val="-4.52994,-29.93"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-4.57994,-29.98;4.27006,-27.68"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="-4.52994,-29.93"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="8.75"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.1999999999999997"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>#MsgEditableWindow#</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="comment">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="abstract">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_attributes">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="suppress_operations">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="visible_attributes">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="visible_comments">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_operations">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="wrap_after_char">
+        <dia:int val="40"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="fill_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="text_color">
+        <dia:color val="#8b6914"/>
+      </dia:attribute>
+      <dia:attribute name="normal_font">
+        <dia:font family="monospace" style="0" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font">
+        <dia:font family="monospace" style="88" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font">
+        <dia:font family="monospace" style="8" name="Courier"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font">
+        <dia:font family="sans" style="80" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font">
+        <dia:font family="sans" style="88" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font">
+        <dia:font family="sans" style="8" name="Helvetica"/>
+      </dia:attribute>
+      <dia:attribute name="font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="polymorphic_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_font_height">
+        <dia:real val="0.80000000000000004"/>
+      </dia:attribute>
+      <dia:attribute name="classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="abstract_classname_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="comment_font_height">
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="attributes"/>
+      <dia:attribute name="operations"/>
+      <dia:attribute name="template">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="templates"/>
+    </dia:object>
+    <dia:object type="UML - Realizes" version="0" id="O71">
+      <dia:attribute name="obj_pos">
+        <dia:point val="-9.825,-26.4675"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-10.675,-29.93;-4.47994,-26.4175"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="-9.825,-26.4675"/>
+        <dia:point val="-9.825,-29.23"/>
+        <dia:point val="-4.52994,-29.23"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="orth_autoroute">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="stereotype">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O57" connection="1"/>
+        <dia:connection handle="1" to="O70" connection="3"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Association" version="0" id="O72">
+      <dia:attribute name="obj_pos">
+        <dia:point val="-4.1,19.65"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="-6.48994,18.85;-3.35,26.25"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="-4.1,19.65"/>
+        <dia:point val="-6.43994,19.65"/>
+        <dia:point val="-6.43994,24.65"/>
+        <dia:point val="-4.1,24.65"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="autorouting">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="direction">
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="ends">
+        <dia:composite>
+          <dia:attribute name="role">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="multiplicity">
+            <dia:string>#many#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="arrow">
+            <dia:boolean val="true"/>
+          </dia:attribute>
+          <dia:attribute name="aggregate">
+            <dia:enum val="0"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite>
+          <dia:attribute name="role">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="multiplicity">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="arrow">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="aggregate">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O10" connection="10"/>
+        <dia:connection handle="1" to="O10" connection="22"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="UML - Association" version="0" id="O73">
+      <dia:attribute name="obj_pos">
+        <dia:point val="5.7503,33.9375"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="5.7003,31.35;11.325,35.9"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="5.7503,33.9375"/>
+        <dia:point val="7.9003,33.9375"/>
+        <dia:point val="7.9003,33.95"/>
+        <dia:point val="10.575,33.95"/>
+        <dia:point val="10.575,32.1"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+      </dia:attribute>
+      <dia:attribute name="autorouting">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="name">
+        <dia:string>##</dia:string>
+      </dia:attribute>
+      <dia:attribute name="direction">
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="ends">
+        <dia:composite>
+          <dia:attribute name="role">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="multiplicity">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="arrow">
+            <dia:boolean val="true"/>
+          </dia:attribute>
+          <dia:attribute name="aggregate">
+            <dia:enum val="0"/>
+          </dia:attribute>
+        </dia:composite>
+        <dia:composite>
+          <dia:attribute name="role">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="multiplicity">
+            <dia:string>##</dia:string>
+          </dia:attribute>
+          <dia:attribute name="arrow">
+            <dia:boolean val="false"/>
+          </dia:attribute>
+          <dia:attribute name="aggregate">
+            <dia:enum val="2"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O45" connection="9"/>
+        <dia:connection handle="1" to="O7" connection="6"/>
       </dia:connections>
     </dia:object>
   </dia:layer>
