@@ -22,7 +22,7 @@
 #include <tny-stream-iface.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-attachment.h>
-#include <tny-camel-stream.h>
+#include <tny-stream-camel.h>
 #include <tny-msg-header.h>
 
 #include <camel/camel-stream-buffer.h>
@@ -86,10 +86,10 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 			wrapper = camel_medium_get_content_object (medium);
 			camel_data_wrapper_write_to_stream (wrapper, stream);
 
-			tny_camel_stream_print (stream);
+			/* tny_camel_stream_print (stream); */
 
 			priv->body_stream = TNY_STREAM_IFACE 
-				(tny_camel_stream_new (stream));
+				(tny_stream_camel_new (stream));
 
 			/* Loose my own ref (tnycamelstream keeps one) */
 			camel_object_unref (CAMEL_OBJECT (stream));

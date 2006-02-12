@@ -35,9 +35,11 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include <tny-camel-session.h>
+#include <tny-session-camel.h>
+
 #include "tny-account-priv.h"
 #include "tny-msg-folder-priv.h"
+
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 

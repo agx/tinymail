@@ -33,7 +33,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include <tny-camel-session.h>
+#include <tny-session-camel.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -197,7 +197,7 @@ tny_account_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	tny_camel_session_set_pass_func (priv->session, self, get_pass_func);
+	tny_session_camel_set_pass_func (priv->session, self, get_pass_func);
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
@@ -211,7 +211,7 @@ tny_account_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forg
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	tny_camel_session_set_forget_pass_func (priv->session, self, get_forget_pass_func);
+	tny_session_camel_set_forget_pass_func (priv->session, self, get_forget_pass_func);
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
@@ -306,7 +306,7 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->proto = NULL;
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
-	priv->session = tny_camel_session_get_instance ();
+	priv->session = tny_session_camel_get_instance ();
 
 	return;
 }

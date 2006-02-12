@@ -32,7 +32,7 @@
 #include <camel/camel.h>
 #include <camel/camel-session.h>
 
-#include <tny-camel-session.h>
+#include <tny-session-camel.h>
 
 #include <tny-account.h>
 #include "tny-account-priv.h"
@@ -59,7 +59,7 @@ typedef struct
 
 
 void
-tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *account, ForgetPassFunc get_forget_pass_func)
+tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *account, ForgetPassFunc get_forget_pass_func)
 {
 	GList *copy = forget_password_funcs, *mark_del = NULL;
 	PrivForgetPassFunc *pf;
@@ -109,7 +109,7 @@ tny_camel_session_set_forget_pass_func (TnyCamelSession *self, TnyAccountIface *
 }
 
 void
-tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account, GetPassFunc get_pass_func)
+tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account, GetPassFunc get_pass_func)
 {
 	GList *copy = password_funcs, *mark_del = NULL;
 	PrivPassFunc *pf;
@@ -159,7 +159,7 @@ tny_camel_session_set_pass_func (TnyCamelSession *self, TnyAccountIface *account
 }
 
 static char *
-tny_camel_session_get_password (CamelSession *session, CamelService *service, const char *domain,
+tny_session_camel_get_password (CamelSession *session, CamelService *service, const char *domain,
 	      const char *prompt, const char *item, guint32 flags, CamelException *ex)
 {
 	GList *copy = password_funcs;
@@ -194,7 +194,7 @@ tny_camel_session_get_password (CamelSession *session, CamelService *service, co
 }
 
 static void
-tny_camel_session_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
+tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
 {
 	GList *copy = forget_password_funcs;
 	ForgetPassFunc func;
@@ -223,7 +223,7 @@ tny_camel_session_forget_password (CamelSession *session, CamelService *service,
 }
 
 static gboolean
-tny_camel_session_alert_user (CamelSession *session, CamelSessionAlertType type, const char *prompt, gboolean cancel)
+tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *prompt, gboolean cancel)
 {
 	return FALSE;
 }
@@ -291,7 +291,7 @@ get_folder (CamelFilterDriver *d, const char *uri, void *data, CamelException *e
 }
 
 static CamelFilterDriver *
-tny_camel_session_get_filter_driver (CamelSession *session, const char *type, CamelException *ex)
+tny_session_camel_get_filter_driver (CamelSession *session, const char *type, CamelException *ex)
 {
 	CamelFilterDriver *driver = camel_filter_driver_new (session);
 	camel_filter_driver_set_folder_func (driver, get_folder, session);
@@ -320,7 +320,7 @@ my_cancel_func (struct _CamelOperation *op, const char *what, int pc, void *data
 }
 
 static void *
-tny_camel_session_ms_thread_msg_new (CamelSession *session, CamelSessionThreadOps *ops, unsigned int size)
+tny_session_camel_ms_thread_msg_new (CamelSession *session, CamelSessionThreadOps *ops, unsigned int size)
 {
 	CamelSessionThreadMsg *msg = ms_parent_class->thread_msg_new(session, ops, size);
 
@@ -335,7 +335,7 @@ tny_camel_session_ms_thread_msg_new (CamelSession *session, CamelSessionThreadOp
 }
 
 static void
-tny_camel_session_ms_thread_msg_free (CamelSession *session, CamelSessionThreadMsg *m)
+tny_session_camel_ms_thread_msg_free (CamelSession *session, CamelSessionThreadMsg *m)
 {
 	ms_parent_class->thread_msg_free(session, m);
 
@@ -343,14 +343,14 @@ tny_camel_session_ms_thread_msg_free (CamelSession *session, CamelSessionThreadM
 }
 
 static void
-tny_camel_session_ms_thread_status (CamelSession *session, CamelSessionThreadMsg *msg, const char *text, int pc)
+tny_session_camel_ms_thread_status (CamelSession *session, CamelSessionThreadMsg *msg, const char *text, int pc)
 {
 	return;
 }
 
 
 static void
-tny_camel_session_init (TnyCamelSession *instance)
+tny_session_camel_init (TnySessionCamel *instance)
 {
 	CamelSession *session = CAMEL_SESSION (instance);
 
@@ -375,15 +375,15 @@ tny_camel_session_init (TnyCamelSession *instance)
 }
 
 
-static TnyCamelSession* the_singleton;
+static TnySessionCamel* the_singleton;
 
-TnyCamelSession*
-tny_camel_session_get_instance (void)
+TnySessionCamel*
+tny_session_camel_get_instance (void)
 {
 	if (!the_singleton)
 	{
-		the_singleton = TNY_CAMEL_SESSION 
-			(camel_object_new (TNY_CAMEL_SESSION_TYPE));
+		the_singleton = TNY_SESSION_CAMEL 
+			(camel_object_new (TNY_SESSION_CAMEL_TYPE));
 	}
 
 	return the_singleton;
@@ -391,50 +391,48 @@ tny_camel_session_get_instance (void)
 
 
 static void
-tny_camel_session_finalise (TnyCamelSession *session)
+tny_session_camel_finalise (TnySessionCamel *session)
 {
-	g_print ("Critical TODO item at %s\n", __FUNCTION__);
-
 	return;
 }
 
 static void
-tny_camel_session_class_init (TnyCamelSessionClass *tny_camel_session_class)
+tny_session_camel_class_init (TnySessionCamelClass *tny_session_camel_class)
 {
-	CamelSessionClass *camel_session_class = CAMEL_SESSION_CLASS (tny_camel_session_class);
+	CamelSessionClass *camel_session_class = CAMEL_SESSION_CLASS (tny_session_camel_class);
 	
-	camel_session_class->get_password = tny_camel_session_get_password;
-	camel_session_class->forget_password = tny_camel_session_forget_password;
-	camel_session_class->alert_user = tny_camel_session_alert_user;
-	camel_session_class->get_filter_driver = tny_camel_session_get_filter_driver;
+	camel_session_class->get_password = tny_session_camel_get_password;
+	camel_session_class->forget_password = tny_session_camel_forget_password;
+	camel_session_class->alert_user = tny_session_camel_alert_user;
+	camel_session_class->get_filter_driver = tny_session_camel_get_filter_driver;
 
-	camel_session_class->thread_msg_new = tny_camel_session_ms_thread_msg_new;
-	camel_session_class->thread_msg_free = tny_camel_session_ms_thread_msg_free;
-	camel_session_class->thread_status = tny_camel_session_ms_thread_status;
+	camel_session_class->thread_msg_new = tny_session_camel_ms_thread_msg_new;
+	camel_session_class->thread_msg_free = tny_session_camel_ms_thread_msg_free;
+	camel_session_class->thread_status = tny_session_camel_ms_thread_status;
 
-	tny_camel_session_class->set_pass_func_func = tny_camel_session_set_pass_func;
-	tny_camel_session_class->set_forget_pass_func_func = tny_camel_session_set_forget_pass_func;
+	tny_session_camel_class->set_pass_func_func = tny_session_camel_set_pass_func;
+	tny_session_camel_class->set_forget_pass_func_func = tny_session_camel_set_forget_pass_func;
 
 	return;
 }
 
 CamelType
-tny_camel_session_get_type (void)
+tny_session_camel_get_type (void)
 {
-	static CamelType tny_camel_session_type = CAMEL_INVALID_TYPE;
+	static CamelType tny_session_camel_type = CAMEL_INVALID_TYPE;
 	
-	if (tny_camel_session_type == CAMEL_INVALID_TYPE) {
+	if (tny_session_camel_type == CAMEL_INVALID_TYPE) {
 		ms_parent_class = (CamelSessionClass *)camel_session_get_type();
-		tny_camel_session_type = camel_type_register (
+		tny_session_camel_type = camel_type_register (
 			camel_session_get_type (),
-			"TnyCamelSession",
-			sizeof (TnyCamelSession),
-			sizeof (TnyCamelSessionClass),
-			(CamelObjectClassInitFunc) tny_camel_session_class_init,
+			"TnySessionCamel",
+			sizeof (TnySessionCamel),
+			sizeof (TnySessionCamelClass),
+			(CamelObjectClassInitFunc) tny_session_camel_class_init,
 			NULL,
-			(CamelObjectInitFunc) tny_camel_session_init,
-			(CamelObjectFinalizeFunc) tny_camel_session_finalise);
+			(CamelObjectInitFunc) tny_session_camel_init,
+			(CamelObjectFinalizeFunc) tny_session_camel_finalise);
 	}
 	
-	return tny_camel_session_type;
+	return tny_session_camel_type;
 }
