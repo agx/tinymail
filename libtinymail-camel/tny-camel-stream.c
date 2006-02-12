@@ -49,7 +49,6 @@ struct _TnyCamelStreamPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_CAMEL_STREAM_TYPE, TnyCamelStreamPriv))
 
 
-
 void
 tny_camel_stream_print (CamelStream *stream)
 {
@@ -79,10 +78,9 @@ tny_camel_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	ssize_t total = 0;
 	ssize_t nb_read;
 	ssize_t nb_written;
-g_print ("1 %s\n", __FUNCTION__);
 	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
 	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
-g_print ("2 %s\n", __FUNCTION__);
+
 	while (!camel_stream_eos (stream)) {
 		nb_read = camel_stream_read (stream, tmp_buf, sizeof (tmp_buf));
 		if (nb_read < 0)
