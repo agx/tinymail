@@ -35,6 +35,8 @@ typedef struct _TnyMsgAttachmentIfaceClass TnyMsgAttachmentIfaceClass;
 typedef struct _TnyAccountIface TnyAccountIface;
 typedef struct _TnyAccountIfaceClass TnyAccountIfaceClass;
 typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
+typedef struct _TnyStreamIface TnyStreamIface;
+typedef struct _TnyStreamIfaceClass TnyStreamIfaceClass;
 typedef struct _TnyAccountStoreIfaceClass TnyAccountStoreIfaceClass;
 typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
 typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
