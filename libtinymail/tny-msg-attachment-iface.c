@@ -19,18 +19,47 @@
 
 #include <tny-msg-attachment-iface.h>
 
+/**
+ * tny_msg_attachment_iface_get_id:
+ * @self: a TnyMsgAttachmentIface object
+ * 
+ * Get the unique id for the attachment (unique per TnyMsgIface instance)
+ * * Uncertain API * 
+ * 
+ * Return value: A unique id
+ **/
 const gint
 tny_msg_attachment_iface_get_id (TnyMsgAttachmentIface *self)
 {
 	return TNY_MSG_ATTACHMENT_IFACE_GET_CLASS (self)->get_id_func (self);
 }
 
+
+/**
+ * tny_msg_attachment_iface_get_mime_type:
+ * @self: a TnyMsgAttachmentIface object
+ * 
+ * Get the MIME-type of the attachment
+ * * Uncertain API * 
+ *
+ * Return value: A read-only string with the MIME-type
+ **/
 const gchar*
 tny_msg_attachment_iface_get_mime_type (TnyMsgAttachmentIface *self)
 {
 	return TNY_MSG_ATTACHMENT_IFACE_GET_CLASS (self)->get_mime_type_func (self);
 }
 
+
+/**
+ * tny_msg_attachment_iface_get_data:
+ * @self: a TnyMsgAttachmentIface object
+ * 
+ * Get the data of the attachment
+ * * Uncertain API *
+ *
+ * Return value: A read-only string with the data
+ **/
 const gchar*
 tny_msg_attachment_iface_get_data (TnyMsgAttachmentIface *self)
 {

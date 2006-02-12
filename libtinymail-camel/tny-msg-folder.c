@@ -97,6 +97,9 @@ tny_msg_folder_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
 
 	priv->folders = g_list_append (priv->folders, folder);
 
+	/* Tell the observers */
+	g_signal_emit (self, tny_msg_folder_iface_signals [FOLDER_INSERTED], 0, folder);
+
 	return;
 }
 

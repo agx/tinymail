@@ -19,12 +19,28 @@
 
 #include <tny-account-iface.h>
 
+/**
+ * tny_account_iface_get_id:
+ * @self: a TnyAccountIface object
+ * 
+ * Get an unique id for the account.
+ * 
+ * Return value: Unique id
+ **/
 const gchar*
 tny_account_iface_get_id (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_id_func (self);
 }
 
+/**
+ * tny_account_iface_set_id:
+ * @self: a TnyAccountIface object
+ * 
+ * Set the accounts unique id.
+ * 
+ * Return value: 
+ **/
 void 
 tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
 {
@@ -32,6 +48,18 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
 	return;
 }
 
+/**
+ * tny_account_iface_set_forget_pass_func:
+ * @self: a TnyAccountIface object
+ * 
+ * Set the password that will be called when the password is no longer needed.
+ * the function must free the password that was allocated by the function that
+ * will return the password (get_pass_func).
+ *
+ * It's recommended to also memset (str, 0, strlen (str)) the memory.
+ * 
+ * Return value:
+ **/
 void
 tny_account_iface_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forget_pass_func)
 {
@@ -39,18 +67,43 @@ tny_account_iface_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc ge
 	return;
 }
 
+/**
+ * tny_account_iface_get_forget_pass_func:
+ * @self: a TnyAccountIface object
+ * 
+ *
+ * 
+ * Return value: A pointer to the forget-password function
+ **/
 ForgetPassFunc
 tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_forget_pass_func_func (self);
 }
 
+/**
+ * tny_account_iface_get_folders:
+ * @self: a TnyAccountIface object
+ * 
+ * Get the folders of an account
+ * 
+ * Return value: A read-only GList which contains TnyFolderIface instances
+ **/
 const GList*
 tny_account_iface_get_folders (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func (self);
 }
 
+/**
+ * tny_account_iface_set_proto:
+ * @self: a TnyAccountIface object
+ * @proto: the protocol (ex. "imap")
+ * 
+ * Set the protocol of an account
+ * 
+ * Return value: 
+ **/
 void
 tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
 {
@@ -58,6 +111,15 @@ tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
 	return;
 }
 
+/**
+ * tny_account_iface_set_user:
+ * @self: a TnyAccountIface object
+ * @user: the username
+ * 
+ * Set the user or login of an account
+ * 
+ * Return value: 
+ **/
 void
 tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
 {
@@ -65,6 +127,15 @@ tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
 	return;
 }
 
+/**
+ * tny_account_iface_set_hostname:
+ * @self: a TnyAccountIface object
+ * @host: the hostname
+ * 
+ * Set the hostname of an account
+ * 
+ * Return value: 
+ **/
 void
 tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
 {
@@ -72,6 +143,16 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
 	return;
 }
 
+/**
+ * tny_account_iface_set_pass_func:
+ * @self: a TnyAccountIface object
+ * @get_pass_func: a pointer to the function
+ * 
+ * Set the function that will be called when the password is needed.
+ * The function must resturn a newly allocated string with the password.
+ * 
+ * Return value: 
+ **/
 void
 tny_account_iface_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
 {
@@ -79,24 +160,56 @@ tny_account_iface_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_fun
 	return;
 }
 
+/**
+ * tny_account_iface_get_proto:
+ * @self: a TnyAccountIface object
+ * 
+ * Get the protocol of an account
+ * 
+ * Return value: the protocol as a read-only string
+ **/
 const gchar*
 tny_account_iface_get_proto (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_proto_func (self);
 }
 
+/**
+ * tny_account_iface_get_user:
+ * @self: a TnyAccountIface object
+ * 
+ * Get the user or login of an account
+ * 
+ * Return value: the user as a read-only string
+ **/
 const gchar*
 tny_account_iface_get_user (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_user_func (self);
 }
 
+/**
+ * tny_account_iface_get_hostname:
+ * @self: a TnyAccountIface object
+ * 
+ * Get the hostname of an account
+ * 
+ * Return value: the hostname as a read-only string
+ **/
 const gchar*
 tny_account_iface_get_hostname (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_hostname_func (self);
 }
 
+/**
+ * tny_account_iface_get_pass_func:
+ * @self: a TnyAccountIface object
+ * 
+ *
+ * 
+ * Return value: A pointer to the get-password function
+ **/
 GetPassFunc
 tny_account_iface_get_pass_func (TnyAccountIface *self)
 {

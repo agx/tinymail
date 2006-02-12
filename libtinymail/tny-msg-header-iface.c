@@ -20,18 +20,43 @@
 #include <tny-msg-header-iface.h>
 #include <tny-msg-folder-iface.h>
 
+
+/**
+ * tny_msg_header_iface_get_id:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * Get an unique id of the message of which self is a message header.
+ * 
+ * Return value: Unique id
+ **/
 const gchar*
 tny_msg_header_iface_get_id (TnyMsgHeaderIface *self)
 {
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_id_func (self);
 }
 
+/**
+ * tny_msg_header_iface_get_from:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * Get the from header
+ * 
+ * Return value: The from header
+ **/
 const gchar* 
 tny_msg_header_iface_get_from (TnyMsgHeaderIface *self)
 {
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_from_func (self);
 }
 
+/**
+ * tny_msg_header_iface_get_subject:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * Get the subject header
+ * 
+ * Return value: The subject header
+ **/
 const gchar*
 tny_msg_header_iface_get_subject (TnyMsgHeaderIface *self)
 {
@@ -39,12 +64,28 @@ tny_msg_header_iface_get_subject (TnyMsgHeaderIface *self)
 }
 
 
+/**
+ * tny_msg_header_iface_get_to:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * Get the to header
+ * 
+ * Return value: The to header
+ **/
 const gchar* 
 tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
 {
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_to_func (self);
 }
 
+/**
+ * tny_msg_header_iface_get_folder:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * Get a reference to the parent folder where this message header is located
+ * 
+ * Return value: The folder of the message header
+ **/
 const TnyMsgFolderIface* 
 tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 {
@@ -52,6 +93,14 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 }
 
 
+/**
+ * tny_msg_header_iface_set_folder:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * Set the reference to the parent folder where this message header is located
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
 {
@@ -59,6 +108,15 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
 	return;
 }
 
+/**
+ * tny_msg_header_iface_set_id:
+ * @self: a TnyMsgHeaderIface object
+ * @id: an unique id
+ * 
+ * * TODO: Make this private * 
+ *
+ * Return value: 
+ **/
 void
 tny_msg_header_iface_set_id (TnyMsgHeaderIface *self, const gchar *id)
 {
@@ -66,6 +124,15 @@ tny_msg_header_iface_set_id (TnyMsgHeaderIface *self, const gchar *id)
 	return;
 }
 
+/**
+ * tny_msg_header_iface_set_from:
+ * @self: a TnyMsgHeaderIface object
+ * @from: the from header
+ * 
+ * * TODO: Make this private * 
+ *
+ * Return value: 
+ **/
 void
 tny_msg_header_iface_set_from (TnyMsgHeaderIface *self, const gchar *from)
 {
@@ -73,6 +140,15 @@ tny_msg_header_iface_set_from (TnyMsgHeaderIface *self, const gchar *from)
 	return;
 }
 
+/**
+ * tny_msg_header_iface_set_to:
+ * @self: a TnyMsgHeaderIface object
+ * @from: the to header
+ * 
+ * * TODO: Make this private * 
+ *
+ * Return value: 
+ **/
 void
 tny_msg_header_iface_set_to (TnyMsgHeaderIface *self, const gchar *to)
 {
@@ -80,6 +156,15 @@ tny_msg_header_iface_set_to (TnyMsgHeaderIface *self, const gchar *to)
 	return;
 }
 
+/**
+ * tny_msg_header_iface_set_subject:
+ * @self: a TnyMsgHeaderIface object
+ * @from: the subject header
+ * 
+ * * TODO: Make this private * 
+ *
+ * Return value: 
+ **/
 void
 tny_msg_header_iface_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 {
@@ -87,6 +172,14 @@ tny_msg_header_iface_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 	return;
 }
 
+/**
+ * tny_msg_header_iface_uncache:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * If it's possible to uncache this instance, uncache it
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_header_iface_uncache (TnyMsgHeaderIface *self)
 {
@@ -95,6 +188,14 @@ tny_msg_header_iface_uncache (TnyMsgHeaderIface *self)
 	return;
 }
 
+/**
+ * tny_msg_header_iface_has_cache:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * If it's possible to uncache this instance, return whether or not it has a cache
+ * 
+ * Return value: Whether or not this instance has a cache
+ **/
 const gboolean
 tny_msg_header_iface_has_cache (TnyMsgHeaderIface *self)
 {

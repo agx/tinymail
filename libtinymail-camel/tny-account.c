@@ -63,6 +63,9 @@ fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelF
 
 		fill_folders_recursive (self, iface, iter->child);
 
+		/* Tell the observers that they should reload */
+		g_signal_emit (iface, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+
 		iter = iter->next;
 	}
 }

@@ -29,12 +29,29 @@
 
 guint *tny_account_store_iface_signals = NULL;
 
+/**
+ * tny_account_store_iface_get_accounts:
+ * @self: a TnyAccountStoreIface object
+ * 
+ * Get a read-only list of accounts in the store
+ * 
+ * Return value: A read-only GList which contains TnyAccountIface instances
+ **/
 const GList*
 tny_account_store_iface_get_accounts (TnyAccountStoreIface *self)
 {
 	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_accounts_func (self);
 }
 
+/**
+ * tny_account_store_iface_add_account:
+ * @self: a TnyAccountStoreIface object
+ * @account: the account to add
+ * 
+ * Add an account to the store
+ * 
+ * Return value: 
+ **/
 void
 tny_account_store_iface_add_account (TnyAccountStoreIface *self, TnyAccountIface *account)
 {
@@ -51,7 +68,7 @@ tny_account_store_iface_base_init (gpointer g_class)
 	if (!initialized) 
 	{
 
-		tny_account_store_iface_signals = g_new0 (guint, LAST_SIGNAL);
+		tny_account_store_iface_signals = g_new0 (guint, TNY_ACCOUNT_STORE_IFACE_LAST_SIGNAL);
 
 		tny_account_store_iface_signals[ACCOUNT_CHANGED] =
 		   g_signal_new ("account_changed",

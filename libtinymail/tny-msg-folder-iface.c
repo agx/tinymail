@@ -20,19 +20,44 @@
 #include <tny-msg-folder-iface.h>
 #include <tny-msg-header-iface.h>
 
+guint *tny_msg_folder_iface_signals;
+
+/**
+ * tny_msg_folder_iface_get_unread:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get the amount of unread messages in this folder.
+ * 
+ * Return value: amount of unread messages
+ **/
 gint
 tny_msg_folder_iface_get_unread (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_unread_func (self);
 }
 
-
+/**
+ * tny_msg_folder_iface_get_account:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get a reference to the parent account of this folder
+ * 
+ * Return value: the account of this folder
+ **/
 const TnyAccountIface*  
 tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_account_func (self);
 }
 
+/**
+ * tny_msg_folder_iface_set_account:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Set the parent of this folder
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account)
 {
@@ -41,12 +66,29 @@ tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface
 	return;
 }
 
+/**
+ * tny_msg_folder_iface_get_folders:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get the child folders of this folder
+ * 
+ * Return value: A read-only GList with TnyMsgFolderIface instances
+ **/
 const GList*
 tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_folders_func (self);
 }
 
+/**
+ * tny_msg_folder_iface_add_folder:
+ * @self: a TnyMsgFolderIface object
+ * @folder: the folder to add
+ * 
+ * Add a folder as child folder to the folder
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_folder_iface_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
 {
@@ -55,30 +97,73 @@ tny_msg_folder_iface_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *fol
 	return;
 }
 
+/**
+ * tny_msg_folder_iface_get_message:
+ * @self: a TnyMsgFolderIface object
+ * @header: the header of the message to get
+ * 
+ * Get a message in the folder by header
+ * 
+ * Return value: The message instance
+ **/
 const TnyMsgIface*
 tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_message_func (self, header);
 }
 
+
+/**
+ * tny_msg_folder_iface_get_headers:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get a read-only list of message header instances that are in this folder
+ * 
+ * Return value: A read-only GList with TnyMsgHeaderIface instances
+ **/
 const GList*
 tny_msg_folder_iface_get_headers (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_headers_func (self);
 }
 
+/**
+ * tny_msg_folder_iface_get_id:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get an unique id for this folder (unique per account)
+ * 
+ * Return value: A unique id
+ **/
 const gchar*
 tny_msg_folder_iface_get_id (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_id_func (self);
 }
 
+/**
+ * tny_msg_folder_iface_get_name:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get the displayable name of this folder
+ * 
+ * Return value: The folder name
+ **/
 const gchar*
 tny_msg_folder_iface_get_name (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_name_func (self);
 }
 
+/**
+ * tny_msg_folder_iface_set_id:
+ * @self: a TnyMsgFolderIface object
+ * @id: an unique id
+ * 
+ * Set the unique id for this folder (unique per account)
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_folder_iface_set_id (TnyMsgFolderIface *self, const gchar *id)
 {
@@ -86,6 +171,15 @@ tny_msg_folder_iface_set_id (TnyMsgFolderIface *self, const gchar *id)
 	return;
 }
 
+/**
+ * tny_msg_folder_iface_set_name:
+ * @self: a TnyMsgFolderIface object
+ * @name: an unique id
+ * 
+ * Set the displayable name of this folder
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name)
 {
@@ -93,6 +187,14 @@ tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name)
 	return;
 }
 
+/**
+ * tny_msg_folder_iface_uncache:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * If it's possible to uncache this instance, uncache it
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_folder_iface_uncache (TnyMsgFolderIface *self)
 {
@@ -101,6 +203,14 @@ tny_msg_folder_iface_uncache (TnyMsgFolderIface *self)
 	return;
 }
 
+/**
+ * tny_msg_folder_iface_has_cache:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * If it's possible to uncache this instance, return whether or not it has a cache
+ * 
+ * Return value: Whether or not this instance has a cache
+ **/
 const gboolean
 tny_msg_folder_iface_has_cache (TnyMsgFolderIface *self)
 {
@@ -114,8 +224,30 @@ tny_msg_folder_iface_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
-	if (!initialized) {
-		/* create interface signals here. */
+	if (!initialized) 
+	{
+
+		tny_msg_folder_iface_signals = g_new0 (guint, TNY_MSG_FOLDER_IFACE_LAST_SIGNAL);
+
+		tny_msg_folder_iface_signals[FOLDER_INSERTED] =
+		   g_signal_new ("folder_inserted",
+			TNY_MSG_FOLDER_IFACE_TYPE,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyMsgFolderIfaceClass, folder_inserted),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__POINTER,
+			G_TYPE_NONE, 1, TNY_MSG_FOLDER_IFACE_TYPE);
+
+		tny_msg_folder_iface_signals[FOLDERS_RELOADED] =
+		   g_signal_new ("folders_reloaded",
+			TNY_MSG_FOLDER_IFACE_TYPE,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyMsgFolderIfaceClass, folders_reloaded),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE, 0);
+
+
 		initialized = TRUE;
 	}
 }

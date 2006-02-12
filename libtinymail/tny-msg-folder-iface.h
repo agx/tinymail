@@ -36,10 +36,27 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG_FOLDER_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_FOLDER_IFACE_TYPE))
 #define TNY_MSG_FOLDER_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_MSG_FOLDER_IFACE_TYPE, TnyMsgFolderIfaceClass))
 
+#ifndef TNY_MSG_FOLDER_IFACE_C
+extern guint *tny_msg_folder_iface_signals;
+#endif
+
+enum
+{
+	FOLDER_INSERTED,
+	FOLDERS_RELOADED,
+	TNY_MSG_FOLDER_IFACE_LAST_SIGNAL
+};
+
 struct _TnyMsgFolderIfaceClass
 {
 	GTypeInterface parent;
+	
+	/* Signals */
+	void (*folder_inserted)            (TnyMsgFolderIface *self, TnyMsgFolderIface *folder);
+	void (*folders_reloaded)           (TnyMsgFolderIface *self);
 
+
+	/* Methods */
 	const GList*  (*get_folders_func)  (TnyMsgFolderIface *self);
 	void          (*add_folder_func)   (TnyMsgFolderIface *self, TnyMsgFolderIface *folder);
 

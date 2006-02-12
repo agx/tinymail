@@ -19,13 +19,30 @@
 
 #include <tny-msg-iface.h>
 
+/**
+ * tny_msg_iface_get_folder:
+ * @self: a TnyMsgIface object
+ * 
+ * Get the parent folder of this message
+ *
+ * Return value: The parent folder of this message
+ **/
 const TnyMsgFolderIface* 
 tny_msg_iface_get_folder (TnyMsgIface *self)
 {
 	return TNY_MSG_IFACE_GET_CLASS (self)->get_folder_func (self);
 }
 
-
+/**
+ * tny_msg_iface_set_folder:
+ * @self: a TnyMsgIface object
+ * @folder: The parent folder
+ * 
+ * Set the parent folder of this message
+ * * TODO: Make this private *
+ *
+ * Return value: Set parent folder of this message
+ **/
 void
 tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
 {
@@ -34,6 +51,14 @@ tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
 }
 
 
+/**
+ * tny_msg_iface_get_attachments:
+ * @self: a TnyMsgIface object
+ * 
+ * Get a read-only list of attachments of this message
+ *
+ * Return value: A read-only GList with TnyMsgAttachmentIface instances
+ **/
 const GList*
 tny_msg_iface_get_attachments (TnyMsgIface *self)
 {
@@ -41,24 +66,59 @@ tny_msg_iface_get_attachments (TnyMsgIface *self)
 	return TNY_MSG_IFACE_GET_CLASS (self)->get_attachments_func (self);
 }
 
+/**
+ * tny_msg_iface_get_body:
+ * @self: a TnyMsgIface object
+ * 
+ * Get the body of the message
+ *
+ * Return value: The body of the message
+ **/
 const TnyMsgBodyIface*
 tny_msg_iface_get_body (TnyMsgIface *self)
 {
 	return TNY_MSG_IFACE_GET_CLASS (self)->get_body_func (self);
 }
 
+/**
+ * tny_msg_iface_get_header:
+ * @self: a TnyMsgIface object
+ * 
+ * Get the header of the message
+ *
+ * Return value: The header of the message
+ **/
 const TnyMsgHeaderIface*
 tny_msg_iface_get_header (TnyMsgIface *self)
 {
 	return TNY_MSG_IFACE_GET_CLASS (self)->get_header_func (self);
 }
 
+
+/**
+ * tny_msg_iface_add_attachment:
+ * @self: a TnyMsgIface object
+ * @attachment: the attachment to add
+ * 
+ * Add an attachment to a message
+ *
+ * Return value: The id of the added attachment
+ **/
 gint
 tny_msg_iface_add_attachment (TnyMsgIface *self, TnyMsgAttachmentIface *attachment)
 {
 	return TNY_MSG_IFACE_GET_CLASS (self)->add_attachment_func (self, attachment);
 }
 
+/**
+ * tny_msg_iface_del_attachment:
+ * @self: a TnyMsgIface object
+ * @id: the attachment id to delete
+ * 
+ * Delete an attachment from a message
+ *
+ * Return value: 
+ **/
 void
 tny_msg_iface_del_attachment (TnyMsgIface *self, gint id)
 {
@@ -66,6 +126,15 @@ tny_msg_iface_del_attachment (TnyMsgIface *self, gint id)
 	return;
 }
 
+/**
+ * tny_msg_iface_set_body:
+ * @self: a TnyMsgIface object
+ * @body: the body to set
+ * 
+ * Set the body of a message
+ *
+ * Return value: 
+ **/
 void
 tny_msg_iface_set_body (TnyMsgIface *self, TnyMsgBodyIface *body)
 {
@@ -73,6 +142,15 @@ tny_msg_iface_set_body (TnyMsgIface *self, TnyMsgBodyIface *body)
 	return;
 }
 
+/**
+ * tny_msg_iface_set_body:
+ * @self: a TnyMsgIface object
+ * @header: the header to set
+ * 
+ * Set the header of a message
+ *
+ * Return value: 
+ **/
 void
 tny_msg_iface_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 {
