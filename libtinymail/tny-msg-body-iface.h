@@ -38,14 +38,12 @@ struct _TnyMsgBodyIfaceClass
 {
 	GTypeInterface parent;
 
-	const gchar* (*get_data_func) (TnyMsgBodyIface *self);
-	void         (*set_data_func) (TnyMsgBodyIface *self, gchar* data);
+	const TnyStreamIface* (*get_stream_func) (TnyMsgBodyIface *self);
 };
 
 GType        tny_msg_body_iface_get_type (void);
 
-const gchar* tny_msg_body_iface_get_data (TnyMsgBodyIface *self);
-void         tny_msg_body_iface_set_data (TnyMsgBodyIface *self, gchar *data);
+const TnyStreamIface* tny_msg_body_iface_get_stream (TnyMsgBodyIface *self);
 
 G_END_DECLS
 

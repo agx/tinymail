@@ -19,17 +19,10 @@
 
 #include <tny-msg-body-iface.h>
 
-const gchar*
-tny_msg_body_iface_get_data (TnyMsgBodyIface *self)
+const TnyStreamIface*
+tny_msg_body_iface_get_stream (TnyMsgBodyIface *self)
 {
-	return TNY_MSG_BODY_IFACE_GET_CLASS (self)->get_data_func (self);
-}
-
-void
-tny_msg_body_iface_set_data (TnyMsgBodyIface *self, gchar *data)
-{
-	TNY_MSG_BODY_IFACE_GET_CLASS (self)->set_data_func (self, data);
-	return;
+	return TNY_MSG_BODY_IFACE_GET_CLASS (self)->get_stream_func (self);
 }
 
 
