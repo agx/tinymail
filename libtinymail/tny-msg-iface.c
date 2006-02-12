@@ -19,6 +19,21 @@
 
 #include <tny-msg-iface.h>
 
+
+/**
+ * tny_msg_iface_get_stream:
+ * @self: a TnyMsgIface object
+ * 
+ * Get stream of this message
+ *
+ * Return value: a stream
+ **/
+const TnyStreamIface*
+tny_msg_iface_get_stream (TnyMsgIface *self)
+{
+	return TNY_MSG_IFACE_GET_CLASS (self)->get_stream_func (self);
+}
+
 /**
  * tny_msg_iface_get_folder:
  * @self: a TnyMsgIface object
@@ -66,19 +81,6 @@ tny_msg_iface_get_attachments (TnyMsgIface *self)
 	return TNY_MSG_IFACE_GET_CLASS (self)->get_attachments_func (self);
 }
 
-/**
- * tny_msg_iface_get_body:
- * @self: a TnyMsgIface object
- * 
- * Get the body of the message
- *
- * Return value: The body of the message
- **/
-const TnyMsgBodyIface*
-tny_msg_iface_get_body (TnyMsgIface *self)
-{
-	return TNY_MSG_IFACE_GET_CLASS (self)->get_body_func (self);
-}
 
 /**
  * tny_msg_iface_get_header:
@@ -126,21 +128,6 @@ tny_msg_iface_del_attachment (TnyMsgIface *self, gint id)
 	return;
 }
 
-/**
- * tny_msg_iface_set_body:
- * @self: a TnyMsgIface object
- * @body: the body to set
- * 
- * Set the body of a message
- *
- * Return value: 
- **/
-void
-tny_msg_iface_set_body (TnyMsgIface *self, TnyMsgBodyIface *body)
-{
-	TNY_MSG_IFACE_GET_CLASS (self)->set_body_func (self, body);
-	return;
-}
 
 /**
  * tny_msg_iface_set_body:

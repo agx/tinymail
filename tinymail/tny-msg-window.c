@@ -43,16 +43,15 @@ reload_msg (TnyMsgWindowIface *self)
 
 	TnyMsgHeaderIface *header;
 	GList *attachments;
-	TnyMsgBodyIface *body;
 	const gchar *text;
 
 	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
-	body = TNY_MSG_BODY_IFACE (tny_msg_iface_get_body (priv->msg));
 	attachments = (GList*)tny_msg_iface_get_attachments (priv->msg);
-	text = tny_msg_body_iface_get_data (body);
 
 	gtk_window_set_title (GTK_WINDOW (self), tny_msg_header_iface_get_subject (header));
-	gtk_text_buffer_set_text (buffer, text, strlen(text));
+
+	/* TODO: Use stream */
+	gtk_text_buffer_set_text (buffer, tny_msg_header_iface_get_subject (header), strlen(tny_msg_header_iface_get_subject (header)));
 
 	return;
 }

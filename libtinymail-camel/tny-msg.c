@@ -19,10 +19,10 @@
 
 #include <tny-msg.h>
 #include <tny-msg-attachment-iface.h>
-#include <tny-msg-body-iface.h>
+#include <tny-stream-iface.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-attachment.h>
-#include <tny-msg-body.h>
+#include <tny-camel-stream.h>
 #include <tny-msg-header.h>
 
 #include <camel/camel-stream-buffer.h>
@@ -38,35 +38,8 @@ void
 _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
-	int tsize, size;
-	CamelStream *stream = camel_stream_mem_new ();
-	GString *gstr = g_string_new("");
-	char buffer [1024];
-
-	if (priv->message)
-		camel_object_unref (priv->message);
-
-	camel_object_ref (message);
-
-	priv->body = TNY_MSG_BODY_IFACE (tny_msg_body_new ());
-
-	/* TODO: Blah! */
 	
-	tsize = camel_data_wrapper_decode_to_stream (CAMEL_DATA_WRAPPER (message), 
-			stream);
-
-	while (size > 0)
-	{
-		size = camel_stream_read (stream, buffer, sizeof (buffer));
-		g_print ("%s\n", buffer);
-		gstr = g_string_append (gstr, (const gchar*)buffer);
-	}
-
-	camel_stream_close (stream);
-
-	tny_msg_body_iface_set_data (priv->body, gstr->str);
-	
-	priv->message = message;
+	/* TODO: Play with priv->stream here */
 
 	return;
 }
@@ -98,12 +71,12 @@ tny_msg_get_attachments (TnyMsgIface *self)
 	return priv->attachments;
 }
 
-static const TnyMsgBodyIface*
-tny_msg_get_body (TnyMsgIface *self)
+static const TnyStreamIface*
+tny_msg_get_stream (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
-	return priv->body;
+	return priv->stream;
 }
 
 static const TnyMsgHeaderIface*
@@ -175,20 +148,6 @@ tny_msg_del_attachment (TnyMsgIface *self, gint id)
 	return;
 }
 
-static void
-tny_msg_set_body (TnyMsgIface *self, TnyMsgBodyIface *body)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	if (priv->body)
-		g_object_unref (G_OBJECT (priv->body));
-
-	g_object_ref (G_OBJECT (body));
-
-	priv->body = body;
-
-	return;
-}
 
 static void
 tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
@@ -222,9 +181,8 @@ tny_msg_finalize (GObject *object)
 	if (priv->header)
 		g_object_unref (G_OBJECT (priv->header));
 
-	if (priv->body)
-		g_object_unref (G_OBJECT (priv->body));
-
+	if (priv->stream)
+		g_object_unref (G_OBJECT (priv->stream));
 
 	if (priv->attachments) 
 	{
@@ -255,13 +213,12 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyMsgIfaceClass *klass = (TnyMsgIfaceClass *)g_iface;
 
 	klass->get_attachments_func = tny_msg_get_attachments;
-	klass->get_body_func = tny_msg_get_body;		
+	klass->get_stream_func = tny_msg_get_stream;		
 	klass->get_header_func = tny_msg_get_header;
 	klass->set_header_func = tny_msg_set_header;
 
 	klass->add_attachment_func = tny_msg_add_attachment;
 	klass->del_attachment_func = tny_msg_del_attachment;
-	klass->set_body_func = tny_msg_set_body;
 
 	klass->set_folder_func = tny_msg_set_folder;
 	klass->get_folder_func = tny_msg_get_folder;
@@ -292,7 +249,7 @@ tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
 
 	priv->message = NULL;
-	priv->body = NULL;
+	priv->stream = NULL;
 	priv->attachments = NULL;
 	priv->header = NULL;
 

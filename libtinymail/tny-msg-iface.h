@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <tny-shared.h>
 #include <tny-msg-header-iface.h>
-#include <tny-msg-body-iface.h>
+#include <tny-stream-iface.h>
 #include <tny-msg-attachment-iface.h>
 
 G_BEGIN_DECLS
@@ -40,7 +40,7 @@ struct _TnyMsgIfaceClass
 	GTypeInterface parent;
 
 	const GList*                  (*get_attachments_func) (TnyMsgIface *self);
-	const TnyMsgBodyIface*        (*get_body_func)        (TnyMsgIface *self);
+	const TnyStreamIface*         (*get_stream_func)      (TnyMsgIface *self);
 	const TnyMsgHeaderIface*      (*get_header_func)      (TnyMsgIface *self);
 
 	gint (*add_attachment_func)   (TnyMsgIface *self, TnyMsgAttachmentIface *attachment);
@@ -50,14 +50,13 @@ struct _TnyMsgIfaceClass
              (*get_folder_func)       (TnyMsgIface *self);
         void (*set_folder_func)       (TnyMsgIface *self, const TnyMsgFolderIface *folder);
 
-	void (*set_body_func)         (TnyMsgIface *self, TnyMsgBodyIface *body);
 	void (*set_header_func)       (TnyMsgIface *self, TnyMsgHeaderIface *header);
 };
 
 GType tny_msg_iface_get_type        (void);
 
 const GList*                        tny_msg_iface_get_attachments  (TnyMsgIface *self);
-const TnyMsgBodyIface*              tny_msg_iface_get_body         (TnyMsgIface *self);
+const TnyStreamIface*               tny_msg_iface_get_stream         (TnyMsgIface *self);
 const TnyMsgHeaderIface*            tny_msg_iface_get_header       (TnyMsgIface *self);
 
 /* Must also set attachment's id (therefore not a const) */
@@ -68,7 +67,6 @@ const TnyMsgFolderIface*
                tny_msg_iface_get_folder    (TnyMsgIface *self);
 void           tny_msg_iface_set_folder    (TnyMsgIface *self, const TnyMsgFolderIface *folder);
 
-void tny_msg_iface_set_body         (TnyMsgIface *self, TnyMsgBodyIface *body);
 void tny_msg_iface_set_header       (TnyMsgIface *self, TnyMsgHeaderIface *header);
 
 G_END_DECLS
