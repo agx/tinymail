@@ -8,6 +8,7 @@ libtinymailui_1_0_headers = 		\
 	tny-msg-header-list-model.h	\
 	tny-account-tree-model.h	\
 	tny-summary-window-iface.h	\
+	tny-text-buffer-stream.h	\
 	tny-msg-window-iface.h
 
 libtinymailui_1_0_la_SOURCES = 		\
@@ -15,6 +16,7 @@ libtinymailui_1_0_la_SOURCES = 		\
 	tny-msg-header-list-model.c	\
 	tny-account-tree-model.c	\
 	tny-summary-window-iface.c	\
+	tny-text-buffer-stream.c	\
 	tny-msg-window-iface.c
 
 libtinymailui_1_0_la_LIBADD = 		\

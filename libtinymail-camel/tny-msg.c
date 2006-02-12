@@ -34,12 +34,96 @@ static GObjectClass *parent_class = NULL;
 #define TNY_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_TYPE, TnyMsgPriv))
 
+typedef gboolean (*CamelPartFunc)(CamelMimeMessage *, CamelMimePart *, void *data);
+
+static gboolean
+message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartFunc callback, void *data)
+{
+        CamelDataWrapper *containee;
+        int parts, i;
+        int go = TRUE;
+
+        if (callback (msg, part, data) == FALSE)
+                return FALSE;
+
+        containee = camel_medium_get_content_object (CAMEL_MEDIUM (part));
+
+        if (containee == NULL)
+                return go;
+
+        /* using the object types is more accurate than using the mime/types */
+        if (CAMEL_IS_MULTIPART (containee)) {
+                parts = camel_multipart_get_number (CAMEL_MULTIPART (containee));
+                for (i = 0; go && i < parts; i++) {
+                        CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
+
+                        go = message_foreach_part_rec (msg, part, callback, data);
+                }
+        } else if (CAMEL_IS_MIME_MESSAGE (containee)) {
+                go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data);
+        }
+
+        return go;
+}
+
+
+static gboolean
+received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
+{
+	TnyMsgPriv *priv = data;
+	CamelTransferEncoding encoding = camel_mime_part_get_encoding (part);
+
+	switch (encoding)
+	{
+		case CAMEL_TRANSFER_ENCODING_DEFAULT:
+		case CAMEL_TRANSFER_ENCODING_7BIT:
+		case CAMEL_TRANSFER_ENCODING_8BIT:
+		case CAMEL_TRANSFER_ENCODING_QUOTEDPRINTABLE:
+		{
+			CamelDataWrapper *wrapper;
+			CamelMedium *medium = CAMEL_MEDIUM (part);
+			CamelStream *stream = camel_stream_mem_new ();
+			wrapper = camel_medium_get_content_object (medium);
+			camel_data_wrapper_write_to_stream (wrapper, stream);
+
+			tny_camel_stream_print (stream);
+
+			priv->body_stream = TNY_STREAM_IFACE 
+				(tny_camel_stream_new (stream));
+
+			/* Loose my own ref (tnycamelstream keeps one) */
+			camel_object_unref (CAMEL_OBJECT (stream));
+		} break;
+
+		case CAMEL_TRANSFER_ENCODING_BASE64:
+		case CAMEL_TRANSFER_ENCODING_BINARY:
+		case CAMEL_TRANSFER_ENCODING_UUENCODE:
+			/* Handle attachments */
+			break;
+
+		case CAMEL_TRANSFER_NUM_ENCODINGS:
+		default:
+			/* Huh? */
+			break;
+	}
+
+	return TRUE;
+}
+
+
 void
 _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
-	
-	/* TODO: Play with priv->stream here */
+	CamelDataWrapper *wrapper;
+	CamelMimePart *part;
+
+	message_foreach_part_rec (message, (CamelMimePart *)message, received_a_part, priv);
+
+	if (!priv->body_stream)
+	{
+		g_print ("Message has no body?!\n");
+	}
 
 	return;
 }
@@ -72,11 +156,11 @@ tny_msg_get_attachments (TnyMsgIface *self)
 }
 
 static const TnyStreamIface*
-tny_msg_get_stream (TnyMsgIface *self)
+tny_msg_get_body_stream (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
-	return priv->stream;
+	return priv->body_stream;
 }
 
 static const TnyMsgHeaderIface*
@@ -181,8 +265,8 @@ tny_msg_finalize (GObject *object)
 	if (priv->header)
 		g_object_unref (G_OBJECT (priv->header));
 
-	if (priv->stream)
-		g_object_unref (G_OBJECT (priv->stream));
+	if (priv->body_stream)
+		g_object_unref (G_OBJECT (priv->body_stream));
 
 	if (priv->attachments) 
 	{
@@ -213,7 +297,7 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyMsgIfaceClass *klass = (TnyMsgIfaceClass *)g_iface;
 
 	klass->get_attachments_func = tny_msg_get_attachments;
-	klass->get_stream_func = tny_msg_get_stream;		
+	klass->get_body_stream_func = tny_msg_get_body_stream;		
 	klass->get_header_func = tny_msg_get_header;
 	klass->set_header_func = tny_msg_set_header;
 
@@ -249,7 +333,7 @@ tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
 
 	priv->message = NULL;
-	priv->stream = NULL;
+	priv->body_stream = NULL;
 	priv->attachments = NULL;
 	priv->header = NULL;
 

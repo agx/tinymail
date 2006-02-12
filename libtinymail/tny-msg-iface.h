@@ -40,7 +40,7 @@ struct _TnyMsgIfaceClass
 	GTypeInterface parent;
 
 	const GList*                  (*get_attachments_func) (TnyMsgIface *self);
-	const TnyStreamIface*         (*get_stream_func)      (TnyMsgIface *self);
+	const TnyStreamIface*         (*get_body_stream_func) (TnyMsgIface *self);
 	const TnyMsgHeaderIface*      (*get_header_func)      (TnyMsgIface *self);
 
 	gint (*add_attachment_func)   (TnyMsgIface *self, TnyMsgAttachmentIface *attachment);
@@ -56,7 +56,7 @@ struct _TnyMsgIfaceClass
 GType tny_msg_iface_get_type        (void);
 
 const GList*                        tny_msg_iface_get_attachments  (TnyMsgIface *self);
-const TnyStreamIface*               tny_msg_iface_get_stream         (TnyMsgIface *self);
+const TnyStreamIface*               tny_msg_iface_get_body_stream  (TnyMsgIface *self);
 const TnyMsgHeaderIface*            tny_msg_iface_get_header       (TnyMsgIface *self);
 
 /* Must also set attachment's id (therefore not a const) */

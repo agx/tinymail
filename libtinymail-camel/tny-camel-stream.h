@@ -52,6 +52,7 @@ GType                   tny_camel_stream_get_type       (void);
 TnyCamelStream*         tny_camel_stream_new            (CamelStream *stream);
 
 void                    tny_camel_stream_set_stream     (TnyCamelStream *self, CamelStream *stream);
+void                    tny_camel_stream_print          (CamelStream *stream);
 
 G_END_DECLS
 

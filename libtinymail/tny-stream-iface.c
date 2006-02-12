@@ -19,6 +19,11 @@
 
 #include <tny-stream-iface.h>
 
+ssize_t
+tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
+{
+	return TNY_STREAM_IFACE_GET_CLASS (self)->write_to_stream_func (self, output);
+}
 
 ssize_t
 tny_stream_iface_read  (TnyStreamIface *self, char *buffer, size_t n)

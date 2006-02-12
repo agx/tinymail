@@ -29,7 +29,7 @@ struct _TnyMsgPriv
 	CamelMimeMessage *message;
 
 	TnyMsgHeaderIface *header;
-	TnyStreamIface *stream;
+	TnyStreamIface *body_stream;
 
 	GList *attachments;
 

@@ -49,6 +49,60 @@ struct _TnyCamelStreamPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_CAMEL_STREAM_TYPE, TnyCamelStreamPriv))
 
 
+
+void
+tny_camel_stream_print (CamelStream *stream)
+{
+	char tmp_buf[4096];
+	ssize_t nb_read;
+	
+	camel_stream_reset (stream);
+
+	while (!camel_stream_eos (stream)) 
+	{
+		nb_read = camel_stream_read (stream, tmp_buf, sizeof (tmp_buf));
+		g_print ("- (%d) -> %s", nb_read, tmp_buf);
+	}
+
+	g_print ("\n");
+
+	return;
+}
+
+static ssize_t
+tny_camel_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
+{
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
+	CamelStream *stream = priv->stream;
+
+	char tmp_buf[4096];
+	ssize_t total = 0;
+	ssize_t nb_read;
+	ssize_t nb_written;
+g_print ("1 %s\n", __FUNCTION__);
+	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
+	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
+g_print ("2 %s\n", __FUNCTION__);
+	while (!camel_stream_eos (stream)) {
+		nb_read = camel_stream_read (stream, tmp_buf, sizeof (tmp_buf));
+		if (nb_read < 0)
+			return -1;
+		else if (nb_read > 0) {
+			nb_written = 0;
+	
+			while (nb_written < nb_read) {
+				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+								  nb_read - nb_written);
+				if (len < 0)
+					return -1;
+				nb_written += len;
+			}
+			total += nb_written;
+		}
+	}
+	return total;
+}
+
 static ssize_t
 tny_camel_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 {
@@ -158,6 +212,7 @@ tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->close_func = tny_camel_stream_close;
 	klass->eos_func = tny_camel_stream_eos;
 	klass->reset_func = tny_camel_stream_reset;
+	klass->write_to_stream_func = tny_camel_stream_write_to_stream;
 
 	return;
 }

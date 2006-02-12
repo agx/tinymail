@@ -29,9 +29,9 @@
  * Return value: a stream
  **/
 const TnyStreamIface*
-tny_msg_iface_get_stream (TnyMsgIface *self)
+tny_msg_iface_get_body_stream (TnyMsgIface *self)
 {
-	return TNY_MSG_IFACE_GET_CLASS (self)->get_stream_func (self);
+	return TNY_MSG_IFACE_GET_CLASS (self)->get_body_stream_func (self);
 }
 
 /**

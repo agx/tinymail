@@ -20,6 +20,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include <tny-msg-window.h>
+#include <tny-text-buffer-stream.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -40,18 +41,21 @@ reload_msg (TnyMsgWindowIface *self)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
-
+	TnyStreamIface *dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
+	TnyStreamIface *source;
 	TnyMsgHeaderIface *header;
 	GList *attachments;
-	const gchar *text;
 
 	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+	source = (TnyStreamIface*)tny_msg_iface_get_body_stream (priv->msg);
 	attachments = (GList*)tny_msg_iface_get_attachments (priv->msg);
 
 	gtk_window_set_title (GTK_WINDOW (self), tny_msg_header_iface_get_subject (header));
 
-	/* TODO: Use stream */
-	gtk_text_buffer_set_text (buffer, tny_msg_header_iface_get_subject (header), strlen(tny_msg_header_iface_get_subject (header)));
+	tny_stream_iface_reset (source);
+	tny_stream_iface_reset (dest);
+
+	tny_stream_iface_write_to_stream (source, dest);
 
 	return;
 }
