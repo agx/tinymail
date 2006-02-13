@@ -186,11 +186,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
 			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
 
-			g_print ("You activated header: %s\n", 
-				tny_msg_header_iface_get_subject (TNY_MSG_HEADER_IFACE (header)));
-			g_print ("You activated header: %s\n", 
-				tny_msg_header_iface_get_subject (TNY_MSG_HEADER_IFACE (nheader)));
-	
 			msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new ());
 			tny_msg_window_iface_set_msg (msgwin, TNY_MSG_IFACE (msg));
 	
@@ -199,6 +194,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	}
 }
 
+/*
 static void
 on_header_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
@@ -214,13 +210,11 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 			&header, -1);
 
-		g_print ("You selected header: %s\n", 
-			tny_msg_header_iface_get_subject (header));
-
 	}
 
 	return;
 }
+*/
 
 TnySummaryWindow*
 tny_summary_window_new (void)
@@ -331,8 +325,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
-	g_signal_connect (G_OBJECT (select), "changed",
-		G_CALLBACK (on_header_view_tree_selection_changed), priv->header_view);
+	/* g_signal_connect (G_OBJECT (select), "changed",
+		G_CALLBACK (on_header_view_tree_selection_changed), priv->header_view); */
 
 	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
 		G_CALLBACK (on_header_view_tree_row_activated), priv->header_view);
