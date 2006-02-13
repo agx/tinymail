@@ -55,7 +55,7 @@ static void
 reload_accounts (TnySummaryWindowPriv *priv)
 {
 	TnyAccountStoreIface *account_store = priv->account_store;
-	GtkTreeModel *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
+	GtkTreeModel *sortable, *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 	const GList* accounts;
 
 	accounts = tny_account_store_iface_get_accounts (account_store);
@@ -70,7 +70,13 @@ reload_accounts (TnySummaryWindowPriv *priv)
 		accounts = g_list_next (accounts);
 	}
 
-	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), mailbox_model);
+	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
+	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
+				TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
+				GTK_SORT_ASCENDING);
+
+	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), 
+		sortable);
 
 	return;
 }
@@ -118,7 +124,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
-		GtkTreeModel *header_model;
+		GtkTreeModel *header_model, *sortable;
 		GList *headers;
 
 		gtk_tree_model_get (model, &iter, 
@@ -136,7 +142,15 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		tny_msg_header_list_model_inject (
 			TNY_MSG_HEADER_LIST_MODEL (header_model), headers);
 
-		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), header_model);
+		sortable = gtk_tree_model_sort_new_with_model (header_model);
+
+		/* TODO: Implement a fast sorting algorithm (not easy) */
+
+		/* gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
+				TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
+				GTK_SORT_ASCENDING); */
+
+		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
 
 	}
 
@@ -264,19 +278,25 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
 			"text", TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN);
+
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
 			"text", TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN);
+
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
+
+
 
 	/* header_view columns */
 	
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("From", renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, 0);			  
+	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
 
@@ -285,7 +305,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("To", renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, 0);			  
+	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
 
@@ -294,13 +314,16 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Subject", renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, 0);			  
+	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
+
+
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->mailbox_view));
+
 
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect (G_OBJECT (select), "changed",
