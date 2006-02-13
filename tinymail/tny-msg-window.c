@@ -102,10 +102,22 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgWindow *self = (TnyMsgWindow *)instance;
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 	
+	GtkWidget *textview_sw = gtk_scrolled_window_new (NULL, NULL);
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (textview_sw), 
+			GTK_SHADOW_ETCHED_IN);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (textview_sw),
+			GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
+
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 	gtk_container_set_border_width (GTK_CONTAINER (self), 8);
-	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->textview));
 
+	gtk_window_set_default_size (GTK_WINDOW (self), 300, 200);
+
+	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (textview_sw));
+	gtk_container_add (GTK_CONTAINER (textview_sw), GTK_WIDGET (priv->textview));
+
+	gtk_widget_show (GTK_WIDGET (textview_sw));
 	gtk_widget_show (GTK_WIDGET (priv->textview));
 
 	return;
