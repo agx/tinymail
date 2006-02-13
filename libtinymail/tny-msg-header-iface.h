@@ -49,20 +49,20 @@ struct _TnyMsgHeaderIfaceClass
 {
 	GTypeInterface g_iface;
 
+	const gchar*   (*get_cc_func)             (TnyMsgHeaderIface *self);
+	const time_t   (*get_date_received_func)  (TnyMsgHeaderIface *self);
+	const time_t   (*get_date_sent_func)      (TnyMsgHeaderIface *self);
 	const gchar*   (*get_subject_func)        (TnyMsgHeaderIface *self);
 	const gchar*   (*get_to_func)             (TnyMsgHeaderIface *self);
 	const gchar*   (*get_from_func)           (TnyMsgHeaderIface *self);
-	const gchar*   (*get_id_func)             (TnyMsgHeaderIface *self);
+	const gchar*   (*get_message_id_func)     (TnyMsgHeaderIface *self);
+
+	void           (*set_message_id_func)     (TnyMsgHeaderIface *self, const gchar *id);
 
          
         const TnyMsgFolderIface*
                        (*get_folder_func)         (TnyMsgHeaderIface *self);
         void           (*set_folder_func)         (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
-
-	void           (*set_subject_func)        (TnyMsgHeaderIface *self, const gchar *subject);
-	void           (*set_to_func)             (TnyMsgHeaderIface *self, const gchar *to);
-	void           (*set_from_func)           (TnyMsgHeaderIface *self, const gchar *from);
-	void           (*set_id_func)             (TnyMsgHeaderIface *self, const gchar *id);
 
 	void           (*uncache_func)            (TnyMsgHeaderIface *self);
 	const gboolean (*has_cache_func)          (TnyMsgHeaderIface *self);
@@ -70,23 +70,23 @@ struct _TnyMsgHeaderIfaceClass
 
 GType          tny_msg_header_iface_get_type      (void);
 
-const gchar*   tny_msg_header_iface_get_id        (TnyMsgHeaderIface *self);
-const gchar*   tny_msg_header_iface_get_from      (TnyMsgHeaderIface *self);
-const gchar*   tny_msg_header_iface_get_to        (TnyMsgHeaderIface *self);
-const gchar*   tny_msg_header_iface_get_subject   (TnyMsgHeaderIface *self);
 
-void           tny_msg_header_iface_set_id        (TnyMsgHeaderIface *self, const gchar *id);
-void           tny_msg_header_iface_set_from      (TnyMsgHeaderIface *self, const gchar *from);
-void           tny_msg_header_iface_set_to        (TnyMsgHeaderIface *self, const gchar *to);
-void           tny_msg_header_iface_set_subject   (TnyMsgHeaderIface *self, const gchar *subject);
+const gchar*   tny_msg_header_iface_get_cc             (TnyMsgHeaderIface *self);
+const time_t   tny_msg_header_iface_get_date_received  (TnyMsgHeaderIface *self);
+const time_t   tny_msg_header_iface_get_date_sent      (TnyMsgHeaderIface *self);
+const gchar*   tny_msg_header_iface_get_message_id     (TnyMsgHeaderIface *self);
+const gchar*   tny_msg_header_iface_get_from           (TnyMsgHeaderIface *self);
+const gchar*   tny_msg_header_iface_get_to             (TnyMsgHeaderIface *self);
+const gchar*   tny_msg_header_iface_get_subject        (TnyMsgHeaderIface *self);
 
+void           tny_msg_header_iface_set_message_id     (TnyMsgHeaderIface *self, const gchar *id);
 
 const TnyMsgFolderIface*
-               tny_msg_header_iface_get_folder    (TnyMsgHeaderIface *self);
-void           tny_msg_header_iface_set_folder    (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
+               tny_msg_header_iface_get_folder         (TnyMsgHeaderIface *self);
+void           tny_msg_header_iface_set_folder         (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
 
-void           tny_msg_header_iface_uncache       (TnyMsgHeaderIface *self);
-const gboolean tny_msg_header_iface_has_cache     (TnyMsgHeaderIface *self);
+void           tny_msg_header_iface_uncache            (TnyMsgHeaderIface *self);
+const gboolean tny_msg_header_iface_has_cache          (TnyMsgHeaderIface *self);
 
 G_END_DECLS
 

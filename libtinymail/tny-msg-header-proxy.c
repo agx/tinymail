@@ -106,7 +106,7 @@ tny_msg_header_proxy_get_to (TnyMsgHeaderIface *self)
 }
 
 static const gchar*
-tny_msg_header_proxy_get_id (TnyMsgHeaderIface *self)
+tny_msg_header_proxy_get_message_id (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
 
@@ -116,29 +116,55 @@ tny_msg_header_proxy_get_id (TnyMsgHeaderIface *self)
 		TNY_MSG_HEADER_PROXY (self)->real = real;
 	}
 
-	return tny_msg_header_iface_get_id (TNY_MSG_HEADER_IFACE(real));
+	return tny_msg_header_iface_get_message_id (TNY_MSG_HEADER_IFACE(real));
+}
+
+static const gchar*
+tny_msg_header_proxy_get_cc (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
+
+	if (real == NULL)
+	{
+		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
+		TNY_MSG_HEADER_PROXY (self)->real = real;
+	}
+
+	return tny_msg_header_iface_get_cc (TNY_MSG_HEADER_IFACE(real));
+}
+
+static const time_t
+tny_msg_header_proxy_get_date_received (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
+
+	if (real == NULL)
+	{
+		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
+		TNY_MSG_HEADER_PROXY (self)->real = real;
+	}
+
+	return tny_msg_header_iface_get_date_received (TNY_MSG_HEADER_IFACE(real));
+}
+
+static const time_t
+tny_msg_header_proxy_get_date_sent (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
+
+	if (real == NULL)
+	{
+		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
+		TNY_MSG_HEADER_PROXY (self)->real = real;
+	}
+
+	return tny_msg_header_iface_get_date_sent (TNY_MSG_HEADER_IFACE(real));
 }
 
 
-static void
-tny_msg_header_proxy_set_from (TnyMsgHeaderIface *self, const gchar *from)
-{
-
-	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
-
-	if (real == NULL)
-	{
-		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
-		TNY_MSG_HEADER_PROXY (self)->real = real;
-	}
-
-	tny_msg_header_iface_set_from (TNY_MSG_HEADER_IFACE (real), from);
-
-	return;
-}
 
 static void
-tny_msg_header_proxy_set_to (TnyMsgHeaderIface *self, const gchar *to)
+tny_msg_header_proxy_set_message_id (TnyMsgHeaderIface *self, const gchar *id)
 {
 	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
 
@@ -148,39 +174,7 @@ tny_msg_header_proxy_set_to (TnyMsgHeaderIface *self, const gchar *to)
 		TNY_MSG_HEADER_PROXY (self)->real = real;
 	}
 
-	tny_msg_header_iface_set_to (TNY_MSG_HEADER_IFACE (real), to);
-
-	return;
-}
-
-static void
-tny_msg_header_proxy_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
-{
-	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
-
-	if (real == NULL)
-	{
-		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
-		TNY_MSG_HEADER_PROXY (self)->real = real;
-	}
-
-	tny_msg_header_iface_set_subject (TNY_MSG_HEADER_IFACE (real), subject);
-
-	return;
-}
-
-static void
-tny_msg_header_proxy_set_id (TnyMsgHeaderIface *self, const gchar *id)
-{
-	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
-
-	if (real == NULL)
-	{
-		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
-		TNY_MSG_HEADER_PROXY (self)->real = real;
-	}
-
-	tny_msg_header_iface_set_id (TNY_MSG_HEADER_IFACE (real), id);
+	tny_msg_header_iface_set_message_id (TNY_MSG_HEADER_IFACE (real), id);
 
 	return;
 }
@@ -219,14 +213,14 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyMsgHeaderIfaceClass *klass = (TnyMsgHeaderIfaceClass *)g_iface;
 
 	klass->get_from_func = tny_msg_header_proxy_get_from;
-	klass->get_id_func = tny_msg_header_proxy_get_id;
+	klass->get_message_id_func = tny_msg_header_proxy_get_message_id;
 	klass->get_to_func = tny_msg_header_proxy_get_to;
 	klass->get_subject_func = tny_msg_header_proxy_get_subject;
+	klass->get_date_received_func = tny_msg_header_proxy_get_date_received;
+	klass->get_date_sent_func = tny_msg_header_proxy_get_date_sent;
+	klass->get_cc_func = tny_msg_header_proxy_get_cc;
 
-	klass->set_from_func = tny_msg_header_proxy_set_from;
-	klass->set_id_func = tny_msg_header_proxy_set_id;
-	klass->set_to_func = tny_msg_header_proxy_set_to;
-	klass->set_subject_func = tny_msg_header_proxy_set_subject;
+	klass->set_message_id_func = tny_msg_header_proxy_set_message_id;
 	
 	klass->has_cache_func = tny_msg_header_proxy_has_cache;
 	klass->uncache_func = tny_msg_header_proxy_uncache;

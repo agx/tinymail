@@ -22,7 +22,50 @@
 
 
 /**
- * tny_msg_header_iface_get_id:
+ * tny_msg_header_iface_get_cc:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * 
+ * 
+ * Return value: cc
+ **/
+const gchar*
+tny_msg_header_iface_get_cc (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_cc_func (self);
+}
+
+
+/**
+ * tny_msg_header_iface_get_date_received:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * 
+ * 
+ * Return value: date received
+ **/
+const time_t
+tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_date_received_func (self);
+}
+
+/**
+ * tny_msg_header_iface_get_date_sent:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * 
+ * 
+ * Return value: date sent
+ **/
+const time_t
+tny_msg_header_iface_get_date_sent (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_date_sent_func (self);
+}
+
+/**
+ * tny_msg_header_iface_get_message_id:
  * @self: a TnyMsgHeaderIface object
  * 
  * Get an unique id of the message of which self is a message header.
@@ -30,9 +73,9 @@
  * Return value: Unique id
  **/
 const gchar*
-tny_msg_header_iface_get_id (TnyMsgHeaderIface *self)
+tny_msg_header_iface_get_message_id (TnyMsgHeaderIface *self)
 {
-	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_id_func (self);
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_message_id_func (self);
 }
 
 /**
@@ -109,7 +152,7 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
 }
 
 /**
- * tny_msg_header_iface_set_id:
+ * tny_msg_header_iface_set_message_id:
  * @self: a TnyMsgHeaderIface object
  * @id: an unique id
  * 
@@ -118,59 +161,12 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
  * Return value: 
  **/
 void
-tny_msg_header_iface_set_id (TnyMsgHeaderIface *self, const gchar *id)
+tny_msg_header_iface_set_message_id (TnyMsgHeaderIface *self, const gchar *id)
 {
-	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_id_func (self, id);
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_message_id_func (self, id);
 	return;
 }
 
-/**
- * tny_msg_header_iface_set_from:
- * @self: a TnyMsgHeaderIface object
- * @from: the from header
- * 
- * * TODO: Make this private * 
- *
- * Return value: 
- **/
-void
-tny_msg_header_iface_set_from (TnyMsgHeaderIface *self, const gchar *from)
-{
-	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_from_func (self, from);
-	return;
-}
-
-/**
- * tny_msg_header_iface_set_to:
- * @self: a TnyMsgHeaderIface object
- * @from: the to header
- * 
- * * TODO: Make this private * 
- *
- * Return value: 
- **/
-void
-tny_msg_header_iface_set_to (TnyMsgHeaderIface *self, const gchar *to)
-{
-	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_to_func (self, to);
-	return;
-}
-
-/**
- * tny_msg_header_iface_set_subject:
- * @self: a TnyMsgHeaderIface object
- * @from: the subject header
- * 
- * * TODO: Make this private * 
- *
- * Return value: 
- **/
-void
-tny_msg_header_iface_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
-{
-	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_subject_func (self, subject);
-	return;
-}
 
 /**
  * tny_msg_header_iface_uncache:

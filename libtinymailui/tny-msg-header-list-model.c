@@ -59,6 +59,9 @@ tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 {		
 	switch (column) 
 	{
+		case TNY_MSG_HEADER_LIST_MODEL_CC_COLUMN:
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 		case TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN:
 		case TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN:
 		case TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN:
@@ -119,11 +122,30 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	return tree_path;
 }
 
+static gchar *
+get_readable_date (const time_t file_time_raw)
+{
+	struct tm *file_time;
+	static gchar readable_date[64];
+	gsize readable_date_size;
+
+	file_time = localtime (&file_time_raw);
+
+	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
+	
+	if (0 == readable_date_size) {
+		return g_strdup ("unknown time");
+	}
+	return g_strndup (readable_date, readable_date_size);
+}
+
+
 static void
 tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint column, GValue *value)
 {
 	TnyMsgHeaderIface *header = NULL;
-	
+	gchar *readable;
+
 	g_return_if_fail (iter->stamp == 
 		TNY_MSG_HEADER_LIST_MODEL (self)->stamp);
 
@@ -133,6 +155,20 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	
 	switch (column) 
 	{
+		case TNY_MSG_HEADER_LIST_MODEL_CC_COLUMN:
+			g_value_init (value, G_TYPE_STRING);
+			g_value_set_string (value, tny_msg_header_iface_get_cc (header));
+			break;
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
+			g_value_init (value, G_TYPE_STRING);
+			g_value_set_string (value, 
+				get_readable_date (tny_msg_header_iface_get_date_sent (header)));
+			break;
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
+			g_value_init (value, G_TYPE_STRING);
+			g_value_set_string (value, 
+			get_readable_date (tny_msg_header_iface_get_date_received (header)));
+			break;
 		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_POINTER);
 			g_value_set_pointer (value, header);

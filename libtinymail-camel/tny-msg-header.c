@@ -117,6 +117,43 @@ tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* fol
 
 	return;
 }
+
+/* TODO: Add these
+camel_message_info_mlist     
+camel_message_info_flags     
+camel_message_info_size      
+camel_message_info_message_id
+*/
+
+static const gchar*
+tny_msg_header_get_cc (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	load_msg_header (priv);
+
+	return camel_message_info_cc (priv->message_info);
+}
+
+static const time_t
+tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	load_msg_header (priv);
+
+	return camel_message_info_date_received (priv->message_info);
+}
+
+static const time_t
+tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	load_msg_header (priv);
+
+	return camel_message_info_date_sent (priv->message_info);
+}
 	
 static const gchar*
 tny_msg_header_get_from (TnyMsgHeaderIface *self)
@@ -150,7 +187,7 @@ tny_msg_header_get_to (TnyMsgHeaderIface *self)
 }
 
 static const gchar*
-tny_msg_header_get_id (TnyMsgHeaderIface *self)
+tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
@@ -160,7 +197,7 @@ tny_msg_header_get_id (TnyMsgHeaderIface *self)
 }
 
 static void
-tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
+tny_msg_header_set_message_id (TnyMsgHeaderIface *self, const gchar *id)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
@@ -245,14 +282,13 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyMsgHeaderIfaceClass *klass = (TnyMsgHeaderIfaceClass *)g_iface;
 
 	klass->get_from_func = tny_msg_header_get_from;
-	klass->get_id_func = tny_msg_header_get_id;
+	klass->get_message_id_func = tny_msg_header_get_message_id;
 	klass->get_to_func = tny_msg_header_get_to;
 	klass->get_subject_func = tny_msg_header_get_subject;
-
-	klass->set_from_func = tny_msg_header_set_from;
-	klass->set_id_func = tny_msg_header_set_id;
-	klass->set_to_func = tny_msg_header_set_to;
-	klass->set_subject_func = tny_msg_header_set_subject;
+	klass->get_date_received_func = tny_msg_header_get_date_received;
+	klass->get_date_sent_func = tny_msg_header_get_date_sent;
+	klass->get_cc_func = tny_msg_header_get_cc;
+	klass->set_message_id_func = tny_msg_header_set_message_id;
 	
 	klass->set_folder_func = tny_msg_header_set_folder;
 	klass->get_folder_func = tny_msg_header_get_folder;
