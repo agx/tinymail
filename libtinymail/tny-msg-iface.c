@@ -21,20 +21,6 @@
 
 
 /**
- * tny_msg_iface_get_stream:
- * @self: a TnyMsgIface object
- * 
- * Get stream of this message
- *
- * Return value: a stream
- **/
-const TnyStreamIface*
-tny_msg_iface_get_body_stream (TnyMsgIface *self)
-{
-	return TNY_MSG_IFACE_GET_CLASS (self)->get_body_stream_func (self);
-}
-
-/**
  * tny_msg_iface_get_folder:
  * @self: a TnyMsgIface object
  * 
@@ -67,18 +53,18 @@ tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
 
 
 /**
- * tny_msg_iface_get_attachments:
+ * tny_msg_iface_get_parts:
  * @self: a TnyMsgIface object
  * 
- * Get a read-only list of attachments of this message
+ * Get a read-only list of mime-parts of this message
  *
- * Return value: A read-only GList with TnyMsgAttachmentIface instances
+ * Return value: A read-only GList with TnyMsgMimePartIface instances
  **/
 const GList*
-tny_msg_iface_get_attachments (TnyMsgIface *self)
+tny_msg_iface_get_parts (TnyMsgIface *self)
 {
 
-	return TNY_MSG_IFACE_GET_CLASS (self)->get_attachments_func (self);
+	return TNY_MSG_IFACE_GET_CLASS (self)->get_parts_func (self);
 }
 
 
@@ -98,39 +84,39 @@ tny_msg_iface_get_header (TnyMsgIface *self)
 
 
 /**
- * tny_msg_iface_add_attachment:
+ * tny_msg_iface_add_part:
  * @self: a TnyMsgIface object
- * @attachment: the attachment to add
+ * @part: the mime-part to add
  * 
- * Add an attachment to a message
+ * Add a mime-part to a message
  *
- * Return value: The id of the added attachment
+ * Return value: The id of the added mime-part
  **/
 gint
-tny_msg_iface_add_attachment (TnyMsgIface *self, TnyMsgAttachmentIface *attachment)
+tny_msg_iface_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 {
-	return TNY_MSG_IFACE_GET_CLASS (self)->add_attachment_func (self, attachment);
+	return TNY_MSG_IFACE_GET_CLASS (self)->add_part_func (self, part);
 }
 
 /**
- * tny_msg_iface_del_attachment:
+ * tny_msg_iface_del_part:
  * @self: a TnyMsgIface object
- * @id: the attachment id to delete
+ * @id: the mime-part id to delete
  * 
- * Delete an attachment from a message
+ * Delete a mime-part from a message
  *
  * Return value: 
  **/
 void
-tny_msg_iface_del_attachment (TnyMsgIface *self, gint id)
+tny_msg_iface_del_part (TnyMsgIface *self, gint id)
 {
-	TNY_MSG_IFACE_GET_CLASS (self)->del_attachment_func (self, id);
+	TNY_MSG_IFACE_GET_CLASS (self)->del_part_func (self, id);
 	return;
 }
 
 
 /**
- * tny_msg_iface_set_body:
+ * tny_msg_iface_set_header:
  * @self: a TnyMsgIface object
  * @header: the header to set
  * 

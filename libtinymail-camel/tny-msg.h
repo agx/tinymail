@@ -24,7 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-msg-iface.h>
-#include <tny-msg-attachment-iface.h>
+#include <tny-msg-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-msg-header-iface.h>
 

@@ -359,7 +359,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 
 	if (camel_init (base_directory, TRUE) != 0)
 	{
-		g_print ("Critical ERROR: Cannot init %d as camel directory\n", base_directory);
+		g_error ("Critical ERROR: Cannot init %d as camel directory\n", base_directory);
 		exit (1);
 	}
 

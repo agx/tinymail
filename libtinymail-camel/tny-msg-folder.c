@@ -59,10 +59,8 @@ load_folder (TnyMsgFolderPriv *priv)
 		CamelStore *store = (CamelStore*) _tny_account_get_service 
 			(TNY_ACCOUNT (priv->account));
 
-		priv->folder = camel_store_get_folder (store, priv->folder_name, 0, &ex);
-
-		g_print ("Get folder (%s) to (%s)\n", 
-			priv->folder_name, camel_folder_get_name (priv->folder));
+		priv->folder = camel_store_get_folder 
+			(store, priv->folder_name, 0, &ex);
 	}
 
 	return;
@@ -134,6 +132,9 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	tny_msg_header_iface_set_folder (header, self);
 	tny_msg_header_iface_set_id (header, uid);
 
+	/* Uncertain (the _new is already a ref, right?) */
+	/* g_object_ref (G_OBJECT (header)) */
+
 	priv->cached_hdrs = g_list_append (priv->cached_hdrs, header);
 
 	return;
@@ -144,6 +145,7 @@ static const GList*
 tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
 	load_folder (priv);
 
 	/* TODO: Cache this on disk, compare it. Don't just cache in memory */
@@ -365,7 +367,7 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 }
 
 static void 
-tny_msg_folder_class_init (TnyMsgFolderIfaceClass *class)
+tny_msg_folder_class_init (TnyMsgFolderClass *class)
 {
 	GObjectClass *object_class;
 

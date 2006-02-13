@@ -40,22 +40,32 @@ static void
 reload_msg (TnyMsgWindowIface *self)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 	TnyStreamIface *dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
-	TnyStreamIface *source;
-	TnyMsgHeaderIface *header;
-	GList *attachments;
+	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
 
-	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
-	source = (TnyStreamIface*)tny_msg_iface_get_body_stream (priv->msg);
-	attachments = (GList*)tny_msg_iface_get_attachments (priv->msg);
+	while (parts)
+	{
+		TnyMsgMimePartIface *part = parts->data;
+
+		if (tny_msg_mime_part_iface_content_type_is (part, "text/*"))
+		{
+			TnyStreamIface *source = tny_msg_mime_part_iface_get_stream (part);
+			
+			tny_stream_iface_reset (source);
+			tny_stream_iface_reset (dest);
+
+			tny_stream_iface_write_to_stream (source, dest);
+
+			break;
+		}
+
+		parts = g_list_next (parts);
+	}
 
 	gtk_window_set_title (GTK_WINDOW (self), tny_msg_header_iface_get_subject (header));
-
-	tny_stream_iface_reset (source);
-	tny_stream_iface_reset (dest);
-
-	tny_stream_iface_write_to_stream (source, dest);
 
 	return;
 }

@@ -39,25 +39,23 @@ struct _TnyStreamIfaceClass
 {
 	GTypeInterface parent;
 
-	ssize_t   (*read_func)  (TnyStreamIface *self, char *buffer, size_t n);
-	ssize_t   (*write_func) (TnyStreamIface *self, const char *buffer, size_t n);
-	gint      (*flush_func) (TnyStreamIface *self);
-	gint      (*close_func) (TnyStreamIface *self);
-	gboolean  (*eos_func)   (TnyStreamIface *self);
-	gint      (*reset_func) (TnyStreamIface *self);
+	ssize_t   (*read_func)            (TnyStreamIface *self, char *buffer, size_t n);
+	ssize_t   (*write_func)           (TnyStreamIface *self, const char *buffer, size_t n);
+	gint      (*flush_func)           (TnyStreamIface *self);
+	gint      (*close_func)           (TnyStreamIface *self);
+	gboolean  (*eos_func)             (TnyStreamIface *self);
+	gint      (*reset_func)           (TnyStreamIface *self);
 	ssize_t   (*write_to_stream_func) (TnyStreamIface *self, TnyStreamIface *output);
 };
 
-GType        tny_stream_iface_get_type        (void);
+GType     tny_stream_iface_get_type        (void);
 
-
-
-ssize_t   tny_stream_iface_read  (TnyStreamIface *self, char *buffer, size_t n);
-ssize_t   tny_stream_iface_write (TnyStreamIface *self, const char *buffer, size_t n);
-gint      tny_stream_iface_flush (TnyStreamIface *self);
-gint      tny_stream_iface_close (TnyStreamIface *self);
-gboolean  tny_stream_iface_eos   (TnyStreamIface *self);
-gint      tny_stream_iface_reset (TnyStreamIface *self);
+ssize_t   tny_stream_iface_read            (TnyStreamIface *self, char *buffer, size_t n);
+ssize_t   tny_stream_iface_write           (TnyStreamIface *self, const char *buffer, size_t n);
+gint      tny_stream_iface_flush           (TnyStreamIface *self);
+gint      tny_stream_iface_close           (TnyStreamIface *self);
+gboolean  tny_stream_iface_eos             (TnyStreamIface *self);
+gint      tny_stream_iface_reset           (TnyStreamIface *self);
 ssize_t   tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output);
 
 G_END_DECLS

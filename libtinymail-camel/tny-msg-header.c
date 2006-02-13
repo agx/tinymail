@@ -265,7 +265,7 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 
 
 static void 
-tny_msg_header_class_init (TnyMsgHeaderIfaceClass *class)
+tny_msg_header_class_init (TnyMsgHeaderClass *class)
 {
 	GObjectClass *object_class;
 

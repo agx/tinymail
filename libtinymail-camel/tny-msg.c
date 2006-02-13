@@ -18,10 +18,10 @@
  */
 
 #include <tny-msg.h>
-#include <tny-msg-attachment-iface.h>
+#include <tny-msg-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-msg-header-iface.h>
-#include <tny-msg-attachment.h>
+#include <tny-msg-mime-part.h>
 #include <tny-stream-camel.h>
 #include <tny-msg-header.h>
 
@@ -71,32 +71,17 @@ static gboolean
 received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
 	TnyMsgPriv *priv = data;
-	/* CamelTransferEncoding encoding = camel_mime_part_get_encoding (part); */
 
-	CamelContentType *content_type = camel_mime_part_get_content_type (part);
+	TnyMsgMimePartIface *tpart = TNY_MSG_MIME_PART_IFACE 
+			(tny_msg_mime_part_new (part));
 
-	if (camel_content_type_is(content_type, "text", "*")) 
-	{
-		CamelDataWrapper *wrapper;
-			CamelMedium *medium = CAMEL_MEDIUM (part);
-			CamelStream *stream = camel_stream_mem_new ();
-			wrapper = camel_medium_get_content_object (medium);
-			camel_data_wrapper_write_to_stream (wrapper, stream);
 
-			/* tny_camel_stream_print (stream); */
+	TnyMsgMimePart *p = tny_msg_mime_part_new (part);
 
-			priv->body_stream = TNY_STREAM_IFACE 
-				(tny_stream_camel_new (stream));
+	/* Uncertain (_new is a ref by itself, right?) */
+	/* g_object_ref (G_OBJECT (tpart)); */
 
-			/* Loose my own ref (tnycamelstream keeps one) */
-			camel_object_unref (CAMEL_OBJECT (stream));
-	}
-
-	g_print ("loc=%s, type=%s,%s , id=%s\n", 
-		camel_mime_part_get_content_location (part),
-		content_type->type, content_type->subtype,
-		camel_mime_part_get_content_id (part));
-
+	priv->parts = g_list_append (priv->parts, tpart);
 
 	return TRUE;
 }
@@ -110,11 +95,6 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 	CamelMimePart *part;
 
 	message_foreach_part_rec (message, (CamelMimePart *)message, received_a_part, priv);
-
-	if (!priv->body_stream)
-	{
-		g_print ("Message has no body?!\n");
-	}
 
 	return;
 }
@@ -139,19 +119,11 @@ tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
 }
 
 static const GList*
-tny_msg_get_attachments (TnyMsgIface *self)
+tny_msg_get_parts (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
-	return priv->attachments;
-}
-
-static const TnyStreamIface*
-tny_msg_get_body_stream (TnyMsgIface *self)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	return priv->body_stream;
+	return priv->parts;
 }
 
 static const TnyMsgHeaderIface*
@@ -162,64 +134,18 @@ tny_msg_get_header (TnyMsgIface *self)
 	return priv->header;
 }
 
-static gint
-compare_attachments_by_id (gconstpointer a, gconstpointer b)
-{
-	TnyMsgAttachmentIface *attachmenta = (TnyMsgAttachmentIface*)a;
-	TnyMsgAttachmentIface *attachmentb = (TnyMsgAttachmentIface*)b;
-
-	gint aid = tny_msg_attachment_iface_get_id (attachmenta);
-	gint bid = tny_msg_attachment_iface_get_id (attachmentb);
-
-	return (aid - bid);
-}
 
 static gint
-find_attachment_by_id (gconstpointer a, gconstpointer b)
+tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 {
-	gint aid = (gint)a;
-	TnyMsgAttachmentIface *attachment = (TnyMsgAttachmentIface*)b;
-	gint bid = tny_msg_attachment_iface_get_id (attachment);
-
-	return (aid - bid);
-}
-
-static gint
-tny_msg_add_attachment (TnyMsgIface *self, TnyMsgAttachmentIface *attachment)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	gint id = g_list_length (priv->attachments);
-
-	id++;
-
-	tny_msg_attachment_iface_set_id (attachment, id);
-
-	g_object_ref (G_OBJECT (attachment));
-
-	priv->attachments = g_list_insert_sorted (
-		priv->attachments, 
-		attachment, compare_attachments_by_id);
-
-	return id;
+	/* TODO */
+	return -1;
 }
 
 static void 
-tny_msg_del_attachment (TnyMsgIface *self, gint id)
+tny_msg_del_part (TnyMsgIface *self, gint id)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	GList *found = g_list_find_custom (priv->attachments,
-		(gconstpointer)id, find_attachment_by_id);
-
-	if (found)
-	{
-		priv->attachments = g_list_remove_link
-			(priv->attachments, found);
-
-		g_object_unref (G_OBJECT (found->data));
-	}
-	
+	/* TODO */
 	return;
 }
 
@@ -240,7 +166,7 @@ tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 }
 
 static void 
-destroy_attachment (gpointer data, gpointer user_data)
+destroy_part (gpointer data, gpointer user_data)
 {
 	g_object_unref (G_OBJECT (data));
 
@@ -256,17 +182,14 @@ tny_msg_finalize (GObject *object)
 	if (priv->header)
 		g_object_unref (G_OBJECT (priv->header));
 
-	if (priv->body_stream)
-		g_object_unref (G_OBJECT (priv->body_stream));
-
-	if (priv->attachments) 
+	if (priv->parts) 
 	{
-		g_list_foreach (priv->attachments, 
-			destroy_attachment, NULL);
+		g_list_foreach (priv->parts, 
+			destroy_part, NULL);
 
-		g_list_free (priv->attachments);
+		g_list_free (priv->parts);
 
-		priv->attachments = NULL;
+		priv->parts = NULL;
 	}
 
 	return;
@@ -287,13 +210,12 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMsgIfaceClass *klass = (TnyMsgIfaceClass *)g_iface;
 
-	klass->get_attachments_func = tny_msg_get_attachments;
-	klass->get_body_stream_func = tny_msg_get_body_stream;		
+	klass->get_parts_func = tny_msg_get_parts;
 	klass->get_header_func = tny_msg_get_header;
 	klass->set_header_func = tny_msg_set_header;
 
-	klass->add_attachment_func = tny_msg_add_attachment;
-	klass->del_attachment_func = tny_msg_del_attachment;
+	klass->add_part_func = tny_msg_add_part;
+	klass->del_part_func = tny_msg_del_part;
 
 	klass->set_folder_func = tny_msg_set_folder;
 	klass->get_folder_func = tny_msg_get_folder;
@@ -302,7 +224,7 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 }
 
 static void 
-tny_msg_class_init (TnyMsgIfaceClass *class)
+tny_msg_class_init (TnyMsgClass *class)
 {
 	GObjectClass *object_class;
 
@@ -324,8 +246,7 @@ tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
 
 	priv->message = NULL;
-	priv->body_stream = NULL;
-	priv->attachments = NULL;
+	priv->parts = NULL;
 	priv->header = NULL;
 
 	return;

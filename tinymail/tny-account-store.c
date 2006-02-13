@@ -227,7 +227,9 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self)
 
 			tny_account_iface_set_pass_func (account, per_account_get_pass_func);
 
-			g_object_ref (G_OBJECT (account));
+			/* Uncertain (the _new is already a ref, right?) */
+			/* g_object_ref (G_OBJECT (account)); */
+
 			priv->accounts = g_list_append (priv->accounts, account);
 		}
 	}
@@ -271,6 +273,7 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
 		count, NULL);
 
+	/* Double check this one */
 	g_object_ref (G_OBJECT (account));
 	priv->accounts = g_list_append (priv->accounts, account);
 

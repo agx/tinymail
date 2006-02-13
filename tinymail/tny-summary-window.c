@@ -131,9 +131,6 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
 
-		g_print ("You selected folder: %s\n", 
-			tny_msg_folder_iface_get_name (folder));
-
 		headers = (GList*)tny_msg_folder_iface_get_headers (folder);
 
 		header_model = GTK_TREE_MODEL (
@@ -314,8 +311,6 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
-
-
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->mailbox_view));
 
 
@@ -325,6 +320,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
+
 	/* g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_header_view_tree_selection_changed), priv->header_view); */
 

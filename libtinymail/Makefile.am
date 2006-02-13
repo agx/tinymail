@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libtinymail-1.0.la
 libtinymail_1_0_headers = 		\
 	tny-shared.h			\
 	tny-msg-folder-iface.h		\
-	tny-msg-attachment-iface.h   	\
+	tny-msg-mime-part-iface.h   	\
 	tny-msg-header-iface.h		\
 	tny-msg-iface.h			\
 	tny-account-iface.h		\
@@ -17,7 +17,7 @@ libtinymail_1_0_la_SOURCES = 		\
 	$(libtinymail_1_0_headers)	\
 	tny-msg-iface.c			\
 	tny-msg-header-iface.c		\
-	tny-msg-attachment-iface.c   	\
+	tny-msg-mime-part-iface.c   	\
 	tny-msg-folder-iface.c		\
 	tny-account-iface.c		\
 	tny-account-store-iface.c	\

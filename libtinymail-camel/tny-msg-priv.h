@@ -27,12 +27,8 @@ typedef struct _TnyMsgPriv TnyMsgPriv;
 struct _TnyMsgPriv
 {
 	CamelMimeMessage *message;
-
 	TnyMsgHeaderIface *header;
-	TnyStreamIface *body_stream;
-
-	GList *attachments;
-
+	GList *parts;
 	TnyMsgFolderIface *folder;
 };
 

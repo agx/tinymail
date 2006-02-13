@@ -58,8 +58,13 @@ fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelF
 
 		if (parent)
 			tny_msg_folder_iface_add_folder (parent, iface);
-		else
+		else 
+		{
+			/* Uncertain (the _new is already a ref, right?) */
+			/* g_object_ref (G_OBJECT (iface)) */
+
 			priv->folders = g_list_append (priv->folders, iface);
+		}
 
 		fill_folders_recursive (self, iface, iter->child);
 
@@ -117,7 +122,7 @@ reconnect (TnyAccountPriv *priv)
 			CAMEL_PROVIDER_STORE, priv->ex);
 
 		if (priv->service == NULL) {
-			g_print ("couldn't get service %s: %s\n", priv->url_string,
+			g_error ("couldn't get service %s: %s\n", priv->url_string,
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
 			return;
