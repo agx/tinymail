@@ -21,34 +21,106 @@
 
 static CamelStreamClass *parent_class = NULL;
 
+ssize_t 
+tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output)
+{
+	CamelStream *stream = CAMEL_STREAM (self);
+
+	char tmp_buf[4096];
+	ssize_t total = 0;
+	ssize_t nb_read;
+	ssize_t nb_written;
+	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
+	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
+
+	while (!camel_stream_eos (stream)) {
+		nb_read = camel_stream_read (stream, tmp_buf, sizeof (tmp_buf));
+		if (nb_read < 0)
+			return -1;
+		else if (nb_read > 0) {
+			nb_written = 0;
+	
+			while (nb_written < nb_read) {
+				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+								  nb_read - nb_written);
+				if (len < 0)
+					return -1;
+				nb_written += len;
+			}
+			total += nb_written;
+		}
+	}
+	return total;
+}
+
 
 static ssize_t
 tny_camel_stream_read (CamelStream *stream, char *buffer, size_t n)
 {
+	TnyCamelStream *self = (TnyCamelStream *)stream;
+
+	return tny_stream_iface_read (self->stream, buffer, n);
 }
 
 static ssize_t
 tny_camel_stream_write (CamelStream *stream, const char *buffer, size_t n)
 {
+	TnyCamelStream *self = (TnyCamelStream *)stream;
+
+	return tny_stream_iface_write (self->stream, buffer, n);
 }
 
 static int
 tny_camel_stream_close (CamelStream *stream)
 {
+	TnyCamelStream *self = (TnyCamelStream *)stream;
+
+	return tny_stream_iface_close (self->stream);
 }
 
+static gboolean
+tny_camel_stream_eos (CamelStream *stream)
+{
+	TnyCamelStream *self = (TnyCamelStream *)stream;
+
+	return tny_stream_iface_eos (self->stream);
+}
+
+static int
+tny_camel_stream_flush (CamelStream *stream)
+{
+	TnyCamelStream *self = (TnyCamelStream *)stream;
+
+	return tny_stream_iface_flush (self->stream);
+}
+
+
+static int
+tny_camel_stream_reset (CamelStream *stream)
+{
+	TnyCamelStream *self = (TnyCamelStream *)stream;
+
+	return tny_stream_iface_reset (self->stream);
+}
 
 static void
 tny_camel_stream_init (CamelObject *object)
 {
+	TnyCamelStream *self = (TnyCamelStream *)object;
+
+	self->stream = NULL;
+
+	return;
 }
+
 
 static void
 tny_camel_stream_finalize (CamelObject *object)
 {
 	TnyCamelStream *self = (TnyCamelStream *)object;
 
-	g_object_unref (G_OBJECT (self->stream));
+	if (self->stream)
+		g_object_unref (G_OBJECT (self->stream));
 
 	return;
 }
@@ -59,6 +131,9 @@ tny_camel_stream_class_init (TnyCamelStreamClass *klass)
 	((CamelStreamClass *)klass)->read = tny_camel_stream_read;
 	((CamelStreamClass *)klass)->write = tny_camel_stream_write;
 	((CamelStreamClass *)klass)->close = tny_camel_stream_close;
+	((CamelStreamClass *)klass)->eos = tny_camel_stream_eos;
+	((CamelStreamClass *)klass)->reset = tny_camel_stream_reset;
+	((CamelStreamClass *)klass)->flush = tny_camel_stream_flush;
 
 	return;
 }
@@ -83,6 +158,22 @@ tny_camel_stream_get_type (void)
 	return type;
 }
 
+void
+tny_camel_stream_set_stream (TnyCamelStream *self, TnyStreamIface *stream)
+{
+
+	if (self->stream)
+		g_object_unref (G_OBJECT (self->stream));
+
+	g_object_ref (G_OBJECT (stream));
+
+	self->stream = stream;
+
+	return;
+}
+
+
+
 TnyCamelStream *
 tny_camel_stream_stream_new (TnyStreamIface *stream)
 {
@@ -90,9 +181,7 @@ tny_camel_stream_stream_new (TnyStreamIface *stream)
 
 	self = (TnyCamelStream *)camel_object_new(tny_camel_stream_get_type());
 
-	g_object_ref (G_OBJECT (stream));
-
-	self->stream = stream;
+	tny_camel_stream_set_stream (self, stream);
 
 	return self;
 }
