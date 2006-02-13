@@ -46,8 +46,6 @@ tny_text_buffer_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	ssize_t total = 0;
 	ssize_t nb_read;
 	ssize_t nb_written;
-
-g_print ("%s\n", __FUNCTION__);
 	
 	while (!tny_stream_iface_eos (self)) {
 		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
@@ -75,7 +73,7 @@ tny_text_buffer_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter dest, end;
 	gint cur_offset, end_offset, rlength;
-g_print ("%s\n", __FUNCTION__);
+
 	gtk_text_buffer_get_end_iter (priv->buffer, &end);
 
 	cur_offset = gtk_text_iter_get_offset (&(priv->cur));
@@ -96,7 +94,7 @@ static ssize_t
 tny_text_buffer_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 {
 	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
-g_print ("%s\n", __FUNCTION__);
+
 	gtk_text_buffer_insert (priv->buffer, &(priv->cur), buffer, (gint)n);
 
 	return (ssize_t) n;
@@ -121,7 +119,7 @@ tny_text_buffer_stream_eos   (TnyStreamIface *self)
 {
 	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter end;
-g_print ("%s\n", __FUNCTION__);
+
 	gtk_text_buffer_get_end_iter (priv->buffer, &end);
 
 	return gtk_text_iter_equal (&(priv->cur), &end);
@@ -131,7 +129,7 @@ static gint
 tny_text_buffer_stream_reset_priv (TnyTextBufferStreamPriv *priv)
 {
 	gtk_text_buffer_get_start_iter (priv->buffer, &(priv->cur));
-g_print ("%s\n", __FUNCTION__);
+
 	return 0;
 }
 
@@ -139,7 +137,7 @@ static gint
 tny_text_buffer_stream_reset (TnyStreamIface *self)
 {
 	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
-g_print ("%s\n", __FUNCTION__);
+
 	return tny_text_buffer_stream_reset_priv (priv);
 }
 
@@ -147,7 +145,7 @@ void
 tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer *buffer)
 {
 	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
-g_print ("%s\n", __FUNCTION__);
+
 	if (priv->buffer)
 		g_object_unref (G_OBJECT (priv->buffer));
 
@@ -164,7 +162,7 @@ TnyTextBufferStream*
 tny_text_buffer_stream_new (GtkTextBuffer *buffer)
 {
 	TnyTextBufferStream *self = g_object_new (TNY_TEXT_BUFFER_STREAM_TYPE, NULL);
-g_print ("%s\n", __FUNCTION__);
+
 	tny_text_buffer_stream_set_text_buffer (self, buffer);
 
 	return self;
@@ -263,4 +261,3 @@ tny_text_buffer_stream_get_type (void)
 
 	return type;
 }
-
