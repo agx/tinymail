@@ -71,16 +71,13 @@ static gboolean
 received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
 	TnyMsgPriv *priv = data;
-	CamelTransferEncoding encoding = camel_mime_part_get_encoding (part);
+	/* CamelTransferEncoding encoding = camel_mime_part_get_encoding (part); */
 
-	switch (encoding)
+	CamelContentType *content_type = camel_mime_part_get_content_type (part);
+
+	if (camel_content_type_is(content_type, "text", "*")) 
 	{
-		case CAMEL_TRANSFER_ENCODING_DEFAULT:
-		case CAMEL_TRANSFER_ENCODING_7BIT:
-		case CAMEL_TRANSFER_ENCODING_8BIT:
-		case CAMEL_TRANSFER_ENCODING_QUOTEDPRINTABLE:
-		{
-			CamelDataWrapper *wrapper;
+		CamelDataWrapper *wrapper;
 			CamelMedium *medium = CAMEL_MEDIUM (part);
 			CamelStream *stream = camel_stream_mem_new ();
 			wrapper = camel_medium_get_content_object (medium);
@@ -93,19 +90,13 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 
 			/* Loose my own ref (tnycamelstream keeps one) */
 			camel_object_unref (CAMEL_OBJECT (stream));
-		} break;
-
-		case CAMEL_TRANSFER_ENCODING_BASE64:
-		case CAMEL_TRANSFER_ENCODING_BINARY:
-		case CAMEL_TRANSFER_ENCODING_UUENCODE:
-			/* Handle attachments */
-			break;
-
-		case CAMEL_TRANSFER_NUM_ENCODINGS:
-		default:
-			/* Huh? */
-			break;
 	}
+
+	g_print ("loc=%s, type=%s,%s , id=%s\n", 
+		camel_mime_part_get_content_location (part),
+		content_type->type, content_type->subtype,
+		camel_mime_part_get_content_id (part));
+
 
 	return TRUE;
 }
