@@ -133,10 +133,9 @@ get_readable_date (const time_t file_time_raw)
 
 	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
 	
-	if (0 == readable_date_size) {
-		return g_strdup ("unknown time");
-	}
-	return g_strndup (readable_date, readable_date_size);
+	return readable_date;
+
+//	return g_strndup (readable_date, readable_date_size);
 }
 
 
