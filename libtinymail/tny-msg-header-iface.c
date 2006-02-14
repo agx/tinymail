@@ -64,6 +64,21 @@ tny_msg_header_iface_get_date_sent (TnyMsgHeaderIface *self)
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_date_sent_func (self);
 }
 
+
+/**
+ * tny_msg_header_iface_get_id:
+ * @self: a TnyMsgHeaderIface object
+ * 
+ * Get an unique id of the message of which self is a message header.
+ * 
+ * Return value: Unique follow-up id
+ **/
+const gchar*
+tny_msg_header_iface_get_id (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_id_func (self);
+}
+
 /**
  * tny_msg_header_iface_get_message_id:
  * @self: a TnyMsgHeaderIface object
@@ -154,16 +169,16 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
 /**
  * tny_msg_header_iface_set_message_id:
  * @self: a TnyMsgHeaderIface object
- * @id: an unique id
+ * @id: an unique follow-up id
  * 
  * * TODO: Make this private * 
  *
  * Return value: 
  **/
 void
-tny_msg_header_iface_set_message_id (TnyMsgHeaderIface *self, const gchar *id)
+tny_msg_header_iface_set_id (TnyMsgHeaderIface *self, const gchar *id)
 {
-	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_message_id_func (self, id);
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_id_func (self, id);
 	return;
 }
 

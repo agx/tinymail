@@ -49,6 +49,9 @@ struct _TnyMsgHeaderIfaceClass
 {
 	GTypeInterface g_iface;
 
+	const gchar*   (*get_id_func)             (TnyMsgHeaderIface *self);
+	void           (*set_id_func)             (TnyMsgHeaderIface *self, const gchar *id);
+
 	const gchar*   (*get_cc_func)             (TnyMsgHeaderIface *self);
 	const time_t   (*get_date_received_func)  (TnyMsgHeaderIface *self);
 	const time_t   (*get_date_sent_func)      (TnyMsgHeaderIface *self);
@@ -56,9 +59,6 @@ struct _TnyMsgHeaderIfaceClass
 	const gchar*   (*get_to_func)             (TnyMsgHeaderIface *self);
 	const gchar*   (*get_from_func)           (TnyMsgHeaderIface *self);
 	const gchar*   (*get_message_id_func)     (TnyMsgHeaderIface *self);
-
-	void           (*set_message_id_func)     (TnyMsgHeaderIface *self, const gchar *id);
-
          
         const TnyMsgFolderIface*
                        (*get_folder_func)         (TnyMsgHeaderIface *self);
@@ -70,6 +70,9 @@ struct _TnyMsgHeaderIfaceClass
 
 GType          tny_msg_header_iface_get_type      (void);
 
+void           tny_msg_header_iface_set_id             (TnyMsgHeaderIface *self, const gchar *id);
+const gchar*   tny_msg_header_iface_get_id             (TnyMsgHeaderIface *self);
+
 
 const gchar*   tny_msg_header_iface_get_cc             (TnyMsgHeaderIface *self);
 const time_t   tny_msg_header_iface_get_date_received  (TnyMsgHeaderIface *self);
@@ -79,7 +82,6 @@ const gchar*   tny_msg_header_iface_get_from           (TnyMsgHeaderIface *self)
 const gchar*   tny_msg_header_iface_get_to             (TnyMsgHeaderIface *self);
 const gchar*   tny_msg_header_iface_get_subject        (TnyMsgHeaderIface *self);
 
-void           tny_msg_header_iface_set_message_id     (TnyMsgHeaderIface *self, const gchar *id);
 
 const TnyMsgFolderIface*
                tny_msg_header_iface_get_folder         (TnyMsgHeaderIface *self);

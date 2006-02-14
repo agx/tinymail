@@ -193,11 +193,22 @@ tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 
 	load_msg_header (priv);
 
+	return camel_message_info_message_id (priv->message_info);
+}
+
+
+static const gchar*
+tny_msg_header_get_id (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
+
+	load_msg_header (priv);
+
 	return camel_message_info_uid (priv->message_info);
 }
 
 static void
-tny_msg_header_set_message_id (TnyMsgHeaderIface *self, const gchar *id)
+tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
@@ -288,7 +299,9 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_date_received_func = tny_msg_header_get_date_received;
 	klass->get_date_sent_func = tny_msg_header_get_date_sent;
 	klass->get_cc_func = tny_msg_header_get_cc;
-	klass->set_message_id_func = tny_msg_header_set_message_id;
+
+	klass->get_id_func = tny_msg_header_get_id;	
+	klass->set_id_func = tny_msg_header_set_id;
 	
 	klass->set_folder_func = tny_msg_header_set_folder;
 	klass->get_folder_func = tny_msg_header_get_folder;

@@ -119,6 +119,21 @@ tny_msg_header_proxy_get_message_id (TnyMsgHeaderIface *self)
 	return tny_msg_header_iface_get_message_id (TNY_MSG_HEADER_IFACE(real));
 }
 
+
+static const gchar*
+tny_msg_header_proxy_get_id (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
+
+	if (real == NULL)
+	{
+		real = tny_msg_header_proxy_get_real (TNY_MSG_HEADER_PROXY (self));
+		TNY_MSG_HEADER_PROXY (self)->real = real;
+	}
+
+	return tny_msg_header_iface_get_id (TNY_MSG_HEADER_IFACE(real));
+}
+
 static const gchar*
 tny_msg_header_proxy_get_cc (TnyMsgHeaderIface *self)
 {
@@ -164,7 +179,7 @@ tny_msg_header_proxy_get_date_sent (TnyMsgHeaderIface *self)
 
 
 static void
-tny_msg_header_proxy_set_message_id (TnyMsgHeaderIface *self, const gchar *id)
+tny_msg_header_proxy_set_id (TnyMsgHeaderIface *self, const gchar *id)
 {
 	TnyMsgHeader *real = TNY_MSG_HEADER_PROXY (self)->real;
 
@@ -174,7 +189,7 @@ tny_msg_header_proxy_set_message_id (TnyMsgHeaderIface *self, const gchar *id)
 		TNY_MSG_HEADER_PROXY (self)->real = real;
 	}
 
-	tny_msg_header_iface_set_message_id (TNY_MSG_HEADER_IFACE (real), id);
+	tny_msg_header_iface_set_id (TNY_MSG_HEADER_IFACE (real), id);
 
 	return;
 }
@@ -220,7 +235,8 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_date_sent_func = tny_msg_header_proxy_get_date_sent;
 	klass->get_cc_func = tny_msg_header_proxy_get_cc;
 
-	klass->set_message_id_func = tny_msg_header_proxy_set_message_id;
+	klass->get_id_func = tny_msg_header_proxy_get_id;
+	klass->set_id_func = tny_msg_header_proxy_set_id;
 	
 	klass->has_cache_func = tny_msg_header_proxy_has_cache;
 	klass->uncache_func = tny_msg_header_proxy_uncache;
