@@ -49,7 +49,7 @@ struct _TnyCamelStreamClass
 };
 
 CamelType        tny_account_get_type             (void);
-TnyCamelStream*  tny_camel_stream_stream_new      (TnyStreamIface *stream);
+TnyCamelStream*  tny_camel_stream_new             (TnyStreamIface *stream);
 void             tny_camel_stream_set_stream      (TnyCamelStream *self, TnyStreamIface *stream);
 
 ssize_t          tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output);

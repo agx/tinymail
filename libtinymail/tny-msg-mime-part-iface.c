@@ -19,6 +19,13 @@
 
 #include <tny-msg-mime-part-iface.h>
 
+void
+tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->write_to_stream_func (self, stream);
+	return;
+}
+
 TnyStreamIface* 
 tny_msg_mime_part_iface_get_stream (TnyMsgMimePartIface *self)
 {

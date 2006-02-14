@@ -52,13 +52,9 @@ reload_msg (TnyMsgWindowIface *self)
 
 		if (tny_msg_mime_part_iface_content_type_is (part, "text/*"))
 		{
-			TnyStreamIface *source = tny_msg_mime_part_iface_get_stream (part);
-			
-			tny_stream_iface_reset (source);
 			tny_stream_iface_reset (dest);
-
-			tny_stream_iface_write_to_stream (source, dest);
-
+			tny_msg_mime_part_iface_write_to_stream (part, dest);
+			tny_stream_iface_reset (dest);
 			break;
 		}
 

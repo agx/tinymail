@@ -175,7 +175,7 @@ tny_camel_stream_set_stream (TnyCamelStream *self, TnyStreamIface *stream)
 
 
 TnyCamelStream *
-tny_camel_stream_stream_new (TnyStreamIface *stream)
+tny_camel_stream_new (TnyStreamIface *stream)
 {
 	TnyCamelStream *self;
 

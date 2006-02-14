@@ -22,6 +22,8 @@
 #include <tny-msg-mime-part-iface.h>
 #include <tny-msg-mime-part.h>
 
+#include <tny-camel-stream.h>
+
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
 
@@ -38,6 +40,24 @@ struct _TnyMsgMimePartPriv
 #define TNY_MSG_MIME_PART_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_MIME_PART_TYPE, TnyMsgMimePartPriv))
 
+
+static void
+tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	TnyStreamIface *retval = NULL;
+	CamelDataWrapper *wrapper;
+
+	CamelMedium *medium = CAMEL_MEDIUM (priv->part);
+	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
+	
+	wrapper = camel_medium_get_content_object (medium);
+	camel_data_wrapper_write_to_stream (wrapper, cstream);
+
+	camel_object_unref (CAMEL_OBJECT (cstream));
+
+	return;
+}
 
 static TnyStreamIface* 
 tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
@@ -158,6 +178,7 @@ tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->content_type_is_func = tny_msg_mime_part_content_type_is;
 	klass->get_content_type_func = tny_msg_mime_part_get_content_type;
 	klass->get_stream_func = tny_msg_mime_part_get_stream;
+	klass->write_to_stream_func = tny_msg_mime_part_write_to_stream;
 
 	return;
 }
