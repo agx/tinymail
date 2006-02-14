@@ -159,7 +159,24 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 
 		/* Speedup trick, also check tny-msg-header.c */
 		priv->cached_uids = uids;
-		/* camel_folder_free_uids (priv->folder, uids); */
+
+		/* The trick is not to free the uid's GPtrArray now, but
+		 * in stead keep it during the livetime of the folder.
+		 * The TnyMsgHeader instances have a reference to the uid's
+		 * in the array. 
+		 *
+		 * The idea is that if a folder get's finalized, first all its
+		 * msg-header instances are also finalized (invalid). So we
+		 * can keep the uid pointers here, and simply assign it (and
+		 * not strdup them for each msg-header instance).
+		 *
+		 * Just make sure that, if using this trick, you don't free the
+		 * uid pointer in the msg-header instance. Free it here.
+		 */
+
+		/* So we postphone the freeing to the finalize 
+		camel_folder_free_uids (priv->folder, uids); */
+
 	}
 
 	return priv->cached_hdrs;
