@@ -48,6 +48,8 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
 
+		tny_msg_folder_iface_uncache (folder);
+
 		if (more_folders && g_list_length ((GList*)more_folders) > 0)
 			fill_treemodel_recursive (self, more_folders, &iter);
 

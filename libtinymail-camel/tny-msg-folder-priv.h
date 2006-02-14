@@ -30,12 +30,10 @@ struct _TnyMsgFolderPriv
 {
 	GList *cached_hdrs;
 	GHashTable *cached_msgs;
-
 	CamelFolder *folder;
 	gchar *folder_name;
 	TnyAccountIface *account;
 	GList *folders;
-
 	GPtrArray *cached_uids;
 };
 

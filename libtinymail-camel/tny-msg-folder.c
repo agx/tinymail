@@ -50,6 +50,15 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_FOLDER_TYPE, TnyMsgFolderPriv))
 
 
+static void 
+unload_folder (TnyMsgFolderPriv *priv)
+{
+	if (priv->folder)
+		camel_object_unref (CAMEL_OBJECT (priv->folder));
+
+	priv->folder = NULL;
+}
+
 static void
 load_folder (TnyMsgFolderPriv *priv)
 {
@@ -263,6 +272,7 @@ tny_msg_folder_get_id (TnyMsgFolderIface *self)
 	return priv->folder_name;
 }
 
+gint s=0;
 static void
 tny_msg_folder_set_id (TnyMsgFolderIface *self, const gchar *id)
 {
@@ -361,6 +371,25 @@ tny_msg_folder_finalize (GObject *object)
 	return;
 }
 
+static void
+tny_msg_folder_uncache (TnyMsgFolderIface *self)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+
+	if (priv->folder != NULL)
+		unload_folder (priv);
+
+	return;
+}
+
+static const gboolean
+tny_msg_folder_has_cache (TnyMsgFolderIface *self)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+
+	return (priv->folder != NULL);
+}
+
 
 static void
 tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
@@ -376,8 +405,8 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_name_func = tny_msg_folder_set_name;
 	klass->get_name_func = tny_msg_folder_get_name;
 
-	klass->has_cache_func = NULL;
-	klass->uncache_func = NULL;
+	klass->has_cache_func = tny_msg_folder_has_cache;
+	klass->uncache_func = tny_msg_folder_uncache;
 
 	klass->add_folder_func = tny_msg_folder_add_folder;
 	klass->get_folders_func = tny_msg_folder_get_folders;
@@ -414,7 +443,7 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folder = NULL;
 	priv->folders = NULL;
 	priv->cached_hdrs = NULL;
-	priv->cached_msgs = NULL;
+	priv->cached_msgs = NULL; 
 
 	return;
 }
