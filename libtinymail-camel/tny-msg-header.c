@@ -55,7 +55,6 @@ unload_msg_header (TnyMsgHeaderPriv *priv)
 	if (priv->message_info) 
 	{
 		camel_message_info_free (priv->message_info);
-		priv->message_info = NULL;
 
 		/* TODO: Remove debugging purpose */
 		allocations--;
