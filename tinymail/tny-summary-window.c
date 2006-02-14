@@ -54,9 +54,15 @@ struct _TnySummaryWindowPriv
 static void 
 reload_accounts (TnySummaryWindowPriv *priv)
 {
+	static GtkTreeModel *empty_model;
+
 	TnyAccountStoreIface *account_store = priv->account_store;
 	GtkTreeModel *sortable, *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 	const GList* accounts;
+
+	if (!empty_model)
+		empty_model = GTK_TREE_MODEL (gtk_list_store_new 
+			(1, G_TYPE_STRING));
 
 	accounts = tny_account_store_iface_get_accounts (account_store);
 	
@@ -75,6 +81,12 @@ reload_accounts (TnySummaryWindowPriv *priv)
 				TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
 				GTK_SORT_ASCENDING);
 
+	
+	/* Clear the header_view by giving it an empty model */
+	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->header_view), 
+		empty_model);
+
+	/* Set the model of the mailbox_view */
 	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), 
 		sortable);
 
@@ -190,28 +202,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		}
 	}
 }
-
-/*
-static void
-on_header_view_tree_selection_changed (GtkTreeSelection *selection, 
-		gpointer user_data)
-{
-	GtkTreeIter iter;
-	GtkTreeModel *model;
-
-	if (gtk_tree_selection_get_selected (selection, &model, &iter))
-	{
-		TnyMsgHeaderIface *header;
-
-		gtk_tree_model_get (model, &iter, 
-			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
-			&header, -1);
-
-	}
-
-	return;
-}
-*/
 
 TnySummaryWindow*
 tny_summary_window_new (void)
@@ -331,9 +321,6 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
-
-	/* g_signal_connect (G_OBJECT (select), "changed",
-		G_CALLBACK (on_header_view_tree_selection_changed), priv->header_view); */
 
 	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
 		G_CALLBACK (on_header_view_tree_row_activated), priv->header_view);

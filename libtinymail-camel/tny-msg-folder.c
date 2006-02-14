@@ -121,8 +121,6 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyAccountIface *acco
 	return;
 }
 
-static glong s=0;
-
 static void
 add_message_with_uid (gpointer data, gpointer user_data)
 {
@@ -150,9 +148,6 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 
 	load_folder (priv);
 
-	/* TODO: Cache this on disk, compare it. Don't just cache in memory */
-
-
 	if (!priv->cached_hdrs)
 	{
 		GPtrArray *uids = NULL;
@@ -162,8 +157,9 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 		uids = camel_folder_get_uids (priv->folder);
 		g_ptr_array_foreach (uids, add_message_with_uid, self);
 
-		g_print ("size: %d\n", s);
-		camel_folder_free_uids (priv->folder, uids);
+		/* Speedup trick, also check tny-msg-header.c */
+		priv->cached_uids = uids;
+		/* camel_folder_free_uids (priv->folder, uids); */
 	}
 
 	return priv->cached_hdrs;
@@ -335,6 +331,13 @@ tny_msg_folder_finalize (GObject *object)
 
 	if (priv->cached_hdrs)
 		g_list_foreach (priv->cached_hdrs, (GFunc)g_object_unref, NULL);
+
+	/* Speedup trick, also check tny-msg-header.c */
+
+	if (priv->cached_uids)
+		camel_folder_free_uids (priv->folder, priv->cached_uids);
+
+	priv->cached_uids = NULL;
 
 	(*parent_class->finalize) (object);
 

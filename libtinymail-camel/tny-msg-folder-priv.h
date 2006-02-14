@@ -35,6 +35,8 @@ struct _TnyMsgFolderPriv
 	gchar *folder_name;
 	TnyAccountIface *account;
 	GList *folders;
+
+	GPtrArray *cached_uids;
 };
 
 CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);

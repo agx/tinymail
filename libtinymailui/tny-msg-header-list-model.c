@@ -244,8 +244,9 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 	g_return_if_fail (iter->user_data != NULL);
 
 	header = G_LIST (iter->user_data)->data;
-		
-	tny_msg_header_iface_uncache (header);
+	
+	if (header)
+		tny_msg_header_iface_uncache (header);
 
 	return;
 }

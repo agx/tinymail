@@ -138,11 +138,30 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	if (!strcmp (ptr, "count"))
 	{
 		/* An account got added, so we simple reload all */
-		destroy_current_accounts (priv);
+
+		GList *old = priv->accounts;
+		priv->accounts = NULL;
 
 		/* Tell the observers that they should reload */
+
 		g_signal_emit (self, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
 
+		priv->accounts = old;
+
+		/* The reason why we switch GList pointers is because our 
+		 * observer might want to reload it's view. This means: 
+		 * uncaching the header instances. But if we destroy all folders
+		 * in the accounts, also the header instances would get
+		 * destroyed (to early, as the model wants to try first). This
+		 * isn't garbage collection where stuff like this wouldn't 
+		 * be a real problem.
+		 *
+		 * By switching the pointer before notifying the observers, we
+		 * act as if the folder-count has become zero. Afterwards we'll
+		 * take care of finishing the stuff ourselves.
+		 */
+
+		destroy_current_accounts (priv);
 	} else 
 	{
 		GList *accounts = priv->accounts;

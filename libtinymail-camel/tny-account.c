@@ -311,16 +311,34 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->proto = NULL;
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
+
 	priv->session = tny_session_camel_get_instance ();
 
 	return;
 }
 
 static void
+destroy_folder (gpointer data, gpointer user_data)
+{
+	g_object_unref (G_OBJECT (data));
+}
+
+
+static void
 tny_account_finalize (GObject *object)
 {
 	TnyAccount *self = (TnyAccount *)object;	
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	if (priv->folders)
+	{
+		g_list_foreach (priv->folders, destroy_folder, NULL);
+
+		/* Tell the observers */
+		/* g_signal_emit (TNY_ACCOUNT_IFACE (self), tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0); */
+	}
+
+	priv->folders = NULL;
 
 	if (priv->id)
 		g_free (priv->id);
@@ -331,8 +349,10 @@ tny_account_finalize (GObject *object)
 	if (priv->host)
 		g_free (priv->proto);
 
-	if (priv->proto)
-		g_free (priv->proto);
+	// TODO: strange
+	//if (priv->proto)
+	//	g_free (priv->proto);
+
 
 	camel_exception_free (priv->ex);
 

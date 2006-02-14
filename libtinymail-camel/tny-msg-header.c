@@ -193,7 +193,7 @@ tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 
 	load_msg_header (priv);
 
-	return camel_message_info_message_id (priv->message_info);
+	return (const gchar*)camel_message_info_message_id (priv->message_info);
 }
 
 
@@ -214,32 +214,16 @@ tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 
 	unload_msg_header (priv);
 
-	if (priv->id)
+	/* Speedup trick, also check tny-msg-folder.c */
+
+	/* if (priv->id)
 		g_free (priv->id);
 
-	priv->id = g_strdup (id);
+	priv->id = g_strdup (id); */
 
-	return;
-}
+	/* Yes I know what I'm doing, also check tny-msg-folder.c */
+	priv->id = (gchar*)id;
 
-static void
-tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
-{
-	g_warning ("%s not implemented\n", __FUNCTION__);
-	return;
-}
-
-static void
-tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
-{
-	g_warning ("%s not implemented\n", __FUNCTION__);
-	return;
-}
-
-static void
-tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
-{
-	g_warning ("%s not implemented\n", __FUNCTION__);
 	return;
 }
 
@@ -272,6 +256,11 @@ tny_msg_header_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->folder)); */
 
 	unload_msg_header (priv);
+
+	/* Indeed, check the speedup trick above */
+
+	/* if (priv->id)
+		g_free (priv->id); */
 
 	(*parent_class->finalize) (object);
 

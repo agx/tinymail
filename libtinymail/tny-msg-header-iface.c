@@ -27,7 +27,7 @@
  * 
  * 
  * 
- * Return value: cc
+ * Return value: cc header
  **/
 const gchar*
 tny_msg_header_iface_get_cc (TnyMsgHeaderIface *self)
@@ -42,7 +42,7 @@ tny_msg_header_iface_get_cc (TnyMsgHeaderIface *self)
  * 
  * 
  * 
- * Return value: date received
+ * Return value: date received header
  **/
 const time_t
 tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
@@ -56,7 +56,7 @@ tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
  * 
  * 
  * 
- * Return value: date sent
+ * Return value: date sent header
  **/
 const time_t
 tny_msg_header_iface_get_date_sent (TnyMsgHeaderIface *self)
@@ -85,7 +85,7 @@ tny_msg_header_iface_get_id (TnyMsgHeaderIface *self)
  * 
  * Get an unique id of the message of which self is a message header.
  * 
- * Return value: Unique id
+ * Return value: message-id header
  **/
 const gchar*
 tny_msg_header_iface_get_message_id (TnyMsgHeaderIface *self)
@@ -99,7 +99,7 @@ tny_msg_header_iface_get_message_id (TnyMsgHeaderIface *self)
  * 
  * Get the from header
  * 
- * Return value: The from header
+ * Return value: from header
  **/
 const gchar* 
 tny_msg_header_iface_get_from (TnyMsgHeaderIface *self)
@@ -113,7 +113,7 @@ tny_msg_header_iface_get_from (TnyMsgHeaderIface *self)
  * 
  * Get the subject header
  * 
- * Return value: The subject header
+ * Return value: subject header
  **/
 const gchar*
 tny_msg_header_iface_get_subject (TnyMsgHeaderIface *self)
@@ -128,7 +128,7 @@ tny_msg_header_iface_get_subject (TnyMsgHeaderIface *self)
  * 
  * Get the to header
  * 
- * Return value: The to header
+ * Return value: to header
  **/
 const gchar* 
 tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
@@ -171,7 +171,6 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
  * @self: a TnyMsgHeaderIface object
  * @id: an unique follow-up id
  * 
- * * TODO: Make this private * 
  *
  * Return value: 
  **/
