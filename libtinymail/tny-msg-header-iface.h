@@ -31,6 +31,7 @@
  * GObject standard techniques.
  */
 
+#include <time.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-shared.h>
