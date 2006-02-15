@@ -148,8 +148,8 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 
 		priv->accounts = old;
 
-		/* The reason why we switch GList pointers is because our 
-		 * observer might want to reload it's view. This means: 
+		/* The reason why I switch these GList pointers is because the 
+		 * observers might want to reload their views. This means
 		 * uncaching the header instances. But if we destroy all folders
 		 * in the accounts, also the header instances would get
 		 * destroyed (to early, as the model wants to try first). This
