@@ -5,6 +5,8 @@ INCLUDES = \
 lib_LTLIBRARIES = libtinymailui-1.0.la
 
 libtinymailui_1_0_headers = 		\
+	tny-msg-window.h		\
+	tny-summary-window.h		\
 	tny-msg-header-list-model.h	\
 	tny-account-tree-model.h	\
 	tny-attach-list-model.h		\
@@ -14,6 +16,8 @@ libtinymailui_1_0_headers = 		\
 
 libtinymailui_1_0_la_SOURCES = 		\
 	$(libtinymailui_1_0_headers)	\
+	tny-msg-window.c		\
+	tny-summary-window.c		\
 	tny-msg-header-list-model.c	\
 	tny-account-tree-model.c	\
 	tny-attach-list-model-priv.h	\

@@ -22,6 +22,7 @@
 #include <libgnomeui/libgnomeui.h>
 
 #include <tny-attach-list-model.h>
+#include <tny-msg-mime-part-iface.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -56,12 +57,12 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 	/* THE gnomeui-2 dependency */
 	icon = gnome_icon_lookup (priv->theme, NULL, 
 		tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
-		mime_type, 0, NULL);
+		tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
 
 	if (icon)
 	{
 		pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
-			ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
+			GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
 		g_free (icon);
 	}
 
