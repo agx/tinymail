@@ -51,6 +51,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 	GtkTreeIter iter;
 	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (self);
 
+	static GdkPixbuf *stock_file_pixbuf = NULL;
 	GdkPixbuf *pixbuf;
         gchar *icon;
 	
@@ -64,6 +65,14 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 		pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
 			GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
 		g_free (icon);
+	} else 
+	{
+		if (!stock_file_pixbuf)
+			stock_file_pixbuf = gtk_icon_theme_load_icon (priv->theme, 
+				GTK_STOCK_FILE, GTK_ICON_SIZE_LARGE_TOOLBAR, 
+				0, NULL);
+
+		pixbuf = stock_file_pixbuf;
 	}
 
 	gtk_list_store_append (model, &iter);
@@ -113,6 +122,8 @@ tny_attach_list_model_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	GtkListStore *store = (GtkListStore*) instance;
 	static GType types[] = { G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_POINTER };
+
+	types[0] = GDK_TYPE_PIXBUF;
 
 	gtk_list_store_set_column_types (store, 
 		TNY_ATTACH_LIST_MODEL_N_COLUMNS, types);
