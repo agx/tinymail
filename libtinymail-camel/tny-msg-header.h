@@ -28,7 +28,8 @@
 G_BEGIN_DECLS
 
 #define TNY_MSG_HEADER_TYPE             (tny_msg_header_get_type ())
-#define TNY_MSG_HEADER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_HEADER_TYPE, TnyMsgHeader))
+#define TNY_MSG_HEADER(obj)             ((TnyMsgHeader*)obj)
+/* #define TNY_MSG_HEADER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_HEADER_TYPE, TnyMsgHeader)) */
 #define TNY_MSG_HEADER_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_HEADER_TYPE, TnyMsgHeaderClass))
 #define TNY_IS_MSG_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_HEADER_TYPE))
 #define TNY_IS_MSG_HEADER_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_HEADER_TYPE))
