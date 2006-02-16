@@ -66,6 +66,8 @@ fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelF
 			priv->folders = g_list_append (priv->folders, iface);
 		}
 
+		tny_msg_folder_iface_uncache (iface);
+
 		fill_folders_recursive (self, iface, iter->child);
 
 		/* Tell the observers that they should reload */
