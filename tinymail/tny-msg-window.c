@@ -23,6 +23,8 @@
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
 
+#include "tny-attach-list-model-priv.h"
+
 static GObjectClass *parent_class = NULL;
 
 typedef struct _TnyMsgWindowPriv TnyMsgWindowPriv;
@@ -125,6 +127,9 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 			GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
 	priv->attachview = GTK_ICON_VIEW (gtk_icon_view_new_with_model (model));
+
+	_tny_attach_list_model_set_screen (TNY_ATTACH_LIST_MODEL (model),
+		gtk_widget_get_screen (GTK_WIDGET (priv->attachview)));
 
 	gtk_icon_view_set_text_column (priv->attachview, 
 		TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN);

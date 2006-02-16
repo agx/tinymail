@@ -19,10 +19,28 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+#include <libgnomeui/libgnomeui.h>
 
 #include <tny-attach-list-model.h>
 
 static GObjectClass *parent_class = NULL;
+
+#include "tny-attach-list-model-priv.h"
+
+#define TNY_ATTACH_LIST_MODEL_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ATTACH_LIST_MODEL_TYPE, TnyAttachListModelPriv))
+
+
+void
+_tny_attach_list_model_set_screen (TnyAttachListModel *self, GdkScreen *screen)
+{
+	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (self);
+
+	priv->screen = screen;
+	priv->theme = gtk_icon_theme_get_for_screen (priv->screen);
+
+	return;
+}
 
 
 void
@@ -30,7 +48,22 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 {
 	GtkListStore *model = GTK_LIST_STORE (self);
 	GtkTreeIter iter;
-	GdkPixbuf *pixbuf = NULL;
+	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (self);
+
+	GdkPixbuf *pixbuf;
+        gchar *icon;
+	
+	/* THE gnomeui-2 dependency */
+	icon = gnome_icon_lookup (priv->theme, NULL, 
+		tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
+		mime_type, 0, NULL);
+
+	if (icon)
+	{
+		pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
+			ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
+		g_free (icon);
+	}
 
 	gtk_list_store_append (model, &iter);
 
@@ -68,6 +101,8 @@ tny_attach_list_model_class_init (TnyAttachListModelClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_attach_list_model_finalize;
+
+	g_type_class_add_private (object_class, sizeof (TnyAttachListModelPriv));
 
 	return;
 }

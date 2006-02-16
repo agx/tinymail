@@ -16,6 +16,7 @@ libtinymailui_1_0_la_SOURCES = 		\
 	$(libtinymailui_1_0_headers)	\
 	tny-msg-header-list-model.c	\
 	tny-account-tree-model.c	\
+	tny-attach-list-model-priv.h	\
 	tny-attach-list-model.c		\
 	tny-summary-window-iface.c	\
 	tny-text-buffer-stream.c	\
