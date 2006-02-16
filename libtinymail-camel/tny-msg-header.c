@@ -69,10 +69,10 @@ unload_msg_header (TnyMsgHeaderPriv *priv)
 static void
 load_msg_header (TnyMsgHeaderPriv *priv)
 {
-	if (!priv->message_info && priv->folder && priv->id)
+	if (!priv->message_info && priv->folder && priv->uid)
 	{
 		CamelFolder *folder = _tny_msg_folder_get_camel_folder (priv->folder);
-		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, priv->id);
+		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, priv->uid);
 
 		tny_msg_header_set_camel_message_info_priv (priv, msginfo);
 
@@ -198,7 +198,7 @@ tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 
 
 static const gchar*
-tny_msg_header_get_id (TnyMsgHeaderIface *self)
+tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
@@ -208,7 +208,7 @@ tny_msg_header_get_id (TnyMsgHeaderIface *self)
 }
 
 static void
-tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
+tny_msg_header_set_uid (TnyMsgHeaderIface *self, const gchar *uid)
 {
 	TnyMsgHeaderPriv *priv = TNY_MSG_HEADER_GET_PRIVATE (TNY_MSG_HEADER (self));
 
@@ -216,13 +216,13 @@ tny_msg_header_set_id (TnyMsgHeaderIface *self, const gchar *id)
 
 	/* Speedup trick, also check tny-msg-folder.c */
 
-	/* if (priv->id)
-		g_free (priv->id);
+	/* if (priv->uid)
+		g_free (priv->uid);
 
-	priv->id = g_strdup (id); */
+	priv->uid = g_strdup (uid); */
 
 	/* Yes I know what I'm doing, also check tny-msg-folder.c */
-	priv->id = (gchar*)id;
+	priv->uid = (gchar*)uid;
 
 	return;
 }
@@ -259,8 +259,8 @@ tny_msg_header_finalize (GObject *object)
 
 	/* Indeed, check the speedup trick above */
 
-	/* if (priv->id)
-		g_free (priv->id); */
+	/* if (priv->uid)
+		g_free (priv->uid); */
 
 	(*parent_class->finalize) (object);
 
@@ -289,8 +289,8 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_date_sent_func = tny_msg_header_get_date_sent;
 	klass->get_cc_func = tny_msg_header_get_cc;
 
-	klass->get_id_func = tny_msg_header_get_id;	
-	klass->set_id_func = tny_msg_header_set_id;
+	klass->get_uid_func = tny_msg_header_get_uid;	
+	klass->set_uid_func = tny_msg_header_set_uid;
 	
 	klass->set_folder_func = tny_msg_header_set_folder;
 	klass->get_folder_func = tny_msg_header_get_folder;

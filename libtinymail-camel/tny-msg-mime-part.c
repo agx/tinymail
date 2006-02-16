@@ -35,6 +35,7 @@ struct _TnyMsgMimePartPriv
 {
 	CamelMimePart *part;
 	gchar *cached_content_type;
+	guint index;
 };
 
 #define TNY_MSG_MIME_PART_GET_PRIVATE(o)	\
@@ -158,6 +159,58 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 	return;
 }
 
+
+static void
+tny_msg_mime_part_set_index (TnyMsgMimePartIface *self, guint index)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	priv->index = index;
+
+	return;
+}
+
+static const guint
+tny_msg_mime_part_get_index (TnyMsgMimePartIface *self)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	return priv->index;
+}
+
+static const gchar*
+tny_msg_mime_part_get_filename (TnyMsgMimePartIface *self)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	return camel_mime_part_get_filename (priv->part);
+}
+
+static const gchar*
+tny_msg_mime_part_get_content_id (TnyMsgMimePartIface *self)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	return camel_mime_part_get_content_id (priv->part);
+}
+
+static const gchar*
+tny_msg_mime_part_get_description (TnyMsgMimePartIface *self)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	return camel_mime_part_get_description (priv->part);
+}
+
+static const gchar*
+tny_msg_mime_part_get_content_location (TnyMsgMimePartIface *self)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	return camel_mime_part_get_content_location (priv->part);
+}
+
+
 TnyMsgMimePart*
 tny_msg_mime_part_new (CamelMimePart *part)
 {
@@ -179,6 +232,14 @@ tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_content_type_func = tny_msg_mime_part_get_content_type;
 	klass->get_stream_func = tny_msg_mime_part_get_stream;
 	klass->write_to_stream_func = tny_msg_mime_part_write_to_stream;
+
+	klass->set_index_func = tny_msg_mime_part_set_index;
+	klass->get_index_func = tny_msg_mime_part_get_index;
+
+	klass->get_filename_func = tny_msg_mime_part_get_filename;
+	klass->get_content_id_func = tny_msg_mime_part_get_content_id;
+	klass->get_description_func = tny_msg_mime_part_get_description;
+	klass->get_content_location_func = tny_msg_mime_part_get_content_location;
 
 	return;
 }

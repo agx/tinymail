@@ -50,8 +50,8 @@ struct _TnyMsgHeaderIfaceClass
 {
 	GTypeInterface g_iface;
 
-	const gchar*   (*get_id_func)             (TnyMsgHeaderIface *self);
-	void           (*set_id_func)             (TnyMsgHeaderIface *self, const gchar *id);
+	const gchar*   (*get_uid_func)            (TnyMsgHeaderIface *self);
+	void           (*set_uid_func)            (TnyMsgHeaderIface *self, const gchar *uid);
 
 	const gchar*   (*get_cc_func)             (TnyMsgHeaderIface *self);
 	const time_t   (*get_date_received_func)  (TnyMsgHeaderIface *self);
@@ -71,8 +71,8 @@ struct _TnyMsgHeaderIfaceClass
 
 GType          tny_msg_header_iface_get_type      (void);
 
-void           tny_msg_header_iface_set_id             (TnyMsgHeaderIface *self, const gchar *id);
-const gchar*   tny_msg_header_iface_get_id             (TnyMsgHeaderIface *self);
+void           tny_msg_header_iface_set_uid             (TnyMsgHeaderIface *self, const gchar *uid);
+const gchar*   tny_msg_header_iface_get_uid             (TnyMsgHeaderIface *self);
 
 
 const gchar*   tny_msg_header_iface_get_cc             (TnyMsgHeaderIface *self);

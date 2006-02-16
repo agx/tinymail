@@ -39,19 +39,36 @@ struct _TnyMsgMimePartIfaceClass
 {
 	GTypeInterface parent;
 
-	const gchar*    (*get_content_type_func)   (TnyMsgMimePartIface *self);
-	gboolean        (*content_type_is_func)    (TnyMsgMimePartIface *self, const gchar *content_type);
-	TnyStreamIface* (*get_stream_func)         (TnyMsgMimePartIface *self);
-	void            (*write_to_stream_func)    (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+	const gchar*    (*get_content_type_func)     (TnyMsgMimePartIface *self);
+	gboolean        (*content_type_is_func)      (TnyMsgMimePartIface *self, const gchar *content_type);
+	TnyStreamIface* (*get_stream_func)           (TnyMsgMimePartIface *self);
+	void            (*write_to_stream_func)      (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+
+	void            (*set_index_func)            (TnyMsgMimePartIface *self, guint index);
+	const guint     (*get_index_func)            (TnyMsgMimePartIface *self);
+
+	const gchar*    (*get_filename_func)         (TnyMsgMimePartIface *self);
+	const gchar*    (*get_content_id_func)       (TnyMsgMimePartIface *self);
+	const gchar*    (*get_description_func)      (TnyMsgMimePartIface *self);
+	const gchar*    (*get_content_location_func) (TnyMsgMimePartIface *self);
 };
 
-GType           tny_msg_mime_part_iface_get_type           (void);
+GType           tny_msg_mime_part_iface_get_type             (void);
 
-const gchar*    tny_msg_mime_part_iface_get_content_type   (TnyMsgMimePartIface *self);
-gboolean        tny_msg_mime_part_iface_content_type_is    (TnyMsgMimePartIface *self, const gchar *type);
+const gchar*    tny_msg_mime_part_iface_get_content_type     (TnyMsgMimePartIface *self);
+gboolean        tny_msg_mime_part_iface_content_type_is      (TnyMsgMimePartIface *self, const gchar *type);
 
-TnyStreamIface* tny_msg_mime_part_iface_get_stream         (TnyMsgMimePartIface *self);
-void            tny_msg_mime_part_iface_write_to_stream    (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+TnyStreamIface* tny_msg_mime_part_iface_get_stream           (TnyMsgMimePartIface *self);
+void            tny_msg_mime_part_iface_write_to_stream      (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+
+
+void            tny_msg_mime_part_iface_set_index            (TnyMsgMimePartIface *self, guint index);
+const guint     tny_msg_mime_part_iface_get_index            (TnyMsgMimePartIface *self);
+
+const gchar*    tny_msg_mime_part_iface_get_filename         (TnyMsgMimePartIface *self);
+const gchar*    tny_msg_mime_part_iface_get_content_id       (TnyMsgMimePartIface *self);
+const gchar*    tny_msg_mime_part_iface_get_description      (TnyMsgMimePartIface *self);
+const gchar*    tny_msg_mime_part_iface_get_content_location (TnyMsgMimePartIface *self);
 
 G_END_DECLS
 

@@ -29,7 +29,7 @@ struct _TnyMsgHeaderPriv
 {
 	TnyMsgFolderIface *folder;
 	CamelMessageInfo *message_info;
-	gchar *id;
+	gchar *uid;
 };
 
 void  _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info);

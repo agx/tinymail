@@ -93,8 +93,6 @@ tny_account_tree_model_class_init (TnyAccountTreeModelClass *class)
 
 	object_class->finalize = tny_account_tree_model_finalize;
 
-	/* g_type_class_add_private (object_class, sizeof (TnyAccountTreeModelPriv)); */
-
 	return;
 }
 

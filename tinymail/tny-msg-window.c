@@ -21,6 +21,7 @@
 #include <gtk/gtk.h>
 #include <tny-msg-window.h>
 #include <tny-text-buffer-stream.h>
+#include <tny-attach-list-model.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -30,6 +31,8 @@ struct _TnyMsgWindowPriv
 {
 	TnyMsgIface *msg;
 	GtkTextView *textview;
+	GtkIconView *attachview;
+	GtkWidget *attachview_sw;
 };
 
 #define TNY_MSG_WINDOW_GET_PRIVATE(o)	\
@@ -46,6 +49,11 @@ reload_msg (TnyMsgWindowIface *self)
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
 	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
 
+	TnyAttachListModel *model = TNY_ATTACH_LIST_MODEL 
+			(gtk_icon_view_get_model (priv->attachview));
+
+	gtk_widget_hide (priv->attachview_sw);
+
 	while (parts)
 	{
 		TnyMsgMimePartIface *part = parts->data;
@@ -55,7 +63,11 @@ reload_msg (TnyMsgWindowIface *self)
 			tny_stream_iface_reset (dest);
 			tny_msg_mime_part_iface_write_to_stream (part, dest);
 			tny_stream_iface_reset (dest);
-			break;
+		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
+			tny_msg_mime_part_iface_get_filename (part))
+		{
+			tny_attach_list_model_add (model, part);
+			gtk_widget_show (priv->attachview_sw);
 		}
 
 		parts = g_list_next (parts);
@@ -97,24 +109,51 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMsgWindow *self = (TnyMsgWindow *)instance;
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
-	
 	GtkWidget *textview_sw = gtk_scrolled_window_new (NULL, NULL);
+	GtkWidget *vbox = gtk_vbox_new (FALSE, 8);
+	GtkTreeModel *model = GTK_TREE_MODEL (tny_attach_list_model_new());
+
+	priv->attachview_sw = gtk_scrolled_window_new (NULL, NULL);
+
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (textview_sw), 
 			GTK_SHADOW_ETCHED_IN);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (textview_sw),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (priv->attachview_sw), 
+			GTK_SHADOW_ETCHED_IN);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (priv->attachview_sw),
 			GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
+	priv->attachview = GTK_ICON_VIEW (gtk_icon_view_new_with_model (model));
+
+	gtk_icon_view_set_text_column (priv->attachview, 
+		TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN);
+
+	gtk_icon_view_set_pixbuf_column (priv->attachview, 
+		TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN);
+
+	gtk_icon_view_set_columns (priv->attachview, -1);
+	gtk_icon_view_set_item_width (priv->attachview, -1);
+	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 	gtk_container_set_border_width (GTK_CONTAINER (self), 8);
 
 	gtk_window_set_default_size (GTK_WINDOW (self), 300, 200);
 
-	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (textview_sw));
-	gtk_container_add (GTK_CONTAINER (textview_sw), GTK_WIDGET (priv->textview));
+	gtk_box_pack_start (GTK_BOX (vbox), textview_sw, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (vbox), priv->attachview_sw, FALSE, TRUE, 0);
 
+	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (vbox));
+
+	gtk_container_add (GTK_CONTAINER (textview_sw), GTK_WIDGET (priv->textview));
+	gtk_container_add (GTK_CONTAINER (priv->attachview_sw), GTK_WIDGET (priv->attachview));
+
+	gtk_widget_show (GTK_WIDGET (vbox));
 	gtk_widget_show (GTK_WIDGET (textview_sw));
+
 	gtk_widget_show (GTK_WIDGET (priv->textview));
+	gtk_widget_show (GTK_WIDGET (priv->attachview));
 
 	return;
 }

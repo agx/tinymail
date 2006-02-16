@@ -19,6 +19,45 @@
 
 #include <tny-msg-mime-part-iface.h>
 
+
+void
+tny_msg_mime_part_iface_set_index (TnyMsgMimePartIface *self, guint index)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_index_func (self, index);
+	return;
+}
+
+
+const guint
+tny_msg_mime_part_iface_get_index (TnyMsgMimePartIface *self)
+{
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_index_func (self);
+}
+
+const gchar*
+tny_msg_mime_part_iface_get_filename (TnyMsgMimePartIface *self)
+{
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_filename_func (self);
+}
+
+const gchar*
+tny_msg_mime_part_iface_get_content_id (TnyMsgMimePartIface *self)
+{
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_id_func (self);
+}
+
+const gchar*
+tny_msg_mime_part_iface_get_description (TnyMsgMimePartIface *self)
+{
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_description_func (self);
+}
+
+const gchar*
+tny_msg_mime_part_iface_get_content_location (TnyMsgMimePartIface *self)
+{
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_location_func (self);
+}
+
 void
 tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {

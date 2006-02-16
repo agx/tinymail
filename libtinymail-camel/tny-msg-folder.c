@@ -139,7 +139,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	tny_msg_header_iface_set_folder (header, self);
-	tny_msg_header_iface_set_id (header, uid);
+	tny_msg_header_iface_set_uid (header, uid);
 
 	/* Uncertain (the _new is already a ref, right?) */
 	/* g_object_ref (G_OBJECT (header)) */
@@ -213,7 +213,8 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyMsgIface *message = NULL;
-	const gchar *id = tny_msg_header_iface_get_id (TNY_MSG_HEADER_IFACE (header));
+
+	const gchar *id = tny_msg_header_iface_get_uid (TNY_MSG_HEADER_IFACE (header));
 
 	load_folder (priv);
 
