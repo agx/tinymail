@@ -70,6 +70,8 @@ load_folder (TnyMsgFolderPriv *priv)
 
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
+		priv->unread_length = (guint)
+			camel_folder_get_unread_message_count (priv->folder);
 	}
 
 	return;
