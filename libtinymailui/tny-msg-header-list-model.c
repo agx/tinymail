@@ -30,7 +30,8 @@ struct _TnyMsgHeaderListModel
 {
 	GObject parent_instance;
 
-	GList *headers;
+	TnyMsgFolderIface *folder;
+	const GList *headers;
 	gint length;
 
 	gint stamp;
@@ -83,7 +84,7 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
 	i = gtk_tree_path_get_indices (path)[0];
-	list = g_list_nth (list_model->headers, i);
+	list = g_list_nth (G_LIST (list_model->headers), i);
 
 	if (i >= list_model->length)
 		return FALSE;
@@ -223,7 +224,7 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	if (parent)
 		return FALSE;
 
-	child = g_list_nth (TNY_MSG_HEADER_LIST_MODEL (self)->headers, n);
+	child = g_list_nth (G_LIST (TNY_MSG_HEADER_LIST_MODEL (self)->headers), n);
 
 	if (child) 
 	{
@@ -284,22 +285,8 @@ tny_msg_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 }
 
 static void
-header_destroy (gpointer data, gpointer user_data)
-{
-	g_object_unref (G_OBJECT (data));
-
-	return;
-}
-
-static void
 destroy_internal_list (TnyMsgHeaderListModel *self)
 {
-	if (self->headers)
-	{
-		g_list_foreach (self->headers, header_destroy, NULL);
-		g_list_free (self->headers);
-		self->headers = NULL;
-	}
 
 	self->headers = NULL;
 	self->length = 0;
@@ -312,7 +299,9 @@ tny_msg_header_list_model_finalize (GObject *object)
 {
 	TnyMsgHeaderListModel *self = (TnyMsgHeaderListModel *)object;
 
-	destroy_internal_list (self);	
+	if (self->folder)
+		g_object_unref (G_OBJECT (self->folder));
+
 	parent_class->finalize (object);
 
 	return;
@@ -339,25 +328,27 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 	return;
 }
 
-void
-tny_msg_header_list_model_add (TnyMsgHeaderListModel *self, TnyMsgHeaderIface *header)
-{
-	self->headers = g_list_append (self->headers, header);
-	self->length = g_list_length (self->headers);
-
-	return;
-}
 
 void
-tny_msg_header_list_model_inject (TnyMsgHeaderListModel *self, GList *headers)
+tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder)
 {
-	destroy_internal_list (self);
+	const GList* headers = tny_msg_folder_iface_get_headers (folder);
+
+	self->headers = NULL;
+	self->length = 0;
+
+	if (self->folder)
+		g_object_unref (G_OBJECT (self->folder));
+
+	self->folder = folder;
+	g_object_ref (G_OBJECT (folder));
 
 	self->headers = headers;
-	self->length = g_list_length (self->headers);
+	self->length = g_list_length (G_LIST (self->headers));
 
 	return;
 }
+
 
 GtkTreeModel *
 tny_msg_header_list_model_new (void)

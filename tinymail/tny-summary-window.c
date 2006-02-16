@@ -137,19 +137,16 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
 		GtkTreeModel *header_model, *sortable;
-		GList *headers;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
 
-		headers = (GList*)tny_msg_folder_iface_get_headers (folder);
-
 		header_model = GTK_TREE_MODEL (
 			tny_msg_header_list_model_new ());
 
-		tny_msg_header_list_model_inject (
-			TNY_MSG_HEADER_LIST_MODEL (header_model), headers);
+		tny_msg_header_list_model_set_folder (
+			TNY_MSG_HEADER_LIST_MODEL (header_model), folder);
 
 		sortable = gtk_tree_model_sort_new_with_model (header_model);
 

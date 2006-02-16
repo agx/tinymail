@@ -22,6 +22,7 @@
 
 #include <gtk/gtktreemodel.h>
 #include <tny-msg-header-iface.h>
+#include <tny-msg-folder-iface.h>
 
 G_BEGIN_DECLS
 
@@ -48,10 +49,10 @@ enum
 };
 
 
-GType         tny_msg_header_list_model_get_type  (void);
-GtkTreeModel* tny_msg_header_list_model_new       (void);
-void          tny_msg_header_list_model_add       (TnyMsgHeaderListModel *self, TnyMsgHeaderIface *header);
-void          tny_msg_header_list_model_inject    (TnyMsgHeaderListModel *self, GList *headers);
+GType         tny_msg_header_list_model_get_type   (void);
+GtkTreeModel* tny_msg_header_list_model_new        (void);
+
+void          tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder);
 
 G_END_DECLS
 
