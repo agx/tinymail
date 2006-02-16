@@ -70,6 +70,8 @@ fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelF
 
 		fill_folders_recursive (self, iface, iter->child);
 
+		
+
 		/* Tell the observers that they should reload */
 		g_signal_emit (iface, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
 
@@ -349,11 +351,10 @@ tny_account_finalize (GObject *object)
 		g_free (priv->user);
 
 	if (priv->host)
-		g_free (priv->proto);
+		g_free (priv->host);
 
-	// TODO: strange
-	//if (priv->proto)
-	//	g_free (priv->proto);
+	if (priv->proto)
+		g_free (priv->proto);
 
 
 	camel_exception_free (priv->ex);
