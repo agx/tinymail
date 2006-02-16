@@ -24,6 +24,7 @@
 #include <glib-object.h>
 #include <tny-msg-header-iface.h>
 
+
 G_BEGIN_DECLS
 
 #define TNY_MSG_HEADER_TYPE             (tny_msg_header_get_type ())
@@ -36,15 +37,6 @@ G_BEGIN_DECLS
 typedef struct _TnyMsgHeader TnyMsgHeader;
 typedef struct _TnyMsgHeaderClass TnyMsgHeaderClass;
 
-struct _TnyMsgHeader 
-{
-	GObject parent;
-};
-
-struct _TnyMsgHeaderClass 
-{
-	GObjectClass parent_class;
-};
 
 GType           tny_msg_header_get_type  (void);
 TnyMsgHeader*   tny_msg_header_new       (void);

@@ -23,13 +23,10 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
-typedef struct _TnyMsgHeaderPriv TnyMsgHeaderPriv;
-
 struct _TnyMsgHeaderPriv
 {
 	TnyMsgFolderIface *folder;
 	CamelMessageInfo *message_info;
-	gchar *uid;
 };
 
 void  _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info);
