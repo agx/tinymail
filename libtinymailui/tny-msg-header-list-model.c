@@ -344,7 +344,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	g_object_ref (G_OBJECT (folder));
 
 	self->headers = headers;
-	self->length = g_list_length (G_LIST (self->headers));
+	self->length = tny_msg_folder_iface_get_all_count (folder);
 
 	return;
 }

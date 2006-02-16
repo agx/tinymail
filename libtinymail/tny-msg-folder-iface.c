@@ -23,17 +23,24 @@
 guint *tny_msg_folder_iface_signals;
 
 /**
- * tny_msg_folder_iface_get_unread:
+ * tny_msg_folder_iface_get_unread_count:
  * @self: a TnyMsgFolderIface object
  * 
  * Get the amount of unread messages in this folder.
  * 
  * Return value: amount of unread messages
  **/
-gint
-tny_msg_folder_iface_get_unread (TnyMsgFolderIface *self)
+guint
+tny_msg_folder_iface_get_unread_count (TnyMsgFolderIface *self)
 {
-	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_unread_func (self);
+	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_unread_count_func (self);
+}
+
+
+guint
+tny_msg_folder_iface_get_all_count (TnyMsgFolderIface *self)
+{
+	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_all_count_func (self);
 }
 
 /**

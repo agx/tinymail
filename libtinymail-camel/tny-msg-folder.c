@@ -91,12 +91,20 @@ tny_msg_folder_get_folders (TnyMsgFolderIface *self)
 }
 
 
-static gint
-tny_msg_folder_get_unread (TnyMsgFolderIface *self)
+static guint
+tny_msg_folder_get_unread_count (TnyMsgFolderIface *self)
 {
-	/* TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self)); */
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
-	return 0;
+	return priv->unread_length;
+}
+
+static guint
+tny_msg_folder_get_all_count (TnyMsgFolderIface *self)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
+	return priv->cached_length;
 }
 
 static void
@@ -145,6 +153,10 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	/* g_object_ref (G_OBJECT (header)) */
 
 	priv->cached_hdrs = g_list_append (priv->cached_hdrs, header);
+	priv->cached_length++;
+
+	/* TODO: If unread */
+	/* priv->unread_length++; */
 
 	return;
 }
@@ -164,6 +176,8 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 
 		camel_folder_refresh_info (priv->folder, &ex);
 		uids = camel_folder_get_uids (priv->folder);
+
+		priv->cached_length = 0;
 		g_ptr_array_foreach (uids, add_message_with_uid, self);
 
 		/* Speedup trick, also check tny-msg-header.c */
@@ -412,7 +426,8 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->add_folder_func = tny_msg_folder_add_folder;
 	klass->get_folders_func = tny_msg_folder_get_folders;
 
-	klass->get_unread_func = tny_msg_folder_get_unread;
+	klass->get_unread_count_func = tny_msg_folder_get_unread_count;
+	klass->get_all_count_func = tny_msg_folder_get_all_count;
 
 	klass->get_account_func = tny_msg_folder_get_account;
 	klass->set_account_func = tny_msg_folder_set_account;
