@@ -32,7 +32,7 @@ typedef struct _TnyMsgWindowPriv TnyMsgWindowPriv;
 struct _TnyMsgWindowPriv
 {
 	TnyMsgIface *msg;
-	GtkTextView *textview;
+	GtkTextView *headerview, *textview;
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
 };
@@ -41,20 +41,73 @@ struct _TnyMsgWindowPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_WINDOW_TYPE, TnyMsgWindowPriv))
 
 
+/* TODO: refactor */
+static gchar *
+_get_readable_date (const time_t file_time_raw)
+{
+	struct tm *file_time;
+	gchar readable_date[64];
+	gsize readable_date_size;
+
+	file_time = localtime (&file_time_raw);
+
+	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
+	
+	return g_strdup (readable_date);
+}
+
 static void
 reload_msg (TnyMsgWindowIface *self)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 
+	GtkTextIter hiter;
+	GtkTextBuffer *headerbuffer = gtk_text_view_get_buffer (priv->headerview);
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 	TnyStreamIface *dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
 	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
+	const gchar *str = NULL;
 
 	TnyAttachListModel *model = TNY_ATTACH_LIST_MODEL 
 			(gtk_icon_view_get_model (priv->attachview));
 
 	gtk_widget_hide (priv->attachview_sw);
+
+	gtk_text_buffer_create_tag (headerbuffer, "bold", 
+			"weight", PANGO_WEIGHT_BOLD, NULL);
+
+	gtk_text_buffer_set_text (headerbuffer, "", 0);
+
+	gtk_text_buffer_get_start_iter (headerbuffer, &hiter);
+	
+	str = "From: ";
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	str = tny_msg_header_iface_get_from (header);
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	str = "\n";
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+
+	str = "To: ";
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	str = tny_msg_header_iface_get_to (header);
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	str = "\n";
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+
+	str = "Subject: ";
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	str = tny_msg_header_iface_get_subject (header);
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	str = "\n";
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+
+	str = "Date: ";
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	str = (gchar*)_get_readable_date (tny_msg_header_iface_get_date_sent (header));
+	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
+	g_free ((gchar*)str);
+
 
 	while (parts)
 	{
@@ -112,7 +165,7 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgWindow *self = (TnyMsgWindow *)instance;
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 	GtkWidget *textview_sw = gtk_scrolled_window_new (NULL, NULL);
-	GtkWidget *vbox = gtk_vbox_new (FALSE, 8);
+	GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
 	GtkTreeModel *model = GTK_TREE_MODEL (tny_attach_list_model_new());
 
 	priv->attachview_sw = gtk_scrolled_window_new (NULL, NULL);
@@ -141,22 +194,31 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_item_width (priv->attachview, -1);
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
+	priv->headerview = GTK_TEXT_VIEW (gtk_text_view_new ());
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
+
+	gtk_text_view_set_editable (priv->headerview, FALSE);
+	gtk_text_view_set_editable (priv->textview, FALSE);
+
 	gtk_container_set_border_width (GTK_CONTAINER (self), 8);
 
 	gtk_window_set_default_size (GTK_WINDOW (self), 300, 200);
 
-	gtk_box_pack_start (GTK_BOX (vbox), textview_sw, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->textview), TRUE, TRUE, 0);	
 	gtk_box_pack_start (GTK_BOX (vbox), priv->attachview_sw, FALSE, TRUE, 0);
 
-	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (vbox));
+	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (textview_sw), 
+			GTK_WIDGET (vbox));
 
-	gtk_container_add (GTK_CONTAINER (textview_sw), GTK_WIDGET (priv->textview));
 	gtk_container_add (GTK_CONTAINER (priv->attachview_sw), GTK_WIDGET (priv->attachview));
+	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (textview_sw));
+
 
 	gtk_widget_show (GTK_WIDGET (vbox));
 	gtk_widget_show (GTK_WIDGET (textview_sw));
 
+	gtk_widget_show (GTK_WIDGET (priv->headerview));
 	gtk_widget_show (GTK_WIDGET (priv->textview));
 	gtk_widget_show (GTK_WIDGET (priv->attachview));
 

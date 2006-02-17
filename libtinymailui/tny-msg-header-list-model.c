@@ -124,7 +124,7 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 }
 
 static gchar *
-get_readable_date (const time_t file_time_raw)
+_get_readable_date (const time_t file_time_raw)
 {
 	struct tm *file_time;
 	static gchar readable_date[64];
@@ -160,12 +160,12 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		case TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
 			g_value_set_string (value, 
-				get_readable_date (tny_msg_header_iface_get_date_sent (header)));
+				_get_readable_date (tny_msg_header_iface_get_date_sent (header)));
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
 			g_value_set_string (value, 
-			get_readable_date (tny_msg_header_iface_get_date_received (header)));
+				_get_readable_date (tny_msg_header_iface_get_date_received (header)));
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_POINTER);
