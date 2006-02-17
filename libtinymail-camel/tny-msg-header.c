@@ -65,10 +65,6 @@ struct _TnyMsgHeaderClass
 	GObjectClass parent_class;
 };
 
-/* TODO: Remove debugging purpose */
-static gint allocations=0;
-
-
 static void
 tny_msg_header_set_camel_message_info_priv  (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
 {
@@ -82,13 +78,7 @@ static void
 unload_msg_header (TnyMsgHeader *self)
 {
 	if (self->message_info) 
-	{
 		camel_message_info_free (self->message_info);
-
-		/* TODO: Remove debugging purpose */
-		allocations--;
-		g_print ("Deallocation. Current = %d\n", allocations);
-	}
 
 	self->message_info = NULL;
 
@@ -104,10 +94,6 @@ load_msg_header (TnyMsgHeader *self)
 		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, self->uid);
 
 		tny_msg_header_set_camel_message_info_priv (self, msginfo);
-
-		/* TODO: Remove debugging purpose */
-		allocations++;
-		g_print ("Allocation. Current = %d\n", allocations);
 	}
 
 	return;
