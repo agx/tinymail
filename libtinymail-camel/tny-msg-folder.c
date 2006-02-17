@@ -140,12 +140,22 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyAccountIface *acco
 	return;
 }
 
+typedef struct 
+{ /* This is a speedup trick */
+	TnyMsgFolderIface *self;
+	TnyMsgFolderPriv *priv;
+} FldAndPriv;
+
 static void
 add_message_with_uid (gpointer data, gpointer user_data)
 {
+	FldAndPriv *ptr = user_data;
 	const char *uid = (const char*)data;
-	TnyMsgFolderIface *self = user_data;
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
+	/* Unpack speedup trick */
+	TnyMsgFolderIface *self = ptr->self;
+	TnyMsgFolderPriv *priv = ptr->priv;
+
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	tny_msg_header_iface_set_folder (header, self);
@@ -175,12 +185,20 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 	{
 		GPtrArray *uids = NULL;
 		CamelException ex;
+		FldAndPriv *ptr = g_new (FldAndPriv, 1);
+
+		/* Prepare speedup trick */
+		ptr->self = self;
+		ptr->priv = priv;
 
 		camel_folder_refresh_info (priv->folder, &ex);
 		uids = camel_folder_get_uids (priv->folder);
 
 		priv->cached_length = 0;
-		g_ptr_array_foreach (uids, add_message_with_uid, self);
+		g_ptr_array_foreach (uids, add_message_with_uid, ptr);
+
+		/* Cleanup speedup trick */
+		g_free (ptr);
 
 		/* Speedup trick, also check tny-msg-header.c */
 		priv->cached_uids = uids;
