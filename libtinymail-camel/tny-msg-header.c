@@ -317,11 +317,6 @@ tny_msg_header_class_init (TnyMsgHeaderClass *class)
 	return;
 }
 
-static void
-tny_msg_header_instance_init (GTypeInstance *instance, gpointer g_class)
-{
-	return;
-}
 
 GType 
 tny_msg_header_get_type (void)
@@ -340,7 +335,7 @@ tny_msg_header_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyMsgHeader),
 		  0,      /* n_preallocs */
-		  tny_msg_header_instance_init    /* instance_init */
+		  NULL    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_msg_header_iface_info = 
