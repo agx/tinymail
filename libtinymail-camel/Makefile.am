@@ -1,4 +1,4 @@
-INCLUDES = $(LIBTINYMAILCAMEL_CFLAGS) -I.	\
+INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS) -I.	\
 	-I$(top_builddir)/libtinymail
 
 lib_LTLIBRARIES = libtinymail-camel-1.0.la 
@@ -29,7 +29,7 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-session-camel.c
 
 libtinymail_camel_1_0_la_LIBADD =		\
-	$(LIBTINYMAILCAMEL_LIBS)		\
+	$(LIBTINYMAIL_CAMEL_LIBS)		\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
 
 libtinymail_camel_1_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
