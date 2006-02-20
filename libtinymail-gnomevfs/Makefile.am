@@ -4,11 +4,11 @@ INCLUDES = $(LIBTINYMAIL_GNOMEVFS_CFLAGS) -I.	\
 lib_LTLIBRARIES = libtinymail-gnomevfs-1.0.la 
 
 libtinymail_gnomevfs_1_0_headers =		\
-	tny-stream-gnomevfs.h
+	tny-vfs-stream.h
 
 libtinymail_gnomevfs_1_0_la_SOURCES = 		\
 	$(libtinymail_gnomevfs_1_0_headers)	\
-	tny-stream-gnomevfs.c
+	tny-vfs-stream.c
 
 libtinymail_gnomevfs_1_0_la_LIBADD =		\
 	$(LIBTINYMAIL_GNOMEVFS_LIBS)		\
