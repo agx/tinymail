@@ -245,7 +245,7 @@ tny_vfs_stream_close (TnyStreamIface *self)
 		return -1;
 	}
 
-	res = gnome_vfs_close(priv->handle);
+	res = gnome_vfs_close (priv->handle);
 
 	priv->handle = NULL;
 
