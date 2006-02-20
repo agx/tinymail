@@ -25,15 +25,20 @@ PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_LIBS)
 
+PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.8 gobject-2.0)
+AC_SUBST(LIBTINYMAILUI_CFLAGS)
+AC_SUBST(LIBTINYMAILUI_LIBS)
+
 PKG_CHECK_MODULES(LIBTINYMAILCAMEL, glib-2.0 >= 2.8 gobject-2.0 camel-1.2 camel-provider-1.2)
 AC_SUBST(LIBTINYMAILCAMEL_CFLAGS)
 AC_SUBST(LIBTINYMAILCAMEL_LIBS)
 
 dnl gnomeui-2 is for gnome_icon_lookup :-\
 
-PKG_CHECK_MODULES(LIBTINYMAILUI, libgnomeui-2.0 gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0)
-AC_SUBST(LIBTINYMAILUI_CFLAGS)
-AC_SUBST(LIBTINYMAILUI_LIBS)
+PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, libgnomeui-2.0 gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0)
+AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
+AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
+
 
 PKG_CHECK_MODULES(TINYMAIL, gconf-2.0 gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(TINYMAIL_CFLAGS)
@@ -51,6 +56,8 @@ libtinymail-camel/Makefile
 libtinymail-camel/libtinymail-camel.pc
 libtinymailui/Makefile
 libtinymailui/libtinymailui.pc
+libtinymailui-gtk/Makefile
+libtinymailui-gtk/libtinymailui-gtk.pc
 tinymail/Makefile
 ])
 

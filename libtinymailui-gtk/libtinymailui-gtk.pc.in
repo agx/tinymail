@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+satmode_serverdir=@libexecdir@
+
+Name: libtinymailui-gtk
+Description: TinyMail UI Gtk+ components library
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -ltinymailui-gtk-@API_VERSION@
+Cflags: -I${includedir}/libtinymailui-gtk-@API_VERSION@

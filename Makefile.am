@@ -1,1 +1,1 @@
-SUBDIRS = libtinymail libtinymail-camel libtinymailui tinymail
+SUBDIRS = libtinymail libtinymail-camel libtinymailui libtinymailui-gtk tinymail
