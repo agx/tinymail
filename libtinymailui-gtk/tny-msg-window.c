@@ -337,7 +337,7 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_container_set_border_width (GTK_CONTAINER (self), 8);
 
-	gtk_window_set_default_size (GTK_WINDOW (self), 300, 200);
+	gtk_window_set_default_size (GTK_WINDOW (self), 640, 480);
 
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->textview), TRUE, TRUE, 0);	
