@@ -22,6 +22,10 @@
 #include <tny-msg-window.h>
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
+#include <tny-vfs-stream.h>
+
+#include <libgnomevfs/gnome-vfs.h>
+#include <libgnomevfs/gnome-vfs-utils.h>
 
 #include "tny-attach-list-model-priv.h"
 
@@ -133,6 +137,123 @@ reload_msg (TnyMsgWindowIface *self)
 	return;
 }
 
+static GnomeVFSResult
+save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
+{
+	GnomeVFSResult result;
+	GnomeVFSHandle *handle;
+	TnyVfsStream *stream = NULL;
+
+	result = gnome_vfs_create (&handle, uri, 
+		GNOME_VFS_OPEN_WRITE, FALSE, 0777);
+
+	if (result != GNOME_VFS_OK)
+		return result;
+
+	stream = tny_vfs_stream_new (handle);
+	tny_msg_mime_part_iface_write_to_stream (part, TNY_STREAM_IFACE (stream));
+
+	/* This also closes the gnome-vfs handle */
+	g_object_unref (G_OBJECT (stream));
+
+	return result;
+}
+
+static void
+for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointer user_data)
+{
+	TnyMsgWindow *self = user_data;
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+	GtkTreeModel *model = gtk_icon_view_get_model (icon_view);
+	GtkTreeIter iter;
+
+	if (gtk_tree_model_get_iter(model, &iter, path))
+	{
+		TnyMsgMimePartIface *part;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
+			&part, -1);
+
+		if (part)
+		{
+		
+			GtkFileChooserDialog *dialog = GTK_FILE_CHOOSER_DIALOG 
+				(gtk_file_chooser_dialog_new ("Save File",
+				GTK_WINDOW (self), GTK_FILE_CHOOSER_ACTION_SAVE,
+				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, 
+				GTK_RESPONSE_ACCEPT, NULL));
+		
+			gtk_file_chooser_set_do_overwrite_confirmation 
+				(GTK_FILE_CHOOSER (dialog), TRUE);
+		
+			gtk_file_chooser_set_current_folder 
+				(GTK_FILE_CHOOSER (dialog), g_get_home_dir ());
+
+			gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (dialog), 
+				tny_msg_mime_part_iface_get_filename (part));
+
+			if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+			{
+				gchar *uri;
+		
+				uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (dialog));
+
+				if (uri)
+				{
+					save_to_file (uri, part);
+					g_free (uri);
+				}
+			}
+		
+			gtk_widget_destroy (GTK_WIDGET (dialog));
+		}
+	}
+
+	return;
+}
+
+
+static void
+tny_msg_window_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
+{
+	TnyMsgWindow *self = user_data;
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+
+	gtk_icon_view_selected_foreach (priv->attachview,
+		for_each_selected_attachment, self);
+
+	return;
+}
+
+
+
+static gint
+tny_msg_window_popup_handler (GtkWidget *widget, GdkEvent *event)
+{
+	GtkMenu *menu;
+	GdkEventButton *event_button;
+	
+	g_return_val_if_fail (widget != NULL, FALSE);
+	g_return_val_if_fail (GTK_IS_MENU (widget), FALSE);
+	g_return_val_if_fail (event != NULL, FALSE);
+	
+	menu = GTK_MENU (widget);
+	
+	if (event->type == GDK_BUTTON_PRESS)
+	{
+	  event_button = (GdkEventButton *) event;
+	  if (event_button->button == 3)
+		{
+			gtk_menu_popup (menu, NULL, NULL, NULL, NULL, 
+					  event_button->button, event_button->time);
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
 static void 
 tny_msg_window_set_msg (TnyMsgWindowIface *self, TnyMsgIface *msg)
 {
@@ -167,6 +288,15 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *textview_sw = gtk_scrolled_window_new (NULL, NULL);
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
 	GtkTreeModel *model = GTK_TREE_MODEL (tny_attach_list_model_new());
+	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
+	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
+	
+	gtk_widget_show (mitem);
+
+	g_signal_connect (G_OBJECT (mitem), "activate", 
+		G_CALLBACK (tny_msg_window_save_as_activated), self);
+
+	gtk_menu_shell_append (GTK_MENU_SHELL (menu), mitem);
 
 	priv->attachview_sw = gtk_scrolled_window_new (NULL, NULL);
 
@@ -181,6 +311,11 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->attachview = GTK_ICON_VIEW (gtk_icon_view_new_with_model (model));
 
+	gtk_icon_view_set_selection_mode (priv->attachview, GTK_SELECTION_SINGLE);
+
+	g_signal_connect_swapped (G_OBJECT (priv->attachview), "button_press_event",
+		G_CALLBACK (tny_msg_window_popup_handler), menu);
+
 	_tny_attach_list_model_set_screen (TNY_ATTACH_LIST_MODEL (model),
 		gtk_widget_get_screen (GTK_WIDGET (priv->attachview)));
 
@@ -191,7 +326,7 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 		TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN);
 
 	gtk_icon_view_set_columns (priv->attachview, -1);
-	gtk_icon_view_set_item_width (priv->attachview, -1);
+	gtk_icon_view_set_item_width (priv->attachview, 100);
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
 	priv->headerview = GTK_TEXT_VIEW (gtk_text_view_new ());

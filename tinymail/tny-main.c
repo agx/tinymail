@@ -24,6 +24,9 @@
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 
+#include <libgnomevfs/gnome-vfs.h>
+#include <libgnomevfs/gnome-vfs-utils.h>
+
 int 
 main (int argc, char **argv)
 {
@@ -31,6 +34,8 @@ main (int argc, char **argv)
 
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
+
+	gnome_vfs_init ();
 
 	window = GTK_WINDOW (tny_summary_window_new ());
 
