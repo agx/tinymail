@@ -286,7 +286,7 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgWindow *self = (TnyMsgWindow *)instance;
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 	GtkWidget *textview_sw = gtk_scrolled_window_new (NULL, NULL);
-	GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
+	GtkWidget *vbox = gtk_vbox_new (FALSE, 1);
 	GtkTreeModel *model = GTK_TREE_MODEL (tny_attach_list_model_new());
 	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
