@@ -1,6 +1,7 @@
 INCLUDES = \
-	$(LIBTINYMAILUI_GTK_CFLAGS)	\
-	-I$(top_builddir)/libtinymail   \
+	$(LIBTINYMAILUI_GTK_CFLAGS)	         \
+	-I$(top_builddir)/libtinymail            \
+	-I$(top_builddir)/libtinymail-gnomevfs   \
 	-I$(top_builddir)/libtinymailui
 
 lib_LTLIBRARIES = libtinymailui-gtk-1.0.la
@@ -23,7 +24,8 @@ libtinymailui_gtk_1_0_la_SOURCES = 	\
 
 libtinymailui_gtk_1_0_la_LIBADD = 	\
 	$(LIBTINYMAILUI_GTK_LIBS)	\
-	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la                   \
+	$(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la
 
 libtinymailuigtkincludedir = $(includedir)/libtinymailui-gtk-$(API_VERSION)

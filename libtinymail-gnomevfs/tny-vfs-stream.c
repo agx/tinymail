@@ -325,12 +325,9 @@ tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 
 	if (priv->handle)
-		g_object_unref (G_OBJECT (priv->handle));
+		gnome_vfs_close (priv->handle);
 
-	g_object_ref (G_OBJECT (handle));
 	priv->handle = handle;
-
-	tny_vfs_stream_reset_priv (priv);
 
 	return;
 }
