@@ -7,6 +7,7 @@ INCLUDES = \
 lib_LTLIBRARIES = libtinymailui-gtk-1.0.la
 
 libtinymailui_gtk_1_0_headers = 	\
+	tny-msg-view.h			\
 	tny-msg-window.h		\
 	tny-msg-header-list-model.h	\
 	tny-account-tree-model.h	\
@@ -15,6 +16,7 @@ libtinymailui_gtk_1_0_headers = 	\
 
 libtinymailui_gtk_1_0_la_SOURCES = 	\
 	$(libtinymailui_gtk_1_0_headers)\
+	tny-msg-view.c			\
 	tny-msg-window.c		\
 	tny-msg-header-list-model.c	\
 	tny-account-tree-model.c	\
