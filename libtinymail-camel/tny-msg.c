@@ -168,7 +168,8 @@ tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 static void 
 destroy_part (gpointer data, gpointer user_data)
 {
-	g_object_unref (G_OBJECT (data));
+	if (data)
+		g_object_unref (G_OBJECT (data));
 
 	return;
 }
@@ -182,15 +183,17 @@ tny_msg_finalize (GObject *object)
 	if (priv->header)
 		g_object_unref (G_OBJECT (priv->header));
 
+	priv->header = NULL;
+
 	if (priv->parts) 
 	{
 		g_list_foreach (priv->parts, 
 			destroy_part, NULL);
 
 		g_list_free (priv->parts);
-
-		priv->parts = NULL;
 	}
+
+	priv->parts = NULL;
 
 	return;
 }

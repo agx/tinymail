@@ -77,9 +77,6 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_widget_hide (priv->attachview_sw);
 
-	gtk_text_buffer_create_tag (headerbuffer, "bold", 
-			"weight", PANGO_WEIGHT_BOLD, NULL);
-
 	gtk_text_buffer_set_text (headerbuffer, "", 0);
 
 	gtk_text_buffer_get_start_iter (headerbuffer, &hiter);
@@ -303,7 +300,8 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 1);
 	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
-	
+	GtkTextBuffer *headerbuffer;
+
 	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 
@@ -343,6 +341,12 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
 	priv->headerview = GTK_TEXT_VIEW (gtk_text_view_new ());
+
+	headerbuffer = gtk_text_view_get_buffer (priv->headerview);
+
+	gtk_text_buffer_create_tag (headerbuffer, "bold", 
+			"weight", PANGO_WEIGHT_BOLD, NULL);
+
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 
 	gtk_text_view_set_editable (priv->headerview, FALSE);
