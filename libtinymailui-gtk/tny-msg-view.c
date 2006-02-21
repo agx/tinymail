@@ -72,9 +72,8 @@ reload_msg (TnyMsgViewIface *self)
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
 	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
 	const gchar *str = NULL;
-
-	TnyAttachListModel *model = TNY_ATTACH_LIST_MODEL 
-			(gtk_icon_view_get_model (priv->attachview));
+	gboolean first_attach = TRUE;
+	TnyAttachListModel *model;
 
 	gtk_widget_hide (priv->attachview_sw);
 
@@ -125,13 +124,25 @@ reload_msg (TnyMsgViewIface *self)
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
 			tny_msg_mime_part_iface_get_filename (part))
 		{
+			if (first_attach)
+			{
+				model = tny_attach_list_model_new ();
+				_tny_attach_list_model_set_screen (model,
+					gtk_widget_get_screen (GTK_WIDGET (priv->attachview)));
+			}
+
 			tny_attach_list_model_add (model, part);
-			gtk_widget_show (priv->attachview_sw);
+			first_attach = FALSE;
 		}
 
 		parts = g_list_next (parts);
 	}
 
+	if (!first_attach)
+	{
+		gtk_icon_view_set_model (priv->attachview, GTK_TREE_MODEL (model));
+		gtk_widget_show (priv->attachview_sw);
+	}
 
 	return;
 }
@@ -290,7 +301,6 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgView *self = (TnyMsgView *)instance;
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 1);
-	GtkTreeModel *model = GTK_TREE_MODEL (tny_attach_list_model_new());
 	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
 	
@@ -316,15 +326,12 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (priv->attachview_sw),
 			GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-	priv->attachview = GTK_ICON_VIEW (gtk_icon_view_new_with_model (model));
+	priv->attachview = GTK_ICON_VIEW (gtk_icon_view_new ());
 
 	gtk_icon_view_set_selection_mode (priv->attachview, GTK_SELECTION_SINGLE);
 
 	g_signal_connect_swapped (G_OBJECT (priv->attachview), "button_press_event",
 		G_CALLBACK (tny_msg_view_popup_handler), menu);
-
-	_tny_attach_list_model_set_screen (TNY_ATTACH_LIST_MODEL (model),
-		gtk_widget_get_screen (GTK_WIDGET (priv->attachview)));
 
 	gtk_icon_view_set_text_column (priv->attachview, 
 		TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN);
