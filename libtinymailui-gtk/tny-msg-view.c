@@ -317,12 +317,11 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->attachview_sw = gtk_scrolled_window_new (NULL, NULL);
 
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (self), 
-			GTK_SHADOW_ETCHED_IN);
-
+			GTK_SHADOW_NONE);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (priv->attachview_sw), 
-			GTK_SHADOW_ETCHED_IN);
+			GTK_SHADOW_NONE);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (priv->attachview_sw),
 			GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
@@ -349,8 +348,6 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_text_view_set_editable (priv->headerview, FALSE);
 	gtk_text_view_set_editable (priv->textview, FALSE);
 
-	gtk_container_set_border_width (GTK_CONTAINER (self), 8);
-
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->textview), TRUE, TRUE, 0);	
 	gtk_box_pack_start (GTK_BOX (vbox), priv->attachview_sw, FALSE, TRUE, 0);
@@ -359,7 +356,6 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 			GTK_WIDGET (vbox));
 
 	gtk_container_add (GTK_CONTAINER (priv->attachview_sw), GTK_WIDGET (priv->attachview));
-
 
 	gtk_widget_show (GTK_WIDGET (vbox));
 

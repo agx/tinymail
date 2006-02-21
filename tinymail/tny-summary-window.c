@@ -260,12 +260,10 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkTreeModel *mailbox_model;
 	GtkTreeSelection *select;
 	gint t = 0, i = 0;
-
 	GtkWidget *hpaned1;
 	GtkWidget *vpaned1;
-	
-	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_msg_view_new ());
-	gtk_widget_show (GTK_WIDGET (priv->msg_view));
+
+	/* TODO: Persist application UI status (of the panes) */
 
 	hpaned1 = gtk_hpaned_new ();
 	gtk_widget_show (hpaned1);
@@ -273,12 +271,15 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 		
 	vpaned1 = gtk_vpaned_new ();
 	gtk_widget_show (vpaned1);
-		
+	
+
+	/* TODO: Only if visible */
+	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_msg_view_new ());
+	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
 
 	gtk_window_set_title (window, "Tinymail");
 	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
-	
 
 
 	mailbox_sw = gtk_scrolled_window_new (NULL, NULL);
@@ -292,11 +293,13 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (header_sw), 
 			GTK_SHADOW_ETCHED_IN);
+
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (header_sw),
 			GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (mailbox_sw),
 		GTK_SHADOW_ETCHED_IN);
+
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (mailbox_sw),
 		                        GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	
@@ -314,6 +317,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_container_add (GTK_CONTAINER (header_sw), GTK_WIDGET (priv->header_view));
 	gtk_container_add (GTK_CONTAINER (mailbox_sw), GTK_WIDGET (priv->mailbox_view));
 
+
+	/* TODO: Persist application UI status */
 	/* mailbox_view columns */
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
@@ -330,26 +335,26 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
 
-
+	/* TODO: Persist application UI status */
 	/* header_view columns */
-	
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("From", renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
-	gtk_tree_view_column_set_fixed_width (column, 200);
-
-	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
-	
-	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes ("To", renderer,
-		"text", TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN);			  
-	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 100);
-
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
+
+	if (FALSE)
+	{
+		renderer = gtk_cell_renderer_text_new ();
+		column = gtk_tree_view_column_new_with_attributes ("To", renderer,
+			"text", TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN, NULL);
+		gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN);			  
+		gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
+		gtk_tree_view_column_set_fixed_width (column, 100);
+		gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
+	}
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Subject", renderer,
@@ -357,7 +362,6 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
-
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
 
@@ -367,30 +371,25 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN);
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 100);
-
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
 
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->mailbox_view));
-
-
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_mailbox_view_tree_selection_changed), priv->header_view);
 
+
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
-
 	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
 		G_CALLBACK (on_header_view_tree_row_activated), priv->header_view);
-
-	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
-
 	g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_header_view_tree_selection_changed), self);
 
-	gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
 
+	/* TODO: Persist application UI status */
+	gtk_window_set_default_size (GTK_WINDOW (window), 640, 480);
 
 	return;
 }
