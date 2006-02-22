@@ -44,10 +44,6 @@
 
   <reference>
     <title>API Reference</title>
-  </reference>
-
-  <index>
-    <title>Index</title>
 	&libtinymail-TnyAccountStoreIface;
 	&libtinymail-TnyMsgFolderIface;
 	&libtinymail-TnyMsgMimePartIface;
@@ -80,7 +76,10 @@
 	&libtinymail-TnyStreamCamel;
 
 	&libtinymail-TnyVfsStream;
+  </reference>
 
+  <index>
+    <title>Index</title>
   </index>
   
 </book>
