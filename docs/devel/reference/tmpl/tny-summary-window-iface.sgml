@@ -2,7 +2,7 @@
 TnySummaryWindowIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An interfaces that defines a summary window type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

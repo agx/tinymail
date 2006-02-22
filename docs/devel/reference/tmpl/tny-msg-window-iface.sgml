@@ -2,7 +2,7 @@
 TnyMsgWindowIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An implementation that defines a message window type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

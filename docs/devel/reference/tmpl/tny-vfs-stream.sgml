@@ -2,7 +2,7 @@
 TnyVfsStream
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An adaptor between #TnyStreamIface and #GnomeVFSHandle
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

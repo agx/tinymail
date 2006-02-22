@@ -2,11 +2,13 @@
 tny-msg-header-list-model
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #GtkTreeModel suitable for storing #TnyMsgHeaderIface instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+This #GtkTreeModel will attempt to uncache #TnyMsgHeaderIface instances
+that are implemented as a proxy for real header instances once their
+corresponding row in the #GtkTreeView become invisible.
 </para>
 
 

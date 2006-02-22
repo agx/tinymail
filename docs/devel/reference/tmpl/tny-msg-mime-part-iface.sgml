@@ -2,7 +2,7 @@
 TnyMsgMimePartIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An interfaces that defines a mime part type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

@@ -2,7 +2,7 @@
 TnySessionCamel
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A session singleton type for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

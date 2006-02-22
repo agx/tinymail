@@ -2,11 +2,11 @@
 TnyAccountIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An interface that defines an account type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+An account contains the folders of an E-mail service and handles the authentication with a service.
 </para>
 
 

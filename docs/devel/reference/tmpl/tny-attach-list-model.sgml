@@ -2,11 +2,13 @@
 TnyAttachListModel
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #GtkTreeModel suitable for storing #TnyMsgMimePartIface instaces
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #GtkTreeModel suitable for storing #TnyMsgMimePartIface instaces. It
+inherits from a #GtkListStore and handles the mime-type icon of the
+icon column automatically.
 </para>
 
 

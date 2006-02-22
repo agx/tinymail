@@ -2,7 +2,7 @@
 TnyMsgFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #TnyFolderIface implementation as a proxy for #CamelFolder
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

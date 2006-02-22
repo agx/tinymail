@@ -2,11 +2,13 @@
 TnyAccountStoreIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An interface that defines an account store type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+An account store is an observable and factory that can deliver
+configured accounts and that will update its observers on changes that
+happen to the accounts.
 </para>
 
 

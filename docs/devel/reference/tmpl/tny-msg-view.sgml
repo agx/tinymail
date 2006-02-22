@@ -2,7 +2,7 @@
 TnyMsgView
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An implementation of #TnyMsgViewIface for Gtk+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

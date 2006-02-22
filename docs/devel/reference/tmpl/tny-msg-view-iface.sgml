@@ -2,7 +2,7 @@
 TnyMsgViewIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An interfaces that defines a message view type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

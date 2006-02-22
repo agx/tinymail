@@ -2,7 +2,7 @@
 TnyMsg
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An implementation of #TnyMsgIface that plays proxy for #CamelMimeMessage
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

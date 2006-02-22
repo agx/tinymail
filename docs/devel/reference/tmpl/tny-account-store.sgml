@@ -6,7 +6,7 @@ A store with accounts that uses libtinymail-camel and GConf
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-An implementation if #TnyAccountStoreIface with accounts that uses libtinymail-camel and GConf.
+An implementation of #TnyAccountStoreIface that uses libtinymail-camel and GConf.
 </para>
 
 

@@ -2,7 +2,7 @@
 TnyMsgWindow
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An implementation of #TnyMsgWindowIface for Gtk+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

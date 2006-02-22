@@ -2,7 +2,7 @@
 TnyTextBufferStream
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An adaptor between #TnyStreamIface and #GtkTextBuffer
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

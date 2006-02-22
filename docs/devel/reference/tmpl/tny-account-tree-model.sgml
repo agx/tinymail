@@ -2,11 +2,13 @@
 TnyAccountTreeModel
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #GtkTreeModel suitable for storing #TnyAccountIface instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #GtkTreeModel suitable for storing #TnyAccountIface instances. It's
+implementing using a simple #GtkTreeStore and recursively walks the
+folders of account instances that get added.
 </para>
 
 

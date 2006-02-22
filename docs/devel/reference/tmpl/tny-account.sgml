@@ -6,13 +6,13 @@ TnyAccount
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A account type implemented for Camel
 </para>
 
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountIface
 </para>
 
 

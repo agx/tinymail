@@ -2,7 +2,7 @@
 TnySummaryWindow
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An implementation of #TnySummaryWindowIface for Gtk+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

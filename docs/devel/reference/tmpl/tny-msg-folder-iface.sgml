@@ -2,11 +2,12 @@
 TnyMsgFolderIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An interface that defines a folder type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A folder type contains both headers and children folders. 
+A folder can have a account or another folder as parent.
 </para>
 
 

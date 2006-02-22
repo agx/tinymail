@@ -2,7 +2,7 @@
 TnyMsgMimePart
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An implementation of #TnyMsgMimePartIface that plays proxy for a #CamelMimePart
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

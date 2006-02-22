@@ -2,11 +2,11 @@
 TnyCamelStream
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #CamelStream as a proxy for a #TnyStreamIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #CamelStream as a proxy for a #TnyStreamIface
 </para>
 
 
