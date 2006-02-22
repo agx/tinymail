@@ -52,7 +52,6 @@ tny_account_store_iface_get_accounts (TnyAccountStoreIface *self)
  * 
  * Add an account to the store
  * 
- * Return value: 
  **/
 void
 tny_account_store_iface_add_account (TnyAccountStoreIface *self, TnyAccountIface *account)

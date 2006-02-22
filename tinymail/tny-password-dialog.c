@@ -38,8 +38,7 @@ struct _TnyPasswordDialogPriv
  * tny_password_dialog_set_prompt:
  * @self: A #TnyPasswordDialog object
  * @prompt: The prompt to set
- *
- * Return value: 
+ * 
  **/
 void
 tny_password_dialog_set_prompt (TnyPasswordDialog *self, const gchar *prompt)

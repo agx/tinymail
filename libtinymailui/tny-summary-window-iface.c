@@ -22,11 +22,10 @@
 /**
  * tny_summary_window_iface_set_account_store:
  * @self: A #TnySummaryWindowIface instance
- * @account: A #TnyAccountStoreIface instace
+ * @account_store: A #TnyAccountStoreIface instace
  *
  * Set the account store (summary window is an observer of it)
  * 
- * Return value: 
  **/
 void
 tny_summary_window_iface_set_account_store (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store)

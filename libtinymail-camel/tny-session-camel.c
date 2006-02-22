@@ -61,7 +61,7 @@ typedef struct
  * tny_session_camel_set_forget_pass_func:
  * @self: a #TnySessionCamel object
  * @account: the #TnyAccountIface account instance
- * @forget_pass_func: The function that will forget the password for the account
+ * @get_forget_pass_func: The function that will forget the password for the account
  *
  * For each account you can set a password handler. This makes it possible to
  * use your own password-store implementation for storing passwords. You set
@@ -70,7 +70,6 @@ typedef struct
  * It's recommended to also memset (buffer, 0, len) the memory where the
  * password was stored. You can do it in the forget_pass_func handler.
  *
- * Return value: 
  **/
 void
 tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *account, ForgetPassFunc get_forget_pass_func)
@@ -132,7 +131,6 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
  * use your own password-store implementation for storing passwords. You set
  * that password handler method using this method.
  *
- * Return value: 
  **/
 void
 tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account, GetPassFunc get_pass_func)

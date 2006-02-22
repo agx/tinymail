@@ -27,7 +27,6 @@
  * 
  * Set the index of a message part
  *
- * Return value: 
  **/
 void
 tny_msg_mime_part_iface_set_index (TnyMsgMimePartIface *self, guint index)
@@ -111,7 +110,6 @@ tny_msg_mime_part_iface_get_content_location (TnyMsgMimePartIface *self)
  * of the part in memory, but in stead will read from the part and write to the
  * stream efficiently.
  *
- * Return value: 
  **/
 void
 tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)

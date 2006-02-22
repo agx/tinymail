@@ -65,7 +65,6 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
  *
  * Add an account to the list model
  *
- * Return value: 
  **/
 void
 tny_account_tree_model_add (TnyAccountTreeModel *self, TnyAccountIface *account)

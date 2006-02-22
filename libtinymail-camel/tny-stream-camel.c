@@ -137,7 +137,6 @@ tny_stream_camel_reset (TnyStreamIface *self)
  *
  * Set the stream to play proxy for
  *
- * Return value:
  **/
 void
 tny_stream_camel_set_stream (TnyStreamCamel *self, CamelStream *stream)

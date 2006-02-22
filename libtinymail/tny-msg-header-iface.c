@@ -157,7 +157,6 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
  * 
  * Set the reference to the parent folder where this message header is located
  * 
- * Return value: 
  **/
 void
 tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
@@ -172,7 +171,6 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
  * @id: an unique follow-up uid
  * 
  *
- * Return value: 
  **/
 void
 tny_msg_header_iface_set_uid (TnyMsgHeaderIface *self, const gchar *id)
@@ -188,7 +186,6 @@ tny_msg_header_iface_set_uid (TnyMsgHeaderIface *self, const gchar *id)
  * 
  * If it's possible to uncache this instance, uncache it
  * 
- * Return value: 
  **/
 void
 tny_msg_header_iface_uncache (TnyMsgHeaderIface *self)

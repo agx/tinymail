@@ -149,7 +149,6 @@ tny_text_buffer_stream_reset (TnyStreamIface *self)
  *
  * Set the #GtkTextBuffer to play adaptor for
  *
- * Return value: 
  **/
 void
 tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer *buffer)

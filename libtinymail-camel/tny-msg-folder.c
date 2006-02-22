@@ -338,7 +338,6 @@ tny_msg_folder_set_name (TnyMsgFolderIface *self, const gchar *name)
  * @self: A #TnyMsgFolder object
  * @camel_folder: The #CamelFolder instance to play proxy for
  *
- * Return value:
  **/
 void
 tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)

@@ -51,7 +51,6 @@ _tny_attach_list_model_set_screen (TnyAttachListModel *self, GdkScreen *screen)
  *
  * Add a mime-part to the list model
  *
- * Return value: 
  **/
 void
 tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)

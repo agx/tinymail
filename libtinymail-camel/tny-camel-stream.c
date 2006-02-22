@@ -175,7 +175,6 @@ tny_camel_stream_get_type (void)
  *
  * Set the stream to play proxy for
  *
- * Return value:
  **/
 void
 tny_camel_stream_set_stream (TnyCamelStream *self, TnyStreamIface *stream)

@@ -39,7 +39,6 @@ tny_account_iface_get_id (TnyAccountIface *self)
  * 
  * Set the accounts unique id.
  * 
- * Return value: 
  **/
 void 
 tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
@@ -58,7 +57,6 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
  *
  * It's recommended to also memset (str, 0, strlen (str)) the memory.
  * 
- * Return value:
  **/
 void
 tny_account_iface_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forget_pass_func)
@@ -102,7 +100,6 @@ tny_account_iface_get_folders (TnyAccountIface *self)
  * 
  * Set the protocol of an account
  * 
- * Return value: 
  **/
 void
 tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
@@ -118,7 +115,6 @@ tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
  * 
  * Set the user or login of an account
  * 
- * Return value: 
  **/
 void
 tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
@@ -134,7 +130,6 @@ tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
  * 
  * Set the hostname of an account
  * 
- * Return value: 
  **/
 void
 tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
@@ -151,7 +146,6 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
  * Set the function that will be called when the password is needed.
  * The function must resturn a newly allocated string with the password.
  * 
- * Return value: 
  **/
 void
 tny_account_iface_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)

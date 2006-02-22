@@ -335,7 +335,6 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
  *
  * Set the folder where the #TnyMsgHeaderIface instances are located
  * 
- * Return value:
  **/
 void
 tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder)

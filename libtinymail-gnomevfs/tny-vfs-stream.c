@@ -326,7 +326,6 @@ tny_vfs_stream_tell (TnySeekableStream *stream)
  *
  * Set the #GnomeVFSHandle to play adaptor for
  *
- * Return value: 
  **/
 void
 tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)

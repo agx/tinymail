@@ -63,7 +63,6 @@ tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
  * 
  * Set the parent of this folder
  * 
- * Return value: 
  **/
 void
 tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account)
@@ -94,7 +93,6 @@ tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
  * 
  * Add a folder as child folder to the folder
  * 
- * Return value: 
  **/
 void
 tny_msg_folder_iface_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
@@ -169,7 +167,6 @@ tny_msg_folder_iface_get_name (TnyMsgFolderIface *self)
  * 
  * Set the unique id for this folder (unique per account)
  * 
- * Return value: 
  **/
 void
 tny_msg_folder_iface_set_id (TnyMsgFolderIface *self, const gchar *id)
@@ -185,7 +182,6 @@ tny_msg_folder_iface_set_id (TnyMsgFolderIface *self, const gchar *id)
  * 
  * Set the displayable name of this folder
  * 
- * Return value: 
  **/
 void
 tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name)
@@ -200,7 +196,6 @@ tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name)
  * 
  * If it's possible to uncache this instance, uncache it
  * 
- * Return value: 
  **/
 void
 tny_msg_folder_iface_uncache (TnyMsgFolderIface *self)

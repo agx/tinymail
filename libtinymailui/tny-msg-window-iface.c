@@ -26,7 +26,6 @@
  *
  * Set message to view in the window
  * 
- * Return value: 
  **/
 void
 tny_msg_window_iface_set_msg (TnyMsgWindowIface *self, TnyMsgIface *msg)

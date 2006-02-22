@@ -43,7 +43,6 @@ tny_msg_iface_get_folder (TnyMsgIface *self)
  *
  * * TODO: Make this private, or make it possible to move messages this way *
  *
- * Return value: Set parent folder of this message
  **/
 void
 tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
@@ -106,7 +105,6 @@ tny_msg_iface_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
  * 
  * Delete a mime-part from a message
  *
- * Return value: 
  **/
 void
 tny_msg_iface_del_part (TnyMsgIface *self, gint id)
@@ -123,7 +121,6 @@ tny_msg_iface_del_part (TnyMsgIface *self, gint id)
  * 
  * Set the header of a message
  *
- * Return value: 
  **/
 void
 tny_msg_iface_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)

@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+
+<!ENTITY libtinymail-TnyAccountIface SYSTEM "xml/tny-account-iface.xml">
+<!ENTITY libtinymail-TnyAccountStoreIface SYSTEM "xml/tny-account-store-iface.xml">
+<!ENTITY libtinymail-TnyAccountStore SYSTEM "xml/tny-account-store.xml">
+<!ENTITY libtinymail-TnyAccountTreeModel SYSTEM "xml/tny-account-tree-model.xml">
+<!ENTITY libtinymail-TnyAccount SYSTEM "xml/tny-account.xml">
+<!ENTITY libtinymail-TnyAttachListModel SYSTEM "xml/tny-attach-list-model.xml">
+<!ENTITY libtinymail-TnyCamelStream SYSTEM "xml/tny-camel-stream.xml">
+<!ENTITY libtinymail-TnyMsgFolderIface SYSTEM "xml/tny-msg-folder-iface.xml">
+<!ENTITY libtinymail-TnyMsgFolder SYSTEM "xml/tny-msg-folder.xml">
+<!ENTITY libtinymail-TnyMsgHeaderIface SYSTEM "xml/tny-msg-header-iface.xml">
+<!ENTITY libtinymail-TnyMsgHeaderListModel SYSTEM "xml/tny-msg-header-list-model.xml">
+<!ENTITY libtinymail-TnyMsgHeader SYSTEM "xml/tny-msg-header.xml">
+<!ENTITY libtinymail-TnyMsgIface SYSTEM "xml/tny-msg-iface.xml">
+<!ENTITY libtinymail-TnyMsgMimePartIface SYSTEM "xml/tny-msg-mime-part-iface.xml">
+<!ENTITY libtinymail-TnyMsgMimePart SYSTEM "xml/tny-msg-mime-part.xml">
+<!ENTITY libtinymail-TnyMsgViewIface SYSTEM "xml/tny-msg-view-iface.xml">
+<!ENTITY libtinymail-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
+<!ENTITY libtinymail-TnyMsgWindowIface SYSTEM "xml/tny-msg-window-iface.xml">
+<!ENTITY libtinymail-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
+<!ENTITY libtinymail-TnyMsg SYSTEM "xml/tny-msg.xml">
+<!ENTITY libtinymail-TnyPasswordDialog SYSTEM "xml/tny-password-dialog.xml">
+<!ENTITY libtinymail-TnySessionCamel SYSTEM "xml/tny-session-camel.xml">
+<!ENTITY libtinymail-TnyStreamCamel SYSTEM "xml/tny-stream-camel.xml">
+<!ENTITY libtinymail-TnyStreamIface SYSTEM "xml/tny-stream-iface.xml">
+<!ENTITY libtinymail-TnySummaryWindowIface SYSTEM "xml/tny-summary-window-iface.xml">
+<!ENTITY libtinymail-TnySummaryWindow SYSTEM "xml/tny-summary-window.xml">
+<!ENTITY libtinymail-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
+<!ENTITY libtinymail-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
+
+]>
+<book id="index">
+  <bookinfo>
+    <title>libtinymail Reference Manual</title>
+  </bookinfo>
+
+  <preface>
+    <title>Introduction</title>
+    <para>libtinymail is a library</para>
+  </preface>
+
+  <reference>
+    <title>API Reference</title>
+  </reference>
+
+  <index>
+    <title>Index</title>
+	&libtinymail-TnyAccountStoreIface;
+	&libtinymail-TnyMsgFolderIface;
+	&libtinymail-TnyMsgMimePartIface;
+	&libtinymail-TnyStreamIface;
+	&libtinymail-TnyAccountIface;
+	&libtinymail-TnyMsgIface;
+	&libtinymail-TnyMsgHeaderIface;
+
+	&libtinymail-TnySummaryWindowIface;
+	&libtinymail-TnyMsgViewIface;
+	&libtinymail-TnyMsgWindowIface;
+
+	&libtinymail-TnyMsgView;
+	&libtinymail-TnyMsgWindow;
+	&libtinymail-TnyAccountTreeModel;
+	&libtinymail-TnyMsgHeaderListModel;
+	&libtinymail-TnyAttachListModel;
+	&libtinymail-TnyTextBufferStream;
+	&libtinymail-TnySummaryWindow;
+	&libtinymail-TnyPasswordDialog;
+
+	&libtinymail-TnyAccountStore;
+	&libtinymail-TnyAccount;
+	&libtinymail-TnyCamelStream;
+	&libtinymail-TnyMsgFolder;
+	&libtinymail-TnyMsgHeader;
+	&libtinymail-TnyMsgMimePart;
+	&libtinymail-TnyMsg;
+	&libtinymail-TnySessionCamel;
+	&libtinymail-TnyStreamCamel;
+
+	&libtinymail-TnyVfsStream;
+
+  </index>
+  
+</book>
+

@@ -23,6 +23,8 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
+GTK_DOC_CHECK([1.0])
+
 PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_LIBS)
@@ -55,6 +57,9 @@ AC_SUBST(BINDIR)
 
 AC_OUTPUT([
 Makefile
+doc/Makefile
+doc/devel/Makefile
+doc/devel/reference/Makefile
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
