@@ -1,7 +1,7 @@
 #ifndef TNY_SUMMARY_WINDOW_IFACE_H
 #define TNY_SUMMARY_WINDOW_IFACE_H
 
-/* libtinymail - The Tiny Mail base library
+/* libtinymailui - The Tiny Mail UI library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or

@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymailui - The Tiny Mail UI library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -19,6 +19,15 @@
 
 #include <tny-msg-view-iface.h>
 
+/**
+ * tny_msg_view_iface_set_msg:
+ * @self: A #TnyMsgViewIface instance
+ * @msg: A #TnyMsgIface instace
+ *
+ * Set message to view
+ * 
+ * Return value: 
+ **/
 void
 tny_msg_view_iface_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {

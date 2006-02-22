@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -283,7 +283,12 @@ tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 	return;
 }
 
-
+/**
+ * tny_msg_view_new:
+ *
+ *
+ * Return value: a new #TnyMsgViewIface instance implemented for Gtk+
+ **/
 TnyMsgView*
 tny_msg_view_new (void)
 {

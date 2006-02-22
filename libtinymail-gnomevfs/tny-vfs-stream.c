@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-gnomevfs - The Tiny Mail base library for GnomeVFS
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -319,6 +319,15 @@ tny_vfs_stream_tell (TnySeekableStream *stream)
 
 */
 
+/**
+ * tny_vfs_stream_set_handle:
+ * @self: A #TnyVfsStream instance
+ * @handle: The #GnomeVFSHandle to write to or read from
+ *
+ * Set the #GnomeVFSHandle to play adaptor for
+ *
+ * Return value: 
+ **/
 void
 tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
 {
@@ -332,7 +341,14 @@ tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
 	return;
 }
 
-
+/**
+ * tny_vfs_stream_new:
+ * @handle: The #GnomeVFSHandle to write to or read from
+ *
+ * Create an adaptor instance between #TnyStreamIface and #GnomeVFSHandle
+ *
+ * Return value: a new #TnyStreamIface instance
+ **/
 TnyVfsStream*
 tny_vfs_stream_new (GnomeVFSHandle *handle)
 {

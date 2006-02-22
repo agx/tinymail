@@ -19,42 +19,112 @@
 
 #include <tny-stream-iface.h>
 
+
+/**
+ * tny_stream_iface_write_to_stream:
+ * @self: a #TnyStreamIface object
+ * @output: a #TnyStreamIface object
+ * 
+ * Write self to output (copy it) in an efficient way
+ *
+ * Return value: the number of bytes written to the output stream, or -1 on
+ * error along with setting errno.
+ **/
 ssize_t
 tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
 	return TNY_STREAM_IFACE_GET_CLASS (self)->write_to_stream_func (self, output);
 }
 
+/**
+ * tny_stream_iface_read:
+ * @self: a #TnyStreamIface object
+ * @buffer: a buffer that is at least n in size
+ * @n: the max amount of bytes to read into buffer
+ * 
+ * Read n bytes of the stream into buffer
+ *
+ * Return value: the number of bytes actually read, or -1 on error and 
+ * set errno.
+ **/
 ssize_t
 tny_stream_iface_read  (TnyStreamIface *self, char *buffer, size_t n)
 {
 	return TNY_STREAM_IFACE_GET_CLASS (self)->read_func (self, buffer, n);
 }
 
+/**
+ * tny_stream_iface_write:
+ * @self: a #TnyStreamIface object
+ * @buffer: a buffer that has at least n bytes
+ * @n: the amount of bytes to read from buffer and to write
+ * 
+ * Write n bytes of the buffer into the stream
+ *
+ * Return value: the number of bytes written to the stream, or -1 on error 
+ * along with setting errno.
+ **/
 ssize_t
 tny_stream_iface_write (TnyStreamIface *self, const char *buffer, size_t n)
 {
 	return TNY_STREAM_IFACE_GET_CLASS (self)->write_func (self, buffer, n);
 }
 
+
+/**
+ * tny_stream_iface_flush:
+ * @self: a #TnyStreamIface object
+ * 
+ * Flushes any buffered data to the stream's backing store. 
+ * Only meaningful for writable streams.
+ *
+ * Return value: 0 on success or -1 on fail along with setting errno.
+ **/
 gint
 tny_stream_iface_flush (TnyStreamIface *self)
 {
 	return TNY_STREAM_IFACE_GET_CLASS (self)->flush_func (self);
 }
 
+/**
+ * tny_stream_iface_close:
+ * @self: a #TnyStreamIface object
+ * 
+ * Closes the stream
+ *
+ * Return value: 0 on success or -1 on fail.
+ **/
 gint
 tny_stream_iface_close (TnyStreamIface *self)
 {
 	return TNY_STREAM_IFACE_GET_CLASS (self)->close_func (self);
 }
 
+
+/**
+ * tny_stream_iface_eos:
+ * @self: a #TnyStreamIface object
+ * 
+ * Tests if there are bytes left to read on the stream object.
+ *
+ * Return value: TRUE on EOS or FALSE otherwise.
+ **/
 gboolean
 tny_stream_iface_eos   (TnyStreamIface *self)
 {
 	return TNY_STREAM_IFACE_GET_CLASS (self)->eos_func (self);
 }
 
+/**
+ * tny_stream_iface_eos:
+ * @self: a #TnyStreamIface object
+ * 
+ * Resets the stream. That is, put it in a state where it can be read from 
+ * the beginning again. Not all streams are seekable, but they must 
+ * all be resettable.
+ *
+ * Return value: 0 on success or -1 on error along with setting errno.
+ **/
 gint
 tny_stream_iface_reset (TnyStreamIface *self)
 {

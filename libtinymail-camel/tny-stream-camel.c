@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -130,6 +130,15 @@ tny_stream_camel_reset (TnyStreamIface *self)
 	return camel_stream_reset (priv->stream);
 }
 
+/**
+ * tny_stream_camel_set_stream:
+ * @self: A #TnyStreamCamel object
+ * @stream: A #CamelStream object
+ *
+ * Set the stream to play proxy for
+ *
+ * Return value:
+ **/
 void
 tny_stream_camel_set_stream (TnyStreamCamel *self, CamelStream *stream)
 {
@@ -143,7 +152,13 @@ tny_stream_camel_set_stream (TnyStreamCamel *self, CamelStream *stream)
 	return;
 }
 
-
+/**
+ * tny_stream_camel_new:
+ * @stream: A #CamelStream stream to play proxy for
+ *
+ * Return value: A new #TnyStreamCamel instance implemented as a proxy
+ * for a #CamelStream
+ **/
 TnyStreamCamel*
 tny_stream_camel_new (CamelStream *stream)
 {

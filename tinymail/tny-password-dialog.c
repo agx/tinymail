@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* tinymail - Tiny Mail
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -34,6 +34,13 @@ struct _TnyPasswordDialogPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_PASSWORD_DIALOG_TYPE, TnyPasswordDialogPriv))
 
 
+/**
+ * tny_password_dialog_set_prompt:
+ * @self: A #TnyPasswordDialog object
+ * @prompt: The prompt to set
+ *
+ * Return value: 
+ **/
 void
 tny_password_dialog_set_prompt (TnyPasswordDialog *self, const gchar *prompt)
 {
@@ -44,6 +51,12 @@ tny_password_dialog_set_prompt (TnyPasswordDialog *self, const gchar *prompt)
 	return;
 }
 
+/**
+ * tny_password_dialog_get_password:
+ * @self: A #TnyPasswordDialog object
+ *
+ * Return value: The password (read-only) as typed by the user
+ **/
 const gchar*
 tny_password_dialog_get_password (TnyPasswordDialog *self)
 {
@@ -52,7 +65,12 @@ tny_password_dialog_get_password (TnyPasswordDialog *self)
 	return gtk_entry_get_text (priv->pwd_entry);
 }
 
-
+/**
+ * tny_summary_window_new:
+ * 
+ *
+ * Return value: A new #TnyPasswordDialog instance implemented for Gtk+
+ **/
 TnyPasswordDialog*
 tny_password_dialog_new (void)
 {

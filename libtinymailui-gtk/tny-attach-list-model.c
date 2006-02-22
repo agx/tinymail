@@ -1,4 +1,4 @@
-/* libtinymailui - The Tiny Mail UI library
+/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ATTACH_LIST_MODEL_TYPE, TnyAttachListModelPriv))
 
 
-void
+void /* Protected function */
 _tny_attach_list_model_set_screen (TnyAttachListModel *self, GdkScreen *screen)
 {
 	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (self);
@@ -44,6 +44,15 @@ _tny_attach_list_model_set_screen (TnyAttachListModel *self, GdkScreen *screen)
 }
 
 
+/**
+ * tny_attach_list_model_add:
+ * @self: A #TnyAttachListModel instace
+ * @part: A #TnyMsgMimePartIface instance
+ *
+ * Add a mime-part to the list model
+ *
+ * Return value: 
+ **/
 void
 tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 {
@@ -88,6 +97,14 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 	return;
 }
 
+
+/**
+ * tny_attach_list_model_new:
+ *
+ *
+ * Return value: a new #GtkTreeModel instance suitable for showing  
+ * #TnyMsgMimePartIface instances
+ **/
 TnyAttachListModel*
 tny_attach_list_model_new (void)
 {

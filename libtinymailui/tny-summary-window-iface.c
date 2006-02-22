@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymailui - The Tiny Mail UI library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -19,6 +19,15 @@
 
 #include <tny-summary-window-iface.h>
 
+/**
+ * tny_summary_window_iface_set_account_store:
+ * @self: A #TnySummaryWindowIface instance
+ * @account: A #TnyAccountStoreIface instace
+ *
+ * Set the account store (summary window is an observer of it)
+ * 
+ * Return value: 
+ **/
 void
 tny_summary_window_iface_set_account_store (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store)
 {

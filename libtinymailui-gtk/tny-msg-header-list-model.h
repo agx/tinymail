@@ -1,7 +1,7 @@
 #ifndef TNY_MSG_HEADER_LIST_MODEL_H
 #define TNY_MSG_HEADER_LIST_MODEL_H
 
-/* libtinymailui - The Tiny Mail UI library
+/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or

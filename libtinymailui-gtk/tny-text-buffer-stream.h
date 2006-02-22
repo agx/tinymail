@@ -1,7 +1,7 @@
 #ifndef TNY_TEXT_BUFFER_STREAM_H
 #define TNY_TEXT_BUFFER_STREAM_H
 
-/* libtinymail - The Tiny Mail base library
+/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or

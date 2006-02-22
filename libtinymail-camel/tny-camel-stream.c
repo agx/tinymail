@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,6 +21,16 @@
 
 static CamelStreamClass *parent_class = NULL;
 
+/**
+ * tny_camel_stream_write_to_stream:
+ * @self: a #TnyCamelStream object
+ * @output: a #TnyStreamIface object to write to
+ * 
+ * Write self to output (copy it) in an efficient way
+ *
+ * Return value: the number of bytes written to the output stream, or -1 on 
+ * error along with setting errno.
+ **/
 ssize_t 
 tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output)
 {
@@ -158,6 +168,15 @@ tny_camel_stream_get_type (void)
 	return type;
 }
 
+/**
+ * tny_camel_stream_set_stream:
+ * @self: A #TnyCamelStream object
+ * @stream: A #TnyStreamIface object
+ *
+ * Set the stream to play proxy for
+ *
+ * Return value:
+ **/
 void
 tny_camel_stream_set_stream (TnyCamelStream *self, TnyStreamIface *stream)
 {
@@ -173,7 +192,13 @@ tny_camel_stream_set_stream (TnyCamelStream *self, TnyStreamIface *stream)
 }
 
 
-
+/**
+ * tny_camel_stream_new:
+ * @stream: A #TnyStreamIface stream to play proxy for
+ *
+ * Return value: A new #CamelStream instance implemented as a proxy
+ * for a #TnyStreamIface
+ **/
 TnyCamelStream *
 tny_camel_stream_new (TnyStreamIface *stream)
 {

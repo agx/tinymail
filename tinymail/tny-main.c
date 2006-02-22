@@ -1,4 +1,4 @@
-/*
+/* tinymail - Tiny Mail
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,15 @@
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 
+/**
+ * main:
+ * @argc: Amount of arguments
+ * @argv: The arguments
+ *
+ * Main entry point of the application
+ *
+ * Return value: application return value (0 on success)
+ **/
 int 
 main (int argc, char **argv)
 {

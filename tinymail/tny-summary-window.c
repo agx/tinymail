@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* tinymail - Tiny Mail
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -239,6 +239,12 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	}
 }
 
+/**
+ * tny_summary_window_new:
+ * 
+ *
+ * Return value: A new #TnySummaryWindowIface instance implemented for Gtk+
+ **/
 TnySummaryWindow*
 tny_summary_window_new (void)
 {

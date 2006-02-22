@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -15,26 +15,6 @@
  * License along with self library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- */
-
-
-/* The story of TnyMsgHeader, By Philip Van Hoof *
- *
- * TnyMsgHeader is a proxy for real subject CamelMessageInfo. The type doesn't
- * use a priv pointer, but in stead is an opaque structure. This is done for 
- * decreasing the amount of allocations (a priv pointer is an unnecessary 
- * allocation). Allocations are slow.
- *
- * The tree model is responsible for calling the uncache method whenever the
- * corresponding row becomes invisble.
- *
- * All kinds of dirty non-gobject-standard tricks have been applied to make this
- * type as fast as possible. Including modifying the TNY_MSG_ACCOUNT() macro and
- * removing the gobject type-check.
- *
- * It's possible this type sooner or later gets reimplemented without using
- * gobject at all. As at this moment, the full size of the GObject type is added
- * for no real reason.
  */
 
 #include <glib.h>
@@ -268,6 +248,31 @@ tny_msg_header_finalize (GObject *object)
 
 	return;
 }
+
+/**
+ * tny_msg_header_new:
+ *
+ * The story of TnyMsgHeader,
+ *
+ * TnyMsgHeader is a proxy for real subject CamelMessageInfo. The type doesn't
+ * use a priv pointer, but in stead is an opaque structure. This is done for 
+ * decreasing the amount of allocations (a priv pointer is an unnecessary 
+ * allocation). Allocations are slow.
+ *
+ * A list model (like a tree model) is responsible for calling the uncache
+ * method whenever the corresponding row becomes invisble.
+ *
+ * All kinds of dirty non-gobject-standard tricks have been applied to make this
+ * type as fast as possible. Including modifying the TNY_MSG_ACCOUNT() macro and
+ * removing the gobject type-check.
+ *
+ * It's possible this type sooner or later gets reimplemented without using
+ * gobject at all. As at this moment, the full size of the GObject type is added
+ * for no real reason.
+ *
+ * Return value: A new #TnyMsgHeader instance implemented for Camel
+ **/
+
 
 TnyMsgHeader*
 tny_msg_header_new (void)

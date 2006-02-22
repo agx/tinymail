@@ -21,7 +21,7 @@
 
 /**
  * tny_account_iface_get_id:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  * Get an unique id for the account.
  * 
@@ -35,7 +35,7 @@ tny_account_iface_get_id (TnyAccountIface *self)
 
 /**
  * tny_account_iface_set_id:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  * Set the accounts unique id.
  * 
@@ -50,7 +50,7 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
 
 /**
  * tny_account_iface_set_forget_pass_func:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  * Set the password that will be called when the password is no longer needed.
  * the function must free the password that was allocated by the function that
@@ -69,7 +69,7 @@ tny_account_iface_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc ge
 
 /**
  * tny_account_iface_get_forget_pass_func:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  *
  * 
@@ -83,7 +83,7 @@ tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
 
 /**
  * tny_account_iface_get_folders:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  * Get the folders of an account
  * 
@@ -97,7 +97,7 @@ tny_account_iface_get_folders (TnyAccountIface *self)
 
 /**
  * tny_account_iface_set_proto:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * @proto: the protocol (ex. "imap")
  * 
  * Set the protocol of an account
@@ -113,7 +113,7 @@ tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
 
 /**
  * tny_account_iface_set_user:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * @user: the username
  * 
  * Set the user or login of an account
@@ -129,7 +129,7 @@ tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
 
 /**
  * tny_account_iface_set_hostname:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * @host: the hostname
  * 
  * Set the hostname of an account
@@ -145,7 +145,7 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
 
 /**
  * tny_account_iface_set_pass_func:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * @get_pass_func: a pointer to the function
  * 
  * Set the function that will be called when the password is needed.
@@ -162,7 +162,7 @@ tny_account_iface_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_fun
 
 /**
  * tny_account_iface_get_proto:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  * Get the protocol of an account
  * 
@@ -176,7 +176,7 @@ tny_account_iface_get_proto (TnyAccountIface *self)
 
 /**
  * tny_account_iface_get_user:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  * Get the user or login of an account
  * 
@@ -190,7 +190,7 @@ tny_account_iface_get_user (TnyAccountIface *self)
 
 /**
  * tny_account_iface_get_hostname:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  * Get the hostname of an account
  * 
@@ -204,7 +204,7 @@ tny_account_iface_get_hostname (TnyAccountIface *self)
 
 /**
  * tny_account_iface_get_pass_func:
- * @self: a TnyAccountIface object
+ * @self: a #TnyAccountIface object
  * 
  *
  * 

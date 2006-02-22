@@ -1,4 +1,4 @@
-/* libtinymailui - The Tiny Mail UI library
+/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -58,6 +58,15 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 
 }
 
+/**
+ * tny_account_tree_model_add:
+ * @self: A #TnyAccountTreeModel instance
+ * @account: A #TnyAccountIface instance
+ *
+ * Add an account to the list model
+ *
+ * Return value: 
+ **/
 void
 tny_account_tree_model_add (TnyAccountTreeModel *self, TnyAccountIface *account)
 {
@@ -69,6 +78,13 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyAccountIface *account)
 	return;
 }
 
+/**
+ * tny_account_tree_model_new:
+ *
+ *
+ * Return value: a new #GtkTreeModel instance suitable for showing  
+ * #TnyAccountIface instances
+ **/
 TnyAccountTreeModel*
 tny_account_tree_model_new (void)
 {

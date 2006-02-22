@@ -1,7 +1,7 @@
 #ifndef TNY_PASSWORD_DIALOG_H
 #define TNY_PASSWORD_DIALOG_H
 
-/*
+/* tinymail - Tiny Mail
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify

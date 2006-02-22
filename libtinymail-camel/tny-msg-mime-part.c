@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -210,7 +210,13 @@ tny_msg_mime_part_get_content_location (TnyMsgMimePartIface *self)
 	return camel_mime_part_get_content_location (priv->part);
 }
 
-
+/**
+ * tny_msg_mime_part_new:
+ * 
+ * The #TnyMsgMimePart implementation is actually a proxy for #CamelMimePart.
+ *
+ * Return value: A new #TnyMsgMimePartIface instance implemented for Camel
+ **/
 TnyMsgMimePart*
 tny_msg_mime_part_new (CamelMimePart *part)
 {

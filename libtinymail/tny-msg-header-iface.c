@@ -23,7 +23,7 @@
 
 /**
  * tny_msg_header_iface_get_cc:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * 
  * 
@@ -38,7 +38,7 @@ tny_msg_header_iface_get_cc (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_date_received:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * 
  * 
@@ -52,7 +52,7 @@ tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_date_sent:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * 
  * 
@@ -67,7 +67,7 @@ tny_msg_header_iface_get_date_sent (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_id:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * Get an unique id of the message of which self is a message header.
  * 
@@ -81,7 +81,7 @@ tny_msg_header_iface_get_uid (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_message_id:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * Get an unique id of the message of which self is a message header.
  * 
@@ -95,7 +95,7 @@ tny_msg_header_iface_get_message_id (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_from:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * Get the from header
  * 
@@ -109,7 +109,7 @@ tny_msg_header_iface_get_from (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_subject:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * Get the subject header
  * 
@@ -124,7 +124,7 @@ tny_msg_header_iface_get_subject (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_to:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * Get the to header
  * 
@@ -138,7 +138,7 @@ tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_get_folder:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * Get a reference to the parent folder where this message header is located
  * 
@@ -153,7 +153,7 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_set_folder:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * Set the reference to the parent folder where this message header is located
  * 
@@ -168,7 +168,7 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
 
 /**
  * tny_msg_header_iface_set_message_id:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * @id: an unique follow-up uid
  * 
  *
@@ -184,7 +184,7 @@ tny_msg_header_iface_set_uid (TnyMsgHeaderIface *self, const gchar *id)
 
 /**
  * tny_msg_header_iface_uncache:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * If it's possible to uncache this instance, uncache it
  * 
@@ -200,7 +200,7 @@ tny_msg_header_iface_uncache (TnyMsgHeaderIface *self)
 
 /**
  * tny_msg_header_iface_has_cache:
- * @self: a TnyMsgHeaderIface object
+ * @self: a #TnyMsgHeaderIface object
  * 
  * If it's possible to uncache this instance, return whether or not it has a cache
  * 

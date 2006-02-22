@@ -236,6 +236,14 @@ tny_msg_folder_iface_base_init (gpointer g_class)
 
 		tny_msg_folder_iface_signals = g_new0 (guint, TNY_MSG_FOLDER_IFACE_LAST_SIGNAL);
 
+/**
+ * TnyMsgFolderIface::folder_inserted:
+ * @self: the object on which the signal is emitted
+ * @folder: the #TnyMsgFolderIface as the added folder
+ *
+ * The "folder_inserted" signal is emitted when a folder got added to 
+ * the folder
+ **/
 		tny_msg_folder_iface_signals[FOLDER_INSERTED] =
 		   g_signal_new ("folder_inserted",
 			TNY_MSG_FOLDER_IFACE_TYPE,
@@ -245,6 +253,13 @@ tny_msg_folder_iface_base_init (gpointer g_class)
 			g_cclosure_marshal_VOID__POINTER,
 			G_TYPE_NONE, 1, TNY_MSG_FOLDER_IFACE_TYPE);
 
+/**
+ * TnyMsgFolderIface::folders_reloaded:
+ * @self: the object on which the signal is emitted
+ *
+ * The "folders_reloaded" signal is emitted when the folder got
+ * reloaded.
+ **/
 		tny_msg_folder_iface_signals[FOLDERS_RELOADED] =
 		   g_signal_new ("folders_reloaded",
 			TNY_MSG_FOLDER_IFACE_TYPE,

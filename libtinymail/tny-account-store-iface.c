@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <tny-account-iface.h>
+
 #ifndef TNY_ACCOUNT_STORE_IFACE_C
 #define TNY_ACCOUNT_STORE_IFACE_C
 #endif
@@ -31,7 +33,7 @@ guint *tny_account_store_iface_signals = NULL;
 
 /**
  * tny_account_store_iface_get_accounts:
- * @self: a TnyAccountStoreIface object
+ * @self: a #TnyAccountStoreIface object
  * 
  * Get a read-only list of accounts in the store
  * 
@@ -45,7 +47,7 @@ tny_account_store_iface_get_accounts (TnyAccountStoreIface *self)
 
 /**
  * tny_account_store_iface_add_account:
- * @self: a TnyAccountStoreIface object
+ * @self: a #TnyAccountStoreIface object
  * @account: the account to add
  * 
  * Add an account to the store
@@ -70,6 +72,13 @@ tny_account_store_iface_base_init (gpointer g_class)
 
 		tny_account_store_iface_signals = g_new0 (guint, TNY_ACCOUNT_STORE_IFACE_LAST_SIGNAL);
 
+/**
+ * TnyAccountStoreIface::account_changed:
+ * @self: the object on which the signal is emitted
+ * @account: the #TnyAccountIface of the account that changed
+ *
+ * The "account_changed" signal is emitted when an account in the store changed
+ **/
 		tny_account_store_iface_signals[ACCOUNT_CHANGED] =
 		   g_signal_new ("account_changed",
 			TNY_ACCOUNT_STORE_IFACE_TYPE,
@@ -77,7 +86,17 @@ tny_account_store_iface_base_init (gpointer g_class)
 			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_changed),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_ACCOUNT_STORE_IFACE_TYPE);
+			G_TYPE_NONE, 1, TNY_ACCOUNT_IFACE_TYPE);
+
+/**
+ * TnyAccountStoreIface::account_inserted:
+ * @self: the object on which the signal is emitted
+ * @account: the #TnyAccountIface of the account that got inserted
+ *
+ * The "account_inserted" signal is emitted when an account is added to the
+ * store
+ **/
+
 
 		tny_account_store_iface_signals[ACCOUNT_INSERTED] =
 		   g_signal_new ("account_inserted",
@@ -86,8 +105,16 @@ tny_account_store_iface_base_init (gpointer g_class)
 			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_inserted),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_ACCOUNT_STORE_IFACE_TYPE);
+			G_TYPE_NONE, 1, TNY_ACCOUNT_IFACE_TYPE);
 
+/**
+ * TnyAccountStoreIface::account_removed:
+ * @self: the object on which the signal is emitted
+ * @account: the #TnyAccountIface of the account that got removed
+ *
+ * The "account_removed" signal is emitted when an account is removed from the
+ * store
+ **/
 		tny_account_store_iface_signals[ACCOUNT_REMOVED] =
 		   g_signal_new ("account_removed",
 			TNY_ACCOUNT_STORE_IFACE_TYPE,
@@ -95,8 +122,15 @@ tny_account_store_iface_base_init (gpointer g_class)
 			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_removed),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_ACCOUNT_STORE_IFACE_TYPE);
+			G_TYPE_NONE, 1, TNY_ACCOUNT_IFACE_TYPE);
 
+/**
+ * TnyAccountStoreIface::accounts_reloaded:
+ * @self: the object on which the signal is emitted
+ *
+ * The "accounts_reloaded" signal is emitted when the store reloaded the 
+ * accounts
+ **/
 		tny_account_store_iface_signals[ACCOUNTS_RELOADED] =
 		   g_signal_new ("accounts_reloaded",
 			TNY_ACCOUNT_STORE_IFACE_TYPE,

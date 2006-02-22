@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -333,6 +333,13 @@ tny_msg_folder_set_name (TnyMsgFolderIface *self, const gchar *name)
 	return;
 }
 
+/**
+ * tny_msg_folder_set_folder:
+ * @self: A #TnyMsgFolder object
+ * @camel_folder: The #CamelFolder instance to play proxy for
+ *
+ * Return value:
+ **/
 void
 tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 {
@@ -348,6 +355,12 @@ tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 	return;
 }
 
+/**
+ * tny_msg_folder_get_folder:
+ * @self: A #TnyMsgFolder object
+ *
+ * Return value: The CamelFolder instance to play proxy for
+ **/
 CamelFolder*
 tny_msg_folder_get_folder (TnyMsgFolder *self)
 {
@@ -356,9 +369,16 @@ tny_msg_folder_get_folder (TnyMsgFolder *self)
 	return priv->folder;
 }
 
-
+/**
+ * tny_msg_folder_new_with_folder:
+ * @camel_folder: CamelFolder instance to play proxy for 
+ *
+ * The #TnyMsgFolder implementation is actually a proxy for #CamelFolder
+ *
+ * Return value: A new #TnyMsgFolderIface instance implemented for Camel
+ **/
 TnyMsgFolder*
-tny_msg_folder_new_with_folder  (CamelFolder *camel_folder)
+tny_msg_folder_new_with_folder (CamelFolder *camel_folder)
 {
 	TnyMsgFolder *self = g_object_new (TNY_MSG_FOLDER_TYPE, NULL);
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
@@ -369,7 +389,15 @@ tny_msg_folder_new_with_folder  (CamelFolder *camel_folder)
 }
 
 
-
+/**
+ * tny_msg_folder_new:
+ * 
+ * The #TnyMsgFolder implementation is actually a proxy for #CamelFolder.
+ * You need to set the #CamelFolder after using this constructor using
+ * tny_msg_folder_set_folder
+ *
+ * Return value: A new #TnyMsgFolderIface instance implemented for Camel
+ **/
 TnyMsgFolder*
 tny_msg_folder_new (void)
 {

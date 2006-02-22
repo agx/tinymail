@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -198,7 +198,14 @@ tny_msg_finalize (GObject *object)
 	return;
 }
 
-
+/**
+ * tny_msg_new:
+ * 
+ * The #TnyMsg implementation is actually a proxy for #CamelMimeMessage (and
+ * a few other Camel types)
+ *
+ * Return value: A new #TnyMsgIface instance implemented for Camel
+ **/
 TnyMsg*
 tny_msg_new (void)
 {

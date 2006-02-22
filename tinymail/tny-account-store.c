@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* tinymail - Tiny Mail
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -301,7 +301,12 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 	return;
 }
 
-
+/**
+ * tny_account_store_get_instance:
+ *
+ *
+ * Return value: The #TnyAccountStoreIface singleton instance
+ **/
 TnyAccountStore*
 tny_account_store_get_instance (void)
 {

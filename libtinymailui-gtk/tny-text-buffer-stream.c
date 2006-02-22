@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -141,6 +141,16 @@ tny_text_buffer_stream_reset (TnyStreamIface *self)
 	return tny_text_buffer_stream_reset_priv (priv);
 }
 
+
+/**
+ * tny_text_buffer_stream_set_text_buffer:
+ * @self: A #TnyTextBufferStream instance
+ * @buffer: The #GtkTextBuffer to write to or read from
+ *
+ * Set the #GtkTextBuffer to play adaptor for
+ *
+ * Return value: 
+ **/
 void
 tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer *buffer)
 {
@@ -157,7 +167,14 @@ tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer
 	return;
 }
 
-
+/**
+ * tny_text_buffer_stream_new:
+ * @buffer: The #GtkTextBuffer to write to or read from
+ *
+ * Create an adaptor instance between #TnyStreamIface and #GtkTextBuffer
+ *
+ * Return value: a new #TnyStreamIface instance
+ **/
 TnyTextBufferStream*
 tny_text_buffer_stream_new (GtkTextBuffer *buffer)
 {

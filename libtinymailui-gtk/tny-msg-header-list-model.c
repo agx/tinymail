@@ -1,4 +1,4 @@
-/* libtinymailui - The Tiny Mail UI library
+/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -328,7 +328,15 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 	return;
 }
 
-
+/**
+ * tny_msg_header_list_model_set_folder:
+ * @self: A #TnyMsgHeaderListModel instance
+ * @folder: a #TnyMsgFolderIface instance
+ *
+ * Set the folder where the #TnyMsgHeaderIface instances are located
+ * 
+ * Return value:
+ **/
 void
 tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder)
 {
@@ -344,12 +352,21 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	g_object_ref (G_OBJECT (folder));
 
 	self->headers = headers;
+
+	/* To avoid a g_list_length (note that the implementation must
+	 * absolutely be correct!) */
 	self->length = tny_msg_folder_iface_get_all_count (folder);
 
 	return;
 }
 
-
+/**
+ * tny_msg_header_list_model_new:
+ *
+ *
+ * Return value: a new #GtkTreeModel instance suitable for showing lots of 
+ * #TnyMsgHeaderIface instances
+ **/
 GtkTreeModel *
 tny_msg_header_list_model_new (void)
 {

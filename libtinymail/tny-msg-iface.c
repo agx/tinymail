@@ -22,7 +22,7 @@
 
 /**
  * tny_msg_iface_get_folder:
- * @self: a TnyMsgIface object
+ * @self: a #TnyMsgIface object
  * 
  * Get the parent folder of this message
  *
@@ -36,11 +36,12 @@ tny_msg_iface_get_folder (TnyMsgIface *self)
 
 /**
  * tny_msg_iface_set_folder:
- * @self: a TnyMsgIface object
+ * @self: a #TnyMsgIface object
  * @folder: The parent folder
  * 
  * Set the parent folder of this message
- * * TODO: Make this private *
+ *
+ * * TODO: Make this private, or make it possible to move messages this way *
  *
  * Return value: Set parent folder of this message
  **/
@@ -54,11 +55,11 @@ tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
 
 /**
  * tny_msg_iface_get_parts:
- * @self: a TnyMsgIface object
+ * @self: a #TnyMsgIface object
  * 
  * Get a read-only list of mime-parts of this message
  *
- * Return value: A read-only GList with TnyMsgMimePartIface instances
+ * Return value: A read-only GList with #TnyMsgMimePartIface instances
  **/
 const GList*
 tny_msg_iface_get_parts (TnyMsgIface *self)
@@ -70,7 +71,7 @@ tny_msg_iface_get_parts (TnyMsgIface *self)
 
 /**
  * tny_msg_iface_get_header:
- * @self: a TnyMsgIface object
+ * @self: a #TnyMsgIface object
  * 
  * Get the header of the message
  *
@@ -85,7 +86,7 @@ tny_msg_iface_get_header (TnyMsgIface *self)
 
 /**
  * tny_msg_iface_add_part:
- * @self: a TnyMsgIface object
+ * @self: a #TnyMsgIface object
  * @part: the mime-part to add
  * 
  * Add a mime-part to a message
@@ -100,7 +101,7 @@ tny_msg_iface_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 
 /**
  * tny_msg_iface_del_part:
- * @self: a TnyMsgIface object
+ * @self: a #TnyMsgIface object
  * @id: the mime-part id to delete
  * 
  * Delete a mime-part from a message
@@ -117,7 +118,7 @@ tny_msg_iface_del_part (TnyMsgIface *self, gint id)
 
 /**
  * tny_msg_iface_set_header:
- * @self: a TnyMsgIface object
+ * @self: a #TnyMsgIface object
  * @header: the header to set
  * 
  * Set the header of a message
