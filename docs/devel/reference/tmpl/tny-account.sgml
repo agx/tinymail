@@ -2,7 +2,7 @@
 TnyAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A account type implemented for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
