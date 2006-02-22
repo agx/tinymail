@@ -1,0 +1,88 @@
+<!-- ##### SECTION Title ##### -->
+TnyCamelStream
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_CAMEL_STREAM_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_CAMEL_STREAM ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO TNY_CAMEL_STREAM_CLASS ##### -->
+<para>
+
+</para>
+
+@k: 
+
+
+<!-- ##### MACRO TNY_CAMEL_VFS_STREAM ##### -->
+<para>
+
+</para>
+
+@o: 
+
+
+<!-- ##### FUNCTION tny_account_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_camel_stream_new ##### -->
+<para>
+
+</para>
+
+@stream: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_camel_stream_set_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@stream: 
+
+
+<!-- ##### FUNCTION tny_camel_stream_write_to_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@output: 
+@Returns: 
+
+

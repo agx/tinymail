@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+TnyAccountStore
+
+<!-- ##### SECTION Short_Description ##### -->
+A store with accounts that uses libtinymail-camel and GConf
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+An implementation if #TnyAccountStoreIface with accounts that uses libtinymail-camel and GConf.
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyAccountStoreIface
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_ACCOUNT_STORE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_account_store_get_instance ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

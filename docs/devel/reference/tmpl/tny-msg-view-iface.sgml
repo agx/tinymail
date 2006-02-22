@@ -1,0 +1,37 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgViewIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_VIEW_IFACE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_msg_view_iface_set_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+

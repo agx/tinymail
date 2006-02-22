@@ -1,0 +1,46 @@
+<!-- ##### SECTION Title ##### -->
+TnyVfsStream
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_VFS_STREAM_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_vfs_stream_new ##### -->
+<para>
+
+</para>
+
+@handle: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_vfs_stream_set_handle ##### -->
+<para>
+
+</para>
+
+@self: 
+@handle: 
+
+

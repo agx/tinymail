@@ -1,0 +1,50 @@
+<!-- ##### SECTION Title ##### -->
+tny-msg-header-list-model
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyMsgHeaderListModel ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderListModelClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_msg_header_list_model_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_header_list_model_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+

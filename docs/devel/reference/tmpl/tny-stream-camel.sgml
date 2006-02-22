@@ -1,0 +1,46 @@
+<!-- ##### SECTION Title ##### -->
+TnyStreamCamel
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_STREAM_CAMEL_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_stream_camel_new ##### -->
+<para>
+
+</para>
+
+@stream: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_stream_camel_set_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@stream: 
+
+

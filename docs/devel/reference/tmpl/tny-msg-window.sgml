@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgWindow
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_WINDOW_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_msg_window_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

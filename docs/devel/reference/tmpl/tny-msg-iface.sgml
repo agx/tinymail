@@ -1,0 +1,92 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_IFACE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_msg_iface_get_parts ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_iface_get_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_iface_add_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_iface_del_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+
+
+<!-- ##### FUNCTION tny_msg_iface_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_iface_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+
+<!-- ##### FUNCTION tny_msg_iface_set_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+

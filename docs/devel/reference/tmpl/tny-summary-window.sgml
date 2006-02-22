@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+TnySummaryWindow
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_SUMMARY_WINDOW_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_summary_window_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

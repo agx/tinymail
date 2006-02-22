@@ -1,0 +1,217 @@
+<!-- ##### SECTION Title ##### -->
+tny-shared
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyMsgIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_parts_func: 
+@get_header_func: 
+@add_part_func: 
+@del_part_func: 
+@get_folder_func: 
+@set_folder_func: 
+@set_header_func: 
+
+<!-- ##### STRUCT TnyMsgFolderIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgFolderIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@folder_inserted: 
+@folders_reloaded: 
+@get_folders_func: 
+@add_folder_func: 
+@get_message_func: 
+@get_headers_func: 
+@get_name_func: 
+@get_id_func: 
+@get_account_func: 
+@set_name_func: 
+@set_id_func: 
+@set_account_func: 
+@get_all_count_func: 
+@get_unread_count_func: 
+@uncache_func: 
+@has_cache_func: 
+
+<!-- ##### STRUCT TnyMsgHeaderIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderIfaceClass ##### -->
+<para>
+
+</para>
+
+@g_iface: 
+@get_uid_func: 
+@set_uid_func: 
+@get_cc_func: 
+@get_date_received_func: 
+@get_date_sent_func: 
+@get_subject_func: 
+@get_to_func: 
+@get_from_func: 
+@get_message_id_func: 
+@get_folder_func: 
+@set_folder_func: 
+@uncache_func: 
+@has_cache_func: 
+
+<!-- ##### STRUCT TnyMsgMimePartIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgMimePartIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_content_type_func: 
+@content_type_is_func: 
+@get_stream_func: 
+@write_to_stream_func: 
+@set_index_func: 
+@get_index_func: 
+@get_filename_func: 
+@get_content_id_func: 
+@get_description_func: 
+@get_content_location_func: 
+
+<!-- ##### STRUCT TnyAccountIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyAccountIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_folders_func: 
+@set_id_func: 
+@set_proto_func: 
+@set_user_func: 
+@set_hostname_func: 
+@set_pass_func_func: 
+@set_forget_pass_func_func: 
+@get_id_func: 
+@get_proto_func: 
+@get_user_func: 
+@get_hostname_func: 
+@get_pass_func_func: 
+@get_forget_pass_func_func: 
+
+<!-- ##### STRUCT TnyAccountStoreIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyStreamIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyStreamIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@read_func: 
+@write_func: 
+@flush_func: 
+@close_func: 
+@eos_func: 
+@reset_func: 
+@write_to_stream_func: 
+
+<!-- ##### STRUCT TnyAccountStoreIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@account_changed: 
+@account_inserted: 
+@account_removed: 
+@accounts_reloaded: 
+@get_accounts_func: 
+@add_account_func: 
+
+<!-- ##### STRUCT TnyMsgHeaderProxy ##### -->
+<para>
+
+</para>
+
+@parent: 
+@real: 
+
+<!-- ##### STRUCT TnyMsgHeaderProxyClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### USER_FUNCTION GetPassFunc ##### -->
+<para>
+
+</para>
+
+@self: 
+@prompt: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION ForgetPassFunc ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

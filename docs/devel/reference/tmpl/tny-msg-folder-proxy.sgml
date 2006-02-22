@@ -1,0 +1,44 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgFolderProxy
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_FOLDER_PROXY_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_IS_MSG_PROXY_FOLDER ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_proxy_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

@@ -1,0 +1,56 @@
+<!-- ##### SECTION Title ##### -->
+TnySessionCamel
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_SESSION_CAMEL_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_session_camel_get_instance ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_pass_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+@get_pass_func: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_forget_pass_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+@get_forget_pass_func: 
+
+

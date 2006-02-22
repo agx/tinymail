@@ -1,0 +1,52 @@
+<!-- ##### SECTION Title ##### -->
+TnyAccountStoreIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_ACCOUNT_STORE_IFACE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### VARIABLE tny_account_store_iface_signals ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_account_store_iface_get_accounts ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_iface_add_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+
+

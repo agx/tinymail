@@ -1,0 +1,46 @@
+<!-- ##### SECTION Title ##### -->
+TnyTextBufferStream
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_TEXT_BUFFER_STREAM_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_text_buffer_stream_new ##### -->
+<para>
+
+</para>
+
+@buffer: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_text_buffer_stream_set_text_buffer ##### -->
+<para>
+
+</para>
+
+@self: 
+@buffer: 
+
+

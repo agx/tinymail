@@ -1,0 +1,96 @@
+<!-- ##### SECTION Title ##### -->
+TnyStreamIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_STREAM_IFACE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_stream_iface_read ##### -->
+<para>
+
+</para>
+
+@self: 
+@buffer: 
+@n: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_stream_iface_write ##### -->
+<para>
+
+</para>
+
+@self: 
+@buffer: 
+@n: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_stream_iface_flush ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_stream_iface_close ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_stream_iface_eos ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_stream_iface_reset ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_stream_iface_write_to_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@output: 
+@Returns: 
+
+

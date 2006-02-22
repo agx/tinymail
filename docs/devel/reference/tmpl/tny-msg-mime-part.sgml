@@ -1,0 +1,46 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgMimePart
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_MIME_PART_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_new ##### -->
+<para>
+
+</para>
+
+@part: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_set_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+
+

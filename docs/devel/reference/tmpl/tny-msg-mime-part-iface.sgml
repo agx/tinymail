@@ -1,0 +1,119 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgMimePartIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_MIME_PART_IFACE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_content_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_content_type_is ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_write_to_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@stream: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_set_index ##### -->
+<para>
+
+</para>
+
+@self: 
+@index: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_index ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_filename ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_content_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_description ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_content_location ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

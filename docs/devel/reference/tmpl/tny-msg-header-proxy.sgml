@@ -1,0 +1,44 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgHeaderProxy
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_HEADER_PROXY_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_IS_MSG_PROXY_HEADER ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### FUNCTION tny_msg_header_proxy_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

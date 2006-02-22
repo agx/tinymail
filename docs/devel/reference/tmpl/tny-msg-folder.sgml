@@ -1,0 +1,63 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgFolder
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_msg_folder_new_with_folder ##### -->
+<para>
+
+</para>
+
+@camel_folder: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@camel_folder: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

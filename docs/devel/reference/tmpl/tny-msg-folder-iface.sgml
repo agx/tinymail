@@ -1,0 +1,160 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgFolderIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_FOLDER_IFACE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### VARIABLE tny_msg_folder_iface_signals ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_folders ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_add_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_headers ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_set_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_set_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_set_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_all_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_unread_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_uncache ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_has_cache ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

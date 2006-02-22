@@ -1,0 +1,48 @@
+<!-- ##### SECTION Title ##### -->
+tny-msg-header
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_MSG_HEADER_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT TnyMsgHeader ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_msg_header_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
