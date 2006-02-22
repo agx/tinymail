@@ -2,7 +2,7 @@
 tny-shared
 
 <!-- ##### SECTION Short_Description ##### -->
-
+Shared include file with forward typedefs
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
