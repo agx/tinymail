@@ -60,6 +60,13 @@
   <reference>
     <title>API Reference</title>
 
+	<chapter id="tinymail">
+		<title>tinymail</title>
+		&libtinymail-TnySummaryWindow;
+                &libtinymail-TnyPasswordDialog;
+		&libtinymail-TnyAccountStore;
+	</chapter>
+
 	<chapter id="libtinymail">
 		<title>libtinymail</title>
 		&libtinymail-Shared;		
@@ -87,13 +94,10 @@
 		&libtinymail-TnyMsgHeaderListModel;
 		&libtinymail-TnyAttachListModel;
 		&libtinymail-TnyTextBufferStream;
-		&libtinymail-TnySummaryWindow;
-		&libtinymail-TnyPasswordDialog;
 	</chapter>
 
 	<chapter id="libtinymail-camel">
 		<title>libtinymail-camel</title>
-		&libtinymail-TnyAccountStore;
 		&libtinymail-TnyAccount;
 		&libtinymail-TnyCamelStream;
 		&libtinymail-TnyMsgFolder;
