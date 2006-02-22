@@ -252,23 +252,6 @@ tny_msg_header_finalize (GObject *object)
 /**
  * tny_msg_header_new:
  *
- * The story of TnyMsgHeader,
- *
- * TnyMsgHeader is a proxy for real subject CamelMessageInfo. The type doesn't
- * use a priv pointer, but in stead is an opaque structure. This is done for 
- * decreasing the amount of allocations (a priv pointer is an unnecessary 
- * allocation). Allocations are slow.
- *
- * A list model (like a tree model) is responsible for calling the uncache
- * method whenever the corresponding row becomes invisble.
- *
- * All kinds of dirty non-gobject-standard tricks have been applied to make this
- * type as fast as possible. Including modifying the TNY_MSG_ACCOUNT() macro and
- * removing the gobject type-check.
- *
- * It's possible this type sooner or later gets reimplemented without using
- * gobject at all. As at this moment, the full size of the GObject type is added
- * for no real reason.
  *
  * Return value: A new #TnyMsgHeader instance implemented for Camel
  **/
