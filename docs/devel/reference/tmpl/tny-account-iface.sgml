@@ -1,0 +1,145 @@
+<!-- ##### SECTION Title ##### -->
+TnyAccountIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_ACCOUNT_IFACE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_account_iface_get_folders ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_set_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+
+
+<!-- ##### FUNCTION tny_account_iface_set_proto ##### -->
+<para>
+
+</para>
+
+@self: 
+@proto: 
+
+
+<!-- ##### FUNCTION tny_account_iface_set_user ##### -->
+<para>
+
+</para>
+
+@self: 
+@user: 
+
+
+<!-- ##### FUNCTION tny_account_iface_set_hostname ##### -->
+<para>
+
+</para>
+
+@self: 
+@host: 
+
+
+<!-- ##### FUNCTION tny_account_iface_set_pass_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@get_pass_func: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_proto ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_user ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_hostname ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_pass_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_set_forget_pass_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@get_forget_pass_func: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_forget_pass_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

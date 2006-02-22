@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+TnyAccount
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_ACCOUNT_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_account_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

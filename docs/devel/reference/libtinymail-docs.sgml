@@ -30,6 +30,11 @@
 <!ENTITY libtinymail-TnySummaryWindow SYSTEM "xml/tny-summary-window.xml">
 <!ENTITY libtinymail-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
 <!ENTITY libtinymail-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
+<!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
+
+<!ENTITY index-Object-Tree SYSTEM "xml/tree_index.sgml">
+<!ENTITY index-Object-Index SYSTEM "xml/object_index.sgml">
+
 
 ]>
 <book id="index">
@@ -39,43 +44,71 @@
 
   <preface>
     <title>Introduction</title>
-    <para>libtinymail is a library</para>
+    <para>libtinymail is a set of libraries that make building a lightweight 
+	e-mail client more easy.</para>
+    <para>They are designed around reducing both memory and cpu usage. They
+	also try not to make to much strict dependencies or make a specific
+	technology dependency replaceable.</para>
   </preface>
 
   <reference>
+    <title>Object Index</title>
+	&index-Object-Index;
+	&index-Object-Tree;
+  </reference>
+
+  <reference>
     <title>API Reference</title>
-	&libtinymail-TnyAccountStoreIface;
-	&libtinymail-TnyMsgFolderIface;
-	&libtinymail-TnyMsgMimePartIface;
-	&libtinymail-TnyStreamIface;
-	&libtinymail-TnyAccountIface;
-	&libtinymail-TnyMsgIface;
-	&libtinymail-TnyMsgHeaderIface;
 
-	&libtinymail-TnySummaryWindowIface;
-	&libtinymail-TnyMsgViewIface;
-	&libtinymail-TnyMsgWindowIface;
+	<chapter id="libtinymail">
+		<title>libtinymail</title>
+		&libtinymail-Shared;		
+		&libtinymail-TnyAccountStoreIface;
+		&libtinymail-TnyMsgFolderIface;
+		&libtinymail-TnyMsgMimePartIface;
+		&libtinymail-TnyStreamIface;
+		&libtinymail-TnyAccountIface;
+		&libtinymail-TnyMsgIface;
+		&libtinymail-TnyMsgHeaderIface;
+	</chapter>
 
-	&libtinymail-TnyMsgView;
-	&libtinymail-TnyMsgWindow;
-	&libtinymail-TnyAccountTreeModel;
-	&libtinymail-TnyMsgHeaderListModel;
-	&libtinymail-TnyAttachListModel;
-	&libtinymail-TnyTextBufferStream;
-	&libtinymail-TnySummaryWindow;
-	&libtinymail-TnyPasswordDialog;
+	<chapter id="libtinymailui">
+		<title>libtinymailui</title>
+		&libtinymail-TnySummaryWindowIface;
+		&libtinymail-TnyMsgViewIface;
+		&libtinymail-TnyMsgWindowIface;
+	</chapter>
 
-	&libtinymail-TnyAccountStore;
-	&libtinymail-TnyAccount;
-	&libtinymail-TnyCamelStream;
-	&libtinymail-TnyMsgFolder;
-	&libtinymail-TnyMsgHeader;
-	&libtinymail-TnyMsgMimePart;
-	&libtinymail-TnyMsg;
-	&libtinymail-TnySessionCamel;
-	&libtinymail-TnyStreamCamel;
+	<chapter id="libtinymailui-gtk">
+	<title>libtinymailui-gtk</title>
+		&libtinymail-TnyMsgView;
+		&libtinymail-TnyMsgWindow;
+		&libtinymail-TnyAccountTreeModel;
+		&libtinymail-TnyMsgHeaderListModel;
+		&libtinymail-TnyAttachListModel;
+		&libtinymail-TnyTextBufferStream;
+		&libtinymail-TnySummaryWindow;
+		&libtinymail-TnyPasswordDialog;
+	</chapter>
 
-	&libtinymail-TnyVfsStream;
+	<chapter id="libtinymail-camel">
+		<title>libtinymail-camel</title>
+		&libtinymail-TnyAccountStore;
+		&libtinymail-TnyAccount;
+		&libtinymail-TnyCamelStream;
+		&libtinymail-TnyMsgFolder;
+		&libtinymail-TnyMsgHeader;
+		&libtinymail-TnyMsgMimePart;
+		&libtinymail-TnyMsg;
+		&libtinymail-TnySessionCamel;
+		&libtinymail-TnyStreamCamel;
+	</chapter>
+
+	<chapter id="libtinymail-gnomevfs">
+		<title>libtinymail-gnomevfs</title>
+		&libtinymail-TnyVfsStream;
+	</chapter>
+
   </reference>
 
   <index>
