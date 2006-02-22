@@ -57,9 +57,9 @@ AC_SUBST(BINDIR)
 
 AC_OUTPUT([
 Makefile
-doc/Makefile
-doc/devel/Makefile
-doc/devel/reference/Makefile
+docs/Makefile
+docs/devel/Makefile
+docs/devel/reference/Makefile
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile

@@ -1,1 +1,1 @@
-SUBDIRS = libtinymail libtinymail-camel libtinymailui libtinymail-gnomevfs libtinymailui-gtk tinymail doc
+SUBDIRS = libtinymail libtinymail-camel libtinymailui libtinymail-gnomevfs libtinymailui-gtk tinymail docs
