@@ -156,7 +156,7 @@ tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
 }
 
 static void
-one_record_to_camel_inet_addr (const gchar *tok, CamelInternetAddress *target)
+one_record_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 {
 	char *stfnd = NULL;
 	
@@ -207,7 +207,7 @@ foreach_field_add_to_inet_addr (TnyMsgHeaderIface *self, const gchar *record, Ca
 	while (tok != NULL)
 	{
 		
-		one_record_to_camel_inet_addr ((const gchar*)tok, target);
+		one_record_to_camel_inet_addr (tok, target);
 
 		tok = strtok_r (NULL, ",;", &save);
 	}
@@ -258,8 +258,11 @@ tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 	CamelInternetAddress *addr =  camel_internet_address_new ();
+	gchar *dup = g_strdup (from);
 
-	one_record_to_camel_inet_addr (from, addr);
+	one_record_to_camel_inet_addr (dup, addr);
+
+	g_free (dup);
 
 	prepare_for_write (me);
 
@@ -287,8 +290,11 @@ tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 	CamelInternetAddress *addr =  camel_internet_address_new ();
+	gchar *dup = g_strdup (to);
 
-	foreach_field_add_to_inet_addr (self, to, addr);
+	foreach_field_add_to_inet_addr (self, dup, addr);
+
+	g_free (dup);
 
 	prepare_for_write (me);
 
