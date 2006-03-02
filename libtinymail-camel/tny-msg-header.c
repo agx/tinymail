@@ -381,6 +381,8 @@ tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
+	/* TODO: write case */
+
 	return camel_message_info_date_sent (me->message_info);
 }
 	
@@ -401,6 +403,8 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 			camel_mime_message_get_from (me->mime_message);
 		gchar *retval = camel_address_format (CAMEL_ADDRESS (addr));
 
+		/* TODO: leaks */
+
 		camel_object_unref (CAMEL_OBJECT (addr));
 
 		return retval;
@@ -414,6 +418,8 @@ tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
 	load_msg_header (me);
+
+	/* TODO: write case */
 
 	return camel_message_info_subject (me->message_info);
 }
@@ -444,6 +450,8 @@ tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
+	/* TODO: write case */
+
 	return (const gchar*)camel_message_info_message_id (me->message_info);
 }
 
@@ -454,6 +462,8 @@ tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
 	load_msg_header (me);
+
+	/* TODO: write case */
 
 	return camel_message_info_uid (me->message_info);
 }
