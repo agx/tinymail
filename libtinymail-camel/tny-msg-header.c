@@ -18,6 +18,7 @@
  */
 
 #include <glib.h>
+#include <string.h>
 
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header.h>
@@ -37,7 +38,9 @@ struct _TnyMsgHeader
 
 	gchar *uid;
 	TnyMsgFolderIface *folder;
+
 	CamelMessageInfo *message_info;
+	CamelMimeMessage *mime_message;
 };
 
 struct _TnyMsgHeaderClass 
@@ -45,14 +48,6 @@ struct _TnyMsgHeaderClass
 	GObjectClass parent_class;
 };
 
-static void
-tny_msg_header_set_camel_message_info_priv  (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
-{
-	/* camel_message_info_ref (camel_message_info); */
-	self->message_info = camel_message_info;
-
-	return;
-}
 
 static void
 unload_msg_header (TnyMsgHeader *self)
@@ -73,16 +68,53 @@ load_msg_header (TnyMsgHeader *self)
 		CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
 		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, self->uid);
 
-		tny_msg_header_set_camel_message_info_priv (self, msginfo);
+		_tny_msg_header_set_camel_message_info (self, msginfo);
 	}
 
 	return;
 }
 
-void /* public version of this method */
+static void
+prepare_for_write (TnyMsgHeader *self)
+{
+	unload_msg_header (self);
+
+	self->uid = NULL;
+
+	if (self->mime_message == NULL)
+	{
+		self->mime_message = camel_mime_message_new ();
+	}
+
+	return;
+}
+
+void /* protected method */
 _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
 {
-	tny_msg_header_set_camel_message_info_priv (self, camel_message_info);
+	/* camel_message_info_ref (camel_message_info); */
+
+	if (self->message_info)
+		g_warning ("Strange behaviour: Overwriting existing message info");
+
+	self->message_info = camel_message_info;
+
+	return;
+}
+
+CamelMimeMessage* /* protected method */
+_tny_msg_header_get_camel_mime_message (TnyMsgHeader *self)
+{
+	return self->mime_message;
+}
+
+void /* protected method */
+_tny_msg_header_set_camel_mime_message (TnyMsgHeader *self, CamelMimeMessage *camel_mime_message)
+{
+	if (self->mime_message)
+		g_warning ("Strange behaviour: Overwriting existing MIME message");
+
+	self->mime_message = camel_mime_message;
 
 	return;
 }
@@ -101,7 +133,183 @@ tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* fol
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
+	if (me->folder)
+		g_warning ("Strange behaviour: Overwriting existing folder");
+
 	me->folder = (TnyMsgFolderIface*)folder;
+
+	return;
+}
+
+
+
+static const gchar*
+tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	load_msg_header (me);
+
+	/* TODO */
+
+	return NULL;
+}
+
+static void
+one_record_to_camel_inet_addr (const gchar *tok, CamelInternetAddress *target)
+{
+	char *stfnd = NULL;
+	
+	stfnd = strchr (tok, '<');
+	
+	if (stfnd)
+	{
+		char *name = (char*)tok, *lname = NULL;
+		char *email = stfnd+1, *gtfnd = NULL;
+
+		lname = stfnd-1;
+
+		gtfnd = strchr (stfnd, '>');
+	
+		if (!gtfnd)
+		{
+			g_warning ("Invalid e-mail address in field");
+			return;
+		}
+	
+		*stfnd = '\0';
+		*gtfnd = '\0';
+	
+		if (*name == ' ')
+			*name++;
+	
+		if (*lname == ' ')
+			*lname-- = '\0';
+
+		camel_internet_address_add (target, name, email);
+	} else {
+		g_print ("%s\n", tok);
+		camel_internet_address_add (target, NULL, tok);
+	}
+}
+
+static void
+foreach_field_add_to_inet_addr (TnyMsgHeaderIface *self, const gchar *record, CamelInternetAddress *target)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	int length = strlen (record), i = 0;
+	char *dup = g_strdup (record);
+	char *tok, *save;
+
+	tok = strtok_r (dup, ",;", &save);
+
+	while (tok != NULL)
+	{
+		
+		one_record_to_camel_inet_addr ((const gchar*)tok, target);
+
+		tok = strtok_r (NULL, ",;", &save);
+	}
+
+	g_free (dup);
+
+	return;
+}
+
+static void
+tny_msg_header_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	CamelInternetAddress *addr =  camel_internet_address_new ();
+
+	foreach_field_add_to_inet_addr (self, bcc, addr);
+
+	prepare_for_write (me);
+
+	camel_mime_message_set_recipients (me->mime_message, 
+		CAMEL_RECIPIENT_TYPE_BCC, addr);
+
+	camel_object_unref (CAMEL_OBJECT (addr));
+
+	return;
+}
+
+static void
+tny_msg_header_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	CamelInternetAddress *addr =  camel_internet_address_new ();
+
+	foreach_field_add_to_inet_addr (self, cc, addr);
+
+	prepare_for_write (me);
+
+	camel_mime_message_set_recipients (me->mime_message, 
+		CAMEL_RECIPIENT_TYPE_CC, addr);
+
+	camel_object_unref (CAMEL_OBJECT (addr));
+
+	return;
+}
+
+static void
+tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	CamelInternetAddress *addr =  camel_internet_address_new ();
+
+	one_record_to_camel_inet_addr (from, addr);
+
+	prepare_for_write (me);
+
+	camel_mime_message_set_from (me->mime_message, addr);
+
+	camel_object_unref (CAMEL_OBJECT (addr));
+
+	return;
+}
+
+static void
+tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	prepare_for_write (me);
+
+	camel_mime_message_set_subject (me->mime_message, subject);
+
+	return;
+}
+
+static void
+tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	CamelInternetAddress *addr =  camel_internet_address_new ();
+
+	foreach_field_add_to_inet_addr (self, to, addr);
+
+	prepare_for_write (me);
+
+	camel_mime_message_set_recipients (me->mime_message, 
+		CAMEL_RECIPIENT_TYPE_TO, addr);
+
+	camel_object_unref (CAMEL_OBJECT (addr));
+
+	return;
+}
+
+
+static void
+tny_msg_header_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	prepare_for_write (me);
+
+	/* TODO */
+
 	return;
 }
 
@@ -278,12 +486,20 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_date_received_func = tny_msg_header_get_date_received;
 	klass->get_date_sent_func = tny_msg_header_get_date_sent;
 	klass->get_cc_func = tny_msg_header_get_cc;
+	klass->get_replyto_func = tny_msg_header_get_replyto;
 
 	klass->get_uid_func = tny_msg_header_get_uid;	
 	klass->set_uid_func = tny_msg_header_set_uid;
 	
 	klass->set_folder_func = tny_msg_header_set_folder;
 	klass->get_folder_func = tny_msg_header_get_folder;
+
+	klass->set_bcc_func = tny_msg_header_set_bcc;
+	klass->set_cc_func = tny_msg_header_set_cc;
+	klass->set_to_func = tny_msg_header_set_to;
+	klass->set_from_func = tny_msg_header_set_from;
+	klass->set_subject_func = tny_msg_header_set_subject;
+	klass->set_replyto_func = tny_msg_header_set_replyto;
 
 	klass->has_cache_func = tny_msg_header_has_cache;
 	klass->uncache_func = tny_msg_header_uncache;

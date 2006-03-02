@@ -23,6 +23,8 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
-void  _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info);
+void                _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info);
+void                _tny_msg_header_set_camel_mime_message (TnyMsgHeader *self, CamelMimeMessage *camel_mime_message);
+CamelMimeMessage*   _tny_msg_header_get_camel_mime_message (TnyMsgHeader *self);
 
 #endif

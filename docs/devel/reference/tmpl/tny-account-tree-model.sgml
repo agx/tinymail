@@ -11,12 +11,10 @@ implementing using a simple #GtkTreeStore and recursively walks the
 folders of account instances that get added.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

@@ -24,6 +24,9 @@
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 
+#include <tny-msg-header.h>
+#include <tny-msg-header-iface.h>
+
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 

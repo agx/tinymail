@@ -50,6 +50,7 @@ struct _TnySummaryWindowPriv
 	TnyAccountStoreIface *account_store;
 	GtkTreeView *mailbox_view, *header_view;
 	TnyMsgViewIface *msg_view;
+	guint accounts_reloaded_signal;
 };
 
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
@@ -114,13 +115,19 @@ tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountSto
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
 
 	if (priv->account_store)
+	{
+		g_signal_handler_disconnect (G_OBJECT (priv->account_store),
+			priv->accounts_reloaded_signal);
+
 		g_object_unref (G_OBJECT (priv->account_store));
+	}
 
 	g_object_ref (G_OBJECT (account_store));
 
 	priv->account_store = account_store;
 
-	g_signal_connect (G_OBJECT (account_store), "accounts_reloaded",
+	priv->accounts_reloaded_signal = g_signal_connect 
+		(G_OBJECT (account_store), "accounts_reloaded",
 		G_CALLBACK (accounts_reloaded), priv);
 
 	reload_accounts (priv);

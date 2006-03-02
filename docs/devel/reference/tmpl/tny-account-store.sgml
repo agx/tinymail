@@ -9,12 +9,10 @@ A store with accounts that uses libtinymail-camel and GConf
 An implementation of #TnyAccountStoreIface that uses libtinymail-camel and GConf.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyAccountStoreIface
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

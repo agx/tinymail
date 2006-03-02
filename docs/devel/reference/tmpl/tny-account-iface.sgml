@@ -9,12 +9,10 @@ An interface that defines an account type
 An account contains the folders of an E-mail service and handles the authentication with a service.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

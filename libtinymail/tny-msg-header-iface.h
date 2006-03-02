@@ -59,8 +59,17 @@ struct _TnyMsgHeaderIfaceClass
 	const gchar*   (*get_subject_func)        (TnyMsgHeaderIface *self);
 	const gchar*   (*get_to_func)             (TnyMsgHeaderIface *self);
 	const gchar*   (*get_from_func)           (TnyMsgHeaderIface *self);
+	const gchar*   (*get_replyto_func)        (TnyMsgHeaderIface *self);
+
 	const gchar*   (*get_message_id_func)     (TnyMsgHeaderIface *self);
-         
+
+	void           (*set_bcc_func)            (TnyMsgHeaderIface *self, const gchar *bcc);
+	void           (*set_cc_func)             (TnyMsgHeaderIface *self, const gchar *cc);
+	void           (*set_from_func)           (TnyMsgHeaderIface *self, const gchar *from);
+	void           (*set_subject_func)        (TnyMsgHeaderIface *self, const gchar *subject);
+	void           (*set_to_func)             (TnyMsgHeaderIface *self, const gchar *to);
+	void           (*set_replyto_func)        (TnyMsgHeaderIface *self, const gchar *to);
+
         const TnyMsgFolderIface*
                        (*get_folder_func)         (TnyMsgHeaderIface *self);
         void           (*set_folder_func)         (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
@@ -83,6 +92,14 @@ const gchar*   tny_msg_header_iface_get_from           (TnyMsgHeaderIface *self)
 const gchar*   tny_msg_header_iface_get_to             (TnyMsgHeaderIface *self);
 const gchar*   tny_msg_header_iface_get_subject        (TnyMsgHeaderIface *self);
 
+const gchar*   tny_msg_header_iface_get_replyto        (TnyMsgHeaderIface *self);
+
+void           tny_msg_header_iface_set_bcc            (TnyMsgHeaderIface *self, const gchar *bcc);
+void           tny_msg_header_iface_set_cc             (TnyMsgHeaderIface *self, const gchar *cc);
+void           tny_msg_header_iface_set_from           (TnyMsgHeaderIface *self, const gchar *from);
+void           tny_msg_header_iface_set_subject        (TnyMsgHeaderIface *self, const gchar *subject);
+void           tny_msg_header_iface_set_to             (TnyMsgHeaderIface *self, const gchar *to);
+void           tny_msg_header_iface_set_replyto        (TnyMsgHeaderIface *self, const gchar *to);
 
 const TnyMsgFolderIface*
                tny_msg_header_iface_get_folder         (TnyMsgHeaderIface *self);

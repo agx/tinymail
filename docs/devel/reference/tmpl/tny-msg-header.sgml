@@ -23,12 +23,10 @@ gobject at all. As at this moment, the full size of the GObject type is added
 for no real reason.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

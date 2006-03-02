@@ -9,12 +9,10 @@ An interfaces that defines a stream type
 A stream is an object that can be written to and can be read from.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

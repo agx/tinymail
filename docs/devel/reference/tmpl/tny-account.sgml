@@ -9,12 +9,10 @@ A account type implemented for Camel
 A account type implemented for Camel
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyAccountIface
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

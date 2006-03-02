@@ -11,12 +11,10 @@ that are implemented as a proxy for real header instances once their
 corresponding row in the #GtkTreeView become invisible.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

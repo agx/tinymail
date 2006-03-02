@@ -9,12 +9,10 @@ Shared include file with forward typedefs
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -88,7 +86,14 @@ Shared include file with forward typedefs
 @get_subject_func: 
 @get_to_func: 
 @get_from_func: 
+@get_replyto_func: 
 @get_message_id_func: 
+@set_bcc_func: 
+@set_cc_func: 
+@set_from_func: 
+@set_subject_func: 
+@set_to_func: 
+@set_replyto_func: 
 @get_folder_func: 
 @set_folder_func: 
 @uncache_func: 
@@ -187,15 +192,12 @@ Shared include file with forward typedefs
 
 </para>
 
-@parent: 
-@real: 
 
 <!-- ##### STRUCT TnyMsgHeaderProxyClass ##### -->
 <para>
 
 </para>
 
-@parent: 
 
 <!-- ##### USER_FUNCTION GetPassFunc ##### -->
 <para>

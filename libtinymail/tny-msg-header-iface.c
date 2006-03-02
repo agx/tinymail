@@ -22,6 +22,118 @@
 
 
 /**
+ * tny_msg_header_iface_set_bcc:
+ * @self: a #TnyMsgHeaderIface object
+ * @to: the reply-to header
+ * 
+ * Set the reply-to header
+ * 
+ **/
+void
+tny_msg_header_iface_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
+{
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_replyto_func (self, to);
+	return;
+}
+
+/**
+ * tny_msg_header_iface_get_replyto:
+ * @self: a #TnyMsgHeaderIface object
+ * 
+ * 
+ * 
+ * Return value: reply-to header
+ **/
+const gchar*
+tny_msg_header_iface_get_replyto (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_replyto_func (self);
+}
+
+/**
+ * tny_msg_header_iface_set_bcc:
+ * @self: a #TnyMsgHeaderIface object
+ * @from: the bcc header in a comma separated list
+ * 
+ * Set the bcc header. Also look at the to header for more information
+ * about the formatting.
+ * 
+ **/
+void
+tny_msg_header_iface_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
+{
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_bcc_func (self, bcc);
+	return;
+}
+
+/**
+ * tny_msg_header_iface_set_cc:
+ * @self: a #TnyMsgHeaderIface object
+ * @from: the cc header in a comma separated list
+ * 
+ * Set the cc header. Also look at the to header for more information
+ * about the formatting.
+ * 
+ **/
+void
+tny_msg_header_iface_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
+{
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_cc_func (self, cc);
+	return;
+}
+
+/**
+ * tny_msg_header_iface_set_from:
+ * @self: a #TnyMsgHeaderIface object
+ * @from: the from header
+ * 
+ * Set the from header
+ * 
+ **/
+void
+tny_msg_header_iface_set_from (TnyMsgHeaderIface *self, const gchar *from)
+{
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_from_func (self, from);
+	return;
+}
+
+/**
+ * tny_msg_header_iface_set_subject:
+ * @self: a #TnyMsgHeaderIface object
+ * @subject: the subject header
+ * 
+ * Set the subject header
+ * 
+ **/
+void
+tny_msg_header_iface_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
+{
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_subject_func (self, subject);
+	return;
+}
+
+/**
+ * tny_msg_header_iface_set_to:
+ * @self: a #TnyMsgHeaderIface object
+ * @to: the to header in a comma separated list
+ * 
+ * Set the to header.
+ *
+ * The format is a comma separated list like this:
+ * 
+ * Real Name 1 <email@address1.com>, Real Name 2 <email@address2.com>
+ *
+ * So there's no quotes nor anything special.
+ * 
+ **/
+void
+tny_msg_header_iface_set_to (TnyMsgHeaderIface *self, const gchar *to)
+{
+	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_to_func (self, to);
+	return;
+}
+
+/**
  * tny_msg_header_iface_get_cc:
  * @self: a #TnyMsgHeaderIface object
  * 

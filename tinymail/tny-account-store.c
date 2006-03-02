@@ -367,7 +367,10 @@ tny_account_store_constructor (GType type, guint n_construct_params,
 		the_singleton = TNY_ACCOUNT_STORE (object);
 	}
 	else
+	{
 		object = g_object_ref (G_OBJECT (the_singleton));
+		g_object_freeze_notify (G_OBJECT(the_singleton));
+	}
 
 	return object;
 }

@@ -9,12 +9,10 @@ An implementation of #TnyMsgMimePartIface that plays proxy for a #CamelMimePart
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

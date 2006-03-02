@@ -11,12 +11,10 @@ inherits from a #GtkListStore and handles the mime-type icon of the
 icon column automatically.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
