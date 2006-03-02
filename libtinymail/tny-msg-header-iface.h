@@ -53,6 +53,7 @@ struct _TnyMsgHeaderIfaceClass
 	const gchar*   (*get_uid_func)            (TnyMsgHeaderIface *self);
 	void           (*set_uid_func)            (TnyMsgHeaderIface *self, const gchar *uid);
 
+	const gchar*   (*get_bcc_func)            (TnyMsgHeaderIface *self);
 	const gchar*   (*get_cc_func)             (TnyMsgHeaderIface *self);
 	const time_t   (*get_date_received_func)  (TnyMsgHeaderIface *self);
 	const time_t   (*get_date_sent_func)      (TnyMsgHeaderIface *self);
@@ -83,7 +84,7 @@ GType          tny_msg_header_iface_get_type      (void);
 void           tny_msg_header_iface_set_uid             (TnyMsgHeaderIface *self, const gchar *uid);
 const gchar*   tny_msg_header_iface_get_uid             (TnyMsgHeaderIface *self);
 
-
+const gchar*   tny_msg_header_iface_get_bcc            (TnyMsgHeaderIface *self);
 const gchar*   tny_msg_header_iface_get_cc             (TnyMsgHeaderIface *self);
 const time_t   tny_msg_header_iface_get_date_received  (TnyMsgHeaderIface *self);
 const time_t   tny_msg_header_iface_get_date_sent      (TnyMsgHeaderIface *self);

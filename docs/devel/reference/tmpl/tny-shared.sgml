@@ -80,6 +80,7 @@ Shared include file with forward typedefs
 @g_iface: 
 @get_uid_func: 
 @set_uid_func: 
+@get_bcc_func: 
 @get_cc_func: 
 @get_date_received_func: 
 @get_date_sent_func: 

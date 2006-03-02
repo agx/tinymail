@@ -147,6 +147,19 @@ tny_msg_header_iface_get_cc (TnyMsgHeaderIface *self)
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_cc_func (self);
 }
 
+/**
+ * tny_msg_header_iface_get_bcc:
+ * @self: a #TnyMsgHeaderIface object
+ * 
+ * 
+ * 
+ * Return value: bcc header
+ **/
+const gchar*
+tny_msg_header_iface_get_bcc (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_bcc_func (self);
+}
 
 /**
  * tny_msg_header_iface_get_date_received:

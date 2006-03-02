@@ -331,9 +331,37 @@ tny_msg_header_get_cc (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	load_msg_header (me);
+	if (me->uid)
+	{
+		load_msg_header (me);
 
-	return camel_message_info_cc (me->message_info);
+		return camel_message_info_cc (me->message_info);
+
+	} else if (me->mime_message)
+	{
+		return camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "cc");
+	} else 
+		return NULL;
+}
+
+static const gchar*
+tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	if (me->uid)
+	{
+		load_msg_header (me);
+
+		/* TODO */
+
+		return NULL;
+
+	} else if (me->mime_message)
+	{
+		return camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "bcc");
+	} else 
+		return NULL;
 }
 
 static const time_t
@@ -361,9 +389,23 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	load_msg_header (me);
+	if (me->uid)
+	{
+		load_msg_header (me);
 
-	return camel_message_info_from (me->message_info);
+		return camel_message_info_from (me->message_info);
+
+	} else if (me->mime_message)
+	{
+		CamelInternetAddress *addr = (CamelInternetAddress*)
+			camel_mime_message_get_from (me->mime_message);
+		gchar *retval = camel_address_format (CAMEL_ADDRESS (addr));
+
+		camel_object_unref (CAMEL_OBJECT (addr));
+
+		return retval;
+	} else 
+		return NULL;
 }
 
 static const gchar*
@@ -382,9 +424,17 @@ tny_msg_header_get_to (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	load_msg_header (me);
+	if (me->uid)
+	{
+		load_msg_header (me);
 
-	return camel_message_info_to (me->message_info);
+		return camel_message_info_to (me->message_info);
+
+	} else if (me->mime_message)
+	{
+		return camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "to");
+	} else 
+		return NULL;
 }
 
 static const gchar*
