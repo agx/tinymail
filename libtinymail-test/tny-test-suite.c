@@ -16,6 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+
+/* Usage:
+ * gunit-test-runner-tool -s tinymail-test-suite -v gnome
+ */
+
 #include "tny-test-suite.h"
 #include "tny-msg-header-iface-test.h"
 
