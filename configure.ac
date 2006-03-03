@@ -3,7 +3,7 @@ AC_CONFIG_SRCDIR(tinymail/tny-main.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
 AM_CONFIG_HEADER(tinymail/config.h)
-AM_CONFIG_HEADER(tests/config.h)
+AM_CONFIG_HEADER(libtinymail-test/config.h)
 AM_CONFIG_HEADER(libtinymail/config.h)
 AM_CONFIG_HEADER(libtinymail-camel/config.h)
 AM_CONFIG_HEADER(libtinymail-gnomevfs/config.h)
@@ -76,6 +76,6 @@ libtinymailui-gtk/libtinymailui-gtk.pc
 libtinymail-gnomevfs/Makefile
 libtinymail-gnomevfs/libtinymail-gnomevfs.pc
 tinymail/Makefile
-tests/Makefile
+libtinymail-test/Makefile
 ])
 
