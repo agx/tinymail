@@ -41,12 +41,24 @@ static void
 tny_test_tui_view_set_test_runner (GUnitView *self, gpointer runner)
 {
 	TnyTestTuiViewPriv *priv = TNY_TEST_TUI_VIEW_GET_PRIVATE (self);
+	GList *lst = NULL;
+
+	lst = gunit_test_runner_get_suite_name_list (runner);
+
+	while (lst)
+	{
+		g_print ("%s\n", lst->data);
+		lst = g_list_next (lst);
+	}
 
 	if (priv->runner)
 		g_object_unref (G_OBJECT (priv->runner));
 
 	g_object_ref (runner);
 	priv->runner = runner;
+
+	gunit_test_runner_run_all (GUNIT_TEST_RUNNER (runner));
+
 
 	return;
 }

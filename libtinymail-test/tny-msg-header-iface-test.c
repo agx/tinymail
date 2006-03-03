@@ -73,6 +73,8 @@ tny_msg_header_iface_test_set_cc (void)
 	tny_msg_header_iface_set_cc (iface, str_in);
 	str_out = tny_msg_header_iface_get_cc (iface);
 
+	g_print ("CC test: %s,%s\n", str_in, str_out);
+
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set cc!");
 
 	return;
@@ -98,6 +100,8 @@ create_tny_msg_header_iface_suite (void)
 
 	/* Create test suite */
 	suite = gunit_test_suite_new ("TnyMsgheaderIface");
+
+	g_print ("New suite\n");
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,
