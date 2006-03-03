@@ -29,7 +29,7 @@ gunit_get_test_suites()
 {
 	GList *suites = NULL;
 
-	suites = g_list_append(suites, create_tny_msg_header_iface_suite ());
+	suites = g_list_append (suites, create_tny_msg_header_iface_suite ());
 
 	return suites;
 }
