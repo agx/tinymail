@@ -31,6 +31,14 @@ tny_msg_header_iface_test_setup (void)
 	return;
 }
 
+void 
+tny_msg_header_iface_test_teardown (void)
+{
+	g_object_unref (G_OBJECT (iface));
+
+	return;
+}
+
 void
 tny_msg_header_iface_test_set_from (void)
 {

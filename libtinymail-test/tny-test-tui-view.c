@@ -34,6 +34,7 @@ struct _TnyTestTuiViewPriv
 static void 
 tny_test_tui_view_update (GUnitView *self)
 {
+	g_print ("update\n");
 }
 
 static void 
