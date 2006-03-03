@@ -26,6 +26,7 @@ static TnyMsgHeaderIface *iface = NULL;
 void
 tny_msg_header_iface_test_setup (void)
 {
+	g_print ("setup\n");
 	iface = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	return;

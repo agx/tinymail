@@ -188,7 +188,6 @@ one_record_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 
 		camel_internet_address_add (target, name, email);
 	} else {
-		g_print ("%s\n", tok);
 		camel_internet_address_add (target, NULL, tok);
 	}
 }
@@ -552,6 +551,8 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_date_received_func = tny_msg_header_get_date_received;
 	klass->get_date_sent_func = tny_msg_header_get_date_sent;
 	klass->get_cc_func = tny_msg_header_get_cc;
+	klass->get_bcc_func = tny_msg_header_get_bcc;
+
 	klass->get_replyto_func = tny_msg_header_get_replyto;
 
 	klass->get_uid_func = tny_msg_header_get_uid;	
