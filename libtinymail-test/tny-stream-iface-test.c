@@ -24,13 +24,20 @@
 #include <tny-stream-camel.h>
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
+#include <camel/camel-folder.h>
+#include <camel/camel.h>
+#include <camel/camel-folder-summary.h>
 
 static TnyStreamIface *iface = NULL, *source = NULL;
 
 static void
 tny_stream_iface_test_setup (void)
 {
+	/* Don't ask me why, I think this is a Camel bug */
+	CamelInternetAddress *addr = camel_internet_address_new ();
 	CamelStream *stream = camel_stream_mem_new ();
+
+	camel_object_unref (CAMEL_OBJECT (addr));
 
 	iface = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
 	source = TNY_STREAM_IFACE (tny_test_stream_new ());
@@ -56,7 +63,7 @@ tny_stream_iface_test_stream (void)
 
 	tny_stream_iface_read (iface, buffer, 42);
 
-	gunit_fail (buffer);
+	g_message ("Buffer %s\n", buffer);
 }
 
 
@@ -67,7 +74,6 @@ create_tny_stream_iface_suite (void)
 
 	/* Create test suite */
 	suite = gunit_test_suite_new ("TnyStreamIface");
-
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,

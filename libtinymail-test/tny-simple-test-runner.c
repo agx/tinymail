@@ -129,7 +129,7 @@ tny_test_view_get_type (void)
 int
 main (int argc, char **argv)
 {
-	GList *suites = NULL;
+	GList *suites = NULL, *names = NULL;
 	GUnitTestRunner *runner = NULL;
 	GUnitView *view = NULL;
 
@@ -151,7 +151,21 @@ main (int argc, char **argv)
 		suites = g_list_next (suites);
 	}
 
-	gunit_test_runner_run_all  (runner);
+	g_list_free (suites);
+
+	names = gunit_test_runner_get_suite_name_list (runner);
+
+	while (names)
+	{
+		const gchar *name = (const gchar*)names->data;
+
+		g_print ("Unit test runner runs %s\n", name);
+		gunit_test_runner_run_suite (runner, name);
+
+		names = g_list_next (names);
+	}
+
+	g_list_free (names);
 
 	return 0;
 }

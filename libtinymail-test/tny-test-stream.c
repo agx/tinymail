@@ -113,15 +113,12 @@ tny_test_stream_new (void)
 static void
 tny_test_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-
 	return;
 }
 
 static void
 tny_test_stream_finalize (GObject *object)
 {
-	
-
 	return;
 }
 

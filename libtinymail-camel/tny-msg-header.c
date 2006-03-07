@@ -291,9 +291,6 @@ tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	CamelInternetAddress *addr = camel_internet_address_new ();
-	camel_object_unref (CAMEL_OBJECT (addr));
-
 	prepare_for_write (me);
 
 	camel_mime_message_set_subject (me->mime_message, subject);

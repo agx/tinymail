@@ -18,6 +18,10 @@
 
 #include <string.h>
 
+#include <camel/camel-folder.h>
+#include <camel/camel.h>
+#include <camel/camel-folder-summary.h>
+
 #include <tny-msg-header-iface-test.h>
 
 /* We are going to test the camel implementation */
@@ -28,6 +32,10 @@ static TnyMsgHeaderIface *iface = NULL;
 static void
 tny_msg_header_iface_test_setup (void)
 {
+	/* Don't ask me why, I think this is a Camel bug */
+	CamelInternetAddress *addr = camel_internet_address_new ();
+	camel_object_unref (CAMEL_OBJECT (addr));
+
 	iface = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	return;
@@ -87,10 +95,7 @@ tny_msg_header_iface_test_set_cc (void)
 	tny_msg_header_iface_set_cc (iface, str_in);
 	str_out = tny_msg_header_iface_get_cc (iface);
 
-	g_message ("CC test: %s,%s\n", str_in, str_out);
-
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set cc!\n");
-
 
 	return;
 }
