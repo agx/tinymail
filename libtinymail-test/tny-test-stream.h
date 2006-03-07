@@ -26,6 +26,9 @@
 
 #include <tny-test-stream.h>
 
+#include "tny-test-suite.h"
+
+
 G_BEGIN_DECLS
 
 #define TNY_TYPE_TEST_STREAM             (tny_test_stream_get_type ())

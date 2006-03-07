@@ -22,13 +22,18 @@
 
 /* We are going to test the camel implementation */
 #include <tny-stream-camel.h>
+#include <camel/camel-stream-mem.h>
+#include <camel/camel-data-wrapper.h>
 
-static TnyStreamIface *iface = NULL;
+static TnyStreamIface *iface = NULL, *source = NULL;
 
 static void
 tny_stream_iface_test_setup (void)
 {
-	//iface = TNY_STREAM_IFACE (tny_stream_camel_new ());
+	CamelStream *stream = camel_stream_mem_new ();
+
+	iface = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
+	source = TNY_STREAM_IFACE (tny_test_stream_new ());
 
 	return;
 }
@@ -37,15 +42,21 @@ static void
 tny_stream_iface_test_teardown (void)
 {
 	g_object_unref (G_OBJECT (iface));
+	g_object_unref (G_OBJECT (source));
 
 	return;
 }
 
 static void
-tny_stream_iface_test_write (void)
+tny_stream_iface_test_stream (void)
 {
+	gchar *buffer = (gchar*) malloc (sizeof (gchar) * 42);
 
-	//gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set subject!\n");
+	tny_stream_iface_write_to_stream (source, iface);
+
+	tny_stream_iface_read (iface, buffer, 42);
+
+	gunit_fail (buffer);
 }
 
 
@@ -60,9 +71,9 @@ create_tny_stream_iface_suite (void)
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_stream_iface_test_write",
+               gunit_test_case_new_with_funcs("tny_stream_iface_test_stream",
                                       tny_stream_iface_test_setup,
-                                      tny_stream_iface_test_write,
+                                      tny_stream_iface_test_stream,
 				      tny_stream_iface_test_teardown));
 
 	return suite;

@@ -22,7 +22,9 @@
  */
 
 #include "tny-test-suite.h"
+
 #include "tny-msg-header-iface-test.h"
+#include "tny-stream-iface-test.h"
 
 GList*
 gunit_get_test_suites()
@@ -30,6 +32,7 @@ gunit_get_test_suites()
 	GList *suites = NULL;
 
 	suites = g_list_append (suites, create_tny_msg_header_iface_suite ());
+	suites = g_list_append (suites, create_tny_stream_iface_suite ());
 
 	return suites;
 }

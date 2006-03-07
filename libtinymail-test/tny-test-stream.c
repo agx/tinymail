@@ -58,13 +58,16 @@ tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 static ssize_t
 tny_test_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 {
-	int i = 0, t = n/2;
+	int i = 0;
 
-	for (i = 0; i < t; i++)
+	for (i = 0; i < n; i++)
 	{
-		//if (i % 2 == 1)
-			
+		if (i % 2 == 1)
+			buffer [i] = '2';
+		else
+			buffer [i] = '4';		
 	}
+
 
 	return 0;
 }
@@ -72,16 +75,23 @@ tny_test_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 static ssize_t
 tny_test_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 {
-	
-
-	return -1;
-
+	return 0;
 }
 
 static gint
 tny_test_stream_close (TnyStreamIface *self)
 {
 	return 0;
+}
+
+static gboolean
+tny_test_stream_eos (TnyStreamIface *self)
+{
+	static gint count = 0;
+
+	count++;
+
+	return (count < 42);
 }
 
 
@@ -124,6 +134,7 @@ tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->write_func = tny_test_stream_write;
 	klass->close_func = tny_test_stream_close;
 	klass->write_to_stream_func = tny_test_stream_write_to_stream;
+	klass->eos_func = tny_test_stream_eos;
 
 	return;
 }
@@ -142,7 +153,7 @@ tny_test_stream_class_init (TnyTestStreamClass *class)
 }
 
 GType 
-tny_vfs_stream_get_type (void)
+tny_test_stream_get_type (void)
 {
 	static GType type = 0;
 
