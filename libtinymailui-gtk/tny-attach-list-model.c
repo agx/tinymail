@@ -29,7 +29,7 @@ static GObjectClass *parent_class = NULL;
 #include "tny-attach-list-model-priv.h"
 
 #define TNY_ATTACH_LIST_MODEL_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ATTACH_LIST_MODEL_TYPE, TnyAttachListModelPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModelPriv))
 
 
 void /* Protected function */
@@ -107,7 +107,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 TnyAttachListModel*
 tny_attach_list_model_new (void)
 {
-	TnyAttachListModel *self = g_object_new (TNY_ATTACH_LIST_MODEL_TYPE, NULL);
+	TnyAttachListModel *self = g_object_new (TNY_TYPE_ATTACH_LIST_MODEL, NULL);
 
 	return self;
 }

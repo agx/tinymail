@@ -556,7 +556,7 @@ tny_msg_header_finalize (GObject *object)
 TnyMsgHeader*
 tny_msg_header_new (void)
 {
-	TnyMsgHeader *self = g_object_new (TNY_MSG_HEADER_TYPE, NULL);
+	TnyMsgHeader *self = g_object_new (TNY_TYPE_MSG_HEADER, NULL);
 	
 	return self;
 }
@@ -648,7 +648,7 @@ tny_msg_header_get_type (void)
 			"TnyMsgHeader",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_MSG_HEADER_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_MSG_HEADER_IFACE, 
 			&tny_msg_header_iface_info);
 	}
 

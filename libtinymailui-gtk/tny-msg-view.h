@@ -31,12 +31,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_VIEW_TYPE             (tny_msg_view_get_type ())
-#define TNY_MSG_VIEW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_VIEW_TYPE, TnyMsgView))
-#define TNY_MSG_VIEW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_VIEW_TYPE, TnyMsgViewClass))
-#define TNY_IS_MSG_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_VIEW_TYPE))
-#define TNY_IS_MSG_VIEW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_VIEW_TYPE))
-#define TNY_MSG_VIEW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_MSG_VIEW_TYPE, TnyMsgViewClass))
+#define TNY_TYPE_MSG_VIEW             (tny_msg_view_get_type ())
+#define TNY_MSG_VIEW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_VIEW, TnyMsgView))
+#define TNY_MSG_VIEW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_VIEW, TnyMsgViewClass))
+#define TNY_IS_MSG_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_VIEW))
+#define TNY_IS_MSG_VIEW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_VIEW))
+#define TNY_MSG_VIEW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_VIEW, TnyMsgViewClass))
 
 typedef struct _TnyMsgView TnyMsgView;
 typedef struct _TnyMsgViewClass TnyMsgViewClass;

@@ -58,7 +58,7 @@ struct _TnyVfsStreamPriv
 };
 
 #define TNY_VFS_STREAM_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_VFS_STREAM_TYPE, TnyVfsStreamPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_VFS_STREAM, TnyVfsStreamPriv))
 
 
 static void
@@ -351,7 +351,7 @@ tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
 TnyVfsStream*
 tny_vfs_stream_new (GnomeVFSHandle *handle)
 {
-	TnyVfsStream *self = g_object_new (TNY_VFS_STREAM_TYPE, NULL);
+	TnyVfsStream *self = g_object_new (TNY_TYPE_VFS_STREAM, NULL);
 
 	tny_vfs_stream_set_handle (self, handle);
 
@@ -442,7 +442,7 @@ tny_vfs_stream_get_type (void)
 			"TnyVfsStream",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_STREAM_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 
 			&tny_stream_iface_info);
 	}
 

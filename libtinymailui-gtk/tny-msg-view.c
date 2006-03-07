@@ -42,7 +42,7 @@ struct _TnyMsgViewPriv
 };
 
 #define TNY_MSG_VIEW_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_VIEW_TYPE, TnyMsgViewPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_VIEW, TnyMsgViewPriv))
 
 
 /* TODO: refactor */
@@ -292,7 +292,7 @@ tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 TnyMsgView*
 tny_msg_view_new (void)
 {
-	TnyMsgView *self = g_object_new (TNY_MSG_VIEW_TYPE, NULL);
+	TnyMsgView *self = g_object_new (TNY_TYPE_MSG_VIEW, NULL);
 
 	return self;
 }
@@ -445,7 +445,7 @@ tny_msg_view_get_type (void)
 			"TnyMsgView",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_MSG_VIEW_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW_IFACE, 
 			&tny_msg_view_iface_info);
 
 	}

@@ -34,7 +34,7 @@ static GObjectClass *parent_class = NULL;
 #include "tny-msg-priv.h"
 
 #define TNY_MSG_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_TYPE, TnyMsgPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG, TnyMsgPriv))
 
 typedef gboolean (*CamelPartFunc)(CamelMimeMessage *, CamelMimePart *, void *data);
 
@@ -211,7 +211,7 @@ tny_msg_finalize (GObject *object)
 TnyMsg*
 tny_msg_new (void)
 {
-	TnyMsg *self = g_object_new (TNY_MSG_TYPE, NULL);
+	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
 	
 	return self;
 }
@@ -301,7 +301,7 @@ tny_msg_get_type (void)
 			"TnyMsg",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_MSG_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_MSG_IFACE,
 			&tny_msg_iface_info);
 	}
 

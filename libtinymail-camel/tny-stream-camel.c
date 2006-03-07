@@ -48,7 +48,7 @@ struct _TnyStreamCamelPriv
 };
 
 #define TNY_STREAM_CAMEL_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_STREAM_CAMEL_TYPE, TnyStreamCamelPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelPriv))
 
 
 static ssize_t
@@ -163,7 +163,7 @@ tny_stream_camel_set_stream (TnyStreamCamel *self, CamelStream *stream)
 TnyStreamCamel*
 tny_stream_camel_new (CamelStream *stream)
 {
-	TnyStreamCamel *self = g_object_new (TNY_STREAM_CAMEL_TYPE, NULL);
+	TnyStreamCamel *self = g_object_new (TNY_TYPE_STREAM_CAMEL, NULL);
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 
 	camel_object_ref (CAMEL_OBJECT (stream));
@@ -264,7 +264,7 @@ tny_stream_camel_get_type (void)
 			"TnyStreamCamel",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_STREAM_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 
 			&tny_stream_iface_info);
 	}
 

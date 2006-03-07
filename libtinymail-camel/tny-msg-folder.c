@@ -49,7 +49,7 @@ static GObjectClass *parent_class = NULL;
 
 
 #define TNY_MSG_FOLDER_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_FOLDER_TYPE, TnyMsgFolderPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))
 
 
 static void 
@@ -381,7 +381,7 @@ tny_msg_folder_get_folder (TnyMsgFolder *self)
 TnyMsgFolder*
 tny_msg_folder_new_with_folder (CamelFolder *camel_folder)
 {
-	TnyMsgFolder *self = g_object_new (TNY_MSG_FOLDER_TYPE, NULL);
+	TnyMsgFolder *self = g_object_new (TNY_TYPE_MSG_FOLDER, NULL);
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
 	tny_msg_folder_set_folder (self, camel_folder);
@@ -402,7 +402,7 @@ tny_msg_folder_new_with_folder (CamelFolder *camel_folder)
 TnyMsgFolder*
 tny_msg_folder_new (void)
 {
-	TnyMsgFolder *self = g_object_new (TNY_MSG_FOLDER_TYPE, NULL);
+	TnyMsgFolder *self = g_object_new (TNY_TYPE_MSG_FOLDER, NULL);
 
 	return self;
 }
@@ -550,7 +550,7 @@ tny_msg_folder_get_type (void)
 			"TnyMsgFolder",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_MSG_FOLDER_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_MSG_FOLDER_IFACE, 
 			&tny_msg_folder_iface_info);
 	}
 

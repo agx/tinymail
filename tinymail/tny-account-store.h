@@ -25,12 +25,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_ACCOUNT_STORE_TYPE             (tny_account_store_get_type ())
-#define TNY_ACCOUNT_STORE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_ACCOUNT_STORE_TYPE, TnyAccountStore))
-#define TNY_ACCOUNT_STORE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_ACCOUNT_STORE_TYPE, TnyAccountStoreClass))
-#define TNY_IS_ACCOUNT_STORE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_ACCOUNT_STORE_TYPE))
-#define TNY_IS_ACCOUNT_STORE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_ACCOUNT_STORE_TYPE))
-#define TNY_ACCOUNT_STORE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_ACCOUNT_STORE_TYPE, TnyAccountStoreClass))
+#define TNY_TYPE_ACCOUNT_STORE             (tny_account_store_get_type ())
+#define TNY_ACCOUNT_STORE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_ACCOUNT_STORE, TnyAccountStore))
+#define TNY_ACCOUNT_STORE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_ACCOUNT_STORE, TnyAccountStoreClass))
+#define TNY_IS_ACCOUNT_STORE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_ACCOUNT_STORE))
+#define TNY_IS_ACCOUNT_STORE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ACCOUNT_STORE))
+#define TNY_ACCOUNT_STORE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_ACCOUNT_STORE, TnyAccountStoreClass))
 
 typedef struct _TnyAccountStore TnyAccountStore;
 typedef struct _TnyAccountStoreClass TnyAccountStoreClass;

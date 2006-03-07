@@ -28,12 +28,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TEXT_BUFFER_STREAM_TYPE             (tny_text_buffer_stream_get_type ())
-#define TNY_TEXT_BUFFER_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TEXT_BUFFER_STREAM_TYPE, TnyTextBufferStream))
-#define TNY_TEXT_BUFFER_STREAM_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TEXT_BUFFER_STREAM_TYPE, TnyTextBufferStreamClass))
-#define TNY_IS_TEXT_BUFFER_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TEXT_BUFFER_STREAM_TYPE))
-#define TNY_IS_TEXT_BUFFER_STREAM_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TEXT_BUFFER_STREAM_TYPE))
-#define TNY_TEXT_BUFFER_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TEXT_BUFFER_STREAM_TYPE, TnyTextBufferStreamClass))
+#define TNY_TYPE_TEXT_BUFFER_STREAM             (tny_text_buffer_stream_get_type ())
+#define TNY_TEXT_BUFFER_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_TEXT_BUFFER_STREAM, TnyTextBufferStream))
+#define TNY_TEXT_BUFFER_STREAM_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_TEXT_BUFFER_STREAM, TnyTextBufferStreamClass))
+#define TNY_IS_TEXT_BUFFER_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_TEXT_BUFFER_STREAM))
+#define TNY_IS_TEXT_BUFFER_STREAM_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_TEXT_BUFFER_STREAM))
+#define TNY_TEXT_BUFFER_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_TEXT_BUFFER_STREAM, TnyTextBufferStreamClass))
 
 typedef struct _TnyTextBufferStream TnyTextBufferStream;
 typedef struct _TnyTextBufferStreamClass TnyTextBufferStreamClass;

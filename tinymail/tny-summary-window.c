@@ -54,7 +54,7 @@ struct _TnySummaryWindowPriv
 };
 
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_SUMMARY_WINDOW_TYPE, TnySummaryWindowPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_SUMMARY_WINDOW, TnySummaryWindowPriv))
 
 static void 
 reload_accounts (TnySummaryWindowPriv *priv)
@@ -255,7 +255,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 TnySummaryWindow*
 tny_summary_window_new (void)
 {
-	TnySummaryWindow *self = g_object_new (TNY_SUMMARY_WINDOW_TYPE, NULL);
+	TnySummaryWindow *self = g_object_new (TNY_TYPE_SUMMARY_WINDOW, NULL);
 
 	return self;
 }
@@ -477,7 +477,7 @@ tny_summary_window_get_type (void)
 			"TnySummaryWindow",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_SUMMARY_WINDOW_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_SUMMARY_WINDOW_IFACE, 
 			&tny_summary_window_iface_info);
 
 	}

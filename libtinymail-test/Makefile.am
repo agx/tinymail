@@ -12,6 +12,10 @@ lib_LTLIBRARIES = libtinymail-test-suite.la
 libtinymail_test_suite_la_SOURCES = 						\
 	tny-msg-header-iface-test.h						\
 	tny-msg-header-iface-test.c						\
+	tny-stream-iface-test.h							\
+	tny-stream-iface-test.c							\
+	tny-test-stream.c							\
+	tny-test-stream.h							\
 	tny-test-suite.c							\
 	tny-test-suite.h
 

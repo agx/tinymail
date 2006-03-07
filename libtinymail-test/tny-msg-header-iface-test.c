@@ -41,7 +41,7 @@ tny_msg_header_iface_test_teardown (void)
 	return;
 }
 
-void
+static void
 tny_msg_header_iface_test_set_from (void)
 {
 	const gchar *str_in = "Me myself and I <me.myself@and.i.com>", *str_out;
@@ -136,7 +136,6 @@ create_tny_msg_header_iface_suite (void)
 	/* Create test suite */
 	suite = gunit_test_suite_new ("TnyMsgheaderIface");
 
-	g_print ("New suite\n");
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,

@@ -24,16 +24,17 @@
 #include <unistd.h>
 #include <glib.h>
 #include <glib-object.h>
+
 #include <tny-shared.h>
 
 G_BEGIN_DECLS
 
-#define TNY_STREAM_IFACE_TYPE             (tny_stream_iface_get_type ())
-#define TNY_STREAM_IFACE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_STREAM_IFACE_TYPE, TnyStreamIface))
-#define TNY_STREAM_IFACE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_STREAM_IFACE_TYPE, TnyStreamIfaceClass))
-#define TNY_IS_STREAM_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_STREAM_IFACE_TYPE))
-#define TNY_IS_STREAM_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_STREAM_IFACE_TYPE))
-#define TNY_STREAM_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_STREAM_IFACE_TYPE, TnyStreamIfaceClass))
+#define TNY_TYPE_STREAM_IFACE             (tny_stream_iface_get_type ())
+#define TNY_STREAM_IFACE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_STREAM_IFACE, TnyStreamIface))
+#define TNY_STREAM_IFACE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_STREAM_IFACE, TnyStreamIfaceClass))
+#define TNY_IS_STREAM_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_STREAM_IFACE))
+#define TNY_IS_STREAM_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_STREAM_IFACE))
+#define TNY_STREAM_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_STREAM_IFACE, TnyStreamIfaceClass))
 
 struct _TnyStreamIfaceClass
 {

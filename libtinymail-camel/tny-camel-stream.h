@@ -28,10 +28,10 @@
 
 G_BEGIN_DECLS
 
-#define TNY_CAMEL_STREAM_TYPE     (tny_camel_stream_get_type ())
-#define TNY_CAMEL_STREAM(obj)     (CAMEL_CHECK_CAST((obj), TNY_CAMEL_STREAM_TYPE, TnyCamelStream))
-#define TNY_CAMEL_STREAM_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_CAMEL_STREAM_TYPE, TnyCamelStreamClass))
-#define TNY_CAMEL_VFS_STREAM(o)   (CAMEL_CHECK_TYPE((o), TNY_CAMEL_STREAM_TYPE))
+#define TNY_TYPE_CAMEL_STREAM     (tny_camel_stream_get_type ())
+#define TNY_CAMEL_STREAM(obj)     (CAMEL_CHECK_CAST((obj), TNY_TYPE_CAMEL_STREAM, TnyCamelStream))
+#define TNY_CAMEL_STREAM_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_TYPE_CAMEL_STREAM, TnyCamelStreamClass))
+#define TNY_CAMEL_VFS_STREAM(o)   (CAMEL_CHECK_TYPE((o), TNY_TYPE_CAMEL_STREAM))
 
 typedef struct _TnyCamelStream TnyCamelStream;
 typedef struct _TnyCamelStreamClass TnyCamelStreamClass;

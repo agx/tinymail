@@ -31,12 +31,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_WINDOW_TYPE             (tny_msg_window_get_type ())
-#define TNY_MSG_WINDOW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_WINDOW_TYPE, TnyMsgWindow))
-#define TNY_MSG_WINDOW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_WINDOW_TYPE, TnyMsgWindowClass))
-#define TNY_IS_MSG_WINDOW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_WINDOW_TYPE))
-#define TNY_IS_MSG_WINDOW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_WINDOW_TYPE))
-#define TNY_MSG_WINDOW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_MSG_WINDOW_TYPE, TnyMsgWindowClass))
+#define TNY_TYPE_MSG_WINDOW             (tny_msg_window_get_type ())
+#define TNY_MSG_WINDOW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_WINDOW, TnyMsgWindow))
+#define TNY_MSG_WINDOW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_WINDOW, TnyMsgWindowClass))
+#define TNY_IS_MSG_WINDOW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_WINDOW))
+#define TNY_IS_MSG_WINDOW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_WINDOW))
+#define TNY_MSG_WINDOW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_WINDOW, TnyMsgWindowClass))
 
 typedef struct _TnyMsgWindow TnyMsgWindow;
 typedef struct _TnyMsgWindowClass TnyMsgWindowClass;

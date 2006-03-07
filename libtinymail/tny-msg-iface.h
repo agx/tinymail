@@ -28,12 +28,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_IFACE_TYPE             (tny_msg_iface_get_type ())
-#define TNY_MSG_IFACE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_IFACE_TYPE, TnyMsgIface))
-#define TNY_MSG_IFACE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_IFACE_TYPE, TnyMsgIfaceClass))
-#define TNY_IS_MSG_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_IFACE_TYPE))
-#define TNY_IS_MSG_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_IFACE_TYPE))
-#define TNY_MSG_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_MSG_IFACE_TYPE, TnyMsgIfaceClass))
+#define TNY_TYPE_MSG_IFACE             (tny_msg_iface_get_type ())
+#define TNY_MSG_IFACE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_IFACE, TnyMsgIface))
+#define TNY_MSG_IFACE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_IFACE, TnyMsgIfaceClass))
+#define TNY_IS_MSG_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_IFACE))
+#define TNY_IS_MSG_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_IFACE))
+#define TNY_MSG_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_MSG_IFACE, TnyMsgIfaceClass))
 
 struct _TnyMsgIfaceClass
 {

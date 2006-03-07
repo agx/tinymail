@@ -241,12 +241,12 @@ tny_msg_folder_iface_base_init (gpointer g_class)
  **/
 		tny_msg_folder_iface_signals[FOLDER_INSERTED] =
 		   g_signal_new ("folder_inserted",
-			TNY_MSG_FOLDER_IFACE_TYPE,
+			TNY_TYPE_MSG_FOLDER_IFACE,
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyMsgFolderIfaceClass, folder_inserted),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_MSG_FOLDER_IFACE_TYPE);
+			G_TYPE_NONE, 1, TNY_TYPE_MSG_FOLDER_IFACE);
 
 /**
  * TnyMsgFolderIface::folders_reloaded:
@@ -257,7 +257,7 @@ tny_msg_folder_iface_base_init (gpointer g_class)
  **/
 		tny_msg_folder_iface_signals[FOLDERS_RELOADED] =
 		   g_signal_new ("folders_reloaded",
-			TNY_MSG_FOLDER_IFACE_TYPE,
+			TNY_TYPE_MSG_FOLDER_IFACE,
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyMsgFolderIfaceClass, folders_reloaded),
 			NULL, NULL,

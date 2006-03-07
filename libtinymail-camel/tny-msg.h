@@ -30,12 +30,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_TYPE             (tny_msg_get_type ())
-#define TNY_MSG(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_TYPE, TnyMsg))
-#define TNY_MSG_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_TYPE, TnyMsgClass))
-#define TNY_IS_MSG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_TYPE))
-#define TNY_IS_MSG_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_TYPE))
-#define TNY_MSG_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_MSG_TYPE, TnyMsgClass))
+#define TNY_TYPE_MSG             (tny_msg_get_type ())
+#define TNY_MSG(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG, TnyMsg))
+#define TNY_MSG_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG, TnyMsgClass))
+#define TNY_IS_MSG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG))
+#define TNY_IS_MSG_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG))
+#define TNY_MSG_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG, TnyMsgClass))
 
 typedef struct _TnyMsg TnyMsg;
 typedef struct _TnyMsgClass TnyMsgClass;

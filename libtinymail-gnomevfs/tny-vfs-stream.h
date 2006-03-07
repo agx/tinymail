@@ -28,12 +28,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_VFS_STREAM_TYPE             (tny_vfs_stream_get_type ())
-#define TNY_VFS_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_VFS_STREAM_TYPE, TnyVfsStream))
-#define TNY_VFS_STREAM_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_VFS_STREAM_TYPE, TnyVfsStreamClass))
-#define TNY_IS_VFS_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_VFS_STREAM_TYPE))
-#define TNY_IS_VFS_STREAM_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_VFS_STREAM_TYPE))
-#define TNY_VFS_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_VFS_STREAM_TYPE, TnyVfsStreamClass))
+#define TNY_TYPE_VFS_STREAM             (tny_vfs_stream_get_type ())
+#define TNY_VFS_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_VFS_STREAM, TnyVfsStream))
+#define TNY_VFS_STREAM_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_VFS_STREAM, TnyVfsStreamClass))
+#define TNY_IS_VFS_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_VFS_STREAM))
+#define TNY_IS_VFS_STREAM_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_VFS_STREAM))
+#define TNY_VFS_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_VFS_STREAM, TnyVfsStreamClass))
 
 typedef struct _TnyVfsStream TnyVfsStream;
 typedef struct _TnyVfsStreamClass TnyVfsStreamClass;

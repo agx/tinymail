@@ -28,12 +28,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_MIME_PART_TYPE             (tny_msg_mime_part_get_type ())
-#define TNY_MSG_MIME_PART(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_MIME_PART_TYPE, TnyMsgMimePart))
-#define TNY_MSG_MIME_PART_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_MIME_PART_TYPE, TnyMsgMimePartClass))
-#define TNY_IS_MSG_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_MIME_PART_TYPE))
-#define TNY_IS_MSG_MIME_PART_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_MIME_PART_TYPE))
-#define TNY_MSG_MIME_PART_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_MSG_MIME_PART_TYPE, TnyMsgMimePartClass))
+#define TNY_TYPE_MSG_MIME_PART             (tny_msg_mime_part_get_type ())
+#define TNY_MSG_MIME_PART(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePart))
+#define TNY_MSG_MIME_PART_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartClass))
+#define TNY_IS_MSG_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_MIME_PART))
+#define TNY_IS_MSG_MIME_PART_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_MIME_PART))
+#define TNY_MSG_MIME_PART_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartClass))
 
 typedef struct _TnyMsgMimePart TnyMsgMimePart;
 typedef struct _TnyMsgMimePartClass TnyMsgMimePartClass;

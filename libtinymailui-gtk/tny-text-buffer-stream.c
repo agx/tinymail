@@ -36,7 +36,7 @@ struct _TnyTextBufferStreamPriv
 };
 
 #define TNY_TEXT_BUFFER_STREAM_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TEXT_BUFFER_STREAM_TYPE, TnyTextBufferStreamPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_TEXT_BUFFER_STREAM, TnyTextBufferStreamPriv))
 
 
 static ssize_t
@@ -177,7 +177,7 @@ tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer
 TnyTextBufferStream*
 tny_text_buffer_stream_new (GtkTextBuffer *buffer)
 {
-	TnyTextBufferStream *self = g_object_new (TNY_TEXT_BUFFER_STREAM_TYPE, NULL);
+	TnyTextBufferStream *self = g_object_new (TNY_TYPE_TEXT_BUFFER_STREAM, NULL);
 
 	tny_text_buffer_stream_set_text_buffer (self, buffer);
 
@@ -271,7 +271,7 @@ tny_text_buffer_stream_get_type (void)
 			"TnyTextBufferStream",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_STREAM_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 
 			&tny_stream_iface_info);
 	}
 

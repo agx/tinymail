@@ -27,10 +27,10 @@
 
 G_BEGIN_DECLS
 
-#define TNY_SESSION_CAMEL_TYPE     (tny_session_camel_get_type ())
-#define TNY_SESSION_CAMEL(obj)     (CAMEL_CHECK_CAST((obj), TNY_SESSION_CAMEL_TYPE, TnySessionCamel))
-#define TNY_SESSION_CAMEL_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_SESSION_CAMEL_TYPE, TnySessionCamelClass))
-#define TNY_IS_SESSION_CAMEL(o)    (CAMEL_CHECK_TYPE((o), TNY_SESSION_CAMEL_TYPE))
+#define TNY_TYPE_SESSION_CAMEL     (tny_session_camel_get_type ())
+#define TNY_SESSION_CAMEL(obj)     (CAMEL_CHECK_CAST((obj), TNY_TYPE_SESSION_CAMEL, TnySessionCamel))
+#define TNY_SESSION_CAMEL_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_TYPE_SESSION_CAMEL, TnySessionCamelClass))
+#define TNY_IS_SESSION_CAMEL(o)    (CAMEL_CHECK_TYPE((o), TNY_TYPE_SESSION_CAMEL))
 
 typedef struct _TnySessionCamel TnySessionCamel;
 typedef struct _TnySessionCamelClass TnySessionCamelClass;

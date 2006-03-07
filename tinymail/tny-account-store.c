@@ -42,7 +42,7 @@ struct _TnyAccountStorePriv
 };
 
 #define TNY_ACCOUNT_STORE_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ACCOUNT_STORE_TYPE, TnyAccountStorePriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ACCOUNT_STORE, TnyAccountStorePriv))
 
 static GHashTable *passwords;
 
@@ -310,7 +310,7 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 TnyAccountStore*
 tny_account_store_get_instance (void)
 {
-	TnyAccountStore *self = g_object_new (TNY_ACCOUNT_STORE_TYPE, NULL);
+	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
 
 	return self;
 }
@@ -435,7 +435,7 @@ tny_account_store_get_type (void)
 			"TnyAccountStore",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_ACCOUNT_STORE_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_IFACE, 
 			&tny_account_store_iface_info);
 	}
 

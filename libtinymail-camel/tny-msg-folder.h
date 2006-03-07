@@ -30,12 +30,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_FOLDER_TYPE             (tny_msg_folder_get_type ())
-#define TNY_MSG_FOLDER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_MSG_FOLDER_TYPE, TnyMsgFolder))
-#define TNY_MSG_FOLDER_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_MSG_FOLDER_TYPE, TnyMsgFolderClass))
-#define TNY_IS_MSG_FOLDER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_MSG_FOLDER_TYPE))
-#define TNY_IS_MSG_FOLDER_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_MSG_FOLDER_TYPE))
-#define TNY_MSG_FOLDER_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_MSG_FOLDER_TYPE, TnyMsgFolderClass))
+#define TNY_TYPE_MSG_FOLDER             (tny_msg_folder_get_type ())
+#define TNY_MSG_FOLDER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_FOLDER, TnyMsgFolder))
+#define TNY_MSG_FOLDER_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_FOLDER, TnyMsgFolderClass))
+#define TNY_IS_MSG_FOLDER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_FOLDER))
+#define TNY_IS_MSG_FOLDER_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_FOLDER))
+#define TNY_MSG_FOLDER_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_FOLDER, TnyMsgFolderClass))
 
 typedef struct _TnyMsgFolder TnyMsgFolder;
 typedef struct _TnyMsgFolderClass TnyMsgFolderClass;

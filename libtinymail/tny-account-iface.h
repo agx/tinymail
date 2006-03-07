@@ -26,12 +26,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_ACCOUNT_IFACE_TYPE             (tny_account_iface_get_type ())
-#define TNY_ACCOUNT_IFACE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_ACCOUNT_IFACE_TYPE, TnyAccountIface))
-#define TNY_ACCOUNT_IFACE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_ACCOUNT_IFACE_TYPE, TnyAccountIfaceClass))
-#define TNY_IS_ACCOUNT_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_ACCOUNT_IFACE_TYPE))
-#define TNY_IS_ACCOUNT_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_ACCOUNT_IFACE_TYPE))
-#define TNY_ACCOUNT_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_ACCOUNT_IFACE_TYPE, TnyAccountIfaceClass))
+#define TNY_TYPE_ACCOUNT_IFACE             (tny_account_iface_get_type ())
+#define TNY_ACCOUNT_IFACE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_ACCOUNT_IFACE, TnyAccountIface))
+#define TNY_ACCOUNT_IFACE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_ACCOUNT_IFACE, TnyAccountIfaceClass))
+#define TNY_IS_ACCOUNT_IFACE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_ACCOUNT_IFACE))
+#define TNY_IS_ACCOUNT_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ACCOUNT_IFACE))
+#define TNY_ACCOUNT_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_ACCOUNT_IFACE, TnyAccountIfaceClass))
 
 struct _TnyAccountIfaceClass
 {

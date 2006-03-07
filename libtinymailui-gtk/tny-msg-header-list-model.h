@@ -26,12 +26,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_MSG_HEADER_TYPE_LIST_MODEL            (tny_msg_header_list_model_get_type ())
-#define TNY_MSG_HEADER_LIST_MODEL(obj)            (GTK_CHECK_CAST ((obj), TNY_MSG_HEADER_TYPE_LIST_MODEL, TnyMsgHeaderListModel))
-#define TNY_MSG_HEADER_LIST_MODEL_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), TNY_MSG_HEADER_TYPE_LIST_MODEL, TnyMsgHeaderListModelClass))
-#define TNY_MSG_HEADER_IS_LIST_MODEL(obj)         (GTK_CHECK_TYPE ((obj), TNY_MSG_HEADER_TYPE_LIST_MODEL))
-#define TNY_MSG_HEADER_IS_LIST_MODEL_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((obj), TNY_MSG_HEADER_TYPE_LIST_MODEL))
-#define TNY_MSG_HEADER_LIST_MODEL_GET_CLASS(obj)  (GTK_CHECK_GET_CLASS ((obj), TNY_MSG_HEADER_TYPE_LIST_MODEL, TnyMsgHeaderListModelClass))
+#define TNY_TYPE_MSG_HEADER_LIST_MODEL            (tny_msg_header_list_model_get_type ())
+#define TNY_MSG_HEADER_LIST_MODEL(obj)            (GTK_CHECK_CAST ((obj), TNY_TYPE_MSG_HEADER_LIST_MODEL, TnyMsgHeaderListModel))
+#define TNY_MSG_HEADER_LIST_MODEL_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), TNY_TYPE_MSG_HEADER_LIST_MODEL, TnyMsgHeaderListModelClass))
+#define TNY_MSG_HEADER_IS_LIST_MODEL(obj)         (GTK_CHECK_TYPE ((obj), TNY_TYPE_MSG_HEADER_TYPE_MODEL))
+#define TNY_MSG_HEADER_IS_LIST_MODEL_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((obj), TNY_TYPE_MSG_HEADER_LIST_MODEL))
+#define TNY_MSG_HEADER_LIST_MODEL_GET_CLASS(obj)  (GTK_CHECK_GET_CLASS ((obj), TNY_TYPE_MSG_HEADER_LIST_MODEL, TnyMsgHeaderListModelClass))
 
 typedef struct _TnyMsgHeaderListModel TnyMsgHeaderListModel;
 typedef struct _TnyMsgHeaderListModelClass TnyMsgHeaderListModelClass;

@@ -80,12 +80,12 @@ tny_account_store_iface_base_init (gpointer g_class)
  **/
 		tny_account_store_iface_signals[ACCOUNT_CHANGED] =
 		   g_signal_new ("account_changed",
-			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_changed),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_ACCOUNT_IFACE_TYPE);
+			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT_IFACE);
 
 /**
  * TnyAccountStoreIface::account_inserted:
@@ -99,12 +99,12 @@ tny_account_store_iface_base_init (gpointer g_class)
 
 		tny_account_store_iface_signals[ACCOUNT_INSERTED] =
 		   g_signal_new ("account_inserted",
-			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_inserted),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_ACCOUNT_IFACE_TYPE);
+			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT_IFACE);
 
 /**
  * TnyAccountStoreIface::account_removed:
@@ -116,12 +116,12 @@ tny_account_store_iface_base_init (gpointer g_class)
  **/
 		tny_account_store_iface_signals[ACCOUNT_REMOVED] =
 		   g_signal_new ("account_removed",
-			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, account_removed),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_ACCOUNT_IFACE_TYPE);
+			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT_IFACE);
 
 /**
  * TnyAccountStoreIface::accounts_reloaded:
@@ -132,7 +132,7 @@ tny_account_store_iface_base_init (gpointer g_class)
  **/
 		tny_account_store_iface_signals[ACCOUNTS_RELOADED] =
 		   g_signal_new ("accounts_reloaded",
-			TNY_ACCOUNT_STORE_IFACE_TYPE,
+			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyAccountStoreIfaceClass, accounts_reloaded),
 			NULL, NULL,

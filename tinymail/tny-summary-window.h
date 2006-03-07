@@ -25,12 +25,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_SUMMARY_WINDOW_TYPE             (tny_summary_window_get_type ())
-#define TNY_SUMMARY_WINDOW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_SUMMARY_WINDOW_TYPE, TnySummaryWindow))
-#define TNY_SUMMARY_WINDOW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_SUMMARY_WINDOW_TYPE, TnySummaryWindowClass))
-#define TNY_IS_SUMMARY_WINDOW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_SUMMARY_WINDOW_TYPE))
-#define TNY_IS_SUMMARY_WINDOW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_SUMMARY_WINDOW_TYPE))
-#define TNY_SUMMARY_WINDOW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_SUMMARY_WINDOW_TYPE, TnySummaryWindowClass))
+#define TNY_TYPE_SUMMARY_WINDOW             (tny_summary_window_get_type ())
+#define TNY_SUMMARY_WINDOW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_SUMMARY_WINDOW, TnySummaryWindow))
+#define TNY_SUMMARY_WINDOW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_SUMMARY_WINDOW, TnySummaryWindowClass))
+#define TNY_IS_SUMMARY_WINDOW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_SUMMARY_WINDOW))
+#define TNY_IS_SUMMARY_WINDOW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_SUMMARY_WINDOW))
+#define TNY_SUMMARY_WINDOW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_SUMMARY_WINDOW, TnySummaryWindowClass))
 
 typedef struct _TnySummaryWindow TnySummaryWindow;
 typedef struct _TnySummaryWindowClass TnySummaryWindowClass;

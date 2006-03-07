@@ -31,7 +31,7 @@ struct _TnyPasswordDialogPriv
 };
 
 #define TNY_PASSWORD_DIALOG_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_PASSWORD_DIALOG_TYPE, TnyPasswordDialogPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_PASSWORD_DIALOG, TnyPasswordDialogPriv))
 
 
 /**
@@ -73,7 +73,7 @@ tny_password_dialog_get_password (TnyPasswordDialog *self)
 TnyPasswordDialog*
 tny_password_dialog_new (void)
 {
-	TnyPasswordDialog *self = g_object_new (TNY_PASSWORD_DIALOG_TYPE, NULL);
+	TnyPasswordDialog *self = g_object_new (TNY_TYPE_PASSWORD_DIALOG, NULL);
 
 	return self;
 }

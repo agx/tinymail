@@ -25,12 +25,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_PASSWORD_DIALOG_TYPE             (tny_password_dialog_get_type ())
-#define TNY_PASSWORD_DIALOG(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_PASSWORD_DIALOG_TYPE, TnyPasswordDialog))
-#define TNY_PASSWORD_DIALOG_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_PASSWORD_DIALOG_TYPE, TnyPasswordDialogClass))
-#define TNY_IS_PASSWORD_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_PASSWORD_DIALOG_TYPE))
-#define TNY_IS_PASSWORD_DIALOG_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_PASSWORD_DIALOG_TYPE))
-#define TNY_PASSWORD_DIALOG_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_PASSWORD_DIALOG_TYPE, TnyPasswordDialogClass))
+#define TNY_TYPE_PASSWORD_DIALOG             (tny_password_dialog_get_type ())
+#define TNY_PASSWORD_DIALOG(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_PASSWORD_DIALOG, TnyPasswordDialog))
+#define TNY_PASSWORD_DIALOG_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_PASSWORD_DIALOG, TnyPasswordDialogClass))
+#define TNY_IS_PASSWORD_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_PASSWORD_DIALOG))
+#define TNY_IS_PASSWORD_DIALOG_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_PASSWORD_DIALOG))
+#define TNY_PASSWORD_DIALOG_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_PASSWORD_DIALOG, TnyPasswordDialogClass))
 
 typedef struct _TnyPasswordDialog TnyPasswordDialog;
 typedef struct _TnyPasswordDialogClass TnyPasswordDialogClass;

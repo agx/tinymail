@@ -28,12 +28,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_STREAM_CAMEL_TYPE             (tny_stream_camel_get_type ())
-#define TNY_STREAM_CAMEL(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_STREAM_CAMEL_TYPE, TnyStreamCamel))
-#define TNY_STREAM_CAMEL_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_STREAM_CAMEL_TYPE, TnyStreamCamelClass))
-#define TNY_IS_STREAM_CAMEL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_STREAM_CAMEL_TYPE))
-#define TNY_IS_STREAM_CAMEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_STREAM_CAMEL_TYPE))
-#define TNY_STREAM_CAMEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_STREAM_CAMEL_TYPE, TnyStreamCamelClass))
+#define TNY_TYPE_STREAM_CAMEL             (tny_stream_camel_get_type ())
+#define TNY_STREAM_CAMEL(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_STREAM_CAMEL, TnyStreamCamel))
+#define TNY_STREAM_CAMEL_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelClass))
+#define TNY_IS_STREAM_CAMEL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_STREAM_CAMEL))
+#define TNY_IS_STREAM_CAMEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_STREAM_CAMEL))
+#define TNY_STREAM_CAMEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelClass))
 
 typedef struct _TnyStreamCamel TnyStreamCamel;
 typedef struct _TnyStreamCamelClass TnyStreamCamelClass;

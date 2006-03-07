@@ -30,7 +30,7 @@ struct _TnyMsgWindowPriv
 };
 
 #define TNY_MSG_WINDOW_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_WINDOW_TYPE, TnyMsgWindowPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_WINDOW, TnyMsgWindowPriv))
 
 
 static void 
@@ -56,7 +56,7 @@ tny_msg_window_set_msg (TnyMsgWindowIface *self, TnyMsgIface *msg)
 TnyMsgWindow*
 tny_msg_window_new (void)
 {
-	TnyMsgWindow *self = g_object_new (TNY_MSG_WINDOW_TYPE, NULL);
+	TnyMsgWindow *self = g_object_new (TNY_TYPE_MSG_WINDOW, NULL);
 
 	return self;
 }
@@ -147,7 +147,7 @@ tny_msg_window_get_type (void)
 			"TnyMsgWindow",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_MSG_WINDOW_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_MSG_WINDOW_IFACE, 
 			&tny_msg_window_iface_info);
 
 	}

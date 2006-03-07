@@ -26,12 +26,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_ACCOUNT_TREE_MODEL_TYPE            (tny_account_tree_model_get_type ())
-#define TNY_ACCOUNT_TREE_MODEL(obj)            (GTK_CHECK_CAST ((obj), TNY_ACCOUNT_TREE_MODEL_TYPE, TnyAccountTreeModel))
-#define TNY_ACCOUNT_TREE_MODEL_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), TNY_ACCOUNT_TREE_MODEL_TYPE, TnyAccountTreeModelClass))
-#define TNY_ACCOUNT_IS_TREE_MODEL(obj)         (GTK_CHECK_TYPE ((obj), TNY_ACCOUNT_TREE_MODEL_TYPE))
-#define TNY_ACCOUNT_IS_TREE_MODEL_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((obj), TNY_ACCOUNT_TREE_MODEL_TYPE))
-#define TNY_ACCOUNT_TREE_MODEL_GET_CLASS(obj)  (GTK_CHECK_GET_CLASS ((obj), TNY_ACCOUNT_TREE_MODEL_TYPE, TnyAccountTreeModelClass))
+#define TNY_TYPE_ACCOUNT_TREE_MODEL            (tny_account_tree_model_get_type ())
+#define TNY_ACCOUNT_TREE_MODEL(obj)            (GTK_CHECK_CAST ((obj), TNY_TYPE_ACCOUNT_TREE_MODEL, TnyAccountTreeModel))
+#define TNY_ACCOUNT_TREE_MODEL_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), TNY_TYPE_ACCOUNT_TREE_MODEL, TnyAccountTreeModelClass))
+#define TNY_ACCOUNT_IS_TREE_MODEL(obj)         (GTK_CHECK_TYPE ((obj), TNY_TYPE_ACCOUNT_TREE_MODEL))
+#define TNY_ACCOUNT_IS_TREE_MODEL_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((obj), TNY_TYPE_ACCOUNT_TREE_MODEL))
+#define TNY_ACCOUNT_TREE_MODEL_GET_CLASS(obj)  (GTK_CHECK_GET_CLASS ((obj), TNY_TYPE_ACCOUNT_TREE_MODEL, TnyAccountTreeModelClass))
 
 typedef struct _TnyAccountTreeModel TnyAccountTreeModel;
 typedef struct _TnyAccountTreeModelClass TnyAccountTreeModelClass;

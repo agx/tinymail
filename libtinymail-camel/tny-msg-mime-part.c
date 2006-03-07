@@ -41,7 +41,7 @@ struct _TnyMsgMimePartPriv
 };
 
 #define TNY_MSG_MIME_PART_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_MSG_MIME_PART_TYPE, TnyMsgMimePartPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartPriv))
 
 
 static void
@@ -222,7 +222,7 @@ tny_msg_mime_part_get_content_location (TnyMsgMimePartIface *self)
 TnyMsgMimePart*
 tny_msg_mime_part_new (CamelMimePart *part)
 {
-	TnyMsgMimePart *self = g_object_new (TNY_MSG_MIME_PART_TYPE, NULL);
+	TnyMsgMimePart *self = g_object_new (TNY_TYPE_MSG_MIME_PART, NULL);
 	
 	tny_msg_mime_part_set_part (self, part);
 
@@ -311,7 +311,7 @@ tny_msg_mime_part_get_type (void)
 			"TnyMsgMimePart",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_MSG_MIME_PART_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_MSG_MIME_PART_IFACE, 
 			&tny_msg_mime_part_iface_info);
 	}
 

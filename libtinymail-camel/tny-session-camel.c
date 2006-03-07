@@ -417,7 +417,7 @@ tny_session_camel_get_instance (void)
 	if (!the_singleton)
 	{
 		the_singleton = TNY_SESSION_CAMEL 
-			(camel_object_new (TNY_SESSION_CAMEL_TYPE));
+			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
 	}
 
 	return the_singleton;

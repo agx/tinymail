@@ -42,7 +42,7 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-shared.h>
 
 #define TNY_ACCOUNT_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ACCOUNT_TYPE, TnyAccountPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ACCOUNT, TnyAccountPriv))
 
 
 static void 
@@ -303,7 +303,7 @@ _tny_account_get_url_string (TnyAccount *self)
 TnyAccount*
 tny_account_new (void)
 {
-	TnyAccount *self = g_object_new (TNY_ACCOUNT_TYPE, NULL);
+	TnyAccount *self = g_object_new (TNY_TYPE_ACCOUNT, NULL);
 
 	return self;
 }
@@ -452,7 +452,7 @@ tny_account_get_type (void)
 			"TnyAccount",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_ACCOUNT_IFACE_TYPE, 
+		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_IFACE, 
 			&tny_account_iface_info);
 	}
 

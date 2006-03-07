@@ -87,7 +87,7 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyAccountIface *account)
 TnyAccountTreeModel*
 tny_account_tree_model_new (void)
 {
-	TnyAccountTreeModel *self = g_object_new (TNY_ACCOUNT_TREE_MODEL_TYPE, NULL);
+	TnyAccountTreeModel *self = g_object_new (TNY_TYPE_ACCOUNT_TREE_MODEL, NULL);
 
 	return self;
 }

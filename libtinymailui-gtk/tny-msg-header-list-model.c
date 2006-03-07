@@ -371,7 +371,7 @@ tny_msg_header_list_model_new (void)
 {
 	TnyMsgHeaderListModel *model;
 
-	model = g_object_new (TNY_MSG_HEADER_TYPE_LIST_MODEL, NULL);
+	model = g_object_new (TNY_TYPE_MSG_HEADER_LIST_MODEL, NULL);
 	
 	return GTK_TREE_MODEL (model);
 }
