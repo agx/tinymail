@@ -23,18 +23,7 @@
 
 #include <tny-msg-header-iface.h>
 
-/* Setup & Teardown */
-void tny_msg_header_iface_test_setup    (void);
-void tny_msg_header_iface_test_teardown (void);
-
-/* Test cases */
-void tny_msg_header_iface_test_set_bcc  (void);           /* Test case 01 */
-void tny_msg_header_iface_test_set_cc   (void);           /* Test case 02 */
-void tny_msg_header_iface_test_set_to   (void);           /* Test case 03 */
-void tny_msg_header_iface_test_set_from (void);           /* Test case 04 */
-
 /* Test suite */
 GUnitTestSuite *create_tny_msg_header_iface_suite (void);
-
 
 #endif

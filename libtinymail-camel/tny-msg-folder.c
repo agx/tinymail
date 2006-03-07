@@ -40,6 +40,8 @@
 #include "tny-account-priv.h"
 #include "tny-msg-folder-priv.h"
 
+#include <tny-camel-shared.h>
+
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
@@ -515,6 +517,12 @@ GType
 tny_msg_folder_get_type (void)
 {
 	static GType type = 0;
+
+	if (!camel_type_init_done)
+	{
+		camel_type_init ();
+		camel_type_init_done = TRUE;
+	}
 
 	if (type == 0) 
 	{

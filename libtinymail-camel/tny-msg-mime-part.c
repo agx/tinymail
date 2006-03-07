@@ -27,6 +27,8 @@
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
 
+#include <tny-camel-shared.h>
+
 static GObjectClass *parent_class = NULL;
 
 typedef struct _TnyMsgMimePartPriv TnyMsgMimePartPriv;
@@ -276,6 +278,12 @@ GType
 tny_msg_mime_part_get_type (void)
 {
 	static GType type = 0;
+
+	if (!camel_type_init_done)
+	{
+		camel_type_init ();
+		camel_type_init_done = TRUE;
+	}
 
 	if (type == 0) 
 	{

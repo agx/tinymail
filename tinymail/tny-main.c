@@ -51,6 +51,10 @@ main (int argc, char **argv)
 
 	window = GTK_WINDOW (tny_summary_window_new ());
 
+TnyMsgHeaderIface *iface = tny_msg_header_new ();
+tny_msg_header_iface_set_subject (iface, "test");
+g_print ("%s\n", tny_msg_header_iface_get_subject (iface));
+
 	gtk_widget_show (GTK_WIDGET (window));
 
 	tny_summary_window_iface_set_account_store (TNY_SUMMARY_WINDOW_IFACE (window),

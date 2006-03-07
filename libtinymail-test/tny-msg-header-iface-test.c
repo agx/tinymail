@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <string.h>
+
 #include <tny-msg-header-iface-test.h>
 
 /* We are going to test the camel implementation */
@@ -23,16 +25,15 @@
 
 static TnyMsgHeaderIface *iface = NULL;
 
-void
+static void
 tny_msg_header_iface_test_setup (void)
 {
-	g_print ("setup\n");
 	iface = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	return;
 }
 
-void 
+static void 
 tny_msg_header_iface_test_teardown (void)
 {
 	g_object_unref (G_OBJECT (iface));
@@ -43,53 +44,86 @@ tny_msg_header_iface_test_teardown (void)
 void
 tny_msg_header_iface_test_set_from (void)
 {
-	const gchar *str_in = "1st test string", *str_out;
+	const gchar *str_in = "Me myself and I <me.myself@and.i.com>", *str_out;
 	
 	tny_msg_header_iface_set_from (iface, str_in);
 	str_out = tny_msg_header_iface_get_from (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set from!");
+	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set from!\n");
 
 	return;
 }
 
-void
+static void
 tny_msg_header_iface_test_set_to (void)
 {
-	const gchar *str_in = "1st test string", *str_out;
-	
-	tny_msg_header_iface_set_to (iface, str_in);
+	gchar *str_in = g_strdup ("Myself <this@is.me>, You Do Die Daa <you.doe.die@daa.com>; patrick@test.com");
+	const gchar *str_out;
+	int i=0;
+
+	tny_msg_header_iface_set_to (iface, (const gchar*)str_in);
 	str_out = tny_msg_header_iface_get_to (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set to!");
+	/* The implementation will always return a comma separated list
+	 * but should also accept ; separated lists. Even mixed (both
+	 * characters have the same meaning). */
+
+	for (i=0; i < strlen(str_in); i++)
+		if (str_in[i] == ';')
+			str_in[i] = ',';
+
+	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set to!\n");
+
+	g_free (str_in);
 
 	return;
 }
 
-void
+static void
 tny_msg_header_iface_test_set_cc (void)
 {
-	const gchar *str_in = "1st test string", *str_out;
+	const gchar *str_in = "First user <first@user.be>, Second user <second@user.com>", *str_out;
 	
 	tny_msg_header_iface_set_cc (iface, str_in);
 	str_out = tny_msg_header_iface_get_cc (iface);
 
-	g_print ("CC test: %s,%s\n", str_in, str_out);
+	g_message ("CC test: %s,%s\n", str_in, str_out);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set cc!");
+	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set cc!\n");
+
 
 	return;
 }
 
-void
+static void
 tny_msg_header_iface_test_set_bcc (void)
 {
-	const gchar *str_in = "1st test string", *str_out;
+	const gchar *str_in = "The Invisible man <the.invisible@man.com>, mark@here.there.com", *str_out;
 	
 	tny_msg_header_iface_set_bcc (iface, str_in);
 	str_out = tny_msg_header_iface_get_bcc (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set bcc!");
+	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set bcc!\n");
+
+	return;
+}
+
+static void
+tny_msg_header_iface_test_set_subject (void)
+{
+	const gchar *str_in = "I'm the nice subject", *str_out;
+	
+	tny_msg_header_iface_set_subject (iface, str_in);
+	str_out = tny_msg_header_iface_get_subject (iface);
+
+	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set subject!\n");
+}
+
+static void
+tny_msg_header_iface_test_set_replyto (void)
+{
+
+	GUNIT_WARNING ("TODO");
 
 	return;
 }
@@ -128,6 +162,19 @@ create_tny_msg_header_iface_suite (void)
                gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_from",
                                       tny_msg_header_iface_test_setup,
                                       tny_msg_header_iface_test_set_from,
+				      tny_msg_header_iface_test_teardown));
+
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_replyto",
+                                      tny_msg_header_iface_test_setup,
+                                      tny_msg_header_iface_test_set_replyto,
+				      tny_msg_header_iface_test_teardown));
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_subject",
+                                      tny_msg_header_iface_test_setup,
+                                      tny_msg_header_iface_test_set_subject,
 				      tny_msg_header_iface_test_teardown));
 
 	return suite;

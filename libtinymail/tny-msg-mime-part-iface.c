@@ -123,7 +123,7 @@ tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIfa
  * @self: a #TnyMsgMimePartIface object
  * 
  * Inefficiently get a stream from a message part. The entire data of the
- * the part will be kept in memory until the stream in unreferenced.
+ * the part will be kept in memory until the stream is unreferenced.
  *
  * Return value: An in-memory stream
  **/

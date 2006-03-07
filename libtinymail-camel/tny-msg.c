@@ -27,6 +27,8 @@
 
 #include <camel/camel-stream-buffer.h>
 
+#include <tny-camel-shared.h>
+
 static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-priv.h"
@@ -266,6 +268,12 @@ GType
 tny_msg_get_type (void)
 {
 	static GType type = 0;
+
+	if (!camel_type_init_done)
+	{
+		camel_type_init ();
+		camel_type_init_done = TRUE;
+	}
 
 	if (type == 0) 
 	{

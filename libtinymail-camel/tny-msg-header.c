@@ -26,6 +26,8 @@
 #include "tny-msg-folder-priv.h"
 #include "tny-msg-header-priv.h"
 
+#include <tny-camel-shared.h>
+
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
@@ -188,7 +190,19 @@ one_record_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 
 		camel_internet_address_add (target, name, email);
 	} else {
-		camel_internet_address_add (target, NULL, tok);
+		
+		char *name = (char*)tok;
+		char *lname = name;
+
+		lname += (strlen (name)-1);
+
+		if (*name == ' ')
+			*name++;
+	
+		if (*lname == ' ')
+			*lname-- = '\0';
+
+		camel_internet_address_add (target, NULL, name);
 	}
 }
 
@@ -276,6 +290,9 @@ static void
 tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	CamelInternetAddress *addr = camel_internet_address_new ();
+	camel_object_unref (CAMEL_OBJECT (addr));
 
 	prepare_for_write (me);
 
@@ -416,11 +433,17 @@ tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	load_msg_header (me);
+	if (me->uid)
+	{
+		load_msg_header (me);
 
-	/* TODO: write case */
+		return camel_message_info_subject (me->message_info);
 
-	return camel_message_info_subject (me->message_info);
+	} else if (me->mime_message)
+	{
+		return camel_mime_message_get_subject (me->mime_message);
+	} else 
+		return NULL;
 }
 
 
@@ -552,10 +575,9 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_date_sent_func = tny_msg_header_get_date_sent;
 	klass->get_cc_func = tny_msg_header_get_cc;
 	klass->get_bcc_func = tny_msg_header_get_bcc;
-
 	klass->get_replyto_func = tny_msg_header_get_replyto;
+	klass->get_uid_func = tny_msg_header_get_uid;
 
-	klass->get_uid_func = tny_msg_header_get_uid;	
 	klass->set_uid_func = tny_msg_header_set_uid;
 	
 	klass->set_folder_func = tny_msg_header_set_folder;
@@ -593,6 +615,12 @@ GType
 tny_msg_header_get_type (void)
 {
 	static GType type = 0;
+
+	if (!camel_type_init_done)
+	{
+		camel_type_init ();
+		camel_type_init_done = TRUE;
+	}
 
 	if (type == 0) 
 	{

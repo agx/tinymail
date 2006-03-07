@@ -37,6 +37,10 @@
 #include <tny-account.h>
 #include "tny-account-priv.h"
 
+#include <tny-camel-shared.h>
+
+gboolean camel_type_init_done = FALSE;
+
 static CamelSessionClass *ms_parent_class;
 static GList *password_funcs = NULL;
 static GList *forget_password_funcs = NULL;
@@ -451,6 +455,12 @@ tny_session_camel_get_type (void)
 {
 	static CamelType tny_session_camel_type = CAMEL_INVALID_TYPE;
 	
+	if (!camel_type_init_done)
+	{
+		camel_type_init ();
+		camel_type_init_done = TRUE;
+	}
+
 	if (tny_session_camel_type == CAMEL_INVALID_TYPE) {
 		ms_parent_class = (CamelSessionClass *)camel_session_get_type();
 		tny_session_camel_type = camel_type_register (

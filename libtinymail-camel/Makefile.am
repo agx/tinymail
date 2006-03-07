@@ -11,6 +11,7 @@ libtinymail_camel_1_0_headers =			\
 	tny-account.h				\
 	tny-camel-stream.h			\
 	tny-stream-camel.h			\
+	tny-camel-shared.h			\
 	tny-session-camel.h
 
 libtinymail_camel_1_0_la_SOURCES = 		\

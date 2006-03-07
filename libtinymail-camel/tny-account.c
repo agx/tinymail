@@ -39,6 +39,8 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-account-priv.h"
 
+#include <tny-camel-shared.h>
+
 #define TNY_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_ACCOUNT_TYPE, TnyAccountPriv))
 
@@ -417,6 +419,12 @@ GType
 tny_account_get_type (void)
 {
 	static GType type = 0;
+
+	if (!camel_type_init_done)
+	{
+		camel_type_init ();
+		camel_type_init_done = TRUE;
+	}
 
 	if (type == 0) 
 	{
