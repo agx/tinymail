@@ -48,6 +48,10 @@ PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 
 AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
+PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0 camel-1.2 camel-provider-1.2 gnome-vfs-2.0)
+AC_SUBST(LIBTINYMAIL_TEST_CFLAGS)
+AC_SUBST(LIBTINYMAIL_TEST_LIBS)
+
 dnl Try to remove the gtk+ and gconf dependency by refactoring to libraries
 PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 gnome-vfs-2.0)
 AC_SUBST(TINYMAIL_CFLAGS)
@@ -87,6 +91,7 @@ libtinymailui-gtk/Makefile
 libtinymailui-gtk/libtinymailui-gtk.pc
 libtinymail-gnomevfs/Makefile
 libtinymail-gnomevfs/libtinymail-gnomevfs.pc
+libtinymail-test/Makefile
 tinymail/Makefile
 tinymail-python/Makefile
 ])
