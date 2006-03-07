@@ -16,9 +16,58 @@ struct _TnyTestViewClass
 	GObjectClass parent;
 };
 
+static void
+tny_test_view_update (GUnitView *self)
+{
+}
+
+static void
+tny_test_view_set_test_runner (GUnitView *self, gpointer runner)
+{
+}
+
+static void
+tny_test_view_show (GUnitView *self)
+{
+}
+
+static void
+tny_test_view_reset (GUnitView *self)
+{
+}
+
+static void
+tny_test_view_failure (GUnitView *self, const gchar *msg)
+{
+}
+
+static void
+tny_test_view_error (GUnitView *self, const gchar *msg)
+{
+}
+
+static void
+tny_test_view_update_progressbar (GUnitView *self, gint fraction, const gchar *msg)
+{
+}
+
+static void
+tny_test_view_update_statusbar (GUnitView *view, const gchar *msg)
+{
+}
+
+
 static void 
 gunit_view_init (GUnitViewClass *class)
 {
+	class->update = tny_test_view_update;
+	class->set_test_runner = tny_test_view_set_test_runner;
+	class->show = tny_test_view_show;
+	class->reset = tny_test_view_reset;
+	class->failure = tny_test_view_failure;
+	class->error = tny_test_view_error;
+	class->update_progressbar = tny_test_view_update_progressbar;
+	class->update_statusbar = tny_test_view_update_statusbar;
 }
 
 static void 
