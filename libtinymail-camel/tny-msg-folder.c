@@ -54,10 +54,12 @@ static GObjectClass *parent_class = NULL;
 typedef struct
 {
 	GList *list;
+	GFunc relaxed_func;
+
 } RelaxedData;
 
 static void
-tny_msg_folder_relaxed_destroy (gpointer data)
+tny_msg_folder_relaxed_runcacher_destroy (gpointer data)
 {
 	RelaxedData *d = data;
 
@@ -66,11 +68,27 @@ tny_msg_folder_relaxed_destroy (gpointer data)
 
 	g_free (d);
 
+
 	return;
 }
 
+static void
+tny_msg_folder_relaxed_remover_destroy (gpointer data)
+{
+	RelaxedData *d = data;
+
+	g_list_free (d->list);
+	d->list = NULL;
+
+	g_free (d);
+
+
+	return;
+}
+
+
 static gboolean
-tny_msg_folder_relaxed_freeer (gpointer data)
+tny_msg_folder_relaxed_performer (gpointer data)
 {
 	RelaxedData *d = data;
 	GList *list = d->list;
@@ -83,10 +101,9 @@ tny_msg_folder_relaxed_freeer (gpointer data)
 		GList *element = list;
 
 		if (element && element->data)
-			g_object_unref (G_OBJECT (element->data));
+			d->relaxed_func (element->data, NULL);
 
 		list = g_list_remove_link (list, element);
-
 		g_list_free (element);
 
 		/* g_print ("rcount:%d lcount:%d\n", count, g_list_length (list)); */
@@ -107,7 +124,16 @@ static void
 tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 {
 	if (priv->cached_hdrs)
-		g_list_foreach (priv->cached_hdrs, (GFunc)tny_msg_header_iface_uncache,NULL);
+	{
+		RelaxedData *d = g_new (RelaxedData, 1);
+
+		d->relaxed_func = (GFunc)tny_msg_header_iface_uncache;
+
+		d->list = g_list_copy (priv->cached_hdrs);
+		
+		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
+			d, tny_msg_folder_relaxed_runcacher_destroy);
+	}
 }
 
 static void 
@@ -117,24 +143,28 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 	{
 		RelaxedData *d = g_new (RelaxedData, 1);
 
+		d->relaxed_func = (GFunc)g_object_unref;
+
 		d->list = priv->cached_hdrs;
 		priv->cached_hdrs = NULL;
-		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_freeer, 
-			d, tny_msg_folder_relaxed_destroy);
+
+		/* Speedup trick, also check tny-msg-header.c */
+		if (priv->cached_uids)
+			camel_folder_free_uids (priv->folder, priv->cached_uids);
+		priv->cached_uids = NULL;
+
+		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
+			d, tny_msg_folder_relaxed_remover_destroy);
 	}
 } 
 
 static void 
 unload_folder (TnyMsgFolderPriv *priv)
 {
-	/* The uncacher is faster but removes less data,
-	   the remover is for the user as fast but uses an 
-	   idle function. So in reality it is a lot slower,
-	   but the user doesn't notice it. */
 
-	/* tny_msg_folder_hdr_cache_uncacher (priv); */
+	tny_msg_folder_hdr_cache_uncacher (priv);
 
-	tny_msg_folder_hdr_cache_remover (priv); 
+	/* tny_msg_folder_hdr_cache_remover (priv); */
 
 	if (priv->folder)
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
@@ -502,13 +532,6 @@ tny_msg_folder_finalize (GObject *object)
 		g_hash_table_destroy (priv->cached_msgs);
 
 	tny_msg_folder_hdr_cache_remover (priv);
-
-	/* Speedup trick, also check tny-msg-header.c */
-
-	if (priv->cached_uids)
-		camel_folder_free_uids (priv->folder, priv->cached_uids);
-
-	priv->cached_uids = NULL;
 
 	(*parent_class->finalize) (object);
 
