@@ -51,16 +51,20 @@ static GObjectClass *parent_class = NULL;
 #define TNY_MSG_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))
 
+typedef struct
+{
+	GList *list;
+} RelaxedData;
 
 static void
 tny_msg_folder_relaxed_destroy (gpointer data)
 {
-	TnyMsgFolderPriv *priv = data;
+	RelaxedData *d = data;
 
-	g_list_free (priv->old_cache);
-	priv->old_cache = NULL;
+	g_list_free (d->list);
+	d->list = NULL;
 
-	g_mutex_unlock (priv->old_cache_lock);
+	g_free (d);
 
 	return;
 }
@@ -68,9 +72,8 @@ tny_msg_folder_relaxed_destroy (gpointer data)
 static gboolean
 tny_msg_folder_relaxed_freeer (gpointer data)
 {
-	TnyMsgFolderPriv *priv = data;
-
-	GList *list = g_list_first (priv->old_cache);
+	RelaxedData *d = data;
+	GList *list = d->list;
 	gint count = 0;
 
 	/* g_print ("removing 5 (%d)\n", g_list_length (list)); */
@@ -91,7 +94,7 @@ tny_msg_folder_relaxed_freeer (gpointer data)
 		count++;
 	}
 
-	priv->old_cache = list;
+	d->list = list;
 
 	if (count <= 1)
 		return FALSE;
@@ -112,18 +115,26 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 {
 	if (priv->cached_hdrs)
 	{
-		g_mutex_lock (priv->old_cache_lock);
-		priv->old_cache = priv->cached_hdrs;
+		RelaxedData *d = g_new (RelaxedData, 1);
+
+		d->list = priv->cached_hdrs;
 		priv->cached_hdrs = NULL;
 		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_freeer, 
-			priv, tny_msg_folder_relaxed_destroy);
+			d, tny_msg_folder_relaxed_destroy);
 	}
-}
+} 
 
 static void 
 unload_folder (TnyMsgFolderPriv *priv)
 {
-	tny_msg_folder_hdr_cache_uncacher (priv); 
+	/* The uncacher is faster but removes less data,
+	   the remover is for the user as fast but uses an 
+	   idle function. So in reality it is a lot slower,
+	   but the user doesn't notice it. */
+
+	/* tny_msg_folder_hdr_cache_uncacher (priv); */
+
+	tny_msg_folder_hdr_cache_remover (priv); 
 
 	if (priv->folder)
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
@@ -578,9 +589,6 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folders = NULL;
 	priv->cached_hdrs = NULL;
 	priv->cached_msgs = NULL; 
-
-	priv->old_cache = NULL;
-	priv->old_cache_lock = g_mutex_new ();
 
 	return;
 }
