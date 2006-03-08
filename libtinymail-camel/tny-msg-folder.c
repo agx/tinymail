@@ -101,16 +101,17 @@ tny_msg_folder_relaxed_freeer (gpointer data)
 
 
 static void 
+tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
+{
+	if (priv->cached_hdrs)
+		g_list_foreach (priv->cached_hdrs, (GFunc)tny_msg_header_iface_uncache,NULL);
+}
+
+static void 
 tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 {
 	if (priv->cached_hdrs)
 	{
-		/* This would be extremely slow
-
-		g_list_foreach (priv->cached_hdrs, (GFunc)g_object_unref, NULL);
-		g_list_free (priv->cached_hdrs);
-		priv->cached_hdrs = NULL; */
-
 		g_mutex_lock (priv->old_cache_lock);
 		priv->old_cache = priv->cached_hdrs;
 		priv->cached_hdrs = NULL;
@@ -122,7 +123,7 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 static void 
 unload_folder (TnyMsgFolderPriv *priv)
 {
-	tny_msg_folder_hdr_cache_remover (priv); 
+	tny_msg_folder_hdr_cache_uncacher (priv); 
 
 	if (priv->folder)
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
