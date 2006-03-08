@@ -178,10 +178,10 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeView *header_view = GTK_TREE_VIEW (user_data);
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	TnyMsgFolderIface *folder;
 
 	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
+		TnyMsgFolderIface *folder;
 		GtkTreeModel *header_model, *sortable;
 
 		gtk_tree_model_get (model, &iter, 
@@ -194,6 +194,19 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (header_model), folder);
 
+		sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
+
+		if (sortable && GTK_IS_TREE_MODEL_SORT (sortable))
+		{
+			GtkTreeModel *model = gtk_tree_model_sort_get_model 
+				(GTK_TREE_MODEL_SORT (sortable));
+
+			if (model)
+				g_object_unref (G_OBJECT (model));
+
+			g_object_unref (G_OBJECT (sortable));
+		}
+
 		sortable = gtk_tree_model_sort_new_with_model (header_model);
 
 		/* TODO: Implement a fast sorting algorithm (not easy) */
@@ -201,7 +214,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		/* gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
 				GTK_SORT_ASCENDING); */
-
+		
 		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
 
 	}

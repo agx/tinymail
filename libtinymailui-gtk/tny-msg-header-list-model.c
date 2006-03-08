@@ -287,7 +287,6 @@ tny_msg_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 static void
 destroy_internal_list (TnyMsgHeaderListModel *self)
 {
-
 	self->headers = NULL;
 	self->length = 0;
 
@@ -300,7 +299,10 @@ tny_msg_header_list_model_finalize (GObject *object)
 	TnyMsgHeaderListModel *self = (TnyMsgHeaderListModel *)object;
 
 	if (self->folder)
+	{
+		tny_msg_folder_iface_uncache (self->folder);
 		g_object_unref (G_OBJECT (self->folder));
+	}
 
 	parent_class->finalize (object);
 

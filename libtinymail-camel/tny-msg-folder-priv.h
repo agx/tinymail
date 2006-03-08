@@ -28,7 +28,7 @@ typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
 
 struct _TnyMsgFolderPriv
 {
-	GList *cached_hdrs;
+	GList *cached_hdrs, *old_cache;
 	GHashTable *cached_msgs;
 	CamelFolder *folder;
 	gchar *folder_name;
@@ -36,6 +36,7 @@ struct _TnyMsgFolderPriv
 	GList *folders;
 	GPtrArray *cached_uids;
 	guint cached_length, unread_length;
+	GMutex *old_cache_lock;
 };
 
 CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);

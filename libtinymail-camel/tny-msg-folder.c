@@ -52,9 +52,78 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))
 
 
+static void
+tny_msg_folder_relaxed_destroy (gpointer data)
+{
+	TnyMsgFolderPriv *priv = data;
+
+	g_list_free (priv->old_cache);
+	priv->old_cache = NULL;
+
+	g_mutex_unlock (priv->old_cache_lock);
+
+	return;
+}
+
+static gboolean
+tny_msg_folder_relaxed_freeer (gpointer data)
+{
+	TnyMsgFolderPriv *priv = data;
+
+	GList *list = g_list_first (priv->old_cache);
+	gint count = 0;
+
+	/* g_print ("removing 5 (%d)\n", g_list_length (list)); */
+
+	while ((count < 5) && list)
+	{
+		GList *element = list;
+
+		if (element && element->data)
+			g_object_unref (G_OBJECT (element->data));
+
+		list = g_list_remove_link (list, element);
+
+		g_list_free (element);
+
+		/* g_print ("rcount:%d lcount:%d\n", count, g_list_length (list)); */
+
+		count++;
+	}
+
+	priv->old_cache = list;
+
+	if (count <= 1)
+		return FALSE;
+	
+	return TRUE;
+}
+
+
+static void 
+tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
+{
+	if (priv->cached_hdrs)
+	{
+		/* This would be extremely slow
+
+		g_list_foreach (priv->cached_hdrs, (GFunc)g_object_unref, NULL);
+		g_list_free (priv->cached_hdrs);
+		priv->cached_hdrs = NULL; */
+
+		g_mutex_lock (priv->old_cache_lock);
+		priv->old_cache = priv->cached_hdrs;
+		priv->cached_hdrs = NULL;
+		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_freeer, 
+			priv, tny_msg_folder_relaxed_destroy);
+	}
+}
+
 static void 
 unload_folder (TnyMsgFolderPriv *priv)
 {
+	tny_msg_folder_hdr_cache_remover (priv); 
+
 	if (priv->folder)
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
 
@@ -420,8 +489,7 @@ tny_msg_folder_finalize (GObject *object)
 	if (priv->cached_msgs)
 		g_hash_table_destroy (priv->cached_msgs);
 
-	if (priv->cached_hdrs)
-		g_list_foreach (priv->cached_hdrs, (GFunc)g_object_unref, NULL);
+	tny_msg_folder_hdr_cache_remover (priv);
 
 	/* Speedup trick, also check tny-msg-header.c */
 
@@ -509,6 +577,9 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folders = NULL;
 	priv->cached_hdrs = NULL;
 	priv->cached_msgs = NULL; 
+
+	priv->old_cache = NULL;
+	priv->old_cache_lock = g_mutex_new ();
 
 	return;
 }
