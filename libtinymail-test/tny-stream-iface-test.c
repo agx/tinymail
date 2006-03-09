@@ -39,7 +39,13 @@ tny_stream_iface_test_setup (void)
 
 	camel_object_unref (CAMEL_OBJECT (addr));
 
+	/* This is the stream that is being tested */
+
 	iface = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
+
+	/* This is a test stream that streams 21 times the answer to
+	   all questions (21 times the bytes '4' and '2'). */
+
 	source = TNY_STREAM_IFACE (tny_test_stream_new ());
 
 	return;
