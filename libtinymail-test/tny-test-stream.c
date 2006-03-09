@@ -35,7 +35,8 @@ tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	ssize_t nb_read;
 	ssize_t nb_written;
 	
-	while (!tny_stream_iface_eos (self)) {
+	while (!tny_stream_iface_eos (self)) 
+	{
 
 		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
 
