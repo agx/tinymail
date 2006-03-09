@@ -58,12 +58,16 @@ static void
 tny_stream_iface_test_stream (void)
 {
 	gchar *buffer = (gchar*) malloc (sizeof (gchar) * 42);
+	const gchar *ret = "424242424242424242424242424242424242424242";
 
 	tny_stream_iface_write_to_stream (source, iface);
 
+	tny_stream_iface_reset (iface);
 	tny_stream_iface_read (iface, buffer, 42);
 
-	g_message ("Buffer %s\n", buffer);
+	gunit_fail_unless(!strcmp (buffer, ret), "Unable to use stream!\n");
+
+	g_free (buffer);
 }
 
 

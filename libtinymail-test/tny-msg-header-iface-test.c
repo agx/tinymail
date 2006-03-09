@@ -128,7 +128,7 @@ static void
 tny_msg_header_iface_test_set_replyto (void)
 {
 
-	GUNIT_WARNING ("TODO");
+	/* GUNIT_WARNING ("TODO"); */
 
 	return;
 }

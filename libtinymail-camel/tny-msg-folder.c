@@ -94,7 +94,7 @@ tny_msg_folder_relaxed_performer (gpointer data)
 	GList *list = d->list;
 	gint count = 0;
 
-	/* g_print ("removing 5 (%d)\n", g_list_length (list)); */
+	g_print ("removing 5 (%d)\n", g_list_length (list));
 
 	while ((count < 5) && list)
 	{
@@ -106,7 +106,7 @@ tny_msg_folder_relaxed_performer (gpointer data)
 		list = g_list_remove_link (list, element);
 		g_list_free (element);
 
-		/* g_print ("rcount:%d lcount:%d\n", count, g_list_length (list)); */
+		g_print ("rcount:%d lcount:%d\n", count, g_list_length (list));
 
 		count++;
 	}

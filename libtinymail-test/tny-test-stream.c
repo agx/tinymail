@@ -30,13 +30,15 @@ static GObjectClass *parent_class = NULL;
 static ssize_t
 tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
-	char tmp_buf[4096];
+	char tmp_buf[42];
 	ssize_t total = 0;
 	ssize_t nb_read;
 	ssize_t nb_written;
 	
 	while (!tny_stream_iface_eos (self)) {
+
 		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
+
 		if (nb_read < 0)
 			return -1;
 		else if (nb_read > 0) {
@@ -68,14 +70,15 @@ tny_test_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 			buffer [i] = '4';		
 	}
 
+	buffer [i] = '\0';
 
-	return 0;
+	return n;
 }
 
 static ssize_t
 tny_test_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 {
-	return 0;
+	return n;
 }
 
 static gint
@@ -91,7 +94,7 @@ tny_test_stream_eos (TnyStreamIface *self)
 
 	count++;
 
-	return (count < 42);
+	return (count > 42);
 }
 
 
