@@ -26,6 +26,16 @@
 
 static GObjectClass *parent_class = NULL;
 
+static gint 
+tny_test_stream_reset (TnyStreamIface *self)
+{
+	TnyTestStream *me = TNY_TEST_STREAM (self);
+
+	me->eos_count = 0;
+
+	return 0;
+}
+
 
 static ssize_t
 tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
@@ -85,17 +95,17 @@ tny_test_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 static gint
 tny_test_stream_close (TnyStreamIface *self)
 {
-	return 0;
+	return tny_test_stream_reset (self);
 }
 
 static gboolean
 tny_test_stream_eos (TnyStreamIface *self)
 {
-	static gint count = 0;
+	TnyTestStream *me = TNY_TEST_STREAM (self);
 
-	count++;
+	me->eos_count++;
 
-	return (count > 42);
+	return (me->eos_count > 1);
 }
 
 
@@ -110,6 +120,8 @@ TnyTestStream*
 tny_test_stream_new (void)
 {
 	TnyTestStream *self = g_object_new (TNY_TYPE_TEST_STREAM, NULL);
+
+	self->eos_count = 0;
 
 	return self;
 }
@@ -136,6 +148,7 @@ tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->close_func = tny_test_stream_close;
 	klass->write_to_stream_func = tny_test_stream_write_to_stream;
 	klass->eos_func = tny_test_stream_eos;
+	klass->reset_func = tny_test_stream_reset;
 
 	return;
 }

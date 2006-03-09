@@ -44,6 +44,8 @@ typedef struct _TnyTestStreamClass TnyTestStreamClass;
 struct _TnyTestStream
 {
 	GObject parent;
+
+	gint eos_count;
 };
 
 struct _TnyTestStreamClass 
@@ -52,7 +54,7 @@ struct _TnyTestStreamClass
 };
 
 GType                   tny_test_stream_get_type        (void);
-TnyTestStream*           tny_test_stream_new             (void);
+TnyTestStream*          tny_test_stream_new             (void);
 
 G_END_DECLS
 

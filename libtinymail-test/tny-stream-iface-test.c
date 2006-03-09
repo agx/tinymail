@@ -58,14 +58,44 @@ static void
 tny_stream_iface_test_stream (void)
 {
 	gchar *buffer = (gchar*) malloc (sizeof (gchar) * 42);
+	gint n=0;
+	/* 21 times the answer to all questions */
 	const gchar *ret = "424242424242424242424242424242424242424242";
+
+	tny_stream_iface_reset (source);
+	tny_stream_iface_reset (iface);
 
 	tny_stream_iface_write_to_stream (source, iface);
 
-	tny_stream_iface_reset (iface);
-	tny_stream_iface_read (iface, buffer, 42);
+	/* Reset the stream being tested and read the amount of bytes that
+	   keep 21 times the answer to all questions from the stream */
 
-	gunit_fail_unless(!strcmp (buffer, ret), "Unable to use stream!\n");
+	tny_stream_iface_reset (iface);
+	tny_stream_iface_read (iface, buffer, strlen (ret));
+
+	/* Check whether the stream in the beginning now contains 21 times
+	   the answer to all questions */
+
+	gunit_fail_unless(!strcmp (buffer, ret), 
+		"At least one of the 42 first bytes changed!\n");
+
+	/* Check whether the stream contains nothing but the answer to all
+	   questions. */
+
+	tny_stream_iface_reset (iface);
+	tny_stream_iface_reset (source);
+
+	while (!tny_stream_iface_eos (iface))
+	{
+		gchar buf[2];
+		tny_stream_iface_read (iface, buf, sizeof (buf));
+
+		gunit_fail_unless(!strcmp (buffer, "42"), "Bytes changed!\n");
+		n++;
+	}
+
+	gunit_fail_unless(n != 21, 
+		"Size in bytes isn't correct or reset didn't succeed!\n");
 
 	g_free (buffer);
 }
