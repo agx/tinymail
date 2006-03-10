@@ -48,7 +48,6 @@ static void
 tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-	TnyStreamIface *retval = NULL;
 	CamelDataWrapper *wrapper;
 
 	CamelMedium *medium = CAMEL_MEDIUM (priv->part);
@@ -60,6 +59,24 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 	camel_object_unref (CAMEL_OBJECT (cstream));
 
 	return;
+}
+
+static gint
+tny_msg_mime_part_read_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	CamelDataWrapper *wrapper;
+	gint retval = -1;
+
+	CamelMedium *medium = CAMEL_MEDIUM (priv->part);
+	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
+	
+	wrapper = camel_medium_get_content_object (medium);
+	retval = camel_data_wrapper_construct_from_stream (wrapper, cstream);
+
+	camel_object_unref (CAMEL_OBJECT (cstream));
+
+	return retval;
 }
 
 static TnyStreamIface* 
@@ -77,8 +94,10 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 
 	retval = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
 
-	/* Loose own ref (tnycamelstream keeps one) */
+	/* Loose own ref (the tnystreamcamel wrapper keeps one) */
 	camel_object_unref (CAMEL_OBJECT (stream));
+
+	tny_stream_iface_reset (retval);
 
 	return retval;
 }
@@ -248,10 +267,9 @@ tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_content_type_func = tny_msg_mime_part_get_content_type;
 	klass->get_stream_func = tny_msg_mime_part_get_stream;
 	klass->write_to_stream_func = tny_msg_mime_part_write_to_stream;
-
+	klass->read_from_stream_func = tny_msg_mime_part_read_from_stream;
 	klass->set_index_func = tny_msg_mime_part_set_index;
 	klass->get_index_func = tny_msg_mime_part_get_index;
-
 	klass->get_filename_func = tny_msg_mime_part_get_filename;
 	klass->get_content_id_func = tny_msg_mime_part_get_content_id;
 	klass->get_description_func = tny_msg_mime_part_get_description;

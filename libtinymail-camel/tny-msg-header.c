@@ -574,19 +574,15 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_bcc_func = tny_msg_header_get_bcc;
 	klass->get_replyto_func = tny_msg_header_get_replyto;
 	klass->get_uid_func = tny_msg_header_get_uid;
-
 	klass->set_uid_func = tny_msg_header_set_uid;
-	
 	klass->set_folder_func = tny_msg_header_set_folder;
 	klass->get_folder_func = tny_msg_header_get_folder;
-
 	klass->set_bcc_func = tny_msg_header_set_bcc;
 	klass->set_cc_func = tny_msg_header_set_cc;
 	klass->set_to_func = tny_msg_header_set_to;
 	klass->set_from_func = tny_msg_header_set_from;
 	klass->set_subject_func = tny_msg_header_set_subject;
 	klass->set_replyto_func = tny_msg_header_set_replyto;
-
 	klass->has_cache_func = tny_msg_header_has_cache;
 	klass->uncache_func = tny_msg_header_uncache;
 

@@ -119,6 +119,22 @@ tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 }
 
 /**
+ * tny_msg_mime_part_iface_read_from_stream:
+ * @self: a #TnyMsgMimePartIface object
+ * @stream: a #TnyMsgStreamIface stream
+ * 
+ * Read the message part from a stream.
+ *
+ * Return value: 0 on success or -1 on fail
+ **/
+gint
+tny_msg_mime_part_iface_read_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+{
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->read_from_stream_func (self, stream);
+}
+
+
+/**
  * tny_msg_mime_part_iface_get_stream:
  * @self: a #TnyMsgMimePartIface object
  * 
