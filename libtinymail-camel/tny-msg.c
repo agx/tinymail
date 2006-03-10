@@ -288,7 +288,7 @@ tny_msg_finalize (GObject *object)
 	if (priv->message)
 		camel_object_unref (CAMEL_OBJECT (priv->message));
 	priv->message = NULL;
-	g_mutex_lock (priv->message_lock);
+	g_mutex_unlock (priv->message_lock);
 
 	unload_parts (priv);
 
