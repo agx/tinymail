@@ -28,13 +28,19 @@ typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
 
 struct _TnyMsgFolderPriv
 {
+	GMutex *cached_hdrs_lock;
 	GList *cached_hdrs;
+	GPtrArray *cached_uids;
+
+	GMutex *cached_msgs_lock;
 	GHashTable *cached_msgs;
+
+	GMutex *folder_lock;
 	CamelFolder *folder;
+
 	gchar *folder_name;
 	TnyAccountIface *account;
 	GList *folders;
-	GPtrArray *cached_uids;
 	guint cached_length, unread_length;
 
 };

@@ -55,33 +55,16 @@ typedef struct
 {
 	GList *list;
 	GFunc relaxed_func;
-
 } RelaxedData;
 
 static void
-tny_msg_folder_relaxed_runcacher_destroy (gpointer data)
+tny_msg_folder_relaxed_data_destroyer (gpointer data)
 {
 	RelaxedData *d = data;
 
 	g_list_free (d->list);
 	d->list = NULL;
-
 	g_free (d);
-
-
-	return;
-}
-
-static void
-tny_msg_folder_relaxed_remover_destroy (gpointer data)
-{
-	RelaxedData *d = data;
-
-	g_list_free (d->list);
-	d->list = NULL;
-
-	g_free (d);
-
 
 	return;
 }
@@ -94,20 +77,13 @@ tny_msg_folder_relaxed_performer (gpointer data)
 	GList *list = d->list;
 	gint count = 0;
 
-	g_print ("removing 5 (%d)\n", g_list_length (list));
-
 	while ((count < 5) && list)
 	{
 		GList *element = list;
-
 		if (element && element->data)
 			d->relaxed_func (element->data, NULL);
-
 		list = g_list_remove_link (list, element);
 		g_list_free (element);
-
-		g_print ("rcount:%d lcount:%d\n", count, g_list_length (list));
-
 		count++;
 	}
 
@@ -129,10 +105,12 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 
 		d->relaxed_func = (GFunc)tny_msg_header_iface_uncache;
 
+		g_mutex_lock (priv->cached_hdrs_lock);
 		d->list = g_list_copy (priv->cached_hdrs);
-		
+		g_mutex_unlock (priv->cached_hdrs_lock);
+
 		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
-			d, tny_msg_folder_relaxed_runcacher_destroy);
+			d, tny_msg_folder_relaxed_data_destroyer);
 	}
 }
 
@@ -145,36 +123,39 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 
 		d->relaxed_func = (GFunc)g_object_unref;
 
+		g_mutex_lock (priv->cached_hdrs_lock);
 		d->list = priv->cached_hdrs;
 		priv->cached_hdrs = NULL;
-
 		/* Speedup trick, also check tny-msg-header.c */
 		if (priv->cached_uids)
 			camel_folder_free_uids (priv->folder, priv->cached_uids);
 		priv->cached_uids = NULL;
+		g_mutex_unlock (priv->cached_hdrs_lock);
 
 		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
-			d, tny_msg_folder_relaxed_remover_destroy);
+			d, tny_msg_folder_relaxed_data_destroyer);
 	}
 } 
 
 static void 
 unload_folder (TnyMsgFolderPriv *priv)
 {
-
 	tny_msg_folder_hdr_cache_uncacher (priv);
 
-	/* tny_msg_folder_hdr_cache_remover (priv); */
-
+	g_mutex_lock (priv->folder_lock);
 	if (priv->folder)
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
 
 	priv->folder = NULL;
+	g_mutex_unlock (priv->folder_lock);
+
+	return;
 }
 
 static void
 load_folder (TnyMsgFolderPriv *priv)
 {
+	g_mutex_lock (priv->folder_lock);
 	if (!priv->folder)
 	{
 		CamelException ex;
@@ -186,6 +167,7 @@ load_folder (TnyMsgFolderPriv *priv)
 		priv->unread_length = (guint)
 			camel_folder_get_unread_message_count (priv->folder);
 	}
+	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -194,15 +176,26 @@ CamelFolder*
 _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
-	return priv->folder;
+	CamelFolder *retval;
+
+	g_mutex_lock (priv->folder_lock);
+	retval = priv->folder;
+	g_mutex_unlock (priv->folder_lock);
+
+	return retval;
 }
 
 static const GList*
 tny_msg_folder_get_folders (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	const GList *retval;
 
-	return priv->folders;
+	g_mutex_lock (priv->folder_lock);
+	retval = priv->folders;
+	g_mutex_unlock (priv->folder_lock);
+
+	return retval;
 }
 
 
@@ -210,16 +203,26 @@ static guint
 tny_msg_folder_get_unread_count (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	guint retval;
 
-	return priv->unread_length;
+	g_mutex_lock (priv->folder_lock);
+	retval = priv->unread_length;
+	g_mutex_unlock (priv->folder_lock);
+
+	return retval;
 }
 
 static guint
 tny_msg_folder_get_all_count (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	guint retval;
 
-	return priv->cached_length;
+	g_mutex_lock (priv->folder_lock);
+	retval = priv->cached_length;
+	g_mutex_unlock (priv->folder_lock);
+
+	return retval;
 }
 
 static void
@@ -262,6 +265,7 @@ typedef struct
 static void
 add_message_with_uid (gpointer data, gpointer user_data)
 {
+	TnyMsgHeaderIface *header = NULL;
 	FldAndPriv *ptr = user_data;
 	const char *uid = (const char*)data;
 
@@ -269,19 +273,19 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	TnyMsgFolderIface *self = ptr->self;
 	TnyMsgFolderPriv *priv = ptr->priv;
 
-	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
+	/* Proxy instantiation */
+	header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	tny_msg_header_iface_set_folder (header, self);
 	tny_msg_header_iface_set_uid (header, uid);
 
-	/* Uncertain (the _new is already a ref, right?) */
-	/* g_object_ref (G_OBJECT (header)) */
-
+	g_mutex_lock (priv->cached_hdrs_lock);
 	priv->cached_hdrs = g_list_append (priv->cached_hdrs, header);
 	priv->cached_length++;
-
 	/* TODO: If unread */
 	/* priv->unread_length++; */
+	g_mutex_unlock (priv->cached_hdrs_lock);
+
 
 	return;
 }
@@ -294,11 +298,18 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 
 	load_folder (priv);
 
+	g_mutex_lock (priv->cached_hdrs_lock);
 	if (!priv->cached_hdrs)
 	{
 		GPtrArray *uids = NULL;
 		CamelException ex;
-		FldAndPriv *ptr = g_new (FldAndPriv, 1);
+		FldAndPriv *ptr = NULL;
+
+		priv->cached_length = 0;
+		priv->cached_hdrs = NULL;
+		g_mutex_unlock (priv->cached_hdrs_lock);
+
+		ptr = g_new (FldAndPriv, 1);
 
 		/* Prepare speedup trick */
 		ptr->self = self;
@@ -307,7 +318,6 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 		camel_folder_refresh_info (priv->folder, &ex);
 		uids = camel_folder_get_uids (priv->folder);
 
-		priv->cached_length = 0;
 		g_ptr_array_foreach (uids, add_message_with_uid, ptr);
 
 		/* Cleanup speedup trick */
@@ -333,6 +343,8 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 		/* So we postphone the freeing to the finalize 
 		camel_folder_free_uids (priv->folder, uids); */
 
+	} else {
+		g_mutex_unlock (priv->cached_hdrs_lock);
 	}
 
 	return priv->cached_hdrs;
@@ -365,13 +377,16 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 
 	load_folder (priv);
 
+	g_mutex_lock (priv->cached_msgs_lock);
 	if (!priv->cached_msgs)
 	{
 		priv->cached_msgs = g_hash_table_new_full 
 			(g_str_hash, g_str_equal, destroy_cached_key,
 			destroy_cached_value);
+		g_mutex_unlock (priv->cached_msgs_lock);
 	} else {
 		message = g_hash_table_lookup (priv->cached_msgs, id);
+		g_mutex_unlock (priv->cached_msgs_lock);
 	}
 	
 	if (!message)
@@ -379,8 +394,12 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 		CamelException *ex = camel_exception_new ();
 		camel_exception_init (ex);
 
-		CamelMimeMessage *camel_message = camel_folder_get_message  
+		CamelMimeMessage *camel_message = NULL;
+
+		g_mutex_lock (priv->folder_lock);
+		camel_message = camel_folder_get_message  
 			(priv->folder, (const char *) id, ex);
+		g_mutex_unlock (priv->folder_lock);
 
 		if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
 		{
@@ -389,7 +408,10 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 			tny_msg_iface_set_folder (message, self);
 			tny_msg_iface_set_header (message, TNY_MSG_HEADER_IFACE (header));
 			_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
+
+			g_mutex_lock (priv->cached_msgs_lock);
 			g_hash_table_insert (priv->cached_msgs, (gpointer)id, message);
+			g_mutex_unlock (priv->cached_msgs_lock);
 		}
 
 		camel_exception_free (ex);
@@ -456,13 +478,15 @@ void
 tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
-	
+
+	g_mutex_lock (priv->folder_lock);
 	if (priv->folder)
 		camel_object_unref (priv->folder);
 
 	camel_object_ref (camel_folder);
 
 	priv->folder = camel_folder;
+	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -477,8 +501,13 @@ CamelFolder*
 tny_msg_folder_get_folder (TnyMsgFolder *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	CamelFolder *retval = NULL;
 
-	return priv->folder;
+	g_mutex_lock (priv->folder_lock);
+	retval = priv->folder;
+	g_mutex_unlock (priv->folder_lock);
+
+	return retval;
 }
 
 /**
@@ -533,6 +562,15 @@ tny_msg_folder_finalize (GObject *object)
 
 	tny_msg_folder_hdr_cache_remover (priv);
 
+	g_mutex_free (priv->cached_hdrs_lock);
+	priv->cached_hdrs_lock = NULL;
+
+	g_mutex_free (priv->cached_msgs_lock);
+	priv->cached_msgs_lock = NULL;
+
+	g_mutex_free (priv->folder_lock);
+	priv->folder_lock = NULL;
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -553,8 +591,13 @@ static const gboolean
 tny_msg_folder_has_cache (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+	gboolean retval;
 
-	return (priv->folder != NULL);
+	g_mutex_lock (priv->folder_lock);
+	retval = (priv->folder != NULL);
+	g_mutex_unlock (priv->folder_lock);
+
+	return retval;
 }
 
 
@@ -565,22 +608,16 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->get_headers_func = tny_msg_folder_get_headers;
 	klass->get_message_func = tny_msg_folder_get_message;
-
 	klass->set_id_func = tny_msg_folder_set_id;
 	klass->get_id_func = tny_msg_folder_get_id;
-
 	klass->set_name_func = tny_msg_folder_set_name;
 	klass->get_name_func = tny_msg_folder_get_name;
-
 	klass->has_cache_func = tny_msg_folder_has_cache;
 	klass->uncache_func = tny_msg_folder_uncache;
-
 	klass->add_folder_func = tny_msg_folder_add_folder;
 	klass->get_folders_func = tny_msg_folder_get_folders;
-
 	klass->get_unread_count_func = tny_msg_folder_get_unread_count;
 	klass->get_all_count_func = tny_msg_folder_get_all_count;
-
 	klass->get_account_func = tny_msg_folder_get_account;
 	klass->set_account_func = tny_msg_folder_set_account;
 
@@ -594,9 +631,7 @@ tny_msg_folder_class_init (TnyMsgFolderClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-
 	object_class->finalize = tny_msg_folder_finalize;
-
 	g_type_class_add_private (object_class, sizeof (TnyMsgFolderPriv));
 
 	return;
@@ -612,6 +647,10 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folders = NULL;
 	priv->cached_hdrs = NULL;
 	priv->cached_msgs = NULL; 
+
+	priv->cached_hdrs_lock = g_mutex_new ();
+	priv->cached_msgs_lock = g_mutex_new ();
+	priv->folder_lock = g_mutex_new ();
 
 	return;
 }
