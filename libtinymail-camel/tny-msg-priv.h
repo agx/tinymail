@@ -26,9 +26,13 @@ typedef struct _TnyMsgPriv TnyMsgPriv;
 
 struct _TnyMsgPriv
 {
+	GMutex *message_lock;
 	CamelMimeMessage *message;
+	GMutex *header_lock;
 	TnyMsgHeaderIface *header;
+	GMutex *parts_lock;
 	GList *parts;
+	GMutex *folder_lock;
 	TnyMsgFolderIface *folder;
 };
 

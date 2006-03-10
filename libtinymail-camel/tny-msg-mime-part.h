@@ -53,6 +53,7 @@ GType                 tny_msg_mime_part_get_type  (void);
 
 TnyMsgMimePart*       tny_msg_mime_part_new       (CamelMimePart *part);
 void                  tny_msg_mime_part_set_part  (TnyMsgMimePart *self, CamelMimePart *part);
+CamelMimePart*	      tny_msg_mime_part_get_part  (TnyMsgMimePart *self);
 
 G_END_DECLS
 

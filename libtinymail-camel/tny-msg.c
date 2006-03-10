@@ -53,15 +53,17 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
         if (containee == NULL)
                 return go;
 
-        /* using the object types is more accurate than using the mime/types */
-        if (CAMEL_IS_MULTIPART (containee)) {
+        if (CAMEL_IS_MULTIPART (containee)) 
+	{
                 parts = camel_multipart_get_number (CAMEL_MULTIPART (containee));
-                for (i = 0; go && i < parts; i++) {
+                for (i = 0; go && i < parts; i++) 
+		{
                         CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
-
                         go = message_foreach_part_rec (msg, part, callback, data);
                 }
-        } else if (CAMEL_IS_MIME_MESSAGE (containee)) {
+
+        } else if (CAMEL_IS_MIME_MESSAGE (containee)) 
+	{
                 go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data);
         }
 
@@ -73,98 +75,15 @@ static gboolean
 received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
 	TnyMsgPriv *priv = data;
-
 	TnyMsgMimePartIface *tpart = TNY_MSG_MIME_PART_IFACE 
 			(tny_msg_mime_part_new (part));
-
-
 	TnyMsgMimePart *p = tny_msg_mime_part_new (part);
 
-	/* Uncertain (_new is a ref by itself, right?) */
-	/* g_object_ref (G_OBJECT (tpart)); */
-
+	g_mutex_lock (priv->parts_lock);
 	priv->parts = g_list_append (priv->parts, tpart);
+	g_mutex_unlock (priv->parts_lock);
 
 	return TRUE;
-}
-
-
-void
-_tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
-	CamelDataWrapper *wrapper;
-	CamelMimePart *part;
-
-	message_foreach_part_rec (message, (CamelMimePart *)message, received_a_part, priv);
-
-	return;
-}
-
-const TnyMsgFolderIface* 
-tny_msg_get_folder (TnyMsgIface *self)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	
-	return (const TnyMsgFolderIface*)priv->folder;
-}
-
-
-void
-tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	priv->folder = (TnyMsgFolderIface*)folder;
-
-	return;
-}
-
-static const GList*
-tny_msg_get_parts (TnyMsgIface *self)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	return priv->parts;
-}
-
-static const TnyMsgHeaderIface*
-tny_msg_get_header (TnyMsgIface *self)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	return priv->header;
-}
-
-
-static gint
-tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
-{
-	/* TODO */
-	return -1;
-}
-
-static void 
-tny_msg_del_part (TnyMsgIface *self, gint id)
-{
-	/* TODO */
-	return;
-}
-
-
-static void
-tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	if (priv->header)
-		g_object_unref (G_OBJECT (priv->header));
-
-	g_object_ref (G_OBJECT (header));
-
-	priv->header = header;
-
-	return;
 }
 
 static void 
@@ -176,16 +95,10 @@ destroy_part (gpointer data, gpointer user_data)
 	return;
 }
 
-static void
-tny_msg_finalize (GObject *object)
+static void 
+unload_parts (TnyMsgPriv *priv)
 {
-	TnyMsg *self = (TnyMsg*) object;
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-
-	if (priv->header)
-		g_object_unref (G_OBJECT (priv->header));
-
-	priv->header = NULL;
+	g_mutex_lock (priv->parts_lock);
 
 	if (priv->parts) 
 	{
@@ -196,6 +109,193 @@ tny_msg_finalize (GObject *object)
 	}
 
 	priv->parts = NULL;
+
+	g_mutex_unlock (priv->parts_lock);
+
+	return;
+}
+
+void
+_tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
+	CamelDataWrapper *wrapper;
+	CamelMimePart *part;
+
+	g_mutex_lock (priv->message_lock);
+
+	if (priv->message)
+		camel_object_unref (CAMEL_OBJECT (priv->message));
+
+	camel_object_ref (CAMEL_OBJECT (message));
+	priv->message = message;
+
+	unload_parts (priv);
+
+	message_foreach_part_rec (message, (CamelMimePart *)message, received_a_part, priv);
+
+	/* Warning: large lock that locks code, not data */
+	g_mutex_unlock (priv->message_lock);
+
+	return;
+}
+
+const TnyMsgFolderIface* 
+tny_msg_get_folder (TnyMsgIface *self)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	const TnyMsgFolderIface *retval;
+
+	g_mutex_lock (priv->folder_lock);
+	retval = priv->folder;
+	g_mutex_unlock (priv->folder_lock);
+
+	return retval;
+}
+
+
+void
+tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+
+	g_mutex_lock (priv->folder_lock);
+	priv->folder = (TnyMsgFolderIface*)folder;
+	g_mutex_unlock (priv->folder_lock);
+
+	return;
+}
+
+static const GList*
+tny_msg_get_parts (TnyMsgIface *self)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	const GList *retval;
+
+	g_mutex_lock (priv->parts_lock);
+	retval = priv->parts;
+	g_mutex_unlock (priv->parts_lock);
+
+	return retval;
+}
+
+static const TnyMsgHeaderIface*
+tny_msg_get_header (TnyMsgIface *self)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyMsgHeaderIface *retval;
+
+	g_mutex_lock (priv->header_lock);
+	retval = priv->header;
+	g_mutex_unlock (priv->header_lock);
+
+	return retval;
+}
+
+
+static gint
+tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	CamelDataWrapper *containee = camel_medium_get_content_object 
+		(CAMEL_MEDIUM (priv->message));
+	gint curl = 0;
+
+	g_mutex_lock (priv->message_lock);
+
+	curl = g_list_length (priv->parts);
+
+	curl++;
+
+
+	/* TODO: coupling mistake. This makes it obligated to use a specific
+	   implementation of MsgMimePartIface (the camel one). */
+
+	camel_multipart_add_part_at (CAMEL_MULTIPART (containee), 
+		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl);
+
+	unload_parts (priv);
+
+	message_foreach_part_rec (priv->message, (CamelMimePart *)priv->message, 
+		received_a_part, priv);
+
+	/* Reload curl (locking granularity allows for changes during the foreach) */
+	g_mutex_lock (priv->parts_lock);
+	curl =  g_list_length (priv->parts);
+	g_mutex_unlock (priv->parts_lock);
+
+
+	/* Warning: large lock that locks code, not data */
+	g_mutex_unlock (priv->message_lock);
+
+	return curl;
+}
+
+static void 
+tny_msg_del_part (TnyMsgIface *self, gint id)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	CamelDataWrapper *containee = camel_medium_get_content_object 
+		(CAMEL_MEDIUM (priv->message));
+
+	g_mutex_lock (priv->message_lock);
+
+	camel_multipart_remove_part_at (CAMEL_MULTIPART (containee), id);
+
+	unload_parts (priv);
+
+	message_foreach_part_rec (priv->message, (CamelMimePart *)priv->message, 
+		received_a_part, priv);
+
+	/* Warning: large lock that locks code, not data */
+	g_mutex_unlock (priv->message_lock);
+
+	return;
+}
+
+
+static void
+tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+
+	g_mutex_lock (priv->header_lock);
+	if (priv->header)
+		g_object_unref (G_OBJECT (priv->header));
+
+	g_object_ref (G_OBJECT (header));
+
+	priv->header = header;
+	g_mutex_unlock (priv->header_lock);
+
+	return;
+}
+
+
+static void
+tny_msg_finalize (GObject *object)
+{
+	TnyMsg *self = (TnyMsg*) object;
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+
+	g_mutex_lock (priv->header_lock);
+	if (priv->header)
+		g_object_unref (G_OBJECT (priv->header));
+	priv->header = NULL;
+	g_mutex_unlock (priv->header_lock);
+
+	g_mutex_lock (priv->message_lock);
+	if (priv->message)
+		camel_object_unref (CAMEL_OBJECT (priv->message));
+	priv->message = NULL;
+	g_mutex_lock (priv->message_lock);
+
+	unload_parts (priv);
+
+	g_mutex_free (priv->message_lock);
+	g_mutex_free (priv->header_lock);
+	g_mutex_free (priv->parts_lock);
+	g_mutex_free (priv->folder_lock);
 
 	return;
 }
@@ -225,10 +325,8 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_parts_func = tny_msg_get_parts;
 	klass->get_header_func = tny_msg_get_header;
 	klass->set_header_func = tny_msg_set_header;
-
 	klass->add_part_func = tny_msg_add_part;
 	klass->del_part_func = tny_msg_del_part;
-
 	klass->set_folder_func = tny_msg_set_folder;
 	klass->get_folder_func = tny_msg_get_folder;
 
@@ -260,6 +358,11 @@ tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->message = NULL;
 	priv->parts = NULL;
 	priv->header = NULL;
+
+	priv->message_lock = g_mutex_new ();
+	priv->parts_lock = g_mutex_new ();
+	priv->header_lock = g_mutex_new ();
+	priv->folder_lock = g_mutex_new ();
 
 	return;
 }

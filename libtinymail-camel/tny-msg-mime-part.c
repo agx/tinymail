@@ -161,6 +161,14 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 	return;
 }
 
+CamelMimePart*
+tny_msg_mime_part_get_part (TnyMsgMimePart *self)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	return priv->part;
+}
+
 
 static void
 tny_msg_mime_part_set_index (TnyMsgMimePartIface *self, guint index)
