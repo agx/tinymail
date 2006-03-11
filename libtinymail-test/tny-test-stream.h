@@ -46,6 +46,7 @@ struct _TnyTestStream
 	GObject parent;
 
 	gint eos_count;
+	gchar *wrote;
 };
 
 struct _TnyTestStreamClass 

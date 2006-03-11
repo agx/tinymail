@@ -19,6 +19,81 @@
 
 #include <tny-msg-mime-part-iface.h>
 
+/**
+ * tny_msg_mime_part_iface_set_content_location:
+ * @self: a #TnyMsgMimePartIface object
+ * @content_location: the location 
+ * 
+ * Set the content location of a message part.
+ *
+ **/
+void
+tny_msg_mime_part_iface_set_content_location (TnyMsgMimePartIface *self, const gchar *content_location)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_location_func (self, content_location);
+	return;
+}
+
+/**
+ * tny_msg_mime_part_iface_set_description:
+ * @self: a #TnyMsgMimePartIface object
+ * @description: the description 
+ * 
+ * Set the description of a message part.
+ *
+ **/
+void
+tny_msg_mime_part_iface_set_description (TnyMsgMimePartIface *self, const gchar *description)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_description_func (self, description);
+	return;
+}
+
+/**
+ * tny_msg_mime_part_iface_set_content_id:
+ * @self: a #TnyMsgMimePartIface object
+ * @content_id: the content id 
+ * 
+ * Set the content id of a message part.
+ *
+ **/
+void
+tny_msg_mime_part_iface_set_content_id (TnyMsgMimePartIface *self, const gchar *content_id)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_id_func (self, content_id);
+	return;
+}
+
+/**
+ * tny_msg_mime_part_iface_set_filename:
+ * @self: a #TnyMsgMimePartIface object
+ * @filename: the filename 
+ * 
+ * Set the filename of a message part.
+ *
+ **/
+void
+tny_msg_mime_part_iface_set_filename (TnyMsgMimePartIface *self, const gchar *filename)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_filename_func (self, filename);
+	return;
+}
+
+/**
+ * tny_msg_mime_part_iface_set_content_type:
+ * @self: a #TnyMsgMimePartIface object
+ * @content_type: the content_type 
+ * 
+ * Set the content type of a message part. Formatted as type/subtype
+ *
+ **/
+void
+tny_msg_mime_part_iface_set_content_type (TnyMsgMimePartIface *self, const gchar *content_type)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_type_func (self, content_type);
+	return;
+}
+
 
 /**
  * tny_msg_mime_part_iface_set_index:
@@ -119,18 +194,18 @@ tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 }
 
 /**
- * tny_msg_mime_part_iface_read_from_stream:
+ * tny_msg_mime_part_iface_construct_from_stream:
  * @self: a #TnyMsgMimePartIface object
  * @stream: a #TnyMsgStreamIface stream
  * 
- * Read the message part from a stream.
+ * Set the stream from which the message part will read its content
  *
  * Return value: 0 on success or -1 on fail
  **/
 gint
-tny_msg_mime_part_iface_read_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+tny_msg_mime_part_iface_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
-	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->read_from_stream_func (self, stream);
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->construct_from_stream_func (self, stream);
 }
 
 

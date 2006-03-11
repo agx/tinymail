@@ -70,7 +70,6 @@ static ssize_t
 tny_camel_stream_read (CamelStream *stream, char *buffer, size_t n)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
-
 	return tny_stream_iface_read (self->stream, buffer, n);
 }
 
@@ -78,7 +77,6 @@ static ssize_t
 tny_camel_stream_write (CamelStream *stream, const char *buffer, size_t n)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
-
 	return tny_stream_iface_write (self->stream, buffer, n);
 }
 

@@ -31,6 +31,10 @@ tny_test_stream_reset (TnyStreamIface *self)
 {
 	TnyTestStream *me = TNY_TEST_STREAM (self);
 
+	if (me->wrote)
+		g_free (me->wrote);
+
+	me->wrote = NULL;
 	me->eos_count = 0;
 
 	return 0;
@@ -83,13 +87,29 @@ tny_test_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 
 	buffer [i] = '\0';
 
-	return n;
+	return i;
 }
 
 static ssize_t
 tny_test_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 {
-	return n;
+
+	gint i=0;
+	TnyTestStream *me = TNY_TEST_STREAM (self);
+
+	if (me->wrote)
+		g_free (me->wrote);
+
+	me->wrote = NULL;
+
+	me->wrote = (gchar*) g_malloc (sizeof (gchar) * n);
+
+	for (i=0; i < n; i++)
+		me->wrote [i] = buffer [i];
+
+	me->wrote[i] = '\0';
+
+	return i;
 }
 
 static gint
@@ -121,6 +141,7 @@ tny_test_stream_new (void)
 {
 	TnyTestStream *self = g_object_new (TNY_TYPE_TEST_STREAM, NULL);
 
+	self->wrote = NULL;
 	self->eos_count = 0;
 
 	return self;

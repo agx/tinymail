@@ -189,7 +189,8 @@ tny_stream_camel_finalize (GObject *object)
 	TnyStreamCamel *self = (TnyStreamCamel *)object;	
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 
-	camel_object_unref (CAMEL_OBJECT (priv->stream));
+	if (priv->stream)
+		camel_object_unref (CAMEL_OBJECT (priv->stream));
 
 	(*parent_class->finalize) (object);
 

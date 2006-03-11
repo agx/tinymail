@@ -1,3 +1,6 @@
+#ifndef TNY_MSG_MIME_PART_IFACE_TEST_H
+#define TNY_MSG_MIME_PART_IFACE_TEST_H
+
 /* tinymail - Tiny Mail gunit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
@@ -16,25 +19,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
-/* Usage:
- * gunit-test-runner-tool -s tinymail-test-suite -v gnome
- */
-
 #include "tny-test-suite.h"
 
-#include "tny-msg-header-iface-test.h"
-#include "tny-stream-iface-test.h"
-#include "tny-msg-mime-part-iface-test.h"
+#include <tny-msg-mime-part-iface.h>
 
-GList*
-gunit_get_test_suites()
-{
-	GList *suites = NULL;
+/* Test suite */
+GUnitTestSuite *create_tny_msg_mime_part_iface_suite (void);
 
-	suites = g_list_append (suites, create_tny_msg_header_iface_suite ());
-	suites = g_list_append (suites, create_tny_stream_iface_suite ());
-	suites = g_list_append (suites, create_tny_msg_mime_part_iface_suite ());
-
-	return suites;
-}
+#endif

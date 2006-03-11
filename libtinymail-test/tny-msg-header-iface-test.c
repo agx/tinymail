@@ -139,7 +139,7 @@ create_tny_msg_header_iface_suite (void)
 	GUnitTestSuite *suite = NULL;
 
 	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyMsgheaderIface");
+	suite = gunit_test_suite_new ("TnyMsgHeaderIface");
 
 
 	/* Add test case objects to test suite */

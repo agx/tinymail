@@ -49,11 +49,18 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
-
 	CamelMedium *medium = CAMEL_MEDIUM (priv->part);
-	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
-	
+	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));	
 	wrapper = camel_medium_get_content_object (medium);
+
+	if (!wrapper)
+	{
+		g_error ("Mime part does not yet have a source stream, use "
+			"camel_data_wrapper_write_to_stream first");
+		camel_object_unref (CAMEL_OBJECT (cstream));
+		return;
+	}
+
 	camel_data_wrapper_write_to_stream (wrapper, cstream);
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
@@ -62,7 +69,7 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 }
 
 static gint
-tny_msg_mime_part_read_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
@@ -72,6 +79,14 @@ tny_msg_mime_part_read_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *s
 	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
 	
 	wrapper = camel_medium_get_content_object (medium);
+
+	if (!wrapper)
+	{
+		wrapper = camel_data_wrapper_new (); 
+		camel_data_wrapper_construct_from_stream (wrapper, cstream);
+		camel_medium_set_content_object (medium, wrapper);
+	}
+
 	retval = camel_data_wrapper_construct_from_stream (wrapper, cstream);
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
@@ -90,6 +105,13 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 	CamelStream *stream = camel_stream_mem_new ();
 	
 	wrapper = camel_medium_get_content_object (medium);
+
+	if (!wrapper)
+	{
+		wrapper = camel_data_wrapper_new (); 
+		camel_medium_set_content_object (medium, wrapper);
+	}
+
 	camel_data_wrapper_write_to_stream (wrapper, stream);
 
 	retval = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
@@ -239,6 +261,53 @@ tny_msg_mime_part_get_content_location (TnyMsgMimePartIface *self)
 	return camel_mime_part_get_content_location (priv->part);
 }
 
+
+static void 
+tny_msg_mime_part_set_content_location (TnyMsgMimePartIface *self, const gchar *content_location)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	camel_mime_part_set_content_location (priv->part, content_location);
+	return;
+}
+
+static void 
+tny_msg_mime_part_set_description (TnyMsgMimePartIface *self, const gchar *description)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	camel_mime_part_set_description (priv->part, description);
+	return;
+}
+
+static void 
+tny_msg_mime_part_set_content_id (TnyMsgMimePartIface *self, const gchar *content_id)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	camel_mime_part_set_content_id (priv->part, content_id);
+	return;
+}
+
+static void 
+tny_msg_mime_part_set_filename (TnyMsgMimePartIface *self, const gchar *filename)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	camel_mime_part_set_filename (priv->part, filename);
+	return;
+}
+
+static void 
+tny_msg_mime_part_set_content_type (TnyMsgMimePartIface *self, const gchar *content_type)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	camel_mime_part_set_content_type (priv->part, content_type);
+
+	if (priv->cached_content_type)
+		g_free (priv->cached_content_type);
+	priv->cached_content_type = NULL;
+
+	return;
+}
+
+
 /**
  * tny_msg_mime_part_new:
  * 
@@ -267,13 +336,18 @@ tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_content_type_func = tny_msg_mime_part_get_content_type;
 	klass->get_stream_func = tny_msg_mime_part_get_stream;
 	klass->write_to_stream_func = tny_msg_mime_part_write_to_stream;
-	klass->read_from_stream_func = tny_msg_mime_part_read_from_stream;
+	klass->construct_from_stream_func = tny_msg_mime_part_construct_from_stream;
 	klass->set_index_func = tny_msg_mime_part_set_index;
 	klass->get_index_func = tny_msg_mime_part_get_index;
 	klass->get_filename_func = tny_msg_mime_part_get_filename;
 	klass->get_content_id_func = tny_msg_mime_part_get_content_id;
 	klass->get_description_func = tny_msg_mime_part_get_description;
 	klass->get_content_location_func = tny_msg_mime_part_get_content_location;
+	klass->set_content_location_func = tny_msg_mime_part_set_content_location;
+	klass->set_description_func = tny_msg_mime_part_set_description;
+	klass->set_content_id_func = tny_msg_mime_part_set_content_id;
+	klass->set_filename_func = tny_msg_mime_part_set_filename;
+	klass->set_content_type_func = tny_msg_mime_part_set_content_type;
 
 	return;
 }
