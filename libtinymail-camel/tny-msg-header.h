@@ -42,6 +42,9 @@ typedef struct _TnyMsgHeaderClass TnyMsgHeaderClass;
 GType           tny_msg_header_get_type  (void);
 TnyMsgHeader*   tny_msg_header_new       (void);
 
+
+void            tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val);
+
 G_END_DECLS
 
 #endif

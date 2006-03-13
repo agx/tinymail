@@ -158,19 +158,25 @@ load_folder (TnyMsgFolderPriv *priv)
 	g_mutex_lock (priv->folder_lock);
 	if (!priv->folder)
 	{
-		CamelException ex;
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelStore *store = (CamelStore*) _tny_account_get_service 
 			(TNY_ACCOUNT (priv->account));
 
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
-		priv->unread_length = (guint)
-			camel_folder_get_unread_message_count (priv->folder);
+		priv->has_summary_cap = camel_folder_has_summary_capability (priv->folder);
+
+		if (priv->folder && priv->has_summary_cap)
+		{
+			priv->unread_length = (guint)
+				camel_folder_get_unread_message_count (priv->folder);
+		}
 	}
 	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
+
 
 CamelFolder*
 _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
@@ -275,6 +281,9 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	/* Proxy instantiation */
 	header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
+
+	tny_msg_header_set_use_summary (TNY_MSG_HEADER (header), 
+		priv->has_summary_cap);
 
 	tny_msg_header_iface_set_folder (header, self);
 	tny_msg_header_iface_set_uid (header, uid);
@@ -480,12 +489,17 @@ tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
 	g_mutex_lock (priv->folder_lock);
+	
 	if (priv->folder)
 		camel_object_unref (priv->folder);
 
 	camel_object_ref (camel_folder);
 
+	tny_msg_folder_set_id (TNY_MSG_FOLDER_IFACE (self), 
+		camel_folder_get_full_name (camel_folder));
+
 	priv->folder = camel_folder;
+
 	g_mutex_unlock (priv->folder_lock);
 
 	return;

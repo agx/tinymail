@@ -61,18 +61,11 @@ fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelF
 		if (parent)
 			tny_msg_folder_iface_add_folder (parent, iface);
 		else 
-		{
-			/* Uncertain (the _new is already a ref, right?) */
-			/* g_object_ref (G_OBJECT (iface)) */
-
 			priv->folders = g_list_append (priv->folders, iface);
-		}
 
 		tny_msg_folder_iface_uncache (iface);
 
 		fill_folders_recursive (self, iface, iter->child);
-
-		
 
 		/* Tell the observers that they should reload */
 		g_signal_emit (iface, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
@@ -88,13 +81,31 @@ tny_account_get_folders (TnyAccountIface *self)
 
 	CamelStore *store = camel_session_get_store (CAMEL_SESSION (priv->session), 
 			priv->url_string, priv->ex);
-	CamelFolderInfo *info = camel_store_get_folder_info 
-		(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
-			CAMEL_STORE_FOLDER_INFO_RECURSIVE, priv->ex);
 
-	fill_folders_recursive (self, NULL, info);
+	if (g_ascii_strcasecmp (tny_account_iface_get_proto (self), "pop") != 0)
+	{
+		CamelFolderInfo *info = camel_store_get_folder_info 
+			(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
+				CAMEL_STORE_FOLDER_INFO_RECURSIVE, priv->ex);
+
+		fill_folders_recursive (self, NULL, info);
 	
-	camel_store_free_folder_info (store, info);
+		camel_store_free_folder_info (store, info);
+
+	} else 
+	{
+		TnyMsgFolderIface *inbox = TNY_MSG_FOLDER_IFACE (tny_msg_folder_new ());
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+		CamelFolder *folder = camel_store_get_inbox (store, &ex);
+
+		g_object_ref (G_OBJECT (inbox));
+
+		tny_msg_folder_set_folder (TNY_MSG_FOLDER (inbox), folder);
+		tny_msg_folder_iface_set_account (inbox, self);
+		priv->folders = g_list_append (priv->folders, inbox);
+		tny_msg_folder_iface_uncache (inbox);
+		g_signal_emit (inbox, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+	}
 
 	return priv->folders;
 }

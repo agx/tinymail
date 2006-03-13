@@ -41,8 +41,13 @@ struct _TnyMsgHeader
 	gchar *uid;
 	TnyMsgFolderIface *folder;
 
+	gboolean use_summary;
+
 	CamelMessageInfo *message_info;
 	CamelMimeMessage *mime_message;
+	gchar *mime_from;
+
+	const gchar *invalid;
 };
 
 struct _TnyMsgHeaderClass 
@@ -54,23 +59,57 @@ struct _TnyMsgHeaderClass
 static void
 unload_msg_header (TnyMsgHeader *self)
 {
-	if (self->message_info) 
-		camel_message_info_free (self->message_info);
+	if (self->mime_from)
+		g_free (self->mime_from);
+	self->mime_from = NULL;
 
-	self->message_info = NULL;
+	if (self->use_summary)
+	{
+		if (self->message_info) 
+			camel_message_info_free (self->message_info);
+		self->message_info = NULL;
+	} else {
+		if (self->mime_message)
+			camel_object_unref (CAMEL_OBJECT (self->mime_message));
+		self->mime_message = NULL;
+	}
 
 	return;
+}
+
+void 
+tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val)
+{
+	unload_msg_header (self);
+
+	self->use_summary = val;
 }
 
 static void
 load_msg_header (TnyMsgHeader *self)
 {
-	if (!self->message_info && self->folder && self->uid)
+	if (self->use_summary)
 	{
-		CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
-		CamelMessageInfo *msginfo = camel_folder_get_message_info (folder, self->uid);
-
-		_tny_msg_header_set_camel_message_info (self, msginfo);
+		if (!self->message_info && self->folder && self->uid)
+		{
+			CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
+			CamelMessageInfo *msginfo = camel_folder_get_message_info 
+					(folder, self->uid);
+			_tny_msg_header_set_camel_message_info (self, msginfo);
+		}
+	} else 
+	{
+		if (!self->mime_message && self->folder && self->uid)
+		{
+			g_print ("get %s\n", self->uid);
+			CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
+			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+			self->mime_message = camel_folder_get_message 
+					(folder, self->uid, &ex);
+			if (self->mime_message)
+				g_print ("have one\n");
+			else g_print ("-- %s\n", camel_exception_get_description (&ex));
+		}
 	}
 
 	return;
@@ -81,12 +120,9 @@ prepare_for_write (TnyMsgHeader *self)
 {
 	unload_msg_header (self);
 
-	self->uid = NULL;
-
-	if (self->mime_message == NULL)
-	{
+	self->use_summary = FALSE;
+	if (!self->mime_message)
 		self->mime_message = camel_mime_message_new ();
-	}
 
 	return;
 }
@@ -332,29 +368,20 @@ tny_msg_header_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
 	return;
 }
 
-/* TODO: Add these
-camel_message_info_mlist     
-camel_message_info_flags     
-camel_message_info_size      
-camel_message_info_message_id
-*/
 
 static const gchar*
 tny_msg_header_get_cc (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	if (me->uid)
-	{
-		load_msg_header (me);
+	load_msg_header (me);
 
+	if (me->use_summary && me->message_info)
 		return camel_message_info_cc (me->message_info);
-
-	} else if (me->mime_message)
-	{
+	else if (me->mime_message)
 		return camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "cc");
-	} else 
-		return NULL;
+
+	return me->invalid;
 }
 
 static const gchar*
@@ -362,19 +389,14 @@ tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	if (me->uid)
-	{
-		load_msg_header (me);
+	load_msg_header (me);
 
-		/* TODO */
-
-		return NULL;
-
-	} else if (me->mime_message)
-	{
+	if (me->use_summary) /* TODO */
+		return me->invalid;
+	else if (me->mime_message)
 		return camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "bcc");
-	} else 
-		return NULL;
+
+	return me->invalid;
 }
 
 static const time_t
@@ -384,7 +406,10 @@ tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	return camel_message_info_date_received (me->message_info);
+	if (me->use_summary && me->message_info)
+		return camel_message_info_date_received (me->message_info);
+	else if (me->mime_message)
+		return camel_mime_message_get_date_received (me->mime_message, NULL);
 }
 
 static const time_t
@@ -394,9 +419,11 @@ tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	/* TODO: write case */
-
-	return camel_message_info_date_sent (me->message_info);
+	if (me->use_summary && me->message_info)
+		return camel_message_info_date_sent (me->message_info);
+	else {
+		/* TODO: write case */
+	}
 }
 	
 static const gchar*
@@ -404,25 +431,24 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	if (me->uid)
-	{
-		load_msg_header (me);
+	load_msg_header (me);
 
+	if (me->use_summary && me->message_info)
 		return camel_message_info_from (me->message_info);
-
-	} else if (me->mime_message)
+	else
 	{
-		CamelInternetAddress *addr = (CamelInternetAddress*)
-			camel_mime_message_get_from (me->mime_message);
-		gchar *retval = camel_address_format (CAMEL_ADDRESS (addr));
+		if (!me->mime_from && me->mime_message)
+		{
+			CamelInternetAddress *addr = (CamelInternetAddress*)
+				camel_mime_message_get_from (me->mime_message);
+			me->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
+			camel_object_unref (CAMEL_OBJECT (addr));
+		}
 
-		/* TODO: leaks */
+		return (const gchar*)me->mime_from;
+	}
 
-		camel_object_unref (CAMEL_OBJECT (addr));
-
-		return retval;
-	} else 
-		return NULL;
+	return me->invalid;
 }
 
 static const gchar*
@@ -430,17 +456,14 @@ tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	if (me->uid)
-	{
-		load_msg_header (me);
+	load_msg_header (me);
 
+	if (me->use_summary && me->message_info)
 		return camel_message_info_subject (me->message_info);
-
-	} else if (me->mime_message)
-	{
+	else if (me->mime_message)
 		return camel_mime_message_get_subject (me->mime_message);
-	} else 
-		return NULL;
+
+	return me->invalid;
 }
 
 
@@ -449,17 +472,14 @@ tny_msg_header_get_to (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	if (me->uid)
-	{
-		load_msg_header (me);
+	load_msg_header (me);
 
+	if (me->use_summary && me->message_info)
 		return camel_message_info_to (me->message_info);
-
-	} else if (me->mime_message)
-	{
+	else if (me->mime_message)
 		return camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "to");
-	} else 
-		return NULL;
+
+	return me->invalid;
 }
 
 static const gchar*
@@ -469,9 +489,12 @@ tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	/* TODO: write case */
+	if (me->use_summary && me->message_info)
+		return (const gchar*)camel_message_info_message_id (me->message_info);
+	else if (me->mime_message)
+		return camel_mime_message_get_message_id (me->mime_message);
 
-	return (const gchar*)camel_message_info_message_id (me->message_info);
+	return me->invalid;
 }
 
 
@@ -482,9 +505,10 @@ tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	/* TODO: write case */
-
-	return camel_message_info_uid (me->message_info);
+	if (me->use_summary && me->message_info)
+		return camel_message_info_uid (me->message_info);
+	else /* Bleh solution ... */
+		return me->uid;
 }
 
 static void
@@ -511,7 +535,10 @@ tny_msg_header_has_cache (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	return (me->message_info != NULL);
+	if (me->use_summary)
+		return (me->message_info != NULL);
+	else
+		return (me->mime_message != NULL);
 }
 
 static void
@@ -519,7 +546,10 @@ tny_msg_header_uncache (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	if (me->message_info)
+	if (me->use_summary && me->message_info)
+		unload_msg_header (me);
+
+	if (!me->use_summary && me->mime_message)
 		unload_msg_header (me);
 
 	return;
@@ -530,7 +560,10 @@ tny_msg_header_finalize (GObject *object)
 {
 	TnyMsgHeader *self = (TnyMsgHeader*) object;
 
-	if (self->message_info)
+	if (self->use_summary && self->message_info)
+		unload_msg_header (self);
+
+	if (!self->use_summary && self->mime_message)
 		unload_msg_header (self);
 
 	/* Indeed, check the speedup trick above */
@@ -554,7 +587,10 @@ TnyMsgHeader*
 tny_msg_header_new (void)
 {
 	TnyMsgHeader *self = g_object_new (TNY_TYPE_MSG_HEADER, NULL);
+	static const gchar *inv = "Invalid";
 	
+	self->invalid = inv;
+
 	return self;
 }
 

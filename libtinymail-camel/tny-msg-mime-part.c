@@ -57,7 +57,7 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 	if (!wrapper)
 	{
 		g_error ("Mime part does not yet have a source stream, use "
-			"camel_data_wrapper_write_to_stream first");
+			"tny_msg_mime_part_construct_from_stream first");
 		camel_object_unref (CAMEL_OBJECT (cstream));
 		return;
 	}
