@@ -67,8 +67,7 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 	/* This should work but doesn't . . .
 	camel_data_wrapper_write_to_stream (wrapper, cstream); */
 
-	/* This shouldn't crash but does . . .
-	camel_object_unref (CAMEL_OBJECT (cstream)); */
+	camel_object_unref (CAMEL_OBJECT (cstream));
 
 	return;
 }
