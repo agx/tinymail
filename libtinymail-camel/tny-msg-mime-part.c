@@ -53,6 +53,7 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));	
 	wrapper = camel_medium_get_content_object (medium);
 
+
 	if (!wrapper)
 	{
 		g_error ("Mime part does not yet have a source stream, use "
@@ -61,9 +62,13 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 		return;
 	}
 
-	camel_data_wrapper_write_to_stream (wrapper, cstream);
+	camel_stream_write_to_stream (wrapper->stream, cstream);
 
-	camel_object_unref (CAMEL_OBJECT (cstream));
+	/* This should work but doesn't . . .
+	camel_data_wrapper_write_to_stream (wrapper, cstream); */
+
+	/* This shouldn't crash but does . . .
+	camel_object_unref (CAMEL_OBJECT (cstream)); */
 
 	return;
 }

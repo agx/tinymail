@@ -37,7 +37,6 @@ ssize_t
 tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output)
 {
 	CamelStream *stream = CAMEL_STREAM (self);
-
 	char tmp_buf[4096];
 	ssize_t total = 0;
 	ssize_t nb_read;
@@ -145,6 +144,7 @@ tny_camel_stream_class_init (TnyCamelStreamClass *klass)
 	((CamelStreamClass *)klass)->reset = tny_camel_stream_reset;
 	((CamelStreamClass *)klass)->flush = tny_camel_stream_flush;
 
+	
 	return;
 }
 

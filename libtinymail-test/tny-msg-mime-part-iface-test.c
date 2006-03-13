@@ -127,23 +127,21 @@ tny_msg_mime_part_iface_test_stream (void)
 	TnyTestStream *myto = TNY_TEST_STREAM (to);
 
 	tny_msg_mime_part_iface_construct_from_stream (iface, from);
-
-g_print ("write to ->\n");
 	tny_msg_mime_part_iface_write_to_stream (iface, to);
-g_print ("write to ->\n");
 
-	while (!tny_stream_iface_eos (to) || n > 1)
+	while (!tny_stream_iface_eos (to) && n < 1)
 	{
 		gchar buf[2];
 		tny_stream_iface_read (to, buf, sizeof (buf));
 
-		g_warning ("%s\n", buf);
+		buf[2] = '\0';
+
+		gunit_fail_unless(!strcmp (buf, "42"), "Unable to stream!\n");
 
 		n++;
 	}
 
-	g_warning ("---> %s\n", myto->wrote);
-
+	return;
 }
 
 GUnitTestSuite*
@@ -184,12 +182,6 @@ create_tny_msg_mime_part_iface_suite (void)
                                       tny_msg_mime_part_iface_test_setup,
                                       tny_msg_mime_part_iface_test_set_filename,
 				      tny_msg_mime_part_iface_test_teardown));
-g_print ("add\n");
-      tny_msg_mime_part_iface_test_setup();
-                                      tny_msg_mime_part_iface_test_stream();
-				      tny_msg_mime_part_iface_test_teardown();
-
-g_print ("done\n");
 
 	gunit_test_suite_add_test_case(suite,
                gunit_test_case_new_with_funcs("tny_msg_mime_part_iface_test_stream",

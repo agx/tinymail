@@ -56,7 +56,6 @@ tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 	CamelStream *stream = priv->stream;
-
 	char tmp_buf[4096];
 	ssize_t total = 0;
 	ssize_t nb_read;
