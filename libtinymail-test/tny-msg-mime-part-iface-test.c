@@ -121,10 +121,10 @@ tny_msg_mime_part_iface_test_set_content_type (void)
 static void
 tny_msg_mime_part_iface_test_stream (void)
 {
+	CamelStream *real_to = camel_stream_mem_new ();
 	TnyStreamIface *from = TNY_STREAM_IFACE (tny_test_stream_new ());
-	TnyStreamIface *to = TNY_STREAM_IFACE (tny_test_stream_new ());
+	TnyStreamIface *to = TNY_STREAM_IFACE (tny_stream_camel_new (real_to));
 	gint n;
-	TnyTestStream *myto = TNY_TEST_STREAM (to);
 
 	tny_msg_mime_part_iface_construct_from_stream (iface, from);
 	tny_msg_mime_part_iface_write_to_stream (iface, to);
@@ -140,6 +140,9 @@ tny_msg_mime_part_iface_test_stream (void)
 
 		n++;
 	}
+
+	g_object_unref (G_OBJECT (to));
+	camel_object_unref (CAMEL_OBJECT (real_to));
 
 	return;
 }
