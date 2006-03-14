@@ -31,5 +31,7 @@ int main (int argc, char **argv)
 		list = g_list_next (list);
 	}
 
+	g_list_free (list);
+
 	return 0;
 }

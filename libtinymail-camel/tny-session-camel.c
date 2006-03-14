@@ -461,7 +461,8 @@ tny_session_camel_get_type (void)
 		camel_type_init_done = TRUE;
 	}
 
-	if (tny_session_camel_type == CAMEL_INVALID_TYPE) {
+	if (tny_session_camel_type == CAMEL_INVALID_TYPE) 
+	{
 		ms_parent_class = (CamelSessionClass *)camel_session_get_type();
 		tny_session_camel_type = camel_type_register (
 			camel_session_get_type (),
