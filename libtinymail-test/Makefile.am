@@ -9,7 +9,7 @@ INCLUDES = 									\
 
 lib_LTLIBRARIES = libtinymail-test-suite.la
 
-bin_PROGRAMS = tny-simple-test-runner
+bin_PROGRAMS = tny-simple-test-runner tny-test-anything
 
 libtinymail_test_suite_la_SOURCES = 						\
 	tny-msg-header-iface-test.h						\
@@ -26,6 +26,7 @@ libtinymail_test_suite_la_SOURCES = 						\
 libtinymail_test_suite_la_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS)
 
 tny_simple_test_runner_SOURCES = tny-simple-test-runner.c
+tny_test_anything_SOURCES = tny-test-anything.c
 
 libtinymail_test_suite_la_LIBADD = 						\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 	        \
@@ -35,10 +36,19 @@ libtinymail_test_suite_la_LIBADD = 						\
 
 tny_simple_test_runner_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS)
 
+tny_test_anything_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS)
+
 tny_simple_test_runner_LDADD = 							\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la               \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la           \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la   \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la	\
+	libtinymail-test-suite.la
+
+tny_test_anything_LDADD =                                                       \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la               \
+	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la           \
+	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la   \
+	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la   \
 	libtinymail-test-suite.la
 

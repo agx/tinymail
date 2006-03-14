@@ -69,7 +69,7 @@ unload_msg_header (TnyMsgHeader *self)
 			camel_message_info_free (self->message_info);
 		self->message_info = NULL;
 	} else {
-		if (self->mime_message)
+		if (self->mime_message && CAMEL_IS_OBJECT (self->mime_message))
 			camel_object_unref (CAMEL_OBJECT (self->mime_message));
 		self->mime_message = NULL;
 	}
@@ -84,6 +84,8 @@ tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val)
 
 	self->use_summary = val;
 }
+
+static gboolean first_time = TRUE;
 
 static void
 load_msg_header (TnyMsgHeader *self)
@@ -101,14 +103,18 @@ load_msg_header (TnyMsgHeader *self)
 	{
 		if (!self->mime_message && self->folder && self->uid)
 		{
-			g_print ("get %s\n", self->uid);
+			if (first_time)
+			{
+				/* Don't ask me, I don't know why this makes it work! */
+				CamelInternetAddress *addr = camel_internet_address_new ();
+				camel_object_unref (CAMEL_OBJECT (addr));
+				first_time = FALSE;
+			}
+
 			CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 			self->mime_message = camel_folder_get_message 
 					(folder, self->uid, &ex);
-			if (self->mime_message)
-				g_print ("have one\n");
-			else g_print ("-- %s\n", camel_exception_get_description (&ex));
 		}
 	}
 
@@ -130,8 +136,6 @@ prepare_for_write (TnyMsgHeader *self)
 void /* protected method */
 _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
 {
-	/* camel_message_info_ref (camel_message_info); */
-
 	if (self->message_info)
 		g_warning ("Strange behaviour: Overwriting existing message info");
 
@@ -524,7 +528,19 @@ tny_msg_header_set_uid (TnyMsgHeaderIface *self, const gchar *uid)
 	priv->uid = g_strdup (uid); */
 
 	/* Yes I know what I'm doing, also check tny-msg-folder.c */
-	me->uid = (gchar*)uid;
+
+	if (me->use_summary) 
+		me->uid = (gchar*)uid;
+	else {
+		/* NEED TO INVESTIGATE THIS
+		For some reason the trick doesn't work if you don't 
+		have support for summaries */
+		if (me->uid)
+			g_free (me->uid);
+		me->uid = g_strdup (uid);
+		/* TODO: And if I AM going to do it this way, I need to lock 
+		 priv->uid */
+	}
 
 	return;
 }
@@ -567,8 +583,8 @@ tny_msg_header_finalize (GObject *object)
 		unload_msg_header (self);
 
 	/* Indeed, check the speedup trick above */
-	/* if (self->uid)
-		g_free (self->uid); */
+	if (self->uid && !self->use_summary)
+		g_free (self->uid); /* Also check above */
 
 	(*parent_class->finalize) (object);
 
