@@ -37,8 +37,6 @@ struct _TnyAccountIfaceClass
 {
 	GTypeInterface parent;
 
-	const GList* (*get_folders_func)   (TnyAccountIface *self);
-
         void (*set_id_func)                (TnyAccountIface *self, const gchar *id);
 
         void (*set_proto_func)             (TnyAccountIface *self, const gchar *proto);
@@ -56,7 +54,6 @@ struct _TnyAccountIfaceClass
 };
 
 GType        tny_account_iface_get_type        (void);
-const GList* tny_account_iface_get_folders     (TnyAccountIface *self);
 
 void         tny_account_iface_set_id          (TnyAccountIface *self, const gchar *id);
 

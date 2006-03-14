@@ -9,6 +9,8 @@ libtinymail_camel_1_0_headers =			\
 	tny-msg.h				\
 	tny-msg-folder.h			\
 	tny-account.h				\
+	tny-store-account.h			\
+	tny-transport-account.h			\
 	tny-camel-stream.h			\
 	tny-stream-camel.h			\
 	tny-camel-shared.h			\
@@ -16,6 +18,8 @@ libtinymail_camel_1_0_headers =			\
 
 libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-account-priv.h			\
+	tny-store-account-priv.h		\
+	tny-transport-account-priv.h		\
 	tny-msg-priv.h				\
 	tny-msg-header-priv.h			\
 	tny-msg-folder-priv.h			\
@@ -25,6 +29,8 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-msg-mime-part.c			\
 	tny-msg-folder.c			\
 	tny-account.c				\
+	tny-store-account.c			\
+	tny-transport-account.c			\
 	tny-camel-stream.c			\
 	tny-stream-camel.c			\
 	tny-session-camel.c

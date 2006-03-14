@@ -23,8 +23,8 @@
 #include <tny-msg-header-iface.h>
 #include <tny-msg.h>
 #include <tny-msg-header.h>
-#include <tny-account-iface.h>
-#include <tny-account.h>
+#include <tny-store-account-iface.h>
+#include <tny-store-account.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>

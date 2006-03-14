@@ -21,7 +21,7 @@
 #include <gtk/gtk.h>
 
 #include <tny-account-tree-model.h>
-#include <tny-account-iface.h>
+#include <tny-store-account-iface.h>
 #include <tny-msg-folder-iface.h>
 
 static GObjectClass *parent_class = NULL;
@@ -67,10 +67,10 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
  *
  **/
 void
-tny_account_tree_model_add (TnyAccountTreeModel *self, TnyAccountIface *account)
+tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *account)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	const GList *folders = tny_account_iface_get_folders (account);
+	const GList *folders = tny_store_account_iface_get_folders (account);
 
 	fill_treemodel_recursive (self, folders, NULL);
 

@@ -40,9 +40,9 @@ guint *tny_account_store_iface_signals = NULL;
  * Return value: A read-only GList which contains TnyAccountIface instances
  **/
 const GList*
-tny_account_store_iface_get_accounts (TnyAccountStoreIface *self)
+tny_account_store_iface_get_store_accounts (TnyAccountStoreIface *self)
 {
-	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_accounts_func (self);
+	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_store_accounts_func (self);
 }
 
 /**
@@ -54,9 +54,9 @@ tny_account_store_iface_get_accounts (TnyAccountStoreIface *self)
  * 
  **/
 void
-tny_account_store_iface_add_account (TnyAccountStoreIface *self, TnyAccountIface *account)
+tny_account_store_iface_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
 {
-	TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->add_account_func (self, account);
+	TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->add_store_account_func (self, account);
 	return;
 }
 

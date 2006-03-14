@@ -57,16 +57,16 @@ struct _TnyAccountStoreIfaceClass
 	void (*accounts_reloaded)             (TnyAccountStoreIface *self);
 
 	/* Methods */
-	const GList*  (*get_accounts_func)    (TnyAccountStoreIface *self);
-	void          (*add_account_func)     (TnyAccountStoreIface *self, TnyAccountIface *account);
+	const GList*  (*get_store_accounts_func)    (TnyAccountStoreIface *self);
+	void          (*add_store_account_func)     (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
 
 
 };
 
 GType         tny_account_store_iface_get_type        (void);
 
-const GList*  tny_account_store_iface_get_accounts    (TnyAccountStoreIface *self);
-void          tny_account_store_iface_add_account     (TnyAccountStoreIface *self, TnyAccountIface *account);
+const GList*  tny_account_store_iface_get_store_accounts    (TnyAccountStoreIface *self);
+void          tny_account_store_iface_add_store_account     (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
 
 
 G_END_DECLS

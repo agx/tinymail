@@ -25,8 +25,13 @@
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 #include <tny-password-dialog.h>
+
 #include <tny-account-iface.h>
-#include <tny-account.h>
+#include <tny-store-account-iface.h>
+#include <tny-transport-account-iface.h>
+
+#include <tny-store-account.h>
+#include <tny-transport-account.h>
 
 /* "GConf vs. Camel" account implementation */
 
@@ -204,7 +209,7 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 }
 
 static const GList*
-tny_account_store_get_accounts (TnyAccountStoreIface *self)
+tny_account_store_get_store_accounts (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
@@ -216,35 +221,35 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self)
 		{
 			gchar *proto, *user, *hostname;
 			gchar *key;
-			TnyAccountIface *account = TNY_ACCOUNT_IFACE (tny_account_new ());
+			TnyStoreAccountIface *account = TNY_STORE_ACCOUNT_IFACE (tny_store_account_new ());
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
 			proto = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
 			g_free (key);
-			tny_account_iface_set_proto (account, proto);
+			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", i);
 			user = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
 
 			g_free (key);
-			tny_account_iface_set_user (account, user);
+			tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", i);
 			hostname = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
 			g_free (key); 
-			tny_account_iface_set_hostname (account, hostname);
+			tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), hostname);
 			
 			g_free (hostname); g_free (proto); g_free (user);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
-			tny_account_iface_set_id (account, key); g_free (key);
+			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), key); g_free (key);
 
 			/* 
 			 * Setting the password function must happen after
 			 * setting the host, user and protocol.
 			 */
 
-			tny_account_iface_set_pass_func (account, per_account_get_pass_func);
+			tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account), per_account_get_pass_func);
 
 			/* Uncertain (the _new is already a ref, right?) */
 			/* g_object_ref (G_OBJECT (account)); */
@@ -258,7 +263,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self)
 
 
 static void
-tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account)
+tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	gchar *key = NULL;
@@ -275,17 +280,17 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_hostname (account), NULL);
+		tny_account_iface_get_hostname (TNY_ACCOUNT_IFACE (account)), NULL);
 	g_free (key); 
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_proto (account), NULL);
+		tny_account_iface_get_proto (TNY_ACCOUNT_IFACE (account)), NULL);
 	g_free (key); 
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_user (account), NULL);
+		tny_account_iface_get_user (TNY_ACCOUNT_IFACE (account)), NULL);
 	g_free (key); 
 
 
@@ -397,8 +402,8 @@ tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyAccountStoreIfaceClass *klass = (TnyAccountStoreIfaceClass *)g_iface;
 
-	klass->add_account_func = tny_account_store_add_account;
-	klass->get_accounts_func = tny_account_store_get_accounts;
+	klass->add_store_account_func = tny_account_store_add_store_account;
+	klass->get_store_accounts_func = tny_account_store_get_store_accounts;
 
 	return;
 }

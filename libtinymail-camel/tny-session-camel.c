@@ -34,8 +34,11 @@
 
 #include <tny-session-camel.h>
 
-#include <tny-account.h>
-#include "tny-account-priv.h"
+#include <tny-store-account.h>
+#include <tny-transport-account.h>
+
+#include "tny-store-account-priv.h"
+#include "tny-transport-account-priv.h"
 
 #include <tny-camel-shared.h>
 

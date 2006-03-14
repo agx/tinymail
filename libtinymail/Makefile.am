@@ -9,6 +9,8 @@ libtinymail_1_0_headers = 		\
 	tny-msg-header-iface.h		\
 	tny-msg-iface.h			\
 	tny-account-iface.h		\
+	tny-store-account-iface.h	\
+	tny-transport-account-iface.h	\
 	tny-account-store-iface.h	\
 	tny-stream-iface.h
 
@@ -19,6 +21,8 @@ libtinymail_1_0_la_SOURCES = 		\
 	tny-msg-mime-part-iface.c   	\
 	tny-msg-folder-iface.c		\
 	tny-account-iface.c		\
+	tny-store-account-iface.c	\
+	tny-transport-account-iface.c	\
 	tny-account-store-iface.c	\
 	tny-stream-iface.c
 

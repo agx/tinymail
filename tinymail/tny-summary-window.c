@@ -23,8 +23,12 @@
 #include <tny-password-dialog.h>
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
+
 #include <tny-account-iface.h>
-#include <tny-account.h>
+#include <tny-store-account-iface.h>
+#include <tny-transport-account-iface.h>
+#include <tny-store-account.h>
+#include <tny-transport-account.h>
 
 #include <tny-msg-view-iface.h>
 #include <tny-msg-view.h>
@@ -69,11 +73,11 @@ reload_accounts (TnySummaryWindowPriv *priv)
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new 
 			(1, G_TYPE_STRING));
 
-	accounts = tny_account_store_iface_get_accounts (account_store);
+	accounts = tny_account_store_iface_get_store_accounts (account_store);
 	
 	while (accounts)
 	{
-		TnyAccountIface *account = accounts->data;
+		TnyStoreAccountIface *account = accounts->data;
 
 		tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
 			(mailbox_model), account);

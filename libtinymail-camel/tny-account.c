@@ -21,8 +21,8 @@
 
 #include <string.h>
 
-#include <tny-account-iface.h>
 #include <tny-account.h>
+
 #include <tny-msg-folder-iface.h>
 #include <tny-msg-folder.h>
 
@@ -34,101 +34,11 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include <tny-session-camel.h>
-
 static GObjectClass *parent_class = NULL;
 
 #include "tny-account-priv.h"
 
 #include <tny-camel-shared.h>
-
-#define TNY_ACCOUNT_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ACCOUNT, TnyAccountPriv))
-
-
-static void 
-fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelFolderInfo *iter)
-{
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-
-	while (iter)
-	{
-		TnyMsgFolderIface *iface = TNY_MSG_FOLDER_IFACE (
-			tny_msg_folder_new ());
-
-		tny_msg_folder_iface_set_id (iface, iter->full_name);
-		tny_msg_folder_iface_set_account (iface, self);
-
-		if (parent)
-			tny_msg_folder_iface_add_folder (parent, iface);
-		else 
-		{
-			g_mutex_lock (priv->folders_lock);
-			priv->folders = g_list_append (priv->folders, iface);
-			g_mutex_unlock (priv->folders_lock);
-		}
-
-		tny_msg_folder_iface_uncache (iface);
-
-		fill_folders_recursive (self, iface, iter->child);
-
-		/* Tell the observers that they should reload */
-		g_signal_emit (iface, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
-
-		iter = iter->next;
-	}
-}
-
-const GList*
-tny_account_get_folders (TnyAccountIface *self)
-{
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	const GList *retval;
-
-	CamelStore *store;
-
-	g_static_rec_mutex_lock (priv->service_lock);
-
-	store = camel_session_get_store (CAMEL_SESSION (priv->session), 
-			priv->url_string, priv->ex);
-
-	g_static_rec_mutex_unlock (priv->service_lock);
-
-	if (g_ascii_strcasecmp (tny_account_iface_get_proto (self), "pop") != 0)
-	{
-		CamelFolderInfo *info = camel_store_get_folder_info 
-			(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
-				CAMEL_STORE_FOLDER_INFO_RECURSIVE, priv->ex);
-
-		fill_folders_recursive (self, NULL, info);
-	
-		camel_store_free_folder_info (store, info);
-
-	} else 
-	{
-		TnyMsgFolderIface *inbox = TNY_MSG_FOLDER_IFACE (tny_msg_folder_new ());
-		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-		CamelFolder *folder = camel_store_get_inbox (store, &ex);
-
-		g_object_ref (G_OBJECT (inbox));
-
-		tny_msg_folder_set_folder (TNY_MSG_FOLDER (inbox), folder);
-		tny_msg_folder_iface_set_account (inbox, self);
-
-		g_mutex_lock (priv->folders_lock);
-		priv->folders = g_list_append (priv->folders, inbox);
-		g_mutex_unlock (priv->folders_lock);
-
-		tny_msg_folder_iface_uncache (inbox);
-		g_signal_emit (inbox, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
-	}
-
-	g_mutex_lock (priv->folders_lock);
-	retval = priv->folders;
-	g_mutex_unlock (priv->folders_lock);
-
-	return retval;
-}
 
 static void 
 reconnect (TnyAccountPriv *priv)
@@ -353,7 +263,7 @@ tny_account_get_forget_pass_func (TnyAccountIface *self)
 	return retval;
 }
 
-const CamelService*
+const CamelService* /* protected */
 _tny_account_get_service (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
@@ -366,7 +276,7 @@ _tny_account_get_service (TnyAccount *self)
 	return retval;
 }
 
-const gchar*
+const gchar* /* protected */
 _tny_account_get_url_string (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
@@ -378,6 +288,7 @@ _tny_account_get_url_string (TnyAccount *self)
 
 	return retval;
 }
+
 
 
 /**
@@ -414,8 +325,6 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->service_lock = g_new (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->service_lock);
 
-	priv->folders_lock = g_mutex_new ();
-
 	return;
 }
 
@@ -431,17 +340,6 @@ tny_account_finalize (GObject *object)
 {
 	TnyAccount *self = (TnyAccount *)object;	
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-
-	if (priv->folders)
-	{
-		g_mutex_lock (priv->folders_lock);
-		g_list_foreach (priv->folders, destroy_folder, NULL);
-		g_mutex_unlock (priv->folders_lock);
-	}
-
-	g_mutex_lock (priv->folders_lock);
-	priv->folders = NULL;
-	g_mutex_unlock (priv->folders_lock);
 
 	g_static_rec_mutex_lock (priv->service_lock);
 	if (priv->id)
@@ -461,19 +359,17 @@ tny_account_finalize (GObject *object)
 	camel_exception_free (priv->ex);
 
 	g_static_rec_mutex_free (priv->service_lock);
-	g_mutex_free (priv->folders_lock);
-	
+
 	(*parent_class->finalize) (object);
 
 	return;
 }
 
+
 static void
 tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyAccountIfaceClass *klass = (TnyAccountIfaceClass *)g_iface;
-
-	klass->get_folders_func = tny_account_get_folders;
 
 	klass->get_hostname_func = tny_account_get_hostname;
 	klass->set_hostname_func = tny_account_set_hostname;
@@ -550,8 +446,8 @@ tny_account_get_type (void)
 
 		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_IFACE, 
 			&tny_account_iface_info);
+
 	}
 
 	return type;
 }
-

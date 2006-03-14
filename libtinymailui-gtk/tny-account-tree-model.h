@@ -22,7 +22,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <tny-account-iface.h>
+#include <tny-store-account-iface.h>
 
 G_BEGIN_DECLS
 
@@ -58,7 +58,7 @@ struct _TnyAccountTreeModelClass
 GType                   tny_account_tree_model_get_type  (void);
 TnyAccountTreeModel*    tny_account_tree_model_new       (void);
 
-void                    tny_account_tree_model_add       (TnyAccountTreeModel *self, TnyAccountIface *account);
+void                    tny_account_tree_model_add       (TnyAccountTreeModel *self, TnyStoreAccountIface *account);
 
 G_END_DECLS
 

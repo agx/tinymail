@@ -47,8 +47,9 @@ struct _TnyAccountClass
 	GObjectClass parent;
 };
 
-GType               tny_account_get_type       (void);
-TnyAccount*         tny_account_new            (void);
+GType                tny_account_get_type       (void);
+TnyAccount*          tny_account_new            (void);
+
 
 G_END_DECLS
 

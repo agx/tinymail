@@ -79,19 +79,6 @@ tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_forget_pass_func_func (self);
 }
 
-/**
- * tny_account_iface_get_folders:
- * @self: a #TnyAccountIface object
- * 
- * Get the folders of an account
- * 
- * Return value: A read-only GList which contains TnyFolderIface instances
- **/
-const GList*
-tny_account_iface_get_folders (TnyAccountIface *self)
-{
-	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func (self);
-}
 
 /**
  * tny_account_iface_set_proto:

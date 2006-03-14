@@ -1,5 +1,5 @@
-#ifndef TNY_ACCOUNT_PRIV_H
-#define TNY_ACCOUNT_PRIV_H
+#ifndef TNY_STORE_ACCOUNT_PRIV_H
+#define TNY_STORE_ACCOUNT_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -20,26 +20,13 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <tny-session-camel.h>
+typedef struct _TnyStoreAccountPriv TnyStoreAccountPriv;
 
-typedef struct _TnyAccountPriv TnyAccountPriv;
-
-struct _TnyAccountPriv
+struct _TnyStoreAccountPriv
 {
-	TnySessionCamel *session;
-	GStaticRecMutex *service_lock;
-	CamelService *service;
-	CamelException *ex;
-	gchar *url_string, *id, *user, *host, *proto;
-	GetPassFunc get_pass_func;
-	ForgetPassFunc forget_pass_func;
-	gboolean pass_func_set, forget_pass_func_set;
+	GMutex *folders_lock;
+	GList *folders;
 };
 
-const CamelService*  _tny_account_get_service    (TnyAccount *self);
-const gchar*         _tny_account_get_url_string (TnyAccount *self);
-
-#define TNY_ACCOUNT_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ACCOUNT, TnyAccountPriv))
 
 #endif
