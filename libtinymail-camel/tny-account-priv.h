@@ -25,6 +25,7 @@ typedef struct _TnyAccountPriv TnyAccountPriv;
 struct _TnyAccountPriv
 {
 	TnySessionCamel *session;
+	GStaticRecMutex *service_lock;
 	CamelService *service;
 	CamelException *ex;
 	gchar *url_string, *id, *user, *host, *proto;

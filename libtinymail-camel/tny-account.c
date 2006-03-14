@@ -17,8 +17,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* TODO: Add a Recusive lock for service */
-
 #include <glib.h>
 
 #include <string.h>
@@ -87,8 +85,14 @@ tny_account_get_folders (TnyAccountIface *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	const GList *retval;
 
-	CamelStore *store = camel_session_get_store (CAMEL_SESSION (priv->session), 
+	CamelStore *store;
+
+	g_static_rec_mutex_lock (priv->service_lock);
+
+	store = camel_session_get_store (CAMEL_SESSION (priv->session), 
 			priv->url_string, priv->ex);
+
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	if (g_ascii_strcasecmp (tny_account_iface_get_proto (self), "pop") != 0)
 	{
@@ -176,10 +180,13 @@ tny_account_set_id (TnyAccountIface *self, const gchar *id)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	if (priv->id)
 		g_free (priv->id);
 
 	priv->id = g_strdup (id);
+
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
@@ -189,6 +196,7 @@ tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
+	g_static_rec_mutex_lock (priv->service_lock);
 	if (priv->proto)
 		g_free (priv->proto);
 
@@ -196,6 +204,8 @@ tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 
 	reconnect (priv);
 	
+	g_static_rec_mutex_unlock (priv->service_lock);
+
 	return;
 }
 
@@ -204,12 +214,15 @@ tny_account_set_user (TnyAccountIface *self, const gchar *user)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
+	g_static_rec_mutex_lock (priv->service_lock);
 	if (priv->user)
 		g_free (priv->user);
 
 	priv->user = g_strdup (user);
 
 	reconnect (priv);
+
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
@@ -219,12 +232,15 @@ tny_account_set_hostname (TnyAccountIface *self, const gchar *host)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
+	g_static_rec_mutex_lock (priv->service_lock);
 	if (priv->host)
 		g_free (priv->host);
 
 	priv->host = g_strdup (host);
 
 	reconnect (priv);
+
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
@@ -234,11 +250,13 @@ tny_account_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	tny_session_camel_set_pass_func (priv->session, self, get_pass_func);
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
-
+	
 	reconnect (priv);
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
@@ -248,10 +266,11 @@ tny_account_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forg
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	tny_session_camel_set_forget_pass_func (priv->session, self, get_forget_pass_func);
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
-
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
@@ -262,7 +281,9 @@ tny_account_get_id (TnyAccountIface *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);	
 	const gchar *retval;
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->id;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -272,8 +293,10 @@ tny_account_get_proto (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
-
+	
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->proto;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -284,7 +307,9 @@ tny_account_get_user (TnyAccountIface *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->user;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -295,7 +320,9 @@ tny_account_get_hostname (TnyAccountIface *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);	
 	const gchar *retval;
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->host;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -306,7 +333,9 @@ tny_account_get_pass_func (TnyAccountIface *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	GetPassFunc retval;
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = priv->get_pass_func;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -317,7 +346,9 @@ tny_account_get_forget_pass_func (TnyAccountIface *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	ForgetPassFunc retval;
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = priv->forget_pass_func;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -328,7 +359,9 @@ _tny_account_get_service (TnyAccount *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	const CamelService *retval;
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const CamelService *)priv->service;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -339,7 +372,9 @@ _tny_account_get_url_string (TnyAccount *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->url_string;
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -376,6 +411,9 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->pass_func_set = FALSE;
 	priv->session = tny_session_camel_get_instance ();
 
+	priv->service_lock = g_new (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->service_lock);
+
 	priv->folders_lock = g_mutex_new ();
 
 	return;
@@ -405,6 +443,7 @@ tny_account_finalize (GObject *object)
 	priv->folders = NULL;
 	g_mutex_unlock (priv->folders_lock);
 
+	g_static_rec_mutex_lock (priv->service_lock);
 	if (priv->id)
 		g_free (priv->id);
 
@@ -416,11 +455,14 @@ tny_account_finalize (GObject *object)
 
 	if (priv->proto)
 		g_free (priv->proto);
+	g_static_rec_mutex_unlock (priv->service_lock);
+
 
 	camel_exception_free (priv->ex);
 
+	g_static_rec_mutex_free (priv->service_lock);
 	g_mutex_free (priv->folders_lock);
-
+	
 	(*parent_class->finalize) (object);
 
 	return;
