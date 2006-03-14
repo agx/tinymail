@@ -76,7 +76,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, C
 	}
 }
 
-const GList*
+static const GList*
 tny_store_account_get_folders (TnyStoreAccountIface *self)
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);

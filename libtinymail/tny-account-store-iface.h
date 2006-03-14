@@ -51,23 +51,28 @@ struct _TnyAccountStoreIfaceClass
 	GTypeInterface parent;
 
 	/* Signals */
-	void (*account_changed)               (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*account_inserted)              (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*account_removed)               (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*accounts_reloaded)             (TnyAccountStoreIface *self);
+	void (*account_changed)                                 (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_inserted)                                (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_removed)                                 (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*accounts_reloaded)                               (TnyAccountStoreIface *self);
 
 	/* Methods */
-	const GList*  (*get_store_accounts_func)    (TnyAccountStoreIface *self);
-	void          (*add_store_account_func)     (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
+	const GList*  (*get_store_accounts_func)                (TnyAccountStoreIface *self);
+	void          (*add_store_account_func)                 (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
 
+	const GList*  (*get_transport_accounts_func)            (TnyAccountStoreIface *self);
+	void          (*add_transport_account_func)             (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
 
 };
 
-GType         tny_account_store_iface_get_type        (void);
+GType         tny_account_store_iface_get_type                  (void);
 
-const GList*  tny_account_store_iface_get_store_accounts    (TnyAccountStoreIface *self);
-void          tny_account_store_iface_add_store_account     (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
+const GList*  tny_account_store_iface_get_store_accounts        (TnyAccountStoreIface *self);
+void          tny_account_store_iface_add_store_account         (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
 
+
+const GList*  tny_account_store_iface_get_transport_accounts    (TnyAccountStoreIface *self);
+void          tny_account_store_iface_add_transport_account     (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
 
 G_END_DECLS
 

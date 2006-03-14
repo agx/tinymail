@@ -32,12 +32,43 @@
 guint *tny_account_store_iface_signals = NULL;
 
 /**
- * tny_account_store_iface_get_accounts:
+ * tny_account_store_iface_get_transport_accounts:
+ * @self: a #TnyAccountTransportIface object
+ * 
+ * Get a read-only list of transport accounts in the store
+ * 
+ * Return value: A read-only GList which contains TnyTransportAccountIface instances
+ **/
+const GList*
+tny_account_store_iface_get_transport_accounts (TnyAccountStoreIface *self)
+{
+	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_transport_accounts_func (self);
+}
+
+
+/**
+ * tny_account_store_iface_add_transport_account:
+ * @self: a #TnyAccountTransportIface object
+ * @account: the account to add
+ * 
+ * Add a transport account to the store
+ * 
+ **/
+void
+tny_account_store_iface_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
+{
+	TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->add_transport_account_func (self, account);
+	return;
+}
+
+
+/**
+ * tny_account_store_iface_get_store_accounts:
  * @self: a #TnyAccountStoreIface object
  * 
- * Get a read-only list of accounts in the store
+ * Get a read-only list of storage accounts in the store
  * 
- * Return value: A read-only GList which contains TnyAccountIface instances
+ * Return value: A read-only GList which contains TnyStoreAccountIface instances
  **/
 const GList*
 tny_account_store_iface_get_store_accounts (TnyAccountStoreIface *self)
@@ -46,11 +77,11 @@ tny_account_store_iface_get_store_accounts (TnyAccountStoreIface *self)
 }
 
 /**
- * tny_account_store_iface_add_account:
+ * tny_account_store_iface_add_store_account:
  * @self: a #TnyAccountStoreIface object
  * @account: the account to add
  * 
- * Add an account to the store
+ * Add a storage account to the store
  * 
  **/
 void
