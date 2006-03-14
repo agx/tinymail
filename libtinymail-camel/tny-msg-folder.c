@@ -569,7 +569,11 @@ tny_msg_folder_finalize (GObject *object)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
 	if (priv->folder)
+	{
+		g_mutex_lock (priv->folder_lock);
 		camel_object_unref (priv->folder);
+		g_mutex_unlock (priv->folder_lock);
+	}
 
 	if (priv->cached_msgs)
 		g_hash_table_destroy (priv->cached_msgs);

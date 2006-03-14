@@ -16,6 +16,9 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
+/* TODO: Add a Recusive lock for service */
+
 #include <glib.h>
 
 #include <string.h>
@@ -61,7 +64,11 @@ fill_folders_recursive (TnyAccountIface *self, TnyMsgFolderIface *parent, CamelF
 		if (parent)
 			tny_msg_folder_iface_add_folder (parent, iface);
 		else 
+		{
+			g_mutex_lock (priv->folders_lock);
 			priv->folders = g_list_append (priv->folders, iface);
+			g_mutex_unlock (priv->folders_lock);
+		}
 
 		tny_msg_folder_iface_uncache (iface);
 
@@ -78,6 +85,7 @@ const GList*
 tny_account_get_folders (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	const GList *retval;
 
 	CamelStore *store = camel_session_get_store (CAMEL_SESSION (priv->session), 
 			priv->url_string, priv->ex);
@@ -102,12 +110,20 @@ tny_account_get_folders (TnyAccountIface *self)
 
 		tny_msg_folder_set_folder (TNY_MSG_FOLDER (inbox), folder);
 		tny_msg_folder_iface_set_account (inbox, self);
+
+		g_mutex_lock (priv->folders_lock);
 		priv->folders = g_list_append (priv->folders, inbox);
+		g_mutex_unlock (priv->folders_lock);
+
 		tny_msg_folder_iface_uncache (inbox);
 		g_signal_emit (inbox, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
 	}
 
-	return priv->folders;
+	g_mutex_lock (priv->folders_lock);
+	retval = priv->folders;
+	g_mutex_unlock (priv->folders_lock);
+
+	return retval;
 }
 
 static void 
@@ -150,8 +166,7 @@ reconnect (TnyAccountPriv *priv)
 
 	if (priv->service && priv->pass_func_set && priv->proto && priv->user && priv->host)
 		camel_service_connect (priv->service, priv->ex);
-		
-
+	
 	return;
 }
 
@@ -160,7 +175,7 @@ void
 tny_account_set_id (TnyAccountIface *self, const gchar *id)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	
+
 	if (priv->id)
 		g_free (priv->id);
 
@@ -180,7 +195,7 @@ tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 	priv->proto = g_strdup (proto);
 
 	reconnect (priv);
-
+	
 	return;
 }
 
@@ -237,71 +252,96 @@ tny_account_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forg
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
+
 	return;
 }
 
 const gchar*
 tny_account_get_id (TnyAccountIface *self)
 {
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	
-	return (const gchar*)priv->id;
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);	
+	const gchar *retval;
+
+	retval = (const gchar*)priv->id;
+
+	return retval;
 }
 
 const gchar*
 tny_account_get_proto (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	
-	return (const gchar*)priv->proto;
+	const gchar *retval;
+
+	retval = (const gchar*)priv->proto;
+
+	return retval;
 }
 
 const gchar*
 tny_account_get_user (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	
-	return (const gchar*)priv->user;
+	const gchar *retval;
+
+	retval = (const gchar*)priv->user;
+
+	return retval;
 }
 
 const gchar*
 tny_account_get_hostname (TnyAccountIface *self)
 {
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	
-	return (const gchar*)priv->host;
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);	
+	const gchar *retval;
+
+	retval = (const gchar*)priv->host;
+
+	return retval;
 }
 
 GetPassFunc
 tny_account_get_pass_func (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	GetPassFunc retval;
 
-	return priv->get_pass_func;
+	retval = priv->get_pass_func;
+
+	return retval;
 }
 
 ForgetPassFunc
 tny_account_get_forget_pass_func (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	ForgetPassFunc retval;
 
-	return priv->forget_pass_func;
+	retval = priv->forget_pass_func;
+
+	return retval;
 }
 
 const CamelService*
 _tny_account_get_service (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	const CamelService *retval;
 
-	return (const CamelService *)priv->service;
+	retval = (const CamelService *)priv->service;
+
+	return retval;
 }
 
 const gchar*
 _tny_account_get_url_string (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	const gchar *retval;
 
-	return (const gchar*)priv->url_string;
+	retval = (const gchar*)priv->url_string;
+
+	return retval;
 }
 
 
@@ -334,8 +374,9 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->proto = NULL;
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
-
 	priv->session = tny_session_camel_get_instance ();
+
+	priv->folders_lock = g_mutex_new ();
 
 	return;
 }
@@ -355,13 +396,14 @@ tny_account_finalize (GObject *object)
 
 	if (priv->folders)
 	{
+		g_mutex_lock (priv->folders_lock);
 		g_list_foreach (priv->folders, destroy_folder, NULL);
-
-		/* Tell the observers */
-		/* g_signal_emit (TNY_ACCOUNT_IFACE (self), tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0); */
+		g_mutex_unlock (priv->folders_lock);
 	}
 
+	g_mutex_lock (priv->folders_lock);
 	priv->folders = NULL;
+	g_mutex_unlock (priv->folders_lock);
 
 	if (priv->id)
 		g_free (priv->id);
@@ -375,8 +417,9 @@ tny_account_finalize (GObject *object)
 	if (priv->proto)
 		g_free (priv->proto);
 
-
 	camel_exception_free (priv->ex);
+
+	g_mutex_free (priv->folders_lock);
 
 	(*parent_class->finalize) (object);
 

@@ -17,6 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+
+/* TODO: More finegrained locking */
+
 #include <string.h>
 
 #include <tny-msg-mime-part-iface.h>
@@ -35,6 +38,7 @@ typedef struct _TnyMsgMimePartPriv TnyMsgMimePartPriv;
 
 struct _TnyMsgMimePartPriv
 {
+	GMutex *part_lock;
 	CamelMimePart *part;
 	gchar *cached_content_type;
 	guint index;
@@ -49,8 +53,13 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
-	CamelMedium *medium = CAMEL_MEDIUM (priv->part);
-	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));	
+	CamelMedium *medium;
+	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
+
+	g_mutex_lock (priv->part_lock);
+	medium = CAMEL_MEDIUM (priv->part);
+	g_mutex_unlock (priv->part_lock);
+
 	wrapper = camel_medium_get_content_object (medium);
 
 
@@ -78,10 +87,13 @@ tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	gint retval = -1;
-
-	CamelMedium *medium = CAMEL_MEDIUM (priv->part);
+	CamelMedium *medium;
 	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
 	
+	g_mutex_lock (priv->part_lock);
+	medium = CAMEL_MEDIUM (priv->part);
+	g_mutex_unlock (priv->part_lock);
+
 	wrapper = camel_medium_get_content_object (medium);
 
 	if (!wrapper)
@@ -104,10 +116,13 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	TnyStreamIface *retval = NULL;
 	CamelDataWrapper *wrapper;
-
-	CamelMedium *medium = CAMEL_MEDIUM (priv->part);
+	CamelMedium *medium;
 	CamelStream *stream = camel_stream_mem_new ();
 	
+	g_mutex_lock (priv->part_lock);
+	medium =  CAMEL_MEDIUM (priv->part);
+	g_mutex_unlock (priv->part_lock);
+
 	wrapper = camel_medium_get_content_object (medium);
 
 	if (!wrapper)
@@ -134,11 +149,13 @@ tny_msg_mime_part_get_content_type (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
+	g_mutex_lock (priv->part_lock);
 	if (!priv->cached_content_type)
 	{
 		CamelContentType *type = camel_mime_part_get_content_type (priv->part);
 		priv->cached_content_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
 	}
+	g_mutex_unlock (priv->part_lock);
 
 	return priv->cached_content_type;
 }
@@ -147,9 +164,13 @@ static gboolean
 tny_msg_mime_part_content_type_is (TnyMsgMimePartIface *self, const gchar *type)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-	CamelContentType *ctype = camel_mime_part_get_content_type (priv->part);
+	CamelContentType *ctype;
 	gchar *dup, *str1, *str2, *ptr;
 	gboolean retval = FALSE;
+
+	g_mutex_lock (priv->part_lock);
+	ctype = camel_mime_part_get_content_type (priv->part);
+	g_mutex_unlock (priv->part_lock);
 
 	/* Whoooo, pointer hocus .. */
 
@@ -169,28 +190,12 @@ tny_msg_mime_part_content_type_is (TnyMsgMimePartIface *self, const gchar *type)
 }
 
 
-static void
-tny_msg_mime_part_finalize (GObject *object)
-{
-	TnyMsgMimePart *self = (TnyMsgMimePart*) object;
-	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-
-	if (priv->cached_content_type)
-		g_free (priv->cached_content_type);
-
-	if (priv->part)
-		camel_object_unref (CAMEL_OBJECT (priv->part));
-
-	(*parent_class->finalize) (object);
-
-	return;
-}
-
 void
 tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
+	g_mutex_lock (priv->part_lock);
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 
@@ -202,6 +207,7 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 	camel_object_ref (CAMEL_OBJECT (part));
 
 	priv->part = part;
+	g_mutex_unlock (priv->part_lock);
 
 	return;
 }
@@ -210,8 +216,13 @@ CamelMimePart*
 tny_msg_mime_part_get_part (TnyMsgMimePart *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	CamelMimePart *retval;
 
-	return priv->part;
+	g_mutex_lock (priv->part_lock);
+	retval = priv->part;
+	g_mutex_unlock (priv->part_lock);
+
+	return retval;
 }
 
 
@@ -237,32 +248,52 @@ static const gchar*
 tny_msg_mime_part_get_filename (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	const gchar *retval;
 
-	return camel_mime_part_get_filename (priv->part);
+	g_mutex_lock (priv->part_lock);
+	retval = camel_mime_part_get_filename (priv->part);
+	g_mutex_unlock (priv->part_lock);
+	
+	return retval;
 }
 
 static const gchar*
 tny_msg_mime_part_get_content_id (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	const gchar *retval;
 
-	return camel_mime_part_get_content_id (priv->part);
+	g_mutex_lock (priv->part_lock);
+	retval = camel_mime_part_get_content_id (priv->part);
+	g_mutex_unlock (priv->part_lock);
+
+	return retval;
 }
 
 static const gchar*
 tny_msg_mime_part_get_description (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	const gchar *retval;
 
-	return camel_mime_part_get_description (priv->part);
+	g_mutex_lock (priv->part_lock);
+	retval = camel_mime_part_get_description (priv->part);
+	g_mutex_unlock (priv->part_lock);
+
+	return retval;
 }
 
 static const gchar*
 tny_msg_mime_part_get_content_location (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	const gchar *retval;
 
-	return camel_mime_part_get_content_location (priv->part);
+	g_mutex_lock (priv->part_lock);
+	retval = camel_mime_part_get_content_location (priv->part);
+	g_mutex_unlock (priv->part_lock);
+
+	return retval;
 }
 
 
@@ -270,7 +301,11 @@ static void
 tny_msg_mime_part_set_content_location (TnyMsgMimePartIface *self, const gchar *content_location)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->part_lock);
 	camel_mime_part_set_content_location (priv->part, content_location);
+	g_mutex_unlock (priv->part_lock);
+
 	return;
 }
 
@@ -278,7 +313,11 @@ static void
 tny_msg_mime_part_set_description (TnyMsgMimePartIface *self, const gchar *description)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->part_lock);
 	camel_mime_part_set_description (priv->part, description);
+	g_mutex_unlock (priv->part_lock);
+
 	return;
 }
 
@@ -286,7 +325,11 @@ static void
 tny_msg_mime_part_set_content_id (TnyMsgMimePartIface *self, const gchar *content_id)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->part_lock);
 	camel_mime_part_set_content_id (priv->part, content_id);
+	g_mutex_unlock (priv->part_lock);
+
 	return;
 }
 
@@ -294,7 +337,11 @@ static void
 tny_msg_mime_part_set_filename (TnyMsgMimePartIface *self, const gchar *filename)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->part_lock);
 	camel_mime_part_set_filename (priv->part, filename);
+	g_mutex_unlock (priv->part_lock);
+
 	return;
 }
 
@@ -302,11 +349,41 @@ static void
 tny_msg_mime_part_set_content_type (TnyMsgMimePartIface *self, const gchar *content_type)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->part_lock);
 	camel_mime_part_set_content_type (priv->part, content_type);
 
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
+	g_mutex_unlock (priv->part_lock);
+
+	return;
+}
+
+static void
+tny_msg_mime_part_finalize (GObject *object)
+{
+	TnyMsgMimePart *self = (TnyMsgMimePart*) object;
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->part_lock);
+	if (priv->cached_content_type)
+		g_free (priv->cached_content_type);
+	priv->cached_content_type = NULL;
+	g_mutex_unlock (priv->part_lock);
+
+	if (priv->part)
+	{
+		g_mutex_lock (priv->part_lock);
+		camel_object_unref (CAMEL_OBJECT (priv->part));
+		g_mutex_unlock (priv->part_lock);
+	}
+
+	g_mutex_free (priv->part_lock);
+	priv->part_lock = NULL;
+
+	(*parent_class->finalize) (object);
 
 	return;
 }
@@ -375,6 +452,11 @@ tny_msg_mime_part_class_init (TnyMsgMimePartClass *class)
 static void
 tny_msg_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
 {
+	TnyMsgMimePart *self = (TnyMsgMimePart*)instance;
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	priv->part_lock = g_mutex_new ();
+
 	return;
 }
 

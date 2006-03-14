@@ -27,14 +27,12 @@ struct _TnyAccountPriv
 	TnySessionCamel *session;
 	CamelService *service;
 	CamelException *ex;
-	gchar *url_string;
-	gchar *id;
+	gchar *url_string, *id, *user, *host, *proto;
+	GMutex *folders_lock;
 	GList *folders;
 	GetPassFunc get_pass_func;
 	ForgetPassFunc forget_pass_func;
-	gboolean pass_func_set;
-	gboolean forget_pass_func_set;
-	gchar *user, *host, *proto;
+	gboolean pass_func_set, forget_pass_func_set;
 };
 
 const CamelService*  _tny_account_get_service (TnyAccount *self);
