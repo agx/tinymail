@@ -389,6 +389,8 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 	g_mutex_lock (priv->cached_msgs_lock);
 	if (!priv->cached_msgs)
 	{
+		/* Questionable: Do we really want a message cache? */
+
 		priv->cached_msgs = g_hash_table_new_full 
 			(g_str_hash, g_str_equal, destroy_cached_key,
 			destroy_cached_value);
@@ -406,8 +408,12 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 		CamelMimeMessage *camel_message = NULL;
 
 		g_mutex_lock (priv->folder_lock);
+
+		/* TODO: We can reuse the message instance in the header 
+		   if not using the summary capabilities. */
 		camel_message = camel_folder_get_message  
 			(priv->folder, (const char *) id, ex);
+
 		g_mutex_unlock (priv->folder_lock);
 
 		if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)

@@ -71,6 +71,7 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 		return;
 	}
 
+	camel_stream_reset (wrapper->stream);
 	camel_stream_write_to_stream (wrapper->stream, cstream);
 
 	/* This should work but doesn't . . .
