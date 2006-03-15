@@ -26,9 +26,18 @@
 
 static GObjectClass *parent_class = NULL;
 
+/*
+static void 
+folders_reloaded (gpointer user_data)
+{
+	TnyAccountTreeModel *self = user_data;
+
+	return;
+}
+*/
 
 static void
-fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTreeIter *parent_iter)
+fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTreeIter *parent_iter, TnyStoreAccountIface *account)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 
@@ -51,10 +60,13 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 		/* TODO: Observe the FOLDERS_RELOADED signal and add 
 		   to the model if a subfolder got added or subscribed */
 
+		/* g_signal_connect (G_OBJECT (folder), "folders_reloaded",
+			G_CALLBACK (folders_reloaded), self+account); */
+
 		tny_msg_folder_iface_uncache (folder);
 
 		if (more_folders && g_list_length ((GList*)more_folders) > 0)
-			fill_treemodel_recursive (self, more_folders, &iter);
+			fill_treemodel_recursive (self, more_folders, &iter, account);
 
 		folders = g_list_next (folders);
 	}
@@ -76,7 +88,7 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *acc
 	const GList *folders = tny_store_account_iface_get_folders (account, 
 			TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
-	fill_treemodel_recursive (self, folders, NULL);
+	fill_treemodel_recursive (self, folders, NULL, account);
 
 	return;
 }
