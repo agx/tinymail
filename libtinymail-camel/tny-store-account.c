@@ -135,6 +135,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 			{
 				CamelFolderInfo *info = camel_store_get_folder_info 
 					(store, "", CAMEL_STORE_FOLDER_INFO_FAST |
+						CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 						CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
 		
 				fill_folders_recursive (self, NULL, info, type);
@@ -153,6 +154,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 				CamelFolderInfo *info = camel_store_get_folder_info 
 					(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
 						CAMEL_STORE_FOLDER_INFO_RECURSIVE | 
+						CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 						CAMEL_STORE_FOLDER_INFO_FAST, &ex);
 		
 				fill_folders_recursive (self, NULL, info, type);
