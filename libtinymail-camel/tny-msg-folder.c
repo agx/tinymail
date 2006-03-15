@@ -444,7 +444,10 @@ tny_msg_folder_get_name (TnyMsgFolderIface *self)
 	
 	load_folder (priv);
 
-	name = camel_folder_get_name (priv->folder);
+	if (!priv->cached_name)
+		name = camel_folder_get_name (priv->folder);
+	else
+		name = priv->cached_name;
 
 	return name;
 }
@@ -479,6 +482,11 @@ tny_msg_folder_set_name (TnyMsgFolderIface *self, const gchar *name)
 	load_folder (priv);
 
 	camel_folder_rename (priv->folder, name);
+
+	if (priv->cached_name)
+		g_free (priv->cached_name);
+
+	priv->cached_name = g_strdup (name);
 
 	return;
 }
@@ -581,6 +589,9 @@ tny_msg_folder_finalize (GObject *object)
 		g_mutex_unlock (priv->folder_lock);
 	}
 
+	if (priv->cached_name)
+		g_free (priv->cached_name);
+
 	if (priv->cached_msgs)
 		g_hash_table_destroy (priv->cached_msgs);
 
@@ -675,6 +686,7 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cached_hdrs_lock = g_mutex_new ();
 	priv->cached_msgs_lock = g_mutex_new ();
 	priv->folder_lock = g_mutex_new ();
+	priv->cached_name = NULL;
 
 	return;
 }

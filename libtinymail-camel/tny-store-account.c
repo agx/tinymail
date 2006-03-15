@@ -177,6 +177,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 
 		tny_msg_folder_set_folder (TNY_MSG_FOLDER (inbox), folder);
 		tny_msg_folder_iface_set_account (inbox, TNY_ACCOUNT_IFACE (self));
+		tny_msg_folder_iface_set_name (TNY_MSG_FOLDER_IFACE (inbox), "INBOX");
 
 		g_mutex_lock (priv->folders_lock);
 		priv->folders = g_list_append (priv->folders, inbox);

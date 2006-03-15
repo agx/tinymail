@@ -45,6 +45,7 @@ struct _TnyMsgFolderPriv
 
 	gboolean has_summary_cap;
 
+	gchar *cached_name;
 };
 
 CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);
