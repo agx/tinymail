@@ -21,6 +21,36 @@
 
 
 /**
+ * tny_store_account_iface_unsubscribe:
+ * @self: a #TnyStoreAccountIface object
+ * @folder_name: The folder name to unsubscribe from
+ *
+ * Unsubscribe from a folder
+ * 
+ **/
+void
+tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
+{
+	TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->unsubscribe_func (self, folder);
+	return;
+}
+
+/**
+ * tny_store_account_iface_subscribe:
+ * @self: a #TnyStoreAccountIface object
+ * @folder_name: The folder name to subscribe to
+ *
+ * Subscribe to a folder
+ * 
+ **/
+void
+tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
+{
+	TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->subscribe_func (self, folder);
+	return;
+}
+
+/**
  * tny_store_account_iface_get_folders:
  * @self: a #TnyStoreAccountIface object
  * 
@@ -29,9 +59,9 @@
  * Return value: A read-only GList which contains TnyFolderIface instances
  **/
 const GList*
-tny_store_account_iface_get_folders (TnyStoreAccountIface *self)
+tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {
-	return TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func (self);
+	return TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func (self, type);
 }
 
 

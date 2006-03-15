@@ -44,7 +44,7 @@ static GObjectClass *parent_class = NULL;
 
 
 static void 
-fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, CamelFolderInfo *iter)
+fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, CamelFolderInfo *iter, TnyStoreAccountFolderType type)
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
@@ -57,17 +57,27 @@ fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, C
 		tny_msg_folder_iface_set_account (iface, TNY_ACCOUNT_IFACE (self));
 
 		if (parent)
-			tny_msg_folder_iface_add_folder (parent, iface);
-		else 
+		{
+			if (type == TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED)
+				tny_msg_folder_iface_add_folder (parent, iface);
+			else {
+				g_mutex_lock (priv->folders_lock);
+				priv->ufolders = g_list_append (priv->ufolders, iface);
+				g_mutex_unlock (priv->folders_lock);
+			}
+		} else 
 		{
 			g_mutex_lock (priv->folders_lock);
-			priv->folders = g_list_append (priv->folders, iface);
+			if (type == TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED)
+				priv->folders = g_list_append (priv->folders, iface);
+			else
+				priv->ufolders = g_list_append (priv->ufolders, iface);
 			g_mutex_unlock (priv->folders_lock);
 		}
 
 		tny_msg_folder_iface_uncache (iface);
 
-		fill_folders_recursive (self, iface, iter->child);
+		fill_folders_recursive (self, iface, iter->child, type);
 
 		/* Tell the observers that they should reload */
 		g_signal_emit (iface, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
@@ -77,7 +87,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, C
 }
 
 static const GList*
-tny_store_account_get_folders (TnyStoreAccountIface *self)
+tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
@@ -87,22 +97,49 @@ tny_store_account_get_folders (TnyStoreAccountIface *self)
 	CamelStore *store;
 
 	g_static_rec_mutex_lock (apriv->service_lock);
-
 	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
 			apriv->url_string, &ex);
-
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	if (g_ascii_strcasecmp (tny_account_iface_get_proto (TNY_ACCOUNT_IFACE (self)), "pop") != 0)
 	{
-		CamelFolderInfo *info = camel_store_get_folder_info 
-			(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
-				CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
 
-		fill_folders_recursive (self, NULL, info);
-	
-		camel_store_free_folder_info (store, info);
+		switch (type)
+		{
+			case TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL:
+			{
+				CamelFolderInfo *info = camel_store_get_folder_info 
+					(store, "", CAMEL_STORE_FOLDER_INFO_FAST |
+						CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
+		
+				fill_folders_recursive (self, NULL, info, type);
+			
+				camel_store_free_folder_info (store, info);
 
+				g_mutex_lock (priv->folders_lock);
+				retval = priv->ufolders;
+				g_mutex_unlock (priv->folders_lock);
+
+			} break;
+
+			case TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED:
+			default:
+			{
+				CamelFolderInfo *info = camel_store_get_folder_info 
+					(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
+						CAMEL_STORE_FOLDER_INFO_RECURSIVE | 
+						CAMEL_STORE_FOLDER_INFO_FAST, &ex);
+		
+				fill_folders_recursive (self, NULL, info, type);
+			
+				camel_store_free_folder_info (store, info);
+
+				g_mutex_lock (priv->folders_lock);
+				retval = priv->folders;
+				g_mutex_unlock (priv->folders_lock);
+
+			} break;
+		}
 	} else 
 	{
 		TnyMsgFolderIface *inbox = TNY_MSG_FOLDER_IFACE (tny_msg_folder_new ());
@@ -120,13 +157,54 @@ tny_store_account_get_folders (TnyStoreAccountIface *self)
 
 		tny_msg_folder_iface_uncache (inbox);
 		g_signal_emit (inbox, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+
+		g_mutex_lock (priv->folders_lock);
+		retval = priv->folders;
+		g_mutex_unlock (priv->folders_lock);
 	}
 
-	g_mutex_lock (priv->folders_lock);
-	retval = priv->folders;
-	g_mutex_unlock (priv->folders_lock);
 
 	return retval;
+}
+
+static void
+tny_store_account_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
+{
+	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelStore *store;
+
+	g_static_rec_mutex_lock (apriv->service_lock);
+	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
+			apriv->url_string, &ex);
+	g_static_rec_mutex_unlock (apriv->service_lock);
+
+	camel_store_subscribe_folder (store, tny_msg_folder_iface_get_name (folder), &ex);
+
+	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
+
+	return;
+}
+
+static void
+tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
+{
+	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelStore *store;
+
+	g_static_rec_mutex_lock (apriv->service_lock);
+	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
+			apriv->url_string, &ex);
+	g_static_rec_mutex_unlock (apriv->service_lock);
+
+	camel_store_unsubscribe_folder (store, tny_msg_folder_iface_get_name (folder), &ex);
+
+	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
+
+	return;
 }
 
 
@@ -176,9 +254,18 @@ tny_store_account_finalize (GObject *object)
 		g_mutex_unlock (priv->folders_lock);
 	}
 
+	if (priv->ufolders)
+	{
+		g_mutex_lock (priv->folders_lock);
+		g_list_foreach (priv->ufolders, destroy_folder, NULL);
+		g_mutex_unlock (priv->folders_lock);
+	}
+
 	g_mutex_lock (priv->folders_lock);
 	priv->folders = NULL;
+	priv->ufolders = NULL;
 	g_mutex_unlock (priv->folders_lock);
+
 
 	g_mutex_free (priv->folders_lock);
 
@@ -193,6 +280,8 @@ tny_store_account_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyStoreAccountIfaceClass *klass = (TnyStoreAccountIfaceClass *)g_iface;
 
 	klass->get_folders_func = tny_store_account_get_folders;
+	klass->subscribe_func = tny_store_account_subscribe;
+	klass->unsubscribe_func = tny_store_account_unsubscribe;
 
 	return;
 }

@@ -25,6 +25,7 @@
 #include <tny-shared.h>
 
 #include <tny-account-iface.h>
+#include <tny-msg-folder-iface.h>
 
 G_BEGIN_DECLS
 
@@ -35,16 +36,27 @@ G_BEGIN_DECLS
 #define TNY_IS_STORE_ACCOUNT_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_STORE_ACCOUNT_IFACE))
 #define TNY_STORE_ACCOUNT_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_STORE_ACCOUNT_IFACE, TnyStoreAccountIfaceClass))
 
+enum _TnyStoreAccountFolderType
+{
+	TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED,
+	TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL
+};
+
 struct _TnyStoreAccountIfaceClass
 {
 	GTypeInterface parent;
 
-	const GList* (*get_folders_func)   (TnyStoreAccountIface *self);
+	const GList* (*get_folders_func)   (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
 
-  };
+	void (*subscribe_func)             (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
+	void (*unsubscribe_func)           (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
+
+};
 
 GType        tny_store_account_iface_get_type        (void);
-const GList* tny_store_account_iface_get_folders     (TnyStoreAccountIface *self);
+const GList* tny_store_account_iface_get_folders     (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
+void         tny_store_account_iface_subscribe       (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
+void         tny_store_account_iface_unsubscribe     (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
 
 
 G_END_DECLS

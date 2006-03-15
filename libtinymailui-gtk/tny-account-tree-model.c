@@ -70,7 +70,8 @@ void
 tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *account)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	const GList *folders = tny_store_account_iface_get_folders (account);
+	const GList *folders = tny_store_account_iface_get_folders (account, 
+			TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
 	fill_treemodel_recursive (self, folders, NULL);
 
