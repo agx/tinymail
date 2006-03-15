@@ -87,13 +87,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, C
 
 		if (parent)
 		{
-			if (type == TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED)
-				tny_msg_folder_iface_add_folder (parent, iface);
-			else {
-				g_mutex_lock (priv->folders_lock);
-				priv->ufolders = g_list_append (priv->ufolders, iface);
-				g_mutex_unlock (priv->folders_lock);
-			}
+			tny_msg_folder_iface_add_folder (parent, iface);
 		} else 
 		{
 			g_mutex_lock (priv->folders_lock);
