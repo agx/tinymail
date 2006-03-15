@@ -512,7 +512,7 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 			CamelInternetAddress *addr = (CamelInternetAddress*)
 				camel_mime_message_get_from (me->mime_message);
 			me->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
-			camel_object_unref (CAMEL_OBJECT (addr));
+			/* camel_object_unref (CAMEL_OBJECT (addr)); */
 		}
 
 		retval = (const gchar*)me->mime_from;
