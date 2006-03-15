@@ -42,6 +42,35 @@ static GObjectClass *parent_class = NULL;
 #define TNY_STORE_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
 
+static void
+destroy_folder (gpointer data, gpointer user_data)
+{
+	g_object_unref (G_OBJECT (data));
+}
+
+static void 
+uncache (TnyStoreAccountPriv *priv)
+{
+	if (priv->folders)
+	{
+		g_mutex_lock (priv->folders_lock);
+		g_list_foreach (priv->folders, destroy_folder, NULL);
+		g_mutex_unlock (priv->folders_lock);
+	}
+
+	if (priv->ufolders)
+	{
+		g_mutex_lock (priv->folders_lock);
+		g_list_foreach (priv->ufolders, destroy_folder, NULL);
+		g_mutex_unlock (priv->folders_lock);
+	}
+
+	g_mutex_lock (priv->folders_lock);
+	priv->folders = NULL;
+	priv->ufolders = NULL;
+	g_mutex_unlock (priv->folders_lock);
+
+}
 
 static void 
 fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, CamelFolderInfo *iter, TnyStoreAccountFolderType type)
@@ -95,6 +124,8 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 	const GList *retval;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
+
+	uncache (priv);
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
@@ -234,12 +265,6 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	return;
 }
 
-static void
-destroy_folder (gpointer data, gpointer user_data)
-{
-	g_object_unref (G_OBJECT (data));
-}
-
 
 static void
 tny_store_account_finalize (GObject *object)
@@ -247,25 +272,7 @@ tny_store_account_finalize (GObject *object)
 	TnyStoreAccount *self = (TnyStoreAccount *)object;	
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
-	if (priv->folders)
-	{
-		g_mutex_lock (priv->folders_lock);
-		g_list_foreach (priv->folders, destroy_folder, NULL);
-		g_mutex_unlock (priv->folders_lock);
-	}
-
-	if (priv->ufolders)
-	{
-		g_mutex_lock (priv->folders_lock);
-		g_list_foreach (priv->ufolders, destroy_folder, NULL);
-		g_mutex_unlock (priv->folders_lock);
-	}
-
-	g_mutex_lock (priv->folders_lock);
-	priv->folders = NULL;
-	priv->ufolders = NULL;
-	g_mutex_unlock (priv->folders_lock);
-
+	uncache (priv);
 
 	g_mutex_free (priv->folders_lock);
 
