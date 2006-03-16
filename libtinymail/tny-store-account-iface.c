@@ -53,6 +53,7 @@ tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface
 /**
  * tny_store_account_iface_get_folders:
  * @self: a #TnyStoreAccountIface object
+ * @type: Either all or only subscribed folders
  * 
  * Get the folders of a storage account
  * 
