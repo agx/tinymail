@@ -324,6 +324,15 @@ tny_msg_new (void)
 	return self;
 }
 
+/**
+ * tny_msg_new_with_header:
+ * @header: a #TnyMsgHeaderIface object
+ *
+ * The #TnyMsg implementation is actually a proxy for #CamelMimeMessage (and
+ * a few other Camel types)
+ *
+ * Return value: A new #TnyMsgIface instance implemented for Camel
+ **/
 TnyMsg*
 tny_msg_new_with_header (TnyMsgHeaderIface *header)
 {
@@ -334,6 +343,16 @@ tny_msg_new_with_header (TnyMsgHeaderIface *header)
 	return self;
 }
 
+/**
+ * tny_msg_new_with_header_and_parts:
+ * @header: a #TnyMsgHeaderIface object
+ * @parts: A double linked list with #TnyMsgMimePartIface objects
+ *
+ * The #TnyMsg implementation is actually a proxy for #CamelMimeMessage (and
+ * a few other Camel types)
+ *
+ * Return value: A new #TnyMsgIface instance implemented for Camel
+ **/
 TnyMsg*
 tny_msg_new_with_header_and_parts (TnyMsgHeaderIface *header, const GList *parts)
 {
