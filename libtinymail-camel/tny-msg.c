@@ -32,6 +32,7 @@
 static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-priv.h"
+#include "tny-msg-header-priv.h"
 
 #define TNY_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG, TnyMsgPriv))
@@ -258,14 +259,21 @@ static void
 tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	CamelMimeMessage *message = NULL;
 
 	g_mutex_lock (priv->header_lock);
+
 	if (priv->header)
 		g_object_unref (G_OBJECT (priv->header));
-
 	g_object_ref (G_OBJECT (header));
 
 	priv->header = header;
+
+	message = _tny_msg_header_get_camel_mime_message (TNY_MSG_HEADER (priv->header));
+
+	if (message)
+		_tny_msg_set_camel_mime_message (TNY_MSG (self), message);
+
 	g_mutex_unlock (priv->header_lock);
 
 	return;
@@ -313,6 +321,34 @@ tny_msg_new (void)
 {
 	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
 	
+	return self;
+}
+
+TnyMsg*
+tny_msg_new_with_header (TnyMsgHeaderIface *header)
+{
+	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
+
+	tny_msg_set_header (TNY_MSG_IFACE (self), header);
+
+	return self;
+}
+
+TnyMsg*
+tny_msg_new_with_header_and_parts (TnyMsgHeaderIface *header, const GList *parts)
+{
+	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
+	GList *list = (GList*)parts;
+
+	tny_msg_set_header (TNY_MSG_IFACE (self), header);
+
+	while (list)
+	{
+		tny_msg_add_part (TNY_MSG_IFACE (self), 
+			TNY_MSG_MIME_PART_IFACE (list->data));
+		list = g_list_next (list);
+	}
+
 	return self;
 }
 

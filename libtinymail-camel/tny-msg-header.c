@@ -46,6 +46,7 @@ struct _TnyMsgHeader
 	CamelMimeMessage *mime_message;
 	gchar *mime_from;
 	const gchar *invalid;
+	gboolean uncachable;
 };
 
 struct _TnyMsgHeaderClass 
@@ -53,10 +54,19 @@ struct _TnyMsgHeaderClass
 	GObjectClass parent_class;
 };
 
+void
+_tny_msg_header_set_not_uncachable (TnyMsgHeader *self)
+{
+	self->uncachable = FALSE;
+	return;
+}
 
 static void
 unload_msg_header (TnyMsgHeader *self)
 {
+	if (!self->uncachable)
+		return;
+
 	if (self->mime_from)
 		g_free (self->mime_from);
 	self->mime_from = NULL;
@@ -89,6 +99,9 @@ tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val)
 static void
 load_msg_header (TnyMsgHeader *self)
 {
+	if (!self->uncachable)
+		return;
+
 	if (self->use_summary)
 	{
 		if (!self->message_info && self->folder && self->uid)
@@ -118,8 +131,11 @@ prepare_for_write (TnyMsgHeader *self)
 	unload_msg_header (self);
 
 	self->use_summary = FALSE;
+
 	if (!self->mime_message)
 		self->mime_message = camel_mime_message_new ();
+
+	_tny_msg_header_set_not_uncachable (self);
 
 	return;
 }
@@ -700,6 +716,10 @@ tny_msg_header_finalize (GObject *object)
 
 	g_mutex_lock (self->hdr_lock);
 
+	/* Instance is going to dissapear, set uncachable as we 
+	   reuse the functionality */
+	self->uncachable = TRUE;
+
 	if (self->use_summary && self->message_info)
 		unload_msg_header (self);
 
@@ -725,15 +745,17 @@ tny_msg_header_finalize (GObject *object)
  *
  * Return value: A new #TnyMsgHeader instance implemented for Camel
  **/
-
-
 TnyMsgHeader*
 tny_msg_header_new (void)
 {
 	TnyMsgHeader *self = g_object_new (TNY_TYPE_MSG_HEADER, NULL);
 	static const gchar *inv = "Invalid";
-	
+
+	self->uncachable = TRUE;	
 	self->invalid = inv;
+	self->mime_message = NULL;
+	self->message_info = NULL;
+	self->mime_from = NULL;
 
 	/* Second allocation :-( */
 	self->hdr_lock = g_mutex_new ();
