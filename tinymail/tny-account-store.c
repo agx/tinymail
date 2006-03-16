@@ -261,6 +261,8 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 			priv->store_accounts = g_list_append (priv->store_accounts, account);
 		}
 
+		tny_account_iface_set_account_store (account, self);
+
 		if (type)
 			g_free (type);
 

@@ -21,6 +21,7 @@
 
 #include <string.h>
 
+#include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-store-account.h>
 
@@ -38,6 +39,7 @@ static GObjectClass *parent_class = NULL;
 #include "tny-store-account-priv.h"
 
 #include <tny-camel-shared.h>
+#include <tny-account-store-iface.h>
 
 #define TNY_STORE_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
@@ -199,6 +201,7 @@ static void
 tny_store_account_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
 {
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyAccountStoreIface *astore = (TnyAccountStoreIface *)tny_account_iface_get_account_store (TNY_ACCOUNT_IFACE (self));
 
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
@@ -212,6 +215,9 @@ tny_store_account_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *fold
 
 	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
+	if (astore)
+		g_signal_emit (astore, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+
 	return;
 }
 
@@ -219,6 +225,7 @@ static void
 tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
 {
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyAccountStoreIface *astore = (TnyAccountStoreIface *)tny_account_iface_get_account_store (TNY_ACCOUNT_IFACE (self));
 
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
@@ -231,6 +238,9 @@ tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *fo
 	camel_store_unsubscribe_folder (store, tny_msg_folder_iface_get_name (folder), &ex);
 
 	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
+
+	if (astore)
+		g_signal_emit (astore, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
 
 	return;
 }

@@ -84,6 +84,21 @@ reconnect (TnyAccountPriv *priv)
 	return;
 }
 
+static void 
+tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	priv->store = store;
+	return;
+}
+
+static const TnyAccountStoreIface*
+tny_account_get_account_store (TnyAccountIface *self)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	return priv->store;
+}
+
 
 void
 tny_account_set_id (TnyAccountIface *self, const gchar *id)
@@ -314,6 +329,7 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
 
+	priv->store = NULL;
 	priv->id = NULL;
 	priv->user = NULL;
 	priv->host = NULL;
@@ -373,21 +389,18 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->get_hostname_func = tny_account_get_hostname;
 	klass->set_hostname_func = tny_account_set_hostname;
-
 	klass->get_proto_func = tny_account_get_proto;
 	klass->set_proto_func = tny_account_set_proto;
-
 	klass->get_user_func = tny_account_get_user;
 	klass->set_user_func = tny_account_set_user;
-
 	klass->get_pass_func_func = tny_account_get_pass_func;
 	klass->set_pass_func_func = tny_account_set_pass_func;
-
 	klass->get_forget_pass_func_func = tny_account_get_forget_pass_func;
 	klass->set_forget_pass_func_func = tny_account_set_forget_pass_func;
-
 	klass->set_id_func = tny_account_set_id;
 	klass->get_id_func = tny_account_get_id;
+	klass->set_account_store_func = tny_account_set_account_store;
+	klass->get_account_store_func = tny_account_get_account_store;
 
 	return;
 }

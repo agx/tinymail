@@ -34,6 +34,7 @@ struct _TnyAccountPriv
 	GetPassFunc get_pass_func;
 	ForgetPassFunc forget_pass_func;
 	gboolean pass_func_set, forget_pass_func_set;
+	const TnyAccountStoreIface *store;
 };
 
 const CamelService*  _tny_account_get_service    (TnyAccount *self);

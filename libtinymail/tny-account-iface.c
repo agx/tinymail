@@ -21,6 +21,35 @@
 
 
 /**
+ * tny_account_iface_set_account_store:
+ * @self: a #TnyAccountIface object
+ * @store: a #TnyAccountStoreIface object
+ *
+ * Set the parent account store for the account.
+ * 
+ **/
+void
+tny_account_iface_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
+{
+	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_store_func (self, store);
+	return;
+}
+
+/**
+ * tny_account_iface_get_account_store:
+ * @self: a #TnyAccountIface object
+ * 
+ * Get the parent store for the account.
+ * 
+ * Return value: the store or NULL if none
+ **/
+const TnyAccountStoreIface*
+tny_account_iface_get_account_store (TnyAccountIface *self)
+{
+	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_account_store_func (self);
+}
+
+/**
  * tny_account_iface_get_id:
  * @self: a #TnyAccountIface object
  * 
