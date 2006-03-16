@@ -61,26 +61,32 @@ reconnect (TnyAccountPriv *priv)
 
 		priv->url_string = camel_url_to_string (url, 0);
 
-		if (priv->service)
-			camel_object_unref (CAMEL_OBJECT (priv->service));
-
-		priv->service = camel_session_get_service 
-			(CAMEL_SESSION (priv->session), priv->url_string, 
-			CAMEL_PROVIDER_STORE, priv->ex);
-
-		if (priv->service == NULL) {
-			g_error ("couldn't get service %s: %s\n", priv->url_string,
-				   camel_exception_get_description (priv->ex));
-			camel_exception_clear (priv->ex);
-			return;
+		if (priv->type == CAMEL_PROVIDER_STORE)
+		{
+			if (priv->service)
+				camel_object_unref (CAMEL_OBJECT (priv->service));
+	
+			priv->service = camel_session_get_service 
+				(CAMEL_SESSION (priv->session), priv->url_string, 
+				priv->type, priv->ex);
+	
+			if (priv->service == NULL) {
+				g_error ("couldn't get service %s: %s\n", priv->url_string,
+					   camel_exception_get_description (priv->ex));
+				camel_exception_clear (priv->ex);
+				return;
+			}
 		}
 
 		camel_url_free (url);
 	}
 
-	if (priv->service && priv->pass_func_set && priv->proto && priv->user && priv->host)
-		camel_service_connect (priv->service, priv->ex);
-	
+	if (priv->type == CAMEL_PROVIDER_STORE)
+	{
+		if (priv->service && priv->pass_func_set && priv->proto && priv->user && priv->host)
+			camel_service_connect (priv->service, priv->ex);
+	}
+
 	return;
 }
 

@@ -21,6 +21,7 @@
  */
 
 #include <camel/camel.h>
+#include <camel/camel-stream-buffer.h>
 
 typedef struct _TnyMsgPriv TnyMsgPriv;
 
@@ -36,7 +37,8 @@ struct _TnyMsgPriv
 	TnyMsgFolderIface *folder;
 };
 
-void  _tny_msg_set_camel_mime_message    (TnyMsg *self, CamelMimeMessage *message);
-void  _tny_msg_header_set_not_uncachable (TnyMsgHeader *self);
+CamelMimeMessage*  _tny_msg_get_camel_mime_message    (TnyMsg *self);
+void               _tny_msg_set_camel_mime_message    (TnyMsg *self, CamelMimeMessage *message);
+void               _tny_msg_header_set_not_uncachable  (TnyMsgHeader *self);
 
 #endif

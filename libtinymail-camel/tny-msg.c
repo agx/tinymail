@@ -25,8 +25,6 @@
 #include <tny-stream-camel.h>
 #include <tny-msg-header.h>
 
-#include <camel/camel-stream-buffer.h>
-
 #include <tny-camel-shared.h>
 
 static GObjectClass *parent_class = NULL;
@@ -116,12 +114,18 @@ unload_parts (TnyMsgPriv *priv)
 	return;
 }
 
+CamelMimeMessage* 
+_tny_msg_get_camel_mime_message (TnyMsg *self)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
+	return priv->message;
+}
+
+
 void
 _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
-	CamelDataWrapper *wrapper;
-	CamelMimePart *part;
 
 	g_mutex_lock (priv->message_lock);
 

@@ -265,7 +265,9 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyStoreAccount *self = (TnyStoreAccount *)instance;
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
+	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 
+	apriv->type = CAMEL_PROVIDER_STORE;
 	priv->folders = NULL;
 	priv->folders_lock = g_mutex_new ();
 

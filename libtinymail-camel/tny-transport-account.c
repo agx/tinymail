@@ -34,6 +34,12 @@
 
 static GObjectClass *parent_class = NULL;
 
+#include <tny-msg.h>
+#include <tny-msg-header.h>
+#include <tny-transport-account.h>
+
+#include "tny-msg-priv.h"
+#include "tny-msg-header-priv.h"
 #include "tny-account-priv.h"
 #include "tny-transport-account-priv.h"
 
@@ -46,10 +52,33 @@ static GObjectClass *parent_class = NULL;
 static void
 tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 {
-	TnyTransportAccountPriv *priv = TNY_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyMsgHeaderIface *header = (TnyMsgHeaderIface *)tny_msg_iface_get_header (msg);
+	CamelMimeMessage *message = _tny_msg_get_camel_mime_message (TNY_MSG (msg));
+	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
+	CamelTransport *transport;
 
-	/* TODO */
+	transport = camel_session_get_transport (CAMEL_SESSION (apriv->session), 
+			"smtp://SMTPSERVER", &ex);
+
+	if (transport && message && header)
+	{
+		CamelAddress 
+			*from = (CamelAddress *) camel_internet_address_new (),
+			*recipients =  (CamelAddress *) camel_internet_address_new ();
+
+
+		//camel_address_copy (from, camel_mime_message_get_from (message));
+		//camel_address_copy (recipients, camel_mime_message_get_from (message));
+
+		
+		camel_transport_send_to (transport, message, from, 
+			recipients, &ex);
+
+		camel_object_unref (CAMEL_OBJECT (from));
+		camel_object_unref (CAMEL_OBJECT (recipients));
+
+	}
 
 	return;
 }
@@ -72,10 +101,13 @@ tny_transport_account_new (void)
 static void
 tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	/*
+	
 	TnyTransportAccount *self = (TnyTransportAccount *)instance;
-	TnyTransportAccountPriv *priv = TNY_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
-	*/
+	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	
+
+	apriv->type = CAMEL_PROVIDER_TRANSPORT;
+
 
 	return;
 }
