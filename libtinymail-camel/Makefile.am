@@ -28,6 +28,7 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	$(libtinymail_camel_1_0_headers)	\
 	tny-msg.c				\
 	tny-msg-header.c 			\
+	tny-msg-mime-part-priv.h		\
 	tny-msg-mime-part.c			\
 	tny-msg-folder.c			\
 	tny-account.c				\

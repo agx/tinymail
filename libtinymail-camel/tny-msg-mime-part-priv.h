@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_PRIV_H
-#define TNY_MSG_PRIV_H
+#ifndef TNY_MSG_MIME_PART_PRIV_H
+#define TNY_MSG_MIME_PART_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -21,23 +21,20 @@
  */
 
 #include <camel/camel.h>
-#include <camel/camel-stream-buffer.h>
+#include <camel/camel-stream-mem.h>
+#include <camel/camel-data-wrapper.h>
 
-typedef struct _TnyMsgPriv TnyMsgPriv;
+typedef struct _TnyMsgMimePartPriv TnyMsgMimePartPriv;
 
-struct _TnyMsgPriv
+struct _TnyMsgMimePartPriv
 {
-	GMutex *message_lock;
-	GMutex *header_lock;
-	TnyMsgHeaderIface *header;
-	GMutex *parts_lock;
-	GList *parts;
-	GMutex *folder_lock;
-	TnyMsgFolderIface *folder;
+	GMutex *part_lock;
+	CamelMimePart *part;
+	gchar *cached_content_type;
+	guint index;
 };
 
-CamelMimeMessage*  _tny_msg_get_camel_mime_message    (TnyMsg *self);
-void               _tny_msg_set_camel_mime_message    (TnyMsg *self, CamelMimeMessage *message);
-void               _tny_msg_header_set_not_uncachable  (TnyMsgHeader *self);
+#define TNY_MSG_MIME_PART_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartPriv))
 
 #endif

@@ -34,19 +34,7 @@
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyMsgMimePartPriv TnyMsgMimePartPriv;
-
-struct _TnyMsgMimePartPriv
-{
-	GMutex *part_lock;
-	CamelMimePart *part;
-	gchar *cached_content_type;
-	guint index;
-};
-
-#define TNY_MSG_MIME_PART_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartPriv))
-
+#include "tny-msg-mime-part-priv.h"
 
 static void
 tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
@@ -131,8 +119,6 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 		wrapper = camel_data_wrapper_new (); 
 		camel_medium_set_content_object (medium, wrapper);
 	}
-
-	camel_data_wrapper_write_to_stream (wrapper, stream);
 
 	retval = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
 

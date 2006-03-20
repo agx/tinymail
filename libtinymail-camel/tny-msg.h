@@ -27,6 +27,7 @@
 #include <tny-msg-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-msg-header-iface.h>
+#include <tny-msg-mime-part.h>
 
 G_BEGIN_DECLS
 
@@ -42,12 +43,12 @@ typedef struct _TnyMsgClass TnyMsgClass;
 
 struct _TnyMsg
 {
-	GObject parent;	
+	TnyMsgMimePart parent;	
 };
 
 struct _TnyMsgClass 
 {
-	GObjectClass parent;
+	TnyMsgMimePartClass parent;
 };
 
 GType     tny_msg_get_type (void);
