@@ -17,12 +17,12 @@ An implementation of #TnyMsgMimePartIface that plays proxy for a #CamelMimePart
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_MIME_PART_TYPE ##### -->
+<!-- ##### STRUCT TnyMsgMimePart ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_msg_mime_part_new ##### -->
 <para>
@@ -40,5 +40,14 @@ An implementation of #TnyMsgMimePartIface that plays proxy for a #CamelMimePart
 
 @self: 
 @part: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_get_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
 
 

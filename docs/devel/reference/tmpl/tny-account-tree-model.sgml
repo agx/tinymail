@@ -19,12 +19,20 @@ folders of account instances that get added.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_ACCOUNT_TREE_MODEL_TYPE ##### -->
+<!-- ##### MACRO TNY_ACCOUNT_TREE_MODEL ##### -->
 <para>
 
 </para>
 
+@obj: 
 
+
+<!-- ##### STRUCT TnyAccountTreeModel ##### -->
+<para>
+
+</para>
+
+@parent: 
 
 <!-- ##### FUNCTION tny_account_tree_model_new ##### -->
 <para>

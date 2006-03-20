@@ -17,12 +17,12 @@ An adaptor between #TnyStreamIface and #GtkTextBuffer
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TEXT_BUFFER_STREAM_TYPE ##### -->
+<!-- ##### STRUCT TnyTextBufferStream ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_text_buffer_stream_new ##### -->
 <para>

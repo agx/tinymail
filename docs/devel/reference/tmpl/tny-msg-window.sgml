@@ -17,12 +17,12 @@ An implementation of #TnyMsgWindowIface for Gtk+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_WINDOW_TYPE ##### -->
+<!-- ##### STRUCT TnyMsgWindow ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_msg_window_new ##### -->
 <para>

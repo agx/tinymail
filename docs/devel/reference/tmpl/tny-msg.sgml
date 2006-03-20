@@ -17,18 +17,37 @@ An implementation of #TnyMsgIface that plays proxy for #CamelMimeMessage
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_TYPE ##### -->
+<!-- ##### STRUCT TnyMsg ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_msg_new ##### -->
 <para>
 
 </para>
 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_new_with_header ##### -->
+<para>
+
+</para>
+
+@header: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_new_with_header_and_parts ##### -->
+<para>
+
+</para>
+
+@header: 
+@parts: 
 @Returns: 
 
 

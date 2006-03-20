@@ -32,6 +32,14 @@ TnyMsgFolderProxy
 @obj: 
 
 
+<!-- ##### STRUCT TnyMsgFolderProxy ##### -->
+<para>
+
+</para>
+
+@parent: 
+@real: 
+
 <!-- ##### FUNCTION tny_msg_folder_proxy_new ##### -->
 <para>
 

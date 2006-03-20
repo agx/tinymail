@@ -17,13 +17,6 @@ An interfaces that defines a header type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_HEADER_IFACE_TYPE ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### FUNCTION tny_msg_header_iface_set_uid ##### -->
 <para>
 
@@ -34,6 +27,15 @@ An interfaces that defines a header type
 
 
 <!-- ##### FUNCTION tny_msg_header_iface_get_uid ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_bcc ##### -->
 <para>
 
 </para>
@@ -103,6 +105,69 @@ An interfaces that defines a header type
 
 @self: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_replyto ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_bcc ##### -->
+<para>
+
+</para>
+
+@self: 
+@bcc: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_cc ##### -->
+<para>
+
+</para>
+
+@self: 
+@cc: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_from ##### -->
+<para>
+
+</para>
+
+@self: 
+@from: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_subject ##### -->
+<para>
+
+</para>
+
+@self: 
+@subject: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_to ##### -->
+<para>
+
+</para>
+
+@self: 
+@to: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_replyto ##### -->
+<para>
+
+</para>
+
+@self: 
+@to: 
 
 
 <!-- ##### FUNCTION tny_msg_header_iface_get_folder ##### -->

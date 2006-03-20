@@ -3,10 +3,14 @@
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
 <!ENTITY libtinymail-TnyAccountIface SYSTEM "xml/tny-account-iface.xml">
+<!ENTITY libtinymail-TnyStoreAccountIface SYSTEM "xml/tny-store-account-iface.xml">
+<!ENTITY libtinymail-TnyTransportAccountIface SYSTEM "xml/tny-transport-account-iface.xml">
 <!ENTITY libtinymail-TnyAccountStoreIface SYSTEM "xml/tny-account-store-iface.xml">
 <!ENTITY libtinymail-TnyAccountStore SYSTEM "xml/tny-account-store.xml">
 <!ENTITY libtinymail-TnyAccountTreeModel SYSTEM "xml/tny-account-tree-model.xml">
 <!ENTITY libtinymail-TnyAccount SYSTEM "xml/tny-account.xml">
+<!ENTITY libtinymail-TnyStoreAccount SYSTEM "xml/tny-store-account.xml">
+<!ENTITY libtinymail-TnyTransportAccount SYSTEM "xml/tny-transport-account.xml">
 <!ENTITY libtinymail-TnyAttachListModel SYSTEM "xml/tny-attach-list-model.xml">
 <!ENTITY libtinymail-TnyCamelStream SYSTEM "xml/tny-camel-stream.xml">
 <!ENTITY libtinymail-TnyMsgFolderIface SYSTEM "xml/tny-msg-folder-iface.xml">
@@ -75,6 +79,8 @@
 		&libtinymail-TnyMsgMimePartIface;
 		&libtinymail-TnyStreamIface;
 		&libtinymail-TnyAccountIface;
+		&libtinymail-TnyStoreAccountIface;
+		&libtinymail-TnyTransportAccountIface;
 		&libtinymail-TnyMsgIface;
 		&libtinymail-TnyMsgHeaderIface;
 	</chapter>
@@ -99,6 +105,8 @@
 	<chapter id="libtinymail-camel">
 		<title>libtinymail-camel</title>
 		&libtinymail-TnyAccount;
+		&libtinymail-TnyStoreAccount;
+		&libtinymail-TnyTransportAccount;
 		&libtinymail-TnyCamelStream;
 		&libtinymail-TnyMsgFolder;
 		&libtinymail-TnyMsgHeader;

@@ -17,13 +17,6 @@ A stream is an object that can be written to and can be read from.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_STREAM_IFACE_TYPE ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### FUNCTION tny_stream_iface_read ##### -->
 <para>
 

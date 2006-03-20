@@ -19,12 +19,20 @@ icon column automatically.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_ATTACH_LIST_MODEL_TYPE ##### -->
+<!-- ##### MACRO TNY_ATTACH_LIST_MODEL ##### -->
 <para>
 
 </para>
 
+@obj: 
 
+
+<!-- ##### STRUCT TnyAttachListModel ##### -->
+<para>
+
+</para>
+
+@parent: 
 
 <!-- ##### FUNCTION tny_attach_list_model_new ##### -->
 <para>

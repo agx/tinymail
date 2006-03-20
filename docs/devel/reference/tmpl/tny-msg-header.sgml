@@ -31,13 +31,6 @@ for no real reason.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_HEADER_TYPE ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### STRUCT TnyMsgHeader ##### -->
 <para>
 
@@ -56,5 +49,14 @@ for no real reason.
 </para>
 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_header_set_use_summary ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
 
 

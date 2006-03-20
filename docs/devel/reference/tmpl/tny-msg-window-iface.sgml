@@ -17,11 +17,10 @@ An implementation that defines a message window type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_WINDOW_IFACE_TYPE ##### -->
+<!-- ##### STRUCT TnyMsgWindowIface ##### -->
 <para>
 
 </para>
-
 
 
 <!-- ##### FUNCTION tny_msg_window_iface_set_msg ##### -->

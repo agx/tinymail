@@ -17,12 +17,13 @@ A session singleton type for Camel
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_SESSION_CAMEL_TYPE ##### -->
+<!-- ##### STRUCT TnySessionCamel ##### -->
 <para>
 
 </para>
 
-
+@parent_object: 
+@interactive: 
 
 <!-- ##### FUNCTION tny_session_camel_get_instance ##### -->
 <para>

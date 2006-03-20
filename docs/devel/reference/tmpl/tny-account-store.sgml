@@ -17,12 +17,12 @@ An implementation of #TnyAccountStoreIface that uses libtinymail-camel and GConf
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_ACCOUNT_STORE_TYPE ##### -->
+<!-- ##### STRUCT TnyAccountStore ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_account_store_get_instance ##### -->
 <para>

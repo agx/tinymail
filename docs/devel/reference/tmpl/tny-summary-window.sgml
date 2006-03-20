@@ -17,12 +17,12 @@ An implementation of #TnySummaryWindowIface for Gtk+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_SUMMARY_WINDOW_TYPE ##### -->
+<!-- ##### STRUCT TnySummaryWindow ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_summary_window_new ##### -->
 <para>

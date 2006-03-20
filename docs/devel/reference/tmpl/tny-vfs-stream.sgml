@@ -17,12 +17,12 @@ An adaptor between #TnyStreamIface and #GnomeVFSHandle
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_VFS_STREAM_TYPE ##### -->
+<!-- ##### STRUCT TnyVfsStream ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_vfs_stream_new ##### -->
 <para>

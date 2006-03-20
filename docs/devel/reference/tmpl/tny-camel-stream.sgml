@@ -17,7 +17,7 @@ A #CamelStream as a proxy for a #TnyStreamIface
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_CAMEL_STREAM_TYPE ##### -->
+<!-- ##### MACRO TNY_TYPE_CAMEL_STREAM ##### -->
 <para>
 
 </para>
@@ -47,6 +47,14 @@ A #CamelStream as a proxy for a #TnyStreamIface
 
 @o: 
 
+
+<!-- ##### STRUCT TnyCamelStream ##### -->
+<para>
+
+</para>
+
+@parent: 
+@stream: 
 
 <!-- ##### FUNCTION tny_account_get_type ##### -->
 <para>

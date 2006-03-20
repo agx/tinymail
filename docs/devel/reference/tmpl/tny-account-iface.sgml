@@ -17,22 +17,6 @@ An account contains the folders of an E-mail service and handles the authenticat
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_ACCOUNT_IFACE_TYPE ##### -->
-<para>
-
-</para>
-
-
-
-<!-- ##### FUNCTION tny_account_iface_get_folders ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_account_iface_set_id ##### -->
 <para>
 
@@ -133,6 +117,24 @@ An account contains the folders of an E-mail service and handles the authenticat
 
 
 <!-- ##### FUNCTION tny_account_iface_get_forget_pass_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_set_account_store ##### -->
+<para>
+
+</para>
+
+@self: 
+@store: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_account_store ##### -->
 <para>
 
 </para>

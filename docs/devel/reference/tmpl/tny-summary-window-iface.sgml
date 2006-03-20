@@ -17,11 +17,10 @@ An interfaces that defines a summary window type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_SUMMARY_WINDOW_IFACE_TYPE ##### -->
+<!-- ##### STRUCT TnySummaryWindowIface ##### -->
 <para>
 
 </para>
-
 
 
 <!-- ##### FUNCTION tny_summary_window_iface_set_account_store ##### -->

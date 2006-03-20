@@ -19,6 +19,14 @@ corresponding row in the #GtkTreeView become invisible.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_MSG_HEADER_LIST_MODEL ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
 <!-- ##### STRUCT TnyMsgHeaderListModel ##### -->
 <para>
 

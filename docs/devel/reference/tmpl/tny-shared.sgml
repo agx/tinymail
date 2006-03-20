@@ -116,12 +116,18 @@ Shared include file with forward typedefs
 @content_type_is_func: 
 @get_stream_func: 
 @write_to_stream_func: 
+@construct_from_stream_func: 
 @set_index_func: 
 @get_index_func: 
 @get_filename_func: 
 @get_content_id_func: 
 @get_description_func: 
 @get_content_location_func: 
+@set_content_location_func: 
+@set_description_func: 
+@set_content_id_func: 
+@set_filename_func: 
+@set_content_type_func: 
 
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
@@ -135,7 +141,6 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_folders_func: 
 @set_id_func: 
 @set_proto_func: 
 @set_user_func: 
@@ -148,6 +153,38 @@ Shared include file with forward typedefs
 @get_hostname_func: 
 @get_pass_func_func: 
 @get_forget_pass_func_func: 
+@set_account_store_func: 
+@get_account_store_func: 
+
+<!-- ##### STRUCT TnyStoreAccountIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyStoreAccountIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_folders_func: 
+@subscribe_func: 
+@unsubscribe_func: 
+
+<!-- ##### STRUCT TnyTransportAccountIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyTransportAccountIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@send_func: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -185,8 +222,10 @@ Shared include file with forward typedefs
 @account_inserted: 
 @account_removed: 
 @accounts_reloaded: 
-@get_accounts_func: 
-@add_account_func: 
+@get_store_accounts_func: 
+@add_store_account_func: 
+@get_transport_accounts_func: 
+@add_transport_account_func: 
 
 <!-- ##### STRUCT TnyMsgHeaderProxy ##### -->
 <para>

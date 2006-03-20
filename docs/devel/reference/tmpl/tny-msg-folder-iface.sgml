@@ -18,13 +18,6 @@ A folder can have a account or another folder as parent.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_FOLDER_IFACE_TYPE ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### VARIABLE tny_msg_folder_iface_signals ##### -->
 <para>
 

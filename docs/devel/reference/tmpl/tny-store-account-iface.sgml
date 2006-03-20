@@ -1,8 +1,8 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgViewIface
+TnyStoreAccountIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interfaces that defines a message view type
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
@@ -17,18 +17,31 @@ An interfaces that defines a message view type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgViewIface ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### FUNCTION tny_msg_view_iface_set_msg ##### -->
+<!-- ##### FUNCTION tny_store_account_iface_get_folders ##### -->
 <para>
 
 </para>
 
 @self: 
-@msg: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_store_account_iface_subscribe ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+
+<!-- ##### FUNCTION tny_store_account_iface_unsubscribe ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
 
 

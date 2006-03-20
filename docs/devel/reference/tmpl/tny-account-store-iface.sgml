@@ -19,20 +19,13 @@ happen to the accounts.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_ACCOUNT_STORE_IFACE_TYPE ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### VARIABLE tny_account_store_iface_signals ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_account_store_iface_get_accounts ##### -->
+<!-- ##### FUNCTION tny_account_store_iface_get_store_accounts ##### -->
 <para>
 
 </para>
@@ -41,7 +34,25 @@ happen to the accounts.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_account_store_iface_add_account ##### -->
+<!-- ##### FUNCTION tny_account_store_iface_add_store_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+
+
+<!-- ##### FUNCTION tny_account_store_iface_get_transport_accounts ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_iface_add_transport_account ##### -->
 <para>
 
 </para>

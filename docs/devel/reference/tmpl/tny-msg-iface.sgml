@@ -17,13 +17,6 @@ An interfaces that defines a message type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_IFACE_TYPE ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### FUNCTION tny_msg_iface_get_parts ##### -->
 <para>
 

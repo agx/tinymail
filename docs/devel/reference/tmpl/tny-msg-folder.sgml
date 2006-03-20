@@ -17,12 +17,12 @@ A #TnyFolderIface implementation as a proxy for #CamelFolder
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_FOLDER_TYPE ##### -->
+<!-- ##### STRUCT TnyMsgFolder ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_msg_folder_new_with_folder ##### -->
 <para>

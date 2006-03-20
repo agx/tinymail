@@ -17,12 +17,12 @@ A #TnyStreamIface implemented as a proxy for a #CamelStream
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_STREAM_CAMEL_TYPE ##### -->
+<!-- ##### STRUCT TnyStreamCamel ##### -->
 <para>
 
 </para>
 
-
+@parent: 
 
 <!-- ##### FUNCTION tny_stream_camel_new ##### -->
 <para>
