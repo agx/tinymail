@@ -40,55 +40,6 @@ static GObjectClass *parent_class = NULL;
 
 #include <tny-camel-shared.h>
 
-static void 
-reconnect (TnyAccountPriv *priv)
-{
-	if (priv->proto && priv->user && priv->host)
-	{
-		CamelURL *url = NULL;
-		gchar *proto = g_strdup_printf ("%s://", priv->proto); 
-
-		url = camel_url_new (proto, priv->ex);
-		g_free (proto);
-	
-		camel_url_set_protocol (url, priv->proto); 
-
-		camel_url_set_user (url, priv->user);
-		camel_url_set_host (url, priv->host);
-	
-		if (priv->url_string)
-			g_free (priv->url_string);
-
-		priv->url_string = camel_url_to_string (url, 0);
-
-		if (priv->type == CAMEL_PROVIDER_STORE)
-		{
-			if (priv->service)
-				camel_object_unref (CAMEL_OBJECT (priv->service));
-	
-			priv->service = camel_session_get_service 
-				(CAMEL_SESSION (priv->session), priv->url_string, 
-				priv->type, priv->ex);
-	
-			if (priv->service == NULL) {
-				g_error ("couldn't get service %s: %s\n", priv->url_string,
-					   camel_exception_get_description (priv->ex));
-				camel_exception_clear (priv->ex);
-				return;
-			}
-		}
-
-		camel_url_free (url);
-	}
-
-	if (priv->type == CAMEL_PROVIDER_STORE)
-	{
-		if (priv->service && priv->pass_func_set && priv->proto && priv->user && priv->host)
-			camel_service_connect (priv->service, priv->ex);
-	}
-
-	return;
-}
 
 static void 
 tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
@@ -133,7 +84,7 @@ tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 
 	priv->proto = g_strdup (proto);
 
-	reconnect (priv);
+	priv->reconnect_func (priv);
 	
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -151,7 +102,7 @@ tny_account_set_user (TnyAccountIface *self, const gchar *user)
 
 	priv->user = g_strdup (user);
 
-	reconnect (priv);
+	priv->reconnect_func (priv);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -169,7 +120,7 @@ tny_account_set_hostname (TnyAccountIface *self, const gchar *host)
 
 	priv->host = g_strdup (host);
 
-	reconnect (priv);
+	priv->reconnect_func (priv);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -186,7 +137,8 @@ tny_account_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 	
-	reconnect (priv);
+	priv->reconnect_func (priv);
+
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
@@ -311,21 +263,6 @@ _tny_account_get_url_string (TnyAccount *self)
 }
 
 
-
-/**
- * tny_account_new:
- * 
- *
- * Return value: A new #TnyAccountIface instance implemented for Camel
- **/
-TnyAccount*
-tny_account_new (void)
-{
-	TnyAccount *self = g_object_new (TNY_TYPE_ACCOUNT, NULL);
-
-	return self;
-}
-
 static void
 tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -407,6 +344,8 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_id_func = tny_account_get_id;
 	klass->set_account_store_func = tny_account_set_account_store;
 	klass->get_account_store_func = tny_account_get_account_store;
+
+	/* priv->reconnect_func is a private to-implement method ! */
 
 	return;
 }

@@ -38,6 +38,7 @@ static GObjectClass *parent_class = NULL;
 #include <tny-msg-header.h>
 #include <tny-transport-account.h>
 
+#include "tny-camel-common-priv.h"
 #include "tny-msg-priv.h"
 #include "tny-msg-header-priv.h"
 #include "tny-account-priv.h"
@@ -49,6 +50,33 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_TRANSPORT_ACCOUNT, TnyTransportAccountPriv))
 
 
+static void 
+reconnect (TnyAccountPriv *priv)
+{
+	if (priv->proto && priv->host)
+	{
+		GString *urlstr = g_string_new ("");
+
+		if (priv->url_string)
+			g_free (priv->url_string);
+
+		urlstr = g_string_append (urlstr, priv->proto);
+		urlstr = g_string_append (urlstr, "://");
+
+		if (priv->user)
+		{
+			urlstr = g_string_append (urlstr, priv->user);
+			urlstr = g_string_append (urlstr, "@");
+		}
+
+		urlstr = g_string_append (urlstr, priv->host);
+
+		priv->url_string = urlstr->str;
+
+		g_string_free (urlstr, FALSE);
+	}
+}
+
 static void
 tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 {
@@ -59,25 +87,26 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 	CamelTransport *transport;
 
 	transport = camel_session_get_transport (CAMEL_SESSION (apriv->session), 
-			"smtp://SMTPSERVER", &ex);
+			apriv->url_string, &ex);
 
 	if (transport && message && header)
 	{
-		CamelAddress 
-			*from = (CamelAddress *) camel_internet_address_new (),
-			*recipients =  (CamelAddress *) camel_internet_address_new ();
+		CamelInternetAddress 
+			*from = camel_internet_address_new (),
+			*recipients = camel_internet_address_new ();
+		const gchar *str = NULL;
 
+		str = tny_msg_header_iface_get_from (header);
+		_foreach_email_add_to_inet_addr (str, from);
 
-		//camel_address_copy (from, camel_mime_message_get_from (message));
-		//camel_address_copy (recipients, camel_mime_message_get_from (message));
+		str = tny_msg_header_iface_get_to (header);
+		_foreach_email_add_to_inet_addr (str, recipients);
 
-		
-		camel_transport_send_to (transport, message, from, 
-			recipients, &ex);
+		camel_transport_send_to (transport, message, (CamelAddress*)from, 
+			(CamelAddress*)recipients, &ex);
 
 		camel_object_unref (CAMEL_OBJECT (from));
 		camel_object_unref (CAMEL_OBJECT (recipients));
-
 	}
 
 	return;
@@ -105,9 +134,8 @@ tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyTransportAccount *self = (TnyTransportAccount *)instance;
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
-
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
-
+	apriv->reconnect_func = reconnect;
 
 	return;
 }

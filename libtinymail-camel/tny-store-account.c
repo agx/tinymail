@@ -44,6 +44,54 @@ static GObjectClass *parent_class = NULL;
 #define TNY_STORE_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
 
+
+
+
+static void 
+reconnect (TnyAccountPriv *priv)
+{
+	if (priv->proto && priv->user && priv->host)
+	{
+		CamelURL *url = NULL;
+		gchar *proto = g_strdup_printf ("%s://", priv->proto); 
+
+		url = camel_url_new (proto, priv->ex);
+		g_free (proto);
+	
+		camel_url_set_protocol (url, priv->proto); 
+
+		camel_url_set_user (url, priv->user);
+		camel_url_set_host (url, priv->host);
+	
+		if (priv->url_string)
+			g_free (priv->url_string);
+
+		priv->url_string = camel_url_to_string (url, 0);
+
+		if (priv->service)
+			camel_object_unref (CAMEL_OBJECT (priv->service));
+	
+		priv->service = camel_session_get_service 
+			(CAMEL_SESSION (priv->session), priv->url_string, 
+			priv->type, priv->ex);
+	
+		if (priv->service == NULL) {
+			g_error ("couldn't get service %s: %s\n", priv->url_string,
+				   camel_exception_get_description (priv->ex));
+			camel_exception_clear (priv->ex);
+			return;
+		}
+
+		camel_url_free (url);
+	}
+
+	if (priv->service && priv->pass_func_set && priv->proto && priv->user && priv->host)
+		camel_service_connect (priv->service, priv->ex);
+
+	return;
+}
+
+
 static void
 destroy_folder (gpointer data, gpointer user_data)
 {
@@ -267,8 +315,10 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 
+	apriv->reconnect_func = reconnect;
 	apriv->type = CAMEL_PROVIDER_STORE;
 	priv->folders = NULL;
+
 	priv->folders_lock = g_mutex_new ();
 
 	return;

@@ -23,6 +23,7 @@
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header.h>
 
+#include "tny-camel-common-priv.h"
 #include "tny-msg-folder-priv.h"
 #include "tny-msg-header-priv.h"
 
@@ -204,7 +205,6 @@ tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* fol
 }
 
 
-
 static const gchar*
 tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
 {
@@ -219,78 +219,7 @@ tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
 	return retval;
 }
 
-static void
-one_record_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
-{
-	char *stfnd = NULL;
-	
-	stfnd = strchr (tok, '<');
-	
-	if (stfnd)
-	{
-		char *name = (char*)tok, *lname = NULL;
-		char *email = stfnd+1, *gtfnd = NULL;
 
-		lname = stfnd-1;
-
-		gtfnd = strchr (stfnd, '>');
-	
-		if (!gtfnd)
-		{
-			g_warning ("Invalid e-mail address in field");
-			return;
-		}
-	
-		*stfnd = '\0';
-		*gtfnd = '\0';
-	
-		if (*name == ' ')
-			*name++;
-	
-		if (*lname == ' ')
-			*lname-- = '\0';
-
-		camel_internet_address_add (target, name, email);
-	} else {
-		
-		char *name = (char*)tok;
-		char *lname = name;
-
-		lname += (strlen (name)-1);
-
-		if (*name == ' ')
-			*name++;
-	
-		if (*lname == ' ')
-			*lname-- = '\0';
-
-		camel_internet_address_add (target, NULL, name);
-	}
-}
-
-static void
-foreach_field_add_to_inet_addr (TnyMsgHeaderIface *self, const gchar *record, CamelInternetAddress *target)
-{
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-
-	int length = strlen (record), i = 0;
-	char *dup = g_strdup (record);
-	char *tok, *save;
-
-	tok = strtok_r (dup, ",;", &save);
-
-	while (tok != NULL)
-	{
-		
-		one_record_to_camel_inet_addr (tok, target);
-
-		tok = strtok_r (NULL, ",;", &save);
-	}
-
-	g_free (dup);
-
-	return;
-}
 
 static void
 tny_msg_header_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
@@ -300,7 +229,7 @@ tny_msg_header_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
 
 	g_mutex_lock (me->hdr_lock);
 
-	foreach_field_add_to_inet_addr (self, bcc, addr);
+	_foreach_email_add_to_inet_addr (bcc, addr);
 
 	prepare_for_write (me);
 
@@ -322,7 +251,7 @@ tny_msg_header_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
 
 	g_mutex_lock (me->hdr_lock);
 
-	foreach_field_add_to_inet_addr (self, cc, addr);
+	_foreach_email_add_to_inet_addr (cc, addr);
 
 	prepare_for_write (me);
 
@@ -346,7 +275,7 @@ tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
 	g_mutex_lock (me->hdr_lock);
 
 	dup = g_strdup (from);
-	one_record_to_camel_inet_addr (dup, addr);
+	_string_to_camel_inet_addr (dup, addr);
 	g_free (dup);
 
 	prepare_for_write (me);
@@ -386,7 +315,7 @@ tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
 
 	dup = g_strdup (to);
 
-	foreach_field_add_to_inet_addr (self, dup, addr);
+	_foreach_email_add_to_inet_addr (dup, addr);
 
 	g_free (dup);
 

@@ -76,13 +76,14 @@ send_test (void)
 
 	const gchar *the_text = "This is the body";
 
-	//tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), "");
+	/* tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), ""); */
 	tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), "smtp");
-	tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), "adasdasd");
+	tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), "....");
 	tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account), get_pass_func);
 
-	tny_msg_header_iface_set_to (header, "sadadsad");
-	tny_msg_header_iface_set_from (header, "sadasdasd");
+	tny_msg_header_iface_set_to (header, ".....");
+	tny_msg_header_iface_set_from (header, ".....");
+	tny_msg_header_iface_set_subject (header, "This is a simple test");
 
 	tny_msg_iface_set_header (msg, header);
 
@@ -90,7 +91,8 @@ send_test (void)
 
 	tny_stream_iface_write (stream, the_text, strlen (the_text));
 
-	//tny_msg_iface_add_part (msg, body);
+	/* This doesn't yet work */
+	/* tny_msg_iface_add_part (msg, body); */
 
 	tny_transport_account_iface_send (account, msg);
 

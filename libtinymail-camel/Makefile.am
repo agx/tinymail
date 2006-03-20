@@ -17,6 +17,8 @@ libtinymail_camel_1_0_headers =			\
 	tny-session-camel.h
 
 libtinymail_camel_1_0_la_SOURCES = 		\
+	tny-camel-common.c			\
+	tny-camel-common-priv.h			\
 	tny-account-priv.h			\
 	tny-store-account-priv.h		\
 	tny-transport-account-priv.h		\

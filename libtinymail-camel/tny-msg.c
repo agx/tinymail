@@ -202,9 +202,19 @@ static gint
 tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	CamelDataWrapper *containee = camel_medium_get_content_object 
-		(CAMEL_MEDIUM (priv->message));
+	CamelMedium *medium = CAMEL_MEDIUM (priv->message);
+	CamelDataWrapper *containee;
+
 	gint curl = 0;
+
+	containee = camel_medium_get_content_object (medium);
+
+	if (!containee)
+	{
+		containee = CAMEL_DATA_WRAPPER (camel_multipart_new ()); 
+		/* camel_data_wrapper_construct_from_stream (wrapper, cstream); */
+		camel_medium_set_content_object (medium, containee);
+	}
 
 	g_mutex_lock (priv->message_lock);
 
@@ -218,6 +228,8 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 
 	camel_multipart_add_part_at (CAMEL_MULTIPART (containee), 
 		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl);
+
+	camel_multipart_set_boundary (CAMEL_MULTIPART (containee), NULL);
 
 	unload_parts (priv);
 

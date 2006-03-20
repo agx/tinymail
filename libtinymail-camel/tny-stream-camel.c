@@ -50,7 +50,6 @@ struct _TnyStreamCamelPriv
 #define TNY_STREAM_CAMEL_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelPriv))
 
-
 static ssize_t
 tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
