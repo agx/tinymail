@@ -316,6 +316,8 @@ tny_msg_finalize (GObject *object)
 	priv->header = NULL;
 	g_mutex_unlock (priv->header_lock);
 
+	/* TOCHECK: This is probably not needed, the finalize of 
+	   mime-part also does it */
 	g_mutex_lock (priv->message_lock);
 	if (ppriv->part)
 		camel_object_unref (CAMEL_OBJECT (ppriv->part));
