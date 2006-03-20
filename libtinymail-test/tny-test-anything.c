@@ -70,8 +70,11 @@ send_test (void)
 	TnyMsgHeaderIface *header = 
 		TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
-	TnyStreamIface *mime_stream = TNY_STREAM_IFACE (tny_stream_camel_new (camel_stream_mem_new()));
-	TnyStreamIface *body_stream = TNY_STREAM_IFACE (tny_stream_camel_new (camel_stream_mem_new()));
+	TnyStreamIface *mime_stream = TNY_STREAM_IFACE 
+		(tny_stream_camel_new (camel_stream_mem_new()));
+
+	TnyStreamIface *body_stream = TNY_STREAM_IFACE 
+		(tny_stream_camel_new (camel_stream_mem_new()));
 
 	TnyMsgMimePartIface *mime_part = 
 		TNY_MSG_MIME_PART_IFACE (tny_msg_mime_part_new (camel_mime_part_new()));
