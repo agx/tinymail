@@ -417,6 +417,7 @@ static TnySessionCamel* the_singleton;
 TnySessionCamel*
 tny_session_camel_get_instance (void)
 {
+	/* TODO: potential problem: singleton without lock */
 	if (!the_singleton)
 	{
 		the_singleton = TNY_SESSION_CAMEL 

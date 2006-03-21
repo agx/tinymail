@@ -48,8 +48,10 @@ static GObjectClass *parent_class = NULL;
 
 
 static void 
-reconnect (TnyAccountPriv *priv)
+tny_store_account_reconnect (TnyAccount *self)
 {
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
 	if (priv->proto && priv->user && priv->host)
 	{
 		CamelURL *url = NULL;
@@ -315,7 +317,6 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	apriv->reconnect_func = reconnect;
 	apriv->type = CAMEL_PROVIDER_STORE;
 	priv->folders = NULL;
 
@@ -362,6 +363,8 @@ tny_store_account_class_init (TnyStoreAccountClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_store_account_finalize;
+
+	((TnyAccountClass*)class)->reconnect_func = tny_store_account_reconnect;
 
 	g_type_class_add_private (object_class, sizeof (TnyStoreAccountPriv));
 

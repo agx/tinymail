@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* TODO: Refactory this type to libtinymailui-gtk */
+
 #include <gtk/gtk.h>
 #include <tny-password-dialog.h>
 

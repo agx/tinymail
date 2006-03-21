@@ -47,6 +47,8 @@ struct _TnyAccount
 struct _TnyAccountClass 
 {
 	GObjectClass parent;
+
+	void (*reconnect_func) (TnyAccount *self);
 };
 
 GType                tny_account_get_type       (void);

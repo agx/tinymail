@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* TODO: Refactor this type to a libtinymail-emerge */
+
 #include <string.h>
 #include <glib.h>
 #include <gtk/gtk.h>
@@ -459,6 +461,8 @@ tny_account_store_constructor (GType type, guint n_construct_params,
 			GObjectConstructParam *construct_params)
 {
 	GObject *object;
+
+	/* TODO: potential problem: singleton without lock */
 
 	if (!the_singleton)
 	{

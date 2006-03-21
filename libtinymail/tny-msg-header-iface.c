@@ -121,8 +121,6 @@ tny_msg_header_iface_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
  *
  * The format is a comma separated list like this:
  * 
- * Real Name 1 <email@address1.com>, Real Name 2 <email@address2.com>
- *
  * So there's no quotes nor anything special.
  * 
  **/

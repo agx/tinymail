@@ -23,7 +23,6 @@
 #include <tny-session-camel.h>
 
 typedef struct _TnyAccountPriv TnyAccountPriv;
-typedef void (*ReconnectFunc) (TnyAccountPriv *priv);
 
 struct _TnyAccountPriv
 {
@@ -37,11 +36,6 @@ struct _TnyAccountPriv
 	gboolean pass_func_set, forget_pass_func_set;
 	const TnyAccountStoreIface *store;
 	CamelProviderType type;
-
-	/* Implementations of this type need to implement 
-	   these methods ! */
-
-	ReconnectFunc reconnect_func;
 };
 
 const CamelService*  _tny_account_get_service    (TnyAccount *self);

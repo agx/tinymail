@@ -84,7 +84,7 @@ tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 
 	priv->proto = g_strdup (proto);
 
-	priv->reconnect_func (priv);
+	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
 	
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -102,7 +102,7 @@ tny_account_set_user (TnyAccountIface *self, const gchar *user)
 
 	priv->user = g_strdup (user);
 
-	priv->reconnect_func (priv);
+	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -120,7 +120,7 @@ tny_account_set_hostname (TnyAccountIface *self, const gchar *host)
 
 	priv->host = g_strdup (host);
 
-	priv->reconnect_func (priv);
+	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -136,8 +136,8 @@ tny_account_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
 	tny_session_camel_set_pass_func (priv->session, self, get_pass_func);
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
-	
-	priv->reconnect_func (priv);
+
+	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -344,8 +344,6 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_id_func = tny_account_get_id;
 	klass->set_account_store_func = tny_account_set_account_store;
 	klass->get_account_store_func = tny_account_get_account_store;
-
-	/* priv->reconnect_func is a private to-implement method ! */
 
 	return;
 }

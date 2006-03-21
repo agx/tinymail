@@ -51,8 +51,10 @@ static GObjectClass *parent_class = NULL;
 
 
 static void 
-reconnect (TnyAccountPriv *priv)
+tny_transport_account_reconnect (TnyAccount *self)
 {
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
 	if (priv->proto && priv->host)
 	{
 		GString *urlstr = g_string_new ("");
@@ -135,7 +137,6 @@ tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
-	apriv->reconnect_func = reconnect;
 
 	return;
 }
@@ -174,6 +175,8 @@ tny_transport_account_class_init (TnyTransportAccountClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_transport_account_finalize;
+
+	((TnyAccountClass*)class)->reconnect_func = tny_transport_account_reconnect;
 
 	g_type_class_add_private (object_class, sizeof (TnyTransportAccountPriv));
 

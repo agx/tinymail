@@ -55,7 +55,6 @@ main (int argc, char **argv)
 
 	tny_summary_window_iface_set_account_store (TNY_SUMMARY_WINDOW_IFACE (window),
 		TNY_ACCOUNT_STORE_IFACE (tny_account_store_get_instance ()));
-
 	
 	g_signal_connect (window, "destroy",
 		G_CALLBACK (gtk_exit), 0);
