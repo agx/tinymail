@@ -70,51 +70,60 @@ send_test (void)
 	TnyMsgHeaderIface *header = 
 		TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
-	TnyStreamIface *mime_stream = TNY_STREAM_IFACE 
-		(tny_stream_camel_new (camel_stream_mem_new()));
+	/* TnyStreamIface *mime_stream = TNY_STREAM_IFACE 
+		(tny_stream_camel_new (camel_stream_mem_new())); */
+
+	const gchar /* *mime_text = "This is the text of a mime part", */
+		    *body_text = "Hey Tinne,\n\n"
+			"If you receive this message, it means tinymail works\n"
+			"\n\nPhilip";
 
 	TnyStreamIface *body_stream = TNY_STREAM_IFACE 
-		(tny_stream_camel_new (camel_stream_mem_new()));
+		(tny_stream_camel_new (
+			camel_stream_mem_new_with_buffer 
+				(body_text, strlen (body_text))));
 
+	/*
 	TnyMsgMimePartIface *mime_part = 
 		TNY_MSG_MIME_PART_IFACE (tny_msg_mime_part_new (camel_mime_part_new()));
-
-	const gchar *mime_text = "This is the text of a mime part",
-		    *body_text = "This is the text of the body";
+	*/
 
 	/* tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), ""); */
 	tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), "smtp");
-	tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), ".....");
+	tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), "SMTPSERVER");
 	tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account), get_pass_func);
 
-	tny_msg_header_iface_set_to (header, ".....");
-	tny_msg_header_iface_set_from (header, ".....");
-	tny_msg_header_iface_set_subject (header, "This is a simple test");
+	tny_msg_header_iface_set_to (header, "Tinne Hannes <tinne dot hannes at gmail dot com>, Philip Van Hoof <spam at pvanhoof dot be>");
+	tny_msg_header_iface_set_from (header, "Philip Van Hoof <spam at pvanhoof dot be>");
+	tny_msg_header_iface_set_subject (header, "A little tinymail test for my girlfriend");
 
 	tny_msg_iface_set_header (msg, header);
 
-	tny_stream_iface_reset (mime_stream);
+
+	/* tny_stream_iface_reset (mime_stream);
 	tny_stream_iface_write (mime_stream, mime_text, strlen (mime_text));
+	tny_stream_iface_reset (mime_stream); 
 
-	tny_msg_mime_part_iface_construct_from_stream (mime_part, mime_stream);
-	tny_msg_mime_part_iface_set_content_type (mime_part, "text/plain");
-	tny_msg_iface_add_part (msg, mime_part);
+	tny_msg_mime_part_iface_construct_from_stream (mime_part, mime_stream, "text/plain");
+	tny_msg_mime_part_iface_set_content_type (mime_part, "text/plain"); */
 
-	/* This might be wrong */
-	tny_stream_iface_reset (body_stream);
-	tny_stream_iface_write (body_stream, body_text, strlen (body_text));
-
-	tny_msg_mime_part_iface_construct_from_stream 
-		(TNY_MSG_MIME_PART_IFACE (msg), body_stream);
 	tny_msg_mime_part_iface_set_content_type 
 		(TNY_MSG_MIME_PART_IFACE (msg), "text/plain");
+
+	tny_stream_iface_reset (body_stream);
+
+	tny_msg_mime_part_iface_construct_from_stream 
+		(TNY_MSG_MIME_PART_IFACE (msg), body_stream, "text/plain");
+
+	/* TODO: Need to copy cameldatapart to camelmultipart stuff in the lib
+	tny_msg_iface_add_part (msg, mime_part); */
 
 	tny_transport_account_iface_send (account, msg);
 
 
 	g_object_unref (G_OBJECT (body_stream));
-	g_object_unref (G_OBJECT (mime_stream));
-	g_object_unref (G_OBJECT (mime_part));
+	/* g_object_unref (G_OBJECT (mime_stream)); */
+	/* g_object_unref (G_OBJECT (mime_part)); */
 	g_object_unref (G_OBJECT (header));
 	g_object_unref (G_OBJECT (msg));
 	g_object_unref (G_OBJECT (account));

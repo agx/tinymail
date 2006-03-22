@@ -61,6 +61,7 @@ An interfaces that defines a mime part type
 
 @self: 
 @stream: 
+@type: 
 @Returns: 
 
 

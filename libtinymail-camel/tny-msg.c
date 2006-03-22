@@ -16,6 +16,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+#include <time.h>
 
 #include <tny-msg.h>
 #include <tny-msg-mime-part-iface.h>
@@ -29,6 +30,8 @@
 
 static GObjectClass *parent_class = NULL;
 
+#include <camel/camel-types.h>
+
 #include "tny-msg-priv.h"
 #include "tny-msg-mime-part-priv.h"
 #include "tny-msg-header-priv.h"
@@ -37,6 +40,7 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG, TnyMsgPriv))
 
 typedef gboolean (*CamelPartFunc)(CamelMimeMessage *, CamelMimePart *, void *data);
+
 
 static gboolean
 message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartFunc callback, void *data)
@@ -251,6 +255,8 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 
 	return curl;
 }
+
+/* TODO: camel_mime_message_set_date(msg, time(0), 930); */
 
 static void 
 tny_msg_del_part (TnyMsgIface *self, gint id)

@@ -50,7 +50,6 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 
 	wrapper = camel_medium_get_content_object (medium);
 
-
 	if (!wrapper)
 	{
 		g_error ("Mime part does not yet have a source stream, use "
@@ -71,8 +70,9 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 }
 
 static gint
-tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream, const gchar *type)
 {
+
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	gint retval = -1;
@@ -81,20 +81,20 @@ tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 	
 	g_mutex_lock (priv->part_lock);
 	medium = CAMEL_MEDIUM (priv->part);
-	g_mutex_unlock (priv->part_lock);
 
 	wrapper = camel_medium_get_content_object (medium);
+	if (wrapper)
+		camel_object_unref (CAMEL_OBJECT (wrapper));
 
-	if (!wrapper)
-	{
-		wrapper = camel_data_wrapper_new (); 
-		camel_data_wrapper_construct_from_stream (wrapper, cstream);
-		camel_medium_set_content_object (medium, wrapper);
-	}
-
+	wrapper = camel_data_wrapper_new (); 
+	camel_data_wrapper_set_mime_type (wrapper, type);
 	retval = camel_data_wrapper_construct_from_stream (wrapper, cstream);
 
+	camel_medium_set_content_object(medium, wrapper);
+
 	camel_object_unref (CAMEL_OBJECT (cstream));
+
+	g_mutex_unlock (priv->part_lock);
 
 	return retval;
 }
@@ -110,8 +110,7 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 	
 	g_mutex_lock (priv->part_lock);
 	medium =  CAMEL_MEDIUM (priv->part);
-	g_mutex_unlock (priv->part_lock);
-
+	
 	wrapper = camel_medium_get_content_object (medium);
 
 	if (!wrapper)
@@ -126,6 +125,8 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 	camel_object_unref (CAMEL_OBJECT (stream));
 
 	tny_stream_iface_reset (retval);
+
+	g_mutex_unlock (priv->part_lock);
 
 	return retval;
 }
@@ -168,7 +169,8 @@ tny_msg_mime_part_content_type_is (TnyMsgMimePartIface *self, const gchar *type)
 
 	/* pocus ! */
 
-	retval = camel_content_type_is (ctype, (const char*)str1, (const char*)str2);
+	retval = camel_content_type_is (ctype, (const char*)str1, 
+			(const char*)str2);
 
 	g_free (dup);
 	g_free (str2);
@@ -338,11 +340,13 @@ tny_msg_mime_part_set_content_type (TnyMsgMimePartIface *self, const gchar *cont
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->part_lock);
+
 	camel_mime_part_set_content_type (priv->part, content_type);
 
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
+
 	g_mutex_unlock (priv->part_lock);
 
 	return;

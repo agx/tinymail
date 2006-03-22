@@ -203,9 +203,9 @@ tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIfa
  * Return value: 0 on success or -1 on fail
  **/
 gint
-tny_msg_mime_part_iface_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+tny_msg_mime_part_iface_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream, const gchar *type)
 {
-	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->construct_from_stream_func (self, stream);
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->construct_from_stream_func (self, stream, type);
 }
 
 

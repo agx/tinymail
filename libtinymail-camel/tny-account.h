@@ -51,7 +51,7 @@ struct _TnyAccountClass
 	void (*reconnect_func) (TnyAccount *self);
 };
 
-GType                tny_account_get_type       (void);
+GType tny_account_get_type (void);
 
 G_END_DECLS
 

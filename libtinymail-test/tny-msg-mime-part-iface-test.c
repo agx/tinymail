@@ -126,7 +126,7 @@ tny_msg_mime_part_iface_test_stream (void)
 	TnyStreamIface *to = TNY_STREAM_IFACE (tny_stream_camel_new (real_to));
 	gint n;
 
-	tny_msg_mime_part_iface_construct_from_stream (iface, from);
+	tny_msg_mime_part_iface_construct_from_stream (iface, from, "text/plain");
 	tny_msg_mime_part_iface_write_to_stream (iface, to);
 
 	while (!tny_stream_iface_eos (to) && n < 1)

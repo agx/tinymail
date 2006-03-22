@@ -44,7 +44,7 @@ struct _TnyMsgMimePartIfaceClass
 	TnyStreamIface* (*get_stream_func)           (TnyMsgMimePartIface *self);
 
 	void            (*write_to_stream_func)       (TnyMsgMimePartIface *self, TnyStreamIface *stream);
-	gint            (*construct_from_stream_func) (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+	gint            (*construct_from_stream_func) (TnyMsgMimePartIface *self, TnyStreamIface *stream, const gchar *type);
 
 	void            (*set_index_func)            (TnyMsgMimePartIface *self, guint index);
 	const guint     (*get_index_func)            (TnyMsgMimePartIface *self);
@@ -69,7 +69,7 @@ gboolean        tny_msg_mime_part_iface_content_type_is       (TnyMsgMimePartIfa
 
 TnyStreamIface* tny_msg_mime_part_iface_get_stream            (TnyMsgMimePartIface *self);
 void            tny_msg_mime_part_iface_write_to_stream       (TnyMsgMimePartIface *self, TnyStreamIface *stream);
-gint            tny_msg_mime_part_iface_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+gint            tny_msg_mime_part_iface_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream, const gchar *type);
 
 
 void            tny_msg_mime_part_iface_set_index             (TnyMsgMimePartIface *self, guint index);
