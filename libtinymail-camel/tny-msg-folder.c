@@ -503,7 +503,6 @@ tny_msg_folder_get_id (TnyMsgFolderIface *self)
 	return priv->folder_name;
 }
 
-gint s=0;
 static void
 tny_msg_folder_set_id (TnyMsgFolderIface *self, const gchar *id)
 {
