@@ -127,7 +127,7 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 		d->list = priv->cached_hdrs;
 		priv->cached_hdrs = NULL;
 		/* Speedup trick, also check tny-msg-header.c */
-		if (priv->cached_uids)
+		if (priv->folder && priv->cached_uids)
 			camel_folder_free_uids (priv->folder, priv->cached_uids);
 		priv->cached_uids = NULL;
 		g_mutex_unlock (priv->cached_hdrs_lock);
@@ -205,6 +205,45 @@ tny_msg_folder_get_folders (TnyMsgFolderIface *self)
 }
 
 
+static const gboolean
+tny_msg_folder_get_subscribed (TnyMsgFolderIface *self)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	gboolean retval;
+
+	g_mutex_lock (priv->folder_lock);
+	retval = priv->subscribed;
+	g_mutex_unlock (priv->folder_lock);
+
+	return (const gboolean)retval;
+}
+
+void /* Only internally used */
+_tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribed)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
+	g_mutex_lock (priv->folder_lock);
+	priv->subscribed = subscribed;
+	g_mutex_unlock (priv->folder_lock);
+
+	return;
+}
+
+static void
+tny_msg_folder_set_subscribed (TnyMsgFolderIface *self, const gboolean subscribed)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
+	/* These will synchronize me using _tny_msg_folder_set_subscribed_priv */
+	if (subscribed)
+		tny_store_account_iface_subscribe (TNY_STORE_ACCOUNT_IFACE (priv->account), self);
+	else
+		tny_store_account_iface_unsubscribe (TNY_STORE_ACCOUNT_IFACE (priv->account), self);
+
+	return;
+}
+
 static guint
 tny_msg_folder_get_unread_count (TnyMsgFolderIface *self)
 {
@@ -236,7 +275,11 @@ tny_msg_folder_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
+	g_object_ref (G_OBJECT (folder));
+
+	g_mutex_lock (priv->folders_lock);
 	priv->folders = g_list_append (priv->folders, folder);
+	g_mutex_unlock (priv->folders_lock);
 
 	/* Tell the observers */
 	g_signal_emit (self, tny_msg_folder_iface_signals [FOLDER_INSERTED], 0, folder);
@@ -576,26 +619,43 @@ tny_msg_folder_new (void)
 }
 
 
+static int count=0;
+
+static void
+destroy_folder (gpointer data, gpointer user_data)
+{
+	g_object_unref (G_OBJECT (data));
+}
+
 static void
 tny_msg_folder_finalize (GObject *object)
 {
 	TnyMsgFolder *self = (TnyMsgFolder*) object;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
+	if (priv->folders)
+	{
+		g_mutex_lock (priv->folders_lock);
+		g_list_foreach (priv->folders, destroy_folder, NULL);
+		g_mutex_unlock (priv->folders_lock);
+	}
+
+	tny_msg_folder_hdr_cache_remover (priv);
+
+	g_mutex_lock (priv->cached_hdrs_lock);
 	if (priv->folder)
 	{
 		g_mutex_lock (priv->folder_lock);
 		camel_object_unref (priv->folder);
 		g_mutex_unlock (priv->folder_lock);
 	}
+	g_mutex_unlock (priv->cached_hdrs_lock);
 
 	if (priv->cached_name)
 		g_free (priv->cached_name);
 
 	if (priv->cached_msgs)
 		g_hash_table_destroy (priv->cached_msgs);
-
-	tny_msg_folder_hdr_cache_remover (priv);
 
 	g_mutex_free (priv->cached_hdrs_lock);
 	priv->cached_hdrs_lock = NULL;
@@ -605,6 +665,9 @@ tny_msg_folder_finalize (GObject *object)
 
 	g_mutex_free (priv->folder_lock);
 	priv->folder_lock = NULL;
+
+	g_mutex_free (priv->folders_lock);
+	priv->folders_lock = NULL;
 
 	(*parent_class->finalize) (object);
 
@@ -655,6 +718,8 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_all_count_func = tny_msg_folder_get_all_count;
 	klass->get_account_func = tny_msg_folder_get_account;
 	klass->set_account_func = tny_msg_folder_set_account;
+	klass->get_subscribed_func = tny_msg_folder_get_subscribed;
+	klass->set_subscribed_func = tny_msg_folder_set_subscribed;
 
 	return;
 }
@@ -686,6 +751,8 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cached_hdrs_lock = g_mutex_new ();
 	priv->cached_msgs_lock = g_mutex_new ();
 	priv->folder_lock = g_mutex_new ();
+	priv->folders_lock = g_mutex_new ();
+
 	priv->cached_name = NULL;
 
 	return;

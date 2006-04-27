@@ -45,8 +45,10 @@ struct _TnyAccountStorePriv
 {
 	GConfClient *client;
 
-	GList *accounts;
+	GMutex *store_accounts_lock;
 	GList *store_accounts;
+
+	GMutex *transport_accounts_lock;
 	GList *transport_accounts;
 
 	guint notify;
@@ -69,25 +71,32 @@ destroy_account (gpointer data, gpointer user_data)
 }
 
 static void
+destroy_these_accounts (GList *accounts)
+{
+	g_list_foreach (accounts, destroy_account, NULL);
+	g_list_free (accounts);
+	accounts = NULL;
+
+	return;
+}
+
+static void
 destroy_current_accounts (TnyAccountStorePriv *priv)
 {
-	if (priv->accounts) 
-	{
-		g_list_foreach (priv->accounts, destroy_account, NULL);
-
-		g_list_free (priv->accounts);
-
-		priv->accounts = NULL;
-	}
+	g_mutex_lock (priv->store_accounts_lock);
+	g_mutex_lock (priv->transport_accounts_lock);
 
 	if (priv->store_accounts)
-		g_list_free (priv->store_accounts);
+		destroy_these_accounts (priv->store_accounts);
 
 	if (priv->transport_accounts)
-		g_list_free (priv->transport_accounts);
+		destroy_these_accounts (priv->transport_accounts);
 
 	priv->transport_accounts = NULL;
 	priv->store_accounts = NULL;
+
+	g_mutex_unlock (priv->transport_accounts_lock);
+	g_mutex_unlock (priv->store_accounts_lock);
 
 	return;
 }
@@ -145,38 +154,25 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	return;
 }
 
-static void
-destroy_trick (TnyAccountStoreIface *self)
+static TnyAccountIface *
+find_account_by_gconf_key (GList *accounts, const gchar *key)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyAccountIface *found = NULL;
 
-	/* An account got added, so we simple reload all */
+	while (accounts)
+	{
+		TnyAccountIface *account = accounts->data;
+		const gchar *aid = tny_account_iface_get_id (account);
+		
+		if (strcmp (key, aid)==0)
+		{
+			found = account;
+			break;
+		}
+		accounts = g_list_next (accounts);
+	}
 
-	GList *old = priv->accounts;
-	priv->accounts = NULL;
-
-	/* Tell the observers that they should reload */
-
-	g_signal_emit (self, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
-
-	priv->accounts = old;
-
-	/* The reason why I switch these GList pointers is because the 
-	 * observers might want to reload their views. This means
-	 * uncaching the header instances. But if we destroy all folders
-	 * in the accounts, also the header instances would get
-	 * destroyed (to early, as the model wants to try first). This
-	 * isn't garbage collection where stuff like this wouldn't 
-	 * be a real problem.
-	 *
-	 * By switching the pointer before notifying the observers, we
-	 * act as if the folder-count has become zero. Afterwards we'll
-	 * take care of finishing the stuff ourselves.
-	 */
-
-	destroy_current_accounts (priv);
-
-	return;
+	return found;
 }
 
 static void
@@ -191,29 +187,28 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 
 	if (!strcmp (ptr, "count"))
 	{
-		destroy_trick (self);
-	} else 
-	{
-		GList *accounts = priv->accounts;
+		destroy_current_accounts (priv);
+
+		g_signal_emit (self, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+
+	} else {
+		GList *accounts;
 		TnyAccountIface *found = NULL;
 		const gchar *val;
 
 		/* Whooo, crazy pointer hocus! */
 		gchar orig = *ptr--; *ptr = '\0';
 
-		while (accounts)
-		{
-			TnyAccountIface *account = accounts->data;
-			const gchar *aid = tny_account_iface_get_id (account);
-			
-			if (strcmp (key, aid)==0)
-			{
-				found = account;
-				break;
-			}
+		g_mutex_lock (priv->transport_accounts_lock);
+		accounts = priv->transport_accounts;
+		found = find_account_by_gconf_key (accounts, key);
+		g_mutex_unlock (priv->transport_accounts_lock);
 
-			accounts = g_list_next (accounts);
-		}
+		g_mutex_lock (priv->store_accounts_lock);
+		accounts = priv->store_accounts;
+		if (!found) 
+			found = find_account_by_gconf_key (accounts, key);
+		g_mutex_unlock (priv->store_accounts_lock);
 
 		/* pocus! */
 		*ptr = orig; *ptr++;
@@ -238,10 +233,7 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	if (priv->accounts)
-	{
-		destroy_trick (self);
-	}
+	destroy_current_accounts (priv);
 
 	gint i=0, count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
 
@@ -295,11 +287,6 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 		 */
 
 		tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account), per_account_get_pass_func);
-
-		/* Uncertain (the _new is already a ref, right?) */
-		/* g_object_ref (G_OBJECT (account)); */
-
-		priv->accounts = g_list_append (priv->accounts, account);
 	}
 }
 
@@ -307,11 +294,16 @@ static const GList*
 tny_account_store_get_store_accounts (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	const GList *retval;
 
-	if (!priv->accounts)
+	if (!priv->store_accounts)
 		tny_account_store_get_all_accounts (self);
 
-	return (const GList*) priv->store_accounts;
+	g_mutex_lock (priv->store_accounts_lock);
+	retval = (const GList*) priv->store_accounts;
+	g_mutex_unlock (priv->store_accounts_lock);
+
+	return retval;
 }
 
 
@@ -319,11 +311,16 @@ static const GList*
 tny_account_store_get_transport_accounts (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	const GList *retval;
 
-	if (!priv->accounts)
+	if (!priv->transport_accounts)
 		tny_account_store_get_all_accounts (self);
 
-	return (const GList*) priv->transport_accounts;
+	g_mutex_lock (priv->transport_accounts_lock);
+	retval = (const GList*) priv->transport_accounts;
+	g_mutex_unlock (priv->transport_accounts_lock);
+
+	return retval;
 }
 
 /*
@@ -334,17 +331,14 @@ tny_account_store_get_transport_accounts (TnyAccountStoreIface *self)
 	gconftool-2 -s /apps/tinymail/accounts/0/type -t string [transport|store]
 */
 
-static gchar*
-tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account)
+static void
+tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	gchar *key = NULL;
-	gchar *retval;
 	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
 
 	count++;
-
-	retval = g_strdup_printf ("/apps/tinymail/accounts/%d", count);
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
@@ -356,6 +350,10 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 		tny_account_iface_get_proto (account), NULL);
 	g_free (key); 
 
+	key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", count);
+	gconf_client_set_string (priv->client, (const gchar*) key, type, NULL);
+	g_free (key); 
+
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
 		tny_account_iface_get_user (account), NULL);
@@ -364,13 +362,7 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
 		count, NULL);
 
-	/* Double check this one */
-	g_object_ref (G_OBJECT (account));
-	priv->accounts = g_list_append (priv->accounts, account);
-
-	g_signal_emit (self, tny_account_store_iface_signals [ACCOUNT_INSERTED], 0, account);
-
-	return retval;
+	return;
 }
 
 static void
@@ -378,12 +370,14 @@ tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccount
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	gchar *key = tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account));
-	gchar *keytype = g_strdup_printf ("%s/type", key);
+	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
+	g_object_ref (G_OBJECT (account));
 
-	gconf_client_set_string (priv->client, (const gchar*) keytype, "store", NULL);
+	g_mutex_lock (priv->store_accounts_lock);
+	priv->store_accounts = g_list_append (priv->store_accounts, account);
+	g_mutex_unlock (priv->store_accounts_lock);
 
-	g_free (keytype); g_free (key);
+	g_signal_emit (self, tny_account_store_iface_signals [ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
@@ -393,12 +387,14 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	gchar *key = tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account));
-	gchar *keytype = g_strdup_printf ("%s/type", key);
+	g_object_ref (G_OBJECT (account));
+	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
 
-	gconf_client_set_string (priv->client, (const gchar*) keytype, "transport", NULL);
+	g_mutex_lock (priv->transport_accounts_lock);
+	priv->transport_accounts = g_list_append (priv->transport_accounts, account);
+	g_mutex_unlock (priv->transport_accounts_lock);
 
-	g_free (keytype); g_free (key);
+	g_signal_emit (self, tny_account_store_iface_signals [ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
@@ -424,6 +420,9 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyAccountStore *self = (TnyAccountStore *)instance;
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
+	priv->store_accounts_lock = g_mutex_new ();
+	priv->transport_accounts_lock = g_mutex_new ();
+
 	priv->client = gconf_client_get_default ();
 
 	gconf_client_add_dir (priv->client, "/apps/tinymail", 
@@ -443,11 +442,16 @@ tny_account_store_finalize (GObject *object)
 	TnyAccountStore *self = (TnyAccountStore *)object;	
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-
 	gconf_client_notify_remove (priv->client, priv->notify);
 	g_object_unref (G_OBJECT (priv->client));
 
 	destroy_current_accounts (priv);
+
+	g_mutex_free (priv->store_accounts_lock);
+	g_mutex_free (priv->transport_accounts_lock);
+
+	priv->store_accounts_lock = NULL;
+	priv->transport_accounts_lock = NULL;
 
 	(*parent_class->finalize) (object);
 

@@ -37,13 +37,13 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-account-priv.h"
 #include "tny-store-account-priv.h"
+#include "tny-msg-folder-priv.h"
 
 #include <tny-camel-shared.h>
 #include <tny-account-store-iface.h>
 
 #define TNY_STORE_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
-
 
 
 
@@ -101,7 +101,7 @@ destroy_folder (gpointer data, gpointer user_data)
 }
 
 static void 
-uncache (TnyStoreAccountPriv *priv)
+tny_store_account_clear_folders (TnyStoreAccountPriv *priv)
 {
 	if (priv->folders)
 	{
@@ -125,37 +125,44 @@ uncache (TnyStoreAccountPriv *priv)
 }
 
 static void 
-fill_folders_recursive (TnyStoreAccountIface *self, TnyMsgFolderIface *parent, CamelFolderInfo *iter, TnyStoreAccountFolderType type)
+fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFolderIface *parent, CamelFolderInfo *iter, TnyStoreAccountFolderType type)
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
 	while (iter)
 	{
+		gboolean subscribed = TRUE;
 		TnyMsgFolderIface *iface = TNY_MSG_FOLDER_IFACE (
 			tny_msg_folder_new ());
 
 		tny_msg_folder_iface_set_id (iface, iter->full_name);
 		tny_msg_folder_iface_set_account (iface, TNY_ACCOUNT_IFACE (self));
 
+
+		if (type == TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL)
+			subscribed = camel_store_folder_subscribed (store, iter->full_name);
+
+		/* Sync */
+		_tny_msg_folder_set_subscribed_priv (iface, subscribed);
+
 		if (parent)
 		{
 			tny_msg_folder_iface_add_folder (parent, iface);
+			/* _add_folder parents to the folder by reffing */
+			g_object_unref (G_OBJECT (iface)); 
+
 		} else 
 		{
 			g_mutex_lock (priv->folders_lock);
-			if (type == TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED)
-				priv->folders = g_list_append (priv->folders, iface);
-			else
-				priv->ufolders = g_list_append (priv->ufolders, iface);
+			priv->folders = g_list_append (priv->folders, iface);
 			g_mutex_unlock (priv->folders_lock);
+
+			/* No unref keeps current folder the parent ref */
 		}
 
 		tny_msg_folder_iface_uncache (iface);
 
-		fill_folders_recursive (self, iface, iter->child, type);
-
-		/* Tell the observers that they should reload */
-		g_signal_emit (iface, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+		fill_folders_recursive (self, store, iface, iter->child, type);
 
 		iter = iter->next;
 	}
@@ -171,7 +178,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 
-	uncache (priv);
+	tny_store_account_clear_folders (priv);
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
@@ -180,50 +187,47 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 
 	if (g_ascii_strcasecmp (tny_account_iface_get_proto (TNY_ACCOUNT_IFACE (self)), "pop") != 0)
 	{
+		CamelFolderInfo *info;
 
 		switch (type)
 		{
 			case TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL:
-			{
-				CamelFolderInfo *info = camel_store_get_folder_info 
+				info = camel_store_get_folder_info 
 					(store, "", CAMEL_STORE_FOLDER_INFO_FAST |
 						CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 						CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
-		
-				fill_folders_recursive (self, NULL, info, type);
-			
-				camel_store_free_folder_info (store, info);
-
-				g_mutex_lock (priv->folders_lock);
-				retval = priv->ufolders;
-				g_mutex_unlock (priv->folders_lock);
-
-			} break;
+				break;
 
 			case TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED:
 			default:
-			{
-				CamelFolderInfo *info = camel_store_get_folder_info 
+				info = camel_store_get_folder_info 
 					(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
 						CAMEL_STORE_FOLDER_INFO_RECURSIVE | 
 						CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 						CAMEL_STORE_FOLDER_INFO_FAST, &ex);
-		
-				fill_folders_recursive (self, NULL, info, type);
-			
-				camel_store_free_folder_info (store, info);
 
-				g_mutex_lock (priv->folders_lock);
-				retval = priv->folders;
-				g_mutex_unlock (priv->folders_lock);
-
-			} break;
+				break;
 		}
+
+		fill_folders_recursive (self, store, NULL, info, type);
+
+		/* Tell the observers that they should reload */
+		if (priv->folders && priv->folders->data)
+			g_signal_emit (priv->folders->data, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+
+		camel_store_free_folder_info (store, info);
+
+		g_mutex_lock (priv->folders_lock);
+		retval = priv->folders;
+		g_mutex_unlock (priv->folders_lock);
+
 	} else 
 	{
 		TnyMsgFolderIface *inbox = TNY_MSG_FOLDER_IFACE (tny_msg_folder_new ());
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelFolder *folder = camel_store_get_inbox (store, &ex);
+
+		/* TODO: Implement subscription logic for POP */
 
 		g_object_ref (G_OBJECT (inbox));
 
@@ -268,6 +272,9 @@ tny_store_account_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *fold
 	if (astore)
 		g_signal_emit (astore, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
 
+	/* Sync */
+	_tny_msg_folder_set_subscribed_priv (folder, TRUE);
+
 	return;
 }
 
@@ -291,6 +298,9 @@ tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *fo
 
 	if (astore)
 		g_signal_emit (astore, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+
+	/* Sync */
+	_tny_msg_folder_set_subscribed_priv (folder, FALSE);
 
 	return;
 }
@@ -332,7 +342,7 @@ tny_store_account_finalize (GObject *object)
 	TnyStoreAccount *self = (TnyStoreAccount *)object;	
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
-	uncache (priv);
+	tny_store_account_clear_folders (priv);
 
 	g_mutex_free (priv->folders_lock);
 

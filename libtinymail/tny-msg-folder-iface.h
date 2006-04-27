@@ -78,6 +78,10 @@ struct _TnyMsgFolderIfaceClass
 
 	void           (*uncache_func)     (TnyMsgFolderIface *self);
 	const gboolean (*has_cache_func)   (TnyMsgFolderIface *self);
+
+	void           (*set_subscribed_func)    (TnyMsgFolderIface *self, const gboolean subscribed);
+	const gboolean (*get_subscribed_func)    (TnyMsgFolderIface *self);
+
 };
 
 GType          tny_msg_folder_iface_get_type     (void);
@@ -102,6 +106,9 @@ guint          tny_msg_folder_iface_get_all_count     (TnyMsgFolderIface *self);
 guint          tny_msg_folder_iface_get_unread_count  (TnyMsgFolderIface *self);
 void           tny_msg_folder_iface_uncache       (TnyMsgFolderIface *self);
 const gboolean tny_msg_folder_iface_has_cache     (TnyMsgFolderIface *self);
+
+void           tny_msg_folder_iface_set_subscribed    (TnyMsgFolderIface *self, const gboolean subscribed);
+const gboolean tny_msg_folder_iface_get_subscribed    (TnyMsgFolderIface *self);
 
 G_END_DECLS
 

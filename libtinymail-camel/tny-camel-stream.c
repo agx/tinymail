@@ -83,7 +83,6 @@ static int
 tny_camel_stream_close (CamelStream *stream)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
-
 	return tny_stream_iface_close (self->stream);
 }
 
@@ -91,7 +90,6 @@ static gboolean
 tny_camel_stream_eos (CamelStream *stream)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
-
 	return tny_stream_iface_eos (self->stream);
 }
 
@@ -99,7 +97,6 @@ static int
 tny_camel_stream_flush (CamelStream *stream)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
-
 	return tny_stream_iface_flush (self->stream);
 }
 
@@ -108,7 +105,6 @@ static int
 tny_camel_stream_reset (CamelStream *stream)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
-
 	return tny_stream_iface_reset (self->stream);
 }
 
@@ -116,9 +112,7 @@ static void
 tny_camel_stream_init (CamelObject *object)
 {
 	TnyCamelStream *self = (TnyCamelStream *)object;
-
 	self->stream = NULL;
-
 	return;
 }
 
@@ -144,7 +138,6 @@ tny_camel_stream_class_init (TnyCamelStreamClass *klass)
 	((CamelStreamClass *)klass)->reset = tny_camel_stream_reset;
 	((CamelStreamClass *)klass)->flush = tny_camel_stream_flush;
 
-	
 	return;
 }
 

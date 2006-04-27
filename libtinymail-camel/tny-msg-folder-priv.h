@@ -40,14 +40,19 @@ struct _TnyMsgFolderPriv
 
 	gchar *folder_name;
 	TnyAccountIface *account;
+
+	GMutex *folders_lock;
 	GList *folders;
 	guint cached_length, unread_length;
 
+	gboolean subscribed;
 	gboolean has_summary_cap;
 
 	gchar *cached_name;
 };
 
 CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);
+
+void _tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribed);
 
 #endif

@@ -23,6 +23,35 @@
 guint *tny_msg_folder_iface_signals;
 
 /**
+ * tny_msg_folder_iface_set_subscribed:
+ * @self: a TnyMsgFolderIface object
+ * @subscribed: Whether or not to subscribe to the folder
+ *
+ * Set the subscribed status of this folder.
+ * 
+ **/
+void
+tny_msg_folder_iface_set_subscribed (TnyMsgFolderIface *self, const gboolean subscribed)
+{
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_subscribed_func (self, subscribed);
+	return;
+}
+
+/**
+ * tny_msg_folder_iface_get_subscribed:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get the subscribed status of this folder.
+ * 
+ * Return value: subscribe status
+ **/
+const gboolean
+tny_msg_folder_iface_get_subscribed (TnyMsgFolderIface *self)
+{
+	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_subscribed_func (self);
+}
+
+/**
  * tny_msg_folder_iface_get_unread_count:
  * @self: a TnyMsgFolderIface object
  * 

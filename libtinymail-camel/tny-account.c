@@ -45,7 +45,13 @@ static void
 tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	if (priv->store)
+		g_object_unref (G_OBJECT (priv->store));
+
+	g_object_ref (G_OBJECT (store));
 	priv->store = store;
+
 	return;
 }
 
@@ -53,6 +59,7 @@ static const TnyAccountStoreIface*
 tny_account_get_account_store (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
 	return priv->store;
 }
 
@@ -314,6 +321,8 @@ tny_account_finalize (GObject *object)
 		g_free (priv->proto);
 	g_static_rec_mutex_unlock (priv->service_lock);
 
+	if (priv->store)
+		g_object_unref (G_OBJECT (priv->store));
 
 	camel_exception_free (priv->ex);
 
