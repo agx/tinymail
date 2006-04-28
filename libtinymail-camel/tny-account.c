@@ -46,10 +46,9 @@ tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	if (priv->store)
-		g_object_unref (G_OBJECT (priv->store));
+	/* No need to reference (would also be cross reference): If store dies,
+	   self should also die. */
 
-	g_object_ref (G_OBJECT (store));
 	priv->store = store;
 
 	return;
@@ -70,6 +69,7 @@ tny_account_set_id (TnyAccountIface *self, const gchar *id)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->service_lock);
+
 	if (priv->id)
 		g_free (priv->id);
 
@@ -86,6 +86,7 @@ tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
 	g_static_rec_mutex_lock (priv->service_lock);
+
 	if (priv->proto)
 		g_free (priv->proto);
 
@@ -104,6 +105,7 @@ tny_account_set_user (TnyAccountIface *self, const gchar *user)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
 	g_static_rec_mutex_lock (priv->service_lock);
+
 	if (priv->user)
 		g_free (priv->user);
 
@@ -122,6 +124,7 @@ tny_account_set_hostname (TnyAccountIface *self, const gchar *host)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
 	g_static_rec_mutex_lock (priv->service_lock);
+
 	if (priv->host)
 		g_free (priv->host);
 
@@ -135,14 +138,18 @@ tny_account_set_hostname (TnyAccountIface *self, const gchar *host)
 }
 
 void
-tny_account_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
+tny_account_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_func)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->service_lock);
+
 	tny_session_camel_set_pass_func (priv->session, self, get_pass_func);
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
+
+	if (!TNY_ACCOUNT_GET_CLASS (self)->reconnect_func)
+		g_error ("This TnyAccountIface instance isn't a fully implemented type\n");
 
 	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
 
@@ -152,14 +159,16 @@ tny_account_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
 }
 
 void
-tny_account_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forget_pass_func)
+tny_account_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->service_lock);
+
 	tny_session_camel_set_forget_pass_func (priv->session, self, get_forget_pass_func);
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
+
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
@@ -217,11 +226,11 @@ tny_account_get_hostname (TnyAccountIface *self)
 	return retval;
 }
 
-GetPassFunc
+TnyGetPassFunc
 tny_account_get_pass_func (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	GetPassFunc retval;
+	TnyGetPassFunc retval;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 	retval = priv->get_pass_func;
@@ -230,11 +239,11 @@ tny_account_get_pass_func (TnyAccountIface *self)
 	return retval;
 }
 
-ForgetPassFunc
+TnyForgetPassFunc
 tny_account_get_forget_pass_func (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	ForgetPassFunc retval;
+	TnyForgetPassFunc retval;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 	retval = priv->forget_pass_func;
@@ -320,9 +329,6 @@ tny_account_finalize (GObject *object)
 	if (priv->proto)
 		g_free (priv->proto);
 	g_static_rec_mutex_unlock (priv->service_lock);
-
-	if (priv->store)
-		g_object_unref (G_OBJECT (priv->store));
 
 	camel_exception_free (priv->ex);
 

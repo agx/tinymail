@@ -42,16 +42,16 @@ struct _TnyAccountIfaceClass
         void (*set_proto_func)             (TnyAccountIface *self, const gchar *proto);
         void (*set_user_func)              (TnyAccountIface *self, const gchar *user);
         void (*set_hostname_func)          (TnyAccountIface *self, const gchar *host);
-        void (*set_pass_func_func)         (TnyAccountIface *self, GetPassFunc get_pass_func);
-        void (*set_forget_pass_func_func)  (TnyAccountIface *self, ForgetPassFunc get_forget_pass_func);
+        void (*set_pass_func_func)         (TnyAccountIface *self, TnyGetPassFunc get_pass_func);
+        void (*set_forget_pass_func_func)  (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func);
 
         const gchar*    (*get_id_func )           (TnyAccountIface *self);
         const gchar*    (*get_proto_func )           (TnyAccountIface *self);
         const gchar*    (*get_user_func)             (TnyAccountIface *self);
         const gchar*    (*get_hostname_func)         (TnyAccountIface *self);
 
-        GetPassFunc     (*get_pass_func_func)        (TnyAccountIface *self);
-	ForgetPassFunc  (*get_forget_pass_func_func) (TnyAccountIface *self);
+        TnyGetPassFunc     (*get_pass_func_func)        (TnyAccountIface *self);
+	TnyForgetPassFunc  (*get_forget_pass_func_func) (TnyAccountIface *self);
 
 	void                         (*set_account_store_func)     (TnyAccountIface *self, const TnyAccountStoreIface *store);
 	const TnyAccountStoreIface*  (*get_account_store_func)     (TnyAccountIface *self);
@@ -65,17 +65,17 @@ void         tny_account_iface_set_id          (TnyAccountIface *self, const gch
 void         tny_account_iface_set_proto       (TnyAccountIface *self, const gchar *proto);
 void         tny_account_iface_set_user        (TnyAccountIface *self, const gchar *user);
 void         tny_account_iface_set_hostname    (TnyAccountIface *self, const gchar *host);
-void         tny_account_iface_set_pass_func   (TnyAccountIface *self, GetPassFunc get_pass_func);
+void         tny_account_iface_set_pass_func   (TnyAccountIface *self, TnyGetPassFunc get_pass_func);
 
 const gchar* tny_account_iface_get_id          (TnyAccountIface *self);
 
 const gchar* tny_account_iface_get_proto       (TnyAccountIface *self);
 const gchar* tny_account_iface_get_user        (TnyAccountIface *self);
 const gchar* tny_account_iface_get_hostname    (TnyAccountIface *self);
-GetPassFunc  tny_account_iface_get_pass_func   (TnyAccountIface *self);
+TnyGetPassFunc  tny_account_iface_get_pass_func   (TnyAccountIface *self);
 
-void         tny_account_iface_set_forget_pass_func   (TnyAccountIface *self, ForgetPassFunc get_forget_pass_func);
-ForgetPassFunc 
+void         tny_account_iface_set_forget_pass_func   (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func);
+TnyForgetPassFunc 
              tny_account_iface_get_forget_pass_func   (TnyAccountIface *self);
 
 void tny_account_iface_set_account_store       (TnyAccountIface *self, const TnyAccountStoreIface *store);

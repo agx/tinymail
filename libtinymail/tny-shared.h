@@ -42,8 +42,8 @@ typedef struct _TnyStreamIfaceClass TnyStreamIfaceClass;
 typedef struct _TnyAccountStoreIfaceClass TnyAccountStoreIfaceClass;
 typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
 typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
-typedef gchar* (*GetPassFunc) (TnyAccountIface *self, const gchar *prompt);
-typedef void (*ForgetPassFunc) (TnyAccountIface *self);
+typedef gchar* (*TnyGetPassFunc) (TnyAccountIface *self, const gchar *prompt);
+typedef void (*TnyForgetPassFunc) (TnyAccountIface *self);
 typedef enum _TnyStoreAccountFolderType TnyStoreAccountFolderType;
 
 G_END_DECLS

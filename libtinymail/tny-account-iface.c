@@ -89,7 +89,7 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
  * 
  **/
 void
-tny_account_iface_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc get_forget_pass_func)
+tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func)
 {
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_forget_pass_func_func (self, get_forget_pass_func);
 	return;
@@ -103,7 +103,7 @@ tny_account_iface_set_forget_pass_func (TnyAccountIface *self, ForgetPassFunc ge
  * 
  * Return value: A pointer to the forget-password function
  **/
-ForgetPassFunc
+TnyForgetPassFunc
 tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_forget_pass_func_func (self);
@@ -165,7 +165,7 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
  * 
  **/
 void
-tny_account_iface_set_pass_func (TnyAccountIface *self, GetPassFunc get_pass_func)
+tny_account_iface_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_func)
 {
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_pass_func_func (self, get_pass_func);
 	return;
@@ -221,7 +221,7 @@ tny_account_iface_get_hostname (TnyAccountIface *self)
  * 
  * Return value: A pointer to the get-password function
  **/
-GetPassFunc
+TnyGetPassFunc
 tny_account_iface_get_pass_func (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_pass_func_func (self);

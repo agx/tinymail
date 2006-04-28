@@ -51,7 +51,7 @@ static GList *forget_password_funcs = NULL;
 typedef struct
 {
 	CamelService *service;
-	GetPassFunc func;
+	TnyGetPassFunc func;
 	TnyAccountIface *account;
 
 } PrivPassFunc;
@@ -59,7 +59,7 @@ typedef struct
 typedef struct
 {
 	CamelService *service;
-	ForgetPassFunc func;
+	TnyForgetPassFunc func;
 	TnyAccountIface *account;
 
 } PrivForgetPassFunc;
@@ -79,7 +79,7 @@ typedef struct
  *
  **/
 void
-tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *account, ForgetPassFunc get_forget_pass_func)
+tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *account, TnyForgetPassFunc get_forget_pass_func)
 {
 	GList *copy = forget_password_funcs, *mark_del = NULL;
 	PrivForgetPassFunc *pf;
@@ -140,7 +140,7 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
  *
  **/
 void
-tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account, GetPassFunc get_pass_func)
+tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account, TnyGetPassFunc get_pass_func)
 {
 	GList *copy = password_funcs, *mark_del = NULL;
 	PrivPassFunc *pf;
@@ -194,7 +194,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	      const char *prompt, const char *item, guint32 flags, CamelException *ex)
 {
 	GList *copy = password_funcs;
-	GetPassFunc func;
+	TnyGetPassFunc func;
 	TnyAccountIface *account;
 	gboolean found = FALSE;
 	gchar *retval = NULL;
@@ -228,7 +228,7 @@ static void
 tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
 {
 	GList *copy = forget_password_funcs;
-	ForgetPassFunc func;
+	TnyForgetPassFunc func;
 	TnyAccountIface *account;
 	gboolean found = FALSE;
 

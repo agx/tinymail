@@ -31,8 +31,8 @@ struct _TnyAccountPriv
 	CamelService *service;
 	CamelException *ex;
 	gchar *url_string, *id, *user, *host, *proto;
-	GetPassFunc get_pass_func;
-	ForgetPassFunc forget_pass_func;
+	TnyGetPassFunc get_pass_func;
+	TnyForgetPassFunc forget_pass_func;
 	gboolean pass_func_set, forget_pass_func_set;
 	const TnyAccountStoreIface *store;
 	CamelProviderType type;
