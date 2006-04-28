@@ -34,6 +34,7 @@
 
 #include <tny-session-camel.h>
 
+#include <tny-account-store-iface.h>
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
 
@@ -383,9 +384,21 @@ tny_session_camel_ms_thread_status (CamelSession *session, CamelSessionThreadMsg
 static void
 tny_session_camel_init (TnySessionCamel *instance)
 {
-	CamelSession *session = CAMEL_SESSION (instance);
+}
 
-	gchar *base_directory = g_build_filename (g_get_home_dir (), ".tinymail", NULL);
+/**
+ * tny_session_camel_set_account_store:
+ * @self: a #TnySessionCamel object
+ * @account_store: the #TnyAccountStoreIface account store instance
+ *
+ *
+ **/
+void 
+tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface *account_store)
+{
+	CamelSession *session = CAMEL_SESSION (self);
+
+	gchar *base_directory = g_strdup (tny_account_store_iface_get_cache_dir (account_store));
 	gchar *camel_dir = NULL;
 
 	if (camel_init (base_directory, TRUE) != 0)
@@ -394,7 +407,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 		exit (1);
 	}
 
-	camel_dir = g_build_filename (g_get_home_dir (), ".tinymail", "mail", NULL);
+	camel_dir = g_build_filename (base_directory, "mail", NULL);
 	camel_provider_init();
 	camel_session_construct (session, camel_dir);
 	camel_session_set_online ((CamelSession *) session, TRUE);
@@ -415,13 +428,19 @@ static TnySessionCamel* the_singleton;
  * Return value: The #TnySessionCamel singleton instance
  **/
 TnySessionCamel*
-tny_session_camel_get_instance (void)
+tny_session_camel_get_instance (TnyAccountStoreIface *account_store)
 {
 	/* TODO: potential problem: singleton without lock */
 	if (!the_singleton)
 	{
 		the_singleton = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
+
+		/* TODO: A session per account store? Might be doable. Atm is 
+		   account_store also a singleton. Nothing is stopping it from
+		   becoming a normal type, except this piece of code. */
+
+		tny_session_camel_set_account_store (the_singleton, account_store);
 	}
 
 	return the_singleton;
@@ -450,7 +469,7 @@ tny_session_camel_class_init (TnySessionCamelClass *tny_session_camel_class)
 
 	tny_session_camel_class->set_pass_func_func = tny_session_camel_set_pass_func;
 	tny_session_camel_class->set_forget_pass_func_func = tny_session_camel_set_forget_pass_func;
-
+	tny_session_camel_class->set_account_store_func = tny_session_camel_set_account_store;
 	return;
 }
 

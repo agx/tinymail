@@ -45,6 +45,8 @@ struct _TnyAccountStorePriv
 {
 	GConfClient *client;
 
+	gchar *cache_dir;
+
 	GMutex *store_accounts_lock;
 	GList *store_accounts;
 
@@ -226,6 +228,18 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 
 	g_free (key);
 	return;
+}
+
+
+static const gchar*
+tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
+{
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	if (!priv->cache_dir)
+		priv->cache_dir = g_build_filename (g_get_home_dir (), ".tinymail", NULL);
+
+	return priv->cache_dir;
 }
 
 static void
@@ -453,6 +467,9 @@ tny_account_store_finalize (GObject *object)
 	priv->store_accounts_lock = NULL;
 	priv->transport_accounts_lock = NULL;
 
+	if (priv->cache_dir)
+		g_free (priv->cache_dir);
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -510,6 +527,7 @@ tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_store_accounts_func = tny_account_store_get_store_accounts;
 	klass->add_transport_account_func = tny_account_store_add_transport_account;
 	klass->get_transport_accounts_func = tny_account_store_get_transport_accounts;
+	klass->get_cache_dir_func = tny_account_store_get_cache_dir;
 
 	return;
 }

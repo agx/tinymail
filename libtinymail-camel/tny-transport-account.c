@@ -55,7 +55,7 @@ tny_transport_account_reconnect (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	if (priv->proto && priv->host)
+	if (priv->session && priv->proto && priv->host)
 	{
 		GString *urlstr = g_string_new ("");
 

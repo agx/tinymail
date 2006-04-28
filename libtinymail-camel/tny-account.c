@@ -23,6 +23,8 @@
 
 #include <tny-account.h>
 
+#include <tny-session-camel.h>
+#include <tny-account-store-iface.h>
 #include <tny-msg-folder-iface.h>
 #include <tny-msg-folder.h>
 
@@ -48,8 +50,17 @@ tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface
 
 	/* No need to reference (would also be cross reference): If store dies,
 	   self should also die. */
-
+	
 	priv->store = store;
+
+	g_static_rec_mutex_lock (priv->service_lock);
+
+	priv->session = tny_session_camel_get_instance 
+		(TNY_ACCOUNT_STORE_IFACE (priv->store));
+
+	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
+
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
@@ -295,7 +306,6 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->proto = NULL;
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
-	priv->session = tny_session_camel_get_instance ();
 
 	priv->service_lock = g_new (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->service_lock);

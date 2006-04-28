@@ -32,6 +32,21 @@
 guint *tny_account_store_iface_signals = NULL;
 
 /**
+ * tny_account_store_iface_get_cache_dir:
+ * @self: a #TnyAccountTransportIface object
+ * 
+ * Get the local path that will be used for storing the disk cache
+ * 
+ * Return value: the local path that will be used for storing the disk cache
+ **/
+const gchar*
+tny_account_store_iface_get_cache_dir (TnyAccountStoreIface *self)
+{
+	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_cache_dir_func (self);
+}
+
+
+/**
  * tny_account_store_iface_get_transport_accounts:
  * @self: a #TnyAccountTransportIface object
  * 

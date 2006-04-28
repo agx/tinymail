@@ -52,7 +52,7 @@ tny_store_account_reconnect (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	if (priv->proto && priv->user && priv->host)
+	if (priv->session && priv->proto && priv->user && priv->host)
 	{
 		CamelURL *url = NULL;
 		gchar *proto = g_strdup_printf ("%s://", priv->proto); 
