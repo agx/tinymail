@@ -237,7 +237,24 @@ tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	if (!priv->cache_dir)
-		priv->cache_dir = g_build_filename (g_get_home_dir (), ".tinymail", NULL);
+	{
+		/* Note that there's no listener for this key. If it changes,
+		   the camelsession should be destroyed and rebuild from scratch.
+		   Which basically means reloading the accounts aswell. 
+		  
+		   So say you're a nut who wants this key to be updatable at 
+		   runtime, you'll have to unload all the accounts here, and of
+		   course reload them. All the functionality for that is already
+		   available. Perhaps I should just do it ... hmm, maybe another
+		   day. Soon. Perhaps. I don't know. Probably . . . . bleh. 
+
+		   Oh and, not to forget! You should probably also move the old
+		   cache location to the new one. Or cleanup the old one. */
+
+		gchar *cache_dir = gconf_client_get_string (priv->client, "/apps/tinymail/cache_dir", NULL);
+		priv->cache_dir = g_build_filename (g_get_home_dir (), cache_dir, NULL);
+		g_free (cache_dir);
+	}
 
 	return priv->cache_dir;
 }
@@ -338,6 +355,8 @@ tny_account_store_get_transport_accounts (TnyAccountStoreIface *self)
 }
 
 /*
+	gconftool-2 -s /apps/tinymail/cache_dir -t string .tinymail
+
 	gconftool-2 -s /apps/tinymail/accounts/count -t int COUNT
 	gconftool-2 -s /apps/tinymail/accounts/0/proto -t string [smtp|imap|pop]
 	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
