@@ -118,7 +118,8 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
 	{
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
-		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prompt);
+		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog),
+			prompt);
 
 		if (gtk_dialog_run (dialog) == GTK_RESPONSE_OK)
 		{
@@ -127,7 +128,8 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
 	
 			retval = g_strdup (pwd);
 
-			g_hash_table_insert (passwords, g_strdup (accountid), retval);
+			g_hash_table_insert (passwords, g_strdup (accountid), 
+				retval);
 		}
 
 		gtk_widget_destroy (GTK_WIDGET (dialog));
@@ -191,7 +193,8 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	{
 		destroy_current_accounts (priv);
 
-		g_signal_emit (self, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+		g_signal_emit (self, 
+			tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
 
 	} else {
 		GList *accounts;
@@ -266,9 +269,12 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
+	gint i=0, count;
+
 	destroy_current_accounts (priv);
 
-	gint i=0, count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
+	count = gconf_client_get_int (priv->client, 
+			"/apps/tinymail/accounts/count", NULL);
 
 	for (i=0; i < count; i++)
 	{
@@ -276,16 +282,19 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 		TnyAccountIface *account;
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", i);
-		type = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
+		type = gconf_client_get_string (priv->client, 
+			(const gchar*) key, NULL);
 		g_free (key);
 
 		if (type && !strcmp (type, "transport"))
 		{
 			account = TNY_ACCOUNT_IFACE (tny_transport_account_new ());
-			priv->transport_accounts = g_list_append (priv->transport_accounts, account);
+			priv->transport_accounts = 
+				g_list_append (priv->transport_accounts, account);
 		} else {
 			account = TNY_ACCOUNT_IFACE (tny_store_account_new ());
-			priv->store_accounts = g_list_append (priv->store_accounts, account);
+			priv->store_accounts = 
+				g_list_append (priv->store_accounts, account);
 		}
 
 		tny_account_iface_set_account_store (account, self);
@@ -294,32 +303,38 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 			g_free (type);
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
-		proto = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
+		proto = gconf_client_get_string (priv->client, 
+			(const gchar*) key, NULL);
 		g_free (key);
 		tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", i);
-		user = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
+		user = gconf_client_get_string (priv->client, 
+			(const gchar*) key, NULL);
 
 		g_free (key);
 		tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", i);
-		hostname = gconf_client_get_string (priv->client, (const gchar*) key, NULL);
+		hostname = gconf_client_get_string (priv->client, 
+			(const gchar*) key, NULL);
 		g_free (key); 
-		tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), hostname);
+		tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), 
+			hostname);
 		
 		g_free (hostname); g_free (proto); g_free (user);
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
-		tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), key); g_free (key);
+		tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), key);
+		g_free (key);
 
 		/* 
 		 * Setting the password function must happen after
 		 * setting the host, user and protocol.
 		 */
 
-		tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account), per_account_get_pass_func);
+		tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
+			per_account_get_pass_func);
 	}
 }
 
