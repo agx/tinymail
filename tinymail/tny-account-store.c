@@ -251,8 +251,10 @@ tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 		   Oh and, not to forget! You should probably also move the old
 		   cache location to the new one. Or cleanup the old one. */
 
-		gchar *cache_dir = gconf_client_get_string (priv->client, "/apps/tinymail/cache_dir", NULL);
-		priv->cache_dir = g_build_filename (g_get_home_dir (), cache_dir, NULL);
+		gchar *cache_dir = gconf_client_get_string (priv->client, 
+			"/apps/tinymail/cache_dir", NULL);
+		priv->cache_dir = g_build_filename (g_get_home_dir (), 
+			cache_dir, NULL);
 		g_free (cache_dir);
 	}
 
