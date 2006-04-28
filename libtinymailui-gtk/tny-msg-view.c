@@ -160,7 +160,7 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 	stream = tny_vfs_stream_new (handle);
 	tny_msg_mime_part_iface_write_to_stream (part, TNY_STREAM_IFACE (stream));
 
-	/* This also closes the gnome-vfs handle */
+	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
 	g_object_unref (G_OBJECT (stream));
 
 	return result;

@@ -470,6 +470,7 @@ tny_session_camel_class_init (TnySessionCamelClass *tny_session_camel_class)
 	tny_session_camel_class->set_pass_func_func = tny_session_camel_set_pass_func;
 	tny_session_camel_class->set_forget_pass_func_func = tny_session_camel_set_forget_pass_func;
 	tny_session_camel_class->set_account_store_func = tny_session_camel_set_account_store;
+
 	return;
 }
 
