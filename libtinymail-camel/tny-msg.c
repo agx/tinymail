@@ -212,6 +212,9 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 	CamelMedium *medium = CAMEL_MEDIUM (ppriv->part);
 	CamelDataWrapper *containee;
 
+	/* Inefficient implementation: Each time you add, the parts are 
+	   regenerated. */
+
 	gint curl = 0;
 
 	containee = camel_medium_get_content_object (medium);
@@ -246,7 +249,7 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 
 	/* Reload curl (locking granularity allows for changes during the foreach) */
 	g_mutex_lock (priv->parts_lock);
-	curl =  g_list_length (priv->parts);
+	curl = g_list_length (priv->parts);
 	g_mutex_unlock (priv->parts_lock);
 
 
@@ -317,13 +320,16 @@ tny_msg_finalize (GObject *object)
 	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->header_lock);
+
 	if (priv->header)
 		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;
+
 	g_mutex_unlock (priv->header_lock);
 
 	/* TOCHECK: This is probably not needed, the finalize of 
 	   mime-part also does it */
+
 	g_mutex_lock (priv->message_lock);
 	if (ppriv->part)
 		camel_object_unref (CAMEL_OBJECT (ppriv->part));
@@ -375,6 +381,50 @@ tny_msg_new_with_header (TnyMsgHeaderIface *header)
 	return self;
 }
 
+static void
+tny_msg_set_parts (TnyMsg *self, const GList *parts)
+{
+	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	CamelMedium *medium = CAMEL_MEDIUM (ppriv->part);
+	CamelDataWrapper *containee;
+	GList *list = (GList*)parts;
+	gint curl = 0;
+
+	unload_parts (priv);
+	
+	containee = camel_medium_get_content_object (medium);
+
+	if (!containee)
+	{
+		containee = CAMEL_DATA_WRAPPER (camel_multipart_new ()); 
+		/* camel_data_wrapper_construct_from_stream (wrapper, cstream); */
+		camel_medium_set_content_object (medium, containee);
+	}
+
+
+	g_mutex_lock (priv->message_lock);
+
+	while (list)
+	{
+		camel_multipart_add_part_at (CAMEL_MULTIPART (containee), 
+			tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (list->data)), curl++);
+
+		camel_multipart_set_boundary (CAMEL_MULTIPART (containee), NULL);
+
+		list = g_list_next (list);
+	}
+
+	message_foreach_part_rec (CAMEL_MIME_MESSAGE (ppriv->part), 
+		(CamelMimePart *)ppriv->part, 
+		received_a_part, priv);
+
+	/* Warning: large lock that locks code, not data */
+	g_mutex_unlock (priv->message_lock);
+
+	return;
+}
+
 /**
  * tny_msg_new_with_header_and_parts:
  * @header: a #TnyMsgHeaderIface object
@@ -389,16 +439,11 @@ TnyMsg*
 tny_msg_new_with_header_and_parts (TnyMsgHeaderIface *header, const GList *parts)
 {
 	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
-	GList *list = (GList*)parts;
+
 
 	tny_msg_set_header (TNY_MSG_IFACE (self), header);
 
-	while (list)
-	{
-		tny_msg_add_part (TNY_MSG_IFACE (self), 
-			TNY_MSG_MIME_PART_IFACE (list->data));
-		list = g_list_next (list);
-	}
+	tny_msg_set_parts (self, parts);
 
 	return self;
 }

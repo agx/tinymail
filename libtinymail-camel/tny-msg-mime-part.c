@@ -45,7 +45,11 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
 
 	g_mutex_lock (priv->part_lock);
+
 	medium = CAMEL_MEDIUM (priv->part);
+	camel_object_ref (CAMEL_OBJECT (medium));
+
+	/* Once medium is referenced, we can continue without lock */
 	g_mutex_unlock (priv->part_lock);
 
 	wrapper = camel_medium_get_content_object (medium);
@@ -66,6 +70,9 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
 
+	/* We are done, so unreference the reference above */
+	camel_object_unref (CAMEL_OBJECT (medium));
+
 	return;
 }
 
@@ -81,8 +88,11 @@ tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 	
 	g_mutex_lock (priv->part_lock);
 	medium = CAMEL_MEDIUM (priv->part);
+	camel_object_ref (CAMEL_OBJECT (medium));
+	g_mutex_unlock (priv->part_lock);
 
 	wrapper = camel_medium_get_content_object (medium);
+
 	if (wrapper)
 		camel_object_unref (CAMEL_OBJECT (wrapper));
 
@@ -94,7 +104,7 @@ tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
 
-	g_mutex_unlock (priv->part_lock);
+	camel_object_unref (CAMEL_OBJECT (medium));
 
 	return retval;
 }
@@ -110,7 +120,9 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 	
 	g_mutex_lock (priv->part_lock);
 	medium =  CAMEL_MEDIUM (priv->part);
-	
+	camel_object_ref (CAMEL_OBJECT (medium));
+	g_mutex_unlock (priv->part_lock);
+
 	wrapper = camel_medium_get_content_object (medium);
 
 	if (!wrapper)
@@ -121,12 +133,12 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 
 	retval = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
 
-	/* Loose own ref (the tnystreamcamel wrapper keeps one) */
+	/* Parenting: Loose own ref (the tnystreamcamel wrapper keeps one) */
 	camel_object_unref (CAMEL_OBJECT (stream));
 
 	tny_stream_iface_reset (retval);
 
-	g_mutex_unlock (priv->part_lock);
+	camel_object_unref (CAMEL_OBJECT (medium));
 
 	return retval;
 }
@@ -137,13 +149,16 @@ tny_msg_mime_part_get_content_type (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
-	g_mutex_lock (priv->part_lock);
 	if (!priv->cached_content_type)
 	{
-		CamelContentType *type = camel_mime_part_get_content_type (priv->part);
+		CamelContentType *type;
+
+		g_mutex_lock (priv->part_lock);
+		type = camel_mime_part_get_content_type (priv->part);
 		priv->cached_content_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
+		/* TODO: Q: camel_content_type_unref (type); */
+		g_mutex_unlock (priv->part_lock);
 	}
-	g_mutex_unlock (priv->part_lock);
 
 	return priv->cached_content_type;
 }
@@ -172,6 +187,8 @@ tny_msg_mime_part_content_type_is (TnyMsgMimePartIface *self, const gchar *type)
 	retval = camel_content_type_is (ctype, (const char*)str1, 
 			(const char*)str2);
 
+	/* TODO: Q: camel_content_type_unref (ctype); */
+
 	g_free (dup);
 	g_free (str2);
 
@@ -185,17 +202,15 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->part_lock);
+
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
-
 	priv->cached_content_type = NULL;
-
 	if (priv->part)
 		camel_object_unref (CAMEL_OBJECT (priv->part));
-
 	camel_object_ref (CAMEL_OBJECT (part));
-
 	priv->part = part;
+
 	g_mutex_unlock (priv->part_lock);
 
 	return;
@@ -342,7 +357,6 @@ tny_msg_mime_part_set_content_type (TnyMsgMimePartIface *self, const gchar *cont
 	g_mutex_lock (priv->part_lock);
 
 	camel_mime_part_set_content_type (priv->part, content_type);
-
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;

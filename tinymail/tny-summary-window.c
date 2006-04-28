@@ -433,7 +433,12 @@ tny_summary_window_finalize (GObject *object)
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
 
 	if (priv->account_store)
+	{
+		g_signal_handler_disconnect (G_OBJECT (priv->account_store),
+			priv->accounts_reloaded_signal);
+
 		g_object_unref (G_OBJECT (priv->account_store));
+	}
 
 	(*parent_class->finalize) (object);
 

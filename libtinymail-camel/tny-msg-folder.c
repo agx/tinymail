@@ -143,10 +143,11 @@ unload_folder (TnyMsgFolderPriv *priv)
 	tny_msg_folder_hdr_cache_uncacher (priv);
 
 	g_mutex_lock (priv->folder_lock);
+
 	if (priv->folder)
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
-
 	priv->folder = NULL;
+
 	g_mutex_unlock (priv->folder_lock);
 
 	return;
@@ -237,9 +238,11 @@ tny_msg_folder_set_subscribed (TnyMsgFolderIface *self, const gboolean subscribe
 
 	/* These will synchronize me using _tny_msg_folder_set_subscribed_priv */
 	if (subscribed)
-		tny_store_account_iface_subscribe (TNY_STORE_ACCOUNT_IFACE (priv->account), self);
+		tny_store_account_iface_subscribe 
+			(TNY_STORE_ACCOUNT_IFACE (priv->account), self);
 	else
-		tny_store_account_iface_unsubscribe (TNY_STORE_ACCOUNT_IFACE (priv->account), self);
+		tny_store_account_iface_unsubscribe
+			(TNY_STORE_ACCOUNT_IFACE (priv->account), self);
 
 	return;
 }
@@ -275,6 +278,8 @@ tny_msg_folder_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
+	/* We reference, so when reparenting folders, unref your instances */
+
 	g_object_ref (G_OBJECT (folder));
 
 	g_mutex_lock (priv->folders_lock);
@@ -300,6 +305,7 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyAccountIface *acco
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
+	/* No need to reference, would be a cross reference */
 	priv->account = TNY_ACCOUNT_IFACE (account);
 
 	return;
@@ -653,8 +659,11 @@ tny_msg_folder_finalize (GObject *object)
 	if (priv->cached_name)
 		g_free (priv->cached_name);
 
+	g_mutex_lock (priv->cached_msgs_lock);
 	if (priv->cached_msgs)
 		g_hash_table_destroy (priv->cached_msgs);
+	g_mutex_unlock (priv->cached_msgs_lock);
+
 
 	g_mutex_free (priv->cached_hdrs_lock);
 	priv->cached_hdrs_lock = NULL;

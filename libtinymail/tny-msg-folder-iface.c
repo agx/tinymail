@@ -120,7 +120,8 @@ tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
  * @self: a TnyMsgFolderIface object
  * @folder: the folder to add
  * 
- * Add a folder as child folder to the folder
+ * Add a folder as child folder to the folder. This function references the
+ * folder instance (take note when reparenting folders).
  * 
  **/
 void
