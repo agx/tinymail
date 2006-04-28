@@ -99,7 +99,7 @@
   (c-name "tny_account_iface_set_pass_func")
   (return-type "none")
   (parameters
-    '("GetPassFunc" "get_pass_func")
+    '("TnyGetPassFunc" "get_pass_func")
   )
 )
 
@@ -130,7 +130,7 @@
 (define-method get_pass_func
   (of-object "TnyAccountIface")
   (c-name "tny_account_iface_get_pass_func")
-  (return-type "GetPassFunc")
+  (return-type "TnyGetPassFunc")
 )
 
 (define-method set_forget_pass_func
@@ -138,14 +138,14 @@
   (c-name "tny_account_iface_set_forget_pass_func")
   (return-type "none")
   (parameters
-    '("ForgetPassFunc" "get_forget_pass_func")
+    '("TnyForgetPassFunc" "get_forget_pass_func")
   )
 )
 
 (define-method get_forget_pass_func
   (of-object "TnyAccountIface")
   (c-name "tny_account_iface_get_forget_pass_func")
-  (return-type "ForgetPassFunc")
+  (return-type "TnyForgetPassFunc")
 )
 
 

@@ -226,7 +226,7 @@
   (return-type "none")
   (parameters
     '("TnyAccountIface*" "account")
-    '("GetPassFunc" "get_pass_func")
+    '("TnyGetPassFunc" "get_pass_func")
   )
 )
 
@@ -236,7 +236,7 @@
   (return-type "none")
   (parameters
     '("TnyAccountIface*" "account")
-    '("ForgetPassFunc" "get_forget_pass_func")
+    '("TnyForgetPassFunc" "get_forget_pass_func")
   )
 )
 
