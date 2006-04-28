@@ -25,7 +25,8 @@
  * @self: a #TnyAccountIface object
  * @store: a #TnyAccountStoreIface object
  *
- * Set the parent account store for the account.
+ * Set the parent account store for the account. You need to set this property
+ * before you can start using the account.
  * 
  **/
 void
@@ -55,7 +56,7 @@ tny_account_iface_get_account_store (TnyAccountIface *self)
  * 
  * Get an unique id for the account.
  * 
- * Return value: Unique id
+ * Return value: Unique id. 
  **/
 const gchar*
 tny_account_iface_get_id (TnyAccountIface *self)
@@ -67,7 +68,8 @@ tny_account_iface_get_id (TnyAccountIface *self)
  * tny_account_iface_set_id:
  * @self: a #TnyAccountIface object
  * 
- * Set the accounts unique id.
+ * Set the accounts unique id. You need to set this property
+ * before you can start using the account.
  * 
  **/
 void 
@@ -86,6 +88,8 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
  * will return the password (get_pass_func).
  *
  * It's recommended to also memset (str, 0, strlen (str)) the memory.
+ *
+ * You need to set this property before you can start using the account.
  * 
  **/
 void
@@ -115,7 +119,8 @@ tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
  * @self: a #TnyAccountIface object
  * @proto: the protocol (ex. "imap")
  * 
- * Set the protocol of an account
+ * Set the protocol of an account. You need to set this property
+ * before you can start using the account.
  * 
  **/
 void
@@ -130,7 +135,8 @@ tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
  * @self: a #TnyAccountIface object
  * @user: the username
  * 
- * Set the user or login of an account
+ * Set the user or login of an account. You need to set this property
+ * before you can start using the account.
  * 
  **/
 void
@@ -145,7 +151,8 @@ tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
  * @self: a #TnyAccountIface object
  * @host: the hostname
  * 
- * Set the hostname of an account
+ * Set the hostname of an account. You need to set this property
+ * before you can start using the account.
  * 
  **/
 void
@@ -162,6 +169,8 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
  * 
  * Set the function that will be called when the password is needed.
  * The function must resturn a newly allocated string with the password.
+ *
+ * You need to set this property before you can start using the account.
  * 
  **/
 void
