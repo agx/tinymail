@@ -140,7 +140,7 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 
 	camel_object_ref (CAMEL_OBJECT (message));
 	ppriv->part = CAMEL_MIME_PART (message);
-
+	
 	unload_parts (priv);
 
 	message_foreach_part_rec (message, (CamelMimePart *)message, received_a_part, priv);
@@ -219,28 +219,38 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 
 	containee = camel_medium_get_content_object (medium);
 
-	if (!containee)
+	curl = g_list_length (priv->parts);
+
+	/* Warp it into a multipart */
+	if (!containee || !CAMEL_IS_MULTIPART (containee))
 	{
-		containee = CAMEL_DATA_WRAPPER (camel_multipart_new ()); 
-		/* camel_data_wrapper_construct_from_stream (wrapper, cstream); */
+
+		/* TODO: restore original mime part */
+
+		if (containee)
+			camel_object_unref (CAMEL_OBJECT (containee));
+
+		if (curl != 1)
+		{
+			g_print ("WARNING: strange situation (%d). This message wasn't a multipart, yet had multipe parts\n", curl);
+			unload_parts (priv);
+		}
+
+		curl = 0;
+		
+		containee = (CamelDataWrapper*)camel_multipart_new ();
+		camel_multipart_set_boundary ((CamelMultipart*)containee, NULL);
+
 		camel_medium_set_content_object (medium, containee);
 	}
 
 	g_mutex_lock (priv->message_lock);
 
-	curl = g_list_length (priv->parts);
-
-	curl++;
-
-
 	/* TODO: coupling mistake. This makes it obligated to use a specific
 	   implementation of MsgMimePartIface (the camel one). */
-
-	camel_multipart_add_part_at (CAMEL_MULTIPART (containee), 
-		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl);
-
-	camel_multipart_set_boundary (CAMEL_MULTIPART (containee), NULL);
-
+	camel_multipart_add_part_at ((CamelMultipart*)containee, 
+		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl++);
+	
 	unload_parts (priv);
 
 	message_foreach_part_rec (CAMEL_MIME_MESSAGE (ppriv->part), 
@@ -359,6 +369,8 @@ tny_msg_new (void)
 {
 	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
 	
+	_tny_msg_set_camel_mime_message (self, camel_mime_message_new  ());
+
 	return self;
 }
 
