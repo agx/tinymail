@@ -148,6 +148,12 @@ unload_folder (TnyMsgFolderPriv *priv)
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
 	priv->folder = NULL;
 
+	g_mutex_lock (priv->cached_msgs_lock);
+	if (priv->cached_msgs)
+		g_hash_table_destroy (priv->cached_msgs);
+	priv->cached_msgs = NULL;
+	g_mutex_unlock (priv->cached_msgs_lock);
+
 	g_mutex_unlock (priv->folder_lock);
 
 	return;
@@ -646,11 +652,6 @@ tny_msg_folder_finalize (GObject *object)
 	}
 
 	tny_msg_folder_hdr_cache_remover (priv);
-
-	g_mutex_lock (priv->cached_msgs_lock);
-	if (priv->cached_msgs)
-		g_hash_table_destroy (priv->cached_msgs);
-	g_mutex_unlock (priv->cached_msgs_lock);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
 	if (priv->folder)

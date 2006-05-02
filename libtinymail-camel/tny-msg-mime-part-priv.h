@@ -31,7 +31,6 @@ struct _TnyMsgMimePartPriv
 	GMutex *part_lock;
 	CamelMimePart *part;
 	gchar *cached_content_type;
-	guint index;
 };
 
 #define TNY_MSG_MIME_PART_GET_PRIVATE(o)	\

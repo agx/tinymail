@@ -448,8 +448,12 @@ tny_session_camel_get_instance (TnyAccountStoreIface *account_store)
 
 
 static void
-tny_session_camel_finalise (TnySessionCamel *session)
+tny_session_camel_finalise (CamelObject *object)
 {
+	
+	/* CamelObject types don't need parent finalization (build-in camel)
+	(*((CamelObjectClass*)ms_parent_class)->finalise) (object); */
+
 	return;
 }
 

@@ -122,8 +122,8 @@ send_test (gboolean multipart)
 	tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), "localhost");
 	tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account), get_pass_func);
 
-	tny_msg_header_iface_set_to (header, "Philip Van Hoof <spam at pvanhoof dot be>");
-	tny_msg_header_iface_set_from (header, "Philip Van Hoof <spam at pvanhoof dot be>");
+	tny_msg_header_iface_set_to (header, "Philip Van Hoof <spam@pvanhoof.be>");
+	tny_msg_header_iface_set_from (header, "Philip Van Hoof <spam@pvanhoof.be>");
 	tny_msg_header_iface_set_subject (header, "testing");
 
 	tny_msg_iface_set_header (msg, header);
@@ -165,6 +165,7 @@ send_test (gboolean multipart)
 	g_object_unref (G_OBJECT (mime_stream)); 
 	g_object_unref (G_OBJECT (mime_part)); 
 	g_object_unref (G_OBJECT (header));
+
 	g_object_unref (G_OBJECT (msg));
 	g_object_unref (G_OBJECT (account));
 

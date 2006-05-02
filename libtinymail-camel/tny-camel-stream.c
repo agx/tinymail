@@ -125,6 +125,9 @@ tny_camel_stream_finalize (CamelObject *object)
 	if (self->stream)
 		g_object_unref (G_OBJECT (self->stream));
 
+	/* CamelObject types don't need parent finalization (build-in camel)
+	(*((CamelObjectClass*)parent_class)->finalise) (object); */
+
 	return;
 }
 

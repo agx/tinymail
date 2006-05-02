@@ -17,24 +17,19 @@
  * Boston, MA 02111-1307, USA.
  */
 
-
-/* TODO: More finegrained locking */
-
 #include <string.h>
-
 #include <tny-msg-mime-part-iface.h>
 #include <tny-msg-mime-part.h>
-
 #include <tny-camel-stream.h>
-
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
-
 #include <tny-camel-shared.h>
 
 static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-mime-part-priv.h"
+
+/* Locking warning: tny-msg.c also locks priv->part_lock */
 
 static void
 tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
@@ -230,24 +225,6 @@ tny_msg_mime_part_get_part (TnyMsgMimePart *self)
 }
 
 
-static void
-tny_msg_mime_part_set_index (TnyMsgMimePartIface *self, guint index)
-{
-	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-
-	priv->index = index;
-
-	return;
-}
-
-static const guint
-tny_msg_mime_part_get_index (TnyMsgMimePartIface *self)
-{
-	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-
-	return priv->index;
-}
-
 static const gchar*
 tny_msg_mime_part_get_filename (TnyMsgMimePartIface *self)
 {
@@ -423,8 +400,6 @@ tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_stream_func = tny_msg_mime_part_get_stream;
 	klass->write_to_stream_func = tny_msg_mime_part_write_to_stream;
 	klass->construct_from_stream_func = tny_msg_mime_part_construct_from_stream;
-	klass->set_index_func = tny_msg_mime_part_set_index;
-	klass->get_index_func = tny_msg_mime_part_get_index;
 	klass->get_filename_func = tny_msg_mime_part_get_filename;
 	klass->get_content_id_func = tny_msg_mime_part_get_content_id;
 	klass->get_description_func = tny_msg_mime_part_get_description;

@@ -96,35 +96,6 @@ tny_msg_mime_part_iface_set_content_type (TnyMsgMimePartIface *self, const gchar
 
 
 /**
- * tny_msg_mime_part_iface_set_index:
- * @self: a #TnyMsgMimePartIface object
- * @index: the index
- * 
- * Set the index of a message part
- *
- **/
-void
-tny_msg_mime_part_iface_set_index (TnyMsgMimePartIface *self, guint index)
-{
-	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_index_func (self, index);
-	return;
-}
-
-/**
- * tny_msg_mime_part_iface_get_index:
- * @self: a #TnyMsgMimePartIface object
- * 
- *
- * Return value: the index of a message part
- **/
-const guint
-tny_msg_mime_part_iface_get_index (TnyMsgMimePartIface *self)
-{
-	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_index_func (self);
-}
-
-
-/**
  * tny_msg_mime_part_iface_get_filename:
  * @self: a #TnyMsgMimePartIface object
  * 

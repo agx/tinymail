@@ -145,11 +145,6 @@ tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_transport_account_finalize (GObject *object)
 {
-	/*
-	TnyTransportAccount *self = (TnyTransportAccount *)object;	
-	TnyTransportAccountPriv *priv = TNY_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
-	*/
-
 	(*parent_class->finalize) (object);
 
 	return;

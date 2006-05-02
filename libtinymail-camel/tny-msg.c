@@ -79,9 +79,9 @@ static gboolean
 received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
 	TnyMsgPriv *priv = data;
+
 	TnyMsgMimePartIface *tpart = TNY_MSG_MIME_PART_IFACE 
 			(tny_msg_mime_part_new (part));
-	TnyMsgMimePart *p = tny_msg_mime_part_new (part);
 
 	g_mutex_lock (priv->parts_lock);
 	priv->parts = g_list_append (priv->parts, tpart);
@@ -209,61 +209,48 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-	CamelMedium *medium = CAMEL_MEDIUM (ppriv->part);
+	CamelMedium *medium;
 	CamelDataWrapper *containee;
-
-	/* Inefficient implementation: Each time you add, the parts are 
-	   regenerated. */
-
+	TnyMsgMimePartIface *tpart;
 	gint curl = 0;
 
-	containee = camel_medium_get_content_object (medium);
+	g_mutex_lock (priv->message_lock);
+	g_mutex_lock (ppriv->part_lock);
 
-	curl = g_list_length (priv->parts);
+	medium = CAMEL_MEDIUM (ppriv->part);
+	containee = camel_medium_get_content_object (medium);
 
 	/* Warp it into a multipart */
 	if (!containee || !CAMEL_IS_MULTIPART (containee))
 	{
-
-		/* TODO: restore original mime part */
-
+		/* TODO: restore original mime part? */
 		if (containee)
 			camel_object_unref (CAMEL_OBJECT (containee));
 
-		if (curl != 1)
-		{
-			g_print ("WARNING: strange situation (%d). This message wasn't a multipart, yet had multipe parts\n", curl);
-			unload_parts (priv);
-		}
-
+		unload_parts (priv);
 		curl = 0;
-		
+
 		containee = (CamelDataWrapper*)camel_multipart_new ();
 		camel_multipart_set_boundary ((CamelMultipart*)containee, NULL);
-
 		camel_medium_set_content_object (medium, containee);
+	} else {
+		curl = g_list_length (priv->parts); curl++;
 	}
-
-	g_mutex_lock (priv->message_lock);
 
 	/* TODO: coupling mistake. This makes it obligated to use a specific
 	   implementation of MsgMimePartIface (the camel one). */
-	camel_multipart_add_part_at ((CamelMultipart*)containee, 
-		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl++);
-	
-	unload_parts (priv);
 
-	message_foreach_part_rec (CAMEL_MIME_MESSAGE (ppriv->part), 
-		(CamelMimePart *)ppriv->part, 
-		received_a_part, priv);
-
-	/* Reload curl (locking granularity allows for changes during the foreach) */
 	g_mutex_lock (priv->parts_lock);
-	curl = g_list_length (priv->parts);
+
+	camel_multipart_add_part_at ((CamelMultipart*)containee, 
+		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl);
+	
+	priv->parts = g_list_append (priv->parts, part); curl++;
+
 	g_mutex_unlock (priv->parts_lock);
 
-
 	/* Warning: large lock that locks code, not data */
+	g_mutex_unlock (ppriv->part_lock);
 	g_mutex_unlock (priv->message_lock);
 
 	return curl;
@@ -276,19 +263,20 @@ tny_msg_del_part (TnyMsgIface *self, gint id)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-
-	CamelDataWrapper *containee = camel_medium_get_content_object 
-		(CAMEL_MEDIUM (ppriv->part));
+	GList *remove;
+	CamelDataWrapper *containee;
 
 	g_mutex_lock (priv->message_lock);
 
+	containee = camel_medium_get_content_object (CAMEL_MEDIUM (ppriv->part));
+	remove = g_list_nth (priv->parts, id);
+	priv->parts = g_list_remove_link (priv->parts, remove);
 	camel_multipart_remove_part_at (CAMEL_MULTIPART (containee), id);
 
-	unload_parts (priv);
+	if (remove->data)
+		camel_object_unref (CAMEL_OBJECT (remove->data));
+	g_list_free (remove);
 
-	message_foreach_part_rec (CAMEL_MIME_MESSAGE (ppriv->part), 
-		(CamelMimePart *)ppriv->part, 
-		received_a_part, priv);
 
 	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (priv->message_lock);
@@ -327,31 +315,23 @@ tny_msg_finalize (GObject *object)
 {
 	TnyMsg *self = (TnyMsg*) object;
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->header_lock);
-
 	if (priv->header)
 		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;
-
 	g_mutex_unlock (priv->header_lock);
 
 	unload_parts (priv);
-
-	/* TOCHECK: This is probably not needed, the finalize of 
-	   mime-part also does it */
-
-	g_mutex_lock (priv->message_lock);
-	if (ppriv->part)
-		camel_object_unref (CAMEL_OBJECT (ppriv->part));
-	ppriv->part = NULL;
-	g_mutex_unlock (priv->message_lock);
 
 	g_mutex_free (priv->message_lock);
 	g_mutex_free (priv->header_lock);
 	g_mutex_free (priv->parts_lock);
 	g_mutex_free (priv->folder_lock);
+
+	/* ppriv->part should also get destroyed (by gobject) */
+
+	(*parent_class->finalize) (object);
 
 	return;
 }
@@ -397,42 +377,18 @@ static void
 tny_msg_set_parts (TnyMsg *self, const GList *parts)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-	CamelMedium *medium = CAMEL_MEDIUM (ppriv->part);
-	CamelDataWrapper *containee;
 	GList *list = (GList*)parts;
-	gint curl = 0;
-
-	unload_parts (priv);
-	
-	containee = camel_medium_get_content_object (medium);
-
-	if (!containee)
-	{
-		containee = CAMEL_DATA_WRAPPER (camel_multipart_new ()); 
-		/* camel_data_wrapper_construct_from_stream (wrapper, cstream); */
-		camel_medium_set_content_object (medium, containee);
-	}
-
-
-	g_mutex_lock (priv->message_lock);
+	gint nth=0;
 
 	while (list)
 	{
-		camel_multipart_add_part_at (CAMEL_MULTIPART (containee), 
-			tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (list->data)), curl++);
+		if (TNY_IS_MSG_MIME_PART_IFACE (list->data))
+			tny_msg_add_part (TNY_MSG_IFACE (self), list->data);
+		else
+			g_warning ("Item number %d isn't a TnyMsgMimePartIface\n", nth);
 
-		camel_multipart_set_boundary (CAMEL_MULTIPART (containee), NULL);
-
-		list = g_list_next (list);
+		list = g_list_next (list); nth++;
 	}
-
-	message_foreach_part_rec (CAMEL_MIME_MESSAGE (ppriv->part), 
-		(CamelMimePart *)ppriv->part, 
-		received_a_part, priv);
-
-	/* Warning: large lock that locks code, not data */
-	g_mutex_unlock (priv->message_lock);
 
 	return;
 }
@@ -452,9 +408,7 @@ tny_msg_new_with_header_and_parts (TnyMsgHeaderIface *header, const GList *parts
 {
 	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
 
-
 	tny_msg_set_header (TNY_MSG_IFACE (self), header);
-
 	tny_msg_set_parts (self, parts);
 
 	return self;
