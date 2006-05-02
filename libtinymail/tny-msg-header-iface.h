@@ -51,19 +51,18 @@ struct _TnyMsgHeaderIfaceClass
 	GTypeInterface g_iface;
 
 	const gchar*   (*get_uid_func)            (TnyMsgHeaderIface *self);
-	void           (*set_uid_func)            (TnyMsgHeaderIface *self, const gchar *uid);
-
 	const gchar*   (*get_bcc_func)            (TnyMsgHeaderIface *self);
 	const gchar*   (*get_cc_func)             (TnyMsgHeaderIface *self);
-	const time_t   (*get_date_received_func)  (TnyMsgHeaderIface *self);
-	const time_t   (*get_date_sent_func)      (TnyMsgHeaderIface *self);
 	const gchar*   (*get_subject_func)        (TnyMsgHeaderIface *self);
 	const gchar*   (*get_to_func)             (TnyMsgHeaderIface *self);
 	const gchar*   (*get_from_func)           (TnyMsgHeaderIface *self);
 	const gchar*   (*get_replyto_func)        (TnyMsgHeaderIface *self);
-
 	const gchar*   (*get_message_id_func)     (TnyMsgHeaderIface *self);
 
+	const time_t   (*get_date_received_func)  (TnyMsgHeaderIface *self);
+	const time_t   (*get_date_sent_func)      (TnyMsgHeaderIface *self);
+
+	void           (*set_uid_func)            (TnyMsgHeaderIface *self, const gchar *uid);
 	void           (*set_bcc_func)            (TnyMsgHeaderIface *self, const gchar *bcc);
 	void           (*set_cc_func)             (TnyMsgHeaderIface *self, const gchar *cc);
 	void           (*set_from_func)           (TnyMsgHeaderIface *self, const gchar *from);
@@ -77,6 +76,7 @@ struct _TnyMsgHeaderIfaceClass
 
 	void           (*uncache_func)            (TnyMsgHeaderIface *self);
 	const gboolean (*has_cache_func)          (TnyMsgHeaderIface *self);
+
 };
 
 GType          tny_msg_header_iface_get_type      (void);

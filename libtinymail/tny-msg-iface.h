@@ -42,14 +42,14 @@ struct _TnyMsgIfaceClass
 	const GList*             (*get_parts_func)        (TnyMsgIface *self);
 	const TnyMsgHeaderIface* (*get_header_func)       (TnyMsgIface *self);
 
-	gint                     (*add_part_func)         (TnyMsgIface *self, TnyMsgMimePartIface *part);
-	void                     (*del_part_func)         (TnyMsgIface *self, gint id);
-
         const TnyMsgFolderIface*
                                  (*get_folder_func)       (TnyMsgIface *self);
         void                     (*set_folder_func)       (TnyMsgIface *self, const TnyMsgFolderIface *folder);
-
 	void                     (*set_header_func)       (TnyMsgIface *self, TnyMsgHeaderIface *header);
+
+	void                     (*del_part_func)         (TnyMsgIface *self, gint id);
+	gint                     (*add_part_func)         (TnyMsgIface *self, TnyMsgMimePartIface *part);
+
 };
 
 GType                    tny_msg_iface_get_type         (void);

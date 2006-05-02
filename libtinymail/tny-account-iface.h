@@ -38,20 +38,19 @@ struct _TnyAccountIfaceClass
 	GTypeInterface parent;
 
         void (*set_id_func)                (TnyAccountIface *self, const gchar *id);
-
         void (*set_proto_func)             (TnyAccountIface *self, const gchar *proto);
         void (*set_user_func)              (TnyAccountIface *self, const gchar *user);
         void (*set_hostname_func)          (TnyAccountIface *self, const gchar *host);
+
         void (*set_pass_func_func)         (TnyAccountIface *self, TnyGetPassFunc get_pass_func);
         void (*set_forget_pass_func_func)  (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func);
+        TnyGetPassFunc     (*get_pass_func_func)        (TnyAccountIface *self);
+	TnyForgetPassFunc  (*get_forget_pass_func_func) (TnyAccountIface *self);
 
         const gchar*    (*get_id_func )           (TnyAccountIface *self);
         const gchar*    (*get_proto_func )           (TnyAccountIface *self);
         const gchar*    (*get_user_func)             (TnyAccountIface *self);
         const gchar*    (*get_hostname_func)         (TnyAccountIface *self);
-
-        TnyGetPassFunc     (*get_pass_func_func)        (TnyAccountIface *self);
-	TnyForgetPassFunc  (*get_forget_pass_func_func) (TnyAccountIface *self);
 
 	void                         (*set_account_store_func)     (TnyAccountIface *self, const TnyAccountStoreIface *store);
 	const TnyAccountStoreIface*  (*get_account_store_func)     (TnyAccountIface *self);
