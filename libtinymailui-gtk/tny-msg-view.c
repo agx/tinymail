@@ -78,6 +78,7 @@ reload_msg (TnyMsgViewIface *self)
 	gtk_widget_hide (priv->attachview_sw);
 
 	gtk_text_buffer_set_text (headerbuffer, "", 0);
+	gtk_text_buffer_set_text (buffer, "", 0);
 
 	gtk_text_buffer_get_start_iter (headerbuffer, &hiter);
 	
@@ -109,11 +110,11 @@ reload_msg (TnyMsgViewIface *self)
 	g_free ((gchar*)str);
 
 
-	while (parts)
+	while (G_LIKELY (parts))
 	{
 		TnyMsgMimePartIface *part = parts->data;
 
-		if (tny_msg_mime_part_iface_content_type_is (part, "text/*"))
+		if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/*")))
 		{
 			tny_stream_iface_reset (dest);
 			tny_msg_mime_part_iface_write_to_stream (part, dest);
@@ -121,7 +122,7 @@ reload_msg (TnyMsgViewIface *self)
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
 			tny_msg_mime_part_iface_get_filename (part))
 		{
-			if (first_attach)
+			if (G_UNLIKELY (first_attach))
 			{
 				model = tny_attach_list_model_new ();
 				_tny_attach_list_model_set_screen (model,
@@ -135,7 +136,7 @@ reload_msg (TnyMsgViewIface *self)
 		parts = g_list_next (parts);
 	}
 
-	if (!first_attach)
+	if (G_LIKELY (!first_attach))
 	{
 		gtk_icon_view_set_model (priv->attachview, GTK_TREE_MODEL (model));
 		gtk_widget_show (priv->attachview_sw);
@@ -154,7 +155,7 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 	result = gnome_vfs_create (&handle, uri, 
 		GNOME_VFS_OPEN_WRITE, FALSE, 0777);
 
-	if (result != GNOME_VFS_OK)
+	if (G_UNLIKELY (result != GNOME_VFS_OK))
 		return result;
 
 	stream = tny_vfs_stream_new (handle);
@@ -174,7 +175,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 	GtkTreeModel *model = gtk_icon_view_get_model (icon_view);
 	GtkTreeIter iter;
 
-	if (gtk_tree_model_get_iter(model, &iter, path))
+	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
 	{
 		TnyMsgMimePartIface *part;
 
@@ -182,11 +183,11 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 			TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
 			&part, -1);
 
-		if (part)
+		if (G_LIKELY (part))
 		{
 			GtkWidget *toplevel = gtk_widget_get_toplevel (GTK_WIDGET (self));
 
-			if (!GTK_WIDGET_TOPLEVEL (toplevel))
+			if (G_UNLIKELY (!GTK_WIDGET_TOPLEVEL (toplevel)))
 				return;
 
 			GtkFileChooserDialog *dialog = GTK_FILE_CHOOSER_DIALOG 
@@ -205,7 +206,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 			gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (dialog), 
 				tny_msg_mime_part_iface_get_filename (part));
 
-			if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+			if (G_LIKELY (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT))
 			{
 				gchar *uri;
 		
@@ -242,20 +243,21 @@ tny_msg_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
 
 static gint
 tny_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
-{
-	GtkMenu *menu;
-	GdkEventButton *event_button;
-	
-	g_return_val_if_fail (widget != NULL, FALSE);
-	g_return_val_if_fail (GTK_IS_MENU (widget), FALSE);
+{	
 	g_return_val_if_fail (event != NULL, FALSE);
 	
-	menu = GTK_MENU (widget);
 	
-	if (event->type == GDK_BUTTON_PRESS)
+	if (G_UNLIKELY (event->type == GDK_BUTTON_PRESS))
 	{
-	  event_button = (GdkEventButton *) event;
-	  if (event_button->button == 3)
+		GtkMenu *menu;
+		GdkEventButton *event_button;
+
+		menu = GTK_MENU (widget);
+		g_return_val_if_fail (widget != NULL, FALSE);
+		g_return_val_if_fail (GTK_IS_MENU (widget), FALSE);
+
+		event_button = (GdkEventButton *) event;
+		if (G_LIKELY (event_button->button == 3))
 		{
 			gtk_menu_popup (menu, NULL, NULL, NULL, NULL, 
 					  event_button->button, event_button->time);
@@ -271,7 +273,7 @@ tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
 
-	if (priv->msg)
+	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
 
 	g_object_ref (G_OBJECT (msg));
@@ -381,7 +383,7 @@ tny_msg_view_finalize (GObject *object)
 	TnyMsgView *self = (TnyMsgView *)object;	
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
 
-	if (priv->msg)
+	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
 
 	(*parent_class->finalize) (object);

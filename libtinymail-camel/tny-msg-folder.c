@@ -77,10 +77,10 @@ tny_msg_folder_relaxed_performer (gpointer data)
 	GList *list = d->list;
 	gint count = 0;
 
-	while ((count < 5) && list)
+	while (G_LIKELY ((count < 5) && list))
 	{
 		GList *element = list;
-		if (element && element->data)
+		if (G_LIKELY (element && element->data))
 			d->relaxed_func (element->data, NULL);
 		list = g_list_remove_link (list, element);
 		g_list_free (element);
@@ -89,7 +89,7 @@ tny_msg_folder_relaxed_performer (gpointer data)
 
 	d->list = list;
 
-	if (count <= 1)
+	if (G_UNLIKELY (count <= 1))
 		return FALSE;
 	
 	return TRUE;
@@ -99,7 +99,7 @@ tny_msg_folder_relaxed_performer (gpointer data)
 static void 
 tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 {
-	if (priv->cached_hdrs)
+	if (G_LIKELY (priv->cached_hdrs))
 	{
 		RelaxedData *d = g_new (RelaxedData, 1);
 
@@ -117,7 +117,7 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 static void 
 tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 {
-	if (priv->cached_hdrs)
+	if (G_LIKELY (priv->cached_hdrs))
 	{
 		RelaxedData *d = g_new (RelaxedData, 1);
 
@@ -127,7 +127,7 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 		d->list = priv->cached_hdrs;
 		priv->cached_hdrs = NULL;
 		/* Speedup trick, also check tny-msg-header.c */
-		if (priv->folder && priv->cached_uids)
+		if (G_LIKELY (priv->folder && priv->cached_uids))
 			camel_folder_free_uids (priv->folder, priv->cached_uids);
 		priv->cached_uids = NULL;
 		g_mutex_unlock (priv->cached_hdrs_lock);
@@ -144,12 +144,12 @@ unload_folder (TnyMsgFolderPriv *priv)
 
 	g_mutex_lock (priv->folder_lock);
 
-	if (priv->folder)
+	if (G_LIKELY (priv->folder))
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
 	priv->folder = NULL;
 
 	g_mutex_lock (priv->cached_msgs_lock);
-	if (priv->cached_msgs)
+	if (G_LIKELY (priv->cached_msgs))
 		g_hash_table_destroy (priv->cached_msgs);
 	priv->cached_msgs = NULL;
 	g_mutex_unlock (priv->cached_msgs_lock);
@@ -163,7 +163,7 @@ static void
 load_folder (TnyMsgFolderPriv *priv)
 {
 	g_mutex_lock (priv->folder_lock);
-	if (!priv->folder)
+	if (G_LIKELY (!priv->folder))
 	{
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelStore *store = (CamelStore*) _tny_account_get_service 
@@ -173,7 +173,7 @@ load_folder (TnyMsgFolderPriv *priv)
 			(store, priv->folder_name, 0, &ex);
 		priv->has_summary_cap = camel_folder_has_summary_capability (priv->folder);
 
-		if (priv->folder && priv->has_summary_cap)
+		if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		{
 			priv->unread_length = (guint)
 				camel_folder_get_unread_message_count (priv->folder);
@@ -243,7 +243,8 @@ tny_msg_folder_set_subscribed (TnyMsgFolderIface *self, const gboolean subscribe
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
 	/* These will synchronize me using _tny_msg_folder_set_subscribed_priv */
-	if (subscribed)
+
+	if (G_LIKELY (subscribed))
 		tny_store_account_iface_subscribe 
 			(TNY_STORE_ACCOUNT_IFACE (priv->account), self);
 	else
@@ -363,7 +364,8 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 	load_folder (priv);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
-	if (!priv->cached_hdrs)
+
+	if (G_UNLIKELY (!priv->cached_hdrs))
 	{
 		GPtrArray *uids = NULL;
 		CamelException ex;
@@ -442,9 +444,10 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 	load_folder (priv);
 
 	g_mutex_lock (priv->cached_msgs_lock);
-	if (!priv->cached_msgs)
+
+	if (G_UNLIKELY (!priv->cached_msgs))
 	{
-		/* Questionable: Do we really want a message cache? */
+		/* Questionable: Do we really want a message cache anyway? */
 
 		priv->cached_msgs = g_hash_table_new_full 
 			(g_str_hash, g_str_equal, destroy_cached_key,
@@ -455,7 +458,7 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 		g_mutex_unlock (priv->cached_msgs_lock);
 	}
 	
-	if (!message)
+	if (G_LIKELY (!message))
 	{
 		CamelException *ex = camel_exception_new ();
 		camel_exception_init (ex);
@@ -497,7 +500,7 @@ tny_msg_folder_get_name (TnyMsgFolderIface *self)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	const gchar *name = NULL;
 	
-	if (!priv->cached_name)
+	if (G_UNLIKELY (!priv->cached_name))
 	{
 		load_folder (priv);
 		name = camel_folder_get_name (priv->folder);
@@ -520,7 +523,7 @@ tny_msg_folder_set_id (TnyMsgFolderIface *self, const gchar *id)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
-	if (priv->folder_name)
+	if (G_UNLIKELY (priv->folder_name))
 		g_free (priv->folder_name);
 
 	priv->folder_name = g_strdup (id);
@@ -534,7 +537,7 @@ _tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
-	if (priv->cached_name)
+	if (G_UNLIKELY (priv->cached_name))
 		g_free (priv->cached_name);
 
 	priv->cached_name = g_strdup (name);
@@ -551,7 +554,7 @@ tny_msg_folder_set_name (TnyMsgFolderIface *self, const gchar *name)
 
 	camel_folder_rename (priv->folder, name);
 
-	if (priv->cached_name)
+	if (G_UNLIKELY (priv->cached_name))
 		g_free (priv->cached_name);
 
 	priv->cached_name = g_strdup (name);
@@ -572,7 +575,7 @@ tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 
 	g_mutex_lock (priv->folder_lock);
 	
-	if (priv->folder)
+	if (G_UNLIKELY (priv->folder))
 		camel_object_unref (priv->folder);
 
 	camel_object_ref (camel_folder);
@@ -658,7 +661,7 @@ tny_msg_folder_finalize (GObject *object)
 	TnyMsgFolder *self = (TnyMsgFolder*) object;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
-	if (priv->folders)
+	if (G_LIKELY (priv->folders))
 	{
 		g_mutex_lock (priv->folders_lock);
 		g_list_foreach (priv->folders, destroy_folder, NULL);
@@ -668,7 +671,7 @@ tny_msg_folder_finalize (GObject *object)
 	tny_msg_folder_hdr_cache_remover (priv);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
-	if (priv->folder)
+	if (G_LIKELY (priv->folder))
 	{
 		g_mutex_lock (priv->folder_lock);
 		camel_object_unref (priv->folder);
@@ -676,7 +679,7 @@ tny_msg_folder_finalize (GObject *object)
 	}
 	g_mutex_unlock (priv->cached_hdrs_lock);
 
-	if (priv->cached_name)
+	if (G_LIKELY (priv->cached_name))
 		g_free (priv->cached_name);
 
 
@@ -703,7 +706,7 @@ tny_msg_folder_uncache (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
-	if (priv->folder != NULL)
+	if (G_LIKELY (priv->folder != NULL))
 		unload_folder (priv);
 
 	return;

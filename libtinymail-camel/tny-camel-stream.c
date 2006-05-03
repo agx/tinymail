@@ -44,17 +44,20 @@ tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output)
 	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
 	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
 
-	while (!camel_stream_eos (stream)) {
+	while (G_LIKELY (!camel_stream_eos (stream)))
+	{
 		nb_read = camel_stream_read (stream, tmp_buf, sizeof (tmp_buf));
-		if (nb_read < 0)
+		if (G_UNLIKELY (nb_read < 0))
 			return -1;
-		else if (nb_read > 0) {
+		else if (G_LIKELY (nb_read > 0))
+		{
 			nb_written = 0;
 	
-			while (nb_written < nb_read) {
+			while (G_LIKELY (nb_written < nb_read))
+			{
 				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
-				if (len < 0)
+				if (G_UNLIKELY (len < 0))
 					return -1;
 				nb_written += len;
 			}
@@ -122,7 +125,7 @@ tny_camel_stream_finalize (CamelObject *object)
 {
 	TnyCamelStream *self = (TnyCamelStream *)object;
 
-	if (self->stream)
+	if (G_LIKELY (self->stream))
 		g_object_unref (G_OBJECT (self->stream));
 
 	/* CamelObject types don't need parent finalization (build-in camel)

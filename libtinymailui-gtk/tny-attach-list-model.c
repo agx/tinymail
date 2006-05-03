@@ -68,14 +68,13 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 		tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
 		tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
 
-	if (icon)
+	if (G_LIKELY (icon))
 	{
 		pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
 			GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
 		g_free (icon);
-	} else 
-	{
-		if (!stock_file_pixbuf)
+	} else {
+		if (G_UNLIKELY (!stock_file_pixbuf))
 			stock_file_pixbuf = gtk_icon_theme_load_icon (priv->theme, 
 				GTK_STOCK_FILE, GTK_ICON_SIZE_LARGE_TOOLBAR, 
 				0, NULL);

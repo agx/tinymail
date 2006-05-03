@@ -52,7 +52,8 @@ tny_store_account_reconnect (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	if (priv->session && priv->proto && priv->user && priv->host)
+	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && 
+		G_UNLIKELY (priv->user) && G_UNLIKELY (priv->host))
 	{
 		CamelURL *url = NULL;
 		gchar *proto = g_strdup_printf ("%s://", priv->proto); 
@@ -132,7 +133,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
-	while (iter)
+	while (G_LIKELY (iter))
 	{
 		gboolean subscribed = TRUE;
 		TnyMsgFolderIface *iface = TNY_MSG_FOLDER_IFACE (

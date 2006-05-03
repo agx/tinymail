@@ -63,11 +63,13 @@ tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
 	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
 
-	while (G_LIKELY (!camel_stream_eos (stream))) {
+	while (G_LIKELY (!camel_stream_eos (stream))) 
+	{
 		nb_read = camel_stream_read (stream, tmp_buf, sizeof (tmp_buf));
 		if (G_UNLIKELY (nb_read < 0))
 			return -1;
-		else if (G_LIKELY (nb_read > 0)) {
+		else if (G_LIKELY (nb_read > 0)) 
+		{
 			nb_written = 0;
 	
 			while (G_UNLIKELY (nb_written < nb_read)) 

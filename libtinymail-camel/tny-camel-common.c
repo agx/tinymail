@@ -27,7 +27,7 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 	
 	stfnd = strchr (tok, '<');
 	
-	if (stfnd)
+	if (G_LIKELY (stfnd))
 	{
 		char *name = (char*)tok, *lname = NULL;
 		char *email = stfnd+1, *gtfnd = NULL;
@@ -36,7 +36,7 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 
 		gtfnd = strchr (stfnd, '>');
 	
-		if (!gtfnd)
+		if (G_UNLIKELY (!gtfnd))
 		{
 			g_warning ("Invalid e-mail address in field");
 			return;
@@ -45,10 +45,10 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 		*stfnd = '\0';
 		*gtfnd = '\0';
 	
-		if (*name == ' ')
+		if (G_LIKELY (*name == ' '))
 			*name++;
 	
-		if (*lname == ' ')
+		if (G_LIKELY (*lname == ' '))
 			*lname-- = '\0';
 		camel_internet_address_add (target, name, email);
 	} else {
@@ -58,10 +58,10 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 
 		lname += (strlen (name)-1);
 
-		if (*name == ' ')
+		if (G_LIKELY (*name == ' '))
 			*name++;
 	
-		if (*lname == ' ')
+		if (G_LIKELY (*lname == ' '))
 			*lname-- = '\0';
 		camel_internet_address_add (target, NULL, name);
 	}
@@ -77,7 +77,7 @@ _foreach_email_add_to_inet_addr (const gchar *emails, CamelInternetAddress *targ
 
 	tok = strtok_r (dup, ",;", &save);
 
-	while (tok != NULL)
+	while (G_LIKELY (tok != NULL))
 	{
 		
 		_string_to_camel_inet_addr (tok, target);

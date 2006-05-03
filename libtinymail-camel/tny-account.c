@@ -81,7 +81,7 @@ tny_account_set_id (TnyAccountIface *self, const gchar *id)
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	if (priv->id)
+	if (G_UNLIKELY (priv->id))
 		g_free (priv->id);
 
 	priv->id = g_strdup (id);
@@ -98,7 +98,7 @@ tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 	
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	if (priv->proto)
+	if (G_UNLIKELY (priv->proto))
 		g_free (priv->proto);
 
 	priv->proto = g_strdup (proto);
@@ -117,7 +117,7 @@ tny_account_set_user (TnyAccountIface *self, const gchar *user)
 	
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	if (priv->user)
+	if (G_UNLIKELY (priv->user))
 		g_free (priv->user);
 
 	priv->user = g_strdup (user);
@@ -136,7 +136,7 @@ tny_account_set_hostname (TnyAccountIface *self, const gchar *host)
 	
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	if (priv->host)
+	if (G_UNLIKELY (priv->host))
 		g_free (priv->host);
 
 	priv->host = g_strdup (host);
@@ -159,7 +159,7 @@ tny_account_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_func)
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
-	if (!TNY_ACCOUNT_GET_CLASS (self)->reconnect_func)
+	if (G_UNLIKELY (!TNY_ACCOUNT_GET_CLASS (self)->reconnect_func))
 		g_error ("This TnyAccountIface instance isn't a fully implemented type\n");
 
 	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
@@ -327,17 +327,18 @@ tny_account_finalize (GObject *object)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->service_lock);
-	if (priv->id)
+	if (G_LIKELY (priv->id))
 		g_free (priv->id);
 
-	if (priv->user)
+	if (G_LIKELY (priv->user))
 		g_free (priv->user);
 
-	if (priv->host)
+	if (G_LIKELY (priv->host))
 		g_free (priv->host);
 
-	if (priv->proto)
+	if (G_LIKELY (priv->proto))
 		g_free (priv->proto);
+
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	camel_exception_free (priv->ex);

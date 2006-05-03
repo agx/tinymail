@@ -47,17 +47,19 @@ tny_text_buffer_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	ssize_t nb_read;
 	ssize_t nb_written;
 	
-	while (!tny_stream_iface_eos (self)) {
+	while (G_LIKELY (!tny_stream_iface_eos (self))) 
+	{
 		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
-		if (nb_read < 0)
+		if (G_UNLIKELY (nb_read < 0))
 			return -1;
-		else if (nb_read > 0) {
+		else if (G_LIKELY (nb_read > 0)) {
 			nb_written = 0;
 	
-			while (nb_written < nb_read) {
+			while (G_LIKELY (nb_written < nb_read))
+			{
 				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
-				if (len < 0)
+				if (G_UNLIKELY (len < 0))
 					return -1;
 				nb_written += len;
 			}

@@ -86,7 +86,7 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 	i = gtk_tree_path_get_indices (path)[0];
 	list = g_list_nth (G_LIST (list_model->headers), i);
 
-	if (i >= list_model->length)
+	if (G_UNLIKELY (i >= list_model->length))
 		return FALSE;
 		
 	iter->stamp = list_model->stamp;
@@ -108,7 +108,7 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	for (list = G_LIST (TNY_MSG_HEADER_LIST_MODEL (self)->headers); 
 		list; list = list->next) 
 	{
-		if (list == G_LIST (iter->user_data))
+		if (G_UNLIKELY (list == G_LIST (iter->user_data)))
 			break;
 		i++;
 	}
@@ -210,7 +210,7 @@ tny_msg_header_list_model_iter_has_child (GtkTreeModel *self, GtkTreeIter *iter)
 static gint
 tny_msg_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter)
 {
-	if (!iter)
+	if (G_LIKELY (!iter))
 		return TNY_MSG_HEADER_LIST_MODEL (self)->length;
 
 	return -1;
@@ -221,12 +221,12 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 {
 	GList *child;
 
-	if (parent)
+	if (G_UNLIKELY (parent))
 		return FALSE;
 
 	child = g_list_nth (G_LIST (TNY_MSG_HEADER_LIST_MODEL (self)->headers), n);
 
-	if (child) 
+	if (G_LIKELY (child))
 	{
 		iter->stamp = TNY_MSG_HEADER_LIST_MODEL (self)->stamp;
 		iter->user_data = child;
@@ -246,7 +246,7 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	header = G_LIST (iter->user_data)->data;
 	
-	if (header)
+	if (G_LIKELY (header))
 		tny_msg_header_iface_uncache (header);
 
 	return;
@@ -346,7 +346,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	self->headers = NULL;
 	self->length = 0;
 
-	if (self->folder)
+	if (G_LIKELY (self->folder))
 		g_object_unref (G_OBJECT (self->folder));
 
 	self->folder = folder;

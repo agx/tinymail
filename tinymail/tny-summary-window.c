@@ -71,13 +71,13 @@ reload_accounts (TnySummaryWindowPriv *priv)
 	GtkTreeModel *sortable, *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 	const GList* accounts;
 
-	if (!empty_model)
+	if (G_UNLIKELY (!empty_model))
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new 
 			(1, G_TYPE_STRING));
 
 	accounts = tny_account_store_iface_get_store_accounts (account_store);
 	
-	while (accounts)
+	while (G_LIKELY (accounts))
 	{
 		TnyStoreAccountIface *account = accounts->data;
 
@@ -120,8 +120,9 @@ tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountSto
 {
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
 
-	if (priv->account_store)
-	{
+	if (G_UNLIKELY (priv->account_store))
+	{ /* You typically set it once, so unlikely */
+
 		g_signal_handler_disconnect (G_OBJECT (priv->account_store),
 			priv->accounts_reloaded_signal);
 
@@ -150,7 +151,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 
-	if (gtk_tree_selection_get_selected (selection, &model, &iter))
+	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
 		TnyMsgHeaderIface *header;
 
@@ -158,7 +159,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 			&header, -1);
 
-		if (header)
+		if (G_LIKELY (header))
 		{
 
 			const TnyMsgFolderIface *folder;
@@ -185,7 +186,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 
-	if (gtk_tree_selection_get_selected (selection, &model, &iter))
+	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
 		TnyMsgFolderIface *folder;
 		GtkTreeModel *header_model, *sortable;
@@ -202,12 +203,12 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 		sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 
-		if (sortable && GTK_IS_TREE_MODEL_SORT (sortable))
+		if (G_LIKELY (sortable) && G_LIKELY (GTK_IS_TREE_MODEL_SORT (sortable)))
 		{
 			GtkTreeModel *model = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (sortable));
 
-			if (model)
+			if (G_LIKELY (model))
 				g_object_unref (G_OBJECT (model));
 
 			g_object_unref (G_OBJECT (sortable));
@@ -237,7 +238,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		
 	model = gtk_tree_view_get_model(treeview);
 	
-	if (gtk_tree_model_get_iter(model, &iter, path))
+	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
 	{
 		TnyMsgHeaderIface *header;
 		TnyMsgWindowIface *msgwin;
@@ -246,7 +247,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 			&header, -1);
 		
-		if (header)
+		if (G_LIKELY (header))
 		{
 
 			const TnyMsgFolderIface *folder;
@@ -377,8 +378,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_view_column_set_fixed_width (column, 100);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
-	if (FALSE)
-	{
+	if (G_UNLIKELY (FALSE))
+	{ /* Unlikely ;-) */
 		renderer = gtk_cell_renderer_text_new ();
 		column = gtk_tree_view_column_new_with_attributes ("To", renderer,
 			"text", TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN, NULL);
@@ -432,7 +433,7 @@ tny_summary_window_finalize (GObject *object)
 	TnySummaryWindow *self = (TnySummaryWindow *)object;	
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
 
-	if (priv->account_store)
+	if (G_LIKELY (priv->account_store))
 	{
 		g_signal_handler_disconnect (G_OBJECT (priv->account_store),
 			priv->accounts_reloaded_signal);

@@ -55,7 +55,7 @@ tny_transport_account_reconnect (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	if (priv->session && priv->proto && priv->host)
+	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->host))
 	{
 		GString *urlstr = g_string_new ("");
 
@@ -91,7 +91,7 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 	transport = camel_session_get_transport (CAMEL_SESSION (apriv->session), 
 			apriv->url_string, &ex);
 
-	if (transport && message && header)
+	if (G_LIKELY (transport && message && header))
 	{
 		CamelInternetAddress 
 			*from = camel_internet_address_new (),

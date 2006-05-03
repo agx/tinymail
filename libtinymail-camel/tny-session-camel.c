@@ -88,17 +88,17 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 	gboolean found = FALSE;
 	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
 
-	while (copy)
+	while (G_LIKELY (copy))
 	{
 		pf = copy->data;
 
-		if (pf->service == NULL || pf->account == NULL)
+		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL))
 		{
 			mark_del = g_list_append (mark_del, copy);
 			continue;
 		}
 
-		if (pf->service == service)
+		if (G_UNLIKELY (pf->service == service))
 		{
 			found = TRUE;
 			break;
@@ -107,24 +107,26 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 		copy = g_list_next (copy);
 	}
 
-	if (!found)
+	if (G_UNLIKELY (!found))
 		pf = g_new0 (PrivForgetPassFunc, 1);
 
 	pf->account = account;
 	pf->func = get_forget_pass_func;
 	pf->service = service;
 
-	if (!found)
+	if (G_UNLIKELY (!found))
 		forget_password_funcs = g_list_append (forget_password_funcs, pf);
 
-	if (mark_del) 
-		while (mark_del)
+	if (G_UNLIKELY (mark_del)) 
+	{
+		while (G_LIKELY (mark_del))
 		{
 			forget_password_funcs = g_list_remove (forget_password_funcs, mark_del->data);
 			mark_del = g_list_next (mark_del);
 		}
 
-	g_list_free (mark_del);
+		g_list_free (mark_del);
+	}
 
 	return;
 }
@@ -149,17 +151,17 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 	gboolean found = FALSE;
 	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
 
-	while (copy)
+	while (G_LIKELY (copy))
 	{
 		pf = copy->data;
 
-		if (pf->service == NULL || pf->account == NULL)
+		if (G_UNLIKELY (pf->service) == NULL || G_UNLIKELY (pf->account == NULL))
 		{
 			mark_del = g_list_append (mark_del, copy);
 			continue;
 		}
 
-		if (pf->service == service)
+		if (G_UNLIKELY (pf->service == service))
 		{
 			found = TRUE;
 			break;
@@ -168,24 +170,26 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 		copy = g_list_next (copy);
 	}
 
-	if (!found)
+	if (G_UNLIKELY (!found))
 		pf = g_new0 (PrivPassFunc, 1);
 
 	pf->account = account;
 	pf->func = get_pass_func;
 	pf->service = service;
 
-	if (!found)
+	if (G_UNLIKELY (!found))
 		password_funcs = g_list_append (password_funcs, pf);
 
-	if (mark_del) 
-		while (mark_del)
+	if (G_UNLIKELY (mark_del))
+	{
+		while (G_LIKELY (mark_del))
 		{
 			password_funcs = g_list_remove (password_funcs, mark_del->data);
 			mark_del = g_list_next (mark_del);
 		}
 
-	g_list_free (mark_del);
+		g_list_free (mark_del);
+	}
 
 	return;
 }
@@ -200,11 +204,11 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	gboolean found = FALSE;
 	gchar *retval = NULL;
 
-	while (copy)
+	while (G_LIKELY (copy))
 	{
 		PrivPassFunc *pf = copy->data;
 
-		if (pf->service == service)
+		if (G_UNLIKELY (pf->service == service))
 		{
 			found = TRUE;
 			func = pf->func;
@@ -215,10 +219,10 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		copy = g_list_next (copy);
 	}
 
-	if (found)
+	if (G_LIKELY (found))
 		retval = func (account, prompt);
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "");
 
 
@@ -233,11 +237,11 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	TnyAccountIface *account;
 	gboolean found = FALSE;
 
-	while (copy)
+	while (G_LIKELY (copy))
 	{
 		PrivForgetPassFunc *pf = copy->data;
 
-		if (pf->service == service)
+		if (G_UNLIKELY (pf->service == service))
 		{
 			found = TRUE;
 			func = pf->func;
@@ -248,7 +252,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		copy = g_list_next (copy);
 	}
 
-	if (found)
+	if (G_LIKELY (found))
 		func (account);
 
 	return;
@@ -273,22 +277,22 @@ mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, 
 	g_return_val_if_fail (uri != NULL, NULL);
 	
 	url = camel_url_new (uri + offset, ex);
-	if (!url) 
+
+	if (G_UNLIKELY (!url))
 	{
 		g_free(curi);
 		return NULL;
 	}
 
 	store = (CamelStore *)camel_session_get_service(session, uri+offset, CAMEL_PROVIDER_STORE, ex);
-	if (store) 
+	if (G_LIKELY (store))
 	{
 		const char *name;
 
 		if (url->fragment) 
 		{
 			name = url->fragment;
-		} else 
-		{
+		} else {
 			if (url->path && *url->path)
 				name = url->path + 1;
 			else
@@ -401,7 +405,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 	gchar *base_directory = g_strdup (tny_account_store_iface_get_cache_dir (account_store));
 	gchar *camel_dir = NULL;
 
-	if (camel_init (base_directory, TRUE) != 0)
+	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
 	{
 		g_error ("Critical ERROR: Cannot init %d as camel directory\n", base_directory);
 		exit (1);

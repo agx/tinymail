@@ -88,10 +88,10 @@ destroy_current_accounts (TnyAccountStorePriv *priv)
 	g_mutex_lock (priv->store_accounts_lock);
 	g_mutex_lock (priv->transport_accounts_lock);
 
-	if (priv->store_accounts)
+	if (G_LIKELY (priv->store_accounts))
 		destroy_these_accounts (priv->store_accounts);
 
-	if (priv->transport_accounts)
+	if (G_LIKELY (priv->transport_accounts))
 		destroy_these_accounts (priv->transport_accounts);
 
 	priv->transport_accounts = NULL;
@@ -109,19 +109,19 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
 	gchar *retval = NULL;
 	const gchar *accountid = tny_account_iface_get_id (account);
 
-	if (!passwords)
+	if (G_UNLIKELY (!passwords))
 		passwords = g_hash_table_new (g_str_hash, g_str_equal);
 
 	retval = g_hash_table_lookup (passwords, accountid);
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 	{
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
 		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog),
 			prompt);
 
-		if (gtk_dialog_run (dialog) == GTK_RESPONSE_OK)
+		if (G_LIKELY (gtk_dialog_run (dialog) == GTK_RESPONSE_OK))
 		{
 			const gchar *pwd = tny_password_dialog_get_password 
 				(TNY_PASSWORD_DIALOG (dialog));
@@ -141,13 +141,13 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
 static void
 per_account_forget_pass_func (TnyAccountIface *account)
 {
-	if (passwords)
+	if (G_LIKELY (passwords))
 	{
 		const gchar *accountid = tny_account_iface_get_id (account);
 
 		gchar *pwd = g_hash_table_lookup (passwords, accountid);
 
-		if (pwd) 
+		if (G_LIKELY (pwd))
 		{
 			memset (pwd, 0, strlen (pwd));
 			g_free (pwd);
@@ -163,16 +163,17 @@ find_account_by_gconf_key (GList *accounts, const gchar *key)
 {
 	TnyAccountIface *found = NULL;
 
-	while (accounts)
+	while (G_LIKELY (accounts))
 	{
 		TnyAccountIface *account = accounts->data;
 		const gchar *aid = tny_account_iface_get_id (account);
 		
-		if (strcmp (key, aid)==0)
+		if (G_UNLIKELY (strcmp (key, aid) == 0))
 		{
 			found = account;
 			break;
 		}
+
 		accounts = g_list_next (accounts);
 	}
 
@@ -239,7 +240,7 @@ tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	if (!priv->cache_dir)
+	if (G_UNLIKELY (!priv->cache_dir))
 	{
 		/* Note that there's no listener for this key. If it changes,
 		   the camelsession should be destroyed and rebuild from scratch.
@@ -344,7 +345,7 @@ tny_account_store_get_store_accounts (TnyAccountStoreIface *self)
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	const GList *retval;
 
-	if (!priv->store_accounts)
+	if (G_UNLIKELY (!priv->store_accounts))
 		tny_account_store_get_all_accounts (self);
 
 	g_mutex_lock (priv->store_accounts_lock);
@@ -361,7 +362,7 @@ tny_account_store_get_transport_accounts (TnyAccountStoreIface *self)
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	const GList *retval;
 
-	if (!priv->transport_accounts)
+	if (G_UNLIKELY (!priv->transport_accounts))
 		tny_account_store_get_all_accounts (self);
 
 	g_mutex_lock (priv->transport_accounts_lock);
@@ -503,7 +504,7 @@ tny_account_store_finalize (GObject *object)
 	priv->store_accounts_lock = NULL;
 	priv->transport_accounts_lock = NULL;
 
-	if (priv->cache_dir)
+	if (G_LIKELY (priv->cache_dir))
 		g_free (priv->cache_dir);
 
 	(*parent_class->finalize) (object);
@@ -521,7 +522,7 @@ tny_account_store_constructor (GType type, guint n_construct_params,
 
 	/* TODO: potential problem: singleton without lock */
 
-	if (!the_singleton)
+	if (G_UNLIKELY (!the_singleton))
 	{
 		object = G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_params, construct_params);
