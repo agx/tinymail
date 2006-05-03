@@ -1,6 +1,9 @@
 INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS) -I.	\
 	-I$(top_builddir)/libtinymail
 
+# This makes tinymail faster, but wastes more memory
+#	-DPERFORMANCE_MODE
+
 lib_LTLIBRARIES = libtinymail-camel-1.0.la 
 
 libtinymail_camel_1_0_headers =			\
