@@ -65,21 +65,25 @@ _tny_msg_header_set_not_uncachable (TnyMsgHeader *self)
 static void
 unload_msg_header (TnyMsgHeader *self)
 {
-	if (!self->uncachable)
+	if (G_UNLIKELY (!self->uncachable))
 		return;
 
-	if (self->mime_from)
-		g_free (self->mime_from);
-	self->mime_from = NULL;
-
-	if (self->use_summary)
+	if (G_LIKELY (self->mime_from))
 	{
-		if (self->message_info) 
+		g_free (self->mime_from);
+		self->mime_from = NULL;
+	}
+
+	if (G_LIKELY (self->use_summary))
+	{
+		if (G_LIKELY (self->message_info))
+		{
 			camel_message_info_free (self->message_info);
-		self->message_info = NULL;
+			self->message_info = NULL;
+		}
 	} else {
-		if (self->mime_message && CAMEL_IS_OBJECT (self->mime_message))
-			camel_object_unref (CAMEL_OBJECT (self->mime_message));
+		if (G_LIKELY (self->mime_message) && G_LIKELY (CAMEL_IS_OBJECT (self->mime_message)))
+			camel_object_unref (CAMEL_OBJECT (self->mime_message));	
 		self->mime_message = NULL;
 	}
 
@@ -100,21 +104,20 @@ tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val)
 static void
 load_msg_header (TnyMsgHeader *self)
 {
-	if (!self->uncachable)
+	if (G_UNLIKELY (!self->uncachable))
 		return;
 
-	if (self->use_summary)
+	if (G_LIKELY (self->use_summary))
 	{
-		if (!self->message_info && self->folder && self->uid)
+		if (G_LIKELY (!self->message_info) && G_LIKELY (self->folder) && G_LIKELY (self->uid))
 		{
 			CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
 			CamelMessageInfo *msginfo = camel_folder_get_message_info 
 					(folder, self->uid);
 			_tny_msg_header_set_camel_message_info (self, msginfo);
 		}
-	} else 
-	{
-		if (!self->mime_message && self->folder && self->uid)
+	} else {
+		if (G_LIKELY (!self->mime_message) && G_LIKELY (self->folder) && G_LIKELY (self->uid))
 		{
 			CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -133,7 +136,7 @@ prepare_for_write (TnyMsgHeader *self)
 
 	self->use_summary = FALSE;
 
-	if (!self->mime_message)
+	if (G_LIKELY (!self->mime_message))
 		self->mime_message = camel_mime_message_new ();
 
 	_tny_msg_header_set_not_uncachable (self);
@@ -145,7 +148,7 @@ void /* protected method */
 _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
 {
 
-	if (self->message_info)
+	if (G_UNLIKELY (self->message_info))
 		g_warning ("Strange behaviour: Overwriting existing message info");
 
 	self->message_info = camel_message_info;
@@ -167,7 +170,7 @@ void /* protected method */
 _tny_msg_header_set_camel_mime_message (TnyMsgHeader *self, CamelMimeMessage *camel_mime_message)
 {
 
-	if (self->mime_message)
+	if (G_UNLIKELY (self->mime_message))
 		g_warning ("Strange behaviour: Overwriting existing MIME message");
 
 	self->mime_message = camel_mime_message;
@@ -194,10 +197,10 @@ tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* fol
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	g_mutex_lock (me->hdr_lock);
-	if (me->folder)
+	if (G_UNLIKELY (me->folder))
 		g_warning ("Strange behaviour: Overwriting existing folder");
 
+	g_mutex_lock (me->hdr_lock);
 	me->folder = (TnyMsgFolderIface*)folder;
 	g_mutex_unlock (me->hdr_lock);
 
@@ -357,12 +360,12 @@ tny_msg_header_get_cc (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_cc (me->message_info);
-	else if (me->mime_message)
+	else if (G_LIKELY (me->mime_message))
 		retval = camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "cc");
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 		retval = me->invalid;
 
 	g_mutex_unlock (me->hdr_lock);
@@ -381,12 +384,12 @@ tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary) /* TODO */
+	if (G_LIKELY (me->use_summary)) /* TODO */
 		retval = me->invalid;
-	else if (me->mime_message)
+	else if (G_LIKELY (me->mime_message))
 		retval = camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "bcc");
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 		retval = me->invalid;
 
 	g_mutex_unlock (me->hdr_lock);
@@ -405,9 +408,9 @@ tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_date_received (me->message_info);
-	else if (me->mime_message)
+	else if (G_LIKELY (me->mime_message))
 		retval = camel_mime_message_get_date_received (me->mime_message, NULL);
 
 	g_mutex_unlock (me->hdr_lock);
@@ -426,7 +429,7 @@ tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_date_sent (me->message_info);
 	else {
 		/* TODO: write case */
@@ -448,11 +451,11 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_from (me->message_info);
 	else
 	{
-		if (!me->mime_from && me->mime_message)
+		if (G_LIKELY (!me->mime_from) && G_LIKELY (me->mime_message))
 		{
 			CamelInternetAddress *addr = (CamelInternetAddress*)
 				camel_mime_message_get_from (me->mime_message);
@@ -463,7 +466,7 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 		retval = (const gchar*)me->mime_from;
 	}
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 		retval = me->invalid;
 
 	g_mutex_unlock (me->hdr_lock);
@@ -481,12 +484,12 @@ tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_subject (me->message_info);
-	else if (me->mime_message)
+	else if (G_LIKELY (me->mime_message))
 		retval = camel_mime_message_get_subject (me->mime_message);
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 		retval = me->invalid;
 
 	g_mutex_unlock (me->hdr_lock);
@@ -506,12 +509,12 @@ tny_msg_header_get_to (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_to (me->message_info);
-	else if (me->mime_message)
+	else if (G_LIKELY (me->mime_message))
 		retval = camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "to");
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 		retval = me->invalid;
 
 	g_mutex_unlock (me->hdr_lock);
@@ -530,12 +533,12 @@ tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = (const gchar*)camel_message_info_message_id (me->message_info);
-	else if (me->mime_message)
+	else if (G_LIKELY (me->mime_message))
 		retval = camel_mime_message_get_message_id (me->mime_message);
 
-	if (!retval)
+	if (G_UNLIKELY (!retval))
 		retval = me->invalid;
 
 	g_mutex_unlock (me->hdr_lock);
@@ -556,7 +559,7 @@ tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_uid (me->message_info);
 	else /* Bleh solution ... */
 		retval = me->uid;
@@ -582,7 +585,7 @@ tny_msg_header_set_uid (TnyMsgHeaderIface *self, const gchar *uid)
 
 	/* Yes I know what I'm doing, also check tny-msg-folder.c */
 
-	if (me->use_summary) 
+	if (G_LIKELY (me->use_summary))
 		me->uid = (gchar*)uid;
 	else {
 		/* NEED TO INVESTIGATE THIS
@@ -610,7 +613,7 @@ tny_msg_header_has_cache (TnyMsgHeaderIface *self)
 
 	g_mutex_lock (me->hdr_lock);
 
-	if (me->use_summary)
+	if (G_LIKELY (me->use_summary))
 		retval = (me->message_info != NULL);
 	else
 		retval = (me->mime_message != NULL);
@@ -627,10 +630,10 @@ tny_msg_header_uncache (TnyMsgHeaderIface *self)
 
 	g_mutex_lock (me->hdr_lock);
 
-	if (me->use_summary && me->message_info)
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		unload_msg_header (me);
 
-	if (!me->use_summary && me->mime_message)
+	if (G_UNLIKELY (!me->use_summary) && G_LIKELY (me->mime_message))
 		unload_msg_header (me);
 
 	g_mutex_unlock (me->hdr_lock);
@@ -649,14 +652,14 @@ tny_msg_header_finalize (GObject *object)
 	   reuse the functionality */
 	self->uncachable = TRUE;
 
-	if (self->use_summary && self->message_info)
+	if (G_LIKELY (self->use_summary) && G_LIKELY (self->message_info))
 		unload_msg_header (self);
 
-	if (!self->use_summary && self->mime_message)
+	if (G_UNLIKELY (!self->use_summary) && G_LIKELY (self->mime_message))
 		unload_msg_header (self);
 
 	/* Indeed, check the speedup trick above */
-	if (self->uid && !self->use_summary)
+	if (G_LIKELY (self->uid) && G_UNLIKELY (!self->use_summary))
 		g_free (self->uid); /* Also check above */
 
 	g_mutex_unlock (self->hdr_lock);
@@ -743,13 +746,13 @@ tny_msg_header_get_type (void)
 {
 	static GType type = 0;
 
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

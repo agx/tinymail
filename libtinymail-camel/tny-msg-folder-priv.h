@@ -54,5 +54,6 @@ struct _TnyMsgFolderPriv
 CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);
 
 void _tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribed);
+void _tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name);
 
 #endif

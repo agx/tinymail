@@ -65,19 +65,20 @@ tny_store_account_reconnect (TnyAccount *self)
 		camel_url_set_user (url, priv->user);
 		camel_url_set_host (url, priv->host);
 	
-		if (priv->url_string)
+		if (G_LIKELY (priv->url_string))
 			g_free (priv->url_string);
 
 		priv->url_string = camel_url_to_string (url, 0);
 
-		if (priv->service)
+		if (G_UNLIKELY (priv->service))
 			camel_object_unref (CAMEL_OBJECT (priv->service));
 	
 		priv->service = camel_session_get_service 
 			(CAMEL_SESSION (priv->session), priv->url_string, 
 			priv->type, priv->ex);
 	
-		if (priv->service == NULL) {
+		if (G_UNLIKELY (priv->service == NULL))
+		{
 			g_error ("couldn't get service %s: %s\n", priv->url_string,
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
@@ -87,7 +88,9 @@ tny_store_account_reconnect (TnyAccount *self)
 		camel_url_free (url);
 	}
 
-	if (priv->service && priv->pass_func_set && priv->proto && priv->user && priv->host)
+	if (G_LIKELY (priv->service) && G_UNLIKELY (priv->pass_func_set) 
+		&& G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->user) 
+		&& G_UNLIKELY (priv->host))
 		camel_service_connect (priv->service, priv->ex);
 
 	return;
@@ -103,14 +106,14 @@ destroy_folder (gpointer data, gpointer user_data)
 static void 
 tny_store_account_clear_folders (TnyStoreAccountPriv *priv)
 {
-	if (priv->folders)
+	if (G_LIKELY (priv->folders))
 	{
 		g_mutex_lock (priv->folders_lock);
 		g_list_foreach (priv->folders, destroy_folder, NULL);
 		g_mutex_unlock (priv->folders_lock);
 	}
 
-	if (priv->ufolders)
+	if (G_UNLIKELY (priv->ufolders))
 	{
 		g_mutex_lock (priv->folders_lock);
 		g_list_foreach (priv->ufolders, destroy_folder, NULL);
@@ -138,14 +141,15 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 		tny_msg_folder_iface_set_id (iface, iter->full_name);
 		tny_msg_folder_iface_set_account (iface, TNY_ACCOUNT_IFACE (self));
 
+		_tny_msg_folder_set_name_priv (iface, iter->name);
 
-		if (type == TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL)
+		if (G_UNLIKELY (type == TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL))
 			subscribed = camel_store_folder_subscribed (store, iter->full_name);
 
 		/* Sync */
 		_tny_msg_folder_set_subscribed_priv (iface, subscribed);
 
-		if (parent)
+		if (G_LIKELY (parent))
 		{
 			tny_msg_folder_iface_add_folder (parent, iface);
 			/* _add_folder parents to the folder by reffing */
@@ -159,8 +163,6 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 
 			/* No unref keeps current folder the parent ref */
 		}
-
-		tny_msg_folder_iface_uncache (iface);
 
 		fill_folders_recursive (self, store, iface, iter->child, type);
 
@@ -185,7 +187,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
-	if (g_ascii_strcasecmp (tny_account_iface_get_proto (TNY_ACCOUNT_IFACE (self)), "pop") != 0)
+	if (G_LIKELY (g_ascii_strcasecmp (tny_account_iface_get_proto (TNY_ACCOUNT_IFACE (self)), "pop") != 0))
 	{
 		CamelFolderInfo *info;
 
@@ -212,7 +214,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		fill_folders_recursive (self, store, NULL, info, type);
 
 		/* Tell the observers that they should reload */
-		if (priv->folders && priv->folders->data)
+		if (G_LIKELY (priv->folders) && G_LIKELY (priv->folders->data))
 			g_signal_emit (priv->folders->data, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
 
 		camel_store_free_folder_info (store, info);
@@ -221,8 +223,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		retval = priv->folders;
 		g_mutex_unlock (priv->folders_lock);
 
-	} else 
-	{
+	} else {
 		TnyMsgFolderIface *inbox = TNY_MSG_FOLDER_IFACE (tny_msg_folder_new ());
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelFolder *folder = camel_store_get_inbox (store, &ex);
@@ -386,13 +387,13 @@ tny_store_account_get_type (void)
 {
 	static GType type = 0;
 
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

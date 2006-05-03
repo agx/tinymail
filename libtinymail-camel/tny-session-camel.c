@@ -431,7 +431,7 @@ TnySessionCamel*
 tny_session_camel_get_instance (TnyAccountStoreIface *account_store)
 {
 	/* TODO: potential problem: singleton without lock */
-	if (!the_singleton)
+	if (G_UNLIKELY (!the_singleton))
 	{
 		the_singleton = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
@@ -483,13 +483,13 @@ tny_session_camel_get_type (void)
 {
 	static CamelType tny_session_camel_type = CAMEL_INVALID_TYPE;
 	
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (tny_session_camel_type == CAMEL_INVALID_TYPE) 
+	if (G_UNLIKELY (tny_session_camel_type == CAMEL_INVALID_TYPE)) 
 	{
 		ms_parent_class = (CamelSessionClass *)camel_session_get_type();
 		tny_session_camel_type = camel_type_register (

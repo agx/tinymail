@@ -149,13 +149,14 @@ tny_camel_stream_get_type (void)
 {
 	static CamelType type = CAMEL_INVALID_TYPE;
 	
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == CAMEL_INVALID_TYPE) {
+	if (G_UNLIKELY (type == CAMEL_INVALID_TYPE)) 
+	{
 		parent_class = (CamelStreamClass *)camel_stream_get_type();
 		type = camel_type_register ((CamelType)parent_class,
 					    "TnyCamelStream",

@@ -383,8 +383,10 @@ tny_msg_header_list_model_get_type (void)
 {
 	static GType object_type = 0;
 
-	if (!object_type) {
-		static const GTypeInfo object_info = {
+	if (G_UNLIKELY(object_type == 0))
+	{
+		static const GTypeInfo object_info = 
+		{
 			sizeof (TnyMsgHeaderListModelClass),
 			NULL,		/* base_init */
 			NULL,		/* base_finalize */

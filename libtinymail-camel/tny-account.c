@@ -393,13 +393,13 @@ tny_account_get_type (void)
 {
 	static GType type = 0;
 
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

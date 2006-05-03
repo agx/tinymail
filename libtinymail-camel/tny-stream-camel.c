@@ -59,20 +59,22 @@ tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	ssize_t total = 0;
 	ssize_t nb_read;
 	ssize_t nb_written;
+
 	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
 	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
 
-	while (!camel_stream_eos (stream)) {
+	while (G_LIKELY (!camel_stream_eos (stream))) {
 		nb_read = camel_stream_read (stream, tmp_buf, sizeof (tmp_buf));
-		if (nb_read < 0)
+		if (G_UNLIKELY (nb_read < 0))
 			return -1;
-		else if (nb_read > 0) {
+		else if (G_LIKELY (nb_read > 0)) {
 			nb_written = 0;
 	
-			while (nb_written < nb_read) {
+			while (G_UNLIKELY (nb_written < nb_read)) 
+			{
 				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
-				if (len < 0)
+				if (G_UNLIKELY (len < 0))
 					return -1;
 				nb_written += len;
 			}
@@ -187,7 +189,7 @@ tny_stream_camel_finalize (GObject *object)
 	TnyStreamCamel *self = (TnyStreamCamel *)object;	
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 
-	if (priv->stream)
+	if (G_LIKELY (priv->stream))
 		camel_object_unref (CAMEL_OBJECT (priv->stream));
 
 	(*parent_class->finalize) (object);
@@ -231,13 +233,13 @@ tny_stream_camel_get_type (void)
 {
 	static GType type = 0;
 
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

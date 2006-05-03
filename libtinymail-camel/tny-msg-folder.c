@@ -497,11 +497,11 @@ tny_msg_folder_get_name (TnyMsgFolderIface *self)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	const gchar *name = NULL;
 	
-	load_folder (priv);
-
 	if (!priv->cached_name)
+	{
+		load_folder (priv);
 		name = camel_folder_get_name (priv->folder);
-	else
+	} else
 		name = priv->cached_name;
 
 	return name;
@@ -524,6 +524,20 @@ tny_msg_folder_set_id (TnyMsgFolderIface *self, const gchar *id)
 		g_free (priv->folder_name);
 
 	priv->folder_name = g_strdup (id);
+
+	return;
+}
+
+
+void
+_tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
+	if (priv->cached_name)
+		g_free (priv->cached_name);
+
+	priv->cached_name = g_strdup (name);
 
 	return;
 }
@@ -773,13 +787,13 @@ tny_msg_folder_get_type (void)
 {
 	static GType type = 0;
 
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

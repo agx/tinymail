@@ -54,10 +54,10 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 
         containee = camel_medium_get_content_object (CAMEL_MEDIUM (part));
 
-        if (containee == NULL)
+        if (G_UNLIKELY (containee == NULL))
                 return go;
 
-        if (CAMEL_IS_MULTIPART (containee)) 
+        if (G_LIKELY (CAMEL_IS_MULTIPART (containee)))
 	{
                 parts = camel_multipart_get_number (CAMEL_MULTIPART (containee));
                 for (i = 0; go && i < parts; i++) 
@@ -66,7 +66,7 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
                         go = message_foreach_part_rec (msg, part, callback, data);
                 }
 
-        } else if (CAMEL_IS_MIME_MESSAGE (containee)) 
+        } else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
 	{
                 go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data);
         }
@@ -93,7 +93,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 static void 
 destroy_part (gpointer data, gpointer user_data)
 {
-	if (data)
+	if (G_LIKELY (data))
 		g_object_unref (G_OBJECT (data));
 
 	return;
@@ -104,7 +104,7 @@ unload_parts (TnyMsgPriv *priv)
 {
 	g_mutex_lock (priv->parts_lock);
 
-	if (priv->parts) 
+	if (G_LIKELY (priv->parts))
 	{
 		g_list_foreach (priv->parts, 
 			destroy_part, NULL);
@@ -135,7 +135,7 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 
 	g_mutex_lock (priv->message_lock);
 
-	if (ppriv->part)
+	if (G_LIKELY (ppriv->part))
 		camel_object_unref (CAMEL_OBJECT (ppriv->part));
 
 	camel_object_ref (CAMEL_OBJECT (message));
@@ -221,10 +221,10 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 	containee = camel_medium_get_content_object (medium);
 
 	/* Warp it into a multipart */
-	if (!containee || !CAMEL_IS_MULTIPART (containee))
+	if (G_UNLIKELY (!containee) || G_LIKELY (!CAMEL_IS_MULTIPART (containee)))
 	{
 		/* TODO: restore original mime part? */
-		if (containee)
+		if (G_LIKELY (containee))
 			camel_object_unref (CAMEL_OBJECT (containee));
 
 		unload_parts (priv);
@@ -273,10 +273,13 @@ tny_msg_del_part (TnyMsgIface *self, gint id)
 	priv->parts = g_list_remove_link (priv->parts, remove);
 	camel_multipart_remove_part_at (CAMEL_MULTIPART (containee), id);
 
-	if (remove->data)
-		camel_object_unref (CAMEL_OBJECT (remove->data));
-	g_list_free (remove);
+	if (G_LIKELY (remove))
+	{
+		if (G_LIKELY (remove->data))
+			camel_object_unref (CAMEL_OBJECT (remove->data));
 
+		g_list_free (remove);
+	}
 
 	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (priv->message_lock);
@@ -301,7 +304,7 @@ tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 
 	message = _tny_msg_header_get_camel_mime_message (TNY_MSG_HEADER (priv->header));
 
-	if (message)
+	if (G_UNLIKELY (message))
 		_tny_msg_set_camel_mime_message (TNY_MSG (self), message);
 
 	g_mutex_unlock (priv->header_lock);
@@ -317,7 +320,7 @@ tny_msg_finalize (GObject *object)
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
 	g_mutex_lock (priv->header_lock);
-	if (priv->header)
+	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;
 	g_mutex_unlock (priv->header_lock);
@@ -380,7 +383,7 @@ tny_msg_set_parts (TnyMsg *self, const GList *parts)
 	GList *list = (GList*)parts;
 	gint nth=0;
 
-	while (list)
+	while (G_LIKELY (list))
 	{
 		if (TNY_IS_MSG_MIME_PART_IFACE (list->data))
 			tny_msg_add_part (TNY_MSG_IFACE (self), list->data);
@@ -468,13 +471,13 @@ tny_msg_get_type (void)
 {
 	static GType type = 0;
 
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

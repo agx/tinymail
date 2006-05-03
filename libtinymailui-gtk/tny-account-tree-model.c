@@ -41,7 +41,7 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 
-	while (folders)
+	while (G_LIKELY (folders))
 	{
 		GtkTreeIter iter;
 		TnyMsgFolderIface *folder = folders->data;
@@ -65,7 +65,11 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 
 		tny_msg_folder_iface_uncache (folder);
 
-		if (more_folders && g_list_length ((GList*)more_folders) > 0)
+		/* The idea here is that if length > 0, then more_folders isn't 
+		   NULL, and if more_folders isn't NULL, length will always 
+		   be > 0 right? So that saves us a g_list_length, correct? */
+
+		if (G_LIKELY (more_folders) /* && g_list_length ((GList*)more_folders) > 0*/)
 			fill_treemodel_recursive (self, more_folders, &iter, account);
 
 		folders = g_list_next (folders);
@@ -145,7 +149,7 @@ tny_account_tree_model_get_type (void)
 {
 	static GType type = 0;
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

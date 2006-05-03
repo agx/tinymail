@@ -159,17 +159,18 @@ tny_vfs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	ssize_t nb_read;
 	ssize_t nb_written;
 	
-	while (!tny_stream_iface_eos (self)) {
+	while (G_UNLIKELY (!tny_stream_iface_eos (self))) {
 		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
-		if (nb_read < 0)
+		if (G_UNLIKELY (nb_read < 0))
 			return -1;
-		else if (nb_read > 0) {
+		else if (G_LIKELY (nb_read > 0)) {
 			nb_written = 0;
 	
-			while (nb_written < nb_read) {
+			while (G_LIKELY (nb_written < nb_read))
+			{
 				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
-				if (len < 0)
+				if (G_UNLIKELY (len < 0))
 					return -1;
 				nb_written += len;
 			}
@@ -186,7 +187,7 @@ tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 	GnomeVFSFileSize count;
 	GnomeVFSResult res;
 
-	if (priv->handle == NULL) 
+	if (G_UNLIKELY (priv->handle == NULL))
 	{
 		errno = EINVAL;
 		return -1;
@@ -194,11 +195,11 @@ tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 
 	res = gnome_vfs_read (priv->handle, buffer, n, &count);
 
-	if (res == GNOME_VFS_OK)
+	if (G_LIKELY (res == GNOME_VFS_OK))
 	{
 		return (ssize_t)count;
 
-	} else if (res == GNOME_VFS_ERROR_EOF) 
+	} else if (G_LIKELY (res == GNOME_VFS_ERROR_EOF))
 	{
 		/*TODO: stream->eos = TRUE; Handle this */
 		return 0;
@@ -216,7 +217,7 @@ tny_vfs_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 	GnomeVFSFileSize count;
 	GnomeVFSResult res;
 
-	if (priv->handle == NULL) 
+	if (G_UNLIKELY (priv->handle == NULL))
 	{
 		errno = EINVAL;
 		return -1;
@@ -224,7 +225,7 @@ tny_vfs_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 
 	res = gnome_vfs_write (priv->handle, buffer, n, &count);
 
-	if (res == GNOME_VFS_OK)
+	if (G_LIKELY (res == GNOME_VFS_OK))
 		return (ssize_t)count;
 
 	tny_vfs_stream_set_errno (res);
@@ -375,7 +376,7 @@ tny_vfs_stream_finalize (GObject *object)
 	TnyVfsStream *self = (TnyVfsStream *)object;	
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 
-	if (priv->handle)
+	if (G_LIKELY (priv->handle))
 		gnome_vfs_close (priv->handle);
 
 	(*parent_class->finalize) (object);
@@ -416,7 +417,7 @@ tny_vfs_stream_get_type (void)
 {
 	static GType type = 0;
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{

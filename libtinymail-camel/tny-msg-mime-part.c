@@ -49,7 +49,7 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 
 	wrapper = camel_medium_get_content_object (medium);
 
-	if (!wrapper)
+	if (G_UNLIKELY (!wrapper))
 	{
 		g_error ("Mime part does not yet have a source stream, use "
 			"tny_msg_mime_part_construct_from_stream first");
@@ -88,7 +88,7 @@ tny_msg_mime_part_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 
 	wrapper = camel_medium_get_content_object (medium);
 
-	if (wrapper)
+	if (G_LIKELY (wrapper))
 		camel_object_unref (CAMEL_OBJECT (wrapper));
 
 	wrapper = camel_data_wrapper_new (); 
@@ -120,7 +120,7 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 
 	wrapper = camel_medium_get_content_object (medium);
 
-	if (!wrapper)
+	if (G_UNLIKELY (!wrapper))
 	{
 		wrapper = camel_data_wrapper_new (); 
 		camel_medium_set_content_object (medium, wrapper);
@@ -144,7 +144,7 @@ tny_msg_mime_part_get_content_type (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
-	if (!priv->cached_content_type)
+	if (G_LIKELY (!priv->cached_content_type))
 	{
 		CamelContentType *type;
 
@@ -198,10 +198,10 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 
 	g_mutex_lock (priv->part_lock);
 
-	if (priv->cached_content_type)
+	if (G_UNLIKELY (priv->cached_content_type))
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
-	if (priv->part)
+	if (G_UNLIKELY (priv->part))
 		camel_object_unref (CAMEL_OBJECT (priv->part));
 	camel_object_ref (CAMEL_OBJECT (part));
 	priv->part = part;
@@ -334,7 +334,7 @@ tny_msg_mime_part_set_content_type (TnyMsgMimePartIface *self, const gchar *cont
 	g_mutex_lock (priv->part_lock);
 
 	camel_mime_part_set_content_type (priv->part, content_type);
-	if (priv->cached_content_type)
+	if (G_UNLIKELY (priv->cached_content_type))
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
 
@@ -355,7 +355,7 @@ tny_msg_mime_part_finalize (GObject *object)
 	priv->cached_content_type = NULL;
 	g_mutex_unlock (priv->part_lock);
 
-	if (priv->part)
+	if (G_LIKELY (priv->part))
 	{
 		g_mutex_lock (priv->part_lock);
 		camel_object_unref (CAMEL_OBJECT (priv->part));
@@ -445,13 +445,13 @@ tny_msg_mime_part_get_type (void)
 {
 	static GType type = 0;
 
-	if (!camel_type_init_done)
+	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
 
-	if (type == 0) 
+	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
 		{
