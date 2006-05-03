@@ -672,7 +672,7 @@ tny_msg_folder_finalize (GObject *object)
 		g_list_foreach (priv->folders, destroy_folder, NULL);
 		g_mutex_unlock (priv->folders_lock);
 	}
-g_print ("FINAL\n");
+
 	tny_msg_folder_hdr_cache_remover (priv);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
