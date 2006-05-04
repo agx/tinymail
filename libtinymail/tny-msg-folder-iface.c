@@ -169,6 +169,7 @@ tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIfa
 /**
  * tny_msg_folder_iface_get_headers:
  * @self: a TnyMsgFolderIface object
+ * @refresh: whether or not to synchronize with the server first
  * 
  * Get a read-only list of message header instances that are in this folder
  * 
