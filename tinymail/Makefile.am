@@ -3,7 +3,7 @@ INCLUDES = 								\
 	-I$(top_builddir)/libtinymail					\
 	-I$(top_builddir)/libtinymailui					\
 	-I$(top_builddir)/libtinymailui-gtk				\
-	-I$(top_builddir)/libtinymail-camel				
+	-I$(top_builddir)/libtinymail-camel				\	
 	-DASYNC_HEADERS
 
 bin_PROGRAMS = tinymail

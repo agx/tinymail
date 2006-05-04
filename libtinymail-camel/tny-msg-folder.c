@@ -57,6 +57,7 @@ typedef struct
 	GFunc relaxed_func;
 	GMutex *lock;
 	gboolean free_lock;
+	GMainLoop *waiter;
 } RelaxedData;
 
 static void
@@ -74,6 +75,9 @@ tny_msg_folder_relaxed_data_destroyer (gpointer data)
 
 	if (d->free_lock)
 		g_mutex_free (d->lock);
+
+	if (d->waiter)
+		g_main_loop_quit (d->waiter);
 
 	return;
 }
@@ -117,6 +121,7 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 		d->free_lock = TRUE;
 		d->lock = g_mutex_new ();
 
+		d->waiter = NULL;
 		g_mutex_lock (priv->cached_hdrs_lock);
 		d->list = g_list_copy (priv->cached_hdrs);
 		g_mutex_unlock (priv->cached_hdrs_lock);
@@ -134,7 +139,7 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 		RelaxedData *d = g_new (RelaxedData, 1);
 
 		d->relaxed_func = (GFunc)g_object_unref;
-
+		d->waiter = priv->waiter;
 		g_mutex_lock (priv->cached_hdrs_lock);
 		d->free_lock = FALSE;
 		d->lock = priv->cached_hdrs_lock;
@@ -453,9 +458,19 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	g_free (mypriv);
 
 	/* We need to get priv->cached_hdrs = NULL; */
+
+/* This *IS* needed! (but doesn't work). priv->cached_hdrs should become NULL!
+	if (!priv->waiter)
+		priv->waiter = g_main_loop_new (NULL, TRUE);
+
 	tny_msg_folder_hdr_cache_remover (priv);
-	/* This is so ugly .. :(. Replace this with good thread sync please */
-	while (priv->cached_hdrs != NULL);
+
+	if (g_main_loop_is_running (priv->waiter))
+		g_main_loop_run (priv->waiter);
+
+	g_main_loop_unref (priv->waiter);
+	priv->waiter = NULL;
+*/
 
 	g_idle_add_full (G_PRIORITY_HIGH, tny_msg_folder_refresh_headers_async_callback, 
 			info, tny_msg_folder_refresh_headers_async_destroyer);
