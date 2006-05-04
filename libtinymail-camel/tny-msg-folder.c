@@ -407,7 +407,8 @@ tny_msg_folder_refresh_headers_async_callback (gpointer thr_user_data)
 	RefreshHeadersInfo *info = thr_user_data;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (info->self));
 
-	info->callback (info->self, info->user_data);
+	if (info->callback)
+		info->callback (info->self, info->user_data);
 
 	return FALSE;
 }
@@ -416,8 +417,9 @@ static void
 tny_msg_folder_refresh_headers_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
 	RefreshHeadersInfo *minfo = thr_user_data;
-		
-	minfo->status_callback (minfo->self, (const gchar*)what, (gint)pc, minfo->user_data);
+	
+	if (minfo->status_callback)
+		minfo->status_callback (minfo->self, (const gchar*)what, (gint)pc, minfo->user_data);
 
 	return;
 }
@@ -468,7 +470,8 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	priv->cached_hdrs = NULL;
 	g_mutex_unlock (priv->folder_lock);
 
-	g_idle_add_full (G_PRIORITY_HIGH, tny_msg_folder_refresh_headers_async_callback, 
+	if (info->callback)
+		g_idle_add_full (G_PRIORITY_HIGH, tny_msg_folder_refresh_headers_async_callback, 
 			info, tny_msg_folder_refresh_headers_async_destroyer);
 
 
