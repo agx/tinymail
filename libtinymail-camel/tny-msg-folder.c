@@ -430,14 +430,17 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	g_mutex_lock (priv->folder_lock);
 	load_folder_no_lock (priv);
 
-	/* This one consumes time */
+	/* On the same IMAP connection, camel will spinlock here */
 	camel_folder_refresh_info (priv->folder, &ex);
+
+	/* TODO: Implement CamelOperation stuff here, so that a new request
+	   gets handled first and/or the old request gets automatically
+	   cancelled in libcamel. */
 
 	g_list_foreach (priv->cached_hdrs, destroy_header, NULL);
 	g_list_free (priv->cached_hdrs);
 	priv->cached_hdrs = NULL;
 	g_mutex_unlock (priv->folder_lock);
-
 
 	g_idle_add_full (G_PRIORITY_HIGH, tny_msg_folder_refresh_headers_async_callback, 
 			info, tny_msg_folder_refresh_headers_async_destroyer);
