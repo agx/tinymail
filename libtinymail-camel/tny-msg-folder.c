@@ -447,6 +447,7 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 		camel_operation_cancel (apriv->cancel);
 
 	apriv->cancel = camel_operation_new (tny_msg_folder_refresh_headers_async_status, info);
+	/* hmmm camel_operation_ref (apriv->cancel); */
 	camel_operation_register (apriv->cancel);
 	camel_operation_start (apriv->cancel, "Reading folder `%s'", priv->folder->full_name);
 
