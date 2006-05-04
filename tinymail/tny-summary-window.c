@@ -221,7 +221,11 @@ refresh_current_folder (TnyMsgFolderIface *folder, gpointer user_data)
 	return;
 }
 
-
+static void
+refresh_current_folder_status_update (TnyMsgFolderIface *folder, const gchar *what, gint status, gpointer user_data)
+{
+	g_print ("%s = %d\n", what, status);
+}
 
 static void
 on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection, 
@@ -240,7 +244,9 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			&folder, -1);
 
 #ifdef ASYNC_HEADERS
-		tny_msg_folder_iface_refresh_headers_async (folder, refresh_current_folder, user_data);
+		tny_msg_folder_iface_refresh_headers_async (folder, 
+			refresh_current_folder, 
+			refresh_current_folder_status_update, user_data);
 #else
 		refresh_current_folder (folder, user_data);
 #endif

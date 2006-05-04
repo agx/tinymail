@@ -299,6 +299,7 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
 
+	priv->cancel_lock = g_mutex_new ();
 	priv->store = NULL;
 	priv->id = NULL;
 	priv->user = NULL;
@@ -327,7 +328,15 @@ tny_account_finalize (GObject *object)
 	TnyAccount *self = (TnyAccount *)object;	
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
+	g_mutex_lock (priv->cancel_lock);
+	if (G_UNLIKELY (priv->cancel))
+		camel_operation_unref (priv->cancel);
+	g_mutex_unlock (priv->cancel_lock);
+
+	g_mutex_free (priv->cancel_lock);
+
 	g_static_rec_mutex_lock (priv->service_lock);
+
 	if (G_LIKELY (priv->id))
 		g_free (priv->id);
 

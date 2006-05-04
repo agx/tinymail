@@ -383,6 +383,7 @@ typedef struct
 {
 	TnyMsgFolderIface *self;
 	TnyGetHeadersCallback callback;
+	TnyGetHeadersStatusCallback status_callback;
 	gpointer user_data;
 } RefreshHeadersInfo;
 
@@ -412,11 +413,15 @@ tny_msg_folder_refresh_headers_async_callback (gpointer thr_user_data)
 }
 
 static void
-camel_op_stat_func (struct _CamelOperation *op, const char *what, int pc, void *data)
+tny_msg_folder_refresh_headers_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
-	/* printf ("%s\n", what); */
+	RefreshHeadersInfo *minfo = thr_user_data;
+		
+	minfo->status_callback (minfo->self, (const gchar*)what, (gint)pc, minfo->user_data);
+
 	return;
 }
+
 
 static gpointer 
 tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
@@ -427,28 +432,36 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
 
-	CamelException ex;
-	CamelOperation *oldcancel;
+	CamelException *ex = camel_exception_new ();
+
+	camel_exception_init (ex);
 
 	g_mutex_lock (priv->folder_lock);
 	load_folder_no_lock (priv);
 
-	/* TODO: Camel cancellation isn't yet working . . . */
+	g_mutex_lock (apriv->cancel_lock);
+
 	if (apriv->cancel)
 		camel_operation_cancel (apriv->cancel);
 
-	apriv->cancel = camel_operation_new (camel_op_stat_func, NULL);
-
+	apriv->cancel = camel_operation_new (tny_msg_folder_refresh_headers_async_status, info);
+	camel_operation_register (apriv->cancel);
 	camel_operation_start (apriv->cancel, "Reading folder `%s'", priv->folder->full_name);
 
-	/* On the same IMAP connection, camel will spinlock here */
-	camel_folder_refresh_info (priv->folder, &ex);
+	g_mutex_unlock (apriv->cancel_lock);
 
+	camel_folder_refresh_info (priv->folder, ex);
+
+	camel_exception_free (ex);
+
+	g_mutex_lock (apriv->cancel_lock);
+
+	camel_operation_unregister (apriv->cancel);
 	camel_operation_end (apriv->cancel);
-
-	/* TODO: Implement CamelOperation stuff here, so that a new request
-	   gets handled first and/or the old request gets automatically
-	   cancelled in libcamel. */
+	if (apriv->cancel)
+		camel_operation_unref (apriv->cancel);
+	apriv->cancel = NULL;
+	g_mutex_unlock (apriv->cancel_lock);
 
 	g_list_foreach (priv->cached_hdrs, destroy_header, NULL);
 	g_list_free (priv->cached_hdrs);
@@ -465,7 +478,7 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 }
 
 static void
-tny_msg_folder_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCallback callback, gpointer user_data)
+tny_msg_folder_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCallback callback, TnyGetHeadersStatusCallback status_callback, gpointer user_data)
 {
 	RefreshHeadersInfo *info = g_new0 (RefreshHeadersInfo, 1);
 	GThread *thread;
@@ -473,6 +486,7 @@ tny_msg_folder_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCall
 
 	info->self = self;
 	info->callback = callback;
+	info->status_callback = status_callback;
 	info->user_data = user_data;
 
 	thread = g_thread_create (tny_msg_folder_refresh_headers_async_thread,

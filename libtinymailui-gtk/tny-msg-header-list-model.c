@@ -302,7 +302,7 @@ tny_msg_header_list_model_finalize (GObject *object)
 
 	if (self->folder)
 	{
-		tny_msg_folder_iface_uncache (self->folder);
+		/* tny_msg_folder_iface_uncache (self->folder); */
 		g_object_unref (G_OBJECT (self->folder));
 	}
 

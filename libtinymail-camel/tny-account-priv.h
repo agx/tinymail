@@ -37,6 +37,7 @@ struct _TnyAccountPriv
 	const TnyAccountStoreIface *store;
 	CamelProviderType type;
 	CamelOperation *cancel;
+	GMutex *cancel_lock;
 };
 
 const CamelService*  _tny_account_get_service    (TnyAccount *self);

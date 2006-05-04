@@ -46,6 +46,7 @@ typedef gchar* (*TnyGetPassFunc) (TnyAccountIface *self, const gchar *prompt);
 typedef void (*TnyForgetPassFunc) (TnyAccountIface *self);
 typedef enum _TnyStoreAccountFolderType TnyStoreAccountFolderType;
 typedef void (*TnyGetHeadersCallback) (TnyMsgFolderIface *self, gpointer user_data);
+typedef void (*TnyGetHeadersStatusCallback) (TnyMsgFolderIface *self, const gchar *what, gint status, gpointer user_data);
 
 #ifndef G_LIKELY
 #define G_LIKELY(expr) (expr)
