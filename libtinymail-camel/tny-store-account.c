@@ -344,6 +344,7 @@ tny_store_account_finalize (GObject *object)
 	TnyStoreAccount *self = (TnyStoreAccount *)object;	
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
+printf ("account store fin\n");
 	tny_store_account_clear_folders (priv);
 
 	g_mutex_free (priv->folders_lock);

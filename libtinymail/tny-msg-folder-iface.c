@@ -23,6 +23,24 @@
 guint *tny_msg_folder_iface_signals;
 
 /**
+ * tny_msg_folder_iface_refresh_headers_async:
+ * @self: a TnyMsgFolderIface object
+ * @callback: The callback handler
+ * @user_data: user data for the callback
+ *
+ * Refresh the headers and call back when finished
+ * 
+ **/
+
+void
+tny_msg_folder_iface_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCallback callback, gpointer user_data)
+{
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_headers_async_func (self, callback, user_data);
+	return;
+}
+
+
+/**
  * tny_msg_folder_iface_set_subscribed:
  * @self: a TnyMsgFolderIface object
  * @subscribed: Whether or not to subscribe to the folder

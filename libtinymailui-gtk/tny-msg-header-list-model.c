@@ -241,6 +241,8 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 {
 	TnyMsgHeaderIface *header = NULL;
 	
+	g_return_if_fail (self);
+
 	g_return_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL (self)->stamp);
 	g_return_if_fail (iter->user_data != NULL);
 
