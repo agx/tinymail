@@ -57,7 +57,6 @@ typedef struct
 	GFunc relaxed_func;
 	GMutex *lock;
 	gboolean free_lock;
-	GMainLoop *waiter;
 } RelaxedData;
 
 static void
@@ -75,9 +74,6 @@ tny_msg_folder_relaxed_data_destroyer (gpointer data)
 
 	if (d->free_lock)
 		g_mutex_free (d->lock);
-
-	if (d->waiter)
-		g_main_loop_quit (d->waiter);
 
 	return;
 }
@@ -121,7 +117,6 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 		d->free_lock = TRUE;
 		d->lock = g_mutex_new ();
 
-		d->waiter = NULL;
 		g_mutex_lock (priv->cached_hdrs_lock);
 		d->list = g_list_copy (priv->cached_hdrs);
 		g_mutex_unlock (priv->cached_hdrs_lock);
@@ -139,7 +134,6 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 		RelaxedData *d = g_new (RelaxedData, 1);
 
 		d->relaxed_func = (GFunc)g_object_unref;
-		d->waiter = priv->waiter;
 		g_mutex_lock (priv->cached_hdrs_lock);
 		d->free_lock = FALSE;
 		d->lock = priv->cached_hdrs_lock;
@@ -417,6 +411,13 @@ tny_msg_folder_refresh_headers_async_callback (gpointer thr_user_data)
 	return FALSE;
 }
 
+static void
+camel_op_stat_func (struct _CamelOperation *op, const char *what, int pc, void *data)
+{
+	/* printf ("%s\n", what); */
+	return;
+}
+
 static gpointer 
 tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 {
@@ -424,14 +425,26 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	TnyMsgFolderIface *self = info->self;
 	gpointer user_data = info->user_data;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
-	TnyMsgFolderPriv *mypriv = g_new0 (TnyMsgFolderPriv, 1);
+	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
+
 	CamelException ex;
+	CamelOperation *oldcancel;
 
 	g_mutex_lock (priv->folder_lock);
 	load_folder_no_lock (priv);
 
+	/* TODO: Camel cancellation isn't yet working . . . */
+	if (apriv->cancel)
+		camel_operation_cancel (apriv->cancel);
+
+	apriv->cancel = camel_operation_new (camel_op_stat_func, NULL);
+
+	camel_operation_start (apriv->cancel, "Reading folder `%s'", priv->folder->full_name);
+
 	/* On the same IMAP connection, camel will spinlock here */
 	camel_folder_refresh_info (priv->folder, &ex);
+
+	camel_operation_end (apriv->cancel);
 
 	/* TODO: Implement CamelOperation stuff here, so that a new request
 	   gets handled first and/or the old request gets automatically
@@ -879,6 +892,8 @@ tny_msg_folder_class_init (TnyMsgFolderClass *class)
 
 	return;
 }
+
+
 
 static void
 tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
