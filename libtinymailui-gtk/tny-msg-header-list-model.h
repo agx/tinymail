@@ -52,7 +52,7 @@ enum
 GType         tny_msg_header_list_model_get_type   (void);
 GtkTreeModel* tny_msg_header_list_model_new        (void);
 
-void          tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder);
+void          tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh);
 
 G_END_DECLS
 

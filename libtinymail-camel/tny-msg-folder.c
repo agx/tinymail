@@ -483,7 +483,7 @@ tny_msg_folder_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCall
 }
 
 static const GList*
-tny_msg_folder_get_headers (TnyMsgFolderIface *self)
+tny_msg_folder_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
@@ -508,7 +508,9 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self)
 		ptr->priv = priv;
 
 		/* This one consumes time (use the async stuff) */
-		/* camel_folder_refresh_info (priv->folder, &ex); */
+
+		if (refresh)
+			camel_folder_refresh_info (priv->folder, &ex);
 
 		/* */
 		uids = camel_folder_get_uids (priv->folder);

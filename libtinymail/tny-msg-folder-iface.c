@@ -175,9 +175,9 @@ tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIfa
  * Return value: A read-only GList with TnyMsgHeaderIface instances
  **/
 const GList*
-tny_msg_folder_iface_get_headers (TnyMsgFolderIface *self)
+tny_msg_folder_iface_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 {
-	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_headers_func (self);
+	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_headers_func (self, refresh);
 }
 
 /**

@@ -187,8 +187,13 @@ refresh_current_folder (TnyMsgFolderIface *folder, gpointer user_data)
 	header_model = GTK_TREE_MODEL (
 		tny_msg_header_list_model_new ());
 
+#ifdef ASYNC_HEADERS
 	tny_msg_header_list_model_set_folder (
-		TNY_MSG_HEADER_LIST_MODEL (header_model), folder);
+		TNY_MSG_HEADER_LIST_MODEL (header_model), folder, FALSE);
+#else
+	tny_msg_header_list_model_set_folder (
+		TNY_MSG_HEADER_LIST_MODEL (header_model), folder, TRUE);
+#endif
 
 	sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 
@@ -234,11 +239,11 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
 
-		/* First refresh using the fast method (showing the current items) */
-		//refresh_current_folder (folder, user_data);
-
-		/* Then do a full refresh and callback */
+#ifdef ASYNC_HEADERS
 		tny_msg_folder_iface_refresh_headers_async (folder, refresh_current_folder, user_data);
+#else
+		refresh_current_folder (folder, user_data);
+#endif
 	}
 
 	return;

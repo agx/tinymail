@@ -336,14 +336,15 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
  * tny_msg_header_list_model_set_folder:
  * @self: A #TnyMsgHeaderListModel instance
  * @folder: a #TnyMsgFolderIface instance
+ * @refresh: whether or not to synchronize with the server first
  *
  * Set the folder where the #TnyMsgHeaderIface instances are located
  * 
  **/
 void
-tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder)
+tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh)
 {
-	const GList* headers = tny_msg_folder_iface_get_headers (folder);
+	const GList* headers = tny_msg_folder_iface_get_headers (folder, refresh);
 
 	self->headers = NULL;
 	self->length = 0;
