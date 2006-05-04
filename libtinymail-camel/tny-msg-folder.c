@@ -425,57 +425,23 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	gpointer user_data = info->user_data;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyMsgFolderPriv *mypriv = g_new0 (TnyMsgFolderPriv, 1);
-	GPtrArray *uids = NULL;
 	CamelException ex;
-	FldAndPriv *ptr = NULL;
 
 	g_mutex_lock (priv->folder_lock);
-
 	load_folder_no_lock (priv);
-
-	mypriv = memcpy (mypriv, priv, sizeof (TnyMsgFolderPriv));
-
-	/* Set this to NULL so that it's a new list! */
-	mypriv->cached_length = 0;
-	mypriv->cached_hdrs = NULL;
-	mypriv->cached_hdrs_lock = g_mutex_new ();
-
-	ptr = g_new (FldAndPriv, 1);
-
-	/* Prepare speedup trick */
-	ptr->self = self;
-	ptr->priv = mypriv; /* Not priv! */
 
 	/* This one consumes time */
 	camel_folder_refresh_info (priv->folder, &ex);
-	uids = camel_folder_get_uids (priv->folder);
 
-	g_ptr_array_foreach (uids, add_message_with_uid, ptr);
-	/* Cleanup speedup trick */
-	g_free (ptr);
+	g_list_foreach (priv->cached_hdrs, destroy_header, NULL);
+	g_list_free (priv->cached_hdrs);
+	priv->cached_hdrs = NULL;
+	g_mutex_unlock (priv->folder_lock);
 
-	g_mutex_free (mypriv->cached_hdrs_lock);
-	g_free (mypriv);
-
-	/* We need to get priv->cached_hdrs = NULL; */
-
-/* This *IS* needed! (but doesn't work). priv->cached_hdrs should become NULL!
-	if (!priv->waiter)
-		priv->waiter = g_main_loop_new (NULL, TRUE);
-
-	tny_msg_folder_hdr_cache_remover (priv);
-
-	if (g_main_loop_is_running (priv->waiter))
-		g_main_loop_run (priv->waiter);
-
-	g_main_loop_unref (priv->waiter);
-	priv->waiter = NULL;
-*/
 
 	g_idle_add_full (G_PRIORITY_HIGH, tny_msg_folder_refresh_headers_async_callback, 
 			info, tny_msg_folder_refresh_headers_async_destroyer);
 
-	g_mutex_unlock (priv->folder_lock);
 
 	g_thread_exit (NULL);
 
