@@ -311,6 +311,10 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			   an async version of this method. I'm not yet planning 
 			   to do that. */
 
+			/* Another solution would be to set the ui back to the
+			   folder of this message, and camel-cancel the folder-
+			   request. */
+
 			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
 			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
 
