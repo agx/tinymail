@@ -305,6 +305,12 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			const TnyMsgHeaderIface *nheader;
 
 			folder = tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE (header));
+
+			/* KNOWN: This call will block the ui if a folder is 
+			   being async loaded. This can be fixed by implementing
+			   an async version of this method. I'm not yet planning 
+			   to do that. */
+
 			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
 			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
 
