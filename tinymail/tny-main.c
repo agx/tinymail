@@ -46,7 +46,7 @@ main (int argc, char **argv)
 
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
-
+	gdk_threads_init ();
 	gnome_vfs_init ();
 
 	window = GTK_WINDOW (tny_summary_window_new ());
