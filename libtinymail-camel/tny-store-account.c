@@ -92,7 +92,22 @@ tny_store_account_reconnect (TnyAccount *self)
 	if (G_LIKELY (priv->service) && G_UNLIKELY (priv->pass_func_set) 
 		&& G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->user) 
 		&& G_UNLIKELY (priv->host))
+	{
+		priv->connected = FALSE;
 		camel_service_connect (priv->service, priv->ex);
+
+		if (camel_exception_is_set (priv->ex))
+		{
+			g_warning ("Not connected with %s: %s\n", priv->url_string,
+				   camel_exception_get_description (priv->ex));
+			camel_exception_clear (priv->ex);
+			camel_service_cancel_connect (priv->service);
+			return;
+		} else {
+			priv->connected = TRUE;
+		}
+
+	}
 
 	return;
 }
@@ -180,6 +195,10 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 	const GList *retval;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
+
+	/* TODO: Support disconnected mode */
+	if (!apriv->connected)
+		return NULL;
 
 	tny_store_account_clear_folders (priv);
 
@@ -332,6 +351,7 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	apriv->type = CAMEL_PROVIDER_STORE;
 	priv->folders = NULL;
 
+	apriv->connected = FALSE;
 	priv->folders_lock = g_mutex_new ();
 
 	return;
@@ -344,7 +364,6 @@ tny_store_account_finalize (GObject *object)
 	TnyStoreAccount *self = (TnyStoreAccount *)object;	
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
-printf ("account store fin\n");
 	tny_store_account_clear_folders (priv);
 
 	g_mutex_free (priv->folders_lock);

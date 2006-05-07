@@ -37,6 +37,7 @@ struct _TnyAccountIfaceClass
 {
 	GTypeInterface parent;
 
+	const gboolean (*is_connected_func)(TnyAccountIface *self);
         void (*set_id_func)                (TnyAccountIface *self, const gchar *id);
         void (*set_proto_func)             (TnyAccountIface *self, const gchar *proto);
         void (*set_user_func)              (TnyAccountIface *self, const gchar *user);
@@ -58,6 +59,8 @@ struct _TnyAccountIfaceClass
 };
 
 GType        tny_account_iface_get_type        (void);
+
+const gboolean tny_account_iface_is_connected (TnyAccountIface *self);
 
 void         tny_account_iface_set_id          (TnyAccountIface *self, const gchar *id);
 

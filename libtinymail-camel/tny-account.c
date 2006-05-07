@@ -43,6 +43,13 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-shared.h>
 
 
+const gboolean 
+tny_account_is_connected (TnyAccountIface *self)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	return priv->connected;
+}
+
 static void 
 tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
 {
@@ -380,6 +387,7 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_id_func = tny_account_get_id;
 	klass->set_account_store_func = tny_account_set_account_store;
 	klass->get_account_store_func = tny_account_get_account_store;
+	klass->is_connected_func = tny_account_is_connected;
 
 	return;
 }

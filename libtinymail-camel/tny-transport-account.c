@@ -104,8 +104,12 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 		str = tny_msg_header_iface_get_to (header);
 		_foreach_email_add_to_inet_addr (str, recipients);
 
+		apriv->connected = TRUE;
+
 		camel_transport_send_to (transport, message, (CamelAddress*)from, 
 			(CamelAddress*)recipients, &ex);
+
+		apriv->connected = FALSE;
 
 		camel_object_unref (CAMEL_OBJECT (from));
 		camel_object_unref (CAMEL_OBJECT (recipients));
@@ -136,6 +140,7 @@ tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyTransportAccount *self = (TnyTransportAccount *)instance;
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
+	apriv->connected = FALSE;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
 
 	return;

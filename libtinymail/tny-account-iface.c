@@ -21,6 +21,20 @@
 
 
 /**
+ * tny_account_iface_is_connected:
+ * @self: a #TnyAccountIface object
+ *
+ * Return value: whether or not the account is connected
+ **/
+
+const gboolean 
+tny_account_iface_is_connected (TnyAccountIface *self)
+{
+	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->is_connected_func (self);
+}
+
+
+/**
  * tny_account_iface_set_account_store:
  * @self: a #TnyAccountIface object
  * @store: a #TnyAccountStoreIface object
