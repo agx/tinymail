@@ -351,7 +351,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	hpaned1 = gtk_hpaned_new ();
 	gtk_widget_show (hpaned1);
-	vbox = gtk_vbox_new (FALSE, 5);
+	vbox = gtk_vbox_new (FALSE, 0);
 	priv->status = GTK_WIDGET (gtk_statusbar_new ());
 	priv->progress = gtk_progress_bar_new ();
 	priv->status_id = gtk_statusbar_get_context_id (GTK_STATUSBAR (priv->status), "default");
