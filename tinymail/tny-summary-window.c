@@ -255,11 +255,12 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 
-	gtk_widget_show (GTK_WIDGET (priv->progress));
 
 	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
 		TnyMsgFolderIface *folder;
+
+		gtk_widget_show (GTK_WIDGET (priv->progress));
 		
 		gtk_tree_model_get (model, &iter, 
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
