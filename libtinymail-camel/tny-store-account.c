@@ -93,6 +93,7 @@ tny_store_account_reconnect (TnyAccount *self)
 		&& G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->user) 
 		&& G_UNLIKELY (priv->host))
 	{
+		
 		priv->connected = FALSE;
 		camel_service_connect (priv->service, priv->ex);
 
@@ -102,11 +103,11 @@ tny_store_account_reconnect (TnyAccount *self)
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
 			camel_service_cancel_connect (priv->service);
-			return;
 		} else {
 			priv->connected = TRUE;
 		}
-
+		
+		camel_session_set_online (CAMEL_SESSION (priv->session), priv->connected);
 	}
 
 	return;
@@ -197,8 +198,8 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 	CamelStore *store;
 
 	/* TODO: Support disconnected mode */
-	if (!apriv->connected)
-		return NULL;
+	//if (!apriv->connected)
+	//	return NULL;
 
 	tny_store_account_clear_folders (priv);
 
