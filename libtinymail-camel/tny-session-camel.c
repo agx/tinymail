@@ -414,6 +414,8 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 	camel_dir = g_build_filename (base_directory, "mail", NULL);
 	camel_provider_init();
 	camel_session_construct (session, camel_dir);
+
+	/* TODO: Implement a smart "is this device online?" technique here */
 	camel_session_set_online ((CamelSession *) session, TRUE); 
 	
 	g_free (camel_dir);
