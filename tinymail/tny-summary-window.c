@@ -351,7 +351,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	hpaned1 = gtk_hpaned_new ();
 	gtk_widget_show (hpaned1);
-	vbox = gtk_vbox_new (FALSE, 0);
+	vbox = gtk_vbox_new (FALSE, 2);
 	priv->status = GTK_WIDGET (gtk_statusbar_new ());
 	priv->progress = gtk_progress_bar_new ();
 	priv->status_id = gtk_statusbar_get_context_id (GTK_STATUSBAR (priv->status), "default");
@@ -374,7 +374,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
 
 	gtk_window_set_title (window, "Tinymail");
-	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
+	gtk_container_set_border_width (GTK_CONTAINER (window), 0);
 
 
 	mailbox_sw = gtk_scrolled_window_new (NULL, NULL);
