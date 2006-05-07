@@ -422,13 +422,15 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
-	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
+	if (G_UNLIKELY (FALSE))
+	{ /* Not really working yet */
+		renderer = gtk_cell_renderer_text_new ();
+		column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
 			"text", TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN);
+		gtk_tree_view_column_set_sort_column_id (column, TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN);
 
-	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
-
+		gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
+	}
 
 	/* TODO: Persist application UI status */
 	/* header_view columns */
