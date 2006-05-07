@@ -223,6 +223,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gpointer user_data)
 	gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
 
 	gtk_widget_hide (GTK_WIDGET (priv->progress));
+	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
 
 	return;
 }
