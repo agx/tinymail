@@ -182,6 +182,17 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 	return;
 }
 
+static gboolean
+cleanup_statusbar (gpointer data)
+{
+	TnySummaryWindowPriv *priv = data;
+
+	gtk_widget_hide (GTK_WIDGET (priv->progress));
+	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
+
+	return FALSE;
+}
+
 static void
 refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer user_data)
 {
@@ -230,14 +241,10 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			
 		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
 
-		gtk_widget_hide (GTK_WIDGET (priv->progress));
-		gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
+		g_idle_add (cleanup_statusbar, priv);
 
 		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
 			&priv->last_mailbox_correct_select);
-
-
-		gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
 
 	} else {
 		g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
