@@ -385,6 +385,7 @@ typedef struct
 	TnyGetHeadersCallback callback;
 	TnyGetHeadersStatusCallback status_callback;
 	gpointer user_data;
+	gboolean cancelled;
 } RefreshHeadersInfo;
 
 
@@ -408,7 +409,7 @@ tny_msg_folder_refresh_headers_async_callback (gpointer thr_user_data)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (info->self));
 
 	if (info->callback)
-		info->callback (info->self, info->user_data);
+		info->callback (info->self, info->cancelled, info->user_data);
 
 	return FALSE;
 }
@@ -444,13 +445,15 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 
 	str = g_strdup_printf ("Reading folder `%s'", priv->folder->full_name);
 
+	info->cancelled = FALSE;
+
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
 		tny_msg_folder_refresh_headers_async_status, info, str);
 
-	g_free (str);
-
 	camel_folder_refresh_info (priv->folder, ex);
 	camel_exception_free (ex);
+
+	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 
 	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
@@ -603,8 +606,14 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 
 		/* TODO: We can reuse the message instance in the header 
 		   if not using the summary capabilities. */
+
+		_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
+					NULL, NULL, NULL);
+
 		camel_message = camel_folder_get_message  
 			(priv->folder, (const char *) id, ex);
+
+		_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
 		g_mutex_unlock (priv->folder_lock);
 

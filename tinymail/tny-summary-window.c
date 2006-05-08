@@ -59,6 +59,9 @@ struct _TnySummaryWindowPriv
 	guint accounts_reloaded_signal;
 	GtkWidget *status, *progress;
 	guint status_id;
+	gulong mailbox_select_sid;
+	GtkTreeSelection *mailbox_select;
+	GtkTreeIter last_mailbox_correct_select;
 };
 
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
@@ -179,51 +182,66 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 	return;
 }
 
-
 static void
-refresh_current_folder (TnyMsgFolderIface *folder, gpointer user_data)
+refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer user_data)
 {
 	TnySummaryWindowPriv *priv = user_data;
 
-	GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
-	GtkTreeModel *header_model, *sortable;
-
-	header_model = GTK_TREE_MODEL (
-		tny_msg_header_list_model_new ());
-
-#ifdef ASYNC_HEADERS
-	tny_msg_header_list_model_set_folder (
-		TNY_MSG_HEADER_LIST_MODEL (header_model), folder, FALSE);
-#else
-	tny_msg_header_list_model_set_folder (
-		TNY_MSG_HEADER_LIST_MODEL (header_model), folder, TRUE);
-#endif
-
-	sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
-
-	if (G_LIKELY (sortable) && G_LIKELY (GTK_IS_TREE_MODEL_SORT (sortable)))
+	if (!cancelled)
 	{
-		GtkTreeModel *model = gtk_tree_model_sort_get_model 
-			(GTK_TREE_MODEL_SORT (sortable));
+		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
+		GtkTreeModel *header_model, *sortable;
+		GtkTreeModel *select_model;
 
-		if (G_LIKELY (model))
-			g_object_unref (G_OBJECT (model));
+		header_model = GTK_TREE_MODEL (
+			tny_msg_header_list_model_new ());
 
-		g_object_unref (G_OBJECT (sortable));
+	#ifdef ASYNC_HEADERS
+		tny_msg_header_list_model_set_folder (
+			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, FALSE);
+	#else
+		tny_msg_header_list_model_set_folder (
+			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, TRUE);
+	#endif
+
+		sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
+
+		if (G_LIKELY (sortable) && G_LIKELY (GTK_IS_TREE_MODEL_SORT (sortable)))
+		{
+			GtkTreeModel *model = gtk_tree_model_sort_get_model 
+				(GTK_TREE_MODEL_SORT (sortable));
+
+			if (G_LIKELY (model))
+				g_object_unref (G_OBJECT (model));
+
+			g_object_unref (G_OBJECT (sortable));
+		}
+
+		sortable = gtk_tree_model_sort_new_with_model (header_model);
+
+		/* TODO: Implement a fast sorting algorithm (not easy) */
+
+		/* gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
+				TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
+				GTK_SORT_ASCENDING); */
+			
+		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
+
+		gtk_widget_hide (GTK_WIDGET (priv->progress));
+		gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
+
+		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
+			&priv->last_mailbox_correct_select);
+
+
+	} else {
+		g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
+
+		/* Restore selection */
+		gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
+
+		g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 	}
-
-	sortable = gtk_tree_model_sort_new_with_model (header_model);
-
-	/* TODO: Implement a fast sorting algorithm (not easy) */
-
-	/* gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
-			TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
-			GTK_SORT_ASCENDING); */
-		
-	gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
-
-	gtk_widget_hide (GTK_WIDGET (priv->progress));
-	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
 
 	return;
 }
@@ -243,7 +261,7 @@ refresh_current_folder_status_update (TnyMsgFolderIface *folder, const gchar *wh
 	}
 	gdk_threads_leave ();
 
-	/* g_print ("%s = %d\n", what, status); */
+	return;
 }
 
 static void
@@ -271,7 +289,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			refresh_current_folder, 
 			refresh_current_folder_status_update, user_data);
 #else
-		refresh_current_folder (folder, user_data);
+		refresh_current_folder (folder, FALSE, user_data);
 #endif
 	}
 
@@ -484,7 +502,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->mailbox_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
-	g_signal_connect (G_OBJECT (select), "changed",
+	priv->mailbox_select = select;
+	priv->mailbox_select_sid = g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_mailbox_view_tree_selection_changed), priv);
 
 
