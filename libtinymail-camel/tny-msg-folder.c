@@ -495,6 +495,8 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
 		tny_msg_folder_refresh_headers_async_status, info, str);
 
+	g_free (str);
+
 	camel_folder_refresh_info (priv->folder, ex);
 	camel_exception_free (ex);
 
