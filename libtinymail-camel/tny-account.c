@@ -43,6 +43,20 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-shared.h>
 
 
+static void 
+tny_account_stop_camel_operation_priv (TnyAccountPriv *priv)
+{
+	if (priv->cancel)
+	{
+		camel_operation_unregister (priv->cancel);
+		camel_operation_end (priv->cancel);
+		if (priv->cancel)
+			camel_operation_unref (priv->cancel);
+		priv->cancel = NULL;
+	}
+
+	return;
+}
 void 
 _tny_account_start_camel_operation (TnyAccountIface *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what)
 {
@@ -51,7 +65,12 @@ _tny_account_start_camel_operation (TnyAccountIface *self, CamelOperationStatusF
 	g_mutex_lock (priv->cancel_lock);
 
 	if (priv->cancel)
-		camel_operation_cancel (priv->cancel);
+	{
+		while (!camel_operation_cancel_check (priv->cancel))
+			camel_operation_cancel (priv->cancel);
+
+		tny_account_stop_camel_operation_priv (priv);
+	}
 
 	priv->cancel = camel_operation_new (func, user_data);
 	camel_operation_ref (priv->cancel);
@@ -69,12 +88,7 @@ _tny_account_stop_camel_operation (TnyAccountIface *self)
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->cancel_lock);
-
-	camel_operation_unregister (priv->cancel);
-	camel_operation_end (priv->cancel);
-	if (priv->cancel)
-		camel_operation_unref (priv->cancel);
-	priv->cancel = NULL;
+	tny_account_stop_camel_operation_priv (priv);
 	g_mutex_unlock (priv->cancel_lock);
 
 	return;
