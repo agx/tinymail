@@ -414,13 +414,58 @@ tny_msg_folder_refresh_headers_async_callback (gpointer thr_user_data)
 	return FALSE;
 }
 
+
+typedef struct{
+	RefreshHeadersInfo *minfo;
+	gchar *what;
+	gint pc;
+} ProgressInfo;
+
+static void
+destroy_progress_idle (gpointer data)
+{
+	ProgressInfo *info = data;
+	g_free (info->what);
+	g_free (info->minfo);
+	g_free (data);
+
+	return;
+}
+
+static gboolean
+progress_func (gpointer data)
+{
+	ProgressInfo *info = data;
+	const gchar *what = (const gchar*)info->what;
+	RefreshHeadersInfo *minfo = info->minfo;
+	gint pc = info->pc;
+
+	if (minfo && minfo->status_callback)
+		minfo->status_callback (minfo->self, (const gchar*)what, (gint)pc, minfo->user_data);
+
+	return FALSE;
+} 
+
+
 static void
 tny_msg_folder_refresh_headers_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
-	RefreshHeadersInfo *minfo = thr_user_data;
-	
-	if (minfo->status_callback)
-		minfo->status_callback (minfo->self, (const gchar*)what, (gint)pc, minfo->user_data);
+	RefreshHeadersInfo *oinfo = thr_user_data;
+	ProgressInfo *info = g_new0 (ProgressInfo, 1);
+
+	/* Camel will shredder what and thr_user_data, so we need to copy it */
+
+	info->what = g_strdup (what);
+	info->minfo = g_new0 (RefreshHeadersInfo ,1);
+	info->minfo->callback = oinfo->callback;
+	info->minfo->cancelled = oinfo->cancelled;
+	info->minfo->self = oinfo->self;
+	info->minfo->status_callback = oinfo->status_callback;
+	info->minfo->user_data = oinfo->user_data;
+	info->pc = pc;
+
+	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+		progress_func, info, destroy_progress_idle);
 
 	return;
 }

@@ -52,27 +52,53 @@ tny_account_stop_camel_operation_priv (TnyAccountPriv *priv)
 		camel_operation_end (priv->cancel);
 		if (priv->cancel)
 			camel_operation_unref (priv->cancel);
-		priv->cancel = NULL;
 	}
+
+	priv->cancel = NULL;
+	priv->inuse_spin = FALSE;
 
 	return;
 }
+
+static gpointer
+camel_cancel_hack_thread (gpointer data)
+{
+	camel_operation_cancel (NULL);
+
+	g_thread_exit (NULL);
+	return NULL;
+}
+
 void 
 _tny_account_start_camel_operation (TnyAccountIface *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what)
 {
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	
-	g_mutex_lock (priv->cancel_lock);
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);\
+	GThread *thread;
+
+	g_mutex_lock (priv->cancel_lock);	
+
+	/* I know this isn't polite. But it works ;-) */
+	/* camel_operation_cancel (NULL); */
+	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
+	g_thread_join (thread);
 
 	if (priv->cancel)
 	{
-		while (!camel_operation_cancel_check (priv->cancel))
-			camel_operation_cancel (priv->cancel);
-
+		/* camel_operation_cancel (priv->cancel); */
+		camel_operation_cancel (NULL);
+		while (!camel_operation_cancel_check (priv->cancel)) 
+		{ 
+			g_warning ("Cancellation failed, retrying\n");
+			camel_operation_cancel (NULL); 
+		}
 		tny_account_stop_camel_operation_priv (priv);
 	}
 
+	while (priv->inuse_spin); 
+	priv->inuse_spin = TRUE;
+
 	priv->cancel = camel_operation_new (func, user_data);
+	
 	camel_operation_ref (priv->cancel);
 	camel_operation_register (priv->cancel);
 	camel_operation_start (priv->cancel, (char*)what);
@@ -87,9 +113,12 @@ _tny_account_stop_camel_operation (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	g_mutex_lock (priv->cancel_lock);
-	tny_account_stop_camel_operation_priv (priv);
-	g_mutex_unlock (priv->cancel_lock);
+	if (priv->cancel)
+	{
+		g_mutex_lock (priv->cancel_lock);
+		tny_account_stop_camel_operation_priv (priv);
+		g_mutex_unlock (priv->cancel_lock);
+	}
 
 	return;
 }
@@ -358,6 +387,8 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	camel_exception_init (priv->ex);
 
 	priv->cancel_lock = g_mutex_new ();
+	priv->inuse_spin = FALSE;
+
 	priv->store = NULL;
 	priv->id = NULL;
 	priv->user = NULL;
@@ -392,6 +423,7 @@ tny_account_finalize (GObject *object)
 	g_mutex_unlock (priv->cancel_lock);
 
 	g_mutex_free (priv->cancel_lock);
+	priv->inuse_spin = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 

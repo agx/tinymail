@@ -31,7 +31,7 @@ struct _TnyMsgFolderPriv
 	GMutex *cached_hdrs_lock;
 	GList *cached_hdrs;
 	GPtrArray *cached_uids;
-
+	
 	GMutex *cached_msgs_lock;
 	GHashTable *cached_msgs;
 

@@ -38,7 +38,7 @@ struct _TnyAccountPriv
 	CamelProviderType type;
 	CamelOperation *cancel;
 	GMutex *cancel_lock;
-	gboolean connected;
+	gboolean connected, inuse_spin;
 };
 
 const CamelService*  _tny_account_get_service    (TnyAccount *self);

@@ -249,19 +249,15 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 	return;
 }
 
+
 static void
 refresh_current_folder_status_update (TnyMsgFolderIface *folder, const gchar *what, gint status, gpointer user_data)
 {
-	gdk_threads_enter ();
-	{
-		TnySummaryWindowPriv *priv = user_data;
+	TnySummaryWindowPriv *priv = user_data;
 
-		gtk_progress_bar_pulse (GTK_PROGRESS_BAR (priv->progress));
-
-		gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
-		gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, what);
-
-	}
+	gtk_progress_bar_pulse (GTK_PROGRESS_BAR (priv->progress));
+	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
+	gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, what);
 	gdk_threads_leave ();
 
 	return;
