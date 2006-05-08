@@ -43,6 +43,43 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-shared.h>
 
 
+void 
+_tny_account_start_camel_operation (TnyAccountIface *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	
+	g_mutex_lock (priv->cancel_lock);
+
+	if (priv->cancel)
+		camel_operation_cancel (priv->cancel);
+
+	priv->cancel = camel_operation_new (func, user_data);
+	camel_operation_ref (priv->cancel);
+	camel_operation_register (priv->cancel);
+	camel_operation_start (priv->cancel, (char*)what);
+
+	g_mutex_unlock (priv->cancel_lock);
+
+	return;
+}
+
+void 
+_tny_account_stop_camel_operation (TnyAccountIface *self)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->cancel_lock);
+
+	camel_operation_unregister (priv->cancel);
+	camel_operation_end (priv->cancel);
+	if (priv->cancel)
+		camel_operation_unref (priv->cancel);
+	priv->cancel = NULL;
+	g_mutex_unlock (priv->cancel_lock);
+
+	return;
+}
+
 const gboolean 
 tny_account_is_connected (TnyAccountIface *self)
 {

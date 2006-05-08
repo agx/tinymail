@@ -44,6 +44,9 @@ struct _TnyAccountPriv
 const CamelService*  _tny_account_get_service    (TnyAccount *self);
 const gchar*         _tny_account_get_url_string (TnyAccount *self);
 
+void _tny_account_start_camel_operation          (TnyAccountIface *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what);
+void _tny_account_stop_camel_operation           (TnyAccountIface *self);
+
 #define TNY_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ACCOUNT, TnyAccountPriv))
 

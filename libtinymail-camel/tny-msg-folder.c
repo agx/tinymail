@@ -433,6 +433,7 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	gpointer user_data = info->user_data;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
+	gchar *str;
 
 	CamelException *ex = camel_exception_new ();
 
@@ -441,30 +442,17 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	g_mutex_lock (priv->folder_lock);
 	load_folder_no_lock (priv);
 
-	g_mutex_lock (apriv->cancel_lock);
+	str = g_strdup_printf ("Reading folder `%s'", priv->folder->full_name);
 
-	if (apriv->cancel)
-		camel_operation_cancel (apriv->cancel);
+	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
+		tny_msg_folder_refresh_headers_async_status, info, str);
 
-	apriv->cancel = camel_operation_new (tny_msg_folder_refresh_headers_async_status, info);
-	camel_operation_ref (apriv->cancel);
-	camel_operation_register (apriv->cancel);
-	camel_operation_start (apriv->cancel, "Reading folder `%s'", priv->folder->full_name);
-
-	g_mutex_unlock (apriv->cancel_lock);
+	g_free (str);
 
 	camel_folder_refresh_info (priv->folder, ex);
-
 	camel_exception_free (ex);
 
-	g_mutex_lock (apriv->cancel_lock);
-
-	camel_operation_unregister (apriv->cancel);
-	camel_operation_end (apriv->cancel);
-	if (apriv->cancel)
-		camel_operation_unref (apriv->cancel);
-	apriv->cancel = NULL;
-	g_mutex_unlock (apriv->cancel_lock);
+	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
 	g_list_foreach (priv->cached_hdrs, destroy_header, NULL);
 	g_list_free (priv->cached_hdrs);

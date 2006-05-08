@@ -20,6 +20,7 @@
 #include <string.h>
 #include "tny-camel-common-priv.h"
 
+
 void
 _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 {
