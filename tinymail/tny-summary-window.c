@@ -237,6 +237,8 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			&priv->last_mailbox_correct_select);
 
 
+		gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
+
 	} else {
 		g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 
