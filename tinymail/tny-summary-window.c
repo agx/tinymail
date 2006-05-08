@@ -197,6 +197,9 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			tny_msg_header_list_model_new ());
 
 	#ifdef ASYNC_HEADERS
+
+		/* TODO: Enable the header view (bit I'm first testing a little bit) */
+
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, FALSE);
 	#else
@@ -285,6 +288,9 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			&folder, -1);
 
 #ifdef ASYNC_HEADERS
+
+		/* TODO: Disable the header view (bit I'm first testing a little bit) */
+
 		tny_msg_folder_iface_refresh_headers_async (folder, 
 			refresh_current_folder, 
 			refresh_current_folder_status_update, user_data);
