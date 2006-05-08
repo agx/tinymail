@@ -258,7 +258,6 @@ refresh_current_folder_status_update (TnyMsgFolderIface *folder, const gchar *wh
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR (priv->progress));
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
 	gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, what);
-	gdk_threads_leave ();
 
 	return;
 }
