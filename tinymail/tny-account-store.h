@@ -23,6 +23,8 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
+#include <tny-camel-shared.h>
+
 G_BEGIN_DECLS
 
 #define TNY_TYPE_ACCOUNT_STORE             (tny_account_store_get_type ())
@@ -47,6 +49,7 @@ struct _TnyAccountStoreClass
 
 GType               tny_account_store_get_type       (void);
 TnyAccountStore*    tny_account_store_get_instance   (void);
+TnySessionCamel*    tny_account_store_get_session    (TnyAccountStore *self);
 
 G_END_DECLS
 

@@ -53,6 +53,8 @@ struct _TnyAccountStorePriv
 	GMutex *transport_accounts_lock;
 	GList *transport_accounts;
 
+	TnySessionCamel *session;
+
 	guint notify;
 };
 
@@ -512,6 +514,13 @@ tny_account_store_finalize (GObject *object)
 	return;
 }
 
+TnySessionCamel*
+tny_account_store_get_session (TnyAccountStore *self)
+{
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	return priv->session;
+}
+
 static TnyAccountStore *the_singleton = NULL;
 
 static GObject*
@@ -524,8 +533,14 @@ tny_account_store_constructor (GType type, guint n_construct_params,
 
 	if (G_UNLIKELY (!the_singleton))
 	{
+		TnyAccountStorePriv *priv;
+
 		object = G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_params, construct_params);
+
+		priv = TNY_ACCOUNT_STORE_GET_PRIVATE (object);
+		priv->session = tny_session_camel_new 
+			(TNY_ACCOUNT_STORE_IFACE (object));
 
 		the_singleton = TNY_ACCOUNT_STORE (object);
 	}

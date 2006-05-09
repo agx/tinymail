@@ -22,9 +22,9 @@
 #include <string.h>
 
 #include <tny-account.h>
-
 #include <tny-session-camel.h>
 #include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 #include <tny-msg-folder-iface.h>
 #include <tny-msg-folder.h>
 
@@ -138,12 +138,12 @@ tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface
 	/* No need to reference (would also be cross reference): If store dies,
 	   self should also die. */
 	
-	priv->store = store;
+	priv->store = (TnyAccountStoreIface*) store;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	priv->session = tny_session_camel_get_instance 
-		(TNY_ACCOUNT_STORE_IFACE (priv->store));
+	priv->session = tny_account_store_get_session 
+			(TNY_ACCOUNT_STORE (priv->store));
 
 	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
 

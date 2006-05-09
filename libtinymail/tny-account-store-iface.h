@@ -75,7 +75,7 @@ void          tny_account_store_iface_add_store_account         (TnyAccountStore
 const GList*  tny_account_store_iface_get_transport_accounts    (TnyAccountStoreIface *self);
 void          tny_account_store_iface_add_transport_account     (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
 
-const gchar*  tny_account_store_iface_get_cache_dir              (TnyAccountStoreIface *self);
+const gchar*  tny_account_store_iface_get_cache_dir             (TnyAccountStoreIface *self);
 
 G_END_DECLS
 

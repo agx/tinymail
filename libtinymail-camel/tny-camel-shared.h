@@ -22,4 +22,9 @@
 
 extern gboolean camel_type_init_done;
 
+typedef struct _TnySessionCamel TnySessionCamel;
+typedef struct _TnySessionCamelClass TnySessionCamelClass;
+
+TnySessionCamel*  tny_session_camel_new  (TnyAccountStoreIface *account_store);
+
 #endif

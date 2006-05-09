@@ -34,7 +34,7 @@ struct _TnyAccountPriv
 	TnyGetPassFunc get_pass_func;
 	TnyForgetPassFunc forget_pass_func;
 	gboolean pass_func_set, forget_pass_func_set;
-	const TnyAccountStoreIface *store;
+	TnyAccountStoreIface *store;
 	CamelProviderType type;
 	CamelOperation *cancel;
 	GMutex *cancel_lock;

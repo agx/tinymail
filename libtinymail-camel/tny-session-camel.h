@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <camel/camel-session.h>
 #include <tny-shared.h>
-
+#include <tny-camel-shared.h>
 
 G_BEGIN_DECLS
 
@@ -31,9 +31,6 @@ G_BEGIN_DECLS
 #define TNY_SESSION_CAMEL(obj)     (CAMEL_CHECK_CAST((obj), TNY_TYPE_SESSION_CAMEL, TnySessionCamel))
 #define TNY_SESSION_CAMEL_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_TYPE_SESSION_CAMEL, TnySessionCamelClass))
 #define TNY_IS_SESSION_CAMEL(o)    (CAMEL_CHECK_TYPE((o), TNY_TYPE_SESSION_CAMEL))
-
-typedef struct _TnySessionCamel TnySessionCamel;
-typedef struct _TnySessionCamelClass TnySessionCamelClass;
 
 struct _TnySessionCamel
 {
@@ -52,7 +49,6 @@ struct _TnySessionCamelClass
 };
 
 CamelType         tny_session_camel_get_type      (void);
-TnySessionCamel*  tny_session_camel_get_instance  (TnyAccountStoreIface *account_store);
 
 void              tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account, TnyGetPassFunc get_pass_func);
 void              tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *account, TnyForgetPassFunc get_forget_pass_func);

@@ -425,31 +425,21 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 }
 
 
-static TnySessionCamel* the_singleton;
-
 /**
- * tny_session_camel_get_instance:
- *
+ * tny_session_camel_new:
+ * @account_store: A TnyAccountStoreIface instance
  *
  * Return value: The #TnySessionCamel singleton instance
  **/
 TnySessionCamel*
-tny_session_camel_get_instance (TnyAccountStoreIface *account_store)
+tny_session_camel_new (TnyAccountStoreIface *account_store)
 {
-	/* TODO: potential problem: singleton without lock */
-	if (G_UNLIKELY (!the_singleton))
-	{
-		the_singleton = TNY_SESSION_CAMEL 
+	TnySessionCamel *retval = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
 
-		/* TODO: A session per account store? Might be doable. Atm is 
-		   account_store also a singleton. Nothing is stopping it from
-		   becoming a normal type, except this piece of code. */
+	tny_session_camel_set_account_store (retval, account_store);
 
-		tny_session_camel_set_account_store (the_singleton, account_store);
-	}
-
-	return the_singleton;
+	return retval;
 }
 
 
