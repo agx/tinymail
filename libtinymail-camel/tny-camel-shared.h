@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <tny-shared.h>
+
 extern gboolean camel_type_init_done;
 
 typedef struct _TnySessionCamel TnySessionCamel;
