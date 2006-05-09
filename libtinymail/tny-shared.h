@@ -32,6 +32,8 @@ typedef struct _TnyMsgMimePartIface TnyMsgMimePartIface;
 typedef struct _TnyMsgMimePartIfaceClass TnyMsgMimePartIfaceClass;
 typedef struct _TnyAccountIface TnyAccountIface;
 typedef struct _TnyAccountIfaceClass TnyAccountIfaceClass;
+typedef struct _TnyDeviceIface TnyDeviceIface;
+typedef struct _TnyDeviceIfaceClass TnyDeviceIfaceClass;
 typedef struct _TnyStoreAccountIface TnyStoreAccountIface;
 typedef struct _TnyStoreAccountIfaceClass TnyStoreAccountIfaceClass;
 typedef struct _TnyTransportAccountIface TnyTransportAccountIface;
