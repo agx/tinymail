@@ -44,6 +44,15 @@ AC_ARG_ENABLE(unit-tests,
 esac],[build_unittests=false])
 AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
 
+AC_ARG_WITH(platform,
+[  --with-platform=gnome-desktop       platform to compile [gnome-desktop]],
+[case "${with_platform}" in
+  gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
+  *) AC_MSG_ERROR(bad value ${with_platform} for --with-platform) ;;
+esac],[PLATFORMDIR=libtinymail-gnome-desktop])
+
+AC_SUBST(PLATFORMDIR)
+
 GTK_DOC_CHECK([1.0])
 
 PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.8 gobject-2.0)
@@ -63,9 +72,20 @@ AC_SUBST(LIBTINYMAIL_GNOMEVFS_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_LIBS)
 
 dnl gnomeui-2 is for gnome_icon_lookup :-\
+dnl Maybe refactor it as a thiny in libtinymail-gnome-desktop?
+
 PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
 AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
+
+if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
+PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
+else
+LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
+LIBTINYMAIL_GNOME_DESKTOP_LIBS=
+fi
+AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)
+AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_LIBS)
 
 if test x$build_unittests = xtrue; then
 PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0 camel-1.2 camel-provider-1.2 gnome-vfs-2.0)
@@ -120,6 +140,8 @@ libtinymailui-gtk/Makefile
 libtinymailui-gtk/libtinymailui-gtk.pc
 libtinymail-gnomevfs/Makefile
 libtinymail-gnomevfs/libtinymail-gnomevfs.pc
+libtinymail-gnome-desktop/Makefile
+libtinymail-gnome-desktop/libtinymail-gnome-desktop.pc
 libtinymail-test/Makefile
 tinymail/Makefile
 tinymail-python/Makefile

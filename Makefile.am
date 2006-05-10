@@ -1,4 +1,4 @@
-SUBDIRS = libtinymail libtinymail-camel libtinymailui libtinymail-gnomevfs libtinymailui-gtk tinymail docs
+SUBDIRS = libtinymail libtinymailui libtinymail-gnomevfs libtinymailui-gtk $(PLATFORMDIR) libtinymail-camel tinymail docs
 if BUILD_UNITTESTS
 SUBDIRS .= libtinymail-test 
 endif

@@ -1,5 +1,6 @@
 INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS) -I.	\
-	-I$(top_builddir)/libtinymail
+	-I$(top_builddir)/libtinymail		\
+	-I$(top_builddir)/$(PLATFORMDIR)
 
 # This makes tinymail faster, but wastes more memory
 #	-DPERFORMANCE_MODE
@@ -43,7 +44,8 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 
 libtinymail_camel_1_0_la_LIBADD =		\
 	$(LIBTINYMAIL_CAMEL_LIBS)		\
-	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
+	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la
 
 libtinymail_camel_1_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
 libtinymail_camel_1_0include_HEADERS = $(libtinymail_camel_1_0_headers)
