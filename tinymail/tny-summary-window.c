@@ -142,6 +142,14 @@ tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountSto
 	if (G_UNLIKELY (priv->account_store))
 	{ /* You typically set it once, so unlikely */
 
+		const TnyDeviceIface *odevice = tny_account_store_iface_get_device (priv->account_store);
+
+		if (g_signal_handler_is_connected (G_OBJECT (odevice), priv->connchanged_signal))
+		{
+			g_signal_handler_disconnect (G_OBJECT (odevice), 
+				priv->connchanged_signal);
+		}
+
 		g_signal_handler_disconnect (G_OBJECT (priv->account_store),
 			priv->accounts_reloaded_signal);
 
@@ -151,12 +159,6 @@ tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountSto
 
 	if (G_LIKELY (device))
 	{
-		if (g_signal_handler_is_connected (G_OBJECT (device), priv->connchanged_signal))
-		{
-			g_signal_handler_disconnect (G_OBJECT (device), 
-				priv->connchanged_signal);
-		}
-
 		priv->connchanged_signal = 
 			g_signal_connect (G_OBJECT (device), "connection_changed",
 				G_CALLBACK (connection_changed), self);	
