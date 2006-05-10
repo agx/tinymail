@@ -18,6 +18,7 @@
  */
 
 #include <tny-device.h>
+#include <libnm_glib.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -39,11 +40,40 @@ tny_device_on_offline (TnyDeviceIface *self)
 	return;
 }
 
+static void 
+nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
+{
+	TnyDevice *self = (TnyDevice *)user_data;
+	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	libnm_glib_state state = libnm_glib_get_network_state (nm_ctx);
+
+	switch (state)
+	{
+		case LIBNM_NO_NETWORK_CONNECTION:
+		tny_device_on_offline (TNY_DEVICE_IFACE (self));
+		break;
+
+		case LIBNM_NO_DBUS:
+		case LIBNM_NO_NETWORKMANAGER:
+		case LIBNM_INVALID_CONTEXT:
+		case LIBNM_ACTIVE_NETWORK_CONNECTION:
+		default:
+		tny_device_on_online (TNY_DEVICE_IFACE (self));
+		break;
+	}
+
+	return;
+}
+
 static void
 tny_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	/* TnyDevice *self = (TnyDevice *)instance;
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self); */
+	TnyDevice *self = (TnyDevice *)instance;
+	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+
+	priv->nm_ctx = libnm_glib_init ();
+	priv->callback_id = libnm_glib_register_callback 
+		(priv->nm_ctx, nm_callback, self, NULL);
 
 	return;
 }
@@ -69,8 +99,12 @@ tny_device_get_instance (void)
 static void
 tny_device_finalize (GObject *object)
 {
-	/* TnyDevice *self = (TnyDevice *)object;	
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self); */
+	TnyDevice *self = (TnyDevice *)object;	
+	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+
+
+	libnm_glib_unregister_callback (priv->nm_ctx, priv->callback_id);
+	libnm_glib_shutdown (priv->nm_ctx);
 
 	(*parent_class->finalize) (object);
 

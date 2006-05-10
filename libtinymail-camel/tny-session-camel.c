@@ -397,8 +397,6 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 {
 	TnySessionCamel *self = user_data;
 
-	g_print ("Going %s\n", online?"ONLINE":"OFFLINE");
-
 	camel_session_set_online ((CamelSession *) self, online); 
 
 	return;
