@@ -121,10 +121,6 @@ tny_device_iface_init (gpointer g_iface, gpointer iface_data)
 }
 
 
-static TnyDevice *the_singleton = NULL;
-
-
-
 
 static void 
 tny_device_class_init (TnyDeviceClass *class)
