@@ -389,6 +389,7 @@ tny_session_camel_ms_thread_status (CamelSession *session, CamelSessionThreadMsg
 static void
 tny_session_camel_init (TnySessionCamel *instance)
 {
+	instance->device = NULL;
 }
 
 static void
@@ -489,7 +490,7 @@ tny_session_camel_finalise (CamelObject *object)
 {
 	TnySessionCamel *self = (TnySessionCamel*)object;
 
-	if (g_signal_handler_is_connected (G_OBJECT (self->device), self->connchanged_signal))
+	if (self->device && g_signal_handler_is_connected (G_OBJECT (self->device), self->connchanged_signal))
 	{
 		g_signal_handler_disconnect (G_OBJECT (self->device), 
 			self->connchanged_signal);
