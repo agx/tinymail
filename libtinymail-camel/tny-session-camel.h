@@ -36,6 +36,8 @@ struct _TnySessionCamel
 {
         CamelSession parent_object;
         gboolean interactive;
+	gpointer device;
+	guint connchanged_signal;
 };
 
 struct _TnySessionCamelClass
@@ -54,6 +56,7 @@ void              tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAcc
 void              tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *account, TnyForgetPassFunc get_forget_pass_func);
 
 void              tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface *account_store);
+void              tny_session_camel_set_device (TnySessionCamel *self, TnyDeviceIface *device);
 
 G_END_DECLS
 

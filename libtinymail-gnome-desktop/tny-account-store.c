@@ -35,6 +35,9 @@
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
 
+#include <tny-device-iface.h>
+#include <tny-device.h>
+
 /* "GConf vs. Camel" account implementation */
 
 static GObjectClass *parent_class = NULL;
@@ -533,6 +536,7 @@ tny_account_store_constructor (GType type, guint n_construct_params,
 
 	if (G_UNLIKELY (!the_singleton))
 	{
+		TnyDeviceIface *device = tny_device_get_instance ();
 		TnyAccountStorePriv *priv;
 
 		object = G_OBJECT_CLASS (parent_class)->constructor (type,
@@ -540,7 +544,7 @@ tny_account_store_constructor (GType type, guint n_construct_params,
 
 		priv = TNY_ACCOUNT_STORE_GET_PRIVATE (object);
 		priv->session = tny_session_camel_new 
-			(TNY_ACCOUNT_STORE_IFACE (object));
+			(TNY_ACCOUNT_STORE_IFACE (object), device);
 
 		the_singleton = TNY_ACCOUNT_STORE (object);
 	}

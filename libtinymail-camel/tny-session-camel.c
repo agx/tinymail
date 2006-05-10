@@ -34,6 +34,7 @@
 
 #include <tny-session-camel.h>
 
+#include <tny-device-iface.h>
 #include <tny-account-store-iface.h>
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
@@ -390,10 +391,22 @@ tny_session_camel_init (TnySessionCamel *instance)
 {
 }
 
+static void
+connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
+{
+	TnySessionCamel *self = user_data;
+
+	g_print ("Going %s\n", online?"ONLINE":"OFFLINE");
+
+	camel_session_set_online ((CamelSession *) self, online); 
+
+	return;
+}
+
 /**
  * tny_session_camel_set_account_store:
  * @self: a #TnySessionCamel object
- * @account_store: the #TnyAccountStoreIface account store instance
+ * @account_store: A #TnyAccountStoreIface account store instance
  *
  *
  **/
@@ -426,18 +439,46 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 
 
 /**
+ * tny_session_camel_set_device:
+ * @self: a #TnySessionCamel object
+ * @device: a #TnyDeviceIface instance
+ *
+ *
+ **/
+void 
+tny_session_camel_set_device (TnySessionCamel *self, TnyDeviceIface *device)
+{
+
+	if (self->device && g_signal_handler_is_connected (G_OBJECT (self->device), self->connchanged_signal))
+	{
+		g_signal_handler_disconnect (G_OBJECT (device), 
+			self->connchanged_signal);
+	}
+
+	self->device = device;
+	self->connchanged_signal = 
+		g_signal_connect (G_OBJECT (device), "connection_changed",
+			G_CALLBACK (connection_changed), self);	
+
+	return;
+}
+
+
+/**
  * tny_session_camel_new:
  * @account_store: A TnyAccountStoreIface instance
+ * @device: a TnyDeviceIface instance
  *
  * Return value: The #TnySessionCamel singleton instance
  **/
 TnySessionCamel*
-tny_session_camel_new (TnyAccountStoreIface *account_store)
+tny_session_camel_new (TnyAccountStoreIface *account_store, TnyDeviceIface *device)
 {
 	TnySessionCamel *retval = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
 
 	tny_session_camel_set_account_store (retval, account_store);
+	tny_session_camel_set_device (retval, device);
 
 	return retval;
 }
@@ -446,7 +487,14 @@ tny_session_camel_new (TnyAccountStoreIface *account_store)
 static void
 tny_session_camel_finalise (CamelObject *object)
 {
-	
+	TnySessionCamel *self = (TnySessionCamel*)object;
+
+	if (g_signal_handler_is_connected (G_OBJECT (self->device), self->connchanged_signal))
+	{
+		g_signal_handler_disconnect (G_OBJECT (self->device), 
+			self->connchanged_signal);
+	}
+
 	/* CamelObject types don't need parent finalization (build-in camel)
 	(*((CamelObjectClass*)ms_parent_class)->finalise) (object); */
 
