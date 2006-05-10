@@ -288,6 +288,16 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 		gchar *proto, *user, *hostname, *type, *key;
 		TnyAccountIface *account;
 
+		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
+		
+		if (!gconf_client_dir_exists (priv->client, (const gchar*)key, NULL))
+		{
+			g_free (key);
+			continue;
+		}
+	
+		g_free (key);
+
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", i);
 		type = gconf_client_get_string (priv->client, 
 			(const gchar*) key, NULL);
