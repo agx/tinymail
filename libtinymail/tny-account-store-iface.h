@@ -64,6 +64,9 @@ struct _TnyAccountStoreIfaceClass
 	void          (*add_transport_account_func)             (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
 
 	const gchar*  (*get_cache_dir_func)                     (TnyAccountStoreIface *self);
+
+	const TnyDeviceIface* 
+		(*get_device_func)				(TnyAccountStoreIface *self);
 };
 
 GType         tny_account_store_iface_get_type                  (void);
@@ -76,6 +79,9 @@ const GList*  tny_account_store_iface_get_transport_accounts    (TnyAccountStore
 void          tny_account_store_iface_add_transport_account     (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
 
 const gchar*  tny_account_store_iface_get_cache_dir             (TnyAccountStoreIface *self);
+
+const TnyDeviceIface* 
+		tny_account_store_iface_get_device		(TnyAccountStoreIface *self);
 
 G_END_DECLS
 

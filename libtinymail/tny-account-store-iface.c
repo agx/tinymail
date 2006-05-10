@@ -32,6 +32,19 @@
 guint *tny_account_store_iface_signals = NULL;
 
 /**
+ * tny_account_store_iface_get_device:
+ * @self: a #TnyAccountTransportIface object
+ * 
+ * Return value: the device attached to this account store
+ **/
+
+const TnyDeviceIface* 
+tny_account_store_iface_get_device (TnyAccountStoreIface *self)
+{
+	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_device_func (self);
+}
+
+/**
  * tny_account_store_iface_get_cache_dir:
  * @self: a #TnyAccountTransportIface object
  * 

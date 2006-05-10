@@ -62,6 +62,7 @@ struct _TnySummaryWindowPriv
 	gulong mailbox_select_sid;
 	GtkTreeSelection *mailbox_select;
 	GtkTreeIter last_mailbox_correct_select;
+	guint connchanged_signal;
 };
 
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
@@ -119,11 +120,24 @@ accounts_reloaded (TnyAccountStoreIface *store, gpointer user_data)
 	return;
 }
 
+static void
+connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
+{
+	TnySummaryWindowIface *self = user_data;
+
+	if (online)
+		gtk_window_set_title (GTK_WINDOW (self), "Tinymail - online");
+	else
+		gtk_window_set_title (GTK_WINDOW (self), "Tinymail - offline");
+
+	return;
+}
 
 static void
 tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store)
 {
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
+	const TnyDeviceIface *device = tny_account_store_iface_get_device (account_store);
 
 	if (G_UNLIKELY (priv->account_store))
 	{ /* You typically set it once, so unlikely */
@@ -132,6 +146,20 @@ tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountSto
 			priv->accounts_reloaded_signal);
 
 		g_object_unref (G_OBJECT (priv->account_store));
+	}
+
+
+	if (G_LIKELY (device))
+	{
+		if (g_signal_handler_is_connected (G_OBJECT (device), priv->connchanged_signal))
+		{
+			g_signal_handler_disconnect (G_OBJECT (device), 
+				priv->connchanged_signal);
+		}
+
+		priv->connchanged_signal = 
+			g_signal_connect (G_OBJECT (device), "connection_changed",
+				G_CALLBACK (connection_changed), self);	
 	}
 
 	g_object_ref (G_OBJECT (account_store));

@@ -57,6 +57,7 @@ struct _TnyAccountStorePriv
 	GList *transport_accounts;
 
 	TnySessionCamel *session;
+	TnyDeviceIface *device;
 
 	guint notify;
 };
@@ -455,6 +456,12 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 	return;
 }
 
+static const TnyDeviceIface*
+tny_account_store_get_device (TnyAccountStoreIface *self)
+{
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	return priv->device;
+}
 
 /**
  * tny_account_store_get_instance:
@@ -526,6 +533,7 @@ tny_account_store_get_session (TnyAccountStore *self)
 
 static TnyAccountStore *the_singleton = NULL;
 
+
 static GObject*
 tny_account_store_constructor (GType type, guint n_construct_params,
 			GObjectConstructParam *construct_params)
@@ -536,15 +544,15 @@ tny_account_store_constructor (GType type, guint n_construct_params,
 
 	if (G_UNLIKELY (!the_singleton))
 	{
-		TnyDeviceIface *device = tny_device_get_instance ();
 		TnyAccountStorePriv *priv;
 
 		object = G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_params, construct_params);
 
 		priv = TNY_ACCOUNT_STORE_GET_PRIVATE (object);
+		priv->device = TNY_DEVICE_IFACE (tny_device_new ());
 		priv->session = tny_session_camel_new 
-			(TNY_ACCOUNT_STORE_IFACE (object), device);
+			(TNY_ACCOUNT_STORE_IFACE (object));
 
 		the_singleton = TNY_ACCOUNT_STORE (object);
 	}
@@ -584,6 +592,7 @@ tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->add_transport_account_func = tny_account_store_add_transport_account;
 	klass->get_transport_accounts_func = tny_account_store_get_transport_accounts;
 	klass->get_cache_dir_func = tny_account_store_get_cache_dir;
+	klass->get_device_func = tny_account_store_get_device;
 
 	return;
 }

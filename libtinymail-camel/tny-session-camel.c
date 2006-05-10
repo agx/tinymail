@@ -403,41 +403,6 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 }
 
 /**
- * tny_session_camel_set_account_store:
- * @self: a #TnySessionCamel object
- * @account_store: A #TnyAccountStoreIface account store instance
- *
- *
- **/
-void 
-tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface *account_store)
-{
-	CamelSession *session = CAMEL_SESSION (self);
-
-	gchar *base_directory = g_strdup (tny_account_store_iface_get_cache_dir (account_store));
-	gchar *camel_dir = NULL;
-
-	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
-	{
-		g_error ("Critical ERROR: Cannot init %d as camel directory\n", base_directory);
-		exit (1);
-	}
-
-	camel_dir = g_build_filename (base_directory, "mail", NULL);
-	camel_provider_init();
-	camel_session_construct (session, camel_dir);
-
-	/* TODO: Implement a smart "is this device online?" technique here */
-	camel_session_set_online ((CamelSession *) session, TRUE); 
-	
-	g_free (camel_dir);
-	g_free (base_directory);
-
-	return;
-}
-
-
-/**
  * tny_session_camel_set_device:
  * @self: a #TnySessionCamel object
  * @device: a #TnyDeviceIface instance
@@ -462,22 +427,59 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDeviceIface *device)
 	return;
 }
 
+/**
+ * tny_session_camel_set_account_store:
+ * @self: a #TnySessionCamel object
+ * @account_store: A #TnyAccountStoreIface account store instance
+ *
+ *
+ **/
+void 
+tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface *account_store)
+{
+	CamelSession *session = CAMEL_SESSION (self);
+	TnyDeviceIface *device = (TnyDeviceIface*)tny_account_store_iface_get_device (account_store);
+
+	gchar *base_directory = g_strdup (tny_account_store_iface_get_cache_dir (account_store));
+	gchar *camel_dir = NULL;
+
+	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
+	{
+		g_error ("Critical ERROR: Cannot init %d as camel directory\n", base_directory);
+		exit (1);
+	}
+
+	camel_dir = g_build_filename (base_directory, "mail", NULL);
+	camel_provider_init();
+	camel_session_construct (session, camel_dir);
+
+	/* TODO: Implement a smart "is this device online?" technique here */
+	camel_session_set_online ((CamelSession *) session, TRUE); 
+	
+	g_free (camel_dir);
+	g_free (base_directory);
+
+	tny_session_camel_set_device (self, device);
+
+	return;
+}
+
+
+
 
 /**
  * tny_session_camel_new:
  * @account_store: A TnyAccountStoreIface instance
- * @device: a TnyDeviceIface instance
  *
  * Return value: The #TnySessionCamel singleton instance
  **/
 TnySessionCamel*
-tny_session_camel_new (TnyAccountStoreIface *account_store, TnyDeviceIface *device)
+tny_session_camel_new (TnyAccountStoreIface *account_store)
 {
 	TnySessionCamel *retval = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
 
 	tny_session_camel_set_account_store (retval, account_store);
-	tny_session_camel_set_device (retval, device);
 
 	return retval;
 }

@@ -87,13 +87,12 @@ tny_device_instance_init (GTypeInstance *instance, gpointer g_class)
  *
  * Return value: The #TnyDeviceIface singleton instance
  **/
-
-TnyDeviceIface*
-tny_device_get_instance (void)
+TnyDevice*
+tny_device_new (void)
 {
 	TnyDevice *self = g_object_new (TNY_TYPE_DEVICE, NULL);
 
-	return TNY_DEVICE_IFACE (self);
+	return self;
 }
 
 
@@ -124,30 +123,7 @@ tny_device_iface_init (gpointer g_iface, gpointer iface_data)
 
 static TnyDevice *the_singleton = NULL;
 
-static GObject*
-tny_device_constructor (GType type, guint n_construct_params,
-			GObjectConstructParam *construct_params)
-{
-	GObject *object;
 
-	/* TODO: potential problem: singleton without lock */
-
-	if (G_UNLIKELY (!the_singleton))
-	{
-
-		object = G_OBJECT_CLASS (parent_class)->constructor (type,
-				n_construct_params, construct_params);
-
-		the_singleton = TNY_DEVICE (object);
-	}
-	else
-	{
-		object = g_object_ref (G_OBJECT (the_singleton));
-		g_object_freeze_notify (G_OBJECT(the_singleton));
-	}
-
-	return object;
-}
 
 
 static void 
@@ -159,7 +135,6 @@ tny_device_class_init (TnyDeviceClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_device_finalize;
-	object_class->constructor = tny_device_constructor;
 
 	g_type_class_add_private (object_class, sizeof (TnyDevicePriv));
 
