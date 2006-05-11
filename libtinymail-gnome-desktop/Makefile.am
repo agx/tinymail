@@ -14,7 +14,9 @@ libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
 	$(libtinymail_gnome_desktop_1_0_headers) \
 	tny-account-store.c			 \
 	rny-device-priv.h			 \
-	tny-device.c
+	tny-device.c				 \
+	tny-password-dialog.c			 \
+	tny-password-dialog.h
 
 libtinymail_gnome_desktop_1_0_la_LIBADD = 	\
 	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)	\
