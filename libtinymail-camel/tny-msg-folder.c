@@ -359,20 +359,20 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	TnyMsgFolderIface *self = ptr->self;
 	TnyMsgFolderPriv *priv = ptr->priv;
 
-	/* Proxy instantiation */
+	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
 	header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	tny_msg_header_set_use_summary (TNY_MSG_HEADER (header), 
 		priv->has_summary_cap);
-
 	tny_msg_header_iface_set_folder (header, self);
 	tny_msg_header_iface_set_uid (header, uid);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
+
 	priv->cached_hdrs = g_list_append (priv->cached_hdrs, header);
 	priv->cached_length++;
-	/* TODO: If unread */
-	/* priv->unread_length++; */
+	/* TODO: If unread -- priv->unread_length++; */
+
 	g_mutex_unlock (priv->cached_hdrs_lock);
 
 
@@ -386,6 +386,7 @@ typedef struct
 	TnyGetHeadersStatusCallback status_callback;
 	gpointer user_data;
 	gboolean cancelled;
+
 } RefreshHeadersInfo;
 
 
@@ -394,12 +395,16 @@ destroy_header (gpointer data, gpointer user_data)
 {
 	g_object_unref (G_OBJECT (data));
 	data=NULL;
+
+	return;
 }
 
 static void
 tny_msg_folder_refresh_headers_async_destroyer (gpointer thr_user_data)
 {
 	g_free (thr_user_data);
+
+	return;
 }
 
 static gboolean
@@ -415,16 +420,19 @@ tny_msg_folder_refresh_headers_async_callback (gpointer thr_user_data)
 }
 
 
-typedef struct{
+typedef struct
+{
 	RefreshHeadersInfo *minfo;
 	gchar *what;
 	gint pc;
+
 } ProgressInfo;
 
 static void
 destroy_progress_idle (gpointer data)
 {
 	ProgressInfo *info = data;
+
 	g_free (info->what);
 	g_free (info->minfo);
 	g_free (data);
@@ -441,7 +449,10 @@ progress_func (gpointer data)
 	gint pc = info->pc;
 
 	if (minfo && minfo->status_callback)
-		minfo->status_callback (minfo->self, (const gchar*)what, (gint)pc, minfo->user_data);
+	{
+		minfo->status_callback (minfo->self, 
+			(const gchar*)what, (gint)pc, minfo->user_data);
+	}
 
 	return FALSE;
 } 
@@ -480,39 +491,37 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
 	gchar *str;
-
 	CamelException *ex = camel_exception_new ();
 
 	camel_exception_init (ex);
 
 	g_mutex_lock (priv->folder_lock);
+
 	load_folder_no_lock (priv);
 
-	str = g_strdup_printf ("Reading folder `%s'", priv->folder->full_name);
-
 	info->cancelled = FALSE;
-
+	str = g_strdup_printf ("Reading folder `%s'", priv->folder->full_name);
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
 		tny_msg_folder_refresh_headers_async_status, info, str);
-
 	g_free (str);
-
 	camel_folder_refresh_info (priv->folder, ex);
 	camel_exception_free (ex);
-
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
-
 	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
 	g_list_foreach (priv->cached_hdrs, destroy_header, NULL);
 	g_list_free (priv->cached_hdrs);
 	priv->cached_hdrs = NULL;
+
 	g_mutex_unlock (priv->folder_lock);
 
 	if (info->callback)
-		g_idle_add_full (G_PRIORITY_HIGH, tny_msg_folder_refresh_headers_async_callback, 
+	{
+		g_idle_add_full (G_PRIORITY_HIGH, 
+			tny_msg_folder_refresh_headers_async_callback, 
 			info, tny_msg_folder_refresh_headers_async_destroyer);
 
+	}
 
 	g_thread_exit (NULL);
 
@@ -533,6 +542,8 @@ tny_msg_folder_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCall
 
 	thread = g_thread_create (tny_msg_folder_refresh_headers_async_thread,
 			info, FALSE, NULL);
+
+	return;
 }
 
 static const GList*
@@ -540,7 +551,9 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
-	load_folder (priv);
+	g_mutex_lock (priv->folder_lock);
+
+	load_folder_no_lock (priv);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
 
@@ -565,7 +578,6 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 		if (refresh)
 			camel_folder_refresh_info (priv->folder, &ex);
 
-		/* */
 		uids = camel_folder_get_uids (priv->folder);
 
 		g_ptr_array_foreach (uids, add_message_with_uid, ptr);
@@ -596,6 +608,8 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 	} else {
 		g_mutex_unlock (priv->cached_hdrs_lock);
 	}
+
+	g_mutex_unlock (priv->folder_lock);
 
 	return priv->cached_hdrs;
 }
