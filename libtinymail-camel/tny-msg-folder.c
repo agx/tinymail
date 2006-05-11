@@ -37,10 +37,8 @@
 #include <errno.h>
 
 #include <tny-session-camel.h>
-
 #include "tny-account-priv.h"
 #include "tny-msg-folder-priv.h"
-
 #include <tny-camel-shared.h>
 
 #include <camel/camel.h>
