@@ -79,7 +79,7 @@ AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
-PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, libnm_glib glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
+PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP,  firefox-nss firefox-xpcom firefox-gtkmozembed libnm_glib glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
 else
 LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
 LIBTINYMAIL_GNOME_DESKTOP_LIBS=

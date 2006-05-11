@@ -33,6 +33,7 @@
 #include <tny-transport-account.h>
 
 #include <tny-msg-view-iface.h>
+#include <tny-moz-embed-msg-view.h>
 #include <tny-msg-view.h>
 
 #include <tny-msg-window-iface.h>
@@ -437,8 +438,12 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_widget_show (vpaned1);
 	
 
-	/* TODO: Only if visible */
-	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_msg_view_new ());
+#ifdef GTKMOZEMBED
+	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_moz_embed_msg_view_new ());
+#else
+	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_text_buffer_msg_view_new ());
+#endif
+
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
 

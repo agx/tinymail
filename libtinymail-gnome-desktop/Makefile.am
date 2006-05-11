@@ -8,6 +8,9 @@ lib_LTLIBRARIES = libtinymail-gnome-desktop-1.0.la
 
 libtinymail_gnome_desktop_1_0_headers = 	 \
 	tny-account-store.h			 \
+	tny-moz-embed-msg-view.h		 \
+	tny-moz-embed-stream.h			 \
+	tny-password-dialog.h			 \
 	tny-device.h
 
 libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
@@ -15,8 +18,9 @@ libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
 	tny-account-store.c			 \
 	rny-device-priv.h			 \
 	tny-device.c				 \
-	tny-password-dialog.c			 \
-	tny-password-dialog.h
+	tny-moz-embed-msg-view.c		 \
+	tny-moz-embed-stream.c			 \
+	tny-password-dialog.c
 
 libtinymail_gnome_desktop_1_0_la_LIBADD = 	\
 	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)	\

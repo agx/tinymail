@@ -5,7 +5,7 @@ INCLUDES = 								\
 	-I$(top_builddir)/libtinymailui-gtk				\
 	-I$(top_builddir)/libtinymail-camel				\
 	-I$(top_builddir)/libtinymail-gnome-desktop			\
-	-DASYNC_HEADERS
+	-DASYNC_HEADERS -DGTKMOZEMBED
 
 bin_PROGRAMS = tinymail
 
@@ -16,6 +16,7 @@ tinymail_SOURCES = 							\
 
 tinymail_LDADD = 							        \
 	$(TINYMAIL_LIBS)						        \
+	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)					\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 	        \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la	        \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la   \
