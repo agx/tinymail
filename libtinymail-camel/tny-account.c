@@ -84,12 +84,11 @@ _tny_account_start_camel_operation (TnyAccountIface *self, CamelOperationStatusF
 
 	if (priv->cancel)
 	{
-		/* camel_operation_cancel (priv->cancel); */
-		camel_operation_cancel (NULL);
 		while (!camel_operation_cancel_check (priv->cancel)) 
 		{ 
 			g_warning ("Cancellation failed, retrying\n");
-			camel_operation_cancel (NULL); 
+			thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
+			g_thread_join (thread);
 		}
 		tny_account_stop_camel_operation_priv (priv);
 	}
