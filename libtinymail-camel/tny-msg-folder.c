@@ -16,6 +16,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include <string.h>
 #include <tny-msg-folder-iface.h>
 #include <tny-msg-folder.h>
@@ -57,6 +58,7 @@ typedef struct
 	GFunc relaxed_func;
 	GMutex *lock;
 	gboolean free_lock;
+
 } RelaxedData;
 
 static void
@@ -124,6 +126,8 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
 			d, tny_msg_folder_relaxed_data_destroyer);
 	}
+
+	return;
 }
 
 static void 
@@ -148,6 +152,8 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
 			d, tny_msg_folder_relaxed_data_destroyer);
 	}
+
+	return;
 } 
 
 static void 
@@ -207,6 +213,8 @@ load_folder (TnyMsgFolderPriv *priv)
 	g_mutex_lock (priv->folder_lock);
 	load_folder_no_lock (priv);
 	g_mutex_unlock (priv->folder_lock);
+
+	return;
 }
 
 CamelFolder*
@@ -343,9 +351,10 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyAccountIface *acco
 }
 
 typedef struct 
-{ /* This is a speedup trick */
+{ 	/* This is a speedup trick */
 	TnyMsgFolderIface *self;
 	TnyMsgFolderPriv *priv;
+
 } FldAndPriv;
 
 static void
@@ -374,7 +383,6 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	/* TODO: If unread -- priv->unread_length++; */
 
 	g_mutex_unlock (priv->cached_hdrs_lock);
-
 
 	return;
 }
@@ -627,6 +635,7 @@ destroy_cached_value (gpointer data)
 {
 	/* Data is a TnyMsgIface or a TnyMsgHeaderIface */
 	g_object_unref (G_OBJECT (data));
+
 	return;
 }
 
@@ -850,13 +859,12 @@ tny_msg_folder_new (void)
 	return self;
 }
 
-
-static int count=0;
-
 static void
 destroy_folder (gpointer data, gpointer user_data)
 {
 	g_object_unref (G_OBJECT (data));
+
+	return;
 }
 
 static void

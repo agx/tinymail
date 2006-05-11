@@ -237,6 +237,7 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	}
 
 	g_free (key);
+
 	return;
 }
 
@@ -353,6 +354,8 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 		tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
 			per_account_get_pass_func);
 	}
+
+	return;
 }
 
 static const GList*
@@ -470,6 +473,7 @@ static const TnyDeviceIface*
 tny_account_store_get_device (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+
 	return priv->device;
 }
 
@@ -538,6 +542,7 @@ TnySessionCamel*
 tny_account_store_get_session (TnyAccountStore *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+
 	return priv->session;
 }
 
@@ -645,4 +650,3 @@ tny_account_store_get_type (void)
 
 	return type;
 }
-
