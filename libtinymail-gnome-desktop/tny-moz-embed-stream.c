@@ -228,6 +228,8 @@ tny_moz_embed_stream_finalize (GObject *object)
 	TnyMozEmbedStream *self = (TnyMozEmbedStream *)object;	
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
+	tny_moz_embed_stream_reset (self);
+
 	if (priv->embed)
 		g_object_unref (G_OBJECT (priv->embed));
 
