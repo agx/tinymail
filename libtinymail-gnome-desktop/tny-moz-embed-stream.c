@@ -16,8 +16,9 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include <glib.h>
 
+#include <glib.h>
+#include <stdlib.h>
 #include <gtk/gtk.h>
 
 #include <tny-stream-iface.h>
@@ -73,7 +74,20 @@ tny_moz_embed_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 static ssize_t
 tny_moz_embed_stream_read  (TnyStreamIface *self, char *data, size_t n)
 {
-	return -1;
+	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
+	ssize_t retval = -1;
+
+	if (priv->filename)
+	{
+		FILE *file = fopen (priv->filename, "r");
+		if (file)
+		{
+			retval = fread (data, 1, n, file);
+			fclose (file);
+		}
+	}
+
+	return retval;
 }
 
 static gint
