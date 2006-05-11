@@ -82,7 +82,11 @@ tny_moz_embed_stream_reset (TnyStreamIface *self)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
 	if (priv->filename)
+	{
+		g_free (priv->filename);
 		g_unlink (priv->filename);
+	}
+
 	priv->filename = NULL;
 
 	return 0;
