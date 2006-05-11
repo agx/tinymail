@@ -237,16 +237,16 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		header_model = GTK_TREE_MODEL (
 			tny_msg_header_list_model_new ());
 
-	#ifdef ASYNC_HEADERS
+#ifdef ASYNC_HEADERS
 
 		/* TODO: Enable the header view (bit I'm first testing a little bit) */
 
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, FALSE);
-	#else
+#else
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, TRUE);
-	#endif
+#endif
 
 		sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 
