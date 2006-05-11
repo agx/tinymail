@@ -30,6 +30,9 @@
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 
+#include <firefox/nspr/nspr.h>
+
+
 /**
  * main:
  * @argc: Amount of arguments

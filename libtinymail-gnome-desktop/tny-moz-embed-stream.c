@@ -83,8 +83,8 @@ tny_moz_embed_stream_reset (TnyStreamIface *self)
 
 	if (priv->filename)
 	{
-		g_free (priv->filename);
 		g_unlink (priv->filename);
+		g_free (priv->filename);
 	}
 
 	priv->filename = NULL;

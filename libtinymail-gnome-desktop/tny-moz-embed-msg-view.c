@@ -118,7 +118,6 @@ reload_msg (TnyMsgViewIface *self)
 		{
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 
-g_print ("Using plain\n");
 			gtk_text_buffer_set_text (buffer, "", 0);
 
 			gtk_widget_hide (GTK_WIDGET (priv->htmlview));
@@ -133,8 +132,6 @@ g_print ("Using plain\n");
 		} else if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/html")))
 		{
 			dest = TNY_STREAM_IFACE (tny_moz_embed_stream_new (priv->htmlview));
-g_print ("Using HTML\n");
-
 
 			have_html = TRUE;
 			gtk_widget_show (GTK_WIDGET (priv->htmlview));
@@ -405,6 +402,7 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 	gtk_widget_show (GTK_WIDGET (priv->attachview));
 
+
 	return;
 }
 
@@ -413,6 +411,7 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 {
 	TnyMozEmbedMsgView *self = (TnyMozEmbedMsgView *)object;	
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
+
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
