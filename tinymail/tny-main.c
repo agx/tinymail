@@ -21,16 +21,12 @@
 
 #include <tny-summary-window.h>
 #include <tny-summary-window-iface.h>
-#include <tny-account-store-iface.h>
-#include <tny-account-store.h>
-
-#include <tny-msg-header.h>
-#include <tny-msg-header-iface.h>
+#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
 
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 
-#include <firefox/nspr/nspr.h>
 
 
 /**
@@ -46,18 +42,23 @@ int
 main (int argc, char **argv)
 {
 	GtkWindow *window = NULL;
+	TnyPlatformFactoryIface *platfact;
 
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
 	gdk_threads_init ();
 	gnome_vfs_init ();
 
+	platfact = TNY_PLATFORM_FACTORY_IFACE 
+			(tny_platform_factory_get_instance ());
+
 	window = GTK_WINDOW (tny_summary_window_new ());
 
 	gtk_widget_show (GTK_WIDGET (window));
 
-	tny_summary_window_iface_set_account_store (TNY_SUMMARY_WINDOW_IFACE (window),
-		TNY_ACCOUNT_STORE_IFACE (tny_account_store_get_instance ()));
+	tny_summary_window_iface_set_account_store (
+		TNY_SUMMARY_WINDOW_IFACE (window),
+		tny_platform_factory_iface_new_account_store (platfact));
 	
 	g_signal_connect (window, "destroy",
 		G_CALLBACK (gtk_exit), 0);

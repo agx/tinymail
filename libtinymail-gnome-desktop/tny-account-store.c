@@ -484,9 +484,13 @@ tny_account_store_get_device (TnyAccountStoreIface *self)
  * Return value: The #TnyAccountStoreIface singleton instance
  **/
 TnyAccountStore*
-tny_account_store_get_instance (void)
+tny_account_store_new (void)
 {
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	priv->device = TNY_DEVICE_IFACE (tny_device_new ());
+	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return self;
 }
@@ -546,41 +550,6 @@ tny_account_store_get_session (TnyAccountStore *self)
 	return priv->session;
 }
 
-static TnyAccountStore *the_singleton = NULL;
-
-
-static GObject*
-tny_account_store_constructor (GType type, guint n_construct_params,
-			GObjectConstructParam *construct_params)
-{
-	GObject *object;
-
-	/* TODO: potential problem: singleton without lock */
-
-	if (G_UNLIKELY (!the_singleton))
-	{
-		TnyAccountStorePriv *priv;
-
-		object = G_OBJECT_CLASS (parent_class)->constructor (type,
-				n_construct_params, construct_params);
-
-		priv = TNY_ACCOUNT_STORE_GET_PRIVATE (object);
-		priv->device = TNY_DEVICE_IFACE (tny_device_new ());
-		priv->session = tny_session_camel_new 
-			(TNY_ACCOUNT_STORE_IFACE (object));
-
-		the_singleton = TNY_ACCOUNT_STORE (object);
-	}
-	else
-	{
-		object = g_object_ref (G_OBJECT (the_singleton));
-		g_object_freeze_notify (G_OBJECT(the_singleton));
-	}
-
-	return object;
-}
-
-
 static void 
 tny_account_store_class_init (TnyAccountStoreClass *class)
 {
@@ -590,7 +559,6 @@ tny_account_store_class_init (TnyAccountStoreClass *class)
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_account_store_finalize;
-	object_class->constructor = tny_account_store_constructor;
 
 	g_type_class_add_private (object_class, sizeof (TnyAccountStorePriv));
 

@@ -54,9 +54,17 @@ tny_msg_window_set_msg (TnyMsgWindowIface *self, TnyMsgIface *msg)
  * Return value: a new #TnyMsgWindowIface instance implemented for Gtk+
  **/
 TnyMsgWindow*
-tny_msg_window_new (void)
+tny_msg_window_new (TnyMsgViewIface *msgview)
 {
 	TnyMsgWindow *self = g_object_new (TNY_TYPE_MSG_WINDOW, NULL);
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+
+	priv->msg_view = msgview;
+
+	/* TODO: Remove old msg_view first */
+
+	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
+	gtk_widget_show (GTK_WIDGET (priv->msg_view));
 
 	return self;
 }
@@ -69,11 +77,7 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_window_set_default_size (GTK_WINDOW (self), 640, 480);
 
-	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_msg_view_new ());
 
-	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
-
-	gtk_widget_show (GTK_WIDGET (priv->msg_view));
 
 	return;
 }

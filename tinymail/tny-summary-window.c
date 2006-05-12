@@ -22,6 +22,9 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
+#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
+
 #include <tny-password-dialog.h>
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
@@ -363,6 +366,11 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			const TnyMsgIface *msg;
 			const TnyMsgHeaderIface *nheader;
 
+			TnyPlatformFactoryIface *platfact;
+
+			platfact = TNY_PLATFORM_FACTORY_IFACE 
+				(tny_platform_factory_get_instance ());
+
 			folder = tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE (header));
 
 			/* KNOWN: This call will block the ui if a folder is 
@@ -377,7 +385,10 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
 			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
 
-			msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new ());
+
+			msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (
+				tny_platform_factory_iface_new_msg_view (platfact)));
+
 			tny_msg_window_iface_set_msg (msgwin, TNY_MSG_IFACE (msg));
 	
 			gtk_widget_show (GTK_WIDGET (msgwin));
@@ -404,6 +415,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnySummaryWindow *self = (TnySummaryWindow *)instance;
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
+	TnyPlatformFactoryIface *platfact;
+
 	GtkWindow *window = GTK_WINDOW (self);
 	GtkWidget *mailbox_sw;
 	GtkWidget *header_sw;
@@ -415,9 +428,12 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *hpaned1;
 	GtkWidget *vpaned1;
 	GtkWidget *vbox;
-
+	
 
 	/* TODO: Persist application UI status (of the panes) */
+
+	platfact = TNY_PLATFORM_FACTORY_IFACE 
+			(tny_platform_factory_get_instance ());
 
 	hpaned1 = gtk_hpaned_new ();
 	gtk_widget_show (hpaned1);
@@ -437,12 +453,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	vpaned1 = gtk_vpaned_new ();
 	gtk_widget_show (vpaned1);
 	
-
-#ifdef GTKMOZEMBED
-	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_moz_embed_msg_view_new ());
-#else
-	priv->msg_view = TNY_MSG_VIEW_IFACE (tny_text_buffer_msg_view_new ());
-#endif
+	priv->msg_view = tny_platform_factory_iface_new_msg_view (platfact);
 
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);

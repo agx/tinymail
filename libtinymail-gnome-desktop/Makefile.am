@@ -11,7 +11,8 @@ libtinymail_gnome_desktop_1_0_headers = 	 \
 	tny-moz-embed-msg-view.h		 \
 	tny-moz-embed-stream.h			 \
 	tny-password-dialog.h			 \
-	tny-device.h
+	tny-device.h				 \
+	tny-platform-factory.h
 
 libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
 	$(libtinymail_gnome_desktop_1_0_headers) \
@@ -20,7 +21,8 @@ libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
 	tny-device.c				 \
 	tny-moz-embed-msg-view.c		 \
 	tny-moz-embed-stream.c			 \
-	tny-password-dialog.c
+	tny-password-dialog.c			 \
+	tny-platform-factory.c
 
 libtinymail_gnome_desktop_1_0_la_LIBADD = 	\
 	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)	\

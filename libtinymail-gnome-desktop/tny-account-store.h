@@ -48,7 +48,7 @@ struct _TnyAccountStoreClass
 };
 
 GType               tny_account_store_get_type       (void);
-TnyAccountStore*    tny_account_store_get_instance   (void);
+TnyAccountStore*    tny_account_store_new            (void);
 TnySessionCamel*    tny_account_store_get_session    (TnyAccountStore *self);
 
 G_END_DECLS
