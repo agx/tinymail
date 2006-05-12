@@ -41,12 +41,9 @@ struct _TnyMsgWindowIfaceClass
 {
 	GTypeInterface parent;
 
-	void (*set_msg_func) (TnyMsgWindowIface *self, TnyMsgIface *msg);
 };
 
 GType         tny_msg_window_iface_get_type        (void);
-
-void          tny_msg_window_iface_set_msg         (TnyMsgWindowIface *self, TnyMsgIface *msg);
 
 
 G_END_DECLS

@@ -19,20 +19,6 @@
 
 #include <tny-msg-window-iface.h>
 
-/**
- * tny_msg_window_iface_set_msg:
- * @self: A #TnyMsgWindowIface instance
- * @msg: A #TnyMsgIface instace
- *
- * Set message to view in the window
- * 
- **/
-void
-tny_msg_window_iface_set_msg (TnyMsgWindowIface *self, TnyMsgIface *msg)
-{
-	TNY_MSG_WINDOW_IFACE_GET_CLASS (self)->set_msg_func (self, msg);
-	return;
-}
 
 static void
 tny_msg_window_iface_base_init (gpointer g_class)

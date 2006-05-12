@@ -34,7 +34,7 @@ struct _TnyMsgWindowPriv
 
 
 static void 
-tny_msg_window_set_msg (TnyMsgWindowIface *self, TnyMsgIface *msg)
+tny_msg_window_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE 
@@ -100,6 +100,14 @@ tny_msg_window_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMsgWindowIfaceClass *klass = (TnyMsgWindowIfaceClass *)g_iface;
 
+	return;
+}
+
+static void
+tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
+{
+	TnyMsgViewIfaceClass *klass = (TnyMsgViewIfaceClass *)g_iface;
+
 	klass->set_msg_func = tny_msg_window_set_msg;
 
 	return;
@@ -147,9 +155,19 @@ tny_msg_window_get_type (void)
 		  NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_msg_view_iface_info = 
+		{
+		  (GInterfaceInitFunc) tny_msg_view_iface_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (GTK_TYPE_WINDOW,
 			"TnyMsgWindow",
 			&info, 0);
+
+		g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW_IFACE, 
+			&tny_msg_view_iface_info);
 
 		g_type_add_interface_static (type, TNY_TYPE_MSG_WINDOW_IFACE, 
 			&tny_msg_window_iface_info);
