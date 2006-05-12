@@ -34,6 +34,8 @@ G_BEGIN_DECLS
 #define TNY_IS_PLATFORM_FACTORY_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_PLATFORM_FACTORY_IFACE))
 #define TNY_PLATFORM_FACTORY_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_PLATFORM_FACTORY_IFACE, TnyPlatformFactoryIfaceClass))
 
+typedef struct _TnyPlatformFactoryIface TnyPlatformFactoryIface;
+typedef struct _TnyPlatformFactoryIfaceClass TnyPlatformFactoryIfaceClass;
 
 struct _TnyPlatformFactoryIfaceClass
 {
