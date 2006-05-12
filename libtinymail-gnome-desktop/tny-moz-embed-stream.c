@@ -112,8 +112,6 @@ tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 	FILE *file = NULL;
 
-	/* TODO: randomize filename and add username */
-
 	if (!priv->filename || !g_file_test  (priv->filename, G_FILE_TEST_EXISTS))
 	{
 		gint ofile;
