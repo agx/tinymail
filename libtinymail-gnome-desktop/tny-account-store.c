@@ -489,7 +489,7 @@ tny_account_store_new (void)
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	priv->device = TNY_DEVICE_IFACE (tny_device_new ());
+	priv->device = tny_platform_factory_new_device (
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return self;
