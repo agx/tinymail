@@ -69,7 +69,6 @@ reload_msg (TnyMsgViewIface *self)
 
 	GtkTextIter hiter;
 	GtkTextBuffer *headerbuffer = gtk_text_view_get_buffer (priv->headerview);
-	TnyStreamIface *dest = NULL;
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
 	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
 	const gchar *str = NULL;
@@ -117,6 +116,7 @@ reload_msg (TnyMsgViewIface *self)
 		if (!have_html && G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/plain")))
 		{
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
+			TnyStreamIface *dest = NULL;
 
 			gtk_text_buffer_set_text (buffer, "", 0);
 
@@ -133,6 +133,8 @@ reload_msg (TnyMsgViewIface *self)
 
 		} else if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/html")))
 		{
+			TnyStreamIface *dest = NULL;
+
 			dest = TNY_STREAM_IFACE (tny_moz_embed_stream_new (priv->htmlview));
 
 			have_html = TRUE;

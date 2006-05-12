@@ -34,6 +34,7 @@ struct _TnyMozEmbedStreamPriv
 {
 	GtkMozEmbed *embed;
 	gchar *filename;
+	gboolean htmlext;
 };
 
 #define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o)	\
@@ -101,6 +102,7 @@ tny_moz_embed_stream_reset (TnyStreamIface *self)
 		g_free (priv->filename);
 	}
 
+	priv->htmlext = FALSE;
 	priv->filename = NULL;
 
 	return 0;
@@ -125,6 +127,7 @@ tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
 		ofile = g_file_open_tmp ((const gchar*)tmpl, &filename, NULL);
 
 		priv->filename = filename;
+		priv->htmlext = FALSE;
 
 		g_free (tmpl);
 
@@ -137,23 +140,32 @@ tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
 
 	if (file && priv->filename)
 	{
-		/* Fucking shit ...  *sigh* */
 
-		gchar *better = g_strdup_printf ("%s.html", priv->filename);
-		gchar *str = g_strdup_printf ("file://%s", better);
+		/* Dear free software world, do you NOW see we are fucking
+			things up?! This is insane! */
+
+		gchar *str;
+
 		fputs (data, file);
 		fclose (file);
 
-		/* Dear free software world, do you NOW see we are fucking
-		   things up?! This is insane! */
+		if (!priv->htmlext)
+		{
+			gchar *better = g_strdup_printf ("%s.html", priv->filename);
 
-		if (g_rename (priv->filename, better) == 0)
-			gtk_moz_embed_load_url (priv->embed, (const gchar*)str);
-		else
-			g_warning ("Can't rename %s to %s\n", priv->filename, better);
+			if (g_rename (priv->filename, better) != 0)
+				g_warning ("Can't rename %s to %s\n", priv->filename, better);
 
-		g_free (str); g_free (priv->filename);
-		priv->filename = better;
+			g_free (priv->filename);
+			priv->filename = better;
+			priv->htmlext = TRUE;
+		}
+
+		str = g_strdup_printf ("file://%s", priv->filename);
+		
+		gtk_moz_embed_load_url (priv->embed, (const gchar*)str);
+
+		g_free (str);
 
 	} else {
 		g_warning ("Can't write %s\n", priv->filename);
