@@ -129,6 +129,8 @@ reload_msg (TnyMsgViewIface *self)
 			tny_msg_mime_part_iface_write_to_stream (part, dest);
 			tny_stream_iface_reset (dest);
 
+			g_object_unref (G_OBJECT (dest));
+
 		} else if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/html")))
 		{
 			dest = TNY_STREAM_IFACE (tny_moz_embed_stream_new (priv->htmlview));
@@ -140,6 +142,8 @@ reload_msg (TnyMsgViewIface *self)
 			tny_stream_iface_reset (dest);
 			tny_msg_mime_part_iface_write_to_stream (part, dest);
 			tny_stream_iface_reset (dest);
+
+			g_object_unref (G_OBJECT (dest));
 
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
 			tny_msg_mime_part_iface_get_filename (part))
