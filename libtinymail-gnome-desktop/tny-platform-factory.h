@@ -34,8 +34,6 @@ G_BEGIN_DECLS
 #define TNY_IS_PLATFORM_FACTORY_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_PLATFORM_FACTORY))
 #define TNY_PLATFORM_FACTORY_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_PLATFORM_FACTORY, TnyPlatformFactoryClass))
 
-/* This is an abstract type */
-
 typedef struct _TnyPlatformFactory TnyPlatformFactory;
 typedef struct _TnyPlatformFactoryClass TnyPlatformFactoryClass;
 
