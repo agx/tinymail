@@ -24,6 +24,9 @@
 #include <gtk/gtk.h>
 #include <gconf/gconf-client.h>
 
+#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
+
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 #include <tny-password-dialog.h>
@@ -488,8 +491,10 @@ tny_account_store_new (void)
 {
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyPlatformFactoryIface *platfact = TNY_PLATFORM_FACTORY_IFACE (
+		tny_platform_factory_get_instance ());
 
-	priv->device = tny_platform_factory_new_device (
+	priv->device = tny_platform_factory_iface_new_device (platfact);
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return self;
