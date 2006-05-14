@@ -59,9 +59,10 @@ tny_msg_window_new (TnyMsgViewIface *msgview)
 	TnyMsgWindow *self = g_object_new (TNY_TYPE_MSG_WINDOW, NULL);
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 
-	priv->msg_view = msgview;
+	if (G_UNLIKELY (priv->msg_view))
+		gtk_container_remove (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
 
-	/* TODO: Remove old msg_view first */
+	priv->msg_view = msgview;
 
 	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));
@@ -77,18 +78,14 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_window_set_default_size (GTK_WINDOW (self), 640, 480);
 
-
-
 	return;
 }
 
 static void
 tny_msg_window_finalize (GObject *object)
 {
-	TnyMsgWindow *self = (TnyMsgWindow *)object;	
-	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
-
-	/* gtk unrefs priv->msg_view for me */
+	/* TnyMsgWindow *self = (TnyMsgWindow *)object;	
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self); */
 
 	(*parent_class->finalize) (object);
 
