@@ -20,6 +20,20 @@
 #include <tny-msg-mime-part-iface.h>
 
 /**
+ * tny_msg_mime_part_iface_is_attachment:
+ * @self: a #TnyMsgMimePartIface object
+ * 
+ * Return value: whether or not the mime part is an attachment
+ *
+ **/
+gboolean 
+tny_msg_mime_part_iface_is_attachment (TnyMsgMimePartIface *self)
+{
+	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->is_attachment_func (self);
+}
+
+
+/**
  * tny_msg_mime_part_iface_set_content_location:
  * @self: a #TnyMsgMimePartIface object
  * @content_location: the location 

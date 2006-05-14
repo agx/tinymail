@@ -57,6 +57,7 @@ struct _TnyMsgMimePartIfaceClass
 	void            (*set_filename_func)         (TnyMsgMimePartIface *self, const gchar *filename);
 	void            (*set_content_type_func)     (TnyMsgMimePartIface *self, const gchar *content_type);
 
+	gboolean 	(*is_attachment_func)        (TnyMsgMimePartIface *self);
 };
 
 GType           tny_msg_mime_part_iface_get_type              (void);
@@ -79,6 +80,8 @@ void            tny_msg_mime_part_iface_set_description       (TnyMsgMimePartIfa
 void            tny_msg_mime_part_iface_set_content_id        (TnyMsgMimePartIface *self, const gchar *content_id); 
 void            tny_msg_mime_part_iface_set_filename          (TnyMsgMimePartIface *self, const gchar *filename);
 void            tny_msg_mime_part_iface_set_content_type      (TnyMsgMimePartIface *self, const gchar *content_type);
+
+gboolean	tny_msg_mime_part_iface_is_attachment         (TnyMsgMimePartIface *self);
 
 G_END_DECLS
 

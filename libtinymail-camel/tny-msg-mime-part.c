@@ -31,6 +31,23 @@ static GObjectClass *parent_class = NULL;
 
 /* Locking warning: tny-msg.c also locks priv->part_lock */
 
+
+static gboolean 
+tny_msg_mime_part_is_attachment (TnyMsgMimePartIface *self)
+{
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	CamelDataWrapper *dw = camel_medium_get_content_object((CamelMedium *)priv->part);
+
+        /*printf("checking is attachment %s/%s\n", ct->type, ct->subtype);*/
+        return !(camel_content_type_is (dw->mime_type, "multipart", "*")
+                 || camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
+                 || camel_content_type_is(dw->mime_type, "application", "pkcs7-mime")
+                 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-signed")
+                 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-encrypted")
+                 || (camel_content_type_is (dw->mime_type, "text", "*")
+                     && camel_mime_part_get_filename(priv->part) == NULL));
+}
+
 static void
 tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
@@ -409,6 +426,7 @@ tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_content_id_func = tny_msg_mime_part_set_content_id;
 	klass->set_filename_func = tny_msg_mime_part_set_filename;
 	klass->set_content_type_func = tny_msg_mime_part_set_content_type;
+	klass->is_attachment_func = tny_msg_mime_part_is_attachment;
 
 	return;
 }

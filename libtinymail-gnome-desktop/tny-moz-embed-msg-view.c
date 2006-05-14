@@ -150,7 +150,7 @@ reload_msg (TnyMsgViewIface *self)
 			priv->dest_stream = dest;
 
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
-			tny_msg_mime_part_iface_get_filename (part))
+			tny_msg_mime_part_iface_is_attachment (part))
 		{
 
 			if (G_UNLIKELY (first_attach))
