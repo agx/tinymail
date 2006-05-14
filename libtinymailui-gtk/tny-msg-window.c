@@ -64,6 +64,7 @@ tny_msg_window_new (TnyMsgViewIface *msgview)
 
 	priv->msg_view = msgview;
 
+	/* This adds a reference */
 	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));
 
@@ -84,8 +85,7 @@ tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_msg_window_finalize (GObject *object)
 {
-	/* TnyMsgWindow *self = (TnyMsgWindow *)object;	
-	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self); */
+	/* Finalization of a GtkWidet removes references */
 
 	(*parent_class->finalize) (object);
 
