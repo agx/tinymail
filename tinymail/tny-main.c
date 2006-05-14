@@ -28,7 +28,6 @@
 #include <libgnomevfs/gnome-vfs-utils.h>
 
 
-
 /**
  * main:
  * @argc: Amount of arguments
