@@ -110,6 +110,8 @@ reload_msg (TnyMsgViewIface *self)
 	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
 	g_free ((gchar*)str);
 
+	if (priv->dest_stream)
+		g_object_unref (G_OBJECT (priv->dest_stream));
 
 	while (G_LIKELY (parts))
 	{
@@ -145,9 +147,6 @@ reload_msg (TnyMsgViewIface *self)
 			tny_stream_iface_reset (dest);
 			tny_msg_mime_part_iface_write_to_stream (part, dest);
 			
-			if (priv->dest_stream)
-				g_object_unref (G_OBJECT (priv->dest_stream));
-
 			priv->dest_stream = dest;
 
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&

@@ -78,6 +78,8 @@ tny_moz_embed_stream_read  (TnyStreamIface *self, char *data, size_t n)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 	ssize_t retval = -1;
 
+	/* TODO: Will always return the beginning of the file (but atm unused) */
+
 	if (priv->filename)
 	{
 		FILE *file = fopen (priv->filename, "r");
@@ -122,7 +124,7 @@ tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
 		if (priv->filename)
 			g_free (priv->filename);
 
-		tmpl = g_strdup_printf ("tinymail.%s.XXXXXX", g_get_user_name ());
+		tmpl = g_strdup_printf ("tinymail.tnymozembedstream.%s.XXXXXX", g_get_user_name ());
 
 		ofile = g_file_open_tmp ((const gchar*)tmpl, &filename, NULL);
 
@@ -213,8 +215,8 @@ tny_moz_embed_stream_set_moz_embed (TnyMozEmbedStream *self, GtkMozEmbed *embed)
 
 	if (priv->embed)
 		g_object_unref (G_OBJECT (priv->embed));
-
 	g_object_ref (G_OBJECT (embed));
+
 	priv->embed = embed;
 
 	return;
