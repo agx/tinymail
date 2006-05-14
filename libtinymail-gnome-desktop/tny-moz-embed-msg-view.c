@@ -121,6 +121,8 @@ reload_msg (TnyMsgViewIface *self)
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 			TnyStreamIface *dest = NULL;
 
+			/*TODO: Add a filter (decoder) here (like em_format_format_text) */
+
 			gtk_text_buffer_set_text (buffer, "", 0);
 
 			gtk_widget_hide (GTK_WIDGET (priv->htmlview));
@@ -137,6 +139,8 @@ reload_msg (TnyMsgViewIface *self)
 		} else if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/html")))
 		{
 			TnyStreamIface *dest = NULL;
+
+			/* TODO: Add a filter (decoder) here (html filter) */
 
 			dest = TNY_STREAM_IFACE (tny_moz_embed_stream_new (priv->htmlview));
 
@@ -190,6 +194,9 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 		return result;
 
 	stream = tny_vfs_stream_new (handle);
+
+	/* TODO: Add a filter (decoder) here (depends on encoding) */
+
 	tny_msg_mime_part_iface_write_to_stream (part, TNY_STREAM_IFACE (stream));
 
 	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */

@@ -56,6 +56,8 @@ tny_msg_mime_part_is_attachment (TnyMsgMimePartIface *self)
 static void
 tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
+	/* TODO: Add a filter (decoder) here */
+
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
