@@ -41,6 +41,7 @@ struct _TnyMozEmbedMsgViewPriv
 	
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
+	TnyStreamIface *dest_stream;
 };
 
 #define TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE(o)	\
@@ -143,9 +144,11 @@ reload_msg (TnyMsgViewIface *self)
 
 			tny_stream_iface_reset (dest);
 			tny_msg_mime_part_iface_write_to_stream (part, dest);
-			tny_stream_iface_reset (dest);
+			
+			if (priv->dest_stream)
+				g_object_unref (G_OBJECT (priv->dest_stream));
 
-			g_object_unref (G_OBJECT (dest));
+			priv->dest_stream = dest;
 
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
 			tny_msg_mime_part_iface_get_filename (part))
@@ -338,6 +341,8 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
 	GtkTextBuffer *headerbuffer;
 
+	priv->dest_stream = NULL;
+
 	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 
@@ -418,6 +423,8 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 	TnyMozEmbedMsgView *self = (TnyMozEmbedMsgView *)object;	
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
+	if (priv->dest_stream)
+		g_object_unref (G_OBJECT (priv->dest_stream));
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
