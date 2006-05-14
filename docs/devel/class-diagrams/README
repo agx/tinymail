@@ -1,6 +1,10 @@
-Please write your UML tool here if you used one for a specific UML class 
-diagram:
+Write the name of the tool in the filename of the document.                 80c
+                                                                              .
+initial_overview_class_diagram.dia.dia
+	Initial overview. Which is outdated and shouldn't be used anymore.
 
-Filename					Tool
--------------------------------------------------------------------------------
-class_diagram.dia				Dia
+TnyMsgWindowIface_decorates_TnyMsgViewIface.umbrello.xmi
+	Interaction and relations between TnyMsgViewIface and TnyMsgWindow-
+	Iface. Illustrates the usage of the decorator pattern. A TnyMsgWind-
+	owIface can decorate a TnyMsgViewIface. The TnyMozEmbedMsgView and
+	TnyTextBufferMsgView are used as examples.
