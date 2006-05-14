@@ -31,21 +31,26 @@ static GObjectClass *parent_class = NULL;
 
 /* Locking warning: tny-msg.c also locks priv->part_lock */
 
-
 static gboolean 
 tny_msg_mime_part_is_attachment (TnyMsgMimePartIface *self)
 {
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *dw = camel_medium_get_content_object((CamelMedium *)priv->part);
 
-        /*printf("checking is attachment %s/%s\n", ct->type, ct->subtype);*/
-        return !(camel_content_type_is (dw->mime_type, "multipart", "*")
+	/* From evolution/mail/em-format.c (func=em_format_is_attachment) */
+
+	if (G_LIKELY (dw))
+	{
+		return !(camel_content_type_is (dw->mime_type, "multipart", "*")
                  || camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
                  || camel_content_type_is(dw->mime_type, "application", "pkcs7-mime")
                  || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-signed")
                  || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-encrypted")
                  || (camel_content_type_is (dw->mime_type, "text", "*")
                      && camel_mime_part_get_filename(priv->part) == NULL));
+	}
+
+	return FALSE;
 }
 
 static void
