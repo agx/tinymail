@@ -195,7 +195,10 @@ tny_msg_mime_part_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *s
 	/* camel_stream_reset (wrapper->stream);
 	camel_stream_write_to_stream (wrapper->stream, cstream); */
 
-	camel_stream_format_text (wrapper, cstream);
+	if (camel_content_type_is (wrapper->mime_type, "text", "*"))
+		camel_stream_format_text (wrapper, cstream);
+        else
+		camel_data_wrapper_decode_to_stream (wrapper, cstream);
 
 	/* This should work but doesn't . . .
 	camel_data_wrapper_write_to_stream (wrapper, cstream); */
