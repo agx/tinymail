@@ -83,6 +83,7 @@ void            tny_msg_mime_part_iface_set_filename          (TnyMsgMimePartIfa
 void            tny_msg_mime_part_iface_set_content_type      (TnyMsgMimePartIface *self, const gchar *content_type);
 
 gboolean	tny_msg_mime_part_iface_is_attachment         (TnyMsgMimePartIface *self);
+void            tny_msg_mime_part_iface_decode_to_stream      (TnyMsgMimePartIface *self, TnyStreamIface *stream);
 
 G_END_DECLS
 
