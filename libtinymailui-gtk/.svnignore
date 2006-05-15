@@ -1,0 +1,9 @@
+Makefile.in
+config.h
+libtinymailui-gtk-1.0.pc
+.libs
+.deps
+Makefile
+.svnignore
+stamp-h6
+libtinymailui-gtk.pc
