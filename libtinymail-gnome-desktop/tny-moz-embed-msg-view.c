@@ -215,7 +215,6 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 	stream = tny_vfs_stream_new (handle);
 
 	/* TODO: Add a filter (decoder) here (depends on encoding) */
-
 	tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
 
 	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
@@ -232,7 +231,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 	GtkTreeModel *model = gtk_icon_view_get_model (icon_view);
 	GtkTreeIter iter;
 
-	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
+	if (G_LIKELY (gtk_tree_model_get_iter (model, &iter, path)))
 	{
 		TnyMsgMimePartIface *part;
 

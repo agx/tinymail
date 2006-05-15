@@ -55,6 +55,7 @@ typedef struct _TnyVfsStreamPriv TnyVfsStreamPriv;
 struct _TnyVfsStreamPriv
 {
 	GnomeVFSHandle *handle;
+	gboolean eos;
 };
 
 #define TNY_VFS_STREAM_GET_PRIVATE(o)	\
@@ -197,12 +198,13 @@ tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 
 	if (G_LIKELY (res == GNOME_VFS_OK))
 	{
+		priv->eos = FALSE;
 		return (ssize_t)count;
 
 	} else if (G_LIKELY (res == GNOME_VFS_ERROR_EOF))
 	{
-		/*TODO: stream->eos = TRUE; Handle this */
-		return 0;
+		priv->eos = TRUE;
+		return (ssize_t)count;
 	}
 
 	tny_vfs_stream_set_errno (res);
@@ -224,7 +226,6 @@ tny_vfs_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 	}
 
 	res = gnome_vfs_write (priv->handle, buffer, n, &count);
-
 	if (G_LIKELY (res == GNOME_VFS_OK))
 		return (ssize_t)count;
 
@@ -365,6 +366,7 @@ tny_vfs_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyVfsStream *self = (TnyVfsStream *)instance;
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 
+	priv->eos = FALSE;
 	priv->handle = NULL;
 
 	return;
@@ -384,10 +386,52 @@ tny_vfs_stream_finalize (GObject *object)
 	return;
 }
 
+static gint 
+tny_vfs_flush (TnyStreamIface *self)
+{
+	return 0;
+}
+
+static gboolean 
+tny_vfs_eos (TnyStreamIface *self)
+{
+	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
+
+	return priv->eos;
+}
+
+static gint 
+tny_vfs_reset (TnyStreamIface *self)
+{
+	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
+	gint retval = -1;
+	GnomeVFSResult res;
+
+	if (priv->handle == NULL) 
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	res = gnome_vfs_seek (priv->handle, GNOME_VFS_SEEK_START, 0);
+
+	if (res != GNOME_VFS_OK)
+	{
+		tny_vfs_stream_set_errno (res);
+		retval = -1;
+	}
+
+	return retval;
+}
+
 static void
 tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyStreamIfaceClass *klass = (TnyStreamIfaceClass *)g_iface;
+
+	klass->reset_func = tny_vfs_reset;
+	klass->flush_func = tny_vfs_flush;
+	klass->eos_func = tny_vfs_eos;
 
 	klass->read_func = tny_vfs_stream_read;
 	klass->write_func = tny_vfs_stream_write;

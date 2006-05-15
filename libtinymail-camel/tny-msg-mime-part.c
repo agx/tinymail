@@ -116,9 +116,11 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 static void
 camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 {
+	/* Stolen from evolution, evil evil me!! moehahah */
+
         CamelStreamFilter *filter_stream;
         CamelMimeFilterCharset *filter;
-        const char *charset = "UTF-8";
+        const char *charset = "UTF-8"; /* I default to UTF-8, like it or not */
         CamelMimeFilterWindows *windows = NULL;
 
 	if (dw->mime_type && (charset = camel_content_type_param 
@@ -161,13 +163,14 @@ camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 
         if (windows)
                 camel_object_unref(windows);
+
+	return;
 }
 
 
 static void
 tny_msg_mime_part_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
-	/* TODO: Add a filter (decoder) here */
 
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
@@ -192,16 +195,10 @@ tny_msg_mime_part_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *s
 		return;
 	}
 
-	/* camel_stream_reset (wrapper->stream);
-	camel_stream_write_to_stream (wrapper->stream, cstream); */
-
 	if (camel_content_type_is (wrapper->mime_type, "text", "*"))
 		camel_stream_format_text (wrapper, cstream);
         else
 		camel_data_wrapper_decode_to_stream (wrapper, cstream);
-
-	/* This should work but doesn't . . .
-	camel_data_wrapper_write_to_stream (wrapper, cstream); */
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
 
