@@ -20,3 +20,4 @@ libtinymail.args
 libtinymail-decl-list.txt
 libtinymail.signals
 .svnignore
+tmpl/tny-moz-embed-msg-view.sgml.bak

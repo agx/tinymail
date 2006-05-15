@@ -1,0 +1,28 @@
+<!-- ##### SECTION Title ##### -->
+tny-store-account-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyStoreAccountPriv ##### -->
+<para>
+
+</para>
+
+@folders_lock: 
+@folders: 
+@ufolders: 
+

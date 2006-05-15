@@ -1,0 +1,52 @@
+<!-- ##### SECTION Title ##### -->
+TnyPlatformFactoryIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyPlatformFactoryIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_platform_factory_iface_new_account_store ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_platform_factory_iface_new_device ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_platform_factory_iface_new_msg_view ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

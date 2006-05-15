@@ -1,0 +1,35 @@
+<!-- ##### SECTION Title ##### -->
+tny-device-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyDevicePriv ##### -->
+<para>
+
+</para>
+
+@nm_ctx: 
+@callback_id: 
+
+<!-- ##### MACRO TNY_DEVICE_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
+

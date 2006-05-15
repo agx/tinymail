@@ -1,0 +1,130 @@
+<!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Title ##### -->
+TnyMsgFolderProxy
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:Title ##### -->
+TnyMsgHeaderProxy
+
+
+<!-- ##### USER_FUNCTION ForgetPassFunc ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### USER_FUNCTION GetPassFunc ##### -->
+<para>
+
+</para>
+
+@self: 
+@prompt: 
+@Returns: 
+
+<!-- ##### MACRO TNY_IS_MSG_PROXY_FOLDER ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+<!-- ##### MACRO TNY_MSG_FOLDER_PROXY_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgFolderProxy ##### -->
+<para>
+
+</para>
+
+@parent: 
+@real: 
+
+<!-- ##### FUNCTION tny_account_store_get_instance ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_folder_proxy_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_get_index ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_set_index ##### -->
+<para>
+
+</para>
+
+@self: 
+@index: 
+
+<!-- ##### FUNCTION tny_msg_window_iface_set_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+<!-- ##### FUNCTION tny_session_camel_get_instance ##### -->
+<para>
+
+</para>
+
+@Returns: 
+

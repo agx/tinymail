@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+tny-msg-mime-part-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyMsgMimePartPriv ##### -->
+<para>
+
+</para>
+
+@part_lock: 
+@part: 
+@cached_content_type: 
+
+<!-- ##### MACRO TNY_MSG_MIME_PART_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
+
