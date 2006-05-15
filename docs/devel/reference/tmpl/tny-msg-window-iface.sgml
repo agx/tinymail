@@ -23,12 +23,3 @@ An implementation that defines a message window type
 </para>
 
 
-<!-- ##### FUNCTION tny_msg_window_iface_set_msg ##### -->
-<para>
-
-</para>
-
-@self: 
-@msg: 
-
-

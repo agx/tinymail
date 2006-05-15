@@ -24,14 +24,8 @@ A session singleton type for Camel
 
 @parent_object: 
 @interactive: 
-
-<!-- ##### FUNCTION tny_session_camel_get_instance ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
+@device: 
+@connchanged_signal: 
 
 <!-- ##### FUNCTION tny_session_camel_set_pass_func ##### -->
 <para>
@@ -51,5 +45,23 @@ A session singleton type for Camel
 @self: 
 @account: 
 @get_forget_pass_func: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_account_store ##### -->
+<para>
+
+</para>
+
+@self: 
+@account_store: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_device ##### -->
+<para>
+
+</para>
+
+@self: 
+@device: 
 
 

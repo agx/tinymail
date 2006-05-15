@@ -65,24 +65,6 @@ An interfaces that defines a mime part type
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_set_index ##### -->
-<para>
-
-</para>
-
-@self: 
-@index: 
-
-
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_index ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_msg_mime_part_iface_get_filename ##### -->
 <para>
 
@@ -162,5 +144,14 @@ An interfaces that defines a mime part type
 
 @self: 
 @content_type: 
+
+
+<!-- ##### FUNCTION tny_msg_mime_part_iface_is_attachment ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
 
 

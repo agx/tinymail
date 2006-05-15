@@ -58,6 +58,7 @@ A folder can have a account or another folder as parent.
 </para>
 
 @self: 
+@refresh: 
 @Returns: 
 
 
@@ -148,5 +149,34 @@ A folder can have a account or another folder as parent.
 
 @self: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_set_subscribed ##### -->
+<para>
+
+</para>
+
+@self: 
+@subscribed: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_subscribed ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_refresh_headers_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 

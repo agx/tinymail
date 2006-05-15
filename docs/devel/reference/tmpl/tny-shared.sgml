@@ -31,11 +31,11 @@ Shared include file with forward typedefs
 @parent: 
 @get_parts_func: 
 @get_header_func: 
-@add_part_func: 
-@del_part_func: 
 @get_folder_func: 
 @set_folder_func: 
 @set_header_func: 
+@del_part_func: 
+@add_part_func: 
 
 <!-- ##### STRUCT TnyMsgFolderIface ##### -->
 <para>
@@ -65,6 +65,9 @@ Shared include file with forward typedefs
 @get_unread_count_func: 
 @uncache_func: 
 @has_cache_func: 
+@set_subscribed_func: 
+@get_subscribed_func: 
+@refresh_headers_async_func: 
 
 <!-- ##### STRUCT TnyMsgHeaderIface ##### -->
 <para>
@@ -79,16 +82,16 @@ Shared include file with forward typedefs
 
 @g_iface: 
 @get_uid_func: 
-@set_uid_func: 
 @get_bcc_func: 
 @get_cc_func: 
-@get_date_received_func: 
-@get_date_sent_func: 
 @get_subject_func: 
 @get_to_func: 
 @get_from_func: 
 @get_replyto_func: 
 @get_message_id_func: 
+@get_date_received_func: 
+@get_date_sent_func: 
+@set_uid_func: 
 @set_bcc_func: 
 @set_cc_func: 
 @set_from_func: 
@@ -117,8 +120,6 @@ Shared include file with forward typedefs
 @get_stream_func: 
 @write_to_stream_func: 
 @construct_from_stream_func: 
-@set_index_func: 
-@get_index_func: 
 @get_filename_func: 
 @get_content_id_func: 
 @get_description_func: 
@@ -128,6 +129,7 @@ Shared include file with forward typedefs
 @set_content_id_func: 
 @set_filename_func: 
 @set_content_type_func: 
+@is_attachment_func: 
 
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
@@ -141,20 +143,35 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
+@is_connected_func: 
 @set_id_func: 
 @set_proto_func: 
 @set_user_func: 
 @set_hostname_func: 
 @set_pass_func_func: 
 @set_forget_pass_func_func: 
+@get_pass_func_func: 
+@get_forget_pass_func_func: 
 @get_id_func: 
 @get_proto_func: 
 @get_user_func: 
 @get_hostname_func: 
-@get_pass_func_func: 
-@get_forget_pass_func_func: 
 @set_account_store_func: 
 @get_account_store_func: 
+
+<!-- ##### STRUCT TnyDeviceIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyDeviceIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@connection_changed: 
 
 <!-- ##### STRUCT TnyStoreAccountIface ##### -->
 <para>
@@ -226,6 +243,8 @@ Shared include file with forward typedefs
 @add_store_account_func: 
 @get_transport_accounts_func: 
 @add_transport_account_func: 
+@get_cache_dir_func: 
+@get_device_func: 
 
 <!-- ##### STRUCT TnyMsgHeaderProxy ##### -->
 <para>
@@ -239,7 +258,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### USER_FUNCTION GetPassFunc ##### -->
+<!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
 
 </para>
@@ -249,11 +268,48 @@ Shared include file with forward typedefs
 @Returns: 
 
 
-<!-- ##### USER_FUNCTION ForgetPassFunc ##### -->
+<!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
 <para>
 
 </para>
 
 @self: 
+
+
+<!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyGetHeadersStatusCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@what: 
+@status: 
+@user_data: 
+
+
+<!-- ##### MACRO G_LIKELY ##### -->
+<para>
+
+</para>
+
+@expr: 
+
+
+<!-- ##### MACRO G_UNLIKELY ##### -->
+<para>
+
+</para>
+
+@expr: 
 
 

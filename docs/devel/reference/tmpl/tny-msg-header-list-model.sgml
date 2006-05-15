@@ -54,5 +54,6 @@ corresponding row in the #GtkTreeView become invisible.
 
 @self: 
 @folder: 
+@refresh: 
 
 

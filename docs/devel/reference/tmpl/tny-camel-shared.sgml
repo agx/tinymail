@@ -23,3 +23,32 @@ tny-camel-shared
 </para>
 
 
+<!-- ##### STRUCT TnySessionCamel ##### -->
+<para>
+
+</para>
+
+@parent_object: 
+@interactive: 
+@device: 
+@connchanged_signal: 
+
+<!-- ##### STRUCT TnySessionCamelClass ##### -->
+<para>
+
+</para>
+
+@parent_class: 
+@set_pass_func_func: 
+@set_forget_pass_func_func: 
+@set_account_store_func: 
+
+<!-- ##### FUNCTION tny_session_camel_new ##### -->
+<para>
+
+</para>
+
+@account_store: 
+@Returns: 
+
+

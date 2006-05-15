@@ -24,11 +24,20 @@ An implementation of #TnyAccountStoreIface that uses libtinymail-camel and GConf
 
 @parent: 
 
-<!-- ##### FUNCTION tny_account_store_get_instance ##### -->
+<!-- ##### FUNCTION tny_account_store_new ##### -->
 <para>
 
 </para>
 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_session ##### -->
+<para>
+
+</para>
+
+@self: 
 @Returns: 
 
 

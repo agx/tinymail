@@ -61,3 +61,21 @@ happen to the accounts.
 @account: 
 
 
+<!-- ##### FUNCTION tny_account_store_iface_get_cache_dir ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_iface_get_device ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
