@@ -1,7 +1,11 @@
+XX-YY-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* More ChangeLog items coming soon
+	
 03-07-2006  Raphael Slinckx  <raphael@slinckx.net>
 
 	* Added initial Python bindings
 	
 01-17-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 	
-	* Initial version
+	* Initial import
