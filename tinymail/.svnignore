@@ -1,0 +1,8 @@
+Makefile.in
+tinymail
+.svnignore
+stamp-h1
+config.h
+.libs
+.deps
+Makefile
