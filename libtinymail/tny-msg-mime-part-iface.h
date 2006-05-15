@@ -43,9 +43,9 @@ struct _TnyMsgMimePartIfaceClass
 	gboolean        (*content_type_is_func)      (TnyMsgMimePartIface *self, const gchar *content_type);
 	TnyStreamIface* (*get_stream_func)           (TnyMsgMimePartIface *self);
 
-	void            (*decode_to_stream_func)       (TnyMsgMimePartIface *self, TnyStreamIface *stream);
-	void            (*write_to_stream_func)       (TnyMsgMimePartIface *self, TnyStreamIface *stream);
-	gint            (*construct_from_stream_func) (TnyMsgMimePartIface *self, TnyStreamIface *stream, const gchar *type);
+	void            (*decode_to_stream_func)     (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+	void            (*write_to_stream_func)      (TnyMsgMimePartIface *self, TnyStreamIface *stream);
+	gint            (*construct_from_stream_func)(TnyMsgMimePartIface *self, TnyStreamIface *stream, const gchar *type);
 
 	const gchar*    (*get_filename_func)         (TnyMsgMimePartIface *self);
 	const gchar*    (*get_content_id_func)       (TnyMsgMimePartIface *self);
