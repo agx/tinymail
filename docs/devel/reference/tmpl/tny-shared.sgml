@@ -118,6 +118,7 @@ Shared include file with forward typedefs
 @get_content_type_func: 
 @content_type_is_func: 
 @get_stream_func: 
+@decode_to_stream_func: 
 @write_to_stream_func: 
 @construct_from_stream_func: 
 @get_filename_func: 

@@ -166,7 +166,7 @@ tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
 		str = g_strdup_printf ("file://%s", priv->filename);
 		
 		gtk_moz_embed_load_url (priv->embed, (const gchar*)str);
-
+		
 		g_free (str);
 
 	} else {

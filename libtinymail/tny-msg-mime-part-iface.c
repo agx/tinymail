@@ -178,6 +178,23 @@ tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 	return;
 }
 
+
+/**
+ * tny_msg_mime_part_iface_decode_to_stream:
+ * @self: a #TnyMsgMimePartIface object
+ * @stream: a #TnyMsgStreamIface stream
+ * 
+ * Efficiently decode the message part to a stream. This will not keep the data
+ * of the part in memory, but in stead will read from the part and write to the
+ * stream efficiently.
+ *
+ **/
+void
+tny_msg_mime_part_iface_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+{
+	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->decode_to_stream_func (self, stream);
+	return;
+}
 /**
  * tny_msg_mime_part_iface_construct_from_stream:
  * @self: a #TnyMsgMimePartIface object

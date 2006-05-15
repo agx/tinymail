@@ -41,7 +41,6 @@ struct _TnyMozEmbedMsgViewPriv
 	
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
-	TnyStreamIface *dest_stream;
 };
 
 #define TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE(o)	\
@@ -61,6 +60,20 @@ _get_readable_date (const time_t file_time_raw)
 	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
 	
 	return g_strdup (readable_date);
+}
+
+static gpointer 
+remove_html_stread_hack (gpointer data)
+{
+	/* Sigh, I don't know why I need this :-(. I think GtkMozEmbed postpones
+	   the loading of the document to the very last moment. */
+
+	sleep (5);
+
+	/* This will remove the file in /tmp/ */
+	g_object_unref (G_OBJECT (data));
+
+	return NULL;
 }
 
 static void
@@ -110,12 +123,16 @@ reload_msg (TnyMsgViewIface *self)
 	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
 	g_free ((gchar*)str);
 
-	if (priv->dest_stream)
-		g_object_unref (G_OBJECT (priv->dest_stream));
-
 	while (G_LIKELY (parts))
 	{
 		TnyMsgMimePartIface *part = parts->data;
+
+		if (!part)
+		{
+			parts = g_list_next (parts);
+			continue;
+		}
+
 		if (!have_html && G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/plain")))
 		{
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
@@ -131,7 +148,7 @@ reload_msg (TnyMsgViewIface *self)
 			dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
 
 			tny_stream_iface_reset (dest);
-			tny_msg_mime_part_iface_write_to_stream (part, dest);
+			tny_msg_mime_part_iface_decode_to_stream (part, dest);
 			tny_stream_iface_reset (dest);
 
 			g_object_unref (G_OBJECT (dest));
@@ -145,13 +162,15 @@ reload_msg (TnyMsgViewIface *self)
 			dest = TNY_STREAM_IFACE (tny_moz_embed_stream_new (priv->htmlview));
 
 			have_html = TRUE;
+
 			gtk_widget_show (GTK_WIDGET (priv->htmlview));
 			gtk_widget_hide (GTK_WIDGET (priv->textview));
 
 			tny_stream_iface_reset (dest);
-			tny_msg_mime_part_iface_write_to_stream (part, dest);
+			tny_msg_mime_part_iface_decode_to_stream (part, dest);
 			
-			priv->dest_stream = dest;
+			g_thread_create (remove_html_stread_hack, dest, FALSE, NULL);
+			/* g_object_unref (G_OBJECT (dest)); */
 
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
 			tny_msg_mime_part_iface_is_attachment (part))
@@ -197,7 +216,7 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 
 	/* TODO: Add a filter (decoder) here (depends on encoding) */
 
-	tny_msg_mime_part_iface_write_to_stream (part, TNY_STREAM_IFACE (stream));
+	tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
 
 	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
 	g_object_unref (G_OBJECT (stream));
@@ -347,8 +366,6 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
 	GtkTextBuffer *headerbuffer;
 
-	priv->dest_stream = NULL;
-
 	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 
@@ -428,9 +445,6 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 {
 	TnyMozEmbedMsgView *self = (TnyMozEmbedMsgView *)object;	
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
-
-	if (priv->dest_stream)
-		g_object_unref (G_OBJECT (priv->dest_stream));
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));

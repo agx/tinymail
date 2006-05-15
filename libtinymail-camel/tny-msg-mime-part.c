@@ -29,6 +29,24 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-mime-part-priv.h"
 
+#include <camel/camel-url.h>
+#include <camel/camel-stream.h>
+#include <camel/camel-stream-mem.h>
+#include <camel/camel-multipart.h>
+#include <camel/camel-multipart-encrypted.h>
+#include <camel/camel-multipart-signed.h>
+#include <camel/camel-medium.h>
+#include <camel/camel-mime-message.h>
+#include <camel/camel-gpg-context.h>
+#include <camel/camel-smime-context.h>
+#include <camel/camel-string-utils.h>
+#include <camel/camel-stream-filter.h>
+#include <camel/camel-stream-null.h>
+#include <camel/camel-mime-filter-charset.h>
+#include <camel/camel-mime-filter-windows.h>
+#include <camel/camel-mime-filter-pgp.h>
+
+
 /* Locking warning: tny-msg.c also locks priv->part_lock */
 
 static gboolean 
@@ -83,6 +101,101 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 
 	camel_stream_reset (wrapper->stream);
 	camel_stream_write_to_stream (wrapper->stream, cstream);
+
+	/* This should work but doesn't . . .
+	camel_data_wrapper_write_to_stream (wrapper, cstream); */
+
+	camel_object_unref (CAMEL_OBJECT (cstream));
+
+	/* We are done, so unreference the reference above */
+	camel_object_unref (CAMEL_OBJECT (medium));
+
+	return;
+}
+
+static void
+camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
+{
+        CamelStreamFilter *filter_stream;
+        CamelMimeFilterCharset *filter;
+        const char *charset = "UTF-8";
+        CamelMimeFilterWindows *windows = NULL;
+
+	if (dw->mime_type && (charset = camel_content_type_param 
+		(dw->mime_type, "charset")) && 
+		g_ascii_strncasecmp(charset, "iso-8859-", 9) == 0) 
+	{
+                CamelStream *null;
+
+                /* Since a few Windows mailers like to claim they sent
+                 * out iso-8859-# encoded text when they really sent
+                 * out windows-cp125#, do some simple sanity checking
+                 * before we move on... */
+
+                null = camel_stream_null_new();
+                filter_stream = camel_stream_filter_new_with_stream(null);
+                camel_object_unref(null);
+
+                windows = (CamelMimeFilterWindows *)camel_mime_filter_windows_new(charset);
+                camel_stream_filter_add (filter_stream, (CamelMimeFilter *)windows);
+
+                camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
+                camel_stream_flush ((CamelStream *)filter_stream);
+                camel_object_unref (filter_stream);
+
+                charset = camel_mime_filter_windows_real_charset (windows);
+
+        }
+
+        filter_stream = camel_stream_filter_new_with_stream (stream);
+
+        if ((filter = camel_mime_filter_charset_new_convert (charset, "UTF-8"))) 
+	{
+                camel_stream_filter_add (filter_stream, (CamelMimeFilter *) filter);
+                camel_object_unref (filter);
+        }
+
+        camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
+        camel_stream_flush ((CamelStream *)filter_stream);
+        camel_object_unref (filter_stream);
+
+        if (windows)
+                camel_object_unref(windows);
+}
+
+
+static void
+tny_msg_mime_part_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
+{
+	/* TODO: Add a filter (decoder) here */
+
+	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+	CamelDataWrapper *wrapper;
+	CamelMedium *medium;
+	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
+
+	g_mutex_lock (priv->part_lock);
+
+	medium = CAMEL_MEDIUM (priv->part);
+	camel_object_ref (CAMEL_OBJECT (medium));
+
+	/* Once medium is referenced, we can continue without lock */
+	g_mutex_unlock (priv->part_lock);
+
+	wrapper = camel_medium_get_content_object (medium);
+
+	if (G_UNLIKELY (!wrapper))
+	{
+		g_error ("Mime part does not yet have a source stream, use "
+			"tny_msg_mime_part_construct_from_stream first");
+		camel_object_unref (CAMEL_OBJECT (cstream));
+		return;
+	}
+
+	/* camel_stream_reset (wrapper->stream);
+	camel_stream_write_to_stream (wrapper->stream, cstream); */
+
+	camel_stream_format_text (wrapper, cstream);
 
 	/* This should work but doesn't . . .
 	camel_data_wrapper_write_to_stream (wrapper, cstream); */
@@ -434,6 +547,8 @@ tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_filename_func = tny_msg_mime_part_set_filename;
 	klass->set_content_type_func = tny_msg_mime_part_set_content_type;
 	klass->is_attachment_func = tny_msg_mime_part_is_attachment;
+
+	klass->decode_to_stream_func = tny_msg_mime_part_decode_to_stream;
 
 	return;
 }
