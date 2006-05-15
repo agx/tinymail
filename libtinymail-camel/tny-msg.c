@@ -82,9 +82,9 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 
 	TnyMsgMimePartIface *tpart = TNY_MSG_MIME_PART_IFACE 
 			(tny_msg_mime_part_new (part));
-
 	g_mutex_lock (priv->parts_lock);
 	priv->parts = g_list_append (priv->parts, tpart);
+
 	g_mutex_unlock (priv->parts_lock);
 
 	return TRUE;
@@ -95,7 +95,6 @@ destroy_part (gpointer data, gpointer user_data)
 {
 	if (G_LIKELY (data))
 		g_object_unref (G_OBJECT (data));
-
 	return;
 }
 

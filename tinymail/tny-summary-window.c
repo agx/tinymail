@@ -67,6 +67,7 @@ struct _TnySummaryWindowPriv
 	GtkTreeSelection *mailbox_select;
 	GtkTreeIter last_mailbox_correct_select;
 	guint connchanged_signal;
+	TnyMsgFolderIface *last_folder;
 };
 
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
@@ -280,6 +281,11 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
 			&priv->last_mailbox_correct_select);
 
+		if (priv->last_folder) /* Don't forget this! (destroys the folder cache) */
+			tny_msg_folder_iface_uncache (priv->last_folder);
+
+		priv->last_folder = folder;
+
 	} else {
 		g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 
@@ -313,7 +319,6 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeView *header_view = priv->header_view;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-
 
 	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
@@ -432,7 +437,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	
 
 	/* TODO: Persist application UI status (of the panes) */
-
+	priv->last_folder = NULL;
 	platfact = TNY_PLATFORM_FACTORY_IFACE 
 			(tny_platform_factory_get_instance ());
 

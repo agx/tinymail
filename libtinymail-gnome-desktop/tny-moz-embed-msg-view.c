@@ -129,6 +129,8 @@ reload_msg (TnyMsgViewIface *self)
 
 		if (!part)
 		{
+			/* This shouldn't happen */
+			g_warning ("Mimepart problem\n");
 			parts = g_list_next (parts);
 			continue;
 		}
