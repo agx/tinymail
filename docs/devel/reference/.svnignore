@@ -1,3 +1,5 @@
+Makefile
+Makefile.in
 libtinymail-sections.txt
 libtinymail.prerequisites
 sgml-build.stamp
