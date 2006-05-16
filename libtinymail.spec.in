@@ -111,6 +111,6 @@ make
 %{_includedir}/libtinymailui-gtk-1.0
 %{_libdir}/pkgconfig/*.pc
 
-changelog
+%changelog
 * Tue May 16 2006 Philip Van Hoof <pvanhoof@gnome.org>
 - Initial version 
