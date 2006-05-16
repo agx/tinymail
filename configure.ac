@@ -126,6 +126,7 @@ BINDIR=$prefix/bin
 AC_SUBST(BINDIR)
 
 AC_OUTPUT([
+libtinymail.spec
 Makefile
 docs/Makefile
 docs/devel/Makefile
