@@ -1,10 +1,11 @@
-.libs
 Makefile.in
 .svnignore
 .deps
+.libs
 Makefile
 tinymail.loT
 tinymailmodule.loT
 gen-tinymail.c
 tinymailmodule.c
 tinymail_camelmodule.c
+
