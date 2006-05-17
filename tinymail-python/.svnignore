@@ -2,3 +2,8 @@ Makefile.in
 .svnignore
 .deps
 Makefile
+tinymail.loT
+tinymailmodule.loT
+gen-tinymail.c
+tinymailmodule.c
+tinymail_camelmodule.c

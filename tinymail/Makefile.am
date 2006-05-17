@@ -1,10 +1,10 @@
 INCLUDES = 								\
 	$(TINYMAIL_CFLAGS) 						\
-	-I$(top_builddir)/libtinymail					\
-	-I$(top_builddir)/libtinymailui					\
-	-I$(top_builddir)/libtinymailui-gtk				\
-	-I$(top_builddir)/libtinymail-camel				\
-	-I$(top_builddir)/libtinymail-gnome-desktop			\
+	-I$(top_srcdir)/libtinymail					\
+	-I$(top_srcdir)/libtinymailui					\
+	-I$(top_srcdir)/libtinymailui-gtk				\
+	-I$(top_srcdir)/libtinymail-camel				\
+	-I$(top_srcdir)/libtinymail-gnome-desktop			\
 	-DASYNC_HEADERS
 
 bin_PROGRAMS = tinymail

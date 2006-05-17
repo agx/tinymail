@@ -1,5 +1,5 @@
 INCLUDES = $(LIBTINYMAIL_GNOMEVFS_CFLAGS) -I.	\
-	-I$(top_builddir)/libtinymail
+	-I$(top_srcdir)/libtinymail
 
 lib_LTLIBRARIES = libtinymail-gnomevfs-1.0.la 
 

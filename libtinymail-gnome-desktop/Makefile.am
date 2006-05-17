@@ -1,8 +1,10 @@
 INCLUDES = 					 \
 	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)	 \
-	-I$(top_builddir)/libtinymail		 \
-	-I$(top_builddir)/libtinymailui		 \
-	-I$(top_builddir)/libtinymailui-gtk
+	-I$(top_srcdir)/libtinymail		 \
+	-I$(top_srcdir)/libtinymailui		 \
+	-I$(top_srcdir)/libtinymailui-gtk	 \
+	-I$(top_srcdir)/libtinymail-camel	 \
+	-I$(top_srcdir)/libtinymail-gnomevfs
 
 lib_LTLIBRARIES = libtinymail-gnome-desktop-1.0.la
 

@@ -146,5 +146,6 @@ libtinymail-gnome-desktop/libtinymail-gnome-desktop.pc
 libtinymail-test/Makefile
 tinymail/Makefile
 tinymail-python/Makefile
+m4/Makefile
 ])
 

@@ -4,4 +4,4 @@ endif
 if BUILD_PYTINYMAIL
 PYTINYMAILDIR = tinymail-python
 endif
-SUBDIRS = libtinymail libtinymailui libtinymail-gnomevfs libtinymailui-gtk $(PLATFORMDIR) libtinymail-camel tinymail docs $(UNITTESTDIR) $(PYTINYMAILDIR)
+SUBDIRS = m4 libtinymail libtinymailui libtinymail-gnomevfs libtinymailui-gtk $(PLATFORMDIR) libtinymail-camel tinymail docs $(UNITTESTDIR) $(PYTINYMAILDIR)

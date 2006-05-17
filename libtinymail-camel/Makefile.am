@@ -1,6 +1,6 @@
 INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS) -I.	\
-	-I$(top_builddir)/libtinymail		\
-	-I$(top_builddir)/$(PLATFORMDIR)
+	-I$(top_srcdir)/libtinymail		\
+	-I$(top_srcdir)/$(PLATFORMDIR)
 
 # This makes tinymail faster, but wastes more memory
 #	-DPERFORMANCE_MODE

@@ -2,10 +2,10 @@ LTVERSION = "0:0:0"
 
 INCLUDES = 									\
 	$(LIBTINYMAIL_TEST_CFLAGS)						\
-	-I$(top_builddir)/libtinymail						\
-	-I$(top_builddir)/libtinymailui						\
-	-I$(top_builddir)/libtinymailui-gtk					\
-	-I$(top_builddir)/libtinymail-camel
+	-I$(top_srcdir)/libtinymail						\
+	-I$(top_srcdir)/libtinymailui						\
+	-I$(top_srcdir)/libtinymailui-gtk					\
+	-I$(top_srcdir)/libtinymail-camel
 
 lib_LTLIBRARIES = libtinymail-test-suite.la
 
