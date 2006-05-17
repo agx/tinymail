@@ -17,7 +17,7 @@ libtinymail_gnome_desktop_1_0_headers = 	 \
 libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
 	$(libtinymail_gnome_desktop_1_0_headers) \
 	tny-account-store.c			 \
-	rny-device-priv.h			 \
+	tny-device-priv.h			 \
 	tny-device.c				 \
 	tny-moz-embed-msg-view.c		 \
 	tny-moz-embed-stream.c			 \
