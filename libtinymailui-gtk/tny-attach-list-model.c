@@ -74,7 +74,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 		tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
 		tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
 #else
-	icon = GTK_STOCK_FILE;
+	icon = g_strdup (GTK_STOCK_FILE);
 #endif
 
 	if (G_LIKELY (icon))

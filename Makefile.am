@@ -4,4 +4,7 @@ endif
 if BUILD_PYTINYMAIL
 PYTINYMAILDIR = tinymail-python
 endif
-SUBDIRS = m4 libtinymail libtinymailui libtinymail-gnomevfs libtinymailui-gtk $(PLATFORMDIR) libtinymail-camel tinymail docs $(UNITTESTDIR) $(PYTINYMAILDIR)
+if BUILD_MOZEMBED
+MOZEMBEDDIR = libtinymailui-mozembed
+endif
+SUBDIRS = m4 libtinymail libtinymailui libtinymail-gnomevfs libtinymailui-gtk $(MOZEMBEDDIR) $(PLATFORMDIR) libtinymail-camel tinymail docs $(UNITTESTDIR) $(PYTINYMAILDIR)

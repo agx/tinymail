@@ -6,6 +6,10 @@ INCLUDES = 					 \
 	-I$(top_srcdir)/libtinymail-camel	 \
 	-I$(top_srcdir)/libtinymail-gnomevfs 
 
+if BUILD_MOZEMBED
+INCLUDES += -I$(top_srcdir)/libtinymailui-mozembed -DMOZEMBED
+endif
+
 if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
@@ -14,8 +18,6 @@ lib_LTLIBRARIES = libtinymail-gnome-desktop-1.0.la
 
 libtinymail_gnome_desktop_1_0_headers = 	 \
 	tny-account-store.h			 \
-	tny-moz-embed-msg-view.h		 \
-	tny-moz-embed-stream.h			 \
 	tny-password-dialog.h			 \
 	tny-device.h				 \
 	tny-platform-factory.h
@@ -25,16 +27,18 @@ libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
 	tny-account-store.c			 \
 	tny-device-priv.h			 \
 	tny-device.c				 \
-	tny-moz-embed-msg-view.c		 \
-	tny-moz-embed-stream.c			 \
 	tny-password-dialog.c			 \
 	tny-platform-factory.c
 
 libtinymail_gnome_desktop_1_0_la_LIBADD = 	\
 	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)	\
-	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la   \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la     \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
+
+if BUILD_MOZEMBED
+libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la
+endif
 
 libtinymailgnomedesktopincludedir = $(includedir)/libtinymail-gnome-desktop-$(API_VERSION)
 libtinymailgnomedesktopinclude_HEADERS = $(libtinymail_gnome_desktop_1_0_headers)

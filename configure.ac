@@ -25,6 +25,7 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
+
 dnl ### Enable gnome features ##
 AC_ARG_ENABLE(gnome,
 [  --enable-gnome    build using gnome features [default=yes]],
@@ -34,6 +35,16 @@ AC_ARG_ENABLE(gnome,
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-gnome) ;;
 esac],[build_gnome=true])
 AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
+
+dnl ### Enable the gtkmozembed widget ##
+AC_ARG_ENABLE(mozembed,
+[  --enable-mozembed    build using the gtkmozembed widget [default=yes]],
+[case "${enableval}" in
+  yes) build_mozembed=true ;;
+  no)  build_mozembed=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-mozembed) ;;
+esac],[build_mozembed=true])
+AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
 
 dnl ### Enable the python language bindings ##
 AC_ARG_ENABLE(py-tinymail,
@@ -101,9 +112,18 @@ PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 $extragtkpkgs g
 AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
+dnl ### libtinymailui-mozembed, a library that wraps the gtkmozembed widget ##
+if test x$build_mozembed = xtrue; then
+  extraplatpkgs="firefox-nss firefox-xpcom firefox-gtkmozembed"
+  PKG_CHECK_MODULES(LIBTINYMAILUI_MOZEMBED, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
+else
+  LIBTINYMAILUI_MOZEMBED_CFLAGS=
+  LIBTINYMAILUI_MOZEMBED_LIBS=
+fi
+
 dnl ### libtinymail-gnome-desktop, a GNOME platform library implementation ##
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP,  firefox-nss firefox-xpcom firefox-gtkmozembed libnm_glib glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, $extraplatpkgs libnm_glib glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
 else
   LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
   LIBTINYMAIL_GNOME_DESKTOP_LIBS=
@@ -167,6 +187,8 @@ libtinymailui/Makefile
 libtinymailui/libtinymailui.pc
 libtinymailui-gtk/Makefile
 libtinymailui-gtk/libtinymailui-gtk.pc
+libtinymailui-mozembed/Makefile
+libtinymailui-mozembed/libtinymailui-mozembed.pc
 libtinymail-gnomevfs/Makefile
 libtinymail-gnomevfs/libtinymail-gnomevfs.pc
 libtinymail-gnome-desktop/Makefile

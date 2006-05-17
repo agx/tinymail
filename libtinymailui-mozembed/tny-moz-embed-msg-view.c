@@ -24,8 +24,10 @@
 #include <tny-attach-list-model.h>
 #include <tny-vfs-stream.h>
 
+#ifdef GNOME
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
+#endif
 
 #include "tny-attach-list-model-priv.h"
 
@@ -200,7 +202,8 @@ reload_msg (TnyMsgViewIface *self)
 
 	return;
 }
-
+/* TODO: Improve this (refactor) */
+#ifdef GNOME
 static GnomeVFSResult
 save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 {
@@ -224,6 +227,14 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 
 	return result;
 }
+#else
+static void
+save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
+{
+	g_print ("UNIMPLEMENTED: save_to_file for non-gnome-vfs platforms\n");
+	return result;
+}
+#endif
 
 static void
 for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointer user_data)

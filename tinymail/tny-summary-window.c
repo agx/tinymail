@@ -36,8 +36,6 @@
 #include <tny-transport-account.h>
 
 #include <tny-msg-view-iface.h>
-#include <tny-moz-embed-msg-view.h>
-#include <tny-msg-view.h>
 
 #include <tny-msg-window-iface.h>
 #include <tny-msg-window.h>

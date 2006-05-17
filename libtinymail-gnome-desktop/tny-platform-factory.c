@@ -26,7 +26,12 @@
 #include <tny-device.h>
 
 #include <tny-msg-view-iface.h>
+
+#ifdef MOZEMBED
 #include <tny-moz-embed-msg-view.h>
+#else
+#include <tny-msg-view.h>
+#endif
 
 static GObjectClass *parent_class = NULL;
 
@@ -52,7 +57,11 @@ tny_platform_factory_new_device (TnyPlatformFactoryIface *self)
 static TnyMsgViewIface*
 tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
 {
+#ifdef MOZEMBED
 	return TNY_MSG_VIEW_IFACE (tny_moz_embed_msg_view_new ());
+#else
+	return TNY_MSG_VIEW_IFACE (tny_msg_view_new ());
+#endif
 }
 
 /**
