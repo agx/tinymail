@@ -4,7 +4,11 @@ INCLUDES = 					 \
 	-I$(top_srcdir)/libtinymailui		 \
 	-I$(top_srcdir)/libtinymailui-gtk	 \
 	-I$(top_srcdir)/libtinymail-camel	 \
-	-I$(top_srcdir)/libtinymail-gnomevfs
+	-I$(top_srcdir)/libtinymail-gnomevfs 
+
+if BUILD_GNOME
+INCLUDES += -DGNOME
+endif
 
 lib_LTLIBRARIES = libtinymail-gnome-desktop-1.0.la
 

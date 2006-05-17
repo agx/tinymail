@@ -2,7 +2,11 @@ INCLUDES = \
 	$(LIBTINYMAILUI_GTK_CFLAGS)	       \
 	-I$(top_srcdir)/libtinymail            \
 	-I$(top_srcdir)/libtinymail-gnomevfs   \
-	-I$(top_srcdir)/libtinymailui
+	-I$(top_srcdir)/libtinymailui 
+
+if BUILD_GNOME
+INCLUDES += -DGNOME
+endif
 
 lib_LTLIBRARIES = libtinymailui-gtk-1.0.la
 

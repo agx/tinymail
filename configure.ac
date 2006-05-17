@@ -25,7 +25,17 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
+dnl ### Enable gnome features ##
+AC_ARG_ENABLE(gnome,
+[  --enable-gnome    build using gnome features [default=yes]],
+[case "${enableval}" in
+  yes) build_gnome=true ;;
+  no)  build_gnome=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-gnome) ;;
+esac],[build_gnome=true])
+AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
 
+dnl ### Enable the python language bindings ##
 AC_ARG_ENABLE(py-tinymail,
 [  --enable-py-tinymail    build python bindings [default=no]],
 [case "${enableval}" in
@@ -35,6 +45,7 @@ AC_ARG_ENABLE(py-tinymail,
 esac],[build_pytinymail=false])
 AM_CONDITIONAL(BUILD_PYTINYMAIL, test x$build_pytinymail = xtrue)
 
+dnl ### Enable building the unit tests ##
 AC_ARG_ENABLE(unit-tests,
 [  --enable-unit-tests    build unit tests [default=no]],
 [case "${enableval}" in
@@ -44,86 +55,103 @@ AC_ARG_ENABLE(unit-tests,
 esac],[build_unittests=false])
 AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
 
+dnl ### Set the platform library ##
 AC_ARG_WITH(platform,
 [  --with-platform=gnome-desktop       platform to compile [gnome-desktop]],
 [case "${with_platform}" in
   gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
   *) AC_MSG_ERROR(bad value ${with_platform} for --with-platform) ;;
 esac],[PLATFORMDIR=libtinymail-gnome-desktop])
-
 AC_SUBST(PLATFORMDIR)
 
+dnl ### gtk-doc
 GTK_DOC_CHECK([1.0])
 
+dnl ### libtinymail, the abstraction library ##
 PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_LIBS)
 
+dnl ### libtinymailui, the ui abstraction library ##
 PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAILUI_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_LIBS)
 
+dnl ### libtinymail-camel, a camel implementation of libtinymail ##
 PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.8 gobject-2.0 camel-1.2 camel-provider-1.2)
 AC_SUBST(LIBTINYMAIL_CAMEL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_CAMEL_LIBS)
 
-PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
+dnl ### libtinymail-gnomevfs, a tnystreamiface for gnome-vfs ##
+if test x$build_gnome = xtrue; then
+extragtkpkgs=libgnomeui-2.0
+extratnypkgs=gnome-vfs-2.0
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
+else
+  LIBTINYMAIL_GNOMEVFS_CFLAGS=
+  LIBTINYMAIL_GNOMEVFS_LIBS=
+  extragtkpkgs=
+  extratnypkgs=
+fi
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_LIBS)
 
-dnl gnomeui-2 is for gnome_icon_lookup :-\
-dnl Maybe refactor it as a thiny in libtinymail-gnome-desktop?
-
-PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
+dnl ### libtinymailui-gtk, a gtk+ implementation of libtinymail-ui ##
+PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 $extragtkpkgs gtk+-2.0)
 AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
+dnl ### libtinymail-gnome-desktop, a GNOME platform library implementation ##
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
-PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP,  firefox-nss firefox-xpcom firefox-gtkmozembed libnm_glib glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP,  firefox-nss firefox-xpcom firefox-gtkmozembed libnm_glib glib-2.0 >= 2.8 gobject-2.0 libgnomeui-2.0 gtk+-2.0)
 else
-LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
-LIBTINYMAIL_GNOME_DESKTOP_LIBS=
+  LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
+  LIBTINYMAIL_GNOME_DESKTOP_LIBS=
 fi
 AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_LIBS)
 
+dnl ### libtinymail-test, a library for testing purposes ##
 if test x$build_unittests = xtrue; then
-PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0 camel-1.2 camel-provider-1.2 gnome-vfs-2.0)
+  PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0 camel-1.2 camel-provider-1.2 $extratnypkgs)
 else
-LIBTINYMAIL_TEST_CFLAGS=
-LIBTINYMAIL_TEST_LIBS=
+  LIBTINYMAIL_TEST_CFLAGS=
+  LIBTINYMAIL_TEST_LIBS=
 fi
 AC_SUBST(LIBTINYMAIL_TEST_CFLAGS)
 AC_SUBST(LIBTINYMAIL_TEST_LIBS)
 
+dnl ### tinymail, the demo-ui ##
 dnl Try to remove the gtk+ and gconf dependency by refactoring to libraries
-PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 gnome-vfs-2.0)
+PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 $extratnypkgs)
 AC_SUBST(TINYMAIL_CFLAGS)
 AC_SUBST(TINYMAIL_LIBS)
 
+dnl ### tinymail-python, the python language bindings ##
 if test x$build_pytinymail = xtrue; then
-AM_PATH_PYTHON(2.3)
-AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
-AC_PATH_PROG(PYGTK_CODEGEN, pygtk-codegen-2.0, no)
-if test "x$PYGTK_CODEGEN" = xno; then
+  AM_PATH_PYTHON(2.3)
+  AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
+  AC_PATH_PROG(PYGTK_CODEGEN, pygtk-codegen-2.0, no)
+  if test "x$PYGTK_CODEGEN" = xno; then
 	AC_MSG_ERROR(could not find pygtk-codegen-2.0 script)
-fi
-AC_MSG_CHECKING(for pygtk defs)
-PYGTK_DEFSDIR=`$PKG_CONFIG --variable=defsdir pygtk-2.0`
-AC_SUBST(PYGTK_DEFSDIR)
-AC_MSG_RESULT($PYGTK_DEFSDIR)
+  fi
+  AC_MSG_CHECKING(for pygtk defs)
+  PYGTK_DEFSDIR=`$PKG_CONFIG --variable=defsdir pygtk-2.0`
+  AC_SUBST(PYGTK_DEFSDIR)
+  AC_MSG_RESULT($PYGTK_DEFSDIR)
 
-PKG_CHECK_MODULES(TINYMAIL_PYTHON, pygobject-2.0 pygtk-2.0 gnome-vfs-2.0)
+  PKG_CHECK_MODULES(TINYMAIL_PYTHON, pygobject-2.0 pygtk-2.0 gnome-vfs-2.0)
 else
-TINYMAIL_PYTHON_CFLAGS=
-TINYMAIL_PYTHON_LIBS=
+  TINYMAIL_PYTHON_CFLAGS=
+  TINYMAIL_PYTHON_LIBS=
 fi
-
 AC_SUBST(TINYMAIL_PYTHON_CFLAGS)
 AC_SUBST(TINYMAIL_PYTHON_LIBS)
 
 BINDIR=$prefix/bin
 AC_SUBST(BINDIR)
+
+
 
 AC_OUTPUT([
 libtinymail.spec
