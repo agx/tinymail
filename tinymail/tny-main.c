@@ -24,8 +24,10 @@
 #include <tny-platform-factory-iface.h>
 #include <tny-platform-factory.h>
 
+#ifdef GNOME
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
+#endif
 
 
 /**
@@ -46,7 +48,10 @@ main (int argc, char **argv)
 	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
 	gdk_threads_init ();
+
+#ifdef GNOME
 	gnome_vfs_init ();
+#endif
 
 	platfact = TNY_PLATFORM_FACTORY_IFACE 
 			(tny_platform_factory_get_instance ());

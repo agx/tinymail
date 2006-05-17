@@ -3,11 +3,10 @@ INCLUDES = 					 \
 	-I$(top_srcdir)/libtinymail		 \
 	-I$(top_srcdir)/libtinymailui		 \
 	-I$(top_srcdir)/libtinymailui-gtk	 \
-	-I$(top_srcdir)/libtinymail-camel	 \
-	-I$(top_srcdir)/libtinymail-gnomevfs 
+	-I$(top_srcdir)/libtinymail-camel
 
 if BUILD_GNOME
-INCLUDES += -DGNOME
+INCLUDES +=  -I$(top_srcdir)/libtinymail-gnomevfs -DGNOME
 endif
 
 lib_LTLIBRARIES = libtinymailui-mozembed-1.0.la
@@ -26,6 +25,10 @@ libtinymailui_mozembed_1_0_la_LIBADD = 	\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la   \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
+
+if BUILD_GNOME
+libtinymailui_mozembed_1_0_la_LIBADD +=  $(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la
+endif
 
 libtinymailuimozembedincludedir = $(includedir)/libtinymailui-mozembed-$(API_VERSION)
 libtinymailuimozembedinclude_HEADERS = $(libtinymailui_mozembed_1_0_headers)

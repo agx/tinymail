@@ -7,6 +7,10 @@ INCLUDES = 								\
 	-I$(top_srcdir)/libtinymail-gnome-desktop			\
 	-DASYNC_HEADERS
 
+if BUILD_GNOME
+INCLUDES += -DGNOME
+endif
+
 bin_PROGRAMS = tinymail
 
 tinymail_SOURCES = 							\

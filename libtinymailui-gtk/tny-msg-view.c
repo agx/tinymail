@@ -22,9 +22,9 @@
 #include <tny-msg-view.h>
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
-#include <tny-vfs-stream.h>
 
 #ifdef GNOME
+#include <tny-vfs-stream.h>
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 #endif
@@ -176,7 +176,7 @@ static void
 save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 {
 	g_print ("UNIMPLEMENTED: save_to_file for non-gnome-vfs platforms\n");
-	return result;
+	return;
 }
 #endif
 
