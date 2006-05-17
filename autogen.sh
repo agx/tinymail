@@ -20,4 +20,5 @@ which gnome-autogen.sh || {
 }
 USE_GNOME2_MACROS=1 . gnome-autogen.sh
 
-
+### Dirty lil hack #
+patch -fp0 < gtk-doc.make.distcheck.patch

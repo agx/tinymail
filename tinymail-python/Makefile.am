@@ -17,7 +17,7 @@ tinymail_camel_la_SOURCES = \
 
 nodist_tinymail_camel_la_SOURCES = tinymail_camelmodule.c
 
-CLEANFILES = tinymailmodule.c tinymail_camelmodule.c
+# CLEANFILES = tinymailmodule.c tinymail_camelmodule.c
 EXTRA_DIST = \
     tinymail.defs \
     tinymail.override \
