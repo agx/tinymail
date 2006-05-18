@@ -75,6 +75,10 @@ TnyMsgHeaderProxy
 </para>
 
 
+<!-- ##### SIGNAL TnyAccountStoreIface::account-changed ##### -->
+
+
+
 <!-- ##### STRUCT TnyMsgFolderProxy ##### -->
 <para>
 

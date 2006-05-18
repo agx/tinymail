@@ -29,6 +29,7 @@ An implementation of #TnyMsgViewIface for Gtk+
 
 </para>
 
+@save_strategy: 
 @Returns: 
 
 

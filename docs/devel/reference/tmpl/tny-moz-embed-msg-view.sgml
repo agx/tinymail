@@ -29,6 +29,7 @@ TnyMozEmbedMsgView
 
 </para>
 
+@save_strategy: 
 @Returns: 
 
 
