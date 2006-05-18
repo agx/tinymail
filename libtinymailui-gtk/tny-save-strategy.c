@@ -47,7 +47,7 @@ static GObjectClass *parent_class = NULL;
 
 
 #ifdef GNOME
-static GnomeVFSResult
+static gboolean
 save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 {
 	GnomeVFSResult result;
@@ -58,7 +58,7 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 		GNOME_VFS_OPEN_WRITE, FALSE, 0777);
 
 	if (G_UNLIKELY (result != GNOME_VFS_OK))
-		return result;
+		return FALSE;
 
 	stream = tny_vfs_stream_new (handle);
 	tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
@@ -66,10 +66,10 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
 	g_object_unref (G_OBJECT (stream));
 
-	return result;
+	return TRUE;
 }
 #else
-static void
+static gboolean
 save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 {
 	/* "file:///filename" */
@@ -79,7 +79,7 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 	const gchar *local_filename = uri+7;
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
-	if (fd)
+	if (fd != -1)
 	{
 		TnyFsStream *stream = NULL;
 		stream = tny_fs_stream_new (fd);
@@ -87,9 +87,11 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 
 		/* This also closes the file descriptor (maybe it shouldn't?) */
 		g_object_unref (G_OBJECT (stream));
+
+		return TRUE;
 	}
 
-	return;
+	return FALSE;
 }
 #endif
 
@@ -102,6 +104,7 @@ tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 		GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, 
 		GTK_RESPONSE_ACCEPT, NULL));
+	gboolean destr=FALSE;
 
 	gtk_file_chooser_set_do_overwrite_confirmation 
 		(GTK_FILE_CHOOSER (dialog), TRUE);
@@ -124,12 +127,26 @@ tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 
 		if (uri)
 		{
-			save_to_file (uri, part);
+			if (!save_to_file (uri, part))
+			{
+				gtk_widget_destroy (GTK_WIDGET (dialog));
+				destr = TRUE;
+				GtkWidget *errd;
+				errd = gtk_message_dialog_new (NULL,
+					GTK_DIALOG_DESTROY_WITH_PARENT,
+					GTK_MESSAGE_ERROR,
+					GTK_BUTTONS_CLOSE,
+					"Saving to %s failed\n", uri);
+				gtk_dialog_run (GTK_DIALOG (errd));
+				gtk_widget_destroy (GTK_WIDGET (errd));
+			}
+
 			g_free (uri);
 		}
 	}
 
-	gtk_widget_destroy (GTK_WIDGET (dialog));
+	if (!destr)
+		gtk_widget_destroy (GTK_WIDGET (dialog));
 
 	return;
 }
