@@ -1,4 +1,4 @@
-/* libtinymailui - The Tiny Mail UI library
+/* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -17,52 +17,33 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <tny-msg-view-iface.h>
+#include <tny-save-strategy-iface.h>
 
 /**
- * tny_msg_view_iface_set_save_strategy:
- * @self: A #TnyMsgViewIface instance
- * @strategy: A TnySaveStrategyIface instace
+ * tny_save_strategy_iface_save:
+ * @self: A TnySaveStrategyIface instance
  *
- * Set the strategy used for saving mime-parts
+ * Performs the saving
  * 
  **/
 void
-tny_msg_view_iface_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy)
+tny_save_strategy_iface_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 {
-	TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_save_strategy_func (self, strategy);
-	return;
-}
-
-
-/**
- * tny_msg_view_iface_set_msg:
- * @self: A #TnyMsgViewIface instance
- * @msg: A #TnyMsgIface instace
- *
- * Set message to view
- * 
- **/
-void
-tny_msg_view_iface_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
-{
-	TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_msg_func (self, msg);
+	TNY_SAVE_STRATEGY_IFACE_GET_CLASS (self)->save_func (self, part);
 	return;
 }
 
 static void
-tny_msg_view_iface_base_init (gpointer g_class)
+tny_save_strategy_iface_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
-	if (!initialized) {
-		/* create interface signals here. */
+	if (!initialized) 
 		initialized = TRUE;
-	}
 }
 
 GType
-tny_msg_view_iface_get_type (void)
+tny_save_strategy_iface_get_type (void)
 {
 	static GType type = 0;
 
@@ -70,8 +51,8 @@ tny_msg_view_iface_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgViewIfaceClass),
-		  tny_msg_view_iface_base_init,   /* base_init */
+		  sizeof (TnySaveStrategyIfaceClass),
+		  tny_save_strategy_iface_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
@@ -81,12 +62,10 @@ tny_msg_view_iface_get_type (void)
 		  NULL    /* instance_init */
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyMsgViewIface", &info, 0);
+			"TnySaveStrategyIface", &info, 0);
 
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}
 
 	return type;
 }
-
-

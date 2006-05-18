@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_VIEW_H
-#define TNY_MSG_VIEW_H
+#ifndef TNY_SAVE_STRATEGY_H
+#define TNY_SAVE_STRATEGY_H
 
 /* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -23,38 +23,33 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
-#include <tny-msg-view-iface.h>
-#include <tny-msg-header-iface.h>
-#include <tny-msg-iface.h>
-#include <tny-stream-iface.h>
-#include <tny-msg-mime-part-iface.h>
 #include <tny-save-strategy-iface.h>
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MSG_VIEW             (tny_msg_view_get_type ())
-#define TNY_MSG_VIEW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_VIEW, TnyMsgView))
-#define TNY_MSG_VIEW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_VIEW, TnyMsgViewClass))
-#define TNY_IS_MSG_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_VIEW))
-#define TNY_IS_MSG_VIEW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_VIEW))
-#define TNY_MSG_VIEW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_VIEW, TnyMsgViewClass))
+#define TNY_TYPE_SAVE_STRATEGY             (tny_save_strategy_get_type ())
+#define TNY_SAVE_STRATEGY(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_SAVE_STRATEGY, TnySaveStrategy))
+#define TNY_SAVE_STRATEGY_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_SAVE_STRATEGY, TnySaveStrategyClass))
+#define TNY_IS_SAVE_STRATEGY(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_SAVE_STRATEGY))
+#define TNY_IS_SAVE_STRATEGY_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_SAVE_STRATEGY))
+#define TNY_SAVE_STRATEGY_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_SAVE_STRATEGY, TnySaveStrategyClass))
 
-typedef struct _TnyMsgView TnyMsgView;
-typedef struct _TnyMsgViewClass TnyMsgViewClass;
+typedef struct _TnySaveStrategy TnySaveStrategy;
+typedef struct _TnySaveStrategyClass TnySaveStrategyClass;
 
-struct _TnyMsgView
+struct _TnySaveStrategy
 {
 	GtkScrolledWindow parent;
 
 };
 
-struct _TnyMsgViewClass
+struct _TnySaveStrategyClass
 {
 	GtkScrolledWindowClass parent_class;
 };
 
-GType               tny_msg_view_get_type       (void);
-TnyMsgView*         tny_msg_view_new            (TnySaveStrategyIface *save_strategy);
+GType               tny_save_strategy_get_type       (void);
+TnySaveStrategy*    tny_save_strategy_new            (void);
 
 G_END_DECLS
 

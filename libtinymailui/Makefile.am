@@ -7,12 +7,14 @@ lib_LTLIBRARIES = libtinymailui-1.0.la
 libtinymailui_1_0_headers = 		\
 	tny-summary-window-iface.h	\
 	tny-msg-view-iface.h		\
+	tny-save-strategy-iface.h	\
 	tny-msg-window-iface.h		\
 	tny-platform-factory-iface.h
 
 libtinymailui_1_0_la_SOURCES = 		\
 	$(libtinymailui_1_0_headers)	\
 	tny-summary-window-iface.c	\
+	tny-save-strategy-iface.c	\
 	tny-msg-view-iface.c		\
 	tny-msg-window-iface.c		\
 	tny-platform-factory-iface.c

@@ -28,6 +28,7 @@
 #include <tny-msg-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-msg-mime-part-iface.h>
+#include <tny-save-strategy-iface.h>
 
 G_BEGIN_DECLS
 
@@ -53,7 +54,7 @@ struct _TnyMozEmbedMsgViewClass
 };
 
 GType               tny_moz_embed_msg_view_get_type       (void);
-TnyMozEmbedMsgView* tny_moz_embed_msg_view_new            (void);
+TnyMozEmbedMsgView* tny_moz_embed_msg_view_new            (TnySaveStrategyIface *save_strategy);
 
 G_END_DECLS
 

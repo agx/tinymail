@@ -24,6 +24,8 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
+#include <tny-save-strategy-iface.h>
+
 G_BEGIN_DECLS
 
 #define TNY_TYPE_MSG_VIEW_IFACE             (tny_msg_view_iface_get_type ())
@@ -41,12 +43,14 @@ struct _TnyMsgViewIfaceClass
 {
 	GTypeInterface parent;
 
-	void (*set_msg_func) (TnyMsgViewIface *self, TnyMsgIface *msg);
+	void (*set_msg_func)           (TnyMsgViewIface *self, TnyMsgIface *msg);
+	void (*set_save_strategy_func) (TnyMsgViewIface *self, TnySaveStrategyIface *strategy);
 };
 
-GType         tny_msg_view_iface_get_type        (void);
+GType tny_msg_view_iface_get_type          (void);
 
-void          tny_msg_view_iface_set_msg         (TnyMsgViewIface *self, TnyMsgIface *msg);
+void  tny_msg_view_iface_set_msg           (TnyMsgViewIface *self, TnyMsgIface *msg);
+void  tny_msg_view_iface_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy);
 
 
 G_END_DECLS

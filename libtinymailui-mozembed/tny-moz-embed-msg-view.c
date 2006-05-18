@@ -52,6 +52,7 @@ struct _TnyMozEmbedMsgViewPriv
 	
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
+	TnySaveStrategyIface *save_strategy;
 };
 
 #define TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE(o)	\
@@ -207,55 +208,22 @@ reload_msg (TnyMsgViewIface *self)
 
 	return;
 }
-/* TODO: Improve this (refactor) */
-#ifdef GNOME
-static GnomeVFSResult
-save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
+
+
+void
+tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy)
 {
-	GnomeVFSResult result;
-	GnomeVFSHandle *handle;
-	TnyVfsStream *stream = NULL;
+	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
-	result = gnome_vfs_create (&handle, uri, 
-		GNOME_VFS_OPEN_WRITE, FALSE, 0777);
+	if (priv->save_strategy)
+		g_object_unref (G_OBJECT (priv->save_strategy));
 
-	if (G_UNLIKELY (result != GNOME_VFS_OK))
-		return result;
-
-	stream = tny_vfs_stream_new (handle);
-
-	/* TODO: Add a filter (decoder) here (depends on encoding) */
-	tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
-
-	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
-	g_object_unref (G_OBJECT (stream));
-
-	return result;
-}
-#else
-static void
-save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
-{
-	/* "file:///filename" */
-	/*  1234567^          */
-
-	/* TODO: make this platform independent */
-	const gchar *local_filename = uri+7;
-	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-	if (fd)
-	{
-		TnyFsStream *stream = NULL;
-		stream = tny_fs_stream_new (fd);
-		tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
-
-		/* This also closes the file descriptor (maybe it shouldn't?) */
-		g_object_unref (G_OBJECT (stream));
-	}
+	g_object_ref (G_OBJECT (strategy));
+	priv->save_strategy = strategy;
 
 	return;
 }
-#endif
+
 
 static void
 for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointer user_data)
@@ -264,6 +232,12 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTreeModel *model = gtk_icon_view_get_model (icon_view);
 	GtkTreeIter iter;
+
+	if (!G_LIKELY (priv->save_strategy))
+	{
+		g_warning ("No save strategy for this message view\n");
+		return;
+	}
 
 	if (G_LIKELY (gtk_tree_model_get_iter (model, &iter, path)))
 	{
@@ -274,43 +248,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 			&part, -1);
 
 		if (G_LIKELY (part))
-		{
-			GtkWidget *toplevel = gtk_widget_get_toplevel (GTK_WIDGET (self));
-
-			if (G_UNLIKELY (!GTK_WIDGET_TOPLEVEL (toplevel)))
-				return;
-
-			GtkFileChooserDialog *dialog = GTK_FILE_CHOOSER_DIALOG 
-				(gtk_file_chooser_dialog_new ("Save File",
-				GTK_WINDOW (toplevel),
-				GTK_FILE_CHOOSER_ACTION_SAVE,
-				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, 
-				GTK_RESPONSE_ACCEPT, NULL));
-		
-			gtk_file_chooser_set_do_overwrite_confirmation 
-				(GTK_FILE_CHOOSER (dialog), TRUE);
-		
-			gtk_file_chooser_set_current_folder 
-				(GTK_FILE_CHOOSER (dialog), g_get_home_dir ());
-
-			gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (dialog), 
-				tny_msg_mime_part_iface_get_filename (part));
-
-			if (G_LIKELY (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT))
-			{
-				gchar *uri;
-		
-				uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (dialog));
-
-				if (uri)
-				{
-					save_to_file (uri, part);
-					g_free (uri);
-				}
-			}
-		
-			gtk_widget_destroy (GTK_WIDGET (dialog));
-		}
+			tny_save_strategy_iface_save (priv->save_strategy, part);
 	}
 
 	return;
@@ -377,14 +315,16 @@ tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 
 /**
  * tny_mozembed_msg_view_new:
- *
+ * @save_strategy: The save strategy to use
  *
  * Return value: a new #TnyMsgViewIface instance implemented for Gtk+
  **/
 TnyMozEmbedMsgView*
-tny_moz_embed_msg_view_new (void)
+tny_moz_embed_msg_view_new (TnySaveStrategyIface *save_strategy)
 {
 	TnyMozEmbedMsgView *self = g_object_new (TNY_TYPE_MOZ_EMBED_MSG_VIEW, NULL);
+
+	tny_msg_view_iface_set_save_strategy (TNY_MSG_VIEW_IFACE (self), save_strategy);
 
 	return self;
 }
@@ -398,6 +338,8 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
 	GtkTextBuffer *headerbuffer;
+
+	priv->save_strategy = NULL;
 
 	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (self), NULL);
@@ -482,6 +424,9 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
 
+	if (G_LIKELY (priv->save_strategy))
+		g_object_unref (G_OBJECT (priv->save_strategy));
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -493,6 +438,7 @@ tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyMsgViewIfaceClass *klass = (TnyMsgViewIfaceClass *)g_iface;
 
 	klass->set_msg_func = tny_moz_embed_msg_view_set_msg;
+	klass->set_save_strategy_func = tny_mozembed_msg_view_set_save_strategy;
 
 	return;
 }
