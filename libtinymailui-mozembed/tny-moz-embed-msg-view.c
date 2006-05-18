@@ -239,6 +239,7 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 	/* "file:///filename" */
 	/*  1234567^          */
 
+	/* TODO: make this platform independent */
 	const gchar *local_filename = uri+7;
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
