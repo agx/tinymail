@@ -42,8 +42,8 @@ FIXXREF_OPTIONS=
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/*.c
-HFILE_GLOB=$(top_srcdir)/libtinymail/*.h $(top_srcdir)/libtinymailui/*.h $(top_srcdir)/libtinymailui-gtk/*.h $(top_srcdir)/libtinymail-gnomevfs/*.h $(top_srcdir)/libtinymail-camel/*.h $(top_srcdir)/libtinymail-gnome-desktop/*.h
-CFILE_GLOB=$(top_srcdir)/libtinymail/*.c $(top_srcdir)/libtinymailui/*.c $(top_srcdir)/libtinymailui-gtk/*.c $(top_srcdir)/libtinymail-gnomevfs/*.c $(top_srcdir)/libtinymail-camel/*.c $(top_srcdir)/libtinymail-gnome-desktop/*.c
+HFILE_GLOB=$(top_srcdir)/libtinymail/*.h $(top_srcdir)/libtinymailui/*.h $(top_srcdir)/libtinymailui-gtk/*.h $(top_srcdir)/libtinymail-gnomevfs/*.h $(top_srcdir)/libtinymail-camel/*.h $(top_srcdir)/libtinymail-gnome-desktop/*.h $(top_srcdir)/libtinymailui-mozembed/*.h
+CFILE_GLOB=$(top_srcdir)/libtinymail/*.c $(top_srcdir)/libtinymailui/*.c $(top_srcdir)/libtinymailui-gtk/*.c $(top_srcdir)/libtinymail-gnomevfs/*.c $(top_srcdir)/libtinymail-camel/*.c $(top_srcdir)/libtinymail-gnome-desktop/*.c $(top_srcdir)/libtinymailui-mozembed/*.c
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
