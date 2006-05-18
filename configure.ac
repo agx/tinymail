@@ -1,8 +1,28 @@
-AC_INIT(libtinymail, 1.0.0, http://www.pvanhoof.be)
+
+m4_define([tny_major_version], [1])
+m4_define([tny_minor_version], [0])
+m4_define([tny_micro_version], [0])
+m4_define([tny_version],
+          [tny_major_version.tny_minor_version.tny_micro_version])
+m4_define([tny_interface_age], [0])
+m4_define([tny_binary_age],
+          [m4_eval(100 * tny_minor_version + tny_micro_version)])
+m4_define([tny_api_version], [1.0])
+
+AC_INIT([libtinymail], [tny_version], [http://www.pvanhoof.be])
+
 AC_CONFIG_SRCDIR(tinymail/tny-main.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AC_CONFIG_MACRO_DIR([m4])
 AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS -I m4")
+
+m4_define([lt_current], [m4_eval(100 * tny_minor_version + tny_micro_version - tny_interface_age)])
+m4_define([lt_revision], [tny_interface_age])
+m4_define([lt_age], [m4_eval(tny_binary_age - tny_interface_age)])
+LT_VERSION_INFO="lt_current:lt_revision:lt_age"
+LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
+AC_SUBST(LT_VERSION_INFO)
+AC_SUBST(LT_CURRENT_MINUS_AGE)
 
 AM_CONFIG_HEADER(tinymail/config.h)
 AM_CONFIG_HEADER(libtinymail/config.h)
@@ -11,7 +31,7 @@ AM_CONFIG_HEADER(libtinymail-gnomevfs/config.h)
 AM_CONFIG_HEADER(libtinymailui/config.h)
 AM_CONFIG_HEADER(libtinymailui-gtk/config.h)
 
-API_VERSION=1.0
+API_VERSION=tny_api_version
 AC_SUBST(API_VERSION)
 
 if test x$prefix = xNONE; then

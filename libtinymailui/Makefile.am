@@ -20,7 +20,7 @@ libtinymailui_1_0_la_SOURCES = 		\
 libtinymailui_1_0_la_LIBADD = 		\
 	$(LIBTINYMAILUI_LIBS)		\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
-
+libtinymailui_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO)
 libtinymailuiincludedir = $(includedir)/libtinymailui-$(API_VERSION)
 libtinymailuiinclude_HEADERS = $(libtinymailui_1_0_headers)
 

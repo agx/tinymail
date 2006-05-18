@@ -26,6 +26,8 @@ libtinymailui_mozembed_1_0_la_LIBADD = 	\
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
 
+libtinymailui_mozembed_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO)
+
 if BUILD_GNOME
 libtinymailui_mozembed_1_0_la_LIBADD +=  $(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la
 endif
