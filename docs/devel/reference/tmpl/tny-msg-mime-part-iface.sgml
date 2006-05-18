@@ -155,3 +155,12 @@ An interfaces that defines a mime part type
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_msg_mime_part_iface_decode_to_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@stream: 
+
+
