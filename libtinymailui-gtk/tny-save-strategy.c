@@ -109,7 +109,11 @@ tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 	gtk_file_chooser_set_current_folder 
 		(GTK_FILE_CHOOSER (dialog), g_get_home_dir ());
 
-	gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (dialog), 
+#ifndef GNOME
+	gtk_file_chooser_set_local_only (GTK_FILE_CHOOSER (dialog), TRUE);
+#endif
+
+	gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), 
 		tny_msg_mime_part_iface_get_filename (part));
 
 	if (G_LIKELY (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT))
