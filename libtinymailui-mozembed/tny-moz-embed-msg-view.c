@@ -17,6 +17,13 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <string.h>
 #include <gtk/gtk.h>
 #include <tny-moz-embed-msg-view.h>
@@ -27,6 +34,8 @@
 #include <tny-vfs-stream.h>
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
+#else
+#include <tny-fs-stream.h>
 #endif
 
 #include "tny-attach-list-model-priv.h"
@@ -227,7 +236,23 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 static void
 save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 {
-	g_print ("UNIMPLEMENTED: save_to_file for non-gnome-vfs platforms\n");
+	/* "file:///filename" */
+	/*  1234567^          */
+
+	const gchar *local_filename = uri+7;
+	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+
+printf ("%s\n", local_filename);
+	if (fd)
+	{
+		TnyFsStream *stream = NULL;
+		stream = tny_fs_stream_new (fd);
+		tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
+
+		/* This also closes the file descriptor (maybe it shouldn't?) */
+		g_object_unref (G_OBJECT (stream));
+	}
+
 	return;
 }
 #endif
