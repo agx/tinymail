@@ -242,7 +242,6 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 	const gchar *local_filename = uri+7;
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
-printf ("%s\n", local_filename);
 	if (fd)
 	{
 		TnyFsStream *stream = NULL;
