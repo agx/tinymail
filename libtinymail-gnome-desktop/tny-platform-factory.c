@@ -60,8 +60,8 @@ tny_platform_factory_new_device (TnyPlatformFactoryIface *self)
 static TnyMsgViewIface*
 tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
 {
-	TnySaveStrategyIface *save_strategy = TNY_SAVE_STRATEGY_IFACE (
-		tny_save_strategy_new ());
+	TnySaveStrategyIface *save_strategy = 
+		TNY_SAVE_STRATEGY_IFACE (tny_save_strategy_new ());
 
 #ifdef MOZEMBED
 	return TNY_MSG_VIEW_IFACE (tny_moz_embed_msg_view_new (save_strategy));
