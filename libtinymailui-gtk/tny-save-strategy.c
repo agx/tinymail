@@ -70,13 +70,8 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 }
 #else
 static gboolean
-save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
+save_to_file (const gchar *local_filename, TnyMsgMimePartIface *part)
 {
-	/* "file:///filename" */
-	/*  1234567^          */
-
-	/* TODO: make this platform independent */
-	const gchar *local_filename = uri+7;
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 	if (fd != -1)
@@ -122,9 +117,11 @@ tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 	if (G_LIKELY (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT))
 	{
 		gchar *uri;
-
+#ifdef GNOME
 		uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (dialog));
-
+#else
+		uri = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+#endif
 		if (uri)
 		{
 			if (!save_to_file (uri, part))
