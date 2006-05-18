@@ -62,14 +62,16 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 		tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
 		tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
 #else
-	icon = g_strdup (GTK_STOCK_FILE);
+	icon = GTK_STOCK_FILE;
 #endif
 
 	if (G_LIKELY (icon))
 	{
 		pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
 			GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
+#ifdef GNOME
 		g_free (icon);
+#endif
 	} else {
 		if (G_UNLIKELY (!stock_file_pixbuf))
 			stock_file_pixbuf = gtk_icon_theme_load_icon (priv->theme, 
