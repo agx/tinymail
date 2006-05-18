@@ -58,8 +58,6 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 		priv->theme = gtk_icon_theme_get_default ();
 
 #ifdef GNOME
-	/* THE gnomeui-2 dependency */
-
 	icon = gnome_icon_lookup (priv->theme, NULL, 
 		tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
 		tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
