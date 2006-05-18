@@ -109,6 +109,7 @@ make
 %{_includedir}/libtinymail-gnomevfs-1.0
 %{_includedir}/libtinymailui-1.0
 %{_includedir}/libtinymailui-gtk-1.0
+%{_includedir}/libtinymailui-mozembed-1.0
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
