@@ -67,8 +67,30 @@ expand_content_files=
 # signals and properties.
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
-INCLUDES=
-GTKDOC_LIBS=
+#
+INCLUDES= $(LIBTINYMAIL_CFLAGS) $(LIBTINYMAILUI_CFLAGS) 		\
+	$(LIBTINYMAIL_CAMEL_CFLAGS) $(LIBTINYMAIL_GNOMEVFS_CFLAGS) 	\
+	$(LIBTINYMAILUI_GTK_CFLAGS) $(LIBTINYMAILUI_MOZEMBED_CFLAGS) 	\
+	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS) $(LIBTINYMAIL_TEST_CFLAGS)  \
+	$(TINYMAIL_CFLAGS) -I$(top_srcdir)/libtinymail 			\
+	-I$(top_srcdir)/libtinymailui -I$(top_srcdir)/libtinymailui-gtk	\
+	-I$(top_srcdir)/libtinymailui-mozembed				\
+	-I$(top_srcdir)/libtinymail-camel				\
+	-I$(top_srcdir)/libtinymail-gnome-desktop			\
+	-I$(top_srcdir)/libtinymail-gnomevfs
+
+GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS) 						\
+	$(LIBTINYMAIL_CAMEL_LIBS) $(LIBTINYMAIL_GNOMEVFS_LIBS)      				\
+	$(LIBTINYMAILUI_GTK_LIBS) $(LIBTINYMAILUI_MOZEMBED_LIBS)    				\
+	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS) $(LIBTINYMAIL_TEST_LIBS)  				\
+	$(TINYMAIL_LIBS)									\
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 				\
+	 $(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la			\
+	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la				\
+	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la			\
+	$(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la		\
+	$(top_builddir)/libtinymail-gnome-desktop/libtinymail-gnome-desktop-$(API_VERSION).la	\
+	$(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.
 include $(top_srcdir)/gtk-doc.make

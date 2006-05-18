@@ -32,3 +32,12 @@ An interfaces that defines a message view type
 @msg: 
 
 
+<!-- ##### FUNCTION tny_msg_view_iface_set_save_strategy ##### -->
+<para>
+
+</para>
+
+@self: 
+@strategy: 
+
+
