@@ -1,4 +1,4 @@
-AC_INIT(TinyMail, 1.0.0, http://www.pvanhoof.be)
+AC_INIT(libtinymail, 1.0.0, http://www.pvanhoof.be)
 AC_CONFIG_SRCDIR(tinymail/tny-main.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AC_CONFIG_MACRO_DIR([m4])
