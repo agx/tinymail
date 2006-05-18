@@ -53,3 +53,5 @@ tny-msg-folder-iface.xml
 tny-device-iface.xml
 tny-test-suite.xml
 tny-summary-window-iface.xml
+tny-save-strategy.xml
+tny-save-strategy-iface.xml

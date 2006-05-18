@@ -1,0 +1,34 @@
+<!-- ##### SECTION Title ##### -->
+TnySaveStrategyIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnySaveStrategyIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_save_strategy_iface_save ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+
+
