@@ -23,7 +23,7 @@ libtinymail_test_suite_la_SOURCES = 						\
 	tny-msg-mime-part-iface-test.h						\
 	tny-test-suite.h
 
-libtinymail_test_suite_la_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS) -export-dynamic -version-info $(LT_VERSION_INFO)
+libtinymail_test_suite_la_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS) -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 
 tny_simple_test_runner_SOURCES = tny-simple-test-runner.c
 tny_test_anything_SOURCES = tny-test-anything.c

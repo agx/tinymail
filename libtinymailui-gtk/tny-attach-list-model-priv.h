@@ -24,10 +24,7 @@ typedef struct _TnyAttachListModelPriv TnyAttachListModelPriv;
 
 struct _TnyAttachListModelPriv
 {
-	GdkScreen *screen;
 	GtkIconTheme *theme;
 };
-
-void  _tny_attach_list_model_set_screen (TnyAttachListModel *self, GdkScreen *screen);
 
 #endif

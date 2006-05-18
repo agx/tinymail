@@ -35,18 +35,6 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModelPriv))
 
 
-void /* Protected function */
-_tny_attach_list_model_set_screen (TnyAttachListModel *self, GdkScreen *screen)
-{
-	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (self);
-
-	priv->screen = screen;
-	priv->theme = gtk_icon_theme_get_for_screen (priv->screen);
-
-	return;
-}
-
-
 /**
  * tny_attach_list_model_add:
  * @self: A #TnyAttachListModel instace
@@ -66,6 +54,8 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part)
 	GdkPixbuf *pixbuf;
         gchar *icon;
 
+	if (!priv->theme)
+		priv->theme = gtk_icon_theme_get_default ();
 
 #ifdef GNOME
 	/* THE gnomeui-2 dependency */
@@ -123,6 +113,11 @@ tny_attach_list_model_new (void)
 static void
 tny_attach_list_model_finalize (GObject *object)
 {
+	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (object);
+
+	if (priv->theme)
+		g_object_unref (G_OBJECT (priv->theme));
+
 	(*parent_class->finalize) (object);
 }
 
@@ -145,8 +140,10 @@ static void
 tny_attach_list_model_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	GtkListStore *store = (GtkListStore*) instance;
+	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (instance);
 	static GType types[] = { G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_POINTER };
 
+	priv->theme = NULL;
 	types[0] = GDK_TYPE_PIXBUF;
 
 	gtk_list_store_set_column_types (store, 

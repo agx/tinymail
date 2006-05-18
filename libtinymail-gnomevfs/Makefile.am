@@ -13,7 +13,9 @@ libtinymail_gnomevfs_1_0_la_SOURCES = 		\
 libtinymail_gnomevfs_1_0_la_LIBADD =		\
 	$(LIBTINYMAIL_GNOMEVFS_LIBS)		\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
-libtinymail_gnomevfs_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO)
+
+libtinymail_gnomevfs_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
+
 libtinymail_gnomevfs_1_0includedir = $(includedir)/libtinymail-gnomevfs-$(API_VERSION)
 libtinymail_gnomevfs_1_0include_HEADERS = $(libtinymail_gnomevfs_1_0_headers)
 

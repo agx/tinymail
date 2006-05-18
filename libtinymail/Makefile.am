@@ -29,7 +29,7 @@ libtinymail_1_0_la_SOURCES = 		\
 	tny-stream-iface.c
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)
-libtinymail_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO)
+libtinymail_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 libtinymail_1_0_includedir = $(includedir)/libtinymail-$(API_VERSION)
 libtinymail_1_0_include_HEADERS = $(libtinymail_1_0_headers)
 
