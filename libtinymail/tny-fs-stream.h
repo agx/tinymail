@@ -32,11 +32,11 @@
 G_BEGIN_DECLS
 
 #define TNY_TYPE_FS_STREAM             (tny_fs_stream_get_type ())
-#define TNY_FS_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_FS_STREAM, TnyfsStream))
-#define TNY_FS_STREAM_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_FS_STREAM, TnyfsStreamClass))
+#define TNY_FS_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_FS_STREAM, TnyFsStream))
+#define TNY_FS_STREAM_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_FS_STREAM, TnyFsStreamClass))
 #define TNY_IS_FS_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_FS_STREAM))
 #define TNY_IS_FS_STREAM_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_FS_STREAM))
-#define TNY_FS_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_FS_STREAM, TnyfsStreamClass))
+#define TNY_FS_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_FS_STREAM, TnyFsStreamClass))
 
 typedef struct _TnyFsStream TnyFsStream;
 typedef struct _TnyFsStreamClass TnyFsStreamClass;
