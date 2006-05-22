@@ -152,7 +152,8 @@ AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
 dnl ### libtinymailui-mozembed, a library that wraps the gtkmozembed widget ##
 if test x$build_mozembed = xtrue; then
-  extraplatpkgs="firefox-nss firefox-xpcom firefox-gtkmozembed"
+  extraplatpkgs="firefox-nspr firefox-nss firefox-xpcom firefox-gtkmozembed"
+  extratnypkgs="$extratnypkgs $extraplatpkgs"
   PKG_CHECK_MODULES(LIBTINYMAILUI_MOZEMBED, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
 else
   LIBTINYMAILUI_MOZEMBED_CFLAGS=

@@ -11,6 +11,10 @@ if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
 
+if BUILD_MOZEMBED
+INCLUDES += -DMOZEMBED
+endif
+
 bin_PROGRAMS = tinymail
 
 tinymail_SOURCES = 							\

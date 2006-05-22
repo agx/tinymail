@@ -375,7 +375,7 @@ static void
 tny_session_camel_ms_thread_msg_free (CamelSession *session, CamelSessionThreadMsg *m)
 {
 	ms_parent_class->thread_msg_free(session, m);
-
+	
 	return;
 }
 

@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 #include <gtk/gtk.h>
 
 #include <tny-summary-window.h>
@@ -29,6 +28,22 @@
 #include <libgnomevfs/gnome-vfs-utils.h>
 #endif
 
+#ifdef MOZEMBED
+#include <nspr.h>
+#include <prthread.h>
+
+static void
+tny_main_shutdown (gpointer data)
+{
+
+	/* This solves a firefox vs. Camel bug. */
+
+	PR_ProcessExit ((int)data);
+	gtk_exit ((gint)data);
+
+	return;
+}
+#endif
 
 /**
  * main:
@@ -65,7 +80,11 @@ main (int argc, char **argv)
 		tny_platform_factory_iface_new_account_store (platfact));
 	
 	g_signal_connect (window, "destroy",
+#ifdef MOZEMBED
+		G_CALLBACK (tny_main_shutdown), 0);
+#else
 		G_CALLBACK (gtk_exit), 0);
+#endif
 
 	gtk_main();
 
