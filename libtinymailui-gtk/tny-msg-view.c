@@ -29,6 +29,8 @@
 #include <tny-msg-view.h>
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
+#include <tny-msg-header-view-iface.h>
+#include <tny-msg-header-view.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -47,7 +49,8 @@ typedef struct _TnyMsgViewPriv TnyMsgViewPriv;
 struct _TnyMsgViewPriv
 {
 	TnyMsgIface *msg;
-	GtkTextView *headerview, *textview;
+	GtkTextView *textview;
+	TnyMsgHeaderViewIface *headerview;
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
 	TnySaveStrategyIface *save_strategy;
@@ -56,29 +59,12 @@ struct _TnyMsgViewPriv
 #define TNY_MSG_VIEW_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_VIEW, TnyMsgViewPriv))
 
-
-/* TODO: refactor */
-static gchar *
-_get_readable_date (const time_t file_time_raw)
-{
-	struct tm *file_time;
-	gchar readable_date[64];
-	gsize readable_date_size;
-
-	file_time = localtime (&file_time_raw);
-
-	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
-	
-	return g_strdup (readable_date);
-}
-
 static void
 reload_msg (TnyMsgViewIface *self)
 {
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
 
 	GtkTextIter hiter;
-	GtkTextBuffer *headerbuffer = gtk_text_view_get_buffer (priv->headerview);
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 	TnyStreamIface *dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
@@ -89,38 +75,8 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_widget_hide (priv->attachview_sw);
 
-	gtk_text_buffer_set_text (headerbuffer, "", 0);
-	gtk_text_buffer_set_text (buffer, "", 0);
-
-	gtk_text_buffer_get_start_iter (headerbuffer, &hiter);
-	
-	str = "From: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = tny_msg_header_iface_get_from (header);
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = "\n";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-
-	str = "To: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = tny_msg_header_iface_get_to (header);
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = "\n";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-
-	str = "Subject: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = tny_msg_header_iface_get_subject (header);
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = "\n";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-
-	str = "Date: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = (gchar*)_get_readable_date (tny_msg_header_iface_get_date_sent (header));
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	g_free ((gchar*)str);
-
+	tny_msg_header_view_iface_set_header (priv->headerview, header);
+	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
 	while (G_LIKELY (parts))
 	{
@@ -323,16 +279,11 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_item_width (priv->attachview, 100);
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
-	priv->headerview = GTK_TEXT_VIEW (gtk_text_view_new ());
-
-	headerbuffer = gtk_text_view_get_buffer (priv->headerview);
-
-	gtk_text_buffer_create_tag (headerbuffer, "bold", 
-			"weight", PANGO_WEIGHT_BOLD, NULL);
+	priv->headerview = 
+		TNY_MSG_HEADER_VIEW_IFACE (tny_msg_header_view_new ());
 
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 
-	gtk_text_view_set_editable (priv->headerview, FALSE);
 	gtk_text_view_set_editable (priv->textview, FALSE);
 
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
@@ -346,7 +297,7 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_widget_show (GTK_WIDGET (vbox));
 
-	gtk_widget_show (GTK_WIDGET (priv->headerview));
+	gtk_widget_hide (GTK_WIDGET (priv->headerview));
 	gtk_widget_show (GTK_WIDGET (priv->textview));
 	gtk_widget_show (GTK_WIDGET (priv->attachview));
 
@@ -364,6 +315,9 @@ tny_msg_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->save_strategy))
 		g_object_unref (G_OBJECT (priv->save_strategy));
+
+	if (G_LIKELY (priv->headerview))
+		g_object_unref (G_OBJECT (priv->headerview));
 
 	(*parent_class->finalize) (object);
 

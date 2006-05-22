@@ -29,6 +29,8 @@
 #include <tny-moz-embed-msg-view.h>
 #include <tny-moz-embed-stream.h>
 #include <tny-attach-list-model.h>
+#include <tny-msg-header-view-iface.h>
+#include <tny-msg-header-view.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -47,7 +49,8 @@ typedef struct _TnyMozEmbedMsgViewPriv TnyMozEmbedMsgViewPriv;
 struct _TnyMozEmbedMsgViewPriv
 {
 	TnyMsgIface *msg;
-	GtkTextView *headerview, *textview;
+	GtkTextView *textview;
+	TnyMsgHeaderViewIface *headerview;
 	GtkMozEmbed *htmlview;
 	
 	GtkIconView *attachview;
@@ -58,21 +61,6 @@ struct _TnyMozEmbedMsgViewPriv
 #define TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MOZ_EMBED_MSG_VIEW, TnyMozEmbedMsgViewPriv))
 
-
-/* TODO: refactor */
-static gchar *
-_get_readable_date (const time_t file_time_raw)
-{
-	struct tm *file_time;
-	gchar readable_date[64];
-	gsize readable_date_size;
-
-	file_time = localtime (&file_time_raw);
-
-	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
-	
-	return g_strdup (readable_date);
-}
 
 static gpointer 
 remove_html_stread_hack (gpointer data)
@@ -94,7 +82,6 @@ reload_msg (TnyMsgViewIface *self)
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
 	GtkTextIter hiter;
-	GtkTextBuffer *headerbuffer = gtk_text_view_get_buffer (priv->headerview);
 	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
 	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
 	const gchar *str = NULL;
@@ -104,36 +91,8 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_widget_hide (priv->attachview_sw);
 
-	gtk_text_buffer_set_text (headerbuffer, "", 0);
-
-	gtk_text_buffer_get_start_iter (headerbuffer, &hiter);
-	
-	str = "From: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = tny_msg_header_iface_get_from (header);
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = "\n";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-
-	str = "To: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = tny_msg_header_iface_get_to (header);
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = "\n";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-
-	str = "Subject: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = tny_msg_header_iface_get_subject (header);
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = "\n";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-
-	str = "Date: ";
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	str = (gchar*)_get_readable_date (tny_msg_header_iface_get_date_sent (header));
-	gtk_text_buffer_insert (headerbuffer, &hiter, str, strlen (str));
-	g_free ((gchar*)str);
+	tny_msg_header_view_iface_set_header (priv->headerview, header);
+	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
 	while (G_LIKELY (parts))
 	{
@@ -151,8 +110,6 @@ reload_msg (TnyMsgViewIface *self)
 		{
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 			TnyStreamIface *dest = NULL;
-
-			/*TODO: Add a filter (decoder) here (like em_format_format_text) */
 
 			gtk_text_buffer_set_text (buffer, "", 0);
 
@@ -379,17 +336,11 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_item_width (priv->attachview, 100);
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
-	priv->headerview = GTK_TEXT_VIEW (gtk_text_view_new ());
-
-	headerbuffer = gtk_text_view_get_buffer (priv->headerview);
-
-	gtk_text_buffer_create_tag (headerbuffer, "bold", 
-			"weight", PANGO_WEIGHT_BOLD, NULL);
+	priv->headerview = 
+		TNY_MSG_HEADER_VIEW_IFACE (tny_msg_header_view_new ());
 
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 	priv->htmlview = GTK_MOZ_EMBED (gtk_moz_embed_new ());
-
-	gtk_text_view_set_editable (priv->headerview, FALSE);
 
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
 
@@ -408,7 +359,7 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_widget_hide (GTK_WIDGET (priv->htmlview));
 	gtk_widget_show (GTK_WIDGET (priv->textview));
 
-	gtk_widget_show (GTK_WIDGET (priv->headerview));
+	gtk_widget_hide (GTK_WIDGET (priv->headerview));
 	gtk_widget_show (GTK_WIDGET (priv->attachview));
 
 
@@ -426,6 +377,9 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->save_strategy))
 		g_object_unref (G_OBJECT (priv->save_strategy));
+
+	if (G_LIKELY (priv->headerview))
+		g_object_unref (G_OBJECT (priv->headerview));
 
 	(*parent_class->finalize) (object);
 
