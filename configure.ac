@@ -1,4 +1,3 @@
-
 m4_define([tny_major_version], [1])
 m4_define([tny_minor_version], [0])
 m4_define([tny_micro_version], [0])
@@ -8,6 +7,9 @@ m4_define([tny_interface_age], [0])
 m4_define([tny_binary_age],
           [m4_eval(100 * tny_minor_version + tny_micro_version)])
 m4_define([tny_api_version], [1.0])
+m4_define([lt_current], [m4_eval(100 * tny_minor_version + tny_micro_version - tny_interface_age)])
+m4_define([lt_revision], [tny_interface_age])
+m4_define([lt_age], [m4_eval(tny_binary_age - tny_interface_age)])
 
 AC_INIT([libtinymail], [tny_version], [http://www.pvanhoof.be])
 
@@ -16,9 +18,6 @@ AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AC_CONFIG_MACRO_DIR([m4])
 AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS -I m4")
 
-m4_define([lt_current], [m4_eval(100 * tny_minor_version + tny_micro_version - tny_interface_age)])
-m4_define([lt_revision], [tny_interface_age])
-m4_define([lt_age], [m4_eval(tny_binary_age - tny_interface_age)])
 LT_VERSION_INFO="lt_current:lt_revision:lt_age"
 LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
 AC_SUBST(LT_VERSION_INFO)
@@ -52,7 +51,7 @@ AC_PROG_LIBTOOL
 
 dnl ### Enable gnome features ##
 AC_ARG_ENABLE(gnome,
-[  --enable-gnome    build using gnome features [default=yes]],
+[  --enable-gnome		build using gnome features [default=yes]],
 [case "${enableval}" in
   yes) build_gnome=true ;;
   no)  build_gnome=false ;;
@@ -60,19 +59,33 @@ AC_ARG_ENABLE(gnome,
 esac],[build_gnome=true])
 AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
 
-dnl ### Enable the gtkmozembed widget ##
-AC_ARG_ENABLE(mozembed,
-[  --enable-mozembed    build using the gtkmozembed widget [default=yes]],
-[case "${enableval}" in
-  yes) build_mozembed=true ;;
-  no)  build_mozembed=false ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-mozembed) ;;
-esac],[build_mozembed=true])
+dnl ### Select the html component ##
+AC_ARG_WITH(html-component,
+[  --with-html-component		set which html component to use [default=mozembed]],
+[case "$with_html_component" in
+  mozembed) 
+	build_mozembed=true
+	build_gtkhtml=false
+  ;;
+  gtkhtml)
+	build_mozembed=false
+	build_gtkhtml=false
+  ;;
+  none)
+	build_mozembed=false 
+	build_gtkhtml=false
+  ;;
+  *) AC_MSG_ERROR(bad value ${with_html_component} for --with-html-component) ;;
+esac], [build_mozembed=true 
+	build_gtkhtml=false
+	with_html_component=mozembed])
+
 AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
+AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
 
 dnl ### Enable the python language bindings ##
 AC_ARG_ENABLE(py-tinymail,
-[  --enable-py-tinymail    build python bindings [default=no]],
+[  --enable-py-tinymail		build python bindings [default=no]],
 [case "${enableval}" in
   yes) build_pytinymail=true ;;
   no)  build_pytinymail=false ;;
@@ -82,7 +95,7 @@ AM_CONDITIONAL(BUILD_PYTINYMAIL, test x$build_pytinymail = xtrue)
 
 dnl ### Enable building the unit tests ##
 AC_ARG_ENABLE(unit-tests,
-[  --enable-unit-tests    build unit tests [default=no]],
+[  --enable-unit-tests		build unit tests [default=no]],
 [case "${enableval}" in
   yes) build_unittests=true ;;
   no)  build_unittests=false ;;
@@ -92,11 +105,12 @@ AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
 
 dnl ### Set the platform library ##
 AC_ARG_WITH(platform,
-[  --with-platform=gnome-desktop       platform to compile [gnome-desktop]],
+[  --with-platform=gnome-desktop		platform to compile [gnome-desktop]],
 [case "${with_platform}" in
   gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
-  *) AC_MSG_ERROR(bad value ${with_platform} for --with-platform) ;;
-esac],[PLATFORMDIR=libtinymail-gnome-desktop])
+  *) PLATFORMDIR=${with_platform}
+esac], [PLATFORMDIR=libtinymail-gnome-desktop
+	with_platform=gnome-desktop])
 AC_SUBST(PLATFORMDIR)
 
 dnl ### gtk-doc
@@ -222,4 +236,22 @@ tinymail/Makefile
 tinymail-python/Makefile
 m4/Makefile
 ])
+
+echo ""
+echo "The following options are selected:"
+echo ""
+echo "  Enable GNOME features:       $build_gnome"
+echo "  HTML component:              ${with_html_component}"
+echo "  Python language bindings:    $build_pytinymail"
+echo "  Unit tests:                  $build_unittests"
+echo "  Target platform:             ${with_platform}"
+echo "  Prefix:                      ${prefix}"
+echo ""
+echo "Version info:"
+echo ""
+echo "  Version:                     $VERSION"
+echo "  API version:                 $API_VERSION"
+echo "  ABI version:                 $LT_VERSION_INFO"
+echo ""
+
 

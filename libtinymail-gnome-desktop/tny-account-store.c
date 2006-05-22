@@ -394,6 +394,24 @@ tny_account_store_get_transport_accounts (TnyAccountStoreIface *self)
 	return retval;
 }
 
+static void
+tny_account_store_notify_add (TnyAccountStoreIface *self)
+{
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	priv->notify = gconf_client_notify_add (priv->client, 
+		"/apps/tinymail/accounts", gconf_listener_account_changed,
+		self, NULL, NULL);
+	return;
+}
+
+static void
+tny_account_store_notify_remove (TnyAccountStoreIface *self)
+{
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	gconf_client_notify_remove (priv->client, priv->notify);
+	return;
+}
+
 /*
 	gconftool-2 -s /apps/tinymail/cache_dir -t string .tinymail
 
@@ -443,7 +461,10 @@ tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccount
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
+	tny_account_store_notify_remove (self);
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
+	tny_account_store_notify_add (self);
+
 	g_object_ref (G_OBJECT (account));
 
 	g_mutex_lock (priv->store_accounts_lock);
@@ -461,7 +482,10 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	g_object_ref (G_OBJECT (account));
+
+	tny_account_store_notify_remove (self);
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
+	tny_account_store_notify_add (self);
 
 	g_mutex_lock (priv->transport_accounts_lock);
 	priv->transport_accounts = g_list_append (priv->transport_accounts, account);
@@ -500,6 +524,7 @@ tny_account_store_new (void)
 	return self;
 }
 
+
 static void
 tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -514,9 +539,7 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	gconf_client_add_dir (priv->client, "/apps/tinymail", 
 		GCONF_CLIENT_PRELOAD_RECURSIVE, NULL);
 
-	priv->notify = gconf_client_notify_add (priv->client, 
-		"/apps/tinymail/accounts", gconf_listener_account_changed,
-		self, NULL, NULL);
+	tny_account_store_notify_add (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return;
 }
@@ -528,7 +551,7 @@ tny_account_store_finalize (GObject *object)
 	TnyAccountStore *self = (TnyAccountStore *)object;	
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	gconf_client_notify_remove (priv->client, priv->notify);
+	tny_account_store_notify_remove (TNY_ACCOUNT_STORE_IFACE (self));
 	g_object_unref (G_OBJECT (priv->client));
 
 	destroy_current_accounts (priv);
