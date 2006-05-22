@@ -93,10 +93,6 @@ tny_store_account_reconnect (TnyAccount *self)
 		&& G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->user) 
 		&& G_UNLIKELY (priv->host))
 	{
-		
-		/* TODO: Look at tny-session-camel.c set_account_store method 
-		   for improving the connecting and offline-mode */
-
 		priv->connected = FALSE;
 		camel_service_connect (priv->service, priv->ex);
 
