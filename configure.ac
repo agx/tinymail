@@ -103,7 +103,7 @@ AC_ARG_ENABLE(unit-tests,
 esac],[build_unittests=false])
 AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
 
-dnl ### Set the platform library ##
+dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
 [  --with-platform=gnome-desktop		platform to compile [gnome-desktop]],
 [case "${with_platform}" in
