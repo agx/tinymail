@@ -50,7 +50,8 @@ enum
 	/* TODO: 
 	- Removing messages
 	- Purging this folder
-	- Removing folders */
+	- Removing folders
+	- Folder type */
 
 struct _TnyMsgFolderIfaceClass
 {
