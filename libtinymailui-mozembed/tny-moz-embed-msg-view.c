@@ -362,7 +362,6 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_widget_hide (GTK_WIDGET (priv->headerview));
 	gtk_widget_show (GTK_WIDGET (priv->attachview));
 
-
 	return;
 }
 
