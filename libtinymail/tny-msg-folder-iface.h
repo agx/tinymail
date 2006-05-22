@@ -47,6 +47,11 @@ enum
 	TNY_MSG_FOLDER_IFACE_LAST_SIGNAL
 };
 
+	/* TODO: 
+	- Removing messages
+	- Purging this folder
+	- Removing folders */
+
 struct _TnyMsgFolderIfaceClass
 {
 	GTypeInterface parent;
