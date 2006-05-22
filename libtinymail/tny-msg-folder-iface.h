@@ -51,7 +51,8 @@ enum
 	- Removing messages
 	- Purging this folder
 	- Removing folders
-	- Folder type */
+	- Folder type 
+	- Moving messages */
 
 struct _TnyMsgFolderIfaceClass
 {
