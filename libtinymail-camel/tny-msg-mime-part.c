@@ -74,8 +74,6 @@ tny_msg_mime_part_is_attachment (TnyMsgMimePartIface *self)
 static void
 tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
-	/* TODO: Add a filter (decoder) here */
-
 	TnyMsgMimePartPriv *priv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
@@ -275,7 +273,6 @@ tny_msg_mime_part_get_stream (TnyMsgMimePartIface *self)
 	return retval;
 }
 
-/* TODO: static */
 const gchar* 
 tny_msg_mime_part_get_content_type (TnyMsgMimePartIface *self)
 {
@@ -288,7 +285,7 @@ tny_msg_mime_part_get_content_type (TnyMsgMimePartIface *self)
 		g_mutex_lock (priv->part_lock);
 		type = camel_mime_part_get_content_type (priv->part);
 		priv->cached_content_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
-		/* TODO: Q: camel_content_type_unref (type); */
+		/* Q: camel_content_type_unref (type); */
 		g_mutex_unlock (priv->part_lock);
 	}
 
