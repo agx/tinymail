@@ -251,7 +251,7 @@ echo "Version info:"
 echo ""
 echo "  Version:                     $VERSION"
 echo "  API version:                 $API_VERSION"
-echo "  ABI version:                 $LT_VERSION_INFO"
+echo "  ABI version:                 $LT_VERSION_INFO - $LT_CURRENT_MINUS_AGE"
 echo ""
 
 
