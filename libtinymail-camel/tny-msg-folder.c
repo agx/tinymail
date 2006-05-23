@@ -155,14 +155,21 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 } 
 
 static void 
-unload_folder (TnyMsgFolderPriv *priv)
+unload_folder (TnyMsgFolderPriv *priv, gboolean destroy)
 {
 
-#ifdef PERFORMANCE_MODE
-	tny_msg_folder_hdr_cache_uncacher (priv);
-#else
-	tny_msg_folder_hdr_cache_remover (priv);
-#endif
+	/* We can't always just destroy the header proxies (regretfully): 
+
+	The unref method of the tree model wouldn't know when we destroyed 
+	the instances, yet would still have (invalid) pointers to this
+	memory (it uses a GList). 
+
+	But then again, it would have been a dirty hack anyway. */
+
+	if (!destroy)
+		tny_msg_folder_hdr_cache_uncacher (priv);
+	else	
+		tny_msg_folder_hdr_cache_remover (priv);
 
 	g_mutex_lock (priv->folder_lock);
 
@@ -918,7 +925,7 @@ tny_msg_folder_uncache (TnyMsgFolderIface *self)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->folder != NULL))
-		unload_folder (priv);
+		unload_folder (priv, FALSE);
 
 	return;
 }

@@ -21,6 +21,7 @@
 
 #include <tny-msg-header-list-model.h>
 #include <tny-msg-header-iface.h>
+#include <tny-msg-folder-iface.h>
 
 #define G_LIST(o) ((GList *) o)
 
@@ -32,7 +33,6 @@ struct _TnyMsgHeaderListModel
 
 	GMutex *folder_lock;
 	TnyMsgFolderIface *folder;
-	const GList *headers;
 	gint length;
 
 	gint stamp;
@@ -91,15 +91,17 @@ static gboolean
 tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePath *path)
 {
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
-	GList *list ;
+	GList *list, *headers;
 	gint i;
 
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
 	g_mutex_lock (list_model->folder_lock);
 
+	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+
 	i = gtk_tree_path_get_indices (path)[0];
-	list = g_list_nth (G_LIST (list_model->headers), i);
+	list = g_list_nth (G_LIST (headers), i);
 
 	if (G_UNLIKELY (i >= list_model->length))
 	{
@@ -118,7 +120,7 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 static GtkTreePath *
 tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 {
-	GList *list;
+	GList *list, *headers;
 	GtkTreePath *tree_path;
 	gint i = 0;
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
@@ -128,8 +130,9 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 
 	g_mutex_lock (list_model->folder_lock);
 
-	for (list = G_LIST (TNY_MSG_HEADER_LIST_MODEL (self)->headers); 
-		list; list = list->next) 
+	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+
+	for (list = G_LIST (headers); list; list = list->next) 
 	{
 		if (G_UNLIKELY (list == G_LIST (iter->user_data)))
 			break;
@@ -225,12 +228,14 @@ tny_msg_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 {
 	gboolean retval;
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
-
+	
 	g_return_val_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL 
 		(self)->stamp, FALSE);
 
-
 	g_mutex_lock (list_model->folder_lock);
+
+	tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+
 	iter->user_data = G_LIST (iter->user_data)->next;
 	retval = (iter->user_data != NULL);
 	g_mutex_unlock (list_model->folder_lock);
@@ -263,7 +268,7 @@ tny_msg_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter
 static gboolean
 tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter, GtkTreeIter *parent, gint n)
 {
-	GList *child;
+	GList *child, *headers;
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
 
 	if (G_UNLIKELY (parent))
@@ -271,7 +276,9 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 
 	g_mutex_lock (list_model->folder_lock);
 
-	child = g_list_nth (G_LIST (TNY_MSG_HEADER_LIST_MODEL (self)->headers), n);
+	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+
+	child = g_list_nth (G_LIST (headers), n);
 
 	if (G_LIKELY (child))
 	{
@@ -299,6 +306,7 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	g_mutex_lock (list_model->folder_lock);
 
+	tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
 	header = G_LIST (iter->user_data)->data;
 	
 	if (G_LIKELY (header))
@@ -337,7 +345,6 @@ tny_msg_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 static void
 destroy_internal_list (TnyMsgHeaderListModel *self)
 {
-	self->headers = NULL;
 	self->length = 0;
 
 	return;
@@ -378,7 +385,6 @@ static void
 tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 {
 	self->folder = NULL;
-	self->headers = NULL;
 	self->folder_lock = g_mutex_new ();
 
 	return;
@@ -400,7 +406,6 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 
 	g_mutex_lock (self->folder_lock);
 
-	self->headers = NULL;
 	self->length = 0;
 
 	if (G_LIKELY (self->folder))
@@ -409,7 +414,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	self->folder = folder;
 	g_object_ref (G_OBJECT (folder));
 
-	self->headers = headers;
+	//self->headers = headers;
 
 	/* To avoid a g_list_length (note that the implementation must
 	 * absolutely be correct!) */
