@@ -54,6 +54,7 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 			tny_msg_folder_iface_get_name (folder),
 			TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 
 			tny_msg_folder_iface_get_unread_count (folder),
+			TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN, 0, /* TODO */
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
 
@@ -92,7 +93,19 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *acc
 	const GList *folders = tny_store_account_iface_get_folders (account, 
 			TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
-	fill_treemodel_recursive (self, folders, NULL, account);
+	GtkTreeIter name_iter;
+
+	gtk_tree_store_append (model, &name_iter, NULL);
+
+	gtk_tree_store_set (model, &name_iter,
+		TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
+		tny_account_iface_get_name (TNY_ACCOUNT_IFACE (account)),
+		TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 0,
+		TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN, -1, /* TODO */
+		TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
+		NULL, -1);
+
+	fill_treemodel_recursive (self, folders, &name_iter, account);
 
 	return;
 }
@@ -135,7 +148,7 @@ static void
 tny_account_tree_model_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	GtkTreeStore *store = (GtkTreeStore*) instance;
-	static GType types[] = { G_TYPE_STRING, G_TYPE_INT, G_TYPE_POINTER };
+	static GType types[] = { G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER };
 
 	gtk_tree_store_set_column_types (store, 
 		TNY_ACCOUNT_TREE_MODEL_N_COLUMNS, types);

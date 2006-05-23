@@ -312,18 +312,6 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 static void
 tny_msg_header_list_model_ref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 {
-	TnyMsgHeaderIface *header = NULL;
-	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
-
-	g_return_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL (self)->stamp);
-	g_return_if_fail (iter->user_data != NULL);
-
-	g_mutex_lock (list_model->folder_lock);
-
-	header = G_LIST (iter->user_data)->data;
-
-	g_mutex_unlock (list_model->folder_lock);
-
 	return;
 }
 

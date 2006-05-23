@@ -43,6 +43,51 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-shared.h>
 
 
+static void
+tny_account_set_url_string (TnyAccountIface *self, const gchar *url_string)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	if (priv->url_string)
+		g_free (priv->url_string);
+
+	priv->url_string = g_strdup (url_string);
+
+	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
+
+	return;
+}
+
+static const gchar*
+tny_account_get_url_string (TnyAccountIface *self)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	return (const gchar*)priv->url_string;
+}
+
+
+static void
+tny_account_set_name (TnyAccountIface *self, const gchar *name)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	if (priv->name)
+		g_free (priv->name);
+
+	priv->name = g_strdup (name);
+
+	return;
+}
+
+static const gchar*
+tny_account_get_name (TnyAccountIface *self)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	return (const gchar*)priv->name;
+}
+
 static void 
 tny_account_stop_camel_operation_priv (TnyAccountPriv *priv)
 {
@@ -429,6 +474,9 @@ tny_account_finalize (GObject *object)
 	if (G_LIKELY (priv->id))
 		g_free (priv->id);
 
+	if (G_LIKELY (priv->name))
+		g_free (priv->name);
+
 	if (G_LIKELY (priv->user))
 		g_free (priv->user);
 
@@ -437,6 +485,9 @@ tny_account_finalize (GObject *object)
 
 	if (G_LIKELY (priv->proto))
 		g_free (priv->proto);
+
+	if (G_LIKELY (priv->url_string))
+		g_free (priv->url_string);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -470,6 +521,10 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_account_store_func = tny_account_set_account_store;
 	klass->get_account_store_func = tny_account_get_account_store;
 	klass->is_connected_func = tny_account_is_connected;
+	klass->set_url_string_func = tny_account_set_url_string;
+	klass->get_url_string_func = tny_account_get_url_string;
+	klass->get_name_func = tny_account_get_name;
+	klass->set_name_func = tny_account_set_name;
 
 	return;
 }

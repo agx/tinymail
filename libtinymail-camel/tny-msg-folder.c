@@ -371,6 +371,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	tny_msg_header_set_use_summary (TNY_MSG_HEADER (header), 
 		priv->has_summary_cap);
+
 	tny_msg_header_iface_set_folder (header, self);
 	tny_msg_header_iface_set_uid (header, uid);
 

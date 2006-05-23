@@ -46,6 +46,17 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
 
 
+static void
+report_error (TnyAccountPriv *priv)
+{
+	if (G_UNLIKELY (priv->service == NULL))
+	{
+		g_error ("couldn't get service %s: %s\n", priv->url_string,
+			   camel_exception_get_description (priv->ex));
+		camel_exception_clear (priv->ex);
+		return;
+	}
+}
 
 static void 
 tny_store_account_reconnect (TnyAccount *self)
@@ -55,38 +66,44 @@ tny_store_account_reconnect (TnyAccount *self)
 	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && 
 		G_UNLIKELY (priv->user) && G_UNLIKELY (priv->host))
 	{
-		CamelURL *url = NULL;
-		gchar *proto = g_strdup_printf ("%s://", priv->proto); 
+		if (!priv->url_string)
+		{
+			CamelURL *url = NULL;
 
-		url = camel_url_new (proto, priv->ex);
-		g_free (proto);
-	
-		camel_url_set_protocol (url, priv->proto); 
+			gchar *proto = g_strdup_printf ("%s://", priv->proto); 
 
-		camel_url_set_user (url, priv->user);
-		camel_url_set_host (url, priv->host);
-	
-		if (G_LIKELY (priv->url_string))
-			g_free (priv->url_string);
+			url = camel_url_new (proto, priv->ex);
+			g_free (proto);
+		
+			camel_url_set_protocol (url, priv->proto); 
 
-		priv->url_string = camel_url_to_string (url, 0);
+			camel_url_set_user (url, priv->user);
+			camel_url_set_host (url, priv->host);
+		
+			if (G_LIKELY (priv->url_string))
+				g_free (priv->url_string);
 
+			priv->url_string = camel_url_to_string (url, 0);
+			camel_url_free (url);
+		}
 		if (G_UNLIKELY (priv->service))
 			camel_object_unref (CAMEL_OBJECT (priv->service));
 	
 		priv->service = camel_session_get_service 
 			(CAMEL_SESSION (priv->session), priv->url_string, 
 			priv->type, priv->ex);
-	
-		if (G_UNLIKELY (priv->service == NULL))
-		{
-			g_error ("couldn't get service %s: %s\n", priv->url_string,
-				   camel_exception_get_description (priv->ex));
-			camel_exception_clear (priv->ex);
-			return;
-		}
 
-		camel_url_free (url);
+		if (priv->service == NULL)
+			report_error (priv);
+	} else
+	if (G_LIKELY (priv->session) && (priv->url_string))
+	{
+		/* un officially supported provider */
+		priv->service = camel_session_get_service 
+			(CAMEL_SESSION (priv->session), priv->url_string, 
+			priv->type, priv->ex);
+		if (priv->service == NULL)
+			report_error (priv);
 	}
 
 	if (G_LIKELY (priv->service) && G_UNLIKELY (priv->pass_func_set) 
@@ -195,6 +212,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 	const GList *retval;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
+	const gchar *proto;
 
 	tny_store_account_clear_folders (priv);
 
@@ -203,7 +221,9 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
-	if (G_LIKELY (g_ascii_strcasecmp (tny_account_iface_get_proto (TNY_ACCOUNT_IFACE (self)), "pop") != 0))
+	proto = tny_account_iface_get_proto (TNY_ACCOUNT_IFACE (self));
+
+	if (!g_ascii_strncasecmp (proto, "imap", 4))
 	{
 		CamelFolderInfo *info;
 
@@ -234,7 +254,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 						CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 						CAMEL_STORE_FOLDER_INFO_FAST, &ex);
 
-				_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self));
+				/* _tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self)); */
 
 				break;
 		}
@@ -251,7 +271,8 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		retval = priv->folders;
 		g_mutex_unlock (priv->folders_lock);
 
-	} else {
+	} else if (!g_ascii_strncasecmp (proto, "pop", 3))
+	{
 		TnyMsgFolderIface *inbox = TNY_MSG_FOLDER_IFACE (tny_msg_folder_new ());
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelFolder *folder = camel_store_get_inbox (store, &ex);
@@ -270,6 +291,26 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 
 		tny_msg_folder_iface_uncache (inbox);
 		g_signal_emit (inbox, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+
+		g_mutex_lock (priv->folders_lock);
+		retval = priv->folders;
+		g_mutex_unlock (priv->folders_lock);
+	} else {
+		/* Un officially supported provider */
+
+		CamelFolderInfo *info;
+		info = camel_store_get_folder_info 
+			(store, "", CAMEL_STORE_FOLDER_INFO_FAST |
+				CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
+				CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
+
+		fill_folders_recursive (self, store, NULL, info, type);
+
+		/* Tell the observers that they should reload */
+		if (G_LIKELY (priv->folders) && G_LIKELY (priv->folders->data))
+			g_signal_emit (priv->folders->data, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+
+		camel_store_free_folder_info (store, info);
 
 		g_mutex_lock (priv->folders_lock);
 		retval = priv->folders;

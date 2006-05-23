@@ -79,9 +79,25 @@ tny_account_iface_get_id (TnyAccountIface *self)
 }
 
 /**
+ * tny_account_iface_set_name:
+ * @self: a #TnyAccountIface object
+ * @name: the name
+ *
+ * Set the accounts human readable name
+ * 
+ **/
+void 
+tny_account_iface_set_name (TnyAccountIface *self, const gchar *name)
+{
+	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_name_func (self, name);
+	return;
+}
+
+/**
  * tny_account_iface_set_id:
  * @self: a #TnyAccountIface object
- * 
+ * @id: the id
+ *
  * Set the accounts unique id. You need to set this property
  * before you can start using the account.
  * 
@@ -127,6 +143,20 @@ tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_forget_pass_func_func (self);
 }
 
+/**
+ * tny_account_iface_set_url_string:
+ * @self: a #TnyAccountIface object
+ * @url_string: the url string (ex. mbox://path)
+ *  
+ * Set the url string of an account
+ * 
+ **/
+void
+tny_account_iface_set_url_string (TnyAccountIface *self, const gchar *url_string)
+{
+	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_url_string_func (self, url_string);
+	return;
+}
 
 /**
  * tny_account_iface_set_proto:
@@ -208,6 +238,22 @@ tny_account_iface_get_proto (TnyAccountIface *self)
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_proto_func (self);
 }
 
+
+
+/**
+ * tny_account_iface_get_url_string:
+ * @self: a #TnyAccountIface object
+ * 
+ * Get the url string of an account
+ * 
+ * Return value: the url string as a read-only string
+ **/
+const gchar*
+tny_account_iface_get_url_string (TnyAccountIface *self)
+{
+	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_url_string_func (self);
+}
+
 /**
  * tny_account_iface_get_user:
  * @self: a #TnyAccountIface object
@@ -220,6 +266,20 @@ const gchar*
 tny_account_iface_get_user (TnyAccountIface *self)
 {
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_user_func (self);
+}
+
+/**
+ * tny_account_iface_get_name:
+ * @self: a #TnyAccountIface object
+ * 
+ * Get the human readable name of an account
+ * 
+ * Return value: the human readable name as a read-only string
+ **/
+const gchar*
+tny_account_iface_get_name (TnyAccountIface *self)
+{
+	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_name_func (self);
 }
 
 /**

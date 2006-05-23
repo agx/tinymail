@@ -321,13 +321,36 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
 		TnyMsgFolderIface *folder;
+		gint type;
 
-		gtk_widget_show (GTK_WIDGET (priv->progress));
-		
+		gtk_tree_model_get (model, &iter, 
+			TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+
+		if (type == -1) { 
+			/* TODO */
+
+			/* Note: if you can reselect the cur folder after 
+			   selecting these account-name 'folders' (you can if 
+			   you try hard), things will crash. Known bug, I'm
+			   trying to solve this. */
+
+			g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
+
+			/* Restore selection */
+			gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
+
+			g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
+
+			return; /* account name clicked */
+		}
+
 		gtk_tree_model_get (model, &iter, 
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
-
+		gtk_widget_show (GTK_WIDGET (priv->progress));
+		
 #ifdef ASYNC_HEADERS
 
 		/* TODO: Disable the header view (bit I'm first testing a little bit) */

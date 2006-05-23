@@ -289,7 +289,7 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 
 	for (i=0; i < count; i++)
 	{
-		gchar *proto, *user, *hostname, *type, *key;
+		gchar *proto, *type, *key, *name;
 		TnyAccountIface *account;
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
@@ -307,7 +307,7 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 			(const gchar*) key, NULL);
 		g_free (key);
 
-		if (type && !strcmp (type, "transport"))
+		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
 			account = TNY_ACCOUNT_IFACE (tny_transport_account_new ());
 			priv->transport_accounts = 
@@ -329,21 +329,50 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 		g_free (key);
 		tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
 
-		key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", i);
-		user = gconf_client_get_string (priv->client, 
+		key = g_strdup_printf ("/apps/tinymail/accounts/%d/name", i);
+		name = gconf_client_get_string (priv->client, 
 			(const gchar*) key, NULL);
-
 		g_free (key);
-		tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
+		tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), name);
+		g_free (name);
 
-		key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", i);
-		hostname = gconf_client_get_string (priv->client, 
-			(const gchar*) key, NULL);
-		g_free (key); 
-		tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), 
-			hostname);
-		
-		g_free (hostname); g_free (proto); g_free (user);
+		/* Because we only check for the n first bytes, the pops, imaps and smtps also work */
+		if (!g_ascii_strncasecmp (proto, "pop", 3) ||
+			!g_ascii_strncasecmp (proto, "imap", 4)||
+			!g_ascii_strncasecmp (proto, "smtp", 4))
+		{
+			gchar *user, *hostname;
+
+			/* TODO: Add other supported and tested providers here */
+			key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", i);
+			user = gconf_client_get_string (priv->client, 
+				(const gchar*) key, NULL);
+
+			g_free (key);
+			tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
+
+			key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", i);
+			hostname = gconf_client_get_string (priv->client, 
+				(const gchar*) key, NULL);
+			g_free (key); 
+			tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), 
+				hostname);
+			
+			g_free (hostname); g_free (proto); g_free (user);
+		} else {
+			gchar *url_string;
+
+			/* Un officially supported provider */
+			/* Assuming there's a url_string in this case */
+
+			key = g_strdup_printf ("/apps/tinymail/accounts/%d/url_string", i);
+			url_string = gconf_client_get_string (priv->client, 
+				(const gchar*) key, NULL);
+
+			g_free (key);
+			tny_account_iface_set_url_string (TNY_ACCOUNT_IFACE (account), url_string);
+			g_free (url_string);
+		}
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
 		tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), key);
@@ -417,9 +446,15 @@ tny_account_store_notify_remove (TnyAccountStoreIface *self)
 
 	gconftool-2 -s /apps/tinymail/accounts/count -t int COUNT
 	gconftool-2 -s /apps/tinymail/accounts/0/proto -t string [smtp|imap|pop]
+	gconftool-2 -s /apps/tinymail/accounts/0/type -t string [transport|store]
+
 	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
 	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
-	gconftool-2 -s /apps/tinymail/accounts/0/type -t string [transport|store]
+
+or
+
+	gconftool-2 -s /apps/tinymail/accounts/0/url_string -t string url_string
+
 */
 
 static void
