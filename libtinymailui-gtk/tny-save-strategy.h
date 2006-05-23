@@ -39,13 +39,13 @@ typedef struct _TnySaveStrategyClass TnySaveStrategyClass;
 
 struct _TnySaveStrategy
 {
-	GtkScrolledWindow parent;
+	GObject parent;
 
 };
 
 struct _TnySaveStrategyClass
 {
-	GtkScrolledWindowClass parent_class;
+	GObjectClass parent_class;
 };
 
 GType               tny_save_strategy_get_type       (void);

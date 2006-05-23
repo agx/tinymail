@@ -227,7 +227,7 @@ tny_save_strategy_get_type (void)
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (GTK_TYPE_SCROLLED_WINDOW,
+		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnySaveStrategy",
 			&info, 0);
 
