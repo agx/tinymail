@@ -38,6 +38,22 @@
 
 G_BEGIN_DECLS
 
+typedef enum _TnyMsgHeaderFlags {
+	TNY_MSG_HEADER_FLAG_ANSWERED = 1<<0,
+	TNY_MSG_HEADER_FLAG_DELETED = 1<<1,
+	TNY_MSG_HEADER_FLAG_DRAFT = 1<<2,
+	TNY_MSG_HEADER_FLAG_FLAGGED = 1<<3,
+	TNY_MSG_HEADER_FLAG_SEEN = 1<<4,
+	TNY_MSG_HEADER_FLAG_ATTACHMENTS = 1<<5,
+	TNY_MSG_HEADER_FLAG_ANSWERED_ALL = 1<<6,
+	TNY_MSG_HEADER_FLAG_JUNK = 1<<7,
+	TNY_MSG_HEADER_FLAG_SECURE = 1<<8,
+	TNY_MSG_HEADER_FLAG_FOLDER_FLAGGED = 1<<16,
+	TNY_MSG_HEADER_FLAG_JUNK_LEARN = 1<<30,
+	TNY_MSG_HEADER_FLAG_USER = 1<<31
+} TnyMsgHeaderFlags;
+
+
 #define TNY_TYPE_MSG_HEADER_IFACE             (tny_msg_header_iface_get_type ())
 #define TNY_MSG_HEADER_IFACE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_HEADER_IFACE, TnyMsgHeaderIface))
 #define TNY_MSG_HEADER_IFACE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_HEADER_IFACE, TnyMsgHeaderIfaceClass))
@@ -77,6 +93,9 @@ struct _TnyMsgHeaderIfaceClass
 	void           (*uncache_func)            (TnyMsgHeaderIface *self);
 	const gboolean (*has_cache_func)          (TnyMsgHeaderIface *self);
 
+    const TnyMsgHeaderFlags (*get_flags_func)       (TnyMsgHeaderIface *self);
+    void              (*set_flags_func)       (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
+    void              (*unset_flags_func)     (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
 };
 
 GType          tny_msg_header_iface_get_type      (void);
@@ -104,7 +123,10 @@ void           tny_msg_header_iface_set_replyto        (TnyMsgHeaderIface *self,
 
 const TnyMsgFolderIface*
                tny_msg_header_iface_get_folder         (TnyMsgHeaderIface *self);
+const TnyMsgHeaderFlags  tny_msg_header_iface_get_flags          (TnyMsgHeaderIface *self);
 void           tny_msg_header_iface_set_folder         (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
+void           tny_msg_header_iface_set_flags          (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
+void           tny_msg_header_iface_unset_flags          (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
 
 void           tny_msg_header_iface_uncache            (TnyMsgHeaderIface *self);
 const gboolean tny_msg_header_iface_has_cache          (TnyMsgHeaderIface *self);

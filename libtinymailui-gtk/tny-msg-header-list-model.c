@@ -76,6 +76,9 @@ tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			retval = G_TYPE_POINTER;
 			break;
+		case TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN:
+			retval = G_TYPE_INT;
+			break;
 		default:
 			retval = G_TYPE_INVALID;
 			break;
@@ -212,6 +215,10 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		case TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
 			g_value_set_string (value, tny_msg_header_iface_get_from (header));			
+			break;
+		case TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN:
+			g_value_init (value, G_TYPE_INT);
+			g_value_set_int (value, tny_msg_header_iface_get_flags (header));
 			break;
 		default:
 			break;
@@ -375,11 +382,12 @@ tny_msg_header_list_model_finalize (GObject *object)
 	g_mutex_lock (self->folder_lock);
 
 	/* We have to unreference all */
-	headers = tny_msg_folder_iface_get_headers (self->folder, FALSE);
-	g_list_foreach ((GList*)headers, unref_header, NULL);
-
-	if (self->folder)
+	if (self->folder) {
+		headers = tny_msg_folder_iface_get_headers (self->folder, FALSE);
+		g_list_foreach ((GList*)headers, unref_header, NULL);
 		g_object_unref (G_OBJECT (self->folder));
+	}
+
 	g_mutex_unlock (self->folder_lock);
 
 	g_mutex_free (self->folder_lock);

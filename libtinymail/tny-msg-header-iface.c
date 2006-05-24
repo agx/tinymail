@@ -273,7 +273,6 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_folder_func (self);
 }
 
-
 /**
  * tny_msg_header_iface_set_folder:
  * @self: a #TnyMsgHeaderIface object
@@ -286,6 +285,48 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
 {
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_folder_func (self, folder);
 	return;
+}
+
+/**
+ * tny_msg_header_iface_get_flags:
+ * @self: a #TnyMsgHeaderIface object
+ * 
+ * Get message information flags.
+ * 
+ * Return value: flag bitmask
+ **/
+const TnyMsgHeaderFlags
+tny_msg_header_iface_get_flags (TnyMsgHeaderIface *self)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_flags_func (self);
+}
+
+/**
+ * tny_msg_header_iface_set_flags:
+ * @self: a #TnyMsgHeaderIface object
+ * @mask: A #TnyMsgHeaderFlags bitmask of flags to set.
+ * 
+ * Modify message flags.
+ * 
+ **/
+void 
+tny_msg_header_iface_set_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_flags_func (self, mask);
+}
+
+/**
+ * tny_msg_header_iface_unset_flags:
+ * @self: a #TnyMsgHeaderIface object
+ * @mask: A #TnyMsgHeaderFlags bitmask of flags to clear.
+ * 
+ * Modify message flags.
+ * 
+ **/
+void 
+tny_msg_header_iface_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
+{
+	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->unset_flags_func (self, mask);
 }
 
 /**

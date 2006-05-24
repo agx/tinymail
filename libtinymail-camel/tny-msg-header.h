@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-msg-header-iface.h>
-
+#include <camel/camel-folder-summary.h>
 
 G_BEGIN_DECLS
 

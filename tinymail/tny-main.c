@@ -83,7 +83,7 @@ main (int argc, char **argv)
 #ifdef MOZEMBED
 		G_CALLBACK (tny_main_shutdown), 0);
 #else
-		G_CALLBACK (gtk_exit), 0);
+		G_CALLBACK (gtk_main_quit), 0);
 #endif
 
 	gtk_main();

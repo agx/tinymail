@@ -397,6 +397,55 @@ tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
 	return retval;
 }
 
+static const TnyMsgHeaderFlags
+tny_msg_header_get_flags (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	TnyMsgHeaderFlags retval;
+
+	g_mutex_lock (me->hdr_lock);
+
+	load_msg_header (me);
+
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
+		retval = camel_message_info_flags (me->message_info);
+
+	g_mutex_unlock (me->hdr_lock);
+
+	return (const TnyMsgHeaderFlags)retval;
+}
+
+static void
+tny_msg_header_set_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	g_mutex_lock (me->hdr_lock);
+
+	prepare_for_write (me);
+
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
+    	camel_message_info_set_flags (me->message_info, mask, ~0);
+
+	g_mutex_unlock (me->hdr_lock);
+}
+
+static void
+tny_msg_header_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+
+	g_mutex_lock (me->hdr_lock);
+
+	prepare_for_write (me);
+
+	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
+    	camel_message_info_set_flags (me->message_info, mask, 0);
+
+	g_mutex_unlock (me->hdr_lock);
+}
+
 static const time_t
 tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
 {
@@ -722,6 +771,9 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_replyto_func = tny_msg_header_set_replyto;
 	klass->has_cache_func = tny_msg_header_has_cache;
 	klass->uncache_func = tny_msg_header_uncache;
+	klass->set_flags_func = tny_msg_header_set_flags;
+	klass->unset_flags_func = tny_msg_header_unset_flags;
+	klass->get_flags_func = tny_msg_header_get_flags;
 
 	return;
 }
