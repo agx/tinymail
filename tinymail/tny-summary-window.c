@@ -241,9 +241,6 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			tny_msg_header_list_model_new ());
 
 #ifdef ASYNC_HEADERS
-
-		/* TODO: Enable the header view (bit I'm first testing a little bit) */
-
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, FALSE);
 #else
@@ -283,6 +280,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			tny_msg_folder_iface_uncache (priv->last_folder);
 
 		priv->last_folder = folder;
+		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);
 
 	} else {
 		g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
@@ -327,33 +325,36 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN, 
 			&type, -1);
 
-
-		if (type == -1) { 
-			/* TODO */
-
-			/* Note: if you can reselect the cur folder after 
-			   selecting these account-name 'folders' (you can if 
-			   you try hard), things will crash. Known bug, I'm
-			   trying to solve this. */
+		if (type == -1) 
+		{ 
+			/* If an "account name"-row was clicked */ 
 
 			g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
-
 			/* Restore selection */
 			gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
-
 			g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
-
-			return; /* account name clicked */
+			return; 
 		}
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
+
+		/* Note: if you can reselect the cur folder after selecting 
+		   these account-name 'folders' (you can if you try hard),
+		   things will crash. Known bug, I'm trying to solve this. 
+
+		   However, if the last folder is known, and the new folder is
+		   the same anyway, then why reload it?!
+		*/
+
+		if (priv->last_folder == folder)
+			return;
+
 		gtk_widget_show (GTK_WIDGET (priv->progress));
+		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE);
 		
 #ifdef ASYNC_HEADERS
-
-		/* TODO: Disable the header view (bit I'm first testing a little bit) */
 
 		tny_msg_folder_iface_refresh_headers_async (folder, 
 			refresh_current_folder, 

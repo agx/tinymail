@@ -56,7 +56,7 @@ typedef struct
 	GFunc relaxed_func;
 	GMutex *lock;
 	gboolean free_lock;
-
+	TnyMsgFolderPriv *priv;
 } RelaxedData;
 
 static void
@@ -86,11 +86,13 @@ tny_msg_folder_relaxed_performer (gpointer data)
 	GList *list = d->list;
 	gint count = 0;
 
+	g_mutex_lock (d->lock);
+
 	while (G_LIKELY ((count < 5) && list))
 	{
 		GList *element = list;
 		if (G_LIKELY (element && element->data))
-			d->relaxed_func (element->data, NULL);
+			d->relaxed_func (element->data, d->priv);
 		list = g_list_remove_link (list, element);
 		g_list_free (element);
 		count++;
@@ -98,10 +100,20 @@ tny_msg_folder_relaxed_performer (gpointer data)
 
 	d->list = list;
 
+	g_mutex_unlock (d->lock);
+
 	if (G_UNLIKELY (count <= 1))
 		return FALSE;
 	
 	return TRUE;
+}
+
+static void 
+proxy_uncache_func (gpointer data, gpointer user_data)
+{
+	if (data)
+		tny_msg_header_iface_uncache (TNY_MSG_HEADER_IFACE (data));
+	return;
 }
 
 
@@ -112,10 +124,10 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 	{
 		RelaxedData *d = g_new (RelaxedData, 1);
 
-		d->relaxed_func = (GFunc)tny_msg_header_iface_uncache;
-
-		d->free_lock = TRUE;
-		d->lock = g_mutex_new ();
+		d->priv = priv;
+		d->relaxed_func = (GFunc)proxy_uncache_func;
+		d->free_lock = FALSE;
+		d->lock = priv->cached_hdrs_lock;
 
 		g_mutex_lock (priv->cached_hdrs_lock);
 		d->list = g_list_copy (priv->cached_hdrs);
@@ -128,6 +140,18 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 	return;
 }
 
+static void
+proxy_destroy_func (gpointer data, gpointer user_data)
+{
+	TnyMsgFolderPriv *priv = user_data;
+
+	if (data)
+		g_object_unref (G_OBJECT (data));
+	data = NULL;
+
+	return;
+}
+
 static void 
 tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 {
@@ -135,7 +159,9 @@ tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
 	{
 		RelaxedData *d = g_new (RelaxedData, 1);
 
-		d->relaxed_func = (GFunc)g_object_unref;
+		d->priv = priv;
+		d->relaxed_func = (GFunc)proxy_destroy_func;
+
 		g_mutex_lock (priv->cached_hdrs_lock);
 		d->free_lock = FALSE;
 		d->lock = priv->cached_hdrs_lock;
@@ -889,6 +915,9 @@ tny_msg_folder_finalize (GObject *object)
 	tny_msg_folder_hdr_cache_remover (priv);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
+
+	// g_list_foreach (priv->cached_hdrs, (GFunc)g_object_unref, NULL);
+
 	if (G_LIKELY (priv->folder))
 	{
 		g_mutex_lock (priv->folder_lock);

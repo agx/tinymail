@@ -29,18 +29,17 @@ static GObjectClass *parent_class;
 
 struct _TnyMsgHeaderListModel 
 {
-	GObject parent_instance;
+	GObject parent;
 
 	GMutex *folder_lock;
 	TnyMsgFolderIface *folder;
 	gint length;
-
 	gint stamp;
 };
 
 struct _TnyMsgHeaderListModelClass 
 {
-	GObjectClass parent_class;
+	GObjectClass parent;
 };
 
 
@@ -99,7 +98,7 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 	g_mutex_lock (list_model->folder_lock);
 
 	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
-
+	
 	i = gtk_tree_path_get_indices (path)[0];
 	list = g_list_nth (G_LIST (headers), i);
 
@@ -164,7 +163,7 @@ _get_readable_date (const time_t file_time_raw)
 
 	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
 	
-	return readable_date;
+	return g_strdup (readable_date);
 }
 
 
@@ -234,6 +233,7 @@ tny_msg_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 
 	g_mutex_lock (list_model->folder_lock);
 
+	/* Need to call this in case the instance was uncached */
 	tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
 
 	iter->user_data = G_LIST (iter->user_data)->next;
@@ -306,7 +306,9 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	g_mutex_lock (list_model->folder_lock);
 
+	/* Need to call this in case the instance was uncached */
 	tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+
 	header = G_LIST (iter->user_data)->data;
 	
 	if (G_LIKELY (header))
@@ -351,11 +353,31 @@ destroy_internal_list (TnyMsgHeaderListModel *self)
 }
 
 static void
+unref_header (gpointer data, gpointer user_data)
+{
+	g_object_unref (G_OBJECT (data));
+	return;
+}
+
+static void
+ref_header (gpointer data, gpointer user_data)
+{
+	g_object_ref (G_OBJECT (data));
+	return;
+}
+
+static void
 tny_msg_header_list_model_finalize (GObject *object)
 {
 	TnyMsgHeaderListModel *self = (TnyMsgHeaderListModel *)object;
+	const GList* headers;
 
 	g_mutex_lock (self->folder_lock);
+
+	/* We have to unreference all */
+	headers = tny_msg_folder_iface_get_headers (self->folder, FALSE);
+	g_list_foreach ((GList*)headers, unref_header, NULL);
+
 	if (self->folder)
 		g_object_unref (G_OBJECT (self->folder));
 	g_mutex_unlock (self->folder_lock);
@@ -390,6 +412,9 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 	return;
 }
 
+
+
+
 /**
  * tny_msg_header_list_model_set_folder:
  * @self: A #TnyMsgHeaderListModel instance
@@ -402,9 +427,11 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 void
 tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh)
 {
-	const GList* headers = tny_msg_folder_iface_get_headers (folder, refresh);
+	const GList* headers;
 
 	g_mutex_lock (self->folder_lock);
+
+	headers = tny_msg_folder_iface_get_headers (folder, refresh);
 
 	self->length = 0;
 
@@ -414,11 +441,13 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	self->folder = folder;
 	g_object_ref (G_OBJECT (folder));
 
-	//self->headers = headers;
-
 	/* To avoid a g_list_length (note that the implementation must
 	 * absolutely be correct!) */
 	self->length = tny_msg_folder_iface_get_all_count (folder);
+
+	/* We add a reference to each header instance because this type
+	   references it (needs it) using the tree-iter token. */
+	g_list_foreach ((GList*)headers, ref_header, NULL);
 
 	g_mutex_unlock (self->folder_lock);
 
