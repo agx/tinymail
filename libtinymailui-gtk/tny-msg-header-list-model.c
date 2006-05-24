@@ -163,7 +163,7 @@ _get_readable_date (const time_t file_time_raw)
 
 	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
 	
-	return g_strdup (readable_date);
+	return readable_date;
 }
 
 
@@ -195,7 +195,7 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		case TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
 			g_value_set_string (value, 
-				_get_readable_date (tny_msg_header_iface_get_date_received (header)));
+				_get_readable_date (tny_msg_header_iface_get_date_sent (header)));
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_POINTER);
