@@ -5,3 +5,7 @@ Philip Van Hoof <pvanhoof@gnome.org>
 Raphael Slinckx  <raphael@slinckx.net>
 
 	* Author of the Python bindings
+
+Florian Boor  <florian.boor@kernelconcepts.de>
+
+	* Initial support for status flags.
