@@ -1,4 +1,11 @@
 ## Process this file with automake to produce Makefile.in
+if ENABLE_GTK_DOC
+all:
+	find $(top_srcdir) -type f -iname "*.h" -printf "#include <%f>\n" > libtinymail.types
+	echo >> libtinymail.types
+	find $(top_srcdir) -type f -iname "*.h" -exec grep get_type {} \; | grep -v define | cut -d " " -f 2- | cut -d "(" -f 1| sed s/\ //g >> libtinymail.types
+	make all-local
+endif
 
 # We require automake 1.6 at least.
 AUTOMAKE_OPTIONS = 1.6
