@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libtinymailui
 Description: TinyMail UI components library
 Version: @VERSION@
-Requires:
+Requires: libtinymail-@API_VERSION@
 Libs: -L${libdir} -ltinymailui-@API_VERSION@
 Cflags: -I${includedir}/libtinymailui-@API_VERSION@

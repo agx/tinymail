@@ -172,6 +172,9 @@ fi
 AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_LIBS)
 
+AC_SUBST(extraplatpkgs)
+AC_SUBST(extragtkpkgs)
+
 dnl ### libtinymail-test, a library for testing purposes ##
 if test x$build_unittests = xtrue; then
   PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0 camel-1.2 camel-provider-1.2 $extratnypkgs)

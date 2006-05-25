@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libtinymailui-gtk
 Description: TinyMail UI Gtk+ components library
 Version: @VERSION@
-Requires:
+Requires: libtinymailui-@API_VERSION@ gtk+-2.0 @extragtkpkgs@
 Libs: -L${libdir} -ltinymailui-gtk-@API_VERSION@
 Cflags: -I${includedir}/libtinymailui-gtk-@API_VERSION@

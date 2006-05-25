@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libtinymailui-mozembed
 Description: TinyMail library for embedding a GtkMozEmbed HTML widget
 Version: @VERSION@
-Requires:
+Requires: libtinymailui-@API_VERSION@ @extraplatpkgs@ @extragtkpkgs@
 Libs: -L${libdir} -ltinymailui-mozembed-@API_VERSION@
 Cflags: -I${includedir}/libtinymailui-mozembed-@API_VERSION@
