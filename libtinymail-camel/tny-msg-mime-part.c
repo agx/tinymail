@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <string.h>
 #include <tny-msg-mime-part-iface.h>
 #include <tny-msg-mime-part.h>
@@ -93,8 +95,8 @@ tny_msg_mime_part_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *st
 
 	if (G_UNLIKELY (!wrapper))
 	{
-		g_error ("Mime part does not yet have a source stream, use "
-			"tny_msg_mime_part_construct_from_stream first");
+		g_error (_("Mime part does not yet have a source stream, use "
+			"tny_msg_mime_part_construct_from_stream first"));
 		camel_object_unref (CAMEL_OBJECT (cstream));
 		return;
 	}
@@ -189,8 +191,8 @@ tny_msg_mime_part_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *s
 
 	if (G_UNLIKELY (!wrapper))
 	{
-		g_error ("Mime part does not yet have a source stream, use "
-			"tny_msg_mime_part_construct_from_stream first");
+		g_error (_("Mime part does not yet have a source stream, use "
+			"tny_msg_mime_part_construct_from_stream first"));
 		camel_object_unref (CAMEL_OBJECT (cstream));
 		return;
 	}

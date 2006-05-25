@@ -17,6 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+#include <glib/gi18n-lib.h>
+
 #include <glib.h>
 #include <stdlib.h>
 #include <gtk/gtk.h>
@@ -170,7 +173,7 @@ tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
 		g_free (str);
 
 	} else {
-		g_warning ("Can't write %s\n", priv->filename);
+		g_warning (_("Can't write %s\n"), priv->filename);
 	}
 
 	return (ssize_t) n;

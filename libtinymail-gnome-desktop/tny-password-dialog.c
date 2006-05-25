@@ -18,6 +18,8 @@
  */
 
 /* TODO: Refactory this type to libtinymailui-gtk */
+#include <config.h>
+#include <glib/gi18n-lib.h>
 
 #include <gtk/gtk.h>
 #include <tny-password-dialog.h>
@@ -89,7 +91,7 @@ tny_password_dialog_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_dialog_add_buttons (GTK_DIALOG (self), GTK_STOCK_OK, GTK_RESPONSE_OK,
 				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
 
-	gtk_window_set_title (GTK_WINDOW (self), "Password input");
+	gtk_window_set_title (GTK_WINDOW (self), _("Password input"));
 
 	/* TODO: Add key icon or something */
 

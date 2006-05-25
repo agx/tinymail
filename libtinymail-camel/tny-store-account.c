@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <glib.h>
 
 #include <string.h>
@@ -53,7 +55,7 @@ report_error (TnyAccountPriv *priv)
 {
 	if (G_UNLIKELY (priv->service == NULL))
 	{
-		g_error ("couldn't get service %s: %s\n", priv->url_string,
+		g_error (_("Couldn't get service %s: %s\n"), priv->url_string,
 			   camel_exception_get_description (priv->ex));
 		camel_exception_clear (priv->ex);
 		return;
@@ -117,7 +119,7 @@ tny_store_account_reconnect (TnyAccount *self)
 
 		if (camel_exception_is_set (priv->ex))
 		{
-			g_warning ("Not connected with %s: %s\n", priv->url_string,
+			g_warning (_("Not connected with %s: %s\n"), priv->url_string,
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
 			camel_service_cancel_connect (priv->service);

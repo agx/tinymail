@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <string.h>
 #include <tny-msg-folder-iface.h>
 #include <tny-msg-folder.h>
@@ -542,7 +544,7 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	load_folder_no_lock (priv);
 
 	info->cancelled = FALSE;
-	str = g_strdup_printf ("Reading folder `%s'", priv->folder->full_name);
+	str = g_strdup_printf (_("Reading folder `%s'"), priv->folder->full_name);
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
 		tny_msg_folder_refresh_headers_async_status, info, str);
 	g_free (str);

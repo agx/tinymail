@@ -70,6 +70,8 @@ main (int argc, char **argv)
 	gnome_vfs_init ();
 #endif
 
+	bindtextdomain(GETTEXT_PACKAGE, TNY_LOCALE_DIR);
+
 	platfact = TNY_PLATFORM_FACTORY_IFACE 
 			(tny_platform_factory_get_instance ());
 

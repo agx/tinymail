@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <glib.h>
 #include <string.h>
 
@@ -173,7 +175,7 @@ _tny_msg_header_set_camel_mime_message (TnyMsgHeader *self, CamelMimeMessage *ca
 {
 
 	if (G_UNLIKELY (self->mime_message))
-		g_warning ("Strange behaviour: Overwriting existing MIME message");
+		g_warning (_("Strange behaviour: Overwriting existing MIME message"));
 
 	self->mime_message = camel_mime_message;
 
@@ -200,7 +202,7 @@ tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* fol
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
 	if (G_UNLIKELY (me->folder))
-		g_warning ("Strange behaviour: Overwriting existing folder");
+		g_warning (_("Strange behaviour: Overwriting existing folder"));
 
 	g_mutex_lock (me->hdr_lock);
 	me->folder = (TnyMsgFolderIface*)folder;

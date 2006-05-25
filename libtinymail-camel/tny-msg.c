@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <time.h>
 
 #include <tny-msg.h>
@@ -390,7 +392,7 @@ tny_msg_set_parts (TnyMsg *self, const GList *parts)
 		if (TNY_IS_MSG_MIME_PART_IFACE (list->data))
 			tny_msg_add_part (TNY_MSG_IFACE (self), list->data);
 		else
-			g_warning ("Item number %d isn't a TnyMsgMimePartIface\n", nth);
+			g_warning (_("Item number %d isn't a TnyMsgMimePartIface\n"), nth);
 
 		list = g_list_next (list); nth++;
 	}

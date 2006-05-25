@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -97,7 +99,7 @@ static void
 tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 {
 	GtkFileChooserDialog *dialog = GTK_FILE_CHOOSER_DIALOG 
-		(gtk_file_chooser_dialog_new ("Save File", NULL,
+		(gtk_file_chooser_dialog_new (_("Save File"), NULL,
 		GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, 
 		GTK_RESPONSE_ACCEPT, NULL));
@@ -135,7 +137,7 @@ tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 					GTK_DIALOG_DESTROY_WITH_PARENT,
 					GTK_MESSAGE_ERROR,
 					GTK_BUTTONS_CLOSE,
-					"Saving to %s failed\n", uri);
+					_("Saving to %s failed\n"), uri);
 				gtk_dialog_run (GTK_DIALOG (errd));
 				gtk_widget_destroy (GTK_WIDGET (errd));
 			}

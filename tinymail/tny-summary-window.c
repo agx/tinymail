@@ -21,6 +21,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <string.h>
 #include <gtk/gtk.h>
 
@@ -131,9 +133,9 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 	TnySummaryWindowIface *self = user_data;
 
 	if (online)
-		gtk_window_set_title (GTK_WINDOW (self), "Tinymail - online");
+		gtk_window_set_title (GTK_WINDOW (self), _("Tinymail - online"));
 	else
-		gtk_window_set_title (GTK_WINDOW (self), "Tinymail - offline");
+		gtk_window_set_title (GTK_WINDOW (self), _("Tinymail - offline"));
 
 	return;
 }
@@ -488,9 +490,8 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
 
-	gtk_window_set_title (window, "Tinymail");
+	gtk_window_set_title (window, _("Tinymail - offline"));
 	gtk_container_set_border_width (GTK_CONTAINER (window), 0);
-
 
 	mailbox_sw = gtk_scrolled_window_new (NULL, NULL);
 	gtk_paned_pack1 (GTK_PANED (hpaned1), mailbox_sw, TRUE, TRUE);
@@ -531,7 +532,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	/* TODO: Persist application UI status */
 	/* mailbox_view columns */
 	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
+	column = gtk_tree_view_column_new_with_attributes (_("Folder"), renderer,
 			"text", TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id (column, TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN);
 
@@ -540,7 +541,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	if (G_UNLIKELY (FALSE))
 	{ /* Not really working yet */
 		renderer = gtk_cell_renderer_text_new ();
-		column = gtk_tree_view_column_new_with_attributes ("Folder", renderer,
+		column = gtk_tree_view_column_new_with_attributes (_("Unread"), renderer,
 			"text", TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, NULL);
 		gtk_tree_view_column_set_sort_column_id (column, TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN);
 
@@ -550,7 +551,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	/* TODO: Persist application UI status */
 	/* header_view columns */
 	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes ("From", renderer,
+	column = gtk_tree_view_column_new_with_attributes (_("From"), renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
@@ -560,7 +561,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	if (G_UNLIKELY (FALSE))
 	{ /* Unlikely ;-) */
 		renderer = gtk_cell_renderer_text_new ();
-		column = gtk_tree_view_column_new_with_attributes ("To", renderer,
+		column = gtk_tree_view_column_new_with_attributes (_("To"), renderer,
 			"text", TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN, NULL);
 		gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN);			  
 		gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
@@ -569,7 +570,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	}
 
 	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes ("Subject", renderer,
+	column = gtk_tree_view_column_new_with_attributes (_("Subject"), renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
@@ -578,7 +579,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 
 	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes ("Date", renderer,
+	column = gtk_tree_view_column_new_with_attributes (_("Date"), renderer,
 		"text", TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id (column, TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN);
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);

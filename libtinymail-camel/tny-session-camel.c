@@ -18,6 +18,7 @@
  */
 
 #include <config.h>
+#include <glib/gi18n-lib.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +28,8 @@
 
 #include <camel/camel.h>
 #include <camel/camel-filter-driver.h>
-#include <camel/camel-i18n.h>
+
+
 #include <camel/camel-store.h>
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -445,7 +447,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 
 	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
 	{
-		g_error ("Critical ERROR: Cannot init %d as camel directory\n", base_directory);
+		g_error (_("Critical ERROR: Cannot init %d as camel directory\n"), base_directory);
 		exit (1);
 	}
 

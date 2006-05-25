@@ -17,6 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+
+#include <glib/gi18n-lib.h>
+
 #include <tny-device.h>
 #include <libnm_glib.h>
 
@@ -56,7 +60,7 @@ nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 		case LIBNM_NO_DBUS:
 		case LIBNM_NO_NETWORKMANAGER:
 		case LIBNM_INVALID_CONTEXT:
-		g_print ("Invalid network manager installation. Going to assume Online status\n");
+		g_print (_("Invalid network manager installation. Going to assume Online status\n"));
 		case LIBNM_ACTIVE_NETWORK_CONNECTION:
 		default:
 		tny_device_on_online (TNY_DEVICE_IFACE (self));

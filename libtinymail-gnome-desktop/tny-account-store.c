@@ -18,6 +18,7 @@
  */
 
 /* TODO: Refactor this type to a libtinymail-emerge */
+#include <config.h>
 
 #include <string.h>
 #include <glib.h>

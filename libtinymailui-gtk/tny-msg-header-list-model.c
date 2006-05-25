@@ -20,6 +20,7 @@
 #include <config.h>
 
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 
 #include <tny-msg-header-list-model.h>
 #include <tny-msg-header-iface.h>
@@ -166,7 +167,7 @@ _get_readable_date (const time_t file_time_raw)
 
 	file_time = localtime (&file_time_raw);
 
-	readable_date_size = strftime (readable_date, 63, "%Y-%m-%d, %-I:%M %p", file_time);		
+	readable_date_size = strftime (readable_date, 63, _("%Y-%m-%d, %-I:%M %p"), file_time);		
 	
 	return readable_date;
 }

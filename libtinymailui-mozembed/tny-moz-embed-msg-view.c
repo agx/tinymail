@@ -17,6 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+#include <glib/gi18n-lib.h>
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -101,7 +104,7 @@ reload_msg (TnyMsgViewIface *self)
 		if (!part)
 		{
 			/* This shouldn't happen */
-			g_warning ("Mimepart problem\n");
+			g_warning (_("Mimepart problem\n"));
 			parts = g_list_next (parts);
 			continue;
 		}
@@ -192,7 +195,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 
 	if (!G_LIKELY (priv->save_strategy))
 	{
-		g_warning ("No save strategy for this message view\n");
+		g_warning (_("No save strategy for this message view\n"));
 		return;
 	}
 

@@ -72,5 +72,8 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Define the location where the catalogs will be installed */
+#undef TNY_LOCALE_DIR
+
 /* Version number of package */
 #undef VERSION

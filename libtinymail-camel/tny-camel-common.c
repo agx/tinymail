@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <string.h>
 #include "tny-camel-common-priv.h"
 
@@ -41,7 +43,7 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 	
 		if (G_UNLIKELY (!gtfnd))
 		{
-			g_warning ("Invalid e-mail address in field");
+			g_warning (_("Invalid e-mail address in field"));
 			return;
 		}
 	
