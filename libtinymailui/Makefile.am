@@ -1,5 +1,5 @@
 INCLUDES = \
-	$(LIBTINYMAILUI_CFLAGS)		\
+	$(LIBTINYMAILUI_CFLAGS)	        \
 	-I$(top_srcdir)/libtinymail
 
 lib_LTLIBRARIES = libtinymailui-1.0.la

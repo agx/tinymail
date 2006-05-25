@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+
 #ifndef TNY_DEVICE_IFACE_C
 #define TNY_DEVICE_IFACE_C
 #endif

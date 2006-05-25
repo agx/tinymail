@@ -19,6 +19,8 @@
 
 /* TODO: Refactory this type to libtinymailui-gtk */
 
+#include <config.h>
+
 #include <string.h>
 #include <gtk/gtk.h>
 

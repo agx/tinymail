@@ -1,9 +1,7 @@
-INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS) -I.	\
+INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS)  	\
+	-I. -I$(top_srcdir)			\
 	-I$(top_srcdir)/libtinymail		\
 	-I$(top_srcdir)/$(PLATFORMDIR)
-
-# This makes tinymail faster, but wastes more memory
-#	-DPERFORMANCE_MODE
 
 lib_LTLIBRARIES = libtinymail-camel-1.0.la 
 
@@ -47,7 +45,8 @@ libtinymail_camel_1_0_la_LIBADD =		\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la
 
-libtinymail_camel_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
+libtinymail_camel_1_0_la_LDFLAGS = -export-dynamic -version-info \
+	$(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 libtinymail_camel_1_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
 libtinymail_camel_1_0include_HEADERS = $(libtinymail_camel_1_0_headers)
 

@@ -1,10 +1,10 @@
-INCLUDES = 								\
-	$(TINYMAIL_CFLAGS) 						\
-	-I$(top_srcdir)/libtinymail					\
-	-I$(top_srcdir)/libtinymailui					\
-	-I$(top_srcdir)/libtinymailui-gtk				\
-	-I$(top_srcdir)/libtinymail-camel				\
-	-I$(top_srcdir)/libtinymail-gnome-desktop			\
+INCLUDES = -I. -I$(top_srcdir)				\
+	$(TINYMAIL_CFLAGS) 				\
+	-I$(top_srcdir)/libtinymail			\
+	-I$(top_srcdir)/libtinymailui			\
+	-I$(top_srcdir)/libtinymailui-gtk		\
+	-I$(top_srcdir)/libtinymail-camel		\
+	-I$(top_srcdir)/libtinymail-gnome-desktop	\
 	-DASYNC_HEADERS
 
 if BUILD_GNOME

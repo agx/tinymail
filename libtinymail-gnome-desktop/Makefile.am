@@ -1,9 +1,9 @@
-INCLUDES = 					 \
-	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)	 \
-	-I$(top_srcdir)/libtinymail		 \
-	-I$(top_srcdir)/libtinymailui		 \
-	-I$(top_srcdir)/libtinymailui-gtk	 \
-	-I$(top_srcdir)/libtinymail-camel	 \
+INCLUDES = -I. -I$(top_srcdir)			    \
+	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)	    \
+	-I$(top_srcdir)/libtinymail		    \
+	-I$(top_srcdir)/libtinymailui		    \
+	-I$(top_srcdir)/libtinymailui-gtk	    \
+	-I$(top_srcdir)/libtinymail-camel	    \
 	-I$(top_srcdir)/libtinymail-gnomevfs 
 
 if BUILD_MOZEMBED
@@ -36,7 +36,8 @@ libtinymail_gnome_desktop_1_0_la_LIBADD = 	\
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
 
-libtinymail_gnome_desktop_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
+libtinymail_gnome_desktop_1_0_la_LDFLAGS = -export-dynamic \
+	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 
 if BUILD_MOZEMBED
 libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la

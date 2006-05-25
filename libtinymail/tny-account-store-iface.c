@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+
 #include <tny-account-iface.h>
 
 #ifndef TNY_ACCOUNT_STORE_IFACE_C

@@ -1,6 +1,6 @@
-INCLUDES = \
-	$(LIBTINYMAILUI_GTK_CFLAGS)	       \
-	-I$(top_srcdir)/libtinymail            \
+INCLUDES = -I. -I$(top_srcdir)		\
+	$(LIBTINYMAILUI_GTK_CFLAGS)	\
+	-I$(top_srcdir)/libtinymail	\
 	-I$(top_srcdir)/libtinymailui 
 
 if BUILD_GNOME

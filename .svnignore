@@ -1,4 +1,6 @@
-TinyMail-*.tar.gz
+config.h
+stamp-h1
+libtinymail-*.tar.gz
 libtinymail.spec
 .anjuta
 .svnignore

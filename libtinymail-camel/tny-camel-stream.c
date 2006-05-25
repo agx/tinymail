@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+
 #include <tny-camel-stream.h>
 #include <tny-camel-shared.h>
 

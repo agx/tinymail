@@ -18,6 +18,8 @@ AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AC_CONFIG_MACRO_DIR([m4])
 AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS -I m4")
 
+AC_CONFIG_HEADERS(config.h)
+
 LT_VERSION_INFO="lt_current:lt_revision:lt_age"
 LT_CURRENT_MINUS_AGE=m4_eval(lt_current - lt_age)
 AC_SUBST(LT_VERSION_INFO)
@@ -27,12 +29,11 @@ dnl ### Don't export functions that start with _ ##
 LIBTOOL_EXPORT_OPTIONS='-export-symbols-regex "^[[^_]].*"'
 AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
 
-AM_CONFIG_HEADER(tinymail/config.h)
-AM_CONFIG_HEADER(libtinymail/config.h)
-AM_CONFIG_HEADER(libtinymail-camel/config.h)
-AM_CONFIG_HEADER(libtinymail-gnomevfs/config.h)
-AM_CONFIG_HEADER(libtinymailui/config.h)
-AM_CONFIG_HEADER(libtinymailui-gtk/config.h)
+GETTEXT_PACKAGE=tinymail
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Package name for gettext])
+ALL_LINGUAS=""
+AM_GLIB_GNU_GETTEXT
 
 API_VERSION=tny_api_version
 AC_SUBST(API_VERSION)
@@ -213,6 +214,7 @@ AC_SUBST(BINDIR)
 
 
 AC_OUTPUT([
+po/Makefile.in
 libtinymail.spec
 Makefile
 docs/Makefile

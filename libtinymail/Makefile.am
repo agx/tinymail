@@ -1,4 +1,4 @@
-INCLUDES = $(LIBTINYMAIL_CFLAGS) -I.
+INCLUDES = $(LIBTINYMAIL_CFLAGS) -I. -I$(top_srcdir)
 
 lib_LTLIBRARIES = libtinymail-1.0.la
 

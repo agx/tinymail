@@ -1,8 +1,8 @@
-INCLUDES = 					 \
-	$(LIBTINYMAILUI_MOZEMBED_CFLAGS)	 \
-	-I$(top_srcdir)/libtinymail		 \
-	-I$(top_srcdir)/libtinymailui		 \
-	-I$(top_srcdir)/libtinymailui-gtk	 \
+INCLUDES = -I. -I$(top_srcdir)		   \
+	$(LIBTINYMAILUI_MOZEMBED_CFLAGS)   \
+	-I$(top_srcdir)/libtinymail	   \
+	-I$(top_srcdir)/libtinymailui	   \
+	-I$(top_srcdir)/libtinymailui-gtk  \
 	-I$(top_srcdir)/libtinymail-camel
 
 if BUILD_GNOME
