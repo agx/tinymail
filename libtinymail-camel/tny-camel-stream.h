@@ -48,7 +48,7 @@ struct _TnyCamelStreamClass
 	CamelStreamClass parent;
 };
 
-CamelType        tny_account_get_type             (void);
+CamelType        tny_camel_stream_get_type        (void);
 TnyCamelStream*  tny_camel_stream_new             (TnyStreamIface *stream);
 void             tny_camel_stream_set_stream      (TnyCamelStream *self, TnyStreamIface *stream);
 

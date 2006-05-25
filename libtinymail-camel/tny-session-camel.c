@@ -532,6 +532,9 @@ tny_session_camel_get_type (void)
 	
 	if (G_UNLIKELY (!camel_type_init_done))
 	{
+		if (!g_thread_supported ()) 
+			g_thread_init (NULL);
+
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}

@@ -1,11 +1,4 @@
 ## Process this file with automake to produce Makefile.in
-if ENABLE_GTK_DOC
-all:
-	find $(top_srcdir) -type f -iname "*.h" -printf "#include <%f>\n" > libtinymail.types
-	echo >> libtinymail.types
-	find $(top_srcdir) -type f -iname "*.h" -exec grep get_type {} \; | grep -v define | cut -d " " -f 2- | cut -d "(" -f 1| sed s/\ //g >> libtinymail.types
-	make all-local
-endif
 
 # We require automake 1.6 at least.
 AUTOMAKE_OPTIONS = 1.6
@@ -84,7 +77,8 @@ INCLUDES= $(LIBTINYMAIL_CFLAGS) $(LIBTINYMAILUI_CFLAGS) 		\
 	-I$(top_srcdir)/libtinymailui-mozembed				\
 	-I$(top_srcdir)/libtinymail-camel				\
 	-I$(top_srcdir)/libtinymail-gnome-desktop			\
-	-I$(top_srcdir)/libtinymail-gnomevfs
+	-I$(top_srcdir)/libtinymail-gnomevfs				\
+	-I$(top_srcdir)/tinymail
 
 GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS) 						\
 	$(LIBTINYMAIL_CAMEL_LIBS) $(LIBTINYMAIL_GNOMEVFS_LIBS)      				\
