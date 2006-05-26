@@ -31,6 +31,7 @@
 <!ENTITY libtinymail-camel-TnyStreamCamel SYSTEM "xml/tny-stream-camel.xml">
 <!ENTITY libtinymail-TnyStreamIface SYSTEM "xml/tny-stream-iface.xml">
 <!ENTITY libtinymailui-TnySummaryWindowIface SYSTEM "xml/tny-summary-window-iface.xml">
+<!ENTITY libtinymailui-TnyAccountStoreViewIface SYSTEM "xml/tny-account-store-view-iface.xml">
 <!ENTITY tinymail-TnySummaryWindow SYSTEM "xml/tny-summary-window.xml">
 <!ENTITY libtinymailui-gtk-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
 <!ENTITY libtinymail-gnomevfs-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
@@ -99,6 +100,7 @@
 	<chapter id="libtinymailui">
 		<title>libtinymailui</title>
 		&libtinymailui-TnySummaryWindowIface;
+		&libtinymailui-TnyAccountStoreViewIface;
 		&libtinymailui-TnyMsgViewIface;
 		&libtinymailui-TnyMsgWindowIface;
 		&libtinymailui-TnySaveStrategyIface;
