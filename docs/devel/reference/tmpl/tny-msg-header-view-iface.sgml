@@ -2,17 +2,17 @@
 TnyMsgHeaderViewIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A type for showing a #TnyMsgHeaderIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type for showing a #TnyMsgHeaderIface to the user
 </para>
 
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgHeaderIface
 </para>
 
 

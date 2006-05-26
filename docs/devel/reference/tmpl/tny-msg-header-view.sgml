@@ -2,17 +2,18 @@
 TnyMsgHeaderView
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A implementation of #TnyMsgHeaderViewIface for Gtk+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A implementation of #TnyMsgHeaderViewIface that inherits the
+GtkTable.
 </para>
 
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgHeaderViewIface, #GtkTable, #TnyMsgHeaderIface
 </para>
 
 
