@@ -1,0 +1,35 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgHeaderView
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyMsgHeaderView ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_msg_header_view_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

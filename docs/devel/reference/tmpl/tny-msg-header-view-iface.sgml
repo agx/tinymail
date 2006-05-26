@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgHeaderViewIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyMsgHeaderViewIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_msg_header_view_iface_set_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+
