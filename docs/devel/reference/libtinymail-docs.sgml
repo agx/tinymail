@@ -37,16 +37,16 @@
 <!ENTITY libtinymail-gnomevfs-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
 <!ENTITY libtinymail-TnyFsStream SYSTEM "xml/tny-fs-stream.xml">
 <!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
-<!ENTITY libtinymail-camel-TnyCamelShared "xml/tny-camel-shared.xml">
-<!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView "xml/tny-moz-embed-msg-view.xml">
-<!ENTITY libtinymailui-mozembed-TnyMozEmbedStream "xml/tny-moz-embed-stream.xml">
-<!ENTITY libtinymail-TnyDeviceIface "xml/tny-device-iface.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyDevice "xml/tny-device.xml">
-<!ENTITY libtinymailui-TnyPlatformFactoryIface "xml/tny-platform-factory-iface.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyPlatformFactory "xml/tny-platform-factory.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyAccountStore "xml/tny-platform-factory.xml">
-<!ENTITY libtinymailui-TnySaveStrategyIface "xml/tny-save-strategy-iface.xml">
-<!ENTITY libtinymailui-gtk-TnySaveStrategy "xml/tny-save-strategy.xml">
+<!ENTITY libtinymail-camel-TnyCamelShared SYSTEM "xml/tny-camel-shared.xml">
+<!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView SYSTEM "xml/tny-moz-embed-msg-view.xml">
+<!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
+<!ENTITY libtinymail-TnyDeviceIface SYSTEM "xml/tny-device-iface.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyDevice SYSTEM "xml/tny-device.xml">
+<!ENTITY libtinymailui-TnyPlatformFactoryIface SYSTEM "xml/tny-platform-factory-iface.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyPlatformFactory SYSTEM "xml/tny-platform-factory.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyAccountStore SYSTEM "xml/tny-platform-factory.xml">
+<!ENTITY libtinymailui-TnySaveStrategyIface SYSTEM "xml/tny-save-strategy-iface.xml">
+<!ENTITY libtinymailui-gtk-TnySaveStrategy SYSTEM "xml/tny-save-strategy.xml">
 
 <!ENTITY index-Object-Tree SYSTEM "xml/tree_index.sgml">
 
