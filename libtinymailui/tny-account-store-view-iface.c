@@ -19,11 +19,26 @@
 
 #include <config.h>
 
-#include <tny-summary-window-iface.h>
+#include <tny-account-store-view-iface.h>
 
+
+/**
+ * tny_account_store_view_iface_set_account_store:
+ * @self: A #TnyAccountStoreViewIface instance
+ * @account_store: A #TnyAccountStoreIface instace
+ *
+ * Set the account store
+ * 
+ **/
+void
+tny_account_store_view_iface_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store)
+{
+	TNY_ACCOUNT_STORE_VIEW_IFACE_GET_CLASS (self)->set_account_store_func (self, account_store);
+	return;
+}
 
 static void
-tny_summary_window_iface_base_init (gpointer g_class)
+tny_account_store_view_iface_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
@@ -34,7 +49,7 @@ tny_summary_window_iface_base_init (gpointer g_class)
 }
 
 GType
-tny_summary_window_iface_get_type (void)
+tny_account_store_view_iface_get_type (void)
 {
 	static GType type = 0;
 
@@ -42,8 +57,8 @@ tny_summary_window_iface_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnySummaryWindowIfaceClass),
-		  tny_summary_window_iface_base_init,   /* base_init */
+		  sizeof (TnyAccountStoreViewIfaceClass),
+		  tny_account_store_view_iface_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
@@ -53,7 +68,7 @@ tny_summary_window_iface_get_type (void)
 		  NULL    /* instance_init */
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnySummaryWindowIface", &info, 0);
+			"TnyAccountStoreViewIface", &info, 0);
 
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}

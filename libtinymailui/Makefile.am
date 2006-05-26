@@ -10,7 +10,8 @@ libtinymailui_1_0_headers = 		\
 	tny-save-strategy-iface.h	\
 	tny-msg-window-iface.h		\
 	tny-platform-factory-iface.h	\
-	tny-msg-header-view-iface.h
+	tny-msg-header-view-iface.h	\
+	tny-account-store-view-iface.h
 
 libtinymailui_1_0_la_SOURCES = 		\
 	$(libtinymailui_1_0_headers)	\
@@ -19,7 +20,8 @@ libtinymailui_1_0_la_SOURCES = 		\
 	tny-msg-view-iface.c		\
 	tny-msg-window-iface.c		\
 	tny-platform-factory-iface.c	\
-	tny-msg-header-view-iface.c
+	tny-msg-header-view-iface.c	\
+	tny-account-store-view-iface.c
 
 libtinymailui_1_0_la_LIBADD = 		\
 	$(LIBTINYMAILUI_LIBS)		\

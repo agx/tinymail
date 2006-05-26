@@ -20,8 +20,7 @@
 
 #include <gtk/gtk.h>
 
-#include <tny-summary-window.h>
-#include <tny-summary-window-iface.h>
+#include <tny-account-store-view-iface.h>
 #include <tny-platform-factory-iface.h>
 #include <tny-platform-factory.h>
 
@@ -79,8 +78,8 @@ main (int argc, char **argv)
 
 	gtk_widget_show (GTK_WIDGET (window));
 
-	tny_summary_window_iface_set_account_store (
-		TNY_SUMMARY_WINDOW_IFACE (window),
+	tny_account_store_view_iface_set_account_store (
+		TNY_ACCOUNT_STORE_VIEW_IFACE (window),
 		tny_platform_factory_iface_new_account_store (platfact));
 	
 	g_signal_connect (window, "destroy",

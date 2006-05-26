@@ -40,13 +40,9 @@ typedef struct _TnySummaryWindowIfaceClass TnySummaryWindowIfaceClass;
 struct _TnySummaryWindowIfaceClass
 {
 	GTypeInterface parent;
-
-	void (*set_account_store_func) (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store);
 };
 
-GType         tny_summary_window_iface_get_type           (void);
-
-void          tny_summary_window_iface_set_account_store  (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store);
+GType tny_summary_window_iface_get_type (void);
 
 
 G_END_DECLS

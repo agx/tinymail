@@ -51,6 +51,7 @@
 
 #include <tny-summary-window.h>
 #include <tny-summary-window-iface.h>
+#include <tny-account-store-view-iface.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -141,7 +142,7 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 }
 
 static void
-tny_summary_window_set_account_store (TnySummaryWindowIface *self, TnyAccountStoreIface *account_store)
+tny_summary_window_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store)
 {
 	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
 	const TnyDeviceIface *device = tny_account_store_iface_get_device (account_store);
@@ -632,7 +633,13 @@ tny_summary_window_finalize (GObject *object)
 static void
 tny_summary_window_iface_init (gpointer g_iface, gpointer iface_data)
 {
-	TnySummaryWindowIfaceClass *klass = (TnySummaryWindowIfaceClass *)g_iface;
+	return;
+}
+
+static void
+tny_account_store_view_iface_init (gpointer g_iface, gpointer iface_data)
+{
+	TnyAccountStoreViewIfaceClass *klass = (TnyAccountStoreViewIfaceClass *)g_iface;
 
 	klass->set_account_store_func = tny_summary_window_set_account_store;
 
@@ -681,12 +688,22 @@ tny_summary_window_get_type (void)
 		  NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_account_store_view_iface_info = 
+		{
+		  (GInterfaceInitFunc) tny_account_store_view_iface_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (GTK_TYPE_WINDOW,
 			"TnySummaryWindow",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_SUMMARY_WINDOW_IFACE, 
 			&tny_summary_window_iface_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_VIEW_IFACE, 
+			&tny_account_store_view_iface_info);
 
 	}
 
