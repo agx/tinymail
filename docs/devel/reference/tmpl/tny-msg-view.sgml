@@ -7,10 +7,10 @@ A implementation of #TnyMsgViewIface for Gtk+.
 <!-- ##### SECTION Long_Description ##### -->
 <para>
 A type that uses the #GtkTextBuffer and #GtkTextView types for displaying the message.
-
+</para><para>
 It obviously doesn't support showing HTML formatted content. It will, however,
 display the source code of such content.
-
+</para><para>
 This type is coupled with the #TnyTextBufferStream.
 </para>
 

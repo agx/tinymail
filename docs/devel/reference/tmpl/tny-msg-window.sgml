@@ -11,7 +11,7 @@ wraps the #TnyMsgViewIface instance with a window. It expects the view implement
 to inherit from GtkWidget. Therefore it's soft coupled with implementations like
 #TnyMsgView for Gtk+ and #TnyMozEmbedMsgView which is also implemented by inheriting
 from a #GtkWidget descendant, but uses a #GtkMozEmbed HTML component.
-
+</para><para>
 You cannot use #TnyMsgViewIface implementations that don't inherit from a #GtkWidget
 type with this type.
 </para>

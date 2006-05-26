@@ -6,8 +6,9 @@ A #GtkTreeModel suitable for storing #TnyAccountIface instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #GtkTreeModel suitable for storing #TnyStoreAccountIface instances. The 
-implementation inherits the #GtkTreeStore. It recursively walks the
+A #GtkTreeModel suitable for storing #TnyStoreAccountIface instances.
+</para><para>
+The implementation inherits the #GtkTreeStore. It recursively walks the
 folders of account instances that get added. Using it as a model for a
 #GtkTreeView will display the account name as parent row with the
 account-folders as the child rows.

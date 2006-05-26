@@ -6,7 +6,8 @@ A #GtkTreeModel suitable for storing #TnyMsgMimePartIface instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #GtkTreeModel suitable for storing #TnyMsgMimePartIface instaces. The
+A #GtkTreeModel suitable for storing #TnyMsgMimePartIface instaces. </para>
+<para>The
 implementation inherits the #GtkListStore. If the library was compiled
 with gnome features, the implementation will handle the mime-type icon 
 automatically.

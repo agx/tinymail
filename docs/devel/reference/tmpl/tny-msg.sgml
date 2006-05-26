@@ -8,7 +8,7 @@ A Camel implementation of the #TnyMsgIface
 <para>
 A #TnyMsgIface proxy for the #CamelMimeMessage type in Camel. It inherits from #TnyMsgMimePart and can
 therefore be used as a mime part. 
-
+</para><para>
 This implementation is coupled with #TnyMsgMimePart.
 </para>
 
