@@ -2,16 +2,18 @@
 TnyDevice
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #TnyDeviceIface implementation for the gnome platform
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyDeviceIface implementation for the gnome platform
+that uses NetworkManager for the online/offline status
+updates.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyDeviceIface, Network Manager
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -2,16 +2,16 @@
 TnyAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-A store with accounts that uses libtinymail-camel and GConf
+A account store implemented for Camel and GConf
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-An implementation of #TnyAccountStoreIface that uses libtinymail-camel and GConf.
+An implementation of #TnyAccountStoreIface that uses Camel and GConf. This implementation is coupled with the #TnyStoreAccount and #TnyTransportAccount implementations. It can only return instances of those implementations of #TnyStoreAccountIface and #TnyTransportAccountIface.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccountStoreIface
+#TnyAccountStoreIface, #TnyAccountIface, #TnyStoreAccountIface, #TnyTransportAccountIface, #TnyAccount, #TnyStoreAccount, #TnyTransportAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

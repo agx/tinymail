@@ -2,16 +2,25 @@
 TnyMozEmbedMsgView
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #TnyMsgViewIface implementation that uses GtkMozEmbed
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
+A #TnyMsgViewIface implementation that uses the GtkMozEmbed HTML
+component. This implementation is coupled with the #TnyMozEmbedStream
+#TnyStreamIface implementation.
 
+The developer needs to decode the #TnyMsgMimePartIface instance of the
+#TnyMsgIface instance that has as mime-type "text/html" to a #TnyMozEmbedStream
+instance. A #TnyMozEmbedStream instance will update the instance of this type.
+
+You need to construct this type with a #TnySaveStrategyIface. It's recommended 
+to use the #TnySaveStrategy implementation in libtinymailui-gtk.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgViewIface, #GtkMozEmbed, #TnyStreamIface, #TnyMozEmbedStream, #TnySaveStrategyIface, #TnySaveStrategy
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -2,16 +2,19 @@
 TnyFsStream
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #TnyStreamIface adaptor for a file discriptor
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+An adaptor for a file descriptor to a #TnyStreamIface type. You need to
+use the standard POSIX open() syscall. The implementation will, upon
+destruction, close() the filedescriptor. This behaviour might change in
+future (as I'm not yet sure whether this is the best thing to do).
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyStreamIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

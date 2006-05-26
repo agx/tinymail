@@ -2,11 +2,12 @@
 TnyDeviceIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A type that implements a few device specific things
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type that implements a few device specific things like the 
+online/offline status.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

@@ -6,12 +6,12 @@ An interface that defines an account type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-An account contains the folders of an E-mail service and handles the authentication with a service.
+A abstract type that contains the shared functionality of the #TnyStoreAccountIface and the #TnyTransportAccountIface types.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyStoreAccountIface, #TnyTransportAccountIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

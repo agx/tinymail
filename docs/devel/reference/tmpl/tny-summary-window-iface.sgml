@@ -2,16 +2,19 @@
 TnySummaryWindowIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interfaces that defines a summary window type
+A type that defines a summary window
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
+You can let your summary window type implement this type. Not that it defines a lot at this moment.
 
+Typical implementations will go in a composition relation with a type that implements #TnyAccountStoreViewIface.
+The demo-ui of tinymail, however, *is* also a #TnyAccountStoreViewIface implementation.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountStoreViewIface, #TnyAccountStoreIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
@@ -21,14 +24,5 @@ An interfaces that defines a summary window type
 <para>
 
 </para>
-
-
-<!-- ##### FUNCTION tny_summary_window_iface_set_account_store ##### -->
-<para>
-
-</para>
-
-@self: 
-@account_store: 
 
 

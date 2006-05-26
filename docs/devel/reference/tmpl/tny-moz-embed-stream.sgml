@@ -2,16 +2,20 @@
 TnyMozEmbedStream
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #TnyStreamIface implementation that updates a #TnyMozEmbedMsgView
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
+The developer needs to decode the #TnyMsgMimePartIface instance of the
+#TnyMsgIface instance that has as mime-type "text/html" to a an instance
+of this type. The implementation will update the #TnyMozEmbedMsgView
+instance which you used to construct this type with.
 
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMozEmbedMsgView, #TnyMsgViewIface, #GtkMozEmbed, #TnyStreamIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -2,16 +2,17 @@
 TnyMsgIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interfaces that defines a message type
+A type that defines a message
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type that defines a message. It inherits from #TnyMsgMimePartIface and can
+therefore be used as a mime part.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgHeaderIface, #TnyMsgFolderIface, #TnyMsgMimePartIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

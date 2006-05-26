@@ -2,18 +2,16 @@
 TnyAccountStoreIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interface that defines an account store type
+A store for accounts
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-An account store is an observable and factory that can deliver
-configured accounts and that will update its observers on changes that
-happen to the accounts.
+A type that returns stored (configured) accounts. Both transport and store accounts.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountIface, #TnyStoreAccountIface, #TnyTransportAccountIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

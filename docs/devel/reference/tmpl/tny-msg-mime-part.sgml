@@ -2,16 +2,16 @@
 TnyMsgMimePart
 
 <!-- ##### SECTION Short_Description ##### -->
-An implementation of #TnyMsgMimePartIface that plays proxy for a #CamelMimePart
+A Camel implementation of #TnyMsgMimePartIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A implementation that plays proxy for a #CamelMimePart.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsg, #TnyMsgIface, #TnyMsgMimePartIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

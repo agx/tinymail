@@ -2,16 +2,16 @@
 TnyStoreAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A store account type implemented for camel.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A store account type implemented for camel.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountIface, #TnyTransportAccountIface, #TnyTransportAccount, #TnyAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

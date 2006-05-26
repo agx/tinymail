@@ -6,12 +6,12 @@ An adaptor between #TnyStreamIface and #GnomeVFSHandle
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type that adapts a #GnomeVFSHandle to a #TnyStreamIface
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnySaveStrategy, #TnyStreamIface, #TnySaveStrategyIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

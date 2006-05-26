@@ -2,17 +2,21 @@
 TnyMsgFolderIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interface that defines a folder type
+A type that defines a folder
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A folder type contains both headers and children folders. 
-A folder can have a account or another folder as parent.
+A folder contains headers and children folders. A folder can have a account or another 
+folder as parent. An implementation of a #TnyStoreAccountIface will typically keep
+track of instances of this type. If you got them from a #TnyStoreAccountIface implementation,
+you typically don't destroy instances of this type. The #TnyStoreAccountIface implementation
+will do that for you upon destruction of the account. You can, however, uncache the folder 
+instances. Depending on the implementation, this will reduce memory usage.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyStoreAccountIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

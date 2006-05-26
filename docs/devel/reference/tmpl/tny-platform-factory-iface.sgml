@@ -2,16 +2,17 @@
 TnyPlatformFactoryIface
 
 <!-- ##### SECTION Short_Description ##### -->
+A factory that returns implementations for a platform	
 
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A factory type that returns specific implementations for a specific platform.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyDeviceIface, #TnyMsgViewIface, #TnyAccountStoreIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

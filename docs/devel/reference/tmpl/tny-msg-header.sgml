@@ -1,18 +1,19 @@
 <!-- ##### SECTION Title ##### -->
-tny-msg-header
+TnyMsgHeader
 
 <!-- ##### SECTION Short_Description ##### -->
-An implementation of #TnyMsgHeaderIface that plays proxy for CamelMessageInfo
+A Camel implementation of #TnyMsgHeaderIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-TnyMsgHeader is a proxy for real subject CamelMessageInfo. The type doesn't
-use a priv pointer, but in stead is an opaque structure. This is done for 
-decreasing the amount of allocations (a priv pointer is an unnecessary 
-allocation). Allocations are slow.
+A proxy for a #CamelMessageInfo. The type doesn't use a priv pointer, it's 
+implemented as a opaque structure. This is done for decreasing the amount 
+of allocations (a priv pointer is an unnecessary allocation). Allocations are 
+slow.
 
 A list model (like a tree model) is responsible for calling the uncache
-method whenever the corresponding row becomes invisble.
+method whenever the corresponding row becomes invisble. Most list model 
+implementations will do this. This implementation copes with this.
 
 All kinds of dirty non-gobject-standard tricks have been applied to make this
 type as fast as possible. Including modifying the TNY_MSG_ACCOUNT() macro and
@@ -25,7 +26,7 @@ for no real reason.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgHeaderIface, #TnyMsgFolder, #TnyMsgFolderIface, #TnyMsgHeaderListModel
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

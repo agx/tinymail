@@ -2,16 +2,16 @@
 TnyMsgWindowIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An implementation that defines a message window type
+A type that defines a message window
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type that shows a new window in which you can view a message
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

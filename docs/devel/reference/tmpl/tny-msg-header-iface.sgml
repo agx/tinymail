@@ -2,16 +2,18 @@
 TnyMsgHeaderIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interfaces that defines a header type
+A type that defines a header
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A header of a #TnyMsgIface instance is the non-body information. It contains for example 
+the "to", the "from", the "subject" and the "sent-date" information. It's typically used 
+by a summary view to give the user an overview of the available messages in a folder.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgIface, #TnyMsgFolderIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

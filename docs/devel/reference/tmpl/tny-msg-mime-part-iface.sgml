@@ -2,16 +2,16 @@
 TnyMsgMimePartIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interfaces that defines a mime part type
+A type that defines a mime part
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A mime part is a part of a message. Like the body, an attachment or the PGP key of a message.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
