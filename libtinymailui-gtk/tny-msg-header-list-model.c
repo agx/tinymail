@@ -38,6 +38,9 @@ struct _TnyMsgHeaderListModel
 	TnyMsgFolderIface *folder;
 	gint length;
 	gint stamp;
+
+	guint last_nth;
+	GList *last_iter;
 };
 
 struct _TnyMsgHeaderListModelClass 
@@ -92,6 +95,22 @@ tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 	return retval;
 }
 
+static GList*
+g_list_travel_to_nth (GList *list, guint cur, guint nth)
+{
+	if (cur == nth)
+		return list;
+
+	if (cur < nth)
+		while ((cur++ < nth) && list)
+			list = list->next;
+	else if (cur > nth)
+		while ((cur-- > nth) && list)
+			list = list->prev;
+
+	return list;
+}
+
 static gboolean
 tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePath *path)
 {
@@ -102,11 +121,22 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
 	g_mutex_lock (list_model->folder_lock);
-
-	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
 	
 	i = gtk_tree_path_get_indices (path)[0];
-	list = g_list_nth (G_LIST (headers), i);
+
+
+	if (list_model->last_iter)
+	{ /* This is a little speed hack */
+		list_model->last_iter = g_list_travel_to_nth (list_model->last_iter, list_model->last_nth, i);
+		list_model->last_nth = i;
+		list = list_model->last_iter;
+	} else {
+		headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+		list_model->last_nth = i;
+		list = g_list_nth (G_LIST (headers), i);
+		list_model->last_iter = list;
+	}
+
 
 	if (G_UNLIKELY (i >= list_model->length))
 	{
@@ -358,6 +388,8 @@ static void
 destroy_internal_list (TnyMsgHeaderListModel *self)
 {
 	self->length = 0;
+	self->last_iter = NULL;
+	self->last_nth = 0;
 
 	return;
 }
@@ -385,7 +417,8 @@ tny_msg_header_list_model_finalize (GObject *object)
 	g_mutex_lock (self->folder_lock);
 
 	/* We have to unreference all */
-	if (self->folder) {
+	if (self->folder) 
+	{
 		headers = tny_msg_folder_iface_get_headers (self->folder, FALSE);
 		g_list_foreach ((GList*)headers, unref_header, NULL);
 		g_object_unref (G_OBJECT (self->folder));
@@ -419,6 +452,7 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 {
 	self->folder = NULL;
 	self->folder_lock = g_mutex_new ();
+	destroy_internal_list (self);
 
 	return;
 }
@@ -441,6 +475,8 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	const GList* headers;
 
 	g_mutex_lock (self->folder_lock);
+
+	destroy_internal_list (self);
 
 	headers = tny_msg_folder_iface_get_headers (folder, refresh);
 
@@ -478,7 +514,7 @@ tny_msg_header_list_model_new (void)
 	TnyMsgHeaderListModel *model;
 
 	model = g_object_new (TNY_TYPE_MSG_HEADER_LIST_MODEL, NULL);
-	
+
 	return GTK_TREE_MODEL (model);
 }
 
