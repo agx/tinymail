@@ -88,7 +88,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	TnyMsgMimePartIface *tpart = TNY_MSG_MIME_PART_IFACE 
 			(tny_msg_mime_part_new (part));
 	g_mutex_lock (priv->parts_lock);
-	priv->parts = g_list_append (priv->parts, tpart);
+	priv->parts = g_list_prepend (priv->parts, tpart);
 
 	g_mutex_unlock (priv->parts_lock);
 
@@ -249,7 +249,7 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 	camel_multipart_add_part_at ((CamelMultipart*)containee, 
 		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl);
 	
-	priv->parts = g_list_append (priv->parts, part); curl++;
+	priv->parts = g_list_prepend (priv->parts, part); curl++;
 
 	g_mutex_unlock (priv->parts_lock);
 

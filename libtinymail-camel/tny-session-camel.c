@@ -97,7 +97,7 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 
 		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL))
 		{
-			mark_del = g_list_append (mark_del, copy);
+			mark_del = g_list_prepend (mark_del, copy);
 			continue;
 		}
 
@@ -118,7 +118,7 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 	pf->service = service;
 
 	if (G_UNLIKELY (!found))
-		forget_password_funcs = g_list_append (forget_password_funcs, pf);
+		forget_password_funcs = g_list_prepend (forget_password_funcs, pf);
 
 	if (G_UNLIKELY (mark_del)) 
 	{
@@ -160,7 +160,7 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 
 		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL))
 		{
-			mark_del = g_list_append (mark_del, copy);
+			mark_del = g_list_prepend (mark_del, copy);
 			continue;
 		}
 
@@ -181,7 +181,7 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 	pf->service = service;
 
 	if (G_UNLIKELY (!found))
-		password_funcs = g_list_append (password_funcs, pf);
+		password_funcs = g_list_prepend (password_funcs, pf);
 
 	if (G_UNLIKELY (mark_del))
 	{

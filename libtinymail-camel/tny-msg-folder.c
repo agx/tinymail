@@ -357,7 +357,7 @@ tny_msg_folder_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
 	g_object_ref (G_OBJECT (folder));
 
 	g_mutex_lock (priv->folders_lock);
-	priv->folders = g_list_append (priv->folders, folder);
+	priv->folders = g_list_prepend (priv->folders, folder);
 	g_mutex_unlock (priv->folders_lock);
 
 	/* Tell the observers */

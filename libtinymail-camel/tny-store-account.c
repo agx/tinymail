@@ -195,7 +195,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 		} else 
 		{
 			g_mutex_lock (priv->folders_lock);
-			priv->folders = g_list_append (priv->folders, iface);
+			priv->folders = g_list_prepend (priv->folders, iface);
 			g_mutex_unlock (priv->folders_lock);
 
 			/* No unref keeps current folder the parent ref */
@@ -290,7 +290,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		tny_msg_folder_iface_set_name (TNY_MSG_FOLDER_IFACE (inbox), "INBOX");
 
 		g_mutex_lock (priv->folders_lock);
-		priv->folders = g_list_append (priv->folders, inbox);
+		priv->folders = g_list_prepend (priv->folders, inbox);
 		g_mutex_unlock (priv->folders_lock);
 
 		tny_msg_folder_iface_uncache (inbox);
