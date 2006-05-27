@@ -137,8 +137,8 @@ tny_account_store_iface_base_init (gpointer g_class)
  * @self: the object on which the signal is emitted
  * @account: the #TnyAccountIface of the account that changed
  *
- * The "account_changed" signal is emitted when an account in the store changed
- **/
+ * Emitted when an account in the store changed
+ */
 		tny_account_store_iface_signals[ACCOUNT_CHANGED] =
 		   g_signal_new ("account_changed",
 			TNY_TYPE_ACCOUNT_STORE_IFACE,
@@ -153,9 +153,8 @@ tny_account_store_iface_base_init (gpointer g_class)
  * @self: the object on which the signal is emitted
  * @account: the #TnyAccountIface of the account that got inserted
  *
- * The "account_inserted" signal is emitted when an account is added to the
- * store
- **/
+ * Emitted when an account is added to the store
+ */
 
 
 		tny_account_store_iface_signals[ACCOUNT_INSERTED] =
@@ -172,9 +171,8 @@ tny_account_store_iface_base_init (gpointer g_class)
  * @self: the object on which the signal is emitted
  * @account: the #TnyAccountIface of the account that got removed
  *
- * The "account_removed" signal is emitted when an account is removed from the
- * store
- **/
+ * Emitted when an account is removed from the store
+ */
 		tny_account_store_iface_signals[ACCOUNT_REMOVED] =
 		   g_signal_new ("account_removed",
 			TNY_TYPE_ACCOUNT_STORE_IFACE,
@@ -188,9 +186,8 @@ tny_account_store_iface_base_init (gpointer g_class)
  * TnyAccountStoreIface::accounts_reloaded:
  * @self: the object on which the signal is emitted
  *
- * The "accounts_reloaded" signal is emitted when the store reloaded the 
- * accounts
- **/
+ * Emitted when the store reloads the accounts
+ */
 		tny_account_store_iface_signals[ACCOUNTS_RELOADED] =
 		   g_signal_new ("accounts_reloaded",
 			TNY_TYPE_ACCOUNT_STORE_IFACE,

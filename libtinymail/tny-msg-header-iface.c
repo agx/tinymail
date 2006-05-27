@@ -55,7 +55,7 @@ tny_msg_header_iface_get_replyto (TnyMsgHeaderIface *self)
 /**
  * tny_msg_header_iface_set_bcc:
  * @self: a #TnyMsgHeaderIface object
- * @from: the bcc header in a comma separated list
+ * @bcc: the bcc header in a comma separated list
  * 
  * Set the bcc header. Also look at the to header for more information
  * about the formatting.
@@ -71,7 +71,7 @@ tny_msg_header_iface_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
 /**
  * tny_msg_header_iface_set_cc:
  * @self: a #TnyMsgHeaderIface object
- * @from: the cc header in a comma separated list
+ * @cc: the cc header in a comma separated list
  * 
  * Set the cc header. Also look at the to header for more information
  * about the formatting.

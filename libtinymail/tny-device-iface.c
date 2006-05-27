@@ -45,9 +45,8 @@ tny_device_iface_base_init (gpointer g_class)
  * @self: the object on which the signal is emitted
  * @online: Whether or not the device is now online
  *
- * The "connection_changed" signal is emitted when the connection
- * status of a device changes.
- **/
+ * Emitted when the connection status of a device changes.
+ */
 		tny_device_iface_signals[CONNECTION_CHANGED] =
 		   g_signal_new ("connection_changed",
 			TNY_TYPE_DEVICE_IFACE,

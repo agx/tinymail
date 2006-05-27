@@ -246,7 +246,7 @@ tny_msg_mime_part_iface_get_content_type (TnyMsgMimePartIface *self)
 /**
  * tny_msg_mime_part_iface_content_type_is:
  * @self: a #TnyMsgMimePartIface object
- * @content_type: The content type in the string format "type/subtype"
+ * @content_type: The content type in the string format type/subtype
  * 
  * Efficiently checks whether a part is of type content_type
  *

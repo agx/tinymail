@@ -84,7 +84,6 @@ tny_msg_header_view_set_header (TnyMsgHeaderViewIface *self, TnyMsgHeaderIface *
 
 /**
  * tny_msg_header_view_new:
- * @save_strategy: The save strategy to use
  *
  * Return value: a new #TnyMsgHeaderViewIface instance implemented for Gtk+
  **/

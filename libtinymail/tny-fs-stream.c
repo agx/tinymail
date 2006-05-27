@@ -136,7 +136,7 @@ tny_fs_stream_close (TnyStreamIface *self)
 /**
  * tny_fs_stream_set_fd:
  * @self: A #TnyFsStream instance
- * @handle: The file descriptor to write to or read from
+ * @fd: The file descriptor to write to or read from
  *
  * Set the file descriptor to play adaptor for
  *
@@ -164,7 +164,7 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
 
 /**
  * tny_fs_stream_new:
- * @handle: The file descriptor to write to or read from
+ * @fd: The file descriptor to write to or read from
  *
  * Create an adaptor instance between #TnyStreamIface and a file descriptor
  *

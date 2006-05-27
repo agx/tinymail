@@ -25,7 +25,7 @@
 /**
  * tny_store_account_iface_unsubscribe:
  * @self: a #TnyStoreAccountIface object
- * @folder_name: The folder name to unsubscribe from
+ * @folder: The folder to unsubscribe from
  *
  * Unsubscribe from a folder
  * 
@@ -40,7 +40,7 @@ tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIfa
 /**
  * tny_store_account_iface_subscribe:
  * @self: a #TnyStoreAccountIface object
- * @folder_name: The folder name to subscribe to
+ * @folder: The folder to subscribe to
  *
  * Subscribe to a folder
  * 
