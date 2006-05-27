@@ -2,51 +2,57 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
+<!ENTITY tinymail-TnySummaryWindow SYSTEM "xml/tny-summary-window.xml">
+
+<!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
 <!ENTITY libtinymail-TnyAccountIface SYSTEM "xml/tny-account-iface.xml">
 <!ENTITY libtinymail-TnyStoreAccountIface SYSTEM "xml/tny-store-account-iface.xml">
 <!ENTITY libtinymail-TnyTransportAccountIface SYSTEM "xml/tny-transport-account-iface.xml">
 <!ENTITY libtinymail-TnyAccountStoreIface SYSTEM "xml/tny-account-store-iface.xml">
-<!ENTITY libtinymail-camel-TnyAccountStore SYSTEM "xml/tny-account-store.xml">
-<!ENTITY libtinymailui-gtk-TnyAccountTreeModel SYSTEM "xml/tny-account-tree-model.xml">
+<!ENTITY libtinymail-TnyMsgHeaderIface SYSTEM "xml/tny-msg-header-iface.xml">
+<!ENTITY libtinymail-TnyMsgIface SYSTEM "xml/tny-msg-iface.xml">
+<!ENTITY libtinymail-TnyMsgMimePartIface SYSTEM "xml/tny-msg-mime-part-iface.xml">
+<!ENTITY libtinymail-TnyStreamIface SYSTEM "xml/tny-stream-iface.xml">
+<!ENTITY libtinymail-TnyFsStream SYSTEM "xml/tny-fs-stream.xml">
+<!ENTITY libtinymail-TnyMsgFolderIface SYSTEM "xml/tny-msg-folder-iface.xml">
+<!ENTITY libtinymail-TnyDeviceIface SYSTEM "xml/tny-device-iface.xml">
+
 <!ENTITY libtinymail-camel-TnyAccount SYSTEM "xml/tny-account.xml">
 <!ENTITY libtinymail-camel-TnyStoreAccount SYSTEM "xml/tny-store-account.xml">
 <!ENTITY libtinymail-camel-TnyTransportAccount SYSTEM "xml/tny-transport-account.xml">
-<!ENTITY libtinymailui-gtk-TnyAttachListModel SYSTEM "xml/tny-attach-list-model.xml">
 <!ENTITY libtinymail-camel-TnyCamelStream SYSTEM "xml/tny-camel-stream.xml">
-<!ENTITY libtinymail-TnyMsgFolderIface SYSTEM "xml/tny-msg-folder-iface.xml">
 <!ENTITY libtinymail-camel-TnyMsgFolder SYSTEM "xml/tny-msg-folder.xml">
-<!ENTITY libtinymail-TnyMsgHeaderIface SYSTEM "xml/tny-msg-header-iface.xml">
-<!ENTITY libtinymailui-gtk-TnyMsgHeaderListModel SYSTEM "xml/tny-msg-header-list-model.xml">
 <!ENTITY libtinymail-camel-TnyMsgHeader SYSTEM "xml/tny-msg-header.xml">
-<!ENTITY libtinymail-TnyMsgIface SYSTEM "xml/tny-msg-iface.xml">
-<!ENTITY libtinymail-TnyMsgMimePartIface SYSTEM "xml/tny-msg-mime-part-iface.xml">
 <!ENTITY libtinymail-camel-TnyMsgMimePart SYSTEM "xml/tny-msg-mime-part.xml">
-<!ENTITY libtinymailui-TnyMsgViewIface SYSTEM "xml/tny-msg-view-iface.xml">
-<!ENTITY libtinymailui-gtk-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
-<!ENTITY libtinymailui-TnyMsgWindowIface SYSTEM "xml/tny-msg-window-iface.xml">
-<!ENTITY libtinymailui-gtk-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
 <!ENTITY libtinymail-camel-TnyMsg SYSTEM "xml/tny-msg.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyPasswordDialog SYSTEM "xml/tny-password-dialog.xml">
 <!ENTITY libtinymail-camel-TnySessionCamel SYSTEM "xml/tny-session-camel.xml">
 <!ENTITY libtinymail-camel-TnyStreamCamel SYSTEM "xml/tny-stream-camel.xml">
-<!ENTITY libtinymail-TnyStreamIface SYSTEM "xml/tny-stream-iface.xml">
-<!ENTITY libtinymailui-TnySummaryWindowIface SYSTEM "xml/tny-summary-window-iface.xml">
-<!ENTITY libtinymailui-TnyAccountStoreViewIface SYSTEM "xml/tny-account-store-view-iface.xml">
-<!ENTITY tinymail-TnySummaryWindow SYSTEM "xml/tny-summary-window.xml">
-<!ENTITY libtinymailui-gtk-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
-<!ENTITY libtinymail-gnomevfs-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
-<!ENTITY libtinymail-TnyFsStream SYSTEM "xml/tny-fs-stream.xml">
-<!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
 <!ENTITY libtinymail-camel-TnyCamelShared SYSTEM "xml/tny-camel-shared.xml">
-<!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView SYSTEM "xml/tny-moz-embed-msg-view.xml">
-<!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
-<!ENTITY libtinymail-TnyDeviceIface SYSTEM "xml/tny-device-iface.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyDevice SYSTEM "xml/tny-device.xml">
-<!ENTITY libtinymailui-TnyPlatformFactoryIface SYSTEM "xml/tny-platform-factory-iface.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyPlatformFactory SYSTEM "xml/tny-platform-factory.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyAccountStore SYSTEM "xml/tny-platform-factory.xml">
-<!ENTITY libtinymailui-TnySaveStrategyIface SYSTEM "xml/tny-save-strategy-iface.xml">
+
+<!ENTITY libtinymail-gnomevfs-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
+
+<!ENTITY libtinymailui-gtk-TnyAccountTreeModel SYSTEM "xml/tny-account-tree-model.xml">
+<!ENTITY libtinymailui-gtk-TnyAttachListModel SYSTEM "xml/tny-attach-list-model.xml">
+<!ENTITY libtinymailui-gtk-TnyMsgHeaderListModel SYSTEM "xml/tny-msg-header-list-model.xml">
+<!ENTITY libtinymailui-gtk-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
+<!ENTITY libtinymailui-gtk-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
+<!ENTITY libtinymailui-gtk-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
 <!ENTITY libtinymailui-gtk-TnySaveStrategy SYSTEM "xml/tny-save-strategy.xml">
+
+<!ENTITY libtinymailui-TnyMsgWindowIface SYSTEM "xml/tny-msg-window-iface.xml">
+<!ENTITY libtinymailui-TnyMsgViewIface SYSTEM "xml/tny-msg-view-iface.xml">
+<!ENTITY libtinymailui-TnyPlatformFactoryIface SYSTEM "xml/tny-platform-factory-iface.xml">
+<!ENTITY libtinymailui-TnyAccountStoreViewIface SYSTEM "xml/tny-account-store-view-iface.xml">
+<!ENTITY libtinymailui-TnySummaryWindowIface SYSTEM "xml/tny-summary-window-iface.xml">
+<!ENTITY libtinymailui-TnySaveStrategyIface SYSTEM "xml/tny-save-strategy-iface.xml">
+
+<!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
+<!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView SYSTEM "xml/tny-moz-embed-msg-view.xml">
+
+<!ENTITY libtinymail-gnome-desktop-TnyPlatformFactory SYSTEM "xml/tny-platform-factory.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyAccountStore SYSTEM "xml/tny-account-store.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyPasswordDialog SYSTEM "xml/tny-password-dialog.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyDevice SYSTEM "xml/tny-device.xml">
 
 <!ENTITY index-Object-Tree SYSTEM "xml/tree_index.sgml">
 
