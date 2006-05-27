@@ -49,6 +49,17 @@ struct _TnyMsgHeaderListModelClass
 };
 
 
+static void
+destroy_internal_list (TnyMsgHeaderListModel *self)
+{
+	self->length = 0;
+	self->last_iter = NULL;
+	self->last_nth = 0;
+
+	return;
+}
+
+
 static guint
 tny_msg_header_list_model_get_flags (GtkTreeModel *self)
 {
@@ -124,6 +135,11 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 	
 	i = gtk_tree_path_get_indices (path)[0];
 
+	if (G_UNLIKELY (i >= list_model->length))
+	{
+		g_mutex_unlock (list_model->folder_lock);
+		return FALSE;
+	}
 
 	if (list_model->last_iter)
 	{ /* This is a little speed hack */
@@ -132,16 +148,11 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 		list = list_model->last_iter;
 	} else {
 		headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+		destroy_internal_list (list_model);
+		list_model->length = g_list_length (headers);
 		list_model->last_nth = i;
 		list = g_list_nth (G_LIST (headers), i);
 		list_model->last_iter = list;
-	}
-
-
-	if (G_UNLIKELY (i >= list_model->length))
-	{
-		g_mutex_unlock (list_model->folder_lock);
-		return FALSE;
 	}
 
 	iter->stamp = list_model->stamp;
@@ -166,6 +177,8 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	g_mutex_lock (list_model->folder_lock);
 
 	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+	destroy_internal_list (list_model);
+	list_model->length = g_list_length (headers);
 
 	for (list = G_LIST (headers); list; list = list->next) 
 	{
@@ -267,14 +280,17 @@ tny_msg_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 {
 	gboolean retval;
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
-	
+	GList *headers;
+
 	g_return_val_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL 
 		(self)->stamp, FALSE);
 
 	g_mutex_lock (list_model->folder_lock);
 
 	/* Need to call this in case the instance was uncached */
-	tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+	destroy_internal_list (list_model);
+	list_model->length = g_list_length (headers);
 
 	iter->user_data = G_LIST (iter->user_data)->next;
 	retval = (iter->user_data != NULL);
@@ -317,6 +333,8 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	g_mutex_lock (list_model->folder_lock);
 
 	headers = (GList*)tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
+	destroy_internal_list (list_model);
+	list_model->length = g_list_length (headers);
 
 	child = g_list_nth (G_LIST (headers), n);
 
@@ -345,9 +363,6 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 	g_return_if_fail (iter->user_data != NULL);
 
 	g_mutex_lock (list_model->folder_lock);
-
-	/* Need to call this in case the instance was uncached */
-	tny_msg_folder_iface_get_headers (list_model->folder, FALSE);
 
 	header = G_LIST (iter->user_data)->data;
 	
@@ -384,15 +399,6 @@ tny_msg_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 	return;
 }
 
-static void
-destroy_internal_list (TnyMsgHeaderListModel *self)
-{
-	self->length = 0;
-	self->last_iter = NULL;
-	self->last_nth = 0;
-
-	return;
-}
 
 static void
 unref_header (gpointer data, gpointer user_data)
@@ -479,8 +485,6 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	destroy_internal_list (self);
 
 	headers = tny_msg_folder_iface_get_headers (folder, refresh);
-
-	self->length = 0;
 
 	if (G_LIKELY (self->folder))
 		g_object_unref (G_OBJECT (self->folder));

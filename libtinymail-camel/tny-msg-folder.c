@@ -414,7 +414,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	g_mutex_lock (priv->cached_hdrs_lock);
 
-	priv->cached_hdrs = g_list_append (priv->cached_hdrs, header);
+	priv->cached_hdrs = g_list_prepend (priv->cached_hdrs, header);
 	priv->cached_length++;
 	/* TODO: If unread -- priv->unread_length++; */
 
