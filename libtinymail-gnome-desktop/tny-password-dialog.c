@@ -128,7 +128,8 @@ tny_password_dialog_class_init (TnyPasswordDialogClass *class)
 {
 	GObjectClass *object_class;
 
-	parent_class = g_type_class_peek_parent (class);
+	/* parent_class = g_type_class_peek_parent (class); */
+
 	object_class = (GObjectClass*) class;
 
 	object_class->finalize = tny_password_dialog_finalize;
@@ -162,6 +163,7 @@ tny_password_dialog_get_type (void)
 			"TnyPasswordDialog",
 			&info, 0);
 
+		parent_class = g_type_class_ref (gtk_dialog_get_type());
 	}
 
 	return type;

@@ -233,9 +233,12 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 			prmpt = g_strdup_printf (_("Enter password for %s"), 
 				tny_account_iface_get_name (account));
 		}
-
-		if (prompt && strstr (prompt, "Unable to connect to POP server")!= NULL)
-			tny_session_camel_forget_password (session, service, domain, item, ex);
+		
+		if (!g_ascii_strncasecmp (tny_account_iface_get_proto (account), "pop", 3))
+		{
+			if (flags & CAMEL_SESSION_PASSWORD_REPROMPT)
+				tny_session_camel_forget_password (session, service, domain, item, ex);
+		}
 
 		retval = func (account, prompt, &cancel);
 
