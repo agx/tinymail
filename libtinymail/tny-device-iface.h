@@ -47,12 +47,16 @@ struct _TnyDeviceIfaceClass
 {
 	GTypeInterface parent;
 
+	gboolean (*is_online_func)  (TnyDeviceIface *self);
+
 	/* Signals */
 	void (*connection_changed)  (TnyDeviceIface *self, gboolean online);
 
 };
 
 GType tny_device_iface_get_type (void);
+
+gboolean tny_device_iface_is_online (TnyDeviceIface *self);
 
 G_END_DECLS
 

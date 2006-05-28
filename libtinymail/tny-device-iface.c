@@ -31,6 +31,20 @@
 
 guint *tny_device_iface_signals = NULL;
 
+
+/**
+ * tny_device_iface_is_online:
+ * @self: a #TnyDeviceIface object
+ * 
+ * Return value: Whether the device is online
+ **/
+gboolean 
+tny_device_iface_is_online (TnyDeviceIface *self)
+{
+	return TNY_DEVICE_IFACE_GET_CLASS (self)->is_online_func (self);
+}
+
+
 static void
 tny_device_iface_base_init (gpointer g_class)
 {

@@ -44,6 +44,33 @@ tny_device_on_offline (TnyDeviceIface *self)
 	return;
 }
 
+static gboolean
+tny_device_is_online (TnyDeviceIface *self)
+{
+	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+
+	libnm_glib_state state = libnm_glib_get_network_state (priv->nm_ctx);
+	gboolean retval;
+
+	switch (state)
+	{
+		case LIBNM_NO_NETWORK_CONNECTION:
+		retval = FALSE;
+		break;
+
+		case LIBNM_NO_DBUS:
+		case LIBNM_NO_NETWORKMANAGER:
+		case LIBNM_INVALID_CONTEXT:
+		g_print (_("Invalid network manager installation. Going to assume Online status\n"));
+		case LIBNM_ACTIVE_NETWORK_CONNECTION:
+		default:
+		retval = TRUE;
+		break;
+	}
+
+	return retval;
+}
+
 static void 
 nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 {
@@ -118,7 +145,9 @@ tny_device_finalize (GObject *object)
 static void
 tny_device_iface_init (gpointer g_iface, gpointer iface_data)
 {
-	/* TnyDeviceIfaceClass *klass = (TnyDeviceIfaceClass *)g_iface; */
+	TnyDeviceIfaceClass *klass = (TnyDeviceIfaceClass *)g_iface;
+
+	klass->is_online_func = tny_device_is_online;
 
 	return;
 }

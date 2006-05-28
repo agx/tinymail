@@ -202,6 +202,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
+@is_online_func: 
 @connection_changed: 
 
 <!-- ##### STRUCT TnyStoreAccountIface ##### -->

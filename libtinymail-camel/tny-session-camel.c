@@ -475,8 +475,8 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 	camel_provider_init();
 	camel_session_construct (session, camel_dir);
 
-	/* TODO: Implement a smart "is this device online?" technique here */
-	camel_session_set_online ((CamelSession *) session, TRUE); 
+	camel_session_set_online ((CamelSession *) session, 
+		tny_device_iface_is_online (device)); 
 	
 	g_free (camel_dir);
 	g_free (base_directory);
