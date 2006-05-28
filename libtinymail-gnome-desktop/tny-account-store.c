@@ -115,24 +115,10 @@ destroy_current_accounts (TnyAccountStorePriv *priv)
 
 
 static gchar* 
-per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const gchar *prompt, const gchar *item)
+per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const gchar *prompt, const gchar *item, gboolean *cancel)
 {
 	gchar *retval = NULL;
-	const gchar *accountid;
-	gchar *prmpt = (gchar*)prompt;
-	gboolean freeit=FALSE;
-
-	if (!account)
-		return;
-
-	if (!prmpt)
-	{
-		prmpt = g_strdup_printf (_("Enter password for %s"), 
-			tny_account_iface_get_name (account));
-		freeit=TRUE;
-	}
-
-	accountid = tny_account_iface_get_id (account);
+	const gchar *accountid = tny_account_iface_get_id (account);
 
 	if (G_UNLIKELY (!passwords))
 		passwords = g_hash_table_new (g_str_hash, g_str_equal);
@@ -144,7 +130,7 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 		/* This crashes on subsequent calls (any gtk widget creation does) */
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
-		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prmpt);
+		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prompt);
 
 		if (G_LIKELY (gtk_dialog_run (dialog) == GTK_RESPONSE_OK))
 		{
@@ -155,6 +141,13 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 
 			g_hash_table_insert (passwords, g_strdup (accountid), 
 				retval);
+
+			*cancel = FALSE;
+
+		} else {
+
+			*cancel = TRUE;
+
 		}
 
 		gtk_widget_destroy (GTK_WIDGET (dialog));
@@ -162,9 +155,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
 	}
-
-	if (freeit)
-		g_free (prmpt);
 
 	return retval;
 }

@@ -44,7 +44,7 @@ typedef struct _TnyStreamIfaceClass TnyStreamIfaceClass;
 typedef struct _TnyAccountStoreIfaceClass TnyAccountStoreIfaceClass;
 typedef struct _TnyMsgHeaderProxy TnyMsgHeaderProxy;
 typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
-typedef gchar* (*TnyGetPassFunc) (TnyAccountIface *self, const gchar *domain, const gchar *prompt, const gchar *item);
+typedef gchar* (*TnyGetPassFunc) (TnyAccountIface *self, const gchar *domain, const gchar *prompt, const gchar *item, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccountIface *self, const gchar *domain, const gchar *item);
 typedef enum _TnyStoreAccountFolderType TnyStoreAccountFolderType;
 typedef void (*TnyGetHeadersCallback) (TnyMsgFolderIface *self, gboolean cancelled, gpointer user_data);
