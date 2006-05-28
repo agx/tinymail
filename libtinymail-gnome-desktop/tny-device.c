@@ -75,24 +75,11 @@ static void
 nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 {
 	TnyDevice *self = (TnyDevice *)user_data;
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
-	libnm_glib_state state = libnm_glib_get_network_state (nm_ctx);
 
-	switch (state)
-	{
-		case LIBNM_NO_NETWORK_CONNECTION:
-		tny_device_on_offline (TNY_DEVICE_IFACE (self));
-		break;
-
-		case LIBNM_NO_DBUS:
-		case LIBNM_NO_NETWORKMANAGER:
-		case LIBNM_INVALID_CONTEXT:
-		g_print (_("Invalid network manager installation. Going to assume Online status\n"));
-		case LIBNM_ACTIVE_NETWORK_CONNECTION:
-		default:
+	if (tny_device_is_online (self))
 		tny_device_on_online (TNY_DEVICE_IFACE (self));
-		break;
-	}
+	else
+		tny_device_on_offline (TNY_DEVICE_IFACE (self));
 
 	return;
 }
