@@ -26,7 +26,6 @@
 
 #include <tny-stream-iface.h>
 #include <tny-moz-embed-stream.h>
-#include <gtkembedmoz/gtkmozembed.h>
 
 static GObjectClass *parent_class = NULL;
 

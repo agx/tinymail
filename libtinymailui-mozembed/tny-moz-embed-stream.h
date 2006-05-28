@@ -25,7 +25,8 @@
 #include <glib-object.h>
 
 #include <tny-stream-iface.h>
-#include <gtkembedmoz/gtkmozembed.h>
+#include <gtkmozembed.h>
+
 
 G_BEGIN_DECLS
 
