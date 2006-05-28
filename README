@@ -1,1 +1,4 @@
 Project tinymail is an attempt to create an E-mail client framework for small devices.
+
+Required packages on a Ubuntu Breezy (for building from subversion repository)
+gnome-devel, subversion, firefox-dev, libcamel1.2-dev, libnm-glib-0-dev, automake-1.7
