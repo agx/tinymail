@@ -116,13 +116,10 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
  * @self: a #TnyAccountIface object
  * 
  * Set the password that will be called when the password is no longer needed.
- * the function must free the password that was allocated by the function that
- * will return the password (get_pass_func).
- *
- * It's recommended to also memset (str, 0, strlen (str)) the memory.
  *
  * You need to set this property before you can start using the account.
  * 
+ * Also see #TnyForgetPassFunc for more information about the function itself. 
  **/
 void
 tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func)
@@ -218,6 +215,7 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
  *
  * You need to set this property before you can start using the account.
  * 
+ * Also see #TnyGetPassFunc for more information about the function itself. 
  **/
 void
 tny_account_iface_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_func)
