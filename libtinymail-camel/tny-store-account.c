@@ -110,7 +110,10 @@ tny_store_account_reconnect (TnyAccount *self)
 			report_error (priv);
 	}
 
-	if (G_LIKELY (priv->service) && G_UNLIKELY (priv->pass_func_set) 
+	if (
+			G_LIKELY (priv->service) 
+		&& G_UNLIKELY (priv->pass_func_set)
+		&& G_UNLIKELY (priv->forget_pass_func_set) 
 		&& G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->user) 
 		&& G_UNLIKELY (priv->host))
 	{
@@ -119,6 +122,11 @@ tny_store_account_reconnect (TnyAccount *self)
 
 		if (camel_exception_is_set (priv->ex))
 		{
+			/*
+			TnyForgetPassFunc func = tny_account_iface_get_forget_pass_func (TNY_ACCOUNT_IFACE (self));
+			func (TNY_ACCOUNT_IFACE (self));
+			*/
+
 			g_warning (_("Not connected with %s: %s\n"), priv->url_string,
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
