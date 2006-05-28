@@ -21,19 +21,36 @@
 
 #include <tny-platform-factory-iface.h>
 
-
+/**
+ * tny_platform_factory_iface_new_account_store:
+ * @self: a TnyPlatformFactoryIface object
+ *
+ * Return value: a #TnyAccountStoreIface instance
+ **/
 TnyAccountStoreIface*
 tny_platform_factory_iface_new_account_store (TnyPlatformFactoryIface *self)
 {
 	return TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_account_store_func (self);
 }
 
+/**
+ * tny_platform_factory_iface_new_device:
+ * @self: a TnyPlatformFactoryIface object
+ *
+ * Return value: a #TnyDeviceIface instance
+ **/
 TnyDeviceIface*
 tny_platform_factory_iface_new_device (TnyPlatformFactoryIface *self)
 {
 	return TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_device_func (self);
 }
 
+/**
+ * tny_platform_factory_iface_new_msg_view:
+ * @self: a TnyPlatformFactoryIface object
+ *
+ * Return value: a #TnyMsgViewIface instance
+ **/
 TnyMsgViewIface*
 tny_platform_factory_iface_new_msg_view (TnyPlatformFactoryIface *self)
 {

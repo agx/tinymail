@@ -201,6 +201,7 @@ tny_msg_mime_part_iface_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIf
  * tny_msg_mime_part_iface_construct_from_stream:
  * @self: a #TnyMsgMimePartIface object
  * @stream: a #TnyMsgStreamIface stream
+ * @type: the type like text/plain
  * 
  * Set the stream from which the message part will read its content
  *

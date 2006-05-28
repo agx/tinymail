@@ -69,7 +69,7 @@ tny_password_dialog_get_password (TnyPasswordDialog *self)
 }
 
 /**
- * tny_summary_window_new:
+ * tny_password_dialog_new:
  * 
  *
  * Return value: A new #TnyPasswordDialog instance implemented for Gtk+

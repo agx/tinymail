@@ -135,7 +135,8 @@ tny_account_store_iface_base_init (gpointer g_class)
 /**
  * TnyAccountStoreIface::account_changed:
  * @self: the object on which the signal is emitted
- * @account: the #TnyAccountIface of the account that changed
+ * @arg1: the #TnyAccountIface of the account that changed
+ * @user_data: user data set when the signal handler was connected
  *
  * Emitted when an account in the store changed
  */
@@ -151,7 +152,8 @@ tny_account_store_iface_base_init (gpointer g_class)
 /**
  * TnyAccountStoreIface::account_inserted:
  * @self: the object on which the signal is emitted
- * @account: the #TnyAccountIface of the account that got inserted
+ * @arg1: the #TnyAccountIface of the account that got inserted
+ * @user_data: user data set when the signal handler was connected.
  *
  * Emitted when an account is added to the store
  */
@@ -169,7 +171,8 @@ tny_account_store_iface_base_init (gpointer g_class)
 /**
  * TnyAccountStoreIface::account_removed:
  * @self: the object on which the signal is emitted
- * @account: the #TnyAccountIface of the account that got removed
+ * @arg1: the #TnyAccountIface of the account that got removed
+ * @user_data: user data set when the signal handler was connected.
  *
  * Emitted when an account is removed from the store
  */

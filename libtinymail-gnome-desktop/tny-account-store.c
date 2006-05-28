@@ -560,10 +560,10 @@ tny_account_store_get_device (TnyAccountStoreIface *self)
 }
 
 /**
- * tny_account_store_get_instance:
+ * tny_account_store_new:
  *
  *
- * Return value: The #TnyAccountStoreIface singleton instance
+ * Return value: A new #TnyAccountStoreIface instance
  **/
 TnyAccountStore*
 tny_account_store_new (void)
@@ -625,6 +625,13 @@ tny_account_store_finalize (GObject *object)
 	return;
 }
 
+
+/**
+ * tny_account_store_get_session:
+ * @self: The #TnyAccountStore instance
+ *
+ * Return value: A #TnySessionCamel instance
+ **/
 TnySessionCamel*
 tny_account_store_get_session (TnyAccountStore *self)
 {

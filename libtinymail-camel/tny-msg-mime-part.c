@@ -328,7 +328,13 @@ tny_msg_mime_part_content_type_is (TnyMsgMimePartIface *self, const gchar *type)
 	return retval;
 }
 
-
+/**
+ * tny_msg_mime_part_set_part:
+ * @self: The #TnyMsgMimePart instance
+ * @part: The #CamelMimePart instance
+ *
+ *
+ **/
 void
 tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 {
@@ -349,6 +355,12 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 	return;
 }
 
+/**
+ * tny_msg_mime_part_get_part:
+ * @self: The #TnyMsgMimePart instance
+ *
+ * Return value: The #CamelMimePart instance
+ **/
 CamelMimePart*
 tny_msg_mime_part_get_part (TnyMsgMimePart *self)
 {

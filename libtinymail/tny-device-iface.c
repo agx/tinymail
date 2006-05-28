@@ -43,7 +43,8 @@ tny_device_iface_base_init (gpointer g_class)
 /**
  * TnyDeviceIface::connection_changed:
  * @self: the object on which the signal is emitted
- * @online: Whether or not the device is now online
+ * @arg1: Whether or not the device is now online
+ * @user_data: user data set when the signal handler was connected.
  *
  * Emitted when the connection status of a device changes.
  */

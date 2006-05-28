@@ -118,7 +118,7 @@ tny_stream_iface_eos   (TnyStreamIface *self)
 }
 
 /**
- * tny_stream_iface_eos:
+ * tny_stream_iface_reset:
  * @self: a #TnyStreamIface object
  * 
  * Resets the stream. That is, put it in a state where it can be read from 

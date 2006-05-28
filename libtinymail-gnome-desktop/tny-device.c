@@ -86,10 +86,9 @@ tny_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 
 /**
- * tny_device_get_instance:
+ * tny_device_new:
  *
- *
- * Return value: The #TnyDeviceIface singleton instance
+ * Return value: A new #TnyDeviceIface instance
  **/
 TnyDevice*
 tny_device_new (void)

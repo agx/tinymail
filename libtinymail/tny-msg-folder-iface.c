@@ -286,6 +286,7 @@ tny_msg_folder_iface_base_init (gpointer g_class)
 /**
  * TnyMsgFolderIface::folder_inserted:
  * @self: the object on which the signal is emitted
+ * @arg1: The folder that got inserted
  * @folder: the #TnyMsgFolderIface as the added folder
  *
  * Emitted when a folder gets added to the folder

@@ -274,7 +274,7 @@ tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 }
 
 /**
- * tny_mozembed_msg_view_new:
+ * tny_moz_embed_msg_view_new:
  * @save_strategy: The save strategy to use
  *
  * Return value: a new #TnyMsgViewIface instance implemented for Gtk+

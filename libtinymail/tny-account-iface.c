@@ -208,13 +208,13 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
 	return;
 }
 
+
 /**
  * tny_account_iface_set_pass_func:
  * @self: a #TnyAccountIface object
  * @get_pass_func: a pointer to the function
  * 
  * Set the function that will be called when the password is needed.
- * The function must resturn a newly allocated string with the password.
  *
  * You need to set this property before you can start using the account.
  * 

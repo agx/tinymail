@@ -94,6 +94,12 @@ unload_msg_header (TnyMsgHeader *self)
 	return;
 }
 
+/**
+ * tny_msg_header_set_use_summary:
+ * @self: The #TnyMsgHeader instance
+ * @val: Whether or not to use summary capabilities
+ *
+ **/
 void 
 tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val)
 {

@@ -51,7 +51,7 @@ struct _TnyDeviceClass
 
 GType tny_device_get_type (void);
 
-TnyDevice* tny_device_get_new (void);
+TnyDevice* tny_device_new (void);
 
 G_END_DECLS
 

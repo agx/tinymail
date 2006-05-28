@@ -97,6 +97,13 @@ TnyMsgHeaderProxy
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_device_get_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_folder_proxy_new ##### -->
 <para>
 
