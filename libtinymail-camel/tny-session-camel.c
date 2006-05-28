@@ -257,8 +257,9 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 			g_free (prmpt);
 	}
 
-	if (G_UNLIKELY (cancel))
-		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "");
+	if (cancel)
+		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
+			_("You cancelled when you had to enter a password"));
 
 	return retval;
 }

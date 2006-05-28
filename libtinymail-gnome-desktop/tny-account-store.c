@@ -42,6 +42,10 @@
 #include <tny-device-iface.h>
 #include <tny-device.h>
 
+#ifdef GNOME
+#include <libgnomeui/gnome-password-dialog.h>
+#endif
+
 /* "GConf vs. Camel" account implementation */
 
 static GObjectClass *parent_class = NULL;
@@ -127,6 +131,36 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 
 	if (G_UNLIKELY (!retval))
 	{
+#ifdef GNOME
+		gboolean canc = FALSE;
+
+		GnomePasswordDialog *dialog = GNOME_PASSWORD_DIALOG 
+				(gnome_password_dialog_new
+					(_("Enter password"), prompt,
+					tny_account_iface_get_user (account), 
+					NULL, TRUE));
+
+		gnome_password_dialog_set_domain (dialog, domain);
+		gnome_password_dialog_set_remember (dialog, 
+			GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER);
+		gnome_password_dialog_set_readonly_username (dialog, TRUE);
+		gnome_password_dialog_set_username (dialog, 
+			tny_account_iface_get_user (account));
+
+		gnome_password_dialog_set_show_username (dialog, FALSE);
+		gnome_password_dialog_set_show_remember (dialog, TRUE);
+		gnome_password_dialog_set_show_domain (dialog, FALSE);
+
+		canc = gnome_password_dialog_run_and_block (dialog);
+
+		if (canc)
+			retval = gnome_password_dialog_get_password (dialog);
+
+		*cancel = (!canc);
+
+		/* I don't have to do this?? */
+		/* g_object_unref (G_OBJECT (dialog)); */
+#else
 		/* This crashes on subsequent calls (any gtk widget creation does) */
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
@@ -152,8 +186,12 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 
 		gtk_widget_destroy (GTK_WIDGET (dialog));
 
+#endif
+
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
+	} else {
+		*cancel = FALSE;
 	}
 
 	return retval;

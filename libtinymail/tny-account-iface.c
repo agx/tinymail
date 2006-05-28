@@ -114,17 +114,18 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
 /**
  * tny_account_iface_set_forget_pass_func:
  * @self: a #TnyAccountIface object
- * 
- * Set the password that will be called when the password is no longer needed.
+ * @forget_pass_func: a pointer to the function
+ *
+ * Set the function that will be called when the password is no longer needed.
  *
  * You need to set this property before you can start using the account.
  * 
  * Also see #TnyForgetPassFunc for more information about the function itself. 
  **/
 void
-tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func)
+tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc forget_pass_func)
 {
-	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_forget_pass_func_func (self, get_forget_pass_func);
+	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_forget_pass_func_func (self, forget_pass_func);
 	return;
 }
 
