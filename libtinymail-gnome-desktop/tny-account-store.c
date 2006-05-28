@@ -17,8 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* TODO: Refactor this type to a libtinymail-emerge */
 #include <config.h>
+#include <glib/gi18n-lib.h>
 
 #include <string.h>
 #include <glib.h>
@@ -113,11 +113,26 @@ destroy_current_accounts (TnyAccountStorePriv *priv)
 	return;
 }
 
+
 static gchar* 
-per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
+per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const gchar *prompt, const gchar *item)
 {
 	gchar *retval = NULL;
-	const gchar *accountid = tny_account_iface_get_id (account);
+	const gchar *accountid;
+	gchar *prmpt = (gchar*)prompt;
+	gboolean freeit=FALSE;
+
+	if (!account)
+		return;
+
+	if (!prmpt)
+	{
+		prmpt = g_strdup_printf (_("Enter password for %s"), 
+			tny_account_iface_get_name (account));
+		freeit=TRUE;
+	}
+
+	accountid = tny_account_iface_get_id (account);
 
 	if (G_UNLIKELY (!passwords))
 		passwords = g_hash_table_new (g_str_hash, g_str_equal);
@@ -126,10 +141,10 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
 
 	if (G_UNLIKELY (!retval))
 	{
+		/* This crashes on subsequent calls (any gtk widget creation does) */
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
-		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog),
-			prompt);
+		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prmpt);
 
 		if (G_LIKELY (gtk_dialog_run (dialog) == GTK_RESPONSE_OK))
 		{
@@ -143,14 +158,24 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt)
 		}
 
 		gtk_widget_destroy (GTK_WIDGET (dialog));
+
+		while (gtk_events_pending ())
+			gtk_main_iteration ();
 	}
+
+	if (freeit)
+		g_free (prmpt);
 
 	return retval;
 }
 
 static void
-per_account_forget_pass_func (TnyAccountIface *account)
+per_account_forget_pass_func (TnyAccountIface *account, const gchar *domain, const gchar *item)
 {
+	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyGetPassFunc func;
+
 	if (G_LIKELY (passwords))
 	{
 		const gchar *accountid = tny_account_iface_get_id (account);
@@ -163,6 +188,7 @@ per_account_forget_pass_func (TnyAccountIface *account)
 			g_free (pwd);
 			g_hash_table_remove (passwords, accountid);
 		}
+
 	}
 
 	return;
@@ -383,6 +409,9 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 		 * Setting the password function must happen after
 		 * setting the host, user and protocol.
 		 */
+
+		tny_account_iface_set_forget_pass_func (TNY_ACCOUNT_IFACE (account),
+			per_account_forget_pass_func);
 
 		tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
 			per_account_get_pass_func);

@@ -211,7 +211,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	{
 		PrivPassFunc *pf = copy->data;
 
-		if (G_UNLIKELY (pf->service == service))
+		if (G_UNLIKELY (pf->service == service) && pf->account)
 		{
 			found = TRUE;
 			func = pf->func;
@@ -223,9 +223,9 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	}
 
 	if (G_LIKELY (found))
-		retval = func (account, prompt);
+		retval = func (account, domain, prompt, item);
 
-	if (G_UNLIKELY (!retval))
+	if (G_UNLIKELY (!retval) || !strcmp (retval, ""))
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "");
 
 
@@ -244,19 +244,18 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	{
 		PrivForgetPassFunc *pf = copy->data;
 
-		if (G_UNLIKELY (pf->service == service))
+		if (G_UNLIKELY (pf->service == service) && pf->account)
 		{
 			found = TRUE;
 			func = pf->func;
 			account = pf->account;
 			break;
 		}
-
 		copy = g_list_next (copy);
 	}
 
 	if (G_LIKELY (found))
-		func (account);
+		func (account, domain, item);
 
 	return;
 }
