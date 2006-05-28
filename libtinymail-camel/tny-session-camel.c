@@ -68,6 +68,9 @@ typedef struct
 
 } PrivForgetPassFunc;
 
+static void
+tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex);
+
 /**
  * tny_session_camel_set_forget_pass_func:
  * @self: a #TnySessionCamel object
@@ -230,6 +233,9 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 			prmpt = g_strdup_printf (_("Enter password for %s"), 
 				tny_account_iface_get_name (account));
 		}
+
+		if (prompt && strstr (prompt, "Unable to connect to POP server")!= NULL)
+			tny_session_camel_forget_password (session, service, domain, item, ex);
 
 		retval = func (account, prompt, &cancel);
 
