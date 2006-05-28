@@ -75,10 +75,6 @@ TnyMsgHeaderProxy
 </para>
 
 
-<!-- ##### SIGNAL TnyAccountStoreIface::account-changed ##### -->
-
-
-
 <!-- ##### STRUCT TnyMsgFolderProxy ##### -->
 <para>
 
@@ -86,6 +82,13 @@ TnyMsgHeaderProxy
 
 @parent: 
 @real: 
+
+<!-- ##### FUNCTION tny_account_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 <!-- ##### FUNCTION tny_account_store_get_instance ##### -->
 <para>

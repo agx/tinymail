@@ -181,6 +181,15 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_msg_header_iface_get_flags ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_msg_header_iface_set_folder ##### -->
 <para>
 
@@ -188,6 +197,24 @@ by a summary view to give the user an overview of the available messages in a fo
 
 @self: 
 @folder: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_flags ##### -->
+<para>
+
+</para>
+
+@self: 
+@mask: 
+
+
+<!-- ##### FUNCTION tny_msg_header_iface_unset_flags ##### -->
+<para>
+
+</para>
+
+@self: 
+@mask: 
 
 
 <!-- ##### FUNCTION tny_msg_header_iface_uncache ##### -->

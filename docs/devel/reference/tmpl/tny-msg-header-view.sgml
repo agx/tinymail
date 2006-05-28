@@ -10,12 +10,10 @@ A implementation of #TnyMsgHeaderViewIface that inherits the
 GtkTable.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMsgHeaderViewIface, #GtkTable, #TnyMsgHeaderIface
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

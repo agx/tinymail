@@ -25,7 +25,6 @@ instance which you used to construct this type with.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_moz_embed_stream_new ##### -->
 <para>

@@ -22,7 +22,6 @@ A #TnyStreamIface implementation that adapts a #GtkTextBuffer.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_text_buffer_stream_new ##### -->
 <para>

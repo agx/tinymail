@@ -27,7 +27,6 @@ This type is coupled with the #TnyTextBufferStream.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_msg_view_new ##### -->
 <para>

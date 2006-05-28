@@ -26,7 +26,6 @@ future (as I'm not yet sure whether this is the best thing to do).
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_fs_stream_new ##### -->
 <para>

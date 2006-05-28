@@ -43,6 +43,21 @@ Shared include file with forward typedefs
 </para>
 
 
+<!-- ##### SIGNAL TnyMsgFolderIface::folder-inserted ##### -->
+<para>
+
+</para>
+
+@tnymsgfolderiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyMsgFolderIface::folders-reloaded ##### -->
+<para>
+
+</para>
+
+@tnymsgfolderiface: the object which received the signal.
+
 <!-- ##### STRUCT TnyMsgFolderIfaceClass ##### -->
 <para>
 
@@ -102,6 +117,9 @@ Shared include file with forward typedefs
 @set_folder_func: 
 @uncache_func: 
 @has_cache_func: 
+@get_flags_func: 
+@set_flags_func: 
+@unset_flags_func: 
 
 <!-- ##### STRUCT TnyMsgMimePartIface ##### -->
 <para>
@@ -146,17 +164,21 @@ Shared include file with forward typedefs
 @parent: 
 @is_connected_func: 
 @set_id_func: 
+@set_name_func: 
 @set_proto_func: 
 @set_user_func: 
 @set_hostname_func: 
+@set_url_string_func: 
 @set_pass_func_func: 
 @set_forget_pass_func_func: 
 @get_pass_func_func: 
 @get_forget_pass_func_func: 
 @get_id_func: 
+@get_name_func: 
 @get_proto_func: 
 @get_user_func: 
 @get_hostname_func: 
+@get_url_string_func: 
 @set_account_store_func: 
 @get_account_store_func: 
 
@@ -165,6 +187,14 @@ Shared include file with forward typedefs
 
 </para>
 
+
+<!-- ##### SIGNAL TnyDeviceIface::connection-changed ##### -->
+<para>
+
+</para>
+
+@tnydeviceiface: the object which received the signal.
+@arg1: 
 
 <!-- ##### STRUCT TnyDeviceIfaceClass ##### -->
 <para>
@@ -209,6 +239,35 @@ Shared include file with forward typedefs
 
 </para>
 
+
+<!-- ##### SIGNAL TnyAccountStoreIface::account-changed ##### -->
+
+
+@tnyaccountstoreiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStoreIface::account-inserted ##### -->
+<para>
+
+</para>
+
+@tnyaccountstoreiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStoreIface::account-removed ##### -->
+<para>
+
+</para>
+
+@tnyaccountstoreiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStoreIface::accounts-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyaccountstoreiface: the object which received the signal.
 
 <!-- ##### STRUCT TnyStreamIface ##### -->
 <para>
@@ -261,46 +320,58 @@ Shared include file with forward typedefs
 
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
-
+A type used for callback functions that implement asking and the user for a password or other authentication data of an account.
+</para>
+<para>
+It's typically implemented to use a key service, like GNOME key ring. This of course depends on the platform. The function
+is typically implemented in the #TnyAccountStoreIface implementation and shared between all accounts in the store.
 </para>
 
-@self: 
-@prompt: 
-@Returns: 
+@self: The #TnyAccountIface instance for which the password is going to be used
+@domain: Domain of the password request
+@prompt: Prompt to provide to the user
+@item: An identifier for the information
+@cancel: A byref gboolean variable. If the used cancelled the request, set this to TRUE
+@Returns: A newly allocated string with the authentication information (the password)
 
 
 <!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
 <para>
-
+This function is used to tell the application that the authentication information it provided via #TnyGetPassFunc was rejected by the service.
+</para>
+<para>
+It can typically be used to tell a key service, like GNOME key ring, to forget the authentication information. This way will a new request for the password typically result in asking to user to type new authentication information.
 </para>
 
-@self: 
+@self:  The #TnyAccountIface instance of which the password was not accepted
+@domain: Domain of the password request
+@item: An identifier for the information
 
 
 <!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
 <para>
-
+A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
 </para>
 
-@self: 
-@cancelled: 
-@user_data: 
+@self: The #TnyMsgFolderIface
+@cancelled: Whether or not a cancellation occured.
+@user_data: user data
 
 
 <!-- ##### USER_FUNCTION TnyGetHeadersStatusCallback ##### -->
 <para>
-
+A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
 </para>
 
-@self: 
-@what: 
-@status: 
-@user_data: 
+@self: The #TnyMsgFolderIface
+@what: What happened
+@status: A status field
+@user_data: user data
 
 
 <!-- ##### MACRO G_LIKELY ##### -->
 <para>
-
+Implemented by GLib or a noop
 </para>
 
 @expr: 
@@ -308,7 +379,7 @@ Shared include file with forward typedefs
 
 <!-- ##### MACRO G_UNLIKELY ##### -->
 <para>
-
+Implemented by GLib or a noop
 </para>
 
 @expr: 

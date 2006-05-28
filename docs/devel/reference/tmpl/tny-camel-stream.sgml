@@ -58,7 +58,7 @@ to a #CamelStream.
 @parent: 
 @stream: 
 
-<!-- ##### FUNCTION tny_account_get_type ##### -->
+<!-- ##### FUNCTION tny_camel_stream_get_type ##### -->
 <para>
 
 </para>

@@ -35,6 +35,15 @@ A abstract type that contains the shared functionality of the #TnyStoreAccountIf
 @id: 
 
 
+<!-- ##### FUNCTION tny_account_iface_set_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+
+
 <!-- ##### FUNCTION tny_account_iface_set_proto ##### -->
 <para>
 
@@ -71,7 +80,25 @@ A abstract type that contains the shared functionality of the #TnyStoreAccountIf
 @get_pass_func: 
 
 
+<!-- ##### FUNCTION tny_account_iface_set_url_string ##### -->
+<para>
+
+</para>
+
+@self: 
+@url_string: 
+
+
 <!-- ##### FUNCTION tny_account_iface_get_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_name ##### -->
 <para>
 
 </para>
@@ -99,6 +126,15 @@ A abstract type that contains the shared functionality of the #TnyStoreAccountIf
 
 
 <!-- ##### FUNCTION tny_account_iface_get_hostname ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_iface_get_url_string ##### -->
 <para>
 
 </para>

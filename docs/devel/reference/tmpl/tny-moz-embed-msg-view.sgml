@@ -31,7 +31,6 @@ to use the #TnySaveStrategy implementation in libtinymailui-gtk.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_moz_embed_msg_view_new ##### -->
 <para>

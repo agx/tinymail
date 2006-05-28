@@ -22,7 +22,6 @@ A transport account type implemented for camel.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_transport_account_new ##### -->
 <para>

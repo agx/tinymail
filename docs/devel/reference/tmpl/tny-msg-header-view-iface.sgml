@@ -9,12 +9,10 @@ A type for showing a #TnyMsgHeaderIface
 A type for showing a #TnyMsgHeaderIface to the user
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMsgHeaderIface
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

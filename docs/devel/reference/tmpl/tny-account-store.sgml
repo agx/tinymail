@@ -22,7 +22,6 @@ An implementation of #TnyAccountStoreIface that uses Camel and GConf. This imple
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_account_store_new ##### -->
 <para>

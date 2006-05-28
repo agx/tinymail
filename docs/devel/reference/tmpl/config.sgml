@@ -9,14 +9,40 @@ config
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
-
 <!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO ENABLE_NLS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GETTEXT_PACKAGE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO HAVE_BIND_TEXTDOMAIN_CODESET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO HAVE_DCGETTEXT ##### -->
+<para>
+
+</para>
+
 
 
 <!-- ##### MACRO HAVE_DLFCN_H ##### -->
@@ -26,7 +52,28 @@ config
 
 
 
+<!-- ##### MACRO HAVE_GETTEXT ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### MACRO HAVE_INTTYPES_H ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO HAVE_LC_MESSAGES ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO HAVE_LOCALE_H ##### -->
 <para>
 
 </para>
@@ -132,6 +179,13 @@ config
 
 
 <!-- ##### MACRO STDC_HEADERS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_LOCALE_DIR ##### -->
 <para>
 
 </para>

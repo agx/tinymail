@@ -2,8 +2,7 @@
 TnyPlatformFactoryIface
 
 <!-- ##### SECTION Short_Description ##### -->
-A factory that returns implementations for a platform	
-
+A factory that returns implementations for a platform
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

@@ -22,7 +22,6 @@ A type that adapts a #GnomeVFSHandle to a #TnyStreamIface
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_vfs_stream_new ##### -->
 <para>

@@ -23,7 +23,6 @@ A factory that returns specific implementations for a specific platform. Like th
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
 <para>

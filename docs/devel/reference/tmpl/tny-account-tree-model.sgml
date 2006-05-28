@@ -35,7 +35,6 @@ account-folders as the child rows.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_account_tree_model_new ##### -->
 <para>
