@@ -328,9 +328,7 @@ is typically implemented in the #TnyAccountStoreIface implementation and shared 
 </para>
 
 @self: The #TnyAccountIface instance for which the password is going to be used
-@domain: Domain of the password request
 @prompt: Prompt to provide to the user
-@item: An identifier for the information
 @cancel: A byref gboolean variable. If the user cancelled the request, set this to TRUE
 @Returns: A newly allocated string with the authentication information (the password)
 
@@ -344,8 +342,6 @@ It can typically be used to tell a key service, like GNOME key ring, to forget t
 </para>
 
 @self:  The #TnyAccountIface instance of which the password was not accepted
-@domain: Domain of the password request
-@item: An identifier for the information
 
 
 <!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->

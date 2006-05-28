@@ -44,6 +44,7 @@
 
 #ifdef GNOME
 #include <libgnomeui/gnome-password-dialog.h>
+#include <gnome-keyring.h>
 #endif
 
 /* "GConf vs. Camel" account implementation */
@@ -117,9 +118,87 @@ destroy_current_accounts (TnyAccountStorePriv *priv)
 	return;
 }
 
-
+#ifdef GNOME
 static gchar* 
-per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const gchar *prompt, const gchar *item, gboolean *cancel)
+per_account_get_pass_func_keyring (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
+{
+	gchar *retval = NULL;
+	const gchar *accountid = tny_account_iface_get_id (account);
+	GList *list;
+	GnomeKeyringResult keyringret;
+	gchar *keyring;
+
+	gnome_keyring_get_default_keyring_sync (&keyring);
+
+	keyringret = gnome_keyring_find_network_password_sync (
+		tny_account_iface_get_user (account),
+		"Mail", tny_account_iface_get_hostname (account),
+		"password", tny_account_iface_get_proto (account), 
+		"PLAIN", 0, &list);
+
+	if (keyringret != GNOME_KEYRING_RESULT_OK)
+	{
+		gboolean canc = FALSE;
+
+		GnomePasswordDialog *dialog = GNOME_PASSWORD_DIALOG 
+				(gnome_password_dialog_new
+					(_("Enter password"), prompt,
+					tny_account_iface_get_user (account), 
+					NULL, TRUE));
+
+		gnome_password_dialog_set_domain (dialog, "Mail");
+		gnome_password_dialog_set_remember (dialog, 
+			GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER);
+		gnome_password_dialog_set_readonly_username (dialog, TRUE);
+		gnome_password_dialog_set_username (dialog, 
+			tny_account_iface_get_user (account));
+
+		gnome_password_dialog_set_show_username (dialog, FALSE);
+		gnome_password_dialog_set_show_remember (dialog, 
+			gnome_keyring_is_available ());
+		gnome_password_dialog_set_show_domain (dialog, FALSE);
+
+		canc = gnome_password_dialog_run_and_block (dialog);
+
+		if (canc)
+		{
+			guint32 item_id;
+
+			retval = gnome_password_dialog_get_password (dialog);
+
+			gnome_keyring_set_network_password_sync (keyring,
+				tny_account_iface_get_user (account),
+				"Mail", tny_account_iface_get_hostname (account),
+				"password", tny_account_iface_get_proto (account), 
+				"PLAIN", 0, retval, &item_id);
+		}
+
+		*cancel = (!canc);
+
+		/* I don't have to do this?? */
+		/* g_object_unref (G_OBJECT (dialog)); */
+
+		while (gtk_events_pending ())
+			gtk_main_iteration ();
+	} else {
+
+		GnomeKeyringNetworkPasswordData *pwd_data;
+		pwd_data = list->data;
+		retval = g_strdup (pwd_data->password);
+
+		*cancel = FALSE;
+	}
+
+	/* this crashes :-), fokking keyring API !!!!
+	gnome_keyring_network_password_list_free (list); */
+
+	return retval;
+}
+#endif
+
+#ifndef GNOME
+static gchar* 
+per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
 	const gchar *accountid = tny_account_iface_get_id (account);
@@ -131,36 +210,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 
 	if (G_UNLIKELY (!retval))
 	{
-#ifdef GNOME
-		gboolean canc = FALSE;
-
-		GnomePasswordDialog *dialog = GNOME_PASSWORD_DIALOG 
-				(gnome_password_dialog_new
-					(_("Enter password"), prompt,
-					tny_account_iface_get_user (account), 
-					NULL, TRUE));
-
-		gnome_password_dialog_set_domain (dialog, domain);
-		gnome_password_dialog_set_remember (dialog, 
-			GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER);
-		gnome_password_dialog_set_readonly_username (dialog, TRUE);
-		gnome_password_dialog_set_username (dialog, 
-			tny_account_iface_get_user (account));
-
-		gnome_password_dialog_set_show_username (dialog, FALSE);
-		gnome_password_dialog_set_show_remember (dialog, TRUE);
-		gnome_password_dialog_set_show_domain (dialog, FALSE);
-
-		canc = gnome_password_dialog_run_and_block (dialog);
-
-		if (canc)
-			retval = gnome_password_dialog_get_password (dialog);
-
-		*cancel = (!canc);
-
-		/* I don't have to do this?? */
-		/* g_object_unref (G_OBJECT (dialog)); */
-#else
 		/* This crashes on subsequent calls (any gtk widget creation does) */
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
@@ -186,8 +235,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 
 		gtk_widget_destroy (GTK_WIDGET (dialog));
 
-#endif
-
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
 	} else {
@@ -196,13 +243,36 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *domain, const 
 
 	return retval;
 }
+#endif
 
 static void
-per_account_forget_pass_func (TnyAccountIface *account, const gchar *domain, const gchar *item)
+per_account_forget_pass_func (TnyAccountIface *account)
 {
 	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyGetPassFunc func;
+
+#ifdef GNOME
+	GList *list=NULL;
+	GnomeKeyringResult keyringret;
+	gchar *keyring;
+	GnomeKeyringNetworkPasswordData *pwd_data;
+
+	gnome_keyring_get_default_keyring_sync (&keyring);
+
+	keyringret = gnome_keyring_find_network_password_sync (
+		tny_account_iface_get_user (account),
+		"Mail", tny_account_iface_get_hostname (account),
+		"password", tny_account_iface_get_proto (account), 
+		"PLAIN", 0, &list);
+
+	if (keyringret == GNOME_KEYRING_RESULT_OK)
+	{
+		pwd_data = list->data;
+		gnome_keyring_item_delete_sync (keyring, pwd_data->item_id);
+	}
+
+#else
 
 	if (G_LIKELY (passwords))
 	{
@@ -218,6 +288,8 @@ per_account_forget_pass_func (TnyAccountIface *account, const gchar *domain, con
 		}
 
 	}
+
+#endif
 
 	return;
 }
@@ -442,7 +514,12 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 			per_account_forget_pass_func);
 
 		tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
+#ifdef GNOME
+			per_account_get_pass_func_keyring);
+#else
 			per_account_get_pass_func);
+#endif
+
 	}
 
 	return;

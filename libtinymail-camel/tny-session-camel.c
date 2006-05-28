@@ -204,10 +204,8 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	GList *copy = password_funcs;
 	TnyGetPassFunc func;
 	TnyAccountIface *account;
-	gboolean found = FALSE, freedom = FALSE, freeit = FALSE, 
-		freeprmpt = FALSE, cancel = FALSE;
-	gchar *retval = NULL;
-	gchar *dom = (gchar*)domain, *it = (gchar*)item, *prmpt = (gchar*)prompt;
+	gboolean found = FALSE, freeprmpt = FALSE, cancel = FALSE;
+	gchar *retval = NULL, *prmpt = (gchar*)prompt;
 
 	while (G_LIKELY (copy))
 	{
@@ -233,25 +231,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_account_iface_get_name (account));
 		}
 
-		if (dom == NULL) 
-		{ 
-			freedom = TRUE;
-			dom = g_strdup ("Mail"); 
-		}
-
-		if (it == NULL) 
-		{ 
-			freeit = TRUE; 
-			it = g_strdup_printf ("%s", tny_account_iface_get_id (account));
-		}
-
-		retval = func (account, domain, prompt, item, &cancel);
-
-		if (freeit)
-			g_free (it);
-
-		if (freedom) 
-			g_free (dom);
+		retval = func (account, prompt, &cancel);
 
 		if (freeprmpt)
 			g_free (prmpt);
@@ -270,8 +250,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	GList *copy = forget_password_funcs;
 	TnyForgetPassFunc func;
 	TnyAccountIface *account;
-	gboolean found = FALSE, freedom = FALSE, freeit = FALSE;
-	gchar *dom = (gchar*)domain, *it = (gchar*)item;
+	gboolean found = FALSE;
 
 	while (G_LIKELY (copy))
 	{
@@ -288,28 +267,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	}
 
 	if (G_LIKELY (found))
-	{
-		if (dom == NULL) 
-		{ 
-			freedom = TRUE;
-			dom = g_strdup ("Mail"); 
-		}
-
-		if (it == NULL) 
-		{ 
-			freeit = TRUE; 
-			it = g_strdup_printf ("%s", tny_account_iface_get_id (account));
-		}
-
-		
-		func (account, (const gchar*)dom, (const gchar*)it);
-
-		if (freeit)
-			g_free (it);
-
-		if (freedom) 
-			g_free (dom);
-	}
+		func (account);
 
 	return;
 }
