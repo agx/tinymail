@@ -158,20 +158,28 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 		gnome_password_dialog_set_show_remember (dialog, 
 			gnome_keyring_is_available ());
 		gnome_password_dialog_set_show_domain (dialog, FALSE);
+		gnome_password_dialog_set_show_userpass_buttons (dialog, FALSE);
 
 		canc = gnome_password_dialog_run_and_block (dialog);
 
 		if (canc)
 		{
 			guint32 item_id;
+			GnomePasswordDialogRemember r;
 
 			retval = gnome_password_dialog_get_password (dialog);
 
-			gnome_keyring_set_network_password_sync (keyring,
-				tny_account_iface_get_user (account),
-				"Mail", tny_account_iface_get_hostname (account),
-				"password", tny_account_iface_get_proto (account), 
-				"PLAIN", 0, retval, &item_id);
+			r = gnome_password_dialog_get_remember (dialog);
+
+			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_SESSION ||
+			r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)
+			{
+				gnome_keyring_set_network_password_sync (keyring,
+					tny_account_iface_get_user (account),
+					"Mail", tny_account_iface_get_hostname (account),
+					"password", tny_account_iface_get_proto (account), 
+					"PLAIN", 0, retval, &item_id);
+			}
 		}
 
 		*cancel = (!canc);
