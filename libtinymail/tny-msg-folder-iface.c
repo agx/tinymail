@@ -25,6 +25,25 @@
 guint *tny_msg_folder_iface_signals;
 
 /**
+ * tny_msg_folder_iface_set_headers_list_type:
+ * @self: a #TnyMsgHeaderIface object
+ * @type: the list-type
+ * 
+ * Set which #TnyListIfaceClass type to use for the
+ * tny_msg_header_iface_get_headers return value
+ *
+ * If you use libtinymailui-gtk, you should probably
+ * set this to TNY_TYPE_MSG_HEADER_LIST_MODEL
+ * 
+ **/
+void 
+tny_msg_folder_iface_set_headers_list_type (TnyMsgFolderIface *self, GType type)
+{
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_headers_list_type_func (self, type);
+	return;
+}
+
+/**
  * tny_msg_folder_iface_refresh_headers_async:
  * @self: a TnyMsgFolderIface object
  * @callback: The callback handler (happens in the GMainLoop)
@@ -176,9 +195,9 @@ tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIfa
  * 
  * Get a read-only list of message header instances that are in this folder
  * 
- * Return value: A read-only GList with TnyMsgHeaderIface instances
+ * Return value: A #TnyListIface with TnyMsgHeaderIface instances
  **/
-const GList*
+TnyListIface*
 tny_msg_folder_iface_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_headers_func (self, refresh);

@@ -74,12 +74,12 @@ tny_device_is_online (TnyDeviceIface *self)
 static void 
 nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 {
-	TnyDevice *self = (TnyDevice *)user_data;
+	TnyDeviceIface *self = (TnyDeviceIface *)user_data;
 
 	if (tny_device_is_online (self))
-		tny_device_on_online (TNY_DEVICE_IFACE (self));
+		tny_device_on_online (self);
 	else
-		tny_device_on_offline (TNY_DEVICE_IFACE (self));
+		tny_device_on_offline (self);
 
 	return;
 }

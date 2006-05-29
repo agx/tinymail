@@ -241,8 +241,24 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
 		GtkTreeModel *header_model, *sortable;
 		GtkTreeModel *select_model;
+		TnyListIface *headers = NULL;
+		TnyMsgHeaderListModel *model;
 
-		header_model = GTK_TREE_MODEL (
+		tny_msg_folder_iface_set_headers_list_type (folder, TNY_TYPE_MSG_HEADER_LIST_MODEL);
+
+#ifdef ASYNC_HEADERS
+		headers = tny_msg_folder_iface_get_headers (folder, FALSE);
+#else
+		headers = tny_msg_folder_iface_get_headers (folder, TRUE);
+#endif
+
+		model = TNY_MSG_HEADER_LIST_MODEL (headers);
+		header_model = GTK_TREE_MODEL (model);
+
+		tny_msg_header_list_model_set_folder (model, folder);
+
+/*
+		GTK_TREE_MODEL (
 			tny_msg_header_list_model_new ());
 
 #ifdef ASYNC_HEADERS
@@ -252,6 +268,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, TRUE);
 #endif
+*/
 
 		sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 
@@ -260,8 +277,8 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			GtkTreeModel *model = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (sortable));
 
-			if (G_LIKELY (model))
-				g_object_unref (G_OBJECT (model));
+			//if (G_LIKELY (model))
+			//	g_object_unref (G_OBJECT (model));
 
 			g_object_unref (G_OBJECT (sortable));
 		}

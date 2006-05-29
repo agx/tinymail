@@ -30,6 +30,7 @@
 #include <tny-msg-header.h>
 #include <tny-store-account-iface.h>
 #include <tny-store-account.h>
+#include <tny-list-iface.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
@@ -56,7 +57,7 @@ static GObjectClass *parent_class = NULL;
 
 typedef struct
 {
-	GList *list;
+	TnyListIface *list;
 	GFunc relaxed_func;
 	GMutex *lock;
 	gboolean free_lock;
@@ -70,7 +71,9 @@ tny_msg_folder_relaxed_data_destroyer (gpointer data)
 
 	g_mutex_lock (d->lock);
 
-	g_list_free (d->list);
+printf ("removed proxy obj\n");
+	g_object_unref (G_OBJECT (d->list));
+
 	d->list = NULL;
 	g_free (d);
 
@@ -87,20 +90,38 @@ static gboolean
 tny_msg_folder_relaxed_performer (gpointer data)
 {
 	RelaxedData *d = data;
-	GList *list = d->list;
+	TnyListIface *list = d->list;
+
+	if (!list)
+		return FALSE;
+
+	TnyIteratorIface *iterator = tny_list_iface_create_iterator (list);
+	GList *toremove=NULL;
+
 	gint count = 0;
 
 	g_mutex_lock (d->lock);
 
-	while (G_LIKELY ((count < 5) && list))
+	while (G_LIKELY ((count < 5) && tny_iterator_iface_has_next (iterator)))
 	{
-		GList *element = list;
-		if (G_LIKELY (element && element->data))
-			d->relaxed_func (element->data, d->priv);
-		list = g_list_remove_link (list, element);
-		g_list_free (element);
+		gpointer item = tny_iterator_iface_next (iterator);
+
+		if (G_LIKELY (item))
+			d->relaxed_func (item, d->priv);
+
+		toremove = g_list_prepend (toremove, item);
+
 		count++;
 	}
+	g_object_unref (G_OBJECT (iterator));
+
+	while (toremove)
+	{ printf ("rem\n");
+		tny_list_iface_remove (list, toremove->data);
+		toremove = g_list_next (toremove);
+	}
+printf ("-\n");
+	
 
 	d->list = list;
 
@@ -134,7 +155,7 @@ tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
 		d->lock = priv->cached_hdrs_lock;
 
 		g_mutex_lock (priv->cached_hdrs_lock);
-		d->list = g_list_copy (priv->cached_hdrs);
+		d->list = tny_list_iface_copy (priv->cached_hdrs);
 		g_mutex_unlock (priv->cached_hdrs_lock);
 
 		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
@@ -414,7 +435,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	g_mutex_lock (priv->cached_hdrs_lock);
 
-	priv->cached_hdrs = g_list_prepend (priv->cached_hdrs, header);
+	tny_list_iface_prepend (priv->cached_hdrs, header);
 	priv->cached_length++;
 	/* TODO: If unread -- priv->unread_length++; */
 
@@ -553,8 +574,11 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
-	g_list_foreach (priv->cached_hdrs, destroy_header, NULL);
-	g_list_free (priv->cached_hdrs);
+	if (priv->cached_hdrs)
+	{
+		tny_list_iface_foreach (priv->cached_hdrs, destroy_header, NULL);
+		g_object_unref (G_OBJECT (priv->cached_hdrs));
+	}
 	priv->cached_hdrs = NULL;
 
 	g_mutex_unlock (priv->folder_lock);
@@ -590,25 +614,27 @@ tny_msg_folder_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCall
 	return;
 }
 
-static const GList*
+static TnyListIface*
 tny_msg_folder_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
 	g_mutex_lock (priv->folder_lock);
-
+	
 	load_folder_no_lock (priv);
 
 	g_mutex_lock (priv->cached_hdrs_lock);
 
 	if (G_UNLIKELY (!priv->cached_hdrs))
 	{
+
 		GPtrArray *uids = NULL;
 		CamelException ex;
 		FldAndPriv *ptr = NULL;
 
 		priv->cached_length = 0;
-		priv->cached_hdrs = NULL;
+		priv->cached_hdrs = g_object_new (priv->headers_list_type, NULL);
+
 		g_mutex_unlock (priv->cached_hdrs_lock);
 
 		ptr = g_new (FldAndPriv, 1);
@@ -917,6 +943,7 @@ tny_msg_folder_finalize (GObject *object)
 	}
 
 	tny_msg_folder_hdr_cache_remover (priv);
+	priv->cached_hdrs = NULL;
 
 	g_mutex_lock (priv->cached_hdrs_lock);
 
@@ -977,11 +1004,24 @@ tny_msg_folder_has_cache (TnyMsgFolderIface *self)
 }
 
 
+void
+tny_msg_folder_set_headers_list_type (TnyMsgFolderIface *self, GType type)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+
+	if (priv->cached_hdrs)
+		tny_msg_folder_hdr_cache_remover (priv);
+
+	priv->headers_list_type = type;
+	return;
+}
+
 static void
 tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMsgFolderIfaceClass *klass = (TnyMsgFolderIfaceClass *)g_iface;
 
+	klass->set_headers_list_type_func = tny_msg_folder_set_headers_list_type;
 	klass->get_headers_func = tny_msg_folder_get_headers;
 	klass->get_message_func = tny_msg_folder_get_message;
 	klass->set_id_func = tny_msg_folder_set_id;

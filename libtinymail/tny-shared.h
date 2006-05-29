@@ -22,6 +22,10 @@
 
 G_BEGIN_DECLS
 
+typedef struct _TnyListIface TnyListIface;
+typedef struct _TnyIteratorIface TnyIteratorIface;
+typedef struct _TnyListIfaceClass TnyListIfaceClass;
+typedef struct _TnyIteratorIfaceClass TnyIteratorIfaceClass;
 typedef struct _TnyMsgIface TnyMsgIface;
 typedef struct _TnyMsgIfaceClass TnyMsgIfaceClass;
 typedef struct _TnyMsgFolderIface TnyMsgFolderIface;
