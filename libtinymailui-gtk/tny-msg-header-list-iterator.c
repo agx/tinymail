@@ -20,10 +20,10 @@
 #include <config.h>
 
 #include <tny-msg-header-list-model.h>
-#include <tny-msg-header-list-iterator.h>
 
 static GObjectClass *parent_class = NULL;
 
+#include "tny-msg-header-list-iterator-priv.h"
 #include "tny-msg-header-list-model-priv.h"
 
 GType _tny_msg_header_list_iterator_get_type (void);
@@ -40,13 +40,6 @@ struct _TnyMsgHeaderListIteratorClass
 	GObjectClass parent;
 };
 
-/**
- * tny_msg_header_list_iterator_set_model:
- * @self: a #TnyMsgHeaderListIterator instance
- * @model: The model
- *
- *
- **/
 void 
 _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
 {
@@ -75,13 +68,7 @@ _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgH
 }
 
 
-/**
- * tny_msg_header_list_iterator_new:
- * @model: The model
- *
- *
- * Return value: a new #TnyMsgHeaderListIteratorIface instance
- **/
+
 TnyMsgHeaderListIterator*
 _tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model)
 {

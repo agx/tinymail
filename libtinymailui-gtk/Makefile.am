@@ -14,24 +14,24 @@ libtinymailui_gtk_1_0_headers = 	\
 	tny-msg-view.h			\
 	tny-msg-window.h		\
 	tny-msg-header-list-model.h	\
-	tny-msg-header-list-iterator.h	\
 	tny-account-tree-model.h	\
 	tny-attach-list-model.h		\
 	tny-text-buffer-stream.h	\
 	tny-msg-header-view.h
 
-libtinymailui_gtk_1_0_la_SOURCES = 	 \
-	$(libtinymailui_gtk_1_0_headers) \
-	tny-save-strategy.c		 \
-	tny-msg-view.c			 \
-	tny-msg-window.c		 \
-	tny-msg-header-list-model-priv.h \
-	tny-msg-header-list-model.c	 \
-	tny-msg-header-list-iterator.c	 \
-	tny-account-tree-model.c	 \
-	tny-attach-list-model-priv.h	 \
-	tny-attach-list-model.c		 \
-	tny-text-buffer-stream.c	 \
+libtinymailui_gtk_1_0_la_SOURCES = 	    \
+	$(libtinymailui_gtk_1_0_headers)    \
+	tny-save-strategy.c		    \
+	tny-msg-view.c			    \
+	tny-msg-window.c		    \
+	tny-msg-header-list-model-priv.h    \
+	tny-msg-header-list-iterator-priv.h \
+	tny-msg-header-list-model.c	    \
+	tny-msg-header-list-iterator.c	    \
+	tny-account-tree-model.c	    \
+	tny-attach-list-model-priv.h	    \
+	tny-attach-list-model.c		    \
+	tny-text-buffer-stream.c	    \
 	tny-msg-header-view.c
 
 libtinymailui_gtk_1_0_la_LIBADD = 	\

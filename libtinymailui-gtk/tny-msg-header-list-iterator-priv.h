@@ -39,6 +39,9 @@ G_BEGIN_DECLS
 typedef struct _TnyMsgHeaderListIterator TnyMsgHeaderListIterator;
 typedef struct _TnyMsgHeaderListIteratorClass TnyMsgHeaderListIteratorClass;
 
+void _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model);
+TnyMsgHeaderListIterator* _tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model);
+void _tny_msg_header_list_iterator_travel_to_nth (TnyMsgHeaderListIterator *self, guint cur, guint nth);
 
 
 G_END_DECLS
