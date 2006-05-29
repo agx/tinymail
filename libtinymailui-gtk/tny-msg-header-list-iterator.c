@@ -46,7 +46,7 @@ struct _TnyMsgHeaderListIteratorClass
  *
  **/
 void 
-tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
+_tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
 {
 
 
@@ -81,11 +81,11 @@ tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHe
  * Return value: a new #TnyMsgHeaderListIteratorIface instance
  **/
 TnyMsgHeaderListIterator*
-tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model)
+_tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model)
 {
 	TnyMsgHeaderListIterator *self = g_object_new (TNY_TYPE_MSG_HEADER_LIST_ITERATOR, NULL);
 
-	tny_msg_header_list_iterator_set_model (self, model);
+	_tny_msg_header_list_iterator_set_model (self, model);
 
 	return self;
 }

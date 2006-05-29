@@ -37,6 +37,12 @@ static GObjectClass *parent_class;
 
 #include "tny-msg-header-list-model-priv.h"
 
+/* Private stuff */
+TnyMsgHeaderListIterator* _tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model);
+void _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model);
+void _tny_msg_header_list_iterator_travel_to_nth (TnyMsgHeaderListIterator *self, guint cur, guint nth);
+
+
 static guint
 tny_msg_header_list_model_get_flags (GtkTreeModel *self)
 {
@@ -413,7 +419,7 @@ tny_msg_header_list_model_create_iterator (TnyListIface *self)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 
-	return TNY_ITERATOR_IFACE (tny_msg_header_list_iterator_new (me));
+	return TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (me));
 }
 
 static TnyListIface*
@@ -534,7 +540,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 
 	g_mutex_lock (self->folder_lock);
 	
-	self->iterator = TNY_ITERATOR_IFACE (tny_msg_header_list_iterator_new (self));
+	self->iterator = TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (self));
 
 	g_mutex_lock (self->iterator_lock);
 
