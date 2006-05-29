@@ -195,10 +195,9 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 		retval = g_strdup (pwd_data->password);
 
 		*cancel = FALSE;
-	}
 
-	/* this crashes :-), fokking keyring API !!!!
-	gnome_keyring_network_password_list_free (list); */
+		gnome_keyring_network_password_list_free (list);
+	}
 
 	return retval;
 }
@@ -227,6 +226,7 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	{
 		pwd_data = list->data;
 		gnome_keyring_item_delete_sync (keyring, pwd_data->item_id);
+		gnome_keyring_network_password_list_free (list);
 	}
 	return;
 }
