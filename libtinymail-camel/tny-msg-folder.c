@@ -672,7 +672,7 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, gboolean refresh)
 		 * uid pointer in the msg-header instance. Free it here.
 		 */
 
-		/* So we postphone the freeing to the finalize 
+		/* So we postpone the freeing to the finalize 
 		camel_folder_free_uids (priv->folder, uids); */
 
 	} else {

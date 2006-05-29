@@ -106,7 +106,7 @@ reload_msg (TnyMsgViewIface *self)
 
 		if (!part)
 		{
-			/* This shouldn't happen */
+			/* This shouldn't happen! ;-) */
 			g_warning (_("Mimepart problem\n"));
 			parts = g_list_next (parts);
 			continue;
@@ -131,8 +131,6 @@ reload_msg (TnyMsgViewIface *self)
 		{
 			TnyStreamIface *dest = NULL;
 
-			/* TODO: Add a filter (decoder) here (html filter) */
-
 			dest = TNY_STREAM_IFACE (tny_moz_embed_stream_new (priv->htmlview));
 
 			have_html = TRUE;
@@ -142,10 +140,10 @@ reload_msg (TnyMsgViewIface *self)
 
 			tny_stream_iface_reset (dest);
 			tny_msg_mime_part_iface_decode_to_stream (part, dest);
-			
-			g_thread_create (remove_html_stread_hack, dest, FALSE, NULL);
-			/* g_object_unref (G_OBJECT (dest)); */
 
+			/* This will do: g_object_unref (G_OBJECT (dest)); */
+			g_thread_create (remove_html_stread_hack, dest, FALSE, NULL);
+			
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
 			tny_msg_mime_part_iface_is_attachment (part))
 		{
