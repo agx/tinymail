@@ -91,11 +91,14 @@ reload_msg (TnyMsgViewIface *self)
 	gboolean first_attach = TRUE;
 	TnyAttachListModel *model;
 	gboolean have_html = FALSE;
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 
 	gtk_widget_hide (priv->attachview_sw);
 
 	tny_msg_header_view_iface_set_header (priv->headerview, header);
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
+
+	gtk_text_buffer_set_text (buffer, "", 0);
 
 	while (G_LIKELY (parts))
 	{
@@ -111,10 +114,7 @@ reload_msg (TnyMsgViewIface *self)
 
 		if (!have_html && G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/plain")))
 		{
-			GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 			TnyStreamIface *dest = NULL;
-
-			gtk_text_buffer_set_text (buffer, "", 0);
 
 			gtk_widget_hide (GTK_WIDGET (priv->htmlview));
 			gtk_widget_show (GTK_WIDGET (priv->textview));

@@ -79,6 +79,8 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_widget_hide (priv->attachview_sw);
 
+	gtk_text_buffer_set_text (buffer, "", 0);
+
 	tny_msg_header_view_iface_set_header (priv->headerview, header);
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
