@@ -29,7 +29,7 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MSG_HEADER_LIST_ITERATOR             (tny_msg_header_list_iterator_get_type ())
+#define TNY_TYPE_MSG_HEADER_LIST_ITERATOR             (_tny_msg_header_list_iterator_get_type ())
 #define TNY_MSG_HEADER_LIST_ITERATOR(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_HEADER_LIST_ITERATOR, TnyMsgHeaderListIterator))
 #define TNY_MSG_HEADER_LIST_ITERATOR_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_HEADER_LIST_ITERATOR, TnyMsgHeaderListIteratorClass))
 #define TNY_IS_MSG_HEADER_LIST_ITERATOR(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_HEADER_LIST_ITERATOR))
@@ -39,8 +39,6 @@ G_BEGIN_DECLS
 typedef struct _TnyMsgHeaderListIterator TnyMsgHeaderListIterator;
 typedef struct _TnyMsgHeaderListIteratorClass TnyMsgHeaderListIteratorClass;
 
-
-GType tny_msg_header_list_iterator_get_type (void);
 
 
 G_END_DECLS

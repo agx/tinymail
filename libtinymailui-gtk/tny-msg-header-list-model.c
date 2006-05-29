@@ -38,6 +38,7 @@ static GObjectClass *parent_class;
 #include "tny-msg-header-list-model-priv.h"
 
 /* Private stuff */
+GType _tny_msg_header_list_iterator_get_type (void);
 TnyMsgHeaderListIterator* _tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model);
 void _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model);
 void _tny_msg_header_list_iterator_travel_to_nth (TnyMsgHeaderListIterator *self, guint cur, guint nth);

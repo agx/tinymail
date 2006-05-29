@@ -26,6 +26,8 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-header-list-model-priv.h"
 
+GType _tny_msg_header_list_iterator_get_type (void);
+
 struct _TnyMsgHeaderListIterator
 {
 	GObject parent;
@@ -259,7 +261,7 @@ tny_msg_header_list_iterator_class_init (TnyMsgHeaderListIteratorClass *klass)
 }
 
 GType 
-tny_msg_header_list_iterator_get_type (void)
+_tny_msg_header_list_iterator_get_type (void)
 {
 	static GType type = 0;
 
