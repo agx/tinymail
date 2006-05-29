@@ -48,8 +48,26 @@ struct _TnyMsgHeaderListIteratorClass
 void 
 tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
 {
+
+
+
+	if (self->model)
+		g_object_unref (G_OBJECT (self->model));
+
+	g_object_ref (G_OBJECT (model));
+
 	self->model = model;
+
+	/* It's not a list_copy, so don't free this list when 
+	   destructing this iterator. Current is used as a ptr
+	   to the 'current' GList node. 
+
+	   When the iterator starts, it points to 'start', or,
+	   the first node in the list. */
+
+	g_mutex_lock (self->model->iterator_lock);
 	self->current = model->first;
+	g_mutex_unlock (self->model->iterator_lock);
 
 	return;
 }
@@ -78,6 +96,7 @@ tny_msg_header_list_iterator_instance_init (GTypeInstance *instance, gpointer g_
 	TnyMsgHeaderListIterator *self = (TnyMsgHeaderListIterator *)instance;
 
 	self->model = NULL;
+	self->current = NULL;
 
 	return;
 }
@@ -85,12 +104,17 @@ tny_msg_header_list_iterator_instance_init (GTypeInstance *instance, gpointer g_
 static void
 tny_msg_header_list_iterator_finalize (GObject *object)
 {
+	TnyMsgHeaderListIterator *self = (TnyMsgHeaderListIterator *)object;
+
+	if (self->model)
+		g_object_unref (G_OBJECT (self->model));
+
 	(*parent_class->finalize) (object);
 
 	return;
 }
 
-void
+void /* Protected method that speeds-up the TnyMsgHeaderListModel type */
 _tny_msg_header_list_iterator_travel_to_nth (TnyMsgHeaderListIterator *self, guint cur, guint nth)
 {
 	if (cur < nth)
@@ -106,10 +130,12 @@ tny_msg_header_list_iterator_next (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
 
-	if (!me || !me->current)
+	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
 
+	g_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_next (me->current);
+	g_mutex_unlock (me->model->iterator_lock);
 
 	return me->current->data;
 }
@@ -119,10 +145,12 @@ tny_msg_header_list_iterator_prev (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
 
-	if (!me || !me->current)
+	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
 
+	g_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_previous (me->current);
+	g_mutex_unlock (me->model->iterator_lock);
 
 	return me->current->data;
 }
@@ -132,10 +160,12 @@ tny_msg_header_list_iterator_first (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
 
-	if (!me || !me->current)
+	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
 
+	g_mutex_lock (me->model->iterator_lock);
 	me->current = me->model->first;
+	g_mutex_unlock (me->model->iterator_lock);
 
 	return me->current->data;
 }
@@ -146,10 +176,12 @@ tny_msg_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
 
-	if (!me || !me->current)
+	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
 
+	g_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_nth (me->model->first, nth);
+	g_mutex_unlock (me->model->iterator_lock);
 
 	return me->current->data;
 }
@@ -159,16 +191,32 @@ static gpointer
 tny_msg_header_list_iterator_current (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
+	gpointer retval;
 
-	return (me && me->current) ? me->current->data:NULL;
+	if (G_UNLIKELY (!me || !me->model))
+		return NULL;
+
+	g_mutex_lock (me->model->iterator_lock);
+	retval = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
+	g_mutex_unlock (me->model->iterator_lock);
+
+	return retval;
 }
 
 static gboolean 
 tny_msg_header_list_iterator_has_next (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
+	gboolean retval;
 
-	return (me && me->current && me->current->next);
+	if (G_UNLIKELY (!me || !me->model))
+		return FALSE;
+
+	g_mutex_lock (me->model->iterator_lock);
+	retval = (G_UNLIKELY (me->current) && me->current->next);
+	g_mutex_unlock (me->model->iterator_lock);
+
+	return retval;
 }
 
 static TnyListIface* 
@@ -176,7 +224,7 @@ tny_msg_header_list_iterator_get_list (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
 
-	if (!me || !me->model)
+	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
 
 	return TNY_LIST_IFACE (me->model);

@@ -53,9 +53,6 @@ static GType
 tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 {
 	GType retval;
-	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
-
-	g_mutex_lock (list_model->folder_lock);
 
 	switch (column) 
 	{
@@ -78,55 +75,48 @@ tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 			break;
 	}
 
-	g_mutex_unlock (list_model->folder_lock);
 
 	return retval;
 }
 
-static GList*
-g_list_travel_to_nth (GList *list, guint cur, guint nth)
-{
-
-	if (cur < nth)
-		while ((cur++ < nth) && list)
-			list = list->next;
-	else if (cur > nth)
-		while ((cur-- > nth) && list)
-			list = list->prev;
-	else	return list;
-
-	return list;
-}
 
 static gboolean
 tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePath *path)
 {
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
-
-	GList *list, *headers;
-	gint i;
+	gint i; gpointer ptr;
 
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
 	g_mutex_lock (list_model->folder_lock);
+
 	
+	g_mutex_lock (list_model->iterator_lock);
+
 	i = gtk_tree_path_get_indices (path)[0];
 
 	if (G_UNLIKELY (i >= list_model->length))
 	{
+		g_mutex_unlock (list_model->iterator_lock);
 		g_mutex_unlock (list_model->folder_lock);
 		return FALSE;
 	}
 
+	g_mutex_unlock (list_model->iterator_lock);
+
 	_tny_msg_header_list_iterator_travel_to_nth 
 		((TnyMsgHeaderListIterator*)list_model->iterator, 
 		list_model->last_nth, i);
+	ptr = tny_iterator_iface_current (list_model->iterator);
 
+	g_mutex_lock (list_model->iterator_lock);
 	list_model->last_nth = i;
-
 	iter->stamp = list_model->stamp;
-	iter->user_data = tny_iterator_iface_current (list_model->iterator);
+	iter->user_data = ptr;
 
+	g_mutex_unlock (list_model->iterator_lock);
+
+	
 	g_mutex_unlock (list_model->folder_lock);
 
 	return TRUE;
@@ -153,11 +143,12 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 		i++;
 	}
 	tny_iterator_iface_first (list_model->iterator);
-
 	
+	g_mutex_lock (list_model->iterator_lock);
 	tree_path = gtk_tree_path_new ();
 	gtk_tree_path_append_index (tree_path, i);
-	
+	g_mutex_unlock (list_model->iterator_lock);
+
 	g_mutex_unlock (list_model->folder_lock);
 
 	return tree_path;
@@ -189,7 +180,8 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	g_return_if_fail (iter->user_data != NULL);
 
 	g_mutex_lock (list_model->folder_lock);
-	
+	g_mutex_lock (list_model->iterator_lock);
+
 	header = iter->user_data;
 	
 	switch (column) 
@@ -232,6 +224,7 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 	}
 
+	g_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
 
 	return;
@@ -249,8 +242,10 @@ tny_msg_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 
 	g_mutex_lock (list_model->folder_lock);
 
+	g_mutex_lock (list_model->iterator_lock);
 	iter->user_data = tny_iterator_iface_next (list_model->iterator);
 	retval = (iter->user_data != NULL);
+	g_mutex_unlock (list_model->iterator_lock);
 
 	g_mutex_unlock (list_model->folder_lock);
 
@@ -271,8 +266,10 @@ tny_msg_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter
 
 	g_mutex_lock (list_model->folder_lock);
 
+	g_mutex_lock (list_model->iterator_lock);
 	if (G_LIKELY (!iter))
 		retval = TNY_MSG_HEADER_LIST_MODEL (self)->length;
+	g_mutex_unlock (list_model->iterator_lock);
 
 	g_mutex_unlock (list_model->folder_lock);
 
@@ -292,15 +289,20 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 
 	child = tny_iterator_iface_nth (list_model->iterator, n);
 
+	g_mutex_lock (list_model->iterator_lock);
+
 	if (G_LIKELY (child))
 	{
 		iter->stamp = TNY_MSG_HEADER_LIST_MODEL (self)->stamp;
 		iter->user_data = child;
+
+		g_mutex_unlock (list_model->iterator_lock);
 		g_mutex_unlock (list_model->folder_lock);
 
 		return TRUE;
 	}
 
+	g_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
 
 	return FALSE;
@@ -318,10 +320,14 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	g_mutex_lock (list_model->folder_lock);
 
+	g_mutex_lock (list_model->iterator_lock);
+
 	header = iter->user_data;
 	
 	if (G_LIKELY (header))
 		tny_msg_header_iface_uncache (header);
+
+	g_mutex_unlock (list_model->iterator_lock);
 
 	g_mutex_unlock (list_model->folder_lock);
 
@@ -374,7 +380,10 @@ tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 
+	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_prepend (me->first, item);
+	g_mutex_unlock (me->iterator_lock);
+
 }
 
 static void
@@ -382,7 +391,10 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 
+	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_append (me->first, item);
+	g_mutex_unlock (me->iterator_lock);
+
 }
 
 static void
@@ -390,7 +402,10 @@ tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 
+	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_remove (me->first, (gconstpointer)item);
+	g_mutex_unlock (me->iterator_lock);
+
 }
 
 static TnyIteratorIface*
@@ -407,9 +422,12 @@ tny_msg_header_list_model_copy_the_list (TnyListIface *self)
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 	TnyMsgHeaderListModel *copy = g_object_new (TNY_TYPE_MSG_HEADER_LIST_MODEL, NULL);
 
-	GList *list_copy = g_list_copy (me->first);
+	/* This only copies the TnyListIface pieces */
 
+	g_mutex_lock (me->iterator_lock);
+	GList *list_copy = g_list_copy (me->first);
 	copy->first = list_copy;
+	g_mutex_unlock (me->iterator_lock);
 
 	return TNY_LIST_IFACE (copy);
 }
@@ -419,7 +437,9 @@ tny_msg_header_list_model_foreach_in_the_list (TnyListIface *self, GFunc func, g
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 
+	g_mutex_lock (me->iterator_lock);
 	g_list_foreach (me->first, func, user_data);
+	g_mutex_unlock (me->iterator_lock);
 
 	return;
 }
@@ -454,10 +474,18 @@ tny_msg_header_list_model_finalize (GObject *object)
 		g_object_unref (G_OBJECT (self->folder));
 	}
 
+	g_mutex_lock (self->iterator_lock);
+	if (self->iterator)
+		g_object_unref (G_OBJECT (self->iterator));
+	g_mutex_unlock (self->iterator_lock);
+
 	g_mutex_unlock (self->folder_lock);
 
 	g_mutex_free (self->folder_lock);
 	self->folder_lock = NULL;
+
+	g_mutex_free (self->iterator_lock);
+	self->iterator_lock = NULL;
 
 	parent_class->finalize (object);
 
@@ -483,7 +511,7 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 {
 	self->folder = NULL;
 	self->folder_lock = g_mutex_new ();
-
+	self->iterator_lock = g_mutex_new ();
 	self->first = NULL;
 
 	return;
@@ -505,8 +533,10 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	const GList* headers;
 
 	g_mutex_lock (self->folder_lock);
-
+	
 	self->iterator = TNY_ITERATOR_IFACE (tny_msg_header_list_iterator_new (self));
+
+	g_mutex_lock (self->iterator_lock);
 
 	if (G_LIKELY (self->folder))
 		g_object_unref (G_OBJECT (self->folder));
@@ -520,9 +550,12 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 
 	/* We add a reference to each header instance because this type
 	   references it (needs it) using the tree-iter token. */
+	g_mutex_unlock (self->iterator_lock);
+
 	tny_msg_header_list_model_foreach_in_the_list 
 		(TNY_LIST_IFACE (self), ref_header, NULL);
 
+	
 	g_mutex_unlock (self->folder_lock);
 
 	return;

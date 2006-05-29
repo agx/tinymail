@@ -24,7 +24,7 @@ struct _TnyMsgHeaderListModel
 {
 	GObject parent;
 
-	GMutex *folder_lock;
+	GMutex *folder_lock, *iterator_lock;
 	TnyMsgFolderIface *folder;
 	gint length;
 	gint stamp;
