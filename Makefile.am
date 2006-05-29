@@ -11,3 +11,5 @@ if BUILD_GNOME
 TNYVFSDIR=libtinymail-gnomevfs
 endif
 SUBDIRS = m4 libtinymail libtinymailui $(TNYVFSDIR) libtinymailui-gtk $(MOZEMBEDDIR) $(PLATFORMDIR) libtinymail-camel tinymail docs $(UNITTESTDIR) $(PYTINYMAILDIR) po
+
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
