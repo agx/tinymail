@@ -444,8 +444,6 @@ tny_msg_header_list_model_finalize (GObject *object)
 {
 	TnyMsgHeaderListModel *self = (TnyMsgHeaderListModel *)object;
 
-	printf ("REALLYT\n");
-
 	g_mutex_lock (self->folder_lock);
 
 	/* We have to unreference all */

@@ -71,7 +71,6 @@ tny_msg_folder_relaxed_data_destroyer (gpointer data)
 
 	g_mutex_lock (d->lock);
 
-printf ("removed proxy obj\n");
 	g_object_unref (G_OBJECT (d->list));
 
 	d->list = NULL;
@@ -116,12 +115,13 @@ tny_msg_folder_relaxed_performer (gpointer data)
 	g_object_unref (G_OBJECT (iterator));
 
 	while (toremove)
-	{ printf ("rem\n");
+	{ 
 		tny_list_iface_remove (list, toremove->data);
 		toremove = g_list_next (toremove);
 	}
-printf ("-\n");
-	
+
+	if (toremove)
+		g_list_free (toremove);
 
 	d->list = list;
 
