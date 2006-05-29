@@ -43,9 +43,6 @@ struct _TnyMsgHeaderListIteratorClass
 void 
 _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
 {
-
-
-
 	if (self->model)
 		g_object_unref (G_OBJECT (self->model));
 
@@ -122,6 +119,8 @@ tny_msg_header_list_iterator_next (TnyIteratorIface *self)
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
 
+	/* Move the iterator to the next node */
+
 	g_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_next (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
@@ -136,6 +135,8 @@ tny_msg_header_list_iterator_prev (TnyIteratorIface *self)
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
+
+	/* Move the iterator to the previous node */
 
 	g_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_previous (me->current);
@@ -152,6 +153,10 @@ tny_msg_header_list_iterator_first (TnyIteratorIface *self)
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
 
+	/* Move the iterator to the first node. We know that model always 
+	   keeps a reference to the first node, there's nothing wrong with 
+	   using that one. */
+
 	g_mutex_lock (me->model->iterator_lock);
 	me->current = me->model->first;
 	g_mutex_unlock (me->model->iterator_lock);
@@ -167,6 +172,10 @@ tny_msg_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
+
+	/* Move the iterator to the nth node. We'll count from zero,
+	   so we start with the first node of which we know the model
+	   stored a reference. */
 
 	g_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_nth (me->model->first, nth);
@@ -185,6 +194,8 @@ tny_msg_header_list_iterator_current (TnyIteratorIface *self)
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
 
+	/* Give the data of the current node */
+
 	g_mutex_lock (me->model->iterator_lock);
 	retval = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
 	g_mutex_unlock (me->model->iterator_lock);
@@ -201,6 +212,8 @@ tny_msg_header_list_iterator_has_next (TnyIteratorIface *self)
 	if (G_UNLIKELY (!me || !me->model))
 		return FALSE;
 
+	/* Return whether or not there's a next node */
+
 	g_mutex_lock (me->model->iterator_lock);
 	retval = (G_UNLIKELY (me->current) && me->current->next);
 	g_mutex_unlock (me->model->iterator_lock);
@@ -212,6 +225,8 @@ static TnyListIface*
 tny_msg_header_list_iterator_get_list (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
+
+	/* Return the list */
 
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
