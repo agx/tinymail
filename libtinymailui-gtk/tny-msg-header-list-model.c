@@ -109,8 +109,6 @@ tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 static GList*
 g_list_travel_to_nth (GList *list, guint cur, guint nth)
 {
-	if (cur == nth)
-		return list;
 
 	if (cur < nth)
 		while ((cur++ < nth) && list)
@@ -118,6 +116,7 @@ g_list_travel_to_nth (GList *list, guint cur, guint nth)
 	else if (cur > nth)
 		while ((cur-- > nth) && list)
 			list = list->prev;
+	else	return list;
 
 	return list;
 }
@@ -143,7 +142,8 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 
 	if (list_model->last_iter)
 	{ /* This is a little speed hack */
-		list_model->last_iter = g_list_travel_to_nth (list_model->last_iter, list_model->last_nth, i);
+		if (list_model->last_nth != i)
+			list_model->last_iter = g_list_travel_to_nth (list_model->last_iter, list_model->last_nth, i);
 		list_model->last_nth = i;
 		list = list_model->last_iter;
 	} else {
