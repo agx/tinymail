@@ -171,8 +171,7 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 
 			r = gnome_password_dialog_get_remember (dialog);
 
-			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_SESSION ||
-			r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)
+			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)
 			{
 				gnome_keyring_set_network_password_sync (keyring,
 					tny_account_iface_get_user (account),
