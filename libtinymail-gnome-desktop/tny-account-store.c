@@ -119,8 +119,9 @@ destroy_current_accounts (TnyAccountStorePriv *priv)
 }
 
 #ifdef GNOME
+
 static gchar* 
-per_account_get_pass_func_keyring (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
+per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
 	const gchar *accountid = tny_account_iface_get_id (account);
@@ -194,9 +195,37 @@ per_account_get_pass_func_keyring (TnyAccountIface *account, const gchar *prompt
 
 	return retval;
 }
-#endif
 
-#ifndef GNOME
+static void
+per_account_forget_pass_func (TnyAccountIface *account)
+{
+	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyGetPassFunc func;
+
+	GList *list=NULL;
+	GnomeKeyringResult keyringret;
+	gchar *keyring;
+	GnomeKeyringNetworkPasswordData *pwd_data;
+
+	gnome_keyring_get_default_keyring_sync (&keyring);
+
+	keyringret = gnome_keyring_find_network_password_sync (
+		tny_account_iface_get_user (account),
+		"Mail", tny_account_iface_get_hostname (account),
+		"password", tny_account_iface_get_proto (account), 
+		"PLAIN", 0, &list);
+
+	if (keyringret == GNOME_KEYRING_RESULT_OK)
+	{
+		pwd_data = list->data;
+		gnome_keyring_item_delete_sync (keyring, pwd_data->item_id);
+	}
+	return;
+}
+
+#else 
+
 static gchar* 
 per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
 {
@@ -243,7 +272,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 
 	return retval;
 }
-#endif
 
 static void
 per_account_forget_pass_func (TnyAccountIface *account)
@@ -251,29 +279,6 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyGetPassFunc func;
-
-#ifdef GNOME
-	GList *list=NULL;
-	GnomeKeyringResult keyringret;
-	gchar *keyring;
-	GnomeKeyringNetworkPasswordData *pwd_data;
-
-	gnome_keyring_get_default_keyring_sync (&keyring);
-
-	keyringret = gnome_keyring_find_network_password_sync (
-		tny_account_iface_get_user (account),
-		"Mail", tny_account_iface_get_hostname (account),
-		"password", tny_account_iface_get_proto (account), 
-		"PLAIN", 0, &list);
-
-	if (keyringret == GNOME_KEYRING_RESULT_OK)
-	{
-		pwd_data = list->data;
-		gnome_keyring_item_delete_sync (keyring, pwd_data->item_id);
-	}
-
-#else
-
 	if (G_LIKELY (passwords))
 	{
 		const gchar *accountid = tny_account_iface_get_id (account);
@@ -289,10 +294,12 @@ per_account_forget_pass_func (TnyAccountIface *account)
 
 	}
 
-#endif
-
 	return;
 }
+
+#endif
+
+
 
 static TnyAccountIface *
 find_account_by_gconf_key (GList *accounts, const gchar *key)
@@ -514,12 +521,7 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 			per_account_forget_pass_func);
 
 		tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
-#ifdef GNOME
-			per_account_get_pass_func_keyring);
-#else
 			per_account_get_pass_func);
-#endif
-
 	}
 
 	return;

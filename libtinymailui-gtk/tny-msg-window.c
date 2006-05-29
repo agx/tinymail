@@ -97,8 +97,6 @@ tny_msg_window_finalize (GObject *object)
 static void
 tny_msg_window_iface_init (gpointer g_iface, gpointer iface_data)
 {
-	TnyMsgWindowIfaceClass *klass = (TnyMsgWindowIfaceClass *)g_iface;
-
 	return;
 }
 
