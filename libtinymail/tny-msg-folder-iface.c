@@ -27,7 +27,7 @@ guint *tny_msg_folder_iface_signals;
 
 
 /**
- * tny_msg_folder_iface_refresh_headers_async:
+ * tny_msg_folder_iface_refresh_folder_async:
  * @self: a TnyMsgFolderIface object
  * @callback: The callback handler (happens in the GMainLoop)
  * @status_callback: A callback for status notifications (in-thread)
