@@ -256,7 +256,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (model), folder);
 
-		oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));\
+		oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 		if (oldsortable && GTK_IS_TREE_MODEL_SORT (oldsortable))
 		{
 			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
