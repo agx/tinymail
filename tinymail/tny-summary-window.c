@@ -356,7 +356,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		
 #ifdef ASYNC_HEADERS
 
-		tny_msg_folder_iface_refresh_folder_async (folder, 
+		tny_msg_folder_iface_refresh_async (folder, 
 			refresh_current_folder, 
 			refresh_current_folder_status_update, user_data);
 #else

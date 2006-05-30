@@ -313,7 +313,7 @@ destroy_header (gpointer data, gpointer user_data)
 }
 
 static void
-tny_msg_folder_refresh_folder_async_destroyer (gpointer thr_user_data)
+tny_msg_folder_refresh_async_destroyer (gpointer thr_user_data)
 {
 	g_free (thr_user_data);
 
@@ -321,7 +321,7 @@ tny_msg_folder_refresh_folder_async_destroyer (gpointer thr_user_data)
 }
 
 static gboolean
-tny_msg_folder_refresh_folder_async_callback (gpointer thr_user_data)
+tny_msg_folder_refresh_async_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (info->self));
@@ -372,7 +372,7 @@ progress_func (gpointer data)
 
 
 static void
-tny_msg_folder_refresh_folder_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
+tny_msg_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
 	RefreshFolderInfo *oinfo = thr_user_data;
 	ProgressInfo *info = g_new0 (ProgressInfo, 1);
@@ -396,7 +396,7 @@ tny_msg_folder_refresh_folder_async_status (struct _CamelOperation *op, const ch
 
 
 static gpointer 
-tny_msg_folder_refresh_folder_async_thread (gpointer thr_user_data)
+tny_msg_folder_refresh_async_thread (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
 	TnyMsgFolderIface *self = info->self;
@@ -415,7 +415,7 @@ tny_msg_folder_refresh_folder_async_thread (gpointer thr_user_data)
 	info->cancelled = FALSE;
 	str = g_strdup_printf (_("Reading folder `%s'"), priv->folder->full_name);
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
-		tny_msg_folder_refresh_folder_async_status, info, str);
+		tny_msg_folder_refresh_async_status, info, str);
 	g_free (str);
 	camel_folder_refresh_info (priv->folder, ex);
 	camel_exception_free (ex);
@@ -428,8 +428,8 @@ tny_msg_folder_refresh_folder_async_thread (gpointer thr_user_data)
 	if (info->callback)
 	{
 		g_idle_add_full (G_PRIORITY_HIGH, 
-			tny_msg_folder_refresh_folder_async_callback, 
-			info, tny_msg_folder_refresh_folder_async_destroyer);
+			tny_msg_folder_refresh_async_callback, 
+			info, tny_msg_folder_refresh_async_destroyer);
 
 	}
 
@@ -439,7 +439,7 @@ tny_msg_folder_refresh_folder_async_thread (gpointer thr_user_data)
 }
 
 static void
-tny_msg_folder_refresh_folder_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_msg_folder_refresh_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info = g_new0 (RefreshFolderInfo, 1);
 	GThread *thread;
@@ -450,8 +450,33 @@ tny_msg_folder_refresh_folder_async (TnyMsgFolderIface *self, TnyRefreshFolderCa
 	info->status_callback = status_callback;
 	info->user_data = user_data;
 
-	thread = g_thread_create (tny_msg_folder_refresh_folder_async_thread,
+	thread = g_thread_create (tny_msg_folder_refresh_async_thread,
 			info, FALSE, NULL);
+
+	return;
+}
+
+static void 
+tny_msg_folder_refresh (TnyMsgFolderIface *self)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
+	gchar *str;
+	CamelException *ex = camel_exception_new ();
+
+	camel_exception_init (ex);
+
+	g_mutex_lock (priv->folder_lock);
+
+	load_folder_no_lock (priv);
+
+	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
+		NULL, NULL, NULL);
+	camel_folder_refresh_info (priv->folder, ex);
+	camel_exception_free (ex);
+	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
+
+	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -844,7 +869,8 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_account_func = tny_msg_folder_set_account;
 	klass->get_subscribed_func = tny_msg_folder_get_subscribed;
 	klass->set_subscribed_func = tny_msg_folder_set_subscribed;
-	klass->refresh_folder_async_func = tny_msg_folder_refresh_folder_async;
+	klass->refresh_async_func = tny_msg_folder_refresh_async;
+	klass->refresh_func = tny_msg_folder_refresh;
 
 	return;
 }

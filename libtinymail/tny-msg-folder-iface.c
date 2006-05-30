@@ -27,23 +27,37 @@ guint *tny_msg_folder_iface_signals;
 
 
 /**
- * tny_msg_folder_iface_refresh_folder_async:
+ * tny_msg_folder_iface_refresh_async:
  * @self: a TnyMsgFolderIface object
  * @callback: The callback handler (happens in the GMainLoop)
  * @status_callback: A callback for status notifications (in-thread)
  * @user_data: user data for the callback
  *
- * Refresh the headers and call back when finished
+ * Refresh the folder and call back when finished
  * 
  **/
-
 void
-tny_msg_folder_iface_refresh_folder_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_msg_folder_iface_refresh_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
-	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_folder_async_func (self, callback, status_callback, user_data);
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_async_func (self, callback, status_callback, user_data);
 	return;
 }
 
+
+
+/**
+ * tny_msg_folder_iface_refresh:
+ * @self: a TnyMsgFolderIface object
+ *
+ * Refresh the folder
+ * 
+ **/
+void
+tny_msg_folder_iface_refresh (TnyMsgFolderIface *self)
+{
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_func (self);
+	return;
+}
 
 /**
  * tny_msg_folder_iface_set_subscribed:
