@@ -17,6 +17,45 @@ Shared include file with forward typedefs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyListIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyIteratorIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyListIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@prepend_func: 
+@append_func: 
+@remove_func: 
+@foreach_func: 
+@copy_func: 
+@create_iterator_func: 
+
+<!-- ##### STRUCT TnyIteratorIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@next_func: 
+@prev_func: 
+@first_func: 
+@nth_func: 
+@current_func: 
+@has_next_func: 
+@get_list_func: 
+
 <!-- ##### STRUCT TnyMsgIface ##### -->
 <para>
 

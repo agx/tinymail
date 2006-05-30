@@ -38,6 +38,7 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 
 </para>
 
+@parent: 
 
 <!-- ##### FUNCTION tny_msg_header_list_model_new ##### -->
 <para>
@@ -54,6 +55,5 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 
 @self: 
 @folder: 
-@refresh: 
 
 

@@ -59,3 +59,7 @@ tny-save-strategy.xml
 tny-save-strategy-iface.xml
 tny-msg-header-view.xml
 tny-msg-header-view-iface.xml
+tny-list-iface.xml
+tny-msg-header-list-model-priv.xml
+tny-msg-header-list-iterator-priv.xml
+tny-iterator-iface.xml

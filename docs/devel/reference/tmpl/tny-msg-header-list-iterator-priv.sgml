@@ -1,35 +1,33 @@
 <!-- ##### SECTION Title ##### -->
-TnyDeviceIface
+tny-msg-header-list-iterator-priv
 
 <!-- ##### SECTION Short_Description ##### -->
-A type that implements a few device specific things
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type that implements a few device specific things like the 
-online/offline status.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### VARIABLE tny_device_iface_signals ##### -->
+<!-- ##### STRUCT TnyMsgHeaderListIterator ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_device_iface_is_online ##### -->
+<!-- ##### STRUCT TnyMsgHeaderListIteratorClass ##### -->
 <para>
 
 </para>
-
-@self: 
-@Returns: 
 
 
