@@ -406,6 +406,8 @@ tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_prepend (me->first, item);
+	me->length++;
+	g_object_ref (G_OBJECT (item));
 	g_mutex_unlock (me->iterator_lock);
 
 }
@@ -421,6 +423,8 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_append (me->first, item);
+	me->length++;
+	g_object_ref (G_OBJECT (item));
 	g_mutex_unlock (me->iterator_lock);
 
 }
@@ -436,6 +440,8 @@ tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_remove (me->first, (gconstpointer)item);
+	me->length--;
+	g_object_unref (G_OBJECT (item));
 	g_mutex_unlock (me->iterator_lock);
 
 }
@@ -499,6 +505,98 @@ tny_list_iface_init (TnyListIfaceClass *klass)
 	return;
 }
 
+typedef struct
+{
+	GList *list;
+	GFunc relaxed_func;
+} RelaxedData;
+
+
+static void
+tny_msg_header_list_model_relaxed_data_destroyer (gpointer data)
+{
+	RelaxedData *d = data;
+
+	g_list_free (d->list);
+	d->list = NULL;
+	g_free (d);
+
+	return;
+}
+
+static gboolean
+tny_msg_header_list_model_relaxed_performer (gpointer data)
+{
+	RelaxedData *d = data;
+	GList *list = d->list;
+	gint count = 0;
+
+	while ((count < 5) && list)
+	{
+		GList *element = list;
+		if (element && element->data) { printf ("rem\n");
+			d->relaxed_func (element->data, NULL);
+		}
+		list = g_list_remove_link (list, element);
+		g_list_free (element);
+		count++;
+	}
+
+	d->list = list;
+
+	printf ("--\n");
+	if (count <= 1)
+		return FALSE;
+
+	return TRUE;
+}
+
+static void 
+proxy_uncache_func (gpointer data, gpointer user_data)
+{
+	if (data)
+		tny_msg_header_iface_uncache (TNY_MSG_HEADER_IFACE (data));
+	return;
+}
+
+
+static void 
+tny_msg_header_list_model_hdr_cache_uncacher (TnyMsgHeaderListModel *self)
+{
+	RelaxedData *d = g_new (RelaxedData, 1);
+
+	d->relaxed_func = (GFunc)proxy_uncache_func;
+	d->list = g_list_copy (self->first);
+
+	g_idle_add_full (G_PRIORITY_LOW, tny_msg_header_list_model_relaxed_performer, 
+		d, tny_msg_header_list_model_relaxed_data_destroyer);
+
+	return;
+}
+
+static void
+proxy_destroy_func (gpointer data, gpointer user_data)
+{
+	if (data)
+		g_object_unref (G_OBJECT (data));
+	data = NULL;
+
+	return;
+}
+
+static void 
+tny_msg_header_list_model_hdr_cache_remover (TnyMsgHeaderListModel *self)
+{
+	RelaxedData *d = g_new (RelaxedData, 1);
+
+	d->relaxed_func = (GFunc)proxy_destroy_func;
+	d->list = self->first;
+
+	g_idle_add_full (G_PRIORITY_LOW, tny_msg_header_list_model_relaxed_performer, 
+		d, tny_msg_header_list_model_relaxed_data_destroyer);
+
+	return;
+} 
 
 
 static void
@@ -508,18 +606,17 @@ tny_msg_header_list_model_finalize (GObject *object)
 
 	g_mutex_lock (self->folder_lock);
 
-	/* We have to unreference all cause of (a) -- see below -- */
-
 	if (self->folder) 
-	{
-		tny_msg_header_list_model_foreach_in_the_list 
-			(TNY_LIST_IFACE (self), unref_header, NULL);
 		g_object_unref (G_OBJECT (self->folder));
-	}
 
 	g_mutex_lock (self->iterator_lock);
+
+	tny_msg_header_list_model_hdr_cache_remover (self);
+	self->length = 0;
+
 	if (self->iterator)
 		g_object_unref (G_OBJECT (self->iterator));
+
 	g_mutex_unlock (self->iterator_lock);
 
 	g_mutex_unlock (self->folder_lock);
@@ -556,6 +653,7 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 	self->folder_lock = g_mutex_new ();
 	self->iterator_lock = g_mutex_new ();
 	self->first = NULL;
+	self->length = 0;
 
 	return;
 }
@@ -569,37 +667,19 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
  * Set the folder where the #TnyMsgHeaderIface instances are located
  * 
  **/
-
 void
 tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder)
 {
-	const GList* headers;
-
 	g_mutex_lock (self->folder_lock);
-	
 	self->iterator = TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (self));
-
 	g_mutex_lock (self->iterator_lock);
 
 	if (G_LIKELY (self->folder))
 		g_object_unref (G_OBJECT (self->folder));
-
-	self->folder = folder;
 	g_object_ref (G_OBJECT (folder));
-
-	/* To avoid a g_list_length (note that the implementation must
-	 * absolutely be correct!) */
-	self->length = tny_msg_folder_iface_get_all_count (folder);
+	self->folder = folder;
 
 	g_mutex_unlock (self->iterator_lock);
-
-	/* We add a reference to each header instance because this type
-	   references it (needs it) using the GtkTreeIter tokens. (a) */
-
-	tny_msg_header_list_model_foreach_in_the_list 
-		(TNY_LIST_IFACE (self), ref_header, NULL);
-
-	
 	g_mutex_unlock (self->folder_lock);
 
 	return;
@@ -618,7 +698,7 @@ tny_msg_header_list_model_new (void)
 	TnyMsgHeaderListModel *model;
 
 	model = g_object_new (TNY_TYPE_MSG_HEADER_LIST_MODEL, NULL);
-
+	
 	return GTK_TREE_MODEL (model);
 }
 

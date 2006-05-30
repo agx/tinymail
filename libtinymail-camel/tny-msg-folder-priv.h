@@ -28,8 +28,6 @@ typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
 
 struct _TnyMsgFolderPriv
 {
-	GMutex *cached_hdrs_lock;
-	TnyListIface *cached_hdrs;
 	GPtrArray *cached_uids;
 	
 	GType headers_list_type;

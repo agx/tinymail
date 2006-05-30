@@ -55,174 +55,15 @@ static GObjectClass *parent_class = NULL;
 #define TNY_MSG_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))
 
-typedef struct
-{
-	TnyListIface *list;
-	GFunc relaxed_func;
-	GMutex *lock;
-	gboolean free_lock;
-	TnyMsgFolderPriv *priv;
-} RelaxedData;
 
 static void
-tny_msg_folder_relaxed_data_destroyer (gpointer data)
+unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 {
-	RelaxedData *d = data;
-
-	g_mutex_lock (d->lock);
-
-	g_object_unref (G_OBJECT (d->list));
-
-	d->list = NULL;
-	g_free (d);
-
-	g_mutex_unlock (d->lock);
-
-	if (d->free_lock)
-		g_mutex_free (d->lock);
-
-	return;
-}
-
-
-static gboolean
-tny_msg_folder_relaxed_performer (gpointer data)
-{
-	RelaxedData *d = data;
-	TnyListIface *list = d->list;
-
-	if (!list)
-		return FALSE;
-
-	TnyIteratorIface *iterator = tny_list_iface_create_iterator (list);
-	GList *toremove=NULL;
-
-	gint count = 0;
-
-	g_mutex_lock (d->lock);
-
-	while (G_LIKELY ((count < 5) && tny_iterator_iface_has_next (iterator)))
+	if (destroy)
 	{
-		gpointer item = tny_iterator_iface_next (iterator);
-
-		if (G_LIKELY (item))
-			d->relaxed_func (item, d->priv);
-
-		toremove = g_list_prepend (toremove, item);
-
-		count++;
-	}
-	g_object_unref (G_OBJECT (iterator));
-
-	while (toremove)
-	{ 
-		tny_list_iface_remove (list, toremove->data);
-		toremove = g_list_next (toremove);
-	}
-
-	if (toremove)
-		g_list_free (toremove);
-
-	d->list = list;
-
-	g_mutex_unlock (d->lock);
-
-	if (G_UNLIKELY (count <= 1))
-		return FALSE;
-	
-	return TRUE;
-}
-
-static void 
-proxy_uncache_func (gpointer data, gpointer user_data)
-{
-	if (data)
-		tny_msg_header_iface_uncache (TNY_MSG_HEADER_IFACE (data));
-	return;
-}
-
-
-static void 
-tny_msg_folder_hdr_cache_uncacher (TnyMsgFolderPriv *priv)
-{
-	if (G_LIKELY (priv->cached_hdrs))
-	{
-		RelaxedData *d = g_new (RelaxedData, 1);
-
-		d->priv = priv;
-		d->relaxed_func = (GFunc)proxy_uncache_func;
-		d->free_lock = FALSE;
-		d->lock = priv->cached_hdrs_lock;
-
-		g_mutex_lock (priv->cached_hdrs_lock);
-		d->list = tny_list_iface_copy (priv->cached_hdrs);
-		g_mutex_unlock (priv->cached_hdrs_lock);
-
-		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
-			d, tny_msg_folder_relaxed_data_destroyer);
-	}
-
-	return;
-}
-
-static void
-proxy_destroy_func (gpointer data, gpointer user_data)
-{
-	TnyMsgFolderPriv *priv = user_data;
-
-	if (data)
-		g_object_unref (G_OBJECT (data));
-	data = NULL;
-
-	return;
-}
-
-static void 
-tny_msg_folder_hdr_cache_remover (TnyMsgFolderPriv *priv)
-{
-	if (G_LIKELY (priv->cached_hdrs))
-	{
-		RelaxedData *d = g_new (RelaxedData, 1);
-
-		d->priv = priv;
-		d->relaxed_func = (GFunc)proxy_destroy_func;
-
-		g_mutex_lock (priv->cached_hdrs_lock);
-		d->free_lock = FALSE;
-		d->lock = priv->cached_hdrs_lock;
-		d->list = priv->cached_hdrs;
-		priv->cached_hdrs = NULL;
-		/* Speedup trick, also check tny-msg-header.c */
 		if (G_LIKELY (priv->folder && priv->cached_uids))
 			camel_folder_free_uids (priv->folder, priv->cached_uids);
-		priv->cached_uids = NULL;
-		g_mutex_unlock (priv->cached_hdrs_lock);
-
-		g_idle_add_full (G_PRIORITY_LOW, tny_msg_folder_relaxed_performer, 
-			d, tny_msg_folder_relaxed_data_destroyer);
 	}
-
-	return;
-} 
-
-static void 
-unload_folder (TnyMsgFolderPriv *priv, gboolean destroy)
-{
-
-	/* We can't always just destroy the header proxies (regretfully): 
-
-	The unref method of the tree model wouldn't know when we destroyed 
-	the instances, yet would still have (invalid) pointers to this
-	memory (it uses a GList). 
-
-	But then again, it would have been a dirty hack anyway. */
-
-	if (!destroy)
-		tny_msg_folder_hdr_cache_uncacher (priv);
-	else	
-		tny_msg_folder_hdr_cache_remover (priv);
-
-	g_mutex_lock (priv->folder_lock);
 
 	if (G_LIKELY (priv->folder))
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
@@ -234,10 +75,20 @@ unload_folder (TnyMsgFolderPriv *priv, gboolean destroy)
 	priv->cached_msgs = NULL;
 	g_mutex_unlock (priv->cached_msgs_lock);
 
-	g_mutex_unlock (priv->folder_lock);
+	priv->cached_length = 0;
 
 	return;
 }
+
+static void 
+unload_folder (TnyMsgFolderPriv *priv, gboolean destroy)
+{
+	g_mutex_lock (priv->folder_lock);
+	unload_folder_no_lock (priv, destroy);
+	g_mutex_unlock (priv->folder_lock);
+}
+
+
 
 static void
 load_folder_no_lock (TnyMsgFolderPriv *priv)
@@ -410,7 +261,7 @@ typedef struct
 { 	/* This is a speedup trick */
 	TnyMsgFolderIface *self;
 	TnyMsgFolderPriv *priv;
-
+	TnyListIface *headers;
 } FldAndPriv;
 
 static void
@@ -423,6 +274,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	/* Unpack speedup trick */
 	TnyMsgFolderIface *self = ptr->self;
 	TnyMsgFolderPriv *priv = ptr->priv;
+	TnyListIface *headers = ptr->headers;
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
 	header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
@@ -433,13 +285,9 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	tny_msg_header_iface_set_folder (header, self);
 	tny_msg_header_iface_set_uid (header, uid);
 
-	g_mutex_lock (priv->cached_hdrs_lock);
-
-	tny_list_iface_prepend (priv->cached_hdrs, header);
+	tny_list_iface_prepend (headers, header);
 	priv->cached_length++;
 	/* TODO: If unread -- priv->unread_length++; */
-
-	g_mutex_unlock (priv->cached_hdrs_lock);
 
 	return;
 }
@@ -574,12 +422,6 @@ tny_msg_folder_refresh_headers_async_thread (gpointer thr_user_data)
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
-	if (priv->cached_hdrs)
-	{
-		tny_list_iface_foreach (priv->cached_hdrs, destroy_header, NULL);
-		g_object_unref (G_OBJECT (priv->cached_hdrs));
-	}
-	priv->cached_hdrs = NULL;
 
 	g_mutex_unlock (priv->folder_lock);
 
@@ -614,74 +456,64 @@ tny_msg_folder_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCall
 	return;
 }
 
-static TnyListIface*
-tny_msg_folder_get_headers (TnyMsgFolderIface *self, gboolean refresh)
+static void
+tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboolean refresh)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	GPtrArray *uids = NULL;
+	CamelException ex;
+	FldAndPriv *ptr = NULL;
+
+	g_object_ref (G_OBJECT (headers));
 
 	g_mutex_lock (priv->folder_lock);
-	
+
+	unload_folder_no_lock (priv, TRUE);
 	load_folder_no_lock (priv);
+	ptr = g_new (FldAndPriv, 1);
 
-	g_mutex_lock (priv->cached_hdrs_lock);
+	/* Prepare speedup trick */
+	ptr->self = self;
+	ptr->priv = priv;
+	ptr->headers = headers;
 
-	if (G_UNLIKELY (!priv->cached_hdrs))
-	{
+	/* This one consumes time (use the async stuff) */
 
-		GPtrArray *uids = NULL;
-		CamelException ex;
-		FldAndPriv *ptr = NULL;
+	if (refresh)
+		camel_folder_refresh_info (priv->folder, &ex);
 
-		priv->cached_length = 0;
-		priv->cached_hdrs = g_object_new (priv->headers_list_type, NULL);
+	priv->cached_length = 0;
 
-		g_mutex_unlock (priv->cached_hdrs_lock);
+	uids = camel_folder_get_uids (priv->folder);
+	g_ptr_array_foreach (uids, add_message_with_uid, ptr);
 
-		ptr = g_new (FldAndPriv, 1);
+	/* Cleanup speedup trick */
+	g_free (ptr);
 
-		/* Prepare speedup trick */
-		ptr->self = self;
-		ptr->priv = priv;
+	/* Speedup trick, also check tny-msg-header.c */
+	priv->cached_uids = uids;
 
-		/* This one consumes time (use the async stuff) */
-
-		if (refresh)
-			camel_folder_refresh_info (priv->folder, &ex);
-
-		uids = camel_folder_get_uids (priv->folder);
-
-		g_ptr_array_foreach (uids, add_message_with_uid, ptr);
-
-		/* Cleanup speedup trick */
-		g_free (ptr);
-
-		/* Speedup trick, also check tny-msg-header.c */
-		priv->cached_uids = uids;
-
-		/* The trick is not to free the uid's GPtrArray now, but
-		 * in stead keep it during the livetime of the folder.
-		 * The TnyMsgHeader instances have a reference to the uid's
-		 * in the array. 
-		 *
-		 * The idea is that if a folder get's finalized, first all its
-		 * msg-header instances are also finalized (invalid). So we
-		 * can keep the uid pointers here, and simply assign it (and
-		 * not strdup them for each msg-header instance).
-		 *
-		 * Just make sure that, if using this trick, you don't free the
-		 * uid pointer in the msg-header instance. Free it here.
-		 */
-
-		/* So we postpone the freeing to the finalize 
-		camel_folder_free_uids (priv->folder, uids); */
-
-	} else {
-		g_mutex_unlock (priv->cached_hdrs_lock);
-	}
+	/* The trick is not to free the uid's GPtrArray now, but
+	 * in stead keep it during the livetime of the folder.
+	 * The TnyMsgHeader instances have a reference to the uid's
+	 * in the array. 
+	 *
+	 * The idea is that if a folder get's finalized, first all its
+	 * msg-header instances are also finalized (invalid). So we
+	 * can keep the uid pointers here, and simply assign it (and
+	 * not strdup them for each msg-header instance).
+	 *
+	 * Just make sure that, if using this trick, you don't free the
+	 * uid pointer in the msg-header instance. Free it here.
+	 */
+	/* So we postpone the freeing to the finalize 
+	camel_folder_free_uids (priv->folder, uids); */
 
 	g_mutex_unlock (priv->folder_lock);
 
-	return priv->cached_hdrs;
+	g_object_unref (G_OBJECT (headers));
+
+	return;
 }
 
 static void
@@ -935,6 +767,8 @@ tny_msg_folder_finalize (GObject *object)
 	TnyMsgFolder *self = (TnyMsgFolder*) object;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
+	unload_folder (priv, TRUE);
+
 	if (G_LIKELY (priv->folders))
 	{
 		g_mutex_lock (priv->folders_lock);
@@ -942,28 +776,16 @@ tny_msg_folder_finalize (GObject *object)
 		g_mutex_unlock (priv->folders_lock);
 	}
 
-	tny_msg_folder_hdr_cache_remover (priv);
-	priv->cached_hdrs = NULL;
-
-	g_mutex_lock (priv->cached_hdrs_lock);
-
-	// g_list_foreach (priv->cached_hdrs, (GFunc)g_object_unref, NULL);
-
 	if (G_LIKELY (priv->folder))
 	{
 		g_mutex_lock (priv->folder_lock);
 		camel_object_unref (priv->folder);
 		g_mutex_unlock (priv->folder_lock);
 	}
-	g_mutex_unlock (priv->cached_hdrs_lock);
 
 	if (G_LIKELY (priv->cached_name))
 		g_free (priv->cached_name);
 
-
-
-	g_mutex_free (priv->cached_hdrs_lock);
-	priv->cached_hdrs_lock = NULL;
 
 	g_mutex_free (priv->cached_msgs_lock);
 	priv->cached_msgs_lock = NULL;
@@ -1004,24 +826,11 @@ tny_msg_folder_has_cache (TnyMsgFolderIface *self)
 }
 
 
-void
-tny_msg_folder_set_headers_list_type (TnyMsgFolderIface *self, GType type)
-{
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
-
-	if (priv->cached_hdrs)
-		tny_msg_folder_hdr_cache_remover (priv);
-
-	priv->headers_list_type = type;
-	return;
-}
-
 static void
 tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMsgFolderIfaceClass *klass = (TnyMsgFolderIfaceClass *)g_iface;
 
-	klass->set_headers_list_type_func = tny_msg_folder_set_headers_list_type;
 	klass->get_headers_func = tny_msg_folder_get_headers;
 	klass->get_message_func = tny_msg_folder_get_message;
 	klass->set_id_func = tny_msg_folder_set_id;
@@ -1066,14 +875,10 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->folder = NULL;
 	priv->folders = NULL;
-	priv->cached_hdrs = NULL;
 	priv->cached_msgs = NULL; 
-
-	priv->cached_hdrs_lock = g_mutex_new ();
 	priv->cached_msgs_lock = g_mutex_new ();
 	priv->folder_lock = g_mutex_new ();
 	priv->folders_lock = g_mutex_new ();
-
 	priv->cached_name = NULL;
 
 	return;

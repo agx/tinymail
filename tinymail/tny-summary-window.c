@@ -241,34 +241,20 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
 		GtkTreeModel *header_model, *sortable;
 		GtkTreeModel *select_model;
-		TnyListIface *headers = NULL;
-		TnyMsgHeaderListModel *model;
 
-		tny_msg_folder_iface_set_headers_list_type (folder, TNY_TYPE_MSG_HEADER_LIST_MODEL);
-
-#ifdef ASYNC_HEADERS
-		headers = tny_msg_folder_iface_get_headers (folder, FALSE);
-#else
-		headers = tny_msg_folder_iface_get_headers (folder, TRUE);
-#endif
-
-		model = TNY_MSG_HEADER_LIST_MODEL (headers);
-		header_model = GTK_TREE_MODEL (model);
-
-		tny_msg_header_list_model_set_folder (model, folder);
-
-/*
-		GTK_TREE_MODEL (
+		TnyListIface *model = TNY_LIST_IFACE (
 			tny_msg_header_list_model_new ());
 
 #ifdef ASYNC_HEADERS
-		tny_msg_header_list_model_set_folder (
-			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, FALSE);
+		tny_msg_folder_iface_get_headers (folder, model, FALSE);
 #else
-		tny_msg_header_list_model_set_folder (
-			TNY_MSG_HEADER_LIST_MODEL (header_model), folder, TRUE);
+		tny_msg_folder_iface_get_headers (folder, model, TRUE);
 #endif
-*/
+
+		header_model = GTK_TREE_MODEL (model);
+
+		tny_msg_header_list_model_set_folder (
+			TNY_MSG_HEADER_LIST_MODEL (model), folder);
 
 		sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 
@@ -277,8 +263,13 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			GtkTreeModel *model = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (sortable));
 
-			//if (G_LIKELY (model))
-			//	g_object_unref (G_OBJECT (model));
+			if (model)
+				g_object_unref (G_OBJECT (model));
+
+
+			// I have a reference wrong, this will be fixed very soon!
+			g_object_unref (G_OBJECT (model));
+
 
 			g_object_unref (G_OBJECT (sortable));
 		}
@@ -298,19 +289,20 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
 			&priv->last_mailbox_correct_select);
 
-		if (priv->last_folder) /* Don't forget this! (destroys the folder cache) */
+		if (priv->last_folder)
 			tny_msg_folder_iface_uncache (priv->last_folder);
 
 		priv->last_folder = folder;
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);
 
 	} else {
-		g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
-
+		g_signal_handler_block (G_OBJECT (priv->mailbox_select), 
+			priv->mailbox_select_sid);
 		/* Restore selection */
-		gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
-
-		g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
+		gtk_tree_selection_select_iter (priv->mailbox_select, 
+			&priv->last_mailbox_correct_select);
+		g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), 
+			priv->mailbox_select_sid);
 	}
 
 	return;
