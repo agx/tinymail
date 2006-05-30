@@ -347,17 +347,6 @@ Shared include file with forward typedefs
 @get_cache_dir_func: 
 @get_device_func: 
 
-<!-- ##### STRUCT TnyMsgHeaderProxy ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyMsgHeaderProxyClass ##### -->
-<para>
-
-</para>
-
 
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
@@ -387,23 +376,23 @@ It can typically be used to tell a key service, like GNOME key ring, to forget t
 
 <!-- ##### USER_FUNCTION TnyRefreshFolderCallback ##### -->
 <para>
-
+A callback function for tny_msg_folder_iface_refresh_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
 </para>
 
-@self: 
-@cancelled: 
-@user_data: 
+@self: The #TnyMsgFolderIface
+@cancelled: Whether or not a cancellation occured.
+@user_data: user data
 
 
 <!-- ##### USER_FUNCTION TnyRefreshFolderStatusCallback ##### -->
 <para>
-
+A callback function for tny_msg_folder_iface_refresh_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
 </para>
 
-@self: 
-@what: 
-@status: 
-@user_data: 
+@self: The #TnyMsgFolderIface
+@what: What happened
+@status: A status field
+@user_data: user data 
 
 
 <!-- ##### MACRO G_LIKELY ##### -->

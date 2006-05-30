@@ -16,6 +16,8 @@
 <!ENTITY libtinymail-TnyFsStream SYSTEM "xml/tny-fs-stream.xml">
 <!ENTITY libtinymail-TnyMsgFolderIface SYSTEM "xml/tny-msg-folder-iface.xml">
 <!ENTITY libtinymail-TnyDeviceIface SYSTEM "xml/tny-device-iface.xml">
+<!ENTITY libtinymail-TnyListIface SYSTEM "xml/tny-list-iface.xml">
+<!ENTITY libtinymail-TnyIteratorIface SYSTEM "xml/tny-iterator-iface.xml">
 
 <!ENTITY libtinymail-camel-TnyAccount SYSTEM "xml/tny-account.xml">
 <!ENTITY libtinymail-camel-TnyStoreAccount SYSTEM "xml/tny-store-account.xml">
@@ -99,6 +101,8 @@
 		&libtinymail-TnyMsgHeaderIface;
 		&libtinymail-TnyFsStream;
 		&libtinymail-TnyDeviceIface;
+		&libtinymail-TnyListIface;
+		&libtinymail-TnyIteratorIface;
 	</chapter>
 
 	<chapter id="libtinymailui">
