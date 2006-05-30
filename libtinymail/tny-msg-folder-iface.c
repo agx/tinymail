@@ -38,9 +38,9 @@ guint *tny_msg_folder_iface_signals;
  **/
 
 void
-tny_msg_folder_iface_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCallback callback, TnyGetHeadersStatusCallback status_callback, gpointer user_data)
+tny_msg_folder_iface_refresh_folder_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
-	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_headers_async_func (self, callback, status_callback, user_data);
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_folder_async_func (self, callback, status_callback, user_data);
 	return;
 }
 

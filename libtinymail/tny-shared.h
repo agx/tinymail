@@ -51,8 +51,8 @@ typedef struct _TnyMsgHeaderProxyClass TnyMsgHeaderProxyClass;
 typedef gchar* (*TnyGetPassFunc) (TnyAccountIface *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccountIface *self);
 typedef enum _TnyStoreAccountFolderType TnyStoreAccountFolderType;
-typedef void (*TnyGetHeadersCallback) (TnyMsgFolderIface *self, gboolean cancelled, gpointer user_data);
-typedef void (*TnyGetHeadersStatusCallback) (TnyMsgFolderIface *self, const gchar *what, gint status, gpointer user_data);
+typedef void (*TnyRefreshFolderCallback) (TnyMsgFolderIface *self, gboolean cancelled, gpointer user_data);
+typedef void (*TnyRefreshFolderStatusCallback) (TnyMsgFolderIface *self, const gchar *what, gint status, gpointer user_data);
 typedef enum _TnyMsgHeaderFlags TnyMsgHeaderFlags;
 
 #ifndef G_LIKELY

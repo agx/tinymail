@@ -91,7 +91,7 @@ struct _TnyMsgFolderIfaceClass
 	void           (*set_subscribed_func)    (TnyMsgFolderIface *self, const gboolean subscribed);
 	const gboolean (*get_subscribed_func)    (TnyMsgFolderIface *self);
 
-	void           (*refresh_headers_async_func) (TnyMsgFolderIface *self, TnyGetHeadersCallback callback, TnyGetHeadersStatusCallback status_callback, gpointer user_data);
+	void           (*refresh_folder_async_func) (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 
 };
 
@@ -121,7 +121,7 @@ const gboolean tny_msg_folder_iface_has_cache     (TnyMsgFolderIface *self);
 void           tny_msg_folder_iface_set_subscribed    (TnyMsgFolderIface *self, const gboolean subscribed);
 const gboolean tny_msg_folder_iface_get_subscribed    (TnyMsgFolderIface *self);
 
-void           tny_msg_folder_iface_refresh_headers_async (TnyMsgFolderIface *self, TnyGetHeadersCallback callback, TnyGetHeadersStatusCallback status_callback, gpointer user_data);
+void           tny_msg_folder_iface_refresh_folder_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 
 G_END_DECLS
 
