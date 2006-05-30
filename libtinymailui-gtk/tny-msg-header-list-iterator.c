@@ -43,11 +43,6 @@ struct _TnyMsgHeaderListIteratorClass
 void 
 _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
 {
-	if (self->model)
-		g_object_unref (G_OBJECT (self->model));
-
-	g_object_ref (G_OBJECT (model));
-
 	self->model = model;
 
 	/* It's not a list_copy, so don't free this list when 
@@ -91,9 +86,6 @@ static void
 tny_msg_header_list_iterator_finalize (GObject *object)
 {
 	TnyMsgHeaderListIterator *self = (TnyMsgHeaderListIterator *)object;
-
-	if (self->model)
-		g_object_unref (G_OBJECT (self->model));
 
 	(*parent_class->finalize) (object);
 

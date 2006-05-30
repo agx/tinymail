@@ -239,7 +239,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 	if (!cancelled)
 	{
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
-		GtkTreeModel *header_model, *sortable;
+		GtkTreeModel *header_model, *sortable, *oldsortable;
 		GtkTreeModel *select_model;
 
 		TnyListIface *model = TNY_LIST_IFACE (
@@ -256,33 +256,25 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		tny_msg_header_list_model_set_folder (
 			TNY_MSG_HEADER_LIST_MODEL (model), folder);
 
-		sortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
-
-		if (G_LIKELY (sortable) && G_LIKELY (GTK_IS_TREE_MODEL_SORT (sortable)))
+		oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));\
+		if (oldsortable && GTK_IS_TREE_MODEL_SORT (oldsortable))
 		{
-			GtkTreeModel *model = gtk_tree_model_sort_get_model 
-				(GTK_TREE_MODEL_SORT (sortable));
-
-			if (model)
-				g_object_unref (G_OBJECT (model));
-
-
-			// I have a reference wrong, this will be fixed very soon!
-			g_object_unref (G_OBJECT (model));
-
-
-			g_object_unref (G_OBJECT (sortable));
+			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
+				(GTK_TREE_MODEL_SORT (oldsortable));
+			if (oldmodel)
+				g_object_unref (G_OBJECT (oldmodel));
+			g_object_unref (G_OBJECT (oldsortable));
 		}
 
 		sortable = gtk_tree_model_sort_new_with_model (header_model);
 
-		/* TODO: Implement a fast sorting algorithm (not easy) */
-
-		/* gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
+		/* TODO: Implement a fast sorting algorithm (not easy)
+		   gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
 				GTK_SORT_ASCENDING); */
-			
+
 		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
+
 
 		g_idle_add (cleanup_statusbar, priv);
 
@@ -296,9 +288,10 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);
 
 	} else {
+		/* Restore selection */
+
 		g_signal_handler_block (G_OBJECT (priv->mailbox_select), 
 			priv->mailbox_select_sid);
-		/* Restore selection */
 		gtk_tree_selection_select_iter (priv->mailbox_select, 
 			&priv->last_mailbox_correct_select);
 		g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), 
@@ -341,10 +334,8 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 		if (type == -1) 
 		{ 
-			/* If an "account name"-row was clicked */ 
-
+			/* If an "account name"-row was clicked */
 			g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
-			/* Restore selection */
 			gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
 			g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 			return; 
@@ -354,13 +345,8 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
 
-		/* Note: if you can reselect the cur folder after selecting 
-		   these account-name 'folders' (you can if you try hard),
-		   things will crash. Known bug, I'm trying to solve this. 
-
-		   However, if the last folder is known, and the new folder is
-		   the same anyway, then why reload it?!
-		*/
+		/* If the last folder is known, and the new folder is
+		   the same: why reload it?! */
 
 		if (priv->last_folder == folder)
 			return;
@@ -413,15 +399,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				(tny_platform_factory_get_instance ());
 
 			folder = tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE (header));
-
-			/* KNOWN: This call will block the ui if a folder is 
-			   being async loaded. This can be fixed by implementing
-			   an async version of this method. I'm not yet planning 
-			   to do that. */
-
-			/* Another solution would be to set the ui back to the
-			   folder of this message, and camel-cancel the folder-
-			   request. Update: This solution has been implemented. */
 
 			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
 			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));

@@ -132,8 +132,8 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 
 	/* Return the path of an existing GtkTreeIter */
 
-	g_return_val_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL 
-			(self)->stamp, NULL);
+	if  (!(iter->stamp == TNY_MSG_HEADER_LIST_MODEL (self)->stamp))
+		return NULL;
 
 	g_mutex_lock (list_model->folder_lock);
 
@@ -534,9 +534,8 @@ tny_msg_header_list_model_relaxed_performer (gpointer data)
 	while ((count < 5) && list)
 	{
 		GList *element = list;
-		if (element && element->data) { printf ("rem\n");
+		if (element && element->data)
 			d->relaxed_func (element->data, NULL);
-		}
 		list = g_list_remove_link (list, element);
 		g_list_free (element);
 		count++;
@@ -544,7 +543,6 @@ tny_msg_header_list_model_relaxed_performer (gpointer data)
 
 	d->list = list;
 
-	printf ("--\n");
 	if (count <= 1)
 		return FALSE;
 
@@ -605,17 +603,17 @@ tny_msg_header_list_model_finalize (GObject *object)
 	TnyMsgHeaderListModel *self = (TnyMsgHeaderListModel *)object;
 
 	g_mutex_lock (self->folder_lock);
-
-	if (self->folder) 
-		g_object_unref (G_OBJECT (self->folder));
-
 	g_mutex_lock (self->iterator_lock);
 
-	tny_msg_header_list_model_hdr_cache_remover (self);
 	self->length = 0;
+	tny_msg_header_list_model_hdr_cache_remover (self);
 
-	if (self->iterator)
-		g_object_unref (G_OBJECT (self->iterator));
+	if (self->folder) 
+	{
+		g_object_unref (G_OBJECT (self->folder));
+		if (self->iterator)
+			g_object_unref (G_OBJECT (self->iterator));
+	}
 
 	g_mutex_unlock (self->iterator_lock);
 
@@ -671,7 +669,9 @@ void
 tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder)
 {
 	g_mutex_lock (self->folder_lock);
+
 	self->iterator = TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (self));
+
 	g_mutex_lock (self->iterator_lock);
 
 	if (G_LIKELY (self->folder))

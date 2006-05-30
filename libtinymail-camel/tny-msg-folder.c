@@ -464,31 +464,27 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 	CamelException ex;
 	FldAndPriv *ptr = NULL;
 
-	g_object_ref (G_OBJECT (headers));
 
 	g_mutex_lock (priv->folder_lock);
 
+	g_object_ref (G_OBJECT (headers));
+
 	unload_folder_no_lock (priv, TRUE);
 	load_folder_no_lock (priv);
-	ptr = g_new (FldAndPriv, 1);
 
-	/* Prepare speedup trick */
+	ptr = g_new (FldAndPriv, 1);
 	ptr->self = self;
 	ptr->priv = priv;
 	ptr->headers = headers;
-
-	/* This one consumes time (use the async stuff) */
 
 	if (refresh)
 		camel_folder_refresh_info (priv->folder, &ex);
 
 	priv->cached_length = 0;
-
 	uids = camel_folder_get_uids (priv->folder);
 	g_ptr_array_foreach (uids, add_message_with_uid, ptr);
-
-	/* Cleanup speedup trick */
 	g_free (ptr);
+
 
 	/* Speedup trick, also check tny-msg-header.c */
 	priv->cached_uids = uids;
@@ -509,9 +505,10 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 	/* So we postpone the freeing to the finalize 
 	camel_folder_free_uids (priv->folder, uids); */
 
+	g_object_unref (G_OBJECT (headers));
+
 	g_mutex_unlock (priv->folder_lock);
 
-	g_object_unref (G_OBJECT (headers));
 
 	return;
 }
