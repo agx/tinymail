@@ -175,7 +175,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_refresh_headers_async ##### -->
+<!-- ##### FUNCTION tny_msg_folder_iface_refresh_async ##### -->
 <para>
 
 </para>
@@ -184,5 +184,13 @@ instances. Depending on the implementation, this will reduce memory usage.
 @callback: 
 @status_callback: 
 @user_data: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_refresh ##### -->
+<para>
+
+</para>
+
+@self: 
 
 

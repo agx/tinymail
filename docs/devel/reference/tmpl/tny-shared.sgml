@@ -121,7 +121,8 @@ Shared include file with forward typedefs
 @has_cache_func: 
 @set_subscribed_func: 
 @get_subscribed_func: 
-@refresh_headers_async_func: 
+@refresh_async_func: 
+@refresh_func: 
 
 <!-- ##### STRUCT TnyMsgHeaderIface ##### -->
 <para>
@@ -384,25 +385,25 @@ It can typically be used to tell a key service, like GNOME key ring, to forget t
 @self:  The #TnyAccountIface instance of which the password was not accepted
 
 
-<!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
+<!-- ##### USER_FUNCTION TnyRefreshFolderCallback ##### -->
 <para>
-A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
+
 </para>
 
-@self: The #TnyMsgFolderIface
-@cancelled: Whether or not a cancellation occured.
-@user_data: user data
+@self: 
+@cancelled: 
+@user_data: 
 
 
-<!-- ##### USER_FUNCTION TnyGetHeadersStatusCallback ##### -->
+<!-- ##### USER_FUNCTION TnyRefreshFolderStatusCallback ##### -->
 <para>
-A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
+
 </para>
 
-@self: The #TnyMsgFolderIface
-@what: What happened
-@status: A status field
-@user_data: user data
+@self: 
+@what: 
+@status: 
+@user_data: 
 
 
 <!-- ##### MACRO G_LIKELY ##### -->

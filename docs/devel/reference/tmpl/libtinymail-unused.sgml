@@ -75,6 +75,25 @@ TnyMsgHeaderProxy
 </para>
 
 
+<!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
+<para>
+A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
+</para>
+
+@self: The #TnyMsgFolderIface
+@cancelled: Whether or not a cancellation occured.
+@user_data: user data
+
+<!-- ##### USER_FUNCTION TnyGetHeadersStatusCallback ##### -->
+<para>
+A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
+</para>
+
+@self: The #TnyMsgFolderIface
+@what: What happened
+@status: A status field
+@user_data: user data
+
 <!-- ##### STRUCT TnyMsgFolderProxy ##### -->
 <para>
 
@@ -103,6 +122,16 @@ TnyMsgHeaderProxy
 </para>
 
 @Returns: 
+
+<!-- ##### FUNCTION tny_msg_folder_iface_refresh_headers_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 <!-- ##### FUNCTION tny_msg_folder_proxy_new ##### -->
 <para>
