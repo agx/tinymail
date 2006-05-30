@@ -80,8 +80,8 @@ tny_list_iface_create_iterator (TnyListIface *self)
 /**
  * tny_list_iface_foreach:
  * @self: A #TnyListIface instance
- * func: the function to call with each element's data.
- * user_data: user data to pass to the function.
+ * @func: the function to call with each element's data.
+ * @user_data: user data to pass to the function.
  *
  * Calls a function for each element of a #TnyListIface.
  *
