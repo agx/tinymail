@@ -460,6 +460,10 @@ tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 
 	/* Remove something from the list */
 
+	/* TODO: the treeview updating doesn't yet work correctly */
+
+	while (item == tny_iterator_iface_next (me->iterator));
+
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 	me->length--;
