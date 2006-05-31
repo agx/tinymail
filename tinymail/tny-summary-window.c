@@ -256,10 +256,10 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (oldsortable));
 			if (oldmodel)
-				g_object_unref (G_OBJECT (oldmodel));
+				g_object_unref (G_OBJECT (oldmodel)); 
 			g_object_unref (G_OBJECT (oldsortable));
-		}
-
+		} 
+		
 		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
 
 		/* TODO: Implement a fast sorting algorithm (not easy)
@@ -268,7 +268,6 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 				GTK_SORT_ASCENDING); */
 
 		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
-
 
 		g_idle_add (cleanup_statusbar, priv);
 
@@ -382,12 +381,12 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		
 		if (G_LIKELY (header))
 		{
-/* Debugging/testing purposes */
+/* Debugging/testing purposes 
 			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (model));
-			tny_list_iface_remove (TNY_LIST_IFACE (oldmodel), header);
+			tny_list_iface_append (TNY_LIST_IFACE (oldmodel), header);
 
-/*
+*/
 			const TnyMsgFolderIface *folder;
 			const TnyMsgIface *msg;
 			const TnyMsgHeaderIface *nheader;
@@ -410,7 +409,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				TNY_MSG_IFACE (msg));
 	
 			gtk_widget_show (GTK_WIDGET (msgwin));
-*/
+
 		}
 	}
 }

@@ -202,7 +202,7 @@ tny_msg_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 gpointer 
 _tny_msg_header_list_iterator_current_nl (TnyMsgHeaderListIterator *me)
 {
-	return me->current->data;
+	return me->current?me->current->data:NULL;
 }
 
 static gpointer 

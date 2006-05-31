@@ -409,6 +409,10 @@ tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 	me->first = g_list_prepend (me->first, item);
 	me->length++;
 	g_object_ref (G_OBJECT (item));
+
+	((TnyMsgHeaderListIterator*)me->iterator)->current = me->first;
+	me->last_nth = 0;
+
 	g_mutex_unlock (me->iterator_lock);
 
 	gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
@@ -432,6 +436,10 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 	me->first = g_list_append (me->first, item);
 	me->length++;
 	g_object_ref (G_OBJECT (item));
+
+	((TnyMsgHeaderListIterator*)me->iterator)->current = me->first;
+	me->last_nth = 0;
+
 	g_mutex_unlock (me->iterator_lock);
 
 	gtk_tree_path_append_index (path, me->length);
@@ -696,6 +704,7 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 	self->iterator_lock = g_mutex_new ();
 	self->first = NULL;
 	self->length = 0;
+	self->iterator = TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (self, FALSE));
 
 	return;
 }
@@ -713,21 +722,20 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 void
 tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh)
 {
-	g_mutex_lock (self->folder_lock);
+
+	g_mutex_lock (self->iterator_lock);
+	self->length = 0;
+	((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
+	self->last_nth = 0;
+	g_mutex_unlock (self->iterator_lock);
 
 	tny_msg_folder_iface_get_headers (folder, TNY_LIST_IFACE (self), refresh);
 
+	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);
 
-	if (self->iterator)
-	{
-		self->length = 0;
-		((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
-		self->last_nth = 0;
-		g_object_unref (G_OBJECT (self->iterator));
-	}
-
-	self->iterator = TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (self, FALSE));
+	((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
+	self->last_nth = 0;
 
 	if (G_LIKELY (self->folder))
 	{
@@ -739,12 +747,9 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 		g_object_unref (G_OBJECT (self->folder));
 	}
 	g_object_ref (G_OBJECT (folder));
-
-
 	self->folder = folder;
-
 	g_mutex_unlock (self->iterator_lock);
-	g_mutex_unlock (self->folder_lock);
+	g_mutex_unlock (self->folder_lock);	
 
 	return;
 }
