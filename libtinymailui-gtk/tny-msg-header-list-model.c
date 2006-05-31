@@ -330,7 +330,9 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	g_return_if_fail (self);
 	g_return_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL (self)->stamp);
-	g_return_if_fail (iter->user_data != NULL);
+
+	if (!iter->user_data);
+		return;
 
 	g_mutex_lock (list_model->folder_lock);
 
@@ -399,10 +401,15 @@ static void
 tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
+	GtkTreePath *path;
+	GtkTreeIter iter;
+
+	path = gtk_tree_path_new ();
+	gtk_tree_path_append_index (path, 0);
+	iter.stamp = me->stamp;
+	iter.user_data = item;
 
 	/* Prepend something to the list */
-
-	/* TODO: Update the view */
 
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_prepend (me->first, item);
@@ -410,16 +417,22 @@ tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 	g_object_ref (G_OBJECT (item));
 	g_mutex_unlock (me->iterator_lock);
 
+	gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
+	gtk_tree_path_free (path);
 }
 
 static void
 tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
+	GtkTreePath *path;
+	GtkTreeIter iter;
+
+	path = gtk_tree_path_new ();
+	iter.stamp = me->stamp;
+	iter.user_data = item;
 
 	/* Append something to the list */
-
-	/* TODO: Update the view */
 
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_append (me->first, item);
@@ -427,16 +440,25 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 	g_object_ref (G_OBJECT (item));
 	g_mutex_unlock (me->iterator_lock);
 
+	gtk_tree_path_append_index (path, me->length);
+	gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
+	gtk_tree_path_free (path);
+
 }
 
 static void
 tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
+	GtkTreePath *path;
+	GtkTreeIter iter;
+
+	iter.stamp = me->stamp;
+	iter.user_data = item;
+
+	path = tny_msg_header_list_model_get_path (GTK_TREE_MODEL (me), &iter);
 
 	/* Remove something from the list */
-
-	/* TODO: Update the view */
 
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_remove (me->first, (gconstpointer)item);
@@ -444,6 +466,8 @@ tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 	g_object_unref (G_OBJECT (item));
 	g_mutex_unlock (me->iterator_lock);
 
+	gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
+	gtk_tree_path_free (path);
 }
 
 static TnyIteratorIface*
@@ -719,17 +743,17 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
  * tny_msg_header_list_model_new:
  *
  *
- * Return value: a new #GtkTreeModel instance suitable for showing lots of 
+ * Return value: a new #TnyMsgHeaderListModel instance suitable for showing lots of 
  * #TnyMsgHeaderIface instances
  **/
-GtkTreeModel *
+TnyMsgHeaderListModel*
 tny_msg_header_list_model_new (void)
 {
 	TnyMsgHeaderListModel *model;
 
 	model = g_object_new (TNY_TYPE_MSG_HEADER_LIST_MODEL, NULL);
 	
-	return GTK_TREE_MODEL (model);
+	return model;
 }
 
 GType
