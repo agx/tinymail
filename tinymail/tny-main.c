@@ -61,8 +61,8 @@ main (int argc, char **argv)
 	GtkWindow *window = NULL;
 	TnyPlatformFactoryIface *platfact;
 
-	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
+	gtk_init (&argc, &argv);
 	gdk_threads_init ();
 
 #ifdef GNOME
