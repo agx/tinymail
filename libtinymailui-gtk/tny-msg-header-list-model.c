@@ -597,6 +597,20 @@ tny_msg_header_list_model_hdr_cache_remover (TnyMsgHeaderListModel *self)
 } 
 
 
+static void 
+tny_msg_header_list_model_hdr_cache_remover_copy (TnyMsgHeaderListModel *self)
+{
+	RelaxedData *d = g_new (RelaxedData, 1);
+
+	d->relaxed_func = (GFunc)proxy_destroy_func;
+	d->list = g_list_copy (self->first);
+
+	g_idle_add_full (G_PRIORITY_LOW, tny_msg_header_list_model_relaxed_performer, 
+		d, tny_msg_header_list_model_relaxed_data_destroyer);
+
+	return;
+} 
+
 static void
 tny_msg_header_list_model_finalize (GObject *object)
 {
@@ -680,8 +694,15 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	g_mutex_lock (self->iterator_lock);
 
 	if (G_LIKELY (self->folder))
+	{
+		if (self->first)
+			tny_msg_header_list_model_hdr_cache_remover_copy (self);
+		g_list_free (self->first);
+		self->first = NULL;
 		g_object_unref (G_OBJECT (self->folder));
+	}
 	g_object_ref (G_OBJECT (folder));
+
 
 	self->folder = folder;
 
