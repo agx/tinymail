@@ -255,10 +255,22 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		{
 			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (oldsortable));
+
 			if (oldmodel)
+			{
 				g_object_unref (G_OBJECT (oldmodel));
+				/*tny_msg_header_list_model_set_folder (oldmodel, folder, refresh); */
+			}
+
 			g_object_unref (G_OBJECT (oldsortable));
 		} 
+/*		else {
+			TnyMsgHeaderListModel *model = tny_msg_header_list_model_new ();
+			tny_msg_header_list_model_set_folder (model, folder, refresh);
+			sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
+			gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
+		}
+*/
 
 		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
 
