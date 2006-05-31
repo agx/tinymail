@@ -295,6 +295,7 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 {
 	GList *child, *headers;
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
+	GList *restore;
 
 	if (G_UNLIKELY (parent))
 		return FALSE;
@@ -302,12 +303,13 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	g_mutex_lock (list_model->folder_lock);
 	g_mutex_lock (list_model->iterator_lock);
 
+	restore = ((TnyMsgHeaderListIterator*)list_model->iterator)->current;
 	/* Move the GtkTreeIter to the nth child */
 	child = _tny_msg_header_list_iterator_nth_nl ((TnyMsgHeaderListIterator*)list_model->iterator, n);
-	list_model->last_nth = n;
 
 	if (G_LIKELY (child))
 	{
+		list_model->last_nth = n;
 		iter->stamp = TNY_MSG_HEADER_LIST_MODEL (self)->stamp;
 		iter->user_data = child;
 
@@ -316,6 +318,8 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 
 		return TRUE;
 	}
+
+	((TnyMsgHeaderListIterator*)list_model->iterator)->current = restore;
 
 	g_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
