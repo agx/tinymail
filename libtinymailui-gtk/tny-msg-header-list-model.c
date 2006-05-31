@@ -606,6 +606,8 @@ tny_msg_header_list_model_finalize (GObject *object)
 	g_mutex_lock (self->iterator_lock);
 
 	self->length = 0;
+
+	/* This one will also do the g_list_free (self->first) */
 	tny_msg_header_list_model_hdr_cache_remover (self);
 
 	if (self->folder) 
@@ -661,14 +663,17 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
  * tny_msg_header_list_model_set_folder:
  * @self: A #TnyMsgHeaderListModel instance
  * @folder: a #TnyMsgFolderIface instance
+ * @refresh: refresh first
  *
  * Set the folder where the #TnyMsgHeaderIface instances are located
  * 
  **/
 void
-tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder)
+tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh)
 {
 	g_mutex_lock (self->folder_lock);
+
+	tny_msg_folder_iface_get_headers (folder, TNY_LIST_IFACE (self), refresh);
 
 	self->iterator = TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (self));
 
@@ -677,6 +682,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	if (G_LIKELY (self->folder))
 		g_object_unref (G_OBJECT (self->folder));
 	g_object_ref (G_OBJECT (folder));
+
 	self->folder = folder;
 
 	g_mutex_unlock (self->iterator_lock);

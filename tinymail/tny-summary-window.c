@@ -239,22 +239,16 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 	if (!cancelled)
 	{
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
-		GtkTreeModel *header_model, *sortable, *oldsortable;
+		GtkTreeModel *sortable, *oldsortable;
 		GtkTreeModel *select_model;
+		TnyMsgHeaderListModel *model = tny_msg_header_list_model_new ();
+		gboolean refresh = FALSE;
 
-		TnyListIface *model = TNY_LIST_IFACE (
-			tny_msg_header_list_model_new ());
-
-#ifdef ASYNC_HEADERS
-		tny_msg_folder_iface_get_headers (folder, model, FALSE);
-#else
-		tny_msg_folder_iface_get_headers (folder, model, TRUE);
+#ifndef ASYNC_HEADERS
+		refresh = TRUE;
 #endif
 
-		header_model = GTK_TREE_MODEL (model);
-
-		tny_msg_header_list_model_set_folder (
-			TNY_MSG_HEADER_LIST_MODEL (model), folder);
+		tny_msg_header_list_model_set_folder (model, folder, refresh);
 
 		oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 		if (oldsortable && GTK_IS_TREE_MODEL_SORT (oldsortable))
@@ -266,7 +260,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			g_object_unref (G_OBJECT (oldsortable));
 		}
 
-		sortable = gtk_tree_model_sort_new_with_model (header_model);
+		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
 
 		/* TODO: Implement a fast sorting algorithm (not easy)
 		   gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
