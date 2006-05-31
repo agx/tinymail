@@ -460,18 +460,19 @@ tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 
 	/* Remove something from the list */
 
-	/* TODO: the treeview updating doesn't yet work correctly */
-
-	while (item == tny_iterator_iface_next (me->iterator));
-
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 	me->length--;
 	g_object_unref (G_OBJECT (item));
+
+	((TnyMsgHeaderListIterator*)me->iterator)->current = me->first;
+	me->last_nth = 0;
+
 	g_mutex_unlock (me->iterator_lock);
 
 	gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
 	gtk_tree_path_free (path);
+
 }
 
 static TnyIteratorIface*

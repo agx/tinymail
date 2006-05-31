@@ -28,17 +28,7 @@ static GObjectClass *parent_class = NULL;
 
 GType _tny_msg_header_list_iterator_get_type (void);
 
-struct _TnyMsgHeaderListIterator
-{
-	GObject parent;
-	TnyMsgHeaderListModel *model;
-	GList *current;
-};
 
-struct _TnyMsgHeaderListIteratorClass 
-{
-	GObjectClass parent;
-};
 
 void 
 _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
