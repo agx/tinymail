@@ -729,11 +729,24 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	iter.user_data = self->first;
 	path = tny_msg_header_list_model_get_path (GTK_TREE_MODEL (self), &iter);
 
+	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);
+
+
+	if (self->first)
+	{
+		tny_msg_header_list_model_hdr_cache_remover_copy (self);
+		g_list_free (self->first);
+	}
+	self->first = NULL;
+	if (G_LIKELY (self->folder))
+		g_object_unref (G_OBJECT (self->folder));
+
 	self->length = 0;
-	((TnyMsgHeaderListIterator*)self->iterator)->current = NULL;
+	((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
 	self->last_nth = 0;
 	g_mutex_unlock (self->iterator_lock);
+	g_mutex_unlock (self->folder_lock);
 
 	tny_msg_folder_iface_get_headers (folder, TNY_LIST_IFACE (self), refresh);
 
@@ -743,16 +756,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 
 	((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
 	self->last_nth = 0;
-
-	if (G_LIKELY (self->folder))
-	{
-
-		if (self->first)
-			tny_msg_header_list_model_hdr_cache_remover_copy (self);
-		g_list_free (self->first);
-		self->first = NULL;
-		g_object_unref (G_OBJECT (self->folder));
-	}
+	
 	g_object_ref (G_OBJECT (folder));
 	self->folder = folder;
 	g_mutex_unlock (self->iterator_lock);

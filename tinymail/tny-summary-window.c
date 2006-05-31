@@ -256,10 +256,10 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (oldsortable));
 			if (oldmodel)
-				g_object_unref (G_OBJECT (oldmodel)); 
+				g_object_unref (G_OBJECT (oldmodel));
 			g_object_unref (G_OBJECT (oldsortable));
 		} 
-		
+
 		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
 
 		/* TODO: Implement a fast sorting algorithm (not easy)
