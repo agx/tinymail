@@ -722,6 +722,12 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 void
 tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh)
 {
+	GtkTreeIter iter;
+	GtkTreePath *path;
+
+	iter.stamp = self->stamp;
+	iter.user_data = self->first;
+	path = tny_msg_header_list_model_get_path (GTK_TREE_MODEL (self), &iter);
 
 	g_mutex_lock (self->iterator_lock);
 	self->length = 0;
@@ -733,6 +739,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 
 	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);
+
 
 	((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
 	self->last_nth = 0;
@@ -750,6 +757,10 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	self->folder = folder;
 	g_mutex_unlock (self->iterator_lock);
 	g_mutex_unlock (self->folder_lock);	
+
+	gtk_tree_path_append_index (path, 0);
+	gtk_tree_model_row_inserted (GTK_TREE_MODEL (self), path, &iter);
+	gtk_tree_path_free (path);
 
 	return;
 }

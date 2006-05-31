@@ -100,8 +100,8 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
 gpointer 
 _tny_msg_header_list_iterator_next_nl (TnyMsgHeaderListIterator *me)
 {
-	me->current = g_list_next (me->current);
-	return me->current->data;
+	me->current = me->current?g_list_next (me->current):NULL;
+	return me->current?me->current->data:NULL;
 }
 
 static gpointer 
@@ -124,8 +124,8 @@ tny_msg_header_list_iterator_next (TnyIteratorIface *self)
 gpointer 
 _tny_msg_header_list_iterator_prev_nl (TnyMsgHeaderListIterator *me)
 {
-	me->current = g_list_previous (me->current);
-	return me->current->data;
+	me->current = me->current?g_list_previous (me->current):NULL;
+	return me->current?me->current->data:NULL;
 }
 
 static gpointer 
@@ -148,8 +148,8 @@ tny_msg_header_list_iterator_prev (TnyIteratorIface *self)
 gpointer 
 _tny_msg_header_list_iterator_first_nl (TnyMsgHeaderListIterator *me)
 {
-	me->current = me->model->first;
-	return me->current->data;
+	me->current = me->model?me->model->first:NULL;
+	return me->current?me->current->data:NULL;
 }
 
 static gpointer 
@@ -175,8 +175,8 @@ tny_msg_header_list_iterator_first (TnyIteratorIface *self)
 gpointer 
 _tny_msg_header_list_iterator_nth_nl (TnyMsgHeaderListIterator *me, guint nth)
 {
-	me->current = g_list_nth (me->model->first, nth);
-	return me->current->data;
+	me->current = me->model?g_list_nth (me->model->first, nth):NULL;
+	return me->current?me->current->data:NULL;
 }
 
 static gpointer 
@@ -226,7 +226,7 @@ tny_msg_header_list_iterator_current (TnyIteratorIface *self)
 gboolean 
 _tny_msg_header_list_iterator_has_next_nl (TnyMsgHeaderListIterator *me)
 {
-	return (me->current->next!=NULL);
+	return (me->current?me->current->next!=NULL:FALSE);
 }
 
 static gboolean 
