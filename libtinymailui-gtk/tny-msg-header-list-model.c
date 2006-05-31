@@ -725,7 +725,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 
 	g_mutex_lock (self->iterator_lock);
 	self->length = 0;
-	((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
+	((TnyMsgHeaderListIterator*)self->iterator)->current = NULL;
 	self->last_nth = 0;
 	g_mutex_unlock (self->iterator_lock);
 
