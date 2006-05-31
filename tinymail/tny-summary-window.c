@@ -394,7 +394,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 /* Debugging/testing purposes 
 			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
 				(GTK_TREE_MODEL_SORT (model));
-			tny_list_iface_append (TNY_LIST_IFACE (oldmodel), header);
+			tny_list_iface_remove (TNY_LIST_IFACE (oldmodel), header);
 
 */
 			const TnyMsgFolderIface *folder;

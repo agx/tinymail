@@ -457,7 +457,7 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 	g_mutex_unlock (me->iterator_lock);
 
 	/* Letting the observers know about this (the GtkTreeView) */
-	gtk_tree_path_append_index (path, me->length);
+	gtk_tree_path_append_index (path, me->length-1);
 	gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
 	gtk_tree_path_free (path);
 
