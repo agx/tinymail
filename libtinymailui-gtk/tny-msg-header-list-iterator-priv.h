@@ -51,9 +51,16 @@ struct _TnyMsgHeaderListIteratorClass
 	GObjectClass parent;
 };
 
-void _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model);
-TnyMsgHeaderListIterator* _tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model);
-void _tny_msg_header_list_iterator_travel_to_nth (TnyMsgHeaderListIterator *self, guint cur, guint nth);
+void _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model, gboolean lock);
+TnyMsgHeaderListIterator* _tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model, gboolean lock);
+
+void _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth);
+gboolean _tny_msg_header_list_iterator_has_next_nl (TnyMsgHeaderListIterator *self);
+gpointer _tny_msg_header_list_iterator_current_nl (TnyMsgHeaderListIterator *me);
+gpointer _tny_msg_header_list_iterator_nth_nl (TnyMsgHeaderListIterator *me, guint nth);
+gpointer _tny_msg_header_list_iterator_first_nl (TnyMsgHeaderListIterator *me);
+gpointer _tny_msg_header_list_iterator_prev_nl (TnyMsgHeaderListIterator *me);
+gpointer _tny_msg_header_list_iterator_next_nl (TnyMsgHeaderListIterator *me);
 
 
 G_END_DECLS

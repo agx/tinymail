@@ -31,7 +31,7 @@ GType _tny_msg_header_list_iterator_get_type (void);
 
 
 void 
-_tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model)
+_tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model, gboolean lock)
 {
 	self->model = model;
 
@@ -42,9 +42,13 @@ _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgH
 	   When the iterator starts, it points to 'start', or,
 	   the first node in the list. */
 
-	g_mutex_lock (self->model->iterator_lock);
+	if (lock)
+		g_mutex_lock (self->model->iterator_lock);
+
 	self->current = model->first;
-	g_mutex_unlock (self->model->iterator_lock);
+
+	if (lock)
+		g_mutex_unlock (self->model->iterator_lock);
 
 	return;
 }
@@ -52,11 +56,11 @@ _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgH
 
 
 TnyMsgHeaderListIterator*
-_tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model)
+_tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model, gboolean lock)
 {
 	TnyMsgHeaderListIterator *self = g_object_new (TNY_TYPE_MSG_HEADER_LIST_ITERATOR, NULL);
 
-	_tny_msg_header_list_iterator_set_model (self, model);
+	_tny_msg_header_list_iterator_set_model (self, model, lock);
 
 	return self;
 }
@@ -83,7 +87,7 @@ tny_msg_header_list_iterator_finalize (GObject *object)
 }
 
 void /* Protected method that speeds-up the TnyMsgHeaderListModel type */
-_tny_msg_header_list_iterator_travel_to_nth (TnyMsgHeaderListIterator *self, guint cur, guint nth)
+_tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
 {
 	if (cur < nth)
 		while ((cur++ < nth) && self->current)
@@ -91,6 +95,13 @@ _tny_msg_header_list_iterator_travel_to_nth (TnyMsgHeaderListIterator *self, gui
 	else if (cur > nth)
 		while ((cur-- > nth) && self->current)
 			self->current = self->current->prev;
+}
+
+gpointer 
+_tny_msg_header_list_iterator_next_nl (TnyMsgHeaderListIterator *me)
+{
+	me->current = g_list_next (me->current);
+	return me->current->data;
 }
 
 static gpointer 
@@ -110,6 +121,13 @@ tny_msg_header_list_iterator_next (TnyIteratorIface *self)
 	return me->current->data;
 }
 
+gpointer 
+_tny_msg_header_list_iterator_prev_nl (TnyMsgHeaderListIterator *me)
+{
+	me->current = g_list_previous (me->current);
+	return me->current->data;
+}
+
 static gpointer 
 tny_msg_header_list_iterator_prev (TnyIteratorIface *self)
 {
@@ -124,6 +142,13 @@ tny_msg_header_list_iterator_prev (TnyIteratorIface *self)
 	me->current = g_list_previous (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
+	return me->current->data;
+}
+
+gpointer 
+_tny_msg_header_list_iterator_first_nl (TnyMsgHeaderListIterator *me)
+{
+	me->current = me->model->first;
 	return me->current->data;
 }
 
@@ -147,6 +172,13 @@ tny_msg_header_list_iterator_first (TnyIteratorIface *self)
 }
 
 
+gpointer 
+_tny_msg_header_list_iterator_nth_nl (TnyMsgHeaderListIterator *me, guint nth)
+{
+	me->current = g_list_nth (me->model->first, nth);
+	return me->current->data;
+}
+
 static gpointer 
 tny_msg_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
@@ -167,6 +199,12 @@ tny_msg_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 }
 
 
+gpointer 
+_tny_msg_header_list_iterator_current_nl (TnyMsgHeaderListIterator *me)
+{
+	return me->current->data;
+}
+
 static gpointer 
 tny_msg_header_list_iterator_current (TnyIteratorIface *self)
 {
@@ -183,6 +221,12 @@ tny_msg_header_list_iterator_current (TnyIteratorIface *self)
 	g_mutex_unlock (me->model->iterator_lock);
 
 	return retval;
+}
+
+gboolean 
+_tny_msg_header_list_iterator_has_next_nl (TnyMsgHeaderListIterator *me)
+{
+	return (me->current->next!=NULL);
 }
 
 static gboolean 
