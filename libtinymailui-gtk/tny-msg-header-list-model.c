@@ -631,6 +631,9 @@ tny_msg_header_list_model_finalize (GObject *object)
 			g_object_unref (G_OBJECT (self->iterator));
 	}
 
+	/* This shouldn't influence the cache remover since it copies the ptr */
+	self->first = NULL;
+
 	g_mutex_unlock (self->iterator_lock);
 
 	g_mutex_unlock (self->folder_lock);
