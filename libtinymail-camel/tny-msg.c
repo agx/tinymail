@@ -139,10 +139,10 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 
 	g_mutex_lock (priv->message_lock);
 
-	if (G_LIKELY (ppriv->part))
+	if (ppriv->part)
 		camel_object_unref (CAMEL_OBJECT (ppriv->part));
 
-	camel_object_ref (CAMEL_OBJECT (message));
+	//camel_object_ref (CAMEL_OBJECT (message));
 	ppriv->part = CAMEL_MIME_PART (message);
 	
 	unload_parts (priv);

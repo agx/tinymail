@@ -345,9 +345,11 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 	if (G_UNLIKELY (priv->cached_content_type))
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
-	if (G_UNLIKELY (priv->part))
+
+	if (priv->part)
 		camel_object_unref (CAMEL_OBJECT (priv->part));
-	camel_object_ref (CAMEL_OBJECT (part));
+
+	//camel_object_ref (CAMEL_OBJECT (part));
 	priv->part = part;
 
 	g_mutex_unlock (priv->part_lock);

@@ -685,10 +685,10 @@ tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 
 	g_mutex_lock (priv->folder_lock);
 	
-	if (G_UNLIKELY (priv->folder))
-		camel_object_unref (priv->folder);
+//	if (G_UNLIKELY (priv->folder))
+//		camel_object_unref (priv->folder);
 
-	camel_object_ref (camel_folder);
+//	camel_object_ref (camel_folder);
 
 	tny_msg_folder_set_id (TNY_MSG_FOLDER_IFACE (self), 
 		camel_folder_get_full_name (camel_folder));
@@ -759,8 +759,11 @@ tny_msg_folder_new (void)
 static void
 destroy_folder (gpointer data, gpointer user_data)
 {
-	g_object_unref (G_OBJECT (data));
-
+printf ("tny-msg-folder.c:destroy folder\n");
+	if (data)
+		g_object_unref (G_OBJECT (data));
+	else
+		g_warning ("NOT\n");
 	return;
 }
 
@@ -769,25 +772,29 @@ tny_msg_folder_finalize (GObject *object)
 {
 	TnyMsgFolder *self = (TnyMsgFolder*) object;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+printf ("tny-msg-folder.c:final\n");
+
+	g_mutex_lock (priv->folders_lock);
+	if (G_LIKELY (priv->folders))
+	{
+printf ("tny-msg-folder.c:foreach\n");
+		//tny_list_iface_foreach (priv->folders, destroy_folder, NULL);
+printf ("tny-msg-folder.c:b\n");
+		g_object_unref (G_OBJECT (priv->folders));
+printf ("tny-msg-folder.c:c\n");
+		priv->folders = NULL;
+	}
+	g_mutex_unlock (priv->folders_lock);
 
 	unload_folder (priv, TRUE);
 
-	if (G_LIKELY (priv->folders))
-	{
-		g_mutex_lock (priv->folders_lock);
-		tny_list_iface_foreach (priv->folders, destroy_folder, NULL);
-		g_object_unref (G_OBJECT (priv->folders));
-		priv->folders = NULL;
-		g_mutex_unlock (priv->folders_lock);
-	}
-
+	g_mutex_lock (priv->folder_lock);
 	if (G_LIKELY (priv->folder))
 	{
-		g_mutex_lock (priv->folder_lock);
 		camel_object_unref (priv->folder);
 		priv->folder = NULL;
-		g_mutex_unlock (priv->folder_lock);
 	}
+	g_mutex_unlock (priv->folder_lock);
 
 	if (G_LIKELY (priv->cached_name))
 		g_free (priv->cached_name);

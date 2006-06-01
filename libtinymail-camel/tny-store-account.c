@@ -144,6 +144,7 @@ tny_store_account_reconnect (TnyAccount *self)
 static void
 destroy_folder (gpointer data, gpointer user_data)
 {
+printf ("tny-store-account.c:destroy folder\n");
 	g_object_unref (G_OBJECT (data));
 }
 
@@ -153,7 +154,8 @@ tny_store_account_clear_folders (TnyStoreAccountPriv *priv)
 	if (G_LIKELY (priv->folders))
 	{
 		g_mutex_lock (priv->folders_lock);
-		tny_list_iface_foreach (priv->folders, destroy_folder, NULL);
+//printf ("tny-store-account.c:foreach\n");
+		//tny_list_iface_foreach (priv->folders, destroy_folder, NULL);
 		g_object_unref (G_OBJECT (priv->folders));
 		g_mutex_unlock (priv->folders_lock);
 	}
@@ -207,6 +209,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 			if (!priv->folders)
 				priv->folders = _tny_msg_folder_list_new (iface);
 			_tny_msg_folder_list_intern_prepend ((TnyMsgFolderList*)priv->folders, iface);
+			g_object_unref (G_OBJECT (iface)); 
 			g_mutex_unlock (priv->folders_lock);
 
 			/* No unref keeps current folder the parent ref */
@@ -317,6 +320,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		g_mutex_lock (priv->folders_lock);
 		priv->folders = _tny_msg_folder_list_new (NULL);
 		_tny_msg_folder_list_intern_prepend ((TnyMsgFolderList*)priv->folders, inbox);
+		g_object_unref (G_OBJECT (inbox)); 
 		g_mutex_unlock (priv->folders_lock);
 
 		tny_msg_folder_iface_uncache (inbox);
@@ -441,7 +445,7 @@ tny_store_account_finalize (GObject *object)
 {
 	TnyStoreAccount *self = (TnyStoreAccount *)object;	
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
-
+printf ("tny-store-account.c:final\n");
 	tny_store_account_clear_folders (priv);
 
 	g_mutex_free (priv->folders_lock);
