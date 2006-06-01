@@ -121,11 +121,6 @@ tny_store_account_reconnect (TnyAccount *self)
 
 		if (camel_exception_is_set (priv->ex))
 		{
-			/*
-			TnyForgetPassFunc func = tny_account_iface_get_forget_pass_func (TNY_ACCOUNT_IFACE (self));
-			func (TNY_ACCOUNT_IFACE (self));
-			*/
-
 			g_warning (_("Not connected with %s: %s\n"), priv->url_string,
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
@@ -141,21 +136,12 @@ tny_store_account_reconnect (TnyAccount *self)
 }
 
 
-static void
-destroy_folder (gpointer data, gpointer user_data)
-{
-printf ("tny-store-account.c:destroy folder\n");
-	g_object_unref (G_OBJECT (data));
-}
-
 static void 
 tny_store_account_clear_folders (TnyStoreAccountPriv *priv)
 {
 	if (G_LIKELY (priv->folders))
 	{
 		g_mutex_lock (priv->folders_lock);
-//printf ("tny-store-account.c:foreach\n");
-		//tny_list_iface_foreach (priv->folders, destroy_folder, NULL);
 		g_object_unref (G_OBJECT (priv->folders));
 		g_mutex_unlock (priv->folders_lock);
 	}
@@ -163,7 +149,6 @@ tny_store_account_clear_folders (TnyStoreAccountPriv *priv)
 	if (G_UNLIKELY (priv->ufolders))
 	{
 		g_mutex_lock (priv->folders_lock);
-		tny_list_iface_foreach (priv->ufolders, destroy_folder, NULL);
 		g_object_unref (G_OBJECT (priv->ufolders));
 		g_mutex_unlock (priv->folders_lock);
 	}
@@ -445,9 +430,8 @@ tny_store_account_finalize (GObject *object)
 {
 	TnyStoreAccount *self = (TnyStoreAccount *)object;	
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
-printf ("tny-store-account.c:final\n");
-	tny_store_account_clear_folders (priv);
 
+	tny_store_account_clear_folders (priv);
 	g_mutex_free (priv->folders_lock);
 
 	(*parent_class->finalize) (object);

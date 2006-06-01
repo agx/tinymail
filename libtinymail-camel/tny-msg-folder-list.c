@@ -177,7 +177,6 @@ tny_msg_folder_list_finalize (GObject *object)
 	g_mutex_lock (self->iterator_lock);
 	if (self->first)
 	{
-		printf ("tny-msg-folder-list.c:foreach\n");
 		g_list_foreach (self->first, destroy_folder, NULL);
 		g_list_free (self->first);
 		self->first = NULL;
