@@ -44,16 +44,13 @@
 #include <tny-session-camel.h>
 #include "tny-account-priv.h"
 #include "tny-msg-folder-priv.h"
+#include "tny-msg-folder-list-priv.h"
 #include <tny-camel-shared.h>
 
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
 static GObjectClass *parent_class = NULL;
-
-
-#define TNY_MSG_FOLDER_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))
 
 
 static void
@@ -137,14 +134,16 @@ _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 	return retval;
 }
 
-static const GList*
+static const TnyListIface*
 tny_msg_folder_get_folders (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
-	const GList *retval;
+	const TnyListIface *retval;
 
 	g_mutex_lock (priv->folder_lock);
-	retval = priv->folders;
+	if (!priv->folders)
+		priv->folders = _tny_msg_folder_list_new (self);
+	retval = (const TnyListIface*)priv->folders;
 	g_mutex_unlock (priv->folder_lock);
 
 	return retval;
@@ -219,24 +218,6 @@ tny_msg_folder_get_all_count (TnyMsgFolderIface *self)
 	return retval;
 }
 
-static void
-tny_msg_folder_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
-{
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
-
-	/* We reference, so when reparenting folders, unref your instances */
-
-	g_object_ref (G_OBJECT (folder));
-
-	g_mutex_lock (priv->folders_lock);
-	priv->folders = g_list_prepend (priv->folders, folder);
-	g_mutex_unlock (priv->folders_lock);
-
-	/* Tell the observers */
-	g_signal_emit (self, tny_msg_folder_iface_signals [FOLDER_INSERTED], 0, folder);
-
-	return;
-}
 
 static const TnyAccountIface*  
 tny_msg_folder_get_account (TnyMsgFolderIface *self)
@@ -794,7 +775,9 @@ tny_msg_folder_finalize (GObject *object)
 	if (G_LIKELY (priv->folders))
 	{
 		g_mutex_lock (priv->folders_lock);
-		g_list_foreach (priv->folders, destroy_folder, NULL);
+		tny_list_iface_foreach (priv->folders, destroy_folder, NULL);
+		g_object_unref (G_OBJECT (priv->folders));
+		priv->folders = NULL;
 		g_mutex_unlock (priv->folders_lock);
 	}
 
@@ -802,12 +785,13 @@ tny_msg_folder_finalize (GObject *object)
 	{
 		g_mutex_lock (priv->folder_lock);
 		camel_object_unref (priv->folder);
+		priv->folder = NULL;
 		g_mutex_unlock (priv->folder_lock);
 	}
 
 	if (G_LIKELY (priv->cached_name))
 		g_free (priv->cached_name);
-
+	priv->cached_name = NULL;
 
 	g_mutex_free (priv->cached_msgs_lock);
 	priv->cached_msgs_lock = NULL;
@@ -861,7 +845,6 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_name_func = tny_msg_folder_get_name;
 	klass->has_cache_func = tny_msg_folder_has_cache;
 	klass->uncache_func = tny_msg_folder_uncache;
-	klass->add_folder_func = tny_msg_folder_add_folder;
 	klass->get_folders_func = tny_msg_folder_get_folders;
 	klass->get_unread_count_func = tny_msg_folder_get_unread_count;
 	klass->get_all_count_func = tny_msg_folder_get_all_count;

@@ -39,6 +39,7 @@ struct _TnyListIfaceClass
 {
 	GTypeInterface parent;
 
+	guint (*length_func) (TnyListIface *self);
 	void (*prepend_func) (TnyListIface *self, gpointer item);
 	void (*append_func) (TnyListIface *self, gpointer item);
 	void (*remove_func) (TnyListIface *self, gpointer item);

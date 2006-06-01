@@ -25,7 +25,7 @@ typedef struct _TnyStoreAccountPriv TnyStoreAccountPriv;
 struct _TnyStoreAccountPriv
 {
 	GMutex *folders_lock;
-	GList *folders, *ufolders;
+	TnyListIface *folders, *ufolders;
 };
 
 

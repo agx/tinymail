@@ -144,30 +144,14 @@ tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface
  * 
  * Get the child folders of this folder
  * 
- * Return value: A read-only GList with TnyMsgFolderIface instances
+ * Return value: A read-only #TnyListIface with TnyMsgFolderIface instances
  **/
-const GList*
+const TnyListIface*
 tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
 {
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_folders_func (self);
 }
 
-/**
- * tny_msg_folder_iface_add_folder:
- * @self: a TnyMsgFolderIface object
- * @folder: the folder to add
- * 
- * Add a folder as child folder to the folder. This function references the
- * folder instance (take note when reparenting folders).
- * 
- **/
-void
-tny_msg_folder_iface_add_folder (TnyMsgFolderIface *self, TnyMsgFolderIface *folder)
-{
-	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->add_folder_func (self, folder);
-
-	return;
-}
 
 /**
  * tny_msg_folder_iface_get_message:

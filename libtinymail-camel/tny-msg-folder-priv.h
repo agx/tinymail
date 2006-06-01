@@ -42,7 +42,7 @@ struct _TnyMsgFolderPriv
 	TnyAccountIface *account;
 
 	GMutex *folders_lock;
-	GList *folders;
+	TnyListIface *folders;
 	guint cached_length, unread_length;
 
 	gboolean subscribed;
@@ -55,5 +55,9 @@ CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);
 
 void _tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribed);
 void _tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name);
+
+#define TNY_MSG_FOLDER_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))
+
 
 #endif

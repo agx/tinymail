@@ -22,6 +22,8 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include <tny-list-iface.h>
+#include <tny-iterator-iface.h>
 #include <tny-account-tree-model.h>
 #include <tny-store-account-iface.h>
 #include <tny-msg-folder-iface.h>
@@ -39,15 +41,20 @@ folders_reloaded (gpointer user_data)
 */
 
 static void
-fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTreeIter *parent_iter, TnyStoreAccountIface *account)
+fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkTreeIter *parent_iter, TnyStoreAccountIface *account)
 {
-	GtkTreeStore *model = GTK_TREE_STORE (self);
 
-	while (G_LIKELY (folders))
+  if (tny_list_iface_length (folders) > 0)
+  {
+	GtkTreeStore *model = GTK_TREE_STORE (self);
+	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
+	gboolean next = TRUE;
+
+	while (next)
 	{
 		GtkTreeIter iter;
-		TnyMsgFolderIface *folder = folders->data;
-		const GList *more_folders = tny_msg_folder_iface_get_folders (folder);
+		TnyMsgFolderIface *folder = tny_iterator_iface_current (iterator);
+		TnyListIface *more_folders = (TnyListIface*)tny_msg_folder_iface_get_folders (folder);
 
 		gtk_tree_store_append (model, &iter, parent_iter);
 
@@ -68,16 +75,17 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, const GList *folders, GtkTr
 
 		tny_msg_folder_iface_uncache (folder);
 
-		/* The idea here is that if length > 0, then more_folders isn't 
-		   NULL, and if more_folders isn't NULL, length will always 
-		   be > 0 right? So that saves us a g_list_length, correct? */
-
-		if (G_LIKELY (more_folders) /* && g_list_length ((GList*)more_folders) > 0*/)
+		if (tny_list_iface_length (more_folders) > 0)
 			fill_treemodel_recursive (self, more_folders, &iter, account);
 
-		folders = g_list_next (folders);
+		next = tny_iterator_iface_has_next (iterator);
+
+		if (next)
+			tny_iterator_iface_next (iterator);
 	}
 
+	g_object_unref (G_OBJECT (iterator));
+  }
 }
 
 /**
@@ -92,10 +100,11 @@ void
 tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *account)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	const GList *folders = tny_store_account_iface_get_folders (account, 
-			TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
-
+	const TnyListIface *folders;
 	GtkTreeIter name_iter;
+
+	folders = tny_store_account_iface_get_folders (account, 
+		TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
 	gtk_tree_store_append (model, &name_iter, NULL);
 
@@ -107,7 +116,8 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *acc
 		TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 		NULL, -1);
 
-	fill_treemodel_recursive (self, folders, &name_iter, account);
+	fill_treemodel_recursive (self, (TnyListIface*)folders, 
+		&name_iter, account);
 
 	return;
 }

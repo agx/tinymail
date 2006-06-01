@@ -22,6 +22,8 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
+#include <tny-msg-folder.h>
+
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 #include <tny-msg-folder-iface.h>
@@ -31,6 +33,7 @@ static GObjectClass *parent_class;
 
 #include "tny-msg-folder-list-priv.h"
 #include "tny-msg-folder-list-iterator-priv.h"
+#include "tny-msg-folder-priv.h"
 
 static void
 destroy_folder (gpointer data, gpointer user_data)
@@ -54,14 +57,28 @@ tny_msg_folder_list_prepend (TnyListIface *self, gpointer item)
 void
 _tny_msg_folder_list_intern_prepend (TnyMsgFolderList *self, TnyMsgFolderIface *item)
 {
-	TnyMsgFolderList *me = (TnyMsgFolderList*)self;
+	TnyMsgFolderPriv *priv = NULL;
+
+	if (self->pfolder)
+		priv = TNY_MSG_FOLDER_GET_PRIVATE (self->pfolder);
 
 	/* Append something to the list */
 
-	g_mutex_lock (me->iterator_lock);
-	me->first = g_list_prepend (me->first, item);
+	g_mutex_lock (self->iterator_lock);
+	if (self->pfolder)
+		g_mutex_lock (priv->folders_lock);
+
+	self->first = g_list_prepend (self->first, item);
 	g_object_ref (G_OBJECT (item));
-	g_mutex_unlock (me->iterator_lock);
+
+	if (self->pfolder)
+		g_mutex_unlock (priv->folders_lock);
+	g_mutex_unlock (self->iterator_lock);
+
+	/* Tell the observers */
+	if (self->pfolder)
+		g_signal_emit (self->pfolder, tny_msg_folder_iface_signals [FOLDER_INSERTED], 0, item);
+
 }
 
 void
@@ -79,6 +96,19 @@ _tny_msg_folder_list_set_folder (TnyMsgFolderList *self, TnyMsgFolderIface *pfol
 	g_mutex_unlock (self->iterator_lock);
 
 	return;
+}
+
+static guint
+tny_msg_folder_list_length (TnyListIface *self)
+{
+	TnyMsgFolderList *me = (TnyMsgFolderList*)self;
+	guint retval = 0;
+
+	g_mutex_lock (me->iterator_lock);
+	retval = me->first?g_list_length (me->first):0;
+	g_mutex_unlock (me->iterator_lock);
+
+	return retval;
 }
 
 static void
@@ -126,6 +156,7 @@ tny_msg_folder_list_foreach_in_the_list (TnyListIface *self, GFunc func, gpointe
 static void
 tny_list_iface_init (TnyListIfaceClass *klass)
 {
+	klass->length_func = tny_msg_folder_list_length;
 	klass->prepend_func = tny_msg_folder_list_prepend;
 	klass->append_func = tny_msg_folder_list_append;
 	klass->remove_func = tny_msg_folder_list_remove;

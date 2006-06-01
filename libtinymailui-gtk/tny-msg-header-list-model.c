@@ -463,6 +463,19 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 
 }
 
+static guint
+tny_msg_header_list_model_length (TnyListIface *self)
+{
+	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
+	guint retval = 0;
+
+	g_mutex_lock (me->iterator_lock);
+	retval = me->first?g_list_length (me->first):0;
+	g_mutex_unlock (me->iterator_lock);
+
+	return retval;
+}
+
 static void
 tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 {
@@ -541,6 +554,7 @@ tny_msg_header_list_model_foreach_in_the_list (TnyListIface *self, GFunc func, g
 static void
 tny_list_iface_init (TnyListIfaceClass *klass)
 {
+	klass->length_func = tny_msg_header_list_model_length;
 	klass->prepend_func = tny_msg_header_list_model_prepend;
 	klass->append_func = tny_msg_header_list_model_append;
 	klass->remove_func = tny_msg_header_list_model_remove;

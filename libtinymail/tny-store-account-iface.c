@@ -59,9 +59,9 @@ tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface
  * 
  * Get the folders of a storage account
  * 
- * Return value: A read-only GList which contains TnyFolderIface instances
+ * Return value: A read-only #TnyListIface which contains TnyFolderIface instances
  **/
-const GList*
+const TnyListIface*
 tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {
 	return TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func (self, type);

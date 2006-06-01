@@ -21,6 +21,18 @@
 
 #include <tny-list-iface.h>
 
+/**
+ * tny_list_iface_length:
+ * @self: A #TnyListIface instance
+ *
+ * Return value: the length of the list
+ **/
+guint
+tny_list_iface_length (TnyListIface *self)
+{
+	TNY_LIST_IFACE_GET_CLASS (self)->length_func (self);
+	return;
+}
 
 /**
  * tny_list_iface_prepend:

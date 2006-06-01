@@ -18,13 +18,11 @@
  */
 
 #include <config.h>
-
 #include <glib/gi18n-lib.h>
-
 #include <glib.h>
-
 #include <string.h>
 
+#include <tny-list-iface.h>
 #include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-store-account.h>
@@ -42,6 +40,7 @@ static GObjectClass *parent_class = NULL;
 #include "tny-account-priv.h"
 #include "tny-store-account-priv.h"
 #include "tny-msg-folder-priv.h"
+#include "tny-msg-folder-list-priv.h"
 
 #include <tny-camel-shared.h>
 #include <tny-account-store-iface.h>
@@ -154,14 +153,16 @@ tny_store_account_clear_folders (TnyStoreAccountPriv *priv)
 	if (G_LIKELY (priv->folders))
 	{
 		g_mutex_lock (priv->folders_lock);
-		g_list_foreach (priv->folders, destroy_folder, NULL);
+		tny_list_iface_foreach (priv->folders, destroy_folder, NULL);
+		g_object_unref (G_OBJECT (priv->folders));
 		g_mutex_unlock (priv->folders_lock);
 	}
 
 	if (G_UNLIKELY (priv->ufolders))
 	{
 		g_mutex_lock (priv->folders_lock);
-		g_list_foreach (priv->ufolders, destroy_folder, NULL);
+		tny_list_iface_foreach (priv->ufolders, destroy_folder, NULL);
+		g_object_unref (G_OBJECT (priv->ufolders));
 		g_mutex_unlock (priv->folders_lock);
 	}
 
@@ -196,14 +197,16 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 
 		if (G_LIKELY (parent))
 		{
-			tny_msg_folder_iface_add_folder (parent, iface);
-			/* _add_folder parents to the folder by reffing */
+			TnyListIface *list = (TnyListIface *)tny_msg_folder_iface_get_folders (parent);
+			_tny_msg_folder_list_intern_prepend ((TnyMsgFolderList*)list, iface);
 			g_object_unref (G_OBJECT (iface)); 
 
 		} else 
 		{
 			g_mutex_lock (priv->folders_lock);
-			priv->folders = g_list_prepend (priv->folders, iface);
+			if (!priv->folders)
+				priv->folders = _tny_msg_folder_list_new (iface);
+			_tny_msg_folder_list_intern_prepend ((TnyMsgFolderList*)priv->folders, iface);
 			g_mutex_unlock (priv->folders_lock);
 
 			/* No unref keeps current folder the parent ref */
@@ -215,13 +218,29 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 	}
 }
 
-static const GList*
+static void
+tny_store_account_notify (TnyStoreAccountPriv *priv)
+{
+	/* Tell the observers that they should reload */
+	if (tny_list_iface_length (priv->folders) > 0)
+	{
+		TnyIteratorIface *iterator = tny_list_iface_create_iterator (priv->folders);
+		TnyMsgFolderIface *folder;
+
+		tny_iterator_iface_nth (iterator, 0);
+		folder = tny_iterator_iface_current (iterator);
+		g_signal_emit (folder, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+		g_object_unref (G_OBJECT (iterator));
+	}
+}
+
+static const TnyListIface*
 tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	const GList *retval;
+	const TnyListIface *retval;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 	const gchar *proto;
@@ -273,9 +292,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 
 		fill_folders_recursive (self, store, NULL, info, type);
 
-		/* Tell the observers that they should reload */
-		if (G_LIKELY (priv->folders) && G_LIKELY (priv->folders->data))
-			g_signal_emit (priv->folders->data, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+		tny_store_account_notify (priv);
 
 		camel_store_free_folder_info (store, info);
 
@@ -298,7 +315,8 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		tny_msg_folder_iface_set_name (TNY_MSG_FOLDER_IFACE (inbox), "INBOX");
 
 		g_mutex_lock (priv->folders_lock);
-		priv->folders = g_list_prepend (priv->folders, inbox);
+		priv->folders = _tny_msg_folder_list_new (NULL);
+		_tny_msg_folder_list_intern_prepend ((TnyMsgFolderList*)priv->folders, inbox);
 		g_mutex_unlock (priv->folders_lock);
 
 		tny_msg_folder_iface_uncache (inbox);
@@ -318,9 +336,8 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 
 		fill_folders_recursive (self, store, NULL, info, type);
 
-		/* Tell the observers that they should reload */
-		if (G_LIKELY (priv->folders) && G_LIKELY (priv->folders->data))
-			g_signal_emit (priv->folders->data, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+
+		tny_store_account_notify (priv);
 
 		camel_store_free_folder_info (store, info);
 
