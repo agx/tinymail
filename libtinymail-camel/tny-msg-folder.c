@@ -905,6 +905,7 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMsgFolder *self = (TnyMsgFolder *)instance;
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
+	priv->folder_changed_id = 0;
 	priv->folder = NULL;
 	priv->folders = NULL;
 	priv->cached_msgs = NULL; 
