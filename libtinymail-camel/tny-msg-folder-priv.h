@@ -35,6 +35,8 @@ struct _TnyMsgFolderPriv
 	GMutex *cached_msgs_lock;
 	GHashTable *cached_msgs;
 
+	guint folder_changed_id;
+
 	GMutex *folder_lock;
 	CamelFolder *folder;
 

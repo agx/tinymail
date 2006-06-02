@@ -53,6 +53,22 @@
 static GObjectClass *parent_class = NULL;
 
 
+static void 
+folder_changed (TnyMsgFolderIface *self, CamelFolderChangeInfo *info, gpointer user_data)
+{
+	/* TnyMsgFolderPriv *priv = user_data; */
+
+	/* When we know a new message got added to this folder */
+
+/*
+        info->uid_added
+        info->uid_removed
+        info->uid_changed
+        info->uid_recent
+*/
+
+}
+
 static void
 unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 {
@@ -61,7 +77,11 @@ unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 		camel_folder_free_uids (priv->folder, priv->cached_uids);
 
 	if (G_LIKELY (priv->folder))
+	{
+		if (priv->folder_changed_id != 0)
+			camel_object_remove_event(priv->folder, priv->folder_changed_id);
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
+	}
 	priv->folder = NULL;
 
 	g_mutex_lock (priv->cached_msgs_lock);
@@ -96,6 +116,11 @@ load_folder_no_lock (TnyMsgFolderPriv *priv)
 
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
+
+		priv->folder_changed_id = camel_object_hook_event (priv->folder, 
+			"folder_changed", (CamelObjectEventHookFunc)folder_changed, 
+			priv);
+
 		priv->has_summary_cap = camel_folder_has_summary_capability (priv->folder);
 
 		if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
