@@ -130,7 +130,10 @@ tny_platform_factory_constructor (GType type, guint n_construct_params,
 	}
 	else
 	{
-		object = g_object_ref (G_OBJECT (the_singleton));
+		/* refdbg killed bug! 
+		object = g_object_ref (G_OBJECT (the_singleton)); */
+
+		object = G_OBJECT (the_singleton);
 		g_object_freeze_notify (G_OBJECT(the_singleton));
 	}
 

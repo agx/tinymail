@@ -68,7 +68,13 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
                 for (i = 0; go && i < parts; i++) 
 		{
                         CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
-                        go = message_foreach_part_rec (msg, part, callback, data);
+			if (part)
+			{
+				/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
+				   and tny-msg-mime-part.c:515 ! */
+
+				go = message_foreach_part_rec (msg, part, callback, data);
+			} else go = FALSE;
                 }
 
         } else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
@@ -85,11 +91,19 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
 	TnyMsgPriv *priv = data;
 
-	TnyMsgMimePartIface *tpart = TNY_MSG_MIME_PART_IFACE 
+	TnyMsgMimePartIface *tpart;
+
+	if (!part)
+		return;
+
+	/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
+	   and tny-msg-mime-part.c:515 ! */
+
+	tpart = TNY_MSG_MIME_PART_IFACE 
 			(tny_msg_mime_part_new (part));
+
 	g_mutex_lock (priv->parts_lock);
 	priv->parts = g_list_prepend (priv->parts, tpart);
-
 	g_mutex_unlock (priv->parts_lock);
 
 	return TRUE;
@@ -127,6 +141,10 @@ CamelMimeMessage*
 _tny_msg_get_camel_mime_message (TnyMsg *self)
 {
 	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
+
+	if (!ppriv->part)
+		G_BREAKPOINT ();
+
 	return CAMEL_MIME_MESSAGE (ppriv->part);
 }
 

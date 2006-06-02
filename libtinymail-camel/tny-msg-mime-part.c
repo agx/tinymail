@@ -346,10 +346,10 @@ tny_msg_mime_part_set_part (TnyMsgMimePart *self, CamelMimePart *part)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
 
-	if (priv->part)
+	/*if (priv->part)
 		camel_object_unref (CAMEL_OBJECT (priv->part));
+	camel_object_ref (CAMEL_OBJECT (part));*/
 
-	//camel_object_ref (CAMEL_OBJECT (part));
 	priv->part = part;
 
 	g_mutex_unlock (priv->part_lock);
@@ -510,7 +510,10 @@ tny_msg_mime_part_finalize (GObject *object)
 	if (G_LIKELY (priv->part))
 	{
 		g_mutex_lock (priv->part_lock);
-		camel_object_unref (CAMEL_OBJECT (priv->part));
+
+		/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 */
+		/* camel_object_unref (CAMEL_OBJECT (priv->part)); */
+
 		g_mutex_unlock (priv->part_lock);
 	}
 
