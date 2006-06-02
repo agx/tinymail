@@ -36,7 +36,7 @@ static GObjectClass *parent_class;
 
 
 G_INLINE_FUNC void /* Protected method that speeds-up the TnyMsgHeaderListModel type */
-_tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
+_tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, register guint cur, register guint nth)
 {
 	if (G_LIKELY (cur < nth))
 		while (G_LIKELY (cur++ < nth))
