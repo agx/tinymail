@@ -90,10 +90,10 @@ void /* Protected method that speeds-up the TnyMsgHeaderListModel type */
 _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
 {
 	if (cur < nth)
-		while ((cur++ < nth) && self->current)
+		while (cur++ < nth)
 			self->current = self->current->next;
 	else if (cur > nth)
-		while ((cur-- > nth) && self->current)
+		while (cur-- > nth)
 			self->current = self->current->prev;
 }
 
