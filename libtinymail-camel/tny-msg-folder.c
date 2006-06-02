@@ -712,11 +712,6 @@ tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 
 	g_mutex_lock (priv->folder_lock);
 	
-//	if (G_UNLIKELY (priv->folder))
-//		camel_object_unref (priv->folder);
-
-//	camel_object_ref (camel_folder);
-
 	tny_msg_folder_set_id (TNY_MSG_FOLDER_IFACE (self), 
 		camel_folder_get_full_name (camel_folder));
 
