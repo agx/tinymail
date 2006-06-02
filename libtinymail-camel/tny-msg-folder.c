@@ -56,11 +56,9 @@ static GObjectClass *parent_class = NULL;
 static void
 unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 {
-	if (destroy)
-	{
-		if (G_LIKELY (priv->folder && priv->cached_uids))
-			camel_folder_free_uids (priv->folder, priv->cached_uids);
-	}
+
+	if (destroy && priv->folder && priv->cached_uids)
+		camel_folder_free_uids (priv->folder, priv->cached_uids);
 
 	if (G_LIKELY (priv->folder))
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
@@ -128,6 +126,10 @@ _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 	CamelFolder *retval;
 
 	g_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder)
+		load_folder (priv);
+
 	retval = priv->folder;
 	g_mutex_unlock (priv->folder_lock);
 
