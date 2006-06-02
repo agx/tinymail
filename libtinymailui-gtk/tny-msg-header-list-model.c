@@ -35,6 +35,17 @@ static GObjectClass *parent_class;
 #include "tny-msg-header-list-iterator-priv.h"
 
 
+G_INLINE_FUNC void /* Protected method that speeds-up the TnyMsgHeaderListModel type */
+_tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
+{
+	if (G_LIKELY (cur < nth))
+		while (G_LIKELY (cur++ < nth))
+			self->current = self->current->next;
+	else if (G_LIKELY (cur > nth))
+		while (G_LIKELY (cur-- > nth))
+			self->current = self->current->prev;
+}
+
 static guint
 tny_msg_header_list_model_get_flags (GtkTreeModel *self)
 {

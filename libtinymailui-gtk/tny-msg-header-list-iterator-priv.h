@@ -54,7 +54,6 @@ struct _TnyMsgHeaderListIteratorClass
 void _tny_msg_header_list_iterator_set_model (TnyMsgHeaderListIterator *self, TnyMsgHeaderListModel *model, gboolean lock);
 TnyMsgHeaderListIterator* _tny_msg_header_list_iterator_new (TnyMsgHeaderListModel *model, gboolean lock);
 
-void _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth);
 gboolean _tny_msg_header_list_iterator_has_next_nl (TnyMsgHeaderListIterator *self);
 gpointer _tny_msg_header_list_iterator_current_nl (TnyMsgHeaderListIterator *me);
 gpointer _tny_msg_header_list_iterator_nth_nl (TnyMsgHeaderListIterator *me, guint nth);

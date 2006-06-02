@@ -86,16 +86,6 @@ tny_msg_header_list_iterator_finalize (GObject *object)
 	return;
 }
 
-void /* Protected method that speeds-up the TnyMsgHeaderListModel type */
-_tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
-{
-	if (cur < nth)
-		while (cur++ < nth)
-			self->current = self->current->next;
-	else if (cur > nth)
-		while (cur-- > nth)
-			self->current = self->current->prev;
-}
 
 gpointer 
 _tny_msg_header_list_iterator_next_nl (TnyMsgHeaderListIterator *me)
