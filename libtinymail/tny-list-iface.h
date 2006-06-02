@@ -50,6 +50,7 @@ struct _TnyListIfaceClass
 
 GType tny_list_iface_get_type (void);
 
+guint tny_list_iface_length (TnyListIface *self);
 void tny_list_iface_prepend (TnyListIface *self, gpointer item);
 void tny_list_iface_append (TnyListIface *self, gpointer item);
 void tny_list_iface_remove (TnyListIface *self, gpointer item);
