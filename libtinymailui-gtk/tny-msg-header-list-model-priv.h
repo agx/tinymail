@@ -29,7 +29,8 @@ struct _TnyMsgHeaderListModel
 	gint length;
 	gint stamp;
 
-	GList *first;
+	gboolean usable_index;
+	GList *first, *index;
 	TnyIteratorIface *iterator;
 	guint last_nth;
 };

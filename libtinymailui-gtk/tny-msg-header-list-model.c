@@ -29,21 +29,74 @@
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 
+#define INDEX_OFFSET 50
+#define INDEX_THRESHOLD 5000
+
 static GObjectClass *parent_class;
 
 #include "tny-msg-header-list-model-priv.h"
 #include "tny-msg-header-list-iterator-priv.h"
 
 
-G_INLINE_FUNC void /* Protected method that speeds-up the TnyMsgHeaderListModel type */
+G_INLINE_FUNC void /* When sorting, this method is called a gazillion times */
 _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, register guint cur, register guint nth)
 {
+
+  /* If we have a usable index table, we'll use it. This happens when as only
+     add operation the prepend has happened more than INDEX_THRESHOLD times.
+     This will trigger on folders larger than INDEX_THRESHOLD headers that have
+     never had appends nor removes of headers.
+
+     Therefore, TODO: rapidly update the index table on append and remove. ;-) 
+
+     Currently, the only adder that keeps the index correct is the prepend.
+     The other ones will set usable_index FALSE. Hev phun .. */
+
+  if (G_UNLIKELY (self->model->usable_index && self->model->index))
+  {
+	/* Math seems faster than walking a next pointer 1000ths of times */
+	register guint idx = (nth / INDEX_OFFSET), cidx = 0;
+	register gint remain = nth - (idx * INDEX_OFFSET);
+	register GList *start = self->model->index, *ret=NULL;
+
+	if (G_LIKELY (idx))
+
+	{       /* If destination is not in the beginning of the list */
+
+		while (G_LIKELY (cidx++ < idx-1))
+			start = start->next;
+		ret = start->data;
+	} else
+		ret = self->model->first;
+
+	/* So we are now at 0 or at (50 * index), walk the remainder */
+	while (G_LIKELY (remain--))
+		ret = ret->next;
+
+	self->current = ret;
+
+  } else {
+	
+	/* First we check whether we are walking somewhere in the beginning 
+	   of the list: We know the first location, so ... (faster to start 
+	   from the first than from the current) */
+
+	if (G_UNLIKELY (nth-cur < nth))
+	{
+		self->current = self->model->first;
+		cur = 0;
+	}
+
+	/* If the current location is less than the destination location */
 	if (G_LIKELY (cur < nth))
-		while (G_LIKELY (cur++ < nth))
+		while (G_LIKELY (cur++ < nth)) {
 			self->current = self->current->next;
-	else if (G_LIKELY (cur > nth))
+
+	/* And if not ... */
+	}else if (G_LIKELY (cur > nth))
 		while (G_LIKELY (cur-- > nth))
 			self->current = self->current->prev;
+  }
 }
 
 static guint
@@ -432,6 +485,13 @@ tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_prepend (me->first, item);
 	me->length++;
+
+	if (me->length % INDEX_OFFSET == 0)
+		me->index = g_list_append (me->index, me->first);
+
+	if (me->length >= INDEX_THRESHOLD)
+		me->usable_index = TRUE;
+
 	g_object_ref (G_OBJECT (item));
 
 	/* Reset the internal iterator */
@@ -460,6 +520,12 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_append (me->first, item);
 	me->length++;
+
+	me->usable_index = FALSE;
+	if (me->index)
+		g_list_free (me->index);
+	me->index = NULL;
+
 	g_object_ref (G_OBJECT (item));
 
 	/* Reset the internal iterator */
@@ -503,6 +569,10 @@ tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 	g_mutex_lock (me->iterator_lock);
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 	me->length--;
+	me->usable_index = FALSE;
+	if (me->index)
+		g_list_free (me->index);
+	me->index = NULL;
 	g_object_unref (G_OBJECT (item));
 
 	/* Reset the internal iterator */
@@ -543,6 +613,7 @@ tny_msg_header_list_model_copy_the_list (TnyListIface *self)
 	g_mutex_lock (me->iterator_lock);
 	GList *list_copy = g_list_copy (me->first);
 	copy->first = list_copy;
+	copy->usable_index = FALSE;
 	g_mutex_unlock (me->iterator_lock);
 
 	return TNY_LIST_IFACE (copy);
@@ -720,6 +791,13 @@ tny_msg_header_list_model_finalize (GObject *object)
 		self->first = NULL;
 	}
 
+	self->usable_index = FALSE;
+	if (self->index)
+	{
+		g_list_free (self->index);
+		self->index = NULL;
+	}
+
 	/* Unreference the folder instance */
 	if (self->folder) 
 	{
@@ -763,6 +841,7 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 	self->iterator_lock = g_mutex_new ();
 	self->first = NULL;
 	self->length = 0;
+	self->usable_index = FALSE;
 
 	/* This is an internal iterator used by the GtkTreeModel implementation */
 	self->iterator = TNY_ITERATOR_IFACE (_tny_msg_header_list_iterator_new (self, FALSE));
