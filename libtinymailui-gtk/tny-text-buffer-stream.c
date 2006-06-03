@@ -162,7 +162,7 @@ tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer
 	if (priv->buffer)
 		g_object_unref (G_OBJECT (priv->buffer));
 
-	/* g_object_ref (G_OBJECT (buffer)); */
+	g_object_ref (G_OBJECT (buffer));
 	priv->buffer = buffer;
 
 	tny_text_buffer_stream_reset_priv (priv);
