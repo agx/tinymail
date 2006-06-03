@@ -193,7 +193,7 @@ tny_camel_stream_set_stream (TnyCamelStream *self, TnyStreamIface *stream)
 	if (self->stream)
 		g_object_unref (G_OBJECT (self->stream));
 
-	/* g_object_ref (G_OBJECT (stream)); */
+	g_object_ref (G_OBJECT (stream)); 
 
 	self->stream = stream;
 

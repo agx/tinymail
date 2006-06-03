@@ -172,7 +172,7 @@ tny_stream_camel_new (CamelStream *stream)
 	TnyStreamCamel *self = g_object_new (TNY_TYPE_STREAM_CAMEL, NULL);
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 
-	//camel_object_ref (CAMEL_OBJECT (stream));
+	camel_object_ref (CAMEL_OBJECT (stream));
 	priv->stream = stream;
 
 	return self;
