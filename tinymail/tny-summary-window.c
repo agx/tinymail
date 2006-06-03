@@ -172,7 +172,7 @@ tny_summary_window_set_account_store (TnyAccountStoreViewIface *self, TnyAccount
 				G_CALLBACK (connection_changed), self);	
 	}
 
-	g_object_ref (G_OBJECT (account_store));
+	/* g_object_ref (G_OBJECT (account_store)); */
 
 	priv->account_store = account_store;
 
@@ -284,8 +284,8 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
 			&priv->last_mailbox_correct_select);
 
-		if (priv->last_folder)
-			tny_msg_folder_iface_uncache (priv->last_folder);
+//		if (priv->last_folder)
+//			tny_msg_folder_iface_uncache (priv->last_folder);
 
 		priv->last_folder = folder;
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);

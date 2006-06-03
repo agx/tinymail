@@ -295,7 +295,7 @@ per_account_forget_pass_func (TnyAccountIface *account)
 		if (G_LIKELY (pwd))
 		{
 			memset (pwd, 0, strlen (pwd));
-			g_free (pwd);
+			/* g_free (pwd); uhm, crashed once */
 			g_hash_table_remove (passwords, accountid);
 		}
 

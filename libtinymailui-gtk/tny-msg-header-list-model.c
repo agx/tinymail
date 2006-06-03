@@ -499,7 +499,7 @@ tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 	if G_UNLIKELY (!me->usable_index && me->length >= INDEX_THRESHOLD)
 		me->usable_index = TRUE;
 
-	g_object_ref (G_OBJECT (item));
+	/* g_object_ref (G_OBJECT (item)); */
 
 	/* Reset the internal iterator */
 	((TnyMsgHeaderListIterator*)me->iterator)->current = me->first;
@@ -533,7 +533,7 @@ tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
 		g_list_free (me->index);
 	me->index = NULL;
 
-	g_object_ref (G_OBJECT (item));
+	/* g_object_ref (G_OBJECT (item)); */
 
 	/* Reset the internal iterator */
 	((TnyMsgHeaderListIterator*)me->iterator)->current = me->first;
@@ -785,6 +785,8 @@ tny_msg_header_list_model_finalize (GObject *object)
 	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);
 
+	self->usable_index = FALSE;
+
 	/* Reset the internal iterator */
 	self->length = 0;
 	((TnyMsgHeaderListIterator*)self->iterator)->current = self->first;
@@ -798,7 +800,6 @@ tny_msg_header_list_model_finalize (GObject *object)
 		self->first = NULL;
 	}
 
-	self->usable_index = FALSE;
 	if (self->index)
 	{
 		g_list_free (self->index);

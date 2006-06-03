@@ -67,7 +67,7 @@ tny_msg_header_view_set_header (TnyMsgHeaderViewIface *self, TnyMsgHeaderIface *
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
 
-	g_object_ref (G_OBJECT (header));
+	g_object_ref (G_OBJECT (header)); 
 
 	priv->header = header;
 

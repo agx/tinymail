@@ -77,12 +77,12 @@ unload_msg_header (TnyMsgHeader *self)
 		g_free (self->mime_from);
 		self->mime_from = NULL;
 	}
-
 	if (G_LIKELY (self->use_summary))
 	{
 		if (G_LIKELY (self->message_info))
 		{
-			camel_message_info_free (self->message_info);
+			/* It looks like this conflicts with freeing the folder 
+			camel_message_info_free (self->message_info); */
 			self->message_info = NULL;
 		}
 	} else {
