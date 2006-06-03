@@ -29,7 +29,7 @@
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 
-#define INDEX_OFFSET 50
+#define INDEX_OFFSET 64
 #define INDEX_THRESHOLD 5000
 
 static GObjectClass *parent_class;
@@ -54,10 +54,12 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
 
      Currently, the only adder that keeps the index correct is the prepend.
      The other ones will set usable_index FALSE. Hev phun .. */
-
+//>>6 would be the / and &0x3F
   if G_UNLIKELY (self->model->usable_index)
   {
-	register guint idx = nth / INDEX_OFFSET, remain = nth % INDEX_OFFSET, cidx = 0;
+	/* register guint idx = nth / INDEX_OFFSET, remain = nth % INDEX_OFFSET, cidx = 0; */
+	register guint idx = nth >> 6, remain = nth & 0x3F, cidx = 0;
+
 	register GList *start = self->model->index, *ret;
 
 	/* Math seems faster than walking a next pointer 1000ths of times */
