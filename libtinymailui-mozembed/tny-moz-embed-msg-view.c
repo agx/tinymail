@@ -176,7 +176,7 @@ tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyI
 	if (priv->save_strategy)
 		g_object_unref (G_OBJECT (priv->save_strategy));
 
-	g_object_ref (G_OBJECT (strategy));
+	/* g_object_ref (G_OBJECT (strategy)); */
 	priv->save_strategy = strategy;
 
 	return;
@@ -262,7 +262,7 @@ tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
 
-	g_object_ref (G_OBJECT (msg));
+	/* g_object_ref (G_OBJECT (msg)); */
 
 	priv->msg = msg;
 
@@ -378,8 +378,8 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 	if (G_LIKELY (priv->save_strategy))
 		g_object_unref (G_OBJECT (priv->save_strategy));
 
-	if (G_LIKELY (priv->headerview))
-		g_object_unref (G_OBJECT (priv->headerview));
+	/*if (G_LIKELY (priv->headerview))
+		g_object_unref (G_OBJECT (priv->headerview));*/
 
 	(*parent_class->finalize) (object);
 
