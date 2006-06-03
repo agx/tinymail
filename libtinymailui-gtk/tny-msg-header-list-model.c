@@ -42,7 +42,7 @@ stack allocations)? It's probably a naïve manual optimization.*/
 
 
 G_INLINE_FUNC void /* When sorting, this method is called a gazillion times */
-_tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, register guint cur, register guint nth)
+_tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
 {
 
   /* If we have a usable index table, we'll use it. This happens when as only
@@ -58,9 +58,8 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
   if G_UNLIKELY (self->model->usable_index)
   {
 	/* register guint idx = nth / INDEX_OFFSET, remain = nth % INDEX_OFFSET, cidx = 0; */
-	register guint idx = nth >> 6, remain = nth & 0x3F, cidx = 0;
-
-	register GList *start = self->model->index, *ret;
+	guint idx = nth >> 6, remain = nth & 0x3F, cidx = 0;
+	GList *start = self->model->index, *ret;
 
 	/* Math seems faster than walking a next pointer 1000ths of times */
 
