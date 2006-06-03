@@ -56,7 +56,7 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
   {
 	/* Math seems faster than walking a next pointer 1000ths of times */
 	register guint idx = (nth / INDEX_OFFSET), cidx = 0;
-	register gint remain = nth - (idx * INDEX_OFFSET);
+	register guint remain = nth - (idx * INDEX_OFFSET);
 	register GList *start = self->model->index, *ret=NULL;
 
 	if (G_LIKELY (idx))
