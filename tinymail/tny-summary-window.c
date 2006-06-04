@@ -76,6 +76,26 @@ struct _TnySummaryWindowPriv
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_SUMMARY_WINDOW, TnySummaryWindowPriv))
 
+
+
+static void
+set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
+{
+	GtkTreeModel *oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
+	if (oldsortable && GTK_IS_TREE_MODEL_SORT (oldsortable))
+	{
+		GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
+			(GTK_TREE_MODEL_SORT (oldsortable));
+		if (oldmodel)
+			g_object_unref (G_OBJECT (oldmodel));
+		g_object_unref (G_OBJECT (oldsortable));
+	} 
+
+	gtk_tree_view_set_model (header_view, model);
+
+	return;
+}
+
 static void 
 reload_accounts (TnySummaryWindowPriv *priv)
 {
@@ -108,8 +128,7 @@ reload_accounts (TnySummaryWindowPriv *priv)
 
 	
 	/* Clear the header_view by giving it an empty model */
-	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->header_view), 
-		empty_model);
+	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
 
 	/* Set the model of the mailbox_view */
 	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), 
@@ -249,27 +268,6 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 #endif
 
 		tny_msg_header_list_model_set_folder (model, folder, refresh);
-
-		oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
-		if (oldsortable && GTK_IS_TREE_MODEL_SORT (oldsortable))
-		{
-			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
-				(GTK_TREE_MODEL_SORT (oldsortable));
-			if (oldmodel)
-			{
-				g_object_unref (G_OBJECT (oldmodel));
-				/*tny_msg_header_list_model_set_folder (oldmodel, folder, refresh); */
-			}
-			g_object_unref (G_OBJECT (oldsortable));
-		} 
-/*		else {
-			TnyMsgHeaderListModel *model = tny_msg_header_list_model_new ();
-			tny_msg_header_list_model_set_folder (model, folder, refresh);
-			sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
-			gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
-		}
-*/
-
 		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
 
 		/* TODO: Implement a fast sorting algorithm (not easy)
@@ -277,15 +275,13 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 				TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
 				GTK_SORT_ASCENDING); */
 
-		gtk_tree_view_set_model (GTK_TREE_VIEW (header_view), sortable);
+		set_header_view_model (header_view, sortable); 
+		
 
 		g_idle_add (cleanup_statusbar, priv);
 
 		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
 			&priv->last_mailbox_correct_select);
-
-//		if (priv->last_folder)
-//			tny_msg_folder_iface_uncache (priv->last_folder);
 
 		priv->last_folder = folder;
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);
