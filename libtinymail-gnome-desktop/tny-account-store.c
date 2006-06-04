@@ -644,7 +644,7 @@ tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccount
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
 	tny_account_store_notify_add (self);
 
-	g_object_ref (G_OBJECT (account));
+	/* g_object_ref (G_OBJECT (account)); */
 
 	g_mutex_lock (priv->store_accounts_lock);
 	priv->store_accounts = g_list_append (priv->store_accounts, account);
@@ -660,7 +660,7 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	g_object_ref (G_OBJECT (account));
+	/* g_object_ref (G_OBJECT (account)); */
 
 	tny_account_store_notify_remove (self);
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");

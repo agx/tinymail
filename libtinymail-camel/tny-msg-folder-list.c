@@ -39,6 +39,7 @@ static void
 destroy_folder (gpointer data, gpointer user_data)
 {
 	g_object_unref (G_OBJECT (data));
+	return;
 }
 
 
@@ -69,6 +70,7 @@ _tny_msg_folder_list_intern_prepend (TnyMsgFolderList *self, TnyMsgFolderIface *
 		g_mutex_lock (priv->folders_lock);
 
 	self->first = g_list_prepend (self->first, item);
+	
 	g_object_ref (G_OBJECT (item));
 
 	if (self->pfolder)

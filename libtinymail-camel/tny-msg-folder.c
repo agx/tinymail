@@ -72,7 +72,6 @@ folder_changed (TnyMsgFolderIface *self, CamelFolderChangeInfo *info, gpointer u
 static void
 unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 {
-
 	if (destroy && priv->folder && priv->cached_uids)
 		camel_folder_free_uids (priv->folder, priv->cached_uids);
 
@@ -323,6 +322,12 @@ destroy_header (gpointer data, gpointer user_data)
 static void
 tny_msg_folder_refresh_async_destroyer (gpointer thr_user_data)
 {
+
+	TnyMsgFolderIface *self = ((RefreshFolderInfo*)thr_user_data)->self;
+
+	/* As promised */
+	g_object_unref (G_OBJECT (self));
+
 	g_free (thr_user_data);
 
 	return;
@@ -353,6 +358,9 @@ static void
 destroy_progress_idle (gpointer data)
 {
 	ProgressInfo *info = data;
+
+	/* As promised */
+	g_object_unref (G_OBJECT (info->minfo->self));
 
 	g_free (info->what);
 	g_free (info->minfo);
@@ -396,6 +404,9 @@ tny_msg_folder_refresh_async_status (struct _CamelOperation *op, const char *wha
 	info->minfo->user_data = oinfo->user_data;
 	info->pc = pc;
 
+	/* Removed in the destroyer */
+	g_object_ref (G_OBJECT (info->minfo->self));
+
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 		progress_func, info, destroy_progress_idle);
 
@@ -435,6 +446,9 @@ tny_msg_folder_refresh_async_thread (gpointer thr_user_data)
 
 	if (info->callback)
 	{
+		/* Removed in the destroyer */
+		g_object_ref (G_OBJECT (self));
+
 		g_idle_add_full (G_PRIORITY_HIGH, 
 			tny_msg_folder_refresh_async_callback, 
 			info, tny_msg_folder_refresh_async_destroyer);
@@ -793,26 +807,29 @@ tny_msg_folder_finalize (GObject *object)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folders_lock);
+	g_mutex_lock (priv->folder_lock);
+
 	if (G_LIKELY (priv->folders))
 	{
 		g_object_unref (G_OBJECT (priv->folders));
 		priv->folders = NULL;
 	}
-	g_mutex_unlock (priv->folders_lock);
 
-	unload_folder (priv, TRUE);
+	unload_folder_no_lock (priv, TRUE);
 
-	g_mutex_lock (priv->folder_lock);
 	if (G_LIKELY (priv->folder))
 	{
 		camel_object_unref (priv->folder);
 		priv->folder = NULL;
 	}
-	g_mutex_unlock (priv->folder_lock);
 
 	if (G_LIKELY (priv->cached_name))
 		g_free (priv->cached_name);
 	priv->cached_name = NULL;
+
+
+	g_mutex_unlock (priv->folder_lock);
+	g_mutex_unlock (priv->folders_lock);
 
 	g_mutex_free (priv->cached_msgs_lock);
 	priv->cached_msgs_lock = NULL;

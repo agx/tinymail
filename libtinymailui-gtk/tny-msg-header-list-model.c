@@ -697,7 +697,6 @@ tny_msg_header_list_model_relaxed_performer (gpointer data)
 		g_list_free (element);
 		count++;
 	}
-
 	d->list = list;
 
 	if (count <= 1)

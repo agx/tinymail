@@ -83,7 +83,7 @@ set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
 {
 	GtkTreeModel *oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
 	if (oldsortable && GTK_IS_TREE_MODEL_SORT (oldsortable))
-	{
+	{ 
 		GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
 			(GTK_TREE_MODEL_SORT (oldsortable));
 		if (oldmodel)
@@ -109,6 +109,9 @@ reload_accounts (TnySummaryWindowPriv *priv)
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new 
 			(1, G_TYPE_STRING));
 
+	/* Clear the header_view by giving it an empty model */
+	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
+
 	accounts = tny_account_store_iface_get_store_accounts (account_store);
 	
 	while (G_LIKELY (accounts))
@@ -127,9 +130,6 @@ reload_accounts (TnySummaryWindowPriv *priv)
 				GTK_SORT_ASCENDING);
 
 	
-	/* Clear the header_view by giving it an empty model */
-	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
-
 	/* Set the model of the mailbox_view */
 	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), 
 		sortable);
