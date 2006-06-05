@@ -29,8 +29,9 @@ A few shared camel routines
 </para>
 
 @parent_object: 
-@interactive: 
 @device: 
+@account_store: 
+@interactive: 
 @connchanged_signal: 
 
 <!-- ##### STRUCT TnySessionCamelClass ##### -->

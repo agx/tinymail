@@ -55,5 +55,6 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 
 @self: 
 @folder: 
+@refresh: 
 
 

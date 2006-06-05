@@ -22,10 +22,14 @@ tny-msg-header-list-iterator-priv
 
 </para>
 
+@parent: 
+@model: 
+@current: 
 
 <!-- ##### STRUCT TnyMsgHeaderListIteratorClass ##### -->
 <para>
 
 </para>
 
+@parent: 
 

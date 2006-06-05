@@ -25,6 +25,8 @@ patch -fp0 < gtk-doc.make.distcheck.patch
 
 # TODO: Put this in a make target (stupid gtk-doc.make doesn't make this possible afaik)
 
-find $srcdir -type f -iname "*.h" -printf "#include <%f>\n" | grep -v "\-priv" | grep -v "\-test" | grep -v "config.h" | grep -v "tny-summary-window.h" | grep -v camel > docs/devel/reference/libtinymail.types
+find $srcdir -type f -iname "*.h" -printf "#include <%f>\n" | grep -v "\-priv" | grep -v "\-test" | grep -v "config.h" | grep -v "tny-summary-window.h" | grep -v "tny-msg-folder-list.h" | grep -v camel > docs/devel/reference/libtinymail.types
+
 echo >> docs/devel/reference/libtinymail.types
-find $srcdir -type f -iname "*.h" -exec grep get_type {} \; | grep -v define | grep -v _test | grep -v tny_summary_window | grep -v camel | cut -d " " -f 2- | cut -d "(" -f 1| sed s/\ //g >> docs/devel/reference/libtinymail.types
+
+find $srcdir -type f -iname "*.h" -exec grep get_type {} \; | grep -v define | grep -v _test | grep -v tny_summary_window |grep -v tny_msg_folder_list | grep -v camel | cut -d " " -f 2- | cut -d "(" -f 1| sed s/\ //g >> docs/devel/reference/libtinymail.types

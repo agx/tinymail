@@ -39,15 +39,6 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_add_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-
-
 <!-- ##### FUNCTION tny_msg_folder_iface_get_message ##### -->
 <para>
 

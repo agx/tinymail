@@ -25,8 +25,9 @@ status of the device.
 </para>
 
 @parent_object: 
-@interactive: 
 @device: 
+@account_store: 
+@interactive: 
 @connchanged_signal: 
 
 <!-- ##### FUNCTION tny_session_camel_set_pass_func ##### -->

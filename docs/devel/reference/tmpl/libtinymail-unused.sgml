@@ -123,6 +123,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_msg_folder_iface_add_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
 <!-- ##### FUNCTION tny_msg_folder_iface_refresh_headers_async ##### -->
 <para>
 

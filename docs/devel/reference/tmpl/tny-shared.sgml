@@ -35,6 +35,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
+@length_func: 
 @prepend_func: 
 @append_func: 
 @remove_func: 
@@ -105,8 +106,9 @@ Shared include file with forward typedefs
 @parent: 
 @folder_inserted: 
 @folders_reloaded: 
+@remove_message_func: 
+@expunge_func: 
 @get_folders_func: 
-@add_folder_func: 
 @get_message_func: 
 @get_headers_func: 
 @get_name_func: 
@@ -115,6 +117,7 @@ Shared include file with forward typedefs
 @set_name_func: 
 @set_id_func: 
 @set_account_func: 
+@get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
 @uncache_func: 
@@ -346,6 +349,18 @@ Shared include file with forward typedefs
 @add_transport_account_func: 
 @get_cache_dir_func: 
 @get_device_func: 
+@alert_func: 
+
+<!-- ##### STRUCT TnyMsgHeaderProxy ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderProxyClass ##### -->
+<para>
+
+</para>
 
 
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
@@ -392,7 +407,7 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when n
 @self: The #TnyMsgFolderIface
 @what: What happened
 @status: A status field
-@user_data: user data 
+@user_data: user data
 
 
 <!-- ##### MACRO G_LIKELY ##### -->
