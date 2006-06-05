@@ -198,19 +198,19 @@ set_folder_type (TnyMsgFolder *folder, CamelFolderInfo *folder_info)
 	else {
 		switch (folder_info->flags & CAMEL_FOLDER_TYPE_MASK) 
 		{
-			case TNY_MSG_FOLDER_TYPE_INBOX:
+			case CAMEL_FOLDER_TYPE_INBOX:
 				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_INBOX);
 			break;
 			case CAMEL_FOLDER_TYPE_OUTBOX:
 				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_OUTBOX); 
 			break;
-			case TNY_MSG_FOLDER_TYPE_TRASH:
+			case CAMEL_FOLDER_TYPE_TRASH:
 				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_TRASH); 
 			break;
 			case CAMEL_FOLDER_TYPE_JUNK:
 				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_JUNK); 
 			break;
-			case TNY_MSG_FOLDER_TYPE_SENT:
+			case CAMEL_FOLDER_TYPE_SENT:
 				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_SENT); 
 			break;
 			default:
