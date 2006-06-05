@@ -77,6 +77,9 @@ struct _TnyMsgFolderIfaceClass
 
 
 	/* Methods */
+	void (*remove_message_func) (TnyMsgFolderIface *self, TnyMsgHeaderIface *header);
+	void (*expunge_func)        (TnyMsgFolderIface *self);
+
 	const TnyListIface*
 		      (*get_folders_func)  (TnyMsgFolderIface *self);
 
@@ -109,6 +112,9 @@ struct _TnyMsgFolderIfaceClass
 };
 
 GType          tny_msg_folder_iface_get_type     (void);
+
+void tny_msg_folder_iface_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header);
+void tny_msg_folder_iface_expunge (TnyMsgFolderIface *self);
 
 const TnyListIface*
 	       tny_msg_folder_iface_get_folders  (TnyMsgFolderIface *self);

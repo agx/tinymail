@@ -25,6 +25,7 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 #include <tny-platform-factory-iface.h>
 #include <tny-platform-factory.h>
@@ -205,6 +206,68 @@ tny_summary_window_set_account_store (TnyAccountStoreViewIface *self, TnyAccount
 }
 
 static void
+on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gpointer user_data)
+{
+	if (event->keyval == GDK_Delete)
+	{
+		TnySummaryWindow *self  = user_data;
+		TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
+		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
+		GtkTreeModel *model, *mymodel, *sortable;
+		GtkTreeIter iter;
+
+		if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
+		{
+			TnyMsgHeaderIface *header;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+				&header, -1);
+
+			if (G_LIKELY (header))
+			{
+				GtkWidget *dialog = gtk_message_dialog_new (NULL, 
+					GTK_DIALOG_MODAL,
+					GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, 
+					_("This will remove the message with subject \"%s\""),
+					tny_msg_header_iface_get_subject (header));
+
+				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+				{
+					TnyMsgFolderIface *folder;
+					const TnyMsgIface *msg;
+
+					if (GTK_IS_TREE_MODEL_SORT (model))
+					{
+						mymodel = gtk_tree_model_sort_get_model 
+							(GTK_TREE_MODEL_SORT (model));
+					} else mymodel = model;
+
+					tny_list_iface_remove (TNY_LIST_IFACE (mymodel), header);
+
+					folder = (TnyMsgFolderIface*)tny_msg_header_iface_get_folder (header);
+					tny_msg_folder_iface_remove_message (folder, header);
+
+					/* This demo-ui does not support hiding marked-as-deleted 
+					   messages. A normal deletion will only *mark* a message
+					   as deleted. That way undeletion is still possible.
+
+					   You shouldn't *use* this demo-ui, so I'm doing destructive
+					   irreversible deletes: I immediately expunge the folder! */
+
+					tny_msg_folder_iface_expunge (folder);
+				}
+
+				gtk_widget_destroy (dialog);
+			}
+		}
+		
+	}
+
+	return;
+}
+
+static void
 on_header_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
 {
@@ -226,11 +289,9 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			const TnyMsgFolderIface *folder;
 			const TnyMsgIface *msg;
-			/* const TnyMsgHeaderIface *nheader; */
 
-			folder = tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE (header));
-			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
-			/* nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg)); */
+			folder = tny_msg_header_iface_get_folder (header);
+			msg = tny_msg_folder_iface_get_message ((TnyMsgFolderIface*)folder, header);
 
 			tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));	
 		}
@@ -387,12 +448,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		
 		if (G_LIKELY (header))
 		{
-/* Debugging/testing purposes 
-			GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
-				(GTK_TREE_MODEL_SORT (model));
-			tny_list_iface_remove (TNY_LIST_IFACE (oldmodel), header);
-
-*/
 			const TnyMsgFolderIface *folder;
 			const TnyMsgIface *msg;
 			const TnyMsgHeaderIface *nheader;
@@ -590,6 +645,10 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
 		G_CALLBACK (on_header_view_tree_row_activated), priv->header_view);
+
+	g_signal_connect(G_OBJECT (priv->header_view), "key-press-event", 
+		G_CALLBACK (on_header_view_key_press_event), self);
+
 	g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_header_view_tree_selection_changed), self);
 

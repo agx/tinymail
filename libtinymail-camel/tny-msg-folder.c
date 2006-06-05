@@ -146,6 +146,45 @@ load_folder (TnyMsgFolderPriv *priv)
 	return;
 }
 
+
+static void 
+tny_msg_folder_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	const gchar *id;
+
+	g_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded)
+		load_folder_no_lock (priv);
+
+	id = tny_msg_header_iface_get_uid (TNY_MSG_HEADER_IFACE (header));
+	camel_folder_delete_message (priv->folder, id);
+
+	g_mutex_unlock (priv->folder_lock);
+
+	return;
+}
+
+static void 
+tny_msg_folder_expunge (TnyMsgFolderIface *self)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	g_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded)
+		load_folder_no_lock (priv);
+	
+	camel_folder_sync (priv->folder, TRUE, &ex);
+
+	g_mutex_unlock (priv->folder_lock);
+
+	return;
+}
+
+
 CamelFolder*
 _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 {
@@ -155,7 +194,7 @@ _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 	g_mutex_lock (priv->folder_lock);
 
 	if (!priv->folder || !priv->loaded)
-		load_folder (priv);
+		load_folder_no_lock (priv);
 	retval = priv->folder;
 
 	g_mutex_unlock (priv->folder_lock);
@@ -907,6 +946,8 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_subscribed_func = tny_msg_folder_set_subscribed;
 	klass->refresh_async_func = tny_msg_folder_refresh_async;
 	klass->refresh_func = tny_msg_folder_refresh;
+	klass->remove_message_func = tny_msg_folder_remove_message;
+	klass->expunge_func = tny_msg_folder_expunge;
 
 	return;
 }

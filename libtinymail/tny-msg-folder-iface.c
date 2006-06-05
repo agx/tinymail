@@ -25,6 +25,34 @@
 guint *tny_msg_folder_iface_signals;
 
 
+/**
+ * tny_msg_folder_iface_expunge:
+ * @self: a TnyMsgFolderIface object
+ *
+ * Sync changes made to a folder to its backing store, 
+ * expunging deleted messages as well.
+ **/
+void 
+tny_msg_folder_iface_expunge (TnyMsgFolderIface *self)
+{
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->expunge_func (self);
+	return;
+}
+
+/**
+ * tny_msg_folder_iface_remove_message:
+ * @self: a TnyMsgFolderIface object
+ * @header: the header of the message to remove
+ *
+ * Remove a message from a folder
+ **/
+void 
+tny_msg_folder_iface_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
+{
+	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->remove_message_func (self, header);
+	return;
+}
+
 
 /**
  * tny_msg_folder_iface_refresh_async:

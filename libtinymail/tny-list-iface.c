@@ -67,7 +67,9 @@ tny_list_iface_append (TnyListIface *self, gpointer item)
  * @self: A #TnyListIface instance
  * @item: the item to remove
  *
- *
+ * Removing a item might invalidate all existing iterators or put them in an
+ * unknown and unspecified state. You'll need to recreate the iterator(s) if you
+ * remove an item to be certain.
  **/
 void 
 tny_list_iface_remove (TnyListIface *self, gpointer item)
