@@ -33,9 +33,6 @@ struct _TnyMsgFolderPriv
 
 	GType headers_list_type;
 
-	GMutex *cached_msgs_lock;
-	GHashTable *cached_msgs;
-
 	guint folder_changed_id;
 
 	GMutex *folder_lock;

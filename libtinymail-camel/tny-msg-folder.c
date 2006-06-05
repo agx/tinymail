@@ -87,12 +87,6 @@ unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 		priv->folder = NULL;
 	}
 
-	g_mutex_lock (priv->cached_msgs_lock);
-	if (G_LIKELY (priv->cached_msgs))
-		g_hash_table_destroy (priv->cached_msgs);
-	priv->cached_msgs = NULL;
-	g_mutex_unlock (priv->cached_msgs_lock);
-
 	priv->cached_length = 0;
 
 	priv->loaded = FALSE;
@@ -159,10 +153,10 @@ _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 
 	g_mutex_lock (priv->folder_lock);
 
-	if (!priv->folder)
+	if (!priv->folder || !priv->loaded)
 		load_folder (priv);
-
 	retval = priv->folder;
+
 	g_mutex_unlock (priv->folder_lock);
 
 	return retval;
@@ -578,86 +572,51 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 	return;
 }
 
-static void
-destroy_cached_key (gpointer data)
-{
-	/* data is a const */
-	return;
-}
-
-
-static void
-destroy_cached_value (gpointer data)
-{
-	/* Data is a TnyMsgIface or a TnyMsgHeaderIface */
-	g_object_unref (G_OBJECT (data));
-
-	return;
-}
-
 
 static const TnyMsgIface*
 tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyMsgIface *message = NULL;
+	const gchar *id;
 
-	const gchar *id = tny_msg_header_iface_get_uid (TNY_MSG_HEADER_IFACE (header));
+	g_mutex_lock (priv->folder_lock);
 
-	load_folder (priv);
+	id = tny_msg_header_iface_get_uid (TNY_MSG_HEADER_IFACE (header));
 
-	g_mutex_lock (priv->cached_msgs_lock);
+	load_folder_no_lock (priv);
 
-	if (G_UNLIKELY (!priv->cached_msgs))
-	{
-		/* Questionable: Do we really want a message cache anyway? */
+	CamelException *ex = camel_exception_new ();
+	camel_exception_init (ex);
 
-		priv->cached_msgs = g_hash_table_new_full 
-			(g_str_hash, g_str_equal, destroy_cached_key,
-			destroy_cached_value);
-		g_mutex_unlock (priv->cached_msgs_lock);
-	} else {
-		message = g_hash_table_lookup (priv->cached_msgs, id);
-		g_mutex_unlock (priv->cached_msgs_lock);
-	}
-	
-	if (G_LIKELY (!message))
-	{
-		CamelException *ex = camel_exception_new ();
-		camel_exception_init (ex);
+	CamelMimeMessage *camel_message = NULL;
 
-		CamelMimeMessage *camel_message = NULL;
 
-		g_mutex_lock (priv->folder_lock);
+	/* TODO: We can reuse the message instance in the header 
+	   if not using the summary capabilities. */
 
-		/* TODO: We can reuse the message instance in the header 
-		   if not using the summary capabilities. */
-
-		_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
+	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
 					NULL, NULL, NULL);
 
-		camel_message = camel_folder_get_message  
+	camel_message = camel_folder_get_message  
 			(priv->folder, (const char *) id, ex);
 
-		_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
+	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
+	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
+	{
+		message = TNY_MSG_IFACE (tny_msg_new ());
 
-		g_mutex_unlock (priv->folder_lock);
-
-		if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
-		{
-			message = TNY_MSG_IFACE (tny_msg_new ());
-
-			tny_msg_iface_set_folder (message, self);
-			tny_msg_iface_set_header (message, TNY_MSG_HEADER_IFACE (header));
-			_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
-
-			g_mutex_lock (priv->cached_msgs_lock);
-			g_hash_table_insert (priv->cached_msgs, (gpointer)id, message);
-			g_mutex_unlock (priv->cached_msgs_lock);
-		}
-
-		camel_exception_free (ex);
+		tny_msg_iface_set_folder (message, self);
+		tny_msg_iface_set_header (message, TNY_MSG_HEADER_IFACE (header));
+		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
+	} else {
+		if (camel_message)
+			camel_object_unref (CAMEL_OBJECT (camel_message));
 	}
+
+	camel_exception_free (ex);
+
+	g_mutex_unlock (priv->folder_lock);
 
 	return message;
 }
@@ -692,12 +651,16 @@ tny_msg_folder_set_id (TnyMsgFolderIface *self, const gchar *id)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
-	unload_folder (priv, TRUE);
+	g_mutex_lock (priv->folder_lock);
+
+	unload_folder_no_lock (priv, TRUE);
 
 	if (G_UNLIKELY (priv->folder_name))
 		g_free (priv->folder_name);
 
 	priv->folder_name = g_strdup (id);
+
+	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -744,12 +707,9 @@ tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
-	g_mutex_lock (priv->folder_lock);
 	
 	tny_msg_folder_set_id (TNY_MSG_FOLDER_IFACE (self), 
 		camel_folder_get_full_name (camel_folder));
-
-	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -849,9 +809,6 @@ tny_msg_folder_finalize (GObject *object)
 	g_mutex_unlock (priv->folder_lock);
 	g_mutex_unlock (priv->folders_lock);
 
-	g_mutex_free (priv->cached_msgs_lock);
-	priv->cached_msgs_lock = NULL;
-
 	g_mutex_free (priv->folder_lock);
 	priv->folder_lock = NULL;
 
@@ -939,8 +896,6 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folder_changed_id = 0;
 	priv->folder = NULL;
 	priv->folders = NULL;
-	priv->cached_msgs = NULL; 
-	priv->cached_msgs_lock = g_mutex_new ();
 	priv->folder_lock = g_mutex_new ();
 	priv->folders_lock = g_mutex_new ();
 	priv->cached_name = NULL;

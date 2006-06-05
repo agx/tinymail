@@ -150,17 +150,19 @@ _tny_msg_get_camel_mime_message (TnyMsg *self)
 
 
 void
-_tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
+_tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message, gboolean pop)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
 	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->message_lock);
 
+	priv->pop = pop;
+
 	if (ppriv->part)
 		camel_object_unref (CAMEL_OBJECT (ppriv->part));
 
-	//camel_object_ref (CAMEL_OBJECT (message));
+	/* camel_object_ref (CAMEL_OBJECT (message)); */
 	ppriv->part = CAMEL_MIME_PART (message);
 	
 	unload_parts (priv);
@@ -327,7 +329,8 @@ tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 	message = _tny_msg_header_get_camel_mime_message (TNY_MSG_HEADER (priv->header));
 
 	if (G_UNLIKELY (message))
-		_tny_msg_set_camel_mime_message (TNY_MSG (self), message);
+		_tny_msg_set_camel_mime_message (TNY_MSG (self), message, 
+			_tny_msg_header_get_is_pop (TNY_MSG_HEADER (priv->header)));
 
 	g_mutex_unlock (priv->header_lock);
 
@@ -340,6 +343,7 @@ tny_msg_finalize (GObject *object)
 {
 	TnyMsg *self = (TnyMsg*) object;
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->header_lock);
 	if (G_LIKELY (priv->header))
@@ -348,6 +352,16 @@ tny_msg_finalize (GObject *object)
 	g_mutex_unlock (priv->header_lock);
 
 	unload_parts (priv);
+
+	g_mutex_lock (priv->message_lock);
+	if (ppriv->part)
+	{
+		/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 */
+		while (((CamelObject*)ppriv->part)->ref_count >= 1)
+			camel_object_unref (CAMEL_OBJECT (ppriv->part));
+	}
+	ppriv->part = NULL;
+	g_mutex_unlock (priv->message_lock);
 
 	g_mutex_free (priv->message_lock);
 	g_mutex_free (priv->header_lock);
@@ -374,7 +388,7 @@ tny_msg_new (void)
 {
 	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
 	
-	_tny_msg_set_camel_mime_message (self, camel_mime_message_new  ());
+	_tny_msg_set_camel_mime_message (self, camel_mime_message_new  (), FALSE);
 
 	return self;
 }
@@ -480,6 +494,7 @@ tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->parts = NULL;
 	priv->header = NULL;
 
+	priv->pop = FALSE;
 	priv->message_lock = g_mutex_new ();
 	priv->parts_lock = g_mutex_new ();
 	priv->header_lock = g_mutex_new ();

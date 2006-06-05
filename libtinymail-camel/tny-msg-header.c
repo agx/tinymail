@@ -59,6 +59,13 @@ struct _TnyMsgHeaderClass
 	GObjectClass parent_class;
 };
 
+gboolean 
+_tny_msg_header_get_is_pop (TnyMsgHeader *self)
+{
+	/* All summary types aren't pop atm ;-) */
+	return (!self->use_summary);
+}
+
 void
 _tny_msg_header_set_not_uncachable (TnyMsgHeader *self)
 {
@@ -82,8 +89,8 @@ unload_msg_header (TnyMsgHeader *self)
 		if (G_LIKELY (self->message_info))
 		{
 			/* It looks like this conflicts with freeing the folder 
-			camel_message_info_free (self->message_info); */
-			self->message_info = NULL;
+			camel_message_info_free (self->message_info); 
+			self->message_info = NULL; */
 		}
 	} else {
 		if (G_LIKELY (self->mime_message) && G_LIKELY (CAMEL_IS_OBJECT (self->mime_message)))
@@ -114,6 +121,7 @@ tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val)
 static void
 load_msg_header (TnyMsgHeader *self)
 {
+
 	if (G_UNLIKELY (!self->uncachable))
 		return;
 
@@ -121,18 +129,26 @@ load_msg_header (TnyMsgHeader *self)
 	{
 		if (G_LIKELY (!self->message_info) && G_LIKELY (self->folder) && G_LIKELY (self->uid))
 		{
-			CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
-			CamelMessageInfo *msginfo = camel_folder_get_message_info 
-					(folder, self->uid);
+		  CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
+		  CamelMessageInfo *msginfo;
+
+		  if (folder)
+		  {
+			msginfo = camel_folder_get_message_info (folder, self->uid);
 			_tny_msg_header_set_camel_message_info (self, msginfo);
+		  }
 		}
 	} else {
 		if (G_LIKELY (!self->mime_message) && G_LIKELY (self->folder) && G_LIKELY (self->uid))
 		{
-			CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
-			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+		  CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
+		  CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+		  if (folder)
+		  {
 			self->mime_message = camel_folder_get_message 
-					(folder, self->uid, &ex);
+				(folder, self->uid, &ex);
+		  }
 		}
 	}
 

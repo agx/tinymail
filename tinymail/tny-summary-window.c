@@ -226,11 +226,11 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			const TnyMsgFolderIface *folder;
 			const TnyMsgIface *msg;
-			const TnyMsgHeaderIface *nheader;
+			/* const TnyMsgHeaderIface *nheader; */
 
 			folder = tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE (header));
 			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
-			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
+			/* nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg)); */
 
 			tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));	
 		}

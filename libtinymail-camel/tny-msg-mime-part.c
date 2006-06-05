@@ -513,7 +513,6 @@ tny_msg_mime_part_finalize (GObject *object)
 
 		/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 */
 		/* camel_object_unref (CAMEL_OBJECT (priv->part)); */
-
 		g_mutex_unlock (priv->part_lock);
 	}
 
