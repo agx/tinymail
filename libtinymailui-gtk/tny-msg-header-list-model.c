@@ -136,6 +136,8 @@ tny_msg_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			retval = G_TYPE_POINTER;
 			break;
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN:
 		case TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			retval = G_TYPE_INT;
 			break;
@@ -274,7 +276,17 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		case TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
 			g_value_set_string (value, 
-				_get_readable_date (tny_msg_header_iface_get_date_sent (header)));
+				_get_readable_date (tny_msg_header_iface_get_date_received (header)));
+			break;
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
+			g_value_init (value, G_TYPE_INT);
+			g_value_set_int (value, 
+					    tny_msg_header_iface_get_date_sent (header));
+			break;
+		case TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN:
+			g_value_init (value, G_TYPE_INT);
+			g_value_set_int (value, 
+					 tny_msg_header_iface_get_date_received (header));
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_POINTER);
