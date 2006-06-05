@@ -113,7 +113,7 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *acc
 		TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
 		tny_account_iface_get_name (TNY_ACCOUNT_IFACE (account)),
 		TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 0,
-		TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN, -1, /* TODO */
+		TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN, -1,
 		TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 		NULL, -1);
 
@@ -161,7 +161,7 @@ static void
 tny_account_tree_model_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	GtkTreeStore *store = (GtkTreeStore*) instance;
-	static GType types[] = { G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER };
+	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_INT, G_TYPE_POINTER };
 
 	gtk_tree_store_set_column_types (store, 
 		TNY_ACCOUNT_TREE_MODEL_N_COLUMNS, types);

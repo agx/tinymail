@@ -234,6 +234,8 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 		tny_msg_folder_iface_set_id (iface, iter->full_name);
 		tny_msg_folder_iface_set_account (iface, TNY_ACCOUNT_IFACE (self));
 		set_folder_type (TNY_MSG_FOLDER (iface), iter);
+		_tny_msg_folder_set_unread_count (TNY_MSG_FOLDER (iface), iter->unread);
+		_tny_msg_folder_set_all_count (TNY_MSG_FOLDER (iface), iter->total);
 
 		_tny_msg_folder_set_name_priv (iface, iter->name);
 

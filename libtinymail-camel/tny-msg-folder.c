@@ -234,6 +234,23 @@ tny_msg_folder_get_unread_count (TnyMsgFolderIface *self)
 	return retval;
 }
 
+void
+_tny_msg_folder_set_unread_count (TnyMsgFolder *self, guint len)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	priv->unread_length = len;
+	return;
+}
+
+void
+_tny_msg_folder_set_all_count (TnyMsgFolder *self, guint len)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	priv->cached_length = len;
+	return;
+}
+
+
 static guint
 tny_msg_folder_get_all_count (TnyMsgFolderIface *self)
 {
