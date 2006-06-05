@@ -29,7 +29,8 @@ typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
 struct _TnyMsgFolderPriv
 {
 	GPtrArray *cached_uids;
-	
+	gboolean loaded;
+
 	GType headers_list_type;
 
 	GMutex *cached_msgs_lock;

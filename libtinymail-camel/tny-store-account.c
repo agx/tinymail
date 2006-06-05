@@ -296,9 +296,9 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 
 		/* TODO: Implement subscription logic for POP */
 
-		/* g_object_ref (G_OBJECT (inbox)); */
-
 		tny_msg_folder_set_folder (TNY_MSG_FOLDER (inbox), folder);
+		camel_object_unref (CAMEL_OBJECT (folder));
+
 		tny_msg_folder_iface_set_account (inbox, TNY_ACCOUNT_IFACE (self));
 		tny_msg_folder_iface_set_name (TNY_MSG_FOLDER_IFACE (inbox), "INBOX");
 

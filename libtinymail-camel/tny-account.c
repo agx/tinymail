@@ -463,6 +463,10 @@ tny_account_finalize (GObject *object)
 	TnyAccount *self = (TnyAccount *)object;	
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
+	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
+		NULL, NULL, NULL);
+	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self));
+
 	g_mutex_lock (priv->cancel_lock);
 	if (G_UNLIKELY (priv->cancel))
 		camel_operation_unref (priv->cancel);
