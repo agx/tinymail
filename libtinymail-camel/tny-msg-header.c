@@ -26,6 +26,7 @@
 
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header.h>
+#include <tny-msg-folder.h>
 
 #include "tny-camel-common-priv.h"
 #include "tny-msg-folder-priv.h"

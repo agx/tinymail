@@ -49,12 +49,14 @@ struct _TnyMsgFolderPriv
 	gboolean has_summary_cap;
 
 	gchar *cached_name;
+	TnyMsgFolderType cached_folder_type;
 };
 
 CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);
 
 void _tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribed);
 void _tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name);
+void _tny_msg_folder_set_folder_type (TnyMsgFolder *self, TnyMsgFolderType type);
 
 #define TNY_MSG_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))

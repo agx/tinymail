@@ -302,7 +302,7 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_msg_header_iface_get_from (header));			
+			g_value_set_string (value, tny_msg_header_iface_get_from (header));
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			g_value_init (value, G_TYPE_INT);

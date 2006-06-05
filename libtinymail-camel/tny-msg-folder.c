@@ -88,7 +88,7 @@ unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 	}
 
 	priv->cached_length = 0;
-
+	priv->cached_folder_type = TNY_MSG_FOLDER_TYPE_UNKNOWN;
 	priv->loaded = FALSE;
 
 	return;
@@ -109,6 +109,7 @@ load_folder_no_lock (TnyMsgFolderPriv *priv)
 {
 	if (!priv->folder && !priv->loaded)
 	{
+		CamelFolderInfo *folder_info;
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelStore *store = (CamelStore*) _tny_account_get_service 
 			(TNY_ACCOUNT (priv->account));
@@ -121,7 +122,7 @@ load_folder_no_lock (TnyMsgFolderPriv *priv)
 			priv);
 
 		priv->has_summary_cap = camel_folder_has_summary_capability (priv->folder);
-
+		
 		if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		{
 			priv->unread_length = (guint)
@@ -638,6 +639,27 @@ tny_msg_folder_get_name (TnyMsgFolderIface *self)
 	return name;
 }
 
+
+static TnyMsgFolderType
+tny_msg_folder_get_folder_type (TnyMsgFolderIface *self)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
+	return priv->cached_folder_type;
+}
+
+void
+_tny_msg_folder_set_folder_type (TnyMsgFolder *self, TnyMsgFolderType type)
+{
+	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+
+	priv->cached_folder_type = type;
+
+	return;
+}
+
+
+
 static const gchar*
 tny_msg_folder_get_id (TnyMsgFolderIface *self)
 {
@@ -856,6 +878,7 @@ tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_id_func = tny_msg_folder_get_id;
 	klass->set_name_func = tny_msg_folder_set_name;
 	klass->get_name_func = tny_msg_folder_get_name;
+	klass->get_folder_type_func = tny_msg_folder_get_folder_type;
 	klass->has_cache_func = tny_msg_folder_has_cache;
 	klass->uncache_func = tny_msg_folder_uncache;
 	klass->get_folders_func = tny_msg_folder_get_folders;
@@ -899,7 +922,8 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folder_lock = g_mutex_new ();
 	priv->folders_lock = g_mutex_new ();
 	priv->cached_name = NULL;
-
+	priv->cached_folder_type = TNY_MSG_FOLDER_TYPE_UNKNOWN;
+	
 	return;
 }
 

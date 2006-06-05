@@ -191,6 +191,36 @@ tny_store_account_clear_folders (TnyStoreAccountPriv *priv)
 }
 
 static void 
+set_folder_type (TnyMsgFolder *folder, CamelFolderInfo *folder_info)
+{
+	if (!folder_info)
+		_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_NORMAL);
+	else {
+		switch (folder_info->flags & CAMEL_FOLDER_TYPE_MASK) 
+		{
+			case TNY_MSG_FOLDER_TYPE_INBOX:
+				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_INBOX);
+			break;
+			case CAMEL_FOLDER_TYPE_OUTBOX:
+				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_OUTBOX); 
+			break;
+			case TNY_MSG_FOLDER_TYPE_TRASH:
+				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_TRASH); 
+			break;
+			case CAMEL_FOLDER_TYPE_JUNK:
+				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_JUNK); 
+			break;
+			case TNY_MSG_FOLDER_TYPE_SENT:
+				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_SENT); 
+			break;
+			default:
+				_tny_msg_folder_set_folder_type (folder, TNY_MSG_FOLDER_TYPE_NORMAL);
+			break;
+		}
+	}
+}
+
+static void 
 fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFolderIface *parent, CamelFolderInfo *iter, TnyStoreAccountFolderType type)
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
@@ -203,6 +233,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyMsgFol
 
 		tny_msg_folder_iface_set_id (iface, iter->full_name);
 		tny_msg_folder_iface_set_account (iface, TNY_ACCOUNT_IFACE (self));
+		set_folder_type (TNY_MSG_FOLDER (iface), iter);
 
 		_tny_msg_folder_set_name_priv (iface, iter->name);
 

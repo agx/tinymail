@@ -242,6 +242,22 @@ tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name)
 	return;
 }
 
+
+
+/**
+ * tny_msg_folder_iface_get_folder_type:
+ * @self: a TnyMsgFolderIface object
+ * 
+ * Get the type of the folder (Inbox, Outbox etc.) 
+ * 
+ **/
+TnyMsgFolderType tny_msg_folder_iface_get_folder_type  (TnyMsgFolderIface *self)
+{
+	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_folder_type_func (self);
+}
+
+
+
 /**
  * tny_msg_folder_iface_uncache:
  * @self: a TnyMsgFolderIface object

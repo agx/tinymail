@@ -48,11 +48,23 @@ enum
 	TNY_MSG_FOLDER_IFACE_LAST_SIGNAL
 };
 
+
+enum _TnyMsgFolderType
+{
+	TNY_MSG_FOLDER_TYPE_UNKNOWN,
+	TNY_MSG_FOLDER_TYPE_NORMAL,
+	TNY_MSG_FOLDER_TYPE_INBOX,
+	TNY_MSG_FOLDER_TYPE_OUTBOX,
+	TNY_MSG_FOLDER_TYPE_TRASH,
+	TNY_MSG_FOLDER_TYPE_JUNK,
+	TNY_MSG_FOLDER_TYPE_SENT
+};
+	
+
 	/* TODO: 
 	- Removing messages
 	- Purging this folder
 	- Removing folders
-	- Folder type 
 	- Moving messages */
 
 struct _TnyMsgFolderIfaceClass
@@ -70,7 +82,7 @@ struct _TnyMsgFolderIfaceClass
 
 	const TnyMsgIface*  
                        (*get_message_func)  (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header);
-
+	
 	void	       (*get_headers_func)  (TnyMsgFolderIface *self, TnyListIface *headers, gboolean refresh);
 
 	const gchar*   (*get_name_func)    (TnyMsgFolderIface *self);
@@ -81,6 +93,7 @@ struct _TnyMsgFolderIfaceClass
 	void           (*set_name_func)    (TnyMsgFolderIface *self, const gchar *name);
 	void           (*set_id_func)      (TnyMsgFolderIface *self, const gchar *id);
 	void           (*set_account_func) (TnyMsgFolderIface *self, const TnyAccountIface *account);
+	TnyMsgFolderType (*get_folder_type_func) (TnyMsgFolderIface *self);
 
 	guint           (*get_all_count_func)     (TnyMsgFolderIface *self);	
 	guint           (*get_unread_count_func)  (TnyMsgFolderIface *self);
@@ -112,6 +125,8 @@ const gchar*   tny_msg_folder_iface_get_name     (TnyMsgFolderIface *self);
 void           tny_msg_folder_iface_set_account  (TnyMsgFolderIface *self, const TnyAccountIface *account);
 void           tny_msg_folder_iface_set_id       (TnyMsgFolderIface *self, const gchar *id);
 void           tny_msg_folder_iface_set_name     (TnyMsgFolderIface *self, const gchar *name);
+
+TnyMsgFolderType tny_msg_folder_iface_get_folder_type  (TnyMsgFolderIface *self);
 
 guint          tny_msg_folder_iface_get_all_count     (TnyMsgFolderIface *self);
 guint          tny_msg_folder_iface_get_unread_count  (TnyMsgFolderIface *self);
