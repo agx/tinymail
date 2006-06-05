@@ -431,7 +431,7 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 	for (i=0; i < count; i++)
 	{
 		gchar *proto, *type, *key, *name;
-		TnyAccountIface *account;
+		TnyAccountIface *account; GSList *options;
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
 		
@@ -476,6 +476,23 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 		g_free (key);
 		tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), name);
 		g_free (name);
+
+
+		key = g_strdup_printf ("/apps/tinymail/accounts/%d/options", i);
+		options = gconf_client_get_list (priv->client, 
+			(const gchar*) key, GCONF_VALUE_STRING, NULL);
+		g_free (key);
+
+		if (options)
+		{
+			while (options)
+			{
+				tny_account_add_option (TNY_ACCOUNT (account), options->data);
+				g_free (options->data);
+				options = g_slist_next (options);
+			}
+			g_slist_free (options);
+		}
 
 		/* Because we only check for the n first bytes, the pops, imaps and smtps also work */
 		if (!g_ascii_strncasecmp (proto, "pop", 3) ||

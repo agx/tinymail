@@ -53,6 +53,8 @@ struct _TnyAccountClass
 
 GType tny_account_get_type (void);
 
+void tny_account_add_option (TnyAccount *self, const gchar *option);
+
 G_END_DECLS
 
 #endif

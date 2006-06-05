@@ -49,6 +49,7 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
 
 
+
 static void
 report_error (TnyAccountPriv *priv)
 {
@@ -72,6 +73,7 @@ tny_store_account_reconnect (TnyAccount *self)
 		if (!priv->url_string)
 		{
 			CamelURL *url = NULL;
+			GList *options = priv->options;
 
 			gchar *proto = g_strdup_printf ("%s://", priv->proto); 
 
@@ -83,10 +85,37 @@ tny_store_account_reconnect (TnyAccount *self)
 			camel_url_set_user (url, priv->user);
 			camel_url_set_host (url, priv->host);
 		
+			while (options)
+			{
+				gchar *ptr, *dup = g_strdup (options->data);
+				gchar *option, *value;
+
+				ptr = strchr (dup, '=');
+
+				if (ptr) 
+				{
+					ptr++;
+					value = g_strdup (ptr); ptr--;
+					*ptr = '\0'; option = dup;
+				} else {
+					option = dup;
+					value = g_strdup ("1");
+				}
+
+				camel_url_set_param (url, option, value);
+
+				g_free (value);
+
+				g_free (dup);
+
+				options = g_list_next (options);
+			}
+
 			if (G_LIKELY (priv->url_string))
 				g_free (priv->url_string);
 
 			priv->url_string = camel_url_to_string (url, 0);
+
 			camel_url_free (url);
 		}
 		if (G_UNLIKELY (priv->service))
@@ -125,6 +154,7 @@ tny_store_account_reconnect (TnyAccount *self)
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
 			camel_service_cancel_connect (priv->service);
+			camel_service_disconnect (priv->service, FALSE, priv->ex);
 		} else {
 			priv->connected = TRUE;
 		}
@@ -210,7 +240,7 @@ static void
 tny_store_account_notify (TnyStoreAccountPriv *priv)
 {
 	/* Tell the observers that they should reload */
-	if (tny_list_iface_length (priv->folders) > 0)
+	if (priv->folders && tny_list_iface_length (priv->folders) > 0)
 	{
 		TnyIteratorIface *iterator = tny_list_iface_create_iterator (priv->folders);
 		TnyMsgFolderIface *folder;
@@ -417,7 +447,6 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	apriv->type = CAMEL_PROVIDER_STORE;
 	priv->folders = NULL;
-
 	apriv->connected = FALSE;
 	priv->folders_lock = g_mutex_new ();
 
@@ -432,6 +461,7 @@ tny_store_account_finalize (GObject *object)
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
 	tny_store_account_clear_folders (priv);
+
 	g_mutex_free (priv->folders_lock);
 
 	(*parent_class->finalize) (object);

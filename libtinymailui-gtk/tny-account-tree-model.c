@@ -44,7 +44,7 @@ static void
 fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkTreeIter *parent_iter, TnyStoreAccountIface *account)
 {
 
-  if (tny_list_iface_length (folders) > 0)
+  if (folders && tny_list_iface_length (folders) > 0)
   {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);

@@ -44,6 +44,18 @@ static GObjectClass *parent_class = NULL;
 
 #include <tny-camel-shared.h>
 
+void 
+tny_account_add_option (TnyAccount *self, const gchar *option)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	priv->options = g_list_prepend (priv->options, g_strdup (option));
+
+	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
+
+	return;
+}
+
 
 static void
 tny_account_set_url_string (TnyAccountIface *self, const gchar *url_string)
@@ -435,6 +447,7 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cancel_lock = g_mutex_new ();
 	priv->inuse_spin = FALSE;
 
+	priv->options = NULL;
 	priv->store = NULL;
 	priv->id = NULL;
 	priv->user = NULL;
@@ -474,6 +487,12 @@ tny_account_finalize (GObject *object)
 
 	g_mutex_free (priv->cancel_lock);
 	priv->inuse_spin = FALSE;
+
+	if (priv->options)
+	{
+		g_list_foreach (priv->options, (GFunc)g_free, NULL);
+		g_list_free (priv->options);
+	}
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
