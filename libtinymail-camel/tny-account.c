@@ -19,6 +19,8 @@
 
 #include <config.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <glib.h>
 
 #include <string.h>
@@ -145,7 +147,7 @@ _tny_account_start_camel_operation (TnyAccountIface *self, CamelOperationStatusF
 	{
 		while (!camel_operation_cancel_check (priv->cancel)) 
 		{ 
-			g_warning ("Cancellation failed, retrying\n");
+			g_warning (_("Cancellation failed, retrying\n"));
 			thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
 			g_thread_join (thread);
 		}
