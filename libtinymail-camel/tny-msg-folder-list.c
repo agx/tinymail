@@ -79,7 +79,7 @@ _tny_msg_folder_list_intern_prepend (TnyMsgFolderList *self, TnyMsgFolderIface *
 
 	/* Tell the observers */
 	if (self->pfolder)
-		g_signal_emit (self->pfolder, tny_msg_folder_iface_signals [FOLDER_INSERTED], 0, item);
+		g_signal_emit (self->pfolder, tny_msg_folder_iface_signals [TNY_MSG_FOLDER_IFACE_FOLDER_INSERTED], 0, item);
 
 }
 

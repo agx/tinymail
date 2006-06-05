@@ -247,7 +247,7 @@ tny_store_account_notify (TnyStoreAccountPriv *priv)
 
 		tny_iterator_iface_nth (iterator, 0);
 		folder = tny_iterator_iface_current (iterator);
-		g_signal_emit (folder, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+		g_signal_emit (folder, tny_msg_folder_iface_signals [TNY_MSG_FOLDER_IFACE_FOLDERS_RELOADED], 0);
 		g_object_unref (G_OBJECT (iterator));
 	}
 }
@@ -339,7 +339,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		g_mutex_unlock (priv->folders_lock);
 
 		tny_msg_folder_iface_uncache (inbox);
-		g_signal_emit (inbox, tny_msg_folder_iface_signals [FOLDERS_RELOADED], 0);
+		g_signal_emit (inbox, tny_msg_folder_iface_signals [TNY_MSG_FOLDER_IFACE_FOLDERS_RELOADED], 0);
 
 		g_mutex_lock (priv->folders_lock);
 		retval = priv->folders;
@@ -388,7 +388,7 @@ tny_store_account_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *fold
 	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
 	if (astore)
-		g_signal_emit (astore, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+		g_signal_emit (astore, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
 
 	/* Sync */
 	_tny_msg_folder_set_subscribed_priv (folder, TRUE);
@@ -415,7 +415,7 @@ tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *fo
 	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
 	if (astore)
-		g_signal_emit (astore, tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+		g_signal_emit (astore, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
 
 	/* Sync */
 	_tny_msg_folder_set_subscribed_priv (folder, FALSE);

@@ -62,7 +62,7 @@ tny_device_iface_base_init (gpointer g_class)
  *
  * Emitted when the connection status of a device changes.
  */
-		tny_device_iface_signals[CONNECTION_CHANGED] =
+		tny_device_iface_signals[TNY_DEVICE_IFACE_CONNECTION_CHANGED] =
 		   g_signal_new ("connection_changed",
 			TNY_TYPE_DEVICE_IFACE,
 			G_SIGNAL_RUN_FIRST,

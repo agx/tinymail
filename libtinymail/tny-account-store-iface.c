@@ -33,13 +33,30 @@
 
 guint *tny_account_store_iface_signals = NULL;
 
+
+/**
+ * tny_account_store_iface_alert:
+ * @self: a #TnyAccountTransportIface object
+ * @type: the message type (severity)
+ * @prompt: the prompt
+ *
+ * This jump-to-the-ui method implements showing a message dialog with prompt
+ * as prompt. It will return TRUE if the reply was affirmative. Or FALSE if not.
+ * 
+ * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
+ **/
+gboolean 
+tny_account_store_iface_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
+{
+	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->alert_func (self, type, prompt);
+}
+
 /**
  * tny_account_store_iface_get_device:
  * @self: a #TnyAccountTransportIface object
  * 
  * Return value: the device attached to this account store
  **/
-
 const TnyDeviceIface* 
 tny_account_store_iface_get_device (TnyAccountStoreIface *self)
 {
@@ -140,7 +157,7 @@ tny_account_store_iface_base_init (gpointer g_class)
  *
  * Emitted when an account in the store changed
  */
-		tny_account_store_iface_signals[ACCOUNT_CHANGED] =
+		tny_account_store_iface_signals[TNY_ACCOUNT_STORE_IFACE_ACCOUNT_CHANGED] =
 		   g_signal_new ("account_changed",
 			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,
@@ -159,7 +176,7 @@ tny_account_store_iface_base_init (gpointer g_class)
  */
 
 
-		tny_account_store_iface_signals[ACCOUNT_INSERTED] =
+		tny_account_store_iface_signals[TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED] =
 		   g_signal_new ("account_inserted",
 			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,
@@ -176,7 +193,7 @@ tny_account_store_iface_base_init (gpointer g_class)
  *
  * Emitted when an account is removed from the store
  */
-		tny_account_store_iface_signals[ACCOUNT_REMOVED] =
+		tny_account_store_iface_signals[TNY_ACCOUNT_STORE_IFACE_ACCOUNT_REMOVED] =
 		   g_signal_new ("account_removed",
 			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,
@@ -191,7 +208,7 @@ tny_account_store_iface_base_init (gpointer g_class)
  *
  * Emitted when the store reloads the accounts
  */
-		tny_account_store_iface_signals[ACCOUNTS_RELOADED] =
+		tny_account_store_iface_signals[TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED] =
 		   g_signal_new ("accounts_reloaded",
 			TNY_TYPE_ACCOUNT_STORE_IFACE,
 			G_SIGNAL_RUN_FIRST,

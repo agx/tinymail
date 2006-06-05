@@ -54,6 +54,7 @@ typedef enum _TnyStoreAccountFolderType TnyStoreAccountFolderType;
 typedef void (*TnyRefreshFolderCallback) (TnyMsgFolderIface *self, gboolean cancelled, gpointer user_data);
 typedef void (*TnyRefreshFolderStatusCallback) (TnyMsgFolderIface *self, const gchar *what, gint status, gpointer user_data);
 typedef enum _TnyMsgHeaderFlags TnyMsgHeaderFlags;
+typedef enum _TnyAlertType TnyAlertType;
 
 #ifndef G_LIKELY
 #define G_LIKELY(expr) (expr)

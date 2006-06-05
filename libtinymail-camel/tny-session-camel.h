@@ -35,8 +35,10 @@ G_BEGIN_DECLS
 struct _TnySessionCamel
 {
         CamelSession parent_object;
-        gboolean interactive;
+
 	gpointer device;
+	gpointer account_store;
+        gboolean interactive;
 	guint connchanged_signal;
 };
 

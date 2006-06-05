@@ -31,7 +31,7 @@ static GObjectClass *parent_class = NULL;
 static void
 tny_device_on_online (TnyDeviceIface *self)
 {
-	g_signal_emit (self, tny_device_iface_signals [CONNECTION_CHANGED], 0, TRUE);
+	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, TRUE);
 
 	return;
 }
@@ -39,7 +39,7 @@ tny_device_on_online (TnyDeviceIface *self)
 static void
 tny_device_on_offline (TnyDeviceIface *self)
 {
-	g_signal_emit (self, tny_device_iface_signals [CONNECTION_CHANGED], 0, FALSE);
+	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, FALSE);
 
 	return;
 }

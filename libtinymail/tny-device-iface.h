@@ -39,7 +39,7 @@ extern guint *tny_device_iface_signals;
 
 enum
 {
-	CONNECTION_CHANGED,
+	TNY_DEVICE_IFACE_CONNECTION_CHANGED,
 	TNY_DEVICE_IFACE_LAST_SIGNAL
 };
 

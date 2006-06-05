@@ -284,6 +284,30 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 static gboolean
 tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *prompt, gboolean cancel)
 {
+	TnySessionCamel *self = (TnySessionCamel *)session;
+
+	if (self->account_store)
+	{
+		TnyAccountStoreIface *account_store = (TnyAccountStoreIface*)self->account_store;
+		TnyAlertType tnytype;
+
+		switch (type)
+		{
+			case CAMEL_SESSION_ALERT_INFO:
+				tnytype = TNY_ALERT_TYPE_INFO;
+			break;
+			case CAMEL_SESSION_ALERT_WARNING:
+				tnytype = TNY_ALERT_TYPE_WARNING;
+			break;
+			case CAMEL_SESSION_ALERT_ERROR:
+			default:
+				tnytype = TNY_ALERT_TYPE_ERROR;
+			break;
+		}
+
+		return tny_account_store_iface_alert (account_store, tnytype, prompt);
+	}
+	
 	return FALSE;
 }
 
@@ -461,6 +485,8 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 {
 	CamelSession *session = CAMEL_SESSION (self);
 	TnyDeviceIface *device = (TnyDeviceIface*)tny_account_store_iface_get_device (account_store);
+
+	self->account_store = (gpointer)account_store;
 
 	gchar *base_directory = g_strdup (tny_account_store_iface_get_cache_dir (account_store));
 	gchar *camel_dir = NULL;

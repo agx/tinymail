@@ -330,6 +330,38 @@ find_account_by_gconf_key (GList *accounts, const gchar *key)
 	return found;
 }
 
+static gboolean
+tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
+{
+	GtkMessageType gtktype;
+	gboolean retval = FALSE;
+	GtkWidget *dialog;
+
+	switch (type)
+	{
+		case TNY_ALERT_TYPE_INFO:
+		gtktype = GTK_MESSAGE_INFO;
+		break;
+		case TNY_ALERT_TYPE_WARNING:
+		gtktype = GTK_MESSAGE_WARNING;
+		break;
+		case TNY_ALERT_TYPE_ERROR:
+		default:
+		gtktype = GTK_MESSAGE_ERROR;
+		break;
+	}
+
+	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+                                  gtktype, GTK_BUTTONS_YES_NO, prompt);
+
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+		retval = TRUE;
+
+	gtk_widget_destroy (dialog);
+
+	return retval;
+}
+
 static void
 gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 			GConfEntry *entry, gpointer user_data)
@@ -345,7 +377,7 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 		destroy_current_accounts (priv);
 
 		g_signal_emit (self, 
-			tny_account_store_iface_signals [ACCOUNTS_RELOADED], 0);
+			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
 
 	} else {
 		GList *accounts;
@@ -667,7 +699,7 @@ tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccount
 	priv->store_accounts = g_list_append (priv->store_accounts, account);
 	g_mutex_unlock (priv->store_accounts_lock);
 
-	g_signal_emit (self, tny_account_store_iface_signals [ACCOUNT_INSERTED], 0, account);
+	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
@@ -687,7 +719,7 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 	priv->transport_accounts = g_list_append (priv->transport_accounts, account);
 	g_mutex_unlock (priv->transport_accounts_lock);
 
-	g_signal_emit (self, tny_account_store_iface_signals [ACCOUNT_INSERTED], 0, account);
+	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
@@ -807,6 +839,7 @@ tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_transport_accounts_func = tny_account_store_get_transport_accounts;
 	klass->get_cache_dir_func = tny_account_store_get_cache_dir;
 	klass->get_device_func = tny_account_store_get_device;
+	klass->alert_func = tny_account_store_alert;
 
 	return;
 }

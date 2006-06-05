@@ -35,11 +35,18 @@ G_BEGIN_DECLS
 
 enum
 {
-	ACCOUNT_CHANGED,
-	ACCOUNT_INSERTED,
-	ACCOUNT_REMOVED,
-	ACCOUNTS_RELOADED,
+	TNY_ACCOUNT_STORE_IFACE_ACCOUNT_CHANGED,
+	TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED,
+	TNY_ACCOUNT_STORE_IFACE_ACCOUNT_REMOVED,
+	TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED,
 	TNY_ACCOUNT_STORE_IFACE_LAST_SIGNAL
+};
+
+enum _TnyAlertType
+{
+	TNY_ALERT_TYPE_INFO,
+	TNY_ALERT_TYPE_WARNING,
+	TNY_ALERT_TYPE_ERROR
 };
 
 #ifndef TNY_ACCOUNT_STORE_IFACE_C
@@ -67,6 +74,8 @@ struct _TnyAccountStoreIfaceClass
 
 	const TnyDeviceIface* 
 		(*get_device_func)				(TnyAccountStoreIface *self);
+
+	gboolean (*alert_func)					(TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 };
 
 GType         tny_account_store_iface_get_type                  (void);
@@ -82,6 +91,8 @@ const gchar*  tny_account_store_iface_get_cache_dir             (TnyAccountStore
 
 const TnyDeviceIface* 
 		tny_account_store_iface_get_device		(TnyAccountStoreIface *self);
+
+gboolean 	tny_account_store_iface_alert 			(TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 
 G_END_DECLS
 
