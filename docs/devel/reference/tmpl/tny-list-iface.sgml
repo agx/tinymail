@@ -17,6 +17,15 @@ An iteratable list type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### FUNCTION tny_list_iface_length ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_list_iface_prepend ##### -->
 <para>
 

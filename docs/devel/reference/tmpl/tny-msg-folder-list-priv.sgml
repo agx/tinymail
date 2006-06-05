@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-msg-header-list-iterator-priv
+TnyMsgFolderList
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,20 +9,23 @@ tny-msg-header-list-iterator-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgHeaderListIterator ##### -->
+<!-- ##### STRUCT TnyMsgFolderList ##### -->
 <para>
 
 </para>
 
 @parent: 
-@model: 
-@current: 
+@iterator_lock: 
+@first: 
+@pfolder: 
 

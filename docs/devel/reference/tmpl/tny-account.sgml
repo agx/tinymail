@@ -23,3 +23,12 @@ A account type implemented for Camel
 </para>
 
 
+<!-- ##### FUNCTION tny_account_add_option ##### -->
+<para>
+
+</para>
+
+@self: 
+@option: 
+
+

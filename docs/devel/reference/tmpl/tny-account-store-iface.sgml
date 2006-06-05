@@ -77,3 +77,14 @@ A type that returns stored (configured) accounts. Both transport and store accou
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_account_store_iface_alert ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+@prompt: 
+@Returns: 
+
+

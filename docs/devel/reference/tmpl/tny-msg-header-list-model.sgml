@@ -19,14 +19,6 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_MSG_HEADER_LIST_MODEL ##### -->
-<para>
-
-</para>
-
-@obj: 
-
-
 <!-- ##### STRUCT TnyMsgHeaderListModel ##### -->
 <para>
 

@@ -30,6 +30,23 @@ instances. Depending on the implementation, this will reduce memory usage.
 </para>
 
 
+<!-- ##### FUNCTION tny_msg_folder_iface_remove_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_expunge ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
 <!-- ##### FUNCTION tny_msg_folder_iface_get_folders ##### -->
 <para>
 
@@ -111,6 +128,15 @@ instances. Depending on the implementation, this will reduce memory usage.
 
 @self: 
 @name: 
+
+
+<!-- ##### FUNCTION tny_msg_folder_iface_get_folder_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
 
 
 <!-- ##### FUNCTION tny_msg_folder_iface_get_all_count ##### -->

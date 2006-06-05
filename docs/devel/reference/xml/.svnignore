@@ -63,3 +63,5 @@ tny-list-iface.xml
 tny-msg-header-list-model-priv.xml
 tny-msg-header-list-iterator-priv.xml
 tny-iterator-iface.xml
+tny-msg-folder-list-priv.xml
+tny-msg-folder-list-iterator-priv.xml
