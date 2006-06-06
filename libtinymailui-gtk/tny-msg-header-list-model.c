@@ -579,6 +579,9 @@ tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
 	GtkTreePath *path;
 	GtkTreeIter iter;
 
+	g_return_if_fail (G_IS_OBJECT (item));
+	g_return_if_fail (G_IS_OBJECT (me));
+
 	iter.stamp = me->stamp;
 	iter.user_data = item;
 	path = tny_msg_header_list_model_get_path (GTK_TREE_MODEL (me), &iter);

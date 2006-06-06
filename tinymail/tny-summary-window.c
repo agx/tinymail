@@ -243,10 +243,10 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 							(GTK_TREE_MODEL_SORT (model));
 					} else mymodel = model;
 
-					tny_list_iface_remove (TNY_LIST_IFACE (mymodel), header);
-
 					folder = (TnyMsgFolderIface*)tny_msg_header_iface_get_folder (header);
 					tny_msg_folder_iface_remove_message (folder, header);
+
+					tny_list_iface_remove (TNY_LIST_IFACE (mymodel), header);
 
 					/* This demo-ui does not support hiding marked-as-deleted 
 					   messages. A normal deletion will only *mark* a message
