@@ -54,7 +54,7 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
 
      Currently, the only adder that keeps the index correct is the prepend.
      The other ones will set usable_index FALSE. Hev phun .. */
-//>>6 would be the / and &0x3F
+
   if G_UNLIKELY (self->model->usable_index)
   {
 	/* register guint idx = nth / INDEX_OFFSET, remain = nth % INDEX_OFFSET, cidx = 0; */
