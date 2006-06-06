@@ -229,7 +229,7 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	return tree_path;
 }
 
-static gchar *
+G_INLINE_FUNC gchar *
 _get_readable_date (const time_t file_time_raw)
 {
 	struct tm *file_time;
@@ -243,6 +243,57 @@ _get_readable_date (const time_t file_time_raw)
 	return readable_date;
 }
 
+/**
+ * tny_msg_header_list_model_received_date_sort_func:
+ * @model: The GtkTreeModel the comparison is within
+ * @a : A GtkTreeIter in model
+ * @b : Another GtkTreeIter in model
+ * @user_data: Data passed
+ *
+ * A GtkTreeIterCompareFunc that sorts using the received date
+ *
+ * Return value: a negative integer, zero, or a positive integer 
+ **/
+gint 
+tny_msg_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
+{
+	TnyMsgHeaderIface *hdr_a, *hdr_b;
+	time_t recv_a, recv_b;
+
+	hdr_a = a->user_data;
+	hdr_b = b->user_data;
+
+	recv_a = tny_msg_header_iface_get_date_received (hdr_a);
+	recv_b = tny_msg_header_iface_get_date_received (hdr_b);
+
+	return (recv_a - recv_b);
+}
+
+/**
+ * tny_msg_header_list_model_sent_date_sort_func:
+ * @model: The GtkTreeModel the comparison is within
+ * @a : A GtkTreeIter in model
+ * @b : Another GtkTreeIter in model
+ * @user_data: Data passed
+ *
+ * A GtkTreeIterCompareFunc that sorts using the sent date
+ *
+ * Return value: a negative integer, zero, or a positive integer 
+ **/
+gint  
+tny_msg_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
+{
+	TnyMsgHeaderIface *hdr_a, *hdr_b;
+	time_t recv_a, recv_b;
+
+	hdr_a = a->user_data;
+	hdr_b = b->user_data;
+
+	recv_a = tny_msg_header_iface_get_date_sent (hdr_a);
+	recv_b = tny_msg_header_iface_get_date_sent (hdr_b);
+
+	return (recv_a - recv_b);
+}
 
 static void
 tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint column, GValue *value)

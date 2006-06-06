@@ -55,6 +55,8 @@ enum
 GType tny_msg_header_list_model_get_type (void);
 TnyMsgHeaderListModel* tny_msg_header_list_model_new (void);
 void tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh);
+gint tny_msg_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
+gint tny_msg_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 
 G_END_DECLS
 

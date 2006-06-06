@@ -331,6 +331,16 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		tny_msg_header_list_model_set_folder (model, folder, refresh);
 		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
 
+		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+			TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
+			tny_msg_header_list_model_received_date_sort_func, 
+			NULL, NULL);
+
+		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+			TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
+			tny_msg_header_list_model_sent_date_sort_func, 
+			NULL, NULL);
+
 		/* TODO: Implement a fast sorting algorithm (not easy)
 		   gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
