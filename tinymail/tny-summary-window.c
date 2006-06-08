@@ -471,8 +471,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		{
 			const TnyMsgFolderIface *folder;
 			const TnyMsgIface *msg;
-			const TnyMsgHeaderIface *nheader;
-
 			TnyPlatformFactoryIface *platfact;
 
 			platfact = TNY_PLATFORM_FACTORY_IFACE 
@@ -485,9 +483,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
 				if (G_LIKELY (msg))
 				{
-					nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
-
-
 					msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (
 						tny_platform_factory_iface_new_msg_view (platfact)));
 
