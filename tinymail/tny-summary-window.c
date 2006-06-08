@@ -350,13 +350,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 			tny_msg_header_list_model_sent_date_sort_func, 
 			NULL, NULL);
 
-		/* TODO: Implement a fast sorting algorithm (not easy)
-		   gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
-				TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, 
-				GTK_SORT_ASCENDING); */
-
-		set_header_view_model (header_view, sortable); 
-		
+		set_header_view_model (header_view, sortable); 		
 
 		g_idle_add (cleanup_statusbar, priv);
 
