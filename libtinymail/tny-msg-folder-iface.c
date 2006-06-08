@@ -188,7 +188,7 @@ tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
  * 
  * Get a message in the folder by header
  * 
- * Return value: The message instance
+ * Return value: The message instance or NULL on failure
  **/
 const TnyMsgIface*
 tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
