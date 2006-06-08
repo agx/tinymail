@@ -83,15 +83,23 @@ static void
 reload_msg (TnyMsgViewIface *self)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
-
 	GtkTextIter hiter;
-	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
-	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
+	TnyMsgHeaderIface *header;
+	GList *parts;
 	const gchar *str = NULL;
 	gboolean first_attach = TRUE;
 	TnyAttachListModel *model;
 	gboolean have_html = FALSE;
-	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
+	GtkTextBuffer *buffer;
+
+	g_return_if_fail (priv->msg);
+
+	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+
+	g_return_if_fail (header);
+
+	parts =  (GList*)tny_msg_iface_get_parts (priv->msg);
+	buffer = gtk_text_view_get_buffer (priv->textview);
 
 	gtk_widget_hide (priv->attachview_sw);
 
@@ -258,6 +266,8 @@ static void
 tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
+
+	g_return_if_fail (msg);
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));

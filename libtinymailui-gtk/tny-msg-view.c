@@ -67,15 +67,24 @@ static void
 reload_msg (TnyMsgViewIface *self)
 {
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
-
 	GtkTextIter hiter;
-	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
-	TnyStreamIface *dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
-	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
-	GList *parts = (GList*)tny_msg_iface_get_parts (priv->msg);
+	GtkTextBuffer *buffer;
+	TnyStreamIface *dest;
+	TnyMsgHeaderIface *header;
+	GList *parts;
 	const gchar *str = NULL;
 	gboolean first_attach = TRUE;
 	TnyAttachListModel *model;
+
+	g_return_if_fail (priv->msg);
+
+	buffer = gtk_text_view_get_buffer (priv->textview);
+	dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
+	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+
+	g_return_if_fail (header);
+
+	parts = (GList*)tny_msg_iface_get_parts (priv->msg);
 
 	gtk_widget_hide (priv->attachview_sw);
 
@@ -206,6 +215,8 @@ static void
 tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+
+	g_return_if_fail (msg);
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));

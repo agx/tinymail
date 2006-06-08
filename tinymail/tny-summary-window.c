@@ -291,9 +291,20 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			const TnyMsgIface *msg;
 
 			folder = tny_msg_header_iface_get_folder (header);
-			msg = tny_msg_folder_iface_get_message ((TnyMsgFolderIface*)folder, header);
+			if (G_LIKELY (folder))
+			{
+				msg = tny_msg_folder_iface_get_message ((TnyMsgFolderIface*)folder, header);
+				if (G_LIKELY (msg))
+					tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));
+				else 
+				{
+					GtkTreeModel *rmodel = model;
+					if (GTK_IS_TREE_MODEL_SORT (model))
+						rmodel = gtk_tree_model_sort_get_model (GTK_TREE_MODEL_SORT (model));
+					tny_list_iface_remove (TNY_LIST_IFACE (rmodel), header);
+				}
 
-			tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));	
+			}
 		}
 	}
 
@@ -469,17 +480,28 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 			folder = tny_msg_header_iface_get_folder (TNY_MSG_HEADER_IFACE (header));
 
-			msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
-			nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
+			if (G_LIKELY (folder))
+			{
+				msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
+				if (G_LIKELY (msg))
+				{
+					nheader = tny_msg_iface_get_header (TNY_MSG_IFACE (msg));
 
 
-			msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (
-				tny_platform_factory_iface_new_msg_view (platfact)));
+					msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (
+						tny_platform_factory_iface_new_msg_view (platfact)));
 
-			tny_msg_view_iface_set_msg (TNY_MSG_VIEW_IFACE (msgwin), 
-				TNY_MSG_IFACE (msg));
-	
-			gtk_widget_show (GTK_WIDGET (msgwin));
+					tny_msg_view_iface_set_msg (TNY_MSG_VIEW_IFACE (msgwin), 
+						TNY_MSG_IFACE (msg));
+			
+					gtk_widget_show (GTK_WIDGET (msgwin));
+				} else {
+					GtkTreeModel *rmodel = model;
+					if (GTK_IS_TREE_MODEL_SORT (model))
+						rmodel = gtk_tree_model_sort_get_model (GTK_TREE_MODEL_SORT (model));
+					tny_list_iface_remove (TNY_LIST_IFACE (rmodel), header);
+				}
+			}
 
 		}
 	}
