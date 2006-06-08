@@ -17,8 +17,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* TODO: Refactory this type to libtinymailui-gtk */
-
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
