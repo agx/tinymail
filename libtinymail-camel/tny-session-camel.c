@@ -101,6 +101,7 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL))
 		{
 			mark_del = g_list_prepend (mark_del, copy);
+			copy = g_list_next (copy);
 			continue;
 		}
 
@@ -164,6 +165,7 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL))
 		{
 			mark_del = g_list_prepend (mark_del, copy);
+			copy = g_list_next (copy);
 			continue;
 		}
 

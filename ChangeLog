@@ -1,3 +1,7 @@
+06-09-2006  Florian Boor  <florian.boor@kernelconcepts.de>
+
+	* Fix endless loop sending mails.
+
 05-24-2006  Florian Boor  <florian.boor@kernelconcepts.de>
 
 	* Support for mail status flags.
