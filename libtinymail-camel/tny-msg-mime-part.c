@@ -48,7 +48,6 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-stream-null.h>
 #include <camel/camel-mime-filter-charset.h>
 #include <camel/camel-mime-filter-windows.h>
-#include <camel/camel-mime-filter-pgp.h>
 
 
 /* Locking warning: tny-msg.c also locks priv->part_lock */

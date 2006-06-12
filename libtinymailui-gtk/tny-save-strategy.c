@@ -105,8 +105,8 @@ tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 		GTK_RESPONSE_ACCEPT, NULL));
 	gboolean destr=FALSE;
 
-	gtk_file_chooser_set_do_overwrite_confirmation 
-		(GTK_FILE_CHOOSER (dialog), TRUE);
+	/* gtk_file_chooser_set_do_overwrite_confirmation 
+		(GTK_FILE_CHOOSER (dialog), TRUE); */
 
 	gtk_file_chooser_set_current_folder 
 		(GTK_FILE_CHOOSER (dialog), g_get_home_dir ());

@@ -34,6 +34,10 @@
 #include <camel/camel-session.h>
 #include <camel/camel-store.h>
 
+#ifndef CAMEL_FOLDER_TYPE_SENT
+#define CAMEL_FOLDER_TYPE_SENT (5 << 10)
+#endif
+
 
 static GObjectClass *parent_class = NULL;
 

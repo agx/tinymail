@@ -2,3 +2,5 @@ Project tinymail is an attempt to create an E-mail client framework for small de
 
 Required packages on a Ubuntu Breezy (for building from subversion repository)
 gnome-devel, subversion, firefox-dev, libcamel1.2-dev, libnm-glib-0-dev, automake-1.7
+
+Required packages on a Fedora Core 4 & 5 (for building from subversion repository) subversion, gnome-common, evolution-data-server-devel, NetworkManager-devel, NetworkManager-glib, gnome-keyring-devel, automake-1.7. Use --with-html-component=none to disable building any HTML component
