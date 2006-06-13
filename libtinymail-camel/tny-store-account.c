@@ -66,10 +66,46 @@ report_error (TnyAccountPriv *priv)
 	}
 }
 
+
+static void
+walk_folders_uncache_em (TnyStoreAccountIface *self, TnyListIface *folders)
+{
+  if (folders && tny_list_iface_length (folders) > 0)
+  {
+	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
+	gboolean next = TRUE;
+
+	while (next)
+	{
+		TnyMsgFolderIface *folder = tny_iterator_iface_current (iterator);
+		TnyListIface *more_folders = (TnyListIface*)tny_msg_folder_iface_get_folders (folder);
+
+		tny_msg_folder_iface_uncache (folder);
+
+		if (tny_list_iface_length (more_folders) > 0)
+			walk_folders_uncache_em (self, more_folders);
+
+		next = tny_iterator_iface_has_next (iterator);
+
+		if (next)
+			tny_iterator_iface_next (iterator);
+	}
+
+	g_object_unref (G_OBJECT (iterator));
+  }
+}
+
 static void 
 tny_store_account_reconnect (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyStoreAccountPriv *spriv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	if (spriv->folders)
+		walk_folders_uncache_em (TNY_STORE_ACCOUNT_IFACE (self), spriv->folders);
+
+	if (spriv->ufolders)
+		walk_folders_uncache_em (TNY_STORE_ACCOUNT_IFACE (self), spriv->ufolders);
 
 	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && 
 		G_UNLIKELY (priv->user) && G_UNLIKELY (priv->host))
@@ -124,8 +160,8 @@ tny_store_account_reconnect (TnyAccount *self)
 		}
 		if (G_UNLIKELY (priv->service))
 			camel_object_unref (CAMEL_OBJECT (priv->service));
-	
-		priv->service = camel_session_get_service 
+
+		priv->service = camel_session_get_service
 			(CAMEL_SESSION (priv->session), priv->url_string, 
 			priv->type, priv->ex);
 
@@ -135,9 +171,11 @@ tny_store_account_reconnect (TnyAccount *self)
 	if (G_LIKELY (priv->session) && (priv->url_string))
 	{
 		/* un officially supported provider */
-		priv->service = camel_session_get_service 
+
+		priv->service = camel_session_get_service
 			(CAMEL_SESSION (priv->session), priv->url_string, 
 			priv->type, priv->ex);
+
 		if (priv->service == NULL)
 			report_error (priv);
 	}
@@ -150,20 +188,17 @@ tny_store_account_reconnect (TnyAccount *self)
 		&& G_UNLIKELY (priv->host))
 	{
 		priv->connected = FALSE;
-		camel_service_connect (priv->service, priv->ex);
 
-		if (camel_exception_is_set (priv->ex))
+		if (!camel_service_connect (priv->service, priv->ex))
 		{
 			g_warning (_("Not connected with %s: %s\n"), priv->url_string,
 				   camel_exception_get_description (priv->ex));
 			camel_exception_clear (priv->ex);
-			camel_service_cancel_connect (priv->service);
-			camel_service_disconnect (priv->service, FALSE, priv->ex);
+			/* camel_service_cancel_connect (priv->service);
+			camel_service_disconnect (priv->service, FALSE, priv->ex); */
 		} else {
 			priv->connected = TRUE;
 		}
-		
-		camel_session_set_online (CAMEL_SESSION (priv->session), priv->connected);
 	}
 
 	return;

@@ -437,6 +437,8 @@ tny_session_camel_ms_thread_status (CamelSession *session, CamelSessionThreadMsg
 static void
 tny_session_camel_init (TnySessionCamel *instance)
 {
+	/* Avoid the first question in connection_changed */
+	instance->prev_constat = TRUE;
 	instance->device = NULL;
 }
 
@@ -444,8 +446,27 @@ static void
 connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 {
 	TnySessionCamel *self = user_data;
-
+	
 	camel_session_set_online ((CamelSession *) self, online); 
+
+	if (self->account_store)
+	{
+		GList *copy;
+
+		copy = (GList*) tny_account_store_iface_get_store_accounts (self->account_store);;
+	
+		while (G_LIKELY (copy))
+		{
+			TnyStoreAccountIface *account = copy->data;
+
+			_tny_account_set_online_status (account, !online);
+
+			copy = g_list_next (copy);
+		}
+	}
+
+
+	self->prev_constat = online;
 
 	return;
 }

@@ -52,6 +52,10 @@
 #include <tny-summary-window-iface.h>
 #include <tny-account-store-view-iface.h>
 
+
+#define GO_ONLINE_TXT _("Go online")
+#define GO_OFFLINE_TXT _("Go offline")
+
 static GObjectClass *parent_class = NULL;
 
 
@@ -63,12 +67,12 @@ struct _TnySummaryWindowPriv
 	GtkTreeView *mailbox_view, *header_view;
 	TnyMsgViewIface *msg_view;
 	guint accounts_reloaded_signal;
-	GtkWidget *status, *progress;
+	GtkWidget *status, *progress, *online_button;
 	guint status_id;
 	gulong mailbox_select_sid;
 	GtkTreeSelection *mailbox_select;
 	GtkTreeIter last_mailbox_correct_select;
-	guint connchanged_signal;
+	guint connchanged_signal, online_button_signal;
 	TnyMsgFolderIface *last_folder;
 };
 
@@ -95,11 +99,11 @@ set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
 	return;
 }
 
+static GtkTreeModel *empty_model;
+
 static void 
 reload_accounts (TnySummaryWindowPriv *priv)
 {
-	static GtkTreeModel *empty_model;
-
 	TnyAccountStoreIface *account_store = priv->account_store;
 	GtkTreeModel *sortable, *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
 	const GList* accounts;
@@ -107,7 +111,6 @@ reload_accounts (TnySummaryWindowPriv *priv)
 	if (G_UNLIKELY (!empty_model))
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new 
 			(1, G_TYPE_STRING));
-
 	/* Clear the header_view by giving it an empty model */
 	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
 
@@ -140,21 +143,52 @@ static void
 accounts_reloaded (TnyAccountStoreIface *store, gpointer user_data)
 {
 	TnySummaryWindowPriv *priv = user_data;
-
+	
 	reload_accounts (priv);
 	
 	return;
+}
+
+static void 
+online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
+{
+	TnySummaryWindowIface *self = user_data;
+	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
+
+	if (priv->account_store)
+	{
+		const TnyDeviceIface *device = tny_account_store_iface_get_device (priv->account_store);
+
+		if (gtk_toggle_button_get_active (togglebutton))
+			tny_device_iface_force_online (device);
+		else
+			tny_device_iface_force_offline (device);
+	}
 }
 
 static void
 connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 {
 	TnySummaryWindowIface *self = user_data;
+	TnySummaryWindowPriv *priv = TNY_SUMMARY_WINDOW_GET_PRIVATE (self);
 
 	if (online)
+	{
+		gtk_button_set_label  (GTK_BUTTON (priv->online_button), GO_OFFLINE_TXT);
+		g_signal_handler_block (G_OBJECT (priv->online_button), priv->online_button_signal);
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->online_button), TRUE);
+		g_signal_handler_unblock (G_OBJECT (priv->online_button), priv->online_button_signal);
+
 		gtk_window_set_title (GTK_WINDOW (self), _("Tinymail - online"));
-	else
+	} else {
+
+		gtk_button_set_label  (GTK_BUTTON (priv->online_button), GO_ONLINE_TXT);
+		g_signal_handler_block (G_OBJECT (priv->online_button), priv->online_button_signal);
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->online_button), FALSE);
+		g_signal_handler_unblock (G_OBJECT (priv->online_button), priv->online_button_signal);
+
 		gtk_window_set_title (GTK_WINDOW (self), _("Tinymail - offline"));
+	}
 
 	return;
 }
@@ -296,10 +330,8 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 					tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));
 				else 
 				{
-					GtkTreeModel *rmodel = model;
-					if (GTK_IS_TREE_MODEL_SORT (model))
-						rmodel = gtk_tree_model_sort_get_model (GTK_TREE_MODEL_SORT (model));
-					tny_list_iface_remove (TNY_LIST_IFACE (rmodel), header);
+					/* Loading the message failed (service unavailable 
+					   or message deleted by an external device) */
 				}
 
 			}
@@ -527,8 +559,12 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *vpaned1;
 	GtkWidget *vbox;
 	
-
 	/* TODO: Persist application UI status (of the panes) */
+
+	priv->online_button = gtk_toggle_button_new ();
+
+	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
+		G_CALLBACK (online_button_toggled), self);
 	priv->last_folder = NULL;
 	platfact = TNY_PLATFORM_FACTORY_IFACE 
 			(tny_platform_factory_get_instance ());
@@ -541,6 +577,9 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->status_id = gtk_statusbar_get_context_id (GTK_STATUSBAR (priv->status), "default");
 
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->progress, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (priv->status), priv->online_button, FALSE, FALSE, 0);
+
+	gtk_widget_show (priv->online_button);
 	gtk_widget_show (priv->status);
 	gtk_widget_show (vbox);
 

@@ -35,6 +35,10 @@
 #include <camel/camel.h>
 #include <camel/camel-session.h>
 #include <camel/camel-store.h>
+#include <camel/camel-offline-folder.h>
+#include <camel/camel-offline-store.h>
+#include <camel/camel-disco-folder.h>
+#include <camel/camel-disco-store.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -469,6 +473,51 @@ static void
 destroy_folder (gpointer data, gpointer user_data)
 {
 	g_object_unref (G_OBJECT (data));
+}
+
+void 
+_tny_account_set_online_status (TnyAccount *self, gboolean offline)
+{
+	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+
+	if (!priv->service)
+		return;
+
+
+	if (offline)
+		camel_service_cancel_connect (priv->service);
+
+        if (CAMEL_IS_DISCO_STORE (priv->service)) {
+                if (!offline) {
+                        camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
+                                                      CAMEL_DISCO_STORE_ONLINE, priv->ex);
+                        return;
+                } else if (camel_disco_store_can_work_offline (CAMEL_DISCO_STORE (priv->service))) {
+
+                        camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
+                                                      CAMEL_DISCO_STORE_OFFLINE,
+                                                      priv->ex);
+                        return;
+                }
+        } else if (CAMEL_IS_OFFLINE_STORE (priv->service)) {
+
+                if (!offline) {
+
+                        camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
+                                                               CAMEL_OFFLINE_STORE_NETWORK_AVAIL,
+                                                               priv->ex);
+                        return;
+                } else {
+                        camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
+                                                               CAMEL_OFFLINE_STORE_NETWORK_UNAVAIL,
+                                                               priv->ex);
+                        return;
+                }
+        }
+
+        if (offline)
+                camel_service_disconnect (CAMEL_SERVICE (priv->service),
+                                          TRUE, priv->ex);
 }
 
 

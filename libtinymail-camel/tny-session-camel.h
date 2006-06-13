@@ -38,7 +38,7 @@ struct _TnySessionCamel
 
 	gpointer device;
 	gpointer account_store;
-        gboolean interactive;
+        gboolean interactive, prev_constat;
 	guint connchanged_signal;
 };
 

@@ -33,6 +33,45 @@ guint *tny_device_iface_signals = NULL;
 
 
 /**
+ * tny_device_iface_reset:
+ * @self: a #TnyDeviceIface object
+ * 
+ * Reset status
+ **/
+void 
+tny_device_iface_reset (TnyDeviceIface *self)
+{
+	TNY_DEVICE_IFACE_GET_CLASS (self)->reset_func (self);
+	return;
+}
+
+/**
+ * tny_device_iface_force_offline:
+ * @self: a #TnyDeviceIface object
+ * 
+ * Force offline status
+ **/
+void 
+tny_device_iface_force_online (TnyDeviceIface *self)
+{
+	TNY_DEVICE_IFACE_GET_CLASS (self)->force_online_func (self);
+	return;
+}
+
+/**
+ * tny_device_iface_force_online:
+ * @self: a #TnyDeviceIface object
+ * 
+ * Force online status
+ **/
+void
+tny_device_iface_force_offline (TnyDeviceIface *self)
+{
+	TNY_DEVICE_IFACE_GET_CLASS (self)->force_offline_func (self);
+	return;
+}
+
+/**
  * tny_device_iface_is_online:
  * @self: a #TnyDeviceIface object
  * 

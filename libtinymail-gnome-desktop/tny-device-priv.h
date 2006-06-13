@@ -26,6 +26,7 @@ struct _TnyDevicePriv
 {
 	libnm_glib_ctx *nm_ctx;
 	guint callback_id;
+	gboolean forced, fset;
 };
 
 

@@ -747,6 +747,7 @@ tny_account_store_new (void)
 		tny_platform_factory_get_instance ());
 
 	priv->device = tny_platform_factory_iface_new_device (platfact);
+	//tny_device_iface_force_online (priv->device);
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return self;
