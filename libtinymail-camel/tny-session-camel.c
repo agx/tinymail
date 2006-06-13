@@ -463,6 +463,10 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 
 			copy = g_list_next (copy);
 		}
+
+		g_signal_emit (self->account_store, 
+			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
+
 	}
 
 
