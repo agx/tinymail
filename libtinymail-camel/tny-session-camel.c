@@ -530,6 +530,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 	camel_provider_init();
 	camel_session_construct (session, camel_dir);
 
+	/* Avoid the first question in connection_changed */
 	self->first_switch = tny_device_iface_is_online (device);
 
 	camel_session_set_online ((CamelSession *) session, 
