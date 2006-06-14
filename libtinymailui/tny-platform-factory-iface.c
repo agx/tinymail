@@ -30,6 +30,11 @@
 TnyAccountStoreIface*
 tny_platform_factory_iface_new_account_store (TnyPlatformFactoryIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_account_store_func)
+		g_warning (_("You must implement tny_platform_factory_iface_new_account_store\n"));
+#endif
+
 	return TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_account_store_func (self);
 }
 
@@ -42,6 +47,11 @@ tny_platform_factory_iface_new_account_store (TnyPlatformFactoryIface *self)
 TnyDeviceIface*
 tny_platform_factory_iface_new_device (TnyPlatformFactoryIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_device_func)
+		g_warning (_("You must implement tny_platform_factory_iface_new_device\n"));
+#endif
+
 	return TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_device_func (self);
 }
 
@@ -54,6 +64,11 @@ tny_platform_factory_iface_new_device (TnyPlatformFactoryIface *self)
 TnyMsgViewIface*
 tny_platform_factory_iface_new_msg_view (TnyPlatformFactoryIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_msg_view_func)
+		g_warning (_("You must implement tny_platform_factory_iface_new_msg_view\n"));
+#endif
+
 	return TNY_PLATFORM_FACTORY_IFACE_GET_CLASS (self)->new_msg_view_func (self);
 }
 

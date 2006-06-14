@@ -31,6 +31,11 @@
 void
 tny_save_strategy_iface_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 {
+#ifdef DEBUG
+	if (!TNY_SAVE_STRATEGY_IFACE_GET_CLASS (self)->save_func)
+		g_warning (_("You must implement tny_save_strategy_iface_save\n"));
+#endif
+
 	TNY_SAVE_STRATEGY_IFACE_GET_CLASS (self)->save_func (self, part);
 	return;
 }
