@@ -522,7 +522,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 
 	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
 	{
-		g_error (_("Critical ERROR: Cannot init %d as camel directory\n"), base_directory);
+		g_error (_("Critical ERROR: Cannot init %s as camel directory\n"), base_directory);
 		exit (1);
 	}
 
