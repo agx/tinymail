@@ -438,7 +438,7 @@ static void
 tny_session_camel_init (TnySessionCamel *instance)
 {
 	/* Avoid the first question in connection_changed */
-	instance->prev_constat = TRUE;
+	instance->prev_constat = FALSE;
 	instance->device = NULL;
 }
 
@@ -449,7 +449,7 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 	
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	if (self->prev_constat != online && self->account_store)
+	if (!self->first_switch && self->prev_constat != online && self->account_store)
 	{
 		GList *copy;
 
@@ -464,9 +464,10 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 			copy = g_list_next (copy);
 		}
 
+		self->first_switch = FALSE;
 	}
 
-	if (self->account_store)
+	if (self->account_store && !self->first_switch)
 		g_signal_emit (self->account_store, 
 			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
 
@@ -528,9 +529,11 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 	camel_provider_init();
 	camel_session_construct (session, camel_dir);
 
+	self->first_switch = tny_device_iface_is_online (device);
+printf ("%s\n", self->first_switch?"yes":"no");
 	camel_session_set_online ((CamelSession *) session, 
-		tny_device_iface_is_online (device)); 
-	
+		self->first_switch); 
+
 	g_free (camel_dir);
 	g_free (base_directory);
 
