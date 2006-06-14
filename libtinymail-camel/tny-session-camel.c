@@ -449,7 +449,7 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 	
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	if (self->account_store)
+	if (online && self->prev_constat != online && self->account_store)
 	{
 		GList *copy;
 

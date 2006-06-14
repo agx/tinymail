@@ -105,7 +105,7 @@ tny_device_is_online (TnyDeviceIface *self)
 {
 	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
 	gboolean retval = priv->forced;
-
+return TRUE;
 	if (!priv->fset)
 	{
 		libnm_glib_state state = libnm_glib_get_network_state (priv->nm_ctx);
