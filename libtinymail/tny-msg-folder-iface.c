@@ -35,6 +35,10 @@ guint *tny_msg_folder_iface_signals;
 void 
 tny_msg_folder_iface_expunge (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->expunge_func)
+		g_critical ("You must implement tny_msg_folder_iface_expunge\n");
+#endif
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->expunge_func (self);
 	return;
 }
@@ -44,11 +48,17 @@ tny_msg_folder_iface_expunge (TnyMsgFolderIface *self)
  * @self: a TnyMsgFolderIface object
  * @header: the header of the message to remove
  *
- * Remove a message from a folder
+ * Remove a message from a folder. This doesn't remove it from a #TnyListIface 
+ * that would hold the headers (for example for a header summary view).
  **/
 void 
 tny_msg_folder_iface_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->remove_message_func)
+		g_critical ("You must implement tny_msg_folder_iface_remove_message\n");
+#endif
+
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->remove_message_func (self, header);
 	return;
 }
@@ -67,6 +77,11 @@ tny_msg_folder_iface_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface 
 void
 tny_msg_folder_iface_refresh_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_async_func)
+		g_critical ("You must implement tny_msg_folder_iface_refresh_async\n");
+#endif
+
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_async_func (self, callback, status_callback, user_data);
 	return;
 }
@@ -83,6 +98,11 @@ tny_msg_folder_iface_refresh_async (TnyMsgFolderIface *self, TnyRefreshFolderCal
 void
 tny_msg_folder_iface_refresh (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_func)
+		g_critical ("You must implement tny_msg_folder_iface_refresh\n");
+#endif
+
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->refresh_func (self);
 	return;
 }
@@ -98,6 +118,11 @@ tny_msg_folder_iface_refresh (TnyMsgFolderIface *self)
 void
 tny_msg_folder_iface_set_subscribed (TnyMsgFolderIface *self, const gboolean subscribed)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_subscribed_func)
+		g_critical ("You must implement tny_msg_folder_iface_set_subscribed\n");
+#endif
+
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_subscribed_func (self, subscribed);
 	return;
 }
@@ -113,6 +138,11 @@ tny_msg_folder_iface_set_subscribed (TnyMsgFolderIface *self, const gboolean sub
 const gboolean
 tny_msg_folder_iface_get_subscribed (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_subscribed_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_subscribed\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_subscribed_func (self);
 }
 
@@ -127,6 +157,11 @@ tny_msg_folder_iface_get_subscribed (TnyMsgFolderIface *self)
 guint
 tny_msg_folder_iface_get_unread_count (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_unread_count_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_unread_count\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_unread_count_func (self);
 }
 
@@ -134,6 +169,11 @@ tny_msg_folder_iface_get_unread_count (TnyMsgFolderIface *self)
 guint
 tny_msg_folder_iface_get_all_count (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_all_count_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_all_count\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_all_count_func (self);
 }
 
@@ -148,6 +188,11 @@ tny_msg_folder_iface_get_all_count (TnyMsgFolderIface *self)
 const TnyAccountIface*  
 tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_account_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_account\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_account_func (self);
 }
 
@@ -161,6 +206,11 @@ tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
 void
 tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_account_func)
+		g_critical ("You must implement tny_msg_folder_iface_set_account\n");
+#endif
+
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_account_func (self, account);
 
 	return;
@@ -177,6 +227,11 @@ tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface
 const TnyListIface*
 tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_folders_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_folders\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_folders_func (self);
 }
 
@@ -193,6 +248,11 @@ tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
 const TnyMsgIface*
 tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_message_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_message\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_message_func (self, header);
 }
 
@@ -209,6 +269,11 @@ tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIfa
 void
 tny_msg_folder_iface_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboolean refresh)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_headers_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_headers\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_headers_func (self, headers, refresh);
 }
 
@@ -223,6 +288,11 @@ tny_msg_folder_iface_get_headers (TnyMsgFolderIface *self, TnyListIface *headers
 const gchar*
 tny_msg_folder_iface_get_id (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_id_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_id\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_id_func (self);
 }
 
@@ -237,6 +307,11 @@ tny_msg_folder_iface_get_id (TnyMsgFolderIface *self)
 const gchar*
 tny_msg_folder_iface_get_name (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_name_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_name\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_name_func (self);
 }
 
@@ -251,6 +326,11 @@ tny_msg_folder_iface_get_name (TnyMsgFolderIface *self)
 void
 tny_msg_folder_iface_set_id (TnyMsgFolderIface *self, const gchar *id)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_id_func)
+		g_critical ("You must implement tny_msg_folder_iface_set_id\n");
+#endif
+
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_id_func (self, id);
 	return;
 }
@@ -266,6 +346,11 @@ tny_msg_folder_iface_set_id (TnyMsgFolderIface *self, const gchar *id)
 void
 tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_name_func)
+		g_critical ("You must implement tny_msg_folder_iface_set_name\n");
+#endif
+
 	TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_name_func (self, name);
 	return;
 }
@@ -281,6 +366,11 @@ tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name)
  **/
 TnyMsgFolderType tny_msg_folder_iface_get_folder_type  (TnyMsgFolderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_folder_type_func)
+		g_critical ("You must implement tny_msg_folder_iface_get_folder_type\n");
+#endif
+
 	return TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_folder_type_func (self);
 }
 

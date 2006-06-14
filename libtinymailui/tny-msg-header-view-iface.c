@@ -34,6 +34,11 @@
 void
 tny_msg_header_view_iface_set_header (TnyMsgHeaderViewIface *self, TnyMsgHeaderIface *header)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_VIEW_IFACE_GET_CLASS (self)->set_header_func)
+		g_critical ("You must implement tny_msg_header_view_iface_set_header\n");
+#endif
+
 	TNY_MSG_HEADER_VIEW_IFACE_GET_CLASS (self)->set_header_func (self, header);
 	return;
 }

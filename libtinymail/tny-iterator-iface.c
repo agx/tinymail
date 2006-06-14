@@ -33,6 +33,11 @@
 gpointer 
 tny_iterator_iface_next (TnyIteratorIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->next_func)
+		g_critical ("You must implement tny_iterator_iface_next\n");
+#endif
+
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->next_func (self);
 }
 
@@ -48,6 +53,11 @@ tny_iterator_iface_next (TnyIteratorIface *self)
 gpointer 
 tny_iterator_iface_prev (TnyIteratorIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->prev_func)
+		g_critical ("You must implement tny_iterator_iface_prev\n");
+#endif
+
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->prev_func (self);
 }
 
@@ -64,6 +74,11 @@ tny_iterator_iface_prev (TnyIteratorIface *self)
 gpointer 
 tny_iterator_iface_first (TnyIteratorIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->first_func)
+		g_critical ("You must implement tny_iterator_iface_first\n");
+#endif
+
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->first_func (self);
 }
 
@@ -80,6 +95,11 @@ tny_iterator_iface_first (TnyIteratorIface *self)
 gpointer
 tny_iterator_iface_nth (TnyIteratorIface *self, guint nth)
 {
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->nth_func)
+		g_critical ("You must implement tny_iterator_iface_nth\n");
+#endif
+
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->nth_func (self, nth);
 }
 
@@ -96,6 +116,11 @@ tny_iterator_iface_nth (TnyIteratorIface *self, guint nth)
 gpointer 
 tny_iterator_iface_current (TnyIteratorIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->current_func)
+		g_critical ("You must implement tny_iterator_iface_current\n");
+#endif
+
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->current_func (self);
 }
 
@@ -111,6 +136,11 @@ tny_iterator_iface_current (TnyIteratorIface *self)
 gboolean
 tny_iterator_iface_has_next (TnyIteratorIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->has_next_func)
+		g_critical ("You must implement tny_iterator_iface_has_next\n");
+#endif
+
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->has_next_func (self);
 }
 
@@ -126,6 +156,11 @@ tny_iterator_iface_has_next (TnyIteratorIface *self)
 TnyListIface*
 tny_iterator_iface_get_list (TnyIteratorIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->get_list_func)
+		g_critical ("You must implement tny_iterator_iface_get_list\n");
+#endif
+
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->get_list_func (self);
 }
 

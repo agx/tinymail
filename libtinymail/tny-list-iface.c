@@ -30,6 +30,11 @@
 guint
 tny_list_iface_length (TnyListIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_LIST_IFACE_GET_CLASS (self)->length_func)
+		g_critical ("You must implement tny_list_iface_length\n");
+#endif
+
 	TNY_LIST_IFACE_GET_CLASS (self)->length_func (self);
 	return;
 }
@@ -39,11 +44,16 @@ tny_list_iface_length (TnyListIface *self)
  * @self: A #TnyListIface instance
  * @item: the item to prepend
  *
- *
+ * Implementors: if you have to choose, make this one the fast one
  **/
 void
 tny_list_iface_prepend (TnyListIface *self, gpointer item)
 {
+#ifdef DEBUG
+	if (!TNY_LIST_IFACE_GET_CLASS (self)->prepend_func)
+		g_critical ("You must implement tny_list_iface_prepend\n");
+#endif
+
 	TNY_LIST_IFACE_GET_CLASS (self)->prepend_func (self, item);
 	return;
 }
@@ -53,11 +63,16 @@ tny_list_iface_prepend (TnyListIface *self, gpointer item)
  * @self: A #TnyListIface instance
  * @item: the item to append
  *
- *
+ * Implementors: if you have to choose, make the prepend one the fast one
  **/
 void 
 tny_list_iface_append (TnyListIface *self, gpointer item)
 {
+#ifdef DEBUG
+	if (!TNY_LIST_IFACE_GET_CLASS (self)->append_func)
+		g_critical ("You must implement tny_list_iface_append\n");
+#endif
+
 	TNY_LIST_IFACE_GET_CLASS (self)->append_func (self, item);
 	return;
 }
@@ -74,6 +89,11 @@ tny_list_iface_append (TnyListIface *self, gpointer item)
 void 
 tny_list_iface_remove (TnyListIface *self, gpointer item)
 {
+#ifdef DEBUG
+	if (!TNY_LIST_IFACE_GET_CLASS (self)->remove_func)
+		g_critical ("You must implement tny_list_iface_remove\n");
+#endif
+
 	TNY_LIST_IFACE_GET_CLASS (self)->remove_func (self, item);
 	return;
 }
@@ -88,6 +108,11 @@ tny_list_iface_remove (TnyListIface *self, gpointer item)
 TnyIteratorIface* 
 tny_list_iface_create_iterator (TnyListIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_LIST_IFACE_GET_CLASS (self)->create_iterator_func)
+		g_critical ("You must implement tny_list_iface_create_iterator\n");
+#endif
+
 	return TNY_LIST_IFACE_GET_CLASS (self)->create_iterator_func (self);
 }
 
@@ -103,6 +128,11 @@ tny_list_iface_create_iterator (TnyListIface *self)
 void 
 tny_list_iface_foreach (TnyListIface *self, GFunc func, gpointer user_data)
 {
+#ifdef DEBUG
+	if (!TNY_LIST_IFACE_GET_CLASS (self)->foreach_func)
+		g_critical ("You must implement tny_list_iface_foreach\n");
+#endif
+
 	TNY_LIST_IFACE_GET_CLASS (self)->foreach_func (self, func, user_data);
 	return;
 }
@@ -118,6 +148,11 @@ tny_list_iface_foreach (TnyListIface *self, GFunc func, gpointer user_data)
 TnyListIface*
 tny_list_iface_copy (TnyListIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_LIST_IFACE_GET_CLASS (self)->copy_func)
+		g_critical ("You must implement tny_list_iface_copy\n");
+#endif
+
 	return TNY_LIST_IFACE_GET_CLASS (self)->copy_func (self);
 }
 

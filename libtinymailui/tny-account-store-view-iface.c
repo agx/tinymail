@@ -33,6 +33,10 @@
 void
 tny_account_store_view_iface_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_STORE_VIEW_IFACE_GET_CLASS (self)->set_account_store_func)
+		g_critical ("You must implement tny_account_store_view_iface_set_account_store\n");
+#endif
 	TNY_ACCOUNT_STORE_VIEW_IFACE_GET_CLASS (self)->set_account_store_func (self, account_store);
 	return;
 }

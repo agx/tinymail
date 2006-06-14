@@ -32,6 +32,11 @@
 const gboolean 
 tny_account_iface_is_connected (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->is_connected_func)
+		g_critical ("You must implement tny_account_iface_is_connected\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->is_connected_func (self);
 }
 
@@ -48,6 +53,11 @@ tny_account_iface_is_connected (TnyAccountIface *self)
 void
 tny_account_iface_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_store_func)
+		g_critical ("You must implement tny_account_iface_set_account_store\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_store_func (self, store);
 	return;
 }
@@ -63,6 +73,11 @@ tny_account_iface_set_account_store (TnyAccountIface *self, const TnyAccountStor
 const TnyAccountStoreIface*
 tny_account_iface_get_account_store (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_account_store_func)
+		g_critical ("You must implement tny_account_iface_get_account_store\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_account_store_func (self);
 }
 
@@ -77,6 +92,11 @@ tny_account_iface_get_account_store (TnyAccountIface *self)
 const gchar*
 tny_account_iface_get_id (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_id_func)
+		g_critical ("You must implement tny_account_iface_get_id\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_id_func (self);
 }
 
@@ -91,6 +111,11 @@ tny_account_iface_get_id (TnyAccountIface *self)
 void 
 tny_account_iface_set_name (TnyAccountIface *self, const gchar *name)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_name_func)
+		g_critical ("You must implement tny_account_iface_set_name\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_name_func (self, name);
 	return;
 }
@@ -107,6 +132,11 @@ tny_account_iface_set_name (TnyAccountIface *self, const gchar *name)
 void 
 tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_id_func)
+		g_critical ("You must implement tny_account_iface_set_id\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_id_func (self, id);
 	return;
 }
@@ -125,6 +155,11 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
 void
 tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc forget_pass_func)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_forget_pass_func_func)
+		g_critical ("You must implement tny_account_iface_set_forget_pass_func\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_forget_pass_func_func (self, forget_pass_func);
 	return;
 }
@@ -140,6 +175,11 @@ tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc
 TnyForgetPassFunc
 tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_forget_pass_func_func)
+		g_critical ("You must implement tny_account_iface_get_forget_pass_func\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_forget_pass_func_func (self);
 }
 
@@ -154,6 +194,11 @@ tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
 void
 tny_account_iface_set_url_string (TnyAccountIface *self, const gchar *url_string)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_url_string_func)
+		g_critical ("You must implement tny_account_iface_set_url_string\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_url_string_func (self, url_string);
 	return;
 }
@@ -170,6 +215,11 @@ tny_account_iface_set_url_string (TnyAccountIface *self, const gchar *url_string
 void
 tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_proto_func)
+		g_critical ("You must implement tny_account_iface_set_proto\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_proto_func (self, proto);
 	return;
 }
@@ -186,6 +236,11 @@ tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
 void
 tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_user_func)
+		g_critical ("You must implement tny_account_iface_set_user\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_user_func (self, user);
 	return;
 }
@@ -202,6 +257,11 @@ tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
 void
 tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_hostname_func)
+		g_critical ("You must implement tny_account_iface_set_hostname\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_hostname_func (self, host);
 	return;
 }
@@ -221,6 +281,11 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
 void
 tny_account_iface_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_func)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_pass_func_func)
+		g_critical ("You must implement tny_account_iface_set_pass_func\n");
+#endif
+
 	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_pass_func_func (self, get_pass_func);
 	return;
 }
@@ -236,6 +301,11 @@ tny_account_iface_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_
 const gchar*
 tny_account_iface_get_proto (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_proto_func)
+		g_critical ("You must implement tny_account_iface_get_proto\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_proto_func (self);
 }
 
@@ -252,6 +322,11 @@ tny_account_iface_get_proto (TnyAccountIface *self)
 const gchar*
 tny_account_iface_get_url_string (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_url_string_func)
+		g_critical ("You must implement tny_account_iface_get_url_string\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_url_string_func (self);
 }
 
@@ -266,6 +341,11 @@ tny_account_iface_get_url_string (TnyAccountIface *self)
 const gchar*
 tny_account_iface_get_user (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_user_func)
+		g_critical ("You must implement tny_account_iface_get_user\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_user_func (self);
 }
 
@@ -280,6 +360,11 @@ tny_account_iface_get_user (TnyAccountIface *self)
 const gchar*
 tny_account_iface_get_name (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_name_func)
+		g_critical ("You must implement tny_account_iface_get_name\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_name_func (self);
 }
 
@@ -294,6 +379,11 @@ tny_account_iface_get_name (TnyAccountIface *self)
 const gchar*
 tny_account_iface_get_hostname (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_hostname_func)
+		g_critical ("You must implement tny_account_iface_get_hostname\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_hostname_func (self);
 }
 
@@ -308,6 +398,11 @@ tny_account_iface_get_hostname (TnyAccountIface *self)
 TnyGetPassFunc
 tny_account_iface_get_pass_func (TnyAccountIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_pass_func_func)
+		g_critical ("You must implement tny_account_iface_get_pass_func\n");
+#endif
+
 	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_pass_func_func (self);
 }
 

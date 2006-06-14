@@ -40,8 +40,10 @@ static GObjectClass *parent_class;
 /* The function is locked, so this is secure (and might cause less
 stack allocations)? It's probably a naïve manual optimization.*/
 
-
-G_INLINE_FUNC void /* When sorting, this method is called a gazillion times */
+#ifndef DEBUG
+G_INLINE_FUNC
+#endif
+void /* When sorting, this method is called a gazillion times */
 _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
 {
 
@@ -229,7 +231,10 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	return tree_path;
 }
 
-G_INLINE_FUNC gchar *
+#ifndef DEBUG
+G_INLINE_FUNC
+#endif
+gchar *
 _get_readable_date (const time_t file_time_raw)
 {
 	struct tm *file_time;

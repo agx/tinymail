@@ -50,7 +50,7 @@ tny_account_store_iface_alert (TnyAccountStoreIface *self, TnyAlertType type, co
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->alert_func)
-		g_warning (_("You must implement tny_account_store_iface_alert\n"));
+		g_critical ("You must implement tny_account_store_iface_alert\n");
 #endif
 	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->alert_func (self, type, prompt);
 }
@@ -66,7 +66,7 @@ tny_account_store_iface_get_device (TnyAccountStoreIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_device_func)
-		g_warning (_("You must implement tny_account_store_iface_get_device\n"));
+		g_critical ("You must implement tny_account_store_iface_get_device\n");
 #endif
 	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_device_func (self);
 }
@@ -84,7 +84,7 @@ tny_account_store_iface_get_cache_dir (TnyAccountStoreIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_cache_dir_func)
-		g_warning (_("You must implement tny_account_store_iface_get_cache_dir\n"));
+		g_critical ("You must implement tny_account_store_iface_get_cache_dir\n");
 #endif
 	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_cache_dir_func (self);
 }
@@ -103,7 +103,7 @@ tny_account_store_iface_get_transport_accounts (TnyAccountStoreIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_transport_accounts_func)
-		g_warning (_("You must implement tny_account_store_iface_get_transport_accounts\n"));
+		g_critical ("You must implement tny_account_store_iface_get_transport_accounts\n");
 #endif
 	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_transport_accounts_func (self);
 }
@@ -122,8 +122,9 @@ tny_account_store_iface_add_transport_account (TnyAccountStoreIface *self, TnyTr
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->add_transport_account_func)
-		g_warning (_("You must implement tny_account_store_iface_add_transport_account\n"));
+		g_critical ("You must implement tny_account_store_iface_add_transport_account\n");
 #endif
+
 	TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->add_transport_account_func (self, account);
 	return;
 }
@@ -142,7 +143,7 @@ tny_account_store_iface_get_store_accounts (TnyAccountStoreIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_store_accounts_func)
-		g_warning (_("You must implement tny_account_store_iface_get_store_accounts\n"));
+		g_critical ("You must implement tny_account_store_iface_get_store_accounts\n");
 #endif
 	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_store_accounts_func (self);
 }
@@ -160,7 +161,7 @@ tny_account_store_iface_add_store_account (TnyAccountStoreIface *self, TnyStoreA
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->add_store_account_func)
-		g_warning (_("You must implement tny_account_store_iface_add_store_account\n"));
+		g_critical ("You must implement tny_account_store_iface_add_store_account\n");
 #endif
 	TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->add_store_account_func (self, account);
 	return;

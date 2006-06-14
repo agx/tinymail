@@ -43,7 +43,7 @@ tny_device_iface_reset (TnyDeviceIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_DEVICE_IFACE_GET_CLASS (self)->reset_func)
-		g_warning (_("You must implement tny_device_iface_reset\n"));
+		g_critical ("You must implement tny_device_iface_reset\n");
 #endif
 
 	TNY_DEVICE_IFACE_GET_CLASS (self)->reset_func (self);
@@ -61,7 +61,7 @@ tny_device_iface_force_online (TnyDeviceIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_DEVICE_IFACE_GET_CLASS (self)->force_online_func)
-		g_warning (_("You must implement tny_device_iface_force_online\n"));
+		g_critical ("You must implement tny_device_iface_force_online\n");
 #endif
 
 	TNY_DEVICE_IFACE_GET_CLASS (self)->force_online_func (self);
@@ -79,7 +79,7 @@ tny_device_iface_force_offline (TnyDeviceIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_DEVICE_IFACE_GET_CLASS (self)->force_offline_func)
-		g_warning (_("You must implement tny_device_iface_force_offline\n"));
+		g_critical ("You must implement tny_device_iface_force_offline\n");
 #endif
 
 	TNY_DEVICE_IFACE_GET_CLASS (self)->force_offline_func (self);
@@ -97,7 +97,7 @@ tny_device_iface_is_online (TnyDeviceIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_DEVICE_IFACE_GET_CLASS (self)->is_online_func)
-		g_warning (_("You must implement tny_device_iface_is_online\n"));
+		g_critical ("You must implement tny_device_iface_is_online\n");
 #endif
 
 	return TNY_DEVICE_IFACE_GET_CLASS (self)->is_online_func (self);

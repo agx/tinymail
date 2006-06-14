@@ -34,7 +34,7 @@ tny_msg_view_iface_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIfac
 {
 #ifdef DEBUG
 	if (!TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_save_strategy_func)
-		g_warning (_("You must implement tny_msg_view_iface_set_save_strategy\n"));
+		g_critical ("You must implement tny_msg_view_iface_set_save_strategy\n");
 #endif
 
 	TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_save_strategy_func (self, strategy);
@@ -55,7 +55,7 @@ tny_msg_view_iface_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_msg_func)
-		g_warning (_("You must implement tny_msg_view_iface_set_msg\n"));
+		g_critical ("You must implement tny_msg_view_iface_set_msg\n");
 #endif
 
 	TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_msg_func (self, msg);
