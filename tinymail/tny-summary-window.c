@@ -73,7 +73,6 @@ struct _TnySummaryWindowPriv
 	GtkTreeSelection *mailbox_select;
 	GtkTreeIter last_mailbox_correct_select;
 	guint connchanged_signal, online_button_signal;
-	TnyMsgFolderIface *last_folder;
 };
 
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
@@ -389,7 +388,6 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
 			&priv->last_mailbox_correct_select);
 
-		priv->last_folder = folder;
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);
 
 	} else {
@@ -449,12 +447,6 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		gtk_tree_model_get (model, &iter, 
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
-
-		/* If the last folder is known, and the new folder is
-		   the same: why reload it?! */
-
-		if (priv->last_folder == folder)
-			return;
 
 		gtk_widget_show (GTK_WIDGET (priv->progress));
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE);
@@ -565,7 +557,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
 		G_CALLBACK (online_button_toggled), self);
-	priv->last_folder = NULL;
+
 	platfact = TNY_PLATFORM_FACTORY_IFACE 
 			(tny_platform_factory_get_instance ());
 
