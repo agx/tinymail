@@ -531,7 +531,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 	camel_session_construct (session, camel_dir);
 
 	self->first_switch = tny_device_iface_is_online (device);
-printf ("%s\n", self->first_switch?"yes":"no");
+
 	camel_session_set_online ((CamelSession *) session, 
 		self->first_switch); 
 
