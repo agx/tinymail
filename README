@@ -17,7 +17,7 @@ It can use a GtkMozEmbed HTML component (which is not recommended). It can
 To disable GnomeVFS and GnomePasswordDialog and gnome-keyring, you use the 
 --enable-gnome=no compilation option during the ./autogen.sh or ./configure.
 
-To select the a HTML component you use the --with-html-component=COMPONENT
+To select the HTML component you use the --with-html-component=COMPONENT
 option. Possible values for COMPONENT are mozembed, none and gtkhtml.
 
 If you want to create a test account, use something like this. You should also
