@@ -464,12 +464,13 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 			copy = g_list_next (copy);
 		}
 
-		self->first_switch = FALSE;
 	}
 
 	if (self->account_store && !self->first_switch)
 		g_signal_emit (self->account_store, 
 			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
+
+	self->first_switch = FALSE;
 
 	self->prev_constat = online;
 
