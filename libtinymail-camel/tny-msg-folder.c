@@ -663,7 +663,7 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *he
 	{
 		message = TNY_MSG_IFACE (tny_msg_new ());
 
-		tny_msg_iface_set_folder (message, self);
+		_tny_msg_set_folder (message, self);
 		tny_msg_iface_set_header (message, TNY_MSG_HEADER_IFACE (header));
 		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
 	} else {

@@ -44,7 +44,6 @@ struct _TnyMsgIfaceClass
 
         const TnyMsgFolderIface*
                                  (*get_folder_func)       (TnyMsgIface *self);
-        void                     (*set_folder_func)       (TnyMsgIface *self, const TnyMsgFolderIface *folder);
 	void                     (*set_header_func)       (TnyMsgIface *self, TnyMsgHeaderIface *header);
 
 	void                     (*del_part_func)         (TnyMsgIface *self, gint id);
@@ -62,8 +61,6 @@ void                     tny_msg_iface_del_part         (TnyMsgIface *self, gint
 
 const TnyMsgFolderIface*
                          tny_msg_iface_get_folder       (TnyMsgIface *self);
-void                     tny_msg_iface_set_folder       (TnyMsgIface *self, const TnyMsgFolderIface *folder);
-
 void                     tny_msg_iface_set_header       (TnyMsgIface *self, TnyMsgHeaderIface *header);
 
 G_END_DECLS

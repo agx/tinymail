@@ -33,24 +33,12 @@
 const TnyMsgFolderIface* 
 tny_msg_iface_get_folder (TnyMsgIface *self)
 {
-	return TNY_MSG_IFACE_GET_CLASS (self)->get_folder_func (self);
-}
+#ifdef DEBUG
+	if (!TNY_MSG_IFACE_GET_CLASS (self)->get_folder_func)
+		g_critical ("You must implement tny_msg_iface_get_folder\n");
+#endif
 
-/**
- * tny_msg_iface_set_folder:
- * @self: a #TnyMsgIface object
- * @folder: The parent folder
- * 
- * Set the parent folder of this message
- *
- * * TODO: Make this private, or make it possible to move messages this way *
- *
- **/
-void
-tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
-{
-	TNY_MSG_IFACE_GET_CLASS (self)->set_folder_func (self, folder);
-	return;
+	return TNY_MSG_IFACE_GET_CLASS (self)->get_folder_func (self);
 }
 
 
@@ -65,6 +53,10 @@ tny_msg_iface_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder)
 const GList*
 tny_msg_iface_get_parts (TnyMsgIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_IFACE_GET_CLASS (self)->get_parts_func)
+		g_critical ("You must implement tny_msg_iface_get_parts\n");
+#endif
 
 	return TNY_MSG_IFACE_GET_CLASS (self)->get_parts_func (self);
 }
@@ -81,6 +73,11 @@ tny_msg_iface_get_parts (TnyMsgIface *self)
 const TnyMsgHeaderIface*
 tny_msg_iface_get_header (TnyMsgIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_IFACE_GET_CLASS (self)->get_header_func)
+		g_critical ("You must implement tny_msg_iface_get_header\n");
+#endif
+
 	return TNY_MSG_IFACE_GET_CLASS (self)->get_header_func (self);
 }
 
@@ -97,6 +94,11 @@ tny_msg_iface_get_header (TnyMsgIface *self)
 gint
 tny_msg_iface_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_IFACE_GET_CLASS (self)->add_part_func)
+		g_critical ("You must implement tny_msg_iface_add_part\n");
+#endif
+
 	return TNY_MSG_IFACE_GET_CLASS (self)->add_part_func (self, part);
 }
 
@@ -111,6 +113,11 @@ tny_msg_iface_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 void
 tny_msg_iface_del_part (TnyMsgIface *self, gint id)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_IFACE_GET_CLASS (self)->del_part_func)
+		g_critical ("You must implement tny_msg_iface_del_part\n");
+#endif
+
 	TNY_MSG_IFACE_GET_CLASS (self)->del_part_func (self, id);
 	return;
 }
@@ -127,6 +134,11 @@ tny_msg_iface_del_part (TnyMsgIface *self, gint id)
 void
 tny_msg_iface_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_IFACE_GET_CLASS (self)->set_header_func)
+		g_critical ("You must implement tny_msg_iface_set_header\n");
+#endif
+
 	TNY_MSG_IFACE_GET_CLASS (self)->set_header_func (self, header);
 	return;
 }

@@ -190,7 +190,7 @@ tny_msg_get_folder (TnyMsgIface *self)
 
 
 void
-tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
+_tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
@@ -464,7 +464,6 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_header_func = tny_msg_set_header;
 	klass->add_part_func = tny_msg_add_part;
 	klass->del_part_func = tny_msg_del_part;
-	klass->set_folder_func = tny_msg_set_folder;
 	klass->get_folder_func = tny_msg_get_folder;
 
 	return;

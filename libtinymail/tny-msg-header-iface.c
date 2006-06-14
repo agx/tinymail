@@ -34,6 +34,11 @@
 void
 tny_msg_header_iface_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_replyto_func)
+		g_critical ("You must implement tny_msg_header_iface_set_replyto\n");
+#endif	
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_replyto_func (self, to);
 	return;
 }
@@ -49,6 +54,10 @@ tny_msg_header_iface_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
 const gchar*
 tny_msg_header_iface_get_replyto (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_replyto_func)
+		g_critical ("You must implement tny_msg_header_iface_get_replyto\n");
+#endif
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_replyto_func (self);
 }
 
@@ -64,6 +73,11 @@ tny_msg_header_iface_get_replyto (TnyMsgHeaderIface *self)
 void
 tny_msg_header_iface_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_bcc_func)
+		g_critical ("You must implement tny_msg_header_iface_set_bcc\n");
+#endif
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_bcc_func (self, bcc);
 	return;
 }
@@ -80,6 +94,11 @@ tny_msg_header_iface_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
 void
 tny_msg_header_iface_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_cc_func)
+		g_critical ("You must implement tny_msg_header_iface_set_cc\n");
+#endif
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_cc_func (self, cc);
 	return;
 }
@@ -95,6 +114,11 @@ tny_msg_header_iface_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
 void
 tny_msg_header_iface_set_from (TnyMsgHeaderIface *self, const gchar *from)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_from_func)
+		g_critical ("You must implement tny_msg_header_iface_set_from\n");
+#endif
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_from_func (self, from);
 	return;
 }
@@ -110,6 +134,11 @@ tny_msg_header_iface_set_from (TnyMsgHeaderIface *self, const gchar *from)
 void
 tny_msg_header_iface_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_subject_func)
+		g_critical ("You must implement tny_msg_header_iface_set_subject\n");
+#endif
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_subject_func (self, subject);
 	return;
 }
@@ -129,6 +158,11 @@ tny_msg_header_iface_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 void
 tny_msg_header_iface_set_to (TnyMsgHeaderIface *self, const gchar *to)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_to_func)
+		g_critical ("You must implement tny_msg_header_iface_set_to\n");
+#endif
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_to_func (self, to);
 	return;
 }
@@ -144,6 +178,11 @@ tny_msg_header_iface_set_to (TnyMsgHeaderIface *self, const gchar *to)
 const gchar*
 tny_msg_header_iface_get_cc (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_cc_func)
+		g_critical ("You must implement tny_msg_header_iface_get_cc\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_cc_func (self);
 }
 
@@ -158,6 +197,11 @@ tny_msg_header_iface_get_cc (TnyMsgHeaderIface *self)
 const gchar*
 tny_msg_header_iface_get_bcc (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_bcc_func)
+		g_critical ("You must implement tny_msg_header_iface_get_bcc\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_bcc_func (self);
 }
 
@@ -172,6 +216,11 @@ tny_msg_header_iface_get_bcc (TnyMsgHeaderIface *self)
 const time_t
 tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_date_received_func)
+		g_critical ("You must implement tny_msg_header_iface_get_date_received\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_date_received_func (self);
 }
 
@@ -186,6 +235,11 @@ tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
 const time_t
 tny_msg_header_iface_get_date_sent (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_date_sent_func)
+		g_critical ("You must implement tny_msg_header_iface_get_date_sent\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_date_sent_func (self);
 }
 
@@ -201,6 +255,11 @@ tny_msg_header_iface_get_date_sent (TnyMsgHeaderIface *self)
 const gchar*
 tny_msg_header_iface_get_uid (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_uid_func)
+		g_critical ("You must implement tny_msg_header_iface_get_uid\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_uid_func (self);
 }
 
@@ -215,6 +274,11 @@ tny_msg_header_iface_get_uid (TnyMsgHeaderIface *self)
 const gchar*
 tny_msg_header_iface_get_message_id (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_message_id_func)
+		g_critical ("You must implement tny_msg_header_iface_get_message_id\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_message_id_func (self);
 }
 
@@ -229,6 +293,11 @@ tny_msg_header_iface_get_message_id (TnyMsgHeaderIface *self)
 const gchar* 
 tny_msg_header_iface_get_from (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_from_func)
+		g_critical ("You must implement tny_msg_header_iface_get_from\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_from_func (self);
 }
 
@@ -243,6 +312,11 @@ tny_msg_header_iface_get_from (TnyMsgHeaderIface *self)
 const gchar*
 tny_msg_header_iface_get_subject (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_subject_func)
+		g_critical ("You must implement tny_msg_header_iface_get_subject\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_subject_func (self);
 }
 
@@ -258,6 +332,11 @@ tny_msg_header_iface_get_subject (TnyMsgHeaderIface *self)
 const gchar* 
 tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_to_func)
+		g_critical ("You must implement tny_msg_header_iface_get_to\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_to_func (self);
 }
 
@@ -272,6 +351,11 @@ tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
 const TnyMsgFolderIface* 
 tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_folder_func)
+		g_critical ("You must implement tny_msg_header_iface_get_folder\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_folder_func (self);
 }
 
@@ -285,6 +369,11 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 void
 tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_folder_func)
+		g_critical ("You must implement tny_msg_header_iface_set_folder\n");
+#endif
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_folder_func (self, folder);
 	return;
 }
@@ -300,6 +389,11 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
 const TnyMsgHeaderFlags
 tny_msg_header_iface_get_flags (TnyMsgHeaderIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_flags_func)
+		g_critical ("You must implement tny_msg_header_iface_get_flags\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->get_flags_func (self);
 }
 
@@ -314,6 +408,11 @@ tny_msg_header_iface_get_flags (TnyMsgHeaderIface *self)
 void 
 tny_msg_header_iface_set_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_flags_func)
+		g_critical ("You must implement tny_msg_header_iface_set_flags\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_flags_func (self, mask);
 }
 
@@ -328,6 +427,11 @@ tny_msg_header_iface_set_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 void 
 tny_msg_header_iface_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->unset_flags_func)
+		g_critical ("You must implement tny_msg_header_iface_unset_flags\n");
+#endif
+
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->unset_flags_func (self, mask);
 }
 
@@ -341,6 +445,11 @@ tny_msg_header_iface_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mas
 void
 tny_msg_header_iface_set_uid (TnyMsgHeaderIface *self, const gchar *id)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_uid_func)
+		g_critical ("You must implement tny_msg_header_iface_set_uid\n");
+#endif
+
 	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_uid_func (self, id);
 	return;
 }
