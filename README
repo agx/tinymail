@@ -1,6 +1,27 @@
 Project tinymail is an attempt to create an E-mail client framework for small
 devices.
 
+Building tips
+=============
+You can set the CFLAGS="-DDEVEL" environment variable to enable a debug build.
+
+For building from repository source code, you simply do something like this:
+
+./autogen.sh --prefix=/opt/tinymail 
+make
+make install
+
+You can use --enable-gtk-doc to build API documentation in docs/devel/reference
+You can use --enable-gnome=no/yes to disable or enable some GNOME features.
+You can use --with-html-component=COMPONENT to select which HTML component to
+use. There's also the option "none" to build no HTML component.
+
+Packager tips
+=============
+You can use make dist, make distcheck and make distclean for distribution
+building and package preparations. You can of course use --prefix and all other
+typical autotools settings and configuration flags.
+
 
 Some information for developers who'd like to tryout the demo user interface:
 ===============================================================================
@@ -14,8 +35,9 @@ ructure for password handling. It can use GnomeVFS and normal FILE operations.
 It can use a GtkMozEmbed HTML component (which is not recommended). It can 
 (soon) also use a GtkHTML HTMl component (recommended).
 
-To disable GnomeVFS and GnomePasswordDialog and gnome-keyring, you use the 
---enable-gnome=no compilation option during the ./autogen.sh or ./configure.
+To disable GnomeVFS, icon lookups using the MIME-type, GnomePasswordDialog and
+gnome-keyring, you use the --enable-gnome=no compilation option during the 
+./autogen.sh or ./configure.
 
 To select the HTML component you use the --with-html-component=COMPONENT
 option. Possible values for COMPONENT are mozembed, none and gtkhtml.
