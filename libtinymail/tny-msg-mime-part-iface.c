@@ -31,6 +31,10 @@
 gboolean 
 tny_msg_mime_part_iface_is_attachment (TnyMsgMimePartIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->is_attachment_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_is_attachment\n");
+#endif
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->is_attachment_func (self);
 }
 
@@ -46,6 +50,11 @@ tny_msg_mime_part_iface_is_attachment (TnyMsgMimePartIface *self)
 void
 tny_msg_mime_part_iface_set_content_location (TnyMsgMimePartIface *self, const gchar *content_location)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_location_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_set_content_location\n");
+#endif
+
 	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_location_func (self, content_location);
 	return;
 }
@@ -61,6 +70,11 @@ tny_msg_mime_part_iface_set_content_location (TnyMsgMimePartIface *self, const g
 void
 tny_msg_mime_part_iface_set_description (TnyMsgMimePartIface *self, const gchar *description)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_description_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_set_description\n");
+#endif
+
 	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_description_func (self, description);
 	return;
 }
@@ -76,6 +90,11 @@ tny_msg_mime_part_iface_set_description (TnyMsgMimePartIface *self, const gchar 
 void
 tny_msg_mime_part_iface_set_content_id (TnyMsgMimePartIface *self, const gchar *content_id)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_id_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_set_content_id\n");
+#endif
+
 	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_id_func (self, content_id);
 	return;
 }
@@ -91,6 +110,11 @@ tny_msg_mime_part_iface_set_content_id (TnyMsgMimePartIface *self, const gchar *
 void
 tny_msg_mime_part_iface_set_filename (TnyMsgMimePartIface *self, const gchar *filename)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_filename_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_set_filename\n");
+#endif
+
 	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_filename_func (self, filename);
 	return;
 }
@@ -106,6 +130,11 @@ tny_msg_mime_part_iface_set_filename (TnyMsgMimePartIface *self, const gchar *fi
 void
 tny_msg_mime_part_iface_set_content_type (TnyMsgMimePartIface *self, const gchar *content_type)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_type_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_set_content_type\n");
+#endif
+
 	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->set_content_type_func (self, content_type);
 	return;
 }
@@ -121,6 +150,11 @@ tny_msg_mime_part_iface_set_content_type (TnyMsgMimePartIface *self, const gchar
 const gchar*
 tny_msg_mime_part_iface_get_filename (TnyMsgMimePartIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_filename_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_get_filename\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_filename_func (self);
 }
 
@@ -134,6 +168,11 @@ tny_msg_mime_part_iface_get_filename (TnyMsgMimePartIface *self)
 const gchar*
 tny_msg_mime_part_iface_get_content_id (TnyMsgMimePartIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_id_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_get_content_id\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_id_func (self);
 }
 
@@ -147,6 +186,11 @@ tny_msg_mime_part_iface_get_content_id (TnyMsgMimePartIface *self)
 const gchar*
 tny_msg_mime_part_iface_get_description (TnyMsgMimePartIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_description_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_get_description\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_description_func (self);
 }
 
@@ -160,6 +204,11 @@ tny_msg_mime_part_iface_get_description (TnyMsgMimePartIface *self)
 const gchar*
 tny_msg_mime_part_iface_get_content_location (TnyMsgMimePartIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_location_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_get_content_location\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_location_func (self);
 }
 
@@ -176,6 +225,11 @@ tny_msg_mime_part_iface_get_content_location (TnyMsgMimePartIface *self)
 void
 tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->write_to_stream_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_write_to_stream\n");
+#endif
+
 	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->write_to_stream_func (self, stream);
 	return;
 }
@@ -194,6 +248,11 @@ tny_msg_mime_part_iface_write_to_stream (TnyMsgMimePartIface *self, TnyStreamIfa
 void
 tny_msg_mime_part_iface_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->decode_to_stream_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_decode_to_stream\n");
+#endif
+
 	TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->decode_to_stream_func (self, stream);
 	return;
 }
@@ -210,6 +269,11 @@ tny_msg_mime_part_iface_decode_to_stream (TnyMsgMimePartIface *self, TnyStreamIf
 gint
 tny_msg_mime_part_iface_construct_from_stream (TnyMsgMimePartIface *self, TnyStreamIface *stream, const gchar *type)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->construct_from_stream_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_construct_from_stream\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->construct_from_stream_func (self, stream, type);
 }
 
@@ -226,6 +290,11 @@ tny_msg_mime_part_iface_construct_from_stream (TnyMsgMimePartIface *self, TnyStr
 TnyStreamIface* 
 tny_msg_mime_part_iface_get_stream (TnyMsgMimePartIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_stream_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_get_stream\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_stream_func (self);
 }
 
@@ -241,6 +310,11 @@ tny_msg_mime_part_iface_get_stream (TnyMsgMimePartIface *self)
 const gchar*
 tny_msg_mime_part_iface_get_content_type (TnyMsgMimePartIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_type_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_get_content_type\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->get_content_type_func (self);
 }
 
@@ -256,6 +330,11 @@ tny_msg_mime_part_iface_get_content_type (TnyMsgMimePartIface *self)
 gboolean
 tny_msg_mime_part_iface_content_type_is (TnyMsgMimePartIface *self, const gchar *content_type)
 {
+#ifdef DEBUG
+	if (!TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->content_type_is_func)
+		g_critical ("You must implement tny_msg_mime_part_iface_content_type_is\n");
+#endif
+
 	return TNY_MSG_MIME_PART_IFACE_GET_CLASS (self)->content_type_is_func (self, content_type);
 }
 

@@ -33,6 +33,11 @@
 void
 tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
 {
+#ifdef DEBUG
+	if (!TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->unsubscribe_func)
+		g_critical ("You must implement tny_store_account_iface_unsubscribe\n");
+#endif
+
 	TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->unsubscribe_func (self, folder);
 	return;
 }
@@ -48,6 +53,11 @@ tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIfa
 void
 tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
 {
+#ifdef DEBUG
+	if (!TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->subscribe_func)
+		g_critical ("You must implement tny_store_account_iface_subscribe\n");
+#endif
+
 	TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->subscribe_func (self, folder);
 	return;
 }
@@ -64,6 +74,11 @@ tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface
 const TnyListIface*
 tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {
+#ifdef DEBUG
+	if (!TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func)
+		g_critical ("You must implement tny_store_account_iface_get_folders\n");
+#endif
+
 	return TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func (self, type);
 }
 

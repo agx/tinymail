@@ -35,6 +35,11 @@
 ssize_t
 tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
+#ifdef DEBUG
+	if (!TNY_STREAM_IFACE_GET_CLASS (self)->write_to_stream_func)
+		g_critical ("You must implement tny_stream_iface_write_to_stream\n");
+#endif
+
 	return TNY_STREAM_IFACE_GET_CLASS (self)->write_to_stream_func (self, output);
 }
 
@@ -52,6 +57,11 @@ tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 ssize_t
 tny_stream_iface_read  (TnyStreamIface *self, char *buffer, size_t n)
 {
+#ifdef DEBUG
+	if (!TNY_STREAM_IFACE_GET_CLASS (self)->read_func)
+		g_critical ("You must implement tny_stream_iface_read\n");
+#endif
+
 	return TNY_STREAM_IFACE_GET_CLASS (self)->read_func (self, buffer, n);
 }
 
@@ -69,6 +79,11 @@ tny_stream_iface_read  (TnyStreamIface *self, char *buffer, size_t n)
 ssize_t
 tny_stream_iface_write (TnyStreamIface *self, const char *buffer, size_t n)
 {
+#ifdef DEBUG
+	if (!TNY_STREAM_IFACE_GET_CLASS (self)->write_func)
+		g_critical ("You must implement tny_stream_iface_write\n");
+#endif
+
 	return TNY_STREAM_IFACE_GET_CLASS (self)->write_func (self, buffer, n);
 }
 
@@ -85,6 +100,11 @@ tny_stream_iface_write (TnyStreamIface *self, const char *buffer, size_t n)
 gint
 tny_stream_iface_flush (TnyStreamIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_STREAM_IFACE_GET_CLASS (self)->flush_func)
+		g_critical ("You must implement tny_stream_iface_flush\n");
+#endif
+
 	return TNY_STREAM_IFACE_GET_CLASS (self)->flush_func (self);
 }
 
@@ -99,6 +119,11 @@ tny_stream_iface_flush (TnyStreamIface *self)
 gint
 tny_stream_iface_close (TnyStreamIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_STREAM_IFACE_GET_CLASS (self)->close_func)
+		g_critical ("You must implement tny_stream_iface_close\n");
+#endif
+
 	return TNY_STREAM_IFACE_GET_CLASS (self)->close_func (self);
 }
 
@@ -114,6 +139,11 @@ tny_stream_iface_close (TnyStreamIface *self)
 gboolean
 tny_stream_iface_eos   (TnyStreamIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_STREAM_IFACE_GET_CLASS (self)->eos_func)
+		g_critical ("You must implement tny_stream_iface_eos\n");
+#endif
+
 	return TNY_STREAM_IFACE_GET_CLASS (self)->eos_func (self);
 }
 
@@ -130,6 +160,11 @@ tny_stream_iface_eos   (TnyStreamIface *self)
 gint
 tny_stream_iface_reset (TnyStreamIface *self)
 {
+#ifdef DEBUG
+	if (!TNY_STREAM_IFACE_GET_CLASS (self)->reset_func)
+		g_critical ("You must implement tny_stream_iface_reset\n");
+#endif
+
 	return TNY_STREAM_IFACE_GET_CLASS (self)->reset_func (self);
 }
 

@@ -33,6 +33,11 @@
 void
 tny_transport_account_iface_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 {
+#ifdef DEBUG
+	if (!TNY_TRANSPORT_ACCOUNT_IFACE_GET_CLASS (self)->send_func)
+		g_critical ("You must implement tny_transport_account_iface_send\n");
+#endif
+
 	TNY_TRANSPORT_ACCOUNT_IFACE_GET_CLASS (self)->send_func (self, msg);
 	return;
 }
