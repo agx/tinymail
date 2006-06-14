@@ -483,6 +483,8 @@ _tny_account_set_online_status (TnyAccount *self, gboolean offline)
 	if (!priv->service)
 		return;
 
+	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
+					NULL, NULL, NULL);
 
 	if (offline)
 		camel_service_cancel_connect (priv->service);
@@ -491,13 +493,13 @@ _tny_account_set_online_status (TnyAccount *self, gboolean offline)
                 if (!offline) {
                         camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
                                                       CAMEL_DISCO_STORE_ONLINE, priv->ex);
-                        return;
+                        goto done;
                 } else if (camel_disco_store_can_work_offline (CAMEL_DISCO_STORE (priv->service))) {
 
                         camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
                                                       CAMEL_DISCO_STORE_OFFLINE,
                                                       priv->ex);
-                        return;
+                        goto done;
                 }
         } else if (CAMEL_IS_OFFLINE_STORE (priv->service)) {
 
@@ -506,18 +508,22 @@ _tny_account_set_online_status (TnyAccount *self, gboolean offline)
                         camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
                                                                CAMEL_OFFLINE_STORE_NETWORK_AVAIL,
                                                                priv->ex);
-                        return;
+                        goto done;
                 } else {
                         camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
                                                                CAMEL_OFFLINE_STORE_NETWORK_UNAVAIL,
                                                                priv->ex);
-                        return;
+                        goto done;
                 }
         }
 
         if (offline)
                 camel_service_disconnect (CAMEL_SERVICE (priv->service),
                                           TRUE, priv->ex);
+done:
+
+	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self));
+
 }
 
 

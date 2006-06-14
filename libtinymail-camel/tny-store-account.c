@@ -352,22 +352,22 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		{
 			case TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL:
 
-				/* _tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
-					NULL, NULL, NULL);*/
+				_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
+					NULL, NULL, NULL);
 
 				info = camel_store_get_folder_info 
 					(store, "", CAMEL_STORE_FOLDER_INFO_FAST |
 						CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 						CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
 
-				/* _tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self)); */
+				_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self));
 
 				break;
 
 			case TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED:
 			default:
-				/* _tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
-					NULL, NULL, NULL); */
+				_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
+					NULL, NULL, NULL);
 
 				info = camel_store_get_folder_info 
 					(store, "", CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |
@@ -375,7 +375,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 						CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 						CAMEL_STORE_FOLDER_INFO_FAST, &ex);
 
-				/* _tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self)); */
+				_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self));
 
 				break;
 		}
@@ -420,10 +420,16 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		/* Un officially supported provider */
 
 		CamelFolderInfo *info;
+
+		_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
+					NULL, NULL, NULL);
+
 		info = camel_store_get_folder_info 
 			(store, "", CAMEL_STORE_FOLDER_INFO_FAST |
 				CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 				CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
+
+		_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self));
 
 		fill_folders_recursive (self, store, NULL, info, type);
 
