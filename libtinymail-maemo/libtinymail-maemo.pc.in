@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libtinymail-olpc
-Description: TinyMail library for OLPC
+Description: TinyMail library for Maemo
 Version: @VERSION@
 Requires: libtinymail-@API_VERSION@ libtinymailui-@API_VERSION@ libtinymailui-gtk-@API_VERSION@
-Libs: -L${libdir} -ltinymail-olpc-@API_VERSION@
-Cflags: -I${includedir}/libtinymail-olpc-@API_VERSION@
+Libs: -L${libdir} -ltinymail-maemo-@API_VERSION@
+Cflags: -I${includedir}/libtinymail-maemo-@API_VERSION@
