@@ -191,13 +191,13 @@ _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	CamelFolder *retval;
 
-	g_mutex_lock (priv->folder_lock);
+	/* g_mutex_lock (priv->folder_lock); */
 
 	if (!priv->folder || !priv->loaded)
 		load_folder_no_lock (priv);
 	retval = priv->folder;
 
-	g_mutex_unlock (priv->folder_lock);
+	/* g_mutex_unlock (priv->folder_lock); */
 
 	return retval;
 }
