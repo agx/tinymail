@@ -112,6 +112,7 @@ AC_ARG_WITH(platform,
   gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
   olpc) PLATFORMDIR=libtinymail-olpc ;;
   maemo) PLATFORMDIR=libtinymail-maemo ;;
+  gpe) PLATFORMDIR=libtinymail-gpe ;;
   *) PLATFORMDIR=${with_platform}
 esac], [PLATFORMDIR=libtinymail-gnome-desktop
 	with_platform=gnome-desktop])
@@ -186,15 +187,26 @@ AC_SUBST(LIBTINYMAIL_OLPC_CFLAGS)
 AC_SUBST(LIBTINYMAIL_OLPC_LIBS)
 	      
 
-dnl ### libtinymail-olpc, a platform library implementation for the maemo platform ##
+dnl ### libtinymail-maemo, a platform library implementation for the maemo platform ##
 if test x$PLATFORMDIR = xlibtinymail-maemo; then
  PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
 else
  LIBTINYMAIL_MAEMO_CFLAGS=
  LIBTINYMAIL_MAEMO_LIBS=
 fi
-AC_SUBST(LIBTINYMAIL_OLPC_MAEMO)
-AC_SUBST(LIBTINYMAIL_OLPC_MAEMO)
+AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
+AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
+
+nl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
+if test x$PLATFORMDIR = xlibtinymail-gpe; then
+ PKG_CHECK_MODULES(LIBTINYMAIL_GPE, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+else
+ LIBTINYMAIL_GPE_CFLAGS=
+ LIBTINYMAIL_GPE_LIBS=
+fi
+AC_SUBST(LIBTINYMAIL_GPE_CFLAGS)
+AC_SUBST(LIBTINYMAIL_GPE_LIBS)
+
 
 AC_SUBST(extraplatpkgs)
 AC_SUBST(extragtkpkgs)
@@ -266,6 +278,8 @@ libtinymail-olpc/Makefile
 libtinymail-olpc/libtinymail-olpc.pc
 libtinymail-maemo/Makefile
 libtinymail-maemo/libtinymail-maemo.pc
+libtinymail-gpe/Makefile
+libtinymail-gpe/libtinymail-gpe.pc
 libtinymail-test/Makefile
 tinymail/Makefile
 tinymail-python/Makefile

@@ -1,8 +1,12 @@
+About
+=====
+
 Project tinymail is an attempt to create an E-mail client framework for small
 devices.
 
 Building tips
 =============
+
 You can set the CFLAGS="-DDEVEL" environment variable to enable a debug build.
 
 For building from repository source code, you simply do something like this:
@@ -18,13 +22,48 @@ use. There's also the option "none" to build no HTML component.
 
 Packager tips
 =============
+
 You can use make dist, make distcheck and make distclean for distribution
 building and package preparations. You can of course use --prefix and all other
 typical autotools settings and configuration flags.
 
+Supported platforms
+===================
 
-Some information for developers who'd like to tryout the demo user interface:
-===============================================================================
+Status
+------
+
+  Work in progress: Maemo, GPE and OLPC
+  Works: GNOME desktop
+
+One Laptop Per Child platform (OLPC)
+------------------------------------
+
+  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=olpc 	  \
+	--enable-gnome=no --with-html-component=none
+
+Maemo platform (For example for the Nokia 770)
+----------------------------------------------
+
+  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=maemo	  \
+	--enable-gnome=no --with-html-component=gtkhtml
+
+GPE platform (For example for PocketPC)
+---------------------------------------
+
+  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=gpe		  \
+        --enable-gnome=no --with-html-component=gtkhtml
+
+GNOME desktop platform
+----------------------
+
+  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=gnome-desktop  \
+	--enable-gnome=yes --with-html-component=mozembed
+
+
+Information for developers who would like to tryout the demo user interface:
+============================================================================
+
 The libtinymail-gnome-desktop is an implementation that will work on a typical
 GNOME desktop. It has been tested on Ubuntu Breezy, Dapper and on Fedora Core 4
 and 5.
@@ -57,35 +96,37 @@ gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string [mailserver]
 
 Ubuntu Breezy & Dapper
 ----------------------
+
 Packages
 
-gnome-devel
-subversion
-firefox-dev
-libcamel1.2-dev
-libnm-glib-0-dev
-automake-1.7
+  gnome-devel
+  subversion
+  firefox-dev
+  libcamel1.2-dev
+  libnm-glib-0-dev
+  automake-1.7
 
 Building
 
-Both Ubuntu Breezy & Dapper support the default ./autogen.sh && make && make 
-install. Provided you installed the above packages.
+  Both Ubuntu Breezy & Dapper support the default ./autogen.sh && make && make 
+  install. Provided you installed the above packages.
 
 Fedora Core 4 & 5
 -----------------
 
 Packages
 
-Subversion
-gnome-common
-evolution-data-server-devel
-NetworkManager-devel
-NetworkManager-glib
-gnome-keyring-devel
-automake-1.7
+  Subversion
+  gnome-common
+  evolution-data-server-devel
+  NetworkManager-devel
+  NetworkManager-glib
+  gnome-keyring-devel
+  automake-1.7
 
 Building
 --------
-Use --with-html-component=none to disable building any HTML component. Because
-Fedora Core 4 uses a quite old gnome-keyring API, it's recommended to also use
---enable-gnome=no when building on Fedora Core 4. 
+  Use --with-html-component=none to disable building any HTML component. Because
+  Fedora Core 4 uses a quite old gnome-keyring API, it's recommended to also use
+  --enable-gnome=no when building on Fedora Core 4. 
+
