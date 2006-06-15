@@ -110,6 +110,8 @@ AC_ARG_WITH(platform,
 [  --with-platform=gnome-desktop		platform to compile [gnome-desktop]],
 [case "${with_platform}" in
   gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
+  olpc) PLATFORMDIR=libtinymail-olpc ;;
+  maemo) PLATFORMDIR=libtinymail-maemo ;;
   *) PLATFORMDIR=${with_platform}
 esac], [PLATFORMDIR=libtinymail-gnome-desktop
 	with_platform=gnome-desktop])
@@ -172,6 +174,28 @@ fi
 AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_LIBS)
 
+
+dnl ### libtinymail-olpc, a platform library implementation for the One Laptop Per Child device ##
+if test x$PLATFORMDIR = xlibtinymail-olpc; then
+ PKG_CHECK_MODULES(LIBTINYMAIL_OLPC, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+else
+ LIBTINYMAIL_OLPC_CFLAGS=
+ LIBTINYMAIL_OLPC_LIBS=
+fi
+AC_SUBST(LIBTINYMAIL_OLPC_CFLAGS)
+AC_SUBST(LIBTINYMAIL_OLPC_LIBS)
+	      
+
+dnl ### libtinymail-olpc, a platform library implementation for the maemo platform ##
+if test x$PLATFORMDIR = xlibtinymail-maemo; then
+ PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+else
+ LIBTINYMAIL_MAEMO_CFLAGS=
+ LIBTINYMAIL_MAEMO_LIBS=
+fi
+AC_SUBST(LIBTINYMAIL_OLPC_MAEMO)
+AC_SUBST(LIBTINYMAIL_OLPC_MAEMO)
+
 AC_SUBST(extraplatpkgs)
 AC_SUBST(extragtkpkgs)
 
@@ -194,7 +218,7 @@ AC_SUBST(TINYMAIL_LIBS)
 dnl ### tinymail-python, the python language bindings ##
 if test x$build_pytinymail = xtrue; then
   AM_PATH_PYTHON(2.3)
-  AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
+  dnl AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
   AC_PATH_PROG(PYGTK_CODEGEN, pygtk-codegen-2.0, no)
   if test "x$PYGTK_CODEGEN" = xno; then
 	AC_MSG_ERROR(could not find pygtk-codegen-2.0 script)
@@ -238,6 +262,10 @@ libtinymail-gnomevfs/Makefile
 libtinymail-gnomevfs/libtinymail-gnomevfs.pc
 libtinymail-gnome-desktop/Makefile
 libtinymail-gnome-desktop/libtinymail-gnome-desktop.pc
+libtinymail-olpc/Makefile
+libtinymail-olpc/libtinymail-olpc.pc
+libtinymail-maemo/Makefile
+libtinymail-maemo/libtinymail-maemo.pc
 libtinymail-test/Makefile
 tinymail/Makefile
 tinymail-python/Makefile
