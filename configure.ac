@@ -197,7 +197,7 @@ fi
 AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
 
-nl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
+dnl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
 if test x$PLATFORMDIR = xlibtinymail-gpe; then
  PKG_CHECK_MODULES(LIBTINYMAIL_GPE, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
 else
