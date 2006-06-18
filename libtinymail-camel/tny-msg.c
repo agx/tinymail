@@ -142,9 +142,6 @@ _tny_msg_get_camel_mime_message (TnyMsg *self)
 {
 	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
 
-	if (!ppriv->part)
-		G_BREAKPOINT ();
-
 	return CAMEL_MIME_MESSAGE (ppriv->part);
 }
 
