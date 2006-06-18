@@ -17,9 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef DEBUG
+/*#ifndef DEBUG
 #define G_IMPLEMENTS_INLINES
-#endif
+#endif*/
 
 #include <config.h>
 
@@ -45,7 +45,9 @@ static GObjectClass *parent_class;
 stack allocations)? It's probably a naïve manual optimization.*/
 
 #ifndef DEBUG
+#ifdef G_CAN_INLINE
 G_INLINE_FUNC
+#endif
 #endif
 void /* When sorting, this method is called a gazillion times */
 _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, guint cur, guint nth)
@@ -236,7 +238,9 @@ tny_msg_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 }
 
 #ifndef DEBUG
+#ifdef G_CAN_INLINE
 G_INLINE_FUNC
+#endif
 #endif
 gchar *
 _get_readable_date (const time_t file_time_raw)
