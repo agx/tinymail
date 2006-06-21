@@ -1,3 +1,7 @@
+06-21-2006  Florian Boor  <florian.boor@kernelconcepts.de>
+
+	* Make GPE TnyDevice default to be online for now.
+
 06-09-2006  Florian Boor  <florian.boor@kernelconcepts.de>
 
 	* Fix endless loop sending mails.
