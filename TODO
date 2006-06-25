@@ -1,0 +1,4 @@
+o. Refactor TnySaveStrategy to a TnyGnomeVfsSaveStrategy and a TnyPosixSaveStrategy
+o. Fix the GTK_TREE_MODEL_SORT assertion of the demo-ui
+o. Refactor the GList's in the account-stuff to TnyListIface implementations
+o. Implement the mmap() idea in camel
