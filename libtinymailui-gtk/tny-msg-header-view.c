@@ -107,7 +107,7 @@ tny_msg_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_table_set_col_spacings (GTK_TABLE (self), 4);
 
-	label2 = gtk_label_new ("<b>to:</b>");
+	label2 = gtk_label_new (_("<b>to:</b>"));
 	gtk_widget_show (label2);
 	gtk_table_attach (GTK_TABLE (self), label2, 0, 1, 1, 2,
 			  (GtkAttachOptions) (GTK_FILL),
@@ -115,7 +115,7 @@ tny_msg_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);
 	gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-	label3 = gtk_label_new ("<b>Subject:</b>");
+	label3 = gtk_label_new (_("<b>Subject:</b>"));
 	gtk_widget_show (label3);
 	gtk_table_attach (GTK_TABLE (self), label3, 0, 1, 2, 3,
 			  (GtkAttachOptions) (GTK_FILL),
@@ -123,7 +123,7 @@ tny_msg_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_label_set_use_markup (GTK_LABEL (label3), TRUE);
 	gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-	label4 = gtk_label_new ("<b>Date:</b>");
+	label4 = gtk_label_new (_("<b>Date:</b>"));
 	gtk_widget_show (label4);
 	gtk_table_attach (GTK_TABLE (self), label4, 0, 1, 3, 4,
 			  (GtkAttachOptions) (GTK_FILL),
@@ -159,7 +159,7 @@ tny_msg_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 			  (GtkAttachOptions) (0), 0, 0);
 	gtk_misc_set_alignment (GTK_MISC (priv->date_label), 0, 0.5);
 
-	label1 = gtk_label_new ("<b>From:</b>");
+	label1 = gtk_label_new (_("<b>From:</b>"));
 	gtk_widget_show (label1);
 	gtk_table_attach (GTK_TABLE (self), label1, 0, 1, 0, 1,
 			  (GtkAttachOptions) (GTK_FILL),
