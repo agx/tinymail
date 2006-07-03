@@ -65,6 +65,9 @@ main (int argc, char **argv)
 	gtk_init (&argc, &argv);
 	gdk_threads_init ();
 
+// demo
+	/* g_object_unref (NULL); */
+
 #ifdef GNOME
 	gnome_vfs_init ();
 #endif

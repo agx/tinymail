@@ -225,7 +225,7 @@ tny_account_get_account_store (TnyAccountIface *self)
 }
 
 
-void
+static void
 tny_account_set_id (TnyAccountIface *self, const gchar *id)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
@@ -242,7 +242,7 @@ tny_account_set_id (TnyAccountIface *self, const gchar *id)
 	return;
 }
 
-void
+static void
 tny_account_set_proto (TnyAccountIface *self, const gchar *proto)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);

@@ -64,6 +64,19 @@ struct _TnyAccountStoreIfaceClass
 	void (*accounts_reloaded)                               (TnyAccountStoreIface *self);
 
 	/* Methods */
+
+/*
+void 
+tny_account_store_iface_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType type)
+
+enum 
+{
+	ONLY_TRANSPORT_ACCOUNTS,
+	ONLY_STORE_ACCOUNTS,
+	BOTH
+} TnyGetACcountsRequestType;
+*/
+
 	const GList*  (*get_store_accounts_func)                (TnyAccountStoreIface *self);
 	void          (*add_store_account_func)                 (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
 

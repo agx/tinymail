@@ -16,7 +16,8 @@ libtinymail_1_0_headers = 		\
 	tny-transport-account-iface.h	\
 	tny-account-store-iface.h	\
 	tny-stream-iface.h		\
-	tny-fs-stream.h
+	tny-fs-stream.h			\
+	tny-list.h
 
 libtinymail_1_0_la_SOURCES = 		\
 	$(libtinymail_1_0_headers)	\
@@ -32,7 +33,11 @@ libtinymail_1_0_la_SOURCES = 		\
 	tny-transport-account-iface.c	\
 	tny-account-store-iface.c	\
 	tny-stream-iface.c		\
-	tny-fs-stream.c
+	tny-fs-stream.c			\
+	tny-list-priv.h			\
+	tny-list.c			\
+	tny-list-iterator-priv.h	\
+	tny-list-iterator.c
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)
 libtinymail_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

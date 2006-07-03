@@ -42,6 +42,8 @@ tny_msg_view_iface_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIfac
 }
 
 
+
+
 /**
  * tny_msg_view_iface_set_msg:
  * @self: A #TnyMsgViewIface instance

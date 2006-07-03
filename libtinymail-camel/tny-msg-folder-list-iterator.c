@@ -77,16 +77,6 @@ tny_msg_folder_list_iterator_finalize (GObject *object)
 	return;
 }
 
-void 
-_tny_msg_folder_list_iterator_travel_to_nth (TnyMsgFolderListIterator *self, guint cur, guint nth)
-{
-	if (cur < nth)
-		while ((cur++ < nth) && self->current)
-			self->current = self->current->next;
-	else if (cur > nth)
-		while ((cur-- > nth) && self->current)
-			self->current = self->current->prev;
-}
 
 static gpointer 
 tny_msg_folder_list_iterator_next (TnyIteratorIface *self)

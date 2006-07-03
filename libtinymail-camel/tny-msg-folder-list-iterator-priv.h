@@ -55,7 +55,6 @@ struct _TnyMsgFolderListIteratorClass
 GType _tny_msg_folder_list_iterator_get_type (void);
 void _tny_msg_folder_list_iterator_set_model (TnyMsgFolderListIterator *self, TnyMsgFolderList *model);
 TnyMsgFolderListIterator* _tny_msg_header_list_iterator_new (TnyMsgFolderList *model);
-void _tny_msg_folder_list_iterator_travel_to_nth (TnyMsgFolderListIterator *self, guint cur, guint nth);
 
 G_END_DECLS
 
