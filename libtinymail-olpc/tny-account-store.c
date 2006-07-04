@@ -360,7 +360,6 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
 				per_account_get_pass_func);
 
-
 			tny_list_iface_prepend (list, account);
 		}
 	}

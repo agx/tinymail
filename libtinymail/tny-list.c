@@ -137,7 +137,12 @@ tny_list_iface_init (TnyListIfaceClass *klass)
 	return;
 }
 
-
+static void
+destroy_item (gpointer item, gpointer user_data)
+{
+	if (G_IS_OBJECT (item))
+		g_object_unref (G_OBJECT (item));
+}
 
 static void
 tny_list_finalize (GObject *object)
@@ -145,8 +150,10 @@ tny_list_finalize (GObject *object)
 	TnyListPriv *priv = TNY_LIST_GET_PRIVATE (object);
 
 	g_mutex_lock (priv->iterator_lock);
+
 	if (priv->first)
 	{
+		g_list_foreach (priv->first, destroy_item, NULL);
 		g_list_free (priv->first);
 		priv->first = NULL;
 	}
