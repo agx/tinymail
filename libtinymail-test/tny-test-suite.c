@@ -28,6 +28,11 @@
 #include "tny-stream-iface-test.h"
 #include "tny-msg-mime-part-iface-test.h"
 #include "tny-list-iface-test.h"
+#include "tny-account-iface-test.h"
+#include "tny-device-iface-test.h"
+#include "tny-iterator-iface-test.h"
+#include "tny-msg-folder-iface-test.h"
+#include "tny-msg-iface-test.h"
 
 GList*
 gunit_get_test_suites()
@@ -38,6 +43,11 @@ gunit_get_test_suites()
 	suites = g_list_append (suites, create_tny_stream_iface_suite ());
 	suites = g_list_append (suites, create_tny_msg_mime_part_iface_suite ());
 	suites = g_list_append (suites, create_tny_list_iface_suite ());
+	suites = g_list_append (suites, create_tny_account_iface_suite ());
+	suites = g_list_append (suites, create_tny_device_iface_suite ());
+	suites = g_list_append (suites, create_tny_iterator_iface_suite ());
+	suites = g_list_append (suites, create_tny_msg_folder_iface_suite ());
+	suites = g_list_append (suites, create_tny_msg_iface_suite ());
 
 	return suites;
 }

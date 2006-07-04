@@ -3,7 +3,8 @@ INCLUDES =  -I. -I$(top_srcdir)			\
 	-I$(top_srcdir)/libtinymail		\
 	-I$(top_srcdir)/libtinymailui		\
 	-I$(top_srcdir)/libtinymailui-gtk	\
-	-I$(top_srcdir)/libtinymail-camel
+	-I$(top_srcdir)/libtinymail-camel	\
+	-I$(top_srcdir)/$(PLATFORMDIR) 
 
 lib_LTLIBRARIES = libtinymail-test-suite.la
 
@@ -21,6 +22,16 @@ libtinymail_test_suite_la_SOURCES = 		\
 	tny-test-suite.c			\
 	tny-msg-mime-part-iface-test.c		\
 	tny-msg-mime-part-iface-test.h		\
+	tny-account-iface-test.c		\
+	tny-account-iface-test.h		\
+	tny-device-iface-test.c			\
+	tny-device-iface-test.h			\
+	tny-iterator-iface-test.c		\
+	tny-iterator-iface-test.h		\
+	tny-msg-folder-iface-test.c		\
+	tny-msg-folder-iface-test.h		\
+	tny-msg-iface-test.c			\
+	tny-msg-iface-test.h			\
 	tny-test-suite.h
 
 libtinymail_test_suite_la_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS) \
@@ -34,7 +45,8 @@ libtinymail_test_suite_la_LIBADD = 						\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 	        \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la	        \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la   \
-	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
+	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la	\
+	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la
 
 tny_simple_test_runner_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS)
 

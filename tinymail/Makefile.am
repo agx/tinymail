@@ -30,3 +30,4 @@ tinymail_LDADD = 							        \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la   \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la	\
 	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la
+

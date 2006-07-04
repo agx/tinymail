@@ -80,7 +80,7 @@ camel_test (void)
 }
 
 static gchar* 
-get_pass_func (TnyAccountIface *account, const gchar *prompt)
+get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
 {
 	g_print ("asks pass\n");
 	return g_strdup ("asdasdsadsad");
