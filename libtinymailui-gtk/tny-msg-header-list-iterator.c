@@ -237,6 +237,27 @@ tny_msg_header_list_iterator_has_next (TnyIteratorIface *self)
 	return retval;
 }
 
+
+
+static gboolean 
+tny_msg_header_list_iterator_has_first (TnyIteratorIface *self)
+{
+	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
+	gboolean retval;
+
+	if (G_UNLIKELY (!me || !me->model))
+		return FALSE;
+
+	/* Return whether or not there's a next node */
+
+	g_mutex_lock (me->model->iterator_lock);
+	retval = G_UNLIKELY (me->current);
+	g_mutex_unlock (me->model->iterator_lock);
+
+	return retval;
+}
+
+
 static TnyListIface* 
 tny_msg_header_list_iterator_get_list (TnyIteratorIface *self)
 {
@@ -259,6 +280,7 @@ tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 	klass->first_func = tny_msg_header_list_iterator_first;
 	klass->nth_func = tny_msg_header_list_iterator_nth;
 	klass->current_func = tny_msg_header_list_iterator_current;
+	klass->has_first_func = tny_msg_header_list_iterator_has_first;
 	klass->has_next_func = tny_msg_header_list_iterator_has_next;
 	klass->get_list_func = tny_msg_header_list_iterator_get_list;
 

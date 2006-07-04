@@ -31,27 +31,22 @@
 #include <tny-password-dialog.h>
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
-
 #include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
-
 #include <tny-msg-view-iface.h>
-
 #include <tny-msg-window-iface.h>
 #include <tny-msg-window.h>
-
 #include <tny-msg-folder-iface.h>
 #include <tny-account-tree-model.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header-list-model.h>
-
 #include <tny-summary-window.h>
 #include <tny-summary-window-iface.h>
 #include <tny-account-store-view-iface.h>
-
+#include <tny-list.h>
 
 #define GO_ONLINE_TXT _("Go online")
 #define GO_OFFLINE_TXT _("Go offline")
@@ -73,6 +68,7 @@ struct _TnySummaryWindowPriv
 	GtkTreeSelection *mailbox_select;
 	GtkTreeIter last_mailbox_correct_select;
 	guint connchanged_signal, online_button_signal;
+	TnyListIface *current_accounts;
 };
 
 #define TNY_SUMMARY_WINDOW_GET_PRIVATE(o)	\
@@ -105,25 +101,46 @@ reload_accounts (TnySummaryWindowPriv *priv)
 {
 	TnyAccountStoreIface *account_store = priv->account_store;
 	GtkTreeModel *sortable, *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
-	const GList* accounts;
+	TnyListIface *accounts = tny_list_new ();
+	gboolean next = FALSE;
+	TnyIteratorIface *iterator;
 
 	if (G_UNLIKELY (!empty_model))
+	{
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new 
 			(1, G_TYPE_STRING));
+	}
+
 	/* Clear the header_view by giving it an empty model */
 	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
 
-	accounts = tny_account_store_iface_get_store_accounts (account_store);
-	
-	while (G_LIKELY (accounts))
+	if (priv->current_accounts)
 	{
-		TnyStoreAccountIface *account = accounts->data;
+		g_object_unref (G_OBJECT (priv->current_accounts));
+		priv->current_accounts = NULL;
+	}
+
+	/* TODO: refactor the tree-model to a TnyListIface */
+	tny_account_store_iface_get_accounts (account_store, accounts, TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+
+	iterator = tny_list_iface_create_iterator (accounts);
+	next = tny_iterator_iface_has_first (iterator);
+
+	while (next)
+	{
+		TnyStoreAccountIface *account = tny_iterator_iface_current (iterator);
 
 		tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
 			(mailbox_model), account);
 
-		accounts = g_list_next (accounts);
+		next = tny_iterator_iface_has_next (iterator);
+
+		if (next)
+			tny_iterator_iface_next (iterator);
 	}
+
+	g_object_unref (G_OBJECT (iterator));
+	priv->current_accounts = accounts;
 
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
@@ -554,6 +571,7 @@ tny_summary_window_instance_init (GTypeInstance *instance, gpointer g_class)
 	/* TODO: Persist application UI status (of the panes) */
 
 	priv->online_button = gtk_toggle_button_new ();
+	priv->current_accounts = NULL;
 
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
 		G_CALLBACK (online_button_toggled), self);

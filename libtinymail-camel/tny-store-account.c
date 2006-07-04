@@ -85,7 +85,7 @@ walk_folders_uncache_em (TnyStoreAccountIface *self, TnyListIface *folders)
   if (folders && tny_list_iface_length (folders) > 0)
   {
 	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
-	gboolean next = TRUE;
+	gboolean next = tny_iterator_iface_has_first (iterator);
 
 	while (next)
 	{
@@ -332,6 +332,7 @@ tny_store_account_notify (TnyStoreAccountPriv *priv)
 		tny_iterator_iface_nth (iterator, 0);
 		folder = tny_iterator_iface_current (iterator);
 		g_signal_emit (folder, tny_msg_folder_iface_signals [TNY_MSG_FOLDER_IFACE_FOLDERS_RELOADED], 0);
+
 		g_object_unref (G_OBJECT (iterator));
 	}
 }
@@ -542,6 +543,7 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folders = NULL;
 	apriv->connected = FALSE;
 	priv->folders_lock = g_mutex_new ();
+	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
 
 	return;
 }

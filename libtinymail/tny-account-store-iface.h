@@ -49,6 +49,13 @@ enum _TnyAlertType
 	TNY_ALERT_TYPE_ERROR
 };
 
+enum _TnyGetAccountsRequestType
+{
+	TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS,
+	TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS,
+	TNY_ACCOUNT_STORE_IFACE_BOTH
+};
+
 #ifndef TNY_ACCOUNT_STORE_IFACE_C
 extern guint *tny_account_store_iface_signals;
 #endif
@@ -58,53 +65,30 @@ struct _TnyAccountStoreIfaceClass
 	GTypeInterface parent;
 
 	/* Signals */
-	void (*account_changed)                                 (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*account_inserted)                                (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*account_removed)                                 (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*accounts_reloaded)                               (TnyAccountStoreIface *self);
+	void (*account_changed)                        (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_inserted)                       (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_removed)                        (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*accounts_reloaded)                      (TnyAccountStoreIface *self);
 
 	/* Methods */
-
-/*
-void 
-tny_account_store_iface_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType type)
-
-enum 
-{
-	ONLY_TRANSPORT_ACCOUNTS,
-	ONLY_STORE_ACCOUNTS,
-	BOTH
-} TnyGetACcountsRequestType;
-*/
-
-	const GList*  (*get_store_accounts_func)                (TnyAccountStoreIface *self);
-	void          (*add_store_account_func)                 (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
-
-	const GList*  (*get_transport_accounts_func)            (TnyAccountStoreIface *self);
-	void          (*add_transport_account_func)             (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
-
-	const gchar*  (*get_cache_dir_func)                     (TnyAccountStoreIface *self);
-
+	void          (*get_accounts_func)             (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
+	void          (*add_store_account_func)        (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
+	void          (*add_transport_account_func)    (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
+	const gchar*  (*get_cache_dir_func)            (TnyAccountStoreIface *self);
 	const TnyDeviceIface* 
-		(*get_device_func)				(TnyAccountStoreIface *self);
-
-	gboolean (*alert_func)					(TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
+		      (*get_device_func)               (TnyAccountStoreIface *self);
+	gboolean      (*alert_func)                    (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 };
 
 GType         tny_account_store_iface_get_type                  (void);
 
-const GList*  tny_account_store_iface_get_store_accounts        (TnyAccountStoreIface *self);
+
+void          tny_account_store_iface_get_accounts              (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
 void          tny_account_store_iface_add_store_account         (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
-
-
-const GList*  tny_account_store_iface_get_transport_accounts    (TnyAccountStoreIface *self);
 void          tny_account_store_iface_add_transport_account     (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
-
 const gchar*  tny_account_store_iface_get_cache_dir             (TnyAccountStoreIface *self);
-
 const TnyDeviceIface* 
 		tny_account_store_iface_get_device		(TnyAccountStoreIface *self);
-
 gboolean 	tny_account_store_iface_alert 			(TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 
 G_END_DECLS

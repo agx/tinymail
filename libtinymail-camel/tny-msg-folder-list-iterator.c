@@ -182,7 +182,25 @@ tny_msg_folder_list_iterator_has_next (TnyIteratorIface *self)
 	/* Return whether or not there's a next node */
 
 	g_mutex_lock (me->model->iterator_lock);
-	retval = (G_UNLIKELY (me->current) && me->current->next);
+	retval = (G_LIKELY (me->current) && me->current->next);
+	g_mutex_unlock (me->model->iterator_lock);
+
+	return retval;
+}
+
+static gboolean 
+tny_msg_folder_list_iterator_has_first (TnyIteratorIface *self)
+{
+	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	gboolean retval;
+
+	if (G_UNLIKELY (!me || !me->model))
+		return FALSE;
+
+	/* Return whether or not there's a next node */
+
+	g_mutex_lock (me->model->iterator_lock);
+	retval = G_LIKELY (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
 	return retval;
@@ -211,6 +229,7 @@ tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 	klass->nth_func = tny_msg_folder_list_iterator_nth;
 	klass->current_func = tny_msg_folder_list_iterator_current;
 	klass->has_next_func = tny_msg_folder_list_iterator_has_next;
+	klass->has_first_func = tny_msg_folder_list_iterator_has_first;
 	klass->get_list_func = tny_msg_folder_list_iterator_get_list;
 
 	return;

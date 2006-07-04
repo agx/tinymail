@@ -442,6 +442,12 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->device = NULL;
 }
 
+void 
+tny_session_camel_set_current_accounts (TnySessionCamel *self, TnyListIface *list)
+{
+	self->current_accounts = list;
+}
+
 static void
 connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 {
@@ -449,29 +455,37 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 	
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	if (!self->first_switch && self->prev_constat != online && self->account_store)
+	if (self->current_accounts && TNY_IS_LIST_IFACE (self->current_accounts) &&
+		!self->first_switch && self->prev_constat != online 
+		&& self->account_store)
 	{
-		GList *copy;
+		TnyListIface *accounts = self->current_accounts;
+		gboolean next = FALSE;
+		TnyIteratorIface *iterator;
 
-		copy = (GList*) tny_account_store_iface_get_store_accounts (self->account_store);;
+		iterator = tny_list_iface_create_iterator (accounts);
+		next = tny_iterator_iface_has_first (iterator);
 	
-		while (G_LIKELY (copy))
+		while (next)
 		{
-			TnyStoreAccountIface *account = copy->data;
+			TnyStoreAccountIface *account = tny_iterator_iface_current (iterator);
 
 			_tny_account_set_online_status (account, !online);
 
-			copy = g_list_next (copy);
+			next = tny_iterator_iface_has_next (iterator);
+			if (next)
+				tny_iterator_iface_next (iterator);
 		}
 
+		g_object_unref (G_OBJECT (iterator));
 	}
 
 	if (self->account_store && !self->first_switch)
 		g_signal_emit (self->account_store, 
 			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
 
-	self->first_switch = FALSE;
 
+	self->first_switch = FALSE;
 	self->prev_constat = online;
 
 	return;

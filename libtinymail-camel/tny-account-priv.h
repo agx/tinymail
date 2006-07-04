@@ -40,6 +40,7 @@ struct _TnyAccountPriv
 	GMutex *cancel_lock;
 	gboolean connected, inuse_spin;
 	gchar *name; GList *options;
+	TnyAccountType account_type;
 };
 
 const CamelService* _tny_account_get_service (TnyAccount *self);

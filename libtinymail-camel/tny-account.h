@@ -34,7 +34,7 @@ G_BEGIN_DECLS
 #define TNY_IS_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ACCOUNT))
 #define TNY_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_ACCOUNT, TnyAccountClass))
 
-/* This is an abstract type */
+/* This is an abstract type, you cannot (should not) instantiate it */
 
 typedef struct _TnyAccount TnyAccount;
 typedef struct _TnyAccountClass TnyAccountClass;
@@ -48,6 +48,7 @@ struct _TnyAccountClass
 {
 	GObjectClass parent;
 
+	/* This is an abstract method */
 	void (*reconnect_func) (TnyAccount *self);
 };
 

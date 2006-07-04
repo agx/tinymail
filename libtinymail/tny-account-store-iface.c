@@ -90,32 +90,25 @@ tny_account_store_iface_get_cache_dir (TnyAccountStoreIface *self)
 }
 
 
-/* TODO:
-
-	- Refactor to let this return a TnyListIface 
-
-	- No two methods, just add a TnyAccountType parameter?
-
-	- No caching allowed here! (no reason)
-
-*/
-
 /**
- * tny_account_store_iface_get_transport_accounts:
+ * tny_account_store_iface_get_accounts:
  * @self: a #TnyAccountTransportIface object
+ * @list: a #TnyListIface instance that will be filled with #TnyAccountIface instances
+ * @types: a #TnyGetAccountsRequestType that describes which account types are needed
  * 
- * Get a read-only list of transport accounts in the store
+ * Get a read-only list of accounts in the store
  * 
- * Return value: A read-only GList which contains TnyTransportAccountIface instances
  **/
-const GList*
-tny_account_store_iface_get_transport_accounts (TnyAccountStoreIface *self)
+void
+tny_account_store_iface_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
 {
 #ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_transport_accounts_func)
-		g_critical ("You must implement tny_account_store_iface_get_transport_accounts\n");
+	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_accounts_func)
+		g_critical ("You must implement tny_account_store_iface_get_accounts\n");
 #endif
-	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_transport_accounts_func (self);
+	TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_accounts_func (self, list, types);
+
+	return;
 }
 
 
@@ -139,33 +132,6 @@ tny_account_store_iface_add_transport_account (TnyAccountStoreIface *self, TnyTr
 	return;
 }
 
-/* TODO:
-
-	- Refactor to let this return a TnyListIface 
-
-	- No two methods, just add a TnyAccountType parameter?
-
-	- No caching allowed here! (no reason)
-
-*/
-
-/**
- * tny_account_store_iface_get_store_accounts:
- * @self: a #TnyAccountStoreIface object
- * 
- * Get a read-only list of storage accounts in the store
- * 
- * Return value: A read-only GList which contains TnyStoreAccountIface instances
- **/
-const GList*
-tny_account_store_iface_get_store_accounts (TnyAccountStoreIface *self)
-{
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_store_accounts_func)
-		g_critical ("You must implement tny_account_store_iface_get_store_accounts\n");
-#endif
-	return TNY_ACCOUNT_STORE_IFACE_GET_CLASS (self)->get_store_accounts_func (self);
-}
 
 /**
  * tny_account_store_iface_add_store_account:

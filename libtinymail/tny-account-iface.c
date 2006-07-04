@@ -21,6 +21,45 @@
 
 #include <tny-account-iface.h>
 
+/**
+ * tny_account_iface_set_account_type:
+ * @self: a #TnyAccountIface object
+ * @type: a #TnyAccountType
+ *
+ * Set the account type
+ *
+ **/
+void
+tny_account_iface_set_account_type (TnyAccountIface *self, TnyAccountType type)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_type_func)
+		g_critical ("You must implement tny_account_iface_set_account_type\n");
+#endif
+
+	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_type_func (self, type);
+}
+
+
+/**
+ * tny_account_iface_get_account_type:
+ * @self: a #TnyAccountIface object
+ *
+ * Get the account type
+ *
+ * Return value: The account type
+ **/
+TnyAccountType
+tny_account_iface_get_account_type (TnyAccountIface *self)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_account_type_func)
+		g_critical ("You must implement tny_account_iface_get_account_type\n");
+#endif
+
+	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_account_type_func (self);
+}
+
 
 /**
  * tny_account_iface_is_connected:
@@ -28,7 +67,6 @@
  *
  * Return value: whether or not the account is connected
  **/
-
 gboolean 
 tny_account_iface_is_connected (TnyAccountIface *self)
 {

@@ -35,6 +35,12 @@ G_BEGIN_DECLS
 #define TNY_IS_ACCOUNT_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ACCOUNT_IFACE))
 #define TNY_ACCOUNT_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_ACCOUNT_IFACE, TnyAccountIfaceClass))
 
+enum _TnyAccountType
+{
+	TNY_ACCOUNT_TYPE_STORE,
+	TNY_ACCOUNT_TYPE_TRANSPORT
+};
+
 struct _TnyAccountIfaceClass
 {
 	GTypeInterface parent;
@@ -46,6 +52,7 @@ struct _TnyAccountIfaceClass
         void (*set_user_func)              (TnyAccountIface *self, const gchar *user);
         void (*set_hostname_func)          (TnyAccountIface *self, const gchar *host);
         void (*set_url_string_func)        (TnyAccountIface *self, const gchar *url_string);
+	void (*set_account_type_func)      (TnyAccountIface *self, TnyAccountType type);
 
         void (*set_pass_func_func)         (TnyAccountIface *self, TnyGetPassFunc get_pass_func);
         void (*set_forget_pass_func_func)  (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func);
@@ -58,6 +65,7 @@ struct _TnyAccountIfaceClass
         const gchar*    (*get_user_func)             (TnyAccountIface *self);
         const gchar*    (*get_hostname_func)         (TnyAccountIface *self);
         const gchar*    (*get_url_string_func)       (TnyAccountIface *self);
+	TnyAccountType  (*get_account_type_func)     (TnyAccountIface *self);
 
 	void                         (*set_account_store_func)     (TnyAccountIface *self, const TnyAccountStoreIface *store);
 	const TnyAccountStoreIface*  (*get_account_store_func)     (TnyAccountIface *self);
@@ -76,6 +84,9 @@ void         tny_account_iface_set_user        (TnyAccountIface *self, const gch
 void         tny_account_iface_set_hostname    (TnyAccountIface *self, const gchar *host);
 void         tny_account_iface_set_pass_func   (TnyAccountIface *self, TnyGetPassFunc get_pass_func);
 void         tny_account_iface_set_url_string  (TnyAccountIface *self, const gchar *url_string);
+
+void           tny_account_iface_set_account_type  (TnyAccountIface *self, TnyAccountType type);
+TnyAccountType tny_account_iface_get_account_type  (TnyAccountIface *self);
 
 const gchar* tny_account_iface_get_id          (TnyAccountIface *self);
 

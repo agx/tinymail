@@ -58,6 +58,9 @@ typedef enum _TnyAlertType TnyAlertType;
 typedef enum _TnyMsgFolderType TnyMsgFolderType;
 typedef struct _TnyList TnyList;
 typedef struct _TnyListClass TnyListClass;
+typedef enum _TnyAccountType TnyAccountType;
+typedef enum _TnyGetAccountsRequestType TnyGetAccountsRequestType;
+
 
 #ifndef G_LIKELY
 #define G_LIKELY(expr) (expr)

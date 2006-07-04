@@ -138,12 +138,12 @@ tny_transport_account_new (void)
 static void
 tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	
 	TnyTransportAccount *self = (TnyTransportAccount *)instance;
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 	
 	apriv->connected = FALSE;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
+	apriv->account_type = TNY_ACCOUNT_TYPE_TRANSPORT;
 
 	return;
 }

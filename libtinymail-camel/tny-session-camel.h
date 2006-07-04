@@ -40,6 +40,7 @@ struct _TnySessionCamel
 	gpointer account_store;
         gboolean interactive, prev_constat, first_switch;
 	guint connchanged_signal;
+	TnyListIface *current_accounts;
 };
 
 struct _TnySessionCamelClass
@@ -59,6 +60,7 @@ void              tny_session_camel_set_forget_pass_func (TnySessionCamel *self,
 
 void              tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface *account_store);
 void              tny_session_camel_set_device (TnySessionCamel *self, TnyDeviceIface *device);
+void              tny_session_camel_set_current_accounts (TnySessionCamel *self, TnyListIface *list);
 
 G_END_DECLS
 

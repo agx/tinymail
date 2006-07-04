@@ -30,15 +30,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-/*
-static void 
-folders_reloaded (gpointer user_data)
-{
-	TnyAccountTreeModel *self = user_data;
-
-	return;
-}
-*/
 
 static void
 fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkTreeIter *parent_iter, TnyStoreAccountIface *account)
@@ -48,13 +39,15 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkT
   {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
-	gboolean next = TRUE;
+	gboolean next = tny_iterator_iface_has_first (iterator);
 
 	while (next)
 	{
 		GtkTreeIter iter;
 		TnyMsgFolderIface *folder = tny_iterator_iface_current (iterator);
-		TnyListIface *more_folders = (TnyListIface*)tny_msg_folder_iface_get_folders (folder);
+		TnyListIface *more_folders;
+
+		more_folders = (TnyListIface*)tny_msg_folder_iface_get_folders (folder);
 
 		gtk_tree_store_append (model, &iter, parent_iter);
 

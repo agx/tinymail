@@ -124,6 +124,27 @@ tny_iterator_iface_current (TnyIteratorIface *self)
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->current_func (self);
 }
 
+
+/**
+ * tny_iterator_iface_has_first:
+ * @self: A #TnyIteratorIface instance
+ *
+ * Does not move the iterator
+ *
+ * Return value: Whether or not there's a first node
+ *
+ **/
+gboolean
+tny_iterator_iface_has_first (TnyIteratorIface *self)
+{
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->has_first_func)
+		g_critical ("You must implement tny_iterator_iface_has_first\n");
+#endif
+
+	return TNY_ITERATOR_IFACE_GET_CLASS (self)->has_first_func (self);
+}
+
 /**
  * tny_iterator_iface_has_next:
  * @self: A #TnyIteratorIface instance
