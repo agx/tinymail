@@ -78,10 +78,11 @@ tny_list_remove (TnyListIface *self, gpointer item)
 
 	g_mutex_lock (priv->iterator_lock);
 
+	priv->first = g_list_remove (priv->first, item);
+
 	if (G_IS_OBJECT (item))
 		g_object_unref (G_OBJECT (item));
 
-	priv->first = g_list_remove (priv->first, item);
 	g_mutex_unlock (priv->iterator_lock);
 
 	return;
