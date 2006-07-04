@@ -1,6 +1,8 @@
 #ifndef TNY_MSG_IFACE_H
 #define TNY_MSG_IFACE_H
 
+/* Urgent TODO: add a unit test for this type */
+
 /* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
