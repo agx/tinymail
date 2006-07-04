@@ -90,6 +90,16 @@ tny_account_store_iface_get_cache_dir (TnyAccountStoreIface *self)
 }
 
 
+/* TODO:
+
+	- Refactor to let this return a TnyListIface 
+
+	- No two methods, just add a TnyAccountType parameter?
+
+	- No caching allowed here! (no reason)
+
+*/
+
 /**
  * tny_account_store_iface_get_transport_accounts:
  * @self: a #TnyAccountTransportIface object
@@ -129,6 +139,15 @@ tny_account_store_iface_add_transport_account (TnyAccountStoreIface *self, TnyTr
 	return;
 }
 
+/* TODO:
+
+	- Refactor to let this return a TnyListIface 
+
+	- No two methods, just add a TnyAccountType parameter?
+
+	- No caching allowed here! (no reason)
+
+*/
 
 /**
  * tny_account_store_iface_get_store_accounts:

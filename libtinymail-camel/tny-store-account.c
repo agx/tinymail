@@ -17,6 +17,18 @@
  * Boston, MA 02111-1307, USA.
  */
 
+
+/* TODO:
+
+	- Refactor to a TnyIMAPStoreAccount, TnyPOPStoreAccount and
+	  TnyNNTPStoreAccount. Maybe also add a TnyExchangeStoreAccount? This
+	  file can stay as an abstract TnyStoreAccount type.
+
+	- Don't cache the folders (no reason, and it makes getting different
+	  types of folder lists difficult -- for example subscribed and 
+	  ubsubscribed folder lists)
+*/
+
 #include <config.h>
 #include <glib/gi18n-lib.h>
 #include <glib.h>

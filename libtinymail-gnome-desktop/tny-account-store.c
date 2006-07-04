@@ -583,6 +583,16 @@ tny_account_store_get_all_accounts (TnyAccountStoreIface *self)
 	return;
 }
 
+/* TODO:
+
+	- Refactor to let this return a TnyListIface 
+
+	- No two methods, just add a TnyAccountType parameter?
+
+	- No caching allowed here! (no reason)
+
+*/
+
 static const GList*
 tny_account_store_get_store_accounts (TnyAccountStoreIface *self)
 {
@@ -599,6 +609,15 @@ tny_account_store_get_store_accounts (TnyAccountStoreIface *self)
 	return retval;
 }
 
+/* TODO:
+
+	- Refactor to let this return a TnyListIface 
+
+	- No two methods, just add a TnyAccountType parameter?
+
+	- No caching allowed here! (no reason)
+
+*/
 
 static const GList*
 tny_account_store_get_transport_accounts (TnyAccountStoreIface *self)
@@ -683,6 +702,17 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 
 	return;
 }
+
+
+/* TODO:
+
+	- Refactor to let this return a TnyListIface 
+
+	- No two methods, just add a TnyAccountType parameter?
+
+	- No caching allowed here! (no reason)
+
+*/
 
 static void
 tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
