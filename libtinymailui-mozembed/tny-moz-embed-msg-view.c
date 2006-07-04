@@ -29,6 +29,9 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
+#include <tny-list-iface.h>
+#include <tny-iterator-iface.h>
+
 #include <tny-moz-embed-msg-view.h>
 #include <tny-moz-embed-stream.h>
 #include <tny-attach-list-model.h>
@@ -85,11 +88,12 @@ reload_msg (TnyMsgViewIface *self)
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextIter hiter;
 	TnyMsgHeaderIface *header;
-	GList *parts;
+	TnyListIface *parts;
+	TnyIteratorIface *iterator;
 	const gchar *str = NULL;
 	gboolean first_attach = TRUE;
 	TnyAttachListModel *model;
-	gboolean have_html = FALSE;
+	gboolean have_html = FALSE, next = FALSE;
 	GtkTextBuffer *buffer;
 
 	g_return_if_fail (priv->msg);
@@ -98,7 +102,10 @@ reload_msg (TnyMsgViewIface *self)
 
 	g_return_if_fail (header);
 
-	parts =  (GList*)tny_msg_iface_get_parts (priv->msg);
+	parts = (TnyListIface*)tny_msg_iface_get_parts (priv->msg);
+	iterator = tny_list_iface_create_iterator (parts);
+	next = tny_iterator_iface_has_first (iterator);
+
 	buffer = gtk_text_view_get_buffer (priv->textview);
 
 	gtk_widget_hide (priv->attachview_sw);
@@ -108,17 +115,9 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_text_buffer_set_text (buffer, "", 0);
 
-	while (G_LIKELY (parts))
+	while (next)
 	{
-		TnyMsgMimePartIface *part = parts->data;
-
-		if (!part)
-		{
-			/* This shouldn't happen! ;-) */
-			g_warning (_("Mimepart problem\n"));
-			parts = g_list_next (parts);
-			continue;
-		}
+		TnyMsgMimePartIface *part = tny_iterator_iface_current (iterator);
 
 		if (!have_html && G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/plain")))
 		{
@@ -163,8 +162,14 @@ reload_msg (TnyMsgViewIface *self)
 			first_attach = FALSE;
 		}
 
-		parts = g_list_next (parts);
+		
+		next = tny_iterator_iface_has_next (iterator);
+
+		if (next)
+			tny_iterator_iface_next (iterator);
 	}
+
+	g_object_unref (G_OBJECT (iterator));
 
 	if (G_LIKELY (!first_attach))
 	{

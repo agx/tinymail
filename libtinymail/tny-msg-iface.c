@@ -48,9 +48,9 @@ tny_msg_iface_get_folder (TnyMsgIface *self)
  * 
  * Get a read-only list of mime-parts of this message
  *
- * Return value: A read-only GList with #TnyMsgMimePartIface instances
+ * Return value: A read-only #TnyListIface with #TnyMsgMimePartIface instances
  **/
-const GList*
+const TnyListIface*
 tny_msg_iface_get_parts (TnyMsgIface *self)
 {
 #ifdef DEBUG

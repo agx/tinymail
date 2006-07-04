@@ -31,7 +31,7 @@ struct _TnyMsgPriv
 	GMutex *header_lock;
 	TnyMsgHeaderIface *header;
 	GMutex *parts_lock;
-	GList *parts;
+	TnyListIface *parts;
 	GMutex *folder_lock;
 	TnyMsgFolderIface *folder;
 	gboolean pop;

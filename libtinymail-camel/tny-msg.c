@@ -23,6 +23,10 @@
 
 #include <time.h>
 
+#include <tny-list.h>
+#include <tny-list-iface.h>
+#include <tny-iterator-iface.h>
+
 #include <tny-msg.h>
 #include <tny-msg-mime-part-iface.h>
 #include <tny-stream-iface.h>
@@ -103,7 +107,11 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 			(tny_msg_mime_part_new (part));
 
 	g_mutex_lock (priv->parts_lock);
-	priv->parts = g_list_prepend (priv->parts, tpart);
+
+	if (!priv->parts)
+		priv->parts = tny_list_new ();
+
+	tny_list_iface_prepend (priv->parts, tpart);
 	g_mutex_unlock (priv->parts_lock);
 
 	return TRUE;
@@ -123,13 +131,7 @@ unload_parts (TnyMsgPriv *priv)
 	g_mutex_lock (priv->parts_lock);
 
 	if (G_LIKELY (priv->parts))
-	{
-		g_list_foreach (priv->parts, 
-			destroy_part, NULL);
-
-		g_list_free (priv->parts);
-	}
-
+		g_object_unref (G_OBJECT (priv->parts));
 	priv->parts = NULL;
 
 	g_mutex_unlock (priv->parts_lock);
@@ -198,11 +200,11 @@ _tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
 	return;
 }
 
-static const GList*
+static const TnyListIface*
 tny_msg_get_parts (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	const GList *retval;
+	const TnyListIface *retval;
 
 	g_mutex_lock (priv->parts_lock);
 	retval = priv->parts;
@@ -255,7 +257,7 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 		camel_multipart_set_boundary ((CamelMultipart*)containee, NULL);
 		camel_medium_set_content_object (medium, containee);
 	} else {
-		curl = g_list_length (priv->parts); curl++;
+		curl = priv->parts ? tny_list_iface_length (priv->parts) : 0; curl++;
 	}
 
 	/* TODO: coupling mistake. This makes it obligated to use a specific
@@ -265,8 +267,11 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 
 	camel_multipart_add_part_at ((CamelMultipart*)containee, 
 		tny_msg_mime_part_get_part (TNY_MSG_MIME_PART (part)), curl);
-	
-	priv->parts = g_list_prepend (priv->parts, part); curl++;
+
+	if (!priv->parts)
+		priv->parts = tny_list_new ();
+
+	tny_list_iface_prepend (priv->parts, part); curl++;
 
 	g_mutex_unlock (priv->parts_lock);
 
@@ -284,23 +289,24 @@ tny_msg_del_part (TnyMsgIface *self, gint id)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 	TnyMsgMimePartPriv *ppriv = TNY_MSG_MIME_PART_GET_PRIVATE (self);
-	GList *remove;
+	gpointer remove;
+	TnyIteratorIface *iterator;
 	CamelDataWrapper *containee;
 
 	g_mutex_lock (priv->message_lock);
 
 	containee = camel_medium_get_content_object (CAMEL_MEDIUM (ppriv->part));
-	remove = g_list_nth (priv->parts, id);
-	priv->parts = g_list_remove_link (priv->parts, remove);
+	if (priv->parts)
+	{
+		iterator = tny_list_iface_create_iterator (priv->parts);
+		remove = tny_iterator_iface_nth (iterator, id);
+		g_object_unref (G_OBJECT (iterator));
+		tny_list_iface_remove (priv->parts, remove);
+	}
 	camel_multipart_remove_part_at (CAMEL_MULTIPART (containee), id);
 
 	if (G_LIKELY (remove))
-	{
-		if (G_LIKELY (remove->data))
-			camel_object_unref (CAMEL_OBJECT (remove->data));
-
-		g_list_free (remove);
-	}
+		camel_object_unref (CAMEL_OBJECT (remove));
 
 	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (priv->message_lock);
@@ -405,47 +411,6 @@ tny_msg_new_with_header (TnyMsgHeaderIface *header)
 	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
 
 	tny_msg_set_header (TNY_MSG_IFACE (self), header);
-
-	return self;
-}
-
-static void
-tny_msg_set_parts (TnyMsg *self, const GList *parts)
-{
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	GList *list = (GList*)parts;
-	gint nth=0;
-
-	while (G_LIKELY (list))
-	{
-		if (TNY_IS_MSG_MIME_PART_IFACE (list->data))
-			tny_msg_add_part (TNY_MSG_IFACE (self), list->data);
-		else
-			g_warning (_("Item number %d isn't a TnyMsgMimePartIface\n"), nth);
-
-		list = g_list_next (list); nth++;
-	}
-
-	return;
-}
-
-/**
- * tny_msg_new_with_header_and_parts:
- * @header: a #TnyMsgHeaderIface object
- * @parts: A double linked list with #TnyMsgMimePartIface objects
- *
- * The #TnyMsg implementation is actually a proxy for #CamelMimeMessage (and
- * a few other Camel types)
- *
- * Return value: A new #TnyMsgIface instance implemented for Camel
- **/
-TnyMsg*
-tny_msg_new_with_header_and_parts (TnyMsgHeaderIface *header, const GList *parts)
-{
-	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
-
-	tny_msg_set_header (TNY_MSG_IFACE (self), header);
-	tny_msg_set_parts (self, parts);
 
 	return self;
 }

@@ -237,7 +237,7 @@ tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 	klass->first_func = tny_list_iterator_first;
 	klass->nth_func = tny_list_iterator_nth;
 	klass->current_func = tny_list_iterator_current;
-	klass->has_first_func = tny_list_iterator_has_next;
+	klass->has_first_func = tny_list_iterator_has_first;
 	klass->has_next_func = tny_list_iterator_has_next;
 	klass->get_list_func = tny_list_iterator_get_list;
 

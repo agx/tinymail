@@ -55,7 +55,6 @@ GType     tny_msg_get_type (void);
 
 TnyMsg*   tny_msg_new                       (void);
 TnyMsg*   tny_msg_new_with_header           (TnyMsgHeaderIface *header);
-TnyMsg*   tny_msg_new_with_header_and_parts (TnyMsgHeaderIface *header, const GList *parts);
 
 G_END_DECLS
 

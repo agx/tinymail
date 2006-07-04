@@ -30,6 +30,10 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
+
+#include <tny-list-iface.h>
+#include <tny-iterator-iface.h>
+
 #include <tny-msg-view.h>
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
@@ -71,9 +75,10 @@ reload_msg (TnyMsgViewIface *self)
 	GtkTextBuffer *buffer;
 	TnyStreamIface *dest;
 	TnyMsgHeaderIface *header;
-	GList *parts;
+	TnyListIface *parts;
+	TnyIteratorIface *iterator;
 	const gchar *str = NULL;
-	gboolean first_attach = TRUE;
+	gboolean first_attach = TRUE, next = FALSE;
 	TnyAttachListModel *model;
 
 	g_return_if_fail (priv->msg);
@@ -84,7 +89,9 @@ reload_msg (TnyMsgViewIface *self)
 
 	g_return_if_fail (header);
 
-	parts = (GList*)tny_msg_iface_get_parts (priv->msg);
+	parts = (TnyListIface*)tny_msg_iface_get_parts (priv->msg);
+	iterator = tny_list_iface_create_iterator (parts);
+	next = tny_iterator_iface_has_first (iterator);
 
 	gtk_widget_hide (priv->attachview_sw);
 
@@ -93,9 +100,9 @@ reload_msg (TnyMsgViewIface *self)
 	tny_msg_header_view_iface_set_header (priv->headerview, header);
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
-	while (G_LIKELY (parts))
+	while (next)
 	{
-		TnyMsgMimePartIface *part = parts->data;
+		TnyMsgMimePartIface *part = tny_iterator_iface_current (iterator);
 
 		if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/*")))
 		{
@@ -112,8 +119,15 @@ reload_msg (TnyMsgViewIface *self)
 			first_attach = FALSE;
 		}
 
-		parts = g_list_next (parts);
+		next = tny_iterator_iface_has_next (iterator);
+
+		if (next)
+			tny_iterator_iface_next (iterator);
+
 	}
+
+	g_object_unref (G_OBJECT (iterator));
+
 
 	if (G_LIKELY (!first_attach))
 	{
