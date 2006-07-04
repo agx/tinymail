@@ -1,4 +1,6 @@
 Makefile.in
-.svnignore
 .deps
 Makefile
+tny-simple-test-runner
+tny-test-anything
+.libs

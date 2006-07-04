@@ -140,7 +140,7 @@ tny_list_iface_init (TnyListIfaceClass *klass)
 static void
 destroy_item (gpointer item, gpointer user_data)
 {
-	if (G_IS_OBJECT (item))
+	if (item && G_IS_OBJECT (item))
 		g_object_unref (G_OBJECT (item));
 }
 

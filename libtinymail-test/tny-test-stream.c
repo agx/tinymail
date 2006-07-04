@@ -55,8 +55,10 @@ tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
 
 		if (nb_read < 0)
+		{
 			return -1;
-		else if (nb_read > 0) {
+		} else if (nb_read > 0) 
+		{
 			nb_written = 0;
 	
 			while (nb_written < nb_read) {

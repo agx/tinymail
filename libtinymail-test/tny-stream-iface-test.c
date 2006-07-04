@@ -29,6 +29,7 @@
 #include <camel/camel-folder-summary.h>
 
 static TnyStreamIface *iface = NULL, *source = NULL;
+static gchar *str;
 
 static void
 tny_stream_iface_test_setup (void)
@@ -79,11 +80,14 @@ tny_stream_iface_test_stream (void)
 	tny_stream_iface_reset (iface);
 	tny_stream_iface_read (iface, buffer, strlen (ret));
 
+	buffer[strlen(ret)] = '\0';
 	/* Check whether the stream in the beginning now contains 21 times
 	   the answer to all questions */
 
-	gunit_fail_unless(!strcmp (buffer, ret), 
-		"At least one of the 42 first bytes changed!\n");
+
+	str = g_strdup_printf ("At least one of the 42 first bytes changed!: (%s) vs. (%s)\n", buffer, ret);
+	gunit_fail_unless(!strncmp (buffer, ret, strlen (buffer)), str);
+	g_free (str);
 
 	/* Check whether the stream contains nothing but the answer to all
 	   questions. */
@@ -94,14 +98,18 @@ tny_stream_iface_test_stream (void)
 	while (!tny_stream_iface_eos (iface))
 	{
 		gchar buf[2];
-		tny_stream_iface_read (iface, buf, sizeof (buf));
+		tny_stream_iface_read (iface, buf, 2);
 
-		gunit_fail_unless(!strcmp (buffer, "42"), "Bytes changed!\n");
+		str = g_strdup_printf ("These two bytes should have been '4' and '2': %s\n", buffer);
+		gunit_fail_unless(!strncmp (buffer, "42", 2), str);
+		g_free (str);
+
 		n++;
 	}
 
-	gunit_fail_unless(n != 21, 
-		"Size in bytes isn't correct or reset didn't succeed!\n");
+	str = g_strdup_printf ("Size in bytes (%d) isn't correct or reset didn't succeed!\n", n);
+	gunit_fail_unless (n == 21, str);
+	g_free (str);
 
 	g_free (buffer);
 }

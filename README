@@ -4,6 +4,12 @@ About
 Project tinymail is an attempt to create an E-mail client framework for small
 devices.
 
+Development tips
+================
+You can find the GUnit framework at http://kooditakomo.cs.tut.fi/projects/gunit
+You'll need it if you build with --enable-unit-tests which will compile the
+unit tests. Check the sources of the unit tests for more information.
+
 Building tips
 =============
 
@@ -111,6 +117,13 @@ Building
   Both Ubuntu Breezy & Dapper support the default ./autogen.sh && make && make 
   install. Provided you installed the above packages.
 
+Dependencies
+
+  If you want the unit tests, check above at the Development tips section. You
+  can find a URL to GUnit. There's often also Debian packages that will work
+  with Ubuntu Dapper & Breezy (and maybe/probably also with newer versions of
+  both the Debian and Ubuntu distributions).
+
 Fedora Core 4 & 5
 -----------------
 
@@ -125,8 +138,14 @@ Packages
   automake-1.7
 
 Building
---------
+  
   Use --with-html-component=none to disable building any HTML component. Because
   Fedora Core 4 uses a quite old gnome-keyring API, it's recommended to also use
   --enable-gnome=no when building on Fedora Core 4. 
+
+Dependencies
+
+  If you want the unit tests, check above at the Development tips section. You
+  can find a URL to GUnit sources.
+
 

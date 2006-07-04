@@ -68,7 +68,7 @@ tny_msg_header_iface_test_set_to (void)
 	gchar *str_in = g_strdup ("Myself <this@is.me>, You Do Die Daa <you.doe.die@daa.com>; patrick@test.com");
 	const gchar *str_out;
 	int i=0;
-	g_warning ("to check\n");
+	
 	tny_msg_header_iface_set_to (iface, (const gchar*)str_in);
 	str_out = tny_msg_header_iface_get_to (iface);
 
