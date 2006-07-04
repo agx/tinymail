@@ -100,10 +100,10 @@ struct _TnyMsgFolderIfaceClass
 	guint           (*get_unread_count_func)  (TnyMsgFolderIface *self);
 
 	void           (*uncache_func)     (TnyMsgFolderIface *self);
-	const gboolean (*has_cache_func)   (TnyMsgFolderIface *self);
+	gboolean       (*has_cache_func)   (TnyMsgFolderIface *self);
 
-	void           (*set_subscribed_func)    (TnyMsgFolderIface *self, const gboolean subscribed);
-	const gboolean (*get_subscribed_func)    (TnyMsgFolderIface *self);
+	void           (*set_subscribed_func)    (TnyMsgFolderIface *self, gboolean subscribed);
+	gboolean       (*get_subscribed_func)    (TnyMsgFolderIface *self);
 
 	void           (*refresh_async_func) (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 	void           (*refresh_func) (TnyMsgFolderIface *self);
@@ -132,16 +132,15 @@ void           tny_msg_folder_iface_set_name     (TnyMsgFolderIface *self, const
 
 TnyMsgFolderType tny_msg_folder_iface_get_folder_type  (TnyMsgFolderIface *self);
 
-guint          tny_msg_folder_iface_get_all_count     (TnyMsgFolderIface *self);
-guint          tny_msg_folder_iface_get_unread_count  (TnyMsgFolderIface *self);
-void           tny_msg_folder_iface_uncache       (TnyMsgFolderIface *self);
-const gboolean tny_msg_folder_iface_has_cache     (TnyMsgFolderIface *self);
+guint          tny_msg_folder_iface_get_all_count      (TnyMsgFolderIface *self);
+guint          tny_msg_folder_iface_get_unread_count   (TnyMsgFolderIface *self);
+void           tny_msg_folder_iface_uncache            (TnyMsgFolderIface *self);
 
-void           tny_msg_folder_iface_set_subscribed    (TnyMsgFolderIface *self, const gboolean subscribed);
-const gboolean tny_msg_folder_iface_get_subscribed    (TnyMsgFolderIface *self);
+void           tny_msg_folder_iface_set_subscribed     (TnyMsgFolderIface *self, gboolean subscribed);
+gboolean       tny_msg_folder_iface_get_subscribed     (TnyMsgFolderIface *self);
 
-void           tny_msg_folder_iface_refresh_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
-void           tny_msg_folder_iface_refresh (TnyMsgFolderIface *self);
+void           tny_msg_folder_iface_refresh_async      (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
+void           tny_msg_folder_iface_refresh            (TnyMsgFolderIface *self);
 
 G_END_DECLS
 

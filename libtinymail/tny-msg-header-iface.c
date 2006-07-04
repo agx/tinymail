@@ -213,7 +213,7 @@ tny_msg_header_iface_get_bcc (TnyMsgHeaderIface *self)
  * 
  * Return value: date received header
  **/
-const time_t
+time_t
 tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
 {
 #ifdef DEBUG
@@ -232,7 +232,7 @@ tny_msg_header_iface_get_date_received (TnyMsgHeaderIface *self)
  * 
  * Return value: date sent header
  **/
-const time_t
+time_t
 tny_msg_header_iface_get_date_sent (TnyMsgHeaderIface *self)
 {
 #ifdef DEBUG
@@ -478,7 +478,7 @@ tny_msg_header_iface_uncache (TnyMsgHeaderIface *self)
  * 
  * Return value: Whether or not this instance has a cache
  **/
-const gboolean
+gboolean
 tny_msg_header_iface_has_cache (TnyMsgHeaderIface *self)
 {
 	if (TNY_MSG_HEADER_IFACE_GET_CLASS (self)->has_cache_func != NULL)

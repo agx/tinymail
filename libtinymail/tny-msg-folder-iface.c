@@ -116,7 +116,7 @@ tny_msg_folder_iface_refresh (TnyMsgFolderIface *self)
  * 
  **/
 void
-tny_msg_folder_iface_set_subscribed (TnyMsgFolderIface *self, const gboolean subscribed)
+tny_msg_folder_iface_set_subscribed (TnyMsgFolderIface *self, gboolean subscribed)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_subscribed_func)
@@ -135,7 +135,7 @@ tny_msg_folder_iface_set_subscribed (TnyMsgFolderIface *self, const gboolean sub
  * 
  * Return value: subscribe status
  **/
-const gboolean
+gboolean
 tny_msg_folder_iface_get_subscribed (TnyMsgFolderIface *self)
 {
 #ifdef DEBUG
@@ -399,7 +399,7 @@ tny_msg_folder_iface_uncache (TnyMsgFolderIface *self)
  * 
  * Return value: Whether or not this instance has a cache
  **/
-const gboolean
+gboolean
 tny_msg_folder_iface_has_cache (TnyMsgFolderIface *self)
 {
 	if (TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->has_cache_func != NULL)

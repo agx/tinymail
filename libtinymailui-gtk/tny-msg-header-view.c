@@ -44,7 +44,7 @@ struct _TnyMsgHeaderViewPriv
 
 /* TODO: refactor */
 static gchar *
-_get_readable_date (const time_t file_time_raw)
+_get_readable_date (time_t file_time_raw)
 {
 	struct tm *file_time;
 	gchar readable_date[64];

@@ -187,7 +187,7 @@ _tny_account_stop_camel_operation (TnyAccountIface *self)
 	return;
 }
 
-const gboolean 
+gboolean 
 tny_account_is_connected (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);

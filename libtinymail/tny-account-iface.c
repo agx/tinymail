@@ -29,7 +29,7 @@
  * Return value: whether or not the account is connected
  **/
 
-const gboolean 
+gboolean 
 tny_account_iface_is_connected (TnyAccountIface *self)
 {
 #ifdef DEBUG

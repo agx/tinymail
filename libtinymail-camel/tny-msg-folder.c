@@ -218,7 +218,7 @@ tny_msg_folder_get_folders (TnyMsgFolderIface *self)
 }
 
 
-static const gboolean
+static gboolean
 tny_msg_folder_get_subscribed (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
@@ -228,7 +228,7 @@ tny_msg_folder_get_subscribed (TnyMsgFolderIface *self)
 	retval = priv->subscribed;
 	g_mutex_unlock (priv->folder_lock);
 
-	return (const gboolean)retval;
+	return retval;
 }
 
 void /* Only internally used */
@@ -244,7 +244,7 @@ _tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribe
 }
 
 static void
-tny_msg_folder_set_subscribed (TnyMsgFolderIface *self, const gboolean subscribed)
+tny_msg_folder_set_subscribed (TnyMsgFolderIface *self, gboolean subscribed)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
@@ -906,7 +906,7 @@ tny_msg_folder_uncache (TnyMsgFolderIface *self)
 	return;
 }
 
-static const gboolean
+static gboolean
 tny_msg_folder_has_cache (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);

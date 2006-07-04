@@ -473,7 +473,7 @@ tny_msg_header_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 	g_mutex_unlock (me->hdr_lock);
 }
 
-static const time_t
+static time_t
 tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
@@ -491,10 +491,10 @@ tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
 
 	g_mutex_unlock (me->hdr_lock);
 
-	return (const time_t)retval;
+	return retval;
 }
 
-static const time_t
+static time_t
 tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
@@ -513,7 +513,7 @@ tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 
 	g_mutex_unlock (me->hdr_lock);
 
-	return (const time_t)retval;
+	return retval;
 }
 	
 static const gchar*
@@ -680,7 +680,7 @@ tny_msg_header_set_uid (TnyMsgHeaderIface *self, const gchar *uid)
 }
 
 
-static const gboolean 
+static gboolean 
 tny_msg_header_has_cache (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
@@ -696,7 +696,7 @@ tny_msg_header_has_cache (TnyMsgHeaderIface *self)
 
 	g_mutex_unlock (me->hdr_lock);
 
-	return (const gboolean)retval;
+	return retval;
 }
 
 static void

@@ -243,7 +243,7 @@ G_INLINE_FUNC
 #endif
 #endif
 gchar *
-_get_readable_date (const time_t file_time_raw)
+_get_readable_date (time_t file_time_raw)
 {
 	struct tm *file_time;
 	static gchar readable_date[64];
