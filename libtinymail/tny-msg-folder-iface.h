@@ -63,11 +63,7 @@ enum _TnyMsgFolderType
 };
 	
 
-	/* TODO: 
-	- Removing messages
-	- Purging this folder
-	- Removing folders
-	- Moving messages */
+/* TODO: Removing folders, Moving messages */
 
 struct _TnyMsgFolderIfaceClass
 {

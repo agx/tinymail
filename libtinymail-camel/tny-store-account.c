@@ -336,6 +336,9 @@ tny_store_account_notify (TnyStoreAccountPriv *priv)
 	}
 }
 
+
+/* TODO: this is a mess. Cleanup (refactor into multiple account types) */
+
 static const TnyListIface*
 tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {

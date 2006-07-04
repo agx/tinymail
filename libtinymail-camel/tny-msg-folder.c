@@ -599,9 +599,6 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 	g_ptr_array_foreach (uids, add_message_with_uid, ptr);
 	g_free (ptr);
 
-
-	/* TODO: free uids! */
-
 	/* Speedup trick, also check tny-msg-header.c */
 	priv->cached_uids = uids;
 

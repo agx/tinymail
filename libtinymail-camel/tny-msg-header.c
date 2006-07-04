@@ -243,7 +243,7 @@ tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
 
 	g_mutex_lock (me->hdr_lock);
 	load_msg_header (me);
-	/* TODO */
+	/* TODO get_replyto */
 	g_mutex_unlock (me->hdr_lock);
 
 	return retval;
@@ -369,7 +369,7 @@ tny_msg_header_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
 
 	g_mutex_lock (me->hdr_lock);
 	prepare_for_write (me);
-	/* TODO */
+	/* TODO set replyto */
 	g_mutex_unlock (me->hdr_lock);
 
 	return;
@@ -411,7 +411,7 @@ tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
 
 	load_msg_header (me);
 
-	if (G_LIKELY (me->use_summary)) /* TODO */
+	if (G_LIKELY (me->use_summary)) /* TODO get_bcc */
 		retval = me->invalid;
 	else if (G_LIKELY (me->mime_message))
 		retval = camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "bcc");
@@ -508,7 +508,7 @@ tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
 		retval = camel_message_info_date_sent (me->message_info);
 	else {
-		/* TODO: write case */
+		/* TODO: write case get_date_sent */
 	}
 
 	g_mutex_unlock (me->hdr_lock);
