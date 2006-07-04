@@ -10,6 +10,11 @@ You can find the GUnit framework at http://kooditakomo.cs.tut.fi/projects/gunit
 You'll need it if you build with --enable-unit-tests which will compile the
 unit tests. Check the sources of the unit tests for more information.
 
+Usage
+
+  export LD_LIBRARY_PATH=./libtinymail-test/.libs/
+  gunit-test-runner-tool -s tinymail-test-suite -v gnome
+
 Building tips
 =============
 
