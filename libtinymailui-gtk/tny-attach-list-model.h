@@ -26,12 +26,12 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_ATTACH_LIST_MODEL            (tny_attach_list_model_get_type ())
-#define TNY_ATTACH_LIST_MODEL(obj)            (GTK_CHECK_CAST ((obj), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModel))
-#define TNY_ATTACH_LIST_MODEL_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModelClass))
-#define TNY_ATTACH_IS_LIST_MODEL(obj)         (GTK_CHECK_TYPE ((obj), TNY_TYPE_ATTACH_LIST_MODEL))
-#define TNY_ATTACH_IS_LIST_MODEL_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((obj), TNY_TYPE_ATTACH_LIST_MODEL))
-#define TNY_ATTACH_LIST_MODEL_GET_CLASS(obj)  (GTK_CHECK_GET_CLASS ((obj), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModelClass))
+#define TNY_TYPE_ATTACH_LIST_MODEL             (tny_attach_list_model_get_type ())
+#define TNY_ATTACH_LIST_MODEL(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModel))
+#define TNY_ATTACH_LIST_MODEL_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModelClass))
+#define TNY_ATTACH_IS_LIST_MODEL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_ATTACH_LIST_MODEL))
+#define TNY_ATTACH_IS_LIST_MODEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ATTACH_LIST_MODEL))
+#define TNY_ATTACH_LIST_MODEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_ATTACH_LIST_MODEL, TnyAttachListModelClass))
 
 typedef struct _TnyAttachListModel TnyAttachListModel;
 typedef struct _TnyAttachListModelClass TnyAttachListModelClass;
