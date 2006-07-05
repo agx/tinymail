@@ -100,18 +100,17 @@ static void
 reload_accounts (TnySummaryWindowPriv *priv)
 {
 	TnyAccountStoreIface *account_store = priv->account_store;
-	GtkTreeModel *sortable, *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
-	TnyListIface *accounts = tny_list_new ();
-	gboolean next = FALSE;
-	TnyIteratorIface *iterator;
+	GtkTreeModel *sortable;
 
-	if (G_UNLIKELY (!empty_model))
-	{
-		empty_model = GTK_TREE_MODEL (gtk_list_store_new 
-			(1, G_TYPE_STRING));
-	}
+	/* TnyAccountTreeModel is also a TnyListIface (it simply both the
+	   TnyListIface and the GtkTreeModelIface interfaces interfaces) */
+
+	GtkTreeModel *mailbox_model = GTK_TREE_MODEL (tny_account_tree_model_new ());
+	TnyListIface *accounts = TNY_LIST_IFACE (mailbox_model);
 
 	/* Clear the header_view by giving it an empty model */
+	if (G_UNLIKELY (!empty_model))
+		empty_model = GTK_TREE_MODEL (gtk_list_store_new (1, G_TYPE_STRING));
 	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
 
 	if (priv->current_accounts)
@@ -120,27 +119,8 @@ reload_accounts (TnySummaryWindowPriv *priv)
 		priv->current_accounts = NULL;
 	}
 
-	/* TODO: refactor the tree-model to a TnyListIface */
-	tny_account_store_iface_get_accounts (account_store, accounts, TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
-
-	iterator = tny_list_iface_create_iterator (accounts);
-	next = tny_iterator_iface_has_first (iterator);
-
-	while (next)
-	{
-		TnyStoreAccountIface *account = tny_iterator_iface_current (iterator);
-
-		tny_account_tree_model_add (TNY_ACCOUNT_TREE_MODEL 
-			(mailbox_model), account);
-
-		next = tny_iterator_iface_has_next (iterator);
-
-		if (next)
-			tny_iterator_iface_next (iterator);
-	}
-
-	g_object_unref (G_OBJECT (iterator));
-	priv->current_accounts = accounts;
+	tny_account_store_iface_get_accounts (account_store, accounts,
+		TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
 
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),

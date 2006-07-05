@@ -46,21 +46,10 @@ enum
 	TNY_ACCOUNT_TREE_MODEL_N_COLUMNS
 };
 
-struct _TnyAccountTreeModel
-{
-	GtkTreeStore parent;
-};
-
-struct _TnyAccountTreeModelClass
-{
-	GtkTreeStoreClass parent_class;
-};
 
 
 GType                   tny_account_tree_model_get_type  (void);
 TnyAccountTreeModel*    tny_account_tree_model_new       (void);
-
-void                    tny_account_tree_model_add       (TnyAccountTreeModel *self, TnyStoreAccountIface *account);
 
 G_END_DECLS
 
