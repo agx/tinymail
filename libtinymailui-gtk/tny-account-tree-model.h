@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <tny-store-account-iface.h>
+#include <tny-list-iface.h>
 
 G_BEGIN_DECLS
 
@@ -33,6 +34,7 @@ G_BEGIN_DECLS
 #define TNY_ACCOUNT_IS_TREE_MODEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ACCOUNT_TREE_MODEL))
 #define TNY_ACCOUNT_TREE_MODEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_ACCOUNT_TREE_MODEL, TnyAccountTreeModelClass))
 
+/* Implements GtkTreeModelIface and TnyListIface */
 
 typedef struct _TnyAccountTreeModel TnyAccountTreeModel;
 typedef struct _TnyAccountTreeModelClass TnyAccountTreeModelClass;

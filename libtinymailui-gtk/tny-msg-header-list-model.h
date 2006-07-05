@@ -23,6 +23,7 @@
 #include <gtk/gtktreemodel.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-folder-iface.h>
+#include <tny-list-iface.h>
 
 G_BEGIN_DECLS
 
@@ -32,6 +33,8 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG_HEADER_LIST_MODEL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_HEADER_LIST_MODEL))
 #define TNY_IS_MSG_HEADER_LIST_MODEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_HEADER_LIST_MODEL))
 #define TNY_MSG_HEADER_LIST_MODEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_MSG_HEADER_LIST_MODEL, TnyMsgHeaderListModelClass))
+
+/* Implements GtkTreeModelIface and TnyListIface */
 
 typedef struct _TnyMsgHeaderListModel TnyMsgHeaderListModel;
 typedef struct _TnyMsgHeaderListModelClass TnyMsgHeaderListModelClass;
