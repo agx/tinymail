@@ -195,6 +195,24 @@ tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyI
 	return;
 }
 
+static void
+tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+{
+	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
+	GtkTextBuffer *buffer;
+
+	gtk_widget_hide (GTK_WIDGET (priv->htmlview));
+	gtk_widget_show (GTK_WIDGET (priv->textview));
+
+	buffer = gtk_text_view_get_buffer (priv->textview);
+	gtk_widget_hide (priv->attachview_sw);
+	gtk_text_buffer_set_text (buffer, _("Message is unavailable"), -1);
+	tny_msg_header_view_iface_set_header (priv->headerview, header);
+	gtk_widget_show (GTK_WIDGET (priv->headerview));
+
+	return;
+}
+
 
 static void
 for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointer user_data)
@@ -408,6 +426,7 @@ tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->set_msg_func = tny_moz_embed_msg_view_set_msg;
 	klass->set_save_strategy_func = tny_mozembed_msg_view_set_save_strategy;
+	klass->set_unavailable_func = tny_mozembed_msg_view_set_unavailable;
 
 	return;
 }

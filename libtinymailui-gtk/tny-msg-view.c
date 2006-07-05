@@ -225,6 +225,21 @@ tny_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 	return FALSE;
 }
 
+static void
+tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+{
+	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	GtkTextBuffer *buffer;
+
+	buffer = gtk_text_view_get_buffer (priv->textview);
+	gtk_widget_hide (priv->attachview_sw);
+	gtk_text_buffer_set_text (buffer, _("Message is unavailable"), -1);
+	tny_msg_header_view_iface_set_header (priv->headerview, header);
+	gtk_widget_show (GTK_WIDGET (priv->headerview));
+
+	return;
+}
+
 static void 
 tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
@@ -359,6 +374,7 @@ tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->set_msg_func = tny_msg_view_set_msg;
 	klass->set_save_strategy_func = tny_msg_view_set_save_strategy;
+	klass->set_unavailable_func = tny_msg_view_set_unavailable;
 
 	return;
 }

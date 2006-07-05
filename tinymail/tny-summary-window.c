@@ -119,9 +119,12 @@ reload_accounts (TnySummaryWindowPriv *priv)
 		priv->current_accounts = NULL;
 	}
 
+	/* This method uses the TnyAccountTreeModel as a TnyListIface */
 	tny_account_store_iface_get_accounts (account_store, accounts,
 		TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
 
+
+	/* Here we use the TnyAccountTreeModel as a GtkTreeModelIface */
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
@@ -215,17 +218,15 @@ tny_summary_window_set_account_store (TnyAccountStoreViewIface *self, TnyAccount
 
 	if (G_LIKELY (device))
 	{
-		priv->connchanged_signal = 
-			g_signal_connect (G_OBJECT (device), "connection_changed",
+		priv->connchanged_signal =  g_signal_connect (
+				G_OBJECT (device), "connection_changed",
 				G_CALLBACK (connection_changed), self);	
 	}
 
-	/* g_object_ref (G_OBJECT (account_store)); */
-
 	priv->account_store = account_store;
 
-	priv->accounts_reloaded_signal = g_signal_connect 
-		(G_OBJECT (account_store), "accounts_reloaded",
+	priv->accounts_reloaded_signal = g_signal_connect (
+		G_OBJECT (account_store), "accounts_reloaded",
 		G_CALLBACK (accounts_reloaded), priv);
 
 	reload_accounts (priv);
@@ -236,6 +237,8 @@ tny_summary_window_set_account_store (TnyAccountStoreViewIface *self, TnyAccount
 static void
 on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gpointer user_data)
 {
+	/* If the user presses the [Del] button on his keyboard */
+
 	if (event->keyval == GDK_Delete)
 	{
 		TnySummaryWindow *self  = user_data;
@@ -325,12 +328,11 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 				if (G_LIKELY (msg))
 					tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));
 				else 
-				{
-					/* Loading the message failed (service unavailable 
-					   or message deleted by an external device) */
-				}
+					tny_msg_view_iface_set_unavailable (priv->msg_view, header);
 
 			}
+		} else {
+			tny_msg_view_iface_set_unavailable (priv->msg_view, NULL);
 		}
 	}
 

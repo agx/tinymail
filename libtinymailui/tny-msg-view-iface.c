@@ -21,6 +21,29 @@
 
 #include <tny-msg-view-iface.h>
 
+
+
+/**
+ * tny_msg_view_iface_set_unavailable:
+ * @self: A #TnyMsgViewIface instance
+ * @header: a #TnyMsgHeaderIface instance or NULL
+ *
+ * Set the view to display that the message was unavailable
+ * 
+ **/
+void
+tny_msg_view_iface_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+{
+#ifdef DEBUG
+	if (!TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_unavailable_func)
+		g_critical ("You must implement tny_msg_view_iface_set_unavailable\n");
+#endif
+
+	TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_unavailable_func (self, header);
+	return;
+}
+
+
 /**
  * tny_msg_view_iface_set_save_strategy:
  * @self: A #TnyMsgViewIface instance

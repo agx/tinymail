@@ -35,6 +35,27 @@ struct _TnyMsgWindowPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_WINDOW, TnyMsgWindowPriv))
 
 
+static void
+tny_msg_window_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy)
+{
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+
+	tny_msg_view_iface_set_save_strategy (priv->msg_view, strategy);
+
+	return;
+}
+
+static void
+tny_msg_window_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+{
+	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
+
+	tny_msg_view_iface_set_unavailable (priv->msg_view, header);
+
+	return;
+}
+
+
 static void 
 tny_msg_window_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
@@ -100,12 +121,15 @@ tny_msg_window_iface_init (gpointer g_iface, gpointer iface_data)
 	return;
 }
 
+
 static void
 tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMsgViewIfaceClass *klass = (TnyMsgViewIfaceClass *)g_iface;
 
 	klass->set_msg_func = tny_msg_window_set_msg;
+	klass->set_save_strategy_func = tny_msg_window_set_save_strategy;
+	klass->set_unavailable_func = tny_msg_window_set_unavailable;
 
 	return;
 }
