@@ -207,8 +207,15 @@ tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface 
 	buffer = gtk_text_view_get_buffer (priv->textview);
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, _("Message is unavailable"), -1);
-	tny_msg_header_view_iface_set_header (priv->headerview, header);
-	gtk_widget_show (GTK_WIDGET (priv->headerview));
+
+	if (header)
+	{
+		tny_msg_header_view_iface_set_header (priv->headerview, header);
+		gtk_widget_show (GTK_WIDGET (priv->headerview));
+	} else {
+		gtk_widget_hide (GTK_WIDGET (priv->headerview));
+	}
+
 
 	return;
 }
