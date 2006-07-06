@@ -189,7 +189,8 @@ tny_account_tree_model_prepend (TnyListIface *self, gpointer item)
 
 	/* Prepend something to the list */
 	me->first = g_list_prepend (me->first, item);
-	tny_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), gtk_tree_store_prepend);
+	tny_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), 
+		gtk_tree_store_prepend);
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -203,8 +204,8 @@ tny_account_tree_model_append (TnyListIface *self, gpointer item)
 
 	/* Append something to the list */
 	me->first = g_list_append (me->first, item);
-
-	tny_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), gtk_tree_store_append);
+	tny_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), 
+		gtk_tree_store_append);
 
 	g_mutex_unlock (me->iterator_lock);
 }
