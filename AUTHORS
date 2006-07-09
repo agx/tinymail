@@ -8,4 +8,8 @@ Raphael Slinckx  <raphael@slinckx.net>
 
 Florian Boor  <florian.boor@kernelconcepts.de>
 
-	* Initial support for status flags.
+	* Initial support for status flags
+
+Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Contributions to the TnyIteratorIface type

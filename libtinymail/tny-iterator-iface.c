@@ -125,6 +125,30 @@ tny_iterator_iface_current (TnyIteratorIface *self)
 }
 
 
+
+/**
+ * tny_iterator_iface_is_done:
+ * @self: A #TnyIteratorIface instance
+ *
+ * Does the iterator point to some valid list item
+ *
+ * Return value: TRUE if it points to a valid list item, FALSE otherwise
+ *
+ **/
+gboolean
+tny_iterator_iface_is_done (TnyIteratorIface *self)
+{
+#ifdef DEBUG
+	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->is_done)
+		g_critical ("You must implement tny_iterator_iface_is_done\n");
+#endif
+
+	return TNY_ITERATOR_IFACE_GET_CLASS (self)->is_done (self);
+}
+
+
+
+
 /**
  * tny_iterator_iface_has_first:
  * @self: A #TnyIteratorIface instance

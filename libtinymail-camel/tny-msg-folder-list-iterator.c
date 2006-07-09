@@ -92,8 +92,25 @@ tny_msg_folder_list_iterator_next (TnyIteratorIface *self)
 	me->current = g_list_next (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return me->current ? me->current->data : NULL;
 }
+
+
+
+
+static gboolean 
+tny_msg_folder_list_iterator_is_done (TnyIteratorIface *self)
+{
+	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+
+	if (G_UNLIKELY (!me || !me->model))
+		return TRUE;
+
+	return me->current != NULL;
+}
+
+
+
 
 static gpointer 
 tny_msg_folder_list_iterator_prev (TnyIteratorIface *self)
@@ -231,7 +248,8 @@ tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 	klass->has_next_func = tny_msg_folder_list_iterator_has_next;
 	klass->has_first_func = tny_msg_folder_list_iterator_has_first;
 	klass->get_list_func = tny_msg_folder_list_iterator_get_list;
-
+	klass->is_done = tny_msg_folder_list_iterator_is_done;
+	
 	return;
 }
 

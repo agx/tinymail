@@ -94,7 +94,7 @@ tny_list_iterator_next (TnyIteratorIface *self)
 	me->current = g_list_next (me->current);
 	g_mutex_unlock (lpriv->iterator_lock);
 
-	return me->current->data;
+	return me->current ? me->current->data : NULL;
 }
 
 static gpointer 
@@ -132,6 +132,16 @@ tny_list_iterator_first (TnyIteratorIface *self)
 
 	return me->current->data;
 }
+
+
+static gboolean 
+tny_list_iterator_is_done (TnyIteratorIface *self)
+{
+	TnyListIterator *me = (TnyListIterator*) self;
+
+	return me->current == NULL;
+}
+
 
 
 static gpointer 
@@ -240,7 +250,8 @@ tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 	klass->has_first_func = tny_list_iterator_has_first;
 	klass->has_next_func = tny_list_iterator_has_next;
 	klass->get_list_func = tny_list_iterator_get_list;
-
+	klass->is_done = tny_list_iterator_is_done;
+	
 	return;
 }
 

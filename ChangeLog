@@ -1,19 +1,35 @@
+06-09-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* tny_iterator_iface_is_end method
+
+06-07-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Major API changes in TnyAccountStore
+	
 06-21-2006  Florian Boor  <florian.boor@kernelconcepts.de>
 
 	* Make GPE TnyDevice default to be online for now.
 
+06-01-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Implementation and implementing
+
 06-09-2006  Florian Boor  <florian.boor@kernelconcepts.de>
 
 	* Fix endless loop sending mails.
+
+05-01-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Implementation and implementing
 
 05-24-2006  Florian Boor  <florian.boor@kernelconcepts.de>
 
 	* Support for mail status flags.
 	* Minor fixes.
 
-XX-YY-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+04-01-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 
-	* More ChangeLog items coming soon. Really.
+	* Implementation and implementing
 	
 03-07-2006  Raphael Slinckx  <raphael@slinckx.net>
 

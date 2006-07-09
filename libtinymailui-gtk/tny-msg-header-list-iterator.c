@@ -108,7 +108,7 @@ tny_msg_header_list_iterator_next (TnyIteratorIface *self)
 	me->current = g_list_next (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return me->current ? me->current->data : NULL;
 }
 
 gpointer 
@@ -134,6 +134,19 @@ tny_msg_header_list_iterator_prev (TnyIteratorIface *self)
 
 	return me->current->data;
 }
+
+
+static gboolean 
+tny_msg_header_list_iterator_is_done (TnyIteratorIface *self)
+{
+	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
+
+	if (G_UNLIKELY (!me  || !me->model))
+		return TRUE;
+
+	return me->current != NULL;
+}
+
 
 gpointer 
 _tny_msg_header_list_iterator_first_nl (TnyMsgHeaderListIterator *me)
@@ -283,7 +296,8 @@ tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 	klass->has_first_func = tny_msg_header_list_iterator_has_first;
 	klass->has_next_func = tny_msg_header_list_iterator_has_next;
 	klass->get_list_func = tny_msg_header_list_iterator_get_list;
-
+	klass->is_done = tny_msg_header_list_iterator_is_done;
+	
 	return;
 }
 
