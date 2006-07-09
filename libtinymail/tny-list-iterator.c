@@ -112,7 +112,7 @@ tny_list_iterator_prev (TnyIteratorIface *self)
 	me->current = g_list_previous (me->current);
 	g_mutex_unlock (lpriv->iterator_lock);
 
-	return me->current->data;
+	 return me->current ? me->current->data : NULL;
 }
 
 static gpointer 

@@ -103,7 +103,7 @@ tny_account_tree_model_iterator_prev (TnyIteratorIface *self)
 	me->current = g_list_previous (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return me->current ? me->current->data : NULL;
 }
 
 

@@ -106,7 +106,7 @@ tny_msg_folder_list_iterator_is_done (TnyIteratorIface *self)
 	if (G_UNLIKELY (!me || !me->model))
 		return TRUE;
 
-	return me->current != NULL;
+	return me->current == NULL;
 }
 
 
@@ -126,7 +126,7 @@ tny_msg_folder_list_iterator_prev (TnyIteratorIface *self)
 	me->current = g_list_previous (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return return me->current ? me->current->data : NULL;
 }
 
 static gpointer 

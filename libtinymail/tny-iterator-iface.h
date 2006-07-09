@@ -42,30 +42,23 @@ struct _TnyIteratorIfaceClass
 	gpointer (*prev_func) (TnyIteratorIface *self);
 	gpointer (*first_func) (TnyIteratorIface *self);
 	gpointer (*nth_func) (TnyIteratorIface *self, guint nth);
-
 	gpointer (*current_func) (TnyIteratorIface *self);
-
 	gboolean (*has_first_func) (TnyIteratorIface *self);
 	gboolean (*has_next_func) (TnyIteratorIface *self);
-
 	gboolean (*is_done) (TnyIteratorIface *self);
-	
 	TnyListIface* (*get_list_func) (TnyIteratorIface *self);
 };
 
-GType     tny_iterator_iface_get_type        (void);
+GType tny_iterator_iface_get_type (void);
 
 gpointer tny_iterator_iface_next (TnyIteratorIface *self);
 gpointer tny_iterator_iface_prev (TnyIteratorIface *self);
 gpointer tny_iterator_iface_first (TnyIteratorIface *self);
 gpointer tny_iterator_iface_nth (TnyIteratorIface *self, guint nth);
-
 gpointer tny_iterator_iface_current (TnyIteratorIface *self);
 gboolean tny_iterator_iface_has_first (TnyIteratorIface *self);
 gboolean tny_iterator_iface_has_next (TnyIteratorIface *self);
-
 gboolean tny_iterator_iface_is_done (TnyIteratorIface *self);
-
 TnyListIface* tny_iterator_iface_get_list (TnyIteratorIface *self);
 
 G_END_DECLS
