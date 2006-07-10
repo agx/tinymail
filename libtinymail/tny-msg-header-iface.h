@@ -93,7 +93,7 @@ struct _TnyMsgHeaderIfaceClass
 	void           (*uncache_func)            (TnyMsgHeaderIface *self);
 	gboolean       (*has_cache_func)          (TnyMsgHeaderIface *self);
 
-	const TnyMsgHeaderFlags 
+	TnyMsgHeaderFlags 
 		       (*get_flags_func)          (TnyMsgHeaderIface *self);
 	void           (*set_flags_func)          (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
 	void           (*unset_flags_func)        (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
@@ -125,7 +125,7 @@ void           tny_msg_header_iface_set_replyto        (TnyMsgHeaderIface *self,
 const TnyMsgFolderIface*
                tny_msg_header_iface_get_folder         (TnyMsgHeaderIface *self);
 
-const TnyMsgHeaderFlags  
+TnyMsgHeaderFlags  
 	       tny_msg_header_iface_get_flags          (TnyMsgHeaderIface *self);
 void           tny_msg_header_iface_set_folder         (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
 void           tny_msg_header_iface_set_flags          (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);

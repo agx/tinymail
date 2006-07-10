@@ -424,7 +424,7 @@ tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
 	return retval;
 }
 
-static const TnyMsgHeaderFlags
+static TnyMsgHeaderFlags
 tny_msg_header_get_flags (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
@@ -440,7 +440,7 @@ tny_msg_header_get_flags (TnyMsgHeaderIface *self)
 
 	g_mutex_unlock (me->hdr_lock);
 
-	return (const TnyMsgHeaderFlags)retval;
+	return (TnyMsgHeaderFlags)retval;
 }
 
 static void

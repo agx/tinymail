@@ -386,7 +386,7 @@ tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIfac
  * 
  * Return value: flag bitmask
  **/
-const TnyMsgHeaderFlags
+TnyMsgHeaderFlags
 tny_msg_header_iface_get_flags (TnyMsgHeaderIface *self)
 {
 #ifdef DEBUG
