@@ -19,8 +19,8 @@ bin_PROGRAMS = tinymail
 
 tinymail_SOURCES = 							\
 	tny-main.c							\
-	tny-summary-window.c						\
-	tny-summary-window.h
+	tny-summary-view.c						\
+	tny-summary-view.h
 
 tinymail_LDADD = 							        \
 	$(TINYMAIL_LIBS)						        \

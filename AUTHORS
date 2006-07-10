@@ -2,14 +2,18 @@ Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Maintainer, designer, developer, tester
 
-Raphael Slinckx  <raphael@slinckx.net>
+Raphael Slinckx <raphael@slinckx.net>
 
 	* Author of the Python bindings
 
-Florian Boor  <florian.boor@kernelconcepts.de>
+Florian Boor <florian.boor@kernelconcepts.de>
 
 	* Initial support for status flags
 
 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Contributions to the TnyIteratorIface type
+
+Chris Lord <chris@openedhand.com>
+
+	* Contributions to the TnySummaryViewIface type

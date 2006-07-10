@@ -39,8 +39,8 @@ tny_main_shutdown (gpointer data)
 
 	/* This solves a firefox vs. Camel bug. */
 
-	PR_ProcessExit ((int)data);
-	gtk_exit ((gint)data);
+	PR_ProcessExit ((PRIntn)data);
+	exit ((int)data);
 
 	return;
 }
@@ -58,11 +58,23 @@ tny_main_shutdown (gpointer data)
 int 
 main (int argc, char **argv)
 {
-	GtkWindow *window = NULL;
+	GtkWidget *view = NULL, *window = NULL;
 	TnyPlatformFactoryIface *platfact;
+	GOptionContext *context;
+	static gint plug = 0;
+	
+	static GOptionEntry entries[] = {
+		{ "plug", 'p', 0, G_OPTION_ARG_INT, &plug,
+			"Socket ID of an XEmbed socket to plug into", NULL },
+		{ NULL }
+	};
+
+	context = g_option_context_new (" - libtinymail demo application");
+	g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
+	g_option_context_add_group (context, gtk_get_option_group (TRUE));
+	g_option_context_parse (context, &argc, &argv, NULL);
 
 	g_thread_init (NULL);
-	gtk_init (&argc, &argv);
 	gdk_threads_init ();
 
 #ifdef GNOME
@@ -74,12 +86,19 @@ main (int argc, char **argv)
 	platfact = TNY_PLATFORM_FACTORY_IFACE 
 			(tny_platform_factory_get_instance ());
 
-	window = GTK_WINDOW (tny_summary_window_new ());
+	view = GTK_WIDGET (tny_summary_view_new ());
 
-	gtk_widget_show (GTK_WIDGET (window));
+	if (plug > 0) {
+		g_message ("Plugging into socket %d", plug);
+		window = gtk_plug_new (plug);
+	} else {
+		window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	}
 
+	gtk_container_add (GTK_CONTAINER (window), view);
+	
 	tny_account_store_view_iface_set_account_store (
-		TNY_ACCOUNT_STORE_VIEW_IFACE (window),
+		TNY_ACCOUNT_STORE_VIEW_IFACE (view),
 		tny_platform_factory_iface_new_account_store (platfact));
 	
 	g_signal_connect (window, "destroy",
@@ -89,6 +108,8 @@ main (int argc, char **argv)
 		G_CALLBACK (gtk_main_quit), 0);
 #endif
 
+	gtk_widget_show (view);
+	gtk_widget_show (window);
 	gtk_main();
 
 	return 0;
