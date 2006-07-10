@@ -1,7 +1,7 @@
 09-10-2006  Chris Lord <chris@openedhand.com>
 
 	* Refactored TnySummaryWindowIface to TnySummaryViewIface
-	* Added support for XEmbed in the demo-ui
+	* Added support for XEmbed and command-line parameters in the demo-ui
 
 09-06-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
