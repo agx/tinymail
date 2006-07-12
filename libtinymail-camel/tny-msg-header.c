@@ -47,7 +47,7 @@ struct _WriteInfo
 	gchar *mime_from;
 };
 
-#pragma pack(1) /* Size will be 21 in stead of 24 */
+//#pragma pack(1) /* Size will be 21 in stead of 24 */
 struct _TnyMsgHeader 
 {
 	GObject parent;
@@ -117,24 +117,6 @@ _tny_msg_header_get_camel_mime_message (TnyMsgHeader *self)
 
 	return ((WriteInfo*)self->info)->msg;
 
-}
-
-void /* protected method */
-_tny_msg_header_set_camel_mime_message (TnyMsgHeader *self, CamelMimeMessage *camel_mime_message)
-{
-
-	if (G_UNLIKELY (self->info))
-		g_warning (_("Strange behaviour: Overwriting existing MIME message"));
-
-	if (self->write)
-		destroy_write (self);
-
-	self->info = g_new0 (WriteInfo, 1);
-	((WriteInfo*)self->info)->msg = camel_mime_message;
-	((WriteInfo*)self->info)->mime_from = NULL;\
-	self->write = 1;
-
-	return;
 }
 
 
@@ -457,6 +439,8 @@ tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 		return invalid;
 
 	retval = camel_message_info_uid ((CamelMessageInfo*)me->info);
+
+	return retval;
 }
 
 
@@ -464,7 +448,7 @@ static gboolean
 tny_msg_header_has_cache (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	return (me->info != NULL);
+	return TRUE;
 }
 
 static void
@@ -482,6 +466,10 @@ tny_msg_header_finalize (GObject *object)
 	{
 		destroy_write (self);
 	}
+
+	/* Normally we do camel_folder_free_message_info here, but we already got
+	   rid of our initial reference at tny-msg-folder.c:add_message_with_uid
+	   I know this is actually ugly */
 
 	(*parent_class->finalize) (object);
 

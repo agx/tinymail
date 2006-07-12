@@ -72,9 +72,6 @@ folder_changed (TnyMsgFolderIface *self, CamelFolderChangeInfo *info, gpointer u
 static void
 unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 {
-	if (destroy && priv->folder && priv->cached_uids)
-		camel_folder_free_uids (priv->folder, priv->cached_uids);
-
 	if (G_LIKELY (priv->folder))
 	{
 		if (((CamelObject*)priv->folder)->ref_count)
@@ -342,13 +339,16 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	TnyMsgFolderPriv *priv = ptr->priv;
 	TnyListIface *headers = ptr->headers;
 	CamelFolder *cfol = _tny_msg_folder_get_camel_folder (self);
+	CamelMessageInfo *mi = camel_folder_get_message_info (cfol, uid);
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
 	header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
 	tny_msg_header_iface_set_folder (header, self);
-	_tny_msg_header_set_camel_message_info (header,
-		camel_folder_get_message_info (cfol, uid));
+	_tny_msg_header_set_camel_message_info (header, mi);
+
+	/* Get rid of the reference already. I know this is ugly */
+	camel_folder_free_message_info (cfol, mi);
 
 	tny_list_iface_prepend (headers, header);
 	priv->cached_length++;
@@ -578,8 +578,6 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 
 	g_object_ref (G_OBJECT (headers));
 
-	if (priv->cached_uids)
-		camel_folder_free_uids (priv->folder, priv->cached_uids);
 	load_folder_no_lock (priv);
 
 	ptr = g_new (FldAndPriv, 1);
@@ -598,24 +596,7 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 	g_ptr_array_foreach (uids, add_message_with_uid, ptr);
 	g_free (ptr);
 
-	/* Speedup trick, also check tny-msg-header.c */
-	priv->cached_uids = uids;
-
-	/* The trick is not to free the uid's GPtrArray now, but
-	 * in stead keep it during the livetime of the folder.
-	 * The TnyMsgHeader instances have a reference to the uid's
-	 * in the array. 
-	 *
-	 * The idea is that if a folder get's finalized, first all its
-	 * msg-header instances are also finalized (invalid). So we
-	 * can keep the uid pointers here, and simply assign it (and
-	 * not strdup them for each msg-header instance).
-	 *
-	 * Just make sure that, if using this trick, you don't free the
-	 * uid pointer in the msg-header instance. Free it here.
-	 */
-	/* So we postpone the freeing to the finalize 
-	camel_folder_free_uids (priv->folder, uids); */
+	camel_folder_free_uids (priv->folder, uids); 
 
 	g_object_unref (G_OBJECT (headers));
 

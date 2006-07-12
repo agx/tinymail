@@ -813,8 +813,9 @@ tny_msg_header_list_model_hdr_cache_uncacher_copy (TnyMsgHeaderListModel *self)
 static void
 proxy_destroy_func (gpointer data, gpointer user_data)
 {
-	if (data)
+	if (data) { printf ("UNREF!\n");
 		g_object_unref (G_OBJECT (data));
+	}
 	data = NULL;
 
 	return;
@@ -873,6 +874,7 @@ tny_msg_header_list_model_finalize (GObject *object)
 	/* Unreference the headers */
 	if (self->first)
 	{
+		/* g_list_foreach (self->first, g_object_unref, NULL); */
 		tny_msg_header_list_model_hdr_cache_remover_copy (self);
 		g_list_free (self->first);
 		self->first = NULL;
