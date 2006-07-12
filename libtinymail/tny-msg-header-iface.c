@@ -435,25 +435,6 @@ tny_msg_header_iface_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mas
 	return TNY_MSG_HEADER_IFACE_GET_CLASS (self)->unset_flags_func (self, mask);
 }
 
-/**
- * tny_msg_header_iface_set_message_id:
- * @self: a #TnyMsgHeaderIface object
- * @id: an unique follow-up uid
- * 
- *
- **/
-void
-tny_msg_header_iface_set_uid (TnyMsgHeaderIface *self, const gchar *id)
-{
-#ifdef DEBUG
-	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_uid_func)
-		g_critical ("You must implement tny_msg_header_iface_set_uid\n");
-#endif
-
-	TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_uid_func (self, id);
-	return;
-}
-
 
 /**
  * tny_msg_header_iface_uncache:

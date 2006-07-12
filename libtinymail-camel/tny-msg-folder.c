@@ -341,15 +341,14 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	TnyMsgFolderIface *self = ptr->self;
 	TnyMsgFolderPriv *priv = ptr->priv;
 	TnyListIface *headers = ptr->headers;
+	CamelFolder *cfol = _tny_msg_folder_get_camel_folder (self);
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
 	header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
 
-	tny_msg_header_set_use_summary (TNY_MSG_HEADER (header), 
-		priv->has_summary_cap);
-
 	tny_msg_header_iface_set_folder (header, self);
-	tny_msg_header_iface_set_uid (header, uid);
+	_tny_msg_header_set_camel_message_info (header,
+		camel_folder_get_message_info (cfol, uid));
 
 	tny_list_iface_prepend (headers, header);
 	priv->cached_length++;

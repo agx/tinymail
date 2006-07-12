@@ -331,10 +331,6 @@ tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 
 	message = _tny_msg_header_get_camel_mime_message (TNY_MSG_HEADER (priv->header));
 
-	if (G_UNLIKELY (message))
-		_tny_msg_set_camel_mime_message (TNY_MSG (self), message, 
-			_tny_msg_header_get_is_pop (TNY_MSG_HEADER (priv->header)));
-
 	g_mutex_unlock (priv->header_lock);
 
 	return;

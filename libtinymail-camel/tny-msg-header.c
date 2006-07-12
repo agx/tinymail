@@ -40,19 +40,21 @@
 
 static GObjectClass *parent_class = NULL;
 
+typedef struct _WriteInfo WriteInfo;
+struct _WriteInfo
+{
+	CamelMimeMessage *msg;
+	gchar *mime_from;
+};
+
+#pragma pack(1) /* Size will be 21 in stead of 24 */
 struct _TnyMsgHeader 
 {
 	GObject parent;
+	void *info;
 
-	gchar *uid;
 	TnyMsgFolderIface *folder;
-	gboolean use_summary;
-	GMutex *hdr_lock;
-	CamelMessageInfo *message_info;
-	CamelMimeMessage *mime_message;
-	gchar *mime_from;
-	const gchar *invalid;
-	gboolean uncachable;
+	guchar write:1;
 };
 
 struct _TnyMsgHeaderClass 
@@ -60,113 +62,30 @@ struct _TnyMsgHeaderClass
 	GObjectClass parent_class;
 };
 
-gboolean 
-_tny_msg_header_get_is_pop (TnyMsgHeader *self)
+static const gchar *invalid = "Invalid";
+
+static void 
+destroy_write (TnyMsgHeader *self)
 {
-	/* All summary types aren't pop atm ;-) */
-	return (!self->use_summary);
-}
+	if (((WriteInfo*)self->info)->msg)
+		camel_object_unref (CAMEL_OBJECT (((WriteInfo*)self->info)->msg));
 
-void
-_tny_msg_header_set_not_uncachable (TnyMsgHeader *self)
-{
-	self->uncachable = FALSE;
-	return;
-}
+	if (((WriteInfo*)self->info)->mime_from)
+		g_free (((WriteInfo*)self->info)->mime_from);
 
-static void
-unload_msg_header (TnyMsgHeader *self)
-{
-	if (G_UNLIKELY (!self->uncachable))
-		return;
-
-	if (G_LIKELY (self->mime_from))
-	{
-		g_free (self->mime_from);
-		self->mime_from = NULL;
-	}
-	if (G_LIKELY (self->use_summary))
-	{
-		if (G_LIKELY (self->message_info))
-		{
-			/* It looks like this conflicts with freeing the folder 
-			camel_message_info_free (self->message_info); 
-			self->message_info = NULL; */
-		}
-	} else {
-		if (G_LIKELY (self->mime_message) && G_LIKELY (CAMEL_IS_OBJECT (self->mime_message)))
-			camel_object_unref (CAMEL_OBJECT (self->mime_message));	
-		self->mime_message = NULL;
-	}
-
-	return;
-}
-
-/**
- * tny_msg_header_set_use_summary:
- * @self: The #TnyMsgHeader instance
- * @val: Whether or not to use summary capabilities
- *
- **/
-void 
-tny_msg_header_set_use_summary (TnyMsgHeader *self, gboolean val)
-{
-	g_mutex_lock (self->hdr_lock);
-	unload_msg_header (self);
-	self->use_summary = val;
-	g_mutex_unlock (self->hdr_lock);
-
-	return;
-}
-
-static void
-load_msg_header (TnyMsgHeader *self)
-{
-
-	if (G_UNLIKELY (!self->uncachable))
-		return;
-
-	if (G_LIKELY (self->use_summary))
-	{
-		if (G_LIKELY (!self->message_info) && G_LIKELY (self->folder) && G_LIKELY (self->uid))
-		{
-		  CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
-		  CamelMessageInfo *msginfo;
-
-		  if (folder)
-		  {
-			msginfo = camel_folder_get_message_info (folder, self->uid);
-			_tny_msg_header_set_camel_message_info (self, msginfo);
-		  }
-		}
-	} else {
-		if (G_LIKELY (!self->mime_message) && G_LIKELY (self->folder) && G_LIKELY (self->uid))
-		{
-		  CamelFolder *folder = _tny_msg_folder_get_camel_folder (self->folder);
-		  CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-
-		  if (folder)
-		  {
-			self->mime_message = camel_folder_get_message 
-				(folder, self->uid, &ex);
-		  }
-		}
-	}
-
-	return;
+	g_free (self->info);
 }
 
 static void
 prepare_for_write (TnyMsgHeader *self)
 {
-	unload_msg_header (self);
-
-	self->use_summary = FALSE;
-
-	if (G_LIKELY (!self->mime_message))
-		self->mime_message = camel_mime_message_new ();
-
-	_tny_msg_header_set_not_uncachable (self);
+	if (!self->write)
+	{
+		self->info = g_new0 (WriteInfo, 1);
+		((WriteInfo*)self->info)->msg = camel_mime_message_new ();
+		((WriteInfo*)self->info)->mime_from = NULL;
+		self->write = 1;
+	}
 
 	return;
 }
@@ -174,11 +93,14 @@ prepare_for_write (TnyMsgHeader *self)
 void /* protected method */
 _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
 {
-
-	if (G_UNLIKELY (self->message_info))
+	if (G_UNLIKELY (self->info))
 		g_warning ("Strange behaviour: Overwriting existing message info");
 
-	self->message_info = camel_message_info;
+	if (self->write)
+		destroy_write (self);
+
+	self->info = camel_message_info;
+	self->write = 0;
 
 	return;
 }
@@ -186,65 +108,44 @@ _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *ca
 CamelMimeMessage* /* protected method */
 _tny_msg_header_get_camel_mime_message (TnyMsgHeader *self)
 {
-	CamelMimeMessage *retval;
 
-	retval = self->mime_message;
+	if (G_UNLIKELY (self->write == 0))
+	{
+		g_warning ("Strange behaviour: the header was not written");
+		return NULL;
+	}
 
-	return retval;
+	return ((WriteInfo*)self->info)->msg;
+
 }
 
 void /* protected method */
 _tny_msg_header_set_camel_mime_message (TnyMsgHeader *self, CamelMimeMessage *camel_mime_message)
 {
 
-	if (G_UNLIKELY (self->mime_message))
+	if (G_UNLIKELY (self->info))
 		g_warning (_("Strange behaviour: Overwriting existing MIME message"));
 
-	self->mime_message = camel_mime_message;
+	if (self->write)
+		destroy_write (self);
+
+	self->info = g_new0 (WriteInfo, 1);
+	((WriteInfo*)self->info)->msg = camel_mime_message;
+	((WriteInfo*)self->info)->mime_from = NULL;\
+	self->write = 1;
 
 	return;
 }
 
-const TnyMsgFolderIface* 
-tny_msg_header_get_folder (TnyMsgHeaderIface *self)
-{
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	const TnyMsgFolderIface *retval;
-
-	g_mutex_lock (me->hdr_lock);
-	retval = me->folder;
-	g_mutex_unlock (me->hdr_lock);
-
-	return retval;
-}
-
-
-void
-tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface* folder)
-{
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-
-	if (G_UNLIKELY (me->folder))
-		g_warning (_("Strange behaviour: Overwriting existing folder"));
-
-	g_mutex_lock (me->hdr_lock);
-	me->folder = (TnyMsgFolderIface*)folder;
-	g_mutex_unlock (me->hdr_lock);
-
-	return;
-}
 
 
 static const gchar*
 tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	const gchar *retval=NULL;
+	const gchar *retval = NULL;
 
-	g_mutex_lock (me->hdr_lock);
-	load_msg_header (me);
 	/* TODO get_replyto */
-	g_mutex_unlock (me->hdr_lock);
 
 	return retval;
 }
@@ -257,18 +158,14 @@ tny_msg_header_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 	CamelInternetAddress *addr = camel_internet_address_new ();
 
-	g_mutex_lock (me->hdr_lock);
-
 	_foreach_email_add_to_inet_addr (bcc, addr);
 
 	prepare_for_write (me);
 
-	camel_mime_message_set_recipients (me->mime_message, 
+	camel_mime_message_set_recipients (((WriteInfo*)me->info)->msg, 
 		CAMEL_RECIPIENT_TYPE_BCC, addr);
 
 	camel_object_unref (CAMEL_OBJECT (addr));
-
-	g_mutex_unlock (me->hdr_lock);
 
 	return;
 }
@@ -279,18 +176,13 @@ tny_msg_header_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 	CamelInternetAddress *addr = camel_internet_address_new ();
 
-	g_mutex_lock (me->hdr_lock);
-
 	_foreach_email_add_to_inet_addr (cc, addr);
 
 	prepare_for_write (me);
 
-	camel_mime_message_set_recipients (me->mime_message, 
+	camel_mime_message_set_recipients (((WriteInfo*)me->info)->msg, 
 		CAMEL_RECIPIENT_TYPE_CC, addr);
-
 	camel_object_unref (CAMEL_OBJECT (addr));
-
-	g_mutex_unlock (me->hdr_lock);
 
 	return;
 }
@@ -302,18 +194,14 @@ tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	gchar *dup;
 
-	g_mutex_lock (me->hdr_lock);
-
 	dup = g_strdup (from);
 	_string_to_camel_inet_addr (dup, addr);
 	g_free (dup);
 
 	prepare_for_write (me);
 
-	camel_mime_message_set_from (me->mime_message, addr);
+	camel_mime_message_set_from (((WriteInfo*)me->info)->msg, addr);
 	camel_object_unref (CAMEL_OBJECT (addr));
-
-	g_mutex_unlock (me->hdr_lock);
 
 	return;
 }
@@ -323,13 +211,8 @@ tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	g_mutex_lock (me->hdr_lock);
-
 	prepare_for_write (me);
-
-	camel_mime_message_set_subject (me->mime_message, subject);
-
-	g_mutex_unlock (me->hdr_lock);
+	camel_mime_message_set_subject (((WriteInfo*)me->info)->msg, subject);
 
 	return;
 }
@@ -341,22 +224,16 @@ tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	gchar *dup;
 
-	g_mutex_lock (me->hdr_lock);
-
 	dup = g_strdup (to);
-
 	_foreach_email_add_to_inet_addr (dup, addr);
-
 	g_free (dup);
 
 	prepare_for_write (me);
 
-	camel_mime_message_set_recipients (me->mime_message, 
+	camel_mime_message_set_recipients ((CamelMimeMessage*)me->info, 
 		CAMEL_RECIPIENT_TYPE_TO, addr);
 
 	camel_object_unref (CAMEL_OBJECT (addr));
-
-	g_mutex_unlock (me->hdr_lock);
 
 	return;
 }
@@ -367,10 +244,7 @@ tny_msg_header_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	g_mutex_lock (me->hdr_lock);
-	prepare_for_write (me);
 	/* TODO set replyto */
-	g_mutex_unlock (me->hdr_lock);
 
 	return;
 }
@@ -380,22 +254,15 @@ static const gchar*
 tny_msg_header_get_cc (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	const gchar *retval;
 
-	const gchar *retval=NULL;
+	if (G_UNLIKELY (!me->info))
+		return invalid;
 
-	g_mutex_lock (me->hdr_lock);
-
-	load_msg_header (me);
-
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_cc (me->message_info);
-	else if (G_LIKELY (me->mime_message))
-		retval = camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "cc");
-
-	if (G_UNLIKELY (!retval))
-		retval = me->invalid;
-
-	g_mutex_unlock (me->hdr_lock);
+	if (G_UNLIKELY (me->write))
+		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "cc");
+	else
+		retval = camel_message_info_cc ((CamelMessageInfo*)me->info);
 
 	return retval;
 }
@@ -404,22 +271,15 @@ static const gchar*
 tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	const gchar *retval;
 
-	static const gchar *retval=NULL;
+	if (G_UNLIKELY (!me->info))
+		return invalid;
 
-	g_mutex_lock (me->hdr_lock);
-
-	load_msg_header (me);
-
-	if (G_LIKELY (me->use_summary)) /* TODO get_bcc */
-		retval = me->invalid;
-	else if (G_LIKELY (me->mime_message))
-		retval = camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "bcc");
-
-	if (G_UNLIKELY (!retval))
-		retval = me->invalid;
-
-	g_mutex_unlock (me->hdr_lock);
+	if (G_UNLIKELY (me->write))
+		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "bcc");
+	else
+		retval = invalid;
 
 	return retval;
 }
@@ -428,19 +288,17 @@ static TnyMsgHeaderFlags
 tny_msg_header_get_flags (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-
 	TnyMsgHeaderFlags retval;
 
-	g_mutex_lock (me->hdr_lock);
+	if (me->write)
+	{
+		g_warning ("tny_msg_header_get_flags: This is a header for a new message!\n");
+		return retval;
+	}
 
-	load_msg_header (me);
+	retval = camel_message_info_flags ((CamelMessageInfo*)me->info);
 
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_flags (me->message_info);
-
-	g_mutex_unlock (me->hdr_lock);
-
-	return (TnyMsgHeaderFlags)retval;
+	return retval;
 }
 
 static void
@@ -448,14 +306,15 @@ tny_msg_header_set_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	g_mutex_lock (me->hdr_lock);
+	if (me->write)
+	{
+		g_warning ("tny_msg_header_get_flags: This is a header for a new message!\n");
+		return;
+	}
 
-	prepare_for_write (me);
+    	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, ~0);
 
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-    	camel_message_info_set_flags (me->message_info, mask, ~0);
-
-	g_mutex_unlock (me->hdr_lock);
+	return;
 }
 
 static void
@@ -463,14 +322,15 @@ tny_msg_header_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 
-	g_mutex_lock (me->hdr_lock);
+	if (me->write)
+	{
+		g_warning ("tny_msg_header_get_flags: This is a header for a new message!\n");
+		return;
+	}
 
-	prepare_for_write (me);
+    	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, 0);
 
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-    	camel_message_info_set_flags (me->message_info, mask, 0);
-
-	g_mutex_unlock (me->hdr_lock);
+	return;
 }
 
 static time_t
@@ -480,16 +340,13 @@ tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
 
 	time_t retval;
 
-	g_mutex_lock (me->hdr_lock);
+	if (G_UNLIKELY (!me->info))
+		return retval;
 
-	load_msg_header (me);
-
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_date_received (me->message_info);
-	else if (G_LIKELY (me->mime_message))
-		retval = camel_mime_message_get_date_received (me->mime_message, NULL);
-
-	g_mutex_unlock (me->hdr_lock);
+	if (G_UNLIKELY (me->write))
+		retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, NULL);
+	else
+		retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
 
 	return retval;
 }
@@ -501,17 +358,10 @@ tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 
 	time_t retval;
 
-	g_mutex_lock (me->hdr_lock);
+	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write))
+		return retval;
 
-	load_msg_header (me);
-
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_date_sent (me->message_info);
-	else {
-		/* TODO: write case get_date_sent */
-	}
-
-	g_mutex_unlock (me->hdr_lock);
+	retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
 
 	return retval;
 }
@@ -521,31 +371,23 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 	
-	const gchar *retval=NULL;
+	const gchar *retval;
 
-	g_mutex_lock (me->hdr_lock);
+	if (G_UNLIKELY (!me->info))
+		return invalid;
 
-	load_msg_header (me);
-
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_from (me->message_info);
-	else
+	if (G_UNLIKELY (me->write))
 	{
-		if (G_LIKELY (!me->mime_from) && G_LIKELY (me->mime_message))
+		if (G_LIKELY (!((WriteInfo*)me->info)->mime_from))
 		{
 			CamelInternetAddress *addr = (CamelInternetAddress*)
-				camel_mime_message_get_from (me->mime_message);
-			me->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
-			/* camel_object_unref (CAMEL_OBJECT (addr)); */
+				camel_mime_message_get_from (((WriteInfo*)me->info)->msg);
+			((WriteInfo*)me->info)->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
 		}
 
-		retval = (const gchar*)me->mime_from;
-	}
-
-	if (G_UNLIKELY (!retval))
-		retval = me->invalid;
-
-	g_mutex_unlock (me->hdr_lock);
+		retval = (const gchar*)((WriteInfo*)me->info)->mime_from;
+	} else
+		retval = camel_message_info_from ((CamelMimeMessage*)me->info);
 
 	return retval;
 }
@@ -554,21 +396,15 @@ static const gchar*
 tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	const gchar *retval=NULL;
+	const gchar *retval;
 
-	g_mutex_lock (me->hdr_lock);
+	if (G_UNLIKELY (!me->info))
+		return invalid;
 
-	load_msg_header (me);
-
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_subject (me->message_info);
-	else if (G_LIKELY (me->mime_message))
-		retval = camel_mime_message_get_subject (me->mime_message);
-
-	if (G_UNLIKELY (!retval))
-		retval = me->invalid;
-
-	g_mutex_unlock (me->hdr_lock);
+	if (G_UNLIKELY (me->write))
+		retval = camel_mime_message_get_subject (((WriteInfo*)me->info)->msg);
+	else
+		retval = camel_message_info_subject ((CamelMessageInfo*)me->info);
 
 	return retval;
 }
@@ -578,48 +414,35 @@ static const gchar*
 tny_msg_header_get_to (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	
-	const gchar *retval=NULL;
+	gchar *retval;
 
-	g_mutex_lock (me->hdr_lock);
+	if (G_UNLIKELY (!me->info))
+		return invalid;
 
-	load_msg_header (me);
+	if (G_UNLIKELY (me->write))
+		retval = (gchar*) camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "to");
+	else
+		retval = (gchar*) camel_message_info_to ((CamelMessageInfo*)me->info);
 
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_to (me->message_info);
-	else if (G_LIKELY (me->mime_message))
-		retval = camel_medium_get_header (CAMEL_MEDIUM (me->mime_message), "to");
-
-	if (G_UNLIKELY (!retval))
-		retval = me->invalid;
-
-	g_mutex_unlock (me->hdr_lock);
-
-	return retval;
+	return (const gchar*)retval;
 }
 
 static const gchar*
 tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	gchar *retval;
 
-	const gchar *retval=NULL;
+	if (G_UNLIKELY (!me->info))
+		return invalid;
 
-	g_mutex_lock (me->hdr_lock);
+	if (G_UNLIKELY (me->write))
+		retval = (gchar*) camel_mime_message_get_message_id (((WriteInfo*)me->info)->msg);
+	else
+		retval = (gchar*) camel_message_info_message_id ((CamelMessageInfo*)me->info);
 
-	load_msg_header (me);
+	return (const gchar*)retval;
 
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = (const gchar*)camel_message_info_message_id (me->message_info);
-	else if (G_LIKELY (me->mime_message))
-		retval = camel_mime_message_get_message_id (me->mime_message);
-
-	if (G_UNLIKELY (!retval))
-		retval = me->invalid;
-
-	g_mutex_unlock (me->hdr_lock);
-
-	return retval;
 
 }
 
@@ -628,55 +451,12 @@ static const gchar*
 tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-
 	const gchar *retval;
 
-	g_mutex_lock (me->hdr_lock);
+	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write))
+		return invalid;
 
-	load_msg_header (me);
-
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		retval = camel_message_info_uid (me->message_info);
-	else /* Bleh solution ... */
-		retval = me->uid;
-
-	g_mutex_unlock (me->hdr_lock);
-
-	return retval;
-}
-
-static void
-tny_msg_header_set_uid (TnyMsgHeaderIface *self, const gchar *uid)
-{
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-
-	g_mutex_lock (me->hdr_lock);
-
-	unload_msg_header (me);
-
-	/* Speedup trick, also check tny-msg-folder.c */
-	/* if (priv->uid)
-		g_free (priv->uid);
-	priv->uid = g_strdup (uid); */
-
-	/* Yes I know what I'm doing, also check tny-msg-folder.c */
-
-	if (G_LIKELY (me->use_summary))
-		me->uid = (gchar*)uid;
-	else {
-		/* NEED TO INVESTIGATE THIS
-		For some reason the trick doesn't work if you don't 
-		have support for summaries */
-		if (me->uid)
-			g_free (me->uid);
-		me->uid = g_strdup (uid);
-		/* TODO: And if I AM going to do it this way, I need to lock 
-		 priv->uid */
-	}
-
-	g_mutex_unlock (me->hdr_lock);
-
-	return;
+	retval = camel_message_info_uid ((CamelMessageInfo*)me->info);
 }
 
 
@@ -684,36 +464,12 @@ static gboolean
 tny_msg_header_has_cache (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-
-	gboolean retval;
-
-	g_mutex_lock (me->hdr_lock);
-
-	if (G_LIKELY (me->use_summary))
-		retval = (me->message_info != NULL);
-	else
-		retval = (me->mime_message != NULL);
-
-	g_mutex_unlock (me->hdr_lock);
-
-	return retval;
+	return (me->info != NULL);
 }
 
 static void
 tny_msg_header_uncache (TnyMsgHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-
-	g_mutex_lock (me->hdr_lock);
-
-	if (G_LIKELY (me->use_summary) && G_LIKELY (me->message_info))
-		unload_msg_header (me);
-
-	if (G_UNLIKELY (!me->use_summary) && G_LIKELY (me->mime_message))
-		unload_msg_header (me);
-
-	g_mutex_unlock (me->hdr_lock);
-
 	return;
 }
 
@@ -722,25 +478,10 @@ tny_msg_header_finalize (GObject *object)
 {
 	TnyMsgHeader *self = (TnyMsgHeader*) object;
 
-	g_mutex_lock (self->hdr_lock);
-
-	/* Instance is going to dissapear, set uncachable as we 
-	   reuse the functionality */
-	self->uncachable = TRUE;
-
-	if (G_LIKELY (self->use_summary) && G_LIKELY (self->message_info))
-		unload_msg_header (self);
-
-	if (G_UNLIKELY (!self->use_summary) && G_LIKELY (self->mime_message))
-		unload_msg_header (self);
-
-	/* Indeed, check the speedup trick above */
-	if (G_LIKELY (self->uid) && G_UNLIKELY (!self->use_summary))
-		g_free (self->uid); /* Also check above */
-
-	g_mutex_unlock (self->hdr_lock);
-
-	g_mutex_free (self->hdr_lock);
+	if (G_UNLIKELY (self->write))
+	{
+		destroy_write (self);
+	}
 
 	(*parent_class->finalize) (object);
 
@@ -757,20 +498,27 @@ TnyMsgHeader*
 tny_msg_header_new (void)
 {
 	TnyMsgHeader *self = g_object_new (TNY_TYPE_MSG_HEADER, NULL);
-	static const gchar *inv = "Invalid";
-
-	self->uncachable = TRUE;	
-	self->invalid = inv;
-	self->mime_message = NULL;
-	self->message_info = NULL;
-	self->mime_from = NULL;
-
-	/* Second allocation :-( */
-	self->hdr_lock = g_mutex_new ();
+	
+	self->info = NULL;
+	self->write = 0;
 
 	return self;
 }
 
+static void
+tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	me->folder = (TnyMsgFolderIface*)folder;
+	return;
+}
+
+static const TnyMsgFolderIface*
+tny_msg_header_get_folder (TnyMsgHeaderIface *self)
+{
+	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	return (const TnyMsgFolderIface*)me->folder;
+}
 
 static void
 tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
@@ -787,7 +535,6 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_bcc_func = tny_msg_header_get_bcc;
 	klass->get_replyto_func = tny_msg_header_get_replyto;
 	klass->get_uid_func = tny_msg_header_get_uid;
-	klass->set_uid_func = tny_msg_header_set_uid;
 	klass->set_folder_func = tny_msg_header_set_folder;
 	klass->get_folder_func = tny_msg_header_get_folder;
 	klass->set_bcc_func = tny_msg_header_set_bcc;
