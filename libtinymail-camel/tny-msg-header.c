@@ -47,7 +47,7 @@ struct _WriteInfo
 	gchar *mime_from;
 };
 
-//#pragma pack(1) /* Size will be 21 in stead of 24 */
+#pragma pack(1) /* Size will be 21 in stead of 24 */
 struct _TnyMsgHeader 
 {
 	GObject parent;
