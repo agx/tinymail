@@ -436,38 +436,6 @@ tny_msg_header_iface_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mas
 }
 
 
-/**
- * tny_msg_header_iface_uncache:
- * @self: a #TnyMsgHeaderIface object
- * 
- * If it's possible to uncache this instance, uncache it
- * 
- **/
-void
-tny_msg_header_iface_uncache (TnyMsgHeaderIface *self)
-{
-	if (TNY_MSG_HEADER_IFACE_GET_CLASS (self)->uncache_func != NULL)
-		TNY_MSG_HEADER_IFACE_GET_CLASS (self)->uncache_func (self);
-	return;
-}
-
-/**
- * tny_msg_header_iface_has_cache:
- * @self: a #TnyMsgHeaderIface object
- * 
- * If it's possible to uncache this instance, return whether or not it has a cache
- * 
- * Return value: Whether or not this instance has a cache
- **/
-gboolean
-tny_msg_header_iface_has_cache (TnyMsgHeaderIface *self)
-{
-	if (TNY_MSG_HEADER_IFACE_GET_CLASS (self)->has_cache_func != NULL)
-		TNY_MSG_HEADER_IFACE_GET_CLASS (self)->has_cache_func (self);
-	return;
-}
-
-
 static void
 tny_msg_header_iface_base_init (gpointer g_class)
 {

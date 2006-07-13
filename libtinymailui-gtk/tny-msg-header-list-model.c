@@ -474,17 +474,21 @@ tny_msg_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	return FALSE;
 }
 
+
 static void
 tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 {
+	return;
+}
+/*
 	TnyMsgHeaderIface *header = NULL;
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
 
 	g_return_if_fail (self);
 	g_return_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL (self)->stamp);
 
-	/* Unref node happens when the GtkTreeView no longer needs the 
-	   reference to the GtkTreeIter (nor its user_data) */
+	* Unref node happens when the GtkTreeView no longer needs the 
+	   reference to the GtkTreeIter (nor its user_data) *
 
 	if (!iter->user_data);
 		return;
@@ -494,12 +498,12 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	header = iter->user_data;
 
-	/* We can use the knowledge that it no longer needs the reference,
+	* We can use the knowledge that it no longer needs the reference,
 	   to uncache the instance. Uncached instances are instances that
 	   typically no longer have their real subject inmem. Next time they'll
 	   get a property-request, they'll create a new real subject (which
 	   takes a certain amount of time) and will cache that before replying
-	   the request using the real subject. */
+	   the request using the real subject. *
 
 	if (G_LIKELY (header))
 		tny_msg_header_iface_uncache (header);
@@ -509,6 +513,7 @@ tny_msg_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 
 	return;
 }
+*/
 
 static void
 tny_msg_header_list_model_ref_node (GtkTreeModel *self, GtkTreeIter  *iter)
@@ -813,9 +818,8 @@ tny_msg_header_list_model_hdr_cache_uncacher_copy (TnyMsgHeaderListModel *self)
 static void
 proxy_destroy_func (gpointer data, gpointer user_data)
 {
-	if (data) { printf ("UNREF!\n");
+	if (data)
 		g_object_unref (G_OBJECT (data));
-	}
 	data = NULL;
 
 	return;

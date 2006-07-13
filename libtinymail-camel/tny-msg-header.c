@@ -444,19 +444,6 @@ tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 }
 
 
-static gboolean 
-tny_msg_header_has_cache (TnyMsgHeaderIface *self)
-{
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	return TRUE;
-}
-
-static void
-tny_msg_header_uncache (TnyMsgHeaderIface *self)
-{
-	return;
-}
-
 static void
 tny_msg_header_finalize (GObject *object)
 {
@@ -531,8 +518,6 @@ tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_from_func = tny_msg_header_set_from;
 	klass->set_subject_func = tny_msg_header_set_subject;
 	klass->set_replyto_func = tny_msg_header_set_replyto;
-	klass->has_cache_func = tny_msg_header_has_cache;
-	klass->uncache_func = tny_msg_header_uncache;
 	klass->set_flags_func = tny_msg_header_set_flags;
 	klass->unset_flags_func = tny_msg_header_unset_flags;
 	klass->get_flags_func = tny_msg_header_get_flags;

@@ -89,9 +89,6 @@ struct _TnyMsgHeaderIfaceClass
                        (*get_folder_func)         (TnyMsgHeaderIface *self);
         void           (*set_folder_func)         (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder);
 
-	void           (*uncache_func)            (TnyMsgHeaderIface *self);
-	gboolean       (*has_cache_func)          (TnyMsgHeaderIface *self);
-
 	TnyMsgHeaderFlags 
 		       (*get_flags_func)          (TnyMsgHeaderIface *self);
 	void           (*set_flags_func)          (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
