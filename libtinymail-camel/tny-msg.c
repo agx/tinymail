@@ -319,7 +319,6 @@ static void
 tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	CamelMimeMessage *message = NULL;
 
 	g_mutex_lock (priv->header_lock);
 
@@ -328,8 +327,6 @@ tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
 	g_object_ref (G_OBJECT (header));
 
 	priv->header = header;
-
-	message = _tny_msg_header_get_camel_mime_message (TNY_MSG_HEADER (priv->header));
 
 	g_mutex_unlock (priv->header_lock);
 
