@@ -50,8 +50,12 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
-dnl ### default value
+dnl ### default values (will get overwritten)
 build_gnome=true
+build_mozembed=true
+with_html_component=mozembed
+build_gtkhtml=false
+PLATFORMDIR=libtinymail-gnome-desktop
 
 dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
