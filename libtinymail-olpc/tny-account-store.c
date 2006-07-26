@@ -179,14 +179,12 @@ static void
 tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-	gint i=0, count;
 	const gchar *filen;
 	gchar *configd;
-	gchar *key = NULL;
 	GDir *dir ;
 
 	configd = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), 
-		".tinymail", "accounts");
+		".tinymail", "accounts", NULL);
 	dir = g_dir_open (configd, 0, NULL);
 	g_free (configd);
 
@@ -195,14 +193,16 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 	for (filen = g_dir_read_name (dir); filen; filen = g_dir_read_name (dir))
 	{
-	  FILE *file = fopen (filen, "r");
-
-	  if (file)
-	  {
-		gchar *tok, proto[200], type[200], key[200], name[200], options[1000];
+		GKeyFile *keyfile;
+		gchar *proto, *type, *key, *name;
 		TnyAccountIface *account = NULL;
+		
+		keyfile = g_key_file_new ();
 
-		fscanf (file, "type=%s", &type);
+		if (!g_key_file_load_from_file (keyfile, filen, G_KEY_FILE_NONE, NULL))
+			continue;
+
+		type = g_key_file_get_value (keyfile, "tinymail", "type", NULL);
 
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
@@ -222,25 +222,30 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			}
 		}
 
+		if (type)
+			g_free (type);
 
 		if (account)
 		{
+			gsize options_len; gint i;
+			gchar **options;
+
 			tny_account_iface_set_account_store (account, self);
 
-			fscanf (file, "proto=%s", &proto);
+			proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
 			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
+			g_free (proto);
 
-			fscanf (file, "name=%s", &name);
+			name = g_key_file_get_value (keyfile, "tinymail", "name", NULL);
 			tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), name);
+			g_free (name);
 
-
-			fscanf (file, "options=%s", &options);
-			tok = strtok (options, ",");
-
-			while (tok)
+			options = g_key_file_get_string_list (keyfile, "tinymail", "options", &options_len, NULL);
+			if (options)
 			{
-				tny_account_add_option (TNY_ACCOUNT (account), tok);
-				tok = strtok (NULL, ",");
+				for (i=0; i<options_len; i++)
+					tny_account_add_option (TNY_ACCOUNT (account), options[i]);
+				g_strfreev (options);
 			}
 
 			/* Because we only check for the n first bytes, the pops, imaps and smtps also work */
@@ -251,22 +256,21 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 				gchar *user, *hostname;
 
 				/* TODO: Add other supported and tested providers here */
-				fscanf (file, "user=%s", &user);
+				user = g_key_file_get_value (keyfile, "tinymail", "user", NULL);
 				tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
 
-
-				fscanf (file, "hostname=%s", &hostname);
-				tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), 
-					hostname);
+				hostname = g_key_file_get_value (keyfile, "tinymail", "hostname", NULL);
+				tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), hostname);
 				
+				g_free (hostname); g_free (user);
 			} else {
 				gchar *url_string;
 
 				/* Un officially supported provider */
 				/* Assuming there's a url_string in this case */
-
-				fscanf (file, "url_string=%s", &url_string);
+				url_string = g_key_file_get_value (keyfile, "tinymail", "url_string", NULL);
 				tny_account_iface_set_url_string (TNY_ACCOUNT_IFACE (account), url_string);
+				g_free (url_string);
 			}
 
 			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), filen);
@@ -278,16 +282,13 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 			tny_account_iface_set_forget_pass_func (TNY_ACCOUNT_IFACE (account),
 				per_account_forget_pass_func);
-
+	
 			tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
 				per_account_get_pass_func);
 
+
 			tny_list_iface_prepend (list, account);
 		}
-
-		fclose (file);
-	  }
-	
 	}	
 	g_dir_close (dir);
 
@@ -302,25 +303,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 static void
 tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-	gchar *filen = g_build_filename (g_get_home_dir(),  ".tinymail", 
-		tny_account_iface_get_name (account));
-	
-	FILE *file = fopen (filen, "w");
-
-	if (file)
-	{
-
-		fprintf (file, "type=%s", type);
-		fprintf (file, "proto=%s", tny_account_iface_get_proto (account));
-		fprintf (file, "name=%s", tny_account_iface_get_name (account));
-		fprintf (file, "options=");
-		fprintf (file, "user=%s", tny_account_iface_get_user (account));
-		fprintf (file, "hostname=%s", tny_account_iface_get_hostname (account));
-
-
-		fclose (file);
-	}
+	g_warning ("Not implemented\n");
 
 	return;
 }
