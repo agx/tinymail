@@ -43,8 +43,7 @@
 #include <tny-device-iface.h>
 #include <tny-device.h>
 
-
-/* "GConf vs. Camel" account implementation */
+/* GKeyFile vs. Camel implementation */
 
 static GObjectClass *parent_class = NULL;
 
