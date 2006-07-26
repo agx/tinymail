@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <sys/mman.h>
+
 #include <config.h>
 #include <glib/gi18n-lib.h>
 
@@ -84,6 +86,8 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 				(TNY_PASSWORD_DIALOG (dialog));
 	
 			retval = g_strdup (pwd);
+
+			mlock (retval, strlen (retval));
 
 			g_hash_table_insert (passwords, g_strdup (accountid), 
 				retval);
