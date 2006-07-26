@@ -18,6 +18,8 @@ Unit test usage
 Building tips
 =============
 
+Also checkout docs/building.txt !
+
 You can set the CFLAGS="-DDEVEL" environment variable to enable a debug build.
 
 For building from repository source code, you simply do something like this:
@@ -38,42 +40,19 @@ You can use make dist, make distcheck and make distclean for distribution
 building and package preparations. You can of course use --prefix and all other
 typical autotools settings and configuration flags.
 
-Supported platforms
-===================
+Supported platforms & devices
+=============================
 
-Status
-------
-
-  Work in progress: Maemo, GPE and OLPC
-  Works: GNOME desktop
-
-One Laptop Per Child platform (OLPC)
-------------------------------------
-
-  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=olpc 	  \
-	--enable-gnome=no --with-html-component=none
-
-Maemo platform (For example for the Nokia 770)
-----------------------------------------------
-
-  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=maemo	  \
-	--enable-gnome=no --with-html-component=gtkhtml
-
-GPE platform (For example for PocketPC)
----------------------------------------
-
-  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=gpe		  \
-        --enable-gnome=no --with-html-component=gtkhtml
-
-GNOME desktop platform
-----------------------
-
-  ./autogen.sh --prefix=/opt/olpc/tinymail --with-platform=gnome-desktop  \
-	--enable-gnome=yes --with-html-component=mozembed
+  o. One Laptop Per Child platform (OLPC)
+  o. Maemo platform (For example for the Nokia 770)
+  o. GPE platform (For example for PocketPC)
+  o. GNOME desktop platform
 
 
 Information for developers who would like to tryout the demo user interface:
 ============================================================================
+
+This information only applies to the desktop support of tinymail!
 
 The libtinymail-gnome-desktop is an implementation that will work on a typical
 GNOME desktop. It has been tested on Ubuntu Breezy, Dapper and on Fedora Core 4
