@@ -50,6 +50,34 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
+dnl ### default value
+build_gnome=true
+
+dnl ### Select the platform library ##
+AC_ARG_WITH(platform,
+[  --with-platform=gnome-desktop                platform to compile [gnome-desktop]],
+[case "${with_platform}" in
+  gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
+  olpc)
+        PLATFORMDIR=libtinymail-olpc
+        build_gtkhtml=false
+        build_mozembed=false
+        build_gnome=false
+        with_html_component=none
+        ;;
+  maemo)
+        PLATFORMDIR=libtinymail-maemo
+        build_gtkhtml=false
+        build_mozembed=false
+        build_gnome=false
+        with_html_component=none
+        ;;
+  gpe) PLATFORMDIR=libtinymail-gpe ;;
+  *) PLATFORMDIR=${with_platform}
+esac], [PLATFORMDIR=libtinymail-gnome-desktop
+        with_platform=gnome-desktop])
+AC_SUBST(PLATFORMDIR)
+
 
 dnl ### Enable gnome features ##
 AC_ARG_ENABLE(gnome,
@@ -58,7 +86,7 @@ AC_ARG_ENABLE(gnome,
   yes) build_gnome=true ;;
   no)  build_gnome=false ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-gnome) ;;
-esac],[build_gnome=true])
+esac],[build_gnome=$build_gnome])
 AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
 
 dnl ### Select the html component ##
@@ -104,19 +132,6 @@ AC_ARG_ENABLE(unit-tests,
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-unit-tests) ;;
 esac],[build_unittests=false])
 AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
-
-dnl ### Select the platform library ##
-AC_ARG_WITH(platform,
-[  --with-platform=gnome-desktop		platform to compile [gnome-desktop]],
-[case "${with_platform}" in
-  gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
-  olpc) PLATFORMDIR=libtinymail-olpc ;;
-  maemo) PLATFORMDIR=libtinymail-maemo ;;
-  gpe) PLATFORMDIR=libtinymail-gpe ;;
-  *) PLATFORMDIR=${with_platform}
-esac], [PLATFORMDIR=libtinymail-gnome-desktop
-	with_platform=gnome-desktop])
-AC_SUBST(PLATFORMDIR)
 
 dnl ### gtk-doc
 GTK_DOC_CHECK([1.0])
@@ -178,7 +193,7 @@ AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_LIBS)
 
 dnl ### libtinymail-olpc, a platform library implementation for the One Laptop Per Child device ##
 if test x$PLATFORMDIR = xlibtinymail-olpc; then
- PKG_CHECK_MODULES(LIBTINYMAIL_OLPC, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+ PKG_CHECK_MODULES(LIBTINYMAIL_OLPC, glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0)
 else
  LIBTINYMAIL_OLPC_CFLAGS=
  LIBTINYMAIL_OLPC_LIBS=
@@ -189,7 +204,7 @@ AC_SUBST(LIBTINYMAIL_OLPC_LIBS)
 
 dnl ### libtinymail-maemo, a platform library implementation for the maemo platform ##
 if test x$PLATFORMDIR = xlibtinymail-maemo; then
- PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+ PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
 else
  LIBTINYMAIL_MAEMO_CFLAGS=
  LIBTINYMAIL_MAEMO_LIBS=
@@ -199,7 +214,7 @@ AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
 
 dnl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
 if test x$PLATFORMDIR = xlibtinymail-gpe; then
- PKG_CHECK_MODULES(LIBTINYMAIL_GPE, gconf-2.0 glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+ PKG_CHECK_MODULES(LIBTINYMAIL_GPE, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
 else
  LIBTINYMAIL_GPE_CFLAGS=
  LIBTINYMAIL_GPE_LIBS=
@@ -222,8 +237,7 @@ AC_SUBST(LIBTINYMAIL_TEST_CFLAGS)
 AC_SUBST(LIBTINYMAIL_TEST_LIBS)
 
 dnl ### tinymail, the demo-ui ##
-dnl Try to remove the gtk+ and gconf dependency by refactoring to libraries
-PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.6 gobject-2.0 gconf-2.0 gtk+-2.0 $extratnypkgs)
+PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.6 gobject-2.0 gtk+-2.0 $extratnypkgs)
 AC_SUBST(TINYMAIL_CFLAGS)
 AC_SUBST(TINYMAIL_LIBS)
 

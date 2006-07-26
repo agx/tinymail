@@ -23,7 +23,6 @@
 #include <string.h>
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <gconf/gconf-client.h>
 
 #include <tny-platform-factory-iface.h>
 #include <tny-platform-factory.h>
@@ -51,8 +50,6 @@ typedef struct _TnyAccountStorePriv TnyAccountStorePriv;
 
 struct _TnyAccountStorePriv
 {
-	GConfClient *client;
-	gchar *cache_dir;
 	TnySessionCamel *session;
 	TnyDeviceIface *device;
 	guint notify;
@@ -77,7 +74,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 
 	if (G_UNLIKELY (!retval))
 	{
-		/* This crashes on subsequent calls (any gtk widget creation does) */
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
 		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prompt);
@@ -167,58 +163,11 @@ tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gc
 	return retval;
 }
 
-static void
-gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
-			GConfEntry *entry, gpointer user_data)
-{
-	TnyAccountStoreIface *self = user_data;
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
-
-	gchar *key = g_strdup (entry->key);
-	gchar *ptr = strrchr (key, '/'); ptr++;
-
-	if (!strcmp (ptr, "count"))
-	{
-		g_signal_emit (self, 
-			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
-
-	}
-
-	g_free (key);
-
-	return;
-}
-
 
 static const gchar*
 tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	if (G_UNLIKELY (!priv->cache_dir))
-	{
-		/* Note that there's no listener for this key. If it changes,
-		   the camelsession should be destroyed and rebuild from scratch.
-		   Which basically means reloading the accounts aswell. 
-		  
-		   So say you're a nut who wants this key to be updatable at 
-		   runtime, you'll have to unload all the accounts here, and of
-		   course reload them. All the functionality for that is already
-		   available. Perhaps I should just do it ... hmm, maybe another
-		   day. Soon. Perhaps. I don't know. Probably . . . . bleh. 
-
-		   Oh and, not to forget! You should probably also move the old
-		   cache location to the new one. Or cleanup the old one. */
-
-		gchar *cache_dir = gconf_client_get_string (priv->client, 
-			"/apps/tinymail/cache_dir", NULL);
-		priv->cache_dir = g_build_filename (g_get_home_dir (), 
-			cache_dir, NULL);
-		g_free (cache_dir);
-	}
-
-	return priv->cache_dir;
+	return g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".tinymail");
 }
 
 
@@ -227,29 +176,29 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	gint i=0, count;
+	const gchar *filen;
+	gchar *configd;
+	gchar *key = NULL;
+	GDir *dir ;
 
-	count = gconf_client_get_int (priv->client, 
-			"/apps/tinymail/accounts/count", NULL);
+	configd = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), 
+		".tinymail", "accounts");
+	dir = g_dir_open (configd, 0, NULL);
+	g_free (configd);
 
-	for (i=0; i < count; i++)
+	if (!dir)
+		return;
+
+	for (filen = g_dir_read_name (dir); filen; filen = g_dir_read_name (dir))
 	{
-		gchar *proto, *type, *key, *name;
+	  FILE *file = fopen (filen, "r");
+
+	  if (file)
+	  {
+		gchar *tok, proto[200], type[200], key[200], name[200], options[1000];
 		TnyAccountIface *account = NULL;
-		GSList *options;
 
-		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
-		
-		if (!gconf_client_dir_exists (priv->client, (const gchar*)key, NULL))
-		{
-			g_free (key);
-			continue;
-		}
-		g_free (key);
-
-		key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", i);
-		type = gconf_client_get_string (priv->client, 
-			(const gchar*) key, NULL);
-		g_free (key);
+		fscanf (file, "type=%s", &type);
 
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
@@ -274,37 +223,20 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 		{
 			tny_account_iface_set_account_store (account, self);
 
-			if (type)
-				g_free (type);
-
-			key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
-			proto = gconf_client_get_string (priv->client, 
-				(const gchar*) key, NULL);
-			g_free (key);
+			fscanf (file, "proto=%s", &proto);
 			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
 
-			key = g_strdup_printf ("/apps/tinymail/accounts/%d/name", i);
-			name = gconf_client_get_string (priv->client, 
-				(const gchar*) key, NULL);
-			g_free (key);
+			fscanf (file, "name=%s", &name);
 			tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), name);
-			g_free (name);
 
 
-			key = g_strdup_printf ("/apps/tinymail/accounts/%d/options", i);
-			options = gconf_client_get_list (priv->client, 
-				(const gchar*) key, GCONF_VALUE_STRING, NULL);
-			g_free (key);
+			fscanf (file, "options=%s", &options);
+			tok = strtok (options, ",");
 
-			if (options)
+			while (tok)
 			{
-				while (options)
-				{
-					tny_account_add_option (TNY_ACCOUNT (account), options->data);
-					g_free (options->data);
-					options = g_slist_next (options);
-				}
-				g_slist_free (options);
+				tny_account_add_option (TNY_ACCOUNT (account), tok);
+				tok = strtok (NULL, ",");
 			}
 
 			/* Because we only check for the n first bytes, the pops, imaps and smtps also work */
@@ -315,39 +247,25 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 				gchar *user, *hostname;
 
 				/* TODO: Add other supported and tested providers here */
-				key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", i);
-				user = gconf_client_get_string (priv->client, 
-					(const gchar*) key, NULL);
-
-				g_free (key);
+				fscanf (file, "user=%s", &user);
 				tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
 
-				key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", i);
-				hostname = gconf_client_get_string (priv->client, 
-					(const gchar*) key, NULL);
-				g_free (key); 
+
+				fscanf (file, "hostname=%s", &hostname);
 				tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), 
 					hostname);
 				
-				g_free (hostname); g_free (proto); g_free (user);
 			} else {
 				gchar *url_string;
 
 				/* Un officially supported provider */
 				/* Assuming there's a url_string in this case */
 
-				key = g_strdup_printf ("/apps/tinymail/accounts/%d/url_string", i);
-				url_string = gconf_client_get_string (priv->client, 
-					(const gchar*) key, NULL);
-
-				g_free (key);
+				fscanf (file, "url_string=%s", &url_string);
 				tny_account_iface_set_url_string (TNY_ACCOUNT_IFACE (account), url_string);
-				g_free (url_string);
 			}
 
-			key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
-			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), key);
-			g_free (key);
+			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), filen);
 
 			/* 
 			 * Setting the password function must happen after
@@ -362,7 +280,13 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 			tny_list_iface_prepend (list, account);
 		}
-	}
+
+		fclose (file);
+	  }
+	
+	}	
+	g_dir_close (dir);
+
 
 	tny_session_camel_set_current_accounts (priv->session, list);
 
@@ -370,68 +294,29 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 }
 
 
-static void
-tny_account_store_notify_add (TnyAccountStoreIface *self)
-{
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-	priv->notify = gconf_client_notify_add (priv->client, 
-		"/apps/tinymail/accounts", gconf_listener_account_changed,
-		self, NULL, NULL);
-	return;
-}
-
-static void
-tny_account_store_notify_remove (TnyAccountStoreIface *self)
-{
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-	gconf_client_notify_remove (priv->client, priv->notify);
-	return;
-}
-
-/*
-	gconftool-2 -s /apps/tinymail/cache_dir -t string .tinymail
-
-	gconftool-2 -s /apps/tinymail/accounts/count -t int COUNT
-	gconftool-2 -s /apps/tinymail/accounts/0/proto -t string [smtp|imap|pop]
-	gconftool-2 -s /apps/tinymail/accounts/0/type -t string [transport|store]
-
-	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
-	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
-or
-	gconftool-2 -s /apps/tinymail/accounts/0/url_string -t string url_string
-
-*/
 
 static void
 tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-	gchar *key = NULL;
-	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
+	gchar *filen = g_build_filename (g_get_home_dir(),  ".tinymail", 
+		tny_account_iface_get_name (account));
+	
+	FILE *file = fopen (filen, "w");
 
-	count++;
+	if (file)
+	{
 
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_hostname (account), NULL);
-	g_free (key); 
+		fprintf (file, "type=%s", type);
+		fprintf (file, "proto=%s", tny_account_iface_get_proto (account));
+		fprintf (file, "name=%s", tny_account_iface_get_name (account));
+		fprintf (file, "options=");
+		fprintf (file, "user=%s", tny_account_iface_get_user (account));
+		fprintf (file, "hostname=%s", tny_account_iface_get_hostname (account));
 
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_proto (account), NULL);
-	g_free (key); 
 
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, type, NULL);
-	g_free (key); 
-
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_user (account), NULL);
-	g_free (key); 
-
-	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
-		count, NULL);
+		fclose (file);
+	}
 
 	return;
 }
@@ -443,9 +328,7 @@ tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccount
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_account_store_notify_remove (self);
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
-	tny_account_store_notify_add (self);
 
 	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
 
@@ -457,9 +340,7 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_account_store_notify_remove (self);
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
-	tny_account_store_notify_add (self);
 
 	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
 
@@ -502,12 +383,6 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyAccountStore *self = (TnyAccountStore *)instance;
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	priv->client = gconf_client_get_default ();
-
-	gconf_client_add_dir (priv->client, "/apps/tinymail", 
-		GCONF_CLIENT_PRELOAD_RECURSIVE, NULL);
-
-	tny_account_store_notify_add (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return;
 }
@@ -515,16 +390,7 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 
 static void
 tny_account_store_finalize (GObject *object)
-{
-	TnyAccountStore *self = (TnyAccountStore *)object;	
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	tny_account_store_notify_remove (TNY_ACCOUNT_STORE_IFACE (self));
-	g_object_unref (G_OBJECT (priv->client));
-
-	if (G_LIKELY (priv->cache_dir))
-		g_free (priv->cache_dir);
-
+{	
 	(*parent_class->finalize) (object);
 
 	return;
