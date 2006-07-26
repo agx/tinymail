@@ -19,6 +19,12 @@ make && make install
 
 Now simply copy /opt/camel-lite and /opt/tinymail-olpc to the device
 
+Mount the image on /media/OLPCRoot
+
+cp -a /opt/camel-lite /media/OLPCRoot/opt/
+cp -a /opt/tinymail-olpc /media/OLPCRoot/opt/
+
+
 Maemo
 -----
 
