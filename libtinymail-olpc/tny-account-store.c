@@ -298,6 +298,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 		if (proto)
 			g_free (proto);
 
+		g_key_file_free (keyfile);
 	}	
 	g_dir_close (dir);
 
