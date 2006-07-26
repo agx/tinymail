@@ -273,13 +273,13 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			}
 		}
 
+		if (type)
+			g_free (type);
 
 		if (account)
 		{
 			tny_account_iface_set_account_store (account, self);
 
-			if (type)
-				g_free (type);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
 			proto = gconf_client_get_string (priv->client, 
@@ -333,7 +333,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 				tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), 
 					hostname);
 				
-				g_free (hostname); g_free (proto); g_free (user);
+				g_free (hostname); g_free (user);
 			} else {
 				gchar *url_string;
 
@@ -367,6 +367,9 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 			tny_list_iface_prepend (list, account);
 		}
+
+		if (proto)
+			g_free (proto);
 	}
 
 	tny_session_camel_set_current_accounts (priv->session, list);

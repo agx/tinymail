@@ -196,11 +196,15 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 		GKeyFile *keyfile;
 		gchar *proto, *type, *key, *name;
 		TnyAccountIface *account = NULL;
-		
+		gchar *fullfilen = g_build_filename (g_get_home_dir(), 
+			".tinymail", "accounts", filen);
 		keyfile = g_key_file_new ();
 
-		if (!g_key_file_load_from_file (keyfile, filen, G_KEY_FILE_NONE, NULL))
+		if (!g_key_file_load_from_file (keyfile, fullfilen, G_KEY_FILE_NONE, NULL))
+		{
+			g_free (fullfilen);
 			continue;
+		}
 
 		type = g_key_file_get_value (keyfile, "tinymail", "type", NULL);
 
@@ -234,7 +238,6 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 			proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
 			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
-			g_free (proto);
 
 			name = g_key_file_get_value (keyfile, "tinymail", "name", NULL);
 			tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), name);
@@ -273,7 +276,9 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 				g_free (url_string);
 			}
 
-			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), filen);
+			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), fullfilen);
+
+			g_free (fullfilen);
 
 			/* 
 			 * Setting the password function must happen after
@@ -289,6 +294,10 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 			tny_list_iface_prepend (list, account);
 		}
+
+		if (proto)
+			g_free (proto);
+
 	}	
 	g_dir_close (dir);
 
