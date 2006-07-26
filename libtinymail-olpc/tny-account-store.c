@@ -52,6 +52,7 @@ typedef struct _TnyAccountStorePriv TnyAccountStorePriv;
 
 struct _TnyAccountStorePriv
 {
+	gchar *cache_dir;
 	TnySessionCamel *session;
 	TnyDeviceIface *device;
 	guint notify;
@@ -171,7 +172,12 @@ tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gc
 static const gchar*
 tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
-	return g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".tinymail");
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	if (!priv->cache_dir)
+		priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".tinymail", NULL);
+
+	return priv->cache_dir;
 }
 
 
@@ -377,10 +383,6 @@ tny_account_store_new (void)
 static void
 tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyAccountStore *self = (TnyAccountStore *)instance;
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
-
 	return;
 }
 
@@ -388,6 +390,11 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_account_store_finalize (GObject *object)
 {	
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (object);
+
+	if (priv->cache_dir)
+		g_free (priv->cache_dir);
+
 	(*parent_class->finalize) (object);
 
 	return;
