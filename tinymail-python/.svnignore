@@ -7,8 +7,6 @@ Makefile
 tinymail.loT
 tinymailmodule.loT
 gen-tinymail.c
-tinymailmodule.c
-tinymail_camelmodule.c
 tinymail_camel-glue.c
 tinymailui.defs
 tinymail.defs
@@ -16,3 +14,8 @@ tinymail_camel.defs
 tinymailui-glue.c
 tinymail-glue.c
 tinymail_camel-glue.loT
+tinymail-platform-glue.c
+tinymailui-gtk.defs
+tinymailui-gtk-glue.c
+tinymail-platform.defs
+platform_include.h

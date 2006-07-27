@@ -1,0 +1,43 @@
+/* -*- Mode: C; c-basic-offset: 4 -*- */
+%%
+headers
+#include <Python.h>
+
+#include <tny-account-iface.h>
+#include <tny-account-store-iface.h>
+#include <tny-device-iface.h>
+#include <tny-fs-stream.h>
+#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-list-iface.h>
+#include <tny-msg-folder-iface.h>
+#include <tny-msg-header-iface.h>
+#include <tny-msg-iface.h>
+#include <tny-msg-mime-part-iface.h>
+#include <tny-shared.h>
+#include <tny-store-account-iface.h>
+#include <tny-stream-iface.h>
+#include <tny-transport-account-iface.h>
+
+#include <tny-account-store-view-iface.h>
+#include <tny-msg-header-view-iface.h>
+#include <tny-msg-view-iface.h>
+#include <tny-msg-window-iface.h>
+#include <tny-platform-factory-iface.h>
+#include <tny-save-strategy-iface.h>
+#include <tny-summary-view-iface.h>
+#include <tny-summary-window-iface.h>
+
+#include "platform_include.h"
+
+#define NO_IMPORT_PYGOBJECT
+#include "pygobject.h"
+
+static PyTypeObject *PyGObject_Type=NULL;
+extern PyTypeObject PyGtkDialog_Type;
+
+%%
+modulename tinymail
+%%
+ignore-glob
+  *_get_type

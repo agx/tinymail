@@ -1,0 +1,37 @@
+/* -*- Mode: C; c-basic-offset: 4 -*- */
+%%
+headers
+#include <Python.h>
+
+#define NO_IMPORT_PYGOBJECT
+#include "pygobject.h"
+
+#include <glib-object.h>
+
+#include <tny-account-tree-model.h>
+#include <tny-attach-list-model.h>
+#include <tny-msg-header-list-model.h>
+#include <tny-msg-header-view.h>
+#include <tny-msg-view.h>
+#include <tny-msg-window.h>
+#include <tny-save-strategy.h>
+#include <tny-text-buffer-stream.h>
+
+extern PyTypeObject PyGtkTextBuffer_Type;
+extern PyTypeObject PyGtkTextBuffer_Type;
+extern PyTypeObject PyGtkListStore_Type;
+extern PyTypeObject PyGtkTable_Type;
+extern PyTypeObject PyGtkScrolledWindow_Type;
+extern PyTypeObject PyGtkWindow_Type;
+
+
+static PyTypeObject *PyGObject_Type=NULL;
+
+%%
+modulename tinymail_camel
+%%
+ignore-glob
+  *_get_type
+%%
+import gobject.GObject as PyGObject_Type
+       
