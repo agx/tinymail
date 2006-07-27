@@ -1,5 +1,4 @@
 tinymail/tny-main.c
-tinymail/tny-summary-window.c
 libtinymail-gnome-desktop/tny-platform-factory.c
 libtinymail-gnome-desktop/tny-account-store.c
 libtinymail-gnome-desktop/tny-device.c

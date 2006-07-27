@@ -12,7 +12,7 @@ void pytinymail_camel_register_classes (PyObject *d);
 void pytinymail_camel_add_constants(PyObject *module, const gchar *strip_prefix);
 extern PyMethodDef pytinymail_camel_functions[];
 
-DL_EXPORT(void)
+/* DL_EXPORT(void)
 inittinymail_camel(void)
 {
     PyObject *m, *d;
@@ -26,4 +26,4 @@ inittinymail_camel(void)
 	
 	if (PyErr_Occurred())
         Py_FatalError("could not initialise module tinymail_camel");
-}
+} */

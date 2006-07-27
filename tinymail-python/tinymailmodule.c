@@ -12,7 +12,7 @@ void pytinymail_register_classes (PyObject *d);
 void pytinymail_add_constants(PyObject *module, const gchar *strip_prefix);
 extern PyMethodDef pytinymail_functions[];
 
-DL_EXPORT(void)
+/* DL_EXPORT(void)
 inittinymail(void)
 {
     PyObject *m, *d;
@@ -26,4 +26,4 @@ inittinymail(void)
 	
 	if (PyErr_Occurred())
         Py_FatalError("could not initialise module tinymail");
-}
+} */
