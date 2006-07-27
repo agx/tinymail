@@ -29,3 +29,79 @@ modulename tinymail
 %%
 ignore-glob
   *_get_type
+
+%%
+override tny_msg_folder_iface_refresh_async kwargs
+
+static void
+tny_refresh_folder_cb (TnyMsgFolderIface *self, gboolean cancelled, gpointer user_data)
+{
+    PyObject *callback, *args, *ret;
+    PyGILState_STATE state;
+
+    state = pyg_gil_state_ensure();
+    callback = PyTuple_GetItem((PyObject *)user_data, 0);
+    args = Py_BuildValue("(NNO)",
+			 pygobject_new((GObject *)self),
+			 PyBool_FromLong (cancelled), 
+			 PyTuple_GetItem((PyObject *)user_data, 2));
+    ret = PyObject_CallObject(callback, args);
+    if (!ret)
+	PyErr_Print();
+    Py_XDECREF(ret);
+    Py_DECREF(args);
+    pyg_gil_state_release(state);
+}
+
+static void
+tny_refresh_folder_status_cb (TnyMsgFolderIface *self, const gchar *what, gint status, gpointer user_data)
+{
+    PyObject *callback, *args, *ret;
+    PyGILState_STATE state;
+
+    state = pyg_gil_state_ensure();
+    callback = PyTuple_GetItem((PyObject *)user_data, 0);
+    args = Py_BuildValue("(NNiO)",
+                         pygobject_new((GObject *)self),
+			 PyString_FromString (what), status,
+                         PyTuple_GetItem((PyObject *)user_data, 2));
+    ret = PyObject_CallObject(callback, args);
+    if (!ret)
+        PyErr_Print();
+    Py_XDECREF(ret);
+    Py_DECREF(args);
+    pyg_gil_state_release(state);
+}
+
+
+static PyObject *
+_wrap_tny_msg_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = { "targets", "get_func", "clear_func", "user_data", NULL };
+    PyObject *refresh_func, *status_func = Py_None, *user_data = Py_None;
+
+    PyObject *data;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,
+                                     "OO|OO:TnyMsgFolderIface.refresh_async",kwlist,
+                                     &refresh_func, &status_func,
+				     &user_data))
+        return NULL;
+    if (!PyCallable_Check(refresh_func)) {
+	PyErr_SetString(PyExc_TypeError, "refresh_func must be callable");
+	return NULL;
+    }
+
+    if (!PyCallable_Check(status_func)) {
+	PyErr_SetString(PyExc_TypeError,"status_func must be callable");
+	return NULL;
+    }
+  
+    data = Py_BuildValue("(OOO)", refresh_func, status_func, user_data);
+
+    tny_msg_folder_iface_refresh_async (TNY_MSG_FOLDER_IFACE (self->obj),
+				      tny_refresh_folder_cb, tny_refresh_folder_status_cb,
+				      data);
+    return Py_None;
+}
+
