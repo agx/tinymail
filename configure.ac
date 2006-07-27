@@ -301,6 +301,8 @@ Makefile
 docs/Makefile
 docs/devel/Makefile
 docs/devel/reference/Makefile
+bindings/Makefile
+bindings/python/Makefile
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
@@ -323,7 +325,6 @@ libtinymail-gpe/Makefile
 libtinymail-gpe/libtinymail-gpe.pc
 libtinymail-test/Makefile
 tinymail/Makefile
-tinymail-python/Makefile
 m4/Makefile
 ])
 
