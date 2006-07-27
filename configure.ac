@@ -123,7 +123,7 @@ AC_ARG_ENABLE(python-bindings,
 [case "${enableval}" in
   yes) build_pytinymail=true ;;
   no)  build_pytinymail=false ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-py-tinymail) ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-python-bindings) ;;
 esac],[build_pytinymail=false])
 AM_CONDITIONAL(BUILD_PYTINYMAIL, test x$build_pytinymail = xtrue)
 
