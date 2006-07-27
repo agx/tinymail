@@ -37,8 +37,9 @@ tinymail_platform_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
 tinymail_platform_la_SOURCES = tinymail-platformmodule.c tinymail-platform-glue.c
 
-CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c \
-	tinymail-platform-glue.c platform_include.h
+CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c 	\
+	tinymail-platform-glue.c platform_include.h tinymail.defs	\
+	tinymailui.defs tinymailui-gtk.defs tinymail-platform.defs
 
 EXTRA_DIST = 			\
 	tinymail.defs 		\
@@ -116,7 +117,7 @@ tinymailui-gtk-glue.c: tinymailui-gtk.defs tinymailui-gtk.override
 	tinymailui-gtk.defs > $@
 
 platform_include.h:
-	ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\-priv | sed 's/^/\#include\ \"/g' | sed 's/\$/\"/g' > $@
+	ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\-priv | sed 's/^/\#include\ \"/g' | sed 's/\.h/\.h\"/g' > $@
 
 tinymail-platform-glue.c: tinymail-platform.defs tinymail-platform.override platform_include.h
 	$(PYGTK_CODEGEN) --prefix tinymail_platform	\

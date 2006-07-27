@@ -118,8 +118,8 @@ AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
 AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
 
 dnl ### Enable the python language bindings ##
-AC_ARG_ENABLE(py-tinymail,
-[  --enable-py-tinymail		build python bindings [default=no]],
+AC_ARG_ENABLE(python-bindings,
+[  --enable-python-bindings		build python bindings [default=no]],
 [case "${enableval}" in
   yes) build_pytinymail=true ;;
   no)  build_pytinymail=false ;;
