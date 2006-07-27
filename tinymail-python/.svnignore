@@ -8,4 +8,8 @@ tinymailmodule.loT
 gen-tinymail.c
 tinymailmodule.c
 tinymail_camelmodule.c
-
+tinymail_camel-glue.c
+tinymailui.defs
+tinymailui-glue.c
+tinymail-glue.c
+tinymail_camel-glue.loT

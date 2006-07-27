@@ -252,6 +252,8 @@ if test x$build_pytinymail = xtrue; then
   if test x$PYTHON = xno; then
        AC_MSG_ERROR(Please install python)
   fi
+  PYGTK_CODEGENDIR="`$PKG_CONFIG --variable=codegendir pygtk-2.0`"
+
   changequote(<<, >>)dnl
   PY_VER=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_config_vars("VERSION")[0];'`
   PY_LIB=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(standard_lib=1);'`
@@ -283,6 +285,7 @@ else
   TINYMAIL_PYTHON_CFLAGS=
   TINYMAIL_PYTHON_LIBS=
 fi
+AC_SUBST(PYGTK_CODEGENDIR)
 AC_SUBST(TINYMAIL_PYTHON_CFLAGS)
 AC_SUBST(TINYMAIL_PYTHON_LIBS)
 

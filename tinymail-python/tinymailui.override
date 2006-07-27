@@ -1,0 +1,24 @@
+/* -*- Mode: C; c-basic-offset: 4 -*- */
+%%
+headers
+#include <Python.h>
+
+#include <tny-account-store-view-iface.h>
+#include <tny-msg-header-view-iface.h>
+#include <tny-msg-view-iface.h>
+#include <tny-msg-window-iface.h>
+#include <tny-platform-factory-iface.h>
+#include <tny-save-strategy-iface.h>
+#include <tny-summary-view-iface.h>
+#include <tny-summary-window-iface.h>
+
+#define NO_IMPORT_PYGOBJECT
+#include "pygobject.h"
+
+static PyTypeObject *PyGObject_Type=NULL;
+
+%%
+modulename tinymailui
+%%
+ignore-glob
+  *_get_type
