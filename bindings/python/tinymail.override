@@ -77,7 +77,7 @@ tny_refresh_folder_status_cb (TnyMsgFolderIface *self, const gchar *what, gint s
 static PyObject *
 _wrap_tny_msg_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObject *kwargs)
 {
-    static char *kwlist[] = { "targets", "get_func", "clear_func", "user_data", NULL };
+    static char *kwlist[] = { "refresh_func", "status_func", "user_data", NULL };
     PyObject *refresh_func, *status_func = Py_None, *user_data = Py_None;
 
     PyObject *data;
