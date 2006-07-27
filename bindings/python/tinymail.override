@@ -60,10 +60,10 @@ tny_refresh_folder_status_cb (TnyMsgFolderIface *self, const gchar *what, gint s
     PyGILState_STATE state;
 
     state = pyg_gil_state_ensure();
-    callback = PyTuple_GetItem((PyObject *)user_data, 0);
-    args = Py_BuildValue("(NNiO)",
+    callback = PyTuple_GetItem((PyObject *)user_data, 1);
+    args = Py_BuildValue("(NsiO)",
                          pygobject_new((GObject *)self),
-			 PyString_FromString (what), status,
+			 what, status,
                          PyTuple_GetItem((PyObject *)user_data, 2));
     ret = PyObject_CallObject(callback, args);
     if (!ret)
@@ -83,7 +83,7 @@ _wrap_tny_msg_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObj
     PyObject *data;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs,
-                                     "OO|OO:TnyMsgFolderIface.refresh_async",kwlist,
+                                     "OO|O:TnyMsgFolderIface.refresh_async",kwlist,
                                      &refresh_func, &status_func,
 				     &user_data))
         return NULL;
