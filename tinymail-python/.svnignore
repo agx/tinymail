@@ -2,6 +2,7 @@ Makefile.in
 .svnignore
 .deps
 .libs
+.defs
 Makefile
 tinymail.loT
 tinymailmodule.loT
