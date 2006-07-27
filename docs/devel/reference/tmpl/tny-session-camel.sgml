@@ -28,7 +28,10 @@ status of the device.
 @device: 
 @account_store: 
 @interactive: 
+@prev_constat: 
+@first_switch: 
 @connchanged_signal: 
+@current_accounts: 
 
 <!-- ##### FUNCTION tny_session_camel_set_pass_func ##### -->
 <para>
@@ -66,5 +69,14 @@ status of the device.
 
 @self: 
 @device: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_current_accounts ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
 
 

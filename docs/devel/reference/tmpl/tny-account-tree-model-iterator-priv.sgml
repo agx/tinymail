@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyPlatformFactory
+TnyAccountTreeModelIterator
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -19,17 +19,12 @@ TnyPlatformFactory
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyPlatformFactory ##### -->
+<!-- ##### STRUCT TnyAccountTreeModelIterator ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
+@parent: 
+@model: 
+@current: 
 

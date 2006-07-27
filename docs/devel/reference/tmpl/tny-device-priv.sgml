@@ -9,10 +9,12 @@ tny-device-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -22,8 +24,8 @@ tny-device-priv
 
 </para>
 
-@nm_ctx: 
-@callback_id: 
+@forced: 
+@fset: 
 
 <!-- ##### MACRO TNY_DEVICE_GET_PRIVATE ##### -->
 <para>

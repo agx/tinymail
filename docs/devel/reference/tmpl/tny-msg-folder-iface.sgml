@@ -165,15 +165,6 @@ instances. Depending on the implementation, this will reduce memory usage.
 @self: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_has_cache ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_msg_folder_iface_set_subscribed ##### -->
 <para>
 

@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyPlatformFactory
+TnySummaryViewIface
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -19,17 +19,9 @@ TnyPlatformFactory
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyPlatformFactory ##### -->
+<!-- ##### STRUCT TnySummaryViewIface ##### -->
 <para>
 
 </para>
-
-
-<!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
-<para>
-
-</para>
-
-@Returns: 
 
 

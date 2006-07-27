@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyPlatformFactory
+tny-msg-iface-test
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -19,13 +19,7 @@ TnyPlatformFactory
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyPlatformFactory ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
+<!-- ##### FUNCTION create_tny_msg_iface_suite ##### -->
 <para>
 
 </para>

@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyPlatformFactory
+tny-list-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -19,17 +19,19 @@ TnyPlatformFactory
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyPlatformFactory ##### -->
+<!-- ##### STRUCT TnyListPriv ##### -->
 <para>
 
 </para>
 
+@iterator_lock: 
+@first: 
 
-<!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
+<!-- ##### MACRO TNY_LIST_GET_PRIVATE ##### -->
 <para>
 
 </para>
 
-@Returns: 
+@o: 
 
 

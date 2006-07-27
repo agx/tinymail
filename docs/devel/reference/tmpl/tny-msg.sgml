@@ -43,13 +43,3 @@ This implementation is coupled with #TnyMsgMimePart.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_new_with_header_and_parts ##### -->
-<para>
-
-</para>
-
-@header: 
-@parts: 
-@Returns: 
-
-

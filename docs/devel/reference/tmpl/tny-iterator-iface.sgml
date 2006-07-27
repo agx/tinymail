@@ -63,7 +63,25 @@ An iterator for #TnyListIface
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_iterator_iface_has_first ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_iterator_iface_has_next ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_iterator_iface_is_done ##### -->
 <para>
 
 </para>

@@ -36,20 +36,18 @@ account-folders as the child rows.
 </para>
 
 
+<!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
+<para>
+
+</para>
+
+@parent_class: 
+
 <!-- ##### FUNCTION tny_account_tree_model_new ##### -->
 <para>
 
 </para>
 
 @Returns: 
-
-
-<!-- ##### FUNCTION tny_account_tree_model_add ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
 
 

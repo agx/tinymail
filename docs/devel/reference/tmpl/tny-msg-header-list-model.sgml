@@ -50,3 +50,27 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 @refresh: 
 
 
+<!-- ##### FUNCTION tny_msg_header_list_model_received_date_sort_func ##### -->
+<para>
+
+</para>
+
+@model: 
+@a: 
+@b: 
+@user_data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_header_list_model_sent_date_sort_func ##### -->
+<para>
+
+</para>
+
+@model: 
+@a: 
+@b: 
+@user_data: 
+@Returns: 
+
+

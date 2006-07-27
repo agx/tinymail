@@ -2,7 +2,6 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
-<!ENTITY tinymail-TnySummaryWindow SYSTEM "xml/tny-summary-window.xml">
 
 <!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
 <!ENTITY libtinymail-TnyAccountIface SYSTEM "xml/tny-account-iface.xml">
@@ -45,7 +44,6 @@
 <!ENTITY libtinymailui-TnyMsgViewIface SYSTEM "xml/tny-msg-view-iface.xml">
 <!ENTITY libtinymailui-TnyPlatformFactoryIface SYSTEM "xml/tny-platform-factory-iface.xml">
 <!ENTITY libtinymailui-TnyAccountStoreViewIface SYSTEM "xml/tny-account-store-view-iface.xml">
-<!ENTITY libtinymailui-TnySummaryWindowIface SYSTEM "xml/tny-summary-window-iface.xml">
 <!ENTITY libtinymailui-TnySaveStrategyIface SYSTEM "xml/tny-save-strategy-iface.xml">
 
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
@@ -84,7 +82,6 @@
 
 	<chapter id="tinymail">
 		<title>tinymail</title>
-		&tinymail-TnySummaryWindow;
 	</chapter>
 
 	<chapter id="libtinymail">
@@ -107,7 +104,6 @@
 
 	<chapter id="libtinymailui">
 		<title>libtinymailui</title>
-		&libtinymailui-TnySummaryWindowIface;
 		&libtinymailui-TnyAccountStoreViewIface;
 		&libtinymailui-TnyMsgViewIface;
 		&libtinymailui-TnyMsgWindowIface;

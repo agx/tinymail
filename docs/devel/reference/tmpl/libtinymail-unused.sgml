@@ -46,6 +46,50 @@ TnyMsgFolderProxy
 TnyMsgHeaderProxy
 
 
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Long_Description ##### -->
+<para>
+A demo implementation of a summary window. Implemented for Gtk+.
+</para><para>
+The implementation claims to also be a #TnyAccountStoreViewIface implementation.
+Which is, of course, perfectly legal. It's possible that a summary window is a
+view for the account store.
+</para><para>
+You can, however, also do it more finegrained and create a real view type that
+implements the #TnyAccountStoreViewIface. And you can let the summary window
+for example decorate that. Or simply goes in a composition relation with that
+type. In a human language: embed the view type in the summary window.
+</para><para>
+The demo-ui, however, implements the summary window *as* the view type. The 
+main reason for this is because that reduces the amount of code. People might
+other wise get scared about having to implement a lot own GObjects if they
+want to use the tinymail framework. This isn't true. 
+</para><para>
+But that doesn't mean the scared people are right. It's probably more correct
+to implement a type as a #TnyAccountStoreViewIface and put it in composition
+with the #TnySummaryWindowIface implementation.
+</para><para>
+Mine is just a simple demo.
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:See_Also ##### -->
+<para>
+#TnyAccountStoreViewIface, #TnySummaryWindowIface, #TnyAccountStoreIface
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Short_Description ##### -->
+A demo implementation of #TnySummaryWindowIface for Gtk+
+
+
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Title ##### -->
+TnySummaryWindow
+
+
 <!-- ##### USER_FUNCTION ForgetPassFunc ##### -->
 <para>
 
@@ -116,6 +160,19 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @parent: 
 
+<!-- ##### STRUCT TnySummaryWindow ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnySummaryWindowIface ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### FUNCTION tny_account_get_type ##### -->
 <para>
 
@@ -129,6 +186,30 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 @Returns: 
+
+<!-- ##### FUNCTION tny_account_store_iface_get_store_accounts ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_account_store_iface_get_transport_accounts ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_account_tree_model_add ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
 
 <!-- ##### FUNCTION tny_device_get_new ##### -->
 <para>
@@ -144,6 +225,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @folder: 
+
+<!-- ##### FUNCTION tny_msg_folder_iface_has_cache ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
 
 <!-- ##### FUNCTION tny_msg_folder_iface_refresh_headers_async ##### -->
 <para>
@@ -162,6 +251,30 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_msg_header_iface_set_uid ##### -->
+<para>
+
+</para>
+
+@self: 
+@uid: 
+
+<!-- ##### FUNCTION tny_msg_header_set_use_summary ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+<!-- ##### FUNCTION tny_msg_iface_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
 <!-- ##### FUNCTION tny_msg_mime_part_iface_get_index ##### -->
 <para>
 
@@ -178,6 +291,15 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @index: 
 
+<!-- ##### FUNCTION tny_msg_new_with_header_and_parts ##### -->
+<para>
+
+</para>
+
+@header: 
+@parts: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_window_iface_set_msg ##### -->
 <para>
 
@@ -187,6 +309,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @msg: 
 
 <!-- ##### FUNCTION tny_session_camel_get_instance ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_summary_window_new ##### -->
 <para>
 
 </para>

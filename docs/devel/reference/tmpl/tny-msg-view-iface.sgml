@@ -42,3 +42,12 @@ to the user.
 @strategy: 
 
 
+<!-- ##### FUNCTION tny_msg_view_iface_set_unavailable ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+

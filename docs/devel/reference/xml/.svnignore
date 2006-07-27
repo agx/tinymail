@@ -65,3 +65,16 @@ tny-msg-header-list-iterator-priv.xml
 tny-iterator-iface.xml
 tny-msg-folder-list-priv.xml
 tny-msg-folder-list-iterator-priv.xml
+tny-summary-view.xml
+tny-list-iterator-priv.xml
+tny-device-iface-test.xml
+tny-msg-folder-iface-test.xml
+tny-account-tree-model-iterator-priv.xml
+tny-list-iface-test.xml
+tny-summary-view-iface.xml
+tny-iterator-iface-test.xml
+tny-msg-iface-test.xml
+tny-list.xml
+tny-account-iface-test.xml
+tny-list-priv.xml
+tny-account-tree-model-priv.xml

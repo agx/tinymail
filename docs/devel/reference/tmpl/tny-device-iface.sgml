@@ -33,3 +33,19 @@ online/offline status.
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_device_iface_force_online ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_device_iface_force_offline ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

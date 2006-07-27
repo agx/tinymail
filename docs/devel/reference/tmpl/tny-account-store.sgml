@@ -2,17 +2,19 @@
 TnyAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-A account store implemented for Camel and GConf
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-An implementation of #TnyAccountStoreIface that uses Camel and GConf. This implementation is coupled with the #TnyStoreAccount and #TnyTransportAccount implementations. It can only return instances of those implementations of #TnyStoreAccountIface and #TnyTransportAccountIface.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccountStoreIface, #TnyAccountIface, #TnyStoreAccountIface, #TnyTransportAccountIface, #TnyAccount, #TnyStoreAccount, #TnyTransportAccount
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

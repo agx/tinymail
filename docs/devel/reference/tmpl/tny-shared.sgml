@@ -54,7 +54,9 @@ Shared include file with forward typedefs
 @first_func: 
 @nth_func: 
 @current_func: 
+@has_first_func: 
 @has_next_func: 
+@is_done: 
 @get_list_func: 
 
 <!-- ##### STRUCT TnyMsgIface ##### -->
@@ -72,7 +74,6 @@ Shared include file with forward typedefs
 @get_parts_func: 
 @get_header_func: 
 @get_folder_func: 
-@set_folder_func: 
 @set_header_func: 
 @del_part_func: 
 @add_part_func: 
@@ -149,7 +150,6 @@ Shared include file with forward typedefs
 @get_message_id_func: 
 @get_date_received_func: 
 @get_date_sent_func: 
-@set_uid_func: 
 @set_bcc_func: 
 @set_cc_func: 
 @set_from_func: 
@@ -158,8 +158,6 @@ Shared include file with forward typedefs
 @set_replyto_func: 
 @get_folder_func: 
 @set_folder_func: 
-@uncache_func: 
-@has_cache_func: 
 @get_flags_func: 
 @set_flags_func: 
 @unset_flags_func: 
@@ -212,6 +210,7 @@ Shared include file with forward typedefs
 @set_user_func: 
 @set_hostname_func: 
 @set_url_string_func: 
+@set_account_type_func: 
 @set_pass_func_func: 
 @set_forget_pass_func_func: 
 @get_pass_func_func: 
@@ -222,6 +221,7 @@ Shared include file with forward typedefs
 @get_user_func: 
 @get_hostname_func: 
 @get_url_string_func: 
+@get_account_type_func: 
 @set_account_store_func: 
 @get_account_store_func: 
 
@@ -246,6 +246,9 @@ Shared include file with forward typedefs
 
 @parent: 
 @is_online_func: 
+@force_online_func: 
+@force_offline_func: 
+@reset_func: 
 @connection_changed: 
 
 <!-- ##### STRUCT TnyStoreAccountIface ##### -->
@@ -343,9 +346,8 @@ Shared include file with forward typedefs
 @account_inserted: 
 @account_removed: 
 @accounts_reloaded: 
-@get_store_accounts_func: 
+@get_accounts_func: 
 @add_store_account_func: 
-@get_transport_accounts_func: 
 @add_transport_account_func: 
 @get_cache_dir_func: 
 @get_device_func: 
@@ -409,6 +411,19 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when n
 @status: A status field
 @user_data: user data
 
+
+<!-- ##### STRUCT TnyList ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyListClass ##### -->
+<para>
+
+</para>
+
+@parent: 
 
 <!-- ##### MACRO G_LIKELY ##### -->
 <para>

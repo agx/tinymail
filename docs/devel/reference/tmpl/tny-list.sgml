@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyPlatformFactory
+TnyList
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -19,13 +19,13 @@ TnyPlatformFactory
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyPlatformFactory ##### -->
+<!-- ##### STRUCT TnyList ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
+<!-- ##### FUNCTION tny_list_new ##### -->
 <para>
 
 </para>

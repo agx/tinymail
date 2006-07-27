@@ -64,15 +64,6 @@ therefore be used as a mime part.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_iface_set_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-
-
 <!-- ##### FUNCTION tny_msg_iface_set_header ##### -->
 <para>
 
