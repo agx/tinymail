@@ -37,7 +37,7 @@ static PyTypeObject *PyGObject_Type=NULL;
 extern PyTypeObject PyGtkDialog_Type;
 
 %%
-modulename tinymail
+modulename tinymail-platform
 %%
 ignore-glob
   *_get_type

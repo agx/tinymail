@@ -28,7 +28,7 @@ extern PyTypeObject PyGtkWindow_Type;
 static PyTypeObject *PyGObject_Type=NULL;
 
 %%
-modulename tinymail_camel
+modulename tinymailui-gtk
 %%
 ignore-glob
   *_get_type
