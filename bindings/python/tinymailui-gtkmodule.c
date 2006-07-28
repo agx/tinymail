@@ -1,23 +1,23 @@
 #include <pygobject.h>
 #include <pygtk/pygtk.h>
 
-void tinymailui_gtk_register_classes (PyObject *d); 
-extern PyMethodDef tinymailui_gtk_functions[];
+void pyuigtk_register_classes (PyObject *d); 
+extern PyMethodDef pyuigtk_functions[];
  
 DL_EXPORT(void)
-inittinymailui_gtk(void)
+init_uigtk(void)
 {
     PyObject *m, *d;
  
     init_pygobject ();
     init_pygtk();
     
-    m = Py_InitModule ("tinymailui_gtk", tinymailui_gtk_functions);
+    m = Py_InitModule ("uigtk", pyuigtk_functions);
     d = PyModule_GetDict (m);
  
-    tinymailui_gtk_register_classes (d);
+    pyuigtk_register_classes (d);
  
     if (PyErr_Occurred ()) {
-        Py_FatalError ("can't initialise module tinymailui_gtk");
+        Py_FatalError ("can't initialise module uigtk");
     }
 }

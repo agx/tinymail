@@ -6,36 +6,38 @@ INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) 		\
 	-I$(top_srcdir)/libtinymail-camel			\
 	-I$(top_srcdir)/$(PLATFORMDIR)
 
-tinymaildir = $(pythondir)/tinymail
-tinymail_LTLIBRARIES = tinymail.la tinymailui.la tinymailui-gtk.la tinymail-platform.la
+common_ldflags = -module -avoid-version
 
-tinymail_la_LDFLAGS = -module -avoid-version 
-# -export-symbols-regex inittinymail
-tinymail_la_LIBADD = $(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) 	\
+tinymaildir = $(pythondir)/tinymail-$(API_VERSION)
+tinymail_LTLIBRARIES = _tinymail.la ui.la uigtk.la platform.la
+
+_tinymail_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_tinymail
+_tinymail_la_LIBADD = $(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) 	\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 
-tinymail_la_SOURCES = tinymailmodule.c tinymail-glue.c
+_tinymail_la_SOURCES = tinymailmodule.c
+nodist__tinymail_la_SOURCES = tinymail-glue.c
 
-tinymailui_la_LDFLAGS = -module -avoid-version
-# -export-symbols-regex inittinymail
-tinymailui_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(TINYMAIL_PYTHON_LIBS) 	\
+ui_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_ui
+ui_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(TINYMAIL_PYTHON_LIBS) 	\
 	$(LIBTINYMAIL_LIBS)						\
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la
-tinymailui_la_SOURCES = tinymailuimodule.c tinymailui-glue.c
-          
-tinymailui_gtk_la_LDFLAGS = -module -avoid-version 
-# -export-symbols-regex inittinymailui_gtk
-tinymailui_gtk_la_LIBADD = $(LIBTINYMAILUI_GTK_LIBS) $(LIBTINYMAILUI_LIBS) 	\
+ui_la_SOURCES = tinymailuimodule.c
+nodist_ui_la_SOURCES = tinymailui-glue.c
+ 
+uigtk_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_uigtk
+uigtk_la_LIBADD = $(LIBTINYMAILUI_GTK_LIBS) $(LIBTINYMAILUI_LIBS) 	\
 	$(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) 				\
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
-tinymailui_gtk_la_SOURCES = tinymailui-gtkmodule.c tinymailui-gtk-glue.c
+uigtk_la_SOURCES = tinymailui-gtkmodule.c
+nodist_uigtk_la_SOURCES = tinymailui-gtk-glue.c
 
-tinymail_platform_la_LDFLAGS = -module -avoid-version
-# -export-symbols-regex inittinymail_platform
-tinymail_platform_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
+platform_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_platform
+platform_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
 	$(TINYMAIL_PYTHON_LIBS) 					\
 	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la	\
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
-tinymail_platform_la_SOURCES = tinymail-platformmodule.c tinymail-platform-glue.c
+platform_la_SOURCES = tinymail-platformmodule.c
+nodist_platform_la_SOURCES = tinymail-platform-glue.c
 
 CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c 	\
 	tinymail-platform-glue.c platform_include.h tinymail.defs	\
@@ -100,17 +102,17 @@ tinymail-platform.defs : $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs` > $@
 
 tinymail-glue.c: tinymail.defs tinymail.override
-	$(PYGTK_CODEGEN) --prefix tinymail		\
+	$(PYGTK_CODEGEN) --prefix pytinymail		\
 	--override tinymail.override			\
 	tinymail.defs > $@
 
 tinymailui-glue.c: tinymailui.defs tinymailui.override
-	$(PYGTK_CODEGEN) --prefix tinymailui		\
+	$(PYGTK_CODEGEN) --prefix pyui			\
 	--override tinymailui.override			\
 	tinymailui.defs > $@
 
 tinymailui-gtk-glue.c: tinymailui-gtk.defs tinymailui-gtk.override
-	$(PYGTK_CODEGEN) --prefix tinymailui_gtk	\
+	$(PYGTK_CODEGEN) --prefix pyuigtk		\
 	--register $(PYGTK_DEFSDIR)/gdk-types.defs      \
 	--register $(PYGTK_DEFSDIR)/gtk-types.defs      \
 	--override tinymailui-gtk.override		\
@@ -120,12 +122,7 @@ platform_include.h:
 	ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\-priv | sed 's/^/\#include\ \"/g' | sed 's/\.h/\.h\"/g' > $@
 
 tinymail-platform-glue.c: tinymail-platform.defs tinymail-platform.override platform_include.h
-	$(PYGTK_CODEGEN) --prefix tinymail_platform	\
+	$(PYGTK_CODEGEN) --prefix pyplatform		\
 	--override tinymail-platform.override		\
 	tinymail-platform.defs > $@
-
-.defs.c:
-	(cd $(srcdir) && $(PYGTK_CODEGEN) --override $*.override \
-	--prefix py$* $*.defs) > gen-$*.c && cp gen-$*.c $*.c && \
-	rm -f gen-$*.c
 

@@ -1,21 +1,21 @@
 #include <pygobject.h>
  
-void tinymailui_register_classes (PyObject *d); 
-extern PyMethodDef tinymailui_functions[];
+void pyui_register_classes (PyObject *d); 
+extern PyMethodDef pyui_functions[];
  
 DL_EXPORT(void)
-inittinymailui(void)
+init_ui(void)
 {
     PyObject *m, *d;
  
     init_pygobject ();
  
-    m = Py_InitModule ("tinymailui", tinymailui_functions);
+    m = Py_InitModule ("ui", pyui_functions);
     d = PyModule_GetDict (m);
  
-    tinymailui_register_classes (d);
+    pyui_register_classes (d);
  
     if (PyErr_Occurred ()) {
-        Py_FatalError ("can't initialise module tinymailui");
+        Py_FatalError ("can't initialise module ui");
     }
 }
