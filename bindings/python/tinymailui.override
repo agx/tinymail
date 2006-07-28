@@ -15,6 +15,11 @@ headers
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
 
+/*extern PyTypeObject PyTnyMsgHeaderIface_Type;
+extern PyTypeObject PyTnyMsgIface_Type;
+extern PyTypeObject PyTnyMsgMimePartIface_Type;
+extern PyTypeObject PyTnyAccountStoreIface_Type;*/
+
 %%
 modulename tinymail.ui
 %%
