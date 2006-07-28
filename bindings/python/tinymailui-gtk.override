@@ -17,13 +17,6 @@ headers
 #include <tny-save-strategy.h>
 #include <tny-text-buffer-stream.h>
 
-extern PyTypeObject PyGtkTextBuffer_Type;
-extern PyTypeObject PyGtkListStore_Type;
-extern PyTypeObject PyGtkTable_Type;
-extern PyTypeObject PyGtkScrolledWindow_Type;
-extern PyTypeObject PyGtkWindow_Type;
-static PyTypeObject *PyGObject_Type=NULL;
-
 %%
 modulename uigtk
 %%

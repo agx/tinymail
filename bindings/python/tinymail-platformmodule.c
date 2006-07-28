@@ -16,6 +16,6 @@ initplatform(void)
     pyplatform_register_classes (d);
  
     if (PyErr_Occurred ()) {
-        Py_FatalError ("can't initialise module platform");
+        PyErr_Print();
     }
 }

@@ -15,8 +15,6 @@ headers
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
 
-static PyTypeObject *PyGObject_Type=NULL;
-
 %%
 modulename ui
 %%

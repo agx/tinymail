@@ -33,10 +33,6 @@ headers
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
 
-static PyTypeObject *PyGObject_Type=NULL;
-extern PyTypeObject PyGtkDialog_Type;
-extern PyTypeObject PyTnyAccountStoreIface_Type;
-
 %%
 modulename platform
 %%

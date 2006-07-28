@@ -1,17 +1,21 @@
-09-10-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+07-28-2006  James Livingston <doclivingston@gmail.com>
+
+	* bindings/python/*: Some fixes for the Python bindings
+
+07-10-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Removed a const label
 
-09-10-2006  Chris Lord <chris@openedhand.com>
+07-10-2006  Chris Lord <chris@openedhand.com>
 
 	* Refactored TnySummaryWindowIface to TnySummaryViewIface
 	* Added support for XEmbed and command-line parameters in the demo-ui
 
-09-06-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+06-09-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* tny_iterator_iface_is_end method
 
-07-06-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+06-07-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Major API changes in TnyAccountStore
 	
@@ -19,7 +23,7 @@
 
 	* Make GPE TnyDevice default to be online for now.
 
-01-06-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+06-01-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Implementation and implementing
 

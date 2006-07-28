@@ -22,7 +22,6 @@ headers
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
 
-static PyTypeObject *PyGObject_Type=NULL;
 
 %%
 modulename tinymail
@@ -30,6 +29,8 @@ modulename tinymail
 ignore-glob
   *_get_type
 
+%%
+import gobject.GObject as PyGObject_Type
 %%
 override tny_msg_folder_iface_refresh_async kwargs
 
