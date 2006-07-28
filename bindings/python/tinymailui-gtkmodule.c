@@ -5,7 +5,7 @@ void pyuigtk_register_classes (PyObject *d);
 extern PyMethodDef pyuigtk_functions[];
  
 DL_EXPORT(void)
-init_uigtk(void)
+inituigtk(void)
 {
     PyObject *m, *d;
  

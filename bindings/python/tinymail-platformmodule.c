@@ -4,7 +4,7 @@ void pyplatform_register_classes (PyObject *d);
 extern PyMethodDef pyplatform_functions[];
  
 DL_EXPORT(void)
-init_platform(void)
+initplatform(void)
 {
     PyObject *m, *d;
  

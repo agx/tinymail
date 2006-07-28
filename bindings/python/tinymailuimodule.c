@@ -4,7 +4,7 @@ void pyui_register_classes (PyObject *d);
 extern PyMethodDef pyui_functions[];
  
 DL_EXPORT(void)
-init_ui(void)
+initui(void)
 {
     PyObject *m, *d;
  
