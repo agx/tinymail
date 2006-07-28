@@ -25,6 +25,7 @@ nodist__tinymail_la_SOURCES = tinymail-glue.c
 ui_la_LDFLAGS = $(common_ldflags) -export-symbols-regex initui
 ui_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(TINYMAIL_PYTHON_LIBS) 		\
 	$(LIBTINYMAIL_LIBS)						\
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la	\
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la
 ui_la_SOURCES = tinymailuimodule.c
 nodist_ui_la_SOURCES = tinymailui-glue.c
@@ -32,6 +33,8 @@ nodist_ui_la_SOURCES = tinymailui-glue.c
 uigtk_la_LDFLAGS = $(common_ldflags) -export-symbols-regex inituigtk
 uigtk_la_LIBADD = $(LIBTINYMAILUI_GTK_LIBS) $(LIBTINYMAILUI_LIBS) 	\
 	$(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) 			\
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la	\
+	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la	\
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
 uigtk_la_SOURCES = tinymailui-gtkmodule.c
 nodist_uigtk_la_SOURCES = tinymailui-gtk-glue.c
@@ -39,6 +42,7 @@ nodist_uigtk_la_SOURCES = tinymailui-gtk-glue.c
 platform_la_LDFLAGS = $(common_ldflags) -export-symbols-regex initplatform
 platform_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
 	$(TINYMAIL_PYTHON_LIBS) 					\
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la	\
 	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la	\
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
 platform_la_SOURCES = tinymail-platformmodule.c
