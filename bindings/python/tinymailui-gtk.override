@@ -18,7 +18,7 @@ headers
 #include <tny-text-buffer-stream.h>
 
 %%
-modulename uigtk
+modulename tinymail.uigtk
 %%
 ignore-glob
   *_get_type

@@ -122,12 +122,15 @@ tinymail-glue.c: tinymail.defs tinymail.override
 tinymailui-glue.c: tinymailui.defs tinymailui.override
 	$(PYGTK_CODEGEN) --prefix pyui			\
 	--override tinymailui.override			\
+	--register tinymail.defs			\
 	tinymailui.defs > $@
 
 tinymailui-gtk-glue.c: tinymailui-gtk.defs tinymailui-gtk.override
 	$(PYGTK_CODEGEN) --prefix pyuigtk		\
 	--register $(PYGTK_DEFSDIR)/gdk-types.defs      \
 	--register $(PYGTK_DEFSDIR)/gtk-types.defs      \
+	--register tinymail.defs			\
+	--register tinymailui.defs			\
 	--override tinymailui-gtk.override		\
 	tinymailui-gtk.defs > $@
 
@@ -137,5 +140,6 @@ platform_include.h:
 tinymail-platform-glue.c: tinymail-platform.defs tinymail-platform.override platform_include.h
 	$(PYGTK_CODEGEN) --prefix pyplatform		\
 	--override tinymail-platform.override		\
+	--register tinymail.defs			\
 	tinymail-platform.defs > $@
 

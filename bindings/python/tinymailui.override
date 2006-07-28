@@ -16,7 +16,13 @@ headers
 #include "pygobject.h"
 
 %%
-modulename ui
+modulename tinymail.ui
 %%
 ignore-glob
   *_get_type
+
+%%
+from ui import AccountStoreIface as PyTnyAccountStoreIface_Type
+from tinymail import MsgHeaderIface as PyTnyMsgHeaderIface_Type
+from tinymail import Msg as PyTnyMsgIface_Type
+from tinymail import MsgMimePart as PyTnyMsgMimePartIface_Type
