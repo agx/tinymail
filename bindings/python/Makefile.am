@@ -9,7 +9,9 @@ INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) 		\
 common_ldflags = -module -avoid-version
 
 tinymaildir = $(pythondir)/tinymail-$(API_VERSION)
+ptinymaildir = $(pythondir)/tinymail-$(API_VERSION)
 tinymail_LTLIBRARIES = _tinymail.la ui.la uigtk.la platform.la
+ptinymail_PYTHON = __init__.py
 
 _tinymail_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_tinymail
 _tinymail_la_LIBADD = $(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) 	\
