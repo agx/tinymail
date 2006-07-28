@@ -25,7 +25,7 @@ extern PyTypeObject PyGtkWindow_Type;
 static PyTypeObject *PyGObject_Type=NULL;
 
 %%
-modulename tinymailui-gtk
+modulename uigtk
 %%
 ignore-glob
   *_get_type

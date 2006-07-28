@@ -35,12 +35,16 @@ headers
 
 static PyTypeObject *PyGObject_Type=NULL;
 extern PyTypeObject PyGtkDialog_Type;
+extern PyTypeObject PyTnyAccountStoreIface_Type;
 
 %%
-modulename tinymail-platform
+modulename platform
 %%
 ignore-glob
   *_get_type
 %%
 import gobject.GObject as PyGObject_Type
 import gtk.Dialog as PyGtkDialog_Type
+
+import platform.AccountStoreIface as PyTnyAccountStoreIface_Type
+

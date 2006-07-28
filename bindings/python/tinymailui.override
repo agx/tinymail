@@ -18,7 +18,7 @@ headers
 static PyTypeObject *PyGObject_Type=NULL;
 
 %%
-modulename tinymailui
+modulename ui
 %%
 ignore-glob
   *_get_type
