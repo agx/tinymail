@@ -303,6 +303,7 @@ docs/devel/Makefile
 docs/devel/reference/Makefile
 bindings/Makefile
 bindings/python/Makefile
+bindings/python/tinymail.pth
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
