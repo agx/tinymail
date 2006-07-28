@@ -41,3 +41,6 @@ modulename tinymail-platform
 %%
 ignore-glob
   *_get_type
+%%
+import gobject.GObject as PyGObject_Type
+import gtk.Dialog as PyGtkDialog_Type

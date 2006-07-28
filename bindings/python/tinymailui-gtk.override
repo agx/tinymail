@@ -18,13 +18,10 @@ headers
 #include <tny-text-buffer-stream.h>
 
 extern PyTypeObject PyGtkTextBuffer_Type;
-extern PyTypeObject PyGtkTextBuffer_Type;
 extern PyTypeObject PyGtkListStore_Type;
 extern PyTypeObject PyGtkTable_Type;
 extern PyTypeObject PyGtkScrolledWindow_Type;
 extern PyTypeObject PyGtkWindow_Type;
-
-
 static PyTypeObject *PyGObject_Type=NULL;
 
 %%
@@ -34,4 +31,8 @@ ignore-glob
   *_get_type
 %%
 import gobject.GObject as PyGObject_Type
-       
+import gtk.Table as PyGtkTable_Type
+import gtk.ScrolledWindow as PyGtkScrolledWindow_Type
+import gtk.TextBuffer as PyGtkTextBuffer_Type
+import gtk.ListStore as PyGtkListStore_Type
+import gtk.Window as PyGtkWindow_Type
