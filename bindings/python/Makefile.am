@@ -121,8 +121,8 @@ tinymail-glue.c: tinymail.defs tinymail.override
 
 tinymailui-glue.c: tinymailui.defs tinymailui.override
 	$(PYGTK_CODEGEN) --prefix pyui			\
-	--override tinymailui.override			\
 	--register tinymail.defs			\
+	--override tinymailui.override			\
 	tinymailui.defs > $@
 
 tinymailui-gtk-glue.c: tinymailui-gtk.defs tinymailui-gtk.override
