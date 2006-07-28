@@ -78,7 +78,8 @@ tinymail.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(top_srcdir)/libtinymail/tny-store-account-iface.h 	\
 	$(top_srcdir)/libtinymail/tny-stream-iface.h 		\
 	$(top_srcdir)/libtinymail/tny-transport-account-iface.h > $@
- 
+	cat $@ | sed 's/define-object\ \(.*\)Iface/define-interface\ \1Iface/g' > $@.tmp
+	mv $@.tmp $@
 
 tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
@@ -90,6 +91,9 @@ tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(top_srcdir)/libtinymailui/tny-save-strategy-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-summary-view-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-summary-window-iface.h > $@
+	cat $@ | sed 's/define-object\ \(.*\)Iface/define-interface\ \1Iface/g' > $@.tmp
+	mv $@.tmp $@
+
 
 tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
@@ -101,10 +105,14 @@ tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(top_srcdir)/libtinymailui-gtk/tny-msg-window.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-save-strategy.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-text-buffer-stream.h > $@
+	cat $@ | sed 's/define-object\ \(.*\)Iface/define-interface\ \1Iface/g' > $@.tmp
+	mv $@.tmp $@
 
 tinymail-platform.defs : $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
 	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs` > $@
+	cat $@ | sed 's/define-object\ \(.*\)Iface/define-interface\ \1Iface/g' > $@.tmp
+	mv $@.tmp $@
 
 tinymail-glue.c: tinymail.defs tinymail.override
 	$(PYGTK_CODEGEN) --prefix pytinymail		\
