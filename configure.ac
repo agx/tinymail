@@ -53,7 +53,6 @@ AC_PROG_LIBTOOL
 dnl ### default values (will get overwritten)
 build_gnome=true
 build_mozembed=true
-with_html_component=mozembed
 build_gtkhtml=false
 PLATFORMDIR=libtinymail-gnome-desktop
 
@@ -106,6 +105,7 @@ AC_ARG_WITH(html-component,
 	build_gtkhtml=false
   ;;
   none)
+	with_html_component=none
 	build_mozembed=false 
 	build_gtkhtml=false
   ;;
@@ -278,7 +278,7 @@ if test x$build_pytinymail = xtrue; then
   AC_SUBST(PYGTK_DEFSDIR)
   AC_MSG_RESULT($PYGTK_DEFSDIR)
 
-  PKG_CHECK_MODULES(TINYMAIL_PYTHON, pygobject-2.0 pygtk-2.0 gnome-vfs-2.0)
+  PKG_CHECK_MODULES(TINYMAIL_PYTHON, pygobject-2.0 pygtk-2.0)
   TINYMAIL_PYTHON_CFLAGS="$TINYMAIL_PYTHON_CFLAGS $PYTHON_CFLAGS"
   TINYMAIL_PYTHON_LIBS="$TINYMAIL_PYTHON_LIBS $PYTHON_LIBS"
 else
