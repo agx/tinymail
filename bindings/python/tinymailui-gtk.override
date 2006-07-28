@@ -17,10 +17,6 @@ headers
 #include <tny-save-strategy.h>
 #include <tny-text-buffer-stream.h>
 
-/*extern PyTypeObject PyTnyMsgMimePartIface_Type;
-extern PyTypeObject PyTnySaveStrategyIface_Type;
-extern PyTypeObject PyTnyMsgViewIface_Type;*/
-
 %%
 modulename tinymail.uigtk
 %%
