@@ -34,6 +34,6 @@ import gtk.TextBuffer as PyGtkTextBuffer_Type
 import gtk.ListStore as PyGtkListStore_Type
 import gtk.Window as PyGtkWindow_Type
 
-from tinymail import MsgMimePart as PyTnyMsgMimePartIface_Type
-from tinymail.ui import SaveStrategyIface as PyTnySaveStrategyIface_Type
-from tinymail.ui import MsgViewIface as PyTnyMsgViewIface_Type
+import tinymail.MsgMimePart as PyTnyMsgMimePartIface_Type
+import tinymail.SaveStrategyIface as PyTnySaveStrategyIface_Type
+import tinymail.ui.MsgViewIface as PyTnyMsgViewIface_Type
