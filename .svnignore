@@ -1,4 +1,4 @@
-py-compile
+py*
 anjuta.anjuta
 config.h
 stamp-h1
