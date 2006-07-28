@@ -126,8 +126,6 @@ void           tny_msg_header_iface_set_folder         (TnyMsgHeaderIface *self,
 void           tny_msg_header_iface_set_flags          (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
 void           tny_msg_header_iface_unset_flags        (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
 
-void           tny_msg_header_iface_uncache            (TnyMsgHeaderIface *self);
-gboolean       tny_msg_header_iface_has_cache          (TnyMsgHeaderIface *self);
 
 G_END_DECLS
 
