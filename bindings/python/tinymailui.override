@@ -7,10 +7,12 @@ headers
 #include <tny-msg-header-view-iface.h>
 #include <tny-msg-view-iface.h>
 #include <tny-msg-window-iface.h>
+#include <tny-msg-iface.h>
 #include <tny-platform-factory-iface.h>
 #include <tny-save-strategy-iface.h>
 #include <tny-summary-view-iface.h>
 #include <tny-summary-window-iface.h>
+#include <tny-account-store-iface.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
