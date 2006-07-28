@@ -16,7 +16,7 @@ ptinymaildir = $(pythondir)/tinymail-$(API_VERSION)
 tinymail_LTLIBRARIES = _tinymail.la ui.la uigtk.la platform.la
 ptinymail_PYTHON = __init__.py
 
-_tinymail_la_LDFLAGS = $(common_ldflags) -export-symbols-regex inittinymail
+_tinymail_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_tinymail
 _tinymail_la_LIBADD = $(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) 	\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 
 _tinymail_la_SOURCES = tinymailmodule.c

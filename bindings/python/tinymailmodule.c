@@ -4,13 +4,13 @@ void pytinymail_register_classes (PyObject *d);
 extern PyMethodDef pytinymail_functions[];
  
 DL_EXPORT(void)
-inittinymail(void)
+init_tinymail(void)
 {
     PyObject *m, *d;
  
     init_pygobject ();
  
-    m = Py_InitModule ("tinymail", pytinymail_functions);
+    m = Py_InitModule ("_tinymail", pytinymail_functions);
     d = PyModule_GetDict (m);
  
     pytinymail_register_classes (d);
