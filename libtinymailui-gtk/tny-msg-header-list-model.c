@@ -108,7 +108,8 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
 	/* And if not ... */
 	else if G_LIKELY (cur > nth)
 		while G_LIKELY (cur-- > nth)
-			self->current = self->current->prev;
+			if (self->current) self->current = self->current->prev;
+			else break;
   }
 
   return;
