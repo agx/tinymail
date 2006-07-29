@@ -48,7 +48,17 @@ enum
 	TNY_ACCOUNT_TREE_MODEL_N_COLUMNS
 };
 
+struct _TnyAccountTreeModel
+{
+	GtkTreeStore parent;
+	GList *first;
+	GMutex *iterator_lock;
+};
 
+struct _TnyAccountTreeModelClass
+{
+	GtkTreeStoreClass parent_class;
+};
 
 GType                   tny_account_tree_model_get_type  (void);
 TnyAccountTreeModel*    tny_account_tree_model_new       (void);

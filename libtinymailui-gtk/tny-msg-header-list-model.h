@@ -55,6 +55,26 @@ enum
 };
 
 
+struct _TnyMsgHeaderListModel 
+{
+	GObject parent;
+
+	GMutex *folder_lock, *iterator_lock;
+	TnyMsgFolderIface *folder;
+	gint length;
+	gint stamp;
+
+	gboolean usable_index;
+	GList *first, *index;
+	TnyIteratorIface *iterator;
+	guint last_nth;
+};
+
+struct _TnyMsgHeaderListModelClass 
+{
+	GObjectClass parent;
+};
+
 GType tny_msg_header_list_model_get_type (void);
 TnyMsgHeaderListModel* tny_msg_header_list_model_new (void);
 void tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh);

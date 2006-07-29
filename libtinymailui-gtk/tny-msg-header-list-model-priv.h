@@ -20,24 +20,5 @@
  * Boston, MA 02111-1307, USA.
  */
 
-struct _TnyMsgHeaderListModel 
-{
-	GObject parent;
-
-	GMutex *folder_lock, *iterator_lock;
-	TnyMsgFolderIface *folder;
-	gint length;
-	gint stamp;
-
-	gboolean usable_index;
-	GList *first, *index;
-	TnyIteratorIface *iterator;
-	guint last_nth;
-};
-
-struct _TnyMsgHeaderListModelClass 
-{
-	GObjectClass parent;
-};
 
 #endif

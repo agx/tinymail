@@ -20,18 +20,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-struct _TnyAccountTreeModel
-{
-	GtkTreeStore parent;
-	GList *first;
-	GMutex *iterator_lock;
-};
-
-struct _TnyAccountTreeModelClass
-{
-	GtkTreeStoreClass parent_class;
-};
-
 
 
 #endif
