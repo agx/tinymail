@@ -2,8 +2,9 @@
 #include <pygtk/pygtk.h>
 
 void pyuigtk_register_classes (PyObject *d); 
+void pyuigtk_add_constants(PyObject *module, const gchar *strip_prefix);
 extern PyMethodDef pyuigtk_functions[];
- 
+
 DL_EXPORT(void)
 inituigtk(void)
 {
@@ -16,7 +17,8 @@ inituigtk(void)
     d = PyModule_GetDict (m);
  
     pyuigtk_register_classes (d);
- 
+    pyuigtk_add_constants (m, "TNY_");
+
     if (PyErr_Occurred ()) {
         PyErr_Print();
         Py_FatalError ("can't initialise module uigtk");
