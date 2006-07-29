@@ -121,3 +121,18 @@ tny_store_account_iface_get_type (void)
 
 	return type;
 }
+
+GType
+tny_store_account_folder_type_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED, "TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED", "subscribed" },
+      { TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL, "TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL", "all" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyStoreAccountFolderType", values);
+  }
+  return etype;
+}

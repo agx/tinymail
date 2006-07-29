@@ -181,3 +181,22 @@ tny_attach_list_model_get_type (void)
 
 	return type;
 }
+
+
+GType 
+tny_attach_list_model_column_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN, "TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN", "pixbuf" },
+      { TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN, "TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN", "filename" },
+      { TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN, "TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN", "instance" },
+      { TNY_ATTACH_LIST_MODEL_N_COLUMNS, "TNY_ATTACH_LIST_MODEL_N_COLUMNS", "n" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyAttachListModelColumn", values);
+  }
+  return etype;
+}
+

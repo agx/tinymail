@@ -35,8 +35,13 @@ G_BEGIN_DECLS
 
 typedef struct _TnyAttachListModel TnyAttachListModel;
 typedef struct _TnyAttachListModelClass TnyAttachListModelClass;
+typedef enum _TnyAttachListModelColumn TnyAttachListModelColumn;
 
-enum 
+
+#define TNY_TYPE_ATTACH_LIST_MODEL_COLUMN (tny_attach_list_model_column_get_type())
+
+
+enum _TnyAttachListModelColumn
 {
 	TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN,
 	TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN,
@@ -55,10 +60,11 @@ struct _TnyAttachListModelClass
 };
 
 
-GType                   tny_attach_list_model_get_type  (void);
-TnyAttachListModel*     tny_attach_list_model_new       (void);
+GType tny_attach_list_model_get_type (void);
+GType tny_attach_list_model_column_get_type (void);
 
-void                    tny_attach_list_model_add       (TnyAttachListModel *self, TnyMsgMimePartIface *part);
+TnyAttachListModel* tny_attach_list_model_new (void);
+void tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part);
 
 G_END_DECLS
 

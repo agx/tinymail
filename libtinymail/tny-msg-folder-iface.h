@@ -48,6 +48,7 @@ enum
 	TNY_MSG_FOLDER_IFACE_LAST_SIGNAL
 };
 
+#define TNY_TYPE_MSG_FOLDER_TYPE (tny_msg_folder_type_get_type())
 
 enum _TnyMsgFolderType
 {
@@ -107,38 +108,36 @@ struct _TnyMsgFolderIfaceClass
 	void           (*refresh_func) (TnyMsgFolderIface *self);
 };
 
-GType          tny_msg_folder_iface_get_type     (void);
+GType tny_msg_folder_iface_get_type (void);
+GType tny_msg_folder_type_get_type (void);
 
 void tny_msg_folder_iface_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header);
 void tny_msg_folder_iface_expunge (TnyMsgFolderIface *self);
 
-const TnyListIface*
-	       tny_msg_folder_iface_get_folders  (TnyMsgFolderIface *self);
+const TnyListIface* tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self);
 
-const TnyMsgIface*
-               tny_msg_folder_iface_get_message  (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header);
-void	       tny_msg_folder_iface_get_headers  (TnyMsgFolderIface *self, TnyListIface *headers, gboolean refresh);
+const TnyMsgIface* tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header);
+void tny_msg_folder_iface_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboolean refresh);
 
-const TnyAccountIface*  
-               tny_msg_folder_iface_get_account  (TnyMsgFolderIface *self);
-const gchar*   tny_msg_folder_iface_get_id       (TnyMsgFolderIface *self);
-const gchar*   tny_msg_folder_iface_get_name     (TnyMsgFolderIface *self);
+const TnyAccountIface* tny_msg_folder_iface_get_account (TnyMsgFolderIface *self);
+const gchar* tny_msg_folder_iface_get_id (TnyMsgFolderIface *self);
+const gchar* tny_msg_folder_iface_get_name (TnyMsgFolderIface *self);
 
-void           tny_msg_folder_iface_set_account  (TnyMsgFolderIface *self, const TnyAccountIface *account);
-void           tny_msg_folder_iface_set_id       (TnyMsgFolderIface *self, const gchar *id);
-void           tny_msg_folder_iface_set_name     (TnyMsgFolderIface *self, const gchar *name);
+void tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account);
+void tny_msg_folder_iface_set_id (TnyMsgFolderIface *self, const gchar *id);
+void tny_msg_folder_iface_set_name (TnyMsgFolderIface *self, const gchar *name);
 
-TnyMsgFolderType tny_msg_folder_iface_get_folder_type  (TnyMsgFolderIface *self);
+TnyMsgFolderType tny_msg_folder_iface_get_folder_type (TnyMsgFolderIface *self);
 
-guint          tny_msg_folder_iface_get_all_count      (TnyMsgFolderIface *self);
-guint          tny_msg_folder_iface_get_unread_count   (TnyMsgFolderIface *self);
-void           tny_msg_folder_iface_uncache            (TnyMsgFolderIface *self);
+guint tny_msg_folder_iface_get_all_count (TnyMsgFolderIface *self);
+guint tny_msg_folder_iface_get_unread_count (TnyMsgFolderIface *self);
+void tny_msg_folder_iface_uncache (TnyMsgFolderIface *self);
 
-void           tny_msg_folder_iface_set_subscribed     (TnyMsgFolderIface *self, gboolean subscribed);
-gboolean       tny_msg_folder_iface_get_subscribed     (TnyMsgFolderIface *self);
+void tny_msg_folder_iface_set_subscribed (TnyMsgFolderIface *self, gboolean subscribed);
+gboolean tny_msg_folder_iface_get_subscribed (TnyMsgFolderIface *self);
 
-void           tny_msg_folder_iface_refresh_async      (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
-void           tny_msg_folder_iface_refresh            (TnyMsgFolderIface *self);
+void tny_msg_folder_iface_refresh_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
+void tny_msg_folder_iface_refresh (TnyMsgFolderIface *self);
 
 G_END_DECLS
 

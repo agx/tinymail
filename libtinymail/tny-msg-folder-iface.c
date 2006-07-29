@@ -481,3 +481,24 @@ tny_msg_folder_iface_get_type (void)
 
 	return type;
 }
+
+
+GType
+tny_msg_folder_type_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_MSG_FOLDER_TYPE_UNKNOWN, "TNY_MSG_FOLDER_TYPE_UNKNOWN", "info" },
+      { TNY_MSG_FOLDER_TYPE_NORMAL, "TNY_MSG_FOLDER_TYPE_NORMAL", "warning" },
+      { TNY_MSG_FOLDER_TYPE_INBOX, "TNY_MSG_FOLDER_TYPE_INBOX", "inbox" },
+      { TNY_MSG_FOLDER_TYPE_OUTBOX, "TNY_MSG_FOLDER_TYPE_OUTBOX", "outbox" },
+      { TNY_MSG_FOLDER_TYPE_TRASH, "TNY_MSG_FOLDER_TYPE_TRASH", "trash" },
+      { TNY_MSG_FOLDER_TYPE_JUNK, "TNY_MSG_FOLDER_TYPE_JUNK", "junk" },
+      { TNY_MSG_FOLDER_TYPE_SENT, "TNY_MSG_FOLDER_TYPE_SENT", "sent" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyMsgFolderType", values);
+  }
+  return etype;
+}

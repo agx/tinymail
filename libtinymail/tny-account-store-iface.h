@@ -42,12 +42,16 @@ enum
 	TNY_ACCOUNT_STORE_IFACE_LAST_SIGNAL
 };
 
+#define TNY_TYPE_ALERT_TYPE (tny_alert_type_get_type())
+
 enum _TnyAlertType
 {
 	TNY_ALERT_TYPE_INFO,
 	TNY_ALERT_TYPE_WARNING,
 	TNY_ALERT_TYPE_ERROR
 };
+
+#define TNY_TYPE_GET_ACCOUNTS_REQUEST_TYPE (tny_get_accounts_request_type_get_type())
 
 enum _TnyGetAccountsRequestType
 {
@@ -80,16 +84,16 @@ struct _TnyAccountStoreIfaceClass
 	gboolean      (*alert_func)                    (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 };
 
-GType         tny_account_store_iface_get_type                  (void);
+GType tny_account_store_iface_get_type (void);
+GType tny_get_accounts_request_type_get_type (void);
+GType tny_alert_type_get_type (void);
 
-
-void          tny_account_store_iface_get_accounts              (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
-void          tny_account_store_iface_add_store_account         (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
-void          tny_account_store_iface_add_transport_account     (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
-const gchar*  tny_account_store_iface_get_cache_dir             (TnyAccountStoreIface *self);
-const TnyDeviceIface* 
-		tny_account_store_iface_get_device		(TnyAccountStoreIface *self);
-gboolean 	tny_account_store_iface_alert 			(TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
+void tny_account_store_iface_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
+void tny_account_store_iface_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
+void tny_account_store_iface_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
+const gchar*  tny_account_store_iface_get_cache_dir (TnyAccountStoreIface *self);
+const TnyDeviceIface* tny_account_store_iface_get_device (TnyAccountStoreIface *self);
+gboolean tny_account_store_iface_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 
 G_END_DECLS
 

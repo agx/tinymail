@@ -42,8 +42,8 @@ struct _TnyListClass
 	GObjectClass parent;
 };
 
-GType         tny_list_get_type         (void);
-TnyListIface* tny_list_new              (void);
+GType tny_list_get_type (void);
+TnyListIface* tny_list_new (void);
 
 G_END_DECLS
 

@@ -1,5 +1,9 @@
 07-29-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 
+	* Improved the enums (GType'ed them)
+
+07-29-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
 	* bindings/python/*: Some fixes for the Python bindings
 	* libtinymailui-gtk/tny-account-tree-model-priv.h, libtinymailui-gtk/
 	tny-account-tree-model.h, libtinymailui-gtk/

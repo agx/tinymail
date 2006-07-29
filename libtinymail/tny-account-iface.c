@@ -485,3 +485,18 @@ tny_account_iface_get_type (void)
 }
 
 
+GType
+tny_account_type_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_ACCOUNT_TYPE_STORE, "TNY_ACCOUNT_TYPE_STORE", "store" },
+      { TNY_ACCOUNT_TYPE_TRANSPORT, "TNY_ACCOUNT_TYPE_TRANSPORT", "transport" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyAccountType", values);
+  }
+  return etype;
+}
+

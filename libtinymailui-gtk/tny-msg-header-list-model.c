@@ -123,7 +123,7 @@ tny_msg_header_list_model_get_flags (GtkTreeModel *self)
 static gint
 tny_msg_header_list_model_get_n_columns (GtkTreeModel *self)
 {
-	return TNY_MSG_HEADER_LIST_MODEL_NUM_COLUMNS;
+	return TNY_MSG_HEADER_LIST_MODEL_N_COLUMNS;
 }
 
 static GType
@@ -1077,3 +1077,29 @@ tny_msg_header_list_model_get_type (void)
 
 	return object_type;
 }
+
+GType
+tny_msg_header_list_model_column_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+
+      { TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN", "from" },
+      { TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN", "to" },
+      { TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN", "subject" },
+      { TNY_MSG_HEADER_LIST_MODEL_CC_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_CC_COLUMN", "cc" },
+      { TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_COLUMN", "date_sent" },
+      { TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN", "date_received_t" },
+      { TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN", "date_sent_t" },
+      { TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN", "date_received" },
+      { TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN", "instance" },
+      { TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN, "TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN", "flags" },
+      { TNY_MSG_HEADER_LIST_MODEL_N_COLUMNS, "TNY_MSG_HEADER_LIST_MODEL_NUM_COLUMNS", "n" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyAccountTreeModelColumn", values);
+  }
+  return etype;
+}
+

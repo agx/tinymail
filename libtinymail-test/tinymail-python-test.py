@@ -21,7 +21,7 @@ vbox = xml.get_widget ("vbox")
 
 platfact = tinymail.platform.tny_platform_factory_get_instance ()
 account_store = platfact.new_account_store ()
-accounts = tinymail.uigtk.tny_account_tree_model_new ()
+accounts = tinymail.uigtk.AccountTreeModel ()
 account_store.get_accounts (accounts, 1)
 
 folderstree.set_model (account_store)

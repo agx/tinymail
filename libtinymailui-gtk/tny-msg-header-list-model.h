@@ -38,8 +38,11 @@ G_BEGIN_DECLS
 
 typedef struct _TnyMsgHeaderListModel TnyMsgHeaderListModel;
 typedef struct _TnyMsgHeaderListModelClass TnyMsgHeaderListModelClass;
+typedef enum _TnyMsgHeaderListModelColumn TnyMsgHeaderListModelColumn;
 
-enum 
+#define TNY_TYPE_MSG_HEADER_LIST_MODEL_COLUMN (tny_msg_header_list_model_column_get_type())
+
+enum _TnyMsgHeaderListModelColumn
 {
 	TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN,
 	TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN,
@@ -51,7 +54,7 @@ enum
 	TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
 	TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN,
 	TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN,
-	TNY_MSG_HEADER_LIST_MODEL_NUM_COLUMNS
+	TNY_MSG_HEADER_LIST_MODEL_N_COLUMNS
 };
 
 
@@ -76,6 +79,7 @@ struct _TnyMsgHeaderListModelClass
 };
 
 GType tny_msg_header_list_model_get_type (void);
+GType tny_msg_header_list_model_column_get_type (void);
 TnyMsgHeaderListModel* tny_msg_header_list_model_new (void);
 void tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh);
 gint tny_msg_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);

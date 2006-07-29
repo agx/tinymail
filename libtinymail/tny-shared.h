@@ -60,6 +60,8 @@ typedef struct _TnyList TnyList;
 typedef struct _TnyListClass TnyListClass;
 typedef enum _TnyAccountType TnyAccountType;
 typedef enum _TnyGetAccountsRequestType TnyGetAccountsRequestType;
+typedef struct _TnyFsStream TnyFsStream;
+typedef struct _TnyFsStreamClass TnyFsStreamClass;
 
 
 #ifndef G_LIKELY

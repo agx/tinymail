@@ -45,6 +45,8 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG_HEADER_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_HEADER_IFACE))
 #define TNY_MSG_HEADER_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_MSG_HEADER_IFACE, TnyMsgHeaderIfaceClass))
 
+#define TNY_TYPE_MSG_HEADER_FLAGS (tny_msg_header_flags_get_type())
+
 enum _TnyMsgHeaderFlags 
 {
 	TNY_MSG_HEADER_FLAG_ANSWERED = 1<<0,
@@ -96,6 +98,7 @@ struct _TnyMsgHeaderIfaceClass
 };
 
 GType          tny_msg_header_iface_get_type      (void);
+GType          tny_msg_header_flags_get_type      (void);
 
 const gchar*   tny_msg_header_iface_get_uid             (TnyMsgHeaderIface *self);
 

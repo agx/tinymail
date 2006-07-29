@@ -274,4 +274,35 @@ tny_account_store_iface_get_type (void)
 	return type;
 }
 
+GType
+tny_alert_type_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_ALERT_TYPE_INFO, "TNY_ALERT_TYPE_INFO", "info" },
+      { TNY_ALERT_TYPE_WARNING, "TNY_ALERT_TYPE_WARNING", "warning" },
+      { TNY_ALERT_TYPE_ERROR, "TNY_ALERT_TYPE_ERROR", "error" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyAlertType", values);
+  }
+  return etype;
+}
+
+GType
+tny_get_accounts_request_type_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS, "TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS", "transport" },
+      { TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS, "TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS", "store" },
+      { TNY_ACCOUNT_STORE_IFACE_BOTH, "TNY_ACCOUNT_STORE_IFACE_BOTH", "both" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyGetAccountsRequestType", values);
+  }
+  return etype;
+}
 

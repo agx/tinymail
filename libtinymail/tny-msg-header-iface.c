@@ -475,3 +475,29 @@ tny_msg_header_iface_get_type (void)
 
 	return type;
 }
+
+
+GType
+tny_msg_header_flags_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_MSG_HEADER_FLAG_ANSWERED, "TNY_MSG_HEADER_FLAG_ANSWERED", "answered" },
+      { TNY_MSG_HEADER_FLAG_DELETED, "TNY_MSG_HEADER_FLAG_DELETED", "deleted" },
+      { TNY_MSG_HEADER_FLAG_DRAFT, "TNY_MSG_HEADER_FLAG_DRAFT", "draft" },
+      { TNY_MSG_HEADER_FLAG_FLAGGED, "TNY_MSG_HEADER_FLAG_FLAGGED", "flagged" },
+      { TNY_MSG_HEADER_FLAG_SEEN, "TNY_MSG_HEADER_FLAG_SEEN", "seen" },
+      { TNY_MSG_HEADER_FLAG_ATTACHMENTS, "TNY_MSG_HEADER_FLAG_ATTACHMENTS", "attachments" },
+      { TNY_MSG_HEADER_FLAG_ANSWERED_ALL, "TNY_MSG_HEADER_FLAG_ANSWERED_ALL", "answered_all" },
+      { TNY_MSG_HEADER_FLAG_JUNK, "TNY_MSG_HEADER_FLAG_junk", "JUNK" },
+      { TNY_MSG_HEADER_FLAG_SECURE, "TNY_MSG_HEADER_FLAG_SECURE", "secure" },
+      { TNY_MSG_HEADER_FLAG_FOLDER_FLAGGED, "TNY_MSG_HEADER_FLAG_FLAGGED", "flagged" },
+      { TNY_MSG_HEADER_FLAG_JUNK_LEARN, "TNY_MSG_HEADER_FLAG_LEARN", "learn" },
+      { TNY_MSG_HEADER_FLAG_USER, "TNY_MSG_HEADER_FLAG_USER", "user" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyMsgHeaderFlags", values);
+  }
+  return etype;
+}

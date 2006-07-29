@@ -38,8 +38,11 @@ G_BEGIN_DECLS
 
 typedef struct _TnyAccountTreeModel TnyAccountTreeModel;
 typedef struct _TnyAccountTreeModelClass TnyAccountTreeModelClass;
+typedef enum _TnyAccountTreeModelColumn TnyAccountTreeModelColumn;
 
-enum 
+#define TNY_TYPE_ACCOUNT_TREE_MODEL_COLUMN (tny_account_tree_model_column_get_type())
+
+enum _TnyAccountTreeModelColumn
 {
 	TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN,
 	TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN,
@@ -60,8 +63,9 @@ struct _TnyAccountTreeModelClass
 	GtkTreeStoreClass parent_class;
 };
 
-GType                   tny_account_tree_model_get_type  (void);
-TnyAccountTreeModel*    tny_account_tree_model_new       (void);
+GType tny_account_tree_model_get_type (void);
+GType tny_account_tree_model_column_get_type (void);
+TnyAccountTreeModel* tny_account_tree_model_new (void);
 
 G_END_DECLS
 
