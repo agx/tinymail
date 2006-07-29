@@ -31,6 +31,7 @@ import gtk.ListStore as PyGtkListStore_Type
 import gtk.Window as PyGtkWindow_Type
 import gtk.TreeStore as PyGtkTreeStore_Type
 import gtk.TreeModel as PyGtkTreeModel_Type
+import gtk.ListStore as PyGtkListStore_Type
 
 import tinymail.MsgFolderIface as PyTnyMsgFolderIface_Type
 import tinymail.MsgMimePartIface as PyTnyMsgMimePartIface_Type
