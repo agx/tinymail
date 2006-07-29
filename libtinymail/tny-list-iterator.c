@@ -79,7 +79,7 @@ tny_list_iterator_finalize (GObject *object)
 }
 
 
-static gpointer 
+static GObject* 
 tny_list_iterator_next (TnyIteratorIface *self)
 {
 	TnyListIterator *me = (TnyListIterator*) self;
@@ -97,7 +97,7 @@ tny_list_iterator_next (TnyIteratorIface *self)
 	return me->current ? me->current->data : NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_list_iterator_prev (TnyIteratorIface *self)
 {
 	TnyListIterator *me = (TnyListIterator*) self;
@@ -115,7 +115,7 @@ tny_list_iterator_prev (TnyIteratorIface *self)
 	 return me->current ? me->current->data : NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_list_iterator_first (TnyIteratorIface *self)
 {
 	TnyListIterator *me = (TnyListIterator*) self;
@@ -144,7 +144,7 @@ tny_list_iterator_is_done (TnyIteratorIface *self)
 
 
 
-static gpointer 
+static GObject* 
 tny_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
 	TnyListIterator *me = (TnyListIterator*) self;
@@ -167,7 +167,7 @@ tny_list_iterator_nth (TnyIteratorIface *self, guint nth)
 }
 
 
-static gpointer 
+static GObject* 
 tny_list_iterator_current (TnyIteratorIface *self)
 {
 	TnyListIterator *me = (TnyListIterator*) self;

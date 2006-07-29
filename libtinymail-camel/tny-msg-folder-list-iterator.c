@@ -78,7 +78,7 @@ tny_msg_folder_list_iterator_finalize (GObject *object)
 }
 
 
-static gpointer 
+static GObject* 
 tny_msg_folder_list_iterator_next (TnyIteratorIface *self)
 {
 	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
@@ -112,7 +112,7 @@ tny_msg_folder_list_iterator_is_done (TnyIteratorIface *self)
 
 
 
-static gpointer 
+static GObject* 
 tny_msg_folder_list_iterator_prev (TnyIteratorIface *self)
 {
 	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
@@ -129,7 +129,7 @@ tny_msg_folder_list_iterator_prev (TnyIteratorIface *self)
 	return me->current ? me->current->data : NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_msg_folder_list_iterator_first (TnyIteratorIface *self)
 {
 	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
@@ -149,7 +149,7 @@ tny_msg_folder_list_iterator_first (TnyIteratorIface *self)
 }
 
 
-static gpointer 
+static GObject* 
 tny_msg_folder_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
 	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
@@ -169,7 +169,7 @@ tny_msg_folder_list_iterator_nth (TnyIteratorIface *self, guint nth)
 }
 
 
-static gpointer 
+static GObject* 
 tny_msg_folder_list_iterator_current (TnyIteratorIface *self)
 {
 	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;

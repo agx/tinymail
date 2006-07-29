@@ -47,7 +47,7 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkT
 	while (next)
 	{
 		GtkTreeIter iter;
-		TnyMsgFolderIface *folder = tny_iterator_iface_current (iterator);
+		TnyMsgFolderIface *folder = (TnyMsgFolderIface*)tny_iterator_iface_current (iterator);
 		TnyListIface *more_folders;
 
 		more_folders = (TnyListIface*)tny_msg_folder_iface_get_folders (folder);

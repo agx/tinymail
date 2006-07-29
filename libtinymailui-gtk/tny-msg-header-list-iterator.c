@@ -94,7 +94,7 @@ _tny_msg_header_list_iterator_next_nl (TnyMsgHeaderListIterator *me)
 	return me->current?me->current->data:NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_msg_header_list_iterator_next (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
@@ -118,7 +118,7 @@ _tny_msg_header_list_iterator_prev_nl (TnyMsgHeaderListIterator *me)
 	return me->current?me->current->data:NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_msg_header_list_iterator_prev (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
@@ -155,7 +155,7 @@ _tny_msg_header_list_iterator_first_nl (TnyMsgHeaderListIterator *me)
 	return me->current?me->current->data:NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_msg_header_list_iterator_first (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
@@ -182,7 +182,7 @@ _tny_msg_header_list_iterator_nth_nl (TnyMsgHeaderListIterator *me, guint nth)
 	return me->current?me->current->data:NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_msg_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;
@@ -208,7 +208,7 @@ _tny_msg_header_list_iterator_current_nl (TnyMsgHeaderListIterator *me)
 	return me->current?me->current->data:NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_msg_header_list_iterator_current (TnyIteratorIface *self)
 {
 	TnyMsgHeaderListIterator *me = (TnyMsgHeaderListIterator*) self;

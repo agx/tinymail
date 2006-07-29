@@ -89,7 +89,7 @@ walk_folders_uncache_em (TnyStoreAccountIface *self, TnyListIface *folders)
 
 	while (next)
 	{
-		TnyMsgFolderIface *folder = tny_iterator_iface_current (iterator);
+		TnyMsgFolderIface *folder = (TnyMsgFolderIface*)tny_iterator_iface_current (iterator);
 		TnyListIface *more_folders = (TnyListIface*)tny_msg_folder_iface_get_folders (folder);
 
 		tny_msg_folder_iface_uncache (folder);
@@ -330,7 +330,7 @@ tny_store_account_notify (TnyStoreAccountPriv *priv)
 		TnyMsgFolderIface *folder;
 
 		tny_iterator_iface_nth (iterator, 0);
-		folder = tny_iterator_iface_current (iterator);
+		folder = (TnyMsgFolderIface*)tny_iterator_iface_current (iterator);
 		g_signal_emit (folder, tny_msg_folder_iface_signals [TNY_MSG_FOLDER_IFACE_FOLDERS_RELOADED], 0);
 
 		g_object_unref (G_OBJECT (iterator));

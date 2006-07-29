@@ -38,11 +38,11 @@ struct _TnyIteratorIfaceClass
 {
 	GTypeInterface parent;
 
-	gpointer (*next_func) (TnyIteratorIface *self);
-	gpointer (*prev_func) (TnyIteratorIface *self);
-	gpointer (*first_func) (TnyIteratorIface *self);
-	gpointer (*nth_func) (TnyIteratorIface *self, guint nth);
-	gpointer (*current_func) (TnyIteratorIface *self);
+	GObject* (*next_func) (TnyIteratorIface *self);
+	GObject* (*prev_func) (TnyIteratorIface *self);
+	GObject* (*first_func) (TnyIteratorIface *self);
+	GObject* (*nth_func) (TnyIteratorIface *self, guint nth);
+	GObject* (*current_func) (TnyIteratorIface *self);
 	gboolean (*has_first_func) (TnyIteratorIface *self);
 	gboolean (*has_next_func) (TnyIteratorIface *self);
 	gboolean (*is_done) (TnyIteratorIface *self);
@@ -51,11 +51,11 @@ struct _TnyIteratorIfaceClass
 
 GType tny_iterator_iface_get_type (void);
 
-gpointer tny_iterator_iface_next (TnyIteratorIface *self);
-gpointer tny_iterator_iface_prev (TnyIteratorIface *self);
-gpointer tny_iterator_iface_first (TnyIteratorIface *self);
-gpointer tny_iterator_iface_nth (TnyIteratorIface *self, guint nth);
-gpointer tny_iterator_iface_current (TnyIteratorIface *self);
+GObject* tny_iterator_iface_next (TnyIteratorIface *self);
+GObject* tny_iterator_iface_prev (TnyIteratorIface *self);
+GObject* tny_iterator_iface_first (TnyIteratorIface *self);
+GObject* tny_iterator_iface_nth (TnyIteratorIface *self, guint nth);
+GObject* tny_iterator_iface_current (TnyIteratorIface *self);
 gboolean tny_iterator_iface_has_first (TnyIteratorIface *self);
 gboolean tny_iterator_iface_has_next (TnyIteratorIface *self);
 gboolean tny_iterator_iface_is_done (TnyIteratorIface *self);

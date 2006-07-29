@@ -72,7 +72,7 @@ tny_account_tree_model_iterator_finalize (GObject *object)
 }
 
 
-static gpointer 
+static GObject* 
 tny_account_tree_model_iterator_next (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
@@ -89,7 +89,7 @@ tny_account_tree_model_iterator_next (TnyIteratorIface *self)
 	return me->current ? me->current->data : NULL;
 }
 
-static gpointer 
+static GObject* 
 tny_account_tree_model_iterator_prev (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
@@ -120,7 +120,7 @@ tny_account_tree_model_iterator_is_done (TnyIteratorIface *self)
 
 
 
-static gpointer 
+static GObject* 
 tny_account_tree_model_iterator_first (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
@@ -140,7 +140,7 @@ tny_account_tree_model_iterator_first (TnyIteratorIface *self)
 }
 
 
-static gpointer 
+static GObject* 
 tny_account_tree_model_iterator_nth (TnyIteratorIface *self, guint nth)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
@@ -160,7 +160,7 @@ tny_account_tree_model_iterator_nth (TnyIteratorIface *self, guint nth)
 }
 
 
-static gpointer 
+static GObject* 
 tny_account_tree_model_iterator_current (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;

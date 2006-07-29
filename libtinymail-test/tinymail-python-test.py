@@ -23,8 +23,14 @@ platfact = tinymail.platform.tny_platform_factory_get_instance ()
 account_store = platfact.new_account_store ()
 accounts = tinymail.uigtk.AccountTreeModel ()
 
-print accounts.length ()
 account_store.get_accounts (accounts, tinymail.ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
+
+print accounts.length ()
+
+iter = accounts.create_iterator ()
+
+account = iter.first ()
+print account.get_name ()
 
 folderstree.set_model (accounts)
 

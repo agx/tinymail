@@ -30,7 +30,7 @@
  * Return value: the next value of the underlying #TnyListIface instance
  *
  **/
-gpointer 
+GObject* 
 tny_iterator_iface_next (TnyIteratorIface *self)
 {
 #ifdef DEBUG
@@ -50,7 +50,7 @@ tny_iterator_iface_next (TnyIteratorIface *self)
  * Return value: the previous value of the underlying #TnyListIface instance
  *
  **/
-gpointer 
+GObject* 
 tny_iterator_iface_prev (TnyIteratorIface *self)
 {
 #ifdef DEBUG
@@ -71,7 +71,7 @@ tny_iterator_iface_prev (TnyIteratorIface *self)
  * Return value: the first value of the underlying #TnyListIface instance
  *
  **/
-gpointer 
+GObject* 
 tny_iterator_iface_first (TnyIteratorIface *self)
 {
 #ifdef DEBUG
@@ -92,7 +92,7 @@ tny_iterator_iface_first (TnyIteratorIface *self)
  * Return value: the value of the underlying #TnyListIface instance at the nth position
  *
  **/
-gpointer
+GObject*
 tny_iterator_iface_nth (TnyIteratorIface *self, guint nth)
 {
 #ifdef DEBUG
@@ -113,7 +113,7 @@ tny_iterator_iface_nth (TnyIteratorIface *self, guint nth)
  * Return value: the currect value of the underlying #TnyListIface instance
  *
  **/
-gpointer 
+GObject* 
 tny_iterator_iface_current (TnyIteratorIface *self)
 {
 #ifdef DEBUG
