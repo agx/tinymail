@@ -18,6 +18,7 @@ inituigtk(void)
     pyuigtk_register_classes (d);
  
     if (PyErr_Occurred ()) {
+        PyErr_Print();
         Py_FatalError ("can't initialise module uigtk");
     }
 }

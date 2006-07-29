@@ -1,4 +1,5 @@
 INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) 		\
+	$(PYGTK_CFLAGS)						\
 	$(LIBTINYMAILUI_GTK_CFLAGS) $(TINYMAIL_PYTHON_CFLAGS) 	\
 	-I$(top_srcdir)/libtinymail				\
 	-I$(top_srcdir)/libtinymailui				\
@@ -11,8 +12,8 @@ common_ldflags = -module -avoid-version
 pthdir = $(pythondir)
 pth_DATA = tinymail.pth
 
-tinymaildir = $(pythondir)/tinymail-$(API_VERSION)
-ptinymaildir = $(pythondir)/tinymail-$(API_VERSION)
+tinymaildir = $(pythondir)/tinymail-$(API_VERSION)/tinymail
+ptinymaildir = $(pythondir)/tinymail-$(API_VERSION)/tinymail
 tinymail_LTLIBRARIES = _tinymail.la ui.la uigtk.la platform.la
 ptinymail_PYTHON = __init__.py
 
