@@ -489,8 +489,8 @@ tny_msg_folder_type_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
-      { TNY_MSG_FOLDER_TYPE_UNKNOWN, "TNY_MSG_FOLDER_TYPE_UNKNOWN", "info" },
-      { TNY_MSG_FOLDER_TYPE_NORMAL, "TNY_MSG_FOLDER_TYPE_NORMAL", "warning" },
+      { TNY_MSG_FOLDER_TYPE_UNKNOWN, "TNY_MSG_FOLDER_TYPE_UNKNOWN", "unknown" },
+      { TNY_MSG_FOLDER_TYPE_NORMAL, "TNY_MSG_FOLDER_TYPE_NORMAL", "normal" },
       { TNY_MSG_FOLDER_TYPE_INBOX, "TNY_MSG_FOLDER_TYPE_INBOX", "inbox" },
       { TNY_MSG_FOLDER_TYPE_OUTBOX, "TNY_MSG_FOLDER_TYPE_OUTBOX", "outbox" },
       { TNY_MSG_FOLDER_TYPE_TRASH, "TNY_MSG_FOLDER_TYPE_TRASH", "trash" },

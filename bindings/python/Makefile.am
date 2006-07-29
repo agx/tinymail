@@ -66,7 +66,7 @@ EXTRA_DIST = 			\
 # To update:
 # ls DIR/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\t\\\\/g
 
-tinymail.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
+tinymail.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymail.defs.extra
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py \
 	$(top_srcdir)/libtinymail/tny-account-iface.h		\
 	$(top_srcdir)/libtinymail/tny-account-store-iface.h	\
@@ -85,6 +85,7 @@ tinymail.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(top_srcdir)/libtinymail/tny-transport-account-iface.h > $@
 	cat $@ | sed 's/define-object\ \(.*\)Iface/define-interface\ \1Iface/g' > $@.tmp
 	mv $@.tmp $@
+	cat tinymail.defs.extra >> $@
 
 tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
@@ -100,7 +101,7 @@ tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	mv $@.tmp $@
 
 
-tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
+tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui-gtk.defs.extra
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
 	$(top_srcdir)/libtinymailui-gtk/tny-account-tree-model.h	\
 	$(top_srcdir)/libtinymailui-gtk/tny-attach-list-model.h		\
@@ -112,6 +113,7 @@ tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(top_srcdir)/libtinymailui-gtk/tny-text-buffer-stream.h > $@
 	cat $@ | sed 's/define-object\ \(.*\)Iface/define-interface\ \1Iface/g' > $@.tmp
 	mv $@.tmp $@
+	cat tinymailui-gtk.defs.extra >> $@
 
 tinymail-platform.defs : $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
