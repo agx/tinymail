@@ -1,6 +1,23 @@
+07-29-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	*  bindings/python/*: Some fixes for the Python bindings
+
+07-29-2006  Gustavo J. A. M. Carneiro <gjc@inescporto.pt>
+
+	* bindings/python/*: Some fixes for the Python bindings
+
 07-28-2006  James Livingston <doclivingston@gmail.com>
 
 	* bindings/python/*: Some fixes for the Python bindings
+
+07-28-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	*  bindings/python/*: Some fixes for the Python bindings
+
+07-27-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	*  tinymail-python/ moved to bindings/python
+	*  bindings/python: reworked the python bindings
 
 07-10-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
