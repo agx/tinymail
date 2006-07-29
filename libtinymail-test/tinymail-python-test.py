@@ -24,6 +24,6 @@ account_store = platfact.new_account_store ()
 accounts = tinymail.uigtk.AccountTreeModel ()
 account_store.get_accounts (accounts, 1)
 
-folderstree.set_model (account_store)
+folderstree.set_model (accounts)
 
 gtk.main()
