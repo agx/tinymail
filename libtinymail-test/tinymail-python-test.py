@@ -14,7 +14,7 @@ pr = gnome.program_init ("E-Mail", "1.0", properties=props)
 xml = gtk.glade.XML ("tinymail-python-test.glade", domain="email")
 
 widget = xml.get_widget ("window")
-foldertree = xml.get_widget ("folderstree")
+folderstree = xml.get_widget ("folderstree")
 headerstree = xml.get_widget ("headerstree")
 hbox = xml.get_widget ("hbox")
 vbox = xml.get_widget ("vbox")
