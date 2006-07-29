@@ -191,8 +191,6 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 	configd = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), 
 		".tinymail", "accounts", NULL);
 	dir = g_dir_open (configd, 0, NULL);
-printf ("OLPC get accounts %s\n", configd);
-
 	g_free (configd);
 
 	if (!dir)
@@ -297,7 +295,6 @@ printf ("OLPC get accounts %s\n", configd);
 	
 			tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
 				per_account_get_pass_func);
-
 
 			tny_list_iface_prepend (list, account);
 		}
