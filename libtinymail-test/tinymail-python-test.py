@@ -13,7 +13,6 @@ def on_folderstree_selected (treeselection, headerstree) :
 		print folder.get_name()
 		listm = tinymail.uigtk.MsgHeaderListModel ()
 		listm.set_folder (folder, False)
-		print listm.length()
 		headerstree.set_model (listm)
 
 props = { gnome.PARAM_APP_DATADIR : "/usr/share" }
