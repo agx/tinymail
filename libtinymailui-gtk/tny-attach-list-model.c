@@ -143,7 +143,7 @@ tny_attach_list_model_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	GtkListStore *store = (GtkListStore*) instance;
 	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (instance);
-	static GType types[] = { G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_POINTER };
+	static GType types[] = { G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_OBJECT };
 
 	priv->theme = NULL;
 	types[0] = GDK_TYPE_PIXBUF;

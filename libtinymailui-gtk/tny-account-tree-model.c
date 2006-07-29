@@ -156,7 +156,7 @@ tny_account_tree_model_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	GtkTreeStore *store = (GtkTreeStore*) instance;
 	TnyAccountTreeModel *me = (TnyAccountTreeModel*) instance;
-	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_INT, G_TYPE_POINTER };
+	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
 
 	me->iterator_lock = g_mutex_new ();
 
