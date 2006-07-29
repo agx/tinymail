@@ -3,9 +3,11 @@ import gtk.glade
 import gnome
 import gnome.ui
 import tinymail
-import ui
-import uigtk
-import platform
+import tinymail.ui
+import tinymail.uigtk
+import tinymail.platform
+
+from tinymail.ui import PlatformFactoryIface
 
 props = { gnome.PARAM_APP_DATADIR : "/usr/share" }
 pr = gnome.program_init ("E-Mail", "1.0", properties=props)
@@ -17,9 +19,9 @@ headerstree = xml.get_widget ("headerstree")
 hbox = xml.get_widget ("hbox")
 vbox = xml.get_widget ("vbox")
 
-platfact = platform.tny_platform_factory_get_instance ()
+platfact = tinymail.platform.tny_platform_factory_get_instance ()
 account_store = platfact.new_account_store ()
-accounts = tny_account_tree_model_new ()
+accounts = tinymail.uigtk.tny_account_tree_model_new ()
 account_store.get_accounts (accounts, 1)
 
 folderstree.set_model (account_store)
