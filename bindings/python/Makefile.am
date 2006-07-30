@@ -83,7 +83,7 @@ tinymail.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymail.defs.extra $(top_
 	$(top_srcdir)/libtinymail/tny-store-account-iface.h 	\
 	$(top_srcdir)/libtinymail/tny-stream-iface.h 		\
 	$(top_srcdir)/libtinymail/tny-transport-account-iface.h | \
-	$(top_srcdir)/bindings/python/filter.py --extra=tinymail.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymail.defs.extra > $@
 
 tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
@@ -95,7 +95,7 @@ tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui.defs.extra $(
 	$(top_srcdir)/libtinymailui/tny-save-strategy-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-summary-view-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-summary-window-iface.h |   \
-	$(top_srcdir)/bindings/python/filter.py --extra=tinymailui.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymailui.defs.extra > $@
 
 
 tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
@@ -108,12 +108,12 @@ tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui-gtk.defs.
 	$(top_srcdir)/libtinymailui-gtk/tny-msg-window.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-save-strategy.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-text-buffer-stream.h |	\
-	$(top_srcdir)/bindings/python/filter.py --extra=tinymailui-gtk.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymailui-gtk.defs.extra > $@
 
 tinymail-platform.defs : $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				  \
 	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs` | \
-	$(top_srcdir)/bindings/python/filter.py --extra=tinymail-platform.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymail-platform.defs.extra > $@
 
 tinymail-glue.c: tinymail.defs tinymail.override
 	$(PYGTK_CODEGEN) --prefix pytinymail		\
