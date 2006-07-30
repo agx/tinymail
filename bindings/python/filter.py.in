@@ -12,7 +12,7 @@ except getopt.error, msg:
 
 for o, a in opts:
 	if o in ("-h", "--help"):
-		sys.stdout.writeln ("--extra FILENAME")
+		sys.stdout.writeln ("--extra=FILENAME")
 		sys.exit(0)
 	if o in ("-e", "--extra"):
 		filename = a
