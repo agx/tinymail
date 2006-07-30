@@ -6,6 +6,12 @@ import tinymail.ui
 import tinymail.uigtk
 import tinymail.platform
 
+def on_headerstree_selected (treeselection) :
+	model, iter = treeselection.get_selected ()
+	header = model.get_value (iter, 8)
+	if header:
+		print header.get_subject ()
+
 def on_folderstree_selected (treeselection, headerstree) :
 	model, iter = treeselection.get_selected ()
 	folder = model.get_value(iter, 3)
@@ -38,5 +44,6 @@ accounts = tinymail.uigtk.AccountTreeModel ()
 account_store.get_accounts (accounts, tinymail.ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
 folderstree.set_model (accounts)
 folderstree.get_selection().connect("changed", on_folderstree_selected, headerstree)
+headerstree.get_selection().connect("changed", on_headerstree_selected)
 xml.signal_connect("on_window_delete_event", gtk.main_quit)
 gtk.main()

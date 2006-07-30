@@ -355,7 +355,7 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_OBJECT);
-			g_value_set_pointer (value, header);
+			g_value_set_object (value, header);
 			break;
 		case TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
