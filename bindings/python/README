@@ -1,0 +1,47 @@
+What will happen
+----------------
+
+The generator will generate a binding for libtinymail, libtinymailui and the
+selected platform library $(PLATFORMDIR)
+
+o. It will first use h2def.py to generate out of the .h files of each target
+a list of defines to the standard output
+
+o. The filter.py(.in) script will read that as standard input. This script will
+also read a .defs.extra file. It will avoid duplicate defines where it will 
+prefer the define in the .defs.extra file. It will also append all the other
+defines of the .defs.extra file to the standard output
+
+o. The filter.py script will also replace "define-object (.*)Iface" with 
+"define-interface ".$1."Iface". In tinymail, type-names ending on "Iface"
+are always interfaces.
+
+o. The standard output is set to $@ in the Makefile.am. It generates tinymail.defs,
+tinymailui.defs, tinymailui-gtk.defs and tinymail-platform.defs
+
+o. Using those .defs files and the non-generated .override files, pygtk-codegen
+generates -glue.c files. Those are compiled to the .so file that gets installed
+in the site-packages directory.
+
+o. A .pth file is installed in the site-packages directory
+ 
+
+When .h files are added
+-----------------------
+You can use this little command-line to get a nice list of files the way you 
+should put it in the Makefile.am:
+
+ls DIR/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\t\\\\/g
+
+
+Special defines
+---------------
+You can override and define extra defines in tinymail.defs.extra, 
+tinymailui.defs.extra, tinymailui-gtk.defs.extra and 
+tinymail-platform.defs.extra
+
+Overrides
+---------
+
+Overrides go in the .override files
+
