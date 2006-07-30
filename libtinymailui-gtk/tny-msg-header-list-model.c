@@ -102,6 +102,7 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
 		cur = 0;
 	}
 
+	/* If nth is 0, then we are fine. Leave it then. */
 	if (G_LIKELY (nth != 0))
 	{
 
