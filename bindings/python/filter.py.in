@@ -25,6 +25,12 @@ cregex =  re.compile ('\(define-object\ (.*)Iface(.*)$')
 f = open (filename, 'r')
 
 for line in f:
+	t = cregex.match(line)
+	if t != None:
+		part1 = t.groups ()[0]
+		part2 = t.groups ()[1]
+		line = "(define-interface " + part1 + "Iface" + part2 + "\n"
+
 	m = tregex.match(line)
 	if m != None:
 		things.append (m.groups ()[0])
