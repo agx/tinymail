@@ -61,7 +61,7 @@ tny_account_store_iface_alert (TnyAccountStoreIface *self, TnyAlertType type, co
  * 
  * Return value: the device attached to this account store
  **/
-const TnyDeviceIface* 
+TnyDeviceIface* 
 tny_account_store_iface_get_device (TnyAccountStoreIface *self)
 {
 #ifdef DEBUG

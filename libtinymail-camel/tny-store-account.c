@@ -340,13 +340,13 @@ tny_store_account_notify (TnyStoreAccountPriv *priv)
 
 /* TODO: this is a mess. Cleanup (refactor into multiple account types) */
 
-static const TnyListIface*
+static TnyListIface*
 tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	const TnyListIface *retval;
+	TnyListIface *retval;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 	const gchar *proto;

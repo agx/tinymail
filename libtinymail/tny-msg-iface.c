@@ -30,7 +30,7 @@
  *
  * Return value: The parent folder of this message
  **/
-const TnyMsgFolderIface* 
+TnyMsgFolderIface* 
 tny_msg_iface_get_folder (TnyMsgIface *self)
 {
 #ifdef DEBUG
@@ -50,7 +50,7 @@ tny_msg_iface_get_folder (TnyMsgIface *self)
  *
  * Return value: A read-only #TnyListIface with #TnyMsgMimePartIface instances
  **/
-const TnyListIface*
+TnyListIface*
 tny_msg_iface_get_parts (TnyMsgIface *self)
 {
 #ifdef DEBUG
@@ -70,7 +70,7 @@ tny_msg_iface_get_parts (TnyMsgIface *self)
  *
  * Return value: The header of the message
  **/
-const TnyMsgHeaderIface*
+TnyMsgHeaderIface*
 tny_msg_iface_get_header (TnyMsgIface *self)
 {
 #ifdef DEBUG

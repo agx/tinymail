@@ -49,8 +49,7 @@ struct _TnyStoreAccountIfaceClass
 {
 	GTypeInterface parent;
 
-	const TnyListIface* 
-	     (*get_folders_func)           (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
+	TnyListIface* (*get_folders_func)  (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
 	void (*subscribe_func)             (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
 	void (*unsubscribe_func)           (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
 };
@@ -58,7 +57,7 @@ struct _TnyStoreAccountIfaceClass
 GType tny_store_account_iface_get_type (void);
 GType tny_store_account_folder_type_get_type (void);
 
-const TnyListIface* tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
+TnyListIface* tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
 void tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
 void tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
 

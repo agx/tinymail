@@ -75,13 +75,12 @@ struct _TnyAccountStoreIfaceClass
 	void (*accounts_reloaded)                      (TnyAccountStoreIface *self);
 
 	/* Methods */
-	void          (*get_accounts_func)             (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
-	void          (*add_store_account_func)        (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
-	void          (*add_transport_account_func)    (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
-	const gchar*  (*get_cache_dir_func)            (TnyAccountStoreIface *self);
-	const TnyDeviceIface* 
-		      (*get_device_func)               (TnyAccountStoreIface *self);
-	gboolean      (*alert_func)                    (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
+	void            (*get_accounts_func)             (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
+	void            (*add_store_account_func)        (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
+	void            (*add_transport_account_func)    (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
+	const gchar*    (*get_cache_dir_func)            (TnyAccountStoreIface *self);
+	TnyDeviceIface* (*get_device_func)               (TnyAccountStoreIface *self);
+	gboolean        (*alert_func)                    (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 };
 
 GType tny_account_store_iface_get_type (void);
@@ -92,7 +91,7 @@ void tny_account_store_iface_get_accounts (TnyAccountStoreIface *self, TnyListIf
 void tny_account_store_iface_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
 void tny_account_store_iface_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
 const gchar*  tny_account_store_iface_get_cache_dir (TnyAccountStoreIface *self);
-const TnyDeviceIface* tny_account_store_iface_get_device (TnyAccountStoreIface *self);
+TnyDeviceIface* tny_account_store_iface_get_device (TnyAccountStoreIface *self);
 gboolean tny_account_store_iface_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 
 G_END_DECLS

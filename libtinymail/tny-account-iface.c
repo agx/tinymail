@@ -89,7 +89,7 @@ tny_account_iface_is_connected (TnyAccountIface *self)
  * 
  **/
 void
-tny_account_iface_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
+tny_account_iface_set_account_store (TnyAccountIface *self, TnyAccountStoreIface *store)
 {
 #ifdef DEBUG
 	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_store_func)
@@ -108,7 +108,7 @@ tny_account_iface_set_account_store (TnyAccountIface *self, const TnyAccountStor
  * 
  * Return value: the store or NULL if none
  **/
-const TnyAccountStoreIface*
+TnyAccountStoreIface*
 tny_account_iface_get_account_store (TnyAccountIface *self)
 {
 #ifdef DEBUG

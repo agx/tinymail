@@ -174,11 +174,11 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message, gboole
 	return;
 }
 
-const TnyMsgFolderIface* 
+TnyMsgFolderIface* 
 tny_msg_get_folder (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	const TnyMsgFolderIface *retval;
+	TnyMsgFolderIface *retval;
 
 	g_mutex_lock (priv->folder_lock);
 	retval = priv->folder;
@@ -189,7 +189,7 @@ tny_msg_get_folder (TnyMsgIface *self)
 
 
 void
-_tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
+_tny_msg_set_folder (TnyMsgIface *self, TnyMsgFolderIface* folder)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
@@ -200,11 +200,11 @@ _tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface* folder)
 	return;
 }
 
-static const TnyListIface*
+static TnyListIface*
 tny_msg_get_parts (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	const TnyListIface *retval;
+	TnyListIface *retval;
 
 	g_mutex_lock (priv->parts_lock);
 	retval = priv->parts;
@@ -213,7 +213,7 @@ tny_msg_get_parts (TnyMsgIface *self)
 	return retval;
 }
 
-static const TnyMsgHeaderIface*
+static TnyMsgHeaderIface*
 tny_msg_get_header (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));

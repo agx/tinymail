@@ -71,7 +71,7 @@ tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface
  * 
  * Return value: A read-only #TnyListIface which contains TnyFolderIface instances
  **/
-const TnyListIface*
+TnyListIface*
 tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
 {
 #ifdef DEBUG

@@ -39,10 +39,10 @@ struct _TnyMsgIfaceClass
 {
 	GTypeInterface parent;
 
-	const TnyListIface*      (*get_parts_func)        (TnyMsgIface *self);
-	const TnyMsgHeaderIface* (*get_header_func)       (TnyMsgIface *self);
+	TnyListIface*      (*get_parts_func)        (TnyMsgIface *self);
+	TnyMsgHeaderIface* (*get_header_func)       (TnyMsgIface *self);
 
-        const TnyMsgFolderIface*
+        TnyMsgFolderIface*
                                  (*get_folder_func)       (TnyMsgIface *self);
 	void                     (*set_header_func)       (TnyMsgIface *self, TnyMsgHeaderIface *header);
 
@@ -53,13 +53,13 @@ struct _TnyMsgIfaceClass
 
 GType                    tny_msg_iface_get_type         (void);
 
-const TnyListIface*      tny_msg_iface_get_parts        (TnyMsgIface *self);
-const TnyMsgHeaderIface* tny_msg_iface_get_header       (TnyMsgIface *self);
+TnyListIface*      tny_msg_iface_get_parts        (TnyMsgIface *self);
+TnyMsgHeaderIface* tny_msg_iface_get_header       (TnyMsgIface *self);
 
 gint                     tny_msg_iface_add_part         (TnyMsgIface *self, TnyMsgMimePartIface *part);
 void                     tny_msg_iface_del_part         (TnyMsgIface *self, gint id);
 
-const TnyMsgFolderIface*
+TnyMsgFolderIface*
                          tny_msg_iface_get_folder       (TnyMsgIface *self);
 void                     tny_msg_iface_set_header       (TnyMsgIface *self, TnyMsgHeaderIface *header);
 

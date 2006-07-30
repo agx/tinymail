@@ -156,7 +156,7 @@ online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 
 	if (priv->account_store)
 	{
-		const TnyDeviceIface *device = tny_account_store_iface_get_device (priv->account_store);
+		TnyDeviceIface *device = tny_account_store_iface_get_device (priv->account_store);
 
 		if (gtk_toggle_button_get_active (togglebutton))
 			tny_device_iface_force_online (device);
@@ -192,12 +192,12 @@ static void
 tny_summary_view_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store)
 {
 	TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
-	const TnyDeviceIface *device = tny_account_store_iface_get_device (account_store);
+	TnyDeviceIface *device = tny_account_store_iface_get_device (account_store);
 
 	if (G_UNLIKELY (priv->account_store))
 	{ /* You typically set it once, so unlikely */
 
-		const TnyDeviceIface *odevice = tny_account_store_iface_get_device (priv->account_store);
+		TnyDeviceIface *odevice = tny_account_store_iface_get_device (priv->account_store);
 
 		if (g_signal_handler_is_connected (G_OBJECT (odevice), priv->connchanged_signal))
 		{
@@ -262,7 +262,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 				{
 					TnyMsgFolderIface *folder;
-					const TnyMsgIface *msg;
+					TnyMsgIface *msg;
 
 					if (GTK_IS_TREE_MODEL_SORT (model))
 					{
@@ -314,8 +314,8 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 		if (G_LIKELY (header))
 		{
 
-			const TnyMsgFolderIface *folder;
-			const TnyMsgIface *msg;
+			TnyMsgFolderIface *folder;
+			TnyMsgIface *msg;
 
 			folder = tny_msg_header_iface_get_folder (header);
 			if (G_LIKELY (folder))
@@ -480,8 +480,8 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		
 		if (G_LIKELY (header))
 		{
-			const TnyMsgFolderIface *folder;
-			const TnyMsgIface *msg;
+			TnyMsgFolderIface *folder;
+			TnyMsgIface *msg;
 			TnyPlatformFactoryIface *platfact;
 
 			platfact = TNY_PLATFORM_FACTORY_IFACE 

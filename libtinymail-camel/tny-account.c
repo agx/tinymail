@@ -212,7 +212,7 @@ tny_account_is_connected (TnyAccountIface *self)
 }
 
 static void 
-tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface *store)
+tny_account_set_account_store (TnyAccountIface *self, TnyAccountStoreIface *store)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
@@ -233,7 +233,7 @@ tny_account_set_account_store (TnyAccountIface *self, const TnyAccountStoreIface
 	return;
 }
 
-static const TnyAccountStoreIface*
+static TnyAccountStoreIface*
 tny_account_get_account_store (TnyAccountIface *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);

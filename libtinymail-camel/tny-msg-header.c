@@ -481,18 +481,18 @@ tny_msg_header_new (void)
 }
 
 static void
-tny_msg_header_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
+tny_msg_header_set_folder (TnyMsgHeaderIface *self, TnyMsgFolderIface *folder)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
 	me->folder = (TnyMsgFolderIface*)folder;
 	return;
 }
 
-static const TnyMsgFolderIface*
+static TnyMsgFolderIface*
 tny_msg_header_get_folder (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	return (const TnyMsgFolderIface*)me->folder;
+	return (TnyMsgFolderIface*)me->folder;
 }
 
 static void

@@ -90,7 +90,7 @@ static void
 tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *account, treeaddfunc func)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	const TnyListIface *folders;
+	TnyListIface *folders;
 	GtkTreeIter name_iter;
 
 	folders = tny_store_account_iface_get_folders (account, 

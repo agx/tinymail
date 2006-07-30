@@ -348,7 +348,7 @@ tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
  * 
  * Return value: The folder of the message header
  **/
-const TnyMsgFolderIface* 
+TnyMsgFolderIface* 
 tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 {
 #ifdef DEBUG
@@ -367,7 +367,7 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
  * 
  **/
 void
-tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, const TnyMsgFolderIface *folder)
+tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, TnyMsgFolderIface *folder)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_folder_func)

@@ -40,6 +40,6 @@ struct _TnyMsgPriv
 CamelMimeMessage* _tny_msg_get_camel_mime_message (TnyMsg *self);
 void _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message, gboolean pop);
 void _tny_msg_header_set_not_uncachable (TnyMsgHeader *self);
-void _tny_msg_set_folder (TnyMsgIface *self, const TnyMsgFolderIface *folder);
+void _tny_msg_set_folder (TnyMsgIface *self, TnyMsgFolderIface *folder);
 
 #endif

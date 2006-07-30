@@ -185,7 +185,7 @@ tny_msg_folder_iface_get_all_count (TnyMsgFolderIface *self)
  * 
  * Return value: the account of this folder
  **/
-const TnyAccountIface*  
+TnyAccountIface*  
 tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
 {
 #ifdef DEBUG
@@ -204,7 +204,7 @@ tny_msg_folder_iface_get_account (TnyMsgFolderIface *self)
  * 
  **/
 void
-tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account)
+tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, TnyAccountIface *account)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->set_account_func)
@@ -224,7 +224,7 @@ tny_msg_folder_iface_set_account (TnyMsgFolderIface *self, const TnyAccountIface
  * 
  * Return value: A read-only #TnyListIface with TnyMsgFolderIface instances
  **/
-const TnyListIface*
+TnyListIface*
 tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
 {
 #ifdef DEBUG
@@ -245,8 +245,8 @@ tny_msg_folder_iface_get_folders (TnyMsgFolderIface *self)
  * 
  * Return value: The message instance or NULL on failure
  **/
-const TnyMsgIface*
-tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
+TnyMsgIface*
+tny_msg_folder_iface_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_FOLDER_IFACE_GET_CLASS (self)->get_message_func)

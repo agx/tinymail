@@ -348,7 +348,7 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 	return;
 }
 
-static const TnyDeviceIface*
+static TnyDeviceIface*
 tny_account_store_get_device (TnyAccountStoreIface *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);

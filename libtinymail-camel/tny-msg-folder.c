@@ -199,16 +199,16 @@ _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 	return retval;
 }
 
-static const TnyListIface*
+static TnyListIface*
 tny_msg_folder_get_folders (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
-	const TnyListIface *retval;
+	TnyListIface *retval;
 
 	g_mutex_lock (priv->folder_lock);
 	if (!priv->folders)
 		priv->folders = _tny_msg_folder_list_new (self);
-	retval = (const TnyListIface*)priv->folders;
+	retval = (TnyListIface*)priv->folders;
 	g_mutex_unlock (priv->folder_lock);
 
 	return retval;
@@ -301,7 +301,7 @@ tny_msg_folder_get_all_count (TnyMsgFolderIface *self)
 }
 
 
-static const TnyAccountIface*  
+static TnyAccountIface*  
 tny_msg_folder_get_account (TnyMsgFolderIface *self)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
@@ -310,7 +310,7 @@ tny_msg_folder_get_account (TnyMsgFolderIface *self)
 }
 
 static void
-tny_msg_folder_set_account (TnyMsgFolderIface *self, const TnyAccountIface *account)
+tny_msg_folder_set_account (TnyMsgFolderIface *self, TnyAccountIface *account)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 
@@ -607,8 +607,8 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 }
 
 
-static const TnyMsgIface*
-tny_msg_folder_get_message (TnyMsgFolderIface *self, const TnyMsgHeaderIface *header)
+static TnyMsgIface*
+tny_msg_folder_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
 {
 	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
 	TnyMsgIface *message = NULL;
