@@ -1,3 +1,8 @@
+07-30-2006  James Livingston <doclivingston@gmail.com>
+
+	* bindings/python/tinymail.override: Sequence protocol, initial
+	pieces of implementation
+
 07-29-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improved the enums (GType'ed them)
