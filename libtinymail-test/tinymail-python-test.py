@@ -16,7 +16,7 @@ def on_status (folder, what, status, headerstree) :
 
 def on_headerstree_selected (treeselection, msgview) :
 	model, iter = treeselection.get_selected ()
-	header = model.get_value (iter, 8)
+	header = model.get_value (iter, tinymail.uigtk.MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN)
 	if header:
 		print header.get_subject ()
 		folder = header.get_folder ()
