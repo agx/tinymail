@@ -17,11 +17,12 @@ def on_status (folder, what, status, headerstree) :
 
 def on_headerstree_selected (treeselection, msgview) :
 	model, iter = treeselection.get_selected ()
-	header = model.get_value (iter, tinymail.uigtk.MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN)
-	if header:
-		folder = header.get_folder ()
-		msg = folder.get_message (header)
-		msgview.set_msg (msg)
+	if iter:
+		header = model.get_value (iter, tinymail.uigtk.MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN)
+		if header:
+			folder = header.get_folder ()
+			msg = folder.get_message (header)
+			msgview.set_msg (msg)
 
 def on_folderstree_selected (treeselection, headerstree) :
 	model, iter = treeselection.get_selected ()
