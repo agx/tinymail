@@ -10,6 +10,7 @@ def on_refresh_folder (folder, cancelled, headerstree):
 	listm = tinymail.uigtk.MsgHeaderListModel ()
 	listm.set_folder (folder, False)
 	headerstree.set_model (listm)
+	progressbar.hide ()
 
 def on_status (folder, what, status, headerstree) :
 	progressbar.pulse ()
@@ -18,7 +19,6 @@ def on_headerstree_selected (treeselection, msgview) :
 	model, iter = treeselection.get_selected ()
 	header = model.get_value (iter, tinymail.uigtk.MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN)
 	if header:
-		print header.get_subject ()
 		folder = header.get_folder ()
 		msg = folder.get_message (header)
 		msgview.set_msg (msg)
@@ -27,6 +27,7 @@ def on_folderstree_selected (treeselection, headerstree) :
 	model, iter = treeselection.get_selected ()
 	folder = model.get_value(iter, 3)
 	if folder:
+		progressbar.show ()
 		folder.refresh_async (on_refresh_folder, on_status, headerstree)
 
 props = { gnome.PARAM_APP_DATADIR : "/usr/share" }
@@ -34,19 +35,29 @@ pr = gnome.program_init ("E-Mail", "1.0", properties=props)
 xml = gtk.glade.XML ("tinymail-python-test.glade", domain="email")
 widget = xml.get_widget ("window")
 progressbar = xml.get_widget ("progressbar")
+progressbar.hide ()
 folderstree = xml.get_widget ("folderstree")
 headerstree = xml.get_widget ("headerstree")
 vpaned = xml.get_widget ("vpaned")
 renderer = gtk.CellRendererText ();
 column = gtk.TreeViewColumn ("Folder", renderer, text=0)
+column.set_fixed_width (100)
+column.set_sizing (gtk.TREE_VIEW_COLUMN_FIXED)
 folderstree.append_column (column)
 renderer = gtk.CellRendererText ();
 column = gtk.TreeViewColumn ("From", renderer, text=0)
 column.set_fixed_width (100)
+column.set_sizing (gtk.TREE_VIEW_COLUMN_FIXED)
 headerstree.append_column (column)
 renderer = gtk.CellRendererText ();
 column = gtk.TreeViewColumn ("Subject", renderer, text=2)
+column.set_fixed_width (200)
+column.set_sizing (gtk.TREE_VIEW_COLUMN_FIXED)
+headerstree.append_column (column)
+renderer = gtk.CellRendererText ();
+column = gtk.TreeViewColumn ("Received", renderer, text=7)
 column.set_fixed_width (100)
+column.set_sizing (gtk.TREE_VIEW_COLUMN_FIXED)
 headerstree.append_column (column)
 platfact = tinymail.platform.tny_platform_factory_get_instance ()
 msgview = platfact.new_msg_view ()

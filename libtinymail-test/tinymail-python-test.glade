@@ -45,7 +45,7 @@
 	      <property name="rules_hint">False</property>
 	      <property name="reorderable">False</property>
 	      <property name="enable_search">True</property>
-	      <property name="fixed_height_mode">False</property>
+	      <property name="fixed_height_mode">True</property>
 	      <property name="hover_selection">False</property>
 	      <property name="hover_expand">False</property>
 	      <signal name="row_activated" handler="on_folderstree_row_activated" last_modification_time="Sat, 29 Jul 2006 14:37:43 GMT"/>
@@ -88,7 +88,7 @@
 		      <property name="rules_hint">False</property>
 		      <property name="reorderable">False</property>
 		      <property name="enable_search">True</property>
-		      <property name="fixed_height_mode">False</property>
+		      <property name="fixed_height_mode">True</property>
 		      <property name="hover_selection">False</property>
 		      <property name="hover_expand">False</property>
 		      <signal name="row_activated" handler="on_headerstree_row_activated" last_modification_time="Sat, 29 Jul 2006 14:37:49 GMT"/>

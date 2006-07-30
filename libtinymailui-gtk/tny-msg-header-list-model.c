@@ -44,6 +44,7 @@ static GObjectClass *parent_class;
 /* The function is locked, so this is secure (and might cause less
 stack allocations)? It's probably a naïve manual optimization.*/
 
+
 #ifndef DEBUG
 #ifdef G_CAN_INLINE
 G_INLINE_FUNC
@@ -94,22 +95,35 @@ _tny_msg_header_list_iterator_travel_to_nth_nl (TnyMsgHeaderListIterator *self, 
 	   of the list: We know the first location, so ... (faster to start 
 	   from the first than from the current) */
 
-	if G_UNLIKELY (nth - cur < nth)
+
+	if (G_UNLIKELY (nth - cur < nth) || G_UNLIKELY (nth == 0))
 	{
 		self->current = self->model->first;
 		cur = 0;
 	}
 
-	/* If the current location is less than the destination location */
-	if G_LIKELY (cur < nth)
-		while G_LIKELY (cur++ < nth)
-			self->current = self->current->next;
+	if (G_LIKELY (nth != 0))
+	{
 
-	/* And if not ... */
-	else if G_LIKELY (cur > nth)
-		while G_LIKELY (cur-- > nth)
-			if (self->current) self->current = self->current->prev;
-			else break;
+		/* If the current location is less than the destination location */
+		if G_LIKELY (cur < nth)
+			while G_LIKELY (cur++ < nth)
+				self->current = self->current->next;
+
+		/* And if not ... */
+		else if G_LIKELY (cur > nth)
+			while G_LIKELY (cur-- > nth)
+				if (G_LIKELY (self->current))
+					self->current = self->current->prev;
+				else 
+				{	
+					/* This is a strange case, but it means that we must 
+					   be at the first item */
+
+					self->current = self->model->first; 
+					break; 
+				}
+	}
   }
 
   return;
@@ -165,6 +179,7 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 {
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
 	gint i; gpointer ptr;
+	gboolean retval=FALSE;
 
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
@@ -189,16 +204,19 @@ tny_msg_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 		list_model->last_nth, i);
 
 	/* We will store this as user_data of the GtkTreeIter */
+	
 	ptr = _tny_msg_header_list_iterator_current_nl ((TnyMsgHeaderListIterator*)list_model->iterator);
 	list_model->last_nth = i;
 	iter->stamp = list_model->stamp;
 	iter->user_data = ptr;
+	retval = (iter->user_data != NULL);
+	
 	g_mutex_unlock (list_model->iterator_lock);
 
 	
 	g_mutex_unlock (list_model->folder_lock);
 
-	return TRUE;
+	return retval;
 }
 
 static GtkTreePath *
@@ -317,7 +335,9 @@ tny_msg_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	TnyMsgHeaderListModel *list_model = TNY_MSG_HEADER_LIST_MODEL (self);
 
 	g_return_if_fail (iter->stamp == TNY_MSG_HEADER_LIST_MODEL (self)->stamp);
-	g_return_if_fail (iter->user_data != NULL);
+
+	if (iter->user_data == NULL)
+		return;
 
 	g_mutex_lock (list_model->folder_lock);
 	g_mutex_lock (list_model->iterator_lock);
