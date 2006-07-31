@@ -32,7 +32,7 @@
  * Return value: the number of bytes written to the output stream, or -1 on
  * error along with setting errno.
  **/
-ssize_t
+gssize
 tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
 #ifdef DEBUG
@@ -54,8 +54,8 @@ tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
  * Return value: the number of bytes actually read, or -1 on error and 
  * set errno.
  **/
-ssize_t
-tny_stream_iface_read  (TnyStreamIface *self, char *buffer, size_t n)
+gssize
+tny_stream_iface_read  (TnyStreamIface *self, char *buffer, gsize n)
 {
 #ifdef DEBUG
 	if (!TNY_STREAM_IFACE_GET_CLASS (self)->read_func)
@@ -76,8 +76,8 @@ tny_stream_iface_read  (TnyStreamIface *self, char *buffer, size_t n)
  * Return value: the number of bytes written to the stream, or -1 on error 
  * along with setting errno.
  **/
-ssize_t
-tny_stream_iface_write (TnyStreamIface *self, const char *buffer, size_t n)
+gssize
+tny_stream_iface_write (TnyStreamIface *self, const char *buffer, gsize n)
 {
 #ifdef DEBUG
 	if (!TNY_STREAM_IFACE_GET_CLASS (self)->write_func)

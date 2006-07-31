@@ -53,15 +53,15 @@ struct _TnyStreamCamelPriv
 #define TNY_STREAM_CAMEL_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelPriv))
 
-static ssize_t
+static gssize
 tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 	CamelStream *stream = priv->stream;
 	char tmp_buf[4096];
-	ssize_t total = 0;
-	ssize_t nb_read;
-	ssize_t nb_written;
+	gssize total = 0;
+	gssize nb_read;
+	gssize nb_written;
 
 	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
 	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
@@ -77,7 +77,7 @@ tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	
 			while (G_UNLIKELY (nb_written < nb_read)) 
 			{
-				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				gssize len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -89,16 +89,16 @@ tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	return total;
 }
 
-static ssize_t
-tny_stream_camel_read  (TnyStreamIface *self, char *buffer, size_t n)
+static gssize
+tny_stream_camel_read  (TnyStreamIface *self, char *buffer, gsize n)
 {
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 
 	return camel_stream_read (priv->stream, buffer, n);
 }
 
-static ssize_t
-tny_stream_camel_write (TnyStreamIface *self, const char *buffer, size_t n)
+static gssize
+tny_stream_camel_write (TnyStreamIface *self, const char *buffer, gsize n)
 {
 	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
 

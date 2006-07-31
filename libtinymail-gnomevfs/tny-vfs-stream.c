@@ -152,13 +152,13 @@ tny_vfs_stream_set_errno (GnomeVFSResult res)
 	}
 }
 
-static ssize_t
+static gssize
 tny_vfs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
 	char tmp_buf[4096];
-	ssize_t total = 0;
-	ssize_t nb_read;
-	ssize_t nb_written;
+	gssize total = 0;
+	gssize nb_read;
+	gssize nb_written;
 	
 	while (G_UNLIKELY (!tny_stream_iface_eos (self))) {
 		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
@@ -169,7 +169,7 @@ tny_vfs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	
 			while (G_LIKELY (nb_written < nb_read))
 			{
-				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				gssize len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -181,8 +181,8 @@ tny_vfs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	return total;
 }
 
-static ssize_t
-tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
+static gssize
+tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	GnomeVFSFileSize count;
@@ -212,8 +212,8 @@ tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 	return -1;
 }
 
-static ssize_t
-tny_vfs_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
+static gssize
+tny_vfs_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	GnomeVFSFileSize count;

@@ -41,13 +41,13 @@ struct _TnyTextBufferStreamPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_TEXT_BUFFER_STREAM, TnyTextBufferStreamPriv))
 
 
-static ssize_t
+static gssize
 tny_text_buffer_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
 	char tmp_buf[4096];
-	ssize_t total = 0;
-	ssize_t nb_read;
-	ssize_t nb_written;
+	gssize total = 0;
+	gssize nb_read;
+	gssize nb_written;
 	
 	while (G_LIKELY (!tny_stream_iface_eos (self))) 
 	{
@@ -59,7 +59,7 @@ tny_text_buffer_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	
 			while (G_LIKELY (nb_written < nb_read))
 			{
-				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				gssize len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -71,8 +71,8 @@ tny_text_buffer_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	return total;
 }
 
-static ssize_t
-tny_text_buffer_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
+static gssize
+tny_text_buffer_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
 {
 	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter dest, end;
@@ -91,17 +91,17 @@ tny_text_buffer_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 
 	buffer = gtk_text_buffer_get_text (priv->buffer, &(priv->cur), &dest, TRUE);
 
-	return (ssize_t) rlength;
+	return (gssize) rlength;
 }
 
-static ssize_t
-tny_text_buffer_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
+static gssize
+tny_text_buffer_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
 {
 	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
 	gtk_text_buffer_insert (priv->buffer, &(priv->cur), buffer, (gint)n);
 
-	return (ssize_t) n;
+	return (gssize) n;
 }
 
 static gint

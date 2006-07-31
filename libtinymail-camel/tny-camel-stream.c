@@ -34,14 +34,14 @@ static CamelStreamClass *parent_class = NULL;
  * Return value: the number of bytes written to the output stream, or -1 on 
  * error along with setting errno.
  **/
-ssize_t 
+gssize 
 tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output)
 {
 	CamelStream *stream = CAMEL_STREAM (self);
 	char tmp_buf[4096];
-	ssize_t total = 0;
-	ssize_t nb_read;
-	ssize_t nb_written;
+	gssize total = 0;
+	gssize nb_read;
+	gssize nb_written;
 	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
 	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
 
@@ -56,7 +56,7 @@ tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output)
 	
 			while (G_LIKELY (nb_written < nb_read))
 			{
-				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				gssize len = tny_stream_iface_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -69,15 +69,15 @@ tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output)
 }
 
 
-static ssize_t
-tny_camel_stream_read (CamelStream *stream, char *buffer, size_t n)
+static gssize
+tny_camel_stream_read (CamelStream *stream, char *buffer, gsize n)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
 	return tny_stream_iface_read (self->stream, buffer, n);
 }
 
-static ssize_t
-tny_camel_stream_write (CamelStream *stream, const char *buffer, size_t n)
+static gssize
+tny_camel_stream_write (CamelStream *stream, const char *buffer, gsize n)
 {
 	TnyCamelStream *self = (TnyCamelStream *)stream;
 	return tny_stream_iface_write (self->stream, buffer, n);
