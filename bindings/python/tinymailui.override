@@ -11,7 +11,6 @@ headers
 #include <tny-platform-factory-iface.h>
 #include <tny-save-strategy-iface.h>
 #include <tny-summary-view-iface.h>
-#include <tny-summary-window-iface.h>
 #include <tny-account-store-iface.h>
 
 #define NO_IMPORT_PYGOBJECT

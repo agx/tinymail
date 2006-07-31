@@ -93,8 +93,7 @@ tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui.defs.extra $(
 	$(top_srcdir)/libtinymailui/tny-msg-window-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-platform-factory-iface.h   \
 	$(top_srcdir)/libtinymailui/tny-save-strategy-iface.h	   \
-	$(top_srcdir)/libtinymailui/tny-summary-view-iface.h	   \
-	$(top_srcdir)/libtinymailui/tny-summary-window-iface.h |   \
+	$(top_srcdir)/libtinymailui/tny-summary-view-iface.h |	   \
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymailui.defs.extra > $@
 
 
