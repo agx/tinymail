@@ -2,11 +2,11 @@
 TnyDevice
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A implementation of #TnyDeviceIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A implementation of #TnyDeviceView suitable for the GNOME desktop that uses features like Network Manager for detecting the online/offline connection status of your computer
 </para>
 
 

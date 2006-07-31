@@ -2,16 +2,16 @@
 TnyList
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A simple list implementation
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A simple list implementation that uses a GList internally
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyListIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
