@@ -51,6 +51,7 @@ tny_refresh_folder_cb (TnyMsgFolderIface *self, gboolean cancelled, gpointer use
 	PyErr_Print();
     Py_XDECREF(ret);
     Py_DECREF(args);
+    Py_DECREF ((PyObject *)user_data);
     pyg_gil_state_release(state);
 }
 

@@ -5,12 +5,20 @@ import tinymail
 import tinymail.ui
 import tinymail.uigtk
 import tinymail.platform
+import gc
 
 def on_refresh_folder (folder, cancelled, headerstree):
 	listm = tinymail.uigtk.MsgHeaderListModel ()
 	listm.set_folder (folder, False)
 	headerstree.set_model (listm)
 	progressbar.hide ()
+
+	# I know. But this does significantly speed
+	# up the garbage collecting. Only use it for
+	# targets that have few memory resources
+
+	gc.collect()
+
 
 def on_status (folder, what, status, headerstree) :
 	progressbar.pulse ()
