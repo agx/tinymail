@@ -251,6 +251,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_msg_header_iface_has_cache ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_header_iface_set_uid ##### -->
 <para>
 
@@ -258,6 +266,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @uid: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_uncache ##### -->
+<para>
+
+</para>
+
+@self: 
 
 <!-- ##### FUNCTION tny_msg_header_set_use_summary ##### -->
 <para>

@@ -208,20 +208,3 @@ by a summary view to give the user an overview of the available messages in a fo
 @mask: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_uncache ##### -->
-<para>
-
-</para>
-
-@self: 
-
-
-<!-- ##### FUNCTION tny_msg_header_iface_has_cache ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
