@@ -11,7 +11,7 @@ m4_define([lt_current], [m4_eval(100 * tny_minor_version + tny_micro_version - t
 m4_define([lt_revision], [tny_interface_age])
 m4_define([lt_age], [m4_eval(tny_binary_age - tny_interface_age)])
 
-AC_INIT([libtinymail], [tny_version], [http://www.pvanhoof.be])
+AC_INIT([libtinymail], [tny_version], [http://tinymail.org/trac/tinymail])
 
 AC_CONFIG_SRCDIR(tinymail/tny-main.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
