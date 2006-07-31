@@ -111,7 +111,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	if (!priv->parts)
 		priv->parts = tny_list_new ();
 
-	tny_list_iface_prepend (priv->parts, tpart);
+	tny_list_iface_prepend (priv->parts, (GObject*)tpart);
 	g_mutex_unlock (priv->parts_lock);
 
 	return TRUE;
@@ -271,7 +271,7 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 	if (!priv->parts)
 		priv->parts = tny_list_new ();
 
-	tny_list_iface_prepend (priv->parts, part); curl++;
+	tny_list_iface_prepend (priv->parts, (GObject*)part); curl++;
 
 	g_mutex_unlock (priv->parts_lock);
 

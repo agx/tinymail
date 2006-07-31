@@ -40,9 +40,9 @@ struct _TnyListIfaceClass
 	GTypeInterface parent;
 
 	guint (*length_func) (TnyListIface *self);
-	void (*prepend_func) (TnyListIface *self, gpointer item);
-	void (*append_func) (TnyListIface *self, gpointer item);
-	void (*remove_func) (TnyListIface *self, gpointer item);
+	void (*prepend_func) (TnyListIface *self, GObject* item);
+	void (*append_func) (TnyListIface *self, GObject* item);
+	void (*remove_func) (TnyListIface *self, GObject* item);
 	void (*foreach_func) (TnyListIface *self, GFunc func, gpointer user_data);
 	TnyListIface* (*copy_func) (TnyListIface *self);
 	TnyIteratorIface* (*create_iterator_func) (TnyListIface *self);
@@ -51,9 +51,9 @@ struct _TnyListIfaceClass
 GType tny_list_iface_get_type (void);
 
 guint tny_list_iface_length (TnyListIface *self);
-void tny_list_iface_prepend (TnyListIface *self, gpointer item);
-void tny_list_iface_append (TnyListIface *self, gpointer item);
-void tny_list_iface_remove (TnyListIface *self, gpointer item);
+void tny_list_iface_prepend (TnyListIface *self, GObject* item);
+void tny_list_iface_append (TnyListIface *self, GObject* item);
+void tny_list_iface_remove (TnyListIface *self, GObject* item);
 void tny_list_iface_foreach (TnyListIface *self, GFunc func, gpointer user_data);
 TnyIteratorIface* tny_list_iface_create_iterator (TnyListIface *self);
 TnyListIface *tny_list_iface_copy (TnyListIface *self);

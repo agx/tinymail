@@ -44,13 +44,13 @@ destroy_folder (gpointer data, gpointer user_data)
 
 
 static void
-tny_msg_folder_list_append (TnyListIface *self, gpointer item)
+tny_msg_folder_list_append (TnyListIface *self, GObject* item)
 {
 	g_warning (_("Cannot add folders to a folder yet\n"));
 }
 
 static void
-tny_msg_folder_list_prepend (TnyListIface *self, gpointer item)
+tny_msg_folder_list_prepend (TnyListIface *self, GObject* item)
 {
 	tny_msg_folder_list_append (self, item);
 }
@@ -114,7 +114,7 @@ tny_msg_folder_list_length (TnyListIface *self)
 }
 
 static void
-tny_msg_folder_list_remove (TnyListIface *self, gpointer item)
+tny_msg_folder_list_remove (TnyListIface *self, GObject* item)
 {
 	g_warning (_("Cannot remove folders from a folder yet\n"));
 }

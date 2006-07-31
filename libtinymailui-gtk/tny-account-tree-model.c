@@ -181,7 +181,7 @@ tny_account_tree_model_create_iterator (TnyListIface *self)
 
 
 static void
-tny_account_tree_model_prepend (TnyListIface *self, gpointer item)
+tny_account_tree_model_prepend (TnyListIface *self, GObject* item)
 {
 	TnyAccountTreeModel *me = (TnyAccountTreeModel*)self;
 
@@ -196,7 +196,7 @@ tny_account_tree_model_prepend (TnyListIface *self, gpointer item)
 }
 
 static void
-tny_account_tree_model_append (TnyListIface *self, gpointer item)
+tny_account_tree_model_append (TnyListIface *self, GObject* item)
 {
 	TnyAccountTreeModel *me = (TnyAccountTreeModel*)self;
 
@@ -226,7 +226,7 @@ tny_account_tree_model_length (TnyListIface *self)
 }
 
 static void
-tny_account_tree_model_remove (TnyListIface *self, gpointer item)
+tny_account_tree_model_remove (TnyListIface *self, GObject* item)
 {
 	TnyAccountTreeModel *me = (TnyAccountTreeModel*)self;
 	GtkTreeModel *model = GTK_TREE_MODEL (me);
@@ -250,7 +250,7 @@ tny_account_tree_model_remove (TnyListIface *self, gpointer item)
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&curaccount, -1);
 
-		if (curaccount == item)
+		if (curaccount == (TnyAccountIface*)item)
 		{
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));

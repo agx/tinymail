@@ -579,7 +579,7 @@ ref_header (gpointer data, gpointer user_data)
 
 
 static void
-tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
+tny_msg_header_list_model_prepend (TnyListIface *self, GObject* item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 	GtkTreePath *path;
@@ -615,7 +615,7 @@ tny_msg_header_list_model_prepend (TnyListIface *self, gpointer item)
 }
 
 static void
-tny_msg_header_list_model_append (TnyListIface *self, gpointer item)
+tny_msg_header_list_model_append (TnyListIface *self, GObject* item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 	GtkTreePath *path;
@@ -664,7 +664,7 @@ tny_msg_header_list_model_length (TnyListIface *self)
 }
 
 static void
-tny_msg_header_list_model_remove (TnyListIface *self, gpointer item)
+tny_msg_header_list_model_remove (TnyListIface *self, GObject* item)
 {
 	TnyMsgHeaderListModel *me = (TnyMsgHeaderListModel*)self;
 	GtkTreePath *path;

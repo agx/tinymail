@@ -34,7 +34,7 @@ static GObjectClass *parent_class;
 
 
 static void
-tny_list_append (TnyListIface *self, gpointer item)
+tny_list_append (TnyListIface *self, GObject* item)
 {
 	TnyListPriv *priv = TNY_LIST_GET_PRIVATE (self);
 
@@ -46,7 +46,7 @@ tny_list_append (TnyListIface *self, gpointer item)
 }
 
 static void
-tny_list_prepend (TnyListIface *self, gpointer item)
+tny_list_prepend (TnyListIface *self, GObject* item)
 {
 	TnyListPriv *priv = TNY_LIST_GET_PRIVATE (self);
 
@@ -72,7 +72,7 @@ tny_list_length (TnyListIface *self)
 }
 
 static void
-tny_list_remove (TnyListIface *self, gpointer item)
+tny_list_remove (TnyListIface *self, GObject* item)
 {
 	TnyListPriv *priv = TNY_LIST_GET_PRIVATE (self);
 

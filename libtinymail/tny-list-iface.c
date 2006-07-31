@@ -47,7 +47,7 @@ tny_list_iface_length (TnyListIface *self)
  * Implementors: if you have to choose, make this one the fast one
  **/
 void
-tny_list_iface_prepend (TnyListIface *self, gpointer item)
+tny_list_iface_prepend (TnyListIface *self, GObject* item)
 {
 #ifdef DEBUG
 	if (!TNY_LIST_IFACE_GET_CLASS (self)->prepend_func)
@@ -66,7 +66,7 @@ tny_list_iface_prepend (TnyListIface *self, gpointer item)
  * Implementors: if you have to choose, make the prepend one the fast one
  **/
 void 
-tny_list_iface_append (TnyListIface *self, gpointer item)
+tny_list_iface_append (TnyListIface *self, GObject* item)
 {
 #ifdef DEBUG
 	if (!TNY_LIST_IFACE_GET_CLASS (self)->append_func)
@@ -87,7 +87,7 @@ tny_list_iface_append (TnyListIface *self, gpointer item)
  * remove an item to be certain.
  **/
 void 
-tny_list_iface_remove (TnyListIface *self, gpointer item)
+tny_list_iface_remove (TnyListIface *self, GObject* item)
 {
 #ifdef DEBUG
 	if (!TNY_LIST_IFACE_GET_CLASS (self)->remove_func)
