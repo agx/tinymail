@@ -19,18 +19,26 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_MSG_HEADER_LIST_MODEL_COLUMN ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyMsgHeaderListModel ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderListModelClass ##### -->
+<!-- ##### FUNCTION tny_msg_header_list_model_column_get_type ##### -->
 <para>
 
 </para>
 
-@parent: 
+@Returns: 
+
 
 <!-- ##### FUNCTION tny_msg_header_list_model_new ##### -->
 <para>

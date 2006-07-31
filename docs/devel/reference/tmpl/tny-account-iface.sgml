@@ -17,6 +17,21 @@ A abstract type that contains the shared functionality of the #TnyStoreAccountIf
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_ACCOUNT_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_account_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_account_iface_is_connected ##### -->
 <para>
 

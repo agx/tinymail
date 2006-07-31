@@ -29,10 +29,25 @@ automatically.
 @obj: 
 
 
+<!-- ##### MACRO TNY_TYPE_ATTACH_LIST_MODEL_COLUMN ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyAttachListModel ##### -->
 <para>
 
 </para>
+
+
+<!-- ##### FUNCTION tny_attach_list_model_column_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 
 <!-- ##### FUNCTION tny_attach_list_model_new ##### -->

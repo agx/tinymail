@@ -126,6 +126,13 @@ TnySummaryWindow
 
 @obj: 
 
+<!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
+<para>
+
+</para>
+
+@parent_class: 
+
 <!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
 <para>
 A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
@@ -154,6 +161,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @real: 
 
 <!-- ##### STRUCT TnyMsgHeaderListIteratorClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyMsgHeaderListModelClass ##### -->
 <para>
 
 </para>

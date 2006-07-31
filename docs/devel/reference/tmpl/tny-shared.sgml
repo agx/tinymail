@@ -425,6 +425,19 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when n
 
 @parent: 
 
+<!-- ##### STRUCT TnyFsStream ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFsStreamClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
 <!-- ##### MACRO G_LIKELY ##### -->
 <para>
 Implemented by GLib or a noop

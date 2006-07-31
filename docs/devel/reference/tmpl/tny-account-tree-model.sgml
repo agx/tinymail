@@ -30,18 +30,26 @@ account-folders as the child rows.
 @obj: 
 
 
+<!-- ##### MACRO TNY_TYPE_ACCOUNT_TREE_MODEL_COLUMN ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyAccountTreeModel ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
+<!-- ##### FUNCTION tny_account_tree_model_column_get_type ##### -->
 <para>
 
 </para>
 
-@parent_class: 
+@Returns: 
+
 
 <!-- ##### FUNCTION tny_account_tree_model_new ##### -->
 <para>

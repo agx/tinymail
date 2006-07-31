@@ -30,6 +30,21 @@ instances. Depending on the implementation, this will reduce memory usage.
 </para>
 
 
+<!-- ##### MACRO TNY_TYPE_MSG_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_msg_folder_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_msg_folder_iface_remove_message ##### -->
 <para>
 
