@@ -49,9 +49,7 @@
 <!ENTITY libtinymailui-TnyPlatformFactoryIface SYSTEM "xml/tny-platform-factory-iface.xml">
 <!ENTITY libtinymailui-TnyAccountStoreViewIface SYSTEM "xml/tny-account-store-view-iface.xml">
 <!ENTITY libtinymailui-TnySaveStrategyIface SYSTEM "xml/tny-save-strategy-iface.xml">
-<!ENTITY libtinymailui-TnyMsgHeaderViewIface SYSTEM "xml/tny-msg-header-view-iface.xml">
 <!ENTITY libtinymailui-TnySummaryViewIface SYSTEM "xml/tny-summary-view-iface.xml">
-<!ENTITY libtinymailui-TnySummaryWindowIface SYSTEM "xml/tny-summary-window-iface.xml">
 
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView SYSTEM "xml/tny-moz-embed-msg-view.xml">
@@ -118,17 +116,16 @@
 		&libtinymailui-TnyMsgViewIface;
 		&libtinymailui-TnyMsgWindowIface;
 		&libtinymailui-TnySaveStrategyIface;
-		&libtinymailui-TnyPlatformFactoryIface
+		&libtinymailui-TnyPlatformFactoryIface;
 		&libtinymailui-TnyMsgHeaderViewIface;
 		&libtinymailui-TnySummaryViewIface;
-		&libtinymailui-TnySummaryWindowIface;
 	</chapter>
 
 	<chapter id="libtinymailui-gtk">
 	<title>libtinymailui-gtk</title>
 		&libtinymailui-gtk-TnyMsgView;
 		&libtinymailui-gtk-TnyMsgWindow;
-		&libtinymailui-gtk-TnyMsgHeaderWindow
+		&libtinymailui-gtk-TnyMsgHeaderView;
 		&libtinymailui-gtk-TnyAccountTreeModel;
 		&libtinymailui-gtk-TnyMsgHeaderListModel;
 		&libtinymailui-gtk-TnyAttachListModel;
