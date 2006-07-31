@@ -1120,7 +1120,7 @@ tny_msg_header_list_model_column_get_type (void)
       { TNY_MSG_HEADER_LIST_MODEL_N_COLUMNS, "TNY_MSG_HEADER_LIST_MODEL_N_COLUMNS", "n" },
       { 0, NULL, NULL }
     };
-    etype = g_enum_register_static ("TnyAccountTreeModelColumn", values);
+    etype = g_enum_register_static ("TnyMsgHeaderListModelColumn", values);
   }
   return etype;
 }

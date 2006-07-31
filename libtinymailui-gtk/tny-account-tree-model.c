@@ -363,7 +363,7 @@ tny_account_tree_model_column_get_type (void)
       { TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, "TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN", "instance" },
       { TNY_ACCOUNT_TREE_MODEL_N_COLUMNS, "TNY_ACCOUNT_TREE_MODEL_N_COLUMNS", "n" },
       { 0, NULL, NULL }
-    };
+     };
     etype = g_enum_register_static ("TnyAccountTreeModelColumn", values);
   }
   return etype;

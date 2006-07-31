@@ -31,3 +31,17 @@
     '("n" "TNY_MSG_HEADER_LIST_MODEL_N_COLUMNS")
   )
 )
+
+
+(define-enum AccountTreeModelColumn
+  (in-module "Tny")
+  (c-name "TnyAccountTreeModelColumn")
+  (gtype-id "TNY_TYPE_ACCOUNT_TREE_MODEL_COLUMN")
+  (values
+    '("name" "TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN")
+    '("unread" "TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN")
+    '("type" "TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN")
+    '("instance" "TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN")
+    '("n" "TNY_ACCOUNT_TREE_MODEL_N_COLUMNS")
+  )
+)
