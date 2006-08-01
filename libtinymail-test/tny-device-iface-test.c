@@ -42,19 +42,23 @@ tny_device_iface_test_teardown (void)
 	return;
 }
 
+/* TODO:  test signal connection_changed (hard to test) */
+
 static void
-tny_device_iface_test_something (void)
+tny_device_iface_test_is_online (void)
 {
-	/* TODO: 
-	test properties: is_online
-	test methods: force_online, force_offline checking property is_online and signal connection_changed
-	test signal connection_changed (hard to test) */
-	
-	str = g_strdup_printf ("Reason\n");
-	gunit_fail_unless (0 == 0, str);
+	tny_device_iface_force_online (iface);
+		
+	str = g_strdup_printf ("Device should be online after force_online\n");
+	gunit_fail_unless (tny_device_iface_is_online(iface) == TRUE, str);
+	g_free (str);
+
+	tny_device_iface_force_offline (iface);
+		
+	str = g_strdup_printf ("Device should be offline after force_online\n");
+	gunit_fail_unless (tny_device_iface_is_online(iface) == FALSE, str);
 	g_free (str);
 }
-
 
 GUnitTestSuite*
 create_tny_device_iface_suite (void)
@@ -66,9 +70,9 @@ create_tny_device_iface_suite (void)
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_device_iface_test_something",
+               gunit_test_case_new_with_funcs("tny_device_iface_test_is_online",
                                       tny_device_iface_test_setup,
-                                      tny_device_iface_test_something,
+                                      tny_device_iface_test_is_online,
 				      tny_device_iface_test_teardown));
 
 	return suite;
