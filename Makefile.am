@@ -1,12 +1,21 @@
-if BUILD_UNITTESTS
-UNITTESTDIR = libtinymail-test 
-endif
-if BUILD_MOZEMBED
-MOZEMBEDDIR = libtinymailui-mozembed
-endif
+SUBDIRS = m4 libtinymail libtinymailui
+
 if BUILD_GNOME
-TNYVFSDIR=libtinymail-gnomevfs
+SUBDIRS += libtinymail-gnomevfs
 endif
-SUBDIRS = m4 libtinymail libtinymailui $(TNYVFSDIR) libtinymailui-gtk $(MOZEMBEDDIR) $(PLATFORMDIR) libtinymail-camel tinymail docs $(UNITTESTDIR) bindings po
+
+SUBDIRS += libtinymailui-gtk
+
+if BUILD_MOZEMBED
+SUBDIRS += libtinymailui-mozembed
+endif
+
+SUBDIRS += $(PLATFORMDIR) libtinymail-camel tinymail docs
+
+if BUILD_UNITTESTS
+SUBDIRS += libtinymail-test 
+endif
+
+SUBDIRS += bindings po
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc

@@ -21,7 +21,9 @@
  */
 
 #include <glib.h>
+#ifdef GNOME
 #include <libgnomevfs/gnome-vfs.h>
+#endif
 #include <glib-object.h>
 
 #include <tny-test-stream.h>
