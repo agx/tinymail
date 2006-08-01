@@ -48,7 +48,16 @@ static void
 tny_list_iface_test_teardown (void)
 {
 
+	/* At this moment aren't the lists reference neutral.
+	   This means that they automatically reparent the items.
+
+	   But this will change in future. And then this must be
+	   invoked or the items must be reparented upon adding them
+	   to the list. */
+
 	/* tny_list_iface_foreach (iface, foreach_test_object, NULL); */
+
+
 	g_object_unref (G_OBJECT (iface)); 
 
 	return;
