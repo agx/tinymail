@@ -1,3 +1,8 @@
+08-01-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Implemented a few new unit tests
+	* Completed a few existing unit tests
+
 07-30-2006  James Livingston <doclivingston@gmail.com>
 
 	* bindings/python/tinymail.override: Sequence protocol, initial
