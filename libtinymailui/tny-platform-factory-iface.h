@@ -24,6 +24,8 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 #include <tny-msg-view-iface.h>
+#include <tny-device-iface.h>
+#include <tny-account-store-iface.h>
 
 G_BEGIN_DECLS
 
