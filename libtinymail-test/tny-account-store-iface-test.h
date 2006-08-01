@@ -1,5 +1,5 @@
-#ifndef TNY_ACCOUNT_IFACE_TEST_H
-#define TNY_ACCOUNT_IFACE_TEST_H
+#ifndef TNY_ACCOUNT_STORE_IFACE_TEST_H
+#define TNY_ACCOUNT_STORE_IFACE_TEST_H
 
 /* tinymail - Tiny Mail gunit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -22,6 +22,6 @@
 #include "tny-test-suite.h"
 
 /* Test suite */
-GUnitTestSuite *create_tny_account_iface_suite (void);
+GUnitTestSuite *create_tny_account_store_iface_suite (void);
 
 #endif
