@@ -33,6 +33,7 @@
 #include "tny-iterator-iface-test.h"
 #include "tny-msg-folder-iface-test.h"
 #include "tny-msg-iface-test.h"
+#include "tny-platform-factory-iface-test.h"
 #include "tny-account-store-iface-test.h"
 
 GList*
@@ -49,6 +50,7 @@ gunit_get_test_suites()
 	suites = g_list_append (suites, create_tny_iterator_iface_suite ());
 	suites = g_list_append (suites, create_tny_msg_folder_iface_suite ());
 	suites = g_list_append (suites, create_tny_msg_iface_suite ());
+	suites = g_list_append (suites, create_tny_platform_factory_iface_suite ());
 	suites = g_list_append (suites, create_tny_account_store_iface_suite ());
 
 	return suites;

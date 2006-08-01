@@ -65,7 +65,7 @@ create_tny_account_store_iface_suite (void)
 	/* Add test case objects to test suite */
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_account_iface_test_something",
+               gunit_test_case_new_with_funcs("tny_account_store_iface_test_something",
                                       tny_account_store_iface_test_setup,
                                       tny_account_store_iface_test_something,
 				      tny_account_store_iface_test_teardown));
