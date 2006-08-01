@@ -43,18 +43,86 @@ tny_account_iface_test_teardown (void)
 	return;
 }
 
-static void
-tny_account_iface_test_something (void)
-{
-	/* TODO:
-	 test properties: id, name, proto, user, hostname, url, account_type
-	 test function pointer properties: pass_func, forget_pass_func */
+/* TODO: test function pointer properties: pass_func, forget_pass_func */
 
-	str = g_strdup_printf ("Reason\n");
-	gunit_fail_unless (0 == 0, str);
+static void
+tny_account_iface_test_set_account_type (void)
+{
+
+	tny_account_iface_set_account_type (iface, TNY_ACCOUNT_TYPE_STORE);
+	gunit_fail_unless (tny_account_iface_get_account_type (iface) == TNY_ACCOUNT_TYPE_STORE, 
+		"Can't set account type to store\n");
+
+	tny_account_iface_set_account_type (iface, TNY_ACCOUNT_TYPE_TRANSPORT);
+	gunit_fail_unless (tny_account_iface_get_account_type (iface) == TNY_ACCOUNT_TYPE_TRANSPORT, 
+		"Can't set account type to transport\n");
+
+}
+
+static void
+tny_account_iface_test_set_hostname (void)
+{
+	const gchar *str_in = "imap.imapserver.com", *str_out;
+
+	tny_account_iface_set_hostname (iface, str_in);
+	str_out = tny_account_iface_get_hostname (iface);
+
+	str = g_strdup_printf ("Unable to set hostname to %s, it became %s\n", str_in, str_out);
+	gunit_fail_unless (!strcmp (str_in, str_out), str);
 	g_free (str);
 }
 
+static void
+tny_account_iface_test_set_user (void)
+{
+	const gchar *str_in = "myusername", *str_out;
+
+	tny_account_iface_set_user (iface, str_in);
+	str_out = tny_account_iface_get_user (iface);
+
+	str = g_strdup_printf ("Unable to set user to %s, it became %s\n", str_in, str_out);
+	gunit_fail_unless (!strcmp (str_in, str_out), str);
+	g_free (str);
+}
+
+static void
+tny_account_iface_test_set_id (void)
+{
+	const gchar *str_in = "THE_ID", *str_out;
+
+	tny_account_iface_set_id (iface, str_in);
+	str_out = tny_account_iface_get_id (iface);
+
+	str = g_strdup_printf ("Unable to set id to %s, it became %s\n", str_in, str_out);
+	gunit_fail_unless (!strcmp (str_in, str_out), str);
+	g_free (str);
+}
+
+static void
+tny_account_iface_test_set_name (void)
+{
+	const gchar *str_in = "The name of the account", *str_out;
+
+	tny_account_iface_set_name (iface, str_in);
+	str_out = tny_account_iface_get_name (iface);
+
+	str = g_strdup_printf ("Unable to set name to %s, it became %s\n", str_in, str_out);
+	gunit_fail_unless (!strcmp (str_in, str_out), str);
+	g_free (str);
+}
+
+static void
+tny_account_iface_test_set_proto (void)
+{
+	const gchar *str_in = "imap", *str_out;
+
+	tny_account_iface_set_proto (iface, str_in);
+	str_out = tny_account_iface_get_proto (iface);
+
+	str = g_strdup_printf ("Unable to set proto to %s, it became %s\n", str_in, str_out);
+	gunit_fail_unless (!strcmp (str_in, str_out), str);
+	g_free (str);
+}
 
 GUnitTestSuite*
 create_tny_account_iface_suite (void)
@@ -65,10 +133,42 @@ create_tny_account_iface_suite (void)
 	suite = gunit_test_suite_new ("TnyAccountIface");
 
 	/* Add test case objects to test suite */
+
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_account_iface_test_something",
+               gunit_test_case_new_with_funcs("tny_account_iface_test_set_account_type",
                                       tny_account_iface_test_setup,
-                                      tny_account_iface_test_something,
+                                      tny_account_iface_test_set_account_type,
+				      tny_account_iface_test_teardown));
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_account_iface_test_set_hostname",
+                                      tny_account_iface_test_setup,
+                                      tny_account_iface_test_set_hostname,
+				      tny_account_iface_test_teardown));
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_account_iface_test_set_user",
+                                      tny_account_iface_test_setup,
+                                      tny_account_iface_test_set_user,
+				      tny_account_iface_test_teardown));
+
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_account_iface_test_set_id",
+                                      tny_account_iface_test_setup,
+                                      tny_account_iface_test_set_id,
+				      tny_account_iface_test_teardown));
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_account_iface_test_set_proto",
+                                      tny_account_iface_test_setup,
+                                      tny_account_iface_test_set_proto,
+				      tny_account_iface_test_teardown));
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_account_iface_test_set_name",
+                                      tny_account_iface_test_setup,
+                                      tny_account_iface_test_set_name,
 				      tny_account_iface_test_teardown));
 
 	return suite;
