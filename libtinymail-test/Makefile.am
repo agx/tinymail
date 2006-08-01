@@ -11,6 +11,8 @@ lib_LTLIBRARIES = libtinymail-test-suite.la
 bin_PROGRAMS = tny-simple-test-runner tny-test-anything
 
 libtinymail_test_suite_la_SOURCES = 		\
+	tny-test-object.h			\
+	tny-test-object.c			\
 	tny-msg-header-iface-test.h		\
 	tny-msg-header-iface-test.c		\
 	tny-stream-iface-test.h			\

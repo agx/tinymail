@@ -20,64 +20,12 @@
 
 #include <tny-list-iface-test.h>
 #include <tny-list.h>
+#include <tny-test-object.h>
 
-static GObjectClass *parent_class = NULL;
 
 static TnyListIface *iface = NULL, *source = NULL;
 static gchar *str;
 
-typedef struct {
-	GObject parent;
-	gchar *str;
-} TnyTestObject;
-typedef struct {
-	GObjectClass parent;
-} TnyTestObjectClass;
-
-static void
-tny_test_object_finalize (GObject *object)
-{
-	TnyTestObject *tobj = (TnyTestObject*)object; 
-	g_free (tobj->str); 
-	(*parent_class->finalize) (object);
-}
-
-static void 
-tny_test_object_class_init (TnyTestObjectClass *class)
-{
-	GObjectClass *object_class;
-
-	parent_class = g_type_class_peek_parent (class);
-	object_class = (GObjectClass*) class;
-	object_class->finalize = tny_test_object_finalize;
-
-	return;
-}
-
-GType 
-tny_test_object_get_type (void) 
-{
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0)) {
-		static const GTypeInfo info = { sizeof (TnyTestObjectClass),
-		  NULL,   /* base_init */ NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_test_object_class_init,   /* class_init */ 
-		  NULL,  /* class_finalize */
-		  NULL,   /* class_data */ sizeof (TnyTestObject),
-		  0,      /* n_preallocs */ NULL    /* instance_init */ };
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyTestObject",
-			&info, 0); 
-	}
-	return type;
-}
-
-static GObject*
-tny_test_object_new (gchar *str)
-{
-	TnyTestObject *obj = g_object_new (tny_test_object_get_type(), NULL);
-	obj->str = str;
-}
 
 static void
 tny_list_iface_test_setup (void)
