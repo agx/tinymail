@@ -54,32 +54,57 @@ tny_list_iface_test_teardown (void)
 	return;
 }
 
+static gint counter;
+
+static void
+tny_list_iface_test_foreach (gpointer gptr_item, gpointer user_data)
+{
+
+	TnyTestObject *item = gptr_item;
+
+	gchar *str, *cstr = g_strdup_printf ("%d", counter);
+	
+	str = g_strdup_printf ("Item should be \"%d\" but is %s\n", counter, item->str);
+	gunit_fail_unless (!strcmp (item->str, cstr), str);
+
+	g_free (str);
+	g_free (cstr);
+
+	counter++;
+}
+
 static void
 tny_list_iface_test_list (void)
 {
 	TnyIteratorIface *iterator;
 	TnyTestObject *item;
-
-	/* TODO:
-	 - test foreach 
-	 - test remove
-	 - test itertor first 
-	 - test iterator current
-	 - test iterator has_next
-	 - test iterator has_first
-	 - test iterator is_done
-	 - test iterator get_list */
+	gint i;
 
 	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("2")));
 	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("3")));
 	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("4")));
 	tny_list_iface_prepend (iface, tny_test_object_new (g_strdup ("1")));
 
+	counter=1;
+	tny_list_iface_foreach (iface, tny_list_iface_test_foreach, NULL);
+
 	str = g_strdup_printf ("Length should be 4 but is %d\n", tny_list_iface_length (iface));
 	gunit_fail_unless (tny_list_iface_length (iface) == 4, str);
 	g_free (str);
 
 	iterator = tny_list_iface_create_iterator (iface);
+
+	str = g_strdup_printf ("has_first should return TRUE in this case\n");
+	gunit_fail_unless (tny_iterator_iface_has_first (iterator) == TRUE, str);
+	g_free (str);
+
+	str = g_strdup_printf ("has_next should return TRUE in this case\n");
+	gunit_fail_unless (tny_iterator_iface_has_next (iterator) == TRUE, str);
+	g_free (str);
+
+	str = g_strdup_printf ("get_list returns the wrong instance\n");
+	gunit_fail_unless (tny_iterator_iface_get_list (iterator) == iface, str);
+	g_free (str);
 
 	item = (TnyTestObject*)tny_iterator_iface_nth (iterator, 2);
 
@@ -105,6 +130,43 @@ tny_list_iface_test_list (void)
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
 
+
+	item = (TnyTestObject*)tny_iterator_iface_current (iterator);
+
+	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "4"), str);
+	g_free (str);
+
+	g_object_unref (G_OBJECT (iterator));
+
+	tny_list_iface_remove (iface, (GObject*)item);
+
+	str = g_strdup_printf ("Length should be 3 but is %d\n", tny_list_iface_length (iface));
+	gunit_fail_unless (tny_list_iface_length (iface) == 3, str);
+	g_free (str);
+
+
+	iterator = tny_list_iface_create_iterator (iface);
+
+	item = (TnyTestObject*)tny_iterator_iface_first (iterator);
+
+	str = g_strdup_printf ("Item should be \"1\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "1"), str);
+	g_free (str);
+
+	for (i=0; i<3; i++)
+	{
+		str = g_strdup_printf ("is_done should return FALSE\n");
+		gunit_fail_unless (tny_iterator_iface_is_done (iterator) == FALSE, str);
+		g_free (str);
+
+		tny_iterator_iface_next (iterator);
+	}
+
+	str = g_strdup_printf ("is_done should by now return TRUE\n");
+	gunit_fail_unless (tny_iterator_iface_is_done (iterator) == TRUE, str);
+	g_free (str);
+	
 	g_object_unref (G_OBJECT (iterator));
 
 }
