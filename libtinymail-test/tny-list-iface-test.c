@@ -21,8 +21,63 @@
 #include <tny-list-iface-test.h>
 #include <tny-list.h>
 
+static GObjectClass *parent_class = NULL;
+
 static TnyListIface *iface = NULL, *source = NULL;
 static gchar *str;
+
+typedef struct {
+	GObject parent;
+	gchar *str;
+} TnyTestObject;
+typedef struct {
+	GObjectClass parent;
+} TnyTestObjectClass;
+
+static void
+tny_test_object_finalize (GObject *object)
+{
+	TnyTestObject *tobj = (TnyTestObject*)object; 
+	g_free (tobj->str); 
+	(*parent_class->finalize) (object);
+}
+
+static void 
+tny_test_object_class_init (TnyTestObjectClass *class)
+{
+	GObjectClass *object_class;
+
+	parent_class = g_type_class_peek_parent (class);
+	object_class = (GObjectClass*) class;
+	object_class->finalize = tny_test_object_finalize;
+
+	return;
+}
+
+GType 
+tny_test_object_get_type (void) 
+{
+	static GType type = 0;
+	if (G_UNLIKELY(type == 0)) {
+		static const GTypeInfo info = { sizeof (TnyTestObjectClass),
+		  NULL,   /* base_init */ NULL,   /* base_finalize */
+		  (GClassInitFunc) tny_test_object_class_init,   /* class_init */ 
+		  NULL,  /* class_finalize */
+		  NULL,   /* class_data */ sizeof (TnyTestObject),
+		  0,      /* n_preallocs */ NULL    /* instance_init */ };
+		type = g_type_register_static (G_TYPE_OBJECT,
+			"TnyTestObject",
+			&info, 0); 
+	}
+	return type;
+}
+
+static GObject*
+tny_test_object_new (gchar *str)
+{
+	TnyTestObject *obj = g_object_new (tny_test_object_get_type(), NULL);
+	obj->str = str;
+}
 
 static void
 tny_list_iface_test_setup (void)
@@ -33,10 +88,20 @@ tny_list_iface_test_setup (void)
 	return;
 }
 
+/*
+static void 
+foreach_test_object (gpointer item, gpointer userdata)
+{
+	g_object_unref (G_OBJECT (item));
+}
+*/
+
 static void 
 tny_list_iface_test_teardown (void)
 {
-	/* g_object_unref (G_OBJECT (iface)); */
+
+	/* tny_list_iface_foreach (iface, foreach_test_object, NULL); */
+	g_object_unref (G_OBJECT (iface)); 
 
 	return;
 }
@@ -45,12 +110,12 @@ static void
 tny_list_iface_test_list (void)
 {
 	TnyIteratorIface *iterator;
-	gchar *item;
-/* TODO: redo this test using a GOBject 
-	tny_list_iface_append (iface, "2");
-	tny_list_iface_append (iface, "3");
-	tny_list_iface_append (iface, "4");
-	tny_list_iface_prepend (iface, "1");
+	TnyTestObject *item;
+
+	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("2")));
+	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("3")));
+	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("4")));
+	tny_list_iface_prepend (iface, tny_test_object_new (g_strdup ("1")));
 
 	str = g_strdup_printf ("Length should be 4 but is %d\n", tny_list_iface_length (iface));
 	gunit_fail_unless (tny_list_iface_length (iface) == 4, str);
@@ -58,20 +123,19 @@ tny_list_iface_test_list (void)
 
 	iterator = tny_list_iface_create_iterator (iface);
 
-	item = tny_iterator_iface_nth (iterator, 2);
+	item = (TnyTestObject*)tny_iterator_iface_nth (iterator, 2);
 
-	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item);
-	gunit_fail_unless (!strcmp (item, "3"), str);
+	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "3"), str);
 	g_free (str);
 
-	item = tny_iterator_iface_next (iterator);
+	item = (TnyTestObject*)tny_iterator_iface_next (iterator);
 
-	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item);
-	gunit_fail_unless (!strcmp (item, "4"), str);
+	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
 
 	g_object_unref (G_OBJECT (iterator));
-*/
 
 }
 
