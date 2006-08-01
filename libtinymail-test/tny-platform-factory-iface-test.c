@@ -37,14 +37,10 @@ tny_platform_factory_iface_test_setup (void)
 static void 
 tny_platform_factory_iface_test_teardown (void)
 {
-	/* It's a singleton */
-	/* g_object_unref (G_OBJECT (iface)); */
 
+	/* It's a singleton */
 	return;
 }
-
-/* TODO: Define and implement this unit test */
-
 
 
 static void
@@ -80,7 +76,10 @@ tny_platform_factory_iface_test_new_msg_view (void)
 	gunit_fail_unless (TNY_IS_MSG_VIEW_IFACE (obj), str);
 	g_free (str);
 
-	g_object_unref (G_OBJECT (obj));
+	/* It's a floating object that gets unreferenced by 
+	  gtk_widget_destroy() and likes
+
+	g_object_unref (G_OBJECT (obj)); */
 }
 
 GUnitTestSuite*

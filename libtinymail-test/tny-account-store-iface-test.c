@@ -20,19 +20,22 @@
 
 #include <tny-account-store-iface-test.h>
 #include <tny-account-store-iface.h>
+#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
 
 /* #include <tny-account-store.h> */
 
 static TnyAccountStoreIface *iface = NULL;
+static TnyPlatformFactoryIface *platfact = NULL;
 static gchar *str;
 
 static void
 tny_account_store_iface_test_setup (void)
 {
+	/* platfact is a singleton */
+	platfact = TNY_PLATFORM_FACTORY_IFACE (tny_platform_factory_get_instance ());
 
-	/* TODO: integrate with current platform factory */
-
-	/* iface = TNY_ACCOUNT_IFACE (tny_account_store_new ()); */
+	iface = tny_platform_factory_iface_new_account_store (platfact);
 
 	return;
 }
@@ -40,13 +43,16 @@ tny_account_store_iface_test_setup (void)
 static void 
 tny_account_store_iface_test_teardown (void)
 {
-	/* g_object_unref (G_OBJECT (iface)); */
+	g_object_unref (G_OBJECT (iface));
 
 	return;
 }
 
-/* TODO: Define and implement this unit test */
-
+/* TODO: 
+	test signals: account_changed, account_inserted, account_removed, accounts_reloaded
+	test methods: get_accounts, add_store_account, add_transport_account, get_cache_dir, get_device
+	test callback: alert
+*/
 
 
 static void
