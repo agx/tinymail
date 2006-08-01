@@ -46,7 +46,9 @@ tny_account_iface_test_teardown (void)
 static void
 tny_account_iface_test_something (void)
 {
-	/* TODO: Implement some useful tests */
+	/* TODO:
+	 test properties: id, name, proto, user, hostname, url, account_type
+	 test function pointer properties: pass_func, forget_pass_func */
 
 	str = g_strdup_printf ("Reason\n");
 	gunit_fail_unless (0 == 0, str);

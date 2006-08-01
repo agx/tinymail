@@ -44,7 +44,7 @@ tny_iterator_iface_test_teardown (void)
 static void
 tny_iterator_iface_test_something (void)
 {
-	/* TODO: Implement some useful tests */
+	/* TODO: Integrate these tests with the tny-list-iface-test.c */
 	
 	str = g_strdup_printf ("Reason\n");
 	gunit_fail_unless (0 == 0, str);

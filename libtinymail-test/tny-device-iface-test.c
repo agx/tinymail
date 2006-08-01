@@ -45,7 +45,10 @@ tny_device_iface_test_teardown (void)
 static void
 tny_device_iface_test_something (void)
 {
-	/* TODO: Implement some useful tests */
+	/* TODO: 
+	test properties: is_online
+	test methods: force_online, force_offline checking property is_online and signal connection_changed
+	test signal connection_changed (hard to test) */
 	
 	str = g_strdup_printf ("Reason\n");
 	gunit_fail_unless (0 == 0, str);

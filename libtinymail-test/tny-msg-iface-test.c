@@ -52,7 +52,10 @@ tny_msg_iface_test_teardown (void)
 static void
 tny_msg_iface_test_something (void)
 {
-	/* TODO: Implement some useful tests */
+	/* TODO: 
+	test methods get_parts, del_part and add_part (important tests)
+	test properties header, folder */
+
 	
 	str = g_strdup_printf ("Reason\n");
 	gunit_fail_unless (0 == 0, str);

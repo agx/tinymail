@@ -45,7 +45,14 @@ tny_msg_folder_iface_test_teardown (void)
 static void
 tny_msg_folder_iface_test_something (void)
 {
-	/* TODO: Implement some useful tests */
+	/* TODO: 
+	test signal folder inserted and folders_reloaded (hard to test)
+	test methods get_folders, get_message, get_headers, remove_message, expunge (hard to test)
+	test properties name, id, account, folder_type
+	test properties all_count and unread_count
+	test methods set_subscribed with get_subscribed
+	test async method refresh_async (hard to test)
+	test method refresh */
 	
 	str = g_strdup_printf ("Reason\n");
 	gunit_fail_unless (0 == 0, str);

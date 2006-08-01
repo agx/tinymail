@@ -29,6 +29,8 @@
 
 static TnyMsgHeaderIface *iface = NULL;
 
+/* TODO: Check wether we are missing testing properties here */
+
 static void
 tny_msg_header_iface_test_setup (void)
 {

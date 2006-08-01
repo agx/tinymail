@@ -60,6 +60,16 @@ tny_list_iface_test_list (void)
 	TnyIteratorIface *iterator;
 	TnyTestObject *item;
 
+	/* TODO:
+	 - test foreach 
+	 - test remove
+	 - test itertor first 
+	 - test iterator current
+	 - test iterator has_next
+	 - test iterator has_first
+	 - test iterator is_done
+	 - test iterator get_list */
+
 	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("2")));
 	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("3")));
 	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("4")));
@@ -72,6 +82,18 @@ tny_list_iface_test_list (void)
 	iterator = tny_list_iface_create_iterator (iface);
 
 	item = (TnyTestObject*)tny_iterator_iface_nth (iterator, 2);
+
+	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "3"), str);
+	g_free (str);
+
+	item = (TnyTestObject*)tny_iterator_iface_next (iterator);
+
+	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "4"), str);
+	g_free (str);
+
+	item = (TnyTestObject*)tny_iterator_iface_prev (iterator);
 
 	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "3"), str);
