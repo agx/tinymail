@@ -117,7 +117,7 @@ reload_msg (TnyMsgViewIface *self)
 
 	while (next)
 	{
-		TnyMsgMimePartIface *part = tny_iterator_iface_current (iterator);
+		TnyMsgMimePartIface *part = (TnyMsgMimePartIface*)tny_iterator_iface_current (iterator);
 
 		if (!have_html && G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/plain")))
 		{
