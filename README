@@ -118,6 +118,7 @@ Packages
   evolution-data-server-devel
   NetworkManager-devel
   NetworkManager-glib
+  NetworkManager-glib-devel
   gnome-keyring-devel
   automake-1.7
 
