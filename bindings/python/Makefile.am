@@ -53,14 +53,14 @@ CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c 	\
 	tinymail-platform-glue.c platform_include.h tinymail.defs	\
 	tinymailui.defs tinymailui-gtk.defs tinymail-platform.defs
 
-EXTRA_DIST = 			\
-	tinymail.defs 		\
-	tinymail.override 	\
-	tinymailui.defs		\
-	tinymailui.override	\
-	tinymailui-gtk.override	\
-	tinymailui-gtk.defs 	\
-	tinymail-platform.defs	\
+EXTRA_DIST = 				\
+	tinymail.defs.extra 		\
+	tinymail.override 		\
+	tinymailui.defs.extra		\
+	tinymailui.override		\
+	tinymailui-gtk.override		\
+	tinymailui-gtk.defs.extra 	\
+	tinymail-platform.defs.extra	\
 	tinymail-platform.override
 
 # To update:
