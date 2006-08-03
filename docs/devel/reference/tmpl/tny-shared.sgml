@@ -396,7 +396,7 @@ It can typically be used to tell a key service, like GNOME key ring, to forget t
 A callback function for tny_msg_folder_iface_refresh_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
 </para>
 
-@self: The #TnyMsgFolderIface
+@self: The #TnyFolderIface
 @cancelled: Whether or not a cancellation occured.
 @user_data: user data
 
@@ -406,7 +406,7 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when t
 A callback function for tny_msg_folder_iface_refresh_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
 </para>
 
-@self: The #TnyMsgFolderIface
+@self: The #TnyFolderIface
 @what: What happened
 @status: A status field
 @user_data: user data

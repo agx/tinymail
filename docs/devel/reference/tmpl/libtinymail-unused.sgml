@@ -42,46 +42,10 @@ tny-folder-iface-test
 
 
 
-<!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Title ##### -->
-TnyMsgFolderProxy
-
-
-<!-- ##### SECTION ./tmpl/tny-msg-folder.sgml:Long_Description ##### -->
-<para>
-A #TnyMsgFolderIface proxy for the #CamelFolder type in Camel.
-
-It's recommended to launch the uncache method on instances of
-this type once the instance is no longer actively used. Doing so
-will dramatically reduce memory usage. Doing it too early will
-cause a reload of folder data (it will slow things down).
-</para><para>
-For example when a new folder becomes the visible or active folder,
-you can launch the uncache method on the old folder instance. You
-shouldn't destroy the instance as the #TnyStoreAccount implementation
-for camel is the type that keeps track of instances of this type.
-But you can uncache them.
-</para><para>
-This type is coupled with the #TnyStoreAccount implementation for
-Camel.
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-msg-folder.sgml:See_Also ##### -->
-<para>
-#TnyMsgFolderIface, #CamelFolder, #TnyStoreAccount, #TnyStoreAccountIface
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-msg-folder.sgml:Short_Description ##### -->
-A Camel #TnyMsgFolderIface implementation
-
-
 <!-- ##### SECTION ./tmpl/tny-msg-folder.sgml:Stability_Level ##### -->
 
 
 
-<!-- ##### SECTION ./tmpl/tny-msg-folder.sgml:Title ##### -->
-TnyMsgFolder
 
 
 <!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:Long_Description ##### -->
@@ -227,7 +191,7 @@ TnySummaryWindow
 A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
 </para>
 
-@self: The #TnyMsgFolderIface
+@self: The #TnyFolderIface
 @cancelled: Whether or not a cancellation occured.
 @user_data: user data
 
@@ -236,24 +200,24 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
 </para>
 
-@self: The #TnyMsgFolderIface
+@self: The #TnyFolderIface
 @what: What happened
 @status: A status field
 @user_data: user data
 
-<!-- ##### STRUCT TnyMsgFolder ##### -->
+<!-- ##### STRUCT TnyFolder ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgFolderIface ##### -->
+<!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### SIGNAL TnyMsgFolderIface::folder-inserted ##### -->
+<!-- ##### SIGNAL TnyFolderIface::folder-inserted ##### -->
 <para>
 
 </para>
@@ -261,14 +225,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @tnymsgfolderiface: the object which received the signal.
 @arg1: 
 
-<!-- ##### SIGNAL TnyMsgFolderIface::folders-reloaded ##### -->
+<!-- ##### SIGNAL TnyFolderIface::folders-reloaded ##### -->
 <para>
 
 </para>
 
 @tnymsgfolderiface: the object which received the signal.
 
-<!-- ##### STRUCT TnyMsgFolderIfaceClass ##### -->
+<!-- ##### STRUCT TnyFolderIfaceClass ##### -->
 <para>
 
 </para>
@@ -297,7 +261,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @refresh_async_func: 
 @refresh_func: 
 
-<!-- ##### STRUCT TnyMsgFolderProxy ##### -->
+<!-- ##### STRUCT TnyFolderProxy ##### -->
 <para>
 
 </para>

@@ -12,7 +12,7 @@ therefore be used as a mime part.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgHeaderIface, #TnyMsgFolderIface, #TnyMsgMimePartIface
+#TnyMsgHeaderIface, #TnyFolderIface, #TnyMsgMimePartIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

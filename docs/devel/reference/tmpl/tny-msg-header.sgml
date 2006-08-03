@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgHeader
+TnysgHeader
 
 <!-- ##### SECTION Short_Description ##### -->
 A Camel implementation of #TnyMsgHeaderIface
@@ -26,7 +26,7 @@ for no real reason.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgHeaderIface, #TnyMsgFolder, #TnyMsgFolderIface, #TnyMsgHeaderListModel
+#TnyMsgHeaderIface, #TnyFolder, #TnyFolderIface, #TnyMsgHeaderListModel
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

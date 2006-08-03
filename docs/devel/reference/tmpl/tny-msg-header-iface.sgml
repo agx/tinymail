@@ -13,7 +13,7 @@ by a summary view to give the user an overview of the available messages in a fo
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgIface, #TnyMsgFolderIface
+#TnyMsgIface, #TnyFolderIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
