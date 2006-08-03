@@ -176,11 +176,11 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message, gboole
 	return;
 }
 
-TnyMsgFolderIface* 
+TnyFolderIface* 
 tny_msg_get_folder (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	TnyMsgFolderIface *retval;
+	TnyFolderIface *retval;
 
 	g_mutex_lock (priv->folder_lock);
 	retval = priv->folder;
@@ -191,12 +191,12 @@ tny_msg_get_folder (TnyMsgIface *self)
 
 
 void
-_tny_msg_set_folder (TnyMsgIface *self, TnyMsgFolderIface* folder)
+_tny_msg_set_folder (TnyMsgIface *self, TnyFolderIface* folder)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
 	g_mutex_lock (priv->folder_lock);
-	priv->folder = (TnyMsgFolderIface*)folder;
+	priv->folder = (TnyFolderIface*)folder;
 	g_mutex_unlock (priv->folder_lock);
 
 	return;

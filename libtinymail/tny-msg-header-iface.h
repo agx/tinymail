@@ -87,9 +87,9 @@ struct _TnyMsgHeaderIfaceClass
 	void           (*set_to_func)             (TnyMsgHeaderIface *self, const gchar *to);
 	void           (*set_replyto_func)        (TnyMsgHeaderIface *self, const gchar *to);
 
-        TnyMsgFolderIface*
+        TnyFolderIface*
                        (*get_folder_func)         (TnyMsgHeaderIface *self);
-        void           (*set_folder_func)         (TnyMsgHeaderIface *self, TnyMsgFolderIface *folder);
+        void           (*set_folder_func)         (TnyMsgHeaderIface *self, TnyFolderIface *folder);
 
 	TnyMsgHeaderFlags 
 		       (*get_flags_func)          (TnyMsgHeaderIface *self);
@@ -120,12 +120,12 @@ void           tny_msg_header_iface_set_subject        (TnyMsgHeaderIface *self,
 void           tny_msg_header_iface_set_to             (TnyMsgHeaderIface *self, const gchar *to);
 void           tny_msg_header_iface_set_replyto        (TnyMsgHeaderIface *self, const gchar *to);
 
-TnyMsgFolderIface*
+TnyFolderIface*
                tny_msg_header_iface_get_folder         (TnyMsgHeaderIface *self);
 
 TnyMsgHeaderFlags  
 	       tny_msg_header_iface_get_flags          (TnyMsgHeaderIface *self);
-void           tny_msg_header_iface_set_folder         (TnyMsgHeaderIface *self, TnyMsgFolderIface *folder);
+void           tny_msg_header_iface_set_folder         (TnyMsgHeaderIface *self, TnyFolderIface *folder);
 void           tny_msg_header_iface_set_flags          (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
 void           tny_msg_header_iface_unset_flags        (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask);
 

@@ -30,7 +30,7 @@
  *
  * Return value: The parent folder of this message
  **/
-TnyMsgFolderIface* 
+TnyFolderIface* 
 tny_msg_iface_get_folder (TnyMsgIface *self)
 {
 #ifdef DEBUG

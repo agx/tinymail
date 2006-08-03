@@ -22,8 +22,8 @@
 #include <glib/gi18n-lib.h>
 
 #include <string.h>
-#include <tny-msg-folder-iface.h>
-#include <tny-msg-folder.h>
+#include <tny-folder-iface.h>
+#include <tny-folder.h>
 #include <tny-msg-iface.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg.h>
@@ -43,8 +43,8 @@
 
 #include <tny-session-camel.h>
 #include "tny-account-priv.h"
-#include "tny-msg-folder-priv.h"
-#include "tny-msg-folder-list-priv.h"
+#include "tny-folder-priv.h"
+#include "tny-folder-list-priv.h"
 #include <tny-camel-shared.h>
 
 #include <camel/camel.h>
@@ -54,9 +54,9 @@ static GObjectClass *parent_class = NULL;
 
 
 static void 
-folder_changed (TnyMsgFolderIface *self, CamelFolderChangeInfo *info, gpointer user_data)
+folder_changed (TnyFolderIface *self, CamelFolderChangeInfo *info, gpointer user_data)
 {
-	/* TnyMsgFolderPriv *priv = user_data; */
+	/* TnyFolderPriv *priv = user_data; */
 
 	/* When we know a new message got added to this folder */
 
@@ -70,7 +70,7 @@ folder_changed (TnyMsgFolderIface *self, CamelFolderChangeInfo *info, gpointer u
 }
 
 static void
-unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
+unload_folder_no_lock (TnyFolderPriv *priv, gboolean destroy)
 {
 	if (G_LIKELY (priv->folder))
 	{
@@ -85,14 +85,14 @@ unload_folder_no_lock (TnyMsgFolderPriv *priv, gboolean destroy)
 	}
 
 	priv->cached_length = 0;
-	priv->cached_folder_type = TNY_MSG_FOLDER_TYPE_UNKNOWN;
+	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 	priv->loaded = FALSE;
 
 	return;
 }
 
 static void 
-unload_folder (TnyMsgFolderPriv *priv, gboolean destroy)
+unload_folder (TnyFolderPriv *priv, gboolean destroy)
 {
 	g_mutex_lock (priv->folder_lock);
 	unload_folder_no_lock (priv, destroy);
@@ -102,7 +102,7 @@ unload_folder (TnyMsgFolderPriv *priv, gboolean destroy)
 
 
 static void
-load_folder_no_lock (TnyMsgFolderPriv *priv)
+load_folder_no_lock (TnyFolderPriv *priv)
 {
 	if (!priv->folder && !priv->loaded)
 	{
@@ -134,7 +134,7 @@ load_folder_no_lock (TnyMsgFolderPriv *priv)
 
 
 static void
-load_folder (TnyMsgFolderPriv *priv)
+load_folder (TnyFolderPriv *priv)
 {
 	g_mutex_lock (priv->folder_lock);
 	load_folder_no_lock (priv);
@@ -145,9 +145,9 @@ load_folder (TnyMsgFolderPriv *priv)
 
 
 static void 
-tny_msg_folder_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
+tny_folder_remove_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	const gchar *id;
 
 	g_mutex_lock (priv->folder_lock);
@@ -164,9 +164,9 @@ tny_msg_folder_remove_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *heade
 }
 
 static void 
-tny_msg_folder_expunge (TnyMsgFolderIface *self)
+tny_folder_expunge (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	g_mutex_lock (priv->folder_lock);
@@ -183,9 +183,9 @@ tny_msg_folder_expunge (TnyMsgFolderIface *self)
 
 
 CamelFolder*
-_tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
+_tny_folder_get_camel_folder (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	CamelFolder *retval;
 
 	/* g_mutex_lock (priv->folder_lock); */
@@ -200,14 +200,14 @@ _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self)
 }
 
 static TnyListIface*
-tny_msg_folder_get_folders (TnyMsgFolderIface *self)
+tny_folder_get_folders (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyListIface *retval;
 
 	g_mutex_lock (priv->folder_lock);
 	if (!priv->folders)
-		priv->folders = _tny_msg_folder_list_new (self);
+		priv->folders = _tny_folder_list_new (self);
 	retval = (TnyListIface*)priv->folders;
 	g_mutex_unlock (priv->folder_lock);
 
@@ -216,9 +216,9 @@ tny_msg_folder_get_folders (TnyMsgFolderIface *self)
 
 
 static gboolean
-tny_msg_folder_get_subscribed (TnyMsgFolderIface *self)
+tny_folder_get_subscribed (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	gboolean retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -229,9 +229,9 @@ tny_msg_folder_get_subscribed (TnyMsgFolderIface *self)
 }
 
 void /* Only internally used */
-_tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribed)
+_tny_folder_set_subscribed_priv (TnyFolderIface *self, gboolean subscribed)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	g_mutex_lock (priv->folder_lock);
 	priv->subscribed = subscribed;
@@ -241,11 +241,11 @@ _tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribe
 }
 
 static void
-tny_msg_folder_set_subscribed (TnyMsgFolderIface *self, gboolean subscribed)
+tny_folder_set_subscribed (TnyFolderIface *self, gboolean subscribed)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
-	/* These will synchronize me using _tny_msg_folder_set_subscribed_priv */
+	/* These will synchronize me using _tny_folder_set_subscribed_priv */
 
 	if (G_LIKELY (subscribed))
 		tny_store_account_iface_subscribe 
@@ -258,9 +258,9 @@ tny_msg_folder_set_subscribed (TnyMsgFolderIface *self, gboolean subscribed)
 }
 
 static guint
-tny_msg_folder_get_unread_count (TnyMsgFolderIface *self)
+tny_folder_get_unread_count (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	guint retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -271,26 +271,26 @@ tny_msg_folder_get_unread_count (TnyMsgFolderIface *self)
 }
 
 void
-_tny_msg_folder_set_unread_count (TnyMsgFolder *self, guint len)
+_tny_folder_set_unread_count (TnyFolder *self, guint len)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	priv->unread_length = len;
 	return;
 }
 
 void
-_tny_msg_folder_set_all_count (TnyMsgFolder *self, guint len)
+_tny_folder_set_all_count (TnyFolder *self, guint len)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	priv->cached_length = len;
 	return;
 }
 
 
 static guint
-tny_msg_folder_get_all_count (TnyMsgFolderIface *self)
+tny_folder_get_all_count (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	guint retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -302,17 +302,17 @@ tny_msg_folder_get_all_count (TnyMsgFolderIface *self)
 
 
 static TnyAccountIface*  
-tny_msg_folder_get_account (TnyMsgFolderIface *self)
+tny_folder_get_account (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	return priv->account;
 }
 
 static void
-tny_msg_folder_set_account (TnyMsgFolderIface *self, TnyAccountIface *account)
+tny_folder_set_account (TnyFolderIface *self, TnyAccountIface *account)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	/* No need to reference, would be a cross reference */
 	priv->account = TNY_ACCOUNT_IFACE (account);
@@ -322,8 +322,8 @@ tny_msg_folder_set_account (TnyMsgFolderIface *self, TnyAccountIface *account)
 
 typedef struct 
 { 	/* This is a speedup trick */
-	TnyMsgFolderIface *self;
-	TnyMsgFolderPriv *priv;
+	TnyFolderIface *self;
+	TnyFolderPriv *priv;
 	TnyListIface *headers;
 } FldAndPriv;
 
@@ -335,10 +335,10 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	const char *uid = (const char*)data;
 
 	/* Unpack speedup trick */
-	TnyMsgFolderIface *self = ptr->self;
-	TnyMsgFolderPriv *priv = ptr->priv;
+	TnyFolderIface *self = ptr->self;
+	TnyFolderPriv *priv = ptr->priv;
 	TnyListIface *headers = ptr->headers;
-	CamelFolder *cfol = _tny_msg_folder_get_camel_folder (self);
+	CamelFolder *cfol = _tny_folder_get_camel_folder (self);
 	CamelMessageInfo *mi = camel_folder_get_message_info (cfol, uid);
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
@@ -361,7 +361,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 typedef struct 
 {
-	TnyMsgFolderIface *self;
+	TnyFolderIface *self;
 	TnyRefreshFolderCallback callback;
 	TnyRefreshFolderStatusCallback status_callback;
 	gpointer user_data;
@@ -380,10 +380,10 @@ destroy_header (gpointer data, gpointer user_data)
 }
 
 static void
-tny_msg_folder_refresh_async_destroyer (gpointer thr_user_data)
+tny_folder_refresh_async_destroyer (gpointer thr_user_data)
 {
 
-	TnyMsgFolderIface *self = ((RefreshFolderInfo*)thr_user_data)->self;
+	TnyFolderIface *self = ((RefreshFolderInfo*)thr_user_data)->self;
 
 	/* As promised */
 	g_object_unref (G_OBJECT (self));
@@ -394,10 +394,10 @@ tny_msg_folder_refresh_async_destroyer (gpointer thr_user_data)
 }
 
 static gboolean
-tny_msg_folder_refresh_async_callback (gpointer thr_user_data)
+tny_folder_refresh_async_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (info->self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (info->self));
 
 	if (info->callback)
 		info->callback (info->self, info->cancelled, info->user_data);
@@ -448,7 +448,7 @@ progress_func (gpointer data)
 
 
 static void
-tny_msg_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
+tny_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
 	RefreshFolderInfo *oinfo = thr_user_data;
 	ProgressInfo *info = g_new0 (ProgressInfo, 1);
@@ -475,12 +475,12 @@ tny_msg_folder_refresh_async_status (struct _CamelOperation *op, const char *wha
 
 
 static gpointer 
-tny_msg_folder_refresh_async_thread (gpointer thr_user_data)
+tny_folder_refresh_async_thread (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
-	TnyMsgFolderIface *self = info->self;
+	TnyFolderIface *self = info->self;
 	gpointer user_data = info->user_data;
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
 	gchar *str;
 	CamelException *ex = camel_exception_new ();
@@ -494,7 +494,7 @@ tny_msg_folder_refresh_async_thread (gpointer thr_user_data)
 	info->cancelled = FALSE;
 	str = g_strdup_printf (_("Reading folder `%s'"), priv->folder->full_name);
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
-		tny_msg_folder_refresh_async_status, info, str);
+		tny_folder_refresh_async_status, info, str);
 	g_free (str);
 	camel_folder_refresh_info (priv->folder, ex);
 	if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
@@ -512,8 +512,8 @@ tny_msg_folder_refresh_async_thread (gpointer thr_user_data)
 		g_object_ref (G_OBJECT (self));
 
 		g_idle_add_full (G_PRIORITY_HIGH, 
-			tny_msg_folder_refresh_async_callback, 
-			info, tny_msg_folder_refresh_async_destroyer);
+			tny_folder_refresh_async_callback, 
+			info, tny_folder_refresh_async_destroyer);
 
 	}
 
@@ -523,27 +523,27 @@ tny_msg_folder_refresh_async_thread (gpointer thr_user_data)
 }
 
 static void
-tny_msg_folder_refresh_async (TnyMsgFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_folder_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info = g_new0 (RefreshFolderInfo, 1);
 	GThread *thread;
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	info->self = self;
 	info->callback = callback;
 	info->status_callback = status_callback;
 	info->user_data = user_data;
 
-	thread = g_thread_create (tny_msg_folder_refresh_async_thread,
+	thread = g_thread_create (tny_folder_refresh_async_thread,
 			info, FALSE, NULL);
 
 	return;
 }
 
 static void 
-tny_msg_folder_refresh (TnyMsgFolderIface *self)
+tny_folder_refresh (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
 	gchar *str;
 	CamelException *ex = camel_exception_new ();
@@ -568,9 +568,9 @@ tny_msg_folder_refresh (TnyMsgFolderIface *self)
 }
 
 static void
-tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboolean refresh)
+tny_folder_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	GPtrArray *uids = NULL;
 	CamelException ex;
 	FldAndPriv *ptr = NULL;
@@ -610,9 +610,9 @@ tny_msg_folder_get_headers (TnyMsgFolderIface *self, TnyListIface *headers, gboo
 
 
 static TnyMsgIface*
-tny_msg_folder_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
+tny_folder_get_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyMsgIface *message = NULL;
 	const gchar *id;
 
@@ -659,9 +659,9 @@ tny_msg_folder_get_message (TnyMsgFolderIface *self, TnyMsgHeaderIface *header)
 
 
 static const gchar*
-tny_msg_folder_get_name (TnyMsgFolderIface *self)
+tny_folder_get_name (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	const gchar *name = NULL;
 	
 	if (G_UNLIKELY (!priv->cached_name))
@@ -675,18 +675,18 @@ tny_msg_folder_get_name (TnyMsgFolderIface *self)
 }
 
 
-static TnyMsgFolderType
-tny_msg_folder_get_folder_type (TnyMsgFolderIface *self)
+static TnyFolderType
+tny_folder_get_folder_type (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	return priv->cached_folder_type;
 }
 
 void
-_tny_msg_folder_set_folder_type (TnyMsgFolder *self, TnyMsgFolderType type)
+_tny_folder_set_folder_type (TnyFolder *self, TnyFolderType type)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	priv->cached_folder_type = type;
 
@@ -696,17 +696,17 @@ _tny_msg_folder_set_folder_type (TnyMsgFolder *self, TnyMsgFolderType type)
 
 
 static const gchar*
-tny_msg_folder_get_id (TnyMsgFolderIface *self)
+tny_folder_get_id (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	return priv->folder_name;
 }
 
 static void
-tny_msg_folder_set_id (TnyMsgFolderIface *self, const gchar *id)
+tny_folder_set_id (TnyFolderIface *self, const gchar *id)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	g_mutex_lock (priv->folder_lock);
 
@@ -724,9 +724,9 @@ tny_msg_folder_set_id (TnyMsgFolderIface *self, const gchar *id)
 
 
 void
-_tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name)
+_tny_folder_set_name_priv (TnyFolderIface *self, const gchar *name)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	if (G_UNLIKELY (priv->cached_name))
 		g_free (priv->cached_name);
@@ -737,9 +737,9 @@ _tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name)
 }
 
 static void
-tny_msg_folder_set_name (TnyMsgFolderIface *self, const gchar *name)
+tny_folder_set_name (TnyFolderIface *self, const gchar *name)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	load_folder (priv);
 
@@ -754,33 +754,33 @@ tny_msg_folder_set_name (TnyMsgFolderIface *self, const gchar *name)
 }
 
 /**
- * tny_msg_folder_set_folder:
- * @self: A #TnyMsgFolder object
+ * tny_folder_set_folder:
+ * @self: A #TnyFolder object
  * @camel_folder: The #CamelFolder instance to play proxy for
  *
  **/
 void
-tny_msg_folder_set_folder (TnyMsgFolder *self, CamelFolder *camel_folder)
+tny_folder_set_folder (TnyFolder *self, CamelFolder *camel_folder)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	
-	tny_msg_folder_set_id (TNY_MSG_FOLDER_IFACE (self), 
+	tny_folder_set_id (TNY_FOLDER_IFACE (self), 
 		camel_folder_get_full_name (camel_folder));
 
 	return;
 }
 
 /**
- * tny_msg_folder_get_folder:
- * @self: A #TnyMsgFolder object
+ * tny_folder_get_folder:
+ * @self: A #TnyFolder object
  *
  * Return value: The CamelFolder instance to play proxy for
  **/
 CamelFolder*
-tny_msg_folder_get_folder (TnyMsgFolder *self)
+tny_folder_get_folder (TnyFolder *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (TNY_MSG_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	CamelFolder *retval = NULL;
 
 	g_mutex_lock (priv->folder_lock);
@@ -791,38 +791,38 @@ tny_msg_folder_get_folder (TnyMsgFolder *self)
 }
 
 /**
- * tny_msg_folder_new_with_folder:
+ * tny_folder_new_with_folder:
  * @camel_folder: CamelFolder instance to play proxy for 
  *
- * The #TnyMsgFolder implementation is actually a proxy for #CamelFolder
+ * The #TnyFolder implementation is actually a proxy for #CamelFolder
  *
- * Return value: A new #TnyMsgFolderIface instance implemented for Camel
+ * Return value: A new #TnyFolderIface instance implemented for Camel
  **/
-TnyMsgFolder*
-tny_msg_folder_new_with_folder (CamelFolder *camel_folder)
+TnyFolder*
+tny_folder_new_with_folder (CamelFolder *camel_folder)
 {
-	TnyMsgFolder *self = g_object_new (TNY_TYPE_MSG_FOLDER, NULL);
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+	TnyFolder *self = g_object_new (TNY_TYPE_FOLDER, NULL);
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
-	tny_msg_folder_set_folder (self, camel_folder);
+	tny_folder_set_folder (self, camel_folder);
 
 	return self;
 }
 
 
 /**
- * tny_msg_folder_new:
+ * tny_folder_new:
  * 
- * The #TnyMsgFolder implementation is actually a proxy for #CamelFolder.
+ * The #TnyFolder implementation is actually a proxy for #CamelFolder.
  * You need to set the #CamelFolder after using this constructor using
- * tny_msg_folder_set_folder
+ * tny_folder_set_folder
  *
- * Return value: A new #TnyMsgFolderIface instance implemented for Camel
+ * Return value: A new #TnyFolderIface instance implemented for Camel
  **/
-TnyMsgFolder*
-tny_msg_folder_new (void)
+TnyFolder*
+tny_folder_new (void)
 {
-	TnyMsgFolder *self = g_object_new (TNY_TYPE_MSG_FOLDER, NULL);
+	TnyFolder *self = g_object_new (TNY_TYPE_FOLDER, NULL);
 
 	return self;
 }
@@ -836,10 +836,10 @@ destroy_folder (gpointer data, gpointer user_data)
 }
 
 static void
-tny_msg_folder_finalize (GObject *object)
+tny_folder_finalize (GObject *object)
 {
-	TnyMsgFolder *self = (TnyMsgFolder*) object;
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+	TnyFolder *self = (TnyFolder*) object;
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folders_lock);
 	g_mutex_lock (priv->folder_lock);
@@ -878,9 +878,9 @@ tny_msg_folder_finalize (GObject *object)
 }
 
 static void
-tny_msg_folder_uncache (TnyMsgFolderIface *self)
+tny_folder_uncache (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->folder != NULL))
 		unload_folder (priv, FALSE);
@@ -889,9 +889,9 @@ tny_msg_folder_uncache (TnyMsgFolderIface *self)
 }
 
 static gboolean
-tny_msg_folder_has_cache (TnyMsgFolderIface *self)
+tny_folder_has_cache (TnyFolderIface *self)
 {
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 	gboolean retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -903,43 +903,43 @@ tny_msg_folder_has_cache (TnyMsgFolderIface *self)
 
 
 static void
-tny_msg_folder_iface_init (gpointer g_iface, gpointer iface_data)
+tny_folder_iface_init (gpointer g_iface, gpointer iface_data)
 {
-	TnyMsgFolderIfaceClass *klass = (TnyMsgFolderIfaceClass *)g_iface;
+	TnyFolderIfaceClass *klass = (TnyFolderIfaceClass *)g_iface;
 
-	klass->get_headers_func = tny_msg_folder_get_headers;
-	klass->get_message_func = tny_msg_folder_get_message;
-	klass->set_id_func = tny_msg_folder_set_id;
-	klass->get_id_func = tny_msg_folder_get_id;
-	klass->set_name_func = tny_msg_folder_set_name;
-	klass->get_name_func = tny_msg_folder_get_name;
-	klass->get_folder_type_func = tny_msg_folder_get_folder_type;
-	klass->has_cache_func = tny_msg_folder_has_cache;
-	klass->uncache_func = tny_msg_folder_uncache;
-	klass->get_folders_func = tny_msg_folder_get_folders;
-	klass->get_unread_count_func = tny_msg_folder_get_unread_count;
-	klass->get_all_count_func = tny_msg_folder_get_all_count;
-	klass->get_account_func = tny_msg_folder_get_account;
-	klass->set_account_func = tny_msg_folder_set_account;
-	klass->get_subscribed_func = tny_msg_folder_get_subscribed;
-	klass->set_subscribed_func = tny_msg_folder_set_subscribed;
-	klass->refresh_async_func = tny_msg_folder_refresh_async;
-	klass->refresh_func = tny_msg_folder_refresh;
-	klass->remove_message_func = tny_msg_folder_remove_message;
-	klass->expunge_func = tny_msg_folder_expunge;
+	klass->get_headers_func = tny_folder_get_headers;
+	klass->get_message_func = tny_folder_get_message;
+	klass->set_id_func = tny_folder_set_id;
+	klass->get_id_func = tny_folder_get_id;
+	klass->set_name_func = tny_folder_set_name;
+	klass->get_name_func = tny_folder_get_name;
+	klass->get_folder_type_func = tny_folder_get_folder_type;
+	klass->has_cache_func = tny_folder_has_cache;
+	klass->uncache_func = tny_folder_uncache;
+	klass->get_folders_func = tny_folder_get_folders;
+	klass->get_unread_count_func = tny_folder_get_unread_count;
+	klass->get_all_count_func = tny_folder_get_all_count;
+	klass->get_account_func = tny_folder_get_account;
+	klass->set_account_func = tny_folder_set_account;
+	klass->get_subscribed_func = tny_folder_get_subscribed;
+	klass->set_subscribed_func = tny_folder_set_subscribed;
+	klass->refresh_async_func = tny_folder_refresh_async;
+	klass->refresh_func = tny_folder_refresh;
+	klass->remove_message_func = tny_folder_remove_message;
+	klass->expunge_func = tny_folder_expunge;
 
 	return;
 }
 
 static void 
-tny_msg_folder_class_init (TnyMsgFolderClass *class)
+tny_folder_class_init (TnyFolderClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-	object_class->finalize = tny_msg_folder_finalize;
-	g_type_class_add_private (object_class, sizeof (TnyMsgFolderPriv));
+	object_class->finalize = tny_folder_finalize;
+	g_type_class_add_private (object_class, sizeof (TnyFolderPriv));
 
 	return;
 }
@@ -947,10 +947,10 @@ tny_msg_folder_class_init (TnyMsgFolderClass *class)
 
 
 static void
-tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyMsgFolder *self = (TnyMsgFolder *)instance;
-	TnyMsgFolderPriv *priv = TNY_MSG_FOLDER_GET_PRIVATE (self);
+	TnyFolder *self = (TnyFolder *)instance;
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
 	priv->loaded = FALSE;
 	priv->folder_changed_id = 0;
@@ -959,13 +959,13 @@ tny_msg_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folder_lock = g_mutex_new ();
 	priv->folders_lock = g_mutex_new ();
 	priv->cached_name = NULL;
-	priv->cached_folder_type = TNY_MSG_FOLDER_TYPE_UNKNOWN;
+	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 	
 	return;
 }
 
 GType 
-tny_msg_folder_get_type (void)
+tny_folder_get_type (void)
 {
 	static GType type = 0;
 
@@ -982,30 +982,30 @@ tny_msg_folder_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgFolderClass),
+		  sizeof (TnyFolderClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_msg_folder_class_init,   /* class_init */
+		  (GClassInitFunc) tny_folder_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyMsgFolder),
+		  sizeof (TnyFolder),
 		  0,      /* n_preallocs */
-		  tny_msg_folder_instance_init    /* instance_init */
+		  tny_folder_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_msg_folder_iface_info = 
+		static const GInterfaceInfo tny_folder_iface_info = 
 		{
-		  (GInterfaceInitFunc) tny_msg_folder_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_folder_iface_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyMsgFolder",
+			"TnyFolder",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_MSG_FOLDER_IFACE, 
-			&tny_msg_folder_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_IFACE, 
+			&tny_folder_iface_info);
 	}
 
 	return type;

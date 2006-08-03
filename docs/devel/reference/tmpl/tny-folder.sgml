@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgFolderIface
+TnyFolderIface
 
 <!-- ##### SECTION Short_Description ##### -->
 A type that defines a folder
@@ -24,20 +24,20 @@ instances. Depending on the implementation, this will reduce memory usage.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### VARIABLE tny_msg_folder_iface_signals ##### -->
+<!-- ##### VARIABLE tny_folder_iface_signals ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### MACRO TNY_TYPE_MSG_FOLDER_TYPE ##### -->
+<!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
 <para>
 
 </para>
 
 
 
-<!-- ##### FUNCTION tny_msg_folder_type_get_type ##### -->
+<!-- ##### FUNCTION tny_folder_type_get_type ##### -->
 <para>
 
 </para>
@@ -45,7 +45,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_remove_message ##### -->
+<!-- ##### FUNCTION tny_folder_iface_remove_message ##### -->
 <para>
 
 </para>
@@ -54,7 +54,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @header: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_expunge ##### -->
+<!-- ##### FUNCTION tny_folder_iface_expunge ##### -->
 <para>
 
 </para>
@@ -62,7 +62,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @self: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_folders ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_folders ##### -->
 <para>
 
 </para>
@@ -71,7 +71,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_message ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_message ##### -->
 <para>
 
 </para>
@@ -81,7 +81,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_headers ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_headers ##### -->
 <para>
 
 </para>
@@ -91,7 +91,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @refresh: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_account ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_account ##### -->
 <para>
 
 </para>
@@ -100,7 +100,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_id ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_id ##### -->
 <para>
 
 </para>
@@ -109,7 +109,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_name ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_name ##### -->
 <para>
 
 </para>
@@ -118,7 +118,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_set_account ##### -->
+<!-- ##### FUNCTION tny_folder_iface_set_account ##### -->
 <para>
 
 </para>
@@ -127,7 +127,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @account: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_set_id ##### -->
+<!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
 <para>
 
 </para>
@@ -136,7 +136,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @id: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_set_name ##### -->
+<!-- ##### FUNCTION tny_folder_iface_set_name ##### -->
 <para>
 
 </para>
@@ -145,7 +145,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @name: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_folder_type ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_folder_type ##### -->
 <para>
 
 </para>
@@ -154,7 +154,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_all_count ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_all_count ##### -->
 <para>
 
 </para>
@@ -163,7 +163,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_unread_count ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_unread_count ##### -->
 <para>
 
 </para>
@@ -172,7 +172,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_uncache ##### -->
+<!-- ##### FUNCTION tny_folder_iface_uncache ##### -->
 <para>
 
 </para>
@@ -180,7 +180,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @self: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_set_subscribed ##### -->
+<!-- ##### FUNCTION tny_folder_iface_set_subscribed ##### -->
 <para>
 
 </para>
@@ -189,7 +189,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @subscribed: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_get_subscribed ##### -->
+<!-- ##### FUNCTION tny_folder_iface_get_subscribed ##### -->
 <para>
 
 </para>
@@ -198,7 +198,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_refresh_async ##### -->
+<!-- ##### FUNCTION tny_folder_iface_refresh_async ##### -->
 <para>
 
 </para>
@@ -209,7 +209,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 @user_data: 
 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_refresh ##### -->
+<!-- ##### FUNCTION tny_folder_iface_refresh ##### -->
 <para>
 
 </para>

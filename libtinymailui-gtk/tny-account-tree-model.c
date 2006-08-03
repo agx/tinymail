@@ -26,7 +26,7 @@
 #include <tny-iterator-iface.h>
 #include <tny-account-tree-model.h>
 #include <tny-store-account-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 
 #include "tny-account-tree-model-priv.h"
 
@@ -47,20 +47,20 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkT
 	while (next)
 	{
 		GtkTreeIter iter;
-		TnyMsgFolderIface *folder = (TnyMsgFolderIface*)tny_iterator_iface_current (iterator);
+		TnyFolderIface *folder = (TnyFolderIface*)tny_iterator_iface_current (iterator);
 		TnyListIface *more_folders;
 
-		more_folders = (TnyListIface*)tny_msg_folder_iface_get_folders (folder);
+		more_folders = (TnyListIface*)tny_folder_iface_get_folders (folder);
 
 		gtk_tree_store_append (model, &iter, parent_iter);
 
  		gtk_tree_store_set (model, &iter,
 			TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
-			tny_msg_folder_iface_get_name (folder),
+			tny_folder_iface_get_name (folder),
 			TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 
-			tny_msg_folder_iface_get_unread_count (folder),
+			tny_folder_iface_get_unread_count (folder),
 			TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN,
-			tny_msg_folder_iface_get_folder_type (folder),
+			tny_folder_iface_get_folder_type (folder),
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
 
@@ -70,7 +70,7 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkT
 		/* g_signal_connect (G_OBJECT (folder), "folders_reloaded",
 			G_CALLBACK (folders_reloaded), self+account); */
 
-		tny_msg_folder_iface_uncache (folder);
+		tny_folder_iface_uncache (folder);
 
 		if (tny_list_iface_length (more_folders) > 0)
 			fill_treemodel_recursive (self, more_folders, &iter, account);

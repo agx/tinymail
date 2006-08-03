@@ -10,7 +10,7 @@ headers
 #include <tny-iterator-iface.h>
 #include <tny-list.h>
 #include <tny-list-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-iface.h>
 #include <tny-msg-mime-part-iface.h>

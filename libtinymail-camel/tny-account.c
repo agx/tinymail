@@ -29,8 +29,8 @@
 #include <tny-session-camel.h>
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
-#include <tny-msg-folder-iface.h>
-#include <tny-msg-folder.h>
+#include <tny-folder-iface.h>
+#include <tny-folder.h>
 
 #include <camel/camel.h>
 #include <camel/camel-session.h>

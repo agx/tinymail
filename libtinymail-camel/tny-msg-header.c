@@ -26,10 +26,10 @@
 
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header.h>
-#include <tny-msg-folder.h>
+#include <tny-folder.h>
 
 #include "tny-camel-common-priv.h"
-#include "tny-msg-folder-priv.h"
+#include "tny-folder-priv.h"
 #include "tny-msg-header-priv.h"
 
 #include <tny-camel-shared.h>
@@ -53,7 +53,7 @@ struct _TnyMsgHeader
 	GObject parent;
 	void *info;
 
-	TnyMsgFolderIface *folder;
+	TnyFolderIface *folder;
 	guchar write:1;
 };
 
@@ -455,7 +455,7 @@ tny_msg_header_finalize (GObject *object)
 	}
 
 	/* Normally we do camel_folder_free_message_info here, but we already got
-	   rid of our initial reference at tny-msg-folder.c:add_message_with_uid
+	   rid of our initial reference at tny-folder.c:add_message_with_uid
 	   I know this is actually ugly */
 
 	(*parent_class->finalize) (object);
@@ -481,18 +481,18 @@ tny_msg_header_new (void)
 }
 
 static void
-tny_msg_header_set_folder (TnyMsgHeaderIface *self, TnyMsgFolderIface *folder)
+tny_msg_header_set_folder (TnyMsgHeaderIface *self, TnyFolderIface *folder)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	me->folder = (TnyMsgFolderIface*)folder;
+	me->folder = (TnyFolderIface*)folder;
 	return;
 }
 
-static TnyMsgFolderIface*
+static TnyFolderIface*
 tny_msg_header_get_folder (TnyMsgHeaderIface *self)
 {
 	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	return (TnyMsgFolderIface*)me->folder;
+	return (TnyFolderIface*)me->folder;
 }
 
 static void

@@ -9,7 +9,7 @@ libtinymail_camel_1_0_headers =			\
 	tny-msg-mime-part.h			\
 	tny-msg-header.h			\
 	tny-msg.h				\
-	tny-msg-folder.h			\
+	tny-folder.h				\
 	tny-account.h				\
 	tny-store-account.h			\
 	tny-transport-account.h			\
@@ -26,23 +26,23 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-transport-account-priv.h		\
 	tny-msg-priv.h				\
 	tny-msg-header-priv.h			\
-	tny-msg-folder-priv.h			\
+	tny-folder-priv.h			\
 	$(libtinymail_camel_1_0_headers)	\
 	tny-msg.c				\
 	tny-msg-header.c 			\
 	tny-msg-mime-part-priv.h		\
 	tny-msg-mime-part.c			\
-	tny-msg-folder.c			\
+	tny-folder.c				\
 	tny-account.c				\
 	tny-store-account.c			\
 	tny-transport-account.c			\
 	tny-camel-stream.c			\
 	tny-stream-camel.c			\
 	tny-session-camel.c			\
-	tny-msg-folder-list.c			\
-	tny-msg-folder-list-priv.h		\
-	tny-msg-folder-list-iterator.c		\
-	tny-msg-folder-list-iterator-priv.h
+	tny-folder-list.c			\
+	tny-folder-list-priv.h			\
+	tny-folder-list-iterator.c		\
+	tny-folder-list-iterator-priv.h
 
 libtinymail_camel_1_0_la_LIBADD =		\
 	$(LIBTINYMAIL_CAMEL_LIBS)		\

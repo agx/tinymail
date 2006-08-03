@@ -1,3 +1,106 @@
+<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Title ##### -->
+tny-folder-iface-test
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Title ##### -->
+TnyFolderListIterator
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Title ##### -->
+TnyFolderList
+
+
+<!-- ##### SECTION ./tmpl/tny-folder.sgml:Long_Description ##### -->
+<para>
+A folder contains headers and children folders. A folder can have a account or another 
+folder as parent. An implementation of a #TnyStoreAccountIface will typically keep
+track of instances of this type.
+</para><para>
+If you got them from a #TnyStoreAccountIface implementation,
+you typically don't destroy instances of this type. The #TnyStoreAccountIface implementation
+will do that for you upon destruction of the account. You can, however, uncache the folder 
+instances. Depending on the implementation, this will reduce memory usage.
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder.sgml:See_Also ##### -->
+<para>
+#TnyStoreAccountIface
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder.sgml:Short_Description ##### -->
+A type that defines a folder
+
+
+<!-- ##### SECTION ./tmpl/tny-folder.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder.sgml:Title ##### -->
+TnyFolderIface
+
+
 <!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Long_Description ##### -->
 <para>
 
@@ -126,12 +229,37 @@ TnySummaryWindow
 
 @obj: 
 
+<!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
 <para>
 
 </para>
 
 @parent_class: 
+
+<!-- ##### STRUCT TnyFolderList ##### -->
+<para>
+
+</para>
+
+@parent: 
+@iterator_lock: 
+@first: 
+@pfolder: 
+
+<!-- ##### STRUCT TnyFolderListIterator ##### -->
+<para>
+
+</para>
+
+@parent: 
+@model: 
+@current: 
 
 <!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
 <para>
@@ -151,6 +279,62 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @what: What happened
 @status: A status field
 @user_data: user data
+
+<!-- ##### STRUCT TnyMsgFolder ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgFolderIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL TnyMsgFolderIface::folder-inserted ##### -->
+<para>
+
+</para>
+
+@tnymsgfolderiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyMsgFolderIface::folders-reloaded ##### -->
+<para>
+
+</para>
+
+@tnymsgfolderiface: the object which received the signal.
+
+<!-- ##### STRUCT TnyMsgFolderIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@folder_inserted: 
+@folders_reloaded: 
+@remove_message_func: 
+@expunge_func: 
+@get_folders_func: 
+@get_message_func: 
+@get_headers_func: 
+@get_name_func: 
+@get_id_func: 
+@get_account_func: 
+@set_name_func: 
+@set_id_func: 
+@set_account_func: 
+@get_folder_type_func: 
+@get_all_count_func: 
+@get_unread_count_func: 
+@uncache_func: 
+@has_cache_func: 
+@set_subscribed_func: 
+@get_subscribed_func: 
+@refresh_async_func: 
+@refresh_func: 
 
 <!-- ##### STRUCT TnyMsgFolderProxy ##### -->
 <para>
@@ -186,6 +370,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 </para>
 
+
+<!-- ##### FUNCTION create_tny_folder_iface_suite ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 <!-- ##### FUNCTION tny_account_get_type ##### -->
 <para>
@@ -232,6 +423,180 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_folder_iface_expunge ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_all_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_folder_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_folders ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_headers ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+@refresh: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_subscribed ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_get_unread_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_refresh ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### FUNCTION tny_folder_iface_refresh_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+<!-- ##### FUNCTION tny_folder_iface_remove_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+<!-- ##### FUNCTION tny_folder_iface_set_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+
+<!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+
+<!-- ##### FUNCTION tny_folder_iface_set_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+
+<!-- ##### FUNCTION tny_folder_iface_set_subscribed ##### -->
+<para>
+
+</para>
+
+@self: 
+@subscribed: 
+
+<!-- ##### VARIABLE tny_folder_iface_signals ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_folder_iface_uncache ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### FUNCTION tny_folder_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_folder_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_folder_iface_add_folder ##### -->
 <para>
 
@@ -258,12 +623,35 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @status_callback: 
 @user_data: 
 
+<!-- ##### FUNCTION tny_msg_folder_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_folder_new_with_folder ##### -->
+<para>
+
+</para>
+
+@camel_folder: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_folder_proxy_new ##### -->
 <para>
 
 </para>
 
 @Returns: 
+
+<!-- ##### FUNCTION tny_msg_folder_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@camel_folder: 
 
 <!-- ##### FUNCTION tny_msg_header_iface_has_cache ##### -->
 <para>

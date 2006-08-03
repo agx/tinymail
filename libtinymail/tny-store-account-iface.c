@@ -31,7 +31,7 @@
  * 
  **/
 void
-tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
+tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 {
 #ifdef DEBUG
 	if (!TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->unsubscribe_func)
@@ -51,7 +51,7 @@ tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIfa
  * 
  **/
 void
-tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder)
+tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 {
 #ifdef DEBUG
 	if (!TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->subscribe_func)

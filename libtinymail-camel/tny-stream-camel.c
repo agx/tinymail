@@ -25,8 +25,8 @@
 
 #include <tny-stream-iface.h>
 #include <tny-stream-camel.h>
-#include <tny-msg-folder-iface.h>
-#include <tny-msg-folder.h>
+#include <tny-folder-iface.h>
+#include <tny-folder.h>
 
 #include <camel/camel.h>
 #include <camel/camel-session.h>

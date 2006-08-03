@@ -19,14 +19,14 @@
 
 #include <config.h>
 
-#include "tny-msg-folder-list-priv.h"
-#include "tny-msg-folder-list-iterator-priv.h"
+#include "tny-folder-list-priv.h"
+#include "tny-folder-list-iterator-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
 
 void 
-_tny_msg_folder_list_iterator_set_model (TnyMsgFolderListIterator *self, TnyMsgFolderList *model)
+_tny_folder_list_iterator_set_model (TnyFolderListIterator *self, TnyFolderList *model)
 {
 	self->model = model;
 
@@ -46,20 +46,20 @@ _tny_msg_folder_list_iterator_set_model (TnyMsgFolderListIterator *self, TnyMsgF
 
 
 
-TnyMsgFolderListIterator*
-_tny_msg_folder_list_iterator_new (TnyMsgFolderList *model)
+TnyFolderListIterator*
+_tny_folder_list_iterator_new (TnyFolderList *model)
 {
-	TnyMsgFolderListIterator *self = g_object_new (TNY_TYPE_MSG_FOLDER_LIST_ITERATOR, NULL);
+	TnyFolderListIterator *self = g_object_new (TNY_TYPE_FOLDER_LIST_ITERATOR, NULL);
 
-	_tny_msg_folder_list_iterator_set_model (self, model);
+	_tny_folder_list_iterator_set_model (self, model);
 
 	return self;
 }
 
 static void
-tny_msg_folder_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_folder_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyMsgFolderListIterator *self = (TnyMsgFolderListIterator *)instance;
+	TnyFolderListIterator *self = (TnyFolderListIterator *)instance;
 
 	self->model = NULL;
 	self->current = NULL;
@@ -68,9 +68,9 @@ tny_msg_folder_list_iterator_instance_init (GTypeInstance *instance, gpointer g_
 }
 
 static void
-tny_msg_folder_list_iterator_finalize (GObject *object)
+tny_folder_list_iterator_finalize (GObject *object)
 {
-	TnyMsgFolderListIterator *self = (TnyMsgFolderListIterator *)object;
+	TnyFolderListIterator *self = (TnyFolderListIterator *)object;
 
 	(*parent_class->finalize) (object);
 
@@ -79,9 +79,9 @@ tny_msg_folder_list_iterator_finalize (GObject *object)
 
 
 static GObject* 
-tny_msg_folder_list_iterator_next (TnyIteratorIface *self)
+tny_folder_list_iterator_next (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
@@ -99,9 +99,9 @@ tny_msg_folder_list_iterator_next (TnyIteratorIface *self)
 
 
 static gboolean 
-tny_msg_folder_list_iterator_is_done (TnyIteratorIface *self)
+tny_folder_list_iterator_is_done (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return TRUE;
@@ -113,9 +113,9 @@ tny_msg_folder_list_iterator_is_done (TnyIteratorIface *self)
 
 
 static GObject* 
-tny_msg_folder_list_iterator_prev (TnyIteratorIface *self)
+tny_folder_list_iterator_prev (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
@@ -130,9 +130,9 @@ tny_msg_folder_list_iterator_prev (TnyIteratorIface *self)
 }
 
 static GObject* 
-tny_msg_folder_list_iterator_first (TnyIteratorIface *self)
+tny_folder_list_iterator_first (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
@@ -150,9 +150,9 @@ tny_msg_folder_list_iterator_first (TnyIteratorIface *self)
 
 
 static GObject* 
-tny_msg_folder_list_iterator_nth (TnyIteratorIface *self, guint nth)
+tny_folder_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return NULL;
@@ -170,9 +170,9 @@ tny_msg_folder_list_iterator_nth (TnyIteratorIface *self, guint nth)
 
 
 static GObject* 
-tny_msg_folder_list_iterator_current (TnyIteratorIface *self)
+tny_folder_list_iterator_current (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 	gpointer retval;
 
 	if (G_UNLIKELY (!me || !me->model))
@@ -188,9 +188,9 @@ tny_msg_folder_list_iterator_current (TnyIteratorIface *self)
 }
 
 static gboolean 
-tny_msg_folder_list_iterator_has_next (TnyIteratorIface *self)
+tny_folder_list_iterator_has_next (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 	gboolean retval;
 
 	if (G_UNLIKELY (!me || !me->model))
@@ -206,9 +206,9 @@ tny_msg_folder_list_iterator_has_next (TnyIteratorIface *self)
 }
 
 static gboolean 
-tny_msg_folder_list_iterator_has_first (TnyIteratorIface *self)
+tny_folder_list_iterator_has_first (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 	gboolean retval;
 
 	if (G_UNLIKELY (!me || !me->model))
@@ -224,9 +224,9 @@ tny_msg_folder_list_iterator_has_first (TnyIteratorIface *self)
 }
 
 static TnyListIface* 
-tny_msg_folder_list_iterator_get_list (TnyIteratorIface *self)
+tny_folder_list_iterator_get_list (TnyIteratorIface *self)
 {
-	TnyMsgFolderListIterator *me = (TnyMsgFolderListIterator*) self;
+	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	/* Return the list */
 
@@ -240,34 +240,34 @@ static void
 tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 {
 
-	klass->next_func = tny_msg_folder_list_iterator_next;
-	klass->prev_func = tny_msg_folder_list_iterator_prev;
-	klass->first_func = tny_msg_folder_list_iterator_first;
-	klass->nth_func = tny_msg_folder_list_iterator_nth;
-	klass->current_func = tny_msg_folder_list_iterator_current;
-	klass->has_next_func = tny_msg_folder_list_iterator_has_next;
-	klass->has_first_func = tny_msg_folder_list_iterator_has_first;
-	klass->get_list_func = tny_msg_folder_list_iterator_get_list;
-	klass->is_done = tny_msg_folder_list_iterator_is_done;
+	klass->next_func = tny_folder_list_iterator_next;
+	klass->prev_func = tny_folder_list_iterator_prev;
+	klass->first_func = tny_folder_list_iterator_first;
+	klass->nth_func = tny_folder_list_iterator_nth;
+	klass->current_func = tny_folder_list_iterator_current;
+	klass->has_next_func = tny_folder_list_iterator_has_next;
+	klass->has_first_func = tny_folder_list_iterator_has_first;
+	klass->get_list_func = tny_folder_list_iterator_get_list;
+	klass->is_done = tny_folder_list_iterator_is_done;
 	
 	return;
 }
 
 static void 
-tny_msg_folder_list_iterator_class_init (TnyMsgFolderListIteratorClass *klass)
+tny_folder_list_iterator_class_init (TnyFolderListIteratorClass *klass)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	object_class->finalize = tny_msg_folder_list_iterator_finalize;
+	object_class->finalize = tny_folder_list_iterator_finalize;
 
 	return;
 }
 
 GType 
-_tny_msg_folder_list_iterator_get_type (void)
+_tny_folder_list_iterator_get_type (void)
 {
 	static GType type = 0;
 
@@ -275,15 +275,15 @@ _tny_msg_folder_list_iterator_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgFolderListIteratorClass),
+		  sizeof (TnyFolderListIteratorClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_msg_folder_list_iterator_class_init,   /* class_init */
+		  (GClassInitFunc) tny_folder_list_iterator_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyMsgFolderListIterator),
+		  sizeof (TnyFolderListIterator),
 		  0,      /* n_preallocs */
-		  tny_msg_folder_list_iterator_instance_init    /* instance_init */
+		  tny_folder_list_iterator_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_iterator_iface_info = 
@@ -294,7 +294,7 @@ _tny_msg_folder_list_iterator_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyMsgFolderListIterator",
+			"TnyFolderListIterator",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ITERATOR_IFACE, 

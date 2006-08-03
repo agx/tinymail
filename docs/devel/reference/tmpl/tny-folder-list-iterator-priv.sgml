@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-msg-folder-iface-test
+TnyFolderListIterator
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -17,11 +17,12 @@ tny-msg-folder-iface-test
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### FUNCTION create_tny_msg_folder_iface_suite ##### -->
+<!-- ##### STRUCT TnyFolderListIterator ##### -->
 <para>
 
 </para>
 
-@Returns: 
-
+@parent: 
+@model: 
+@current: 
 

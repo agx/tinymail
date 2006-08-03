@@ -22,18 +22,18 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <tny-msg-folder.h>
+#include <tny-folder.h>
 
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 
 
 static GObjectClass *parent_class;
 
-#include "tny-msg-folder-list-priv.h"
-#include "tny-msg-folder-list-iterator-priv.h"
-#include "tny-msg-folder-priv.h"
+#include "tny-folder-list-priv.h"
+#include "tny-folder-list-iterator-priv.h"
+#include "tny-folder-priv.h"
 
 static void
 destroy_folder (gpointer data, gpointer user_data)
@@ -44,25 +44,25 @@ destroy_folder (gpointer data, gpointer user_data)
 
 
 static void
-tny_msg_folder_list_append (TnyListIface *self, GObject* item)
+tny_folder_list_append (TnyListIface *self, GObject* item)
 {
 	g_warning (_("Cannot add folders to a folder yet\n"));
 }
 
 static void
-tny_msg_folder_list_prepend (TnyListIface *self, GObject* item)
+tny_folder_list_prepend (TnyListIface *self, GObject* item)
 {
-	tny_msg_folder_list_append (self, item);
+	tny_folder_list_append (self, item);
 }
 
 void
-_tny_msg_folder_list_intern_prepend (TnyMsgFolderList *self, TnyMsgFolderIface *item)
+_tny_folder_list_intern_prepend (TnyFolderList *self, TnyFolderIface *item)
 {
-	TnyMsgFolderPriv *priv = NULL;
+	TnyFolderPriv *priv = NULL;
 
 	/* Internally, we don*/
 	if (self->pfolder)
-		priv = TNY_MSG_FOLDER_GET_PRIVATE (self->pfolder);
+		priv = TNY_FOLDER_GET_PRIVATE (self->pfolder);
 
 	/* Append something to the list */
 
@@ -80,12 +80,12 @@ _tny_msg_folder_list_intern_prepend (TnyMsgFolderList *self, TnyMsgFolderIface *
 
 	/* Tell the observers */
 	if (self->pfolder)
-		g_signal_emit (self->pfolder, tny_msg_folder_iface_signals [TNY_MSG_FOLDER_IFACE_FOLDER_INSERTED], 0, item);
+		g_signal_emit (self->pfolder, tny_folder_iface_signals [TNY_FOLDER_IFACE_FOLDER_INSERTED], 0, item);
 
 }
 
 void
-_tny_msg_folder_list_set_folder (TnyMsgFolderList *self, TnyMsgFolderIface *pfolder)
+_tny_folder_list_set_folder (TnyFolderList *self, TnyFolderIface *pfolder)
 {
 	g_mutex_lock (self->iterator_lock);
 	if (self->first)
@@ -102,9 +102,9 @@ _tny_msg_folder_list_set_folder (TnyMsgFolderList *self, TnyMsgFolderIface *pfol
 }
 
 static guint
-tny_msg_folder_list_length (TnyListIface *self)
+tny_folder_list_length (TnyListIface *self)
 {
-	TnyMsgFolderList *me = (TnyMsgFolderList*)self;
+	TnyFolderList *me = (TnyFolderList*)self;
 	guint retval = 0;
 
 	g_mutex_lock (me->iterator_lock);
@@ -115,24 +115,24 @@ tny_msg_folder_list_length (TnyListIface *self)
 }
 
 static void
-tny_msg_folder_list_remove (TnyListIface *self, GObject* item)
+tny_folder_list_remove (TnyListIface *self, GObject* item)
 {
 	g_warning (_("Cannot remove folders from a folder yet\n"));
 }
 
 static TnyIteratorIface*
-tny_msg_folder_list_create_iterator (TnyListIface *self)
+tny_folder_list_create_iterator (TnyListIface *self)
 {
-	TnyMsgFolderList *me = (TnyMsgFolderList*)self;
+	TnyFolderList *me = (TnyFolderList*)self;
 
-	return TNY_ITERATOR_IFACE (_tny_msg_folder_list_iterator_new (me));
+	return TNY_ITERATOR_IFACE (_tny_folder_list_iterator_new (me));
 }
 
 static TnyListIface*
-tny_msg_folder_list_copy_the_list (TnyListIface *self)
+tny_folder_list_copy_the_list (TnyListIface *self)
 {
-	TnyMsgFolderList *me = (TnyMsgFolderList*)self;
-	TnyMsgFolderList *copy = g_object_new (TNY_TYPE_MSG_FOLDER_LIST, NULL);
+	TnyFolderList *me = (TnyFolderList*)self;
+	TnyFolderList *copy = g_object_new (TNY_TYPE_FOLDER_LIST, NULL);
 
 	g_mutex_lock (me->iterator_lock);
 	GList *list_copy = g_list_copy (me->first);
@@ -143,9 +143,9 @@ tny_msg_folder_list_copy_the_list (TnyListIface *self)
 }
 
 static void 
-tny_msg_folder_list_foreach_in_the_list (TnyListIface *self, GFunc func, gpointer user_data)
+tny_folder_list_foreach_in_the_list (TnyListIface *self, GFunc func, gpointer user_data)
 {
-	TnyMsgFolderList *me = (TnyMsgFolderList*)self;
+	TnyFolderList *me = (TnyFolderList*)self;
 
 	/* Foreach item in the list (without using a slower iterator) */
 
@@ -159,13 +159,13 @@ tny_msg_folder_list_foreach_in_the_list (TnyListIface *self, GFunc func, gpointe
 static void
 tny_list_iface_init (TnyListIfaceClass *klass)
 {
-	klass->length_func = tny_msg_folder_list_length;
-	klass->prepend_func = tny_msg_folder_list_prepend;
-	klass->append_func = tny_msg_folder_list_append;
-	klass->remove_func = tny_msg_folder_list_remove;
-	klass->create_iterator_func = tny_msg_folder_list_create_iterator;
-	klass->copy_func = tny_msg_folder_list_copy_the_list;
-	klass->foreach_func = tny_msg_folder_list_foreach_in_the_list;
+	klass->length_func = tny_folder_list_length;
+	klass->prepend_func = tny_folder_list_prepend;
+	klass->append_func = tny_folder_list_append;
+	klass->remove_func = tny_folder_list_remove;
+	klass->create_iterator_func = tny_folder_list_create_iterator;
+	klass->copy_func = tny_folder_list_copy_the_list;
+	klass->foreach_func = tny_folder_list_foreach_in_the_list;
 
 	return;
 }
@@ -173,9 +173,9 @@ tny_list_iface_init (TnyListIfaceClass *klass)
 
 
 static void
-tny_msg_folder_list_finalize (GObject *object)
+tny_folder_list_finalize (GObject *object)
 {
-	TnyMsgFolderList *self = (TnyMsgFolderList *)object;
+	TnyFolderList *self = (TnyFolderList *)object;
 
 	g_mutex_lock (self->iterator_lock);
 	if (self->first)
@@ -196,20 +196,20 @@ tny_msg_folder_list_finalize (GObject *object)
 
 
 static void
-tny_msg_folder_list_class_init (TnyMsgFolderListClass *klass)
+tny_folder_list_class_init (TnyFolderListClass *klass)
 {
 	GObjectClass *object_class;
 
 	object_class = (GObjectClass *)klass;
 	parent_class = g_type_class_peek_parent (klass);
 
-	object_class->finalize = tny_msg_folder_list_finalize;
+	object_class->finalize = tny_folder_list_finalize;
 
 	return;
 }
 
 static void
-tny_msg_folder_list_init (TnyMsgFolderList *self)
+tny_folder_list_init (TnyFolderList *self)
 {
 	self->pfolder = NULL;
 	self->iterator_lock = g_mutex_new ();
@@ -221,17 +221,17 @@ tny_msg_folder_list_init (TnyMsgFolderList *self)
 
 
 TnyListIface*
-_tny_msg_folder_list_new (TnyMsgFolderIface *pfolder)
+_tny_folder_list_new (TnyFolderIface *pfolder)
 {
-	TnyMsgFolderList *self = g_object_new (TNY_TYPE_MSG_FOLDER_LIST, NULL);
+	TnyFolderList *self = g_object_new (TNY_TYPE_FOLDER_LIST, NULL);
 	
-	_tny_msg_folder_list_set_folder (self, pfolder);
+	_tny_folder_list_set_folder (self, pfolder);
 
 	return TNY_LIST_IFACE (self);
 }
 
 GType
-_tny_msg_folder_list_get_type (void)
+_tny_folder_list_get_type (void)
 {
 	static GType object_type = 0;
 
@@ -239,15 +239,15 @@ _tny_msg_folder_list_get_type (void)
 	{
 		static const GTypeInfo object_info = 
 		{
-			sizeof (TnyMsgFolderListClass),
+			sizeof (TnyFolderListClass),
 			NULL,		/* base_init */
 			NULL,		/* base_finalize */
-			(GClassInitFunc) tny_msg_folder_list_class_init,
+			(GClassInitFunc) tny_folder_list_class_init,
 			NULL,		/* class_finalize */
 			NULL,		/* class_data */
-			sizeof (TnyMsgFolderList),
+			sizeof (TnyFolderList),
 			0,              /* n_preallocs */
-			(GInstanceInitFunc) tny_msg_folder_list_init
+			(GInstanceInitFunc) tny_folder_list_init
 		};
 
 		static const GInterfaceInfo tny_list_iface_info = {
@@ -257,7 +257,7 @@ _tny_msg_folder_list_get_type (void)
 		};
 
 		object_type = g_type_register_static (G_TYPE_OBJECT, 
-						"TnyMsgFolderList", &object_info, 0);
+						"TnyFolderList", &object_info, 0);
 
 		g_type_add_interface_static (object_type, TNY_TYPE_LIST_IFACE,
 					     &tny_list_iface_info);

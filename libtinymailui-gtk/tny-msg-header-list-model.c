@@ -28,7 +28,7 @@
 
 #include <tny-msg-header-list-model.h>
 #include <tny-msg-header-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
@@ -917,7 +917,7 @@ tny_msg_header_list_model_finalize (GObject *object)
 	/* Unreference the folder instance */
 	if (self->folder) 
 	{
-		tny_msg_folder_iface_uncache (self->folder);
+		tny_folder_iface_uncache (self->folder);
 		g_object_unref (G_OBJECT (self->folder));
 		if (self->iterator)
 			g_object_unref (G_OBJECT (self->iterator));
@@ -970,14 +970,14 @@ tny_msg_header_list_model_init (TnyMsgHeaderListModel *self)
 /**
  * tny_msg_header_list_model_set_folder:
  * @self: A #TnyMsgHeaderListModel instance
- * @folder: a #TnyMsgFolderIface instance
+ * @folder: a #TnyFolderIface instance
  * @refresh: refresh first
  *
  * Set the folder where the #TnyMsgHeaderIface instances are located
  * 
  **/
 void
-tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh)
+tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyFolderIface *folder, gboolean refresh)
 {
 	GtkTreeIter iter;
 	GtkTreePath *path;
@@ -1001,7 +1001,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	/* Unreference the previous folder instance */
 	if (G_LIKELY (self->folder))
 	{
-		tny_msg_folder_iface_uncache (self->folder);
+		tny_folder_iface_uncache (self->folder);
 		g_object_unref (G_OBJECT (self->folder));
 	}
 
@@ -1014,7 +1014,7 @@ tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderI
 	g_mutex_unlock (self->folder_lock);
 
 	/* Get a new list of headers */
-	tny_msg_folder_iface_get_headers (folder, TNY_LIST_IFACE (self), refresh);
+	tny_folder_iface_get_headers (folder, TNY_LIST_IFACE (self), refresh);
 
 	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);

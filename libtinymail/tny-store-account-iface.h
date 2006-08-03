@@ -25,7 +25,7 @@
 #include <tny-shared.h>
 
 #include <tny-account-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 #include <tny-list-iface.h>
 
 G_BEGIN_DECLS
@@ -50,16 +50,16 @@ struct _TnyStoreAccountIfaceClass
 	GTypeInterface parent;
 
 	TnyListIface* (*get_folders_func)  (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
-	void (*subscribe_func)             (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
-	void (*unsubscribe_func)           (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
+	void (*subscribe_func)             (TnyStoreAccountIface *self, TnyFolderIface *folder);
+	void (*unsubscribe_func)           (TnyStoreAccountIface *self, TnyFolderIface *folder);
 };
 
 GType tny_store_account_iface_get_type (void);
 GType tny_store_account_folder_type_get_type (void);
 
 TnyListIface* tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type);
-void tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
-void tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyMsgFolderIface *folder);
+void tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder);
+void tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folder);
 
 
 G_END_DECLS

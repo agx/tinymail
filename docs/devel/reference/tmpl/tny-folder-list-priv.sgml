@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgFolderListIterator
+TnyFolderList
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -17,12 +17,13 @@ TnyMsgFolderListIterator
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgFolderListIterator ##### -->
+<!-- ##### STRUCT TnyFolderList ##### -->
 <para>
 
 </para>
 
 @parent: 
-@model: 
-@current: 
+@iterator_lock: 
+@first: 
+@pfolder: 
 

@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgFolderList
+tny-folder-iface-test
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -17,13 +17,11 @@ TnyMsgFolderList
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgFolderList ##### -->
+<!-- ##### FUNCTION create_tny_folder_iface_suite ##### -->
 <para>
 
 </para>
 
-@parent: 
-@iterator_lock: 
-@first: 
-@pfolder: 
+@Returns: 
+
 

@@ -39,7 +39,7 @@
 #include <tny-msg-view-iface.h>
 #include <tny-msg-window-iface.h>
 #include <tny-msg-window.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 #include <tny-account-tree-model.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-header-list-model.h>
@@ -262,7 +262,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 				{
-					TnyMsgFolderIface *folder;
+					TnyFolderIface *folder;
 					TnyMsgIface *msg;
 
 					if (GTK_IS_TREE_MODEL_SORT (model))
@@ -271,8 +271,8 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 							(GTK_TREE_MODEL_SORT (model));
 					} else mymodel = model;
 
-					folder = (TnyMsgFolderIface*)tny_msg_header_iface_get_folder (header);
-					tny_msg_folder_iface_remove_message (folder, header);
+					folder = (TnyFolderIface*)tny_msg_header_iface_get_folder (header);
+					tny_folder_iface_remove_message (folder, header);
 
 					tny_list_iface_remove (TNY_LIST_IFACE (mymodel), (GObject*)header);
 
@@ -283,7 +283,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 					   You shouldn't *use* this demo-ui, so I'm doing destructive
 					   irreversible deletes: I immediately expunge the folder! */
 
-					tny_msg_folder_iface_expunge (folder);
+					tny_folder_iface_expunge (folder);
 				}
 
 				gtk_widget_destroy (dialog);
@@ -315,13 +315,13 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 		if (G_LIKELY (header))
 		{
 
-			TnyMsgFolderIface *folder;
+			TnyFolderIface *folder;
 			TnyMsgIface *msg;
 
 			folder = tny_msg_header_iface_get_folder (header);
 			if (G_LIKELY (folder))
 			{
-				msg = tny_msg_folder_iface_get_message ((TnyMsgFolderIface*)folder, header);
+				msg = tny_folder_iface_get_message ((TnyFolderIface*)folder, header);
 				if (G_LIKELY (msg))
 				{
 					tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));
@@ -353,7 +353,7 @@ cleanup_statusbar (gpointer data)
 }
 
 static void
-refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer user_data)
+refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer user_data)
 {
 	TnySummaryViewPriv *priv = user_data;
 
@@ -407,7 +407,7 @@ refresh_current_folder (TnyMsgFolderIface *folder, gboolean cancelled, gpointer 
 
 
 static void
-refresh_current_folder_status_update (TnyMsgFolderIface *folder, const gchar *what, gint status, gpointer user_data)
+refresh_current_folder_status_update (TnyFolderIface *folder, const gchar *what, gint status, gpointer user_data)
 {
 	TnySummaryViewPriv *priv = user_data;
 
@@ -429,7 +429,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
-		TnyMsgFolderIface *folder;
+		TnyFolderIface *folder;
 		gint type;
 
 		gtk_tree_model_get (model, &iter, 
@@ -454,7 +454,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		
 #ifdef ASYNC_HEADERS
 
-		tny_msg_folder_iface_refresh_async (folder, 
+		tny_folder_iface_refresh_async (folder, 
 			refresh_current_folder, 
 			refresh_current_folder_status_update, user_data);
 #else
@@ -486,7 +486,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		
 		if (G_LIKELY (header))
 		{
-			TnyMsgFolderIface *folder;
+			TnyFolderIface *folder;
 			TnyMsgIface *msg;
 			TnyPlatformFactoryIface *platfact;
 
@@ -497,7 +497,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 			if (G_LIKELY (folder))
 			{
-				msg = tny_msg_folder_iface_get_message (TNY_MSG_FOLDER_IFACE (folder), header);
+				msg = tny_folder_iface_get_message (TNY_FOLDER_IFACE (folder), header);
 				if (G_LIKELY (msg))
 				{
 					msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (

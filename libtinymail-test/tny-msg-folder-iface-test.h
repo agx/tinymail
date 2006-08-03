@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_FOLDER_IFACE_TEST_H
-#define TNY_MSG_FOLDER_IFACE_TEST_H
+#ifndef TNY_FOLDER_IFACE_TEST_H
+#define TNY_FOLDER_IFACE_TEST_H
 
 /* tinymail - Tiny Mail gunit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -21,9 +21,9 @@
 
 #include "tny-test-suite.h"
 
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 
 /* Test suite */
-GUnitTestSuite *create_tny_msg_folder_iface_suite (void);
+GUnitTestSuite *create_tny_folder_iface_suite (void);
 
 #endif

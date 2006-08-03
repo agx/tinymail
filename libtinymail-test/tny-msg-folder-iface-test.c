@@ -18,24 +18,24 @@
 
 #include <string.h>
 
-#include <tny-msg-folder-iface-test.h>
-#include <tny-msg-folder-iface.h>
-#include <tny-msg-folder.h>
+#include <tny-folder-iface-test.h>
+#include <tny-folder-iface.h>
+#include <tny-folder.h>
 
-static TnyMsgFolderIface *iface = NULL;
+static TnyFolderIface *iface = NULL;
 static gchar *str;
 
 static void
-tny_msg_folder_iface_test_setup (void)
+tny_folder_iface_test_setup (void)
 {
 
-	iface = TNY_MSG_FOLDER_IFACE (tny_msg_folder_new ());
+	iface = TNY_FOLDER_IFACE (tny_folder_new ());
 
 	return;
 }
 
 static void 
-tny_msg_folder_iface_test_teardown (void)
+tny_folder_iface_test_teardown (void)
 {
 	g_object_unref (G_OBJECT (iface));
 
@@ -43,7 +43,7 @@ tny_msg_folder_iface_test_teardown (void)
 }
 
 static void
-tny_msg_folder_iface_test_something (void)
+tny_folder_iface_test_something (void)
 {
 	/* TODO: 
 	test signal folder inserted and folders_reloaded (hard to test)
@@ -61,19 +61,19 @@ tny_msg_folder_iface_test_something (void)
 
 
 GUnitTestSuite*
-create_tny_msg_folder_iface_suite (void)
+create_tny_folder_iface_suite (void)
 {
 	GUnitTestSuite *suite = NULL;
 
 	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyMsgFolderIface");
+	suite = gunit_test_suite_new ("TnyFolderIface");
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_folder_iface_test_something",
-                                      tny_msg_folder_iface_test_setup,
-                                      tny_msg_folder_iface_test_something,
-				      tny_msg_folder_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_folder_iface_test_something",
+                                      tny_folder_iface_test_setup,
+                                      tny_folder_iface_test_something,
+				      tny_folder_iface_test_teardown));
 
 	return suite;
 }

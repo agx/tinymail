@@ -20,7 +20,7 @@
 #include <config.h>
 
 #include <tny-msg-header-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 
 
 /**
@@ -348,7 +348,7 @@ tny_msg_header_iface_get_to (TnyMsgHeaderIface *self)
  * 
  * Return value: The folder of the message header
  **/
-TnyMsgFolderIface* 
+TnyFolderIface* 
 tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
 {
 #ifdef DEBUG
@@ -367,7 +367,7 @@ tny_msg_header_iface_get_folder (TnyMsgHeaderIface *self)
  * 
  **/
 void
-tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, TnyMsgFolderIface *folder)
+tny_msg_header_iface_set_folder (TnyMsgHeaderIface *self, TnyFolderIface *folder)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_HEADER_IFACE_GET_CLASS (self)->set_folder_func)

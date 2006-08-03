@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_FOLDER_PRIV_H
-#define TNY_MSG_FOLDER_PRIV_H
+#ifndef TNY_FOLDER_PRIV_H
+#define TNY_FOLDER_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -22,11 +22,11 @@
 #include <glib.h>
 #include <camel/camel-folder.h>
 #include <tny-account-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 
-typedef struct _TnyMsgFolderPriv TnyMsgFolderPriv;
+typedef struct _TnyFolderPriv TnyFolderPriv;
 
-struct _TnyMsgFolderPriv
+struct _TnyFolderPriv
 {
 	gboolean loaded;
 
@@ -48,19 +48,19 @@ struct _TnyMsgFolderPriv
 	gboolean has_summary_cap;
 
 	gchar *cached_name;
-	TnyMsgFolderType cached_folder_type;
+	TnyFolderType cached_folder_type;
 };
 
-CamelFolder* _tny_msg_folder_get_camel_folder (TnyMsgFolderIface *self);
+CamelFolder* _tny_folder_get_camel_folder (TnyFolderIface *self);
 
-void _tny_msg_folder_set_subscribed_priv (TnyMsgFolderIface *self, gboolean subscribed);
-void _tny_msg_folder_set_name_priv (TnyMsgFolderIface *self, const gchar *name);
-void _tny_msg_folder_set_folder_type (TnyMsgFolder *self, TnyMsgFolderType type);
-void _tny_msg_folder_set_unread_count (TnyMsgFolder *self, guint len);
-void _tny_msg_folder_set_all_count (TnyMsgFolder *self, guint len);
+void _tny_folder_set_subscribed_priv (TnyFolderIface *self, gboolean subscribed);
+void _tny_folder_set_name_priv (TnyFolderIface *self, const gchar *name);
+void _tny_folder_set_folder_type (TnyFolder *self, TnyFolderType type);
+void _tny_folder_set_unread_count (TnyFolder *self, guint len);
+void _tny_folder_set_all_count (TnyFolder *self, guint len);
 
-#define TNY_MSG_FOLDER_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_FOLDER, TnyMsgFolderPriv))
+#define TNY_FOLDER_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER, TnyFolderPriv))
 
 
 #endif

@@ -10,7 +10,7 @@ headers
 #include <tny-iterator-iface.h>
 #include <tny-list.h>
 #include <tny-list-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 #include <tny-msg-header-iface.h>
 #include <tny-msg-iface.h>
 #include <tny-msg-mime-part-iface.h>
@@ -32,10 +32,10 @@ ignore-glob
 %%
 import gobject.GObject as PyGObject_Type
 %%
-override tny_msg_folder_iface_refresh_async kwargs
+override tny_folder_iface_refresh_async kwargs
 
 static void
-tny_refresh_folder_cb (TnyMsgFolderIface *self, gboolean cancelled, gpointer user_data)
+tny_refresh_folder_cb (TnyFolderIface *self, gboolean cancelled, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -56,7 +56,7 @@ tny_refresh_folder_cb (TnyMsgFolderIface *self, gboolean cancelled, gpointer use
 }
 
 static void
-tny_refresh_folder_status_cb (TnyMsgFolderIface *self, const gchar *what, gint status, gpointer user_data)
+tny_refresh_folder_status_cb (TnyFolderIface *self, const gchar *what, gint status, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -77,7 +77,7 @@ tny_refresh_folder_status_cb (TnyMsgFolderIface *self, const gchar *what, gint s
 
 
 static PyObject *
-_wrap_tny_msg_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObject *kwargs)
+_wrap_tny_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObject *kwargs)
 {
     static char *kwlist[] = { "refresh_func", "status_func", "user_data", NULL };
     PyObject *refresh_func, *status_func = Py_None, *user_data = Py_None;
@@ -85,7 +85,7 @@ _wrap_tny_msg_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObj
     PyObject *data;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs,
-                                     "OO|O:TnyMsgFolderIface.refresh_async",kwlist,
+                                     "OO|O:TnyFolderIface.refresh_async",kwlist,
                                      &refresh_func, &status_func,
 				     &user_data))
         return NULL;
@@ -101,7 +101,7 @@ _wrap_tny_msg_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObj
   
     data = Py_BuildValue("(OOO)", refresh_func, status_func, user_data);
 
-    tny_msg_folder_iface_refresh_async (TNY_MSG_FOLDER_IFACE (self->obj),
+    tny_folder_iface_refresh_async (TNY_FOLDER_IFACE (self->obj),
 				      tny_refresh_folder_cb, tny_refresh_folder_status_cb,
 				      data);
     return Py_None;

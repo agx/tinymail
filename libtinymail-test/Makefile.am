@@ -34,8 +34,8 @@ libtinymail_test_suite_la_SOURCES = 		\
 	tny-device-iface-test.h			\
 	tny-iterator-iface-test.c		\
 	tny-iterator-iface-test.h		\
-	tny-msg-folder-iface-test.c		\
-	tny-msg-folder-iface-test.h		\
+	tny-folder-iface-test.c			\
+	tny-folder-iface-test.h			\
 	tny-msg-iface-test.c			\
 	tny-msg-iface-test.h			\
 	tny-test-suite.h

@@ -22,7 +22,7 @@
 
 #include <gtk/gtktreemodel.h>
 #include <tny-msg-header-iface.h>
-#include <tny-msg-folder-iface.h>
+#include <tny-folder-iface.h>
 #include <tny-list-iface.h>
 
 G_BEGIN_DECLS
@@ -63,7 +63,7 @@ struct _TnyMsgHeaderListModel
 	GObject parent;
 
 	GMutex *folder_lock, *iterator_lock;
-	TnyMsgFolderIface *folder;
+	TnyFolderIface *folder;
 	gint length;
 	gint stamp;
 
@@ -81,7 +81,7 @@ struct _TnyMsgHeaderListModelClass
 GType tny_msg_header_list_model_get_type (void);
 GType tny_msg_header_list_model_column_get_type (void);
 TnyMsgHeaderListModel* tny_msg_header_list_model_new (void);
-void tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyMsgFolderIface *folder, gboolean refresh);
+void tny_msg_header_list_model_set_folder (TnyMsgHeaderListModel *self, TnyFolderIface *folder, gboolean refresh);
 gint tny_msg_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 gint tny_msg_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 
