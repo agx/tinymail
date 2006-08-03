@@ -78,6 +78,56 @@ Shared include file with forward typedefs
 @del_part_func: 
 @add_part_func: 
 
+<!-- ##### STRUCT TnyFolderIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL TnyFolderIface::folder-inserted ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyFolderIface::folders-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+
+<!-- ##### STRUCT TnyFolderIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@folder_inserted: 
+@folders_reloaded: 
+@remove_message_func: 
+@expunge_func: 
+@get_folders_func: 
+@get_message_func: 
+@get_headers_func: 
+@get_name_func: 
+@get_id_func: 
+@get_account_func: 
+@set_name_func: 
+@set_id_func: 
+@set_account_func: 
+@get_folder_type_func: 
+@get_all_count_func: 
+@get_unread_count_func: 
+@uncache_func: 
+@has_cache_func: 
+@set_subscribed_func: 
+@get_subscribed_func: 
+@refresh_async_func: 
+@refresh_func: 
+
 <!-- ##### STRUCT TnyMsgHeaderIface ##### -->
 <para>
 

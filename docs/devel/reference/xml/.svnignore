@@ -21,7 +21,6 @@ tny-msg-view.xml
 tny-platform-factory-iface.xml
 tny-msg-header-iface-test.xml
 tny-device.xml
-tny-msg-folder.xml
 tny-msg-mime-part-iface-test.xml
 tny-account-iface.xml
 tny-summary-window.xml
@@ -51,7 +50,6 @@ tny-msg-window-iface.xml
 tny-stream-iface.xml
 tny-session-camel.xml
 tny-msg-view-iface.xml
-tny-msg-folder-iface.xml
 tny-device-iface.xml
 tny-test-suite.xml
 tny-summary-window-iface.xml
@@ -63,12 +61,9 @@ tny-list-iface.xml
 tny-msg-header-list-model-priv.xml
 tny-msg-header-list-iterator-priv.xml
 tny-iterator-iface.xml
-tny-msg-folder-list-priv.xml
-tny-msg-folder-list-iterator-priv.xml
 tny-summary-view.xml
 tny-list-iterator-priv.xml
 tny-device-iface-test.xml
-tny-msg-folder-iface-test.xml
 tny-account-tree-model-iterator-priv.xml
 tny-list-iface-test.xml
 tny-summary-view-iface.xml
@@ -78,3 +73,11 @@ tny-list.xml
 tny-account-iface-test.xml
 tny-list-priv.xml
 tny-account-tree-model-priv.xml
+tny-platform-factory-iface-test.xml
+tny-folder-iface.xml
+tny-test-object.xml
+tny-folder-list-priv.xml
+tny-account-store-iface-test.xml
+tny-folder.xml
+tny-folder-list-iterator-priv.xml
+tny-folder-priv.xml

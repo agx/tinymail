@@ -1,0 +1,50 @@
+<!-- ##### SECTION Title ##### -->
+tny-folder-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyFolderPriv ##### -->
+<para>
+
+</para>
+
+@loaded: 
+@headers_list_type: 
+@folder_changed_id: 
+@folder_lock: 
+@folder: 
+@folder_name: 
+@account: 
+@folders_lock: 
+@folders: 
+@cached_length: 
+@unread_length: 
+@subscribed: 
+@has_summary_cap: 
+@cached_name: 
+@cached_folder_type: 
+
+<!-- ##### MACRO TNY_FOLDER_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
+
