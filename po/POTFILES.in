@@ -30,7 +30,6 @@ libtinymailui-gtk/tny-text-buffer-stream.c
 libtinymailui-gtk/tny-msg-header-view.c
 libtinymailui-gtk/tny-save-strategy.c
 libtinymail-gnomevfs/tny-vfs-stream.c
-libtinymailui/tny-summary-window-iface.c
 libtinymailui/tny-platform-factory-iface.c
 libtinymailui/tny-msg-window-iface.c
 libtinymailui/tny-msg-view-iface.c

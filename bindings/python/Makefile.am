@@ -66,7 +66,7 @@ EXTRA_DIST = 			\
 # To update:
 # ls DIR/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\t\\\\/g
 
-tinymail.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
+tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py \
 	$(top_srcdir)/libtinymail/tny-account-iface.h		\
 	$(top_srcdir)/libtinymail/tny-account-store-iface.h	\
@@ -85,7 +85,7 @@ tinymail.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymail.defs.extra $(top_
 	$(top_srcdir)/libtinymail/tny-transport-account-iface.h | \
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymail.defs.extra > $@
 
-tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
+tinymailui.defs: tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
 	$(top_srcdir)/libtinymailui/tny-account-store-view-iface.h \
 	$(top_srcdir)/libtinymailui/tny-msg-header-view-iface.h	   \
@@ -97,7 +97,7 @@ tinymailui.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui.defs.extra $(
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymailui.defs.extra > $@
 
 
-tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
+tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
 	$(top_srcdir)/libtinymailui-gtk/tny-account-tree-model.h	\
 	$(top_srcdir)/libtinymailui-gtk/tny-attach-list-model.h		\
@@ -109,7 +109,7 @@ tinymailui-gtk.defs: $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymailui-gtk.defs.
 	$(top_srcdir)/libtinymailui-gtk/tny-text-buffer-stream.h |	\
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymailui-gtk.defs.extra > $@
 
-tinymail-platform.defs : $(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py
+tinymail-platform.defs : tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				  \
 	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs` | \
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymail-platform.defs.extra > $@
