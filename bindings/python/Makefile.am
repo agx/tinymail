@@ -84,7 +84,7 @@ tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(top_srcdir)/libtinymail/tny-store-account-iface.h 	\
 	$(top_srcdir)/libtinymail/tny-stream-iface.h 		\
 	$(top_srcdir)/libtinymail/tny-transport-account-iface.h | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymail.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymail.defs.extra > $@
 
 tinymailui.defs: tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
@@ -95,7 +95,7 @@ tinymailui.defs: tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(top_srcdir)/libtinymailui/tny-platform-factory-iface.h   \
 	$(top_srcdir)/libtinymailui/tny-save-strategy-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-summary-view-iface.h |	   \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymailui.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymailui.defs.extra > $@
 
 
 tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
@@ -108,31 +108,31 @@ tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/fil
 	$(top_srcdir)/libtinymailui-gtk/tny-msg-window.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-save-strategy.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-text-buffer-stream.h |	\
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymailui-gtk.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra > $@
 
 tinymail-platform.defs : tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				  \
 	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs` | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=tinymail-platform.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymail-platform.defs.extra > $@
 
 tinymail-glue.c: tinymail.defs tinymail.override
-	$(PYGTK_CODEGEN) --prefix pytinymail		\
-	--override tinymail.override			\
+	$(PYGTK_CODEGEN) --prefix pytinymail				\
+	--override $(top_srcdir)/bindings/python/tinymail.override	\
 	tinymail.defs > $@
 
 tinymailui-glue.c: tinymailui.defs tinymailui.override
-	$(PYGTK_CODEGEN) --prefix pyui			\
-	--register tinymail.defs			\
-	--override tinymailui.override			\
+	$(PYGTK_CODEGEN) --prefix pyui					\
+	--register tinymail.defs					\
+	--override $(top_srcdir)/bindings/python/tinymailui.override	\
 	tinymailui.defs > $@
 
 tinymailui-gtk-glue.c: tinymailui-gtk.defs tinymailui-gtk.override
-	$(PYGTK_CODEGEN) --prefix pyuigtk		\
-	--register $(PYGTK_DEFSDIR)/gdk-types.defs      \
-	--register $(PYGTK_DEFSDIR)/gtk-types.defs      \
-	--register tinymail.defs			\
-	--register tinymailui.defs			\
-	--override tinymailui-gtk.override		\
+	$(PYGTK_CODEGEN) --prefix pyuigtk				 \
+	--register $(PYGTK_DEFSDIR)/gdk-types.defs      		 \
+	--register $(PYGTK_DEFSDIR)/gtk-types.defs      		 \
+	--register tinymail.defs					 \
+	--register tinymailui.defs					 \
+	--override $(top_srcdir)/bindings/python/tinymailui-gtk.override \
 	tinymailui-gtk.defs > $@
 
 platform_include.h:
@@ -142,6 +142,6 @@ tinymail-platform-glue.c: tinymail-platform.defs tinymail-platform.override plat
 	$(PYGTK_CODEGEN) --prefix pyplatform		\
 	--register tinymailui.defs			\
 	--register tinymail.defs			\
-	--override tinymail-platform.override		\
+	--override $(top_srcdir)/bindings/python/tinymail-platform.override \
 	tinymail-platform.defs > $@
 
