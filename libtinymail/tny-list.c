@@ -39,6 +39,7 @@ tny_list_append (TnyListIface *self, GObject* item)
 	TnyListPriv *priv = TNY_LIST_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->iterator_lock);
+	g_object_ref (G_OBJECT (item));
 	priv->first = g_list_append (priv->first, item);
 	g_mutex_unlock (priv->iterator_lock);
 
@@ -51,6 +52,7 @@ tny_list_prepend (TnyListIface *self, GObject* item)
 	TnyListPriv *priv = TNY_LIST_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->iterator_lock);
+	g_object_ref (G_OBJECT (item));
 	priv->first = g_list_prepend (priv->first, item);
 	g_mutex_unlock (priv->iterator_lock);
 
@@ -79,9 +81,7 @@ tny_list_remove (TnyListIface *self, GObject* item)
 	g_mutex_lock (priv->iterator_lock);
 
 	priv->first = g_list_remove (priv->first, item);
-
-	if (G_IS_OBJECT (item))
-		g_object_unref (G_OBJECT (item));
+	g_object_unref (G_OBJECT (item));
 
 	g_mutex_unlock (priv->iterator_lock);
 

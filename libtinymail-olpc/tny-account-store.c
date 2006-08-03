@@ -297,6 +297,8 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 				per_account_get_pass_func);
 
 			tny_list_iface_prepend (list, (GObject*)account);
+			g_object_unref (G_OBJECT (account));
+
 		}
 
 		if (proto)

@@ -112,6 +112,8 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 		priv->parts = tny_list_new ();
 
 	tny_list_iface_prepend (priv->parts, (GObject*)tpart);
+	g_object_unref (G_OBJECT (tpart));
+
 	g_mutex_unlock (priv->parts_lock);
 
 	return TRUE;
@@ -272,6 +274,7 @@ tny_msg_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
 		priv->parts = tny_list_new ();
 
 	tny_list_iface_prepend (priv->parts, (GObject*)part); curl++;
+	g_object_unref (G_OBJECT (part));
 
 	g_mutex_unlock (priv->parts_lock);
 

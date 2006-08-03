@@ -366,6 +366,8 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 
 			tny_list_iface_prepend (list, account);
+			g_object_unref (G_OBJECT (account));
+
 		}
 
 		if (proto)

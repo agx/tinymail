@@ -60,6 +60,7 @@ _tny_msg_folder_list_intern_prepend (TnyMsgFolderList *self, TnyMsgFolderIface *
 {
 	TnyMsgFolderPriv *priv = NULL;
 
+	/* Internally, we don*/
 	if (self->pfolder)
 		priv = TNY_MSG_FOLDER_GET_PRIVATE (self->pfolder);
 

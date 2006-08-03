@@ -2,11 +2,11 @@
 TnyAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-A implementation of #TnyAccountStoreIface
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A implementation of #TnyAccountStoreIface that uses GNOME desktop features like GConf and the Camel implementation of libtinymail
+
 </para>
 
 

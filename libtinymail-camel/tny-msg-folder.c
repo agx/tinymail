@@ -351,6 +351,8 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	camel_folder_free_message_info (cfol, mi);
 
 	tny_list_iface_prepend (headers, (GObject*)header);
+	g_object_unref (G_OBJECT (header));
+
 	priv->cached_length++;
 	/* TODO: If unread -- priv->unread_length++; */
 

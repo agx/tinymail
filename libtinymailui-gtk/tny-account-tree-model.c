@@ -188,6 +188,7 @@ tny_account_tree_model_prepend (TnyListIface *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Prepend something to the list */
+	g_object_ref (G_OBJECT (item));
 	me->first = g_list_prepend (me->first, item);
 	tny_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), 
 		gtk_tree_store_prepend);
@@ -203,6 +204,7 @@ tny_account_tree_model_append (TnyListIface *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Append something to the list */
+	g_object_ref (G_OBJECT (item));
 	me->first = g_list_append (me->first, item);
 	tny_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), 
 		gtk_tree_store_append);

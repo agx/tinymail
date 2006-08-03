@@ -593,6 +593,7 @@ tny_msg_header_list_model_prepend (TnyListIface *self, GObject* item)
 	/* Prepend something to the list */
 
 	g_mutex_lock (me->iterator_lock);
+	g_object_ref (G_OBJECT (item));
 	me->first = g_list_prepend (me->first, item);
 	me->length++;
 
@@ -628,6 +629,7 @@ tny_msg_header_list_model_append (TnyListIface *self, GObject* item)
 	/* Append something to the list */
 
 	g_mutex_lock (me->iterator_lock);
+	g_object_ref (G_OBJECT (item));
 	me->first = g_list_append (me->first, item);
 	me->length++;
 

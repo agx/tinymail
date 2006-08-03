@@ -88,11 +88,21 @@ tny_list_iface_test_list (void)
 	TnyIteratorIface *iterator;
 	TnyTestObject *item;
 	gint i;
+	GObject *a, *b, *c, *d;
 
-	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("2")));
-	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("3")));
-	tny_list_iface_append (iface, tny_test_object_new (g_strdup ("4")));
-	tny_list_iface_prepend (iface, tny_test_object_new (g_strdup ("1")));
+	a = tny_test_object_new (g_strdup ("2"));
+	b = tny_test_object_new (g_strdup ("3"));
+	c = tny_test_object_new (g_strdup ("4"));
+	d = tny_test_object_new (g_strdup ("1"));
+	
+	tny_list_iface_append (iface, a);
+	g_object_unref (G_OBJECT (a)); 
+	tny_list_iface_append (iface, b);
+	g_object_unref (G_OBJECT (b));
+	tny_list_iface_append (iface, c);
+	g_object_unref (G_OBJECT (c));
+	tny_list_iface_prepend (iface, d);
+	g_object_unref (G_OBJECT (d));
 
 	counter=1;
 	tny_list_iface_foreach (iface, tny_list_iface_test_foreach, NULL);
