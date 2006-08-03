@@ -87,7 +87,7 @@ tny_msg_window_new (TnyMsgViewIface *msgview)
 
 	priv->msg_view = msgview;
 
-	/* This adds a reference */
+	/* This adds a reference to msgview (it's a gtkwidget) */
 	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));
 

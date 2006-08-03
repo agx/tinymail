@@ -211,6 +211,7 @@ tny_summary_view_set_account_store (TnyAccountStoreViewIface *self, TnyAccountSt
 		g_object_unref (G_OBJECT (priv->account_store));
 	}
 
+	g_object_ref (G_OBJECT (account_store));
 
 	if (G_LIKELY (device))
 	{
@@ -322,10 +323,15 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			{
 				msg = tny_msg_folder_iface_get_message ((TnyMsgFolderIface*)folder, header);
 				if (G_LIKELY (msg))
+				{
 					tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));
-				else 
+					/* Reparent */
+					g_object_unref (G_OBJECT (msg));
+				} else { 
 					tny_msg_view_iface_set_unavailable (priv->msg_view, header);
-
+					/* Reparent */
+					g_object_unref (G_OBJECT (header));
+				}
 			}
 		} else {
 			tny_msg_view_iface_set_unavailable (priv->msg_view, NULL);

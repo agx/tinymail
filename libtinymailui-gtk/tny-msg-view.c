@@ -98,6 +98,7 @@ reload_msg (TnyMsgViewIface *self)
 	gtk_text_buffer_set_text (buffer, "", 0);
 
 	tny_msg_header_view_iface_set_header (priv->headerview, header);
+
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
 	while (next)
@@ -146,7 +147,7 @@ tny_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *str
 	if (priv->save_strategy)
 		g_object_unref (G_OBJECT (priv->save_strategy));
 
-	/* g_object_ref (G_OBJECT (strategy)); */
+	g_object_ref (G_OBJECT (strategy));
 	priv->save_strategy = strategy;
 
 	return;
@@ -256,8 +257,7 @@ tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
 
-	/* g_object_ref (G_OBJECT (msg)); */
-
+	g_object_ref (G_OBJECT (msg));
 	priv->msg = msg;
 
 	reload_msg (self);
