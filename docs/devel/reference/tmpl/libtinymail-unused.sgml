@@ -1,27 +1,3 @@
-<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Long_Description ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:See_Also ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Short_Description ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-folder-iface-test.sgml:Title ##### -->
-tny-folder-iface-test
-
-
 <!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Long_Description ##### -->
 <para>
 
@@ -43,8 +19,6 @@ tny-folder-iface-test
 
 
 <!-- ##### SECTION ./tmpl/tny-msg-folder.sgml:Stability_Level ##### -->
-
-
 
 
 
@@ -186,6 +160,14 @@ TnySummaryWindow
 
 @parent_class: 
 
+<!-- ##### STRUCT TnyFolderProxy ##### -->
+<para>
+
+</para>
+
+@parent: 
+@real: 
+
 <!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
 <para>
 A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
@@ -204,70 +186,6 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @what: What happened
 @status: A status field
 @user_data: user data
-
-<!-- ##### STRUCT TnyFolder ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyFolderIface ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SIGNAL TnyFolderIface::folder-inserted ##### -->
-<para>
-
-</para>
-
-@tnymsgfolderiface: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyFolderIface::folders-reloaded ##### -->
-<para>
-
-</para>
-
-@tnymsgfolderiface: the object which received the signal.
-
-<!-- ##### STRUCT TnyFolderIfaceClass ##### -->
-<para>
-
-</para>
-
-@parent: 
-@folder_inserted: 
-@folders_reloaded: 
-@remove_message_func: 
-@expunge_func: 
-@get_folders_func: 
-@get_message_func: 
-@get_headers_func: 
-@get_name_func: 
-@get_id_func: 
-@get_account_func: 
-@set_name_func: 
-@set_id_func: 
-@set_account_func: 
-@get_folder_type_func: 
-@get_all_count_func: 
-@get_unread_count_func: 
-@uncache_func: 
-@has_cache_func: 
-@set_subscribed_func: 
-@get_subscribed_func: 
-@refresh_async_func: 
-@refresh_func: 
-
-<!-- ##### STRUCT TnyFolderProxy ##### -->
-<para>
-
-</para>
-
-@parent: 
-@real: 
 
 <!-- ##### STRUCT TnyMsgHeaderListIteratorClass ##### -->
 <para>
