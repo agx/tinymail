@@ -21,4 +21,19 @@ endif
 
 SUBDIRS += bindings po 
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
+DIST_SUBDIRS = \
+	libtinymail \
+	libtinymailui \
+	libtinymail-gnomevfs \
+	libtinymailui-gtk \
+	libtinymail-camel \
+	tinymail docs \
+	libtinymail-test \
+	bindings po \
+	libtinymail-maemo \
+	libtinymail-olpc \
+	libtinymail-gpe m4 \
+	libtinymailui-mozembed \
+	libtinymail-gnome-desktop
+
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-python-bindings --enable-unit-tests
