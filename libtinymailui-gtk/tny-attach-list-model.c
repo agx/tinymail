@@ -120,11 +120,22 @@ tny_attach_list_model_new (void)
 	return self;
 }
 
+static void 
+destroy_parts (gpointer item, gpointer user_data)
+{
+	g_object_unref (G_OBJECT (item));
+}
+
 static void
 tny_attach_list_model_finalize (GObject *object)
 {
 	TnyAttachListModelPriv *priv = TNY_ATTACH_LIST_MODEL_GET_PRIVATE (object);
 	TnyAttachListModel *me = (TnyAttachListModel*) object;
+
+
+	g_mutex_lock (me->iterator_lock);
+	g_list_foreach (me->first, destroy_parts, NULL);
+	g_mutex_unlock (me->iterator_lock);
 
 	g_mutex_free (me->iterator_lock);
 	me->iterator_lock = NULL;
