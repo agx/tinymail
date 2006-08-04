@@ -75,11 +75,10 @@ reload_msg (TnyMsgViewIface *self)
 	GtkTextBuffer *buffer;
 	TnyStreamIface *dest;
 	TnyMsgHeaderIface *header;
-	TnyListIface *parts;
 	TnyIteratorIface *iterator;
 	const gchar *str = NULL;
 	gboolean first_attach = TRUE, next = FALSE;
-	TnyAttachListModel *model;
+	TnyAttachListModel *model = tny_attach_list_model_new ();;
 
 	g_return_if_fail (priv->msg);
 
@@ -89,8 +88,8 @@ reload_msg (TnyMsgViewIface *self)
 
 	g_return_if_fail (header);
 
-	parts = (TnyListIface*)tny_msg_iface_get_parts (priv->msg);
-	iterator = tny_list_iface_create_iterator (parts);
+	tny_msg_iface_get_parts (priv->msg, TNY_LIST_IFACE (model));
+	iterator = tny_list_iface_create_iterator (TNY_LIST_IFACE (model));
 	next = tny_iterator_iface_has_first (iterator);
 
 	gtk_widget_hide (priv->attachview_sw);
@@ -110,13 +109,10 @@ reload_msg (TnyMsgViewIface *self)
 			tny_stream_iface_reset (dest);
 			tny_msg_mime_part_iface_write_to_stream (part, dest);
 			tny_stream_iface_reset (dest);
+
 		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
 			tny_msg_mime_part_iface_is_attachment (part))
-		{
-			if (G_UNLIKELY (first_attach))
-				model = tny_attach_list_model_new ();
-
-			tny_attach_list_model_add (model, part);
+		{			
 			first_attach = FALSE;
 		}
 
@@ -135,6 +131,8 @@ reload_msg (TnyMsgViewIface *self)
 		gtk_icon_view_set_model (priv->attachview, GTK_TREE_MODEL (model));
 		gtk_widget_show (priv->attachview_sw);
 	}
+
+	g_object_unref (G_OBJECT (model));
 
 	return;
 }

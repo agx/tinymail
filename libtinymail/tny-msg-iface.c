@@ -45,20 +45,21 @@ tny_msg_iface_get_folder (TnyMsgIface *self)
 /**
  * tny_msg_iface_get_parts:
  * @self: a #TnyMsgIface object
+ * @list: a #TnyListIface object
  * 
  * Get a read-only list of mime-parts of this message
  *
- * Return value: A read-only #TnyListIface with #TnyMsgMimePartIface instances
  **/
-TnyListIface*
-tny_msg_iface_get_parts (TnyMsgIface *self)
+void
+tny_msg_iface_get_parts (TnyMsgIface *self, TnyListIface *list)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_IFACE_GET_CLASS (self)->get_parts_func)
 		g_critical ("You must implement tny_msg_iface_get_parts\n");
 #endif
 
-	return TNY_MSG_IFACE_GET_CLASS (self)->get_parts_func (self);
+	TNY_MSG_IFACE_GET_CLASS (self)->get_parts_func (self, list);
+	return;
 }
 
 

@@ -52,6 +52,8 @@ enum _TnyAttachListModelColumn
 struct _TnyAttachListModel
 {
 	GtkListStore parent;
+	GList *first;
+	GMutex *iterator_lock;
 };
 
 struct _TnyAttachListModelClass
@@ -62,9 +64,7 @@ struct _TnyAttachListModelClass
 
 GType tny_attach_list_model_get_type (void);
 GType tny_attach_list_model_column_get_type (void);
-
 TnyAttachListModel* tny_attach_list_model_new (void);
-void tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part);
 
 G_END_DECLS
 

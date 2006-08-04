@@ -31,14 +31,12 @@ struct _TnyMsgPriv
 	GMutex *header_lock;
 	TnyMsgHeaderIface *header;
 	GMutex *parts_lock;
-	TnyListIface *parts;
 	GMutex *folder_lock;
 	TnyFolderIface *folder;
-	gboolean pop;
 };
 
 CamelMimeMessage* _tny_msg_get_camel_mime_message (TnyMsg *self);
-void _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message, gboolean pop);
+void _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message);
 void _tny_msg_header_set_not_uncachable (TnyMsgHeader *self);
 void _tny_msg_set_folder (TnyMsgIface *self, TnyFolderIface *folder);
 

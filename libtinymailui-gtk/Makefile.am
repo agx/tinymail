@@ -31,6 +31,8 @@ libtinymailui_gtk_1_0_la_SOURCES = 	       \
 	tny-account-tree-model-priv.h	       \
 	tny-msg-header-list-model.c	       \
 	tny-msg-header-list-iterator.c	       \
+	tny-attach-list-model-iterator-priv.h  \
+	tny-attach-list-model-iterator.c       \
 	tny-account-tree-model.c	       \
 	tny-attach-list-model-priv.h	       \
 	tny-attach-list-model.c		       \
