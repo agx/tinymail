@@ -255,6 +255,12 @@ tny_moz_embed_msg_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_d
 	TnyMozEmbedMsgView *self = user_data;
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
+	if (!G_LIKELY (priv->save_strategy))
+	{
+		g_warning (_("No save strategy for this message view\n"));
+		return;
+	}
+
 	gtk_icon_view_selected_foreach (priv->attachview,
 		for_each_selected_attachment, self);
 

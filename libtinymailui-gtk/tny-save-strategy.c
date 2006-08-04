@@ -98,12 +98,14 @@ save_to_file (const gchar *local_filename, TnyMsgMimePartIface *part)
 static void
 tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
 {
-	GtkFileChooserDialog *dialog = GTK_FILE_CHOOSER_DIALOG 
+	GtkFileChooserDialog *dialog;
+	gboolean destr=FALSE;
+
+	dialog = GTK_FILE_CHOOSER_DIALOG 
 		(gtk_file_chooser_dialog_new (_("Save File"), NULL,
 		GTK_FILE_CHOOSER_ACTION_SAVE,
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, 
 		GTK_RESPONSE_ACCEPT, NULL));
-	gboolean destr=FALSE;
 
 	/* gtk_file_chooser_set_do_overwrite_confirmation 
 		(GTK_FILE_CHOOSER (dialog), TRUE); */
