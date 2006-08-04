@@ -57,18 +57,24 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part, 
 			tny_msg_mime_part_iface_is_attachment (part))
 	{
 
-		if (!priv->theme)
+		if (!priv->theme || !GTK_IS_ICON_THEME (priv->theme))
+		{
 			priv->theme = gtk_icon_theme_get_default ();
+			g_object_ref (G_OBJECT (priv->theme));
+		}
 
 #ifdef GNOME
-		icon = gnome_icon_lookup (priv->theme, NULL, 
-			tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
-			tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
+		if (priv->theme && GTK_IS_ICON_THEME (priv->theme))
+		{
+			icon = gnome_icon_lookup (priv->theme, NULL, 
+				tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
+				tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
+		}
 #else
 		icon = GTK_STOCK_FILE;
 #endif
 
-		if (G_LIKELY (icon) && priv->theme)
+		if (G_LIKELY (icon) && priv->theme && GTK_IS_ICON_THEME (priv->theme))
 		{
 			pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
 				GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
@@ -76,7 +82,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part, 
 			g_free (icon);
 #endif
 		} else {
-			if (G_UNLIKELY (!stock_file_pixbuf) && priv->theme)
+			if (G_UNLIKELY (!stock_file_pixbuf) && priv->theme && GTK_IS_ICON_THEME (priv->theme))
 				stock_file_pixbuf = gtk_icon_theme_load_icon (priv->theme, 
 					GTK_STOCK_FILE, GTK_ICON_SIZE_LARGE_TOOLBAR, 
 					0, NULL);
