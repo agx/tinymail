@@ -252,6 +252,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @account: 
 
+<!-- ##### FUNCTION tny_attach_list_model_add ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+
 <!-- ##### FUNCTION tny_device_get_new ##### -->
 <para>
 

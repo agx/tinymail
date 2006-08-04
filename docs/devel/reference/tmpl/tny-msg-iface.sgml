@@ -24,7 +24,7 @@ therefore be used as a mime part.
 </para>
 
 @self: 
-@Returns: 
+@list: 
 
 
 <!-- ##### FUNCTION tny_msg_iface_get_header ##### -->

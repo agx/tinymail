@@ -2,35 +2,44 @@
 TnyFolderIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A type that defines a folder
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A folder contains headers and children folders. A folder can have a account or another 
+folder as parent. An implementation of a #TnyStoreAccountIface will typically keep
+track of instances of this type.
+</para><para>
+If you got them from a #TnyStoreAccountIface implementation,
+you typically don't destroy instances of this type. The #TnyStoreAccountIface implementation
+will do that for you upon destruction of the account. You can, however, uncache the folder 
+instances. Depending on the implementation, this will reduce memory usage.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyStoreAccountIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### VARIABLE tny_folder_iface_signals ##### -->
+<!-- ##### STRUCT TnyFolder ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
+<!-- ##### FUNCTION tny_folder_new_with_folder ##### -->
 <para>
 
 </para>
 
+@camel_folder: 
+@Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_type_get_type ##### -->
+<!-- ##### FUNCTION tny_folder_new ##### -->
 <para>
 
 </para>
@@ -38,175 +47,21 @@ TnyFolderIface
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_iface_remove_message ##### -->
+<!-- ##### FUNCTION tny_folder_set_folder ##### -->
 <para>
 
 </para>
 
 @self: 
-@header: 
+@camel_folder: 
 
 
-<!-- ##### FUNCTION tny_folder_iface_expunge ##### -->
-<para>
-
-</para>
-
-@self: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_folders ##### -->
+<!-- ##### FUNCTION tny_folder_get_folder ##### -->
 <para>
 
 </para>
 
 @self: 
 @Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_message ##### -->
-<para>
-
-</para>
-
-@self: 
-@header: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_headers ##### -->
-<para>
-
-</para>
-
-@self: 
-@headers: 
-@refresh: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_account ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_id ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_name ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_set_account ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
-<para>
-
-</para>
-
-@self: 
-@id: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_set_name ##### -->
-<para>
-
-</para>
-
-@self: 
-@name: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_folder_type ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_all_count ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_unread_count ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_uncache ##### -->
-<para>
-
-</para>
-
-@self: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_set_subscribed ##### -->
-<para>
-
-</para>
-
-@self: 
-@subscribed: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_get_subscribed ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_refresh_async ##### -->
-<para>
-
-</para>
-
-@self: 
-@callback: 
-@status_callback: 
-@user_data: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_refresh ##### -->
-<para>
-
-</para>
-
-@self: 
 
 
