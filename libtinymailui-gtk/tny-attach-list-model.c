@@ -68,7 +68,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part, 
 		icon = GTK_STOCK_FILE;
 #endif
 
-		if (G_LIKELY (icon))
+		if (G_LIKELY (icon) && priv->theme)
 		{
 			pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
 				GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
@@ -76,7 +76,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part, 
 			g_free (icon);
 #endif
 		} else {
-			if (G_UNLIKELY (!stock_file_pixbuf))
+			if (G_UNLIKELY (!stock_file_pixbuf) && priv->theme)
 				stock_file_pixbuf = gtk_icon_theme_load_icon (priv->theme, 
 					GTK_STOCK_FILE, GTK_ICON_SIZE_LARGE_TOOLBAR, 
 					0, NULL);
