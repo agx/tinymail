@@ -29,7 +29,7 @@ struct _TnyMsgPriv
 {
 	GMutex *message_lock;
 	GMutex *header_lock;
-	TnyMsgHeaderIface *header;
+	TnyHeaderIface *header;
 	GMutex *parts_lock;
 	GMutex *folder_lock;
 	TnyFolderIface *folder;
@@ -37,7 +37,7 @@ struct _TnyMsgPriv
 
 CamelMimeMessage* _tny_msg_get_camel_mime_message (TnyMsg *self);
 void _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message);
-void _tny_msg_header_set_not_uncachable (TnyMsgHeader *self);
+void _tny_header_set_not_uncachable (TnyHeader *self);
 void _tny_msg_set_folder (TnyMsgIface *self, TnyFolderIface *folder);
 
 #endif

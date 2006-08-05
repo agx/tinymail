@@ -17,7 +17,7 @@
 	* bindings/python/*: Some fixes for the Python bindings
 	* libtinymailui-gtk/tny-account-tree-model-priv.h, libtinymailui-gtk/
 	tny-account-tree-model.h, libtinymailui-gtk/
-	tny-msg-header-list-model-priv.h: Forward typedefs don't work well
+	tny-header-list-model-priv.h: Forward typedefs don't work well
 	with the python binding generator
 
 07-29-2006  Gustavo J. A. M. Carneiro <gjc@inescporto.pt>

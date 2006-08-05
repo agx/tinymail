@@ -24,7 +24,7 @@
 
 #include "tny-test-suite.h"
 
-#include "tny-msg-header-iface-test.h"
+#include "tny-header-iface-test.h"
 #include "tny-stream-iface-test.h"
 #include "tny-mime-part-iface-test.h"
 #include "tny-list-iface-test.h"
@@ -41,7 +41,7 @@ gunit_get_test_suites()
 {
 	GList *suites = NULL;
 
-	suites = g_list_append (suites, create_tny_msg_header_iface_suite ());
+	suites = g_list_append (suites, create_tny_header_iface_suite ());
 	suites = g_list_append (suites, create_tny_stream_iface_suite ());
 	suites = g_list_append (suites, create_tny_mime_part_iface_suite ());
 	suites = g_list_append (suites, create_tny_list_iface_suite ());

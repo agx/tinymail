@@ -30,10 +30,10 @@
 #include <tny-msg.h>
 #include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 #include <tny-mime-part.h>
 #include <tny-stream-camel.h>
-#include <tny-msg-header.h>
+#include <tny-header.h>
 
 #include <tny-camel-shared.h>
 
@@ -43,7 +43,7 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-priv.h"
 #include "tny-mime-part-priv.h"
-#include "tny-msg-header-priv.h"
+#include "tny-header-priv.h"
 
 #define TNY_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG, TnyMsgPriv))
@@ -183,11 +183,11 @@ tny_msg_get_parts (TnyMsgIface *self, TnyListIface *list)
 	return;
 }
 
-static TnyMsgHeaderIface*
+static TnyHeaderIface*
 tny_msg_get_header (TnyMsgIface *self)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
-	TnyMsgHeaderIface *retval;
+	TnyHeaderIface *retval;
 
 	g_mutex_lock (priv->header_lock);
 	retval = priv->header;
@@ -271,7 +271,7 @@ tny_msg_del_part (TnyMsgIface *self, gint id)
 
 
 static void
-tny_msg_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
+tny_msg_set_header (TnyMsgIface *self, TnyHeaderIface *header)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 
@@ -344,7 +344,7 @@ tny_msg_new (void)
 
 /**
  * tny_msg_new_with_header:
- * @header: a #TnyMsgHeaderIface object
+ * @header: a #TnyHeaderIface object
  *
  * The #TnyMsg implementation is actually a proxy for #CamelMimeMessage (and
  * a few other Camel types)
@@ -352,7 +352,7 @@ tny_msg_new (void)
  * Return value: A new #TnyMsgIface instance implemented for Camel
  **/
 TnyMsg*
-tny_msg_new_with_header (TnyMsgHeaderIface *header)
+tny_msg_new_with_header (TnyHeaderIface *header)
 {
 	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
 

@@ -5,8 +5,8 @@
 #include <tny-mime-part.h>
 #include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
-#include <tny-msg-header.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header.h>
+#include <tny-header-iface.h>
 #include <tny-account-iface.h>
 #include <tny-account-store-iface.h>
 #include <tny-transport-account-iface.h>
@@ -94,8 +94,8 @@ send_test (gboolean multipart)
 
 	TnyMsgIface *msg = TNY_MSG_IFACE (tny_msg_new ());
 
-	TnyMsgHeaderIface *header = 
-		TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
+	TnyHeaderIface *header = 
+		TNY_HEADER_IFACE (tny_header_new ());
 
 	TnyStreamIface *mime_stream = TNY_STREAM_IFACE 
 		(tny_stream_camel_new (camel_stream_mem_new())); 
@@ -122,9 +122,9 @@ send_test (gboolean multipart)
 	tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), "localhost");
 	tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account), get_pass_func);
 
-	tny_msg_header_iface_set_to (header, "Philip Van Hoof <spam@pvanhoof.be>");
-	tny_msg_header_iface_set_from (header, "Philip Van Hoof <spam@pvanhoof.be>");
-	tny_msg_header_iface_set_subject (header, "testing");
+	tny_header_iface_set_to (header, "Philip Van Hoof <spam@pvanhoof.be>");
+	tny_header_iface_set_from (header, "Philip Van Hoof <spam@pvanhoof.be>");
+	tny_header_iface_set_subject (header, "testing");
 
 	tny_msg_iface_set_header (msg, header);
 

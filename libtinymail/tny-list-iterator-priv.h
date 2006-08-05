@@ -54,7 +54,7 @@ struct _TnyListIteratorClass
 
 GType _tny_list_iterator_get_type (void);
 void _tny_list_iterator_set_model (TnyListIterator *self, TnyList *model);
-TnyListIterator* _tny_msg_header_list_iterator_new (TnyList *model);
+TnyListIterator* _tny_header_list_iterator_new (TnyList *model);
 
 G_END_DECLS
 

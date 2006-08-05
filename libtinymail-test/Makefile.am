@@ -13,8 +13,8 @@ bin_PROGRAMS = tny-simple-test-runner tny-test-anything
 libtinymail_test_suite_la_SOURCES = 		\
 	tny-test-object.h			\
 	tny-test-object.c			\
-	tny-msg-header-iface-test.h		\
-	tny-msg-header-iface-test.c		\
+	tny-header-iface-test.h			\
+	tny-header-iface-test.c			\
 	tny-stream-iface-test.h			\
 	tny-stream-iface-test.c			\
 	tny-list-iface-test.h			\

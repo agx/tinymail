@@ -13,22 +13,22 @@
 
 
 
-(define-enum MsgHeaderListModelColumn
+(define-enum HeaderListModelColumn
   (in-module "Tny")
-  (c-name "TnyMsgHeaderListModelColumn")
-  (gtype-id "TNY_TYPE_MSG_HEADER_LIST_MODEL_COLUMN")
+  (c-name "TnyHeaderListModelColumn")
+  (gtype-id "TNY_TYPE_HEADER_LIST_MODEL_COLUMN")
   (values
-    '("from" "TNY_MSG_HEADER_LIST_MODEL_FROM_COLUMN")
-    '("to" "TNY_MSG_HEADER_LIST_MODEL_TO_COLUMN")
-    '("subject" "TNY_MSG_HEADER_LIST_MODEL_SUBJECT_COLUMN")
-    '("cc" "TNY_MSG_HEADER_LIST_MODEL_CC_COLUMN")
-    '("date_sent" "TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_COLUMN")
-    '("date_received_t" "TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN")
-    '("date_sent_t" "TNY_MSG_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN")
-    '("date_received" "TNY_MSG_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN")
-    '("instance" "TNY_MSG_HEADER_LIST_MODEL_INSTANCE_COLUMN")
-    '("flags" "TNY_MSG_HEADER_LIST_MODEL_FLAGS_COLUMN")
-    '("n" "TNY_MSG_HEADER_LIST_MODEL_N_COLUMNS")
+    '("from" "TNY_HEADER_LIST_MODEL_FROM_COLUMN")
+    '("to" "TNY_HEADER_LIST_MODEL_TO_COLUMN")
+    '("subject" "TNY_HEADER_LIST_MODEL_SUBJECT_COLUMN")
+    '("cc" "TNY_HEADER_LIST_MODEL_CC_COLUMN")
+    '("date_sent" "TNY_HEADER_LIST_MODEL_DATE_SENT_COLUMN")
+    '("date_received_t" "TNY_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN")
+    '("date_sent_t" "TNY_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN")
+    '("date_received" "TNY_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN")
+    '("instance" "TNY_HEADER_LIST_MODEL_INSTANCE_COLUMN")
+    '("flags" "TNY_HEADER_LIST_MODEL_FLAGS_COLUMN")
+    '("n" "TNY_HEADER_LIST_MODEL_N_COLUMNS")
   )
 )
 

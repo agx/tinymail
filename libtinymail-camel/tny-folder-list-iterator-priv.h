@@ -54,7 +54,7 @@ struct _TnyFolderListIteratorClass
 
 GType _tny_folder_list_iterator_get_type (void);
 void _tny_folder_list_iterator_set_model (TnyFolderListIterator *self, TnyFolderList *model);
-TnyFolderListIterator* _tny_msg_header_list_iterator_new (TnyFolderList *model);
+TnyFolderListIterator* _tny_header_list_iterator_new (TnyFolderList *model);
 
 G_END_DECLS
 

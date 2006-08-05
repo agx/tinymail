@@ -22,29 +22,29 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
-#include <tny-msg-header-iface-test.h>
+#include <tny-header-iface-test.h>
 
 /* We are going to test the camel implementation */
-#include <tny-msg-header.h>
+#include <tny-header.h>
 
-static TnyMsgHeaderIface *iface = NULL;
+static TnyHeaderIface *iface = NULL;
 
 /* TODO: Check wether we are missing testing properties here */
 
 static void
-tny_msg_header_iface_test_setup (void)
+tny_header_iface_test_setup (void)
 {
 	/* Don't ask me why, I think this is a Camel bug */
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	iface = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
+	iface = TNY_HEADER_IFACE (tny_header_new ());
 
 	return;
 }
 
 static void 
-tny_msg_header_iface_test_teardown (void)
+tny_header_iface_test_teardown (void)
 {
 	g_object_unref (G_OBJECT (iface));
 
@@ -52,12 +52,12 @@ tny_msg_header_iface_test_teardown (void)
 }
 
 static void
-tny_msg_header_iface_test_set_from (void)
+tny_header_iface_test_set_from (void)
 {
 	const gchar *str_in = "Me myself and I <me.myself@and.i.com>", *str_out;
 	
-	tny_msg_header_iface_set_from (iface, str_in);
-	str_out = tny_msg_header_iface_get_from (iface);
+	tny_header_iface_set_from (iface, str_in);
+	str_out = tny_header_iface_get_from (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set from!\n");
 
@@ -65,14 +65,14 @@ tny_msg_header_iface_test_set_from (void)
 }
 
 static void
-tny_msg_header_iface_test_set_to (void)
+tny_header_iface_test_set_to (void)
 {
 	gchar *str_in = g_strdup ("Myself <this@is.me>, You Do Die Daa <you.doe.die@daa.com>; patrick@test.com");
 	const gchar *str_out;
 	int i=0;
 	
-	tny_msg_header_iface_set_to (iface, (const gchar*)str_in);
-	str_out = tny_msg_header_iface_get_to (iface);
+	tny_header_iface_set_to (iface, (const gchar*)str_in);
+	str_out = tny_header_iface_get_to (iface);
 
 	/* The implementation will always return a comma separated list
 	 * but should also accept ; separated lists. Even mixed (both
@@ -90,12 +90,12 @@ tny_msg_header_iface_test_set_to (void)
 }
 
 static void
-tny_msg_header_iface_test_set_cc (void)
+tny_header_iface_test_set_cc (void)
 {
 	const gchar *str_in = "First user <first@user.be>, Second user <second@user.com>", *str_out;
 
-	tny_msg_header_iface_set_cc (iface, str_in);
-	str_out = tny_msg_header_iface_get_cc (iface);
+	tny_header_iface_set_cc (iface, str_in);
+	str_out = tny_header_iface_get_cc (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set cc!\n");
 
@@ -103,12 +103,12 @@ tny_msg_header_iface_test_set_cc (void)
 }
 
 static void
-tny_msg_header_iface_test_set_bcc (void)
+tny_header_iface_test_set_bcc (void)
 {
 	const gchar *str_in = "The Invisible man <the.invisible@man.com>, mark@here.there.com", *str_out;
 
-	tny_msg_header_iface_set_bcc (iface, str_in);
-	str_out = tny_msg_header_iface_get_bcc (iface);
+	tny_header_iface_set_bcc (iface, str_in);
+	str_out = tny_header_iface_get_bcc (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set bcc!\n");
 
@@ -116,18 +116,18 @@ tny_msg_header_iface_test_set_bcc (void)
 }
 
 static void
-tny_msg_header_iface_test_set_subject (void)
+tny_header_iface_test_set_subject (void)
 {
 	const gchar *str_in = "I'm the nice subject", *str_out;
 	
-	tny_msg_header_iface_set_subject (iface, str_in);
-	str_out = tny_msg_header_iface_get_subject (iface);
+	tny_header_iface_set_subject (iface, str_in);
+	str_out = tny_header_iface_get_subject (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set subject!\n");
 }
 
 static void
-tny_msg_header_iface_test_set_replyto (void)
+tny_header_iface_test_set_replyto (void)
 {
 
 	/* GUNIT_WARNING ("TODO"); */
@@ -136,52 +136,52 @@ tny_msg_header_iface_test_set_replyto (void)
 }
 
 GUnitTestSuite*
-create_tny_msg_header_iface_suite (void)
+create_tny_header_iface_suite (void)
 {
 	GUnitTestSuite *suite = NULL;
 
 	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyMsgHeaderIface");
+	suite = gunit_test_suite_new ("TnyHeaderIface");
 
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_bcc",
-                                      tny_msg_header_iface_test_setup,
-                                      tny_msg_header_iface_test_set_bcc,
-				      tny_msg_header_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_header_iface_test_set_bcc",
+                                      tny_header_iface_test_setup,
+                                      tny_header_iface_test_set_bcc,
+				      tny_header_iface_test_teardown));
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_cc",
-                                      tny_msg_header_iface_test_setup,
-                                      tny_msg_header_iface_test_set_cc,
-				      tny_msg_header_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_header_iface_test_set_cc",
+                                      tny_header_iface_test_setup,
+                                      tny_header_iface_test_set_cc,
+				      tny_header_iface_test_teardown));
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_to",
-                                      tny_msg_header_iface_test_setup,
-                                      tny_msg_header_iface_test_set_to,
-				      tny_msg_header_iface_test_teardown));
-
-
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_from",
-                                      tny_msg_header_iface_test_setup,
-                                      tny_msg_header_iface_test_set_from,
-				      tny_msg_header_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_header_iface_test_set_to",
+                                      tny_header_iface_test_setup,
+                                      tny_header_iface_test_set_to,
+				      tny_header_iface_test_teardown));
 
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_replyto",
-                                      tny_msg_header_iface_test_setup,
-                                      tny_msg_header_iface_test_set_replyto,
-				      tny_msg_header_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_header_iface_test_set_from",
+                                      tny_header_iface_test_setup,
+                                      tny_header_iface_test_set_from,
+				      tny_header_iface_test_teardown));
+
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_header_iface_test_set_subject",
-                                      tny_msg_header_iface_test_setup,
-                                      tny_msg_header_iface_test_set_subject,
-				      tny_msg_header_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_header_iface_test_set_replyto",
+                                      tny_header_iface_test_setup,
+                                      tny_header_iface_test_set_replyto,
+				      tny_header_iface_test_teardown));
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_header_iface_test_set_subject",
+                                      tny_header_iface_test_setup,
+                                      tny_header_iface_test_set_subject,
+				      tny_header_iface_test_teardown));
 
 	return suite;
 }

@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_HEADER_H
-#define TNY_MSG_HEADER_H
+#ifndef TNY_HEADER_H
+#define TNY_HEADER_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -22,25 +22,25 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 #include <camel/camel-folder-summary.h>
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MSG_HEADER             (tny_msg_header_get_type ())
-#define TNY_MSG_HEADER(obj)             ((TnyMsgHeader*)obj)
-/* #define TNY_MSG_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_HEADER, TnyMsgHeader)) */
-#define TNY_MSG_HEADER_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_HEADER, TnyMsgHeaderClass))
-#define TNY_IS_MSG_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_HEADER))
-#define TNY_IS_MSG_HEADER_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_HEADER))
-#define TNY_MSG_HEADER_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_HEADER, TnyMsgHeaderClass))
+#define TNY_TYPE_HEADER             (tny_header_get_type ())
+#define TNY_HEADER(obj)             ((TnyHeader*)obj)
+/* #define TNY_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_HEADER, TnyHeader)) */
+#define TNY_HEADER_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_HEADER, TnyHeaderClass))
+#define TNY_IS_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_HEADER))
+#define TNY_IS_HEADER_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_HEADER))
+#define TNY_HEADER_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_HEADER, TnyHeaderClass))
 
-typedef struct _TnyMsgHeader TnyMsgHeader;
-typedef struct _TnyMsgHeaderClass TnyMsgHeaderClass;
+typedef struct _TnyHeader TnyHeader;
+typedef struct _TnyHeaderClass TnyHeaderClass;
 
 
-GType           tny_msg_header_get_type  (void);
-TnyMsgHeader*   tny_msg_header_new       (void);
+GType           tny_header_get_type  (void);
+TnyHeader*   tny_header_new       (void);
 
 
 G_END_DECLS

@@ -4,7 +4,7 @@ headers
 #include <Python.h>
 
 #include <tny-account-store-view-iface.h>
-#include <tny-msg-header-view-iface.h>
+#include <tny-header-view-iface.h>
 #include <tny-msg-view-iface.h>
 #include <tny-msg-window-iface.h>
 #include <tny-msg-iface.h>
@@ -23,7 +23,7 @@ ignore-glob
   *_get_type
 
 %%
-import tinymail.MsgHeaderIface as PyTnyMsgHeaderIface_Type
+import tinymail.HeaderIface as PyTnyHeaderIface_Type
 import tinymail.MsgIface as PyTnyMsgIface_Type
 import tinymail.MsgMimePartIface as PyTnyMimePartIface_Type
 import tinymail.AccountStoreIface as PyTnyAccountStoreIface_Type

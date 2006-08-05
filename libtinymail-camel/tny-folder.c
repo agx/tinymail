@@ -25,9 +25,9 @@
 #include <tny-folder-iface.h>
 #include <tny-folder.h>
 #include <tny-msg-iface.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 #include <tny-msg.h>
-#include <tny-msg-header.h>
+#include <tny-header.h>
 #include <tny-store-account-iface.h>
 #include <tny-store-account.h>
 #include <tny-list-iface.h>
@@ -145,7 +145,7 @@ load_folder (TnyFolderPriv *priv)
 
 
 static void 
-tny_folder_remove_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
+tny_folder_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	const gchar *id;
@@ -155,7 +155,7 @@ tny_folder_remove_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
 	if (!priv->folder || !priv->loaded)
 		load_folder_no_lock (priv);
 
-	id = tny_msg_header_iface_get_uid (TNY_MSG_HEADER_IFACE (header));
+	id = tny_header_iface_get_uid (TNY_HEADER_IFACE (header));
 	camel_folder_delete_message (priv->folder, id);
 
 	g_mutex_unlock (priv->folder_lock);
@@ -330,7 +330,7 @@ typedef struct
 static void
 add_message_with_uid (gpointer data, gpointer user_data)
 {
-	TnyMsgHeaderIface *header = NULL;
+	TnyHeaderIface *header = NULL;
 	FldAndPriv *ptr = user_data;
 	const char *uid = (const char*)data;
 
@@ -342,10 +342,10 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	CamelMessageInfo *mi = camel_folder_get_message_info (cfol, uid);
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
-	header = TNY_MSG_HEADER_IFACE (tny_msg_header_new ());
+	header = TNY_HEADER_IFACE (tny_header_new ());
 
-	tny_msg_header_iface_set_folder (header, self);
-	_tny_msg_header_set_camel_message_info (header, mi);
+	tny_header_iface_set_folder (header, self);
+	_tny_header_set_camel_message_info (header, mi);
 
 	/* Get rid of the reference already. I know this is ugly */
 	camel_folder_free_message_info (cfol, mi);
@@ -610,7 +610,7 @@ tny_folder_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean re
 
 
 static TnyMsgIface*
-tny_folder_get_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
+tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyMsgIface *message = NULL;
@@ -618,7 +618,7 @@ tny_folder_get_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
 
 	g_mutex_lock (priv->folder_lock);
 
-	id = tny_msg_header_iface_get_uid (TNY_MSG_HEADER_IFACE (header));
+	id = tny_header_iface_get_uid (TNY_HEADER_IFACE (header));
 
 	load_folder_no_lock (priv);
 
@@ -643,7 +643,7 @@ tny_folder_get_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
 		message = TNY_MSG_IFACE (tny_msg_new ());
 
 		_tny_msg_set_folder (message, self);
-		tny_msg_iface_set_header (message, TNY_MSG_HEADER_IFACE (header));
+		tny_msg_iface_set_header (message, TNY_HEADER_IFACE (header));
 		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
 	} else {
 		if (camel_message)

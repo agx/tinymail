@@ -19,32 +19,32 @@
 
 #include <config.h>
 
-#include <tny-msg-header-view-iface.h>
+#include <tny-header-view-iface.h>
 
 
 
 /**
- * tny_msg_header_view_iface_set_msg_header:
- * @self: A #TnyMsgHeaderViewIface instance
- * @msg_header: A #TnyMsgHeaderIface instace
+ * tny_header_view_iface_set_header:
+ * @self: A #TnyHeaderViewIface instance
+ * @header: A #TnyHeaderIface instace
  *
  * Set header to view
  * 
  **/
 void
-tny_msg_header_view_iface_set_header (TnyMsgHeaderViewIface *self, TnyMsgHeaderIface *header)
+tny_header_view_iface_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_HEADER_VIEW_IFACE_GET_CLASS (self)->set_header_func)
-		g_critical ("You must implement tny_msg_header_view_iface_set_header\n");
+	if (!TNY_HEADER_VIEW_IFACE_GET_CLASS (self)->set_header_func)
+		g_critical ("You must implement tny_header_view_iface_set_header\n");
 #endif
 
-	TNY_MSG_HEADER_VIEW_IFACE_GET_CLASS (self)->set_header_func (self, header);
+	TNY_HEADER_VIEW_IFACE_GET_CLASS (self)->set_header_func (self, header);
 	return;
 }
 
 static void
-tny_msg_header_view_iface_base_init (gpointer g_class)
+tny_header_view_iface_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
@@ -55,7 +55,7 @@ tny_msg_header_view_iface_base_init (gpointer g_class)
 }
 
 GType
-tny_msg_header_view_iface_get_type (void)
+tny_header_view_iface_get_type (void)
 {
 	static GType type = 0;
 
@@ -63,8 +63,8 @@ tny_msg_header_view_iface_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgHeaderViewIfaceClass),
-		  tny_msg_header_view_iface_base_init,   /* base_init */
+		  sizeof (TnyHeaderViewIfaceClass),
+		  tny_header_view_iface_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
@@ -74,7 +74,7 @@ tny_msg_header_view_iface_get_type (void)
 		  NULL    /* instance_init */
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyMsgHeaderViewIface", &info, 0);
+			"TnyHeaderViewIface", &info, 0);
 
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}

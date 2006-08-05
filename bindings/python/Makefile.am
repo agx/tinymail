@@ -77,7 +77,7 @@ tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(top_srcdir)/libtinymail/tny-list.h			\
 	$(top_srcdir)/libtinymail/tny-list-iface.h		\
 	$(top_srcdir)/libtinymail/tny-folder-iface.h		\
-	$(top_srcdir)/libtinymail/tny-msg-header-iface.h	\
+	$(top_srcdir)/libtinymail/tny-header-iface.h		\
 	$(top_srcdir)/libtinymail/tny-msg-iface.h		\
 	$(top_srcdir)/libtinymail/tny-mime-part-iface.h		\
 	$(top_srcdir)/libtinymail/tny-shared.h			\
@@ -89,7 +89,7 @@ tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 tinymailui.defs: tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
 	$(top_srcdir)/libtinymailui/tny-account-store-view-iface.h \
-	$(top_srcdir)/libtinymailui/tny-msg-header-view-iface.h	   \
+	$(top_srcdir)/libtinymailui/tny-header-view-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-msg-view-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-msg-window-iface.h	   \
 	$(top_srcdir)/libtinymailui/tny-platform-factory-iface.h   \
@@ -102,8 +102,8 @@ tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/fil
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
 	$(top_srcdir)/libtinymailui-gtk/tny-account-tree-model.h	\
 	$(top_srcdir)/libtinymailui-gtk/tny-attach-list-model.h		\
-	$(top_srcdir)/libtinymailui-gtk/tny-msg-header-list-model.h	\
-	$(top_srcdir)/libtinymailui-gtk/tny-msg-header-view.h		\
+	$(top_srcdir)/libtinymailui-gtk/tny-header-list-model.h		\
+	$(top_srcdir)/libtinymailui-gtk/tny-header-view.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-msg-view.h			\
 	$(top_srcdir)/libtinymailui-gtk/tny-msg-window.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-save-strategy.h		\

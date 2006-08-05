@@ -26,7 +26,7 @@
 #include <tny-msg-iface.h>
 #include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 #include <tny-mime-part.h>
 
 G_BEGIN_DECLS
@@ -54,7 +54,7 @@ struct _TnyMsgClass
 GType     tny_msg_get_type (void);
 
 TnyMsg*   tny_msg_new                       (void);
-TnyMsg*   tny_msg_new_with_header           (TnyMsgHeaderIface *header);
+TnyMsg*   tny_msg_new_with_header           (TnyHeaderIface *header);
 
 G_END_DECLS
 

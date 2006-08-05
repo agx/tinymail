@@ -35,8 +35,8 @@
 #include <tny-moz-embed-msg-view.h>
 #include <tny-moz-embed-stream.h>
 #include <tny-attach-list-model.h>
-#include <tny-msg-header-view-iface.h>
-#include <tny-msg-header-view.h>
+#include <tny-header-view-iface.h>
+#include <tny-header-view.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -56,7 +56,7 @@ struct _TnyMozEmbedMsgViewPriv
 {
 	TnyMsgIface *msg;
 	GtkTextView *textview;
-	TnyMsgHeaderViewIface *headerview;
+	TnyHeaderViewIface *headerview;
 	GtkMozEmbed *htmlview;
 	
 	GtkIconView *attachview;
@@ -89,7 +89,7 @@ reload_msg (TnyMsgViewIface *self)
 	GtkTextIter hiter;
 	GtkTextBuffer *buffer;
 	TnyStreamIface *dest;
-	TnyMsgHeaderIface *header;
+	TnyHeaderIface *header;
 	TnyIteratorIface *iterator;
 	const gchar *str = NULL;
 	gboolean first_attach = TRUE;
@@ -100,7 +100,7 @@ reload_msg (TnyMsgViewIface *self)
 
 	buffer = gtk_text_view_get_buffer (priv->textview);
 	dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
-	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+	header = TNY_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
 
 	g_return_if_fail (header);
 
@@ -112,7 +112,7 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_text_buffer_set_text (buffer, "", 0);
 
-	tny_msg_header_view_iface_set_header (priv->headerview, header);
+	tny_header_view_iface_set_header (priv->headerview, header);
 
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
@@ -194,7 +194,7 @@ tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyI
 }
 
 static void
-tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
@@ -208,7 +208,7 @@ tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface 
 
 	if (header)
 	{
-		tny_msg_header_view_iface_set_header (priv->headerview, header);
+		tny_header_view_iface_set_header (priv->headerview, header);
 		gtk_widget_show (GTK_WIDGET (priv->headerview));
 	} else {
 		gtk_widget_hide (GTK_WIDGET (priv->headerview));
@@ -381,7 +381,7 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
 	priv->headerview = 
-		TNY_MSG_HEADER_VIEW_IFACE (tny_msg_header_view_new ());
+		TNY_HEADER_VIEW_IFACE (tny_header_view_new ());
 
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 	priv->htmlview = GTK_MOZ_EMBED (gtk_moz_embed_new ());

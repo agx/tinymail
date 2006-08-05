@@ -20,7 +20,7 @@
 #include <config.h>
 
 #include <tny-folder-iface.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 
 guint *tny_folder_iface_signals;
 
@@ -52,7 +52,7 @@ tny_folder_iface_expunge (TnyFolderIface *self)
  * that would hold the headers (for example for a header summary view).
  **/
 void 
-tny_folder_iface_remove_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
+tny_folder_iface_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_IFACE_GET_CLASS (self)->remove_message_func)
@@ -246,7 +246,7 @@ tny_folder_iface_get_folders (TnyFolderIface *self)
  * Return value: The message instance or NULL on failure
  **/
 TnyMsgIface*
-tny_folder_iface_get_message (TnyFolderIface *self, TnyMsgHeaderIface *header)
+tny_folder_iface_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_IFACE_GET_CLASS (self)->get_message_func)

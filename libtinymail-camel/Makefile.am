@@ -7,7 +7,7 @@ lib_LTLIBRARIES = libtinymail-camel-1.0.la
 
 libtinymail_camel_1_0_headers =			\
 	tny-mime-part.h				\
-	tny-msg-header.h			\
+	tny-header.h				\
 	tny-msg.h				\
 	tny-folder.h				\
 	tny-account.h				\
@@ -25,11 +25,11 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-store-account-priv.h		\
 	tny-transport-account-priv.h		\
 	tny-msg-priv.h				\
-	tny-msg-header-priv.h			\
+	tny-header-priv.h			\
 	tny-folder-priv.h			\
 	$(libtinymail_camel_1_0_headers)	\
 	tny-msg.c				\
-	tny-msg-header.c 			\
+	tny-header.c 				\
 	tny-mime-part-priv.h			\
 	tny-mime-part.c				\
 	tny-folder.c				\

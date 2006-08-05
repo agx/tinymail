@@ -8,7 +8,7 @@ libtinymail_1_0_headers = 		\
 	tny-iterator-iface.h		\
 	tny-folder-iface.h		\
 	tny-mime-part-iface.h   	\
-	tny-msg-header-iface.h		\
+	tny-header-iface.h		\
 	tny-msg-iface.h			\
 	tny-device-iface.h		\
 	tny-account-iface.h		\
@@ -24,7 +24,7 @@ libtinymail_1_0_la_SOURCES = 		\
 	tny-list-iface.c		\
 	tny-iterator-iface.c		\
 	tny-msg-iface.c			\
-	tny-msg-header-iface.c		\
+	tny-header-iface.c		\
 	tny-mime-part-iface.c   	\
 	tny-folder-iface.c		\
 	tny-device-iface.c		\

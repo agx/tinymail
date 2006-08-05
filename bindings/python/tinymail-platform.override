@@ -11,7 +11,7 @@ headers
 #include <tny-list.h>
 #include <tny-list-iface.h>
 #include <tny-folder-iface.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 #include <tny-msg-iface.h>
 #include <tny-mime-part-iface.h>
 #include <tny-shared.h>
@@ -20,7 +20,7 @@ headers
 #include <tny-transport-account-iface.h>
 
 #include <tny-account-store-view-iface.h>
-#include <tny-msg-header-view-iface.h>
+#include <tny-header-view-iface.h>
 #include <tny-msg-view-iface.h>
 #include <tny-msg-window-iface.h>
 #include <tny-platform-factory-iface.h>

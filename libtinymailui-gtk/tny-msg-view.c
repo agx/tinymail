@@ -37,8 +37,8 @@
 #include <tny-msg-view.h>
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
-#include <tny-msg-header-view-iface.h>
-#include <tny-msg-header-view.h>
+#include <tny-header-view-iface.h>
+#include <tny-header-view.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -58,7 +58,7 @@ struct _TnyMsgViewPriv
 {
 	TnyMsgIface *msg;
 	GtkTextView *textview;
-	TnyMsgHeaderViewIface *headerview;
+	TnyHeaderViewIface *headerview;
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
 	TnySaveStrategyIface *save_strategy;
@@ -74,7 +74,7 @@ reload_msg (TnyMsgViewIface *self)
 	GtkTextIter hiter;
 	GtkTextBuffer *buffer;
 	TnyStreamIface *dest;
-	TnyMsgHeaderIface *header;
+	TnyHeaderIface *header;
 	TnyIteratorIface *iterator;
 	const gchar *str = NULL;
 	gboolean first_attach = TRUE, next = FALSE;
@@ -84,7 +84,7 @@ reload_msg (TnyMsgViewIface *self)
 
 	buffer = gtk_text_view_get_buffer (priv->textview);
 	dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
-	header = TNY_MSG_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+	header = TNY_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
 
 	g_return_if_fail (header);
 
@@ -96,7 +96,7 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_text_buffer_set_text (buffer, "", 0);
 
-	tny_msg_header_view_iface_set_header (priv->headerview, header);
+	tny_header_view_iface_set_header (priv->headerview, header);
 
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
@@ -231,7 +231,7 @@ tny_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 }
 
 static void
-tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
 {
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
@@ -242,7 +242,7 @@ tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
 
 	if (header)
 	{
-		tny_msg_header_view_iface_set_header (priv->headerview, header);
+		tny_header_view_iface_set_header (priv->headerview, header);
 		gtk_widget_show (GTK_WIDGET (priv->headerview));
 	} else {
 		gtk_widget_hide (GTK_WIDGET (priv->headerview));
@@ -336,7 +336,7 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
 	priv->headerview = 
-		TNY_MSG_HEADER_VIEW_IFACE (tny_msg_header_view_new ());
+		TNY_HEADER_VIEW_IFACE (tny_header_view_new ());
 
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 

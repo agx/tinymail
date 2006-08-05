@@ -24,13 +24,13 @@
 #include <glib.h>
 #include <string.h>
 
-#include <tny-msg-header-iface.h>
-#include <tny-msg-header.h>
+#include <tny-header-iface.h>
+#include <tny-header.h>
 #include <tny-folder.h>
 
 #include "tny-camel-common-priv.h"
 #include "tny-folder-priv.h"
-#include "tny-msg-header-priv.h"
+#include "tny-header-priv.h"
 
 #include <tny-camel-shared.h>
 
@@ -48,7 +48,7 @@ struct _WriteInfo
 };
 
 #pragma pack(1) /* Size will be 21 in stead of 24 */
-struct _TnyMsgHeader 
+struct _TnyHeader 
 {
 	GObject parent;
 	void *info;
@@ -57,7 +57,7 @@ struct _TnyMsgHeader
 	guchar write:1;
 };
 
-struct _TnyMsgHeaderClass 
+struct _TnyHeaderClass 
 {
 	GObjectClass parent_class;
 };
@@ -65,7 +65,7 @@ struct _TnyMsgHeaderClass
 static const gchar *invalid = "Invalid";
 
 static void 
-destroy_write (TnyMsgHeader *self)
+destroy_write (TnyHeader *self)
 {
 	if (((WriteInfo*)self->info)->msg)
 		camel_object_unref (CAMEL_OBJECT (((WriteInfo*)self->info)->msg));
@@ -77,7 +77,7 @@ destroy_write (TnyMsgHeader *self)
 }
 
 static void
-prepare_for_write (TnyMsgHeader *self)
+prepare_for_write (TnyHeader *self)
 {
 	if (!self->write)
 	{
@@ -91,7 +91,7 @@ prepare_for_write (TnyMsgHeader *self)
 }
 
 void /* protected method */
-_tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *camel_message_info)
+_tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_message_info)
 {
 	if (G_UNLIKELY (self->info))
 		g_warning ("Strange behaviour: Overwriting existing message info");
@@ -106,7 +106,7 @@ _tny_msg_header_set_camel_message_info (TnyMsgHeader *self, CamelMessageInfo *ca
 }
 
 CamelMimeMessage* /* protected method */
-_tny_msg_header_get_camel_mime_message (TnyMsgHeader *self)
+_tny_header_get_camel_mime_message (TnyHeader *self)
 {
 
 	if (G_UNLIKELY (self->write == 0))
@@ -122,9 +122,9 @@ _tny_msg_header_get_camel_mime_message (TnyMsgHeader *self)
 
 
 static const gchar*
-tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
+tny_header_get_replyto (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	const gchar *retval = NULL;
 
 	/* TODO get_replyto */
@@ -135,9 +135,9 @@ tny_msg_header_get_replyto (TnyMsgHeaderIface *self)
 
 
 static void
-tny_msg_header_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
+tny_header_set_bcc (TnyHeaderIface *self, const gchar *bcc)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	CamelInternetAddress *addr = camel_internet_address_new ();
 
 	_foreach_email_add_to_inet_addr (bcc, addr);
@@ -153,9 +153,9 @@ tny_msg_header_set_bcc (TnyMsgHeaderIface *self, const gchar *bcc)
 }
 
 static void
-tny_msg_header_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
+tny_header_set_cc (TnyHeaderIface *self, const gchar *cc)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	CamelInternetAddress *addr = camel_internet_address_new ();
 
 	_foreach_email_add_to_inet_addr (cc, addr);
@@ -170,9 +170,9 @@ tny_msg_header_set_cc (TnyMsgHeaderIface *self, const gchar *cc)
 }
 
 static void
-tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
+tny_header_set_from (TnyHeaderIface *self, const gchar *from)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	gchar *dup;
 
@@ -189,9 +189,9 @@ tny_msg_header_set_from (TnyMsgHeaderIface *self, const gchar *from)
 }
 
 static void
-tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
+tny_header_set_subject (TnyHeaderIface *self, const gchar *subject)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 
 	prepare_for_write (me);
 	camel_mime_message_set_subject (((WriteInfo*)me->info)->msg, subject);
@@ -200,9 +200,9 @@ tny_msg_header_set_subject (TnyMsgHeaderIface *self, const gchar *subject)
 }
 
 static void
-tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
+tny_header_set_to (TnyHeaderIface *self, const gchar *to)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	gchar *dup;
 
@@ -222,9 +222,9 @@ tny_msg_header_set_to (TnyMsgHeaderIface *self, const gchar *to)
 
 
 static void
-tny_msg_header_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
+tny_header_set_replyto (TnyHeaderIface *self, const gchar *to)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 
 	/* TODO set replyto */
 
@@ -233,9 +233,9 @@ tny_msg_header_set_replyto (TnyMsgHeaderIface *self, const gchar *to)
 
 
 static const gchar*
-tny_msg_header_get_cc (TnyMsgHeaderIface *self)
+tny_header_get_cc (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	const gchar *retval;
 
 	if (G_UNLIKELY (!me->info))
@@ -250,9 +250,9 @@ tny_msg_header_get_cc (TnyMsgHeaderIface *self)
 }
 
 static const gchar*
-tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
+tny_header_get_bcc (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	const gchar *retval;
 
 	if (G_UNLIKELY (!me->info))
@@ -266,15 +266,15 @@ tny_msg_header_get_bcc (TnyMsgHeaderIface *self)
 	return retval;
 }
 
-static TnyMsgHeaderFlags
-tny_msg_header_get_flags (TnyMsgHeaderIface *self)
+static TnyHeaderFlags
+tny_header_get_flags (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
-	TnyMsgHeaderFlags retval;
+	TnyHeader *me = TNY_HEADER (self);
+	TnyHeaderFlags retval;
 
 	if (me->write)
 	{
-		g_warning ("tny_msg_header_get_flags: This is a header for a new message!\n");
+		g_warning ("tny_header_get_flags: This is a header for a new message!\n");
 		return retval;
 	}
 
@@ -284,13 +284,13 @@ tny_msg_header_get_flags (TnyMsgHeaderIface *self)
 }
 
 static void
-tny_msg_header_set_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
+tny_header_set_flags (TnyHeaderIface *self, TnyHeaderFlags mask)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 
 	if (me->write)
 	{
-		g_warning ("tny_msg_header_get_flags: This is a header for a new message!\n");
+		g_warning ("tny_header_get_flags: This is a header for a new message!\n");
 		return;
 	}
 
@@ -300,13 +300,13 @@ tny_msg_header_set_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 }
 
 static void
-tny_msg_header_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
+tny_header_unset_flags (TnyHeaderIface *self, TnyHeaderFlags mask)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 
 	if (me->write)
 	{
-		g_warning ("tny_msg_header_get_flags: This is a header for a new message!\n");
+		g_warning ("tny_header_get_flags: This is a header for a new message!\n");
 		return;
 	}
 
@@ -316,9 +316,9 @@ tny_msg_header_unset_flags (TnyMsgHeaderIface *self, TnyMsgHeaderFlags mask)
 }
 
 static time_t
-tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
+tny_header_get_date_received (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 
 	time_t retval;
 
@@ -334,9 +334,9 @@ tny_msg_header_get_date_received (TnyMsgHeaderIface *self)
 }
 
 static time_t
-tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
+tny_header_get_date_sent (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 
 	time_t retval;
 
@@ -349,9 +349,9 @@ tny_msg_header_get_date_sent (TnyMsgHeaderIface *self)
 }
 	
 static const gchar*
-tny_msg_header_get_from (TnyMsgHeaderIface *self)
+tny_header_get_from (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	
 	const gchar *retval;
 
@@ -375,9 +375,9 @@ tny_msg_header_get_from (TnyMsgHeaderIface *self)
 }
 
 static const gchar*
-tny_msg_header_get_subject (TnyMsgHeaderIface *self)
+tny_header_get_subject (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	const gchar *retval;
 
 	if (G_UNLIKELY (!me->info))
@@ -393,9 +393,9 @@ tny_msg_header_get_subject (TnyMsgHeaderIface *self)
 
 
 static const gchar*
-tny_msg_header_get_to (TnyMsgHeaderIface *self)
+tny_header_get_to (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	gchar *retval;
 
 	if (G_UNLIKELY (!me->info))
@@ -410,9 +410,9 @@ tny_msg_header_get_to (TnyMsgHeaderIface *self)
 }
 
 static const gchar*
-tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
+tny_header_get_message_id (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	gchar *retval;
 
 	if (G_UNLIKELY (!me->info))
@@ -430,9 +430,9 @@ tny_msg_header_get_message_id (TnyMsgHeaderIface *self)
 
 
 static const gchar*
-tny_msg_header_get_uid (TnyMsgHeaderIface *self)
+tny_header_get_uid (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	const gchar *retval;
 
 	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write))
@@ -445,9 +445,9 @@ tny_msg_header_get_uid (TnyMsgHeaderIface *self)
 
 
 static void
-tny_msg_header_finalize (GObject *object)
+tny_header_finalize (GObject *object)
 {
-	TnyMsgHeader *self = (TnyMsgHeader*) object;
+	TnyHeader *self = (TnyHeader*) object;
 
 	if (G_UNLIKELY (self->write))
 	{
@@ -464,15 +464,15 @@ tny_msg_header_finalize (GObject *object)
 }
 
 /**
- * tny_msg_header_new:
+ * tny_header_new:
  *
  *
- * Return value: A new #TnyMsgHeader instance implemented for Camel
+ * Return value: A new #TnyHeader instance implemented for Camel
  **/
-TnyMsgHeader*
-tny_msg_header_new (void)
+TnyHeader*
+tny_header_new (void)
 {
-	TnyMsgHeader *self = g_object_new (TNY_TYPE_MSG_HEADER, NULL);
+	TnyHeader *self = g_object_new (TNY_TYPE_HEADER, NULL);
 	
 	self->info = NULL;
 	self->write = 0;
@@ -481,67 +481,67 @@ tny_msg_header_new (void)
 }
 
 static void
-tny_msg_header_set_folder (TnyMsgHeaderIface *self, TnyFolderIface *folder)
+tny_header_set_folder (TnyHeaderIface *self, TnyFolderIface *folder)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	me->folder = (TnyFolderIface*)folder;
 	return;
 }
 
 static TnyFolderIface*
-tny_msg_header_get_folder (TnyMsgHeaderIface *self)
+tny_header_get_folder (TnyHeaderIface *self)
 {
-	TnyMsgHeader *me = TNY_MSG_HEADER (self);
+	TnyHeader *me = TNY_HEADER (self);
 	return (TnyFolderIface*)me->folder;
 }
 
 static void
-tny_msg_header_iface_init (gpointer g_iface, gpointer iface_data)
+tny_header_iface_init (gpointer g_iface, gpointer iface_data)
 {
-	TnyMsgHeaderIfaceClass *klass = (TnyMsgHeaderIfaceClass *)g_iface;
+	TnyHeaderIfaceClass *klass = (TnyHeaderIfaceClass *)g_iface;
 
-	klass->get_from_func = tny_msg_header_get_from;
-	klass->get_message_id_func = tny_msg_header_get_message_id;
-	klass->get_to_func = tny_msg_header_get_to;
-	klass->get_subject_func = tny_msg_header_get_subject;
-	klass->get_date_received_func = tny_msg_header_get_date_received;
-	klass->get_date_sent_func = tny_msg_header_get_date_sent;
-	klass->get_cc_func = tny_msg_header_get_cc;
-	klass->get_bcc_func = tny_msg_header_get_bcc;
-	klass->get_replyto_func = tny_msg_header_get_replyto;
-	klass->get_uid_func = tny_msg_header_get_uid;
-	klass->set_folder_func = tny_msg_header_set_folder;
-	klass->get_folder_func = tny_msg_header_get_folder;
-	klass->set_bcc_func = tny_msg_header_set_bcc;
-	klass->set_cc_func = tny_msg_header_set_cc;
-	klass->set_to_func = tny_msg_header_set_to;
-	klass->set_from_func = tny_msg_header_set_from;
-	klass->set_subject_func = tny_msg_header_set_subject;
-	klass->set_replyto_func = tny_msg_header_set_replyto;
-	klass->set_flags_func = tny_msg_header_set_flags;
-	klass->unset_flags_func = tny_msg_header_unset_flags;
-	klass->get_flags_func = tny_msg_header_get_flags;
+	klass->get_from_func = tny_header_get_from;
+	klass->get_message_id_func = tny_header_get_message_id;
+	klass->get_to_func = tny_header_get_to;
+	klass->get_subject_func = tny_header_get_subject;
+	klass->get_date_received_func = tny_header_get_date_received;
+	klass->get_date_sent_func = tny_header_get_date_sent;
+	klass->get_cc_func = tny_header_get_cc;
+	klass->get_bcc_func = tny_header_get_bcc;
+	klass->get_replyto_func = tny_header_get_replyto;
+	klass->get_uid_func = tny_header_get_uid;
+	klass->set_folder_func = tny_header_set_folder;
+	klass->get_folder_func = tny_header_get_folder;
+	klass->set_bcc_func = tny_header_set_bcc;
+	klass->set_cc_func = tny_header_set_cc;
+	klass->set_to_func = tny_header_set_to;
+	klass->set_from_func = tny_header_set_from;
+	klass->set_subject_func = tny_header_set_subject;
+	klass->set_replyto_func = tny_header_set_replyto;
+	klass->set_flags_func = tny_header_set_flags;
+	klass->unset_flags_func = tny_header_unset_flags;
+	klass->get_flags_func = tny_header_get_flags;
 
 	return;
 }
 
 
 static void 
-tny_msg_header_class_init (TnyMsgHeaderClass *class)
+tny_header_class_init (TnyHeaderClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_msg_header_finalize;
+	object_class->finalize = tny_header_finalize;
 
 	return;
 }
 
 
 GType 
-tny_msg_header_get_type (void)
+tny_header_get_type (void)
 {
 	static GType type = 0;
 
@@ -558,30 +558,30 @@ tny_msg_header_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgHeaderClass),
+		  sizeof (TnyHeaderClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_msg_header_class_init,   /* class_init */
+		  (GClassInitFunc) tny_header_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyMsgHeader),
+		  sizeof (TnyHeader),
 		  0,      /* n_preallocs */
 		  NULL    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_msg_header_iface_info = 
+		static const GInterfaceInfo tny_header_iface_info = 
 		{
-		  (GInterfaceInitFunc) tny_msg_header_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_header_iface_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyMsgHeader",
+			"TnyHeader",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_MSG_HEADER_IFACE, 
-			&tny_msg_header_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_HEADER_IFACE, 
+			&tny_header_iface_info);
 	}
 
 	return type;

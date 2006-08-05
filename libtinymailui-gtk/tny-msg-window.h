@@ -25,7 +25,7 @@
 
 #include <tny-msg-view-iface.h>
 #include <tny-msg-window-iface.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 #include <tny-msg-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-mime-part-iface.h>

@@ -23,23 +23,23 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
-#include <tny-msg-header-view.h>
+#include <tny-header-view.h>
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyMsgHeaderViewPriv TnyMsgHeaderViewPriv;
+typedef struct _TnyHeaderViewPriv TnyHeaderViewPriv;
 
-struct _TnyMsgHeaderViewPriv
+struct _TnyHeaderViewPriv
 {
-	TnyMsgHeaderIface *header;
+	TnyHeaderIface *header;
 	GtkWidget *from_label;
 	GtkWidget *to_label;
 	GtkWidget *subject_label;
 	GtkWidget *date_label;
 };
 
-#define TNY_MSG_HEADER_VIEW_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_HEADER_VIEW, TnyMsgHeaderViewPriv))
+#define TNY_HEADER_VIEW_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_HEADER_VIEW, TnyHeaderViewPriv))
 
 
 /* TODO: refactor */
@@ -59,9 +59,9 @@ _get_readable_date (time_t file_time_raw)
 
 
 static void 
-tny_msg_header_view_set_header (TnyMsgHeaderViewIface *self, TnyMsgHeaderIface *header)
+tny_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
 {
-	TnyMsgHeaderViewPriv *priv = TNY_MSG_HEADER_VIEW_GET_PRIVATE (self);
+	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
 	gchar *str;
 
 	if (G_LIKELY (priv->header))
@@ -71,11 +71,11 @@ tny_msg_header_view_set_header (TnyMsgHeaderViewIface *self, TnyMsgHeaderIface *
 
 	priv->header = header;
 
-	gtk_label_set_text (GTK_LABEL (priv->to_label), tny_msg_header_iface_get_to (header));
-	gtk_label_set_text (GTK_LABEL (priv->from_label), tny_msg_header_iface_get_from (header));
-	gtk_label_set_text (GTK_LABEL (priv->subject_label), tny_msg_header_iface_get_subject (header));
+	gtk_label_set_text (GTK_LABEL (priv->to_label), tny_header_iface_get_to (header));
+	gtk_label_set_text (GTK_LABEL (priv->from_label), tny_header_iface_get_from (header));
+	gtk_label_set_text (GTK_LABEL (priv->subject_label), tny_header_iface_get_subject (header));
 
-	str = _get_readable_date (tny_msg_header_iface_get_date_sent (header));
+	str = _get_readable_date (tny_header_iface_get_date_sent (header));
 	gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);
 	g_free (str);
 
@@ -83,23 +83,23 @@ tny_msg_header_view_set_header (TnyMsgHeaderViewIface *self, TnyMsgHeaderIface *
 }
 
 /**
- * tny_msg_header_view_new:
+ * tny_header_view_new:
  *
- * Return value: a new #TnyMsgHeaderViewIface instance implemented for Gtk+
+ * Return value: a new #TnyHeaderViewIface instance implemented for Gtk+
  **/
-TnyMsgHeaderView*
-tny_msg_header_view_new (void)
+TnyHeaderView*
+tny_header_view_new (void)
 {
-	TnyMsgHeaderView *self = g_object_new (TNY_TYPE_MSG_HEADER_VIEW, NULL);
+	TnyHeaderView *self = g_object_new (TNY_TYPE_HEADER_VIEW, NULL);
 
 	return self;
 }
 
 static void
-tny_msg_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyMsgHeaderView *self = (TnyMsgHeaderView *)instance;
-	TnyMsgHeaderViewPriv *priv = TNY_MSG_HEADER_VIEW_GET_PRIVATE (self);
+	TnyHeaderView *self = (TnyHeaderView *)instance;
+	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
 	GtkWidget *label2, *label3, *label4, *label1;
 
 	gtk_table_set_homogeneous (GTK_TABLE (self), FALSE);
@@ -171,10 +171,10 @@ tny_msg_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_msg_header_view_finalize (GObject *object)
+tny_header_view_finalize (GObject *object)
 {
-	TnyMsgHeaderView *self = (TnyMsgHeaderView *)object;	
-	TnyMsgHeaderViewPriv *priv = TNY_MSG_HEADER_VIEW_GET_PRIVATE (self);
+	TnyHeaderView *self = (TnyHeaderView *)object;	
+	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
@@ -185,32 +185,32 @@ tny_msg_header_view_finalize (GObject *object)
 }
 
 static void
-tny_msg_header_view_iface_init (gpointer g_iface, gpointer iface_data)
+tny_header_view_iface_init (gpointer g_iface, gpointer iface_data)
 {
-	TnyMsgHeaderViewIfaceClass *klass = (TnyMsgHeaderViewIfaceClass *)g_iface;
+	TnyHeaderViewIfaceClass *klass = (TnyHeaderViewIfaceClass *)g_iface;
 
-	klass->set_header_func = tny_msg_header_view_set_header;
+	klass->set_header_func = tny_header_view_set_header;
 
 	return;
 }
 
 static void 
-tny_msg_header_view_class_init (TnyMsgHeaderViewClass *class)
+tny_header_view_class_init (TnyHeaderViewClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_msg_header_view_finalize;
+	object_class->finalize = tny_header_view_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyMsgHeaderViewPriv));
+	g_type_class_add_private (object_class, sizeof (TnyHeaderViewPriv));
 
 	return;
 }
 
 GType 
-tny_msg_header_view_get_type (void)
+tny_header_view_get_type (void)
 {
 	static GType type = 0;
 
@@ -218,30 +218,30 @@ tny_msg_header_view_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgHeaderViewClass),
+		  sizeof (TnyHeaderViewClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_msg_header_view_class_init,   /* class_init */
+		  (GClassInitFunc) tny_header_view_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyMsgHeaderView),
+		  sizeof (TnyHeaderView),
 		  0,      /* n_preallocs */
-		  tny_msg_header_view_instance_init    /* instance_init */
+		  tny_header_view_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_msg_header_view_iface_info = 
+		static const GInterfaceInfo tny_header_view_iface_info = 
 		{
-		  (GInterfaceInitFunc) tny_msg_header_view_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_header_view_iface_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
 		type = g_type_register_static (GTK_TYPE_TABLE,
-			"TnyMsgHeaderView",
+			"TnyHeaderView",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_MSG_HEADER_VIEW_IFACE, 
-			&tny_msg_header_view_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_HEADER_VIEW_IFACE, 
+			&tny_header_view_iface_info);
 
 	}
 

@@ -24,7 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-msg-iface.h>
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 
 #include <camel/camel-folder.h>
 

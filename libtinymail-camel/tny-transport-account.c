@@ -37,12 +37,12 @@
 static GObjectClass *parent_class = NULL;
 
 #include <tny-msg.h>
-#include <tny-msg-header.h>
+#include <tny-header.h>
 #include <tny-transport-account.h>
 
 #include "tny-camel-common-priv.h"
 #include "tny-msg-priv.h"
-#include "tny-msg-header-priv.h"
+#include "tny-header-priv.h"
 #include "tny-account-priv.h"
 #include "tny-transport-account-priv.h"
 
@@ -85,7 +85,7 @@ static void
 tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 {
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
-	TnyMsgHeaderIface *header = (TnyMsgHeaderIface *)tny_msg_iface_get_header (msg);
+	TnyHeaderIface *header = (TnyHeaderIface *)tny_msg_iface_get_header (msg);
 	CamelMimeMessage *message = _tny_msg_get_camel_mime_message (TNY_MSG (msg));
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
 	CamelTransport *transport;
@@ -100,10 +100,10 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 			*recipients = camel_internet_address_new ();
 		const gchar *str = NULL;
 
-		str = tny_msg_header_iface_get_from (header);
+		str = tny_header_iface_get_from (header);
 		_foreach_email_add_to_inet_addr (str, from);
 
-		str = tny_msg_header_iface_get_to (header);
+		str = tny_header_iface_get_to (header);
 		_foreach_email_add_to_inet_addr (str, recipients);
 
 		apriv->connected = TRUE;

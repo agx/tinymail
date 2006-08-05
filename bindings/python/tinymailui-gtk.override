@@ -10,8 +10,8 @@ headers
 
 #include <tny-account-tree-model.h>
 #include <tny-attach-list-model.h>
-#include <tny-msg-header-list-model.h>
-#include <tny-msg-header-view.h>
+#include <tny-header-list-model.h>
+#include <tny-header-view.h>
 #include <tny-msg-view.h>
 #include <tny-msg-window.h>
 #include <tny-save-strategy.h>

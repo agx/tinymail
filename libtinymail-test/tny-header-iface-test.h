@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_HEADER_IFACE_TEST_H
-#define TNY_MSG_HEADER_IFACE_TEST_H
+#ifndef TNY_HEADER_IFACE_TEST_H
+#define TNY_HEADER_IFACE_TEST_H
 
 /* tinymail - Tiny Mail gunit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -21,9 +21,9 @@
 
 #include "tny-test-suite.h"
 
-#include <tny-msg-header-iface.h>
+#include <tny-header-iface.h>
 
 /* Test suite */
-GUnitTestSuite *create_tny_msg_header_iface_suite (void);
+GUnitTestSuite *create_tny_header_iface_suite (void);
 
 #endif

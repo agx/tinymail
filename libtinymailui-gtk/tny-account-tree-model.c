@@ -272,7 +272,7 @@ tny_account_tree_model_copy_the_list (TnyListIface *self)
 	TnyAccountTreeModel *copy = g_object_new (TNY_TYPE_ACCOUNT_TREE_MODEL, NULL);
 
 	/* This only copies the TnyListIface pieces. The result is not a
-	   correct or good TnyMsgHeaderListModel. But it will be a correct
+	   correct or good TnyHeaderListModel. But it will be a correct
 	   TnyListIface instance. It is the only thing the user of this
 	   method expects.
 

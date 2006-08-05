@@ -26,13 +26,13 @@
 /**
  * tny_msg_view_iface_set_unavailable:
  * @self: A #TnyMsgViewIface instance
- * @header: a #TnyMsgHeaderIface instance or NULL
+ * @header: a #TnyHeaderIface instance or NULL
  *
  * Set the view to display that the message was unavailable
  * 
  **/
 void
-tny_msg_view_iface_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+tny_msg_view_iface_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_VIEW_IFACE_GET_CLASS (self)->set_unavailable_func)

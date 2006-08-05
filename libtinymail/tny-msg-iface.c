@@ -71,7 +71,7 @@ tny_msg_iface_get_parts (TnyMsgIface *self, TnyListIface *list)
  *
  * Return value: The header of the message
  **/
-TnyMsgHeaderIface*
+TnyHeaderIface*
 tny_msg_iface_get_header (TnyMsgIface *self)
 {
 #ifdef DEBUG
@@ -133,7 +133,7 @@ tny_msg_iface_del_part (TnyMsgIface *self, gint id)
  *
  **/
 void
-tny_msg_iface_set_header (TnyMsgIface *self, TnyMsgHeaderIface *header)
+tny_msg_iface_set_header (TnyMsgIface *self, TnyHeaderIface *header)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_IFACE_GET_CLASS (self)->set_header_func)

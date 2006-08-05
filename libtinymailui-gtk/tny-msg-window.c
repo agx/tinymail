@@ -46,7 +46,7 @@ tny_msg_window_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *s
 }
 
 static void
-tny_msg_window_set_unavailable (TnyMsgViewIface *self, TnyMsgHeaderIface *header)
+tny_msg_window_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 
@@ -60,12 +60,12 @@ static void
 tny_msg_window_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
-	TnyMsgHeaderIface *header = TNY_MSG_HEADER_IFACE 
+	TnyHeaderIface *header = TNY_HEADER_IFACE 
 		(tny_msg_iface_get_header (msg));
 
 	tny_msg_view_iface_set_msg (priv->msg_view, msg);
 
-	gtk_window_set_title (GTK_WINDOW (self), tny_msg_header_iface_get_subject (header));
+	gtk_window_set_title (GTK_WINDOW (self), tny_header_iface_get_subject (header));
 
 	return;
 }

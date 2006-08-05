@@ -283,7 +283,7 @@ tny_attach_list_model_copy_the_list (TnyListIface *self)
 	TnyAttachListModel *copy = g_object_new (TNY_TYPE_ATTACH_LIST_MODEL, NULL);
 
 	/* This only copies the TnyListIface pieces. The result is not a
-	   correct or good TnyMsgHeaderListModel. But it will be a correct
+	   correct or good TnyHeaderListModel. But it will be a correct
 	   TnyListIface instance. It is the only thing the user of this
 	   method expects.
 
