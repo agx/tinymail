@@ -1,13 +1,13 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgHeaderListModel
+TnyHeaderListModel
 
 <!-- ##### SECTION Short_Description ##### -->
-A #GtkTreeModel suitable for storing #TnyMsgHeaderIface instances
+A #GtkTreeModel suitable for storing #TnyHeaderIface instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
 This #GtkTreeModel implementation will attempt to aggressively uncache 
-#TnyMsgHeaderIface instances once their corresponding row in the 
+#TnyHeaderIface instances once their corresponding row in the 
 #GtkTreeView become invisible. This reduces memory usage.
 </para>
 

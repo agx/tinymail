@@ -1,17 +1,17 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgHeaderViewIface
+TnyHeaderViewIface
 
 <!-- ##### SECTION Short_Description ##### -->
-A type for showing a #TnyMsgHeaderIface
+A type for showing a #TnyHeaderIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type for showing a #TnyMsgHeaderIface to the user
+A type for showing a #TnyHeaderIface to the user
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgHeaderIface
+#TnyHeaderIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

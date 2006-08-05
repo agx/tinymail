@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgHeaderIface
+TnyHeaderIface
 
 <!-- ##### SECTION Short_Description ##### -->
 A type that defines a header
