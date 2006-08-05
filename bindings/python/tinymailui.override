@@ -25,5 +25,5 @@ ignore-glob
 %%
 import tinymail.HeaderIface as PyTnyHeaderIface_Type
 import tinymail.MsgIface as PyTnyMsgIface_Type
-import tinymail.MsgMimePartIface as PyTnyMimePartIface_Type
+import tinymail.MimePartIface as PyTnyMimePartIface_Type
 import tinymail.AccountStoreIface as PyTnyAccountStoreIface_Type
