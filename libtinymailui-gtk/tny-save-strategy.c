@@ -52,7 +52,7 @@ static GObjectClass *parent_class = NULL;
 
 #ifdef GNOME
 static gboolean
-save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
+save_to_file (const gchar *uri, TnyMimePartIface *part)
 {
 	GnomeVFSResult result;
 	GnomeVFSHandle *handle;
@@ -74,7 +74,7 @@ save_to_file (const gchar *uri, TnyMsgMimePartIface *part)
 }
 #else
 static gboolean
-save_to_file (const gchar *local_filename, TnyMsgMimePartIface *part)
+save_to_file (const gchar *local_filename, TnyMimePartIface *part)
 {
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
@@ -96,7 +96,7 @@ save_to_file (const gchar *local_filename, TnyMsgMimePartIface *part)
 
 
 static void
-tny_save_strategy_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
+tny_save_strategy_save (TnySaveStrategyIface *self, TnyMimePartIface *part)
 {
 	GtkFileChooserDialog *dialog;
 	gboolean destr=FALSE;

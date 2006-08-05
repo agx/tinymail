@@ -93,7 +93,7 @@ tny_msg_iface_get_header (TnyMsgIface *self)
  * Return value: The id of the added mime-part
  **/
 gint
-tny_msg_iface_add_part (TnyMsgIface *self, TnyMsgMimePartIface *part)
+tny_msg_iface_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_IFACE_GET_CLASS (self)->add_part_func)
@@ -177,7 +177,7 @@ tny_msg_iface_get_type (void)
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyMsgIface", &info, 0);
 
-		g_type_interface_add_prerequisite (type, TNY_TYPE_MSG_MIME_PART_IFACE); 
+		g_type_interface_add_prerequisite (type, TNY_TYPE_MIME_PART_IFACE); 
 	}
 
 	return type;

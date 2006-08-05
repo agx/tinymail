@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_MIME_PART_PRIV_H
-#define TNY_MSG_MIME_PART_PRIV_H
+#ifndef TNY_MIME_PART_PRIV_H
+#define TNY_MIME_PART_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -24,16 +24,16 @@
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
 
-typedef struct _TnyMsgMimePartPriv TnyMsgMimePartPriv;
+typedef struct _TnyMimePartPriv TnyMimePartPriv;
 
-struct _TnyMsgMimePartPriv
+struct _TnyMimePartPriv
 {
 	GMutex *part_lock;
 	CamelMimePart *part;
 	gchar *cached_content_type;
 };
 
-#define TNY_MSG_MIME_PART_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartPriv))
+#define TNY_MIME_PART_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MIME_PART, TnyMimePartPriv))
 
 #endif

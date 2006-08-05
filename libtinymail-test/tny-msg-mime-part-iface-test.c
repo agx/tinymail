@@ -29,7 +29,7 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
-static TnyMsgMimePartIface *iface = NULL;
+static TnyMimePartIface *iface = NULL;
 static gchar *str;
 
 static void
@@ -40,7 +40,7 @@ tny_msg_mime_part_iface_test_setup (void)
 	camel_object_unref (CAMEL_OBJECT (addr));
 
 	CamelMimePart *cpart = camel_mime_part_new ();
-	iface = TNY_MSG_MIME_PART_IFACE (tny_msg_mime_part_new (cpart));
+	iface = TNY_MIME_PART_IFACE (tny_msg_mime_part_new (cpart));
 
 	return;
 }
@@ -161,7 +161,7 @@ create_tny_msg_mime_part_iface_suite (void)
 	GUnitTestSuite *suite = NULL;
 
 	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyMsgMimePartIface");
+	suite = gunit_test_suite_new ("TnyMimePartIface");
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,

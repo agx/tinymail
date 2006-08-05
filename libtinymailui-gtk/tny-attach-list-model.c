@@ -43,7 +43,7 @@ static GObjectClass *parent_class = NULL;
 typedef void (*listaddfunc) (GtkListStore *list_store, GtkTreeIter *iter);
 
 static void
-tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part, listaddfunc func)
+tny_attach_list_model_add (TnyAttachListModel *self, TnyMimePartIface *part, listaddfunc func)
 {
 	GtkListStore *model = GTK_LIST_STORE (self);
 	GtkTreeIter iter;
@@ -110,7 +110,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMsgMimePartIface *part, 
  *
  *
  * Return value: a new #GtkTreeModel instance suitable for showing  
- * #TnyMsgMimePartIface instances
+ * #TnyMimePartIface instances
  **/
 TnyAttachListModel*
 tny_attach_list_model_new (void)
@@ -201,7 +201,7 @@ tny_attach_list_model_prepend (TnyListIface *self, GObject* item)
 	/* Prepend something to the list */
 	g_object_ref (G_OBJECT (item));
 	me->first = g_list_prepend (me->first, item);
-	tny_attach_list_model_add (me, TNY_MSG_MIME_PART_IFACE (item), 
+	tny_attach_list_model_add (me, TNY_MIME_PART_IFACE (item), 
 		gtk_list_store_prepend);
 
 	g_mutex_unlock (me->iterator_lock);
@@ -217,7 +217,7 @@ tny_attach_list_model_append (TnyListIface *self, GObject* item)
 	/* Append something to the list */
 	g_object_ref (G_OBJECT (item));
 	me->first = g_list_append (me->first, item);
-	tny_attach_list_model_add (me, TNY_MSG_MIME_PART_IFACE (item), 
+	tny_attach_list_model_add (me, TNY_MIME_PART_IFACE (item), 
 		gtk_list_store_append);
 
 	g_mutex_unlock (me->iterator_lock);
@@ -257,13 +257,13 @@ tny_attach_list_model_remove (TnyListIface *self, GObject* item)
 	gtk_tree_model_get_iter_first (model, &iter);
 	while (gtk_tree_model_iter_next (model, &iter))
 	{
-		TnyMsgMimePartIface *curpart;
+		TnyMimePartIface *curpart;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
 			&curpart, -1);
 
-		if (curpart == (TnyMsgMimePartIface*)item)
+		if (curpart == (TnyMimePartIface*)item)
 		{
 			gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));

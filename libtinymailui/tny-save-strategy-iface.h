@@ -40,11 +40,11 @@ struct _TnySaveStrategyIfaceClass
 {
 	GTypeInterface parent;
 
-	void (*save_func) (TnySaveStrategyIface *self, TnyMsgMimePartIface *part);
+	void (*save_func) (TnySaveStrategyIface *self, TnyMimePartIface *part);
 };
 
 GType tny_save_strategy_iface_get_type (void);
-void  tny_save_strategy_iface_save     (TnySaveStrategyIface *self, TnyMsgMimePartIface *part);
+void  tny_save_strategy_iface_save     (TnySaveStrategyIface *self, TnyMimePartIface *part);
 
 G_END_DECLS
 

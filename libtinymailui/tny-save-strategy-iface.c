@@ -29,7 +29,7 @@
  * 
  **/
 void
-tny_save_strategy_iface_save (TnySaveStrategyIface *self, TnyMsgMimePartIface *part)
+tny_save_strategy_iface_save (TnySaveStrategyIface *self, TnyMimePartIface *part)
 {
 #ifdef DEBUG
 	if (!TNY_SAVE_STRATEGY_IFACE_GET_CLASS (self)->save_func)

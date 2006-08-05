@@ -108,11 +108,11 @@ send_test (gboolean multipart)
 		(tny_stream_camel_new (camel_stream_mem_new_with_buffer 
 				(body_text, strlen (body_text))));
 	
-	TnyMsgMimePartIface *mime_part = 
-		TNY_MSG_MIME_PART_IFACE (tny_msg_mime_part_new (camel_mime_part_new()));
+	TnyMimePartIface *mime_part = 
+		TNY_MIME_PART_IFACE (tny_msg_mime_part_new (camel_mime_part_new()));
 
-	TnyMsgMimePartIface *body_part = 
-		TNY_MSG_MIME_PART_IFACE (tny_msg_mime_part_new (camel_mime_part_new()));
+	TnyMimePartIface *body_part = 
+		TNY_MIME_PART_IFACE (tny_msg_mime_part_new (camel_mime_part_new()));
 	
 	tny_account_iface_set_account_store (TNY_ACCOUNT_IFACE (account), 
 		TNY_ACCOUNT_STORE_IFACE (tny_account_store_get_instance ()));
@@ -146,14 +146,14 @@ send_test (gboolean multipart)
 	tny_msg_mime_part_iface_set_content_type (body_part, "text/plain"); 
 
 	tny_msg_mime_part_iface_set_content_type 
-		(TNY_MSG_MIME_PART_IFACE (msg), "text/plain");
+		(TNY_MIME_PART_IFACE (msg), "text/plain");
 
 	tny_stream_iface_reset (body_stream);
 
 	if (!multipart)
 	{
 		tny_msg_mime_part_iface_construct_from_stream 
-			(TNY_MSG_MIME_PART_IFACE (msg), body_stream, "text/plain");
+			(TNY_MIME_PART_IFACE (msg), body_stream, "text/plain");
 	} else {
 		tny_msg_iface_add_part (msg, body_part); 
 		tny_msg_iface_add_part (msg, mime_part); 

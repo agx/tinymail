@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_MIME_PART_IFACE_TEST_H
-#define TNY_MSG_MIME_PART_IFACE_TEST_H
+#ifndef TNY_MIME_PART_IFACE_TEST_H
+#define TNY_MIME_PART_IFACE_TEST_H
 
 /* tinymail - Tiny Mail gunit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>

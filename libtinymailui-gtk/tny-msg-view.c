@@ -102,7 +102,7 @@ reload_msg (TnyMsgViewIface *self)
 
 	while (next)
 	{
-		TnyMsgMimePartIface *part = (TnyMsgMimePartIface*)tny_iterator_iface_current (iterator);
+		TnyMimePartIface *part = (TnyMimePartIface*)tny_iterator_iface_current (iterator);
 
 		if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/*")))
 		{
@@ -168,7 +168,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 
 	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
 	{
-		TnyMsgMimePartIface *part;
+		TnyMimePartIface *part;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 

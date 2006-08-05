@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_MIME_PART_H
-#define TNY_MSG_MIME_PART_H
+#ifndef TNY_MIME_PART_H
+#define TNY_MIME_PART_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -28,22 +28,22 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MSG_MIME_PART             (tny_msg_mime_part_get_type ())
-#define TNY_MSG_MIME_PART(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePart))
-#define TNY_MSG_MIME_PART_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartClass))
-#define TNY_IS_MSG_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_MIME_PART))
-#define TNY_IS_MSG_MIME_PART_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_MIME_PART))
-#define TNY_MSG_MIME_PART_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_MIME_PART, TnyMsgMimePartClass))
+#define TNY_TYPE_MIME_PART             (tny_msg_mime_part_get_type ())
+#define TNY_MIME_PART(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MIME_PART, TnyMimePart))
+#define TNY_MIME_PART_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MIME_PART, TnyMimePartClass))
+#define TNY_IS_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MIME_PART))
+#define TNY_IS_MIME_PART_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MIME_PART))
+#define TNY_MIME_PART_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MIME_PART, TnyMimePartClass))
 
-typedef struct _TnyMsgMimePart TnyMsgMimePart;
-typedef struct _TnyMsgMimePartClass TnyMsgMimePartClass;
+typedef struct _TnyMimePart TnyMimePart;
+typedef struct _TnyMimePartClass TnyMimePartClass;
 
-struct _TnyMsgMimePart 
+struct _TnyMimePart 
 {
 	GObject parent;
 };
 
-struct _TnyMsgMimePartClass 
+struct _TnyMimePartClass 
 {
 	GObjectClass parent;
 };
@@ -51,9 +51,9 @@ struct _TnyMsgMimePartClass
 
 GType                 tny_msg_mime_part_get_type  (void);
 
-TnyMsgMimePart*       tny_msg_mime_part_new       (CamelMimePart *part);
-void                  tny_msg_mime_part_set_part  (TnyMsgMimePart *self, CamelMimePart *part);
-CamelMimePart*	      tny_msg_mime_part_get_part  (TnyMsgMimePart *self);
+TnyMimePart*       tny_msg_mime_part_new       (CamelMimePart *part);
+void                  tny_msg_mime_part_set_part  (TnyMimePart *self, CamelMimePart *part);
+CamelMimePart*	      tny_msg_mime_part_get_part  (TnyMimePart *self);
 
 G_END_DECLS
 
