@@ -17,7 +17,7 @@ tny-mime-part-iface-test
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### FUNCTION create_tny_msg_mime_part_iface_suite ##### -->
+<!-- ##### FUNCTION create_tny_mime_part_iface_suite ##### -->
 <para>
 
 </para>
