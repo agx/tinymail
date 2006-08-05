@@ -33,7 +33,7 @@ import gtk.TreeStore as PyGtkTreeStore_Type
 import gtk.TreeModel as PyGtkTreeModel_Type
 import gtk.ListStore as PyGtkListStore_Type
 
-import tinymail.MsgFolderIface as PyTnyFolderIface_Type
+import tinymail.FolderIface as PyTnyFolderIface_Type
 import tinymail.MimePartIface as PyTnyMimePartIface_Type
 import tinymail.ui.SaveStrategyIface as PyTnySaveStrategyIface_Type
 import tinymail.ui.MsgViewIface as PyTnyMsgViewIface_Type
