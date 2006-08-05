@@ -104,14 +104,14 @@ reload_msg (TnyMsgViewIface *self)
 	{
 		TnyMimePartIface *part = (TnyMimePartIface*)tny_iterator_iface_current (iterator);
 
-		if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/*")))
+		if (G_LIKELY (tny_mime_part_iface_content_type_is (part, "text/*")))
 		{
 			tny_stream_iface_reset (dest);
-			tny_msg_mime_part_iface_write_to_stream (part, dest);
+			tny_mime_part_iface_write_to_stream (part, dest);
 			tny_stream_iface_reset (dest);
 
-		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
-			tny_msg_mime_part_iface_is_attachment (part))
+		} else if (tny_mime_part_iface_get_content_type (part) &&
+			tny_mime_part_iface_is_attachment (part))
 		{			
 			first_attach = FALSE;
 		}

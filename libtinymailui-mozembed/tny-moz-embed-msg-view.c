@@ -120,7 +120,7 @@ reload_msg (TnyMsgViewIface *self)
 	{
 		TnyMimePartIface *part = (TnyMimePartIface*)tny_iterator_iface_current (iterator);
 
-		if (!have_html && G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/plain")))
+		if (!have_html && G_LIKELY (tny_mime_part_iface_content_type_is (part, "text/plain")))
 		{
 			TnyStreamIface *dest = NULL;
 
@@ -130,12 +130,12 @@ reload_msg (TnyMsgViewIface *self)
 			dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
 
 			tny_stream_iface_reset (dest);
-			tny_msg_mime_part_iface_decode_to_stream (part, dest);
+			tny_mime_part_iface_decode_to_stream (part, dest);
 			tny_stream_iface_reset (dest);
 
 			g_object_unref (G_OBJECT (dest));
 
-		} else if (G_LIKELY (tny_msg_mime_part_iface_content_type_is (part, "text/html")))
+		} else if (G_LIKELY (tny_mime_part_iface_content_type_is (part, "text/html")))
 		{
 			TnyStreamIface *dest = NULL;
 
@@ -147,13 +147,13 @@ reload_msg (TnyMsgViewIface *self)
 			gtk_widget_hide (GTK_WIDGET (priv->textview));
 
 			tny_stream_iface_reset (dest);
-			tny_msg_mime_part_iface_decode_to_stream (part, dest);
+			tny_mime_part_iface_decode_to_stream (part, dest);
 
 			/* This will do: g_object_unref (G_OBJECT (dest)); */
 			g_thread_create (remove_html_stread_hack, dest, FALSE, NULL);
 			
-		} else if (tny_msg_mime_part_iface_get_content_type (part) &&
-			tny_msg_mime_part_iface_is_attachment (part))
+		} else if (tny_mime_part_iface_get_content_type (part) &&
+			tny_mime_part_iface_is_attachment (part))
 		{
 			first_attach = FALSE;
 		}

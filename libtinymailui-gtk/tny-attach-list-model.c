@@ -53,8 +53,8 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMimePartIface *part, lis
 	GdkPixbuf *pixbuf;
         gchar *icon;
 
-	if (tny_msg_mime_part_iface_get_content_type (part) &&
-			tny_msg_mime_part_iface_is_attachment (part))
+	if (tny_mime_part_iface_get_content_type (part) &&
+			tny_mime_part_iface_is_attachment (part))
 	{
 
 		if (!priv->theme || !GTK_IS_ICON_THEME (priv->theme))
@@ -67,8 +67,8 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMimePartIface *part, lis
 		if (priv->theme && GTK_IS_ICON_THEME (priv->theme))
 		{
 			icon = gnome_icon_lookup (priv->theme, NULL, 
-				tny_msg_mime_part_iface_get_filename (part), NULL, NULL,
-				tny_msg_mime_part_iface_get_content_type (part), 0, NULL);
+				tny_mime_part_iface_get_filename (part), NULL, NULL,
+				tny_mime_part_iface_get_content_type (part), 0, NULL);
 		}
 #else
 		icon = GTK_STOCK_FILE;
@@ -96,7 +96,7 @@ tny_attach_list_model_add (TnyAttachListModel *self, TnyMimePartIface *part, lis
 			TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN, 
 			pixbuf,
 			TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN, 
-			tny_msg_mime_part_iface_get_filename (part),
+			tny_mime_part_iface_get_filename (part),
 			TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN,
 			part, -1);
 	}

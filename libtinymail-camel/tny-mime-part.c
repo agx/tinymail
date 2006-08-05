@@ -53,7 +53,7 @@ static GObjectClass *parent_class = NULL;
 /* Locking warning: tny-msg.c also locks priv->part_lock */
 
 static gboolean 
-tny_msg_mime_part_is_attachment (TnyMimePartIface *self)
+tny_mime_part_is_attachment (TnyMimePartIface *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *dw = camel_medium_get_content_object((CamelMedium *)priv->part);
@@ -75,7 +75,7 @@ tny_msg_mime_part_is_attachment (TnyMimePartIface *self)
 }
 
 static void
-tny_msg_mime_part_write_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
+tny_mime_part_write_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
@@ -95,7 +95,7 @@ tny_msg_mime_part_write_to_stream (TnyMimePartIface *self, TnyStreamIface *strea
 	if (G_UNLIKELY (!wrapper))
 	{
 		g_error (_("Mime part does not yet have a source stream, use "
-			"tny_msg_mime_part_construct_from_stream first"));
+			"tny_mime_part_construct_from_stream first"));
 		camel_object_unref (CAMEL_OBJECT (cstream));
 		return;
 	}
@@ -170,7 +170,7 @@ camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 
 
 static void
-tny_msg_mime_part_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
+tny_mime_part_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
 {
 
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
@@ -191,7 +191,7 @@ tny_msg_mime_part_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *stre
 	if (G_UNLIKELY (!wrapper))
 	{
 		g_error (_("Mime part does not yet have a source stream, use "
-			"tny_msg_mime_part_construct_from_stream first"));
+			"tny_mime_part_construct_from_stream first"));
 		camel_object_unref (CAMEL_OBJECT (cstream));
 		return;
 	}
@@ -210,7 +210,7 @@ tny_msg_mime_part_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *stre
 }
 
 static gint
-tny_msg_mime_part_construct_from_stream (TnyMimePartIface *self, TnyStreamIface *stream, const gchar *type)
+tny_mime_part_construct_from_stream (TnyMimePartIface *self, TnyStreamIface *stream, const gchar *type)
 {
 
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
@@ -243,7 +243,7 @@ tny_msg_mime_part_construct_from_stream (TnyMimePartIface *self, TnyStreamIface 
 }
 
 static TnyStreamIface* 
-tny_msg_mime_part_get_stream (TnyMimePartIface *self)
+tny_mime_part_get_stream (TnyMimePartIface *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	TnyStreamIface *retval = NULL;
@@ -277,7 +277,7 @@ tny_msg_mime_part_get_stream (TnyMimePartIface *self)
 }
 
 const gchar* 
-tny_msg_mime_part_get_content_type (TnyMimePartIface *self)
+tny_mime_part_get_content_type (TnyMimePartIface *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 
@@ -296,7 +296,7 @@ tny_msg_mime_part_get_content_type (TnyMimePartIface *self)
 }
 
 static gboolean 
-tny_msg_mime_part_content_type_is (TnyMimePartIface *self, const gchar *type)
+tny_mime_part_content_type_is (TnyMimePartIface *self, const gchar *type)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelContentType *ctype;
@@ -328,14 +328,14 @@ tny_msg_mime_part_content_type_is (TnyMimePartIface *self, const gchar *type)
 }
 
 /**
- * tny_msg_mime_part_set_part:
+ * tny_mime_part_set_part:
  * @self: The #TnyMimePart instance
  * @part: The #CamelMimePart instance
  *
  *
  **/
 void
-tny_msg_mime_part_set_part (TnyMimePart *self, CamelMimePart *part)
+tny_mime_part_set_part (TnyMimePart *self, CamelMimePart *part)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 
@@ -357,13 +357,13 @@ tny_msg_mime_part_set_part (TnyMimePart *self, CamelMimePart *part)
 }
 
 /**
- * tny_msg_mime_part_get_part:
+ * tny_mime_part_get_part:
  * @self: The #TnyMimePart instance
  *
  * Return value: The #CamelMimePart instance
  **/
 CamelMimePart*
-tny_msg_mime_part_get_part (TnyMimePart *self)
+tny_mime_part_get_part (TnyMimePart *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelMimePart *retval;
@@ -377,7 +377,7 @@ tny_msg_mime_part_get_part (TnyMimePart *self)
 
 
 static const gchar*
-tny_msg_mime_part_get_filename (TnyMimePartIface *self)
+tny_mime_part_get_filename (TnyMimePartIface *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
@@ -390,7 +390,7 @@ tny_msg_mime_part_get_filename (TnyMimePartIface *self)
 }
 
 static const gchar*
-tny_msg_mime_part_get_content_id (TnyMimePartIface *self)
+tny_mime_part_get_content_id (TnyMimePartIface *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
@@ -403,7 +403,7 @@ tny_msg_mime_part_get_content_id (TnyMimePartIface *self)
 }
 
 static const gchar*
-tny_msg_mime_part_get_description (TnyMimePartIface *self)
+tny_mime_part_get_description (TnyMimePartIface *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
@@ -416,7 +416,7 @@ tny_msg_mime_part_get_description (TnyMimePartIface *self)
 }
 
 static const gchar*
-tny_msg_mime_part_get_content_location (TnyMimePartIface *self)
+tny_mime_part_get_content_location (TnyMimePartIface *self)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
@@ -430,7 +430,7 @@ tny_msg_mime_part_get_content_location (TnyMimePartIface *self)
 
 
 static void 
-tny_msg_mime_part_set_content_location (TnyMimePartIface *self, const gchar *content_location)
+tny_mime_part_set_content_location (TnyMimePartIface *self, const gchar *content_location)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 
@@ -442,7 +442,7 @@ tny_msg_mime_part_set_content_location (TnyMimePartIface *self, const gchar *con
 }
 
 static void 
-tny_msg_mime_part_set_description (TnyMimePartIface *self, const gchar *description)
+tny_mime_part_set_description (TnyMimePartIface *self, const gchar *description)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 
@@ -454,7 +454,7 @@ tny_msg_mime_part_set_description (TnyMimePartIface *self, const gchar *descript
 }
 
 static void 
-tny_msg_mime_part_set_content_id (TnyMimePartIface *self, const gchar *content_id)
+tny_mime_part_set_content_id (TnyMimePartIface *self, const gchar *content_id)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 
@@ -466,7 +466,7 @@ tny_msg_mime_part_set_content_id (TnyMimePartIface *self, const gchar *content_i
 }
 
 static void 
-tny_msg_mime_part_set_filename (TnyMimePartIface *self, const gchar *filename)
+tny_mime_part_set_filename (TnyMimePartIface *self, const gchar *filename)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 
@@ -478,7 +478,7 @@ tny_msg_mime_part_set_filename (TnyMimePartIface *self, const gchar *filename)
 }
 
 static void 
-tny_msg_mime_part_set_content_type (TnyMimePartIface *self, const gchar *content_type)
+tny_mime_part_set_content_type (TnyMimePartIface *self, const gchar *content_type)
 {
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 
@@ -495,7 +495,7 @@ tny_msg_mime_part_set_content_type (TnyMimePartIface *self, const gchar *content
 }
 
 static void
-tny_msg_mime_part_finalize (GObject *object)
+tny_mime_part_finalize (GObject *object)
 {
 	TnyMimePart *self = (TnyMimePart*) object;
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
@@ -525,18 +525,18 @@ tny_msg_mime_part_finalize (GObject *object)
 
 
 /**
- * tny_msg_mime_part_new:
+ * tny_mime_part_new:
  * 
  * The #TnyMimePart implementation is actually a proxy for #CamelMimePart.
  *
  * Return value: A new #TnyMimePartIface instance implemented for Camel
  **/
 TnyMimePart*
-tny_msg_mime_part_new (CamelMimePart *part)
+tny_mime_part_new (CamelMimePart *part)
 {
 	TnyMimePart *self = g_object_new (TNY_TYPE_MIME_PART, NULL);
 	
-	tny_msg_mime_part_set_part (self, part);
+	tny_mime_part_set_part (self, part);
 
 	return self;
 }
@@ -544,41 +544,41 @@ tny_msg_mime_part_new (CamelMimePart *part)
 
 
 static void
-tny_msg_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
+tny_mime_part_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMimePartIfaceClass *klass = (TnyMimePartIfaceClass *)g_iface;
 
-	klass->content_type_is_func = tny_msg_mime_part_content_type_is;
-	klass->get_content_type_func = tny_msg_mime_part_get_content_type;
-	klass->get_stream_func = tny_msg_mime_part_get_stream;
-	klass->write_to_stream_func = tny_msg_mime_part_write_to_stream;
-	klass->construct_from_stream_func = tny_msg_mime_part_construct_from_stream;
-	klass->get_filename_func = tny_msg_mime_part_get_filename;
-	klass->get_content_id_func = tny_msg_mime_part_get_content_id;
-	klass->get_description_func = tny_msg_mime_part_get_description;
-	klass->get_content_location_func = tny_msg_mime_part_get_content_location;
-	klass->set_content_location_func = tny_msg_mime_part_set_content_location;
-	klass->set_description_func = tny_msg_mime_part_set_description;
-	klass->set_content_id_func = tny_msg_mime_part_set_content_id;
-	klass->set_filename_func = tny_msg_mime_part_set_filename;
-	klass->set_content_type_func = tny_msg_mime_part_set_content_type;
-	klass->is_attachment_func = tny_msg_mime_part_is_attachment;
+	klass->content_type_is_func = tny_mime_part_content_type_is;
+	klass->get_content_type_func = tny_mime_part_get_content_type;
+	klass->get_stream_func = tny_mime_part_get_stream;
+	klass->write_to_stream_func = tny_mime_part_write_to_stream;
+	klass->construct_from_stream_func = tny_mime_part_construct_from_stream;
+	klass->get_filename_func = tny_mime_part_get_filename;
+	klass->get_content_id_func = tny_mime_part_get_content_id;
+	klass->get_description_func = tny_mime_part_get_description;
+	klass->get_content_location_func = tny_mime_part_get_content_location;
+	klass->set_content_location_func = tny_mime_part_set_content_location;
+	klass->set_description_func = tny_mime_part_set_description;
+	klass->set_content_id_func = tny_mime_part_set_content_id;
+	klass->set_filename_func = tny_mime_part_set_filename;
+	klass->set_content_type_func = tny_mime_part_set_content_type;
+	klass->is_attachment_func = tny_mime_part_is_attachment;
 
-	klass->decode_to_stream_func = tny_msg_mime_part_decode_to_stream;
+	klass->decode_to_stream_func = tny_mime_part_decode_to_stream;
 
 	return;
 }
 
 
 static void 
-tny_msg_mime_part_class_init (TnyMimePartClass *class)
+tny_mime_part_class_init (TnyMimePartClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_msg_mime_part_finalize;
+	object_class->finalize = tny_mime_part_finalize;
 
 	g_type_class_add_private (object_class, sizeof (TnyMimePartPriv));
 
@@ -586,7 +586,7 @@ tny_msg_mime_part_class_init (TnyMimePartClass *class)
 }
 
 static void
-tny_msg_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMimePart *self = (TnyMimePart*)instance;
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
@@ -597,7 +597,7 @@ tny_msg_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 GType 
-tny_msg_mime_part_get_type (void)
+tny_mime_part_get_type (void)
 {
 	static GType type = 0;
 
@@ -617,17 +617,17 @@ tny_msg_mime_part_get_type (void)
 		  sizeof (TnyMimePartClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_msg_mime_part_class_init,   /* class_init */
+		  (GClassInitFunc) tny_mime_part_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
 		  sizeof (TnyMimePart),
 		  0,      /* n_preallocs */
-		  tny_msg_mime_part_instance_init    /* instance_init */
+		  tny_mime_part_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_msg_mime_part_iface_info = 
+		static const GInterfaceInfo tny_mime_part_iface_info = 
 		{
-		  (GInterfaceInitFunc) tny_msg_mime_part_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_mime_part_iface_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -637,7 +637,7 @@ tny_msg_mime_part_get_type (void)
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_IFACE, 
-			&tny_msg_mime_part_iface_info);
+			&tny_mime_part_iface_info);
 	}
 
 	return type;

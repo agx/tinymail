@@ -102,7 +102,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
 	   and tny-mime-part.c:515 ! */
 
-	tpart = TNY_MIME_PART_IFACE  (tny_msg_mime_part_new (part));
+	tpart = TNY_MIME_PART_IFACE  (tny_mime_part_new (part));
 
 	tny_list_iface_prepend (list, (GObject*)tpart);
 	g_object_unref (G_OBJECT (tpart));
@@ -233,7 +233,7 @@ tny_msg_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 	g_mutex_lock (priv->parts_lock);
 
 	camel_multipart_add_part ((CamelMultipart*)containee, 
-		tny_msg_mime_part_get_part (TNY_MIME_PART (part)));
+		tny_mime_part_get_part (TNY_MIME_PART (part)));
 
 	g_mutex_unlock (priv->parts_lock);
 

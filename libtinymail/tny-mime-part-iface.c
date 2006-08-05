@@ -22,25 +22,25 @@
 #include <tny-mime-part-iface.h>
 
 /**
- * tny_msg_mime_part_iface_is_attachment:
+ * tny_mime_part_iface_is_attachment:
  * @self: a #TnyMimePartIface object
  * 
  * Return value: whether or not the mime part is an attachment
  *
  **/
 gboolean 
-tny_msg_mime_part_iface_is_attachment (TnyMimePartIface *self)
+tny_mime_part_iface_is_attachment (TnyMimePartIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->is_attachment_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_is_attachment\n");
+		g_critical ("You must implement tny_mime_part_iface_is_attachment\n");
 #endif
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->is_attachment_func (self);
 }
 
 
 /**
- * tny_msg_mime_part_iface_set_content_location:
+ * tny_mime_part_iface_set_content_location:
  * @self: a #TnyMimePartIface object
  * @content_location: the location 
  * 
@@ -48,11 +48,11 @@ tny_msg_mime_part_iface_is_attachment (TnyMimePartIface *self)
  *
  **/
 void
-tny_msg_mime_part_iface_set_content_location (TnyMimePartIface *self, const gchar *content_location)
+tny_mime_part_iface_set_content_location (TnyMimePartIface *self, const gchar *content_location)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->set_content_location_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_set_content_location\n");
+		g_critical ("You must implement tny_mime_part_iface_set_content_location\n");
 #endif
 
 	TNY_MIME_PART_IFACE_GET_CLASS (self)->set_content_location_func (self, content_location);
@@ -60,7 +60,7 @@ tny_msg_mime_part_iface_set_content_location (TnyMimePartIface *self, const gcha
 }
 
 /**
- * tny_msg_mime_part_iface_set_description:
+ * tny_mime_part_iface_set_description:
  * @self: a #TnyMimePartIface object
  * @description: the description 
  * 
@@ -68,11 +68,11 @@ tny_msg_mime_part_iface_set_content_location (TnyMimePartIface *self, const gcha
  *
  **/
 void
-tny_msg_mime_part_iface_set_description (TnyMimePartIface *self, const gchar *description)
+tny_mime_part_iface_set_description (TnyMimePartIface *self, const gchar *description)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->set_description_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_set_description\n");
+		g_critical ("You must implement tny_mime_part_iface_set_description\n");
 #endif
 
 	TNY_MIME_PART_IFACE_GET_CLASS (self)->set_description_func (self, description);
@@ -80,7 +80,7 @@ tny_msg_mime_part_iface_set_description (TnyMimePartIface *self, const gchar *de
 }
 
 /**
- * tny_msg_mime_part_iface_set_content_id:
+ * tny_mime_part_iface_set_content_id:
  * @self: a #TnyMimePartIface object
  * @content_id: the content id 
  * 
@@ -88,11 +88,11 @@ tny_msg_mime_part_iface_set_description (TnyMimePartIface *self, const gchar *de
  *
  **/
 void
-tny_msg_mime_part_iface_set_content_id (TnyMimePartIface *self, const gchar *content_id)
+tny_mime_part_iface_set_content_id (TnyMimePartIface *self, const gchar *content_id)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->set_content_id_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_set_content_id\n");
+		g_critical ("You must implement tny_mime_part_iface_set_content_id\n");
 #endif
 
 	TNY_MIME_PART_IFACE_GET_CLASS (self)->set_content_id_func (self, content_id);
@@ -100,7 +100,7 @@ tny_msg_mime_part_iface_set_content_id (TnyMimePartIface *self, const gchar *con
 }
 
 /**
- * tny_msg_mime_part_iface_set_filename:
+ * tny_mime_part_iface_set_filename:
  * @self: a #TnyMimePartIface object
  * @filename: the filename 
  * 
@@ -108,11 +108,11 @@ tny_msg_mime_part_iface_set_content_id (TnyMimePartIface *self, const gchar *con
  *
  **/
 void
-tny_msg_mime_part_iface_set_filename (TnyMimePartIface *self, const gchar *filename)
+tny_mime_part_iface_set_filename (TnyMimePartIface *self, const gchar *filename)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->set_filename_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_set_filename\n");
+		g_critical ("You must implement tny_mime_part_iface_set_filename\n");
 #endif
 
 	TNY_MIME_PART_IFACE_GET_CLASS (self)->set_filename_func (self, filename);
@@ -120,7 +120,7 @@ tny_msg_mime_part_iface_set_filename (TnyMimePartIface *self, const gchar *filen
 }
 
 /**
- * tny_msg_mime_part_iface_set_content_type:
+ * tny_mime_part_iface_set_content_type:
  * @self: a #TnyMimePartIface object
  * @content_type: the content_type 
  * 
@@ -128,11 +128,11 @@ tny_msg_mime_part_iface_set_filename (TnyMimePartIface *self, const gchar *filen
  *
  **/
 void
-tny_msg_mime_part_iface_set_content_type (TnyMimePartIface *self, const gchar *content_type)
+tny_mime_part_iface_set_content_type (TnyMimePartIface *self, const gchar *content_type)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->set_content_type_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_set_content_type\n");
+		g_critical ("You must implement tny_mime_part_iface_set_content_type\n");
 #endif
 
 	TNY_MIME_PART_IFACE_GET_CLASS (self)->set_content_type_func (self, content_type);
@@ -141,79 +141,79 @@ tny_msg_mime_part_iface_set_content_type (TnyMimePartIface *self, const gchar *c
 
 
 /**
- * tny_msg_mime_part_iface_get_filename:
+ * tny_mime_part_iface_get_filename:
  * @self: a #TnyMimePartIface object
  * 
  *
  * Return value: the filename of a message part
  **/
 const gchar*
-tny_msg_mime_part_iface_get_filename (TnyMimePartIface *self)
+tny_mime_part_iface_get_filename (TnyMimePartIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->get_filename_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_get_filename\n");
+		g_critical ("You must implement tny_mime_part_iface_get_filename\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->get_filename_func (self);
 }
 
 /**
- * tny_msg_mime_part_iface_get_content_id:
+ * tny_mime_part_iface_get_content_id:
  * @self: a #TnyMimePartIface object
  * 
  *
  * Return value: the content-id of a message part
  **/
 const gchar*
-tny_msg_mime_part_iface_get_content_id (TnyMimePartIface *self)
+tny_mime_part_iface_get_content_id (TnyMimePartIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->get_content_id_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_get_content_id\n");
+		g_critical ("You must implement tny_mime_part_iface_get_content_id\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->get_content_id_func (self);
 }
 
 /**
- * tny_msg_mime_part_iface_get_description:
+ * tny_mime_part_iface_get_description:
  * @self: a #TnyMimePartIface object
  * 
  *
  * Return value: the description of a message part
  **/
 const gchar*
-tny_msg_mime_part_iface_get_description (TnyMimePartIface *self)
+tny_mime_part_iface_get_description (TnyMimePartIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->get_description_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_get_description\n");
+		g_critical ("You must implement tny_mime_part_iface_get_description\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->get_description_func (self);
 }
 
 /**
- * tny_msg_mime_part_iface_get_content_location:
+ * tny_mime_part_iface_get_content_location:
  * @self: a #TnyMimePartIface object
  * 
  *
  * Return value: the content-location of a message part
  **/
 const gchar*
-tny_msg_mime_part_iface_get_content_location (TnyMimePartIface *self)
+tny_mime_part_iface_get_content_location (TnyMimePartIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->get_content_location_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_get_content_location\n");
+		g_critical ("You must implement tny_mime_part_iface_get_content_location\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->get_content_location_func (self);
 }
 
 /**
- * tny_msg_mime_part_iface_write_to_stream:
+ * tny_mime_part_iface_write_to_stream:
  * @self: a #TnyMimePartIface object
  * @stream: a #TnyMsgStreamIface stream
  * 
@@ -223,11 +223,11 @@ tny_msg_mime_part_iface_get_content_location (TnyMimePartIface *self)
  *
  **/
 void
-tny_msg_mime_part_iface_write_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
+tny_mime_part_iface_write_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->write_to_stream_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_write_to_stream\n");
+		g_critical ("You must implement tny_mime_part_iface_write_to_stream\n");
 #endif
 
 	TNY_MIME_PART_IFACE_GET_CLASS (self)->write_to_stream_func (self, stream);
@@ -236,7 +236,7 @@ tny_msg_mime_part_iface_write_to_stream (TnyMimePartIface *self, TnyStreamIface 
 
 
 /**
- * tny_msg_mime_part_iface_decode_to_stream:
+ * tny_mime_part_iface_decode_to_stream:
  * @self: a #TnyMimePartIface object
  * @stream: a #TnyMsgStreamIface stream
  * 
@@ -246,18 +246,18 @@ tny_msg_mime_part_iface_write_to_stream (TnyMimePartIface *self, TnyStreamIface 
  *
  **/
 void
-tny_msg_mime_part_iface_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
+tny_mime_part_iface_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->decode_to_stream_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_decode_to_stream\n");
+		g_critical ("You must implement tny_mime_part_iface_decode_to_stream\n");
 #endif
 
 	TNY_MIME_PART_IFACE_GET_CLASS (self)->decode_to_stream_func (self, stream);
 	return;
 }
 /**
- * tny_msg_mime_part_iface_construct_from_stream:
+ * tny_mime_part_iface_construct_from_stream:
  * @self: a #TnyMimePartIface object
  * @stream: a #TnyMsgStreamIface stream
  * @type: the type like text/plain
@@ -267,11 +267,11 @@ tny_msg_mime_part_iface_decode_to_stream (TnyMimePartIface *self, TnyStreamIface
  * Return value: 0 on success or -1 on fail
  **/
 gint
-tny_msg_mime_part_iface_construct_from_stream (TnyMimePartIface *self, TnyStreamIface *stream, const gchar *type)
+tny_mime_part_iface_construct_from_stream (TnyMimePartIface *self, TnyStreamIface *stream, const gchar *type)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->construct_from_stream_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_construct_from_stream\n");
+		g_critical ("You must implement tny_mime_part_iface_construct_from_stream\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->construct_from_stream_func (self, stream, type);
@@ -279,7 +279,7 @@ tny_msg_mime_part_iface_construct_from_stream (TnyMimePartIface *self, TnyStream
 
 
 /**
- * tny_msg_mime_part_iface_get_stream:
+ * tny_mime_part_iface_get_stream:
  * @self: a #TnyMimePartIface object
  * 
  * Inefficiently get a stream from a message part. The entire data of the
@@ -288,18 +288,18 @@ tny_msg_mime_part_iface_construct_from_stream (TnyMimePartIface *self, TnyStream
  * Return value: An in-memory stream
  **/
 TnyStreamIface* 
-tny_msg_mime_part_iface_get_stream (TnyMimePartIface *self)
+tny_mime_part_iface_get_stream (TnyMimePartIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->get_stream_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_get_stream\n");
+		g_critical ("You must implement tny_mime_part_iface_get_stream\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->get_stream_func (self);
 }
 
 /**
- * tny_msg_mime_part_iface_get_content_type:
+ * tny_mime_part_iface_get_content_type:
  * @self: a #TnyMimePartIface object
  * 
  * A read-only string in the format "type/subtype". You shouldn't free this
@@ -308,18 +308,18 @@ tny_msg_mime_part_iface_get_stream (TnyMimePartIface *self)
  * Return value: the read-only content-type of a message part
  **/
 const gchar*
-tny_msg_mime_part_iface_get_content_type (TnyMimePartIface *self)
+tny_mime_part_iface_get_content_type (TnyMimePartIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->get_content_type_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_get_content_type\n");
+		g_critical ("You must implement tny_mime_part_iface_get_content_type\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->get_content_type_func (self);
 }
 
 /**
- * tny_msg_mime_part_iface_content_type_is:
+ * tny_mime_part_iface_content_type_is:
  * @self: a #TnyMimePartIface object
  * @content_type: The content type in the string format type/subtype
  * 
@@ -328,11 +328,11 @@ tny_msg_mime_part_iface_get_content_type (TnyMimePartIface *self)
  * Return value: Whether or not the part is the content type
  **/
 gboolean
-tny_msg_mime_part_iface_content_type_is (TnyMimePartIface *self, const gchar *content_type)
+tny_mime_part_iface_content_type_is (TnyMimePartIface *self, const gchar *content_type)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_IFACE_GET_CLASS (self)->content_type_is_func)
-		g_critical ("You must implement tny_msg_mime_part_iface_content_type_is\n");
+		g_critical ("You must implement tny_mime_part_iface_content_type_is\n");
 #endif
 
 	return TNY_MIME_PART_IFACE_GET_CLASS (self)->content_type_is_func (self, content_type);
@@ -341,7 +341,7 @@ tny_msg_mime_part_iface_content_type_is (TnyMimePartIface *self, const gchar *co
 
 
 static void
-tny_msg_mime_part_iface_base_init (gpointer g_class)
+tny_mime_part_iface_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
@@ -352,7 +352,7 @@ tny_msg_mime_part_iface_base_init (gpointer g_class)
 }
 
 GType
-tny_msg_mime_part_iface_get_type (void)
+tny_mime_part_iface_get_type (void)
 {
 	static GType type = 0;
 
@@ -361,7 +361,7 @@ tny_msg_mime_part_iface_get_type (void)
 		static const GTypeInfo info = 
 		{
 		  sizeof (TnyMimePartIfaceClass),
-		  tny_msg_mime_part_iface_base_init,   /* base_init */
+		  tny_mime_part_iface_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */

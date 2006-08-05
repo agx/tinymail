@@ -33,20 +33,20 @@ static TnyMimePartIface *iface = NULL;
 static gchar *str;
 
 static void
-tny_msg_mime_part_iface_test_setup (void)
+tny_mime_part_iface_test_setup (void)
 {
 	/* Don't ask me why, I think this is a Camel bug */
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
 	CamelMimePart *cpart = camel_mime_part_new ();
-	iface = TNY_MIME_PART_IFACE (tny_msg_mime_part_new (cpart));
+	iface = TNY_MIME_PART_IFACE (tny_mime_part_new (cpart));
 
 	return;
 }
 
 static void 
-tny_msg_mime_part_iface_test_teardown (void)
+tny_mime_part_iface_test_teardown (void)
 {
 	g_object_unref (G_OBJECT (iface));
 
@@ -54,12 +54,12 @@ tny_msg_mime_part_iface_test_teardown (void)
 }
 
 static void
-tny_msg_mime_part_iface_test_set_content_location (void)
+tny_mime_part_iface_test_set_content_location (void)
 {
 	const gchar *str_in = "testcontentlocation", *str_out;
 	
-	tny_msg_mime_part_iface_set_content_location (iface, str_in);
-	str_out = tny_msg_mime_part_iface_get_content_location (iface);
+	tny_mime_part_iface_set_content_location (iface, str_in);
+	str_out = tny_mime_part_iface_get_content_location (iface);
 
 	str = g_strdup_printf ("Unable to set content location! (%s) vs. (%s)\n",
 		str_in, str_out);
@@ -73,12 +73,12 @@ tny_msg_mime_part_iface_test_set_content_location (void)
 
 
 static void
-tny_msg_mime_part_iface_test_set_description (void)
+tny_mime_part_iface_test_set_description (void)
 {
 	const gchar *str_in = "test description", *str_out;
 	
-	tny_msg_mime_part_iface_set_description (iface, str_in);
-	str_out = tny_msg_mime_part_iface_get_description (iface);
+	tny_mime_part_iface_set_description (iface, str_in);
+	str_out = tny_mime_part_iface_get_description (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set description!\n");
 
@@ -86,12 +86,12 @@ tny_msg_mime_part_iface_test_set_description (void)
 }
 
 static void
-tny_msg_mime_part_iface_test_set_content_id (void)
+tny_mime_part_iface_test_set_content_id (void)
 {
 	const gchar *str_in = "testcontentid", *str_out;
 	
-	tny_msg_mime_part_iface_set_content_id (iface, str_in);
-	str_out = tny_msg_mime_part_iface_get_content_id (iface);
+	tny_mime_part_iface_set_content_id (iface, str_in);
+	str_out = tny_mime_part_iface_get_content_id (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set content id!\n");
 
@@ -99,12 +99,12 @@ tny_msg_mime_part_iface_test_set_content_id (void)
 }
     
 static void
-tny_msg_mime_part_iface_test_set_filename (void)
+tny_mime_part_iface_test_set_filename (void)
 {
 	const gchar *str_in = "test_filename.txt", *str_out;
 	
-	tny_msg_mime_part_iface_set_filename (iface, str_in);
-	str_out = tny_msg_mime_part_iface_get_filename (iface);
+	tny_mime_part_iface_set_filename (iface, str_in);
+	str_out = tny_mime_part_iface_get_filename (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set filename!\n");
 
@@ -112,12 +112,12 @@ tny_msg_mime_part_iface_test_set_filename (void)
 }
        
 static void
-tny_msg_mime_part_iface_test_set_content_type (void)
+tny_mime_part_iface_test_set_content_type (void)
 {
 	const gchar *str_in = "text/html", *str_out;
 	
-	tny_msg_mime_part_iface_set_content_type (iface, str_in);
-	str_out = tny_msg_mime_part_iface_get_content_type (iface);
+	tny_mime_part_iface_set_content_type (iface, str_in);
+	str_out = tny_mime_part_iface_get_content_type (iface);
 
 	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to content type!\n");
 
@@ -125,7 +125,7 @@ tny_msg_mime_part_iface_test_set_content_type (void)
 }
 
 static void
-tny_msg_mime_part_iface_test_stream (void)
+tny_mime_part_iface_test_stream (void)
 {
 	CamelStream *real_to = camel_stream_mem_new ();
 	TnyStreamIface *from = TNY_STREAM_IFACE (tny_test_stream_new ());
@@ -134,8 +134,8 @@ tny_msg_mime_part_iface_test_stream (void)
 
 /* TODO (this one crashes)
 
-	tny_msg_mime_part_iface_construct_from_stream (iface, from, "text/plain");
-	tny_msg_mime_part_iface_write_to_stream (iface, to);
+	tny_mime_part_iface_construct_from_stream (iface, from, "text/plain");
+	tny_mime_part_iface_write_to_stream (iface, to);
 
 	while (!tny_stream_iface_eos (to) && n < 1)
 	{
@@ -156,7 +156,7 @@ tny_msg_mime_part_iface_test_stream (void)
 }
 
 GUnitTestSuite*
-create_tny_msg_mime_part_iface_suite (void)
+create_tny_mime_part_iface_suite (void)
 {
 	GUnitTestSuite *suite = NULL;
 
@@ -165,39 +165,39 @@ create_tny_msg_mime_part_iface_suite (void)
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_mime_part_iface_test_set_content_location",
-                                      tny_msg_mime_part_iface_test_setup,
-                                      tny_msg_mime_part_iface_test_set_content_location,
-				      tny_msg_mime_part_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_mime_part_iface_test_set_content_location",
+                                      tny_mime_part_iface_test_setup,
+                                      tny_mime_part_iface_test_set_content_location,
+				      tny_mime_part_iface_test_teardown));
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_mime_part_iface_test_set_description",
-                                      tny_msg_mime_part_iface_test_setup,
-                                      tny_msg_mime_part_iface_test_set_description,
-				      tny_msg_mime_part_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_mime_part_iface_test_set_description",
+                                      tny_mime_part_iface_test_setup,
+                                      tny_mime_part_iface_test_set_description,
+				      tny_mime_part_iface_test_teardown));
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_mime_part_iface_test_set_content_id",
-                                      tny_msg_mime_part_iface_test_setup,
-                                      tny_msg_mime_part_iface_test_set_content_id,
-				      tny_msg_mime_part_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_mime_part_iface_test_set_content_id",
+                                      tny_mime_part_iface_test_setup,
+                                      tny_mime_part_iface_test_set_content_id,
+				      tny_mime_part_iface_test_teardown));
 	
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_mime_part_iface_test_set_content_type",
-                                      tny_msg_mime_part_iface_test_setup,
-                                      tny_msg_mime_part_iface_test_set_content_type,
-				      tny_msg_mime_part_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_mime_part_iface_test_set_content_type",
+                                      tny_mime_part_iface_test_setup,
+                                      tny_mime_part_iface_test_set_content_type,
+				      tny_mime_part_iface_test_teardown));
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_mime_part_iface_test_set_filename",
-                                      tny_msg_mime_part_iface_test_setup,
-                                      tny_msg_mime_part_iface_test_set_filename,
-				      tny_msg_mime_part_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_mime_part_iface_test_set_filename",
+                                      tny_mime_part_iface_test_setup,
+                                      tny_mime_part_iface_test_set_filename,
+				      tny_mime_part_iface_test_teardown));
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_mime_part_iface_test_stream",
-                                      tny_msg_mime_part_iface_test_setup,
-                                      tny_msg_mime_part_iface_test_stream,
-				      tny_msg_mime_part_iface_test_teardown));
+               gunit_test_case_new_with_funcs("tny_mime_part_iface_test_stream",
+                                      tny_mime_part_iface_test_setup,
+                                      tny_mime_part_iface_test_stream,
+				      tny_mime_part_iface_test_teardown));
 	return suite;
 }

@@ -43,7 +43,7 @@ gunit_get_test_suites()
 
 	suites = g_list_append (suites, create_tny_msg_header_iface_suite ());
 	suites = g_list_append (suites, create_tny_stream_iface_suite ());
-	suites = g_list_append (suites, create_tny_msg_mime_part_iface_suite ());
+	suites = g_list_append (suites, create_tny_mime_part_iface_suite ());
 	suites = g_list_append (suites, create_tny_list_iface_suite ());
 	suites = g_list_append (suites, create_tny_account_iface_suite ());
 	suites = g_list_append (suites, create_tny_device_iface_suite ());

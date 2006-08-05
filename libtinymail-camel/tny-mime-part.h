@@ -28,7 +28,7 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MIME_PART             (tny_msg_mime_part_get_type ())
+#define TNY_TYPE_MIME_PART             (tny_mime_part_get_type ())
 #define TNY_MIME_PART(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MIME_PART, TnyMimePart))
 #define TNY_MIME_PART_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MIME_PART, TnyMimePartClass))
 #define TNY_IS_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MIME_PART))
@@ -49,11 +49,11 @@ struct _TnyMimePartClass
 };
 
 
-GType                 tny_msg_mime_part_get_type  (void);
+GType                 tny_mime_part_get_type  (void);
 
-TnyMimePart*       tny_msg_mime_part_new       (CamelMimePart *part);
-void                  tny_msg_mime_part_set_part  (TnyMimePart *self, CamelMimePart *part);
-CamelMimePart*	      tny_msg_mime_part_get_part  (TnyMimePart *self);
+TnyMimePart*       tny_mime_part_new       (CamelMimePart *part);
+void                  tny_mime_part_set_part  (TnyMimePart *self, CamelMimePart *part);
+CamelMimePart*	      tny_mime_part_get_part  (TnyMimePart *self);
 
 G_END_DECLS
 

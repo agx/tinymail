@@ -24,6 +24,6 @@
 #include <tny-mime-part-iface.h>
 
 /* Test suite */
-GUnitTestSuite *create_tny_msg_mime_part_iface_suite (void);
+GUnitTestSuite *create_tny_mime_part_iface_suite (void);
 
 #endif

@@ -65,7 +65,7 @@ save_to_file (const gchar *uri, TnyMimePartIface *part)
 		return FALSE;
 
 	stream = tny_vfs_stream_new (handle);
-	tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
+	tny_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
 
 	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
 	g_object_unref (G_OBJECT (stream));
@@ -82,7 +82,7 @@ save_to_file (const gchar *local_filename, TnyMimePartIface *part)
 	{
 		TnyFsStream *stream = NULL;
 		stream = tny_fs_stream_new (fd);
-		tny_msg_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
+		tny_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
 
 		/* This also closes the file descriptor (maybe it shouldn't?) */
 		g_object_unref (G_OBJECT (stream));
@@ -118,7 +118,7 @@ tny_save_strategy_save (TnySaveStrategyIface *self, TnyMimePartIface *part)
 #endif
 
 	gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), 
-		tny_msg_mime_part_iface_get_filename (part));
+		tny_mime_part_iface_get_filename (part));
 
 	if (G_LIKELY (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT))
 	{
