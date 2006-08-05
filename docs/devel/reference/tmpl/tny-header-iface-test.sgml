@@ -17,7 +17,7 @@ tny-msg-header-iface-test
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### FUNCTION create_tny_msg_header_iface_suite ##### -->
+<!-- ##### FUNCTION create_tny_header_iface_suite ##### -->
 <para>
 
 </para>

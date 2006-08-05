@@ -19,28 +19,20 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_MSG_HEADER_LIST_MODEL_COLUMN ##### -->
+<!-- ##### MACRO TNY_TYPE_HEADER_LIST_MODEL_COLUMN ##### -->
 <para>
 
 </para>
 
 
 
-<!-- ##### STRUCT TnyMsgHeaderListModel ##### -->
+<!-- ##### STRUCT TnyHeaderListModel ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_msg_header_list_model_column_get_type ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_msg_header_list_model_new ##### -->
+<!-- ##### FUNCTION tny_header_list_model_column_get_type ##### -->
 <para>
 
 </para>
@@ -48,7 +40,15 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_list_model_set_folder ##### -->
+<!-- ##### FUNCTION tny_header_list_model_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_header_list_model_set_folder ##### -->
 <para>
 
 </para>
@@ -58,7 +58,7 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 @refresh: 
 
 
-<!-- ##### FUNCTION tny_msg_header_list_model_received_date_sort_func ##### -->
+<!-- ##### FUNCTION tny_header_list_model_received_date_sort_func ##### -->
 <para>
 
 </para>
@@ -70,7 +70,7 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_list_model_sent_date_sort_func ##### -->
+<!-- ##### FUNCTION tny_header_list_model_sent_date_sort_func ##### -->
 <para>
 
 </para>

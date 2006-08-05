@@ -128,13 +128,13 @@ Shared include file with forward typedefs
 @refresh_async_func: 
 @refresh_func: 
 
-<!-- ##### STRUCT TnyMsgHeaderIface ##### -->
+<!-- ##### STRUCT TnyHeaderIface ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderIfaceClass ##### -->
+<!-- ##### STRUCT TnyHeaderIfaceClass ##### -->
 <para>
 
 </para>
@@ -353,13 +353,13 @@ Shared include file with forward typedefs
 @get_device_func: 
 @alert_func: 
 
-<!-- ##### STRUCT TnyMsgHeaderProxy ##### -->
+<!-- ##### STRUCT TnyHeaderProxy ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderProxyClass ##### -->
+<!-- ##### STRUCT TnyHeaderProxyClass ##### -->
 <para>
 
 </para>

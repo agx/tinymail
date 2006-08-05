@@ -22,6 +22,30 @@
 
 
 
+<!-- ##### SECTION ./tmpl/tny-msg-header-list-model-priv.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-list-model-priv.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-list-model-priv.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-list-model-priv.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-msg-header-list-model-priv.sgml:Title ##### -->
+TnyMsgHeaderListModel
+
+
 <!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:Long_Description ##### -->
 <para>
 
@@ -153,6 +177,18 @@ TnySummaryWindow
 
 @obj: 
 
+<!-- ##### MACRO TNY_TYPE_MSG_HEADER_FLAGS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO TNY_TYPE_MSG_HEADER_LIST_MODEL_COLUMN ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
 <para>
 
@@ -187,6 +223,61 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @status: A status field
 @user_data: user data
 
+<!-- ##### STRUCT TnyMsgHeader ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderIfaceClass ##### -->
+<para>
+
+</para>
+
+@g_iface: 
+@get_uid_func: 
+@get_bcc_func: 
+@get_cc_func: 
+@get_subject_func: 
+@get_to_func: 
+@get_from_func: 
+@get_replyto_func: 
+@get_message_id_func: 
+@get_date_received_func: 
+@get_date_sent_func: 
+@set_bcc_func: 
+@set_cc_func: 
+@set_from_func: 
+@set_subject_func: 
+@set_to_func: 
+@set_replyto_func: 
+@get_folder_func: 
+@set_folder_func: 
+@get_flags_func: 
+@set_flags_func: 
+@unset_flags_func: 
+
+<!-- ##### STRUCT TnyMsgHeaderListIterator ##### -->
+<para>
+
+</para>
+
+@parent: 
+@model: 
+@current: 
+
 <!-- ##### STRUCT TnyMsgHeaderListIteratorClass ##### -->
 <para>
 
@@ -194,12 +285,42 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @parent: 
 
+<!-- ##### STRUCT TnyMsgHeaderListModel ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyMsgHeaderListModelClass ##### -->
 <para>
 
 </para>
 
 @parent: 
+
+<!-- ##### STRUCT TnyMsgHeaderProxy ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderProxyClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderView ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgHeaderViewIface ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### STRUCT TnyMsgMimePartIface ##### -->
 <para>
@@ -242,6 +363,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 </para>
 
+
+<!-- ##### FUNCTION create_tny_msg_header_iface_suite ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 <!-- ##### FUNCTION create_tny_msg_mime_part_iface_suite ##### -->
 <para>
@@ -367,6 +495,109 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @camel_folder: 
 
+<!-- ##### FUNCTION tny_msg_header_flags_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_bcc ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_cc ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_date_received ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_date_sent ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_flags ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_from ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_message_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_replyto ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_subject ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_to ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_get_uid ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_header_iface_has_cache ##### -->
 <para>
 
@@ -374,6 +605,70 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_bcc ##### -->
+<para>
+
+</para>
+
+@self: 
+@bcc: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_cc ##### -->
+<para>
+
+</para>
+
+@self: 
+@cc: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_flags ##### -->
+<para>
+
+</para>
+
+@self: 
+@mask: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_from ##### -->
+<para>
+
+</para>
+
+@self: 
+@from: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_replyto ##### -->
+<para>
+
+</para>
+
+@self: 
+@to: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_subject ##### -->
+<para>
+
+</para>
+
+@self: 
+@subject: 
+
+<!-- ##### FUNCTION tny_msg_header_iface_set_to ##### -->
+<para>
+
+</para>
+
+@self: 
+@to: 
 
 <!-- ##### FUNCTION tny_msg_header_iface_set_uid ##### -->
 <para>
@@ -390,6 +685,66 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 
+<!-- ##### FUNCTION tny_msg_header_iface_unset_flags ##### -->
+<para>
+
+</para>
+
+@self: 
+@mask: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_column_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_received_date_sort_func ##### -->
+<para>
+
+</para>
+
+@model: 
+@a: 
+@b: 
+@user_data: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_sent_date_sort_func ##### -->
+<para>
+
+</para>
+
+@model: 
+@a: 
+@b: 
+@user_data: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+@refresh: 
+
+<!-- ##### FUNCTION tny_msg_header_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_header_set_use_summary ##### -->
 <para>
 
@@ -397,6 +752,21 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @val: 
+
+<!-- ##### FUNCTION tny_msg_header_view_iface_set_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+<!-- ##### FUNCTION tny_msg_header_view_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 <!-- ##### FUNCTION tny_msg_iface_set_folder ##### -->
 <para>

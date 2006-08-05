@@ -32,19 +32,19 @@ for no real reason.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgHeader ##### -->
+<!-- ##### STRUCT TnyHeader ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderClass ##### -->
+<!-- ##### STRUCT TnyHeaderClass ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_msg_header_new ##### -->
+<!-- ##### FUNCTION tny_header_new ##### -->
 <para>
 
 </para>

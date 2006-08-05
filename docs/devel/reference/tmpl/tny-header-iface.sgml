@@ -19,14 +19,14 @@ by a summary view to give the user an overview of the available messages in a fo
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_MSG_HEADER_FLAGS ##### -->
+<!-- ##### MACRO TNY_TYPE_HEADER_FLAGS ##### -->
 <para>
 
 </para>
 
 
 
-<!-- ##### FUNCTION tny_msg_header_flags_get_type ##### -->
+<!-- ##### FUNCTION tny_header_flags_get_type ##### -->
 <para>
 
 </para>
@@ -34,7 +34,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_uid ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_uid ##### -->
 <para>
 
 </para>
@@ -43,7 +43,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_bcc ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_bcc ##### -->
 <para>
 
 </para>
@@ -52,7 +52,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_cc ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_cc ##### -->
 <para>
 
 </para>
@@ -61,7 +61,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_date_received ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_date_received ##### -->
 <para>
 
 </para>
@@ -70,7 +70,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_date_sent ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_date_sent ##### -->
 <para>
 
 </para>
@@ -79,7 +79,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_message_id ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_message_id ##### -->
 <para>
 
 </para>
@@ -88,7 +88,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_from ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_from ##### -->
 <para>
 
 </para>
@@ -97,7 +97,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_to ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_to ##### -->
 <para>
 
 </para>
@@ -106,7 +106,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_subject ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_subject ##### -->
 <para>
 
 </para>
@@ -115,7 +115,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_replyto ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_replyto ##### -->
 <para>
 
 </para>
@@ -124,7 +124,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_bcc ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_bcc ##### -->
 <para>
 
 </para>
@@ -133,7 +133,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @bcc: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_cc ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_cc ##### -->
 <para>
 
 </para>
@@ -142,7 +142,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @cc: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_from ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_from ##### -->
 <para>
 
 </para>
@@ -151,7 +151,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @from: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_subject ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_subject ##### -->
 <para>
 
 </para>
@@ -160,7 +160,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @subject: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_to ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_to ##### -->
 <para>
 
 </para>
@@ -169,7 +169,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @to: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_replyto ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_replyto ##### -->
 <para>
 
 </para>
@@ -178,7 +178,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @to: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_folder ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_folder ##### -->
 <para>
 
 </para>
@@ -187,7 +187,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_flags ##### -->
+<!-- ##### FUNCTION tny_header_iface_get_flags ##### -->
 <para>
 
 </para>
@@ -196,7 +196,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_folder ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_folder ##### -->
 <para>
 
 </para>
@@ -205,7 +205,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @folder: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_flags ##### -->
+<!-- ##### FUNCTION tny_header_iface_set_flags ##### -->
 <para>
 
 </para>
@@ -214,7 +214,7 @@ by a summary view to give the user an overview of the available messages in a fo
 @mask: 
 
 
-<!-- ##### FUNCTION tny_msg_header_iface_unset_flags ##### -->
+<!-- ##### FUNCTION tny_header_iface_unset_flags ##### -->
 <para>
 
 </para>

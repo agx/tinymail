@@ -8,7 +8,7 @@
 <!ENTITY libtinymail-TnyStoreAccountIface SYSTEM "xml/tny-store-account-iface.xml">
 <!ENTITY libtinymail-TnyTransportAccountIface SYSTEM "xml/tny-transport-account-iface.xml">
 <!ENTITY libtinymail-TnyAccountStoreIface SYSTEM "xml/tny-account-store-iface.xml">
-<!ENTITY libtinymail-TnyMsgHeaderIface SYSTEM "xml/tny-msg-header-iface.xml">
+<!ENTITY libtinymail-TnyHeaderIface SYSTEM "xml/tny-header-iface.xml">
 <!ENTITY libtinymail-TnyMsgIface SYSTEM "xml/tny-msg-iface.xml">
 <!ENTITY libtinymail-TnyMimePartIface SYSTEM "xml/tny-mime-part-iface.xml">
 <!ENTITY libtinymail-TnyStreamIface SYSTEM "xml/tny-stream-iface.xml">
@@ -25,7 +25,7 @@
 <!ENTITY libtinymail-camel-TnyTransportAccount SYSTEM "xml/tny-transport-account.xml">
 <!ENTITY libtinymail-camel-TnyCamelStream SYSTEM "xml/tny-camel-stream.xml">
 <!ENTITY libtinymail-camel-TnyFolder SYSTEM "xml/tny-folder.xml">
-<!ENTITY libtinymail-camel-TnyMsgHeader SYSTEM "xml/tny-msg-header.xml">
+<!ENTITY libtinymail-camel-TnyHeader SYSTEM "xml/tny-header.xml">
 <!ENTITY libtinymail-camel-TnyMimePart SYSTEM "xml/tny-mime-part.xml">
 <!ENTITY libtinymail-camel-TnyMsg SYSTEM "xml/tny-msg.xml">
 <!ENTITY libtinymail-camel-TnySessionCamel SYSTEM "xml/tny-session-camel.xml">
@@ -36,16 +36,16 @@
 
 <!ENTITY libtinymailui-gtk-TnyAccountTreeModel SYSTEM "xml/tny-account-tree-model.xml">
 <!ENTITY libtinymailui-gtk-TnyAttachListModel SYSTEM "xml/tny-attach-list-model.xml">
-<!ENTITY libtinymailui-gtk-TnyMsgHeaderListModel SYSTEM "xml/tny-msg-header-list-model.xml">
+<!ENTITY libtinymailui-gtk-TnyHeaderListModel SYSTEM "xml/tny-header-list-model.xml">
 <!ENTITY libtinymailui-gtk-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
 <!ENTITY libtinymailui-gtk-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
-<!ENTITY libtinymailui-gtk-TnyMsgHeaderView SYSTEM "xml/tny-msg-header-view.xml">
+<!ENTITY libtinymailui-gtk-TnyHeaderView SYSTEM "xml/tny-header-view.xml">
 <!ENTITY libtinymailui-gtk-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
 <!ENTITY libtinymailui-gtk-TnySaveStrategy SYSTEM "xml/tny-save-strategy.xml">
 
 <!ENTITY libtinymailui-TnyMsgWindowIface SYSTEM "xml/tny-msg-window-iface.xml">
 <!ENTITY libtinymailui-TnyMsgViewIface SYSTEM "xml/tny-msg-view-iface.xml">
-<!ENTITY libtinymailui-TnyMsgHeaderViewIface SYSTEM "xml/tny-msg-header-view-iface.xml">
+<!ENTITY libtinymailui-TnyHeaderViewIface SYSTEM "xml/tny-header-view-iface.xml">
 <!ENTITY libtinymailui-TnyPlatformFactoryIface SYSTEM "xml/tny-platform-factory-iface.xml">
 <!ENTITY libtinymailui-TnyAccountStoreViewIface SYSTEM "xml/tny-account-store-view-iface.xml">
 <!ENTITY libtinymailui-TnySaveStrategyIface SYSTEM "xml/tny-save-strategy-iface.xml">
@@ -98,7 +98,7 @@
 		&libtinymail-TnyMsgIface;
 		&libtinymail-TnyMimePartIface;
 		&libtinymail-TnyFolderIface;
-		&libtinymail-TnyMsgHeaderIface;
+		&libtinymail-TnyHeaderIface;
 		&libtinymail-TnyStreamIface;
 		&libtinymail-TnyFsStream;
 		&libtinymail-TnyDeviceIface;
@@ -110,12 +110,12 @@
 	<chapter id="libtinymailui">
 		<title>libtinymailui</title>
 		&libtinymailui-TnyAccountStoreViewIface;
-		&libtinymailui-TnyMsgHeaderViewIface;
+		&libtinymailui-TnyHeaderViewIface;
 		&libtinymailui-TnyMsgViewIface;
 		&libtinymailui-TnyMsgWindowIface;
 		&libtinymailui-TnySaveStrategyIface;
 		&libtinymailui-TnyPlatformFactoryIface;
-		&libtinymailui-TnyMsgHeaderViewIface;
+		&libtinymailui-TnyHeaderViewIface;
 		&libtinymailui-TnySummaryViewIface;
 	</chapter>
 
@@ -123,9 +123,9 @@
 	<title>libtinymailui-gtk</title>
 		&libtinymailui-gtk-TnyMsgView;
 		&libtinymailui-gtk-TnyMsgWindow;
-		&libtinymailui-gtk-TnyMsgHeaderView;
+		&libtinymailui-gtk-TnyHeaderView;
 		&libtinymailui-gtk-TnyAccountTreeModel;
-		&libtinymailui-gtk-TnyMsgHeaderListModel;
+		&libtinymailui-gtk-TnyHeaderListModel;
 		&libtinymailui-gtk-TnyAttachListModel;
 		&libtinymailui-gtk-TnyTextBufferStream;
 		&libtinymailui-gtk-TnySaveStrategy;
@@ -157,7 +157,7 @@
 		&libtinymail-camel-TnyTransportAccount;
 		&libtinymail-camel-TnyCamelStream;
 		&libtinymail-camel-TnyFolder;
-		&libtinymail-camel-TnyMsgHeader;
+		&libtinymail-camel-TnyHeader;
 		&libtinymail-camel-TnyMimePart;
 		&libtinymail-camel-TnyMsg;
 		&libtinymail-camel-TnySessionCamel;

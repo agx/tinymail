@@ -17,13 +17,13 @@ A type for showing a #TnyMsgHeaderIface to the user
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgHeaderViewIface ##### -->
+<!-- ##### STRUCT TnyHeaderViewIface ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_msg_header_view_iface_set_header ##### -->
+<!-- ##### FUNCTION tny_header_view_iface_set_header ##### -->
 <para>
 
 </para>

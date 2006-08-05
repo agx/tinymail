@@ -17,7 +17,7 @@ tny-msg-header-list-iterator-priv
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgHeaderListIterator ##### -->
+<!-- ##### STRUCT TnyHeaderListIterator ##### -->
 <para>
 
 </para>
