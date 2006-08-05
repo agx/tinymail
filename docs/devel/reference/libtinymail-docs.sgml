@@ -10,7 +10,7 @@
 <!ENTITY libtinymail-TnyAccountStoreIface SYSTEM "xml/tny-account-store-iface.xml">
 <!ENTITY libtinymail-TnyMsgHeaderIface SYSTEM "xml/tny-msg-header-iface.xml">
 <!ENTITY libtinymail-TnyMsgIface SYSTEM "xml/tny-msg-iface.xml">
-<!ENTITY libtinymail-TnyMsgMimePartIface SYSTEM "xml/tny-msg-mime-part-iface.xml">
+<!ENTITY libtinymail-TnyMimePartIface SYSTEM "xml/tny-mime-part-iface.xml">
 <!ENTITY libtinymail-TnyStreamIface SYSTEM "xml/tny-stream-iface.xml">
 <!ENTITY libtinymail-TnyFsStream SYSTEM "xml/tny-fs-stream.xml">
 <!ENTITY libtinymail-TnyFolderIface SYSTEM "xml/tny-folder-iface.xml">
@@ -26,7 +26,7 @@
 <!ENTITY libtinymail-camel-TnyCamelStream SYSTEM "xml/tny-camel-stream.xml">
 <!ENTITY libtinymail-camel-TnyFolder SYSTEM "xml/tny-folder.xml">
 <!ENTITY libtinymail-camel-TnyMsgHeader SYSTEM "xml/tny-msg-header.xml">
-<!ENTITY libtinymail-camel-TnyMsgMimePart SYSTEM "xml/tny-msg-mime-part.xml">
+<!ENTITY libtinymail-camel-TnyMimePart SYSTEM "xml/tny-mime-part.xml">
 <!ENTITY libtinymail-camel-TnyMsg SYSTEM "xml/tny-msg.xml">
 <!ENTITY libtinymail-camel-TnySessionCamel SYSTEM "xml/tny-session-camel.xml">
 <!ENTITY libtinymail-camel-TnyStreamCamel SYSTEM "xml/tny-stream-camel.xml">
@@ -96,7 +96,7 @@
 		&libtinymail-TnyStoreAccountIface;
 		&libtinymail-TnyTransportAccountIface;
 		&libtinymail-TnyMsgIface;
-		&libtinymail-TnyMsgMimePartIface;
+		&libtinymail-TnyMimePartIface;
 		&libtinymail-TnyFolderIface;
 		&libtinymail-TnyMsgHeaderIface;
 		&libtinymail-TnyStreamIface;
@@ -158,7 +158,7 @@
 		&libtinymail-camel-TnyCamelStream;
 		&libtinymail-camel-TnyFolder;
 		&libtinymail-camel-TnyMsgHeader;
-		&libtinymail-camel-TnyMsgMimePart;
+		&libtinymail-camel-TnyMimePart;
 		&libtinymail-camel-TnyMsg;
 		&libtinymail-camel-TnySessionCamel;
 		&libtinymail-camel-TnyStreamCamel;

@@ -6,7 +6,7 @@ tny-camel-stream.xml
 libtinymail-doc.top
 tny-attach-list-model.xml
 tny-moz-embed-msg-view.xml
-tny-msg-mime-part.xml
+tny-mime-part.xml
 tny-msg-header-iface.xml
 tny-camel-shared.xml
 object_index.sgml
@@ -16,12 +16,12 @@ tny-account-store-iface.xml
 tny-msg-iface.xml
 tny-store-account-iface.xml
 config.xml
-tny-msg-mime-part-priv.xml
+tny-mime-part-priv.xml
 tny-msg-view.xml
 tny-platform-factory-iface.xml
 tny-msg-header-iface-test.xml
 tny-device.xml
-tny-msg-mime-part-iface-test.xml
+tny-mime-part-iface-test.xml
 tny-account-iface.xml
 tny-summary-window.xml
 tny-transport-account-priv.xml
@@ -36,7 +36,7 @@ tny-stream-iface-test.xml
 .svnignore
 tny-msg-header-list-model.xml
 tny-text-buffer-stream.xml
-tny-msg-mime-part-iface.xml
+tny-mime-part-iface.xml
 tny-store-account.xml
 tny-msg.xml
 tny-account-store.xml

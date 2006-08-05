@@ -162,13 +162,13 @@ Shared include file with forward typedefs
 @set_flags_func: 
 @unset_flags_func: 
 
-<!-- ##### STRUCT TnyMsgMimePartIface ##### -->
+<!-- ##### STRUCT TnyMimePartIface ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgMimePartIfaceClass ##### -->
+<!-- ##### STRUCT TnyMimePartIfaceClass ##### -->
 <para>
 
 </para>
