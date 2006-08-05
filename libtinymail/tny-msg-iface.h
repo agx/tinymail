@@ -24,7 +24,7 @@
 #include <tny-shared.h>
 #include <tny-msg-header-iface.h>
 #include <tny-stream-iface.h>
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 
 G_BEGIN_DECLS
 

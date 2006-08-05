@@ -19,7 +19,7 @@
 
 #include <config.h>
 
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 
 /**
  * tny_msg_mime_part_iface_is_attachment:

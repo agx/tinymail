@@ -76,10 +76,10 @@ tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(top_srcdir)/libtinymail/tny-iterator-iface.h		\
 	$(top_srcdir)/libtinymail/tny-list.h			\
 	$(top_srcdir)/libtinymail/tny-list-iface.h		\
-	$(top_srcdir)/libtinymail/tny-folder-iface.h	\
+	$(top_srcdir)/libtinymail/tny-folder-iface.h		\
 	$(top_srcdir)/libtinymail/tny-msg-header-iface.h	\
 	$(top_srcdir)/libtinymail/tny-msg-iface.h		\
-	$(top_srcdir)/libtinymail/tny-msg-mime-part-iface.h	\
+	$(top_srcdir)/libtinymail/tny-mime-part-iface.h		\
 	$(top_srcdir)/libtinymail/tny-shared.h			\
 	$(top_srcdir)/libtinymail/tny-store-account-iface.h 	\
 	$(top_srcdir)/libtinymail/tny-stream-iface.h 		\

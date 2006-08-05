@@ -34,7 +34,7 @@
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
 
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>

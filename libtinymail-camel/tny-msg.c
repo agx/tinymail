@@ -28,10 +28,10 @@
 #include <tny-iterator-iface.h>
 
 #include <tny-msg.h>
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-msg-header-iface.h>
-#include <tny-msg-mime-part.h>
+#include <tny-mime-part.h>
 #include <tny-stream-camel.h>
 #include <tny-msg-header.h>
 
@@ -42,7 +42,7 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-types.h>
 
 #include "tny-msg-priv.h"
-#include "tny-msg-mime-part-priv.h"
+#include "tny-mime-part-priv.h"
 #include "tny-msg-header-priv.h"
 
 #define TNY_MSG_GET_PRIVATE(o)	\
@@ -75,7 +75,7 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 			if (part)
 			{
 				/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
-				   and tny-msg-mime-part.c:515 ! */
+				   and tny-mime-part.c:515 ! */
 
 				go = message_foreach_part_rec (msg, part, callback, data);
 			} else go = FALSE;
@@ -100,7 +100,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 		return;
 
 	/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
-	   and tny-msg-mime-part.c:515 ! */
+	   and tny-mime-part.c:515 ! */
 
 	tpart = TNY_MIME_PART_IFACE  (tny_msg_mime_part_new (part));
 

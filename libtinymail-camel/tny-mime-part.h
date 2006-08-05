@@ -21,7 +21,7 @@
  */
 
 #include <glib.h>
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 #include <camel/camel-mime-part.h>
 
 #include <glib-object.h>

@@ -2,8 +2,8 @@
 
 #include <tny-msg.h>
 #include <tny-msg-iface.h>
-#include <tny-msg-mime-part.h>
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part.h>
+#include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-msg-header.h>
 #include <tny-msg-header-iface.h>

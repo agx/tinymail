@@ -21,7 +21,7 @@
 
 #include "tny-test-suite.h"
 
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 
 /* Test suite */
 GUnitTestSuite *create_tny_msg_mime_part_iface_suite (void);

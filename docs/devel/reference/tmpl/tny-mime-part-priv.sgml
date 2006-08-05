@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-msg-mime-part-iface-test
+tny-mime-part-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -17,11 +17,20 @@ tny-msg-mime-part-iface-test
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### FUNCTION create_tny_msg_mime_part_iface_suite ##### -->
+<!-- ##### STRUCT TnyMimePartPriv ##### -->
 <para>
 
 </para>
 
-@Returns: 
+@part_lock: 
+@part: 
+@cached_content_type: 
+
+<!-- ##### MACRO TNY_MIME_PART_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
 
 

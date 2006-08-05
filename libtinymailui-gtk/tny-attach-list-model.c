@@ -27,9 +27,9 @@
 #endif
 
 #include <tny-attach-list-model.h>
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-msg-mime-part-iface.h>
+#include <tny-mime-part-iface.h>
 #include <tny-folder-iface.h>
 
 #include "tny-attach-list-model-priv.h"

@@ -18,10 +18,10 @@
 
 #include <string.h>
 
-#include <tny-msg-mime-part-iface-test.h>
+#include <tny-mime-part-iface-test.h>
 
 /* We are going to test the camel implementation */
-#include <tny-msg-mime-part.h>
+#include <tny-mime-part.h>
 #include <tny-stream-iface.h>
 #include <tny-test-stream.h>
 

@@ -26,7 +26,7 @@
 
 #include "tny-msg-header-iface-test.h"
 #include "tny-stream-iface-test.h"
-#include "tny-msg-mime-part-iface-test.h"
+#include "tny-mime-part-iface-test.h"
 #include "tny-list-iface-test.h"
 #include "tny-account-iface-test.h"
 #include "tny-device-iface-test.h"

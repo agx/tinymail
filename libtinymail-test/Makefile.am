@@ -22,8 +22,8 @@ libtinymail_test_suite_la_SOURCES = 		\
 	tny-test-stream.c			\
 	tny-test-stream.h			\
 	tny-test-suite.c			\
-	tny-msg-mime-part-iface-test.c		\
-	tny-msg-mime-part-iface-test.h		\
+	tny-mime-part-iface-test.c		\
+	tny-mime-part-iface-test.h		\
 	tny-platform-factory-iface-test.c	\
 	tny-platform-factory-iface-test.h	\
 	tny-account-store-iface-test.c		\

@@ -22,8 +22,8 @@
 #include <glib/gi18n-lib.h>
 
 #include <string.h>
-#include <tny-msg-mime-part-iface.h>
-#include <tny-msg-mime-part.h>
+#include <tny-mime-part-iface.h>
+#include <tny-mime-part.h>
 #include <tny-camel-stream.h>
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
@@ -31,7 +31,7 @@
 
 static GObjectClass *parent_class = NULL;
 
-#include "tny-msg-mime-part-priv.h"
+#include "tny-mime-part-priv.h"
 
 #include <camel/camel-url.h>
 #include <camel/camel-stream.h>
