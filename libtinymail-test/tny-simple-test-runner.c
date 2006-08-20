@@ -45,6 +45,7 @@ tny_test_view_failure (GUnitView *self, const gchar *msg)
 static void
 tny_test_view_error (GUnitView *self, const gchar *msg)
 {
+    g_print ("%s\n", msg);
 }
 
 static void
