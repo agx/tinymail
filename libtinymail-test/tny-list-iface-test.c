@@ -103,7 +103,7 @@ tny_list_iface_test_list (void)
 	g_object_unref (G_OBJECT (c));
 	tny_list_iface_prepend (iface, d);
 	g_object_unref (G_OBJECT (d));
-
+    
 	counter=1;
 	tny_list_iface_foreach (iface, tny_list_iface_test_foreach, NULL);
 
@@ -121,37 +121,34 @@ tny_list_iface_test_list (void)
 	tny_iterator_iface_nth (iterator, 2);
 	item = (TnyTestObject*)tny_iterator_iface_current (iterator);
 	
-	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
+	str = g_strdup_printf ("Item should be \"3\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "3"), str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_iface_next (iterator);
 	item = (TnyTestObject*)tny_iterator_iface_current (iterator);	
-	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
+	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_iface_prev (iterator);
 	item = (TnyTestObject*)tny_iterator_iface_current (iterator);	
-
-	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
+	str = g_strdup_printf ("Item should be \"3\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "3"), str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_iface_next (iterator);
-	tny_iterator_iface_current (iterator);	
-	
-	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
+	item = (TnyTestObject*)tny_iterator_iface_current (iterator);	
+	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 
 	item = (TnyTestObject*)tny_iterator_iface_current (iterator);
-	
-	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
+	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
 
