@@ -19,7 +19,7 @@ if BUILD_UNITTESTS
 SUBDIRS += libtinymail-test 
 endif
 
-SUBDIRS += bindings po 
+SUBDIRS += bindings po tests 
 
 DIST_SUBDIRS = \
 	libtinymail \

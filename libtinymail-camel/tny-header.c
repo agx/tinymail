@@ -50,7 +50,7 @@ struct _WriteInfo
 #pragma pack(1) /* Size will be 21 in stead of 24 */
 struct _TnyHeader 
 {
-	GObject parent;
+	GObject parent;		
 	void *info;
 
 	TnyFolderIface *folder;
