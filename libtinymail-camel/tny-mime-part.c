@@ -25,6 +25,7 @@
 #include <tny-mime-part-iface.h>
 #include <tny-mime-part.h>
 #include <tny-camel-stream.h>
+#include <tny-stream-camel.h>
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
 #include <tny-camel-shared.h>
@@ -622,7 +623,8 @@ tny_mime_part_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyMimePart),
 		  0,      /* n_preallocs */
-		  tny_mime_part_instance_init    /* instance_init */
+		  tny_mime_part_instance_init,    /* instance_init */
+		  NULL
 		};
 
 		static const GInterfaceInfo tny_mime_part_iface_info = 

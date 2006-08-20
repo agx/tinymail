@@ -106,7 +106,6 @@ load_folder_no_lock (TnyFolderPriv *priv)
 {
 	if (!priv->folder && !priv->loaded)
 	{
-		CamelFolderInfo *folder_info;
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelStore *store = (CamelStore*) _tny_account_get_service 
 			(TNY_ACCOUNT (priv->account));

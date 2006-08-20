@@ -73,8 +73,7 @@ static gchar*
 per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
-	const gchar *accountid = tny_account_iface_get_id (account);
-	GList *list;
+GList *list;
 	GnomeKeyringResult keyringret;
 	gchar *keyring;
 
@@ -154,10 +153,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 static void
 per_account_forget_pass_func (TnyAccountIface *account)
 {
-	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-	TnyGetPassFunc func;
-
 	GList *list=NULL;
 	GnomeKeyringResult keyringret;
 	gchar *keyring;
@@ -297,8 +292,6 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 			GConfEntry *entry, gpointer user_data)
 {
 	TnyAccountStoreIface *self = user_data;
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
 
 	gchar *key = g_strdup (entry->key);
 	gchar *ptr = strrchr (key, '/'); ptr++;
@@ -570,8 +563,6 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 static void
 tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
 	tny_account_store_notify_remove (self);
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
 	tny_account_store_notify_add (self);
@@ -584,8 +575,6 @@ tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccount
 static void
 tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
 	tny_account_store_notify_remove (self);
 	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
 	tny_account_store_notify_add (self);

@@ -223,7 +223,8 @@ tny_save_strategy_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnySaveStrategy),
 		  0,      /* n_preallocs */
-		  tny_save_strategy_instance_init    /* instance_init */
+		  tny_save_strategy_instance_init,    /* instance_init */
+		  NULL
 		};
 
 		static const GInterfaceInfo tny_save_strategy_iface_info = 

@@ -113,45 +113,44 @@ tny_list_iface_test_list (void)
 
 	iterator = tny_list_iface_create_iterator (iface);
 
-	str = g_strdup_printf ("has_first should return TRUE in this case\n");
-	gunit_fail_unless (tny_iterator_iface_has_first (iterator) == TRUE, str);
-	g_free (str);
-
-	str = g_strdup_printf ("has_next should return TRUE in this case\n");
-	gunit_fail_unless (tny_iterator_iface_has_next (iterator) == TRUE, str);
-	g_free (str);
 
 	str = g_strdup_printf ("get_list returns the wrong instance\n");
 	gunit_fail_unless (tny_iterator_iface_get_list (iterator) == iface, str);
 	g_free (str);
 
-	item = (TnyTestObject*)tny_iterator_iface_nth (iterator, 2);
+	tny_iterator_iface_nth (iterator, 2);
+	item = (TnyTestObject*)tny_iterator_iface_current (iterator);
+	
+	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "3"), str);
+	g_free (str);
+	g_object_unref (G_OBJECT(item));
+	
+	tny_iterator_iface_next (iterator);
+	item = (TnyTestObject*)tny_iterator_iface_current (iterator);	
+	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
+	gunit_fail_unless (!strcmp (item->str, "4"), str);
+	g_free (str);
+	g_object_unref (G_OBJECT(item));
+	
+	tny_iterator_iface_prev (iterator);
+	item = (TnyTestObject*)tny_iterator_iface_current (iterator);	
 
 	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "3"), str);
 	g_free (str);
-
-	item = (TnyTestObject*)tny_iterator_iface_next (iterator);
-
+	g_object_unref (G_OBJECT(item));
+	
+	tny_iterator_iface_next (iterator);
+	tny_iterator_iface_current (iterator);	
+	
 	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
-
-	item = (TnyTestObject*)tny_iterator_iface_prev (iterator);
-
-	str = g_strdup_printf ("Item should be \"3\" but is %s\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "3"), str);
-	g_free (str);
-
-	item = (TnyTestObject*)tny_iterator_iface_next (iterator);
-
-	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "4"), str);
-	g_free (str);
-
+	g_object_unref (G_OBJECT(item));
 
 	item = (TnyTestObject*)tny_iterator_iface_current (iterator);
-
+	
 	str = g_strdup_printf ("Item should be \"4\" but is %s\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
@@ -164,11 +163,13 @@ tny_list_iface_test_list (void)
 	gunit_fail_unless (tny_list_iface_length (iface) == 3, str);
 	g_free (str);
 
-
+	g_object_unref (G_OBJECT(item)); /* need to unref ? */
+	
 	iterator = tny_list_iface_create_iterator (iface);
 
-	item = (TnyTestObject*)tny_iterator_iface_first (iterator);
-
+	tny_iterator_iface_first (iterator);
+	item = (TnyTestObject*)tny_iterator_iface_current (iterator);
+	
 	str = g_strdup_printf ("Item should be \"1\" but is %s\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "1"), str);
 	g_free (str);
@@ -187,7 +188,7 @@ tny_list_iface_test_list (void)
 	g_free (str);
 	
 	g_object_unref (G_OBJECT (iterator));
-
+	g_object_unref (G_OBJECT(item)); /* need to unref ? */	
 }
 
 

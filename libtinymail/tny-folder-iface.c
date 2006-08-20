@@ -403,8 +403,9 @@ gboolean
 tny_folder_iface_has_cache (TnyFolderIface *self)
 {
 	if (TNY_FOLDER_IFACE_GET_CLASS (self)->has_cache_func != NULL)
-		TNY_FOLDER_IFACE_GET_CLASS (self)->has_cache_func (self);
-	return;
+		return TNY_FOLDER_IFACE_GET_CLASS (self)->has_cache_func (self);
+	else
+		return FALSE;
 }
 
 static void
@@ -471,7 +472,8 @@ tny_folder_iface_get_type (void)
 		  NULL,   /* class_data */
 		  0,
 		  0,      /* n_preallocs */
-		  NULL    /* instance_init */
+		  NULL,    /* instance_init */
+		  NULL
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyFolderIface", &info, 0);

@@ -97,7 +97,6 @@ tny_list_create_iterator (TnyListIface *self)
 static TnyListIface*
 tny_list_copy_the_list (TnyListIface *self)
 {
-	TnyList *me = (TnyList*)self;
 	TnyList *copy = g_object_new (TNY_TYPE_LIST, NULL);
 
 	TnyListPriv *priv = TNY_LIST_GET_PRIVATE (self);
@@ -225,7 +224,8 @@ tny_list_get_type (void)
 			NULL,		/* class_data */
 			sizeof (TnyList),
 			0,              /* n_preallocs */
-			(GInstanceInitFunc) tny_list_init
+			(GInstanceInitFunc) tny_list_init,
+			NULL
 		};
 
 		static const GInterfaceInfo tny_list_iface_info = {

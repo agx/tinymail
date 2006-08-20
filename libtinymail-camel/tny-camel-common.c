@@ -76,7 +76,6 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 void
 _foreach_email_add_to_inet_addr (const gchar *emails, CamelInternetAddress *target)
 {
-	int length = strlen (emails), i = 0;
 	char *dup = g_strdup (emails);
 	char *tok, *save;
 

@@ -1,3 +1,15 @@
+20-08-2006  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Reviewed and corrected Dirk-Jan's patch of 08-08
+	* Removed the has_first and has_next methods from
+	the iterator API
+
+08-08-2006  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+
+	* make iterator ops next/prev/first/last/nth all void
+	* g_object_ref iterator _current retval, except with headers...
+	* misc small fixes (-Wall -Wextra helps...)
+
 08-01-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Implemented a few new unit tests

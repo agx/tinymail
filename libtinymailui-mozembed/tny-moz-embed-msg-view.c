@@ -37,6 +37,7 @@
 #include <tny-attach-list-model.h>
 #include <tny-header-view-iface.h>
 #include <tny-header-view.h>
+#include <tny-text-buffer-stream.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -86,15 +87,13 @@ static void
 reload_msg (TnyMsgViewIface *self)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
-	GtkTextIter hiter;
 	GtkTextBuffer *buffer;
 	TnyStreamIface *dest;
 	TnyHeaderIface *header;
 	TnyIteratorIface *iterator;
-	const gchar *str = NULL;
 	gboolean first_attach = TRUE;
 	TnyAttachListModel *model = tny_attach_list_model_new ();;
-	gboolean have_html = FALSE, next = FALSE;
+	gboolean have_html = FALSE;
 
 	g_return_if_fail (priv->msg);
 
@@ -106,8 +105,6 @@ reload_msg (TnyMsgViewIface *self)
 
 	tny_msg_iface_get_parts (priv->msg, TNY_LIST_IFACE (model));
 	iterator = tny_list_iface_create_iterator (TNY_LIST_IFACE (model));
-	next = tny_iterator_iface_has_first (iterator);
-
 	gtk_widget_hide (priv->attachview_sw);
 
 	gtk_text_buffer_set_text (buffer, "", 0);
@@ -116,7 +113,7 @@ reload_msg (TnyMsgViewIface *self)
 
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
-	while (next)
+	while (!tny_iterator_iface_is_done (iterator))
 	{
 		TnyMimePartIface *part = (TnyMimePartIface*)tny_iterator_iface_current (iterator);
 
@@ -157,12 +154,9 @@ reload_msg (TnyMsgViewIface *self)
 		{
 			first_attach = FALSE;
 		}
-
+		g_object_unref (G_OBJECT(part));
 		
-		next = tny_iterator_iface_has_next (iterator);
-
-		if (next)
-			tny_iterator_iface_next (iterator);
+		tny_iterator_iface_next (iterator);
 	}
 
 	g_object_unref (G_OBJECT (iterator));
@@ -338,7 +332,6 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 1);
 	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
-	GtkTextBuffer *headerbuffer;
 
 	priv->save_strategy = NULL;
 

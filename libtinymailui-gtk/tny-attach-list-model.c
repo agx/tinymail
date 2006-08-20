@@ -33,6 +33,8 @@
 #include <tny-folder-iface.h>
 
 #include "tny-attach-list-model-priv.h"
+#include "tny-attach-list-model-iterator-priv.h"
+
 
 static GObjectClass *parent_class = NULL;
 
@@ -343,7 +345,8 @@ tny_attach_list_model_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyAttachListModel),
 		  0,      /* n_preallocs */
-		  tny_attach_list_model_instance_init    /* instance_init */
+		  tny_attach_list_model_instance_init,    /* instance_init */
+		  NULL
 		};
 
 		type = g_type_register_static (GTK_TYPE_LIST_STORE, "TnyAttachListModel",

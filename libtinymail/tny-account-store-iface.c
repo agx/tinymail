@@ -263,7 +263,8 @@ tny_account_store_iface_get_type (void)
 		  NULL,   /* class_data */
 		  0,
 		  0,      /* n_preallocs */
-		  NULL    /* instance_init */
+		  NULL,    /* instance_init */
+		  NULL
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyAccountStoreIface", &info, 0);

@@ -85,9 +85,8 @@ walk_folders_uncache_em (TnyStoreAccountIface *self, TnyListIface *folders)
   if (folders && tny_list_iface_length (folders) > 0)
   {
 	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
-	gboolean next = tny_iterator_iface_has_first (iterator);
 
-	while (next)
+	while (!tny_iterator_iface_is_done (iterator))
 	{
 		TnyFolderIface *folder = (TnyFolderIface*)tny_iterator_iface_current (iterator);
 		TnyListIface *more_folders = (TnyListIface*)tny_folder_iface_get_folders (folder);
@@ -97,10 +96,9 @@ walk_folders_uncache_em (TnyStoreAccountIface *self, TnyListIface *folders)
 		if (tny_list_iface_length (more_folders) > 0)
 			walk_folders_uncache_em (self, more_folders);
 
-		next = tny_iterator_iface_has_next (iterator);
-
-		if (next)
-			tny_iterator_iface_next (iterator);
+		g_object_unref (G_OBJECT(folder));
+		
+		tny_iterator_iface_next (iterator);
 	}
 
 	g_object_unref (G_OBJECT (iterator));
@@ -332,7 +330,7 @@ tny_store_account_notify (TnyStoreAccountPriv *priv)
 		tny_iterator_iface_nth (iterator, 0);
 		folder = (TnyFolderIface*)tny_iterator_iface_current (iterator);
 		g_signal_emit (folder, tny_folder_iface_signals [TNY_FOLDER_IFACE_FOLDERS_RELOADED], 0);
-
+		g_object_unref (G_OBJECT (folder));
 		g_object_unref (G_OBJECT (iterator));
 	}
 }

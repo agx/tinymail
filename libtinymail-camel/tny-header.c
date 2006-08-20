@@ -566,7 +566,8 @@ tny_header_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyHeader),
 		  0,      /* n_preallocs */
-		  NULL    /* instance_init */
+		  NULL,    /* instance_init */
+		  NULL
 		};
 
 		static const GInterfaceInfo tny_header_iface_info = 

@@ -21,6 +21,7 @@
 #include <glib/gi18n-lib.h>
 
 #include <glib.h>
+#include <glib/gstdio.h> /* for g_unlink */
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
@@ -187,8 +188,6 @@ tny_moz_embed_stream_flush (TnyStreamIface *self)
 static gint
 tny_moz_embed_stream_close (TnyStreamIface *self)
 {
-	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
-
 	tny_moz_embed_stream_reset (self);
 
 	return 0;

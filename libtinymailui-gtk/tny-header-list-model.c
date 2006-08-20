@@ -27,6 +27,8 @@
 #include <glib/gi18n-lib.h>
 
 #include <tny-header-list-model.h>
+#include <tny-header-list-iterator-priv.h>
+
 #include <tny-header-iface.h>
 #include <tny-folder-iface.h>
 
@@ -45,11 +47,6 @@ static GObjectClass *parent_class;
 stack allocations)? It's probably a naïve manual optimization.*/
 
 
-#ifndef DEBUG
-#ifdef G_CAN_INLINE
-G_INLINE_FUNC
-#endif
-#endif
 void /* When sorting, this method is called a gazillion times */
 _tny_header_list_iterator_travel_to_nth_nl (TnyHeaderListIterator *self, guint cur, guint nth)
 {
@@ -205,7 +202,7 @@ tny_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePa
 		list_model->last_nth, i);
 
 	/* We will store this as user_data of the GtkTreeIter */
-	
+	/* don't unref */	
 	ptr = _tny_header_list_iterator_current_nl ((TnyHeaderListIterator*)list_model->iterator);
 	list_model->last_nth = i;
 	iter->stamp = list_model->stamp;
@@ -223,7 +220,6 @@ tny_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePa
 static GtkTreePath *
 tny_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 {
-	GList *list, *headers;
 	GtkTreePath *tree_path;
 	gint i = 0;
 	TnyHeaderListModel *list_model = TNY_HEADER_LIST_MODEL (self);
@@ -236,10 +232,14 @@ tny_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	g_mutex_lock (list_model->folder_lock);
 	g_mutex_lock (list_model->iterator_lock);
 
-	while (_tny_header_list_iterator_has_next_nl ((TnyHeaderListIterator*)list_model->iterator))
+	while (!_tny_header_list_iterator_is_done_nl ((TnyHeaderListIterator*)list_model->iterator))
 	{
-		if (_tny_header_list_iterator_next_nl ((TnyHeaderListIterator*)list_model->iterator) == iter->user_data)
+		/* header list iterator does not need to be unref'd */
+		if (_tny_header_list_iterator_current_nl ((TnyHeaderListIterator*)list_model->iterator) == iter->user_data)
 			break;
+		
+		_tny_header_list_iterator_next_nl ((TnyHeaderListIterator*)list_model->iterator);
+
 		i++;
 	}
 
@@ -257,11 +257,7 @@ tny_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	return tree_path;
 }
 
-#ifndef DEBUG
-#ifdef G_CAN_INLINE
-G_INLINE_FUNC
-#endif
-#endif
+
 gchar *
 _get_readable_date (time_t file_time_raw)
 {
@@ -332,7 +328,6 @@ static void
 tny_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint column, GValue *value)
 {
 	TnyHeaderIface *header = NULL;
-	gchar *readable;
 	TnyHeaderListModel *list_model = TNY_HEADER_LIST_MODEL (self);
 
 	g_return_if_fail (iter->stamp == TNY_HEADER_LIST_MODEL (self)->stamp);
@@ -409,7 +404,7 @@ tny_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 {
 	gboolean retval;
 	TnyHeaderListModel *list_model = TNY_HEADER_LIST_MODEL (self);
-	GList *headers; gpointer ptr;
+	gpointer ptr;
 
 	/* Move the GtkTreeIter to the next item */
 
@@ -420,7 +415,9 @@ tny_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 	g_mutex_lock (list_model->iterator_lock);
 
 	/* We simply move the iterator and get the value */
-	ptr = _tny_header_list_iterator_next_nl ((TnyHeaderListIterator*)list_model->iterator);
+	_tny_header_list_iterator_next_nl ((TnyHeaderListIterator*)list_model->iterator);
+	/* the ptr needs not to be unref'd... */
+	ptr = _tny_header_list_iterator_current_nl ((TnyHeaderListIterator*)list_model->iterator);
 	list_model->last_nth++;
 	iter->user_data = ptr;
 	retval = (iter->user_data != NULL);
@@ -462,7 +459,7 @@ tny_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter)
 static gboolean
 tny_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter, GtkTreeIter *parent, gint n)
 {
-	GList *child, *headers;
+	GList *child;
 	TnyHeaderListModel *list_model = TNY_HEADER_LIST_MODEL (self);
 	GList *restore;
 
@@ -474,8 +471,10 @@ tny_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter, Gtk
 
 	restore = ((TnyHeaderListIterator*)list_model->iterator)->current;
 	/* Move the GtkTreeIter to the nth child */
-	child = _tny_header_list_iterator_nth_nl ((TnyHeaderListIterator*)list_model->iterator, n);
-
+	_tny_header_list_iterator_nth_nl ((TnyHeaderListIterator*)list_model->iterator, n);
+	/* child needs not to be unref'd */
+	child = _tny_header_list_iterator_current_nl ((TnyHeaderListIterator*)list_model->iterator);
+	 
 	if (G_LIKELY (child))
 	{
 		list_model->last_nth = n;
@@ -562,7 +561,7 @@ tny_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 	return;
 }
 
-
+#if 0
 static void
 unref_header (gpointer data, gpointer user_data)
 {
@@ -576,6 +575,7 @@ ref_header (gpointer data, gpointer user_data)
 	g_object_ref (G_OBJECT (data));
 	return;
 }
+#endif /* 0 */
 
 
 static void
@@ -813,13 +813,18 @@ tny_header_list_model_relaxed_performer (gpointer data)
 	return TRUE;
 }
 
+
+#if 0
+
 static void 
 proxy_uncache_func (gpointer data, gpointer user_data)
 {
 	if (data)
-		tny_header_iface_uncache (TNY_HEADER_IFACE (data));
+		g_printerr ("tinymail: uncache %p\n", user_data);
+		//tny_header_iface_uncache (TNY_HEADER_IFACE (data));
 	return;
 }
+
 
 
 static void 
@@ -835,16 +840,6 @@ tny_header_list_model_hdr_cache_uncacher_copy (TnyHeaderListModel *self)
 
 	g_idle_add_full (G_PRIORITY_LOW, tny_header_list_model_relaxed_performer, 
 		d, tny_header_list_model_relaxed_data_destroyer);
-
-	return;
-}
-
-static void
-proxy_destroy_func (gpointer data, gpointer user_data)
-{
-	if (data)
-		g_object_unref (G_OBJECT (data));
-	data = NULL;
 
 	return;
 }
@@ -865,6 +860,20 @@ tny_header_list_model_hdr_cache_remover (TnyHeaderListModel *self)
 
 	return;
 } 
+
+#endif /* 0 */
+
+
+static void
+proxy_destroy_func (gpointer data, gpointer user_data)
+{
+	if (data)
+		g_object_unref (G_OBJECT (data));
+	data = NULL;
+
+	return;
+}
+
 
 
 static void 
@@ -1072,7 +1081,8 @@ tny_header_list_model_get_type (void)
 			NULL,		/* class_data */
 			sizeof (TnyHeaderListModel),
 			0,              /* n_preallocs */
-			(GInstanceInitFunc) tny_header_list_model_init
+			(GInstanceInitFunc) tny_header_list_model_init,
+			NULL
 		};
 
 		static const GInterfaceInfo tree_model_info = {

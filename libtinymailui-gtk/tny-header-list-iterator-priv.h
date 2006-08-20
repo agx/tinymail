@@ -54,12 +54,12 @@ struct _TnyHeaderListIteratorClass
 void _tny_header_list_iterator_set_model (TnyHeaderListIterator *self, TnyHeaderListModel *model, gboolean lock);
 TnyHeaderListIterator* _tny_header_list_iterator_new (TnyHeaderListModel *model, gboolean lock);
 
-gboolean _tny_header_list_iterator_has_next_nl (TnyHeaderListIterator *self);
+gboolean _tny_header_list_iterator_is_done_nl (TnyHeaderListIterator *self);
 gpointer _tny_header_list_iterator_current_nl (TnyHeaderListIterator *me);
-gpointer _tny_header_list_iterator_nth_nl (TnyHeaderListIterator *me, guint nth);
-gpointer _tny_header_list_iterator_first_nl (TnyHeaderListIterator *me);
-gpointer _tny_header_list_iterator_prev_nl (TnyHeaderListIterator *me);
-gpointer _tny_header_list_iterator_next_nl (TnyHeaderListIterator *me);
+void _tny_header_list_iterator_nth_nl (TnyHeaderListIterator *me, guint nth);
+void _tny_header_list_iterator_first_nl (TnyHeaderListIterator *me);
+void _tny_header_list_iterator_prev_nl (TnyHeaderListIterator *me);
+void _tny_header_list_iterator_next_nl (TnyHeaderListIterator *me);
 
 
 G_END_DECLS

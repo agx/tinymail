@@ -460,21 +460,19 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 		&& self->account_store)
 	{
 		TnyListIface *accounts = self->current_accounts;
-		gboolean next = FALSE;
 		TnyIteratorIface *iterator;
 
 		iterator = tny_list_iface_create_iterator (accounts);
-		next = tny_iterator_iface_has_first (iterator);
 	
-		while (next)
+		while (!tny_iterator_iface_is_done (iterator))
 		{
 			TnyStoreAccountIface *account = (TnyStoreAccountIface*)tny_iterator_iface_current (iterator);
-
+			
 			_tny_account_set_online_status (account, !online);
-
-			next = tny_iterator_iface_has_next (iterator);
-			if (next)
-				tny_iterator_iface_next (iterator);
+	
+			g_object_unref (G_OBJECT(account));
+			
+			tny_iterator_iface_next (iterator);
 		}
 
 		g_object_unref (G_OBJECT (iterator));

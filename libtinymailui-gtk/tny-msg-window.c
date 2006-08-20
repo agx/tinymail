@@ -98,7 +98,6 @@ static void
 tny_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMsgWindow *self = (TnyMsgWindow *)instance;
-	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 
 	gtk_window_set_default_size (GTK_WINDOW (self), 640, 480);
 
@@ -166,7 +165,8 @@ tny_msg_window_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyMsgWindow),
 		  0,      /* n_preallocs */
-		  tny_msg_window_instance_init    /* instance_init */
+		  tny_msg_window_instance_init,    /* instance_init */
+		  NULL
 		};
 
 		static const GInterfaceInfo tny_msg_window_iface_info = 

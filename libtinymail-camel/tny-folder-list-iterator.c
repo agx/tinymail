@@ -24,7 +24,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-
 void 
 _tny_folder_list_iterator_set_model (TnyFolderListIterator *self, TnyFolderList *model)
 {
@@ -70,21 +69,18 @@ tny_folder_list_iterator_instance_init (GTypeInstance *instance, gpointer g_clas
 static void
 tny_folder_list_iterator_finalize (GObject *object)
 {
-	TnyFolderListIterator *self = (TnyFolderListIterator *)object;
-
 	(*parent_class->finalize) (object);
 
 	return;
 }
 
-
-static GObject* 
+static void
 tny_folder_list_iterator_next (TnyIteratorIface *self)
 {
 	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the next node */
 
@@ -92,7 +88,7 @@ tny_folder_list_iterator_next (TnyIteratorIface *self)
 	me->current = g_list_next (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current ? me->current->data : NULL;
+	return;
 }
 
 
@@ -112,13 +108,13 @@ tny_folder_list_iterator_is_done (TnyIteratorIface *self)
 
 
 
-static GObject* 
+static void
 tny_folder_list_iterator_prev (TnyIteratorIface *self)
 {
 	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the previous node */
 
@@ -126,16 +122,16 @@ tny_folder_list_iterator_prev (TnyIteratorIface *self)
 	me->current = g_list_previous (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current ? me->current->data : NULL;
+	return;
 }
 
-static GObject* 
+static void
 tny_folder_list_iterator_first (TnyIteratorIface *self)
 {
 	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the first node. We know that model always 
 	   keeps a reference to the first node, there's nothing wrong with 
@@ -145,17 +141,17 @@ tny_folder_list_iterator_first (TnyIteratorIface *self)
 	me->current = me->model->first;
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return;
 }
 
 
-static GObject* 
+static void
 tny_folder_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
 	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
-
+	
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the nth node. We'll count from zero,
 	   so we start with the first node of which we know the model
@@ -165,7 +161,7 @@ tny_folder_list_iterator_nth (TnyIteratorIface *self, guint nth)
 	me->current = g_list_nth (me->model->first, nth);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return;
 }
 
 
@@ -173,7 +169,7 @@ static GObject*
 tny_folder_list_iterator_current (TnyIteratorIface *self)
 {
 	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
-	gpointer retval;
+	GObject *obj;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
@@ -181,47 +177,15 @@ tny_folder_list_iterator_current (TnyIteratorIface *self)
 	/* Give the data of the current node */
 
 	g_mutex_lock (me->model->iterator_lock);
-	retval = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
+	obj = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return retval;
+	if (obj)
+		g_object_ref (obj);
+	
+	return obj;
 }
 
-static gboolean 
-tny_folder_list_iterator_has_next (TnyIteratorIface *self)
-{
-	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
-	gboolean retval;
-
-	if (G_UNLIKELY (!me || !me->model))
-		return FALSE;
-
-	/* Return whether or not there's a next node */
-
-	g_mutex_lock (me->model->iterator_lock);
-	retval = (G_LIKELY (me->current) && me->current->next);
-	g_mutex_unlock (me->model->iterator_lock);
-
-	return retval;
-}
-
-static gboolean 
-tny_folder_list_iterator_has_first (TnyIteratorIface *self)
-{
-	TnyFolderListIterator *me = (TnyFolderListIterator*) self;
-	gboolean retval;
-
-	if (G_UNLIKELY (!me || !me->model))
-		return FALSE;
-
-	/* Return whether or not there's a next node */
-
-	g_mutex_lock (me->model->iterator_lock);
-	retval = G_LIKELY (me->current);
-	g_mutex_unlock (me->model->iterator_lock);
-
-	return retval;
-}
 
 static TnyListIface* 
 tny_folder_list_iterator_get_list (TnyIteratorIface *self)
@@ -239,14 +203,11 @@ tny_folder_list_iterator_get_list (TnyIteratorIface *self)
 static void
 tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 {
-
 	klass->next_func = tny_folder_list_iterator_next;
 	klass->prev_func = tny_folder_list_iterator_prev;
 	klass->first_func = tny_folder_list_iterator_first;
 	klass->nth_func = tny_folder_list_iterator_nth;
 	klass->current_func = tny_folder_list_iterator_current;
-	klass->has_next_func = tny_folder_list_iterator_has_next;
-	klass->has_first_func = tny_folder_list_iterator_has_first;
 	klass->get_list_func = tny_folder_list_iterator_get_list;
 	klass->is_done = tny_folder_list_iterator_is_done;
 	

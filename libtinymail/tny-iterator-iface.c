@@ -26,19 +26,16 @@
  * @self: A #TnyIteratorIface instance
  *
  * Moves the iterator to the next node 
- * 
- * Return value: the next value of the underlying #TnyListIface instance
  *
  **/
-GObject* 
+void 
 tny_iterator_iface_next (TnyIteratorIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->next_func)
 		g_critical ("You must implement tny_iterator_iface_next\n");
 #endif
-
-	return TNY_ITERATOR_IFACE_GET_CLASS (self)->next_func (self);
+	TNY_ITERATOR_IFACE_GET_CLASS (self)->next_func (self);
 }
 
 /**
@@ -47,18 +44,15 @@ tny_iterator_iface_next (TnyIteratorIface *self)
  *
  * Moves the iterator to the previous node
  *
- * Return value: the previous value of the underlying #TnyListIface instance
- *
  **/
-GObject* 
+void
 tny_iterator_iface_prev (TnyIteratorIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->prev_func)
 		g_critical ("You must implement tny_iterator_iface_prev\n");
 #endif
-
-	return TNY_ITERATOR_IFACE_GET_CLASS (self)->prev_func (self);
+	TNY_ITERATOR_IFACE_GET_CLASS (self)->prev_func (self);
 }
 
 
@@ -68,10 +62,8 @@ tny_iterator_iface_prev (TnyIteratorIface *self)
  *
  * Moves the iterator to the first node
  *
- * Return value: the first value of the underlying #TnyListIface instance
- *
  **/
-GObject* 
+void 
 tny_iterator_iface_first (TnyIteratorIface *self)
 {
 #ifdef DEBUG
@@ -79,7 +71,7 @@ tny_iterator_iface_first (TnyIteratorIface *self)
 		g_critical ("You must implement tny_iterator_iface_first\n");
 #endif
 
-	return TNY_ITERATOR_IFACE_GET_CLASS (self)->first_func (self);
+	TNY_ITERATOR_IFACE_GET_CLASS (self)->first_func (self);
 }
 
 /**
@@ -92,15 +84,14 @@ tny_iterator_iface_first (TnyIteratorIface *self)
  * Return value: the value of the underlying #TnyListIface instance at the nth position
  *
  **/
-GObject*
+void
 tny_iterator_iface_nth (TnyIteratorIface *self, guint nth)
 {
 #ifdef DEBUG
 	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->nth_func)
 		g_critical ("You must implement tny_iterator_iface_nth\n");
 #endif
-
-	return TNY_ITERATOR_IFACE_GET_CLASS (self)->nth_func (self, nth);
+	TNY_ITERATOR_IFACE_GET_CLASS (self)->nth_func (self, nth);
 }
 
 
@@ -120,7 +111,6 @@ tny_iterator_iface_current (TnyIteratorIface *self)
 	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->current_func)
 		g_critical ("You must implement tny_iterator_iface_current\n");
 #endif
-
 	return TNY_ITERATOR_IFACE_GET_CLASS (self)->current_func (self);
 }
 
@@ -147,47 +137,6 @@ tny_iterator_iface_is_done (TnyIteratorIface *self)
 }
 
 
-
-
-/**
- * tny_iterator_iface_has_first:
- * @self: A #TnyIteratorIface instance
- *
- * Does not move the iterator
- *
- * Return value: Whether or not there's a first node
- *
- **/
-gboolean
-tny_iterator_iface_has_first (TnyIteratorIface *self)
-{
-#ifdef DEBUG
-	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->has_first_func)
-		g_critical ("You must implement tny_iterator_iface_has_first\n");
-#endif
-
-	return TNY_ITERATOR_IFACE_GET_CLASS (self)->has_first_func (self);
-}
-
-/**
- * tny_iterator_iface_has_next:
- * @self: A #TnyIteratorIface instance
- *
- * Does not move the iterator
- *
- * Return value: Whether or not there's a next node
- *
- **/
-gboolean
-tny_iterator_iface_has_next (TnyIteratorIface *self)
-{
-#ifdef DEBUG
-	if (!TNY_ITERATOR_IFACE_GET_CLASS (self)->has_next_func)
-		g_critical ("You must implement tny_iterator_iface_has_next\n");
-#endif
-
-	return TNY_ITERATOR_IFACE_GET_CLASS (self)->has_next_func (self);
-}
 
 /**
  * tny_iterator_iface_get_list:
@@ -239,7 +188,8 @@ tny_iterator_iface_get_type (void)
 		  NULL,   /* class_data */
 		  0,
 		  0,      /* n_preallocs */
-		  NULL    /* instance_init */
+		  NULL,    /* instance_init */
+		  NULL
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyIteratorIface", &info, 0);

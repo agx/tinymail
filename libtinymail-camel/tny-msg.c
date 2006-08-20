@@ -97,8 +97,8 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	TnyMimePartIface *tpart;
 
 	if (!part)
-		return;
-
+		return FALSE;
+	
 	/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
 	   and tny-mime-part.c:515 ! */
 
@@ -204,7 +204,6 @@ tny_msg_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 	TnyMimePartPriv *ppriv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelMedium *medium;
 	CamelDataWrapper *containee;
-	TnyMimePartIface *tpart;
 	gint curl = 0;
 
 	g_mutex_lock (priv->message_lock);
@@ -252,7 +251,6 @@ tny_msg_del_part (TnyMsgIface *self, gint id)
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 	TnyMimePartPriv *ppriv = TNY_MIME_PART_GET_PRIVATE (self);
 	gpointer remove;
-	TnyIteratorIface *iterator;
 	CamelDataWrapper *containee;
 
 	g_mutex_lock (priv->message_lock);
@@ -434,7 +432,8 @@ tny_msg_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyMsg),
 		  0,      /* n_preallocs */
-		  tny_msg_instance_init    /* instance_init */
+		  tny_msg_instance_init,    /* instance_init */
+		  NULL
 		};
 
 		static const GInterfaceInfo tny_msg_iface_info = 

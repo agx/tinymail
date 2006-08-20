@@ -89,8 +89,6 @@ tny_platform_factory_get_instance (void)
 static void
 tny_platform_factory_finalize (GObject *object)
 {
-	TnyPlatformFactory *self = (TnyPlatformFactory *)object;	
-
 	(*parent_class->finalize) (object);
 
 	return;

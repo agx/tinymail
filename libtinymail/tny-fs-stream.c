@@ -277,7 +277,8 @@ tny_fs_stream_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyFsStream),
 		  0,      /* n_preallocs */
-		  tny_fs_stream_instance_init    /* instance_init */
+		  tny_fs_stream_instance_init,   /* instance_init */
+		  NULL
 		};
 
 		static const GInterfaceInfo tny_stream_iface_info = 

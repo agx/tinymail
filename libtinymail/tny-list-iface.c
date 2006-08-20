@@ -34,9 +34,7 @@ tny_list_iface_length (TnyListIface *self)
 	if (!TNY_LIST_IFACE_GET_CLASS (self)->length_func)
 		g_critical ("You must implement tny_list_iface_length\n");
 #endif
-
-	TNY_LIST_IFACE_GET_CLASS (self)->length_func (self);
-	return;
+	return TNY_LIST_IFACE_GET_CLASS (self)->length_func (self);
 }
 
 /**
@@ -184,7 +182,8 @@ tny_list_iface_get_type (void)
 		  NULL,   /* class_data */
 		  0,
 		  0,      /* n_preallocs */
-		  NULL    /* instance_init */
+		  NULL,    /* instance_init */
+		  NULL
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyListIface", &info, 0);

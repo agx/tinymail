@@ -55,6 +55,11 @@ tny_text_buffer_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 		if (G_UNLIKELY (nb_read < 0))
 			return -1;
 		else if (G_LIKELY (nb_read > 0)) {
+			const gchar *end;
+			if (!g_utf8_validate (tmp_buf, nb_read, &end)) 
+				g_warning ("utf8 invalid: %d of %d", (gint)nb_read,
+					   (gint)(end - tmp_buf));
+				
 			nb_written = 0;
 	
 			while (G_LIKELY (nb_written < nb_read))

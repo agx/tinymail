@@ -130,9 +130,12 @@ _wrap_tny_list_iface_tp_getitem(PyGObject *self, PyObject *key)
 
         iter = tny_list_iface_create_iterator (TNY_LIST_IFACE (self->obj));
         /* TODO: check for failure? */
-
-        ret = tny_iterator_iface_nth (iter, index);
+		
+		tny_iterator_iface_nth (iter, index);
+        ret = tny_iterator_iface_current (iter);
+        g_object_unref (G_OBJECT (ret));
         g_object_unref (G_OBJECT (iter));
+        
     } else {
         /* TODO: handle other keys */
 	PyErr_SetString(PyExc_TypeError, "key must be valid index");

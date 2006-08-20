@@ -115,8 +115,6 @@ tny_password_dialog_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_password_dialog_finalize (GObject *object)
 {
-	TnyPasswordDialog *self = (TnyPasswordDialog *)object;	
-	
 	(*parent_class->finalize) (object);
 
 	return;

@@ -64,21 +64,19 @@ tny_account_tree_model_iterator_instance_init (GTypeInstance *instance, gpointer
 static void
 tny_account_tree_model_iterator_finalize (GObject *object)
 {
-	TnyAccountTreeModelIterator *self = (TnyAccountTreeModelIterator *)object;
-
 	(*parent_class->finalize) (object);
 
 	return;
 }
 
 
-static GObject* 
+static void
 tny_account_tree_model_iterator_next (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the next node */
 
@@ -86,16 +84,16 @@ tny_account_tree_model_iterator_next (TnyIteratorIface *self)
 	me->current = g_list_next (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current ? me->current->data : NULL;
+	return;
 }
 
-static GObject* 
+static void 
 tny_account_tree_model_iterator_prev (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the previous node */
 
@@ -103,7 +101,7 @@ tny_account_tree_model_iterator_prev (TnyIteratorIface *self)
 	me->current = g_list_previous (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current ? me->current->data : NULL;
+	return;
 }
 
 
@@ -120,13 +118,13 @@ tny_account_tree_model_iterator_is_done (TnyIteratorIface *self)
 
 
 
-static GObject* 
+static void 
 tny_account_tree_model_iterator_first (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the first node. We know that model always 
 	   keeps a reference to the first node, there's nothing wrong with 
@@ -136,17 +134,17 @@ tny_account_tree_model_iterator_first (TnyIteratorIface *self)
 	me->current = me->model->first;
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return;
 }
 
 
-static GObject* 
+static void 
 tny_account_tree_model_iterator_nth (TnyIteratorIface *self, guint nth)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
-		return NULL;
+		return;
 
 	/* Move the iterator to the nth node. We'll count from zero,
 	   so we start with the first node of which we know the model
@@ -156,7 +154,7 @@ tny_account_tree_model_iterator_nth (TnyIteratorIface *self, guint nth)
 	me->current = g_list_nth (me->model->first, nth);
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return me->current->data;
+	return;
 }
 
 
@@ -164,7 +162,7 @@ static GObject*
 tny_account_tree_model_iterator_current (TnyIteratorIface *self)
 {
 	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
-	gpointer retval;
+	gpointer ptr;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
@@ -172,48 +170,13 @@ tny_account_tree_model_iterator_current (TnyIteratorIface *self)
 	/* Give the data of the current node */
 
 	g_mutex_lock (me->model->iterator_lock);
-	retval = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
+	ptr = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
 	g_mutex_unlock (me->model->iterator_lock);
 
-	return retval;
-}
-
-static gboolean 
-tny_account_tree_model_iterator_has_next (TnyIteratorIface *self)
-{
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
-	gboolean retval;
-
-	if (G_UNLIKELY (!me || !me->model))
-		return FALSE;
-
-	/* Return whether or not there's a next node */
-
-	g_mutex_lock (me->model->iterator_lock);
-	retval = (G_UNLIKELY (me->current) && me->current->next);
-	g_mutex_unlock (me->model->iterator_lock);
-
-	return retval;
-}
-
-
-
-static gboolean 
-tny_account_tree_model_iterator_has_first (TnyIteratorIface *self)
-{
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
-	gboolean retval;
-
-	if (G_UNLIKELY (!me || !me->model))
-		return FALSE;
-
-	/* Return whether or not there's a next node */
-
-	g_mutex_lock (me->model->iterator_lock);
-	retval = G_UNLIKELY (me->current);
-	g_mutex_unlock (me->model->iterator_lock);
-
-	return retval;
+	if (ptr)
+		g_object_ref (G_OBJECT(ptr));
+	
+	return G_OBJECT(ptr);
 }
 
 
@@ -233,14 +196,11 @@ tny_account_tree_model_iterator_get_list (TnyIteratorIface *self)
 static void
 tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 {
-
 	klass->next_func = tny_account_tree_model_iterator_next;
 	klass->prev_func = tny_account_tree_model_iterator_prev;
 	klass->first_func = tny_account_tree_model_iterator_first;
 	klass->nth_func = tny_account_tree_model_iterator_nth;
 	klass->current_func = tny_account_tree_model_iterator_current;
-	klass->has_first_func = tny_account_tree_model_iterator_has_first;
-	klass->has_next_func = tny_account_tree_model_iterator_has_next;
 	klass->get_list_func = tny_account_tree_model_iterator_get_list;
 	klass->is_done  = tny_account_tree_model_iterator_is_done;
 	
@@ -277,7 +237,8 @@ _tny_account_tree_model_iterator_get_type (void)
 		  NULL,   /* class_data */
 		  sizeof (TnyAccountTreeModelIterator),
 		  0,      /* n_preallocs */
-		  tny_account_tree_model_iterator_instance_init    /* instance_init */
+		  tny_account_tree_model_iterator_instance_init,    /* instance_init */
+		  NULL
 		};
 
 		static const GInterfaceInfo tny_iterator_iface_info = 
