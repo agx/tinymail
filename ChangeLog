@@ -3,6 +3,7 @@
 	* Reviewed and corrected Dirk-Jan's patch of 08-08
 	* Removed the has_first and has_next methods from
 	the iterator API
+	* Moved the Python demo to tests/python-demo
 
 08-08-2006  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
