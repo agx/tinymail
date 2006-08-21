@@ -1,1 +1,1 @@
-SUBDIRS = memory python-demo
+SUBDIRS = shared memory python-demo
