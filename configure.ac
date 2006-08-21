@@ -137,6 +137,16 @@ AC_ARG_ENABLE(unit-tests,
 esac],[build_unittests=false])
 AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
 
+dnl ### Enable building the tests ##
+AC_ARG_ENABLE(tests,
+[  --enable-tests          build tests [default=no]],
+[case "${enableval}" in
+  yes) build_tests=true ;;
+  no)  build_tests=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-tests) ;;
+esac],[build_tests=false])
+AM_CONDITIONAL(BUILD_TESTS, test x$build_tests = xtrue)
+
 dnl ### gtk-doc
 GTK_DOC_CHECK([1.0])
 

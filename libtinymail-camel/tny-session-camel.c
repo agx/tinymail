@@ -154,7 +154,7 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 {
 	GList *copy = password_funcs, *mark_del = NULL;
 	PrivPassFunc *pf;
-	CamelSession *me = CAMEL_SESSION (self);
+	CamelSession *me = (CamelSession*)self;
 	gboolean found = FALSE;
 	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
 
@@ -524,14 +524,14 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDeviceIface *device)
 void 
 tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface *account_store)
 {
-	CamelSession *session = CAMEL_SESSION (self);
+	CamelSession *session = (CamelSession*) self;
 	TnyDeviceIface *device = (TnyDeviceIface*)tny_account_store_iface_get_device (account_store);
 
 	self->account_store = (gpointer)account_store;
 
 	gchar *base_directory = g_strdup (tny_account_store_iface_get_cache_dir (account_store));
 	gchar *camel_dir = NULL;
-
+    
 	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
 	{
 		g_error (_("Critical ERROR: Cannot init %s as camel directory\n"), base_directory);

@@ -114,8 +114,7 @@ send_test (gboolean multipart)
 	TnyMimePartIface *body_part = 
 		TNY_MIME_PART_IFACE (tny_mime_part_new (camel_mime_part_new()));
 	
-	tny_account_iface_set_account_store (TNY_ACCOUNT_IFACE (account), 
-		TNY_ACCOUNT_STORE_IFACE (tny_account_store_get_instance ()));
+	// tny_account_iface_set_session (TNY_ACCOUNT_IFACE (account), session);
 
 	/* tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), ""); */
 	tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), "smtp");

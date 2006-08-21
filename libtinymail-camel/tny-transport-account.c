@@ -90,7 +90,7 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
 	CamelTransport *transport;
 
-	transport = camel_session_get_transport (CAMEL_SESSION (apriv->session), 
+	transport = camel_session_get_transport ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 
 	if (G_LIKELY (transport && message && header))

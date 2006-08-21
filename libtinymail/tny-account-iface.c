@@ -80,46 +80,6 @@ tny_account_iface_is_connected (TnyAccountIface *self)
 
 
 /**
- * tny_account_iface_set_account_store:
- * @self: a #TnyAccountIface object
- * @store: a #TnyAccountStoreIface object
- *
- * Set the parent account store for the account. You need to set this property
- * before you can start using the account.
- * 
- **/
-void
-tny_account_iface_set_account_store (TnyAccountIface *self, TnyAccountStoreIface *store)
-{
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_store_func)
-		g_critical ("You must implement tny_account_iface_set_account_store\n");
-#endif
-
-	TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_store_func (self, store);
-	return;
-}
-
-/**
- * tny_account_iface_get_account_store:
- * @self: a #TnyAccountIface object
- * 
- * Get the parent store for the account.
- * 
- * Return value: the store or NULL if none
- **/
-TnyAccountStoreIface*
-tny_account_iface_get_account_store (TnyAccountIface *self)
-{
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_account_store_func)
-		g_critical ("You must implement tny_account_iface_get_account_store\n");
-#endif
-
-	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->get_account_store_func (self);
-}
-
-/**
  * tny_account_iface_get_id:
  * @self: a #TnyAccountIface object
  * 

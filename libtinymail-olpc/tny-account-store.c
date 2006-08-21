@@ -31,6 +31,8 @@
 
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
+#include <tny-account.h>
+
 #include <tny-password-dialog.h>
 
 #include <tny-account-iface.h>
@@ -239,7 +241,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			gsize options_len; gint i;
 			gchar **options;
 
-			tny_account_iface_set_account_store (account, self);
+			tny_account_set_session (TNY_ACCOUNT (account), priv->session);
 
 			proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
 			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
@@ -368,7 +370,9 @@ TnyAccountStore*
 tny_account_store_new (void)
 {
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
-	
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
+
 	return self;
 }
 
@@ -382,8 +386,7 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->device = tny_platform_factory_iface_new_device (platfact);
 	/* tny_device_iface_force_online (priv->device); */
-	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
-    
+	
 	return;
 }
 

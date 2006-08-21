@@ -172,7 +172,7 @@ tny_store_account_reconnect (TnyAccount *self)
 			camel_object_unref (CAMEL_OBJECT (priv->service));
 
 		priv->service = camel_session_get_service
-			(CAMEL_SESSION (priv->session), priv->url_string, 
+			((CamelSession*) priv->session, priv->url_string, 
 			priv->type, priv->ex);
 
 		if (priv->service == NULL)
@@ -183,7 +183,7 @@ tny_store_account_reconnect (TnyAccount *self)
 		/* un officially supported provider */
 
 		priv->service = camel_session_get_service
-			(CAMEL_SESSION (priv->session), priv->url_string, 
+			((CamelSession*) priv->session, priv->url_string, 
 			priv->type, priv->ex);
 
 		if (priv->service == NULL)
@@ -352,7 +352,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 	tny_store_account_clear_folders (priv);
 
 	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
+	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
@@ -471,22 +471,18 @@ static void
 tny_store_account_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 {
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
-	TnyAccountStoreIface *astore = (TnyAccountStoreIface *)tny_account_iface_get_account_store (TNY_ACCOUNT_IFACE (self));
 
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 
 	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
+	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	camel_store_subscribe_folder (store, tny_folder_iface_get_name (folder), &ex);
 
 	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
-
-	if (astore)
-		g_signal_emit (astore, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
 
 	/* Sync */
 	_tny_folder_set_subscribed_priv (folder, TRUE);
@@ -498,22 +494,18 @@ static void
 tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 {
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
-	TnyAccountStoreIface *astore = (TnyAccountStoreIface *)tny_account_iface_get_account_store (TNY_ACCOUNT_IFACE (self));
 
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 
 	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store (CAMEL_SESSION (apriv->session), 
+	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	camel_store_unsubscribe_folder (store, tny_folder_iface_get_name (folder), &ex);
 
 	tny_store_account_get_folders (self, TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
-
-	if (astore)
-		g_signal_emit (astore, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
 
 	/* Sync */
 	_tny_folder_set_subscribed_priv (folder, FALSE);

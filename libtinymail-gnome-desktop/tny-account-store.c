@@ -35,6 +35,7 @@
 #include <tny-password-dialog.h>
 
 #include <tny-account-iface.h>
+#include <tny-account.h>
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
 
@@ -73,7 +74,7 @@ static gchar*
 per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
-GList *list;
+	GList *list;
 	GnomeKeyringResult keyringret;
 	gchar *keyring;
 
@@ -392,7 +393,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 		if (account)
 		{
-			tny_account_iface_set_account_store (account, self);
+			tny_account_set_session (TNY_ACCOUNT (account), priv->session);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
 			proto = gconf_client_get_string (priv->client, 
@@ -602,7 +603,8 @@ TnyAccountStore*
 tny_account_store_new (void)
 {
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
-	
+	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return self;
 }
@@ -625,7 +627,7 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	platfact = TNY_PLATFORM_FACTORY_IFACE (tny_platform_factory_get_instance ());
     	priv->device = tny_platform_factory_iface_new_device (platfact);
 	/* tny_device_iface_force_online (priv->device); */
-	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
+	
 
 	return;
 }

@@ -22,7 +22,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-
+#include <tny-camel-shared.h>
 #include <tny-account-iface.h>
 
 G_BEGIN_DECLS
@@ -55,6 +55,7 @@ struct _TnyAccountClass
 GType tny_account_get_type (void);
 
 void tny_account_add_option (TnyAccount *self, const gchar *option);
+void tny_account_set_session (TnyAccount *self, TnySessionCamel *session);
 
 G_END_DECLS
 

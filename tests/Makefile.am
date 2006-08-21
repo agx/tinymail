@@ -1,5 +1,5 @@
 SUBDIRS = python-demo
 
-if BUILD_UNITTESTS
+if BUILD_TESTS
 SUBDIRS += shared memory functional 
 endif

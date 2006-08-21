@@ -67,7 +67,7 @@ static void
 mem_test_print_folders (void)
 {
 	TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE 
-		(tny_memtest_account_store_new ());
+		(tny_account_store_new ());
 	TnyListIface *accounts = tny_list_new (), *folders;
 	TnyStoreAccountIface *account;
 	TnyIteratorIface *aiter, *fiter;

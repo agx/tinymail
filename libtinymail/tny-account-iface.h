@@ -66,10 +66,6 @@ struct _TnyAccountIfaceClass
         const gchar*    (*get_hostname_func)         (TnyAccountIface *self);
         const gchar*    (*get_url_string_func)       (TnyAccountIface *self);
 	TnyAccountType  (*get_account_type_func)     (TnyAccountIface *self);
-
-	void                   (*set_account_store_func)     (TnyAccountIface *self, TnyAccountStoreIface *store);
-	TnyAccountStoreIface*  (*get_account_store_func)     (TnyAccountIface *self);
-
 };
 
 GType tny_account_iface_get_type (void);
@@ -101,9 +97,6 @@ TnyGetPassFunc tny_account_iface_get_pass_func (TnyAccountIface *self);
 
 void tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func);
 TnyForgetPassFunc tny_account_iface_get_forget_pass_func (TnyAccountIface *self);
-
-void tny_account_iface_set_account_store (TnyAccountIface *self, TnyAccountStoreIface *store);
-TnyAccountStoreIface* tny_account_iface_get_account_store (TnyAccountIface *self);
 
 G_END_DECLS
 

@@ -26,16 +26,19 @@
 #include <glib.h>
 
 #include <tny-platform-factory-iface.h>
-#include <tny-platform-factory.h>
+#include "platfact.h"
 
 #include <tny-account-store-iface.h>
 #include <tny-account-iface.h>
+#include <tny-account.h>
+
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
 #include <tny-device-iface.h>
-#include <tny-device.h>
+
+#include "device.h"
 
 #include <tny-camel-shared.h>
 
@@ -60,51 +63,59 @@ per_account_forget_pass_func (TnyAccountIface *account)
 
 
 static gboolean
-tny_memtest_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
+tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
 {
 	return TRUE;
 }
 
 
 static const gchar*
-tny_memtest_account_store_get_cache_dir (TnyAccountStoreIface *self)
+tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
-	/* FIXME: Small memleak here */
-	return g_build_filename (g_get_home_dir (), ".tinymail", NULL);
+	TnyAccountStore *me = (TnyAccountStore*) self;
+    
+	if (!me->cache_dir)
+	{
+		gint att=0;
+		GDir *dir = NULL;
+		do {
+			gchar *attempt = g_strdup_printf ("tinymail.%d", att);
+			gchar *str = g_build_filename (g_get_tmp_dir (), attempt, NULL);
+			g_free (attempt);		    
+                    	dir = g_dir_open (str, 0, NULL);
+			if (dir)
+		    	{
+				g_dir_close (dir);
+				g_free (str);
+			} else 
+				me->cache_dir = str;
+			att++;
+		} while (dir != NULL);          
+	}
+    
+	return me->cache_dir;
 }
 
 
 static void
-tny_memtest_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
+tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
 {
+    	TnyAccountStore *me = (TnyAccountStore *) self;
+    
 	TnyAccountIface *account = TNY_ACCOUNT_IFACE (tny_store_account_new ());
     
-    
 	/* Dear visitor of the SVN-web. This is indeed a fully functional and
-	   working IMAP account. This does not mean that you need to fuck it up.
-	   
-	   And I know you can. Just like I can very easily correct your mess by
-	   restoring the backup.
-	   
-	   The purpose of this account is testing software. Not your enjoyment 
-	   nor showing your friends how 3l33t you are (in which case you most
-	   certainly aren't. In that case you are just a pain in the ass or a
-	   piece of stinking shit being annoying to people).
-	   
-	   So .. please DO use the account of preparing your automated tests.
-	   
-	   But don't screwup the account. */
+	   working IMAP account. This does not mean that you need to fuck it up */
     
-	tny_account_iface_set_account_store (account, (TnyAccountStoreIface*)self);
-	tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), "imap");
-	tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), "unit test account");
-	tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), "tinymailunittest");
-	tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), "mail.tinymail.org");
-	tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), "unique");
-	tny_account_iface_set_forget_pass_func (TNY_ACCOUNT_IFACE (account),
-			per_account_forget_pass_func);
-	tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
-			per_account_get_pass_func);
+	tny_account_set_session (TNY_ACCOUNT (account), me->session);
+    
+	tny_account_iface_set_proto (account, "imap");
+	tny_account_iface_set_name (account, "unit test account");
+	tny_account_iface_set_user (account, "tinymailunittest");
+	tny_account_iface_set_hostname (account, "mail.tinymail.org");
+	tny_account_iface_set_id (account, "unique");
+	tny_account_iface_set_forget_pass_func (account, per_account_forget_pass_func);
+	tny_account_iface_set_pass_func (account, per_account_get_pass_func);
 
 	tny_list_iface_prepend (list, (GObject*)account);
 	g_object_unref (G_OBJECT (account));
@@ -114,37 +125,39 @@ tny_memtest_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface
 
 
 
-static void
-tny_memtest_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
+TnyAccountStore*
+tny_account_store_new (void)
 {
-	return;
-}
+	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
 
-
-
-TnyMemTestAccountStore*
-tny_memtest_account_store_new (void)
-{
-	TnyMemTestAccountStore *self = g_object_new (TNY_TYPE_MEMTEST_ACCOUNT_STORE, NULL);
-
+	self->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
+    
 	return self;
 }
 
 
 static void
-tny_memtest_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyDeviceIface *device = tny_account_store_iface_get_device (TNY_ACCOUNT_STORE_IFACE (instance));
+	TnyAccountStore *self = (TnyAccountStore *)instance;
+	TnyPlatformFactoryIface *platfact = TNY_PLATFORM_FACTORY_IFACE (
+		tny_platform_factory_get_instance ());
 
-	tny_device_iface_force_online (device);
+	self->device = tny_platform_factory_iface_new_device (platfact);
+	/* tny_device_iface_force_online (priv->device); */
     
 	return;
 }
 
 
 static void
-tny_memtest_account_store_finalize (GObject *object)
+tny_account_store_finalize (GObject *object)
 {
+	TnyAccountStore *me = (TnyAccountStore*) object;
+    
+	if (me->cache_dir)
+		g_free (me->cache_dir);
+    
 	(*parent_class->finalize) (object);
 
 	return;
@@ -152,33 +165,58 @@ tny_memtest_account_store_finalize (GObject *object)
 
 
 static void 
-tny_memtest_account_store_class_init (TnyMemTestAccountStoreClass *class)
+tny_account_store_class_init (TnyAccountStoreClass *class)
 {
 	GObjectClass *object_class;
-
+    
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_memtest_account_store_finalize;
+	object_class->finalize = tny_account_store_finalize;
 
 	return;
 }
 
+
 static void
-tny_memtest_account_store_iface_init (gpointer g_iface, gpointer iface_data)
+tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
+{
+	return;
+}
+
+static void
+tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
+{
+	return;
+}
+
+static TnyDeviceIface*
+tny_account_store_get_device (TnyAccountStoreIface *self)
+{
+	TnyAccountStore *me =  (TnyAccountStore*) self;
+
+	return me->device;
+}
+
+
+static void
+tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyAccountStoreIfaceClass *klass = (TnyAccountStoreIfaceClass *)g_iface;
 
-	klass->get_accounts_func = tny_memtest_account_store_get_accounts;
-	klass->get_cache_dir_func = tny_memtest_account_store_get_cache_dir;
-	klass->alert_func = tny_memtest_account_store_alert;
+	klass->get_accounts_func = tny_account_store_get_accounts;
+	klass->get_cache_dir_func = tny_account_store_get_cache_dir;
+	klass->alert_func = tny_account_store_alert;
+	klass->add_store_account_func = tny_account_store_add_store_account;
+	klass->add_transport_account_func = tny_account_store_add_transport_account;
+	klass->get_device_func = tny_account_store_get_device;
     
 	return;
 }
 
 
 GType 
-tny_memtest_account_store_get_type (void)
+tny_account_store_get_type (void)
 {
 	static GType type = 0;
 
@@ -186,30 +224,30 @@ tny_memtest_account_store_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMemTestAccountStoreClass),
+		  sizeof (TnyAccountStoreClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_memtest_account_store_class_init,   /* class_init */
+		  (GClassInitFunc) tny_account_store_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyMemTestAccountStore),
+		  sizeof (TnyAccountStore),
 		  0,      /* n_preallocs */
-		  tny_memtest_account_store_instance_init    /* instance_init */
+		  tny_account_store_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_memtest_account_store_iface_info = 
+		static const GInterfaceInfo tny_account_store_iface_info = 
 		{
-		  (GInterfaceInitFunc) tny_memtest_account_store_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_account_store_iface_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (TNY_TYPE_ACCOUNT_STORE,
-			"TnyMemTestAccountStore",
+		type = g_type_register_static (G_TYPE_OBJECT,
+			"TnyAccountStore",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_IFACE, 
-			&tny_memtest_account_store_iface_info);
+			&tny_account_store_iface_info);
 	}
 
 	return type;

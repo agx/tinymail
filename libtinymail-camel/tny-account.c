@@ -211,34 +211,20 @@ tny_account_is_connected (TnyAccountIface *self)
 	return priv->connected;
 }
 
-static void 
-tny_account_set_account_store (TnyAccountIface *self, TnyAccountStoreIface *store)
+void 
+tny_account_set_session (TnyAccount *self, TnySessionCamel *session)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
-	/* No need to reference (would also be cross reference): If store dies,
-	   self should also die. */
-	
-	priv->store = (TnyAccountStoreIface*) store;
-
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	priv->session = tny_account_store_get_session 
-			(TNY_ACCOUNT_STORE (priv->store));
-
+	priv->session = session;
+    
 	TNY_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
-}
-
-static TnyAccountStoreIface*
-tny_account_get_account_store (TnyAccountIface *self)
-{
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-
-	return priv->store;
 }
 
 
@@ -471,7 +457,6 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->inuse_spin = FALSE;
 
 	priv->options = NULL;
-	priv->store = NULL;
 	priv->id = NULL;
 	priv->user = NULL;
 	priv->host = NULL;
@@ -617,8 +602,6 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_forget_pass_func_func = tny_account_set_forget_pass_func;
 	klass->set_id_func = tny_account_set_id;
 	klass->get_id_func = tny_account_get_id;
-	klass->set_account_store_func = tny_account_set_account_store;
-	klass->get_account_store_func = tny_account_get_account_store;
 	klass->is_connected_func = tny_account_is_connected;
 	klass->set_url_string_func = tny_account_set_url_string;
 	klass->get_url_string_func = tny_account_get_url_string;
