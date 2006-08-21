@@ -333,6 +333,7 @@ tests/Makefile
 tests/shared/Makefile
 tests/python-demo/Makefile
 tests/memory/Makefile
+tests/functional/Makefile
 m4/Makefile
 ])
 

@@ -1,3 +1,4 @@
+libtestsshared.a
 Makefile.in
 .svnignore
 Makefile
