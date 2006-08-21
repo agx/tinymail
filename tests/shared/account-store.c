@@ -79,6 +79,22 @@ tny_memtest_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface
 {
 	TnyAccountIface *account = TNY_ACCOUNT_IFACE (tny_store_account_new ());
     
+    
+	/* Dear visitor of the SVN-web. This is indeed a fully functional and
+	   working IMAP account. This does not mean that you need to fuck it up.
+	   
+	   And I know you can. Just like I can very easily correct your mess by
+	   restoring the backup.
+	   
+	   The purpose of this account is testing software. Not your enjoyment 
+	   nor showing your friends how 3l33t you are (in which case you most
+	   certainly aren't. In that case you are just a pain in the ass or a
+	   piece of stinking shit being annoying to people).
+	   
+	   So .. please DO use the account of preparing your automated tests.
+	   
+	   But don't screwup the account. */
+    
 	tny_account_iface_set_account_store (account, (TnyAccountStoreIface*)self);
 	tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), "imap");
 	tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), "unit test account");
