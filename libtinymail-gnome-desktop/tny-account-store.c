@@ -602,13 +602,7 @@ TnyAccountStore*
 tny_account_store_new (void)
 {
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-	TnyPlatformFactoryIface *platfact = TNY_PLATFORM_FACTORY_IFACE (
-		tny_platform_factory_get_instance ());
-
-	priv->device = tny_platform_factory_iface_new_device (platfact);
-	/* tny_device_iface_force_online (priv->device); */
-	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
+	
 
 	return self;
 }
@@ -619,6 +613,7 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyAccountStore *self = (TnyAccountStore *)instance;
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyPlatformFactoryIface *platfact;
 
 	priv->client = gconf_client_get_default ();
 
@@ -626,6 +621,11 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 		GCONF_CLIENT_PRELOAD_RECURSIVE, NULL);
 
 	tny_account_store_notify_add (TNY_ACCOUNT_STORE_IFACE (self));
+
+	platfact = TNY_PLATFORM_FACTORY_IFACE (tny_platform_factory_get_instance ());
+    	priv->device = tny_platform_factory_iface_new_device (platfact);
+	/* tny_device_iface_force_online (priv->device); */
+	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
 
 	return;
 }
@@ -659,7 +659,7 @@ TnySessionCamel*
 tny_account_store_get_session (TnyAccountStore *self)
 {
 	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
-
+    
 	return priv->session;
 }
 

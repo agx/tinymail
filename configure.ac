@@ -330,6 +330,7 @@ libtinymail-gpe/libtinymail-gpe.pc
 libtinymail-test/Makefile
 tinymail/Makefile
 tests/Makefile
+tests/shared/Makefile
 tests/python-demo/Makefile
 tests/memory/Makefile
 m4/Makefile
