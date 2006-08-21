@@ -69,7 +69,8 @@ tny_memtest_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, 
 static const gchar*
 tny_memtest_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
-	return ".tinymail";
+	/* FIXME: Small memleak here */
+	return g_build_filename (g_get_home_dir (), ".tinymail", NULL);
 }
 
 
