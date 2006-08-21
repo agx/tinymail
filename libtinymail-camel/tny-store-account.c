@@ -444,10 +444,11 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 					NULL, NULL, NULL);
 
 		info = camel_store_get_folder_info 
-			(store, "", CAMEL_STORE_FOLDER_INFO_FAST |
+			(store, "", /*CAMEL_STORE_FOLDER_INFO_SUBSCRIBED |*/
+				CAMEL_STORE_FOLDER_INFO_RECURSIVE | 
 				CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
-				CAMEL_STORE_FOLDER_INFO_RECURSIVE, &ex);
-
+				CAMEL_STORE_FOLDER_INFO_FAST, &ex);
+	    
 		_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (self));
 
 		fill_folders_recursive (self, store, NULL, info, type);
