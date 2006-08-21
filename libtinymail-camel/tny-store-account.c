@@ -364,6 +364,11 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 
 		switch (type)
 		{
+		    /* FIXME, UNBUGME, REDESIGNME, WHATEVER ME
+		    disco_get_folder_info in camel-disco-store.c's 
+		    CAMEL_DISCO_STORE_OFFLINE label first if requires that
+		    you are online for this to work!
+		    */
 			case TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL:
 
 				_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (self), 
