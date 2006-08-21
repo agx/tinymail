@@ -56,6 +56,7 @@ GType tny_account_get_type (void);
 
 void tny_account_add_option (TnyAccount *self, const gchar *option);
 void tny_account_set_session (TnyAccount *self, TnySessionCamel *session);
+void tny_account_set_online_status (TnyAccount *self, gboolean offline);
 
 G_END_DECLS
 

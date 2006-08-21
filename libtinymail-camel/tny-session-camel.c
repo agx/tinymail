@@ -468,7 +468,7 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 		{
 			TnyStoreAccountIface *account = (TnyStoreAccountIface*)tny_iterator_iface_current (iterator);
 			
-			_tny_account_set_online_status (account, !online);
+			tny_account_set_online_status (TNY_ACCOUNT (account), !online);
 	
 			g_object_unref (G_OBJECT(account));
 			

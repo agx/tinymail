@@ -18,6 +18,7 @@
  */
 
 #include <sys/mman.h>
+#include <camel/camel-session.h>
 
 #include <config.h>
 #include <glib/gi18n-lib.h>
@@ -108,7 +109,9 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 	   working IMAP account. This does not mean that you need to fuck it up */
     
 	tny_account_set_session (TNY_ACCOUNT (account), me->session);
-    
+	camel_session_set_online (me->session, TRUE); 
+	tny_account_set_online_status (TNY_ACCOUNT (account), FALSE);
+
 	tny_account_iface_set_proto (account, "imap");
 	tny_account_iface_set_name (account, "unit test account");
 	tny_account_iface_set_user (account, "tinymailunittest");
@@ -144,7 +147,7 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 		tny_platform_factory_get_instance ());
 
 	self->device = tny_platform_factory_iface_new_device (platfact);
-	/* tny_device_iface_force_online (priv->device); */
+	tny_device_iface_force_online (self->device);
     
 	return;
 }

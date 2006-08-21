@@ -478,7 +478,7 @@ destroy_folder (gpointer data, gpointer user_data)
 }
 
 void 
-_tny_account_set_online_status (TnyAccount *self, gboolean offline)
+tny_account_set_online_status (TnyAccount *self, gboolean offline)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
 
