@@ -443,7 +443,6 @@ tny_header_get_uid (TnyHeaderIface *self)
 	return retval;
 }
 
-
 static void
 tny_header_finalize (GObject *object)
 {

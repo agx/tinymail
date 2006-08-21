@@ -28,10 +28,22 @@
 
 #include <account-store.h>
 
-static gint recursion_level=0;
+static void
+do_test_folder (TnyFolderIface *folder)
+{
+    TnyListIface *headers = tny_list_new ();
+    
+    g_print ("Loading headers ...\n");
+    tny_folder_iface_get_headers (folder, headers, FALSE);
+    g_print ("Loaded %d headers\n", tny_list_iface_length (headers));
+    sleep (2);
+    g_print ("Unloading headers ...\n");
+    g_object_unref (G_OBJECT (headers));
+    sleep (2);
+}
 
 static void 
-recursive_walk_subfolders (TnyFolderIface *parent)
+recursive_walk_subfolders (TnyFolderIface *parent, const gchar *folname)
 {
     TnyListIface *folders = tny_folder_iface_get_folders (parent);
     if (folders)
@@ -41,20 +53,11 @@ recursive_walk_subfolders (TnyFolderIface *parent)
 	    while (!tny_iterator_iface_is_done (iterator))
 	    {
 		TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (iterator));
+								
+		if (!strcmp (tny_folder_iface_get_id (folder), folname))
+			do_test_folder (folder);
 		
-		if (!folder)
-			continue;
-		
-		gint i=0;
-		
-		for (i=0; i<recursion_level; i++)
-			g_print ("\t");
-		
-		g_print ("\t%s\n", tny_folder_iface_get_name (folder));
-		
-		recursion_level++;
-		recursive_walk_subfolders (folder);
-		recursion_level--;
+		recursive_walk_subfolders (folder, folname);
 		
 		g_object_unref (G_OBJECT (folder));
 		tny_iterator_iface_next (iterator);
@@ -67,7 +70,7 @@ recursive_walk_subfolders (TnyFolderIface *parent)
 }
 
 static void 
-mem_test_print_folders (void)
+mem_test_folder (const gchar *folname)
 {
 	TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE 
 		(tny_memtest_account_store_new ());
@@ -92,10 +95,11 @@ mem_test_print_folders (void)
 		while (!tny_iterator_iface_is_done (fiter))
 		{
 		    TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (fiter));
-		    
-		    g_print ("Root folder: %s\n", tny_folder_iface_get_name (folder));
-		    
-		    recursive_walk_subfolders (folder);
+		    		    
+		    if (!strcmp (tny_folder_iface_get_id (folder), folname))
+			do_test_folder (folder);
+
+		    recursive_walk_subfolders (folder, folname);
 		    
 		    g_object_unref (G_OBJECT (folder));
 		    tny_iterator_iface_next (fiter);
@@ -114,6 +118,9 @@ int
 main (int argc, char **argv)
 {
     g_type_init ();
-    mem_test_print_folders ();
+    
+    mem_test_folder ("INBOX/1");
+    mem_test_folder ("INBOX/100/spam");
+    mem_test_folder ("INBOX/15000/mailinglist");
 }
 
