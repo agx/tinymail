@@ -28,6 +28,16 @@
 
 #include <account-store.h>
 
+typedef void (*performer) (TnyFolderIface *folder);
+
+static void
+do_get_folder (TnyFolderIface *folder)
+{   
+    g_print ("Getting headers ...\n");
+    tny_folder_iface_refresh (folder);
+}
+
+
 static void
 do_test_folder (TnyFolderIface *folder)
 {
@@ -43,7 +53,7 @@ do_test_folder (TnyFolderIface *folder)
 }
 
 static void 
-recursive_walk_subfolders (TnyFolderIface *parent, const gchar *folname)
+recursive_walk_subfolders (TnyFolderIface *parent, const gchar *folname, performer func)
 {
     TnyListIface *folders = tny_folder_iface_get_folders (parent);
     if (folders)
@@ -55,9 +65,9 @@ recursive_walk_subfolders (TnyFolderIface *parent, const gchar *folname)
 		TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (iterator));
 								
 		if (!strcmp (tny_folder_iface_get_id (folder), folname))
-			do_test_folder (folder);
+			func (folder);
 		
-		recursive_walk_subfolders (folder, folname);
+		recursive_walk_subfolders (folder, folname, func);
 		
 		g_object_unref (G_OBJECT (folder));
 		tny_iterator_iface_next (iterator);
@@ -70,46 +80,26 @@ recursive_walk_subfolders (TnyFolderIface *parent, const gchar *folname)
 }
 
 static void 
-mem_test_folder (const gchar *folname)
+mem_test_folder (TnyListIface *root_folders, const gchar *folname, performer func)
 {
-	TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE 
-		(tny_account_store_new ());
-	TnyListIface *accounts = tny_list_new (), *folders;
-	TnyStoreAccountIface *account;
-	TnyIteratorIface *aiter, *fiter;
-    
-	tny_account_store_iface_get_accounts (account_store, accounts, 
-			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+    	TnyIteratorIface *fiter;
 
-	aiter = tny_list_iface_create_iterator (accounts);
-	tny_iterator_iface_first (aiter);
-	account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
-    
-	folders = tny_store_account_iface_get_folders (account, 
-			TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL);
-	
-	if (folders)
+	fiter = tny_list_iface_create_iterator (root_folders);
+	tny_iterator_iface_first (fiter);
+	    
+	while (!tny_iterator_iface_is_done (fiter))
 	{
-		fiter = tny_list_iface_create_iterator (folders);
-		
-		while (!tny_iterator_iface_is_done (fiter))
-		{
-		    TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (fiter));
+	    TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (fiter));
 		    		    
-		    if (!strcmp (tny_folder_iface_get_id (folder), folname))
-			do_test_folder (folder);
+	    if (!strcmp (tny_folder_iface_get_id (folder), folname))
+		func (folder);
 
-		    recursive_walk_subfolders (folder, folname);
+	    recursive_walk_subfolders (folder, folname, func);
 		    
-		    g_object_unref (G_OBJECT (folder));
-		    tny_iterator_iface_next (fiter);
-		}
-		g_object_unref (G_OBJECT (fiter));
+	    g_object_unref (G_OBJECT (folder));
+	    tny_iterator_iface_next (fiter);
 	}
-    
-	g_object_unref (G_OBJECT (account));
-	g_object_unref (G_OBJECT (aiter));
-    	g_object_unref (G_OBJECT (accounts));
+	g_object_unref (G_OBJECT (fiter));
     
 	return;
 }
@@ -117,10 +107,38 @@ mem_test_folder (const gchar *folname)
 int 
 main (int argc, char **argv)
 {
-    g_type_init ();
+   g_type_init ();
+   {
+       
+   TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE 
+		(tny_account_store_new ());
+   TnyListIface *accounts = tny_list_new (), *folders;
+   TnyStoreAccountIface *account;
+   TnyIteratorIface *aiter;
+   TnyListIface *root_folders;
+       
+   tny_account_store_iface_get_accounts (account_store, accounts, 
+			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+
+   aiter = tny_list_iface_create_iterator (accounts);
+   tny_iterator_iface_first (aiter);
+   account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
+       
+   root_folders = tny_store_account_iface_get_folders (account, 
+			TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL);
+
+   mem_test_folder (root_folders, "INBOX/1", do_get_folder);
+   mem_test_folder (root_folders, "INBOX/100/spam", do_get_folder);
+   mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_get_folder);
+
+   mem_test_folder (root_folders, "INBOX/1", do_test_folder);
+   mem_test_folder (root_folders, "INBOX/100/spam", do_test_folder);
+   mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_test_folder);
+       
+   g_object_unref (G_OBJECT (account));
+   g_object_unref (G_OBJECT (aiter));
+   g_object_unref (G_OBJECT (accounts));
+   }
     
-    mem_test_folder ("INBOX/1");
-    mem_test_folder ("INBOX/100/spam");
-    mem_test_folder ("INBOX/15000/mailinglist");
 }
 
