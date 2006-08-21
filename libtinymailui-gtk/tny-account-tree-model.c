@@ -93,7 +93,7 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *acc
 	GtkTreeIter name_iter;
 
 	folders = tny_store_account_iface_get_folders (account, 
-		TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL);
+		TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
 	func (model, &name_iter, NULL);
 
