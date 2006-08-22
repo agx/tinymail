@@ -153,7 +153,13 @@ main (int argc, char **argv)
 	TnyStoreAccountIface *account;
 	TnyIteratorIface *aiter;
 	TnyListIface *root_folders, *folders;
-	
+    	gint i=0;
+	gchar *folderids[14] = {
+	    "INBOX/1", "INBOX/10","INBOX/100","INBOX/200",
+	    "INBOX/400", "INBOX/800","INBOX/2000","INBOX/3000", "INBOX/5000",
+	    "INBOX/15000", "INBOX/20000","INBOX/30000","INBOX/40000",
+	    "INBOX/50000" };
+    
     	free (malloc (10));
     
 	g_type_init ();
@@ -190,16 +196,11 @@ main (int argc, char **argv)
 	}
     
 	if (online)
-	{
-		mem_test_folder (root_folders, "INBOX/1", do_get_folder);
-		mem_test_folder (root_folders, "INBOX/100", do_get_folder);
-		mem_test_folder (root_folders, "INBOX/15000", do_get_folder);
-	}
-    
-	mem_test_folder (root_folders, "INBOX/1", do_test_folder);
-	mem_test_folder (root_folders, "INBOX/100", do_test_folder);
-	mem_test_folder (root_folders, "INBOX/15000", do_test_folder);
-    
+		for (i=0; i<14; i++)
+			mem_test_folder (root_folders, folderids[i], do_get_folder);
+
+    	for (i=0; i<14; i++)
+		mem_test_folder (root_folders, folderids[i], do_test_folder);    
     
 err:
 	g_object_unref (G_OBJECT (account));
