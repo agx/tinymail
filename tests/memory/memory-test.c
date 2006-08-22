@@ -200,7 +200,7 @@ main (int argc, char **argv)
 		for (i=0; i<14; i++)
 			mem_test_folder (root_folders, folderids[i], do_get_folder);
 
-    	for (i=0; i<14; i++)
+    	for (i=0; i<7; i++)
 		mem_test_folder (root_folders, folderids[i], do_test_folder);    
     
 err:
