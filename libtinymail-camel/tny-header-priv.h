@@ -23,6 +23,28 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
+
+typedef struct _WriteInfo WriteInfo;
+struct _WriteInfo
+{
+	CamelMimeMessage *msg;
+	gchar *mime_from;
+};
+
+#pragma pack(1) /* Size will be 21 in stead of 24 */
+struct _TnyHeader 
+{
+	GObject parent;		
+	gpointer info;
+	TnyFolderIface *folder;
+	guchar write:1;
+};
+
+struct _TnyHeaderClass 
+{
+	GObjectClass parent_class;
+};
+
 void                _tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_message_info);
 CamelMimeMessage*   _tny_header_get_camel_mime_message (TnyHeader *self);
 

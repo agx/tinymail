@@ -40,27 +40,7 @@
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _WriteInfo WriteInfo;
-struct _WriteInfo
-{
-	CamelMimeMessage *msg;
-	gchar *mime_from;
-};
 
-#pragma pack(1) /* Size will be 21 in stead of 24 */
-struct _TnyHeader 
-{
-	GObject parent;		
-	void *info;
-
-	TnyFolderIface *folder;
-	guchar write:1;
-};
-
-struct _TnyHeaderClass 
-{
-	GObjectClass parent_class;
-};
 
 static const gchar *invalid = "Invalid";
 

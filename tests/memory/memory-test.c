@@ -25,31 +25,58 @@
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
+#include <tny-header.h>
 
 #include <account-store.h>
+
+#include <camel/camel.h>
+#include <tny-header-priv.h>
 
 typedef void (*performer) (TnyFolderIface *folder);
 
 static void
 do_get_folder (TnyFolderIface *folder)
 {   
-    g_print ("Getting headers ...\n");
-    tny_folder_iface_refresh (folder);
+	g_print ("Getting headers of %s ...\n", tny_folder_iface_get_id (folder));
+	tny_folder_iface_refresh (folder);
 }
 
 
 static void
 do_test_folder (TnyFolderIface *folder)
 {
-    TnyListIface *headers = tny_list_new ();
+	TnyListIface *headers = tny_list_new ();
+	gint length, bytes;
+	gdouble kbytes, mbytes;
     
-    g_print ("Loading headers for %s ...\n", tny_folder_iface_get_id (folder));
-    tny_folder_iface_get_headers (folder, headers, FALSE);
-    g_print ("Loaded %d headers\n", tny_list_iface_length (headers));
-    sleep (2);
-    g_print ("Unloading headers ...\n");
-    g_object_unref (G_OBJECT (headers));
-    sleep (2);
+	g_print ("Loading headers for %s ...\n", tny_folder_iface_get_id (folder));
+	tny_folder_iface_get_headers (folder, headers, FALSE);
+	length=tny_list_iface_length (headers);
+	
+    	bytes = (sizeof (TnyHeader) + sizeof (CamelMessageInfo) + 
+		 sizeof (CamelMessageInfoBase) + 
+		 sizeof (CamelMessageContentInfo) + sizeof (struct _CamelFlag) +
+		 sizeof (struct _CamelTag)) * length;
+    
+	kbytes = ((gdouble)bytes) / 1024;
+    	mbytes = kbytes / 1024;
+    
+	g_print ("Loaded %d headers\n", length);
+
+    	g_print ("\tsizeof (TnyHeader) = %d\n", sizeof (TnyHeader));
+	g_print ("\tsizeof (CamelMessageInfo) = %d\n", sizeof (CamelMessageInfo));
+	g_print ("\tsizeof (CamelMessageInfoBase) = %d\n", sizeof (CamelMessageInfoBase));
+	g_print ("\tsizeof (CamelMessageContentInfo) = %d\n", sizeof (CamelMessageContentInfo));
+	g_print ("\tsizeof (struct _CamelFlag) = %d\n", sizeof (struct _CamelFlag));
+	g_print ("\tsizeof (struct _CamelTag) = %d\n\n", sizeof (struct _CamelTag));
+
+	g_print ("This means that ~%d bytes or ~%.2lfK or ~%.2lfM is used\n", 
+		 bytes, kbytes, mbytes);
+
+	sleep (2);
+	g_print ("Unloading headers ...\n");
+	g_object_unref (G_OBJECT (headers));
+	sleep (2);
 }
 
 static void 
