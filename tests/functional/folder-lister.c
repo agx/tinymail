@@ -121,14 +121,10 @@ main (int argc, char **argv)
 
     	g_option_context_parse (context, &argc, &argv, NULL);
 
-	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online));
+	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online, cachedir));
 
 	if (cachedir)
-    	{
 		g_print ("Using %s as cache directory\n", cachedir);
-		tny_account_store_set_cache_dir 
-		    	(TNY_ACCOUNT_STORE (account_store), (const gchar*)cachedir);
-	}
 
 	g_option_context_free (context);
     

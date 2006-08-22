@@ -44,7 +44,7 @@ tny_platform_factory_instance_init (GTypeInstance *instance, gpointer g_class)
 static TnyAccountStoreIface*
 tny_platform_factory_new_account_store (TnyPlatformFactoryIface *self)
 {
-	return TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (FALSE));
+	return TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (FALSE, NULL));
 }
 
 static TnyDeviceIface*

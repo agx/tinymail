@@ -69,23 +69,13 @@ tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gc
 	return TRUE;
 }
 
-void 
-tny_account_store_set_cache_dir (TnyAccountStore *self, const gchar *cache_dir)
-{
-    if (self->cache_dir)
-	g_free (self->cache_dir);
-    
-    self->cache_dir = g_strdup (cache_dir);
-    
-    return;
-}
 
 static const gchar*
 tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
 	TnyAccountStore *me = (TnyAccountStore*) self;
     
-	if (!me->cache_dir)
+	if (me->cache_dir == NULL)
 	{
 		gint att=0;
 		GDir *dir = NULL;
@@ -133,16 +123,26 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 	tny_list_iface_prepend (list, (GObject*)account);
 	g_object_unref (G_OBJECT (account));
 
+    	tny_session_camel_set_current_accounts (me->session, list);
+    
 	return;	
 }
 
 
 
 TnyAccountStore*
-tny_account_store_new (gboolean force_online)
+tny_account_store_new (gboolean force_online, const gchar *cachedir)
 {
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
 
+	if (cachedir)
+	{
+		if (self->cache_dir)
+			g_free (self->cache_dir);
+		    
+		self->cache_dir = g_strdup (cachedir);
+	}
+    
 	self->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
     	self->force_online = force_online;
 

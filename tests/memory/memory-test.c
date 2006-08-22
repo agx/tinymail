@@ -43,7 +43,7 @@ do_test_folder (TnyFolderIface *folder)
 {
     TnyListIface *headers = tny_list_new ();
     
-    g_print ("Loading headers ...\n");
+    g_print ("Loading headers for %s ...\n", tny_folder_iface_get_id (folder));
     tny_folder_iface_get_headers (folder, headers, FALSE);
     g_print ("Loaded %d headers\n", tny_list_iface_length (headers));
     sleep (2);
@@ -136,15 +136,11 @@ main (int argc, char **argv)
     
 	g_option_context_parse (context, &argc, &argv, NULL);
 
-	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online));
+	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online, cachedir));
 
 	if (cachedir)
-    	{
 		g_print ("Using %s as cache directory\n", cachedir);
-		tny_account_store_set_cache_dir 
-		    	(TNY_ACCOUNT_STORE (account_store), (const gchar*)cachedir);
-	}
-    
+
 	g_option_context_free (context);
 
 	accounts = tny_list_new ();
@@ -165,7 +161,7 @@ main (int argc, char **argv)
 		goto err;
 	}
     
-	if (!cachedir)
+	if (online)
 	{
 		mem_test_folder (root_folders, "INBOX/1", do_get_folder);
 		mem_test_folder (root_folders, "INBOX/100/spam", do_get_folder);
