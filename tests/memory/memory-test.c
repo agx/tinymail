@@ -192,13 +192,13 @@ main (int argc, char **argv)
 	if (online)
 	{
 		mem_test_folder (root_folders, "INBOX/1", do_get_folder);
-		mem_test_folder (root_folders, "INBOX/100/spam", do_get_folder);
-		mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_get_folder);
+		mem_test_folder (root_folders, "INBOX/100", do_get_folder);
+		mem_test_folder (root_folders, "INBOX/15000", do_get_folder);
 	}
     
 	mem_test_folder (root_folders, "INBOX/1", do_test_folder);
-	mem_test_folder (root_folders, "INBOX/100/spam", do_test_folder);
-	mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_test_folder);
+	mem_test_folder (root_folders, "INBOX/100", do_test_folder);
+	mem_test_folder (root_folders, "INBOX/15000", do_test_folder);
     
     
 err:
