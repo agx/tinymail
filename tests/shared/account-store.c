@@ -117,11 +117,11 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
     
 	/* Dear visitor of the SVN-web. This is indeed a fully functional and
 	   working IMAP account. This does not mean that you need to fuck it up */
-    
-	tny_account_set_session (TNY_ACCOUNT (account), me->session);
-	camel_session_set_online ((CamelSession*)me->session, TRUE); 
-	tny_account_set_online_status (TNY_ACCOUNT (account), FALSE);
 
+	tny_account_set_session (TNY_ACCOUNT (account), me->session);
+	camel_session_set_online ((CamelSession*)me->session, me->force_online); 
+	tny_account_set_online_status (TNY_ACCOUNT (account), !me->force_online);
+    
 	tny_account_iface_set_proto (account, "imap");
 	tny_account_iface_set_name (account, "unit test account");
 	tny_account_iface_set_user (account, "tinymailunittest");
@@ -139,11 +139,17 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 
 TnyAccountStore*
-tny_account_store_new (void)
+tny_account_store_new (gboolean force_online)
 {
 	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
 
 	self->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
+    	self->force_online = force_online;
+
+    	if (self->force_online)
+		tny_device_iface_force_online (self->device);
+    	else
+		tny_device_iface_force_offline (self->device);
     
 	return self;
 }
@@ -157,7 +163,7 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 		tny_platform_factory_get_instance ());
 
 	self->device = tny_platform_factory_iface_new_device (platfact);
-	tny_device_iface_force_online (self->device);
+	
     
 	return;
 }

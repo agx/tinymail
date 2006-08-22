@@ -43,6 +43,7 @@ struct _TnyAccountStore
 	gchar *cache_dir;
     	TnySessionCamel *session;
     	TnyDeviceIface *device;
+    	gboolean force_online;
 };
 
 struct _TnyAccountStoreClass
@@ -51,7 +52,7 @@ struct _TnyAccountStoreClass
 };
 
 GType               tny_account_store_get_type       (void);
-TnyAccountStore*    tny_account_store_new            (void);
+TnyAccountStore*    tny_account_store_new            (gboolean force_online);
 TnySessionCamel*    tny_account_store_get_session    (TnyAccountStore *self);
 
 void tny_account_store_set_cache_dir (TnyAccountStore *self, const gchar *cache_dir);

@@ -91,11 +91,15 @@ mem_test_print_folders (TnyListIface *folders)
 }
 
 static gchar *cachedir=NULL;
+static gboolean online=FALSE;
 
 static const GOptionEntry options[] = 
 {
 	{ "cachedir", 'c', 0, G_OPTION_ARG_STRING, &cachedir,
 		"Cache directory", NULL },
+	{ "online", 'o', 0, G_OPTION_ARG_NONE, &online,
+		"Online or offline", NULL },
+    
 	{ NULL }
 };
 
@@ -114,11 +118,13 @@ main (int argc, char **argv)
 
     	context = g_option_context_new ("- The tinymail functional tester");
 	g_option_context_add_main_entries (context, options, "tinymail");
-    
-	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new ());
 
-	if (g_option_context_parse (context, &argc, &argv, NULL) && cachedir)
-	{
+    	g_option_context_parse (context, &argc, &argv, NULL);
+
+	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online));
+
+	if (cachedir)
+    	{
 		g_print ("Using %s as cache directory\n", cachedir);
 		tny_account_store_set_cache_dir 
 		    	(TNY_ACCOUNT_STORE (account_store), (const gchar*)cachedir);
@@ -136,10 +142,11 @@ main (int argc, char **argv)
 	account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
 
 	folders = tny_store_account_iface_get_folders (account, 
-			TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL);
-
-	mem_test_print_folders (folders);
-
+			TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
+	if (folders)
+		mem_test_print_folders (folders);
+	else g_print ("No root folders?\n");
+    
 	g_object_unref (G_OBJECT (account));
 	g_object_unref (G_OBJECT (aiter));
 	g_object_unref (G_OBJECT (accounts));
