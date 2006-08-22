@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
  
-
-#include <gtk/gtk.h>
+#include <stdlib.h>
+#include <glib.h>
 
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
@@ -104,41 +104,70 @@ mem_test_folder (TnyListIface *root_folders, const gchar *folname, performer fun
 	return;
 }
 
+static gchar *cachedir=NULL;
+
+static const GOptionEntry options[] = 
+{
+	{ "cachedir", 'c', 0, G_OPTION_ARG_STRING, &cachedir,
+		"Cache directory", NULL },
+	{ NULL }
+};
+
 int 
 main (int argc, char **argv)
 {
-   g_type_init ();
-   {
-       
-   TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE 
-		(tny_account_store_new ());
-   TnyListIface *accounts = tny_list_new (), *folders;
-   TnyStoreAccountIface *account;
-   TnyIteratorIface *aiter;
-   TnyListIface *root_folders;
-       
-   tny_account_store_iface_get_accounts (account_store, accounts, 
-			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
-
-   aiter = tny_list_iface_create_iterator (accounts);
-   tny_iterator_iface_first (aiter);
-   account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
-       
-   root_folders = tny_store_account_iface_get_folders (account, 
-			TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL);
-
-   mem_test_folder (root_folders, "INBOX/1", do_get_folder);
-   mem_test_folder (root_folders, "INBOX/100/spam", do_get_folder);
-   mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_get_folder);
-
-   mem_test_folder (root_folders, "INBOX/1", do_test_folder);
-   mem_test_folder (root_folders, "INBOX/100/spam", do_test_folder);
-   mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_test_folder);
-       
-   g_object_unref (G_OBJECT (account));
-   g_object_unref (G_OBJECT (aiter));
-   g_object_unref (G_OBJECT (accounts));
-   }
+	GOptionContext *context;
+	TnyAccountStoreIface *account_store;
+	TnyListIface *accounts;
+	TnyStoreAccountIface *account;
+	TnyIteratorIface *aiter;
+	TnyListIface *root_folders, *folders;
+	
+    	free (malloc (10));
     
+	g_type_init ();
+
+	context = g_option_context_new ("- The tinymail memory tester");
+	g_option_context_add_main_entries (context, options, "tinymail");
+
+	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new ());
+    
+	if (g_option_context_parse (context, &argc, &argv, NULL) && cachedir)
+	{
+		g_print ("Using %s as cache directory\n", cachedir);
+		tny_account_store_set_cache_dir 
+		    	(TNY_ACCOUNT_STORE (account_store), (const gchar*)cachedir);
+	}
+    
+	g_option_context_free (context);
+
+	accounts = tny_list_new ();
+	    
+	tny_account_store_iface_get_accounts (account_store, accounts, 
+				TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+
+	aiter = tny_list_iface_create_iterator (accounts);
+	tny_iterator_iface_first (aiter);
+	account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
+	    
+	root_folders = tny_store_account_iface_get_folders (account, 
+				TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL);
+
+	if (!cachedir)
+	{
+		mem_test_folder (root_folders, "INBOX/1", do_get_folder);
+		mem_test_folder (root_folders, "INBOX/100/spam", do_get_folder);
+		mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_get_folder);
+	}
+    
+	mem_test_folder (root_folders, "INBOX/1", do_test_folder);
+	mem_test_folder (root_folders, "INBOX/100/spam", do_test_folder);
+	mem_test_folder (root_folders, "INBOX/15000/mailinglist", do_test_folder);
+	    
+	g_object_unref (G_OBJECT (account));
+	g_object_unref (G_OBJECT (aiter));
+	g_object_unref (G_OBJECT (accounts));
+    
+	return 0;
 }
 

@@ -69,6 +69,16 @@ tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gc
 	return TRUE;
 }
 
+void 
+tny_account_store_set_cache_dir (TnyAccountStore *self, const gchar *cache_dir)
+{
+    if (self->cache_dir)
+	g_free (self->cache_dir);
+    
+    self->cache_dir = g_strdup (cache_dir);
+    
+    return;
+}
 
 static const gchar*
 tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
@@ -109,7 +119,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 	   working IMAP account. This does not mean that you need to fuck it up */
     
 	tny_account_set_session (TNY_ACCOUNT (account), me->session);
-	camel_session_set_online (me->session, TRUE); 
+	camel_session_set_online ((CamelSession*)me->session, TRUE); 
 	tny_account_set_online_status (TNY_ACCOUNT (account), FALSE);
 
 	tny_account_iface_set_proto (account, "imap");

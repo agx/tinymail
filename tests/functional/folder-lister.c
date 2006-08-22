@@ -15,7 +15,10 @@
  * along with self program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
+#include <stdlib.h>
+#include <glib.h>
+
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 #include <tny-list.h>
@@ -64,53 +67,81 @@ recursive_walk_subfolders (TnyFolderIface *parent)
 }
 
 static void 
-mem_test_print_folders (void)
+mem_test_print_folders (TnyListIface *folders)
 {
-	TnyAccountStoreIface *account_store = TNY_ACCOUNT_STORE_IFACE 
-		(tny_account_store_new ());
-	TnyListIface *accounts = tny_list_new (), *folders;
-	TnyStoreAccountIface *account;
-	TnyIteratorIface *aiter, *fiter;
+	TnyIteratorIface *fiter;
     
+	fiter = tny_list_iface_create_iterator (folders);
+	
+	while (!tny_iterator_iface_is_done (fiter))
+	{
+	    TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (fiter));
+	    
+	    g_print ("Root folder: %s\n", tny_folder_iface_get_name (folder));
+	    
+	    recursive_walk_subfolders (folder);
+	    
+	    g_object_unref (G_OBJECT (folder));
+	    tny_iterator_iface_next (fiter);
+	}
+    
+	g_object_unref (G_OBJECT (fiter));
+    
+	return;
+}
+
+static gchar *cachedir=NULL;
+
+static const GOptionEntry options[] = 
+{
+	{ "cachedir", 'c', 0, G_OPTION_ARG_STRING, &cachedir,
+		"Cache directory", NULL },
+	{ NULL }
+};
+
+int 
+main (int argc, char **argv)
+{
+	GOptionContext *context;
+	TnyAccountStoreIface *account_store;
+	TnyListIface *accounts, *folders;
+	TnyStoreAccountIface *account;
+	TnyIteratorIface *aiter;
+
+	free (malloc (10));
+    
+	g_type_init ();
+
+    	context = g_option_context_new ("- The tinymail functional tester");
+	g_option_context_add_main_entries (context, options, "tinymail");
+    
+	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new ());
+
+	if (g_option_context_parse (context, &argc, &argv, NULL) && cachedir)
+	{
+		g_print ("Using %s as cache directory\n", cachedir);
+		tny_account_store_set_cache_dir 
+		    	(TNY_ACCOUNT_STORE (account_store), (const gchar*)cachedir);
+	}
+
+	g_option_context_free (context);
+    
+	accounts = tny_list_new ();
+
 	tny_account_store_iface_get_accounts (account_store, accounts, 
 			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
 
 	aiter = tny_list_iface_create_iterator (accounts);
 	tny_iterator_iface_first (aiter);
 	account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
-    
+
 	folders = tny_store_account_iface_get_folders (account, 
 			TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL);
-	
-	if (folders)
-	{
-		fiter = tny_list_iface_create_iterator (folders);
-		
-		while (!tny_iterator_iface_is_done (fiter))
-		{
-		    TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (fiter));
-		    
-		    g_print ("Root folder: %s\n", tny_folder_iface_get_name (folder));
-		    
-		    recursive_walk_subfolders (folder);
-		    
-		    g_object_unref (G_OBJECT (folder));
-		    tny_iterator_iface_next (fiter);
-		}
-		g_object_unref (G_OBJECT (fiter));
-	}
-    
+
+	mem_test_print_folders (folders);
+
 	g_object_unref (G_OBJECT (account));
 	g_object_unref (G_OBJECT (aiter));
-    	g_object_unref (G_OBJECT (accounts));
-    
-	return;
-}
-
-int 
-main (int argc, char **argv)
-{
-    g_type_init ();
-    mem_test_print_folders ();
+	g_object_unref (G_OBJECT (accounts));
 }
 

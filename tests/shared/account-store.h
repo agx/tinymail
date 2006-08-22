@@ -54,6 +54,8 @@ GType               tny_account_store_get_type       (void);
 TnyAccountStore*    tny_account_store_new            (void);
 TnySessionCamel*    tny_account_store_get_session    (TnyAccountStore *self);
 
+void tny_account_store_set_cache_dir (TnyAccountStore *self, const gchar *cache_dir);
+
 G_END_DECLS
 
 #endif
