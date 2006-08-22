@@ -61,21 +61,22 @@ do_test_folder (TnyFolderIface *folder)
 	kbytes = ((gdouble)bytes) / 1024;
     	mbytes = kbytes / 1024;
     
-	g_print ("Loaded %d headers\n", length);
+	g_print ("Loaded %d headers\n\n", length);
 
-    	g_print ("\tsizeof (TnyHeader) = %d\n", sizeof (TnyHeader));
-	g_print ("\tsizeof (CamelMessageInfo) = %d\n", sizeof (CamelMessageInfo));
-	g_print ("\tsizeof (CamelMessageInfoBase) = %d\n", sizeof (CamelMessageInfoBase));
-	g_print ("\tsizeof (CamelMessageContentInfo) = %d\n", sizeof (CamelMessageContentInfo));
-	g_print ("\tsizeof (struct _CamelFlag) = %d\n", sizeof (struct _CamelFlag));
-	g_print ("\tsizeof (struct _CamelTag) = %d\n\n", sizeof (struct _CamelTag));
+    	g_print ("\tsizeof (TnyHeader) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (TnyHeader), length * sizeof (TnyHeader), ((gdouble)length * sizeof (TnyHeader))/1024);
+	g_print ("\tsizeof (CamelMessageInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfo), length * sizeof (CamelMessageInfo), ((gdouble)length * sizeof (CamelMessageInfo))/1024);
+	g_print ("\tsizeof (CamelMessageInfoBase) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfoBase), length * sizeof (CamelMessageInfoBase), ((gdouble)length * sizeof (CamelMessageInfoBase))/1024);
+	g_print ("\tsizeof (CamelMessageContentInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageContentInfo), length * sizeof (CamelMessageContentInfo), ((gdouble)length * sizeof (CamelMessageContentInfo))/1024);
+	g_print ("\tsizeof (struct _CamelFlag) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (struct _CamelFlag), length * sizeof (struct _CamelFlag), ((gdouble)length * sizeof (struct _CamelFlag))/1024);
+	g_print ("\tsizeof (struct _CamelTag) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (struct _CamelTag), length * sizeof (struct _CamelTag), ((gdouble)length * sizeof (struct _CamelTag))/1024);
 
-	g_print ("This means that ~%d bytes or ~%.2lfK or ~%.2lfM is used\n", 
-		 bytes, kbytes, mbytes);
+	g_print ("\nThis means that (at least) %d bytes or ~%.2lfK or ~%.2lfM are needed for this folder\n", bytes, kbytes, mbytes);
 
+    	g_print ("Sleeping to allow your valgrind to see this...\n");
 	sleep (2);
 	g_print ("Unloading headers ...\n");
 	g_object_unref (G_OBJECT (headers));
+       	g_print ("Sleeping to allow your valgrind to see this...\n");
 	sleep (2);
 }
 
