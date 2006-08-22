@@ -73,11 +73,12 @@ do_test_folder (TnyFolderIface *folder)
 	g_print ("\nThis means that (at least) %d bytes or ~%.2lfK or ~%.2lfM are needed for this folder\n", bytes, kbytes, mbytes);
 
     	g_print ("Sleeping to allow your valgrind to see this...\n");
-	sleep (2);
+	sleep (5);
 	g_print ("Unloading headers ...\n");
 	g_object_unref (G_OBJECT (headers));
+	tny_folder_iface_uncache (folder);
        	g_print ("Sleeping to allow your valgrind to see this...\n");
-	sleep (2);
+	sleep (5);
 }
 
 static void 
