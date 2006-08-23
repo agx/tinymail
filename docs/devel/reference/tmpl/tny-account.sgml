@@ -32,3 +32,21 @@ A account type implemented for Camel
 @option: 
 
 
+<!-- ##### FUNCTION tny_account_set_session ##### -->
+<para>
+
+</para>
+
+@self: 
+@session: 
+
+
+<!-- ##### FUNCTION tny_account_set_online_status ##### -->
+<para>
+
+</para>
+
+@self: 
+@offline: 
+
+

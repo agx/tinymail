@@ -196,6 +196,14 @@ TnySummaryWindow
 
 @parent_class: 
 
+<!-- ##### SIGNAL TnyDeviceIface::connection-changed ##### -->
+<para>
+
+</para>
+
+@tnydeviceiface: the object which received the signal.
+@arg1: 
+
 <!-- ##### STRUCT TnyFolderProxy ##### -->
 <para>
 
@@ -385,6 +393,30 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_account_iface_get_account_store ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_account_iface_set_account_store ##### -->
+<para>
+
+</para>
+
+@self: 
+@store: 
+
+<!-- ##### FUNCTION tny_account_iface_set_account_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+
 <!-- ##### FUNCTION tny_account_store_get_instance ##### -->
 <para>
 
@@ -429,6 +461,38 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 </para>
 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+
+<!-- ##### FUNCTION tny_header_iface_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+<!-- ##### FUNCTION tny_iterator_iface_has_first ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_iterator_iface_has_next ##### -->
+<para>
+
+</para>
+
+@self: 
 @Returns: 
 
 <!-- ##### FUNCTION tny_msg_folder_get_folder ##### -->

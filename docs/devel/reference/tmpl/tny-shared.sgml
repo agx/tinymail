@@ -54,8 +54,6 @@ Shared include file with forward typedefs
 @first_func: 
 @nth_func: 
 @current_func: 
-@has_first_func: 
-@has_next_func: 
 @is_done: 
 @get_list_func: 
 
@@ -116,7 +114,6 @@ Shared include file with forward typedefs
 @get_id_func: 
 @get_account_func: 
 @set_name_func: 
-@set_id_func: 
 @set_account_func: 
 @get_folder_type_func: 
 @get_all_count_func: 
@@ -157,7 +154,6 @@ Shared include file with forward typedefs
 @set_to_func: 
 @set_replyto_func: 
 @get_folder_func: 
-@set_folder_func: 
 @get_flags_func: 
 @set_flags_func: 
 @unset_flags_func: 
@@ -210,7 +206,6 @@ Shared include file with forward typedefs
 @set_user_func: 
 @set_hostname_func: 
 @set_url_string_func: 
-@set_account_type_func: 
 @set_pass_func_func: 
 @set_forget_pass_func_func: 
 @get_pass_func_func: 
@@ -222,22 +217,12 @@ Shared include file with forward typedefs
 @get_hostname_func: 
 @get_url_string_func: 
 @get_account_type_func: 
-@set_account_store_func: 
-@get_account_store_func: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### SIGNAL TnyDeviceIface::connection-changed ##### -->
-<para>
-
-</para>
-
-@tnydeviceiface: the object which received the signal.
-@arg1: 
 
 <!-- ##### STRUCT TnyDeviceIfaceClass ##### -->
 <para>

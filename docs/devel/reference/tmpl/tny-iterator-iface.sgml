@@ -23,7 +23,6 @@ An iterator for #TnyListIface
 </para>
 
 @self: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_iterator_iface_prev ##### -->
@@ -32,7 +31,6 @@ An iterator for #TnyListIface
 </para>
 
 @self: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_iterator_iface_first ##### -->
@@ -41,7 +39,6 @@ An iterator for #TnyListIface
 </para>
 
 @self: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_iterator_iface_nth ##### -->
@@ -51,28 +48,9 @@ An iterator for #TnyListIface
 
 @self: 
 @nth: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_iterator_iface_current ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_iterator_iface_has_first ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_iterator_iface_has_next ##### -->
 <para>
 
 </para>

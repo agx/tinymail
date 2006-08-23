@@ -196,15 +196,6 @@ by a summary view to give the user an overview of the available messages in a fo
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_iface_set_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-
-
 <!-- ##### FUNCTION tny_header_iface_set_flags ##### -->
 <para>
 

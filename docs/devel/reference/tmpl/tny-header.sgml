@@ -43,6 +43,7 @@ for no real reason.
 
 </para>
 
+@parent_class: 
 
 <!-- ##### FUNCTION tny_header_new ##### -->
 <para>

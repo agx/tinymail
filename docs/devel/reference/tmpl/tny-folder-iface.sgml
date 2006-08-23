@@ -127,15 +127,6 @@ instances. Depending on the implementation, this will reduce memory usage.
 @account: 
 
 
-<!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
-<para>
-
-</para>
-
-@self: 
-@id: 
-
-
 <!-- ##### FUNCTION tny_folder_iface_set_name ##### -->
 <para>
 

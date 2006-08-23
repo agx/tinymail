@@ -104,15 +104,6 @@ A abstract type that contains the shared functionality of the #TnyStoreAccountIf
 @url_string: 
 
 
-<!-- ##### FUNCTION tny_account_iface_set_account_type ##### -->
-<para>
-
-</para>
-
-@self: 
-@type: 
-
-
 <!-- ##### FUNCTION tny_account_iface_get_account_type ##### -->
 <para>
 
@@ -195,24 +186,6 @@ A abstract type that contains the shared functionality of the #TnyStoreAccountIf
 
 
 <!-- ##### FUNCTION tny_account_iface_get_forget_pass_func ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_account_iface_set_account_store ##### -->
-<para>
-
-</para>
-
-@self: 
-@store: 
-
-
-<!-- ##### FUNCTION tny_account_iface_get_account_store ##### -->
 <para>
 
 </para>

@@ -17,3 +17,17 @@ tny-header-priv
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT WriteInfo ##### -->
+<para>
+
+</para>
+
+@msg: 
+@mime_from: 
+
+<!-- ##### STRUCT TnyHeader ##### -->
+<para>
+
+</para>
+
+

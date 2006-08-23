@@ -24,6 +24,7 @@ TnyDevice
 
 </para>
 
+@parent: 
 
 <!-- ##### FUNCTION tny_device_new ##### -->
 <para>

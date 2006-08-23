@@ -121,16 +121,14 @@ tny_iterator_iface_current (TnyIteratorIface *self)
  *
  * Does the iterator point to some valid list item. You can use this property
  * to make loops like:
- *
+ * 
  * <informalexample><programlisting>
  * TnyListIface *list = tny_list_new ();
  * TnyIteratorIface *iter = tny_list_iface_create_iterator (list);
- *
  * while (!tny_iterator_iface_is_done (iter))
  *    tny_iterator_iface_next (iter);
- *
  * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (list));  
+ * g_object_unref (G_OBJECT (list));
  * </programlisting></informalexample>
  *
  * Return value: TRUE if it points to a valid list item, FALSE otherwise
