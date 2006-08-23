@@ -29,8 +29,8 @@ guint *tny_folder_iface_signals;
  * tny_folder_iface_expunge:
  * @self: a TnyFolderIface object
  *
- * Sync changes made to a folder to its backing store, 
- * expunging deleted messages as well.
+ * Sync changes made to a folder to its backing store, expunging deleted 
+ * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
  **/
 void 
 tny_folder_iface_expunge (TnyFolderIface *self)
@@ -49,7 +49,12 @@ tny_folder_iface_expunge (TnyFolderIface *self)
  * @header: the header of the message to remove
  *
  * Remove a message from a folder. This doesn't remove it from a #TnyListIface 
- * that would hold the headers (for example for a header summary view).
+ * that holds the headers (for example for a header summary view) after doing
+ * the tny_folder_iface_get_headers method.
+ *
+ * This method also doesn't truely remove the header from the folder. It only
+ * marks it as removed (it sets the TNY_HEADER_FLAG_DELETED). If you perform
+ * tny_folder_iface_expunge on the folder, it will really be removed.
  **/
 void 
 tny_folder_iface_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
@@ -67,12 +72,19 @@ tny_folder_iface_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
 /**
  * tny_folder_iface_refresh_async:
  * @self: a TnyFolderIface object
- * @callback: The callback handler (happens in the GMainLoop)
- * @status_callback: A callback for status notifications (in-thread)
+ * @callback: The callback handler
+ * @status_callback: A callback for status notifications
  * @user_data: user data for the callback
  *
- * Refresh the folder and call back when finished
+ * Refresh the folder and call back when finished. If you want to use this 
+ * functionality, your application needs to use a glib main event loop 
+ * (#GMainLoop). All Gtk+ and GNOME applications use this automatically.
  * 
+ * The callback and the status_callback don't need gdk_threads_enter and
+ * gdk_threads_leave because they are both invoked using g_timeout_add in the
+ * main event loop of your application.
+ *
+ * DOC TODO: Document callback and status_callback
  **/
 void
 tny_folder_iface_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
@@ -92,8 +104,13 @@ tny_folder_iface_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback c
  * tny_folder_iface_refresh:
  * @self: a TnyFolderIface object
  *
- * Refresh the folder
- * 
+ * Refresh the folder. This gets the summary information from the IMAP service
+ * to the ondisk cache and updates it if there was cache already.
+ *
+ * After this method, tny_folder_iface_get_all_count and 
+ * tny_folder_iface_get_unread_count are guaranteed to be correct.
+ *
+ * Also read about tny_folder_iface_get_headers and tny_folder_iface_uncache.
  **/
 void
 tny_folder_iface_refresh (TnyFolderIface *self)
@@ -150,7 +167,8 @@ tny_folder_iface_get_subscribed (TnyFolderIface *self)
  * tny_folder_iface_get_unread_count:
  * @self: a TnyFolderIface object
  * 
- * Get the amount of unread messages in this folder.
+ * Get the amount of unread messages in this folder. The value is only
+ * garuanteed to be correct after tny_folder_iface_refresh.
  * 
  * Return value: amount of unread messages
  **/
@@ -165,7 +183,15 @@ tny_folder_iface_get_unread_count (TnyFolderIface *self)
 	return TNY_FOLDER_IFACE_GET_CLASS (self)->get_unread_count_func (self);
 }
 
-
+/**
+ * tny_folder_iface_get_all_count:
+ * @self: a TnyFolderIface object
+ * 
+ * Get the amount of messages in this folder. The value is only
+ * garuanteed to be correct after tny_folder_iface_refresh.
+ * 
+ * Return value: amount of messages
+ **/
 guint
 tny_folder_iface_get_all_count (TnyFolderIface *self)
 {
@@ -198,10 +224,13 @@ tny_folder_iface_get_account (TnyFolderIface *self)
 
 /**
  * tny_folder_iface_set_account:
- * @self: a TnyFolderIface object
+ * @self: a #TnyFolderIface object
+ * @account: a #TnyAccountIface object
  * 
- * Set the parent of this folder
+ * Set the parent of this folder. It's not recommended to use this method. in 
+ * an application. It's being used internally.
  * 
+ * TODO: make this method private in the implementation
  **/
 void
 tny_folder_iface_set_account (TnyFolderIface *self, TnyAccountIface *account)
@@ -219,10 +248,15 @@ tny_folder_iface_set_account (TnyFolderIface *self, TnyAccountIface *account)
 /**
  * tny_folder_iface_get_folders:
  * @self: a TnyFolderIface object
+ *
+ * WARNING: This API might soon change.
  * 
- * Get the child folders of this folder
+ * Get the child folders of this folder. You should not tamper with the 
+ * resulting #TnyListIface instance (it's read-only).
  * 
- * Return value: A read-only #TnyListIface with TnyFolderIface instances
+ * TODO: refactor this
+ *
+ * Return value: A read-only #TnyListIface with #TnyFolderIface instances
  **/
 TnyListIface*
 tny_folder_iface_get_folders (TnyFolderIface *self)
@@ -241,7 +275,7 @@ tny_folder_iface_get_folders (TnyFolderIface *self)
  * @self: a TnyFolderIface object
  * @header: the header of the message to get
  * 
- * Get a message in the folder by header
+ * Get a message in the folder identified by a header
  * 
  * Return value: The message instance or NULL on failure
  **/
@@ -263,8 +297,8 @@ tny_folder_iface_get_message (TnyFolderIface *self, TnyHeaderIface *header)
  * @headers: A #TnyListIface instance where the headers will be put
  * @refresh: whether or not to synchronize with the server first
  * 
- * Get a list of message header instances that are in this folder
- * 
+ * Get a list of message header instances that are in this folder. Also read
+ * about tny_folder_iface_uncache and tny_folder_iface_refresh.
  **/
 void
 tny_folder_iface_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh)
@@ -281,7 +315,13 @@ tny_folder_iface_get_headers (TnyFolderIface *self, TnyListIface *headers, gbool
  * tny_folder_iface_get_id:
  * @self: a TnyFolderIface object
  * 
- * Get an unique id for this folder (unique per account)
+ * Get an unique id for this folder (unique per account). The ID will be a 
+ * a "/" separated string like "INBOX/parent-folder/folder" depending on the
+ * service type (the example is for IMAP using the libtinymail-camel 
+ * implementation).
+ *
+ * The ID is guaranteed to be unique per account. You should not free the result
+ * of this method.
  * 
  * Return value: A unique id
  **/
@@ -300,7 +340,8 @@ tny_folder_iface_get_id (TnyFolderIface *self)
  * tny_folder_iface_get_name:
  * @self: a TnyFolderIface object
  * 
- * Get the displayable name of this folder
+ * Get a displayable name for this folder. You should not free the result of 
+ * this method.
  * 
  * Return value: The folder name
  **/
@@ -320,8 +361,10 @@ tny_folder_iface_get_name (TnyFolderIface *self)
  * @self: a TnyFolderIface object
  * @id: an unique id
  * 
- * Set the unique id for this folder (unique per account)
+ * Set the unique id for this folder (unique per account). It's not recommended 
+ * to use this method. in an application. It's being used internally.
  * 
+ * TODO: make this method private in the implementation 
  **/
 void
 tny_folder_iface_set_id (TnyFolderIface *self, const gchar *id)
@@ -338,10 +381,10 @@ tny_folder_iface_set_id (TnyFolderIface *self, const gchar *id)
 /**
  * tny_folder_iface_set_name:
  * @self: a TnyFolderIface object
- * @name: an unique id
+ * @name: a new name for the folder
  * 
- * Set the displayable name of this folder
- * 
+ * Rename a folder. Most services require the name to be unique in the 
+ * parent folder.
  **/
 void
 tny_folder_iface_set_name (TnyFolderIface *self, const gchar *name)
@@ -363,8 +406,10 @@ tny_folder_iface_set_name (TnyFolderIface *self, const gchar *name)
  * 
  * Get the type of the folder (Inbox, Outbox etc.) 
  * 
+ * Return value: The folder type as  a #TnyFolderType enum
  **/
-TnyFolderType tny_folder_iface_get_folder_type  (TnyFolderIface *self)
+TnyFolderType 
+tny_folder_iface_get_folder_type  (TnyFolderIface *self)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_IFACE_GET_CLASS (self)->get_folder_type_func)
@@ -380,8 +425,19 @@ TnyFolderType tny_folder_iface_get_folder_type  (TnyFolderIface *self)
  * tny_folder_iface_uncache:
  * @self: a TnyFolderIface object
  * 
- * If it's possible to uncache this instance, uncache it
+ * If it's possible to uncache this instance, uncache it. It is recommended to
+ * perform this method after you did a tny_folder_iface_get_headers once the 
+ * folder isn't needed anymore.
  * 
+ * The libtinymail-camel folder implementation will keep a copy of the headers
+ * until you perform this method. Not performing it will make a second
+ * get_headers call faster but will keep the memory needed for these headers
+ * alive. You typically don't want this on a device with few memory resources.
+ *
+ * If you use libtinymailui-gtk's #TnyHeaderListModel, this is done for you
+ * in a convenient way when switching the model of a #GtkTreeView. In other
+ * words: you don't have to worry about it when using the #TnyHeaderListModel
+ * type as list parameter of tny_folder_iface_get_headers.
  **/
 void
 tny_folder_iface_uncache (TnyFolderIface *self)
@@ -395,7 +451,8 @@ tny_folder_iface_uncache (TnyFolderIface *self)
  * tny_folder_iface_has_cache:
  * @self: a TnyFolderIface object
  * 
- * If it's possible to uncache this instance, return whether or not it has a cache
+ * If it's possible to uncache this instance, return whether or not it has a 
+ * cache.
  * 
  * Return value: Whether or not this instance has a cache
  **/
