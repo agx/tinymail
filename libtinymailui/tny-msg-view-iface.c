@@ -28,7 +28,7 @@
  * @self: A #TnyMsgViewIface instance
  * @header: a #TnyHeaderIface instance or NULL
  *
- * Set the view to display that the message was unavailable
+ * Set the view to display the fact that the message was unavailable
  * 
  **/
 void

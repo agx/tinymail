@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymailui - The Tiny Mail user interface library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -17,6 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* The reason why this type is defined in libtinymailui rather than libtinymail
+   is because the factory also returns types defined in libtinymailui */
+   
 #include <config.h>
 
 #include <tny-platform-factory-iface.h>
@@ -25,7 +28,11 @@
  * tny_platform_factory_iface_new_account_store:
  * @self: a TnyPlatformFactoryIface object
  *
+ * When implementing a platform-specific library, you need to implement this
+ * method. You must simply return a new #TnyAccountStoreIface instance.
+ *
  * Return value: a #TnyAccountStoreIface instance
+ *
  **/
 TnyAccountStoreIface*
 tny_platform_factory_iface_new_account_store (TnyPlatformFactoryIface *self)
@@ -42,7 +49,11 @@ tny_platform_factory_iface_new_account_store (TnyPlatformFactoryIface *self)
  * tny_platform_factory_iface_new_device:
  * @self: a TnyPlatformFactoryIface object
  *
+ * When implementing a platform-specific library, you need to implement this
+ * method. You must simply return a new #TnyDeviceIface instance.
+ *
  * Return value: a #TnyDeviceIface instance
+ *
  **/
 TnyDeviceIface*
 tny_platform_factory_iface_new_device (TnyPlatformFactoryIface *self)
@@ -59,7 +70,11 @@ tny_platform_factory_iface_new_device (TnyPlatformFactoryIface *self)
  * tny_platform_factory_iface_new_msg_view:
  * @self: a TnyPlatformFactoryIface object
  *
+ * When implementing a platform-specific library, you need to implement this
+ * method. You must simply return a new #TnyMsgViewIface instance.
+ *
  * Return value: a #TnyMsgViewIface instance
+ *
  **/
 TnyMsgViewIface*
 tny_platform_factory_iface_new_msg_view (TnyPlatformFactoryIface *self)

@@ -23,9 +23,10 @@
 
 /**
  * tny_save_strategy_iface_save:
- * @self: A TnySaveStrategyIface instance
+ * @self: A #TnySaveStrategyIface instance
+ * @part: The #TnyMimePartIface instance that must be saved
  *
- * Performs the saving
+ * Performs the saving of a mime part
  * 
  **/
 void
