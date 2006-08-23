@@ -356,27 +356,6 @@ tny_folder_iface_get_name (TnyFolderIface *self)
 	return TNY_FOLDER_IFACE_GET_CLASS (self)->get_name_func (self);
 }
 
-/**
- * tny_folder_iface_set_id:
- * @self: a TnyFolderIface object
- * @id: an unique id
- * 
- * Set the unique id for this folder (unique per account). It's not recommended 
- * to use this method. in an application. It's being used internally.
- * 
- * TODO: make this method private in the implementation 
- **/
-void
-tny_folder_iface_set_id (TnyFolderIface *self, const gchar *id)
-{
-#ifdef DEBUG
-	if (!TNY_FOLDER_IFACE_GET_CLASS (self)->set_id_func)
-		g_critical ("You must implement tny_folder_iface_set_id\n");
-#endif
-
-	TNY_FOLDER_IFACE_GET_CLASS (self)->set_id_func (self, id);
-	return;
-}
 
 /**
  * tny_folder_iface_set_name:

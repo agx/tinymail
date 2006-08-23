@@ -122,10 +122,8 @@ load_folder_no_lock (TnyFolderPriv *priv)
 		priv->has_summary_cap = camel_folder_has_summary_capability (priv->folder);
 		
 		if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
-		{
 			priv->unread_length = (guint)
 				camel_folder_get_unread_message_count (priv->folder);
-		}
 
 		priv->loaded = TRUE;
 	}
@@ -710,8 +708,8 @@ tny_folder_get_id (TnyFolderIface *self)
 	return priv->folder_name;
 }
 
-static void
-tny_folder_set_id (TnyFolderIface *self, const gchar *id)
+void
+_tny_folder_set_id (TnyFolder *self, const gchar *id)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
@@ -770,10 +768,8 @@ void
 tny_folder_set_folder (TnyFolder *self, CamelFolder *camel_folder)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-
 	
-	tny_folder_set_id (TNY_FOLDER_IFACE (self), 
-		camel_folder_get_full_name (camel_folder));
+	_tny_folder_set_id (self, camel_folder_get_full_name (camel_folder));
 
 	return;
 }
@@ -916,7 +912,6 @@ tny_folder_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->get_headers_func = tny_folder_get_headers;
 	klass->get_message_func = tny_folder_get_message;
-	klass->set_id_func = tny_folder_set_id;
 	klass->get_id_func = tny_folder_get_id;
 	klass->set_name_func = tny_folder_set_name;
 	klass->get_name_func = tny_folder_get_name;

@@ -280,7 +280,7 @@ fill_folders_recursive (TnyStoreAccountIface *self, CamelStore *store, TnyFolder
 		TnyFolderIface *iface = TNY_FOLDER_IFACE (
 			tny_folder_new ());
 
-		tny_folder_iface_set_id (iface, iter->full_name);
+		_tny_folder_set_id (TNY_FOLDER (iface), iter->full_name);
 		tny_folder_iface_set_account (iface, TNY_ACCOUNT_IFACE (self));
 		set_folder_type (TNY_FOLDER (iface), iter);
 		_tny_folder_set_unread_count (TNY_FOLDER (iface), iter->unread);

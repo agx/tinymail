@@ -91,7 +91,6 @@ struct _TnyFolderIfaceClass
                        (*get_account_func) (TnyFolderIface *self);
 
 	void           (*set_name_func)    (TnyFolderIface *self, const gchar *name);
-	void           (*set_id_func)      (TnyFolderIface *self, const gchar *id);
 	void           (*set_account_func) (TnyFolderIface *self, TnyAccountIface *account);
 	TnyFolderType (*get_folder_type_func) (TnyFolderIface *self);
 
@@ -124,7 +123,6 @@ const gchar* tny_folder_iface_get_id (TnyFolderIface *self);
 const gchar* tny_folder_iface_get_name (TnyFolderIface *self);
 
 void tny_folder_iface_set_account (TnyFolderIface *self, TnyAccountIface *account);
-void tny_folder_iface_set_id (TnyFolderIface *self, const gchar *id);
 void tny_folder_iface_set_name (TnyFolderIface *self, const gchar *name);
 
 TnyFolderType tny_folder_iface_get_folder_type (TnyFolderIface *self);
