@@ -69,7 +69,6 @@ tny_account_iface_test_teardown (void)
 	return;
 }
 
-/* TODO: test function pointer properties: pass_func, forget_pass_func */
 static void
 tny_store_account_iface_test_get_folders (void)
 {
