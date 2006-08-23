@@ -56,7 +56,7 @@ tny_folder_iface_expunge (TnyFolderIface *self)
  * marks it as removed (it sets the TNY_HEADER_FLAG_DELETED). If you perform
  * tny_folder_iface_expunge on the folder, it will really be removed.
  *
- * This means that the tny_folder_iface_get_headers method will prepend the
+ * This means that the tny_folder_iface_get_headers method will still prepend the
  * removed message in the list until the expunge happened. You are advised to
  * hide messages that have been marked as being deleted from your summary view.
  * In Gtk+ for the #GtkTreeView component, you can do this using the 
