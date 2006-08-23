@@ -1,8 +1,17 @@
-22-08-2006  Philip Van oof  <pvanhoof@gnome.org>
+08-23-2006  Philip Van Hoof  <pvanhoof@gnome.org>
+	
+	* ChangeLog: Corrected the dates
+	* libtinymail-test: Implemented unit tests for TnyFolderIface
+	* Made tests/shared reusable for the unit test library
+	* Various fixes
+	* API simplification of TnyFolderIface
+	* API documentation of TnyFolderIface
+	
+08-22-2006  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* tests/*: Added some tests
 
-20-08-2006  Philip Van Hoof <pvanhoof@gnome.org>
+08-20-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Reviewed and corrected Dirk-Jan's patch of 08-08
 	* Removed the has_first and has_next methods from
