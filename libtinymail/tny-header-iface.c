@@ -291,7 +291,7 @@ tny_header_iface_get_message_id (TnyHeaderIface *self)
  * tny_header_iface_get_from:
  * @self: a #TnyHeaderIface object
  * 
- * Get the from header.  The returned value should not be freed.
+ * Get the from header. The returned value should not be freed.
  * 
  * Return value: from header as a read-only string.
  *
@@ -311,7 +311,7 @@ tny_header_iface_get_from (TnyHeaderIface *self)
  * tny_header_iface_get_subject:
  * @self: a #TnyHeaderIface object
  * 
- * Get the subject header.  The returned value should not be freed.
+ * Get the subject header. The returned value should not be freed.
  * 
  * Return value: subject header as a read-only string.
  *
@@ -332,7 +332,7 @@ tny_header_iface_get_subject (TnyHeaderIface *self)
  * tny_header_iface_get_to:
  * @self: a #TnyHeaderIface object
  * 
- * Get the to header.  The returned value should not be freed.
+ * Get the to header. The returned value should not be freed.
  * 
  * Return value: to header as a read-only string
  *

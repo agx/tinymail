@@ -255,6 +255,8 @@ tny_header_list_iterator_get_list (TnyIteratorIface *self)
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
 
+       	g_object_ref (G_OBJECT (me->model));
+
 	return TNY_LIST_IFACE (me->model);
 }
 

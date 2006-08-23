@@ -81,8 +81,6 @@ tny_iterator_iface_first (TnyIteratorIface *self)
  *
  * Moves the iterator to the nth node
  *
- * Return value: the value of the underlying #TnyListIface instance at the nth position
- *
  **/
 void
 tny_iterator_iface_nth (TnyIteratorIface *self, guint nth)
@@ -99,9 +97,10 @@ tny_iterator_iface_nth (TnyIteratorIface *self, guint nth)
  * tny_iterator_iface_current:
  * @self: A #TnyIteratorIface instance
  *
- * Does not move the iterator
+ * Does not move the iterator. Returns the object at the current position.
+ * The returned object should be unreferenced after use.
  *
- * Return value: the currect value of the underlying #TnyListIface instance
+ * Return value: the currect object
  *
  **/
 GObject* 
@@ -120,7 +119,19 @@ tny_iterator_iface_current (TnyIteratorIface *self)
  * tny_iterator_iface_is_done:
  * @self: A #TnyIteratorIface instance
  *
- * Does the iterator point to some valid list item
+ * Does the iterator point to some valid list item. You can use this property
+ * to make loops like:
+ *
+ * <informalexample><programlisting>
+ * TnyListIface *list = tny_list_new ();
+ * TnyIteratorIface *iter = tny_list_iface_create_iterator (list);
+ *
+ * while (!tny_iterator_iface_is_done (iter))
+ *    tny_iterator_iface_next (iter);
+ *
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (list));  
+ * </programlisting></informalexample>
  *
  * Return value: TRUE if it points to a valid list item, FALSE otherwise
  *
@@ -142,7 +153,8 @@ tny_iterator_iface_is_done (TnyIteratorIface *self)
  * tny_iterator_iface_get_list:
  * @self: A #TnyIteratorIface instance
  *
- * Does not move the iterator
+ * Does not move the iterator. Returns the list of which this iterator is an
+ * iterator. The returned list object should be unreferenced after use.
  *
  * Return value: The #TnyListIface instance being iterated
  *

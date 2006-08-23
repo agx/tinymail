@@ -85,6 +85,7 @@ tny_list_iface_test_foreach (gpointer gptr_item, gpointer user_data)
 static void
 tny_list_iface_test_list (void)
 {
+    	TnyListIface *ref;
 	TnyIteratorIface *iterator;
 	TnyTestObject *item;
 	gint i;
@@ -115,9 +116,11 @@ tny_list_iface_test_list (void)
 
 
 	str = g_strdup_printf ("get_list returns the wrong instance\n");
-	gunit_fail_unless (tny_iterator_iface_get_list (iterator) == iface, str);
+    	ref = tny_iterator_iface_get_list (iterator);
+	gunit_fail_unless (ref == iface, str);
 	g_free (str);
-
+	g_object_unref (G_OBJECT (ref));
+    
 	tny_iterator_iface_nth (iterator, 2);
 	item = (TnyTestObject*)tny_iterator_iface_current (iterator);
 	

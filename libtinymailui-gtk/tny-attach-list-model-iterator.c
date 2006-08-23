@@ -190,6 +190,8 @@ tny_attach_list_model_iterator_get_list (TnyIteratorIface *self)
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
 
+       	g_object_ref (G_OBJECT (me->model));
+
 	return TNY_LIST_IFACE (me->model);
 }
 
