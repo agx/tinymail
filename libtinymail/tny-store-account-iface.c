@@ -27,6 +27,8 @@
  * @self: a #TnyStoreAccountIface object
  * @folder: The folder to unsubscribe from
  *
+ * WARNING: This API might soon change
+ *
  * Unsubscribe from a folder
  * 
  **/
@@ -46,6 +48,8 @@ tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface 
  * tny_store_account_iface_subscribe:
  * @self: a #TnyStoreAccountIface object
  * @folder: The folder to subscribe to
+ *
+ * WARNING: This API might soon change
  *
  * Subscribe to a folder
  * 
@@ -67,9 +71,12 @@ tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyFolderIface *f
  * @self: a #TnyStoreAccountIface object
  * @type: Either all or only subscribed folders
  * 
+ * WARNING: This API might soon change
+ *
  * Get the folders of a storage account
  * 
- * Return value: A read-only #TnyListIface which contains TnyFolderIface instances
+ * Return value: A read-only #TnyListIface which contains #TnyFolderIface instances
+ *
  **/
 TnyListIface*
 tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)

@@ -27,10 +27,11 @@
  * @self: a #TnyStreamIface object
  * @output: a #TnyStreamIface object
  * 
- * Write self to output (copy it) in an efficient way
+ * Write the stream self to the stream output in an efficient way
  *
  * Return value: the number of bytes written to the output stream, or -1 on
  * error along with setting errno.
+ *
  **/
 gssize
 tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
@@ -47,12 +48,14 @@ tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
  * tny_stream_iface_read:
  * @self: a #TnyStreamIface object
  * @buffer: a buffer that is at least n in size
- * @n: the max amount of bytes to read into buffer
+ * @n: the max amount of bytes to read from self and to write into buffer
  * 
- * Read n bytes of the stream into buffer
+ * Read n bytes of the stream and write it into buffer. It's your responsibility
+ * to pass a buffer that is large enough to hold n bytes.
  *
  * Return value: the number of bytes actually read, or -1 on error and 
  * set errno.
+ *
  **/
 gssize
 tny_stream_iface_read  (TnyStreamIface *self, char *buffer, gsize n)
@@ -69,12 +72,14 @@ tny_stream_iface_read  (TnyStreamIface *self, char *buffer, gsize n)
  * tny_stream_iface_write:
  * @self: a #TnyStreamIface object
  * @buffer: a buffer that has at least n bytes
- * @n: the amount of bytes to read from buffer and to write
+ * @n: the amount of bytes to read from buffer and to write to self
  * 
- * Write n bytes of the buffer into the stream
+ * Write n bytes of the buffer into the stream. It's your responsibility to pass
+ * a buffer that has at least n bytes.
  *
  * Return value: the number of bytes written to the stream, or -1 on error 
  * along with setting errno.
+ *
  **/
 gssize
 tny_stream_iface_write (TnyStreamIface *self, const char *buffer, gsize n)
@@ -93,9 +98,9 @@ tny_stream_iface_write (TnyStreamIface *self, const char *buffer, gsize n)
  * @self: a #TnyStreamIface object
  * 
  * Flushes any buffered data to the stream's backing store. 
- * Only meaningful for writable streams.
  *
  * Return value: 0 on success or -1 on fail along with setting errno.
+ *
  **/
 gint
 tny_stream_iface_flush (TnyStreamIface *self)
@@ -135,6 +140,7 @@ tny_stream_iface_close (TnyStreamIface *self)
  * Tests if there are bytes left to read on the stream object.
  *
  * Return value: TRUE on EOS or FALSE otherwise.
+ *
  **/
 gboolean
 tny_stream_iface_eos   (TnyStreamIface *self)
@@ -156,6 +162,7 @@ tny_stream_iface_eos   (TnyStreamIface *self)
  * all be resettable.
  *
  * Return value: 0 on success or -1 on error along with setting errno.
+ *
  **/
 gint
 tny_stream_iface_reset (TnyStreamIface *self)

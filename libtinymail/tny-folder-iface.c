@@ -129,6 +129,8 @@ tny_folder_iface_refresh (TnyFolderIface *self)
  * @self: a TnyFolderIface object
  * @subscribed: Whether or not to subscribe to the folder
  *
+ * WARNING: This API might soon change
+ *
  * Set the subscribed status of this folder.
  * 
  **/
@@ -148,6 +150,8 @@ tny_folder_iface_set_subscribed (TnyFolderIface *self, gboolean subscribed)
  * tny_folder_iface_get_subscribed:
  * @self: a TnyFolderIface object
  * 
+ * WARNING: This API might soon change
+ *
  * Get the subscribed status of this folder.
  * 
  * Return value: subscribe status
