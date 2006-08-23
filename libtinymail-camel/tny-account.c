@@ -51,14 +51,6 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-shared.h>
 
 
-static void
-tny_account_set_account_type (TnyAccountIface *self, TnyAccountType type)
-{
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-
-	priv->account_type = type;
-}
-
 static TnyAccountType
 tny_account_get_account_type (TnyAccountIface *self)
 {
@@ -607,7 +599,6 @@ tny_account_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_url_string_func = tny_account_get_url_string;
 	klass->get_name_func = tny_account_get_name;
 	klass->set_name_func = tny_account_set_name;
-	klass->set_account_type_func = tny_account_set_account_type;
 	klass->get_account_type_func = tny_account_get_account_type;
 
 	return;

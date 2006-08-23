@@ -52,7 +52,6 @@ struct _TnyAccountIfaceClass
         void (*set_user_func)              (TnyAccountIface *self, const gchar *user);
         void (*set_hostname_func)          (TnyAccountIface *self, const gchar *host);
         void (*set_url_string_func)        (TnyAccountIface *self, const gchar *url_string);
-	void (*set_account_type_func)      (TnyAccountIface *self, TnyAccountType type);
 
         void (*set_pass_func_func)         (TnyAccountIface *self, TnyGetPassFunc get_pass_func);
         void (*set_forget_pass_func_func)  (TnyAccountIface *self, TnyForgetPassFunc get_forget_pass_func);
@@ -82,7 +81,6 @@ void         tny_account_iface_set_hostname    (TnyAccountIface *self, const gch
 void         tny_account_iface_set_pass_func   (TnyAccountIface *self, TnyGetPassFunc get_pass_func);
 void         tny_account_iface_set_url_string  (TnyAccountIface *self, const gchar *url_string);
 
-void           tny_account_iface_set_account_type  (TnyAccountIface *self, TnyAccountType type);
 TnyAccountType tny_account_iface_get_account_type  (TnyAccountIface *self);
 
 const gchar* tny_account_iface_get_id (TnyAccountIface *self);

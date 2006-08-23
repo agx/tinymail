@@ -23,8 +23,6 @@
 #include <tny-platform-factory-iface.h>
 #include <platfact.h>
 
-/* #include <tny-account-store.h> */
-
 static TnyAccountStoreIface *iface = NULL;
 static TnyPlatformFactoryIface *platfact = NULL;
 static gchar *str;

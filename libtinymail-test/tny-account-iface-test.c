@@ -46,16 +46,11 @@ tny_account_iface_test_teardown (void)
 /* TODO: test function pointer properties: pass_func, forget_pass_func */
 
 static void
-tny_account_iface_test_set_account_type (void)
+tny_account_iface_test_get_account_type (void)
 {
 
-	tny_account_iface_set_account_type (iface, TNY_ACCOUNT_TYPE_STORE);
 	gunit_fail_unless (tny_account_iface_get_account_type (iface) == TNY_ACCOUNT_TYPE_STORE, 
-		"Can't set account type to store\n");
-
-	tny_account_iface_set_account_type (iface, TNY_ACCOUNT_TYPE_TRANSPORT);
-	gunit_fail_unless (tny_account_iface_get_account_type (iface) == TNY_ACCOUNT_TYPE_TRANSPORT, 
-		"Can't set account type to transport\n");
+		"Account type should be store\n");
 
 }
 
@@ -135,9 +130,9 @@ create_tny_account_iface_suite (void)
 	/* Add test case objects to test suite */
 
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_account_iface_test_set_account_type",
+               gunit_test_case_new_with_funcs("tny_account_iface_test_get_account_type",
                                       tny_account_iface_test_setup,
-                                      tny_account_iface_test_set_account_type,
+                                      tny_account_iface_test_get_account_type,
 				      tny_account_iface_test_teardown));
 
 	gunit_test_suite_add_test_case(suite,

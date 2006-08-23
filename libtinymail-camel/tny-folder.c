@@ -343,7 +343,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
 	header = TNY_HEADER_IFACE (tny_header_new ());
 
-	tny_header_iface_set_folder (header, self);
+	_tny_header_set_folder (TNY_HEADER (header), TNY_FOLDER (self));
 	_tny_header_set_camel_message_info (header, mi);
 
 	/* Get rid of the reference already. I know this is ugly */

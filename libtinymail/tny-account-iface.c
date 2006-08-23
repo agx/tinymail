@@ -21,25 +21,6 @@
 
 #include <tny-account-iface.h>
 
-/**
- * tny_account_iface_set_account_type:
- * @self: a #TnyAccountIface object
- * @type: a #TnyAccountType
- *
- * Set the account type
- *
- **/
-void
-tny_account_iface_set_account_type (TnyAccountIface *self, TnyAccountType type)
-{
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_type_func)
-		g_critical ("You must implement tny_account_iface_set_account_type\n");
-#endif
-
-	return TNY_ACCOUNT_IFACE_GET_CLASS (self)->set_account_type_func (self, type);
-}
-
 
 /**
  * tny_account_iface_get_account_type:
@@ -103,7 +84,7 @@ tny_account_iface_get_id (TnyAccountIface *self)
  * @self: a #TnyAccountIface object
  * @name: the name
  *
- * Set the accounts human readable name
+ * Set the account's human readable name
  * 
  **/
 void 
@@ -123,7 +104,7 @@ tny_account_iface_set_name (TnyAccountIface *self, const gchar *name)
  * @self: a #TnyAccountIface object
  * @id: the id
  *
- * Set the accounts unique id. You need to set this property
+ * Set the account's unique id. You need to set this property
  * before you can start using the account.
  * 
  **/
@@ -144,11 +125,13 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
  * @self: a #TnyAccountIface object
  * @forget_pass_func: a pointer to the function
  *
- * Set the function that will be called when the password is no longer needed.
+ * Set the function that will be called in case the password was wrong and 
+ * therefore can be forgotten by the password store.
  *
  * You need to set this property before you can start using the account.
  * 
- * Also see #TnyForgetPassFunc for more information about the function itself. 
+ * Also see #TnyForgetPassFunc for more information about the function itself.
+ *
  **/
 void
 tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc forget_pass_func)
@@ -166,9 +149,8 @@ tny_account_iface_set_forget_pass_func (TnyAccountIface *self, TnyForgetPassFunc
  * tny_account_iface_get_forget_pass_func:
  * @self: a #TnyAccountIface object
  * 
- *
- * 
  * Return value: A pointer to the forget-password function
+ *
  **/
 TnyForgetPassFunc
 tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
@@ -186,7 +168,8 @@ tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
  * @self: a #TnyAccountIface object
  * @url_string: the url string (ex. mbox://path)
  *  
- * Set the url string of an account
+ * Set the url string of an account. You don't need to use this for imap and pop
+ * where you can use the simplified API (set_proto, set_hostname, etc).
  * 
  **/
 void
@@ -229,7 +212,7 @@ tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
  * 
  * Set the user or login of an account. You need to set this property
  * before you can start using the account.
- * 
+ *
  **/
 void
 tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
@@ -250,7 +233,6 @@ tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
  * 
  * Set the hostname of an account. You need to set this property
  * before you can start using the account.
- * 
  **/
 void
 tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
@@ -270,11 +252,13 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
  * @self: a #TnyAccountIface object
  * @get_pass_func: a pointer to the function
  * 
- * Set the function that will be called when the password is needed.
+ * Set the function that will be called when the password is needed. The
+ * function should return the password for a specific account.
  *
  * You need to set this property before you can start using the account.
  * 
  * Also see #TnyGetPassFunc for more information about the function itself. 
+ *
  **/
 void
 tny_account_iface_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_func)
@@ -292,9 +276,10 @@ tny_account_iface_set_pass_func (TnyAccountIface *self, TnyGetPassFunc get_pass_
  * tny_account_iface_get_proto:
  * @self: a #TnyAccountIface object
  * 
- * Get the protocol of an account
+ * Get the protocol of an account. The returned value should not be freed.
  * 
  * Return value: the protocol as a read-only string
+ *
  **/
 const gchar*
 tny_account_iface_get_proto (TnyAccountIface *self)
@@ -313,9 +298,10 @@ tny_account_iface_get_proto (TnyAccountIface *self)
  * tny_account_iface_get_url_string:
  * @self: a #TnyAccountIface object
  * 
- * Get the url string of an account
+ * Get the url string of an account. The returned value should not be freed.
  * 
  * Return value: the url string as a read-only string
+ *
  **/
 const gchar*
 tny_account_iface_get_url_string (TnyAccountIface *self)
@@ -332,9 +318,10 @@ tny_account_iface_get_url_string (TnyAccountIface *self)
  * tny_account_iface_get_user:
  * @self: a #TnyAccountIface object
  * 
- * Get the user or login of an account
+ * Get the user or login of an account. The returned value should not be freed.
  * 
  * Return value: the user as a read-only string
+ *
  **/
 const gchar*
 tny_account_iface_get_user (TnyAccountIface *self)
@@ -351,9 +338,11 @@ tny_account_iface_get_user (TnyAccountIface *self)
  * tny_account_iface_get_name:
  * @self: a #TnyAccountIface object
  * 
- * Get the human readable name of an account
+ * Get the human readable name of an account. The returned value should not 
+ * be freed.
  * 
  * Return value: the human readable name as a read-only string
+ *
  **/
 const gchar*
 tny_account_iface_get_name (TnyAccountIface *self)
@@ -370,9 +359,10 @@ tny_account_iface_get_name (TnyAccountIface *self)
  * tny_account_iface_get_hostname:
  * @self: a #TnyAccountIface object
  * 
- * Get the hostname of an account
+ * Get the hostname of an account. The returned value should not be freed.
  * 
  * Return value: the hostname as a read-only string
+ *
  **/
 const gchar*
 tny_account_iface_get_hostname (TnyAccountIface *self)
@@ -392,6 +382,7 @@ tny_account_iface_get_hostname (TnyAccountIface *self)
  *
  * 
  * Return value: A pointer to the get-password function
+ *
  **/
 TnyGetPassFunc
 tny_account_iface_get_pass_func (TnyAccountIface *self)

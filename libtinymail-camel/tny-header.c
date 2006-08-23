@@ -459,8 +459,8 @@ tny_header_new (void)
 	return self;
 }
 
-static void
-tny_header_set_folder (TnyHeaderIface *self, TnyFolderIface *folder)
+void
+_tny_header_set_folder (TnyHeader *self, TnyFolder *folder)
 {
 	TnyHeader *me = TNY_HEADER (self);
 	me->folder = (TnyFolderIface*)folder;
@@ -471,6 +471,10 @@ static TnyFolderIface*
 tny_header_get_folder (TnyHeaderIface *self)
 {
 	TnyHeader *me = TNY_HEADER (self);
+    
+    	if (me->folder)
+	    	g_object_ref (G_OBJECT (me->folder));
+    
 	return (TnyFolderIface*)me->folder;
 }
 
@@ -489,7 +493,6 @@ tny_header_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->get_bcc_func = tny_header_get_bcc;
 	klass->get_replyto_func = tny_header_get_replyto;
 	klass->get_uid_func = tny_header_get_uid;
-	klass->set_folder_func = tny_header_set_folder;
 	klass->get_folder_func = tny_header_get_folder;
 	klass->set_bcc_func = tny_header_set_bcc;
 	klass->set_cc_func = tny_header_set_cc;

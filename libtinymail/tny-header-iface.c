@@ -47,7 +47,7 @@ tny_header_iface_set_replyto (TnyHeaderIface *self, const gchar *to)
  * tny_header_iface_get_replyto:
  * @self: a #TnyHeaderIface object
  * 
- * 
+ * Get the reply-to header
  * 
  * Return value: reply-to header
  **/
@@ -67,7 +67,7 @@ tny_header_iface_get_replyto (TnyHeaderIface *self)
  * @bcc: the bcc header in a comma separated list
  * 
  * Set the bcc header. Also look at the to header for more information
- * about the formatting.
+ * about formatting.
  * 
  **/
 void
@@ -88,7 +88,7 @@ tny_header_iface_set_bcc (TnyHeaderIface *self, const gchar *bcc)
  * @cc: the cc header in a comma separated list
  * 
  * Set the cc header. Also look at the to header for more information
- * about the formatting.
+ * about formatting.
  * 
  **/
 void
@@ -151,8 +151,9 @@ tny_header_iface_set_subject (TnyHeaderIface *self, const gchar *subject)
  * Set the to header.
  *
  * The format is a comma separated list like this:
- * 
- * So there's no quotes nor anything special.
+ * Full name &gt;user@domain&lt;, Full name &gt;user@domain&lt;
+ *
+ * There are no quotes nor anything special. Just commas.
  * 
  **/
 void
@@ -171,7 +172,7 @@ tny_header_iface_set_to (TnyHeaderIface *self, const gchar *to)
  * tny_header_iface_get_cc:
  * @self: a #TnyHeaderIface object
  * 
- * 
+ * Get the CC header
  * 
  * Return value: cc header
  **/
@@ -190,7 +191,7 @@ tny_header_iface_get_cc (TnyHeaderIface *self)
  * tny_header_iface_get_bcc:
  * @self: a #TnyHeaderIface object
  * 
- * 
+ * Get the BCC header
  * 
  * Return value: bcc header
  **/
@@ -209,7 +210,7 @@ tny_header_iface_get_bcc (TnyHeaderIface *self)
  * tny_header_iface_get_date_received:
  * @self: a #TnyHeaderIface object
  * 
- * 
+ * Get the Date Received header as a time_t
  * 
  * Return value: date received header
  **/
@@ -228,7 +229,7 @@ tny_header_iface_get_date_received (TnyHeaderIface *self)
  * tny_header_iface_get_date_sent:
  * @self: a #TnyHeaderIface object
  * 
- * 
+ * Get the Date Sent header as a time_t
  * 
  * Return value: date sent header
  **/
@@ -248,9 +249,11 @@ tny_header_iface_get_date_sent (TnyHeaderIface *self)
  * tny_header_iface_get_id:
  * @self: a #TnyHeaderIface object
  * 
- * Get an unique id of the message of which self is a message header.
+ * Get an unique id of the message of which self is a message header. The 
+ * returned value should not be freed.
  * 
- * Return value: Unique follow-up uid
+ * Return value: Unique follow-up uid as a read-only string
+ *
  **/
 const gchar*
 tny_header_iface_get_uid (TnyHeaderIface *self)
@@ -267,9 +270,11 @@ tny_header_iface_get_uid (TnyHeaderIface *self)
  * tny_header_iface_get_message_id:
  * @self: a #TnyHeaderIface object
  * 
- * Get an unique id of the message of which self is a message header.
+ * Get an unique id of the message of which self is a message header. The 
+ * returned value should not be freed.
  * 
- * Return value: message-id header
+ * Return value: message-id header as a read-only string
+ *
  **/
 const gchar*
 tny_header_iface_get_message_id (TnyHeaderIface *self)
@@ -286,9 +291,10 @@ tny_header_iface_get_message_id (TnyHeaderIface *self)
  * tny_header_iface_get_from:
  * @self: a #TnyHeaderIface object
  * 
- * Get the from header
+ * Get the from header.  The returned value should not be freed.
  * 
- * Return value: from header
+ * Return value: from header as a read-only string.
+ *
  **/
 const gchar* 
 tny_header_iface_get_from (TnyHeaderIface *self)
@@ -305,9 +311,10 @@ tny_header_iface_get_from (TnyHeaderIface *self)
  * tny_header_iface_get_subject:
  * @self: a #TnyHeaderIface object
  * 
- * Get the subject header
+ * Get the subject header.  The returned value should not be freed.
  * 
- * Return value: subject header
+ * Return value: subject header as a read-only string.
+ *
  **/
 const gchar*
 tny_header_iface_get_subject (TnyHeaderIface *self)
@@ -325,9 +332,10 @@ tny_header_iface_get_subject (TnyHeaderIface *self)
  * tny_header_iface_get_to:
  * @self: a #TnyHeaderIface object
  * 
- * Get the to header
+ * Get the to header.  The returned value should not be freed.
  * 
- * Return value: to header
+ * Return value: to header as a read-only string
+ *
  **/
 const gchar* 
 tny_header_iface_get_to (TnyHeaderIface *self)
@@ -344,9 +352,11 @@ tny_header_iface_get_to (TnyHeaderIface *self)
  * tny_header_iface_get_folder:
  * @self: a #TnyHeaderIface object
  * 
- * Get a reference to the parent folder where this message header is located
+ * Get the parent folder where this message header is located.
+ * The returned folder object should be unreferenced after use.
  * 
  * Return value: The folder of the message header
+ *
  **/
 TnyFolderIface* 
 tny_header_iface_get_folder (TnyHeaderIface *self)
@@ -359,24 +369,7 @@ tny_header_iface_get_folder (TnyHeaderIface *self)
 	return TNY_HEADER_IFACE_GET_CLASS (self)->get_folder_func (self);
 }
 
-/**
- * tny_header_iface_set_folder:
- * @self: a #TnyHeaderIface object
- * 
- * Set the reference to the parent folder where this message header is located
- * 
- **/
-void
-tny_header_iface_set_folder (TnyHeaderIface *self, TnyFolderIface *folder)
-{
-#ifdef DEBUG
-	if (!TNY_HEADER_IFACE_GET_CLASS (self)->set_folder_func)
-		g_critical ("You must implement tny_header_iface_set_folder\n");
-#endif
 
-	TNY_HEADER_IFACE_GET_CLASS (self)->set_folder_func (self, folder);
-	return;
-}
 
 /**
  * tny_header_iface_get_flags:

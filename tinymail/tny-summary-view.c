@@ -284,6 +284,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 					   irreversible deletes: I immediately expunge the folder! */
 
 					tny_folder_iface_expunge (folder);
+				    	g_object_unref (G_OBJECT (folder));
 				}
 
 				gtk_widget_destroy (dialog);
@@ -332,7 +333,9 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 					/* Reparent */
 					g_object_unref (G_OBJECT (header));
 				}
+			    	g_object_unref (G_OBJECT (folder));
 			}
+		    	
 		} else {
 			tny_msg_view_iface_set_unavailable (priv->msg_view, NULL);
 		}
@@ -515,6 +518,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				}
+			    	g_object_unref (G_OBJECT (folder));
 			}
 
 		}

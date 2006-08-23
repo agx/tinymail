@@ -89,7 +89,6 @@ struct _TnyHeaderIfaceClass
 
         TnyFolderIface*
                        (*get_folder_func)         (TnyHeaderIface *self);
-        void           (*set_folder_func)         (TnyHeaderIface *self, TnyFolderIface *folder);
 
 	TnyHeaderFlags 
 		       (*get_flags_func)          (TnyHeaderIface *self);
@@ -125,7 +124,6 @@ TnyFolderIface*
 
 TnyHeaderFlags  
 	       tny_header_iface_get_flags          (TnyHeaderIface *self);
-void           tny_header_iface_set_folder         (TnyHeaderIface *self, TnyFolderIface *folder);
 void           tny_header_iface_set_flags          (TnyHeaderIface *self, TnyHeaderFlags mask);
 void           tny_header_iface_unset_flags        (TnyHeaderIface *self, TnyHeaderFlags mask);
 
