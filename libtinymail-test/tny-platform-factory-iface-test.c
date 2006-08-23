@@ -21,7 +21,7 @@
 #include <tny-platform-factory-iface-test.h>
 #include <tny-platform-factory-iface.h>
 
-#include <tny-platform-factory.h>
+#include <platfact.h>
 
 static TnyPlatformFactoryIface *iface = NULL;
 static gchar *str;

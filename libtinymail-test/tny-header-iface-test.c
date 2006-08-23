@@ -140,6 +140,7 @@ create_tny_header_iface_suite (void)
 {
 	GUnitTestSuite *suite = NULL;
 
+	
 	/* Create test suite */
 	suite = gunit_test_suite_new ("TnyHeaderIface");
 

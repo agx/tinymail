@@ -91,6 +91,10 @@ tny_device_is_online (TnyDeviceIface *self)
 {
 	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
 	gboolean retval = FALSE;
+    
+    	if (priv->fset)
+		retval = priv->forced;
+	
 	return retval;
 }
 

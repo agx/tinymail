@@ -20,7 +20,7 @@
 
 #include <tny-device-iface-test.h>
 #include <tny-device-iface.h>
-#include <tny-device.h>
+#include <device.h>
 
 static TnyDeviceIface *iface = NULL;
 static gchar *str;

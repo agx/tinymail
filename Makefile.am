@@ -13,13 +13,11 @@ if BUILD_MOZEMBED
 SUBDIRS += libtinymailui-mozembed 
 endif
 
-SUBDIRS += $(PLATFORMDIR) libtinymail-camel tinymail docs 
+SUBDIRS += $(PLATFORMDIR) libtinymail-camel tinymail docs bindings po tests
 
 if BUILD_UNITTESTS
 SUBDIRS += libtinymail-test 
 endif
-
-SUBDIRS += bindings po tests 
 
 DIST_SUBDIRS = \
 	libtinymail \
@@ -28,7 +26,7 @@ DIST_SUBDIRS = \
 	libtinymailui-gtk \
 	libtinymail-camel \
 	tinymail docs \
-	libtinymail-test \
+	libtinymail-test tests \
 	bindings po \
 	libtinymail-maemo \
 	libtinymail-olpc \
@@ -36,4 +34,5 @@ DIST_SUBDIRS = \
 	libtinymailui-mozembed \
 	libtinymail-gnome-desktop
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-python-bindings --enable-unit-tests
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-python-bindings --enable-unit-tests --enable-tests
+

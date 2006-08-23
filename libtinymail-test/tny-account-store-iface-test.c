@@ -21,7 +21,7 @@
 #include <tny-account-store-iface-test.h>
 #include <tny-account-store-iface.h>
 #include <tny-platform-factory-iface.h>
-#include <tny-platform-factory.h>
+#include <platfact.h>
 
 /* #include <tny-account-store.h> */
 

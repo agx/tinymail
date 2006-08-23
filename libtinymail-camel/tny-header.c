@@ -192,7 +192,7 @@ tny_header_set_to (TnyHeaderIface *self, const gchar *to)
 
 	prepare_for_write (me);
 
-	camel_mime_message_set_recipients ((CamelMimeMessage*)me->info, 
+	camel_mime_message_set_recipients (((WriteInfo*)me->info)->msg, 
 		CAMEL_RECIPIENT_TYPE_TO, addr);
 
 	camel_object_unref (CAMEL_OBJECT (addr));
