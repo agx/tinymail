@@ -42,6 +42,10 @@ static gchar *str;
 static void
 tny_account_iface_test_setup (void)
 {
+    iface = NULL;
+    
+    if (online_tests)
+    {
 	accounts = tny_list_new ();
 	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (TRUE, NULL));
 	tny_account_store_iface_get_accounts (account_store, accounts, 
@@ -51,12 +55,15 @@ tny_account_iface_test_setup (void)
     
 	iface = TNY_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
     
-    	if (iface)
-		online_tests = TRUE;
-    	else
-		iface = TNY_ACCOUNT_IFACE (tny_store_account_new ());
+    	if (!iface)
+		online_tests = FALSE;
+	
+    }
     
-	return;
+    if (!iface)
+	    iface = TNY_ACCOUNT_IFACE (tny_store_account_new ());
+    
+   return;
 }
 
 static void 
@@ -76,10 +83,7 @@ tny_store_account_iface_test_get_folders (void)
     	TnyListIface *root_folders;
     
       	if (!online_tests)
-	{
-		GUNIT_WARNING ("Test cannot continue (are you online?)");
 	    	return;
-	}
     
     	root_folders = tny_store_account_iface_get_folders (TNY_STORE_ACCOUNT_IFACE (iface), 
 				TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
@@ -172,6 +176,8 @@ create_tny_account_iface_suite (void)
 
 	/* Add test case objects to test suite */
 
+    	online_tests = FALSE;
+    
 	gunit_test_suite_add_test_case(suite,
                gunit_test_case_new_with_funcs("tny_account_iface_test_get_account_type",
                                       tny_account_iface_test_setup,
@@ -209,6 +215,7 @@ create_tny_account_iface_suite (void)
                                       tny_account_iface_test_set_name,
 				      tny_account_iface_test_teardown));
 
+    	online_tests = TRUE;
 	gunit_test_suite_add_test_case(suite,
                gunit_test_case_new_with_funcs("tny_store_account_iface_test_get_folders",
                                       tny_account_iface_test_setup,
