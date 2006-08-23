@@ -50,7 +50,7 @@ tny_account_iface_test_setup (void)
 	tny_iterator_iface_first (aiter);
     
 	iface = TNY_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
-
+    
     	if (iface)
 		online_tests = TRUE;
     	else
@@ -62,6 +62,7 @@ tny_account_iface_test_setup (void)
 static void 
 tny_account_iface_test_teardown (void)
 {
+    	g_object_unref (G_OBJECT (iface));
     	g_object_unref (G_OBJECT (iface));
 	g_object_unref (G_OBJECT (aiter));
 	g_object_unref (G_OBJECT (accounts));
