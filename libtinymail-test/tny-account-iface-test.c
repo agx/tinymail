@@ -22,36 +22,79 @@
 #include <tny-account-iface.h>
 
 #include <tny-store-account.h>
+#include <tny-list-iface.h>
+#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-account-store-iface.h>
+#include <tny-store-account-iface.h>
+#include <tny-folder-iface.h>
+#include <tny-header.h>
+
+#include <account-store.h>
 
 static TnyAccountIface *iface = NULL;
+static TnyAccountStoreIface *account_store;
+static TnyListIface *accounts, *root_folders;
+static TnyIteratorIface *aiter;
+static gboolean online_tests=FALSE;
 static gchar *str;
 
 static void
 tny_account_iface_test_setup (void)
 {
+	accounts = tny_list_new ();
+	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (TRUE, NULL));
+	tny_account_store_iface_get_accounts (account_store, accounts, 
+			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+	aiter = tny_list_iface_create_iterator (accounts);
+	tny_iterator_iface_first (aiter);
+    
+	iface = TNY_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
 
-	iface = TNY_ACCOUNT_IFACE (tny_store_account_new ());
-
+    	if (iface)
+		online_tests = TRUE;
+    	else
+		iface = TNY_ACCOUNT_IFACE (tny_store_account_new ());
+    
 	return;
 }
 
 static void 
 tny_account_iface_test_teardown (void)
 {
-	g_object_unref (G_OBJECT (iface));
-
+    	g_object_unref (G_OBJECT (iface));
+	g_object_unref (G_OBJECT (aiter));
+	g_object_unref (G_OBJECT (accounts));
+    
 	return;
 }
 
 /* TODO: test function pointer properties: pass_func, forget_pass_func */
+static void
+tny_store_account_iface_test_get_folders (void)
+{
+    	TnyListIface *root_folders;
+    
+      	if (!online_tests)
+	{
+		GUNIT_WARNING ("Test cannot continue (are you online?)");
+	    	return;
+	}
+    
+    	root_folders = tny_store_account_iface_get_folders (TNY_STORE_ACCOUNT_IFACE (iface), 
+				TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
+    
+    	gunit_fail_unless (tny_list_iface_length (root_folders) == 1, 
+		"Account should have at least an inbox folder\n");
+    
+    	return;
+}
 
 static void
 tny_account_iface_test_get_account_type (void)
 {
-
 	gunit_fail_unless (tny_account_iface_get_account_type (iface) == TNY_ACCOUNT_TYPE_STORE, 
 		"Account type should be store\n");
-
 }
 
 static void
@@ -164,6 +207,12 @@ create_tny_account_iface_suite (void)
                gunit_test_case_new_with_funcs("tny_account_iface_test_set_name",
                                       tny_account_iface_test_setup,
                                       tny_account_iface_test_set_name,
+				      tny_account_iface_test_teardown));
+
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_store_account_iface_test_get_folders",
+                                      tny_account_iface_test_setup,
+                                      tny_store_account_iface_test_get_folders,
 				      tny_account_iface_test_teardown));
 
 	return suite;
