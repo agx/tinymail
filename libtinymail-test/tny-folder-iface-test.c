@@ -138,8 +138,8 @@ tny_folder_iface_test_teardown (void)
 
 	/* TODO: 
 	test signal folder inserted and folders_reloaded (hard to test)
-	test methods get_folders, get_message, remove_message, expunge (hard to test)
-	test properties name, id, account, folder_type
+	test methods get_folders, get_message,
+	test properties name, account, folder_type
 	test properties unread_count
 	test methods set_subscribed with get_subscribed
 	test async method refresh_async (hard to test)
@@ -174,6 +174,78 @@ tny_folder_iface_test_get_headers_sync (void)
 }
 
 
+static void
+tny_folder_iface_test_remove_message (void)
+{
+    	TnyListIface *headers;
+	gint orig_length = 0, test_len = 0, new_len = 0, headers_len = 0;
+	TnyIteratorIface *iter;
+    	TnyHeaderIface *header;
+    
+    	if (iface == NULL)
+	{
+		GUNIT_WARNING ("Test cannot continue (are you online?)");
+	    	return;
+	}
+    
+    	headers = tny_list_new ();
+	tny_folder_iface_refresh (iface);
+	
+	tny_folder_iface_get_headers (iface, headers, FALSE);
+	orig_length = tny_list_iface_length (headers);
+        test_len = tny_folder_iface_get_all_count (iface);
+    
+	str = g_strdup_printf ("I received %d headers, the folder tells me it has %d messages\n", orig_length, test_len);
+	gunit_fail_unless (orig_length == test_len, str);
+	g_free (str);
+    
+    	iter = tny_list_iface_create_iterator (headers);
+    	tny_iterator_iface_first (iter);
+    	header = (TnyHeaderIface*)tny_iterator_iface_current (iter);
+
+    	/* Flag as removed */
+    	tny_folder_iface_remove_message (iface, header);
+    	tny_folder_iface_refresh (iface);
+
+    	g_object_unref (G_OBJECT (headers));
+
+    
+    	new_len = tny_folder_iface_get_all_count (iface);
+    	str = g_strdup_printf ("After removal but not yet expunge, the new length is %d, whereas it should be %d\n", new_len, orig_length);
+	gunit_fail_unless (new_len == orig_length, str);
+	g_free (str);
+
+    	headers = tny_list_new ();
+    	tny_folder_iface_get_headers (iface, headers, FALSE);
+	headers_len = tny_list_iface_length (headers);
+	g_object_unref (G_OBJECT (headers));
+
+       	str = g_strdup_printf ("After removal but not yet expunge, the header count is %d, whereas it should be %d\n", headers_len, orig_length);
+	gunit_fail_unless (new_len == orig_length, str);
+	g_free (str);
+
+    	/* Expunge ...*/
+    	tny_folder_iface_expunge (iface);    
+	tny_folder_iface_refresh (iface);
+    
+        new_len = tny_folder_iface_get_all_count (iface);
+    	str = g_strdup_printf ("After removal, the new length is %d, whereas it should be %d\n", new_len, orig_length-1);
+	gunit_fail_unless (new_len == orig_length-1, str);
+	g_free (str);
+
+    	headers = tny_list_new ();
+    	tny_folder_iface_get_headers (iface, headers, FALSE);
+	headers_len = tny_list_iface_length (headers);
+	g_object_unref (G_OBJECT (headers));
+
+       	str = g_strdup_printf ("After removal, the header count is %d, whereas it should be %d\n", headers_len, orig_length-1);
+	gunit_fail_unless (new_len == orig_length-1, str);
+	g_free (str);
+
+	tny_folder_iface_uncache (iface);
+
+}
+
 GUnitTestSuite*
 create_tny_folder_iface_suite (void)
 {
@@ -187,6 +259,14 @@ create_tny_folder_iface_suite (void)
                gunit_test_case_new_with_funcs("tny_folder_iface_test_get_headers_sync",
                                       tny_folder_iface_test_setup,
                                       tny_folder_iface_test_get_headers_sync,
+				      tny_folder_iface_test_teardown));
+
+    
+    	/* Add test case objects to test suite */
+	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_folder_iface_test_remove_message",
+                                      tny_folder_iface_test_setup,
+                                      tny_folder_iface_test_remove_message,
 				      tny_folder_iface_test_teardown));
 
 	return suite;
