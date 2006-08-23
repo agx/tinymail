@@ -26,7 +26,8 @@
  * tny_msg_iface_get_folder:
  * @self: a #TnyMsgIface object
  * 
- * Get the parent folder of this message
+ * Get the parent folder of this message. The returned folder object should be
+ * unreferenced after use.
  *
  * Return value: The parent folder of this message
  **/
@@ -47,7 +48,7 @@ tny_msg_iface_get_folder (TnyMsgIface *self)
  * @self: a #TnyMsgIface object
  * @list: a #TnyListIface object
  * 
- * Get a read-only list of mime-parts of this message
+ * Get a read-only list of mime-parts of this message.
  *
  **/
 void
@@ -67,7 +68,8 @@ tny_msg_iface_get_parts (TnyMsgIface *self, TnyListIface *list)
  * tny_msg_iface_get_header:
  * @self: a #TnyMsgIface object
  * 
- * Get the header of the message
+ * Get the header of the message. The returned header object should be 
+ * unreferenced after use.
  *
  * Return value: The header of the message
  **/

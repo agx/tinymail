@@ -149,6 +149,7 @@ tny_msg_get_folder (TnyMsgIface *self)
 
 	g_mutex_lock (priv->folder_lock);
 	retval = priv->folder;
+    	g_object_ref (G_OBJECT (retval));
 	g_mutex_unlock (priv->folder_lock);
 
 	return retval;
@@ -191,6 +192,7 @@ tny_msg_get_header (TnyMsgIface *self)
 
 	g_mutex_lock (priv->header_lock);
 	retval = priv->header;
+    	g_object_ref (G_OBJECT (retval));
 	g_mutex_unlock (priv->header_lock);
 
 	return retval;

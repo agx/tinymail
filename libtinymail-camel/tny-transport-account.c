@@ -115,6 +115,7 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 
 		camel_object_unref (CAMEL_OBJECT (from));
 		camel_object_unref (CAMEL_OBJECT (recipients));
+        	g_object_unref (G_OBJECT (header));
 	}
 
 	return;

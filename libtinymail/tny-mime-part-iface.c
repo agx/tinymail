@@ -25,6 +25,10 @@
  * tny_mime_part_iface_is_attachment:
  * @self: a #TnyMimePartIface object
  * 
+ * Figures out whether or not a mime part is an attachment. An attachment
+ * is typically something with a original filename. Examples are attached
+ * files. Examples are not PGP signatures.
+ * 
  * Return value: whether or not the mime part is an attachment
  *
  **/
@@ -44,7 +48,7 @@ tny_mime_part_iface_is_attachment (TnyMimePartIface *self)
  * @self: a #TnyMimePartIface object
  * @content_location: the location 
  * 
- * Set the content location of a message part.
+ * Set the content location of a mime part.
  *
  **/
 void
@@ -64,7 +68,7 @@ tny_mime_part_iface_set_content_location (TnyMimePartIface *self, const gchar *c
  * @self: a #TnyMimePartIface object
  * @description: the description 
  * 
- * Set the description of a message part.
+ * Set the description of a mime part.
  *
  **/
 void
@@ -84,7 +88,7 @@ tny_mime_part_iface_set_description (TnyMimePartIface *self, const gchar *descri
  * @self: a #TnyMimePartIface object
  * @content_id: the content id 
  * 
- * Set the content id of a message part.
+ * Set the content id of a mime part.
  *
  **/
 void
@@ -104,7 +108,7 @@ tny_mime_part_iface_set_content_id (TnyMimePartIface *self, const gchar *content
  * @self: a #TnyMimePartIface object
  * @filename: the filename 
  * 
- * Set the filename of a message part.
+ * Set the filename of a mime part.
  *
  **/
 void
@@ -124,7 +128,7 @@ tny_mime_part_iface_set_filename (TnyMimePartIface *self, const gchar *filename)
  * @self: a #TnyMimePartIface object
  * @content_type: the content_type 
  * 
- * Set the content type of a message part. Formatted as type/subtype
+ * Set the content type of a mime part. Formatted as type/subtype
  *
  **/
 void
@@ -144,8 +148,10 @@ tny_mime_part_iface_set_content_type (TnyMimePartIface *self, const gchar *conte
  * tny_mime_part_iface_get_filename:
  * @self: a #TnyMimePartIface object
  * 
+ * Get the filename of a mime part. The returned value should not be freed.
  *
- * Return value: the filename of a message part
+ * Return value: the filename of a mime part as a read-only string
+ *
  **/
 const gchar*
 tny_mime_part_iface_get_filename (TnyMimePartIface *self)
@@ -162,8 +168,10 @@ tny_mime_part_iface_get_filename (TnyMimePartIface *self)
  * tny_mime_part_iface_get_content_id:
  * @self: a #TnyMimePartIface object
  * 
+ * Get the content-id of a mime part. The returned value should not be freed.
  *
- * Return value: the content-id of a message part
+ * Return value: the content-id of a mime part as a read-only string
+ *
  **/
 const gchar*
 tny_mime_part_iface_get_content_id (TnyMimePartIface *self)
@@ -180,8 +188,9 @@ tny_mime_part_iface_get_content_id (TnyMimePartIface *self)
  * tny_mime_part_iface_get_description:
  * @self: a #TnyMimePartIface object
  * 
+ * Get the description of a mime part. The returned value should not be freed.
  *
- * Return value: the description of a message part
+ * Return value: the description of a mime part as a read-only string
  **/
 const gchar*
 tny_mime_part_iface_get_description (TnyMimePartIface *self)
@@ -198,8 +207,10 @@ tny_mime_part_iface_get_description (TnyMimePartIface *self)
  * tny_mime_part_iface_get_content_location:
  * @self: a #TnyMimePartIface object
  * 
+ * Get the content location of a mime part. The returned value should not be freed.
  *
- * Return value: the content-location of a message part
+ * Return value: the content-location of a mime part as a read-only string
+ *
  **/
 const gchar*
 tny_mime_part_iface_get_content_location (TnyMimePartIface *self)
@@ -217,10 +228,14 @@ tny_mime_part_iface_get_content_location (TnyMimePartIface *self)
  * @self: a #TnyMimePartIface object
  * @stream: a #TnyMsgStreamIface stream
  * 
- * Efficiently write the message part to a stream. This will not keep the data
- * of the part in memory, but in stead will read from the part and write to the
- * stream efficiently.
+ * Efficiently write the mime part to a stream. This will not read the data
+ * of the part in a memory buffer. In stead it will read the part data while
+ * already writing it to the stream efficiently.
  *
+ * You probably want to utilise the tny_mime_part_iface_decode_to_stream
+ * method in stead of this one. This method will not attempt to decode the
+ * mime part. Mime parts are encoded before appending it to a message.
+ * 
  **/
 void
 tny_mime_part_iface_write_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
@@ -240,9 +255,9 @@ tny_mime_part_iface_write_to_stream (TnyMimePartIface *self, TnyStreamIface *str
  * @self: a #TnyMimePartIface object
  * @stream: a #TnyMsgStreamIface stream
  * 
- * Efficiently decode the message part to a stream. This will not keep the data
- * of the part in memory, but in stead will read from the part and write to the
- * stream efficiently.
+ * Efficiently decode the message part to a stream. This will not read the data
+ * of the part in a memory buffer. In stead it will read the part data while
+ * already writing it to the stream efficiently.
  *
  **/
 void
@@ -264,7 +279,7 @@ tny_mime_part_iface_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *st
  * 
  * Set the stream from which the message part will read its content
  *
- * Return value: 0 on success or -1 on fail
+ * Return value: 0 on success or -1 on failure
  **/
 gint
 tny_mime_part_iface_construct_from_stream (TnyMimePartIface *self, TnyStreamIface *stream, const gchar *type)
@@ -282,7 +297,7 @@ tny_mime_part_iface_construct_from_stream (TnyMimePartIface *self, TnyStreamIfac
  * tny_mime_part_iface_get_stream:
  * @self: a #TnyMimePartIface object
  * 
- * Inefficiently get a stream from a message part. The entire data of the
+ * Inefficiently get a stream for a message part. The entire data of the
  * the part will be kept in memory until the stream is unreferenced.
  *
  * Return value: An in-memory stream
@@ -302,10 +317,11 @@ tny_mime_part_iface_get_stream (TnyMimePartIface *self)
  * tny_mime_part_iface_get_content_type:
  * @self: a #TnyMimePartIface object
  * 
- * A read-only string in the format "type/subtype". You shouldn't free this
- * value (it's internally handled). Hence it's a const.
+ * A read-only string in the format "type/subtype". You shouldn't free the 
+ * returned value.
  *
- * Return value: the read-only content-type of a message part
+ * Return value: content-type of a message part as a read-only string
+ *
  **/
 const gchar*
 tny_mime_part_iface_get_content_type (TnyMimePartIface *self)
@@ -326,6 +342,7 @@ tny_mime_part_iface_get_content_type (TnyMimePartIface *self)
  * Efficiently checks whether a part is of type content_type
  *
  * Return value: Whether or not the part is the content type
+ *
  **/
 gboolean
 tny_mime_part_iface_content_type_is (TnyMimePartIface *self, const gchar *content_type)

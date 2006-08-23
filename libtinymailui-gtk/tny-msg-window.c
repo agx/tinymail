@@ -60,13 +60,14 @@ static void
 tny_msg_window_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
-	TnyHeaderIface *header = TNY_HEADER_IFACE 
-		(tny_msg_iface_get_header (msg));
+	TnyHeaderIface *header = TNY_HEADER_IFACE (tny_msg_iface_get_header (msg));
 
 	tny_msg_view_iface_set_msg (priv->msg_view, msg);
 
 	gtk_window_set_title (GTK_WINDOW (self), tny_header_iface_get_subject (header));
 
+    	g_object_unref (G_OBJECT (header));
+    
 	return;
 }
 

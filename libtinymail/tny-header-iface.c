@@ -172,9 +172,10 @@ tny_header_iface_set_to (TnyHeaderIface *self, const gchar *to)
  * tny_header_iface_get_cc:
  * @self: a #TnyHeaderIface object
  * 
- * Get the CC header
+ * Get the CC header. The returned value should not be freed.
  * 
- * Return value: cc header
+ * Return value: cc header as a read-only string
+ *
  **/
 const gchar*
 tny_header_iface_get_cc (TnyHeaderIface *self)
@@ -191,9 +192,10 @@ tny_header_iface_get_cc (TnyHeaderIface *self)
  * tny_header_iface_get_bcc:
  * @self: a #TnyHeaderIface object
  * 
- * Get the BCC header
+ * Get the BCC header. The returned value should not be freed.
  * 
- * Return value: bcc header
+ * Return value: bcc header as a read-only string
+ *
  **/
 const gchar*
 tny_header_iface_get_bcc (TnyHeaderIface *self)

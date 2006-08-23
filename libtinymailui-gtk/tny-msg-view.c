@@ -125,6 +125,7 @@ reload_msg (TnyMsgViewIface *self)
 		gtk_widget_show (priv->attachview_sw);
 	}
 
+    	g_object_unref (G_OBJECT (header));
 	g_object_unref (G_OBJECT (model));
 
 	return;

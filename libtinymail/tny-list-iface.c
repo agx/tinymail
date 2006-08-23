@@ -42,7 +42,10 @@ tny_list_iface_length (TnyListIface *self)
  * @self: A #TnyListIface instance
  * @item: the item to prepend
  *
- * Implementors: if you have to choose, make this one the fast one
+ * Prepends an item to a list
+ *
+ * Implementers: if you have to choose, make this one the fast one
+ *
  **/
 void
 tny_list_iface_prepend (TnyListIface *self, GObject* item)
@@ -61,7 +64,10 @@ tny_list_iface_prepend (TnyListIface *self, GObject* item)
  * @self: A #TnyListIface instance
  * @item: the item to append
  *
- * Implementors: if you have to choose, make the prepend one the fast one
+ * Appends an item to a list
+ *
+ * Implementers: if you have to choose, make the prepend one the fast one
+ *
  **/
 void 
 tny_list_iface_append (TnyListIface *self, GObject* item)
@@ -80,9 +86,15 @@ tny_list_iface_append (TnyListIface *self, GObject* item)
  * @self: A #TnyListIface instance
  * @item: the item to remove
  *
+ * Removes an item from a list
+ *
  * Removing a item might invalidate all existing iterators or put them in an
  * unknown and unspecified state. You'll need to recreate the iterator(s) if you
  * remove an item to be certain.
+ *
+ * There's no guarantee whatsoever that existing iterators of 'self' will be
+ * valid after this method returned.
+ *
  **/
 void 
 tny_list_iface_remove (TnyListIface *self, GObject* item)
@@ -100,6 +112,18 @@ tny_list_iface_remove (TnyListIface *self, GObject* item)
  * tny_list_iface_create_iterator:
  * @self: A #TnyListIface instance
  *
+ * Creates a new iterator instance for the list. 
+ *
+ * An iterator is a position indicator for a list. It keeps the position
+ * state of a list iteration. The list itself does not keep any position 
+ * information. This makes it possible to create multiple iterations consuming
+ * multiple iterator instances simultanously.
+ *
+ * The reason why the method isn't called get_iterator is because it's a
+ * object creation method. It's not a property. It effectively creates a new
+ * instance of an iterator. The returned iterator object should (therefore) be
+ * unreferenced after use.
+ * 
  * Return value: A new iterator for this list
  *
  **/
@@ -120,7 +144,17 @@ tny_list_iface_create_iterator (TnyListIface *self)
  * @func: the function to call with each element's data.
  * @user_data: user data to pass to the function.
  *
- * Calls a function for each element of a #TnyListIface.
+ * Calls a function for each element of a #TnyListIface. It will use an internal
+ * iteration which you don't have to worry about. 
+ *
+ * The purpose of this method is to have a fast foreach iteration. Using this
+ * is faster than inventing your own foreach loop using the is_done and next
+ * methods. The order is guaranteed to be the first element first, the last 
+ * element last. It's guaranteed that all current items will be iterated.
+ *
+ * In the func implementation and during the foreach operation you shouldn't
+ * append, remove nor prepend items to the list. In multithreaded environments
+ * it's advisable to introduce a lock when using this functionality. 
  *
  **/
 void 
@@ -140,7 +174,13 @@ tny_list_iface_foreach (TnyListIface *self, GFunc func, gpointer user_data)
  * tny_list_iface_copy:
  * @self: A #TnyListIface instance
  *
- * Return value: A copy (new instance) of this list
+ * Creates a copy of the list. It doesn't copy the items. It, however, creates
+ * a new list with new references to the same items.
+ *
+ * Because it's a new instance, the returned list object should be unreferenced
+ * after use.
+ *
+ * Return value: A copy of this list
  *
  **/
 TnyListIface*
