@@ -113,6 +113,8 @@ load_folder_no_lock (TnyFolderPriv *priv)
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
 
+    	    	priv->cached_length = camel_folder_get_message_count (priv->folder);
+
 		priv->folder_changed_id = camel_object_hook_event (priv->folder, 
 			"folder_changed", (CamelObjectEventHookFunc)folder_changed, 
 			priv);
@@ -496,6 +498,8 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 		tny_folder_refresh_async_status, info, str);
 	g_free (str);
 	camel_folder_refresh_info (priv->folder, ex);
+       	priv->cached_length = camel_folder_get_message_count (priv->folder);
+
 	if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 	camel_exception_free (ex);
@@ -556,6 +560,8 @@ tny_folder_refresh (TnyFolderIface *self)
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
 		NULL, NULL, NULL);
 	camel_folder_refresh_info (priv->folder, ex);
+    	priv->cached_length = camel_folder_get_message_count (priv->folder);
+    
 	if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 	camel_exception_free (ex);
@@ -589,6 +595,8 @@ tny_folder_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean re
 	if (refresh)
 	{
 		camel_folder_refresh_info (priv->folder, &ex);
+        	priv->cached_length = camel_folder_get_message_count (priv->folder);
+
 		if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 			priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 	}
