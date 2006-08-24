@@ -46,7 +46,7 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 			    finfo->flags & CAMEL_FOLDER_SUBSCRIBED)
 				retval = TRUE;
 
-			if ((options & TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED) &&
+			if ((options & TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED) &&
 			    !(finfo->flags & CAMEL_FOLDER_SUBSCRIBED))
 				retval = TRUE;
 
