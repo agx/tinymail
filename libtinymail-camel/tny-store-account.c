@@ -572,7 +572,7 @@ tny_store_account_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *l
 
 	iter = camel_store_get_folder_info (store, "", 0, &ex);
         
-    	/* TODO : cache iter for TnyFolder's and give the iter->child to it */
+    	/* TODO : cache iter for TnyFolders and give the iter->child to it */
     
     	if (iter)
     	{
