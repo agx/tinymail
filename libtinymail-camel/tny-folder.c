@@ -985,6 +985,8 @@ tny_folder_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, Tn
 	CamelFolderInfo *iter;
 
 	iter = camel_store_get_folder_info (store, priv->folder_name, 0, &ex);
+
+	/* TODO : reuse iter from TnyStoreAccount */
     
     	if (iter)
 	{			
