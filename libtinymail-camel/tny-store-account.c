@@ -590,7 +590,7 @@ tny_store_account_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *l
 	    	tny_list_iface_prepend (list, G_OBJECT (folder));
 		iter = iter->next;
 	  }
-	  camel_store_free_folder_info_full (store, iter);
+	  camel_store_free_folder_info (store, iter);
 	}
     
 	return;

@@ -1006,7 +1006,7 @@ tny_folder_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, Tn
 		iter = iter->next;
 	  }
     
-    	  camel_store_free_folder_info_full (store, iter);
+    	  camel_store_free_folder_info (store, iter);
 	}
     
 	return;
