@@ -18,12 +18,57 @@
  */
 
 #include <config.h>
-
 #include <glib/gi18n-lib.h>
-
 #include <string.h>
-#include "tny-camel-common-priv.h"
 
+#include "tny-camel-common-priv.h"
+#include <tny-folder-store-query.h>
+
+gboolean 
+_tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *finfo)
+{
+    	gboolean retval = FALSE;
+    
+	if (query)
+	{
+		TnyListIface *items = tny_folder_store_query_get_items (query);
+		TnyIteratorIface *iterator;
+		iterator = tny_list_iface_create_iterator (items);
+		 
+		 
+		while (!tny_iterator_iface_is_done (iterator))
+		{
+			TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_iface_current (iterator);
+			TnyFolderStoreQueryOption options = tny_folder_store_query_item_get_options (item);
+			regex_t *regex = tny_folder_store_query_item_get_regex (item);
+
+			if ((options & TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED) &&
+			    finfo->flags & CAMEL_FOLDER_SUBSCRIBED)
+				retval = TRUE;
+
+			if ((options & TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED) &&
+			    !(finfo->flags & CAMEL_FOLDER_SUBSCRIBED))
+				retval = TRUE;
+
+			if (regex && options & TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME)
+			    if (regexec (regex, finfo->name, 0, NULL, 0) == 0)
+				retval = TRUE;
+
+			if (regex && options & TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID)
+			    if (regexec (regex, finfo->full_name, 0, NULL, 0) == 0)
+				retval = TRUE;
+
+			g_object_unref (G_OBJECT (item));
+			tny_iterator_iface_next (iterator);
+		}
+		 
+		g_object_unref (G_OBJECT (iterator));    
+		g_object_unref (G_OBJECT (items));
+	} else
+		retval = TRUE;
+    
+ 	return retval;
+}
 
 void
 _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)

@@ -25,73 +25,46 @@
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
+#include <tny-folder-store-iface.h>
+#include <tny-folder-store-query.h>
 
 #include <account-store.h>
 
 static gint recursion_level=0;
-
-static void 
-recursive_walk_subfolders (TnyFolderIface *parent)
-{
-    TnyListIface *folders = tny_folder_iface_get_folders (parent);
-    if (folders)
-    {
-	    TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
-	    
-	    while (!tny_iterator_iface_is_done (iterator))
-	    {
-		TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (iterator));
-		
-		if (!folder)
-			continue;
-		
-		gint i=0;
-		
-		for (i=0; i<recursion_level; i++)
-			g_print ("\t");
-		
-		g_print ("\t%s\n", tny_folder_iface_get_name (folder));
-		
-		recursion_level++;
-		recursive_walk_subfolders (folder);
-		recursion_level--;
-		
-		g_object_unref (G_OBJECT (folder));
-		tny_iterator_iface_next (iterator);
-	    }
-	    
-	    g_object_unref (G_OBJECT (iterator));
-    }
-    
-    return;
-}
-
-static void 
-mem_test_print_folders (TnyListIface *folders)
-{
-	TnyIteratorIface *fiter;
-    
-	fiter = tny_list_iface_create_iterator (folders);
-	
-	while (!tny_iterator_iface_is_done (fiter))
-	{
-	    TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (fiter));
-	    
-	    g_print ("Root folder: %s\n", tny_folder_iface_get_name (folder));
-	    
-	    recursive_walk_subfolders (folder);
-	    
-	    g_object_unref (G_OBJECT (folder));
-	    tny_iterator_iface_next (fiter);
-	}
-    
-	g_object_unref (G_OBJECT (fiter));
-    
-	return;
-}
-
 static gchar *cachedir=NULL;
 static gboolean online=FALSE;
+
+static void
+recurse_folders (TnyFolderStoreIface *store, TnyFolderStoreQuery *query)
+{
+	TnyIteratorIface *iter;
+	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
+
+	tny_folder_store_iface_get_folders (store, folders, query);
+	iter = tny_list_iface_create_iterator (folders);
+
+	while (!tny_iterator_iface_is_done (iter))
+	{
+		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
+		gint i=0;
+
+		for (i=0; i<recursion_level; i++)
+			g_print ("\t");
+
+		g_print ("%s\n", tny_folder_iface_get_name (TNY_FOLDER_IFACE (folder)));
+
+		recursion_level++;
+		recurse_folders (folder, query);
+		recursion_level--;
+	    
+ 		g_object_unref (G_OBJECT (folder));
+
+		tny_iterator_iface_next (iter);	    
+	}
+
+	 g_object_unref (G_OBJECT (iter));
+	 g_object_unref (G_OBJECT (folders));
+}
 
 static const GOptionEntry options[] = 
 {
@@ -108,10 +81,11 @@ main (int argc, char **argv)
 {
 	GOptionContext *context;
 	TnyAccountStoreIface *account_store;
-	TnyListIface *accounts, *folders;
-	TnyStoreAccountIface *account;
-	TnyIteratorIface *aiter;
-
+	TnyListIface *accounts;
+	TnyFolderStoreQuery *query;
+	TnyStoreAccountIface *account; TnyIteratorIface *iter;
+	TnyFolderStoreQueryOption qoptions;
+    
 	free (malloc (10));
     
 	g_type_init ();
@@ -128,23 +102,27 @@ main (int argc, char **argv)
 
 	g_option_context_free (context);
     
+       
 	accounts = tny_list_new ();
 
 	tny_account_store_iface_get_accounts (account_store, accounts, 
-			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+	      TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+    
+	iter = tny_list_iface_create_iterator (accounts);
+	account = (TnyStoreAccountIface*) tny_iterator_iface_current (iter);
 
-	aiter = tny_list_iface_create_iterator (accounts);
-	tny_iterator_iface_first (aiter);
-	account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
-
-	folders = tny_store_account_iface_get_folders (account, 
-			TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
-	if (folders)
-		mem_test_print_folders (folders);
-	else g_print ("No root folders?\n");
+	recursion_level = 0;
+	qoptions = TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED;
+	qoptions |= TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED;
+	//query = tny_folder_store_query_new ();
+	//tny_folder_store_query_add_item (query, NULL, qoptions);
+	    
+	recurse_folders (TNY_FOLDER_STORE_IFACE (account), NULL);
     
 	g_object_unref (G_OBJECT (account));
-	g_object_unref (G_OBJECT (aiter));
+	g_object_unref (G_OBJECT (iter));
 	g_object_unref (G_OBJECT (accounts));
+    
+	return 0;
 }
 

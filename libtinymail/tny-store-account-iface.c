@@ -20,6 +20,7 @@
 #include <config.h>
 
 #include <tny-store-account-iface.h>
+#include <tny-folder-store-iface.h>
 
 
 /**
@@ -125,6 +126,7 @@ tny_store_account_iface_get_type (void)
 			"TnyStoreAccountIface", &info, 0);
 
 		g_type_interface_add_prerequisite (type, TNY_TYPE_ACCOUNT_IFACE);
+    		g_type_interface_add_prerequisite (type, TNY_TYPE_FOLDER_STORE_IFACE);
 	}
 
 	return type;

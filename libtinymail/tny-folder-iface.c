@@ -20,6 +20,7 @@
 #include <config.h>
 
 #include <tny-folder-iface.h>
+#include <tny-folder-store-iface.h>
 #include <tny-header-iface.h>
 
 guint *tny_folder_iface_signals;
@@ -83,9 +84,11 @@ tny_folder_iface_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
  * @status_callback: A callback for status notifications
  * @user_data: user data for the callback
  *
- * Refresh the folder and call back when finished. If you want to use this 
- * functionality, your application needs to use a glib main event loop 
- * (#GMainLoop). All Gtk+ and GNOME applications use this automatically.
+ * Refresh the folder and call back when finished.
+ *
+ * If you want to use this functionality, your application needs to use a glib 
+ * main event loop (#GMainLoop). All Gtk+ and GNOME applications use this
+ * automatically.
  * 
  * The callback and the status_callback don't need gdk_threads_enter and
  * gdk_threads_leave because they are both invoked using g_timeout_add in the
@@ -525,7 +528,7 @@ tny_folder_iface_get_type (void)
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyFolderIface", &info, 0);
 
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+		g_type_interface_add_prerequisite (type, TNY_TYPE_FOLDER_STORE_IFACE);
 	}
 
 	return type;

@@ -21,6 +21,7 @@
  */
 #include <glib.h>
 #include <camel/camel-folder.h>
+#include <camel/camel-store.h>
 #include <tny-account-iface.h>
 #include <tny-folder-iface.h>
 
@@ -54,9 +55,9 @@ struct _TnyFolderPriv
 CamelFolder* _tny_folder_get_camel_folder (TnyFolderIface *self);
 
 void _tny_folder_set_id (TnyFolder *self, const gchar *id);
-void _tny_folder_set_subscribed_priv (TnyFolderIface *self, gboolean subscribed);
-void _tny_folder_set_name_priv (TnyFolderIface *self, const gchar *name);
-void _tny_folder_set_folder_type (TnyFolder *self, TnyFolderType type);
+void _tny_folder_set_subscribed (TnyFolder *self, gboolean subscribed);
+void _tny_folder_set_name (TnyFolder *self, const gchar *name);
+void _tny_folder_set_folder_type (TnyFolder *folder, CamelFolderInfo *folder_info);
 void _tny_folder_set_unread_count (TnyFolder *self, guint len);
 void _tny_folder_set_all_count (TnyFolder *self, guint len);
 

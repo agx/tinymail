@@ -1,3 +1,22 @@
+08-24-2006  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel/tny-camel-common.c, 
+	libtinymail-camel/tny-folder.c, 
+	libtinymail-camel/tny-store-account.c,
+	libtinymail-camel/tny-camel-common-priv.h,
+	libtinymail-camel/tny-folder-priv.h,
+	tests/functional/folder-lister.c,
+	libtinymail/tny-store-account-iface.c,
+	libtinymail/tny-shared.h,
+	libtinymail/tny-folder-store-query.c,
+	libtinymail/tny-folder-store-iface.c,
+	libtinymail/tny-folder-store-query.h,
+	libtinymail/tny-folder-store-iface.h,
+	libtinymail/Makefile.am,
+	libtinymail/tny-folder-iface.c: The new get-folders API
+
+	* This was a major API change
+
 08-23-2006  Philip Van Hoof <pvanhoof@gnome.org>
 	
 	* ChangeLog: Corrected the dates
@@ -6,6 +25,8 @@
 	* Various fixes
 	* API simplification of TnyFolderIface
 	* API documentation of TnyFolderIface
+	
+	* This was a major API change
 	
 08-22-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -18,12 +39,16 @@
 	the iterator API
 	* Moved the Python demo to tests/python-demo
 
+	* This was a major API change
+	
 08-08-2006  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
 	* make iterator ops next/prev/first/last/nth all void
 	* g_object_ref iterator _current retval, except with headers...
 	* misc small fixes (-Wall -Wextra helps...)
 
+	* This was a major API change
+	
 08-01-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implemented a few new unit tests
@@ -38,6 +63,8 @@
 
 	* Improved the enums (GType'ed them)
 
+	* This was a major API change
+	
 07-29-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* bindings/python/*: Some fixes for the Python bindings
@@ -72,13 +99,19 @@
 	* Refactored TnySummaryWindowIface to TnySummaryViewIface
 	* Added support for XEmbed and command-line parameters in the demo-ui
 
+	* This was a major API change
+	
 06-09-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* tny_iterator_iface_is_end method
 
+	* This was a major API change
+	
 06-07-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Major API changes in TnyAccountStore
+	
+	* This was a major API change
 	
 06-21-2006  Florian Boor <florian.boor@kernelconcepts.de>
 
@@ -116,3 +149,6 @@
 	
 	* Initial import
 	* Tinymail epoch
+
+	* This was a major API change
+	

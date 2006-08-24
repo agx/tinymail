@@ -22,6 +22,8 @@
 #include <glib/gi18n-lib.h>
 
 #include <string.h>
+
+#include <tny-folder-store-iface.h>
 #include <tny-folder-iface.h>
 #include <tny-folder.h>
 #include <tny-msg-iface.h>
@@ -45,6 +47,7 @@
 #include "tny-account-priv.h"
 #include "tny-folder-priv.h"
 #include "tny-folder-list-priv.h"
+#include "tny-camel-common-priv.h"
 #include <tny-camel-shared.h>
 
 #include <camel/camel.h>
@@ -228,9 +231,9 @@ tny_folder_get_subscribed (TnyFolderIface *self)
 }
 
 void /* Only internally used */
-_tny_folder_set_subscribed_priv (TnyFolderIface *self, gboolean subscribed)
+_tny_folder_set_subscribed (TnyFolder *self, gboolean subscribed)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folder_lock);
 	priv->subscribed = subscribed;
@@ -688,17 +691,6 @@ tny_folder_get_folder_type (TnyFolderIface *self)
 	return priv->cached_folder_type;
 }
 
-void
-_tny_folder_set_folder_type (TnyFolder *self, TnyFolderType type)
-{
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-
-	priv->cached_folder_type = type;
-
-	return;
-}
-
-
 
 static const gchar*
 tny_folder_get_id (TnyFolderIface *self)
@@ -729,7 +721,7 @@ _tny_folder_set_id (TnyFolder *self, const gchar *id)
 
 
 void
-_tny_folder_set_name_priv (TnyFolderIface *self, const gchar *name)
+_tny_folder_set_name (TnyFolder *self, const gchar *name)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
@@ -933,6 +925,115 @@ tny_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	return;
 }
 
+
+static void 
+tny_folder_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *folder)
+{
+	/* TODO */
+    
+	return;
+}
+
+static TnyFolderIface*
+tny_folder_create_folder (TnyFolderStoreIface *self, const gchar *name)
+{
+	/* TODO */
+    
+	return TNY_FOLDER_IFACE (tny_folder_new ());
+}
+
+
+void 
+_tny_folder_set_folder_type (TnyFolder *folder, CamelFolderInfo *folder_info)
+{
+    	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (folder));
+
+	if (!folder_info)
+		priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
+	else {
+		switch (folder_info->flags & CAMEL_FOLDER_TYPE_MASK) 
+		{
+			case CAMEL_FOLDER_TYPE_INBOX:
+				priv->cached_folder_type = TNY_FOLDER_TYPE_INBOX;
+			break;
+			case CAMEL_FOLDER_TYPE_OUTBOX:
+				priv->cached_folder_type = TNY_FOLDER_TYPE_OUTBOX; 
+			break;
+			case CAMEL_FOLDER_TYPE_TRASH:
+				priv->cached_folder_type = TNY_FOLDER_TYPE_TRASH; 
+			break;
+			case CAMEL_FOLDER_TYPE_JUNK:
+				priv->cached_folder_type = TNY_FOLDER_TYPE_JUNK; 
+			break;
+			case CAMEL_FOLDER_TYPE_SENT:
+				priv->cached_folder_type = TNY_FOLDER_TYPE_SENT; 
+			break;
+			default:
+				priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
+			break;
+		}
+	}
+}
+
+static void 
+tny_folder_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
+{
+	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	CamelStore *store = (CamelStore*) _tny_account_get_service (TNY_ACCOUNT (priv->account));
+	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
+	CamelFolderInfo *iter;
+
+	iter = camel_store_get_folder_info (store, priv->folder_name, 0, &ex);
+    
+    	if (iter)
+	{			
+	  iter = iter->child;
+		
+	  while (iter && _tny_folder_store_query_passes (query, iter))
+  	  {
+		TnyFolder *folder = tny_folder_new ();
+		_tny_folder_set_id (folder, iter->full_name);
+		_tny_folder_set_folder_type (folder, iter);
+		_tny_folder_set_unread_count (folder, iter->unread);
+		_tny_folder_set_all_count (folder, iter->total);
+		_tny_folder_set_name (folder, iter->name);
+
+    		tny_folder_iface_set_account (TNY_FOLDER_IFACE (folder), 
+			TNY_ACCOUNT_IFACE (priv->account));
+
+	    	tny_list_iface_prepend (list, G_OBJECT (folder));
+		iter = iter->next;
+	  }
+    
+    	  camel_store_free_folder_info_full (store, iter);
+	}
+    
+	return;
+}
+
+static void 
+tny_folder_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyGetFoldersStatusCallback statuscb, TnyFolderStoreQuery *query, gpointer user_data)
+{
+    	/* TODO */
+    
+	return;
+}
+
+
+static void
+tny_folder_store_iface_init (gpointer g_iface, gpointer iface_data)
+{
+	TnyFolderStoreIfaceClass *klass = (TnyFolderStoreIfaceClass *)g_iface;
+
+	klass->remove_folder_func = tny_folder_remove_folder;
+	klass->create_folder_func = tny_folder_create_folder;
+	klass->get_folders_func = tny_folder_get_folders_thenew;
+	klass->get_folders_async_func = tny_folder_get_folders_async;
+					
+    	return;
+}
+
 static void 
 tny_folder_class_init (TnyFolderClass *class)
 {
@@ -1002,12 +1103,24 @@ tny_folder_get_type (void)
 		  NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_folder_store_iface_info = 
+		{
+		  (GInterfaceInitFunc) tny_folder_store_iface_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+	    
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyFolder",
 			&info, 0);
 
+       		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE_IFACE, 
+			&tny_folder_store_iface_info);
+	    
 		g_type_add_interface_static (type, TNY_TYPE_FOLDER_IFACE, 
 			&tny_folder_iface_info);
+	    
+
 	}
 
 	return type;
