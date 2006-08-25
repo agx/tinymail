@@ -295,7 +295,7 @@ tny_msg_finalize (GObject *object)
 	TnyMsg *self = (TnyMsg*) object;
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 	TnyMimePartPriv *ppriv = TNY_MIME_PART_GET_PRIVATE (self);
-
+    
 	g_mutex_lock (priv->header_lock);
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));

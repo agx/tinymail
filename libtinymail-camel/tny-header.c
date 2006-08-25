@@ -427,7 +427,11 @@ static void
 tny_header_finalize (GObject *object)
 {
 	TnyHeader *self = (TnyHeader*) object;
-
+	TnyFolderPriv *fpriv = TNY_FOLDER_GET_PRIVATE (self->folder);
+    
+    	fpriv->headers_managed--;
+    	_tny_folder_check_uncache (((TnyFolder*)self->folder), fpriv);
+    
 	if (G_UNLIKELY (self->write))
 	{
 		destroy_write (self);
@@ -460,10 +464,11 @@ tny_header_new (void)
 }
 
 void
-_tny_header_set_folder (TnyHeader *self, TnyFolder *folder)
+_tny_header_set_folder (TnyHeader *self, TnyFolder *folder, TnyFolderPriv *fpriv)
 {
 	TnyHeader *me = TNY_HEADER (self);
 	me->folder = (TnyFolderIface*)folder;
+    	fpriv->headers_managed++;
 	return;
 }
 

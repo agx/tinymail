@@ -97,9 +97,6 @@ struct _TnyFolderIfaceClass
 	guint           (*get_all_count_func)     (TnyFolderIface *self);	
 	guint           (*get_unread_count_func)  (TnyFolderIface *self);
 
-	void           (*uncache_func)     (TnyFolderIface *self);
-	gboolean       (*has_cache_func)   (TnyFolderIface *self);
-
 	void           (*set_subscribed_func)    (TnyFolderIface *self, gboolean subscribed);
 	gboolean       (*get_subscribed_func)    (TnyFolderIface *self);
 
@@ -129,7 +126,6 @@ TnyFolderType tny_folder_iface_get_folder_type (TnyFolderIface *self);
 
 guint tny_folder_iface_get_all_count (TnyFolderIface *self);
 guint tny_folder_iface_get_unread_count (TnyFolderIface *self);
-void tny_folder_iface_uncache (TnyFolderIface *self);
 
 void tny_folder_iface_set_subscribed (TnyFolderIface *self, gboolean subscribed);
 gboolean tny_folder_iface_get_subscribed (TnyFolderIface *self);

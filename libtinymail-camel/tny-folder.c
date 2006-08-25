@@ -346,7 +346,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
 	header = TNY_HEADER_IFACE (tny_header_new ());
 
-	_tny_header_set_folder (TNY_HEADER (header), TNY_FOLDER (self));
+	_tny_header_set_folder (TNY_HEADER (header), TNY_FOLDER (self), priv);
 	_tny_header_set_camel_message_info (header, mi);
 
 	/* Get rid of the reference already. I know this is ugly */
@@ -896,6 +896,15 @@ tny_folder_has_cache (TnyFolderIface *self)
 	return retval;
 }
 
+void 
+_tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv)
+{
+	if (priv->headers_managed == 0) {
+		tny_folder_uncache (TNY_FOLDER_IFACE (self));
+	    printf ("UNCACHED\n");
+	}
+}
+
 
 static void
 tny_folder_iface_init (gpointer g_iface, gpointer iface_data)
@@ -908,8 +917,6 @@ tny_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_name_func = tny_folder_set_name;
 	klass->get_name_func = tny_folder_get_name;
 	klass->get_folder_type_func = tny_folder_get_folder_type;
-	klass->has_cache_func = tny_folder_has_cache;
-	klass->uncache_func = tny_folder_uncache;
 	klass->get_folders_func = tny_folder_get_folders;
 	klass->get_unread_count_func = tny_folder_get_unread_count;
 	klass->get_all_count_func = tny_folder_get_all_count;
@@ -1057,6 +1064,7 @@ tny_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyFolder *self = (TnyFolder *)instance;
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
+	priv->headers_managed = 0;
 	priv->loaded = FALSE;
 	priv->folder_changed_id = 0;
 	priv->folder = NULL;

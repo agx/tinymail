@@ -170,7 +170,6 @@ tny_folder_iface_test_get_headers_sync (void)
 	g_free (str);
     
 	g_object_unref (G_OBJECT (headers));
-	tny_folder_iface_uncache (iface);
 }
 
 
@@ -241,8 +240,6 @@ tny_folder_iface_test_remove_message (void)
        	str = g_strdup_printf ("After removal, the header count is %d, whereas it should be %d\n", headers_len, orig_length-1);
 	gunit_fail_unless (new_len == orig_length-1, str);
 	g_free (str);
-
-	tny_folder_iface_uncache (iface);
 
 }
 

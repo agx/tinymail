@@ -70,7 +70,7 @@ fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkT
 		/* g_signal_connect (G_OBJECT (folder), "folders_reloaded",
 			G_CALLBACK (folders_reloaded), self+account); */
 
-		tny_folder_iface_uncache (folder);
+		/* tny_folder_iface_uncache (folder); */
 
 		if (tny_list_iface_length (more_folders) > 0)
 			fill_treemodel_recursive (self, more_folders, &iter, account);

@@ -93,7 +93,8 @@ reload_msg (TnyMsgViewIface *self)
 	gtk_text_buffer_set_text (buffer, "", 0);
 
 	tny_header_view_iface_set_header (priv->headerview, header);
-
+	g_object_unref (G_OBJECT (header));
+    
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
 	while (!tny_iterator_iface_is_done (iterator))
@@ -230,6 +231,12 @@ tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
 
+    	if (G_LIKELY (priv->msg)) 
+    	{
+		g_object_unref (G_OBJECT (priv->msg));
+		priv->msg = NULL;
+	}
+
 	buffer = gtk_text_view_get_buffer (priv->textview);
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, _("Message is unavailable"), -1);
@@ -237,6 +244,7 @@ tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
 	if (header)
 	{
 		tny_header_view_iface_set_header (priv->headerview, header);
+		g_object_unref (G_OBJECT (header));
 		gtk_widget_show (GTK_WIDGET (priv->headerview));
 	} else {
 		gtk_widget_hide (GTK_WIDGET (priv->headerview));

@@ -120,7 +120,7 @@ tny_folder_iface_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback c
  * After this method, tny_folder_iface_get_all_count and 
  * tny_folder_iface_get_unread_count are guaranteed to be correct.
  *
- * Also read about tny_folder_iface_get_headers and tny_folder_iface_uncache.
+ * Also read about tny_folder_iface_get_headers.
  **/
 void
 tny_folder_iface_refresh (TnyFolderIface *self)
@@ -312,7 +312,7 @@ tny_folder_iface_get_message (TnyFolderIface *self, TnyHeaderIface *header)
  * @refresh: whether or not to synchronize with the server first
  * 
  * Get a list of message header instances that are in this folder. Also read
- * about tny_folder_iface_uncache and tny_folder_iface_refresh.
+ * about tny_folder_iface_refresh.
  **/
 void
 tny_folder_iface_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh)
@@ -414,49 +414,6 @@ tny_folder_iface_get_folder_type  (TnyFolderIface *self)
 
 
 
-/**
- * tny_folder_iface_uncache:
- * @self: a TnyFolderIface object
- * 
- * If it's possible to uncache this instance, uncache it. It is recommended to
- * perform this method after you did a tny_folder_iface_get_headers once the 
- * folder isn't needed anymore.
- * 
- * The libtinymail-camel folder implementation will keep a copy of the headers
- * until you perform this method. Not performing it will make a second
- * get_headers call faster but will keep the memory needed for these headers
- * alive. You typically don't want this on a device with few memory resources.
- *
- * If you use libtinymailui-gtk's #TnyHeaderListModel, this is done for you
- * in a convenient way when switching the model of a #GtkTreeView. In other
- * words: you don't have to worry about it when using the #TnyHeaderListModel
- * type as list parameter of tny_folder_iface_get_headers.
- **/
-void
-tny_folder_iface_uncache (TnyFolderIface *self)
-{
-	if (TNY_FOLDER_IFACE_GET_CLASS (self)->uncache_func != NULL)
-		TNY_FOLDER_IFACE_GET_CLASS (self)->uncache_func (self);
-	return;
-}
-
-/**
- * tny_folder_iface_has_cache:
- * @self: a TnyFolderIface object
- * 
- * If it's possible to uncache this instance, return whether or not it has a 
- * cache.
- * 
- * Return value: Whether or not this instance has a cache
- **/
-gboolean
-tny_folder_iface_has_cache (TnyFolderIface *self)
-{
-	if (TNY_FOLDER_IFACE_GET_CLASS (self)->has_cache_func != NULL)
-		return TNY_FOLDER_IFACE_GET_CLASS (self)->has_cache_func (self);
-	else
-		return FALSE;
-}
 
 static void
 tny_folder_iface_base_init (gpointer g_class)

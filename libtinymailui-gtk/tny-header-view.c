@@ -64,9 +64,10 @@ tny_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
 	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
 	gchar *str;
 
-	if (G_LIKELY (priv->header))
+	if (G_LIKELY (priv->header)){
+	    printf ("unref header\n");
 		g_object_unref (G_OBJECT (priv->header));
-
+	}
 	g_object_ref (G_OBJECT (header)); 
 
 	priv->header = header;
@@ -176,6 +177,7 @@ tny_header_view_finalize (GObject *object)
 	TnyHeaderView *self = (TnyHeaderView *)object;	
 	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
 
+    printf ("head view final\n");
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
 

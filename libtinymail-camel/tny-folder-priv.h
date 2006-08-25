@@ -34,7 +34,8 @@ struct _TnyFolderPriv
 	GType headers_list_type;
 
 	guint folder_changed_id;
-
+	guint headers_managed;
+    
 	GMutex *folder_lock;
 	CamelFolder *folder;
 
@@ -60,6 +61,7 @@ void _tny_folder_set_name (TnyFolder *self, const gchar *name);
 void _tny_folder_set_folder_type (TnyFolder *folder, CamelFolderInfo *folder_info);
 void _tny_folder_set_unread_count (TnyFolder *self, guint len);
 void _tny_folder_set_all_count (TnyFolder *self, guint len);
+void _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv);
 
 #define TNY_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER, TnyFolderPriv))

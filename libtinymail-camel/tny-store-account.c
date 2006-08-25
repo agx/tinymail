@@ -92,7 +92,7 @@ walk_folders_uncache_em (TnyStoreAccountIface *self, TnyListIface *folders)
 		TnyFolderIface *folder = (TnyFolderIface*)tny_iterator_iface_current (iterator);
 		TnyListIface *more_folders = (TnyListIface*)tny_folder_iface_get_folders (folder);
 
-		tny_folder_iface_uncache (folder);
+		/* tny_folder_iface_uncache (folder); */
 
 		if (tny_list_iface_length (more_folders) > 0)
 			walk_folders_uncache_em (self, more_folders);
@@ -400,7 +400,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		g_object_unref (G_OBJECT (inbox)); 
 		g_mutex_unlock (priv->folders_lock);
 
-		tny_folder_iface_uncache (inbox);
+		/* tny_folder_iface_uncache (inbox); */
 		g_signal_emit (inbox, tny_folder_iface_signals [TNY_FOLDER_IFACE_FOLDERS_RELOADED], 0);
 
 		g_mutex_lock (priv->folders_lock);

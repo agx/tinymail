@@ -508,7 +508,8 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 					tny_msg_view_iface_set_msg (TNY_MSG_VIEW_IFACE (msgwin), 
 						TNY_MSG_IFACE (msg));
-			
+					g_object_unref (G_OBJECT (msg));
+				    
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				} else {
 					msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (

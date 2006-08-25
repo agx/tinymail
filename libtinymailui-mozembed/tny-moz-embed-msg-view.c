@@ -110,7 +110,8 @@ reload_msg (TnyMsgViewIface *self)
 	gtk_text_buffer_set_text (buffer, "", 0);
 
 	tny_header_view_iface_set_header (priv->headerview, header);
-
+	g_object_unref (G_OBJECT (header));
+    
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
 	while (!tny_iterator_iface_is_done (iterator))
@@ -194,6 +195,12 @@ tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *he
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
 
+	if (G_LIKELY (priv->msg)) 
+    	{
+		g_object_unref (G_OBJECT (priv->msg));
+		priv->msg = NULL;
+	}
+    
 	gtk_widget_hide (GTK_WIDGET (priv->htmlview));
 	gtk_widget_show (GTK_WIDGET (priv->textview));
 
@@ -204,6 +211,7 @@ tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *he
 	if (header)
 	{
 		tny_header_view_iface_set_header (priv->headerview, header);
+		g_object_unref (G_OBJECT (header));
 		gtk_widget_show (GTK_WIDGET (priv->headerview));
 	} else {
 		gtk_widget_hide (GTK_WIDGET (priv->headerview));
@@ -297,10 +305,10 @@ tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
 	g_return_if_fail (msg);
-
+    
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
-
+    
 	g_object_ref (G_OBJECT (msg));
 	priv->msg = msg;
 

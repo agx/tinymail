@@ -926,7 +926,7 @@ tny_header_list_model_finalize (GObject *object)
 	/* Unreference the folder instance */
 	if (self->folder) 
 	{
-		tny_folder_iface_uncache (self->folder);
+		/* tny_folder_iface_uncache (self->folder); */
 		g_object_unref (G_OBJECT (self->folder));
 		if (self->iterator)
 			g_object_unref (G_OBJECT (self->iterator));
@@ -1010,7 +1010,7 @@ tny_header_list_model_set_folder (TnyHeaderListModel *self, TnyFolderIface *fold
 	/* Unreference the previous folder instance */
 	if (G_LIKELY (self->folder))
 	{
-		tny_folder_iface_uncache (self->folder);
+		/* tny_folder_iface_uncache (self->folder); */
 		g_object_unref (G_OBJECT (self->folder));
 	}
 
