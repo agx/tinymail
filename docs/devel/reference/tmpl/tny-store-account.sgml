@@ -11,7 +11,7 @@ A store account type implemented for camel.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccountIface, #TnyTransportAccountIface, #TnyTransportAccount, #TnyAccount
+#TnyFolderStoreIface, #TnyAccountIface, #TnyTransportAccountIface, #TnyTransportAccount, #TnyAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

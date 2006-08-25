@@ -18,7 +18,7 @@ instances. Depending on the implementation, this will reduce memory usage.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccountIface
+#TnyFolderStoreIface, #TnyStoreAccountIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
