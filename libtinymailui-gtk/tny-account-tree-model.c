@@ -27,6 +27,7 @@
 #include <tny-account-tree-model.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
+#include <tny-folder-store-iface.h>
 
 #include "tny-account-tree-model-priv.h"
 #include "tny-account-tree-model-iterator-priv.h"
@@ -35,53 +36,44 @@ static GObjectClass *parent_class = NULL;
 
 typedef void (*treeaddfunc) (GtkTreeStore *tree_store, GtkTreeIter *iter, GtkTreeIter *parent);
 
+
+
 static void
-fill_treemodel_recursive (TnyAccountTreeModel *self, TnyListIface *folders, GtkTreeIter *parent_iter, TnyStoreAccountIface *account)
+recurse_folders (TnyAccountTreeModel *self, TnyFolderStoreIface *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
 {
+	TnyIteratorIface *iter;
+	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
 
-  if (folders && tny_list_iface_length (folders) > 0)
-  {
-	GtkTreeStore *model = GTK_TREE_STORE (self);
-	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
+	tny_folder_store_iface_get_folders (store, folders, query);
+	iter = tny_list_iface_create_iterator (folders);
 
-	while (!tny_iterator_iface_is_done (iterator))
+	while (!tny_iterator_iface_is_done (iter))
 	{
-		GtkTreeIter iter;
-		TnyFolderIface *folder = (TnyFolderIface*)tny_iterator_iface_current (iterator);
-		TnyListIface *more_folders;
+		GtkTreeStore *model = GTK_TREE_STORE (self);
+		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
+		gint i=0; GtkTreeIter tree_iter;
+	    
+		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
-		more_folders = (TnyListIface*)tny_folder_iface_get_folders (folder);
-
-		gtk_tree_store_append (model, &iter, parent_iter);
-
- 		gtk_tree_store_set (model, &iter,
+ 		gtk_tree_store_set (model, &tree_iter,
 			TNY_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
-			tny_folder_iface_get_name (folder),
+			tny_folder_iface_get_name (TNY_FOLDER_IFACE (folder)),
 			TNY_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 
-			tny_folder_iface_get_unread_count (folder),
+			tny_folder_iface_get_unread_count (TNY_FOLDER_IFACE (folder)),
 			TNY_ACCOUNT_TREE_MODEL_TYPE_COLUMN,
-			tny_folder_iface_get_folder_type (folder),
+			tny_folder_iface_get_folder_type (TNY_FOLDER_IFACE (folder)),
 			TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
+	    
+		recurse_folders (self, folder, query, &tree_iter);
+	    
+ 		g_object_unref (G_OBJECT (folder));
 
-		/* TODO: Observe the FOLDERS_RELOADED signal and add 
-		   to the model if a subfolder got added or subscribed */
-
-		/* g_signal_connect (G_OBJECT (folder), "folders_reloaded",
-			G_CALLBACK (folders_reloaded), self+account); */
-
-		/* tny_folder_iface_uncache (folder); */
-
-		if (tny_list_iface_length (more_folders) > 0)
-			fill_treemodel_recursive (self, more_folders, &iter, account);
-
-		g_object_unref (G_OBJECT(folder));
-		
-		tny_iterator_iface_next (iterator);
+		tny_iterator_iface_next (iter);	    
 	}
 
-	g_object_unref (G_OBJECT (iterator));
-  }
+	g_object_unref (G_OBJECT (iter));
+	g_object_unref (G_OBJECT (folders));
 }
 
 
@@ -89,11 +81,8 @@ static void
 tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *account, treeaddfunc func)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	TnyListIface *folders;
+	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
 	GtkTreeIter name_iter;
-
-	folders = tny_store_account_iface_get_folders (account, 
-		TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
 
 	func (model, &name_iter, NULL);
 
@@ -105,9 +94,10 @@ tny_account_tree_model_add (TnyAccountTreeModel *self, TnyStoreAccountIface *acc
 		TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 		NULL, -1);
 
-	fill_treemodel_recursive (self, (TnyListIface*)folders, 
-		&name_iter, account);
+	recurse_folders (self, TNY_FOLDER_STORE_IFACE (account), NULL, &name_iter);
 
+    	g_object_unref (G_OBJECT (folders));
+    
 	return;
 }
 

@@ -1,5 +1,10 @@
 08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* libtinymailui-gtk/tny-account-tree-model.c: Reimplemented using the
+	new TnyFolderStoreIface API
+
+08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Speedup the new get-folders API by caching the CamelFolderStore
 
 08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
