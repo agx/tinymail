@@ -101,6 +101,8 @@ tny_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
 	GtkWidget *label2, *label3, *label4, *label1;
 
+    	priv->header = NULL;
+    
 	gtk_table_set_homogeneous (GTK_TABLE (self), FALSE);
 	gtk_table_resize (GTK_TABLE (self), 4, 2);
 

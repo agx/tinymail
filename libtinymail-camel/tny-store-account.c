@@ -430,7 +430,7 @@ tny_store_account_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolder
 		g_mutex_unlock (priv->folders_lock);
 	}
 
-
+	camel_object_unref (CAMEL_OBJECT (store)); 
 	return retval;
 }
 
@@ -454,6 +454,8 @@ tny_store_account_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 	/* Sync */
 	_tny_folder_set_subscribed (TNY_FOLDER (folder), TRUE);
 
+    	camel_object_unref (CAMEL_OBJECT (store));
+    
 	return;
 }
 
@@ -477,6 +479,8 @@ tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folde
 	/* Sync */
 	_tny_folder_set_subscribed (TNY_FOLDER (folder), FALSE);
 
+	camel_object_unref (CAMEL_OBJECT (store));
+    
 	return;
 }
 
@@ -538,6 +542,7 @@ tny_store_account_finalize (GObject *object)
 	g_list_free (priv->managed_folders);
     
 	camel_store_free_folder_info (priv->iter_store, priv->iter);
+	camel_object_unref (CAMEL_OBJECT (priv->iter_store));
     
 	g_mutex_free (priv->folders_lock);
 

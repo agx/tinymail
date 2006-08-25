@@ -110,7 +110,6 @@ reload_msg (TnyMsgViewIface *self)
 	gtk_text_buffer_set_text (buffer, "", 0);
 
 	tny_header_view_iface_set_header (priv->headerview, header);
-	g_object_unref (G_OBJECT (header));
     
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
@@ -211,7 +210,7 @@ tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *he
 	if (header)
 	{
 		tny_header_view_iface_set_header (priv->headerview, header);
-		g_object_unref (G_OBJECT (header));
+	    
 		gtk_widget_show (GTK_WIDGET (priv->headerview));
 	} else {
 		gtk_widget_hide (GTK_WIDGET (priv->headerview));
