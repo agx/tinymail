@@ -22,6 +22,25 @@
 #include <tny-msg-view-iface.h>
 
 
+/**
+ * tny_msg_view_iface_clear:
+ * @self: A #TnyMsgViewIface instance
+ *
+ * Clear the view (show nothing)
+ * 
+ **/
+void
+tny_msg_view_iface_clear (TnyMsgViewIface *self)
+{
+#ifdef DEBUG
+	if (!TNY_MSG_VIEW_IFACE_GET_CLASS (self)->clear_func)
+		g_critical ("You must implement tny_msg_view_iface_clear\n");
+#endif
+
+	TNY_MSG_VIEW_IFACE_GET_CLASS (self)->clear_func (self);
+	return;
+}
+
 
 /**
  * tny_msg_view_iface_set_unavailable:

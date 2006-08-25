@@ -62,22 +62,26 @@ static void
 tny_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
 {
 	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
-	gchar *str;
 
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
-	g_object_ref (G_OBJECT (header)); 
+    
+	if (header)
+	{
+	    	gchar *str;
+		g_object_ref (G_OBJECT (header)); 
 
-	priv->header = header;
+		priv->header = header;
 
-	gtk_label_set_text (GTK_LABEL (priv->to_label), tny_header_iface_get_to (header));
-	gtk_label_set_text (GTK_LABEL (priv->from_label), tny_header_iface_get_from (header));
-	gtk_label_set_text (GTK_LABEL (priv->subject_label), tny_header_iface_get_subject (header));
+		gtk_label_set_text (GTK_LABEL (priv->to_label), tny_header_iface_get_to (header));
+		gtk_label_set_text (GTK_LABEL (priv->from_label), tny_header_iface_get_from (header));
+		gtk_label_set_text (GTK_LABEL (priv->subject_label), tny_header_iface_get_subject (header));
 
-	str = _get_readable_date (tny_header_iface_get_date_sent (header));
-	gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);
-	g_free (str);
-
+		str = _get_readable_date (tny_header_iface_get_date_sent (header));
+		gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);
+		g_free (str);
+	} else priv->header = NULL;
+    
 	return;
 }
 

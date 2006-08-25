@@ -1,5 +1,11 @@
 08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Added the tny_msg_view_iface_clear API
+
+	* This was a major API change
+
+08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* libtinymailui-gtk/tny-account-tree-model.c: Reimplemented using the
 	new TnyFolderStoreIface API
 

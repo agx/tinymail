@@ -304,17 +304,30 @@ tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
-	g_return_if_fail (msg);
     
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
     
-	g_object_ref (G_OBJECT (msg));
-	priv->msg = msg;
+    	if (msg)
+	{
+		g_object_ref (G_OBJECT (msg));
+		priv->msg = msg;
+		reload_msg (self);
+	}
+}
 
-	reload_msg (self);
+static void
+tny_moz_embed_msg_view_clear (TnyMsgViewIface *self)
+{
+	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
-	return;
+    	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
+	gtk_widget_hide (priv->attachview_sw);
+	gtk_text_buffer_set_text (buffer, "", 0);
+	tny_header_view_iface_set_header (priv->headerview, NULL);
+	gtk_widget_hide (GTK_WIDGET (priv->headerview));
+    
+    	return;
 }
 
 /**
@@ -439,6 +452,7 @@ tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_msg_func = tny_moz_embed_msg_view_set_msg;
 	klass->set_save_strategy_func = tny_mozembed_msg_view_set_save_strategy;
 	klass->set_unavailable_func = tny_mozembed_msg_view_set_unavailable;
+	klass->clear_func = tny_moz_embed_msg_view_clear;
 
 	return;
 }

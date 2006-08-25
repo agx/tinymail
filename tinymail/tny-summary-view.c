@@ -112,7 +112,9 @@ reload_accounts (TnySummaryViewPriv *priv)
 	if (G_UNLIKELY (!empty_model))
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new (1, G_TYPE_STRING));
 	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
-
+	
+    	tny_msg_view_iface_clear (priv->msg_view);
+    
 	if (priv->current_accounts)
 	{
 		g_object_unref (G_OBJECT (priv->current_accounts));
