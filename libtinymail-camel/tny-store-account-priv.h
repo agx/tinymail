@@ -24,8 +24,6 @@ typedef struct _TnyStoreAccountPriv TnyStoreAccountPriv;
 
 struct _TnyStoreAccountPriv
 {
-	GMutex *folders_lock;
-	TnyListIface *folders, *ufolders;
 	CamelStore *iter_store;
 	CamelFolderInfo *iter;
 	GList *managed_folders;

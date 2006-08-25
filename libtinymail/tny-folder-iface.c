@@ -259,30 +259,6 @@ tny_folder_iface_set_account (TnyFolderIface *self, TnyAccountIface *account)
 	return;
 }
 
-/**
- * tny_folder_iface_get_folders:
- * @self: a TnyFolderIface object
- *
- * WARNING: This API might soon change.
- * 
- * Get the child folders of this folder. You should not tamper with the 
- * resulting #TnyListIface instance (it's read-only).
- * 
- * TODO: refactor this
- *
- * Return value: A read-only #TnyListIface with #TnyFolderIface instances
- **/
-TnyListIface*
-tny_folder_iface_get_folders (TnyFolderIface *self)
-{
-#ifdef DEBUG
-	if (!TNY_FOLDER_IFACE_GET_CLASS (self)->get_folders_func)
-		g_critical ("You must implement tny_folder_iface_get_folders\n");
-#endif
-
-	return TNY_FOLDER_IFACE_GET_CLASS (self)->get_folders_func (self);
-}
-
 
 /**
  * tny_folder_iface_get_message:

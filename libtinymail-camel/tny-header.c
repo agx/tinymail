@@ -427,14 +427,18 @@ static void
 tny_header_finalize (GObject *object)
 {
 	TnyHeader *self = (TnyHeader*) object;
-	TnyFolderPriv *fpriv = TNY_FOLDER_GET_PRIVATE (self->folder);
-    
-    	fpriv->headers_managed--;
-    	_tny_folder_check_uncache (((TnyFolder*)self->folder), fpriv);
     
 	if (G_UNLIKELY (self->write))
 	{
 		destroy_write (self);
+	}
+    
+    	if (self->folder)
+    	{
+	    	TnyFolderPriv *fpriv = TNY_FOLDER_GET_PRIVATE (self->folder);
+
+	       	fpriv->headers_managed--;
+    		_tny_folder_check_uncache (((TnyFolder*)self->folder), fpriv);
 	}
 
 	/* Normally we do camel_folder_free_message_info here, but we already got

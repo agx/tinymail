@@ -20,6 +20,7 @@
 
 #include <tny-account-iface-test.h>
 #include <tny-account-iface.h>
+#include <tny-folder-store-iface.h>
 
 #include <tny-store-account.h>
 #include <tny-list-iface.h>
@@ -80,16 +81,18 @@ tny_account_iface_test_teardown (void)
 static void
 tny_store_account_iface_test_get_folders (void)
 {
-    	TnyListIface *root_folders;
+    	TnyListIface *folders = (tny_list_new());
     
       	if (!online_tests)
 	    	return;
     
-    	root_folders = tny_store_account_iface_get_folders (TNY_STORE_ACCOUNT_IFACE (iface), 
-				TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
-    
-    	gunit_fail_unless (tny_list_iface_length (root_folders) == 1, 
+    	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (iface),
+			folders, NULL);
+        
+    	gunit_fail_unless (tny_list_iface_length (folders) == 1, 
 		"Account should have at least an inbox folder\n");
+    
+    	g_object_unref (G_OBJECT (folders));
     
     	return;
 }

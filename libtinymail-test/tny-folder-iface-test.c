@@ -21,7 +21,7 @@
 #include <tny-folder-iface-test.h>
 #include <tny-folder-iface.h>
 #include <tny-folder.h>
-
+#include <tny-folder-store-iface.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 #include <tny-list.h>
@@ -34,7 +34,7 @@
 
 static TnyFolderIface *iface = NULL;
 static TnyAccountStoreIface *account_store;
-static TnyListIface *accounts, *root_folders;
+static TnyListIface *accounts;
 static TnyStoreAccountIface *account;
 static TnyIteratorIface *aiter;
 static gchar *str;
@@ -48,56 +48,31 @@ do_test_folder (TnyFolderIface *folder)
 }
 
 
-static void 
-recursive_walk_subfolders (TnyFolderIface *parent, const gchar *folname, performer func)
+static void
+recurse_folders (TnyFolderStoreIface *store, TnyFolderStoreQuery *query, const gchar *folname, performer func)
 {
-    TnyListIface *folders = tny_folder_iface_get_folders (parent);
-    if (folders)
-    {
-	    TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
-	    
-	    while (!tny_iterator_iface_is_done (iterator))
-	    {
-		TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (iterator));
-								
-		if (!strcmp (tny_folder_iface_get_id (folder), folname))
-			func (folder);
-		
-		recursive_walk_subfolders (folder, folname, func);
-		
-		g_object_unref (G_OBJECT (folder));
-		tny_iterator_iface_next (iterator);
-	    }
-	    
-	    g_object_unref (G_OBJECT (iterator));
-    }
-    
-    return;
-}
+	TnyIteratorIface *iter;
+	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
 
-static void 
-mem_test_folder (TnyListIface *root_folders, const gchar *folname, performer func)
-{
-    	TnyIteratorIface *fiter;
+	tny_folder_store_iface_get_folders (store, folders, query);
+	iter = tny_list_iface_create_iterator (folders);
 
-	fiter = tny_list_iface_create_iterator (root_folders);
-	tny_iterator_iface_first (fiter);
-	    
-	while (!tny_iterator_iface_is_done (fiter))
+	while (!tny_iterator_iface_is_done (iter))
 	{
-	    TnyFolderIface *folder = TNY_FOLDER_IFACE (tny_iterator_iface_current (fiter));
-		    		    
-	    if (!strcmp (tny_folder_iface_get_id (folder), folname))
-		func (folder);
+		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
 
-	    recursive_walk_subfolders (folder, folname, func);
-		    
-	    g_object_unref (G_OBJECT (folder));
-	    tny_iterator_iface_next (fiter);
+		if (!strcmp (tny_folder_iface_get_id (TNY_FOLDER_IFACE (folder)), folname))
+			func (TNY_FOLDER_IFACE (folder));
+	    
+		recurse_folders (folder, query, folname, func);
+	    
+ 		g_object_unref (G_OBJECT (folder));
+
+		tny_iterator_iface_next (iter);	    
 	}
-	g_object_unref (G_OBJECT (fiter));
-    
-	return;
+
+	 g_object_unref (G_OBJECT (iter));
+	 g_object_unref (G_OBJECT (folders));
 }
 
 static void
@@ -111,12 +86,8 @@ tny_folder_iface_test_setup (void)
 	tny_iterator_iface_first (aiter);
 	account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
 	
-    	root_folders = tny_store_account_iface_get_folders (account, 
-				TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED);
-    
-	if (root_folders)
-	    	mem_test_folder (root_folders, "INBOX/tny-folder-iface-test", do_test_folder);
-    
+	recurse_folders (TNY_FOLDER_STORE_IFACE (account), NULL, "INBOX/tny-folder-iface-test", do_test_folder);
+
  	if (iface)
 	    	g_object_ref (G_OBJECT (iface));
     

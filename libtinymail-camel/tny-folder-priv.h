@@ -42,8 +42,6 @@ struct _TnyFolderPriv
 	gchar *folder_name;
 	TnyAccountIface *account;
 
-	GMutex *folders_lock;
-	TnyListIface *folders;
 	guint cached_length, unread_length;
 
 	gboolean subscribed;

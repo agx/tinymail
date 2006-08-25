@@ -202,21 +202,6 @@ _tny_folder_get_camel_folder (TnyFolderIface *self)
 	return retval;
 }
 
-static TnyListIface*
-tny_folder_get_folders (TnyFolderIface *self)
-{
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-	TnyListIface *retval;
-
-	g_mutex_lock (priv->folder_lock);
-	if (!priv->folders)
-		priv->folders = _tny_folder_list_new (self);
-	retval = (TnyListIface*)priv->folders;
-	g_mutex_unlock (priv->folder_lock);
-
-	return retval;
-}
-
 
 static gboolean
 tny_folder_get_subscribed (TnyFolderIface *self)
@@ -837,7 +822,6 @@ tny_folder_finalize (GObject *object)
 	TnyFolder *self = (TnyFolder*) object;
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
-	g_mutex_lock (priv->folders_lock);
 	g_mutex_lock (priv->folder_lock);
 
     	if (priv->account)
@@ -846,18 +830,12 @@ tny_folder_finalize (GObject *object)
 		apriv->managed_folders = g_list_remove (apriv->managed_folders, self);
 	}
     
-	if (!priv->iter_parented)
+	if (!priv->iter_parented && priv->iter)
 	{
     		CamelStore *store = (CamelStore*) _tny_account_get_service (TNY_ACCOUNT (priv->account));
 		camel_store_free_folder_info (store, priv->iter);
 	}
-    
-	if (G_LIKELY (priv->folders))
-	{
-		g_object_unref (G_OBJECT (priv->folders));
-		priv->folders = NULL;
-	}
-
+   
 	unload_folder_no_lock (priv, TRUE);
 
 	if (G_LIKELY (priv->folder))
@@ -872,13 +850,10 @@ tny_folder_finalize (GObject *object)
 
 
 	g_mutex_unlock (priv->folder_lock);
-	g_mutex_unlock (priv->folders_lock);
 
 	g_mutex_free (priv->folder_lock);
 	priv->folder_lock = NULL;
 
-	g_mutex_free (priv->folders_lock);
-	priv->folders_lock = NULL;
 
 	(*parent_class->finalize) (object);
 
@@ -930,7 +905,6 @@ tny_folder_iface_init (gpointer g_iface, gpointer iface_data)
 	klass->set_name_func = tny_folder_set_name;
 	klass->get_name_func = tny_folder_get_name;
 	klass->get_folder_type_func = tny_folder_get_folder_type;
-	klass->get_folders_func = tny_folder_get_folders;
 	klass->get_unread_count_func = tny_folder_get_unread_count;
 	klass->get_all_count_func = tny_folder_get_all_count;
 	klass->get_account_func = tny_folder_get_account;
@@ -1006,7 +980,7 @@ _tny_folder_set_iter (TnyFolder *folder, CamelFolderInfo *iter)
 
 
 static void 
-tny_folder_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
+tny_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyStoreAccountPriv *apriv = TNY_STORE_ACCOUNT_GET_PRIVATE (priv->account);
@@ -1022,8 +996,6 @@ tny_folder_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, Tn
 	} 
     
 	iter = priv->iter;
-    
-	/* TODO : reuse iter from TnyStoreAccount */
     
     	if (iter)
 	{			
@@ -1068,7 +1040,7 @@ tny_folder_store_iface_init (gpointer g_iface, gpointer iface_data)
 
 	klass->remove_folder_func = tny_folder_remove_folder;
 	klass->create_folder_func = tny_folder_create_folder;
-	klass->get_folders_func = tny_folder_get_folders_thenew;
+	klass->get_folders_func = tny_folder_get_folders;
 	klass->get_folders_async_func = tny_folder_get_folders_async;
 					
     	return;
@@ -1101,9 +1073,7 @@ tny_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->loaded = FALSE;
 	priv->folder_changed_id = 0;
 	priv->folder = NULL;
-	priv->folders = NULL;
 	priv->folder_lock = g_mutex_new ();
-	priv->folders_lock = g_mutex_new ();
 	priv->cached_name = NULL;
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 	

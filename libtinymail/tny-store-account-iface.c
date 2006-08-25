@@ -67,29 +67,6 @@ tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyFolderIface *f
 	return;
 }
 
-/**
- * tny_store_account_iface_get_folders:
- * @self: a #TnyStoreAccountIface object
- * @type: Either all or only subscribed folders
- * 
- * WARNING: This API might soon change
- *
- * Get the folders of a storage account
- * 
- * Return value: A read-only #TnyListIface which contains #TnyFolderIface instances
- *
- **/
-TnyListIface*
-tny_store_account_iface_get_folders (TnyStoreAccountIface *self, TnyStoreAccountFolderType type)
-{
-#ifdef DEBUG
-	if (!TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func)
-		g_critical ("You must implement tny_store_account_iface_get_folders\n");
-#endif
-
-	return TNY_STORE_ACCOUNT_IFACE_GET_CLASS (self)->get_folders_func (self, type);
-}
-
 
 static void
 tny_store_account_iface_base_init (gpointer g_class)
