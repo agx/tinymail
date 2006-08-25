@@ -589,9 +589,12 @@ tny_store_account_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *l
 			apriv->url_string, &ex);
 	CamelFolderInfo *iter;
 	guint32 flags;
-    
+    		
 	flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 		CAMEL_STORE_FOLDER_INFO_RECURSIVE;
+
+       	if (!camel_session_is_online ((CamelSession*) apriv->session))
+		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
 	iter = camel_store_get_folder_info (store, "", flags, &ex);
         priv->iter = iter;
