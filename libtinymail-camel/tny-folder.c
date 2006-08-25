@@ -899,10 +899,8 @@ tny_folder_has_cache (TnyFolderIface *self)
 void 
 _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv)
 {
-	if (priv->headers_managed == 0) {
+	if (priv->headers_managed == 0)
 		tny_folder_uncache (TNY_FOLDER_IFACE (self));
-	    printf ("UNCACHED\n");
-	}
 }
 
 
