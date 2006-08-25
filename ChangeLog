@@ -1,13 +1,19 @@
 08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Lots of files: Removed the tny_folder_iface_uncache API and replaced it 
-	with a detection mechanism that automates this. It will now uncache the folder
-	once there's no more header instances of that folder being referenced.
+	* Speedup the new get-folders API by caching the CamelFolderStore
 
-	This indeed means that the reference counting of the headers must be carefully
-	monitored and absolutely correct. Some of the changes of this commit included
-	fixes for this. For example the reparenting of the header instance didn't
-	happen in the TnyMsgViewIface implementations in ui-gtk and ui-mozembed.
+08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Lots of files: Removed the tny_folder_iface_uncache API and replaced 
+	it with a detection mechanism that automates this. It will now uncache 
+	the folder once there's no more header instances of that folder being 
+	referenced.
+
+	This indeed means that the reference counting of the headers must be 
+	carefully monitored and absolutely correct. Some of the changes of this
+	commit included fixes for this. For example the reparenting of the 
+	header instance didn't happen in the TnyMsgViewIface implementations in
+	ui-gtk and ui-mozembed.
 
 	* This was a major API change
 	
@@ -15,12 +21,13 @@
 
 	* libtinymail-camel/tny-camel-common.c, 
 	libtinymail-camel/tny-folder.c, libtinymail-camel/tny-store-account.c,
-	libtinymail-camel/tny-camel-common-priv.h, libtinymail-camel/tny-folder-priv.h,
-	tests/functional/folder-lister.c, libtinymail/tny-store-account-iface.c,
-	libtinymail/tny-shared.h, libtinymail/tny-folder-store-query.c,
-	libtinymail/tny-folder-store-iface.c, libtinymail/tny-folder-store-query.h,
-	libtinymail/tny-folder-store-iface.h, libtinymail/Makefile.am,
-	libtinymail/tny-folder-iface.c: The new get-folders API
+	libtinymail-camel/tny-camel-common-priv.h, libtinymail-camel/
+	tny-folder-priv.h, tests/functional/folder-lister.c, libtinymail/
+	tny-store-account-iface.c, libtinymail/tny-shared.h, libtinymail/
+	tny-folder-store-query.c, libtinymail/tny-folder-store-iface.c, 
+	libtinymail/tny-folder-store-query.h, libtinymail/tny-folder-store-
+	iface.h, libtinymail/Makefile.am, libtinymail/tny-folder-iface.c: 
+	The new get-folders API
 
 	* This was a major API change
 
@@ -62,8 +69,8 @@
 
 07-30-2006  James Livingston <doclivingston@gmail.com>
 
-	* bindings/python/tinymail.override: Sequence protocol, initial pieces of 
-	implementation
+	* bindings/python/tinymail.override: Sequence protocol, initial pieces 
+	of implementation
 
 07-29-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -75,8 +82,9 @@
 
 	* bindings/python/*: Some fixes for the Python bindings
 	* libtinymailui-gtk/tny-account-tree-model-priv.h, libtinymailui-gtk/
-	tny-account-tree-model.h, libtinymailui-gtk/ tny-header-list-model-priv.h: 
-	Forward typedefs don't work well with the python binding generator
+	tny-account-tree-model.h, libtinymailui-gtk/ tny-header-list-model
+	-priv.h: Forward typedefs don't work well with the python binding 
+	generator
 
 07-29-2006  Gustavo J. A. M. Carneiro <gjc@inescporto.pt>
 

@@ -62,10 +62,6 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-shared.h>
 #include <tny-account-store-iface.h>
 
-#define TNY_STORE_ACCOUNT_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
-
-
 
 static void
 report_error (TnyAccountPriv *priv)
@@ -511,10 +507,24 @@ tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	apriv->connected = FALSE;
 	priv->folders_lock = g_mutex_new ();
 	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
-
+	priv->managed_folders = NULL;
+    
 	return;
 }
 
+static void
+foreach_managed_folder (gpointer data, gpointer user_data)
+{
+	if (data && TNY_IS_FOLDER (data))
+	{
+		TnyFolder *folder = (TnyFolder*) data;
+
+		TNY_FOLDER_GET_PRIVATE (folder)->iter = NULL;
+		TNY_FOLDER_GET_PRIVATE (folder)->iter_parented = FALSE;
+	}
+    
+	return;
+}
 
 static void
 tny_store_account_finalize (GObject *object)
@@ -523,7 +533,12 @@ tny_store_account_finalize (GObject *object)
 	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
 
 	tny_store_account_clear_folders (priv);
-
+    
+ 	g_list_foreach (priv->managed_folders, foreach_managed_folder, self);
+	g_list_free (priv->managed_folders);
+    
+	camel_store_free_folder_info (priv->iter_store, priv->iter);
+    
 	g_mutex_free (priv->folders_lock);
 
 	(*parent_class->finalize) (object);
@@ -563,17 +578,20 @@ static void
 tny_store_account_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
 {
     	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);    
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
-
 	CamelStore *store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
-    
 	CamelFolderInfo *iter;
-
-	iter = camel_store_get_folder_info (store, "", 0, &ex);
-        
-    	/* TODO : cache iter for TnyFolders and give the iter->child to it */
+	guint32 flags;
     
+	flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
+		CAMEL_STORE_FOLDER_INFO_RECURSIVE;
+
+	iter = camel_store_get_folder_info (store, "", flags, &ex);
+        priv->iter = iter;
+	priv->iter_store = store;
+
     	if (iter)
     	{
 	  while (iter && _tny_folder_store_query_passes (query, iter))
@@ -585,14 +603,16 @@ tny_store_account_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *l
 		_tny_folder_set_unread_count (folder, iter->unread);
 		_tny_folder_set_all_count (folder, iter->total);
 		_tny_folder_set_name (folder, iter->name);
-
+		_tny_folder_set_iter (folder, iter);
+		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+	      
     		tny_folder_iface_set_account (TNY_FOLDER_IFACE (folder), 
 			TNY_ACCOUNT_IFACE (self));
 
 	    	tny_list_iface_prepend (list, G_OBJECT (folder));
 		iter = iter->next;
 	  }
-	  camel_store_free_folder_info (store, iter);
+	  
 	}
     
 	return;

@@ -26,7 +26,12 @@ struct _TnyStoreAccountPriv
 {
 	GMutex *folders_lock;
 	TnyListIface *folders, *ufolders;
+	CamelStore *iter_store;
+	CamelFolderInfo *iter;
+	GList *managed_folders;
 };
 
+#define TNY_STORE_ACCOUNT_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
 
 #endif

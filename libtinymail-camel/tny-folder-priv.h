@@ -48,7 +48,10 @@ struct _TnyFolderPriv
 
 	gboolean subscribed;
 	gboolean has_summary_cap;
-
+    
+	CamelFolderInfo *iter;
+	gboolean iter_parented;
+    
 	gchar *cached_name;
 	TnyFolderType cached_folder_type;
 };
@@ -62,6 +65,7 @@ void _tny_folder_set_folder_type (TnyFolder *folder, CamelFolderInfo *folder_inf
 void _tny_folder_set_unread_count (TnyFolder *self, guint len);
 void _tny_folder_set_all_count (TnyFolder *self, guint len);
 void _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv);
+void _tny_folder_set_iter (TnyFolder *folder, CamelFolderInfo *iter);
 
 #define TNY_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER, TnyFolderPriv))
