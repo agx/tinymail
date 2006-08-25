@@ -1007,6 +1007,7 @@ static void
 tny_folder_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyStoreAccountPriv *apriv = TNY_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 	CamelFolderInfo *iter;
 
 	if (!priv->iter && priv->iter_parented)
@@ -1035,6 +1036,8 @@ tny_folder_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *list, Tn
 		_tny_folder_set_all_count (folder, iter->total);
 		_tny_folder_set_name (folder, iter->name);
 		_tny_folder_set_iter (folder, iter);
+		
+		apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
 		
     		tny_folder_iface_set_account (TNY_FOLDER_IFACE (folder), 
 			TNY_ACCOUNT_IFACE (priv->account));

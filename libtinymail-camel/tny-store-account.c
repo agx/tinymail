@@ -604,6 +604,7 @@ tny_store_account_get_folders_thenew (TnyFolderStoreIface *self, TnyListIface *l
 		_tny_folder_set_all_count (folder, iter->total);
 		_tny_folder_set_name (folder, iter->name);
 		_tny_folder_set_iter (folder, iter);
+	      
 		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
 	      
     		tny_folder_iface_set_account (TNY_FOLDER_IFACE (folder), 
