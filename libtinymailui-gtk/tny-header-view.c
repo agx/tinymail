@@ -80,7 +80,8 @@ tny_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
 		str = _get_readable_date (tny_header_iface_get_date_sent (header));
 		gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);
 		g_free (str);
-	} else priv->header = NULL;
+	} else 
+		priv->header = NULL;
     
 	return;
 }
