@@ -107,7 +107,6 @@ Shared include file with forward typedefs
 @folders_reloaded: 
 @remove_message_func: 
 @expunge_func: 
-@get_folders_func: 
 @get_message_func: 
 @get_headers_func: 
 @get_name_func: 
@@ -118,8 +117,6 @@ Shared include file with forward typedefs
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
-@uncache_func: 
-@has_cache_func: 
 @set_subscribed_func: 
 @get_subscribed_func: 
 @refresh_async_func: 
@@ -248,7 +245,6 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_folders_func: 
 @subscribe_func: 
 @unsubscribe_func: 
 
@@ -422,6 +418,69 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when n
 </para>
 
 @parent: 
+
+<!-- ##### STRUCT TnyFolderStoreIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderStoreIfaceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@remove_folder_func: 
+@create_folder_func: 
+@get_folders_func: 
+@get_folders_async_func: 
+
+<!-- ##### STRUCT TnyFolderStoreQuery ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderStoreQueryClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyFolderStoreQueryItem ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderStoreQueryItemClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyGetFoldersStatusCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@status: 
+@user_data: 
+
 
 <!-- ##### MACRO G_LIKELY ##### -->
 <para>

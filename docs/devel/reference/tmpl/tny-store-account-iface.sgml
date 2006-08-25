@@ -32,16 +32,6 @@ A store account contains the folders of an E-mail service and handles the authen
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_store_account_iface_get_folders ##### -->
-<para>
-
-</para>
-
-@self: 
-@type: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_store_account_iface_subscribe ##### -->
 <para>
 

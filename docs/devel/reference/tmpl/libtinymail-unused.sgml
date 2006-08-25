@@ -204,6 +204,25 @@ TnySummaryWindow
 @tnydeviceiface: the object which received the signal.
 @arg1: 
 
+<!-- ##### STRUCT TnyFolderList ##### -->
+<para>
+
+</para>
+
+@parent: 
+@iterator_lock: 
+@first: 
+@pfolder: 
+
+<!-- ##### STRUCT TnyFolderListIterator ##### -->
+<para>
+
+</para>
+
+@parent: 
+@model: 
+@current: 
+
 <!-- ##### STRUCT TnyFolderProxy ##### -->
 <para>
 
@@ -463,6 +482,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_folder_iface_get_folders ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
 <para>
 
@@ -470,6 +497,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @id: 
+
+<!-- ##### FUNCTION tny_folder_iface_uncache ##### -->
+<para>
+
+</para>
+
+@self: 
 
 <!-- ##### FUNCTION tny_header_iface_set_folder ##### -->
 <para>
@@ -1033,6 +1067,15 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 </para>
 
+@Returns: 
+
+<!-- ##### FUNCTION tny_store_account_iface_get_folders ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
 @Returns: 
 
 <!-- ##### FUNCTION tny_summary_window_new ##### -->

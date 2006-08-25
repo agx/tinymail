@@ -1,0 +1,63 @@
+<!-- ##### SECTION Title ##### -->
+TnyFolderStoreIface
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION tny_folder_store_iface_remove_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+
+<!-- ##### FUNCTION tny_folder_store_iface_create_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_store_iface_get_folders ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
+@query: 
+
+
+<!-- ##### FUNCTION tny_folder_store_iface_get_folders_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
+@callback: 
+@statuscb: 
+@query: 
+@user_data: 
+
+

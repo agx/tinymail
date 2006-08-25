@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyFolderList
+TnyDevice
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,11 +9,28 @@ TnyFolderList
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyDevice ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### FUNCTION tny_device_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 

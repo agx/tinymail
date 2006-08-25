@@ -81,3 +81,10 @@ tny-account-store-iface-test.xml
 tny-folder.xml
 tny-folder-list-iterator-priv.xml
 tny-folder-priv.xml
+tny-folder-store-iface.xml
+tny-header-priv.xml
+platfact.xml
+device.xml
+device-priv.xml
+tny-folder-store-query.xml
+account-store.xml

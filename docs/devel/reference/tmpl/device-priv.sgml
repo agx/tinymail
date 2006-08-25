@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyFolderList
+device-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,11 +9,29 @@ TnyFolderList
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyDevicePriv ##### -->
+<para>
+
+</para>
+
+@forced: 
+@fset: 
+
+<!-- ##### MACRO TNY_DEVICE_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
 
 

@@ -62,15 +62,6 @@ instances. Depending on the implementation, this will reduce memory usage.
 @self: 
 
 
-<!-- ##### FUNCTION tny_folder_iface_get_folders ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_folder_iface_get_message ##### -->
 <para>
 
@@ -161,14 +152,6 @@ instances. Depending on the implementation, this will reduce memory usage.
 
 @self: 
 @Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_iface_uncache ##### -->
-<para>
-
-</para>
-
-@self: 
 
 
 <!-- ##### FUNCTION tny_folder_iface_set_subscribed ##### -->

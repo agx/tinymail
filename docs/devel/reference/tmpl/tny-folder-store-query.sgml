@@ -1,0 +1,141 @@
+<!-- ##### SECTION Title ##### -->
+TnyFolderStoreQuery
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_TYPE_FOLDER_STORE_QUERY_ITEM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_FOLDER_STORE_QUERY_ITEM ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO TNY_FOLDER_STORE_QUERY_ITEM_CLASS ##### -->
+<para>
+
+</para>
+
+@vtable: 
+
+
+<!-- ##### MACRO TNY_IS_FOLDER_STORE_QUERY_ITEM ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO TNY_IS_FOLDER_STORE_QUERY_ITEM_CLASS ##### -->
+<para>
+
+</para>
+
+@vtable: 
+
+
+<!-- ##### MACRO TNY_FOLDER_STORE_QUERY_ITEM_GET_CLASS ##### -->
+<para>
+
+</para>
+
+@inst: 
+
+
+<!-- ##### STRUCT TnyFolderStoreQueryItem ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderStoreQuery ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_folder_store_query_item_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_store_query_option_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_store_query_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_store_query_add_item ##### -->
+<para>
+
+</para>
+
+@query: 
+@pattern: 
+@options: 
+
+
+<!-- ##### FUNCTION tny_folder_store_query_get_items ##### -->
+<para>
+
+</para>
+
+@query: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_store_query_item_get_options ##### -->
+<para>
+
+</para>
+
+@item: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_store_query_item_get_regex ##### -->
+<para>
+
+</para>
+
+@item: 
+@Returns: 
+
+

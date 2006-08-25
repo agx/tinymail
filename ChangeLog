@@ -1,5 +1,10 @@
 08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Further upgraded to the new get-folders API
+	* Updated the API documentation
+
+08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Added the tny_msg_view_iface_clear API
 
 	* This was a major API change

@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyFolderList
+TnyPlatformFactory
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,11 +9,27 @@ TnyFolderList
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyPlatformFactory ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 

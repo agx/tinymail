@@ -6,6 +6,8 @@
 <!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
 <!ENTITY libtinymail-TnyAccountIface SYSTEM "xml/tny-account-iface.xml">
 <!ENTITY libtinymail-TnyStoreAccountIface SYSTEM "xml/tny-store-account-iface.xml">
+<!ENTITY libtinymail-TnyFolderStoreIface SYSTEM "xml/tny-folder-store-iface.xml">
+<!ENTITY libtinymail-TnyFolderStoreQuery SYSTEM "xml/tny-folder-store-query.xml">
 <!ENTITY libtinymail-TnyTransportAccountIface SYSTEM "xml/tny-transport-account-iface.xml">
 <!ENTITY libtinymail-TnyAccountStoreIface SYSTEM "xml/tny-account-store-iface.xml">
 <!ENTITY libtinymail-TnyHeaderIface SYSTEM "xml/tny-header-iface.xml">
@@ -92,6 +94,8 @@
 		<title>libtinymail</title>
 		&libtinymail-Shared;		
 		&libtinymail-TnyAccountStoreIface;
+		&libtinymail-TnyFolderStoreIface;
+		&libtinymail-TnyFolderStoreQuery;
 		&libtinymail-TnyAccountIface;
 		&libtinymail-TnyStoreAccountIface;
 		&libtinymail-TnyTransportAccountIface;

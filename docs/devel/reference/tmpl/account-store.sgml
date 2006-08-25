@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-store-account-priv
+TnyAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,28 +9,36 @@ tny-store-account-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyStoreAccountPriv ##### -->
+<!-- ##### STRUCT TnyAccountStore ##### -->
 <para>
 
 </para>
 
-@iter_store: 
-@iter: 
-@managed_folders: 
 
-<!-- ##### MACRO TNY_STORE_ACCOUNT_GET_PRIVATE ##### -->
+<!-- ##### FUNCTION tny_account_store_new ##### -->
 <para>
 
 </para>
 
-@o: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_session ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
 
 

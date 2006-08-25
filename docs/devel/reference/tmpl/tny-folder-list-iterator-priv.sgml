@@ -17,12 +17,3 @@ TnyFolderListIterator
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyFolderListIterator ##### -->
-<para>
-
-</para>
-
-@parent: 
-@model: 
-@current: 
-
