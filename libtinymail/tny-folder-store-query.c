@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include <tny-folder-store-query.h>
+#include <tny-list.h>
 
 static GObjectClass *parent_class;
 static GObjectClass *item_parent_class;
