@@ -63,4 +63,6 @@ tny_test_object_new (gchar *str)
 {
 	TnyTestObject *obj = g_object_new (TNY_TYPE_TEST_OBJECT, NULL);
 	obj->str = str;
+
+	return G_OBJECT(obj);
 }

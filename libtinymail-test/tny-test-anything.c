@@ -44,6 +44,7 @@ TnyAccountStore*    tny_account_store_get_instance   (void);
 
 static GObjectClass *parent_class = NULL;
 
+#if 0 /* not used */
 static void 
 camel_test (void)
 {
@@ -78,6 +79,7 @@ camel_test (void)
 
 	return;
 }
+#endif /* 0 */
 
 static gchar* 
 get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
@@ -183,7 +185,7 @@ int main (int argc, char **argv)
 	send_test (TRUE);
 	/* send_test (FALSE); */
 
-	return;
+	return 0;
 }
 
 

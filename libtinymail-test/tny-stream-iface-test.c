@@ -27,6 +27,7 @@
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
+#include <tny-test-stream.h>
 
 static TnyStreamIface *iface = NULL, *source = NULL;
 static gchar *str;

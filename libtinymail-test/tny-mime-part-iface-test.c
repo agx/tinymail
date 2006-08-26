@@ -24,10 +24,12 @@
 #include <tny-mime-part.h>
 #include <tny-stream-iface.h>
 #include <tny-test-stream.h>
+#include <tny-stream-camel.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
+
 
 static TnyMimePartIface *iface = NULL;
 static gchar *str;
@@ -128,9 +130,9 @@ static void
 tny_mime_part_iface_test_stream (void)
 {
 	CamelStream *real_to = camel_stream_mem_new ();
-	TnyStreamIface *from = TNY_STREAM_IFACE (tny_test_stream_new ());
+	//TnyStreamIface *from = TNY_STREAM_IFACE (tny_test_stream_new ());
 	TnyStreamIface *to = TNY_STREAM_IFACE (tny_stream_camel_new (real_to));
-	gint n;
+	//gint n;
 
 /* TODO (this one crashes)
 

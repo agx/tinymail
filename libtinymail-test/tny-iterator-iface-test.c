@@ -21,7 +21,7 @@
 #include <tny-iterator-iface-test.h>
 #include <tny-iterator-iface.h>
 
-static TnyIteratorIface *iface = NULL;
+//static TnyIteratorIface *iface = NULL;
 static gchar *str;
 
 static void

@@ -138,6 +138,8 @@ main (int argc, char **argv)
 	g_type_init ();
 	g_thread_init (NULL);
 
+	gtk_init (&argc, &argv);
+
 	view = GUNIT_VIEW (g_object_new (tny_test_view_get_type (), NULL));
 
 	runner = gunit_test_runner_get_instance ();

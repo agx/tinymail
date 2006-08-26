@@ -35,7 +35,7 @@
 
 static TnyAccountIface *iface = NULL;
 static TnyAccountStoreIface *account_store;
-static TnyListIface *accounts, *root_folders;
+static TnyListIface *accounts;// *root_folders;
 static TnyIteratorIface *aiter;
 static gboolean online_tests=FALSE;
 static gchar *str;

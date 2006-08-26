@@ -23,7 +23,7 @@
 #include <tny-test-object.h>
 
 
-static TnyListIface *iface = NULL, *source = NULL;
+static TnyListIface *iface = NULL;// *source = NULL;
 static gchar *str;
 
 

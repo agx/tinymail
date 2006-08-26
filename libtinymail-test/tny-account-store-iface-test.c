@@ -25,7 +25,7 @@
 
 static TnyAccountStoreIface *iface = NULL;
 static TnyPlatformFactoryIface *platfact = NULL;
-static gchar *str;
+//static gchar *str;
 
 static void
 tny_account_store_iface_test_setup (void)
