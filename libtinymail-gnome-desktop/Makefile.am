@@ -1,5 +1,6 @@
 INCLUDES = -I. -I$(top_srcdir)			    \
 	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)	    \
+	$(LIBTINYMAIL_CAMEL_CFLAGS)		    \
 	-I$(top_srcdir)/libtinymail		    \
 	-I$(top_srcdir)/libtinymailui		    \
 	-I$(top_srcdir)/libtinymailui-gtk	    \

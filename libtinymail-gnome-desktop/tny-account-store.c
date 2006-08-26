@@ -44,6 +44,7 @@
 
 #include <tny-device-iface.h>
 #include <tny-device.h>
+#include <tny-session-camel.h>
 
 #ifdef GNOME
 #include <libgnomeui/gnome-password-dialog.h>
