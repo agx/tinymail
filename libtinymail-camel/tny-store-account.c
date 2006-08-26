@@ -54,10 +54,12 @@
 
 static GObjectClass *parent_class = NULL;
 
+#include <tny-folder-iface.h>
 #include "tny-account-priv.h"
 #include "tny-store-account-priv.h"
 #include "tny-folder-priv.h"
 #include "tny-folder-list-priv.h"
+#include "tny-camel-common-priv.h"
 
 #include <tny-camel-shared.h>
 #include <tny-account-store-iface.h>
@@ -81,8 +83,6 @@ static void
 tny_store_account_reconnect (TnyAccount *self)
 {
 	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
-	TnyStoreAccountPriv *spriv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
-
 
 	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && 
 		G_UNLIKELY (priv->user) && G_UNLIKELY (priv->host))

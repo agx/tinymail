@@ -96,7 +96,7 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 		*gtfnd = '\0';
 	
 		if (G_LIKELY (*name == ' '))
-			*name++;
+			name++;
 	
 		if (G_LIKELY (*lname == ' '))
 			*lname-- = '\0';
@@ -109,7 +109,7 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 		lname += (strlen (name)-1);
 
 		if (G_LIKELY (*name == ' '))
-			*name++;
+			name++;
 	
 		if (G_LIKELY (*lname == ' '))
 			*lname-- = '\0';

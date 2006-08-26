@@ -463,11 +463,13 @@ tny_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	return;
 }
 
+#if 0 /* not used */
 static void
 destroy_folder (gpointer data, gpointer user_data)
 {
 	g_object_unref (G_OBJECT (data));
 }
+#endif /* 0 */
 
 void 
 tny_account_set_online_status (TnyAccount *self, gboolean offline)

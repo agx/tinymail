@@ -104,7 +104,7 @@ _tny_header_get_camel_mime_message (TnyHeader *self)
 static const gchar*
 tny_header_get_replyto (TnyHeaderIface *self)
 {
-	TnyHeader *me = TNY_HEADER (self);
+	//TnyHeader *me = TNY_HEADER (self);
 	const gchar *retval = NULL;
 
 	/* TODO get_replyto */
@@ -204,7 +204,7 @@ tny_header_set_to (TnyHeaderIface *self, const gchar *to)
 static void
 tny_header_set_replyto (TnyHeaderIface *self, const gchar *to)
 {
-	TnyHeader *me = TNY_HEADER (self);
+	//TnyHeader *me = TNY_HEADER (self);
 
 	/* TODO set replyto */
 

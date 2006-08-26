@@ -47,11 +47,12 @@
 #include "tny-account-priv.h"
 #include "tny-store-account-priv.h"
 #include "tny-folder-priv.h"
+#include "tny-header-priv.h"
+#include "tny-msg-priv.h"
 #include "tny-folder-list-priv.h"
 #include "tny-camel-common-priv.h"
 #include <tny-camel-shared.h>
 
-#include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
 static GObjectClass *parent_class = NULL;
@@ -333,7 +334,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	header = TNY_HEADER_IFACE (tny_header_new ());
 
 	_tny_header_set_folder (TNY_HEADER (header), TNY_FOLDER (self), priv);
-	_tny_header_set_camel_message_info (header, mi);
+	_tny_header_set_camel_message_info (TNY_HEADER(header), mi);
 
 	/* Get rid of the reference already. I know this is ugly */
 	camel_folder_free_message_info (cfol, mi);
@@ -358,6 +359,7 @@ typedef struct
 } RefreshFolderInfo;
 
 
+#if 0 /* NOT USED */
 static void
 destroy_header (gpointer data, gpointer user_data)
 {
@@ -366,6 +368,7 @@ destroy_header (gpointer data, gpointer user_data)
 
 	return;
 }
+#endif /* 0 */
 
 static void
 tny_folder_refresh_async_destroyer (gpointer thr_user_data)
@@ -385,7 +388,7 @@ static gboolean
 tny_folder_refresh_async_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (info->self));
+	//TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (info->self));
 
 	if (info->callback)
 		info->callback (info->self, info->cancelled, info->user_data);
@@ -467,7 +470,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
 	TnyFolderIface *self = info->self;
-	gpointer user_data = info->user_data;
+	//gpointer user_data = info->user_data;
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
 	gchar *str;
@@ -517,7 +520,7 @@ tny_folder_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callbac
 {
 	RefreshFolderInfo *info = g_new0 (RefreshFolderInfo, 1);
 	GThread *thread;
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	//TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 
 	info->self = self;
 	info->callback = callback;
@@ -534,8 +537,8 @@ static void
 tny_folder_refresh (TnyFolderIface *self)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
-	gchar *str;
+	//TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
+	//gchar *str;
 	CamelException *ex = camel_exception_new ();
 
 	camel_exception_init (ex);
@@ -745,7 +748,7 @@ tny_folder_set_name (TnyFolderIface *self, const gchar *name)
 void
 tny_folder_set_folder (TnyFolder *self, CamelFolder *camel_folder)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	//TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	
 	_tny_folder_set_id (self, camel_folder_get_full_name (camel_folder));
 
@@ -783,7 +786,7 @@ TnyFolder*
 tny_folder_new_with_folder (CamelFolder *camel_folder)
 {
 	TnyFolder *self = g_object_new (TNY_TYPE_FOLDER, NULL);
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
+	//TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
 
 	tny_folder_set_folder (self, camel_folder);
 
@@ -808,6 +811,7 @@ tny_folder_new (void)
 	return self;
 }
 
+#if 0 /* NOT USED */
 static void
 destroy_folder (gpointer data, gpointer user_data)
 {
@@ -815,6 +819,7 @@ destroy_folder (gpointer data, gpointer user_data)
 		g_object_unref (G_OBJECT (data));
 	return;
 }
+#endif /* 0 */
 
 static void
 tny_folder_finalize (GObject *object)
@@ -871,6 +876,7 @@ tny_folder_uncache (TnyFolderIface *self)
 	return;
 }
 
+#if 0 /* not used */
 static gboolean
 tny_folder_has_cache (TnyFolderIface *self)
 {
@@ -883,6 +889,7 @@ tny_folder_has_cache (TnyFolderIface *self)
 
 	return retval;
 }
+#endif /* 0 */
 
 void 
 _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv)
@@ -989,7 +996,6 @@ tny_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolder
 	if (!priv->iter && priv->iter_parented)
 	{
 		CamelStore *store = (CamelStore*) _tny_account_get_service (TNY_ACCOUNT (priv->account));
-		TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 		priv->iter = camel_store_get_folder_info (store, priv->folder_name, 0, &ex);
 		priv->iter_parented = FALSE;
