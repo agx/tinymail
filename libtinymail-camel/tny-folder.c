@@ -49,7 +49,6 @@
 #include "tny-folder-priv.h"
 #include "tny-header-priv.h"
 #include "tny-msg-priv.h"
-#include "tny-folder-list-priv.h"
 #include "tny-camel-common-priv.h"
 #include <tny-camel-shared.h>
 

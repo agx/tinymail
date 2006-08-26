@@ -38,11 +38,7 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-transport-account.c			\
 	tny-camel-stream.c			\
 	tny-stream-camel.c			\
-	tny-session-camel.c			\
-	tny-folder-list.c			\
-	tny-folder-list-priv.h			\
-	tny-folder-list-iterator.c		\
-	tny-folder-list-iterator-priv.h
+	tny-session-camel.c			
 
 libtinymail_camel_1_0_la_LIBADD =		\
 	$(LIBTINYMAIL_CAMEL_LIBS)		\

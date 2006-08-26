@@ -58,7 +58,6 @@ static GObjectClass *parent_class = NULL;
 #include "tny-account-priv.h"
 #include "tny-store-account-priv.h"
 #include "tny-folder-priv.h"
-#include "tny-folder-list-priv.h"
 #include "tny-camel-common-priv.h"
 
 #include <tny-camel-shared.h>
