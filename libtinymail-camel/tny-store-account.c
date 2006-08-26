@@ -76,31 +76,6 @@ report_error (TnyAccountPriv *priv)
 }
 
 
-static void
-walk_folders_uncache_em (TnyStoreAccountIface *self, TnyListIface *folders)
-{
-  if (folders && tny_list_iface_length (folders) > 0)
-  {
-	TnyIteratorIface *iterator = tny_list_iface_create_iterator (folders);
-
-	while (!tny_iterator_iface_is_done (iterator))
-	{
-		TnyFolderIface *folder = (TnyFolderIface*)tny_iterator_iface_current (iterator);
-		TnyListIface *more_folders = (TnyListIface*)tny_folder_iface_get_folders (folder);
-
-		/* tny_folder_iface_uncache (folder); */
-
-		if (tny_list_iface_length (more_folders) > 0)
-			walk_folders_uncache_em (self, more_folders);
-
-		g_object_unref (G_OBJECT(folder));
-		
-		tny_iterator_iface_next (iterator);
-	}
-
-	g_object_unref (G_OBJECT (iterator));
-  }
-}
 
 static void 
 tny_store_account_reconnect (TnyAccount *self)
