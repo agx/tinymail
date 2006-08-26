@@ -28,6 +28,7 @@
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
 #include <tny-folder-store-iface.h>
+#include <tny-list.h>
 
 #include "tny-account-tree-model-priv.h"
 #include "tny-account-tree-model-iterator-priv.h"
@@ -51,7 +52,7 @@ recurse_folders (TnyAccountTreeModel *self, TnyFolderStoreIface *store, TnyFolde
 	{
 		GtkTreeStore *model = GTK_TREE_STORE (self);
 		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
-		gint i=0; GtkTreeIter tree_iter;
+		GtkTreeIter tree_iter;
 	    
 		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
