@@ -240,10 +240,10 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 	if (event->keyval == GDK_Delete)
 	{
-		TnySummaryView *self  = user_data;
-		TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
+		//TnySummaryView *self  = user_data;
+		//TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
 		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
-		GtkTreeModel *model, *mymodel, *sortable;
+		GtkTreeModel *model, *mymodel; //, *sortable;
 		GtkTreeIter iter;
 
 		if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
@@ -265,7 +265,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 				{
 					TnyFolderIface *folder;
-					TnyMsgIface *msg;
+					//TnyMsgIface *msg;
 
 					if (GTK_IS_TREE_MODEL_SORT (model))
 					{
@@ -365,7 +365,7 @@ refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer use
 	if (!cancelled)
 	{
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
-		GtkTreeModel *sortable, *oldsortable;
+		GtkTreeModel *sortable; // *oldsortable;
 		GtkTreeModel *select_model;
 		TnyHeaderListModel *model = tny_header_list_model_new ();
 		gboolean refresh = FALSE;
@@ -428,7 +428,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		gpointer user_data)
 {
 	TnySummaryViewPriv *priv = user_data;
-	GtkTreeView *header_view = priv->header_view;
+	//GtkTreeView *header_view = priv->header_view;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 
@@ -554,9 +554,9 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *header_sw;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
-	GtkTreeModel *mailbox_model;
+	//GtkTreeModel *mailbox_model;
 	GtkTreeSelection *select;
-	gint t = 0, i = 0;
+	//gint t = 0, i = 0;
 	GtkWidget *hpaned1;
 	GtkWidget *vpaned1;
 	

@@ -17,12 +17,13 @@
  */
 
 #include <config.h>
-
+#include <libintl.h>
 #include <gtk/gtk.h>
 
 #include <tny-account-store-view-iface.h>
 #include <tny-platform-factory-iface.h>
 #include <tny-platform-factory.h>
+#include <tny-summary-view.h>
 
 #ifdef GNOME
 #include <libgnomevfs/gnome-vfs.h>
@@ -39,8 +40,8 @@ tny_main_shutdown (gpointer data)
 
 	/* This solves a firefox vs. Camel bug. */
 
-	PR_ProcessExit ((PRIntn)data);
-	exit ((int)data);
+	PR_ProcessExit ((PRIntn)(long)data);
+	exit ((long)data);
 
 	return;
 }
