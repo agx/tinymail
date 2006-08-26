@@ -38,6 +38,7 @@
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
 #include <tny-device-iface.h>
+#include <tny-session-camel.h>
 
 #include "device.h"
 

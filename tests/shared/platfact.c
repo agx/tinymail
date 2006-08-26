@@ -30,6 +30,7 @@
 #include "device.h"
 
 #include <tny-msg-view-iface.h>
+#include <tny-msg-view.h>
 
 
 static GObjectClass *parent_class = NULL;

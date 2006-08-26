@@ -101,8 +101,8 @@ tny_device_is_online (TnyDeviceIface *self)
 static void
 tny_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyDevice *self = (TnyDevice *)instance;
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	//TnyDevice *self = (TnyDevice *)instance;
+	//TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
 
 	return;
 }
@@ -126,8 +126,8 @@ tny_device_new (void)
 static void
 tny_device_finalize (GObject *object)
 {
-	TnyDevice *self = (TnyDevice *)object;	
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	//TnyDevice *self = (TnyDevice *)object;	
+	//TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
 
 	(*parent_class->finalize) (object);
 

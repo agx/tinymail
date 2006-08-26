@@ -1,3 +1,5 @@
+AM_CFLAGS = -fPIC
+
 INCLUDES = -I. -I$(top_srcdir) \
 	$(TINYMAIL_CFLAGS)                              \
 	$(LIBTINYMAIL_CAMEL_CFLAGS)			\
