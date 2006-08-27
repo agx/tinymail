@@ -24,9 +24,13 @@ typedef struct _TnyDevicePriv TnyDevicePriv;
 
 struct _TnyDevicePriv
 {
-	libnm_glib_ctx *nm_ctx;
-	guint callback_id;
 	gboolean forced, fset;
+    
+#ifdef GNOME
+	guint callback_id;
+	libnm_glib_ctx *nm_ctx;
+#endif
+
 };
 
 

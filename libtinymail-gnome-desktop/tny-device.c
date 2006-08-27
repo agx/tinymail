@@ -22,7 +22,10 @@
 #include <glib/gi18n-lib.h>
 
 #include <tny-device.h>
+
+#ifdef GNOME
 #include <libnm_glib.h>
+#endif
 
 static GObjectClass *parent_class = NULL;
 
@@ -32,7 +35,7 @@ static void tny_device_on_online (TnyDeviceIface *self);
 static void tny_device_on_offline (TnyDeviceIface *self);
 static gboolean tny_device_is_online (TnyDeviceIface *self);
 
-
+#ifdef GNOME
 static void 
 nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 {
@@ -45,6 +48,7 @@ nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 
 	return;
 }
+#endif
 
 static void 
 tny_device_reset (TnyDeviceIface *self)
@@ -53,8 +57,10 @@ tny_device_reset (TnyDeviceIface *self)
 
 	priv->fset = FALSE;
 	priv->forced = FALSE;
-
+    
+#ifdef GNOME
 	nm_callback (priv->nm_ctx, self);
+#endif
 }
 
 static void 
@@ -65,8 +71,10 @@ tny_device_force_online (TnyDeviceIface *self)
 	priv->fset = TRUE;
 	priv->forced = TRUE;
 
+#ifdef GNOME
 	nm_callback (priv->nm_ctx, self);
-
+#endif
+    
 	return;
 }
 
@@ -79,8 +87,10 @@ tny_device_force_offline (TnyDeviceIface *self)
 	priv->fset = TRUE;
 	priv->forced = FALSE;
 
-	nm_callback (priv->nm_ctx, self);
-
+#ifdef GNOME
+    nm_callback (priv->nm_ctx, self);
+#endif
+    
 	return;
 }
 
@@ -106,6 +116,7 @@ tny_device_is_online (TnyDeviceIface *self)
 	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
 	gboolean retval = priv->forced;
 
+#ifdef GNOME
 	if (!priv->fset)
 	{
 		libnm_glib_state state = libnm_glib_get_network_state (priv->nm_ctx);
@@ -126,7 +137,8 @@ tny_device_is_online (TnyDeviceIface *self)
 			break;
 		}
 	}
-
+#endif
+    
 	return retval;
 }
 
@@ -139,10 +151,14 @@ tny_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->fset = FALSE;
 	priv->forced = FALSE;
+
+#ifdef GNOME
 	priv->nm_ctx = libnm_glib_init ();
 	priv->callback_id = libnm_glib_register_callback 
 		(priv->nm_ctx, nm_callback, self, NULL);
 
+#endif
+    
 	return;
 }
 
@@ -168,9 +184,10 @@ tny_device_finalize (GObject *object)
 	TnyDevice *self = (TnyDevice *)object;	
 	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
 
-
+#ifdef GNOME
 	libnm_glib_unregister_callback (priv->nm_ctx, priv->callback_id);
 	libnm_glib_shutdown (priv->nm_ctx);
+#endif
 
 	(*parent_class->finalize) (object);
 
