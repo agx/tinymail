@@ -1,31 +1,31 @@
-08-27-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-27  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfix when switching offline and online and again getting a
 	message that had been viewed already
 
 	* Rechecked the dirty camel_object_unref hacks in tny-msg.c
 
-08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Further upgraded to the new get-folders API
 	* Updated the API documentation
 
-08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Added the tny_msg_view_iface_clear API
 
 	* This was a major API change
 
-08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymailui-gtk/tny-account-tree-model.c: Reimplemented using the
 	new TnyFolderStoreIface API
 
-08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Speedup the new get-folders API by caching the CamelFolderStore
 
-08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Lots of files: Removed the tny_folder_iface_uncache API and replaced 
 	it with a detection mechanism that automates this. It will now uncache 
@@ -40,7 +40,7 @@
 
 	* This was a major API change
 	
-08-24-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-24  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/tny-camel-common.c, 
 	libtinymail-camel/tny-folder.c, libtinymail-camel/tny-store-account.c,
@@ -54,7 +54,7 @@
 
 	* This was a major API change
 
-08-23-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-23  Philip Van Hoof <pvanhoof@gnome.org>
 	
 	* ChangeLog: Corrected the dates
 	* libtinymail-test: Implemented unit tests for TnyFolderIface
@@ -65,11 +65,11 @@
 	
 	* This was a major API change
 	
-08-22-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-22  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* tests/*: Added some tests
 
-08-20-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Reviewed and corrected Dirk-Jan's patch of 08-08
 	* Removed the has_first and has_next methods from the iterator API
@@ -77,7 +77,7 @@
 
 	* This was a major API change
 	
-08-08-2006  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+2006-08-08  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
 	* make iterator ops next/prev/first/last/nth all void
 	* g_object_ref iterator _current retval, except with headers...
@@ -85,23 +85,23 @@
 
 	* This was a major API change
 	
-08-01-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implemented a few new unit tests
 	* Completed a few existing unit tests
 
-07-30-2006  James Livingston <doclivingston@gmail.com>
+2006-07-30  James Livingston <doclivingston@gmail.com>
 
 	* bindings/python/tinymail.override: Sequence protocol, initial pieces 
 	of implementation
 
-07-29-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-29  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Improved the enums (GType'ed them)
 
 	* This was a major API change
 	
-07-29-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-29  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* bindings/python/*: Some fixes for the Python bindings
 	* libtinymailui-gtk/tny-account-tree-model-priv.h, libtinymailui-gtk/
@@ -109,79 +109,79 @@
 	-priv.h: Forward typedefs don't work well with the python binding 
 	generator
 
-07-29-2006  Gustavo J. A. M. Carneiro <gjc@inescporto.pt>
+2006-07-29  Gustavo J. A. M. Carneiro <gjc@inescporto.pt>
 
 	* bindings/python/*: Some fixes for the Python bindings
 
-07-28-2006  James Livingston <doclivingston@gmail.com>
+2006-07-28  James Livingston <doclivingston@gmail.com>
 
 	* bindings/python/*: Some fixes for the Python bindings
 
-07-28-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-28  Philip Van Hoof <pvanhoof@gnome.org>
 
 	*  bindings/python/*: Some fixes for the Python bindings
 
-07-27-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-27  Philip Van Hoof <pvanhoof@gnome.org>
 
 	*  tinymail-python/ moved to bindings/python
 	*  bindings/python: reworked the python bindings
 
-07-10-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+2006-07-10  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Removed a const label
 
-07-10-2006  Chris Lord <chris@openedhand.com>
+2006-07-10  Chris Lord <chris@openedhand.com>
 
 	* Refactored TnySummaryWindowIface to TnySummaryViewIface
 	* Added support for XEmbed and command-line parameters in the demo-ui
 
 	* This was a major API change
 	
-06-09-2006  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+2006-06-09  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* tny_iterator_iface_is_end method
 
 	* This was a major API change
 	
-06-07-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-06-07  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Major API changes in TnyAccountStore
 	
 	* This was a major API change
 	
-06-21-2006  Florian Boor <florian.boor@kernelconcepts.de>
+2006-06-21  Florian Boor <florian.boor@kernelconcepts.de>
 
 	* Make GPE TnyDevice default to be online for now.
 
-06-01-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-06-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implementation and implementing
 	* Lots of coding happened
 
-06-09-2006  Florian Boor <florian.boor@kernelconcepts.de>
+2006-06-09  Florian Boor <florian.boor@kernelconcepts.de>
 
 	* Fix endless loop sending mails.
 
-05-01-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-05-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implementation and implementing
 	* Lots of coding happened
 
-05-24-2006  Florian Boor <florian.boor@kernelconcepts.de>
+2006-05-24  Florian Boor <florian.boor@kernelconcepts.de>
 
 	* Support for mail status flags.
 	* Minor fixes.
 
-04-01-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-04-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implementation and implementing
 	* Lots of coding happened
 	
-03-07-2006  Raphael Slinckx <raphael@slinckx.net>
+2006-03-07  Raphael Slinckx <raphael@slinckx.net>
 
 	* Added initial Python bindings
 	
-01-17-2006  Philip Van Hoof <pvanhoof@gnome.org>
+2006-01-17  Philip Van Hoof <pvanhoof@gnome.org>
 	
 	* Initial import
 	* Tinymail epoch
