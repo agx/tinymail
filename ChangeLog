@@ -5,6 +5,13 @@
 
 	* Rechecked the dirty camel_object_unref hacks in tny-msg.c
 
+2006-08-26 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+
+	* Made tinymail compile with -Wall -Werror
+	* Fix some AMD64 problems
+	* Fix test program (gtk_init)
+	* Fix internet address parsing (camel-common)
+
 2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Further upgraded to the new get-folders API
