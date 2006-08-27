@@ -1,3 +1,10 @@
+08-27-2006  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Bugfix when switching offline and online and again getting a
+	message that had been viewed already
+
+	* Rechecked the dirty camel_object_unref hacks in tny-msg.c
+
 08-25-2006  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Further upgraded to the new get-folders API

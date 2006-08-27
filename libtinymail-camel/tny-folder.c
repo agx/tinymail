@@ -333,7 +333,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	header = TNY_HEADER_IFACE (tny_header_new ());
 
 	_tny_header_set_folder (TNY_HEADER (header), TNY_FOLDER (self), priv);
-	_tny_header_set_camel_message_info (TNY_HEADER(header), mi);
+	_tny_header_set_camel_message_info (TNY_HEADER(header), mi, FALSE);
 
 	/* Get rid of the reference already. I know this is ugly */
 	camel_folder_free_message_info (cfol, mi);
@@ -610,40 +610,44 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyMsgIface *message = NULL;
+    	CamelMimeMessage *camel_message = NULL;
 	const gchar *id;
-
+	CamelException *ex = camel_exception_new ();
+	CamelMessageInfo *info = NULL;
+    
 	g_mutex_lock (priv->folder_lock);
 
 	id = tny_header_iface_get_uid (TNY_HEADER_IFACE (header));
-
 	load_folder_no_lock (priv);
-
-	CamelException *ex = camel_exception_new ();
 	camel_exception_init (ex);
-
-	CamelMimeMessage *camel_message = NULL;
-
-
-	/* TODO: We can reuse the message instance in the header 
-	   if not using the summary capabilities. */
 
 	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
 					NULL, NULL, NULL);
-
-	camel_message = camel_folder_get_message  
-			(priv->folder, (const char *) id, ex);
-
+	camel_message = camel_folder_get_message (priv->folder, (const char *) id, ex);    
 	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
-	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
-	{
-		message = TNY_MSG_IFACE (tny_msg_new ());
 
+    	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
+		info = camel_folder_get_message_info (priv->folder, (const char *) id);
+
+	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE && info)
+	{
+	    	TnyHeaderIface *nheader = TNY_HEADER_IFACE (tny_header_new ());
+	    
+		message = TNY_MSG_IFACE (tny_msg_new ());
 		_tny_msg_set_folder (message, self);
-		tny_msg_iface_set_header (message, TNY_HEADER_IFACE (header));
-		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message);
+		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message); 
+	    
+		/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
+		_tny_header_set_camel_mime_message (TNY_HEADER (nheader), camel_message);
+		/* _tny_header_set_camel_message_info (TNY_HEADER (header), info, TRUE); */
+	    
+		tny_msg_iface_set_header (message, nheader);
+		/* strange, g_object_unref (G_OBJECT (header)); should happen here */
+	    
 	} else {
 		if (camel_message)
 			camel_object_unref (CAMEL_OBJECT (camel_message));
+	    	message = NULL;
 	}
 
 	camel_exception_free (ex);

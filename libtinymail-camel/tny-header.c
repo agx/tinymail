@@ -40,13 +40,12 @@
 
 static GObjectClass *parent_class = NULL;
 
-
-
 static const gchar *invalid = "Invalid";
 
 static void 
 destroy_write (TnyHeader *self)
 {
+    	/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
 	if (((WriteInfo*)self->info)->msg)
 		camel_object_unref (CAMEL_OBJECT (((WriteInfo*)self->info)->msg));
 
@@ -70,10 +69,10 @@ prepare_for_write (TnyHeader *self)
 	return;
 }
 
-void /* protected method */
-_tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_message_info)
+void 
+_tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit)
 {
-	if (G_UNLIKELY (self->info))
+	if (!knowit && G_UNLIKELY (self->info))
 		g_warning ("Strange behaviour: Overwriting existing message info");
 
 	if (self->write)
@@ -85,33 +84,34 @@ _tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_mes
 	return;
 }
 
-CamelMimeMessage* /* protected method */
-_tny_header_get_camel_mime_message (TnyHeader *self)
+void 
+_tny_header_set_camel_mime_message (TnyHeader *self, CamelMimeMessage *camel_mime_message)
 {
+	if (G_UNLIKELY (self->info))
+		g_warning ("Strange behaviour: Overwriting existing message info");
 
-	if (G_UNLIKELY (self->write == 0))
-	{
-		g_warning ("Strange behaviour: the header was not written");
-		return NULL;
-	}
+	if (self->write)
+		destroy_write (self);
 
-	return ((WriteInfo*)self->info)->msg;
-
+	self->info = g_new0 (WriteInfo, 1);
+	self->write = 1;
+	((WriteInfo*)self->info)->mime_from = NULL;
+	((WriteInfo*)self->info)->msg = camel_mime_message;
+	camel_object_ref (CAMEL_OBJECT (camel_mime_message));
+    
+	return;
 }
-
 
 
 static const gchar*
 tny_header_get_replyto (TnyHeaderIface *self)
 {
-	//TnyHeader *me = TNY_HEADER (self);
-	const gchar *retval = NULL;
+	const gchar *retval = invalid;
 
 	/* TODO get_replyto */
 
 	return retval;
 }
-
 
 
 static void
@@ -204,8 +204,6 @@ tny_header_set_to (TnyHeaderIface *self, const gchar *to)
 static void
 tny_header_set_replyto (TnyHeaderIface *self, const gchar *to)
 {
-	//TnyHeader *me = TNY_HEADER (self);
-
 	/* TODO set replyto */
 
 	return;

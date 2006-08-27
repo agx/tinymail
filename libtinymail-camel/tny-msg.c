@@ -295,21 +295,27 @@ tny_msg_finalize (GObject *object)
 	TnyMsg *self = (TnyMsg*) object;
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 	TnyMimePartPriv *ppriv = TNY_MIME_PART_GET_PRIVATE (self);
-    
+
+    	g_mutex_lock (priv->message_lock);
+	if (ppriv->part)
+	{
+	    	if (priv->header)
+		{ /* Stupid hack, else the unreffer below would fuck it up */
+			TnyHeader *hdr = (TnyHeader*)priv->header;
+			hdr->write = 0;
+		}
+		/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 */
+		while (((CamelObject*)ppriv->part)->ref_count >= 1)
+			camel_object_unref (CAMEL_OBJECT (ppriv->part));
+	}
+	ppriv->part = NULL;
+
 	g_mutex_lock (priv->header_lock);
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;
 	g_mutex_unlock (priv->header_lock);
 
-	g_mutex_lock (priv->message_lock);
-	if (ppriv->part)
-	{
-		/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 */
-		while (((CamelObject*)ppriv->part)->ref_count >= 1)
-			camel_object_unref (CAMEL_OBJECT (ppriv->part));
-	}
-	ppriv->part = NULL;
 	g_mutex_unlock (priv->message_lock);
 
 	g_mutex_free (priv->message_lock);

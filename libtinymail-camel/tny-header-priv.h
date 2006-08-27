@@ -46,8 +46,8 @@ struct _TnyHeaderClass
 	GObjectClass parent_class;
 };
 
-void _tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_message_info);
-CamelMimeMessage* _tny_header_get_camel_mime_message (TnyHeader *self);
+void _tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit);
 void _tny_header_set_folder (TnyHeader *self, TnyFolder *folder, TnyFolderPriv *tpriv);
+void _tny_header_set_camel_mime_message (TnyHeader *self, CamelMimeMessage *camel_mime_message);
 
 #endif
