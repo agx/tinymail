@@ -17,17 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-
-/* TODO:
-
-	- Refactor to a TnyIMAPStoreAccount, TnyPOPStoreAccount and
-	  TnyNNTPStoreAccount. Maybe also add a TnyExchangeStoreAccount? This
-	  file can stay as an abstract TnyStoreAccount type.
-
-	- Don't cache the folders (no reason, and it makes getting different
-	  types of folder lists difficult -- for example subscribed and 
-	  ubsubscribed folder lists)
-*/
+/* TODO: Refactor to a TnyIMAPStoreAccount, TnyPOPStoreAccount and 
+TnyNNTPStoreAccount. Maybe also add a TnyExchangeStoreAccount? This file can 
+stay as an abstract TnyStoreAccount type. */
 
 #include <config.h>
 #include <glib/gi18n-lib.h>
@@ -375,16 +367,102 @@ tny_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, Tn
 	return;
 }
 
-static void 
-tny_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyGetFoldersStatusCallback statuscb, TnyFolderStoreQuery *query, gpointer user_data)
+
+typedef struct {
+    TnyFolderStoreIface *self;
+    TnyListIface *list;
+    TnyGetFoldersCallback callback;
+    TnyFolderStoreQuery *query;
+    gpointer user_data;
+} GetFoldersInfo;
+
+
+static void
+tny_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 {
-    	/* TODO */
-    
-       	g_critical ("TODO: The get_folders_async method is unimplemented in this TnyFolderStoreIface implementation (TnyStoreAccount)\n");
+	TnyFolderStoreIface *self = ((GetFoldersInfo*)thr_user_data)->self;
+	TnyListIface *list = ((GetFoldersInfo*)thr_user_data)->list;
+	TnyFolderStoreQuery *query = ((GetFoldersInfo*)thr_user_data)->query;
+        
+	/* gidle reference */
+	g_object_unref (G_OBJECT (self));
+	g_object_unref (G_OBJECT (list));
+    	if (query)
+		g_object_unref (G_OBJECT (query));
+
+	g_free (thr_user_data);
 
 	return;
 }
 
+static gboolean
+tny_store_account_get_folders_async_callback (gpointer thr_user_data)
+{
+	GetFoldersInfo *info = thr_user_data;
+
+	if (info->callback)
+		info->callback (info->self, info->list, info->user_data);
+
+	return FALSE;
+}
+
+static gpointer 
+tny_store_account_get_folders_async_thread (gpointer thr_user_data)
+{
+	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
+    
+	tny_store_account_get_folders (info->self, info->list, info->query);
+ 
+	if (info->callback)
+	{
+		/* gidle reference */
+		g_object_ref (G_OBJECT (info->self));
+		g_object_ref (G_OBJECT (info->list));
+		if (info->query)
+			g_object_ref (G_OBJECT (info->query));
+
+		g_idle_add_full (G_PRIORITY_HIGH, 
+			tny_store_account_get_folders_async_callback, 
+			info, tny_store_account_get_folders_async_destroyer);
+
+	}
+
+	/* thread reference
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->list));
+    
+	if (info->query)
+		g_object_unref (G_OBJECT (info->query)); */
+    
+	g_thread_exit (NULL);
+    
+	return NULL;
+}
+
+static void 
+tny_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
+{
+	GetFoldersInfo *info = g_new0 (GetFoldersInfo, 1);
+	GThread *thread;
+
+    
+	info->self = self;
+    	info->list = list;
+	info->callback = callback;
+	info->user_data = user_data;
+	info->query = query;
+    
+	/* thread reference
+	g_object_ref (G_OBJECT (self));
+	g_object_ref (G_OBJECT (list)); 
+    	if (query)
+		g_object_ref (G_OBJECT (query)); */
+
+	thread = g_thread_create (tny_store_account_get_folders_async_thread,
+			info, FALSE, NULL);    
+
+	return;
+}
 
 static void
 tny_folder_store_iface_init (gpointer g_iface, gpointer iface_data)

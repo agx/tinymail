@@ -107,14 +107,14 @@ tny_folder_store_iface_get_folders (TnyFolderStoreIface *self, TnyListIface *lis
  * 
  **/
 void 
-tny_folder_store_iface_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyGetFoldersStatusCallback statuscb, TnyFolderStoreQuery *query, gpointer user_data)
+tny_folder_store_iface_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_STORE_IFACE_GET_CLASS (self)->get_folders_async_func)
 		g_critical ("You must implement tny_folder_store_iface_get_folders_async\n");
 #endif
 
-	TNY_FOLDER_STORE_IFACE_GET_CLASS (self)->get_folders_async_func (self, list, callback, statuscb, query, user_data);
+	TNY_FOLDER_STORE_IFACE_GET_CLASS (self)->get_folders_async_func (self, list, callback, query, user_data);
 	return;
 }
 

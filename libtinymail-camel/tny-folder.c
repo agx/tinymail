@@ -358,16 +358,6 @@ typedef struct
 } RefreshFolderInfo;
 
 
-#if 0 /* NOT USED */
-static void
-destroy_header (gpointer data, gpointer user_data)
-{
-	g_object_unref (G_OBJECT (data));
-	data=NULL;
-
-	return;
-}
-#endif /* 0 */
 
 static void
 tny_folder_refresh_async_destroyer (gpointer thr_user_data)
@@ -375,7 +365,7 @@ tny_folder_refresh_async_destroyer (gpointer thr_user_data)
 
 	TnyFolderIface *self = ((RefreshFolderInfo*)thr_user_data)->self;
 
-	/* As promised */
+	/* gidle reference */
 	g_object_unref (G_OBJECT (self));
 
 	g_free (thr_user_data);
@@ -387,7 +377,6 @@ static gboolean
 tny_folder_refresh_async_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
-	//TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (info->self));
 
 	if (info->callback)
 		info->callback (info->self, info->cancelled, info->user_data);
@@ -409,7 +398,7 @@ destroy_progress_idle (gpointer data)
 {
 	ProgressInfo *info = data;
 
-	/* As promised */
+	/* gidle reference */
 	g_object_unref (G_OBJECT (info->minfo->self));
 
 	g_free (info->what);
@@ -454,7 +443,7 @@ tny_folder_refresh_async_status (struct _CamelOperation *op, const char *what, i
 	info->minfo->user_data = oinfo->user_data;
 	info->pc = pc;
 
-	/* Removed in the destroyer */
+	/* gidle reference */
 	g_object_ref (G_OBJECT (info->minfo->self));
 
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
@@ -469,7 +458,6 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
 	TnyFolderIface *self = info->self;
-	//gpointer user_data = info->user_data;
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
 	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
 	gchar *str;
@@ -500,7 +488,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 
 	if (info->callback)
 	{
-		/* Removed in the destroyer */
+		/* gidle reference */
 		g_object_ref (G_OBJECT (self));
 
 		g_idle_add_full (G_PRIORITY_HIGH, 
@@ -508,6 +496,9 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 			info, tny_folder_refresh_async_destroyer);
 
 	}
+
+    	/* thread reference */
+	g_object_unref (G_OBJECT (self));
 
 	g_thread_exit (NULL);
 
@@ -519,12 +510,14 @@ tny_folder_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callbac
 {
 	RefreshFolderInfo *info = g_new0 (RefreshFolderInfo, 1);
 	GThread *thread;
-	//TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-
+    
 	info->self = self;
 	info->callback = callback;
 	info->status_callback = status_callback;
 	info->user_data = user_data;
+
+	/* thread reference */
+	g_object_ref (G_OBJECT (self));
 
 	thread = g_thread_create (tny_folder_refresh_async_thread,
 			info, FALSE, NULL);
@@ -536,8 +529,6 @@ static void
 tny_folder_refresh (TnyFolderIface *self)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-	//TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
-	//gchar *str;
 	CamelException *ex = camel_exception_new ();
 
 	camel_exception_init (ex);
@@ -613,7 +604,6 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
     	CamelMimeMessage *camel_message = NULL;
 	const gchar *id;
 	CamelException *ex = camel_exception_new ();
-	CamelMessageInfo *info = NULL;
     
 	g_mutex_lock (priv->folder_lock);
 
@@ -626,14 +616,19 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 	camel_message = camel_folder_get_message (priv->folder, (const char *) id, ex);    
 	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
-    	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
-		info = camel_folder_get_message_info (priv->folder, (const char *) id);
-
-	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE && info)
+	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
 	{
 	    	TnyHeaderIface *nheader = TNY_HEADER_IFACE (tny_header_new ());
 	    
+	    	/* I don't reuse the header because that would keep a reference
+		   on it. Meaning that the CamelFolder can't be destroyed (the
+		   fpriv->headers_managed stuff in tny-header.c). The TnyHeader
+		   type can also work with a CamelMimeMessage, so why not use
+		   that. Right? */
+
+	    
 		message = TNY_MSG_IFACE (tny_msg_new ());
+		
 		_tny_msg_set_folder (message, self);
 		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message); 
 	    
@@ -1037,12 +1032,87 @@ tny_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolder
 	return;
 }
 
-static void 
-tny_folder_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyGetFoldersStatusCallback statuscb, TnyFolderStoreQuery *query, gpointer user_data)
+
+typedef struct {
+    TnyFolderStoreIface *self;
+    TnyListIface *list;
+    TnyGetFoldersCallback callback;
+    TnyFolderStoreQuery *query;
+    gpointer user_data;
+} GetFoldersInfo;
+
+
+static void
+tny_folder_get_folders_async_destroyer (gpointer thr_user_data)
 {
-    	/* TODO */
+	TnyFolderStoreIface *self = ((GetFoldersInfo*)thr_user_data)->self;
+	TnyListIface *list = ((GetFoldersInfo*)thr_user_data)->list;
     
-    	g_critical ("TODO: The get_folders_async method is unimplemented in this TnyFolderStoreIface implementation (TnyFolder)\n");
+	/* gidle reference */
+	g_object_unref (G_OBJECT (self));
+	g_object_unref (G_OBJECT (list));
+
+	g_free (thr_user_data);
+
+	return;
+}
+
+static gboolean
+tny_folder_get_folders_async_callback (gpointer thr_user_data)
+{
+	GetFoldersInfo *info = thr_user_data;
+
+	if (info->callback)
+		info->callback (info->self, info->list, info->user_data);
+
+	return FALSE;
+}
+
+static gpointer 
+tny_folder_get_folders_async_thread (gpointer thr_user_data)
+{
+	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
+	tny_folder_get_folders (info->self, info->list, info->query);
+
+	if (info->callback)
+	{
+		/* gidle reference */
+		g_object_ref (G_OBJECT (info->self));
+		g_object_ref (G_OBJECT (info->list));
+
+		g_idle_add_full (G_PRIORITY_HIGH, 
+			tny_folder_get_folders_async_callback, 
+			info, tny_folder_get_folders_async_destroyer);
+
+	}
+
+	/* thread reference */
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->list));
+    
+	g_thread_exit (NULL);
+    
+	return NULL;
+}
+
+static void 
+tny_folder_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
+{
+	GetFoldersInfo *info = g_new0 (GetFoldersInfo, 1);
+	GThread *thread;
+
+    
+	info->self = self;
+    	info->list = list;
+	info->callback = callback;
+	info->user_data = user_data;
+
+	/* thread reference */
+	g_object_ref (G_OBJECT (self));
+	g_object_ref (G_OBJECT (list));
+
+	thread = g_thread_create (tny_folder_get_folders_async_thread,
+			info, FALSE, NULL);    
 
 	return;
 }

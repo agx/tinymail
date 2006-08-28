@@ -69,8 +69,7 @@ typedef struct _TnyFolderStoreQueryClass TnyFolderStoreQueryClass;
 typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
-typedef void (*TnyGetFoldersCallback) (TnyFolderStoreIface *self, gboolean cancelled, gpointer user_data);
-typedef void (*TnyGetFoldersStatusCallback) (TnyFolderStoreIface *self, gint status, gpointer user_data);
+typedef void (*TnyGetFoldersCallback) (TnyFolderStoreIface *self, TnyListIface *list, gpointer user_data);
 
 
 #ifndef G_LIKELY
