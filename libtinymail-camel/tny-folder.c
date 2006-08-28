@@ -483,8 +483,10 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
 
-
 	g_mutex_unlock (priv->folder_lock);
+
+      	/* thread reference */
+	g_object_unref (G_OBJECT (self));
 
 	if (info->callback)
 	{
@@ -497,9 +499,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 
 	}
 
-    	/* thread reference */
-	g_object_unref (G_OBJECT (self));
-
+  
 	g_thread_exit (NULL);
 
 	return NULL;
