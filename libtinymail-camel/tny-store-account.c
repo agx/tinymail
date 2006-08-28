@@ -309,6 +309,8 @@ tny_store_account_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *fold
 {
 	/* TODO */
     
+       	g_critical ("TODO: The remove_folder method is unimplemented in this TnyFolderStoreIface implementation (TnyStoreAccount)\n");
+
 	return;
 }
 
@@ -317,6 +319,8 @@ tny_store_account_create_folder (TnyFolderStoreIface *self, const gchar *name)
 {
 	/* TODO */
     
+       	g_critical ("TODO: The create_folder method is unimplemented in this TnyFolderStoreIface implementation (TnyStoreAccount)\n");
+
 	return TNY_FOLDER_IFACE (tny_folder_new ());
 }
 
@@ -376,6 +380,8 @@ tny_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *li
 {
     	/* TODO */
     
+       	g_critical ("TODO: The get_folders_async method is unimplemented in this TnyFolderStoreIface implementation (TnyStoreAccount)\n");
+
 	return;
 }
 
