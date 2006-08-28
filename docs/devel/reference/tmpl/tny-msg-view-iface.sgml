@@ -48,7 +48,6 @@ to the user.
 </para>
 
 @self: 
-@header: 
 
 
 <!-- ##### FUNCTION tny_msg_view_iface_clear ##### -->

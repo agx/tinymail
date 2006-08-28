@@ -14,14 +14,15 @@ This #GtkTreeModel implementation will attempt to aggressively uncache
 It's very important to unreference the instance you will get when doing something like this:
 <programlisting>
 TnyHeaderIface *header;
-gtk_tree_model_get (model, &iter, 
+gtk_tree_model_get (model, &amp;iter, 
   TNY_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
-  &header, -1);
+  &amp;header, -1);
 /* use header */
 g_object_unref (G_OBJECT(header));
 </programlisting>
 The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeModel will indeed add a reference.
 </para>
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMsgViewIface

@@ -88,3 +88,4 @@ device.xml
 device-priv.xml
 tny-folder-store-query.xml
 account-store.xml
+tny-folder-store-query-test.xml

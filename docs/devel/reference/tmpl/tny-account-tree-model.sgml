@@ -17,9 +17,9 @@ account-folders as the child rows.
 It's very important to unreference the instance you will get when doing something like this:
 <programlisting>
 TnyFolderface *folder;
-gtk_tree_model_get (model, &iter,
+gtk_tree_model_get (model, &amp;iter,
   TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
-  &folder, -1);
+  &amp;folder, -1);
 /* use folder */
 g_object_unref (G_OBJECT(folder));
 </programlisting>

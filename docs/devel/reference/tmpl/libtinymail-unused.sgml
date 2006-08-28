@@ -1,3 +1,51 @@
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Title ##### -->
+TnyFolderListIterator
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-folder-list-priv.sgml:Title ##### -->
+TnyFolderList
+
+
 <!-- ##### SECTION ./tmpl/tny-msg-folder-proxy.sgml:Long_Description ##### -->
 <para>
 

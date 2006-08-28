@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-memory-test
+tny-folder-store-query-test
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,11 +9,21 @@ memory-test
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION create_tny_folder_store_query_suite ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 

@@ -52,7 +52,7 @@ therefore be used as a mime part.
 </para>
 
 @self: 
-@id: 
+@part: 
 
 
 <!-- ##### FUNCTION tny_msg_iface_get_folder ##### -->

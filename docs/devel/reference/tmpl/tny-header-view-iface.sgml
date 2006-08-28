@@ -32,3 +32,11 @@ A type for showing a #TnyHeaderIface to the user
 @header: 
 
 
+<!-- ##### FUNCTION tny_header_view_iface_clear ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

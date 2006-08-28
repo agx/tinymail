@@ -9,12 +9,10 @@ An interface that defines a store for folders
 A abstract type that contains child folders
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyStoreAccountIface, #TnyStoreAccount, #TnyFolder, #TnyFolderStore
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

@@ -10,12 +10,10 @@ A query for when you want to get a list of folders from a #TnyFolderStoreIface i
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyFolderStoreIface, #TnyFolder, #TnyFolderIface, #TnyStoreAccountIface, #TnyStoreAccount
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
