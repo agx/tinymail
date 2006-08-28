@@ -30,32 +30,23 @@ typedef struct _TnyFolderPriv TnyFolderPriv;
 struct _TnyFolderPriv
 {
 	gboolean loaded;
-
 	GType headers_list_type;
-
 	guint folder_changed_id;
 	guint headers_managed;
-    
 	GMutex *folder_lock;
 	CamelFolder *folder;
-
 	gchar *folder_name;
 	TnyAccountIface *account;
-
 	guint cached_length, unread_length;
-
 	gboolean subscribed;
 	gboolean has_summary_cap;
-    
 	CamelFolderInfo *iter;
 	gboolean iter_parented;
-    
 	gchar *cached_name;
 	TnyFolderType cached_folder_type;
 };
 
 CamelFolder* _tny_folder_get_camel_folder (TnyFolderIface *self);
-
 void _tny_folder_set_id (TnyFolder *self, const gchar *id);
 void _tny_folder_set_subscribed (TnyFolder *self, gboolean subscribed);
 void _tny_folder_set_name (TnyFolder *self, const gchar *name);
@@ -64,9 +55,9 @@ void _tny_folder_set_unread_count (TnyFolder *self, guint len);
 void _tny_folder_set_all_count (TnyFolder *self, guint len);
 void _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv);
 void _tny_folder_set_iter (TnyFolder *folder, CamelFolderInfo *iter);
+void _tny_folder_set_account (TnyFolder *self, TnyAccountIface *account);
 
 #define TNY_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER, TnyFolderPriv))
-
 
 #endif

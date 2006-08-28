@@ -39,24 +39,24 @@ struct _TnyStreamIfaceClass
 {
 	GTypeInterface parent;
 
-	gssize    (*read_func)            (TnyStreamIface *self, char *buffer, gsize n);
-	gssize    (*write_func)           (TnyStreamIface *self, const char *buffer, gsize n);
-	gint      (*flush_func)           (TnyStreamIface *self);
-	gint      (*close_func)           (TnyStreamIface *self);
-	gboolean  (*eos_func)             (TnyStreamIface *self);
-	gint      (*reset_func)           (TnyStreamIface *self);
-	gssize    (*write_to_stream_func) (TnyStreamIface *self, TnyStreamIface *output);
+	gssize (*read_func) (TnyStreamIface *self, char *buffer, gsize n);
+	gssize (*write_func) (TnyStreamIface *self, const char *buffer, gsize n);
+	gint (*flush_func) (TnyStreamIface *self);
+	gint (*close_func) (TnyStreamIface *self);
+	gboolean (*eos_func) (TnyStreamIface *self);
+	gint (*reset_func) (TnyStreamIface *self);
+	gssize (*write_to_stream_func) (TnyStreamIface *self, TnyStreamIface *output);
 };
 
-GType     tny_stream_iface_get_type        (void);
+GType tny_stream_iface_get_type (void);
 
-gssize    tny_stream_iface_read            (TnyStreamIface *self, char *buffer, gsize n);
-gssize    tny_stream_iface_write           (TnyStreamIface *self, const char *buffer, gsize n);
-gint      tny_stream_iface_flush           (TnyStreamIface *self);
-gint      tny_stream_iface_close           (TnyStreamIface *self);
-gboolean  tny_stream_iface_eos             (TnyStreamIface *self);
-gint      tny_stream_iface_reset           (TnyStreamIface *self);
-gssize    tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output);
+gssize tny_stream_iface_read (TnyStreamIface *self, char *buffer, gsize n);
+gssize tny_stream_iface_write (TnyStreamIface *self, const char *buffer, gsize n);
+gint tny_stream_iface_flush (TnyStreamIface *self);
+gint tny_stream_iface_close (TnyStreamIface *self);
+gboolean tny_stream_iface_eos (TnyStreamIface *self);
+gint tny_stream_iface_reset (TnyStreamIface *self);
+gssize tny_stream_iface_write_to_stream (TnyStreamIface *self, TnyStreamIface *output);
 
 G_END_DECLS
 

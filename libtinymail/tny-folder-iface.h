@@ -61,44 +61,32 @@ enum _TnyFolderType
 	TNY_FOLDER_TYPE_SENT
 };
 	
-
-/* TODO: Removing folders, Moving messages */
+/* TODO: Moving messages */
 
 struct _TnyFolderIfaceClass
 {
 	GTypeInterface parent;
 	
 	/* Signals */
-	void (*folder_inserted)            (TnyFolderIface *self, TnyFolderIface *folder);
-	void (*folders_reloaded)           (TnyFolderIface *self);
-
+	void (*folder_inserted) (TnyFolderIface *self, TnyFolderIface *folder);
+	void (*folders_reloaded) (TnyFolderIface *self);
 
 	/* Methods */
 	void (*remove_message_func) (TnyFolderIface *self, TnyHeaderIface *header);
-	void (*expunge_func)        (TnyFolderIface *self);
-
-	TnyMsgIface*  
-                       (*get_message_func)  (TnyFolderIface *self, TnyHeaderIface *header);
-	
-	void	       (*get_headers_func)  (TnyFolderIface *self, TnyListIface *headers, gboolean refresh);
-
-	const gchar*   (*get_name_func)    (TnyFolderIface *self);
-	const gchar*   (*get_id_func)      (TnyFolderIface *self);
-	TnyAccountIface*   
-                       (*get_account_func) (TnyFolderIface *self);
-
-	void           (*set_name_func)    (TnyFolderIface *self, const gchar *name);
-	void           (*set_account_func) (TnyFolderIface *self, TnyAccountIface *account);
+	void (*expunge_func) (TnyFolderIface *self);
+	TnyMsgIface* (*get_message_func) (TnyFolderIface *self, TnyHeaderIface *header);
+	void (*get_headers_func) (TnyFolderIface *self, TnyListIface *headers, gboolean refresh);
+	const gchar* (*get_name_func) (TnyFolderIface *self);
+	const gchar* (*get_id_func) (TnyFolderIface *self);
+	TnyAccountIface* (*get_account_func) (TnyFolderIface *self);
+	void (*set_name_func) (TnyFolderIface *self, const gchar *name);
 	TnyFolderType (*get_folder_type_func) (TnyFolderIface *self);
-
-	guint           (*get_all_count_func)     (TnyFolderIface *self);	
-	guint           (*get_unread_count_func)  (TnyFolderIface *self);
-
-	void           (*set_subscribed_func)    (TnyFolderIface *self, gboolean subscribed);
-	gboolean       (*get_subscribed_func)    (TnyFolderIface *self);
-
-	void           (*refresh_async_func) (TnyFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
-	void           (*refresh_func) (TnyFolderIface *self);
+	guint (*get_all_count_func) (TnyFolderIface *self);	
+	guint (*get_unread_count_func) (TnyFolderIface *self);
+	void (*set_subscribed_func) (TnyFolderIface *self, gboolean subscribed);
+	gboolean (*get_subscribed_func) (TnyFolderIface *self);
+	void (*refresh_async_func) (TnyFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
+	void (*refresh_func) (TnyFolderIface *self);
 };
 
 GType tny_folder_iface_get_type (void);
@@ -106,25 +94,17 @@ GType tny_folder_type_get_type (void);
 
 void tny_folder_iface_remove_message (TnyFolderIface *self, TnyHeaderIface *header);
 void tny_folder_iface_expunge (TnyFolderIface *self);
-
 TnyMsgIface* tny_folder_iface_get_message (TnyFolderIface *self, TnyHeaderIface *header);
 void tny_folder_iface_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh);
-
 TnyAccountIface* tny_folder_iface_get_account (TnyFolderIface *self);
 const gchar* tny_folder_iface_get_id (TnyFolderIface *self);
 const gchar* tny_folder_iface_get_name (TnyFolderIface *self);
-
-void tny_folder_iface_set_account (TnyFolderIface *self, TnyAccountIface *account);
 void tny_folder_iface_set_name (TnyFolderIface *self, const gchar *name);
-
 TnyFolderType tny_folder_iface_get_folder_type (TnyFolderIface *self);
-
 guint tny_folder_iface_get_all_count (TnyFolderIface *self);
 guint tny_folder_iface_get_unread_count (TnyFolderIface *self);
-
 void tny_folder_iface_set_subscribed (TnyFolderIface *self, gboolean subscribed);
 gboolean tny_folder_iface_get_subscribed (TnyFolderIface *self);
-
 void tny_folder_iface_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 void tny_folder_iface_refresh (TnyFolderIface *self);
 

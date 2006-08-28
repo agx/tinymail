@@ -50,12 +50,12 @@ struct _TnyIteratorIfaceClass
 
 GType tny_iterator_iface_get_type (void);
 
-void tny_iterator_iface_next              (TnyIteratorIface *self);
-void tny_iterator_iface_prev              (TnyIteratorIface *self);
-void tny_iterator_iface_first             (TnyIteratorIface *self);
-void tny_iterator_iface_nth               (TnyIteratorIface *self, guint nth);
-GObject* tny_iterator_iface_current       (TnyIteratorIface *self);
-gboolean tny_iterator_iface_is_done       (TnyIteratorIface *self);
+void tny_iterator_iface_next (TnyIteratorIface *self);
+void tny_iterator_iface_prev (TnyIteratorIface *self);
+void tny_iterator_iface_first (TnyIteratorIface *self);
+void tny_iterator_iface_nth (TnyIteratorIface *self, guint nth);
+GObject* tny_iterator_iface_current (TnyIteratorIface *self);
+gboolean tny_iterator_iface_is_done (TnyIteratorIface *self);
 TnyListIface* tny_iterator_iface_get_list (TnyIteratorIface *self);
 
 G_END_DECLS

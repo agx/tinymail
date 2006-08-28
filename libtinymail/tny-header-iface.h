@@ -63,69 +63,55 @@ enum _TnyHeaderFlags
 	TNY_HEADER_FLAG_USER = 1<<31
 };
 
-
 struct _TnyHeaderIfaceClass
 {
 	GTypeInterface g_iface;
 
-	const gchar*   (*get_uid_func)            (TnyHeaderIface *self);
-	const gchar*   (*get_bcc_func)            (TnyHeaderIface *self);
-	const gchar*   (*get_cc_func)             (TnyHeaderIface *self);
-	const gchar*   (*get_subject_func)        (TnyHeaderIface *self);
-	const gchar*   (*get_to_func)             (TnyHeaderIface *self);
-	const gchar*   (*get_from_func)           (TnyHeaderIface *self);
-	const gchar*   (*get_replyto_func)        (TnyHeaderIface *self);
-	const gchar*   (*get_message_id_func)     (TnyHeaderIface *self);
-
-	time_t         (*get_date_received_func)  (TnyHeaderIface *self);
-	time_t         (*get_date_sent_func)      (TnyHeaderIface *self);
-
-	void           (*set_bcc_func)            (TnyHeaderIface *self, const gchar *bcc);
-	void           (*set_cc_func)             (TnyHeaderIface *self, const gchar *cc);
-	void           (*set_from_func)           (TnyHeaderIface *self, const gchar *from);
-	void           (*set_subject_func)        (TnyHeaderIface *self, const gchar *subject);
-	void           (*set_to_func)             (TnyHeaderIface *self, const gchar *to);
-	void           (*set_replyto_func)        (TnyHeaderIface *self, const gchar *to);
-
-        TnyFolderIface*
-                       (*get_folder_func)         (TnyHeaderIface *self);
-
-	TnyHeaderFlags 
-		       (*get_flags_func)          (TnyHeaderIface *self);
-	void           (*set_flags_func)          (TnyHeaderIface *self, TnyHeaderFlags mask);
-	void           (*unset_flags_func)        (TnyHeaderIface *self, TnyHeaderFlags mask);
+	const gchar* (*get_uid_func) (TnyHeaderIface *self);
+	const gchar* (*get_bcc_func) (TnyHeaderIface *self);
+	const gchar* (*get_cc_func) (TnyHeaderIface *self);
+	const gchar* (*get_subject_func) (TnyHeaderIface *self);
+	const gchar* (*get_to_func) (TnyHeaderIface *self);
+	const gchar* (*get_from_func) (TnyHeaderIface *self);
+	const gchar* (*get_replyto_func) (TnyHeaderIface *self);
+	const gchar* (*get_message_id_func) (TnyHeaderIface *self);
+	time_t (*get_date_received_func) (TnyHeaderIface *self);
+	time_t (*get_date_sent_func) (TnyHeaderIface *self);
+	void (*set_bcc_func) (TnyHeaderIface *self, const gchar *bcc);
+	void (*set_cc_func) (TnyHeaderIface *self, const gchar *cc);
+	void (*set_from_func) (TnyHeaderIface *self, const gchar *from);
+	void (*set_subject_func) (TnyHeaderIface *self, const gchar *subject);
+	void (*set_to_func) (TnyHeaderIface *self, const gchar *to);
+	void (*set_replyto_func) (TnyHeaderIface *self, const gchar *to);
+        TnyFolderIface* (*get_folder_func) (TnyHeaderIface *self);
+	TnyHeaderFlags (*get_flags_func) (TnyHeaderIface *self);
+	void (*set_flags_func) (TnyHeaderIface *self, TnyHeaderFlags mask);
+	void (*unset_flags_func) (TnyHeaderIface *self, TnyHeaderFlags mask);
 };
 
-GType          tny_header_iface_get_type      (void);
-GType          tny_header_flags_get_type      (void);
+GType tny_header_iface_get_type (void);
+GType tny_header_flags_get_type (void);
 
-const gchar*   tny_header_iface_get_uid             (TnyHeaderIface *self);
-
-const gchar*   tny_header_iface_get_bcc            (TnyHeaderIface *self);
-const gchar*   tny_header_iface_get_cc             (TnyHeaderIface *self);
-time_t         tny_header_iface_get_date_received  (TnyHeaderIface *self);
-time_t         tny_header_iface_get_date_sent      (TnyHeaderIface *self);
-const gchar*   tny_header_iface_get_message_id     (TnyHeaderIface *self);
-const gchar*   tny_header_iface_get_from           (TnyHeaderIface *self);
-const gchar*   tny_header_iface_get_to             (TnyHeaderIface *self);
-const gchar*   tny_header_iface_get_subject        (TnyHeaderIface *self);
-
-const gchar*   tny_header_iface_get_replyto        (TnyHeaderIface *self);
-
-void           tny_header_iface_set_bcc            (TnyHeaderIface *self, const gchar *bcc);
-void           tny_header_iface_set_cc             (TnyHeaderIface *self, const gchar *cc);
-void           tny_header_iface_set_from           (TnyHeaderIface *self, const gchar *from);
-void           tny_header_iface_set_subject        (TnyHeaderIface *self, const gchar *subject);
-void           tny_header_iface_set_to             (TnyHeaderIface *self, const gchar *to);
-void           tny_header_iface_set_replyto        (TnyHeaderIface *self, const gchar *to);
-
-TnyFolderIface*
-               tny_header_iface_get_folder         (TnyHeaderIface *self);
-
-TnyHeaderFlags  
-	       tny_header_iface_get_flags          (TnyHeaderIface *self);
-void           tny_header_iface_set_flags          (TnyHeaderIface *self, TnyHeaderFlags mask);
-void           tny_header_iface_unset_flags        (TnyHeaderIface *self, TnyHeaderFlags mask);
+const gchar* tny_header_iface_get_uid (TnyHeaderIface *self);
+const gchar* tny_header_iface_get_bcc (TnyHeaderIface *self);
+const gchar* tny_header_iface_get_cc (TnyHeaderIface *self);
+time_t tny_header_iface_get_date_received (TnyHeaderIface *self);
+time_t tny_header_iface_get_date_sent (TnyHeaderIface *self);
+const gchar* tny_header_iface_get_message_id (TnyHeaderIface *self);
+const gchar* tny_header_iface_get_from (TnyHeaderIface *self);
+const gchar* tny_header_iface_get_to (TnyHeaderIface *self);
+const gchar* tny_header_iface_get_subject (TnyHeaderIface *self);
+const gchar* tny_header_iface_get_replyto (TnyHeaderIface *self);
+void tny_header_iface_set_bcc (TnyHeaderIface *self, const gchar *bcc);
+void tny_header_iface_set_cc (TnyHeaderIface *self, const gchar *cc);
+void tny_header_iface_set_from (TnyHeaderIface *self, const gchar *from);
+void tny_header_iface_set_subject (TnyHeaderIface *self, const gchar *subject);
+void tny_header_iface_set_to (TnyHeaderIface *self, const gchar *to);
+void tny_header_iface_set_replyto (TnyHeaderIface *self, const gchar *to);
+TnyFolderIface* tny_header_iface_get_folder (TnyHeaderIface *self);
+TnyHeaderFlags tny_header_iface_get_flags (TnyHeaderIface *self);
+void tny_header_iface_set_flags (TnyHeaderIface *self, TnyHeaderFlags mask);
+void tny_header_iface_unset_flags (TnyHeaderIface *self, TnyHeaderFlags mask);
 
 
 G_END_DECLS

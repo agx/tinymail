@@ -239,28 +239,6 @@ tny_folder_iface_get_account (TnyFolderIface *self)
 	return TNY_FOLDER_IFACE_GET_CLASS (self)->get_account_func (self);
 }
 
-/**
- * tny_folder_iface_set_account:
- * @self: a #TnyFolderIface object
- * @account: a #TnyAccountIface object
- * 
- * Set the parent of this folder. It's not recommended to use this method. in 
- * an application. It's being used internally.
- * 
- * TODO: make this method private in the implementation
- **/
-void
-tny_folder_iface_set_account (TnyFolderIface *self, TnyAccountIface *account)
-{
-#ifdef DEBUG
-	if (!TNY_FOLDER_IFACE_GET_CLASS (self)->set_account_func)
-		g_critical ("You must implement tny_folder_iface_set_account\n");
-#endif
-
-	TNY_FOLDER_IFACE_GET_CLASS (self)->set_account_func (self, account);
-
-	return;
-}
 
 
 /**

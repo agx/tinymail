@@ -71,7 +71,6 @@ typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
 typedef void (*TnyGetFoldersCallback) (TnyFolderStoreIface *self, TnyListIface *list, gpointer user_data);
 
-
 #ifndef G_LIKELY
 #define G_LIKELY(expr) (expr)
 #endif

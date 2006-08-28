@@ -69,18 +69,18 @@ struct _TnyAccountStoreIfaceClass
 	GTypeInterface parent;
 
 	/* Signals */
-	void (*account_changed)                        (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*account_inserted)                       (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*account_removed)                        (TnyAccountStoreIface *self, TnyAccountIface *account);
-	void (*accounts_reloaded)                      (TnyAccountStoreIface *self);
+	void (*account_changed) (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_inserted) (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*account_removed) (TnyAccountStoreIface *self, TnyAccountIface *account);
+	void (*accounts_reloaded) (TnyAccountStoreIface *self);
 
 	/* Methods */
-	void            (*get_accounts_func)             (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
-	void            (*add_store_account_func)        (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
-	void            (*add_transport_account_func)    (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
-	const gchar*    (*get_cache_dir_func)            (TnyAccountStoreIface *self);
-	TnyDeviceIface* (*get_device_func)               (TnyAccountStoreIface *self);
-	gboolean        (*alert_func)                    (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
+	void (*get_accounts_func) (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types);
+	void (*add_store_account_func) (TnyAccountStoreIface *self, TnyStoreAccountIface *account);
+	void (*add_transport_account_func) (TnyAccountStoreIface *self, TnyTransportAccountIface *account);
+	const gchar* (*get_cache_dir_func) (TnyAccountStoreIface *self);
+	TnyDeviceIface* (*get_device_func) (TnyAccountStoreIface *self);
+	gboolean (*alert_func) (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt);
 };
 
 GType tny_account_store_iface_get_type (void);
