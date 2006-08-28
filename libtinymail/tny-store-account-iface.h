@@ -37,13 +37,6 @@ G_BEGIN_DECLS
 #define TNY_IS_STORE_ACCOUNT_IFACE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_STORE_ACCOUNT_IFACE))
 #define TNY_STORE_ACCOUNT_IFACE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_STORE_ACCOUNT_IFACE, TnyStoreAccountIfaceClass))
 
-#define TNY_TYPE_STORE_ACCOUNT_FOLDER_TYPE (tny_store_account_folder_type_get_type())
-
-enum _TnyStoreAccountFolderType
-{
-	TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED,
-	TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL
-};
 
 struct _TnyStoreAccountIfaceClass
 {
@@ -54,7 +47,6 @@ struct _TnyStoreAccountIfaceClass
 };
 
 GType tny_store_account_iface_get_type (void);
-GType tny_store_account_folder_type_get_type (void);
 
 void tny_store_account_iface_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder);
 void tny_store_account_iface_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folder);

@@ -19,15 +19,16 @@
     '("error" "TNY_ALERT_TYPE_ERROR")
   )
 )
-
-
-(define-enum StoreAccountFolderType
+   
+(define-enum FolderStoreQueryOption
   (in-module "Tny")
-  (c-name "TnyStoreAccountFolderType")
-  (gtype-id "TNY_TYPE_STORE_ACCOUNT_FOLDER_TYPE")
+  (c-name "TnyFolderStoreQueryOption")
+  (gtype-id "TNY_TYPE_FOLDER_STORE_QUERY_OPTION")
   (values
-    '("subscribed" "TNY_STORE_ACCOUNT_FOLDER_TYPE_SUBSCRIBED")
-    '("all" "TNY_STORE_ACCOUNT_FOLDER_TYPE_ALL")
+    '("subscribed" "TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED")
+    '("unsubscribed" "TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED")
+    '("match_on_name" "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME")
+    '("match_on_id" "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID")
   )
 )
 

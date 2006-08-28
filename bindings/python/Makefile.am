@@ -69,6 +69,8 @@ EXTRA_DIST = 				\
 
 tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py \
+	$(top_srcdir)/libtinymail/tny-folder-store-iface.h	\
+	$(top_srcdir)/libtinymail/tny-folder-store-query.h	\
 	$(top_srcdir)/libtinymail/tny-account-iface.h		\
 	$(top_srcdir)/libtinymail/tny-account-store-iface.h	\
 	$(top_srcdir)/libtinymail/tny-device-iface.h		\

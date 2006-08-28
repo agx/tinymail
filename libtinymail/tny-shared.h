@@ -50,7 +50,6 @@ typedef struct _TnyHeaderProxy TnyHeaderProxy;
 typedef struct _TnyHeaderProxyClass TnyHeaderProxyClass;
 typedef gchar* (*TnyGetPassFunc) (TnyAccountIface *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccountIface *self);
-typedef enum _TnyStoreAccountFolderType TnyStoreAccountFolderType;
 typedef void (*TnyRefreshFolderCallback) (TnyFolderIface *self, gboolean cancelled, gpointer user_data);
 typedef void (*TnyRefreshFolderStatusCallback) (TnyFolderIface *self, const gchar *what, gint status, gpointer user_data);
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
