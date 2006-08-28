@@ -54,7 +54,6 @@ A abstract type that contains child folders
 @self: 
 @list: 
 @callback: 
-@statuscb: 
 @query: 
 @user_data: 
 

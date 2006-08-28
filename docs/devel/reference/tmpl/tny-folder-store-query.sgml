@@ -65,6 +65,13 @@ A query for when you want to get a list of folders from a #TnyFolderStoreIface i
 @inst: 
 
 
+<!-- ##### MACRO TNY_TYPE_FOLDER_STORE_QUERY_OPTION ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyFolderStoreQueryItem ##### -->
 <para>
 

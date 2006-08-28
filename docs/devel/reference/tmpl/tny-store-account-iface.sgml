@@ -17,21 +17,6 @@ A store account contains the folders of an E-mail service and handles the authen
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_STORE_ACCOUNT_FOLDER_TYPE ##### -->
-<para>
-
-</para>
-
-
-
-<!-- ##### FUNCTION tny_store_account_folder_type_get_type ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_store_account_iface_subscribe ##### -->
 <para>
 

@@ -109,15 +109,6 @@ instances. Depending on the implementation, this will reduce memory usage.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_iface_set_account ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
-
-
 <!-- ##### FUNCTION tny_folder_iface_set_name ##### -->
 <para>
 

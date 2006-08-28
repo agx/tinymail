@@ -113,7 +113,6 @@ Shared include file with forward typedefs
 @get_id_func: 
 @get_account_func: 
 @set_name_func: 
-@set_account_func: 
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
@@ -468,17 +467,7 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when n
 </para>
 
 @self: 
-@cancelled: 
-@user_data: 
-
-
-<!-- ##### USER_FUNCTION TnyGetFoldersStatusCallback ##### -->
-<para>
-
-</para>
-
-@self: 
-@status: 
+@list: 
 @user_data: 
 
 

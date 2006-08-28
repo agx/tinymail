@@ -1,3 +1,27 @@
+<!-- ##### SECTION ./tmpl/folder-lister.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/folder-lister.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/folder-lister.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/folder-lister.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/folder-lister.sgml:Title ##### -->
+folder-lister
+
+
 <!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Long_Description ##### -->
 <para>
 
@@ -237,6 +261,12 @@ TnySummaryWindow
 </para>
 
 
+<!-- ##### MACRO TNY_TYPE_STORE_ACCOUNT_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
 <para>
 
@@ -278,6 +308,15 @@ TnySummaryWindow
 
 @parent: 
 @real: 
+
+<!-- ##### USER_FUNCTION TnyGetFoldersStatusCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@status: 
+@user_data: 
 
 <!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
 <para>
@@ -537,6 +576,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @Returns: 
+
+<!-- ##### FUNCTION tny_folder_iface_set_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
 
 <!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
 <para>
@@ -1111,6 +1158,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @msg: 
 
 <!-- ##### FUNCTION tny_session_camel_get_instance ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_store_account_folder_type_get_type ##### -->
 <para>
 
 </para>
