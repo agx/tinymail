@@ -35,7 +35,7 @@
 
 static TnyAccountIface *iface = NULL;
 static TnyAccountStoreIface *account_store;
-static TnyListIface *accounts;// *root_folders;
+static TnyListIface *accounts;
 static TnyIteratorIface *aiter;
 static gboolean online_tests=FALSE;
 static gchar *str;
@@ -71,7 +71,6 @@ static void
 tny_account_iface_test_teardown (void)
 {
     	g_object_unref (G_OBJECT (iface));
-    	g_object_unref (G_OBJECT (iface));
 	g_object_unref (G_OBJECT (aiter));
 	g_object_unref (G_OBJECT (accounts));
     
@@ -81,10 +80,12 @@ tny_account_iface_test_teardown (void)
 static void
 tny_store_account_iface_test_get_folders (void)
 {
-    	TnyListIface *folders = (tny_list_new());
+    	TnyListIface *folders = NULL;
     
       	if (!online_tests)
 	    	return;
+    
+    	folders = (TnyListIface *) tny_list_new();
     
     	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (iface),
 			folders, NULL);

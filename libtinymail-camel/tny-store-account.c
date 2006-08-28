@@ -343,23 +343,26 @@ tny_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, Tn
 
     	if (iter)
     	{
-	  while (iter && _tny_folder_store_query_passes (query, iter))
+	  while (iter)
 	  {
-		TnyFolder *folder = tny_folder_new ();
-	    
-		_tny_folder_set_id (folder, iter->full_name);
-		_tny_folder_set_folder_type (folder, iter);
-		_tny_folder_set_unread_count (folder, iter->unread);
-		_tny_folder_set_all_count (folder, iter->total);
-		_tny_folder_set_name (folder, iter->name);
-		_tny_folder_set_iter (folder, iter);
-	      
-		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-	      
-    		tny_folder_iface_set_account (TNY_FOLDER_IFACE (folder), 
-			TNY_ACCOUNT_IFACE (self));
+		if (_tny_folder_store_query_passes (query, iter))
+		{
+			TnyFolder *folder = tny_folder_new ();
+		    
+			_tny_folder_set_id (folder, iter->full_name);
+			_tny_folder_set_folder_type (folder, iter);
+			_tny_folder_set_unread_count (folder, iter->unread);
+			_tny_folder_set_all_count (folder, iter->total);
+			_tny_folder_set_name (folder, iter->name);
+			_tny_folder_set_iter (folder, iter);
+		      
+			priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+		      
+			tny_folder_iface_set_account (TNY_FOLDER_IFACE (folder), 
+				TNY_ACCOUNT_IFACE (self));
 
-	    	tny_list_iface_prepend (list, G_OBJECT (folder));
+			tny_list_iface_prepend (list, G_OBJECT (folder));	
+		}
 		iter = iter->next;
 	  }
 	  

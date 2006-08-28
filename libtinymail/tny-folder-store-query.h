@@ -20,10 +20,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <regex.h>
 #include <tny-shared.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
+
+#include <regex.h>
 
 G_BEGIN_DECLS
 

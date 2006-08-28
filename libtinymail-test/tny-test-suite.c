@@ -35,11 +35,14 @@
 #include "tny-msg-iface-test.h"
 #include "tny-platform-factory-iface-test.h"
 #include "tny-account-store-iface-test.h"
+#include "tny-folder-store-query-test.h"
 
 GList*
 gunit_get_test_suites()
 {
 	GList *suites = NULL;
+
+    	suites = g_list_append (suites, create_tny_folder_store_query_suite ());
 
 	suites = g_list_append (suites, create_tny_header_iface_suite ());
 	suites = g_list_append (suites, create_tny_stream_iface_suite ());
@@ -52,6 +55,6 @@ gunit_get_test_suites()
 	suites = g_list_append (suites, create_tny_msg_iface_suite ());
 	suites = g_list_append (suites, create_tny_platform_factory_iface_suite ());
 	suites = g_list_append (suites, create_tny_account_store_iface_suite ());
-
+    
 	return suites;
 }
