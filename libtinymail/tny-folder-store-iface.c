@@ -99,12 +99,9 @@ tny_folder_store_iface_get_folders (TnyFolderStoreIface *self, TnyListIface *lis
  * main event loop (#GMainLoop). All Gtk+ and GNOME applications use this
  * automatically.
  *
- * The callback and the status_callback don't need gdk_threads_enter and
- * gdk_threads_leave because they are both invoked using g_timeout_add in the
- * main event loop of your application.
+ * The callback doesn't need gdk_threads_enter and gdk_threads_leave because
+ * it's invoked using g_timeout_add in the main event loop of your application.
  *
- * DOC TODO: Document callback and status_callback
- * 
  **/
 void 
 tny_folder_store_iface_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
