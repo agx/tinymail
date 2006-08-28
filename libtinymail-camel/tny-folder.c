@@ -639,10 +639,9 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 	    
 		/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
 		_tny_header_set_camel_mime_message (TNY_HEADER (nheader), camel_message);
-		/* _tny_header_set_camel_message_info (TNY_HEADER (header), info, TRUE); */
 	    
 		tny_msg_iface_set_header (message, nheader);
-		/* strange, g_object_unref (G_OBJECT (header)); should happen here */
+		g_object_unref (G_OBJECT (nheader));  
 	    
 	} else {
 		if (camel_message)
@@ -896,9 +895,7 @@ tny_folder_has_cache (TnyFolderIface *self)
 
 void 
 _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv)
-{
-	/* printf ("check %d\n", priv->headers_managed); */
-    
+{    
 	if (priv->headers_managed == 0)
 		tny_folder_uncache (TNY_FOLDER_IFACE (self));
 }

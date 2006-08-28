@@ -92,26 +92,28 @@ reload_msg (TnyMsgViewIface *self)
 	TnyHeaderIface *header;
 	TnyIteratorIface *iterator;
 	gboolean first_attach = TRUE;
-	TnyAttachListModel *model = tny_attach_list_model_new ();;
+	TnyAttachListModel *model;
 	gboolean have_html = FALSE;
 
-	g_return_if_fail (priv->msg);
+	tny_header_view_iface_clear (TNY_HEADER_VIEW_IFACE (priv->headerview));
+    
+	g_return_if_fail (TNY_IS_MSG_IFACE (priv->msg));
 
-	buffer = gtk_text_view_get_buffer (priv->textview);
+	header = TNY_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));    
+	g_return_if_fail (TNY_IS_HEADER_IFACE (header));
+	tny_header_view_iface_set_header (priv->headerview, header);
+	g_object_unref (G_OBJECT (header));
+
+    
+    	buffer = gtk_text_view_get_buffer (priv->textview);
 	dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
-	header = TNY_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
-
-	g_return_if_fail (header);
-
+    
+    	model = tny_attach_list_model_new ();;
 	tny_msg_iface_get_parts (priv->msg, TNY_LIST_IFACE (model));
 	iterator = tny_list_iface_create_iterator (TNY_LIST_IFACE (model));
 	gtk_widget_hide (priv->attachview_sw);
 
 	gtk_text_buffer_set_text (buffer, "", 0);
-
-	tny_header_view_iface_set_header (priv->headerview, header);
-	g_object_unref (G_OBJECT (header));
-    
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
 	while (!tny_iterator_iface_is_done (iterator))
@@ -168,7 +170,6 @@ reload_msg (TnyMsgViewIface *self)
 		gtk_widget_show (priv->attachview_sw);
 	}
 
-       	g_object_unref (G_OBJECT (header));
 	g_object_unref (G_OBJECT (model));
 
 	return;
@@ -182,7 +183,8 @@ tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyI
 
 	if (priv->save_strategy)
 		g_object_unref (G_OBJECT (priv->save_strategy));
-
+	priv->save_strategy = NULL;
+    
 	g_object_ref (G_OBJECT (strategy));
 	priv->save_strategy = strategy;
 
@@ -190,7 +192,7 @@ tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyI
 }
 
 static void
-tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
+tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
@@ -208,14 +210,8 @@ tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *he
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, _("Message is unavailable"), -1);
 
-	if (header)
-	{
-		tny_header_view_iface_set_header (priv->headerview, header);
-	    
-		gtk_widget_show (GTK_WIDGET (priv->headerview));
-	} else {
-		gtk_widget_hide (GTK_WIDGET (priv->headerview));
-	}
+ 	tny_header_view_iface_clear (priv->headerview);
+	gtk_widget_hide (GTK_WIDGET (priv->headerview));
 
 
 	return;
@@ -307,6 +303,7 @@ tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
     
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
+	priv->msg = NULL;
     
     	if (msg)
 	{
@@ -324,7 +321,7 @@ tny_moz_embed_msg_view_clear (TnyMsgViewIface *self)
     	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, "", 0);
-	tny_header_view_iface_set_header (priv->headerview, NULL);
+	tny_header_view_iface_clear (priv->headerview);
 	gtk_widget_hide (GTK_WIDGET (priv->headerview));
     
     	return;
@@ -356,7 +353,8 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
 
 	priv->save_strategy = NULL;
-
+	priv->msg = NULL;
+    
 	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (self), NULL);
 
@@ -432,13 +430,18 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
-
+	priv->msg = NULL;
+    
 	if (G_LIKELY (priv->save_strategy))
 		g_object_unref (G_OBJECT (priv->save_strategy));
-
-	/*if (G_LIKELY (priv->headerview))
-		g_object_unref (G_OBJECT (priv->headerview));*/
-
+	priv->save_strategy = NULL;
+    
+	if (G_LIKELY (priv->headerview))
+	{
+	     	tny_header_view_iface_clear (priv->headerview);
+		/* g_object_unref (G_OBJECT (priv->headerview)); */
+	}
+    
 	(*parent_class->finalize) (object);
 
 	return;

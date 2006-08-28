@@ -64,13 +64,13 @@ tny_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
 	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->header))
-		g_object_unref (G_OBJECT (priv->header));
-    
-	if (header)
+ 		g_object_unref (G_OBJECT (priv->header));
+	priv->header = NULL;
+
+	if (header && G_IS_OBJECT (header))
 	{
 	    	gchar *str;
 		g_object_ref (G_OBJECT (header)); 
-
 		priv->header = header;
 
 		gtk_label_set_text (GTK_LABEL (priv->to_label), tny_header_iface_get_to (header));
@@ -80,11 +80,29 @@ tny_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
 		str = _get_readable_date (tny_header_iface_get_date_sent (header));
 		gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);
 		g_free (str);
-	} else 
-		priv->header = NULL;
+	}
     
 	return;
 }
+
+
+static void 
+tny_header_view_clear (TnyHeaderViewIface *self)
+{
+	TnyHeaderViewPriv *priv = TNY_HEADER_VIEW_GET_PRIVATE (self);
+
+	if (G_LIKELY (priv->header))
+		g_object_unref (G_OBJECT (priv->header));
+	priv->header = NULL;
+    
+	gtk_label_set_text (GTK_LABEL (priv->to_label), "");
+	gtk_label_set_text (GTK_LABEL (priv->from_label), "");
+	gtk_label_set_text (GTK_LABEL (priv->subject_label), "");
+	gtk_label_set_text (GTK_LABEL (priv->date_label), "");
+    
+	return;
+}
+
 
 /**
  * tny_header_view_new:
@@ -184,7 +202,8 @@ tny_header_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
-
+	priv->header = NULL;
+    
 	(*parent_class->finalize) (object);
 
 	return;
@@ -196,7 +215,8 @@ tny_header_view_iface_init (gpointer g_iface, gpointer iface_data)
 	TnyHeaderViewIfaceClass *klass = (TnyHeaderViewIfaceClass *)g_iface;
 
 	klass->set_header_func = tny_header_view_set_header;
-
+	klass->clear_func = tny_header_view_clear;
+    
 	return;
 }
 

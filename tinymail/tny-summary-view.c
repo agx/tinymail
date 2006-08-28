@@ -290,6 +290,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 				}
 
 				gtk_widget_destroy (dialog);
+			    	g_object_unref (G_OBJECT (header));
 			}
 		}
 		
@@ -314,10 +315,9 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 		gtk_tree_model_get (model, &iter, 
 			TNY_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 			&header, -1);
-
+	    
 		if (G_LIKELY (header))
 		{
-
 			TnyFolderIface *folder;
 			TnyMsgIface *msg;
 
@@ -328,18 +328,17 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 				if (G_LIKELY (msg))
 				{
 					tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));
-					/* Reparent */
 					g_object_unref (G_OBJECT (msg));
 				} else { 
-					tny_msg_view_iface_set_unavailable (priv->msg_view, header);
-					/* Reparent */
-					g_object_unref (G_OBJECT (header));
+					tny_msg_view_iface_set_unavailable (priv->msg_view);
 				}
 			    	g_object_unref (G_OBJECT (folder));
 			}
-		    	
+
+		    	g_object_unref (G_OBJECT (header));
+		    
 		} else {
-			tny_msg_view_iface_set_unavailable (priv->msg_view, NULL);
+			tny_msg_view_iface_set_unavailable (priv->msg_view);
 		}
 	}
 
@@ -465,6 +464,8 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 #else
 		refresh_current_folder (folder, FALSE, user_data);
 #endif
+	    
+	    	g_object_unref (G_OBJECT (folder));
 	}
 
 	return;
@@ -517,13 +518,13 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 					msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (
 						tny_platform_factory_iface_new_msg_view (platfact)));
 
-					tny_msg_view_iface_set_unavailable (TNY_MSG_VIEW_IFACE (msgwin), header);
+					tny_msg_view_iface_set_unavailable (TNY_MSG_VIEW_IFACE (msgwin));
 			
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				}
 			    	g_object_unref (G_OBJECT (folder));
 			}
-
+			g_object_unref (G_OBJECT (header));
 		}
 	}
 }

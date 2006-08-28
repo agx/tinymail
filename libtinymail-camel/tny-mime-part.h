@@ -49,11 +49,11 @@ struct _TnyMimePartClass
 };
 
 
-GType                 tny_mime_part_get_type  (void);
+GType tny_mime_part_get_type (void);
 
-TnyMimePart*       tny_mime_part_new       (CamelMimePart *part);
-void                  tny_mime_part_set_part  (TnyMimePart *self, CamelMimePart *part);
-CamelMimePart*	      tny_mime_part_get_part  (TnyMimePart *self);
+TnyMimePart* tny_mime_part_new (CamelMimePart *part);
+void tny_mime_part_set_part (TnyMimePart *self, CamelMimePart *part);
+CamelMimePart* tny_mime_part_get_part (TnyMimePart *self);
 
 G_END_DECLS
 

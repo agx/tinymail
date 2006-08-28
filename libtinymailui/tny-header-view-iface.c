@@ -21,6 +21,17 @@
 
 #include <tny-header-view-iface.h>
 
+void
+tny_header_view_iface_clear (TnyHeaderViewIface *self)
+{
+#ifdef DEBUG
+	if (!TNY_HEADER_VIEW_IFACE_GET_CLASS (self)->clear_func)
+		g_critical ("You must implement tny_header_view_iface_clear\n");
+#endif
+
+	TNY_HEADER_VIEW_IFACE_GET_CLASS (self)->clear_func (self);
+	return;    
+}
 
 
 /**

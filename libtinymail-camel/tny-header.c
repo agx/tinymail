@@ -469,8 +469,9 @@ void
 _tny_header_set_folder (TnyHeader *self, TnyFolder *folder, TnyFolderPriv *fpriv)
 {
 	TnyHeader *me = TNY_HEADER (self);
-	me->folder = (TnyFolderIface*)folder;
     	fpriv->headers_managed++;
+	me->folder = (TnyFolderIface*)folder;
+    
 	return;
 }
 

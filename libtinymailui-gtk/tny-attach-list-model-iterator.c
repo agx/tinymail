@@ -175,7 +175,7 @@ tny_attach_list_model_iterator_current (TnyIteratorIface *self)
 
 	if (retval)
 		g_object_ref (G_OBJECT(retval));
-	
+
 	return (GObject*)retval;
 }
 

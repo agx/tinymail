@@ -76,24 +76,25 @@ reload_msg (TnyMsgViewIface *self)
 	TnyHeaderIface *header;
 	TnyIteratorIface *iterator;
 	gboolean first_attach = TRUE;
-	TnyAttachListModel *model = tny_attach_list_model_new ();;
+	TnyAttachListModel *model;
 
-	g_return_if_fail (priv->msg);
+	g_return_if_fail (TNY_IS_MSG_IFACE (priv->msg));
 
-	buffer = gtk_text_view_get_buffer (priv->textview);
-	dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
 	header = TNY_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));
+    	g_return_if_fail (TNY_IS_HEADER_IFACE (header));
+	tny_header_view_iface_set_header (priv->headerview, header);
+    	g_object_unref (G_OBJECT (header));
 
-	g_return_if_fail (header);
-
+    	buffer = gtk_text_view_get_buffer (priv->textview);
+	dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
+    
+    	model = tny_attach_list_model_new ();
 	tny_msg_iface_get_parts (priv->msg, TNY_LIST_IFACE (model));
 	iterator = tny_list_iface_create_iterator (TNY_LIST_IFACE (model));
 
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, "", 0);
 
-	tny_header_view_iface_set_header (priv->headerview, header);
-    	g_object_unref (G_OBJECT (header));
     
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
@@ -126,7 +127,6 @@ reload_msg (TnyMsgViewIface *self)
 		gtk_widget_show (priv->attachview_sw);
 	}
 
-    	g_object_unref (G_OBJECT (header));
 	g_object_unref (G_OBJECT (model));
 
 	return;
@@ -226,7 +226,7 @@ tny_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 }
 
 static void
-tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
+tny_msg_view_set_unavailable (TnyMsgViewIface *self)
 {
 	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
@@ -241,13 +241,8 @@ tny_msg_view_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, _("Message is unavailable"), -1);
 
-	if (header)
-	{
-		tny_header_view_iface_set_header (priv->headerview, header);
-		gtk_widget_show (GTK_WIDGET (priv->headerview));
-	} else {
-		gtk_widget_hide (GTK_WIDGET (priv->headerview));
-	}
+ 	tny_header_view_iface_clear (priv->headerview);
+	gtk_widget_hide (GTK_WIDGET (priv->headerview));
 
 	return;
 }

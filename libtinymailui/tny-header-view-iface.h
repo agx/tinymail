@@ -42,12 +42,14 @@ struct _TnyHeaderViewIfaceClass
 {
 	GTypeInterface parent;
 
-	void (*set_header_func)           (TnyHeaderViewIface *self, TnyHeaderIface *header);
+	void (*set_header_func) (TnyHeaderViewIface *self, TnyHeaderIface *header);
+	void (*clear_func) (TnyHeaderViewIface *self);   
 };
 
-GType tny_header_view_iface_get_type          (void);
+GType tny_header_view_iface_get_type (void);
 
-void  tny_header_view_iface_set_header    (TnyHeaderViewIface *self, TnyHeaderIface *header);
+void  tny_header_view_iface_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header);
+void  tny_header_view_iface_clear (TnyHeaderViewIface *self);
 
 
 G_END_DECLS

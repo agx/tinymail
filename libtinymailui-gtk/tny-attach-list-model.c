@@ -125,7 +125,9 @@ tny_attach_list_model_new (void)
 static void 
 destroy_parts (gpointer item, gpointer user_data)
 {
-	g_object_unref (G_OBJECT (item));
+    	if (item && G_IS_OBJECT (item))
+		g_object_unref (G_OBJECT (item));
+    	return;
 }
 
 static void
@@ -202,7 +204,9 @@ tny_attach_list_model_prepend (TnyListIface *self, GObject* item)
 
 	/* Prepend something to the list */
 	g_object_ref (G_OBJECT (item));
+    
 	me->first = g_list_prepend (me->first, item);
+    
 	tny_attach_list_model_add (me, TNY_MIME_PART_IFACE (item), 
 		gtk_list_store_prepend);
 
@@ -218,6 +222,7 @@ tny_attach_list_model_append (TnyListIface *self, GObject* item)
 
 	/* Append something to the list */
 	g_object_ref (G_OBJECT (item));
+    
 	me->first = g_list_append (me->first, item);
 	tny_attach_list_model_add (me, TNY_MIME_PART_IFACE (item), 
 		gtk_list_store_append);
@@ -269,7 +274,6 @@ tny_attach_list_model_remove (TnyListIface *self, GObject* item)
 		{
 			gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));
-
 			break;
 		}
 	}

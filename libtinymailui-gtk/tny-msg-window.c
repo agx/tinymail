@@ -46,11 +46,11 @@ tny_msg_window_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *s
 }
 
 static void
-tny_msg_window_set_unavailable (TnyMsgViewIface *self, TnyHeaderIface *header)
+tny_msg_window_set_unavailable (TnyMsgViewIface *self)
 {
 	TnyMsgWindowPriv *priv = TNY_MSG_WINDOW_GET_PRIVATE (self);
 
-	tny_msg_view_iface_set_unavailable (priv->msg_view, header);
+	tny_msg_view_iface_set_unavailable (priv->msg_view);
 
 	return;
 }

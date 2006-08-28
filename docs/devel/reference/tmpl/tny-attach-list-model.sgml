@@ -12,7 +12,18 @@ implementation inherits the #GtkListStore. If the library was compiled
 with gnome features, the implementation will handle the mime-type icon 
 automatically.
 </para>
-
+<para>
+It's very important to unreference the instance you will get when doing something like this:
+<programlisting>
+TnyMimePartIface *part;
+gtk_tree_model_get (model, &iter,
+  TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN,
+  &part, -1);
+/* use part */
+g_object_unref (G_OBJECT(partr));
+</programlisting>
+The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeModel will indeed add a reference.
+</para>
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMsgMimePartIface, #GtkTreeModel, #GtkListStore, #GtkTreeView
