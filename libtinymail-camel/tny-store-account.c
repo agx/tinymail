@@ -380,17 +380,13 @@ typedef struct {
 static void
 tny_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 {
-	TnyFolderStoreIface *self = ((GetFoldersInfo*)thr_user_data)->self;
-	TnyListIface *list = ((GetFoldersInfo*)thr_user_data)->list;
-	TnyFolderStoreQuery *query = ((GetFoldersInfo*)thr_user_data)->query;
-        
+	GetFoldersInfo *info = thr_user_data;
+    
 	/* gidle reference */
-	g_object_unref (G_OBJECT (self));
-	g_object_unref (G_OBJECT (list));
-    	if (query)
-		g_object_unref (G_OBJECT (query));
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->list));
 
-	g_free (thr_user_data);
+	g_free (info);
 
 	return;
 }
@@ -412,28 +408,26 @@ tny_store_account_get_folders_async_thread (gpointer thr_user_data)
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
     
 	tny_store_account_get_folders (info->self, info->list, info->query);
- 
+    
+ 	if (info->query)
+		g_object_unref (G_OBJECT (info->query));
+
+    	/* thread reference */
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->list));
+    
 	if (info->callback)
 	{
 		/* gidle reference */
 		g_object_ref (G_OBJECT (info->self));
 		g_object_ref (G_OBJECT (info->list));
-		if (info->query)
-			g_object_ref (G_OBJECT (info->query));
 
 		g_idle_add_full (G_PRIORITY_HIGH, 
 			tny_store_account_get_folders_async_callback, 
 			info, tny_store_account_get_folders_async_destroyer);
-
 	}
 
-	/* thread reference
-	g_object_unref (G_OBJECT (info->self));
-	g_object_unref (G_OBJECT (info->list));
-    
-	if (info->query)
-		g_object_unref (G_OBJECT (info->query)); */
-    
+        
 	g_thread_exit (NULL);
     
 	return NULL;
@@ -452,11 +446,11 @@ tny_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *li
 	info->user_data = user_data;
 	info->query = query;
     
-	/* thread reference
-	g_object_ref (G_OBJECT (self));
-	g_object_ref (G_OBJECT (list)); 
-    	if (query)
-		g_object_ref (G_OBJECT (query)); */
+	/* thread reference */
+	g_object_ref (G_OBJECT (info->self));
+	g_object_ref (G_OBJECT (info->list)); 
+    	if (info->query)
+		g_object_ref (G_OBJECT (info->query));
 
 	thread = g_thread_create (tny_store_account_get_folders_async_thread,
 			info, FALSE, NULL);    

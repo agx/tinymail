@@ -1045,14 +1045,13 @@ typedef struct {
 static void
 tny_folder_get_folders_async_destroyer (gpointer thr_user_data)
 {
-	TnyFolderStoreIface *self = ((GetFoldersInfo*)thr_user_data)->self;
-	TnyListIface *list = ((GetFoldersInfo*)thr_user_data)->list;
+	GetFoldersInfo *info = thr_user_data;
     
 	/* gidle reference */
-	g_object_unref (G_OBJECT (self));
-	g_object_unref (G_OBJECT (list));
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->list));
 
-	g_free (thr_user_data);
+	g_free (info);
 
 	return;
 }
@@ -1072,8 +1071,16 @@ static gpointer
 tny_folder_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
+    
 	tny_folder_get_folders (info->self, info->list, info->query);
+    
+	if (info->query)
+		g_object_unref (G_OBJECT (info->query));
 
+    	/* thread reference */
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->list));
+    
 	if (info->callback)
 	{
 		/* gidle reference */
@@ -1086,10 +1093,7 @@ tny_folder_get_folders_async_thread (gpointer thr_user_data)
 
 	}
 
-	/* thread reference */
-	g_object_unref (G_OBJECT (info->self));
-	g_object_unref (G_OBJECT (info->list));
-    
+
 	g_thread_exit (NULL);
     
 	return NULL;
@@ -1101,16 +1105,18 @@ tny_folder_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, Tny
 	GetFoldersInfo *info = g_new0 (GetFoldersInfo, 1);
 	GThread *thread;
 
-    
 	info->self = self;
     	info->list = list;
 	info->callback = callback;
 	info->user_data = user_data;
-
+	info->query = query;
+    
 	/* thread reference */
-	g_object_ref (G_OBJECT (self));
-	g_object_ref (G_OBJECT (list));
-
+	g_object_ref (G_OBJECT (info->self));
+	g_object_ref (G_OBJECT (info->list));
+	if (info->query)
+		g_object_ref (G_OBJECT (info->query));
+    
 	thread = g_thread_create (tny_folder_get_folders_async_thread,
 			info, FALSE, NULL);    
 
