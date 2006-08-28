@@ -5,6 +5,8 @@
 	*  Fixed some ugly memory leaks (reference count problems)
 	* Implemented a first attempt of the get_folders_async API of
 	TnyFolderStoreIface
+	* Added a functional test folder-lister-async.c for the 
+	get_folders_async API of TnyFolderStoreIface
 
 	* This was a major API change
 
