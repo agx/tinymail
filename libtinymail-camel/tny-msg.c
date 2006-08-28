@@ -206,7 +206,7 @@ tny_msg_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 	TnyMimePartPriv *ppriv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelMedium *medium;
 	CamelDataWrapper *containee;
-	gint curl = 0;
+	gint curl = 0, retval = 0;
 
 	g_mutex_lock (priv->message_lock);
 	g_mutex_lock (ppriv->part_lock);
@@ -235,33 +235,33 @@ tny_msg_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 
 	camel_multipart_add_part ((CamelMultipart*)containee, 
 		tny_mime_part_get_part (TNY_MIME_PART (part)));
-
+    
+	retval = camel_multipart_get_number ((CamelMultipart*)containee);
+    
 	g_mutex_unlock (priv->parts_lock);
 
 	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (ppriv->part_lock);
 	g_mutex_unlock (priv->message_lock);
 
-	return camel_multipart_get_number ((CamelMultipart*)containee);
+	return retval;
 }
 
 /* TODO: camel_mime_message_set_date(msg, time(0), 930); */
 
 static void 
-tny_msg_del_part (TnyMsgIface *self, gint id)
+tny_msg_del_part (TnyMsgIface *self,  TnyMimePartIface *part)
 {
 	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
 	TnyMimePartPriv *ppriv = TNY_MIME_PART_GET_PRIVATE (self);
-	gpointer remove;
 	CamelDataWrapper *containee;
 
 	g_mutex_lock (priv->message_lock);
 
 	containee = camel_medium_get_content_object (CAMEL_MEDIUM (ppriv->part));
-	camel_multipart_remove_part_at (CAMEL_MULTIPART (containee), id);
-
-	if (G_LIKELY (remove))
-		camel_object_unref (CAMEL_OBJECT (remove));
+    
+	camel_multipart_remove_part (CAMEL_MULTIPART (containee), 
+		tny_mime_part_get_part (TNY_MIME_PART (part)));
 
 	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (priv->message_lock);

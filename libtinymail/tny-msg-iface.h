@@ -39,29 +39,22 @@ struct _TnyMsgIfaceClass
 {
 	GTypeInterface parent;
 
-	void               (*get_parts_func)        (TnyMsgIface *self, TnyListIface *list);
-	TnyHeaderIface* (*get_header_func)       (TnyMsgIface *self);
-
-        TnyFolderIface*
-                                 (*get_folder_func)       (TnyMsgIface *self);
-	void                     (*set_header_func)       (TnyMsgIface *self, TnyHeaderIface *header);
-
-	void                     (*del_part_func)         (TnyMsgIface *self, gint id);
-	gint                     (*add_part_func)         (TnyMsgIface *self, TnyMimePartIface *part);
-
+	void (*get_parts_func) (TnyMsgIface *self, TnyListIface *list);
+	TnyHeaderIface* (*get_header_func) (TnyMsgIface *self);
+        TnyFolderIface* (*get_folder_func) (TnyMsgIface *self);
+	void (*set_header_func) (TnyMsgIface *self, TnyHeaderIface *header);
+	void (*del_part_func) (TnyMsgIface *self, TnyMimePartIface *part);
+	gint (*add_part_func) (TnyMsgIface *self, TnyMimePartIface *part);
 };
 
-GType                    tny_msg_iface_get_type         (void);
+GType tny_msg_iface_get_type (void);
 
-void               tny_msg_iface_get_parts        (TnyMsgIface *self, TnyListIface *list);
-TnyHeaderIface* tny_msg_iface_get_header       (TnyMsgIface *self);
-
-gint                     tny_msg_iface_add_part         (TnyMsgIface *self, TnyMimePartIface *part);
-void                     tny_msg_iface_del_part         (TnyMsgIface *self, gint id);
-
-TnyFolderIface*
-                         tny_msg_iface_get_folder       (TnyMsgIface *self);
-void                     tny_msg_iface_set_header       (TnyMsgIface *self, TnyHeaderIface *header);
+void tny_msg_iface_get_parts (TnyMsgIface *self, TnyListIface *list);
+TnyHeaderIface* tny_msg_iface_get_header (TnyMsgIface *self);
+gint tny_msg_iface_add_part (TnyMsgIface *self, TnyMimePartIface *part);
+void tny_msg_iface_del_part (TnyMsgIface *self, TnyMimePartIface *part);
+TnyFolderIface* tny_msg_iface_get_folder (TnyMsgIface *self);
+void tny_msg_iface_set_header (TnyMsgIface *self, TnyHeaderIface *header);
 
 G_END_DECLS
 

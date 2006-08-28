@@ -108,20 +108,20 @@ tny_msg_iface_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 /**
  * tny_msg_iface_del_part:
  * @self: a #TnyMsgIface object
- * @id: the mime-part id to delete
+ * @part: the mime-part to delete
  * 
  * Delete a mime-part from a message
  *
  **/
 void
-tny_msg_iface_del_part (TnyMsgIface *self, gint id)
+tny_msg_iface_del_part (TnyMsgIface *self, TnyMimePartIface *part)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_IFACE_GET_CLASS (self)->del_part_func)
 		g_critical ("You must implement tny_msg_iface_del_part\n");
 #endif
 
-	TNY_MSG_IFACE_GET_CLASS (self)->del_part_func (self, id);
+	TNY_MSG_IFACE_GET_CLASS (self)->del_part_func (self, part);
 	return;
 }
 

@@ -42,8 +42,8 @@ gunit_get_test_suites()
 {
 	GList *suites = NULL;
 
+    	suites = g_list_append (suites, create_tny_msg_iface_suite ());
     	suites = g_list_append (suites, create_tny_folder_store_query_suite ());
-
 	suites = g_list_append (suites, create_tny_header_iface_suite ());
 	suites = g_list_append (suites, create_tny_stream_iface_suite ());
 	suites = g_list_append (suites, create_tny_mime_part_iface_suite ());
@@ -52,7 +52,6 @@ gunit_get_test_suites()
 	suites = g_list_append (suites, create_tny_device_iface_suite ());
 	suites = g_list_append (suites, create_tny_iterator_iface_suite ());
 	suites = g_list_append (suites, create_tny_folder_iface_suite ());
-	suites = g_list_append (suites, create_tny_msg_iface_suite ());
 	suites = g_list_append (suites, create_tny_platform_factory_iface_suite ());
 	suites = g_list_append (suites, create_tny_account_store_iface_suite ());
     

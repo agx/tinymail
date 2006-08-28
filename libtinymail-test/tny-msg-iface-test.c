@@ -21,6 +21,9 @@
 #include <tny-msg-iface-test.h>
 #include <tny-msg-iface.h>
 #include <tny-msg.h>
+#include <tny-list-iface.h>
+#include <tny-iterator-iface.h>
+#include <tny-list.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
@@ -48,18 +51,51 @@ tny_msg_iface_test_teardown (void)
 
 	return;
 }
+static void
+tny_msg_iface_test_set_header (void)
+{
+	TnyHeaderIface *header = TNY_HEADER_IFACE (tny_header_new ()), *gheader;
+	tny_msg_iface_set_header (iface, header);
+	gheader = tny_msg_iface_get_header (iface);
+	    
+	str = g_strdup_printf ("Get-header should return what setheader sets\n");
+	gunit_fail_unless (header == gheader, str);
+	g_free (str);
+    
+    	return;
+}
 
 static void
-tny_msg_iface_test_something (void)
+tny_msg_iface_test_add_part_del_part (void)
 {
-	/* TODO: 
-	test methods get_parts, del_part and add_part (important tests)
-	test properties header, folder */
+    
+    	gint length = 0;
+    	TnyListIface *parts = TNY_LIST_IFACE (tny_list_new());
+	CamelMimePart *cpart = camel_mime_part_new ();
+	TnyMimePartIface *part = TNY_MIME_PART_IFACE (tny_mime_part_new (cpart));
+    
+	tny_msg_iface_add_part (iface, part);
 
-	
-	str = g_strdup_printf ("Reason\n");
-	gunit_fail_unless (0 == 0, str);
+    	tny_msg_iface_get_parts (iface, parts);
+	length = tny_list_iface_length (parts);
+    	g_object_unref (G_OBJECT (parts));
+
+    	/* TnyMsg contains one part by itself */
+	str = g_strdup_printf ("Length must be exactly 2, received %d parts\n", length);
+	gunit_fail_unless (length == 2, str);
 	g_free (str);
+
+    	parts = TNY_LIST_IFACE (tny_list_new ());
+    	tny_msg_iface_del_part (iface, part);
+       	tny_msg_iface_get_parts (iface, parts);
+	length = tny_list_iface_length (parts);
+    	g_object_unref (G_OBJECT (parts));
+    
+	str = g_strdup_printf ("Length must be exactly 1, received %d parts\n", length);
+	gunit_fail_unless (length == 1, str);
+	g_free (str);
+    
+    	return;
 }
 
 
@@ -73,9 +109,16 @@ create_tny_msg_iface_suite (void)
 
 	/* Add test case objects to test suite */
 	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_msg_iface_test_something",
+               gunit_test_case_new_with_funcs("tny_msg_iface_test_add_part_del_part",
                                       tny_msg_iface_test_setup,
-                                      tny_msg_iface_test_something,
+                                      tny_msg_iface_test_add_part_del_part,
+				      tny_msg_iface_test_teardown));
+
+    
+    	gunit_test_suite_add_test_case(suite,
+               gunit_test_case_new_with_funcs("tny_msg_iface_test_set_header",
+                                      tny_msg_iface_test_setup,
+                                      tny_msg_iface_test_set_header,
 				      tny_msg_iface_test_teardown));
 
 	return suite;

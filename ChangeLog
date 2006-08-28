@@ -1,6 +1,7 @@
 2006-08-28  Philip Van Hoof <pvanhoof@gnome.org>
 
-	*  Added a unit test for TnyFolderStoreQuery
+	*  Added unit tests for TnyFolderStoreQuery
+	*  Added unit tests for TnyMsgIface
 	
 2006-08-27  Philip Van Hoof <pvanhoof@gnome.org>
 
