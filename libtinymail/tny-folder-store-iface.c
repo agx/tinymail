@@ -95,12 +95,17 @@ tny_folder_store_iface_get_folders (TnyFolderStoreIface *self, TnyListIface *lis
  * Get a list of child folders from this folder store and call back when 
  * finished. 
  *
- * If you want to use this functionality, your application needs to use a glib 
- * main event loop (#GMainLoop). All Gtk+ and GNOME applications use this
- * automatically.
+ * If you want to use this functionality, it's advised to let your application 
+ * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
+ * called.
+ * 
+ * Under a #GMainLoop will this method callback using g_idle_add_full. Without
+ * a #GMainLoop, which the framework detects using (g_main_depth > 0), the
+ * callbacks will happen in a worker thread at an unknown moment in time (check
+ * your locking).
  *
- * The callback doesn't need gdk_threads_enter and gdk_threads_leave because
- * it's invoked using g_timeout_add in the main event loop of your application.
+ * Under a #GMainLoop the callback doesn't need gdk_threads_enter and 
+ * gdk_threads_leave in Gtk+.
  *
  **/
 void 

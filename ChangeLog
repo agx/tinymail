@@ -7,6 +7,7 @@
 	TnyFolderStoreIface
 	* Added a functional test folder-lister-async.c for the 
 	get_folders_async API of TnyFolderStoreIface
+	* Support for non-mainloop _async methods
 
 	* This was a major API change
 

@@ -32,7 +32,7 @@
 
 static gint recursion_level=0;
 static gchar *cachedir=NULL;
-static gboolean online=FALSE;
+static gboolean online=FALSE, mainloop=FALSE;
 
 static const GOptionEntry options[] = 
 {
@@ -40,6 +40,8 @@ static const GOptionEntry options[] =
 		"Cache directory", NULL },
 	{ "online", 'o', 0, G_OPTION_ARG_NONE, &online,
 		"Online or offline", NULL },
+	{ "mainloop", 'm', 0, G_OPTION_ARG_NONE, &mainloop,
+		"Use the Gtk+ mainloop", NULL },
     
 	{ NULL }
 };
@@ -72,8 +74,21 @@ callback (TnyFolderStoreIface *self, TnyListIface *list, gpointer user_data)
 static gboolean
 time_s_up (gpointer data)
 {
-    gtk_main_quit ();
-    return FALSE;
+	gtk_main_quit ();
+	return FALSE;
+}
+
+static gboolean
+dance (gpointer data)
+{
+	TnyListIface *folders;
+	TnyStoreAccountIface *account = data;
+    
+	folders = (TnyListIface *) tny_list_new ();
+    	tny_folder_store_iface_get_folders_async (TNY_FOLDER_STORE_IFACE (account),
+		folders, callback, NULL, NULL);
+    
+	return FALSE;
 }
 
 int 
@@ -81,18 +96,21 @@ main (int argc, char **argv)
 {
 	GOptionContext *context;
 	TnyAccountStoreIface *account_store;
-	TnyListIface *accounts, *folders;
+	TnyListIface *accounts;
 	TnyStoreAccountIface *account; TnyIteratorIface *iter;
 	TnyFolderStoreQueryOption qoptions;
     
 	free (malloc (10));
+	g_type_init ();
     
-	gtk_init (&argc, &argv);
-
+    
     	context = g_option_context_new ("- The tinymail functional tester");
 	g_option_context_add_main_entries (context, options, "tinymail");
 
     	g_option_context_parse (context, &argc, &argv, NULL);
+
+    	if (mainloop)
+		gtk_init (&argc, &argv);
 
 	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online, cachedir));
 
@@ -109,15 +127,22 @@ main (int argc, char **argv)
 	iter = tny_list_iface_create_iterator (accounts);
 	account = (TnyStoreAccountIface*) tny_iterator_iface_current (iter);
 
-	recursion_level = 0;
 
-	folders = (TnyListIface *) tny_list_new ();
-    	tny_folder_store_iface_get_folders_async (TNY_FOLDER_STORE_IFACE (account),
-		folders, callback, NULL, NULL);
-
-	g_timeout_add (1000 * 4, time_s_up, NULL);
-
-	gtk_main ();
+    	if (mainloop)
+	{
+		g_print ("Using the Gtk+ mainloop (will wait 4 seconds in the loop)\n");
+	    
+	    	g_timeout_add (1, dance, account);	    
+	    	g_timeout_add (1000 * 4, time_s_up, NULL);
+	    
+		gtk_main ();
+	    
+	} else {
+		g_print ("Not using a mainloop (will sleep 4 seconds)\n");
+	    
+		dance (account);
+		sleep (4);
+	}
     
 	g_object_unref (G_OBJECT (account));
 	g_object_unref (G_OBJECT (iter));

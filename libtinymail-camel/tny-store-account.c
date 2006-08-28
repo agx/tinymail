@@ -374,6 +374,7 @@ typedef struct {
     TnyGetFoldersCallback callback;
     TnyFolderStoreQuery *query;
     gpointer user_data;
+    guint depth;
 } GetFoldersInfo;
 
 
@@ -422,9 +423,15 @@ tny_store_account_get_folders_async_thread (gpointer thr_user_data)
 		g_object_ref (G_OBJECT (info->self));
 		g_object_ref (G_OBJECT (info->list));
 
-		g_idle_add_full (G_PRIORITY_HIGH, 
-			tny_store_account_get_folders_async_callback, 
-			info, tny_store_account_get_folders_async_destroyer);
+		if (info->depth > 0)
+		{
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				tny_store_account_get_folders_async_callback, 
+				info, tny_store_account_get_folders_async_destroyer);
+		} else {
+			tny_store_account_get_folders_async_callback (info);
+			tny_store_account_get_folders_async_destroyer (info);
+		}
 	}
 
         
@@ -445,6 +452,7 @@ tny_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *li
 	info->callback = callback;
 	info->user_data = user_data;
 	info->query = query;
+	info->depth = g_main_depth ();
     
 	/* thread reference */
 	g_object_ref (G_OBJECT (info->self));
