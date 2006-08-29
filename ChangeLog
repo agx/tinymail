@@ -6,6 +6,7 @@
 
 	* Updated the Python bindings a little bit
 	* Documentation updates
+	* Added some support for the doxygen documentation generator
 
 2006-08-28  Philip Van Hoof <pvanhoof@gnome.org>
 

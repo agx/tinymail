@@ -54,6 +54,7 @@ dnl ### default values (will get overwritten)
 build_gnome=true
 build_mozembed=true
 build_gtkhtml=false
+build_doxygen=false
 PLATFORMDIR=libtinymail-gnome-desktop
 
 dnl ### Select the platform library ##
@@ -146,6 +147,21 @@ AC_ARG_ENABLE(tests,
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-tests) ;;
 esac],[build_tests=false])
 AM_CONDITIONAL(BUILD_TESTS, test x$build_tests = xtrue)
+
+dnl ### doxygen
+AC_ARG_ENABLE(doxygen,
+[  --enable-doxygen          build doxygen docs [default=no]],
+[case "${enableval}" in
+  yes) build_doxygen=true ;;
+  no)  build_doxygen=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-doxygen) ;;
+esac],[build_doxygen=false])
+AM_CONDITIONAL(BUILD_DOXYGEN, test x$build_doxygen = xtrue)
+
+if test x$build_doxygen = xtrue; then
+  AC_CHECK_PROGS(DOXYGEN,doxygen, [You need doxygen])
+  AC_CHECK_PROGS(PERL,perl, [You need perl])
+fi
 
 dnl ### gtk-doc
 GTK_DOC_CHECK([1.0])
@@ -314,6 +330,11 @@ Makefile
 docs/Makefile
 docs/devel/Makefile
 docs/devel/reference/Makefile
+docs/devel/doxygen/Makefile
+docs/devel/doxygen/libtinymail
+docs/devel/doxygen/libtinymail-camel
+docs/devel/doxygen/libtinymailui
+docs/devel/doxygen/libtinymailui-gtk
 bindings/Makefile
 bindings/python/Makefile
 bindings/python/tinymail.pth
