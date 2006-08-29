@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = libtinymail 
+PROJECT_NAME           = libtinymailui-gtk 
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = @top_builddir@/docs/devel/doxygen/out/libtinymailui-gtk 
 CREATE_SUBDIRS         = NO
