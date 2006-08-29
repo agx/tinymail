@@ -44,7 +44,7 @@ struct _TnyAccountStoreViewIfaceClass
 	void (*set_account_store_func) (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store);
 };
 
-GType tny_account_store_view_iface_get_type         (void);
+GType tny_account_store_view_iface_get_type (void);
 
 void tny_account_store_view_iface_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store);
 

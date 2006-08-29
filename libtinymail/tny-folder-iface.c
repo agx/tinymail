@@ -32,6 +32,7 @@ guint *tny_folder_iface_signals;
  *
  * Sync changes made to a folder to its backing store, expunging deleted 
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
+ *
  **/
 void 
 tny_folder_iface_expunge (TnyFolderIface *self)
@@ -60,6 +61,7 @@ tny_folder_iface_expunge (TnyFolderIface *self)
  * This means that the tny_folder_iface_get_headers method will still prepend the
  * removed message in the list until the expunge happened. You are advised to
  * hide messages that have been marked as being deleted from your summary view.
+ * 
  * In Gtk+ for the #GtkTreeView component, you can do this using the 
  * #GtkTreeModelFilter tree model filtering model.
  *
@@ -90,12 +92,12 @@ tny_folder_iface_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
  * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
  * called.
  * 
- * Under a #GMainLoop will this method callback using g_idle_add_full. Without
- * a #GMainLoop, which the framework detects using (g_main_depth > 0), the
- * callbacks will happen in a worker thread at an unknown moment in time (check
- * your locking).
+ * When using a #GMainLoop this method will callback using g_idle_add_full.
+ * Without a #GMainLoop, which the libtinymail-camel implementation detects
+ * using (g_main_depth > 0), the callbacks will happen in a worker thread at an
+ * unknown moment in time (check your locking).
  *
- * Under a #GMainLoop the callback doesn't need gdk_threads_enter and 
+ * When using Gtk+, the callback doesn't need gdk_threads_enter and 
  * gdk_threads_leave in Gtk+.
  *
  **/
@@ -117,13 +119,14 @@ tny_folder_iface_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback c
  * tny_folder_iface_refresh:
  * @self: a TnyFolderIface object
  *
- * Refresh the folder. This gets the summary information from the IMAP service
- * to the ondisk cache and updates it if there was cache already.
+ * Refresh the folder. This gets the summary information from the E-Mail service
+ * and writes it to the the on-disk cache or updates it.
  *
  * After this method, tny_folder_iface_get_all_count and 
  * tny_folder_iface_get_unread_count are guaranteed to be correct.
  *
  * Also read about tny_folder_iface_get_headers.
+ *
  **/
 void
 tny_folder_iface_refresh (TnyFolderIface *self)
@@ -188,6 +191,7 @@ tny_folder_iface_get_subscribed (TnyFolderIface *self)
  * garuanteed to be correct after tny_folder_iface_refresh.
  * 
  * Return value: amount of unread messages
+ *
  **/
 guint
 tny_folder_iface_get_unread_count (TnyFolderIface *self)
@@ -208,6 +212,7 @@ tny_folder_iface_get_unread_count (TnyFolderIface *self)
  * garuanteed to be correct after tny_folder_iface_refresh.
  * 
  * Return value: amount of messages
+ *
  **/
 guint
 tny_folder_iface_get_all_count (TnyFolderIface *self)
@@ -227,8 +232,9 @@ tny_folder_iface_get_all_count (TnyFolderIface *self)
  * Get a reference to the parent account of this folder
  * 
  * Return value: the account of this folder
+ *
  **/
-TnyAccountIface*  
+TnyStoreAccountIface*  
 tny_folder_iface_get_account (TnyFolderIface *self)
 {
 #ifdef DEBUG
@@ -249,6 +255,7 @@ tny_folder_iface_get_account (TnyFolderIface *self)
  * Get a message in the folder identified by a header
  * 
  * Return value: The message instance or NULL on failure
+ *
  **/
 TnyMsgIface*
 tny_folder_iface_get_message (TnyFolderIface *self, TnyHeaderIface *header)
@@ -270,6 +277,7 @@ tny_folder_iface_get_message (TnyFolderIface *self, TnyHeaderIface *header)
  * 
  * Get a list of message header instances that are in this folder. Also read
  * about tny_folder_iface_refresh.
+ *
  **/
 void
 tny_folder_iface_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh)
@@ -295,6 +303,7 @@ tny_folder_iface_get_headers (TnyFolderIface *self, TnyListIface *headers, gbool
  * of this method.
  * 
  * Return value: A unique id
+ *
  **/
 const gchar*
 tny_folder_iface_get_id (TnyFolderIface *self)
@@ -315,6 +324,7 @@ tny_folder_iface_get_id (TnyFolderIface *self)
  * this method.
  * 
  * Return value: The folder name
+ *
  **/
 const gchar*
 tny_folder_iface_get_name (TnyFolderIface *self)
@@ -335,6 +345,7 @@ tny_folder_iface_get_name (TnyFolderIface *self)
  * 
  * Rename a folder. Most services require the name to be unique in the 
  * parent folder.
+ *
  **/
 void
 tny_folder_iface_set_name (TnyFolderIface *self, const gchar *name)
@@ -357,6 +368,7 @@ tny_folder_iface_set_name (TnyFolderIface *self, const gchar *name)
  * Get the type of the folder (Inbox, Outbox etc.) 
  * 
  * Return value: The folder type as  a #TnyFolderType enum
+ *
  **/
 TnyFolderType 
 tny_folder_iface_get_folder_type  (TnyFolderIface *self)

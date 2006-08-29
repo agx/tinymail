@@ -26,8 +26,10 @@
  * tny_msg_view_iface_clear:
  * @self: A #TnyMsgViewIface instance
  *
- * Clear the view (show nothing)
+ * Clear the view @self (show nothing)
  * 
+ * Implementors: this method should clear @self (display nothing)
+ *
  **/
 void
 tny_msg_view_iface_clear (TnyMsgViewIface *self)
@@ -46,8 +48,12 @@ tny_msg_view_iface_clear (TnyMsgViewIface *self)
  * tny_msg_view_iface_set_unavailable:
  * @self: A #TnyMsgViewIface instance
  *
- * Set the view to display the fact that the message was unavailable
+ * Set the view @self to display that the message was unavailable
  * 
+ * Implementors: this method should set @self to display a message like
+ * "Message unavailable" or any other indication that a specific message
+ * isn't available.
+ *
  **/
 void
 tny_msg_view_iface_set_unavailable (TnyMsgViewIface *self)
@@ -69,6 +75,16 @@ tny_msg_view_iface_set_unavailable (TnyMsgViewIface *self)
  *
  * Set the strategy used for saving mime-parts
  * 
+ * Implementors: This method should set the strategy for saving a mime-part.
+ * The user interface of the view can for example have a popup menu in its
+ * attachment viewer that will have to use this strategy for saving the
+ * mime-part.
+ *
+ * The idea is that devices can have a specific such strategy. For example a
+ * strategy that sends it to another computer or a strategy that saves it to
+ * a flash disk. However. In the message view component, you don't care about
+ * that. You only care about the API of the save-strategy interface.
+ *
  **/
 void
 tny_msg_view_iface_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy)
@@ -90,8 +106,26 @@ tny_msg_view_iface_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIfac
  * @self: A #TnyMsgViewIface instance
  * @msg: A #TnyMsgIface instace
  *
- * Set message to view
+ * Set message of the view @self
  * 
+ * Implementors: this method should cause the view @self to show the message
+ * @msg to the user. This includes showing the header (for which you can
+ * make a composition with a #TnyHeaderViewIface), the message body and the
+ * attachments.
+ *
+ * You can get a list of mime-parts using the tny_msg_iface_get_parts API of
+ * the #TnyMsgIface type. If the mime-part has as content type a type that your
+ * viewer supports and recognises as an E-mail body (you can check the content
+ * type if a mime-part using tny_mime_part_iface_content_type_is), the view
+ * should show it.
+ *
+ * It's advised to use the #TnyStreamIface API for streaming the decoded content
+ * of the mime-part to the model of your view that will display the body.
+ * Examples are #TnyMsgView in libtinymailui-gtk and #TnyMozEmbedMsgView in
+ * libtinymailui-mozembed. If you don't decode the content of the mime-part,
+ * for example using tny_mime_part_iface_decode_to_stream, the content might be
+ * encoded in a format suitable for data transfer over for example SMTP.
+ *
  **/
 void
 tny_msg_view_iface_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)

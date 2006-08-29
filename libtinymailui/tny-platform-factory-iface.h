@@ -43,16 +43,16 @@ struct _TnyPlatformFactoryIfaceClass
 {
 	GTypeInterface parent;
 
-	TnyAccountStoreIface*  (*new_account_store_func)  (TnyPlatformFactoryIface *self);
-	TnyDeviceIface*        (*new_device_func)         (TnyPlatformFactoryIface *self);
-	TnyMsgViewIface*       (*new_msg_view_func)       (TnyPlatformFactoryIface *self);
+	TnyAccountStoreIface* (*new_account_store_func) (TnyPlatformFactoryIface *self);
+	TnyDeviceIface* (*new_device_func) (TnyPlatformFactoryIface *self);
+	TnyMsgViewIface* (*new_msg_view_func) (TnyPlatformFactoryIface *self);
 };
 
 GType tny_platform_factory_iface_get_type (void);
 
-TnyAccountStoreIface*  tny_platform_factory_iface_new_account_store  (TnyPlatformFactoryIface *self);
-TnyDeviceIface*        tny_platform_factory_iface_new_device         (TnyPlatformFactoryIface *self);
-TnyMsgViewIface*       tny_platform_factory_iface_new_msg_view       (TnyPlatformFactoryIface *self);
+TnyAccountStoreIface* tny_platform_factory_iface_new_account_store (TnyPlatformFactoryIface *self);
+TnyDeviceIface* tny_platform_factory_iface_new_device (TnyPlatformFactoryIface *self);
+TnyMsgViewIface* tny_platform_factory_iface_new_msg_view (TnyPlatformFactoryIface *self);
 
 G_END_DECLS
 

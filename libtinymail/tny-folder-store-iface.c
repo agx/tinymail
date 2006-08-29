@@ -27,7 +27,7 @@
  * @self: a #TnyFolderStoreIface object
  * @folder: The folder to remove
  *
- * Removes folder from self
+ * Removes a folder represented by @folder from the folder store @self
  * 
  **/
 void 
@@ -47,9 +47,10 @@ tny_folder_store_iface_remove_folder (TnyFolderStoreIface *self, TnyFolderIface 
  * @self: a #TnyFolderStoreIface object
  * @name: The folder name to create
  *
- * Creates a new folder in self
+ * Creates a new folder in folder store @self
  * 
  * Return value: A new folder instance representing the folder that was created
+ *
  **/
 TnyFolderIface *
 tny_folder_store_iface_create_folder (TnyFolderStoreIface *self, const gchar *name)
@@ -66,9 +67,10 @@ tny_folder_store_iface_create_folder (TnyFolderStoreIface *self, const gchar *na
  * tny_folder_store_iface_get_folders:
  * @self: a #TnyFolderStoreIface object
  * @list: A #TnyListIface to fillup
- * @query: A #TnyFolderStoreQuery object
+ * @query: A #TnyFolderStoreQuery object or NULL
  *
- * Get a list of child folders from this folder store
+ * Get a list of child folders from the folder store @self. You can use @query to 
+ * limit the list of folders with only folders that match the query.
  * 
  **/
 void 
@@ -92,19 +94,19 @@ tny_folder_store_iface_get_folders (TnyFolderStoreIface *self, TnyListIface *lis
  * @query: A #TnyFolderStoreQuery object
  * @user_data: user data for the callback
  *
- * Get a list of child folders from this folder store and call back when 
+ * Get a list of child folders from the folder store @self and call back when 
  * finished. 
  *
  * If you want to use this functionality, it's advised to let your application 
  * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
  * called.
  * 
- * Under a #GMainLoop will this method callback using g_idle_add_full. Without
- * a #GMainLoop, which the framework detects using (g_main_depth > 0), the
- * callbacks will happen in a worker thread at an unknown moment in time (check
- * your locking).
+ * When using a #GMainLoop, this method will callback using g_idle_add_full.
+ * Without a #GMainLoop, which the libtinymail-camel implementations detect
+ * using (g_main_depth > 0), the callbacks will happen in a worker thread at an 
+ * unknown moment in time (check your locking).
  *
- * Under a #GMainLoop the callback doesn't need gdk_threads_enter and 
+ * When using Gtk+ the callback doesn't need gdk_threads_enter and 
  * gdk_threads_leave in Gtk+.
  *
  **/

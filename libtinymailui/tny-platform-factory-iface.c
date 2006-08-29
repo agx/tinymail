@@ -28,8 +28,8 @@
  * tny_platform_factory_iface_new_account_store:
  * @self: a TnyPlatformFactoryIface object
  *
- * When implementing a platform-specific library, you need to implement this
- * method. You must simply return a new #TnyAccountStoreIface instance.
+ * Implementors: when implementing a platform-specific library, return a 
+ * new #TnyAccountStoreIface instance.
  *
  * Return value: a #TnyAccountStoreIface instance
  *
@@ -49,8 +49,8 @@ tny_platform_factory_iface_new_account_store (TnyPlatformFactoryIface *self)
  * tny_platform_factory_iface_new_device:
  * @self: a TnyPlatformFactoryIface object
  *
- * When implementing a platform-specific library, you need to implement this
- * method. You must simply return a new #TnyDeviceIface instance.
+ * Implementors: when implementing a platform-specific library, return a 
+ * new #TnyDeviceIface instance.
  *
  * Return value: a #TnyDeviceIface instance
  *
@@ -70,8 +70,8 @@ tny_platform_factory_iface_new_device (TnyPlatformFactoryIface *self)
  * tny_platform_factory_iface_new_msg_view:
  * @self: a TnyPlatformFactoryIface object
  *
- * When implementing a platform-specific library, you need to implement this
- * method. You must simply return a new #TnyMsgViewIface instance.
+ * Implementors: when implementing a platform-specific library, return a 
+ * new #TnyMsgViewIface instance.
  *
  * Return value: a #TnyMsgViewIface instance
  *

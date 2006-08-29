@@ -43,19 +43,19 @@ struct _TnyMsgViewIfaceClass
 {
 	GTypeInterface parent;
 
-	void (*set_msg_func)           (TnyMsgViewIface *self, TnyMsgIface *msg);
+	void (*set_msg_func) (TnyMsgViewIface *self, TnyMsgIface *msg);
 	void (*set_save_strategy_func) (TnyMsgViewIface *self, TnySaveStrategyIface *strategy);
-	void (*set_unavailable_func)   (TnyMsgViewIface *self);
-	void (*clear_func)             (TnyMsgViewIface *self);
+	void (*set_unavailable_func) (TnyMsgViewIface *self);
+	void (*clear_func) (TnyMsgViewIface *self);
     
 };
 
-GType tny_msg_view_iface_get_type          (void);
+GType tny_msg_view_iface_get_type (void);
 
-void  tny_msg_view_iface_set_msg           (TnyMsgViewIface *self, TnyMsgIface *msg);
+void  tny_msg_view_iface_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg);
 void  tny_msg_view_iface_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy);
-void  tny_msg_view_iface_set_unavailable   (TnyMsgViewIface *self);
-void  tny_msg_view_iface_clear             (TnyMsgViewIface *self);
+void  tny_msg_view_iface_set_unavailable (TnyMsgViewIface *self);
+void  tny_msg_view_iface_clear (TnyMsgViewIface *self);
 
 
 G_END_DECLS

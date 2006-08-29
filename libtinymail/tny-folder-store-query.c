@@ -28,6 +28,12 @@
 static GObjectClass *parent_class;
 static GObjectClass *item_parent_class;
 
+/**
+ * tny_folder_store_query_new:
+ *
+ * Return value: a new #TnyFolderStoreQuery instance
+ *
+ **/
 TnyFolderStoreQuery* 
 tny_folder_store_query_new (void)
 {
@@ -172,6 +178,26 @@ get_regerror (int errcode, regex_t *compiled)
 	return buffer;
 }
 
+/**
+ * tny_folder_store_query_add_item:
+ * @query: a #TnyFolderStoreQuery object
+ * @pattern: a regular expression
+ * @options: a #TnyFolderStoreQueryOption enum
+ *
+ * Add a "AND" query-item to the query.
+ * 
+ * If the options contain TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME or 
+ * TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID then pattern will be used as
+ * regular expression for matching the property of the folders.
+ *
+ * The tny_folder_iface_get_name and tny_folder_iface_get_id properties will
+ * then be used.
+ * 
+ * For the options TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED and 
+ * TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED, the folder subscription status
+ * is used.
+ *
+ **/
 void 
 tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *pattern, TnyFolderStoreQueryOption options)
 {
@@ -208,6 +234,14 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
 	}    
 }
 
+/**
+ * tny_folder_store_query_get_items:
+ * @query: a #TnyFolderStoreQuery object
+ *
+ * Get a list of AND query items 
+ *
+ * Return value: a list of AND query items
+ **/
 TnyListIface*
 tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
 {
@@ -215,6 +249,15 @@ tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
 }
 
 
+/**
+ * tny_folder_store_query_item_get_options:
+ * @item: a #TnyFolderStoreQueryItem object
+ *
+ * Get the options of the AND query item @item
+ *
+ * Return value: the options of a AND query item
+ *
+ **/
 TnyFolderStoreQueryOption 
 tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
 {
@@ -222,6 +265,15 @@ tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
 }
 
 
+/**
+ * tny_folder_store_query_item_get_regex:
+ * @item: a #TnyFolderStoreQueryItem object
+ *
+ * Get the compiled regular expression of the AND query item @item
+ *
+ * Return value: the compiled regular expression of a AND query item
+ *
+ **/
 regex_t*
 tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item)
 {

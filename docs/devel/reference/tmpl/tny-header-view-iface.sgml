@@ -2,16 +2,17 @@
 TnyHeaderViewIface
 
 <!-- ##### SECTION Short_Description ##### -->
-A type for showing a #TnyHeaderIface
+A type for showing a header
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type for showing a #TnyHeaderIface to the user
+A type for showing a #TnyHeaderIface implementation to the user. This type is often used in a composition
+with a #TnyMsgViewIface implementation.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyHeaderIface
+#TnyHeaderIface, #TnyMsgViewIface, #TnyMsgWindowIface, #TnyMsgView, #TnyMsgWindow
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

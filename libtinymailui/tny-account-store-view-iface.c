@@ -27,7 +27,7 @@
  * @self: A #TnyAccountStoreViewIface instance
  * @account_store: A #TnyAccountStoreIface instace
  *
- * Set the account store
+ * Set the account store of the view
  * 
  **/
 void

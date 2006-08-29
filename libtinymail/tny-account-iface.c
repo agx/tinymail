@@ -26,7 +26,12 @@
  * tny_account_iface_get_account_type:
  * @self: a #TnyAccountIface object
  *
- * Get the account type
+ * Get the account type. There's two account types: a store and a transport
+ * account type. A store account will implement the #TnyFolderStoreIface 
+ * interfaces which defines that the type contains folders.
+ *
+ * A transport account has a send method for sending #TnyMsgIface instances
+ * using the transport protocol of the account (for example using SMTP).
  *
  * Return value: The account type
  **/
@@ -46,6 +51,8 @@ tny_account_iface_get_account_type (TnyAccountIface *self)
  * tny_account_iface_is_connected:
  * @self: a #TnyAccountIface object
  *
+ * Get the connection status of an account
+ *
  * Return value: whether or not the account is connected
  **/
 gboolean 
@@ -64,9 +71,11 @@ tny_account_iface_is_connected (TnyAccountIface *self)
  * tny_account_iface_get_id:
  * @self: a #TnyAccountIface object
  * 
- * Get an unique id for the account.
+ * Get an unique id for the account. The only certainty you have is that the
+ * id is unique. The format of the id isn't specified. The implementor of the
+ * #TnyAccountStoreIface will set this id using tny_account_iface_set_id.
  * 
- * Return value: Unique id. 
+ * Return value: Unique id
  **/
 const gchar*
 tny_account_iface_get_id (TnyAccountIface *self)
@@ -104,8 +113,9 @@ tny_account_iface_set_name (TnyAccountIface *self, const gchar *name)
  * @self: a #TnyAccountIface object
  * @id: the id
  *
- * Set the account's unique id. You need to set this property
- * before you can start using the account.
+ * Set the account's unique id. You need to set this property before you can 
+ * start using the account. The id must be unique and is typically set in the
+ * implementation of a #TnyAccountStoreIface.
  * 
  **/
 void 
@@ -128,7 +138,8 @@ tny_account_iface_set_id (TnyAccountIface *self, const gchar *id)
  * Set the function that will be called in case the password was wrong and 
  * therefore can be forgotten by the password store.
  *
- * You need to set this property before you can start using the account.
+ * You need to set this property before you can start using the account. This
+ * property is typically set in the implementation of a #TnyAccountStoreIface.
  * 
  * Also see #TnyForgetPassFunc for more information about the function itself.
  *
@@ -169,7 +180,8 @@ tny_account_iface_get_forget_pass_func (TnyAccountIface *self)
  * @url_string: the url string (ex. mbox://path)
  *  
  * Set the url string of an account. You don't need to use this for imap and pop
- * where you can use the simplified API (set_proto, set_hostname, etc).
+ * where you can use the simplified API (set_proto, set_hostname, etc). This
+ * property is typically set in the implementation of a #TnyAccountStoreIface.
  * 
  **/
 void
@@ -189,8 +201,9 @@ tny_account_iface_set_url_string (TnyAccountIface *self, const gchar *url_string
  * @self: a #TnyAccountIface object
  * @proto: the protocol (ex. "imap")
  * 
- * Set the protocol of an account. You need to set this property
- * before you can start using the account.
+ * Set the protocol of an account. You need to set this property before you can
+ * start using the account. This property is typically set in the implementation
+ * of a #TnyAccountStoreIface.
  * 
  **/
 void
@@ -210,8 +223,9 @@ tny_account_iface_set_proto (TnyAccountIface *self, const gchar *proto)
  * @self: a #TnyAccountIface object
  * @user: the username
  * 
- * Set the user or login of an account. You need to set this property
- * before you can start using the account.
+ * Set the user or login of an account. You need to set this property before you
+ * can start using the account. This property is typically set in the
+ * implementation of a #TnyAccountStoreIface.
  *
  **/
 void
@@ -231,8 +245,10 @@ tny_account_iface_set_user (TnyAccountIface *self, const gchar *user)
  * @self: a #TnyAccountIface object
  * @host: the hostname
  * 
- * Set the hostname of an account. You need to set this property
- * before you can start using the account.
+ * Set the hostname of an account. You need to set this property before you can
+ * start using the account. This property is typically set in the implementation
+ * of a #TnyAccountStoreIface.
+ *
  **/
 void
 tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
@@ -255,7 +271,8 @@ tny_account_iface_set_hostname (TnyAccountIface *self, const gchar *host)
  * Set the function that will be called when the password is needed. The
  * function should return the password for a specific account.
  *
- * You need to set this property before you can start using the account.
+ * You need to set this property before you can start using the account. This
+ * property is typically set in the implementation of a #TnyAccountStoreIface.
  * 
  * Also see #TnyGetPassFunc for more information about the function itself. 
  *
@@ -378,8 +395,6 @@ tny_account_iface_get_hostname (TnyAccountIface *self)
 /**
  * tny_account_iface_get_pass_func:
  * @self: a #TnyAccountIface object
- * 
- *
  * 
  * Return value: A pointer to the get-password function
  *

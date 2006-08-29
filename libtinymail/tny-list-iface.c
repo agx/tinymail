@@ -116,8 +116,8 @@ tny_list_iface_remove (TnyListIface *self, GObject* item)
  *
  * An iterator is a position indicator for a list. It keeps the position
  * state of a list iteration. The list itself does not keep any position 
- * information. This makes it possible to create multiple iterations consuming
- * multiple iterator instances simultanously.
+ * information. This makes it possible to have multiple list-iterations by
+ * consuming multiple iterator instances simultanously.
  *
  * The reason why the method isn't called get_iterator is because it's a
  * object creation method. It's not a property. It effectively creates a new

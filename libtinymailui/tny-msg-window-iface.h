@@ -43,7 +43,7 @@ struct _TnyMsgWindowIfaceClass
 
 };
 
-GType         tny_msg_window_iface_get_type        (void);
+GType tny_msg_window_iface_get_type (void);
 
 
 G_END_DECLS

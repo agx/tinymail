@@ -29,7 +29,7 @@
  * Get the parent folder of this message. The returned folder object should be
  * unreferenced after use.
  *
- * Return value: The parent folder of this message
+ * Return value: The parent folder of this message or NULL if none
  **/
 TnyFolderIface* 
 tny_msg_iface_get_folder (TnyMsgIface *self)
@@ -93,6 +93,7 @@ tny_msg_iface_get_header (TnyMsgIface *self)
  * Add a mime-part to a message
  *
  * Return value: The id of the added mime-part
+ *
  **/
 gint
 tny_msg_iface_add_part (TnyMsgIface *self, TnyMimePartIface *part)

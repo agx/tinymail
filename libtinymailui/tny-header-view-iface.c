@@ -21,6 +21,16 @@
 
 #include <tny-header-view-iface.h>
 
+
+/**
+ * tny_header_view_iface_clear:
+ * @self: A #TnyHeaderViewIface instance
+ *
+ * Clear the view @self (show nothing)
+ *
+ * Implementors:  this method should clear @self (display nothing)
+ * 
+ **/
 void
 tny_header_view_iface_clear (TnyHeaderViewIface *self)
 {
@@ -39,8 +49,15 @@ tny_header_view_iface_clear (TnyHeaderViewIface *self)
  * @self: A #TnyHeaderViewIface instance
  * @header: A #TnyHeaderIface instace
  *
- * Set header to view
+ * Set header of the view @self (show nothing)
  * 
+ * Implementors: this method should cause the view @self to show the header
+ * @header to the user. Often this means showing the from, to, subject, date
+ * and cc labels.
+ *
+ * #TnyHeaderViewIface is often used in a composition with the #TnyMsgViewIface
+ * type (the #TnyMsgViewIface implementation contains a #TnyHeaderViewIface).
+ *
  **/
 void
 tny_header_view_iface_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)

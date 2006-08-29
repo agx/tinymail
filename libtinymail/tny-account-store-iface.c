@@ -43,8 +43,8 @@ guint *tny_account_store_iface_signals = NULL;
  * This jump-to-the-ui method implements showing a message dialog with prompt
  * as prompt. It will return TRUE if the reply was affirmative. Or FALSE if not.
  *
- * When implementing a platform-specific library, you need to implement this
- * method. For example in Gtk+ by using the GtkDialog API.
+ * Implementors: when implementing a platform-specific library, you must
+ * implement this method. For example in Gtk+ by using the GtkDialog API.
  *
  * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
  *
@@ -65,8 +65,8 @@ tny_account_store_iface_alert (TnyAccountStoreIface *self, TnyAlertType type, co
  *
  * This method returns a #TnyDeviceIface instance
  *
- * When implementing a platform-specific library, you need to implement this
- * method and a #TnyDeviceIface implementation.
+ * Implementors: when implementing a platform-specific library, you must
+ * implement this method and a #TnyDeviceIface implementation.
  *
  * Return value: the device attached to this account store
  *
@@ -87,9 +87,11 @@ tny_account_store_iface_get_device (TnyAccountStoreIface *self)
  * 
  * Get the local path that will be used for storing the disk cache
  *
- * When implementing a platform-specific library, you need to implement this
- * method. You can simply let it return the path to some folder on the file
- * system. Note that the callers of this method will not free the result. You
+ * Implementors: when implementing a platform-specific library, you must
+ * implement this method. You can for example let it return the path to some
+ * folder on the file system.
+ *
+ * Note that the callers of this method will not free the result. You
  * are responsible of freeing it up. For example when destroying the 
  * #TnyAccountStoreIface implementation instance.
  * 
@@ -113,20 +115,26 @@ tny_account_store_iface_get_cache_dir (TnyAccountStoreIface *self)
  * @list: a #TnyListIface instance that will be filled with #TnyAccountIface instances
  * @types: a #TnyGetAccountsRequestType that describes which account types are needed
  * 
- * Get a read-only list of accounts in the store.
+ * Get a read-only list of accounts in the store
  *
- * When implementing a platform-specific library, you need to implement this
- * method. It is allowed to cache the list (but not required). If you are 
- * implementing an account store for account implementations from libtinymail-camel,
- * you must register the created accounts with a #TnySessionCamel instance.
- *
- * Each created account must also be informed about the #TnySessionCamel instance
- * being used. Read more about this at tny_account_set_session of #TnyAccount 
- * and tny_session_camel_set_current_accounts of #TnySessionCamel. Note that
- * this is specific for the libtinymail-camel implementation and isn't a contract
- * requirement of the interfaces.
+ * Implementors: when implementing a platform-specific library, you must 
+ * implement this method.
  * 
- * There's multiple samples of #TnyAccountStoreIface implementations in
+ * It is allowed to cache the list (but not required). If you are implementing
+ * an account store for account implementations from libtinymail-camel, you must
+ * register the created accounts with a #TnySessionCamel instance using the 
+ * libtinymail-camel specific tny_session_camel_set_current_accounts API.
+ *
+ * The implementation must fillup @list with instances to the available accounts.
+ * Note that if you cache the list, you must add a reference to each account
+ * added to the list (they will be unreferenced and if the reference count
+ * would reaches zero, an account would no longer be cached).
+ *
+ * With libtinymail-camel each created account must also be informed about the
+ * #TnySessionCamel instance being used. Read more about this at
+ * tny_account_set_session of the libtinymail-camel specific #TnyAccount.
+ *
+ * There are multiple samples of #TnyAccountStoreIface implementations in
  * libtinymail-gnome-desktop, libtinymail-olpc, libtinymail-gpe, 
  * libtinymail-maemo and tests/shared/account-store.c which is being used by
  * the unit tests and the normal tests.

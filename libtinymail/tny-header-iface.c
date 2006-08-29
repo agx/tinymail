@@ -66,7 +66,7 @@ tny_header_iface_get_replyto (TnyHeaderIface *self)
  * @self: a #TnyHeaderIface object
  * @bcc: the bcc header in a comma separated list
  * 
- * Set the bcc header. Also look at the to header for more information
+ * Set the bcc header. Look at the to header for more information
  * about formatting.
  * 
  **/
@@ -87,7 +87,7 @@ tny_header_iface_set_bcc (TnyHeaderIface *self, const gchar *bcc)
  * @self: a #TnyHeaderIface object
  * @cc: the cc header in a comma separated list
  * 
- * Set the cc header. Also look at the to header for more information
+ * Set the cc header. Look at the to header for more information
  * about formatting.
  * 
  **/

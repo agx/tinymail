@@ -78,7 +78,7 @@ struct _TnyFolderIfaceClass
 	void (*get_headers_func) (TnyFolderIface *self, TnyListIface *headers, gboolean refresh);
 	const gchar* (*get_name_func) (TnyFolderIface *self);
 	const gchar* (*get_id_func) (TnyFolderIface *self);
-	TnyAccountIface* (*get_account_func) (TnyFolderIface *self);
+	TnyStoreAccountIface* (*get_account_func) (TnyFolderIface *self);
 	void (*set_name_func) (TnyFolderIface *self, const gchar *name);
 	TnyFolderType (*get_folder_type_func) (TnyFolderIface *self);
 	guint (*get_all_count_func) (TnyFolderIface *self);	
@@ -96,7 +96,7 @@ void tny_folder_iface_remove_message (TnyFolderIface *self, TnyHeaderIface *head
 void tny_folder_iface_expunge (TnyFolderIface *self);
 TnyMsgIface* tny_folder_iface_get_message (TnyFolderIface *self, TnyHeaderIface *header);
 void tny_folder_iface_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh);
-TnyAccountIface* tny_folder_iface_get_account (TnyFolderIface *self);
+TnyStoreAccountIface* tny_folder_iface_get_account (TnyFolderIface *self);
 const gchar* tny_folder_iface_get_id (TnyFolderIface *self);
 const gchar* tny_folder_iface_get_name (TnyFolderIface *self);
 void tny_folder_iface_set_name (TnyFolderIface *self, const gchar *name);

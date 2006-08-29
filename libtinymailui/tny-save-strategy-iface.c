@@ -27,6 +27,14 @@
  * @part: The #TnyMimePartIface instance that must be saved
  *
  * Performs the saving of a mime part
+ *
+ * Implementors: the idea is that devices can have a specific such strategy.
+ * For example a strategy that sends it to another computer or a strategy that
+ * saves it to a flash disk. 
+ *
+ * The method is typically called by the implementation of a #TnyMsgViewIface.
+ * For example a clicked handler of a popup menu of a attachment view in the
+ * #TnyMsgViewIface implementation.
  * 
  **/
 void

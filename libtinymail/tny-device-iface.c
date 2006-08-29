@@ -36,7 +36,7 @@ guint *tny_device_iface_signals = NULL;
  * tny_device_iface_reset:
  * @self: a #TnyDeviceIface object
  * 
- * Reset status
+ * Reset status (unforce the status)
  **/
 void 
 tny_device_iface_reset (TnyDeviceIface *self)

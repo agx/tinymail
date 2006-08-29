@@ -44,7 +44,7 @@ struct _TnySaveStrategyIfaceClass
 };
 
 GType tny_save_strategy_iface_get_type (void);
-void  tny_save_strategy_iface_save     (TnySaveStrategyIface *self, TnyMimePartIface *part);
+void tny_save_strategy_iface_save (TnySaveStrategyIface *self, TnyMimePartIface *part);
 
 G_END_DECLS
 
