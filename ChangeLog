@@ -1,3 +1,7 @@
+2006-08-29  Thomas Hisch <t.hisch@gmail.com>
+
+	* Bugfix in libtinymail-gnome-desktop/tny-account-store.c
+	
 2006-08-29  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Updated the Python bindings a little bit

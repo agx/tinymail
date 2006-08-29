@@ -533,8 +533,6 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 	gchar *key = NULL;
 	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
 
-	count++;
-
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
 		tny_account_iface_get_hostname (account), NULL);
@@ -553,6 +551,8 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 	gconf_client_set_string (priv->client, (const gchar*) key, 
 		tny_account_iface_get_user (account), NULL);
 	g_free (key); 
+
+    	count++;
 
 	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
 		count, NULL);
