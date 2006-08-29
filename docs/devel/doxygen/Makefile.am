@@ -9,3 +9,5 @@ clean:
 	rm -rf out/libtinymailui
 	rm -rf out/libtinymailui-gtk
 	rm -rf out/libtinymail-camel
+
+distclean: clean
