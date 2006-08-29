@@ -1,0 +1,123 @@
+# French translation of deskbar-applet.
+# Copyright (C) 2006 Free Software Foundation, Inc.
+# This file is distributed under the same license as the tinymail package.
+#
+# Robert-André Mauchin <zebob.m@gmail.com>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tinymail\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-08-29 02:33+0200\n"
+"PO-Revision-Date: 2006-08-29 02:44:55+0200\n"
+"Last-Translator: Robert-André Mauchin <zebob.m@gmail.com>\n"
+"Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: ../libtinymail-gnome-desktop/tny-account-store.c:96
+msgid "Enter password"
+msgstr "Saisissez le mot de passe"
+
+#: ../libtinymail-gnome-desktop/tny-device.c:133
+msgid "Invalid network manager installation. Going to assume Online status\n"
+msgstr "Installation invalide du gestionnaire de réseau. Votre état est présumé en ligne\n"
+
+#: ../libtinymail-gnome-desktop/tny-password-dialog.c:94
+msgid "Password input"
+msgstr "Zone de saisie du mot de passe"
+
+#: ../libtinymail-camel/tny-camel-common.c:91
+msgid "Invalid e-mail address in field"
+msgstr "Adresse électronique invalide dans le champ"
+
+#: ../libtinymail-camel/tny-folder.c:468
+#, c-format
+msgid "Reading folder `%s'"
+msgstr "Lecture du dossier « %s »"
+
+#: ../libtinymail-camel/tny-store-account.c:64
+#, c-format
+msgid "Couldn't get service %s: %s\n"
+msgstr "Impossible d'obtenir le service %s : %s\n"
+
+#: ../libtinymail-camel/tny-store-account.c:162
+#, c-format
+msgid "Not connected with %s: %s\n"
+msgstr "Non connecté avec %s : %s\n"
+
+#: ../libtinymail-camel/tny-account.c:163
+msgid "Cancellation failed, retrying\n"
+msgstr "L'annulation a échoué, réessai\n"
+
+#: ../libtinymail-camel/tny-session-camel.c:236
+#, c-format
+msgid "Enter password for %s"
+msgstr "Saisissez un mot de passe pour %s"
+
+#: ../libtinymail-camel/tny-session-camel.c:254
+msgid "You cancelled when you had to enter a password"
+msgstr "Vous avez annulé quand vous aviez à saisir un mot de passe"
+
+#: ../libtinymail-camel/tny-session-camel.c:538
+#, c-format
+msgid "Critical ERROR: Cannot init %s as camel directory\n"
+msgstr "Erreur critique : impossible d'initialiser %s comme répertoire camel\n"
+
+#: ../libtinymail-camel/tny-mime-part.c:98
+#: ../libtinymail-camel/tny-mime-part.c:194
+msgid ""
+"Mime part does not yet have a source stream, use "
+"tny_mime_part_construct_from_stream first"
+msgstr ""
+"La partie Mime n'a pas encore un flux source, utilisez "
+"tny_mime_part_construct_from_stream d'abord"
+
+#: ../libtinymailui-gtk/tny-msg-view.c:160
+#: ../libtinymailui-gtk/tny-msg-view.c:189
+#: ../libtinymailui-mozembed/tny-moz-embed-msg-view.c:231
+#: ../libtinymailui-mozembed/tny-moz-embed-msg-view.c:259
+msgid "No save strategy for this message view\n"
+msgstr "Aucune stratégie d'enregistrement pour cette vue de message\n"
+
+#: ../libtinymailui-gtk/tny-msg-view.c:242
+#: ../libtinymailui-mozembed/tny-moz-embed-msg-view.c:211
+msgid "Message is unavailable"
+msgstr "Le message n'est pas disponible"
+
+#: ../libtinymailui-gtk/tny-header-list-model.c:270
+#: ../libtinymailui-gtk/tny-header-view.c:55
+msgid "%Y-%m-%d, %-I:%M %p"
+msgstr "%d-%m-%Y, %-I:%M %p"
+
+#: ../libtinymailui-gtk/tny-header-view.c:134
+msgid "<b>to:</b>"
+msgstr "<b>À :</b>"
+
+#: ../libtinymailui-gtk/tny-header-view.c:142
+msgid "<b>Subject:</b>"
+msgstr "<b>Sujet :</b>"
+
+#: ../libtinymailui-gtk/tny-header-view.c:150
+msgid "<b>Date:</b>"
+msgstr "<b>Date :</b>"
+
+#: ../libtinymailui-gtk/tny-header-view.c:186
+msgid "<b>From:</b>"
+msgstr "<b>De :</b>"
+
+#: ../libtinymailui-gtk/tny-save-strategy.c:105
+msgid "Save File"
+msgstr "Enregistrer le fichier"
+
+#: ../libtinymailui-gtk/tny-save-strategy.c:142
+#, c-format
+msgid "Saving to %s failed\n"
+msgstr "L'enregistrement vers %s a échoué\n"
+
+#: ../libtinymailui-mozembed/tny-moz-embed-stream.c:176
+#, c-format
+msgid "Can't write %s\n"
+msgstr "Impossible d'écrire %s\n"
