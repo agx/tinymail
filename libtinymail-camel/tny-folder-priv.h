@@ -36,7 +36,7 @@ struct _TnyFolderPriv
 	GMutex *folder_lock;
 	CamelFolder *folder;
 	gchar *folder_name;
-	TnyAccountIface *account;
+	TnyStoreAccountIface *account;
 	guint cached_length, unread_length;
 	gboolean subscribed;
 	gboolean has_summary_cap;
@@ -55,7 +55,7 @@ void _tny_folder_set_unread_count (TnyFolder *self, guint len);
 void _tny_folder_set_all_count (TnyFolder *self, guint len);
 void _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv);
 void _tny_folder_set_iter (TnyFolder *folder, CamelFolderInfo *iter);
-void _tny_folder_set_account (TnyFolder *self, TnyAccountIface *account);
+void _tny_folder_set_account (TnyFolder *self, TnyStoreAccountIface *account);
 
 #define TNY_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER, TnyFolderPriv))

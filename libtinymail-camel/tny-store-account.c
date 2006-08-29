@@ -354,7 +354,7 @@ tny_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, Tn
 		      
 			priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
 		      
-			_tny_folder_set_account (folder, TNY_ACCOUNT_IFACE (self));
+			_tny_folder_set_account (folder, TNY_STORE_ACCOUNT_IFACE (self));
 
 			tny_list_iface_prepend (list, G_OBJECT (folder));	
 		}

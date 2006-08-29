@@ -281,7 +281,7 @@ tny_folder_get_all_count (TnyFolderIface *self)
 }
 
 
-static TnyAccountIface*  
+static TnyStoreAccountIface*  
 tny_folder_get_account (TnyFolderIface *self)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
@@ -290,10 +290,10 @@ tny_folder_get_account (TnyFolderIface *self)
 }
 
 void
-_tny_folder_set_account (TnyFolder *self, TnyAccountIface *account)
+_tny_folder_set_account (TnyFolder *self, TnyStoreAccountIface *account)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
-	priv->account = TNY_ACCOUNT_IFACE (account);
+	priv->account = TNY_STORE_ACCOUNT_IFACE (account);
 
 	return;
 }
@@ -991,7 +991,8 @@ tny_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolder
 			
 			apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
 			
-			_tny_folder_set_account (folder, TNY_ACCOUNT_IFACE (priv->account));
+			_tny_folder_set_account (folder,
+						 TNY_STORE_ACCOUNT_IFACE (priv->account));
 
 			tny_list_iface_prepend (list, G_OBJECT (folder));
 		}	    

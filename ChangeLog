@@ -1,3 +1,8 @@
+2006-08-29 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+	
+	* Fix type conflict in libtinymail-camel; only store accounts have
+	folders anyway
+
 2006-08-29  Thomas Hisch <t.hisch@gmail.com>
 
 	* Bugfix in libtinymail-gnome-desktop/tny-account-store.c
