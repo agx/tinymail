@@ -27,7 +27,7 @@
 #include <tny-camel-transport-account.h>
 
 #include <tny-folder-iface.h>
-#include <tny-folder.h>
+#include <tny-camel-folder.h>
 
 #include <camel/camel.h>
 #include <camel/camel-session.h>

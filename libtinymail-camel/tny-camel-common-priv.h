@@ -27,7 +27,7 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 #include <camel/camel-store.h>
-#include <tny-folder.h>
+#include <tny-camel-folder.h>
 
 void _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target);
 void _foreach_email_add_to_inet_addr (const gchar *emails, CamelInternetAddress *target);

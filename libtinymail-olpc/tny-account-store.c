@@ -31,18 +31,16 @@
 
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
-#include <tny-account.h>
-
 #include <tny-password-dialog.h>
-
 #include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
-
-#include <tny-store-account.h>
-#include <tny-transport-account.h>
-
 #include <tny-device-iface.h>
+
+#include <tny-camel-account.h>
+#include <tny-camel-store-account.h>
+#include <tny-camel-transport-account.h>
+#include <tny-session-camel.h>
 #include <tny-device.h>
 
 /* GKeyFile vs. Camel implementation */
@@ -217,20 +215,12 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
-			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || 
-			    types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
-			{
-				account = TNY_ACCOUNT_IFACE (tny_transport_account_new ());
-			}
-	
-		} else 
-		{
+			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
+				account = tny_camel_transport_account_new ();	
+		} else {
 
-			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || 
-			    types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
-			{
-				account = TNY_ACCOUNT_IFACE (tny_store_account_new ());
-			}
+			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
+				account = tny_camel_store_account_new ();
 		}
 
 		if (type)
@@ -241,7 +231,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			gsize options_len; gint i;
 			gchar **options;
 
-			tny_account_set_session (TNY_ACCOUNT (account), priv->session);
+			tny_camel_account_set_session (TNY_ACCOUNT (account), priv->session);
 
 			proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
 			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);

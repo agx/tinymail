@@ -26,10 +26,10 @@
 
 #include <tny-header-iface.h>
 #include <tny-camel-header.h>
-#include <tny-folder.h>
+#include <tny-camel-folder.h>
 
 #include "tny-camel-common-priv.h"
-#include "tny-folder-priv.h"
+#include "tny-camel-folder-priv.h"
 #include "tny-camel-header-priv.h"
 
 #include <tny-camel-shared.h>
@@ -433,10 +433,10 @@ tny_camel_header_finalize (GObject *object)
     
     	if (self->folder)
     	{
-	    	TnyFolderPriv *fpriv = TNY_FOLDER_GET_PRIVATE (self->folder);
+	    	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self->folder);
 
 	       	fpriv->headers_managed--;
-    		_tny_folder_check_uncache (((TnyFolder*)self->folder), fpriv);
+    		_tny_camel_folder_check_uncache (((TnyCamelFolder*)self->folder), fpriv);
 	}
 
 	/* Normally we do camel_folder_free_message_info here, but we already got
@@ -452,9 +452,9 @@ tny_camel_header_finalize (GObject *object)
  * tny_camel_header_new:
  *
  *
- * Return value: A new #TnyCamelHeader instance implemented for Camel
+ * Return value: A new #TnyHeaderIface instance implemented for Camel
  **/
-TnyCamelHeader*
+TnyHeaderIface*
 tny_camel_header_new (void)
 {
 	TnyCamelHeader *self = g_object_new (TNY_TYPE_CAMEL_HEADER, NULL);
@@ -462,11 +462,11 @@ tny_camel_header_new (void)
 	self->info = NULL;
 	self->write = 0;
 
-	return self;
+	return (TnyHeaderIface*)self;
 }
 
 void
-_tny_camel_header_set_folder (TnyCamelHeader *self, TnyFolder *folder, TnyFolderPriv *fpriv)
+_tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyCamelFolderPriv *fpriv)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
     	fpriv->headers_managed++;

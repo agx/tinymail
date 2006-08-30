@@ -9,7 +9,7 @@ libtinymail_camel_1_0_headers =			\
 	tny-camel-mime-part.h			\
 	tny-camel-header.h			\
 	tny-camel-msg.h				\
-	tny-folder.h				\
+	tny-camel-folder.h			\
 	tny-camel-account.h			\
 	tny-camel-store-account.h		\
 	tny-camel-transport-account.h		\
@@ -26,13 +26,13 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-camel-transport-account-priv.h	\
 	tny-camel-msg-priv.h			\
 	tny-camel-header-priv.h			\
-	tny-folder-priv.h			\
+	tny-camel-folder-priv.h			\
 	$(libtinymail_camel_1_0_headers)	\
 	tny-camel-msg.c				\
 	tny-camel-header.c 			\
 	tny-camel-mime-part-priv.h		\
 	tny-camel-mime-part.c			\
-	tny-folder.c				\
+	tny-camel-folder.c			\
 	tny-camel-account.c			\
 	tny-camel-store-account.c		\
 	tny-camel-transport-account.c		\

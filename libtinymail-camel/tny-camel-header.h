@@ -39,8 +39,8 @@ typedef struct _TnyCamelHeader TnyCamelHeader;
 typedef struct _TnyCamelHeaderClass TnyCamelHeaderClass;
 
 
-GType             tny_camel_header_get_type  (void);
-TnyCamelHeader*   tny_camel_header_new       (void);
+GType tny_camel_header_get_type (void);
+TnyHeaderIface* tny_camel_header_new (void);
 
 
 G_END_DECLS

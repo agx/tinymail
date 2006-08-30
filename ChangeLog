@@ -10,7 +10,8 @@
 	* Renamed TnyStreamCamel to TnyCamelStream
 	* Renamed TnyMimePart to TnyCamelMimePart
 	* Renamed TnyMsg to TnyCamelMsg
-	
+	* Renamed TnyFolder to TnyCamelFolder
+
 2006-08-29  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
 	* Fix type conflict in libtinymail-camel; only store accounts have

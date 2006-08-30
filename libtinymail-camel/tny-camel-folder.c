@@ -25,7 +25,7 @@
 
 #include <tny-folder-store-iface.h>
 #include <tny-folder-iface.h>
-#include <tny-folder.h>
+#include <tny-camel-folder.h>
 #include <tny-msg-iface.h>
 #include <tny-header-iface.h>
 #include <tny-camel-msg.h>
@@ -46,7 +46,7 @@
 #include <tny-session-camel.h>
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"
-#include "tny-folder-priv.h"
+#include "tny-camel-folder-priv.h"
 #include "tny-camel-header-priv.h"
 #include "tny-camel-msg-priv.h"
 #include "tny-camel-common-priv.h"
@@ -71,7 +71,7 @@ folder_changed (TnyFolderIface *self, CamelFolderChangeInfo *info, gpointer user
 }
 
 static void
-unload_folder_no_lock (TnyFolderPriv *priv, gboolean destroy)
+unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 {
 	if (G_LIKELY (priv->folder))
 	{
@@ -93,7 +93,7 @@ unload_folder_no_lock (TnyFolderPriv *priv, gboolean destroy)
 }
 
 static void 
-unload_folder (TnyFolderPriv *priv, gboolean destroy)
+unload_folder (TnyCamelFolderPriv *priv, gboolean destroy)
 {
 	g_mutex_lock (priv->folder_lock);
 	unload_folder_no_lock (priv, destroy);
@@ -102,7 +102,7 @@ unload_folder (TnyFolderPriv *priv, gboolean destroy)
 
 
 static void
-load_folder_no_lock (TnyFolderPriv *priv)
+load_folder_no_lock (TnyCamelFolderPriv *priv)
 {
 	if (!priv->folder && !priv->loaded)
 	{
@@ -133,7 +133,7 @@ load_folder_no_lock (TnyFolderPriv *priv)
 
 
 static void
-load_folder (TnyFolderPriv *priv)
+load_folder (TnyCamelFolderPriv *priv)
 {
 	g_mutex_lock (priv->folder_lock);
 	load_folder_no_lock (priv);
@@ -144,9 +144,9 @@ load_folder (TnyFolderPriv *priv)
 
 
 static void 
-tny_folder_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
+tny_camel_folder_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	const gchar *id;
 
 	g_mutex_lock (priv->folder_lock);
@@ -163,9 +163,9 @@ tny_folder_remove_message (TnyFolderIface *self, TnyHeaderIface *header)
 }
 
 static void 
-tny_folder_expunge (TnyFolderIface *self)
+tny_camel_folder_expunge (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	g_mutex_lock (priv->folder_lock);
@@ -182,9 +182,9 @@ tny_folder_expunge (TnyFolderIface *self)
 
 
 CamelFolder*
-_tny_folder_get_camel_folder (TnyFolderIface *self)
+_tny_camel_folder_get_camel_folder (TnyCamelFolder *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelFolder *retval;
 
 	if (!priv->folder || !priv->loaded)
@@ -196,9 +196,9 @@ _tny_folder_get_camel_folder (TnyFolderIface *self)
 
 
 static gboolean
-tny_folder_get_subscribed (TnyFolderIface *self)
+tny_camel_folder_get_subscribed (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	gboolean retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -209,9 +209,9 @@ tny_folder_get_subscribed (TnyFolderIface *self)
 }
 
 void
-_tny_folder_set_subscribed (TnyFolder *self, gboolean subscribed)
+_tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folder_lock);
 	priv->subscribed = subscribed;
@@ -221,9 +221,9 @@ _tny_folder_set_subscribed (TnyFolder *self, gboolean subscribed)
 }
 
 static void
-tny_folder_set_subscribed (TnyFolderIface *self, gboolean subscribed)
+tny_camel_folder_set_subscribed (TnyFolderIface *self, gboolean subscribed)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	/* These will synchronize me using _tny_folder_set_subscribed_priv */
 
@@ -238,9 +238,9 @@ tny_folder_set_subscribed (TnyFolderIface *self, gboolean subscribed)
 }
 
 static guint
-tny_folder_get_unread_count (TnyFolderIface *self)
+tny_camel_folder_get_unread_count (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	guint retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -251,26 +251,26 @@ tny_folder_get_unread_count (TnyFolderIface *self)
 }
 
 void
-_tny_folder_set_unread_count (TnyFolder *self, guint len)
+_tny_camel_folder_set_unread_count (TnyCamelFolder *self, guint len)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	priv->unread_length = len;
 	return;
 }
 
 void
-_tny_folder_set_all_count (TnyFolder *self, guint len)
+_tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	priv->cached_length = len;
 	return;
 }
 
 
 static guint
-tny_folder_get_all_count (TnyFolderIface *self)
+tny_camel_folder_get_all_count (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	guint retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -282,17 +282,17 @@ tny_folder_get_all_count (TnyFolderIface *self)
 
 
 static TnyStoreAccountIface*  
-tny_folder_get_account (TnyFolderIface *self)
+tny_camel_folder_get_account (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	return priv->account;
 }
 
 void
-_tny_folder_set_account (TnyFolder *self, TnyStoreAccountIface *account)
+_tny_camel_folder_set_account (TnyCamelFolder *self, TnyStoreAccountIface *account)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	priv->account = TNY_STORE_ACCOUNT_IFACE (account);
 
 	return;
@@ -301,7 +301,7 @@ _tny_folder_set_account (TnyFolder *self, TnyStoreAccountIface *account)
 typedef struct 
 { 	/* This is a speedup trick */
 	TnyFolderIface *self;
-	TnyFolderPriv *priv;
+	TnyCamelFolderPriv *priv;
 	TnyListIface *headers;
 } FldAndPriv;
 
@@ -314,15 +314,15 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	/* Unpack speedup trick */
 	TnyFolderIface *self = ptr->self;
-	TnyFolderPriv *priv = ptr->priv;
+	TnyCamelFolderPriv *priv = ptr->priv;
 	TnyListIface *headers = ptr->headers;
-	CamelFolder *cfol = _tny_folder_get_camel_folder (self);
+	CamelFolder *cfol = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
 	CamelMessageInfo *mi = camel_folder_get_message_info (cfol, uid);
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
-	header = TNY_HEADER_IFACE (tny_camel_header_new ());
+	header = tny_camel_header_new ();
 
-	_tny_camel_header_set_folder (TNY_CAMEL_HEADER (header), TNY_FOLDER (self), priv);
+	_tny_camel_header_set_folder (TNY_CAMEL_HEADER (header), TNY_CAMEL_FOLDER (self), priv);
 	_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (header), mi, FALSE);
 
 	/* Get rid of the reference already. I know this is ugly */
@@ -350,7 +350,7 @@ typedef struct
 
 
 static void
-tny_folder_refresh_async_destroyer (gpointer thr_user_data)
+tny_camel_folder_refresh_async_destroyer (gpointer thr_user_data)
 {
 
 	TnyFolderIface *self = ((RefreshFolderInfo*)thr_user_data)->self;
@@ -364,7 +364,7 @@ tny_folder_refresh_async_destroyer (gpointer thr_user_data)
 }
 
 static gboolean
-tny_folder_refresh_async_callback (gpointer thr_user_data)
+tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
 
@@ -416,7 +416,7 @@ progress_func (gpointer data)
 
 
 static void
-tny_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
+tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
 	RefreshFolderInfo *oinfo = thr_user_data;
 	ProgressInfo *info = g_new0 (ProgressInfo, 1);
@@ -449,11 +449,11 @@ tny_folder_refresh_async_status (struct _CamelOperation *op, const char *what, i
 
 
 static gpointer 
-tny_folder_refresh_async_thread (gpointer thr_user_data)
+tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
 	TnyFolderIface *self = info->self;
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 	gchar *str;
 	CamelException *ex = camel_exception_new ();
@@ -467,7 +467,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 	info->cancelled = FALSE;
 	str = g_strdup_printf (_("Reading folder `%s'"), priv->folder->full_name);
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
-		tny_folder_refresh_async_status, info, str);
+		tny_camel_folder_refresh_async_status, info, str);
 	g_free (str);
 	camel_folder_refresh_info (priv->folder, ex);
        	priv->cached_length = camel_folder_get_message_count (priv->folder);
@@ -491,11 +491,11 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
-				tny_folder_refresh_async_callback, 
-				info, tny_folder_refresh_async_destroyer);
+				tny_camel_folder_refresh_async_callback, 
+				info, tny_camel_folder_refresh_async_destroyer);
 		} else {
-			tny_folder_refresh_async_callback (info);
-			tny_folder_refresh_async_destroyer (info);
+			tny_camel_folder_refresh_async_callback (info);
+			tny_camel_folder_refresh_async_destroyer (info);
 		}
 	}
   
@@ -505,7 +505,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 }
 
 static void
-tny_folder_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_camel_folder_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info = g_new0 (RefreshFolderInfo, 1);
 	GThread *thread;
@@ -519,16 +519,16 @@ tny_folder_refresh_async (TnyFolderIface *self, TnyRefreshFolderCallback callbac
 	/* thread reference */
 	g_object_ref (G_OBJECT (self));
 
-	thread = g_thread_create (tny_folder_refresh_async_thread,
+	thread = g_thread_create (tny_camel_folder_refresh_async_thread,
 			info, FALSE, NULL);
 
 	return;
 }
 
 static void 
-tny_folder_refresh (TnyFolderIface *self)
+tny_camel_folder_refresh (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelException *ex = camel_exception_new ();
 
 	camel_exception_init (ex);
@@ -540,12 +540,12 @@ tny_folder_refresh (TnyFolderIface *self)
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
 		NULL, NULL, NULL);
 	camel_folder_refresh_info (priv->folder, ex);
-    	priv->cached_length = camel_folder_get_message_count (priv->folder);
-    
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+
+    	priv->cached_length = camel_folder_get_message_count (priv->folder);    
 	if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
-	camel_exception_free (ex);
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+	camel_exception_free (ex);	
 
 	g_mutex_unlock (priv->folder_lock);
 
@@ -553,9 +553,9 @@ tny_folder_refresh (TnyFolderIface *self)
 }
 
 static void
-tny_folder_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh)
+tny_camel_folder_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean refresh)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	GPtrArray *uids = NULL;
 	CamelException ex;
 	FldAndPriv *ptr = NULL;
@@ -576,30 +576,27 @@ tny_folder_get_headers (TnyFolderIface *self, TnyListIface *headers, gboolean re
 	{
 		camel_folder_refresh_info (priv->folder, &ex);
         	priv->cached_length = camel_folder_get_message_count (priv->folder);
-
 		if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 			priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 	}
+    
 	priv->cached_length = 0;
 	uids = camel_folder_get_uids (priv->folder);
 	g_ptr_array_foreach (uids, add_message_with_uid, ptr);
 	g_free (ptr);
 
 	camel_folder_free_uids (priv->folder, uids); 
-
 	g_object_unref (G_OBJECT (headers));
-
 	g_mutex_unlock (priv->folder_lock);
-
 
 	return;
 }
 
 
 static TnyMsgIface*
-tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
+tny_camel_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyMsgIface *message = NULL;
     	CamelMimeMessage *camel_message = NULL;
 	const gchar *id;
@@ -630,10 +627,8 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 		
 		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), self);
 		_tny_camel_msg_set_camel_mime_message (TNY_CAMEL_MSG (message), camel_message); 
-	    
 		/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
 		_tny_camel_header_set_camel_mime_message (TNY_CAMEL_HEADER (nheader), camel_message);
-	    
 		tny_msg_iface_set_header (message, nheader);
 		g_object_unref (G_OBJECT (nheader));  
 	    
@@ -652,9 +647,9 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 
 
 static const gchar*
-tny_folder_get_name (TnyFolderIface *self)
+tny_camel_folder_get_name (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	const gchar *name = NULL;
 	
 	if (G_UNLIKELY (!priv->cached_name))
@@ -669,26 +664,26 @@ tny_folder_get_name (TnyFolderIface *self)
 
 
 static TnyFolderType
-tny_folder_get_folder_type (TnyFolderIface *self)
+tny_camel_folder_get_folder_type (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	return priv->cached_folder_type;
 }
 
 
 static const gchar*
-tny_folder_get_id (TnyFolderIface *self)
+tny_camel_folder_get_id (TnyFolderIface *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	return priv->folder_name;
 }
 
 void
-_tny_folder_set_id (TnyFolder *self, const gchar *id)
+_tny_camel_folder_set_id (TnyCamelFolder *self, const gchar *id)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folder_lock);
 
@@ -706,9 +701,9 @@ _tny_folder_set_id (TnyFolder *self, const gchar *id)
 
 
 void
-_tny_folder_set_name (TnyFolder *self, const gchar *name)
+_tny_camel_folder_set_name (TnyCamelFolder *self, const gchar *name)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	if (G_UNLIKELY (priv->cached_name))
 		g_free (priv->cached_name);
@@ -719,9 +714,9 @@ _tny_folder_set_name (TnyFolder *self, const gchar *name)
 }
 
 static void
-tny_folder_set_name (TnyFolderIface *self, const gchar *name)
+tny_camel_folder_set_name (TnyFolderIface *self, const gchar *name)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	load_folder (priv);
 
@@ -736,28 +731,29 @@ tny_folder_set_name (TnyFolderIface *self, const gchar *name)
 }
 
 /**
- * tny_folder_set_folder:
- * @self: A #TnyFolder object
+ * tny_camel_folder_set_folder:
+ * @self: A #TnyCamelFolder object
  * @camel_folder: The #CamelFolder instance to play proxy for
  *
  **/
 void
-tny_folder_set_folder (TnyFolder *self, CamelFolder *camel_folder)
+tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder)
 {
-	_tny_folder_set_id (self, camel_folder_get_full_name (camel_folder));
+	_tny_camel_folder_set_id (self, camel_folder_get_full_name (camel_folder));
+    
 	return;
 }
 
 /**
- * tny_folder_get_folder:
- * @self: A #TnyFolder object
+ * tny_camel_folder_get_folder:
+ * @self: A #TnyCamelFolder object
  *
  * Return value: The CamelFolder instance to play proxy for
  **/
 CamelFolder*
-tny_folder_get_folder (TnyFolder *self)
+tny_camel_folder_get_folder (TnyCamelFolder *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelFolder *retval = NULL;
 
 	g_mutex_lock (priv->folder_lock);
@@ -768,46 +764,47 @@ tny_folder_get_folder (TnyFolder *self)
 }
 
 /**
- * tny_folder_new_with_folder:
+ * tny_camel_folder_new_with_folder:
  * @camel_folder: CamelFolder instance to play proxy for 
  *
- * The #TnyFolder implementation is actually a proxy for #CamelFolder
+ * The #TnyCamelFolder implementation is actually a proxy for #CamelFolder
  *
  * Return value: A new #TnyFolderIface instance implemented for Camel
  **/
-TnyFolder*
-tny_folder_new_with_folder (CamelFolder *camel_folder)
+TnyFolderIface*
+tny_camel_folder_new_with_folder (CamelFolder *camel_folder)
 {
-	TnyFolder *self = g_object_new (TNY_TYPE_FOLDER, NULL);
-	tny_folder_set_folder (self, camel_folder);
+	TnyCamelFolder *self = g_object_new (TNY_TYPE_CAMEL_FOLDER, NULL);
+    
+	tny_camel_folder_set_folder (self, camel_folder);
 
-	return self;
+	return TNY_FOLDER_IFACE (self);
 }
 
 
 /**
- * tny_folder_new:
+ * tny_camel_folder_new:
  * 
- * The #TnyFolder implementation is actually a proxy for #CamelFolder.
+ * The #TnyCamelFolder implementation is actually a proxy for #CamelFolder.
  * You need to set the #CamelFolder after using this constructor using
- * tny_folder_set_folder
+ * tny_camel_folder_set_folder
  *
  * Return value: A new #TnyFolderIface instance implemented for Camel
  **/
-TnyFolder*
-tny_folder_new (void)
+TnyFolderIface*
+tny_camel_folder_new (void)
 {
-	TnyFolder *self = g_object_new (TNY_TYPE_FOLDER, NULL);
+	TnyCamelFolder *self = g_object_new (TNY_TYPE_CAMEL_FOLDER, NULL);
 
-	return self;
+	return TNY_FOLDER_IFACE (self);
 }
 
 
 static void
-tny_folder_finalize (GObject *object)
+tny_camel_folder_finalize (GObject *object)
 {
-	TnyFolder *self = (TnyFolder*) object;
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
+	TnyCamelFolder *self = (TnyCamelFolder*) object;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folder_lock);
 
@@ -848,9 +845,9 @@ tny_folder_finalize (GObject *object)
 }
 
 static void
-tny_folder_uncache (TnyFolderIface *self)
+tny_camel_folder_uncache (TnyCamelFolder *self)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->folder != NULL))
 		unload_folder (priv, FALSE);
@@ -860,10 +857,10 @@ tny_folder_uncache (TnyFolderIface *self)
 
 
 void 
-_tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv)
+_tny_camel_folder_check_uncache (TnyCamelFolder *self, TnyCamelFolderPriv *priv)
 {    
 	if (priv->headers_managed == 0)
-		tny_folder_uncache (TNY_FOLDER_IFACE (self));
+		tny_camel_folder_uncache (self);
 }
 
 
@@ -872,28 +869,28 @@ tny_folder_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyFolderIfaceClass *klass = (TnyFolderIfaceClass *)g_iface;
 
-	klass->get_headers_func = tny_folder_get_headers;
-	klass->get_message_func = tny_folder_get_message;
-	klass->get_id_func = tny_folder_get_id;
-	klass->set_name_func = tny_folder_set_name;
-	klass->get_name_func = tny_folder_get_name;
-	klass->get_folder_type_func = tny_folder_get_folder_type;
-	klass->get_unread_count_func = tny_folder_get_unread_count;
-	klass->get_all_count_func = tny_folder_get_all_count;
-	klass->get_account_func = tny_folder_get_account;
-	klass->get_subscribed_func = tny_folder_get_subscribed;
-	klass->set_subscribed_func = tny_folder_set_subscribed;
-	klass->refresh_async_func = tny_folder_refresh_async;
-	klass->refresh_func = tny_folder_refresh;
-	klass->remove_message_func = tny_folder_remove_message;
-	klass->expunge_func = tny_folder_expunge;
+	klass->get_headers_func = tny_camel_folder_get_headers;
+	klass->get_message_func = tny_camel_folder_get_message;
+	klass->get_id_func = tny_camel_folder_get_id;
+	klass->set_name_func = tny_camel_folder_set_name;
+	klass->get_name_func = tny_camel_folder_get_name;
+	klass->get_folder_type_func = tny_camel_folder_get_folder_type;
+	klass->get_unread_count_func = tny_camel_folder_get_unread_count;
+	klass->get_all_count_func = tny_camel_folder_get_all_count;
+	klass->get_account_func = tny_camel_folder_get_account;
+	klass->get_subscribed_func = tny_camel_folder_get_subscribed;
+	klass->set_subscribed_func = tny_camel_folder_set_subscribed;
+	klass->refresh_async_func = tny_camel_folder_refresh_async;
+	klass->refresh_func = tny_camel_folder_refresh;
+	klass->remove_message_func = tny_camel_folder_remove_message;
+	klass->expunge_func = tny_camel_folder_expunge;
 
 	return;
 }
 
 
 static void 
-tny_folder_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *folder)
+tny_camel_folder_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *folder)
 {
 	/* TODO */
     
@@ -903,20 +900,20 @@ tny_folder_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *folder)
 }
 
 static TnyFolderIface*
-tny_folder_create_folder (TnyFolderStoreIface *self, const gchar *name)
+tny_camel_folder_create_folder (TnyFolderStoreIface *self, const gchar *name)
 {
 	/* TODO */
     
        	g_critical ("TODO: The create_folder method is unimplemented in this TnyFolderStoreIface implementation (TnyFolder)\n");
 
-	return TNY_FOLDER_IFACE (tny_folder_new ());
+	return TNY_FOLDER_IFACE (tny_camel_folder_new ());
 }
 
 
 void 
-_tny_folder_set_folder_type (TnyFolder *folder, CamelFolderInfo *folder_info)
+_tny_camel_folder_set_folder_type (TnyCamelFolder *folder, CamelFolderInfo *folder_info)
 {
-    	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (folder));
+    	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 
 	if (!folder_info)
 		priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
@@ -946,19 +943,21 @@ _tny_folder_set_folder_type (TnyFolder *folder, CamelFolderInfo *folder_info)
 }
 
 void 
-_tny_folder_set_iter (TnyFolder *folder, CamelFolderInfo *iter)
+_tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (folder);
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+    
 	priv->iter = iter;
     	priv->iter_parented = TRUE;
+    
 	return;
 }
 
 
 static void 
-tny_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
+tny_camel_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
 {
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 	CamelFolderInfo *iter;
 
@@ -980,17 +979,18 @@ tny_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolder
   	  {
 		if (_tny_folder_store_query_passes (query, iter))
 		{
-			TnyFolder *folder = tny_folder_new ();
-			_tny_folder_set_id (folder, iter->full_name);
-			_tny_folder_set_folder_type (folder, iter);
-			_tny_folder_set_unread_count (folder, iter->unread);
-			_tny_folder_set_all_count (folder, iter->total);
-			_tny_folder_set_name (folder, iter->name);
-			_tny_folder_set_iter (folder, iter);
+			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_folder_new ());
+		    
+			_tny_camel_folder_set_id (folder, iter->full_name);
+			_tny_camel_folder_set_folder_type (folder, iter);
+			_tny_camel_folder_set_unread_count (folder, iter->unread);
+			_tny_camel_folder_set_all_count (folder, iter->total);
+			_tny_camel_folder_set_name (folder, iter->name);
+			_tny_camel_folder_set_iter (folder, iter);
 			
 			apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
 			
-			_tny_folder_set_account (folder,
+			_tny_camel_folder_set_account (folder,
 						 TNY_STORE_ACCOUNT_IFACE (priv->account));
 
 			tny_list_iface_prepend (list, G_OBJECT (folder));
@@ -1014,7 +1014,7 @@ typedef struct {
 
 
 static void
-tny_folder_get_folders_async_destroyer (gpointer thr_user_data)
+tny_camel_folder_get_folders_async_destroyer (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
     
@@ -1028,7 +1028,7 @@ tny_folder_get_folders_async_destroyer (gpointer thr_user_data)
 }
 
 static gboolean
-tny_folder_get_folders_async_callback (gpointer thr_user_data)
+tny_camel_folder_get_folders_async_callback (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
 
@@ -1039,11 +1039,11 @@ tny_folder_get_folders_async_callback (gpointer thr_user_data)
 }
 
 static gpointer 
-tny_folder_get_folders_async_thread (gpointer thr_user_data)
+tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
     
-	tny_folder_get_folders (info->self, info->list, info->query);
+	tny_camel_folder_get_folders (info->self, info->list, info->query);
     
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
@@ -1061,11 +1061,11 @@ tny_folder_get_folders_async_thread (gpointer thr_user_data)
     		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
-				tny_folder_get_folders_async_callback, 
-				info, tny_folder_get_folders_async_destroyer);
+				tny_camel_folder_get_folders_async_callback, 
+				info, tny_camel_folder_get_folders_async_destroyer);
 		} else {
-			tny_folder_get_folders_async_callback (info);
-			tny_folder_get_folders_async_destroyer (info);
+			tny_camel_folder_get_folders_async_callback (info);
+			tny_camel_folder_get_folders_async_destroyer (info);
 		}
 	}
 
@@ -1076,7 +1076,7 @@ tny_folder_get_folders_async_thread (gpointer thr_user_data)
 }
 
 static void 
-tny_folder_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
+tny_camel_folder_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
 {
 	GetFoldersInfo *info = g_new0 (GetFoldersInfo, 1);
 	GThread *thread;
@@ -1094,7 +1094,7 @@ tny_folder_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, Tny
 	if (info->query)
 		g_object_ref (G_OBJECT (info->query));
     
-	thread = g_thread_create (tny_folder_get_folders_async_thread,
+	thread = g_thread_create (tny_camel_folder_get_folders_async_thread,
 			info, FALSE, NULL);    
 
 	return;
@@ -1106,23 +1106,23 @@ tny_folder_store_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyFolderStoreIfaceClass *klass = (TnyFolderStoreIfaceClass *)g_iface;
 
-	klass->remove_folder_func = tny_folder_remove_folder;
-	klass->create_folder_func = tny_folder_create_folder;
-	klass->get_folders_func = tny_folder_get_folders;
-	klass->get_folders_async_func = tny_folder_get_folders_async;
+	klass->remove_folder_func = tny_camel_folder_remove_folder;
+	klass->create_folder_func = tny_camel_folder_create_folder;
+	klass->get_folders_func = tny_camel_folder_get_folders;
+	klass->get_folders_async_func = tny_camel_folder_get_folders_async;
 					
     	return;
 }
 
 static void 
-tny_folder_class_init (TnyFolderClass *class)
+tny_camel_folder_class_init (TnyCamelFolderClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-	object_class->finalize = tny_folder_finalize;
-	g_type_class_add_private (object_class, sizeof (TnyFolderPriv));
+	object_class->finalize = tny_camel_folder_finalize;
+	g_type_class_add_private (object_class, sizeof (TnyCamelFolderPriv));
 
 	return;
 }
@@ -1130,10 +1130,10 @@ tny_folder_class_init (TnyFolderClass *class)
 
 
 static void
-tny_folder_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyFolder *self = (TnyFolder *)instance;
-	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (self);
+	TnyCamelFolder *self = (TnyCamelFolder *)instance;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
     	priv->iter = NULL;
 	priv->iter_parented = FALSE;
@@ -1149,7 +1149,7 @@ tny_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 GType 
-tny_folder_get_type (void)
+tny_camel_folder_get_type (void)
 {
 	static GType type = 0;
 
@@ -1166,15 +1166,15 @@ tny_folder_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyFolderClass),
+		  sizeof (TnyCamelFolderClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_folder_class_init,   /* class_init */
+		  (GClassInitFunc) tny_camel_folder_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyFolder),
+		  sizeof (TnyCamelFolder),
 		  0,      /* n_preallocs */
-		  tny_folder_instance_init    /* instance_init */
+		  tny_camel_folder_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_folder_iface_info = 
@@ -1192,7 +1192,7 @@ tny_folder_get_type (void)
 		};
 	    
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyFolder",
+			"TnyCamelFolder",
 			&info, 0);
 
        		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE_IFACE, 

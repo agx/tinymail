@@ -33,7 +33,7 @@ stay as an abstract TnyStoreAccount type. */
 
 #include <tny-folder-iface.h>
 #include <tny-folder-store-iface.h>
-#include <tny-folder.h>
+#include <tny-camel-folder.h>
 
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -47,7 +47,7 @@ stay as an abstract TnyStoreAccount type. */
 
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"
-#include "tny-folder-priv.h"
+#include "tny-camel-folder-priv.h"
 #include "tny-camel-common-priv.h"
 
 #include <tny-camel-shared.h>
@@ -187,7 +187,7 @@ tny_camel_store_account_subscribe (TnyStoreAccountIface *self, TnyFolderIface *f
 	camel_store_subscribe_folder (store, tny_folder_iface_get_name (folder), &ex);
 
 	/* Sync */
-	_tny_folder_set_subscribed (TNY_FOLDER (folder), TRUE);
+	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), TRUE);
 
     	camel_object_unref (CAMEL_OBJECT (store));
     
@@ -209,7 +209,7 @@ tny_camel_store_account_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface 
 	camel_store_unsubscribe_folder (store, tny_folder_iface_get_name (folder), &ex);
 
 	/* Sync */
-	_tny_folder_set_subscribed (TNY_FOLDER (folder), FALSE);
+	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE);
 
 	camel_object_unref (CAMEL_OBJECT (store));
     
@@ -249,12 +249,12 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 static void
 foreach_managed_folder (gpointer data, gpointer user_data)
 {
-	if (data && TNY_IS_FOLDER (data))
+	if (data && TNY_IS_CAMEL_FOLDER (data))
 	{
-		TnyFolder *folder = (TnyFolder*) data;
+		TnyCamelFolder *folder = (TnyCamelFolder*) data;
 
-		TNY_FOLDER_GET_PRIVATE (folder)->iter = NULL;
-		TNY_FOLDER_GET_PRIVATE (folder)->iter_parented = FALSE;
+		TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter = NULL;
+		TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter_parented = FALSE;
 	}
     
 	return;
@@ -298,7 +298,7 @@ tny_camel_store_account_create_folder (TnyFolderStoreIface *self, const gchar *n
     
        	g_critical ("TODO: The create_folder method is unimplemented in this TnyFolderStoreIface implementation (TnyStoreAccount)\n");
 
-	return TNY_FOLDER_IFACE (tny_folder_new ());
+	return TNY_FOLDER_IFACE (tny_camel_folder_new ());
 }
 
 static void 
@@ -332,18 +332,18 @@ tny_camel_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *li
 	  {
 		if (_tny_folder_store_query_passes (query, iter))
 		{
-			TnyFolder *folder = tny_folder_new ();
+			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_folder_new ());
 		    
-			_tny_folder_set_id (folder, iter->full_name);
-			_tny_folder_set_folder_type (folder, iter);
-			_tny_folder_set_unread_count (folder, iter->unread);
-			_tny_folder_set_all_count (folder, iter->total);
-			_tny_folder_set_name (folder, iter->name);
-			_tny_folder_set_iter (folder, iter);
+			_tny_camel_folder_set_id (folder, iter->full_name);
+			_tny_camel_folder_set_folder_type (folder, iter);
+			_tny_camel_folder_set_unread_count (folder, iter->unread);
+			_tny_camel_folder_set_all_count (folder, iter->total);
+			_tny_camel_folder_set_name (folder, iter->name);
+			_tny_camel_folder_set_iter (folder, iter);
 		      
 			priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
 		      
-			_tny_folder_set_account (folder, TNY_STORE_ACCOUNT_IFACE (self));
+			_tny_camel_folder_set_account (folder, TNY_STORE_ACCOUNT_IFACE (self));
 
 			tny_list_iface_prepend (list, G_OBJECT (folder));	
 		}

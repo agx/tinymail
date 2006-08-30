@@ -1,5 +1,5 @@
-#ifndef TNY_FOLDER_PRIV_H
-#define TNY_FOLDER_PRIV_H
+#ifndef TNY_CAMEL_FOLDER_PRIV_H
+#define TNY_CAMEL_FOLDER_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -25,9 +25,9 @@
 #include <tny-account-iface.h>
 #include <tny-folder-iface.h>
 
-typedef struct _TnyFolderPriv TnyFolderPriv;
+typedef struct _TnyCamelFolderPriv TnyCamelFolderPriv;
 
-struct _TnyFolderPriv
+struct _TnyCamelFolderPriv
 {
 	gboolean loaded;
 	GType headers_list_type;
@@ -46,18 +46,18 @@ struct _TnyFolderPriv
 	TnyFolderType cached_folder_type;
 };
 
-CamelFolder* _tny_folder_get_camel_folder (TnyFolderIface *self);
-void _tny_folder_set_id (TnyFolder *self, const gchar *id);
-void _tny_folder_set_subscribed (TnyFolder *self, gboolean subscribed);
-void _tny_folder_set_name (TnyFolder *self, const gchar *name);
-void _tny_folder_set_folder_type (TnyFolder *folder, CamelFolderInfo *folder_info);
-void _tny_folder_set_unread_count (TnyFolder *self, guint len);
-void _tny_folder_set_all_count (TnyFolder *self, guint len);
-void _tny_folder_check_uncache (TnyFolder *self, TnyFolderPriv *priv);
-void _tny_folder_set_iter (TnyFolder *folder, CamelFolderInfo *iter);
-void _tny_folder_set_account (TnyFolder *self, TnyStoreAccountIface *account);
+CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);
+void _tny_camel_folder_set_id (TnyCamelFolder *self, const gchar *id);
+void _tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed);
+void _tny_camel_folder_set_name (TnyCamelFolder *self, const gchar *name);
+void _tny_camel_folder_set_folder_type (TnyCamelFolder *folder, CamelFolderInfo *folder_info);
+void _tny_camel_folder_set_unread_count (TnyCamelFolder *self, guint len);
+void _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len);
+void _tny_camel_folder_check_uncache (TnyCamelFolder *self, TnyCamelFolderPriv *priv);
+void _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter);
+void _tny_camel_folder_set_account (TnyCamelFolder *self, TnyStoreAccountIface *account);
 
-#define TNY_FOLDER_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER, TnyFolderPriv))
+#define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_FOLDER, TnyCamelFolderPriv))
 
 #endif

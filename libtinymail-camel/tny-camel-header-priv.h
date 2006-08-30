@@ -22,8 +22,8 @@
 
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
-#include <tny-folder.h>
-#include "tny-folder-priv.h"
+#include <tny-camel-folder.h>
+#include "tny-camel-folder-priv.h"
 
 typedef struct _WriteInfo WriteInfo;
 struct _WriteInfo
@@ -47,7 +47,7 @@ struct _TnyCamelHeaderClass
 };
 
 void _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit);
-void _tny_camel_header_set_folder (TnyCamelHeader *self, TnyFolder *folder, TnyFolderPriv *tpriv);
+void _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyCamelFolderPriv *tpriv);
 void _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage *camel_mime_message);
 
 #endif

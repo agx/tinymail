@@ -29,20 +29,17 @@
 
 #include <tny-platform-factory-iface.h>
 #include <tny-platform-factory.h>
-
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 #include <tny-password-dialog.h>
-
 #include <tny-account-iface.h>
-#include <tny-camel-account.h>
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
+#include <tny-device-iface.h>
 
+#include <tny-camel-account.h>
 #include <tny-camel-store-account.h>
 #include <tny-camel-transport-account.h>
-
-#include <tny-device-iface.h>
 #include <tny-device.h>
 #include <tny-session-camel.h>
 
@@ -194,7 +191,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 
 	if (G_UNLIKELY (!retval))
 	{
-		/* This crashes on subsequent calls (any gtk widget creation does) */
 		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
 	
 		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prompt);
@@ -373,20 +369,12 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
-			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || 
-			    types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
-			{
+			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
 				account = TNY_ACCOUNT_IFACE (tny_camel_transport_account_new ());
-			}
-	
-		} else 
-		{
+		} else {
 
-			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || 
-			    types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
-			{
+			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
 				account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
-			}
 		}
 
 		if (type)
