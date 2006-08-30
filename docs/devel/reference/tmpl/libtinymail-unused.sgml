@@ -305,6 +305,13 @@ TnyTransportAccount
 
 @obj: 
 
+<!-- ##### MACRO TNY_MIME_PART_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
 <!-- ##### MACRO TNY_MSG_FOLDER_PROXY_TYPE ##### -->
 <para>
 
@@ -437,6 +444,21 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 @parent_class: 
+
+<!-- ##### STRUCT TnyMimePart ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMimePartPriv ##### -->
+<para>
+
+</para>
+
+@part_lock: 
+@part: 
+@cached_content_type: 
 
 <!-- ##### STRUCT TnyMsgHeader ##### -->
 <para>
@@ -798,6 +820,30 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @Returns: 
+
+<!-- ##### FUNCTION tny_mime_part_get_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_mime_part_new ##### -->
+<para>
+
+</para>
+
+@part: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_mime_part_set_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
 
 <!-- ##### FUNCTION tny_msg_folder_get_folder ##### -->
 <para>

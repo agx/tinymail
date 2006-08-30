@@ -28,7 +28,7 @@
 <!ENTITY libtinymail-camel-TnyCamelStream SYSTEM "xml/tny-camel-stream.xml">
 <!ENTITY libtinymail-camel-TnyFolder SYSTEM "xml/tny-folder.xml">
 <!ENTITY libtinymail-camel-TnyCamelHeader SYSTEM "xml/tny-camel-header.xml">
-<!ENTITY libtinymail-camel-TnyMimePart SYSTEM "xml/tny-mime-part.xml">
+<!ENTITY libtinymail-camel-TnyCamelMimePart SYSTEM "xml/tny-camel-mime-part.xml">
 <!ENTITY libtinymail-camel-TnyMsg SYSTEM "xml/tny-msg.xml">
 <!ENTITY libtinymail-camel-TnySessionCamel SYSTEM "xml/tny-session-camel.xml">
 <!ENTITY libtinymail-camel-TnyStreamCamel SYSTEM "xml/tny-stream-camel.xml">
@@ -162,7 +162,7 @@
 		&libtinymail-camel-TnyCamelStream;
 		&libtinymail-camel-TnyFolder;
 		&libtinymail-camel-TnyCamelHeader;
-		&libtinymail-camel-TnyMimePart;
+		&libtinymail-camel-TnyCamelMimePart;
 		&libtinymail-camel-TnyMsg;
 		&libtinymail-camel-TnySessionCamel;
 		&libtinymail-camel-TnyStreamCamel;

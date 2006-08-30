@@ -17,13 +17,13 @@ A implementation that plays proxy for a #CamelMimePart.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMimePart ##### -->
+<!-- ##### STRUCT TnyCamelMimePart ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_mime_part_new ##### -->
+<!-- ##### FUNCTION tny_camel_mime_part_new ##### -->
 <para>
 
 </para>
@@ -32,7 +32,7 @@ A implementation that plays proxy for a #CamelMimePart.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_mime_part_set_part ##### -->
+<!-- ##### FUNCTION tny_camel_mime_part_set_part ##### -->
 <para>
 
 </para>
@@ -41,7 +41,7 @@ A implementation that plays proxy for a #CamelMimePart.
 @part: 
 
 
-<!-- ##### FUNCTION tny_mime_part_get_part ##### -->
+<!-- ##### FUNCTION tny_camel_mime_part_get_part ##### -->
 <para>
 
 </para>
