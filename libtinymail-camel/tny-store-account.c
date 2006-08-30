@@ -43,10 +43,8 @@ stay as an abstract TnyStoreAccount type. */
 #define CAMEL_FOLDER_TYPE_SENT (5 << 10)
 #endif
 
-
-static GObjectClass *parent_class = NULL;
-
 #include <tny-folder-iface.h>
+
 #include "tny-account-priv.h"
 #include "tny-store-account-priv.h"
 #include "tny-folder-priv.h"
@@ -56,8 +54,10 @@ static GObjectClass *parent_class = NULL;
 #include <tny-account-store-iface.h>
 
 
+static GObjectClass *parent_class = NULL;
+
 static void
-report_error (TnyAccountPriv *priv)
+report_error (TnyCamelAccountPriv *priv)
 {
 	if (G_UNLIKELY (priv->service == NULL))
 	{
@@ -69,11 +69,10 @@ report_error (TnyAccountPriv *priv)
 }
 
 
-
 static void 
-tny_store_account_reconnect (TnyAccount *self)
+tny_camel_store_account_reconnect (TnyCamelAccount *self)
 {
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && 
 		G_UNLIKELY (priv->user) && G_UNLIKELY (priv->host))
@@ -174,10 +173,9 @@ tny_store_account_reconnect (TnyAccount *self)
 
 
 static void
-tny_store_account_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
+tny_camel_store_account_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 {
-	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
-
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 
@@ -197,10 +195,9 @@ tny_store_account_subscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 }
 
 static void
-tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
+tny_camel_store_account_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folder)
 {
-	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
-
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 
@@ -221,25 +218,25 @@ tny_store_account_unsubscribe (TnyStoreAccountIface *self, TnyFolderIface *folde
 
 
 /**
- * tny_store_account_new:
+ * tny_camel_store_account_new:
  * 
  *
  * Return value: A new #TnyStoreAccountIface instance implemented for Camel
  **/
-TnyStoreAccount*
-tny_store_account_new (void)
+TnyStoreAccountIface*
+tny_camel_store_account_new (void)
 {
-	TnyStoreAccount *self = g_object_new (TNY_TYPE_STORE_ACCOUNT, NULL);
+	TnyCamelStoreAccount *self = g_object_new (TNY_TYPE_CAMEL_STORE_ACCOUNT, NULL);
 
-	return self;
+	return TNY_STORE_ACCOUNT_IFACE (self);
 }
 
 static void
-tny_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyStoreAccount *self = (TnyStoreAccount *)instance;
-	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
-	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccount *self = (TnyCamelStoreAccount *)instance;
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	apriv->type = CAMEL_PROVIDER_STORE;
 	apriv->connected = FALSE;
@@ -264,11 +261,10 @@ foreach_managed_folder (gpointer data, gpointer user_data)
 }
 
 static void
-tny_store_account_finalize (GObject *object)
+tny_camel_store_account_finalize (GObject *object)
 {
-	TnyStoreAccount *self = (TnyStoreAccount *)object;	
-	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);
-
+	TnyCamelStoreAccount *self = (TnyCamelStoreAccount *)object;	
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
  	g_list_foreach (priv->managed_folders, foreach_managed_folder, self);
 	g_list_free (priv->managed_folders);
@@ -285,19 +281,8 @@ tny_store_account_finalize (GObject *object)
 	return;
 }
 
-static void
-tny_store_account_iface_init (gpointer g_iface, gpointer iface_data)
-{
-	TnyStoreAccountIfaceClass *klass = (TnyStoreAccountIfaceClass *)g_iface;
-
-	klass->subscribe_func = tny_store_account_subscribe;
-	klass->unsubscribe_func = tny_store_account_unsubscribe;
-
-	return;
-}
-
 static void 
-tny_store_account_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *folder)
+tny_camel_store_account_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *folder)
 {
 	/* TODO */
     
@@ -307,7 +292,7 @@ tny_store_account_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *fold
 }
 
 static TnyFolderIface*
-tny_store_account_create_folder (TnyFolderStoreIface *self, const gchar *name)
+tny_camel_store_account_create_folder (TnyFolderStoreIface *self, const gchar *name)
 {
 	/* TODO */
     
@@ -317,10 +302,10 @@ tny_store_account_create_folder (TnyFolderStoreIface *self, const gchar *name)
 }
 
 static void 
-tny_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
+tny_camel_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
 {
-    	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
-	TnyStoreAccountPriv *priv = TNY_STORE_ACCOUNT_GET_PRIVATE (self);    
+    	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 	CamelStore *store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
@@ -333,7 +318,11 @@ tny_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, Tn
        	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
+    	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (self), 
+					NULL, NULL, NULL);
 	iter = camel_store_get_folder_info (store, "", flags, &ex);
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));
+    
         priv->iter = iter;
 	priv->iter_store = store;
 
@@ -368,17 +357,17 @@ tny_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, Tn
 
 
 typedef struct {
-    TnyFolderStoreIface *self;
-    TnyListIface *list;
-    TnyGetFoldersCallback callback;
-    TnyFolderStoreQuery *query;
-    gpointer user_data;
-    guint depth;
+	TnyFolderStoreIface *self;
+	TnyListIface *list;
+	TnyGetFoldersCallback callback;
+	TnyFolderStoreQuery *query;
+	gpointer user_data;
+	guint depth;
 } GetFoldersInfo;
 
 
 static void
-tny_store_account_get_folders_async_destroyer (gpointer thr_user_data)
+tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
     
@@ -392,7 +381,7 @@ tny_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 }
 
 static gboolean
-tny_store_account_get_folders_async_callback (gpointer thr_user_data)
+tny_camel_store_account_get_folders_async_callback (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
 
@@ -403,11 +392,11 @@ tny_store_account_get_folders_async_callback (gpointer thr_user_data)
 }
 
 static gpointer 
-tny_store_account_get_folders_async_thread (gpointer thr_user_data)
+tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
     
-	tny_store_account_get_folders (info->self, info->list, info->query);
+	tny_camel_store_account_get_folders (info->self, info->list, info->query);
     
  	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
@@ -425,11 +414,11 @@ tny_store_account_get_folders_async_thread (gpointer thr_user_data)
 		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
-				tny_store_account_get_folders_async_callback, 
-				info, tny_store_account_get_folders_async_destroyer);
+				tny_camel_store_account_get_folders_async_callback, 
+				info, tny_camel_store_account_get_folders_async_destroyer);
 		} else {
-			tny_store_account_get_folders_async_callback (info);
-			tny_store_account_get_folders_async_destroyer (info);
+			tny_camel_store_account_get_folders_async_callback (info);
+			tny_camel_store_account_get_folders_async_destroyer (info);
 		}
 	}
 
@@ -440,12 +429,11 @@ tny_store_account_get_folders_async_thread (gpointer thr_user_data)
 }
 
 static void 
-tny_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
+tny_camel_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
 {
 	GetFoldersInfo *info = g_new0 (GetFoldersInfo, 1);
 	GThread *thread;
 
-    
 	info->self = self;
     	info->list = list;
 	info->callback = callback;
@@ -459,7 +447,7 @@ tny_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *li
     	if (info->query)
 		g_object_ref (G_OBJECT (info->query));
 
-	thread = g_thread_create (tny_store_account_get_folders_async_thread,
+	thread = g_thread_create (tny_camel_store_account_get_folders_async_thread,
 			info, FALSE, NULL);    
 
 	return;
@@ -470,33 +458,45 @@ tny_folder_store_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyFolderStoreIfaceClass *klass = (TnyFolderStoreIfaceClass *)g_iface;
 
-	klass->remove_folder_func = tny_store_account_remove_folder;
-	klass->create_folder_func = tny_store_account_create_folder;
-	klass->get_folders_func = tny_store_account_get_folders;
-	klass->get_folders_async_func = tny_store_account_get_folders_async;
-					
+	klass->remove_folder_func = tny_camel_store_account_remove_folder;
+	klass->create_folder_func = tny_camel_store_account_create_folder;
+	klass->get_folders_func = tny_camel_store_account_get_folders;
+	klass->get_folders_async_func = tny_camel_store_account_get_folders_async;
+
     	return;
 }
 
+static void
+tny_store_account_iface_init (gpointer g_iface, gpointer iface_data)
+{
+	TnyStoreAccountIfaceClass *klass = (TnyStoreAccountIfaceClass *)g_iface;
+
+	klass->subscribe_func = tny_camel_store_account_subscribe;
+	klass->unsubscribe_func = tny_camel_store_account_unsubscribe;
+
+	return;
+}
+
+
 static void 
-tny_store_account_class_init (TnyStoreAccountClass *class)
+tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_store_account_finalize;
+	object_class->finalize = tny_camel_store_account_finalize;
 
-	((TnyAccountClass*)class)->reconnect_func = tny_store_account_reconnect;
+	((TnyCamelAccountClass*)class)->reconnect_func = tny_camel_store_account_reconnect;
 
-	g_type_class_add_private (object_class, sizeof (TnyStoreAccountPriv));
+	g_type_class_add_private (object_class, sizeof (TnyCamelStoreAccountPriv));
 
 	return;
 }
 
 GType 
-tny_store_account_get_type (void)
+tny_camel_store_account_get_type (void)
 {
 	static GType type = 0;
 
@@ -513,15 +513,15 @@ tny_store_account_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyStoreAccountClass),
+		  sizeof (TnyCamelStoreAccountClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_store_account_class_init,   /* class_init */
+		  (GClassInitFunc) tny_camel_store_account_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyStoreAccount),
+		  sizeof (TnyCamelStoreAccount),
 		  0,      /* n_preallocs */
-		  tny_store_account_instance_init    /* instance_init */
+		  tny_camel_store_account_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_store_account_iface_info = 
@@ -538,8 +538,8 @@ tny_store_account_get_type (void)
 		  NULL          /* interface_data */
 		};
 	    
-		type = g_type_register_static (TNY_TYPE_ACCOUNT,
-			"TnyStoreAccount",
+		type = g_type_register_static (TNY_TYPE_CAMEL_ACCOUNT,
+			"TnyCamelStoreAccount",
 			&info, 0);
 
        		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE_IFACE, 

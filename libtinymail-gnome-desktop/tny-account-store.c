@@ -376,7 +376,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || 
 			    types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
 			{
-				account = TNY_ACCOUNT_IFACE (tny_transport_account_new ());
+				account = TNY_ACCOUNT_IFACE (tny_camel_transport_account_new ());
 			}
 	
 		} else 
@@ -385,7 +385,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || 
 			    types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
 			{
-				account = TNY_ACCOUNT_IFACE (tny_store_account_new ());
+				account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
 			}
 		}
 
@@ -394,7 +394,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 		if (account)
 		{
-			tny_account_set_session (TNY_ACCOUNT (account), priv->session);
+			tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), priv->session);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
 			proto = gconf_client_get_string (priv->client, 
@@ -419,7 +419,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			{
 				while (options)
 				{
-					tny_account_add_option (TNY_ACCOUNT (account), options->data);
+					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), options->data);
 					g_free (options->data);
 					options = g_slist_next (options);
 				}

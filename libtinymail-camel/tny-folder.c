@@ -107,8 +107,8 @@ load_folder_no_lock (TnyFolderPriv *priv)
 	if (!priv->folder && !priv->loaded)
 	{
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-		CamelStore *store = (CamelStore*) _tny_account_get_service 
-			(TNY_ACCOUNT (priv->account));
+		CamelStore *store = (CamelStore*) _tny_camel_account_get_service 
+			(TNY_CAMEL_ACCOUNT (priv->account));
 
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
@@ -454,7 +454,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 	RefreshFolderInfo *info = thr_user_data;
 	TnyFolderIface *self = info->self;
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 	gchar *str;
 	CamelException *ex = camel_exception_new ();
 
@@ -466,7 +466,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 
 	info->cancelled = FALSE;
 	str = g_strdup_printf (_("Reading folder `%s'"), priv->folder->full_name);
-	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
+	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
 		tny_folder_refresh_async_status, info, str);
 	g_free (str);
 	camel_folder_refresh_info (priv->folder, ex);
@@ -476,7 +476,7 @@ tny_folder_refresh_async_thread (gpointer thr_user_data)
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 	camel_exception_free (ex);
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
-	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	g_mutex_unlock (priv->folder_lock);
 
@@ -537,7 +537,7 @@ tny_folder_refresh (TnyFolderIface *self)
 
 	load_folder_no_lock (priv);
 
-	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
+	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
 		NULL, NULL, NULL);
 	camel_folder_refresh_info (priv->folder, ex);
     	priv->cached_length = camel_folder_get_message_count (priv->folder);
@@ -545,7 +545,7 @@ tny_folder_refresh (TnyFolderIface *self)
 	if (G_LIKELY (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 	camel_exception_free (ex);
-	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	g_mutex_unlock (priv->folder_lock);
 
@@ -611,10 +611,10 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 	load_folder_no_lock (priv);
 	camel_exception_init (ex);
 
-	_tny_account_start_camel_operation (TNY_ACCOUNT_IFACE (priv->account), 
+	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
 					NULL, NULL, NULL);
 	camel_message = camel_folder_get_message (priv->folder, (const char *) id, ex);    
-	_tny_account_stop_camel_operation (TNY_ACCOUNT_IFACE (priv->account));
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
 	{
@@ -814,13 +814,13 @@ tny_folder_finalize (GObject *object)
 
     	if (priv->account)
 	{
-		TnyStoreAccountPriv *apriv = TNY_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 		apriv->managed_folders = g_list_remove (apriv->managed_folders, self);
 	}
     
 	if (!priv->iter_parented && priv->iter)
 	{
-    		CamelStore *store = (CamelStore*) _tny_account_get_service (TNY_ACCOUNT (priv->account));
+    		CamelStore *store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
 		camel_store_free_folder_info (store, priv->iter);
 	}
    
@@ -960,12 +960,12 @@ static void
 tny_folder_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
 {
 	TnyFolderPriv *priv = TNY_FOLDER_GET_PRIVATE (TNY_FOLDER (self));
-	TnyStoreAccountPriv *apriv = TNY_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 	CamelFolderInfo *iter;
 
 	if (!priv->iter && priv->iter_parented)
 	{
-		CamelStore *store = (CamelStore*) _tny_account_get_service (TNY_ACCOUNT (priv->account));
+		CamelStore *store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 		priv->iter = camel_store_get_folder_info (store, priv->folder_name, 0, &ex);
 		priv->iter_parented = FALSE;

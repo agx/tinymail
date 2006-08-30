@@ -48,14 +48,13 @@ static GObjectClass *parent_class = NULL;
 
 #include <tny-camel-shared.h>
 
-#define TNY_TRANSPORT_ACCOUNT_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_TRANSPORT_ACCOUNT, TnyTransportAccountPriv))
-
+#define TNY_CAMEL_TRANSPORT_ACCOUNT_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT, TnyCamelTransportAccountPriv))
 
 static void 
-tny_transport_account_reconnect (TnyAccount *self)
+tny_camel_transport_account_reconnect (TnyCamelAccount *self)
 {
-	TnyAccountPriv *priv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->host))
 	{
@@ -82,9 +81,9 @@ tny_transport_account_reconnect (TnyAccount *self)
 }
 
 static void
-tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
+tny_camel_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 {
-	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyHeaderIface *header = (TnyHeaderIface *)tny_msg_iface_get_header (msg);
 	CamelMimeMessage *message = _tny_msg_get_camel_mime_message (TNY_MSG (msg));
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
@@ -95,10 +94,10 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 
 	if (G_LIKELY (transport && message && header))
 	{
+		const gchar *str = NULL;
 		CamelInternetAddress 
 			*from = camel_internet_address_new (),
 			*recipients = camel_internet_address_new ();
-		const gchar *str = NULL;
 
 		str = tny_header_iface_get_from (header);
 		_foreach_email_add_to_inet_addr (str, from);
@@ -123,24 +122,24 @@ tny_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *msg)
 
 
 /**
- * tny_transport_account_new:
+ * tny_camel_transport_account_new:
  * 
  *
  * Return value: A new #TnyTransportAccountIface instance implemented for Camel
  **/
-TnyTransportAccount*
-tny_transport_account_new (void)
+TnyTransportAccountIface*
+tny_camel_transport_account_new (void)
 {
-	TnyTransportAccount *self = g_object_new (TNY_TYPE_TRANSPORT_ACCOUNT, NULL);
+	TnyCamelTransportAccount *self = g_object_new (TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT, NULL);
 
-	return self;
+	return TNY_TRANSPORT_ACCOUNT_IFACE (self);
 }
 
 static void
-tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_camel_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyTransportAccount *self = (TnyTransportAccount *)instance;
-	TnyAccountPriv *apriv = TNY_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelTransportAccount *self = (TnyCamelTransportAccount *)instance;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	
 	apriv->connected = FALSE;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
@@ -151,7 +150,7 @@ tny_transport_account_instance_init (GTypeInstance *instance, gpointer g_class)
 
 
 static void
-tny_transport_account_finalize (GObject *object)
+tny_camel_transport_account_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -163,31 +162,31 @@ tny_transport_account_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyTransportAccountIfaceClass *klass = (TnyTransportAccountIfaceClass *)g_iface;
 
-	klass->send_func = tny_transport_account_send;
+	klass->send_func = tny_camel_transport_account_send;
 
 	return;
 }
 
 
 static void 
-tny_transport_account_class_init (TnyTransportAccountClass *class)
+tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *klass)
 {
 	GObjectClass *object_class;
 
-	parent_class = g_type_class_peek_parent (class);
-	object_class = (GObjectClass*) class;
+	parent_class = g_type_class_peek_parent (klass);
+	object_class = (GObjectClass*) klass;
 
-	object_class->finalize = tny_transport_account_finalize;
+	object_class->finalize = tny_camel_transport_account_finalize;
 
-	((TnyAccountClass*)class)->reconnect_func = tny_transport_account_reconnect;
+	((TnyCamelAccountClass*)klass)->reconnect_func = tny_camel_transport_account_reconnect;
 
-	g_type_class_add_private (object_class, sizeof (TnyTransportAccountPriv));
+	g_type_class_add_private (object_class, sizeof (TnyCamelTransportAccountPriv));
 
 	return;
 }
 
 GType 
-tny_transport_account_get_type (void)
+tny_camel_transport_account_get_type (void)
 {
 	static GType type = 0;
 
@@ -204,15 +203,15 @@ tny_transport_account_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyTransportAccountClass),
+		  sizeof (TnyCamelTransportAccountClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_transport_account_class_init,   /* class_init */
+		  (GClassInitFunc) tny_camel_transport_account_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyTransportAccount),
+		  sizeof (TnyCamelTransportAccount),
 		  0,      /* n_preallocs */
-		  tny_transport_account_instance_init    /* instance_init */
+		  tny_camel_transport_account_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_transport_account_iface_info = 
@@ -222,8 +221,8 @@ tny_transport_account_get_type (void)
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (TNY_TYPE_ACCOUNT,
-			"TnyTransportAccount",
+		type = g_type_register_static (TNY_TYPE_CAMEL_ACCOUNT,
+			"TnyCamelTransportAccount",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_TRANSPORT_ACCOUNT_IFACE, 

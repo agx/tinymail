@@ -62,7 +62,7 @@ tny_account_iface_test_setup (void)
     }
     
     if (!iface)
-	    iface = TNY_ACCOUNT_IFACE (tny_store_account_new ());
+	    iface = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
     
    return;
 }

@@ -1,5 +1,5 @@
-#ifndef TNY_STORE_ACCOUNT_H
-#define TNY_STORE_ACCOUNT_H
+#ifndef TNY_CAMEL_STORE_ACCOUNT_H
+#define TNY_CAMEL_STORE_ACCOUNT_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -28,28 +28,28 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_STORE_ACCOUNT             (tny_store_account_get_type ())
-#define TNY_STORE_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccount))
-#define TNY_STORE_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountClass))
-#define TNY_IS_STORE_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_STORE_ACCOUNT))
-#define TNY_IS_STORE_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_STORE_ACCOUNT))
-#define TNY_STORE_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountClass))
+#define TNY_TYPE_CAMEL_STORE_ACCOUNT             (tny_camel_store_account_get_type ())
+#define TNY_CAMEL_STORE_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_STORE_ACCOUNT, TnyCamelStoreAccount))
+#define TNY_CAMEL_STORE_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_STORE_ACCOUNT, TnyCamelStoreAccountClass))
+#define TNY_IS_CAMEL_STORE_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_STORE_ACCOUNT))
+#define TNY_IS_CAMEL_STORE_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_STORE_ACCOUNT))
+#define TNY_CAMEL_STORE_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_STORE_ACCOUNT, TnyCamelStoreAccountClass))
 
-typedef struct _TnyStoreAccount TnyStoreAccount;
-typedef struct _TnyStoreAccountClass TnyStoreAccountClass;
+typedef struct _TnyCamelStoreAccount TnyCamelStoreAccount;
+typedef struct _TnyCamelStoreAccountClass TnyCamelStoreAccountClass;
 
-struct _TnyStoreAccount
+struct _TnyCamelStoreAccount
 {
-	TnyAccount parent;
+	TnyCamelAccount parent;
 };
 
-struct _TnyStoreAccountClass 
+struct _TnyCamelStoreAccountClass 
 {
-	TnyAccountClass parent;
+	TnyCamelAccountClass parent;
 };
 
-GType                    tny_store_account_get_type       (void);
-TnyStoreAccount*         tny_store_account_new            (void);
+GType tny_camel_store_account_get_type (void);
+TnyStoreAccountIface* tny_camel_store_account_new (void);
 
 G_END_DECLS
 

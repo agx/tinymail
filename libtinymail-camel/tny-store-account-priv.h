@@ -1,5 +1,5 @@
-#ifndef TNY_STORE_ACCOUNT_PRIV_H
-#define TNY_STORE_ACCOUNT_PRIV_H
+#ifndef TNY_CAMEL_STORE_ACCOUNT_PRIV_H
+#define TNY_CAMEL_STORE_ACCOUNT_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -20,16 +20,16 @@
  * Boston, MA 02111-1307, USA.
  */
 
-typedef struct _TnyStoreAccountPriv TnyStoreAccountPriv;
+typedef struct _TnyCamelStoreAccountPriv TnyCamelStoreAccountPriv;
 
-struct _TnyStoreAccountPriv
+struct _TnyCamelStoreAccountPriv
 {
 	CamelStore *iter_store;
 	CamelFolderInfo *iter;
 	GList *managed_folders;
 };
 
-#define TNY_STORE_ACCOUNT_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountPriv))
+#define TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_STORE_ACCOUNT, TnyCamelStoreAccountPriv))
 
 #endif

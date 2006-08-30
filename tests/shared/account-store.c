@@ -104,14 +104,14 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 {
     	TnyAccountStore *me = (TnyAccountStore *) self;
     
-	TnyAccountIface *account = TNY_ACCOUNT_IFACE (tny_store_account_new ());
+	TnyAccountIface *account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
     
 	/* Dear visitor of the SVN-web. This is indeed a fully functional and
 	   working IMAP account. This does not mean that you need to fuck it up */
 
-	tny_account_set_session (TNY_ACCOUNT (account), me->session);
+	tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 	camel_session_set_online ((CamelSession*)me->session, me->force_online); 
-	tny_account_set_online_status (TNY_ACCOUNT (account), !me->force_online);
+	tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online);
     
 	tny_account_iface_set_proto (account, "imap");
 	tny_account_iface_set_name (account, "unit test account");

@@ -1,5 +1,5 @@
-#ifndef TNY_ACCOUNT_PRIV_H
-#define TNY_ACCOUNT_PRIV_H
+#ifndef TNY_CAMEL_ACCOUNT_PRIV_H
+#define TNY_CAMEL_ACCOUNT_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -22,9 +22,9 @@
 
 #include <tny-session-camel.h>
 
-typedef struct _TnyAccountPriv TnyAccountPriv;
+typedef struct _TnyCamelAccountPriv TnyCamelAccountPriv;
 
-struct _TnyAccountPriv
+struct _TnyCamelAccountPriv
 {
 	TnySessionCamel *session;
 	GStaticRecMutex *service_lock;
@@ -42,12 +42,12 @@ struct _TnyAccountPriv
 	TnyAccountType account_type;
 };
 
-const CamelService* _tny_account_get_service (TnyAccount *self);
-const gchar* _tny_account_get_url_string (TnyAccount *self);
-void _tny_account_start_camel_operation (TnyAccountIface *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what);
-void _tny_account_stop_camel_operation (TnyAccountIface *self);
+const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);
+const gchar* _tny_camel_account_get_url_string (TnyCamelAccount *self);
+void _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what);
+void _tny_camel_account_stop_camel_operation (TnyCamelAccount *self);
 
-#define TNY_ACCOUNT_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ACCOUNT, TnyAccountPriv))
+#define TNY_CAMEL_ACCOUNT_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountPriv))
 
 #endif

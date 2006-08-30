@@ -93,7 +93,7 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 	PrivForgetPassFunc *pf;
 	//CamelSession *me = (CamelSession*)self;
 	gboolean found = FALSE;
-	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
+	CamelService *service = (CamelService*)_tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (account));
 
 	while (G_LIKELY (copy))
 	{
@@ -157,7 +157,7 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 	PrivPassFunc *pf;
 	//CamelSession *me = (CamelSession*)self;
 	gboolean found = FALSE;
-	CamelService *service = (CamelService*)_tny_account_get_service (TNY_ACCOUNT (account));
+	CamelService *service = (CamelService*)_tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (account));
 
 	while (G_LIKELY (copy))
 	{
@@ -469,7 +469,7 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 		{
 			TnyStoreAccountIface *account = (TnyStoreAccountIface*)tny_iterator_iface_current (iterator);
 			
-			tny_account_set_online_status (TNY_ACCOUNT (account), !online);
+			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !online);
 	
 			g_object_unref (G_OBJECT(account));
 			

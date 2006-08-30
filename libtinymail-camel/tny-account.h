@@ -1,5 +1,5 @@
-#ifndef TNY_ACCOUNT_H
-#define TNY_ACCOUNT_H
+#ifndef TNY_CAMEL_ACCOUNT_H
+#define TNY_CAMEL_ACCOUNT_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -27,36 +27,36 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_ACCOUNT             (tny_account_get_type ())
-#define TNY_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_ACCOUNT, TnyAccount))
-#define TNY_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_ACCOUNT, TnyAccountClass))
-#define TNY_IS_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_ACCOUNT))
-#define TNY_IS_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ACCOUNT))
-#define TNY_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_ACCOUNT, TnyAccountClass))
+#define TNY_TYPE_CAMEL_ACCOUNT             (tny_camel_account_get_type ())
+#define TNY_CAMEL_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccount))
+#define TNY_CAMEL_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountClass))
+#define TNY_IS_CAMEL_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_ACCOUNT))
+#define TNY_IS_ACAMEL_CCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_ACCOUNT))
+#define TNY_CAMEL_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountClass))
 
 /* This is an abstract type, you cannot (should not) instantiate it */
 
-typedef struct _TnyAccount TnyAccount;
-typedef struct _TnyAccountClass TnyAccountClass;
+typedef struct _TnyCamelAccount TnyCamelAccount;
+typedef struct _TnyCamelAccountClass TnyCamelAccountClass;
 
-struct _TnyAccount
+struct _TnyCamelAccount
 {
 	GObject parent;
 };
 
-struct _TnyAccountClass 
+struct _TnyCamelAccountClass 
 {
 	GObjectClass parent;
 
 	/* This is an abstract method */
-	void (*reconnect_func) (TnyAccount *self);
+	void (*reconnect_func) (TnyCamelAccount *self);
 };
 
-GType tny_account_get_type (void);
+GType tny_camel_account_get_type (void);
 
-void tny_account_add_option (TnyAccount *self, const gchar *option);
-void tny_account_set_session (TnyAccount *self, TnySessionCamel *session);
-void tny_account_set_online_status (TnyAccount *self, gboolean offline);
+void tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option);
+void tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session);
+void tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline);
 
 G_END_DECLS
 

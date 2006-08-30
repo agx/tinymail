@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyStoreAccount
+TnyCamelStoreAccount
 
 <!-- ##### SECTION Short_Description ##### -->
 A store account type implemented for camel.
@@ -11,7 +11,7 @@ A store account type implemented for camel.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderStoreIface, #TnyAccountIface, #TnyTransportAccountIface, #TnyTransportAccount, #TnyAccount
+#TnyFolderStoreIface, #TnyAccountIface, #TnyTransportAccountIface, #TnyTransportAccount, #TnyCamelAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -1,5 +1,5 @@
-#ifndef TNY_TRANSPORT_ACCOUNT_H
-#define TNY_TRANSPORT_ACCOUNT_H
+#ifndef TNY_CAMEL_TRANSPORT_ACCOUNT_H
+#define TNY_CAMEL_TRANSPORT_ACCOUNT_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -28,28 +28,28 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_TRANSPORT_ACCOUNT             (tny_transport_account_get_type ())
-#define TNY_TRANSPORT_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_TRANSPORT_ACCOUNT, TnyTransportAccount))
-#define TNY_TRANSPORT_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_TRANSPORT_ACCOUNT, TnyTransportAccountClass))
-#define TNY_IS_TRANSPORT_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_TRANSPORT_ACCOUNT))
-#define TNY_IS_TRANSPORT_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_TRANSPORT_ACCOUNT))
-#define TNY_TRANSPORT_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_TRANSPORT_ACCOUNT, TnyTransportAccountClass))
+#define TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT             (tny_camel_transport_account_get_type ())
+#define TNY_CAMEL_TRANSPORT_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT, TnyCamelTransportAccount))
+#define TNY_CAMEL_TRANSPORT_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT, TnyCamelTransportAccountClass))
+#define TNY_IS_CAMEL_TRANSPORT_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT))
+#define TNY_IS_CAMEL_TRANSPORT_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT))
+#define TNY_CAMEL_TRANSPORT_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT, TnyCamelTransportAccountClass))
 
-typedef struct _TnyTransportAccount TnyTransportAccount;
-typedef struct _TnyTransportAccountClass TnyTransportAccountClass;
+typedef struct _TnyCamelTransportAccount TnyCamelTransportAccount;
+typedef struct _TnyCamelTransportAccountClass TnyCamelTransportAccountClass;
 
-struct _TnyTransportAccount
+struct _TnyCamelTransportAccount
 {
-	TnyAccount parent;
+	TnyCamelAccount parent;
 };
 
-struct _TnyTransportAccountClass 
+struct _TnyCamelTransportAccountClass 
 {
-	TnyAccountClass parent;
+	TnyCamelAccountClass parent;
 };
 
-GType                        tny_transport_account_get_type       (void);
-TnyTransportAccount*         tny_transport_account_new            (void);
+GType tny_camel_transport_account_get_type (void);
+TnyTransportAccountIface* tny_camel_transport_account_new (void);
 
 G_END_DECLS
 

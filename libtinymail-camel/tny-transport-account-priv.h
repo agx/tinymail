@@ -1,5 +1,5 @@
-#ifndef TNY_STORE_ACCOUNT_PRIV_H
-#define TNY_STORE_ACCOUNT_PRIV_H
+#ifndef TNY_CAMEL_TRANSPORT_ACCOUNT_PRIV_H
+#define TNY_CAMEL_TRANSPORT_ACCOUNT_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -20,9 +20,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-typedef struct _TnyTransportAccountPriv TnyTransportAccountPriv;
+typedef struct _TnyCamelTransportAccountPriv TnyCamelTransportAccountPriv;
 
-struct _TnyTransportAccountPriv
+struct _TnyCamelTransportAccountPriv
 {
 
 };
