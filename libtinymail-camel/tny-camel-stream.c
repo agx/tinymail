@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include <tny-stream-iface.h>
-#include <tny-stream-camel.h>
+#include <tny-camel-stream.h>
 #include <tny-folder-iface.h>
 #include <tny-folder.h>
 

@@ -2,6 +2,8 @@
 
 	* Renamed TnyAccount to TnyCamelAccount
 	* Renamed TnyStoreAccount to TnyCamelStoreAccount
+	* Renamed TnyCamelStream to TnyStreamCamel
+	* Renamed TnyStreamCamel to TnyCamelStream
 
 2006-08-29  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	

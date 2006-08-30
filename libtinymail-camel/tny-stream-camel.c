@@ -19,7 +19,7 @@
 
 #include <config.h>
 
-#include <tny-camel-stream.h>
+#include <tny-stream-camel.h>
 #include <tny-camel-shared.h>
 
 static CamelStreamClass *parent_class = NULL;
