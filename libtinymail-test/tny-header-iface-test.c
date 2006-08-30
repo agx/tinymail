@@ -25,7 +25,7 @@
 #include <tny-header-iface-test.h>
 
 /* We are going to test the camel implementation */
-#include <tny-header.h>
+#include <tny-camel-header.h>
 
 static TnyHeaderIface *iface = NULL;
 
@@ -38,7 +38,7 @@ tny_header_iface_test_setup (void)
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	iface = TNY_HEADER_IFACE (tny_header_new ());
+	iface = TNY_HEADER_IFACE (tny_camel_header_new ());
 
 	return;
 }

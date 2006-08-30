@@ -25,13 +25,13 @@
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
-#include <tny-header.h>
+#include <tny-camel-header.h>
 #include <tny-folder-store-iface.h>
 
 #include <account-store.h>
 
 #include <camel/camel.h>
-#include <tny-header-priv.h>
+#include <tny-camel-header-priv.h>
 
 typedef void (*performer) (TnyFolderIface *folder);
 
@@ -54,7 +54,7 @@ do_test_folder (TnyFolderIface *folder)
 	tny_folder_iface_get_headers (folder, headers, FALSE);
 	length=tny_list_iface_length (headers);
 	
-    	bytes = (sizeof (TnyHeader) + sizeof (CamelMessageInfo) + 
+    	bytes = (sizeof (TnyCamelHeader) + sizeof (CamelMessageInfo) + 
 		 sizeof (CamelMessageInfoBase) + 
 		 sizeof (CamelMessageContentInfo) + sizeof (struct _CamelFlag) +
 		 sizeof (struct _CamelTag)) * length;
@@ -64,7 +64,7 @@ do_test_folder (TnyFolderIface *folder)
     
 	g_print ("Loaded %d headers\n\n", length);
 
-    	g_print ("\tsizeof (TnyHeader) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (TnyHeader), length * sizeof (TnyHeader), ((gdouble)length * sizeof (TnyHeader))/1024);
+    	g_print ("\tsizeof (TnyHeader) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (TnyCamelHeader), length * sizeof (TnyCamelHeader), ((gdouble)length * sizeof (TnyCamelHeader))/1024);
 	g_print ("\tsizeof (CamelMessageInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfo), length * sizeof (CamelMessageInfo), ((gdouble)length * sizeof (CamelMessageInfo))/1024);
 	g_print ("\tsizeof (CamelMessageInfoBase) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfoBase), length * sizeof (CamelMessageInfoBase), ((gdouble)length * sizeof (CamelMessageInfoBase))/1024);
 	g_print ("\tsizeof (CamelMessageContentInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageContentInfo), length * sizeof (CamelMessageContentInfo), ((gdouble)length * sizeof (CamelMessageContentInfo))/1024);

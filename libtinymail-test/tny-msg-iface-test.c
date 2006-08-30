@@ -54,7 +54,7 @@ tny_msg_iface_test_teardown (void)
 static void
 tny_msg_iface_test_set_header (void)
 {
-	TnyHeaderIface *header = TNY_HEADER_IFACE (tny_header_new ()), *gheader;
+	TnyHeaderIface *header = TNY_HEADER_IFACE (tny_camel_header_new ()), *gheader;
 	tny_msg_iface_set_header (iface, header);
 	gheader = tny_msg_iface_get_header (iface);
 	    

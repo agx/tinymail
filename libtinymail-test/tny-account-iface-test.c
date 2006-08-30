@@ -29,7 +29,7 @@
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
-#include <tny-header.h>
+#include <tny-camel-header.h>
 
 #include <account-store.h>
 

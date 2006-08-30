@@ -1,5 +1,5 @@
-#ifndef TNY_HEADER_PRIV_H
-#define TNY_HEADER_PRIV_H
+#ifndef TNY_CAMEL_HEADER_PRIV_H
+#define TNY_CAMEL_HEADER_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -33,7 +33,7 @@ struct _WriteInfo
 };
 
 #pragma pack(1) /* Size will be 21 in stead of 24 */
-struct _TnyHeader 
+struct _TnyCamelHeader 
 {
 	GObject parent;		
 	gpointer info;
@@ -41,13 +41,13 @@ struct _TnyHeader
 	guchar write:1;
 };
 
-struct _TnyHeaderClass 
+struct _TnyCamelHeaderClass 
 {
 	GObjectClass parent_class;
 };
 
-void _tny_header_set_camel_message_info (TnyHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit);
-void _tny_header_set_folder (TnyHeader *self, TnyFolder *folder, TnyFolderPriv *tpriv);
-void _tny_header_set_camel_mime_message (TnyHeader *self, CamelMimeMessage *camel_mime_message);
+void _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit);
+void _tny_camel_header_set_folder (TnyCamelHeader *self, TnyFolder *folder, TnyFolderPriv *tpriv);
+void _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage *camel_mime_message);
 
 #endif

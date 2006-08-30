@@ -37,7 +37,7 @@ struct _TnyMsgPriv
 
 CamelMimeMessage* _tny_msg_get_camel_mime_message (TnyMsg *self);
 void _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message);
-void _tny_header_set_not_uncachable (TnyHeader *self);
+void _tny_camel_header_set_not_uncachable (TnyCamelHeader *self);
 void _tny_msg_set_folder (TnyMsgIface *self, TnyFolderIface *folder);
 
 #endif

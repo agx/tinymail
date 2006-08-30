@@ -37,12 +37,12 @@
 static GObjectClass *parent_class = NULL;
 
 #include <tny-msg.h>
-#include <tny-header.h>
+#include <tny-camel-header.h>
 #include <tny-camel-transport-account.h>
 
 #include "tny-camel-common-priv.h"
 #include "tny-msg-priv.h"
-#include "tny-header-priv.h"
+#include "tny-camel-header-priv.h"
 #include "tny-camel-account-priv.h"
 #include "tny-camel-transport-account-priv.h"
 

@@ -33,7 +33,7 @@
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 #include <tny-list.h>
-#include <tny-header.h>
+#include <tny-camel-header.h>
 
 #include <tny-folder-store-query.h>
 

@@ -1,3 +1,7 @@
+2006-08-30  Thomas Hisch <t.hisch@gmail.com>
+
+	* Renamed TnyHeader to TnyCamelHeader
+
 2006-08-30  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed TnyAccount to TnyCamelAccount

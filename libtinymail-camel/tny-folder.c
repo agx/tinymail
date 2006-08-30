@@ -29,7 +29,7 @@
 #include <tny-msg-iface.h>
 #include <tny-header-iface.h>
 #include <tny-msg.h>
-#include <tny-header.h>
+#include <tny-camel-header.h>
 #include <tny-store-account-iface.h>
 #include <tny-camel-store-account.h>
 #include <tny-list-iface.h>
@@ -47,7 +47,7 @@
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"
 #include "tny-folder-priv.h"
-#include "tny-header-priv.h"
+#include "tny-camel-header-priv.h"
 #include "tny-msg-priv.h"
 #include "tny-camel-common-priv.h"
 #include <tny-camel-shared.h>
@@ -320,10 +320,10 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	CamelMessageInfo *mi = camel_folder_get_message_info (cfol, uid);
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
-	header = TNY_HEADER_IFACE (tny_header_new ());
+	header = TNY_HEADER_IFACE (tny_camel_header_new ());
 
-	_tny_header_set_folder (TNY_HEADER (header), TNY_FOLDER (self), priv);
-	_tny_header_set_camel_message_info (TNY_HEADER(header), mi, FALSE);
+	_tny_camel_header_set_folder (TNY_CAMEL_HEADER (header), TNY_FOLDER (self), priv);
+	_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (header), mi, FALSE);
 
 	/* Get rid of the reference already. I know this is ugly */
 	camel_folder_free_message_info (cfol, mi);
@@ -618,14 +618,13 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 
 	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
 	{
-	    	TnyHeaderIface *nheader = TNY_HEADER_IFACE (tny_header_new ());
+	    	TnyHeaderIface *nheader = TNY_HEADER_IFACE (tny_camel_header_new ());
 	    
 	    	/* I don't reuse the header because that would keep a reference
 		   on it. Meaning that the CamelFolder can't be destroyed (the
-		   fpriv->headers_managed stuff in tny-header.c). The TnyHeader
-		   type can also work with a CamelMimeMessage, so why not use
-		   that. Right? */
-
+		   fpriv->headers_managed stuff in tny-header.c). The 
+		   TnyCamelHeader type can also work with a CamelMimeMessage, 
+		   so why not use that. Right? */
 	    
 		message = TNY_MSG_IFACE (tny_msg_new ());
 		
@@ -633,7 +632,7 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message); 
 	    
 		/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
-		_tny_header_set_camel_mime_message (TNY_HEADER (nheader), camel_message);
+		_tny_camel_header_set_camel_mime_message (TNY_CAMEL_HEADER (nheader), camel_message);
 	    
 		tny_msg_iface_set_header (message, nheader);
 		g_object_unref (G_OBJECT (nheader));  

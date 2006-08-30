@@ -33,7 +33,7 @@
 #include <tny-header-iface.h>
 #include <tny-mime-part.h>
 #include <tny-stream-camel.h>
-#include <tny-header.h>
+#include <tny-camel-header.h>
 
 #include <tny-camel-shared.h>
 
@@ -43,7 +43,7 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-msg-priv.h"
 #include "tny-mime-part-priv.h"
-#include "tny-header-priv.h"
+#include "tny-camel-header-priv.h"
 
 #define TNY_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG, TnyMsgPriv))
@@ -301,7 +301,7 @@ tny_msg_finalize (GObject *object)
 	{
 	    	if (priv->header)
 		{ /* Stupid hack, else the unreffer below would fuck it up */
-			TnyHeader *hdr = (TnyHeader*)priv->header;
+			TnyCamelHeader *hdr = (TnyCamelHeader*)priv->header;
 			hdr->write = 0;
 		}
 		/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 */
