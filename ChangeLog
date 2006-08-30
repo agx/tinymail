@@ -2,6 +2,8 @@
 
 	* Renamed TnyHeader to TnyCamelHeader
 
+	* This was a major API change
+	
 2006-08-30  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed TnyAccount to TnyCamelAccount
@@ -12,6 +14,8 @@
 	* Renamed TnyMsg to TnyCamelMsg
 	* Renamed TnyFolder to TnyCamelFolder
 
+	* This was a major API change
+	
 2006-08-29  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
 	* Fix type conflict in libtinymail-camel; only store accounts have
