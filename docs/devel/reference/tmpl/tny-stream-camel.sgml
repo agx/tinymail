@@ -2,13 +2,13 @@
 TnyStreamCamel
 
 <!-- ##### SECTION Short_Description ##### -->
-A #TnyStreamIface as adaptor for a #CamelStream
+A #CamelStream as adaptor for a #TnyStreamIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-This type adapts the #CamelStream to a #TnyStreamIface. It's used in the 
-libtinymail-camel implementation library for converting a #CamelStream
-to a #TnyStreamIface.
+This type adapts the #TnyStreamIface to a #CamelStream. It's used in the 
+libtinymail-camel implementation library for converting a #TnyStreamIface 
+to a #CamelStream.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
