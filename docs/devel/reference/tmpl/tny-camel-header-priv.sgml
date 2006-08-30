@@ -25,9 +25,13 @@ tny-header-priv
 @msg: 
 @mime_from: 
 
-<!-- ##### STRUCT TnyHeader ##### -->
+<!-- ##### STRUCT TnyCamelHeader ##### -->
 <para>
 
 </para>
 
+@parent: 
+@info: 
+@folder: 
+@write: 
 

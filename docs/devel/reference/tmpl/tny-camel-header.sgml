@@ -32,20 +32,24 @@ for no real reason.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyHeader ##### -->
+<!-- ##### STRUCT TnyCamelHeader ##### -->
 <para>
 
 </para>
 
+@parent: 
+@info: 
+@folder: 
+@write: 
 
-<!-- ##### STRUCT TnyHeaderClass ##### -->
+<!-- ##### STRUCT TnyCamelHeaderClass ##### -->
 <para>
 
 </para>
 
 @parent_class: 
 
-<!-- ##### FUNCTION tny_header_new ##### -->
+<!-- ##### FUNCTION tny_camel_header_new ##### -->
 <para>
 
 </para>

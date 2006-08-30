@@ -19,12 +19,44 @@ to a #CamelStream.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_STREAM_CAMEL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_STREAM_CAMEL ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO TNY_STREAM_CAMEL_CLASS ##### -->
+<para>
+
+</para>
+
+@k: 
+
+
 <!-- ##### STRUCT TnyStreamCamel ##### -->
 <para>
 
 </para>
 
 @parent: 
+@stream: 
+
+<!-- ##### FUNCTION tny_stream_camel_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 
 <!-- ##### FUNCTION tny_stream_camel_new ##### -->
 <para>
@@ -42,5 +74,15 @@ to a #CamelStream.
 
 @self: 
 @stream: 
+
+
+<!-- ##### FUNCTION tny_stream_camel_write_to_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@output: 
+@Returns: 
 
 

@@ -277,6 +277,27 @@ TnyTransportAccount
 @prompt: 
 @Returns: 
 
+<!-- ##### MACRO TNY_CAMEL_STREAM ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+<!-- ##### MACRO TNY_CAMEL_STREAM_CLASS ##### -->
+<para>
+
+</para>
+
+@k: 
+
+<!-- ##### MACRO TNY_CAMEL_VFS_STREAM ##### -->
+<para>
+
+</para>
+
+@o: 
+
 <!-- ##### MACRO TNY_IS_MSG_PROXY_FOLDER ##### -->
 <para>
 
@@ -303,6 +324,12 @@ TnyTransportAccount
 </para>
 
 @o: 
+
+<!-- ##### MACRO TNY_TYPE_CAMEL_STREAM ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### MACRO TNY_TYPE_MSG_HEADER_FLAGS ##### -->
 <para>
@@ -397,6 +424,19 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @what: What happened
 @status: A status field
 @user_data: user data
+
+<!-- ##### STRUCT TnyHeader ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyHeaderClass ##### -->
+<para>
+
+</para>
+
+@parent_class: 
 
 <!-- ##### STRUCT TnyMsgHeader ##### -->
 <para>
@@ -674,6 +714,22 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @part: 
 
+<!-- ##### FUNCTION tny_camel_stream_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_camel_stream_write_to_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@output: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_device_get_new ##### -->
 <para>
 
@@ -719,6 +775,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @folder: 
+
+<!-- ##### FUNCTION tny_header_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
 
 <!-- ##### FUNCTION tny_iterator_iface_has_first ##### -->
 <para>
