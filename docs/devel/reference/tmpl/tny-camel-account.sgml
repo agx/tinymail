@@ -17,13 +17,53 @@ A account type implemented for Camel
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyAccount ##### -->
+<!-- ##### MACRO TNY_TYPE_CAMEL_ACCOUNT ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_account_add_option ##### -->
+
+<!-- ##### MACRO TNY_CAMEL_ACCOUNT ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO TNY_CAMEL_ACCOUNT_CLASS ##### -->
+<para>
+
+</para>
+
+@vtable: 
+
+
+<!-- ##### MACRO TNY_IS_CAMEL_ACCOUNT ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO TNY_CAMEL_ACCOUNT_GET_CLASS ##### -->
+<para>
+
+</para>
+
+@inst: 
+
+
+<!-- ##### STRUCT TnyCamelAccount ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### FUNCTION tny_camel_account_add_option ##### -->
 <para>
 
 </para>
@@ -32,7 +72,7 @@ A account type implemented for Camel
 @option: 
 
 
-<!-- ##### FUNCTION tny_account_set_session ##### -->
+<!-- ##### FUNCTION tny_camel_account_set_session ##### -->
 <para>
 
 </para>
@@ -41,7 +81,7 @@ A account type implemented for Camel
 @session: 
 
 
-<!-- ##### FUNCTION tny_account_set_online_status ##### -->
+<!-- ##### FUNCTION tny_camel_account_set_online_status ##### -->
 <para>
 
 </para>

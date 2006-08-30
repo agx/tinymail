@@ -17,13 +17,14 @@ A store account type implemented for camel.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyStoreAccount ##### -->
+<!-- ##### STRUCT TnyCamelStoreAccount ##### -->
 <para>
 
 </para>
 
+@parent: 
 
-<!-- ##### FUNCTION tny_store_account_new ##### -->
+<!-- ##### FUNCTION tny_camel_store_account_new ##### -->
 <para>
 
 </para>

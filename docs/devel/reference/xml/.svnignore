@@ -44,7 +44,7 @@ tny-transport-account.xml
 tny-vfs-stream.xml
 tny-account-tree-model.xml
 tny-platform-factory.xml
-tny-account.xml
+tny-camel-account.xml
 tny-password-dialog.xml
 tny-msg-window-iface.xml
 tny-stream-iface.xml
@@ -89,3 +89,9 @@ device-priv.xml
 tny-folder-store-query.xml
 account-store.xml
 tny-folder-store-query-test.xml
+tny-camel-account.xml
+tny-camel-account-priv.xml
+tny-camel-transport-account-priv.xml
+tny-camel-store-account-priv.xml
+tny-camel-transport-account.xml
+tny-camel-store-account.xml

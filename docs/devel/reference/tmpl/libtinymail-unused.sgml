@@ -213,6 +213,54 @@ A demo implementation of #TnySummaryWindowIface for Gtk+
 TnySummaryWindow
 
 
+<!-- ##### SECTION ./tmpl/tny-transport-account-priv.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account-priv.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account-priv.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account-priv.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account-priv.sgml:Title ##### -->
+tny-transport-account-priv
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Long_Description ##### -->
+<para>
+A transport account type implemented for camel.
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:See_Also ##### -->
+<para>
+#TnyStoreAccountIface, #TnyAccountIface, #TnyStoreAccount, #TnyAccount
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Short_Description ##### -->
+A Camel transport account type
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Title ##### -->
+TnyTransportAccount
+
+
 <!-- ##### USER_FUNCTION ForgetPassFunc ##### -->
 <para>
 
@@ -249,6 +297,13 @@ TnySummaryWindow
 
 @obj: 
 
+<!-- ##### MACRO TNY_STORE_ACCOUNT_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
 <!-- ##### MACRO TNY_TYPE_MSG_HEADER_FLAGS ##### -->
 <para>
 
@@ -262,6 +317,12 @@ TnySummaryWindow
 
 
 <!-- ##### MACRO TNY_TYPE_STORE_ACCOUNT_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyAccount ##### -->
 <para>
 
 </para>
@@ -465,6 +526,21 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @set_content_type_func: 
 @is_attachment_func: 
 
+<!-- ##### STRUCT TnyStoreAccount ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyStoreAccountPriv ##### -->
+<para>
+
+</para>
+
+@iter_store: 
+@iter: 
+@managed_folders: 
+
 <!-- ##### STRUCT TnySummaryWindow ##### -->
 <para>
 
@@ -473,6 +549,18 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @parent: 
 
 <!-- ##### STRUCT TnySummaryWindowIface ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyTransportAccount ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyTransportAccountPriv ##### -->
 <para>
 
 </para>
@@ -491,6 +579,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 @Returns: 
+
+<!-- ##### FUNCTION tny_account_add_option ##### -->
+<para>
+
+</para>
+
+@self: 
+@option: 
 
 <!-- ##### FUNCTION tny_account_get_type ##### -->
 <para>
@@ -522,6 +618,22 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @type: 
+
+<!-- ##### FUNCTION tny_account_set_online_status ##### -->
+<para>
+
+</para>
+
+@self: 
+@offline: 
+
+<!-- ##### FUNCTION tny_account_set_session ##### -->
+<para>
+
+</para>
+
+@self: 
+@session: 
 
 <!-- ##### FUNCTION tny_account_store_get_instance ##### -->
 <para>
@@ -1180,7 +1292,21 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @type: 
 @Returns: 
 
+<!-- ##### FUNCTION tny_store_account_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 <!-- ##### FUNCTION tny_summary_window_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_transport_account_new ##### -->
 <para>
 
 </para>

@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-store-account-priv
+TnyCamelTransportAccount
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,28 +9,28 @@ tny-store-account-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelStoreAccountPriv ##### -->
+<!-- ##### STRUCT TnyCamelTransportAccount ##### -->
 <para>
 
 </para>
 
-@iter_store: 
-@iter: 
-@managed_folders: 
+@parent: 
 
-<!-- ##### MACRO TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE ##### -->
+<!-- ##### FUNCTION tny_camel_transport_account_new ##### -->
 <para>
 
 </para>
 
-@o: 
+@Returns: 
 
 
