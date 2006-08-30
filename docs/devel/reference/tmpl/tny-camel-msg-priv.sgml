@@ -1,0 +1,33 @@
+<!-- ##### SECTION Title ##### -->
+tny-camel-msg-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyCamelMsgPriv ##### -->
+<para>
+
+</para>
+
+@message_lock: 
+@header_lock: 
+@header: 
+@parts_lock: 
+@folder_lock: 
+@folder: 
+

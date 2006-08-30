@@ -22,33 +22,6 @@
 folder-lister
 
 
-<!-- ##### SECTION ./tmpl/tny-camel-msg.sgml:Long_Description ##### -->
-<para>
-A #TnyMsgIface proxy for the #CamelMimeMessage type in Camel. It inherits from #TnyMsgMimePart and can
-therefore be used as a mime part. 
-</para><para>
-This implementation is coupled with #TnyMsgMimePart.
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-camel-msg.sgml:See_Also ##### -->
-<para>
-#TnyMsgIface, #CamelMimeMessage, #TnyMsgMimePart, #TnyMsgMimePartIface
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-camel-msg.sgml:Short_Description ##### -->
-A Camel implementation of the #TnyMsgIface
-
-
-<!-- ##### SECTION ./tmpl/tny-camel-msg.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-camel-msg.sgml:Title ##### -->
-TnyCamelMsg
-
-
 <!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Long_Description ##### -->
 <para>
 

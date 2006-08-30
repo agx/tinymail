@@ -20,13 +20,14 @@ This implementation is coupled with #TnyMsgMimePart.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsg ##### -->
+<!-- ##### STRUCT TnyCamelMsg ##### -->
 <para>
 
 </para>
 
+@parent: 
 
-<!-- ##### FUNCTION tny_msg_new ##### -->
+<!-- ##### FUNCTION tny_camel_msg_new ##### -->
 <para>
 
 </para>
@@ -34,7 +35,7 @@ This implementation is coupled with #TnyMsgMimePart.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_new_with_header ##### -->
+<!-- ##### FUNCTION tny_camel_msg_new_with_header ##### -->
 <para>
 
 </para>
