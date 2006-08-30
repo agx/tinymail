@@ -23,7 +23,7 @@
 
 #include <string.h>
 #include <tny-mime-part-iface.h>
-#include <tny-mime-part.h>
+#include <tny-camel-mime-part.h>
 #include <tny-camel-stream.h>
 #include <tny-stream-camel.h>
 #include <camel/camel-stream-mem.h>
@@ -32,7 +32,7 @@
 
 static GObjectClass *parent_class = NULL;
 
-#include "tny-mime-part-priv.h"
+#include "tny-camel-mime-part-priv.h"
 
 #include <camel/camel-url.h>
 #include <camel/camel-stream.h>

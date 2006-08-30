@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMimePart
+TnyCamelMimePart
 
 <!-- ##### SECTION Short_Description ##### -->
 A Camel implementation of #TnyMimePartIface

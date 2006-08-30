@@ -27,7 +27,7 @@
 #include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-header-iface.h>
-#include <tny-mime-part.h>
+#include <tny-camel-mime-part.h>
 
 G_BEGIN_DECLS
 

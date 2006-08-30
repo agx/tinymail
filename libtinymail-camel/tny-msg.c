@@ -31,7 +31,7 @@
 #include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-header-iface.h>
-#include <tny-mime-part.h>
+#include <tny-camel-mime-part.h>
 #include <tny-stream-camel.h>
 #include <tny-camel-header.h>
 
@@ -42,7 +42,7 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-types.h>
 
 #include "tny-msg-priv.h"
-#include "tny-mime-part-priv.h"
+#include "tny-camel-mime-part-priv.h"
 #include "tny-camel-header-priv.h"
 
 #define TNY_MSG_GET_PRIVATE(o)	\

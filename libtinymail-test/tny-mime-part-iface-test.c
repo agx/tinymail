@@ -21,7 +21,7 @@
 #include <tny-mime-part-iface-test.h>
 
 /* We are going to test the camel implementation */
-#include <tny-mime-part.h>
+#include <tny-camel-mime-part.h>
 #include <tny-stream-iface.h>
 #include <tny-test-stream.h>
 #include <tny-stream-camel.h>

@@ -6,7 +6,7 @@ INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS)  	\
 lib_LTLIBRARIES = libtinymail-camel-1.0.la 
 
 libtinymail_camel_1_0_headers =			\
-	tny-mime-part.h				\
+	tny-camel-mime-part.h			\
 	tny-camel-header.h			\
 	tny-msg.h				\
 	tny-folder.h				\
@@ -30,8 +30,8 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	$(libtinymail_camel_1_0_headers)	\
 	tny-msg.c				\
 	tny-camel-header.c 			\
-	tny-mime-part-priv.h			\
-	tny-mime-part.c				\
+	tny-camel-mime-part-priv.h		\
+	tny-camel-mime-part.c			\
 	tny-folder.c				\
 	tny-camel-account.c			\
 	tny-camel-store-account.c		\
