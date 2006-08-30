@@ -43,7 +43,7 @@ tny_mime_part_iface_test_setup (void)
 	camel_object_unref (CAMEL_OBJECT (addr));
 
 	CamelMimePart *cpart = camel_mime_part_new ();
-	iface = TNY_MIME_PART_IFACE (tny_mime_part_new (cpart));
+	iface = TNY_MIME_PART_IFACE (tny_camel_mime_part_new (cpart));
 
 	return;
 }

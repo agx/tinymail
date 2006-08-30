@@ -72,7 +72,7 @@ tny_msg_iface_test_add_part_del_part (void)
     	gint length = 0;
     	TnyListIface *parts = TNY_LIST_IFACE (tny_list_new());
 	CamelMimePart *cpart = camel_mime_part_new ();
-	TnyMimePartIface *part = TNY_MIME_PART_IFACE (tny_mime_part_new (cpart));
+	TnyMimePartIface *part = TNY_MIME_PART_IFACE (tny_camel_mime_part_new (cpart));
     
 	tny_msg_iface_add_part (iface, part);
 

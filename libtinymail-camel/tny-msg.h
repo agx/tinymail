@@ -43,12 +43,12 @@ typedef struct _TnyMsgClass TnyMsgClass;
 
 struct _TnyMsg
 {
-	TnyMimePart parent;	
+	TnyCamelMimePart parent;	
 };
 
 struct _TnyMsgClass 
 {
-	TnyMimePartClass parent;
+	TnyCamelMimePartClass parent;
 };
 
 GType     tny_msg_get_type (void);
