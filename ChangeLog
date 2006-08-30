@@ -6,6 +6,9 @@
 	
 2006-08-30  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Updated the platform specific libraries olpc, maemo, gpe and
+	gnome-desktop to the new APIs
+
 	* Renamed TnyAccount to TnyCamelAccount
 	* Renamed TnyStoreAccount to TnyCamelStoreAccount
 	* Renamed TnyCamelStream to TnyStreamCamel

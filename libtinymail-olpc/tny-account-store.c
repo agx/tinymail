@@ -114,8 +114,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 static void
 per_account_forget_pass_func (TnyAccountIface *account)
 {
-	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyGetPassFunc func;
 	if (G_LIKELY (passwords))
 	{
@@ -231,7 +229,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			gsize options_len; gint i;
 			gchar **options;
 
-			tny_camel_account_set_session (TNY_ACCOUNT (account), priv->session);
+			tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), priv->session);
 
 			proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
 			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
@@ -244,7 +242,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			if (options)
 			{
 				for (i=0; i<options_len; i++)
-					tny_account_add_option (TNY_ACCOUNT (account), options[i]);
+					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), options[i]);
 				g_strfreev (options);
 			}
 

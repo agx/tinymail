@@ -32,14 +32,15 @@
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
 #include <tny-password-dialog.h>
+
 #include <tny-account-iface.h>
-#include <tny-store-account.h>
-#include <tny-transport-account.h>
+#include <tny-store-account-iface.h>
+#include <tny-transport-account-iface.h>
 #include <tny-device-iface.h>
 
 #include <tny-camel-account.h>
-#include <tny-camel-store-account-iface.h>
-#include <tny-camel-transport-account-iface.h>
+#include <tny-camel-store-account.h>
+#include <tny-camel-transport-account.h>
 #include <tny-session-camel.h>
 #include <tny-device.h>
 
@@ -116,8 +117,6 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 static void
 per_account_forget_pass_func (TnyAccountIface *account)
 {
-	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyGetPassFunc func;
 	if (G_LIKELY (passwords))
 	{
@@ -268,7 +267,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 		if (account)
 		{
-			tny_camel_account_set_session (TNY_ACCOUNT (account), priv->session);
+			tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), priv->session);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
 			proto = gconf_client_get_string (priv->client, 
@@ -293,7 +292,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			{
 				while (options)
 				{
-					tny_account_add_option (TNY_ACCOUNT (account), options->data);
+					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), options->data);
 					g_free (options->data);
 					options = g_slist_next (options);
 				}
@@ -354,7 +353,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 				per_account_get_pass_func);
 
 
-			tny_list_iface_prepend (list, account);
+			tny_list_iface_prepend (list, (GObject*)account);
 			g_object_unref (G_OBJECT (account));
 
 		}
