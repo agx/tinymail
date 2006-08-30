@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include <tny-transport-account-iface.h>
-#include <tny-transport-account.h>
+#include <tny-camel-transport-account.h>
 
 #include <tny-folder-iface.h>
 #include <tny-folder.h>
@@ -38,13 +38,13 @@ static GObjectClass *parent_class = NULL;
 
 #include <tny-msg.h>
 #include <tny-header.h>
-#include <tny-transport-account.h>
+#include <tny-camel-transport-account.h>
 
 #include "tny-camel-common-priv.h"
 #include "tny-msg-priv.h"
 #include "tny-header-priv.h"
-#include "tny-account-priv.h"
-#include "tny-transport-account-priv.h"
+#include "tny-camel-account-priv.h"
+#include "tny-camel-transport-account-priv.h"
 
 #include <tny-camel-shared.h>
 

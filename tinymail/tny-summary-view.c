@@ -34,8 +34,6 @@
 #include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
-#include <tny-store-account.h>
-#include <tny-transport-account.h>
 #include <tny-msg-view-iface.h>
 #include <tny-msg-window-iface.h>
 #include <tny-msg-window.h>

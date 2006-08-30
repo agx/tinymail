@@ -1,4 +1,9 @@
-2006-08-29 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+2006-08-30  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Renamed TnyAccount to TnyCamelAccount
+	* Renamed TnyStoreAccount to TnyCamelStoreAccount
+
+2006-08-29  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
 	* Fix type conflict in libtinymail-camel; only store accounts have
 	folders anyway

@@ -22,7 +22,7 @@
 #include <tny-account-iface.h>
 #include <tny-folder-store-iface.h>
 
-#include <tny-store-account.h>
+#include <tny-camel-store-account.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 #include <tny-list.h>

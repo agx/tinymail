@@ -38,12 +38,12 @@
 
 #include <tny-device-iface.h>
 #include <tny-account-store-iface.h>
-#include <tny-store-account.h>
-#include <tny-transport-account.h>
+#include <tny-camel-store-account.h>
+#include <tny-camel-transport-account.h>
 
-#include "tny-store-account-priv.h"
-#include "tny-transport-account-priv.h"
-#include "tny-account-priv.h"
+#include "tny-camel-store-account-priv.h"
+#include "tny-camel-transport-account-priv.h"
+#include "tny-camel-account-priv.h"
 
 #include <tny-camel-shared.h>
 

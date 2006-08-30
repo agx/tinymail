@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <string.h>
 
-#include <tny-account.h>
+#include <tny-camel-account.h>
 #include <tny-session-camel.h>
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
@@ -44,7 +44,7 @@
 
 #include <tny-camel-shared.h>
 
-#include "tny-account-priv.h"
+#include "tny-camel-account-priv.h"
 
 static GObjectClass *parent_class = NULL;
 

@@ -31,12 +31,12 @@
 
 #include <tny-account-store-iface.h>
 #include <tny-account-iface.h>
-#include <tny-account.h>
+#include <tny-camel-account.h>
 
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
-#include <tny-store-account.h>
-#include <tny-transport-account.h>
+#include <tny-camel-store-account.h>
+#include <tny-camel-transport-account.h>
 #include <tny-device-iface.h>
 #include <tny-session-camel.h>
 

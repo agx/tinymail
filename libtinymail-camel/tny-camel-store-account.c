@@ -29,7 +29,7 @@ stay as an abstract TnyStoreAccount type. */
 #include <tny-list-iface.h>
 #include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
-#include <tny-store-account.h>
+#include <tny-camel-store-account.h>
 
 #include <tny-folder-iface.h>
 #include <tny-folder-store-iface.h>
@@ -45,8 +45,8 @@ stay as an abstract TnyStoreAccount type. */
 
 #include <tny-folder-iface.h>
 
-#include "tny-account-priv.h"
-#include "tny-store-account-priv.h"
+#include "tny-camel-account-priv.h"
+#include "tny-camel-store-account-priv.h"
 #include "tny-folder-priv.h"
 #include "tny-camel-common-priv.h"
 

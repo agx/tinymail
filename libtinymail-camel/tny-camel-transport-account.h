@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-account.h>
+#include <tny-camel-account.h>
 #include <tny-transport-account-iface.h>
 
 G_BEGIN_DECLS

@@ -31,7 +31,7 @@
 #include <tny-msg.h>
 #include <tny-header.h>
 #include <tny-store-account-iface.h>
-#include <tny-store-account.h>
+#include <tny-camel-store-account.h>
 #include <tny-list-iface.h>
 
 #include <camel/camel-folder.h>
@@ -44,8 +44,8 @@
 #include <errno.h>
 
 #include <tny-session-camel.h>
-#include "tny-account-priv.h"
-#include "tny-store-account-priv.h"
+#include "tny-camel-account-priv.h"
+#include "tny-camel-store-account-priv.h"
 #include "tny-folder-priv.h"
 #include "tny-header-priv.h"
 #include "tny-msg-priv.h"
