@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyHeader
+TnyCamelHeader
 
 <!-- ##### SECTION Short_Description ##### -->
 A Camel implementation of #TnyHeaderIface
