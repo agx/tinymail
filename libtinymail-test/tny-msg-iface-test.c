@@ -20,7 +20,7 @@
 
 #include <tny-msg-iface-test.h>
 #include <tny-msg-iface.h>
-#include <tny-msg.h>
+#include <tny-camel-msg.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 #include <tny-list.h>
@@ -39,7 +39,7 @@ tny_msg_iface_test_setup (void)
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	iface = TNY_MSG_IFACE (tny_msg_new ());
+	iface = tny_camel_msg_new ();
 
 	return;
 }

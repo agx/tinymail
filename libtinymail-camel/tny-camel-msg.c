@@ -27,7 +27,7 @@
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 
-#include <tny-msg.h>
+#include <tny-camel-msg.h>
 #include <tny-mime-part-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-header-iface.h>
@@ -41,12 +41,12 @@ static GObjectClass *parent_class = NULL;
 
 #include <camel/camel-types.h>
 
-#include "tny-msg-priv.h"
+#include "tny-camel-msg-priv.h"
 #include "tny-camel-mime-part-priv.h"
 #include "tny-camel-header-priv.h"
 
-#define TNY_MSG_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG, TnyMsgPriv))
+#define TNY_CAMEL_MSG_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_MSG, TnyCamelMsgPriv))
 
 typedef gboolean (*CamelPartFunc)(CamelMimeMessage *, CamelMimePart *, void *data);
 
@@ -102,7 +102,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
 	   and tny-mime-part.c:515 ! */
 
-	tpart = TNY_MIME_PART_IFACE  (tny_camel_mime_part_new (part));
+	tpart = tny_camel_mime_part_new (part);
 
 	tny_list_iface_prepend (list, (GObject*)tpart);
 	g_object_unref (G_OBJECT (tpart));
@@ -113,7 +113,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 
 
 CamelMimeMessage* 
-_tny_msg_get_camel_mime_message (TnyMsg *self)
+_tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self)
 {
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
@@ -122,9 +122,9 @@ _tny_msg_get_camel_mime_message (TnyMsg *self)
 
 
 void
-_tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
+_tny_camel_msg_set_camel_mime_message (TnyCamelMsg *self, CamelMimeMessage *message)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->message_lock);
@@ -142,9 +142,9 @@ _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message)
 }
 
 TnyFolderIface* 
-tny_msg_get_folder (TnyMsgIface *self)
+tny_camel_msg_get_folder (TnyMsgIface *self)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyFolderIface *retval;
 
 	g_mutex_lock (priv->folder_lock);
@@ -157,9 +157,9 @@ tny_msg_get_folder (TnyMsgIface *self)
 
 
 void
-_tny_msg_set_folder (TnyMsgIface *self, TnyFolderIface* folder)
+_tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolderIface* folder)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folder_lock);
 	priv->folder = (TnyFolderIface*)folder;
@@ -169,9 +169,9 @@ _tny_msg_set_folder (TnyMsgIface *self, TnyFolderIface* folder)
 }
 
 static void
-tny_msg_get_parts (TnyMsgIface *self, TnyListIface *list)
+tny_camel_msg_get_parts (TnyMsgIface *self, TnyListIface *list)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->parts_lock);
@@ -185,9 +185,9 @@ tny_msg_get_parts (TnyMsgIface *self, TnyListIface *list)
 }
 
 static TnyHeaderIface*
-tny_msg_get_header (TnyMsgIface *self)
+tny_camel_msg_get_header (TnyMsgIface *self)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyHeaderIface *retval;
 
 	g_mutex_lock (priv->header_lock);
@@ -200,9 +200,9 @@ tny_msg_get_header (TnyMsgIface *self)
 
 
 static gint
-tny_msg_add_part (TnyMsgIface *self, TnyMimePartIface *part)
+tny_camel_msg_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelMedium *medium;
 	CamelDataWrapper *containee;
@@ -251,9 +251,9 @@ tny_msg_add_part (TnyMsgIface *self, TnyMimePartIface *part)
 /* TODO: camel_mime_message_set_date(msg, time(0), 930); */
 
 static void 
-tny_msg_del_part (TnyMsgIface *self,  TnyMimePartIface *part)
+tny_camel_msg_del_part (TnyMsgIface *self,  TnyMimePartIface *part)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *containee;
 
@@ -273,9 +273,9 @@ tny_msg_del_part (TnyMsgIface *self,  TnyMimePartIface *part)
 
 
 static void
-tny_msg_set_header (TnyMsgIface *self, TnyHeaderIface *header)
+tny_camel_msg_set_header (TnyMsgIface *self, TnyHeaderIface *header)
 {
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->header_lock);
 
@@ -292,10 +292,10 @@ tny_msg_set_header (TnyMsgIface *self, TnyHeaderIface *header)
 
 
 static void
-tny_msg_finalize (GObject *object)
+tny_camel_msg_finalize (GObject *object)
 {
-	TnyMsg *self = (TnyMsg*) object;
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (TNY_MSG (self));
+	TnyCamelMsg *self = (TnyCamelMsg*) object;
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
     	g_mutex_lock (priv->message_lock);
@@ -333,40 +333,40 @@ tny_msg_finalize (GObject *object)
 }
 
 /**
- * tny_msg_new:
+ * tny_camel_msg_new:
  * 
- * The #TnyMsg implementation is actually a proxy for #CamelMimeMessage (and
+ * The #TnyCamelMsg implementation is actually a proxy for #CamelMimeMessage (and
  * a few other Camel types)
  *
  * Return value: A new #TnyMsgIface instance implemented for Camel
  **/
-TnyMsg*
-tny_msg_new (void)
+TnyMsgIface*
+tny_camel_msg_new (void)
 {
-	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
+	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
 	
-	_tny_msg_set_camel_mime_message (self, camel_mime_message_new  ());
+	_tny_camel_msg_set_camel_mime_message (self, camel_mime_message_new ());
 
-	return self;
+	return TNY_MSG_IFACE (self);
 }
 
 /**
- * tny_msg_new_with_header:
+ * tny_camel_msg_new_with_header:
  * @header: a #TnyHeaderIface object
  *
- * The #TnyMsg implementation is actually a proxy for #CamelMimeMessage (and
+ * The #TnyCamelMsg implementation is actually a proxy for #CamelMimeMessage (and
  * a few other Camel types)
  *
  * Return value: A new #TnyMsgIface instance implemented for Camel
  **/
-TnyMsg*
-tny_msg_new_with_header (TnyHeaderIface *header)
+TnyMsgIface*
+tny_camel_msg_new_with_header (TnyHeaderIface *header)
 {
-	TnyMsg *self = g_object_new (TNY_TYPE_MSG, NULL);
+	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
 
-	tny_msg_set_header (TNY_MSG_IFACE (self), header);
+	tny_camel_msg_set_header (TNY_MSG_IFACE (self), header);
 
-	return self;
+	return TNY_MSG_IFACE (self);
 }
 
 
@@ -375,36 +375,36 @@ tny_msg_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMsgIfaceClass *klass = (TnyMsgIfaceClass *)g_iface;
 
-	klass->get_parts_func = tny_msg_get_parts;
-	klass->get_header_func = tny_msg_get_header;
-	klass->set_header_func = tny_msg_set_header;
-	klass->add_part_func = tny_msg_add_part;
-	klass->del_part_func = tny_msg_del_part;
-	klass->get_folder_func = tny_msg_get_folder;
+	klass->get_parts_func = tny_camel_msg_get_parts;
+	klass->get_header_func = tny_camel_msg_get_header;
+	klass->set_header_func = tny_camel_msg_set_header;
+	klass->add_part_func = tny_camel_msg_add_part;
+	klass->del_part_func = tny_camel_msg_del_part;
+	klass->get_folder_func = tny_camel_msg_get_folder;
 
 	return;
 }
 
 static void 
-tny_msg_class_init (TnyMsgClass *class)
+tny_camel_msg_class_init (TnyCamelMsgClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-	object_class->finalize = tny_msg_finalize;
+	object_class->finalize = tny_camel_msg_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyMsgPriv));
+	g_type_class_add_private (object_class, sizeof (TnyCamelMsgPriv));
 
 	return;
 }
 
 
 static void
-tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_camel_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyMsg *self = (TnyMsg *)instance;
-	TnyMsgPriv *priv = TNY_MSG_GET_PRIVATE (self);
+	TnyCamelMsg *self = (TnyCamelMsg*)instance;
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 
 	priv->header = NULL;
 
@@ -417,7 +417,7 @@ tny_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 GType 
-tny_msg_get_type (void)
+tny_camel_msg_get_type (void)
 {
 	static GType type = 0;
 
@@ -434,15 +434,15 @@ tny_msg_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgClass),
+		  sizeof (TnyCamelMsgClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_msg_class_init, /* class_init */
+		  (GClassInitFunc) tny_camel_msg_class_init, /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyMsg),
+		  sizeof (TnyCamelMsg),
 		  0,      /* n_preallocs */
-		  tny_msg_instance_init,    /* instance_init */
+		  tny_camel_msg_instance_init,    /* instance_init */
 		  NULL
 		};
 
@@ -454,7 +454,7 @@ tny_msg_get_type (void)
 		};
 
 		type = g_type_register_static (TNY_TYPE_CAMEL_MIME_PART,
-			"TnyMsg",
+			"TnyCamelMsg",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_MSG_IFACE,

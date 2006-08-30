@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_PRIV_H
-#define TNY_MSG_PRIV_H
+#ifndef TNY_CAMEL_MSG_PRIV_H
+#define TNY_CAMEL_MSG_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -23,9 +23,9 @@
 #include <camel/camel.h>
 #include <camel/camel-stream-buffer.h>
 
-typedef struct _TnyMsgPriv TnyMsgPriv;
+typedef struct _TnyCamelMsgPriv TnyCamelMsgPriv;
 
-struct _TnyMsgPriv
+struct _TnyCamelMsgPriv
 {
 	GMutex *message_lock;
 	GMutex *header_lock;
@@ -35,9 +35,8 @@ struct _TnyMsgPriv
 	TnyFolderIface *folder;
 };
 
-CamelMimeMessage* _tny_msg_get_camel_mime_message (TnyMsg *self);
-void _tny_msg_set_camel_mime_message (TnyMsg *self, CamelMimeMessage *message);
-void _tny_camel_header_set_not_uncachable (TnyCamelHeader *self);
-void _tny_msg_set_folder (TnyMsgIface *self, TnyFolderIface *folder);
+CamelMimeMessage* _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self);
+void _tny_camel_msg_set_camel_mime_message (TnyCamelMsg *self, CamelMimeMessage *message);
+void _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolderIface *folder);
 
 #endif

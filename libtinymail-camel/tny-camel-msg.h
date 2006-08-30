@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_H
-#define TNY_MSG_H
+#ifndef TNY_CAMEL_MSG_H
+#define TNY_CAMEL_MSG_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -31,30 +31,30 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MSG             (tny_msg_get_type ())
-#define TNY_MSG(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG, TnyMsg))
-#define TNY_MSG_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG, TnyMsgClass))
-#define TNY_IS_MSG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG))
-#define TNY_IS_MSG_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG))
-#define TNY_MSG_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG, TnyMsgClass))
+#define TNY_TYPE_CAMEL_MSG             (tny_camel_msg_get_type ())
+#define TNY_CAMEL_MSG(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_MSG, TnyCamelMsg))
+#define TNY_CAMEL_MSG_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_MSG, TnyCamelMsgClass))
+#define TNY_IS_CAMEL_MSG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_MSG))
+#define TNY_IS_CAMEL_MSG_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_MSG))
+#define TNY_CAMEL_MSG_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_MSG, TnyCamelMsgClass))
 
-typedef struct _TnyMsg TnyMsg;
-typedef struct _TnyMsgClass TnyMsgClass;
+typedef struct _TnyCamelMsg TnyCamelMsg;
+typedef struct _TnyCamelMsgClass TnyCamelMsgClass;
 
-struct _TnyMsg
+struct _TnyCamelMsg
 {
 	TnyCamelMimePart parent;	
 };
 
-struct _TnyMsgClass 
+struct _TnyCamelMsgClass 
 {
 	TnyCamelMimePartClass parent;
 };
 
-GType     tny_msg_get_type (void);
+GType tny_camel_msg_get_type (void);
 
-TnyMsg*   tny_msg_new                       (void);
-TnyMsg*   tny_msg_new_with_header           (TnyHeaderIface *header);
+TnyMsgIface* tny_camel_msg_new (void);
+TnyMsgIface* tny_camel_msg_new_with_header (TnyHeaderIface *header);
 
 G_END_DECLS
 

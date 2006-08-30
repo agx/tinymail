@@ -28,7 +28,7 @@
 #include <tny-folder.h>
 #include <tny-msg-iface.h>
 #include <tny-header-iface.h>
-#include <tny-msg.h>
+#include <tny-camel-msg.h>
 #include <tny-camel-header.h>
 #include <tny-store-account-iface.h>
 #include <tny-camel-store-account.h>
@@ -48,7 +48,7 @@
 #include "tny-camel-store-account-priv.h"
 #include "tny-folder-priv.h"
 #include "tny-camel-header-priv.h"
-#include "tny-msg-priv.h"
+#include "tny-camel-msg-priv.h"
 #include "tny-camel-common-priv.h"
 #include <tny-camel-shared.h>
 
@@ -626,10 +626,10 @@ tny_folder_get_message (TnyFolderIface *self, TnyHeaderIface *header)
 		   TnyCamelHeader type can also work with a CamelMimeMessage, 
 		   so why not use that. Right? */
 	    
-		message = TNY_MSG_IFACE (tny_msg_new ());
+		message = tny_camel_msg_new ();
 		
-		_tny_msg_set_folder (message, self);
-		_tny_msg_set_camel_mime_message (TNY_MSG (message), camel_message); 
+		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), self);
+		_tny_camel_msg_set_camel_mime_message (TNY_CAMEL_MSG (message), camel_message); 
 	    
 		/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
 		_tny_camel_header_set_camel_mime_message (TNY_CAMEL_HEADER (nheader), camel_message);

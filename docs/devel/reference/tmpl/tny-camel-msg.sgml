@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsg
+TnyCamelMsg
 
 <!-- ##### SECTION Short_Description ##### -->
 A Camel implementation of the #TnyMsgIface

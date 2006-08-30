@@ -36,12 +36,12 @@
 
 static GObjectClass *parent_class = NULL;
 
-#include <tny-msg.h>
+#include <tny-camel-msg.h>
 #include <tny-camel-header.h>
 #include <tny-camel-transport-account.h>
 
 #include "tny-camel-common-priv.h"
-#include "tny-msg-priv.h"
+#include "tny-camel-msg-priv.h"
 #include "tny-camel-header-priv.h"
 #include "tny-camel-account-priv.h"
 #include "tny-camel-transport-account-priv.h"
@@ -85,7 +85,7 @@ tny_camel_transport_account_send (TnyTransportAccountIface *self, TnyMsgIface *m
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyHeaderIface *header = (TnyHeaderIface *)tny_msg_iface_get_header (msg);
-	CamelMimeMessage *message = _tny_msg_get_camel_mime_message (TNY_MSG (msg));
+	CamelMimeMessage *message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
 	CamelTransport *transport;
 
