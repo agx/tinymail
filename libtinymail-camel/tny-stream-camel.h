@@ -1,5 +1,5 @@
-#ifndef TNY_STREAM_CAMEL_H
-#define TNY_STREAM_CAMEL_H
+#ifndef TNY_CAMEL_STREAM_H
+#define TNY_CAMEL_STREAM_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -28,30 +28,29 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_STREAM_CAMEL             (tny_stream_camel_get_type ())
-#define TNY_STREAM_CAMEL(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_STREAM_CAMEL, TnyStreamCamel))
-#define TNY_STREAM_CAMEL_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelClass))
-#define TNY_IS_STREAM_CAMEL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_STREAM_CAMEL))
-#define TNY_IS_STREAM_CAMEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_STREAM_CAMEL))
-#define TNY_STREAM_CAMEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelClass))
+#define TNY_TYPE_CAMEL_STREAM             (tny_camel_stream_get_type ())
+#define TNY_CAMEL_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_STREAM, TnyCamelStream))
+#define TNY_CAMEL_STREAM_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_STREAM, TnyCamelStreamClass))
+#define TNY_IS_CAMEL_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_STREAM))
+#define TNY_IS_CAMEL_STREAM_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_STREAM))
+#define TNY_CAMEL_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_STREAM, TnyCamelStreamClass))
 
-typedef struct _TnyStreamCamel TnyStreamCamel;
-typedef struct _TnyStreamCamelClass TnyStreamCamelClass;
+typedef struct _TnyCamelStream TnyCamelStream;
+typedef struct _TnyCamelStreamClass TnyCamelStreamClass;
 
-struct _TnyStreamCamel
+struct _TnyCamelStream
 {
 	GObject parent;
 };
 
-struct _TnyStreamCamelClass 
+struct _TnyCamelStreamClass 
 {
 	GObjectClass parent;
 };
 
-GType                   tny_stream_camel_get_type       (void);
-TnyStreamCamel*         tny_stream_camel_new            (CamelStream *stream);
-
-void                    tny_stream_camel_set_stream     (TnyStreamCamel *self, CamelStream *stream);
+GType tny_camel_stream_get_type (void);
+TnyStreamIface* tny_camel_stream_new            (CamelStream *stream);
+void tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream);
 
 G_END_DECLS
 

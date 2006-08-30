@@ -43,20 +43,20 @@
 static GObjectClass *parent_class = NULL;
 
 
-typedef struct _TnyStreamCamelPriv TnyStreamCamelPriv;
+typedef struct _TnyCamelStreamPriv TnyCamelStreamPriv;
 
-struct _TnyStreamCamelPriv
+struct _TnyCamelStreamPriv
 {
 	CamelStream *stream;
 };
 
-#define TNY_STREAM_CAMEL_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_STREAM_CAMEL, TnyStreamCamelPriv))
+#define TNY_CAMEL_STREAM_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_STREAM, TnyCamelStreamPriv))
 
 static gssize
-tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
+tny_camel_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 	CamelStream *stream = priv->stream;
 	char tmp_buf[4096];
 	gssize total = 0;
@@ -90,69 +90,68 @@ tny_stream_camel_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 }
 
 static gssize
-tny_stream_camel_read  (TnyStreamIface *self, char *buffer, gsize n)
+tny_camel_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	return camel_stream_read (priv->stream, buffer, n);
 }
 
 static gssize
-tny_stream_camel_write (TnyStreamIface *self, const char *buffer, gsize n)
+tny_camel_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	return camel_stream_write (priv->stream, buffer, n);
 }
 
 static gint
-tny_stream_camel_flush (TnyStreamIface *self)
+tny_camel_stream_flush (TnyStreamIface *self)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	return camel_stream_flush (priv->stream);
 }
 
 static gint
-tny_stream_camel_close (TnyStreamIface *self)
+tny_camel_stream_close (TnyStreamIface *self)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	return camel_stream_close (priv->stream);
 }
 
 static gboolean
-tny_stream_camel_eos   (TnyStreamIface *self)
+tny_camel_stream_eos   (TnyStreamIface *self)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	return camel_stream_eos (priv->stream);
 }
 
 static gint
-tny_stream_camel_reset (TnyStreamIface *self)
+tny_camel_stream_reset (TnyStreamIface *self)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	return camel_stream_reset (priv->stream);
 }
 
 /**
- * tny_stream_camel_set_stream:
- * @self: A #TnyStreamCamel object
+ * tny_camel_stream_set_stream:
+ * @self: A #TnyCamelStream object
  * @stream: A #CamelStream object
  *
  * Set the stream to play proxy for
  *
  **/
 void
-tny_stream_camel_set_stream (TnyStreamCamel *self, CamelStream *stream)
+tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream)
 {
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	if (priv->stream)
 		camel_object_unref (CAMEL_OBJECT (priv->stream));
-	//camel_object_ref (CAMEL_OBJECT (stream));
 
 	priv->stream = stream;
 
@@ -160,29 +159,29 @@ tny_stream_camel_set_stream (TnyStreamCamel *self, CamelStream *stream)
 }
 
 /**
- * tny_stream_camel_new:
+ * tny_camel_stream_camel_new:
  * @stream: A #CamelStream stream to play proxy for
  *
- * Return value: A new #TnyStreamCamel instance implemented as a proxy
+ * Return value: A new #TnyStreamIface instance implemented as a proxy
  * for a #CamelStream
  **/
-TnyStreamCamel*
-tny_stream_camel_new (CamelStream *stream)
+TnyStreamIface*
+tny_camel_stream_new (CamelStream *stream)
 {
-	TnyStreamCamel *self = g_object_new (TNY_TYPE_STREAM_CAMEL, NULL);
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStream *self = g_object_new (TNY_TYPE_CAMEL_STREAM, NULL);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	camel_object_ref (CAMEL_OBJECT (stream));
 	priv->stream = stream;
 
-	return self;
+	return TNY_STREAM_IFACE (self);
 }
 
 static void
-tny_stream_camel_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_camel_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyStreamCamel *self = (TnyStreamCamel *)instance;
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStream *self = (TnyCamelStream *)instance;
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	priv->stream = NULL;
 
@@ -190,10 +189,10 @@ tny_stream_camel_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_stream_camel_finalize (GObject *object)
+tny_camel_stream_finalize (GObject *object)
 {
-	TnyStreamCamel *self = (TnyStreamCamel *)object;	
-	TnyStreamCamelPriv *priv = TNY_STREAM_CAMEL_GET_PRIVATE (self);
+	TnyCamelStream *self = (TnyCamelStream *)object;	
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->stream))
 		camel_object_unref (CAMEL_OBJECT (priv->stream));
@@ -208,34 +207,34 @@ tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyStreamIfaceClass *klass = (TnyStreamIfaceClass *)g_iface;
 
-	klass->read_func = tny_stream_camel_read;
-	klass->write_func = tny_stream_camel_write;
-	klass->flush_func = tny_stream_camel_flush;
-	klass->close_func = tny_stream_camel_close;
-	klass->eos_func = tny_stream_camel_eos;
-	klass->reset_func = tny_stream_camel_reset;
-	klass->write_to_stream_func = tny_stream_camel_write_to_stream;
+	klass->read_func = tny_camel_stream_read;
+	klass->write_func = tny_camel_stream_write;
+	klass->flush_func = tny_camel_stream_flush;
+	klass->close_func = tny_camel_stream_close;
+	klass->eos_func = tny_camel_stream_eos;
+	klass->reset_func = tny_camel_stream_reset;
+	klass->write_to_stream_func = tny_camel_stream_write_to_stream;
 
 	return;
 }
 
 static void 
-tny_stream_camel_class_init (TnyStreamCamelClass *class)
+tny_camel_stream_class_init (TnyCamelStreamClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_stream_camel_finalize;
+	object_class->finalize = tny_camel_stream_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyStreamCamelPriv));
+	g_type_class_add_private (object_class, sizeof (TnyCamelStreamPriv));
 
 	return;
 }
 
 GType 
-tny_stream_camel_get_type (void)
+tny_camel_stream_get_type (void)
 {
 	static GType type = 0;
 
@@ -252,15 +251,15 @@ tny_stream_camel_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyStreamCamelClass),
+		  sizeof (TnyCamelStreamClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_stream_camel_class_init,   /* class_init */
+		  (GClassInitFunc) tny_camel_stream_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyStreamCamel),
+		  sizeof (TnyCamelStream),
 		  0,      /* n_preallocs */
-		  tny_stream_camel_instance_init    /* instance_init */
+		  tny_camel_stream_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_stream_iface_info = 
@@ -271,7 +270,7 @@ tny_stream_camel_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyStreamCamel",
+			"TnyCamelStream",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 

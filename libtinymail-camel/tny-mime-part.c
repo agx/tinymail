@@ -81,7 +81,7 @@ tny_mime_part_write_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
-	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
+	CamelStream *cstream = tny_stream_camel_new (stream);
 
 	g_mutex_lock (priv->part_lock);
 
@@ -177,7 +177,7 @@ tny_mime_part_decode_to_stream (TnyMimePartIface *self, TnyStreamIface *stream)
 	TnyMimePartPriv *priv = TNY_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
-	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
+	CamelStream *cstream = tny_stream_camel_new (stream);
 
 	g_mutex_lock (priv->part_lock);
 
@@ -218,7 +218,7 @@ tny_mime_part_construct_from_stream (TnyMimePartIface *self, TnyStreamIface *str
 	CamelDataWrapper *wrapper;
 	gint retval = -1;
 	CamelMedium *medium;
-	CamelStream *cstream = CAMEL_STREAM (tny_camel_stream_new (stream));
+	CamelStream *cstream = tny_stream_camel_new (stream);
 	
 	g_mutex_lock (priv->part_lock);
 	medium = CAMEL_MEDIUM (priv->part);
@@ -265,7 +265,7 @@ tny_mime_part_get_stream (TnyMimePartIface *self)
 		camel_medium_set_content_object (medium, wrapper);
 	}
 
-	retval = TNY_STREAM_IFACE (tny_stream_camel_new (stream));
+	retval = TNY_STREAM_IFACE (tny_camel_stream_new (stream));
 
 	/* Parenting: Loose own ref (the tnystreamcamel wrapper keeps one) */
 	camel_object_unref (CAMEL_OBJECT (stream));

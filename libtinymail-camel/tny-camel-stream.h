@@ -1,5 +1,5 @@
-#ifndef TNY_CAMEL_STREAM_H
-#define TNY_CAMEL_STREAM_H
+#ifndef TNY_STREAM_CAMEL_H
+#define TNY_STREAM_CAMEL_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -28,31 +28,30 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_CAMEL_STREAM     (tny_camel_stream_get_type ())
-#define TNY_CAMEL_STREAM(obj)     (CAMEL_CHECK_CAST((obj), TNY_TYPE_CAMEL_STREAM, TnyCamelStream))
-#define TNY_CAMEL_STREAM_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_TYPE_CAMEL_STREAM, TnyCamelStreamClass))
-#define TNY_CAMEL_VFS_STREAM(o)   (CAMEL_CHECK_TYPE((o), TNY_TYPE_CAMEL_STREAM))
+#define TNY_TYPE_STREAM_CAMEL     (tny_stream_camel_get_type ())
+#define TNY_STREAM_CAMEL(obj)     (CAMEL_CHECK_CAST((obj), TNY_TYPE_STREAM_CAMEL_STREAM, TnyStreamCamel))
+#define TNY_STREAM_CAMEL_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_TYPE_STREAM_CAMEL_STREAM, TnyStreamCamelClass))
 
-typedef struct _TnyCamelStream TnyCamelStream;
-typedef struct _TnyCamelStreamClass TnyCamelStreamClass;
+typedef struct _TnyStreamCamel TnyStreamCamel;
+typedef struct _TnyStreamCamelClass TnyStreamCamelClass;
 
-struct _TnyCamelStream
+struct _TnyStreamCamel
 {
 	CamelStream parent;
 
 	TnyStreamIface *stream;
 };
 
-struct _TnyCamelStreamClass 
+struct _TnyStreamCamelClass 
 {
 	CamelStreamClass parent;
 };
 
-CamelType        tny_camel_stream_get_type        (void);
-TnyCamelStream*  tny_camel_stream_new             (TnyStreamIface *stream);
-void             tny_camel_stream_set_stream      (TnyCamelStream *self, TnyStreamIface *stream);
+CamelType        tny_stream_camel_get_type        (void);
+CamelStream*     tny_stream_camel_new             (TnyStreamIface *stream);
+void             tny_stream_camel_set_stream      (TnyStreamCamel *self, TnyStreamIface *stream);
 
-gssize           tny_camel_stream_write_to_stream (TnyCamelStream *self, TnyStreamIface *output);
+gssize           tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStreamIface *output);
 
 G_END_DECLS
 
