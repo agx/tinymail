@@ -17,7 +17,7 @@ tny-folder-priv
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyFolderPriv ##### -->
+<!-- ##### STRUCT TnyCamelFolderPriv ##### -->
 <para>
 
 </para>
@@ -39,7 +39,7 @@ tny-folder-priv
 @cached_name: 
 @cached_folder_type: 
 
-<!-- ##### MACRO TNY_FOLDER_GET_PRIVATE ##### -->
+<!-- ##### MACRO TNY_CAMEL_FOLDER_GET_PRIVATE ##### -->
 <para>
 
 </para>

@@ -16,13 +16,14 @@ Camel #TnyMsgFolderIface implementation
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyFolder ##### -->
+<!-- ##### STRUCT TnyCamelFolder ##### -->
 <para>
 
 </para>
 
+@parent: 
 
-<!-- ##### FUNCTION tny_folder_new_with_folder ##### -->
+<!-- ##### FUNCTION tny_camel_folder_new_with_folder ##### -->
 <para>
 
 </para>
@@ -31,7 +32,7 @@ Camel #TnyMsgFolderIface implementation
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_new ##### -->
+<!-- ##### FUNCTION tny_camel_folder_new ##### -->
 <para>
 
 </para>
@@ -39,7 +40,7 @@ Camel #TnyMsgFolderIface implementation
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_set_folder ##### -->
+<!-- ##### FUNCTION tny_camel_folder_set_folder ##### -->
 <para>
 
 </para>
@@ -48,7 +49,7 @@ Camel #TnyMsgFolderIface implementation
 @camel_folder: 
 
 
-<!-- ##### FUNCTION tny_folder_get_folder ##### -->
+<!-- ##### FUNCTION tny_camel_folder_get_folder ##### -->
 <para>
 
 </para>

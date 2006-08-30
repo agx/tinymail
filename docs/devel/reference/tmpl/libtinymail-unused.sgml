@@ -298,6 +298,13 @@ TnyTransportAccount
 
 @o: 
 
+<!-- ##### MACRO TNY_FOLDER_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
 <!-- ##### MACRO TNY_IS_MSG_PROXY_FOLDER ##### -->
 <para>
 
@@ -377,6 +384,27 @@ TnyTransportAccount
 @tnydeviceiface: the object which received the signal.
 @arg1: 
 
+<!-- ##### STRUCT TnyFolder ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL TnyFolderIface::folder-inserted ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyFolderIface::folders-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+
 <!-- ##### STRUCT TnyFolderList ##### -->
 <para>
 
@@ -395,6 +423,28 @@ TnyTransportAccount
 @parent: 
 @model: 
 @current: 
+
+<!-- ##### STRUCT TnyFolderPriv ##### -->
+<para>
+
+</para>
+
+@loaded: 
+@headers_list_type: 
+@folder_changed_id: 
+@headers_managed: 
+@folder_lock: 
+@folder: 
+@folder_name: 
+@account: 
+@cached_length: 
+@unread_length: 
+@subscribed: 
+@has_summary_cap: 
+@iter: 
+@iter_parented: 
+@cached_name: 
+@cached_folder_type: 
 
 <!-- ##### STRUCT TnyFolderProxy ##### -->
 <para>
@@ -765,6 +815,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_folder_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_folder_iface_get_folders ##### -->
 <para>
 
@@ -795,6 +853,29 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 @self: 
+
+<!-- ##### FUNCTION tny_folder_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_new_with_folder ##### -->
+<para>
+
+</para>
+
+@camel_folder: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@camel_folder: 
 
 <!-- ##### FUNCTION tny_header_iface_set_folder ##### -->
 <para>
