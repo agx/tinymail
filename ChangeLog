@@ -4,6 +4,14 @@
 	and get_folders_async methods virtual ones that can be
 	overridden
 
+	* Refactored TnyCamelStoreAccount into three types:
+	TnyCamelIMAPStoreAccount, TnyCamelNNTPStoreAccount and
+	TnyCamelPOPStoreAccount (todo: the folders and implementing
+	custom get_folders and get_folders_async methods for NNTP
+	and POP)
+
+	* This was a major API change
+
 2006-08-30  Thomas Hisch <t.hisch@gmail.com>
 
 	* Renamed TnyHeader to TnyCamelHeader

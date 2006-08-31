@@ -12,6 +12,9 @@ libtinymail_camel_1_0_headers =			\
 	tny-camel-folder.h			\
 	tny-camel-account.h			\
 	tny-camel-store-account.h		\
+	tny-camel-imap-store-account.h		\
+	tny-camel-nntp-store-account.h		\
+	tny-camel-pop-store-account.h		\
 	tny-camel-transport-account.h		\
 	tny-camel-stream.h			\
 	tny-stream-camel.h			\
@@ -35,6 +38,9 @@ libtinymail_camel_1_0_la_SOURCES = 		\
 	tny-camel-folder.c			\
 	tny-camel-account.c			\
 	tny-camel-store-account.c		\
+	tny-camel-imap-store-account.c		\
+	tny-camel-nntp-store-account.c		\
+	tny-camel-pop-store-account.c		\
 	tny-camel-transport-account.c		\
 	tny-camel-stream.c			\
 	tny-stream-camel.c			\

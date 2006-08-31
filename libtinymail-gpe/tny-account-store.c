@@ -252,27 +252,34 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			(const gchar*) key, NULL);
 		g_free (key);
 
+		key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
+		proto = gconf_client_get_string (priv->client, 
+			(const gchar*) key, NULL);
+		g_free (key);
+	    
+	    
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
 			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
 				account = TNY_ACCOUNT_IFACE (tny_camel_transport_account_new ());
-		} else {
-
-			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
-				account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
+		} else if (type && types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
+		{		
+			if (!g_ascii_strncasecmp (proto, "imap", 4))
+				account = TNY_ACCOUNT_IFACE (tny_camel_imap_store_account_new ());
+			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
+				account = TNY_ACCOUNT_IFACE (tny_camel_nntp_store_account_new ());
+			else if (!g_ascii_strncasecmp (proto, "pop", 4))
+				account = TNY_ACCOUNT_IFACE (tny_camel_pop_store_account_new ());
+			else	/* Unknown, create a generic one? */
+			        account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
 		}
-
+	    
 		if (type)
 			g_free (type);
 
 		if (account)
 		{
 			tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), priv->session);
-
-			key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
-			proto = gconf_client_get_string (priv->client, 
-				(const gchar*) key, NULL);
-			g_free (key);
 			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/name", i);

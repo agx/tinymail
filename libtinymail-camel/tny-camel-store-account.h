@@ -50,7 +50,8 @@ struct _TnyCamelStoreAccountClass
 	/* virtual methods (they have a default implementation in TnyCamelStoreAccount */
 	void (*get_folders_async_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
 	void (*get_folders_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query);
-
+	void (*remove_folder_func) (TnyFolderStoreIface *self, TnyFolderIface *folder);
+	TnyFolderIface* (*create_folder_func) (TnyFolderStoreIface *self, const gchar *name);
 };
 
 GType tny_camel_store_account_get_type (void);

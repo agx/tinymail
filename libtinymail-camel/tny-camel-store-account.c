@@ -284,6 +284,12 @@ tny_camel_store_account_finalize (GObject *object)
 static void 
 tny_camel_store_account_remove_folder (TnyFolderStoreIface *self, TnyFolderIface *folder)
 {
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->remove_folder_func (self, folder);
+}
+
+static void 
+tny_camel_store_account_remove_folder_default (TnyFolderStoreIface *self, TnyFolderIface *folder)
+{
 	/* TODO */
     
        	g_critical ("TODO: The remove_folder method is unimplemented in this TnyFolderStoreIface implementation (TnyStoreAccount)\n");
@@ -293,6 +299,13 @@ tny_camel_store_account_remove_folder (TnyFolderStoreIface *self, TnyFolderIface
 
 static TnyFolderIface*
 tny_camel_store_account_create_folder (TnyFolderStoreIface *self, const gchar *name)
+{
+	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->create_folder_func (self, name);
+}
+
+
+static TnyFolderIface*
+tny_camel_store_account_create_folder_default (TnyFolderStoreIface *self, const gchar *name)
 {
 	/* TODO */
     
@@ -506,6 +519,8 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
     
 	class->get_folders_async_func = tny_camel_store_account_get_folders_async_default;
 	class->get_folders_func = tny_camel_store_account_get_folders_default;
+	class->create_folder_func = tny_camel_store_account_create_folder_default;
+	class->remove_folder_func = tny_camel_store_account_remove_folder_default;
     
 	g_type_class_add_private (object_class, sizeof (TnyCamelStoreAccountPriv));
 
