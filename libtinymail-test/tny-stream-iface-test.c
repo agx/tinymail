@@ -22,6 +22,7 @@
 
 /* We are going to test the camel implementation */
 #include <tny-stream-camel.h>
+#include <tny-camel-stream.h>
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
 #include <camel/camel-folder.h>

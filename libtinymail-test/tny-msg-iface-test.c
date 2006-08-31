@@ -21,6 +21,7 @@
 #include <tny-msg-iface-test.h>
 #include <tny-msg-iface.h>
 #include <tny-camel-msg.h>
+#include <tny-camel-header.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 #include <tny-list.h>

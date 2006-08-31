@@ -381,7 +381,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 		{
 			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
 				account = TNY_ACCOUNT_IFACE (tny_camel_transport_account_new ());
-		} else if (type && types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
+		} else if (type && (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS))
 		{		
 			if (!g_ascii_strncasecmp (proto, "imap", 4))
 				account = TNY_ACCOUNT_IFACE (tny_camel_imap_store_account_new ());
