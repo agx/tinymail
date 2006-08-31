@@ -1,19 +1,63 @@
 Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Maintainer, designer, developer, tester
+	* Overall project maintainer and decision making
+	* Design, implementation and analysis of the abstraction
+	* Main developer of the core implementation
+	* Main developer of the unit tests
+	* Main implementer of the Python bindings
+	* API GTK-DOC Documentation writer
+	* Wiki/Trac documentation and maintenance
+	* Build environment implementer
+	* Marketing website
+
+Tinne Hannes <tinne.hannes@gmain.com>
+
+	* Wiki/Trac documentation and maintenance
+	* Marketing website
+	* Mascot and project name reason :) (tinne's mail client or tinymail)
 
 Raphael Slinckx <raphael@slinckx.net>
 
-	* Author of the Python bindings
+	* Author of the first Python binding implementation
+
+James "Doc" Livingston <doclivingston@gmail.com>
+
+	* Contributions to the language bindings for Python
 
 Florian Boor <florian.boor@kernelconcepts.de>
 
 	* Initial support for status flags
+	* Co-developer of Modest, an E-mail client on top of tinymail
+
+Nils Faerber <nils.faerber_at_kernelconcepts.de> 
+
+	* Co-developer of Modest, an E-mail client on top if tinymail
 
 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
-	* Contributions to the TnyIteratorIface type.
+	* Main developer of Modest, an E-mail client on top of tinymail
+	* Co-designer of the TnyIteratorIface and TnyListIface
+	* Implementer of many TnyIteratorIface types
+	* Implementer of many TnyListIface types
 
 Chris Lord <chris@openedhand.com>
 
-	* Contributions to the TnySummaryViewIface type
+	* Contributions to and refactoring of the TnySummaryViewIface type
+
+Thomas Hisch <t.hisch@gmail.com>
+
+	* Refactoring and renaming types
+
+Yoan BLANC <greut.lists@dosimple.ch>
+
+	* Language bindings for .NET
+
+Thomas Van Machelen <thomas.vanmachelen@gmail.com>
+
+	* Language bindings for .NET
+
+Bart Deleye <bart.deleye@gmail.com>
+
+	* Language bindings for .NET
+
+
