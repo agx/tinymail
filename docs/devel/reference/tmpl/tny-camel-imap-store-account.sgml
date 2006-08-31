@@ -9,12 +9,10 @@ IMAP #TnyStoreAccountIface instance implemented for Camel
 IMAP #TnyStoreAccountIface instance implemented for Camel
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyStoreAccountIface, #TnyCamelStoreAccount
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

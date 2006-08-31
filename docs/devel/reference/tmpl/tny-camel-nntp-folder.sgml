@@ -1,30 +1,32 @@
 <!-- ##### SECTION Title ##### -->
-TnyCamelNNTPStoreAccount
+TnyCamelNNTPFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-NNTP #TnyStoreAccountIface instance implemented for Camel
+A NNTP #TnyFolderIface implementation for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-NNTP #TnyStoreAccountIface instance implemented for Camel
+A NNTP #TnyFolderIface implementation for Camel
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccountIface, #TnyCamelStoreAccount
+#TnyFolderIface, #TnyCamelFolder
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelNNTPStoreAccount ##### -->
+<!-- ##### STRUCT TnyCamelNNTPFolder ##### -->
 <para>
 
 </para>
 
 @parent: 
 
-<!-- ##### FUNCTION tny_camel_nntp_store_account_new ##### -->
+<!-- ##### FUNCTION tny_camel_nntp_folder_new ##### -->
 <para>
 
 </para>
