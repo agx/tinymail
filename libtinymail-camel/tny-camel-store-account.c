@@ -301,8 +301,15 @@ tny_camel_store_account_create_folder (TnyFolderStoreIface *self, const gchar *n
 	return TNY_FOLDER_IFACE (tny_camel_folder_new ());
 }
 
-static void 
+static void
 tny_camel_store_account_get_folders (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
+{
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_func (self, list, query);
+}
+
+
+static void 
+tny_camel_store_account_get_folders_default (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query)
 {
     	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
@@ -396,7 +403,8 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
     
-	tny_camel_store_account_get_folders (info->self, info->list, info->query);
+	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (info->self),
+		info->list, info->query);
     
  	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
@@ -428,8 +436,14 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	return NULL;
 }
 
-static void 
+static void
 tny_camel_store_account_get_folders_async (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
+{
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_async_func (self, list, callback, query, user_data);
+}
+
+static void 
+tny_camel_store_account_get_folders_async_default (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
 {
 	GetFoldersInfo *info = g_new0 (GetFoldersInfo, 1);
 	GThread *thread;
@@ -489,7 +503,10 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	object_class->finalize = tny_camel_store_account_finalize;
 
 	((TnyCamelAccountClass*)class)->reconnect_func = tny_camel_store_account_reconnect;
-
+    
+	class->get_folders_async_func = tny_camel_store_account_get_folders_async_default;
+	class->get_folders_func = tny_camel_store_account_get_folders_default;
+    
 	g_type_class_add_private (object_class, sizeof (TnyCamelStoreAccountPriv));
 
 	return;

@@ -48,7 +48,9 @@ struct _TnyCamelAccountClass
 {
 	GObjectClass parent;
 
-	/* This is an abstract method */
+	/* This is an abstract method (as it's not implemented by 
+	TnyCamelAccount, it's also not virtual) */
+    
 	void (*reconnect_func) (TnyCamelAccount *self);
 };
 

@@ -1,3 +1,9 @@
+2006-08-31  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Made TnyCamelFolder and TnyAccountStore's get_folders
+	and get_folders_async methods virtual ones that can be
+	overridden
+
 2006-08-30  Thomas Hisch <t.hisch@gmail.com>
 
 	* Renamed TnyHeader to TnyCamelHeader

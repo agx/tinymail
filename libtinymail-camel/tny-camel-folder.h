@@ -48,6 +48,11 @@ struct _TnyCamelFolder
 struct _TnyCamelFolderClass 
 {
 	GObjectClass parent;
+    
+    	/* virtual methods (they have a default implementation in TnyCamelFolder */
+	void (*get_folders_async_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
+	void (*get_folders_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query);
+
 };
 
 GType tny_camel_folder_get_type (void);
