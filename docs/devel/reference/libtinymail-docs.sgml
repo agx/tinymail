@@ -24,6 +24,9 @@
 
 <!ENTITY libtinymail-camel-TnyCamelAccount SYSTEM "xml/tny-camel-account.xml">
 <!ENTITY libtinymail-camel-TnyCamelStoreAccount SYSTEM "xml/tny-camel-store-account.xml">
+<!ENTITY libtinymail-camel-TnyCamelIMAPStoreAccount SYSTEM "xml/tny-camel-imap-store-account.xml">
+<!ENTITY libtinymail-camel-TnyCamelNNTPStoreAccount SYSTEM "xml/tny-camel-nntp-store-account.xml">
+<!ENTITY libtinymail-camel-TnyCamelPOPStoreAccount SYSTEM "xml/tny-camel-pop-store-account.xml">
 <!ENTITY libtinymail-camel-TnyCamelTransportAccount SYSTEM "xml/tny-camel-transport-account.xml">
 <!ENTITY libtinymail-camel-TnyCamelStream SYSTEM "xml/tny-camel-stream.xml">
 <!ENTITY libtinymail-camel-TnyCamelFolder SYSTEM "xml/tny-camel-folder.xml">
@@ -158,6 +161,9 @@
 		<title>libtinymail-camel</title>
 		&libtinymail-camel-TnyCamelAccount;
 		&libtinymail-camel-TnyCamelStoreAccount;
+		&libtinymail-camel-TnyCamelIMAPStoreAccount;
+		&libtinymail-camel-TnyCamelNNTPStoreAccount;
+		&libtinymail-camel-TnyCamelPOPStoreAccount;
 		&libtinymail-camel-TnyCamelTransportAccount;
 		&libtinymail-camel-TnyCamelStream;
 		&libtinymail-camel-TnyCamelFolder;
