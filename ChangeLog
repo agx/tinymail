@@ -10,6 +10,9 @@
 	custom get_folders and get_folders_async methods for NNTP
 	and POP)
 
+	* Created templates for TnyCamelPOPFolder, TnyCamelIMAPFolder
+	and TnyCamelNNTPFolder
+
 	* This was a major API change
 
 2006-08-30  Thomas Hisch <t.hisch@gmail.com>
