@@ -376,7 +376,6 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 			(const gchar*) key, NULL);
 		g_free (key);
 	    
-	    
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
 			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
@@ -477,7 +476,7 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 			tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
 				per_account_get_pass_func);
-
+		    
 			tny_list_iface_prepend (list, (GObject*)account);
 			g_object_unref (G_OBJECT (account));
 
