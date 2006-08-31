@@ -91,8 +91,11 @@ tny_camel_nntp_store_account_class_init (TnyCamelNNTPStoreAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-    	/* The abstract CamelStoreAccount has good default implementations
-	of get_folders and get_folders_async for NNTP */
+    	/* TODO: implement custom get_folders and get_folders_async for NNTP */
+	/* TODO: implement a TnyCamelNNTPFolder (that implements get_folders 
+	   and get_folders_async) */
+	/* TODO: Implement a TnyAccountStoreView that loads child folders on-demand */
+	/* TODO: implement do-nothing create_folder and remove_folder for NNTP */
 
 	object_class->finalize = tny_camel_nntp_store_account_finalize;
 
