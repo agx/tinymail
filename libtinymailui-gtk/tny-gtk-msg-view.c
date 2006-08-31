@@ -34,7 +34,7 @@
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 
-#include <tny-msg-view.h>
+#include <tny-gtk-msg-view.h>
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
 #include <tny-header-view-iface.h>
@@ -52,9 +52,9 @@
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyMsgViewPriv TnyMsgViewPriv;
+typedef struct _TnyGtkMsgViewPriv TnyGtkMsgViewPriv;
 
-struct _TnyMsgViewPriv
+struct _TnyGtkMsgViewPriv
 {
 	TnyMsgIface *msg;
 	GtkTextView *textview;
@@ -64,13 +64,13 @@ struct _TnyMsgViewPriv
 	TnySaveStrategyIface *save_strategy;
 };
 
-#define TNY_MSG_VIEW_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MSG_VIEW, TnyMsgViewPriv))
+#define TNY_GTK_MSG_VIEW_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgViewPriv))
 
 static void
 reload_msg (TnyMsgViewIface *self)
 {
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
 	TnyStreamIface *dest;
 	TnyHeaderIface *header;
@@ -133,9 +133,9 @@ reload_msg (TnyMsgViewIface *self)
 }
 
 void
-tny_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy)
+tny_gtk_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy)
 {
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 
 	if (priv->save_strategy)
 		g_object_unref (G_OBJECT (priv->save_strategy));
@@ -150,8 +150,8 @@ tny_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *str
 static void
 for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointer user_data)
 {
-	TnyMsgView *self = user_data;
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgView *self = user_data;
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GtkTreeModel *model = gtk_icon_view_get_model (icon_view);
 	GtkTreeIter iter;
 
@@ -179,10 +179,10 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 
 
 static void
-tny_msg_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
+tny_gtk_msg_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
 {
-	TnyMsgView *self = user_data;
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgView *self = user_data;
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 
 	if (!G_LIKELY (priv->save_strategy))
 	{
@@ -199,7 +199,7 @@ tny_msg_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
 
 
 static gint
-tny_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
+tny_gtk_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 {	
 	g_return_val_if_fail (event != NULL, FALSE);
 	
@@ -226,9 +226,9 @@ tny_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 }
 
 static void
-tny_msg_view_set_unavailable (TnyMsgViewIface *self)
+tny_gtk_msg_view_set_unavailable (TnyMsgViewIface *self)
 {
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
 
     	if (G_LIKELY (priv->msg)) 
@@ -248,9 +248,9 @@ tny_msg_view_set_unavailable (TnyMsgViewIface *self)
 }
 
 static void 
-tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
+tny_gtk_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 {
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
@@ -266,9 +266,9 @@ tny_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 }
 
 static void
-tny_msg_view_clear (TnyMsgViewIface *self)
+tny_gtk_msg_view_clear (TnyMsgViewIface *self)
 {
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 
     	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 	gtk_widget_hide (priv->attachview_sw);
@@ -280,15 +280,15 @@ tny_msg_view_clear (TnyMsgViewIface *self)
 }
 
 /**
- * tny_msg_view_new:
+ * tny_gtk_msg_view_new:
  * @save_strategy: The save strategy to use
  *
- * Return value: a new #TnyMsgViewIface instance implemented for Gtk+
+ * Return value: a new #TnyGtkMsgView instance implemented for Gtk+
  **/
-TnyMsgView*
-tny_msg_view_new (TnySaveStrategyIface *save_strategy)
+TnyGtkMsgView*
+tny_gtk_msg_view_new (TnySaveStrategyIface *save_strategy)
 {
-	TnyMsgView *self = g_object_new (TNY_TYPE_MSG_VIEW, NULL);
+	TnyGtkMsgView *self = g_object_new (TNY_TYPE_GTK_MSG_VIEW, NULL);
 
 	tny_msg_view_iface_set_save_strategy (TNY_MSG_VIEW_IFACE (self), save_strategy);
 
@@ -296,10 +296,10 @@ tny_msg_view_new (TnySaveStrategyIface *save_strategy)
 }
 
 static void
-tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyMsgView *self = (TnyMsgView *)instance;
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgView *self = (TnyGtkMsgView *)instance;
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 1);
 	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
@@ -312,7 +312,7 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_widget_show (mitem);
 
 	g_signal_connect (G_OBJECT (mitem), "activate", 
-		G_CALLBACK (tny_msg_view_save_as_activated), self);
+		G_CALLBACK (tny_gtk_msg_view_save_as_activated), self);
 
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), mitem);
 
@@ -332,7 +332,7 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_selection_mode (priv->attachview, GTK_SELECTION_SINGLE);
 
 	g_signal_connect_swapped (G_OBJECT (priv->attachview), "button_press_event",
-		G_CALLBACK (tny_msg_view_popup_handler), menu);
+		G_CALLBACK (tny_gtk_msg_view_popup_handler), menu);
 
 	gtk_icon_view_set_text_column (priv->attachview, 
 		TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN);
@@ -370,10 +370,10 @@ tny_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_msg_view_finalize (GObject *object)
+tny_gtk_msg_view_finalize (GObject *object)
 {
-	TnyMsgView *self = (TnyMsgView *)object;	
-	TnyMsgViewPriv *priv = TNY_MSG_VIEW_GET_PRIVATE (self);
+	TnyGtkMsgView *self = (TnyGtkMsgView *)object;	
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
@@ -387,35 +387,35 @@ tny_msg_view_finalize (GObject *object)
 }
 
 static void
-tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
+tny_gtk_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyMsgViewIfaceClass *klass = (TnyMsgViewIfaceClass *)g_iface;
 
-	klass->set_msg_func = tny_msg_view_set_msg;
-	klass->set_save_strategy_func = tny_msg_view_set_save_strategy;
-	klass->set_unavailable_func = tny_msg_view_set_unavailable;
-	klass->clear_func = tny_msg_view_clear;
+	klass->set_msg_func = tny_gtk_msg_view_set_msg;
+	klass->set_save_strategy_func = tny_gtk_msg_view_set_save_strategy;
+	klass->set_unavailable_func = tny_gtk_msg_view_set_unavailable;
+	klass->clear_func = tny_gtk_msg_view_clear;
     
 	return;
 }
 
 static void 
-tny_msg_view_class_init (TnyMsgViewClass *class)
+tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_msg_view_finalize;
+	object_class->finalize = tny_gtk_msg_view_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyMsgViewPriv));
+	g_type_class_add_private (object_class, sizeof (TnyGtkMsgViewPriv));
 
 	return;
 }
 
 GType 
-tny_msg_view_get_type (void)
+tny_gtk_msg_view_get_type (void)
 {
 	static GType type = 0;
 
@@ -423,31 +423,31 @@ tny_msg_view_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyMsgViewClass),
+		  sizeof (TnyGtkMsgViewClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_msg_view_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gtk_msg_view_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyMsgView),
+		  sizeof (TnyGtkMsgView),
 		  0,      /* n_preallocs */
-		  tny_msg_view_instance_init,    /* instance_init */
+		  tny_gtk_msg_view_instance_init,    /* instance_init */
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_msg_view_iface_info = 
+		static const GInterfaceInfo tny_gtk_msg_view_iface_info = 
 		{
-		  (GInterfaceInitFunc) tny_msg_view_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_gtk_msg_view_iface_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
 		type = g_type_register_static (GTK_TYPE_SCROLLED_WINDOW,
-			"TnyMsgView",
+			"TnyGtkMsgView",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW_IFACE, 
-			&tny_msg_view_iface_info);
+			&tny_gtk_msg_view_iface_info);
 
 	}
 

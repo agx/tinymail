@@ -1,5 +1,5 @@
-#ifndef TNY_MSG_WINDOW_H
-#define TNY_MSG_WINDOW_H
+#ifndef TNY_GTK_MSG_VIEW_H
+#define TNY_GTK_MSG_VIEW_H
 
 /* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -24,37 +24,37 @@
 #include <tny-shared.h>
 
 #include <tny-msg-view-iface.h>
-#include <tny-msg-window-iface.h>
 #include <tny-header-iface.h>
 #include <tny-msg-iface.h>
 #include <tny-stream-iface.h>
 #include <tny-mime-part-iface.h>
+#include <tny-save-strategy-iface.h>
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MSG_WINDOW             (tny_msg_window_get_type ())
-#define TNY_MSG_WINDOW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_WINDOW, TnyMsgWindow))
-#define TNY_MSG_WINDOW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MSG_WINDOW, TnyMsgWindowClass))
-#define TNY_IS_MSG_WINDOW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_WINDOW))
-#define TNY_IS_MSG_WINDOW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MSG_WINDOW))
-#define TNY_MSG_WINDOW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MSG_WINDOW, TnyMsgWindowClass))
+#define TNY_TYPE_GTK_MSG_VIEW         (tny_gtk_msg_view_get_type ())
+#define TNY_GTK_MSG_VIEW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgView))
+#define TNY_GTK_MSG_VIEW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgViewClass))
+#define TNY_IS_GTK_MSG_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GTK_MSG_VIEW))
+#define TNY_IS_GTK_MSG_VIEW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GTK_MSG_VIEW))
+#define TNY_GTK_MSG_VIEW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgViewClass))
 
-typedef struct _TnyMsgWindow TnyMsgWindow;
-typedef struct _TnyMsgWindowClass TnyMsgWindowClass;
+typedef struct _TnyGtkMsgView TnyGtkMsgView;
+typedef struct _TnyGtkMsgViewClass TnyGtkMsgViewClass;
 
-struct _TnyMsgWindow
+struct _TnyGtkMsgView
 {
-	GtkWindow parent;
+	GtkScrolledWindow parent;
 
 };
 
-struct _TnyMsgWindowClass
+struct _TnyGtkMsgViewClass
 {
-	GtkWindowClass parent_class;
+	GtkScrolledWindowClass parent_class;
 };
 
-GType               tny_msg_window_get_type       (void);
-TnyMsgWindow*       tny_msg_window_new            (TnyMsgViewIface *msgview);
+GType tny_gtk_msg_view_get_type (void);
+TnyGtkMsgView* tny_gtk_msg_view_new (TnySaveStrategyIface *save_strategy);
 
 G_END_DECLS
 

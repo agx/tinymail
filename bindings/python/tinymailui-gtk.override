@@ -12,8 +12,8 @@ headers
 #include <tny-attach-list-model.h>
 #include <tny-header-list-model.h>
 #include <tny-header-view.h>
-#include <tny-msg-view.h>
-#include <tny-msg-window.h>
+#include <tny-gtk-msg-view.h>
+#include <tny-gtk-msg-window.h>
 #include <tny-save-strategy.h>
 #include <tny-text-buffer-stream.h>
 

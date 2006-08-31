@@ -36,7 +36,7 @@
 #include <tny-transport-account-iface.h>
 #include <tny-msg-view-iface.h>
 #include <tny-msg-window-iface.h>
-#include <tny-msg-window.h>
+#include <tny-gtk-msg-window.h>
 #include <tny-folder-iface.h>
 #include <tny-account-tree-model.h>
 #include <tny-header-iface.h>
@@ -504,7 +504,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				msg = tny_folder_iface_get_message (TNY_FOLDER_IFACE (folder), header);
 				if (G_LIKELY (msg))
 				{
-					msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (
+					msgwin = TNY_MSG_WINDOW_IFACE (tny_gtk_msg_window_new (
 						tny_platform_factory_iface_new_msg_view (platfact)));
 
 					tny_msg_view_iface_set_msg (TNY_MSG_VIEW_IFACE (msgwin), 
@@ -513,7 +513,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				    
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				} else {
-					msgwin = TNY_MSG_WINDOW_IFACE (tny_msg_window_new (
+					msgwin = TNY_MSG_WINDOW_IFACE (tny_gtk_msg_window_new (
 						tny_platform_factory_iface_new_msg_view (platfact)));
 
 					tny_msg_view_iface_set_unavailable (TNY_MSG_VIEW_IFACE (msgwin));

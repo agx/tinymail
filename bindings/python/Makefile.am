@@ -106,8 +106,8 @@ tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/fil
 	$(top_srcdir)/libtinymailui-gtk/tny-attach-list-model.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-header-list-model.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-header-view.h		\
-	$(top_srcdir)/libtinymailui-gtk/tny-msg-view.h			\
-	$(top_srcdir)/libtinymailui-gtk/tny-msg-window.h		\
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-view.h		\
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-save-strategy.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-text-buffer-stream.h |	\
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra > $@
