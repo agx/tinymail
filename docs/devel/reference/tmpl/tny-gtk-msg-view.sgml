@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgView
+TnyGtkMsgView
 
 <!-- ##### SECTION Short_Description ##### -->
 A implementation of #TnyMsgViewIface for Gtk+.
@@ -22,13 +22,13 @@ This type is coupled with the #TnyTextBufferStream.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgView ##### -->
+<!-- ##### STRUCT TnyGtkMsgView ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_msg_view_new ##### -->
+<!-- ##### FUNCTION tny_gtk_msg_view_new ##### -->
 <para>
 
 </para>

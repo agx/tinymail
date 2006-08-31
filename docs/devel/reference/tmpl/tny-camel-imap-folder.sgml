@@ -9,12 +9,10 @@ A IMAP #TnyFolderIface implementation for Camel
 A IMAP #TnyFolderIface implementation for Camel
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyFolderIface, #TnyCamelFolder
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

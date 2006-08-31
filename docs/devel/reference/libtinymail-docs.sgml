@@ -46,9 +46,9 @@
 <!ENTITY libtinymailui-gtk-TnyAttachListModel SYSTEM "xml/tny-attach-list-model.xml">
 <!ENTITY libtinymailui-gtk-TnyHeaderListModel SYSTEM "xml/tny-header-list-model.xml">
 <!ENTITY libtinymailui-gtk-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
-<!ENTITY libtinymailui-gtk-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkMsgView SYSTEM "xml/tny-gtk-msg-view.xml">
 <!ENTITY libtinymailui-gtk-TnyHeaderView SYSTEM "xml/tny-header-view.xml">
-<!ENTITY libtinymailui-gtk-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkMsgWindow SYSTEM "xml/tny-gtk-msg-window.xml">
 <!ENTITY libtinymailui-gtk-TnySaveStrategy SYSTEM "xml/tny-save-strategy.xml">
 
 <!ENTITY libtinymailui-TnyMsgWindowIface SYSTEM "xml/tny-msg-window-iface.xml">
@@ -131,8 +131,8 @@
 
 	<chapter id="libtinymailui-gtk">
 	<title>libtinymailui-gtk</title>
-		&libtinymailui-gtk-TnyMsgView;
-		&libtinymailui-gtk-TnyMsgWindow;
+		&libtinymailui-gtk-TnyGtkMsgView;
+		&libtinymailui-gtk-TnyGtkMsgWindow;
 		&libtinymailui-gtk-TnyHeaderView;
 		&libtinymailui-gtk-TnyAccountTreeModel;
 		&libtinymailui-gtk-TnyHeaderListModel;

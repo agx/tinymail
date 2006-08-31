@@ -644,6 +644,18 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @set_content_type_func: 
 @is_attachment_func: 
 
+<!-- ##### STRUCT TnyMsgView ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyMsgWindow ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyStoreAccount ##### -->
 <para>
 
@@ -1472,6 +1484,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @parts: 
 @Returns: 
 
+<!-- ##### FUNCTION tny_msg_view_new ##### -->
+<para>
+
+</para>
+
+@save_strategy: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_window_iface_set_msg ##### -->
 <para>
 
@@ -1479,6 +1499,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @msg: 
+
+<!-- ##### FUNCTION tny_msg_window_new ##### -->
+<para>
+
+</para>
+
+@msgview: 
+@Returns: 
 
 <!-- ##### FUNCTION tny_session_camel_get_instance ##### -->
 <para>

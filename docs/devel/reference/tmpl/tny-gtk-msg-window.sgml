@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyMsgWindow
+TnyGtkMsgWindow
 
 <!-- ##### SECTION Short_Description ##### -->
 A implementation of #TnyMsgWindowIface for Gtk+
@@ -24,13 +24,13 @@ type with this type.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMsgWindow ##### -->
+<!-- ##### STRUCT TnyGtkMsgWindow ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_msg_window_new ##### -->
+<!-- ##### FUNCTION tny_gtk_msg_window_new ##### -->
 <para>
 
 </para>
