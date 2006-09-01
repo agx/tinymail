@@ -333,14 +333,14 @@ tny_moz_embed_msg_view_clear (TnyMsgViewIface *self)
  *
  * Return value: a new #TnyMsgViewIface instance implemented for Gtk+
  **/
-TnyMozEmbedMsgView*
+TnyMsgViewIface*
 tny_moz_embed_msg_view_new (TnySaveStrategyIface *save_strategy)
 {
 	TnyMozEmbedMsgView *self = g_object_new (TNY_TYPE_MOZ_EMBED_MSG_VIEW, NULL);
 
 	tny_msg_view_iface_set_save_strategy (TNY_MSG_VIEW_IFACE (self), save_strategy);
 
-	return self;
+	return TNY_MSG_VIEW_IFACE (self);
 }
 
 static void

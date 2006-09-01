@@ -65,9 +65,9 @@ tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
 		TNY_SAVE_STRATEGY_IFACE (tny_save_strategy_new ());
 
 #ifdef MOZEMBED
-	return TNY_MSG_VIEW_IFACE (tny_moz_embed_msg_view_new (save_strategy));
+	return tny_moz_embed_msg_view_new (save_strategy);
 #else
-	return TNY_MSG_VIEW_IFACE (tny_gtk_msg_view_new (save_strategy));
+	return tny_gtk_msg_view_new (save_strategy);
 #endif
 }
 

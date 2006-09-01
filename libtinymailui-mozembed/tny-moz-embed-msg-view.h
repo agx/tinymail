@@ -53,8 +53,8 @@ struct _TnyMozEmbedMsgViewClass
 	GtkScrolledWindowClass parent_class;
 };
 
-GType               tny_moz_embed_msg_view_get_type       (void);
-TnyMozEmbedMsgView* tny_moz_embed_msg_view_new            (TnySaveStrategyIface *save_strategy);
+GType tny_moz_embed_msg_view_get_type (void);
+TnyMsgViewIface* tny_moz_embed_msg_view_new (TnySaveStrategyIface *save_strategy);
 
 G_END_DECLS
 
