@@ -53,8 +53,8 @@ struct _TnyGtkMsgWindowClass
 	GtkWindowClass parent_class;
 };
 
-GType               tny_gtk_msg_window_get_type       (void);
-TnyGtkMsgWindow*    tny_gtk_msg_window_new            (TnyMsgViewIface *msgview);
+GType tny_gtk_msg_window_get_type (void);
+TnyMsgWindowIface* tny_gtk_msg_window_new (TnyMsgViewIface *msgview);
 
 G_END_DECLS
 

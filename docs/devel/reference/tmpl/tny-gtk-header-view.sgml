@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyHeaderView
+TnyGtkHeaderView
 
 <!-- ##### SECTION Short_Description ##### -->
 A implementation of #TnyHeaderViewIface for Gtk+
@@ -18,13 +18,13 @@ GtkTable.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyHeaderView ##### -->
+<!-- ##### STRUCT TnyGtkHeaderView ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_header_view_new ##### -->
+<!-- ##### FUNCTION tny_gtk_header_view_new ##### -->
 <para>
 
 </para>

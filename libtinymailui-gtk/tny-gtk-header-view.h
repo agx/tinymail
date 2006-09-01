@@ -1,5 +1,5 @@
-#ifndef TNY_HEADER_VIEW_H
-#define TNY_HEADER_VIEW_H
+#ifndef TNY_GTK_HEADER_VIEW_H
+#define TNY_GTK_HEADER_VIEW_H
 
 /* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -27,29 +27,29 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_HEADER_VIEW             (tny_header_view_get_type ())
-#define TNY_HEADER_VIEW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_HEADER_VIEW, TnyHeaderView))
-#define TNY_HEADER_VIEW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_HEADER_VIEW, TnyHeaderViewClass))
-#define TNY_IS_HEADER_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_HEADER_VIEW))
-#define TNY_IS_HEADER_VIEW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_HEADER_VIEW))
-#define TNY_HEADER_VIEW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_HEADER_VIEW, TnyHeaderViewClass))
+#define TNY_TYPE_GTK_HEADER_VIEW             (tny_gtk_header_view_get_type ())
+#define TNY_GTK_HEADER_VIEW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_GTK_HEADER_VIEW, TnyGtkHeaderView))
+#define TNY_GTK_HEADER_VIEW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GTK_HEADER_VIEW, TnyGtkHeaderViewClass))
+#define TNY_IS_GTK_HEADER_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GTK_HEADER_VIEW))
+#define TNY_IS_GTK_HEADER_VIEW_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GTK_HEADER_VIEW))
+#define TNY_GTK_HEADER_VIEW_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_GTK_HEADER_VIEW, TnyGtkHeaderViewClass))
 
-typedef struct _TnyHeaderView TnyHeaderView;
-typedef struct _TnyHeaderViewClass TnyHeaderViewClass;
+typedef struct _TnyGtkHeaderView TnyGtkHeaderView;
+typedef struct _TnyGtkHeaderViewClass TnyGtkHeaderViewClass;
 
-struct _TnyHeaderView
+struct _TnyGtkHeaderView
 {
 	GtkTable parent;
 
 };
 
-struct _TnyHeaderViewClass
+struct _TnyGtkHeaderViewClass
 {
 	GtkTableClass parent_class;
 };
 
-GType               tny_header_view_get_type       (void);
-TnyHeaderView*   tny_header_view_new            (void);
+GType tny_gtk_header_view_get_type (void);
+TnyHeaderViewIface* tny_gtk_header_view_new (void);
 
 G_END_DECLS
 

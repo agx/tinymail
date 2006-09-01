@@ -36,7 +36,7 @@
 #include <tny-moz-embed-stream.h>
 #include <tny-attach-list-model.h>
 #include <tny-header-view-iface.h>
-#include <tny-header-view.h>
+#include <tny-gtk-header-view.h>
 #include <tny-text-buffer-stream.h>
 
 #ifdef GNOME
@@ -393,8 +393,7 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_item_width (priv->attachview, 100);
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
-	priv->headerview = 
-		TNY_HEADER_VIEW_IFACE (tny_header_view_new ());
+	priv->headerview = tny_gtk_header_view_new ();
 
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 	priv->htmlview = GTK_MOZ_EMBED (gtk_moz_embed_new ());

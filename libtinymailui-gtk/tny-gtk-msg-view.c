@@ -38,7 +38,7 @@
 #include <tny-text-buffer-stream.h>
 #include <tny-attach-list-model.h>
 #include <tny-header-view-iface.h>
-#include <tny-header-view.h>
+#include <tny-gtk-header-view.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -283,16 +283,16 @@ tny_gtk_msg_view_clear (TnyMsgViewIface *self)
  * tny_gtk_msg_view_new:
  * @save_strategy: The save strategy to use
  *
- * Return value: a new #TnyGtkMsgView instance implemented for Gtk+
+ * Return value: a new #TnyMsgViewIface instance implemented for Gtk+
  **/
-TnyGtkMsgView*
+TnyMsgViewIface*
 tny_gtk_msg_view_new (TnySaveStrategyIface *save_strategy)
 {
 	TnyGtkMsgView *self = g_object_new (TNY_TYPE_GTK_MSG_VIEW, NULL);
 
 	tny_msg_view_iface_set_save_strategy (TNY_MSG_VIEW_IFACE (self), save_strategy);
 
-	return self;
+	return TNY_MSG_VIEW_IFACE (self);
 }
 
 static void
@@ -344,8 +344,7 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_icon_view_set_item_width (priv->attachview, 100);
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
-	priv->headerview = 
-		TNY_HEADER_VIEW_IFACE (tny_header_view_new ());
+	priv->headerview = tny_gtk_header_view_new ();
 
 	priv->textview = GTK_TEXT_VIEW (gtk_text_view_new ());
 

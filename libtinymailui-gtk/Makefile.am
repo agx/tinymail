@@ -17,7 +17,7 @@ libtinymailui_gtk_1_0_headers = 	\
 	tny-account-tree-model.h	\
 	tny-attach-list-model.h		\
 	tny-text-buffer-stream.h	\
-	tny-header-view.h
+	tny-gtk-header-view.h
 
 libtinymailui_gtk_1_0_la_SOURCES =		\
 	$(libtinymailui_gtk_1_0_headers)	\
@@ -37,7 +37,7 @@ libtinymailui_gtk_1_0_la_SOURCES =		\
 	tny-attach-list-model-priv.h		\
 	tny-attach-list-model.c			\
 	tny-text-buffer-stream.c		\
-	tny-header-view.c
+	tny-gtk-header-view.c
 
 libtinymailui_gtk_1_0_la_LIBADD = 	\
 	$(LIBTINYMAILUI_GTK_LIBS)	\

@@ -54,7 +54,7 @@ struct _TnyGtkMsgViewClass
 };
 
 GType tny_gtk_msg_view_get_type (void);
-TnyGtkMsgView* tny_gtk_msg_view_new (TnySaveStrategyIface *save_strategy);
+TnyMsgViewIface* tny_gtk_msg_view_new (TnySaveStrategyIface *save_strategy);
 
 G_END_DECLS
 

@@ -1,3 +1,9 @@
+2006-09-01   Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Renamed TnyHeaderView to TnyGtkHeaderView
+
+	* This was a major API change
+
 2006-08-31  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed some small issues in the renaming patch of Thomas and
