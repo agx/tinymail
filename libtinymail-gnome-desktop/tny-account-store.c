@@ -134,7 +134,7 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 		*cancel = (!canc);
 
 		/* this causes warnings, but should be done afaik */
-		g_object_unref (G_OBJECT (dialog));
+		gtk_object_destroy (GTK_OBJECT (dialog));
 
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
