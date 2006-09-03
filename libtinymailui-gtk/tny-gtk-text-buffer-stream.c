@@ -23,22 +23,22 @@
 #include <gtk/gtk.h>
 
 #include <tny-stream-iface.h>
-#include <tny-text-buffer-stream.h>
+#include <tny-gtk-text-buffer-stream.h>
 
 static GObjectClass *parent_class = NULL;
 
 
-typedef struct _TnyTextBufferStreamPriv TnyTextBufferStreamPriv;
+typedef struct _TnyGtkTextBufferStreamPriv TnyGtkTextBufferStreamPriv;
 
-struct _TnyTextBufferStreamPriv
+struct _TnyGtkTextBufferStreamPriv
 {
 	GtkTextBuffer *buffer;
 	GtkTextIter cur;
 
 };
 
-#define TNY_TEXT_BUFFER_STREAM_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_TEXT_BUFFER_STREAM, TnyTextBufferStreamPriv))
+#define TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_TEXT_BUFFER_STREAM, TnyGtkTextBufferStreamPriv))
 
 
 static gssize
@@ -77,9 +77,9 @@ tny_text_buffer_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 }
 
 static gssize
-tny_text_buffer_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
+tny_gtk_text_buffer_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
 {
-	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter dest, end;
 	gint cur_offset, end_offset, rlength;
 
@@ -100,9 +100,9 @@ tny_text_buffer_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
 }
 
 static gssize
-tny_text_buffer_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
+tny_gtk_text_buffer_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
 {
-	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
 	gtk_text_buffer_insert (priv->buffer, &(priv->cur), buffer, (gint)n);
 
@@ -110,23 +110,23 @@ tny_text_buffer_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
 }
 
 static gint
-tny_text_buffer_stream_flush (TnyStreamIface *self)
+tny_gtk_text_buffer_stream_flush (TnyStreamIface *self)
 {
 	return 0;
 }
 
 static gint
-tny_text_buffer_stream_close (TnyStreamIface *self)
+tny_gtk_text_buffer_stream_close (TnyStreamIface *self)
 {
-	tny_text_buffer_stream_flush (self);
+	tny_gtk_text_buffer_stream_flush (self);
 
 	return 0;
 }
 
 static gboolean
-tny_text_buffer_stream_eos   (TnyStreamIface *self)
+tny_gtk_text_buffer_stream_eos   (TnyStreamIface *self)
 {
-	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter end;
 
 	gtk_text_buffer_get_end_iter (priv->buffer, &end);
@@ -135,7 +135,7 @@ tny_text_buffer_stream_eos   (TnyStreamIface *self)
 }
 
 static gint
-tny_text_buffer_stream_reset_priv (TnyTextBufferStreamPriv *priv)
+tny_gtk_text_buffer_stream_reset_priv (TnyGtkTextBufferStreamPriv *priv)
 {
 	gtk_text_buffer_get_start_iter (priv->buffer, &(priv->cur));
 
@@ -143,26 +143,26 @@ tny_text_buffer_stream_reset_priv (TnyTextBufferStreamPriv *priv)
 }
 
 static gint
-tny_text_buffer_stream_reset (TnyStreamIface *self)
+tny_gtk_text_buffer_stream_reset (TnyStreamIface *self)
 {
-	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
-	return tny_text_buffer_stream_reset_priv (priv);
+	return tny_gtk_text_buffer_stream_reset_priv (priv);
 }
 
 
 /**
- * tny_text_buffer_stream_set_text_buffer:
- * @self: A #TnyTextBufferStream instance
+ * tny_gtk_text_buffer_stream_set_text_buffer:
+ * @self: A #TnyGtkTextBufferStream instance
  * @buffer: The #GtkTextBuffer to write to or read from
  *
  * Set the #GtkTextBuffer to play adaptor for
  *
  **/
 void
-tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer *buffer)
+tny_gtk_text_buffer_stream_set_text_buffer (TnyGtkTextBufferStream *self, GtkTextBuffer *buffer)
 {
-	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
 	if (priv->buffer)
 		g_object_unref (G_OBJECT (priv->buffer));
@@ -170,34 +170,34 @@ tny_text_buffer_stream_set_text_buffer (TnyTextBufferStream *self, GtkTextBuffer
 	g_object_ref (G_OBJECT (buffer));
 	priv->buffer = buffer;
 
-	tny_text_buffer_stream_reset_priv (priv);
+	tny_gtk_text_buffer_stream_reset_priv (priv);
 
 	return;
 }
 
 /**
- * tny_text_buffer_stream_new:
+ * tny_gtk_text_buffer_stream_new:
  * @buffer: The #GtkTextBuffer to write to or read from
  *
  * Create an adaptor instance between #TnyStreamIface and #GtkTextBuffer
  *
  * Return value: a new #TnyStreamIface instance
  **/
-TnyTextBufferStream*
-tny_text_buffer_stream_new (GtkTextBuffer *buffer)
+TnyStreamIface*
+tny_gtk_text_buffer_stream_new (GtkTextBuffer *buffer)
 {
-	TnyTextBufferStream *self = g_object_new (TNY_TYPE_TEXT_BUFFER_STREAM, NULL);
+	TnyGtkTextBufferStream *self = g_object_new (TNY_TYPE_GTK_TEXT_BUFFER_STREAM, NULL);
 
-	tny_text_buffer_stream_set_text_buffer (self, buffer);
+	tny_gtk_text_buffer_stream_set_text_buffer (self, buffer);
 
-	return self;
+	return TNY_STREAM_IFACE (self);
 }
 
 static void
-tny_text_buffer_stream_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gtk_text_buffer_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyTextBufferStream *self = (TnyTextBufferStream *)instance;
-	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	TnyGtkTextBufferStream *self = (TnyGtkTextBufferStream *)instance;
+	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
 	priv->buffer = NULL;
 
@@ -205,10 +205,10 @@ tny_text_buffer_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_text_buffer_stream_finalize (GObject *object)
+tny_gtk_text_buffer_stream_finalize (GObject *object)
 {
-	TnyTextBufferStream *self = (TnyTextBufferStream *)object;	
-	TnyTextBufferStreamPriv *priv = TNY_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	TnyGtkTextBufferStream *self = (TnyGtkTextBufferStream *)object;	
+	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
 	if (priv->buffer)
 		g_object_unref (G_OBJECT (priv->buffer));
@@ -223,34 +223,34 @@ tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyStreamIfaceClass *klass = (TnyStreamIfaceClass *)g_iface;
 
-	klass->read_func = tny_text_buffer_stream_read;
-	klass->write_func = tny_text_buffer_stream_write;
-	klass->flush_func = tny_text_buffer_stream_flush;
-	klass->close_func = tny_text_buffer_stream_close;
-	klass->eos_func = tny_text_buffer_stream_eos;
-	klass->reset_func = tny_text_buffer_stream_reset;
+	klass->read_func = tny_gtk_text_buffer_stream_read;
+	klass->write_func = tny_gtk_text_buffer_stream_write;
+	klass->flush_func = tny_gtk_text_buffer_stream_flush;
+	klass->close_func = tny_gtk_text_buffer_stream_close;
+	klass->eos_func = tny_gtk_text_buffer_stream_eos;
+	klass->reset_func = tny_gtk_text_buffer_stream_reset;
 	klass->write_to_stream_func = tny_text_buffer_write_to_stream;
 
 	return;
 }
 
 static void 
-tny_text_buffer_stream_class_init (TnyTextBufferStreamClass *class)
+tny_gtk_text_buffer_stream_class_init (TnyGtkTextBufferStreamClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_text_buffer_stream_finalize;
+	object_class->finalize = tny_gtk_text_buffer_stream_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyTextBufferStreamPriv));
+	g_type_class_add_private (object_class, sizeof (TnyGtkTextBufferStreamPriv));
 
 	return;
 }
 
 GType 
-tny_text_buffer_stream_get_type (void)
+tny_gtk_text_buffer_stream_get_type (void)
 {
 	static GType type = 0;
 
@@ -258,15 +258,15 @@ tny_text_buffer_stream_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyTextBufferStreamClass),
+		  sizeof (TnyGtkTextBufferStreamClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_text_buffer_stream_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gtk_text_buffer_stream_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyTextBufferStream),
+		  sizeof (TnyGtkTextBufferStream),
 		  0,      /* n_preallocs */
-		  tny_text_buffer_stream_instance_init    /* instance_init */
+		  tny_gtk_text_buffer_stream_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_stream_iface_info = 
@@ -277,7 +277,7 @@ tny_text_buffer_stream_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyTextBufferStream",
+			"TnyGtkTextBufferStream",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 

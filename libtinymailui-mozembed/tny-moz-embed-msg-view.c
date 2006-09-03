@@ -37,7 +37,7 @@
 #include <tny-attach-list-model.h>
 #include <tny-header-view-iface.h>
 #include <tny-gtk-header-view.h>
-#include <tny-text-buffer-stream.h>
+#include <tny-gtk-text-buffer-stream.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -88,7 +88,6 @@ reload_msg (TnyMsgViewIface *self)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
-	TnyStreamIface *dest;
 	TnyHeaderIface *header;
 	TnyIteratorIface *iterator;
 	gboolean first_attach = TRUE;
@@ -104,9 +103,7 @@ reload_msg (TnyMsgViewIface *self)
 	tny_header_view_iface_set_header (priv->headerview, header);
 	g_object_unref (G_OBJECT (header));
 
-    
     	buffer = gtk_text_view_get_buffer (priv->textview);
-	dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
     
     	model = tny_attach_list_model_new ();;
 	tny_msg_iface_get_parts (priv->msg, TNY_LIST_IFACE (model));
@@ -127,7 +124,7 @@ reload_msg (TnyMsgViewIface *self)
 			gtk_widget_hide (GTK_WIDGET (priv->htmlview));
 			gtk_widget_show (GTK_WIDGET (priv->textview));
 
-			dest = TNY_STREAM_IFACE (tny_text_buffer_stream_new (buffer));
+			dest = tny_gtk_text_buffer_stream_new (buffer);
 
 			tny_stream_iface_reset (dest);
 			tny_mime_part_iface_decode_to_stream (part, dest);

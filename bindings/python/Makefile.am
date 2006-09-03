@@ -109,7 +109,7 @@ tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/fil
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-view.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-save-strategy.h		\
-	$(top_srcdir)/libtinymailui-gtk/tny-text-buffer-stream.h |	\
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h |	\
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra > $@
 
 tinymail-platform.defs : tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py

@@ -1,6 +1,7 @@
 2006-09-03  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed TnySaveStrategy to TnyGtkSaveStrategy
+	* Renamed TnyTextBufferStream to TnyGtkTextBufferStream
 
 	* This was a major API change in libtinymailui-gtk
 
