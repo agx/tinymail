@@ -1,22 +1,28 @@
-2006-09-01   Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-03  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Renamed TnySaveStrategy to TnyGtkSaveStrategy
+
+	* This was a major API change in libtinymailui-gtk
+
+2006-09-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed TnyHeaderView to TnyGtkHeaderView
 
-	* This was a major API change
+	* This was a major API change in libtinymailui-gtk
 
 2006-08-31  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed some small issues in the renaming patch of Thomas and
 	committed it.
 
-	* These fixes too where a major API change
+	* These fixes too where a major API change in libtinymailui-gtk
 
 2006-08-31  Thomas Hisch <t.hisch@gmail.com>
 
 	* Renamed TnyMsgView to TnyGtkMsgView
 	* Renamed TnyMsgWindow to TnyGtkMsgWindow
 
-	* This was a major API change
+	* This was a major API change in libtinymailui-gtk
 		
 2006-08-31  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -33,13 +39,13 @@
 	* Created templates for TnyCamelPOPFolder, TnyCamelIMAPFolder
 	and TnyCamelNNTPFolder
 
-	* This was a major API change
+	* This was a major API change in libtinymail-camel
 
 2006-08-30  Thomas Hisch <t.hisch@gmail.com>
 
 	* Renamed TnyHeader to TnyCamelHeader
 
-	* This was a major API change
+	* This was a major API change in libtinymail-camel
 	
 2006-08-30  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -54,7 +60,7 @@
 	* Renamed TnyMsg to TnyCamelMsg
 	* Renamed TnyFolder to TnyCamelFolder
 
-	* This was a major API change
+	* This was a major API change in libtinymail-camel
 	
 2006-08-29  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
@@ -82,7 +88,7 @@
 	get_folders_async API of TnyFolderStoreIface
 	* Support for non-mainloop _async methods
 
-	* This was a major API change
+	* This was a major API change in all
 
 2006-08-27  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -107,7 +113,7 @@
 
 	* Added the tny_msg_view_iface_clear API
 
-	* This was a major API change
+	* This was a major API change in libtinymailui and libtinymailui-gtk
 
 2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -131,7 +137,7 @@
 	header instance didn't happen in the TnyMsgViewIface implementations in
 	ui-gtk and ui-mozembed.
 
-	* This was a major API change
+	* This was a major API change in all
 	
 2006-08-24  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -145,7 +151,7 @@
 	iface.h, libtinymail/Makefile.am, libtinymail/tny-folder-iface.c: 
 	The new get-folders API
 
-	* This was a major API change
+	* This was a major API change in all
 
 2006-08-23  Philip Van Hoof <pvanhoof@gnome.org>
 	
@@ -156,7 +162,7 @@
 	* API simplification of TnyFolderIface
 	* API documentation of TnyFolderIface
 	
-	* This was a major API change
+	* This was a major API change in all
 	
 2006-08-22  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -168,7 +174,7 @@
 	* Removed the has_first and has_next methods from the iterator API
 	* Moved the Python demo to tests/python-demo
 
-	* This was a major API change
+	* This was a major API change in all
 	
 2006-08-08  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
@@ -176,7 +182,7 @@
 	* g_object_ref iterator _current retval, except with headers...
 	* misc small fixes (-Wall -Wextra helps...)
 
-	* This was a major API change
+	* This was a major API change in all
 	
 2006-08-01  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -192,7 +198,8 @@
 
 	* Improved the enums (GType'ed them)
 
-	* This was a major API change
+	* This was a minor API change in all but a major one for language
+	bindings
 	
 2006-07-29  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -228,19 +235,19 @@
 	* Refactored TnySummaryWindowIface to TnySummaryViewIface
 	* Added support for XEmbed and command-line parameters in the demo-ui
 
-	* This was a major API change
+	* This was a major API change in libtinymailui and libtinymailui-gtk
 	
 2006-06-09  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* tny_iterator_iface_is_end method
 
-	* This was a major API change
+	* This was a major API change in all
 	
 2006-06-07  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Major API changes in TnyAccountStore
 	
-	* This was a major API change
+	* This was a major API change in all
 	
 2006-06-21  Florian Boor <florian.boor@kernelconcepts.de>
 
@@ -279,5 +286,5 @@
 	* Initial import
 	* Tinymail epoch
 
-	* This was a major API change
+	* This was a major API change in all
 	

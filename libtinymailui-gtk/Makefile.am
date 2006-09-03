@@ -10,7 +10,7 @@ endif
 lib_LTLIBRARIES = libtinymailui-gtk-1.0.la
 
 libtinymailui_gtk_1_0_headers = 	\
-	tny-save-strategy.h		\
+	tny-gtk-save-strategy.h		\
 	tny-gtk-msg-view.h		\
 	tny-gtk-msg-window.h		\
 	tny-header-list-model.h		\
@@ -21,7 +21,7 @@ libtinymailui_gtk_1_0_headers = 	\
 
 libtinymailui_gtk_1_0_la_SOURCES =		\
 	$(libtinymailui_gtk_1_0_headers)	\
-	tny-save-strategy.c			\
+	tny-gtk-save-strategy.c			\
 	tny-gtk-msg-view.c			\
 	tny-gtk-msg-window.c			\
 	tny-header-list-model-priv.h       	\

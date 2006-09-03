@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnySaveStrategy
+TnyGtkSaveStrategy
 
 <!-- ##### SECTION Short_Description ##### -->
 A strategy for saving a mime part using Gtk+
@@ -30,7 +30,7 @@ normal file descriptor.
 </para>
 
 
-<!-- ##### FUNCTION tny_save_strategy_new ##### -->
+<!-- ##### FUNCTION tny_gtk_save_strategy_new ##### -->
 <para>
 
 </para>

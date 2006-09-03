@@ -21,7 +21,7 @@
 #include <tny-platform-factory.h>
 
 #include <tny-save-strategy-iface.h>
-#include <tny-save-strategy.h>
+#include <tny-gtk-save-strategy.h>
 
 #include <tny-account-store-iface.h>
 #include <tny-account-store.h>
@@ -61,8 +61,7 @@ tny_platform_factory_new_device (TnyPlatformFactoryIface *self)
 static TnyMsgViewIface*
 tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
 {
-	TnySaveStrategyIface *save_strategy = 
-		TNY_SAVE_STRATEGY_IFACE (tny_save_strategy_new ());
+	TnySaveStrategyIface *save_strategy = tny_gtk_save_strategy_new ();
 
 #ifdef MOZEMBED
 	return tny_moz_embed_msg_view_new (save_strategy);

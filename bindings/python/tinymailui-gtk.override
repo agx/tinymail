@@ -14,7 +14,7 @@ headers
 #include <tny-gtk-header-view.h>
 #include <tny-gtk-msg-view.h>
 #include <tny-gtk-msg-window.h>
-#include <tny-save-strategy.h>
+#include <tny-gtk-save-strategy.h>
 #include <tny-text-buffer-stream.h>
 
 %%
