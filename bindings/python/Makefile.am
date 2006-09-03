@@ -102,7 +102,7 @@ tinymailui.defs: tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
 
 tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
-	$(top_srcdir)/libtinymailui-gtk/tny-account-tree-model.h	\
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-tree-model.h	\
 	$(top_srcdir)/libtinymailui-gtk/tny-attach-list-model.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-header-list-model.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-view.h		\

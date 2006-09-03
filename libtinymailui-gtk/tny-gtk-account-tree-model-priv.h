@@ -1,5 +1,5 @@
-#ifndef TNY_ACCOUNT_TREE_MODEL_PRIV_H
-#define TNY_ACCOUNT_TREE_MODEL_PRIV_H
+#ifndef TNY_GTK_ACCOUNT_TREE_MODEL_PRIV_H
+#define TNY_GTK_ACCOUNT_TREE_MODEL_PRIV_H
 
 /* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>

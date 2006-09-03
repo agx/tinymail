@@ -19,18 +19,18 @@
 
 #include <config.h>
 
-#include <tny-account-tree-model.h>
+#include <tny-gtk-account-tree-model.h>
 
 static GObjectClass *parent_class = NULL;
 
-#include "tny-account-tree-model-iterator-priv.h"
-#include "tny-account-tree-model-priv.h"
+#include "tny-gtk-account-tree-model-iterator-priv.h"
+#include "tny-gtk-account-tree-model-priv.h"
 
-GType _tny_account_tree_model_iterator_get_type (void);
+GType _tny_gtk_account_tree_model_iterator_get_type (void);
 
 
 void 
-_tny_account_tree_model_iterator_set_model (TnyAccountTreeModelIterator *self, TnyAccountTreeModel *model)
+_tny_gtk_account_tree_model_iterator_set_model (TnyGtkAccountTreeModelIterator *self, TnyGtkAccountTreeModel *model)
 {
 	self->model = model;
 	self->current = model->first;
@@ -40,20 +40,20 @@ _tny_account_tree_model_iterator_set_model (TnyAccountTreeModelIterator *self, T
 
 
 
-TnyAccountTreeModelIterator*
-_tny_account_tree_model_iterator_new (TnyAccountTreeModel *model)
+TnyGtkAccountTreeModelIterator*
+_tny_gtk_account_tree_model_iterator_new (TnyGtkAccountTreeModel *model)
 {
-	TnyAccountTreeModelIterator *self = g_object_new (TNY_TYPE_ACCOUNT_TREE_MODEL_ITERATOR, NULL);
+	TnyGtkAccountTreeModelIterator *self = g_object_new (TNY_TYPE_GTK_ACCOUNT_TREE_MODEL_ITERATOR, NULL);
 
-	_tny_account_tree_model_iterator_set_model (self, model);
+	_tny_gtk_account_tree_model_iterator_set_model (self, model);
 
 	return self;
 }
 
 static void
-tny_account_tree_model_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gtk_account_tree_model_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyAccountTreeModelIterator *self = (TnyAccountTreeModelIterator *)instance;
+	TnyGtkAccountTreeModelIterator *self = (TnyGtkAccountTreeModelIterator *)instance;
 
 	self->model = NULL;
 	self->current = NULL;
@@ -62,7 +62,7 @@ tny_account_tree_model_iterator_instance_init (GTypeInstance *instance, gpointer
 }
 
 static void
-tny_account_tree_model_iterator_finalize (GObject *object)
+tny_gtk_account_tree_model_iterator_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -71,9 +71,9 @@ tny_account_tree_model_iterator_finalize (GObject *object)
 
 
 static void
-tny_account_tree_model_iterator_next (TnyIteratorIface *self)
+tny_gtk_account_tree_model_iterator_next (TnyIteratorIface *self)
 {
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
+	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -88,9 +88,9 @@ tny_account_tree_model_iterator_next (TnyIteratorIface *self)
 }
 
 static void 
-tny_account_tree_model_iterator_prev (TnyIteratorIface *self)
+tny_gtk_account_tree_model_iterator_prev (TnyIteratorIface *self)
 {
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
+	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -106,9 +106,9 @@ tny_account_tree_model_iterator_prev (TnyIteratorIface *self)
 
 
 static gboolean 
-tny_account_tree_model_iterator_is_done (TnyIteratorIface *self)
+tny_gtk_account_tree_model_iterator_is_done (TnyIteratorIface *self)
 {
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
+	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 	
 	if (G_UNLIKELY (!me || !me->model))
 		return TRUE;
@@ -119,9 +119,9 @@ tny_account_tree_model_iterator_is_done (TnyIteratorIface *self)
 
 
 static void 
-tny_account_tree_model_iterator_first (TnyIteratorIface *self)
+tny_gtk_account_tree_model_iterator_first (TnyIteratorIface *self)
 {
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
+	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -139,9 +139,9 @@ tny_account_tree_model_iterator_first (TnyIteratorIface *self)
 
 
 static void 
-tny_account_tree_model_iterator_nth (TnyIteratorIface *self, guint nth)
+tny_gtk_account_tree_model_iterator_nth (TnyIteratorIface *self, guint nth)
 {
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
+	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -159,9 +159,9 @@ tny_account_tree_model_iterator_nth (TnyIteratorIface *self, guint nth)
 
 
 static GObject* 
-tny_account_tree_model_iterator_current (TnyIteratorIface *self)
+tny_gtk_account_tree_model_iterator_current (TnyIteratorIface *self)
 {
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
+	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 	gpointer ptr;
 
 	if (G_UNLIKELY (!me || !me->model))
@@ -181,9 +181,9 @@ tny_account_tree_model_iterator_current (TnyIteratorIface *self)
 
 
 static TnyListIface* 
-tny_account_tree_model_iterator_get_list (TnyIteratorIface *self)
+tny_gtk_account_tree_model_iterator_get_list (TnyIteratorIface *self)
 {
-	TnyAccountTreeModelIterator *me = (TnyAccountTreeModelIterator*) self;
+	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 
 	/* Return the list */
 
@@ -198,32 +198,32 @@ tny_account_tree_model_iterator_get_list (TnyIteratorIface *self)
 static void
 tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 {
-	klass->next_func = tny_account_tree_model_iterator_next;
-	klass->prev_func = tny_account_tree_model_iterator_prev;
-	klass->first_func = tny_account_tree_model_iterator_first;
-	klass->nth_func = tny_account_tree_model_iterator_nth;
-	klass->current_func = tny_account_tree_model_iterator_current;
-	klass->get_list_func = tny_account_tree_model_iterator_get_list;
-	klass->is_done  = tny_account_tree_model_iterator_is_done;
+	klass->next_func = tny_gtk_account_tree_model_iterator_next;
+	klass->prev_func = tny_gtk_account_tree_model_iterator_prev;
+	klass->first_func = tny_gtk_account_tree_model_iterator_first;
+	klass->nth_func = tny_gtk_account_tree_model_iterator_nth;
+	klass->current_func = tny_gtk_account_tree_model_iterator_current;
+	klass->get_list_func = tny_gtk_account_tree_model_iterator_get_list;
+	klass->is_done  = tny_gtk_account_tree_model_iterator_is_done;
 	
 	return;
 }
 
 static void 
-tny_account_tree_model_iterator_class_init (TnyAccountTreeModelIteratorClass *klass)
+tny_gtk_account_tree_model_iterator_class_init (TnyGtkAccountTreeModelIteratorClass *klass)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	object_class->finalize = tny_account_tree_model_iterator_finalize;
+	object_class->finalize = tny_gtk_account_tree_model_iterator_finalize;
 
 	return;
 }
 
 GType 
-_tny_account_tree_model_iterator_get_type (void)
+_tny_gtk_account_tree_model_iterator_get_type (void)
 {
 	static GType type = 0;
 
@@ -231,15 +231,15 @@ _tny_account_tree_model_iterator_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyAccountTreeModelIteratorClass),
+		  sizeof (TnyGtkAccountTreeModelIteratorClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_account_tree_model_iterator_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gtk_account_tree_model_iterator_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyAccountTreeModelIterator),
+		  sizeof (TnyGtkAccountTreeModelIterator),
 		  0,      /* n_preallocs */
-		  tny_account_tree_model_iterator_instance_init,    /* instance_init */
+		  tny_gtk_account_tree_model_iterator_instance_init,    /* instance_init */
 		  NULL
 		};
 
@@ -251,7 +251,7 @@ _tny_account_tree_model_iterator_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyAccountTreeModelIterator",
+			"TnyGtkAccountTreeModelIterator",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ITERATOR_IFACE, 
