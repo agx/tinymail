@@ -1,2 +1,14 @@
+o. Remove the Iface suffix of interface types
+o. Rename types in the platform specific libraries
+o. Rename types in the demo-ui
+o. Rename types in the tests/shared stuff
 o. Refactor TnySaveStrategy to a TnyGnomeVfsSaveStrategy and a TnyPosixSaveStrategy
 o. Fix the GTK_TREE_MODEL_SORT assertion of the demo-ui
+o. camel-lite-builder builds without nspr-dev resulting in a compilation error
+o. The docs don't describe the enums
+o. The docs don't describe the TnyGetFoldersCallback
+o. The docs don't describe the arg1 of the signals
+o. The docs talk about TnyHeaderProxy?
+o. The prerequisites of some types add GObject (this isn't needed)
+o. The implemented interfaces only add the ones of libtinymail
+o. Add lots of code samples to the docs
