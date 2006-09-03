@@ -5,6 +5,8 @@
 	* Bugfix in TnyMozEmbedMsgView and TnyGtkMsgView
 	* Renamed TnyAccountTreeModel to TnyGtkAccountTreeModel
 	* Renamed TnyHeaderListModel to TnyGtkHeaderListModel
+	* Renamed TnyAttachListModel to TnyGtkAttachListModel
+	* Fixed several reference counting problems
 
 	* This was a major API change in libtinymailui-gtk
 

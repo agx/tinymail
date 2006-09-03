@@ -247,9 +247,10 @@ tny_gtk_account_tree_model_remove (TnyListIface *self, GObject* item)
 		{
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));
-
+			g_object_unref (G_OBJECT (curaccount));
 			break;
 		}
+		g_object_unref (G_OBJECT (curaccount));	    
 	}
 
 	g_mutex_unlock (me->iterator_lock);

@@ -34,7 +34,7 @@
 
 #include <tny-moz-embed-msg-view.h>
 #include <tny-moz-embed-stream.h>
-#include <tny-attach-list-model.h>
+#include <tny-gtk-attach-list-model.h>
 #include <tny-header-view-iface.h>
 #include <tny-gtk-header-view.h>
 #include <tny-gtk-text-buffer-stream.h>
@@ -47,7 +47,7 @@
 #include <tny-fs-stream.h>
 #endif
 
-#include "tny-attach-list-model-priv.h"
+#include "tny-gtk-attach-list-model-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
@@ -91,7 +91,7 @@ reload_msg (TnyMsgViewIface *self)
 	TnyHeaderIface *header;
 	TnyIteratorIface *iterator;
 	gboolean first_attach = TRUE;
-	TnyAttachListModel *model;
+	GtkTreeModel *model;
 	gboolean have_html = FALSE;
 
 	tny_header_view_iface_clear (TNY_HEADER_VIEW_IFACE (priv->headerview));
@@ -105,7 +105,7 @@ reload_msg (TnyMsgViewIface *self)
 
     	buffer = gtk_text_view_get_buffer (priv->textview);
     
-    	model = tny_attach_list_model_new ();;
+    	model = tny_gtk_attach_list_model_new ();;
 	tny_msg_iface_get_parts (priv->msg, TNY_LIST_IFACE (model));
 	iterator = tny_list_iface_create_iterator (TNY_LIST_IFACE (model));
 	gtk_widget_hide (priv->attachview_sw);
@@ -234,11 +234,14 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 		TnyMimePartIface *part;
 
 		gtk_tree_model_get (model, &iter, 
-			TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
+			TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
 			&part, -1);
 
 		if (G_LIKELY (part))
-			tny_save_strategy_iface_save (priv->save_strategy, part);
+		{
+			tny_save_strategy_iface_save (priv->save_strategy, part);    
+		    	g_object_unref (G_OBJECT (part));
+		}
 	}
 
 	return;
@@ -381,10 +384,10 @@ tny_moz_embed_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 		G_CALLBACK (tny_moz_embed_msg_view_popup_handler), menu);
 
 	gtk_icon_view_set_text_column (priv->attachview, 
-		TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN);
+		TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN);
 
 	gtk_icon_view_set_pixbuf_column (priv->attachview, 
-		TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN);
+		TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN);
 
 	gtk_icon_view_set_columns (priv->attachview, -1);
 	gtk_icon_view_set_item_width (priv->attachview, 100);

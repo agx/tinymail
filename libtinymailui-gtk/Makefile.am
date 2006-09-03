@@ -15,7 +15,7 @@ libtinymailui_gtk_1_0_headers = 	\
 	tny-gtk-msg-window.h		\
 	tny-gtk-header-list-model.h	\
 	tny-gtk-account-tree-model.h	\
-	tny-attach-list-model.h		\
+	tny-gtk-attach-list-model.h	\
 	tny-gtk-text-buffer-stream.h	\
 	tny-gtk-header-view.h
 
@@ -32,10 +32,10 @@ libtinymailui_gtk_1_0_la_SOURCES =		\
 	tny-gtk-account-tree-model-priv.h	\
 	tny-gtk-header-list-model.c	       	\
 	tny-gtk-header-list-iterator.c		\
-	tny-attach-list-model-iterator-priv.h	\
-	tny-attach-list-model-iterator.c	\
-	tny-attach-list-model-priv.h		\
-	tny-attach-list-model.c			\
+	tny-gtk-attach-list-model-iterator-priv.h \
+	tny-gtk-attach-list-model-iterator.c	\
+	tny-gtk-attach-list-model-priv.h	\
+	tny-gtk-attach-list-model.c		\
 	tny-gtk-text-buffer-stream.c		\
 	tny-gtk-header-view.c
 

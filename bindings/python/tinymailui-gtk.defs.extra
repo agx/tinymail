@@ -1,21 +1,18 @@
-
-(define-enum AttachListModelColumn
+(define-enum GtkAttachListModelColumn
   (in-module "Tny")
-  (c-name "TnyAttachListModelColumn")
-  (gtype-id "TNY_TYPE_ATTACH_LIST_MODEL_COLUMN")
+  (c-name "TnyGtkAttachListModelColumn")
+  (gtype-id "TNY_TYPE_GTK_ATTACH_LIST_MODEL_COLUMN")
   (values
-    '("pixbuf" "TNY_ATTACH_LIST_MODEL_PIXBUF_COLUMN")
-    '("filename" "TNY_ATTACH_LIST_MODEL_FILENAME_COLUMN")
-    '("instance" "TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN")
-    '("n" "TNY_ATTACH_LIST_MODEL_N_COLUMNS")
+    '("pixbuf" "TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN")
+    '("filename" "TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN")
+    '("instance" "TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN")
+    '("n" "TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS")
   )
 )
 
-
-
-(define-enum HeaderListModelColumn
+(define-enum GtkHeaderListModelColumn
   (in-module "Tny")
-  (c-name "TnyHeaderListModelColumn")
+  (c-name "TnyGtkHeaderListModelColumn")
   (gtype-id "TNY_TYPE_GTK_HEADER_LIST_MODEL_COLUMN")
   (values
     '("from" "TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN")
@@ -32,10 +29,9 @@
   )
 )
 
-
-(define-enum AccountTreeModelColumn
+(define-enum GtkAccountTreeModelColumn
   (in-module "Tny")
-  (c-name "TnyAccountTreeModelColumn")
+  (c-name "TnyGtkAccountTreeModelColumn")
   (gtype-id "TNY_TYPE_GTK_ACCOUNT_TREE_MODEL_COLUMN")
   (values
     '("name" "TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN")

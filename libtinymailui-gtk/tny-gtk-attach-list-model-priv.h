@@ -1,5 +1,5 @@
-#ifndef TNY_ATTACH_LIST_MODEL_PRIV_H
-#define TNY_ATTACH_LIST_MODEL_PRIV_H
+#ifndef TNY_GTK_ATTACH_LIST_MODEL_PRIV_H
+#define TNY_GTK_ATTACH_LIST_MODEL_PRIV_H
 
 /* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -20,9 +20,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-typedef struct _TnyAttachListModelPriv TnyAttachListModelPriv;
+typedef struct _TnyGtkAttachListModelPriv TnyGtkAttachListModelPriv;
 
-struct _TnyAttachListModelPriv
+struct _TnyGtkAttachListModelPriv
 {
 	GtkIconTheme *theme;
 };

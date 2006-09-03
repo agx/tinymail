@@ -9,7 +9,7 @@ headers
 #include <glib-object.h>
 
 #include <tny-gtk-account-tree-model.h>
-#include <tny-attach-list-model.h>
+#include <tny-gtk-attach-list-model.h>
 #include <tny-gtk-header-list-model.h>
 #include <tny-gtk-header-view.h>
 #include <tny-gtk-msg-view.h>

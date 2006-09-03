@@ -32,7 +32,7 @@
 #include <gtk/gtk.h>
 #include <tny-gtk-save-strategy.h>
 #include <tny-gtk-text-buffer-stream.h>
-#include <tny-attach-list-model.h>
+#include <tny-gtk-attach-list-model.h>
 
 #include <tny-mime-part-iface.h>
 
