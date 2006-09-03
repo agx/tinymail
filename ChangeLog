@@ -4,6 +4,7 @@
 	* Renamed TnyTextBufferStream to TnyGtkTextBufferStream
 	* Bugfix in TnyMozEmbedMsgView and TnyGtkMsgView
 	* Renamed TnyAccountTreeModel to TnyGtkAccountTreeModel
+	* Renamed TnyHeaderListModel to TnyGtkHeaderListModel
 
 	* This was a major API change in libtinymailui-gtk
 

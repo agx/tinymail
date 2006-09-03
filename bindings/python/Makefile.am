@@ -104,7 +104,7 @@ tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/fil
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-tree-model.h	\
 	$(top_srcdir)/libtinymailui-gtk/tny-attach-list-model.h		\
-	$(top_srcdir)/libtinymailui-gtk/tny-header-list-model.h		\
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-list-model.h	\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-view.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-view.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h		\

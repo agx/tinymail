@@ -19,19 +19,19 @@
 
 #include <config.h>
 
-#include <tny-header-list-model.h>
+#include <tny-gtk-header-list-model.h>
 
 static GObjectClass *parent_class = NULL;
 
-#include "tny-header-list-iterator-priv.h"
-#include "tny-header-list-model-priv.h"
+#include "tny-gtk-header-list-iterator-priv.h"
+#include "tny-gtk-header-list-model-priv.h"
 
-GType _tny_header_list_iterator_get_type (void);
+GType _tny_gtk_header_list_iterator_get_type (void);
 
 
 
 void 
-_tny_header_list_iterator_set_model (TnyHeaderListIterator *self, TnyHeaderListModel *model, gboolean lock)
+_tny_gtk_header_list_iterator_set_model (TnyGtkHeaderListIterator *self, TnyGtkHeaderListModel *model, gboolean lock)
 {
 	self->model = model;
 
@@ -55,20 +55,20 @@ _tny_header_list_iterator_set_model (TnyHeaderListIterator *self, TnyHeaderListM
 
 
 
-TnyHeaderListIterator*
-_tny_header_list_iterator_new (TnyHeaderListModel *model, gboolean lock)
+TnyIteratorIface*
+_tny_gtk_header_list_iterator_new (TnyGtkHeaderListModel *model, gboolean lock)
 {
-	TnyHeaderListIterator *self = g_object_new (TNY_TYPE_HEADER_LIST_ITERATOR, NULL);
+	TnyGtkHeaderListIterator *self = g_object_new (TNY_TYPE_GTK_HEADER_LIST_ITERATOR, NULL);
 
-	_tny_header_list_iterator_set_model (self, model, lock);
+	_tny_gtk_header_list_iterator_set_model (self, model, lock);
 
-	return self;
+	return TNY_ITERATOR_IFACE (self);
 }
 
 static void
-tny_header_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gtk_header_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyHeaderListIterator *self = (TnyHeaderListIterator *)instance;
+	TnyGtkHeaderListIterator *self = (TnyGtkHeaderListIterator *)instance;
 
 	self->model = NULL;
 	self->current = NULL;
@@ -77,7 +77,7 @@ tny_header_list_iterator_instance_init (GTypeInstance *instance, gpointer g_clas
 }
 
 static void
-tny_header_list_iterator_finalize (GObject *object)
+tny_gtk_header_list_iterator_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -86,7 +86,7 @@ tny_header_list_iterator_finalize (GObject *object)
 
 
 void 
-_tny_header_list_iterator_next_nl (TnyHeaderListIterator *me)
+_tny_gtk_header_list_iterator_next_nl (TnyGtkHeaderListIterator *me)
 {
 	me->current = me->current?g_list_next (me->current):NULL;
 
@@ -94,9 +94,9 @@ _tny_header_list_iterator_next_nl (TnyHeaderListIterator *me)
 }
 
 static void 
-tny_header_list_iterator_next (TnyIteratorIface *self)
+tny_gtk_header_list_iterator_next (TnyIteratorIface *self)
 {
-	TnyHeaderListIterator *me = (TnyHeaderListIterator*) self;
+	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -111,7 +111,7 @@ tny_header_list_iterator_next (TnyIteratorIface *self)
 }
 
 void
-_tny_header_list_iterator_prev_nl (TnyHeaderListIterator *me)
+_tny_gtk_header_list_iterator_prev_nl (TnyGtkHeaderListIterator *me)
 {
 	me->current = me->current?g_list_previous (me->current):NULL;
 
@@ -119,9 +119,9 @@ _tny_header_list_iterator_prev_nl (TnyHeaderListIterator *me)
 }
 
 static void
-tny_header_list_iterator_prev (TnyIteratorIface *self)
+tny_gtk_header_list_iterator_prev (TnyIteratorIface *self)
 {
-	TnyHeaderListIterator *me = (TnyHeaderListIterator*) self;
+	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -136,7 +136,7 @@ tny_header_list_iterator_prev (TnyIteratorIface *self)
 }
 
 gboolean 
-_tny_header_list_iterator_is_done_nl (TnyHeaderListIterator *me)
+_tny_gtk_header_list_iterator_is_done_nl (TnyGtkHeaderListIterator *me)
 {
 	if (G_UNLIKELY (!me  || !me->model))
 		return TRUE;
@@ -145,9 +145,9 @@ _tny_header_list_iterator_is_done_nl (TnyHeaderListIterator *me)
 }
 
 static gboolean 
-tny_header_list_iterator_is_done (TnyIteratorIface *self)
+tny_gtk_header_list_iterator_is_done (TnyIteratorIface *self)
 {
-	TnyHeaderListIterator *me = (TnyHeaderListIterator*) self;
+	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 	gboolean retval = FALSE;
 	
 	g_mutex_lock (me->model->iterator_lock);
@@ -163,7 +163,7 @@ tny_header_list_iterator_is_done (TnyIteratorIface *self)
 
 
 void
-_tny_header_list_iterator_first_nl (TnyHeaderListIterator *me)
+_tny_gtk_header_list_iterator_first_nl (TnyGtkHeaderListIterator *me)
 {
 	me->current = me->model?me->model->first:NULL;
 
@@ -171,9 +171,9 @@ _tny_header_list_iterator_first_nl (TnyHeaderListIterator *me)
 }
 
 static void
-tny_header_list_iterator_first (TnyIteratorIface *self)
+tny_gtk_header_list_iterator_first (TnyIteratorIface *self)
 {
-	TnyHeaderListIterator *me = (TnyHeaderListIterator*) self;
+	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -191,7 +191,7 @@ tny_header_list_iterator_first (TnyIteratorIface *self)
 
 
 void
-_tny_header_list_iterator_nth_nl (TnyHeaderListIterator *me, guint nth)
+_tny_gtk_header_list_iterator_nth_nl (TnyGtkHeaderListIterator *me, guint nth)
 {
 	me->current = me->model?g_list_nth (me->model->first, nth):NULL;
 
@@ -199,9 +199,9 @@ _tny_header_list_iterator_nth_nl (TnyHeaderListIterator *me, guint nth)
 }
 
 static void 
-tny_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
+tny_gtk_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
-	TnyHeaderListIterator *me = (TnyHeaderListIterator*) self;
+	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -219,15 +219,15 @@ tny_header_list_iterator_nth (TnyIteratorIface *self, guint nth)
 
 /* exception: don't ref */
 gpointer 
-_tny_header_list_iterator_current_nl (TnyHeaderListIterator *me)
+_tny_gtk_header_list_iterator_current_nl (TnyGtkHeaderListIterator *me)
 {
 	return me->current?me->current->data:NULL;
 }
 
 static GObject* 
-tny_header_list_iterator_current (TnyIteratorIface *self)
+tny_gtk_header_list_iterator_current (TnyIteratorIface *self)
 {
-	TnyHeaderListIterator *me = (TnyHeaderListIterator*) self;
+	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 	gpointer retval;
 
 	if (G_UNLIKELY (!me || !me->model))
@@ -246,9 +246,9 @@ tny_header_list_iterator_current (TnyIteratorIface *self)
 
 
 static TnyListIface* 
-tny_header_list_iterator_get_list (TnyIteratorIface *self)
+tny_gtk_header_list_iterator_get_list (TnyIteratorIface *self)
 {
-	TnyHeaderListIterator *me = (TnyHeaderListIterator*) self;
+	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 
 	/* Return the list */
 
@@ -264,32 +264,32 @@ static void
 tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 {
 
-	klass->next_func = tny_header_list_iterator_next;
-	klass->prev_func = tny_header_list_iterator_prev;
-	klass->first_func = tny_header_list_iterator_first;
-	klass->nth_func = tny_header_list_iterator_nth;
-	klass->current_func = tny_header_list_iterator_current;
-	klass->get_list_func = tny_header_list_iterator_get_list;
-	klass->is_done = tny_header_list_iterator_is_done;
+	klass->next_func = tny_gtk_header_list_iterator_next;
+	klass->prev_func = tny_gtk_header_list_iterator_prev;
+	klass->first_func = tny_gtk_header_list_iterator_first;
+	klass->nth_func = tny_gtk_header_list_iterator_nth;
+	klass->current_func = tny_gtk_header_list_iterator_current;
+	klass->get_list_func = tny_gtk_header_list_iterator_get_list;
+	klass->is_done = tny_gtk_header_list_iterator_is_done;
 	
 	return;
 }
 
 static void 
-tny_header_list_iterator_class_init (TnyHeaderListIteratorClass *klass)
+tny_gtk_header_list_iterator_class_init (TnyGtkHeaderListIteratorClass *klass)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	object_class->finalize = tny_header_list_iterator_finalize;
+	object_class->finalize = tny_gtk_header_list_iterator_finalize;
 
 	return;
 }
 
 GType 
-_tny_header_list_iterator_get_type (void)
+_tny_gtk_header_list_iterator_get_type (void)
 {
 	static GType type = 0;
 
@@ -297,15 +297,15 @@ _tny_header_list_iterator_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyHeaderListIteratorClass),
+		  sizeof (TnyGtkHeaderListIteratorClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_header_list_iterator_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gtk_header_list_iterator_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyHeaderListIterator),
+		  sizeof (TnyGtkHeaderListIterator),
 		  0,      /* n_preallocs */
-		  tny_header_list_iterator_instance_init,    /* instance_init */
+		  tny_gtk_header_list_iterator_instance_init,    /* instance_init */
 		  NULL
 		};
 
@@ -317,7 +317,7 @@ _tny_header_list_iterator_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyHeaderListIterator",
+			"TnyGtkHeaderListIterator",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ITERATOR_IFACE, 

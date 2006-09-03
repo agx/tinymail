@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyHeaderListModel
+TnyGtkHeaderListModel
 
 <!-- ##### SECTION Short_Description ##### -->
 A #GtkTreeModel suitable for storing #TnyHeaderIface instances
@@ -31,28 +31,20 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_HEADER_LIST_MODEL_COLUMN ##### -->
+<!-- ##### MACRO TNY_TYPE_GTK_HEADER_LIST_MODEL_COLUMN ##### -->
 <para>
 
 </para>
 
 
 
-<!-- ##### STRUCT TnyHeaderListModel ##### -->
+<!-- ##### STRUCT TnyGtkHeaderListModel ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_header_list_model_column_get_type ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_header_list_model_new ##### -->
+<!-- ##### FUNCTION tny_gtk_header_list_model_column_get_type ##### -->
 <para>
 
 </para>
@@ -60,7 +52,15 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_list_model_set_folder ##### -->
+<!-- ##### FUNCTION tny_gtk_header_list_model_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_gtk_header_list_model_set_folder ##### -->
 <para>
 
 </para>
@@ -70,7 +70,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 @refresh: 
 
 
-<!-- ##### FUNCTION tny_header_list_model_received_date_sort_func ##### -->
+<!-- ##### FUNCTION tny_gtk_header_list_model_received_date_sort_func ##### -->
 <para>
 
 </para>
@@ -82,7 +82,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_list_model_sent_date_sort_func ##### -->
+<!-- ##### FUNCTION tny_gtk_header_list_model_sent_date_sort_func ##### -->
 <para>
 
 </para>

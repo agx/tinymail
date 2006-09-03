@@ -40,7 +40,7 @@
 #include <tny-folder-iface.h>
 #include <tny-gtk-account-tree-model.h>
 #include <tny-header-iface.h>
-#include <tny-header-list-model.h>
+#include <tny-gtk-header-list-model.h>
 #include <tny-summary-view.h>
 #include <tny-summary-view-iface.h>
 #include <tny-account-store-view-iface.h>
@@ -249,7 +249,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 			TnyHeaderIface *header;
 
 			gtk_tree_model_get (model, &iter, 
-				TNY_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+				TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 				&header, -1);
 
 			if (G_LIKELY (header))
@@ -311,7 +311,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 		TnyHeaderIface *header;
 
 		gtk_tree_model_get (model, &iter, 
-			TNY_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+			TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 			&header, -1);
 	    
 		if (G_LIKELY (header))
@@ -364,24 +364,24 @@ refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer use
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
 		GtkTreeModel *sortable; // *oldsortable;
 		GtkTreeModel *select_model;
-		TnyHeaderListModel *model = tny_header_list_model_new ();
+		GtkTreeModel *model = tny_gtk_header_list_model_new ();
 		gboolean refresh = FALSE;
 
 #ifndef ASYNC_HEADERS
 		refresh = TRUE;
 #endif
 
-		tny_header_list_model_set_folder (model, folder, refresh);
+		tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (model), folder, refresh);
 		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
 
 		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
-			TNY_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
-			tny_header_list_model_received_date_sort_func, 
+			TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
+			tny_gtk_header_list_model_received_date_sort_func, 
 			NULL, NULL);
 
 		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
-			TNY_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
-			tny_header_list_model_sent_date_sort_func, 
+			TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
+			tny_gtk_header_list_model_sent_date_sort_func, 
 			NULL, NULL);
 
 		set_header_view_model (header_view, sortable); 		
@@ -485,7 +485,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		TnyMsgWindowIface *msgwin;
 
 		gtk_tree_model_get (model, &iter, 
-			TNY_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+			TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 			&header, -1);
 		
 		if (G_LIKELY (header))
@@ -654,8 +654,8 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	/* header_view columns */
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes (_("From"), renderer,
-		"text", TNY_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_HEADER_LIST_MODEL_FROM_COLUMN);			  
+		"text", TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 100);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
@@ -664,8 +664,8 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	{ /* Unlikely ;-) */
 		renderer = gtk_cell_renderer_text_new ();
 		column = gtk_tree_view_column_new_with_attributes (_("To"), renderer,
-			"text", TNY_HEADER_LIST_MODEL_TO_COLUMN, NULL);
-		gtk_tree_view_column_set_sort_column_id (column, TNY_HEADER_LIST_MODEL_TO_COLUMN);			  
+			"text", TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN, NULL);
+		gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN);			  
 		gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 		gtk_tree_view_column_set_fixed_width (column, 100);
 		gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
@@ -673,8 +673,8 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes (_("Subject"), renderer,
-		"text", TNY_HEADER_LIST_MODEL_SUBJECT_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_HEADER_LIST_MODEL_SUBJECT_COLUMN);			  
+		"text", TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN);			  
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
@@ -682,8 +682,8 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes (_("Date"), renderer,
-		"text", TNY_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN);
+		"text", TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN);
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 100);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
