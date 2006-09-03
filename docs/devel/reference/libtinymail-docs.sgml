@@ -42,14 +42,14 @@
 
 <!ENTITY libtinymail-gnomevfs-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
 
-<!ENTITY libtinymailui-gtk-TnyAccountTreeModel SYSTEM "xml/tny-account-tree-model.xml">
-<!ENTITY libtinymailui-gtk-TnyAttachListModel SYSTEM "xml/tny-attach-list-model.xml">
-<!ENTITY libtinymailui-gtk-TnyHeaderListModel SYSTEM "xml/tny-header-list-model.xml">
-<!ENTITY libtinymailui-gtk-TnyTextBufferStream SYSTEM "xml/tny-text-buffer-stream.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkAccountTreeModel SYSTEM "xml/tny-gtk-account-tree-model.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkAttachListModel SYSTEM "xml/tny-gtk-attach-list-model.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkHeaderListModel SYSTEM "xml/tny-gtk-header-list-model.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkTextBufferStream SYSTEM "xml/tny-gtk-text-buffer-stream.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkMsgView SYSTEM "xml/tny-gtk-msg-view.xml">
-<!ENTITY libtinymailui-gtk-TnyHeaderView SYSTEM "xml/tny-header-view.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkHeaderView SYSTEM "xml/tny-gtk-header-view.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkMsgWindow SYSTEM "xml/tny-gtk-msg-window.xml">
-<!ENTITY libtinymailui-gtk-TnySaveStrategy SYSTEM "xml/tny-save-strategy.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkSaveStrategy SYSTEM "xml/tny-gtk-save-strategy.xml">
 
 <!ENTITY libtinymailui-TnyMsgWindowIface SYSTEM "xml/tny-msg-window-iface.xml">
 <!ENTITY libtinymailui-TnyMsgViewIface SYSTEM "xml/tny-msg-view-iface.xml">
@@ -133,12 +133,12 @@
 	<title>libtinymailui-gtk</title>
 		&libtinymailui-gtk-TnyGtkMsgView;
 		&libtinymailui-gtk-TnyGtkMsgWindow;
-		&libtinymailui-gtk-TnyHeaderView;
-		&libtinymailui-gtk-TnyAccountTreeModel;
-		&libtinymailui-gtk-TnyHeaderListModel;
-		&libtinymailui-gtk-TnyAttachListModel;
-		&libtinymailui-gtk-TnyTextBufferStream;
-		&libtinymailui-gtk-TnySaveStrategy;
+		&libtinymailui-gtk-TnyGtkHeaderView;
+		&libtinymailui-gtk-TnyGtkAccountTreeModel;
+		&libtinymailui-gtk-TnyGtkHeaderListModel;
+		&libtinymailui-gtk-TnyGtkAttachListModel;
+		&libtinymailui-gtk-TnyGtkTextBufferStream;
+		&libtinymailui-gtk-TnyGtkSaveStrategy;
 	</chapter>
 
         <chapter id="libtinymail-gnomevfs">
