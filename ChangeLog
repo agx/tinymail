@@ -2,7 +2,7 @@
 
 	* Renamed TnySaveStrategy to TnyGtkSaveStrategy
 	* Renamed TnyTextBufferStream to TnyGtkTextBufferStream
-	* Bugfix in TnyMozEmbedMsgView and TnyMsgView
+	* Bugfix in TnyMozEmbedMsgView and TnyGtkMsgView
 	
 	* This was a major API change in libtinymailui-gtk
 
