@@ -277,6 +277,13 @@ TnyTransportAccount
 @prompt: 
 @Returns: 
 
+<!-- ##### MACRO TNY_ATTACH_LIST_MODEL ##### -->
+<para>
+
+</para>
+
+@obj: 
+
 <!-- ##### MACRO TNY_CAMEL_STREAM ##### -->
 <para>
 
@@ -304,6 +311,13 @@ TnyTransportAccount
 </para>
 
 @o: 
+
+<!-- ##### MACRO TNY_GTK_ACCOUNT_TREE_MODEL ##### -->
+<para>
+
+</para>
+
+@obj: 
 
 <!-- ##### MACRO TNY_IS_MSG_PROXY_FOLDER ##### -->
 <para>
@@ -338,6 +352,12 @@ TnyTransportAccount
 </para>
 
 @o: 
+
+<!-- ##### MACRO TNY_TYPE_ATTACH_LIST_MODEL_COLUMN ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### MACRO TNY_TYPE_CAMEL_STREAM ##### -->
 <para>
@@ -375,6 +395,30 @@ TnyTransportAccount
 </para>
 
 @parent_class: 
+
+<!-- ##### STRUCT TnyAccountTreeModelIterator ##### -->
+<para>
+
+</para>
+
+@parent: 
+@model: 
+@current: 
+
+<!-- ##### STRUCT TnyAttachListModel ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyAttachListModelIterator ##### -->
+<para>
+
+</para>
+
+@parent: 
+@model: 
+@current: 
 
 <!-- ##### SIGNAL TnyDeviceIface::connection-changed ##### -->
 <para>
@@ -494,6 +538,15 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 @parent_class: 
+
+<!-- ##### STRUCT TnyHeaderListIterator ##### -->
+<para>
+
+</para>
+
+@parent: 
+@model: 
+@current: 
 
 <!-- ##### STRUCT TnyMimePart ##### -->
 <para>
@@ -656,6 +709,12 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 
+<!-- ##### STRUCT TnySaveStrategy ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyStoreAccount ##### -->
 <para>
 
@@ -804,6 +863,20 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @part: 
 
+<!-- ##### FUNCTION tny_attach_list_model_column_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_attach_list_model_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 <!-- ##### FUNCTION tny_camel_stream_get_type ##### -->
 <para>
 
@@ -888,6 +961,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @self: 
 @camel_folder: 
+
+<!-- ##### FUNCTION tny_gtk_text_buffer_stream_set_text_buffer ##### -->
+<para>
+
+</para>
+
+@self: 
+@buffer: 
 
 <!-- ##### FUNCTION tny_header_iface_set_folder ##### -->
 <para>

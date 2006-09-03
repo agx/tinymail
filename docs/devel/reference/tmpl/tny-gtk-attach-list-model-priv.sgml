@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-msg-header-list-iterator-priv
+tny-gtk-attach-list-model-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,20 +9,20 @@ tny-msg-header-list-iterator-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyGtkHeaderListIterator ##### -->
+<!-- ##### STRUCT TnyGtkAttachListModelPriv ##### -->
 <para>
 
 </para>
 
-@parent: 
-@model: 
-@current: 
+@theme: 
 

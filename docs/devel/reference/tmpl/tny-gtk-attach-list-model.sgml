@@ -31,7 +31,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_ATTACH_LIST_MODEL ##### -->
+<!-- ##### MACRO TNY_GTK_ATTACH_LIST_MODEL ##### -->
 <para>
 
 </para>
@@ -39,20 +39,20 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 @obj: 
 
 
-<!-- ##### MACRO TNY_TYPE_ATTACH_LIST_MODEL_COLUMN ##### -->
+<!-- ##### MACRO TNY_TYPE_GTK_ATTACH_LIST_MODEL_COLUMN ##### -->
 <para>
 
 </para>
 
 
 
-<!-- ##### STRUCT TnyAttachListModel ##### -->
+<!-- ##### STRUCT TnyGtkAttachListModel ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_attach_list_model_column_get_type ##### -->
+<!-- ##### FUNCTION tny_gtk_attach_list_model_column_get_type ##### -->
 <para>
 
 </para>
@@ -60,7 +60,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_attach_list_model_new ##### -->
+<!-- ##### FUNCTION tny_gtk_attach_list_model_new ##### -->
 <para>
 
 </para>

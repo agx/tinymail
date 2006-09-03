@@ -17,7 +17,7 @@ TnyAttachListModelIterator
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyAttachListModelIterator ##### -->
+<!-- ##### STRUCT TnyGtkAttachListModelIterator ##### -->
 <para>
 
 </para>

@@ -32,7 +32,7 @@ A #TnyStreamIface implementation that adapts a #GtkTextBuffer.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_gtk_text_buffer_stream_set_text_buffer ##### -->
+<!-- ##### FUNCTION tny_gtk_text_buffer_stream_set_gtk_text_buffer ##### -->
 <para>
 
 </para>
