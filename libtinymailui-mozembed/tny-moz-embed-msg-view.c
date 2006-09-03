@@ -432,11 +432,7 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->save_strategy));
 	priv->save_strategy = NULL;
     
-	if (G_LIKELY (priv->headerview))
-	{
-	     	tny_header_view_iface_clear (priv->headerview);
-		/* g_object_unref (G_OBJECT (priv->headerview)); */
-	}
+	/* priv->headerview will be destroyed as a GtkObject */
     
 	(*parent_class->finalize) (object);
 

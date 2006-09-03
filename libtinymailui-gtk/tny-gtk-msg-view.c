@@ -382,6 +382,8 @@ tny_gtk_msg_view_finalize (GObject *object)
 	if (G_LIKELY (priv->save_strategy))
 		g_object_unref (G_OBJECT (priv->save_strategy));
 
+    	/* priv->headerview will be destroyed as a GtkObject */
+    
 	(*parent_class->finalize) (object);
 
 	return;
