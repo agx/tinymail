@@ -62,12 +62,17 @@ static TnyMsgViewIface*
 tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
 {
 	TnySaveStrategyIface *save_strategy = tny_gtk_save_strategy_new ();
-
+	TnyMsgViewIface *retval;
+    
 #ifdef MOZEMBED
-	return tny_moz_embed_msg_view_new (save_strategy);
+	retval = tny_moz_embed_msg_view_new (save_strategy);
 #else
-	return tny_gtk_msg_view_new (save_strategy);
+	retval = tny_gtk_msg_view_new (save_strategy);
 #endif
+
+	g_object_unref (G_OBJECT (save_strategy));
+
+	return retval;
 }
 
 /**

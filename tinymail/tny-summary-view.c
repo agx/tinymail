@@ -26,11 +26,18 @@
 #include <gdk/gdkkeysyms.h>
 
 #include <tny-platform-factory-iface.h>
-#include <tny-platform-factory.h>
 
+#if PLATFORM==gpe
+#include <tny-gpe-platform-factory.h>
+#include <tny-gpe-password-dialog.h>
+#include <tny-gpe-account-store.h>
+#else
+#include <tny-platform-factory.h>
 #include <tny-password-dialog.h>
-#include <tny-account-store-iface.h>
 #include <tny-account-store.h>
+#endif
+
+#include <tny-account-store-iface.h>
 #include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
@@ -493,9 +500,11 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			TnyFolderIface *folder;
 			TnyMsgIface *msg;
 			TnyPlatformFactoryIface *platfact;
-
-			platfact = TNY_PLATFORM_FACTORY_IFACE 
-				(tny_platform_factory_get_instance ());
+#if PLATFORM==gpe
+			platfact = tny_gpe_platform_factory_get_instance ();
+#else
+			platfact = tny_platform_factory_get_instance ();
+#endif
 
 			folder = tny_header_iface_get_folder (TNY_HEADER_IFACE (header));
 
@@ -533,12 +542,12 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
  *
  * Return value: A new #TnySummaryViewIface instance implemented for Gtk+
  **/
-TnySummaryView*
+TnySummaryViewIface*
 tny_summary_view_new (void)
 {
 	TnySummaryView *self = g_object_new (TNY_TYPE_SUMMARY_VIEW, NULL);
 
-	return self;
+	return TNY_SUMMARY_VIEW_IFACE (self);
 }
 
 static void
@@ -567,8 +576,11 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
 		G_CALLBACK (online_button_toggled), self);
 
-	platfact = TNY_PLATFORM_FACTORY_IFACE 
-			(tny_platform_factory_get_instance ());
+#if PLATFORM==gpe
+	platfact = tny_gpe_platform_factory_get_instance ();
+#else
+	platfact = tny_platform_factory_get_instance ();
+#endif
 
 	hpaned1 = gtk_hpaned_new ();
 	gtk_widget_show (hpaned1);

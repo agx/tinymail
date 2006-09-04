@@ -28,8 +28,7 @@ static gchar *str;
 static void
 tny_device_iface_test_setup (void)
 {
-
-	iface = TNY_DEVICE_IFACE (tny_device_new ());
+	iface = tny_test_device_new ();
 
 	return;
 }

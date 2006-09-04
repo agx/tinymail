@@ -52,6 +52,7 @@ AC_PROG_LIBTOOL
 
 dnl ### default values (will get overwritten)
 build_gnome=true
+build_demoui=true
 build_mozembed=true
 build_gtkhtml=false
 build_doxygen=false
@@ -61,13 +62,19 @@ dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
 [  --with-platform=gnome-desktop                platform to compile [gnome-desktop]],
 [case "${with_platform}" in
-  gnome-desktop) PLATFORMDIR=libtinymail-gnome-desktop ;;
+  gnome-desktop) 
+	PLATFORMDIR=libtinymail-gnome-desktop 
+	build_demoui=true
+	PLATFORM="gnome"
+	;;
   olpc)
         PLATFORMDIR=libtinymail-olpc
         build_gtkhtml=false
         build_mozembed=false
         build_gnome=false
         with_html_component=none
+	build_demoui=true
+	PLATFORM="olpc"
         ;;
   maemo)
         PLATFORMDIR=libtinymail-maemo
@@ -75,13 +82,33 @@ AC_ARG_WITH(platform,
         build_mozembed=false
         build_gnome=false
         with_html_component=none
+	build_demoui=true
+	PLATFORM="maemo"
         ;;
-  gpe) PLATFORMDIR=libtinymail-gpe ;;
-  *) PLATFORMDIR=${with_platform}
+  gpe) 
+	PLATFORMDIR=libtinymail-gpe 
+	build_demoui=true
+	PLATFORM="gpe"
+	;;
+  *) 
+	PLATFORMDIR=${with_platform}
+	build_demoui=false
+	PLATFORM="unknown"
 esac], [PLATFORMDIR=libtinymail-gnome-desktop
         with_platform=gnome-desktop])
-AC_SUBST(PLATFORMDIR)
 
+AC_SUBST(PLATFORMDIR)
+AC_SUBST(PLATFORM)
+
+dnl ### Enable demoui ##
+AC_ARG_ENABLE(demoui,
+[  --enable-demoui               build the demo user interface [default=$build_demoui]],
+[case "${enableval}" in
+  yes) build_demoui=true ;;
+  no)  build_demoui=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-demoui) ;;
+esac],[build_demoui=$build_demoui])
+AM_CONDITIONAL(BUILD_DEMOUI, test x$build_demoui = xtrue)
 
 dnl ### Enable gnome features ##
 AC_ARG_ENABLE(gnome,

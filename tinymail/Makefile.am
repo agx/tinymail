@@ -5,7 +5,8 @@ INCLUDES = -I. -I$(top_srcdir)				\
 	-I$(top_srcdir)/libtinymailui-gtk		\
 	-I$(top_srcdir)/libtinymail-camel		\
 	-I$(top_srcdir)/$(PLATFORMDIR)			\
-	-DASYNC_HEADERS
+	-DASYNC_HEADERS					\
+	-DPLATFORM=$(PLATFORM)
 
 if BUILD_GNOME
 INCLUDES += -DGNOME

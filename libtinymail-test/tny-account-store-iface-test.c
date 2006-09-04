@@ -25,14 +25,13 @@
 
 static TnyAccountStoreIface *iface = NULL;
 static TnyPlatformFactoryIface *platfact = NULL;
-//static gchar *str;
 
 static void
 tny_account_store_iface_test_setup (void)
 {
 	/* platfact is a singleton */
-	platfact = TNY_PLATFORM_FACTORY_IFACE (tny_platform_factory_get_instance ());
-
+    
+	platfact = tny_test_platform_factory_get_instance ();
 	iface = tny_platform_factory_iface_new_account_store (platfact);
 
 	return;

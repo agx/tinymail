@@ -22,7 +22,13 @@
 
 #include <tny-account-store-view-iface.h>
 #include <tny-platform-factory-iface.h>
+
+#if PLATFORM==gpe
+#include <tny-gpe-platform-factory.h>
+#else
 #include <tny-platform-factory.h>
+#endif
+
 #include <tny-summary-view.h>
 
 #ifdef GNOME
@@ -85,9 +91,12 @@ main (int argc, char **argv)
 
 	bindtextdomain(GETTEXT_PACKAGE, TNY_LOCALE_DIR);
 
-	platfact = TNY_PLATFORM_FACTORY_IFACE 
-			(tny_platform_factory_get_instance ());
-
+#if PLATFORM==gpe
+	platfact = tny_gpe_platform_factory_get_instance ();
+#else
+	platfact = tny_platform_factory_get_instance ();    
+#endif
+    
 	view = GTK_WIDGET (tny_summary_view_new ());
 
 	if (plug > 0) {

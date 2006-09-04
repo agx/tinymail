@@ -10,23 +10,23 @@ INCLUDES = -I. -I$(top_srcdir)			    \
 
 lib_LTLIBRARIES = libtinymail-gpe-1.0.la
 
-libtinymail_gpe_1_0_headers = 	 		 \
-	tny-account-store.h			 \
-	tny-password-dialog.h			 \
-	tny-device.h				 \
-	tny-platform-factory.h
+libtinymail_gpe_1_0_headers = 	 	\
+	tny-gpe-account-store.h		\
+	tny-gpe-password-dialog.h	\
+	tny-gpe-device.h		\
+	tny-gpe-platform-factory.h
 
-libtinymail_gpe_1_0_la_SOURCES = 	 	 \
-	$(libtinymail_gpe_1_0_headers) 	 \
-	tny-account-store.c			 \
-	tny-device-priv.h			 \
-	tny-device.c				 \
-	tny-password-dialog.c			 \
-	tny-platform-factory.c
+libtinymail_gpe_1_0_la_SOURCES = 	\
+	$(libtinymail_gpe_1_0_headers)	\
+	tny-gpe-account-store.c		\
+	tny-gpe-device-priv.h		\
+	tny-gpe-device.c		\
+	tny-gpe-password-dialog.c	\
+	tny-gpe-platform-factory.c
 
-libtinymail_gpe_1_0_la_LIBADD = 	\
+libtinymail_gpe_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_GPE_LIBS)	\
-	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la     \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
 
@@ -44,3 +44,4 @@ pkgconfig_DATA = libtinymail-gpe-$(API_VERSION).pc
 EXTRA_DIST = $(pkgconfig_DATA:-$(API_VERSION).pc=.pc.in)
 
 DISTCLEANFILES = $(pkgconfig_DATA)
+

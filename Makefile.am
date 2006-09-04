@@ -13,7 +13,13 @@ if BUILD_MOZEMBED
 SUBDIRS += libtinymailui-mozembed 
 endif
 
-SUBDIRS += $(PLATFORMDIR) libtinymail-camel tinymail docs bindings po tests 
+SUBDIRS += $(PLATFORMDIR) libtinymail-camel 
+
+if BUILD_DEMOUI
+SUBDIRS += tinymail 
+endif
+
+SUBDIRS += docs bindings po tests 
 
 if BUILD_UNITTESTS
 SUBDIRS += libtinymail-test 

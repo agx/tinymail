@@ -1,4 +1,12 @@
-2006-09004  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Renamed the GPE types in libtinymail-gpe
+	* Made compilation of the demo-ui optional
+	* Added some ifdefs to the demo-ui
+
+	* This was a major API change in libtinymail-gpe
+
+2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 	
 	* Renamed TnyDevice of libtestshared to TnyTestDevice
 	* Renamed TnyPlatformFactory of libtestshared to

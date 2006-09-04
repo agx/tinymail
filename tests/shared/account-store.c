@@ -157,8 +157,7 @@ static void
 tny_test_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyTestAccountStore *self = (TnyTestAccountStore *)instance;
-	TnyPlatformFactoryIface *platfact = TNY_PLATFORM_FACTORY_IFACE (
-		tny_platform_factory_get_instance ());
+	TnyPlatformFactoryIface *platfact = tny_test_platform_factory_get_instance ();
 
 	self->device = tny_platform_factory_iface_new_device (platfact);
 	

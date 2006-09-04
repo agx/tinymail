@@ -1,5 +1,5 @@
-#ifndef TNY_DEVICE_H
-#define TNY_DEVICE_H
+#ifndef TNY_GPE_DEVICE_H
+#define TNY_GPE_DEVICE_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -27,31 +27,31 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_DEVICE             (tny_device_get_type ())
-#define TNY_DEVICE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_DEVICE, TnyDevice))
-#define TNY_DEVICE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_DEVICE, TnyDeviceClass))
-#define TNY_IS_DEVICE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_DEVICE))
-#define TNY_IS_DEVICE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_DEVICE))
-#define TNY_DEVICE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_DEVICE, TnyDeviceClass))
+#define TNY_TYPE_GPE_DEVICE             (tny_gpe_device_get_type ())
+#define TNY_GPE_DEVICE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_GPE_DEVICE, TnyGpeDevice))
+#define TNY_GPE_DEVICE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GPE_DEVICE, TnyGpeDeviceClass))
+#define TNY_IS_GPE_DEVICE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GPE_DEVICE))
+#define TNY_IS_GPE_DEVICE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GPE_DEVICE))
+#define TNY_GPE_DEVICE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_GPE_DEVICE, TnyGpeDeviceClass))
 
 /* This is an abstract type */
 
-typedef struct _TnyDevice TnyDevice;
-typedef struct _TnyDeviceClass TnyDeviceClass;
+typedef struct _TnyGpeDevice TnyGpeDevice;
+typedef struct _TnyGpeDeviceClass TnyGpeDeviceClass;
 
-struct _TnyDevice
+struct _TnyGpeDevice
 {
 	GObject parent;
 };
 
-struct _TnyDeviceClass 
+struct _TnyGpeDeviceClass 
 {
 	GObjectClass parent;
 };
 
-GType tny_device_get_type (void);
+GType tny_gpe_device_get_type (void);
 
-TnyDevice* tny_device_new (void);
+TnyDeviceIface* tny_gpe_device_new (void);
 
 G_END_DECLS
 

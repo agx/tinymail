@@ -56,9 +56,12 @@ tny_platform_factory_new_device (TnyPlatformFactoryIface *self)
 static TnyMsgViewIface*
 tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
 {
-	TnySaveStrategyIface *save_strategy = 
-		TNY_SAVE_STRATEGY_IFACE (tny_save_strategy_new ());
-	return tny_gtk_msg_view_new (save_strategy);
+	TnySaveStrategyIface *save_strategy = tny_gtk_save_strategy_new ();
+	TnyMsgViewIface *retval = tny_gtk_msg_view_new (save_strategy);
+    
+	g_object_unref (G_OBJECT (save_strategy));
+    
+	return retval;
 }
 
 /**

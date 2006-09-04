@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 #include <glib-object.h>
 #include <tny-shared.h>
+#include <tny-summary-view-iface.h>
 
 G_BEGIN_DECLS
 
@@ -46,8 +47,8 @@ struct _TnySummaryViewClass
 	GtkVBoxClass parent_class;
 };
 
-GType               tny_summary_view_get_type          (void);
-TnySummaryView*   tny_summary_view_new               (void);
+GType tny_summary_view_get_type (void);
+TnySummaryViewIface* tny_summary_view_new (void);
 
 
 G_END_DECLS
