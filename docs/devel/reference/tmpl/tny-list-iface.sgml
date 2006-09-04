@@ -2,17 +2,19 @@
 TnyListIface
 
 <!-- ##### SECTION Short_Description ##### -->
-A list type
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-An iteratable list type
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyIteratorIface, #TnyMsgHeaderListModel
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

@@ -2,24 +2,19 @@
 TnyGtkMsgWindow
 
 <!-- ##### SECTION Short_Description ##### -->
-A implementation of #TnyMsgWindowIface for Gtk+
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type that decorates the #TnyMsgViewIface and is implemented as a GtkWindow. It
-wraps the #TnyMsgViewIface instance with a window. It expects the view implementation
-to inherit from GtkWidget. Therefore it's soft coupled with implementations like
-#TnyMsgView for Gtk+ and #TnyMozEmbedMsgView which is also implemented by inheriting
-from a #GtkWidget descendant, but uses a #GtkMozEmbed HTML component.
-</para><para>
-You cannot use #TnyMsgViewIface implementations that don't inherit from a #GtkWidget
-type with this type.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgViewIface, #TnyMsgView, #TnyMozEmbedMsgView, #GtkWindow, #GtkWidget
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

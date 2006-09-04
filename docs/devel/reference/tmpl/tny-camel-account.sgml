@@ -2,17 +2,19 @@
 TnyCamelAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-A account type implemented for Camel
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A account type implemented for Camel
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccountIface
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

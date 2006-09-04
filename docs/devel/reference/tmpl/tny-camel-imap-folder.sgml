@@ -2,17 +2,19 @@
 TnyCamelIMAPFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-A IMAP #TnyFolderIface implementation for Camel
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A IMAP #TnyFolderIface implementation for Camel
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderIface, #TnyCamelFolder
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

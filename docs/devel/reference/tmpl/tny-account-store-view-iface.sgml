@@ -2,17 +2,19 @@
 TnyAccountStoreViewIface
 
 <!-- ##### SECTION Short_Description ##### -->
-A type for showing an account store to the user
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type for showing an account store to the user.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

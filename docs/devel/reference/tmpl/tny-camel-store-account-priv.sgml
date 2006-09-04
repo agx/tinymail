@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-store-account-priv
+tny-camel-store-account-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,10 +9,12 @@ tny-store-account-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

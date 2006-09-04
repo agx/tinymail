@@ -2,18 +2,19 @@
 TnyGtkHeaderView
 
 <!-- ##### SECTION Short_Description ##### -->
-A implementation of #TnyHeaderViewIface for Gtk+
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A implementation of #TnyHeaderViewIface that inherits the
-GtkTable.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyHeaderViewIface, #GtkTable, #TnyHeaderIface
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

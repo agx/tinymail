@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-mime-part-priv
+tny-camel-mime-part-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,10 +9,12 @@ tny-mime-part-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

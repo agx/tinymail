@@ -2,17 +2,19 @@
 TnyAccountIface
 
 <!-- ##### SECTION Short_Description ##### -->
-An interface that defines an account type
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A abstract type that contains the shared functionality of the #TnyStoreAccountIface and the #TnyTransportAccountIface types.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccountIface, #TnyTransportAccountIface
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

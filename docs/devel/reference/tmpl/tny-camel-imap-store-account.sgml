@@ -2,17 +2,19 @@
 TnyCamelIMAPStoreAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-IMAP #TnyStoreAccountIface instance implemented for Camel
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-IMAP #TnyStoreAccountIface instance implemented for Camel
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccountIface, #TnyCamelStoreAccount
+
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 
