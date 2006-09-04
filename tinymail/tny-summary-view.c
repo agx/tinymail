@@ -46,9 +46,9 @@
 #endif
 
 #if PLATFORM==4
-#include <tny-platform-factory.h>
-#include <tny-password-dialog.h>
-#include <tny-account-store.h>
+#include <tny-olpc-platform-factory.h>
+#include <tny-olpc-password-dialog.h>
+#include <tny-olpc-account-store.h>
 #endif
 
 #include <tny-account-store-iface.h>
@@ -529,7 +529,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 #endif
 		    
 #if PLATFORM==4
-			platfact = tny_platform_factory_get_instance ();    
+			platfact = tny_olpc_platform_factory_get_instance ();    
 #endif
 
 		    
@@ -616,7 +616,7 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 #endif
 
 #if PLATFORM==4
-	platfact = tny_platform_factory_get_instance ();
+	platfact = tny_olpc_platform_factory_get_instance ();
 #endif
     
 

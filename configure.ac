@@ -67,15 +67,6 @@ AC_ARG_WITH(platform,
 	build_demoui=true
 	PLATFORM=1
 	;;
-  olpc)
-        PLATFORMDIR=libtinymail-olpc
-        build_gtkhtml=false
-        build_mozembed=false
-        build_gnome=false
-        with_html_component=none
-	build_demoui=true
-	PLATFORM=4
-        ;;
   maemo)
         PLATFORMDIR=libtinymail-maemo
         build_gtkhtml=false
@@ -90,6 +81,15 @@ AC_ARG_WITH(platform,
 	build_demoui=true
 	PLATFORM=3
 	;;
+  olpc)
+        PLATFORMDIR=libtinymail-olpc
+        build_gtkhtml=false
+        build_mozembed=false
+        build_gnome=false
+        with_html_component=none
+        build_demoui=true
+        PLATFORM=4
+        ;;
   *) 
 	PLATFORMDIR=${with_platform}
 	build_demoui=false

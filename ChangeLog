@@ -2,10 +2,13 @@
 
 	* Renamed the GPE types in libtinymail-gpe
 	* Renamed the Maemo types in libtinymail-maemo
+	* Renamed the OLPC types in libtinymail-olpc
+
 	* Made compilation of the demo-ui optional
 	* Added some ifdefs to the demo-ui
 
-	* This was a major API change in libtinymail-gpe, libtinymail-maemo
+	* This was a major API change in libtinymail-gpe, libtinymail-maemo,
+	libtinymail-olpc
 
 2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 	

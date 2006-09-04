@@ -24,7 +24,7 @@
 #include <tny-platform-factory-iface.h>
 
 #if PLATFORM==1
-#include <tny-gpe-platform-factory.h>
+#include <tny-gnome-platform-factory.h>
 #endif
 
 #if PLATFORM==2
@@ -32,11 +32,11 @@
 #endif
 
 #if PLATFORM==3
-#include <tny-platform-factory.h>
+#include <tny-gpe-platform-factory.h>
 #endif
 
 #if PLATFORM==4
-#include <tny-platform-factory.h>
+#include <tny-olpc-platform-factory.h>
 #endif
 
 #include <tny-summary-view.h>
@@ -102,7 +102,7 @@ main (int argc, char **argv)
 	bindtextdomain(GETTEXT_PACKAGE, TNY_LOCALE_DIR);
 
 #if PLATFORM==1
-	platfact = tny_gpe_platform_factory_get_instance ();
+	platfact = tny_gnome_platform_factory_get_instance ();
 #endif
     
 #if PLATFORM==2
@@ -110,11 +110,11 @@ main (int argc, char **argv)
 #endif
 
 #if PLATFORM==3
-	platfact = tny_platform_factory_get_instance ();    
+	platfact = tny_gpe_platform_factory_get_instance ();    
 #endif
 
 #if PLATFORM==4
-	platfact = tny_platform_factory_get_instance ();    
+	platfact = tny_olpc_platform_factory_get_instance ();    
 #endif
 
 	view = GTK_WIDGET (tny_summary_view_new ());

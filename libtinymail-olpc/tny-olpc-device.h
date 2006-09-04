@@ -1,5 +1,5 @@
-#ifndef TNY_DEVICE_H
-#define TNY_DEVICE_H
+#ifndef TNY_OLPC_DEVICE_H
+#define TNY_OLPC_DEVICE_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -27,31 +27,31 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_DEVICE             (tny_device_get_type ())
-#define TNY_DEVICE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_DEVICE, TnyDevice))
-#define TNY_DEVICE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_DEVICE, TnyDeviceClass))
-#define TNY_IS_DEVICE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_DEVICE))
-#define TNY_IS_DEVICE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_DEVICE))
-#define TNY_DEVICE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_DEVICE, TnyDeviceClass))
+#define TNY_TYPE_OLPC_DEVICE             (tny_olpc_device_get_type ())
+#define TNY_OLPC_DEVICE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_OLPC_DEVICE, TnyOlpcDevice))
+#define TNY_OLPC_DEVICE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_OLPC_DEVICE, TnyOlpcDeviceClass))
+#define TNY_IS_OLPC_DEVICE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_OLPC_DEVICE))
+#define TNY_IS_OLPC_DEVICE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_OLPC_DEVICE))
+#define TNY_OLPC_DEVICE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_OLPC_DEVICE, TnyOlpcDeviceClass))
 
 /* This is an abstract type */
 
-typedef struct _TnyDevice TnyDevice;
-typedef struct _TnyDeviceClass TnyDeviceClass;
+typedef struct _TnyOlpcDevice TnyOlpcDevice;
+typedef struct _TnyOlpcDeviceClass TnyOlpcDeviceClass;
 
-struct _TnyDevice
+struct _TnyOlpcDevice
 {
 	GObject parent;
 };
 
-struct _TnyDeviceClass 
+struct _TnyOlpcDeviceClass 
 {
 	GObjectClass parent;
 };
 
-GType tny_device_get_type (void);
+GType tny_olpc_device_get_type (void);
 
-TnyDevice* tny_device_new (void);
+TnyDeviceIface* tny_olpc_device_new (void);
 
 G_END_DECLS
 
