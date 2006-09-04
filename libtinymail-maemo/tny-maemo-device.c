@@ -21,21 +21,21 @@
 
 #include <glib/gi18n-lib.h>
 
-#include <tny-device.h>
+#include <tny-maemo-device.h>
 
 static GObjectClass *parent_class = NULL;
 
-#include "tny-device-priv.h"
+#include "tny-maemo-device-priv.h"
 
-static void tny_device_on_online (TnyDeviceIface *self);
-static void tny_device_on_offline (TnyDeviceIface *self);
-static gboolean tny_device_is_online (TnyDeviceIface *self);
+static void tny_maemo_device_on_online (TnyDeviceIface *self);
+static void tny_maemo_device_on_offline (TnyDeviceIface *self);
+static gboolean tny_maemo_device_is_online (TnyDeviceIface *self);
 
 
 static void 
-tny_device_reset (TnyDeviceIface *self)
+tny_maemo_device_reset (TnyDeviceIface *self)
 {
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
 	priv->fset = FALSE;
 	priv->forced = FALSE;
@@ -43,35 +43,35 @@ tny_device_reset (TnyDeviceIface *self)
 }
 
 static void 
-tny_device_force_online (TnyDeviceIface *self)
+tny_maemo_device_force_online (TnyDeviceIface *self)
 {
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
 	priv->fset = TRUE;
 	priv->forced = TRUE;
 
-	tny_device_on_online (self);
+	tny_maemo_device_on_online (self);
 
 	return;
 }
 
 
 static void
-tny_device_force_offline (TnyDeviceIface *self)
+tny_maemo_device_force_offline (TnyDeviceIface *self)
 {
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
 	priv->fset = TRUE;
 	priv->forced = FALSE;
 
 
-	tny_device_on_offline (self);
+	tny_maemo_device_on_offline (self);
 	
 	return;
 }
 
 static void
-tny_device_on_online (TnyDeviceIface *self)
+tny_maemo_device_on_online (TnyDeviceIface *self)
 {
 	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, TRUE);
 
@@ -79,7 +79,7 @@ tny_device_on_online (TnyDeviceIface *self)
 }
 
 static void
-tny_device_on_offline (TnyDeviceIface *self)
+tny_maemo_device_on_offline (TnyDeviceIface *self)
 {
 	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, FALSE);
 
@@ -87,18 +87,18 @@ tny_device_on_offline (TnyDeviceIface *self)
 }
 
 static gboolean
-tny_device_is_online (TnyDeviceIface *self)
+tny_maemo_device_is_online (TnyDeviceIface *self)
 {
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 	gboolean retval = FALSE;
 	return retval;
 }
 
 static void
-tny_device_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyDevice *self = (TnyDevice *)instance;
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
+	TnyMaemoDevice *self = (TnyMaemoDevice *)instance;
+	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
 	return;
 }
@@ -106,25 +106,22 @@ tny_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 
 /**
- * tny_device_new:
+ * tny_maemo_device_new:
  *
  * Return value: A new #TnyDeviceIface instance
  **/
-TnyDevice*
-tny_device_new (void)
+TnyDeviceIface*
+tny_maemo_device_new (void)
 {
-	TnyDevice *self = g_object_new (TNY_TYPE_DEVICE, NULL);
+	TnyMaemoDevice *self = g_object_new (TNY_TYPE_MAEMO_DEVICE, NULL);
 
-	return self;
+	return TNY_DEVICE_IFACE (self);
 }
 
 
 static void
-tny_device_finalize (GObject *object)
+tny_maemo_device_finalize (GObject *object)
 {
-	TnyDevice *self = (TnyDevice *)object;	
-	TnyDevicePriv *priv = TNY_DEVICE_GET_PRIVATE (self);
-
 	(*parent_class->finalize) (object);
 
 	return;
@@ -136,10 +133,10 @@ tny_device_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyDeviceIfaceClass *klass = (TnyDeviceIfaceClass *)g_iface;
 
-	klass->is_online_func = tny_device_is_online;
-	klass->reset_func = tny_device_reset;
-	klass->force_offline_func = tny_device_force_offline;
-	klass->force_online_func = tny_device_force_online;
+	klass->is_online_func = tny_maemo_device_is_online;
+	klass->reset_func = tny_maemo_device_reset;
+	klass->force_offline_func = tny_maemo_device_force_offline;
+	klass->force_online_func = tny_maemo_device_force_online;
 
 	return;
 }
@@ -147,22 +144,22 @@ tny_device_iface_init (gpointer g_iface, gpointer iface_data)
 
 
 static void 
-tny_device_class_init (TnyDeviceClass *class)
+tny_maemo_device_class_init (TnyMaemoDeviceClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_device_finalize;
+	object_class->finalize = tny_maemo_device_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyDevicePriv));
+	g_type_class_add_private (object_class, sizeof (TnyMaemoDevicePriv));
 
 	return;
 }
 
 GType 
-tny_device_get_type (void)
+tny_maemo_device_get_type (void)
 {
 	static GType type = 0;
 
@@ -170,15 +167,15 @@ tny_device_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyDeviceClass),
+		  sizeof (TnyMaemoDeviceClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_device_class_init,   /* class_init */
+		  (GClassInitFunc) tny_maemo_device_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyDevice),
+		  sizeof (TnyMaemoDevice),
 		  0,      /* n_preallocs */
-		  tny_device_instance_init    /* instance_init */
+		  tny_maemo_device_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_device_iface_info = 
@@ -189,7 +186,7 @@ tny_device_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyDevice",
+			"TnyMaemoDevice",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_DEVICE_IFACE, 

@@ -29,10 +29,10 @@
 
 
 #include <tny-platform-factory-iface.h>
-#include <tny-platform-factory.h>
+#include <tny-maemo-platform-factory.h>
 #include <tny-account-store-iface.h>
-#include <tny-account-store.h>
-#include <tny-password-dialog.h>
+#include <tny-maemo-account-store.h>
+#include <tny-maemo-password-dialog.h>
 #include <tny-account-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-transport-account-iface.h>
@@ -42,16 +42,16 @@
 #include <tny-camel-store-account.h>
 #include <tny-camel-transport-account.h>
 #include <tny-session-camel.h>
-#include <tny-device.h>
+#include <tny-maemo-device.h>
 
 
 /* "GConf vs. Camel" account implementation */
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyAccountStorePriv TnyAccountStorePriv;
+typedef struct _TnyMaemoAccountStorePriv TnyMaemoAccountStorePriv;
 
-struct _TnyAccountStorePriv
+struct _TnyMaemoAccountStorePriv
 {
 	GConfClient *client;
 	gchar *cache_dir;
@@ -60,8 +60,8 @@ struct _TnyAccountStorePriv
 	guint notify;
 };
 
-#define TNY_ACCOUNT_STORE_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_ACCOUNT_STORE, TnyAccountStorePriv))
+#define TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MAEMO_ACCOUNT_STORE, TnyMaemoAccountStorePriv))
 
 
 static GHashTable *passwords;
@@ -79,14 +79,14 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 
 	if (G_UNLIKELY (!retval))
 	{
-		GtkDialog *dialog = GTK_DIALOG (tny_password_dialog_new ());
+		GtkDialog *dialog = GTK_DIALOG (tny_maemo_password_dialog_new ());
 	
-		tny_password_dialog_set_prompt (TNY_PASSWORD_DIALOG (dialog), prompt);
+		tny_maemo_password_dialog_set_prompt (TNY_MAEMO_PASSWORD_DIALOG (dialog), prompt);
 
 		if (G_LIKELY (gtk_dialog_run (dialog) == GTK_RESPONSE_OK))
 		{
-			const gchar *pwd = tny_password_dialog_get_password 
-				(TNY_PASSWORD_DIALOG (dialog));
+			const gchar *pwd = tny_maemo_password_dialog_get_password 
+				(TNY_MAEMO_PASSWORD_DIALOG (dialog));
 	
 			retval = g_strdup (pwd);
 
@@ -138,7 +138,7 @@ per_account_forget_pass_func (TnyAccountIface *account)
 }
 
 static gboolean
-tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
+tny_maemo_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
 {
 	GtkMessageType gtktype;
 	gboolean retval = FALSE;
@@ -174,7 +174,7 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 			GConfEntry *entry, gpointer user_data)
 {
 	TnyAccountStoreIface *self = user_data;
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
 
 	gchar *key = g_strdup (entry->key);
@@ -194,9 +194,9 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 
 
 static const gchar*
-tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
+tny_maemo_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	if (G_UNLIKELY (!priv->cache_dir))
 	{
@@ -225,9 +225,9 @@ tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 
 
 static void
-tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
+tny_maemo_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	gint i=0, count;
 
 	count = gconf_client_get_int (priv->client, 
@@ -378,9 +378,9 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 
 static void
-tny_account_store_notify_add (TnyAccountStoreIface *self)
+tny_maemo_account_store_notify_add (TnyAccountStoreIface *self)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	priv->notify = gconf_client_notify_add (priv->client, 
 		"/apps/tinymail/accounts", gconf_listener_account_changed,
 		self, NULL, NULL);
@@ -388,9 +388,9 @@ tny_account_store_notify_add (TnyAccountStoreIface *self)
 }
 
 static void
-tny_account_store_notify_remove (TnyAccountStoreIface *self)
+tny_maemo_account_store_notify_remove (TnyAccountStoreIface *self)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	gconf_client_notify_remove (priv->client, priv->notify);
 	return;
 }
@@ -410,9 +410,9 @@ or
 */
 
 static void
-tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
+tny_maemo_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	gchar *key = NULL;
 	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
 
@@ -446,13 +446,13 @@ tny_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *acco
 
 
 static void
-tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
+tny_maemo_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_account_store_notify_remove (self);
-	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
-	tny_account_store_notify_add (self);
+	tny_maemo_account_store_notify_remove (self);
+	tny_maemo_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
+	tny_maemo_account_store_notify_add (self);
 
 	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
 
@@ -460,13 +460,13 @@ tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccount
 }
 
 static void
-tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
+tny_maemo_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_account_store_notify_remove (self);
-	tny_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
-	tny_account_store_notify_add (self);
+	tny_maemo_account_store_notify_remove (self);
+	tny_maemo_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
+	tny_maemo_account_store_notify_add (self);
 
 	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
 
@@ -474,35 +474,35 @@ tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTranspor
 }
 
 static TnyDeviceIface*
-tny_account_store_get_device (TnyAccountStoreIface *self)
+tny_maemo_account_store_get_device (TnyAccountStoreIface *self)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	return priv->device;
 }
 
 /**
- * tny_account_store_new:
+ * tny_maemo_account_store_new:
  *
  *
- * Return value: A new #TnyAccountStoreIface instance
+ * Return value: A new #TnyAccountStoreIface instance implemented for Maemo
  **/
-TnyAccountStore*
-tny_account_store_new (void)
+TnyAccountStoreIface*
+tny_maemo_account_store_new (void)
 {
-	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStore *self = g_object_new (TNY_TYPE_MAEMO_ACCOUNT_STORE, NULL);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
 
-	return self;
+	return TNY_ACCOUNT_STORE_IFACE (self);
 }
 
 
 static void
-tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_maemo_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyAccountStore *self = (TnyAccountStore *)instance;
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStore *self = (TnyMaemoAccountStore *)instance;
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyPlatformFactoryIface *platfact;
     
 	priv->client = gconf_client_get_default ();
@@ -510,10 +510,10 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	gconf_client_add_dir (priv->client, "/apps/tinymail", 
 		GCONF_CLIENT_PRELOAD_RECURSIVE, NULL);
 
-	tny_account_store_notify_add (TNY_ACCOUNT_STORE_IFACE (self));
+	tny_maemo_account_store_notify_add (TNY_ACCOUNT_STORE_IFACE (self));
 
 	platfact = TNY_PLATFORM_FACTORY_IFACE (
-		tny_platform_factory_get_instance ());
+		tny_maemo_platform_factory_get_instance ());
 
 	priv->device = tny_platform_factory_iface_new_device (platfact);
 	/* tny_device_iface_force_online (priv->device); */
@@ -523,12 +523,12 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 
 
 static void
-tny_account_store_finalize (GObject *object)
+tny_maemo_account_store_finalize (GObject *object)
 {
-	TnyAccountStore *self = (TnyAccountStore *)object;	
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStore *self = (TnyMaemoAccountStore *)object;	
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_account_store_notify_remove (TNY_ACCOUNT_STORE_IFACE (self));
+	tny_maemo_account_store_notify_remove (TNY_ACCOUNT_STORE_IFACE (self));
 	g_object_unref (G_OBJECT (priv->client));
 
 	if (G_LIKELY (priv->cache_dir))
@@ -541,30 +541,30 @@ tny_account_store_finalize (GObject *object)
 
 
 /**
- * tny_account_store_get_session:
- * @self: The #TnyAccountStore instance
+ * tny_maemo_account_store_get_session:
+ * @self: The #TnyMaemoAccountStore instance
  *
  * Return value: A #TnySessionCamel instance
  **/
 TnySessionCamel*
-tny_account_store_get_session (TnyAccountStore *self)
+tny_maemo_account_store_get_session (TnyMaemoAccountStore *self)
 {
-	TnyAccountStorePriv *priv = TNY_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	return priv->session;
 }
 
 static void 
-tny_account_store_class_init (TnyAccountStoreClass *class)
+tny_maemo_account_store_class_init (TnyMaemoAccountStoreClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_account_store_finalize;
+	object_class->finalize = tny_maemo_account_store_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyAccountStorePriv));
+	g_type_class_add_private (object_class, sizeof (TnyMaemoAccountStorePriv));
 
 	return;
 }
@@ -574,19 +574,19 @@ tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyAccountStoreIfaceClass *klass = (TnyAccountStoreIfaceClass *)g_iface;
 
-	klass->get_accounts_func = tny_account_store_get_accounts;
-	klass->add_store_account_func = tny_account_store_add_store_account;
-	klass->add_transport_account_func = tny_account_store_add_transport_account;
-	klass->get_cache_dir_func = tny_account_store_get_cache_dir;
-	klass->get_device_func = tny_account_store_get_device;
-	klass->alert_func = tny_account_store_alert;
+	klass->get_accounts_func = tny_maemo_account_store_get_accounts;
+	klass->add_store_account_func = tny_maemo_account_store_add_store_account;
+	klass->add_transport_account_func = tny_maemo_account_store_add_transport_account;
+	klass->get_cache_dir_func = tny_maemo_account_store_get_cache_dir;
+	klass->get_device_func = tny_maemo_account_store_get_device;
+	klass->alert_func = tny_maemo_account_store_alert;
 
 	return;
 }
 
 
 GType 
-tny_account_store_get_type (void)
+tny_maemo_account_store_get_type (void)
 {
 	static GType type = 0;
 
@@ -594,15 +594,15 @@ tny_account_store_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyAccountStoreClass),
+		  sizeof (TnyMaemoAccountStoreClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_account_store_class_init,   /* class_init */
+		  (GClassInitFunc) tny_maemo_account_store_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyAccountStore),
+		  sizeof (TnyMaemoAccountStore),
 		  0,      /* n_preallocs */
-		  tny_account_store_instance_init    /* instance_init */
+		  tny_maemo_account_store_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_account_store_iface_info = 
@@ -613,7 +613,7 @@ tny_account_store_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyAccountStore",
+			"TnyMaemoAccountStore",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_IFACE, 

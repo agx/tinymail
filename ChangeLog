@@ -1,10 +1,11 @@
 2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed the GPE types in libtinymail-gpe
+	* Renamed the Maemo types in libtinymail-maemo
 	* Made compilation of the demo-ui optional
 	* Added some ifdefs to the demo-ui
 
-	* This was a major API change in libtinymail-gpe
+	* This was a major API change in libtinymail-gpe, libtinymail-maemo
 
 2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 	

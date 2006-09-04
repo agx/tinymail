@@ -65,7 +65,7 @@ AC_ARG_WITH(platform,
   gnome-desktop) 
 	PLATFORMDIR=libtinymail-gnome-desktop 
 	build_demoui=true
-	PLATFORM="gnome"
+	PLATFORM=1
 	;;
   olpc)
         PLATFORMDIR=libtinymail-olpc
@@ -74,7 +74,7 @@ AC_ARG_WITH(platform,
         build_gnome=false
         with_html_component=none
 	build_demoui=true
-	PLATFORM="olpc"
+	PLATFORM=4
         ;;
   maemo)
         PLATFORMDIR=libtinymail-maemo
@@ -83,17 +83,17 @@ AC_ARG_WITH(platform,
         build_gnome=false
         with_html_component=none
 	build_demoui=true
-	PLATFORM="maemo"
+	PLATFORM=2
         ;;
   gpe) 
 	PLATFORMDIR=libtinymail-gpe 
 	build_demoui=true
-	PLATFORM="gpe"
+	PLATFORM=3
 	;;
   *) 
 	PLATFORMDIR=${with_platform}
 	build_demoui=false
-	PLATFORM="unknown"
+	PLATFORM=0
 esac], [PLATFORMDIR=libtinymail-gnome-desktop
         with_platform=gnome-desktop])
 

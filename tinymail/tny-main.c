@@ -23,9 +23,19 @@
 #include <tny-account-store-view-iface.h>
 #include <tny-platform-factory-iface.h>
 
-#if PLATFORM==gpe
+#if PLATFORM==1
 #include <tny-gpe-platform-factory.h>
-#else
+#endif
+
+#if PLATFORM==2
+#include <tny-maemo-platform-factory.h>
+#endif
+
+#if PLATFORM==3
+#include <tny-platform-factory.h>
+#endif
+
+#if PLATFORM==4
 #include <tny-platform-factory.h>
 #endif
 
@@ -91,12 +101,22 @@ main (int argc, char **argv)
 
 	bindtextdomain(GETTEXT_PACKAGE, TNY_LOCALE_DIR);
 
-#if PLATFORM==gpe
+#if PLATFORM==1
 	platfact = tny_gpe_platform_factory_get_instance ();
-#else
-	platfact = tny_platform_factory_get_instance ();    
 #endif
     
+#if PLATFORM==2
+	platfact = tny_maemo_platform_factory_get_instance ();    
+#endif
+
+#if PLATFORM==3
+	platfact = tny_platform_factory_get_instance ();    
+#endif
+
+#if PLATFORM==4
+	platfact = tny_platform_factory_get_instance ();    
+#endif
+
 	view = GTK_WIDGET (tny_summary_view_new ());
 
 	if (plug > 0) {

@@ -27,11 +27,25 @@
 
 #include <tny-platform-factory-iface.h>
 
-#if PLATFORM==gpe
+#if PLATFORM==1
+#include <tny-platform-factory.h>
+#include <tny-password-dialog.h>
+#include <tny-account-store.h>
+#endif
+
+#if PLATFORM==2
+#include <tny-maemo-platform-factory.h>
+#include <tny-maemo-password-dialog.h>
+#include <tny-maemo-account-store.h>
+#endif
+
+#if PLATFORM==3
 #include <tny-gpe-platform-factory.h>
 #include <tny-gpe-password-dialog.h>
 #include <tny-gpe-account-store.h>
-#else
+#endif
+
+#if PLATFORM==4
 #include <tny-platform-factory.h>
 #include <tny-password-dialog.h>
 #include <tny-account-store.h>
@@ -500,12 +514,25 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			TnyFolderIface *folder;
 			TnyMsgIface *msg;
 			TnyPlatformFactoryIface *platfact;
-#if PLATFORM==gpe
-			platfact = tny_gpe_platform_factory_get_instance ();
-#else
-			platfact = tny_platform_factory_get_instance ();
+
+
+#if PLATFORM==1
+			platfact = tny_platform_factory_get_instance ();    
 #endif
 
+#if PLATFORM==2
+			platfact = tny_maemo_platform_factory_get_instance ();    
+#endif
+
+#if PLATFORM==3
+			platfact = tny_gpe_platform_factory_get_instance ();
+#endif
+		    
+#if PLATFORM==4
+			platfact = tny_platform_factory_get_instance ();    
+#endif
+
+		    
 			folder = tny_header_iface_get_folder (TNY_HEADER_IFACE (header));
 
 			if (G_LIKELY (folder))
@@ -576,11 +603,22 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
 		G_CALLBACK (online_button_toggled), self);
 
-#if PLATFORM==gpe
-	platfact = tny_gpe_platform_factory_get_instance ();
-#else
+#if PLATFORM==1
 	platfact = tny_platform_factory_get_instance ();
 #endif
+
+#if PLATFORM==2
+	platfact = tny_maemo_platform_factory_get_instance ();
+#endif
+
+#if PLATFORM==3
+	platfact = tny_gpe_platform_factory_get_instance ();
+#endif
+
+#if PLATFORM==4
+	platfact = tny_platform_factory_get_instance ();
+#endif
+    
 
 	hpaned1 = gtk_hpaned_new ();
 	gtk_widget_show (hpaned1);

@@ -10,19 +10,19 @@ INCLUDES = -I. -I$(top_srcdir)			    \
 
 lib_LTLIBRARIES = libtinymail-maemo-1.0.la
 
-libtinymail_maemo_1_0_headers = 	 	 \
-	tny-account-store.h			 \
-	tny-password-dialog.h			 \
-	tny-device.h				 \
-	tny-platform-factory.h
+libtinymail_maemo_1_0_headers = 	\
+	tny-maemo-account-store.h	\
+	tny-maemo-password-dialog.h	\
+	tny-maemo-device.h		\
+	tny-maemo-platform-factory.h
 
-libtinymail_maemo_1_0_la_SOURCES = 	 	 \
-	$(libtinymail_maemo_1_0_headers) 	 \
-	tny-account-store.c			 \
-	tny-device-priv.h			 \
-	tny-device.c				 \
-	tny-password-dialog.c			 \
-	tny-platform-factory.c
+libtinymail_maemo_1_0_la_SOURCES = 	 \
+	$(libtinymail_maemo_1_0_headers) \
+	tny-maemo-account-store.c	 \
+	tny-maemo-device-priv.h		 \
+	tny-maemo-device.c		 \
+	tny-maemo-password-dialog.c	 \
+	tny-maemo-platform-factory.c
 
 libtinymail_maemo_1_0_la_LIBADD = 	\
 	$(LIBTINYMAIL_MAEMO_LIBS)	\
