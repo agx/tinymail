@@ -9,7 +9,7 @@
 	* Added some ifdefs to the demo-ui
 
 	* This was a major API change in libtinymail-gpe, libtinymail-maemo,
-	libtinymail-olpc
+	libtinymail-olpc and libtinymail-gnome
 
 2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 	
