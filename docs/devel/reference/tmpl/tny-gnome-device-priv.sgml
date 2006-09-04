@@ -1,33 +1,38 @@
 <!-- ##### SECTION Title ##### -->
-TnyCamelTransportAccount
+tny-gnome-device-priv
 
 <!-- ##### SECTION Short_Description ##### -->
-A Camel transport account type
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A transport account type implemented for camel.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelTransportAccount ##### -->
+<!-- ##### STRUCT TnyGnomeDevicePriv ##### -->
 <para>
 
 </para>
 
+@forced: 
+@fset: 
+@nm_ctx: 
 
-<!-- ##### FUNCTION tny_camel_transport_account_new ##### -->
+<!-- ##### MACRO TNY_GNOME_DEVICE_GET_PRIVATE ##### -->
 <para>
 
 </para>
 
-@Returns: 
+@o: 
 
 

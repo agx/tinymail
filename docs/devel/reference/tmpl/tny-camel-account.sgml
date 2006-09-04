@@ -61,7 +61,6 @@ A account type implemented for Camel
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_account_add_option ##### -->
 <para>

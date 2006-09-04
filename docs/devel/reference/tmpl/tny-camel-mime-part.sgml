@@ -22,7 +22,6 @@ A implementation that plays proxy for a #CamelMimePart.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_mime_part_new ##### -->
 <para>

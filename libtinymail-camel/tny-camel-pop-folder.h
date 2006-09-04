@@ -23,6 +23,8 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <tny-folder-iface.h>
+#include <tny-camel-folder.h>
 #include <tny-camel-account.h>
 #include <tny-store-account-iface.h>
 

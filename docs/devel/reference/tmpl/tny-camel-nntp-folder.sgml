@@ -22,7 +22,6 @@ A NNTP #TnyFolderIface implementation for Camel
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_nntp_folder_new ##### -->
 <para>

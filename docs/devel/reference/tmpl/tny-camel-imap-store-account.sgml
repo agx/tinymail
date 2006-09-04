@@ -22,7 +22,6 @@ IMAP #TnyStoreAccountIface instance implemented for Camel
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_imap_store_account_new ##### -->
 <para>

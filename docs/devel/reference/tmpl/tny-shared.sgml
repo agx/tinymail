@@ -82,6 +82,21 @@ Shared include file with forward typedefs
 </para>
 
 
+<!-- ##### SIGNAL TnyFolderIface::folder-inserted ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyFolderIface::folders-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+
 <!-- ##### STRUCT TnyFolderIfaceClass ##### -->
 <para>
 
@@ -251,35 +266,6 @@ Shared include file with forward typedefs
 
 </para>
 
-
-<!-- ##### SIGNAL TnyAccountStoreIface::account-changed ##### -->
-
-
-@tnyaccountstoreiface: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStoreIface::account-inserted ##### -->
-<para>
-
-</para>
-
-@tnyaccountstoreiface: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStoreIface::account-removed ##### -->
-<para>
-
-</para>
-
-@tnyaccountstoreiface: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStoreIface::accounts-reloaded ##### -->
-<para>
-
-</para>
-
-@tnyaccountstoreiface: the object which received the signal.
 
 <!-- ##### STRUCT TnyStreamIface ##### -->
 <para>

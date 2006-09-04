@@ -1,33 +1,45 @@
 <!-- ##### SECTION Title ##### -->
-TnyCamelTransportAccount
+TnyOlpcAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-A Camel transport account type
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A transport account type implemented for camel.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelTransportAccount ##### -->
+<!-- ##### STRUCT TnyOlpcAccountStore ##### -->
 <para>
 
 </para>
 
+@parent: 
 
-<!-- ##### FUNCTION tny_camel_transport_account_new ##### -->
+<!-- ##### FUNCTION tny_olpc_account_store_new ##### -->
 <para>
 
 </para>
 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_olpc_account_store_get_session ##### -->
+<para>
+
+</para>
+
+@self: 
 @Returns: 
 
 

@@ -17,7 +17,7 @@ device-priv
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyDevicePriv ##### -->
+<!-- ##### STRUCT TnyTestDevicePriv ##### -->
 <para>
 
 </para>
@@ -25,7 +25,7 @@ device-priv
 @forced: 
 @fset: 
 
-<!-- ##### MACRO TNY_DEVICE_GET_PRIVATE ##### -->
+<!-- ##### MACRO TNY_TEST_DEVICE_GET_PRIVATE ##### -->
 <para>
 
 </para>

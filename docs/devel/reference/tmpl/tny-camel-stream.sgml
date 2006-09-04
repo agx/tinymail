@@ -24,7 +24,6 @@ to a #TnyStreamIface.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_stream_new ##### -->
 <para>

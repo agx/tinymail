@@ -22,7 +22,6 @@ NNTP #TnyStoreAccountIface instance implemented for Camel
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_nntp_store_account_new ##### -->
 <para>

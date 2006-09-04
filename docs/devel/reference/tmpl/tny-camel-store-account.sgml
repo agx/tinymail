@@ -22,7 +22,6 @@ A store account type implemented for camel.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_store_account_new ##### -->
 <para>

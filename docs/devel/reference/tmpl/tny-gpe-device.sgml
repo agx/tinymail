@@ -1,29 +1,32 @@
 <!-- ##### SECTION Title ##### -->
-TnyCamelTransportAccount
+TnyGpeDevice
 
 <!-- ##### SECTION Short_Description ##### -->
-A Camel transport account type
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A transport account type implemented for camel.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelTransportAccount ##### -->
+<!-- ##### STRUCT TnyGpeDevice ##### -->
 <para>
 
 </para>
 
+@parent: 
 
-<!-- ##### FUNCTION tny_camel_transport_account_new ##### -->
+<!-- ##### FUNCTION tny_gpe_device_new ##### -->
 <para>
 
 </para>

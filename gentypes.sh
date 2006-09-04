@@ -1,7 +1,8 @@
 
 srcdir=$1
+echo "#include <glib.h>" > docs/devel/reference/libtinymail.types
 
-find '.' -type f -iname '*.h' -printf '#include <%f>\n' | grep -v "\-priv" | grep -v "\-test" | grep -v platform_include.h | grep -v camel.h | grep -v platfact.h | grep -v device.h | grep -v account-store.h | grep -v config.h | grep -v tny-summary-view.h | grep -v olpc | grep -v gnome | grep -v maemo | grep -v gpe > docs/devel/reference/libtinymail.types
+find '.' -type f -iname '*.h' -printf '#include <%f>\n' | grep -v "\-priv" | grep -v "\-test" | grep -v platform_include.h | grep -v camel.h | grep -v platfact.h | grep -v device.h | grep -v account-store.h | grep -v config.h | grep -v tny-summary-view.h | grep -v olpc | grep -v gnome | grep -v maemo | grep -v gpe >> docs/devel/reference/libtinymail.types
 
 echo >> docs/devel/reference/libtinymail.types
 

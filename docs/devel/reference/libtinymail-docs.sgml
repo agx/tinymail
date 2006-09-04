@@ -62,10 +62,10 @@
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView SYSTEM "xml/tny-moz-embed-msg-view.xml">
 
-<!ENTITY libtinymail-gnome-desktop-TnyPlatformFactory SYSTEM "xml/tny-platform-factory.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyAccountStore SYSTEM "xml/tny-account-store.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyPasswordDialog SYSTEM "xml/tny-password-dialog.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyDevice SYSTEM "xml/tny-device.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyGnomePlatformFactory SYSTEM "xml/tny-gnome-platform-factory.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyGnomeAccountStore SYSTEM "xml/tny-gnome-account-store.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyGnomePasswordDialog SYSTEM "xml/tny-gnome-password-dialog.xml">
+<!ENTITY libtinymail-gnome-desktop-TnyGnomeDevice SYSTEM "xml/tny-gnome-device.xml">
 
 
 <!ENTITY index-Object-Tree SYSTEM "xml/tree_index.sgml">
@@ -154,10 +154,10 @@
 
 	<chapter id="libtinymail-gnome-desktop">
 	<title>libtinymail-gnome-desktop</title>
-		&libtinymail-gnome-desktop-TnyAccountStore;
-		&libtinymail-gnome-desktop-TnyPasswordDialog;
-		&libtinymail-gnome-desktop-TnyPlatformFactory;
-		&libtinymail-gnome-desktop-TnyDevice;
+		&libtinymail-gnome-desktop-TnyGnomeAccountStore;
+		&libtinymail-gnome-desktop-TnyGnomePasswordDialog;
+		&libtinymail-gnome-desktop-TnyGnomePlatformFactory;
+		&libtinymail-gnome-desktop-TnyGnomeDevice;
 	</chapter>
 
 	<chapter id="libtinymail-camel">

@@ -25,7 +25,6 @@ This implementation is coupled with #TnyMsgMimePart.
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_msg_new ##### -->
 <para>

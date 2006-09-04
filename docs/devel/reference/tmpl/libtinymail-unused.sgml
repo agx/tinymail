@@ -22,6 +22,102 @@
 folder-lister
 
 
+<!-- ##### SECTION ./tmpl/memory-test.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/memory-test.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/memory-test.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/memory-test.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/memory-test.sgml:Title ##### -->
+memory-test
+
+
+<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-account-store.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Title ##### -->
+TnyAccountStore
+
+
+<!-- ##### SECTION ./tmpl/tny-device-priv.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-device-priv.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-device-priv.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-device-priv.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-device-priv.sgml:Title ##### -->
+tny-device-priv
+
+
+<!-- ##### SECTION ./tmpl/tny-device.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-device.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-device.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-device.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-device.sgml:Title ##### -->
+TnyDevice
+
+
 <!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Long_Description ##### -->
 <para>
 
@@ -140,6 +236,54 @@ TnyMsgHeaderListModel
 
 <!-- ##### SECTION ./tmpl/tny-msg-header-proxy.sgml:Title ##### -->
 TnyMsgHeaderProxy
+
+
+<!-- ##### SECTION ./tmpl/tny-password-dialog.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-password-dialog.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-password-dialog.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-password-dialog.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-password-dialog.sgml:Title ##### -->
+TnyPasswordDialog
+
+
+<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Title ##### -->
+TnyPlatformFactory
 
 
 <!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Long_Description ##### -->
@@ -305,6 +449,13 @@ TnyTransportAccount
 
 @o: 
 
+<!-- ##### MACRO TNY_DEVICE_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
 <!-- ##### MACRO TNY_FOLDER_GET_PRIVATE ##### -->
 <para>
 
@@ -389,6 +540,41 @@ TnyTransportAccount
 </para>
 
 
+<!-- ##### STRUCT TnyAccountStore ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL TnyAccountStoreIface::account-changed ##### -->
+
+
+@tnyaccountstoreiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStoreIface::account-inserted ##### -->
+<para>
+
+</para>
+
+@tnyaccountstoreiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStoreIface::account-removed ##### -->
+<para>
+
+</para>
+
+@tnyaccountstoreiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStoreIface::accounts-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyaccountstoreiface: the object which received the signal.
+
 <!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
 <para>
 
@@ -420,6 +606,13 @@ TnyTransportAccount
 @model: 
 @current: 
 
+<!-- ##### STRUCT TnyDevice ##### -->
+<para>
+
+</para>
+
+@parent: 
+
 <!-- ##### SIGNAL TnyDeviceIface::connection-changed ##### -->
 <para>
 
@@ -428,26 +621,19 @@ TnyTransportAccount
 @tnydeviceiface: the object which received the signal.
 @arg1: 
 
+<!-- ##### STRUCT TnyDevicePriv ##### -->
+<para>
+
+</para>
+
+@forced: 
+@fset: 
+
 <!-- ##### STRUCT TnyFolder ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### SIGNAL TnyFolderIface::folder-inserted ##### -->
-<para>
-
-</para>
-
-@tnyfolderiface: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyFolderIface::folders-reloaded ##### -->
-<para>
-
-</para>
-
-@tnyfolderiface: the object which received the signal.
 
 <!-- ##### STRUCT TnyFolderList ##### -->
 <para>
@@ -709,6 +895,18 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 
+<!-- ##### STRUCT TnyPasswordDialog ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyPlatformFactory ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnySaveStrategy ##### -->
 <para>
 
@@ -831,6 +1029,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
+<!-- ##### FUNCTION tny_account_store_get_session ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_account_store_iface_get_store_accounts ##### -->
 <para>
 
@@ -845,6 +1051,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 @self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_account_store_new ##### -->
+<para>
+
+</para>
+
 @Returns: 
 
 <!-- ##### FUNCTION tny_account_tree_model_add ##### -->
@@ -894,6 +1107,13 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @Returns: 
 
 <!-- ##### FUNCTION tny_device_get_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_device_new ##### -->
 <para>
 
 </para>
@@ -1587,6 +1807,36 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 @msgview: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_password_dialog_get_password ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_password_dialog_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_password_dialog_set_prompt ##### -->
+<para>
+
+</para>
+
+@self: 
+@prompt: 
+
+<!-- ##### FUNCTION tny_platform_factory_get_instance ##### -->
+<para>
+
+</para>
+
 @Returns: 
 
 <!-- ##### FUNCTION tny_session_camel_get_instance ##### -->

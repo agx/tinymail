@@ -21,7 +21,6 @@ Camel #TnyMsgFolderIface implementation
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_folder_new_with_folder ##### -->
 <para>

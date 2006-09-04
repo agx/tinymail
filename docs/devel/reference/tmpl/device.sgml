@@ -17,14 +17,14 @@ TnyDevice
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyDevice ##### -->
+<!-- ##### STRUCT TnyTestDevice ##### -->
 <para>
 
 </para>
 
 @parent: 
 
-<!-- ##### FUNCTION tny_device_new ##### -->
+<!-- ##### FUNCTION tny_test_device_new ##### -->
 <para>
 
 </para>

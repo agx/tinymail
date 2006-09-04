@@ -22,7 +22,6 @@ A IMAP #TnyFolderIface implementation for Camel
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_camel_imap_folder_new ##### -->
 <para>
