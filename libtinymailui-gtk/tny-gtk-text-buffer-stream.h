@@ -51,7 +51,7 @@ struct _TnyGtkTextBufferStreamClass
 GType tny_gtk_text_buffer_stream_get_type (void);
 TnyStreamIface* tny_gtk_text_buffer_stream_new (GtkTextBuffer *buffer);
 
-void tny_gtk_text_buffer_stream_set_gtk_text_buffer (TnyGtkTextBufferStream *self, GtkTextBuffer *buffer);
+void tny_gtk_text_buffer_stream_set_text_buffer (TnyGtkTextBufferStream *self, GtkTextBuffer *buffer);
 
 G_END_DECLS
 
