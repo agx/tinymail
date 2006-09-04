@@ -8,7 +8,7 @@ import tinymail.platform
 import gc
 
 def on_refresh_folder (folder, cancelled, headerstree):
-	listm = tinymail.uigtk.HeaderListModel ()
+	listm = tinymail.uigtk.GtkHeaderListModel ()
 	listm.set_folder (folder, False)
 	headerstree.set_model (listm)
 	progressbar.hide ()
@@ -26,7 +26,7 @@ def on_status (folder, what, status, headerstree) :
 def on_headerstree_selected (treeselection, msgview) :
 	model, iter = treeselection.get_selected ()
 	if iter:
-		header = model.get_value (iter, tinymail.uigtk.HEADER_LIST_MODEL_INSTANCE_COLUMN)
+		header = model.get_value (iter, tinymail.uigtk.GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN)
 		if header:
 			folder = header.get_folder ()
 			msg = folder.get_message (header)
@@ -68,14 +68,14 @@ column = gtk.TreeViewColumn ("Received", renderer, text=7)
 column.set_fixed_width (100)
 column.set_sizing (gtk.TREE_VIEW_COLUMN_FIXED)
 headerstree.append_column (column)
-platfact = tinymail.platform.tny_platform_factory_get_instance ()
+platfact = tinymail.platform.tny_gnome_platform_factory_get_instance ()
 msgview = platfact.new_msg_view ()
 msgview.show ()
 vpaned.pack2 (msgview, True, True)
 account_store = platfact.new_account_store ()
 device = account_store.get_device ()
 device.force_online ()
-accounts = tinymail.uigtk.AccountTreeModel ()
+accounts = tinymail.uigtk.GtkAccountTreeModel ()
 account_store.get_accounts (accounts, tinymail.ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
 folderstree.set_model (accounts)
 folderstree.get_selection().connect("changed", on_folderstree_selected, headerstree)
