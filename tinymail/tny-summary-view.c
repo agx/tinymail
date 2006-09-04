@@ -28,9 +28,9 @@
 #include <tny-platform-factory-iface.h>
 
 #if PLATFORM==1
-#include <tny-platform-factory.h>
-#include <tny-password-dialog.h>
-#include <tny-account-store.h>
+#include <tny-gnome-platform-factory.h>
+#include <tny-gnome-password-dialog.h>
+#include <tny-gnome-account-store.h>
 #endif
 
 #if PLATFORM==2
@@ -517,7 +517,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 
 #if PLATFORM==1
-			platfact = tny_platform_factory_get_instance ();    
+			platfact = tny_gnome_platform_factory_get_instance ();    
 #endif
 
 #if PLATFORM==2
@@ -604,7 +604,7 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 		G_CALLBACK (online_button_toggled), self);
 
 #if PLATFORM==1
-	platfact = tny_platform_factory_get_instance ();
+	platfact = tny_gnome_platform_factory_get_instance ();
 #endif
 
 #if PLATFORM==2

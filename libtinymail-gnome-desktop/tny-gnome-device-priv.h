@@ -1,5 +1,5 @@
-#ifndef TNY_DEVICE_PRIV_H
-#define TNY_DEVICE_PRIV_H
+#ifndef TNY_GNOME_DEVICE_PRIV_H
+#define TNY_GNOME_DEVICE_PRIV_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -20,9 +20,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-typedef struct _TnyDevicePriv TnyDevicePriv;
+typedef struct _TnyGnomeDevicePriv TnyGnomeDevicePriv;
 
-struct _TnyDevicePriv
+struct _TnyGnomeDevicePriv
 {
 	gboolean forced, fset;
     
@@ -34,7 +34,7 @@ struct _TnyDevicePriv
 };
 
 
-#define TNY_DEVICE_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_DEVICE, TnyDevicePriv))
+#define TNY_GNOME_DEVICE_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GNOME_DEVICE, TnyGnomeDevicePriv))
 
 #endif

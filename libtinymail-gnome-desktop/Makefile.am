@@ -17,19 +17,19 @@ endif
 
 lib_LTLIBRARIES = libtinymail-gnome-desktop-1.0.la
 
-libtinymail_gnome_desktop_1_0_headers = 	 \
-	tny-account-store.h			 \
-	tny-password-dialog.h			 \
-	tny-device.h				 \
-	tny-platform-factory.h
+libtinymail_gnome_desktop_1_0_headers = 	\
+	tny-gnome-account-store.h		\
+	tny-gnome-password-dialog.h		\
+	tny-gnome-device.h			\
+	tny-gnome-platform-factory.h
 
-libtinymail_gnome_desktop_1_0_la_SOURCES = 	 \
+libtinymail_gnome_desktop_1_0_la_SOURCES = 	\
 	$(libtinymail_gnome_desktop_1_0_headers) \
-	tny-account-store.c			 \
-	tny-device-priv.h			 \
-	tny-device.c				 \
-	tny-password-dialog.c			 \
-	tny-platform-factory.c
+	tny-gnome-account-store.c		\
+	tny-gnome-device-priv.h			\
+	tny-gnome-device.c			\
+	tny-gnome-password-dialog.c		\
+	tny-gnome-platform-factory.c
 
 libtinymail_gnome_desktop_1_0_la_LIBADD = 	\
 	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)	\

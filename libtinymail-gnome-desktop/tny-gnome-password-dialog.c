@@ -22,32 +22,32 @@
 #include <glib/gi18n-lib.h>
 
 #include <gtk/gtk.h>
-#include <tny-password-dialog.h>
+#include <tny-gnome-password-dialog.h>
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyPasswordDialogPriv TnyPasswordDialogPriv;
+typedef struct _TnyGnomePasswordDialogPriv TnyGnomePasswordDialogPriv;
 
-struct _TnyPasswordDialogPriv
+struct _TnyGnomePasswordDialogPriv
 {
 	GtkEntry *pwd_entry;
 	GtkLabel *prompt_label;
 };
 
-#define TNY_PASSWORD_DIALOG_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_PASSWORD_DIALOG, TnyPasswordDialogPriv))
+#define TNY_GNOME_PASSWORD_DIALOG_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GNOME_PASSWORD_DIALOG, TnyGnomePasswordDialogPriv))
 
 
 /**
- * tny_password_dialog_set_prompt:
- * @self: A #TnyPasswordDialog object
+ * tny_gnome_password_dialog_set_prompt:
+ * @self: A #TnyGnomePasswordDialog object
  * @prompt: The prompt to set
  * 
  **/
 void
-tny_password_dialog_set_prompt (TnyPasswordDialog *self, const gchar *prompt)
+tny_gnome_password_dialog_set_prompt (TnyGnomePasswordDialog *self, const gchar *prompt)
 {
-	TnyPasswordDialogPriv *priv = TNY_PASSWORD_DIALOG_GET_PRIVATE (self);
+	TnyGnomePasswordDialogPriv *priv = TNY_GNOME_PASSWORD_DIALOG_GET_PRIVATE (self);
 
 	gtk_label_set_text (priv->prompt_label, prompt);
 
@@ -55,38 +55,38 @@ tny_password_dialog_set_prompt (TnyPasswordDialog *self, const gchar *prompt)
 }
 
 /**
- * tny_password_dialog_get_password:
- * @self: A #TnyPasswordDialog object
+ * tny_gnome_password_dialog_get_password:
+ * @self: A #TnyGnomePasswordDialog object
  *
  * Return value: The password (read-only) as typed by the user
  **/
 const gchar*
-tny_password_dialog_get_password (TnyPasswordDialog *self)
+tny_gnome_password_dialog_get_password (TnyGnomePasswordDialog *self)
 {
-	TnyPasswordDialogPriv *priv = TNY_PASSWORD_DIALOG_GET_PRIVATE (self);
+	TnyGnomePasswordDialogPriv *priv = TNY_GNOME_PASSWORD_DIALOG_GET_PRIVATE (self);
 
 	return gtk_entry_get_text (priv->pwd_entry);
 }
 
 /**
- * tny_password_dialog_new:
+ * tny_gnome_password_dialog_new:
  * 
  *
- * Return value: A new #TnyPasswordDialog instance implemented for Gtk+
+ * Return value: A new #GtkDialog password dialog instance implemented for Gtk+
  **/
-TnyPasswordDialog*
-tny_password_dialog_new (void)
+GtkDialog*
+tny_gnome_password_dialog_new (void)
 {
-	TnyPasswordDialog *self = g_object_new (TNY_TYPE_PASSWORD_DIALOG, NULL);
+	TnyGnomePasswordDialog *self = g_object_new (TNY_TYPE_GNOME_PASSWORD_DIALOG, NULL);
 
-	return self;
+	return GTK_DIALOG (self);
 }
 
 static void
-tny_password_dialog_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gnome_password_dialog_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyPasswordDialog *self = (TnyPasswordDialog *)instance;
-	TnyPasswordDialogPriv *priv = TNY_PASSWORD_DIALOG_GET_PRIVATE (self);
+	TnyGnomePasswordDialog *self = (TnyGnomePasswordDialog *)instance;
+	TnyGnomePasswordDialogPriv *priv = TNY_GNOME_PASSWORD_DIALOG_GET_PRIVATE (self);
 
 	gtk_dialog_add_buttons (GTK_DIALOG (self), GTK_STOCK_OK, GTK_RESPONSE_OK,
 				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
@@ -113,7 +113,7 @@ tny_password_dialog_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_password_dialog_finalize (GObject *object)
+tny_gnome_password_dialog_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -122,7 +122,7 @@ tny_password_dialog_finalize (GObject *object)
 
 
 static void 
-tny_password_dialog_class_init (TnyPasswordDialogClass *class)
+tny_gnome_password_dialog_class_init (TnyGnomePasswordDialogClass *class)
 {
 	GObjectClass *object_class;
 
@@ -130,15 +130,15 @@ tny_password_dialog_class_init (TnyPasswordDialogClass *class)
 
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_password_dialog_finalize;
+	object_class->finalize = tny_gnome_password_dialog_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyPasswordDialogPriv));
+	g_type_class_add_private (object_class, sizeof (TnyGnomePasswordDialogPriv));
 
 	return;
 }
 
 GType 
-tny_password_dialog_get_type (void)
+tny_gnome_password_dialog_get_type (void)
 {
 	static GType type = 0;
 
@@ -146,19 +146,19 @@ tny_password_dialog_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyPasswordDialogClass),
+		  sizeof (TnyGnomePasswordDialogClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_password_dialog_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gnome_password_dialog_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyPasswordDialog),
+		  sizeof (TnyGnomePasswordDialog),
 		  0,      /* n_preallocs */
-		  tny_password_dialog_instance_init    /* instance_init */
+		  tny_gnome_password_dialog_instance_init    /* instance_init */
 		};
 
 		type = g_type_register_static (GTK_TYPE_DIALOG,
-			"TnyPasswordDialog",
+			"TnyGnomePasswordDialog",
 			&info, 0);
 
 		parent_class = g_type_class_ref (gtk_dialog_get_type());

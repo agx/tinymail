@@ -3,6 +3,7 @@
 	* Renamed the GPE types in libtinymail-gpe
 	* Renamed the Maemo types in libtinymail-maemo
 	* Renamed the OLPC types in libtinymail-olpc
+	* Renamed the GNOME types in libtinymail-gnome-desktop
 
 	* Made compilation of the demo-ui optional
 	* Added some ifdefs to the demo-ui

@@ -57,6 +57,7 @@ build_mozembed=true
 build_gtkhtml=false
 build_doxygen=false
 PLATFORMDIR=libtinymail-gnome-desktop
+PLATFORM=1
 
 dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
