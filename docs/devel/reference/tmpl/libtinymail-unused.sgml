@@ -1182,7 +1182,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @camel_folder: 
 
-<!-- ##### FUNCTION tny_gtk_text_buffer_stream_set_text_buffer ##### -->
+<!-- ##### FUNCTION tny_gtk_text_buffer_stream_set_gtk_text_buffer ##### -->
 <para>
 
 </para>
