@@ -2,19 +2,16 @@
 TnyCamelFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-
+Camel #TnyMsgFolderIface implementation
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
 </para>
-
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyFolderStoreIface, #TnyStoreAccountIface
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

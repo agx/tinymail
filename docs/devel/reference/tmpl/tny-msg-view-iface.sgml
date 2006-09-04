@@ -2,19 +2,18 @@
 TnyMsgViewIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A type that defines a view for a message
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type that defines a view for a #TnyMsgIface implementation. The type is sometimes decorated by a 
+#TnyMsgWindowIface implementation.
 </para>
-
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgIface, #TnyMsgMimePartIface, #TnyMsgWindowIface, #TnyMsgView, #TnyMsgWindow
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

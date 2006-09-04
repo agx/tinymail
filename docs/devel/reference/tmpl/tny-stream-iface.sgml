@@ -2,19 +2,17 @@
 TnyStreamIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A type that defines a stream
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A stream is an object that can be written to and can be read from.
 </para>
-
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyMsgMimePartIface, #TnyMsgViewIface, #TnySaveStrategyIface, #TnyCamelStream, #TnyStreamCamel, #TnyMozEmbedStream, #TnyTextBufferStream, #TnyFsStream, #TnyVfsStream
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

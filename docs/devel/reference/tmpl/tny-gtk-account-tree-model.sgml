@@ -2,19 +2,34 @@
 TnyGtkAccountTreeModel
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A #GtkTreeModel suitable for storing #TnyAccountIface instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #GtkTreeModel suitable for storing #TnyStoreAccountIface instances.
+</para><para>
+The implementation inherits the #GtkTreeStore. It recursively walks the
+folders of account instances that get added. Using it as a model for a
+#GtkTreeView will display the account name as parent row with the
+account-folders as the child rows.
 </para>
-
+<para>
+It's very important to unreference the instance you will get when doing something like this:
+<programlisting>
+TnyFolderface *folder;
+gtk_tree_model_get (model, &amp;iter,
+  TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
+  &amp;folder, -1);
+/* use folder */
+g_object_unref (G_OBJECT(folder));
+</programlisting>
+The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeModel will indeed add a reference.
+</para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyStoreAccountIface, #GtkTreeView, #GtkTreeStore, #GtkTreeModel
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

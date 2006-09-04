@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyGtkHeaderListIterator
+tny-msg-header-list-iterator-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,12 +9,10 @@ TnyGtkHeaderListIterator
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

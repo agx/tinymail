@@ -2,19 +2,17 @@
 TnyFolderStoreIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An interface that defines a store for folders
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A abstract type that contains child folders
 </para>
-
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyStoreAccountIface, #TnyStoreAccount, #TnyFolder, #TnyFolderStore
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

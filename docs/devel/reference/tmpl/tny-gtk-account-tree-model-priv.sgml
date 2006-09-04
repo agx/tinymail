@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-gtk-account-tree-model-priv
+TnyAccountTreeModel
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,12 +9,10 @@ tny-gtk-account-tree-model-priv
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

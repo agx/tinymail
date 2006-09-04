@@ -2,19 +2,17 @@
 TnyIteratorIface
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An iterator for #TnyListIface
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+An iterator for #TnyListIface
 </para>
-
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyListIface
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

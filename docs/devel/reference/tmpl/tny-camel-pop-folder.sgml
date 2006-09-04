@@ -2,19 +2,17 @@
 TnyCamelPOPFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A POP #TnyFolderIface implementation for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A POP #TnyFolderIface implementation for Camel
 </para>
-
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyFolderIface, #TnyCamelFolder
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

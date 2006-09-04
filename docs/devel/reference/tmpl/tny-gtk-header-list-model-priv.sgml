@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-gtk-header-list-model-priv
+TnyHeaderListModel
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,12 +9,10 @@ tny-gtk-header-list-model-priv
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
