@@ -148,7 +148,7 @@ main (int argc, char **argv)
     
 	g_option_context_parse (context, &argc, &argv, NULL);
 
-	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online, cachedir));
+	account_store = tny_test_account_store_new (online, cachedir);
 
 	if (cachedir)
 		g_print ("Using %s as cache directory\n", cachedir);

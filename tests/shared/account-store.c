@@ -41,9 +41,6 @@
 #include <tny-session-camel.h>
 
 #include "device.h"
-
-#include <tny-camel-shared.h>
-
 #include "account-store.h"
 
 
@@ -65,16 +62,16 @@ per_account_forget_pass_func (TnyAccountIface *account)
 
 
 static gboolean
-tny_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
+tny_test_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
 {
 	return TRUE;
 }
 
 
 static const gchar*
-tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
+tny_test_account_store_get_cache_dir (TnyAccountStoreIface *self)
 {
-	TnyAccountStore *me = (TnyAccountStore*) self;
+	TnyTestAccountStore *me = (TnyTestAccountStore*) self;
     
 	if (me->cache_dir == NULL)
 	{
@@ -100,9 +97,9 @@ tny_account_store_get_cache_dir (TnyAccountStoreIface *self)
 
 
 static void
-tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
+tny_test_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
 {
-    	TnyAccountStore *me = (TnyAccountStore *) self;
+    	TnyTestAccountStore *me = (TnyTestAccountStore *) self;
     
 	TnyAccountIface *account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
     
@@ -131,10 +128,10 @@ tny_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, 
 
 
 
-TnyAccountStore*
-tny_account_store_new (gboolean force_online, const gchar *cachedir)
+TnyAccountStoreIface*
+tny_test_account_store_new (gboolean force_online, const gchar *cachedir)
 {
-	TnyAccountStore *self = g_object_new (TNY_TYPE_ACCOUNT_STORE, NULL);
+	TnyTestAccountStore *self = g_object_new (TNY_TYPE_TEST_ACCOUNT_STORE, NULL);
 
 	if (cachedir)
 	{
@@ -152,14 +149,14 @@ tny_account_store_new (gboolean force_online, const gchar *cachedir)
     	else
 		tny_device_iface_force_offline (self->device);
     
-	return self;
+	return TNY_ACCOUNT_STORE_IFACE (self);
 }
 
 
 static void
-tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_test_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyAccountStore *self = (TnyAccountStore *)instance;
+	TnyTestAccountStore *self = (TnyTestAccountStore *)instance;
 	TnyPlatformFactoryIface *platfact = TNY_PLATFORM_FACTORY_IFACE (
 		tny_platform_factory_get_instance ());
 
@@ -171,9 +168,9 @@ tny_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 
 
 static void
-tny_account_store_finalize (GObject *object)
+tny_test_account_store_finalize (GObject *object)
 {
-	TnyAccountStore *me = (TnyAccountStore*) object;
+	TnyTestAccountStore *me = (TnyTestAccountStore*) object;
     
 	if (me->cache_dir)
 		g_free (me->cache_dir);
@@ -185,35 +182,35 @@ tny_account_store_finalize (GObject *object)
 
 
 static void 
-tny_account_store_class_init (TnyAccountStoreClass *class)
+tny_test_account_store_class_init (TnyTestAccountStoreClass *class)
 {
 	GObjectClass *object_class;
     
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_account_store_finalize;
+	object_class->finalize = tny_test_account_store_finalize;
 
 	return;
 }
 
 
 static void
-tny_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
+tny_test_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
 {
 	return;
 }
 
 static void
-tny_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
+tny_test_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
 {
 	return;
 }
 
 static TnyDeviceIface*
-tny_account_store_get_device (TnyAccountStoreIface *self)
+tny_test_account_store_get_device (TnyAccountStoreIface *self)
 {
-	TnyAccountStore *me =  (TnyAccountStore*) self;
+	TnyTestAccountStore *me =  (TnyTestAccountStore*) self;
 
 	return me->device;
 }
@@ -224,19 +221,19 @@ tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyAccountStoreIfaceClass *klass = (TnyAccountStoreIfaceClass *)g_iface;
 
-	klass->get_accounts_func = tny_account_store_get_accounts;
-	klass->get_cache_dir_func = tny_account_store_get_cache_dir;
-	klass->alert_func = tny_account_store_alert;
-	klass->add_store_account_func = tny_account_store_add_store_account;
-	klass->add_transport_account_func = tny_account_store_add_transport_account;
-	klass->get_device_func = tny_account_store_get_device;
+	klass->get_accounts_func = tny_test_account_store_get_accounts;
+	klass->get_cache_dir_func = tny_test_account_store_get_cache_dir;
+	klass->alert_func = tny_test_account_store_alert;
+	klass->add_store_account_func = tny_test_account_store_add_store_account;
+	klass->add_transport_account_func = tny_test_account_store_add_transport_account;
+	klass->get_device_func = tny_test_account_store_get_device;
     
 	return;
 }
 
 
 GType 
-tny_account_store_get_type (void)
+tny_test_account_store_get_type (void)
 {
 	static GType type = 0;
 
@@ -244,15 +241,15 @@ tny_account_store_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyAccountStoreClass),
+		  sizeof (TnyTestAccountStoreClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_account_store_class_init,   /* class_init */
+		  (GClassInitFunc) tny_test_account_store_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyAccountStore),
+		  sizeof (TnyTestAccountStore),
 		  0,      /* n_preallocs */
-		  tny_account_store_instance_init    /* instance_init */
+		  tny_test_account_store_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_account_store_iface_info = 
@@ -263,7 +260,7 @@ tny_account_store_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyAccountStore",
+			"TnyTestAccountStore",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_IFACE, 

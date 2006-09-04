@@ -50,7 +50,7 @@ tny_folder_store_query_test_setup (void)
     if (online_tests)
     {
 	accounts = tny_list_new ();
-	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (TRUE, NULL));
+	account_store = tny_test_account_store_new (TRUE, NULL);
 	tny_account_store_iface_get_accounts (account_store, accounts, 
 			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
 	aiter = tny_list_iface_create_iterator (accounts);

@@ -17,7 +17,7 @@ endif
 
 bin_PROGRAMS = memory-test
 
-memory_test_SOURCES = memory-test.c memory-test.h 
+memory_test_SOURCES = memory-test.c 
 
 memory_test_LDADD = 							        \
 	$(TINYMAIL_LIBS)						        \

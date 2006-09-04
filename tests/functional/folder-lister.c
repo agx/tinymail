@@ -83,8 +83,8 @@ main (int argc, char **argv)
 	TnyAccountStoreIface *account_store;
 	TnyListIface *accounts;
 	TnyFolderStoreQuery *query;
-	TnyStoreAccountIface *account; TnyIteratorIface *iter;
-	TnyFolderStoreQueryOption qoptions;
+	TnyStoreAccountIface *account;
+	TnyIteratorIface *iter;
     
 	free (malloc (10));
     
@@ -92,17 +92,15 @@ main (int argc, char **argv)
 
     	context = g_option_context_new ("- The tinymail functional tester");
 	g_option_context_add_main_entries (context, options, "tinymail");
-
     	g_option_context_parse (context, &argc, &argv, NULL);
 
-	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online, cachedir));
+	account_store = tny_test_account_store_new (online, cachedir);
 
 	if (cachedir)
 		g_print ("Using %s as cache directory\n", cachedir);
 
 	g_option_context_free (context);
     
-       
 	accounts = tny_list_new ();
 
 	tny_account_store_iface_get_accounts (account_store, accounts, 
@@ -111,12 +109,7 @@ main (int argc, char **argv)
 	iter = tny_list_iface_create_iterator (accounts);
 	account = (TnyStoreAccountIface*) tny_iterator_iface_current (iter);
 
-	recursion_level = 0;
-	qoptions = TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED;
-	qoptions |= TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED;
-	//query = tny_folder_store_query_new ();
-	//tny_folder_store_query_add_item (query, NULL, qoptions);
-	    
+	recursion_level = 0;	    
 	recurse_folders (TNY_FOLDER_STORE_IFACE (account), NULL);
     
 	g_object_unref (G_OBJECT (account));

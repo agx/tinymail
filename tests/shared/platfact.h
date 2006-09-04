@@ -1,5 +1,5 @@
-#ifndef TNY_PLATFORM_FACTORY_H
-#define TNY_PLATFORM_FACTORY_H
+#ifndef PLATFACT_H
+#define PLATFACT_H
 
 /* libtinymail-camel - The Tiny Mail base library for Camel
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -27,29 +27,28 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_PLATFORM_FACTORY             (tny_platform_factory_get_type ())
-#define TNY_PLATFORM_FACTORY(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_PLATFORM_FACTORY, TnyPlatformFactory))
-#define TNY_PLATFORM_FACTORY_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_PLATFORM_FACTORY, TnyPlatformFactoryClass))
-#define TNY_IS_PLATFORM_FACTORY(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_PLATFORM_FACTORY))
-#define TNY_IS_PLATFORM_FACTORY_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_PLATFORM_FACTORY))
-#define TNY_PLATFORM_FACTORY_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_PLATFORM_FACTORY, TnyPlatformFactoryClass))
+#define TNY_TYPE_TEST_PLATFORM_FACTORY             (tny_test_platform_factory_get_type ())
+#define TNY_TEST_PLATFORM_FACTORY(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_TEST_PLATFORM_FACTORY, TnyTestPlatformFactory))
+#define TNY_TEST_PLATFORM_FACTORY_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_TEST_PLATFORM_FACTORY, TnyTestPlatformFactoryClass))
+#define TNY_IS_TEST_PLATFORM_FACTORY(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_TEST_PLATFORM_FACTORY))
+#define TNY_IS_TEST_PLATFORM_FACTORY_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_TEST_PLATFORM_FACTORY))
+#define TNY_TEST_PLATFORM_FACTORY_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_TEST_PLATFORM_FACTORY, TnyTestPlatformFactoryClass))
 
-typedef struct _TnyPlatformFactory TnyPlatformFactory;
-typedef struct _TnyPlatformFactoryClass TnyPlatformFactoryClass;
+typedef struct _TnyTestPlatformFactory TnyTestPlatformFactory;
+typedef struct _TnyTestPlatformFactoryClass TnyTestPlatformFactoryClass;
 
-struct _TnyPlatformFactory
+struct _TnyTestPlatformFactory
 {
 	GObject parent;
 };
 
-struct _TnyPlatformFactoryClass 
+struct _TnyTestPlatformFactoryClass 
 {
 	GObjectClass parent;
 };
 
-GType tny_platform_factory_get_type (void);
-
-TnyPlatformFactory* tny_platform_factory_get_instance (void);
+GType tny_test_platform_factory_get_type (void);
+TnyPlatformFactoryIface* tny_test_platform_factory_get_instance (void);
 
 G_END_DECLS
 

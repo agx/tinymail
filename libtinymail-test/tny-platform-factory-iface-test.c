@@ -29,7 +29,7 @@ static gchar *str;
 static void
 tny_platform_factory_iface_test_setup (void)
 {
-	iface = TNY_PLATFORM_FACTORY_IFACE (tny_platform_factory_get_instance ());
+	iface = tny_test_platform_factory_get_instance ();
 
 	return;
 }

@@ -1,5 +1,5 @@
-#ifndef TNY_ACCOUNT_STORE_H
-#define TNY_ACCOUNT_STORE_H
+#ifndef ACCOUNT_STORE_H
+#define ACCOUNT_STORE_H
 
 /* tinymail - Tiny Mail
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -22,21 +22,23 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-shared.h>
+#include <tny-account-store-iface.h>
 #include <tny-camel-shared.h>
+
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_ACCOUNT_STORE             (tny_account_store_get_type ())
-#define TNY_ACCOUNT_STORE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_ACCOUNT_STORE, TnyAccountStore))
-#define TNY_ACCOUNT_STORE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_ACCOUNT_STORE, TnyAccountStoreClass))
-#define TNY_IS_ACCOUNT_STORE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_ACCOUNT_STORE))
-#define TNY_IS_ACCOUNT_STORE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_ACCOUNT_STORE))
-#define TNY_ACCOUNT_STORE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_ACCOUNT_STORE, TnyAccountStoreClass))
+#define TNY_TYPE_TEST_ACCOUNT_STORE             (tny_test_account_store_get_type ())
+#define TNY_TEST_ACCOUNT_STORE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_TEST_ACCOUNT_STORE, TnyTestAccountStore))
+#define TNY_TEST_ACCOUNT_STORE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_TEST_ACCOUNT_STORE, TnyTestAccountStoreClass))
+#define TNY_IS_TEST_ACCOUNT_STORE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_TEST_ACCOUNT_STORE))
+#define TNY_IS_TEST_ACCOUNT_STORE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_TEST_ACCOUNT_STORE))
+#define TNY_TEST_ACCOUNT_STORE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_TEST_ACCOUNT_STORE, TnyTestAccountStoreClass))
 
-typedef struct _TnyAccountStore TnyAccountStore;
-typedef struct _TnyAccountStoreClass TnyAccountStoreClass;
+typedef struct _TnyTestAccountStore TnyTestAccountStore;
+typedef struct _TnyTestAccountStoreClass TnyTestAccountStoreClass;
 
-struct _TnyAccountStore
+struct _TnyTestAccountStore
 {
 	GObject parent;
     
@@ -46,14 +48,14 @@ struct _TnyAccountStore
     	gboolean force_online;
 };
 
-struct _TnyAccountStoreClass
+struct _TnyTestAccountStoreClass
 {
 	GObjectClass parent;
 };
 
-GType               tny_account_store_get_type       (void);
-TnyAccountStore*    tny_account_store_new            (gboolean force_online, const gchar *cachedir);
-TnySessionCamel*    tny_account_store_get_session    (TnyAccountStore *self);
+GType tny_test_account_store_get_type (void);
+TnyAccountStoreIface* tny_test_account_store_new (gboolean force_online, const gchar *cachedir);
+TnySessionCamel* tny_test_account_store_get_session (TnyTestAccountStore *self);
 
 G_END_DECLS
 

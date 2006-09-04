@@ -97,8 +97,8 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	TnyAccountStoreIface *account_store;
 	TnyListIface *accounts;
-	TnyStoreAccountIface *account; TnyIteratorIface *iter;
-	TnyFolderStoreQueryOption qoptions;
+	TnyStoreAccountIface *account;
+	TnyIteratorIface *iter;
     
 	free (malloc (10));
 	g_type_init ();
@@ -112,7 +112,7 @@ main (int argc, char **argv)
     	if (mainloop)
 		gtk_init (&argc, &argv);
 
-	account_store = TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (online, cachedir));
+	account_store = tny_test_account_store_new (online, cachedir);
 
 	if (cachedir)
 		g_print ("Using %s as cache directory\n", cachedir);

@@ -36,30 +36,30 @@
 static GObjectClass *parent_class = NULL;
 
 static void
-tny_platform_factory_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_test_platform_factory_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	return;
 }
 
 
 static TnyAccountStoreIface*
-tny_platform_factory_new_account_store (TnyPlatformFactoryIface *self)
+tny_test_platform_factory_new_account_store (TnyPlatformFactoryIface *self)
 {
-	return TNY_ACCOUNT_STORE_IFACE (tny_account_store_new (FALSE, NULL));
+	return tny_test_account_store_new (FALSE, NULL);
 }
 
 static TnyDeviceIface*
-tny_platform_factory_new_device (TnyPlatformFactoryIface *self)
+tny_test_platform_factory_new_device (TnyPlatformFactoryIface *self)
 {
-	return TNY_DEVICE_IFACE (tny_device_new ());
+	return tny_test_device_new ();
 }
 
 static TnyMsgViewIface*
-tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
+tny_test_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
 {
 	TnySaveStrategyIface *save_strategy = tny_gtk_save_strategy_new ();
 
-	return TNY_MSG_VIEW_IFACE (tny_gtk_msg_view_new (save_strategy));
+	return tny_gtk_msg_view_new (save_strategy);
 }
 
 /**
@@ -68,17 +68,17 @@ tny_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
  *
  * Return value: The #TnyPlatformFactoryIface singleton instance
  **/
-TnyPlatformFactory*
-tny_platform_factory_get_instance (void)
+TnyPlatformFactoryIface*
+tny_test_platform_factory_get_instance (void)
 {
-	TnyPlatformFactory *self = g_object_new (TNY_TYPE_PLATFORM_FACTORY, NULL);
+	TnyTestPlatformFactory *self = g_object_new (TNY_TYPE_TEST_PLATFORM_FACTORY, NULL);
 
-	return self;
+	return TNY_PLATFORM_FACTORY_IFACE (self);
 }
 
 
 static void
-tny_platform_factory_finalize (GObject *object)
+tny_test_platform_factory_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -91,19 +91,19 @@ tny_platform_factory_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyPlatformFactoryIfaceClass *klass = (TnyPlatformFactoryIfaceClass *)g_iface;
 
-	klass->new_account_store_func = tny_platform_factory_new_account_store;
-	klass->new_device_func = tny_platform_factory_new_device;
-	klass->new_msg_view_func = tny_platform_factory_new_msg_view;
+	klass->new_account_store_func = tny_test_platform_factory_new_account_store;
+	klass->new_device_func = tny_test_platform_factory_new_device;
+	klass->new_msg_view_func = tny_test_platform_factory_new_msg_view;
 
 	return;
 }
 
 
-static TnyPlatformFactory *the_singleton = NULL;
+static TnyTestPlatformFactory *the_singleton = NULL;
 
 
 static GObject*
-tny_platform_factory_constructor (GType type, guint n_construct_params,
+tny_test_platform_factory_constructor (GType type, guint n_construct_params,
 			GObjectConstructParam *construct_params)
 {
 	GObject *object;
@@ -115,7 +115,7 @@ tny_platform_factory_constructor (GType type, guint n_construct_params,
 		object = G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_params, construct_params);
 
-		the_singleton = TNY_PLATFORM_FACTORY (object);
+		the_singleton = TNY_TEST_PLATFORM_FACTORY (object);
 	}
 	else
 	{
@@ -130,21 +130,21 @@ tny_platform_factory_constructor (GType type, guint n_construct_params,
 }
 
 static void 
-tny_platform_factory_class_init (TnyPlatformFactoryClass *class)
+tny_test_platform_factory_class_init (TnyTestPlatformFactoryClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_platform_factory_finalize;
-	object_class->constructor = tny_platform_factory_constructor;
+	object_class->finalize = tny_test_platform_factory_finalize;
+	object_class->constructor = tny_test_platform_factory_constructor;
 
 	return;
 }
 
 GType 
-tny_platform_factory_get_type (void)
+tny_test_platform_factory_get_type (void)
 {
 	static GType type = 0;
 
@@ -152,15 +152,15 @@ tny_platform_factory_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyPlatformFactoryClass),
+		  sizeof (TnyTestPlatformFactoryClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_platform_factory_class_init,   /* class_init */
+		  (GClassInitFunc) tny_test_platform_factory_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyPlatformFactory),
+		  sizeof (TnyTestPlatformFactory),
 		  0,      /* n_preallocs */
-		  tny_platform_factory_instance_init    /* instance_init */
+		  tny_test_platform_factory_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_platform_factory_iface_info = 
@@ -171,7 +171,7 @@ tny_platform_factory_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyPlatformFactory",
+			"TnyTestPlatformFactory",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_PLATFORM_FACTORY_IFACE, 
