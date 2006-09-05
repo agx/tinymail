@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnySummaryView
+TnyDemouiSummaryView
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -17,14 +17,14 @@ TnySummaryView
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnySummaryView ##### -->
+<!-- ##### STRUCT TnyDemouiSummaryView ##### -->
 <para>
 
 </para>
 
 @parent: 
 
-<!-- ##### FUNCTION tny_summary_view_new ##### -->
+<!-- ##### FUNCTION tny_demoui_summary_view_new ##### -->
 <para>
 
 </para>

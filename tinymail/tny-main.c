@@ -39,7 +39,7 @@
 #include <tny-olpc-platform-factory.h>
 #endif
 
-#include <tny-summary-view.h>
+#include <tny-demoui-summary-view.h>
 
 #ifdef GNOME
 #include <libgnomevfs/gnome-vfs.h>
@@ -117,7 +117,7 @@ main (int argc, char **argv)
 	platfact = tny_olpc_platform_factory_get_instance ();    
 #endif
 
-	view = GTK_WIDGET (tny_summary_view_new ());
+	view = GTK_WIDGET (tny_demoui_summary_view_new ());
 
 	if (plug > 0) {
 		g_message ("Plugging into socket %d", plug);

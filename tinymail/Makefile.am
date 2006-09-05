@@ -18,10 +18,10 @@ endif
 
 bin_PROGRAMS = tinymail
 
-tinymail_SOURCES = 							\
-	tny-main.c							\
-	tny-summary-view.c						\
-	tny-summary-view.h
+tinymail_SOURCES = 				\
+	tny-main.c				\
+	tny-demoui-summary-view.c		\
+	tny-demoui-summary-view.h
 
 tinymail_LDADD = 							        \
 	$(TINYMAIL_LIBS)						        \

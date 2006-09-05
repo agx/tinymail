@@ -62,7 +62,7 @@
 #include <tny-gtk-account-tree-model.h>
 #include <tny-header-iface.h>
 #include <tny-gtk-header-list-model.h>
-#include <tny-summary-view.h>
+#include <tny-demoui-summary-view.h>
 #include <tny-summary-view-iface.h>
 #include <tny-account-store-view-iface.h>
 #include <tny-list.h>
@@ -73,9 +73,9 @@
 static GObjectClass *parent_class = NULL;
 
 
-typedef struct _TnySummaryViewPriv TnySummaryViewPriv;
+typedef struct _TnyDemouiSummaryViewPriv TnyDemouiSummaryViewPriv;
 
-struct _TnySummaryViewPriv
+struct _TnyDemouiSummaryViewPriv
 {
 	TnyAccountStoreIface *account_store;
 	GtkTreeView *mailbox_view, *header_view;
@@ -90,8 +90,8 @@ struct _TnySummaryViewPriv
 	TnyListIface *current_accounts;
 };
 
-#define TNY_SUMMARY_VIEW_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_SUMMARY_VIEW, TnySummaryViewPriv))
+#define TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_DEMOUI_SUMMARY_VIEW, TnyDemouiSummaryViewPriv))
 
 
 
@@ -116,7 +116,7 @@ set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
 static GtkTreeModel *empty_model;
 
 static void 
-reload_accounts (TnySummaryViewPriv *priv)
+reload_accounts (TnyDemouiSummaryViewPriv *priv)
 {
 	TnyAccountStoreIface *account_store = priv->account_store;
 	GtkTreeModel *sortable;
@@ -162,7 +162,7 @@ reload_accounts (TnySummaryViewPriv *priv)
 static void
 accounts_reloaded (TnyAccountStoreIface *store, gpointer user_data)
 {
-	TnySummaryViewPriv *priv = user_data;
+	TnyDemouiSummaryViewPriv *priv = user_data;
 	
 	reload_accounts (priv);
 	
@@ -173,7 +173,7 @@ static void
 online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 {
 	TnySummaryViewIface *self = user_data;
-	TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
 	if (priv->account_store)
 	{
@@ -190,7 +190,7 @@ static void
 connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 {
 	TnySummaryViewIface *self = user_data;
-	TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
 	if (online)
 	{
@@ -210,9 +210,9 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 }
 
 static void
-tny_summary_view_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store)
+tny_demoui_summary_view_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store)
 {
-	TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyDeviceIface *device = tny_account_store_iface_get_device (account_store);
 
 	if (G_UNLIKELY (priv->account_store))
@@ -255,14 +255,10 @@ tny_summary_view_set_account_store (TnyAccountStoreViewIface *self, TnyAccountSt
 static void
 on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gpointer user_data)
 {
-	/* If the user presses the [Del] button on his keyboard */
-
 	if (event->keyval == GDK_Delete)
 	{
-		//TnySummaryView *self  = user_data;
-		//TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
 		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
-		GtkTreeModel *model, *mymodel; //, *sortable;
+		GtkTreeModel *model, *mymodel;
 		GtkTreeIter iter;
 
 		if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
@@ -322,8 +318,8 @@ static void
 on_header_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
 {
-	TnySummaryView *self  = user_data;
-	TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyDemouiSummaryView *self  = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 
@@ -367,7 +363,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 static gboolean
 cleanup_statusbar (gpointer data)
 {
-	TnySummaryViewPriv *priv = data;
+	TnyDemouiSummaryViewPriv *priv = data;
 
 	gtk_widget_hide (GTK_WIDGET (priv->progress));
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
@@ -378,7 +374,7 @@ cleanup_statusbar (gpointer data)
 static void
 refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer user_data)
 {
-	TnySummaryViewPriv *priv = user_data;
+	TnyDemouiSummaryViewPriv *priv = user_data;
 
 	if (!cancelled)
 	{
@@ -432,7 +428,7 @@ refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer use
 static void
 refresh_current_folder_status_update (TnyFolderIface *folder, const gchar *what, gint status, gpointer user_data)
 {
-	TnySummaryViewPriv *priv = user_data;
+	TnyDemouiSummaryViewPriv *priv = user_data;
 
 	gtk_progress_bar_pulse (GTK_PROGRESS_BAR (priv->progress));
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
@@ -445,8 +441,7 @@ static void
 on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
 {
-	TnySummaryViewPriv *priv = user_data;
-	//GtkTreeView *header_view = priv->header_view;
+	TnyDemouiSummaryViewPriv *priv = user_data;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 
@@ -564,24 +559,24 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 }
 
 /**
- * tny_summary_view_new:
+ * tny_demoui_summary_view_new:
  * 
  *
  * Return value: A new #TnySummaryViewIface instance implemented for Gtk+
  **/
 TnySummaryViewIface*
-tny_summary_view_new (void)
+tny_demoui_summary_view_new (void)
 {
-	TnySummaryView *self = g_object_new (TNY_TYPE_SUMMARY_VIEW, NULL);
+	TnyDemouiSummaryView *self = g_object_new (TNY_TYPE_DEMOUI_SUMMARY_VIEW, NULL);
 
 	return TNY_SUMMARY_VIEW_IFACE (self);
 }
 
 static void
-tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnySummaryView *self = (TnySummaryView *)instance;
-	TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyDemouiSummaryView *self = (TnyDemouiSummaryView *)instance;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyPlatformFactoryIface *platfact;
 
 	GtkVBox *vbox = GTK_VBOX (self);
@@ -764,10 +759,10 @@ tny_summary_view_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_summary_view_finalize (GObject *object)
+tny_demoui_summary_view_finalize (GObject *object)
 {
-	TnySummaryView *self = (TnySummaryView *)object;	
-	TnySummaryViewPriv *priv = TNY_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyDemouiSummaryView *self = (TnyDemouiSummaryView *)object;	
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->account_store))
 	{
@@ -793,28 +788,28 @@ tny_account_store_view_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	TnyAccountStoreViewIfaceClass *klass = (TnyAccountStoreViewIfaceClass *)g_iface;
 
-	klass->set_account_store_func = tny_summary_view_set_account_store;
+	klass->set_account_store_func = tny_demoui_summary_view_set_account_store;
 
 	return;
 }
 
 static void 
-tny_summary_view_class_init (TnySummaryViewClass *class)
+tny_demoui_summary_view_class_init (TnyDemouiSummaryViewClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_summary_view_finalize;
+	object_class->finalize = tny_demoui_summary_view_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnySummaryViewPriv));
+	g_type_class_add_private (object_class, sizeof (TnyDemouiSummaryViewPriv));
 
 	return;
 }
 
 GType 
-tny_summary_view_get_type (void)
+tny_demoui_summary_view_get_type (void)
 {
 	static GType type = 0;
 
@@ -822,15 +817,15 @@ tny_summary_view_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnySummaryViewClass),
+		  sizeof (TnyDemouiSummaryViewClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_summary_view_class_init,   /* class_init */
+		  (GClassInitFunc) tny_demoui_summary_view_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnySummaryView),
+		  sizeof (TnyDemouiSummaryView),
 		  0,      /* n_preallocs */
-		  tny_summary_view_instance_init    /* instance_init */
+		  tny_demoui_summary_view_instance_init    /* instance_init */
 		};
 
 		static const GInterfaceInfo tny_summary_view_iface_info = 
@@ -848,7 +843,7 @@ tny_summary_view_get_type (void)
 		};
 
 		type = g_type_register_static (GTK_TYPE_VBOX,
-			"TnySummaryView",
+			"TnyDemouiSummaryView",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_SUMMARY_VIEW_IFACE, 

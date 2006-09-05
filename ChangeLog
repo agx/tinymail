@@ -1,3 +1,7 @@
+2006-09-05  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Renamed TnySummaryView to TnyDemouiSummaryView
+
 2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed the GPE types in libtinymail-gpe
