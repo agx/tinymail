@@ -379,7 +379,7 @@ refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer use
 	if (!cancelled)
 	{
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
-		GtkTreeModel *sortable; // *oldsortable;
+		GtkTreeModel *sortable;
 		GtkTreeModel *select_model;
 		GtkTreeModel *model = tny_gtk_header_list_model_new ();
 		gboolean refresh = FALSE;
