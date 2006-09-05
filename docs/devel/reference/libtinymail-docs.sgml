@@ -19,7 +19,7 @@
 <!ENTITY libtinymail-TnyDeviceIface SYSTEM "xml/tny-device-iface.xml">
 <!ENTITY libtinymail-TnyListIface SYSTEM "xml/tny-list-iface.xml">
 <!ENTITY libtinymail-TnyIteratorIface SYSTEM "xml/tny-iterator-iface.xml">
-<!ENTITY libtinymail-TnyList SYSTEM "xml/tny-list.xml">
+<!ENTITY libtinymail-TnySimpleList SYSTEM "xml/tny-simple-list.xml">
 
 
 <!ENTITY libtinymail-camel-TnyCamelAccount SYSTEM "xml/tny-camel-account.xml">
@@ -114,7 +114,7 @@
 		&libtinymail-TnyDeviceIface;
 		&libtinymail-TnyListIface;
 		&libtinymail-TnyIteratorIface;
-		&libtinymail-TnyList;
+		&libtinymail-TnySimpleList;
 	</chapter>
 
 	<chapter id="libtinymailui">

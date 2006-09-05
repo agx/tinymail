@@ -477,6 +477,13 @@ TnyTransportAccount
 
 @obj: 
 
+<!-- ##### MACRO TNY_LIST_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
 <!-- ##### MACRO TNY_MIME_PART_GET_PRIVATE ##### -->
 <para>
 
@@ -733,6 +740,36 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @parent: 
 @model: 
 @current: 
+
+<!-- ##### STRUCT TnyList ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyListClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyListIterator ##### -->
+<para>
+
+</para>
+
+@parent: 
+@model: 
+@current: 
+
+<!-- ##### STRUCT TnyListPriv ##### -->
+<para>
+
+</para>
+
+@iterator_lock: 
+@first: 
 
 <!-- ##### STRUCT TnyMimePart ##### -->
 <para>

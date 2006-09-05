@@ -363,13 +363,13 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when n
 @user_data: user data
 
 
-<!-- ##### STRUCT TnyList ##### -->
+<!-- ##### STRUCT TnySimpleList ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyListClass ##### -->
+<!-- ##### STRUCT TnySimpleListClass ##### -->
 <para>
 
 </para>

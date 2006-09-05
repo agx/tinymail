@@ -17,7 +17,7 @@ tny-list-priv
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyListPriv ##### -->
+<!-- ##### STRUCT TnySimpleListPriv ##### -->
 <para>
 
 </para>
@@ -25,7 +25,7 @@ tny-list-priv
 @iterator_lock: 
 @first: 
 
-<!-- ##### MACRO TNY_LIST_GET_PRIVATE ##### -->
+<!-- ##### MACRO TNY_SIMPLE_LIST_GET_PRIVATE ##### -->
 <para>
 
 </para>
