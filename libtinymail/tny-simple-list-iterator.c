@@ -22,21 +22,22 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <tny-list.h>
-#include "tny-list-priv.h"
-#include "tny-list-iterator-priv.h"
+#include <tny-simple-list.h>
+
+#include "tny-simple-list-priv.h"
+#include "tny-simple-list-iterator-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
 
 void 
-_tny_list_iterator_set_model (TnyListIterator *self, TnyList *model)
+_tny_simple_list_iterator_set_model (TnySimpleListIterator *self, TnySimpleList *model)
 {
-	TnyListPriv *lpriv;
+	TnySimpleListPriv *lpriv;
 
 	self->model = model;
 
-	lpriv = TNY_LIST_GET_PRIVATE (self->model);
+	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (self->model);
 
 	g_mutex_lock (lpriv->iterator_lock);
 	self->current = lpriv->first;
@@ -47,20 +48,20 @@ _tny_list_iterator_set_model (TnyListIterator *self, TnyList *model)
 
 
 
-TnyListIterator*
-_tny_list_iterator_new (TnyList *model)
+TnyIteratorIface*
+_tny_simple_list_iterator_new (TnySimpleList *model)
 {
-	TnyListIterator *self = g_object_new (TNY_TYPE_LIST_ITERATOR, NULL);
+	TnySimpleListIterator *self = g_object_new (TNY_TYPE_SIMPLE_LIST_ITERATOR, NULL);
 
-	_tny_list_iterator_set_model (self, model);
+	_tny_simple_list_iterator_set_model (self, model);
 
-	return self;
+	return TNY_ITERATOR_IFACE (self);
 }
 
 static void
-tny_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_simple_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyListIterator *self = (TnyListIterator *)instance;
+	TnySimpleListIterator *self = (TnySimpleListIterator *)instance;
 
 	self->model = NULL;
 	self->current = NULL;
@@ -69,7 +70,7 @@ tny_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-tny_list_iterator_finalize (GObject *object)
+tny_simple_list_iterator_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -78,15 +79,15 @@ tny_list_iterator_finalize (GObject *object)
 
 
 static void 
-tny_list_iterator_next (TnyIteratorIface *self)
+tny_simple_list_iterator_next (TnyIteratorIface *self)
 {
-	TnyListIterator *me = (TnyListIterator*) self;
-	TnyListPriv *lpriv;
+	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
+	TnySimpleListPriv *lpriv;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
-	lpriv = TNY_LIST_GET_PRIVATE (me->model);
+	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (me->model);
 
 	g_mutex_lock (lpriv->iterator_lock);
 	me->current = g_list_next (me->current);
@@ -96,15 +97,15 @@ tny_list_iterator_next (TnyIteratorIface *self)
 }
 
 static void 
-tny_list_iterator_prev (TnyIteratorIface *self)
+tny_simple_list_iterator_prev (TnyIteratorIface *self)
 {
-	TnyListIterator *me = (TnyListIterator*) self;
-	TnyListPriv *lpriv;
+	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
+	TnySimpleListPriv *lpriv;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
-	lpriv = TNY_LIST_GET_PRIVATE (me->model);
+	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (me->model);
 
 	g_mutex_lock (lpriv->iterator_lock);
 	me->current = g_list_previous (me->current);
@@ -114,15 +115,15 @@ tny_list_iterator_prev (TnyIteratorIface *self)
 }
 
 static void 
-tny_list_iterator_first (TnyIteratorIface *self)
+tny_simple_list_iterator_first (TnyIteratorIface *self)
 {
-	TnyListIterator *me = (TnyListIterator*) self;
-	TnyListPriv *lpriv;
+	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
+	TnySimpleListPriv *lpriv;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
-	lpriv = TNY_LIST_GET_PRIVATE (me->model);
+	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (me->model);
 
 	g_mutex_lock (lpriv->iterator_lock);
 	me->current = lpriv->first;
@@ -133,9 +134,9 @@ tny_list_iterator_first (TnyIteratorIface *self)
 
 
 static gboolean 
-tny_list_iterator_is_done (TnyIteratorIface *self)
+tny_simple_list_iterator_is_done (TnyIteratorIface *self)
 {
-	TnyListIterator *me = (TnyListIterator*) self;
+	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 
 	return me->current == NULL;
 }
@@ -143,15 +144,15 @@ tny_list_iterator_is_done (TnyIteratorIface *self)
 
 
 static void
-tny_list_iterator_nth (TnyIteratorIface *self, guint nth)
+tny_simple_list_iterator_nth (TnyIteratorIface *self, guint nth)
 {
-	TnyListIterator *me = (TnyListIterator*) self;
-	TnyListPriv *lpriv;
+	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
+	TnySimpleListPriv *lpriv;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
-	lpriv = TNY_LIST_GET_PRIVATE (me->model);
+	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (me->model);
 
 	/* Move the iterator to the nth node. We'll count from zero,
 	   so we start with the first node of which we know the model
@@ -166,16 +167,16 @@ tny_list_iterator_nth (TnyIteratorIface *self, guint nth)
 
 
 static GObject* 
-tny_list_iterator_current (TnyIteratorIface *self)
+tny_simple_list_iterator_current (TnyIteratorIface *self)
 {
-	TnyListIterator *me = (TnyListIterator*) self;
+	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 	gpointer retval;
-	TnyListPriv *lpriv;
+	TnySimpleListPriv *lpriv;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
 
-	lpriv = TNY_LIST_GET_PRIVATE (me->model);
+	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (me->model);
 
 	g_mutex_lock (lpriv->iterator_lock);
 	retval = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
@@ -189,9 +190,9 @@ tny_list_iterator_current (TnyIteratorIface *self)
 
 
 static TnyListIface* 
-tny_list_iterator_get_list (TnyIteratorIface *self)
+tny_simple_list_iterator_get_list (TnyIteratorIface *self)
 {
-	TnyListIterator *me = (TnyListIterator*) self;
+	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 
 	/* Return the list */
 
@@ -207,32 +208,32 @@ static void
 tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
 {
 
-	klass->next_func = tny_list_iterator_next;
-	klass->prev_func = tny_list_iterator_prev;
-	klass->first_func = tny_list_iterator_first;
-	klass->nth_func = tny_list_iterator_nth;
-	klass->current_func = tny_list_iterator_current;
-	klass->get_list_func = tny_list_iterator_get_list;
-	klass->is_done = tny_list_iterator_is_done;
+	klass->next_func = tny_simple_list_iterator_next;
+	klass->prev_func = tny_simple_list_iterator_prev;
+	klass->first_func = tny_simple_list_iterator_first;
+	klass->nth_func = tny_simple_list_iterator_nth;
+	klass->current_func = tny_simple_list_iterator_current;
+	klass->get_list_func = tny_simple_list_iterator_get_list;
+	klass->is_done = tny_simple_list_iterator_is_done;
 	
 	return;
 }
 
 static void 
-tny_list_iterator_class_init (TnyListIteratorClass *klass)
+tny_simple_list_iterator_class_init (TnySimpleListIteratorClass *klass)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	object_class->finalize = tny_list_iterator_finalize;
+	object_class->finalize = tny_simple_list_iterator_finalize;
 
 	return;
 }
 
 GType 
-_tny_list_iterator_get_type (void)
+_tny_simple_list_iterator_get_type (void)
 {
 	static GType type = 0;
 
@@ -240,15 +241,15 @@ _tny_list_iterator_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyListIteratorClass),
+		  sizeof (TnySimpleListIteratorClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_list_iterator_class_init,   /* class_init */
+		  (GClassInitFunc) tny_simple_list_iterator_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyListIterator),
+		  sizeof (TnySimpleListIterator),
 		  0,      /* n_preallocs */
-		  tny_list_iterator_instance_init,    /* instance_init */
+		  tny_simple_list_iterator_instance_init,    /* instance_init */
 		  NULL
 		};
 
@@ -260,7 +261,7 @@ _tny_list_iterator_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyListIterator",
+			"TnySimpleListIterator",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ITERATOR_IFACE, 

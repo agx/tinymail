@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnyList
+TnySimpleList
 
 <!-- ##### SECTION Short_Description ##### -->
 A simple list implementation
@@ -17,13 +17,13 @@ A simple list implementation that uses a GList internally
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyList ##### -->
+<!-- ##### STRUCT TnySimpleList ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_list_new ##### -->
+<!-- ##### FUNCTION tny_simple_list_new ##### -->
 <para>
 
 </para>

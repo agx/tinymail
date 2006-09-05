@@ -24,7 +24,7 @@
 #include <tny-camel-header.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
@@ -71,7 +71,7 @@ tny_msg_iface_test_add_part_del_part (void)
 {
     
     	gint length = 0;
-    	TnyListIface *parts = TNY_LIST_IFACE (tny_list_new());
+    	TnyListIface *parts = tny_simple_list_new();
 	CamelMimePart *cpart = camel_mime_part_new ();
 	TnyMimePartIface *part = TNY_MIME_PART_IFACE (tny_camel_mime_part_new (cpart));
     
@@ -86,7 +86,7 @@ tny_msg_iface_test_add_part_del_part (void)
 	gunit_fail_unless (length == 2, str);
 	g_free (str);
 
-    	parts = TNY_LIST_IFACE (tny_list_new ());
+    	parts = tny_simple_list_new ();
     	tny_msg_iface_del_part (iface, part);
        	tny_msg_iface_get_parts (iface, parts);
 	length = tny_list_iface_length (parts);

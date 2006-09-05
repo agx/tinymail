@@ -27,7 +27,7 @@
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
 #include <tny-folder-store-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 
 #include <tny-gtk-account-tree-model.h>
 
@@ -44,7 +44,7 @@ static void
 recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStoreIface *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
 {
 	TnyIteratorIface *iter;
-	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
+	TnyListIface *folders = tny_simple_list_new ();
 
 	tny_folder_store_iface_get_folders (store, folders, query);
 	iter = tny_list_iface_create_iterator (folders);
@@ -83,7 +83,7 @@ static void
 tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccountIface *account, treeaddfunc func)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
+	TnyListIface *folders = tny_simple_list_new ();
 	GtkTreeIter name_iter;
 
 	func (model, &name_iter, NULL);

@@ -25,7 +25,7 @@
 #include <tny-camel-store-account.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
@@ -47,7 +47,7 @@ tny_account_iface_test_setup (void)
     
     if (online_tests)
     {
-	accounts = tny_list_new ();
+	accounts = tny_simple_list_new ();
 	account_store = tny_test_account_store_new (TRUE, NULL);
 	tny_account_store_iface_get_accounts (account_store, accounts, 
 			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
@@ -85,7 +85,7 @@ tny_store_account_iface_test_get_folders (void)
       	if (!online_tests)
 	    	return;
     
-    	folders = (TnyListIface *) tny_list_new();
+    	folders = tny_simple_list_new ();
     
     	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (iface),
 			folders, NULL);

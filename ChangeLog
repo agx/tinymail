@@ -1,7 +1,10 @@
 2006-09-05  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Renamed TnyList to TnySimpleList
 	* Renamed TnySummaryView to TnyDemouiSummaryView
 	* Bugfix in tny-gtk-header-list-model.c
+
+	* This was a major API change in all libraries
 
 2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 

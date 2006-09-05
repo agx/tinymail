@@ -32,7 +32,7 @@
 #include <tny-folder-store-iface.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 #include <tny-camel-header.h>
 
 #include <tny-folder-store-query.h>
@@ -49,7 +49,7 @@ tny_folder_store_query_test_setup (void)
 {
     if (online_tests)
     {
-	accounts = tny_list_new ();
+	accounts = tny_simple_list_new ();
 	account_store = tny_test_account_store_new (TRUE, NULL);
 	tny_account_store_iface_get_accounts (account_store, accounts, 
 			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
@@ -92,8 +92,8 @@ tny_folder_store_query_test_match_on_name (void)
 	query = tny_folder_store_query_new ();
 	tny_folder_store_query_add_item (query, "^tny.*$", TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME);
 
-	folders = (TnyListIface *) tny_list_new();
-	subfolders = (TnyListIface *) tny_list_new();
+	folders = tny_simple_list_new();
+	subfolders = tny_simple_list_new();
 
 	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
 			folders, NULL);
@@ -140,8 +140,8 @@ tny_folder_store_query_test_match_on_id (void)
 	query = tny_folder_store_query_new ();
 	tny_folder_store_query_add_item (query, "^INBOX/tny.*$", TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID);
 
-	folders = (TnyListIface *) tny_list_new();
-	subfolders = (TnyListIface *) tny_list_new();
+	folders = tny_simple_list_new();
+	subfolders = tny_simple_list_new();
 
 	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
 			folders, NULL);
@@ -186,8 +186,8 @@ tny_folder_store_query_test_match_subscribed (void)
 	query = tny_folder_store_query_new ();
 	tny_folder_store_query_add_item (query, NULL, TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED);
 
-	folders = (TnyListIface *) tny_list_new();
-	subfolders = (TnyListIface *) tny_list_new();
+	folders = tny_simple_list_new();
+	subfolders = tny_simple_list_new();
 
 	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
 			folders, NULL);
@@ -233,8 +233,8 @@ tny_folder_store_query_test_match_unsubscribed (void)
 	query = tny_folder_store_query_new ();
 	tny_folder_store_query_add_item (query, NULL, TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED);
 
-	folders = (TnyListIface *) tny_list_new();
-	subfolders = (TnyListIface *) tny_list_new();
+	folders = tny_simple_list_new();
+	subfolders = tny_simple_list_new();
 
 	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
 			folders, NULL);

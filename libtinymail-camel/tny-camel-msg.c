@@ -23,7 +23,6 @@
 
 #include <time.h>
 
-#include <tny-list.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
 

@@ -24,7 +24,7 @@
 #include <tny-folder-store-iface.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
@@ -52,7 +52,7 @@ static void
 recurse_folders (TnyFolderStoreIface *store, TnyFolderStoreQuery *query, const gchar *folname, performer func)
 {
 	TnyIteratorIface *iter;
-	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
+	TnyListIface *folders = tny_simple_list_new ();
 
 	tny_folder_store_iface_get_folders (store, folders, query);
 	iter = tny_list_iface_create_iterator (folders);
@@ -78,7 +78,7 @@ recurse_folders (TnyFolderStoreIface *store, TnyFolderStoreQuery *query, const g
 static void
 tny_folder_iface_test_setup (void)
 {
-	accounts = tny_list_new ();
+	accounts = tny_simple_list_new ();
 	account_store = tny_test_account_store_new (TRUE, NULL);
 	tny_account_store_iface_get_accounts (account_store, accounts, 
 			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
@@ -129,7 +129,7 @@ tny_folder_iface_test_get_headers_sync (void)
 	    	return;
 	}
     
-    	headers = tny_list_new ();
+    	headers = tny_simple_list_new ();
 	tny_folder_iface_refresh (iface);
 	all_count = tny_folder_iface_get_all_count (iface);
     
@@ -158,7 +158,7 @@ tny_folder_iface_test_remove_message (void)
 	    	return;
 	}
     
-    	headers = tny_list_new ();
+    	headers = tny_simple_list_new ();
 	tny_folder_iface_refresh (iface);
 	
 	tny_folder_iface_get_headers (iface, headers, FALSE);
@@ -185,7 +185,7 @@ tny_folder_iface_test_remove_message (void)
 	gunit_fail_unless (new_len == orig_length, str);
 	g_free (str);
 
-    	headers = tny_list_new ();
+    	headers = tny_simple_list_new ();
     	tny_folder_iface_get_headers (iface, headers, FALSE);
 	headers_len = tny_list_iface_length (headers);
 	g_object_unref (G_OBJECT (headers));
@@ -203,7 +203,7 @@ tny_folder_iface_test_remove_message (void)
 	gunit_fail_unless (new_len == orig_length-1, str);
 	g_free (str);
 
-    	headers = tny_list_new ();
+    	headers = tny_simple_list_new ();
     	tny_folder_iface_get_headers (iface, headers, FALSE);
 	headers_len = tny_list_iface_length (headers);
 	g_object_unref (G_OBJECT (headers));

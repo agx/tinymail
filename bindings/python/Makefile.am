@@ -76,7 +76,7 @@ tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(top_srcdir)/libtinymail/tny-device-iface.h		\
 	$(top_srcdir)/libtinymail/tny-fs-stream.h		\
 	$(top_srcdir)/libtinymail/tny-iterator-iface.h		\
-	$(top_srcdir)/libtinymail/tny-list.h			\
+	$(top_srcdir)/libtinymail/tny-simple-list.h		\
 	$(top_srcdir)/libtinymail/tny-list-iface.h		\
 	$(top_srcdir)/libtinymail/tny-folder-iface.h		\
 	$(top_srcdir)/libtinymail/tny-header-iface.h		\

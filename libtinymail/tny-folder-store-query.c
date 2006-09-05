@@ -23,7 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include <tny-folder-store-query.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 
 static GObjectClass *parent_class;
 static GObjectClass *item_parent_class;
@@ -102,7 +102,7 @@ tny_folder_store_query_item_init (TnyFolderStoreQueryItem *self)
 static void
 tny_folder_store_query_init (TnyFolderStoreQuery *self)
 {
-	self->items = TNY_LIST_IFACE (tny_list_new ());
+	self->items = tny_simple_list_new ();
 	return;
 }
 

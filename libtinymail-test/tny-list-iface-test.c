@@ -19,7 +19,7 @@
 #include <string.h>
 
 #include <tny-list-iface-test.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 #include <tny-test-object.h>
 
 
@@ -31,7 +31,7 @@ static void
 tny_list_iface_test_setup (void)
 {
 
-	iface = TNY_LIST_IFACE (tny_list_new ());
+	iface = tny_simple_list_new ();
 
 	return;
 }

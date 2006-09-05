@@ -21,7 +21,7 @@
 #include <tny-shared.h>
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
@@ -55,7 +55,7 @@ callback (TnyFolderStoreIface *self, TnyListIface *list, gpointer user_data)
 	while (!tny_iterator_iface_is_done (iter))
 	{
 		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
-		TnyListIface *folders = (TnyListIface *) tny_list_new ();
+		TnyListIface *folders = tny_simple_list_new ();
 
 		g_print ("%s\n", tny_folder_iface_get_name (TNY_FOLDER_IFACE (folder)));
 	    
@@ -84,7 +84,7 @@ dance (gpointer data)
 	TnyListIface *folders;
 	TnyStoreAccountIface *account = data;
     
-	folders = (TnyListIface *) tny_list_new ();
+	folders = tny_simple_list_new ();
     	tny_folder_store_iface_get_folders_async (TNY_FOLDER_STORE_IFACE (account),
 		folders, callback, NULL, NULL);
     
@@ -119,7 +119,7 @@ main (int argc, char **argv)
 
 	g_option_context_free (context);
     
-	accounts = tny_list_new ();
+	accounts = tny_simple_list_new ();
 
 	tny_account_store_iface_get_accounts (account_store, accounts, 
 	      TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);

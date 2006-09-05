@@ -17,7 +17,7 @@ libtinymail_1_0_headers = 		\
 	tny-account-store-iface.h	\
 	tny-stream-iface.h		\
 	tny-fs-stream.h			\
-	tny-list.h			\
+	tny-simple-list.h		\
 	tny-folder-store-iface.h	\
 	tny-folder-store-query.h
 
@@ -36,10 +36,10 @@ libtinymail_1_0_la_SOURCES = 		\
 	tny-account-store-iface.c	\
 	tny-stream-iface.c		\
 	tny-fs-stream.c			\
-	tny-list-priv.h			\
-	tny-list.c			\
-	tny-list-iterator-priv.h	\
-	tny-list-iterator.c		\
+	tny-simple-list-priv.h		\
+	tny-simple-list.c		\
+	tny-simple-list-iterator-priv.h	\
+	tny-simple-list-iterator.c	\
 	tny-folder-store-iface.c	\
 	tny-folder-store-query.c
 

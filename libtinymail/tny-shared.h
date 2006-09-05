@@ -55,8 +55,8 @@ typedef void (*TnyRefreshFolderStatusCallback) (TnyFolderIface *self, const gcha
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
 typedef enum _TnyAlertType TnyAlertType;
 typedef enum _TnyFolderType TnyFolderType;
-typedef struct _TnyList TnyList;
-typedef struct _TnyListClass TnyListClass;
+typedef struct _TnySimpleList TnySimpleList;
+typedef struct _TnySimpleListClass TnySimpleListClass;
 typedef enum _TnyAccountType TnyAccountType;
 typedef enum _TnyGetAccountsRequestType TnyGetAccountsRequestType;
 typedef struct _TnyFsStream TnyFsStream;

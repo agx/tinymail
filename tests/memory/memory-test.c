@@ -21,7 +21,7 @@
 
 #include <tny-list-iface.h>
 #include <tny-iterator-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 #include <tny-account-store-iface.h>
 #include <tny-store-account-iface.h>
 #include <tny-folder-iface.h>
@@ -46,7 +46,7 @@ do_get_folder (TnyFolderIface *folder)
 static void
 do_test_folder (TnyFolderIface *folder)
 {
-	TnyListIface *headers = tny_list_new ();
+	TnyListIface *headers = tny_simple_list_new ();
 	gint length, bytes;
 	gdouble kbytes, mbytes;
     
@@ -86,7 +86,7 @@ static void
 recurse_folders (TnyFolderStoreIface *store, TnyFolderStoreQuery *query, const gchar *folname, performer func)
 {
 	TnyIteratorIface *iter;
-	TnyListIface *folders = TNY_LIST_IFACE (tny_list_new ());
+	TnyListIface *folders = tny_simple_list_new ();
 
 	tny_folder_store_iface_get_folders (store, folders, query);
 	iter = tny_list_iface_create_iterator (folders);
@@ -155,7 +155,7 @@ main (int argc, char **argv)
 
 	g_option_context_free (context);
 
-	accounts = tny_list_new ();
+	accounts = tny_simple_list_new ();
 	    
 	tny_account_store_iface_get_accounts (account_store, accounts, 
 		TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);

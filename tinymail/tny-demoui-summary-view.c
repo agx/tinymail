@@ -65,7 +65,6 @@
 #include <tny-demoui-summary-view.h>
 #include <tny-summary-view-iface.h>
 #include <tny-account-store-view-iface.h>
-#include <tny-list.h>
 
 #define GO_ONLINE_TXT _("Go online")
 #define GO_OFFLINE_TXT _("Go offline")

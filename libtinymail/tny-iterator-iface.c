@@ -123,7 +123,7 @@ tny_iterator_iface_current (TnyIteratorIface *self)
  * to make loops like:
  * 
  * <informalexample><programlisting>
- * TnyListIface *list = tny_list_new ();
+ * TnyListIface *list = tny_simple_list_new ();
  * TnyIteratorIface *iter = tny_list_iface_create_iterator (list);
  * while (!tny_iterator_iface_is_done (iter))
  *    tny_iterator_iface_next (iter);

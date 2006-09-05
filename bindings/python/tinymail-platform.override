@@ -8,7 +8,7 @@ headers
 #include <tny-device-iface.h>
 #include <tny-fs-stream.h>
 #include <tny-iterator-iface.h>
-#include <tny-list.h>
+#include <tny-simple-list.h>
 #include <tny-list-iface.h>
 #include <tny-folder-iface.h>
 #include <tny-header-iface.h>
