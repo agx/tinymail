@@ -234,7 +234,7 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreViewIface *self, TnyAc
 
 	g_object_ref (G_OBJECT (account_store));
 
-	if (G_LIKELY (device))
+	if (device)
 	{
 		priv->connchanged_signal =  g_signal_connect (
 				G_OBJECT (device), "connection_changed",
@@ -261,7 +261,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 		GtkTreeModel *model, *mymodel;
 		GtkTreeIter iter;
 
-		if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
+		if (gtk_tree_selection_get_selected (selection, &model, &iter))
 		{
 			TnyHeaderIface *header;
 
@@ -269,7 +269,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 				TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 				&header, -1);
 
-			if (G_LIKELY (header))
+			if (header)
 			{
 				GtkWidget *dialog = gtk_message_dialog_new (NULL, 
 					GTK_DIALOG_MODAL,
@@ -280,7 +280,6 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 				{
 					TnyFolderIface *folder;
-					//TnyMsgIface *msg;
 
 					if (GTK_IS_TREE_MODEL_SORT (model))
 					{
@@ -288,10 +287,10 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 							(GTK_TREE_MODEL_SORT (model));
 					} else mymodel = model;
 
-					folder = (TnyFolderIface*)tny_header_iface_get_folder (header);
+					folder = tny_header_iface_get_folder (header);
 					tny_folder_iface_remove_message (folder, header);
 
-					tny_list_iface_remove (TNY_LIST_IFACE (mymodel), (GObject*)header);
+					tny_list_iface_remove (TNY_LIST_IFACE (mymodel), G_OBJECT (header));
 
 					/* This demo-ui does not support hiding marked-as-deleted 
 					   messages. A normal deletion will only *mark* a message
@@ -339,10 +338,10 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			folder = tny_header_iface_get_folder (header);
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_iface_get_message ((TnyFolderIface*)folder, header);
+				msg = tny_folder_iface_get_message (folder, header);
 				if (G_LIKELY (msg))
 				{
-					tny_msg_view_iface_set_msg (priv->msg_view, TNY_MSG_IFACE (msg));
+					tny_msg_view_iface_set_msg (priv->msg_view, msg);
 					g_object_unref (G_OBJECT (msg));
 				} else { 
 					tny_msg_view_iface_set_unavailable (priv->msg_view);
@@ -532,20 +531,19 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_iface_get_message (TNY_FOLDER_IFACE (folder), header);
+				msg = tny_folder_iface_get_message (folder, header);
 				if (G_LIKELY (msg))
 				{
-					msgwin = TNY_MSG_WINDOW_IFACE (tny_gtk_msg_window_new (
-						tny_platform_factory_iface_new_msg_view (platfact)));
+					msgwin = tny_gtk_msg_window_new (
+						tny_platform_factory_iface_new_msg_view (platfact));
 
-					tny_msg_view_iface_set_msg (TNY_MSG_VIEW_IFACE (msgwin), 
-						TNY_MSG_IFACE (msg));
+					tny_msg_view_iface_set_msg (TNY_MSG_VIEW_IFACE (msgwin), msg);
 					g_object_unref (G_OBJECT (msg));
 				    
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				} else {
-					msgwin = TNY_MSG_WINDOW_IFACE (tny_gtk_msg_window_new (
-						tny_platform_factory_iface_new_msg_view (platfact)));
+					msgwin = tny_gtk_msg_window_new (
+						tny_platform_factory_iface_new_msg_view (platfact));
 
 					tny_msg_view_iface_set_unavailable (TNY_MSG_VIEW_IFACE (msgwin));
 			
