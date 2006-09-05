@@ -1,7 +1,6 @@
 o. Remove the Iface suffix of interface types
 o. Rename types in the demo-ui
 o. Refactor TnySaveStrategy to a TnyGnomeVfsSaveStrategy and a TnyPosixSaveStrategy
-o. Fix the GTK_TREE_MODEL_SORT assertion of the demo-ui
 o. camel-lite-builder builds without nspr-dev resulting in a compilation error
 o. The docs don't describe the enums
 o. The docs don't describe the TnyGetFoldersCallback

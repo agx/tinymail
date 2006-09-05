@@ -86,6 +86,7 @@ struct _TnyDemouiSummaryViewPriv
 	gulong mailbox_select_sid;
 	GtkTreeSelection *mailbox_select;
 	GtkTreeIter last_mailbox_correct_select;
+ 	gboolean last_mailbox_correct_select_set;
 	guint connchanged_signal, online_button_signal;
 	TnyListIface *current_accounts;
 };
@@ -456,9 +457,13 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		if (type == -1) 
 		{ 
 			/* If an "account name"-row was clicked */
-			g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
-			gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
-			g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
+		    	if (priv->last_mailbox_correct_select_set) 
+			{
+				g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
+				gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
+				g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
+			}
+	    		priv->last_mailbox_correct_select_set = TRUE;
 			return; 
 		}
 
@@ -493,7 +498,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	GtkTreeIter iter;
 		
 	model = gtk_tree_view_get_model(treeview);
-	
+    
 	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
 	{
 		TnyHeaderIface *header;
@@ -590,6 +595,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	
 	/* TODO: Persist application UI status (of the panes) */
 
+    	priv->last_mailbox_correct_select_set = FALSE;
 	priv->online_button = gtk_toggle_button_new ();
 	priv->current_accounts = NULL;
 
