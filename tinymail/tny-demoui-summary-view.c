@@ -581,15 +581,12 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyDemouiSummaryView *self = (TnyDemouiSummaryView *)instance;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyPlatformFactoryIface *platfact;
-
 	GtkVBox *vbox = GTK_VBOX (self);
 	GtkWidget *mailbox_sw;
 	GtkWidget *header_sw;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
-	//GtkTreeModel *mailbox_model;
 	GtkTreeSelection *select;
-	//gint t = 0, i = 0;
 	GtkWidget *hpaned1;
 	GtkWidget *vpaned1;
 	

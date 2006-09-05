@@ -91,7 +91,6 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 {
 	GList *copy = forget_password_funcs, *mark_del = NULL;
 	PrivForgetPassFunc *pf;
-	//CamelSession *me = (CamelSession*)self;
 	gboolean found = FALSE;
 	CamelService *service = (CamelService*)_tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (account));
 
@@ -155,7 +154,6 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account
 {
 	GList *copy = password_funcs, *mark_del = NULL;
 	PrivPassFunc *pf;
-	//CamelSession *me = (CamelSession*)self;
 	gboolean found = FALSE;
 	CamelService *service = (CamelService*)_tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (account));
 

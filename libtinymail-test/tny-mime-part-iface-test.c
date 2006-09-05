@@ -131,9 +131,7 @@ static void
 tny_mime_part_iface_test_stream (void)
 {
 	CamelStream *real_to = camel_stream_mem_new ();
-	//TnyStreamIface *from = TNY_STREAM_IFACE (tny_test_stream_new ());
 	TnyStreamIface *to = TNY_STREAM_IFACE (tny_camel_stream_new (real_to));
-	//gint n;
 
 /* TODO (this one crashes)
 

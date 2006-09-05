@@ -561,22 +561,6 @@ tny_gtk_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 	return;
 }
 
-#if 0
-static void
-unref_header (gpointer data, gpointer user_data)
-{
-	g_object_unref (G_OBJECT (data));
-	return;
-}
-
-static void
-ref_header (gpointer data, gpointer user_data)
-{
-	g_object_ref (G_OBJECT (data));
-	return;
-}
-#endif /* 0 */
-
 
 static void
 tny_gtk_header_list_model_prepend (TnyListIface *self, GObject* item)
@@ -602,8 +586,6 @@ tny_gtk_header_list_model_prepend (TnyListIface *self, GObject* item)
 
 	if G_UNLIKELY (!me->usable_index && me->length >= INDEX_THRESHOLD)
 		me->usable_index = TRUE;
-
-	/* g_object_ref (G_OBJECT (item)); */
 
 	/* Reset the internal iterator */
 	((TnyGtkHeaderListIterator*)me->iterator)->current = me->first;
@@ -637,8 +619,6 @@ tny_gtk_header_list_model_append (TnyListIface *self, GObject* item)
 	if (me->index)
 		g_list_free (me->index);
 	me->index = NULL;
-
-	/* g_object_ref (G_OBJECT (item)); */
 
 	/* Reset the internal iterator */
 	((TnyGtkHeaderListIterator*)me->iterator)->current = me->first;
@@ -814,56 +794,6 @@ tny_gtk_header_list_model_relaxed_performer (gpointer data)
 }
 
 
-#if 0
-
-static void 
-proxy_uncache_func (gpointer data, gpointer user_data)
-{
-	if (data)
-		g_printerr ("tinymail: uncache %p\n", user_data);
-		//tny_header_iface_uncache (TNY_HEADER_IFACE (data));
-	return;
-}
-
-
-
-static void 
-tny_gtk_header_list_model_hdr_cache_uncacher_copy (TnyGtkHeaderListModel *self)
-{
-	RelaxedData *d = g_new (RelaxedData, 1);
-
-	/* This one will perform an uncache on each item in the list. It uses 
-	   a copy of the list. */
-
-	d->relaxed_func = (GFunc)proxy_uncache_func;
-	d->list = g_list_copy (self->first);
-
-	g_idle_add_full (G_PRIORITY_LOW, tny_gtk_header_list_model_relaxed_performer, 
-		d, tny_gtk_header_list_model_relaxed_data_destroyer);
-
-	return;
-}
-
-static void 
-tny_gtk_header_list_model_hdr_cache_remover (TnyGtkHeaderListModel *self)
-{
-	RelaxedData *d = g_new (RelaxedData, 1);
-
-	/* This one will perform a destruction of each item in the list. It uses 
-	   the original list. */
-
-	d->relaxed_func = (GFunc)proxy_destroy_func;
-	d->list = self->first;
-
-	g_idle_add_full (G_PRIORITY_LOW, tny_gtk_header_list_model_relaxed_performer, 
-		d, tny_gtk_header_list_model_relaxed_data_destroyer);
-
-	return;
-} 
-
-#endif /* 0 */
-
-
 static void
 proxy_destroy_func (gpointer data, gpointer user_data)
 {
@@ -911,8 +841,12 @@ tny_gtk_header_list_model_finalize (GObject *object)
 	/* Unreference the headers */
 	if (self->first)
 	{
-		/* g_list_foreach (self->first, g_object_unref, NULL); */
-		tny_gtk_header_list_model_hdr_cache_remover_copy (self);
+
+		if (G_LIKELY (g_main_depth () > 0))
+			tny_gtk_header_list_model_hdr_cache_remover_copy (self);
+		else
+			g_list_foreach (self->first, (GFunc)g_object_unref, NULL);
+	    
 		g_list_free (self->first);
 		self->first = NULL;
 	}
@@ -926,7 +860,6 @@ tny_gtk_header_list_model_finalize (GObject *object)
 	/* Unreference the folder instance */
 	if (self->folder) 
 	{
-		/* tny_folder_iface_uncache (self->folder); */
 		g_object_unref (G_OBJECT (self->folder));
 		if (self->iterator)
 			g_object_unref (G_OBJECT (self->iterator));
@@ -969,7 +902,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->length = 0;
 	self->usable_index = FALSE;
 
-	/* This is an internal iterator used by the GtkTreeModel implementation */
+	/* This is an internal iterator used by this GtkTreeModel implementation */
 	self->iterator = _tny_gtk_header_list_iterator_new (self, FALSE);
 
 	return;
@@ -1009,10 +942,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolderIfac
 
 	/* Unreference the previous folder instance */
 	if (G_LIKELY (self->folder))
-	{
-		/* tny_folder_iface_uncache (self->folder); */
 		g_object_unref (G_OBJECT (self->folder));
-	}
 
 	/* Reset the internal iterator */
 	self->length = 0;
@@ -1029,13 +959,17 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolderIfac
 	g_mutex_lock (self->iterator_lock);
 
 	/* Reset the internal iterator */
+   
+    	/* TODO: Code review question (by Philip to myself, so don't ask 
+	Philip), shouldn't this reset self->usable_index = FALSE ?*/
+
 	((TnyGtkHeaderListIterator*)self->iterator)->current = self->first;
 	self->last_nth = 0;
 
 	/* Reference the new folder instance */
 	g_object_ref (G_OBJECT (folder));
 	self->folder = folder;
-
+        
 	g_mutex_unlock (self->iterator_lock);
 	g_mutex_unlock (self->folder_lock);	
 
