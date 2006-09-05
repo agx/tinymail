@@ -48,14 +48,14 @@ _tny_simple_list_iterator_set_model (TnySimpleListIterator *self, TnySimpleList 
 
 
 
-TnyIteratorIface*
+TnyIterator*
 _tny_simple_list_iterator_new (TnySimpleList *model)
 {
 	TnySimpleListIterator *self = g_object_new (TNY_TYPE_SIMPLE_LIST_ITERATOR, NULL);
 
 	_tny_simple_list_iterator_set_model (self, model);
 
-	return TNY_ITERATOR_IFACE (self);
+	return TNY_ITERATOR (self);
 }
 
 static void
@@ -79,7 +79,7 @@ tny_simple_list_iterator_finalize (GObject *object)
 
 
 static void 
-tny_simple_list_iterator_next (TnyIteratorIface *self)
+tny_simple_list_iterator_next (TnyIterator *self)
 {
 	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 	TnySimpleListPriv *lpriv;
@@ -97,7 +97,7 @@ tny_simple_list_iterator_next (TnyIteratorIface *self)
 }
 
 static void 
-tny_simple_list_iterator_prev (TnyIteratorIface *self)
+tny_simple_list_iterator_prev (TnyIterator *self)
 {
 	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 	TnySimpleListPriv *lpriv;
@@ -115,7 +115,7 @@ tny_simple_list_iterator_prev (TnyIteratorIface *self)
 }
 
 static void 
-tny_simple_list_iterator_first (TnyIteratorIface *self)
+tny_simple_list_iterator_first (TnyIterator *self)
 {
 	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 	TnySimpleListPriv *lpriv;
@@ -134,7 +134,7 @@ tny_simple_list_iterator_first (TnyIteratorIface *self)
 
 
 static gboolean 
-tny_simple_list_iterator_is_done (TnyIteratorIface *self)
+tny_simple_list_iterator_is_done (TnyIterator *self)
 {
 	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 
@@ -144,7 +144,7 @@ tny_simple_list_iterator_is_done (TnyIteratorIface *self)
 
 
 static void
-tny_simple_list_iterator_nth (TnyIteratorIface *self, guint nth)
+tny_simple_list_iterator_nth (TnyIterator *self, guint nth)
 {
 	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 	TnySimpleListPriv *lpriv;
@@ -167,7 +167,7 @@ tny_simple_list_iterator_nth (TnyIteratorIface *self, guint nth)
 
 
 static GObject* 
-tny_simple_list_iterator_current (TnyIteratorIface *self)
+tny_simple_list_iterator_current (TnyIterator *self)
 {
 	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 	gpointer retval;
@@ -189,8 +189,8 @@ tny_simple_list_iterator_current (TnyIteratorIface *self)
 }
 
 
-static TnyListIface* 
-tny_simple_list_iterator_get_list (TnyIteratorIface *self)
+static TnyList* 
+tny_simple_list_iterator_get_list (TnyIterator *self)
 {
 	TnySimpleListIterator *me = (TnySimpleListIterator*) self;
 
@@ -201,11 +201,11 @@ tny_simple_list_iterator_get_list (TnyIteratorIface *self)
 
     	g_object_ref (G_OBJECT (me->model));
 			  
-	return TNY_LIST_IFACE (me->model);
+	return TNY_LIST (me->model);
 }
 
 static void
-tny_iterator_iface_init (TnyIteratorIfaceClass *klass)
+tny_iterator_init (TnyIteratorIface *klass)
 {
 
 	klass->next_func = tny_simple_list_iterator_next;
@@ -253,9 +253,9 @@ _tny_simple_list_iterator_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_iterator_iface_info = 
+		static const GInterfaceInfo tny_iterator_info = 
 		{
-		  (GInterfaceInitFunc) tny_iterator_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_iterator_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -264,8 +264,8 @@ _tny_simple_list_iterator_get_type (void)
 			"TnySimpleListIterator",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_ITERATOR_IFACE, 
-			&tny_iterator_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_ITERATOR, 
+			&tny_iterator_info);
 	}
 
 	return type;

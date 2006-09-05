@@ -7,13 +7,13 @@ A session type for Camel
 <!-- ##### SECTION Long_Description ##### -->
 <para>
 A type being used internally by the libtinymail-camel implementation. It, 
-for example, observes the #TnyDeviceIface instance for the online/offline
+for example, observes the #TnyDevice instance for the online/offline
 status of the device.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyDeviceIface, #TnyAccountIface, #TnyStoreAccountIface, #TnyTransportAccountIface
+#TnyDevice, #TnyAccount, #TnyStoreAccount, #TnyTransportAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

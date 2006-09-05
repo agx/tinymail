@@ -3,29 +3,29 @@
 headers
 #include <Python.h>
 
-#include <tny-account-iface.h>
-#include <tny-account-store-iface.h>
-#include <tny-device-iface.h>
+#include <tny-account.h>
+#include <tny-account-store.h>
+#include <tny-device.h>
 #include <tny-fs-stream.h>
-#include <tny-iterator-iface.h>
+#include <tny-iterator.h>
 #include <tny-simple-list.h>
-#include <tny-list-iface.h>
-#include <tny-folder-iface.h>
-#include <tny-header-iface.h>
-#include <tny-msg-iface.h>
-#include <tny-mime-part-iface.h>
+#include <tny-list.h>
+#include <tny-folder.h>
+#include <tny-header.h>
+#include <tny-msg.h>
+#include <tny-mime-part.h>
 #include <tny-shared.h>
-#include <tny-store-account-iface.h>
-#include <tny-stream-iface.h>
-#include <tny-transport-account-iface.h>
+#include <tny-store-account.h>
+#include <tny-stream.h>
+#include <tny-transport-account.h>
 
-#include <tny-account-store-view-iface.h>
-#include <tny-header-view-iface.h>
-#include <tny-msg-view-iface.h>
-#include <tny-msg-window-iface.h>
-#include <tny-platform-factory-iface.h>
-#include <tny-save-strategy-iface.h>
-#include <tny-summary-view-iface.h>
+#include <tny-account-store-view.h>
+#include <tny-header-view.h>
+#include <tny-msg-view.h>
+#include <tny-msg-window.h>
+#include <tny-platform-factory.h>
+#include <tny-save-strategy.h>
+#include <tny-summary-view.h>
 
 #include "platform_include.h"
 
@@ -41,6 +41,6 @@ ignore-glob
 import gobject.GObject as PyGObject_Type
 import gtk.Dialog as PyGtkDialog_Type
 
-import tinymail.ui.PlatformFactoryIface as PyTnyPlatformFactoryIface_Type
-import tinymail.DeviceIface as PyTnyDeviceIface_Type
-import tinymail.AccountStoreIface as PyTnyAccountStoreIface_Type
+import tinymail.ui.PlatformFactory as PyTnyPlatformFactory_Type
+import tinymail.Device as PyTnyDevice_Type
+import tinymail.AccountStore as PyTnyAccountStore_Type

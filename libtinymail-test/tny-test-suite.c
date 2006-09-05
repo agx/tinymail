@@ -24,17 +24,17 @@
 
 #include "tny-test-suite.h"
 
-#include "tny-header-iface-test.h"
-#include "tny-stream-iface-test.h"
-#include "tny-mime-part-iface-test.h"
-#include "tny-list-iface-test.h"
-#include "tny-account-iface-test.h"
-#include "tny-device-iface-test.h"
-#include "tny-iterator-iface-test.h"
-#include "tny-folder-iface-test.h"
-#include "tny-msg-iface-test.h"
-#include "tny-platform-factory-iface-test.h"
-#include "tny-account-store-iface-test.h"
+#include "tny-header-test.h"
+#include "tny-stream-test.h"
+#include "tny-mime-part-test.h"
+#include "tny-list-test.h"
+#include "tny-account-test.h"
+#include "tny-device-test.h"
+#include "tny-iterator-test.h"
+#include "tny-folder-test.h"
+#include "tny-msg-test.h"
+#include "tny-platform-factory-test.h"
+#include "tny-account-store-test.h"
 #include "tny-folder-store-query-test.h"
 
 GList*
@@ -42,18 +42,18 @@ gunit_get_test_suites()
 {
 	GList *suites = NULL;
 
-    	suites = g_list_append (suites, create_tny_msg_iface_suite ());
+    	suites = g_list_append (suites, create_tny_msg_suite ());
     	suites = g_list_append (suites, create_tny_folder_store_query_suite ());
-	suites = g_list_append (suites, create_tny_header_iface_suite ());
-	suites = g_list_append (suites, create_tny_stream_iface_suite ());
-	suites = g_list_append (suites, create_tny_mime_part_iface_suite ());
-	suites = g_list_append (suites, create_tny_list_iface_suite ());
-	suites = g_list_append (suites, create_tny_account_iface_suite ());
-	suites = g_list_append (suites, create_tny_device_iface_suite ());
-	suites = g_list_append (suites, create_tny_iterator_iface_suite ());
-	suites = g_list_append (suites, create_tny_folder_iface_suite ());
-	suites = g_list_append (suites, create_tny_platform_factory_iface_suite ());
-	suites = g_list_append (suites, create_tny_account_store_iface_suite ());
+	suites = g_list_append (suites, create_tny_header_suite ());
+	suites = g_list_append (suites, create_tny_stream_suite ());
+	suites = g_list_append (suites, create_tny_mime_part_suite ());
+	suites = g_list_append (suites, create_tny_list_suite ());
+	suites = g_list_append (suites, create_tny_account_suite ());
+	suites = g_list_append (suites, create_tny_device_suite ());
+	suites = g_list_append (suites, create_tny_iterator_suite ());
+	suites = g_list_append (suites, create_tny_folder_suite ());
+	suites = g_list_append (suites, create_tny_platform_factory_suite ());
+	suites = g_list_append (suites, create_tny_account_store_suite ());
     
 	return suites;
 }

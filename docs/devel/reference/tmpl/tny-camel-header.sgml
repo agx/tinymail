@@ -2,7 +2,7 @@
 TnyCamelHeader
 
 <!-- ##### SECTION Short_Description ##### -->
-A Camel implementation of #TnyHeaderIface
+A Camel implementation of #TnyHeader
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
@@ -26,7 +26,7 @@ for no real reason.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyHeaderIface, #TnyFolder, #TnyFolderIface, #TnyHeaderListModel
+#TnyHeader, #TnyFolder, #TnyFolder, #TnyHeaderListModel
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

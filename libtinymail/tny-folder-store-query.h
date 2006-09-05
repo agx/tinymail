@@ -21,8 +21,8 @@
  */
 
 #include <tny-shared.h>
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 
 #include <regex.h>
 
@@ -67,7 +67,7 @@ struct _TnyFolderStoreQueryItemClass
 struct _TnyFolderStoreQuery 
 {
 	GObject parent;
-    	TnyListIface *items;
+    	TnyList *items;
 };
 
 struct _TnyFolderStoreQueryClass 
@@ -81,7 +81,7 @@ GType tny_folder_store_query_option_get_type (void);
 
 TnyFolderStoreQuery* tny_folder_store_query_new (void);
 void tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *pattern, TnyFolderStoreQueryOption options);
-TnyListIface* tny_folder_store_query_get_items (TnyFolderStoreQuery *query);
+TnyList* tny_folder_store_query_get_items (TnyFolderStoreQuery *query);
 TnyFolderStoreQueryOption tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item);
 regex_t* tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item);
 

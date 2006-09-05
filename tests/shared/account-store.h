@@ -22,7 +22,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-shared.h>
-#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 #include <tny-camel-shared.h>
 
 
@@ -44,7 +44,7 @@ struct _TnyTestAccountStore
     
 	gchar *cache_dir;
     	TnySessionCamel *session;
-    	TnyDeviceIface *device;
+    	TnyDevice *device;
     	gboolean force_online;
 };
 
@@ -54,7 +54,7 @@ struct _TnyTestAccountStoreClass
 };
 
 GType tny_test_account_store_get_type (void);
-TnyAccountStoreIface* tny_test_account_store_new (gboolean force_online, const gchar *cachedir);
+TnyAccountStore* tny_test_account_store_new (gboolean force_online, const gchar *cachedir);
 TnySessionCamel* tny_test_account_store_get_session (TnyTestAccountStore *self);
 
 G_END_DECLS

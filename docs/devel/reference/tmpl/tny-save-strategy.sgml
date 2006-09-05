@@ -1,0 +1,35 @@
+<!-- ##### SECTION Title ##### -->
+TnySaveStrategy
+
+<!-- ##### SECTION Short_Description ##### -->
+A strategy for saving a mime part
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type used by a #TnyMsgView instance for saving a #TnyMsgMimePart
+(like an attachment) to a file.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyMsgView, #TnyMsgMimePart
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnySaveStrategy ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_save_strategy_save ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+
+

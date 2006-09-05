@@ -4,43 +4,43 @@ lib_LTLIBRARIES = libtinymail-1.0.la
 
 libtinymail_1_0_headers = 		\
 	tny-shared.h			\
-	tny-list-iface.h		\
-	tny-iterator-iface.h		\
-	tny-folder-iface.h		\
-	tny-mime-part-iface.h   	\
-	tny-header-iface.h		\
-	tny-msg-iface.h			\
-	tny-device-iface.h		\
-	tny-account-iface.h		\
-	tny-store-account-iface.h	\
-	tny-transport-account-iface.h	\
-	tny-account-store-iface.h	\
-	tny-stream-iface.h		\
+	tny-list.h		\
+	tny-iterator.h		\
+	tny-folder.h		\
+	tny-mime-part.h   	\
+	tny-header.h		\
+	tny-msg.h			\
+	tny-device.h		\
+	tny-account.h		\
+	tny-store-account.h	\
+	tny-transport-account.h	\
+	tny-account-store.h	\
+	tny-stream.h		\
 	tny-fs-stream.h			\
 	tny-simple-list.h		\
-	tny-folder-store-iface.h	\
+	tny-folder-store.h	\
 	tny-folder-store-query.h
 
 libtinymail_1_0_la_SOURCES = 		\
 	$(libtinymail_1_0_headers)	\
-	tny-list-iface.c		\
-	tny-iterator-iface.c		\
-	tny-msg-iface.c			\
-	tny-header-iface.c		\
-	tny-mime-part-iface.c   	\
-	tny-folder-iface.c		\
-	tny-device-iface.c		\
-	tny-account-iface.c		\
-	tny-store-account-iface.c	\
-	tny-transport-account-iface.c	\
-	tny-account-store-iface.c	\
-	tny-stream-iface.c		\
+	tny-list.c		\
+	tny-iterator.c		\
+	tny-msg.c			\
+	tny-header.c		\
+	tny-mime-part.c   	\
+	tny-folder.c		\
+	tny-device.c		\
+	tny-account.c		\
+	tny-store-account.c	\
+	tny-transport-account.c	\
+	tny-account-store.c	\
+	tny-stream.c		\
 	tny-fs-stream.c			\
 	tny-simple-list-priv.h		\
 	tny-simple-list.c		\
 	tny-simple-list-iterator-priv.h	\
 	tny-simple-list-iterator.c	\
-	tny-folder-store-iface.c	\
+	tny-folder-store.c	\
 	tny-folder-store-query.c
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)

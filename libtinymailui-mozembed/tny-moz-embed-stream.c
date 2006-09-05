@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 #include <tny-moz-embed-stream.h>
 
 static GObjectClass *parent_class = NULL;
@@ -43,19 +43,19 @@ struct _TnyMozEmbedStreamPriv
 #define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MOZ_EMBED_STREAM, TnyMozEmbedStreamPriv))
 
-static gint tny_moz_embed_stream_close (TnyStreamIface *self);
+static gint tny_moz_embed_stream_close (TnyStream *self);
 
 static ssize_t
-tny_moz_embed_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
+tny_moz_embed_write_to_stream (TnyStream *self, TnyStream *output)
 {
 	char tmp_buf[4096];
 	ssize_t total = 0;
 	ssize_t nb_read;
 	ssize_t nb_written;
 	
-	while (G_LIKELY (!tny_stream_iface_eos (self))) 
+	while (G_LIKELY (!tny_stream_eos (self))) 
 	{
-		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
+		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
 		if (G_UNLIKELY (nb_read < 0))
 			return -1;
 		else if (G_LIKELY (nb_read > 0)) {
@@ -63,7 +63,7 @@ tny_moz_embed_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	
 			while (G_LIKELY (nb_written < nb_read))
 			{
-				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				ssize_t len = tny_stream_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -76,7 +76,7 @@ tny_moz_embed_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 }
 
 static ssize_t
-tny_moz_embed_stream_read  (TnyStreamIface *self, char *data, size_t n)
+tny_moz_embed_stream_read  (TnyStream *self, char *data, size_t n)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 	ssize_t retval = -1;
@@ -97,7 +97,7 @@ tny_moz_embed_stream_read  (TnyStreamIface *self, char *data, size_t n)
 }
 
 static gint
-tny_moz_embed_stream_reset (TnyStreamIface *self)
+tny_moz_embed_stream_reset (TnyStream *self)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
@@ -114,7 +114,7 @@ tny_moz_embed_stream_reset (TnyStreamIface *self)
 }
 
 static ssize_t
-tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
+tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 	FILE *file = NULL;
@@ -180,13 +180,13 @@ tny_moz_embed_stream_write (TnyStreamIface *self, const char *data, size_t n)
 }
 
 static gint
-tny_moz_embed_stream_flush (TnyStreamIface *self)
+tny_moz_embed_stream_flush (TnyStream *self)
 {
 	return 0;
 }
 
 static gint
-tny_moz_embed_stream_close (TnyStreamIface *self)
+tny_moz_embed_stream_close (TnyStream *self)
 {
 	tny_moz_embed_stream_reset (self);
 
@@ -194,7 +194,7 @@ tny_moz_embed_stream_close (TnyStreamIface *self)
 }
 
 static gboolean
-tny_moz_embed_stream_eos   (TnyStreamIface *self)
+tny_moz_embed_stream_eos   (TnyStream *self)
 {
 	return TRUE;
 }
@@ -227,9 +227,9 @@ tny_moz_embed_stream_set_moz_embed (TnyMozEmbedStream *self, GtkMozEmbed *embed)
  * tny_moz_embed_stream_new:
  * @embed: The #GtkMozEmbed to write to or read from
  *
- * Create an adaptor instance between #TnyStreamIface and #GtkMozEmbed
+ * Create an adaptor instance between #TnyStream and #GtkMozEmbed
  *
- * Return value: a new #TnyStreamIface instance
+ * Return value: a new #TnyStream instance
  **/
 TnyMozEmbedStream*
 tny_moz_embed_stream_new (GtkMozEmbed *embed)
@@ -259,7 +259,7 @@ tny_moz_embed_stream_finalize (GObject *object)
 	TnyMozEmbedStream *self = (TnyMozEmbedStream *)object;	
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
-	tny_moz_embed_stream_reset (TNY_STREAM_IFACE (self));
+	tny_moz_embed_stream_reset (TNY_STREAM (self));
 
 	if (priv->embed)
 		g_object_unref (G_OBJECT (priv->embed));
@@ -270,9 +270,9 @@ tny_moz_embed_stream_finalize (GObject *object)
 }
 
 static void
-tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
+tny_stream_init (gpointer g, gpointer iface_data)
 {
-	TnyStreamIfaceClass *klass = (TnyStreamIfaceClass *)g_iface;
+	TnyStreamIface *klass = (TnyStreamIface *)g;
 
 	klass->read_func = tny_moz_embed_stream_read;
 	klass->write_func = tny_moz_embed_stream_write;
@@ -320,9 +320,9 @@ tny_moz_embed_stream_get_type (void)
 		  tny_moz_embed_stream_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_stream_iface_info = 
+		static const GInterfaceInfo tny_stream_info = 
 		{
-		  (GInterfaceInitFunc) tny_stream_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_stream_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -331,8 +331,8 @@ tny_moz_embed_stream_get_type (void)
 			"TnyMozEmbedStream",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 
-			&tny_stream_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
+			&tny_stream_info);
 	}
 
 	return type;

@@ -20,16 +20,16 @@
 
 #include "platfact.h"
 
-#include <tny-save-strategy-iface.h>
+#include <tny-save-strategy.h>
 #include <tny-gtk-save-strategy.h>
 
-#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 #include "account-store.h"
 
-#include <tny-device-iface.h>
+#include <tny-device.h>
 #include "device.h"
 
-#include <tny-msg-view-iface.h>
+#include <tny-msg-view.h>
 #include <tny-gtk-msg-view.h>
 
 
@@ -42,22 +42,22 @@ tny_test_platform_factory_instance_init (GTypeInstance *instance, gpointer g_cla
 }
 
 
-static TnyAccountStoreIface*
-tny_test_platform_factory_new_account_store (TnyPlatformFactoryIface *self)
+static TnyAccountStore*
+tny_test_platform_factory_new_account_store (TnyPlatformFactory *self)
 {
 	return tny_test_account_store_new (FALSE, NULL);
 }
 
-static TnyDeviceIface*
-tny_test_platform_factory_new_device (TnyPlatformFactoryIface *self)
+static TnyDevice*
+tny_test_platform_factory_new_device (TnyPlatformFactory *self)
 {
 	return tny_test_device_new ();
 }
 
-static TnyMsgViewIface*
-tny_test_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
+static TnyMsgView*
+tny_test_platform_factory_new_msg_view (TnyPlatformFactory *self)
 {
-	TnySaveStrategyIface *save_strategy = tny_gtk_save_strategy_new ();
+	TnySaveStrategy *save_strategy = tny_gtk_save_strategy_new ();
 
 	return tny_gtk_msg_view_new (save_strategy);
 }
@@ -66,14 +66,14 @@ tny_test_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
  * tny_platform_factory_get_instance:
  *
  *
- * Return value: The #TnyPlatformFactoryIface singleton instance
+ * Return value: The #TnyPlatformFactory singleton instance
  **/
-TnyPlatformFactoryIface*
+TnyPlatformFactory*
 tny_test_platform_factory_get_instance (void)
 {
 	TnyTestPlatformFactory *self = g_object_new (TNY_TYPE_TEST_PLATFORM_FACTORY, NULL);
 
-	return TNY_PLATFORM_FACTORY_IFACE (self);
+	return TNY_PLATFORM_FACTORY (self);
 }
 
 
@@ -87,9 +87,9 @@ tny_test_platform_factory_finalize (GObject *object)
 
 
 static void
-tny_platform_factory_iface_init (gpointer g_iface, gpointer iface_data)
+tny_platform_factory_init (gpointer g, gpointer iface_data)
 {
-	TnyPlatformFactoryIfaceClass *klass = (TnyPlatformFactoryIfaceClass *)g_iface;
+	TnyPlatformFactoryIface *klass = (TnyPlatformFactoryIface *)g;
 
 	klass->new_account_store_func = tny_test_platform_factory_new_account_store;
 	klass->new_device_func = tny_test_platform_factory_new_device;
@@ -163,9 +163,9 @@ tny_test_platform_factory_get_type (void)
 		  tny_test_platform_factory_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_platform_factory_iface_info = 
+		static const GInterfaceInfo tny_platform_factory_info = 
 		{
-		  (GInterfaceInitFunc) tny_platform_factory_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_platform_factory_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -174,8 +174,8 @@ tny_test_platform_factory_get_type (void)
 			"TnyTestPlatformFactory",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_PLATFORM_FACTORY_IFACE, 
-			&tny_platform_factory_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_PLATFORM_FACTORY, 
+			&tny_platform_factory_info);
 
 	}
 

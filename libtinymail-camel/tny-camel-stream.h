@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 #include <camel/camel-stream.h>
 
 G_BEGIN_DECLS
@@ -49,7 +49,7 @@ struct _TnyCamelStreamClass
 };
 
 GType tny_camel_stream_get_type (void);
-TnyStreamIface* tny_camel_stream_new            (CamelStream *stream);
+TnyStream* tny_camel_stream_new            (CamelStream *stream);
 void tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream);
 
 G_END_DECLS

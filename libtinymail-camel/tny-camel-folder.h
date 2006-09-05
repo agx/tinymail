@@ -23,8 +23,8 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-msg-iface.h>
-#include <tny-header-iface.h>
+#include <tny-msg.h>
+#include <tny-header.h>
 
 #include <camel/camel-folder.h>
 
@@ -50,16 +50,16 @@ struct _TnyCamelFolderClass
 	GObjectClass parent;
     
     	/* virtual methods (they have a default implementation in TnyCamelFolder */
-	void (*get_folders_async_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
-	void (*get_folders_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query);
-	void (*remove_folder_func) (TnyFolderStoreIface *self, TnyFolderIface *folder);
-	TnyFolderIface* (*create_folder_func) (TnyFolderStoreIface *self, const gchar *name);
+	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
+	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);
+	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder);
+	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name);
 };
 
 GType tny_camel_folder_get_type (void);
 
-TnyFolderIface* tny_camel_folder_new_with_folder (CamelFolder *camel_folder);
-TnyFolderIface* tny_camel_folder_new (void);
+TnyFolder* tny_camel_folder_new_with_folder (CamelFolder *camel_folder);
+TnyFolder* tny_camel_folder_new (void);
 void tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder);
 CamelFolder* tny_camel_folder_get_folder (TnyCamelFolder *self);
 

@@ -5,23 +5,23 @@ INCLUDES = \
 lib_LTLIBRARIES = libtinymailui-1.0.la
 
 libtinymailui_1_0_headers = 		\
-	tny-summary-view-iface.h	\
-	tny-msg-view-iface.h		\
-	tny-save-strategy-iface.h	\
-	tny-msg-window-iface.h		\
-	tny-platform-factory-iface.h	\
-	tny-header-view-iface.h		\
-	tny-account-store-view-iface.h
+	tny-summary-view.h	\
+	tny-msg-view.h		\
+	tny-save-strategy.h	\
+	tny-msg-window.h		\
+	tny-platform-factory.h	\
+	tny-header-view.h		\
+	tny-account-store-view.h
 
 libtinymailui_1_0_la_SOURCES = 		\
 	$(libtinymailui_1_0_headers)	\
-	tny-summary-view-iface.c	\
-	tny-save-strategy-iface.c	\
-	tny-msg-view-iface.c		\
-	tny-msg-window-iface.c		\
-	tny-platform-factory-iface.c	\
-	tny-header-view-iface.c		\
-	tny-account-store-view-iface.c
+	tny-summary-view.c	\
+	tny-save-strategy.c	\
+	tny-msg-view.c		\
+	tny-msg-window.c		\
+	tny-platform-factory.c	\
+	tny-header-view.c		\
+	tny-account-store-view.c
 
 libtinymailui_1_0_la_LIBADD = 		\
 	$(LIBTINYMAILUI_LIBS)		\

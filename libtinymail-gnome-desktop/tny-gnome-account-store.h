@@ -48,7 +48,7 @@ struct _TnyGnomeAccountStoreClass
 };
 
 GType tny_gnome_account_store_get_type (void);
-TnyAccountStoreIface* tny_gnome_account_store_new (void);
+TnyAccountStore* tny_gnome_account_store_new (void);
 TnySessionCamel* tny_gnome_account_store_get_session (TnyGnomeAccountStore *self);
 
 G_END_DECLS

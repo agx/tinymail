@@ -1,0 +1,34 @@
+<!-- ##### SECTION Title ##### -->
+TnyAccountStoreView
+
+<!-- ##### SECTION Short_Description ##### -->
+A type for showing an account store to the user
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type for showing an account store to the user.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyAccountStoreView ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_account_store_view_set_account_store ##### -->
+<para>
+
+</para>
+
+@self: 
+@account_store: 
+
+

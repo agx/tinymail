@@ -24,7 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-camel-account.h>
-#include <tny-store-account-iface.h>
+#include <tny-store-account.h>
 
 G_BEGIN_DECLS
 
@@ -49,7 +49,7 @@ struct _TnyCamelPOPStoreAccountClass
 };
 
 GType tny_camel_pop_store_account_get_type (void);
-TnyStoreAccountIface* tny_camel_pop_store_account_new (void);
+TnyStoreAccount* tny_camel_pop_store_account_new (void);
 
 G_END_DECLS
 

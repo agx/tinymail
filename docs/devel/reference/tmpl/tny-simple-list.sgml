@@ -11,7 +11,7 @@ A simple list implementation that uses a GList internally
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyListIface
+#TnyList
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

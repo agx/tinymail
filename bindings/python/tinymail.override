@@ -3,22 +3,22 @@
 headers
 #include <Python.h>
 
-#include <tny-account-iface.h>
-#include <tny-account-store-iface.h>
-#include <tny-device-iface.h>
+#include <tny-account.h>
+#include <tny-account-store.h>
+#include <tny-device.h>
 #include <tny-fs-stream.h>
-#include <tny-iterator-iface.h>
+#include <tny-iterator.h>
 #include <tny-simple-list.h>
-#include <tny-list-iface.h>
-#include <tny-folder-iface.h>
-#include <tny-header-iface.h>
-#include <tny-msg-iface.h>
-#include <tny-mime-part-iface.h>
+#include <tny-list.h>
+#include <tny-folder.h>
+#include <tny-header.h>
+#include <tny-msg.h>
+#include <tny-mime-part.h>
 #include <tny-shared.h>
-#include <tny-store-account-iface.h>
-#include <tny-stream-iface.h>
-#include <tny-transport-account-iface.h>
-#include <tny-folder-store-iface.h>
+#include <tny-store-account.h>
+#include <tny-stream.h>
+#include <tny-transport-account.h>
+#include <tny-folder-store.h>
 #include <tny-folder-store-query.h>
 
 #define NO_IMPORT_PYGOBJECT
@@ -34,10 +34,10 @@ ignore-glob
 %%
 import gobject.GObject as PyGObject_Type
 %%
-override tny_folder_iface_refresh_async kwargs
+override tny_folder_refresh_async kwargs
 
 static void
-tny_refresh_folder_cb (TnyFolderIface *self, gboolean cancelled, gpointer user_data)
+tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -58,7 +58,7 @@ tny_refresh_folder_cb (TnyFolderIface *self, gboolean cancelled, gpointer user_d
 }
 
 static void
-tny_refresh_folder_status_cb (TnyFolderIface *self, const gchar *what, gint status, gpointer user_data)
+tny_refresh_folder_status_cb (TnyFolder *self, const gchar *what, gint status, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -79,7 +79,7 @@ tny_refresh_folder_status_cb (TnyFolderIface *self, const gchar *what, gint stat
 
 
 static PyObject *
-_wrap_tny_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObject *kwargs)
+_wrap_tny_folder_refresh_async (PyGObject *self, PyObject *args, PyObject *kwargs)
 {
     static char *kwlist[] = { "refresh_func", "status_func", "user_data", NULL };
     PyObject *refresh_func, *status_func = Py_None, *user_data = Py_None;
@@ -87,7 +87,7 @@ _wrap_tny_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObject 
     PyObject *data;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs,
-                                     "OO|O:TnyFolderIface.refresh_async",kwlist,
+                                     "OO|O:TnyFolder.refresh_async",kwlist,
                                      &refresh_func, &status_func,
 				     &user_data))
         return NULL;
@@ -103,38 +103,38 @@ _wrap_tny_folder_iface_refresh_async (PyGObject *self, PyObject *args, PyObject 
   
     data = Py_BuildValue("(OOO)", refresh_func, status_func, user_data);
 
-    tny_folder_iface_refresh_async (TNY_FOLDER_IFACE (self->obj),
+    tny_folder_refresh_async (TNY_FOLDER (self->obj),
 				      tny_refresh_folder_cb, tny_refresh_folder_status_cb,
 				      data);
     return Py_None;
 }
 %%
-override-slot TnyListIface.tp_as_sequence
+override-slot TnyList.tp_as_sequence
 
 static int
-_wrap_tny_list_iface_tp_length(PyGObject *self)
+_wrap_tny_list_tp_length(PyGObject *self)
 {
-    return tny_list_iface_length(TNY_LIST_IFACE(self->obj));
+    return tny_list_length(TNY_LIST(self->obj));
 }
 
 static PyObject *
-_wrap_tny_list_iface_tp_getitem(PyGObject *self, PyObject *key)
+_wrap_tny_list_tp_getitem(PyGObject *self, PyObject *key)
 {
     GObject *ret = NULL;
 
     if (PyInt_Check (key)) {
         int index;
-        TnyIteratorIface *iter;
+        TnyIterator *iter;
 
         index = PyInt_AsLong (key);
         if (index < 0)
-            index += _wrap_tny_list_iface_tp_length (self);
+            index += _wrap_tny_list_tp_length (self);
 
-        iter = tny_list_iface_create_iterator (TNY_LIST_IFACE (self->obj));
+        iter = tny_list_create_iterator (TNY_LIST (self->obj));
         /* TODO: check for failure? */
 		
-		tny_iterator_iface_nth (iter, index);
-        ret = tny_iterator_iface_current (iter);
+		tny_iterator_nth (iter, index);
+        ret = tny_iterator_current (iter);
         g_object_unref (G_OBJECT (ret));
         g_object_unref (G_OBJECT (iter));
         
@@ -148,11 +148,11 @@ _wrap_tny_list_iface_tp_getitem(PyGObject *self, PyObject *key)
 }
 
 
-static PySequenceMethods _wrap_tny_list_iface_tp_as_sequence = {
-    (inquiry) _wrap_tny_list_iface_tp_length,
+static PySequenceMethods _wrap_tny_list_tp_as_sequence = {
+    (inquiry) _wrap_tny_list_tp_length,
     (binaryfunc) NULL, /* concatenate (PyGObject, PyObject) -> new PyGObject */
     (intargfunc) NULL, /* repeat (PyGObject, int) ->new PyGObject */
-    (intargfunc) _wrap_tny_list_iface_tp_getitem,
+    (intargfunc) _wrap_tny_list_tp_getitem,
     (intintargfunc) NULL, /* getslice (PyGObject, int, int) -> PyObject[tuple] */
     (intobjargproc) NULL, /* setitem (PyGObject, int, PyObject) -> int */
     (intintobjargproc) NULL, /* setslice (PyGObject, int, int, PyObject[tuple]) -> int */

@@ -2,16 +2,16 @@
 TnyGtkTextBufferStream
 
 <!-- ##### SECTION Short_Description ##### -->
-An adaptor between #TnyStreamIface and #GtkTextBuffer
+An adaptor between #TnyStream and #GtkTextBuffer
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #TnyStreamIface implementation that adapts a #GtkTextBuffer.
+A #TnyStream implementation that adapts a #GtkTextBuffer.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#GtkTextBuffer, #TnyStreamIface, #TnyMsgViewIface, #TnyGtkMsgView
+#GtkTextBuffer, #TnyStream, #TnyMsgView, #TnyGtkMsgView
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

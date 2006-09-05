@@ -1,0 +1,112 @@
+<!-- ##### SECTION Title ##### -->
+TnyAccountStore
+
+<!-- ##### SECTION Short_Description ##### -->
+A store for accounts
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type that returns stored (configured) accounts. Both transport and store accounts.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyAccount, #TnyStoreAccount, #TnyTransportAccount
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_TYPE_ALERT_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_TYPE_GET_ACCOUNTS_REQUEST_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### VARIABLE tny_account_store_signals ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_get_accounts_request_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_alert_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_accounts ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
+@types: 
+
+
+<!-- ##### FUNCTION tny_account_store_add_store_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+
+
+<!-- ##### FUNCTION tny_account_store_add_transport_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_cache_dir ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_device ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_alert ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+@prompt: 
+@Returns: 
+
+

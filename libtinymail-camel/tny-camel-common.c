@@ -31,14 +31,14 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
     
 	if (query)
 	{
-		TnyListIface *items = tny_folder_store_query_get_items (query);
-		TnyIteratorIface *iterator;
-		iterator = tny_list_iface_create_iterator (items);
+		TnyList *items = tny_folder_store_query_get_items (query);
+		TnyIterator *iterator;
+		iterator = tny_list_create_iterator (items);
 		 
 		 
-		while (!tny_iterator_iface_is_done (iterator))
+		while (!tny_iterator_is_done (iterator))
 		{
-			TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_iface_current (iterator);
+			TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_current (iterator);
 			TnyFolderStoreQueryOption options = tny_folder_store_query_item_get_options (item);
 			regex_t *regex = tny_folder_store_query_item_get_regex (item);
 
@@ -59,7 +59,7 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 				retval = TRUE;
 
 			g_object_unref (G_OBJECT (item));
-			tny_iterator_iface_next (iterator);
+			tny_iterator_next (iterator);
 		}
 		 
 		g_object_unref (G_OBJECT (iterator));    

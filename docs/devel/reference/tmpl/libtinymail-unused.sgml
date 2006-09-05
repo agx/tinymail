@@ -286,43 +286,43 @@ TnyPasswordDialog
 TnyPlatformFactory
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Long_Description ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Long_Description ##### -->
 <para>
 You can let your summary window type implement this type. Not that it defines a lot at this moment.
 </para><para>
-Typical implementations will go in a composition relation with a type that implements #TnyAccountStoreViewIface.
-The demo-ui of tinymail, however, *is* also a #TnyAccountStoreViewIface implementation.
+Typical implementations will go in a composition relation with a type that implements #TnyAccountStoreView.
+The demo-ui of tinymail, however, *is* also a #TnyAccountStoreView implementation.
 </para>
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:See_Also ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:See_Also ##### -->
 <para>
-#TnyAccountStoreViewIface, #TnyAccountStoreIface
+#TnyAccountStoreView, #TnyAccountStore
 </para>
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Short_Description ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Short_Description ##### -->
 A type that defines a summary window
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Stability_Level ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Stability_Level ##### -->
 
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Title ##### -->
-TnySummaryWindowIface
+<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Title ##### -->
+TnySummaryWindow
 
 
 <!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Long_Description ##### -->
 <para>
 A demo implementation of a summary window. Implemented for Gtk+.
 </para><para>
-The implementation claims to also be a #TnyAccountStoreViewIface implementation.
+The implementation claims to also be a #TnyAccountStoreView implementation.
 Which is, of course, perfectly legal. It's possible that a summary window is a
 view for the account store.
 </para><para>
 You can, however, also do it more finegrained and create a real view type that
-implements the #TnyAccountStoreViewIface. And you can let the summary window
+implements the #TnyAccountStoreView. And you can let the summary window
 for example decorate that. Or simply goes in a composition relation with that
 type. In a human language: embed the view type in the summary window.
 </para><para>
@@ -332,8 +332,8 @@ other wise get scared about having to implement a lot own GObjects if they
 want to use the tinymail framework. This isn't true. 
 </para><para>
 But that doesn't mean the scared people are right. It's probably more correct
-to implement a type as a #TnyAccountStoreViewIface and put it in composition
-with the #TnySummaryWindowIface implementation.
+to implement a type as a #TnyAccountStoreView and put it in composition
+with the #TnySummaryWindow implementation.
 </para><para>
 Mine is just a simple demo.
 </para>
@@ -341,12 +341,12 @@ Mine is just a simple demo.
 
 <!-- ##### SECTION ./tmpl/tny-summary-window.sgml:See_Also ##### -->
 <para>
-#TnyAccountStoreViewIface, #TnySummaryWindowIface, #TnyAccountStoreIface
+#TnyAccountStoreView, #TnySummaryWindow, #TnyAccountStore
 </para>
 
 
 <!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Short_Description ##### -->
-A demo implementation of #TnySummaryWindowIface for Gtk+
+A demo implementation of #TnySummaryWindow for Gtk+
 
 
 <!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Stability_Level ##### -->
@@ -389,7 +389,7 @@ A transport account type implemented for camel.
 
 <!-- ##### SECTION ./tmpl/tny-transport-account.sgml:See_Also ##### -->
 <para>
-#TnyStoreAccountIface, #TnyAccountIface, #TnyStoreAccount, #TnyAccount
+#TnyStoreAccount, #TnyAccount, #TnyStoreAccount, #TnyAccount
 </para>
 
 
@@ -553,13 +553,13 @@ TnyTransportAccount
 </para>
 
 
-<!-- ##### SIGNAL TnyAccountStoreIface::account-changed ##### -->
+<!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
 
 
 @tnyaccountstoreiface: the object which received the signal.
 @arg1: 
 
-<!-- ##### SIGNAL TnyAccountStoreIface::account-inserted ##### -->
+<!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
 <para>
 
 </para>
@@ -567,7 +567,7 @@ TnyTransportAccount
 @tnyaccountstoreiface: the object which received the signal.
 @arg1: 
 
-<!-- ##### SIGNAL TnyAccountStoreIface::account-removed ##### -->
+<!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
 <para>
 
 </para>
@@ -575,7 +575,7 @@ TnyTransportAccount
 @tnyaccountstoreiface: the object which received the signal.
 @arg1: 
 
-<!-- ##### SIGNAL TnyAccountStoreIface::accounts-reloaded ##### -->
+<!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
 <para>
 
 </para>
@@ -620,7 +620,7 @@ TnyTransportAccount
 
 @parent: 
 
-<!-- ##### SIGNAL TnyDeviceIface::connection-changed ##### -->
+<!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
 <para>
 
 </para>
@@ -702,19 +702,19 @@ TnyTransportAccount
 
 <!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
 <para>
-A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
+A callback function for tny_msg_folder_refresh_headers_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_get_headers in. It can for example be used for updating a header summary view.
 </para>
 
-@self: The #TnyFolderIface
+@self: The #TnyFolder
 @cancelled: Whether or not a cancellation occured.
 @user_data: user data
 
 <!-- ##### USER_FUNCTION TnyGetHeadersStatusCallback ##### -->
 <para>
-A callback function for tny_msg_folder_iface_refresh_headers_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
+A callback function for tny_msg_folder_refresh_headers_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
 </para>
 
-@self: The #TnyFolderIface
+@self: The #TnyFolder
 @what: What happened
 @status: A status field
 @user_data: user data
@@ -804,18 +804,18 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderIface ##### -->
+<!-- ##### STRUCT TnyMsgHeader ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderIfaceClass ##### -->
+<!-- ##### STRUCT TnyMsgHeaderClass ##### -->
 <para>
 
 </para>
 
-@g_iface: 
+@g: 
 @get_uid_func: 
 @get_bcc_func: 
 @get_cc_func: 
@@ -885,19 +885,19 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderViewIface ##### -->
+<!-- ##### STRUCT TnyMsgHeaderView ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgMimePartIface ##### -->
+<!-- ##### STRUCT TnyMsgMimePart ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgMimePartIfaceClass ##### -->
+<!-- ##### STRUCT TnyMsgMimePartClass ##### -->
 <para>
 
 </para>
@@ -972,7 +972,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @parent: 
 
-<!-- ##### STRUCT TnySummaryWindowIface ##### -->
+<!-- ##### STRUCT TnySummaryWindow ##### -->
 <para>
 
 </para>
@@ -990,14 +990,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 </para>
 
 
-<!-- ##### FUNCTION create_tny_msg_header_iface_suite ##### -->
+<!-- ##### FUNCTION create_tny_msg_header_suite ##### -->
 <para>
 
 </para>
 
 @Returns: 
 
-<!-- ##### FUNCTION create_tny_msg_mime_part_iface_suite ##### -->
+<!-- ##### FUNCTION create_tny_msg_mime_part_suite ##### -->
 <para>
 
 </para>
@@ -1019,7 +1019,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
-<!-- ##### FUNCTION tny_account_iface_get_account_store ##### -->
+<!-- ##### FUNCTION tny_account_get_account_store ##### -->
 <para>
 
 </para>
@@ -1027,7 +1027,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_account_iface_set_account_store ##### -->
+<!-- ##### FUNCTION tny_account_set_account_store ##### -->
 <para>
 
 </para>
@@ -1035,7 +1035,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @store: 
 
-<!-- ##### FUNCTION tny_account_iface_set_account_type ##### -->
+<!-- ##### FUNCTION tny_account_set_account_type ##### -->
 <para>
 
 </para>
@@ -1074,7 +1074,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_account_store_iface_get_store_accounts ##### -->
+<!-- ##### FUNCTION tny_account_store_get_store_accounts ##### -->
 <para>
 
 </para>
@@ -1082,7 +1082,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_account_store_iface_get_transport_accounts ##### -->
+<!-- ##### FUNCTION tny_account_store_get_transport_accounts ##### -->
 <para>
 
 </para>
@@ -1165,7 +1165,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_folder_iface_get_folders ##### -->
+<!-- ##### FUNCTION tny_folder_get_folders ##### -->
 <para>
 
 </para>
@@ -1173,7 +1173,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_folder_iface_set_account ##### -->
+<!-- ##### FUNCTION tny_folder_set_account ##### -->
 <para>
 
 </para>
@@ -1181,7 +1181,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @account: 
 
-<!-- ##### FUNCTION tny_folder_iface_set_id ##### -->
+<!-- ##### FUNCTION tny_folder_set_id ##### -->
 <para>
 
 </para>
@@ -1189,7 +1189,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @id: 
 
-<!-- ##### FUNCTION tny_folder_iface_uncache ##### -->
+<!-- ##### FUNCTION tny_folder_uncache ##### -->
 <para>
 
 </para>
@@ -1227,7 +1227,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @buffer: 
 
-<!-- ##### FUNCTION tny_header_iface_set_folder ##### -->
+<!-- ##### FUNCTION tny_header_set_folder ##### -->
 <para>
 
 </para>
@@ -1242,7 +1242,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
-<!-- ##### FUNCTION tny_iterator_iface_has_first ##### -->
+<!-- ##### FUNCTION tny_iterator_has_first ##### -->
 <para>
 
 </para>
@@ -1250,7 +1250,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_iterator_iface_has_next ##### -->
+<!-- ##### FUNCTION tny_iterator_has_next ##### -->
 <para>
 
 </para>
@@ -1290,7 +1290,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_add_folder ##### -->
+<!-- ##### FUNCTION tny_msg_folder_add_folder ##### -->
 <para>
 
 </para>
@@ -1298,7 +1298,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @folder: 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_has_cache ##### -->
+<!-- ##### FUNCTION tny_msg_folder_has_cache ##### -->
 <para>
 
 </para>
@@ -1306,7 +1306,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_folder_iface_refresh_headers_async ##### -->
+<!-- ##### FUNCTION tny_msg_folder_refresh_headers_async ##### -->
 <para>
 
 </para>
@@ -1353,7 +1353,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_bcc ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_bcc ##### -->
 <para>
 
 </para>
@@ -1361,7 +1361,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_cc ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_cc ##### -->
 <para>
 
 </para>
@@ -1369,7 +1369,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_date_received ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_date_received ##### -->
 <para>
 
 </para>
@@ -1377,7 +1377,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_date_sent ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_date_sent ##### -->
 <para>
 
 </para>
@@ -1385,7 +1385,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_flags ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_flags ##### -->
 <para>
 
 </para>
@@ -1393,7 +1393,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_folder ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_folder ##### -->
 <para>
 
 </para>
@@ -1401,7 +1401,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_from ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_from ##### -->
 <para>
 
 </para>
@@ -1409,7 +1409,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_message_id ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_message_id ##### -->
 <para>
 
 </para>
@@ -1417,7 +1417,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_replyto ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_replyto ##### -->
 <para>
 
 </para>
@@ -1425,7 +1425,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_subject ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_subject ##### -->
 <para>
 
 </para>
@@ -1433,7 +1433,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_to ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_to ##### -->
 <para>
 
 </para>
@@ -1441,7 +1441,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_get_uid ##### -->
+<!-- ##### FUNCTION tny_msg_header_get_uid ##### -->
 <para>
 
 </para>
@@ -1449,7 +1449,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_has_cache ##### -->
+<!-- ##### FUNCTION tny_msg_header_has_cache ##### -->
 <para>
 
 </para>
@@ -1457,7 +1457,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_bcc ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_bcc ##### -->
 <para>
 
 </para>
@@ -1465,7 +1465,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @bcc: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_cc ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_cc ##### -->
 <para>
 
 </para>
@@ -1473,7 +1473,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @cc: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_flags ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_flags ##### -->
 <para>
 
 </para>
@@ -1481,7 +1481,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @mask: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_folder ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_folder ##### -->
 <para>
 
 </para>
@@ -1489,7 +1489,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @folder: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_from ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_from ##### -->
 <para>
 
 </para>
@@ -1497,7 +1497,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @from: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_replyto ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_replyto ##### -->
 <para>
 
 </para>
@@ -1505,7 +1505,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @to: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_subject ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_subject ##### -->
 <para>
 
 </para>
@@ -1513,7 +1513,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @subject: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_to ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_to ##### -->
 <para>
 
 </para>
@@ -1521,7 +1521,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @to: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_set_uid ##### -->
+<!-- ##### FUNCTION tny_msg_header_set_uid ##### -->
 <para>
 
 </para>
@@ -1529,14 +1529,14 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @uid: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_uncache ##### -->
+<!-- ##### FUNCTION tny_msg_header_uncache ##### -->
 <para>
 
 </para>
 
 @self: 
 
-<!-- ##### FUNCTION tny_msg_header_iface_unset_flags ##### -->
+<!-- ##### FUNCTION tny_msg_header_unset_flags ##### -->
 <para>
 
 </para>
@@ -1604,7 +1604,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @val: 
 
-<!-- ##### FUNCTION tny_msg_header_view_iface_set_header ##### -->
+<!-- ##### FUNCTION tny_msg_header_view_set_header ##### -->
 <para>
 
 </para>
@@ -1619,7 +1619,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_iface_set_folder ##### -->
+<!-- ##### FUNCTION tny_msg_set_folder ##### -->
 <para>
 
 </para>
@@ -1635,7 +1635,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_construct_from_stream ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_construct_from_stream ##### -->
 <para>
 
 </para>
@@ -1645,7 +1645,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @type: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_content_type_is ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_content_type_is ##### -->
 <para>
 
 </para>
@@ -1654,7 +1654,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @type: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_decode_to_stream ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_decode_to_stream ##### -->
 <para>
 
 </para>
@@ -1662,7 +1662,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @stream: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_content_id ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_get_content_id ##### -->
 <para>
 
 </para>
@@ -1670,7 +1670,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_content_location ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_get_content_location ##### -->
 <para>
 
 </para>
@@ -1678,7 +1678,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_content_type ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_get_content_type ##### -->
 <para>
 
 </para>
@@ -1686,7 +1686,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_description ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_get_description ##### -->
 <para>
 
 </para>
@@ -1694,7 +1694,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_filename ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_get_filename ##### -->
 <para>
 
 </para>
@@ -1702,7 +1702,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_index ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_get_index ##### -->
 <para>
 
 </para>
@@ -1710,7 +1710,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_get_stream ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_get_stream ##### -->
 <para>
 
 </para>
@@ -1718,7 +1718,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_is_attachment ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_is_attachment ##### -->
 <para>
 
 </para>
@@ -1726,7 +1726,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_set_content_id ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_set_content_id ##### -->
 <para>
 
 </para>
@@ -1734,7 +1734,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @content_id: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_set_content_location ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_set_content_location ##### -->
 <para>
 
 </para>
@@ -1742,7 +1742,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @content_location: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_set_content_type ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_set_content_type ##### -->
 <para>
 
 </para>
@@ -1750,7 +1750,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @content_type: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_set_description ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_set_description ##### -->
 <para>
 
 </para>
@@ -1758,7 +1758,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @description: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_set_filename ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_set_filename ##### -->
 <para>
 
 </para>
@@ -1766,7 +1766,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @filename: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_set_index ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_set_index ##### -->
 <para>
 
 </para>
@@ -1774,7 +1774,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @self: 
 @index: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_iface_write_to_stream ##### -->
+<!-- ##### FUNCTION tny_msg_mime_part_write_to_stream ##### -->
 <para>
 
 </para>
@@ -1830,7 +1830,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 @save_strategy: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_window_iface_set_msg ##### -->
+<!-- ##### FUNCTION tny_msg_window_set_msg ##### -->
 <para>
 
 </para>
@@ -1890,7 +1890,7 @@ A callback function for tny_msg_folder_iface_refresh_headers_async that callsbac
 
 @Returns: 
 
-<!-- ##### FUNCTION tny_store_account_iface_get_folders ##### -->
+<!-- ##### FUNCTION tny_store_account_get_folders ##### -->
 <para>
 
 </para>

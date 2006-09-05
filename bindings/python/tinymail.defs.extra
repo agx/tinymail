@@ -3,9 +3,9 @@
   (c-name "TnyGetAccountsRequestType")
   (gtype-id "TNY_TYPE_GET_ACCOUNTS_REQUEST_TYPE")
   (values
-    '("transport" "TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS")
-    '("store" "TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS")
-    '("both" "TNY_ACCOUNT_STORE_IFACE_BOTH")
+    '("transport" "TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS")
+    '("store" "TNY_ACCOUNT_STORE_STORE_ACCOUNTS")
+    '("both" "TNY_ACCOUNT_STORE_BOTH")
   )
 )
 

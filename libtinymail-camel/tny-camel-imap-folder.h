@@ -24,7 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-camel-account.h>
-#include <tny-store-account-iface.h>
+#include <tny-store-account.h>
 
 G_BEGIN_DECLS
 
@@ -49,7 +49,7 @@ struct _TnyCamelIMAPFolderClass
 };
 
 GType tny_camel_imap_folder_get_type (void);
-TnyFolderIface* tny_camel_imap_folder_new (void);
+TnyFolder* tny_camel_imap_folder_new (void);
 
 G_END_DECLS
 

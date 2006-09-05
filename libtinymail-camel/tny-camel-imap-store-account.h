@@ -23,8 +23,8 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-account-iface.h>
-#include <tny-store-account-iface.h>
+#include <tny-account.h>
+#include <tny-store-account.h>
 #include <tny-camel-account.h>
 #include <tny-camel-store-account.h>
 
@@ -51,7 +51,7 @@ struct _TnyCamelIMAPStoreAccountClass
 };
 
 GType tny_camel_imap_store_account_get_type (void);
-TnyStoreAccountIface* tny_camel_imap_store_account_new (void);
+TnyStoreAccount* tny_camel_imap_store_account_new (void);
 
 G_END_DECLS
 

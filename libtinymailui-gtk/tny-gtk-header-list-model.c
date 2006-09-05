@@ -29,11 +29,11 @@
 #include <tny-gtk-header-list-model.h>
 #include <tny-gtk-header-list-iterator-priv.h>
 
-#include <tny-header-iface.h>
-#include <tny-folder-iface.h>
+#include <tny-header.h>
+#include <tny-folder.h>
 
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 
 #define INDEX_OFFSET 64
 #define INDEX_THRESHOLD 5000
@@ -183,7 +183,7 @@ tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 
 	g_mutex_lock (list_model->folder_lock);
 
-	/* Fill an GtkTreeIter (this is not a TnyIteratorIface!) using a path */
+	/* Fill an GtkTreeIter (this is not a TnyIterator!) using a path */
 
 	g_mutex_lock (list_model->iterator_lock);
 
@@ -286,14 +286,14 @@ _get_readable_date (time_t file_time_raw)
 gint 
 tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
-	TnyHeaderIface *hdr_a, *hdr_b;
+	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
 
 	hdr_a = a->user_data;
 	hdr_b = b->user_data;
 
-	recv_a = tny_header_iface_get_date_received (hdr_a);
-	recv_b = tny_header_iface_get_date_received (hdr_b);
+	recv_a = tny_header_get_date_received (hdr_a);
+	recv_b = tny_header_get_date_received (hdr_b);
 
 	return (recv_a - recv_b);
 }
@@ -312,14 +312,14 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 gint  
 tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
-	TnyHeaderIface *hdr_a, *hdr_b;
+	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
 
 	hdr_a = a->user_data;
 	hdr_b = b->user_data;
 
-	recv_a = tny_header_iface_get_date_sent (hdr_a);
-	recv_b = tny_header_iface_get_date_sent (hdr_b);
+	recv_a = tny_header_get_date_sent (hdr_a);
+	recv_b = tny_header_get_date_sent (hdr_b);
 
 	return (recv_a - recv_b);
 }
@@ -327,7 +327,7 @@ tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter 
 static void
 tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint column, GValue *value)
 {
-	TnyHeaderIface *header = NULL;
+	TnyHeader *header = NULL;
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 
 	g_return_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp);
@@ -347,27 +347,27 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_iface_get_cc (header));
+			g_value_set_string (value, tny_header_get_cc (header));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
 			g_value_set_string (value, 
-				_get_readable_date (tny_header_iface_get_date_sent (header)));
+				_get_readable_date (tny_header_get_date_sent (header)));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
 			g_value_set_string (value, 
-				_get_readable_date (tny_header_iface_get_date_received (header)));
+				_get_readable_date (tny_header_get_date_received (header)));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
 			g_value_init (value, G_TYPE_INT);
 			g_value_set_int (value, 
-					    tny_header_iface_get_date_sent (header));
+					    tny_header_get_date_sent (header));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN:
 			g_value_init (value, G_TYPE_INT);
 			g_value_set_int (value, 
-					 tny_header_iface_get_date_received (header));
+					 tny_header_get_date_received (header));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_OBJECT);
@@ -375,19 +375,19 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_iface_get_to (header));
+			g_value_set_string (value, tny_header_get_to (header));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_iface_get_subject (header));
+			g_value_set_string (value, tny_header_get_subject (header));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_iface_get_from (header));
+			g_value_set_string (value, tny_header_get_from (header));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			g_value_init (value, G_TYPE_INT);
-			g_value_set_int (value, tny_header_iface_get_flags (header));
+			g_value_set_int (value, tny_header_get_flags (header));
 			break;
 		default:
 			break;
@@ -502,7 +502,7 @@ tny_gtk_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 	return;
 }
 /*
-	TnyHeaderIface *header = NULL;
+	TnyHeader *header = NULL;
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 
 	g_return_if_fail (self);
@@ -527,7 +527,7 @@ tny_gtk_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
 	   the request using the real subject. *
 
 	if (G_LIKELY (header))
-		tny_header_iface_uncache (header);
+		tny_header_uncache (header);
 
 	g_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
@@ -563,7 +563,7 @@ tny_gtk_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 
 
 static void
-tny_gtk_header_list_model_prepend (TnyListIface *self, GObject* item)
+tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	GtkTreePath *path;
@@ -598,7 +598,7 @@ tny_gtk_header_list_model_prepend (TnyListIface *self, GObject* item)
 }
 
 static void
-tny_gtk_header_list_model_append (TnyListIface *self, GObject* item)
+tny_gtk_header_list_model_append (TnyList *self, GObject* item)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	GtkTreePath *path;
@@ -633,7 +633,7 @@ tny_gtk_header_list_model_append (TnyListIface *self, GObject* item)
 }
 
 static guint
-tny_gtk_header_list_model_length (TnyListIface *self)
+tny_gtk_header_list_model_length (TnyList *self)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	guint retval = 0;
@@ -646,7 +646,7 @@ tny_gtk_header_list_model_length (TnyListIface *self)
 }
 
 static void
-tny_gtk_header_list_model_remove (TnyListIface *self, GObject* item)
+tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	GtkTreePath *path;
@@ -681,8 +681,8 @@ tny_gtk_header_list_model_remove (TnyListIface *self, GObject* item)
 
 }
 
-static TnyIteratorIface*
-tny_gtk_header_list_model_create_iterator (TnyListIface *self)
+static TnyIterator*
+tny_gtk_header_list_model_create_iterator (TnyList *self)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 
@@ -691,15 +691,15 @@ tny_gtk_header_list_model_create_iterator (TnyListIface *self)
 	return _tny_gtk_header_list_iterator_new (me, TRUE);
 }
 
-static TnyListIface*
-tny_gtk_header_list_model_copy_the_list (TnyListIface *self)
+static TnyList*
+tny_gtk_header_list_model_copy_the_list (TnyList *self)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	TnyGtkHeaderListModel *copy = g_object_new (TNY_TYPE_GTK_HEADER_LIST_MODEL, NULL);
 
-	/* This only copies the TnyListIface pieces. The result is not a
+	/* This only copies the TnyList pieces. The result is not a
 	   correct or good TnyGtkHeaderListModel. But it will be a correct
-	   TnyListIface instance. It is the only thing the user of this
+	   TnyList instance. It is the only thing the user of this
 	   method expects.
 
 	   The new list will point to the same instances, of course. It's
@@ -711,11 +711,11 @@ tny_gtk_header_list_model_copy_the_list (TnyListIface *self)
 	copy->usable_index = FALSE;
 	g_mutex_unlock (me->iterator_lock);
 
-	return TNY_LIST_IFACE (copy);
+	return TNY_LIST (copy);
 }
 
 static void 
-tny_gtk_header_list_model_foreach_in_the_list (TnyListIface *self, GFunc func, gpointer user_data)
+tny_gtk_header_list_model_foreach_in_the_list (TnyList *self, GFunc func, gpointer user_data)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 
@@ -729,7 +729,7 @@ tny_gtk_header_list_model_foreach_in_the_list (TnyListIface *self, GFunc func, g
 }
 
 static void
-tny_list_iface_init (TnyListIfaceClass *klass)
+tny_list_init (TnyListIface *klass)
 {
 	klass->length_func = tny_gtk_header_list_model_length;
 	klass->prepend_func = tny_gtk_header_list_model_prepend;
@@ -912,14 +912,14 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 /**
  * tny_gtk_header_list_model_set_folder:
  * @self: A #TnyGtkHeaderListModel instance
- * @folder: a #TnyFolderIface instance
+ * @folder: a #TnyFolder instance
  * @refresh: refresh first
  *
- * Set the folder where the #TnyHeaderIface instances are located
+ * Set the folder where the #TnyHeader instances are located
  * 
  **/
 void
-tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolderIface *folder, gboolean refresh)
+tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *folder, gboolean refresh)
 {
 	GtkTreeIter iter;
 	GtkTreePath *path;
@@ -953,7 +953,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolderIfac
 	g_mutex_unlock (self->folder_lock);
 
 	/* Get a new list of headers */
-	tny_folder_iface_get_headers (folder, TNY_LIST_IFACE (self), refresh);
+	tny_folder_get_headers (folder, TNY_LIST (self), refresh);
 
 	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);
@@ -994,7 +994,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolderIfac
  *
  *
  * Return value: a new #GtkTreeModel instance suitable for showing lots of 
- * #TnyHeaderIface instances
+ * #TnyHeader instances
  **/
 GtkTreeModel*
 tny_gtk_header_list_model_new (void)
@@ -1034,8 +1034,8 @@ tny_gtk_header_list_model_get_type (void)
 		};
 		
 
-		static const GInterfaceInfo tny_list_iface_info = {
-			(GInterfaceInitFunc) tny_list_iface_init,
+		static const GInterfaceInfo tny_list_info = {
+			(GInterfaceInitFunc) tny_list_init,
 			NULL,
 			NULL
 		};
@@ -1046,8 +1046,8 @@ tny_gtk_header_list_model_get_type (void)
 		g_type_add_interface_static (object_type, GTK_TYPE_TREE_MODEL,
 					     &tree_model_info);
 
-		g_type_add_interface_static (object_type, TNY_TYPE_LIST_IFACE,
-					     &tny_list_iface_info);
+		g_type_add_interface_static (object_type, TNY_TYPE_LIST,
+					     &tny_list_info);
 
 	}
 

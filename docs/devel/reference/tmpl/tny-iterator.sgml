@@ -1,0 +1,79 @@
+<!-- ##### SECTION Title ##### -->
+TnyIterator
+
+<!-- ##### SECTION Short_Description ##### -->
+An iterator for #TnyList
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+An iterator for #TnyList
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyList
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION tny_iterator_next ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_iterator_prev ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_iterator_first ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_iterator_nth ##### -->
+<para>
+
+</para>
+
+@self: 
+@nth: 
+
+
+<!-- ##### FUNCTION tny_iterator_current ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_iterator_is_done ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_iterator_get_list ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

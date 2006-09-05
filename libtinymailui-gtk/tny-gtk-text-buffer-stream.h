@@ -24,7 +24,7 @@
 #include <gtk/gtk.h>
 #include <glib-object.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 
 G_BEGIN_DECLS
 
@@ -49,7 +49,7 @@ struct _TnyGtkTextBufferStreamClass
 };
 
 GType tny_gtk_text_buffer_stream_get_type (void);
-TnyStreamIface* tny_gtk_text_buffer_stream_new (GtkTextBuffer *buffer);
+TnyStream* tny_gtk_text_buffer_stream_new (GtkTextBuffer *buffer);
 
 void tny_gtk_text_buffer_stream_set_text_buffer (TnyGtkTextBufferStream *self, GtkTextBuffer *buffer);
 

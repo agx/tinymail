@@ -22,8 +22,8 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 #include <tny-simple-list.h>
 
 
@@ -34,7 +34,7 @@ static GObjectClass *parent_class;
 
 
 static void
-tny_simple_list_append (TnyListIface *self, GObject* item)
+tny_simple_list_append (TnyList *self, GObject* item)
 {
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 
@@ -47,7 +47,7 @@ tny_simple_list_append (TnyListIface *self, GObject* item)
 }
 
 static void
-tny_simple_list_prepend (TnyListIface *self, GObject* item)
+tny_simple_list_prepend (TnyList *self, GObject* item)
 {
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 
@@ -61,7 +61,7 @@ tny_simple_list_prepend (TnyListIface *self, GObject* item)
 
 
 static guint
-tny_simple_list_length (TnyListIface *self)
+tny_simple_list_length (TnyList *self)
 {
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 	guint retval = 0;
@@ -74,7 +74,7 @@ tny_simple_list_length (TnyListIface *self)
 }
 
 static void
-tny_simple_list_remove (TnyListIface *self, GObject* item)
+tny_simple_list_remove (TnyList *self, GObject* item)
 {
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 
@@ -88,14 +88,14 @@ tny_simple_list_remove (TnyListIface *self, GObject* item)
 	return;
 }
 
-static TnyIteratorIface*
-tny_simple_list_create_iterator (TnyListIface *self)
+static TnyIterator*
+tny_simple_list_create_iterator (TnyList *self)
 {
 	return _tny_simple_list_iterator_new (TNY_SIMPLE_LIST (self));
 }
 
-static TnyListIface*
-tny_simple_list_copy_the_simple_list (TnyListIface *self)
+static TnyList*
+tny_simple_list_copy_the_simple_list (TnyList *self)
 {
 	TnySimpleList *copy = g_object_new (TNY_TYPE_SIMPLE_LIST, NULL);
 
@@ -107,11 +107,11 @@ tny_simple_list_copy_the_simple_list (TnyListIface *self)
 	cpriv->first = list_copy;
 	g_mutex_unlock (priv->iterator_lock);
 
-	return TNY_LIST_IFACE (copy);
+	return TNY_LIST (copy);
 }
 
 static void 
-tny_simple_list_foreach_in_the_simple_list (TnyListIface *self, GFunc func, gpointer user_data)
+tny_simple_list_foreach_in_the_simple_list (TnyList *self, GFunc func, gpointer user_data)
 {
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 
@@ -123,7 +123,7 @@ tny_simple_list_foreach_in_the_simple_list (TnyListIface *self, GFunc func, gpoi
 }
 
 static void
-tny_list_iface_init (TnyListIfaceClass *klass)
+tny_list_init (TnyListIface *klass)
 {
 	klass->length_func = tny_simple_list_length;
 	klass->prepend_func = tny_simple_list_prepend;
@@ -197,14 +197,14 @@ tny_simple_list_init (TnySimpleList *self)
 /**
  * tny_simple_list_new:
  * 
- * Return value: A general purpose #TnyListIface instance
+ * Return value: A general purpose #TnyList instance
  **/
-TnyListIface*
+TnyList*
 tny_simple_list_new (void)
 {
 	TnySimpleList *self = g_object_new (TNY_TYPE_SIMPLE_LIST, NULL);
 
-	return TNY_LIST_IFACE (self);
+	return TNY_LIST (self);
 }
 
 GType
@@ -228,8 +228,8 @@ tny_simple_list_get_type (void)
 			NULL
 		};
 
-		static const GInterfaceInfo tny_list_iface_info = {
-			(GInterfaceInitFunc) tny_list_iface_init,
+		static const GInterfaceInfo tny_list_info = {
+			(GInterfaceInitFunc) tny_list_init,
 			NULL,
 			NULL
 		};
@@ -237,8 +237,8 @@ tny_simple_list_get_type (void)
 		object_type = g_type_register_static (G_TYPE_OBJECT, 
 						"TnySimpleList", &object_info, 0);
 
-		g_type_add_interface_static (object_type, TNY_TYPE_LIST_IFACE,
-					     &tny_list_iface_info);
+		g_type_add_interface_static (object_type, TNY_TYPE_LIST,
+					     &tny_list_info);
 
 	}
 

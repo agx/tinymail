@@ -26,16 +26,16 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
 #include <tny-olpc-platform-factory.h>
 
-#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 #include <tny-olpc-account-store.h>
 #include <tny-olpc-password-dialog.h>
-#include <tny-account-iface.h>
-#include <tny-store-account-iface.h>
-#include <tny-transport-account-iface.h>
-#include <tny-device-iface.h>
+#include <tny-account.h>
+#include <tny-store-account.h>
+#include <tny-transport-account.h>
+#include <tny-device.h>
 
 #include <tny-camel-account.h>
 #include <tny-camel-store-account.h>
@@ -53,7 +53,7 @@ struct _TnyOlpcAccountStorePriv
 {
 	gchar *cache_dir;
 	TnySessionCamel *session;
-	TnyDeviceIface *device;
+	TnyDevice *device;
 	guint notify;
 };
 
@@ -64,10 +64,10 @@ struct _TnyOlpcAccountStorePriv
 static GHashTable *passwords;
 
 static gchar* 
-per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
+per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
-	const gchar *accountid = tny_account_iface_get_id (account);
+	const gchar *accountid = tny_account_get_id (account);
 
 	if (G_UNLIKELY (!passwords))
 		passwords = g_hash_table_new (g_str_hash, g_str_equal);
@@ -112,12 +112,12 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 }
 
 static void
-per_account_forget_pass_func (TnyAccountIface *account)
+per_account_forget_pass_func (TnyAccount *account)
 {
 	TnyGetPassFunc func;
 	if (G_LIKELY (passwords))
 	{
-		const gchar *accountid = tny_account_iface_get_id (account);
+		const gchar *accountid = tny_account_get_id (account);
 
 		gchar *pwd = g_hash_table_lookup (passwords, accountid);
 
@@ -134,7 +134,7 @@ per_account_forget_pass_func (TnyAccountIface *account)
 }
 
 static gboolean
-tny_olpc_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
+tny_olpc_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
 {
 	GtkMessageType gtktype;
 	gboolean retval = FALSE;
@@ -167,7 +167,7 @@ tny_olpc_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, con
 
 
 static const gchar*
-tny_olpc_account_store_get_cache_dir (TnyAccountStoreIface *self)
+tny_olpc_account_store_get_cache_dir (TnyAccountStore *self)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 
@@ -179,7 +179,7 @@ tny_olpc_account_store_get_cache_dir (TnyAccountStoreIface *self)
 
 
 static void
-tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
+tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 	const gchar *filen;
@@ -198,7 +198,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *l
 	{
 		GKeyFile *keyfile;
 		gchar *proto, *type, *key, *name;
-		TnyAccountIface *account = NULL;
+		TnyAccount *account = NULL;
 		gchar *fullfilen = g_build_filename (g_get_home_dir(), 
 			".tinymail", "accounts", filen);
 		keyfile = g_key_file_new ();
@@ -214,18 +214,18 @@ tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *l
 	    
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
-			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
-				account = TNY_ACCOUNT_IFACE (tny_camel_transport_account_new ());
-		} else if (type && types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS)
+			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
+				account = TNY_ACCOUNT (tny_camel_transport_account_new ());
+		} else if (type && types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS)
 		{		
 			if (!g_ascii_strncasecmp (proto, "imap", 4))
-				account = TNY_ACCOUNT_IFACE (tny_camel_imap_store_account_new ());
+				account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
 			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
-				account = TNY_ACCOUNT_IFACE (tny_camel_nntp_store_account_new ());
+				account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
 			else if (!g_ascii_strncasecmp (proto, "pop", 4))
-				account = TNY_ACCOUNT_IFACE (tny_camel_pop_store_account_new ());
+				account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
 			else	/* Unknown, create a generic one? */
-			        account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
+			        account = TNY_ACCOUNT (tny_camel_store_account_new ());
 		}
 
 		if (type)
@@ -237,10 +237,10 @@ tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *l
 			gchar **options;
 
 			tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), priv->session);
-			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
+			tny_account_set_proto (TNY_ACCOUNT (account), proto);
 
 			name = g_key_file_get_value (keyfile, "tinymail", "name", NULL);
-			tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), name);
+			tny_account_set_name (TNY_ACCOUNT (account), name);
 			g_free (name);
 
 			options = g_key_file_get_string_list (keyfile, "tinymail", "options", &options_len, NULL);
@@ -260,10 +260,10 @@ tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *l
 
 				/* TODO: Add other supported and tested providers here */
 				user = g_key_file_get_value (keyfile, "tinymail", "user", NULL);
-				tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
+				tny_account_set_user (TNY_ACCOUNT (account), user);
 
 				hostname = g_key_file_get_value (keyfile, "tinymail", "hostname", NULL);
-				tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), hostname);
+				tny_account_set_hostname (TNY_ACCOUNT (account), hostname);
 				
 				g_free (hostname); g_free (user);
 			} else {
@@ -272,11 +272,11 @@ tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *l
 				/* Un officially supported provider */
 				/* Assuming there's a url_string in this case */
 				url_string = g_key_file_get_value (keyfile, "tinymail", "url_string", NULL);
-				tny_account_iface_set_url_string (TNY_ACCOUNT_IFACE (account), url_string);
+				tny_account_set_url_string (TNY_ACCOUNT (account), url_string);
 				g_free (url_string);
 			}
 
-			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), fullfilen);
+			tny_account_set_id (TNY_ACCOUNT (account), fullfilen);
 
 			g_free (fullfilen);
 
@@ -285,13 +285,13 @@ tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *l
 			 * setting the host, user and protocol.
 			 */
 
-			tny_account_iface_set_forget_pass_func (TNY_ACCOUNT_IFACE (account),
+			tny_account_set_forget_pass_func (TNY_ACCOUNT (account),
 				per_account_forget_pass_func);
 	
-			tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
+			tny_account_set_pass_func (TNY_ACCOUNT (account),
 				per_account_get_pass_func);
 
-			tny_list_iface_prepend (list, (GObject*)account);
+			tny_list_prepend (list, (GObject*)account);
 			g_object_unref (G_OBJECT (account));
 
 		}
@@ -312,7 +312,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *l
 
 
 static void
-tny_olpc_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
+tny_olpc_account_store_add_account (TnyAccountStore *self, TnyAccount *account, const gchar *type)
 {
 	g_warning ("Not implemented\n");
 
@@ -322,31 +322,31 @@ tny_olpc_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface 
 
 
 static void
-tny_olpc_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
+tny_olpc_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_olpc_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
+	tny_olpc_account_store_add_account (self, TNY_ACCOUNT (account), "store");
 
-	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
+	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
 
 static void
-tny_olpc_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
+tny_olpc_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_olpc_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
+	tny_olpc_account_store_add_account (self, TNY_ACCOUNT (account), "transport");
 
-	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
+	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
 
-static TnyDeviceIface*
-tny_olpc_account_store_get_device (TnyAccountStoreIface *self)
+static TnyDevice*
+tny_olpc_account_store_get_device (TnyAccountStore *self)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 
@@ -357,16 +357,16 @@ tny_olpc_account_store_get_device (TnyAccountStoreIface *self)
  * tny_olpc_account_store_new:
  *
  *
- * Return value: A new #TnyAccountStoreIface implemented for OLPC
+ * Return value: A new #TnyAccountStore implemented for OLPC
  **/
-TnyAccountStoreIface*
+TnyAccountStore*
 tny_olpc_account_store_new (void)
 {
 	TnyOlpcAccountStore *self = g_object_new (TNY_TYPE_OLPC_ACCOUNT_STORE, NULL);
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
-	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
+	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
 
-	return TNY_ACCOUNT_STORE_IFACE (self);
+	return TNY_ACCOUNT_STORE (self);
 }
 
 
@@ -374,11 +374,11 @@ static void
 tny_olpc_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (instance);
-	TnyPlatformFactoryIface *platfact = TNY_PLATFORM_FACTORY_IFACE (
+	TnyPlatformFactory *platfact = TNY_PLATFORM_FACTORY (
 		tny_olpc_platform_factory_get_instance ());
 
-	priv->device = tny_platform_factory_iface_new_device (platfact);
-	/* tny_device_iface_force_online (priv->device); */
+	priv->device = tny_platform_factory_new_device (platfact);
+	/* tny_device_force_online (priv->device); */
 	
 	return;
 }
@@ -428,9 +428,9 @@ tny_olpc_account_store_class_init (TnyOlpcAccountStoreClass *class)
 }
 
 static void
-tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
+tny_account_store_init (gpointer g, gpointer iface_data)
 {
-	TnyAccountStoreIfaceClass *klass = (TnyAccountStoreIfaceClass *)g_iface;
+	TnyAccountStoreClass *klass = (TnyAccountStoreClass *)g;
 
 	klass->get_accounts_func = tny_olpc_account_store_get_accounts;
 	klass->add_store_account_func = tny_olpc_account_store_add_store_account;
@@ -463,9 +463,9 @@ tny_olpc_account_store_get_type (void)
 		  tny_olpc_account_store_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_account_store_iface_info = 
+		static const GInterfaceInfo tny_account_store_info = 
 		{
-		  (GInterfaceInitFunc) tny_account_store_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_account_store_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -474,8 +474,8 @@ tny_olpc_account_store_get_type (void)
 			"TnyOlpcAccountStore",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_IFACE, 
-			&tny_account_store_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE, 
+			&tny_account_store_info);
 	}
 
 	return type;

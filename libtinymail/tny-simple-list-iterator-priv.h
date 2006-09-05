@@ -25,8 +25,8 @@
 
 #include <tny-shared.h>
 
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 
 G_BEGIN_DECLS
 
@@ -54,7 +54,7 @@ struct _TnySimpleListIteratorClass
 
 GType _tny_simple_list_iterator_get_type (void);
 void _tny_simple_list_iterator_set_model (TnySimpleListIterator *self, TnySimpleList *model);
-TnyIteratorIface* _tny_simple_list_iterator_new (TnySimpleList *model);
+TnyIterator* _tny_simple_list_iterator_new (TnySimpleList *model);
 
 G_END_DECLS
 

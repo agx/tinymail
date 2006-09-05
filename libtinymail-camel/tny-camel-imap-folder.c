@@ -27,8 +27,8 @@ stay as an abstract TnyStoreAccount type. */
 #include <string.h>
 
 
-#include <tny-folder-iface.h>
-#include <tny-folder-store-iface.h>
+#include <tny-folder.h>
+#include <tny-folder-store.h>
 #include <tny-camel-folder.h>
 #include <tny-camel-imap-folder.h>
 
@@ -36,7 +36,7 @@ stay as an abstract TnyStoreAccount type. */
 #include <camel/camel-session.h>
 #include <camel/camel-store.h>
 
-#include <tny-folder-iface.h>
+#include <tny-folder.h>
 
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"
@@ -44,7 +44,7 @@ stay as an abstract TnyStoreAccount type. */
 #include "tny-camel-common-priv.h"
 
 #include <tny-camel-shared.h>
-#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 
 
 static GObjectClass *parent_class = NULL;
@@ -54,14 +54,14 @@ static GObjectClass *parent_class = NULL;
  * tny_camel_imap_folder_new:
  * 
  *
- * Return value: A new IMAP #TnyFolderIface instance implemented for Camel
+ * Return value: A new IMAP #TnyFolder instance implemented for Camel
  **/
-TnyFolderIface*
+TnyFolder*
 tny_camel_imap_folder_new (void)
 {
 	TnyCamelIMAPFolder *self = g_object_new (TNY_TYPE_CAMEL_IMAP_FOLDER, NULL);
 
-	return TNY_FOLDER_IFACE (self);
+	return TNY_FOLDER (self);
 }
 
 static void

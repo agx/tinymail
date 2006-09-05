@@ -2,16 +2,16 @@
 TnyVfsStream
 
 <!-- ##### SECTION Short_Description ##### -->
-An adaptor between #TnyStreamIface and #GnomeVFSHandle
+An adaptor between #TnyStream and #GnomeVFSHandle
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type that adapts a #GnomeVFSHandle to a #TnyStreamIface
+A type that adapts a #GnomeVFSHandle to a #TnyStream
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnySaveStrategy, #TnyStreamIface, #TnySaveStrategyIface
+#TnySaveStrategy, #TnyStream, #TnySaveStrategy
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

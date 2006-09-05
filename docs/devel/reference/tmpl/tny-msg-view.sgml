@@ -1,0 +1,60 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgView
+
+<!-- ##### SECTION Short_Description ##### -->
+A type that defines a view for a message
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type that defines a view for a #TnyMsg implementation. The type is sometimes decorated by a 
+#TnyMsgWindow implementation.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyMsg, #TnyMsgMimePart, #TnyMsgWindow, #TnyMsgView, #TnyMsgWindow
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyMsgView ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_msg_view_set_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+
+<!-- ##### FUNCTION tny_msg_view_set_save_strategy ##### -->
+<para>
+
+</para>
+
+@self: 
+@strategy: 
+
+
+<!-- ##### FUNCTION tny_msg_view_set_unavailable ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_msg_view_clear ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

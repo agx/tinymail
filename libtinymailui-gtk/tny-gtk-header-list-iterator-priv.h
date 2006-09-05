@@ -24,8 +24,8 @@
 #include <glib-object.h>
 
 #include <tny-shared.h>
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 
 G_BEGIN_DECLS
 
@@ -52,7 +52,7 @@ struct _TnyGtkHeaderListIteratorClass
 };
 
 void _tny_gtk_header_list_iterator_set_model (TnyGtkHeaderListIterator *self, TnyGtkHeaderListModel *model, gboolean lock);
-TnyIteratorIface* _tny_gtk_header_list_iterator_new (TnyGtkHeaderListModel *model, gboolean lock);
+TnyIterator* _tny_gtk_header_list_iterator_new (TnyGtkHeaderListModel *model, gboolean lock);
 
 gboolean _tny_gtk_header_list_iterator_is_done_nl (TnyGtkHeaderListIterator *self);
 gpointer _tny_gtk_header_list_iterator_current_nl (TnyGtkHeaderListIterator *me);

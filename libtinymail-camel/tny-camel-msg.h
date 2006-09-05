@@ -23,10 +23,10 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-msg-iface.h>
-#include <tny-mime-part-iface.h>
-#include <tny-stream-iface.h>
-#include <tny-header-iface.h>
+#include <tny-msg.h>
+#include <tny-mime-part.h>
+#include <tny-stream.h>
+#include <tny-header.h>
 #include <tny-camel-mime-part.h>
 
 G_BEGIN_DECLS
@@ -53,8 +53,8 @@ struct _TnyCamelMsgClass
 
 GType tny_camel_msg_get_type (void);
 
-TnyMsgIface* tny_camel_msg_new (void);
-TnyMsgIface* tny_camel_msg_new_with_header (TnyHeaderIface *header);
+TnyMsg* tny_camel_msg_new (void);
+TnyMsg* tny_camel_msg_new_with_header (TnyHeader *header);
 
 G_END_DECLS
 

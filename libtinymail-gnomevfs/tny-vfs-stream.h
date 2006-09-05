@@ -24,7 +24,7 @@
 #include <libgnomevfs/gnome-vfs.h>
 #include <glib-object.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 
 G_BEGIN_DECLS
 

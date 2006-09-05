@@ -27,10 +27,10 @@
 #endif
 
 #include <tny-gtk-attach-list-model.h>
-#include <tny-mime-part-iface.h>
-#include <tny-iterator-iface.h>
-#include <tny-mime-part-iface.h>
-#include <tny-folder-iface.h>
+#include <tny-mime-part.h>
+#include <tny-iterator.h>
+#include <tny-mime-part.h>
+#include <tny-folder.h>
 
 #include "tny-gtk-attach-list-model-priv.h"
 #include "tny-gtk-attach-list-model-iterator-priv.h"
@@ -45,7 +45,7 @@ static GObjectClass *parent_class = NULL;
 typedef void (*listaddfunc) (GtkListStore *list_store, GtkTreeIter *iter);
 
 static void
-tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePartIface *part, listaddfunc func)
+tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, listaddfunc func)
 {
 	GtkListStore *model = GTK_LIST_STORE (self);
 	GtkTreeIter iter;
@@ -55,8 +55,8 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePartIface *pa
 	GdkPixbuf *pixbuf;
         gchar *icon;
 
-	if (tny_mime_part_iface_get_content_type (part) &&
-			tny_mime_part_iface_is_attachment (part))
+	if (tny_mime_part_get_content_type (part) &&
+			tny_mime_part_is_attachment (part))
 	{
 
 		if (!priv->theme || !GTK_IS_ICON_THEME (priv->theme))
@@ -69,8 +69,8 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePartIface *pa
 		if (priv->theme && GTK_IS_ICON_THEME (priv->theme))
 		{
 			icon = gnome_icon_lookup (priv->theme, NULL, 
-				tny_mime_part_iface_get_filename (part), NULL, NULL,
-				tny_mime_part_iface_get_content_type (part), 0, NULL);
+				tny_mime_part_get_filename (part), NULL, NULL,
+				tny_mime_part_get_content_type (part), 0, NULL);
 		}
 #else
 		icon = GTK_STOCK_FILE;
@@ -98,7 +98,7 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePartIface *pa
 			TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN, 
 			pixbuf,
 			TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN, 
-			tny_mime_part_iface_get_filename (part),
+			tny_mime_part_get_filename (part),
 			TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN,
 			part, -1);
 	}
@@ -112,7 +112,7 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePartIface *pa
  *
  *
  * Return value: a new #GtkTreeModel instance suitable for showing  
- * #TnyMimePartIface instances
+ * #TnyMimePart instances
  **/
 GtkTreeModel*
 tny_gtk_attach_list_model_new (void)
@@ -183,20 +183,20 @@ tny_gtk_attach_list_model_instance_init (GTypeInstance *instance, gpointer g_cla
 	return;
 }
 
-static TnyIteratorIface*
-tny_gtk_attach_list_model_create_iterator (TnyListIface *self)
+static TnyIterator*
+tny_gtk_attach_list_model_create_iterator (TnyList *self)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 
 	/* Return a new iterator */
 
-	return TNY_ITERATOR_IFACE (_tny_gtk_attach_list_model_iterator_new (me));
+	return TNY_ITERATOR (_tny_gtk_attach_list_model_iterator_new (me));
 }
 
 
 
 static void
-tny_gtk_attach_list_model_prepend (TnyListIface *self, GObject* item)
+tny_gtk_attach_list_model_prepend (TnyList *self, GObject* item)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 
@@ -207,14 +207,14 @@ tny_gtk_attach_list_model_prepend (TnyListIface *self, GObject* item)
     
 	me->first = g_list_prepend (me->first, item);
     
-	tny_gtk_attach_list_model_add (me, TNY_MIME_PART_IFACE (item), 
+	tny_gtk_attach_list_model_add (me, TNY_MIME_PART (item), 
 		gtk_list_store_prepend);
 
 	g_mutex_unlock (me->iterator_lock);
 }
 
 static void
-tny_gtk_attach_list_model_append (TnyListIface *self, GObject* item)
+tny_gtk_attach_list_model_append (TnyList *self, GObject* item)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 
@@ -224,14 +224,14 @@ tny_gtk_attach_list_model_append (TnyListIface *self, GObject* item)
 	g_object_ref (G_OBJECT (item));
     
 	me->first = g_list_append (me->first, item);
-	tny_gtk_attach_list_model_add (me, TNY_MIME_PART_IFACE (item), 
+	tny_gtk_attach_list_model_add (me, TNY_MIME_PART (item), 
 		gtk_list_store_append);
 
 	g_mutex_unlock (me->iterator_lock);
 }
 
 static guint
-tny_gtk_attach_list_model_length (TnyListIface *self)
+tny_gtk_attach_list_model_length (TnyList *self)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 	guint retval = 0;
@@ -246,7 +246,7 @@ tny_gtk_attach_list_model_length (TnyListIface *self)
 }
 
 static void
-tny_gtk_attach_list_model_remove (TnyListIface *self, GObject* item)
+tny_gtk_attach_list_model_remove (TnyList *self, GObject* item)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 	GtkTreeModel *model = GTK_TREE_MODEL (me);
@@ -264,13 +264,13 @@ tny_gtk_attach_list_model_remove (TnyListIface *self, GObject* item)
 	gtk_tree_model_get_iter_first (model, &iter);
 	while (gtk_tree_model_iter_next (model, &iter))
 	{
-		TnyMimePartIface *curpart;
+		TnyMimePart *curpart;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
 			&curpart, -1);
 
-		if (curpart == (TnyMimePartIface*)item)
+		if (curpart == (TnyMimePart*)item)
 		{
 			gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));
@@ -284,15 +284,15 @@ tny_gtk_attach_list_model_remove (TnyListIface *self, GObject* item)
 }
 
 
-static TnyListIface*
-tny_gtk_attach_list_model_copy_the_list (TnyListIface *self)
+static TnyList*
+tny_gtk_attach_list_model_copy_the_list (TnyList *self)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 	TnyGtkAttachListModel *copy = g_object_new (TNY_TYPE_GTK_ATTACH_LIST_MODEL, NULL);
 
-	/* This only copies the TnyListIface pieces. The result is not a
+	/* This only copies the TnyList pieces. The result is not a
 	   correct or good TnyHeaderListModel. But it will be a correct
-	   TnyListIface instance. It is the only thing the user of this
+	   TnyList instance. It is the only thing the user of this
 	   method expects.
 
 	   The new list will point to the same instances, of course. It's
@@ -303,11 +303,11 @@ tny_gtk_attach_list_model_copy_the_list (TnyListIface *self)
 	copy->first = list_copy;
 	g_mutex_unlock (me->iterator_lock);
 
-	return TNY_LIST_IFACE (copy);
+	return TNY_LIST (copy);
 }
 
 static void 
-tny_gtk_attach_list_model_foreach_in_the_list (TnyListIface *self, GFunc func, gpointer user_data)
+tny_gtk_attach_list_model_foreach_in_the_list (TnyList *self, GFunc func, gpointer user_data)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 
@@ -321,7 +321,7 @@ tny_gtk_attach_list_model_foreach_in_the_list (TnyListIface *self, GFunc func, g
 }
 
 static void
-tny_list_iface_init (TnyListIfaceClass *klass)
+tny_list_init (TnyListIface *klass)
 {
 	klass->length_func = tny_gtk_attach_list_model_length;
 	klass->prepend_func = tny_gtk_attach_list_model_prepend;
@@ -359,14 +359,14 @@ tny_gtk_attach_list_model_get_type (void)
 					    &info, 0);
 
 
-		static const GInterfaceInfo tny_list_iface_info = {
-			(GInterfaceInitFunc) tny_list_iface_init,
+		static const GInterfaceInfo tny_list_info = {
+			(GInterfaceInitFunc) tny_list_init,
 			NULL,
 			NULL
 		};
 
-		g_type_add_interface_static (type, TNY_TYPE_LIST_IFACE,
-					     &tny_list_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_LIST,
+					     &tny_list_info);
 
 	}
 

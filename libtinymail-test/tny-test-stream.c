@@ -21,13 +21,13 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 #include <tny-test-stream.h>
 
 static GObjectClass *parent_class = NULL;
 
 static gint 
-tny_test_stream_reset (TnyStreamIface *self)
+tny_test_stream_reset (TnyStream *self)
 {
 	TnyTestStream *me = TNY_TEST_STREAM (self);
 
@@ -42,17 +42,17 @@ tny_test_stream_reset (TnyStreamIface *self)
 
 
 static ssize_t
-tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
+tny_test_stream_write_to_stream (TnyStream *self, TnyStream *output)
 {
 	char tmp_buf[42];
 	ssize_t total = 0;
 	ssize_t nb_read;
 	ssize_t nb_written;
 	
-	while (!tny_stream_iface_eos (self)) 
+	while (!tny_stream_eos (self)) 
 	{
 
-		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
+		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
 
 		if (nb_read < 0)
 		{
@@ -62,7 +62,7 @@ tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 			nb_written = 0;
 	
 			while (nb_written < nb_read) {
-				ssize_t len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				ssize_t len = tny_stream_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (len < 0)
 					return -1;
@@ -75,7 +75,7 @@ tny_test_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 }
 
 static ssize_t
-tny_test_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
+tny_test_stream_read  (TnyStream *self, char *buffer, size_t n)
 {
 	int i = 0;
 
@@ -93,7 +93,7 @@ tny_test_stream_read  (TnyStreamIface *self, char *buffer, size_t n)
 }
 
 static ssize_t
-tny_test_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
+tny_test_stream_write (TnyStream *self, const char *buffer, size_t n)
 {
 
 	gint i=0;
@@ -115,13 +115,13 @@ tny_test_stream_write (TnyStreamIface *self, const char *buffer, size_t n)
 }
 
 static gint
-tny_test_stream_close (TnyStreamIface *self)
+tny_test_stream_close (TnyStream *self)
 {
 	return tny_test_stream_reset (self);
 }
 
 static gboolean
-tny_test_stream_eos (TnyStreamIface *self)
+tny_test_stream_eos (TnyStream *self)
 {
 	TnyTestStream *me = TNY_TEST_STREAM (self);
 
@@ -136,7 +136,7 @@ tny_test_stream_eos (TnyStreamIface *self)
  *
  * Create an test stream that streams the answer to all questions 
  *
- * Return value: a new #TnyStreamIface instance
+ * Return value: a new #TnyStream instance
  **/
 TnyTestStream*
 tny_test_stream_new (void)
@@ -162,9 +162,9 @@ tny_test_stream_finalize (GObject *object)
 }
 
 static void
-tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
+tny_stream_init (gpointer g, gpointer iface_data)
 {
-	TnyStreamIfaceClass *klass = (TnyStreamIfaceClass *)g_iface;
+	TnyStreamIface *klass = (TnyStreamIface *)g;
 
 	klass->read_func = tny_test_stream_read;
 	klass->write_func = tny_test_stream_write;
@@ -209,9 +209,9 @@ tny_test_stream_get_type (void)
 		  tny_test_stream_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_stream_iface_info = 
+		static const GInterfaceInfo tny_stream_info = 
 		{
-		  (GInterfaceInitFunc) tny_stream_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_stream_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -220,8 +220,8 @@ tny_test_stream_get_type (void)
 			"TnyTestStream",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 
-			&tny_stream_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
+			&tny_stream_info);
 	}
 
 	return type;

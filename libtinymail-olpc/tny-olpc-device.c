@@ -27,13 +27,13 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-olpc-device-priv.h"
 
-static void tny_olpc_device_on_online (TnyDeviceIface *self);
-static void tny_olpc_device_on_offline (TnyDeviceIface *self);
-static gboolean tny_olpc_device_is_online (TnyDeviceIface *self);
+static void tny_olpc_device_on_online (TnyDevice *self);
+static void tny_olpc_device_on_offline (TnyDevice *self);
+static gboolean tny_olpc_device_is_online (TnyDevice *self);
 
 
 static void 
-tny_olpc_device_reset (TnyDeviceIface *self)
+tny_olpc_device_reset (TnyDevice *self)
 {
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
 
@@ -43,7 +43,7 @@ tny_olpc_device_reset (TnyDeviceIface *self)
 }
 
 static void 
-tny_olpc_device_force_online (TnyDeviceIface *self)
+tny_olpc_device_force_online (TnyDevice *self)
 {
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
 
@@ -57,7 +57,7 @@ tny_olpc_device_force_online (TnyDeviceIface *self)
 
 
 static void
-tny_olpc_device_force_offline (TnyDeviceIface *self)
+tny_olpc_device_force_offline (TnyDevice *self)
 {
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
 
@@ -71,23 +71,23 @@ tny_olpc_device_force_offline (TnyDeviceIface *self)
 }
 
 static void
-tny_olpc_device_on_online (TnyDeviceIface *self)
+tny_olpc_device_on_online (TnyDevice *self)
 {
-	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, TRUE);
+	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
 
 	return;
 }
 
 static void
-tny_olpc_device_on_offline (TnyDeviceIface *self)
+tny_olpc_device_on_offline (TnyDevice *self)
 {
-	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, FALSE);
+	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
 
 	return;
 }
 
 static gboolean
-tny_olpc_device_is_online (TnyDeviceIface *self)
+tny_olpc_device_is_online (TnyDevice *self)
 {
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
 	gboolean retval = FALSE;
@@ -108,14 +108,14 @@ tny_olpc_device_instance_init (GTypeInstance *instance, gpointer g_class)
 /**
  * tny_olpc_device_new:
  *
- * Return value: A new #TnyDeviceIface implemented for OLPC
+ * Return value: A new #TnyDevice implemented for OLPC
  **/
-TnyDeviceIface*
+TnyDevice*
 tny_olpc_device_new (void)
 {
 	TnyOlpcDevice *self = g_object_new (TNY_TYPE_OLPC_DEVICE, NULL);
 
-	return TNY_DEVICE_IFACE (self);
+	return TNY_DEVICE (self);
 }
 
 
@@ -132,9 +132,9 @@ tny_olpc_device_finalize (GObject *object)
 
 
 static void
-tny_device_iface_init (gpointer g_iface, gpointer iface_data)
+tny_device_init (gpointer g, gpointer iface_data)
 {
-	TnyDeviceIfaceClass *klass = (TnyDeviceIfaceClass *)g_iface;
+	TnyDeviceClass *klass = (TnyDeviceClass *)g;
 
 	klass->is_online_func = tny_olpc_device_is_online;
 	klass->reset_func = tny_olpc_device_reset;
@@ -181,9 +181,9 @@ tny_olpc_device_get_type (void)
 		  tny_olpc_device_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_device_iface_info = 
+		static const GInterfaceInfo tny_device_info = 
 		{
-		  (GInterfaceInitFunc) tny_device_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_device_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -192,8 +192,8 @@ tny_olpc_device_get_type (void)
 			"TnyOlpcDevice",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_DEVICE_IFACE, 
-			&tny_device_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_DEVICE, 
+			&tny_device_info);
 
 	}
 

@@ -2,16 +2,16 @@
 TnyCamelNNTPFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-A NNTP #TnyFolderIface implementation for Camel
+A NNTP #TnyFolder implementation for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A NNTP #TnyFolderIface implementation for Camel
+A NNTP #TnyFolder implementation for Camel
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderIface, #TnyCamelFolder
+#TnyFolder, #TnyCamelFolder
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

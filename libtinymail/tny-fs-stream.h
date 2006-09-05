@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 
 G_BEGIN_DECLS
 

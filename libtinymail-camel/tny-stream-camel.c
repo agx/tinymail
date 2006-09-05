@@ -27,7 +27,7 @@ static CamelStreamClass *parent_class = NULL;
 /**
  * tny_stream_camel_write_to_stream:
  * @self: a #TnyCamelStream object
- * @output: a #TnyStreamIface object to write to
+ * @output: a #TnyStream object to write to
  * 
  * Write self to output (copy it) in an efficient way
  *
@@ -35,7 +35,7 @@ static CamelStreamClass *parent_class = NULL;
  * error along with setting errno.
  **/
 gssize 
-tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStreamIface *output)
+tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStream *output)
 {
 	CamelStream *stream = CAMEL_STREAM (self);
 	char tmp_buf[4096];
@@ -43,7 +43,7 @@ tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStreamIface *output)
 	gssize nb_read;
 	gssize nb_written;
 	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
-	g_return_val_if_fail (TNY_IS_STREAM_IFACE (output), -1);
+	g_return_val_if_fail (TNY_IS_STREAM (output), -1);
 
 	while (G_LIKELY (!camel_stream_eos (stream)))
 	{
@@ -56,7 +56,7 @@ tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStreamIface *output)
 	
 			while (G_LIKELY (nb_written < nb_read))
 			{
-				gssize len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				gssize len = tny_stream_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -73,35 +73,35 @@ static gssize
 tny_stream_camel_read (CamelStream *stream, char *buffer, gsize n)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)stream;
-	return tny_stream_iface_read (self->stream, buffer, n);
+	return tny_stream_read (self->stream, buffer, n);
 }
 
 static gssize
 tny_stream_camel_write (CamelStream *stream, const char *buffer, gsize n)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)stream;
-	return tny_stream_iface_write (self->stream, buffer, n);
+	return tny_stream_write (self->stream, buffer, n);
 }
 
 static int
 tny_stream_camel_close (CamelStream *stream)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)stream;
-	return tny_stream_iface_close (self->stream);
+	return tny_stream_close (self->stream);
 }
 
 static gboolean
 tny_stream_camel_eos (CamelStream *stream)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)stream;
-	return tny_stream_iface_eos (self->stream);
+	return tny_stream_eos (self->stream);
 }
 
 static int
 tny_stream_camel_flush (CamelStream *stream)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)stream;
-	return tny_stream_iface_flush (self->stream);
+	return tny_stream_flush (self->stream);
 }
 
 
@@ -109,7 +109,7 @@ static int
 tny_stream_camel_reset (CamelStream *stream)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)stream;
-	return tny_stream_iface_reset (self->stream);
+	return tny_stream_reset (self->stream);
 }
 
 static void
@@ -181,13 +181,13 @@ tny_stream_camel_get_type (void)
 /**
  * tny_stream_camel_set_stream:
  * @self: A #TnyStreamCamel object
- * @stream: A #TnyStreamIface object
+ * @stream: A #TnyStream object
  *
  * Set the stream to play proxy for
  *
  **/
 void
-tny_stream_camel_set_stream (TnyStreamCamel *self, TnyStreamIface *stream)
+tny_stream_camel_set_stream (TnyStreamCamel *self, TnyStream *stream)
 {
 
 	if (self->stream)
@@ -203,13 +203,13 @@ tny_stream_camel_set_stream (TnyStreamCamel *self, TnyStreamIface *stream)
 
 /**
  * tny_stream_camel_new:
- * @stream: A #TnyStreamIface stream to play proxy for
+ * @stream: A #TnyStream stream to play proxy for
  *
  * Return value: A new #CamelStream instance implemented as a proxy
- * for a #TnyStreamIface
+ * for a #TnyStream
  **/
 CamelStream *
-tny_stream_camel_new (TnyStreamIface *stream)
+tny_stream_camel_new (TnyStream *stream)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *) camel_object_new (tny_stream_camel_get_type());
 

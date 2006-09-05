@@ -26,14 +26,14 @@ stay as an abstract TnyStoreAccount type. */
 #include <glib.h>
 #include <string.h>
 
-#include <tny-list-iface.h>
-#include <tny-account-iface.h>
-#include <tny-store-account-iface.h>
+#include <tny-list.h>
+#include <tny-account.h>
+#include <tny-store-account.h>
 #include <tny-camel-store-account.h>
 #include <tny-camel-nntp-store-account.h>
 
-#include <tny-folder-iface.h>
-#include <tny-folder-store-iface.h>
+#include <tny-folder.h>
+#include <tny-folder-store.h>
 #include <tny-camel-folder.h>
 
 #include <camel/camel.h>
@@ -44,7 +44,7 @@ stay as an abstract TnyStoreAccount type. */
 #define CAMEL_FOLDER_TYPE_SENT (5 << 10)
 #endif
 
-#include <tny-folder-iface.h>
+#include <tny-folder.h>
 
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"
@@ -52,7 +52,7 @@ stay as an abstract TnyStoreAccount type. */
 #include "tny-camel-common-priv.h"
 
 #include <tny-camel-shared.h>
-#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 
 
 static GObjectClass *parent_class = NULL;
@@ -62,14 +62,14 @@ static GObjectClass *parent_class = NULL;
  * tny_camel_nntp_store_account_new:
  * 
  *
- * Return value: A new NNTP #TnyStoreAccountIface instance implemented for Camel
+ * Return value: A new NNTP #TnyStoreAccount instance implemented for Camel
  **/
-TnyStoreAccountIface*
+TnyStoreAccount*
 tny_camel_nntp_store_account_new (void)
 {
 	TnyCamelNNTPStoreAccount *self = g_object_new (TNY_TYPE_CAMEL_NNTP_STORE_ACCOUNT, NULL);
 
-	return TNY_STORE_ACCOUNT_IFACE (self);
+	return TNY_STORE_ACCOUNT (self);
 }
 
 static void

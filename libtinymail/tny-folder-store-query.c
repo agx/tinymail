@@ -190,7 +190,7 @@ get_regerror (int errcode, regex_t *compiled)
  * TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID then pattern will be used as
  * regular expression for matching the property of the folders.
  *
- * The tny_folder_iface_get_name and tny_folder_iface_get_id properties will
+ * The tny_folder_get_name and tny_folder_get_id properties will
  * then be used.
  * 
  * For the options TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED and 
@@ -229,7 +229,7 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
 	    	if (has_regex)
 			add->regex = regex;
 	    	else add->regex = NULL;
-		tny_list_iface_prepend (query->items, G_OBJECT (add));
+		tny_list_prepend (query->items, G_OBJECT (add));
 		g_object_unref (G_OBJECT (add));
 	}    
 }
@@ -242,7 +242,7 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
  *
  * Return value: a list of AND query items
  **/
-TnyListIface*
+TnyList*
 tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
 {
     return g_object_ref (G_OBJECT (query->items));

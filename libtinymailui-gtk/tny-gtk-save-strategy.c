@@ -34,7 +34,7 @@
 #include <tny-gtk-text-buffer-stream.h>
 #include <tny-gtk-attach-list-model.h>
 
-#include <tny-mime-part-iface.h>
+#include <tny-mime-part.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -52,7 +52,7 @@ static GObjectClass *parent_class = NULL;
 
 #ifdef GNOME
 static gboolean
-gtk_save_to_file (const gchar *uri, TnyMimePartIface *part)
+gtk_save_to_file (const gchar *uri, TnyMimePart *part)
 {
 	GnomeVFSResult result;
 	GnomeVFSHandle *handle;
@@ -65,7 +65,7 @@ gtk_save_to_file (const gchar *uri, TnyMimePartIface *part)
 		return FALSE;
 
 	stream = tny_vfs_stream_new (handle);
-	tny_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
+	tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
 
 	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
 	g_object_unref (G_OBJECT (stream));
@@ -74,7 +74,7 @@ gtk_save_to_file (const gchar *uri, TnyMimePartIface *part)
 }
 #else
 static gboolean
-gtk_save_to_file (const gchar *local_filename, TnyMimePartIface *part)
+gtk_save_to_file (const gchar *local_filename, TnyMimePart *part)
 {
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
@@ -82,7 +82,7 @@ gtk_save_to_file (const gchar *local_filename, TnyMimePartIface *part)
 	{
 		TnyFsStream *stream = NULL;
 		stream = tny_fs_stream_new (fd);
-		tny_mime_part_iface_decode_to_stream (part, TNY_STREAM_IFACE (stream));
+		tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
 
 		/* This also closes the file descriptor (maybe it shouldn't?) */
 		g_object_unref (G_OBJECT (stream));
@@ -96,7 +96,7 @@ gtk_save_to_file (const gchar *local_filename, TnyMimePartIface *part)
 
 
 static void
-tny_gtk_save_strategy_save (TnySaveStrategyIface *self, TnyMimePartIface *part)
+tny_gtk_save_strategy_save (TnySaveStrategy *self, TnyMimePart *part)
 {
 	GtkFileChooserDialog *dialog;
 	gboolean destr=FALSE;
@@ -118,7 +118,7 @@ tny_gtk_save_strategy_save (TnySaveStrategyIface *self, TnyMimePartIface *part)
 #endif
 
 	gtk_file_chooser_set_current_name (GTK_FILE_CHOOSER (dialog), 
-		tny_mime_part_iface_get_filename (part));
+		tny_mime_part_get_filename (part));
 
 	if (G_LIKELY (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT))
 	{
@@ -159,14 +159,14 @@ tny_gtk_save_strategy_save (TnySaveStrategyIface *self, TnyMimePartIface *part)
  * tny_gtk_save_strategy_new:
  *
  *
- * Return value: a new #TnySaveStrategyIface instance implemented for Gtk+
+ * Return value: a new #TnySaveStrategy instance implemented for Gtk+
  **/
-TnySaveStrategyIface*
+TnySaveStrategy*
 tny_gtk_save_strategy_new (void)
 {
 	TnyGtkSaveStrategy *self = g_object_new (TNY_TYPE_GTK_SAVE_STRATEGY, NULL);
 
-	return TNY_SAVE_STRATEGY_IFACE (self);
+	return TNY_SAVE_STRATEGY (self);
 }
 
 static void
@@ -184,9 +184,9 @@ tny_gtk_save_strategy_finalize (GObject *object)
 }
 
 static void
-tny_gtk_save_strategy_iface_init (gpointer g_iface, gpointer iface_data)
+tny_gtk_save_strategy_init (gpointer g, gpointer iface_data)
 {
-	TnySaveStrategyIfaceClass *klass = (TnySaveStrategyIfaceClass *)g_iface;
+	TnySaveStrategyIface *klass = (TnySaveStrategyIface *)g;
 
 	klass->save_func = tny_gtk_save_strategy_save;
 
@@ -227,9 +227,9 @@ tny_gtk_save_strategy_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_gtk_save_strategy_iface_info = 
+		static const GInterfaceInfo tny_gtk_save_strategy_info = 
 		{
-		  (GInterfaceInitFunc) tny_gtk_save_strategy_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_gtk_save_strategy_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -238,8 +238,8 @@ tny_gtk_save_strategy_get_type (void)
 			"TnyGtkSaveStrategy",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_SAVE_STRATEGY_IFACE, 
-			&tny_gtk_save_strategy_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_SAVE_STRATEGY, 
+			&tny_gtk_save_strategy_info);
 
 	}
 

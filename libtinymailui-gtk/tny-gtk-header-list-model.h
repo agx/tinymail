@@ -21,9 +21,9 @@
  */
 
 #include <gtk/gtktreemodel.h>
-#include <tny-header-iface.h>
-#include <tny-folder-iface.h>
-#include <tny-list-iface.h>
+#include <tny-header.h>
+#include <tny-folder.h>
+#include <tny-list.h>
 
 G_BEGIN_DECLS
 
@@ -34,7 +34,7 @@ G_BEGIN_DECLS
 #define TNY_IS_GTK_HEADER_LIST_MODEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GTK_HEADER_LIST_MODEL))
 #define TNY_GTK_HEADER_LIST_MODEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_GTK_HEADER_LIST_MODEL, TnyGtkHeaderListModelClass))
 
-/* Implements GtkTreeModelIface and TnyListIface */
+/* Implements GtkTreeModel and TnyList */
 
 typedef struct _TnyGtkHeaderListModel TnyGtkHeaderListModel;
 typedef struct _TnyGtkHeaderListModelClass TnyGtkHeaderListModelClass;
@@ -63,13 +63,13 @@ struct _TnyGtkHeaderListModel
 	GObject parent;
 
 	GMutex *folder_lock, *iterator_lock;
-	TnyFolderIface *folder;
+	TnyFolder *folder;
 	gint length;
 	gint stamp;
 
 	gboolean usable_index;
 	GList *first, *index;
-	TnyIteratorIface *iterator;
+	TnyIterator *iterator;
 	guint last_nth;
 };
 
@@ -82,7 +82,7 @@ GType tny_gtk_header_list_model_get_type (void);
 GType tny_gtk_header_list_model_column_get_type (void);
 
 GtkTreeModel* tny_gtk_header_list_model_new (void);
-void tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolderIface *folder, gboolean refresh);
+void tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *folder, gboolean refresh);
 gint tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 gint tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 

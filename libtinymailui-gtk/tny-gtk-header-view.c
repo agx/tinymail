@@ -31,7 +31,7 @@ typedef struct _TnyGtkHeaderViewPriv TnyGtkHeaderViewPriv;
 
 struct _TnyGtkHeaderViewPriv
 {
-	TnyHeaderIface *header;
+	TnyHeader *header;
 	GtkWidget *from_label;
 	GtkWidget *to_label;
 	GtkWidget *subject_label;
@@ -59,7 +59,7 @@ _get_readable_date (time_t file_time_raw)
 
 
 static void 
-tny_gtk_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header)
+tny_gtk_header_view_set_header (TnyHeaderView *self, TnyHeader *header)
 {
 	TnyGtkHeaderViewPriv *priv = TNY_GTK_HEADER_VIEW_GET_PRIVATE (self);
 
@@ -73,11 +73,11 @@ tny_gtk_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header
 		g_object_ref (G_OBJECT (header)); 
 		priv->header = header;
 
-		gtk_label_set_text (GTK_LABEL (priv->to_label), tny_header_iface_get_to (header));
-		gtk_label_set_text (GTK_LABEL (priv->from_label), tny_header_iface_get_from (header));
-		gtk_label_set_text (GTK_LABEL (priv->subject_label), tny_header_iface_get_subject (header));
+		gtk_label_set_text (GTK_LABEL (priv->to_label), tny_header_get_to (header));
+		gtk_label_set_text (GTK_LABEL (priv->from_label), tny_header_get_from (header));
+		gtk_label_set_text (GTK_LABEL (priv->subject_label), tny_header_get_subject (header));
 
-		str = _get_readable_date (tny_header_iface_get_date_sent (header));
+		str = _get_readable_date (tny_header_get_date_sent (header));
 		gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);
 		g_free (str);
 	}
@@ -87,7 +87,7 @@ tny_gtk_header_view_set_header (TnyHeaderViewIface *self, TnyHeaderIface *header
 
 
 static void 
-tny_gtk_header_view_clear (TnyHeaderViewIface *self)
+tny_gtk_header_view_clear (TnyHeaderView *self)
 {
 	TnyGtkHeaderViewPriv *priv = TNY_GTK_HEADER_VIEW_GET_PRIVATE (self);
 
@@ -107,14 +107,14 @@ tny_gtk_header_view_clear (TnyHeaderViewIface *self)
 /**
  * tny_gtk_header_view_new:
  *
- * Return value: a new #TnyHeaderViewIface instance implemented for Gtk+
+ * Return value: a new #TnyHeaderView instance implemented for Gtk+
  **/
-TnyHeaderViewIface*
+TnyHeaderView*
 tny_gtk_header_view_new (void)
 {
 	TnyGtkHeaderView *self = g_object_new (TNY_TYPE_GTK_HEADER_VIEW, NULL);
 
-	return TNY_HEADER_VIEW_IFACE (self);
+	return TNY_HEADER_VIEW (self);
 }
 
 static void
@@ -210,9 +210,9 @@ tny_gtk_header_view_finalize (GObject *object)
 }
 
 static void
-tny_header_view_iface_init (gpointer g_iface, gpointer iface_data)
+tny_header_view_init (gpointer g, gpointer iface_data)
 {
-	TnyHeaderViewIfaceClass *klass = (TnyHeaderViewIfaceClass *)g_iface;
+	TnyHeaderViewIface *klass = (TnyHeaderViewIface *)g;
 
 	klass->set_header_func = tny_gtk_header_view_set_header;
 	klass->clear_func = tny_gtk_header_view_clear;
@@ -255,9 +255,9 @@ tny_gtk_header_view_get_type (void)
 		  tny_gtk_header_view_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_header_view_iface_info = 
+		static const GInterfaceInfo tny_header_view_info = 
 		{
-		  (GInterfaceInitFunc) tny_header_view_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_header_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -266,8 +266,8 @@ tny_gtk_header_view_get_type (void)
 			"TnyGtkHeaderView",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_HEADER_VIEW_IFACE, 
-			&tny_header_view_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_HEADER_VIEW, 
+			&tny_header_view_info);
 
 	}
 

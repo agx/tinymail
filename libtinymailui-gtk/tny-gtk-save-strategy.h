@@ -23,7 +23,7 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
-#include <tny-save-strategy-iface.h>
+#include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
 
@@ -49,7 +49,7 @@ struct _TnyGtkSaveStrategyClass
 };
 
 GType tny_gtk_save_strategy_get_type (void);
-TnySaveStrategyIface* tny_gtk_save_strategy_new (void);
+TnySaveStrategy* tny_gtk_save_strategy_new (void);
 
 G_END_DECLS
 

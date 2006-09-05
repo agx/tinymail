@@ -2,16 +2,16 @@
 TnyCamelNNTPStoreAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-NNTP #TnyStoreAccountIface instance implemented for Camel
+NNTP #TnyStoreAccount instance implemented for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-NNTP #TnyStoreAccountIface instance implemented for Camel
+NNTP #TnyStoreAccount instance implemented for Camel
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccountIface, #TnyCamelStoreAccount
+#TnyStoreAccount, #TnyCamelStoreAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

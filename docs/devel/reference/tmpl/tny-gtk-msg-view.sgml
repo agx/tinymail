@@ -2,7 +2,7 @@
 TnyGtkMsgView
 
 <!-- ##### SECTION Short_Description ##### -->
-A implementation of #TnyMsgViewIface for Gtk+.
+A implementation of #TnyMsgView for Gtk+.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
@@ -16,7 +16,7 @@ This type is coupled with the #TnyTextBufferStream.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgIface, #TnyMsgMimePartIface, #TnyTextBufferStream, #GtkTextBuffer, #GtkTextView
+#TnyMsg, #TnyMsgMimePart, #TnyTextBufferStream, #GtkTextBuffer, #GtkTextView
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

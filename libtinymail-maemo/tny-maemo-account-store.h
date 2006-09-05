@@ -48,7 +48,7 @@ struct _TnyMaemoAccountStoreClass
 };
 
 GType tny_maemo_account_store_get_type (void);
-TnyAccountStoreIface* tny_maemo_account_store_new (void);
+TnyAccountStore* tny_maemo_account_store_new (void);
 TnySessionCamel* tny_maemo_account_store_get_session (TnyMaemoAccountStore *self);
 
 G_END_DECLS

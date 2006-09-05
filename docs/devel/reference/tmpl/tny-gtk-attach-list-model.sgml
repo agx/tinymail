@@ -2,11 +2,11 @@
 TnyGtkAttachListModel
 
 <!-- ##### SECTION Short_Description ##### -->
-A #GtkTreeModel suitable for storing #TnyMsgMimePartIface instances
+A #GtkTreeModel suitable for storing #TnyMsgMimePart instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #GtkTreeModel suitable for storing #TnyMsgMimePartIface instaces. </para>
+A #GtkTreeModel suitable for storing #TnyMsgMimePart instaces. </para>
 <para>The
 implementation inherits the #GtkListStore. If the library was compiled
 with gnome features, the implementation will handle the mime-type icon 
@@ -15,7 +15,7 @@ automatically.
 <para>
 It's very important to unreference the instance you will get when doing something like this:
 <programlisting>
-TnyMimePartIface *part;
+TnyMimePart *part;
 gtk_tree_model_get (model, &amp;iter, TNY_ATTACH_LIST_MODEL_INSTANCE_COLUMN, &amp;part, -1);
 /* use part */
 g_object_unref (G_OBJECT(partr));
@@ -25,7 +25,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgMimePartIface, #GtkTreeModel, #GtkListStore, #GtkTreeView
+#TnyMsgMimePart, #GtkTreeModel, #GtkListStore, #GtkTreeView
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

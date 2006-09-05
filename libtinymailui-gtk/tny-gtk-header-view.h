@@ -23,7 +23,7 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
-#include <tny-header-view-iface.h>
+#include <tny-header-view.h>
 
 G_BEGIN_DECLS
 
@@ -49,7 +49,7 @@ struct _TnyGtkHeaderViewClass
 };
 
 GType tny_gtk_header_view_get_type (void);
-TnyHeaderViewIface* tny_gtk_header_view_new (void);
+TnyHeaderView* tny_gtk_header_view_new (void);
 
 G_END_DECLS
 

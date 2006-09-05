@@ -22,8 +22,8 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <tny-store-account-iface.h>
-#include <tny-list-iface.h>
+#include <tny-store-account.h>
+#include <tny-list.h>
 
 G_BEGIN_DECLS
 
@@ -34,7 +34,7 @@ G_BEGIN_DECLS
 #define TNY_IS_GTK_ACCOUNT_TREE_MODEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GTK_ACCOUNT_TREE_MODEL))
 #define TNY_GTK_ACCOUNT_TREE_MODEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_GTK_ACCOUNT_TREE_MODEL, TnyGtkAccountTreeModelClass))
 
-/* Implements GtkTreeModelIface and TnyListIface */
+/* Implements GtkTreeModel and TnyList */
 
 typedef struct _TnyGtkAccountTreeModel TnyGtkAccountTreeModel;
 typedef struct _TnyGtkAccountTreeModelClass TnyGtkAccountTreeModelClass;

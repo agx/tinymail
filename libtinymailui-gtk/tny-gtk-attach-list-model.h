@@ -22,7 +22,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <tny-account-iface.h>
+#include <tny-account.h>
 
 G_BEGIN_DECLS
 

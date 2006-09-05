@@ -22,7 +22,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 
 #include <camel/camel-seekable-stream.h>
 
@@ -39,7 +39,7 @@ struct _TnyStreamCamel
 {
 	CamelStream parent;
 
-	TnyStreamIface *stream;
+	TnyStream *stream;
 };
 
 struct _TnyStreamCamelClass 
@@ -48,10 +48,10 @@ struct _TnyStreamCamelClass
 };
 
 CamelType        tny_stream_camel_get_type        (void);
-CamelStream*     tny_stream_camel_new             (TnyStreamIface *stream);
-void             tny_stream_camel_set_stream      (TnyStreamCamel *self, TnyStreamIface *stream);
+CamelStream*     tny_stream_camel_new             (TnyStream *stream);
+void             tny_stream_camel_set_stream      (TnyStreamCamel *self, TnyStream *stream);
 
-gssize           tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStreamIface *output);
+gssize           tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStream *output);
 
 G_END_DECLS
 

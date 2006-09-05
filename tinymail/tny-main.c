@@ -20,8 +20,8 @@
 #include <libintl.h>
 #include <gtk/gtk.h>
 
-#include <tny-account-store-view-iface.h>
-#include <tny-platform-factory-iface.h>
+#include <tny-account-store-view.h>
+#include <tny-platform-factory.h>
 
 #if PLATFORM==1
 #include <tny-gnome-platform-factory.h>
@@ -64,10 +64,10 @@ int
 main (int argc, char **argv)
 {
 	GtkWidget *view = NULL, *window = NULL;
-	TnyPlatformFactoryIface *platfact;
+	TnyPlatformFactory *platfact;
 	GOptionContext *context;
 	static gint plug = 0;
-	TnyAccountStoreIface *account_store;
+	TnyAccountStore *account_store;
 
 	static GOptionEntry entries[] = {
 		{ "plug", 'p', 0, G_OPTION_ARG_INT, &plug,
@@ -116,9 +116,9 @@ main (int argc, char **argv)
 
 	gtk_container_add (GTK_CONTAINER (window), view);
 	
-	account_store = tny_platform_factory_iface_new_account_store (platfact);
-	tny_account_store_view_iface_set_account_store (
-		TNY_ACCOUNT_STORE_VIEW_IFACE (view), account_store);
+	account_store = tny_platform_factory_new_account_store (platfact);
+	tny_account_store_view_set_account_store (
+		TNY_ACCOUNT_STORE_VIEW (view), account_store);
 	g_object_unref (G_OBJECT (account_store));
 	
 	g_signal_connect (window, "destroy",

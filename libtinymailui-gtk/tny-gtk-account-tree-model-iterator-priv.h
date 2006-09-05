@@ -24,8 +24,8 @@
 #include <glib-object.h>
 
 #include <tny-shared.h>
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 
 G_BEGIN_DECLS
 

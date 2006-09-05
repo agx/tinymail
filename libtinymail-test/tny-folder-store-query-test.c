@@ -19,28 +19,28 @@
 #include <string.h>
 #include <tny-folder-store-query-test.h>
 
-#include <tny-account-iface-test.h>
-#include <tny-account-iface.h>
-#include <tny-folder-store-iface.h>
+#include <tny-account-test.h>
+#include <tny-account.h>
+#include <tny-folder-store.h>
 #include <tny-camel-store-account.h>
-#include <tny-account-store-iface.h>
-#include <tny-store-account-iface.h>
-#include <tny-folder-iface.h>
+#include <tny-account-store.h>
+#include <tny-store-account.h>
+#include <tny-folder.h>
 
 #include <account-store.h>
 
-#include <tny-folder-store-iface.h>
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-folder-store.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 #include <tny-simple-list.h>
 #include <tny-camel-header.h>
 
 #include <tny-folder-store-query.h>
 
-static TnyAccountStoreIface *account_store;
-static TnyListIface *accounts;
-static TnyIteratorIface *aiter;
-static TnyStoreAccountIface *account=NULL;
+static TnyAccountStore *account_store;
+static TnyList *accounts;
+static TnyIterator *aiter;
+static TnyStoreAccount *account=NULL;
 static gboolean online_tests=FALSE;
 static gchar *str;
 
@@ -51,12 +51,12 @@ tny_folder_store_query_test_setup (void)
     {
 	accounts = tny_simple_list_new ();
 	account_store = tny_test_account_store_new (TRUE, NULL);
-	tny_account_store_iface_get_accounts (account_store, accounts, 
-			TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
-	aiter = tny_list_iface_create_iterator (accounts);
-	tny_iterator_iface_first (aiter);
+	tny_account_store_get_accounts (account_store, accounts, 
+			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+	aiter = tny_list_create_iterator (accounts);
+	tny_iterator_first (aiter);
 	
-	account = TNY_STORE_ACCOUNT_IFACE (tny_iterator_iface_current (aiter));
+	account = TNY_STORE_ACCOUNT (tny_iterator_current (aiter));
        	g_object_unref (G_OBJECT (aiter));
 
     	if (!account)
@@ -81,9 +81,9 @@ static void
 tny_folder_store_query_test_match_on_name (void)
 {
 	TnyFolderStoreQuery *query = NULL;
-	TnyListIface *folders = NULL, *subfolders;
-	TnyIteratorIface *iter = NULL;
-	TnyFolderIface *folder;
+	TnyList *folders = NULL, *subfolders;
+	TnyIterator *iter = NULL;
+	TnyFolder *folder;
 	gint length=0;
     
 	if (!online_tests)
@@ -95,9 +95,9 @@ tny_folder_store_query_test_match_on_name (void)
 	folders = tny_simple_list_new();
 	subfolders = tny_simple_list_new();
 
-	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_iface_length (folders);
+    	length = tny_list_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -106,15 +106,15 @@ tny_folder_store_query_test_match_on_name (void)
     	if (length >= 1) 
     	{
 		
-		iter = tny_list_iface_create_iterator (folders);
-		folder = (TnyFolderIface *) tny_iterator_iface_current (iter);
-		tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (folder),
+		iter = tny_list_create_iterator (folders);
+		folder = (TnyFolder *) tny_iterator_current (iter);
+		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_iface_length (subfolders);
+		length = tny_list_length (subfolders);
 	    
 		str = g_strdup_printf ("^tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
-		gunit_fail_unless (tny_list_iface_length (subfolders) == 1, str);
+		gunit_fail_unless (tny_list_length (subfolders) == 1, str);
 		g_free (str);	    
 		g_object_unref (G_OBJECT (iter));
 	}
@@ -129,9 +129,9 @@ static void
 tny_folder_store_query_test_match_on_id (void)
 {
 	TnyFolderStoreQuery *query = NULL;
-	TnyListIface *folders = NULL, *subfolders;
-	TnyIteratorIface *iter = NULL;
-	TnyFolderIface *folder;
+	TnyList *folders = NULL, *subfolders;
+	TnyIterator *iter = NULL;
+	TnyFolder *folder;
 	gint length=0;
     
 	if (!online_tests)
@@ -143,9 +143,9 @@ tny_folder_store_query_test_match_on_id (void)
 	folders = tny_simple_list_new();
 	subfolders = tny_simple_list_new();
 
-	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_iface_length (folders);
+    	length = tny_list_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -153,15 +153,15 @@ tny_folder_store_query_test_match_on_id (void)
     
     	if (length >= 1) 
     	{	
-		iter = tny_list_iface_create_iterator (folders);
-		folder = (TnyFolderIface *) tny_iterator_iface_current (iter);
-		tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (folder),
+		iter = tny_list_create_iterator (folders);
+		folder = (TnyFolder *) tny_iterator_current (iter);
+		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_iface_length (subfolders);
+		length = tny_list_length (subfolders);
 	    
 		str = g_strdup_printf ("^INBOX/tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
-		gunit_fail_unless (tny_list_iface_length (subfolders) == 1, str);
+		gunit_fail_unless (tny_list_length (subfolders) == 1, str);
 		g_object_unref (G_OBJECT (iter));
 	}
 
@@ -175,9 +175,9 @@ static void
 tny_folder_store_query_test_match_subscribed (void)
 {
 	TnyFolderStoreQuery *query = NULL;
-	TnyListIface *folders = NULL, *subfolders;
-	TnyIteratorIface *iter = NULL;
-	TnyFolderIface *folder;
+	TnyList *folders = NULL, *subfolders;
+	TnyIterator *iter = NULL;
+	TnyFolder *folder;
 	gint length=0;
     
 	if (!online_tests)
@@ -189,9 +189,9 @@ tny_folder_store_query_test_match_subscribed (void)
 	folders = tny_simple_list_new();
 	subfolders = tny_simple_list_new();
 
-	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_iface_length (folders);
+    	length = tny_list_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -199,15 +199,15 @@ tny_folder_store_query_test_match_subscribed (void)
     
     	if (length >= 1) 
 	{	
-		iter = tny_list_iface_create_iterator (folders);
-		folder = (TnyFolderIface *) tny_iterator_iface_current (iter);
-		tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (folder),
+		iter = tny_list_create_iterator (folders);
+		folder = (TnyFolder *) tny_iterator_current (iter);
+		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_iface_length (subfolders);
+		length = tny_list_length (subfolders);
 	    
 		str = g_strdup_printf ("There's 17 subscribed folders in the test account, I received %d\n", length);
-		gunit_fail_unless (tny_list_iface_length (subfolders) == 17, str);
+		gunit_fail_unless (tny_list_length (subfolders) == 17, str);
 		g_free (str);
 		g_object_unref (G_OBJECT (iter));
 	}
@@ -222,9 +222,9 @@ static void
 tny_folder_store_query_test_match_unsubscribed (void)
 {
 	TnyFolderStoreQuery *query = NULL;
-	TnyListIface *folders = NULL, *subfolders;
-	TnyIteratorIface *iter = NULL;
-	TnyFolderIface *folder;
+	TnyList *folders = NULL, *subfolders;
+	TnyIterator *iter = NULL;
+	TnyFolder *folder;
 	gint length=0;
     
 	if (!online_tests)
@@ -236,9 +236,9 @@ tny_folder_store_query_test_match_unsubscribed (void)
 	folders = tny_simple_list_new();
 	subfolders = tny_simple_list_new();
 
-	tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (account),
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_iface_length (folders);
+    	length = tny_list_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -246,15 +246,15 @@ tny_folder_store_query_test_match_unsubscribed (void)
     
     	if (length >= 1) 
 	{	
-		iter = tny_list_iface_create_iterator (folders);
-		folder = (TnyFolderIface *) tny_iterator_iface_current (iter);
-		tny_folder_store_iface_get_folders (TNY_FOLDER_STORE_IFACE (folder),
+		iter = tny_list_create_iterator (folders);
+		folder = (TnyFolder *) tny_iterator_current (iter);
+		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_iface_length (subfolders);
+		length = tny_list_length (subfolders);
 	    
 		str = g_strdup_printf ("There's 1 subscribed folder in the test account, I received %d\n", length);
-		gunit_fail_unless (tny_list_iface_length (subfolders) == 1, str);
+		gunit_fail_unless (tny_list_length (subfolders) == 1, str);
 		g_free (str);
 	    
 		g_object_unref (G_OBJECT (iter));

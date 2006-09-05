@@ -36,8 +36,8 @@
 
 #include <tny-session-camel.h>
 
-#include <tny-device-iface.h>
-#include <tny-account-store-iface.h>
+#include <tny-device.h>
+#include <tny-account-store.h>
 #include <tny-camel-store-account.h>
 #include <tny-camel-transport-account.h>
 
@@ -57,7 +57,7 @@ typedef struct
 {
 	CamelService *service;
 	TnyGetPassFunc func;
-	TnyAccountIface *account;
+	TnyAccount *account;
 
 } PrivPassFunc;
 
@@ -65,7 +65,7 @@ typedef struct
 {
 	CamelService *service;
 	TnyForgetPassFunc func;
-	TnyAccountIface *account;
+	TnyAccount *account;
 
 } PrivForgetPassFunc;
 
@@ -75,7 +75,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 /**
  * tny_session_camel_set_forget_pass_func:
  * @self: a #TnySessionCamel object
- * @account: the #TnyAccountIface account instance
+ * @account: the #TnyAccount account instance
  * @get_forget_pass_func: The function that will forget the password for the account
  *
  * For each account you can set a password handler. This makes it possible to
@@ -87,7 +87,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
  *
  **/
 void
-tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *account, TnyForgetPassFunc get_forget_pass_func)
+tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc get_forget_pass_func)
 {
 	GList *copy = forget_password_funcs, *mark_del = NULL;
 	PrivForgetPassFunc *pf;
@@ -141,7 +141,7 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
 /**
  * tny_session_camel_set_pass_func:
  * @self: a #TnySessionCamel object
- * @account: the #TnyAccountIface account instance
+ * @account: the #TnyAccount account instance
  * @get_pass_func: The function that will return the password for the account
  *
  * For each account you can set a password handler. This makes it possible to
@@ -150,7 +150,7 @@ tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccountIface *
  *
  **/
 void
-tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccountIface *account, TnyGetPassFunc get_pass_func)
+tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func)
 {
 	GList *copy = password_funcs, *mark_del = NULL;
 	PrivPassFunc *pf;
@@ -207,7 +207,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 {
 	GList *copy = password_funcs;
 	TnyGetPassFunc func;
-	TnyAccountIface *account;
+	TnyAccount *account;
 	gboolean found = FALSE, freeprmpt = FALSE, cancel = FALSE;
 	gchar *retval = NULL, *prmpt = (gchar*)prompt;
 
@@ -232,10 +232,10 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		{
 			freeprmpt = TRUE;
 			prmpt = g_strdup_printf (_("Enter password for %s"), 
-				tny_account_iface_get_name (account));
+				tny_account_get_name (account));
 		}
 		
-		if (!g_ascii_strncasecmp (tny_account_iface_get_proto (account), "pop", 3))
+		if (!g_ascii_strncasecmp (tny_account_get_proto (account), "pop", 3))
 		{
 			if (flags & CAMEL_SESSION_PASSWORD_REPROMPT)
 				tny_session_camel_forget_password (session, service, domain, item, ex);
@@ -259,7 +259,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 {
 	GList *copy = forget_password_funcs;
 	TnyForgetPassFunc func;
-	TnyAccountIface *account;
+	TnyAccount *account;
 	gboolean found = FALSE;
 
 	while (G_LIKELY (copy))
@@ -289,7 +289,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 
 	if (self->account_store)
 	{
-		TnyAccountStoreIface *account_store = (TnyAccountStoreIface*)self->account_store;
+		TnyAccountStore *account_store = (TnyAccountStore*)self->account_store;
 		TnyAlertType tnytype;
 
 		switch (type)
@@ -306,7 +306,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
-		return tny_account_store_iface_alert (account_store, tnytype, prompt);
+		return tny_account_store_alert (account_store, tnytype, prompt);
 	}
 	
 	return FALSE;
@@ -442,36 +442,36 @@ tny_session_camel_init (TnySessionCamel *instance)
 }
 
 void 
-tny_session_camel_set_current_accounts (TnySessionCamel *self, TnyListIface *list)
+tny_session_camel_set_current_accounts (TnySessionCamel *self, TnyList *list)
 {
 	self->current_accounts = list;
 }
 
 static void
-connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
+connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 {
 	TnySessionCamel *self = user_data;
 	
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	if (self->current_accounts && TNY_IS_LIST_IFACE (self->current_accounts) &&
+	if (self->current_accounts && TNY_IS_LIST (self->current_accounts) &&
 		!self->first_switch && self->prev_constat != online 
 		&& self->account_store)
 	{
-		TnyListIface *accounts = self->current_accounts;
-		TnyIteratorIface *iterator;
+		TnyList *accounts = self->current_accounts;
+		TnyIterator *iterator;
 
-		iterator = tny_list_iface_create_iterator (accounts);
+		iterator = tny_list_create_iterator (accounts);
 	
-		while (!tny_iterator_iface_is_done (iterator))
+		while (!tny_iterator_is_done (iterator))
 		{
-			TnyStoreAccountIface *account = (TnyStoreAccountIface*)tny_iterator_iface_current (iterator);
+			TnyStoreAccount *account = (TnyStoreAccount*)tny_iterator_current (iterator);
 			
 			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !online);
 	
 			g_object_unref (G_OBJECT(account));
 			
-			tny_iterator_iface_next (iterator);
+			tny_iterator_next (iterator);
 		}
 
 		g_object_unref (G_OBJECT (iterator));
@@ -479,7 +479,7 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 
 	if (self->account_store && !self->first_switch)
 		g_signal_emit (self->account_store, 
-			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
+			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
 
 
 	self->first_switch = FALSE;
@@ -491,12 +491,12 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 /**
  * tny_session_camel_set_device:
  * @self: a #TnySessionCamel object
- * @device: a #TnyDeviceIface instance
+ * @device: a #TnyDevice instance
  *
  *
  **/
 void 
-tny_session_camel_set_device (TnySessionCamel *self, TnyDeviceIface *device)
+tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 {
 
 	if (self->device && g_signal_handler_is_connected (G_OBJECT (self->device), self->connchanged_signal))
@@ -516,19 +516,19 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDeviceIface *device)
 /**
  * tny_session_camel_set_account_store:
  * @self: a #TnySessionCamel object
- * @account_store: A #TnyAccountStoreIface account store instance
+ * @account_store: A #TnyAccountStore account store instance
  *
  *
  **/
 void 
-tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface *account_store)
+tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store)
 {
 	CamelSession *session = (CamelSession*) self;
-	TnyDeviceIface *device = (TnyDeviceIface*)tny_account_store_iface_get_device (account_store);
+	TnyDevice *device = (TnyDevice*)tny_account_store_get_device (account_store);
 
 	self->account_store = (gpointer)account_store;
 
-	gchar *base_directory = g_strdup (tny_account_store_iface_get_cache_dir (account_store));
+	gchar *base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
 	gchar *camel_dir = NULL;
     
 	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
@@ -542,7 +542,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 	camel_session_construct (session, camel_dir);
 
 	/* Avoid the first question in connection_changed */
-	self->first_switch = tny_device_iface_is_online (device);
+	self->first_switch = tny_device_is_online (device);
 
 	camel_session_set_online ((CamelSession *) session, 
 		self->first_switch); 
@@ -560,12 +560,12 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStoreIface
 
 /**
  * tny_session_camel_new:
- * @account_store: A TnyAccountStoreIface instance
+ * @account_store: A TnyAccountStore instance
  *
  * Return value: The #TnySessionCamel singleton instance
  **/
 TnySessionCamel*
-tny_session_camel_new (TnyAccountStoreIface *account_store)
+tny_session_camel_new (TnyAccountStore *account_store)
 {
 	TnySessionCamel *retval = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));

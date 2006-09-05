@@ -23,10 +23,10 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-folder-iface.h>
+#include <tny-folder.h>
 #include <tny-camel-folder.h>
 #include <tny-camel-account.h>
-#include <tny-store-account-iface.h>
+#include <tny-store-account.h>
 
 G_BEGIN_DECLS
 
@@ -51,7 +51,7 @@ struct _TnyCamelPOPFolderClass
 };
 
 GType tny_camel_pop_folder_get_type (void);
-TnyFolderIface* tny_camel_pop_folder_new (void);
+TnyFolder* tny_camel_pop_folder_new (void);
 
 G_END_DECLS
 

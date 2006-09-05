@@ -45,7 +45,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 #include <tny-fs-stream.h>
 
 static GObjectClass *parent_class = NULL;
@@ -64,15 +64,15 @@ struct _TnyFsStreamPriv
 
 
 static gssize
-tny_fs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
+tny_fs_stream_write_to_stream (TnyStream *self, TnyStream *output)
 {
 	char tmp_buf[4096];
 	gssize total = 0;
 	gssize nb_read;
 	gssize nb_written;
 	
-	while (G_UNLIKELY (!tny_stream_iface_eos (self))) {
-		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
+	while (G_UNLIKELY (!tny_stream_eos (self))) {
+		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
 		if (G_UNLIKELY (nb_read < 0))
 			return -1;
 		else if (G_LIKELY (nb_read > 0)) {
@@ -80,7 +80,7 @@ tny_fs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	
 			while (G_LIKELY (nb_written < nb_read))
 			{
-				gssize len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				gssize len = tny_stream_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -93,7 +93,7 @@ tny_fs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 }
 
 static gssize
-tny_fs_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
+tny_fs_stream_read  (TnyStream *self, char *buffer, gsize n)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	gssize nread;
@@ -108,7 +108,7 @@ tny_fs_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
 }
 
 static gssize
-tny_fs_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
+tny_fs_stream_write (TnyStream *self, const char *buffer, gsize n)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	gssize nwritten;
@@ -120,7 +120,7 @@ tny_fs_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
 }
 
 static gint
-tny_fs_stream_close (TnyStreamIface *self)
+tny_fs_stream_close (TnyStream *self)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 
@@ -166,9 +166,9 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
  * tny_fs_stream_new:
  * @fd: The file descriptor to write to or read from
  *
- * Create an adaptor instance between #TnyStreamIface and a file descriptor
+ * Create an adaptor instance between #TnyStream and a file descriptor
  *
- * Return value: a new #TnyStreamIface instance
+ * Return value: a new #TnyStream instance
  **/
 TnyFsStream*
 tny_fs_stream_new (int fd)
@@ -209,29 +209,29 @@ tny_fs_stream_finalize (GObject *object)
 }
 
 static gint 
-tny_fs_flush (TnyStreamIface *self)
+tny_fs_flush (TnyStream *self)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	return fsync(priv->fd);
 }
 
 static gboolean 
-tny_fs_eos (TnyStreamIface *self)
+tny_fs_eos (TnyStream *self)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	return priv->eos;
 }
 
 static gint 
-tny_fs_reset (TnyStreamIface *self)
+tny_fs_reset (TnyStream *self)
 {
 	return 0;
 }
 
 static void
-tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
+tny_stream_init (gpointer g, gpointer iface_data)
 {
-	TnyStreamIfaceClass *klass = (TnyStreamIfaceClass *)g_iface;
+	TnyStreamIface *klass = (TnyStreamIface *)g;
 
 	klass->reset_func = tny_fs_reset;
 	klass->flush_func = tny_fs_flush;
@@ -281,9 +281,9 @@ tny_fs_stream_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_stream_iface_info = 
+		static const GInterfaceInfo tny_stream_info = 
 		{
-		  (GInterfaceInitFunc) tny_stream_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_stream_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -292,8 +292,8 @@ tny_fs_stream_get_type (void)
 			"TnyFsStream",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 
-			&tny_stream_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
+			&tny_stream_info);
 	}
 
 	return type;

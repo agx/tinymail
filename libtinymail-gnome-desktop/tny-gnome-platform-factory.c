@@ -20,16 +20,16 @@
 
 #include <tny-gnome-platform-factory.h>
 
-#include <tny-save-strategy-iface.h>
+#include <tny-save-strategy.h>
 #include <tny-gtk-save-strategy.h>
 
-#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 #include <tny-gnome-account-store.h>
 
-#include <tny-device-iface.h>
+#include <tny-device.h>
 #include <tny-gnome-device.h>
 
-#include <tny-msg-view-iface.h>
+#include <tny-msg-view.h>
 
 #ifdef MOZEMBED
 #include <tny-moz-embed-msg-view.h>
@@ -46,23 +46,23 @@ tny_gnome_platform_factory_instance_init (GTypeInstance *instance, gpointer g_cl
 }
 
 
-static TnyAccountStoreIface*
-tny_gnome_platform_factory_new_account_store (TnyPlatformFactoryIface *self)
+static TnyAccountStore*
+tny_gnome_platform_factory_new_account_store (TnyPlatformFactory *self)
 {
-	return TNY_ACCOUNT_STORE_IFACE (tny_gnome_account_store_new ());
+	return TNY_ACCOUNT_STORE (tny_gnome_account_store_new ());
 }
 
-static TnyDeviceIface*
-tny_gnome_platform_factory_new_device (TnyPlatformFactoryIface *self)
+static TnyDevice*
+tny_gnome_platform_factory_new_device (TnyPlatformFactory *self)
 {
-	return TNY_DEVICE_IFACE (tny_gnome_device_new ());
+	return TNY_DEVICE (tny_gnome_device_new ());
 }
 
-static TnyMsgViewIface*
-tny_gnome_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
+static TnyMsgView*
+tny_gnome_platform_factory_new_msg_view (TnyPlatformFactory *self)
 {
-	TnySaveStrategyIface *save_strategy = tny_gtk_save_strategy_new ();
-	TnyMsgViewIface *retval;
+	TnySaveStrategy *save_strategy = tny_gtk_save_strategy_new ();
+	TnyMsgView *retval;
     
 #ifdef MOZEMBED
 	retval = tny_moz_embed_msg_view_new (save_strategy);
@@ -79,14 +79,14 @@ tny_gnome_platform_factory_new_msg_view (TnyPlatformFactoryIface *self)
  * tny_gnome_platform_factory_get_instance:
  *
  *
- * Return value: The #TnyPlatformFactoryIface singleton instance implemented for GNOME desktops
+ * Return value: The #TnyPlatformFactory singleton instance implemented for GNOME desktops
  **/
-TnyPlatformFactoryIface*
+TnyPlatformFactory*
 tny_gnome_platform_factory_get_instance (void)
 {
 	TnyGnomePlatformFactory *self = g_object_new (TNY_TYPE_GNOME_PLATFORM_FACTORY, NULL);
 
-	return TNY_PLATFORM_FACTORY_IFACE (self);
+	return TNY_PLATFORM_FACTORY (self);
 }
 
 
@@ -100,9 +100,9 @@ tny_gnome_platform_factory_finalize (GObject *object)
 
 
 static void
-tny_platform_factory_iface_init (gpointer g_iface, gpointer iface_data)
+tny_platform_factory_init (gpointer g, gpointer iface_data)
 {
-	TnyPlatformFactoryIfaceClass *klass = (TnyPlatformFactoryIfaceClass *)g_iface;
+	TnyPlatformFactoryIface *klass = (TnyPlatformFactoryIface *)g;
 
 	klass->new_account_store_func = tny_gnome_platform_factory_new_account_store;
 	klass->new_device_func = tny_gnome_platform_factory_new_device;
@@ -176,9 +176,9 @@ tny_gnome_platform_factory_get_type (void)
 		  tny_gnome_platform_factory_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_platform_factory_iface_info = 
+		static const GInterfaceInfo tny_platform_factory_info = 
 		{
-		  (GInterfaceInitFunc) tny_platform_factory_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_platform_factory_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -187,8 +187,8 @@ tny_gnome_platform_factory_get_type (void)
 			"TnyGnomePlatformFactory",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_PLATFORM_FACTORY_IFACE, 
-			&tny_platform_factory_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_PLATFORM_FACTORY, 
+			&tny_platform_factory_info);
 
 	}
 

@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 #include <tny-shared.h>
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 
 G_BEGIN_DECLS
 
@@ -43,7 +43,7 @@ struct _TnySimpleListClass
 };
 
 GType tny_simple_list_get_type (void);
-TnyListIface* tny_simple_list_new (void);
+TnyList* tny_simple_list_new (void);
 
 G_END_DECLS
 

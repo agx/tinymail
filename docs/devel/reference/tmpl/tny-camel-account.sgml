@@ -11,7 +11,7 @@ A account type implemented for Camel
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccountIface
+#TnyAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -23,12 +23,12 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
-#include <tny-msg-view-iface.h>
-#include <tny-header-iface.h>
-#include <tny-msg-iface.h>
-#include <tny-stream-iface.h>
-#include <tny-mime-part-iface.h>
-#include <tny-save-strategy-iface.h>
+#include <tny-msg-view.h>
+#include <tny-header.h>
+#include <tny-msg.h>
+#include <tny-stream.h>
+#include <tny-mime-part.h>
+#include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
 
@@ -54,7 +54,7 @@ struct _TnyGtkMsgViewClass
 };
 
 GType tny_gtk_msg_view_get_type (void);
-TnyMsgViewIface* tny_gtk_msg_view_new (TnySaveStrategyIface *save_strategy);
+TnyMsgView* tny_gtk_msg_view_new (TnySaveStrategy *save_strategy);
 
 G_END_DECLS
 

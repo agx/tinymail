@@ -1,0 +1,75 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsg
+
+<!-- ##### SECTION Short_Description ##### -->
+A type that defines a message
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type that defines a message. It inherits from #TnyMsgMimePart and can
+therefore be used as a mime part.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyMsgHeader, #TnyFolder, #TnyMsgMimePart
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION tny_msg_get_parts ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
+
+
+<!-- ##### FUNCTION tny_msg_get_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_add_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_del_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+
+
+<!-- ##### FUNCTION tny_msg_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_set_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+

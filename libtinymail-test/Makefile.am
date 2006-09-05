@@ -16,31 +16,31 @@ libtinymail_test_suite_la_SOURCES = 		\
 	tny-folder-store-query-test.h		\
 	tny-test-object.h			\
 	tny-test-object.c			\
-	tny-header-iface-test.h			\
-	tny-header-iface-test.c			\
-	tny-stream-iface-test.h			\
-	tny-stream-iface-test.c			\
-	tny-list-iface-test.h			\
-	tny-list-iface-test.c			\
+	tny-header-test.h			\
+	tny-header-test.c			\
+	tny-stream-test.h			\
+	tny-stream-test.c			\
+	tny-list-test.h			\
+	tny-list-test.c			\
 	tny-test-stream.c			\
 	tny-test-stream.h			\
 	tny-test-suite.c			\
-	tny-mime-part-iface-test.c		\
-	tny-mime-part-iface-test.h		\
-	tny-platform-factory-iface-test.c	\
-	tny-platform-factory-iface-test.h	\
-	tny-account-store-iface-test.c		\
-	tny-account-store-iface-test.h		\
-	tny-account-iface-test.c		\
-	tny-account-iface-test.h		\
-	tny-device-iface-test.c			\
-	tny-device-iface-test.h			\
-	tny-iterator-iface-test.c		\
-	tny-iterator-iface-test.h		\
-	tny-folder-iface-test.c			\
-	tny-folder-iface-test.h			\
-	tny-msg-iface-test.c			\
-	tny-msg-iface-test.h			\
+	tny-mime-part-test.c		\
+	tny-mime-part-test.h		\
+	tny-platform-factory-test.c	\
+	tny-platform-factory-test.h	\
+	tny-account-store-test.c		\
+	tny-account-store-test.h		\
+	tny-account-test.c		\
+	tny-account-test.h		\
+	tny-device-test.c			\
+	tny-device-test.h			\
+	tny-iterator-test.c		\
+	tny-iterator-test.h		\
+	tny-folder-test.c			\
+	tny-folder-test.h			\
+	tny-msg-test.c			\
+	tny-msg-test.h			\
 	tny-test-suite.h
 
 libtinymail_test_suite_la_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS) \

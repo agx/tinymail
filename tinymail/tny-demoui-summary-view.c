@@ -25,7 +25,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
-#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
 
 #if PLATFORM==1
 #include <tny-gnome-platform-factory.h>
@@ -51,20 +51,20 @@
 #include <tny-olpc-account-store.h>
 #endif
 
-#include <tny-account-store-iface.h>
-#include <tny-account-iface.h>
-#include <tny-store-account-iface.h>
-#include <tny-transport-account-iface.h>
-#include <tny-msg-view-iface.h>
-#include <tny-msg-window-iface.h>
+#include <tny-account-store.h>
+#include <tny-account.h>
+#include <tny-store-account.h>
+#include <tny-transport-account.h>
+#include <tny-msg-view.h>
+#include <tny-msg-window.h>
 #include <tny-gtk-msg-window.h>
-#include <tny-folder-iface.h>
+#include <tny-folder.h>
 #include <tny-gtk-account-tree-model.h>
-#include <tny-header-iface.h>
+#include <tny-header.h>
 #include <tny-gtk-header-list-model.h>
 #include <tny-demoui-summary-view.h>
-#include <tny-summary-view-iface.h>
-#include <tny-account-store-view-iface.h>
+#include <tny-summary-view.h>
+#include <tny-account-store-view.h>
 
 #define GO_ONLINE_TXT _("Go online")
 #define GO_OFFLINE_TXT _("Go offline")
@@ -76,9 +76,9 @@ typedef struct _TnyDemouiSummaryViewPriv TnyDemouiSummaryViewPriv;
 
 struct _TnyDemouiSummaryViewPriv
 {
-	TnyAccountStoreIface *account_store;
+	TnyAccountStore *account_store;
 	GtkTreeView *mailbox_view, *header_view;
-	TnyMsgViewIface *msg_view;
+	TnyMsgView *msg_view;
 	guint accounts_reloaded_signal;
 	GtkWidget *status, *progress, *online_button;
 	guint status_id;
@@ -87,7 +87,7 @@ struct _TnyDemouiSummaryViewPriv
 	GtkTreeIter last_mailbox_correct_select;
  	gboolean last_mailbox_correct_select_set;
 	guint connchanged_signal, online_button_signal;
-	TnyListIface *current_accounts;
+	TnyList *current_accounts;
 };
 
 #define TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE(o)	\
@@ -118,21 +118,21 @@ static GtkTreeModel *empty_model;
 static void 
 reload_accounts (TnyDemouiSummaryViewPriv *priv)
 {
-	TnyAccountStoreIface *account_store = priv->account_store;
+	TnyAccountStore *account_store = priv->account_store;
 	GtkTreeModel *sortable;
 
-	/* TnyAccountTreeModel is also a TnyListIface (it simply both the
-	   TnyListIface and the GtkTreeModelIface interfaces interfaces) */
+	/* TnyAccountTreeModel is also a TnyList (it simply both the
+	   TnyList and the GtkTreeModel interfaces interfaces) */
 
 	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new ();
-	TnyListIface *accounts = TNY_LIST_IFACE (mailbox_model);
+	TnyList *accounts = TNY_LIST (mailbox_model);
 
 	/* Clear the header_view by giving it an empty model */
 	if (G_UNLIKELY (!empty_model))
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new (1, G_TYPE_STRING));
 	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
 	
-    	tny_msg_view_iface_clear (priv->msg_view);
+    	tny_msg_view_clear (priv->msg_view);
     
 	if (priv->current_accounts)
 	{
@@ -140,12 +140,12 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 		priv->current_accounts = NULL;
 	}
 
-	/* This method uses the TnyAccountTreeModel as a TnyListIface */
-	tny_account_store_iface_get_accounts (account_store, accounts,
-		TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+	/* This method uses the TnyAccountTreeModel as a TnyList */
+	tny_account_store_get_accounts (account_store, accounts,
+		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
 
-	/* Here we use the TnyAccountTreeModel as a GtkTreeModelIface */
+	/* Here we use the TnyAccountTreeModel as a GtkTreeModel */
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
@@ -160,7 +160,7 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 }
 
 static void
-accounts_reloaded (TnyAccountStoreIface *store, gpointer user_data)
+accounts_reloaded (TnyAccountStore *store, gpointer user_data)
 {
 	TnyDemouiSummaryViewPriv *priv = user_data;
 	
@@ -172,24 +172,24 @@ accounts_reloaded (TnyAccountStoreIface *store, gpointer user_data)
 static void 
 online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 {
-	TnySummaryViewIface *self = user_data;
+	TnySummaryView *self = user_data;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
 	if (priv->account_store)
 	{
-		TnyDeviceIface *device = tny_account_store_iface_get_device (priv->account_store);
+		TnyDevice *device = tny_account_store_get_device (priv->account_store);
 
 		if (gtk_toggle_button_get_active (togglebutton))
-			tny_device_iface_force_online (device);
+			tny_device_force_online (device);
 		else
-			tny_device_iface_force_offline (device);
+			tny_device_force_offline (device);
 	}
 }
 
 static void
-connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
+connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 {
-	TnySummaryViewIface *self = user_data;
+	TnySummaryView *self = user_data;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
 	if (online)
@@ -210,15 +210,15 @@ connection_changed (TnyDeviceIface *device, gboolean online, gpointer user_data)
 }
 
 static void
-tny_demoui_summary_view_set_account_store (TnyAccountStoreViewIface *self, TnyAccountStoreIface *account_store)
+tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccountStore *account_store)
 {
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
-	TnyDeviceIface *device = tny_account_store_iface_get_device (account_store);
+	TnyDevice *device = tny_account_store_get_device (account_store);
 
 	if (G_UNLIKELY (priv->account_store))
 	{ /* You typically set it once, so unlikely */
 
-		TnyDeviceIface *odevice = tny_account_store_iface_get_device (priv->account_store);
+		TnyDevice *odevice = tny_account_store_get_device (priv->account_store);
 
 		if (g_signal_handler_is_connected (G_OBJECT (odevice), priv->connchanged_signal))
 		{
@@ -263,7 +263,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 		if (gtk_tree_selection_get_selected (selection, &model, &iter))
 		{
-			TnyHeaderIface *header;
+			TnyHeader *header;
 
 			gtk_tree_model_get (model, &iter, 
 				TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
@@ -275,11 +275,11 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 					GTK_DIALOG_MODAL,
 					GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, 
 					_("This will remove the message with subject \"%s\""),
-					tny_header_iface_get_subject (header));
+					tny_header_get_subject (header));
 
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 				{
-					TnyFolderIface *folder;
+					TnyFolder *folder;
 
 					if (GTK_IS_TREE_MODEL_SORT (model))
 					{
@@ -287,10 +287,10 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 							(GTK_TREE_MODEL_SORT (model));
 					} else mymodel = model;
 
-					folder = tny_header_iface_get_folder (header);
-					tny_folder_iface_remove_message (folder, header);
+					folder = tny_header_get_folder (header);
+					tny_folder_remove_message (folder, header);
 
-					tny_list_iface_remove (TNY_LIST_IFACE (mymodel), G_OBJECT (header));
+					tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
 
 					/* This demo-ui does not support hiding marked-as-deleted 
 					   messages. A normal deletion will only *mark* a message
@@ -299,7 +299,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 					   You shouldn't *use* this demo-ui, so I'm doing destructive
 					   irreversible deletes: I immediately expunge the folder! */
 
-					tny_folder_iface_expunge (folder);
+					tny_folder_expunge (folder);
 				    	g_object_unref (G_OBJECT (folder));
 				}
 
@@ -324,7 +324,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 
 	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
-		TnyHeaderIface *header;
+		TnyHeader *header;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
@@ -332,19 +332,19 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 	    
 		if (G_LIKELY (header))
 		{
-			TnyFolderIface *folder;
-			TnyMsgIface *msg;
+			TnyFolder *folder;
+			TnyMsg *msg;
 
-			folder = tny_header_iface_get_folder (header);
+			folder = tny_header_get_folder (header);
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_iface_get_message (folder, header);
+				msg = tny_folder_get_message (folder, header);
 				if (G_LIKELY (msg))
 				{
-					tny_msg_view_iface_set_msg (priv->msg_view, msg);
+					tny_msg_view_set_msg (priv->msg_view, msg);
 					g_object_unref (G_OBJECT (msg));
 				} else { 
-					tny_msg_view_iface_set_unavailable (priv->msg_view);
+					tny_msg_view_set_unavailable (priv->msg_view);
 				}
 			    	g_object_unref (G_OBJECT (folder));
 			}
@@ -352,7 +352,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 		    	g_object_unref (G_OBJECT (header));
 		    
 		} else {
-			tny_msg_view_iface_set_unavailable (priv->msg_view);
+			tny_msg_view_set_unavailable (priv->msg_view);
 		}
 	}
 
@@ -371,7 +371,7 @@ cleanup_statusbar (gpointer data)
 }
 
 static void
-refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer user_data)
+refresh_current_folder (TnyFolder *folder, gboolean cancelled, gpointer user_data)
 {
 	TnyDemouiSummaryViewPriv *priv = user_data;
 
@@ -425,7 +425,7 @@ refresh_current_folder (TnyFolderIface *folder, gboolean cancelled, gpointer use
 
 
 static void
-refresh_current_folder_status_update (TnyFolderIface *folder, const gchar *what, gint status, gpointer user_data)
+refresh_current_folder_status_update (TnyFolder *folder, const gchar *what, gint status, gpointer user_data)
 {
 	TnyDemouiSummaryViewPriv *priv = user_data;
 
@@ -446,7 +446,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
 	{
-		TnyFolderIface *folder;
+		TnyFolder *folder;
 		gint type;
 
 		gtk_tree_model_get (model, &iter, 
@@ -475,7 +475,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		
 #ifdef ASYNC_HEADERS
 
-		tny_folder_iface_refresh_async (folder, 
+		tny_folder_refresh_async (folder, 
 			refresh_current_folder, 
 			refresh_current_folder_status_update, user_data);
 #else
@@ -500,8 +500,8 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
     
 	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
 	{
-		TnyHeaderIface *header;
-		TnyMsgWindowIface *msgwin;
+		TnyHeader *header;
+		TnyMsgWindow *msgwin;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
@@ -509,9 +509,9 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		
 		if (G_LIKELY (header))
 		{
-			TnyFolderIface *folder;
-			TnyMsgIface *msg;
-			TnyPlatformFactoryIface *platfact;
+			TnyFolder *folder;
+			TnyMsg *msg;
+			TnyPlatformFactory *platfact;
 
 
 #if PLATFORM==1
@@ -531,25 +531,25 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 #endif
 
 		    
-			folder = tny_header_iface_get_folder (TNY_HEADER_IFACE (header));
+			folder = tny_header_get_folder (TNY_HEADER (header));
 
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_iface_get_message (folder, header);
+				msg = tny_folder_get_message (folder, header);
 				if (G_LIKELY (msg))
 				{
 					msgwin = tny_gtk_msg_window_new (
-						tny_platform_factory_iface_new_msg_view (platfact));
+						tny_platform_factory_new_msg_view (platfact));
 
-					tny_msg_view_iface_set_msg (TNY_MSG_VIEW_IFACE (msgwin), msg);
+					tny_msg_view_set_msg (TNY_MSG_VIEW (msgwin), msg);
 					g_object_unref (G_OBJECT (msg));
 				    
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				} else {
 					msgwin = tny_gtk_msg_window_new (
-						tny_platform_factory_iface_new_msg_view (platfact));
+						tny_platform_factory_new_msg_view (platfact));
 
-					tny_msg_view_iface_set_unavailable (TNY_MSG_VIEW_IFACE (msgwin));
+					tny_msg_view_set_unavailable (TNY_MSG_VIEW (msgwin));
 			
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				}
@@ -564,14 +564,14 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
  * tny_demoui_summary_view_new:
  * 
  *
- * Return value: A new #TnySummaryViewIface instance implemented for Gtk+
+ * Return value: A new #TnySummaryView instance implemented for Gtk+
  **/
-TnySummaryViewIface*
+TnySummaryView*
 tny_demoui_summary_view_new (void)
 {
 	TnyDemouiSummaryView *self = g_object_new (TNY_TYPE_DEMOUI_SUMMARY_VIEW, NULL);
 
-	return TNY_SUMMARY_VIEW_IFACE (self);
+	return TNY_SUMMARY_VIEW (self);
 }
 
 static void
@@ -579,7 +579,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 {
 	TnyDemouiSummaryView *self = (TnyDemouiSummaryView *)instance;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
-	TnyPlatformFactoryIface *platfact;
+	TnyPlatformFactory *platfact;
 	GtkVBox *vbox = GTK_VBOX (self);
 	GtkWidget *mailbox_sw;
 	GtkWidget *header_sw;
@@ -635,7 +635,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	vpaned1 = gtk_vpaned_new ();
 	gtk_widget_show (vpaned1);
 	
-	priv->msg_view = tny_platform_factory_iface_new_msg_view (platfact);
+	priv->msg_view = tny_platform_factory_new_msg_view (platfact);
 
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
@@ -778,15 +778,15 @@ tny_demoui_summary_view_finalize (GObject *object)
 }
 
 static void
-tny_summary_view_iface_init (gpointer g_iface, gpointer iface_data)
+tny_summary_view_init (gpointer g, gpointer iface_data)
 {
 	return;
 }
 
 static void
-tny_account_store_view_iface_init (gpointer g_iface, gpointer iface_data)
+tny_account_store_view_init (gpointer g, gpointer iface_data)
 {
-	TnyAccountStoreViewIfaceClass *klass = (TnyAccountStoreViewIfaceClass *)g_iface;
+	TnyAccountStoreViewIface *klass = (TnyAccountStoreViewIface *)g;
 
 	klass->set_account_store_func = tny_demoui_summary_view_set_account_store;
 
@@ -828,16 +828,16 @@ tny_demoui_summary_view_get_type (void)
 		  tny_demoui_summary_view_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_summary_view_iface_info = 
+		static const GInterfaceInfo tny_summary_view_info = 
 		{
-		  (GInterfaceInitFunc) tny_summary_view_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_summary_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
-		static const GInterfaceInfo tny_account_store_view_iface_info = 
+		static const GInterfaceInfo tny_account_store_view_info = 
 		{
-		  (GInterfaceInitFunc) tny_account_store_view_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_account_store_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -846,11 +846,11 @@ tny_demoui_summary_view_get_type (void)
 			"TnyDemouiSummaryView",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_SUMMARY_VIEW_IFACE, 
-			&tny_summary_view_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_SUMMARY_VIEW, 
+			&tny_summary_view_info);
 
-		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_VIEW_IFACE, 
-			&tny_account_store_view_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_VIEW, 
+			&tny_account_store_view_info);
 
 	}
 

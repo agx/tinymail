@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
 
 G_BEGIN_DECLS
 
@@ -48,7 +48,7 @@ struct _TnyGpePlatformFactoryClass
 };
 
 GType tny_gpe_platform_factory_get_type (void);
-TnyPlatformFactoryIface* tny_gpe_platform_factory_get_instance (void);
+TnyPlatformFactory* tny_gpe_platform_factory_get_instance (void);
 
 G_END_DECLS
 

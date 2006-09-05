@@ -19,13 +19,13 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <tny-shared.h>
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 #include <tny-simple-list.h>
-#include <tny-account-store-iface.h>
-#include <tny-store-account-iface.h>
-#include <tny-folder-iface.h>
-#include <tny-folder-store-iface.h>
+#include <tny-account-store.h>
+#include <tny-store-account.h>
+#include <tny-folder.h>
+#include <tny-folder-store.h>
 #include <tny-folder-store-query.h>
 
 #include <account-store.h>
@@ -48,23 +48,23 @@ static const GOptionEntry options[] =
 
 
 static void 
-callback (TnyFolderStoreIface *self, TnyListIface *list, gpointer user_data)
+callback (TnyFolderStore *self, TnyList *list, gpointer user_data)
 {
-	TnyIteratorIface *iter = tny_list_iface_create_iterator (list);
+	TnyIterator *iter = tny_list_create_iterator (list);
     
-	while (!tny_iterator_iface_is_done (iter))
+	while (!tny_iterator_is_done (iter))
 	{
-		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
-		TnyListIface *folders = tny_simple_list_new ();
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
+		TnyList *folders = tny_simple_list_new ();
 
-		g_print ("%s\n", tny_folder_iface_get_name (TNY_FOLDER_IFACE (folder)));
+		g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
 	    
-		tny_folder_store_iface_get_folders_async (folder,
+		tny_folder_store_get_folders_async (folder,
 			folders, callback, NULL, NULL);
 	    
 		g_object_unref (G_OBJECT (folder));
 	    
-		tny_iterator_iface_next (iter);	    
+		tny_iterator_next (iter);	    
 	}
 
 	g_object_unref (G_OBJECT (iter));
@@ -81,11 +81,11 @@ time_s_up (gpointer data)
 static gboolean
 dance (gpointer data)
 {
-	TnyListIface *folders;
-	TnyStoreAccountIface *account = data;
+	TnyList *folders;
+	TnyStoreAccount *account = data;
     
 	folders = tny_simple_list_new ();
-    	tny_folder_store_iface_get_folders_async (TNY_FOLDER_STORE_IFACE (account),
+    	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
 		folders, callback, NULL, NULL);
     
 	return FALSE;
@@ -95,10 +95,10 @@ int
 main (int argc, char **argv)
 {
 	GOptionContext *context;
-	TnyAccountStoreIface *account_store;
-	TnyListIface *accounts;
-	TnyStoreAccountIface *account;
-	TnyIteratorIface *iter;
+	TnyAccountStore *account_store;
+	TnyList *accounts;
+	TnyStoreAccount *account;
+	TnyIterator *iter;
     
 	free (malloc (10));
 	g_type_init ();
@@ -121,11 +121,11 @@ main (int argc, char **argv)
     
 	accounts = tny_simple_list_new ();
 
-	tny_account_store_iface_get_accounts (account_store, accounts, 
-	      TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+	tny_account_store_get_accounts (account_store, accounts, 
+	      TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
     
-	iter = tny_list_iface_create_iterator (accounts);
-	account = (TnyStoreAccountIface*) tny_iterator_iface_current (iter);
+	iter = tny_list_create_iterator (accounts);
+	account = (TnyStoreAccount*) tny_iterator_current (iter);
 
 
     	if (mainloop)

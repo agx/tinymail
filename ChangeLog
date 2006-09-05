@@ -1,3 +1,11 @@
+2006-09-06  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* The big commit we have all been waiting for: Removing the Iface
+	suffix from the interface types
+	* This was a huge API change
+
+	* This was a major API change in all libraries
+
 2006-09-05  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed TnyList to TnySimpleList

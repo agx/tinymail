@@ -37,7 +37,7 @@ struct _TnyCamelHeader
 {
 	GObject parent;		
 	gpointer info;
-	TnyFolderIface *folder;
+	TnyFolder *folder;
 	guchar write:1;
 };
 

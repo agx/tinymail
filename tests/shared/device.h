@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <tny-device-iface.h>
+#include <tny-device.h>
 
 G_BEGIN_DECLS
 
@@ -50,7 +50,7 @@ struct _TnyTestDeviceClass
 };
 
 GType tny_test_device_get_type (void);
-TnyDeviceIface* tny_test_device_new (void);
+TnyDevice* tny_test_device_new (void);
 
 G_END_DECLS
 

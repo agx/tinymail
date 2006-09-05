@@ -24,7 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-camel-account.h>
-#include <tny-transport-account-iface.h>
+#include <tny-transport-account.h>
 
 G_BEGIN_DECLS
 
@@ -49,7 +49,7 @@ struct _TnyCamelTransportAccountClass
 };
 
 GType tny_camel_transport_account_get_type (void);
-TnyTransportAccountIface* tny_camel_transport_account_new (void);
+TnyTransportAccount* tny_camel_transport_account_new (void);
 
 G_END_DECLS
 

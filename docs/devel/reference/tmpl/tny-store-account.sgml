@@ -1,0 +1,37 @@
+<!-- ##### SECTION Title ##### -->
+TnyStoreAccount
+
+<!-- ##### SECTION Short_Description ##### -->
+A type for getting folders (and E-mails) of an account
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A store account contains the folders of an E-mail service and handles the authentication with the service.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyFolderStore, #TnyAccount, #TnyTransportAccount
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION tny_store_account_subscribe ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+
+<!-- ##### FUNCTION tny_store_account_unsubscribe ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+

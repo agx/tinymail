@@ -4,21 +4,21 @@
 
 
 <!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
-<!ENTITY libtinymail-TnyAccountIface SYSTEM "xml/tny-account-iface.xml">
-<!ENTITY libtinymail-TnyStoreAccountIface SYSTEM "xml/tny-store-account-iface.xml">
-<!ENTITY libtinymail-TnyFolderStoreIface SYSTEM "xml/tny-folder-store-iface.xml">
+<!ENTITY libtinymail-TnyAccount SYSTEM "xml/tny-account.xml">
+<!ENTITY libtinymail-TnyStoreAccount SYSTEM "xml/tny-store-account.xml">
+<!ENTITY libtinymail-TnyFolderStore SYSTEM "xml/tny-folder-store.xml">
 <!ENTITY libtinymail-TnyFolderStoreQuery SYSTEM "xml/tny-folder-store-query.xml">
-<!ENTITY libtinymail-TnyTransportAccountIface SYSTEM "xml/tny-transport-account-iface.xml">
-<!ENTITY libtinymail-TnyAccountStoreIface SYSTEM "xml/tny-account-store-iface.xml">
-<!ENTITY libtinymail-TnyHeaderIface SYSTEM "xml/tny-header-iface.xml">
-<!ENTITY libtinymail-TnyMsgIface SYSTEM "xml/tny-msg-iface.xml">
-<!ENTITY libtinymail-TnyMimePartIface SYSTEM "xml/tny-mime-part-iface.xml">
-<!ENTITY libtinymail-TnyStreamIface SYSTEM "xml/tny-stream-iface.xml">
+<!ENTITY libtinymail-TnyTransportAccount SYSTEM "xml/tny-transport-account.xml">
+<!ENTITY libtinymail-TnyAccountStore SYSTEM "xml/tny-account-store.xml">
+<!ENTITY libtinymail-TnyHeader SYSTEM "xml/tny-header.xml">
+<!ENTITY libtinymail-TnyMsg SYSTEM "xml/tny-msg.xml">
+<!ENTITY libtinymail-TnyMimePart SYSTEM "xml/tny-mime-part.xml">
+<!ENTITY libtinymail-TnyStream SYSTEM "xml/tny-stream.xml">
 <!ENTITY libtinymail-TnyFsStream SYSTEM "xml/tny-fs-stream.xml">
-<!ENTITY libtinymail-TnyFolderIface SYSTEM "xml/tny-folder-iface.xml">
-<!ENTITY libtinymail-TnyDeviceIface SYSTEM "xml/tny-device-iface.xml">
-<!ENTITY libtinymail-TnyListIface SYSTEM "xml/tny-list-iface.xml">
-<!ENTITY libtinymail-TnyIteratorIface SYSTEM "xml/tny-iterator-iface.xml">
+<!ENTITY libtinymail-TnyFolder SYSTEM "xml/tny-folder.xml">
+<!ENTITY libtinymail-TnyDevice SYSTEM "xml/tny-device.xml">
+<!ENTITY libtinymail-TnyList SYSTEM "xml/tny-list.xml">
+<!ENTITY libtinymail-TnyIterator SYSTEM "xml/tny-iterator.xml">
 <!ENTITY libtinymail-TnySimpleList SYSTEM "xml/tny-simple-list.xml">
 
 
@@ -51,13 +51,13 @@
 <!ENTITY libtinymailui-gtk-TnyGtkMsgWindow SYSTEM "xml/tny-gtk-msg-window.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkSaveStrategy SYSTEM "xml/tny-gtk-save-strategy.xml">
 
-<!ENTITY libtinymailui-TnyMsgWindowIface SYSTEM "xml/tny-msg-window-iface.xml">
-<!ENTITY libtinymailui-TnyMsgViewIface SYSTEM "xml/tny-msg-view-iface.xml">
-<!ENTITY libtinymailui-TnyHeaderViewIface SYSTEM "xml/tny-header-view-iface.xml">
-<!ENTITY libtinymailui-TnyPlatformFactoryIface SYSTEM "xml/tny-platform-factory-iface.xml">
-<!ENTITY libtinymailui-TnyAccountStoreViewIface SYSTEM "xml/tny-account-store-view-iface.xml">
-<!ENTITY libtinymailui-TnySaveStrategyIface SYSTEM "xml/tny-save-strategy-iface.xml">
-<!ENTITY libtinymailui-TnySummaryViewIface SYSTEM "xml/tny-summary-view-iface.xml">
+<!ENTITY libtinymailui-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
+<!ENTITY libtinymailui-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
+<!ENTITY libtinymailui-TnyHeaderView SYSTEM "xml/tny-header-view.xml">
+<!ENTITY libtinymailui-TnyPlatformFactory SYSTEM "xml/tny-platform-factory.xml">
+<!ENTITY libtinymailui-TnyAccountStoreView SYSTEM "xml/tny-account-store-view.xml">
+<!ENTITY libtinymailui-TnySaveStrategy SYSTEM "xml/tny-save-strategy.xml">
+<!ENTITY libtinymailui-TnySummaryView SYSTEM "xml/tny-summary-view.xml">
 
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView SYSTEM "xml/tny-moz-embed-msg-view.xml">
@@ -99,34 +99,34 @@
 	<chapter id="libtinymail">
 		<title>libtinymail</title>
 		&libtinymail-Shared;		
-		&libtinymail-TnyAccountStoreIface;
-		&libtinymail-TnyFolderStoreIface;
+		&libtinymail-TnyAccountStore;
+		&libtinymail-TnyFolderStore;
 		&libtinymail-TnyFolderStoreQuery;
-		&libtinymail-TnyAccountIface;
-		&libtinymail-TnyStoreAccountIface;
-		&libtinymail-TnyTransportAccountIface;
-		&libtinymail-TnyMsgIface;
-		&libtinymail-TnyMimePartIface;
-		&libtinymail-TnyFolderIface;
-		&libtinymail-TnyHeaderIface;
-		&libtinymail-TnyStreamIface;
+		&libtinymail-TnyAccount;
+		&libtinymail-TnyStoreAccount;
+		&libtinymail-TnyTransportAccount;
+		&libtinymail-TnyMsg;
+		&libtinymail-TnyMimePart;
+		&libtinymail-TnyFolder;
+		&libtinymail-TnyHeader;
+		&libtinymail-TnyStream;
 		&libtinymail-TnyFsStream;
-		&libtinymail-TnyDeviceIface;
-		&libtinymail-TnyListIface;
-		&libtinymail-TnyIteratorIface;
+		&libtinymail-TnyDevice;
+		&libtinymail-TnyList;
+		&libtinymail-TnyIterator;
 		&libtinymail-TnySimpleList;
 	</chapter>
 
 	<chapter id="libtinymailui">
 		<title>libtinymailui</title>
-		&libtinymailui-TnyAccountStoreViewIface;
-		&libtinymailui-TnyHeaderViewIface;
-		&libtinymailui-TnyMsgViewIface;
-		&libtinymailui-TnyMsgWindowIface;
-		&libtinymailui-TnySaveStrategyIface;
-		&libtinymailui-TnyPlatformFactoryIface;
-		&libtinymailui-TnyHeaderViewIface;
-		&libtinymailui-TnySummaryViewIface;
+		&libtinymailui-TnyAccountStoreView;
+		&libtinymailui-TnyHeaderView;
+		&libtinymailui-TnyMsgView;
+		&libtinymailui-TnyMsgWindow;
+		&libtinymailui-TnySaveStrategy;
+		&libtinymailui-TnyPlatformFactory;
+		&libtinymailui-TnyHeaderView;
+		&libtinymailui-TnySummaryView;
 	</chapter>
 
 	<chapter id="libtinymailui-gtk">

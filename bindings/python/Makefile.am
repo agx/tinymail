@@ -69,34 +69,34 @@ EXTRA_DIST = 				\
 
 tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py \
-	$(top_srcdir)/libtinymail/tny-folder-store-iface.h	\
+	$(top_srcdir)/libtinymail/tny-folder-store.h	\
 	$(top_srcdir)/libtinymail/tny-folder-store-query.h	\
-	$(top_srcdir)/libtinymail/tny-account-iface.h		\
-	$(top_srcdir)/libtinymail/tny-account-store-iface.h	\
-	$(top_srcdir)/libtinymail/tny-device-iface.h		\
+	$(top_srcdir)/libtinymail/tny-account.h		\
+	$(top_srcdir)/libtinymail/tny-account-store.h	\
+	$(top_srcdir)/libtinymail/tny-device.h		\
 	$(top_srcdir)/libtinymail/tny-fs-stream.h		\
-	$(top_srcdir)/libtinymail/tny-iterator-iface.h		\
+	$(top_srcdir)/libtinymail/tny-iterator.h		\
 	$(top_srcdir)/libtinymail/tny-simple-list.h		\
-	$(top_srcdir)/libtinymail/tny-list-iface.h		\
-	$(top_srcdir)/libtinymail/tny-folder-iface.h		\
-	$(top_srcdir)/libtinymail/tny-header-iface.h		\
-	$(top_srcdir)/libtinymail/tny-msg-iface.h		\
-	$(top_srcdir)/libtinymail/tny-mime-part-iface.h		\
+	$(top_srcdir)/libtinymail/tny-list.h		\
+	$(top_srcdir)/libtinymail/tny-folder.h		\
+	$(top_srcdir)/libtinymail/tny-header.h		\
+	$(top_srcdir)/libtinymail/tny-msg.h		\
+	$(top_srcdir)/libtinymail/tny-mime-part.h		\
 	$(top_srcdir)/libtinymail/tny-shared.h			\
-	$(top_srcdir)/libtinymail/tny-store-account-iface.h 	\
-	$(top_srcdir)/libtinymail/tny-stream-iface.h 		\
-	$(top_srcdir)/libtinymail/tny-transport-account-iface.h | \
+	$(top_srcdir)/libtinymail/tny-store-account.h 	\
+	$(top_srcdir)/libtinymail/tny-stream.h 		\
+	$(top_srcdir)/libtinymail/tny-transport-account.h | \
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymail.defs.extra > $@
 
 tinymailui.defs: tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
-	$(top_srcdir)/libtinymailui/tny-account-store-view-iface.h \
-	$(top_srcdir)/libtinymailui/tny-header-view-iface.h	   \
-	$(top_srcdir)/libtinymailui/tny-msg-view-iface.h	   \
-	$(top_srcdir)/libtinymailui/tny-msg-window-iface.h	   \
-	$(top_srcdir)/libtinymailui/tny-platform-factory-iface.h   \
-	$(top_srcdir)/libtinymailui/tny-save-strategy-iface.h	   \
-	$(top_srcdir)/libtinymailui/tny-summary-view-iface.h |	   \
+	$(top_srcdir)/libtinymailui/tny-account-store-view.h \
+	$(top_srcdir)/libtinymailui/tny-header-view.h	   \
+	$(top_srcdir)/libtinymailui/tny-msg-view.h	   \
+	$(top_srcdir)/libtinymailui/tny-msg-window.h	   \
+	$(top_srcdir)/libtinymailui/tny-platform-factory.h   \
+	$(top_srcdir)/libtinymailui/tny-save-strategy.h	   \
+	$(top_srcdir)/libtinymailui/tny-summary-view.h |	   \
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymailui.defs.extra > $@
 
 

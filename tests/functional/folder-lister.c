@@ -19,13 +19,13 @@
 #include <stdlib.h>
 #include <glib.h>
 
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 #include <tny-simple-list.h>
-#include <tny-account-store-iface.h>
-#include <tny-store-account-iface.h>
-#include <tny-folder-iface.h>
-#include <tny-folder-store-iface.h>
+#include <tny-account-store.h>
+#include <tny-store-account.h>
+#include <tny-folder.h>
+#include <tny-folder-store.h>
 #include <tny-folder-store-query.h>
 
 #include <account-store.h>
@@ -35,23 +35,23 @@ static gchar *cachedir=NULL;
 static gboolean online=FALSE;
 
 static void
-recurse_folders (TnyFolderStoreIface *store, TnyFolderStoreQuery *query)
+recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query)
 {
-	TnyIteratorIface *iter;
-	TnyListIface *folders = tny_simple_list_new ();
+	TnyIterator *iter;
+	TnyList *folders = tny_simple_list_new ();
 
-	tny_folder_store_iface_get_folders (store, folders, query);
-	iter = tny_list_iface_create_iterator (folders);
+	tny_folder_store_get_folders (store, folders, query);
+	iter = tny_list_create_iterator (folders);
 
-	while (!tny_iterator_iface_is_done (iter))
+	while (!tny_iterator_is_done (iter))
 	{
-		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
 		gint i=0;
 
 		for (i=0; i<recursion_level; i++)
 			g_print ("\t");
 
-		g_print ("%s\n", tny_folder_iface_get_name (TNY_FOLDER_IFACE (folder)));
+		g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
 
 		recursion_level++;
 		recurse_folders (folder, query);
@@ -59,7 +59,7 @@ recurse_folders (TnyFolderStoreIface *store, TnyFolderStoreQuery *query)
 	    
  		g_object_unref (G_OBJECT (folder));
 
-		tny_iterator_iface_next (iter);	    
+		tny_iterator_next (iter);	    
 	}
 
 	 g_object_unref (G_OBJECT (iter));
@@ -80,11 +80,11 @@ int
 main (int argc, char **argv)
 {
 	GOptionContext *context;
-	TnyAccountStoreIface *account_store;
-	TnyListIface *accounts;
+	TnyAccountStore *account_store;
+	TnyList *accounts;
 	TnyFolderStoreQuery *query;
-	TnyStoreAccountIface *account;
-	TnyIteratorIface *iter;
+	TnyStoreAccount *account;
+	TnyIterator *iter;
     
 	free (malloc (10));
     
@@ -103,14 +103,14 @@ main (int argc, char **argv)
     
 	accounts = tny_simple_list_new ();
 
-	tny_account_store_iface_get_accounts (account_store, accounts, 
-	      TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS);
+	tny_account_store_get_accounts (account_store, accounts, 
+	      TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
     
-	iter = tny_list_iface_create_iterator (accounts);
-	account = (TnyStoreAccountIface*) tny_iterator_iface_current (iter);
+	iter = tny_list_create_iterator (accounts);
+	account = (TnyStoreAccount*) tny_iterator_current (iter);
 
 	recursion_level = 0;	    
-	recurse_folders (TNY_FOLDER_STORE_IFACE (account), NULL);
+	recurse_folders (TNY_FOLDER_STORE (account), NULL);
     
 	g_object_unref (G_OBJECT (account));
 	g_object_unref (G_OBJECT (iter));

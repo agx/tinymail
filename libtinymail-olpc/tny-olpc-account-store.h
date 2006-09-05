@@ -48,7 +48,7 @@ struct _TnyOlpcAccountStoreClass
 };
 
 GType tny_olpc_account_store_get_type (void);
-TnyAccountStoreIface* tny_olpc_account_store_new (void);
+TnyAccountStore* tny_olpc_account_store_new (void);
 TnySessionCamel* tny_olpc_account_store_get_session (TnyOlpcAccountStore *self);
 
 G_END_DECLS

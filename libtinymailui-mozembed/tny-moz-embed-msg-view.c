@@ -29,13 +29,13 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
 
 #include <tny-moz-embed-msg-view.h>
 #include <tny-moz-embed-stream.h>
 #include <tny-gtk-attach-list-model.h>
-#include <tny-header-view-iface.h>
+#include <tny-header-view.h>
 #include <tny-gtk-header-view.h>
 #include <tny-gtk-text-buffer-stream.h>
 
@@ -55,14 +55,14 @@ typedef struct _TnyMozEmbedMsgViewPriv TnyMozEmbedMsgViewPriv;
 
 struct _TnyMozEmbedMsgViewPriv
 {
-	TnyMsgIface *msg;
+	TnyMsg *msg;
 	GtkTextView *textview;
-	TnyHeaderViewIface *headerview;
+	TnyHeaderView *headerview;
 	GtkMozEmbed *htmlview;
 	
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
-	TnySaveStrategyIface *save_strategy;
+	TnySaveStrategy *save_strategy;
 };
 
 #define TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE(o)	\
@@ -84,79 +84,79 @@ remove_html_stread_hack (gpointer data)
 }
 
 static void
-reload_msg (TnyMsgViewIface *self)
+reload_msg (TnyMsgView *self)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
-	TnyHeaderIface *header;
-	TnyIteratorIface *iterator;
+	TnyHeader *header;
+	TnyIterator *iterator;
 	gboolean first_attach = TRUE;
 	GtkTreeModel *model;
 	gboolean have_html = FALSE;
 
-	tny_header_view_iface_clear (TNY_HEADER_VIEW_IFACE (priv->headerview));
+	tny_header_view_clear (TNY_HEADER_VIEW (priv->headerview));
     
-	g_return_if_fail (TNY_IS_MSG_IFACE (priv->msg));
+	g_return_if_fail (TNY_IS_MSG (priv->msg));
 
-	header = TNY_HEADER_IFACE (tny_msg_iface_get_header (priv->msg));    
-	g_return_if_fail (TNY_IS_HEADER_IFACE (header));
-	tny_header_view_iface_set_header (priv->headerview, header);
+	header = TNY_HEADER (tny_msg_get_header (priv->msg));    
+	g_return_if_fail (TNY_IS_HEADER (header));
+	tny_header_view_set_header (priv->headerview, header);
 	g_object_unref (G_OBJECT (header));
 
     	buffer = gtk_text_view_get_buffer (priv->textview);
     
     	model = tny_gtk_attach_list_model_new ();;
-	tny_msg_iface_get_parts (priv->msg, TNY_LIST_IFACE (model));
-	iterator = tny_list_iface_create_iterator (TNY_LIST_IFACE (model));
+	tny_msg_get_parts (priv->msg, TNY_LIST (model));
+	iterator = tny_list_create_iterator (TNY_LIST (model));
 	gtk_widget_hide (priv->attachview_sw);
 
 	gtk_text_buffer_set_text (buffer, "", 0);
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 
-	while (!tny_iterator_iface_is_done (iterator))
+	while (!tny_iterator_is_done (iterator))
 	{
-		TnyMimePartIface *part = (TnyMimePartIface*)tny_iterator_iface_current (iterator);
+		TnyMimePart *part = (TnyMimePart*)tny_iterator_current (iterator);
 
-		if (!have_html && G_LIKELY (tny_mime_part_iface_content_type_is (part, "text/plain")))
+		if (!have_html && G_LIKELY (tny_mime_part_content_type_is (part, "text/plain")))
 		{
-			TnyStreamIface *dest = NULL;
+			TnyStream *dest = NULL;
 
 			gtk_widget_hide (GTK_WIDGET (priv->htmlview));
 			gtk_widget_show (GTK_WIDGET (priv->textview));
 
 			dest = tny_gtk_text_buffer_stream_new (buffer);
 
-			tny_stream_iface_reset (dest);
-			tny_mime_part_iface_decode_to_stream (part, dest);
-			tny_stream_iface_reset (dest);
+			tny_stream_reset (dest);
+			tny_mime_part_decode_to_stream (part, dest);
+			tny_stream_reset (dest);
 
 			g_object_unref (G_OBJECT (dest));
 
-		} else if (G_LIKELY (tny_mime_part_iface_content_type_is (part, "text/html")))
+		} else if (G_LIKELY (tny_mime_part_content_type_is (part, "text/html")))
 		{
-			TnyStreamIface *dest = NULL;
+			TnyStream *dest = NULL;
 
-			dest = TNY_STREAM_IFACE (tny_moz_embed_stream_new (priv->htmlview));
+			dest = TNY_STREAM (tny_moz_embed_stream_new (priv->htmlview));
 
 			have_html = TRUE;
 
 			gtk_widget_show (GTK_WIDGET (priv->htmlview));
 			gtk_widget_hide (GTK_WIDGET (priv->textview));
 
-			tny_stream_iface_reset (dest);
-			tny_mime_part_iface_decode_to_stream (part, dest);
+			tny_stream_reset (dest);
+			tny_mime_part_decode_to_stream (part, dest);
 
 			/* This will do: g_object_unref (G_OBJECT (dest)); */
 			g_thread_create (remove_html_stread_hack, dest, FALSE, NULL);
 			
-		} else if (tny_mime_part_iface_get_content_type (part) &&
-			tny_mime_part_iface_is_attachment (part))
+		} else if (tny_mime_part_get_content_type (part) &&
+			tny_mime_part_is_attachment (part))
 		{
 			first_attach = FALSE;
 		}
 		g_object_unref (G_OBJECT(part));
 		
-		tny_iterator_iface_next (iterator);
+		tny_iterator_next (iterator);
 	}
 
 	g_object_unref (G_OBJECT (iterator));
@@ -174,7 +174,7 @@ reload_msg (TnyMsgViewIface *self)
 
 
 void
-tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyIface *strategy)
+tny_mozembed_msg_view_set_save_strategy (TnyMsgView *self, TnySaveStrategy *strategy)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
@@ -189,7 +189,7 @@ tny_mozembed_msg_view_set_save_strategy (TnyMsgViewIface *self, TnySaveStrategyI
 }
 
 static void
-tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self)
+tny_mozembed_msg_view_set_unavailable (TnyMsgView *self)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
@@ -207,7 +207,7 @@ tny_mozembed_msg_view_set_unavailable (TnyMsgViewIface *self)
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, _("Message is unavailable"), -1);
 
- 	tny_header_view_iface_clear (priv->headerview);
+ 	tny_header_view_clear (priv->headerview);
 	gtk_widget_hide (GTK_WIDGET (priv->headerview));
 
 
@@ -231,7 +231,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 
 	if (G_LIKELY (gtk_tree_model_get_iter (model, &iter, path)))
 	{
-		TnyMimePartIface *part;
+		TnyMimePart *part;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
@@ -239,7 +239,7 @@ for_each_selected_attachment (GtkIconView *icon_view, GtkTreePath *path, gpointe
 
 		if (G_LIKELY (part))
 		{
-			tny_save_strategy_iface_save (priv->save_strategy, part);    
+			tny_save_strategy_save (priv->save_strategy, part);    
 		    	g_object_unref (G_OBJECT (part));
 		}
 	}
@@ -296,7 +296,7 @@ tny_moz_embed_msg_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 }
 
 static void 
-tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
+tny_moz_embed_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
@@ -314,14 +314,14 @@ tny_moz_embed_msg_view_set_msg (TnyMsgViewIface *self, TnyMsgIface *msg)
 }
 
 static void
-tny_moz_embed_msg_view_clear (TnyMsgViewIface *self)
+tny_moz_embed_msg_view_clear (TnyMsgView *self)
 {
 	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 
     	GtkTextBuffer *buffer = gtk_text_view_get_buffer (priv->textview);
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, "", 0);
-	tny_header_view_iface_clear (priv->headerview);
+	tny_header_view_clear (priv->headerview);
 	gtk_widget_hide (GTK_WIDGET (priv->headerview));
     
     	return;
@@ -331,16 +331,16 @@ tny_moz_embed_msg_view_clear (TnyMsgViewIface *self)
  * tny_moz_embed_msg_view_new:
  * @save_strategy: The save strategy to use
  *
- * Return value: a new #TnyMsgViewIface instance implemented for Gtk+
+ * Return value: a new #TnyMsgView instance implemented for Gtk+
  **/
-TnyMsgViewIface*
-tny_moz_embed_msg_view_new (TnySaveStrategyIface *save_strategy)
+TnyMsgView*
+tny_moz_embed_msg_view_new (TnySaveStrategy *save_strategy)
 {
 	TnyMozEmbedMsgView *self = g_object_new (TNY_TYPE_MOZ_EMBED_MSG_VIEW, NULL);
 
-	tny_msg_view_iface_set_save_strategy (TNY_MSG_VIEW_IFACE (self), save_strategy);
+	tny_msg_view_set_save_strategy (TNY_MSG_VIEW (self), save_strategy);
 
-	return TNY_MSG_VIEW_IFACE (self);
+	return TNY_MSG_VIEW (self);
 }
 
 static void
@@ -443,9 +443,9 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 }
 
 static void
-tny_msg_view_iface_init (gpointer g_iface, gpointer iface_data)
+tny_msg_view_init (gpointer g, gpointer iface_data)
 {
-	TnyMsgViewIfaceClass *klass = (TnyMsgViewIfaceClass *)g_iface;
+	TnyMsgViewIface *klass = (TnyMsgViewIface *)g;
 
 	klass->set_msg_func = tny_moz_embed_msg_view_set_msg;
 	klass->set_save_strategy_func = tny_mozembed_msg_view_set_save_strategy;
@@ -490,9 +490,9 @@ tny_moz_embed_msg_view_get_type (void)
 		  tny_moz_embed_msg_view_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_msg_view_iface_info = 
+		static const GInterfaceInfo tny_msg_view_info = 
 		{
-		  (GInterfaceInitFunc) tny_msg_view_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_msg_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -501,8 +501,8 @@ tny_moz_embed_msg_view_get_type (void)
 			"TnyMozEmbedMsgView",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW_IFACE, 
-			&tny_msg_view_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW, 
+			&tny_msg_view_info);
 
 	}
 

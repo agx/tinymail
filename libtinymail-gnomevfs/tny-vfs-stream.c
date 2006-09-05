@@ -45,7 +45,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <tny-stream-iface.h>
+#include <tny-stream.h>
 #include <tny-vfs-stream.h>
 
 static GObjectClass *parent_class = NULL;
@@ -153,15 +153,15 @@ tny_vfs_stream_set_errno (GnomeVFSResult res)
 }
 
 static gssize
-tny_vfs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
+tny_vfs_stream_write_to_stream (TnyStream *self, TnyStream *output)
 {
 	char tmp_buf[4096];
 	gssize total = 0;
 	gssize nb_read;
 	gssize nb_written;
 	
-	while (G_UNLIKELY (!tny_stream_iface_eos (self))) {
-		nb_read = tny_stream_iface_read (self, tmp_buf, sizeof (tmp_buf));
+	while (G_UNLIKELY (!tny_stream_eos (self))) {
+		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
 		if (G_UNLIKELY (nb_read < 0))
 			return -1;
 		else if (G_LIKELY (nb_read > 0)) {
@@ -169,7 +169,7 @@ tny_vfs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 	
 			while (G_LIKELY (nb_written < nb_read))
 			{
-				gssize len = tny_stream_iface_write (output, tmp_buf + nb_written,
+				gssize len = tny_stream_write (output, tmp_buf + nb_written,
 								  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
@@ -182,7 +182,7 @@ tny_vfs_stream_write_to_stream (TnyStreamIface *self, TnyStreamIface *output)
 }
 
 static gssize
-tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
+tny_vfs_stream_read  (TnyStream *self, char *buffer, gsize n)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	GnomeVFSFileSize count;
@@ -213,7 +213,7 @@ tny_vfs_stream_read  (TnyStreamIface *self, char *buffer, gsize n)
 }
 
 static gssize
-tny_vfs_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
+tny_vfs_stream_write (TnyStream *self, const char *buffer, gsize n)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	GnomeVFSFileSize count;
@@ -236,7 +236,7 @@ tny_vfs_stream_write (TnyStreamIface *self, const char *buffer, gsize n)
 }
 
 static gint
-tny_vfs_stream_close (TnyStreamIface *self)
+tny_vfs_stream_close (TnyStream *self)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	GnomeVFSResult res;
@@ -346,9 +346,9 @@ tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
  * tny_vfs_stream_new:
  * @handle: The #GnomeVFSHandle to write to or read from
  *
- * Create an adaptor instance between #TnyStreamIface and #GnomeVFSHandle
+ * Create an adaptor instance between #TnyStream and #GnomeVFSHandle
  *
- * Return value: a new #TnyStreamIface instance
+ * Return value: a new #TnyStream instance
  **/
 TnyVfsStream*
 tny_vfs_stream_new (GnomeVFSHandle *handle)
@@ -387,13 +387,13 @@ tny_vfs_stream_finalize (GObject *object)
 }
 
 static gint 
-tny_vfs_flush (TnyStreamIface *self)
+tny_vfs_flush (TnyStream *self)
 {
 	return 0;
 }
 
 static gboolean 
-tny_vfs_eos (TnyStreamIface *self)
+tny_vfs_eos (TnyStream *self)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 
@@ -401,7 +401,7 @@ tny_vfs_eos (TnyStreamIface *self)
 }
 
 static gint 
-tny_vfs_reset (TnyStreamIface *self)
+tny_vfs_reset (TnyStream *self)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	gint retval = -1;
@@ -425,9 +425,9 @@ tny_vfs_reset (TnyStreamIface *self)
 }
 
 static void
-tny_stream_iface_init (gpointer g_iface, gpointer iface_data)
+tny_stream_init (gpointer g, gpointer iface_data)
 {
-	TnyStreamIfaceClass *klass = (TnyStreamIfaceClass *)g_iface;
+	TnyStreamIface *klass = (TnyStreamIface *)g;
 
 	klass->reset_func = tny_vfs_reset;
 	klass->flush_func = tny_vfs_flush;
@@ -477,9 +477,9 @@ tny_vfs_stream_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_stream_iface_info = 
+		static const GInterfaceInfo tny_stream_info = 
 		{
-		  (GInterfaceInitFunc) tny_stream_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_stream_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -488,8 +488,8 @@ tny_vfs_stream_get_type (void)
 			"TnyVfsStream",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_STREAM_IFACE, 
-			&tny_stream_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
+			&tny_stream_info);
 	}
 
 	return type;

@@ -22,7 +22,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <tny-header-iface.h>
+#include <tny-header.h>
 #include <camel/camel-folder-summary.h>
 
 G_BEGIN_DECLS
@@ -40,7 +40,7 @@ typedef struct _TnyCamelHeaderClass TnyCamelHeaderClass;
 
 
 GType tny_camel_header_get_type (void);
-TnyHeaderIface* tny_camel_header_new (void);
+TnyHeader* tny_camel_header_new (void);
 
 
 G_END_DECLS

@@ -31,15 +31,15 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-gnome-device-priv.h"
 
-static void tny_gnome_device_on_online (TnyDeviceIface *self);
-static void tny_gnome_device_on_offline (TnyDeviceIface *self);
-static gboolean tny_gnome_device_is_online (TnyDeviceIface *self);
+static void tny_gnome_device_on_online (TnyDevice *self);
+static void tny_gnome_device_on_offline (TnyDevice *self);
+static gboolean tny_gnome_device_is_online (TnyDevice *self);
 
 #ifdef GNOME
 static void 
 nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 {
-	TnyDeviceIface *self = (TnyDeviceIface *)user_data;
+	TnyDevice *self = (TnyDevice *)user_data;
 
 	if (tny_gnome_device_is_online (self))
 		tny_gnome_device_on_online (self);
@@ -51,7 +51,7 @@ nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 #endif
 
 static void 
-tny_gnome_device_reset (TnyDeviceIface *self)
+tny_gnome_device_reset (TnyDevice *self)
 {
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
@@ -64,7 +64,7 @@ tny_gnome_device_reset (TnyDeviceIface *self)
 }
 
 static void 
-tny_gnome_device_force_online (TnyDeviceIface *self)
+tny_gnome_device_force_online (TnyDevice *self)
 {
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
@@ -80,7 +80,7 @@ tny_gnome_device_force_online (TnyDeviceIface *self)
 
 
 static void
-tny_gnome_device_force_offline (TnyDeviceIface *self)
+tny_gnome_device_force_offline (TnyDevice *self)
 {
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
@@ -95,23 +95,23 @@ tny_gnome_device_force_offline (TnyDeviceIface *self)
 }
 
 static void
-tny_gnome_device_on_online (TnyDeviceIface *self)
+tny_gnome_device_on_online (TnyDevice *self)
 {
-	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, TRUE);
+	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
 
 	return;
 }
 
 static void
-tny_gnome_device_on_offline (TnyDeviceIface *self)
+tny_gnome_device_on_offline (TnyDevice *self)
 {
-	g_signal_emit (self, tny_device_iface_signals [TNY_DEVICE_IFACE_CONNECTION_CHANGED], 0, FALSE);
+	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
 
 	return;
 }
 
 static gboolean
-tny_gnome_device_is_online (TnyDeviceIface *self)
+tny_gnome_device_is_online (TnyDevice *self)
 {
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 	gboolean retval = priv->forced;
@@ -167,14 +167,14 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 /**
  * tny_gnome_device_new:
  *
- * Return value: A new #TnyDeviceIface instance
+ * Return value: A new #TnyDevice instance
  **/
-TnyDeviceIface*
+TnyDevice*
 tny_gnome_device_new (void)
 {
 	TnyGnomeDevice *self = g_object_new (TNY_TYPE_GNOME_DEVICE, NULL);
 
-	return TNY_DEVICE_IFACE (self);
+	return TNY_DEVICE (self);
 }
 
 
@@ -196,9 +196,9 @@ tny_gnome_device_finalize (GObject *object)
 
 
 static void
-tny_device_iface_init (gpointer g_iface, gpointer iface_data)
+tny_device_init (gpointer g, gpointer iface_data)
 {
-	TnyDeviceIfaceClass *klass = (TnyDeviceIfaceClass *)g_iface;
+	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
 	klass->is_online_func = tny_gnome_device_is_online;
 	klass->reset_func = tny_gnome_device_reset;
@@ -245,9 +245,9 @@ tny_gnome_device_get_type (void)
 		  tny_gnome_device_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_device_iface_info = 
+		static const GInterfaceInfo tny_device_info = 
 		{
-		  (GInterfaceInitFunc) tny_device_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_device_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -256,8 +256,8 @@ tny_gnome_device_get_type (void)
 			"TnyGnomeDevice",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_DEVICE_IFACE, 
-			&tny_device_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_DEVICE, 
+			&tny_device_info);
 
 	}
 

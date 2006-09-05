@@ -17,19 +17,19 @@ Shared include file with forward typedefs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyListIface ##### -->
+<!-- ##### STRUCT TnyList ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyIteratorIface ##### -->
+<!-- ##### STRUCT TnyIterator ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyListIfaceClass ##### -->
+<!-- ##### STRUCT TnyListClass ##### -->
 <para>
 
 </para>
@@ -43,7 +43,7 @@ Shared include file with forward typedefs
 @copy_func: 
 @create_iterator_func: 
 
-<!-- ##### STRUCT TnyIteratorIfaceClass ##### -->
+<!-- ##### STRUCT TnyIteratorClass ##### -->
 <para>
 
 </para>
@@ -57,13 +57,13 @@ Shared include file with forward typedefs
 @is_done: 
 @get_list_func: 
 
-<!-- ##### STRUCT TnyMsgIface ##### -->
+<!-- ##### STRUCT TnyMsg ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMsgIfaceClass ##### -->
+<!-- ##### STRUCT TnyMsgClass ##### -->
 <para>
 
 </para>
@@ -76,13 +76,13 @@ Shared include file with forward typedefs
 @del_part_func: 
 @add_part_func: 
 
-<!-- ##### STRUCT TnyFolderIface ##### -->
+<!-- ##### STRUCT TnyFolder ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### SIGNAL TnyFolderIface::folder-inserted ##### -->
+<!-- ##### SIGNAL TnyFolder::folder-inserted ##### -->
 <para>
 
 </para>
@@ -90,14 +90,14 @@ Shared include file with forward typedefs
 @tnyfolderiface: the object which received the signal.
 @arg1: 
 
-<!-- ##### SIGNAL TnyFolderIface::folders-reloaded ##### -->
+<!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
 <para>
 
 </para>
 
 @tnyfolderiface: the object which received the signal.
 
-<!-- ##### STRUCT TnyFolderIfaceClass ##### -->
+<!-- ##### STRUCT TnyFolderClass ##### -->
 <para>
 
 </para>
@@ -121,18 +121,18 @@ Shared include file with forward typedefs
 @refresh_async_func: 
 @refresh_func: 
 
-<!-- ##### STRUCT TnyHeaderIface ##### -->
+<!-- ##### STRUCT TnyHeader ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyHeaderIfaceClass ##### -->
+<!-- ##### STRUCT TnyHeaderClass ##### -->
 <para>
 
 </para>
 
-@g_iface: 
+@g: 
 @get_uid_func: 
 @get_bcc_func: 
 @get_cc_func: 
@@ -154,13 +154,13 @@ Shared include file with forward typedefs
 @set_flags_func: 
 @unset_flags_func: 
 
-<!-- ##### STRUCT TnyMimePartIface ##### -->
+<!-- ##### STRUCT TnyMimePart ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyMimePartIfaceClass ##### -->
+<!-- ##### STRUCT TnyMimePartClass ##### -->
 <para>
 
 </para>
@@ -183,13 +183,13 @@ Shared include file with forward typedefs
 @set_content_type_func: 
 @is_attachment_func: 
 
-<!-- ##### STRUCT TnyAccountIface ##### -->
+<!-- ##### STRUCT TnyAccount ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyAccountIfaceClass ##### -->
+<!-- ##### STRUCT TnyAccountClass ##### -->
 <para>
 
 </para>
@@ -214,13 +214,13 @@ Shared include file with forward typedefs
 @get_url_string_func: 
 @get_account_type_func: 
 
-<!-- ##### STRUCT TnyDeviceIface ##### -->
+<!-- ##### STRUCT TnyDevice ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyDeviceIfaceClass ##### -->
+<!-- ##### STRUCT TnyDeviceClass ##### -->
 <para>
 
 </para>
@@ -232,13 +232,13 @@ Shared include file with forward typedefs
 @reset_func: 
 @connection_changed: 
 
-<!-- ##### STRUCT TnyStoreAccountIface ##### -->
+<!-- ##### STRUCT TnyStoreAccount ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyStoreAccountIfaceClass ##### -->
+<!-- ##### STRUCT TnyStoreAccountClass ##### -->
 <para>
 
 </para>
@@ -247,13 +247,13 @@ Shared include file with forward typedefs
 @subscribe_func: 
 @unsubscribe_func: 
 
-<!-- ##### STRUCT TnyTransportAccountIface ##### -->
+<!-- ##### STRUCT TnyTransportAccount ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyTransportAccountIfaceClass ##### -->
+<!-- ##### STRUCT TnyTransportAccountClass ##### -->
 <para>
 
 </para>
@@ -261,19 +261,19 @@ Shared include file with forward typedefs
 @parent: 
 @send_func: 
 
-<!-- ##### STRUCT TnyAccountStoreIface ##### -->
+<!-- ##### STRUCT TnyAccountStore ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyStreamIface ##### -->
+<!-- ##### STRUCT TnyStream ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyStreamIfaceClass ##### -->
+<!-- ##### STRUCT TnyStreamClass ##### -->
 <para>
 
 </para>
@@ -287,7 +287,7 @@ Shared include file with forward typedefs
 @reset_func: 
 @write_to_stream_func: 
 
-<!-- ##### STRUCT TnyAccountStoreIfaceClass ##### -->
+<!-- ##### STRUCT TnyAccountStoreClass ##### -->
 <para>
 
 </para>
@@ -322,10 +322,10 @@ A type used for callback functions that implement asking and the user for a pass
 </para>
 <para>
 It's typically implemented to use a key service, like GNOME key ring. This of course depends on the platform. The function
-is typically implemented in the #TnyAccountStoreIface implementation and shared between all accounts in the store.
+is typically implemented in the #TnyAccountStore implementation and shared between all accounts in the store.
 </para>
 
-@self: The #TnyAccountIface instance for which the password is going to be used
+@self: The #TnyAccount instance for which the password is going to be used
 @prompt: Prompt to provide to the user
 @cancel: A byref gboolean variable. If the user cancelled the request, set this to TRUE
 @Returns: A newly allocated string with the authentication information (the password)
@@ -339,25 +339,25 @@ This function is used to tell the application that the authentication informatio
 It can typically be used to tell a key service, like GNOME key ring, to forget the authentication information. This way will a new request for the password typically result in asking to user to type new authentication information.
 </para>
 
-@self:  The #TnyAccountIface instance of which the password was not accepted
+@self:  The #TnyAccount instance of which the password was not accepted
 
 
 <!-- ##### USER_FUNCTION TnyRefreshFolderCallback ##### -->
 <para>
-A callback function for tny_msg_folder_iface_refresh_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_iface_get_headers in. It can for example be used for updating a header summary view.
+A callback function for tny_msg_folder_refresh_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_get_headers in. It can for example be used for updating a header summary view.
 </para>
 
-@self: The #TnyFolderIface
+@self: The #TnyFolder
 @cancelled: Whether or not a cancellation occured.
 @user_data: user data
 
 
 <!-- ##### USER_FUNCTION TnyRefreshFolderStatusCallback ##### -->
 <para>
-A callback function for tny_msg_folder_iface_refresh_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
+A callback function for tny_msg_folder_refresh_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
 </para>
 
-@self: The #TnyFolderIface
+@self: The #TnyFolder
 @what: What happened
 @status: A status field
 @user_data: user data
@@ -389,13 +389,13 @@ A callback function for tny_msg_folder_iface_refresh_async that callsback when n
 
 @parent: 
 
-<!-- ##### STRUCT TnyFolderStoreIface ##### -->
+<!-- ##### STRUCT TnyFolderStore ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyFolderStoreIfaceClass ##### -->
+<!-- ##### STRUCT TnyFolderStoreClass ##### -->
 <para>
 
 </para>

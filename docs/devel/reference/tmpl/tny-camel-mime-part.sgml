@@ -2,7 +2,7 @@
 TnyCamelMimePart
 
 <!-- ##### SECTION Short_Description ##### -->
-A Camel implementation of #TnyMimePartIface
+A Camel implementation of #TnyMimePart
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
@@ -11,7 +11,7 @@ A implementation that plays proxy for a #CamelMimePart.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsg, #TnyMsgIface, #TnyMimePartIface
+#TnyMsg, #TnyMsg, #TnyMimePart
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -22,11 +22,11 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include <tny-list-iface.h>
-#include <tny-iterator-iface.h>
-#include <tny-store-account-iface.h>
-#include <tny-folder-iface.h>
-#include <tny-folder-store-iface.h>
+#include <tny-list.h>
+#include <tny-iterator.h>
+#include <tny-store-account.h>
+#include <tny-folder.h>
+#include <tny-folder-store.h>
 #include <tny-simple-list.h>
 
 #include <tny-gtk-account-tree-model.h>
@@ -41,29 +41,29 @@ typedef void (*treeaddfunc) (GtkTreeStore *tree_store, GtkTreeIter *iter, GtkTre
 
 
 static void
-recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStoreIface *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
+recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
 {
-	TnyIteratorIface *iter;
-	TnyListIface *folders = tny_simple_list_new ();
+	TnyIterator *iter;
+	TnyList *folders = tny_simple_list_new ();
 
-	tny_folder_store_iface_get_folders (store, folders, query);
-	iter = tny_list_iface_create_iterator (folders);
+	tny_folder_store_get_folders (store, folders, query);
+	iter = tny_list_create_iterator (folders);
 
-	while (!tny_iterator_iface_is_done (iter))
+	while (!tny_iterator_is_done (iter))
 	{
 		GtkTreeStore *model = GTK_TREE_STORE (self);
-		TnyFolderStoreIface *folder = (TnyFolderStoreIface*) tny_iterator_iface_current (iter);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
 		GtkTreeIter tree_iter;
 	    
 		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
  		gtk_tree_store_set (model, &tree_iter,
 			TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
-			tny_folder_iface_get_name (TNY_FOLDER_IFACE (folder)),
+			tny_folder_get_name (TNY_FOLDER (folder)),
 			TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 
-			tny_folder_iface_get_unread_count (TNY_FOLDER_IFACE (folder)),
+			tny_folder_get_unread_count (TNY_FOLDER (folder)),
 			TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN,
-			tny_folder_iface_get_folder_type (TNY_FOLDER_IFACE (folder)),
+			tny_folder_get_folder_type (TNY_FOLDER (folder)),
 			TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
 	    
@@ -71,7 +71,7 @@ recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStoreIface *store, TnyFo
 	    
  		g_object_unref (G_OBJECT (folder));
 
-		tny_iterator_iface_next (iter);	    
+		tny_iterator_next (iter);	    
 	}
 
 	g_object_unref (G_OBJECT (iter));
@@ -80,23 +80,23 @@ recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStoreIface *store, TnyFo
 
 
 static void
-tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccountIface *account, treeaddfunc func)
+tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccount *account, treeaddfunc func)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	TnyListIface *folders = tny_simple_list_new ();
+	TnyList *folders = tny_simple_list_new ();
 	GtkTreeIter name_iter;
 
 	func (model, &name_iter, NULL);
 
 	gtk_tree_store_set (model, &name_iter,
 		TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
-		tny_account_iface_get_name (TNY_ACCOUNT_IFACE (account)),
+		tny_account_get_name (TNY_ACCOUNT (account)),
 		TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 0,
 		TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN, -1,
 		TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 		NULL, -1);
 
-	recurse_folders (self, TNY_FOLDER_STORE_IFACE (account), NULL, &name_iter);
+	recurse_folders (self, TNY_FOLDER_STORE (account), NULL, &name_iter);
 
     	g_object_unref (G_OBJECT (folders));
     
@@ -108,7 +108,7 @@ tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccountIfa
  *
  *
  * Return value: a new #GtkTreeModel instance suitable for showing  
- * #TnyAccountIface instances
+ * #TnyAccount instances
  **/
 GtkTreeModel*
 tny_gtk_account_tree_model_new (void)
@@ -159,20 +159,20 @@ tny_gtk_account_tree_model_instance_init (GTypeInstance *instance, gpointer g_cl
 
 
 
-static TnyIteratorIface*
-tny_gtk_account_tree_model_create_iterator (TnyListIface *self)
+static TnyIterator*
+tny_gtk_account_tree_model_create_iterator (TnyList *self)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 
 	/* Return a new iterator */
 
-	return TNY_ITERATOR_IFACE (_tny_gtk_account_tree_model_iterator_new (me));
+	return TNY_ITERATOR (_tny_gtk_account_tree_model_iterator_new (me));
 }
 
 
 
 static void
-tny_gtk_account_tree_model_prepend (TnyListIface *self, GObject* item)
+tny_gtk_account_tree_model_prepend (TnyList *self, GObject* item)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 
@@ -181,14 +181,14 @@ tny_gtk_account_tree_model_prepend (TnyListIface *self, GObject* item)
 	/* Prepend something to the list */
 	g_object_ref (G_OBJECT (item));
 	me->first = g_list_prepend (me->first, item);
-	tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), 
+	tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT (item), 
 		gtk_tree_store_prepend);
 
 	g_mutex_unlock (me->iterator_lock);
 }
 
 static void
-tny_gtk_account_tree_model_append (TnyListIface *self, GObject* item)
+tny_gtk_account_tree_model_append (TnyList *self, GObject* item)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 
@@ -197,14 +197,14 @@ tny_gtk_account_tree_model_append (TnyListIface *self, GObject* item)
 	/* Append something to the list */
 	g_object_ref (G_OBJECT (item));
 	me->first = g_list_append (me->first, item);
-	tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT_IFACE (item), 
+	tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT (item), 
 		gtk_tree_store_append);
 
 	g_mutex_unlock (me->iterator_lock);
 }
 
 static guint
-tny_gtk_account_tree_model_length (TnyListIface *self)
+tny_gtk_account_tree_model_length (TnyList *self)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 	guint retval = 0;
@@ -219,7 +219,7 @@ tny_gtk_account_tree_model_length (TnyListIface *self)
 }
 
 static void
-tny_gtk_account_tree_model_remove (TnyListIface *self, GObject* item)
+tny_gtk_account_tree_model_remove (TnyList *self, GObject* item)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 	GtkTreeModel *model = GTK_TREE_MODEL (me);
@@ -237,13 +237,13 @@ tny_gtk_account_tree_model_remove (TnyListIface *self, GObject* item)
 	gtk_tree_model_get_iter_first (model, &iter);
 	while (gtk_tree_model_iter_next (model, &iter))
 	{
-		TnyAccountIface *curaccount;
+		TnyAccount *curaccount;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
 			&curaccount, -1);
 
-		if (curaccount == (TnyAccountIface*)item)
+		if (curaccount == (TnyAccount*)item)
 		{
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));
@@ -257,15 +257,15 @@ tny_gtk_account_tree_model_remove (TnyListIface *self, GObject* item)
 }
 
 
-static TnyListIface*
-tny_gtk_account_tree_model_copy_the_list (TnyListIface *self)
+static TnyList*
+tny_gtk_account_tree_model_copy_the_list (TnyList *self)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 	TnyGtkAccountTreeModel *copy = g_object_new (TNY_TYPE_GTK_ACCOUNT_TREE_MODEL, NULL);
 
-	/* This only copies the TnyListIface pieces. The result is not a
+	/* This only copies the TnyList pieces. The result is not a
 	   correct or good TnyHeaderListModel. But it will be a correct
-	   TnyListIface instance. It is the only thing the user of this
+	   TnyList instance. It is the only thing the user of this
 	   method expects.
 
 	   The new list will point to the same instances, of course. It's
@@ -276,11 +276,11 @@ tny_gtk_account_tree_model_copy_the_list (TnyListIface *self)
 	copy->first = list_copy;
 	g_mutex_unlock (me->iterator_lock);
 
-	return TNY_LIST_IFACE (copy);
+	return TNY_LIST (copy);
 }
 
 static void 
-tny_gtk_account_tree_model_foreach_in_the_list (TnyListIface *self, GFunc func, gpointer user_data)
+tny_gtk_account_tree_model_foreach_in_the_list (TnyList *self, GFunc func, gpointer user_data)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 
@@ -295,7 +295,7 @@ tny_gtk_account_tree_model_foreach_in_the_list (TnyListIface *self, GFunc func, 
 
 
 static void
-tny_list_iface_init (TnyListIfaceClass *klass)
+tny_list_init (TnyListIface *klass)
 {
 	klass->length_func = tny_gtk_account_tree_model_length;
 	klass->prepend_func = tny_gtk_account_tree_model_prepend;
@@ -331,14 +331,14 @@ tny_gtk_account_tree_model_get_type (void)
 		type = g_type_register_static (GTK_TYPE_TREE_STORE, "TnyGtkAccountTreeModel",
 					    &info, 0);
 
-		static const GInterfaceInfo tny_list_iface_info = {
-			(GInterfaceInitFunc) tny_list_iface_init,
+		static const GInterfaceInfo tny_list_info = {
+			(GInterfaceInitFunc) tny_list_init,
 			NULL,
 			NULL
 		};
 
-		g_type_add_interface_static (type, TNY_TYPE_LIST_IFACE,
-					     &tny_list_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_LIST,
+					     &tny_list_info);
 	}
 
 	return type;

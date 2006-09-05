@@ -24,7 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-camel-account.h>
-#include <tny-store-account-iface.h>
+#include <tny-store-account.h>
 
 G_BEGIN_DECLS
 
@@ -48,14 +48,14 @@ struct _TnyCamelStoreAccountClass
 	TnyCamelAccountClass parent;
     
 	/* virtual methods (they have a default implementation in TnyCamelStoreAccount */
-	void (*get_folders_async_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
-	void (*get_folders_func) (TnyFolderStoreIface *self, TnyListIface *list, TnyFolderStoreQuery *query);
-	void (*remove_folder_func) (TnyFolderStoreIface *self, TnyFolderIface *folder);
-	TnyFolderIface* (*create_folder_func) (TnyFolderStoreIface *self, const gchar *name);
+	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
+	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);
+	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder);
+	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name);
 };
 
 GType tny_camel_store_account_get_type (void);
-TnyStoreAccountIface* tny_camel_store_account_new (void);
+TnyStoreAccount* tny_camel_store_account_new (void);
 
 G_END_DECLS
 

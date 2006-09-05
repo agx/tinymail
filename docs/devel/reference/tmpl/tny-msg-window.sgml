@@ -1,0 +1,27 @@
+<!-- ##### SECTION Title ##### -->
+TnyMsgWindow
+
+<!-- ##### SECTION Short_Description ##### -->
+A type that defines a window for showing a message
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type that shows a new window in which you can view a #TnyMsg implementation. The implementation of this type
+is often designed as a decorator of a #TnyMsgView implementation. It usually wraps the #TnyMsgView 
+implementation with the API and implementation of a window.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyMsg, #TnyMsgView, #TnyMsgWindow, #TnyMsgView
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyMsgWindow ##### -->
+<para>
+
+</para>
+
+

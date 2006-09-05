@@ -1,0 +1,184 @@
+<!-- ##### SECTION Title ##### -->
+TnyFolder
+
+<!-- ##### SECTION Short_Description ##### -->
+A type that defines a folder
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A folder contains headers and children folders. A folder can have a account or another 
+folder as parent. An implementation of a #TnyStoreAccount will typically keep
+track of instances of this type.
+</para><para>
+If you got them from a #TnyStoreAccount implementation,
+you typically don't destroy instances of this type. The #TnyStoreAccount implementation
+will do that for you upon destruction of the account. You can, however, uncache the folder 
+instances. Depending on the implementation, this will reduce memory usage.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyFolderStore, #TnyStoreAccount
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### VARIABLE tny_folder_signals ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_folder_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_remove_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+
+<!-- ##### FUNCTION tny_folder_expunge ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_folder_get_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_headers ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+@refresh: 
+
+
+<!-- ##### FUNCTION tny_folder_get_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_set_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+
+
+<!-- ##### FUNCTION tny_folder_get_folder_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_all_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_unread_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_set_subscribed ##### -->
+<para>
+
+</para>
+
+@self: 
+@subscribed: 
+
+
+<!-- ##### FUNCTION tny_folder_get_subscribed ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_refresh_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
+<!-- ##### FUNCTION tny_folder_refresh ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

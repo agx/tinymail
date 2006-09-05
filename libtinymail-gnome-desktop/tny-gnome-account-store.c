@@ -27,15 +27,15 @@
 #include <gtk/gtk.h>
 #include <gconf/gconf-client.h>
 
-#include <tny-platform-factory-iface.h>
+#include <tny-platform-factory.h>
 #include <tny-gnome-platform-factory.h>
-#include <tny-account-store-iface.h>
+#include <tny-account-store.h>
 #include <tny-gnome-account-store.h>
 #include <tny-gnome-password-dialog.h>
-#include <tny-account-iface.h>
-#include <tny-store-account-iface.h>
-#include <tny-transport-account-iface.h>
-#include <tny-device-iface.h>
+#include <tny-account.h>
+#include <tny-store-account.h>
+#include <tny-transport-account.h>
+#include <tny-device.h>
 
 #include <tny-camel-account.h>
 #include <tny-camel-store-account.h>
@@ -62,7 +62,7 @@ struct _TnyGnomeAccountStorePriv
 	GConfClient *client;
 	gchar *cache_dir;
 	TnySessionCamel *session;
-	TnyDeviceIface *device;
+	TnyDevice *device;
 	guint notify;
 };
 
@@ -72,7 +72,7 @@ struct _TnyGnomeAccountStorePriv
 
 #ifdef GNOME
 static gchar* 
-per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
+per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
 	GList *list;
@@ -82,9 +82,9 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 	gnome_keyring_get_default_keyring_sync (&keyring);
 
 	keyringret = gnome_keyring_find_network_password_sync (
-		tny_account_iface_get_user (account),
-		"Mail", tny_account_iface_get_hostname (account),
-		"password", tny_account_iface_get_proto (account), 
+		tny_account_get_user (account),
+		"Mail", tny_account_get_hostname (account),
+		"password", tny_account_get_proto (account), 
 		"PLAIN", 0, &list);
 
 	if (keyringret != GNOME_KEYRING_RESULT_OK)
@@ -94,7 +94,7 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 		GnomePasswordDialog *dialog = GNOME_PASSWORD_DIALOG 
 				(gnome_password_dialog_new
 					(_("Enter password"), prompt,
-					tny_account_iface_get_user (account), 
+					tny_account_get_user (account), 
 					NULL, TRUE));
 
 		gnome_password_dialog_set_domain (dialog, "Mail");
@@ -102,7 +102,7 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 			GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER);
 		gnome_password_dialog_set_readonly_username (dialog, TRUE);
 		gnome_password_dialog_set_username (dialog, 
-			tny_account_iface_get_user (account));
+			tny_account_get_user (account));
 
 		gnome_password_dialog_set_show_username (dialog, FALSE);
 		gnome_password_dialog_set_show_remember (dialog, 
@@ -124,9 +124,9 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)
 			{
 				gnome_keyring_set_network_password_sync (keyring,
-					tny_account_iface_get_user (account),
-					"Mail", tny_account_iface_get_hostname (account),
-					"password", tny_account_iface_get_proto (account), 
+					tny_account_get_user (account),
+					"Mail", tny_account_get_hostname (account),
+					"password", tny_account_get_proto (account), 
 					"PLAIN", 0, retval, &item_id);
 			}
 		}
@@ -153,7 +153,7 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 }
 
 static void
-per_account_forget_pass_func (TnyAccountIface *account)
+per_account_forget_pass_func (TnyAccount *account)
 {
 	GList *list=NULL;
 	GnomeKeyringResult keyringret;
@@ -163,9 +163,9 @@ per_account_forget_pass_func (TnyAccountIface *account)
 	gnome_keyring_get_default_keyring_sync (&keyring);
 
 	keyringret = gnome_keyring_find_network_password_sync (
-		tny_account_iface_get_user (account),
-		"Mail", tny_account_iface_get_hostname (account),
-		"password", tny_account_iface_get_proto (account), 
+		tny_account_get_user (account),
+		"Mail", tny_account_get_hostname (account),
+		"password", tny_account_get_proto (account), 
 		"PLAIN", 0, &list);
 
 	if (keyringret == GNOME_KEYRING_RESULT_OK)
@@ -182,10 +182,10 @@ per_account_forget_pass_func (TnyAccountIface *account)
 static GHashTable *passwords;
 
 static gchar* 
-per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboolean *cancel)
+per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
-	const gchar *accountid = tny_account_iface_get_id (account);
+	const gchar *accountid = tny_account_get_id (account);
 
 	if (G_UNLIKELY (!passwords))
 		passwords = g_hash_table_new (g_str_hash, g_str_equal);
@@ -230,14 +230,14 @@ per_account_get_pass_func (TnyAccountIface *account, const gchar *prompt, gboole
 }
 
 static void
-per_account_forget_pass_func (TnyAccountIface *account)
+per_account_forget_pass_func (TnyAccount *account)
 {
-	const TnyAccountStoreIface *self = tny_account_iface_get_account_store (account);
+	const TnyAccountStore *self = tny_account_get_account_store (account);
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyGetPassFunc func;
 	if (G_LIKELY (passwords))
 	{
-		const gchar *accountid = tny_account_iface_get_id (account);
+		const gchar *accountid = tny_account_get_id (account);
 
 		gchar *pwd = g_hash_table_lookup (passwords, accountid);
 
@@ -257,7 +257,7 @@ per_account_forget_pass_func (TnyAccountIface *account)
 
 
 static gboolean
-tny_gnome_account_store_alert (TnyAccountStoreIface *self, TnyAlertType type, const gchar *prompt)
+tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
 {
 	GtkMessageType gtktype;
 	gboolean retval = FALSE;
@@ -292,7 +292,7 @@ static void
 gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 			GConfEntry *entry, gpointer user_data)
 {
-	TnyAccountStoreIface *self = user_data;
+	TnyAccountStore *self = user_data;
 
 	gchar *key = g_strdup (entry->key);
 	gchar *ptr = strrchr (key, '/'); ptr++;
@@ -300,7 +300,7 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	if (!strcmp (ptr, "count"))
 	{
 		g_signal_emit (self, 
-			tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNTS_RELOADED], 0);
+			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
 
 	}
 
@@ -311,7 +311,7 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 
 
 static const gchar*
-tny_gnome_account_store_get_cache_dir (TnyAccountStoreIface *self)
+tny_gnome_account_store_get_cache_dir (TnyAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 
@@ -342,7 +342,7 @@ tny_gnome_account_store_get_cache_dir (TnyAccountStoreIface *self)
 
 
 static void
-tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *list, TnyGetAccountsRequestType types)
+tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	gint i=0, count;
@@ -353,7 +353,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *
 	for (i=0; i < count; i++)
 	{
 		gchar *proto, *type, *key, *name;
-		TnyAccountIface *account = NULL;
+		TnyAccount *account = NULL;
 		GSList *options;
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
@@ -378,18 +378,18 @@ tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *
 	    
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
-			if (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_TRANSPORT_ACCOUNTS)
-				account = TNY_ACCOUNT_IFACE (tny_camel_transport_account_new ());
-		} else if (type && (types == TNY_ACCOUNT_STORE_IFACE_BOTH || types == TNY_ACCOUNT_STORE_IFACE_STORE_ACCOUNTS))
+			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
+				account = TNY_ACCOUNT (tny_camel_transport_account_new ());
+		} else if (type && (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS))
 		{		
 			if (!g_ascii_strncasecmp (proto, "imap", 4))
-				account = TNY_ACCOUNT_IFACE (tny_camel_imap_store_account_new ());
+				account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
 			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
-				account = TNY_ACCOUNT_IFACE (tny_camel_nntp_store_account_new ());
+				account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
 			else if (!g_ascii_strncasecmp (proto, "pop", 4))
-				account = TNY_ACCOUNT_IFACE (tny_camel_pop_store_account_new ());
+				account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
 			else	/* Unknown, create a generic one? */
-			        account = TNY_ACCOUNT_IFACE (tny_camel_store_account_new ());
+			        account = TNY_ACCOUNT (tny_camel_store_account_new ());
 		}
 
 		if (type)
@@ -398,13 +398,13 @@ tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *
 		if (account)
 		{
 			tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), priv->session);
-			tny_account_iface_set_proto (TNY_ACCOUNT_IFACE (account), proto);
+			tny_account_set_proto (TNY_ACCOUNT (account), proto);
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/name", i);
 			name = gconf_client_get_string (priv->client, 
 				(const gchar*) key, NULL);
 			g_free (key);
-			tny_account_iface_set_name (TNY_ACCOUNT_IFACE (account), name);
+			tny_account_set_name (TNY_ACCOUNT (account), name);
 			g_free (name);
 
 
@@ -437,13 +437,13 @@ tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *
 					(const gchar*) key, NULL);
 
 				g_free (key);
-				tny_account_iface_set_user (TNY_ACCOUNT_IFACE (account), user);
+				tny_account_set_user (TNY_ACCOUNT (account), user);
 
 				key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", i);
 				hostname = gconf_client_get_string (priv->client, 
 					(const gchar*) key, NULL);
 				g_free (key); 
-				tny_account_iface_set_hostname (TNY_ACCOUNT_IFACE (account), 
+				tny_account_set_hostname (TNY_ACCOUNT (account), 
 					hostname);
 				
 				g_free (hostname); g_free (user);
@@ -458,12 +458,12 @@ tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *
 					(const gchar*) key, NULL);
 
 				g_free (key);
-				tny_account_iface_set_url_string (TNY_ACCOUNT_IFACE (account), url_string);
+				tny_account_set_url_string (TNY_ACCOUNT (account), url_string);
 				g_free (url_string);
 			}
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
-			tny_account_iface_set_id (TNY_ACCOUNT_IFACE (account), key);
+			tny_account_set_id (TNY_ACCOUNT (account), key);
 			g_free (key);
 
 			/* 
@@ -471,13 +471,13 @@ tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *
 			 * setting the host, user and protocol.
 			 */
 
-			tny_account_iface_set_forget_pass_func (TNY_ACCOUNT_IFACE (account),
+			tny_account_set_forget_pass_func (TNY_ACCOUNT (account),
 				per_account_forget_pass_func);
 
-			tny_account_iface_set_pass_func (TNY_ACCOUNT_IFACE (account),
+			tny_account_set_pass_func (TNY_ACCOUNT (account),
 				per_account_get_pass_func);
 		    
-			tny_list_iface_prepend (list, (GObject*)account);
+			tny_list_prepend (list, (GObject*)account);
 			g_object_unref (G_OBJECT (account));
 
 		}
@@ -493,7 +493,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStoreIface *self, TnyListIface *
 
 
 static void
-tny_gnome_account_store_notify_add (TnyAccountStoreIface *self)
+tny_gnome_account_store_notify_add (TnyAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	priv->notify = gconf_client_notify_add (priv->client, 
@@ -503,7 +503,7 @@ tny_gnome_account_store_notify_add (TnyAccountStoreIface *self)
 }
 
 static void
-tny_gnome_account_store_notify_remove (TnyAccountStoreIface *self)
+tny_gnome_account_store_notify_remove (TnyAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	gconf_client_notify_remove (priv->client, priv->notify);
@@ -525,7 +525,7 @@ or
 */
 
 static void
-tny_gnome_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface *account, const gchar *type)
+tny_gnome_account_store_add_account (TnyAccountStore *self, TnyAccount *account, const gchar *type)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	gchar *key = NULL;
@@ -533,12 +533,12 @@ tny_gnome_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_hostname (account), NULL);
+		tny_account_get_hostname (account), NULL);
 	g_free (key); 
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_proto (account), NULL);
+		tny_account_get_proto (account), NULL);
 	g_free (key); 
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", count);
@@ -547,7 +547,7 @@ tny_gnome_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_iface_get_user (account), NULL);
+		tny_account_get_user (account), NULL);
 	g_free (key); 
 
     	count++;
@@ -561,31 +561,31 @@ tny_gnome_account_store_add_account (TnyAccountStoreIface *self, TnyAccountIface
 
 
 static void
-tny_gnome_account_store_add_store_account (TnyAccountStoreIface *self, TnyStoreAccountIface *account)
+tny_gnome_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
 {
 	tny_gnome_account_store_notify_remove (self);
-	tny_gnome_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "store");
+	tny_gnome_account_store_add_account (self, TNY_ACCOUNT (account), "store");
 	tny_gnome_account_store_notify_add (self);
 
-	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
+	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
 
 static void
-tny_gnome_account_store_add_transport_account (TnyAccountStoreIface *self, TnyTransportAccountIface *account)
+tny_gnome_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
 {
 	tny_gnome_account_store_notify_remove (self);
-	tny_gnome_account_store_add_account (self, TNY_ACCOUNT_IFACE (account), "transport");
+	tny_gnome_account_store_add_account (self, TNY_ACCOUNT (account), "transport");
 	tny_gnome_account_store_notify_add (self);
 
-	g_signal_emit (self, tny_account_store_iface_signals [TNY_ACCOUNT_STORE_IFACE_ACCOUNT_INSERTED], 0, account);
+	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
 
-static TnyDeviceIface*
-tny_gnome_account_store_get_device (TnyAccountStoreIface *self)
+static TnyDevice*
+tny_gnome_account_store_get_device (TnyAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 
@@ -596,16 +596,16 @@ tny_gnome_account_store_get_device (TnyAccountStoreIface *self)
  * tny_gnome_account_store_new:
  *
  *
- * Return value: A new #TnyAccountStoreIface instance
+ * Return value: A new #TnyAccountStore instance
  **/
-TnyAccountStoreIface*
+TnyAccountStore*
 tny_gnome_account_store_new (void)
 {
 	TnyGnomeAccountStore *self = g_object_new (TNY_TYPE_GNOME_ACCOUNT_STORE, NULL);
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE_IFACE (self));
+	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
 
-	return TNY_ACCOUNT_STORE_IFACE (self);
+	return TNY_ACCOUNT_STORE (self);
 }
 
 
@@ -614,18 +614,18 @@ tny_gnome_account_store_instance_init (GTypeInstance *instance, gpointer g_class
 {
 	TnyGnomeAccountStore *self = (TnyGnomeAccountStore *)instance;
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-	TnyPlatformFactoryIface *platfact;
+	TnyPlatformFactory *platfact;
 
 	priv->client = gconf_client_get_default ();
 
 	gconf_client_add_dir (priv->client, "/apps/tinymail", 
 		GCONF_CLIENT_PRELOAD_RECURSIVE, NULL);
 
-	tny_gnome_account_store_notify_add (TNY_ACCOUNT_STORE_IFACE (self));
+	tny_gnome_account_store_notify_add (TNY_ACCOUNT_STORE (self));
 
-	platfact = TNY_PLATFORM_FACTORY_IFACE (tny_gnome_platform_factory_get_instance ());
-    	priv->device = tny_platform_factory_iface_new_device (platfact);
-	/* tny_device_iface_force_online (priv->device); */
+	platfact = TNY_PLATFORM_FACTORY (tny_gnome_platform_factory_get_instance ());
+    	priv->device = tny_platform_factory_new_device (platfact);
+	/* tny_device_force_online (priv->device); */
 	
 
 	return;
@@ -638,7 +638,7 @@ tny_gnome_account_store_finalize (GObject *object)
 	TnyGnomeAccountStore *self = (TnyGnomeAccountStore *)object;	
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_gnome_account_store_notify_remove (TNY_ACCOUNT_STORE_IFACE (self));
+	tny_gnome_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
 	g_object_unref (G_OBJECT (priv->client));
 
 	if (G_LIKELY (priv->cache_dir))
@@ -680,9 +680,9 @@ tny_gnome_account_store_class_init (TnyGnomeAccountStoreClass *class)
 }
 
 static void
-tny_account_store_iface_init (gpointer g_iface, gpointer iface_data)
+tny_account_store_init (gpointer g, gpointer iface_data)
 {
-	TnyAccountStoreIfaceClass *klass = (TnyAccountStoreIfaceClass *)g_iface;
+	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
 	klass->get_accounts_func = tny_gnome_account_store_get_accounts;
 	klass->add_store_account_func = tny_gnome_account_store_add_store_account;
@@ -715,9 +715,9 @@ tny_gnome_account_store_get_type (void)
 		  tny_gnome_account_store_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_account_store_iface_info = 
+		static const GInterfaceInfo tny_account_store_info = 
 		{
-		  (GInterfaceInitFunc) tny_account_store_iface_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_account_store_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
@@ -726,8 +726,8 @@ tny_gnome_account_store_get_type (void)
 			"TnyGnomeAccountStore",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE_IFACE, 
-			&tny_account_store_iface_info);
+		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT_STORE, 
+			&tny_account_store_info);
 	}
 
 	return type;
