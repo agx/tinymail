@@ -49,18 +49,6 @@
 #ifdef MOZEMBED
 #include <nspr.h>
 #include <prthread.h>
-
-static void
-tny_main_shutdown (gpointer data)
-{
-
-	/* This solves a firefox vs. Camel bug. */
-
-	PR_ProcessExit ((PRIntn)(long)data);    
-    	gtk_main_quit ();
-
-	return;
-}
 #endif
 
 /**
@@ -134,19 +122,16 @@ main (int argc, char **argv)
 	g_object_unref (G_OBJECT (account_store));
 	
 	g_signal_connect (window, "destroy",
-#ifdef MOZEMBED
-		G_CALLBACK (tny_main_shutdown), 0);
-#else
 		G_CALLBACK (gtk_main_quit), 0);
-#endif
 
 	gtk_widget_show (view);
 	gtk_widget_show (window);
 
 	gtk_main();
 
-	gtk_object_destroy (GTK_OBJECT (view));
-	gtk_object_destroy (GTK_OBJECT (window));
-		
+#ifdef MOZEMBED
+	PR_ProcessExit ((PRIntn)(long)0);  		
+#endif
+
 	return 0;
 }
