@@ -56,8 +56,8 @@ tny_main_shutdown (gpointer data)
 
 	/* This solves a firefox vs. Camel bug. */
 
-	PR_ProcessExit ((PRIntn)(long)data);
-	exit ((long)data);
+	PR_ProcessExit ((PRIntn)(long)data);    
+    	gtk_main_quit ();
 
 	return;
 }
@@ -142,7 +142,11 @@ main (int argc, char **argv)
 
 	gtk_widget_show (view);
 	gtk_widget_show (window);
+
 	gtk_main();
 
+	gtk_object_destroy (GTK_OBJECT (view));
+	gtk_object_destroy (GTK_OBJECT (window));
+		
 	return 0;
 }
