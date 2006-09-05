@@ -24,6 +24,14 @@ A type used by a #TnyMsgView instance for saving a #TnyMsgMimePart
 </para>
 
 
+<!-- ##### STRUCT TnySaveStrategyIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@save_func: 
+
 <!-- ##### FUNCTION tny_save_strategy_save ##### -->
 <para>
 

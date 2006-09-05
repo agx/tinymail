@@ -17,6 +17,15 @@ A store account contains the folders of an E-mail service and handles the authen
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyStoreAccountIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@subscribe_func: 
+@unsubscribe_func: 
+
 <!-- ##### FUNCTION tny_store_account_subscribe ##### -->
 <para>
 

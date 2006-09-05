@@ -23,6 +23,16 @@ A factory type that returns specific implementations for a specific platform.
 </para>
 
 
+<!-- ##### STRUCT TnyPlatformFactoryIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@new_account_store_func: 
+@new_device_func: 
+@new_msg_view_func: 
+
 <!-- ##### FUNCTION tny_platform_factory_new_account_store ##### -->
 <para>
 

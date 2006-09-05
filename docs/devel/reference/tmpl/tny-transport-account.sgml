@@ -17,6 +17,14 @@ A transport account and transport E-mail via a service and handles the authentic
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyTransportAccountIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@send_func: 
+
 <!-- ##### FUNCTION tny_transport_account_send ##### -->
 <para>
 

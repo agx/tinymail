@@ -24,6 +24,31 @@ A abstract type that contains the shared functionality of the #TnyStoreAccount a
 
 
 
+<!-- ##### STRUCT TnyAccountIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@is_connected_func: 
+@set_id_func: 
+@set_name_func: 
+@set_proto_func: 
+@set_user_func: 
+@set_hostname_func: 
+@set_url_string_func: 
+@set_pass_func_func: 
+@set_forget_pass_func_func: 
+@get_pass_func_func: 
+@get_forget_pass_func_func: 
+@get_id_func: 
+@get_name_func: 
+@get_proto_func: 
+@get_user_func: 
+@get_hostname_func: 
+@get_url_string_func: 
+@get_account_type_func: 
+
 <!-- ##### FUNCTION tny_account_type_get_type ##### -->
 <para>
 

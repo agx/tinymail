@@ -46,30 +46,6 @@ folder-lister
 memory-test
 
 
-<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Long_Description ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-account-store.sgml:See_Also ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Short_Description ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-account-store.sgml:Title ##### -->
-TnyAccountStore
-
-
 <!-- ##### SECTION ./tmpl/tny-device-priv.sgml:Long_Description ##### -->
 <para>
 
@@ -92,30 +68,6 @@ TnyAccountStore
 
 <!-- ##### SECTION ./tmpl/tny-device-priv.sgml:Title ##### -->
 tny-device-priv
-
-
-<!-- ##### SECTION ./tmpl/tny-device.sgml:Long_Description ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-device.sgml:See_Also ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-device.sgml:Short_Description ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-device.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-device.sgml:Title ##### -->
-TnyDevice
 
 
 <!-- ##### SECTION ./tmpl/tny-folder-list-iterator-priv.sgml:Long_Description ##### -->
@@ -262,55 +214,31 @@ TnyMsgHeaderProxy
 TnyPasswordDialog
 
 
-<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Long_Description ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:See_Also ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Short_Description ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-platform-factory.sgml:Title ##### -->
-TnyPlatformFactory
-
-
-<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Long_Description ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Long_Description ##### -->
 <para>
 You can let your summary window type implement this type. Not that it defines a lot at this moment.
 </para><para>
-Typical implementations will go in a composition relation with a type that implements #TnyAccountStoreView.
-The demo-ui of tinymail, however, *is* also a #TnyAccountStoreView implementation.
+Typical implementations will go in a composition relation with a type that implements #TnyAccountStoreViewIface.
+The demo-ui of tinymail, however, *is* also a #TnyAccountStoreViewIface implementation.
 </para>
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:See_Also ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:See_Also ##### -->
 <para>
-#TnyAccountStoreView, #TnyAccountStore
+#TnyAccountStoreViewIface, #TnyAccountStoreIface
 </para>
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Short_Description ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Short_Description ##### -->
 A type that defines a summary window
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Stability_Level ##### -->
+<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Stability_Level ##### -->
 
 
 
-<!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Title ##### -->
-TnySummaryWindow
+<!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Title ##### -->
+TnySummaryWindowIface
 
 
 <!-- ##### SECTION ./tmpl/tny-summary-window.sgml:Long_Description ##### -->
@@ -379,30 +307,6 @@ TnySummaryWindow
 
 <!-- ##### SECTION ./tmpl/tny-transport-account-priv.sgml:Title ##### -->
 tny-transport-account-priv
-
-
-<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Long_Description ##### -->
-<para>
-A transport account type implemented for camel.
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:See_Also ##### -->
-<para>
-#TnyStoreAccount, #TnyAccount, #TnyStoreAccount, #TnyAccount
-</para>
-
-
-<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Short_Description ##### -->
-A Camel transport account type
-
-
-<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Stability_Level ##### -->
-
-
-
-<!-- ##### SECTION ./tmpl/tny-transport-account.sgml:Title ##### -->
-TnyTransportAccount
 
 
 <!-- ##### USER_FUNCTION ForgetPassFunc ##### -->
@@ -541,17 +445,30 @@ TnyTransportAccount
 </para>
 
 
-<!-- ##### STRUCT TnyAccount ##### -->
+<!-- ##### STRUCT TnyAccountClass ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### STRUCT TnyAccountStore ##### -->
-<para>
-
-</para>
-
+@parent: 
+@is_connected_func: 
+@set_id_func: 
+@set_name_func: 
+@set_proto_func: 
+@set_user_func: 
+@set_hostname_func: 
+@set_url_string_func: 
+@set_pass_func_func: 
+@set_forget_pass_func_func: 
+@get_pass_func_func: 
+@get_forget_pass_func_func: 
+@get_id_func: 
+@get_name_func: 
+@get_proto_func: 
+@get_user_func: 
+@get_hostname_func: 
+@get_url_string_func: 
+@get_account_type_func: 
 
 <!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
 
@@ -581,6 +498,23 @@ TnyTransportAccount
 </para>
 
 @tnyaccountstoreiface: the object which received the signal.
+
+<!-- ##### STRUCT TnyAccountStoreClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@account_changed: 
+@account_inserted: 
+@account_removed: 
+@accounts_reloaded: 
+@get_accounts_func: 
+@add_store_account_func: 
+@add_transport_account_func: 
+@get_cache_dir_func: 
+@get_device_func: 
+@alert_func: 
 
 <!-- ##### STRUCT TnyAccountTreeModelClass ##### -->
 <para>
@@ -613,13 +547,6 @@ TnyTransportAccount
 @model: 
 @current: 
 
-<!-- ##### STRUCT TnyDevice ##### -->
-<para>
-
-</para>
-
-@parent: 
-
 <!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
 <para>
 
@@ -627,6 +554,18 @@ TnyTransportAccount
 
 @tnydeviceiface: the object which received the signal.
 @arg1: 
+
+<!-- ##### STRUCT TnyDeviceClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@is_online_func: 
+@force_online_func: 
+@force_offline_func: 
+@reset_func: 
+@connection_changed: 
 
 <!-- ##### STRUCT TnyDevicePriv ##### -->
 <para>
@@ -636,11 +575,29 @@ TnyTransportAccount
 @forced: 
 @fset: 
 
-<!-- ##### STRUCT TnyFolder ##### -->
+<!-- ##### STRUCT TnyFolderClass ##### -->
 <para>
 
 </para>
 
+@parent: 
+@folder_inserted: 
+@folders_reloaded: 
+@remove_message_func: 
+@expunge_func: 
+@get_message_func: 
+@get_headers_func: 
+@get_name_func: 
+@get_id_func: 
+@get_account_func: 
+@set_name_func: 
+@get_folder_type_func: 
+@get_all_count_func: 
+@get_unread_count_func: 
+@set_subscribed_func: 
+@get_subscribed_func: 
+@refresh_async_func: 
+@refresh_func: 
 
 <!-- ##### STRUCT TnyFolderList ##### -->
 <para>
@@ -691,6 +648,17 @@ TnyTransportAccount
 @parent: 
 @real: 
 
+<!-- ##### STRUCT TnyFolderStoreClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@remove_folder_func: 
+@create_folder_func: 
+@get_folders_func: 
+@get_folders_async_func: 
+
 <!-- ##### USER_FUNCTION TnyGetFoldersStatusCallback ##### -->
 <para>
 
@@ -719,18 +687,32 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @status: A status field
 @user_data: user data
 
-<!-- ##### STRUCT TnyHeader ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyHeaderClass ##### -->
 <para>
 
 </para>
 
-@parent_class: 
+@g: 
+@get_uid_func: 
+@get_bcc_func: 
+@get_cc_func: 
+@get_subject_func: 
+@get_to_func: 
+@get_from_func: 
+@get_replyto_func: 
+@get_message_id_func: 
+@get_date_received_func: 
+@get_date_sent_func: 
+@set_bcc_func: 
+@set_cc_func: 
+@set_from_func: 
+@set_subject_func: 
+@set_to_func: 
+@set_replyto_func: 
+@get_folder_func: 
+@get_flags_func: 
+@set_flags_func: 
+@unset_flags_func: 
 
 <!-- ##### STRUCT TnyHeaderListIterator ##### -->
 <para>
@@ -741,11 +723,31 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @model: 
 @current: 
 
-<!-- ##### STRUCT TnyList ##### -->
+<!-- ##### STRUCT TnyHeaderProxy ##### -->
 <para>
 
 </para>
 
+
+<!-- ##### STRUCT TnyHeaderProxyClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyIteratorClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@next_func: 
+@prev_func: 
+@first_func: 
+@nth_func: 
+@current_func: 
+@is_done: 
+@get_list_func: 
 
 <!-- ##### STRUCT TnyListClass ##### -->
 <para>
@@ -753,6 +755,13 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 </para>
 
 @parent: 
+@length_func: 
+@prepend_func: 
+@append_func: 
+@remove_func: 
+@foreach_func: 
+@copy_func: 
+@create_iterator_func: 
 
 <!-- ##### STRUCT TnyListIterator ##### -->
 <para>
@@ -771,11 +780,28 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @iterator_lock: 
 @first: 
 
-<!-- ##### STRUCT TnyMimePart ##### -->
+<!-- ##### STRUCT TnyMimePartClass ##### -->
 <para>
 
 </para>
 
+@parent: 
+@get_content_type_func: 
+@content_type_is_func: 
+@get_stream_func: 
+@decode_to_stream_func: 
+@write_to_stream_func: 
+@construct_from_stream_func: 
+@get_filename_func: 
+@get_content_id_func: 
+@get_description_func: 
+@get_content_location_func: 
+@set_content_location_func: 
+@set_description_func: 
+@set_content_id_func: 
+@set_filename_func: 
+@set_content_type_func: 
+@is_attachment_func: 
 
 <!-- ##### STRUCT TnyMimePartPriv ##### -->
 <para>
@@ -786,23 +812,18 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @part: 
 @cached_content_type: 
 
-<!-- ##### STRUCT TnyMsg ##### -->
+<!-- ##### STRUCT TnyMsgClass ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### STRUCT TnyMsgHeader ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyMsgHeaderClass ##### -->
-<para>
-
-</para>
-
+@parent: 
+@get_parts_func: 
+@get_header_func: 
+@get_folder_func: 
+@set_header_func: 
+@del_part_func: 
+@add_part_func: 
 
 <!-- ##### STRUCT TnyMsgHeader ##### -->
 <para>
@@ -885,12 +906,6 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 </para>
 
 
-<!-- ##### STRUCT TnyMsgHeaderView ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyMsgMimePart ##### -->
 <para>
 
@@ -920,41 +935,20 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @set_content_type_func: 
 @is_attachment_func: 
 
-<!-- ##### STRUCT TnyMsgView ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyMsgWindow ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyPasswordDialog ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnyPlatformFactory ##### -->
+<!-- ##### STRUCT TnyStoreAccountClass ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### STRUCT TnySaveStrategy ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyStoreAccount ##### -->
-<para>
-
-</para>
-
+@parent: 
+@subscribe_func: 
+@unsubscribe_func: 
 
 <!-- ##### STRUCT TnyStoreAccountPriv ##### -->
 <para>
@@ -965,6 +959,20 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @iter: 
 @managed_folders: 
 
+<!-- ##### STRUCT TnyStreamClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@read_func: 
+@write_func: 
+@flush_func: 
+@close_func: 
+@eos_func: 
+@reset_func: 
+@write_to_stream_func: 
+
 <!-- ##### STRUCT TnySummaryWindow ##### -->
 <para>
 
@@ -972,17 +980,13 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 
 @parent: 
 
-<!-- ##### STRUCT TnySummaryWindow ##### -->
+<!-- ##### STRUCT TnyTransportAccountClass ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### STRUCT TnyTransportAccount ##### -->
-<para>
-
-</para>
-
+@parent: 
+@send_func: 
 
 <!-- ##### STRUCT TnyTransportAccountPriv ##### -->
 <para>
@@ -1012,19 +1016,19 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @option: 
 
-<!-- ##### FUNCTION tny_account_get_type ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
 <!-- ##### FUNCTION tny_account_get_account_store ##### -->
 <para>
 
 </para>
 
 @self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_account_get_type ##### -->
+<para>
+
+</para>
+
 @Returns: 
 
 <!-- ##### FUNCTION tny_account_set_account_store ##### -->
@@ -1173,6 +1177,21 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @Returns: 
 
+<!-- ##### FUNCTION tny_folder_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_folder_new_with_folder ##### -->
+<para>
+
+</para>
+
+@camel_folder: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_folder_set_account ##### -->
 <para>
 
@@ -1180,6 +1199,14 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 
 @self: 
 @account: 
+
+<!-- ##### FUNCTION tny_folder_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@camel_folder: 
 
 <!-- ##### FUNCTION tny_folder_set_id ##### -->
 <para>
@@ -1196,29 +1223,6 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 
 @self: 
 
-<!-- ##### FUNCTION tny_folder_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-<!-- ##### FUNCTION tny_folder_new_with_folder ##### -->
-<para>
-
-</para>
-
-@camel_folder: 
-@Returns: 
-
-<!-- ##### FUNCTION tny_folder_set_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@camel_folder: 
-
 <!-- ##### FUNCTION tny_gtk_text_buffer_stream_set_gtk_text_buffer ##### -->
 <para>
 
@@ -1227,6 +1231,13 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @buffer: 
 
+<!-- ##### FUNCTION tny_header_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 <!-- ##### FUNCTION tny_header_set_folder ##### -->
 <para>
 
@@ -1234,13 +1245,6 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 
 @self: 
 @folder: 
-
-<!-- ##### FUNCTION tny_header_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
 
 <!-- ##### FUNCTION tny_iterator_has_first ##### -->
 <para>
@@ -1282,14 +1286,6 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @part: 
 
-<!-- ##### FUNCTION tny_msg_folder_get_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
 <!-- ##### FUNCTION tny_msg_folder_add_folder ##### -->
 <para>
 
@@ -1298,7 +1294,7 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @folder: 
 
-<!-- ##### FUNCTION tny_msg_folder_has_cache ##### -->
+<!-- ##### FUNCTION tny_msg_folder_get_folder ##### -->
 <para>
 
 </para>
@@ -1306,15 +1302,13 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @Returns: 
 
-<!-- ##### FUNCTION tny_msg_folder_refresh_headers_async ##### -->
+<!-- ##### FUNCTION tny_msg_folder_has_cache ##### -->
 <para>
 
 </para>
 
 @self: 
-@callback: 
-@status_callback: 
-@user_data: 
+@Returns: 
 
 <!-- ##### FUNCTION tny_msg_folder_new ##### -->
 <para>
@@ -1337,6 +1331,16 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 </para>
 
 @Returns: 
+
+<!-- ##### FUNCTION tny_msg_folder_refresh_headers_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 <!-- ##### FUNCTION tny_msg_folder_set_folder ##### -->
 <para>
@@ -1457,6 +1461,58 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @Returns: 
 
+<!-- ##### FUNCTION tny_msg_header_list_model_column_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_received_date_sort_func ##### -->
+<para>
+
+</para>
+
+@model: 
+@a: 
+@b: 
+@user_data: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_sent_date_sort_func ##### -->
+<para>
+
+</para>
+
+@model: 
+@a: 
+@b: 
+@user_data: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_header_list_model_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+@refresh: 
+
+<!-- ##### FUNCTION tny_msg_header_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_header_set_bcc ##### -->
 <para>
 
@@ -1529,6 +1585,14 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @uid: 
 
+<!-- ##### FUNCTION tny_msg_header_set_use_summary ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
 <!-- ##### FUNCTION tny_msg_header_uncache ##### -->
 <para>
 
@@ -1544,65 +1608,12 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @mask: 
 
-<!-- ##### FUNCTION tny_msg_header_list_model_column_get_type ##### -->
+<!-- ##### FUNCTION tny_msg_header_view_new ##### -->
 <para>
 
 </para>
 
 @Returns: 
-
-<!-- ##### FUNCTION tny_msg_header_list_model_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-<!-- ##### FUNCTION tny_msg_header_list_model_received_date_sort_func ##### -->
-<para>
-
-</para>
-
-@model: 
-@a: 
-@b: 
-@user_data: 
-@Returns: 
-
-<!-- ##### FUNCTION tny_msg_header_list_model_sent_date_sort_func ##### -->
-<para>
-
-</para>
-
-@model: 
-@a: 
-@b: 
-@user_data: 
-@Returns: 
-
-<!-- ##### FUNCTION tny_msg_header_list_model_set_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-@refresh: 
-
-<!-- ##### FUNCTION tny_msg_header_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-<!-- ##### FUNCTION tny_msg_header_set_use_summary ##### -->
-<para>
-
-</para>
-
-@self: 
-@val: 
 
 <!-- ##### FUNCTION tny_msg_header_view_set_header ##### -->
 <para>
@@ -1611,29 +1622,6 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 
 @self: 
 @header: 
-
-<!-- ##### FUNCTION tny_msg_header_view_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-<!-- ##### FUNCTION tny_msg_set_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-
-<!-- ##### FUNCTION tny_msg_mime_part_get_part ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
 
 <!-- ##### FUNCTION tny_msg_mime_part_construct_from_stream ##### -->
 <para>
@@ -1710,6 +1698,14 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @Returns: 
 
+<!-- ##### FUNCTION tny_msg_mime_part_get_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION tny_msg_mime_part_get_stream ##### -->
 <para>
 
@@ -1724,6 +1720,14 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 </para>
 
 @self: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_mime_part_new ##### -->
+<para>
+
+</para>
+
+@part: 
 @Returns: 
 
 <!-- ##### FUNCTION tny_msg_mime_part_set_content_id ##### -->
@@ -1774,22 +1778,6 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @self: 
 @index: 
 
-<!-- ##### FUNCTION tny_msg_mime_part_write_to_stream ##### -->
-<para>
-
-</para>
-
-@self: 
-@stream: 
-
-<!-- ##### FUNCTION tny_msg_mime_part_new ##### -->
-<para>
-
-</para>
-
-@part: 
-@Returns: 
-
 <!-- ##### FUNCTION tny_msg_mime_part_set_part ##### -->
 <para>
 
@@ -1797,6 +1785,14 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 
 @self: 
 @part: 
+
+<!-- ##### FUNCTION tny_msg_mime_part_write_to_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@stream: 
 
 <!-- ##### FUNCTION tny_msg_new ##### -->
 <para>
@@ -1822,12 +1818,28 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @parts: 
 @Returns: 
 
+<!-- ##### FUNCTION tny_msg_set_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
 <!-- ##### FUNCTION tny_msg_view_new ##### -->
 <para>
 
 </para>
 
 @save_strategy: 
+@Returns: 
+
+<!-- ##### FUNCTION tny_msg_window_new ##### -->
+<para>
+
+</para>
+
+@msgview: 
 @Returns: 
 
 <!-- ##### FUNCTION tny_msg_window_set_msg ##### -->
@@ -1837,14 +1849,6 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 
 @self: 
 @msg: 
-
-<!-- ##### FUNCTION tny_msg_window_new ##### -->
-<para>
-
-</para>
-
-@msgview: 
-@Returns: 
 
 <!-- ##### FUNCTION tny_password_dialog_get_password ##### -->
 <para>

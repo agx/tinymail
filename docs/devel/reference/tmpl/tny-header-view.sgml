@@ -24,6 +24,15 @@ with a #TnyMsgView implementation.
 </para>
 
 
+<!-- ##### STRUCT TnyHeaderViewIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@set_header_func: 
+@clear_func: 
+
 <!-- ##### FUNCTION tny_header_view_set_header ##### -->
 <para>
 

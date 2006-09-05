@@ -23,6 +23,14 @@ A type for showing an account store to the user.
 </para>
 
 
+<!-- ##### STRUCT TnyAccountStoreViewIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@set_account_store_func: 
+
 <!-- ##### FUNCTION tny_account_store_view_set_account_store ##### -->
 <para>
 

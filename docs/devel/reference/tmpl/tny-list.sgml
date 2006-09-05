@@ -17,6 +17,20 @@ An iteratable list type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyListIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@length_func: 
+@prepend_func: 
+@append_func: 
+@remove_func: 
+@foreach_func: 
+@copy_func: 
+@create_iterator_func: 
+
 <!-- ##### FUNCTION tny_list_length ##### -->
 <para>
 

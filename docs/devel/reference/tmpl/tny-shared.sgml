@@ -29,7 +29,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyListClass ##### -->
+<!-- ##### STRUCT TnyListIface ##### -->
 <para>
 
 </para>
@@ -43,7 +43,7 @@ Shared include file with forward typedefs
 @copy_func: 
 @create_iterator_func: 
 
-<!-- ##### STRUCT TnyIteratorClass ##### -->
+<!-- ##### STRUCT TnyIteratorIface ##### -->
 <para>
 
 </para>
@@ -63,7 +63,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyMsgClass ##### -->
+<!-- ##### STRUCT TnyMsgIface ##### -->
 <para>
 
 </para>
@@ -97,7 +97,7 @@ Shared include file with forward typedefs
 
 @tnyfolderiface: the object which received the signal.
 
-<!-- ##### STRUCT TnyFolderClass ##### -->
+<!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
 
 </para>
@@ -127,7 +127,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyHeaderClass ##### -->
+<!-- ##### STRUCT TnyHeaderIface ##### -->
 <para>
 
 </para>
@@ -160,7 +160,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyMimePartClass ##### -->
+<!-- ##### STRUCT TnyMimePartIface ##### -->
 <para>
 
 </para>
@@ -189,7 +189,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyAccountClass ##### -->
+<!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
 
 </para>
@@ -220,7 +220,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyDeviceClass ##### -->
+<!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
 
 </para>
@@ -238,7 +238,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyStoreAccountClass ##### -->
+<!-- ##### STRUCT TnyStoreAccountIface ##### -->
 <para>
 
 </para>
@@ -253,7 +253,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyTransportAccountClass ##### -->
+<!-- ##### STRUCT TnyTransportAccountIface ##### -->
 <para>
 
 </para>
@@ -273,7 +273,7 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### STRUCT TnyStreamClass ##### -->
+<!-- ##### STRUCT TnyStreamIface ##### -->
 <para>
 
 </para>
@@ -287,7 +287,7 @@ Shared include file with forward typedefs
 @reset_func: 
 @write_to_stream_func: 
 
-<!-- ##### STRUCT TnyAccountStoreClass ##### -->
+<!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
 
 </para>
@@ -303,18 +303,6 @@ Shared include file with forward typedefs
 @get_cache_dir_func: 
 @get_device_func: 
 @alert_func: 
-
-<!-- ##### STRUCT TnyHeaderProxy ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyHeaderProxyClass ##### -->
-<para>
-
-</para>
-
 
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
@@ -395,7 +383,7 @@ A callback function for tny_msg_folder_refresh_async that callsback when new inf
 </para>
 
 
-<!-- ##### STRUCT TnyFolderStoreClass ##### -->
+<!-- ##### STRUCT TnyFolderStoreIface ##### -->
 <para>
 
 </para>

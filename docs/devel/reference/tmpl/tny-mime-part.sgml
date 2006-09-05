@@ -17,6 +17,29 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyMimePartIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_content_type_func: 
+@content_type_is_func: 
+@get_stream_func: 
+@decode_to_stream_func: 
+@write_to_stream_func: 
+@construct_from_stream_func: 
+@get_filename_func: 
+@get_content_id_func: 
+@get_description_func: 
+@get_content_location_func: 
+@set_content_location_func: 
+@set_description_func: 
+@set_content_id_func: 
+@set_filename_func: 
+@set_content_type_func: 
+@is_attachment_func: 
+
 <!-- ##### FUNCTION tny_mime_part_get_content_type ##### -->
 <para>
 

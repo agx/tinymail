@@ -17,6 +17,17 @@ A abstract type that contains child folders
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyFolderStoreIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@remove_folder_func: 
+@create_folder_func: 
+@get_folders_func: 
+@get_folders_async_func: 
+
 <!-- ##### FUNCTION tny_folder_store_remove_folder ##### -->
 <para>
 

@@ -17,6 +17,20 @@ A stream is an object that can be written to and can be read from.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyStreamIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@read_func: 
+@write_func: 
+@flush_func: 
+@close_func: 
+@eos_func: 
+@reset_func: 
+@write_to_stream_func: 
+
 <!-- ##### FUNCTION tny_stream_read ##### -->
 <para>
 

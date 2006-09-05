@@ -24,6 +24,17 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 </para>
 
 
+<!-- ##### STRUCT TnyMsgViewIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@set_msg_func: 
+@set_save_strategy_func: 
+@set_unavailable_func: 
+@clear_func: 
+
 <!-- ##### FUNCTION tny_msg_view_set_msg ##### -->
 <para>
 
