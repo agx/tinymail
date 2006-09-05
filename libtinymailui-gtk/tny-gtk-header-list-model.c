@@ -960,12 +960,20 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolderIfac
 
 	/* Reset the internal iterator */
    
-    	/* TODO: Code review question (by Philip to myself, so don't ask 
+    	/* Code review question (by Philip to myself, so don't ask 
 	Philip), shouldn't this reset self->usable_index = FALSE ?*/
 
 	((TnyGtkHeaderListIterator*)self->iterator)->current = self->first;
 	self->last_nth = 0;
 
+    	/* Note to myself: After more code review I decided that the answer 
+	was yes ;-) */
+    
+    	self->usable_index = FALSE;
+	if (self->index)
+		g_list_free (self->index);
+	self->index = NULL;
+    
 	/* Reference the new folder instance */
 	g_object_ref (G_OBJECT (folder));
 	self->folder = folder;

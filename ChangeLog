@@ -1,6 +1,7 @@
 2006-09-05  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Renamed TnySummaryView to TnyDemouiSummaryView
+	* Bugfix in tny-gtk-header-list-model.c
 
 2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
 
