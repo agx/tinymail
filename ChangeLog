@@ -1,3 +1,7 @@
+2006-09-08  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed the Python bindings
+
 2006-09-06  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* The big commit we have all been waiting for: Removing the Iface

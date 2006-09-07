@@ -68,36 +68,40 @@ EXTRA_DIST = 				\
 # ls DIR/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\t\\\\/g
 
 tinymail.defs: tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py \
-	$(top_srcdir)/libtinymail/tny-folder-store.h	\
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			\
+	$(top_srcdir)/libtinymail/tny-folder-store.h		\
 	$(top_srcdir)/libtinymail/tny-folder-store-query.h	\
-	$(top_srcdir)/libtinymail/tny-account.h		\
-	$(top_srcdir)/libtinymail/tny-account-store.h	\
-	$(top_srcdir)/libtinymail/tny-device.h		\
+	$(top_srcdir)/libtinymail/tny-account.h			\
+	$(top_srcdir)/libtinymail/tny-account-store.h		\
+	$(top_srcdir)/libtinymail/tny-device.h			\
 	$(top_srcdir)/libtinymail/tny-fs-stream.h		\
 	$(top_srcdir)/libtinymail/tny-iterator.h		\
 	$(top_srcdir)/libtinymail/tny-simple-list.h		\
-	$(top_srcdir)/libtinymail/tny-list.h		\
-	$(top_srcdir)/libtinymail/tny-folder.h		\
-	$(top_srcdir)/libtinymail/tny-header.h		\
-	$(top_srcdir)/libtinymail/tny-msg.h		\
+	$(top_srcdir)/libtinymail/tny-list.h			\
+	$(top_srcdir)/libtinymail/tny-folder.h			\
+	$(top_srcdir)/libtinymail/tny-header.h			\
+	$(top_srcdir)/libtinymail/tny-msg.h			\
 	$(top_srcdir)/libtinymail/tny-mime-part.h		\
 	$(top_srcdir)/libtinymail/tny-shared.h			\
-	$(top_srcdir)/libtinymail/tny-store-account.h 	\
-	$(top_srcdir)/libtinymail/tny-stream.h 		\
-	$(top_srcdir)/libtinymail/tny-transport-account.h | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymail.defs.extra > $@
+	$(top_srcdir)/libtinymail/tny-store-account.h 		\
+	$(top_srcdir)/libtinymail/tny-stream.h 			\
+	$(top_srcdir)/libtinymail/tny-transport-account.h | 	\
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 	\
+	--extra=$(top_srcdir)/bindings/python/tinymail.defs.extra \
+	--topsrcdir=$(top_srcdir) > $@
 
 tinymailui.defs: tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			   \
-	$(top_srcdir)/libtinymailui/tny-account-store-view.h \
-	$(top_srcdir)/libtinymailui/tny-header-view.h	   \
-	$(top_srcdir)/libtinymailui/tny-msg-view.h	   \
-	$(top_srcdir)/libtinymailui/tny-msg-window.h	   \
-	$(top_srcdir)/libtinymailui/tny-platform-factory.h   \
-	$(top_srcdir)/libtinymailui/tny-save-strategy.h	   \
-	$(top_srcdir)/libtinymailui/tny-summary-view.h |	   \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymailui.defs.extra > $@
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py 			\
+	$(top_srcdir)/libtinymailui/tny-account-store-view.h 	\
+	$(top_srcdir)/libtinymailui/tny-header-view.h	   	\
+	$(top_srcdir)/libtinymailui/tny-msg-view.h	   	\
+	$(top_srcdir)/libtinymailui/tny-msg-window.h	   	\
+	$(top_srcdir)/libtinymailui/tny-platform-factory.h   	\
+	$(top_srcdir)/libtinymailui/tny-save-strategy.h	   	\
+	$(top_srcdir)/libtinymailui/tny-summary-view.h |	\
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 	\
+	--extra=$(top_srcdir)/bindings/python/tinymailui.defs.extra \
+	--topsrcdir=$(top_srcdir) > $@
 
 
 tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
@@ -110,12 +114,16 @@ tinymailui-gtk.defs: tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/fil
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-save-strategy.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h |	\
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 		\
+	--extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra \
+	--topsrcdir=$(top_srcdir) > $@
 
 tinymail-platform.defs : tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py				  \
 	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs` | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py --extra=$(top_srcdir)/bindings/python/tinymail-platform.defs.extra > $@
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 		  \
+	--extra=$(top_srcdir)/bindings/python/tinymail-platform.defs.extra \
+	--topsrcdir=$(top_srcdir) > $@
 
 tinymail-glue.c: tinymail.defs tinymail.override
 	$(PYGTK_CODEGEN) --prefix pytinymail				\
