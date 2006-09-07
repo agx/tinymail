@@ -17,6 +17,12 @@ An iterator for #TnyList
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyIterator ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyIteratorIface ##### -->
 <para>
 

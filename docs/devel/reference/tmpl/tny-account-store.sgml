@@ -37,6 +37,12 @@ A type that returns stored (configured) accounts. Both transport and store accou
 </para>
 
 
+<!-- ##### STRUCT TnyAccountStore ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
 

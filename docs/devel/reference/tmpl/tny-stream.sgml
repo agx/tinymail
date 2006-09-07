@@ -17,6 +17,12 @@ A stream is an object that can be written to and can be read from.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyStream ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyStreamIface ##### -->
 <para>
 

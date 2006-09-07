@@ -3,7 +3,6 @@
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
 
-<!ENTITY libtinymail-Shared SYSTEM "xml/tny-shared.xml">
 <!ENTITY libtinymail-TnyAccount SYSTEM "xml/tny-account.xml">
 <!ENTITY libtinymail-TnyStoreAccount SYSTEM "xml/tny-store-account.xml">
 <!ENTITY libtinymail-TnyFolderStore SYSTEM "xml/tny-folder-store.xml">
@@ -98,7 +97,6 @@
 
 	<chapter id="libtinymail">
 		<title>libtinymail</title>
-		&libtinymail-Shared;		
 		&libtinymail-TnyAccountStore;
 		&libtinymail-TnyFolderStore;
 		&libtinymail-TnyFolderStoreQuery;

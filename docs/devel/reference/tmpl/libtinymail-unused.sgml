@@ -214,6 +214,30 @@ TnyMsgHeaderProxy
 TnyPasswordDialog
 
 
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Short_Description ##### -->
+Shared include file with forward typedefs
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Title ##### -->
+tny-shared
+
+
 <!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Long_Description ##### -->
 <para>
 You can let your summary window type implement this type. Not that it defines a lot at this moment.
@@ -459,12 +483,6 @@ Implemented by GLib or a noop
 </para>
 
 
-<!-- ##### STRUCT TnyAccount ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyAccountClass ##### -->
 <para>
 
@@ -567,12 +585,6 @@ Implemented by GLib or a noop
 @model: 
 @current: 
 
-<!-- ##### STRUCT TnyDevice ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
 <para>
 
@@ -600,27 +612,6 @@ Implemented by GLib or a noop
 
 @forced: 
 @fset: 
-
-<!-- ##### STRUCT TnyFolder ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SIGNAL TnyFolder::folder-inserted ##### -->
-<para>
-
-</para>
-
-@tnyfolderiface: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
-<para>
-
-</para>
-
-@tnyfolderiface: the object which received the signal.
 
 <!-- ##### STRUCT TnyFolderClass ##### -->
 <para>
@@ -695,12 +686,6 @@ Implemented by GLib or a noop
 @parent: 
 @real: 
 
-<!-- ##### STRUCT TnyFolderStore ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyFolderStoreClass ##### -->
 <para>
 
@@ -712,6 +697,20 @@ Implemented by GLib or a noop
 @get_folders_func: 
 @get_folders_async_func: 
 
+<!-- ##### STRUCT TnyFolderStoreQueryClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyFolderStoreQueryItemClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
 <!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
 <para>
 This function is used to tell the application that the authentication information it provided via #TnyGetPassFunc was rejected by the service.
@@ -721,6 +720,13 @@ It can typically be used to tell a key service, like GNOME key ring, to forget t
 </para>
 
 @self:  The #TnyAccount instance of which the password was not accepted
+
+<!-- ##### STRUCT TnyFsStreamClass ##### -->
+<para>
+
+</para>
+
+@parent: 
 
 <!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
 <para>
@@ -773,12 +779,6 @@ is typically implemented in the #TnyAccountStore implementation and shared betwe
 @cancel: A byref gboolean variable. If the user cancelled the request, set this to TRUE
 @Returns: A newly allocated string with the authentication information (the password)
 
-<!-- ##### STRUCT TnyHeader ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyHeaderClass ##### -->
 <para>
 
@@ -827,12 +827,6 @@ is typically implemented in the #TnyAccountStore implementation and shared betwe
 </para>
 
 
-<!-- ##### STRUCT TnyIterator ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyIteratorClass ##### -->
 <para>
 
@@ -846,12 +840,6 @@ is typically implemented in the #TnyAccountStore implementation and shared betwe
 @current_func: 
 @is_done: 
 @get_list_func: 
-
-<!-- ##### STRUCT TnyList ##### -->
-<para>
-
-</para>
-
 
 <!-- ##### STRUCT TnyListClass ##### -->
 <para>
@@ -884,12 +872,6 @@ is typically implemented in the #TnyAccountStore implementation and shared betwe
 @iterator_lock: 
 @first: 
 
-<!-- ##### STRUCT TnyMimePart ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyMimePartClass ##### -->
 <para>
 
@@ -921,12 +903,6 @@ is typically implemented in the #TnyAccountStore implementation and shared betwe
 @part_lock: 
 @part: 
 @cached_content_type: 
-
-<!-- ##### STRUCT TnyMsg ##### -->
-<para>
-
-</para>
-
 
 <!-- ##### STRUCT TnyMsgClass ##### -->
 <para>
@@ -1076,11 +1052,12 @@ A callback function for tny_msg_folder_refresh_async that callsback when new inf
 @status: A status field
 @user_data: user data
 
-<!-- ##### STRUCT TnyStoreAccount ##### -->
+<!-- ##### STRUCT TnySimpleListClass ##### -->
 <para>
 
 </para>
 
+@parent: 
 
 <!-- ##### STRUCT TnyStoreAccountClass ##### -->
 <para>
@@ -1099,12 +1076,6 @@ A callback function for tny_msg_folder_refresh_async that callsback when new inf
 @iter_store: 
 @iter: 
 @managed_folders: 
-
-<!-- ##### STRUCT TnyStream ##### -->
-<para>
-
-</para>
-
 
 <!-- ##### STRUCT TnyStreamClass ##### -->
 <para>
@@ -1126,12 +1097,6 @@ A callback function for tny_msg_folder_refresh_async that callsback when new inf
 </para>
 
 @parent: 
-
-<!-- ##### STRUCT TnyTransportAccount ##### -->
-<para>
-
-</para>
-
 
 <!-- ##### STRUCT TnyTransportAccountClass ##### -->
 <para>
