@@ -33,6 +33,12 @@ G_BEGIN_DECLS
 
 #define TNY_TYPE_ACCOUNT_TYPE (tny_account_type_get_type())
 
+#ifndef TNY_SHARED_H
+typedef enum _TnyAccountType TnyAccountType;
+typedef struct _TnyAccount TnyAccount;
+typedef struct _TnyAccountIface TnyAccountIface;
+#endif
+
 enum _TnyAccountType
 {
 	TNY_ACCOUNT_TYPE_STORE,

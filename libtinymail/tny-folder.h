@@ -39,6 +39,12 @@ G_BEGIN_DECLS
 extern guint *tny_folder_signals;
 #endif
 
+#ifndef TNY_SHARED_H
+typedef enum _TnyFolderType TnyFolderType;
+typedef struct _TnyFolder TnyFolder;
+typedef struct _TnyFolderIface TnyFolderIface;
+#endif
+
 enum
 {
 	TNY_FOLDER_FOLDER_INSERTED,

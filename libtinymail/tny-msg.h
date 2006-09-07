@@ -33,6 +33,11 @@ G_BEGIN_DECLS
 #define TNY_IS_MSG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG))
 #define TNY_MSG_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_MSG, TnyMsgIface))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyMsg TnyMsg;
+typedef struct _TnyMsgIface TnyMsgIface;
+#endif
+
 struct _TnyMsgIface
 {
 	GTypeInterface parent;

@@ -38,6 +38,11 @@ G_BEGIN_DECLS
 #define TNY_IS_FS_STREAM_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_FS_STREAM))
 #define TNY_FS_STREAM_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_FS_STREAM, TnyFsStreamClass))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyFsStream TnyFsStream;
+typedef struct _TnyFsStream TnyFsStreamClass;
+#endif
+
 struct _TnyFsStream
 {
 	GObject parent;

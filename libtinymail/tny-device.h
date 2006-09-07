@@ -41,6 +41,11 @@ enum
 	TNY_DEVICE_LAST_SIGNAL
 };
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyDevice TnyDevice;
+typedef struct _TnyDeviceIface TnyDeviceIface;
+#endif
+
 struct _TnyDeviceIface
 {
 	GTypeInterface parent;

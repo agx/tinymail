@@ -316,6 +316,20 @@ tny-transport-account-priv
 
 @self: 
 
+<!-- ##### MACRO G_LIKELY ##### -->
+<para>
+Implemented by GLib or a noop
+</para>
+
+@expr: the expression
+
+<!-- ##### MACRO G_UNLIKELY ##### -->
+<para>
+Implemented by GLib or a noop
+</para>
+
+@expr: the expression
+
 <!-- ##### USER_FUNCTION GetPassFunc ##### -->
 <para>
 
@@ -445,6 +459,12 @@ tny-transport-account-priv
 </para>
 
 
+<!-- ##### STRUCT TnyAccount ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyAccountClass ##### -->
 <para>
 
@@ -547,6 +567,12 @@ tny-transport-account-priv
 @model: 
 @current: 
 
+<!-- ##### STRUCT TnyDevice ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
 <para>
 
@@ -574,6 +600,27 @@ tny-transport-account-priv
 
 @forced: 
 @fset: 
+
+<!-- ##### STRUCT TnyFolder ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL TnyFolder::folder-inserted ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
 
 <!-- ##### STRUCT TnyFolderClass ##### -->
 <para>
@@ -648,6 +695,12 @@ tny-transport-account-priv
 @parent: 
 @real: 
 
+<!-- ##### STRUCT TnyFolderStore ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyFolderStoreClass ##### -->
 <para>
 
@@ -658,6 +711,25 @@ tny-transport-account-priv
 @create_folder_func: 
 @get_folders_func: 
 @get_folders_async_func: 
+
+<!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
+<para>
+This function is used to tell the application that the authentication information it provided via #TnyGetPassFunc was rejected by the service.
+</para>
+<para>
+It can typically be used to tell a key service, like GNOME key ring, to forget the authentication information. This way will a new request for the password typically result in asking to user to type new authentication information.
+</para>
+
+@self:  The #TnyAccount instance of which the password was not accepted
+
+<!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
+@user_data: 
 
 <!-- ##### USER_FUNCTION TnyGetFoldersStatusCallback ##### -->
 <para>
@@ -686,6 +758,26 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @what: What happened
 @status: A status field
 @user_data: user data
+
+<!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
+<para>
+A type used for callback functions that implement asking and the user for a password or other authentication data of an account.
+</para>
+<para>
+It's typically implemented to use a key service, like GNOME key ring. This of course depends on the platform. The function
+is typically implemented in the #TnyAccountStore implementation and shared between all accounts in the store.
+</para>
+
+@self: The #TnyAccount instance for which the password is going to be used
+@prompt: Prompt to provide to the user
+@cancel: A byref gboolean variable. If the user cancelled the request, set this to TRUE
+@Returns: A newly allocated string with the authentication information (the password)
+
+<!-- ##### STRUCT TnyHeader ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### STRUCT TnyHeaderClass ##### -->
 <para>
@@ -735,6 +827,12 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 </para>
 
 
+<!-- ##### STRUCT TnyIterator ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyIteratorClass ##### -->
 <para>
 
@@ -748,6 +846,12 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @current_func: 
 @is_done: 
 @get_list_func: 
+
+<!-- ##### STRUCT TnyList ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### STRUCT TnyListClass ##### -->
 <para>
@@ -780,6 +884,12 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @iterator_lock: 
 @first: 
 
+<!-- ##### STRUCT TnyMimePart ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyMimePartClass ##### -->
 <para>
 
@@ -811,6 +921,12 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @part_lock: 
 @part: 
 @cached_content_type: 
+
+<!-- ##### STRUCT TnyMsg ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### STRUCT TnyMsgClass ##### -->
 <para>
@@ -941,6 +1057,31 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 </para>
 
 
+<!-- ##### USER_FUNCTION TnyRefreshFolderCallback ##### -->
+<para>
+A callback function for tny_msg_folder_refresh_async that callsback when the headers are refreshed. The function is typically used for putting a tny_msg_folder_get_headers in. It can for example be used for updating a header summary view.
+</para>
+
+@self: The #TnyFolder
+@cancelled: Whether or not a cancellation occured.
+@user_data: user data
+
+<!-- ##### USER_FUNCTION TnyRefreshFolderStatusCallback ##### -->
+<para>
+A callback function for tny_msg_folder_refresh_async that callsback when new information about refreshing headers is available. The function is typically used for updating a progress bar or writing to a status bar.
+</para>
+
+@self: The #TnyFolder
+@what: What happened
+@status: A status field
+@user_data: user data
+
+<!-- ##### STRUCT TnyStoreAccount ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyStoreAccountClass ##### -->
 <para>
 
@@ -958,6 +1099,12 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 @iter_store: 
 @iter: 
 @managed_folders: 
+
+<!-- ##### STRUCT TnyStream ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### STRUCT TnyStreamClass ##### -->
 <para>
@@ -979,6 +1126,12 @@ A callback function for tny_msg_folder_refresh_headers_async that callsback when
 </para>
 
 @parent: 
+
+<!-- ##### STRUCT TnyTransportAccount ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### STRUCT TnyTransportAccountClass ##### -->
 <para>

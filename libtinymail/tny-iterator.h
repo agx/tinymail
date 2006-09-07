@@ -32,6 +32,11 @@ G_BEGIN_DECLS
 #define TNY_IS_ITERATOR(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_ITERATOR))
 #define TNY_ITERATOR_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_ITERATOR, TnyIteratorIface))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyIterator TnyIterator;
+typedef struct _TnyIteratorIface TnyIteratorIface;
+#endif
+
 struct _TnyIteratorIface
 {
 	GTypeInterface parent;

@@ -47,7 +47,7 @@ CFILE_GLOB=$(top_srcdir)/libtinymail/*.c $(top_srcdir)/libtinymailui/*.c $(top_s
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=tny-account-priv.h tny-attach-list-model-priv.h tny-msg-folder-priv.h tny-msg-priv.h
+IGNORE_HFILES=tny-shared.h *-priv.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png

@@ -45,6 +45,12 @@ G_BEGIN_DECLS
 
 #define TNY_TYPE_HEADER_FLAGS (tny_header_flags_get_type())
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyHeader TnyHeader;
+typedef struct _TnyHeaderIface TnyHeaderIface;
+typedef enum _TnyHeaderFlags TnyHeaderFlags;
+#endif
+
 enum _TnyHeaderFlags 
 {
 	TNY_HEADER_FLAG_ANSWERED = 1<<0,

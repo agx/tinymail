@@ -33,6 +33,11 @@ G_BEGIN_DECLS
 #define TNY_IS_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MIME_PART))
 #define TNY_MIME_PART_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_MIME_PART, TnyMimePartIface))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyMimePart TnyMimePart;
+typedef struct _TnyMimePartIface TnyMimePartIface;
+#endif
+
 struct _TnyMimePartIface
 {
 	GTypeInterface parent;

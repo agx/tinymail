@@ -35,6 +35,10 @@ G_BEGIN_DECLS
 #define TNY_IS_STORE_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_STORE_ACCOUNT))
 #define TNY_STORE_ACCOUNT_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_STORE_ACCOUNT, TnyStoreAccountIface))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyStoreAccount TnyStoreAccount;
+typedef struct _TnyStoreAccountIface TnyStoreAccountIface;
+#endif
 
 struct _TnyStoreAccountIface
 {

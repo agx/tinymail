@@ -33,6 +33,11 @@ G_BEGIN_DECLS
 #define TNY_IS_LIST(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_LIST))
 #define TNY_LIST_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_LIST, TnyListIface))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyList TnyList;
+typedef struct _TnyListIface TnyListIface;
+#endif
+
 struct _TnyListIface
 {
 	GTypeInterface parent;

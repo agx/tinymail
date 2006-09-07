@@ -22,6 +22,9 @@
 
 G_BEGIN_DECLS
 
+typedef struct _TnyAccountStore TnyAccountStore;
+typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
+
 typedef struct _TnyList TnyList;
 typedef struct _TnyIterator TnyIterator;
 typedef struct _TnyListIface TnyListIface;
@@ -42,10 +45,8 @@ typedef struct _TnyStoreAccount TnyStoreAccount;
 typedef struct _TnyStoreAccountIface TnyStoreAccountIface;
 typedef struct _TnyTransportAccount TnyTransportAccount;
 typedef struct _TnyTransportAccountIface TnyTransportAccountIface;
-typedef struct _TnyAccountStore TnyAccountStore;
 typedef struct _TnyStream TnyStream;
 typedef struct _TnyStreamIface TnyStreamIface;
-typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);
 typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, gpointer user_data);

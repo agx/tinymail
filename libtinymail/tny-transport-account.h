@@ -33,6 +33,11 @@ G_BEGIN_DECLS
 #define TNY_IS_TRANSPORT_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_TRANSPORT_ACCOUNT))
 #define TNY_TRANSPORT_ACCOUNT_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_TRANSPORT_ACCOUNT, TnyTransportAccountIface))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyTransportAccount TnyTransportAccount;
+typedef struct _TnyTransportAccountIface TnyTransportAccountIface;
+#endif
+
 struct _TnyTransportAccountIface
 {
 	GTypeInterface parent;

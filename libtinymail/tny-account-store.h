@@ -62,8 +62,12 @@ enum _TnyGetAccountsRequestType
 extern guint *tny_account_store_signals;
 #endif
 
-struct _TnyAccountStoreIface
-{
+#ifndef TNY_SHARED_H
+typedef struct _TnyAccountStore TnyAccountStore;
+typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
+#endif
+
+struct _TnyAccountStoreIface {
 	GTypeInterface parent;
 
 	/* Signals */

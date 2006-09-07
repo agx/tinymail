@@ -33,6 +33,11 @@ G_BEGIN_DECLS
 #define TNY_IS_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_STREAM))
 #define TNY_STREAM_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_STREAM, TnyStreamIface))
 
+#ifndef TNY_SHARED_H
+typedef struct _TnyStream TnyStream;
+typedef struct _TnyStreamIface TnyStreamIface;
+#endif
+
 struct _TnyStreamIface
 {
 	GTypeInterface parent;
