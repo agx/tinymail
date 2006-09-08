@@ -26,6 +26,7 @@ Most people will not have to care about this type a lot. Most people should simp
 follow the guidelines for implementing a #TnyAccountStore and after that always
 develop against the #TnyAccountStore interface API using an instance of their implementation.
 </para>
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyDevice, #TnyAccount, #TnyStoreAccount, #TnyTransportAccount, #TnyCamelStoreAccount, #TnyCamelTransportAccount
