@@ -259,7 +259,7 @@ tny_account_store_base_init (gpointer g_class)
 		tny_account_store_signals = g_new0 (guint, TNY_ACCOUNT_STORE_LAST_SIGNAL);
 
 /**
- * TnyAccountStore::account_changed:
+ * TnyAccountStore::account-changed
  * @self: the object on which the signal is emitted
  * @arg1: the #TnyAccount of the account that changed
  * @user_data: user data set when the signal handler was connected
@@ -276,7 +276,7 @@ tny_account_store_base_init (gpointer g_class)
 			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT);
 
 /**
- * TnyAccountStore::account_inserted:
+ * TnyAccountStore::account-inserted
  * @self: the object on which the signal is emitted
  * @arg1: the #TnyAccount of the account that got inserted
  * @user_data: user data set when the signal handler was connected.
@@ -295,7 +295,7 @@ tny_account_store_base_init (gpointer g_class)
 			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT);
 
 /**
- * TnyAccountStore::account_removed:
+ * TnyAccountStore::account-removed
  * @self: the object on which the signal is emitted
  * @arg1: the #TnyAccount of the account that got removed
  * @user_data: user data set when the signal handler was connected.
@@ -312,7 +312,7 @@ tny_account_store_base_init (gpointer g_class)
 			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT);
 
 /**
- * TnyAccountStore::accounts_reloaded:
+ * TnyAccountStore::accounts-reloaded
  * @self: the object on which the signal is emitted
  *
  * Emitted when the store reloads the accounts

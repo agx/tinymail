@@ -413,7 +413,7 @@ tny_folder_base_init (gpointer g_class)
 		tny_folder_signals = g_new0 (guint, TNY_FOLDER_LAST_SIGNAL);
 
 /**
- * TnyFolder::folder_inserted:
+ * TnyFolder::folder-inserted
  * @self: the object on which the signal is emitted
  * @arg1: The folder that got inserted
  * @folder: the #TnyFolder as the added folder
@@ -430,7 +430,7 @@ tny_folder_base_init (gpointer g_class)
 			G_TYPE_NONE, 1, TNY_TYPE_FOLDER);
 
 /**
- * TnyFolder::folders_reloaded:
+ * TnyFolder::folders-reloaded
  * @self: the object on which the signal is emitted
  *
  * Emitted when the folder gets reloaded.
