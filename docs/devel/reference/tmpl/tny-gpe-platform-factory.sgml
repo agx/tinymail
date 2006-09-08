@@ -2,16 +2,16 @@
 TnyGpePlatformFactory
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A platform factory type for GPE
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyPlatformFactory implementation that will give you a #TnyGtkMsgView with a #TnyGtkStrategy, a #TnyGpeAccountStore and a #TnyGpeDevice.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyGtkMsgView, #TnyGtkStrategy, #TnyGpeAccountStore, #TnyGpeDevice
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

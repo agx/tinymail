@@ -2,16 +2,16 @@
 TnyMaemoAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A account store type for Maemo devices
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyAccountStore implementation for Maemo devices
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

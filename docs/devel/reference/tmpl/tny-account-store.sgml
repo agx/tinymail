@@ -2,11 +2,11 @@
 TnyAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-A store for accounts
+A type that defines a store for accounts
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type that returns stored (configured) accounts. Both transport and store accounts.
+A abstract type that defines a store for accounts
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

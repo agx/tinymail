@@ -2,16 +2,16 @@
 TnyOlpcAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A account store for the OLPC device
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyAccountStore implementation for the OLPC device that uses a inifile for storing the account information
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

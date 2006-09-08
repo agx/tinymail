@@ -2,21 +2,24 @@
 TnyGtkMsgView
 
 <!-- ##### SECTION Short_Description ##### -->
-A implementation of #TnyMsgView for Gtk+.
+A message view type for Gtk+.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type that uses the #GtkTextBuffer and #GtkTextView types for displaying the message.
-</para><para>
-It obviously doesn't support showing HTML formatted content. It will, however,
+A #TnyMsgView implementation that uses the #GtkTextBuffer and #GtkTextView 
+for displaying the message.
+</para>
+<para>
+ It doesn't support viewing formatted HTML messages. It will, however,
 display the source code of such content.
-</para><para>
+</para>
+<para>
 This type is coupled with the #TnyTextBufferStream.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsg, #TnyMsgMimePart, #TnyTextBufferStream, #GtkTextBuffer, #GtkTextView
+#TnyMsg, #TnyMsgView, #TnyMimePart, #TnyTextBufferStream, #GtkTextBuffer, #GtkTextView
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

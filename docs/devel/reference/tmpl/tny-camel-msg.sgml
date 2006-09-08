@@ -2,19 +2,19 @@
 TnyCamelMsg
 
 <!-- ##### SECTION Short_Description ##### -->
-A Camel implementation of the #TnyMsg
+A message type for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #TnyMsg proxy for the #CamelMimeMessage type in Camel. It inherits from #TnyMsgMimePart and can
-therefore be used as a mime part. 
+A #TnyMsg implementation that plays proxy for the #CamelMimeMessage type in Camel.
+It inherits from #TnyCamelMimePart and can therefore be used as a mime part too. 
 </para><para>
-This implementation is coupled with #TnyMsgMimePart.
+This implementation is coupled with #TnyCamelMimePart.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsg, #CamelMimeMessage, #TnyMsgMimePart, #TnyMsgMimePart
+#TnyMsg, #TnyCamelMimePart, #TnyMimePart
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

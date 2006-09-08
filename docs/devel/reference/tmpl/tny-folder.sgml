@@ -6,19 +6,12 @@ A type that defines a folder
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A folder contains headers and children folders. A folder can have a account or another 
-folder as parent. An implementation of a #TnyStoreAccount will typically keep
-track of instances of this type.
-</para><para>
-If you got them from a #TnyStoreAccount implementation,
-you typically don't destroy instances of this type. The #TnyStoreAccount implementation
-will do that for you upon destruction of the account. You can, however, uncache the folder 
-instances. Depending on the implementation, this will reduce memory usage.
+A abstract type that defines a folder
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderStore, #TnyStoreAccount
+#TnyFolderStore, #TnyStoreAccount, #TnyCamelFolder
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -11,7 +11,7 @@ An iteratable list type
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyIterator, #TnyMsgHeaderListModel
+#TnyIterator
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

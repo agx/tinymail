@@ -6,9 +6,9 @@ A #TnyStream as adaptor for a #CamelStream
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-This type adapts the #CamelStream to a #TnyStream. It's used in the 
-libtinymail-camel implementation library for converting a #CamelStream
-to a #TnyStream.
+This type adapts a #CamelStream to a #TnyStream. It's used in the 
+libtinymail-camel library for converting a #CamelStream to a
+#TnyStream.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

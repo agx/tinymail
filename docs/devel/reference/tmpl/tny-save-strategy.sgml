@@ -6,13 +6,13 @@ A strategy for saving a mime part
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type used by a #TnyMsgView instance for saving a #TnyMsgMimePart
-(like an attachment) to a file.
+A type typically used by a #TnyMsgView implementation for saving a #TnyMimePart or a #TnyMsg 
+(which inherits from #TnyMimePart) to a file.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgView, #TnyMsgMimePart
+#TnyMsgView, #TnyMimePart, #TnyMsg
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

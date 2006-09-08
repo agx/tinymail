@@ -2,11 +2,13 @@
 TnyIterator
 
 <!-- ##### SECTION Short_Description ##### -->
-An iterator for #TnyList
+An iterator type for a list
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-An iterator for #TnyList
+An iterator for a #TnyList is used for iterating over a list. The iterator is an instance that keeps the
+position state information. The #TnyList instance will not by itself keep a position state. Only iterators
+can keep a position state for a list.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

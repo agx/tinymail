@@ -6,12 +6,12 @@ A simple list implementation
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A simple list implementation that uses a GList internally
+A simple list implementation that uses a #GList (a doubly linked list) internally
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyList
+#TnyList, #GList
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

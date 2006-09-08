@@ -6,7 +6,7 @@ A store account type implemented for camel.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A store account type implemented for camel.
+A #TnyStoreAccount implemented using camel.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

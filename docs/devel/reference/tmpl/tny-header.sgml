@@ -10,10 +10,13 @@ A header of a #TnyMsg instance is the non-body information. It contains for exam
 the "to", the "from", the "subject" and the "sent-date" information. It's typically used 
 by a summary view to give the user an overview of the available messages in a folder.
 </para>
+<para>One #TnyHeader means all the typical headers. Not all headers but only the
+typical ones (like subject, from, dates and to). For getting all headers, wait for or 
+implement an API in #TnyMsg as you will need to fetch the entire message for that.</para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsg, #TnyFolder
+#TnyMsg, #TnyFolder, #TnyGtkHeaderListModel
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

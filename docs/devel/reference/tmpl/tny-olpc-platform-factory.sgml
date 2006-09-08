@@ -2,16 +2,16 @@
 TnyOlpcPlatformFactory
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A platform factory for a OLPC device
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyPlatformFactory that gives you a #TnyGtkMsgView with a #TnyGtkSaveStrategy, a #TnyOlpcDevice and a #TnyOlpcAccountStore
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyPlatformFactory, #TnyGtkMsgView, #TnyGtkSaveStrategy, #TnyOlpcDevice, #TnyOlpcAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -2,7 +2,7 @@
 TnyStoreAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-A type for getting folders (and E-mails) of an account
+A type for getting folders and E-mails of an account
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
@@ -11,7 +11,7 @@ A store account contains the folders of an E-mail service and handles the authen
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderStore, #TnyAccount, #TnyTransportAccount
+#TnyFolderStore, #TnyAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -2,11 +2,11 @@
 TnyAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-An interface that defines an account type
+A type that defines an account
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A abstract type that contains the shared functionality of the #TnyStoreAccount and the #TnyTransportAccount types.
+A abstract type that contains shared functionality of the #TnyStoreAccount and the #TnyTransportAccount types.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

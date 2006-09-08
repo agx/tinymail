@@ -8,12 +8,27 @@ A session type for Camel
 <para>
 A type being used internally by the libtinymail-camel implementation. It, 
 for example, observes the #TnyDevice instance for the online/offline
-status of the device.
+status of the device and registers the accounts with the Camel library.
 </para>
-
+<para>
+The Camel library uses the offline/online status for knowing whether it should
+attempt to get unavailable messages from the service and put them in cache or
+whether it should only try to read from that cache.
+</para>
+<para>
+The type is also used for delivering alert messages, like SSL certificate questions,
+to the account store, delivering passwords to the services and delivering the command
+to forget the password to the password store in case the service replied that the 
+password was incorrect.
+</para>
+<para>
+Most people will not have to care about this type a lot. Most people should simply
+follow the guidelines for implementing a #TnyAccountStore and after that always
+develop against the #TnyAccountStore interface API using an instance of their implementation.
+</para>
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyDevice, #TnyAccount, #TnyStoreAccount, #TnyTransportAccount
+#TnyDevice, #TnyAccount, #TnyStoreAccount, #TnyTransportAccount, #TnyCamelStoreAccount, #TnyCamelTransportAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

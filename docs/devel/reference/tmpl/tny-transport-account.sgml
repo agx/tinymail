@@ -11,7 +11,7 @@ A transport account and transport E-mail via a service and handles the authentic
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccount, #TnyAccount
+#TnyStoreAccount, #TnyAccount, #TnyCamelTransportAccount, #TnyCamelAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -11,7 +11,7 @@ A factory type that returns specific implementations for a specific platform.
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyDevice, #TnyMsgView, #TnyAccountStore
+#TnyDevice, #TnyMsgView, #TnySaveStrategy, #TnyAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

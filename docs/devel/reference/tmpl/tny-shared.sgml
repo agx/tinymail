@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-shared
+tny-shared.h
 
 <!-- ##### SECTION Short_Description ##### -->
 Shared include file with forward typedefs

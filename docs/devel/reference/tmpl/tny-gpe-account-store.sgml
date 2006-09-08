@@ -2,16 +2,16 @@
 TnyGpeAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A account store type for GPE
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyAccountStore implementation using GPE
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

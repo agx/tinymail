@@ -2,16 +2,16 @@
 TnyMaemoPlatformFactory
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A platform factory for Maemo
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyPlatformFactory that gives you a #TnyGtkMsgView with a #TnyGtkSaveStrategy, a #TnyMaemoDevice and a #TnyMaemoAccountStore
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyGtkMsgView, #TnyGtkSaveStrategy, #TnyMaemoDevice, #TnyMaemoAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -2,16 +2,16 @@
 TnyGnomeAccountStore
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A account store type for GNOME	
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyAccountStore implementation using GNOME's GConf and libtinymail-camel
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

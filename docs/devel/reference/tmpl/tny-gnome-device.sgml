@@ -2,11 +2,11 @@
 TnyGnomeDevice
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A device type for a GNOME desktop
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyDevice implementation that represents a GNOME desktop
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

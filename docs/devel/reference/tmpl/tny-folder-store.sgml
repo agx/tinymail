@@ -2,16 +2,16 @@
 TnyFolderStore
 
 <!-- ##### SECTION Short_Description ##### -->
-An interface that defines a store for folders
+An type that defines a store for folders
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A abstract type that contains child folders
+A abstract type that defines a store for child folders
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccount, #TnyStoreAccount, #TnyFolder, #TnyFolderStore
+#TnyStoreAccount, #TnyFolder, #TnyCamelFolder, #TnyCamelStoreAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -7,14 +7,13 @@ A type that defines a summary window
 <!-- ##### SECTION Long_Description ##### -->
 <para>
 You can let your summary window type implement this type. Not that it defines a lot at this moment.
-</para><para>
+</para>
+<para>
 Typical implementations will go in a composition relation with a type that implements #TnyAccountStoreViewIface.
-The demo-ui of tinymail, however, *is* also a #TnyAccountStoreViewIface implementation.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccountStoreViewIface, #TnyAccountStoreIface
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

@@ -5,13 +5,8 @@ TnyFsStream
 A #TnyStream adaptor for a file discriptor
 
 <!-- ##### SECTION Long_Description ##### -->
-<para>
-An adaptor for a file descriptor to a #TnyStream type. You need to
-use the standard POSIX open() syscall. </para>
-<para>The implementation will, upon
-destruction, close() the filedescriptor. This behaviour might change in
-future (as I'm not yet sure whether this is the best thing to do).
-</para>
+<para>An adaptor for a file descriptor to a #TnyStream type. You need to use the standard POSIX open() syscall. </para>
+<para>The instance will, upon destruction, close() the filedescriptor. </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>

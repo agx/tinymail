@@ -2,7 +2,7 @@
 TnyCamelIMAPFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-A IMAP #TnyFolder implementation for Camel
+A IMAP folder type for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

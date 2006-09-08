@@ -6,7 +6,7 @@ A type that defines a stream
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A stream is an object that can be written to and can be read from.
+A stream is an object that can be written to and can be read from in a streaming fashion.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

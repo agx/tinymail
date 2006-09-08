@@ -2,14 +2,11 @@
 TnyGtkHeaderListModel
 
 <!-- ##### SECTION Short_Description ##### -->
-A #GtkTreeModel suitable for storing #TnyHeader instances
+A tree model for storing header instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-This #GtkTreeModel implementation will attempt to aggressively uncache 
-#TnyHeader instances once their corresponding row in the 
-#GtkTreeView become invisible. This reduces memory usage.
-</para>
+It implements both #GtkTreeModel and #TnyList</para>
 <para>
 It's very important to unreference the instance you will get when doing something like this:
 <programlisting>
@@ -25,7 +22,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgView
+#TnyList, #GtkTreeModel, #TnyHeader
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

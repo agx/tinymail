@@ -7,12 +7,11 @@ A query for when you want to get a list of folders
 <!-- ##### SECTION Long_Description ##### -->
 <para>
 A query for when you want to get a list of folders from a #TnyFolderStore implementation
-
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderStore, #TnyFolder, #TnyFolder, #TnyStoreAccount, #TnyStoreAccount
+#TnyFolderStore, #TnyFolder, #TnyStoreAccount
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

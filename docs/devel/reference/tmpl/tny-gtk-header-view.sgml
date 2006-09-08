@@ -2,12 +2,11 @@
 TnyGtkHeaderView
 
 <!-- ##### SECTION Short_Description ##### -->
-A implementation of #TnyHeaderView for Gtk+
+A a header view type for Gtk+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A implementation of #TnyHeaderView that inherits the
-GtkTable.
+A #TnyHeaderView implementation that uses Gtk+ and inherits the GtkTable type.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

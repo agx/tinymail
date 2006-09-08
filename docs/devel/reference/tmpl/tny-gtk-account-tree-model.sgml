@@ -2,15 +2,16 @@
 TnyGtkAccountTreeModel
 
 <!-- ##### SECTION Short_Description ##### -->
-A #GtkTreeModel suitable for storing #TnyAccount instances
+A  tree model suitable for storing account instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #GtkTreeModel suitable for storing #TnyStoreAccount instances.
-</para><para>
-The implementation inherits the #GtkTreeStore. It recursively walks the
-folders of account instances that get added. Using it as a model for a
-#GtkTreeView will display the account name as parent row with the
+A #GtkTreeModel implementation for storing #TnyStoreAccount instances.
+</para>
+<para>
+The implementation inherits the #GtkTreeStore, implements #GtkTreeModel and #TnyList.
+It recursively walks the folders of account instances that get added. Using it as
+a model for a #GtkTreeView will display the account name as parent row with the
 account-folders as the child rows.
 </para>
 <para>
@@ -28,7 +29,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccount, #GtkTreeView, #GtkTreeStore, #GtkTreeModel
+#TnyList, #TnyStoreAccount, #GtkTreeView, #GtkTreeStore, #GtkTreeModel
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

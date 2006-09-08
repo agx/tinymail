@@ -6,13 +6,13 @@ A type for showing a header
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type for showing a #TnyHeader implementation to the user. This type is often used in a composition
+A type for showing a #TnyHeader to the user. This type is often used in a composition
 with a #TnyMsgView implementation.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyHeader, #TnyMsgView, #TnyMsgWindow, #TnyMsgView, #TnyMsgWindow
+#TnyHeader, #TnyMsgView, #TnyMsgWindow, #TnyGtkMsgView, #TnyGtkMsgWindow
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

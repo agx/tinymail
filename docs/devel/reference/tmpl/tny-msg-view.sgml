@@ -12,7 +12,7 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsg, #TnyMsgMimePart, #TnyMsgWindow, #TnyMsgView, #TnyMsgWindow
+#TnyMsg, #TnyMsgMimePart, #TnyMsgWindow, #TnyGtkMsgView, #TnyGtkMsgWindow
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

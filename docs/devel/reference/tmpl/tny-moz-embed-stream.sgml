@@ -2,14 +2,11 @@
 TnyMozEmbedStream
 
 <!-- ##### SECTION Short_Description ##### -->
-A #TnyStream implementation that updates a #TnyMozEmbedMsgView
+A stream that updates a mozembed msg view type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-The developer needs to decode the #TnyMsgMimePart instance of the
-#TnyMsg instance that has as mime-type "text/html" to a an instance
-of this type. The implementation will update the #TnyMozEmbedMsgView
-instance which you used to construct this type with.
+This type is internally used by the #TnyMozEmbedMsgView implementation of #TnyMsgView
 </para>
 
 <!-- ##### SECTION See_Also ##### -->

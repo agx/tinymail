@@ -2,15 +2,16 @@
 TnyCamelFolder
 
 <!-- ##### SECTION Short_Description ##### -->
-Camel #TnyMsgFolder implementation
+A folder type for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
+A #TnyFolder implemented using Camel
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderStore, #TnyStoreAccount
+#TnyFolderStore, #TnyStoreAccount, #TnyFolder
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

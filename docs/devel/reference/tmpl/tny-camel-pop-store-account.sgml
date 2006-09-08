@@ -2,16 +2,16 @@
 TnyCamelPOPStoreAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-POP #TnyStoreAccount instance implemented for Camel
+A POP store account type for Camel
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-POP #TnyStoreAccount instance implemented for Camel
+A POP #TnyStoreAccount implemented using Camel
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyStoreAccount, #TnyCamelStoreAccount
+#TnyStoreAccount, #TnyCamelStoreAccount, #TnyPOPFolder, #TnyFolder, #TnyFolderStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

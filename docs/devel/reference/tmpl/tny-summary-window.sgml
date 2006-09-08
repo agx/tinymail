@@ -2,36 +2,15 @@
 TnySummaryWindow
 
 <!-- ##### SECTION Short_Description ##### -->
-A demo implementation of #TnySummaryWindow for Gtk+
+A type for displaying the summary of a folder
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A demo implementation of a summary window. Implemented for Gtk+.
-</para><para>
-The implementation claims to also be a #TnyAccountStoreView implementation.
-Which is, of course, perfectly legal. It's possible that a summary window is a
-view for the account store.
-</para><para>
-You can, however, also do it more finegrained and create a real view type that
-implements the #TnyAccountStoreView. And you can let the summary window
-for example decorate that. Or simply goes in a composition relation with that
-type. In a human language: embed the view type in the summary window.
-</para><para>
-The demo-ui, however, implements the summary window *as* the view type. The 
-main reason for this is because that reduces the amount of code. People might
-other wise get scared about having to implement a lot own GObjects if they
-want to use the tinymail framework. This isn't true. 
-</para><para>
-But that doesn't mean the scared people are right. It's probably more correct
-to implement a type as a #TnyAccountStoreView and put it in composition
-with the #TnySummaryWindow implementation.
-</para><para>
-Mine is just a simple demo.
+A type for displaying the summary of a folder
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccountStoreView, #TnySummaryWindow, #TnyAccountStore
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
