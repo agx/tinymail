@@ -80,13 +80,11 @@ gtk_save_to_file (const gchar *local_filename, TnyMimePart *part)
 
 	if (fd != -1)
 	{
-		TnyFsStream *stream = NULL;
-		stream = tny_fs_stream_new (fd);
+		TnyStream *stream = tny_fs_stream_new (fd);
 		tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
 
-		/* This also closes the file descriptor (maybe it shouldn't?) */
+		/* This also closes the file descriptor */
 		g_object_unref (G_OBJECT (stream));
-
 		return TRUE;
 	}
 

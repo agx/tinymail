@@ -17,8 +17,12 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* Original file: camel-stream-fs.c : file system based stream (Camel source code)
- *
+/* Original file: camel-stream-fs.c : file system based stream (Camel 
+ * source code). Note that this implementation is heavily modified and that
+ * therefore bugs aren't necessarily caused by the original authors.
+ */
+
+/*
  * Authors: Bertrand Guiheneuf <bertrand@helixcode.com>
  *	    Michael Zucchi <notzed@ximian.com>
  *
@@ -166,18 +170,27 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
  * tny_fs_stream_new:
  * @fd: The file descriptor to write to or read from
  *
- * Create an adaptor instance between #TnyStream and a file descriptor
+ * Create an adaptor instance between #TnyStream and a file descriptor. Note 
+ * that you must not to close() fd yourself. The destructor will do that for
+ * you.
+ *
+ * Therefore use it with care. It's more or less an exception in the framework.
+ *
+ * The the instance will on top of close() when destructing, also fsync() the
+ * filedescriptor. It does this depending on its mood, the weather and your
+ * wives periods using a complex algorithm that abuses your privacy and might
+ * kill your cat and dog.
  *
  * Return value: a new #TnyStream instance
  **/
-TnyFsStream*
+TnyStream*
 tny_fs_stream_new (int fd)
 {
 	TnyFsStream *self = g_object_new (TNY_TYPE_FS_STREAM, NULL);
 
 	tny_fs_stream_set_fd (self, fd);
 
-	return self;
+	return TNY_STREAM (self);
 }
 
 static void
@@ -199,8 +212,10 @@ tny_fs_stream_finalize (GObject *object)
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 
 	if (priv->fd != -1)
-		close (priv->fd);
-
+ 	{
+		fsync (priv->fd);
+		close (priv->fd);	     
+	}
 	priv->fd = -1;
 
 	(*parent_class->finalize) (object);
@@ -299,49 +314,3 @@ tny_fs_stream_get_type (void)
 	return type;
 }
 
-
-/*
-
-static off_t
-stream_seek (CamelSeekableStream *stream, off_t offset, CamelStreamSeekPolicy policy)
-{
-	CamelStreamFs *stream_fs = CAMEL_STREAM_FS (stream);
-	off_t real = 0;
-
-	switch (policy) {
-	case CAMEL_STREAM_SET:
-		real = offset;
-		break;
-	case CAMEL_STREAM_CUR:
-		real = stream->position + offset;
-		break;
-	case CAMEL_STREAM_END:
-		if (stream->bound_end == CAMEL_STREAM_UNBOUND) {
-			real = lseek(stream_fs->fd, offset, SEEK_END);
-			if (real != -1) {
-				if (real<stream->bound_start)
-					real = stream->bound_start;
-				stream->position = real;
-			}
-			return real;
-		}
-		real = stream->bound_end + offset;
-		break;
-	}
-
-	if (stream->bound_end != CAMEL_STREAM_UNBOUND)
-		real = MIN (real, stream->bound_end);
-	real = MAX (real, stream->bound_start);
-
-	real = lseek(stream_fs->fd, real, SEEK_SET);
-	if (real == -1)
-		return -1;
-
-	if (real != stream->position && ((CamelStream *)stream)->eos)
-		((CamelStream *)stream)->eos = FALSE;
-
-	stream->position = real;
-
-	return real;
-}
-*/

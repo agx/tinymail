@@ -129,6 +129,7 @@ tny_iterator_get_current (TnyIterator *self)
  * while (!tny_iterator_is_done (iter))
  * {
  *    GObject *cur = tny_iterator_get_current (iter);
+ *    ...
  *    g_object_unref (cur);
  *    tny_iterator_next (iter);
  * }

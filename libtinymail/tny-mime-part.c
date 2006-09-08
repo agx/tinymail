@@ -27,8 +27,29 @@
  * 
  * Figures out whether or not a mime part is an attachment. An attachment
  * is typically something with a original filename. Examples are attached
- * files. Examples are not PGP signatures.
- * 
+ * files. Examples that will return FALSE are PGP signatures.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsg *message = ...
+ * TnyList *parts = tny_simple_list_new ();
+ * tny_msg_get_parts (message, parts);
+ * iter = tny_list_create_iterator (parts);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *      TnyMimePart *part = TNY_MIME_PART (tny_iterator_get_current (iter));
+ *      if (tny_mime_part_is_attachment (part))
+ *      {
+ *              g_print ("Found an attachment (%s)\n",
+ *			tny_mime_part_get_filename (part));
+ *      }
+ *      g_object_unref (G_OBJECT (part));
+ *      tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (parts));
+ * </programlisting></informalexample>
+ *
  * Return value: whether or not the mime part is an attachment
  *
  **/
@@ -236,6 +257,17 @@ tny_mime_part_get_content_location (TnyMimePart *self)
  * method in stead of this one. This method will not attempt to decode the
  * mime part. Mime parts are encoded before appending it to a message.
  * 
+ * Example:
+ * <informalexample><programlisting>
+ * int fd = open ("/tmp/attachment.png.base64enc", O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
+ * TnyMimePart *part = ...
+ * if (fd != -1)
+ * {
+ *      TnyFsStream *stream = tny_fs_stream_new (fd);
+ *      tny_mime_part_write_to_stream (part, TNY_STREAM (stream));
+ *      g_object_unref (G_OBJECT (stream));
+ * }
+ * </programlisting></informalexample>
  **/
 void
 tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
@@ -259,6 +291,18 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
  * of the part in a memory buffer. In stead it will read the part data while
  * already writing it to the stream efficiently.
  *
+ * Example:
+ * <informalexample><programlisting>
+ * int fd = open ("/tmp/attachment.png", O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
+ * TnyMimePart *part = ...
+ * if (fd != -1)
+ * {
+ *      TnyFsStream *stream = tny_fs_stream_new (fd);
+ *      tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
+ *      g_object_unref (G_OBJECT (stream));
+ * }
+ * </programlisting></informalexample>
+ *
  **/
 void
 tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
@@ -278,6 +322,17 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
  * @type: the type like text/plain
  * 
  * Set the stream from which the message part will read its content
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * int fd = open ("/tmp/attachment.png", ...);
+ * TnyMimePart *part = ...
+ * if (fd != -1)
+ * {
+ *      TnyFsStream *stream = tny_fs_stream_new (fd);
+ *      tny_mime_part_construct_from_stream (part, TNY_STREAM (stream));
+ * }
+ * </programlisting></informalexample>
  *
  * Return value: 0 on success or -1 on failure
  **/
@@ -317,11 +372,10 @@ tny_mime_part_get_stream (TnyMimePart *self)
  * tny_mime_part_get_content_type:
  * @self: a #TnyMimePart object
  * 
- * A read-only string in the format "type/subtype". You shouldn't free the 
+ * A read-only string in the format "type/subtype".  You shouldn't free the 
  * returned value.
  *
  * Return value: content-type of a message part as a read-only string
- *
  **/
 const gchar*
 tny_mime_part_get_content_type (TnyMimePart *self)
@@ -339,7 +393,29 @@ tny_mime_part_get_content_type (TnyMimePart *self)
  * @self: a #TnyMimePart object
  * @content_type: The content type in the string format type/subtype
  * 
- * Efficiently checks whether a part is of type content_type
+ * Efficiently checks whether a part is of type content_type. You can use things
+ * like "type/*" for matching. Only * works, stands for 'any', and it's not 
+ * (like) a regular expression.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsg *message = ...
+ * TnyList *parts = tny_simple_list_new ();
+ * tny_msg_get_parts (message, parts);
+ * iter = tny_list_create_iterator (parts);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *      TnyMimePart *part = TNY_MIME_PART (tny_iterator_get_current (iter));
+ *      if (tny_mime_part_content_type_is (part, "text/*"))
+ *              g_print ("Found an E-mail body\n");
+ *      if (tny_mime_part_content_type_is (part, "text/html"))
+ *              g_print ("Found an E-mail HTML body\n"); 
+ *      g_object_unref (G_OBJECT (part));
+ *      tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (parts));
+ * </programlisting></informalexample>
  *
  * Return value: Whether or not the part is the content type
  *

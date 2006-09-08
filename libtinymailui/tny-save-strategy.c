@@ -28,9 +28,46 @@
  *
  * Performs the saving of a mime part
  *
+ * Example:
+ * <informalexample><programlisting>
+ * static void 
+ * tny_my_msg_view_on_save_clicked (TnyMsgView *self_i, TnyMimePart *attachment)
+ * {
+ *     TnyMyMsgView *self = TNY_MY_MSG_VIEW (self_i);
+ *     tny_save_strategy_save (self->save_strategy, attachment);
+ * }
+ * </programlisting></informalexample>
+ *
  * Implementors: the idea is that devices can have a specific such strategy.
  * For example a strategy that sends it to another computer or a strategy that
  * saves it to a flash disk. 
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * static void
+ * tny_gtk_save_strategy_save (TnySaveStrategy *self, TnyMimePart *part)
+ * {
+ *      GtkFileChooserDialog *dialog;
+ *      dialog = GTK_FILE_CHOOSER_DIALOG 
+ *            (gtk_file_chooser_dialog_new (_("Save File"), NULL,
+ *            GTK_FILE_CHOOSER_ACTION_SAVE,
+ *            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, 
+ *            GTK_RESPONSE_ACCEPT, NULL));
+ *      gtk_file_chooser_set_current_name (dialog, 
+ *            tny_mime_part_get_filename (part));
+ * 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+ *            gchar *uri; int fd;
+ *            uri = gtk_file_chooser_get_filename (dialog);
+ *            fd = open (uri, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
+ *            if (fd != -1) {
+ *                      TnyStream *stream = tny_fs_stream_new (fd);
+ *                      tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
+ *                      g_object_unref (G_OBJECT (stream));
+ *            }		
+ *      }
+ *      gtk_widget_destroy (GTK_WIDGET (dialog));
+ * }
+ * </programlisting></informalexample>
  *
  * The method is typically called by the implementation of a #TnyMsgView.
  * For example a clicked handler of a popup menu of a attachment view in the

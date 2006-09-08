@@ -121,8 +121,8 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	TnyAccountStore *account_store = priv->account_store;
 	GtkTreeModel *sortable;
 
-	/* TnyAccountTreeModel is also a TnyList (it simply both the
-	   TnyList and the GtkTreeModel interfaces interfaces) */
+	/* TnyAccountTreeModel is also a TnyList (it simply implements both the
+	   TnyList and the GtkTreeModel interfaces) */
 
 	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new ();
 	TnyList *accounts = TNY_LIST (mailbox_model);

@@ -28,7 +28,9 @@
  *
  * Clear the view @self (show nothing)
  * 
- * Implementors: this method should clear @self (display nothing)
+ * Implementors: this method should clear @self (display nothing, or display
+ * a picture with flowers and nude people if that is how your E-mail client
+ * indicates that there's no message loaded)
  *
  **/
 void
@@ -80,6 +82,33 @@ tny_msg_view_set_unavailable (TnyMsgView *self)
  * attachment viewer that will have to use this strategy for saving the
  * mime-part.
  *
+ * Example:
+ * <informalexample><programlisting>
+ * static void 
+ * tny_my_msg_view_set_save_strategy (TnyMsgView *self_i, TnySaveStrategy *strat)
+ * {
+ *      TnyMyMsgView *self = TNY_MY_MSG_VIEW (self_i);
+ *      if (self->save_strategy)
+ *            g_object_unref (G_OBJECT (self->save_strategy));
+ *      self->save_strategy = g_object_ref (G_OBJECT (strat));
+ * }
+ * static void
+ * tny_my_msg_view_finalize (TnyMyMsgView *self)
+ * {
+ *      if (self->save_strategy))
+ *		g_object_unref (G_OBJECT (self->save_strategy));
+ * }
+ * </programlisting></informalexample>
+ *
+ * <informalexample><programlisting>
+ * static void 
+ * tny_my_msg_view_on_save_clicked (TnyMsgView *self, TnyMimePart *attachment)
+ * {
+ *     TnyMyMsgView *self = TNY_MY_MSG_VIEW (self_i);
+ *     tny_save_strategy_save (self->save_strategy, attachment);
+ * }
+ * </programlisting></informalexample>
+ *
  * The idea is that devices can have a specific such strategy. For example a
  * strategy that sends it to another computer or a strategy that saves it to
  * a flash disk. However. In the message view component, you don't care about
@@ -97,8 +126,6 @@ tny_msg_view_set_save_strategy (TnyMsgView *self, TnySaveStrategy *strategy)
 	TNY_MSG_VIEW_GET_IFACE (self)->set_save_strategy_func (self, strategy);
 	return;
 }
-
-
 
 
 /**

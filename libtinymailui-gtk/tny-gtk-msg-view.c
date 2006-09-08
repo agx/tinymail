@@ -92,7 +92,6 @@ reload_msg (TnyMsgView *self)
 
 	gtk_widget_hide (priv->attachview_sw);
 	gtk_text_buffer_set_text (buffer, "", 0);
-
     
 	gtk_widget_show (GTK_WIDGET (priv->headerview));
 

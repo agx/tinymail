@@ -28,7 +28,9 @@
  *
  * Clear the view @self (show nothing)
  *
- * Implementors:  this method should clear @self (display nothing)
+ * Implementors: this method should clear @self (display nothing, or display
+ * a picture with flowers and nude people if that is how your E-mail client
+ * indicates that there's no header loaded)
  * 
  **/
 void
@@ -49,7 +51,7 @@ tny_header_view_clear (TnyHeaderView *self)
  * @self: A #TnyHeaderView instance
  * @header: A #TnyHeader instace
  *
- * Set header of the view @self (show nothing)
+ * Set header of the view @self
  * 
  * Implementors: this method should cause the view @self to show the header
  * @header to the user. Often this means showing the from, to, subject, date

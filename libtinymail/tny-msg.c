@@ -50,6 +50,22 @@ tny_msg_get_folder (TnyMsg *self)
  * 
  * Get a read-only list of mime-parts of this message.
  *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsg *message = ...
+ * TnyList *parts = tny_simple_list_new ();
+ * tny_msg_get_parts (message, parts);
+ * iter = tny_list_create_iterator (parts);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *      TnyMimePart *part = TNY_MIME_PART (tny_iterator_get_current (iter));
+ *      g_object_unref (G_OBJECT (part));
+ *      tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (parts));
+ * </programlisting></informalexample>
+ *
  **/
 void
 tny_msg_get_parts (TnyMsg *self, TnyList *list)

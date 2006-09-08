@@ -86,13 +86,14 @@ tny_list_append (TnyList *self, GObject* item)
  * @self: A #TnyList instance
  * @item: the item to remove
  *
- * Removes an item from a list
+ * Removes an item from a list.  Removing a item might invalidate all existing
+ * iterators or put them in an unknown and unspecified state. You'll need to 
+ * recreate the iterator(s) if you remove an item to be certain.
  *
- * Removing a item might invalidate all existing iterators or put them in an
- * unknown and unspecified state. You'll need to recreate the iterator(s) if you
- * remove an item to be certain.
+ * If you want to clear a list, consider using the tny_list_foreach or simply
+ * destroy the list instance and construct a new one.
  *
- * There's no guarantee whatsoever that existing iterators of 'self' will be
+ * There's no guarantee whatsoever that existing iterators of @self will be
  * valid after this method returned.
  *
  **/
@@ -116,8 +117,26 @@ tny_list_remove (TnyList *self, GObject* item)
  *
  * An iterator is a position indicator for a list. It keeps the position
  * state of a list iteration. The list itself does not keep any position 
- * information. This makes it possible to have multiple list-iterations by
- * consuming multiple iterator instances simultanously.
+ * information. Consuming multiple iterator instances makes it possible to
+ * have multiple list iterations simultanously (i.e. multiple threads or in
+ * in a loop that simultanously works with multiple position states in a
+ * single list).
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyList *list = tny_simple_list_new ();
+ * TnyIterator *iter1 = tny_list_create_iterator (list);
+ * TnyIterator *iter2 = tny_list_create_iterator (list);
+ * while (!tny_iterator_is_done (iter1))
+ * {
+ *	while (!tny_iterator_is_done (iter2))
+ *		tny_iterator_next (iter2);
+ *	tny_iterator_next (iter1);
+ * }
+ * g_object_unref (G_OBJECT (iter1));
+ * g_object_unref (G_OBJECT (iter2));
+ * g_object_unref (G_OBJECT (list));
+ * </programlisting></informalexample>
  *
  * The reason why the method isn't called get_iterator is because it's a
  * object creation method. It's not a property. It effectively creates a new
@@ -146,6 +165,22 @@ tny_list_create_iterator (TnyList *self)
  *
  * Calls a function for each element of a #TnyList. It will use an internal
  * iteration which you don't have to worry about. 
+ *
+ * <informalexample><programlisting>
+ * static void
+ * list_foreach_item (TnyHeader *header, gpointer user_data)
+ * {
+ *	g_print ("%s\n", tny_header_get_subject (header));
+ * }
+ * </programlisting></informalexample>
+ *
+ * <informalexample><programlisting>
+ * TnyFolder *folder = ...
+ * TnyList *headers = tny_simple_list_new ();
+ * tny_folder_get_headers (folder, headers, FALSE);
+ * tny_list_foreach (headers, list_foreach_item, NULL);
+ * g_object_unref (G_OBJECT (list));
+ * </programlisting></informalexample>
  *
  * The purpose of this method is to have a fast foreach iteration. Using this
  * is faster than inventing your own foreach loop using the is_done and next
@@ -227,8 +262,6 @@ tny_list_get_type (void)
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyList", &info, 0);
-
-		/* g_type_interface_add_prerequisite (type, G_TYPE_OBJECT); */
 	}
 
 	return type;

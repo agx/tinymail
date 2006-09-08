@@ -54,7 +54,7 @@ struct _TnyFsStreamClass
 };
 
 GType  tny_fs_stream_get_type (void);
-TnyFsStream* tny_fs_stream_new (int fd);
+TnyStream* tny_fs_stream_new (int fd);
 void tny_fs_stream_set_fd (TnyFsStream *self, int fd);
 
 G_END_DECLS
