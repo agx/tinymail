@@ -55,7 +55,7 @@ void _tny_gtk_header_list_iterator_set_model (TnyGtkHeaderListIterator *self, Tn
 TnyIterator* _tny_gtk_header_list_iterator_new (TnyGtkHeaderListModel *model, gboolean lock);
 
 gboolean _tny_gtk_header_list_iterator_is_done_nl (TnyGtkHeaderListIterator *self);
-gpointer _tny_gtk_header_list_iterator_current_nl (TnyGtkHeaderListIterator *me);
+gpointer _tny_gtk_header_list_iterator_get_current_nl (TnyGtkHeaderListIterator *me);
 void _tny_gtk_header_list_iterator_nth_nl (TnyGtkHeaderListIterator *me, guint nth);
 void _tny_gtk_header_list_iterator_first_nl (TnyGtkHeaderListIterator *me);
 void _tny_gtk_header_list_iterator_prev_nl (TnyGtkHeaderListIterator *me);

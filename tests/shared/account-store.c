@@ -211,7 +211,7 @@ tny_test_account_store_get_device (TnyAccountStore *self)
 {
 	TnyTestAccountStore *me =  (TnyTestAccountStore*) self;
 
-	return me->device;
+	return g_object_ref (G_OBJECT (me->device));
 }
 
 

@@ -41,10 +41,43 @@ guint *tny_account_store_signals = NULL;
  * @prompt: the prompt
  *
  * This jump-to-the-ui method implements showing a message dialog with prompt
- * as prompt. It will return TRUE if the reply was affirmative. Or FALSE if not.
+ * as prompt. It will return TRUE if the reply was affirmative or FALSE if not.
  *
  * Implementors: when implementing a platform-specific library, you must
- * implement this method. For example in Gtk+ by using the GtkDialog API.
+ * implement this method. For example in Gtk+ by using the #GtkDialog API.
+ *
+ * Example implementation for Gtk+:
+ * <informalexample><programlisting>
+ * static gboolean
+ * tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
+ * {
+ * 	GtkMessageType gtktype;
+ * 	gboolean retval = FALSE;
+ * 	GtkWidget *dialog;
+ * 	switch (type)
+ * 	{
+ * 		case TNY_ALERT_TYPE_INFO:
+ * 		gtktype = GTK_MESSAGE_INFO;
+ * 		break;
+ * 		case TNY_ALERT_TYPE_WARNING:
+ * 		gtktype = GTK_MESSAGE_WARNING;
+ * 		break;
+ * 		case TNY_ALERT_TYPE_ERROR:
+ * 		default:
+ * 		gtktype = GTK_MESSAGE_ERROR;
+ * 		break;
+ * 	}
+ * 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+ *		gtktype, GTK_BUTTONS_YES_NO, prompt);
+ * 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+ * 		retval = TRUE;
+ * 	gtk_widget_destroy (dialog);
+ * 	return retval;
+ * }
+ * </programlisting></informalexample>
+ *
+ * The @prompt will be a message like a question to the user whether or not he
+ * accepts the SSL certificate of the service.
  *
  * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
  *
@@ -63,10 +96,14 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *
  * tny_account_store_get_device:
  * @self: a #TnyAccountTransport object
  *
- * This method returns a #TnyDevice instance
+ * This method returns a #TnyDevice instance. You must unreference the return
+ * value after use.
  *
  * Implementors: when implementing a platform-specific library, you must
- * implement this method and a #TnyDevice implementation.
+ * implement this method and a #TnyDevice implementation. 
+ 
+ * As the implementor of this method, you must add a reference count before 
+ * returning.
  *
  * Return value: the device attached to this account store
  *
@@ -89,12 +126,12 @@ tny_account_store_get_device (TnyAccountStore *self)
  *
  * Implementors: when implementing a platform-specific library, you must
  * implement this method. You can for example let it return the path to some
- * folder on the file system.
+ * folder in $HOME on the file system.
  *
- * Note that the callers of this method will not free the result. You
- * are responsible of freeing it up. For example when destroying the 
- * #TnyAccountStore implementation instance.
- * 
+ * Note that the callers of this method will not free the result. The
+ * implementor of a #TnyAccountStore is responsible of freeing it up. For
+ * example when destroying the instance.
+ *
  * Return value: the local path that will be used for storing the disk cache
  *
  **/
@@ -117,6 +154,22 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * 
  * Get a read-only list of accounts in the store
  *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyList *list = tny_simple_list_new ();
+ * tny_account_store_get_accounts (astore, list, TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+ * TnyIterator *iter = tny_list_create_iterator (list);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *    TnyStoreAccount *cur = TNY_STORE_ACCOUNT (tny_iterator_get_current (iter));
+ *    printf ("%s\n", tny_store_account_get_name (cur));
+ *    g_object_unref (G_OBJECT (cur));
+ *    tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (list));
+ * </programlisting></informalexample>
+ *
  * Implementors: when implementing a platform-specific library, you must 
  * implement this method.
  * 
@@ -125,14 +178,15 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * register the created accounts with a #TnySessionCamel instance using the 
  * libtinymail-camel specific tny_session_camel_set_current_accounts API.
  *
- * The implementation must fillup @list with instances to the available accounts.
+ * The implementation must obviously fillup @list with available accounts.
  * Note that if you cache the list, you must add a reference to each account
- * added to the list (they will be unreferenced and if the reference count
- * would reaches zero, an account would no longer be cached).
+ * added to the list (else they will be unreferenced and if the reference count
+ * would reach zero, an account would no longer be cached).
  *
  * With libtinymail-camel each created account must also be informed about the
  * #TnySessionCamel instance being used. Read more about this at
- * tny_account_set_session of the libtinymail-camel specific #TnyAccount.
+ * tny_camel_account_set_session of the libtinymail-camel specific 
+ * #TnyCamelAccount.
  *
  * There are multiple samples of #TnyAccountStore implementations in
  * libtinymail-gnome-desktop, libtinymail-olpc, libtinymail-gpe, 

@@ -56,7 +56,7 @@ tny_folder_store_query_test_setup (void)
 	aiter = tny_list_create_iterator (accounts);
 	tny_iterator_first (aiter);
 	
-	account = TNY_STORE_ACCOUNT (tny_iterator_current (aiter));
+	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
        	g_object_unref (G_OBJECT (aiter));
 
     	if (!account)
@@ -107,7 +107,7 @@ tny_folder_store_query_test_match_on_name (void)
     	{
 		
 		iter = tny_list_create_iterator (folders);
-		folder = (TnyFolder *) tny_iterator_current (iter);
+		folder = (TnyFolder *) tny_iterator_get_current (iter);
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
@@ -154,7 +154,7 @@ tny_folder_store_query_test_match_on_id (void)
     	if (length >= 1) 
     	{	
 		iter = tny_list_create_iterator (folders);
-		folder = (TnyFolder *) tny_iterator_current (iter);
+		folder = (TnyFolder *) tny_iterator_get_current (iter);
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
@@ -200,7 +200,7 @@ tny_folder_store_query_test_match_subscribed (void)
     	if (length >= 1) 
 	{	
 		iter = tny_list_create_iterator (folders);
-		folder = (TnyFolder *) tny_iterator_current (iter);
+		folder = (TnyFolder *) tny_iterator_get_current (iter);
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
@@ -247,7 +247,7 @@ tny_folder_store_query_test_match_unsubscribed (void)
     	if (length >= 1) 
 	{	
 		iter = tny_list_create_iterator (folders);
-		folder = (TnyFolder *) tny_iterator_current (iter);
+		folder = (TnyFolder *) tny_iterator_get_current (iter);
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));

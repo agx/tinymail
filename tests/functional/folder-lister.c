@@ -45,7 +45,7 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query)
 
 	while (!tny_iterator_is_done (iter))
 	{
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 		gint i=0;
 
 		for (i=0; i<recursion_level; i++)
@@ -107,7 +107,7 @@ main (int argc, char **argv)
 	      TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
     
 	iter = tny_list_create_iterator (accounts);
-	account = (TnyStoreAccount*) tny_iterator_current (iter);
+	account = (TnyStoreAccount*) tny_iterator_get_current (iter);
 
 	recursion_level = 0;	    
 	recurse_folders (TNY_FOLDER_STORE (account), NULL);

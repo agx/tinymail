@@ -52,7 +52,7 @@ recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderS
 	while (!tny_iterator_is_done (iter))
 	{
 		GtkTreeStore *model = GTK_TREE_STORE (self);
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 		GtkTreeIter tree_iter;
 	    
 		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);

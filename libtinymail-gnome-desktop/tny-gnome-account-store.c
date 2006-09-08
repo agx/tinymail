@@ -589,7 +589,7 @@ tny_gnome_account_store_get_device (TnyAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	return priv->device;
+	return g_object_ref (G_OBJECT (priv->device));
 }
 
 /**

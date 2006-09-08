@@ -17,12 +17,6 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyMimePart ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyMimePartIface ##### -->
 <para>
 

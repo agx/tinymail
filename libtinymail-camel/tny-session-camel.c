@@ -465,7 +465,7 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 	
 		while (!tny_iterator_is_done (iterator))
 		{
-			TnyStoreAccount *account = (TnyStoreAccount*)tny_iterator_current (iterator);
+			TnyStoreAccount *account = (TnyStoreAccount*)tny_iterator_get_current (iterator);
 			
 			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !online);
 	
@@ -525,15 +525,16 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 {
 	CamelSession *session = (CamelSession*) self;
 	TnyDevice *device = (TnyDevice*)tny_account_store_get_device (account_store);
-
-	self->account_store = (gpointer)account_store;
-
-	gchar *base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
+	gchar *base_directory = NULL;
 	gchar *camel_dir = NULL;
+
+	self->account_store = (gpointer)account_store;    
+    	base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
     
 	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
 	{
 		g_error (_("Critical ERROR: Cannot init %s as camel directory\n"), base_directory);
+	    	g_object_unref (G_OBJECT (device));
 		exit (1);
 	}
 
@@ -551,6 +552,8 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	g_free (base_directory);
 
 	tny_session_camel_set_device (self, device);
+    
+    	g_object_unref (G_OBJECT (device));
 
 	return;
 }

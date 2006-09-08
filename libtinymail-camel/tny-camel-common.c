@@ -38,7 +38,7 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 		 
 		while (!tny_iterator_is_done (iterator))
 		{
-			TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_current (iterator);
+			TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_get_current (iterator);
 			TnyFolderStoreQueryOption options = tny_folder_store_query_item_get_options (item);
 			regex_t *regex = tny_folder_store_query_item_get_regex (item);
 

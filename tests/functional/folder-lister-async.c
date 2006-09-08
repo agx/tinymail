@@ -54,7 +54,7 @@ callback (TnyFolderStore *self, TnyList *list, gpointer user_data)
     
 	while (!tny_iterator_is_done (iter))
 	{
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 		TnyList *folders = tny_simple_list_new ();
 
 		g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
@@ -125,7 +125,7 @@ main (int argc, char **argv)
 	      TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
     
 	iter = tny_list_create_iterator (accounts);
-	account = (TnyStoreAccount*) tny_iterator_current (iter);
+	account = (TnyStoreAccount*) tny_iterator_get_current (iter);
 
 
     	if (mainloop)

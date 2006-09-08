@@ -184,18 +184,57 @@ get_regerror (int errcode, regex_t *compiled)
  * @pattern: a regular expression
  * @options: a #TnyFolderStoreQueryOption enum
  *
- * Add a "AND" query-item to the query.
+ * Add a query-item to @query.
  * 
  * If the options contain TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME or 
- * TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID then pattern will be used as
- * regular expression for matching the property of the folders.
+ * TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID then @pattern will be used as
+ * regular expression for matching the property of the folders. What the
+ * properties tny_folder_get_name and tny_folder_get_id would contain will 
+ * be used in this case.
  *
- * The tny_folder_get_name and tny_folder_get_id properties will
- * then be used.
- * 
+ * Example:
+ * <informalexample><programlisting>
+ * FolderStoreQuery *query = tny_folder_store_query_new ();
+ * TnyList *folders = tny_simple_list_new ();
+ * TnyFolderStore *store = ...; TnyIterator *iter; 
+ * tny_folder_store_query_add_item (query, ".*GNOME.*", TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME);
+ * tny_folder_store_get_folders (store, folders, query);
+ * iter = tny_list_create_iterator (folders);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *  	TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
+ * 	g_print ("%s\n", tny_folder_get_name (folder));
+ * 	g_object_unref (G_OBJECT (folder));
+ * 	tny_iterator_next (iter);	    
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (folders)); 
+ * g_object_unref (G_OBJECT (query)); 
+ * </programlisting></informalexample>
+ *
  * For the options TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED and 
  * TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED, the folder subscription status
  * is used.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * FolderStoreQuery *query = tny_folder_store_query_new ();
+ * TnyList *folders = tny_simple_list_new ();
+ * TnyFolderStore *store = ...; TnyIterator *iter; 
+ * tny_folder_store_query_add_item (query, NULL, TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED);
+ * tny_folder_store_get_folders (store, folders, query);
+ * iter = tny_list_create_iterator (folders);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *  	TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
+ * 	g_print ("%s\n", tny_folder_get_name (folder));
+ * 	g_object_unref (G_OBJECT (folder));
+ * 	tny_iterator_next (iter);	    
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (folders)); 
+ * g_object_unref (G_OBJECT (query)); 
+ * </programlisting></informalexample>
  *
  **/
 void 
@@ -238,9 +277,9 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
  * tny_folder_store_query_get_items:
  * @query: a #TnyFolderStoreQuery object
  *
- * Get a list of AND query items 
+ * Get a list of query items 
  *
- * Return value: a list of AND query items
+ * Return value: a list of query items
  **/
 TnyList*
 tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
@@ -253,9 +292,9 @@ tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
  * tny_folder_store_query_item_get_options:
  * @item: a #TnyFolderStoreQueryItem object
  *
- * Get the options of the AND query item @item
+ * Get the options of @item
  *
- * Return value: the options of a AND query item
+ * Return value: the options of a query item
  *
  **/
 TnyFolderStoreQueryOption 
@@ -269,9 +308,9 @@ tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
  * tny_folder_store_query_item_get_regex:
  * @item: a #TnyFolderStoreQueryItem object
  *
- * Get the compiled regular expression of the AND query item @item
+ * Get the compiled regular expression of @item
  *
- * Return value: the compiled regular expression of a AND query item
+ * Return value: the compiled regular expression of a query item
  *
  **/
 regex_t*

@@ -476,7 +476,7 @@ tny_gpe_account_store_get_device (TnyAccountStore *self)
 {
 	TnyGpeAccountStorePriv *priv = TNY_GPE_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	return priv->device;
+	return g_object_ref (G_OBJECT (priv->device));
 }
 
 /**

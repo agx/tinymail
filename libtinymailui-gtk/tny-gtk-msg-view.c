@@ -98,7 +98,7 @@ reload_msg (TnyMsgView *self)
 
 	while (!tny_iterator_is_done (iterator))
 	{
-		TnyMimePart *part = (TnyMimePart*)tny_iterator_current (iterator);
+		TnyMimePart *part = (TnyMimePart*)tny_iterator_get_current (iterator);
 
 		if (G_LIKELY (tny_mime_part_content_type_is (part, "text/*")))
 		{

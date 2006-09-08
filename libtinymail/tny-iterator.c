@@ -94,7 +94,7 @@ tny_iterator_nth (TnyIterator *self, guint nth)
 
 
 /**
- * tny_iterator_current:
+ * tny_iterator_get_current:
  * @self: A #TnyIterator instance
  *
  * Does not move the iterator. Returns the object at the current position.
@@ -104,13 +104,13 @@ tny_iterator_nth (TnyIterator *self, guint nth)
  *
  **/
 GObject* 
-tny_iterator_current (TnyIterator *self)
+tny_iterator_get_current (TnyIterator *self)
 {
 #ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->current_func)
-		g_critical ("You must implement tny_iterator_current\n");
+	if (!TNY_ITERATOR_GET_IFACE (self)->get_current_func)
+		g_critical ("You must implement tny_iterator_get_current\n");
 #endif
-	return TNY_ITERATOR_GET_IFACE (self)->current_func (self);
+	return TNY_ITERATOR_GET_IFACE (self)->get_current_func (self);
 }
 
 
@@ -122,11 +122,16 @@ tny_iterator_current (TnyIterator *self)
  * Does the iterator point to some valid list item. You can use this property
  * to make loops like:
  * 
+ * Example:
  * <informalexample><programlisting>
  * TnyList *list = tny_simple_list_new ();
  * TnyIterator *iter = tny_list_create_iterator (list);
  * while (!tny_iterator_is_done (iter))
+ * {
+ *    GObject *cur = tny_iterator_get_current (iter);
+ *    g_object_unref (cur);
  *    tny_iterator_next (iter);
+ * }
  * g_object_unref (G_OBJECT (iter));
  * g_object_unref (G_OBJECT (list));
  * </programlisting></informalexample>

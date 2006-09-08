@@ -54,7 +54,7 @@ tny_account_test_setup (void)
 	aiter = tny_list_create_iterator (accounts);
 	tny_iterator_first (aiter);
     
-	iface = TNY_ACCOUNT (tny_iterator_current (aiter));
+	iface = TNY_ACCOUNT (tny_iterator_get_current (aiter));
     
     	if (!iface)
 		online_tests = FALSE;

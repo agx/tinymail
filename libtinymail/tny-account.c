@@ -26,12 +26,12 @@
  * tny_account_get_account_type:
  * @self: a #TnyAccount object
  *
- * Get the account type. There's two account types: a store and a transport
+ * Get the account type. There are two account types: a store and a transport
  * account type. A store account will implement the #TnyFolderStore 
  * interfaces which defines that the type contains folders.
  *
  * A transport account has a send method for sending #TnyMsg instances
- * using the transport protocol of the account (for example using SMTP).
+ * using the transport protocol of the account (for example SMTP).
  *
  * Return value: The account type
  **/
@@ -71,9 +71,9 @@ tny_account_is_connected (TnyAccount *self)
  * tny_account_get_id:
  * @self: a #TnyAccount object
  * 
- * Get an unique id for the account. The only certainty you have is that the
+ * Get the unique id of the account. The only certainty you have is that the
  * id is unique. The format of the id isn't specified. The implementor of the
- * #TnyAccountStore will set this id using tny_account_set_id.
+ * #TnyAccountStore must set this id using tny_account_set_id.
  * 
  * Return value: Unique id
  **/
@@ -113,8 +113,8 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
  * @self: a #TnyAccount object
  * @id: the id
  *
- * Set the account's unique id. You need to set this property before you can 
- * start using the account. The id must be unique and is typically set in the
+ * Set the unique id of the account. You need to set this property before you 
+ * can start using the account. The id must be unique and is typically set in the
  * implementation of a #TnyAccountStore.
  * 
  **/

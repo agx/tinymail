@@ -69,9 +69,26 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name)
  * @list: A #TnyList to fillup
  * @query: A #TnyFolderStoreQuery object or NULL
  *
- * Get a list of child folders from the folder store @self. You can use @query to 
- * limit the list of folders with only folders that match the query.
- * 
+ * Get a list of child folders from the folder store @self. You can use @query 
+ * to limit the list of folders with only folders that match the query.
+ *  
+ * Example:
+ * <informalexample><programlisting>
+ * TnyFolderStore *store = ...
+ * TnyIterator *iter; TnyFolderStoreQuery *query = ...
+ * TnyList *folders = tny_simple_list_new ();
+ * tny_folder_store_get_folders (store, folders, query);
+ * iter = tny_list_create_iterator (folders);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *  	TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
+ * 	g_print ("%s\n", tny_folder_get_name (folder));
+ * 	g_object_unref (G_OBJECT (folder));
+ * 	tny_iterator_next (iter);	    
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (folders)); 
+ * </programlisting></informalexample>
  **/
 void 
 tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query)

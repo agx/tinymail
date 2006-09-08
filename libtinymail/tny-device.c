@@ -36,7 +36,7 @@ guint *tny_device_signals = NULL;
  * tny_device_reset:
  * @self: a #TnyDevice object
  * 
- * Reset status (unforce the status)
+ * Reset the status (unforce the status)
  **/
 void 
 tny_device_reset (TnyDevice *self)

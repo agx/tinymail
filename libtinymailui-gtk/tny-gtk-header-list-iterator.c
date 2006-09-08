@@ -219,13 +219,13 @@ tny_gtk_header_list_iterator_nth (TnyIterator *self, guint nth)
 
 /* exception: don't ref */
 gpointer 
-_tny_gtk_header_list_iterator_current_nl (TnyGtkHeaderListIterator *me)
+_tny_gtk_header_list_iterator_get_current_nl (TnyGtkHeaderListIterator *me)
 {
 	return me->current?me->current->data:NULL;
 }
 
 static GObject* 
-tny_gtk_header_list_iterator_current (TnyIterator *self)
+tny_gtk_header_list_iterator_get_current (TnyIterator *self)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 	gpointer retval;
@@ -267,7 +267,7 @@ tny_iterator_init (TnyIteratorIface *klass)
 	klass->prev_func = tny_gtk_header_list_iterator_prev;
 	klass->first_func = tny_gtk_header_list_iterator_first;
 	klass->nth_func = tny_gtk_header_list_iterator_nth;
-	klass->current_func = tny_gtk_header_list_iterator_current;
+	klass->get_current_func = tny_gtk_header_list_iterator_get_current;
 	klass->get_list_func = tny_gtk_header_list_iterator_get_list;
 	klass->is_done = tny_gtk_header_list_iterator_is_done;
 	

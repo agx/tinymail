@@ -183,6 +183,8 @@ online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 			tny_device_force_online (device);
 		else
 			tny_device_force_offline (device);
+	    
+		g_object_unref (G_OBJECT (device));
 	}
 }
 
@@ -230,16 +232,14 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 			priv->accounts_reloaded_signal);
 
 		g_object_unref (G_OBJECT (priv->account_store));
+	    	g_object_unref (G_OBJECT (odevice));
 	}
 
 	g_object_ref (G_OBJECT (account_store));
 
-	if (device)
-	{
-		priv->connchanged_signal =  g_signal_connect (
-				G_OBJECT (device), "connection_changed",
-				G_CALLBACK (connection_changed), self);	
-	}
+	priv->connchanged_signal =  g_signal_connect (
+			G_OBJECT (device), "connection_changed",
+			G_CALLBACK (connection_changed), self);	
 
 	priv->account_store = account_store;
 
@@ -249,6 +249,8 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 
 	reload_accounts (priv);
 
+    	g_object_unref (G_OBJECT (device));
+    
 	return;
 }
 

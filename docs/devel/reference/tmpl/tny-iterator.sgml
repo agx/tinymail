@@ -17,12 +17,6 @@ An iterator for #TnyList
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyIterator ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyIteratorIface ##### -->
 <para>
 
@@ -33,7 +27,7 @@ An iterator for #TnyList
 @prev_func: 
 @first_func: 
 @nth_func: 
-@current_func: 
+@get_current_func: 
 @is_done: 
 @get_list_func: 
 
@@ -68,15 +62,6 @@ An iterator for #TnyList
 
 @self: 
 @nth: 
-
-
-<!-- ##### FUNCTION tny_iterator_current ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_iterator_is_done ##### -->

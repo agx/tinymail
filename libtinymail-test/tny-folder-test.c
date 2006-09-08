@@ -59,7 +59,7 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, const gchar 
 
 	while (!tny_iterator_is_done (iter))
 	{
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 
 		if (!strcmp (tny_folder_get_id (TNY_FOLDER (folder)), folname))
 			func (TNY_FOLDER (folder));
@@ -84,7 +84,7 @@ tny_folder_test_setup (void)
 			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 	aiter = tny_list_create_iterator (accounts);
 	tny_iterator_first (aiter);
-	account = TNY_STORE_ACCOUNT (tny_iterator_current (aiter));
+	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
 	
 	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/tny-folder-test", do_test_folder);
 
@@ -171,7 +171,7 @@ tny_folder_test_remove_message (void)
     
     	iter = tny_list_create_iterator (headers);
     	tny_iterator_first (iter);
-    	header = (TnyHeader*)tny_iterator_current (iter);
+    	header = (TnyHeader*)tny_iterator_get_current (iter);
 
     	/* Flag as removed */
     	tny_folder_remove_message (iface, header);

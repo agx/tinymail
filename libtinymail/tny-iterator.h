@@ -45,7 +45,7 @@ struct _TnyIteratorIface
 	void (*prev_func) (TnyIterator *self);
 	void (*first_func) (TnyIterator *self);
 	void (*nth_func) (TnyIterator *self, guint nth);
-	GObject* (*current_func) (TnyIterator *self);
+	GObject* (*get_current_func) (TnyIterator *self);
 
 	gboolean (*is_done) (TnyIterator *self);
 	TnyList* (*get_list_func) (TnyIterator *self);
@@ -57,7 +57,7 @@ void tny_iterator_next (TnyIterator *self);
 void tny_iterator_prev (TnyIterator *self);
 void tny_iterator_first (TnyIterator *self);
 void tny_iterator_nth (TnyIterator *self, guint nth);
-GObject* tny_iterator_current (TnyIterator *self);
+GObject* tny_iterator_get_current (TnyIterator *self);
 gboolean tny_iterator_is_done (TnyIterator *self);
 TnyList* tny_iterator_get_list (TnyIterator *self);
 

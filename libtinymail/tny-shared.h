@@ -24,7 +24,6 @@ G_BEGIN_DECLS
 
 typedef struct _TnyAccountStore TnyAccountStore;
 typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
-
 typedef struct _TnyList TnyList;
 typedef struct _TnyIterator TnyIterator;
 typedef struct _TnyListIface TnyListIface;
@@ -68,13 +67,6 @@ typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
 typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, TnyList *list, gpointer user_data);
-
-#ifndef G_LIKELY
-#define G_LIKELY(expr) (expr)
-#endif
-#ifndef G_UNLIKELY
-#define G_UNLIKELY(expr) (expr)
-#endif
 
 G_END_DECLS
 

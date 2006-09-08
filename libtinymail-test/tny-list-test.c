@@ -103,7 +103,7 @@ tny_list_test_list (void)
 	g_object_unref (G_OBJECT (ref));
     
 	tny_iterator_nth (iterator, 2);
-	item = (TnyTestObject*)tny_iterator_current (iterator);
+	item = (TnyTestObject*)tny_iterator_get_current (iterator);
 	
 	str = g_strdup_printf ("Item should be \"3\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "3"), str);
@@ -111,27 +111,27 @@ tny_list_test_list (void)
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_next (iterator);
-	item = (TnyTestObject*)tny_iterator_current (iterator);	
+	item = (TnyTestObject*)tny_iterator_get_current (iterator);	
 	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_prev (iterator);
-	item = (TnyTestObject*)tny_iterator_current (iterator);	
+	item = (TnyTestObject*)tny_iterator_get_current (iterator);	
 	str = g_strdup_printf ("Item should be \"3\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "3"), str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_next (iterator);
-	item = (TnyTestObject*)tny_iterator_current (iterator);	
+	item = (TnyTestObject*)tny_iterator_get_current (iterator);	
 	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 
-	item = (TnyTestObject*)tny_iterator_current (iterator);
+	item = (TnyTestObject*)tny_iterator_get_current (iterator);
 	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "4"), str);
 	g_free (str);
@@ -149,7 +149,7 @@ tny_list_test_list (void)
 	iterator = tny_list_create_iterator (iface);
 
 	tny_iterator_first (iterator);
-	item = (TnyTestObject*)tny_iterator_current (iterator);
+	item = (TnyTestObject*)tny_iterator_get_current (iterator);
 	
 	str = g_strdup_printf ("Item should be \"1\" but is %s\n", item->str);
 	gunit_fail_unless (!strcmp (item->str, "1"), str);

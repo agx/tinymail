@@ -203,7 +203,7 @@ tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 
 	/* We will store this as user_data of the GtkTreeIter */
 	/* don't unref */	
-	ptr = _tny_gtk_header_list_iterator_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
+	ptr = _tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
 	list_model->last_nth = i;
 	iter->stamp = list_model->stamp;
 	iter->user_data = ptr;
@@ -235,7 +235,7 @@ tny_gtk_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	while (!_tny_gtk_header_list_iterator_is_done_nl ((TnyGtkHeaderListIterator*)list_model->iterator))
 	{
 		/* header list iterator does not need to be unref'd */
-		if (_tny_gtk_header_list_iterator_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator) == iter->user_data)
+		if (_tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator) == iter->user_data)
 			break;
 		
 		_tny_gtk_header_list_iterator_next_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
@@ -417,7 +417,7 @@ tny_gtk_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 	/* We simply move the iterator and get the value */
 	_tny_gtk_header_list_iterator_next_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
 	/* the ptr needs not to be unref'd... */
-	ptr = _tny_gtk_header_list_iterator_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
+	ptr = _tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
 	list_model->last_nth++;
 	iter->user_data = ptr;
 	retval = (iter->user_data != NULL);
@@ -473,7 +473,7 @@ tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	/* Move the GtkTreeIter to the nth child */
 	_tny_gtk_header_list_iterator_nth_nl ((TnyGtkHeaderListIterator*)list_model->iterator, n);
 	/* child needs not to be unref'd */
-	child = _tny_gtk_header_list_iterator_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
+	child = _tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
 	 
 	if (G_LIKELY (child))
 	{

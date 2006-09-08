@@ -478,7 +478,7 @@ tny_maemo_account_store_get_device (TnyAccountStore *self)
 {
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	return priv->device;
+	return g_object_ref (G_OBJECT (priv->device));
 }
 
 /**

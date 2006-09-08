@@ -24,12 +24,6 @@ A abstract type that contains the shared functionality of the #TnyStoreAccount a
 
 
 
-<!-- ##### STRUCT TnyAccount ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
 

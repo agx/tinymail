@@ -93,7 +93,7 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, const gchar 
 
 	while (!tny_iterator_is_done (iter))
 	{
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_current (iter);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 
 		if (!strcmp (tny_folder_get_id (TNY_FOLDER (folder)), folname))
 			func (TNY_FOLDER (folder));
@@ -162,7 +162,7 @@ main (int argc, char **argv)
 
 	aiter = tny_list_create_iterator (accounts);
 	tny_iterator_first (aiter);
-	account = TNY_STORE_ACCOUNT (tny_iterator_current (aiter));
+	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
     
 	if (online)
 		for (i=0; i<14; i++)

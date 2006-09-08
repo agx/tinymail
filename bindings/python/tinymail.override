@@ -134,7 +134,7 @@ _wrap_tny_list_tp_getitem(PyGObject *self, PyObject *key)
         /* TODO: check for failure? */
 		
 		tny_iterator_nth (iter, index);
-        ret = tny_iterator_current (iter);
+        ret = tny_iterator_get_current (iter);
         g_object_unref (G_OBJECT (ret));
         g_object_unref (G_OBJECT (iter));
         

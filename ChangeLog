@@ -1,7 +1,12 @@
 2006-09-08  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed the Python bindings
+	* Fixed the TnyIterator API (current -> get_current, as it's a
+	property like any other property)
+	* Added lots of samples to the API reference documentation
 
+	* This was a major API change in all libraries
+	
 2006-09-06  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* The big commit we have all been waiting for: Removing the Iface

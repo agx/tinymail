@@ -159,7 +159,7 @@ tny_gtk_account_tree_model_iterator_nth (TnyIterator *self, guint nth)
 
 
 static GObject* 
-tny_gtk_account_tree_model_iterator_current (TnyIterator *self)
+tny_gtk_account_tree_model_iterator_get_current (TnyIterator *self)
 {
 	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
 	gpointer ptr;
@@ -202,7 +202,7 @@ tny_iterator_init (TnyIteratorIface *klass)
 	klass->prev_func = tny_gtk_account_tree_model_iterator_prev;
 	klass->first_func = tny_gtk_account_tree_model_iterator_first;
 	klass->nth_func = tny_gtk_account_tree_model_iterator_nth;
-	klass->current_func = tny_gtk_account_tree_model_iterator_current;
+	klass->get_current_func = tny_gtk_account_tree_model_iterator_get_current;
 	klass->get_list_func = tny_gtk_account_tree_model_iterator_get_list;
 	klass->is_done  = tny_gtk_account_tree_model_iterator_is_done;
 	
