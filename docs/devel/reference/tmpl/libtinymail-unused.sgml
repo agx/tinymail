@@ -214,6 +214,30 @@ TnyMsgHeaderProxy
 TnyPasswordDialog
 
 
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Short_Description ##### -->
+Shared include file with forward typedefs
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/tny-shared.sgml:Title ##### -->
+tny-shared
+
+
 <!-- ##### SECTION ./tmpl/tny-summary-window-iface.sgml:Long_Description ##### -->
 <para>
 You can let your summary window type implement this type. Not that it defines a lot at this moment.
@@ -673,6 +697,20 @@ Implemented by GLib or a noop
 @get_folders_func: 
 @get_folders_async_func: 
 
+<!-- ##### STRUCT TnyFolderStoreQueryClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyFolderStoreQueryItemClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
 <!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
 <para>
 This function is used to tell the application that the authentication information it provided via #TnyGetPassFunc was rejected by the service.
@@ -682,6 +720,12 @@ It can typically be used to tell a key service, like GNOME key ring, to forget t
 </para>
 
 @self:  The #TnyAccount instance of which the password was not accepted
+
+<!-- ##### TYPEDEF TnyFsStreamClass ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
 <para>
@@ -1006,6 +1050,13 @@ A callback function for tny_msg_folder_refresh_async that callsback when new inf
 @what: What happened
 @status: A status field
 @user_data: user data
+
+<!-- ##### STRUCT TnySimpleListClass ##### -->
+<para>
+
+</para>
+
+@parent: 
 
 <!-- ##### STRUCT TnyStoreAccountClass ##### -->
 <para>
