@@ -30,7 +30,7 @@ guint *tny_folder_signals;
  * tny_folder_expunge:
  * @self: a TnyFolder object
  *
- * Sync changes made to a folder to its backing store, expunging deleted 
+ * Persist changes made to a folder to its backing store, expunging deleted 
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
  *
  **/
@@ -51,16 +51,18 @@ tny_folder_expunge (TnyFolder *self)
  * @header: the header of the message to remove
  *
  * Remove a message from a folder. This doesn't remove it from a #TnyList 
- * that holds the headers (for example for a header summary view) after doing
- * the tny_folder_get_headers method.
+ * that holds the headers (for example for a header summary view) if the
+ * tny_folder_get_headers method happened before the deletion. You are 
+ * responsible for refreshing your own lists.
  *
  * This method also doesn't truely remove the header from the folder. It only
  * marks it as removed (it sets the TNY_HEADER_FLAG_DELETED). If you perform
  * tny_folder_expunge on the folder, it will really be removed.
  *
- * This means that the tny_folder_get_headers method will still prepend the
- * removed message in the list until the expunge happened. You are advised to
- * hide messages that have been marked as being deleted from your summary view.
+ * This means that a tny_folder_get_headers method call will still prepend the
+ * removed message to the list. It will do this until the expunge happened. You
+ * are advised to hide messages that have been marked as being deleted from your
+ * summary view.
  * 
  * In Gtk+ for the #GtkTreeView component, you can do this using the 
  * #GtkTreeModelFilter tree model filtering model.
@@ -97,8 +99,8 @@ tny_folder_remove_message (TnyFolder *self, TnyHeader *header)
  * using (g_main_depth > 0), the callbacks will happen in a worker thread at an
  * unknown moment in time (check your locking).
  *
- * When using Gtk+, the callback doesn't need gdk_threads_enter and 
- * gdk_threads_leave in Gtk+.
+ * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
+ * gdk_threads_leave guards (because it happens in the #GMainLoop).
  *
  **/
 void
@@ -120,7 +122,7 @@ tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, Tn
  * @self: a TnyFolder object
  *
  * Refresh the folder. This gets the summary information from the E-Mail service
- * and writes it to the the on-disk cache or updates it.
+ * and writes it to the the on-disk cache and/or updates it.
  *
  * After this method, tny_folder_get_all_count and 
  * tny_folder_get_unread_count are guaranteed to be correct.
@@ -278,6 +280,22 @@ tny_folder_get_message (TnyFolder *self, TnyHeader *header)
  * Get a list of message header instances that are in this folder. Also read
  * about tny_folder_refresh.
  *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyList *headers = tny_simple_list_new ();
+ * TnyFolder *folder = ...; TnyIterator *iter; 
+ * tny_folder_get_headers (folder, headers, TRUE);
+ * iter = tny_list_create_iterator (headers);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *  	TnyHeader *folder = TNY_HEADER (tny_iterator_get_current (iter));
+ * 	g_print ("%s\n", tny_header_get_subject (header));
+ * 	g_object_unref (G_OBJECT (header));
+ * 	tny_iterator_next (iter);	    
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (headers)); 
+ * </programlisting></informalexample>
  **/
 void
 tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh)
@@ -367,7 +385,7 @@ tny_folder_set_name (TnyFolder *self, const gchar *name)
  * 
  * Get the type of the folder (Inbox, Outbox etc.) 
  * 
- * Return value: The folder type as  a #TnyFolderType enum
+ * Return value: The folder type as a #TnyFolderType enum
  *
  **/
 TnyFolderType 
