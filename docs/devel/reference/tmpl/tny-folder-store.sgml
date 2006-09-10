@@ -17,6 +17,12 @@ A abstract type that defines a store for child folders
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyFolderStore ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyFolderStoreIface ##### -->
 <para>
 

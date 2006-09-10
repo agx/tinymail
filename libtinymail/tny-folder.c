@@ -22,13 +22,7 @@
 #include <tny-folder-store.h>
 #include <tny-header.h>
 
-#ifndef TNY_FOLDER_C
-#define TNY_FOLDER_C
-#endif
 #include <tny-folder.h>
-#ifdef TNY_FOLDER_C
-#undef TNY_FOLDER_C
-#endif
 guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
 /**
@@ -408,7 +402,7 @@ tny_folder_get_folder_type  (TnyFolder *self)
 
 
 static void
-tny_folder_base_init (gpointer g_class)
+tny_folder_class_init (gpointer g_class, gpointer class_data)
 {
 	static gboolean tny_folder_initialized = FALSE;
 
@@ -461,9 +455,9 @@ tny_folder_get_type (void)
 		static const GTypeInfo info = 
 		{
 		  sizeof (TnyFolderIface),
-		  tny_folder_base_init,   /* base_init */
+		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
+		  tny_folder_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
 		  0,

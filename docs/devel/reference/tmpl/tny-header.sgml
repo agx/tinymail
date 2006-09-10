@@ -29,6 +29,12 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 
 
 
+<!-- ##### STRUCT TnyHeader ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyHeaderIface ##### -->
 <para>
 

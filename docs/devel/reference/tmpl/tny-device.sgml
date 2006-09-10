@@ -18,6 +18,12 @@ online/offline status.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyDevice ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
 
@@ -48,6 +54,14 @@ online/offline status.
 
 
 <!-- ##### FUNCTION tny_device_force_offline ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_device_reset ##### -->
 <para>
 
 </para>

@@ -17,12 +17,26 @@ A abstract type that defines a folder
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
+<!-- ##### STRUCT TnyFolder ##### -->
 <para>
 
 </para>
 
 
+<!-- ##### SIGNAL TnyFolder::folder-inserted ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyfolderiface: the object which received the signal.
 
 <!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
@@ -47,6 +61,13 @@ A abstract type that defines a folder
 @get_subscribed_func: 
 @refresh_async_func: 
 @refresh_func: 
+
+<!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
 
 <!-- ##### FUNCTION tny_folder_type_get_type ##### -->
 <para>

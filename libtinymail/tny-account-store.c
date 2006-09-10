@@ -239,7 +239,7 @@ tny_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *acc
 
 
 static void
-tny_account_store_base_init (gpointer g_class)
+tny_account_store_class_init (gpointer g_class, gpointer class_data)
 {
 	static gboolean tny_account_store_initialized = FALSE;
 
@@ -330,9 +330,9 @@ tny_account_store_get_type (void)
 		static const GTypeInfo info = 
 		{
 		  sizeof (TnyAccountStoreIface),
-		  tny_account_store_base_init,   /* base_init */
+		  NULL,   /* base_init */
 		  NULL,   /*    base_finalize */
-		  NULL,   /* class_init */
+		  tny_account_store_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
 		  0,
