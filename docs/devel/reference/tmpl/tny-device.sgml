@@ -18,18 +18,6 @@ online/offline status.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### VARIABLE tny_device_signals ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyDevice ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
 

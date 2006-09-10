@@ -19,12 +19,17 @@
 
 #include <config.h>
 
-#include <tny-folder.h>
 #include <tny-folder-store.h>
 #include <tny-header.h>
 
-guint *tny_folder_signals;
-
+#ifndef TNY_FOLDER_C
+#define TNY_FOLDER_C
+#endif
+#include <tny-folder.h>
+#ifdef TNY_FOLDER_C
+#undef TNY_FOLDER_C
+#endif
+guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
 /**
  * tny_folder_expunge:
@@ -405,13 +410,10 @@ tny_folder_get_folder_type  (TnyFolder *self)
 static void
 tny_folder_base_init (gpointer g_class)
 {
-	static gboolean initialized = FALSE;
+	static gboolean tny_folder_initialized = FALSE;
 
-	if (!initialized) 
-	{
-
-		tny_folder_signals = g_new0 (guint, TNY_FOLDER_LAST_SIGNAL);
-
+	if (!tny_folder_initialized) 
+	{   
 /**
  * TnyFolder::folder-inserted
  * @self: the object on which the signal is emitted
@@ -445,7 +447,7 @@ tny_folder_base_init (gpointer g_class)
 			G_TYPE_NONE, 0);
 
 
-		initialized = TRUE;
+		tny_folder_initialized = TRUE;
 	}
 }
 

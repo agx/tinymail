@@ -19,12 +19,6 @@ can keep a position state for a list.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyIterator ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyIteratorIface ##### -->
 <para>
 
@@ -70,15 +64,6 @@ can keep a position state for a list.
 
 @self: 
 @nth: 
-
-
-<!-- ##### FUNCTION tny_iterator_get_current ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_iterator_is_done ##### -->

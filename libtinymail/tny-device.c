@@ -19,17 +19,8 @@
 
 #include <config.h>
 
-#ifndef TNY_DEVICE_C
-#define TNY_DEVICE_C
-#endif
-
 #include <tny-device.h>
-
-#ifdef TNY_DEVICE_C
-#undef TNY_DEVICE_C
-#endif
-
-guint *tny_device_signals = NULL;
+guint tny_device_signals [TNY_DEVICE_LAST_SIGNAL];
 
 
 /**
@@ -107,14 +98,12 @@ tny_device_is_online (TnyDevice *self)
 static void
 tny_device_base_init (gpointer g_class)
 {
-	static gboolean initialized = FALSE;
+	static gboolean tny_device_initialized = FALSE;
 
-	if (!initialized) 
+	if (!tny_device_initialized) 
 	{
-		tny_device_signals = g_new0 (guint, TNY_DEVICE_LAST_SIGNAL);
-
 /**
- * TnyDevice::connection_changed:
+ * TnyDevice::connection-changed
  * @self: the object on which the signal is emitted
  * @arg1: Whether or not the device is now online
  * @user_data: user data set when the signal handler was connected.
@@ -130,7 +119,7 @@ tny_device_base_init (gpointer g_class)
 			g_cclosure_marshal_VOID__BOOLEAN, G_TYPE_NONE, 1,
 				G_TYPE_BOOLEAN);
 
-		initialized = TRUE;
+		tny_device_initialized = TRUE;
 	}
 }
 

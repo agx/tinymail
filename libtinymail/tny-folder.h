@@ -35,10 +35,6 @@ G_BEGIN_DECLS
 #define TNY_IS_FOLDER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_FOLDER))
 #define TNY_FOLDER_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_FOLDER, TnyFolderIface))
 
-#ifndef TNY_FOLDER_C
-extern guint *tny_folder_signals;
-#endif
-
 #ifndef TNY_SHARED_H
 typedef enum _TnyFolderType TnyFolderType;
 typedef struct _TnyFolder TnyFolder;
@@ -51,6 +47,8 @@ enum
 	TNY_FOLDER_FOLDERS_RELOADED,
 	TNY_FOLDER_LAST_SIGNAL
 };
+
+extern guint tny_folder_signals[TNY_FOLDER_LAST_SIGNAL];
 
 #define TNY_TYPE_FOLDER_TYPE (tny_folder_type_get_type())
 

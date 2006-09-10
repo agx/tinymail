@@ -11,16 +11,10 @@ A stream is an object that can be written to and can be read from in a streaming
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsgMimePart, #TnyMsgView, #TnySaveStrategy, #TnyCamelStream, #TnyStreamCamel, #TnyMozEmbedStream, #TnyTextBufferStream, #TnyFsStream, #TnyVfsStream
+#TnyCamelStream, #TnyStreamCamel, #TnyMozEmbedStream, #TnyGtkTextBufferStream, #TnyFsStream, #TnyVfsStream
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
-
-
-<!-- ##### STRUCT TnyStream ##### -->
-<para>
-
-</para>
 
 
 <!-- ##### STRUCT TnyStreamIface ##### -->

@@ -21,18 +21,8 @@
 
 #include <tny-account.h>
 
-#ifndef TNY_ACCOUNT_STORE_C
-#define TNY_ACCOUNT_STORE_C
-#endif
-
 #include <tny-account-store.h>
-
-#ifdef TNY_ACCOUNT_STORE_C
-#undef TNY_ACCOUNT_STORE_C
-#endif
-
-guint *tny_account_store_signals = NULL;
-
+guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 
 /**
  * tny_account_store_alert:
@@ -251,13 +241,10 @@ tny_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *acc
 static void
 tny_account_store_base_init (gpointer g_class)
 {
-	static gboolean initialized = FALSE;
+	static gboolean tny_account_store_initialized = FALSE;
 
-	if (!initialized) 
+	if (!tny_account_store_initialized) 
 	{
-
-		tny_account_store_signals = g_new0 (guint, TNY_ACCOUNT_STORE_LAST_SIGNAL);
-
 /**
  * TnyAccountStore::account-changed
  * @self: the object on which the signal is emitted
@@ -326,20 +313,12 @@ tny_account_store_base_init (gpointer g_class)
 			g_cclosure_marshal_VOID__VOID,
 			G_TYPE_NONE, 0);
 
-		initialized = TRUE;
+		tny_account_store_initialized = TRUE;
 	}
 
 	return;
 }
 
-static void
-tny_account_store_base_finalize (gpointer g_class)
-{
-	if (tny_account_store_signals)
-		g_free (tny_account_store_signals);
-
-	return;
-}
 
 GType
 tny_account_store_get_type (void)
@@ -352,7 +331,7 @@ tny_account_store_get_type (void)
 		{
 		  sizeof (TnyAccountStoreIface),
 		  tny_account_store_base_init,   /* base_init */
-		  tny_account_store_base_finalize,   /* base_finalize */
+		  NULL,   /*    base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */

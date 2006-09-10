@@ -58,9 +58,7 @@ enum _TnyGetAccountsRequestType
 	TNY_ACCOUNT_STORE_BOTH
 };
 
-#ifndef TNY_ACCOUNT_STORE_C
-extern guint *tny_account_store_signals;
-#endif
+extern guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 
 #ifndef TNY_SHARED_H
 typedef struct _TnyAccountStore TnyAccountStore;

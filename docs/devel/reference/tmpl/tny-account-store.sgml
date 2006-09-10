@@ -31,18 +31,6 @@ A abstract type that defines a store for accounts
 
 
 
-<!-- ##### VARIABLE tny_account_store_signals ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyAccountStore ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
 

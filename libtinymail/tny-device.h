@@ -31,15 +31,13 @@ G_BEGIN_DECLS
 #define TNY_IS_DEVICE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_DEVICE))
 #define TNY_DEVICE_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_DEVICE, TnyDeviceIface))
 
-#ifndef TNY_DEVICE_C
-extern guint *tny_device_signals;
-#endif
-
 enum
 {
 	TNY_DEVICE_CONNECTION_CHANGED,
 	TNY_DEVICE_LAST_SIGNAL
 };
+
+extern guint tny_device_signals [TNY_DEVICE_LAST_SIGNAL];
 
 #ifndef TNY_SHARED_H
 typedef struct _TnyDevice TnyDevice;
@@ -66,6 +64,7 @@ GType tny_device_get_type (void);
 gboolean tny_device_is_online (TnyDevice *self);
 void tny_device_force_online (TnyDevice *self);
 void tny_device_force_offline (TnyDevice *self);
+void tny_device_reset (TnyDevice *self);
 
 G_END_DECLS
 
