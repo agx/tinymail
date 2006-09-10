@@ -2,7 +2,7 @@
 TnyFolderStore
 
 <!-- ##### SECTION Short_Description ##### -->
-An type that defines a store for folders
+A type that defines a store for folders
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

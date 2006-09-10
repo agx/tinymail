@@ -2,7 +2,7 @@
 TnyIterator
 
 <!-- ##### SECTION Short_Description ##### -->
-An iterator type for a list
+A iterator type for a list
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
