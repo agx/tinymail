@@ -4,6 +4,24 @@ About
 Project tinymail is an attempt to create an E-mail client framework for small
 devices.
 
+Documentation
+=============
+
+Online :
+
+API reference manual per API version: http://tinymail.org/API/
+Development website and info: http://tinymail.org/trac/tinymail
+Marketing documentation & contact: http://tinymail.org
+
+To generate the API documentation yourself:
+
+./autogen.sh --enable-gtk-doc --enable-tests && make
+./autogen.sh --enable-doxygen && make
+
+Your documentation will be generated in docs/devel/reference and 
+docs/devel/doxygen. Tinymail being glib/gobject based will give you the best 
+results when using gtk-doc for API documentation generation.
+
 Development tips
 ================
 You can find the GUnit framework at http://kooditakomo.cs.tut.fi/projects/gunit

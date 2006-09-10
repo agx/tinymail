@@ -4,7 +4,8 @@
 	TnyDevice interfaces
 	* Improved the documentation generation
 	* Small fixes for the signals of above types
-
+	* From now on will --enable-gtk-doc require --enable-tests too
+	
 2006-09-08  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed the Python bindings

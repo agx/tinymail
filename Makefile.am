@@ -19,7 +19,28 @@ if BUILD_DEMOUI
 SUBDIRS += tinymail 
 endif
 
-SUBDIRS += docs bindings po tests 
+SUBDIRS += tests bindings po 
+
+#### Funny OR simulation :)
+if BUILD_TESTS
+if !BUILD_UNITTESTS
+SUBDIRS += docs 
+endif
+endif
+
+if BUILD_UNITTESTS
+if !BUILD_TESTS
+SUBDIRS += docs 
+endif
+endif
+
+if BUILD_UNITTESTS
+if BUILD_TESTS
+SUBDIRS += docs 
+endif
+endif
+###
+
 
 if BUILD_UNITTESTS
 SUBDIRS += libtinymail-test 
