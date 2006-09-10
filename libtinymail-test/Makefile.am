@@ -63,7 +63,12 @@ libtinymail_test_suite_la_LIBADD = 						\
 
 tny_simple_test_runner_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS)
 
-tny_test_anything_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS)
+tny_test_anything_LDFLAGS = $(LIBTINYMAIL_TEST_LIBS) \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la               \
+	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la           \
+	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la   \
+	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la   \
+	$(top_builddir)/tests/shared/libtestsshared.a
 
 tny_simple_test_runner_LDADD = 							\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la               \

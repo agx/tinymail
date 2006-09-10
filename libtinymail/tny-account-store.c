@@ -239,7 +239,7 @@ tny_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *acc
 
 
 static void
-tny_account_store_class_init (gpointer g_class, gpointer class_data)
+tny_account_store_base_init (gpointer g_class)
 {
 	static gboolean tny_account_store_initialized = FALSE;
 
@@ -330,9 +330,9 @@ tny_account_store_get_type (void)
 		static const GTypeInfo info = 
 		{
 		  sizeof (TnyAccountStoreIface),
-		  NULL,   /* base_init */
+		  tny_account_store_base_init,   /* base_init */
 		  NULL,   /*    base_finalize */
-		  tny_account_store_class_init,   /* class_init */
+		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
 		  0,
@@ -342,6 +342,7 @@ tny_account_store_get_type (void)
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyAccountStore", &info, 0);
+		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}
 
 	return type;

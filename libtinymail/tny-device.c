@@ -96,7 +96,7 @@ tny_device_is_online (TnyDevice *self)
 
 
 static void
-tny_device_class_init (gpointer g_class, gpointer class_data)
+tny_device_base_init (gpointer g_class)
 {
 	static gboolean tny_device_initialized = FALSE;
 
@@ -133,9 +133,9 @@ tny_device_get_type (void)
 		static const GTypeInfo info = 
 		{
 		  sizeof (TnyDeviceIface),
-		  NULL,   /* base_init */
+		  tny_device_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
-		  tny_device_class_init,   /* class_init */
+		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
 		  0,
@@ -143,6 +143,7 @@ tny_device_get_type (void)
 		  NULL,   /* instance_init */
 		  NULL
 		};
+	    
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyDevice", &info, 0);
 

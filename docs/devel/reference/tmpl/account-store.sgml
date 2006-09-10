@@ -22,11 +22,6 @@ TnyAccountStore
 
 </para>
 
-@parent: 
-@cache_dir: 
-@session: 
-@device: 
-@force_online: 
 
 <!-- ##### FUNCTION tny_test_account_store_new ##### -->
 <para>

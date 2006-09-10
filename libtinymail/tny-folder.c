@@ -402,7 +402,7 @@ tny_folder_get_folder_type  (TnyFolder *self)
 
 
 static void
-tny_folder_class_init (gpointer g_class, gpointer class_data)
+tny_folder_base_init (gpointer g_class)
 {
 	static gboolean tny_folder_initialized = FALSE;
 
@@ -455,14 +455,14 @@ tny_folder_get_type (void)
 		static const GTypeInfo info = 
 		{
 		  sizeof (TnyFolderIface),
-		  NULL,   /* base_init */
+		  tny_folder_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
-		  tny_folder_class_init,   /* class_init */
+		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
 		  0,
 		  0,      /* n_preallocs */
-		  NULL,    /* instance_init */
+		  NULL,   /* instance_init */
 		  NULL
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 

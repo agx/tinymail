@@ -22,7 +22,6 @@ TnyPlatformFactory
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_test_platform_factory_get_instance ##### -->
 <para>

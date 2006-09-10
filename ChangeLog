@@ -1,3 +1,10 @@
+2006-09-11  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed the signal documentation of the TnyFolder, TnyAccountStore and
+	TnyDevice interfaces
+	* Improved the documentation generation
+	* Small fixes for the signals of above types
+
 2006-09-08  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed the Python bindings

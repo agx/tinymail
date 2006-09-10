@@ -22,7 +22,6 @@ TnyDevice
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_test_device_new ##### -->
 <para>
