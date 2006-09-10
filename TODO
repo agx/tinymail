@@ -3,7 +3,7 @@ o. camel-lite-builder builds without nspr-dev resulting in a compilation error
 o. The docs don't describe the enums
 o. The docs don't describe the TnyGetFoldersCallback
 o. The docs don't describe the arg1 of the signals
-o. The docs don't find the signals
+o. The docs don't find the signals (funny but it does find it for TnyFolder?!!)
 o. The prerequisites of some types add GObject (this isn't needed)
 o. The Python bindings don't wrap the TnyGetFoldersCallback
 o. I think the tny_list_copy implementations need to add a reference to the items!
