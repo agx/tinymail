@@ -1,12 +1,9 @@
-o. Remove the Iface suffix of interface types
-o. Rename types in the demo-ui
 o. Refactor TnySaveStrategy to a TnyGnomeVfsSaveStrategy and a TnyPosixSaveStrategy
 o. camel-lite-builder builds without nspr-dev resulting in a compilation error
 o. The docs don't describe the enums
 o. The docs don't describe the TnyGetFoldersCallback
 o. The docs don't describe the arg1 of the signals
-o. The docs talk about TnyHeaderProxy?
+o. The docs don't find the signals
 o. The prerequisites of some types add GObject (this isn't needed)
-o. The implemented interfaces only add the ones of libtinymail (seems fixed now, need to check this)
-o. Add lots of code samples to the docs
 o. The Python bindings don't wrap the TnyGetFoldersCallback
+o. I think the tny_list_copy implementations need to add a reference to the items!
