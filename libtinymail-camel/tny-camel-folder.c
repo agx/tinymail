@@ -898,9 +898,27 @@ tny_camel_folder_remove_folder (TnyFolderStore *self, TnyFolder *folder)
 static void 
 tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder)
 {
-	/* TODO */
-    
-       	g_critical ("TODO: The remove_folder method is unimplemented in this TnyFolderStore implementation (TnyFolder)\n");
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	CamelStore *store = (CamelStore*) _tny_camel_account_get_service 
+		(TNY_CAMEL_ACCOUNT (priv->account));
+	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
+	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
+    	gchar *cfolname = cpriv->folder_name;
+	gchar *folname = priv->folder_name;
+	gint parlen = strlen (folname);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
+
+	/* /INBOX/test	
+	   /INBOX/test/test */
+
+    	if (!strncmp (folname, cfolname, parlen))
+	{
+		gchar *ccfoln = cfolname + parlen;
+		if ((*ccfoln == '/') && (strrchr (ccfoln, '/') == ccfoln))
+			camel_store_delete_folder (store, cfolname, &ex);
+	}
+	
+	/* TODO: error handling using 'ex' */
 
 	return;
 }
@@ -915,11 +933,22 @@ tny_camel_folder_create_folder (TnyFolderStore *self, const gchar *name)
 static TnyFolder*
 tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name)
 {
-	/* TODO */
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	CamelStore *store = (CamelStore*) _tny_camel_account_get_service 
+		(TNY_CAMEL_ACCOUNT (priv->account));
+	gchar *folname = priv->folder_name;
+	TnyFolder *folder = tny_camel_folder_new ();
+	CamelFolderInfo *info;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
     
-       	g_critical ("TODO: The create_folder method is unimplemented in this TnyFolderStore implementation (TnyFolder)\n");
+	info = camel_store_create_folder (store, priv->folder_name, name, &ex);
+    
+	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
+    	camel_store_free_folder_info (store, info);
 
-	return TNY_FOLDER (tny_camel_folder_new ());
+	/* TODO: Error handling using 'ex' */
+
+    	return folder;
 }
 
 

@@ -2,7 +2,7 @@
 TnyMozEmbedMsgView
 
 <!-- ##### SECTION Short_Description ##### -->
-A msg view type that uses GtkMozEmbed
+A message view type that uses GtkMozEmbed
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

@@ -1,5 +1,7 @@
 2006-09-11  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Implemented create_folder and remove_folder in TnyCamelFolder
+	and TnyCamelStoreAccount
 	* Fixed the signal documentation of the TnyFolder, TnyAccountStore and
 	TnyDevice interfaces
 	* Improved the documentation generation
