@@ -27,8 +27,10 @@
  * @self: a #TnyAccount object
  *
  * Get the account type. There are two account types: a store and a transport
- * account type. A store account will implement the #TnyFolderStore 
- * interfaces which defines that the type contains folders.
+ * account type.
+ *
+ * A store account will implement the #TnyFolderStore 
+ * interfaces which means that the type can contain folders.
  *
  * A transport account has a send method for sending #TnyMsg instances
  * using the transport protocol of the account (for example SMTP).

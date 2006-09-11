@@ -119,7 +119,7 @@ tny_iterator_get_current (TnyIterator *self)
  * tny_iterator_is_done:
  * @self: A #TnyIterator instance
  *
- * Does the iterator point to some valid list item. You can use this property
+ * Does the iterator point to some valid list item? You can use this property
  * to make loops like:
  * 
  * Example:
@@ -158,7 +158,8 @@ tny_iterator_is_done (TnyIterator *self)
  * @self: A #TnyIterator instance
  *
  * Does not move the iterator. Returns the list of which this iterator is an
- * iterator. The returned list object should be unreferenced after use.
+ * iterator. The returned list object should be unreferenced after use. Remember
+ * when using this property that lists shouldn't change while iterating them.
  *
  * Return value: The #TnyList instance being iterated
  *
@@ -209,8 +210,6 @@ tny_iterator_get_type (void)
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyIterator", &info, 0);
-
-		/* g_type_interface_add_prerequisite (type, G_TYPE_OBJECT); */
 	}
 
 	return type;

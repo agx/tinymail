@@ -42,7 +42,29 @@ tny_list_length (TnyList *self)
  * @self: A #TnyList instance
  * @item: the item to prepend
  *
- * Prepends an item to a list
+ * Prepends an item to a list. You can only prepend items that inherit from the
+ * GObject base item. That's because the tinymail list infrastructure does 
+ * reference counting. It effectively means that indeed you can't use non 
+ * GObject types in a tinymail list. But there's not a single situation where 
+ * you must do that. If you must store a non GObject in a list, you shouldn't
+ * use the tinymail infrastructure for this. Consider using a doubly linked list
+ * or a pointer array or any other list-type available on your development
+ * platform.
+ *
+ * However, tinymail lists can cope with any valid GObject. Not just the 
+ * GObjects implemented by the tinymail framework.
+ *
+ * All reference handling in tinymail is reference neutral. Also the lists. This
+ * means that if your plan is to reparent the item to the list, that you should
+ * take care of that by, after prepending or appending it, unreferencing it to 
+ * get rid of its initial reference. If you don't want to reparent, but you do
+ * want to destroy your item once removed from the list, then you must 
+ * unreference your items twice. Note that reparenting is highly recommended
+ * in most such cases (because it's a much cleaner way). However, if reparented
+ * and the list itself gets destroyed, then the item will also get unreferenced.
+ *
+ * Reparenting indeed means reparenting. Okay? Loosing your parent reference
+ * means loosing your reason of existance. So you'll get destroyed.
  *
  * Implementers: if you have to choose, make this one the fast one
  *
@@ -64,7 +86,29 @@ tny_list_prepend (TnyList *self, GObject* item)
  * @self: A #TnyList instance
  * @item: the item to append
  *
- * Appends an item to a list
+ * Appends an item to a list. You can only append items that inherit from the
+ * GObject base item. That's because the tinymail list infrastructure does 
+ * reference counting. It effectively means that indeed you can't use non 
+ * GObject types in a tinymail list. But there's not a single situation where 
+ * you must do that. If you must store a non GObject in a list, you shouldn't
+ * use the tinymail infrastructure for this. Consider using a doubly linked list
+ * or a pointer array or any other list-type available on your development
+ * platform.
+ *
+ * However, tinymail lists can cope with any valid GObject. Not just the 
+ * GObjects implemented by the tinymail framework.
+ *
+ * All reference handling in tinymail is reference neutral. Also the lists. This
+ * means that if your plan is to reparent the item to the list, that you should
+ * take care of that by, after prepending or appending it, unreferencing it to 
+ * get rid of its initial reference. If you don't want to reparent, but you do
+ * want to destroy your item once removed from the list, then you must 
+ * unreference your items twice. Note that reparenting is highly recommended
+ * in most such cases (because it's a much cleaner way). However, if reparented
+ * and the list itself gets destroyed, then the item will also get unreferenced.
+ *
+ * Reparenting indeed means reparenting. Okay? Loosing your parent reference
+ * means loosing your reason of existance. So you'll get destroyed.
  *
  * Implementers: if you have to choose, make the prepend one the fast one
  *
@@ -91,10 +135,47 @@ tny_list_append (TnyList *self, GObject* item)
  * recreate the iterator(s) if you remove an item to be certain.
  *
  * If you want to clear a list, consider using the tny_list_foreach or simply
- * destroy the list instance and construct a new one.
+ * destroy the list instance and construct a new one. If you want to remove
+ * specific items from a list, consider using a second list. You should not
+ * attempt to remove items from a list while an (any) iterator is active on the
+ * same list.
+ *
+ * Example (removing even items):
+ * <informalexample><programlisting>
+ * TnyList *toremovefrom = ...
+ * TnyList *removethese = tny_simple_list_new ();
+ * TnyIterator *iter = tny_list_create_iterator (toremovefrom);
+ * int i = 0;
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *      if (i % 2 == 0)
+ *      {
+ *           GObject *obj = tny_iterator_get_current (iter);
+ *           tny_list_prepend (removethese, obj);
+ *           g_object_unref (G_OBJECT (obj));
+ *      }
+ *      i++;
+ *      tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * iter = tny_list_create_iterator (removethese);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *      GObject *obj = tny_iterator_get_current (iter);
+ *      tny_list_remove (toremovefrom, obj);
+ *      g_object_unref (G_OBJECT (obj));
+ *      tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (removethese));
+ * g_object_unref (G_OBJECT (toremovefrom));
+ * </programlisting></informalexample>
  *
  * There's no guarantee whatsoever that existing iterators of @self will be
- * valid after this method returned.
+ * valid after this method returned. 
+ *
+ * Note that if you didn't remove the initial reference when putting the item
+ * in the list, this remove will not take of that initial reference either. 
  *
  **/
 void 
@@ -129,9 +210,9 @@ tny_list_remove (TnyList *self, GObject* item)
  * TnyIterator *iter2 = tny_list_create_iterator (list);
  * while (!tny_iterator_is_done (iter1))
  * {
- *	while (!tny_iterator_is_done (iter2))
- *		tny_iterator_next (iter2);
- *	tny_iterator_next (iter1);
+ *      while (!tny_iterator_is_done (iter2))
+ *            tny_iterator_next (iter2);
+ *      tny_iterator_next (iter1);
  * }
  * g_object_unref (G_OBJECT (iter1));
  * g_object_unref (G_OBJECT (iter2));
@@ -139,11 +220,19 @@ tny_list_remove (TnyList *self, GObject* item)
  * </programlisting></informalexample>
  *
  * The reason why the method isn't called get_iterator is because it's a
- * object creation method. It's not a property. It effectively creates a new
- * instance of an iterator. The returned iterator object should (therefore) be
- * unreferenced after use.
+ * object creation method (a factory method). It's not a property. It effectively
+ * creates a new instance of an iterator. The returned iterator object should
+ * (therefore) be unreferenced after use.
  * 
- * Return value: A new iterator for this list
+ * Implementers: For custom lists you must create a private iterator type and
+ * return a new instance of it. You shouldn't make the internal API of that type
+ * public.
+ *
+ * The developer will always only use the TnyIterator interface API on instances
+ * of your type. You must therefore return your private iterator type, that 
+ * implements TnyIterator, here.
+ *
+ * Return value: A new iterator for the list @self
  *
  **/
 TnyIterator* 
@@ -163,14 +252,15 @@ tny_list_create_iterator (TnyList *self)
  * @func: the function to call with each element's data.
  * @user_data: user data to pass to the function.
  *
- * Calls a function for each element of a #TnyList. It will use an internal
+ * Calls a function for each element in a #TnyList. It will use an internal
  * iteration which you don't have to worry about. 
  *
+ * Example:
  * <informalexample><programlisting>
  * static void
  * list_foreach_item (TnyHeader *header, gpointer user_data)
  * {
- *	g_print ("%s\n", tny_header_get_subject (header));
+ *      g_print ("%s\n", tny_header_get_subject (header));
  * }
  * </programlisting></informalexample>
  *
@@ -185,7 +275,8 @@ tny_list_create_iterator (TnyList *self)
  * The purpose of this method is to have a fast foreach iteration. Using this
  * is faster than inventing your own foreach loop using the is_done and next
  * methods. The order is guaranteed to be the first element first, the last 
- * element last. It's guaranteed that all current items will be iterated.
+ * element last. If during the iteration you don't remove items, it's guaranteed
+ * that all current items will be iterated.
  *
  * In the func implementation and during the foreach operation you shouldn't
  * append, remove nor prepend items to the list. In multithreaded environments

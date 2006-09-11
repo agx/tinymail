@@ -2,6 +2,7 @@
 %%
 headers
 #include <Python.h>
+#include <pygobject.h>
 
 #include <tny-account-store-view.h>
 #include <tny-header-view.h>

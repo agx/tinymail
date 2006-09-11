@@ -1,5 +1,7 @@
 2006-09-11  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Experimented a bit with scanvirtuals.py in bindings/python decided
+	to add it
 	* Fixed some guards for the folder_name of TnyCamelFolder
 	* Fixed small memory leak
 	* Implemented create_folder and remove_folder in TnyCamelFolder
