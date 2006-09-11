@@ -5,7 +5,9 @@
 	* Improved the documentation generation
 	* Small fixes for the signals of above types
 	* From now on will --enable-gtk-doc require --enable-tests too
-	
+	* Fixed the Python binding's get_folders_async of TnyFolderStore
+	* Fixed a reference counting problem on TnyList::copy
+
 2006-09-08  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed the Python bindings
