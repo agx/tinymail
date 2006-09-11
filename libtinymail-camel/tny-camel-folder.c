@@ -104,7 +104,7 @@ unload_folder (TnyCamelFolderPriv *priv, gboolean destroy)
 static void
 load_folder_no_lock (TnyCamelFolderPriv *priv)
 {
-	if (!priv->folder && !priv->loaded)
+	if (!priv->folder && !priv->loaded && priv->folder_name)
 	{
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelStore *store = (CamelStore*) _tny_camel_account_get_service 
@@ -838,7 +838,9 @@ tny_camel_folder_finalize (GObject *object)
 	g_mutex_free (priv->folder_lock);
 	priv->folder_lock = NULL;
 
-
+	if (priv->folder_name)
+		g_free (priv->folder_name);
+    
 	(*parent_class->finalize) (object);
 
 	return;
@@ -903,19 +905,27 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder)
 		(TNY_CAMEL_ACCOUNT (priv->account));
 	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
-    	gchar *cfolname = cpriv->folder_name;
-	gchar *folname = priv->folder_name;
-	gint parlen = strlen (folname);
+    	gchar *cfolname; gchar *folname; gint parlen;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
+
+       	if (!cpriv->folder_name || !priv->folder_name)
+		return;
+
+	cfolname = cpriv->folder_name;
+	folname = priv->folder_name;
+	parlen = strlen (folname);
 
 	/* /INBOX/test	
 	   /INBOX/test/test */
-
+    
     	if (!strncmp (folname, cfolname, parlen))
 	{
 		gchar *ccfoln = cfolname + parlen;
 		if ((*ccfoln == '/') && (strrchr (ccfoln, '/') == ccfoln))
+		{
 			camel_store_delete_folder (store, cfolname, &ex);
+			g_free (cpriv->folder_name); cpriv->folder_name = NULL;
+		}
 	}
 	
 	/* TODO: error handling using 'ex' */
@@ -936,11 +946,16 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelStore *store = (CamelStore*) _tny_camel_account_get_service 
 		(TNY_CAMEL_ACCOUNT (priv->account));
-	gchar *folname = priv->folder_name;
-	TnyFolder *folder = tny_camel_folder_new ();
+	gchar *folname;
+	TnyFolder *folder;
 	CamelFolderInfo *info;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-    
+
+	if (!priv->folder_name)
+		return;
+
+	folname = priv->folder_name;
+    	folder = tny_camel_folder_new ();
 	info = camel_store_create_folder (store, priv->folder_name, name, &ex);
     
 	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
@@ -1007,6 +1022,10 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 	CamelFolderInfo *iter;
+
+
+	if (!priv->folder_name)
+		return;
 
 	if (!priv->iter && priv->iter_parented)
 	{

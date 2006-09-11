@@ -27,8 +27,27 @@
  * @self: a #TnyFolderStore object
  * @folder: The folder to remove
  *
- * Removes a folder represented by @folder from the folder store @self
- * 
+ * Removes a folder represented by @folder from the folder store @self. You are
+ * responsible to unreference the @folder instance yourself. This method will
+ * not do this for you, leaving the instance in an unusable state. The id of the
+ * @folder instance will be blanked.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyFolderStore *store = ...
+ * TnyFolder *remfol;
+ * TnyIterator *iter;
+ * TnyList *folders = tny_simple_list_new ();
+ * tny_folder_store_get_folders (store, folders, NULL);
+ * iter = tny_list_create_iterator (folders);
+ * tny_iterator_first (iter);
+ * remfol = TNY_FOLDER (tny_iterator_get_current (iter));
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (folders)); 
+ * tny_folder_store_remove_folder (store, remfol);
+ * g_object_unref (G_OBJECT (remfol));
+ * </programlisting></informalexample>
+ *
  **/
 void 
 tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder)
@@ -47,7 +66,16 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder)
  * @self: a #TnyFolderStore object
  * @name: The folder name to create
  *
- * Creates a new folder in folder store @self
+ * Creates a new folder in folder store @self. The value returned is the newly
+ * created folder and must be unreferenced after use.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyFolderStore *store = ...
+ * TnyFolder *createfol;
+ * createfol = tny_folder_store_create_folder (store, "Test");
+ * g_object_unref (G_OBJECT (createfol));
+ * </programlisting></informalexample>
  * 
  * Return value: A new folder instance representing the folder that was created
  *

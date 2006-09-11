@@ -296,10 +296,13 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 			apriv->url_string, &ex);
 	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
-    	gchar *cfolname = cpriv->folder_name;
 
-	camel_store_delete_folder (store, cfolname, &ex);
-	
+ 	if (cpriv->folder_name)
+ 	{
+		camel_store_delete_folder (store, cpriv->folder_name, &ex);
+		g_free (cpriv->folder_name); cpriv->folder_name = NULL;
+	}
+    
 	/* TODO: error handling using 'ex' */
 
 	return;
