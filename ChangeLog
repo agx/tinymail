@@ -8,6 +8,8 @@
 	* Fixed the Python binding's get_folders_async of TnyFolderStore
 	* Fixed a reference counting problem on TnyList::copy
 
+	* This was a major API change in libtinymail
+
 2006-09-08  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed the Python bindings
