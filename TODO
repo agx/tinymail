@@ -2,6 +2,6 @@ o. Refactor TnySaveStrategy to a TnyGnomeVfsSaveStrategy and a TnyPosixSaveStrat
 o. camel-lite-builder builds without nspr-dev resulting in a compilation error
 o. The docs don't describe the enums
 o. The docs don't describe the TnyGetFoldersCallback
-o. The prerequisites of some types add GObject (this isn't needed)
-o. The Python bindings don't wrap the TnyGetFoldersCallback
-o. I think the tny_list_copy implementations need to add a reference to the items!
+o. The prerequisites of some types add GObject (this often isn't needed)
+o. Implement removing folders and messages (TnyFolderStore)
+o. Implement and design moving messages (TnyFolderStore?)

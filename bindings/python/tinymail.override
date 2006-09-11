@@ -34,6 +34,58 @@ ignore-glob
 %%
 import gobject.GObject as PyGObject_Type
 %%
+override tny_folder_store_get_folders_async kwargs
+
+static void
+tny_get_folders_cb (TnyFolderStore *self, TnyList *list, gpointer user_data)
+{
+    PyObject *callback, *args, *ret;
+    PyGILState_STATE state;
+
+    state = pyg_gil_state_ensure();
+    callback = PyTuple_GetItem((PyObject *)user_data, 0);
+    args = Py_BuildValue("(NNO)",
+			 pygobject_new((GObject *)self),
+			 pygobject_new((GObject *)list),
+			 PyTuple_GetItem((PyObject *)user_data, 1));
+    ret = PyObject_CallObject(callback, args);
+    if (!ret)
+	PyErr_Print();
+    Py_XDECREF(ret);
+    Py_DECREF(args);
+    Py_DECREF ((PyObject *)user_data);
+    pyg_gil_state_release(state);
+}
+
+
+static PyObject *
+_wrap_tny_folder_store_get_folders_async (PyGObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = { "list", "get_folders_func", "query", "user_data", NULL };
+    PyObject *get_folders_func = Py_None, *user_data = Py_None;
+    PyGObject *list = NULL, *query = NULL;
+    PyObject *data;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,
+                                     "OO|OO:TnyFolderStore.get_folders_async", kwlist,
+                                     &list, &get_folders_func, &query, &user_data))
+        return NULL;
+
+    if (!PyCallable_Check(get_folders_func)) {
+	PyErr_SetString(PyExc_TypeError, "get_folders_async must be callable");
+	return NULL;
+    }
+  
+    data = Py_BuildValue("(OO)", get_folders_func, user_data);
+
+    tny_folder_store_get_folders_async (TNY_FOLDER_STORE (self->obj),
+					TNY_LIST (list->obj),
+				        tny_get_folders_cb, 
+					query!=NULL?TNY_FOLDER_STORE_QUERY (query->obj):NULL, 
+					data);
+    return Py_None;
+}
+%%
 override tny_folder_refresh_async kwargs
 
 static void
@@ -133,9 +185,10 @@ _wrap_tny_list_tp_getitem(PyGObject *self, PyObject *key)
         iter = tny_list_create_iterator (TNY_LIST (self->obj));
         /* TODO: check for failure? */
 		
-		tny_iterator_nth (iter, index);
+	tny_iterator_nth (iter, index);
         ret = tny_iterator_get_current (iter);
-        g_object_unref (G_OBJECT (ret));
+
+        g_object_unref (G_OBJECT (ret)); /* IM Not sure about this one */
         g_object_unref (G_OBJECT (iter));
         
     } else {

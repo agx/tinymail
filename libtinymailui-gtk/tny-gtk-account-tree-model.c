@@ -273,6 +273,7 @@ tny_gtk_account_tree_model_copy_the_list (TnyList *self)
 
 	g_mutex_lock (me->iterator_lock);
 	GList *list_copy = g_list_copy (me->first);
+	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
 	copy->first = list_copy;
 	g_mutex_unlock (me->iterator_lock);
 

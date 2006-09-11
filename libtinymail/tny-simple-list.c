@@ -104,6 +104,7 @@ tny_simple_list_copy_the_simple_list (TnyList *self)
 
 	g_mutex_lock (priv->iterator_lock);
 	GList *list_copy = g_list_copy (priv->first);
+	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
 	cpriv->first = list_copy;
 	g_mutex_unlock (priv->iterator_lock);
 

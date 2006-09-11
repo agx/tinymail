@@ -210,10 +210,10 @@ tny_list_foreach (TnyList *self, GFunc func, gpointer user_data)
  * @self: A #TnyList instance
  *
  * Creates a copy of the list. It doesn't copy the items. It, however, creates
- * a new list with new references to the same items.
- *
- * Because it's a new instance, the returned list object should be unreferenced
- * after use.
+ * a new list with new references to the same items. The items will get an extra
+ * reference added for the new list being their second parent, setting their
+ * reference count to for example two. Which means that both lists (the original
+ * and the copy) must be unreferenced after use.
  *
  * Return value: A copy of this list
  *
