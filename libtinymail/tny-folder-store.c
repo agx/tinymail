@@ -28,9 +28,9 @@
  * @folder: The folder to remove
  *
  * Removes a folder represented by @folder from the folder store @self. You are
- * responsible to unreference the @folder instance yourself. This method will
+ * responsible for unreferencing the @folder instance yourself. This method will
  * not do this for you, leaving the instance in an unusable state. The id of the
- * @folder instance will be blanked.
+ * @folder instance will be blanked once really deleted from the service.
  *
  * Example:
  * <informalexample><programlisting>
