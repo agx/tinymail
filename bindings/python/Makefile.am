@@ -91,6 +91,7 @@ tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/py
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 		\
 	--extra=$(top_srcdir)/bindings/python/tinymail.defs.extra 	\
 	--topsrcdir=$(top_srcdir) > $@
+
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
 #	$(tinymail_h_files) >> $@
 
@@ -120,13 +121,13 @@ tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-view.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-view.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h		\
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-save-strategy.h	\
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-save-strategy.h		\
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h
 
 tinymailui-gtk.defs: $(tinymailui_gtk_h_files) tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_gtk_h_files) |	\
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 			\
-	--extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra 	\
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_gtk_h_files) | \
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 		   \
+	--extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra    \
 	--topsrcdir=$(top_srcdir) > $@
 
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
@@ -154,13 +155,10 @@ tinymailui-glue.c: tinymailui.defs tinymailui.override
 	--override $(top_srcdir)/bindings/python/tinymailui.override	\
 	tinymailui.defs > $@
 
-tinymailui-gtk-glue.c: tinymailui-gtk.defs tinymailui-gtk.override
-	$(PYGTK_CODEGEN) --prefix pyuigtk				 \
-	--register $(PYGTK_DEFSDIR)/gdk-types.defs      		 \
-	--register $(PYGTK_DEFSDIR)/gtk-types.defs      		 \
-	--register tinymail.defs					 \
-	--register tinymailui.defs					 \
-	--override $(top_srcdir)/bindings/python/tinymailui-gtk.override \
+tinymailui-gtk-glue.c: tinymail.defs $(PYGTK_DEFSDIR)/gdk-types.defs $(PYGTK_DEFSDIR)/gtk-types.defs tinymailui-gtk.defs tinymailui-gtk.override
+	$(PYGTK_CODEGEN) --prefix pyuigtk --register $(PYGTK_DEFSDIR)/gdk-types.defs \
+	--register $(PYGTK_DEFSDIR)/gtk-types.defs --register tinymail.defs \
+	--register tinymailui.defs --override $(top_srcdir)/bindings/python/tinymailui-gtk.override \
 	tinymailui-gtk.defs > $@
 
 platform_include.h:

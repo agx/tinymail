@@ -2,7 +2,6 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
-
 <!ENTITY libtinymail-TnyAccount SYSTEM "xml/tny-account.xml">
 <!ENTITY libtinymail-TnyStoreAccount SYSTEM "xml/tny-store-account.xml">
 <!ENTITY libtinymail-TnyFolderStore SYSTEM "xml/tny-folder-store.xml">

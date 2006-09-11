@@ -2,7 +2,6 @@
 %%
 headers
 #include <Python.h>
-#include <pygobject.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
