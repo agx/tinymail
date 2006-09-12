@@ -135,7 +135,6 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * @self: a #TnyFolderStore object
  * @list: A #TnyList to fillup
  * @callback: The callback handler
- * @status_callback: A callback for status notifications
  * @query: A #TnyFolderStoreQuery object
  * @user_data: user data for the callback
  *

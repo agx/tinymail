@@ -9,12 +9,10 @@ Enumerations for tinymail
 Enumerations for tinymail
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyHeader, #TnyAccountStore, #TnyAccount, #TnyDevice, #TnyFolder, #TnyFolderStore
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -78,7 +76,7 @@ Enumerations for tinymail
 
 </para>
 
-@TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED: Only subscribed folders will match this query 
+@TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED: Only subscribed folders will match this query
 @TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED: Only unsibscribed folders will match this query
 @TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME: Only folders that will match the pattern on folder name will match this query
 @TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID: Only folders that wil match the pattern on folder id will match this query
@@ -97,7 +95,7 @@ Enumerations for tinymail
 @TNY_HEADER_FLAG_ANSWERED_ALL: Unknown
 @TNY_HEADER_FLAG_JUNK: This message is detected as junk mail
 @TNY_HEADER_FLAG_SECURE: Unknown
-@TNY_HEADER_FLAG_FOLDER_FLAGGED: Unknown 
+@TNY_HEADER_FLAG_FOLDER_FLAGGED: Unknown
 @TNY_HEADER_FLAG_JUNK_LEARN: This message is flagged to be junk-learned
 @TNY_HEADER_FLAG_USER: Unknown
 

@@ -40,7 +40,7 @@ G_BEGIN_DECLS
 
 #ifndef TNY_SHARED_H
 typedef struct _TnyFsStream TnyFsStream;
-typedef struct _TnyFsStream TnyFsStreamClass;
+typedef struct _TnyFsStreamClass TnyFsStreamClass;
 #endif
 
 struct _TnyFsStream
