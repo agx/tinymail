@@ -40,6 +40,7 @@
 
 <!ENTITY libtinymail-gnomevfs-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
 
+<!ENTITY libtinymailui-gtk-TnyGtkEnums SYSTEM "xml/tny-gtk-enums.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkAccountTreeModel SYSTEM "xml/tny-gtk-account-tree-model.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkAttachListModel SYSTEM "xml/tny-gtk-attach-list-model.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkHeaderListModel SYSTEM "xml/tny-gtk-header-list-model.xml">
@@ -136,6 +137,7 @@
 		&libtinymailui-gtk-TnyGtkAttachListModel;
 		&libtinymailui-gtk-TnyGtkTextBufferStream;
 		&libtinymailui-gtk-TnyGtkSaveStrategy;
+		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 
         <chapter id="libtinymail-gnomevfs">
