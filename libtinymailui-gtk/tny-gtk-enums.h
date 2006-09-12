@@ -1,5 +1,7 @@
 #ifdef TNY_GTK_ENUMS_H 
 
+/* These are fakes for gtk-doc */
+
 G_BEGIN_DECLS
 
 typedef enum {
