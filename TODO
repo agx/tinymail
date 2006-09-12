@@ -3,5 +3,5 @@ o. camel-lite-builder builds without nspr-dev resulting in a compilation error
 o. The docs don't describe the enums
 o. The docs don't describe the TnyGetFoldersCallback
 o. The prerequisites of some types add GObject (this often isn't needed)
-o. Implement removing folders and messages (TnyFolderStore)
-o. Implement and design moving messages (TnyFolderStore?)
+o. Implement and design removing messages (TnyFolderStore)
+o. Implement and design copying messages (TnyFolderStore)
