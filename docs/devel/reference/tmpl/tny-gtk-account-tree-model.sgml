@@ -29,7 +29,7 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyList, #TnyStoreAccount, #GtkTreeView, #GtkTreeStore, #GtkTreeModel
+#TnyList, #TnyStoreAccount, #GtkTreeView, #GtkTreeStore, #GtkTreeModel, #TnyGtkAccountTreeModelColumn
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

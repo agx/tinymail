@@ -2,18 +2,6 @@
 
 G_BEGIN_DECLS
 
-/* This is a fake type to fool gtk-doc */
-
-#define TNY_TYPE_GTK_ENUMS             (tny_gtk_enums_get_type ())
-#define TNY_GTK_ENUMS(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_GTK_ENUMS, TnyGtkEnums))
-#define TNY_GTK_ENUMS_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GTK_ENUMS, TnyGtkEnums))
-#define TNY_IS_GTK_ENUMS(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GTK_ENUMS))
-#define TNY_IS_GTK_ENUMS_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GTK_ENUMS))
-#define TNY_GTK_ENUMS_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_GTK_ENUMS, TnyGtkHeaderListModelClass))
-
-typedef struct _TnyGtkEnums TnyGtkEnums;
-typedef struct _TnyGtkEnumsClass TnyGtkEnumsClass;
-
 typedef enum {
 	TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN,
 	TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN,
@@ -42,18 +30,6 @@ typedef enum {
 	TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 	TNY_GTK_ACCOUNT_TREE_MODEL_N_COLUMNS
 } TnyGtkAccountTreeModelColumn;
-
-struct _TnyGtkEnums
-{
-	GObject parent;
-};
-
-struct _TnyGtkEnumsClass 
-{
-	GObjectClass parent;
-};
-
-GType tny_gtk_enums_get_type (void);
 
 
 G_END_DECLS

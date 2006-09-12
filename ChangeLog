@@ -1,3 +1,7 @@
+2006-09-13  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added documentation about the Gtk+ tree model column enumerations
+
 2006-09-11  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Experimented a bit with scanvirtuals.py in bindings/python decided

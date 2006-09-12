@@ -6,5 +6,5 @@ find '.' -type f -iname '*.h' -printf '#include <%f>\n' | grep -v "\-priv" | gre
 
 echo >> docs/devel/reference/libtinymail.types
 
-find $srcdir -type f -iname "*.h" -exec grep get_type {} \; | grep -v _tny_simple_list_iterator | grep -v tny_demoui_summary_view | grep -v define | grep -v tny_maemo | grep -v tny_gpe | grep -v tny_gnome | grep -v tny_olpc | grep -v _camel_get_type | grep -v tny_test_stream_get_type |  cut -d " " -f 2- | cut -d "(" -f 1 | sed s/\ //g >> docs/devel/reference/libtinymail.types
+find $srcdir -type f -iname "*.h" -exec grep get_type {} \; | grep -v _tny_simple_list_iterator | grep -v tny_demoui_summary_view | grep -v define | grep -v tny_maemo | grep -v tny_gpe | grep -v tny_gnome | grep -v tny_olpc | grep -v _camel_get_type | grep -v tny_test_stream_get_type |  grep -v tny_gtk_enums_get_type | cut -d " " -f 2- | cut -d "(" -f 1 | sed s/\ //g >> docs/devel/reference/libtinymail.types
 
