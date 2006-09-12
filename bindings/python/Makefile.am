@@ -137,7 +137,7 @@ tinymailui-gtk.defs: $(tinymailui_gtk_h_files) tinymailui-gtk.defs.extra $(top_s
 
 tinymail-platform.defs : $(tinymail_platform_h_files) tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py					\
-	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs`	|	\	
+	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs`	|	\
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py			\
 	--extra=$(top_srcdir)/bindings/python/tinymail-platform.defs.extra	\
 	--topsrcdir=$(top_srcdir) > $@
