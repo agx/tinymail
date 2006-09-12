@@ -11,7 +11,7 @@ A query for when you want to get a list of folders from a #TnyFolderStore implem
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderStore, #TnyFolder, #TnyStoreAccount
+#TnyFolderStore, #TnyFolder, #TnyStoreAccount, #TnyFolderStoreQueryOption
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

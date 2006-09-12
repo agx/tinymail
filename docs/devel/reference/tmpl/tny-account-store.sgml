@@ -11,7 +11,7 @@ A abstract type that defines a store for accounts
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyAccount, #TnyStoreAccount, #TnyTransportAccount
+#TnyAccount, #TnyStoreAccount, #TnyTransportAccount, #TnyAccountStoreSignal, #TnyGetAccountsRequestType
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

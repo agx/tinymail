@@ -16,7 +16,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyMsg, #TnyFolder, #TnyGtkHeaderListModel
+#TnyMsg, #TnyFolder, #TnyGtkHeaderListModel, #TnyHeaderFlags
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

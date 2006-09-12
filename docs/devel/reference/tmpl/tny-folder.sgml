@@ -11,7 +11,7 @@ A abstract type that defines a folder
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyFolderStore, #TnyStoreAccount, #TnyCamelFolder
+#TnyFolderStore, #TnyStoreAccount, #TnyCamelFolder, #TnyFolderSignal
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
