@@ -41,7 +41,7 @@ typedef struct _TnyFolder TnyFolder;
 typedef struct _TnyFolderIface TnyFolderIface;
 #endif
 
-enum
+enum _TnyFolderSignal
 {
 	TNY_FOLDER_FOLDER_INSERTED,
 	TNY_FOLDER_FOLDERS_RELOADED,

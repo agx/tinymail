@@ -67,6 +67,9 @@ typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
 typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, TnyList *list, gpointer user_data);
+typedef enum _TnyFolderSignal TnyFolderSignal;
+typedef enum _TnyDeviceSignal TnyDeviceSignal;
+typedef enum _TnyAccountStoreSignal TnyAccountStoreSignal;
 
 G_END_DECLS
 
