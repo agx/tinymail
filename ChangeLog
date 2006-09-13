@@ -3,9 +3,9 @@
 	* Introduction of TnyGtkAccountListModel which could be useful for for
 	example the GtkComboBox view component, the TnyGtkAccountTreeModel
 	doesn't change in functionality. It's also likely that a
-	TnyGtkFolderTreeModel will also be implemented at some point. The
+	TnyGtkFolderStoreTreeModel will also be implemented at some point. The
 	TnyGtkAccountListModel in combination with such a
-	TnyGtkFolderTreeModel used on a GtkComboBox and a GtkTreeView would
+	TnyGtkFolderStoreTreeModel used on a GtkComboBox and a GtkTreeView would
 	mimic the behaviour of the TnyGtkAccountTreeModel on a GtkTreeView by
 	separating the two views (for example a combo box with accounts and a
 	treeview with folders in the current account, rather than only support
