@@ -2,12 +2,14 @@
 TnyGtkAttachListModel
 
 <!-- ##### SECTION Short_Description ##### -->
-A tree model suitable for mime part instances
+A tree model for mime part instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #GtkTreeModel for storing #TnyMimePart instaces. </para>
-<para>The implementation inherits the #GtkListStore, implements #GtkTreeModel and #TnyList.
+A #GtkTreeModel for storing #TnyMimePart instances.
+</para>
+<para>
+The implementation inherits the #GtkListStore, implements #GtkTreeModel and #TnyList.
 If the library was compiled with gnome features, the implementation will handle the 
 mime-type icon automatically.
 </para>

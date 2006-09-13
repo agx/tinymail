@@ -2,7 +2,7 @@
 TnyGtkHeaderListModel
 
 <!-- ##### SECTION Short_Description ##### -->
-A tree model for storing header instances
+A tree model for header instances
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>

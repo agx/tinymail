@@ -51,7 +51,16 @@ Enumerations for the Gtk+ tree models
 
 @TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN: Account-name or Folder-name
 @TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN: Amount of unread items
-@TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN: Contains -1 if it's not a #TnyFolder in the instance column
-@TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN: If not -1 then this column contains a #TnyFolder instance, make sure that you unref instances you get from this folder if you use gtk_tree_model_get
+@TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN: Contains TNY_FOLDER_TYPE_ROOT if it's not a #TnyFolder in the instance column, but a #TnyAccount. Else it's a #TnyFolder instance
+@TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN: If the type column isn't TNY_FOLDER_TYPE_ROOT then this column contains a #TnyFolder instance, else the column contains a #TnyAccount instance. Make sure that you unref instances you get if you use gtk_tree_model_get
 @TNY_GTK_ACCOUNT_TREE_MODEL_N_COLUMNS: The amount of available columns
+
+<!-- ##### ENUM TnyGtkAccountListModelColumn ##### -->
+<para>
+
+</para>
+
+@TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN: Account-name
+@TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN: Always a #TnyAccount instance
+@TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS: Amount of available columns
 
