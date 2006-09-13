@@ -223,7 +223,7 @@ tny_list_test_list (void)
 	gunit_fail_unless (tny_list_length (iface) == 3, str);
 	g_free (str);
 
-	g_object_unref (G_OBJECT(item)); /* need to unref ? */
+	g_object_unref (G_OBJECT(item));
 	
 	iterator = tny_list_create_iterator (iface);
 
