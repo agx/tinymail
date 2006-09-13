@@ -32,14 +32,6 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_GTK_ATTACH_LIST_MODEL ##### -->
-<para>
-
-</para>
-
-@obj: 
-
-
 <!-- ##### MACRO TNY_TYPE_GTK_ATTACH_LIST_MODEL_COLUMN ##### -->
 <para>
 

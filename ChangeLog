@@ -1,5 +1,6 @@
 2006-09-13  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Introduction of TnyGtkFolderTreeModel (however, it's atm unfinished)
 	* Introduction of TnyGtkAccountListModel which could be useful for for
 	example the GtkComboBox view component, the TnyGtkAccountTreeModel
 	doesn't change in functionality. It's also likely that a
