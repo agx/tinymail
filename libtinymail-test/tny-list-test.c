@@ -19,29 +19,57 @@
 #include <string.h>
 
 #include <tny-list-test.h>
+
 #include <tny-simple-list.h>
+#include <tny-gtk-account-list-model.h>
+#include <tny-gtk-attach-list-model.h>
+#include <tny-gtk-account-tree-model.h>
+#include <tny-gtk-folder-tree-model.h>
+#include <tny-gtk-header-list-model.h>
+
+#include <tny-camel-imap-store-account.h>
+#include <tny-camel-header.h>
+#include <tny-camel-mime-part.h>
+
+#include <account-store.h>
+#include <tny-session-camel.h>
 #include <tny-test-object.h>
 
+#include <camel/camel-folder.h>
+#include <camel/camel.h>
+#include <camel/camel-folder-summary.h>
 
-static TnyList *iface = NULL;
+static TnyList *ifaces[6];
 static gchar *str;
-
 
 static void
 tny_list_test_setup (void)
 {
+    
+    CamelInternetAddress *addr = camel_internet_address_new ();
+	camel_object_unref (CAMEL_OBJECT (addr));
 
-	iface = tny_simple_list_new ();
-
+  	ifaces[0] = tny_simple_list_new ();
+    	ifaces[1] = TNY_LIST (tny_gtk_account_list_model_new ());
+	ifaces[2] = TNY_LIST (tny_gtk_attach_list_model_new ());
+	ifaces[3] = TNY_LIST (tny_gtk_account_tree_model_new (FALSE));
+	ifaces[4] = TNY_LIST (tny_gtk_account_tree_model_new (TRUE));    
+	ifaces[5] = TNY_LIST (tny_gtk_header_list_model_new ());
+	
 	return;
 }
 
 static void 
 tny_list_test_teardown (void)
 {
-	g_object_unref (G_OBJECT (iface)); 
+    int i =0;
 
-	return;
+    for (i=0; i < 6; i++)
+    {
+	g_object_unref (G_OBJECT (ifaces[i])); 
+    }
+    
+    return;
 }
 
 static gint counter;
@@ -49,33 +77,85 @@ static gint counter;
 static void
 tny_list_test_foreach (gpointer gptr_item, gpointer user_data)
 {
-
-	TnyTestObject *item = gptr_item;
-
-	gchar *str, *cstr = g_strdup_printf ("%d", counter);
-	
-	str = g_strdup_printf ("Item should be \"%d\" but is %s\n", counter, item->str);
-	gunit_fail_unless (!strcmp (item->str, cstr), str);
-
-	g_free (str);
-	g_free (cstr);
-
 	counter++;
+}
+
+static TnyAccountStore *astore = NULL;
+static TnySessionCamel *session;
+
+static void
+setup_objs (int num, GObject **a, GObject **b, GObject **c, GObject **d)
+{
+    
+    if (session == NULL)
+    {
+	astore = tny_test_account_store_new (FALSE, NULL);
+	session = tny_session_camel_new (astore);
+    }
+    
+    if (num == 0)
+    {
+    	*a = tny_test_object_new (g_strdup ("2"));
+	*b = tny_test_object_new (g_strdup ("3"));
+	*c = tny_test_object_new (g_strdup ("4"));
+	*d = tny_test_object_new (g_strdup ("1"));
+    }
+
+    if (num == 1 || num == 3 || num == 4)
+    {
+	TnyAccount *a1,*b1,*c1,*d1;
+	a1 = (TnyAccount*) tny_camel_imap_store_account_new ();
+	b1 = (TnyAccount*) tny_camel_imap_store_account_new ();
+	c1 = (TnyAccount*) tny_camel_imap_store_account_new ();
+	d1 = (TnyAccount*) tny_camel_imap_store_account_new ();
+	
+	tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (a1), session);
+	tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (b1), session);
+	tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (d1), session);
+	tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (c1), session);
+	
+	tny_account_set_url_string (a1, "imap://user@localhost");
+	tny_account_set_url_string (b1, "imap://user@localhost");
+	tny_account_set_url_string (c1, "imap://user@localhost");
+	tny_account_set_url_string (d1, "imap://user@localhost");
+
+	*a = (GObject*)a1; *b = (GObject*)b1; *c = (GObject*)c1; *d = (GObject*)d1;
+    }
+
+    if (num == 2)
+    {
+	*a = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
+	*b = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
+	*c = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
+	*d = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
+    }
+
+    if (num == 5)
+    {
+	*a = (GObject*) tny_camel_header_new ();
+	*b = (GObject*) tny_camel_header_new ();
+	*c = (GObject*) tny_camel_header_new ();
+	*d = (GObject*) tny_camel_header_new ();
+    }
+
+    
 }
 
 static void
 tny_list_test_list (void)
 {
+    int t = 0;
+
+    for (t=0; t < 6; t++)
+    {
+	TnyList *iface = ifaces [t];
     	TnyList *ref;
 	TnyIterator *iterator;
-	TnyTestObject *item;
+	GObject *item;
 	gint i;
 	GObject *a, *b, *c, *d;
-
-	a = tny_test_object_new (g_strdup ("2"));
-	b = tny_test_object_new (g_strdup ("3"));
-	c = tny_test_object_new (g_strdup ("4"));
-	d = tny_test_object_new (g_strdup ("1"));
+	printf ("%d\n", t);
+	setup_objs (t, &a, &b, &c, &d);
 	
 	tny_list_append (iface, a);
 	g_object_unref (G_OBJECT (a)); 
@@ -86,61 +166,66 @@ tny_list_test_list (void)
 	tny_list_prepend (iface, d);
 	g_object_unref (G_OBJECT (d));
     
-	counter=1;
+	counter=0;
 	tny_list_foreach (iface, tny_list_test_foreach, NULL);
+	
+	str = g_strdup_printf ("Implementation: %s - Counter after foreach should be 4 but is %d\n", G_OBJECT_TYPE_NAME (iface), counter);
+	gunit_fail_unless (counter == 4, str);
+	g_free (str);
 
-	str = g_strdup_printf ("Length should be 4 but is %d\n", tny_list_length (iface));
+	
+	str = g_strdup_printf ("Implementation: %s - Length should be 4 but is %d\n", G_OBJECT_TYPE_NAME (iface), tny_list_length (iface));
 	gunit_fail_unless (tny_list_length (iface) == 4, str);
 	g_free (str);
 
 	iterator = tny_list_create_iterator (iface);
 
 
-	str = g_strdup_printf ("get_list returns the wrong instance\n");
+	str = g_strdup_printf ("Implementation: %s - get_list returns the wrong instance\n", G_OBJECT_TYPE_NAME (iface));
     	ref = tny_iterator_get_list (iterator);
 	gunit_fail_unless (ref == iface, str);
 	g_free (str);
 	g_object_unref (G_OBJECT (ref));
     
 	tny_iterator_nth (iterator, 2);
-	item = (TnyTestObject*)tny_iterator_get_current (iterator);
+	item = tny_iterator_get_current (iterator);
 	
-	str = g_strdup_printf ("Item should be \"3\" but is \"%s\"\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "3"), str);
+	str = g_strdup_printf ("Implementation: %s - Item should be \"3\"\n", G_OBJECT_TYPE_NAME (iface));
+	gunit_fail_unless (item == b, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_next (iterator);
-	item = (TnyTestObject*)tny_iterator_get_current (iterator);	
-	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "4"), str);
+	item = tny_iterator_get_current (iterator);	
+	str = g_strdup_printf ("Implementation: %s - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
+	gunit_fail_unless (item == c, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_prev (iterator);
-	item = (TnyTestObject*)tny_iterator_get_current (iterator);	
-	str = g_strdup_printf ("Item should be \"3\" but is \"%s\"\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "3"), str);
+	item = tny_iterator_get_current (iterator);	
+	str = g_strdup_printf ("Implementation: %s - Item should be \"3\"\n", G_OBJECT_TYPE_NAME (iface));
+	gunit_fail_unless (item == b, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	tny_iterator_next (iterator);
-	item = (TnyTestObject*)tny_iterator_get_current (iterator);	
-	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "4"), str);
+	item = tny_iterator_get_current (iterator);	
+	str = g_strdup_printf ("Implementation: %s - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
+	gunit_fail_unless (item == c, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 
-	item = (TnyTestObject*)tny_iterator_get_current (iterator);
-	str = g_strdup_printf ("Item should be \"4\" but is \"%s\"\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "4"), str);
+	item = tny_iterator_get_current (iterator);
+	str = g_strdup_printf ("Implementation - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
+	gunit_fail_unless (item == c, str);
 	g_free (str);
 
 	g_object_unref (G_OBJECT (iterator));
 
 	tny_list_remove (iface, (GObject*)item);
 
-	str = g_strdup_printf ("Length should be 3 but is %d\n", tny_list_length (iface));
+	str = g_strdup_printf ("Implementation %s - Length should be 3 but is %d\n", G_OBJECT_TYPE_NAME (iface), tny_list_length (iface));
 	gunit_fail_unless (tny_list_length (iface) == 3, str);
 	g_free (str);
 
@@ -149,27 +234,28 @@ tny_list_test_list (void)
 	iterator = tny_list_create_iterator (iface);
 
 	tny_iterator_first (iterator);
-	item = (TnyTestObject*)tny_iterator_get_current (iterator);
+	item = tny_iterator_get_current (iterator);
 	
-	str = g_strdup_printf ("Item should be \"1\" but is %s\n", item->str);
-	gunit_fail_unless (!strcmp (item->str, "1"), str);
+	str = g_strdup_printf ("Implementation: %s - Item should be \"1\"\n", G_OBJECT_TYPE_NAME (iface));
+	gunit_fail_unless (item == d, str);
 	g_free (str);
 
 	for (i=0; i<3; i++)
 	{
-		str = g_strdup_printf ("is_done should return FALSE\n");
+		str = g_strdup_printf ("Implementation %s - is_done should return FALSE\n", G_OBJECT_TYPE_NAME (iface));
 		gunit_fail_unless (tny_iterator_is_done (iterator) == FALSE, str);
 		g_free (str);
 
 		tny_iterator_next (iterator);
 	}
 
-	str = g_strdup_printf ("is_done should by now return TRUE\n");
+	str = g_strdup_printf ("Implementation: %s - is_done should by now return TRUE\n", G_OBJECT_TYPE_NAME (iface));
 	gunit_fail_unless (tny_iterator_is_done (iterator) == TRUE, str);
 	g_free (str);
+
 	
-	g_object_unref (G_OBJECT (iterator));
-	g_object_unref (G_OBJECT(item)); /* need to unref ? */	
+	g_object_unref (G_OBJECT (iterator));	
+    }
 }
 
 

@@ -86,7 +86,7 @@ tny_folder_test_setup (void)
 	tny_iterator_first (aiter);
 	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
 	
-	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/tny-folder-test", do_test_folder);
+	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/tny-folder-iface-test", do_test_folder);
 
  	if (iface)
 	    	g_object_ref (G_OBJECT (iface));
