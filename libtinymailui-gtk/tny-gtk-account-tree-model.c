@@ -79,7 +79,7 @@ recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, gpointer u
 	g_object_unref (G_OBJECT (iter));   
 	g_object_unref (G_OBJECT (folders));
     
-    	//gtk_tree_iter_free (hlrp->parent_tree_iter);
+    	gtk_tree_iter_free (hlrp->parent_tree_iter);
     	g_free (hlrp);
     
 }
