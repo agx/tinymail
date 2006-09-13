@@ -165,7 +165,6 @@ static void
 tny_gtk_account_tree_model_add_async (TnyGtkAccountTreeModel *self, TnyStoreAccount *account, treeaddfunc func)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
-	TnyList *folders = tny_simple_list_new ();
 	GtkTreeIter first, *name_iter;
 	gboolean need_add = TRUE;
     
@@ -189,8 +188,6 @@ tny_gtk_account_tree_model_add_async (TnyGtkAccountTreeModel *self, TnyStoreAcco
 		account, -1);
 
 	recurse_folders_async (self, TNY_FOLDER_STORE (account), NULL, name_iter);
-
-    	g_object_unref (G_OBJECT (folders));
     
 	return;
 }
