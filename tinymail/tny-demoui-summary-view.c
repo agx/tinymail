@@ -150,7 +150,6 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 
     	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
-
 	gtk_combo_box_set_model (priv->account_view, maccounts);
     
 	/* Here we use the TnyAccountTreeModel as a GtkTreeModel */
@@ -158,7 +157,6 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
 				GTK_SORT_ASCENDING);
-
 	
 	/* Set the model of the mailbox_view */
 	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), 
@@ -463,7 +461,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN, 
 			&type, -1);
 
-		if (type == -1) 
+		if (type == TNY_FOLDER_TYPE_ROOT) 
 		{ 
 			/* If an "account name"-row was clicked */
 		    	if (priv->last_mailbox_correct_select_set) 
@@ -473,28 +471,29 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 				g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 			}
 	    		priv->last_mailbox_correct_select_set = TRUE;
-			return; 
-		}
+		    
+		} else {
 
-		gtk_tree_model_get (model, &iter, 
-			TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
-			&folder, -1);
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
 
-		gtk_widget_show (GTK_WIDGET (priv->progress));
-		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE);
+			gtk_widget_show (GTK_WIDGET (priv->progress));
+			gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE);
 		
 #ifdef ASYNC_HEADERS
 
-		tny_folder_refresh_async (folder, 
-			refresh_current_folder, 
-			refresh_current_folder_status_update, user_data);
+			tny_folder_refresh_async (folder, 
+				refresh_current_folder, 
+				refresh_current_folder_status_update, user_data);
 #else
-		refresh_current_folder (folder, FALSE, user_data);
+			refresh_current_folder (folder, FALSE, user_data);
 #endif
 	    
-	    	g_object_unref (G_OBJECT (folder));
+	    		g_object_unref (G_OBJECT (folder));
+		}
 	}
-
+    
 	return;
 }
 
