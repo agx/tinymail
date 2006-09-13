@@ -39,6 +39,7 @@ G_BEGIN_DECLS
 typedef struct _TnyGtkAccountTreeModel TnyGtkAccountTreeModel;
 typedef struct _TnyGtkAccountTreeModelClass TnyGtkAccountTreeModelClass;
 typedef enum _TnyGtkAccountTreeModelColumn TnyGtkAccountTreeModelColumn;
+typedef enum _TnyGtkAccountTreeModelColumnType TnyGtkAccountTreeModelColumnType;
 
 #define TNY_TYPE_GTK_ACCOUNT_TREE_MODEL_COLUMN (tny_gtk_account_tree_model_column_get_type())
 

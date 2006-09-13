@@ -91,9 +91,9 @@ tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccount *a
 		TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
 		tny_account_get_name (TNY_ACCOUNT (account)),
 		TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 0,
-		TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN, -1,
+		TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN, TNY_FOLDER_TYPE_ROOT,
 		TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
-		NULL, -1);
+		account, -1);
 
 	recurse_folders (self, TNY_FOLDER_STORE (account), NULL, &name_iter);
 
@@ -362,3 +362,4 @@ tny_gtk_account_tree_model_column_get_type (void)
   }
   return etype;
 }
+
