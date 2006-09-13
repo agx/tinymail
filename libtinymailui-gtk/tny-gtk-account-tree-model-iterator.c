@@ -24,7 +24,6 @@
 static GObjectClass *parent_class = NULL;
 
 #include "tny-gtk-account-tree-model-iterator-priv.h"
-#include "tny-gtk-account-tree-model-priv.h"
 
 GType _tny_gtk_account_tree_model_iterator_get_type (void);
 

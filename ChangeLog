@@ -1,5 +1,15 @@
 2006-09-13  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Introduction of TnyGtkAccountListModel which could be useful for for
+	example the GtkComboBox view component, the TnyGtkAccountTreeModel
+	doesn't change in functionality. It's also likely that a
+	TnyGtkFolderTreeModel will also be implemented at some point. The
+	TnyGtkAccountListModel in combination with such a
+	TnyGtkFolderTreeModel used on a GtkComboBox and a GtkTreeView would
+	mimic the behaviour of the TnyGtkAccountTreeModel on a GtkTreeView by
+	separating the two views (for example a combo box with accounts and a
+	treeview with folders in the current account, rather than only support
+	for a treeview with both accounts and folders)
 	* Added documentation about the Gtk+ tree model column enumerations
 	* Added documentation about tinymail enumerations
 

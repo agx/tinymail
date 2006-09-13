@@ -24,7 +24,6 @@
 static GObjectClass *parent_class = NULL;
 
 #include "tny-gtk-header-list-iterator-priv.h"
-#include "tny-gtk-header-list-model-priv.h"
 
 GType _tny_gtk_header_list_iterator_get_type (void);
 

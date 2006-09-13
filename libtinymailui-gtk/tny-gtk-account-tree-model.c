@@ -31,7 +31,6 @@
 
 #include <tny-gtk-account-tree-model.h>
 
-#include "tny-gtk-account-tree-model-priv.h"
 #include "tny-gtk-account-tree-model-iterator-priv.h"
 
 static GObjectClass *parent_class = NULL;

@@ -59,6 +59,7 @@
 #include <tny-msg-window.h>
 #include <tny-gtk-msg-window.h>
 #include <tny-folder.h>
+#include <tny-gtk-account-list-model.h>
 #include <tny-gtk-account-tree-model.h>
 #include <tny-header.h>
 #include <tny-gtk-header-list-model.h>
@@ -77,6 +78,7 @@ typedef struct _TnyDemouiSummaryViewPriv TnyDemouiSummaryViewPriv;
 struct _TnyDemouiSummaryViewPriv
 {
 	TnyAccountStore *account_store;
+ 	GtkComboBox *account_view;
 	GtkTreeView *mailbox_view, *header_view;
 	TnyMsgView *msg_view;
 	guint accounts_reloaded_signal;
@@ -119,14 +121,16 @@ static void
 reload_accounts (TnyDemouiSummaryViewPriv *priv)
 {
 	TnyAccountStore *account_store = priv->account_store;
-	GtkTreeModel *sortable;
+	GtkTreeModel *sortable, *maccounts;
 
 	/* TnyAccountTreeModel is also a TnyList (it simply implements both the
 	   TnyList and the GtkTreeModel interfaces) */
 
 	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new ();
 	TnyList *accounts = TNY_LIST (mailbox_model);
-
+    
+	maccounts = tny_gtk_account_list_model_new ();
+    
 	/* Clear the header_view by giving it an empty model */
 	if (G_UNLIKELY (!empty_model))
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new (1, G_TYPE_STRING));
@@ -144,7 +148,11 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	tny_account_store_get_accounts (account_store, accounts,
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
+    	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
+		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
+	gtk_combo_box_set_model (priv->account_view, maccounts);
+    
 	/* Here we use the TnyAccountTreeModel as a GtkTreeModel */
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
@@ -590,7 +598,8 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	GtkTreeSelection *select;
 	GtkWidget *hpaned1;
 	GtkWidget *vpaned1;
-	
+	GtkBox *vpbox;
+    
 	/* TODO: Persist application UI status (of the panes) */
 
     	priv->last_mailbox_correct_select_set = FALSE;
@@ -642,8 +651,19 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
 
+    	priv->account_view = GTK_COMBO_BOX (gtk_combo_box_new ());
+    	renderer = gtk_cell_renderer_text_new();
+    	gtk_cell_layout_pack_start((GtkCellLayout *)priv->account_view, renderer, TRUE);
+	gtk_cell_layout_set_attributes((GtkCellLayout *)priv->account_view, renderer, "text", 0, NULL);
+    
 	mailbox_sw = gtk_scrolled_window_new (NULL, NULL);
-	gtk_paned_pack1 (GTK_PANED (hpaned1), mailbox_sw, TRUE, TRUE);
+	vpbox = GTK_BOX (gtk_vbox_new (FALSE, 0));
+    	gtk_box_pack_start (GTK_BOX (vpbox), GTK_WIDGET (priv->account_view), FALSE, FALSE, 0);    
+    	gtk_box_pack_start (GTK_BOX (vpbox), mailbox_sw, TRUE, TRUE, 0);
+	gtk_widget_show (GTK_WIDGET (vpbox));    
+	gtk_widget_show (GTK_WIDGET (priv->account_view));
+    
+	gtk_paned_pack1 (GTK_PANED (hpaned1), GTK_WIDGET (vpbox), TRUE, TRUE);
 	gtk_paned_pack2 (GTK_PANED (hpaned1), vpaned1, TRUE, TRUE);
 	gtk_widget_show (GTK_WIDGET (mailbox_sw));
 

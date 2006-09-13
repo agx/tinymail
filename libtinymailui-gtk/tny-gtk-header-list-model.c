@@ -40,7 +40,6 @@
 
 static GObjectClass *parent_class;
 
-#include "tny-gtk-header-list-model-priv.h"
 #include "tny-gtk-header-list-iterator-priv.h"
 
 /* The function is locked, so this is secure (and might cause less
