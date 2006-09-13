@@ -104,7 +104,7 @@ Enumerations for tinymail
 
 </para>
 
-@TNY_FOLDER_TYPE_UNKNOWN: The type is unknown 
+@TNY_FOLDER_TYPE_UNKNOWN: The type is unknown
 @TNY_FOLDER_TYPE_NORMAL: The folder type is a normal folder
 @TNY_FOLDER_TYPE_INBOX: The folder type is a INBOX folder
 @TNY_FOLDER_TYPE_OUTBOX: The folder type is an OUTBOX folder
