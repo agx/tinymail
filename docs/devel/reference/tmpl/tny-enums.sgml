@@ -99,3 +99,17 @@ Enumerations for tinymail
 @TNY_HEADER_FLAG_JUNK_LEARN: This message is flagged to be junk-learned
 @TNY_HEADER_FLAG_USER: Unknown
 
+<!-- ##### ENUM TnyFolderType ##### -->
+<para>
+
+</para>
+
+@TNY_FOLDER_TYPE_UNKNOWN: The type is unknown 
+@TNY_FOLDER_TYPE_NORMAL: The folder type is a normal folder
+@TNY_FOLDER_TYPE_INBOX: The folder type is a INBOX folder
+@TNY_FOLDER_TYPE_OUTBOX: The folder type is an OUTBOX folder
+@TNY_FOLDER_TYPE_TRASH: The folder type is a TRASH folder
+@TNY_FOLDER_TYPE_JUNK: The folder type is a JUNK folder
+@TNY_FOLDER_TYPE_SENT: The folder type is a SENT folder
+@TNY_FOLDER_TYPE_ROOT: The folder type is a #TnyAccount that contains this folder (used for the #TnyGtkAccountTreeModel)
+
