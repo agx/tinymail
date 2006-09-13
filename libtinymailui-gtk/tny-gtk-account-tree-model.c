@@ -333,24 +333,23 @@ tny_gtk_account_tree_model_remove (TnyList *self, GObject* item)
 
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 
-	gtk_tree_model_get_iter_first (model, &iter);
-	while (gtk_tree_model_iter_next (model, &iter))
-	{
-		TnyAccount *curaccount;
-
+	if (gtk_tree_model_get_iter_first (model, &iter))
+	  while (gtk_tree_model_iter_next (model, &iter))
+	  {
+		GObject *citem;
+  
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
-			&curaccount, -1);
+			&citem, -1);
 
-		if (curaccount == (TnyAccount*)item)
-		{
+		if (citem == item)
+	  	{
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));
-			g_object_unref (G_OBJECT (curaccount));
 			break;
 		}
-		g_object_unref (G_OBJECT (curaccount));	    
-	}
+		g_object_unref (G_OBJECT (citem));
+	  }
 
 	g_mutex_unlock (me->iterator_lock);
 }

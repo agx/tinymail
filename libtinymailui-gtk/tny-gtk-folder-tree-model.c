@@ -167,25 +167,24 @@ tny_gtk_folder_tree_model_remove (TnyList *self, GObject* item)
 
 	g_mutex_lock (me->iterator_lock);
 	
-	gtk_tree_model_get_iter_first (model, &iter);
-	while (gtk_tree_model_iter_next (model, &iter))
-	{
-		TnyAccount *curacc;
-
+	if (gtk_tree_model_get_iter_first (model, &iter))
+	  while (gtk_tree_model_iter_next (model, &iter))
+	  {
+		GObject *citem;
+	      
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_FOLDER_TREE_MODEL_INSTANCE_COLUMN, 
-			&curacc, -1);
+			&citem, -1);
 
-		if (curacc == (TnyAccount*)item)
+		if (citem == item)
 		{
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
-			g_object_unref (G_OBJECT (item));
-			g_object_unref (G_OBJECT (curacc));
+		    	g_object_unref (G_OBJECT (item));
 			break;
 		}
-		g_object_unref (G_OBJECT (curacc));
-	}
-
+		g_object_unref (G_OBJECT (citem));
+	  }
+    
 	g_mutex_unlock (me->iterator_lock);
 }
 

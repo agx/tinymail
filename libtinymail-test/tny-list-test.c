@@ -154,7 +154,6 @@ tny_list_test_list (void)
 	GObject *item;
 	gint i;
 	GObject *a, *b, *c, *d;
-	printf ("%d\n", t);
 	setup_objs (t, &a, &b, &c, &d);
 	
 	tny_list_append (iface, a);
@@ -165,22 +164,19 @@ tny_list_test_list (void)
 	g_object_unref (G_OBJECT (c));
 	tny_list_prepend (iface, d);
 	g_object_unref (G_OBJECT (d));
-    
+	
 	counter=0;
 	tny_list_foreach (iface, tny_list_test_foreach, NULL);
 	
 	str = g_strdup_printf ("Implementation: %s - Counter after foreach should be 4 but is %d\n", G_OBJECT_TYPE_NAME (iface), counter);
 	gunit_fail_unless (counter == 4, str);
 	g_free (str);
-
 	
 	str = g_strdup_printf ("Implementation: %s - Length should be 4 but is %d\n", G_OBJECT_TYPE_NAME (iface), tny_list_length (iface));
 	gunit_fail_unless (tny_list_length (iface) == 4, str);
 	g_free (str);
 
 	iterator = tny_list_create_iterator (iface);
-
-
 	str = g_strdup_printf ("Implementation: %s - get_list returns the wrong instance\n", G_OBJECT_TYPE_NAME (iface));
     	ref = tny_iterator_get_list (iterator);
 	gunit_fail_unless (ref == iface, str);
@@ -194,21 +190,21 @@ tny_list_test_list (void)
 	gunit_fail_unless (item == b, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
-	
+
 	tny_iterator_next (iterator);
 	item = tny_iterator_get_current (iterator);	
 	str = g_strdup_printf ("Implementation: %s - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
 	gunit_fail_unless (item == c, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
-	
+
 	tny_iterator_prev (iterator);
 	item = tny_iterator_get_current (iterator);	
 	str = g_strdup_printf ("Implementation: %s - Item should be \"3\"\n", G_OBJECT_TYPE_NAME (iface));
 	gunit_fail_unless (item == b, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
-	
+
 	tny_iterator_next (iterator);
 	item = tny_iterator_get_current (iterator);	
 	str = g_strdup_printf ("Implementation: %s - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
@@ -222,9 +218,7 @@ tny_list_test_list (void)
 	g_free (str);
 
 	g_object_unref (G_OBJECT (iterator));
-
 	tny_list_remove (iface, (GObject*)item);
-
 	str = g_strdup_printf ("Implementation %s - Length should be 3 but is %d\n", G_OBJECT_TYPE_NAME (iface), tny_list_length (iface));
 	gunit_fail_unless (tny_list_length (iface) == 3, str);
 	g_free (str);
@@ -235,11 +229,12 @@ tny_list_test_list (void)
 
 	tny_iterator_first (iterator);
 	item = tny_iterator_get_current (iterator);
-	
+
 	str = g_strdup_printf ("Implementation: %s - Item should be \"1\"\n", G_OBJECT_TYPE_NAME (iface));
 	gunit_fail_unless (item == d, str);
 	g_free (str);
-
+	g_object_unref (G_OBJECT(item));
+	
 	for (i=0; i<3; i++)
 	{
 		str = g_strdup_printf ("Implementation %s - is_done should return FALSE\n", G_OBJECT_TYPE_NAME (iface));
@@ -253,7 +248,6 @@ tny_list_test_list (void)
 	gunit_fail_unless (tny_iterator_is_done (iterator) == TRUE, str);
 	g_free (str);
 
-	
 	g_object_unref (G_OBJECT (iterator));	
     }
 }

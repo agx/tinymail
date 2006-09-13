@@ -261,25 +261,24 @@ tny_gtk_attach_list_model_remove (TnyList *self, GObject* item)
 
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 
-	gtk_tree_model_get_iter_first (model, &iter);
-	while (gtk_tree_model_iter_next (model, &iter))
-	{
-		TnyMimePart *curpart;
+	if (gtk_tree_model_get_iter_first (model, &iter))
+	  while (gtk_tree_model_iter_next (model, &iter))
+	  {
+		GObject *citem;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN, 
-			&curpart, -1);
+			&citem, -1);
 
-		if (curpart == (TnyMimePart*)item)
+		if (citem == item)
 		{
 			gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
-			g_object_unref (G_OBJECT (item));
-			g_object_unref (G_OBJECT (curpart));
+		    	g_object_unref (G_OBJECT (item));
 			break;
 		}
-		g_object_unref (G_OBJECT (curpart));
-	}
-
+		g_object_unref (G_OBJECT (citem));
+	  }
+    
 	g_mutex_unlock (me->iterator_lock);
 }
 

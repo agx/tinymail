@@ -1,3 +1,7 @@
+2006-09-14  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Bugfixes in the list types found after improving a few unit tests
+
 2006-09-13  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Removed silly API in TnySessionCamel, solved the need for the API internally
