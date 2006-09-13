@@ -359,10 +359,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
        	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
-    	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (self), 
-					NULL, NULL, NULL);
+    	/*_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (self), 
+					NULL, NULL, NULL); */
 	iter = camel_store_get_folder_info (store, "", flags, &ex);
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));
+	/*_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));*/
     
         priv->iter = iter;
 	priv->iter_store = store;
