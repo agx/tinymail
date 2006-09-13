@@ -27,24 +27,13 @@ static GObjectClass *parent_class = NULL;
 
 GType _tny_gtk_account_list_model_iterator_get_type (void);
 
-static void
-prep_iterator (TnyGtkAccountListModelIterator *self)
-{
-	if (!self->has_first) 
-	{
-	    	GtkTreeIter iter;
-	    
-		self->has_first = gtk_tree_model_get_iter_first (GTK_TREE_MODEL (self->model), 
-			self->current);	    	    
-		self->has_next = gtk_tree_model_iter_next (GTK_TREE_MODEL (self->model), &iter);
-	}
-}
 
 void 
 _tny_gtk_account_list_model_iterator_set_model (TnyGtkAccountListModelIterator *self, TnyGtkAccountListModel *model)
 {
 	self->model = model;
-	prep_iterator (self);
+	self->current = model->first;
+
 	return;
 }
 
@@ -67,20 +56,13 @@ tny_gtk_account_list_model_iterator_instance_init (GTypeInstance *instance, gpoi
 
 	self->model = NULL;
 	self->current = NULL;
-	self->has_first = FALSE;
-	self->has_next = FALSE;
-	self->previous = NULL;
-    
+
 	return;
 }
 
 static void
 tny_gtk_account_list_model_iterator_finalize (GObject *object)
 {
-	TnyGtkAccountListModelIterator *self = (TnyGtkAccountListModelIterator *) object;
-	self->has_first = FALSE;
-	self->has_next = FALSE;
-    
 	(*parent_class->finalize) (object);
 
 	return;
@@ -92,17 +74,13 @@ tny_gtk_account_list_model_iterator_next (TnyIterator *self)
 {
 	TnyGtkAccountListModelIterator *me = (TnyGtkAccountListModelIterator*) self;
 
+	if (G_UNLIKELY (!me || !me->current || !me->model))
+		return;
 
 	/* Move the iterator to the next node */
 
 	g_mutex_lock (me->model->iterator_lock);
-    
-	prep_iterator (me);
-    
-    	me->previous = me->current;
-	me->has_next = gtk_tree_model_iter_next (GTK_TREE_MODEL (me->model),
-			me->current);
-	
+	me->current = g_list_next (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
 	return;
@@ -116,15 +94,10 @@ tny_gtk_account_list_model_iterator_prev (TnyIterator *self)
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
-	/* Move the iterator to the previous node (or the first) */
+	/* Move the iterator to the previous node */
 
 	g_mutex_lock (me->model->iterator_lock);
-    
-	prep_iterator (me);
-
-    	if (me->previous)
-		me->current = me->previous;
-    
+	me->current = g_list_previous (me->current);
 	g_mutex_unlock (me->model->iterator_lock);
 
 	return;
@@ -135,12 +108,13 @@ static gboolean
 tny_gtk_account_list_model_iterator_is_done (TnyIterator *self)
 {
 	TnyGtkAccountListModelIterator *me = (TnyGtkAccountListModelIterator*) self;
-    	
+	
 	if (G_UNLIKELY (!me || !me->model))
 		return TRUE;
 
-	return ((!me->has_first) || (!me->has_next));
+	return me->current == NULL;
 }
+
 
 
 static void
@@ -148,7 +122,7 @@ tny_gtk_account_list_model_iterator_first (TnyIterator *self)
 {
 	TnyGtkAccountListModelIterator *me = (TnyGtkAccountListModelIterator*) self;
 
-    	if (G_UNLIKELY (!me || !me->model))
+	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
 	/* Move the iterator to the first node. We know that model always 
@@ -156,12 +130,7 @@ tny_gtk_account_list_model_iterator_first (TnyIterator *self)
 	   using that one. */
 
 	g_mutex_lock (me->model->iterator_lock);
-    
-	prep_iterator (me);
-    
-	gtk_tree_model_get_iter_first (GTK_TREE_MODEL (me->model), 
-			me->current);
-    
+	me->current = me->model->first;
 	g_mutex_unlock (me->model->iterator_lock);
 
 	return;
@@ -172,26 +141,16 @@ static void
 tny_gtk_account_list_model_iterator_nth (TnyIterator *self, guint nth)
 {
 	TnyGtkAccountListModelIterator *me = (TnyGtkAccountListModelIterator*) self;
-	gboolean next = FALSE;
-	gint i=0;
 
-    	if (G_UNLIKELY (!me || !me->model))
+	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
-    
+
 	/* Move the iterator to the nth node. We'll count from zero,
 	   so we start with the first node of which we know the model
 	   stored a reference. */
 
 	g_mutex_lock (me->model->iterator_lock);
-	next = gtk_tree_model_get_iter_first (GTK_TREE_MODEL (me->model), 
-			me->current);
-	while (next && i < nth)
-	{
-		next = gtk_tree_model_iter_next (GTK_TREE_MODEL (me->model), 
-				me->current);
-		i++;
-	}
-    
+	me->current = g_list_nth (me->model->first, nth);
 	g_mutex_unlock (me->model->iterator_lock);
 
 	return;
@@ -202,7 +161,7 @@ static GObject*
 tny_gtk_account_list_model_iterator_get_current (TnyIterator *self)
 {
 	TnyGtkAccountListModelIterator *me = (TnyGtkAccountListModelIterator*) self;
-	TnyAccount *retval;
+	gpointer retval;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
@@ -210,10 +169,11 @@ tny_gtk_account_list_model_iterator_get_current (TnyIterator *self)
 	/* Give the data of the current node */
 
 	g_mutex_lock (me->model->iterator_lock);
-	/* This indeed adds a reference (which is good) */
-	gtk_tree_model_get (GTK_TREE_MODEL (me->model), me->current,
-		TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN, retval, -1);
+	retval = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
 	g_mutex_unlock (me->model->iterator_lock);
+
+	if (retval)
+		g_object_ref (G_OBJECT(retval));
 
 	return (GObject*)retval;
 }

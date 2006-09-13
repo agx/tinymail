@@ -44,6 +44,7 @@
 #include <tny-camel-shared.h>
 
 #include "tny-camel-account-priv.h"
+#include "tny-session-camel-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
@@ -230,6 +231,8 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
     
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (self);
 
+	_tny_session_camel_add_account (session, self);
+    
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
@@ -544,6 +547,7 @@ tny_camel_account_finalize (GObject *object)
 	TnyCamelAccount *self = (TnyCamelAccount *)object;	
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	_tny_session_camel_forget_account (priv->session, (TnyCamelAccount*) object);    
 	_tny_camel_account_start_camel_operation (self, NULL, NULL, NULL);
 	_tny_camel_account_stop_camel_operation (self);
 

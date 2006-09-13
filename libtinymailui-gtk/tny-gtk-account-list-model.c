@@ -57,11 +57,23 @@ tny_gtk_account_list_model_new (void)
 	return GTK_TREE_MODEL (self);
 }
 
+static void 
+destroy_accs (gpointer item, gpointer user_data)
+{
+    	if (item && G_IS_OBJECT (item))
+		g_object_unref (G_OBJECT (item));
+    	return;
+}
+
 static void
 tny_gtk_account_list_model_finalize (GObject *object)
 {
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*) object;
-
+    
+	g_mutex_lock (me->iterator_lock);
+	g_list_foreach (me->first, destroy_accs, NULL);
+	g_mutex_unlock (me->iterator_lock);
+    
 	(*parent_class->finalize) (object);
 }
 
@@ -86,7 +98,8 @@ tny_gtk_account_list_model_instance_init (GTypeInstance *instance, gpointer g_cl
 	static GType types[] = { G_TYPE_STRING, G_TYPE_OBJECT };
 
 	me->iterator_lock = g_mutex_new ();
-
+	me->first = NULL;
+    
 	gtk_list_store_set_column_types (store, 
 		TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS, types);
 
@@ -114,10 +127,12 @@ tny_gtk_account_list_model_prepend (TnyList *self, GObject* item)
 	TnyAccount *account = TNY_ACCOUNT (item);
     
 	g_mutex_lock (me->iterator_lock);
+	g_object_ref (G_OBJECT (item));
+	me->first = g_list_prepend (me->first, item);    
 	gtk_list_store_prepend (store, &iter);
 	gtk_list_store_set (store, &iter, 
 		TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN, tny_account_get_name (account),
-		TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN, account, -1);    
+		TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN, account, -1); 
 	g_mutex_unlock (me->iterator_lock);
 }
 
@@ -130,6 +145,8 @@ tny_gtk_account_list_model_append (TnyList *self, GObject* item)
 	TnyAccount *account = TNY_ACCOUNT (item);
         
 	g_mutex_lock (me->iterator_lock);
+	g_object_ref (G_OBJECT (item)); 
+	me->first = g_list_append (me->first, item);    
 	gtk_list_store_append (store, &iter);
 	gtk_list_store_set (store, &iter, 
 		TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN, tny_account_get_name (account),
@@ -145,9 +162,7 @@ tny_gtk_account_list_model_length (TnyList *self)
 	GtkTreeIter iter;
     
 	g_mutex_lock (me->iterator_lock);
-	gtk_tree_model_get_iter_first (GTK_TREE_MODEL (me), &iter);
-	while (gtk_tree_model_iter_next (GTK_TREE_MODEL (me), &iter))
-		retval++;
+	retval = me->first?g_list_length (me->first):0;
 	g_mutex_unlock (me->iterator_lock);
 
 	return retval;
@@ -167,6 +182,8 @@ tny_gtk_account_list_model_remove (TnyList *self, GObject* item)
 
 	g_mutex_lock (me->iterator_lock);
 	
+	me->first = g_list_remove (me->first, (gconstpointer)item);
+    
 	gtk_tree_model_get_iter_first (model, &iter);
 	while (gtk_tree_model_iter_next (model, &iter))
 	{
@@ -189,45 +206,16 @@ tny_gtk_account_list_model_remove (TnyList *self, GObject* item)
 	g_mutex_unlock (me->iterator_lock);
 }
 
-
-typedef struct 
-{
-	gpointer user_data;
-	GFunc func;
-} ForeachHelpr;
-
-static gboolean 
-tny_gtk_account_list_model_foreach_in_the_list_impl (GtkTreeModel *model,
-		GtkTreePath *path, GtkTreeIter *iter, gpointer data)
-{
-	ForeachHelpr *dta = (ForeachHelpr*) data;
-	TnyAccount *item;
-
-	gtk_tree_model_get (model, iter, 
-		TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN, &item, -1);
-	dta->func (item, dta->user_data);
-    
-	g_object_unref (G_OBJECT (item));
-	return FALSE;
-}
-	
 static void 
 tny_gtk_account_list_model_foreach_in_the_list (TnyList *self, GFunc func, gpointer user_data)
 {
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*)self;
-	ForeachHelpr *dta = g_new0 (ForeachHelpr, 1);
-    
-	dta->user_data = user_data;
-	dta->func = func;
-    
+
 	/* Foreach item in the list (without using a slower iterator) */
 
 	g_mutex_lock (me->iterator_lock);
-	gtk_tree_model_foreach (GTK_TREE_MODEL (me), 
-		tny_gtk_account_list_model_foreach_in_the_list_impl, dta);
+	g_list_foreach (me->first, func, user_data);
 	g_mutex_unlock (me->iterator_lock);
-
-    	g_free (dta);
 
 	return;
 }
@@ -238,19 +226,12 @@ tny_gtk_account_list_model_copy_the_list (TnyList *self)
 {
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*)self;
 	TnyGtkAccountListModel *copy = g_object_new (TNY_TYPE_GTK_ACCOUNT_LIST_MODEL, NULL);
-
-	/* This only copies the TnyList pieces. The result is not a
-	   correct or good TnyHeaderListModel. But it will be a correct
-	   TnyList instance. It is the only thing the user of this
-	   method expects.
-
-	   The new list will point to the same instances, of course. It's
-	   only a copy of the list-nodes of course. */
-
+    
 	g_mutex_lock (me->iterator_lock);
-	tny_gtk_account_list_model_foreach_in_the_list (TNY_LIST (copy), 
-			(GFunc)g_object_ref, NULL);
-	g_mutex_unlock (me->iterator_lock);
+	GList *list_copy = g_list_copy (me->first);
+	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
+	copy->first = list_copy;
+	g_mutex_unlock (me->iterator_lock);    
 
 	return TNY_LIST (copy);
 }

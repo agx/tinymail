@@ -136,7 +136,6 @@ tny_gtk_attach_list_model_finalize (GObject *object)
 	TnyGtkAttachListModelPriv *priv = TNY_GTK_ATTACH_LIST_MODEL_GET_PRIVATE (object);
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*) object;
 
-
 	g_mutex_lock (me->iterator_lock);
 	g_list_foreach (me->first, destroy_parts, NULL);
 	g_mutex_unlock (me->iterator_lock);
@@ -176,7 +175,8 @@ tny_gtk_attach_list_model_instance_init (GTypeInstance *instance, gpointer g_cla
 	priv->theme = NULL;
 	types[0] = GDK_TYPE_PIXBUF;
 	me->iterator_lock = g_mutex_new ();
-
+	me->first = NULL;
+    
 	gtk_list_store_set_column_types (store, 
 		TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS, types);
 

@@ -57,6 +57,7 @@ struct _TnyGtkAccountTreeModel
 	GtkTreeStore parent;
 	GList *first;
 	GMutex *iterator_lock;
+	gboolean is_async;
 };
 
 struct _TnyGtkAccountTreeModelClass
@@ -66,7 +67,7 @@ struct _TnyGtkAccountTreeModelClass
 
 GType tny_gtk_account_tree_model_get_type (void);
 GType tny_gtk_account_tree_model_column_get_type (void);
-GtkTreeModel* tny_gtk_account_tree_model_new (void);
+GtkTreeModel* tny_gtk_account_tree_model_new (gboolean async);
 
 G_END_DECLS
 

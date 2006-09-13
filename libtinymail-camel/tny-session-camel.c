@@ -29,7 +29,6 @@
 #include <camel/camel.h>
 #include <camel/camel-filter-driver.h>
 
-
 #include <camel/camel-store.h>
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -41,6 +40,7 @@
 #include <tny-camel-store-account.h>
 #include <tny-camel-transport-account.h>
 
+#include "tny-session-camel-priv.h"
 #include "tny-camel-store-account-priv.h"
 #include "tny-camel-transport-account-priv.h"
 #include "tny-camel-account-priv.h"
@@ -442,9 +442,23 @@ tny_session_camel_init (TnySessionCamel *instance)
 }
 
 void 
-tny_session_camel_set_current_accounts (TnySessionCamel *self, TnyList *list)
+_tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
 {
-	self->current_accounts = list;
+	self->current_accounts = g_list_prepend (self->current_accounts, account);
+}
+
+void 
+_tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account)
+{
+	self->current_accounts = g_list_remove (self->current_accounts, account);
+}
+
+static void
+foreach_account_set_connectivity (gpointer data, gpointer udata)
+{
+	gboolean online = (gboolean)udata;
+	if (data && TNY_IS_CAMEL_ACCOUNT (data))
+		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (data), !online);
 }
 
 static void
@@ -454,33 +468,16 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 	
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	if (self->current_accounts && TNY_IS_LIST (self->current_accounts) &&
-		!self->first_switch && self->prev_constat != online 
+	if (self->current_accounts && !self->first_switch && self->prev_constat != online 
 		&& self->account_store)
 	{
-		TnyList *accounts = self->current_accounts;
-		TnyIterator *iterator;
-
-		iterator = tny_list_create_iterator (accounts);
-	
-		while (!tny_iterator_is_done (iterator))
-		{
-			TnyStoreAccount *account = (TnyStoreAccount*)tny_iterator_get_current (iterator);
-			
-			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !online);
-	
-			g_object_unref (G_OBJECT(account));
-			
-			tny_iterator_next (iterator);
-		}
-
-		g_object_unref (G_OBJECT (iterator));
+		g_list_foreach (self->current_accounts, 
+			foreach_account_set_connectivity, (gpointer) online);
 	}
 
 	if (self->account_store && !self->first_switch)
 		g_signal_emit (self->account_store, 
 			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
-
 
 	self->first_switch = FALSE;
 	self->prev_constat = online;

@@ -34,13 +34,72 @@
 #include "tny-gtk-account-tree-model-iterator-priv.h"
 
 static GObjectClass *parent_class = NULL;
+static void recurse_folders_async (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter);
 
 typedef void (*treeaddfunc) (GtkTreeStore *tree_store, GtkTreeIter *iter, GtkTreeIter *parent);
 
 
+typedef struct {
+	GtkTreeIter *parent_tree_iter;
+	TnyGtkAccountTreeModel *self;
+	TnyFolderStoreQuery *query;
+} AsyncHelpr;
 
 static void
-recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
+recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, gpointer user_data)
+{
+	AsyncHelpr *hlrp = user_data;
+	TnyIterator *iter = tny_list_create_iterator (folders);
+
+	while (!tny_iterator_is_done (iter))
+	{
+		GtkTreeStore *model = GTK_TREE_STORE (hlrp->self);
+		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
+		GtkTreeIter *tree_iter = gtk_tree_iter_copy (hlrp->parent_tree_iter);
+	    
+		gtk_tree_store_append (model, tree_iter, hlrp->parent_tree_iter);
+
+ 		gtk_tree_store_set (model, tree_iter,
+			TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
+			tny_folder_get_name (TNY_FOLDER (folder)),
+			TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 
+			tny_folder_get_unread_count (TNY_FOLDER (folder)),
+			TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN,
+			tny_folder_get_folder_type (TNY_FOLDER (folder)),
+			TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
+			folder, -1);
+	    
+		recurse_folders_async (hlrp->self, folder, hlrp->query, tree_iter);
+	    
+ 		g_object_unref (G_OBJECT (folder));
+
+		tny_iterator_next (iter);	    
+	}
+
+	g_object_unref (G_OBJECT (iter));   
+	g_object_unref (G_OBJECT (folders));
+    
+    	//gtk_tree_iter_free (hlrp->parent_tree_iter);
+    	g_free (hlrp);
+    
+}
+
+
+static void
+recurse_folders_async (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
+{
+	AsyncHelpr *hlrp = g_new0 (AsyncHelpr, 1);
+	TnyList *folders = tny_simple_list_new ();
+    
+	hlrp->self = self;
+	hlrp->parent_tree_iter = parent_tree_iter;
+	hlrp->query = query;
+    
+	tny_folder_store_get_folders_async (store, folders,  recurse_get_folders_callback, query, hlrp);
+}
+
+static void
+recurse_folders_sync (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
 {
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
@@ -66,7 +125,7 @@ recurse_folders (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderS
 			TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
 	    
-		recurse_folders (self, folder, query, &tree_iter);
+		recurse_folders_sync (self, folder, query, &tree_iter);
 	    
  		g_object_unref (G_OBJECT (folder));
 
@@ -84,7 +143,7 @@ tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccount *a
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 	TnyList *folders = tny_simple_list_new ();
 	GtkTreeIter name_iter;
-
+    
 	func (model, &name_iter, NULL);
 
 	gtk_tree_store_set (model, &name_iter,
@@ -95,7 +154,41 @@ tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccount *a
 		TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 		account, -1);
 
-	recurse_folders (self, TNY_FOLDER_STORE (account), NULL, &name_iter);
+	recurse_folders_sync (self, TNY_FOLDER_STORE (account), NULL, &name_iter);
+
+    	g_object_unref (G_OBJECT (folders));
+    
+	return;
+}
+
+static void
+tny_gtk_account_tree_model_add_async (TnyGtkAccountTreeModel *self, TnyStoreAccount *account, treeaddfunc func)
+{
+	GtkTreeStore *model = GTK_TREE_STORE (self);
+	TnyList *folders = tny_simple_list_new ();
+	GtkTreeIter first, *name_iter;
+	gboolean need_add = TRUE;
+    
+	if (!gtk_tree_model_get_iter_first (GTK_TREE_MODEL (self), &first))
+	{
+		func (model, &first, NULL);
+		need_add = FALSE;
+	}
+
+	name_iter = gtk_tree_iter_copy (&first);
+
+	if (need_add)
+		func (model, name_iter, NULL);
+
+	gtk_tree_store_set (model, name_iter,
+		TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
+		tny_account_get_name (TNY_ACCOUNT (account)),
+		TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, 0,
+		TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN, TNY_FOLDER_TYPE_ROOT,
+		TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
+		account, -1);
+
+	recurse_folders_async (self, TNY_FOLDER_STORE (account), NULL, name_iter);
 
     	g_object_unref (G_OBJECT (folders));
     
@@ -104,16 +197,16 @@ tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccount *a
 
 /**
  * tny_gtk_account_tree_model_new:
- *
+ * @async: Whether or not this component should attempt to asynchronously fill the tree
  *
  * Return value: a new #GtkTreeModel instance suitable for showing  
  * #TnyAccount instances
  **/
 GtkTreeModel*
-tny_gtk_account_tree_model_new (void)
+tny_gtk_account_tree_model_new (gboolean async)
 {
 	TnyGtkAccountTreeModel *self = g_object_new (TNY_TYPE_GTK_ACCOUNT_TREE_MODEL, NULL);
-
+	self->is_async = async;
 	return GTK_TREE_MODEL (self);
 }
 
@@ -180,9 +273,14 @@ tny_gtk_account_tree_model_prepend (TnyList *self, GObject* item)
 	/* Prepend something to the list */
 	g_object_ref (G_OBJECT (item));
 	me->first = g_list_prepend (me->first, item);
-	tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT (item), 
-		gtk_tree_store_prepend);
-
+    
+    	if (me->is_async)
+		tny_gtk_account_tree_model_add_async (me, TNY_STORE_ACCOUNT (item), 
+			gtk_tree_store_prepend);
+	else
+		tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT (item), 
+			gtk_tree_store_prepend);
+	
 	g_mutex_unlock (me->iterator_lock);
 }
 
@@ -196,9 +294,14 @@ tny_gtk_account_tree_model_append (TnyList *self, GObject* item)
 	/* Append something to the list */
 	g_object_ref (G_OBJECT (item));
 	me->first = g_list_append (me->first, item);
-	tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT (item), 
-		gtk_tree_store_append);
-
+    
+	if (me->is_async)
+		tny_gtk_account_tree_model_add_async (me, TNY_STORE_ACCOUNT (item), 
+			gtk_tree_store_append);
+	else
+		tny_gtk_account_tree_model_add (me, TNY_STORE_ACCOUNT (item), 
+			gtk_tree_store_append);
+    
 	g_mutex_unlock (me->iterator_lock);
 }
 

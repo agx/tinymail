@@ -43,8 +43,7 @@ struct _TnyGtkAccountListModelIterator
 {
 	GObject parent;
 	TnyGtkAccountListModel *model;
-	GtkTreeIter *current, *previous;
-	gboolean has_first, has_next;
+	GList *current;
 };
 
 struct _TnyGtkAccountListModelIteratorClass 

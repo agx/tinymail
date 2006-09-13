@@ -25,7 +25,4 @@ TnyGtkAccountListModelIterator
 @parent: 
 @model: 
 @current: 
-@previous: 
-@has_first: 
-@has_next: 
 

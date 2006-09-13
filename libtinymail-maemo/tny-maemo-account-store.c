@@ -371,8 +371,6 @@ tny_maemo_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 
 	}
 
-	tny_session_camel_set_current_accounts (priv->session, list);
-
 	return;	
 }
 

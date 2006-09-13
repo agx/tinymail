@@ -120,8 +120,6 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 	tny_list_prepend (list, (GObject*)account);
 	g_object_unref (G_OBJECT (account));
-
-    	tny_session_camel_set_current_accounts (me->session, list);
     
 	return;	
 }

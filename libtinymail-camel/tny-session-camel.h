@@ -40,27 +40,25 @@ struct _TnySessionCamel
 	gpointer account_store;
         gboolean interactive, prev_constat, first_switch;
 	guint connchanged_signal;
-	TnyList *current_accounts;
+	GList *current_accounts;
 };
 
 struct _TnySessionCamelClass
 {
         CamelSessionClass parent_class;
 
-        void        (*set_pass_func_func)        (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
-        void        (*set_forget_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc forget_pass_func);
-	void        (*set_account_store_func)    (TnySessionCamel *self, TnyAccountStore *account_store);
+        void (*set_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
+        void (*set_forget_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc forget_pass_func);
+	void (*set_account_store_func) (TnySessionCamel *self, TnyAccountStore *account_store);
 
 };
 
-CamelType         tny_session_camel_get_type      (void);
+CamelType tny_session_camel_get_type (void);
 
-void              tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
-void              tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc get_forget_pass_func);
-
-void              tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store);
-void              tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device);
-void              tny_session_camel_set_current_accounts (TnySessionCamel *self, TnyList *list);
+void tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
+void tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc get_forget_pass_func);
+void tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store);
+void tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device);
 
 G_END_DECLS
 

@@ -369,8 +369,6 @@ tny_gpe_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGet
 			g_free (proto);
 	}
 
-	tny_session_camel_set_current_accounts (priv->session, list);
-
 	return;	
 }
 

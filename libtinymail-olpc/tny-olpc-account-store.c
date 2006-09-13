@@ -303,9 +303,6 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 	}	
 	g_dir_close (dir);
 
-
-	tny_session_camel_set_current_accounts (priv->session, list);
-
 	return;	
 }
 
