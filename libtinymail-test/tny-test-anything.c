@@ -14,8 +14,9 @@
 #include <camel/camel-folder-summary.h>
 #include <tny-test-stream.h>
 #include <tny-fs-stream.h>
+#include <tny-vfs-stream.h>
 
-static TnyStream *cmstream = NULL, *fstream, *tbstream = NULL, *source = NULL;
+static TnyStream *cmstream = NULL, *vfsstream = NULL, *fstream, *tbstream = NULL, *source = NULL;
 
 
 int main (int argc , char **argv)
@@ -24,6 +25,9 @@ int main (int argc , char **argv)
 	GtkTextView *view;
     	gchar *tmpl = g_strdup ("/tmp/tinymail-stream-test.XXXXXX");
 	gint filed = g_mkstemp (tmpl);
+    	gchar *gvfs = g_strdup_printf ("file://%s", tmpl);
+    	GnomeVFSHandle *handle;
+    	GnomeVFSResult result;
     
  	if (filed == -1)
 		perror ("Creating temporary file");
@@ -31,8 +35,11 @@ int main (int argc , char **argv)
     	g_free (tmpl);
     
    	gtk_init (&argc, &argv);
-	g_thread_init (NULL);
+    	gnome_vfs_init ();
+    	
+    	close (filed);
     
+    	result = gnome_vfs_create (&handle,gvfs,GNOME_VFS_OPEN_WRITE|GNOME_VFS_OPEN_READ,FALSE,0777);
     	view = GTK_TEXT_VIEW (gtk_text_view_new ());
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
   
@@ -45,8 +52,11 @@ int main (int argc , char **argv)
 	tbstream = tny_gtk_text_buffer_stream_new (buffer);
 	source = TNY_STREAM (tny_test_stream_new ());
 	fstream = tny_fs_stream_new (filed);
+    	if (result == GNOME_VFS_OK)
+	    	vfsstream = tny_vfs_stream_new (handle);
+    	else printf ("Problem with vfs (%s, %d, %d)\n", gvfs,result,GNOME_VFS_ERROR_INVALID_OPEN_MODE);
     
-     TnyStream *streams [1] = { fstream };
+     TnyStream *streams [1] = { vfsstream };
     int te=0;
     
     

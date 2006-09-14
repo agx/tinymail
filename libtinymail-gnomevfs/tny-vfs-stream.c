@@ -198,7 +198,15 @@ tny_vfs_stream_read  (TnyStream *self, char *buffer, gsize n)
 
 	if (G_LIKELY (res == GNOME_VFS_OK))
 	{
-		priv->eos = FALSE;
+		gchar buf[1]; GnomeVFSResult res2;
+		GnomeVFSFileSize curpos, cnt;
+		gnome_vfs_tell (priv->handle, &curpos);
+		res2 = gnome_vfs_read (priv->handle, buf, 1, &cnt);
+		gnome_vfs_seek (priv->handle, GNOME_VFS_SEEK_START, curpos);
+		if (res2 == GNOME_VFS_ERROR_EOF)
+			priv->eos = TRUE;
+	    	else priv->eos = FALSE;
+	    
 		return (ssize_t)count;
 
 	} else if (G_LIKELY (res == GNOME_VFS_ERROR_EOF))
@@ -226,6 +234,7 @@ tny_vfs_stream_write (TnyStream *self, const char *buffer, gsize n)
 	}
 
 	res = gnome_vfs_write (priv->handle, buffer, n, &count);
+    	priv->eos = FALSE;
 	if (G_LIKELY (res == GNOME_VFS_OK))
 		return (ssize_t)count;
 
@@ -250,7 +259,8 @@ tny_vfs_stream_close (TnyStream *self)
 	res = gnome_vfs_close (priv->handle);
 
 	priv->handle = NULL;
-
+	priv->eos = TRUE;
+    
 	if (res == GNOME_VFS_OK)
 		return 0;
 
@@ -259,67 +269,6 @@ tny_vfs_stream_close (TnyStream *self)
 	return -1;
 }
 
-/*
-
-static off_t
-tny_vfs_stream_seek (TnySeekableStream *stream, off_t offset, TnyStreamSeekPolicy policy)
-{
-	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
-	GnomeVFSSeekPosition vpolicy;
-	GnomeVFSFileSize pos;
-	GnomeVFSResult res;
-
-	if (priv->handle == NULL) 
-	{
-		errno = EINVAL;
-		return -1;
-	}
-
-	switch (policy) 
-	{
-		case TNY_STREAM_SET:
-		default:
-			vpolicy = GNOME_VFS_SEEK_START;
-			break;
-		case TNY_STREAM_CUR:
-			vpolicy = GNOME_VFS_SEEK_CURRENT;
-			break;
-		case TNY_STREAM_END:
-			vpolicy = GNOME_VFS_SEEK_END;
-			break;
-	}
-
-	if ( (res = gnome_vfs_seek (priv->handle, vpolicy, offset)) == GNOME_VFS_OK
-	     && (res = gnome_vfs_tell(priv->handle, &pos)) == GNOME_VFS_OK)
-		return pos;
-
-	tny_vfs_stream_set_errno (res);
-
-	return -1;
-}
-
-static off_t
-tny_vfs_stream_tell (TnySeekableStream *stream)
-{
-	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
-	GnomeVFSFileSize pos;
-	GnomeVFSResult res;
-
-	if (priv->handle == NULL) 
-	{
-		errno = EINVAL;
-		return -1;
-	}
-
-	if ((res = gnome_vfs_tell (priv->handle, &pos)) == GNOME_VFS_OK)
-		return pos;
-
-	tny_vfs_stream_set_errno (res);
-
-	return -1;
-}
-
-*/
 
 /**
  * tny_vfs_stream_set_handle:
@@ -338,7 +287,8 @@ tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
 		gnome_vfs_close (priv->handle);
 
 	priv->handle = handle;
-
+	priv->eos = FALSE;
+    
 	return;
 }
 
@@ -350,14 +300,14 @@ tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
  *
  * Return value: a new #TnyStream instance
  **/
-TnyVfsStream*
+TnyStream*
 tny_vfs_stream_new (GnomeVFSHandle *handle)
 {
 	TnyVfsStream *self = g_object_new (TNY_TYPE_VFS_STREAM, NULL);
 
 	tny_vfs_stream_set_handle (self, handle);
 
-	return self;
+	return TNY_STREAM (self);
 }
 
 static void
@@ -420,7 +370,8 @@ tny_vfs_reset (TnyStream *self)
 		tny_vfs_stream_set_errno (res);
 		retval = -1;
 	}
-
+	priv->eos = FALSE;
+    
 	return retval;
 }
 

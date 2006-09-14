@@ -5,7 +5,8 @@ INCLUDES =  -I. -I$(top_srcdir) -I$(top_srcdir)/tests/shared \
 	-I$(top_srcdir)/libtinymail		\
 	-I$(top_srcdir)/libtinymailui		\
 	-I$(top_srcdir)/libtinymailui-gtk	\
-	-I$(top_srcdir)/libtinymail-camel
+	-I$(top_srcdir)/libtinymail-camel	\
+	-I$(top_srcdir)/libtinymail-gnomevfs
 
 if BUILD_GNOME
 INCLUDES += -DGNOME

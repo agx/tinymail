@@ -56,7 +56,7 @@ gtk_save_to_file (const gchar *uri, TnyMimePart *part)
 {
 	GnomeVFSResult result;
 	GnomeVFSHandle *handle;
-	TnyVfsStream *stream = NULL;
+	TnyStream *stream = NULL;
 
 	result = gnome_vfs_create (&handle, uri, 
 		GNOME_VFS_OPEN_WRITE, FALSE, 0777);
@@ -65,7 +65,7 @@ gtk_save_to_file (const gchar *uri, TnyMimePart *part)
 		return FALSE;
 
 	stream = tny_vfs_stream_new (handle);
-	tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
+	tny_mime_part_decode_to_stream (part, stream);
 
 	/* This also closes the gnome-vfs handle (maybe it shouldn't?) */
 	g_object_unref (G_OBJECT (stream));

@@ -2,6 +2,7 @@
 
 	* Bugfixes in the list types found after improving a few unit tests
 	* Bugfixes in the stream types found after improving a few unit tests
+	* Fixed the TnyFsStream, TnyGtkTextBufferStream and TnyVfsStream types
 
 2006-09-13  Philip Van Hoof <pvanhoof@gnome.org>
 

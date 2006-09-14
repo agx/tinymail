@@ -49,7 +49,7 @@ struct _TnyVfsStreamClass
 };
 
 GType                   tny_vfs_stream_get_type        (void);
-TnyVfsStream*           tny_vfs_stream_new             (GnomeVFSHandle *handle);
+TnyStream*              tny_vfs_stream_new             (GnomeVFSHandle *handle);
 
 void                    tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle);
 
