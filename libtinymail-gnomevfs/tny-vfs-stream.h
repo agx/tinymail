@@ -48,10 +48,10 @@ struct _TnyVfsStreamClass
 	GObjectClass parent;
 };
 
-GType                   tny_vfs_stream_get_type        (void);
-TnyStream*              tny_vfs_stream_new             (GnomeVFSHandle *handle);
+GType tny_vfs_stream_get_type (void);
+TnyStream* tny_vfs_stream_new (GnomeVFSHandle *handle);
 
-void                    tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle);
+void tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle);
 
 G_END_DECLS
 
