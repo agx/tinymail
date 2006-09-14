@@ -44,7 +44,6 @@
  */
 
 #include <config.h>
-
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -101,12 +100,19 @@ tny_fs_stream_read  (TnyStream *self, char *buffer, gsize n)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	gssize nread;
+	char b[1];
 	
 	if ((nread = read (priv->fd, buffer, n)) > 0)
 		priv->offset += nread;
-	else if (nread == 0)
+    
+    	if (nread != n)
 		priv->eos = TRUE;
 	
+    	if (read (priv->fd, b, 1) != 1)
+		priv->eos = TRUE;
+    	else 
+		lseek (priv->fd, priv->offset, SEEK_SET);
+    
 	return nread;
 
 }
@@ -120,6 +126,8 @@ tny_fs_stream_write (TnyStream *self, const char *buffer, gsize n)
 	if ((nwritten = write (priv->fd, buffer, n)) > 0)
 		priv->offset += nwritten;
 	
+    	priv->eos = FALSE;
+    
 	return nwritten;
 }
 
@@ -158,11 +166,13 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
 
 	priv->fd = fd;
 
-	priv->offset = lseek (priv->fd, 0, SEEK_CUR);
+	priv->offset = lseek (priv->fd, 0, SEEK_SET);
 
 	if (priv->offset == -1)
 		priv->offset = 0;
 
+	priv->eos = FALSE;
+    
 	return;
 }
 
@@ -201,7 +211,8 @@ tny_fs_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->eos = TRUE;
 	priv->fd = -1;
-
+	priv->offset = 0;
+    
 	return;
 }
 
@@ -217,7 +228,8 @@ tny_fs_stream_finalize (GObject *object)
 		close (priv->fd);	     
 	}
 	priv->fd = -1;
-
+	priv->eos = TRUE;
+    
 	(*parent_class->finalize) (object);
 
 	return;
@@ -240,6 +252,9 @@ tny_fs_eos (TnyStream *self)
 static gint 
 tny_fs_reset (TnyStream *self)
 {
+	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
+    	priv->offset = lseek (priv->fd, 0, SEEK_SET);
+    	priv->eos = FALSE;
 	return 0;
 }
 

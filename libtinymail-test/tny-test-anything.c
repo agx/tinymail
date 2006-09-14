@@ -13,15 +13,23 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 #include <tny-test-stream.h>
+#include <tny-fs-stream.h>
 
-static TnyStream *cmstream = NULL, *tbstream = NULL, *source = NULL;
+static TnyStream *cmstream = NULL, *fstream, *tbstream = NULL, *source = NULL;
 
 
 int main (int argc , char **argv)
 {
 	GtkTextBuffer *buffer;
 	GtkTextView *view;
-
+    	gchar *tmpl = g_strdup ("/tmp/tinymail-stream-test.XXXXXX");
+	gint filed = g_mkstemp (tmpl);
+    
+ 	if (filed == -1)
+		perror ("Creating temporary file");
+    
+    	g_free (tmpl);
+    
    	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
     
@@ -36,9 +44,9 @@ int main (int argc , char **argv)
 	/* These are the streams that is being tested */
 	tbstream = tny_gtk_text_buffer_stream_new (buffer);
 	source = TNY_STREAM (tny_test_stream_new ());
-
+	fstream = tny_fs_stream_new (filed);
     
-     TnyStream *streams [1] = { tbstream };
+     TnyStream *streams [1] = { fstream };
     int te=0;
     
     
@@ -70,9 +78,12 @@ int main (int argc , char **argv)
 		gchar buf[2];
 		tny_stream_read (iface, buf, 2);
 		printf ("[[%s]]\n", buf);
+	    	n++;
 	}
-
+printf ("n=%d\n", n);
 
 	g_free (buffer);
+	
+	g_object_unref (G_OBJECT (iface));
    }
 }

@@ -7,6 +7,10 @@ INCLUDES =  -I. -I$(top_srcdir) -I$(top_srcdir)/tests/shared \
 	-I$(top_srcdir)/libtinymailui-gtk	\
 	-I$(top_srcdir)/libtinymail-camel
 
+if BUILD_GNOME
+INCLUDES += -DGNOME
+endif
+
 lib_LTLIBRARIES = libtinymail-test-suite.la
 
 bin_PROGRAMS = tny-simple-test-runner tny-test-anything

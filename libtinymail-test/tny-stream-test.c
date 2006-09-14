@@ -30,8 +30,10 @@
 #include <camel/camel-folder-summary.h>
 #include <tny-test-stream.h>
 #include <tny-gtk-text-buffer-stream.h>
+#include <tny-fs-stream.h>
 
-static TnyStream *cmstream = NULL, *tbstream = NULL, *source = NULL;
+static TnyStream *cmstream = NULL, *tbstream = NULL, 
+	*fstream, *source = NULL;
 static gchar *str;
 
 static void
@@ -39,12 +41,16 @@ tny_stream_test_setup (void)
 {
 	GtkWidget *view;
 	GtkTextBuffer *buffer;
-
 	view = gtk_text_view_new ();
-
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-  
-  /* Don't ask me why, I think this is a Camel bug */
+	gchar *tmpl = g_strdup ("/tmp/tinymail-stream-test.XXXXXX");
+	gint filed = g_mkstemp (tmpl);
+    
+ 	if (filed == -1)
+		perror ("Creating temporary file");
+    	g_free (tmpl);
+    
+	/* Don't ask me why, I think this is a Camel bug */
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	CamelStream *stream = camel_stream_mem_new ();
 
@@ -53,6 +59,7 @@ tny_stream_test_setup (void)
 	/* These are the streams that is being tested */
 	cmstream = TNY_STREAM (tny_camel_stream_new (stream));
 	tbstream = tny_gtk_text_buffer_stream_new (buffer);
+    	fstream = tny_fs_stream_new (filed);
     
 	/* This is a test stream that streams 21 times the answer to
 	   all questions (21 times the bytes '4' and '2'). */
@@ -68,18 +75,19 @@ tny_stream_test_teardown (void)
     	g_object_unref (G_OBJECT (tbstream));
 	g_object_unref (G_OBJECT (cmstream));
 	g_object_unref (G_OBJECT (source));
-
+	g_object_unref (G_OBJECT (fstream));
+    
 	return;
 }
 
 static void
 tny_stream_test_stream (void)
 {
-    TnyStream *streams [2] = { tbstream, cmstream };
+    TnyStream *streams [3] = { tbstream, cmstream, fstream };
     int te=0;
     
     
-    for (te=0; te<2; te++)
+    for (te=0; te<3; te++)
     {
 	TnyStream *iface = streams[te];
 	gchar *buffer = (gchar*) malloc (sizeof (gchar) * 42);
