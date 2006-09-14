@@ -56,7 +56,7 @@ tny_stream_test_setup (void)
 
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	/* These are the streams that is being tested */
+	/* These are the streams that are being tested */
 	cmstream = TNY_STREAM (tny_camel_stream_new (stream));
 	tbstream = tny_gtk_text_buffer_stream_new (buffer);
     	fstream = tny_fs_stream_new (filed);
