@@ -110,8 +110,8 @@ tny_fs_stream_read  (TnyStream *self, char *buffer, gsize n)
 	
     	if (read (priv->fd, b, 1) != 1)
 		priv->eos = TRUE;
-    	else 
-		lseek (priv->fd, priv->offset, SEEK_SET);
+    
+	priv->offset = lseek (priv->fd, priv->offset, SEEK_SET);
     
 	return nread;
 

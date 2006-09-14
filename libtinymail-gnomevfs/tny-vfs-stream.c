@@ -202,10 +202,10 @@ tny_vfs_stream_read  (TnyStream *self, char *buffer, gsize n)
 		GnomeVFSFileSize curpos, cnt;
 		gnome_vfs_tell (priv->handle, &curpos);
 		res2 = gnome_vfs_read (priv->handle, buf, 1, &cnt);
-		gnome_vfs_seek (priv->handle, GNOME_VFS_SEEK_START, curpos);
 		if (res2 == GNOME_VFS_ERROR_EOF)
 			priv->eos = TRUE;
 	    	else priv->eos = FALSE;
+		gnome_vfs_seek (priv->handle, GNOME_VFS_SEEK_START, curpos);
 	    
 		return (ssize_t)count;
 
