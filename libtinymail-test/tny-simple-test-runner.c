@@ -135,7 +135,7 @@ main (int argc, char **argv)
 	GUnitTestRunner *runner = NULL;
 	GUnitView *view = NULL;
 
-	g_type_init ();
+    	gtk_init (&argc, &argv);
 	g_thread_init (NULL);
 
 	gtk_init (&argc, &argv);

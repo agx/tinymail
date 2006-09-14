@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 #include <config.h>
-
+#include <string.h>
 #include <glib.h>
 
 #include <gtk/gtk.h>
@@ -81,21 +81,26 @@ tny_gtk_text_buffer_stream_read  (TnyStream *self, char *buffer, gsize n)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter dest, end;
+	gchar *buf;
 	gint cur_offset, end_offset, rlength;
-
 	gtk_text_buffer_get_end_iter (priv->buffer, &end);
 
-	cur_offset = gtk_text_iter_get_offset (&(priv->cur));
+	cur_offset = gtk_text_iter_get_offset (&(priv->cur));    
 	end_offset = gtk_text_iter_get_offset (&end);
 
 	if (cur_offset + (gint)n > end_offset)
 		rlength = end_offset - cur_offset;
 	else rlength = (gint)n;
 
+        gtk_text_buffer_get_start_iter (priv->buffer, &dest);
 	gtk_text_iter_set_offset (&dest, rlength);
 
-	buffer = gtk_text_buffer_get_text (priv->buffer, &(priv->cur), &dest, TRUE);
-
+    
+	buf = gtk_text_buffer_get_text (priv->buffer, &(priv->cur), &dest, TRUE);
+    	strncpy (buffer, buf, rlength);
+    	g_free (buf);
+    	gtk_text_iter_set_offset (&(priv->cur), cur_offset + rlength);
+    	
 	return (gssize) rlength;
 }
 
@@ -128,10 +133,14 @@ tny_gtk_text_buffer_stream_eos   (TnyStream *self)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter end;
+	gint end_offset, cur_offset;
 
 	gtk_text_buffer_get_end_iter (priv->buffer, &end);
 
-	return gtk_text_iter_equal (&(priv->cur), &end);
+	cur_offset = gtk_text_iter_get_offset (&(priv->cur));
+	end_offset = gtk_text_iter_get_offset (&end);
+    
+	return (cur_offset >= end_offset);
 }
 
 static gint

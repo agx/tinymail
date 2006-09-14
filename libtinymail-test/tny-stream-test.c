@@ -29,22 +29,31 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 #include <tny-test-stream.h>
+#include <tny-gtk-text-buffer-stream.h>
 
-static TnyStream *iface = NULL, *source = NULL;
+static TnyStream *cmstream = NULL, *tbstream = NULL, *source = NULL;
 static gchar *str;
 
 static void
 tny_stream_test_setup (void)
 {
-	/* Don't ask me why, I think this is a Camel bug */
+	GtkWidget *view;
+	GtkTextBuffer *buffer;
+
+	view = gtk_text_view_new ();
+
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+  
+  /* Don't ask me why, I think this is a Camel bug */
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	CamelStream *stream = camel_stream_mem_new ();
 
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	/* This is the stream that is being tested */
-	iface = TNY_STREAM (tny_camel_stream_new (stream));
-
+	/* These are the streams that is being tested */
+	cmstream = TNY_STREAM (tny_camel_stream_new (stream));
+	tbstream = tny_gtk_text_buffer_stream_new (buffer);
+    
 	/* This is a test stream that streams 21 times the answer to
 	   all questions (21 times the bytes '4' and '2'). */
 
@@ -56,7 +65,8 @@ tny_stream_test_setup (void)
 static void 
 tny_stream_test_teardown (void)
 {
-	g_object_unref (G_OBJECT (iface));
+    	g_object_unref (G_OBJECT (tbstream));
+	g_object_unref (G_OBJECT (cmstream));
 	g_object_unref (G_OBJECT (source));
 
 	return;
@@ -65,6 +75,13 @@ tny_stream_test_teardown (void)
 static void
 tny_stream_test_stream (void)
 {
+    TnyStream *streams [2] = { tbstream, cmstream };
+    int te=0;
+    
+    
+    for (te=0; te<2; te++)
+    {
+	TnyStream *iface = streams[te];
 	gchar *buffer = (gchar*) malloc (sizeof (gchar) * 42);
 	gint n=0;
 	/* 21 times the answer to all questions */
@@ -101,7 +118,7 @@ tny_stream_test_stream (void)
 		gchar buf[2];
 		tny_stream_read (iface, buf, 2);
 
-		str = g_strdup_printf ("These two bytes should have been '4' and '2': %s\n", buffer);
+		str = g_strdup_printf ("These two bytes should have been '4' and '2': [%s]\n", buffer);
 		gunit_fail_unless(!strncmp (buffer, "42", 2), str);
 		g_free (str);
 
@@ -113,6 +130,7 @@ tny_stream_test_stream (void)
 	g_free (str);
 
 	g_free (buffer);
+   }
 }
 
 
