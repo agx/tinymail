@@ -196,7 +196,7 @@ _tny_camel_folder_get_camel_folder (TnyCamelFolder *self)
 
 
 static gboolean
-tny_camel_folder_get_subscribed (TnyFolder *self)
+tny_camel_folder_is_subscribed (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	gboolean retval;
@@ -220,22 +220,6 @@ _tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed)
 	return;
 }
 
-static void
-tny_camel_folder_set_subscribed (TnyFolder *self, gboolean subscribed)
-{
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-
-	/* These will synchronize me using _tny_folder_set_subscribed_priv */
-
-	if (G_LIKELY (subscribed))
-		tny_store_account_subscribe 
-			(TNY_STORE_ACCOUNT (priv->account), self);
-	else
-		tny_store_account_unsubscribe
-			(TNY_STORE_ACCOUNT (priv->account), self);
-
-	return;
-}
 
 static guint
 tny_camel_folder_get_unread_count (TnyFolder *self)
@@ -880,8 +864,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->get_unread_count_func = tny_camel_folder_get_unread_count;
 	klass->get_all_count_func = tny_camel_folder_get_all_count;
 	klass->get_account_func = tny_camel_folder_get_account;
-	klass->get_subscribed_func = tny_camel_folder_get_subscribed;
-	klass->set_subscribed_func = tny_camel_folder_set_subscribed;
+	klass->is_subscribed_func = tny_camel_folder_is_subscribed;
 	klass->refresh_async_func = tny_camel_folder_refresh_async;
 	klass->refresh_func = tny_camel_folder_refresh;
 	klass->remove_message_func = tny_camel_folder_remove_message;

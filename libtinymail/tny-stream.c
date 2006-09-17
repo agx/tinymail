@@ -134,7 +134,7 @@ tny_stream_close (TnyStream *self)
 
 
 /**
- * tny_stream_eos:
+ * tny_stream_is_eos:
  * @self: a #TnyStream object
  * 
  * Tests if there are bytes left to read on the stream object.
@@ -143,14 +143,14 @@ tny_stream_close (TnyStream *self)
  *
  **/
 gboolean
-tny_stream_eos   (TnyStream *self)
+tny_stream_is_eos   (TnyStream *self)
 {
 #ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->eos_func)
-		g_critical ("You must implement tny_stream_eos\n");
+	if (!TNY_STREAM_GET_IFACE (self)->is_eos_func)
+		g_critical ("You must implement tny_stream_is_eos\n");
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->eos_func (self);
+	return TNY_STREAM_GET_IFACE (self)->is_eos_func (self);
 }
 
 /**

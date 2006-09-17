@@ -2,7 +2,10 @@
 
 	* Changed the length method of the TnyList interface to get_length as
 	it's a normal property like any other
-	
+	* Changed the eos method of the TnyStream interface to is_eos as it's
+	a normal property like any other
+	* Changes to the subscribe/unsubscribe API in TnyFolder
+
 	* This was a major API change
 
 2006-09-14  Philip Van Hoof <pvanhoof@gnome.org>

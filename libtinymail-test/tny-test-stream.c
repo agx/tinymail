@@ -49,7 +49,7 @@ tny_test_stream_write_to_stream (TnyStream *self, TnyStream *output)
 	ssize_t nb_read;
 	ssize_t nb_written;
 	
-	while (!tny_stream_eos (self)) 
+	while (!tny_stream_is_eos (self)) 
 	{
 
 		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
@@ -121,7 +121,7 @@ tny_test_stream_close (TnyStream *self)
 }
 
 static gboolean
-tny_test_stream_eos (TnyStream *self)
+tny_test_stream_is_eos (TnyStream *self)
 {
 	TnyTestStream *me = TNY_TEST_STREAM (self);
 
@@ -170,7 +170,7 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->write_func = tny_test_stream_write;
 	klass->close_func = tny_test_stream_close;
 	klass->write_to_stream_func = tny_test_stream_write_to_stream;
-	klass->eos_func = tny_test_stream_eos;
+	klass->is_eos_func = tny_test_stream_is_eos;
 	klass->reset_func = tny_test_stream_reset;
 
 	return;

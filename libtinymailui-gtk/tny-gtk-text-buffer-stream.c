@@ -49,7 +49,7 @@ tny_text_buffer_write_to_stream (TnyStream *self, TnyStream *output)
 	gssize nb_read;
 	gssize nb_written;
 	
-	while (G_LIKELY (!tny_stream_eos (self))) 
+	while (G_LIKELY (!tny_stream_is_eos (self))) 
 	{
 		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
 		if (G_UNLIKELY (nb_read < 0))
@@ -129,7 +129,7 @@ tny_gtk_text_buffer_stream_close (TnyStream *self)
 }
 
 static gboolean
-tny_gtk_text_buffer_stream_eos   (TnyStream *self)
+tny_gtk_text_buffer_stream_is_eos   (TnyStream *self)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter end;
@@ -236,7 +236,7 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->write_func = tny_gtk_text_buffer_stream_write;
 	klass->flush_func = tny_gtk_text_buffer_stream_flush;
 	klass->close_func = tny_gtk_text_buffer_stream_close;
-	klass->eos_func = tny_gtk_text_buffer_stream_eos;
+	klass->is_eos_func = tny_gtk_text_buffer_stream_is_eos;
 	klass->reset_func = tny_gtk_text_buffer_stream_reset;
 	klass->write_to_stream_func = tny_text_buffer_write_to_stream;
 

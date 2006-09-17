@@ -57,8 +57,7 @@ A abstract type that defines a folder
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
-@set_subscribed_func: 
-@get_subscribed_func: 
+@is_subscribed_func: 
 @refresh_async_func: 
 @refresh_func: 
 
@@ -169,24 +168,6 @@ A abstract type that defines a folder
 
 
 <!-- ##### FUNCTION tny_folder_get_unread_count ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_set_subscribed ##### -->
-<para>
-
-</para>
-
-@self: 
-@subscribed: 
-
-
-<!-- ##### FUNCTION tny_folder_get_subscribed ##### -->
 <para>
 
 </para>

@@ -122,7 +122,7 @@ tny_camel_stream_close (TnyStream *self)
 }
 
 static gboolean
-tny_camel_stream_eos   (TnyStream *self)
+tny_camel_stream_is_eos   (TnyStream *self)
 {
 	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
@@ -211,7 +211,7 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->write_func = tny_camel_stream_write;
 	klass->flush_func = tny_camel_stream_flush;
 	klass->close_func = tny_camel_stream_close;
-	klass->eos_func = tny_camel_stream_eos;
+	klass->is_eos_func = tny_camel_stream_is_eos;
 	klass->reset_func = tny_camel_stream_reset;
 	klass->write_to_stream_func = tny_camel_stream_write_to_stream;
 

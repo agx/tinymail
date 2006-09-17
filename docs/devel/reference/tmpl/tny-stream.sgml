@@ -33,7 +33,7 @@ A stream is an object that can be written to and can be read from in a streaming
 @write_func: 
 @flush_func: 
 @close_func: 
-@eos_func: 
+@is_eos_func: 
 @reset_func: 
 @write_to_stream_func: 
 
@@ -69,15 +69,6 @@ A stream is an object that can be written to and can be read from in a streaming
 
 
 <!-- ##### FUNCTION tny_stream_close ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_stream_eos ##### -->
 <para>
 
 </para>

@@ -138,7 +138,7 @@ tny_mime_part_test_stream (void)
 	tny_mime_part_construct_from_stream (iface, from, "text/plain");
 	tny_mime_part_write_to_stream (iface, to);
 
-	while (!tny_stream_eos (to) && n < 1)
+	while (!tny_stream_is_eos (to) && n < 1)
 	{
 		gchar buf[2];
 		tny_stream_read (to, buf, sizeof (buf));

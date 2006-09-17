@@ -94,7 +94,7 @@ static gboolean
 tny_stream_camel_eos (CamelStream *stream)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)stream;
-	return tny_stream_eos (self->stream);
+	return tny_stream_is_eos (self->stream);
 }
 
 static int

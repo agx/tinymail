@@ -74,7 +74,7 @@ tny_fs_stream_write_to_stream (TnyStream *self, TnyStream *output)
 	gssize nb_read;
 	gssize nb_written;
 	
-	while (G_UNLIKELY (!tny_stream_eos (self))) {
+	while (G_UNLIKELY (!tny_stream_is_eos (self))) {
 		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
 		if (G_UNLIKELY (nb_read < 0))
 			return -1;
@@ -243,7 +243,7 @@ tny_fs_flush (TnyStream *self)
 }
 
 static gboolean 
-tny_fs_eos (TnyStream *self)
+tny_fs_is_eos (TnyStream *self)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	return priv->eos;
@@ -265,7 +265,7 @@ tny_stream_init (gpointer g, gpointer iface_data)
 
 	klass->reset_func = tny_fs_reset;
 	klass->flush_func = tny_fs_flush;
-	klass->eos_func = tny_fs_eos;
+	klass->is_eos_func = tny_fs_is_eos;
 
 	klass->read_func = tny_fs_stream_read;
 	klass->write_func = tny_fs_stream_write;

@@ -141,47 +141,25 @@ tny_folder_refresh (TnyFolder *self)
 	return;
 }
 
-/**
- * tny_folder_set_subscribed:
- * @self: a TnyFolder object
- * @subscribed: Whether or not to subscribe to the folder
- *
- * WARNING: This API might soon change
- *
- * Set the subscribed status of this folder.
- * 
- **/
-void
-tny_folder_set_subscribed (TnyFolder *self, gboolean subscribed)
-{
-#ifdef DEBUG
-	if (!TNY_FOLDER_GET_IFACE (self)->set_subscribed_func)
-		g_critical ("You must implement tny_folder_set_subscribed\n");
-#endif
-
-	TNY_FOLDER_GET_IFACE (self)->set_subscribed_func (self, subscribed);
-	return;
-}
 
 /**
- * tny_folder_get_subscribed:
+ * tny_folder_is_subscribed:
  * @self: a TnyFolder object
  * 
- * WARNING: This API might soon change
  *
  * Get the subscribed status of this folder.
  * 
  * Return value: subscribe status
  **/
 gboolean
-tny_folder_get_subscribed (TnyFolder *self)
+tny_folder_is_subscribed (TnyFolder *self)
 {
 #ifdef DEBUG
-	if (!TNY_FOLDER_GET_IFACE (self)->get_subscribed_func)
-		g_critical ("You must implement tny_folder_get_subscribed\n");
+	if (!TNY_FOLDER_GET_IFACE (self)->is_subscribed_func)
+		g_critical ("You must implement tny_folder_is_subscribed\n");
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_subscribed_func (self);
+	return TNY_FOLDER_GET_IFACE (self)->is_subscribed_func (self);
 }
 
 /**

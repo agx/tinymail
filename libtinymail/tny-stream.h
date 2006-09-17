@@ -46,7 +46,7 @@ struct _TnyStreamIface
 	gssize (*write_func) (TnyStream *self, const char *buffer, gsize n);
 	gint (*flush_func) (TnyStream *self);
 	gint (*close_func) (TnyStream *self);
-	gboolean (*eos_func) (TnyStream *self);
+	gboolean (*is_eos_func) (TnyStream *self);
 	gint (*reset_func) (TnyStream *self);
 	gssize (*write_to_stream_func) (TnyStream *self, TnyStream *output);
 };
@@ -57,7 +57,7 @@ gssize tny_stream_read (TnyStream *self, char *buffer, gsize n);
 gssize tny_stream_write (TnyStream *self, const char *buffer, gsize n);
 gint tny_stream_flush (TnyStream *self);
 gint tny_stream_close (TnyStream *self);
-gboolean tny_stream_eos (TnyStream *self);
+gboolean tny_stream_is_eos (TnyStream *self);
 gint tny_stream_reset (TnyStream *self);
 gssize tny_stream_write_to_stream (TnyStream *self, TnyStream *output);
 

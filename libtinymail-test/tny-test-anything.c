@@ -83,7 +83,7 @@ int main (int argc , char **argv)
 	tny_stream_reset (iface);
 	tny_stream_reset (source);
 
-	while (!tny_stream_eos (iface))
+	while (!tny_stream_is_eos (iface))
 	{
 		gchar buf[2];
 		tny_stream_read (iface, buf, 2);
