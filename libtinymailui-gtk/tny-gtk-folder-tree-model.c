@@ -138,7 +138,7 @@ tny_gtk_folder_tree_model_append (TnyList *self, GObject* item)
 }
 
 static guint
-tny_gtk_folder_tree_model_length (TnyList *self)
+tny_gtk_folder_tree_model_get_length (TnyList *self)
 {
 	TnyGtkFolderTreeModel *me = (TnyGtkFolderTreeModel*)self;
 	guint retval = 0;
@@ -257,7 +257,7 @@ tny_gtk_folder_tree_model_copy_the_list (TnyList *self)
 static void
 tny_list_init (TnyListIface *klass)
 {
-	klass->length_func = tny_gtk_folder_tree_model_length;
+	klass->get_length_func = tny_gtk_folder_tree_model_get_length;
 	klass->prepend_func = tny_gtk_folder_tree_model_prepend;
 	klass->append_func = tny_gtk_folder_tree_model_append;
 	klass->remove_func = tny_gtk_folder_tree_model_remove;

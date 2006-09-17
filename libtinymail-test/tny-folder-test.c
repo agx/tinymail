@@ -134,7 +134,7 @@ tny_folder_test_get_headers_sync (void)
 	all_count = tny_folder_get_all_count (iface);
     
 	tny_folder_get_headers (iface, headers, FALSE);
-	length = tny_list_length (headers);
+	length = tny_list_get_length (headers);
         
 	str = g_strdup_printf ("I received %d headers, the folder tells me it has %d messages\n", length, all_count);
 	gunit_fail_unless (length == all_count, str);
@@ -162,7 +162,7 @@ tny_folder_test_remove_message (void)
 	tny_folder_refresh (iface);
 	
 	tny_folder_get_headers (iface, headers, FALSE);
-	orig_length = tny_list_length (headers);
+	orig_length = tny_list_get_length (headers);
         test_len = tny_folder_get_all_count (iface);
     
 	str = g_strdup_printf ("I received %d headers, the folder tells me it has %d messages\n", orig_length, test_len);
@@ -187,7 +187,7 @@ tny_folder_test_remove_message (void)
 
     	headers = tny_simple_list_new ();
     	tny_folder_get_headers (iface, headers, FALSE);
-	headers_len = tny_list_length (headers);
+	headers_len = tny_list_get_length (headers);
 	g_object_unref (G_OBJECT (headers));
 
        	str = g_strdup_printf ("After removal but not yet expunge, the header count is %d, whereas it should be %d\n", headers_len, orig_length);
@@ -205,7 +205,7 @@ tny_folder_test_remove_message (void)
 
     	headers = tny_simple_list_new ();
     	tny_folder_get_headers (iface, headers, FALSE);
-	headers_len = tny_list_length (headers);
+	headers_len = tny_list_get_length (headers);
 	g_object_unref (G_OBJECT (headers));
 
        	str = g_strdup_printf ("After removal, the header count is %d, whereas it should be %d\n", headers_len, orig_length-1);

@@ -78,7 +78,7 @@ tny_msg_test_add_part_del_part (void)
 	tny_msg_add_part (iface, part);
 
     	tny_msg_get_parts (iface, parts);
-	length = tny_list_length (parts);
+	length = tny_list_get_length (parts);
     	g_object_unref (G_OBJECT (parts));
 
     	/* TnyMsg contains one part by itself */
@@ -89,7 +89,7 @@ tny_msg_test_add_part_del_part (void)
     	parts = tny_simple_list_new ();
     	tny_msg_del_part (iface, part);
        	tny_msg_get_parts (iface, parts);
-	length = tny_list_length (parts);
+	length = tny_list_get_length (parts);
     	g_object_unref (G_OBJECT (parts));
     
 	str = g_strdup_printf ("Length must be exactly 1, received %d parts\n", length);

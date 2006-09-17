@@ -42,7 +42,7 @@ struct _TnyListIface
 {
 	GTypeInterface parent;
 
-	guint (*length_func) (TnyList *self);
+	guint (*get_length_func) (TnyList *self);
 	void (*prepend_func) (TnyList *self, GObject* item);
 	void (*append_func) (TnyList *self, GObject* item);
 	void (*remove_func) (TnyList *self, GObject* item);
@@ -53,7 +53,7 @@ struct _TnyListIface
 
 GType tny_list_get_type (void);
 
-guint tny_list_length (TnyList *self);
+guint tny_list_get_length (TnyList *self);
 void tny_list_prepend (TnyList *self, GObject* item);
 void tny_list_append (TnyList *self, GObject* item);
 void tny_list_remove (TnyList *self, GObject* item);

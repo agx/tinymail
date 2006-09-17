@@ -29,22 +29,13 @@ An iteratable list type
 </para>
 
 @parent: 
-@length_func: 
+@get_length_func: 
 @prepend_func: 
 @append_func: 
 @remove_func: 
 @foreach_func: 
 @copy_func: 
 @create_iterator_func: 
-
-<!-- ##### FUNCTION tny_list_length ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
 
 <!-- ##### FUNCTION tny_list_prepend ##### -->
 <para>

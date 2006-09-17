@@ -1,3 +1,10 @@
+2006-09-17  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Changed the length method of the TnyList interface to get_length as
+	it's a normal property like any other
+	
+	* This was a major API change
+
 2006-09-14  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfixes in the list types found after improving a few unit tests

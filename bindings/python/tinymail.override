@@ -167,7 +167,7 @@ override-slot TnyList.tp_as_sequence
 static int
 _wrap_tny_list_tp_length(PyGObject *self)
 {
-    return tny_list_length(TNY_LIST(self->obj));
+    return tny_list_get_length(TNY_LIST(self->obj));
 }
 
 static PyObject *

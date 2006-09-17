@@ -303,7 +303,7 @@ tny_gtk_account_tree_model_append (TnyList *self, GObject* item)
 }
 
 static guint
-tny_gtk_account_tree_model_length (TnyList *self)
+tny_gtk_account_tree_model_get_length (TnyList *self)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*)self;
 	guint retval = 0;
@@ -396,7 +396,7 @@ tny_gtk_account_tree_model_foreach_in_the_list (TnyList *self, GFunc func, gpoin
 static void
 tny_list_init (TnyListIface *klass)
 {
-	klass->length_func = tny_gtk_account_tree_model_length;
+	klass->get_length_func = tny_gtk_account_tree_model_get_length;
 	klass->prepend_func = tny_gtk_account_tree_model_prepend;
 	klass->append_func = tny_gtk_account_tree_model_append;
 	klass->remove_func = tny_gtk_account_tree_model_remove;

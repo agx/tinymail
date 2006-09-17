@@ -52,7 +52,7 @@ do_test_folder (TnyFolder *folder)
     
 	g_print ("Loading headers for %s ...\n", tny_folder_get_id (folder));
 	tny_folder_get_headers (folder, headers, FALSE);
-	length=tny_list_length (headers);
+	length=tny_list_get_length (headers);
 	
     	bytes = (sizeof (TnyCamelHeader) + sizeof (CamelMessageInfo) + 
 		 sizeof (CamelMessageInfoBase) + 

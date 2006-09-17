@@ -231,7 +231,7 @@ tny_gtk_attach_list_model_append (TnyList *self, GObject* item)
 }
 
 static guint
-tny_gtk_attach_list_model_length (TnyList *self)
+tny_gtk_attach_list_model_get_length (TnyList *self)
 {
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*)self;
 	guint retval = 0;
@@ -323,7 +323,7 @@ tny_gtk_attach_list_model_foreach_in_the_list (TnyList *self, GFunc func, gpoint
 static void
 tny_list_init (TnyListIface *klass)
 {
-	klass->length_func = tny_gtk_attach_list_model_length;
+	klass->get_length_func = tny_gtk_attach_list_model_get_length;
 	klass->prepend_func = tny_gtk_attach_list_model_prepend;
 	klass->append_func = tny_gtk_attach_list_model_append;
 	klass->remove_func = tny_gtk_attach_list_model_remove;

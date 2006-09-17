@@ -97,7 +97,7 @@ tny_folder_store_query_test_match_on_name (void)
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_length (folders);
+    	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -111,10 +111,10 @@ tny_folder_store_query_test_match_on_name (void)
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_length (subfolders);
+		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("^tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
-		gunit_fail_unless (tny_list_length (subfolders) == 1, str);
+		gunit_fail_unless (tny_list_get_length (subfolders) == 1, str);
 		g_free (str);	    
 		g_object_unref (G_OBJECT (iter));
 	}
@@ -145,7 +145,7 @@ tny_folder_store_query_test_match_on_id (void)
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_length (folders);
+    	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -158,10 +158,10 @@ tny_folder_store_query_test_match_on_id (void)
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_length (subfolders);
+		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("^INBOX/tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
-		gunit_fail_unless (tny_list_length (subfolders) == 1, str);
+		gunit_fail_unless (tny_list_get_length (subfolders) == 1, str);
 		g_object_unref (G_OBJECT (iter));
 	}
 
@@ -191,7 +191,7 @@ tny_folder_store_query_test_match_subscribed (void)
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_length (folders);
+    	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -204,10 +204,10 @@ tny_folder_store_query_test_match_subscribed (void)
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_length (subfolders);
+		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("There's 17 subscribed folders in the test account, I received %d\n", length);
-		gunit_fail_unless (tny_list_length (subfolders) == 17, str);
+		gunit_fail_unless (tny_list_get_length (subfolders) == 17, str);
 		g_free (str);
 		g_object_unref (G_OBJECT (iter));
 	}
@@ -238,7 +238,7 @@ tny_folder_store_query_test_match_unsubscribed (void)
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL);
-    	length = tny_list_length (folders);
+    	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	gunit_fail_unless (length == 1, str);
@@ -251,10 +251,10 @@ tny_folder_store_query_test_match_unsubscribed (void)
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query);
 		g_object_unref (G_OBJECT (folder));
-		length = tny_list_length (subfolders);
+		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("There's 1 subscribed folder in the test account, I received %d\n", length);
-		gunit_fail_unless (tny_list_length (subfolders) == 1, str);
+		gunit_fail_unless (tny_list_get_length (subfolders) == 1, str);
 		g_free (str);
 	    
 		g_object_unref (G_OBJECT (iter));

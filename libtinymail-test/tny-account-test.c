@@ -90,7 +90,7 @@ tny_store_account_test_get_folders (void)
     	tny_folder_store_get_folders (TNY_FOLDER_STORE (iface),
 			folders, NULL);
         
-    	gunit_fail_unless (tny_list_length (folders) == 1, 
+    	gunit_fail_unless (tny_list_get_length (folders) == 1, 
 		"Account should have at least an inbox folder\n");
     
     	g_object_unref (G_OBJECT (folders));

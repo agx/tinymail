@@ -22,19 +22,19 @@
 #include <tny-list.h>
 
 /**
- * tny_list_length:
+ * tny_list_get_length:
  * @self: A #TnyList instance
  *
  * Return value: the length of the list
  **/
 guint
-tny_list_length (TnyList *self)
+tny_list_get_length (TnyList *self)
 {
 #ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->length_func)
-		g_critical ("You must implement tny_list_length\n");
+	if (!TNY_LIST_GET_IFACE (self)->get_length_func)
+		g_critical ("You must implement tny_list_get_length\n");
 #endif
-	return TNY_LIST_GET_IFACE (self)->length_func (self);
+	return TNY_LIST_GET_IFACE (self)->get_length_func (self);
 }
 
 /**

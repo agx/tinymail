@@ -61,7 +61,7 @@ tny_simple_list_prepend (TnyList *self, GObject* item)
 
 
 static guint
-tny_simple_list_length (TnyList *self)
+tny_simple_list_get_length (TnyList *self)
 {
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 	guint retval = 0;
@@ -126,7 +126,7 @@ tny_simple_list_foreach_in_the_simple_list (TnyList *self, GFunc func, gpointer 
 static void
 tny_list_init (TnyListIface *klass)
 {
-	klass->length_func = tny_simple_list_length;
+	klass->get_length_func = tny_simple_list_get_length;
 	klass->prepend_func = tny_simple_list_prepend;
 	klass->append_func = tny_simple_list_append;
 	klass->remove_func = tny_simple_list_remove;
