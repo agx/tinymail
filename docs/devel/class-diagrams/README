@@ -10,23 +10,8 @@ libtinymail-amatarasuml.cld:
 Below are outdated class diagrams:
 -----------------------------------
 
-TnyMsgWindowIface_decorates_TnyMsgViewIface.umbrello.xmi
-	Interaction and relations between TnyMsgViewIface and TnyMsgWindow-
-	Iface. Illustrates the usage of the decorator pattern. A TnyMsgWind-
-	owIface can decorate a TnyMsgViewIface. The TnyMozEmbedMsgView and
-	TnyTextBufferMsgView are used as examples.
+TnyMsgWindow_decorates_TnyMsgView.umbrello.xmi
+	Interaction and relations between TnyMsgView and TnyMsgWindow. 
+	Illustrates the usage of the decorator pattern. A TnyMsgWindow
+	can decorate a TnyMsgView. 
 
-Overview_Account_Folder_Header_Message_Mimepart.umbrello.xmi
-	This is a new updated core-idea/overview class diagram. It does not
-	illustrate for example the ui specifics nor the implementation details
-	like how most of the objects are a proxy for a camel type.
-
-	So in some way it's a simplified (probably more usable) diagram of the
-	first dia diagram.
-
-	It illustrates the interactions between accounts, folders, headers,
-	messages, mime parts and streams: the core infrastructure.
-
-Overview_AccountStore_PlatformFactory_Device.umbrello.xmi
-	This one illustrates the interactions and relations between the account-
-	store, platform factory and device types
