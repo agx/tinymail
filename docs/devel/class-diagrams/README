@@ -2,7 +2,7 @@ Write the name of the tool in the filename of the document.                 80c
 
 libtinymail-amatarasuml.cld:
 	Overview of libtinymail. Updated on Sep 18 2006. This document uses 
-	AmatarasUML which is an Eclipse plugin. 
+	AmaterasUML which is an Eclipse plugin. 
 	http://amateras.sourceforge.jp/cgi-bin/fswiki_en/wiki.cgi?page=AmaterasUML
 	You can find a JPG of this document on the wiki of tinymail:
 	http://tinymail.org/trac/tinymail/wiki/ClassDiagrams
