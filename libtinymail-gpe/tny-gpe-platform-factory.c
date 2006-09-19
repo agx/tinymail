@@ -91,7 +91,7 @@ tny_gpe_platform_factory_finalize (GObject *object)
 static void
 tny_platform_factory_init (gpointer g, gpointer iface_data)
 {
-	TnyPlatformFactoryClass *klass = (TnyPlatformFactoryClass *)g;
+	TnyPlatformFactoryIface *klass = (TnyPlatformFactoryIface *)g;
 
 	klass->new_account_store_func = tny_gpe_platform_factory_new_account_store;
 	klass->new_device_func = tny_gpe_platform_factory_new_device;

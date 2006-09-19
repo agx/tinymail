@@ -131,7 +131,7 @@ tny_gpe_device_finalize (GObject *object)
 static void
 tny_device_init (gpointer g, gpointer iface_data)
 {
-	TnyDeviceClass *klass = (TnyDeviceClass *)g;
+	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
 	klass->is_online_func = tny_gpe_device_is_online;
 	klass->reset_func = tny_gpe_device_reset;

@@ -570,7 +570,7 @@ tny_maemo_account_store_class_init (TnyMaemoAccountStoreClass *class)
 static void
 tny_account_store_init (gpointer g, gpointer iface_data)
 {
-	TnyAccountStoreClass *klass = (TnyAccountStoreClass *)g;
+	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
 	klass->get_accounts_func = tny_maemo_account_store_get_accounts;
 	klass->add_store_account_func = tny_maemo_account_store_add_store_account;

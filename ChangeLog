@@ -1,3 +1,7 @@
+2006-09-19  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed compilation for OLPC, GPE and Maemo platforms
+
 2006-09-17  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Changed the length method of the TnyList interface to get_length as
