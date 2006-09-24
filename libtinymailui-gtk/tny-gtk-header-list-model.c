@@ -972,7 +972,8 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	    
 		g_list_free (self->first);
 		self->first = NULL;
-	}
+	} else 
+		folder_overwrite_destruction (self, NULL);
 	
 
 	/* Reset the internal iterator */
