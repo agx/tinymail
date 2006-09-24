@@ -34,8 +34,6 @@ G_BEGIN_DECLS
 #define TNY_IS_GPE_DEVICE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GPE_DEVICE))
 #define TNY_GPE_DEVICE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_GPE_DEVICE, TnyGpeDeviceClass))
 
-/* This is an abstract type */
-
 typedef struct _TnyGpeDevice TnyGpeDevice;
 typedef struct _TnyGpeDeviceClass TnyGpeDeviceClass;
 

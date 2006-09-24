@@ -102,6 +102,23 @@ unload_folder (TnyCamelFolderPriv *priv, gboolean destroy)
 
 
 static void
+pos_header_check (gpointer data, gpointer udata)
+{
+    	/* this is a very ugly check .. let's hope that we can remove this soon */
+    
+    	/* Note: TNY_IS_CAMEL_HEADER crashes if there's a message referenced (
+	   this might imply that a header is still referenced and therefore not
+	   destroyed) .. I don't know, it's definitely a bug. Also check #1 on 
+	   the trac's tickets. */
+    
+	if (data)
+	{
+		TnyCamelHeader *hdr = data;
+		hdr->healthy = 0;
+	}
+}
+
+static void
 load_folder_no_lock (TnyCamelFolderPriv *priv)
 {
 	if (!priv->folder && !priv->loaded && priv->folder_name)
@@ -110,6 +127,10 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		CamelStore *store = (CamelStore*) _tny_camel_account_get_service 
 			(TNY_CAMEL_ACCOUNT (priv->account));
 
+		g_list_foreach (priv->possible_headers, pos_header_check, NULL);
+		g_list_free (priv->possible_headers);
+		priv->possible_headers = NULL;
+	    
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
 
@@ -313,6 +334,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	camel_folder_free_message_info (cfol, mi);
 
 	tny_list_prepend (headers, (GObject*)header);
+	priv->possible_headers = g_list_prepend (priv->possible_headers, header);    
 	g_object_unref (G_OBJECT (header));
 
 	priv->cached_length++;
@@ -566,6 +588,13 @@ tny_camel_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refres
     
 	priv->cached_length = 0;
 	uids = camel_folder_get_uids (priv->folder);
+    
+	/* TODO: remove this warning, as it's not really strange. But needed for debugging aid
+	   for ticket #1 on the trac. So if we fix this bug, remove this. */
+    
+	if (priv->possible_headers != NULL)
+		g_print ("Strange behaviour, adding headers while old headers are still loaded\n");
+    
 	g_ptr_array_foreach (uids, add_message_with_uid, ptr);
 	g_free (ptr);
 
@@ -671,7 +700,7 @@ _tny_camel_folder_set_id (TnyCamelFolder *self, const gchar *id)
 
 	g_mutex_lock (priv->folder_lock);
 
-	unload_folder_no_lock (priv, TRUE);
+	/* unload_folder_no_lock (priv, TRUE); */
 
 	if (G_UNLIKELY (priv->folder_name))
 		g_free (priv->folder_name);

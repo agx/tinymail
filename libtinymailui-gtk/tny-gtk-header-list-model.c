@@ -331,9 +331,9 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 
 	g_return_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp);
 
-	if (iter->user_data == NULL)
+	if (iter->user_data == NULL || !TNY_IS_HEADER (iter->user_data))
 		return;
-
+        
 	g_mutex_lock (list_model->folder_lock);
 	g_mutex_lock (list_model->iterator_lock);
 

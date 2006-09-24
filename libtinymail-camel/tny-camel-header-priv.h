@@ -39,6 +39,7 @@ struct _TnyCamelHeader
 	gpointer info;
 	TnyFolder *folder;
 	guchar write:1;
+    	guchar healthy:1;
 };
 
 struct _TnyCamelHeaderClass 
