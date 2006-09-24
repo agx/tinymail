@@ -73,12 +73,14 @@ folder_changed (TnyFolder *self, CamelFolderChangeInfo *info, gpointer user_data
 static void
 unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 {
-	if (G_LIKELY (priv->folder))
+	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder))
 	{
+	    	/*
 		if (((CamelObject*)priv->folder)->ref_count)
 			if (priv->folder_changed_id != 0)
 				camel_object_remove_event (priv->folder, priv->folder_changed_id);
-
+		*/
+	    
 		while (((CamelObject*)priv->folder)->ref_count >= 1)
 			camel_object_unref (CAMEL_OBJECT (priv->folder));
 
@@ -136,9 +138,9 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 
     	    	priv->cached_length = camel_folder_get_message_count (priv->folder);
 
-		priv->folder_changed_id = camel_object_hook_event (priv->folder, 
+		/* priv->folder_changed_id = camel_object_hook_event (priv->folder, 
 			"folder_changed", (CamelObjectEventHookFunc)folder_changed, 
-			priv);
+			priv); */
 
 		priv->has_summary_cap = camel_folder_has_summary_capability (priv->folder);
 		
