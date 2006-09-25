@@ -45,6 +45,7 @@ struct _TnyCamelFolderPriv
 	gchar *cached_name;
 	TnyFolderType cached_folder_type;
 	GList *possible_headers;
+	GMutex *poshdr_lock;    
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);

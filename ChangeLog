@@ -1,5 +1,27 @@
 2006-09-19  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Aggressively hardened the TnyCamelFolder implementation. This
+	hardening isn't good for debugging, as major bugs and mistakes now
+	won't crash. Therefore it's possible that some hardening is going to
+	come inbetween #ifdef/#endif's so that developers still get a crashing
+	tinymail. However. I soon want to release, therefore this hardening
+	tries to on forehand detect problems with the CamelFolder instance.
+
+	These problems specifically arise when CamelOperation cancellations
+	have happened. The problem is that the instance (priv->folder) isn't
+	always a CamelFolder anymore (especially after cancellation). Sure
+	this is a Camel bug or probably a Camel bug, but tinymail crashes
+	cause of it. Tinymail's 1.0 release shouldn't crash, period.
+
+	This doesn't mean that I will leave this work-around hack for what it
+	is. I will indeed investigate and find the real bug that is causing
+	this to happen. Why else do you think I leave a big fat fucking note
+	in the ChangeLog for everybody to see?
+
+	Feel free to help me spot it, and/or fix it.
+
+2006-09-19  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Fixed compilation for OLPC, GPE and Maemo platforms
 
 2006-09-17  Philip Van Hoof <pvanhoof@gnome.org>
