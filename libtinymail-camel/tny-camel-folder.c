@@ -356,7 +356,7 @@ tny_camel_folder_get_account (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	return priv->account;
+	return TNY_STORE_ACCOUNT (g_object_ref (priv->account));
 }
 
 void

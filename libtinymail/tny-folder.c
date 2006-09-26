@@ -87,7 +87,12 @@ tny_folder_remove_message (TnyFolder *self, TnyHeader *header)
  * @status_callback: A callback for status notifications
  * @user_data: user data for the callback
  *
- * Refresh the folder and call back when finished.
+ * Refresh the folder and call back when finished. This gets the summary 
+ * information from the E-Mail service and writes it to the the on-disk cache 
+ * and/or updates it.
+ *
+ * After this method, tny_folder_get_all_count and 
+ * tny_folder_get_unread_count are guaranteed to be correct.
  *
  * If you want to use this functionality, it's advised to let your application 
  * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
@@ -208,7 +213,8 @@ tny_folder_get_all_count (TnyFolder *self)
  * tny_folder_get_account:
  * @self: a TnyFolder object
  * 
- * Get a reference to the parent account of this folder
+ * Get a the parent account of this folder. You must unreference the return
+ * value after use.
  * 
  * Return value: the account of this folder
  *
@@ -231,7 +237,8 @@ tny_folder_get_account (TnyFolder *self)
  * @self: a TnyFolder object
  * @header: the header of the message to get
  * 
- * Get a message in the folder identified by a header
+ * Get a message in the folder identified by a header. You must unreference the
+ * return value after use.
  * 
  * Return value: The message instance or NULL on failure
  *

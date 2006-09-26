@@ -1,4 +1,8 @@
-2006-09-19  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-26  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Bugfix in tny-camel-folder.c, added documentation aid
+
+2006-09-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Aggressively hardened the TnyCamelFolder implementation. This
 	hardening isn't good for debugging, as major bugs and mistakes now
