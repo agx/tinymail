@@ -17,6 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+
+/* This implementation is unfinished and highly unstable! */
+
 #include <config.h>
 
 #include <glib.h>
@@ -57,11 +60,30 @@ tny_gtk_folder_tree_model_new (void)
 	return GTK_TREE_MODEL (self);
 }
 
+/*
+static void 
+destroy_fols (gpointer item, gpointer user_data)
+{
+    	if (item && G_IS_OBJECT (item))
+		g_object_unref (G_OBJECT (item));
+    	return;
+}
+*/
+
 static void
 tny_gtk_folder_tree_model_finalize (GObject *object)
 {
 	TnyGtkFolderTreeModel *me = (TnyGtkFolderTreeModel*) object;
 
+    /*
+	g_mutex_lock (me->iterator_lock);
+    	if (me->first)
+	{
+		g_list_foreach (me->first, destroy_fols, NULL);
+		g_list_free (me->first); me->first = NULL;
+	}
+	g_mutex_unlock (me->iterator_lock);
+    */
 	(*parent_class->finalize) (object);
 }
 

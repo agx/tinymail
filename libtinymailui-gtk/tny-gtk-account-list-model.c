@@ -71,7 +71,11 @@ tny_gtk_account_list_model_finalize (GObject *object)
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*) object;
     
 	g_mutex_lock (me->iterator_lock);
-	g_list_foreach (me->first, destroy_accs, NULL);
+    	if (me->first)
+	{
+		g_list_foreach (me->first, destroy_accs, NULL);
+		g_list_free (me->first); me->first = NULL;
+	}
 	g_mutex_unlock (me->iterator_lock);
     
 	(*parent_class->finalize) (object);

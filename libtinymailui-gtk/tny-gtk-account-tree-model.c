@@ -207,11 +207,27 @@ tny_gtk_account_tree_model_new (gboolean async)
 	return GTK_TREE_MODEL (self);
 }
 
+static void 
+destroy_accounts (gpointer item, gpointer user_data)
+{
+    	if (item && G_IS_OBJECT (item))
+		g_object_unref (G_OBJECT (item));
+    	return;
+}
+
 static void
 tny_gtk_account_tree_model_finalize (GObject *object)
 {
 	TnyGtkAccountTreeModel *me = (TnyGtkAccountTreeModel*) object;
 
+	g_mutex_lock (me->iterator_lock);
+    	if (me->first)
+	{
+		g_list_foreach (me->first, destroy_accounts, NULL);
+		g_list_free (me->first); me->first = NULL;
+	}
+	g_mutex_unlock (me->iterator_lock);
+    
 	g_mutex_free (me->iterator_lock);
 	me->iterator_lock = NULL;
 

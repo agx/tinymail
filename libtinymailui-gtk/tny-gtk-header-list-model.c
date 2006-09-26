@@ -17,10 +17,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/*#ifndef DEBUG
-#define G_IMPLEMENTS_INLINES
-#endif*/
-
 #include <config.h>
 
 #include <glib.h>

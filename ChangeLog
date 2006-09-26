@@ -1,6 +1,7 @@
 2006-09-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfix in tny-camel-folder.c, added documentation aid
+	* Fixed possible memory leak
 
 2006-09-25  Philip Van Hoof <pvanhoof@gnome.org>
 
