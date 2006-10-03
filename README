@@ -36,6 +36,24 @@ Unit test usage
 Building tips
 =============
 
+Camel-lite via camel-lite-builder
+---------------------------------
+More info: http://tinymail.org/trac/camel-lite-builder. Camel-lite is a lite
+version of Camel that you can build using camel-lite-builder.
+
+Install firefox-nspr and firefox-nns (or the mozilla equivalents) to have
+a Camel with SSL and NSS support. Else use --enable-ssl=no and --enable-ssl=no
+when building Camel using the camel-lite-builder. But make sure that you also
+read the buildme.txt file in the root of the camel-lite-builder source tree.
+
+You can also compile using your platform's camel-dev(el) packages. But then
+you'll be using a camel as shipped with Evolution or evolution-devel or
+evolution-data-server(-devel) which is a quite large package comared to what
+you really need (which camel-lite extracts).
+
+Other
+-----
+
 Also checkout docs/building.txt !
 
 You can set the CFLAGS="-DDEVEL" environment variable to enable a debug build.
@@ -110,7 +128,7 @@ Packages
   gnome-devel
   subversion
   firefox-dev
-  libcamel1.2-dev
+  libcamel1.2-dev or install camel-lite via camel-lite-builder
   libnm-glib-0-dev
   automake-1.7
 
@@ -125,6 +143,9 @@ Dependencies
   can find a URL to GUnit. There's often also Debian packages that will work
   with Ubuntu Dapper & Breezy (and maybe/probably also with newer versions of
   both the Debian and Ubuntu distributions).
+
+ If you want the Python bindings: python-gtk2-dev, python2.4-dev
+
 
 Fedora Core 4 & 5
 -----------------
