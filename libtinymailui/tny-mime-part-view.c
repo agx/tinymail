@@ -87,10 +87,8 @@ tny_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *st
  *
  * Clear the view @self (show nothing)
  *
- * Implementors: this method should clear @self (display nothing, or display
- * a picture with flowers and nude people if that is how your E-mail client
- * indicates that there's no mime_part loaded)
- * 
+ * Implementors: this method should clear @self (display nothing and cleanup)
+ *
  **/
 void
 tny_mime_part_view_clear (TnyMimePartView *self)
@@ -110,14 +108,10 @@ tny_mime_part_view_clear (TnyMimePartView *self)
  * @self: A #TnyMimePartView instance
  * @mime_part: A #TnyMimePart instace
  *
- * Set mime_part of the view @self
+ * Set mime part of the view @self
  * 
- * Implementors: this method should cause the view @self to show the mime_part
- * @mime_part to the user. Often this means showing the from, to, subject, date
- * and cc labels.
- *
- * #TnyMimePartView is often used in a composition with the #TnyMsgView
- * type (the #TnyMsgView implementation contains a #TnyMimePartView).
+ * Implementors: this method should cause the view @self to show the mime part
+ * @mime_part to the user. 
  *
  **/
 void
