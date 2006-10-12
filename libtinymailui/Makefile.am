@@ -1,30 +1,32 @@
 INCLUDES = \
-	$(LIBTINYMAILUI_CFLAGS)	        \
+	$(LIBTINYMAILUI_CFLAGS) \
 	-I$(top_srcdir)/libtinymail
 
 lib_LTLIBRARIES = libtinymailui-1.0.la
 
-libtinymailui_1_0_headers = 		\
-	tny-summary-view.h	\
-	tny-msg-view.h		\
-	tny-save-strategy.h	\
-	tny-msg-window.h		\
-	tny-platform-factory.h	\
-	tny-header-view.h		\
-	tny-account-store-view.h
+libtinymailui_1_0_headers = \
+	tny-summary-view.h \
+	tny-msg-view.h \
+	tny-save-strategy.h \
+	tny-msg-window.h \
+	tny-platform-factory.h \
+	tny-header-view.h \
+	tny-account-store-view.h \
+	tny-mime-part-view.h 
 
-libtinymailui_1_0_la_SOURCES = 		\
-	$(libtinymailui_1_0_headers)	\
-	tny-summary-view.c	\
-	tny-save-strategy.c	\
-	tny-msg-view.c		\
-	tny-msg-window.c		\
-	tny-platform-factory.c	\
-	tny-header-view.c		\
-	tny-account-store-view.c
+libtinymailui_1_0_la_SOURCES = \
+	$(libtinymailui_1_0_headers) \
+	tny-summary-view.c \
+	tny-save-strategy.c \
+	tny-msg-view.c \
+	tny-msg-window.c \
+	tny-platform-factory.c \
+	tny-header-view.c \
+	tny-account-store-view.c \
+	tny-mime-part-view.c 
 
-libtinymailui_1_0_la_LIBADD = 		\
-	$(LIBTINYMAILUI_LIBS)		\
+libtinymailui_1_0_la_LIBADD = \
+	$(LIBTINYMAILUI_LIBS) \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
 
 libtinymailui_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
