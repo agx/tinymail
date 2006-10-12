@@ -24,6 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-mime-part.h>
+#include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
 
@@ -39,11 +40,19 @@ struct _TnyMimePartViewIface
 {
 	GTypeInterface parent;
 
+	void (*set_save_strategy_func) (TnyMimePartView *self, TnySaveStrategy *strategy);
+	gboolean (*can_view_func) (TnyMimePartView *self, TnyMimePart *part);
 	void (*view_mime_part_func) (TnyMimePartView *self, TnyMimePart *part);
 	void (*clear_func) (TnyMimePartView *self); 
 };
 
 GType tny_mime_part_view_get_type();
+
+void tny_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *strategy);
+gboolean tny_mime_part_view_is_supported (TnyMimePartView *self, TnyMimePart *part);
+void tny_mime_part_view_clear (TnyMimePartView *self);
+void tny_mime_part_view_set_mime_part (TnyMimePartView *self, TnyMimePart *mime_part);
+
 
 G_END_DECLS
 
