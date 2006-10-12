@@ -97,8 +97,7 @@ tny_mime_part_view_is_supported (TnyMimePartView *self, TnyMimePart *part)
 		g_critical ("You must implement tny_mime_part_view_is_supported\n");
 #endif
 
-	TNY_MIME_PART_VIEW_GET_IFACE (self)->can_view_func (self, part);
-	return;
+	return TNY_MIME_PART_VIEW_GET_IFACE (self)->can_view_func (self, part);
 }
 
 
