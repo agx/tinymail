@@ -81,7 +81,7 @@ tny_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *st
 }
 
 /**
- * tny_mime_part_view_is_supported:
+ * tny_mime_part_view_can_view:
  * @self: A #TnyMimePartView instance
  * @part: a #TnyMimePart instance
  *
@@ -90,7 +90,7 @@ tny_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *st
  * Return value: Whether or not the view supports viewing this mime-part
  **/
 gboolean 
-tny_mime_part_view_is_supported (TnyMimePartView *self, TnyMimePart *part)
+tny_mime_part_view_can_view (TnyMimePartView *self, TnyMimePart *part)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_VIEW_GET_IFACE (self)->can_view_func)
