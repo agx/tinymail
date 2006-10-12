@@ -13,6 +13,7 @@ libtinymailui_gtk_1_0_headers = 	\
 	tny-gtk-save-strategy.h		\
 	tny-gtk-msg-view.h		\
 	tny-gtk-msg-window.h		\
+	tny-gtk-text-mime-part-view.h	\
 	tny-gtk-header-list-model.h	\
 	tny-gtk-folder-tree-model.h	\
 	tny-gtk-account-list-model.h	\
@@ -25,6 +26,7 @@ libtinymailui_gtk_1_0_la_SOURCES =		\
 	$(libtinymailui_gtk_1_0_headers)	\
 	tny-gtk-save-strategy.c			\
 	tny-gtk-msg-view.c			\
+	tny-gtk-text-mime-part-view.c		\
 	tny-gtk-msg-window.c			\
 	tny-gtk-folder-tree-model.c		\
 	tny-gtk-folder-tree-model-iterator-priv.h \

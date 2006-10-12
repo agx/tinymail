@@ -24,6 +24,7 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
+#include <tny-mime-part-view.h>
 #include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
@@ -45,7 +46,7 @@ struct _TnyMsgViewIface
 	void (*set_save_strategy_func) (TnyMsgView *self, TnySaveStrategy *strategy);
 	void (*set_unavailable_func) (TnyMsgView *self);
 	void (*clear_func) (TnyMsgView *self);
-    
+	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
 };
 
 GType tny_msg_view_get_type (void);
@@ -53,8 +54,7 @@ GType tny_msg_view_get_type (void);
 void  tny_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg);
 void  tny_msg_view_set_save_strategy (TnyMsgView *self, TnySaveStrategy *strategy);
 void  tny_msg_view_set_unavailable (TnyMsgView *self);
-void  tny_msg_view_clear (TnyMsgView *self);
-
+TnyMimePartView* tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part);
 
 G_END_DECLS
 

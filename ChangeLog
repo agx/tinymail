@@ -1,3 +1,9 @@
+2006-10-12  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* The new TnyMimePartView API
+	* The TnyMimePartView API implemented for Gtk+
+	* The TnyMimePartView API implemented for GtkMozEmbed
+
 2006-09-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfix in tny-camel-folder.c, added documentation aid

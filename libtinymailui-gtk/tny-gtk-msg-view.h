@@ -32,7 +32,7 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_GTK_MSG_VIEW         (tny_gtk_msg_view_get_type ())
+#define TNY_TYPE_GTK_MSG_VIEW             (tny_gtk_msg_view_get_type ())
 #define TNY_GTK_MSG_VIEW(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgView))
 #define TNY_GTK_MSG_VIEW_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgViewClass))
 #define TNY_IS_GTK_MSG_VIEW(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GTK_MSG_VIEW))
@@ -45,12 +45,19 @@ typedef struct _TnyGtkMsgViewClass TnyGtkMsgViewClass;
 struct _TnyGtkMsgView
 {
 	GtkScrolledWindow parent;
-
+	GtkBox *viewers;
 };
 
 struct _TnyGtkMsgViewClass
 {
 	GtkScrolledWindowClass parent_class;
+	
+	/* virtual methods (they have a default implementation in TnyGtkMsgView */
+	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
+	void (*set_save_strategy_func) (TnyMsgView *self, TnySaveStrategy *strategy);
+	void (*set_unavailable_func) (TnyMsgView *self);
+	void (*clear_func) (TnyMsgView *self);
+	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);	
 };
 
 GType tny_gtk_msg_view_get_type (void);

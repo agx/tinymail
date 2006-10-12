@@ -21,6 +21,25 @@
 
 #include <tny-msg-view.h>
 
+/**
+ * tny_msg_view_create_mime_part_view_for:
+ * @self: A #TnyMsgView instance
+ * @part: A #TnyMimePart instance
+ *
+ * Create a #TnyMimePartView instance for viewing @part
+ *
+ * Return value: A #TnyMimePartView instance for viewing @part
+ **/
+TnyMimePartView*
+tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
+{
+#ifdef DEBUG
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_mime_part_view_for_func)
+		g_critical ("You must implement tny_msg_view_create_mime_part_view_for\n");
+#endif
+
+	return TNY_MSG_VIEW_GET_IFACE (self)->create_mime_part_view_for_func (self, part);
+}
 
 /**
  * tny_msg_view_clear:
@@ -76,7 +95,7 @@ tny_msg_view_set_unavailable (TnyMsgView *self)
  * @strategy: A TnySaveStrategy instace
  *
  * Set the strategy used for saving mime-parts
- * 
+ *
  * Implementors: This method should set the strategy for saving a mime-part.
  * The user interface of the view can for example have a popup menu in its
  * attachment viewer that will have to use this strategy for saving the

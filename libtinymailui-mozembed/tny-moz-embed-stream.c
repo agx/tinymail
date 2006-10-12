@@ -21,7 +21,7 @@
 #include <glib/gi18n-lib.h>
 
 #include <glib.h>
-#include <glib/gstdio.h> /* for g_unlink */
+#include <glib/gstdio.h>
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
@@ -231,14 +231,14 @@ tny_moz_embed_stream_set_moz_embed (TnyMozEmbedStream *self, GtkMozEmbed *embed)
  *
  * Return value: a new #TnyStream instance
  **/
-TnyMozEmbedStream*
+TnyStream*
 tny_moz_embed_stream_new (GtkMozEmbed *embed)
 {
 	TnyMozEmbedStream *self = g_object_new (TNY_TYPE_MOZ_EMBED_STREAM, NULL);
 
 	tny_moz_embed_stream_set_moz_embed (self, embed);
 
-	return self;
+	return TNY_STREAM (self);
 }
 
 static void

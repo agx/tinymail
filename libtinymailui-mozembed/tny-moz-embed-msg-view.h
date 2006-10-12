@@ -23,12 +23,7 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
-#include <tny-msg-view.h>
-#include <tny-header.h>
-#include <tny-msg.h>
-#include <tny-stream.h>
-#include <tny-mime-part.h>
-#include <tny-save-strategy.h>
+#include <tny-gtk-msg-view.h>
 
 G_BEGIN_DECLS
 
@@ -44,13 +39,16 @@ typedef struct _TnyMozEmbedMsgViewClass TnyMozEmbedMsgViewClass;
 
 struct _TnyMozEmbedMsgView
 {
-	GtkScrolledWindow parent;
+	TnyGtkMsgView parent;
 
 };
 
 struct _TnyMozEmbedMsgViewClass
 {
-	GtkScrolledWindowClass parent_class;
+	TnyGtkMsgViewClass parent_class;
+	
+	void (*set_save_strategy_orig_func) (TnyMsgView *self, TnySaveStrategy *strategy);
+	TnyMimePartView* (*create_mime_part_view_for_orig_func) (TnyMsgView *self, TnyMimePart *part);	
 };
 
 GType tny_moz_embed_msg_view_get_type (void);

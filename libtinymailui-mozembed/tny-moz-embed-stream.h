@@ -50,9 +50,9 @@ struct _TnyMozEmbedStreamClass
 	GObjectClass parent;
 };
 
-GType                 tny_moz_embed_stream_get_type        (void);
-TnyMozEmbedStream*    tny_moz_embed_stream_new             (GtkMozEmbed *embed);
-void                  tny_moz_embed_stream_set_moz_embed   (TnyMozEmbedStream *self, GtkMozEmbed *embed);
+GType tny_moz_embed_stream_get_type (void);
+TnyStream* tny_moz_embed_stream_new (GtkMozEmbed *embed);
+void tny_moz_embed_stream_set_moz_embed (TnyMozEmbedStream *self, GtkMozEmbed *embed);
 
 
 G_END_DECLS

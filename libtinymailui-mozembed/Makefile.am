@@ -13,10 +13,12 @@ lib_LTLIBRARIES = libtinymailui-mozembed-1.0.la
 
 libtinymailui_mozembed_1_0_headers = 		 \
 	tny-moz-embed-msg-view.h		 \
+	tny-moz-embed-html-mime-part-view.h	\
 	tny-moz-embed-stream.h
 
 libtinymailui_mozembed_1_0_la_SOURCES = 	 \
 	$(libtinymailui_mozembed_1_0_headers)	 \
+	tny-moz-embed-html-mime-part-view.c	 \
 	tny-moz-embed-msg-view.c		 \
 	tny-moz-embed-stream.c
 

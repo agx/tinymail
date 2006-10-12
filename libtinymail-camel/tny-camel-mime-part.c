@@ -500,7 +500,7 @@ tny_camel_mime_part_finalize (GObject *object)
 {
 	TnyCamelMimePart *self = (TnyCamelMimePart*) object;
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-
+	
 	g_mutex_lock (priv->part_lock);
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
