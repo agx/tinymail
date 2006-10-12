@@ -77,6 +77,15 @@ A stream is an object that can be written to and can be read from in a streaming
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_stream_is_eos ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_stream_reset ##### -->
 <para>
 

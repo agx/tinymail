@@ -176,6 +176,15 @@ A abstract type that defines a folder
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_folder_is_subscribed ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_folder_refresh_async ##### -->
 <para>
 

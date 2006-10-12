@@ -37,6 +37,15 @@ An iteratable list type
 @copy_func: 
 @create_iterator_func: 
 
+<!-- ##### FUNCTION tny_list_get_length ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_list_prepend ##### -->
 <para>
 

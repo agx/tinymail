@@ -38,6 +38,8 @@ tny-folder-priv
 @iter_parented: 
 @cached_name: 
 @cached_folder_type: 
+@possible_headers: 
+@poshdr_lock: 
 
 <!-- ##### MACRO TNY_CAMEL_FOLDER_GET_PRIVATE ##### -->
 <para>
