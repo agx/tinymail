@@ -9,12 +9,10 @@ A type that can display text/* mime parts
 A type that can display text/* mime parts implemented using #GtkTextView
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

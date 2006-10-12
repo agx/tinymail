@@ -1,5 +1,6 @@
 <!-- ##### SECTION Title ##### -->
 TnyMimePartView
+
 <!-- ##### SECTION Short_Description ##### -->
 A type for displaying a mime part
 
@@ -8,12 +9,10 @@ A type for displaying a mime part
 A type for displaying a #TnyMimePart
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMimePart
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -41,16 +40,6 @@ A type for displaying a #TnyMimePart
 
 @self: 
 @strategy: 
-
-
-<!-- ##### FUNCTION tny_mime_part_view_can_view ##### -->
-<para>
-
-</para>
-
-@self: 
-@part: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_mime_part_view_clear ##### -->

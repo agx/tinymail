@@ -9,12 +9,10 @@ A type that can display a text/html mime part
 A type that can display a text/html mime part implemented using #GtkMozEmbed
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMimePart, #TnyMimePartView
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
