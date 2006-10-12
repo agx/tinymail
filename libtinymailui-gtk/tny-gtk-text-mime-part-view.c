@@ -138,7 +138,7 @@ tny_gtk_text_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 		dest = tny_gtk_text_buffer_stream_new (buffer);
 			    
 		tny_stream_reset (dest);
-		tny_mime_part_write_to_stream (part, dest);
+		tny_mime_part_decode_to_stream (part, dest);
 		tny_stream_reset (dest);
 
 		g_object_unref (G_OBJECT (dest));
