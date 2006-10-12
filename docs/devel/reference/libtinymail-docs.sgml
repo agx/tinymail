@@ -52,6 +52,7 @@
 <!ENTITY libtinymailui-gtk-TnyGtkHeaderView SYSTEM "xml/tny-gtk-header-view.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkMsgWindow SYSTEM "xml/tny-gtk-msg-window.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkSaveStrategy SYSTEM "xml/tny-gtk-save-strategy.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkTextMimePartView SYSTEM "xml/tny-gtk-text-mime-part-view.xml">
 
 <!ENTITY libtinymailui-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
 <!ENTITY libtinymailui-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
@@ -60,9 +61,11 @@
 <!ENTITY libtinymailui-TnyAccountStoreView SYSTEM "xml/tny-account-store-view.xml">
 <!ENTITY libtinymailui-TnySaveStrategy SYSTEM "xml/tny-save-strategy.xml">
 <!ENTITY libtinymailui-TnySummaryView SYSTEM "xml/tny-summary-view.xml">
+<!ENTITY libtinymailui-TnyMimePartView SYSTEM "xml/tny-mime-part-view.xml">
 
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedStream SYSTEM "xml/tny-moz-embed-stream.xml">
 <!ENTITY libtinymailui-mozembed-TnyMozEmbedMsgView SYSTEM "xml/tny-moz-embed-msg-view.xml">
+<!ENTITY libtinymailui-mozembed-TnyMozEmbedHtmlMimePartView SYSTEM "xml/tny-moz-embed-html-mime-part-view.xml">
 
 <!ENTITY libtinymail-gnome-desktop-TnyGnomePlatformFactory SYSTEM "xml/tny-gnome-platform-factory.xml">
 <!ENTITY libtinymail-gnome-desktop-TnyGnomeAccountStore SYSTEM "xml/tny-gnome-account-store.xml">
@@ -129,6 +132,7 @@
 		&libtinymailui-TnyPlatformFactory;
 		&libtinymailui-TnyHeaderView;
 		&libtinymailui-TnySummaryView;
+		&libtinymailui-TnyMimePartView;
 	</chapter>
 
 	<chapter id="libtinymailui-gtk">
@@ -143,6 +147,7 @@
 		&libtinymailui-gtk-TnyGtkAttachListModel;
 		&libtinymailui-gtk-TnyGtkTextBufferStream;
 		&libtinymailui-gtk-TnyGtkSaveStrategy;
+		&libtinymailui-gtk-TnyGtkTextMimePartView;
 		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 
@@ -155,6 +160,7 @@
 	<title>libtinymailui-mozembed</title>
 		&libtinymailui-mozembed-TnyMozEmbedMsgView;
 		&libtinymailui-mozembed-TnyMozEmbedStream;
+		&libtinymailui-mozembed-TnyMozEmbedHtmlMimePartView;
 	</chapter>
 
 	<chapter id="libtinymail-gnome-desktop">
