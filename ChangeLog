@@ -1,3 +1,7 @@
+2006-10-13   Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added the TnyGtkAttachmentMimePartView type
+
 2006-10-12  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* The new TnyMimePartView API

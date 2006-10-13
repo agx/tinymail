@@ -30,9 +30,7 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
-
-#include <tny-gtk-text-mime-part-view.h>
-#include <tny-gtk-text-buffer-stream.h>
+#include <tny-list.h>
 
 #ifdef GNOME
 #include <tny-vfs-stream.h>
@@ -42,26 +40,28 @@
 #include <tny-fs-stream.h>
 #endif
 
+#include <tny-gtk-attachment-mime-part-view.h>
+
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyGtkTextMimePartViewPriv TnyGtkTextMimePartViewPriv;
+typedef struct _TnyGtkAttachmentMimePartViewPriv TnyGtkAttachmentMimePartViewPriv;
 
-struct _TnyGtkTextMimePartViewPriv
+struct _TnyGtkAttachmentMimePartViewPriv
 {
 	TnyMimePart *part;
 	TnySaveStrategy *save_strategy;
+	TnyGtkAttachListModel *imodel;
 };
 
-#define TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE(o) \
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_TEXT_MIME_PART_VIEW, TnyGtkTextMimePartViewPriv))
+#define TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE(o) \
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_ATTACHMENT_MIME_PART_VIEW, TnyGtkAttachmentMimePartViewPriv))
 
-	
 
 static void
-tny_gtk_text_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *strategy)
+tny_gtk_attachment_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *strategy)
 {
-	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
+	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
 
 	if (priv->save_strategy)
 		g_object_unref (G_OBJECT (priv->save_strategy));
@@ -74,10 +74,10 @@ tny_gtk_text_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStr
 
 
 static void
-tny_gtk_text_mime_part_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
+tny_gtk_attachment_mime_part_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
 {
-	TnyGtkTextMimePartView *self = user_data;
-	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
+	TnyGtkAttachmentMimePartView *self = user_data;
+	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
 
 	if (!G_LIKELY (priv->save_strategy))
 	{
@@ -92,7 +92,7 @@ tny_gtk_text_mime_part_view_save_as_activated (GtkMenuItem *menuitem, gpointer u
 
 
 static gint
-tny_gtk_text_mime_part_view_popup_handler (GtkWidget *widget, GdkEvent *event)
+tny_gtk_attachment_mime_part_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 {	
 	g_return_val_if_fail (event != NULL, FALSE);
 	
@@ -119,102 +119,98 @@ tny_gtk_text_mime_part_view_popup_handler (GtkWidget *widget, GdkEvent *event)
 }
 
 static void 
-tny_gtk_text_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
+tny_gtk_attachment_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 {
-	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
+	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
-    
-    	if (part)
+
+	if (part)
 	{
-		GtkTextBuffer *buffer;
-		TnyStream *dest;
-
-		buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-		if (buffer && GTK_IS_TEXT_BUFFER (buffer))
-			gtk_text_buffer_set_text (buffer, "", 0);
-	    
-		dest = tny_gtk_text_buffer_stream_new (buffer);
-			    
-		tny_stream_reset (dest);
-		tny_mime_part_decode_to_stream (part, dest);
-		tny_stream_reset (dest);
-
-		g_object_unref (G_OBJECT (dest));
-		
+		tny_list_prepend (TNY_LIST (priv->imodel), G_OBJECT (part));
 		g_object_ref (G_OBJECT (part));
 		priv->part = part;
-		
 	}
-    
+
 	return;
 }
 
 static void
-tny_gtk_text_mime_part_view_clear (TnyMimePartView *self)
+tny_gtk_attachment_mime_part_view_clear (TnyMimePartView *self)
 {
-	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
-    	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-	
-	if (buffer && GTK_IS_TEXT_BUFFER (buffer))
-		gtk_text_buffer_set_text (buffer, "", 0);
-    
-    	return;
+	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	if (priv->part)
+	{
+		tny_list_remove (TNY_LIST (priv->imodel), G_OBJECT (priv->part));
+		g_object_unref (G_OBJECT (priv->part));
+		priv->part = NULL;
+	}
+
+	return;
 }
 
 /**
- * tny_gtk_text_mime_part_view_new:
+ * tny_gtk_attachment_mime_part_view_new:
  * @save_strategy: The save strategy to use
  *
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*
-tny_gtk_text_mime_part_view_new (TnySaveStrategy *save_strategy)
+tny_gtk_attachment_mime_part_view_new (TnySaveStrategy *save_strategy, TnyGtkAttachListModel *imodel)
 {
-	TnyGtkTextMimePartView *self = g_object_new (TNY_TYPE_GTK_TEXT_MIME_PART_VIEW, NULL);
+	TnyGtkAttachmentMimePartView *self = g_object_new (TNY_TYPE_GTK_ATTACHMENT_MIME_PART_VIEW, NULL);
 
 	tny_mime_part_view_set_save_strategy (TNY_MIME_PART_VIEW (self), save_strategy);
+
+	g_object_ref (G_OBJECT (imodel));
+	TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self)->imodel = imodel;
 
 	return TNY_MIME_PART_VIEW (self);
 }
 
 static void
-tny_gtk_text_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gtk_attachment_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyGtkTextMimePartView *self = (TnyGtkTextMimePartView *)instance;
-	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
+	TnyGtkAttachmentMimePartView *self = (TnyGtkAttachmentMimePartView *)instance;
+	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
 	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
 	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
 
+	priv->imodel = NULL;
 	priv->save_strategy = NULL;
-	gtk_widget_show (mitem);
 
+	gtk_widget_show (mitem);
 	g_signal_connect (G_OBJECT (mitem), "activate", 
-		G_CALLBACK (tny_gtk_text_mime_part_view_save_as_activated), self);
+		G_CALLBACK (tny_gtk_attachment_mime_part_view_save_as_activated), self);
 
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), mitem);
-			
-	g_signal_connect_swapped (G_OBJECT (self), "button_press_event",
-		G_CALLBACK (tny_gtk_text_mime_part_view_popup_handler), menu);
 
-	gtk_text_view_set_editable (GTK_TEXT_VIEW (self), FALSE);
+	g_signal_connect_swapped (G_OBJECT (self), "button_press_event",
+		G_CALLBACK (tny_gtk_attachment_mime_part_view_popup_handler), menu);
 
 	return;
 }
 
 static void
-tny_gtk_text_mime_part_view_finalize (GObject *object)
+tny_gtk_attachment_mime_part_view_finalize (GObject *object)
 {
-	TnyGtkTextMimePartView *self = (TnyGtkTextMimePartView *)object;	
-	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
+	TnyGtkAttachmentMimePartView *self = (TnyGtkAttachmentMimePartView *)object;	
+	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	if (priv->imodel)
+		g_object_unref (G_OBJECT (priv->imodel));
+	priv->imodel = NULL;
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
+	priv->part = NULL;
 
 	if (G_LIKELY (priv->save_strategy))
 		g_object_unref (G_OBJECT (priv->save_strategy));
-    
+	priv->save_strategy = NULL;
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -225,30 +221,28 @@ tny_mime_part_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartViewIface *klass = (TnyMimePartViewIface *)g;
 
-	klass->set_part_func = tny_gtk_text_mime_part_view_set_part;
-	klass->set_save_strategy_func = tny_gtk_text_mime_part_view_set_save_strategy;
-	klass->clear_func = tny_gtk_text_mime_part_view_clear;
-	
+	klass->set_part_func = tny_gtk_attachment_mime_part_view_set_part;
+	klass->set_save_strategy_func = tny_gtk_attachment_mime_part_view_set_save_strategy;
+	klass->clear_func = tny_gtk_attachment_mime_part_view_clear;
+
 	return;
 }
 
 static void 
-tny_gtk_text_mime_part_view_class_init (TnyGtkTextMimePartViewClass *class)
+tny_gtk_attachment_mime_part_view_class_init (TnyGtkAttachmentMimePartViewClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-
-	object_class->finalize = tny_gtk_text_mime_part_view_finalize;
-
-	g_type_class_add_private (object_class, sizeof (TnyGtkTextMimePartViewPriv));
+	object_class->finalize = tny_gtk_attachment_mime_part_view_finalize;
+	g_type_class_add_private (object_class, sizeof (TnyGtkAttachmentMimePartViewPriv));
 
 	return;
 }
 
 GType 
-tny_gtk_text_mime_part_view_get_type (void)
+tny_gtk_attachment_mime_part_view_get_type (void)
 {
 	static GType type = 0;
 
@@ -256,15 +250,15 @@ tny_gtk_text_mime_part_view_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyGtkTextMimePartViewClass),
+		  sizeof (TnyGtkAttachmentMimePartViewClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_gtk_text_mime_part_view_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gtk_attachment_mime_part_view_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyGtkTextMimePartView),
+		  sizeof (TnyGtkAttachmentMimePartView),
 		  0,      /* n_preallocs */
-		  tny_gtk_text_mime_part_view_instance_init,    /* instance_init */
+		  tny_gtk_attachment_mime_part_view_instance_init,    /* instance_init */
 		  NULL
 		};
 
@@ -275,8 +269,8 @@ tny_gtk_text_mime_part_view_get_type (void)
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (GTK_TYPE_TEXT_VIEW,
-			"TnyGtkTextMimePartView",
+		type = g_type_register_static (G_TYPE_OBJECT,
+			"TnyGtkAttachmentMimePartView",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 

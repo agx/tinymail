@@ -224,14 +224,14 @@ tny_moz_embed_html_mime_part_view_finalize (GObject *object)
 }
 
 static void
-tny_moz_embed_html_mime_part_view_init (gpointer g, gpointer iface_data)
+tny_mime_part_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartViewIface *klass = (TnyMimePartViewIface *)g;
 
 	klass->set_part_func = tny_moz_embed_html_mime_part_view_set_part;
 	klass->set_save_strategy_func = tny_moz_embed_html_mime_part_view_set_save_strategy;
 	klass->clear_func = tny_moz_embed_html_mime_part_view_clear;
-	
+
 	return;
 }
 
@@ -271,9 +271,9 @@ tny_moz_embed_html_mime_part_view_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_moz_embed_html_mime_part_view_info = 
+		static const GInterfaceInfo tny_mime_part_view_info = 
 		{
-		  (GInterfaceInitFunc) tny_moz_embed_html_mime_part_view_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_mime_part_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};

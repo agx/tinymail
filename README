@@ -114,6 +114,7 @@ be configurable using this method! This method is for the demo-ui only!
 
 gconftool-2 -s /apps/tinymail/cache_dir -t string .tinymail
 gconftool-2 -s /apps/tinymail/accounts/count -t int 1
+gconftool-2 -s /apps/tinymail/accounts/0/name -t string "Account name"
 gconftool-2 -s /apps/tinymail/accounts/0/proto -t string imap
 gconftool-2 -s /apps/tinymail/accounts/0/type -t string store
 gconftool-2 -s /apps/tinymail/accounts/0/user -t string [username]
