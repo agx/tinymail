@@ -394,7 +394,7 @@ tny_gtk_msg_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->save_strategy))
 		g_object_unref (G_OBJECT (priv->save_strategy));
-	    
+
 	(*parent_class->finalize) (object);
 
 	return;
