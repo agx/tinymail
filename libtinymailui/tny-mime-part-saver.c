@@ -80,9 +80,9 @@ tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnySaveStrategy *
  * Example:
  * <informalexample><programlisting>
  * static void 
- * tny_my_msg_view_on_save_clicked (TnyMsgView *self, TnyMimePart *attachment)
+ * tny_my_msg_view_on_save_clicked (TnyMimePartSaver *self, TnyMimePart *attachment)
  * {
- *     TnySaveStrategy *strategy = tny_msg_view_get_save_strategy (self);
+ *     TnySaveStrategy *strategy = tny_mime_part_saver_get_save_strategy (self);
  *     tny_save_strategy_save (strategy, attachment);
  *     g_object_unref (G_OBJECT (strategy));
  * }
@@ -122,7 +122,7 @@ tny_mime_part_saver_get_save_strategy (TnyMimePartSaver *self)
  * @self: A #TnyMimePartSaver instance
  * @mime_part: A #TnyMimePart instace
  *
- * Saves @mime_part
+ * Saves @mime_part using the save strategy
  *
  **/
 void
