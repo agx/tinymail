@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-TnySaveStrategy
+TnyMimePartSaveStrategy
 
 <!-- ##### SECTION Short_Description ##### -->
 A strategy for saving a mime part
@@ -18,13 +18,13 @@ A type typically used by a #TnyMsgView implementation for saving a #TnyMimePart 
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnySaveStrategy ##### -->
+<!-- ##### STRUCT TnyMimePartSaveStrategy ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### STRUCT TnySaveStrategyIface ##### -->
+<!-- ##### STRUCT TnyMimePartSaveStrategyIface ##### -->
 <para>
 
 </para>
@@ -32,7 +32,7 @@ A type typically used by a #TnyMsgView implementation for saving a #TnyMimePart 
 @parent: 
 @save_func: 
 
-<!-- ##### FUNCTION tny_save_strategy_save ##### -->
+<!-- ##### FUNCTION tny_mime_part_save_strategy_save ##### -->
 <para>
 
 </para>
