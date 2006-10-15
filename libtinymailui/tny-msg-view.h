@@ -25,7 +25,6 @@
 #include <tny-shared.h>
 
 #include <tny-mime-part-view.h>
-#include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
 

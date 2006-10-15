@@ -1,5 +1,5 @@
-#ifndef TNY_save_STRATEGY_H
-#define TNY_save_STRATEGY_H
+#ifndef TNY_MIME_PART_SAVE_STRATEGY_H
+#define TNY_MIME_PART_SAVE_STRATEGY_H
 
 /* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -26,23 +26,23 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_SAVE_STRATEGY             (tny_save_strategy_get_type ())
-#define TNY_SAVE_STRATEGY(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_SAVE_STRATEGY, TnySaveStrategy))
-#define TNY_IS_SAVE_STRATEGY(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_SAVE_STRATEGY))
-#define TNY_SAVE_STRATEGY_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_SAVE_STRATEGY, TnySaveStrategyIface))
+#define TNY_TYPE_MIME_PART_SAVE_STRATEGY             (tny_mime_part_save_strategy_get_type ())
+#define TNY_MIME_PART_SAVE_STRATEGY(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MIME_PART_SAVE_STRATEGY, TnyMimePartSaveStrategy))
+#define TNY_IS_MIME_PART_SAVE_STRATEGY(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MIME_PART_SAVE_STRATEGY))
+#define TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_MIME_PART_SAVE_STRATEGY, TnyMimePartSaveStrategyIface))
 
-typedef struct _TnySaveStrategy TnySaveStrategy;
-typedef struct _TnySaveStrategyIface TnySaveStrategyIface;
+typedef struct _TnyMimePartSaveStrategy TnyMimePartSaveStrategy;
+typedef struct _TnyMimePartSaveStrategyIface TnyMimePartSaveStrategyIface;
 
-struct _TnySaveStrategyIface
+struct _TnyMimePartSaveStrategyIface
 {
 	GTypeInterface parent;
 
-	void (*save_func) (TnySaveStrategy *self, TnyMimePart *part);
+	void (*save_func) (TnyMimePartSaveStrategy *self, TnyMimePart *part);
 };
 
-GType tny_save_strategy_get_type (void);
-void tny_save_strategy_save (TnySaveStrategy *self, TnyMimePart *part);
+GType tny_mime_part_save_strategy_get_type (void);
+void tny_mime_part_save_strategy_save (TnyMimePartSaveStrategy *self, TnyMimePart *part);
 
 G_END_DECLS
 

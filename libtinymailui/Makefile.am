@@ -7,7 +7,7 @@ lib_LTLIBRARIES = libtinymailui-1.0.la
 libtinymailui_1_0_headers = \
 	tny-summary-view.h \
 	tny-msg-view.h \
-	tny-save-strategy.h \
+	tny-mime-part-save-strategy.h \
 	tny-msg-window.h \
 	tny-platform-factory.h \
 	tny-header-view.h \
@@ -18,7 +18,7 @@ libtinymailui_1_0_headers = \
 libtinymailui_1_0_la_SOURCES = \
 	$(libtinymailui_1_0_headers) \
 	tny-summary-view.c \
-	tny-save-strategy.c \
+	tny-mime-part-save-strategy.c \
 	tny-msg-view.c \
 	tny-msg-window.c \
 	tny-platform-factory.c \

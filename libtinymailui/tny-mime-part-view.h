@@ -24,7 +24,6 @@
 #include <glib-object.h>
 
 #include <tny-mime-part.h>
-#include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
 

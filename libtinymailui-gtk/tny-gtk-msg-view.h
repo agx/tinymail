@@ -28,8 +28,6 @@
 #include <tny-msg.h>
 #include <tny-stream.h>
 #include <tny-mime-part.h>
-#include <tny-mime-part-saver.h>
-#include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
 

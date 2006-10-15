@@ -24,7 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-mime-part.h>
-#include <tny-save-strategy.h>
+#include <tny-mime-part-save-strategy.h>
 
 G_BEGIN_DECLS
 
@@ -40,15 +40,15 @@ struct _TnyMimePartSaverIface
 {
 	GTypeInterface parent;
 
-	TnySaveStrategy* (*get_save_strategy_func) (TnyMimePartSaver *self);
-	void (*set_save_strategy_func) (TnyMimePartSaver *self, TnySaveStrategy *strategy);
+	TnyMimePartSaveStrategy* (*get_mime_part_save_strategy_func) (TnyMimePartSaver *self);
+	void (*set_mime_part_save_strategy_func) (TnyMimePartSaver *self, TnyMimePartSaveStrategy *strategy);
 	void (*perform_save_func) (TnyMimePartSaver *self, TnyMimePart *part);	
 };
 
 GType tny_mime_part_saver_get_type();
 
-TnySaveStrategy* tny_mime_part_saver_get_save_strategy (TnyMimePartSaver *self);
-void tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnySaveStrategy *strategy);
+TnyMimePartSaveStrategy* tny_mime_part_saver_get_mime_part_save_strategy (TnyMimePartSaver *self);
+void tny_mime_part_saver_set_mime_part_save_strategy (TnyMimePartSaver *self, TnyMimePartSaveStrategy *strategy);
 void tny_mime_part_saver_perform_save (TnyMimePartSaver *self, TnyMimePart *part);
 
 

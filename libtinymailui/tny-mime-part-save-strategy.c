@@ -19,11 +19,11 @@
 
 #include <config.h>
 
-#include <tny-save-strategy.h>
+#include <tny-mime-part-save-strategy.h>
 
 /**
- * tny_save_strategy_save:
- * @self: A #TnySaveStrategy instance
+ * tny_mime_part_save_strategy_save:
+ * @self: A #TnyMimePartSaveStrategy instance
  * @part: The #TnyMimePart instance that must be saved
  *
  * Performs the saving of a mime part
@@ -31,10 +31,10 @@
  * Example:
  * <informalexample><programlisting>
  * static void 
- * tny_my_msg_view_on_save_clicked (TnyMsgView *self_i, TnyMimePart *attachment)
+ * tny_my_msg_view_on_mime_part_save_clicked (TnyMsgView *self_i, TnyMimePart *attachment)
  * {
  *     TnyMyMsgView *self = TNY_MY_MSG_VIEW (self_i);
- *     tny_save_strategy_save (self->save_strategy, attachment);
+ *     tny_mime_part_save_strategy_save (self->mime_part_save_strategy, attachment);
  * }
  * </programlisting></informalexample>
  *
@@ -45,13 +45,13 @@
  * Example:
  * <informalexample><programlisting>
  * static void
- * tny_gtk_save_strategy_save (TnySaveStrategy *self, TnyMimePart *part)
+ * tny_gtk_mime_part_save_strategy_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
  * {
  *      GtkFileChooserDialog *dialog;
  *      dialog = GTK_FILE_CHOOSER_DIALOG 
- *            (gtk_file_chooser_dialog_new (_("Save File"), NULL,
- *            GTK_FILE_CHOOSER_ACTION_SAVE,
- *            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, 
+ *            (gtk_file_chooser_dialog_new (_("MimePartSave File"), NULL,
+ *            GTK_FILE_CHOOSER_ACTION_MIME_PART_SAVE,
+ *            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_MIME_PART_SAVE, 
  *            GTK_RESPONSE_ACCEPT, NULL));
  *      gtk_file_chooser_set_current_name (dialog, 
  *            tny_mime_part_get_filename (part));
@@ -75,19 +75,19 @@
  * 
  **/
 void
-tny_save_strategy_save (TnySaveStrategy *self, TnyMimePart *part)
+tny_mime_part_save_strategy_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
 {
 #ifdef DEBUG
-	if (!TNY_SAVE_STRATEGY_GET_IFACE (self)->save_func)
-		g_critical ("You must implement tny_save_strategy_save\n");
+	if (!TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->save_func)
+		g_critical ("You must implement tny_mime_part_save_strategy_save\n");
 #endif
 
-	TNY_SAVE_STRATEGY_GET_IFACE (self)->save_func (self, part);
+	TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->save_func (self, part);
 	return;
 }
 
 static void
-tny_save_strategy_base_init (gpointer g_class)
+tny_mime_part_save_strategy_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
@@ -96,7 +96,7 @@ tny_save_strategy_base_init (gpointer g_class)
 }
 
 GType
-tny_save_strategy_get_type (void)
+tny_mime_part_save_strategy_get_type (void)
 {
 	static GType type = 0;
 
@@ -104,8 +104,8 @@ tny_save_strategy_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnySaveStrategyIface),
-		  tny_save_strategy_base_init,   /* base_init */
+		  sizeof (TnyMimePartSaveStrategyIface),
+		  tny_mime_part_save_strategy_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
@@ -115,7 +115,7 @@ tny_save_strategy_get_type (void)
 		  NULL    /* instance_init */
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnySaveStrategy", &info, 0);
+			"TnyMimePartSaveStrategy", &info, 0);
 
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}

@@ -26,7 +26,6 @@
 #include <tny-mime-part-view.h>
 #include <tny-stream.h>
 #include <tny-mime-part.h>
-#include <tny-save-strategy.h>
 #include <tny-gtk-attach-list-model.h>
 
 G_BEGIN_DECLS

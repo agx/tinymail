@@ -30,7 +30,7 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
-#include <tny-gtk-save-strategy.h>
+#include <tny-gtk-mime-part-save-strategy.h>
 #include <tny-gtk-text-buffer-stream.h>
 #include <tny-gtk-attach-list-model.h>
 
@@ -46,8 +46,8 @@
 
 static GObjectClass *parent_class = NULL;
 
-#define TNY_GTK_SAVE_STRATEGY_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_SAVE_STRATEGY, TnyGtkSaveStrategyPriv))
+#define TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_MIME_PART_SAVE_STRATEGY, TnyGtkMimePartSaveStrategyPriv))
 
 
 #ifdef GNOME
@@ -94,7 +94,7 @@ gtk_save_to_file (const gchar *local_filename, TnyMimePart *part)
 
 
 static void
-tny_gtk_save_strategy_save (TnySaveStrategy *self, TnyMimePart *part)
+tny_gtk_mime_part_save_strategy_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
 {
 	GtkFileChooserDialog *dialog;
 	gboolean destr=FALSE;
@@ -154,27 +154,27 @@ tny_gtk_save_strategy_save (TnySaveStrategy *self, TnyMimePart *part)
 
 
 /**
- * tny_gtk_save_strategy_new:
+ * tny_gtk_mime_part_save_strategy_new:
  *
  *
- * Return value: a new #TnySaveStrategy instance implemented for Gtk+
+ * Return value: a new #TnyMimePartSaveStrategy instance implemented for Gtk+
  **/
-TnySaveStrategy*
-tny_gtk_save_strategy_new (void)
+TnyMimePartSaveStrategy*
+tny_gtk_mime_part_save_strategy_new (void)
 {
-	TnyGtkSaveStrategy *self = g_object_new (TNY_TYPE_GTK_SAVE_STRATEGY, NULL);
+	TnyGtkMimePartSaveStrategy *self = g_object_new (TNY_TYPE_GTK_MIME_PART_SAVE_STRATEGY, NULL);
 
-	return TNY_SAVE_STRATEGY (self);
+	return TNY_MIME_PART_SAVE_STRATEGY (self);
 }
 
 static void
-tny_gtk_save_strategy_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gtk_mime_part_save_strategy_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	return;
 }
 
 static void
-tny_gtk_save_strategy_finalize (GObject *object)
+tny_gtk_mime_part_save_strategy_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -182,30 +182,30 @@ tny_gtk_save_strategy_finalize (GObject *object)
 }
 
 static void
-tny_gtk_save_strategy_init (gpointer g, gpointer iface_data)
+tny_gtk_mime_part_save_strategy_init (gpointer g, gpointer iface_data)
 {
-	TnySaveStrategyIface *klass = (TnySaveStrategyIface *)g;
+	TnyMimePartSaveStrategyIface *klass = (TnyMimePartSaveStrategyIface *)g;
 
-	klass->save_func = tny_gtk_save_strategy_save;
+	klass->save_func = tny_gtk_mime_part_save_strategy_save;
 
 	return;
 }
 
 static void 
-tny_gtk_save_strategy_class_init (TnyGtkSaveStrategyClass *class)
+tny_gtk_mime_part_save_strategy_class_init (TnyGtkMimePartSaveStrategyClass *class)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	object_class->finalize = tny_gtk_save_strategy_finalize;
+	object_class->finalize = tny_gtk_mime_part_save_strategy_finalize;
 
 	return;
 }
 
 GType 
-tny_gtk_save_strategy_get_type (void)
+tny_gtk_mime_part_save_strategy_get_type (void)
 {
 	static GType type = 0;
 
@@ -213,31 +213,31 @@ tny_gtk_save_strategy_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyGtkSaveStrategyClass),
+		  sizeof (TnyGtkMimePartSaveStrategyClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_gtk_save_strategy_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gtk_mime_part_save_strategy_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyGtkSaveStrategy),
+		  sizeof (TnyGtkMimePartSaveStrategy),
 		  0,      /* n_preallocs */
-		  tny_gtk_save_strategy_instance_init,    /* instance_init */
+		  tny_gtk_mime_part_save_strategy_instance_init,    /* instance_init */
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_gtk_save_strategy_info = 
+		static const GInterfaceInfo tny_gtk_mime_part_save_strategy_info = 
 		{
-		  (GInterfaceInitFunc) tny_gtk_save_strategy_init, /* interface_init */
+		  (GInterfaceInitFunc) tny_gtk_mime_part_save_strategy_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyGtkSaveStrategy",
+			"TnyGtkMimePartSaveStrategy",
 			&info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_SAVE_STRATEGY, 
-			&tny_gtk_save_strategy_info);
+		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_SAVE_STRATEGY, 
+			&tny_gtk_mime_part_save_strategy_info);
 
 	}
 
