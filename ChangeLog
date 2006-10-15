@@ -1,6 +1,6 @@
 2006-10-15  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Major refactoring in the TnySaveStrategy stuff
+	* Major refactoring in the TnyMimePartSaveStrategy stuff
 	* Introduced a new client-type for the strategy pattern:
 	the TnyMimePartSaver
 	* Removed all saving functionality from the default gtk+
@@ -8,6 +8,7 @@
 	the person who should connect the dots (inherit a TnyMsgView
 	and/or a TnyMimePartView, or implement it fully, and let that
 	type also implement the TnyMimePartSaver)
+	* Renamed TnySaveStrategy to TnyMimePartSaveStrategy
 
 	*  This was a major API change in libtinymailui
 	
