@@ -57,9 +57,7 @@ tny_test_platform_factory_new_device (TnyPlatformFactory *self)
 static TnyMsgView*
 tny_test_platform_factory_new_msg_view (TnyPlatformFactory *self)
 {
-	TnySaveStrategy *save_strategy = tny_gtk_save_strategy_new ();
-
-	return tny_gtk_msg_view_new (save_strategy);
+	return tny_gtk_msg_view_new ();
 }
 
 /**

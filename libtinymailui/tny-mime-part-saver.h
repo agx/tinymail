@@ -42,14 +42,14 @@ struct _TnyMimePartSaverIface
 
 	TnySaveStrategy* (*get_save_strategy_func) (TnyMimePartSaver *self);
 	void (*set_save_strategy_func) (TnyMimePartSaver *self, TnySaveStrategy *strategy);
-	void (*save_part_func) (TnyMimePartSaver *self, TnyMimePart *part);	
+	void (*perform_save_func) (TnyMimePartSaver *self, TnyMimePart *part);	
 };
 
 GType tny_mime_part_saver_get_type();
 
 TnySaveStrategy* tny_mime_part_saver_get_save_strategy (TnyMimePartSaver *self);
 void tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnySaveStrategy *strategy);
-void tny_mime_part_saver_save_part (TnyMimePartSaver *self, TnyMimePart *part);
+void tny_mime_part_saver_perform_save (TnyMimePartSaver *self, TnyMimePart *part);
 
 
 G_END_DECLS
