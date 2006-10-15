@@ -283,7 +283,7 @@ tny_moz_embed_html_mime_part_view_get_type (void)
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 
-			&tny_moz_embed_html_mime_part_view_info);
+			&tny_mime_part_view_info);
 
 	}
 
