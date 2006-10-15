@@ -21,16 +21,14 @@
 
 #include <tny-header-view.h>
 
-
 /**
  * tny_header_view_clear:
  * @self: A #TnyHeaderView instance
  *
  * Clear the view @self (show nothing)
  *
- * Implementors: this method should clear @self (display nothing, or display
- * a picture with flowers and nude people if that is how your E-mail client
- * indicates that there's no header loaded)
+ * Implementors: this method should clear view @self (display nothing and 
+ * clearup)
  * 
  **/
 void
@@ -54,11 +52,11 @@ tny_header_view_clear (TnyHeaderView *self)
  * Set header of the view @self
  * 
  * Implementors: this method should cause the view @self to show the header
- * @header to the user. Often this means showing the from, to, subject, date
+ * @header to the user. This typically means showing the from, to, subject, date
  * and cc labels.
  *
- * #TnyHeaderView is often used in a composition with the #TnyMsgView
- * type (the #TnyMsgView implementation contains a #TnyHeaderView).
+ * #TnyHeaderView is often used in a composition with a #TnyMsgView
+ * type (the #TnyMsgView implementation contains or aggregates a #TnyHeaderView).
  *
  **/
 void

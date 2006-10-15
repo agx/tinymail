@@ -74,7 +74,7 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  * @self: A #TnyMimePartView instance
  * @mime_part: A #TnyMimePart instace
  *
- * Set mime part of the view @self
+ * Set mime part which the view @self should display.
  * 
  * Implementors: this method should cause the view @self to show the mime part
  * @mime_part to the user. 
