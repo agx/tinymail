@@ -9,12 +9,10 @@ A type for saving a mime part
 A type that can save a #TnyMimePart
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMsgView, #TnyMimePartView
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -31,11 +29,11 @@ A type that can save a #TnyMimePart
 </para>
 
 @parent: 
-@get_save_strategy_func: 
-@set_save_strategy_func: 
+@get_mime_part_save_strategy_func: 
+@set_mime_part_save_strategy_func: 
 @perform_save_func: 
 
-<!-- ##### FUNCTION tny_mime_part_saver_get_save_strategy ##### -->
+<!-- ##### FUNCTION tny_mime_part_saver_get_mime_part_save_strategy ##### -->
 <para>
 
 </para>
@@ -44,7 +42,7 @@ A type that can save a #TnyMimePart
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_mime_part_saver_set_save_strategy ##### -->
+<!-- ##### FUNCTION tny_mime_part_saver_set_mime_part_save_strategy ##### -->
 <para>
 
 </para>

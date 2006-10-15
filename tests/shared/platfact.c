@@ -20,9 +20,6 @@
 
 #include "platfact.h"
 
-#include <tny-save-strategy.h>
-#include <tny-gtk-save-strategy.h>
-
 #include <tny-account-store.h>
 #include "account-store.h"
 

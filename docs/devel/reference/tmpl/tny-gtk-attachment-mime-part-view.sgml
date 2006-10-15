@@ -9,12 +9,10 @@ A type that can show a file attachment mime part
 A type that can show a file attachment #TnyMimePart instance
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
