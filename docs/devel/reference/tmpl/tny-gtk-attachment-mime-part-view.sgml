@@ -1,33 +1,36 @@
 <!-- ##### SECTION Title ##### -->
-TnyGtkTextMimePartView
+TnyGtkAttachmentMimePartView
 
 <!-- ##### SECTION Short_Description ##### -->
-A type that can display text/* mime parts
+A type that can show a file attachment mime part
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type that can display text/* mime parts implemented using #GtkTextView
+A type that can show a file attachment #TnyMimePart instance
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyGtkTextMimePartView ##### -->
+<!-- ##### STRUCT TnyGtkAttachmentMimePartView ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_gtk_text_mime_part_view_new ##### -->
+<!-- ##### FUNCTION tny_gtk_attachment_mime_part_view_new ##### -->
 <para>
 
 </para>
 
+@iview: 
 @Returns: 
 
 

@@ -28,7 +28,6 @@ A type that can display a text/html mime part implemented using #GtkMozEmbed
 
 </para>
 
-@save_strategy: 
 @Returns: 
 
 

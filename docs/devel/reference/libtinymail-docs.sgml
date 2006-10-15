@@ -41,6 +41,7 @@
 
 <!ENTITY libtinymail-gnomevfs-TnyVfsStream SYSTEM "xml/tny-vfs-stream.xml">
 
+<!ENTITY libtinymailui-gtk-TnyGtkAttachmentMimePartView SYSTEM "xml/tny-gtk-attachment-mime-part-view.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkEnums SYSTEM "xml/tny-gtk-enums.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkAccountTreeModel SYSTEM "xml/tny-gtk-account-tree-model.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkFolderTreeModel SYSTEM "xml/tny-gtk-folder-tree-model.xml">
@@ -54,6 +55,7 @@
 <!ENTITY libtinymailui-gtk-TnyGtkSaveStrategy SYSTEM "xml/tny-gtk-save-strategy.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkTextMimePartView SYSTEM "xml/tny-gtk-text-mime-part-view.xml">
 
+<!ENTITY libtinymailui-TnyMimePartSaver SYSTEM "xml/tny-mime-part-saver.xml">
 <!ENTITY libtinymailui-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
 <!ENTITY libtinymailui-TnyMsgView SYSTEM "xml/tny-msg-view.xml">
 <!ENTITY libtinymailui-TnyHeaderView SYSTEM "xml/tny-header-view.xml">
@@ -133,6 +135,7 @@
 		&libtinymailui-TnyHeaderView;
 		&libtinymailui-TnySummaryView;
 		&libtinymailui-TnyMimePartView;
+		&libtinymailui-TnyMimePartSaver;
 	</chapter>
 
 	<chapter id="libtinymailui-gtk">
@@ -148,6 +151,7 @@
 		&libtinymailui-gtk-TnyGtkTextBufferStream;
 		&libtinymailui-gtk-TnyGtkSaveStrategy;
 		&libtinymailui-gtk-TnyGtkTextMimePartView;
+		&libtinymailui-gtk-TnyGtkAttachmentMimePartView;
 		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 

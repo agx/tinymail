@@ -30,11 +30,20 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 </para>
 
 @parent: 
+@get_msg_func: 
 @set_msg_func: 
-@set_save_strategy_func: 
 @set_unavailable_func: 
 @clear_func: 
 @create_mime_part_view_for_func: 
+
+<!-- ##### FUNCTION tny_msg_view_get_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 
 <!-- ##### FUNCTION tny_msg_view_set_msg ##### -->
 <para>
@@ -43,15 +52,6 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 
 @self: 
 @msg: 
-
-
-<!-- ##### FUNCTION tny_msg_view_set_save_strategy ##### -->
-<para>
-
-</para>
-
-@self: 
-@strategy: 
 
 
 <!-- ##### FUNCTION tny_msg_view_set_unavailable ##### -->

@@ -29,18 +29,9 @@ A type for displaying a #TnyMimePart
 </para>
 
 @parent: 
-@set_save_strategy_func: 
+@get_part_func: 
 @set_part_func: 
 @clear_func: 
-
-<!-- ##### FUNCTION tny_mime_part_view_set_save_strategy ##### -->
-<para>
-
-</para>
-
-@self: 
-@strategy: 
-
 
 <!-- ##### FUNCTION tny_mime_part_view_clear ##### -->
 <para>
@@ -57,5 +48,14 @@ A type for displaying a #TnyMimePart
 
 @self: 
 @mime_part: 
+
+
+<!-- ##### FUNCTION tny_mime_part_view_get_part ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
 
 
