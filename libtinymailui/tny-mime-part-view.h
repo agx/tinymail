@@ -40,16 +40,16 @@ struct _TnyMimePartViewIface
 {
 	GTypeInterface parent;
 
-	void (*set_save_strategy_func) (TnyMimePartView *self, TnySaveStrategy *strategy);
+	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
 	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
 	void (*clear_func) (TnyMimePartView *self); 
 };
 
 GType tny_mime_part_view_get_type();
 
-void tny_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *strategy);
 void tny_mime_part_view_clear (TnyMimePartView *self);
 void tny_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *mime_part);
+TnyMimePart* tny_mime_part_view_get_part (TnyMimePartView *self);
 
 
 G_END_DECLS

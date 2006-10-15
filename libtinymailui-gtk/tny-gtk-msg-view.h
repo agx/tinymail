@@ -28,6 +28,7 @@
 #include <tny-msg.h>
 #include <tny-stream.h>
 #include <tny-mime-part.h>
+#include <tny-mime-part-saver.h>
 #include <tny-save-strategy.h>
 
 G_BEGIN_DECLS
@@ -53,15 +54,15 @@ struct _TnyGtkMsgViewClass
 	GtkScrolledWindowClass parent_class;
 	
 	/* virtual methods (they have a default implementation in TnyGtkMsgView */
+	TnyMsg* (*get_msg_func) (TnyMsgView *self);
 	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
-	void (*set_save_strategy_func) (TnyMsgView *self, TnySaveStrategy *strategy);
 	void (*set_unavailable_func) (TnyMsgView *self);
 	void (*clear_func) (TnyMsgView *self);
 	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);	
 };
 
 GType tny_gtk_msg_view_get_type (void);
-TnyMsgView* tny_gtk_msg_view_new (TnySaveStrategy *save_strategy);
+TnyMsgView* tny_gtk_msg_view_new (void);
 
 G_END_DECLS
 

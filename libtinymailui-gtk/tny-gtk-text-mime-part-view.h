@@ -52,7 +52,7 @@ struct _TnyGtkTextMimePartViewClass
 };
 
 GType tny_gtk_text_mime_part_view_get_type (void);
-TnyMimePartView* tny_gtk_text_mime_part_view_new (TnySaveStrategy *save_strategy);
+TnyMimePartView* tny_gtk_text_mime_part_view_new (void);
 
 G_END_DECLS
 

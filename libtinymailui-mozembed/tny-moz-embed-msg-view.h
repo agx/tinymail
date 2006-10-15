@@ -46,13 +46,11 @@ struct _TnyMozEmbedMsgView
 struct _TnyMozEmbedMsgViewClass
 {
 	TnyGtkMsgViewClass parent_class;
-	
-	void (*set_save_strategy_orig_func) (TnyMsgView *self, TnySaveStrategy *strategy);
 	TnyMimePartView* (*create_mime_part_view_for_orig_func) (TnyMsgView *self, TnyMimePart *part);	
 };
 
 GType tny_moz_embed_msg_view_get_type (void);
-TnyMsgView* tny_moz_embed_msg_view_new (TnySaveStrategy *save_strategy);
+TnyMsgView* tny_moz_embed_msg_view_new (void);
 
 G_END_DECLS
 

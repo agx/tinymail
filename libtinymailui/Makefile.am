@@ -12,7 +12,8 @@ libtinymailui_1_0_headers = \
 	tny-platform-factory.h \
 	tny-header-view.h \
 	tny-account-store-view.h \
-	tny-mime-part-view.h 
+	tny-mime-part-view.h \
+	tny-mime-part-saver.h
 
 libtinymailui_1_0_la_SOURCES = \
 	$(libtinymailui_1_0_headers) \
@@ -23,7 +24,8 @@ libtinymailui_1_0_la_SOURCES = \
 	tny-platform-factory.c \
 	tny-header-view.c \
 	tny-account-store-view.c \
-	tny-mime-part-view.c 
+	tny-mime-part-view.c \
+	tny-mime-part-saver.c 
 
 libtinymailui_1_0_la_LIBADD = \
 	$(LIBTINYMAILUI_LIBS) \

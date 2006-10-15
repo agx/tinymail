@@ -36,25 +36,19 @@ struct _TnyGtkMsgWindowPriv
 
 
 static void
-tny_gtk_msg_window_set_save_strategy (TnyMsgView *self, TnySaveStrategy *strategy)
-{
-	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
-
-	tny_msg_view_set_save_strategy (priv->msg_view, strategy);
-
-	return;
-}
-
-static void
 tny_gtk_msg_window_set_unavailable (TnyMsgView *self)
 {
 	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
-
 	tny_msg_view_set_unavailable (priv->msg_view);
-
 	return;
 }
 
+static TnyMsg* 
+tny_gtk_msg_window_get_msg (TnyMsgView *self)
+{
+	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
+	return tny_msg_view_get_msg (priv->msg_view);
+}
 
 static void 
 tny_gtk_msg_window_set_msg (TnyMsgView *self, TnyMsg *msg)
@@ -127,8 +121,8 @@ tny_gtk_msg_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMsgViewIface *klass = (TnyMsgViewIface *)g;
 
+	klass->get_msg_func = tny_gtk_msg_window_get_msg;
 	klass->set_msg_func = tny_gtk_msg_window_set_msg;
-	klass->set_save_strategy_func = tny_gtk_msg_window_set_save_strategy;
 	klass->set_unavailable_func = tny_gtk_msg_window_set_unavailable;
 
 	return;

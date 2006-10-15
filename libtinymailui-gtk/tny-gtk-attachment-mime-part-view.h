@@ -53,7 +53,7 @@ struct _TnyGtkAttachmentMimePartViewClass
 };
 
 GType tny_gtk_attachment_mime_part_view_get_type (void);
-TnyMimePartView* tny_gtk_attachment_mime_part_view_new (TnySaveStrategy *save_strategy, TnyGtkAttachListModel *iview);
+TnyMimePartView* tny_gtk_attachment_mime_part_view_new (TnyGtkAttachListModel *iview);
 
 G_END_DECLS
 

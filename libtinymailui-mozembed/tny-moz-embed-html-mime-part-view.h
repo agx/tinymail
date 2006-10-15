@@ -53,7 +53,7 @@ struct _TnyMozEmbedHtmlMimePartViewClass
 };
 
 GType tny_moz_embed_html_mime_part_view_get_type (void);
-TnyMimePartView* tny_moz_embed_html_mime_part_view_new (TnySaveStrategy *save_strategy);
+TnyMimePartView* tny_moz_embed_html_mime_part_view_new (void);
 
 G_END_DECLS
 

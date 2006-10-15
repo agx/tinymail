@@ -90,62 +90,28 @@ tny_msg_view_set_unavailable (TnyMsgView *self)
 
 
 /**
- * tny_msg_view_set_save_strategy:
+ * tny_msg_view_get_msg:
  * @self: A #TnyMsgView instance
- * @strategy: A TnySaveStrategy instace
  *
- * Set the strategy used for saving mime-parts
+ * Get message of the view @self The return value must be unreferenced after
+ * use.
+ * 
+ * Implementors: this method should return the message this view is currently
+ * displaying. It should add a reference to the instance before returning. If
+ * the view isn't viewing any message, it must return NULL.
  *
- * Implementors: This method should set the strategy for saving a mime-part.
- * The user interface of the view can for example have a popup menu in its
- * attachment viewer that will have to use this strategy for saving the
- * mime-part.
- *
- * Example:
- * <informalexample><programlisting>
- * static void 
- * tny_my_msg_view_set_save_strategy (TnyMsgView *self_i, TnySaveStrategy *strat)
- * {
- *      TnyMyMsgView *self = TNY_MY_MSG_VIEW (self_i);
- *      if (self->save_strategy)
- *            g_object_unref (G_OBJECT (self->save_strategy));
- *      self->save_strategy = g_object_ref (G_OBJECT (strat));
- * }
- * static void
- * tny_my_msg_view_finalize (TnyMyMsgView *self)
- * {
- *      if (self->save_strategy))
- *		g_object_unref (G_OBJECT (self->save_strategy));
- * }
- * </programlisting></informalexample>
- *
- * <informalexample><programlisting>
- * static void 
- * tny_my_msg_view_on_save_clicked (TnyMsgView *self, TnyMimePart *attachment)
- * {
- *     TnyMyMsgView *self = TNY_MY_MSG_VIEW (self_i);
- *     tny_save_strategy_save (self->save_strategy, attachment);
- * }
- * </programlisting></informalexample>
- *
- * The idea is that devices can have a specific such strategy. For example a
- * strategy that sends it to another computer or a strategy that saves it to
- * a flash disk. However. In the message view component, you don't care about
- * that. You only care about the API of the save-strategy interface.
- *
+ * Return value: A #TnyMsg instance or NULL
  **/
-void
-tny_msg_view_set_save_strategy (TnyMsgView *self, TnySaveStrategy *strategy)
+TnyMsg* 
+tny_msg_view_get_msg (TnyMsgView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->set_save_strategy_func)
-		g_critical ("You must implement tny_msg_view_set_save_strategy\n");
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->get_msg_func)
+		g_critical ("You must implement tny_msg_view_get_msg\n");
 #endif
 
-	TNY_MSG_VIEW_GET_IFACE (self)->set_save_strategy_func (self, strategy);
-	return;
+	return TNY_MSG_VIEW_GET_IFACE (self)->get_msg_func (self);
 }
-
 
 /**
  * tny_msg_view_set_msg:
@@ -217,8 +183,6 @@ tny_msg_view_get_type (void)
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyMsgView", &info, 0);
-
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}
 
 	return type;

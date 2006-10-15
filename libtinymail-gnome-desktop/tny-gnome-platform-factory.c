@@ -20,9 +20,6 @@
 
 #include <tny-gnome-platform-factory.h>
 
-#include <tny-save-strategy.h>
-#include <tny-gtk-save-strategy.h>
-
 #include <tny-account-store.h>
 #include <tny-gnome-account-store.h>
 
@@ -61,16 +58,13 @@ tny_gnome_platform_factory_new_device (TnyPlatformFactory *self)
 static TnyMsgView*
 tny_gnome_platform_factory_new_msg_view (TnyPlatformFactory *self)
 {
-	TnySaveStrategy *save_strategy = tny_gtk_save_strategy_new ();
 	TnyMsgView *retval;
     
 #ifdef MOZEMBED
-	retval = tny_moz_embed_msg_view_new (save_strategy);
+	retval = tny_moz_embed_msg_view_new ();
 #else
-	retval = tny_gtk_msg_view_new (save_strategy);
+	retval = tny_gtk_msg_view_new ();
 #endif
-
-	g_object_unref (G_OBJECT (save_strategy));
 
 	return retval;
 }

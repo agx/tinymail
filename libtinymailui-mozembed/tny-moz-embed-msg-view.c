@@ -26,29 +26,16 @@
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyMozEmbedMsgViewPriv TnyMozEmbedMsgViewPriv;
-
-struct _TnyMozEmbedMsgViewPriv
-{
-	TnySaveStrategy *save_strategy;
-};
-
-#define TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE(o) \
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MOZ_EMBED_MSG_VIEW, TnyMozEmbedMsgViewPriv))
-
 
 /**
  * tny_moz_embed_msg_view_new:
- * @save_strategy: The save strategy to use
  *
  * Return value: a new #TnyMsgView instance implemented for Gtk+
  **/
 TnyMsgView*
-tny_moz_embed_msg_view_new (TnySaveStrategy *save_strategy)
+tny_moz_embed_msg_view_new (void)
 {
 	TnyMozEmbedMsgView *self = g_object_new (TNY_TYPE_MOZ_EMBED_MSG_VIEW, NULL);
-
-	tny_msg_view_set_save_strategy (TNY_MSG_VIEW (self), save_strategy);
 
 	return TNY_MSG_VIEW (self);
 }
@@ -70,12 +57,11 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 static TnyMimePartView*
 tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 {
-	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
 	TnyMimePartView *retval = NULL;
 
 	if (tny_mime_part_content_type_is (part, "text/html"))
 	{
-		retval = tny_moz_embed_html_mime_part_view_new (priv->save_strategy);
+		retval = tny_moz_embed_html_mime_part_view_new ();
 		gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), GTK_WIDGET (retval), TRUE, TRUE, 0);
 		gtk_widget_show (GTK_WIDGET (retval));
 	}
@@ -86,15 +72,6 @@ tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart 
 	return retval;
 }
 
-static void
-tny_moz_embed_msg_view_set_save_strategy (TnyMsgView *self, TnySaveStrategy *strategy)
-{
-	TnyMozEmbedMsgViewPriv *priv = TNY_MOZ_EMBED_MSG_VIEW_GET_PRIVATE (self);
-	priv->save_strategy = strategy;
-	TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->set_save_strategy_orig_func (self, strategy);
-	
-	return;
-}
 
 
 static void 
@@ -108,12 +85,8 @@ tny_moz_embed_msg_view_class_init (TnyMozEmbedMsgViewClass *class)
 	object_class->finalize = tny_moz_embed_msg_view_finalize;
 
 	/* Method overloading */
-	class->create_mime_part_view_for_orig_func = TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func;
-	class->set_save_strategy_orig_func = TNY_GTK_MSG_VIEW_CLASS (class)->set_save_strategy_func;
+	class->create_mime_part_view_for_orig_func = TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func;	
 	TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for;
-	TNY_GTK_MSG_VIEW_CLASS (class)->set_save_strategy_func = tny_moz_embed_msg_view_set_save_strategy;
-
-	g_type_class_add_private (object_class, sizeof (TnyMozEmbedMsgViewPriv));
 
 	return;
 }

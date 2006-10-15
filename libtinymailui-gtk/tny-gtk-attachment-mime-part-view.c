@@ -50,7 +50,6 @@ typedef struct _TnyGtkAttachmentMimePartViewPriv TnyGtkAttachmentMimePartViewPri
 struct _TnyGtkAttachmentMimePartViewPriv
 {
 	TnyMimePart *part;
-	TnySaveStrategy *save_strategy;
 	TnyGtkAttachListModel *imodel;
 };
 
@@ -58,64 +57,11 @@ struct _TnyGtkAttachmentMimePartViewPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_ATTACHMENT_MIME_PART_VIEW, TnyGtkAttachmentMimePartViewPriv))
 
 
-static void
-tny_gtk_attachment_mime_part_view_set_save_strategy (TnyMimePartView *self, TnySaveStrategy *strategy)
+static TnyMimePart*
+tny_gtk_attachment_mime_part_view_get_part (TnyMimePartView *self)
 {
 	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
-
-	if (priv->save_strategy)
-		g_object_unref (G_OBJECT (priv->save_strategy));
-
-	g_object_ref (G_OBJECT (strategy));
-	priv->save_strategy = strategy;
-
-	return;
-}
-
-
-static void
-tny_gtk_attachment_mime_part_view_save_as_activated (GtkMenuItem *menuitem, gpointer user_data)
-{
-	TnyGtkAttachmentMimePartView *self = user_data;
-	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
-
-	if (!G_LIKELY (priv->save_strategy))
-	{
-		g_warning (_("No save strategy for this mime part view\n"));
-		return;
-	}
-
-	tny_save_strategy_save (priv->save_strategy, priv->part);
-
-	return;
-}
-
-
-static gint
-tny_gtk_attachment_mime_part_view_popup_handler (GtkWidget *widget, GdkEvent *event)
-{	
-	g_return_val_if_fail (event != NULL, FALSE);
-	
-	
-	if (G_UNLIKELY (event->type == GDK_BUTTON_PRESS))
-	{
-		GtkMenu *menu;
-		GdkEventButton *event_button;
-
-		menu = GTK_MENU (widget);
-		g_return_val_if_fail (widget != NULL, FALSE);
-		g_return_val_if_fail (GTK_IS_MENU (widget), FALSE);
-
-		event_button = (GdkEventButton *) event;
-		if (G_LIKELY (event_button->button == 3))
-		{
-			gtk_menu_popup (menu, NULL, NULL, NULL, NULL, 
-					  event_button->button, event_button->time);
-			return TRUE;
-		}
-	}
-	
-	return FALSE;
+	return (priv->part)?TNY_MIME_PART (g_object_ref (priv->part)):NULL;
 }
 
 static void 
@@ -158,11 +104,9 @@ tny_gtk_attachment_mime_part_view_clear (TnyMimePartView *self)
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*
-tny_gtk_attachment_mime_part_view_new (TnySaveStrategy *save_strategy, TnyGtkAttachListModel *imodel)
+tny_gtk_attachment_mime_part_view_new (TnyGtkAttachListModel *imodel)
 {
 	TnyGtkAttachmentMimePartView *self = g_object_new (TNY_TYPE_GTK_ATTACHMENT_MIME_PART_VIEW, NULL);
-
-	tny_mime_part_view_set_save_strategy (TNY_MIME_PART_VIEW (self), save_strategy);
 
 	g_object_ref (G_OBJECT (imodel));
 	TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self)->imodel = imodel;
@@ -175,20 +119,8 @@ tny_gtk_attachment_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 {
 	TnyGtkAttachmentMimePartView *self = (TnyGtkAttachmentMimePartView *)instance;
 	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
-	GtkMenu *menu = GTK_MENU (gtk_menu_new ());
-	GtkWidget *mitem = gtk_menu_item_new_with_mnemonic ("Save _As");
 
 	priv->imodel = NULL;
-	priv->save_strategy = NULL;
-
-	gtk_widget_show (mitem);
-	g_signal_connect (G_OBJECT (mitem), "activate", 
-		G_CALLBACK (tny_gtk_attachment_mime_part_view_save_as_activated), self);
-
-	gtk_menu_shell_append (GTK_MENU_SHELL (menu), mitem);
-
-	g_signal_connect_swapped (G_OBJECT (self), "button_press_event",
-		G_CALLBACK (tny_gtk_attachment_mime_part_view_popup_handler), menu);
 
 	return;
 }
@@ -207,10 +139,6 @@ tny_gtk_attachment_mime_part_view_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->part));
 	priv->part = NULL;
 
-	if (G_LIKELY (priv->save_strategy))
-		g_object_unref (G_OBJECT (priv->save_strategy));
-	priv->save_strategy = NULL;
-
 	(*parent_class->finalize) (object);
 
 	return;
@@ -221,8 +149,8 @@ tny_mime_part_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartViewIface *klass = (TnyMimePartViewIface *)g;
 
+	klass->get_part_func = tny_gtk_attachment_mime_part_view_get_part;
 	klass->set_part_func = tny_gtk_attachment_mime_part_view_set_part;
-	klass->set_save_strategy_func = tny_gtk_attachment_mime_part_view_set_save_strategy;
 	klass->clear_func = tny_gtk_attachment_mime_part_view_clear;
 
 	return;
