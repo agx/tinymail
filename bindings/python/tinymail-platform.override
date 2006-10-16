@@ -25,7 +25,7 @@ headers
 #include <tny-msg-view.h>
 #include <tny-msg-window.h>
 #include <tny-platform-factory.h>
-#include <tny-save-strategy.h>
+#include <tny-mime-part-save-strategy.h>
 #include <tny-summary-view.h>
 
 #include "platform_include.h"

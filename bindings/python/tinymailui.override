@@ -10,7 +10,7 @@ headers
 #include <tny-msg-window.h>
 #include <tny-msg.h>
 #include <tny-platform-factory.h>
-#include <tny-save-strategy.h>
+#include <tny-mime-part-save-strategy.h>
 #include <tny-summary-view.h>
 #include <tny-account-store.h>
 
