@@ -20,8 +20,8 @@
 #include <config.h>
 
 #include <tny-device.h>
-guint tny_device_signals [TNY_DEVICE_LAST_SIGNAL];
 
+guint tny_device_signals [TNY_DEVICE_LAST_SIGNAL];
 
 /**
  * tny_device_reset:
@@ -46,6 +46,15 @@ tny_device_reset (TnyDevice *self)
  * @self: a #TnyDevice object
  * 
  * Force offline status
+ * 
+ * Example:
+ * <informalexample><programlisting>
+ * TnyDevice *device = ...
+ * tny_device_force_offline (device);
+ * if (tny_device_is_online (device))
+ *      g_print ("Something is wrong\n");
+ * tny_device_reset (device);
+ * </programlisting></informalexample>
  **/
 void 
 tny_device_force_online (TnyDevice *self)
@@ -81,6 +90,19 @@ tny_device_force_offline (TnyDevice *self)
  * tny_device_is_online:
  * @self: a #TnyDevice object
  * 
+ * Example:
+ * <informalexample><programlisting>
+ * static void
+ * connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
+ * {
+ *      if (!online && tny_device_is_online (device))
+ *           g_print ("Something is wrong\n");
+ * }
+ * TnyDevice *device = ...
+ * g_signal_connect (G_OBJECT (device), "connection_changed",
+ *       G_CALLBACK (connection_changed), self);
+ * </programlisting></informalexample>
+ * 
  * Return value: Whether the device is online
  **/
 gboolean 
@@ -93,7 +115,6 @@ tny_device_is_online (TnyDevice *self)
 
 	return TNY_DEVICE_GET_IFACE (self)->is_online_func (self);
 }
-
 
 static void
 tny_device_base_init (gpointer g_class)

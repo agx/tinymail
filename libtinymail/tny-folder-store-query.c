@@ -316,7 +316,7 @@ tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
 regex_t*
 tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item)
 {
-    return item->regex;
+	return item->regex;
 }
 
 

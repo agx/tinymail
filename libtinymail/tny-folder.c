@@ -32,6 +32,15 @@ guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
  * Persist changes made to a folder to its backing store, expunging deleted 
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
  *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyHeader *header = ...
+ * TnyFolder *folder = tny_header_get_folder (header);
+ * tny_folder_remove_message (folder, header);
+ * tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
+ * tny_folder_expunge (folder);
+ * g_object_unref (G_OBJECT (folder));
+ * </programlisting></informalexample>
  **/
 void 
 tny_folder_expunge (TnyFolder *self)
@@ -65,6 +74,33 @@ tny_folder_expunge (TnyFolder *self)
  * 
  * In Gtk+ for the #GtkTreeView component, you can do this using the 
  * #GtkTreeModelFilter tree model filtering model.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * static void
+ * on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gpointer user_data)
+ * {
+ *   if (event->keyval == GDK_Delete)
+ *   {
+ *       GtkTreeSelection *selection;
+ *       GtkTreeModel *model;
+ *       GtkTreeIter iter;
+ *       selection = gtk_tree_view_get_selection (header_view);
+ *       if (gtk_tree_selection_get_selected (selection, &model, &iter))
+ *       {
+ *          TnyHeader *header;
+ *          gtk_tree_model_get (model, &iter, 
+ *                TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+ *                &header, -1);
+ *          TnyFolder *folder = tny_header_get_folder (header);
+ *          tny_folder_remove_message (folder, header);
+ *          tny_list_remove (TNY_LIST (model), G_OBJECT (header));
+ *          g_object_unref (G_OBJECT (folder));
+ *          g_object_unref (G_OBJECT (header));
+ *       }
+ *   }
+ * }
+ * </programlisting></informalexample>
  *
  **/
 void 
@@ -106,6 +142,40 @@ tny_folder_remove_message (TnyFolder *self, TnyHeader *header)
  * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
  * gdk_threads_leave guards (because it happens in the #GMainLoop).
  *
+ * Example:
+ * <informalexample><programlisting>
+ * static void
+ * status_update_cb (TnyFolder *folder, const gchar *what, gint status, gpointer user_data)
+ * {
+ *     g_print (".");
+ * }
+ * static void
+ * folder_refresh_cb (TnyFolder *folder, gboolean cancelled, gpointer user_data)
+ * {
+ *     if (!cancelled)
+ *     {
+ *         TnyList *headers = tny_simple_list_new ();
+ *         TnyIterator *iter;
+ *         g_print ("done\nHeaders for %s are:", 
+ *                tny_folder_get_name (folder));
+ *         tny_folder_get_headers (folder, headers, FALSE);
+ *         iter = tny_list_create_iterator (headers);
+ *         while (!tny_iterator_is_done (iter))
+ *         {
+ *             TnyHeader *header = tny_iterator_current (iter);
+ *             g_print ("\t%s\n", tny_header_get_subject (header));
+ *             g_object_unref (G_OBJECT (header));
+ *             tny_iterator_next (iter);
+ *         }
+ *         g_object_unref (G_OBJECT (headers));
+ *     }
+ * }
+ * TnyFolder *folder = ...
+ * g_print ("Getting headers ");
+ * tny_folder_refresh_async (folder, 
+ *          folder_refresh_cb, 
+ *          status_update_cb, NULL); 
+ * </programlisting></informalexample>
  **/
 void
 tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
@@ -267,15 +337,16 @@ tny_folder_get_message (TnyFolder *self, TnyHeader *header)
  * Example:
  * <informalexample><programlisting>
  * TnyList *headers = tny_simple_list_new ();
- * TnyFolder *folder = ...; TnyIterator *iter; 
+ * TnyFolder *folder = ...;
+ * TnyIterator *iter; 
  * tny_folder_get_headers (folder, headers, TRUE);
  * iter = tny_list_create_iterator (headers);
  * while (!tny_iterator_is_done (iter))
  * {
- *  	TnyHeader *folder = TNY_HEADER (tny_iterator_get_current (iter));
- * 	g_print ("%s\n", tny_header_get_subject (header));
- * 	g_object_unref (G_OBJECT (header));
- * 	tny_iterator_next (iter);	    
+ *     TnyHeader *header = tny_iterator_get_current (iter);
+ *     g_print ("%s\n", tny_header_get_subject (header));
+ *     g_object_unref (G_OBJECT (header));
+ *     tny_iterator_next (iter);
  * }
  * g_object_unref (G_OBJECT (iter));
  * g_object_unref (G_OBJECT (headers)); 

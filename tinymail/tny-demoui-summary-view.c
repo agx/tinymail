@@ -96,7 +96,6 @@ struct _TnyDemouiSummaryViewPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_DEMOUI_SUMMARY_VIEW, TnyDemouiSummaryViewPriv))
 
 
-
 static void
 set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
 {
@@ -128,16 +127,16 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 
 	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (TRUE);
 	TnyList *accounts = TNY_LIST (mailbox_model);
-    
+
 	maccounts = tny_gtk_account_list_model_new ();
-    
+
 	/* Clear the header_view by giving it an empty model */
 	if (G_UNLIKELY (!empty_model))
 		empty_model = GTK_TREE_MODEL (gtk_list_store_new (1, G_TYPE_STRING));
 	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
-	
-    	tny_msg_view_clear (priv->msg_view);
-    
+
+	tny_msg_view_clear (priv->msg_view);
+
 	if (priv->current_accounts)
 	{
 		g_object_unref (G_OBJECT (priv->current_accounts));
@@ -148,16 +147,16 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	tny_account_store_get_accounts (account_store, accounts,
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
-    	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
-		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
+			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 	gtk_combo_box_set_model (priv->account_view, maccounts);
-    
+
 	/* Here we use the TnyAccountTreeModel as a GtkTreeModel */
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
 				GTK_SORT_ASCENDING);
-	
+
 	/* Set the model of the mailbox_view */
 	gtk_tree_view_set_model (GTK_TREE_VIEW (priv->mailbox_view), 
 		sortable);
@@ -238,7 +237,7 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 			priv->accounts_reloaded_signal);
 
 		g_object_unref (G_OBJECT (priv->account_store));
-	    	g_object_unref (G_OBJECT (odevice));
+		g_object_unref (G_OBJECT (odevice));
 	}
 
 	g_object_ref (G_OBJECT (account_store));
@@ -255,8 +254,8 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 
 	reload_accounts (priv);
 
-    	g_object_unref (G_OBJECT (device));
-    
+	g_object_unref (G_OBJECT (device));
+
 	return;
 }
 
@@ -308,11 +307,11 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 					   irreversible deletes: I immediately expunge the folder! */
 
 					tny_folder_expunge (folder);
-				    	g_object_unref (G_OBJECT (folder));
+					g_object_unref (G_OBJECT (folder));
 				}
 
 				gtk_widget_destroy (dialog);
-			    	g_object_unref (G_OBJECT (header));
+				g_object_unref (G_OBJECT (header));
 			}
 		}
 		
@@ -337,7 +336,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
 			&header, -1);
-	    
+	
 		if (G_LIKELY (header))
 		{
 			TnyFolder *folder;
@@ -354,11 +353,11 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 				} else { 
 					tny_msg_view_set_unavailable (priv->msg_view);
 				}
-			    	g_object_unref (G_OBJECT (folder));
+				g_object_unref (G_OBJECT (folder));
 			}
 
-		    	g_object_unref (G_OBJECT (header));
-		    
+			g_object_unref (G_OBJECT (header));
+		
 		} else {
 			tny_msg_view_set_unavailable (priv->msg_view);
 		}
@@ -464,14 +463,14 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		if (type == TNY_FOLDER_TYPE_ROOT) 
 		{ 
 			/* If an "account name"-row was clicked */
-		    	if (priv->last_mailbox_correct_select_set) 
+			if (priv->last_mailbox_correct_select_set) 
 			{
 				g_signal_handler_block (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 				gtk_tree_selection_select_iter (priv->mailbox_select, &priv->last_mailbox_correct_select);
 				g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 			}
-	    		priv->last_mailbox_correct_select_set = TRUE;
-		    
+			priv->last_mailbox_correct_select_set = TRUE;
+		
 		} else {
 
 			gtk_tree_model_get (model, &iter, 
@@ -489,8 +488,8 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 #else
 			refresh_current_folder (folder, FALSE, user_data);
 #endif
-	    
-	    		g_object_unref (G_OBJECT (folder));
+	
+			g_object_unref (G_OBJECT (folder));
 		}
 	}
     
@@ -534,12 +533,11 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 #if PLATFORM==3
 			platfact = tny_gpe_platform_factory_get_instance ();
 #endif
-		    
+
 #if PLATFORM==4
 			platfact = tny_olpc_platform_factory_get_instance ();    
 #endif
 
-		    
 			folder = tny_header_get_folder (TNY_HEADER (header));
 
 			if (G_LIKELY (folder))
@@ -552,7 +550,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 					tny_msg_view_set_msg (TNY_MSG_VIEW (msgwin), msg);
 					g_object_unref (G_OBJECT (msg));
-				    
+				
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				} else {
 					msgwin = tny_gtk_msg_window_new (
@@ -562,7 +560,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				}
-			    	g_object_unref (G_OBJECT (folder));
+				g_object_unref (G_OBJECT (folder));
 			}
 			g_object_unref (G_OBJECT (header));
 		}
@@ -680,7 +678,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 		GTK_SHADOW_ETCHED_IN);
 
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (mailbox_sw),
-		                        GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+					GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	
 	priv->header_view = GTK_TREE_VIEW (gtk_tree_view_new ());
 	gtk_widget_show (GTK_WIDGET (priv->header_view));
