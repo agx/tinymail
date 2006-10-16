@@ -1,6 +1,7 @@
 2006-10-16  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed the Python bindings
+	* Added lots of code samples to the API reference documentation
 
 	* This was a major API change in the Python bindings
 
