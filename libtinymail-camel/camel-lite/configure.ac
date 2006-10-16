@@ -1,6 +1,7 @@
 AC_INIT([camel-lite],[1.0],[http://tinymail.org/trac/camel-lite-builder])
 AC_CONFIG_SRCDIR(camel/camel-object.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+AC_CONFIG_HEADERS(config.h)
 
 AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS")
 
@@ -54,9 +55,6 @@ AC_PROG_MAKE_SET
 GETTEXT_PACKAGE=camel-lite
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Package name for gettext])
-AM_GLIB_DEFINE_LOCALEDIR([TNY_LOCALE_DIR])
-ALL_LINGUAS=""
-AM_GLIB_GNU_GETTEXT
 
 
 dnl ******************************
