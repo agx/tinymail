@@ -83,7 +83,7 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-stream.h \
 	$(top_srcdir)/libtinymail/tny-transport-account.h
 
-tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py
+tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py 
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) | \
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
 	--extra=$(top_srcdir)/bindings/python/tinymail.defs.extra \
@@ -104,9 +104,9 @@ tinymailui_h_files = \
 	$(top_srcdir)/libtinymailui/tny-summary-view.h
 
 tinymailui.defs: $(tinymailui_h_files) tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_h_files) |	\
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 		\
-	--extra=$(top_srcdir)/bindings/python/tinymailui.defs.extra 	\
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_h_files) | \
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
+	--extra=$(top_srcdir)/bindings/python/tinymailui.defs.extra \
 	--topsrcdir=$(top_srcdir) > $@
 
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py

@@ -13,6 +13,7 @@ headers
 #include <tny-mime-part-save-strategy.h>
 #include <tny-summary-view.h>
 #include <tny-account-store.h>
+#include <tny-mime-part-saver.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"

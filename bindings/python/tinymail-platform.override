@@ -42,6 +42,7 @@ ignore-glob
 import gobject.GObject as PyGObject_Type
 import gtk.Dialog as PyGtkDialog_Type
 
+import tinymail.ui.MimePartSaveStrategy as PyTnyMimePartSaveStrategy_Type
 import tinymail.ui.PlatformFactory as PyTnyPlatformFactory_Type
 import tinymail.Device as PyTnyDevice_Type
 import tinymail.AccountStore as PyTnyAccountStore_Type
