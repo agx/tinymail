@@ -86,12 +86,12 @@ tny_folder_expunge (TnyFolder *self)
  *       GtkTreeModel *model;
  *       GtkTreeIter iter;
  *       selection = gtk_tree_view_get_selection (header_view);
- *       if (gtk_tree_selection_get_selected (selection, &model, &iter))
+ *       if (gtk_tree_selection_get_selected (selection, &amp;model, &iter))
  *       {
  *          TnyHeader *header;
- *          gtk_tree_model_get (model, &iter, 
+ *          gtk_tree_model_get (model, &amp;iter, 
  *                TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
- *                &header, -1);
+ *                &amp;header, -1);
  *          TnyFolder *folder = tny_header_get_folder (header);
  *          tny_folder_remove_message (folder, header);
  *          tny_list_remove (TNY_LIST (model), G_OBJECT (header));
