@@ -109,10 +109,10 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name)
  * iter = tny_list_create_iterator (folders);
  * while (!tny_iterator_is_done (iter))
  * {
- *  	TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
- * 	g_print ("%s\n", tny_folder_get_name (folder));
- * 	g_object_unref (G_OBJECT (folder));
- * 	tny_iterator_next (iter);	    
+ *     TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
+ *     g_print ("%s\n", tny_folder_get_name (folder));
+ *     g_object_unref (G_OBJECT (folder));
+ *     tny_iterator_next (iter);
  * }
  * g_object_unref (G_OBJECT (iter));
  * g_object_unref (G_OBJECT (folders)); 
@@ -141,7 +141,36 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * Get a list of child folders from the folder store @self and call back when 
  * finished. 
  *
- * If you want to use this functionality, it's advised to let your application 
+ * Example:
+ * <informalexample><programlisting>
+ * static void 
+ * callback (TnyFolderStore *self, TnyList *list, gpointer user_data)
+ * {
+ *     TnyIterator *iter = tny_list_create_iterator (list);
+ *     while (!tny_iterator_is_done (iter))
+ *     {
+ *         TnyFolderStore *folder = tny_iterator_get_current (iter);
+ *         TnyList *folders = tny_simple_list_new ();
+ *         g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
+ *         tny_folder_store_get_folders_async (folder,
+ *             folders, callback, NULL, NULL);
+ *         g_object_unref (G_OBJECT (folder));
+ *         tny_iterator_next (iter);
+ *     }
+ *     g_object_unref (G_OBJECT (iter));
+ *     g_object_unref (G_OBJECT (list));
+ * } 
+ * static void
+ * get_all_folders (TnyStoreAccount *account)
+ * {
+ *     TnyList *folders;
+ *     folders = tny_simple_list_new ();
+ *     tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
+ *         folders, callback, NULL, NULL);
+ * }
+ * </programlisting></informalexample>
+ *
+ * If you want to use this functionality, you are advised to let your application 
  * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
  * called.
  * 
