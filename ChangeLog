@@ -1,3 +1,7 @@
+2006-10-17  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added libtinymail-camel/camel-lite
+
 2006-10-16  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed the Python bindings

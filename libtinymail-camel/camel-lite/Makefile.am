@@ -1,0 +1,1 @@
+SUBDIRS = libedataserver camel

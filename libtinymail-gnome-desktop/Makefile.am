@@ -1,10 +1,11 @@
-INCLUDES = -I. -I$(top_srcdir)			    \
-	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS)	    \
-	$(LIBTINYMAIL_CAMEL_CFLAGS)		    \
-	-I$(top_srcdir)/libtinymail		    \
-	-I$(top_srcdir)/libtinymailui		    \
-	-I$(top_srcdir)/libtinymailui-gtk	    \
-	-I$(top_srcdir)/libtinymail-camel	    \
+INCLUDES = -I. -I$(top_srcdir) \
+	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS) \
+	$(LIBTINYMAIL_CAMEL_CFLAGS) \
+	-I$(top_srcdir)/libtinymail \
+	-I$(top_srcdir)/libtinymailui \
+	-I$(top_srcdir)/libtinymailui-gtk \
+	-I$(top_srcdir)/libtinymail-camel \
+	-I$(top_srcdir)/libtinymail-camel/camel-lite \
 	-I$(top_srcdir)/libtinymail-gnomevfs 
 
 if BUILD_MOZEMBED
@@ -17,25 +18,26 @@ endif
 
 lib_LTLIBRARIES = libtinymail-gnome-desktop-1.0.la
 
-libtinymail_gnome_desktop_1_0_headers = 	\
-	tny-gnome-account-store.h		\
-	tny-gnome-password-dialog.h		\
-	tny-gnome-device.h			\
+libtinymail_gnome_desktop_1_0_headers = \
+	tny-gnome-account-store.h \
+	tny-gnome-password-dialog.h \
+	tny-gnome-device.h \
 	tny-gnome-platform-factory.h
 
-libtinymail_gnome_desktop_1_0_la_SOURCES = 	\
+libtinymail_gnome_desktop_1_0_la_SOURCES = \
 	$(libtinymail_gnome_desktop_1_0_headers) \
-	tny-gnome-account-store.c		\
-	tny-gnome-device-priv.h			\
-	tny-gnome-device.c			\
-	tny-gnome-password-dialog.c		\
+	tny-gnome-account-store.c \
+	tny-gnome-device-priv.h \
+	tny-gnome-device.c \
+	tny-gnome-password-dialog.c \
 	tny-gnome-platform-factory.c
 
-libtinymail_gnome_desktop_1_0_la_LIBADD = 	\
-	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)	\
-	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la     \
+libtinymail_gnome_desktop_1_0_la_LIBADD = \
+	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS) \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
-	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
+	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
+	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
 
 libtinymail_gnome_desktop_1_0_la_LDFLAGS = -export-dynamic \
 	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

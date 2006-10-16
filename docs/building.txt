@@ -4,20 +4,13 @@ One laptop per child
 
 = On a x86 desktop =
 
-svn co https://svn.tinymail.org/svn/camel-lite-builder
-cd camel-lite-builder/trunk
-./getcamel.sh
-./autogen.sh --prefix=/opt/camel-lite
-make && make install
-
-cd ../..
 
 svn co https://svn.tinymail.org/svn/tinymail
 cd tinymail/trunk
-PKG_CONFIG_PATH=/opt/camel-lite/lib/pkgconfig ./autogen.sh --prefix=/opt/tinymail-olpc --with-platform=olpc
+./autogen.sh --prefix=/opt/tinymail-olpc --with-platform=olpc
 make && make install
 
-Now simply copy /opt/camel-lite and /opt/tinymail-olpc to the device
+Now simply copy /opt/tinymail-olpc to the device
 
 Mount the image on /media/OLPCRoot
 
@@ -31,40 +24,23 @@ Maemo
 = Outside scratchbox =
 
 cd /scratchbox/users/$USER/home/$USER/
-svn co https://svn.tinymail.org/svn/camel-lite-builder
-cd camel-lite-builder/trunk
-./getcamel.sh
-cd ../..
 svn co https://svn.tinymail.org/svn/tinymail
 
 = Inside an ARMEL scratchbox =
 
-cd camel-lite-builder/trunk
-./autogen.sh --prefix=/opt/camel-lite
-make && make install
-
-cd ../..
 cd tinymail/trunk
-PKG_CONFIG_PATH=/opt/camel-lite/lib/pkgconfig ./autogen.sh --prefix=/opt/tinymail-maemo --with-platform=maemo
+./autogen.sh --prefix=/opt/tinymail-maemo --with-platform=maemo
 make && make install
 
-Now simply copy /opt/camel-lite and /opt/tinymail-maemo to the device
+Now simply copy /opt/tinymail-maemo to the device
 
 
 A desktop
 ---------
 
-svn co https://svn.tinymail.org/svn/camel-lite-builder
-cd camel-lite-builder/trunk
-./getcamel.sh
-./autogen.sh --prefix=/opt/camel-lite
-make && make install
-
-cd ../..
-
 svn co https://svn.tinymail.org/svn/tinymail
 cd tinymail/trunk
-PKG_CONFIG_PATH=/opt/camel-lite/lib/pkgconfig ./autogen.sh --prefix=/opt/tinymail
+./autogen.sh --prefix=/opt/tinymail
 make && make install
 
 Now run /opt/tinymail/bin/tinymail

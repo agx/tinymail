@@ -205,7 +205,7 @@ AC_SUBST(LIBTINYMAILUI_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_LIBS)
 
 dnl ### libtinymail-camel, a camel implementation of libtinymail ##
-PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.6 gobject-2.0 camel-1.2 camel-provider-1.2)
+PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.6 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_CAMEL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_CAMEL_LIBS)
 
@@ -286,7 +286,7 @@ AC_SUBST(extragtkpkgs)
 
 dnl ### libtinymail-test, a library for testing purposes ##
 if test x$build_unittests = xtrue; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.6 gobject-2.0 camel-1.2 camel-provider-1.2 $extratnypkgs)
+  PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.6 gobject-2.0 $extratnypkgs)
 else
   LIBTINYMAIL_TEST_CFLAGS=
   LIBTINYMAIL_TEST_LIBS=
@@ -349,7 +349,7 @@ AC_SUBST(PYGTK_LIBS)
 BINDIR=$prefix/bin
 AC_SUBST(BINDIR)
 
-
+AC_CONFIG_SUBDIRS(libtinymail-camel/camel-lite)
 
 AC_OUTPUT([
 po/Makefile.in
