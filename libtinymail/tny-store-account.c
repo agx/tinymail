@@ -28,7 +28,7 @@
  * @self: a #TnyStoreAccount object
  * @folder: The folder to unsubscribe from
  *
- * WARNING: This API might soon change
+ * API WARNING: This API might change
  *
  * Unsubscribe from a folder
  * 
@@ -50,7 +50,7 @@ tny_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
  * @self: a #TnyStoreAccount object
  * @folder: The folder to subscribe to
  *
- * WARNING: This API might soon change
+ * API WARNING: This API might change
  *
  * Subscribe to a folder
  * 
@@ -103,7 +103,7 @@ tny_store_account_get_type (void)
 			"TnyStoreAccount", &info, 0);
 
 		g_type_interface_add_prerequisite (type, TNY_TYPE_ACCOUNT);
-    		g_type_interface_add_prerequisite (type, TNY_TYPE_FOLDER_STORE);
+		g_type_interface_add_prerequisite (type, TNY_TYPE_FOLDER_STORE);
 	}
 
 	return type;

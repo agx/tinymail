@@ -71,7 +71,7 @@ tny_folder_expunge (TnyFolder *self)
  * removed message to the list. It will do this until the expunge happened. You
  * are advised to hide messages that have been marked as being deleted from your
  * summary view.
- * 
+ * g
  * In Gtk+ for the #GtkTreeView component, you can do this using the 
  * #GtkTreeModelFilter tree model filtering model.
  *
@@ -310,6 +310,15 @@ tny_folder_get_account (TnyFolder *self)
  * Get a message in the folder identified by a header. You must unreference the
  * return value after use.
  * 
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
+ * TnyFolder *folder = ...
+ * TnyHeader *header = ...
+ * TnyMsg *message = tny_folder_get_message (folder, header);
+ * tny_msg_view_set_msg (message_view, message);
+ * </programlisting></informalexample>
+ *
  * Return value: The message instance or NULL on failure
  *
  **/

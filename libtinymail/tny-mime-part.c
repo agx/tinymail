@@ -40,8 +40,8 @@
  *      TnyMimePart *part = TNY_MIME_PART (tny_iterator_get_current (iter));
  *      if (tny_mime_part_is_attachment (part))
  *      {
- *              g_print ("Found an attachment (%s)\n",
- *			tny_mime_part_get_filename (part));
+ *          g_print ("Found an attachment (%s)\n",
+ *               tny_mime_part_get_filename (part));
  *      }
  *      g_object_unref (G_OBJECT (part));
  *      tny_iterator_next (iter);
@@ -464,11 +464,8 @@ tny_mime_part_get_type (void)
 		  NULL,   /* instance_init */
 		  NULL
 		};
-
 		type = g_type_register_static (G_TYPE_INTERFACE,
 			"TnyMimePart", &info, 0);
-
-		/* g_type_interface_add_prerequisite (type, G_TYPE_OBJECT); */
 	}
 
 	return type;

@@ -46,7 +46,7 @@
  * tny_my_msg_view_finalize (TnyMyMsgView *self)
  * {
  *      if (self->save_strategy))
- *		g_object_unref (G_OBJECT (self->save_strategy));
+ *          g_object_unref (G_OBJECT (self->save_strategy));
  * }
  * </programlisting></informalexample>
  *

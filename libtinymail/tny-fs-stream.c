@@ -24,7 +24,7 @@
 
 /*
  * Authors: Bertrand Guiheneuf <bertrand@helixcode.com>
- *	    Michael Zucchi <notzed@ximian.com>
+ *          Michael Zucchi <notzed@ximian.com>
  *
  * Copyright 1999-2003 Ximian, Inc. (www.ximian.com)
  *
@@ -84,7 +84,7 @@ tny_fs_stream_write_to_stream (TnyStream *self, TnyStream *output)
 			while (G_LIKELY (nb_written < nb_read))
 			{
 				gssize len = tny_stream_write (output, tmp_buf + nb_written,
-								  nb_read - nb_written);
+					  nb_read - nb_written);
 				if (G_UNLIKELY (len < 0))
 					return -1;
 				nb_written += len;
@@ -104,15 +104,12 @@ tny_fs_stream_read  (TnyStream *self, char *buffer, gsize n)
 	
 	if ((nread = read (priv->fd, buffer, n)) > 0)
 		priv->offset += nread;
-    
-    	if (nread != n)
+	if (nread != n)
 		priv->eos = TRUE;
-	
-    	if (read (priv->fd, b, 1) != 1)
+	if (read (priv->fd, b, 1) != 1)
 		priv->eos = TRUE;
-    
+
 	priv->offset = lseek (priv->fd, priv->offset, SEEK_SET);
-    
 	return nread;
 
 }
@@ -122,12 +119,9 @@ tny_fs_stream_write (TnyStream *self, const char *buffer, gsize n)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	gssize nwritten;
-		
 	if ((nwritten = write (priv->fd, buffer, n)) > 0)
 		priv->offset += nwritten;
-	
-    	priv->eos = FALSE;
-    
+	priv->eos = FALSE;
 	return nwritten;
 }
 
@@ -135,12 +129,9 @@ static gint
 tny_fs_stream_close (TnyStream *self)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-
 	if (close (priv->fd) == -1)
 		return -1;
-	
 	priv->fd = -1;
-
 	return 0;
 }
 
@@ -157,22 +148,15 @@ void
 tny_fs_stream_set_fd (TnyFsStream *self, int fd)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-
 	if (fd == -1)
 		return;
-
 	if (priv->fd != -1)
 		close (priv->fd);
-
 	priv->fd = fd;
-
 	priv->offset = lseek (priv->fd, 0, SEEK_SET);
-
 	if (priv->offset == -1)
 		priv->offset = 0;
-
 	priv->eos = FALSE;
-    
 	return;
 }
 
@@ -197,9 +181,7 @@ TnyStream*
 tny_fs_stream_new (int fd)
 {
 	TnyFsStream *self = g_object_new (TNY_TYPE_FS_STREAM, NULL);
-
 	tny_fs_stream_set_fd (self, fd);
-
 	return TNY_STREAM (self);
 }
 
@@ -208,11 +190,9 @@ tny_fs_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyFsStream *self = (TnyFsStream *)instance;
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-
 	priv->eos = TRUE;
 	priv->fd = -1;
 	priv->offset = 0;
-    
 	return;
 }
 
@@ -221,17 +201,14 @@ tny_fs_stream_finalize (GObject *object)
 {
 	TnyFsStream *self = (TnyFsStream *)object;	
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-
 	if (priv->fd != -1)
- 	{
+	{
 		fsync (priv->fd);
 		close (priv->fd);	     
 	}
 	priv->fd = -1;
 	priv->eos = TRUE;
-    
 	(*parent_class->finalize) (object);
-
 	return;
 }
 
@@ -253,8 +230,8 @@ static gint
 tny_fs_reset (TnyStream *self)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-    	priv->offset = lseek (priv->fd, 0, SEEK_SET);
-    	priv->eos = FALSE;
+	priv->offset = lseek (priv->fd, 0, SEEK_SET);
+	priv->eos = FALSE;
 	return 0;
 }
 
@@ -266,7 +243,6 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->reset_func = tny_fs_reset;
 	klass->flush_func = tny_fs_flush;
 	klass->is_eos_func = tny_fs_is_eos;
-
 	klass->read_func = tny_fs_stream_read;
 	klass->write_func = tny_fs_stream_write;
 	klass->close_func = tny_fs_stream_close;
@@ -282,9 +258,7 @@ tny_fs_stream_class_init (TnyFsStreamClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-
 	object_class->finalize = tny_fs_stream_finalize;
-
 	g_type_class_add_private (object_class, sizeof (TnyFsStreamPriv));
 
 	return;

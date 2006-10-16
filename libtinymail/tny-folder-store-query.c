@@ -46,10 +46,8 @@ static void
 tny_folder_store_query_item_finalize (GObject *object)
 {
 	TnyFolderStoreQueryItem *self = (TnyFolderStoreQueryItem*) object;
-    
-   	if (self->regex)
+	if (self->regex)
 		regfree (self->regex);
-    
 	item_parent_class->finalize (object);
 }
 
@@ -57,11 +55,8 @@ static void
 tny_folder_store_query_finalize (GObject *object)
 {
 	TnyFolderStoreQuery *self = (TnyFolderStoreQuery*) object;
-    
 	g_object_unref (G_OBJECT (self->items));
-    
 	parent_class->finalize (object);
-
 	return;
 }
 
@@ -69,12 +64,9 @@ static void
 tny_folder_store_query_item_class_init (TnyFolderStoreQueryItemClass *klass)
 {
 	GObjectClass *object_class;
-
 	object_class = (GObjectClass *)klass;
 	item_parent_class = g_type_class_peek_parent (klass);
-
 	object_class->finalize = tny_folder_store_query_item_finalize;
-
 	return;
 }
 
@@ -82,12 +74,9 @@ static void
 tny_folder_store_query_class_init (TnyFolderStoreQueryClass *klass)
 {
 	GObjectClass *object_class;
-
 	object_class = (GObjectClass *)klass;
 	parent_class = g_type_class_peek_parent (klass);
-
 	object_class->finalize = tny_folder_store_query_finalize;
-
 	return;
 }
 
@@ -95,7 +84,7 @@ static void
 tny_folder_store_query_item_init (TnyFolderStoreQueryItem *self)
 {
 	self->options = 0;
-    	self->regex = NULL;
+	self->regex = NULL;
 	return;
 }
 
@@ -127,12 +116,8 @@ tny_folder_store_query_get_type (void)
 			(GInstanceInitFunc) tny_folder_store_query_init,
 			NULL
 		};
-
-
 		object_type = g_type_register_static (G_TYPE_OBJECT, 
 			"TnyFolderStoreQuery", &object_info, 0);
-
-
 	}
 
 	return object_type;
@@ -159,8 +144,6 @@ tny_folder_store_query_item_get_type (void)
 			(GInstanceInitFunc) tny_folder_store_query_item_init,
 			NULL
 		};
-
-
 		object_type = g_type_register_static (G_TYPE_OBJECT, 
 			"TnyFolderStoreQueryItem", &object_info, 0);
 
@@ -240,37 +223,36 @@ get_regerror (int errcode, regex_t *compiled)
 void 
 tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *pattern, TnyFolderStoreQueryOption options)
 {
-    	gint er=0;
+	gint er=0;
 	gboolean addit=pattern?TRUE:FALSE;
-        regex_t *regex = g_new0 (regex_t, 1);
+	regex_t *regex = g_new0 (regex_t, 1);
 	gboolean has_regex = FALSE;
-    
-    	if (addit)
+
+	if (addit)
 		er = regcomp (regex, (const char*)pattern, 0);
-    
 	if (addit && er != 0)
 	{
 		gchar *erstr = get_regerror (er, regex);
 		g_warning (erstr);
 		g_free (erstr);
 		regfree (regex);
-	    	addit = FALSE;
-	    	regex = NULL;
+		addit = FALSE;
+		regex = NULL;
 	} else {
-	    	has_regex = TRUE;
+		has_regex = TRUE;
 		addit = TRUE;
 	}
-    
+
 	if (addit)
 	{
-	    	TnyFolderStoreQueryItem *add = g_object_new (TNY_TYPE_FOLDER_STORE_QUERY_ITEM, NULL);
+		TnyFolderStoreQueryItem *add = g_object_new (TNY_TYPE_FOLDER_STORE_QUERY_ITEM, NULL);
 		add->options = options;
-	    	if (has_regex)
+		if (has_regex)
 			add->regex = regex;
-	    	else add->regex = NULL;
+		else add->regex = NULL;
 		tny_list_prepend (query->items, G_OBJECT (add));
 		g_object_unref (G_OBJECT (add));
-	}    
+	}
 }
 
 /**
@@ -284,7 +266,7 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
 TnyList*
 tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
 {
-    return g_object_ref (G_OBJECT (query->items));
+	return g_object_ref (G_OBJECT (query->items));
 }
 
 

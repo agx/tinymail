@@ -183,6 +183,55 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * libtinymail-maemo and tests/shared/account-store.c which is being used by
  * the unit tests and the normal tests.
  *
+ * Example (that uses a cache):
+ * <informalexample><programlisting>
+ * static TnyCamelSession *session = NULL;
+ * static TnyList *accounts = NULL;
+ * static gchar* 
+ * account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
+ * {
+ *      return g_strdup ("the password");
+ * }
+ * static void
+ * account_forget_pass_func (TnyAccount *account)
+ * {
+ *      g_print ("Password was incorrect\n");
+ * }
+ * static void
+ * tny_my_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
+ * {
+ *    TnyIterator *iter;
+ *    if (session == NULL)
+ *        session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
+ *    if (accounts == NULL)
+ *    {
+ *        accounts = tny_simple_list_new ();
+ *        for (... each account ... )
+ *        {
+ *           TnyAccount *account = TNY_ACCOUNT (tny_camel_store_account_new ());
+ *           tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), session);
+ *           tny_account_set_proto (account, "imap");
+ *           tny_account_set_name (account, "account i");
+ *           tny_account_set_user (account, "user of account i");
+ *           tny_account_set_hostname (account, "server.domain of account i");
+ *           tny_account_set_id (account, "i");
+ *           tny_account_set_forget_pass_func (account, account_forget_pass_func);
+ *           tny_account_set_pass_func (account, account_get_pass_func);
+ *           tny_list_prepend (accounts, account);
+ *           g_object_unref (G_OBJECT (account));
+ *        }
+ *    }
+ *    iter = tny_list_create_iterator (accounts);
+ *    while (tny_iterator_is_done (iter))
+ *    {
+ *        GObject *cur = tny_iterator_get_current (iter);
+ *        tny_list_prepend (list, cur);
+ *        g_object_unref (cur);
+ *        tny_iterator_next (iter);
+ *    }
+ *    g_object_unref (G_OBJECT (iter));
+ * }
+ * </programlisting></informalexample>
  **/
 void
 tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
@@ -202,8 +251,9 @@ tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAcco
  * @self: a #TnyAccountTransport object
  * @account: the account to add
  * 
+ * API WARNING: This API might change
+ *
  * Add a transport account to the store
- * 
  **/
 void
 tny_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
@@ -223,8 +273,9 @@ tny_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAcco
  * @self: a #TnyAccountStore object
  * @account: the account to add
  * 
- * Add a storage account to the store
+ * API WARNING: This API might change
  * 
+ * Add a storage account to the store
  **/
 void
 tny_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
@@ -315,7 +366,6 @@ tny_account_store_base_init (gpointer g_class)
 
 		tny_account_store_initialized = TRUE;
 	}
-
 	return;
 }
 
@@ -324,7 +374,6 @@ GType
 tny_account_store_get_type (void)
 {
 	static GType type = 0;
-
 	if (G_UNLIKELY(type == 0))
 	{
 		static const GTypeInfo info = 
@@ -344,7 +393,6 @@ tny_account_store_get_type (void)
 			"TnyAccountStore", &info, 0);
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}
-
 	return type;
 }
 

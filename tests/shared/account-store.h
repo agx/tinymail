@@ -41,11 +41,11 @@ typedef struct _TnyTestAccountStoreClass TnyTestAccountStoreClass;
 struct _TnyTestAccountStore
 {
 	GObject parent;
-    
+
 	gchar *cache_dir;
-    	TnySessionCamel *session;
-    	TnyDevice *device;
-    	gboolean force_online;
+	TnySessionCamel *session;
+	TnyDevice *device;
+	gboolean force_online;
 };
 
 struct _TnyTestAccountStoreClass

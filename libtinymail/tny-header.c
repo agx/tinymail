@@ -29,7 +29,6 @@
  * @to: the reply-to header
  * 
  * Set the reply-to header
- * 
  **/
 void
 tny_header_set_replyto (TnyHeader *self, const gchar *to)

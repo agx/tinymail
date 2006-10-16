@@ -79,10 +79,8 @@ tny_simple_list_remove (TnyList *self, GObject* item)
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->iterator_lock);
-
 	priv->first = g_list_remove (priv->first, item);
 	g_object_unref (G_OBJECT (item));
-
 	g_mutex_unlock (priv->iterator_lock);
 
 	return;
@@ -98,7 +96,6 @@ static TnyList*
 tny_simple_list_copy_the_simple_list (TnyList *self)
 {
 	TnySimpleList *copy = g_object_new (TNY_TYPE_SIMPLE_LIST, NULL);
-
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 	TnySimpleListPriv *cpriv = TNY_SIMPLE_LIST_GET_PRIVATE (copy);
 
@@ -175,9 +172,7 @@ tny_simple_list_class_init (TnySimpleListClass *klass)
 
 	object_class = (GObjectClass *)klass;
 	parent_class = g_type_class_peek_parent (klass);
-
 	object_class->finalize = tny_simple_list_finalize;
-
 	g_type_class_add_private (object_class, sizeof (TnySimpleListPriv));
 
 	return;
@@ -236,10 +231,10 @@ tny_simple_list_get_type (void)
 		};
 
 		object_type = g_type_register_static (G_TYPE_OBJECT, 
-						"TnySimpleList", &object_info, 0);
+				"TnySimpleList", &object_info, 0);
 
 		g_type_add_interface_static (object_type, TNY_TYPE_LIST,
-					     &tny_list_info);
+					&tny_list_info);
 
 	}
 

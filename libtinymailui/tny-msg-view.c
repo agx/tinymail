@@ -82,7 +82,7 @@
  *         gtk_widget_show (GTK_WIDGET (retval));
  *     }
  *     if (!retval)
- * 		retval = TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_orig_func (self, part);
+ *         retval = TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_orig_func (self, part);
  *     return retval;
  * }
  * static void 

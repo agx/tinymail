@@ -72,7 +72,7 @@ static const gchar*
 tny_test_account_store_get_cache_dir (TnyAccountStore *self)
 {
 	TnyTestAccountStore *me = (TnyTestAccountStore*) self;
-    
+
 	if (me->cache_dir == NULL)
 	{
 		gint att=0;
@@ -80,10 +80,10 @@ tny_test_account_store_get_cache_dir (TnyAccountStore *self)
 		do {
 			gchar *attempt = g_strdup_printf ("tinymail.%d", att);
 			gchar *str = g_build_filename (g_get_tmp_dir (), attempt, NULL);
-			g_free (attempt);		    
-                    	dir = g_dir_open (str, 0, NULL);
+			g_free (attempt);
+			dir = g_dir_open (str, 0, NULL);
 			if (dir)
-		    	{
+			{
 				g_dir_close (dir);
 				g_free (str);
 			} else 
@@ -99,17 +99,16 @@ tny_test_account_store_get_cache_dir (TnyAccountStore *self)
 static void
 tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
 {
-    	TnyTestAccountStore *me = (TnyTestAccountStore *) self;
-    
+	TnyTestAccountStore *me = (TnyTestAccountStore *) self;
 	TnyAccount *account = TNY_ACCOUNT (tny_camel_store_account_new ());
-    
+
 	/* Dear visitor of the SVN-web. This is indeed a fully functional and
 	   working IMAP account. This does not mean that you need to fuck it up */
 
 	tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 	camel_session_set_online ((CamelSession*)me->session, me->force_online); 
 	tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online);
-    
+
 	tny_account_set_proto (account, "imap");
 	tny_account_set_name (account, "unit test account");
 	tny_account_set_user (account, "tinymailunittest");
@@ -120,8 +119,8 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 	tny_list_prepend (list, (GObject*)account);
 	g_object_unref (G_OBJECT (account));
-    
-	return;	
+
+	return;
 }
 
 
@@ -135,18 +134,17 @@ tny_test_account_store_new (gboolean force_online, const gchar *cachedir)
 	{
 		if (self->cache_dir)
 			g_free (self->cache_dir);
-		    
 		self->cache_dir = g_strdup (cachedir);
 	}
-    
-	self->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
-    	self->force_online = force_online;
 
-    	if (self->force_online)
+	self->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
+	self->force_online = force_online;
+
+	if (self->force_online)
 		tny_device_force_online (self->device);
-    	else
+	else
 		tny_device_force_offline (self->device);
-    
+
 	return TNY_ACCOUNT_STORE (self);
 }
 
@@ -158,8 +156,7 @@ tny_test_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyPlatformFactory *platfact = tny_test_platform_factory_get_instance ();
 
 	self->device = tny_platform_factory_new_device (platfact);
-	
-    
+
 	return;
 }
 

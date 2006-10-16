@@ -22,7 +22,6 @@
 #include <tny-mime-part-view.h>
 
 
-
 /**
  * tny_mime_part_view_clear:
  * @self: A #TnyMimePartView instance
@@ -41,7 +40,7 @@ tny_mime_part_view_clear (TnyMimePartView *self)
 #endif
 
 	TNY_MIME_PART_VIEW_GET_IFACE (self)->clear_func (self);
-	return;    
+	return;
 }
 
 
@@ -79,6 +78,26 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  * Implementors: this method should cause the view @self to show the mime part
  * @mime_part to the user. 
  *
+ * Example:
+ * <informalexample><programlisting>
+ * static void 
+ * tny_gtk_text_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
+ * {
+ *      if (part)
+ *      {
+ *           GtkTextBuffer *buffer;
+ *           TnyStream *dest;
+ *           buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
+ *           if (buffer &amp;&amp; GTK_IS_TEXT_BUFFER (buffer))
+ *                gtk_text_buffer_set_text (buffer, "", 0);
+ *           dest = tny_gtk_text_buffer_stream_new (buffer);
+ *           tny_stream_reset (dest);
+ *           tny_mime_part_decode_to_stream (part, dest);
+ *           tny_stream_reset (dest);
+ *           g_object_unref (G_OBJECT (dest));
+ *      }
+ * }
+ * </programlisting></informalexample>
  **/
 void
 tny_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *mime_part)
