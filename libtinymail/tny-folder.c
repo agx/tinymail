@@ -317,6 +317,7 @@ tny_folder_get_account (TnyFolder *self)
  * TnyHeader *header = ...
  * TnyMsg *message = tny_folder_get_message (folder, header);
  * tny_msg_view_set_msg (message_view, message);
+ * g_object_unref (G_OBJECT (message));
  * </programlisting></informalexample>
  *
  * Return value: The message instance or NULL on failure
