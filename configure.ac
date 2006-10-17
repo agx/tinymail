@@ -53,7 +53,7 @@ AC_PROG_LIBTOOL
 dnl ### default values (will get overwritten)
 build_gnome=true
 build_demoui=true
-build_mozembed=true
+build_mozembed=false
 build_gtkhtml=false
 build_doxygen=false
 PLATFORMDIR=libtinymail-gnome-desktop
@@ -123,7 +123,7 @@ AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
 
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,
-[  --with-html-component		set which html component to use [default=mozembed]],
+[  --with-html-component		set which html component to use [default=none]],
 [case "$with_html_component" in
   mozembed) 
 	build_mozembed=true
@@ -139,9 +139,9 @@ AC_ARG_WITH(html-component,
 	build_gtkhtml=false
   ;;
   *) AC_MSG_ERROR(bad value ${with_html_component} for --with-html-component) ;;
-esac], [build_mozembed=true 
+esac], [build_mozembed=false 
 	build_gtkhtml=false
-	with_html_component=mozembed])
+	with_html_component=none])
 
 AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
 AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
