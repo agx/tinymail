@@ -17,6 +17,29 @@ Shared include file with forward typedefs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyAccountStore ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyAccountStoreIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@account_changed: 
+@account_inserted: 
+@account_removed: 
+@accounts_reloaded: 
+@get_accounts_func: 
+@add_store_account_func: 
+@add_transport_account_func: 
+@get_cache_dir_func: 
+@get_device_func: 
+@alert_func: 
+
 <!-- ##### STRUCT TnyList ##### -->
 <para>
 
@@ -35,7 +58,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@length_func: 
+@get_length_func: 
 @prepend_func: 
 @append_func: 
 @remove_func: 
@@ -87,15 +110,15 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyfolderiface: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
 <para>
 
 </para>
 
-@tnyfolderiface: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
@@ -116,8 +139,7 @@ Shared include file with forward typedefs
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
-@set_subscribed_func: 
-@get_subscribed_func: 
+@is_subscribed_func: 
 @refresh_async_func: 
 @refresh_func: 
 
@@ -261,12 +283,6 @@ Shared include file with forward typedefs
 @parent: 
 @send_func: 
 
-<!-- ##### STRUCT TnyAccountStore ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT TnyStream ##### -->
 <para>
 
@@ -283,26 +299,49 @@ Shared include file with forward typedefs
 @write_func: 
 @flush_func: 
 @close_func: 
-@eos_func: 
+@is_eos_func: 
 @reset_func: 
 @write_to_stream_func: 
 
-<!-- ##### STRUCT TnyAccountStoreIface ##### -->
+<!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
 
 </para>
 
-@parent: 
-@account_changed: 
-@account_inserted: 
-@account_removed: 
-@accounts_reloaded: 
-@get_accounts_func: 
-@add_store_account_func: 
-@add_transport_account_func: 
-@get_cache_dir_func: 
-@get_device_func: 
-@alert_func: 
+@self: 
+@prompt: 
+@cancel: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### USER_FUNCTION TnyRefreshFolderCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyRefreshFolderStatusCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@what: 
+@status: 
+@user_data: 
+
 
 <!-- ##### STRUCT TnySimpleList ##### -->
 <para>
@@ -323,11 +362,12 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### TYPEDEF TnyFsStreamClass ##### -->
+<!-- ##### STRUCT TnyFsStreamClass ##### -->
 <para>
 
 </para>
 
+@parent: 
 
 <!-- ##### STRUCT TnyFolderStore ##### -->
 <para>
@@ -371,4 +411,14 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
+
+<!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
+@user_data: 
+
 
