@@ -23,7 +23,7 @@ DOC_SOURCE_DIR=$(top_srcdir)/libtinymail
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
 SCANGOBJ_OPTIONS=
 
-TO_IGNORE = \
+TO_SCAN = \
 	--source-dir=$(top_srcdir)/libtinymailui \
 	--source-dir=$(top_srcdir)/libtinymailui-gtk \
 	--source-dir=$(top_srcdir)/libtinymailui-mozembed \
@@ -34,12 +34,12 @@ TO_IGNORE = \
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED" 
 
-SCAN_OPTIONS=$(TO_IGNORE) \
+SCAN_OPTIONS=$(TO_SCAN) \
 	--ignore-headers="`find $(top_srcdir)/libtinymail-camel/camel-lite/ -name \*.h -printf \"%f \"`"
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
-MKDB_OPTIONS=$(TO_IGNORE) --sgml-mode --output-format=xml \
+MKDB_OPTIONS=$(TO_SCAN) --sgml-mode --output-format=xml \
 	--ignore-files="`find $(top_srcdir)/libtinymail-camel/camel-lite/ -printf \"%f \"`"
 
 # Extra options to supply to gtkdoc-mktmpl
