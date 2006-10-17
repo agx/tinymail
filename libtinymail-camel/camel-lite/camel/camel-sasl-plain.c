@@ -95,10 +95,10 @@ plain_challenge (CamelSasl *sasl, GByteArray *token, CamelException *ex)
 	
 	/* FIXME: make sure these are "UTF8-SAFE" */
 	buf = g_byte_array_new ();
-	g_byte_array_append (buf, "", 1);
-	g_byte_array_append (buf, url->user, strlen (url->user));
-	g_byte_array_append (buf, "", 1);
-	g_byte_array_append (buf, url->passwd, strlen (url->passwd));
+	g_byte_array_append (buf, (guchar *) "", 1);
+	g_byte_array_append (buf,(guchar *)  url->user, strlen (url->user));
+	g_byte_array_append (buf,(guchar *)  "", 1);
+	g_byte_array_append (buf, (guchar *) url->passwd, strlen (url->passwd));
 	
 	sasl->authenticated = TRUE;
 	

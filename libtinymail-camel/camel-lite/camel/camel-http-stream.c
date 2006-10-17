@@ -268,7 +268,7 @@ http_get_statuscode (CamelHttpStream *http)
 
 	/* parse the HTTP status code */
 	if (!g_ascii_strncasecmp (buffer, "HTTP/", 5)) {
-		token = http_next_token (buffer);
+		token = http_next_token ((const unsigned char *) buffer);
 		http->statuscode = camel_header_decode_int (&token);
 		return http->statuscode;
 	}

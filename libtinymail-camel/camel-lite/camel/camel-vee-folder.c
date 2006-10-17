@@ -380,11 +380,12 @@ camel_vee_folder_hash_folder(CamelFolder *folder, char buffer[8])
 
 	md5_init(&ctx);
 	tmp = camel_service_get_url((CamelService *)folder->parent_store);
-	md5_update(&ctx, tmp, strlen(tmp));
+	md5_update(&ctx, (unsigned char*) tmp, strlen(tmp));
 	g_free(tmp);
-	md5_update(&ctx, folder->full_name, strlen(folder->full_name));
+	md5_update(&ctx, (unsigned char*)folder->full_name, strlen(folder->full_name));
 	md5_final(&ctx, digest);
-	camel_base64_encode_close(digest, 6, FALSE, buffer, &state, &save);
+
+	camel_base64_encode_close(digest, 6, FALSE, (unsigned char *) buffer, (int*) &state, (int*) &save);
 
 	for (i=0;i<8;i++) {
 		if (buffer[i] == '+')

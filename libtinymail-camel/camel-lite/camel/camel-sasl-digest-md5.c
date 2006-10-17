@@ -544,7 +544,7 @@ digest_hex (guchar *digest, guchar hex[33])
 	
 	/* lowercase hexify that bad-boy... */
 	for (s = digest, p = hex; p < hex + 32; s++, p += 2)
-		sprintf (p, "%.2x", *s);
+		sprintf ((char *) p, "%.2x", *s);
 }
 
 static char *
@@ -566,22 +566,22 @@ compute_response (struct _DigestResponse *resp, const char *passwd, gboolean cli
 	
 	/* compute A1 */
 	md5_init (&ctx);
-	md5_update (&ctx, resp->username, strlen (resp->username));
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, resp->realm, strlen (resp->realm));
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, passwd, strlen (passwd));
+	md5_update (&ctx, (const guchar*) resp->username, strlen (resp->username));
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) resp->realm, strlen (resp->realm));
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) passwd, strlen (passwd));
 	md5_final (&ctx, digest);
 	
 	md5_init (&ctx);
 	md5_update (&ctx, digest, 16);
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, resp->nonce, strlen (resp->nonce));
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, resp->cnonce, strlen (resp->cnonce));
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) resp->nonce, strlen (resp->nonce));
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) resp->cnonce, strlen (resp->cnonce));
 	if (resp->authzid) {
-		md5_update (&ctx, ":", 1);
-		md5_update (&ctx, resp->authzid, strlen (resp->authzid));
+		md5_update (&ctx, (const guchar*) ":", 1);
+		md5_update (&ctx, (const guchar*) resp->authzid, strlen (resp->authzid));
 	}
 	
 	/* hexify A1 */
@@ -592,18 +592,18 @@ compute_response (struct _DigestResponse *resp, const char *passwd, gboolean cli
 	md5_init (&ctx);
 	if (client) {
 		/* we are calculating the client response */
-		md5_update (&ctx, "AUTHENTICATE:", strlen ("AUTHENTICATE:"));
+		md5_update (&ctx, (const guchar*) "AUTHENTICATE:", strlen ("AUTHENTICATE:"));
 	} else {
 		/* we are calculating the server rspauth */
-		md5_update (&ctx, ":", 1);
+		md5_update (&ctx, (const guchar*) ":", 1);
 	}
 	
 	buf = digest_uri_to_string (resp->uri);
-	md5_update (&ctx, buf, strlen (buf));
+	md5_update (&ctx, (const guchar*) buf, strlen (buf));
 	g_free (buf);
 	
 	if (resp->qop == QOP_AUTH_INT || resp->qop == QOP_AUTH_CONF)
-		md5_update (&ctx, ":00000000000000000000000000000000", 33);
+		md5_update (&ctx, (const guchar*) ":00000000000000000000000000000000", 33);
 	
 	/* now hexify A2 */
 	md5_final (&ctx, digest);
@@ -611,17 +611,17 @@ compute_response (struct _DigestResponse *resp, const char *passwd, gboolean cli
 	
 	/* compute KD */
 	md5_init (&ctx);
-	md5_update (&ctx, hex_a1, 32);
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, resp->nonce, strlen (resp->nonce));
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, resp->nc, 8);
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, resp->cnonce, strlen (resp->cnonce));
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, qop_to_string (resp->qop), strlen (qop_to_string (resp->qop)));
-	md5_update (&ctx, ":", 1);
-	md5_update (&ctx, hex_a2, 32);
+	md5_update (&ctx, (const guchar*) hex_a1, 32);
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) resp->nonce, strlen (resp->nonce));
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) resp->nc, 8);
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) resp->cnonce, strlen (resp->cnonce));
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx,(const guchar*)  qop_to_string (resp->qop), strlen (qop_to_string (resp->qop)));
+	md5_update (&ctx, (const guchar*) ":", 1);
+	md5_update (&ctx, (const guchar*) hex_a2, 32);
 	md5_final (&ctx, digest);
 	
 	digest_hex (digest, out);
@@ -649,7 +649,7 @@ generate_response (struct _DigestChallenge *challenge, const char *host,
 	bgen = g_strdup_printf ("%p:%lu:%lu", resp,
 				(unsigned long) getpid (),
 				(unsigned long) time (0));
-	md5_get_digest (bgen, strlen (bgen), digest);
+	md5_get_digest (bgen, strlen (bgen), (guchar*) digest);
 	g_free (bgen);
 	/* take our recommended 64 bits of entropy */
 	resp->cnonce = camel_base64_encode_simple (digest, 8);
@@ -686,7 +686,7 @@ generate_response (struct _DigestChallenge *challenge, const char *host,
 	/* we don't really care about this... */
 	resp->authzid = NULL;
 	
-	compute_response (resp, passwd, TRUE, resp->resp);
+	compute_response (resp, passwd, TRUE, (guchar*) resp->resp);
 	
 	return resp;
 }
@@ -699,7 +699,7 @@ digest_response (struct _DigestResponse *resp)
 	char *buf;
 	
 	buffer = g_byte_array_new ();
-	g_byte_array_append (buffer, "username=\"", 10);
+	g_byte_array_append (buffer, (guchar*) "username=\"", 10);
 	if (resp->charset) {
 		/* Encode the username using the requested charset */
 		char *username, *outbuf;
@@ -732,61 +732,61 @@ digest_response (struct _DigestResponse *resp)
 		if (cd != (iconv_t) -1)
 			e_iconv_close (cd);
 		
-		g_byte_array_append (buffer, username, strlen (username));
+		g_byte_array_append (buffer, (guchar *) username, strlen (username));
 		g_free (username);
 	} else {
-		g_byte_array_append (buffer, resp->username, strlen (resp->username));
+		g_byte_array_append (buffer, (guchar *) resp->username, strlen (resp->username));
 	}
 	
-	g_byte_array_append (buffer, "\",realm=\"", 9);
-	g_byte_array_append (buffer, resp->realm, strlen (resp->realm));
+	g_byte_array_append (buffer, (guchar *) "\",realm=\"", 9);
+	g_byte_array_append (buffer,(guchar *)  resp->realm, strlen (resp->realm));
 	
-	g_byte_array_append (buffer, "\",nonce=\"", 9);
-	g_byte_array_append (buffer, resp->nonce, strlen (resp->nonce));
+	g_byte_array_append (buffer, (guchar *) "\",nonce=\"", 9);
+	g_byte_array_append (buffer, (guchar *) resp->nonce, strlen (resp->nonce));
 	
-	g_byte_array_append (buffer, "\",cnonce=\"", 10);
-	g_byte_array_append (buffer, resp->cnonce, strlen (resp->cnonce));
+	g_byte_array_append (buffer, (guchar *) "\",cnonce=\"", 10);
+	g_byte_array_append (buffer, (guchar *) resp->cnonce, strlen (resp->cnonce));
 	
-	g_byte_array_append (buffer, "\",nc=", 5);
-	g_byte_array_append (buffer, resp->nc, 8);
+	g_byte_array_append (buffer, (guchar *) "\",nc=", 5);
+	g_byte_array_append (buffer,(guchar *)  resp->nc, 8);
 	
-	g_byte_array_append (buffer, ",qop=", 5);
+	g_byte_array_append (buffer, (guchar *) ",qop=", 5);
 	str = qop_to_string (resp->qop);
-	g_byte_array_append (buffer, str, strlen (str));
+	g_byte_array_append (buffer, (guchar *) str, strlen (str));
 	
-	g_byte_array_append (buffer, ",digest-uri=\"", 13);
+	g_byte_array_append (buffer, (guchar *) ",digest-uri=\"", 13);
 	buf = digest_uri_to_string (resp->uri);
-	g_byte_array_append (buffer, buf, strlen (buf));
+	g_byte_array_append (buffer, (guchar *) buf, strlen (buf));
 	g_free (buf);
 	
-	g_byte_array_append (buffer, "\",response=", 11);
-	g_byte_array_append (buffer, resp->resp, 32);
+	g_byte_array_append (buffer, (guchar *) "\",response=", 11);
+	g_byte_array_append (buffer, (guchar *) resp->resp, 32);
 	
 	if (resp->maxbuf > 0) {
-		g_byte_array_append (buffer, ",maxbuf=", 8);
+		g_byte_array_append (buffer, (guchar *) ",maxbuf=", 8);
 		buf = g_strdup_printf ("%u", resp->maxbuf);
-		g_byte_array_append (buffer, buf, strlen (buf));
+		g_byte_array_append (buffer, (guchar *) buf, strlen (buf));
 		g_free (buf);
 	}
 	
 	if (resp->charset) {
-		g_byte_array_append (buffer, ",charset=", 9);
-		g_byte_array_append (buffer, resp->charset, strlen (resp->charset));
+		g_byte_array_append (buffer, (guchar *) ",charset=", 9);
+		g_byte_array_append (buffer, (guchar *) resp->charset, strlen ((char *) resp->charset));
 	}
 	
 	if (resp->cipher != CIPHER_INVALID) {
 		str = cipher_to_string (resp->cipher);
 		if (str) {
-			g_byte_array_append (buffer, ",cipher=\"", 9);
-			g_byte_array_append (buffer, str, strlen (str));
-			g_byte_array_append (buffer, "\"", 1);
+			g_byte_array_append (buffer, (guchar *) ",cipher=\"", 9);
+			g_byte_array_append (buffer, (guchar *) str, strlen (str));
+			g_byte_array_append (buffer, (guchar *) "\"", 1);
 		}
 	}
 	
 	if (resp->authzid) {
-		g_byte_array_append (buffer, ",authzid=\"", 10);
-		g_byte_array_append (buffer, resp->authzid, strlen (resp->authzid));
-		g_byte_array_append (buffer, "\"", 1);
+		g_byte_array_append (buffer, (guchar *) ",authzid=\"", 10);
+		g_byte_array_append (buffer, (guchar *) resp->authzid, strlen (resp->authzid));
+		g_byte_array_append (buffer, (guchar *) "\"", 1);
 	}
 	
 	return buffer;
@@ -819,7 +819,7 @@ digest_md5_challenge (CamelSasl *sasl, GByteArray *token, CamelException *ex)
 			return NULL;
 		}
 		
-		tokens = g_strndup (token->data, token->len);
+		tokens = g_strndup ((gchar *) token->data, token->len);
 		priv->challenge = parse_server_challenge (tokens, &abort);
 		g_free (tokens);
 		if (!priv->challenge || abort) {
@@ -853,7 +853,7 @@ digest_md5_challenge (CamelSasl *sasl, GByteArray *token, CamelException *ex)
 		break;
 	case STATE_FINAL:
 		if (token->len)
-			tokens = g_strndup (token->data, token->len);
+			tokens = g_strndup ((gchar *) token->data, token->len);
 		else
 			tokens = NULL;
 		

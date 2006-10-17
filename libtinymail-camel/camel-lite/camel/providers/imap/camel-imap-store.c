@@ -1910,7 +1910,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 			for (i = 0; i < response->untagged->len; i++) {
 				resp = response->untagged->pdata[i];
 				
-				if (!imap_parse_list_response (imap_store, resp, &flags, NULL, &thisone))
+				if (!imap_parse_list_response (imap_store, resp, (int *) &flags, NULL, &thisone))
 					continue;
 				
 				if (!strcmp (parent_name, thisone)) {
@@ -3004,7 +3004,7 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 	
 	ba = g_byte_array_new ();
 	while ((nread = camel_stream_buffer_gets (stream, linebuf, sizeof (linebuf))) > 0) {
-		g_byte_array_append (ba, linebuf, nread);
+		g_byte_array_append (ba, (const guchar*) linebuf, nread);
 		if (linebuf[nread - 1] == '\n')
 			break;
 	}
@@ -3036,7 +3036,7 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 		nread--;
 	}
 	
-	*dest = ba->data;
+	*dest = (char *) ba->data;
 	g_byte_array_free (ba, FALSE);
 	
 	return nread;

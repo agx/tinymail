@@ -123,7 +123,7 @@ imap_namespace_decode (const char **in, struct _namespace **namespace)
 			}
 			
 			/* decode IMAP's modified UTF-7 into UTF-8 */
-			node->prefix = imap_mailbox_decode (astring, len);
+			node->prefix = imap_mailbox_decode ((const unsigned char *) astring, len);
 			g_free (astring);
 			if (!node->prefix) {
 				g_free (node);
@@ -384,7 +384,7 @@ imap_parse_list_response (CamelImapStore *store, const char *buf, int *flags, ch
 
 		char *mailbox;
 
-		mailbox = imap_mailbox_decode (astring, strlen (astring));
+		mailbox = imap_mailbox_decode ((const unsigned char *) astring, strlen (astring));
 		g_free (astring);
 		if (!mailbox)
 			return FALSE;
@@ -966,7 +966,7 @@ imap_body_decode (const char **in, CamelMessageContentInfo *ci, CamelFolder *fol
 		
 		/* size */
 		size = strtoul ((const char *) inptr, &p, 10);
-		inptr = (const unsigned char *) p;
+		inptr = (const char *) p;
 		
 		if (camel_content_type_is (ctype, "message", "rfc822")) {
 			/* body_type_msg */
@@ -989,14 +989,14 @@ imap_body_decode (const char **in, CamelMessageContentInfo *ci, CamelFolder *fol
 			
 			/* lines */
 			strtoul ((const char *) inptr, &p, 10);
-			inptr = (const unsigned char *) p;
+			inptr = (const char *) p;
 		} else if (camel_content_type_is (ctype, "text", "*")) {
 			if (*inptr++ != ' ')
 				goto exception;
 			
 			/* lines */
 			strtoul ((const char *) inptr, &p, 10);
-			inptr = (const unsigned char *) p;
+			inptr = (const char *) p;
 		} else {
 			/* body_type_basic */
 		}

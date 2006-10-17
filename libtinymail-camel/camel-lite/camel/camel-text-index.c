@@ -1460,14 +1460,14 @@ text_index_name_add_buffer(CamelIndexName *idn, const char *buffer, size_t len)
 		return 0;
 	}
 
-	ptr = buffer;
-	ptrend = buffer+len;
+	ptr = (const unsigned char *) buffer;
+	ptrend = (const unsigned char *) buffer+len;
 	while ((c = camel_utf8_next(&ptr, ptrend))) {
 		if (g_unichar_isalnum(c)) {
 			c = g_unichar_tolower(c);
-			utf8len = g_unichar_to_utf8(c, utf8);
+			utf8len = g_unichar_to_utf8(c, (gchar *) utf8);
 			utf8[utf8len] = 0;
-			g_string_append(p->buffer, utf8);
+			g_string_append(p->buffer, (gchar *) utf8);
 		} else {
 			if (p->buffer->len > 0 && p->buffer->len <= CAMEL_TEXT_INDEX_MAX_WORDLEN) {
 				text_index_name_add_word(idn, p->buffer->str);

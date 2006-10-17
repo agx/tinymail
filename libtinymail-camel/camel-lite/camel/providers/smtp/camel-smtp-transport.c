@@ -619,7 +619,7 @@ esmtp_get_authtypes (const unsigned char *buffer)
 		while (*end && !isspace ((int) *end))
 			end++;
 		
-		type = g_strndup (start, end - start);
+		type = g_strndup ((gchar*) start, end - start);
 		g_hash_table_insert (table, type, type);
 		
 		/* advance to the next token */
@@ -790,8 +790,9 @@ smtp_decode_status_code (const char *in, size_t len)
 	unsigned char *inptr, *outptr;
 	const unsigned char *inend;
 	char *outbuf;
-	
-	outptr = outbuf = g_malloc (len + 1);
+
+	outbuf = (char *) g_malloc (len + 1);
+	outptr = (unsigned char *) outbuf;
 	
 	inptr = (unsigned char *) in;
 	inend = inptr + len;
@@ -976,7 +977,7 @@ smtp_helo (CamelSmtpTransport *transport, CamelException *ex)
 						g_hash_table_destroy (transport->authtypes);
 					}
 					
-					transport->authtypes = esmtp_get_authtypes (token);
+					transport->authtypes = esmtp_get_authtypes ((const unsigned char *) token);
 				}
 			}
 		}

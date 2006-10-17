@@ -654,7 +654,7 @@ cert_fingerprint(CERTCertificate *cert)
 	int i;
 	const char tohex[16] = "0123456789abcdef";
 
-	md5_get_digest (cert->derCert.data, cert->derCert.len, md5sum);
+	md5_get_digest ((const gchar *) cert->derCert.data, cert->derCert.len, md5sum);
 	for (i=0,f = fingerprint; i<16; i++) {
 		unsigned int c = md5sum[i];
 
@@ -672,7 +672,7 @@ cert_fingerprint(CERTCertificate *cert)
 
 	fingerprint[47] = 0;
 
-	return g_strdup(fingerprint);
+	return g_strdup((gchar*) fingerprint);
 }
 
 /* lookup a cert uses fingerprint to index an on-disk file */
@@ -806,7 +806,7 @@ camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertificate
 	
 	stream = camel_stream_fs_new_with_name (path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 	if (stream != NULL) {
-		if (camel_stream_write (stream, ccert->rawcert->data, ccert->rawcert->len) == -1) {
+		if (camel_stream_write (stream, (const char *) ccert->rawcert->data, ccert->rawcert->len) == -1) {
 			g_warning ("Could not save cert: %s: %s", path, strerror (errno));
 			g_unlink (path);
 		}
