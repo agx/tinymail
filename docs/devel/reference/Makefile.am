@@ -18,25 +18,26 @@ DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 # gtk-doc will search all .c & .h files beneath here for inline comments
 # documenting the functions and macros.
 # e.g. DOC_SOURCE_DIR=../../../gtk
-DOC_SOURCE_DIR=\
-	$(top_srcdir)/libtinymail \
-	$(top_srcdir)/libtinymailui \
-	$(top_srcdir)/libtinymailui-gtk \
-	$(top_srcdir)/libtinymail-camel \
-	$(top_srcdir)/libtinymail-gnomevfs \
-	$(top_srcdir)/libtinymailui-mozembed \
-	$(top_srcdir)/libtinymail-gnome-desktop
+DOC_SOURCE_DIR=$(top_srcdir)/libtinymail
 
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
 SCANGOBJ_OPTIONS=
 
+SCAN_OPTIONS=\
+	--source-dir=$(top_srcdir)/libtinymailui \
+	--source-dir=$(top_srcdir)/libtinymailui \
+	--source-dir=$(top_srcdir)/libtinymailui-gtk \
+	--source-dir=$(top_srcdir)/libtinymailui-mozembed \
+	--source-dir=$(top_srcdir)/libtinymail-camel \
+	--source-dir=$(top_srcdir)/libtinymail-gnomevfs \
+	--source-dir=$(top_srcdir)/libtinymail-gnome-desktop
+
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED" 
-SCAN_OPTIONS=
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
-MKDB_OPTIONS=--sgml-mode --output-format=xml
+MKDB_OPTIONS=$SCAN_OPTIONS --sgml-mode --output-format=xml
 
 # Extra options to supply to gtkdoc-mktmpl
 # e.g. MKTMPL_OPTIONS=--only-section-tmpl
@@ -54,7 +55,7 @@ CFILE_GLOB=$(top_srcdir)/libtinymail/*.c $(top_srcdir)/libtinymailui/*.c $(top_s
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=tny-shared.h *-priv.h camel-*.h e-*.h
+IGNORE_HFILES=tny-shared.h *-priv.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
