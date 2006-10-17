@@ -471,7 +471,7 @@ cobject_state_read(CamelObject *obj, FILE *fp)
 			switch(argv->argv[argv->argc].tag & CAMEL_ARG_TYPE) {
 			case CAMEL_ARG_INT:
 			case CAMEL_ARG_BOO:
-				if (camel_file_util_decode_uint32(fp, &argv->argv[argv->argc].ca_int) == -1)
+				if (camel_file_util_decode_uint32(fp, (guint32*) &argv->argv[argv->argc].ca_int) == -1)
 					goto cleanup;
 				break;
 			case CAMEL_ARG_STR:

@@ -237,7 +237,7 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 
 	count = 0;
 	total = high-low+1;
-	while ((ret = camel_nntp_stream_line(store->stream, (unsigned char **)&line, &len)) > 0) {
+	while ((ret = camel_nntp_stream_line(store->stream, (unsigned char **)&line, (unsigned int *) &len)) > 0) {
 		camel_operation_progress(NULL, (count * 100) / total);
 		count++;
 		n = strtoul(line, &tab, 10);
