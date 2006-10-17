@@ -1,6 +1,10 @@
 2006-10-17  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Added libtinymail-camel/camel-lite
+	* Made a huge amount of compiler warning fixes to libtinymail-camel/camel-lite
+	* Reorganization of some build scripts
+	* Fixed the tests and unit tests
+	* Fixed the documentation build procedure
 
 2006-10-16  Philip Van Hoof <pvanhoof@gnome.org>
 
