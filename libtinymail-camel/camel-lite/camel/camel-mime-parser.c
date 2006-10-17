@@ -368,7 +368,7 @@ byte_array_to_string(GByteArray *array)
 		return NULL;
 
 	if (array->len == 0 || array->data[array->len-1] != '\0')
-		g_byte_array_append(array, "", 1);
+		g_byte_array_append(array, (guchar*)"", 1);
 
 	return (const char *) array->data;
 }
@@ -1041,7 +1041,7 @@ folder_scan_skip_line(struct _header_scan_state *s, GByteArray *save)
 		}
 
 		if (save)
-			g_byte_array_append(save, s->inptr, inptr-s->inptr);
+			g_byte_array_append(save, (guchar*)s->inptr, inptr-s->inptr);
 
 		s->inptr = inptr;
 
@@ -1714,11 +1714,11 @@ tail_recurse:
 					if (h->prestage > 0) {
 						if (h->posttext == NULL)
 							h->posttext = g_byte_array_new();
-						g_byte_array_append(h->posttext, *databuffer, *datalength);
+						g_byte_array_append(h->posttext, (guchar*) *databuffer, *datalength);
 					} else {
 						if (h->pretext == NULL)
 							h->pretext = g_byte_array_new();
-						g_byte_array_append(h->pretext, *databuffer, *datalength);
+						g_byte_array_append(h->pretext, (guchar*) *databuffer, *datalength);
 					}
 				}
 			} while (hb==h && *datalength>0);
