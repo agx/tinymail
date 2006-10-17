@@ -28,7 +28,10 @@ A abstract type that defines a folder
 
 </para>
 
-@tnyfolderiface: the object which received the signal.
+@: 
+@:
+
+@tnyfolder: the object which received the signal.
 @arg1: 
 
 <!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
@@ -36,7 +39,9 @@ A abstract type that defines a folder
 
 </para>
 
-@tnyfolderiface: the object which received the signal.
+@:
+
+@tnyfolder: the object which received the signal.
 
 <!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
