@@ -143,7 +143,6 @@ static GStaticRecMutex type_lock = G_STATIC_REC_MUTEX_INIT;
 static GMutex *ref_lock;
 
 static GHashTable *type_table;
-// static EMemChunk *type_chunks;
 
 /* fundamental types are accessed via global */
 CamelType camel_object_type;
@@ -211,9 +210,6 @@ camel_type_init(void)
 		return;
 
 	init = TRUE;
-	//pair_chunks = e_memchunk_new(16, sizeof(CamelHookPair));
-	//hook_chunks = e_memchunk_new(16, sizeof(CamelHookList));
-	//type_chunks = e_memchunk_new(32, sizeof(CamelType));
 	type_table = g_hash_table_new(NULL, NULL);
 	ref_lock = g_mutex_new();
 }
@@ -877,15 +873,7 @@ camel_object_unref(void *vo)
 	register CamelObjectClass *klass, *k;
 	CamelHookList *hooks = NULL;
 
-	if (!CAMEL_IS_OBJECT (o))
-	{
-		printf ("BREAK HERE\n");		
-		printf ("BREAK HERE\n");
-		printf ("BREAK HERE\n");
-	}
-	
 	g_return_if_fail(CAMEL_IS_OBJECT(o));
-	
 	klass = o->klass;
 
 	if (o->hooks)
@@ -928,7 +916,9 @@ camel_object_unref(void *vo)
 
 	CLASS_LOCK(klass);
 
-	g_slice_free1 (klass->object_size, o);
+	if (o->ref_count <= 0)
+		g_slice_free1 (klass->object_size, o);
+
 	CLASS_UNLOCK(klass);
 }
 
