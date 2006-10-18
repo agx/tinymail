@@ -224,7 +224,6 @@ struct _CamelFolderSummary {
 	guint32 content_info_size;
 
 	/* memory allocators (setup automatically) */
-	struct _EMemChunk *message_info_chunks;
 	struct _EMemChunk *content_info_chunks;
 
 	char *summary_path;

@@ -143,7 +143,7 @@ static GStaticRecMutex type_lock = G_STATIC_REC_MUTEX_INIT;
 static GMutex *ref_lock;
 
 static GHashTable *type_table;
-static EMemChunk *type_chunks;
+// static EMemChunk *type_chunks;
 
 /* fundamental types are accessed via global */
 CamelType camel_object_type;
@@ -164,7 +164,7 @@ pair_alloc(void)
 	CamelHookPair *pair;
 
 	P_LOCK(chunks_lock);
-	pair = e_memchunk_alloc(pair_chunks);
+	pair = g_slice_new (CamelHookPair);
 	pair->id = pair_id++;
 	if (pair_id == 0)
 		pair_id = 1;
@@ -176,10 +176,8 @@ pair_alloc(void)
 static void
 pair_free(CamelHookPair *pair)
 {
-	g_assert(pair_chunks != NULL);
-
 	P_LOCK(chunks_lock);
-	e_memchunk_free(pair_chunks, pair);
+	g_slice_free (CamelHookPair, pair);
 	P_UNLOCK(chunks_lock);
 }
 
@@ -189,7 +187,7 @@ hooks_alloc(void)
 	CamelHookList *hooks;
 
 	P_LOCK(chunks_lock);
-	hooks = e_memchunk_alloc(hook_chunks);
+	hooks = g_slice_new (CamelHookList);
 	P_UNLOCK(chunks_lock);
 
 	return hooks;
@@ -198,10 +196,8 @@ hooks_alloc(void)
 static void
 hooks_free(CamelHookList *hooks)
 {
-	g_assert(hook_chunks != NULL);
-
 	P_LOCK(chunks_lock);
-	e_memchunk_free(hook_chunks, hooks);
+	g_slice_free (CamelHookList, hooks);
 	P_UNLOCK(chunks_lock);
 }
 
@@ -215,9 +211,9 @@ camel_type_init(void)
 		return;
 
 	init = TRUE;
-	pair_chunks = e_memchunk_new(16, sizeof(CamelHookPair));
-	hook_chunks = e_memchunk_new(16, sizeof(CamelHookList));
-	type_chunks = e_memchunk_new(32, sizeof(CamelType));
+	//pair_chunks = e_memchunk_new(16, sizeof(CamelHookPair));
+	//hook_chunks = e_memchunk_new(16, sizeof(CamelHookList));
+	//type_chunks = e_memchunk_new(32, sizeof(CamelType));
 	type_table = g_hash_table_new(NULL, NULL);
 	ref_lock = g_mutex_new();
 }
@@ -762,12 +758,12 @@ co_type_register(CamelType parent, const char * name,
 		return NULL;
 	}
 
-	klass = g_malloc0(klass_size);
+	klass = g_slice_alloc (klass_size);
 	klass->klass_size = klass_size;
 	klass->object_size = object_size;
 	klass->lock = g_mutex_new();
-	klass->instance_chunks = e_memchunk_new(8, object_size);
-	
+	klass->hooks = NULL;
+
 	klass->parent = parent;
 	if (parent) {
 		klass->next = parent->child;
@@ -848,15 +844,7 @@ camel_object_new(CamelType type)
 
 	CLASS_LOCK(type);
 
-	o = e_memchunk_alloc0(type->instance_chunks);
-
-#ifdef CAMEL_OBJECT_TRACK_INSTANCES
-	if (type->instances)
-		type->instances->prev = o;
-	o->next = type->instances;
-	o->prev = NULL;
-	type->instances = o;
-#endif
+	o = g_slice_alloc0 (type->object_size);
 
 	CLASS_UNLOCK(type);
 
@@ -939,15 +927,8 @@ camel_object_unref(void *vo)
 	o->magic = CAMEL_OBJECT_FINALISED_MAGIC;
 
 	CLASS_LOCK(klass);
-#ifdef CAMEL_OBJECT_TRACK_INSTANCES
-	if (o->prev)
-		o->prev->next = o->next;
-	else
-		klass->instances = o->next;
-	if (o->next)
-		o->next->prev = o->prev;
-#endif
-	e_memchunk_free(klass->instance_chunks, o);
+
+	g_slice_free1 (klass->object_size, o);
 	CLASS_UNLOCK(klass);
 }
 
@@ -1903,9 +1884,6 @@ static void
 object_class_dump_tree_rec(CamelType root, int depth)
 {
 	char *p;
-#ifdef CAMEL_OBJECT_TRACK_INSTANCES
-	struct _CamelObject *o;
-#endif
 
 	p = alloca(depth*2+1);
 	memset(p, ' ', depth*2);
@@ -1923,22 +1901,7 @@ object_class_dump_tree_rec(CamelType root, int depth)
 				pair = pair->next;
 			}
 		}
-#ifdef CAMEL_OBJECT_TRACK_INSTANCES
-		o = root->instances;
-		while (o) {
-			printf("%s instance %p [%d]\n", p, o, o->ref_count);
-			/* todo: should lock hooks while it scans them */
-			if (o->hooks) {
-				CamelHookPair *pair = o->hooks->list;
 
-				while (pair) {
-					printf("%s  hook '%s' func %p data %p\n", p, pair->name, pair->func.event, pair->data);
-					pair = pair->next;
-				}
-			}
-			o = o->next;
-		}
-#endif
 		CLASS_UNLOCK(root);
 
 		if (root->child)

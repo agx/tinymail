@@ -127,7 +127,6 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	s->message_info_size = sizeof(CamelMessageInfoBase);
 	s->content_info_size = sizeof(CamelMessageContentInfo);
 
-	s->message_info_chunks = NULL;
 	s->content_info_chunks = NULL;
 
 #if defined (DOESTRV) || defined (DOEPOOLV)
@@ -157,6 +156,12 @@ static void free_o_name(void *key, void *value, void *data)
 }
 
 static void
+foreach_msginfo (gpointer data, gpointer user_data)
+{
+	g_slice_free1 ((gint)user_data, data);
+}
+
+static void
 camel_folder_summary_finalize (CamelObject *obj)
 {
 	struct _CamelFolderSummaryPrivate *p;
@@ -165,11 +170,11 @@ camel_folder_summary_finalize (CamelObject *obj)
 	p = _PRIVATE(obj);
 
 	camel_folder_summary_clear(s);
-	
 	if (s->file)
 		g_mapped_file_free (s->file);
 	s->file = NULL;
-	
+
+	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
 	g_ptr_array_free(s->messages, TRUE);
 	g_hash_table_destroy(s->messages_uid);
 
@@ -178,8 +183,6 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	g_free(s->summary_path);
 
-	if (s->message_info_chunks)
-		e_memchunk_destroy(s->message_info_chunks);
 	if (s->content_info_chunks)
 		e_memchunk_destroy(s->content_info_chunks);
 
@@ -1987,10 +1990,7 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 
 	g_free(mi->references);
 
-	if (s)
-		e_memchunk_free(s->message_info_chunks, mi);
-	else
-		g_free(mi);
+	g_slice_free1 (s->message_info_size, mi);
 }
 
 static CamelMessageContentInfo *
@@ -2735,12 +2735,10 @@ camel_message_info_new (CamelFolderSummary *s)
 
 	if (s) {
 		CAMEL_SUMMARY_LOCK(s, alloc_lock);
-		if (s->message_info_chunks == NULL)
-			s->message_info_chunks = e_memchunk_new(32, s->message_info_size);
-		info = e_memchunk_alloc0(s->message_info_chunks);
+		info = g_slice_alloc0 (s->message_info_size);
 		CAMEL_SUMMARY_UNLOCK(s, alloc_lock);
 	} else {
-		info = g_malloc0(sizeof(CamelMessageInfoBase));
+		info = g_slice_alloc0 (s->message_info_size);
 	}
 
 	info->refcount = 1;
