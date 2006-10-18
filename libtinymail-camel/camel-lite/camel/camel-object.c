@@ -916,8 +916,7 @@ camel_object_unref(void *vo)
 
 	CLASS_LOCK(klass);
 
-	if (o->ref_count <= 0)
-		g_slice_free1 (klass->object_size, o);
+	g_slice_free1 (klass->object_size, o);
 
 	CLASS_UNLOCK(klass);
 }
