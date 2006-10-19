@@ -1372,8 +1372,7 @@ search_get_size (struct _ESExp *f, int argc, struct _ESExpResult **argv, CamelFo
 	/* are we inside a match-all? */
 	if (s->current) {
 		r = e_sexp_result_new (f, ESEXP_RES_INT);
-		//r->value.number = camel_message_info_size(s->current) / 1024;
-		r->value.number = 0;
+		r->value.number = camel_message_info_size(s->current) / 1024;
 	} else {
 		r = e_sexp_result_new (f, ESEXP_RES_ARRAY_PTR);
 		r->value.ptrarray = g_ptr_array_new ();

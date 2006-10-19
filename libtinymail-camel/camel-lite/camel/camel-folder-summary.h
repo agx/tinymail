@@ -122,11 +122,13 @@ typedef struct _CamelSummaryMessageID {
 	} id;
 } CamelSummaryMessageID;
 
+#ifdef NON_TINYMAIL_FEATURES
 /* summary references is a fixed size array of references */
 typedef struct _CamelSummaryReferences {
 	int size;
 	CamelSummaryMessageID references[1];
 } CamelSummaryReferences;
+#endif
 
 /* accessor id's */
 enum {
@@ -174,13 +176,17 @@ struct _CamelMessageInfoBase {
 	const char *mlist;
 
 	guint32 flags;
-	//guint32 size;
-
+#ifdef NON_TINYMAIL_FEATURES
+	guint32 size;
+#endif
 	time_t date_sent;
 	time_t date_received;
 
 	CamelSummaryMessageID message_id;
-	//CamelSummaryReferences *references;/* from parent to root */
+
+#ifdef NON_TINYMAIL_FEATURES
+	CamelSummaryReferences *references;/* from parent to root */
+#endif
 
 	struct _CamelFlag *user_flags;
 	struct _CamelTag *user_tags;
@@ -396,13 +402,18 @@ time_t camel_message_info_time(const CamelMessageInfo *mi, int id);
 #define camel_message_info_mlist(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_MLIST))
 
 #define camel_message_info_flags(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_FLAGS)
-//#define camel_message_info_size(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE)
+
+#ifdef NON_TINYMAIL_FEATURES
+#define camel_message_info_size(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE)
+#endif
 
 #define camel_message_info_date_sent(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_SENT)
 #define camel_message_info_date_received(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_RECEIVED)
 
 #define camel_message_info_message_id(mi) ((const CamelSummaryMessageID *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_MESSAGE_ID))
-//#define camel_message_info_references(mi) ((const CamelSummaryReferences *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_REFERENCES))
+#ifdef NON_TINYMAIL_FEATURES
+#define camel_message_info_references(mi) ((const CamelSummaryReferences *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_REFERENCES))
+#endif
 #define camel_message_info_user_flags(mi) ((const CamelFlag *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_USER_FLAGS))
 #define camel_message_info_user_tags(mi) ((const CamelTag *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_USER_TAGS))
 

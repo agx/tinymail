@@ -995,8 +995,9 @@ camel_folder_summary_info_new_from_parser(CamelFolderSummary *s, CamelMimeParser
 		}
 
 		CAMEL_SUMMARY_UNLOCK(s, filter_lock);
-
-		//((CamelMessageInfoBase *)info)->size = camel_mime_parser_tell(mp) - start;
+#ifdef NON_TINYMAIL_FEATURES
+		((CamelMessageInfoBase *)info)->size = camel_mime_parser_tell(mp) - start;
+#endif
 	}
 	return info;
 }
@@ -1750,7 +1751,8 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 		memcpy(mi->message_id.id.hash, digest, sizeof(mi->message_id.id.hash));
 		g_free(msgid);
 	}
-	
+
+#ifdef NON_TINYMAIL_FEATURES
 	/* decode our references and in-reply-to headers */
 	refs = camel_header_references_decode (camel_header_raw_find (&h, "references", NULL));
 	irt = camel_header_references_inreplyto_decode (camel_header_raw_find (&h, "in-reply-to", NULL));
@@ -1765,20 +1767,20 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 			
 			refs = irt;
 		}
-		
 		count = camel_header_references_list_size(&refs);
-		//mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
+		mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
 		count = 0;
 		scan = refs;
 		while (scan) {
 			md5_get_digest(scan->id, strlen(scan->id), digest);
-			//memcpy(mi->references->references[count].id.hash, digest, sizeof(mi->message_id.id.hash));
+			memcpy(mi->references->references[count].id.hash, digest, sizeof(mi->message_id.id.hash));
 			count++;
 			scan = scan->next;
 		}
-		//mi->references->size = count;
+		mi->references->size = count;
 		camel_header_references_list_clear(&refs);
 	}
+#endif
 
 	return (CamelMessageInfo *)mi;
 }
@@ -1790,7 +1792,11 @@ message_info_load(CamelFolderSummary *s)
 	CamelMessageInfoBase *mi;
 	guint count, len;
 	unsigned char *ptrchr = s->filepos;
-	unsigned int i, size;
+	unsigned int i;
+
+#ifndef NON_TINYMAIL_FEATURES
+	unsigned int size;
+#endif
 
 	mi = (CamelMessageInfoBase *)camel_message_info_new(s);
 
@@ -1804,10 +1810,11 @@ message_info_load(CamelFolderSummary *s)
 	ptrchr += len;
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
-
-	//ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
+#ifdef NON_TINYMAIL_FEATURES
+	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
+#else
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &size, FALSE);
-
+#endif
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_sent);
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_received);
 
@@ -1844,25 +1851,36 @@ message_info_load(CamelFolderSummary *s)
 	mi->content = NULL;
 
 	s->filepos = ptrchr;
+
+#ifdef NON_TINYMAIL_FEATURES
 	mi->message_id.id.part.hi = g_ntohl(get_unaligned_u32(s->filepos)); 
 	s->filepos += 4;
 	mi->message_id.id.part.lo = g_ntohl(get_unaligned_u32(s->filepos)); 
 	s->filepos += 4;
+#else
+	s->filepos += 8;
+#endif
 
 	ptrchr = (unsigned char*) s->filepos;
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
 
-	//mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
-	//mi->references->size = count;
-	
+#ifdef NON_TINYMAIL_FEATURES
+	mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
+	mi->references->size = count;
+#endif
+
 	s->filepos = ptrchr;
 
+#ifdef NON_TINYMAIL_FEATURES
 	for (i=0;i<count;i++) {
-		// mi->references->references[i].id.part.hi = g_ntohl(get_unaligned_u32(s->filepos)); 
+		mi->references->references[i].id.part.hi = g_ntohl(get_unaligned_u32(s->filepos)); 
 		s->filepos += 4;
-		//  mi->references->references[i].id.part.lo = g_ntohl(get_unaligned_u32(s->filepos));
+		mi->references->references[i].id.part.lo = g_ntohl(get_unaligned_u32(s->filepos));
 		s->filepos += 4;
 	}
+#else
+	s->filepos += (count * 8);
+#endif
 
 	ptrchr = s->filepos;
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
@@ -1918,8 +1936,11 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 
 	camel_file_util_encode_string(out, camel_message_info_uid(mi));
 	camel_file_util_encode_uint32(out, mi->flags);
-	//camel_file_util_encode_uint32(out, mi->size);
+#ifdef NON_TINYMAIL_FEATURES
+	camel_file_util_encode_uint32(out, mi->size);
+#else
 	camel_file_util_encode_uint32(out, 0);
+#endif
 	camel_file_util_encode_time_t(out, mi->date_sent);
 	camel_file_util_encode_time_t(out, mi->date_received);
 	camel_file_util_encode_string(out, camel_message_info_subject(mi));
@@ -1931,15 +1952,16 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.hi);
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.lo);
 
-	/*if (mi->references) {
+#ifdef NON_TINYMAIL_FEATURES
+	if (mi->references) {
 		camel_file_util_encode_uint32(out, mi->references->size);
 		for (i=0;i<mi->references->size;i++) {
 			camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.hi);
 			camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.lo);
 		}
-	} else {*/
+	} else {
+#endif
 		camel_file_util_encode_uint32(out, 0);
-	/*}*/
 
 	count = camel_flag_list_size(&mi->user_flags);
 	camel_file_util_encode_uint32(out, count);
@@ -1990,7 +2012,9 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 	} else if (mi->uid_needs_free)
 		g_free (mi->uid);
 
-	//g_free(mi->references);
+#ifdef NON_TINYMAIL_FEATURES
+	g_free(mi->references);
+#endif
 
 	g_slice_free1 (s->message_info_size, mi);
 }
@@ -2852,7 +2876,9 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 	to = (CamelMessageInfoBase *)camel_message_info_new(s);
 
 	to->flags = from->flags;
-	//to->size = from->size;
+#ifdef NON_TINYMAIL_FEATURES
+	to->size = from->size;
+#endif
 	to->date_sent = from->date_sent;
 	to->date_received = from->date_received;
 	to->refcount = 1;
@@ -2866,14 +2892,17 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 	to->to = camel_pstring_strdup(from->to);
 	to->cc = camel_pstring_strdup(from->cc);
 	to->mlist = camel_pstring_strdup(from->mlist);
+
+#ifdef NON_TINYMAIL_FEATURES
 	memcpy(&to->message_id, &from->message_id, sizeof(to->message_id));
 
-	/*if (from->references) {
+	if (from->references) {
 		int len = sizeof(*from->references) + ((from->references->size-1) * sizeof(from->references->references[0]));
 
 		to->references = g_malloc(len);
 		memcpy(to->references, from->references, len);
-	}*/
+	}
+#endif
 
 	flag = from->user_flags;
 	while (flag) {
@@ -2930,8 +2959,10 @@ info_ptr(const CamelMessageInfo *mi, int id)
 		return ((const CamelMessageInfoBase *)mi)->mlist;
 	case CAMEL_MESSAGE_INFO_MESSAGE_ID:
 		return &((const CamelMessageInfoBase *)mi)->message_id;
-	//case CAMEL_MESSAGE_INFO_REFERENCES:
-	//	return ((const CamelMessageInfoBase *)mi)->references;
+#ifdef NON_TINYMAIL_FEATURES
+	case CAMEL_MESSAGE_INFO_REFERENCES:
+		return ((const CamelMessageInfoBase *)mi)->references;
+#endif
 	case CAMEL_MESSAGE_INFO_USER_FLAGS:
 		return ((const CamelMessageInfoBase *)mi)->user_flags;
 	case CAMEL_MESSAGE_INFO_USER_TAGS:
@@ -2947,8 +2978,10 @@ info_uint32(const CamelMessageInfo *mi, int id)
 	switch (id) {
 	case CAMEL_MESSAGE_INFO_FLAGS:
 		return ((const CamelMessageInfoBase *)mi)->flags;
-	//case CAMEL_MESSAGE_INFO_SIZE:
-	//	return ((const CamelMessageInfoBase *)mi)->size;
+#ifdef NON_TINYMAIL_FEATURES
+	case CAMEL_MESSAGE_INFO_SIZE:
+		return ((const CamelMessageInfoBase *)mi)->size;
+#endif
 	default:
 		abort();
 	}

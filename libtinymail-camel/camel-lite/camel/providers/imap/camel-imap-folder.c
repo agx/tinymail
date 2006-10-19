@@ -2077,7 +2077,9 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
 		/* If the message is small or only 1 part, or server doesn't do 4v1 (properly) fetch it in one piece. */
 		if (store->server_level < IMAP_LEVEL_IMAP4REV1
 		    || store->braindamaged
-		    //|| mi->info.size < IMAP_SMALL_BODY_SIZE
+#ifdef NON_TINYMAIL_FEATURES
+		    || mi->info.size < IMAP_SMALL_BODY_SIZE
+#endif
 		    || (!content_info_incomplete(mi->info.content) && !mi->info.content->childs)) {
 			msg = get_message_simple (imap_folder, uid, NULL, ex);
 		} else {
@@ -2543,10 +2545,12 @@ imap_update_summary (CamelFolder *folder, int exists,
 			mi->info.flags |= flags;
 			flags_to_label(folder, mi);
 		}
-		size = GPOINTER_TO_INT (g_datalist_get_data (&data, "RFC822.SIZE"));
-		//if (size)
-			//mi->info.size = size;
 		
+#ifdef NON_TINYMAIL_FEATURES
+		size = GPOINTER_TO_INT (g_datalist_get_data (&data, "RFC822.SIZE"));
+		if (size)
+			mi->info.size = size;
+#endif
 		g_datalist_clear (&data);
 	}
 	g_ptr_array_free (fetch_data, TRUE);

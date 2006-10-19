@@ -2,6 +2,7 @@
 
 	* libtinymail-camel: bugfix in tny-camel-store-account.c
 	* libtinymail-camel/camel-lite: Merged with new stuff from Matthew
+	* Memory consumption reduction in libtinymail-camel/camel-lite
 
 2006-10-18  Philip Van Hoof <pvanhoof@gnome.org>
 
