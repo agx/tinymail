@@ -444,17 +444,17 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 			}
 
 			mi->info.flags |= (camel_message_info_flags(info) & 0xffff);
-			mi->info.size = camel_message_info_size(info);
+			//mi->info.size = camel_message_info_size(info);
 		}
 
 		/* we need to calculate the size ourselves */
-		if (mi->info.size == 0) {
+		/* if (mi->info.size == 0) {
 			CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
 
 			camel_data_wrapper_write_to_stream((CamelDataWrapper *)msg, (CamelStream *)sn);
 			mi->info.size = sn->written;
 			camel_object_unref((CamelObject *)sn);
-		}
+		}*/
 
 		mi->info.flags &= ~(CAMEL_MESSAGE_FOLDER_NOXEV|CAMEL_MESSAGE_FOLDER_FLAGGED);
 		xev = camel_local_summary_encode_x_evolution(cls, mi);

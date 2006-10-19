@@ -996,7 +996,7 @@ camel_folder_summary_info_new_from_parser(CamelFolderSummary *s, CamelMimeParser
 
 		CAMEL_SUMMARY_UNLOCK(s, filter_lock);
 
-		((CamelMessageInfoBase *)info)->size = camel_mime_parser_tell(mp) - start;
+		//((CamelMessageInfoBase *)info)->size = camel_mime_parser_tell(mp) - start;
 	}
 	return info;
 }
@@ -1767,16 +1767,16 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 		}
 		
 		count = camel_header_references_list_size(&refs);
-		mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
+		//mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
 		count = 0;
 		scan = refs;
 		while (scan) {
 			md5_get_digest(scan->id, strlen(scan->id), digest);
-			memcpy(mi->references->references[count].id.hash, digest, sizeof(mi->message_id.id.hash));
+			//memcpy(mi->references->references[count].id.hash, digest, sizeof(mi->message_id.id.hash));
 			count++;
 			scan = scan->next;
 		}
-		mi->references->size = count;
+		//mi->references->size = count;
 		camel_header_references_list_clear(&refs);
 	}
 
@@ -1790,7 +1790,7 @@ message_info_load(CamelFolderSummary *s)
 	CamelMessageInfoBase *mi;
 	guint count, len;
 	unsigned char *ptrchr = s->filepos;
-	unsigned int i;
+	unsigned int i, size;
 
 	mi = (CamelMessageInfoBase *)camel_message_info_new(s);
 
@@ -1805,7 +1805,8 @@ message_info_load(CamelFolderSummary *s)
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
 
-	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
+	//ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
+	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &size, FALSE);
 
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_sent);
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_received);
@@ -1851,15 +1852,15 @@ message_info_load(CamelFolderSummary *s)
 	ptrchr = (unsigned char*) s->filepos;
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
 
-	mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
-	mi->references->size = count;
+	//mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
+	//mi->references->size = count;
 	
 	s->filepos = ptrchr;
 
 	for (i=0;i<count;i++) {
-		mi->references->references[i].id.part.hi = g_ntohl(get_unaligned_u32(s->filepos)); 
+		// mi->references->references[i].id.part.hi = g_ntohl(get_unaligned_u32(s->filepos)); 
 		s->filepos += 4;
-		mi->references->references[i].id.part.lo = g_ntohl(get_unaligned_u32(s->filepos));
+		//  mi->references->references[i].id.part.lo = g_ntohl(get_unaligned_u32(s->filepos));
 		s->filepos += 4;
 	}
 
@@ -1917,7 +1918,8 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 
 	camel_file_util_encode_string(out, camel_message_info_uid(mi));
 	camel_file_util_encode_uint32(out, mi->flags);
-	camel_file_util_encode_uint32(out, mi->size);
+	//camel_file_util_encode_uint32(out, mi->size);
+	camel_file_util_encode_uint32(out, 0);
 	camel_file_util_encode_time_t(out, mi->date_sent);
 	camel_file_util_encode_time_t(out, mi->date_received);
 	camel_file_util_encode_string(out, camel_message_info_subject(mi));
@@ -1929,15 +1931,15 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.hi);
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.lo);
 
-	if (mi->references) {
+	/*if (mi->references) {
 		camel_file_util_encode_uint32(out, mi->references->size);
 		for (i=0;i<mi->references->size;i++) {
 			camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.hi);
 			camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.lo);
 		}
-	} else {
+	} else {*/
 		camel_file_util_encode_uint32(out, 0);
-	}
+	/*}*/
 
 	count = camel_flag_list_size(&mi->user_flags);
 	camel_file_util_encode_uint32(out, count);
@@ -1988,7 +1990,7 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 	} else if (mi->uid_needs_free)
 		g_free (mi->uid);
 
-	g_free(mi->references);
+	//g_free(mi->references);
 
 	g_slice_free1 (s->message_info_size, mi);
 }
@@ -2850,7 +2852,7 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 	to = (CamelMessageInfoBase *)camel_message_info_new(s);
 
 	to->flags = from->flags;
-	to->size = from->size;
+	//to->size = from->size;
 	to->date_sent = from->date_sent;
 	to->date_received = from->date_received;
 	to->refcount = 1;
@@ -2866,12 +2868,12 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 	to->mlist = camel_pstring_strdup(from->mlist);
 	memcpy(&to->message_id, &from->message_id, sizeof(to->message_id));
 
-	if (from->references) {
+	/*if (from->references) {
 		int len = sizeof(*from->references) + ((from->references->size-1) * sizeof(from->references->references[0]));
 
 		to->references = g_malloc(len);
 		memcpy(to->references, from->references, len);
-	}
+	}*/
 
 	flag = from->user_flags;
 	while (flag) {
@@ -2928,8 +2930,8 @@ info_ptr(const CamelMessageInfo *mi, int id)
 		return ((const CamelMessageInfoBase *)mi)->mlist;
 	case CAMEL_MESSAGE_INFO_MESSAGE_ID:
 		return &((const CamelMessageInfoBase *)mi)->message_id;
-	case CAMEL_MESSAGE_INFO_REFERENCES:
-		return ((const CamelMessageInfoBase *)mi)->references;
+	//case CAMEL_MESSAGE_INFO_REFERENCES:
+	//	return ((const CamelMessageInfoBase *)mi)->references;
 	case CAMEL_MESSAGE_INFO_USER_FLAGS:
 		return ((const CamelMessageInfoBase *)mi)->user_flags;
 	case CAMEL_MESSAGE_INFO_USER_TAGS:
@@ -2945,8 +2947,8 @@ info_uint32(const CamelMessageInfo *mi, int id)
 	switch (id) {
 	case CAMEL_MESSAGE_INFO_FLAGS:
 		return ((const CamelMessageInfoBase *)mi)->flags;
-	case CAMEL_MESSAGE_INFO_SIZE:
-		return ((const CamelMessageInfoBase *)mi)->size;
+	//case CAMEL_MESSAGE_INFO_SIZE:
+	//	return ((const CamelMessageInfoBase *)mi)->size;
 	default:
 		abort();
 	}

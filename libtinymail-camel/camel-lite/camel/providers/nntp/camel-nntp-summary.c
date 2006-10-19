@@ -283,7 +283,7 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 			if (mi == NULL) {
 				mi = (CamelMessageInfoBase *)camel_folder_summary_add_from_header(s, headers);
 				if (mi) {
-					mi->size = size;
+					//mi->size = size;
 					cns->high = n;
 					camel_folder_change_info_add_uid(changes, camel_message_info_uid(mi));
 				}

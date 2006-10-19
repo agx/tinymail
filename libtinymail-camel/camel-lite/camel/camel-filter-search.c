@@ -503,7 +503,8 @@ get_size (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessageS
 	ESExpResult *r;
 	
 	r = e_sexp_result_new(f, ESEXP_RES_INT);
-	r->value.number = camel_message_info_size(fms->info) / 1024;
+	// r->value.number = camel_message_info_size(fms->info) / 1024;
+	r->value.number = 0;
 
 	return r;
 }

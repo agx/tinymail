@@ -448,7 +448,7 @@ thread_summary(CamelFolderThread *thread, GPtrArray *summary)
 	for (i=0;i<summary->len;i++) {
 		CamelMessageInfo *mi = summary->pdata[i];
 		const CamelSummaryMessageID *mid = camel_message_info_message_id(mi);
-		const CamelSummaryReferences *references = camel_message_info_references(mi);
+		//const CamelSummaryReferences *references = camel_message_info_references(mi);
 
 		if (mid->id.id) {
 			c = g_hash_table_lookup(id_table, mid);
@@ -473,12 +473,12 @@ thread_summary(CamelFolderThread *thread, GPtrArray *summary)
 		c->message = mi;
 		c->order = i+1;
 		child = c;
-		if (references) {
+		/*if (references) {
 			int j;
 
 			d(printf("references:\n"));
 			for (j=0;j<references->size;j++) {
-				/* should never be empty, but just incase */
+				// should never be empty, but just incase 
 				if (references->references[j].id.id == 0)
 					continue;
 
@@ -492,7 +492,7 @@ thread_summary(CamelFolderThread *thread, GPtrArray *summary)
 					container_parent_child(c, child);
 				child = c;
 			}
-		}
+		}*/
 	}
 
 	d(printf("\n\n"));
