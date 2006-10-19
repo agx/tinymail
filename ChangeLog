@@ -1,3 +1,8 @@
+2006-10-19  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel: bugfix in tny-camel-store-account.c
+	* libtinymail-camel/camel-lite: Merged with new stuff from Matthew
+
 2006-10-18  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite/: EMsgPort, EThread, EMutex and

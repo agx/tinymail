@@ -124,18 +124,15 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 			priv->url_string = camel_url_to_string (url, 0);
 
 			camel_url_free (url);
+
+			priv->service = camel_session_get_service
+				((CamelSession*) priv->session, priv->url_string, 
+				priv->type, priv->ex);
+
+			if (priv->service == NULL)
+				report_error (priv);
 		}
-		if (G_UNLIKELY (priv->service))
-			camel_object_unref (CAMEL_OBJECT (priv->service));
-
-		priv->service = camel_session_get_service
-			((CamelSession*) priv->session, priv->url_string, 
-			priv->type, priv->ex);
-
-		if (priv->service == NULL)
-			report_error (priv);
-	} else
-	if (G_LIKELY (priv->session) && (priv->url_string))
+	} else if (G_LIKELY (priv->session) && (priv->url_string))
 	{
 		/* un officially supported provider */
 
@@ -147,12 +144,8 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 			report_error (priv);
 	}
 
-	if (
-			G_LIKELY (priv->service) 
-		&& G_UNLIKELY (priv->pass_func_set)
-		&& G_UNLIKELY (priv->forget_pass_func_set) 
-		&& G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->user) 
-		&& G_UNLIKELY (priv->host))
+	if ( G_LIKELY (priv->service) && G_UNLIKELY (priv->pass_func_set)
+		&& G_UNLIKELY (priv->forget_pass_func_set) )
 	{
 		priv->connected = FALSE;
 
@@ -345,54 +338,53 @@ tny_camel_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFol
 static void 
 tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query)
 {
-    	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
-	CamelStore *store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex);
 	CamelFolderInfo *iter;
 	guint32 flags;
-    		
+	CamelStore *store = camel_session_get_store ((CamelSession*) apriv->session, 
+			apriv->url_string, &ex);
+
+	if (!store)
+		return;
+
 	flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 		CAMEL_STORE_FOLDER_INFO_RECURSIVE;
 
-       	if (!camel_session_is_online ((CamelSession*) apriv->session))
+	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
-    	/*_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (self), 
+	/*_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (self), 
 					NULL, NULL, NULL); */
 	iter = camel_store_get_folder_info (store, "", flags, &ex);
 	/*_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));*/
-    
-        priv->iter = iter;
+
+	priv->iter = iter;
 	priv->iter_store = store;
 
-    	if (iter)
-    	{
+	if (iter)
+	{
 	  while (iter)
 	  {
 		if (_tny_folder_store_query_passes (query, iter))
 		{
 			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_folder_new ());
-		    
+
 			_tny_camel_folder_set_id (folder, iter->full_name);
 			_tny_camel_folder_set_folder_type (folder, iter);
 			_tny_camel_folder_set_unread_count (folder, iter->unread);
 			_tny_camel_folder_set_all_count (folder, iter->total);
 			_tny_camel_folder_set_name (folder, iter->name);
 			_tny_camel_folder_set_iter (folder, iter);
-		      
 			priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-		      
 			_tny_camel_folder_set_account (folder, TNY_STORE_ACCOUNT (self));
 
 			tny_list_prepend (list, G_OBJECT (folder));	
 		}
 		iter = iter->next;
 	  }
-	  
 	}
-    
 	return;
 }
 
@@ -537,7 +529,7 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	object_class->finalize = tny_camel_store_account_finalize;
 
 	((TnyCamelAccountClass*)class)->reconnect_func = tny_camel_store_account_reconnect;
-    
+
 	class->get_folders_async_func = tny_camel_store_account_get_folders_async_default;
 	class->get_folders_func = tny_camel_store_account_get_folders_default;
 	class->create_folder_func = tny_camel_store_account_create_folder_default;

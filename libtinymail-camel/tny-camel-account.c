@@ -327,7 +327,7 @@ tny_camel_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
 	if (G_UNLIKELY (!TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func))
 		g_error ("This TnyAccount instance isn't a fully implemented type\n");
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func ((TnyCamelAccount*)self);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
