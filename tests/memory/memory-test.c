@@ -56,8 +56,7 @@ do_test_folder (TnyFolder *folder)
 	
     	bytes = (sizeof (TnyCamelHeader) + sizeof (CamelMessageInfo) + 
 		 sizeof (CamelMessageInfoBase) + 
-		 sizeof (CamelMessageContentInfo) + sizeof (struct _CamelFlag) +
-		 sizeof (struct _CamelTag)) * length;
+		 sizeof (CamelMessageContentInfo));
     
 	kbytes = ((gdouble)bytes) / 1024;
     	mbytes = kbytes / 1024;
@@ -68,8 +67,6 @@ do_test_folder (TnyFolder *folder)
 	g_print ("\tsizeof (CamelMessageInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfo), length * sizeof (CamelMessageInfo), ((gdouble)length * sizeof (CamelMessageInfo))/1024);
 	g_print ("\tsizeof (CamelMessageInfoBase) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfoBase), length * sizeof (CamelMessageInfoBase), ((gdouble)length * sizeof (CamelMessageInfoBase))/1024);
 	g_print ("\tsizeof (CamelMessageContentInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageContentInfo), length * sizeof (CamelMessageContentInfo), ((gdouble)length * sizeof (CamelMessageContentInfo))/1024);
-	g_print ("\tsizeof (struct _CamelFlag) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (struct _CamelFlag), length * sizeof (struct _CamelFlag), ((gdouble)length * sizeof (struct _CamelFlag))/1024);
-	g_print ("\tsizeof (struct _CamelTag) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (struct _CamelTag), length * sizeof (struct _CamelTag), ((gdouble)length * sizeof (struct _CamelTag))/1024);
 
 	g_print ("\nThis means that (at least) %d bytes or ~%.2lfK or ~%.2lfM are needed for this folder\n", bytes, kbytes, mbytes);
 
@@ -168,7 +165,7 @@ main (int argc, char **argv)
 		for (i=0; i<14; i++)
 			recurse_folders (TNY_FOLDER_STORE (account), NULL, folderids[i], do_get_folder);
 
-    	for (i=0; i<7; i++)
+    	for (i=0; i<14; i++)
 		recurse_folders (TNY_FOLDER_STORE (account), NULL, folderids[i], do_test_folder);
     
 err:
