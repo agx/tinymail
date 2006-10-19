@@ -47,8 +47,6 @@ static pthread_mutex_t exception_mutex = PTHREAD_MUTEX_INITIALIZER;
 #define CAMEL_EXCEPTION_LOCK(e) (pthread_mutex_lock(&exception_mutex))
 #define CAMEL_EXCEPTION_UNLOCK(e) (pthread_mutex_unlock(&exception_mutex))
 
-static EMemChunk *exception_chunks = NULL;
-
 /**
  * camel_exception_new: allocate a new exception object. 
  * 
@@ -63,10 +61,7 @@ camel_exception_new (void)
 
 	CAMEL_EXCEPTION_LOCK(exception);
 
-	if (exception_chunks == NULL)
-		exception_chunks = e_memchunk_new(16, sizeof(CamelException));
-
-	ex = e_memchunk_alloc(exception_chunks);
+	ex = g_slice_new (CamelException);
 	ex->desc = NULL;
 
 	/* set the Exception Id to NULL */
@@ -135,9 +130,7 @@ camel_exception_free (CamelException *exception)
 		g_free (exception->desc);
 
 	CAMEL_EXCEPTION_LOCK(exception);
-
-	e_memchunk_free(exception_chunks, exception);
-
+	g_slice_free (CamelException, exception);
 	CAMEL_EXCEPTION_UNLOCK(exception);
 }
 

@@ -155,12 +155,6 @@ struct _CamelObjectClass
 	/* available hooks for this class */
 	struct _CamelHookPair *hooks;
 
-	/* memchunks for this type */
-	struct _EMemChunk *instance_chunks;
-#ifdef CAMEL_OBJECT_TRACK_INSTANCES
-	struct _CamelObject *instances;
-#endif
-
 	/* init class */
 	void (*klass_init)(struct _CamelObjectClass *);
 	void (*klass_finalise)(struct _CamelObjectClass *);
