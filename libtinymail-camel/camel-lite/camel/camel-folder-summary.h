@@ -188,8 +188,10 @@ struct _CamelMessageInfoBase {
 	CamelSummaryReferences *references;/* from parent to root */
 #endif
 
+#ifdef NON_TINYMAIL_FEATURES
 	struct _CamelFlag *user_flags;
 	struct _CamelTag *user_tags;
+#endif
 
 	/* tree of content description - NULL if it is not available */
 	CamelMessageContentInfo *content;

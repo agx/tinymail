@@ -1733,8 +1733,11 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 		mi->mlist = camel_pstring_add (mlist, TRUE);
 	else mi->mlist = NULL;
 
+#ifdef NON_TINYMAIL_FEATURES
 	mi->user_flags = NULL;
 	mi->user_tags = NULL;
+#endif
+
 	mi->date_sent = camel_header_decode_date(camel_header_raw_find(&h, "date", NULL), NULL);
 	received = camel_header_raw_find(&h, "received", NULL);
 
@@ -1893,7 +1896,9 @@ message_info_load(CamelFolderSummary *s)
 			name = (char*) ptrchr;
 		ptrchr += len;
 
+#ifdef NON_TINYMAIL_FEATURES
 		camel_flag_set(&mi->user_flags, name, TRUE);
+#endif
 	}
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
@@ -1912,8 +1917,9 @@ message_info_load(CamelFolderSummary *s)
 		if (len) 
 			value =(char*) ptrchr;
 		ptrchr += len;
-
+#ifdef NON_TINYMAIL_FEATURES
 		camel_tag_set(&mi->user_tags, name, value);
+#endif
 	}
 
 
@@ -1963,23 +1969,34 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 #endif
 		camel_file_util_encode_uint32(out, 0);
 
+#ifdef NON_TINYMAIL_FEATURES
 	count = camel_flag_list_size(&mi->user_flags);
+#else
+	count = 0;
+#endif
 	camel_file_util_encode_uint32(out, count);
+#ifdef NON_TINYMAIL_FEATURES
 	flag = mi->user_flags;
 	while (flag) {
 		camel_file_util_encode_string(out, flag->name);
 		flag = flag->next;
 	}
+#endif
 
+#ifdef NON_TINYMAIL_FEATURES
 	count = camel_tag_list_size(&mi->user_tags);
+#else
+	count = 0;
+#endif
 	camel_file_util_encode_uint32(out, count);
+#ifdef NON_TINYMAIL_FEATURES
 	tag = mi->user_tags;
 	while (tag) {
 		camel_file_util_encode_string(out, tag->name);
 		camel_file_util_encode_string(out, tag->value);
 		tag = tag->next;
 	}
-
+#endif
 	return ferror(out);
 }
 
@@ -2005,10 +2022,10 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 
 		if (mi->mlist)
 			camel_pstring_free(mi->mlist);
-
+#ifdef NON_TINYMAIL_FEATURES
 		camel_flag_list_free(&mi->user_flags);
 		camel_tag_list_free(&mi->user_tags);
-
+#endif
 	} else if (mi->uid_needs_free)
 		g_free (mi->uid);
 
@@ -2904,6 +2921,7 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 	}
 #endif
 
+#ifdef NON_TINYMAIL_FEATURES
 	flag = from->user_flags;
 	while (flag) {
 		camel_flag_set(&to->user_flags, flag->name, TRUE);
@@ -2915,6 +2933,7 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 		camel_tag_set(&to->user_tags, tag->name, tag->value);
 		tag = tag->next;
 	}
+#endif
 
 	if (from->content) {
 		/* FIXME: copy content-infos */
@@ -2959,14 +2978,19 @@ info_ptr(const CamelMessageInfo *mi, int id)
 		return ((const CamelMessageInfoBase *)mi)->mlist;
 	case CAMEL_MESSAGE_INFO_MESSAGE_ID:
 		return &((const CamelMessageInfoBase *)mi)->message_id;
+
 #ifdef NON_TINYMAIL_FEATURES
 	case CAMEL_MESSAGE_INFO_REFERENCES:
 		return ((const CamelMessageInfoBase *)mi)->references;
 #endif
+
+#ifdef NON_TINYMAIL_FEATURES
 	case CAMEL_MESSAGE_INFO_USER_FLAGS:
 		return ((const CamelMessageInfoBase *)mi)->user_flags;
 	case CAMEL_MESSAGE_INFO_USER_TAGS:
 		return ((const CamelMessageInfoBase *)mi)->user_tags;
+#endif
+
 	default:
 		abort();
 	}
@@ -3003,13 +3027,21 @@ info_time(const CamelMessageInfo *mi, int id)
 static gboolean
 info_user_flag(const CamelMessageInfo *mi, const char *id)
 {
+#ifdef NON_TINYMAIL_FEATURES
 	return camel_flag_get(&((CamelMessageInfoBase *)mi)->user_flags, id);
+#else
+	return FALSE;
+#endif
 }
 
 static const char *
 info_user_tag(const CamelMessageInfo *mi, const char *id)
 {
+#ifdef NON_TINYMAIL_FEATURES
 	return camel_tag_get(&((CamelMessageInfoBase *)mi)->user_tags, id);
+#else
+	return NULL;
+#endif
 }
 
 
@@ -3163,7 +3195,9 @@ info_set_user_flag(CamelMessageInfo *info, const char *name, gboolean value)
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 	int res;
 
+#ifdef NON_TINYMAIL_FEATURES
 	res = camel_flag_set(&mi->user_flags, name, value);
+#endif
 
 	/* TODO: check this item is still in the summary first */
 	if (mi->summary && res && mi->summary->folder && mi->uid) {
@@ -3205,7 +3239,9 @@ info_set_user_tag(CamelMessageInfo *info, const char *name, const char *value)
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 	int res;
 
+#ifdef NON_TINYMAIL_FEATURES
 	res = camel_tag_set(&mi->user_tags, name, value);
+#endif
 
 	if (mi->summary && res && mi->summary->folder && mi->uid) {
 		CamelFolderChangeInfo *changes = camel_folder_change_info_new();

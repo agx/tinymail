@@ -595,7 +595,10 @@ flags_to_label(CamelFolder *folder, CamelImapMessageInfo *mi)
 		}
 
 		mi->info.flags = (mi->info.flags & ~CAMEL_IMAP_MESSAGE_LABEL_MASK) | mask;
+
+#ifdef NON_TINYMAIL_FEATURES
 		camel_tag_set(&mi->info.user_tags, "label", label);
+#endif
 	}
 }
 

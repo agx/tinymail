@@ -479,8 +479,10 @@ local_summary_encode_x_evolution(CamelLocalSummary *cls, const CamelLocalMessage
 	GString *out = g_string_new("");
 	struct _camel_header_param *params = NULL;
 	GString *val = g_string_new("");
+#ifdef NON_TINYMAIL_FEATURES
 	CamelFlag *flag = mi->info.user_flags;
 	CamelTag *tag = mi->info.user_tags;
+#endif
 	char *ret;
 	const char *p, *uidstr;
 	guint32 uid;
@@ -496,6 +498,7 @@ local_summary_encode_x_evolution(CamelLocalSummary *cls, const CamelLocalMessage
 		g_string_printf (out, "%s-%04x", uidstr, mi->info.flags & 0xffff);
 	}
 
+#ifdef NON_TINYMAIL_FEATURES
 	if (flag || tag) {
 		val = g_string_new ("");
 		
@@ -524,6 +527,8 @@ local_summary_encode_x_evolution(CamelLocalSummary *cls, const CamelLocalMessage
 		camel_header_param_list_format_append (out, params);
 		camel_header_param_list_free (params);
 	}
+#endif
+
 	ret = out->str;
 	g_string_free (out, FALSE);
 	

@@ -503,7 +503,12 @@ get_size (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessageS
 	ESExpResult *r;
 	
 	r = e_sexp_result_new(f, ESEXP_RES_INT);
+
+#ifdef NON_TINYMAIL_FEATURES
 	r->value.number = camel_message_info_size(fms->info) / 1024;
+#else
+	r->value.number = 0;
+#endif
 
 	return r;
 }
