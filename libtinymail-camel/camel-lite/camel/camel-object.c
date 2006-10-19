@@ -41,10 +41,8 @@
 #define h(x) 			/* hooks */
 
 /* I just mashed the keyboard for these... */
-#define CAMEL_OBJECT_MAGIC           	 0x77A344ED
 #define CAMEL_OBJECT_CLASS_MAGIC     	 0xEE26A997
 #define CAMEL_INTERFACE_MAGIC     	 0xBCE137A7
-#define CAMEL_OBJECT_FINALISED_MAGIC       0x84AC365F
 #define CAMEL_OBJECT_CLASS_FINALISED_MAGIC 0x7621ABCD
 #define CAMEL_INTERFACE_FINALISED_MAGIC    0x7CB2FE71
 
@@ -223,7 +221,6 @@ static void
 cobject_init(CamelObject *o, CamelObjectClass *klass)
 {
 	o->klass = klass;
-	o->magic = CAMEL_OBJECT_MAGIC;
 	o->ref_count = 1;
 	o->flags = 0;
 }
@@ -238,7 +235,6 @@ cobject_finalise(CamelObject *o)
 
 	camel_object_free_hooks(o);
 
-	o->magic = CAMEL_OBJECT_FINALISED_MAGIC;
 	o->klass = NULL;
 }
 
@@ -912,8 +908,6 @@ camel_object_unref(void *vo)
 		k = k->parent;
 	}
 
-	o->magic = CAMEL_OBJECT_FINALISED_MAGIC;
-
 	CLASS_LOCK(klass);
 
 	g_slice_free1 (klass->object_size, o);
@@ -943,64 +937,6 @@ CamelType camel_name_to_type(const char *name)
 	return g_hash_table_lookup(type_table, name);
 }
 
-static char *
-desc_data(CamelObject *o, guint32 ok)
-{
-	char *what;
-
-	if (o == NULL)
-		what = g_strdup("NULL OBJECT");
-	else if (o->magic == ok)
-		what = NULL;
-	else if (o->magic == CAMEL_OBJECT_MAGIC)
-		what = g_strdup_printf("CLASS '%s'", ((CamelObjectClass *)o)->name);
-	else if (o->magic == CAMEL_OBJECT_CLASS_MAGIC)
-		what = g_strdup_printf("CLASS '%s'", ((CamelObjectClass *)o)->name);
-	else if (o->magic == CAMEL_INTERFACE_MAGIC)
-		what = g_strdup_printf("INTERFACE '%s'", ((CamelObjectClass *)o)->name);
-	else if (o->magic == CAMEL_OBJECT_FINALISED_MAGIC)
-		what = g_strdup_printf("finalised OBJECT");
-	else if (o->magic == CAMEL_OBJECT_CLASS_FINALISED_MAGIC)
-		what = g_strdup_printf("finalised CLASS");
-	else if (o->magic == CAMEL_INTERFACE_FINALISED_MAGIC)
-		what = g_strdup_printf("finalised INTERFACE");
-	else 
-		what = g_strdup_printf("junk data");
-
-	return what;
-}
-
-#define check_magic(o, ctype, omagic) \
-	( ((CamelObject *)(o))->magic == (omagic) \
-	&& (ctype)->magic == CAMEL_OBJECT_CLASS_MAGIC) \
-	? 1 : check_magic_fail(o, ctype, omagic)
-
-static gboolean
-check_magic_fail(void *o, CamelType ctype, guint32 omagic)
-{
-	char *what, *to;
-
-	what = desc_data(o, omagic);
-	to = desc_data((CamelObject *)ctype, CAMEL_OBJECT_CLASS_MAGIC);
-
-	if (what || to) {
-		if (what == NULL) {
-			if (omagic == CAMEL_OBJECT_MAGIC)
-				what = g_strdup_printf("OBJECT '%s'", ((CamelObject *)o)->klass->name);
-			else
-				what = g_strdup_printf("OBJECT '%s'", ((CamelObjectClass *)o)->name);
-		}		
-		if (to == NULL)
-			to = g_strdup_printf("OBJECT '%s'", ctype->name);
-		g_warning("Trying to check %s is %s", what, to);
-		g_free(what);
-		g_free(to);
-
-		return FALSE;
-	}
-
-	return TRUE;
-}
 
 gboolean
 camel_object_is(CamelObject *o, CamelType ctype)
@@ -1008,7 +944,6 @@ camel_object_is(CamelObject *o, CamelType ctype)
 	CamelObjectClass *k;
 
 	g_return_val_if_fail(o != NULL, FALSE);
-	g_return_val_if_fail(check_magic(o, ctype, CAMEL_OBJECT_MAGIC), FALSE);
 
 	k = o->klass;
 	while (k) {
@@ -1024,7 +959,6 @@ gboolean
 camel_object_class_is(CamelObjectClass *k, CamelType ctype)
 {
 	g_return_val_if_fail(k != NULL, FALSE);
-	g_return_val_if_fail(check_magic(k, ctype, CAMEL_OBJECT_CLASS_MAGIC), FALSE);
 
 	while (k) {
 		if (k == ctype)
@@ -1039,7 +973,6 @@ gboolean
 camel_interface_is(CamelObjectClass *k, CamelType ctype)
 {
 	g_return_val_if_fail(k != NULL, FALSE);
-	g_return_val_if_fail(check_magic(k, ctype, CAMEL_INTERFACE_MAGIC), FALSE);
 
 	while (k) {
 		if (k == ctype)
@@ -1054,8 +987,6 @@ CamelObject *
 camel_object_cast(CamelObject *o, CamelType ctype)
 {
 	CamelObjectClass *k;
-
-	g_return_val_if_fail(check_magic(o, ctype, CAMEL_OBJECT_MAGIC), NULL);
 
 	k = o->klass;
 	while (k) {
@@ -1074,8 +1005,6 @@ camel_object_class_cast(CamelObjectClass *k, CamelType ctype)
 {
 	CamelObjectClass *r = k;
 
-	g_return_val_if_fail(check_magic(k, ctype, CAMEL_OBJECT_CLASS_MAGIC), NULL);
-
 	while (k) {
 		if (k == ctype)
 			return r;
@@ -1091,8 +1020,6 @@ CamelObjectClass *
 camel_interface_cast(CamelObjectClass *k, CamelType ctype)
 {
 	CamelObjectClass *r = k;
-
-	g_return_val_if_fail(check_magic(k, ctype, CAMEL_INTERFACE_MAGIC), NULL);
 
 	while (k) {
 		if (k == ctype)

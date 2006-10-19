@@ -39,9 +39,6 @@ extern "C" {
 #include <camel/camel-arg.h>
 #include <camel/camel-types.h>	/* this is a @##$@#SF stupid header */
 
-/* turn on so that camel_object_class_dump_tree() dumps object instances as well */
-#define CAMEL_OBJECT_TRACK_INSTANCES
-
 typedef struct _CamelObjectClass *CamelType;
 
 #ifdef G_DISABLE_CHECKS
@@ -121,17 +118,11 @@ struct _CamelObjectMeta {
 struct _CamelObject {
 	struct _CamelObjectClass *klass;
 
-	guint32 magic;		/* only really needed for debugging ... */
-
 	/* current hooks on this object */
 	struct _CamelHookList *hooks;
 
 	guint32 ref_count:24;
 	guint32 flags:8;
-
-#ifdef CAMEL_OBJECT_TRACK_INSTANCES
-	struct _CamelObject *next, *prev;
-#endif
 };
 
 struct _CamelObjectClass
