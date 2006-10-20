@@ -146,7 +146,7 @@ change_folder(CamelStore *store, const char *name, guint32 flags, int count)
 	const char *tmp;
 	CamelURL *url;
 
-	fi = g_malloc0(sizeof(*fi));
+	fi = camel_folder_info_new ();
 	fi->full_name = g_strdup(name);
 	tmp = strrchr(name, '/');
 	if (tmp == NULL)

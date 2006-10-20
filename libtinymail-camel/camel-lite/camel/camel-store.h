@@ -231,6 +231,8 @@ void             camel_store_free_folder_info_full (CamelStore *store,
 void             camel_store_free_folder_info_nop  (CamelStore *store,
 						    CamelFolderInfo *fi);
 
+
+CamelFolderInfo *camel_folder_info_new             (void);
 void             camel_folder_info_free            (CamelFolderInfo *fi);
 CamelFolderInfo *camel_folder_info_build           (GPtrArray *folders,
 						    const char *namespace,

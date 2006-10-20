@@ -486,7 +486,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 	g_free (str);
 	g_free (name);
 	
-	fi = g_new0 (CamelFolderInfo, 1);
+	fi = camel_folder_info_new ();
 	fi->full_name = g_strdup (folder_name);
 	fi->name = g_path_get_basename (folder_name);
 	fi->uri = g_strdup_printf ("%s:%s#%s", ((CamelService *) store)->url->protocol,

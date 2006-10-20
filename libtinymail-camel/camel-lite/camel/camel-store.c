@@ -711,7 +711,7 @@ add_special_info (CamelStore *store, CamelFolderInfo *info, const char *name, co
 		g_free (vinfo->uri);
 	} else {
 		/* There wasn't a Trash/Junk folder so create a new folder entry */
-		vinfo = g_new0 (CamelFolderInfo, 1);
+		vinfo = camel_folder_info_new ();
 		
 		g_assert(parent != NULL);
 		
@@ -856,6 +856,7 @@ camel_store_free_folder_info_nop (CamelStore *store, CamelFolderInfo *fi)
 	;
 }
 
+
 /**
  * camel_folder_info_free:
  * @fi: a #CamelFolderInfo
@@ -871,8 +872,20 @@ camel_folder_info_free (CamelFolderInfo *fi)
 		g_free (fi->name);
 		g_free (fi->full_name);
 		g_free (fi->uri);
-		g_free (fi);
+		g_slice_free (CamelFolderInfo, fi);
 	}
+}
+
+
+/**
+ * camel_folder_info_new:
+ *
+ * Return value: a new empty CamelFolderInfo instance
+ **/
+CamelFolderInfo* 
+camel_folder_info_new (void)
+{
+	return g_slice_new0 (CamelFolderInfo);
 }
 
 static int
@@ -943,7 +956,7 @@ camel_folder_info_build (GPtrArray *folders, const char *namespace,
 				CamelURL *url;
 				char *sep;
 
-				pfi = g_new0 (CamelFolderInfo, 1);
+				pfi = camel_folder_info_new ();
 				if (short_names) {
 					pfi->name = strrchr (pname, separator);
 					if (pfi->name)

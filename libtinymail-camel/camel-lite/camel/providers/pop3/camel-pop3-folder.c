@@ -193,7 +193,7 @@ cmd_list(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		ret = camel_pop3_stream_line(stream, &line, &len);
 		if (ret>=0) {
 			if (sscanf((char *) line, "%u %u", &id, &size) == 2) {
-				fi = g_malloc0(sizeof(*fi));
+				fi = g_malloc0 (sizeof(*fi));
 				fi->size = size;
 				fi->id = id;
 				fi->index = ((CamelPOP3Folder *)folder)->uids->len;

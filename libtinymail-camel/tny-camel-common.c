@@ -27,15 +27,14 @@
 gboolean 
 _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *finfo)
 {
-    	gboolean retval = FALSE;
-    
+	gboolean retval = FALSE;
+
 	if (query)
 	{
 		TnyList *items = tny_folder_store_query_get_items (query);
 		TnyIterator *iterator;
 		iterator = tny_list_create_iterator (items);
-		 
-		 
+
 		while (!tny_iterator_is_done (iterator))
 		{
 			TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_get_current (iterator);
@@ -66,8 +65,8 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 		g_object_unref (G_OBJECT (items));
 	} else
 		retval = TRUE;
-    
- 	return retval;
+
+	return retval;
 }
 
 void

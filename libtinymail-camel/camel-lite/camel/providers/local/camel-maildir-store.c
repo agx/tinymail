@@ -365,7 +365,7 @@ static CamelFolderInfo *scan_fi(CamelStore *store, guint32 flags, CamelURL *url,
 	char *tmp, *cur, *new;
 	struct stat st;
 
-	fi = g_malloc0(sizeof(*fi));
+	fi = camel_folder_info_new ();
 	fi->full_name = g_strdup(full);
 	fi->name = g_strdup(name);
 	camel_url_set_fragment(url, fi->full_name);

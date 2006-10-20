@@ -1037,8 +1037,8 @@ imap_build_folder_info(CamelImapStore *imap_store, const char *folder_name)
 	const char *name;
 	CamelFolderInfo *fi;
 
-	fi = g_malloc0(sizeof(*fi));
-
+	fi = camel_folder_info_new ();
+	
 	fi->full_name = g_strdup(folder_name);
 	fi->unread = -1;
 	fi->total = -1;
@@ -2405,7 +2405,8 @@ parse_list_response_as_folder_info (CamelImapStore *imap_store,
 
 	flags = (flags & ~CAMEL_FOLDER_SUBSCRIBED) | (si->info.flags & CAMEL_STORE_FOLDER_INFO_SUBSCRIBED);
 
-	fi = g_new0 (CamelFolderInfo, 1);
+	fi = camel_folder_info_new ();
+	
 	fi->full_name = g_strdup(camel_store_info_path(imap_store->summary, si));
 	if (!g_ascii_strcasecmp(fi->full_name, "inbox")) {
 		flags |= CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_TYPE_INBOX;
