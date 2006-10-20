@@ -88,8 +88,8 @@
     <title>Introduction</title>
     <para>Tinymail is a development framework for both accessing E-mail services 
 	and building a user interface for it.</para>
-    <para>It will make sure you, as a developer, can do this on devices with
-	few memory resources.</para>
+    <para>It will make sure that you as a developer can do this on devices with
+	low memory resources.</para>
     <para>It supports IMAP, Exchange and NNTP. It can be used to send 
 	messages over SMTP.</para>
     <para>It's licensed as LGPL.</para>
