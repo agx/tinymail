@@ -212,7 +212,9 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		
 		fprintf (stderr, "sending : %c%.5u %s\r\n", store->tag_prefix, store->command, mask);
 	}
-	
+
+	/* printf ("--> %s\n", cmd); */
+
 	nwritten = camel_stream_printf (store->ostream, "%c%.5u %s\r\n",
 					store->tag_prefix, store->command++, cmd);
 	
@@ -299,6 +301,8 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		return CAMEL_IMAP_RESPONSE_ERROR;
 	}
+
+	/* printf ("<-- %s\n", respbuf); */
 
 	switch (*respbuf) {
 	case '*':

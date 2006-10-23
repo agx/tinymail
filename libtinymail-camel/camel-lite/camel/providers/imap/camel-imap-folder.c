@@ -2285,7 +2285,7 @@ decode_internaldate (const unsigned char *in)
 	return date;
 }
 
-static void
+static CamelImapMessageInfo*
 add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 		       int first, GData *data)
 {
@@ -2297,10 +2297,10 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	
 	seq = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
 	if (seq < first)
-		return;
+		return NULL;
 	stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
 	if (!stream)
-		return;
+		return NULL;
 	
 	if (seq - first >= messages->len)
 		g_ptr_array_set_size (messages, seq - first + 1);
@@ -2308,7 +2308,7 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	msg = camel_mime_message_new ();
 	if (camel_data_wrapper_construct_from_stream (CAMEL_DATA_WRAPPER (msg), stream) == -1) {
 		camel_object_unref (CAMEL_OBJECT (msg));
-		return;
+		return NULL;
 	}
 	
 	mi = (CamelImapMessageInfo *)camel_folder_summary_info_new_from_message (folder->summary, msg);
@@ -2320,8 +2320,10 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	
 	if (mi->info.date_received == -1)
 		mi->info.date_received = mi->info.date_sent;
-	
+
 	messages->pdata[seq - first] = mi;
+
+	return mi;
 }
 
 
@@ -2332,6 +2334,35 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
    of mailing-list headers and so might be best if this were
    auto-generated? */
 #define MAILING_LIST_HEADERS "X-MAILING-LIST X-LOOP LIST-ID LIST-POST MAILING-LIST ORIGINATOR X-LIST SENDER RETURN-PATH X-BEENTHERE"
+
+
+static guint32 
+imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, GPtrArray *needheaders, int size, int got)
+{
+	char *resp;
+	CamelImapResponseType type;
+	guint32 cnt = 0;
+	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+	GData *data;
+ 
+	camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
+	while ((type = camel_imap_command_response (store, &resp, ex)) ==
+			CAMEL_IMAP_RESPONSE_UNTAGGED) 
+	{
+		cnt++;
+		data = parse_fetch_response (imap_folder, resp);
+		g_free (resp);
+		if (!data)
+			continue;
+		g_ptr_array_add (needheaders, g_datalist_get_data (&data, "UID"));
+		if (size > 0)
+			camel_operation_progress (NULL, got * 100 / size);
+	}
+	camel_operation_end (NULL);
+	g_free (resp);
+	return cnt;
+
+}
 
 static void
 imap_update_summary (CamelFolder *folder, int exists,
@@ -2349,8 +2380,8 @@ imap_update_summary (CamelFolder *folder, int exists,
    CamelStream *stream;
    char *uid, *resp;
    GData *data;
-   gboolean more = TRUE, tryagain = FALSE, tried = FALSE;
-   unsigned int nextn = 1, cnt=0;
+   gboolean more = TRUE;
+   unsigned int nextn = 1, cnt=0, tcnt=0;
 
    if (store->server_level >= IMAP_LEVEL_IMAP4REV1)
    	header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS MAILING_LIST_HEADERS ")";
@@ -2364,14 +2395,9 @@ imap_update_summary (CamelFolder *folder, int exists,
    if( g_getenv ("EVO_IMAP_FETCH_ALL_HEADERS") )
    	header_spec = "HEADER";
 
-   while (more || tryagain)
+   tcnt = 0;
+   while (more)
    {
-
-	/* Figure out if any of the new messages are already cached (which
-	 * may be the case if we're re-syncing after disconnected operation).
-	 * If so, get their UIDs, FLAGS, and SIZEs. If not, get all that
-	 * and ask for the headers too at the same time.
-	 */
 	seq = camel_folder_summary_count (folder->summary);
 	first = seq + 1;
 	if (seq > 0) {
@@ -2384,112 +2410,40 @@ imap_update_summary (CamelFolder *folder, int exists,
 	size = (exists - seq) * (IMAP_PRETEND_SIZEOF_FLAGS + IMAP_PRETEND_SIZEOF_SIZE + IMAP_PRETEND_SIZEOF_HEADERS);
 	got = 0;
 
-	/* The thing is that x:y doesn't always work, it seems x:* does. So if 
-	we didn't see any messages pass by the first attempt, retry with a x:*
-	once. If we still don't get any messages, we'll assume the folder is
-	empty and/or no new messages are available (which is, indeed, a bit 
-	strange as something higher-up should have blocked this call then) */
-
-	if (!tryagain)
-	{
-		/* printf ("%d:%d\n", uidval + 1, uidval + 1 + nextn); */
-		if (!camel_imap_command_start (store, folder, ex,
-				"UID FETCH %d:%d (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
-				uidval + 1, uidval + 1 + nextn, header_spec))
-			return;
-	} else 
-	{
-		/* printf ("%d:*\n", uidval + 1); */
-		if (!camel_imap_command_start (store, folder, ex,
-				"UID FETCH %d:* (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
-				uidval + 1, header_spec))
-		tried = TRUE;
-	}
+	if (!camel_imap_command_start (store, folder, ex,
+		"UID FETCH %d:%d FLAGS", uidval + 1, uidval + 1 + nextn))
+		return;
 
 	/* 1, 7, 19, 43, 91, .. until 1000 (the smaller, the more dumps, 
 	the slower. But too large consumes a lot memory, and also takes longer 
 	to fetch from the service before we can dump) */
+
+	more = FALSE; 
+	needheaders = g_ptr_array_new ();
+	cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+	tcnt += cnt;
+
+	if (tcnt >= (exists - seq))
+		more = FALSE;
+	else
+		more = TRUE;
+
+	if (more && (((exists - seq) > nextn) && (cnt < nextn)))
+	{
+		if (!camel_imap_command_start (store, folder, ex,
+			"UID FETCH %d:* FLAGS", uidval + 1))
+			return;
+		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+		tcnt += cnt;
+		more = FALSE;
+	}
 
 	if (nextn < 1000)
 		nextn += (nextn+5);
 	else
 		nextn = 1000;
 
-	camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
-
-	/* Parse the responses. We can't add a message to the summary
-	 * until we've gotten its headers, and there's no guarantee
-	 * the server will send the responses in a useful order...
-	 */
-
-	more = FALSE; 
-	tryagain = !tried;
-
-	fetch_data = g_ptr_array_new ();
 	messages = g_ptr_array_new ();
-	while ((type = camel_imap_command_response (store, &resp, ex)) ==
-			CAMEL_IMAP_RESPONSE_UNTAGGED) 
-	{
-		more = TRUE;
-		tried = TRUE;
-		tryagain = FALSE;
-
-		data = parse_fetch_response (imap_folder, resp);
-		g_free (resp);
-cnt++;
-		if (!data)
-			continue;
-		
-		seq = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
-		if (seq < first) {
-			g_datalist_clear (&data);
-			continue;
-		}
-
-		if (g_datalist_get_data (&data, "FLAGS"))
-			got += IMAP_PRETEND_SIZEOF_FLAGS;
-		if (g_datalist_get_data (&data, "RFC822.SIZE"))
-			got += IMAP_PRETEND_SIZEOF_SIZE;
-		stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
-		if (stream) {
-			got += IMAP_PRETEND_SIZEOF_HEADERS;
-			
-			/* Use the stream now so we don't tie up many
-			 * many fds if we're fetching many many messages.
-			 */
-			add_message_from_data (folder, messages, first, data);
-			g_datalist_set_data (&data, "BODY_PART_STREAM", NULL);
-		}
-
-		if (size > 0)
-			camel_operation_progress (NULL, got * 100 / size);
-		g_ptr_array_add (fetch_data, data);
-	}
-	camel_operation_end (NULL);
-
-	if (type == CAMEL_IMAP_RESPONSE_ERROR)
-		goto lose;
-
-	/* Free the final tagged response */
-	g_free (resp);
-
-	/* Figure out which headers we still need to fetch. */
-	needheaders = g_ptr_array_new ();
-	size = got = 0;
-	for (i = 0; i < fetch_data->len; i++) 
-	{
-		data = fetch_data->pdata[i];
-		if (g_datalist_get_data (&data, "BODY_PART_LEN"))
-			continue;
-
-		uid = g_datalist_get_data (&data, "UID");
-		if (uid) {
-			g_ptr_array_add (needheaders, uid);
-			size += IMAP_PRETEND_SIZEOF_HEADERS;
-		}
-	}
-
-	/* And fetch them */
 	if (needheaders->len) 
 	{
 		char *uidset;
@@ -2499,10 +2453,11 @@ cnt++;
 			sizeof (void *), uid_compar);
 
 		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
-		while (uid < needheaders->len) {
+		while (uid < needheaders->len) 
+		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
 			if (!camel_imap_command_start (store, folder, ex,
-						       "UID FETCH %s BODY.PEEK[%s]",
+						       "UID FETCH %s (FLAGS INTERNALDATE BODY.PEEK[%s])",
 						       uidset, header_spec)) {
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
@@ -2512,15 +2467,35 @@ cnt++;
 			g_free (uidset);
 
 			while ((type = camel_imap_command_response (store, &resp, ex))
-			       == CAMEL_IMAP_RESPONSE_UNTAGGED) {
+				== CAMEL_IMAP_RESPONSE_UNTAGGED) 
+			{
+				gchar *muid;
+
 				data = parse_fetch_response (imap_folder, resp);
 				g_free (resp);
 				if (!data)
 					continue;
-				
+
 				stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
 				if (stream) {
-					add_message_from_data (folder, messages, first, data);
+					mi = add_message_from_data (folder, messages, first, data);
+
+					if (mi) 
+					{
+					  flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
+					  if (flags) {
+						mi->server_flags = flags;
+						mi->info.flags |= flags;
+						flags_to_label(folder, mi);
+					  }
+
+					  muid = g_datalist_get_data (&data, "UID");
+					  if (muid) {
+						mi->info.uid = g_strdup (muid);
+						mi->info.uid_needs_free = TRUE;
+					  }
+					}
+
 					got += IMAP_PRETEND_SIZEOF_HEADERS;
 					if (size > 0)
 						camel_operation_progress (NULL, got * 100 / size);
@@ -2538,85 +2513,14 @@ cnt++;
 		camel_operation_end (NULL);
 	}
 
-	/* Now finish up summary entries (fix UIDs, set flags and size) */
-	for (i = 0; i < fetch_data->len; i++) {
-		data = fetch_data->pdata[i];
-
-		seq = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
-		if (seq >= first + messages->len) {
-			g_datalist_clear (&data);
-			continue;
-		}
-
-		mi = messages->pdata[seq - first];
-		if (mi == NULL) {
-			CamelMessageInfo *pmi = NULL;
-			int j;
-
-			/* This is a kludge around a bug in Exchange
-			 * 5.5 that sometimes claims multiple messages
-			 * have the same UID. See bug #17694 for
-			 * details. The "solution" is to create a fake
-			 * message-info with the same details as the
-			 * previously valid message. Yes, the user
-			 * will have a clone in his/her message-list,
-			 * but at least we don't crash.
-			 */
-			
-			/* find the previous valid message info */
-			for (j = seq - first - 1; j >= 0; j--) {
-				pmi = messages->pdata[j];
-				if (pmi != NULL)
-					break;
-			}
-
-			if (pmi == NULL) {
-				/* Server response is *really* fucked up,
-				   I guess we just pretend it never happened? */
-				continue;
-			}
-			
-			mi = (CamelImapMessageInfo *)camel_message_info_clone(pmi);
-		}
-
-		uid = g_datalist_get_data (&data, "UID");
-		if (uid) {
-			mi->info.uid = g_strdup (uid);
-			mi->info.uid_needs_free = TRUE;
-		}
-
-		flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
-		if (flags) {
-			((CamelImapMessageInfo *)mi)->server_flags = flags;
-			/* "or" them in with the existing flags that may
-			 * have been set by summary_info_new_from_message.
-			 */
-			mi->info.flags |= flags;
-			flags_to_label(folder, mi);
-		}
-
-#ifdef NON_TINYMAIL_FEATURES
-		size = GPOINTER_TO_INT (g_datalist_get_data (&data, "RFC822.SIZE"));
-		if (size)
-			mi->info.size = size;
-#endif
-
-		g_datalist_clear (&data);
-	}
-	g_ptr_array_free (fetch_data, TRUE);
 
 	/* And add the entries to the summary, etc. */
 	for (i = 0; i < messages->len; i++) 
 	{
 
 		mi = messages->pdata[i];
-		if (!mi) {
-			/* g_warning ("No information for message %d", i + first);
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-					      _("Incomplete server response: no information provided for message %d"),
-					      i + first); */
+		if (!mi)
 			continue;
-		}
 
 		uid = (char *)camel_message_info_uid(mi);
 		if (uid[0] == 0) {
@@ -2628,7 +2532,8 @@ cnt++;
 		}
 
 		info = (CamelImapMessageInfo *)camel_folder_summary_uid(folder->summary, uid);
-		if (info) {
+		if (info) 
+		{
 			for (seq = 0; seq < camel_folder_summary_count (folder->summary); seq++) {
 				if (folder->summary->messages->pdata[seq] == info)
 					break;
@@ -2649,9 +2554,6 @@ cnt++;
 		if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
 			camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
 	}
-
-	/* Dumping each nextn'th header (this is needed for the nextn calc to 
-	   be correct), it *must* write the summary cache to disk! */
 
 	camel_folder_summary_dump_mmap (folder->summary);
 
@@ -2840,7 +2742,7 @@ parse_fetch_response (CamelImapFolder *imap_folder, char *response)
 	char *start, *part_spec = NULL, *body = NULL, *uid = NULL, *idate = NULL;
 	gboolean cache_header = TRUE, header = FALSE;
 	size_t body_len = 0;
-	
+
 	if (*response != '(') {
 		long seq;
 		
