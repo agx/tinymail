@@ -308,6 +308,8 @@ struct _CamelFolderMetaSummary {
 CamelType			 camel_folder_summary_get_type	(void);
 CamelFolderSummary      *camel_folder_summary_new	(struct _CamelFolder *folder);
 
+void camel_folder_summary_dump_mmap (CamelFolderSummary *s);
+
 unsigned char*
 decode_uint32 (unsigned char *start, guint32 *dest, gboolean is_string);
 

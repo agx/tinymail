@@ -57,7 +57,7 @@ tny_gnome_device_reset (TnyDevice *self)
 
 	priv->fset = FALSE;
 	priv->forced = FALSE;
-    
+
 #ifdef GNOME
 	nm_callback (priv->nm_ctx, self);
 #endif
@@ -74,7 +74,7 @@ tny_gnome_device_force_online (TnyDevice *self)
 #ifdef GNOME
 	nm_callback (priv->nm_ctx, self);
 #endif
-    
+
 	return;
 }
 
@@ -88,9 +88,9 @@ tny_gnome_device_force_offline (TnyDevice *self)
 	priv->forced = FALSE;
 
 #ifdef GNOME
-    nm_callback (priv->nm_ctx, self);
+	nm_callback (priv->nm_ctx, self);
 #endif
-    
+
 	return;
 }
 
@@ -117,28 +117,29 @@ tny_gnome_device_is_online (TnyDevice *self)
 	gboolean retval = priv->forced;
 
 #ifdef GNOME
-	if (!priv->fset)
+	if (!priv->fset && !priv->invnm)
 	{
 		libnm_glib_state state = libnm_glib_get_network_state (priv->nm_ctx);
 		
 		switch (state)
 		{
-			case LIBNM_NO_NETWORK_CONNECTION:
-			retval = FALSE;
+			case LIBNM_ACTIVE_NETWORK_CONNECTION:
+			retval = TRUE;
 			break;
 
 			case LIBNM_NO_DBUS:
 			case LIBNM_NO_NETWORKMANAGER:
 			case LIBNM_INVALID_CONTEXT:
-			g_print (_("Invalid network manager installation. Going to assume Online status\n"));
-			case LIBNM_ACTIVE_NETWORK_CONNECTION:
+			g_print (_("Invalid network manager installation. Going to assume Offline status\n"));
+			priv->invnm = TRUE;
+			case LIBNM_NO_NETWORK_CONNECTION:
 			default:
-			retval = TRUE;
+			retval = FALSE;
 			break;
 		}
 	}
 #endif
-    
+
 	return retval;
 }
 
@@ -149,6 +150,7 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyGnomeDevice *self = (TnyGnomeDevice *)instance;
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
+	priv->invnm = FALSE;
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
@@ -156,9 +158,8 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->nm_ctx = libnm_glib_init ();
 	priv->callback_id = libnm_glib_register_callback 
 		(priv->nm_ctx, nm_callback, self, NULL);
-
 #endif
-    
+
 	return;
 }
 

@@ -113,6 +113,10 @@ static void camel_folder_summary_class_init (CamelFolderSummaryClass *klass);
 static void camel_folder_summary_init       (CamelFolderSummary *obj);
 static void camel_folder_summary_finalize   (CamelObject *obj);
 
+
+static void camel_folder_summary_mmap_add(CamelFolderSummary *s, CamelMessageInfo *info);
+static void camel_folder_summary_unload_mmap (CamelFolderSummary *s);
+
 static CamelObjectClass *camel_folder_summary_parent;
 
 static void
@@ -161,6 +165,26 @@ foreach_msginfo (gpointer data, gpointer user_data)
 	g_slice_free1 ((gint)user_data, data);
 }
 
+static gboolean always_true (gpointer key, gpointer value, gpointer gp)
+{
+	return TRUE;
+}
+
+static void 
+camel_folder_summary_unload_mmap (CamelFolderSummary *s)
+{
+	camel_folder_summary_clear(s);
+	if (s->file)
+		g_mapped_file_free (s->file);
+	s->file = NULL;
+
+	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
+	if (s->messages->len > 0)
+		g_ptr_array_remove_range (s->messages, 0, s->messages->len-1);
+	g_hash_table_foreach_remove (s->messages_uid, always_true, NULL);
+
+}
+
 static void
 camel_folder_summary_finalize (CamelObject *obj)
 {
@@ -177,6 +201,7 @@ camel_folder_summary_finalize (CamelObject *obj)
 	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
 	g_ptr_array_free(s->messages, TRUE);
 	g_hash_table_destroy(s->messages_uid);
+	s->messages_uid = NULL;
 
 	g_hash_table_foreach(p->filter_charset, free_o_name, 0);
 	g_hash_table_destroy(p->filter_charset);
@@ -591,7 +616,7 @@ camel_folder_summary_load(CamelFolderSummary *s)
 			}
 		}
 
-		camel_folder_summary_add(s, mi);
+		camel_folder_summary_mmap_add(s, mi);
 	}
 
 
@@ -807,6 +832,17 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 }
 
 
+
+void 
+camel_folder_summary_dump_mmap (CamelFolderSummary *s)
+{
+	camel_folder_summary_save (s);
+	camel_folder_summary_unload_mmap (s);
+	camel_folder_summary_load(s);
+
+	return;
+}
+
 /**
  * camel_folder_summary_add:
  * @summary: a #CamelFolderSummary object
@@ -845,6 +881,24 @@ camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 }
 
+static void
+camel_folder_summary_mmap_add(CamelFolderSummary *s, CamelMessageInfo *info)
+{
+	CAMEL_SUMMARY_LOCK(s, summary_lock);
+
+/* unnecessary for pooled vectors */
+#ifdef DOESTRV
+	/* this is vitally important, and also if this is ever modified, then
+	   the hash table needs to be resynced */
+	info->strings = e_strv_pack(info->strings);
+#endif
+
+	g_ptr_array_add(s->messages, info);
+	g_hash_table_insert(s->messages_uid, (char *)camel_message_info_uid(info), info);
+	s->flags |= CAMEL_SUMMARY_DIRTY;
+
+	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+}
 
 /**
  * camel_folder_summary_add_from_header:
@@ -1090,9 +1144,9 @@ camel_folder_summary_content_info_free(CamelFolderSummary *s, CamelMessageConten
 void
 camel_folder_summary_touch(CamelFolderSummary *s)
 {
-	CAMEL_SUMMARY_LOCK(s, summary_lock);
+	//CAMEL_SUMMARY_LOCK(s, summary_lock);
 	s->flags |= CAMEL_SUMMARY_DIRTY;
-	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+	//CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 }
 
 

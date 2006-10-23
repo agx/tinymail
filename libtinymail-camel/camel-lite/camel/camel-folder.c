@@ -2116,7 +2116,7 @@ camel_folder_change_info_add_uid(CamelFolderChangeInfo *info, const char *uid)
 	struct _CamelFolderChangeInfoPrivate *p;
 	GPtrArray *olduids;
 	char *olduid;
-	
+
 	g_assert(info != NULL);
 	
 	p = info->priv;

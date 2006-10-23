@@ -1,3 +1,11 @@
+2006-10-23  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel/camel-lite: Drastic reduction of memory
+	consumption on initial download of both IMAP and NNTP folders.
+	* libtinymail-gnome-desktop: Default status of the device is now
+	offline in stead of online (for example in case network manager
+	installation was invalid or not found)
+
 2006-10-20  Sankarshan Mukhopadhyay <sankarshan.mukhopadhyay@gmail.com>
 
 	* docs/deve/reference/libtinymail-docs.sgml: Language corrections in

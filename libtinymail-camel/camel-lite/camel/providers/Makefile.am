@@ -1,18 +1,20 @@
 ## Process this file with automake to produce Makefile.in
 
+
+SUBDIRS = pop3 smtp imap local  
+
 if ENABLE_NNTP
-NNTP_DIR=nntp
+SUBDIRS += nntp 
 endif
 
 if ENABLE_IMAPP
-IMAPP_DIR=imapp
+SUBDIRS += imapp 
 endif
+
 
 if OS_WIN32
 else
-SENDMAIL_DIR=sendmail
+SUBDIRS += sendmail 
 endif
-
-SUBDIRS = pop3 $(SENDMAIL_DIR) smtp imap $(NNTP_DIR) local $(IMAPP_DIR) 
 
 

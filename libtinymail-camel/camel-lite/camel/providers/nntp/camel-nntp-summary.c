@@ -219,7 +219,7 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 	struct _camel_header_raw *headers = NULL;
 	char *line, *tab;
 	int len, ret;
-	unsigned int n, count, total, size;
+	unsigned int n, count, total, size, acnt=0;
 	struct _xover_header *xover;
 
 	s = (CamelFolderSummary *)cns;
@@ -281,6 +281,12 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 		if (xover == NULL) {
 			mi = (CamelMessageInfoBase *)camel_folder_summary_uid(s, cns->priv->uid);
 			if (mi == NULL) {
+
+				if (acnt > 1000) {
+					camel_folder_summary_dump_mmap (s);
+					acnt = 0;
+				}
+				acnt++;
 				mi = (CamelMessageInfoBase *)camel_folder_summary_add_from_header(s, headers);
 				if (mi) {
 #ifdef NON_TINYMAIL_FEATURES
@@ -314,7 +320,7 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 	CamelFolderSummary *s;
 	int ret = -1;
 	char *line, *msgid;
-	unsigned int i, n, count, total;
+	unsigned int i, n, count, total, acnt=0;
 	CamelMessageInfo *mi;
 	CamelMimeParser *mp;
 
@@ -348,10 +354,16 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 		if ((msgid = strchr(line, '<')) && (line = strchr(msgid+1, '>'))){
 			line[1] = 0;
 			cns->priv->uid = g_strdup_printf("%u,%s\n", n, msgid);
+
 			mi = camel_folder_summary_uid(s, cns->priv->uid);
 			if (mi == NULL) {
 				if (camel_mime_parser_init_with_stream(mp, (CamelStream *)store->stream) == -1)
 					goto error;
+				if (acnt > 1000) {
+					camel_folder_summary_dump_mmap (s);
+					acnt = 0;
+				}
+				acnt++;
 				mi = camel_folder_summary_add_from_parser(s, mp);
 				while (camel_mime_parser_step(mp, NULL, NULL) != CAMEL_MIME_PARSER_STATE_EOF)
 					;
