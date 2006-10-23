@@ -129,11 +129,6 @@ static void camel_object_bag_remove_unlocked(CamelObjectBag *inbag, CamelObject 
 
 /* ********************************************************************** */
 
-static pthread_mutex_t chunks_lock = PTHREAD_MUTEX_INITIALIZER;
-
-static EMemChunk *pair_chunks;
-static EMemChunk *hook_chunks;
-static unsigned int pair_id = 1;
 
 /* type-lock must be recursive, for atomically creating classes */
 static GStaticRecMutex type_lock = G_STATIC_REC_MUTEX_INIT;
@@ -146,8 +141,6 @@ static GHashTable *type_table;
 CamelType camel_object_type;
 CamelType camel_interface_type;
 
-#define P_LOCK(l) (pthread_mutex_lock(&l))
-#define P_UNLOCK(l) (pthread_mutex_unlock(&l))
 #define CLASS_LOCK(k) (g_mutex_lock((((CamelObjectClass *)k)->lock)))
 #define CLASS_UNLOCK(k) (g_mutex_unlock((((CamelObjectClass *)k)->lock)))
 #define REF_LOCK() (g_mutex_lock(ref_lock))
@@ -158,14 +151,17 @@ CamelType camel_interface_type;
 static struct _CamelHookPair *
 pair_alloc(void)
 {
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+	static guint next_id = 1;
 	CamelHookPair *pair;
 
-	P_LOCK(chunks_lock);
-	pair = g_slice_new (CamelHookPair);
-	pair->id = pair_id++;
-	if (pair_id == 0)
-		pair_id = 1;
-	P_UNLOCK(chunks_lock);
+	pair = g_slice_new(CamelHookPair);
+
+	g_static_mutex_lock(&mutex);
+	pair->id = next_id++;
+	if (next_id == 0)
+		next_id = 1;
+	g_static_mutex_unlock(&mutex);
 
 	return pair;
 }
@@ -173,29 +169,19 @@ pair_alloc(void)
 static void
 pair_free(CamelHookPair *pair)
 {
-	P_LOCK(chunks_lock);
 	g_slice_free (CamelHookPair, pair);
-	P_UNLOCK(chunks_lock);
 }
 
 static struct _CamelHookList *
 hooks_alloc(void)
 {
-	CamelHookList *hooks;
-
-	P_LOCK(chunks_lock);
-	hooks = g_slice_new (CamelHookList);
-	P_UNLOCK(chunks_lock);
-
-	return hooks;
+	return g_slice_new0 (CamelHookList);
 }
 
 static void
 hooks_free(CamelHookList *hooks)
 {
-	P_LOCK(chunks_lock);
 	g_slice_free (CamelHookList, hooks);
-	P_UNLOCK(chunks_lock);
 }
 
 /* not checked locked, who cares, only required for people that want to redefine root objects */
@@ -732,7 +718,7 @@ co_type_register(CamelType parent, const char * name,
 
 	size = offset + klass_size;
 
-	klass = g_malloc0(size);
+	klass = g_slice_alloc0(size);
 
 	klass->klass_size = size;
 	klass->klass_data = offset;

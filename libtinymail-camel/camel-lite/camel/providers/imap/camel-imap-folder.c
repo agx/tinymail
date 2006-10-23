@@ -2327,6 +2327,7 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 
 #define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE "
 
+
 /* FIXME: this needs to be kept in sync with camel-mime-utils.c's list
    of mailing-list headers and so might be best if this were
    auto-generated? */
@@ -2348,8 +2349,8 @@ imap_update_summary (CamelFolder *folder, int exists,
    CamelStream *stream;
    char *uid, *resp;
    GData *data;
-   gboolean more = TRUE;
-   unsigned int nextn = 1;
+   gboolean more = TRUE, tryagain = FALSE, tried = FALSE;
+   unsigned int nextn = 1, cnt=0;
 
    if (store->server_level >= IMAP_LEVEL_IMAP4REV1)
    	header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS MAILING_LIST_HEADERS ")";
@@ -2363,10 +2364,8 @@ imap_update_summary (CamelFolder *folder, int exists,
    if( g_getenv ("EVO_IMAP_FETCH_ALL_HEADERS") )
    	header_spec = "HEADER";
 
-   while (more)
+   while (more || tryagain)
    {
-	gint count = 0;
-	more = FALSE;
 
 	/* Figure out if any of the new messages are already cached (which
 	 * may be the case if we're re-syncing after disconnected operation).
@@ -2384,10 +2383,28 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	size = (exists - seq) * (IMAP_PRETEND_SIZEOF_FLAGS + IMAP_PRETEND_SIZEOF_SIZE + IMAP_PRETEND_SIZEOF_HEADERS);
 	got = 0;
-	if (!camel_imap_command_start (store, folder, ex,
-				       "UID FETCH %d:%d (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
-				       uidval + 1, uidval + 1 + nextn, header_spec))
-		return;
+
+	/* The thing is that x:y doesn't always work, it seems x:* does. So if 
+	we didn't see any messages pass by the first attempt, retry with a x:*
+	once. If we still don't get any messages, we'll assume the folder is
+	empty and/or no new messages are available (which is, indeed, a bit 
+	strange as something higher-up should have blocked this call then) */
+
+	if (!tryagain)
+	{
+		/* printf ("%d:%d\n", uidval + 1, uidval + 1 + nextn); */
+		if (!camel_imap_command_start (store, folder, ex,
+				"UID FETCH %d:%d (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
+				uidval + 1, uidval + 1 + nextn, header_spec))
+			return;
+	} else 
+	{
+		/* printf ("%d:*\n", uidval + 1); */
+		if (!camel_imap_command_start (store, folder, ex,
+				"UID FETCH %d:* (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
+				uidval + 1, header_spec))
+		tried = TRUE;
+	}
 
 	/* 1, 7, 19, 43, 91, .. until 1000 (the smaller, the more dumps, 
 	the slower. But too large consumes a lot memory, and also takes longer 
@@ -2405,15 +2422,21 @@ imap_update_summary (CamelFolder *folder, int exists,
 	 * the server will send the responses in a useful order...
 	 */
 
+	more = FALSE; 
+	tryagain = !tried;
+
 	fetch_data = g_ptr_array_new ();
 	messages = g_ptr_array_new ();
 	while ((type = camel_imap_command_response (store, &resp, ex)) ==
 			CAMEL_IMAP_RESPONSE_UNTAGGED) 
 	{
 		more = TRUE;
+		tried = TRUE;
+		tryagain = FALSE;
+
 		data = parse_fetch_response (imap_folder, resp);
 		g_free (resp);
-
+cnt++;
 		if (!data)
 			continue;
 		
@@ -2657,8 +2680,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 	}
 
 	endbmore:
-	count = 0;
+	i++; i--;
    } /* more */
+   
 }
 
 /* Called with the store's connect_lock locked */

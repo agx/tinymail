@@ -231,9 +231,6 @@ struct _CamelFolderSummary {
 	guint32 message_info_size;
 	guint32 content_info_size;
 
-	/* memory allocators (setup automatically) */
-	struct _EMemChunk *content_info_chunks;
-
 	char *summary_path;
 	gboolean build_content;	/* do we try and parse/index the content, or not? */
 

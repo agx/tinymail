@@ -6,6 +6,7 @@
 	offline in stead of online (for example in case network manager
 	installation was invalid or not found)
 	* Bugfix reported by Nitin.Mahajan@nokia.com
+	* libtinymail-camel/camel-lite: Merging with Matthen Barnes's stuff
 
 2006-10-20  Sankarshan Mukhopadhyay <sankarshan.mukhopadhyay@gmail.com>
 

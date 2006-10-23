@@ -112,14 +112,11 @@ camel_certdb_init (CamelCertDB *certdb)
 	
 	certdb->cert_size = sizeof (CamelCert);
 	
-	certdb->cert_chunks = NULL;
-	
 	certdb->certs = g_ptr_array_new ();
 	certdb->cert_hash = g_hash_table_new (g_str_hash, g_str_equal);
 	
 	certdb->priv->db_lock = g_mutex_new ();
 	certdb->priv->io_lock = g_mutex_new ();
-	certdb->priv->alloc_lock = g_mutex_new ();
 	certdb->priv->ref_lock = g_mutex_new ();
 }
 
@@ -140,12 +137,8 @@ camel_certdb_finalize (CamelObject *obj)
 	
 	g_free (certdb->filename);
 	
-	if (certdb->cert_chunks)
-		e_memchunk_destroy (certdb->cert_chunks);
-	
 	g_mutex_free (p->db_lock);
 	g_mutex_free (p->io_lock);
-	g_mutex_free (p->alloc_lock);
 	g_mutex_free (p->ref_lock);
 	
 	g_free (p);
@@ -478,10 +471,7 @@ certdb_cert_new (CamelCertDB *certdb)
 {
 	CamelCert *cert;
 	
-	if (certdb->cert_chunks)
-		cert = e_memchunk_alloc0 (certdb->cert_chunks);
-	else
-		cert = g_malloc0 (certdb->cert_size);
+	cert = g_slice_alloc0 (certdb->cert_size);
 	
 	cert->refcount = 1;
 	
@@ -491,17 +481,9 @@ certdb_cert_new (CamelCertDB *certdb)
 CamelCert *
 camel_certdb_cert_new (CamelCertDB *certdb)
 {
-	CamelCert *cert;
-	
 	g_return_val_if_fail (CAMEL_IS_CERTDB (certdb), NULL);
-	
-	CAMEL_CERTDB_LOCK (certdb, alloc_lock);
-	
-	cert = CAMEL_CERTDB_GET_CLASS (certdb)->cert_new (certdb);
-	
-	CAMEL_CERTDB_UNLOCK (certdb, alloc_lock);
-	
-	return cert;
+
+	return CAMEL_CERTDB_GET_CLASS (certdb)->cert_new (certdb);
 }
 
 void
@@ -536,10 +518,7 @@ camel_certdb_cert_unref (CamelCertDB *certdb, CamelCert *cert)
 	
 	if (cert->refcount <= 1) {
 		CAMEL_CERTDB_GET_CLASS (certdb)->cert_free (certdb, cert);
-		if (certdb->cert_chunks)
-			e_memchunk_free (certdb->cert_chunks, cert);
-		else
-			g_free (cert);
+		g_slice_free1(certdb->cert_size, cert);
 	} else {
 		cert->refcount--;
 	}

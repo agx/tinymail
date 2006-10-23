@@ -49,6 +49,7 @@ enum _ESExpResultType {
 };
 
 struct _ESExpResult {
+	struct _ESExpResult *mem_chain;
 	enum _ESExpResultType type;
 	union {
 		GPtrArray *ptrarray;
@@ -88,6 +89,7 @@ struct _ESExpSymbol {
 };
 
 struct _ESExpTerm {
+	struct _ESExpTerm *mem_chain;
 	enum _ESExpTermType type;
 	union {
 		char *string;
@@ -120,8 +122,8 @@ struct _ESExp {
 	
 	/* TODO: may also need a pool allocator for term strings, so we dont lose them
 	   in error conditions? */
-	struct _EMemChunk *term_chunks;
-	struct _EMemChunk *result_chunks;
+	struct _ESExpTerm *term_mem_chain;
+	struct _ESExpResult *result_mem_chain;
 };
 
 struct _ESExpClass {

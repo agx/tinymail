@@ -31,6 +31,7 @@ extern "C" {
 #include <camel/camel-folder.h>
 
 typedef struct _CamelFolderThreadNode {
+	struct _CamelFolderThreadNode *mem_chain;
 	struct _CamelFolderThreadNode *next, *parent, *child;
 	const CamelMessageInfo *message;
 	char *root_subject;	/* cached root equivalent subject */
@@ -43,7 +44,7 @@ typedef struct _CamelFolderThread {
 	guint32 subject   : 1;
 	
 	struct _CamelFolderThreadNode *tree;
-	struct _EMemChunk *node_chunks;
+	struct _CamelFolderThreadNode *mem_chain;
 	CamelFolder *folder;
 	GPtrArray *summary;
 } CamelFolderThread;
@@ -65,6 +66,8 @@ void camel_folder_thread_messages_unref(CamelFolderThread *threads);
 
 /* debugging function only */
 int camel_folder_threaded_messages_dump(CamelFolderThreadNode *c);
+
+CamelFolderThreadNode *camel_folder_thread_node_new(CamelFolderThread *thread);
 
 #ifdef __cplusplus
 }

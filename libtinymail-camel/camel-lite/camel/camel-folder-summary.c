@@ -131,8 +131,6 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	s->message_info_size = sizeof(CamelMessageInfoBase);
 	s->content_info_size = sizeof(CamelMessageContentInfo);
 
-	s->content_info_chunks = NULL;
-
 #if defined (DOESTRV) || defined (DOEPOOLV)
 	s->message_info_strings = CAMEL_MESSAGE_INFO_LAST;
 #endif
@@ -149,7 +147,6 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	p->summary_lock = g_mutex_new();
 	p->io_lock = g_mutex_new();
 	p->filter_lock = g_mutex_new();
-	p->alloc_lock = g_mutex_new();
 	p->ref_lock = g_mutex_new();
 }
 
@@ -208,9 +205,6 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	g_free(s->summary_path);
 
-	if (s->content_info_chunks)
-		e_memchunk_destroy(s->content_info_chunks);
-
 	if (p->filter_index)
 		camel_object_unref((CamelObject *)p->filter_index);
 	if (p->filter_64)
@@ -232,7 +226,6 @@ camel_folder_summary_finalize (CamelObject *obj)
 	g_mutex_free(p->summary_lock);
 	g_mutex_free(p->io_lock);
 	g_mutex_free(p->filter_lock);
-	g_mutex_free(p->alloc_lock);
 	g_mutex_free(p->ref_lock);
 	
 	g_free(p);
@@ -1720,17 +1713,7 @@ summary_format_string (struct _camel_header_raw *h, const char *name, const char
 CamelMessageContentInfo *
 camel_folder_summary_content_info_new(CamelFolderSummary *s)
 {
-	CamelMessageContentInfo *ci;
-
-	CAMEL_SUMMARY_LOCK(s, alloc_lock);
-	if (s->content_info_chunks == NULL)
-		s->content_info_chunks = e_memchunk_new(32, s->content_info_size);
-	ci = e_memchunk_alloc(s->content_info_chunks);
-	CAMEL_SUMMARY_UNLOCK(s, alloc_lock);
-	ci->needs_free = FALSE;
-	memset(ci, 0, s->content_info_size);
-
-	return ci;
+	return g_slice_alloc0(s->content_info_size);
 }
 
 static CamelMessageInfo *
@@ -2200,7 +2183,7 @@ content_info_free(CamelFolderSummary *s, CamelMessageContentInfo *ci)
 		token_free (ci->encoding);
 	}
 
-	e_memchunk_free(s->content_info_chunks, ci);
+	g_slice_free1(s->content_info_size, ci);
 }
 
 static char *
@@ -2830,13 +2813,10 @@ camel_message_info_new (CamelFolderSummary *s)
 {
 	CamelMessageInfo *info;
 
-	if (s) {
-		CAMEL_SUMMARY_LOCK(s, alloc_lock);
-		info = g_slice_alloc0 (s->message_info_size);
-		CAMEL_SUMMARY_UNLOCK(s, alloc_lock);
-	} else {
-		info = g_slice_alloc0 (s->message_info_size);
-	}
+	if (s)
+		info = g_slice_alloc0(s->message_info_size);
+	else
+		info = g_slice_new0(CamelMessageInfo);
 
 	info->refcount = 1;
 	info->summary = s;

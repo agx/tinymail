@@ -171,7 +171,9 @@ e_sexp_error(struct _ESExp *f)
 struct _ESExpResult *
 e_sexp_result_new(struct _ESExp *f, int type)
 {
-	struct _ESExpResult *r = e_memchunk_alloc0(f->result_chunks);
+	struct _ESExpResult *r = g_slice_new0(struct _ESExpResult);
+	r->mem_chain = f->result_mem_chain;
+	f->result_mem_chain = r;
 	r->type = type;
 	return r;
 }
@@ -198,7 +200,9 @@ e_sexp_result_free(struct _ESExp *f, struct _ESExpResult *t)
 	default:
 		g_assert_not_reached();
 	}
-	e_memchunk_free(f->result_chunks, t);
+
+	/* Just leave the result on the mem_chain.
+	 * It will be freed in e_sexp_finalise(). */
 }
 
 /* used in normal functions if they have to abort, and free their arguments */
@@ -813,7 +817,9 @@ parse_dump_term(struct _ESExpTerm *t, int depth)
 static struct _ESExpTerm *
 parse_term_new(struct _ESExp *f, int type)
 {
-	struct _ESExpTerm *s = e_memchunk_alloc0(f->term_chunks);
+	struct _ESExpTerm *s = g_slice_new0(struct _ESExpTerm);
+	s->mem_chain = f->term_mem_chain;
+	f->term_mem_chain = s;
 	s->type = type;
 	return s;
 }
@@ -849,7 +855,9 @@ parse_term_free(struct _ESExp *f, struct _ESExpTerm *t)
 	default:
 		printf("parse_term_free: unknown type: %d\n", t->type);
 	}
-	e_memchunk_free(f->term_chunks, t);
+
+	/* Just leave the term on the mem_chain.
+	 * It will be freed in e_sexp_finalise(). */
 }
 
 static struct _ESExpTerm **
@@ -1084,8 +1092,8 @@ e_sexp_finalise(void *o)
 		s->tree = NULL;
 	}
 
-	e_memchunk_destroy(s->term_chunks);
-	e_memchunk_destroy(s->result_chunks);
+	g_slice_free_chain(struct _ESExpTerm, s->term_mem_chain, mem_chain);
+	g_slice_free_chain(struct _ESExpResult, s->result_mem_chain, mem_chain);
 
 	g_scanner_scope_foreach_symbol(s->scanner, 0, free_symbol, 0);
 	g_scanner_destroy(s->scanner);
@@ -1101,8 +1109,6 @@ e_sexp_init (ESExp *s)
 	int i;
 
 	s->scanner = g_scanner_new(&scanner_config);
-	s->term_chunks = e_memchunk_new(16, sizeof(struct _ESExpTerm));
-	s->result_chunks = e_memchunk_new(16, sizeof(struct _ESExpResult));
 
 	/* load in builtin symbols? */
 	for(i=0;i<sizeof(symbols)/sizeof(symbols[0]);i++) {

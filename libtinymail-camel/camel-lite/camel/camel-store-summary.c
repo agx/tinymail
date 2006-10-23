@@ -97,8 +97,6 @@ camel_store_summary_init (CamelStoreSummary *s)
 
 	s->store_info_size = sizeof(CamelStoreInfo);
 
-	s->store_info_chunks = NULL;
-
 	s->version = CAMEL_STORE_SUMMARY_VERSION;
 	s->flags = 0;
 	s->count = 0;
@@ -109,7 +107,6 @@ camel_store_summary_init (CamelStoreSummary *s)
 	
 	p->summary_lock = g_mutex_new();
 	p->io_lock = g_mutex_new();
-	p->alloc_lock = g_mutex_new();
 	p->ref_lock = g_mutex_new();
 }
 
@@ -127,12 +124,8 @@ camel_store_summary_finalise (CamelObject *obj)
 
 	g_free(s->summary_path);
 
-	if (s->store_info_chunks)
-		e_memchunk_destroy(s->store_info_chunks);
-	
 	g_mutex_free(p->summary_lock);
 	g_mutex_free(p->io_lock);
-	g_mutex_free(p->alloc_lock);
 	g_mutex_free(p->ref_lock);
 	
 	g_free(p);
@@ -830,11 +823,7 @@ camel_store_summary_info_new(CamelStoreSummary *s)
 {
 	CamelStoreInfo *info;
 
-	CAMEL_STORE_SUMMARY_LOCK(s, alloc_lock);
-	if (s->store_info_chunks == NULL)
-		s->store_info_chunks = e_memchunk_new(32, s->store_info_size);
-	info = e_memchunk_alloc0(s->store_info_chunks);
-	CAMEL_STORE_SUMMARY_UNLOCK(s, alloc_lock);
+	info = g_slice_alloc0(s->store_info_size);
 	info->refcount = 1;
 	return info;
 }
@@ -943,7 +932,7 @@ store_info_free(CamelStoreSummary *s, CamelStoreInfo *info)
 {
 	g_free(info->path);
 	g_free(info->uri);
-	e_memchunk_free(s->store_info_chunks, info);
+	g_slice_free1(s->store_info_size, info);
 }
 
 static const char *

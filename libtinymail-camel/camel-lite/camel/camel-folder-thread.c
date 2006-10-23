@@ -116,8 +116,6 @@ prune_empty(CamelFolderThread *thread, CamelFolderThreadNode **cp)
 			if (c->child == NULL) {
 				d(printf("removing empty node\n"));
 				lastc->next = c->next;
-				m(memset(c, 0xfe, sizeof(*c)));
-				e_memchunk_free(thread->node_chunks, c);
 				continue;
 			}
 			if (c->parent || c->child->next==0) {
@@ -266,8 +264,6 @@ group_root_set(CamelFolderThread *thread, CamelFolderThreadNode **cp)
 					scan = scan->next;
 				scan->next = c->child;
 				clast->next = c->next;
-				m(memset(c, 0xee, sizeof(*c)));
-				e_memchunk_free(thread->node_chunks, c);
 				continue;
 			} if (c->message == NULL && container->message != NULL) {
 				d(printf("container is non-empty parent\n"));
@@ -294,7 +290,7 @@ group_root_set(CamelFolderThread *thread, CamelFolderThreadNode **cp)
 				remove_node(cp, container, &clast);
 				remove_node(cp, c, &clast);
 
-				scan = e_memchunk_alloc0(thread->node_chunks);
+				scan = camel_folder_thread_node_new(thread);
 
 				scan->root_subject = c->root_subject;
 				scan->re = c->re && container->re;
@@ -459,16 +455,16 @@ thread_summary(CamelFolderThread *thread, GPtrArray *summary)
 				/* if duplicate, just make out it is a no-id message,  but try and insert it
 				   into the right spot in the tree */
 				d(printf("doing: (duplicate message id)\n"));
-				c = e_memchunk_alloc0(thread->node_chunks);
+				c = camel_folder_thread_node_new(thread);
 				g_hash_table_insert(no_id_table, (void *)mi, c);
 			} else if (!c) {
 				d(printf("doing : %08x%08x (%s)\n", mid->id.part.hi, mid->id.part.lo, camel_message_info_subject(mi)));
-				c = e_memchunk_alloc0(thread->node_chunks);
+				c = camel_folder_thread_node_new(thread);
 				g_hash_table_insert(id_table, (void *)mid, c);
 			}
 		} else {
 			d(printf("doing : (no message id)\n"));
-			c = e_memchunk_alloc0(thread->node_chunks);
+			c = camel_folder_thread_node_new(thread);
 			g_hash_table_insert(no_id_table, (void *)mi, c);
 		}
 
@@ -489,7 +485,7 @@ thread_summary(CamelFolderThread *thread, GPtrArray *summary)
 				c = g_hash_table_lookup(id_table, &references->references[j]);
 				if (c == NULL) {
 					d(printf("not found\n"));
-					c = e_memchunk_alloc0(thread->node_chunks);
+					c = camel_folder_thread_node_new(thread);
 					g_hash_table_insert(id_table, (void *)&references->references[j], c);
 				}
 				if (c!=child)
@@ -550,8 +546,6 @@ thread_summary(CamelFolderThread *thread, GPtrArray *summary)
 			/* and link the now 'real' node into the list */
 			newtop->next = child->next;
 			c = newtop;
-			m(memset(child, 0xde, sizeof(*child)));
-			e_memchunk_free(thread->node_chunks, child);
 		} else {
 			c = child;
 		}
@@ -610,7 +604,7 @@ camel_folder_thread_messages_new (CamelFolder *folder, GPtrArray *uids, gboolean
 	thread->refcount = 1;
 	thread->subject = thread_subject;
 	thread->tree = NULL;
-	thread->node_chunks = e_memchunk_new(32, sizeof(CamelFolderThreadNode));
+	thread->mem_chain = NULL;
 	thread->folder = folder;
 	camel_object_ref((CamelObject *)folder);
 
@@ -685,9 +679,10 @@ camel_folder_thread_messages_apply(CamelFolderThread *thread, GPtrArray *uids)
 
 	g_hash_table_destroy(table);
 
+	g_slice_free_chain(CamelFolderThreadNode, thread->mem_chain, mem_chain);
+
 	thread->tree = NULL;
-	e_memchunk_destroy(thread->node_chunks);
-	thread->node_chunks = e_memchunk_new(32, sizeof(CamelFolderThreadNode));
+	thread->mem_chain = NULL;
 	thread_summary(thread, all);
 
 	g_ptr_array_free(thread->summary, TRUE);
@@ -722,7 +717,7 @@ camel_folder_thread_messages_unref(CamelFolderThread *thread)
 		g_ptr_array_free(thread->summary, TRUE);
 		camel_object_unref((CamelObject *)thread->folder);
 	}
-	e_memchunk_destroy(thread->node_chunks);
+	g_slice_free_chain(CamelFolderThreadNode, thread->mem_chain, mem_chain);
 	g_free(thread);
 }
 
@@ -753,7 +748,7 @@ camel_folder_thread_messages_new_summary(GPtrArray *summary)
 	thread = g_malloc(sizeof(*thread));
 	thread->refcount = 1;
 	thread->tree = NULL;
-	thread->node_chunks = e_memchunk_new(32, sizeof(CamelFolderThreadNode));
+	thread->mem_chain = NULL;
 	thread->folder = NULL;
 	thread->summary = NULL;
 
@@ -801,8 +796,9 @@ camel_folder_thread_messages_add(CamelFolderThread *thread, GPtrArray *summary)
 	g_hash_table_destroy(table);
 
 	/* reset the tree, and rebuild fully */
+	g_slice_free_chain(CamelFolderThreadNode, thread->mem_chain, mem_chain);
 	thread->tree = NULL;
-	e_memchunk_empty(thread->node_chunks);
+	thread->mem_chain = NULL;
 	thread_summary(thread, all);
 }
 
@@ -839,7 +835,6 @@ remove_uid_node_rec(CamelFolderThread *thread, GHashTable *table, CamelFolderThr
 
 				rest = next->next;
 				node->next = child;
-				e_memchunk_free(thread->node_chunks, next);
 				next = child;
 				do {
 					lchild = child;
@@ -856,7 +851,6 @@ remove_uid_node_rec(CamelFolderThread *thread, GHashTable *table, CamelFolderThr
 				  node
 				  rest */
 				node->next = next->next;
-				e_memchunk_free(thread->node_chunks, next);
 				next = node->next;
 			}
 		} else {
@@ -881,3 +875,16 @@ camel_folder_thread_messages_remove(CamelFolderThread *thread, GPtrArray *uids)
 }
 
 #endif
+
+CamelFolderThreadNode *
+camel_folder_thread_node_new(CamelFolderThread *thread)
+{
+	CamelFolderThreadNode *node;
+
+	node = g_slice_new0(CamelFolderThreadNode);
+	node->mem_chain = thread->mem_chain;
+	thread->mem_chain = node;
+
+	return node;
+}
+

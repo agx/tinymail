@@ -1825,6 +1825,7 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	return items;
 }
 
+
 static CamelFolder *
 get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, CamelException *ex)
 {

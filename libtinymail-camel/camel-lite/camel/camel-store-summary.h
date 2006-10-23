@@ -102,9 +102,6 @@ struct _CamelStoreSummary {
 	/* sizes of memory objects */
 	guint32 store_info_size;
 
-	/* memory allocators (setup automatically) */
-	struct _EMemChunk *store_info_chunks;
-
 	char *summary_path;
 
 	GPtrArray *folders;	/* CamelStoreInfo's */

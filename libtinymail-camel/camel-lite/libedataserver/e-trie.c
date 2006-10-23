@@ -34,6 +34,7 @@
 #define d(x)
 
 struct _trie_state {
+	struct _trie_state *mem_chain;
 	struct _trie_state *next;
 	struct _trie_state *fail;
 	struct _trie_match *match;
@@ -42,6 +43,7 @@ struct _trie_state {
 };
 
 struct _trie_match {
+	struct _trie_match *mem_chain;
 	struct _trie_match *next;
 	struct _trie_state *state;
 	gunichar c;
@@ -57,8 +59,8 @@ struct _ETrie {
 	GPtrArray *fail_states;
 	gboolean icase;
 	
-	EMemChunk *match_chunks;
-	EMemChunk *state_chunks;
+	struct _trie_match *match_mem_chain;
+	struct _trie_state *state_mem_chain;
 };
 
 
@@ -128,8 +130,8 @@ e_trie_new (gboolean icase)
 	trie->fail_states = g_ptr_array_sized_new (8);
 	trie->icase = icase;
 	
-	trie->match_chunks = e_memchunk_new (8, sizeof (struct _trie_match));
-	trie->state_chunks = e_memchunk_new (8, sizeof (struct _trie_state));
+	trie->match_mem_chain = NULL;
+	trie->state_mem_chain = NULL;
 	
 	return trie;
 }
@@ -144,8 +146,8 @@ void
 e_trie_free (ETrie *trie)
 {
 	g_ptr_array_free (trie->fail_states, TRUE);
-	e_memchunk_destroy (trie->match_chunks);
-	e_memchunk_destroy (trie->state_chunks);
+	g_slice_free_chain (struct _trie_match, trie->match_mem_chain, mem_chain);
+	g_slice_free_chain (struct _trie_state, trie->state_mem_chain, mem_chain);
 	g_free (trie);
 }
 
@@ -167,12 +169,16 @@ trie_insert (ETrie *trie, int depth, struct _trie_state *q, gunichar c)
 {
 	struct _trie_match *m;
 	
-	m = e_memchunk_alloc (trie->match_chunks);
+	m = g_slice_new (struct _trie_match);
+	m->mem_chain = trie->match_mem_chain;
+	trie->match_mem_chain = m;
 	m->next = q->match;
 	m->c = c;
 	
 	q->match = m;
-	q = m->state = e_memchunk_alloc (trie->state_chunks);
+	q = m->state = g_slice_new (struct _trie_state);
+	q->mem_chain = trie->state_mem_chain;
+	trie->state_mem_chain = q;
 	q->match = NULL;
 	q->fail = &trie->root;
 	q->final = 0;

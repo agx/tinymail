@@ -299,7 +299,7 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		return CAMEL_IMAP_RESPONSE_ERROR;
 	}
-	
+
 	switch (*respbuf) {
 	case '*':
 		if (!g_ascii_strncasecmp (respbuf, "* BYE", 5)) {
