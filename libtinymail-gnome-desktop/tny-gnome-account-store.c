@@ -232,9 +232,6 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 static void
 per_account_forget_pass_func (TnyAccount *account)
 {
-	const TnyAccountStore *self = tny_account_get_account_store (account);
-	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-	TnyGetPassFunc func;
 	if (G_LIKELY (passwords))
 	{
 		const gchar *accountid = tny_account_get_id (account);
