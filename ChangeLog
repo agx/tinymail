@@ -5,6 +5,7 @@
 	* libtinymail-gnome-desktop: Default status of the device is now
 	offline in stead of online (for example in case network manager
 	installation was invalid or not found)
+	* Bugfix reported by Nitin.Mahajan@nokia.com
 
 2006-10-20  Sankarshan Mukhopadhyay <sankarshan.mukhopadhyay@gmail.com>
 
