@@ -2357,7 +2357,9 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	return;
 }
 
-#define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE "
+/* #define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE " */
+
+#define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE "
 
 
 /* FIXME: this needs to be kept in sync with camel-mime-utils.c's list
@@ -2413,16 +2415,16 @@ imap_update_summary (CamelFolder *folder, int exists,
    unsigned int nextn = 1, cnt=0, tcnt=0;
 
    if (store->server_level >= IMAP_LEVEL_IMAP4REV1)
-   	header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS MAILING_LIST_HEADERS ")";
+   	header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS ")";
    else
    	header_spec = "0";
 
-   /* Used as a way to fetch all Headers instead of the selective headers.
-      Support for fetching custom headers could be done in a better way,
-      using CamelURL and EPlugins. */
-
-   if( g_getenv ("EVO_IMAP_FETCH_ALL_HEADERS") )
+   if( g_getenv ("TNY_IMAP_FETCH_ALL_HEADERS") )
    	header_spec = "HEADER";
+
+   nextn = camel_folder_summary_count (folder->summary);
+   if (nextn <= 0)
+      camel_folder_summary_load (folder->summary);
 
    tcnt = 0;
    while (more)
@@ -2445,7 +2447,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	got = 0;
 
 	if (!camel_imap_command_start (store, folder, ex,
-		"UID FETCH %d:%d FLAGS", uidval + 1, uidval + 1 + nextn))
+		"UID FETCH %d:%d (FLAGS)", uidval + 1, uidval + 1 + nextn))
 		return;
 
 	more = FALSE; 

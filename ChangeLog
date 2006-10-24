@@ -1,3 +1,7 @@
+2006-10-24  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel/camel-lite: All sorts of bugfixes
+
 2006-10-23  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Drastic reduction of memory
