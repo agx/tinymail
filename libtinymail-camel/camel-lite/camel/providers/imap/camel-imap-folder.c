@@ -2353,9 +2353,10 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 		g_free (resp);
 		if (!data)
 			continue;
-		g_ptr_array_add (needheaders, g_datalist_get_data (&data, "UID"));
+		g_ptr_array_add (needheaders, g_strdup (g_datalist_get_data (&data, "UID")));
 		if (size > 0)
 			camel_operation_progress (NULL, got * 100 / size);
+		g_datalist_clear (&data);
 	}
 	g_free (resp);
 	return cnt;
