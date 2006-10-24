@@ -2426,6 +2426,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    if (nextn <= 0)
       camel_folder_summary_load (folder->summary);
 
+   nextn = 1;
    tcnt = 0;
    while (more)
    {
