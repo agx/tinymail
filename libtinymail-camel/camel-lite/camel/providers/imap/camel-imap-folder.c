@@ -2412,7 +2412,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    char *uid, *resp;
    GData *data;
    gboolean more = TRUE;
-   unsigned int nextn = 1, cnt=0, tcnt=0;
+   unsigned int nextn, cnt=0, tcnt=0;
 
    if (store->server_level >= IMAP_LEVEL_IMAP4REV1)
    	header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS ")";
@@ -2422,9 +2422,11 @@ imap_update_summary (CamelFolder *folder, int exists,
    if( g_getenv ("TNY_IMAP_FETCH_ALL_HEADERS") )
    	header_spec = "HEADER";
 
-   nextn = camel_folder_summary_count (folder->summary);
+   nextn = 0;
+   if (folder->summary)
+   	nextn = camel_folder_summary_count (folder->summary);
    if (nextn <= 0)
-      camel_folder_summary_load (folder->summary);
+   	camel_folder_summary_load (folder->summary);
 
    nextn = 1;
    tcnt = 0;
