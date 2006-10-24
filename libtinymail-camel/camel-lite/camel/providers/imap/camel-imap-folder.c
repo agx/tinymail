@@ -2499,7 +2499,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
 			if (!camel_imap_command_start (store, folder, ex,
 						       "UID FETCH %s (FLAGS INTERNALDATE BODY.PEEK[%s])",
-						       uidset, header_spec)) {
+						       uidset, header_spec)) 
+			{
+				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
 				g_free (uidset);
@@ -2526,14 +2528,16 @@ imap_update_summary (CamelFolder *folder, int exists,
 					if (mi) 
 					{
 					  flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
-					  if (flags) {
+					  if (flags) 
+					  {
 						mi->server_flags = flags;
 						mi->info.flags |= flags;
 						flags_to_label(folder, mi);
 					  }
 
 					  muid = g_datalist_get_data (&data, "UID");
-					  if (muid) {
+					  if (muid) 
+					  {
 						mi->info.uid = g_strdup (muid);
 						mi->info.uid_needs_free = TRUE;
 					  }
@@ -2568,6 +2572,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			}
 			
 			if (type == CAMEL_IMAP_RESPONSE_ERROR) {
+				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
 				more = FALSE;
@@ -2576,6 +2581,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 		}
 		camel_operation_end (NULL);
 	}
+	g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 	g_ptr_array_free (needheaders, TRUE);
 
    } /* more */
