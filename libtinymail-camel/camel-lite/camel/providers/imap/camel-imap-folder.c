@@ -2573,10 +2573,10 @@ imap_update_summary (CamelFolder *folder, int exists,
 	}
 	g_ptr_array_free (needheaders, TRUE);
 
-	camel_folder_summary_dump_mmap (folder->summary);
-
    } /* more */
-   
+
+   camel_folder_summary_dump_mmap (folder->summary);
+
 }
 
 /* Called with the store's connect_lock locked */
