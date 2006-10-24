@@ -2345,7 +2345,6 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
 	GData *data;
  
-	camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 	while ((type = camel_imap_command_response (store, &resp, ex)) ==
 			CAMEL_IMAP_RESPONSE_UNTAGGED) 
 	{
@@ -2358,7 +2357,6 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 		if (size > 0)
 			camel_operation_progress (NULL, got * 100 / size);
 	}
-	camel_operation_end (NULL);
 	g_free (resp);
 	return cnt;
 
@@ -2398,6 +2396,9 @@ imap_update_summary (CamelFolder *folder, int exists,
    tcnt = 0;
    while (more)
    {
+	gboolean did_hack = FALSE;
+	gint hcnt = 0;
+
 	seq = camel_folder_summary_count (folder->summary);
 	first = seq + 1;
 	if (seq > 0) {
@@ -2420,7 +2421,11 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	more = FALSE; 
 	needheaders = g_ptr_array_new ();
+
+	camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 	cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+	camel_operation_end (NULL);
+
 	tcnt += cnt;
 
 	if (tcnt >= (exists - seq))
@@ -2430,12 +2435,15 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	if (more && (((exists - seq) > nextn) && (cnt < nextn)))
 	{
+		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 		if (!camel_imap_command_start (store, folder, ex,
 			"UID FETCH %d:* FLAGS", uidval + 1))
 			return;
 		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+		camel_operation_end (NULL);
 		tcnt += cnt;
 		more = FALSE;
+		did_hack = TRUE;
 	}
 
 	if (nextn < 1000)
@@ -2479,7 +2487,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 				stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
 				if (stream) {
 					mi = add_message_from_data (folder, messages, first, data);
-
 					if (mi) 
 					{
 					  flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
@@ -2494,6 +2501,16 @@ imap_update_summary (CamelFolder *folder, int exists,
 						mi->info.uid = g_strdup (muid);
 						mi->info.uid_needs_free = TRUE;
 					  }
+					}
+
+					if (did_hack)
+					{
+						hcnt++;
+						if (hcnt > 1000)
+						{
+							camel_folder_summary_dump_mmap (folder->summary);
+							hcnt = 0;
+						}
 					}
 
 					got += IMAP_PRETEND_SIZEOF_HEADERS;
