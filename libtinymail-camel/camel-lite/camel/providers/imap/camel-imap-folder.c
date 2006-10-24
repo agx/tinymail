@@ -2285,7 +2285,38 @@ decode_internaldate (const unsigned char *in)
 	return date;
 }
 
+
 static CamelImapMessageInfo*
+message_from_data (CamelFolder *folder, GData *data)
+{
+	CamelMimeMessage *msg;
+	CamelStream *stream;
+	CamelImapMessageInfo *mi;
+	const char *idate;
+
+	stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
+	if (!stream)
+		return NULL;
+
+	msg = camel_mime_message_new ();
+	if (camel_data_wrapper_construct_from_stream (CAMEL_DATA_WRAPPER (msg), stream) == -1) {
+		camel_object_unref (CAMEL_OBJECT (msg));
+		return NULL;
+	}
+
+	mi = (CamelImapMessageInfo *)camel_folder_summary_info_new_from_message (folder->summary, msg);
+	camel_object_unref (CAMEL_OBJECT (msg));
+
+	if ((idate = g_datalist_get_data (&data, "INTERNALDATE")))
+		mi->info.date_received = decode_internaldate ((const unsigned char *) idate);
+	
+	if (mi->info.date_received == -1)
+		mi->info.date_received = mi->info.date_sent;
+
+	return mi;
+}
+
+static void
 add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 		       int first, GData *data)
 {
@@ -2297,10 +2328,10 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	
 	seq = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
 	if (seq < first)
-		return NULL;
+		return;
 	stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
 	if (!stream)
-		return NULL;
+		return;
 	
 	if (seq - first >= messages->len)
 		g_ptr_array_set_size (messages, seq - first + 1);
@@ -2308,7 +2339,7 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	msg = camel_mime_message_new ();
 	if (camel_data_wrapper_construct_from_stream (CAMEL_DATA_WRAPPER (msg), stream) == -1) {
 		camel_object_unref (CAMEL_OBJECT (msg));
-		return NULL;
+		return;
 	}
 	
 	mi = (CamelImapMessageInfo *)camel_folder_summary_info_new_from_message (folder->summary, msg);
@@ -2323,9 +2354,8 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 
 	messages->pdata[seq - first] = mi;
 
-	return mi;
+	return;
 }
-
 
 #define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE "
 
@@ -2370,7 +2400,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 {
    CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
    CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
-   GPtrArray *fetch_data = NULL, *messages = NULL, *needheaders;
+   GPtrArray *needheaders;
    guint32 flags, uidval;
    int i, seq, first, size, got;
    CamelImapResponseType type;
@@ -2400,7 +2430,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 	gboolean did_hack = FALSE;
 	gint hcnt = 0;
 
+	camel_folder_summary_dump_mmap (folder->summary);
 	seq = camel_folder_summary_count (folder->summary);
+
 	first = seq + 1;
 	if (seq > 0) {
 		mi = (CamelImapMessageInfo *)camel_folder_summary_index (folder->summary, seq - 1);
@@ -2415,10 +2447,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 	if (!camel_imap_command_start (store, folder, ex,
 		"UID FETCH %d:%d FLAGS", uidval + 1, uidval + 1 + nextn))
 		return;
-
-	/* 1, 7, 19, 43, 91, .. until 1000 (the smaller, the more dumps, 
-	the slower. But too large consumes a lot memory, and also takes longer 
-	to fetch from the service before we can dump) */
 
 	more = FALSE; 
 	needheaders = g_ptr_array_new ();
@@ -2452,7 +2480,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 	else
 		nextn = 1000;
 
-	messages = g_ptr_array_new ();
 	if (needheaders->len) 
 	{
 		char *uidset;
@@ -2471,7 +2498,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
 				g_free (uidset);
-				goto lose;
+				more = FALSE;
+				goto endbmore;
 			}
 			g_free (uidset);
 
@@ -2486,8 +2514,10 @@ imap_update_summary (CamelFolder *folder, int exists,
 					continue;
 
 				stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
-				if (stream) {
-					mi = add_message_from_data (folder, messages, first, data);
+				if (stream) 
+				{
+					mi = message_from_data (folder, data);
+
 					if (mi) 
 					{
 					  flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
@@ -2502,6 +2532,17 @@ imap_update_summary (CamelFolder *folder, int exists,
 						mi->info.uid = g_strdup (muid);
 						mi->info.uid_needs_free = TRUE;
 					  }
+
+					  info = (CamelImapMessageInfo *)camel_folder_summary_uid(folder->summary, muid);
+					  if (info)
+						camel_message_info_free(&info->info);
+
+					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
+					  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
+
+					  if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
+						camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
+
 					}
 
 					if (did_hack)
@@ -2524,80 +2565,17 @@ imap_update_summary (CamelFolder *folder, int exists,
 			if (type == CAMEL_IMAP_RESPONSE_ERROR) {
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
-				goto lose;
+				more = FALSE;
+				goto endbmore;
 			}
 		}
 		g_ptr_array_free (needheaders, TRUE);
 		camel_operation_end (NULL);
 	}
 
-
-	/* And add the entries to the summary, etc. */
-	for (i = 0; i < messages->len; i++) 
-	{
-
-		mi = messages->pdata[i];
-		if (!mi)
-			continue;
-
-		uid = (char *)camel_message_info_uid(mi);
-		if (uid[0] == 0) {
-			g_warning("Server provided no uid: message %d", i + first);
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-					      _("Incomplete server response: no UID provided for message %d"),
-					      i + first);
-			break;
-		}
-
-		info = (CamelImapMessageInfo *)camel_folder_summary_uid(folder->summary, uid);
-		if (info) 
-		{
-			for (seq = 0; seq < camel_folder_summary_count (folder->summary); seq++) {
-				if (folder->summary->messages->pdata[seq] == info)
-					break;
-			}
-			
-			g_warning("Message already present? %s", camel_message_info_uid(mi));
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-					      _("Unexpected server response: Identical UIDs provided for messages %d and %d"),
-					      seq + 1, i + first);
-			
-			camel_message_info_free(&info->info);
-			break;
-		}
-
-		camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
-		camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
-
-		if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
-			camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
-	}
-
 	camel_folder_summary_dump_mmap (folder->summary);
 
-	for ( ; i < messages->len; i++) {
-		if ((mi = messages->pdata[i]))
-			camel_message_info_free(&mi->info);
-	}
-	g_ptr_array_free (messages, TRUE);
-
 	goto endbmore;
-
- lose:
-	if (fetch_data) {
-		for (i = 0; i < fetch_data->len; i++) {
-			data = fetch_data->pdata[i];
-			g_datalist_clear (&data);
-		}
-		g_ptr_array_free (fetch_data, TRUE);
-	}
-	if (messages) {
-		for (i = 0; i < messages->len; i++) {
-			if (messages->pdata[i])
-				camel_message_info_free(messages->pdata[i]);
-		}
-		g_ptr_array_free (messages, TRUE);
-	}
 
 	endbmore:
 	i++; i--;
