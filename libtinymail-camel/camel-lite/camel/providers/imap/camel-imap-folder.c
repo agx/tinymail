@@ -2466,7 +2466,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	{
 		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 		if (!camel_imap_command_start (store, folder, ex,
-			"UID FETCH %d:* FLAGS", uidval + 1))
+			"UID FETCH %d:* FLAGS", uidval + 1 + cnt))
 			return;
 		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
 		camel_operation_end (NULL);
@@ -2499,7 +2499,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 				camel_operation_end (NULL);
 				g_free (uidset);
 				more = FALSE;
-				goto endbmore;
+				return;
 			}
 			g_free (uidset);
 
@@ -2566,19 +2566,15 @@ imap_update_summary (CamelFolder *folder, int exists,
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
 				more = FALSE;
-				goto endbmore;
+				return;
 			}
 		}
-		g_ptr_array_free (needheaders, TRUE);
 		camel_operation_end (NULL);
 	}
+	g_ptr_array_free (needheaders, TRUE);
 
 	camel_folder_summary_dump_mmap (folder->summary);
 
-	goto endbmore;
-
-	endbmore:
-	i++; i--;
    } /* more */
    
 }
