@@ -2415,6 +2415,9 @@ imap_update_summary (CamelFolder *folder, int exists,
    gboolean more = TRUE;
    unsigned int nextn, cnt=0, tcnt=0;
 
+   if (!store->ostream || !store->istream)
+	return;
+
    if (store->server_level >= IMAP_LEVEL_IMAP4REV1)
    	header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS ")";
    else
@@ -2451,7 +2454,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	got = 0;
 
 	if (!camel_imap_command_start (store, folder, ex,
-		"UID FETCH %d:%d (FLAGS)", uidval + 1, uidval + 1 + nextn))
+		"UID FETCH %d:%d (FLAGS)", uidval + 1, uidval + 1 + nextn)) 
 		return;
 
 	more = FALSE; 
@@ -2476,6 +2479,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			return;
 		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
 		camel_operation_end (NULL);
+
 		tcnt += cnt;
 		more = FALSE;
 		did_hack = TRUE;

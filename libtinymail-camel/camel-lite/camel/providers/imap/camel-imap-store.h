@@ -111,6 +111,7 @@ struct _CamelImapStore {
 	
 	CamelStream *istream;
 	CamelStream *ostream;
+	GMutex *stream_lock;
 
 	struct _CamelImapStoreSummary *summary;
 	

@@ -211,16 +211,19 @@ camel_imap_store_finalize (CamelObject *object)
 		disco->diary = NULL;
 	}
 
+	g_mutex_free (imap_store->stream_lock);
+
 }
 
 static void
 camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
-	
+
 	imap_store->istream = NULL;
 	imap_store->ostream = NULL;
-	
+	imap_store->stream_lock = g_mutex_new ();
+
 	imap_store->dir_sep = '\0';
 	imap_store->current_folder = NULL;
 	imap_store->connected = FALSE;
@@ -597,10 +600,12 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		
 		return FALSE;
 	}
-	
+
+	g_mutex_lock (store->stream_lock);
 	store->ostream = tcp_stream;
 	store->istream = camel_stream_buffer_new (tcp_stream, CAMEL_STREAM_BUFFER_READ);
-	
+	g_mutex_unlock (store->stream_lock);
+
 	store->connected = TRUE;
 	store->preauthed = FALSE;
 	store->command = 0;
@@ -616,7 +621,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	camel_tcp_stream_setsockopt((CamelTcpStream *)tcp_stream, &sockopt);
 
 	/* Read the greeting, if any, and deal with PREAUTH */
-	if (camel_imap_store_readline (store, &buf, ex) < 0) {
+	if (camel_imap_store_readline (store, &buf, ex) < 0) 
+	{
+
+		g_mutex_lock (store->stream_lock);
 		if (store->istream) {
 			camel_object_unref (store->istream);
 			store->istream = NULL;
@@ -626,7 +634,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
 		}
-		
+		g_mutex_unlock (store->stream_lock);
+
 		store->connected = FALSE;
 		
 		return FALSE;
@@ -666,7 +675,9 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	g_free (buf);
 	
 	/* get the imap server capabilities */
-	if (!imap_get_capability (service, ex)) {
+	if (!imap_get_capability (service, ex)) 
+	{
+		g_mutex_lock (store->stream_lock);
 		if (store->istream) {
 			camel_object_unref (store->istream);
 			store->istream = NULL;
@@ -676,7 +687,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
 		}
-		
+		g_mutex_unlock (store->stream_lock);
+
 		store->connected = FALSE;
 		return FALSE;
 	}
@@ -704,10 +716,14 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	clean_quit = FALSE;
 	
 	response = camel_imap_command (store, NULL, ex, "STARTTLS");
-	if (!response) {
+	if (!response) 
+	{
+		g_mutex_lock (store->stream_lock);
 		camel_object_unref (store->istream);
 		camel_object_unref (store->ostream);
 		store->istream = store->ostream = NULL;
+		g_mutex_unlock (store->stream_lock);
+
 		return FALSE;
 	}
 	
@@ -729,7 +745,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	
 	/* rfc2595, section 4 states that after a successful STLS
            command, the client MUST discard prior CAPA responses */
-	if (!imap_get_capability (service, ex)) {
+	if (!imap_get_capability (service, ex)) 
+	{
+
+		g_mutex_lock (store->stream_lock);
 		if (store->istream) {
 			camel_object_unref (store->istream);
 			store->istream = NULL;
@@ -739,7 +758,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
 		}
-		
+		g_mutex_unlock (store->stream_lock);
+
 		store->connected = FALSE;
 		
 		return FALSE;
@@ -762,7 +782,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		if (response)
 			camel_imap_response_free_without_processing (store, response);
 	}
-	
+
+	g_mutex_lock (store->stream_lock);
 	if (store->istream) {
 		camel_object_unref (store->istream);
 		store->istream = NULL;
@@ -772,7 +793,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		camel_object_unref (store->ostream);
 		store->ostream = NULL;
 	}
-	
+	g_mutex_unlock (store->stream_lock);
+
 	store->connected = FALSE;
 	
 	return FALSE;
@@ -878,16 +900,20 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 		return FALSE;
 	}
 	g_free (full_cmd);
-	
+
+	g_mutex_lock (store->stream_lock);
 	store->ostream = cmd_stream;
 	store->istream = camel_stream_buffer_new (cmd_stream, CAMEL_STREAM_BUFFER_READ);
-	
+	g_mutex_unlock (store->stream_lock);
+
 	store->connected = TRUE;
 	store->preauthed = FALSE;
 	store->command = 0;
 	
 	/* Read the greeting, if any, and deal with PREAUTH */
-	if (camel_imap_store_readline (store, &buf, ex) < 0) {
+	if (camel_imap_store_readline (store, &buf, ex) < 0) 
+	{
+		g_mutex_lock (store->stream_lock);
 		if (store->istream) {
 			camel_object_unref (store->istream);
 			store->istream = NULL;
@@ -897,7 +923,8 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
 		}
-		
+		g_mutex_unlock (store->stream_lock);
+
 		store->connected = FALSE;
 		return FALSE;
 	}
@@ -906,7 +933,9 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 	g_free (buf);
 	
 	/* get the imap server capabilities */
-	if (!imap_get_capability (service, ex)) {
+	if (!imap_get_capability (service, ex)) 
+	{
+		g_mutex_lock (store->stream_lock);
 		if (store->istream) {
 			camel_object_unref (store->istream);
 			store->istream = NULL;
@@ -916,7 +945,8 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
 		}
-		
+		g_mutex_unlock (store->stream_lock);
+
 		store->connected = FALSE;
 		return FALSE;
 	}
@@ -1567,6 +1597,7 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 
+	g_mutex_lock (store->stream_lock);
 	if (store->istream) {
 		camel_stream_close(store->istream);
 		camel_object_unref(store->istream);
@@ -1578,7 +1609,8 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 		camel_object_unref(store->ostream);
 		store->ostream = NULL;
 	}
-	
+	g_mutex_unlock (store->stream_lock);
+
 	store->connected = FALSE;
 	if (store->current_folder) {
 		camel_object_unref (store->current_folder);
