@@ -127,7 +127,7 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	p = _PRIVATE(s) = g_malloc0(sizeof(*p));
 
 	p->filter_charset = g_hash_table_new (camel_strcase_hash, camel_strcase_equal);
-
+	s->dump_lock = g_mutex_new ();
 	s->message_info_size = sizeof(CamelMessageInfoBase);
 	s->content_info_size = sizeof(CamelMessageContentInfo);
 
@@ -179,7 +179,6 @@ camel_folder_summary_unload_mmap (CamelFolderSummary *s)
 	if (s->messages->len > 0)
 		g_ptr_array_remove_range (s->messages, 0, s->messages->len-1);
 	g_hash_table_foreach_remove (s->messages_uid, always_true, NULL);
-
 }
 
 static void
@@ -190,6 +189,7 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	p = _PRIVATE(obj);
 
+	g_mutex_lock (s->dump_lock);
 	camel_folder_summary_clear(s);
 	if (s->file)
 		g_mapped_file_free (s->file);
@@ -199,6 +199,8 @@ camel_folder_summary_finalize (CamelObject *obj)
 	g_ptr_array_free(s->messages, TRUE);
 	g_hash_table_destroy(s->messages_uid);
 	s->messages_uid = NULL;
+	g_mutex_unlock (s->dump_lock);
+	g_mutex_free (s->dump_lock);
 
 	g_hash_table_foreach(p->filter_charset, free_o_name, 0);
 	g_hash_table_destroy(p->filter_charset);
@@ -829,9 +831,11 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 void 
 camel_folder_summary_dump_mmap (CamelFolderSummary *s)
 {
+	g_mutex_lock (s->dump_lock);
 	camel_folder_summary_save (s);
 	camel_folder_summary_unload_mmap (s);
 	camel_folder_summary_load(s);
+	g_mutex_unlock (s->dump_lock);
 
 	return;
 }
@@ -852,11 +856,19 @@ camel_folder_summary_dump_mmap (CamelFolderSummary *s)
 void
 camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 {
-	if (info == NULL)
+	g_mutex_lock (s->dump_lock);
+
+	if (info == NULL) 
+	{
+		g_mutex_unlock (s->dump_lock);
 		return;
+	}
 
 	if (summary_assign_uid(s, info) == 0)
+	{
+		g_mutex_unlock (s->dump_lock);
 		return;
+	}
 
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 
@@ -872,6 +884,8 @@ camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+
+	g_mutex_unlock (s->dump_lock);
 }
 
 static void
@@ -1181,13 +1195,14 @@ camel_folder_summary_clear(CamelFolderSummary *s)
 void
 camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 {
+	g_mutex_lock (s->dump_lock);
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 	g_hash_table_remove(s->messages_uid, camel_message_info_uid(info));
 	g_ptr_array_remove(s->messages, info);
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
-
 	camel_message_info_free(info);
+	g_mutex_unlock (s->dump_lock);
 }
 
 
@@ -1260,6 +1275,7 @@ camel_folder_summary_remove_range(CamelFolderSummary *s, int start, int end)
 	if (end < start)
 		return;
 
+	g_mutex_lock (s->dump_lock);
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 	if (start < s->messages->len) {
 		CamelMessageInfo **infos;
@@ -1287,6 +1303,8 @@ camel_folder_summary_remove_range(CamelFolderSummary *s, int start, int end)
 	} else {
 		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 	}
+	
+	g_mutex_unlock (s->dump_lock);
 }
 
 /* should be sorted, for binary search */

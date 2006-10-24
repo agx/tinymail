@@ -242,6 +242,7 @@ struct _CamelFolderSummary {
 
 	GMappedFile *file;
 	unsigned char *filepos;
+	GMutex *dump_lock;
 };
 
 struct _CamelFolderSummaryClass {

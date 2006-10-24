@@ -2371,7 +2371,7 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 static guint32 
 imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, GPtrArray *needheaders, int size, int got)
 {
-	char *resp;
+	char *resp = NULL;
 	CamelImapResponseType type;
 	guint32 cnt = 0;
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
@@ -2382,7 +2382,7 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 	{
 		cnt++;
 		data = parse_fetch_response (imap_folder, resp);
-		g_free (resp);
+		g_free (resp); resp=NULL;
 		if (!data)
 			continue;
 		g_ptr_array_add (needheaders, g_strdup (g_datalist_get_data (&data, "UID")));
@@ -2390,7 +2390,8 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 			camel_operation_progress (NULL, got * 100 / size);
 		g_datalist_clear (&data);
 	}
-	g_free (resp);
+	if (type == CAMEL_IMAP_RESPONSE_TAGGED && resp)
+		g_free (resp);
 	return cnt;
 
 }

@@ -940,7 +940,7 @@ static struct {
 	{ NULL,            "imap",  IMAP_PORT,  MODE_CLEAR },
 };
 
-static gboolean
+gboolean
 connect_to_server_wrapper (CamelService *service, CamelException *ex)
 {
 	const char *ssl_mode;

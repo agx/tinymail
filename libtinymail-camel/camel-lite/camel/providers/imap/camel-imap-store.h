@@ -151,6 +151,7 @@ CamelType camel_imap_store_get_type (void);
 gboolean camel_imap_store_connected (CamelImapStore *store, CamelException *ex);
 
 ssize_t camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *ex);
+gboolean connect_to_server_wrapper (CamelService *service, CamelException *ex);
 
 #ifdef __cplusplus
 }

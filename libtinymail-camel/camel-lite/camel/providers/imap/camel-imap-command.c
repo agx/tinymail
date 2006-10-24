@@ -176,7 +176,10 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		    const char *cmd, CamelException *ex)
 {
 	ssize_t nwritten;
-	
+
+	if (store->ostream == NULL)
+		connect_to_server_wrapper ((CamelService*)store, ex);
+
 	g_return_val_if_fail(store->ostream!=NULL, FALSE);
 	g_return_val_if_fail(store->istream!=NULL, FALSE);
 	
