@@ -2475,12 +2475,33 @@ imap_update_summary (CamelFolder *folder, int exists,
 	{
 		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 		if (!camel_imap_command_start (store, folder, ex,
-			"UID FETCH %d:* FLAGS", uidval + 1 + cnt))
+			"UID FETCH %d:* (FLAGS)", uidval + 1 + cnt))
 			return;
 		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
 		camel_operation_end (NULL);
 
 		tcnt += cnt;
+		more = FALSE;
+		did_hack = TRUE;
+	}
+
+	if (!more && (tcnt + seq < exists))
+	{
+		/* This is a rescue operation: loosing mail is far worse */
+		g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
+		g_ptr_array_free (needheaders, TRUE);
+		needheaders = g_ptr_array_new ();
+
+		g_warning (_("I have %d headers, the IMAP server said there "
+			"are %d headers. I'm getting a fresh list for you!\n"), 
+			tcnt, exists);
+
+		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
+		if (!camel_imap_command_start (store, folder, ex,
+			"UID FETCH 1:* (FLAGS)", uidval + 1 + cnt))
+			return;
+		tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+		camel_operation_end (NULL);
 		more = FALSE;
 		did_hack = TRUE;
 	}
