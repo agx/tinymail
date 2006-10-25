@@ -2462,54 +2462,40 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 	cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+	tcnt += cnt;
 	camel_operation_end (NULL);
 
-	tcnt += cnt;
+	/* Figure out whether we need more */
+	more = (cnt < (exists - seq));
 
-	if (tcnt >= (exists - seq))
-		more = FALSE;
-	else
-		more = TRUE;
-
-	if (more && (((exists - seq) > nextn) && (cnt < nextn)))
+	/* If we received less than what we asked for, yet need more */
+	if ((cnt < nextn) && more)
 	{
 		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 		if (!camel_imap_command_start (store, folder, ex,
-			"UID FETCH %d:* (FLAGS)", uidval + 1 + cnt))
-			return;
+			"UID FETCH %d:* (FLAGS)", uidval + 1 + cnt)) 
+			{ camel_operation_end (NULL); return; }
 		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
-		camel_operation_end (NULL);
-
 		tcnt += cnt;
-		more = FALSE;
-		did_hack = TRUE;
-	}
 
-	if (!more && (tcnt + seq < exists))
-	{
-		/* This is a rescue operation: loosing mail is far worse */
-		g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
-		g_ptr_array_free (needheaders, TRUE);
-		needheaders = g_ptr_array_new ();
+		/* If we still received to few */
+		if (tcnt < (exists - seq))
+		{
+			g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
+			g_ptr_array_free (needheaders, TRUE);
+			needheaders = g_ptr_array_new ();
+			if (!camel_imap_command_start (store, folder, ex,
+				"UID FETCH 1:* (FLAGS)", uidval + 1 + cnt))
+				{ camel_operation_end (NULL); return; }
+			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+		}
 
-		g_warning (_("I have %d headers, the IMAP server said there "
-			"are %d headers. I'm getting a fresh list for you!\n"), 
-			tcnt, exists);
-
-		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
-		if (!camel_imap_command_start (store, folder, ex,
-			"UID FETCH 1:* (FLAGS)", uidval + 1 + cnt))
-			return;
-		tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
 		camel_operation_end (NULL);
 		more = FALSE;
 		did_hack = TRUE;
 	}
 
-	if (nextn < 1000)
-		nextn += (nextn+5);
-	else
-		nextn = 1000;
+	nextn = (nextn < 1000) ? nextn+nextn+5 : 1000;
 
 	if (needheaders->len) 
 	{
