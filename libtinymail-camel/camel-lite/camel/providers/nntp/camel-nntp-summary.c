@@ -283,7 +283,7 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 			if (mi == NULL) {
 
 				if (acnt > 1000) {
-					camel_folder_summary_dump_mmap (s);
+					camel_folder_summary_save (s);
 					acnt = 0;
 				}
 				acnt++;
@@ -360,7 +360,7 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 				if (camel_mime_parser_init_with_stream(mp, (CamelStream *)store->stream) == -1)
 					goto error;
 				if (acnt > 1000) {
-					camel_folder_summary_dump_mmap (s);
+					camel_folder_summary_save (s);
 					acnt = 0;
 				}
 				acnt++;

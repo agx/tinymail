@@ -3,6 +3,7 @@
 	* libtinymail-camel/camel-lite: Applied patch #75412 of Bug #363695
 	which was done by Matthew Barnes (porting the patch from evolution-
 	data-server to camel-lite)
+	* libtinymail-camel/camel-lite: Bugfixes (important ones)
 	
 2006-10-24  Philip Van Hoof <pvanhoof@gnome.org>
 

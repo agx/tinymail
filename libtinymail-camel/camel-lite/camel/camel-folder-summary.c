@@ -673,17 +673,19 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	CamelMessageInfo *mi;
 	char *path;
 
+	g_mutex_lock (s->dump_lock);
+
 	g_assert(s->message_info_size >= sizeof(CamelMessageInfoBase));
 
 	if (s->summary_path == NULL
 	    || (s->flags & CAMEL_SUMMARY_DIRTY) == 0)
-		return 0;
+		{ g_mutex_unlock (s->dump_lock); return 0; }
 
 	path = alloca(strlen(s->summary_path)+4);
 	sprintf(path, "%s~", s->summary_path);
 	fd = g_open(path, O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0600);
-	if (fd == -1)
-		return -1;
+	if (fd == -1) 
+	{ g_mutex_unlock (s->dump_lock); return -1; }
 
 	out = fdopen(fd, "wb");
 	if (out == NULL) {
@@ -691,6 +693,7 @@ camel_folder_summary_save(CamelFolderSummary *s)
 		g_unlink(path);
 		close(fd);
 		errno = i;
+		g_mutex_unlock (s->dump_lock);
 		return -1;
 	}
 
@@ -703,7 +706,9 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	
 	/* now write out each message ... */
 	/* we check ferorr when done for i/o errors */
+	
 	count = s->messages->len;
+
 	for (i = 0; i < count; i++) {
 		mi = s->messages->pdata[i];
 		if (((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS (s)))->message_info_save (s, out, mi) == -1)
@@ -714,7 +719,7 @@ camel_folder_summary_save(CamelFolderSummary *s)
 				goto exception;
 		}
 	}
-	
+
 	if (fflush (out) != 0 || fsync (fileno (out)) == -1)
 		goto exception;
 
@@ -722,7 +727,7 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	
 	fclose (out);
 
-	
+	camel_folder_summary_unload_mmap (s);
 #ifdef G_OS_WIN32
 	g_unlink(s->summary_path);
 #endif
@@ -732,8 +737,11 @@ camel_folder_summary_save(CamelFolderSummary *s)
 		errno = i;
 		return -1;
 	}
-	
+	camel_folder_summary_load (s);
+
 	s->flags &= ~CAMEL_SUMMARY_DIRTY;
+
+	g_mutex_unlock (s->dump_lock);
 
 	return 0;
 	
@@ -747,7 +755,7 @@ camel_folder_summary_save(CamelFolderSummary *s)
 		
 	g_unlink (path);
 	errno = i;
-	
+	g_mutex_unlock (s->dump_lock);
 
 	return -1;
 }
@@ -826,19 +834,6 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 	return 1;
 }
 
-
-
-void 
-camel_folder_summary_dump_mmap (CamelFolderSummary *s)
-{
-	g_mutex_lock (s->dump_lock);
-	camel_folder_summary_save (s);
-	camel_folder_summary_unload_mmap (s);
-	camel_folder_summary_load(s);
-	g_mutex_unlock (s->dump_lock);
-
-	return;
-}
 
 /**
  * camel_folder_summary_add:

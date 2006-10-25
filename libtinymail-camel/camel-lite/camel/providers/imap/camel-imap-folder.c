@@ -2413,7 +2413,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    char *uid, *resp;
    GData *data;
    gboolean more = TRUE;
-   unsigned int nextn, cnt=0, tcnt=0;
+   unsigned int nextn, cnt=0, tcnt=0, ucnt=0;
 
    if (!store->ostream || !store->istream)
 	return;
@@ -2439,7 +2439,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	gboolean did_hack = FALSE;
 	gint hcnt = 0;
 
-	camel_folder_summary_dump_mmap (folder->summary);
+	camel_folder_summary_save (folder->summary);
 	seq = camel_folder_summary_count (folder->summary);
 
 	first = seq + 1;
@@ -2455,7 +2455,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	if (!camel_imap_command_start (store, folder, ex,
 		"UID FETCH %d:%d (FLAGS)", uidval + 1, uidval + 1 + nextn)) 
-		return;
+		{ g_warning ("IMAP error getting UIDs (1)"); return; }
 
 	more = FALSE; 
 	needheaders = g_ptr_array_new ();
@@ -2474,11 +2474,11 @@ imap_update_summary (CamelFolder *folder, int exists,
 		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 		if (!camel_imap_command_start (store, folder, ex,
 			"UID FETCH %d:* (FLAGS)", uidval + 1 + cnt)) 
-			{ camel_operation_end (NULL); return; }
+			{ g_warning ("IMAP error getting UIDs (2)"); 
+			  camel_operation_end (NULL); return; }
 		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
 		tcnt += cnt;
-
-		/* If we still received to few */
+		/* If we still received too few */
 		if (tcnt < (exists - seq))
 		{
 			g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
@@ -2486,7 +2486,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 			needheaders = g_ptr_array_new ();
 			if (!camel_imap_command_start (store, folder, ex,
 				"UID FETCH 1:* (FLAGS)", uidval + 1 + cnt))
-				{ camel_operation_end (NULL); return; }
+				{ g_warning ("IMAP error getting UIDs (3)");
+				  camel_operation_end (NULL); return; }
 			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
 		}
 
@@ -2499,9 +2500,10 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	if (needheaders->len) 
 	{
-		char *uidset;
 		int uid = 0;
+		char *uidset;
 
+		ucnt = 0;
 		qsort (needheaders->pdata, needheaders->len,
 			sizeof (void *), uid_compar);
 
@@ -2509,10 +2511,12 @@ imap_update_summary (CamelFolder *folder, int exists,
 		while (uid < needheaders->len) 
 		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
+
 			if (!camel_imap_command_start (store, folder, ex,
 						       "UID FETCH %s (FLAGS INTERNALDATE BODY.PEEK[%s])",
 						       uidset, header_spec)) 
 			{
+				g_warning ("IMAP error getting headers (1)");
 				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
@@ -2557,7 +2561,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 					  info = (CamelImapMessageInfo *)camel_folder_summary_uid(folder->summary, muid);
 					  if (info)
 						camel_message_info_free(&info->info);
-
+					  ucnt++;
 					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
 					  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
 
@@ -2571,7 +2575,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 						hcnt++;
 						if (hcnt > 1000)
 						{
-							camel_folder_summary_dump_mmap (folder->summary);
+							camel_folder_summary_save (folder->summary);
 							hcnt = 0;
 						}
 					}
@@ -2584,6 +2588,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			}
 			
 			if (type == CAMEL_IMAP_RESPONSE_ERROR) {
+				g_warning ("IMAP error getting headers (2)");
 				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 				g_ptr_array_free (needheaders, TRUE);
 				camel_operation_end (NULL);
@@ -2593,12 +2598,18 @@ imap_update_summary (CamelFolder *folder, int exists,
 		}
 		camel_operation_end (NULL);
 	}
+
+	if (ucnt < needheaders->len)
+		g_warning ("Problem while receiving headers from MMAP "
+			"(I didn't receive enough headers %d vs %d)\n",
+			ucnt, needheaders->len);
+
 	g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 	g_ptr_array_free (needheaders, TRUE);
 
    } /* more */
 
-   camel_folder_summary_dump_mmap (folder->summary);
+   camel_folder_summary_save (folder->summary);
 
 }
 
