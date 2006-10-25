@@ -150,11 +150,11 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyGnomeDevice *self = (TnyGnomeDevice *)instance;
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
-	priv->invnm = FALSE;
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
 #ifdef GNOME
+	priv->invnm = FALSE;
 	priv->nm_ctx = libnm_glib_init ();
 	priv->callback_id = libnm_glib_register_callback 
 		(priv->nm_ctx, nm_callback, self, NULL);
