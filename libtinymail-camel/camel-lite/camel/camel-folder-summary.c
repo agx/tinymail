@@ -2,7 +2,13 @@
 /*
  *  Copyright (C) 2000-2003 Ximian Inc.
  *
- *  Authors: Michael Zucchi <notzed@ximian.com>
+ * This is the mmap version of camel-folder-summary.c which maps 
+ * the header data into memory in stead of fread()ing it. It uses
+ * the mmap() syscall for this.
+ *
+ *  Authors: 
+ *   Michael Zucchi <notzed@ximian.com>
+ *   Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU Lesser General Public

@@ -1,10 +1,15 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
-/* camel-imap-folder.c: class for an imap folder */
-
-/* 
+/* camel-imap-folder.c: class for an imap folder
+ * 
+ * This is the mmap version of camel-imap-folder.c which has a memory
+ * consumption reduced imap_update_summary implementation that will
+ * periodically instruct the mmap CamelFolderSummary instance to sync
+ * headers to disk.
+ *
  * Authors:
  *   Dan Winship <danw@ximian.com>
  *   Jeffrey Stedfast <fejj@ximian.com> 
+ *   Philip Van Hoof <pvanhoof@gnome.org>
  *
  * Copyright (C) 2000, 2001 Ximian, Inc.
  *
