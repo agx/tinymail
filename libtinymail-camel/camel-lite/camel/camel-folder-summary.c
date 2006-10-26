@@ -124,7 +124,7 @@ camel_folder_summary_init (CamelFolderSummary *s)
 {
 	struct _CamelFolderSummaryPrivate *p;
 
-	p = _PRIVATE(s) = g_malloc0(sizeof(*p));
+	p = _PRIVATE(s) = g_slice_alloc0 (sizeof (*p));
 
 	p->filter_charset = g_hash_table_new (camel_strcase_hash, camel_strcase_equal);
 	s->dump_lock = g_mutex_new ();
@@ -252,8 +252,8 @@ camel_folder_summary_finalize (CamelObject *obj)
 	g_mutex_free(p->io_lock);
 	g_mutex_free(p->filter_lock);
 	g_mutex_free(p->ref_lock);
-	
-	g_free(p);
+
+	g_slice_free1 (sizeof (*p), p);
 }
 
 CamelType
