@@ -80,15 +80,16 @@ typedef enum _CamelMessageFlags {
 	CAMEL_MESSAGE_SECURE = 1<<8,
 	CAMEL_MESSAGE_FREED = 1<<9,
 	
+
 	/* following flags are for the folder, and are not really permanent flags */
 	CAMEL_MESSAGE_FOLDER_FLAGGED = 1<<16, /* for use by the folder implementation */
 
-	CAMEL_MESSAGE_MI_ALLOCATED = 1<<28, /* internally used */
-	CAMEL_MESSAGE_UID_ALLOCATED = 1<<29, /* internally used */
 
 	/* flags after 1<<16 are used by camel providers,
-           if adding non permanent flags, add them to the end  */
+	   if adding non permanent flags, add them to the end  */
 
+	CAMEL_MESSAGE_INFO_NEEDS_FREE = 1<<28, /* internally used */
+	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE = 1<<29, /* internally used */
 	CAMEL_MESSAGE_JUNK_LEARN = 1<<30, /* used when setting CAMEL_MESSAGE_JUNK flag
 					     to say that we request junk plugin
 					     to learn that message as junk/non junk */
@@ -173,8 +174,9 @@ struct _CamelMessageInfoBase {
 	const char *from;
 	const char *to;
 	const char *cc;
+#ifdef NON_TINYMAIL_FEATURES
 	const char *mlist;
-
+#endif
 	guint32 flags;
 #ifdef NON_TINYMAIL_FEATURES
 	guint32 size;
@@ -195,7 +197,6 @@ struct _CamelMessageInfoBase {
 
 	/* tree of content description - NULL if it is not available */
 	CamelMessageContentInfo *content;
-	gboolean needs_free, uid_needs_free;
 };
 
 /* probably do this as well, removing CamelFolderChangeInfo and interfaces 
@@ -399,7 +400,10 @@ time_t camel_message_info_time(const CamelMessageInfo *mi, int id);
 #define camel_message_info_from(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_FROM))
 #define camel_message_info_to(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_TO))
 #define camel_message_info_cc(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_CC))
+
+#ifdef NON_TINYMAIL_FEATURES
 #define camel_message_info_mlist(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_MLIST))
+#endif
 
 #define camel_message_info_flags(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_FLAGS)
 

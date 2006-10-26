@@ -2560,7 +2560,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 					  if (muid) 
 					  {
 						mi->info.uid = g_strdup (muid);
-						mi->info.uid_needs_free = TRUE;
+						mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 					  }
 
 					  info = (CamelImapMessageInfo *)camel_folder_summary_uid(folder->summary, muid);

@@ -6,7 +6,7 @@
  * the header data into memory in stead of fread()ing it. It uses
  * the mmap() syscall for this.
  *
- *  Authors: 
+ *  Authors: _
  *   Michael Zucchi <notzed@ximian.com>
  *   Philip Van Hoof <pvanhoof@gnome.org>
  *
@@ -835,10 +835,10 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 	uid = camel_message_info_uid(info);
 	if (uid == NULL || uid[0] == 0) {
 
-		if (bi->flags || bi->needs_free)
+		if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE || (bi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE))
 			g_free(info->uid);
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
-		bi->uid_needs_free = TRUE;
+		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	}
 
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
@@ -850,10 +850,10 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 		d(printf ("Trying to insert message with clashing uid (%s).  new uid re-assigned", camel_message_info_uid(info)));
 
 
-		if (bi->uid_needs_free || bi->needs_free)
+		if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE || bi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
 			g_free(info->uid);
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
-		bi->uid_needs_free = TRUE;
+		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 		camel_message_info_set_flags(info, CAMEL_MESSAGE_FOLDER_FLAGGED, CAMEL_MESSAGE_FOLDER_FLAGGED);
 		CAMEL_SUMMARY_LOCK(s, summary_lock);
@@ -1773,8 +1773,7 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	const char *content, *charset = NULL;
 
 	mi = (CamelMessageInfoBase *)camel_message_info_new(s);
-
-	mi->needs_free = TRUE;
+	mi->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;
 
 	if ((content = camel_header_raw_find(&h, "Content-Type", NULL))
 	     && (ct = camel_content_type_decode(content))
@@ -1809,11 +1808,11 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 		mi->cc = camel_pstring_add (cc, TRUE);
 	else mi->cc = NULL;
 
+#ifdef NON_TINYMAIL_FEATURES
 	if (mlist)
 		mi->mlist = camel_pstring_add (mlist, TRUE);
 	else mi->mlist = NULL;
 
-#ifdef NON_TINYMAIL_FEATURES
 	mi->user_flags = NULL;
 	mi->user_tags = NULL;
 #endif
@@ -1883,8 +1882,6 @@ message_info_load(CamelFolderSummary *s)
 
 	mi = (CamelMessageInfoBase *)camel_message_info_new(s);
 
-	mi->needs_free = FALSE;
-
 	io(printf("Loading message info\n"));
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
@@ -1893,6 +1890,10 @@ message_info_load(CamelFolderSummary *s)
 	ptrchr += len;
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
+
+	mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
+
 #ifdef NON_TINYMAIL_FEATURES
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
 #else
@@ -1927,9 +1928,12 @@ message_info_load(CamelFolderSummary *s)
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 
+#ifdef NON_TINYMAIL_FEATURES
 	if (len) 
 		mi->mlist = (const char*)ptrchr;
-	ptrchr += len;	
+#endif
+
+	ptrchr += len;
 
 	mi->content = NULL;
 
@@ -1941,7 +1945,7 @@ message_info_load(CamelFolderSummary *s)
 	mi->message_id.id.part.lo = g_ntohl(get_unaligned_u32(s->filepos)); 
 	s->filepos += 4;
 #else
-	s->filepos += 8;
+	s->filepos += 8; 
 #endif
 
 	ptrchr = (unsigned char*) s->filepos;
@@ -2033,8 +2037,11 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	camel_file_util_encode_string(out, camel_message_info_from(mi));
 	camel_file_util_encode_string(out, camel_message_info_to(mi));
 	camel_file_util_encode_string(out, camel_message_info_cc(mi));
+#ifdef NON_TINYMAIL_FEATURES
 	camel_file_util_encode_string(out, camel_message_info_mlist(mi));
-
+#else
+	camel_file_util_encode_string(out, "");
+#endif
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.hi);
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.lo);
 
@@ -2085,28 +2092,24 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 {
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 
-	if (mi->needs_free) {
+	if (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
+	{
 		g_free(mi->uid);
-
 		if (mi->subject)
 			camel_pstring_free(mi->subject);
-
 		if (mi->from)
 			camel_pstring_free(mi->from);
-
 		if (mi->to)
 			camel_pstring_free(mi->to);
-		
 		if (mi->cc)
 			camel_pstring_free(mi->cc);
-
+#ifdef NON_TINYMAIL_FEATURES
 		if (mi->mlist)
 			camel_pstring_free(mi->mlist);
-#ifdef NON_TINYMAIL_FEATURES
 		camel_flag_list_free(&mi->user_flags);
 		camel_tag_list_free(&mi->user_tags);
 #endif
-	} else if (mi->uid_needs_free)
+	} else if (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
 		g_free (mi->uid);
 
 #ifdef NON_TINYMAIL_FEATURES
@@ -2979,15 +2982,15 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 
 	/* NB: We don't clone the uid */
 
-	from->needs_free = TRUE;
+	from->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;
 
 	to->subject = camel_pstring_strdup(from->subject);
 	to->from = camel_pstring_strdup(from->from);
 	to->to = camel_pstring_strdup(from->to);
 	to->cc = camel_pstring_strdup(from->cc);
-	to->mlist = camel_pstring_strdup(from->mlist);
 
 #ifdef NON_TINYMAIL_FEATURES
+	to->mlist = camel_pstring_strdup(from->mlist);
 	memcpy(&to->message_id, &from->message_id, sizeof(to->message_id));
 
 	if (from->references) {
@@ -3051,12 +3054,12 @@ info_ptr(const CamelMessageInfo *mi, int id)
 		return ((const CamelMessageInfoBase *)mi)->to;
 	case CAMEL_MESSAGE_INFO_CC:
 		return ((const CamelMessageInfoBase *)mi)->cc;
-	case CAMEL_MESSAGE_INFO_MLIST:
-		return ((const CamelMessageInfoBase *)mi)->mlist;
 	case CAMEL_MESSAGE_INFO_MESSAGE_ID:
 		return &((const CamelMessageInfoBase *)mi)->message_id;
 
 #ifdef NON_TINYMAIL_FEATURES
+	case CAMEL_MESSAGE_INFO_MLIST:
+		return ((const CamelMessageInfoBase *)mi)->mlist;
 	case CAMEL_MESSAGE_INFO_REFERENCES:
 		return ((const CamelMessageInfoBase *)mi)->references;
 #endif

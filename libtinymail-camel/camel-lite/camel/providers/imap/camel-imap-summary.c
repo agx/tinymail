@@ -303,7 +303,7 @@ camel_imap_summary_add_offline (CamelFolderSummary *summary, const char *uid,
 #ifdef NON_TINYMAIL_FEATURES
 	mi->info.size = camel_message_info_size(info);
 #endif
-	mi->info.uid_needs_free = TRUE;
+	mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	mi->info.uid = g_strdup (uid);
 
 	label_to_flags(mi);
@@ -320,7 +320,7 @@ camel_imap_summary_add_offline_uncached (CamelFolderSummary *summary, const char
 	mi = camel_message_info_clone(info);
 
 	mi->info.uid = g_strdup(uid);
-	mi->info.uid_needs_free = TRUE;
+	mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 	label_to_flags(mi);
 

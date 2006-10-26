@@ -152,7 +152,7 @@ check_header (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMess
 		/* shortcut: a match for "" against any header always matches */
 		for (i=1; i<argc && !matched; i++)
 			matched = argv[i]->type == ESEXP_RES_STRING && argv[i]->value.string[0] == 0;
-
+#if NON_TINYMAIL_FEATURES
 		if (g_ascii_strcasecmp(name, "x-camel-mlist") == 0) {
 			const char *list = camel_message_info_mlist(fms->info);
 
@@ -163,6 +163,7 @@ check_header (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMess
 				}
 			}
 		} else {
+#endif
 			CamelMimeMessage *message = camel_filter_search_get_message (fms, f);
 			struct _camel_header_raw *header;
 			const char *charset = NULL;
@@ -188,7 +189,9 @@ check_header (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMess
 					}
 				}
 			}
+#ifdef NON_TINYMAIL_FEATURES
 		}
+#endif
 	}
 	
 	r = e_sexp_result_new (f, ESEXP_RES_BOOL);
