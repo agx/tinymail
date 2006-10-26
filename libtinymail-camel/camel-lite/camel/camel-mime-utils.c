@@ -2209,12 +2209,13 @@ camel_header_param_list_free(struct _camel_header_param *p)
 CamelContentType *
 camel_content_type_new(const char *type, const char *subtype)
 {
-	CamelContentType *t = g_malloc(sizeof(*t));
+	CamelContentType *t = g_slice_new (CamelContentType);
 
 	t->type = g_strdup(type);
 	t->subtype = g_strdup(subtype);
 	t->params = NULL;
 	t->refcount = 1;
+
 	return t;
 }
 
@@ -2247,7 +2248,7 @@ camel_content_type_unref(CamelContentType *ct)
 			camel_header_param_list_free(ct->params);
 			g_free(ct->type);
 			g_free(ct->subtype);
-			g_free(ct);
+			g_slice_free (CamelContentType, ct);
 			ct = NULL;
 		} else {
 			ct->refcount--;
