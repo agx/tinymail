@@ -170,6 +170,10 @@ static gboolean always_true (gpointer key, gpointer value, gpointer gp)
 static void 
 camel_folder_summary_unload_mmap (CamelFolderSummary *s)
 {
+	struct _CamelFolderSummaryPrivate *p;
+
+	p = _PRIVATE(s);
+
 	camel_folder_summary_clear(s);
 	if (s->file)
 		g_mapped_file_free (s->file);
@@ -179,6 +183,25 @@ camel_folder_summary_unload_mmap (CamelFolderSummary *s)
 	if (s->messages->len > 0)
 		g_ptr_array_remove_range (s->messages, 0, s->messages->len-1);
 	g_hash_table_foreach_remove (s->messages_uid, always_true, NULL);
+	g_hash_table_foreach(p->filter_charset, free_o_name, 0);
+	
+	if (p->filter_index)
+		camel_object_unref((CamelObject *)p->filter_index);
+	if (p->filter_64)
+		camel_object_unref((CamelObject *)p->filter_64);
+	if (p->filter_qp)
+		camel_object_unref((CamelObject *)p->filter_qp);
+	if (p->filter_uu)
+		camel_object_unref((CamelObject *)p->filter_uu);
+	if (p->filter_save)
+		camel_object_unref((CamelObject *)p->filter_save);
+	if (p->filter_html)
+		camel_object_unref((CamelObject *)p->filter_html);
+
+	if (p->filter_stream)
+		camel_object_unref((CamelObject *)p->filter_stream);
+	if (p->index)
+		camel_object_unref((CamelObject *)p->index);
 }
 
 static void
