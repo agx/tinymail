@@ -156,13 +156,14 @@ static void free_o_name(void *key, void *value, void *data)
 	g_free(key);
 }
 
-static void
+static inline void
 foreach_msginfo (gpointer data, gpointer user_data)
 {
 	g_slice_free1 ((gint)user_data, data);
 }
 
-static gboolean always_true (gpointer key, gpointer value, gpointer gp)
+static inline 
+gboolean always_true (gpointer key, gpointer value, gpointer gp)
 {
 	return TRUE;
 }
