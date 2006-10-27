@@ -2,6 +2,7 @@
 
 	* libtinymail-camel/camel-lite: Added xulrunner-nspr/nss as possible
 	nspr and nss packages
+	* libtinymail-camel/libtinymail-camel.pc.in: Bugfix
 
 2006-10-27  Philip Van Hoof <pvanhoof@gnome.org>
 
