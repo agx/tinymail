@@ -97,17 +97,8 @@
 /* Define to 1 if you have the `mkstemp' function. */
 #undef HAVE_MKSTEMP
 
-/* Define to 1 if you have the <nspr.h> header file. */
-#undef HAVE_NSPR_H
-
 /* Define if you have NSS */
 #undef HAVE_NSS
-
-/* Define to 1 if you have the <nss.h> header file. */
-#undef HAVE_NSS_H
-
-/* Define to 1 if you have the <prio.h> header file. */
-#undef HAVE_PRIO_H
 
 /* Define to 1 if you have the <pthread.h> header file. */
 #undef HAVE_PTHREAD_H
@@ -118,14 +109,8 @@
 /* Define to 1 if you have the <semaphore.h> header file. */
 #undef HAVE_SEMAPHORE_H
 
-/* Define to 1 if you have the <smime.h> header file. */
-#undef HAVE_SMIME_H
-
 /* Define if you have a supported SSL library */
 #undef HAVE_SSL
-
-/* Define to 1 if you have the <ssl.h> header file. */
-#undef HAVE_SSL_H
 
 /* Define to 1 if you have the `statfs' function. */
 #undef HAVE_STATFS

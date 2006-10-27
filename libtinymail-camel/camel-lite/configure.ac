@@ -1,4 +1,4 @@
-AC_INIT([camel-lite],[1.0],[http://tinymail.org/trac/camel-lite-builder])
+AC_INIT([camel-lite],[1.0],[http://tinymail.org/])
 AC_CONFIG_SRCDIR(camel/camel-object.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AC_CONFIG_HEADERS(config.h)
@@ -87,8 +87,6 @@ AC_SUBST(LIBEXECDIR_IN_SERVER_FILE)
 
 AC_CHECK_HEADERS(pthread.h semaphore.h sys/wait.h)
 AC_CHECK_FUNCS(fsync strptime strtok_r)
-
-dnl alloca()
 AC_CHECK_HEADERS(alloca.h)
 
 AC_CHECK_FUNCS(regexec,,[AC_CHECK_LIB(regex,regexec,
@@ -213,252 +211,48 @@ ac_cv_lkstrftime=yes
 ],[ac_cv_lkstrftime=no],[ac_cv_lkstrftime=no])
 AC_MSG_RESULT($ac_cv_lkstrftime)
 
-dnl ********************************************************************************
-dnl security extension support (SSL and S/MIME)
-dnl
-dnl The following voodoo does detection of mozilla libraries (nspr and nss) 
-dnl needed by Camel (SSL and S/MIME).
-dnl
-dnl The Evolution security extensions are only built if these libraries are found
-dnl ********************************************************************************
 msg_ssl="no"
 msg_smime="no"
+mozilla_nspr_pcs=""
 
-dnl these 2 enable's are inverses of each other
-AC_ARG_ENABLE(nss, [  --enable-nss=[yes,no,static]        Attempt to use Mozilla libnss for SSL support.],
-	enable_nss="$enableval", enable_nss="yes")
-
-AC_ARG_ENABLE(smime, [ --enable-smime=[yes,no]            Attempt to use Mozilla libnss for SMIME support (this requires --enable-nss)],
-	enable_smime="$enableval", enable_smime="yes")
-
-AC_ARG_ENABLE(gnome-keyring, [ --enable-gnome-keyring=[yes,no]            Attempt to use Gnome Keyring for storing passwords (this requires --enable-gnome-keyring)],
-	enable_gnome_keyring="$enableval", enable_gnome_keyring="no")
-
-AC_ARG_WITH(nspr-includes, [  --with-nspr-includes=PREFIX	Location of Mozilla nspr4 includes.],
-	with_nspr_includes="$withval")
-
-AC_ARG_WITH(nspr-libs, [  --with-nspr-libs=PREFIX       	Location of Mozilla nspr4 libs.],
-	with_nspr_libs="$withval")
-
-AC_ARG_WITH(nss-includes, [  --with-nss-includes=PREFIX 	Location of Mozilla nss3 includes.],
-	with_nss_includes="$withval")
-
-AC_ARG_WITH(nss-libs, [  --with-nss-libs=PREFIX         	Location of Mozilla nss3 libs.],
-	with_nss_libs="$withval")
-
-
-if test "x${enable_nss}" = "xyes" || test "x${enable_nss}" = "xstatic"; then
-	if test -n "${with_nspr_includes}" || test -n "${with_nspr_libs}" || test -n "${with_nss_includes}" || test -n "${with_nss_libs}" || test "x${enable_nss}" = "xstatic"; then
-		check_manually="yes"
-	else
-		check_manually="no"
+AC_MSG_CHECKING(Mozilla NSPR pkg-config module name)
+mozilla_nspr_pcs="nspr mozilla-nspr firefox-nspr"
+for pc in $mozilla_nspr_pcs; do
+	if $PKG_CONFIG --exists $pc; then
+		AC_MSG_RESULT($pc)
+		mozilla_nspr=$pc
+		break;
 	fi
-	
-	if test "x${check_manually}" = "xno"; then
-		AC_MSG_CHECKING(Mozilla NSPR pkg-config module name)
-		mozilla_nspr_pcs="nspr mozilla-nspr firefox-nspr"
-		for pc in $mozilla_nspr_pcs; do
-			if $PKG_CONFIG --exists $pc; then
-				AC_MSG_RESULT($pc)
-				mozilla_nspr=$pc
-				break;
-			fi
-		done
+done
 		
-		AC_MSG_CHECKING(Mozilla NSS pkg-config module name)
-		mozilla_nss_pcs="nss mozilla-nss firefox-nss"
-		for pc in $mozilla_nss_pcs; do
-			if $PKG_CONFIG --exists $pc; then
-				AC_MSG_RESULT($pc)
-				mozilla_nss=$pc
-				break;
-			fi
-		done
-		
-		if test -n "$mozilla_nspr" -a -n "$mozilla_nss"; then
-			msg_ssl="yes (Mozilla NSS)"
-			if test "x$enable_smime" = "xyes"; then
-				AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
-				msg_smime="yes (Mozilla NSS)"
-			fi
-			AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
-			AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
-			MANUAL_NSPR_CFLAGS=""
-			MANUAL_NSPR_LIBS=""
-			MANUAL_NSS_CFLAGS=""
-			MANUAL_NSS_LIBS=""
-		else
-			check_manually="yes"
-			mozilla_nspr=""
-			mozilla_nss=""
-		fi
+AC_MSG_CHECKING(Mozilla NSS pkg-config module name)
+mozilla_nss_pcs="nss mozilla-nss firefox-nss"
+for pc in $mozilla_nss_pcs; do
+	if $PKG_CONFIG --exists $pc; then
+		AC_MSG_RESULT($pc)
+		mozilla_nss=$pc
+		break;
 	fi
-	
-	if test "x${check_manually}" = "xyes"; then
-		have_nspr_includes="no"
-		if test "x${with_nspr_includes}" != "xno"; then
-			CPPFLAGS_save="$CPPFLAGS"
-			
-			AC_MSG_CHECKING(for Mozilla nspr4 includes in $with_nspr_includes)
-			AC_MSG_RESULT("")
-			
-			CPPFLAGS="$CPPFLAGS -I$with_nspr_includes"
-			AC_CHECK_HEADERS(nspr.h prio.h, [ moz_nspr_includes="yes" ])
-			CPPFLAGS="$CPPFLAGS_save"
-			
-			if test "x{$moz_nspr_includes}" != "xno" -a "x{$moz_nspr_includes}" != "x" ; then
-				have_nspr_includes="yes"
-				MANUAL_NSPR_CFLAGS="-I$with_nspr_includes"
-			fi
-		else
-			AC_MSG_CHECKING(for Mozilla nspr4 includes)
-			AC_MSG_RESULT(no)
-		fi
+done
 		
-		have_nspr_libs="no"
-		if test "x${with_nspr_libs}" != "xno" -a "x${have_nspr_includes}" != "xno"; then
-			CFLAGS_save="$CFLAGS"
-			LDFLAGS_save="$LDFLAGS"
-			
-			if test "$enable_nss" = "static"; then
-				if test -z "${with_nspr_libs}"; then
-					AC_MSG_ERROR([Static linkage requested, but path to nspr libraries not set.]
-[Please specify the path to libnspr4.a]
-[Example: --with-nspr-libs=/usr/lib])
-       				else
-	       				nsprlibs="$DL_LIB $with_nspr_libs/libplc4.a $with_nspr_libs/libplds4.a $with_nspr_libs/libnspr4.a $PTHREAD_LIB"
-				fi
-			else
-				nsprlibs="$DL_LIB -lplc4 -lplds4 -lnspr4 $PTHREAD_LIB"
-			fi
-			
-			AC_CACHE_CHECK([for Mozilla nspr libraries], moz_nspr_libs,
-			[
-		       		LIBS_save="$LIBS"
-				CFLAGS="$CFLAGS $MANUAL_NSPR_CFLAGS"
-				
-				if test "x${with_nspr_libs}" != "x"; then
-		       			LIBS="$nsprlibs"
-		       			LDFLAGS="$LDFLAGS -L$with_nspr_libs"
-				else
-		       			LIBS="$nsprlibs"
-		       			LDFLAGS="$LDFLAGS"
-				fi
-				
-				AC_TRY_LINK_FUNC(PR_Init, moz_nspr_libs="yes", moz_nspr_libs="no")
-				CFLAGS="$CFLAGS_save"
-				LDFLAGS="$LDFLAGS_save"
-	 			LIBS="$LIBS_save"
-			])
-			if test "x$moz_nspr_libs" != "xno"; then
-				have_nspr_libs="yes"
-				MANUAL_NSPR_LIBS="-L$with_nspr_libs $nsprlibs"
-			else
-				MANUAL_NSPR_CLFAGS=""
-			fi
-		else
-			AC_MSG_CHECKING(for Mozilla nspr4 libraries)
-			AC_MSG_RESULT(no)
-		fi
-		
-		if test "x${with_nss_includes}" != "xno" -a "x${have_nspr_libs}" != "xno"; then
-			CPPFLAGS_save="$CPPFLAGS"
-			
-			AC_MSG_CHECKING(for Mozilla nss3 includes in $with_nss_includes)
-			AC_MSG_RESULT("")
-			
-			if test "x${with_nspr_includes}" != "x"; then
-				CPPFLAGS="$CPPFLAGS -I$with_nspr_includes -I$with_nss_includes"
-			else
-				CPPFLAGS="$CPPFLAGS -I$with_nss_includes"
-			fi
-			
-			AC_CHECK_HEADERS(nss.h ssl.h smime.h,
-				[ have_nss_includes="yes" ], 
-				[ have_nss_includes="no" ])
-			
-			CPPFLAGS="$CPPFLAGS_save"
-			
-			if test "x${have_nss_includes}" = "xyes"; then	
-				have_nss_includes="yes"
-				MANUAL_NSS_CFLAGS="-I$with_nss_includes"
-			else
-				MANUAL_NSPR_CFLAGS=""
-				MANUAL_NSPR_LIBS=""
-			fi
-		else
-			AC_MSG_CHECKING(for Mozilla nss3 includes)
-			AC_MSG_RESULT(no)
-		fi
-		
-		if test "x${with_nss_libs}" != "xno" -a "x${have_nss_includes}" != "xno"; then
-			LDFLAGS_save="$LDFLAGS"
-			
-			if test "$enable_nss" = "static"; then
-		    		if test -z "${with_nss_libs}"; then
-					AC_MSG_ERROR([Static linkage requested, but path to nss libraries not set.]
-[Please specify the path to libnss3.a]
-[Example: --with-nspr-libs=/usr/lib/mozilla])
-				else
-					nsslibs="-ldb1 $with_nss_libs/libnssckfw.a $with_nss_libs/libasn1.a $with_nss_libs/libcrmf.a $with_nss_libs/libswfci.a $with_nss_libs/libjar.a $with_nss_libs/libpkcs12.a $with_nss_libs/libpkcs7.a $with_nss_libs/libpki1.a $with_nss_libs/libsmime.a $with_nss_libs/libssl.a $with_nss_libs/libnss.a $with_nss_libs/libpk11wrap.a $with_nss_libs/libsoftokn.a $with_nss_libs/libfreebl.a $with_nss_libs/libnsspki.a $with_nss_libs/libnssdev.a $with_nss_libs/libcryptohi.a $with_nss_libs/libcerthi.a $with_nss_libs/libcertdb.a $with_nss_libs/libsecutil.a $with_nss_libs/libnssb.a"
-					case "$host" in
-						*solaris*)
-						nsslibs="$nsslibs $with_nss_libs/libfreebl.a"
-					;;
-					esac
-				fi
-			else
-		 		nsslibs="-lssl3 -lsmime3 -lnss3 $SOFTOKN3_LIB"
-	 		fi	
-			
-			AC_CACHE_CHECK([for Mozilla nss libraries], moz_nss_libs,
-			[
-	 			LIBS_save="$LIBS"
-				LDFLAGS="$LDFLAGS -L$with_nspr_libs $nsprlibs -L$with_nss_libs $nsslibs"
-		      		LIBS="$nsslibs $nsprlibs"
-				AC_TRY_LINK_FUNC(NSS_Init, moz_nss_libs="yes", moz_nss_libs="no")
-				if test "$moz_nss_libs" = no; then
-					nsslibs="-lssl3 -lsmime3 -lnss3 $SOFTOKN3_LIB"
-					LDFLAGS="$LDFLAGS -L$with_nspr_libs $nsprlibs -L$with_nss_libs $nsslibs"
-					AC_TRY_LINK_FUNC(NSS_Init, moz_nss_libs="yes", moz_nss_libs="no")	
-				fi
-				LDFLAGS="$LDFLAGS_save"
-	 			LIBS="$LIBS_save"
-			])
-			if test "$moz_nss_libs" != no; then
-				AC_DEFINE(HAVE_NSS)
-				AC_DEFINE(HAVE_SSL)
-				if test "$enable_nss" = "static"; then
-					msg_ssl="yes (Mozilla NSS:static)"
-		 		else
-					msg_ssl="yes (Mozilla NSS)"
-				fi # static_nss
-				if test "$enable_smime" = "yes"; then
-					AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
-					msg_smime="yes (Mozilla NSS)"
-				fi
-				MANUAL_NSS_LIBS="-L$with_nss_libs $nsslibs"
-			else
-				MANUAL_NSS_CFLAGS=""
-				MANUAL_NSPR_CFLAGS=""
-				MANUAL_NSPR_LIBS=""
-			fi
-		else
-			AC_MSG_CHECKING(for Mozilla nss libraries)
-			AC_MSG_RESULT(no)
-		fi
-		
-		MANUAL_NSS_CFLAGS="$MANUAL_NSPR_CFLAGS $MANUAL_NSS_CFLAGS"
-		MANUAL_NSS_LIBS="$MANUAL_NSPR_LIBS $MANUAL_NSS_LIBS"
-	fi
+if test -n "$mozilla_nspr" -a -n "$mozilla_nss"; then
+	msg_ssl="yes (Mozilla NSS)"
+	AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
+	msg_smime="yes (Mozilla NSS)"
+	AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
+	AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
+else
+	AC_MSG_CHECKING(for NSPR and NSS)
+	AC_MSG_RESULT(no)
 fi
+
+AC_MSG_CHECKING(Support for SSL)
+AC_MSG_RESULT($msg_ssl)
+AC_MSG_CHECKING(Support for SMIME)
+AC_MSG_RESULT($msg_smime)
 
 AM_CONDITIONAL(ENABLE_SMIME, test "x$msg_smime" != "xno")
 
-AC_SUBST(MANUAL_NSPR_CFLAGS)
-AC_SUBST(MANUAL_NSPR_LIBS)
-AC_SUBST(MANUAL_NSS_CFLAGS)
-AC_SUBST(MANUAL_NSS_LIBS)
 
 dnl
 dnl system mail stuff
@@ -905,11 +699,7 @@ AC_DEFINE(ENABLE_THREADS,1,[Required])
 
 CFLAGS="$CFLAGS $WARN_CFLAGS"
 
-PKG_CHECK_MODULES(E_DATA_SERVER, libxml-2.0 glib-2.0 gobject-2.0 $mozilla_nspr)
-
-E_DATA_SERVER_CFLAGS="$E_DATA_SERVER_CFLAGS $MANUAL_NSPR_CFLAGS"
-E_DATA_SERVER_LIBS="$E_DATA_SERVER_LIBS $MANUAL_NSPR_LIBS"
-
+PKG_CHECK_MODULES(E_DATA_SERVER, libxml-2.0 glib-2.0 gobject-2.0 $mozilla_nspr $mozilla_nss)
 AC_SUBST(E_DATA_SERVER_CFLAGS)
 AC_SUBST(E_DATA_SERVER_LIBS)
 
@@ -917,15 +707,14 @@ AC_SUBST(E_DATA_SERVER_LIBS)
 zlib_found=false
 dnl deflateInit is a #define, use deflateEnd instead
 AC_CHECK_LIB(z, deflateEnd,
-    [ AC_CHECK_HEADER(zlib.h, zlib_found=true) ])                                                                                                                                                                            
+    [ AC_CHECK_HEADER(zlib.h, zlib_found=true) ])                                                                                                                                      
 if test "x$zlib_found" = "xfalse"; then
     AC_MSG_ERROR([*** zlib is required])
 fi
 
-PKG_CHECK_MODULES(CAMEL, gthread-2.0 gmodule-2.0 gobject-2.0 $mozilla_nss)
-
-CAMEL_CFLAGS="$CAMEL_CFLAGS $THREADS_CFLAGS $KRB4_CFLAGS $KRB5_CFLAGS $MANUAL_NSS_CFLAGS"
-CAMEL_LIBS="$CAMEL_LIBS -lz $THREADS_LIBS $KRB4_LDFLAGS $KRB5_LDFLAGS $MANUAL_NSS_LIBS"
+PKG_CHECK_MODULES(CAMEL, gthread-2.0 gmodule-2.0 gobject-2.0 $mozilla_nss $mozilla_nspr)
+CAMEL_CFLAGS="$CAMEL_CFLAGS $THREADS_CFLAGS $KRB4_CFLAGS $KRB5_CFLAGS"
+CAMEL_LIBS="$CAMEL_LIBS -lz $THREADS_LIBS $KRB4_LDFLAGS $KRB5_LDFLAGS"
 
 
 LARGEFILE_CFLAGS=""
@@ -949,11 +738,7 @@ AC_CACHE_CHECK([if large files (>2 GB) are supported], largefile_support,
 
 AC_SUBST(CAMEL_CFLAGS)
 AC_SUBST(CAMEL_LIBS)
-AC_SUBST(CAMEL_GROUPWISE_CFLAGS)
-AC_SUBST(CAMEL_GROUPWISE_LIBS)
 
-
-dnl separate camel from e-d-s?  or should it be under the same spot?  same for now.
 camel_lite_providerdir='${libdir}'/camel-lite-$API_VERSION/camel-providers
 camel_providerdir=$camel_lite_providerdir
 AC_SUBST(camel_lite_providerdir)

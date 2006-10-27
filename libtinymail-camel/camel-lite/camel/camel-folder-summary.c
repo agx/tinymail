@@ -3396,7 +3396,9 @@ camel_message_info_dump (CamelMessageInfo *mi)
 	printf("Subject: %s\n", camel_message_info_subject(mi));
 	printf("To: %s\n", camel_message_info_to(mi));
 	printf("Cc: %s\n", camel_message_info_cc(mi));
+#ifdef NON_TINYMAIL_FEATURES
 	printf("mailing list: %s\n", camel_message_info_mlist(mi));
+#endif
 	printf("From: %s\n", camel_message_info_from(mi));
 	printf("UID: %s\n", camel_message_info_uid(mi));
 	printf("Flags: %04x\n", camel_message_info_flags(mi));

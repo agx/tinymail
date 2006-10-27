@@ -1,5 +1,9 @@
 2006-10-26  Philip Van Hoof <pvanhoof@gnome.org>
 
+	*  libtinymail-camel/camel-lite: NSPR & NSS detection, bugfix
+
+2006-10-26  Philip Van Hoof <pvanhoof@gnome.org>
+
 	*  libtinymail-camel/camel-lite: Aggressive memory reductions by
 	removing unused features and fields from Camel
 
