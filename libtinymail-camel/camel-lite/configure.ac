@@ -216,7 +216,7 @@ msg_smime="no"
 mozilla_nspr_pcs=""
 
 AC_MSG_CHECKING(Mozilla NSPR pkg-config module name)
-mozilla_nspr_pcs="nspr mozilla-nspr firefox-nspr"
+mozilla_nspr_pcs="nspr mozilla-nspr firefox-nspr xulrunner-nspr"
 for pc in $mozilla_nspr_pcs; do
 	if $PKG_CONFIG --exists $pc; then
 		AC_MSG_RESULT($pc)
@@ -226,7 +226,7 @@ for pc in $mozilla_nspr_pcs; do
 done
 		
 AC_MSG_CHECKING(Mozilla NSS pkg-config module name)
-mozilla_nss_pcs="nss mozilla-nss firefox-nss"
+mozilla_nss_pcs="nss mozilla-nss firefox-nss xulrunner-nss"
 for pc in $mozilla_nss_pcs; do
 	if $PKG_CONFIG --exists $pc; then
 		AC_MSG_RESULT($pc)
