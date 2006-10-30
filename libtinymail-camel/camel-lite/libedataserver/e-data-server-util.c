@@ -699,7 +699,7 @@ setup (void)
 	g_free (full_pfx);
 	g_free (cp_pfx);
 
-	localedir = replace_prefix (cp_prefix, EVOLUTION_LOCALEDIR);
+	localedir = replace_prefix (cp_prefix, LOCALEDIR);
 	extensiondir = replace_prefix (prefix, E_DATA_SERVER_EXTENSIONDIR);
 	imagesdir = replace_prefix (prefix, E_DATA_SERVER_IMAGESDIR);
 	ui_gladedir = replace_prefix (prefix, E_DATA_SERVER_UI_GLADEDIR);

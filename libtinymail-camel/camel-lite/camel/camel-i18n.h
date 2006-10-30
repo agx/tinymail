@@ -33,9 +33,9 @@ extern "C" {
 
 #ifdef ENABLE_NLS
 #    include <libintl.h>
-#    ifdef CAMEL_EXPLICIT_TRANSLATION_DOMAIN
+#    ifdef TRANSDOM
 #        undef _
-#        define _(String) dgettext (CAMEL_EXPLICIT_TRANSLATION_DOMAIN, String)
+#        define _(String) dgettext (TRANSDOM, String)
 #    else 
 #        define _(String) gettext (String)
 #    endif

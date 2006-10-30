@@ -30,6 +30,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#ifndef _LARGEFILE64_SOURCE
+#define O_LARGEFILE 0
+#endif
+
 #include <glib.h>
 #include <glib/gstdio.h>
 

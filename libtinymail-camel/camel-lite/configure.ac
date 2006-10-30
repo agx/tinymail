@@ -7,7 +7,6 @@ AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS")
 
 BASE_VERSION=1.0
 API_VERSION=1.2
-
 AC_SUBST(BASE_VERSION)
 AC_SUBST(API_VERSION)
 AC_DEFINE_UNQUOTED(BASE_VERSION, "$BASE_VERSION", [Base version (Major.Minor)])
@@ -17,11 +16,6 @@ AC_DEFINE_UNQUOTED(API_VERSION, "$API_VERSION", [Api version (Major.Minor)])
 LIBEDATASERVER_CURRENT=8
 LIBEDATASERVER_REVISION=0
 LIBEDATASERVER_AGE=1
-
-LIBEGROUPWISE_CURRENT=11
-LIBEGROUPWISE_REVISION=0
-LIBEGROUPWISE_AGE=2
-
 LIBCAMEL_CURRENT=9
 LIBCAMEL_REVISION=0
 LIBCAMEL_AGE=1
@@ -29,13 +23,9 @@ LIBCAMEL_AGE=1
 AC_SUBST(LIBEDATASERVER_CURRENT)
 AC_SUBST(LIBEDATASERVER_REVISION)
 AC_SUBST(LIBEDATASERVER_AGE)
-AC_SUBST(LIBEGROUPWISE_CURRENT)
-AC_SUBST(LIBEGROUPWISE_REVISION)
-AC_SUBST(LIBEGROUPWISE_AGE)
 AC_SUBST(LIBCAMEL_CURRENT)
 AC_SUBST(LIBCAMEL_REVISION)
 AC_SUBST(LIBCAMEL_AGE)
-
 
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 
@@ -43,14 +33,12 @@ dnl Initialize maintainer mode
 AC_PROG_LIBTOOL
 AC_ISC_POSIX
 AC_PROG_CC
-AC_PROG_CPP
 AC_C_INLINE
-AC_PROG_YACC
 AC_HEADER_STDC([])
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-
+AC_SYS_LARGEFILE
 
 GETTEXT_PACKAGE=camel-lite
 AC_SUBST(GETTEXT_PACKAGE)
@@ -90,9 +78,9 @@ AC_CHECK_FUNCS(fsync strptime strtok_r)
 AC_CHECK_HEADERS(alloca.h)
 
 AC_CHECK_FUNCS(regexec,,[AC_CHECK_LIB(regex,regexec,
-				      [REGEX_LIBS=-lregex
-				       AC_DEFINE(HAVE_REGEXEC,1,[Define to 1 if you have the regexec function.])],
-				      [AC_MSG_ERROR([No regex library found])])])
+	      [REGEX_LIBS=-lregex
+	       AC_DEFINE(HAVE_REGEXEC,1,[Define to 1 if you have the regexec function.])],
+	      [AC_MSG_ERROR([No regex library found])])])
 AC_SUBST(REGEX_LIBS)
 
 have_iconv=no
@@ -336,29 +324,6 @@ fi
 
 
 AC_CHECK_FUNCS(mkstemp mkdtemp isblank)
-
-dnl **************************************************
-dnl ctime_r prototype
-dnl **************************************************
-
-AC_CACHE_CHECK([if ctime_r wants three arguments], ac_cv_ctime_r_three_args,
-[
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-		#include <time.h>
-	]], [[
-		char *buf;
-		time_t date;
-		ctime_r (&date, buf, 100);
-	]])],[
-		ac_cv_ctime_r_three_args=yes
-	],[
-		ac_cv_ctime_r_three_args=no
-	])
-])
-	
-if test x"$ac_cv_ctime_r_three_args" = xyes ; then
-	AC_DEFINE(CTIME_R_THREE_ARGS, 1, [Solaris-style ctime_r])
-fi
 
 dnl **************************************************
 dnl gethostbyname_r prototype
@@ -715,26 +680,6 @@ fi
 PKG_CHECK_MODULES(CAMEL, gthread-2.0 gmodule-2.0 gobject-2.0 $mozilla_nss $mozilla_nspr)
 CAMEL_CFLAGS="$CAMEL_CFLAGS $THREADS_CFLAGS $KRB4_CFLAGS $KRB5_CFLAGS"
 CAMEL_LIBS="$CAMEL_LIBS -lz $THREADS_LIBS $KRB4_LDFLAGS $KRB5_LDFLAGS"
-
-
-LARGEFILE_CFLAGS=""
-AC_CACHE_CHECK([if large files (>2 GB) are supported], largefile_support,
-[
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-                #define _LARGEFILE64_SOURCE
-                #include <sys/types.h>
-                #include <sys/stat.h>
-                #include <fcntl.h>
-        ]], [[
-                int fd = open ("filename", O_CREAT | O_RDWR | O_LARGEFILE, 0644);
-        ]])],[
-                largefile_support="yes"
-		CAMEL_CFLAGS="$CAMEL_CFLAGS -D_LARGEFILE64_SOURCE"
-        ],[
-                largefile_support="no"
-		CAMEL_CFLAGS="$CAMEL_CFLAGS -DO_LARGEFILE=0"
-        ])
-])
 
 AC_SUBST(CAMEL_CFLAGS)
 AC_SUBST(CAMEL_LIBS)

@@ -79,7 +79,7 @@ camel_init (const char *configdir, gboolean nss_init)
 	if (initialised)
 		return 0;
 
-	bindtextdomain (GETTEXT_PACKAGE, EVOLUTION_LOCALEDIR);
+	bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 
 	camel_debug_init();

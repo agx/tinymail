@@ -184,8 +184,8 @@ const char *_camel_get_localedir (void) G_GNUC_CONST;
 const char *_camel_get_libexecdir (void) G_GNUC_CONST;
 const char *_camel_get_providerdir (void) G_GNUC_CONST;
 
-#undef EVOLUTION_LOCALEDIR
-#define EVOLUTION_LOCALEDIR _camel_get_localedir ()
+#undef LOCALEDIR
+#define LOCALEDIR _camel_get_localedir ()
 
 #undef CAMEL_LIBEXECDIR
 #define CAMEL_LIBEXECDIR _camel_get_libexecdir ()

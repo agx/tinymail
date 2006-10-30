@@ -25,14 +25,14 @@ camel_litelibexecdir = $(libexecdir)
 
 lib_LTLIBRARIES = libcamel-lite-1.2.la libcamel-lite-provider-1.2.la
 
-INCLUDES = -I.. -I$(srcdir)/.. 			 	\
-	-I$(top_srcdir)/intl			 	\
+INCLUDES = -I.. -I$(srcdir)/.. \
+	-I$(top_srcdir)/intl \
 	-DCAMEL_LIBEXECDIR=\""$(camel_litelibexecdir)"\" \
 	-DCAMEL_PROVIDERDIR=\""$(camel_lite_providerdir)"\" \
-	-DG_LOG_DOMAIN=\"camel\"			\
-	-DCAMEL_EXPLICIT_TRANSLATION_DOMAIN=\"$(GETTEXT_PACKAGE)\"	\
-	-DE_DATA_SERVER_PREFIX=\"$(prefix)\"		\
-	-DEVOLUTION_LOCALEDIR=\""$(localedir)"\"	\
+	-DG_LOG_DOMAIN=\"camel-lite\" \
+	-DTRANSDOM=\"$(GETTEXT_PACKAGE)\" \
+	-DE_DATA_SERVER_PREFIX=\"$(prefix)\" \
+	-DLOCALEDIR=\""$(localedir)"\" \
 	$(CAMEL_CFLAGS)
 
 libcamel_lite_provider_1_2_la_SOURCES = 	\

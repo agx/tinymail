@@ -3,7 +3,7 @@ INCLUDES =								\
 	-DG_LOG_DOMAIN=\"e-data-server\"				\
 	$(DB_CFLAGS)							\
 	-DE_DATA_SERVER_PREFIX=\"$(prefix)\"				\
-	-DEVOLUTION_LOCALEDIR=\""$(localedir)"\"			\
+	-DLOCALEDIR=\""$(localedir)"\"					\
 	-DE_DATA_SERVER_EXTENSIONDIR=\"$(extensiondir)\"		\
 	-DE_DATA_SERVER_IMAGESDIR=\"$(imagesdir)\"			\
 	-DE_DATA_SERVER_UI_GLADEDIR=\""$(gladedir)"\"			\

@@ -6,9 +6,6 @@
 /* Base version (Major.Minor) */
 #undef BASE_VERSION
 
-/* Solaris-style ctime_r */
-#undef CTIME_R_THREE_ARGS
-
 /* Really don't try this at home */
 #undef ENABLE_IMAPP
 
@@ -207,6 +204,12 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+#undef _FILE_OFFSET_BITS
+
+/* Define for large files, on AIX-style hosts. */
+#undef _LARGE_FILES
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
