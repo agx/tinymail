@@ -250,7 +250,7 @@ AC_MSG_CHECKING(Support for SMIME)
 AC_MSG_RESULT($msg_smime)
 
 AM_CONDITIONAL(ENABLE_SMIME, test "x$msg_smime" != "xno")
-AM_CONDITIONAL(ENABLE_OPENSSL, [test "x$msg_ssl" = "xyes (OpenSSL)"])
+AM_CONDITIONAL(ENABLE_OPENSSL, [test "x$msg_ssl" == "xyes (OpenSSL)"])
 
 dnl
 dnl system mail stuff

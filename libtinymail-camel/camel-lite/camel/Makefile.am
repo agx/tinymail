@@ -36,9 +36,9 @@ INCLUDES = -I.. -I$(srcdir)/.. \
 	$(CAMEL_CFLAGS)
 
 if ENABLE_OPENSSL
-ssl_files = camel-tcp-stream-openssl.c
+SSL_FILE = camel-tcp-stream-openssl.c
 else
-ssl_files = camel-tcp-stream-ssl.c
+SSL_FILE = camel-tcp-stream-ssl.c
 endif
 
 libcamel_lite_provider_1_2_la_SOURCES = 	\
@@ -76,7 +76,7 @@ libcamel_lite_provider_1_2_la_SOURCES = 	\
 	camel-smime-context.c			\
 	camel-store-summary.c			\
 	camel-store.c				\
-	$(ssl_files)				\
+	$(SSL_FILE)				\
 	camel-tcp-stream-raw.c			\
 	camel-tcp-stream.c			\
 	camel-transport.c			\
