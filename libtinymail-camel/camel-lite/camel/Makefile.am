@@ -135,7 +135,8 @@ libcamel_lite_provider_1_2_la_LIBADD =		\
 	libcamel-lite-1.2.la			\
 	$(CAMEL_LIBS)				\
 	$(SOCKET_LIBS)				\
-	$(REGEX_LIBS)
+	$(REGEX_LIBS)				\
+	$(SSL_LIBS)
 
 libcamel_lite_1_2_la_SOURCES = 			\
 	broken-date-parser.c			\
@@ -278,7 +279,8 @@ libcamel_lite_1_2_la_LIBADD =				\
 	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.a  \
 	$(CAMEL_LIBS)							\
 	$(SOCKET_LIBS)							\
-	$(REGEX_LIBS)
+	$(REGEX_LIBS)							\
+	$(SSL_LIBS)
 
 camel-mime-tables.c: gentables.pl
 	perl gentables.pl > $@

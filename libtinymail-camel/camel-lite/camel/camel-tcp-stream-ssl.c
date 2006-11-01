@@ -29,6 +29,8 @@
 
 #include <config.h>
 
+#ifndef HAVE_OPENSSL
+
 #ifdef HAVE_NSS
 #include <unistd.h>
 #include <sys/types.h>
@@ -1310,3 +1312,4 @@ stream_get_remote_address (CamelTcpStream *stream, socklen_t *len)
 }
 
 #endif /* HAVE_NSS */
+#endif /* HAVE_OPENSSL */

@@ -1,3 +1,7 @@
+2006-11-01  Philip van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel/camel-lite: Restored the OpenSSL support
+
 2006-10-30  Philip van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Build environment simplificiations

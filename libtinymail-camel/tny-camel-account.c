@@ -62,7 +62,8 @@ tny_camel_account_get_account_type (TnyAccount *self)
  * @option: a "key=value" Camel option
  *
  * Add a Camel option to this #TnyCamelAccount instance. For example
- * "use_ssl=true" is the typical option added.
+ * "use_ssl=always" is the typical option added. Other possibilities for
+ * the "use_ssl" option are "never" and "when-possible".
  *
  **/
 void 

@@ -1,9 +1,8 @@
 AC_INIT([camel-lite],[1.0],[http://tinymail.org/])
 AC_CONFIG_SRCDIR(camel/camel-object.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
-AC_CONFIG_HEADERS(config.h)
-
 AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS")
+AC_CONFIG_HEADERS(config.h)
 
 BASE_VERSION=1.0
 API_VERSION=1.2
@@ -222,18 +221,29 @@ for pc in $mozilla_nss_pcs; do
 		break;
 	fi
 done
-		
+
+SSL_LIBS=""
+
 if test -n "$mozilla_nspr" -a -n "$mozilla_nss"; then
 	msg_ssl="yes (Mozilla NSS)"
-	AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
 	msg_smime="yes (Mozilla NSS)"
+	AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
 	AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
 	AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
+	AC_DEFINE(HAVE_OPENSSL,0,[Define if you want to use OpenSSL as SSL library])
 else
 	AC_MSG_CHECKING(for NSPR and NSS)
 	AC_MSG_RESULT(no)
+
+	AC_CHECK_LIB(crypto, EVP_md5, [
+		SSL_LIBS="-lcrypto -lssl"
+		msg_ssl="yes (OpenSSL)"
+		AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
+		AC_DEFINE(HAVE_OPENSSL,1,[Define if you want to use OpenSSL as SSL library])
+	],,)
 fi
 
+AC_SUBST(SSL_LIBS)
 AC_MSG_CHECKING(Support for SSL)
 AC_MSG_RESULT($msg_ssl)
 AC_MSG_CHECKING(Support for SMIME)
