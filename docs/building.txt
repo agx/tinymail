@@ -54,3 +54,5 @@ gconftool-2 -s /apps/tinymail/accounts/0/type -t string "store"
 gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string "mail.tinymail.org"
 gconftool-2 -s /apps/tinymail/accounts/0/user -t string "tinymailunittest"
 
+ps. The password is "unittest"
+
