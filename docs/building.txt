@@ -14,7 +14,6 @@ Now simply copy /opt/tinymail-olpc to the device
 
 Mount the image on /media/OLPCRoot
 
-cp -a /opt/camel-lite /media/OLPCRoot/opt/
 cp -a /opt/tinymail-olpc /media/OLPCRoot/opt/
 
 
