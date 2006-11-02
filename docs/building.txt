@@ -44,4 +44,13 @@ make && make install
 
 Now run /opt/tinymail/bin/tinymail
 
+Creating the test-account for GPE, Maemo en Desktop builds
+----------------------------------------------------------
+
+gconftool-2 -s /apps/tinymail/accounts/count -t int 1
+gconftool-2 -s /apps/tinymail/accounts/0/name -t string "Test account"
+gconftool-2 -s /apps/tinymail/accounts/0/proto -t string "imap"
+gconftool-2 -s /apps/tinymail/accounts/0/type -t string "store"
+gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string "mail.tinymail.org"
+gconftool-2 -s /apps/tinymail/accounts/0/user -t string "tinymailunittest"
 
