@@ -33,6 +33,15 @@ make && make install
 
 Now simply copy /opt/tinymail-maemo to the device
 
+GPE
+---
+
+svn co https://svn.tinymail.org/svn/tinymail
+cd tinymail/trunk
+./autogen.sh --prefix=/opt/tinymail --with-platform=gpe
+make && make install
+
+Now run /opt/tinymail/bin/tinymail
 
 A desktop
 ---------
