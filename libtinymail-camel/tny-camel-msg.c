@@ -274,6 +274,7 @@ tny_camel_msg_del_part (TnyMsg *self,  TnyMimePart *part)
 static void
 tny_camel_msg_set_header (TnyMsg *self, TnyHeader *header)
 {
+	TnyCamelMsg *msg;
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->header_lock);
@@ -283,6 +284,10 @@ tny_camel_msg_set_header (TnyMsg *self, TnyHeader *header)
 	g_object_ref (G_OBJECT (header));
 
 	priv->header = header;
+
+	msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
+	_tny_camel_header_set_camel_mime_message (TNY_CAMEL_HEADER (priv->header),
+						  msg);
 
 	g_mutex_unlock (priv->header_lock);
 

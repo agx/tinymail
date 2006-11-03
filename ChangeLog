@@ -1,3 +1,7 @@
+2006-11-03  Sergio Villar Senin <svillar@igalia.com>
+
+	* libtinymail-camel: Some bugfixes for when sendings E-mails
+
 2006-11-01  Philip van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Restored the OpenSSL support

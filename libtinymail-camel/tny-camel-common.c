@@ -123,6 +123,9 @@ _foreach_email_add_to_inet_addr (const gchar *emails, CamelInternetAddress *targ
 	char *dup = g_strdup (emails);
 	char *tok, *save;
 
+	if (!emails)
+		return;
+
 	tok = strtok_r (dup, ",;", &save);
 
 	while (G_LIKELY (tok != NULL))
