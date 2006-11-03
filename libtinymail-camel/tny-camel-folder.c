@@ -712,34 +712,34 @@ tny_camel_folder_get_message (TnyFolder *self, TnyHeader *header)
 		g_mutex_unlock (priv->folder_lock);
 		return;
 	}
-    
+
 	camel_exception_init (ex);
 
 	camel_message = camel_folder_get_message (priv->folder, (const char *) id, ex);    
 
 	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
 	{
-	    	TnyHeader *nheader = TNY_HEADER (tny_camel_header_new ());
-	    
-	    	/* I don't reuse the header because that would keep a reference
+		TnyCamelHeader *nheader = tny_camel_header_new ();
+
+		/* I don't reuse the header because that would keep a reference
 		   on it. Meaning that the CamelFolder can't be destroyed (the
 		   fpriv->headers_managed stuff in tny-header.c). The 
 		   TnyCamelHeader type can also work with a CamelMimeMessage, 
 		   so why not use that. Right? */
-	    
+
 		message = tny_camel_msg_new ();
-		
+
 		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), self);
 		_tny_camel_msg_set_camel_mime_message (TNY_CAMEL_MSG (message), camel_message); 
 		/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
-		_tny_camel_header_set_camel_mime_message (TNY_CAMEL_HEADER (nheader), camel_message);
-		tny_msg_set_header (message, nheader);
-		g_object_unref (G_OBJECT (nheader));  
-	    
+		_tny_camel_header_set_camel_mime_message (nheader, camel_message);
+		_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
+		g_object_unref (G_OBJECT (nheader));
+
 	} else {
 		if (camel_message)
 			camel_object_unref (CAMEL_OBJECT (camel_message));
-	    	message = NULL;
+		message = NULL;
 	}
 
 	camel_exception_free (ex);

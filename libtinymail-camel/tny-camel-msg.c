@@ -270,11 +270,25 @@ tny_camel_msg_del_part (TnyMsg *self,  TnyMimePart *part)
 	return;
 }
 
+void
+_tny_camel_msg_set_header (TnyCamelMsg *self, TnyCamelHeader *header)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+	g_mutex_lock (priv->header_lock);
+
+	if (priv->header)
+		g_object_unref (G_OBJECT (priv->header));
+
+	g_object_ref (G_OBJECT (header));
+	priv->header = TNY_HEADER (header);
+	g_mutex_unlock (priv->header_lock);
+	return;
+}
 
 static void
 tny_camel_msg_set_header (TnyMsg *self, TnyHeader *header)
 {
-	TnyCamelMsg *msg;
+	CamelMimeMessage *msg;
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->header_lock);

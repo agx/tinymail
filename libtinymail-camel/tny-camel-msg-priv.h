@@ -38,5 +38,6 @@ struct _TnyCamelMsgPriv
 CamelMimeMessage* _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self);
 void _tny_camel_msg_set_camel_mime_message (TnyCamelMsg *self, CamelMimeMessage *message);
 void _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder *folder);
+void _tny_camel_msg_set_header (TnyCamelMsg *self, TnyCamelHeader *header);
 
 #endif

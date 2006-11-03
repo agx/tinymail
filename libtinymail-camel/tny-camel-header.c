@@ -98,11 +98,11 @@ _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage
 	self->info = g_new0 (WriteInfo, 1);
 	self->write = 1;
 	self->healthy = 1;
-    
+
 	((WriteInfo*)self->info)->mime_from = NULL;
 	((WriteInfo*)self->info)->msg = camel_mime_message;
 	camel_object_ref (CAMEL_OBJECT (camel_mime_message));
-    
+
 	return;
 }
 
