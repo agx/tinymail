@@ -49,6 +49,12 @@ struct _TnyGtkAttachmentMimePartView
 struct _TnyGtkAttachmentMimePartViewClass
 {
 	GObjectClass parent_class;
+
+	/* virtual methods */
+	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
+	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
+	void (*clear_func) (TnyMimePartView *self); 
+
 };
 
 GType tny_gtk_attachment_mime_part_view_get_type (void);
