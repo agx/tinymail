@@ -7,7 +7,9 @@ if BUILD_GNOME
 SUBDIRS += libtinymail-gnomevfs 
 endif
 
+if BUILD_UIGTK
 SUBDIRS += libtinymailui-gtk 
+endif
 
 if BUILD_MOZEMBED
 SUBDIRS += libtinymailui-mozembed 

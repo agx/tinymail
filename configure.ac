@@ -52,6 +52,7 @@ AC_PROG_LIBTOOL
 
 dnl ### default values (will get overwritten)
 build_gnome=true
+build_uigtk=true
 build_demoui=true
 build_mozembed=false
 build_gtkhtml=false
@@ -61,10 +62,12 @@ PLATFORM=1
 
 dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
-[  --with-platform=gnome-desktop                platform to compile [gnome-desktop]],
+AC_HELP_STRING([--with-platform=gnome-desktop], 
+  [Platform to compile (gnome-desktop, maemo, olpc or gpe)]),
 [case "${with_platform}" in
   gnome-desktop) 
 	PLATFORMDIR=libtinymail-gnome-desktop 
+	build_uigtk=true
 	build_demoui=true
 	PLATFORM=1
 	;;
@@ -74,11 +77,13 @@ AC_ARG_WITH(platform,
         build_mozembed=false
         build_gnome=false
         with_html_component=none
+	build_uigtk=true
 	build_demoui=true
 	PLATFORM=2
         ;;
   gpe) 
 	PLATFORMDIR=libtinymail-gpe 
+	build_uigtk=true
 	build_demoui=true
 	PLATFORM=3
 	;;
@@ -88,11 +93,13 @@ AC_ARG_WITH(platform,
         build_mozembed=false
         build_gnome=false
         with_html_component=none
+	build_uigtk=true
         build_demoui=true
         PLATFORM=4
         ;;
   *) 
 	PLATFORMDIR=${with_platform}
+	build_uigtk=false
 	build_demoui=false
 	PLATFORM=0
 esac], [PLATFORMDIR=libtinymail-gnome-desktop
@@ -101,9 +108,22 @@ esac], [PLATFORMDIR=libtinymail-gnome-desktop
 AC_SUBST(PLATFORMDIR)
 AC_SUBST(PLATFORM)
 
+
+dnl ### Enable uigtk ##
+AC_ARG_ENABLE(uigtk, 
+AC_HELP_STRING([--enable-uigtk],
+  [Build the gtk+ implementation for the ui components (yes, no)]),
+[case "${enableval}" in
+  yes) build_uigtk=true ;;
+  no)  build_uigtk=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-uigtk) ;;
+esac],[build_uigtk=$build_uigtk])
+AM_CONDITIONAL(BUILD_UIGTK, test x$build_uigtk = xtrue)
+
 dnl ### Enable demoui ##
 AC_ARG_ENABLE(demoui,
-[  --enable-demoui               build the demo user interface [default=$build_demoui]],
+AC_HELP_STRING([--enable-demoui],
+  [Build the demo user interface (yes, no)]),
 [case "${enableval}" in
   yes) build_demoui=true ;;
   no)  build_demoui=false ;;
@@ -113,7 +133,8 @@ AM_CONDITIONAL(BUILD_DEMOUI, test x$build_demoui = xtrue)
 
 dnl ### Enable gnome features ##
 AC_ARG_ENABLE(gnome,
-[  --enable-gnome		build using gnome features [default=yes]],
+AC_HELP_STRING([--enable-gnome],
+  [Build using gnome features]),
 [case "${enableval}" in
   yes) build_gnome=true ;;
   no)  build_gnome=false ;;
@@ -123,15 +144,18 @@ AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
 
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,
-[  --with-html-component		set which html component to use [default=none]],
+AC_HELP_STRING([--with-html-component],
+  [Set which html component to use (none, mozembed, gtkhtml)]),
 [case "$with_html_component" in
   mozembed) 
 	build_mozembed=true
 	build_gtkhtml=false
+	build_demoui=true
   ;;
   gtkhtml)
 	build_mozembed=false
 	build_gtkhtml=false
+	build_demoui=true
   ;;
   none)
 	with_html_component=none
@@ -148,7 +172,8 @@ AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
 
 dnl ### Enable the python language bindings ##
 AC_ARG_ENABLE(python-bindings,
-[  --enable-python-bindings		build python bindings [default=no]],
+AC_HELP_STRING([--enable-python-bindings],
+  [Build python bindings (no, yes)]),
 [case "${enableval}" in
   yes) build_pytinymail=true ;;
   no)  build_pytinymail=false ;;
@@ -158,7 +183,8 @@ AM_CONDITIONAL(BUILD_PYTINYMAIL, test x$build_pytinymail = xtrue)
 
 dnl ### Enable building the unit tests ##
 AC_ARG_ENABLE(unit-tests,
-[  --enable-unit-tests		build unit tests [default=no]],
+AC_HELP_STRING([--enable-unit-tests],
+  [Build unit tests (no, yes)]),
 [case "${enableval}" in
   yes) build_unittests=true ;;
   no)  build_unittests=false ;;
@@ -168,7 +194,8 @@ AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
 
 dnl ### Enable building the tests ##
 AC_ARG_ENABLE(tests,
-[  --enable-tests          build tests [default=no]],
+AC_HELP_STRING([--enable-tests],
+  [Build tests (no, yes)]),
 [case "${enableval}" in
   yes) build_tests=true ;;
   no)  build_tests=false ;;
@@ -178,7 +205,8 @@ AM_CONDITIONAL(BUILD_TESTS, test x$build_tests = xtrue)
 
 dnl ### doxygen
 AC_ARG_ENABLE(doxygen,
-[  --enable-doxygen          build doxygen docs [default=no]],
+AC_HELP_STRING([--enable-doxygen],
+  [Build doxygen docs (no, yes)]),
 [case "${enableval}" in
   yes) build_doxygen=true ;;
   no)  build_doxygen=false ;;
