@@ -44,6 +44,12 @@ struct _TnyGtkTextBufferStreamPriv
 static gssize
 tny_text_buffer_write_to_stream (TnyStream *self, TnyStream *output)
 {
+	return TNY_GTK_TEXT_BUFFER_STREAM_GET_CLASS (self)->write_to_stream_func (self, output);
+}
+
+static gssize
+tny_text_buffer_write_to_stream_default (TnyStream *self, TnyStream *output)
+{
 	char tmp_buf[4096];
 	gssize total = 0;
 	gssize nb_read;
@@ -77,7 +83,13 @@ tny_text_buffer_write_to_stream (TnyStream *self, TnyStream *output)
 }
 
 static gssize
-tny_gtk_text_buffer_stream_read  (TnyStream *self, char *buffer, gsize n)
+tny_gtk_text_buffer_stream_read (TnyStream *self, char *buffer, gsize n)
+{
+	return TNY_GTK_TEXT_BUFFER_STREAM_GET_CLASS (self)->read_func (self, buffer, n);
+}
+
+static gssize
+tny_gtk_text_buffer_stream_read_default (TnyStream *self, char *buffer, gsize n)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter dest, end;
@@ -92,20 +104,26 @@ tny_gtk_text_buffer_stream_read  (TnyStream *self, char *buffer, gsize n)
 		rlength = end_offset - cur_offset;
 	else rlength = (gint)n;
 
-        gtk_text_buffer_get_start_iter (priv->buffer, &dest);
+	gtk_text_buffer_get_start_iter (priv->buffer, &dest);
 	gtk_text_iter_set_offset (&dest, rlength);
 
-    
+
 	buf = gtk_text_buffer_get_text (priv->buffer, &(priv->cur), &dest, TRUE);
-    	strncpy (buffer, buf, rlength);
-    	g_free (buf);
-    	gtk_text_iter_set_offset (&(priv->cur), cur_offset + rlength);
-    	
+	strncpy (buffer, buf, rlength);
+	g_free (buf);
+	gtk_text_iter_set_offset (&(priv->cur), cur_offset + rlength);
+
 	return (gssize) rlength;
 }
 
 static gssize
 tny_gtk_text_buffer_stream_write (TnyStream *self, const char *buffer, gsize n)
+{
+	return TNY_GTK_TEXT_BUFFER_STREAM_GET_CLASS (self)->write_func (self, buffer, n);
+}
+
+static gssize
+tny_gtk_text_buffer_stream_write_default (TnyStream *self, const char *buffer, gsize n)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
@@ -117,11 +135,23 @@ tny_gtk_text_buffer_stream_write (TnyStream *self, const char *buffer, gsize n)
 static gint
 tny_gtk_text_buffer_stream_flush (TnyStream *self)
 {
+	return TNY_GTK_TEXT_BUFFER_STREAM_GET_CLASS (self)->flush_func (self);
+}
+
+static gint
+tny_gtk_text_buffer_stream_flush_default (TnyStream *self)
+{
 	return 0;
 }
 
 static gint
 tny_gtk_text_buffer_stream_close (TnyStream *self)
+{
+	return TNY_GTK_TEXT_BUFFER_STREAM_GET_CLASS (self)->close_func (self);
+}
+
+static gint
+tny_gtk_text_buffer_stream_close_default (TnyStream *self)
 {
 	tny_gtk_text_buffer_stream_flush (self);
 
@@ -129,7 +159,13 @@ tny_gtk_text_buffer_stream_close (TnyStream *self)
 }
 
 static gboolean
-tny_gtk_text_buffer_stream_is_eos   (TnyStream *self)
+tny_gtk_text_buffer_stream_is_eos (TnyStream *self)
+{
+	return TNY_GTK_TEXT_BUFFER_STREAM_GET_CLASS (self)->is_eos_func (self);
+}
+
+static gboolean
+tny_gtk_text_buffer_stream_is_eos_default (TnyStream *self)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	GtkTextIter end;
@@ -139,7 +175,7 @@ tny_gtk_text_buffer_stream_is_eos   (TnyStream *self)
 
 	cur_offset = gtk_text_iter_get_offset (&(priv->cur));
 	end_offset = gtk_text_iter_get_offset (&end);
-    
+
 	return (cur_offset >= end_offset);
 }
 
@@ -153,6 +189,12 @@ tny_gtk_text_buffer_stream_reset_priv (TnyGtkTextBufferStreamPriv *priv)
 
 static gint
 tny_gtk_text_buffer_stream_reset (TnyStream *self)
+{
+	return TNY_GTK_TEXT_BUFFER_STREAM_GET_CLASS (self)->reset_func (self);
+}
+
+static gint
+tny_gtk_text_buffer_stream_reset_default (TnyStream *self)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
@@ -250,6 +292,14 @@ tny_gtk_text_buffer_stream_class_init (TnyGtkTextBufferStreamClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	class->read_func = tny_gtk_text_buffer_stream_read_default;
+	class->write_func = tny_gtk_text_buffer_stream_write_default;
+	class->flush_func = tny_gtk_text_buffer_stream_flush_default;
+	class->close_func = tny_gtk_text_buffer_stream_close_default;
+	class->is_eos_func = tny_gtk_text_buffer_stream_is_eos_default;
+	class->reset_func = tny_gtk_text_buffer_stream_reset_default;
+	class->write_to_stream_func = tny_text_buffer_write_to_stream_default;
 
 	object_class->finalize = tny_gtk_text_buffer_stream_finalize;
 

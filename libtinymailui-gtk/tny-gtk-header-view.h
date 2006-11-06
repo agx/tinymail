@@ -46,6 +46,10 @@ struct _TnyGtkHeaderView
 struct _TnyGtkHeaderViewClass
 {
 	GtkTableClass parent_class;
+
+	/* virtual methods */
+	void (*set_header_func) (TnyHeaderView *self, TnyHeader *header);
+	void (*clear_func) (TnyHeaderView *self);   
 };
 
 GType tny_gtk_header_view_get_type (void);

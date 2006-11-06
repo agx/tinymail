@@ -31,12 +31,19 @@ struct _TnyGtkMsgWindowPriv
 	TnyMsgView *msg_view;
 };
 
-#define TNY_GTK_MSG_WINDOW_GET_PRIVATE(o)	\
+#define TNY_GTK_MSG_WINDOW_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_MSG_WINDOW, TnyGtkMsgWindowPriv))
 
 
 static void
 tny_gtk_msg_window_set_unavailable (TnyMsgView *self)
+{
+	TNY_GTK_MSG_WINDOW_GET_CLASS (self)->set_unavailable_func (self);
+	return;
+}
+
+static void
+tny_gtk_msg_window_set_unavailable_default (TnyMsgView *self)
 {
 	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
 	tny_msg_view_set_unavailable (priv->msg_view);
@@ -46,12 +53,25 @@ tny_gtk_msg_window_set_unavailable (TnyMsgView *self)
 static TnyMsg* 
 tny_gtk_msg_window_get_msg (TnyMsgView *self)
 {
+	return TNY_GTK_MSG_WINDOW_GET_CLASS (self)->get_msg_func (self);
+}
+
+static TnyMsg* 
+tny_gtk_msg_window_get_msg_default (TnyMsgView *self)
+{
 	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
 	return tny_msg_view_get_msg (priv->msg_view);
 }
 
 static void 
 tny_gtk_msg_window_set_msg (TnyMsgView *self, TnyMsg *msg)
+{
+	TNY_GTK_MSG_WINDOW_GET_CLASS (self)->set_msg_func (self, msg);
+	return;
+}
+
+static void 
+tny_gtk_msg_window_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 {
 	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
 	TnyHeader *header = TNY_HEADER (tny_msg_get_header (msg));
@@ -60,8 +80,8 @@ tny_gtk_msg_window_set_msg (TnyMsgView *self, TnyMsg *msg)
 
 	gtk_window_set_title (GTK_WINDOW (self), tny_header_get_subject (header));
 
-    	g_object_unref (G_OBJECT (header));
-    
+	g_object_unref (G_OBJECT (header));
+
 	return;
 }
 
@@ -135,6 +155,10 @@ tny_gtk_msg_window_class_init (TnyGtkMsgWindowClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	class->get_msg_func = tny_gtk_msg_window_get_msg_default;
+	class->set_msg_func = tny_gtk_msg_window_set_msg_default;
+	class->set_unavailable_func = tny_gtk_msg_window_set_unavailable_default;
 
 	object_class->finalize = tny_gtk_msg_window_finalize;
 

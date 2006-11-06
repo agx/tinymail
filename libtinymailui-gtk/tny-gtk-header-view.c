@@ -57,9 +57,15 @@ _get_readable_date (time_t file_time_raw)
 	return g_strdup (readable_date);
 }
 
-
 static void 
 tny_gtk_header_view_set_header (TnyHeaderView *self, TnyHeader *header)
+{
+	TNY_GTK_HEADER_VIEW_GET_CLASS (self)->set_header_func (self, header);
+	return;
+}
+
+static void 
+tny_gtk_header_view_set_header_default (TnyHeaderView *self, TnyHeader *header)
 {
 	TnyGtkHeaderViewPriv *priv = TNY_GTK_HEADER_VIEW_GET_PRIVATE (self);
 
@@ -69,7 +75,7 @@ tny_gtk_header_view_set_header (TnyHeaderView *self, TnyHeader *header)
 
 	if (header && G_IS_OBJECT (header))
 	{
-	    	gchar *str;
+		gchar *str;
 		g_object_ref (G_OBJECT (header)); 
 		priv->header = header;
 
@@ -81,27 +87,34 @@ tny_gtk_header_view_set_header (TnyHeaderView *self, TnyHeader *header)
 		gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);
 		g_free (str);
 	}
-    
+
 	return;
 }
 
-
 static void 
 tny_gtk_header_view_clear (TnyHeaderView *self)
+{
+	TNY_GTK_HEADER_VIEW_GET_CLASS (self)->clear_func (self);
+	return;
+}
+
+static void 
+tny_gtk_header_view_clear_default (TnyHeaderView *self)
 {
 	TnyGtkHeaderViewPriv *priv = TNY_GTK_HEADER_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;
-    
+
 	gtk_label_set_text (GTK_LABEL (priv->to_label), "");
 	gtk_label_set_text (GTK_LABEL (priv->from_label), "");
 	gtk_label_set_text (GTK_LABEL (priv->subject_label), "");
 	gtk_label_set_text (GTK_LABEL (priv->date_label), "");
-    
+
 	return;
 }
+
 
 
 /**
@@ -203,7 +216,7 @@ tny_gtk_header_view_finalize (GObject *object)
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;
-    
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -216,7 +229,7 @@ tny_header_view_init (gpointer g, gpointer iface_data)
 
 	klass->set_header_func = tny_gtk_header_view_set_header;
 	klass->clear_func = tny_gtk_header_view_clear;
-    
+
 	return;
 }
 
@@ -227,6 +240,9 @@ tny_gtk_header_view_class_init (TnyGtkHeaderViewClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	class->set_header_func = tny_gtk_header_view_set_header_default;
+	class->clear_func = tny_gtk_header_view_clear_default;
 
 	object_class->finalize = tny_gtk_header_view_finalize;
 

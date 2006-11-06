@@ -77,7 +77,7 @@ tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 }
 
 static TnyMimePartView*
-tny_gtk_msg_view_create_mime_part_view_for_defimpl (TnyMsgView *self, TnyMimePart *part)
+tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePart *part)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	TnyMimePartView *retval = NULL;
@@ -154,7 +154,7 @@ tny_gtk_msg_view_set_unavailable (TnyMsgView *self)
 }
 
 static void
-tny_gtk_msg_view_set_unavailable_defimpl (TnyMsgView *self)
+tny_gtk_msg_view_set_unavailable_default (TnyMsgView *self)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer;
@@ -175,7 +175,7 @@ tny_gtk_msg_view_get_msg (TnyMsgView *self)
 }
 
 static TnyMsg* 
-tny_gtk_msg_view_get_msg_defimpl (TnyMsgView *self)
+tny_gtk_msg_view_get_msg_default (TnyMsgView *self)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	
@@ -189,7 +189,7 @@ tny_gtk_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg)
 }
 
 static void 
-tny_gtk_msg_view_set_msg_defimpl (TnyMsgView *self, TnyMsg *msg)
+tny_gtk_msg_view_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 
@@ -219,7 +219,7 @@ tny_gtk_msg_view_clear (TnyMsgView *self)
 }
 
 static void
-tny_gtk_msg_view_clear_defimpl (TnyMsgView *self)
+tny_gtk_msg_view_clear_default (TnyMsgView *self)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GList *kids = gtk_container_get_children (GTK_CONTAINER (TNY_GTK_MSG_VIEW (self)->viewers));
@@ -351,11 +351,11 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 
 	object_class->finalize = tny_gtk_msg_view_finalize;
 
-	class->get_msg_func = tny_gtk_msg_view_get_msg_defimpl;
-	class->set_msg_func = tny_gtk_msg_view_set_msg_defimpl;
-	class->set_unavailable_func = tny_gtk_msg_view_set_unavailable_defimpl;
-	class->clear_func = tny_gtk_msg_view_clear_defimpl;
-	class->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for_defimpl;
+	class->get_msg_func = tny_gtk_msg_view_get_msg_default;
+	class->set_msg_func = tny_gtk_msg_view_set_msg_default;
+	class->set_unavailable_func = tny_gtk_msg_view_set_unavailable_default;
+	class->clear_func = tny_gtk_msg_view_clear_default;
+	class->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for_default;
 	
 	g_type_class_add_private (object_class, sizeof (TnyGtkMsgViewPriv));
 

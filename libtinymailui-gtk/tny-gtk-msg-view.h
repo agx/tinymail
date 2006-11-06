@@ -50,13 +50,13 @@ struct _TnyGtkMsgView
 struct _TnyGtkMsgViewClass
 {
 	GtkScrolledWindowClass parent_class;
-	
-	/* virtual methods (they have a default implementation in TnyGtkMsgView */
+
+	/* virtual methods */
 	TnyMsg* (*get_msg_func) (TnyMsgView *self);
 	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
 	void (*set_unavailable_func) (TnyMsgView *self);
 	void (*clear_func) (TnyMsgView *self);
-	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);	
+	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
 };
 
 GType tny_gtk_msg_view_get_type (void);

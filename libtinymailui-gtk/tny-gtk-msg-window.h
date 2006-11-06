@@ -51,6 +51,13 @@ struct _TnyGtkMsgWindow
 struct _TnyGtkMsgWindowClass
 {
 	GtkWindowClass parent_class;
+
+	/* virtual methods */
+	TnyMsg* (*get_msg_func) (TnyMsgView *self);
+	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
+	void (*set_unavailable_func) (TnyMsgView *self);
+	void (*clear_func) (TnyMsgView *self);
+	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
 };
 
 GType tny_gtk_msg_window_get_type (void);
