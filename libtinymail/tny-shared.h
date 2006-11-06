@@ -70,6 +70,8 @@ typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, TnyList *list, gpoi
 typedef enum _TnyFolderSignal TnyFolderSignal;
 typedef enum _TnyDeviceSignal TnyDeviceSignal;
 typedef enum _TnyAccountStoreSignal TnyAccountStoreSignal;
+typedef struct _TnyMsgRemoveStrategy TnyMsgRemoveStrategy;
+typedef struct _TnyMsgRemoveStrategyIface TnyMsgRemoveStrategyIface;
 
 G_END_DECLS
 

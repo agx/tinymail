@@ -295,7 +295,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 					} else mymodel = model;
 
 					folder = tny_header_get_folder (header);
-					tny_folder_remove_message (folder, header);
+					tny_folder_remove_msg (folder, header);
 
 					tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
 
@@ -345,7 +345,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			folder = tny_header_get_folder (header);
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_get_message (folder, header);
+				msg = tny_folder_get_msg (folder, header);
 				if (G_LIKELY (msg))
 				{
 					tny_msg_view_set_msg (priv->msg_view, msg);
@@ -542,7 +542,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_get_message (folder, header);
+				msg = tny_folder_get_msg (folder, header);
 				if (G_LIKELY (msg))
 				{
 					msgwin = tny_gtk_msg_window_new (

@@ -26,6 +26,7 @@
 #include <tny-msg.h>
 #include <tny-header.h>
 #include <tny-account.h>
+#include <tny-msg-remove-strategy.h>
 #include <tny-list.h>
 
 G_BEGIN_DECLS
@@ -75,16 +76,18 @@ struct _TnyFolderIface
 	void (*folders_reloaded) (TnyFolder *self);
 
 	/* Methods */
-	void (*remove_message_func) (TnyFolder *self, TnyHeader *header);
+	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header);
 	void (*expunge_func) (TnyFolder *self);
-	TnyMsg* (*get_message_func) (TnyFolder *self, TnyHeader *header);
+	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
+	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
+	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header);
 	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh);
 	const gchar* (*get_name_func) (TnyFolder *self);
 	const gchar* (*get_id_func) (TnyFolder *self);
 	TnyStoreAccount* (*get_account_func) (TnyFolder *self);
 	void (*set_name_func) (TnyFolder *self, const gchar *name);
 	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
-	guint (*get_all_count_func) (TnyFolder *self);	
+	guint (*get_all_count_func) (TnyFolder *self);
 	guint (*get_unread_count_func) (TnyFolder *self);
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
@@ -94,9 +97,11 @@ struct _TnyFolderIface
 GType tny_folder_get_type (void);
 GType tny_folder_type_get_type (void);
 
-void tny_folder_remove_message (TnyFolder *self, TnyHeader *header);
+TnyMsgRemoveStrategy* tny_folder_get_msg_remove_strategy (TnyFolder *self);
+void tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st);
+void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header);
 void tny_folder_expunge (TnyFolder *self);
-TnyMsg* tny_folder_get_message (TnyFolder *self, TnyHeader *header);
+TnyMsg* tny_folder_get_msg (TnyFolder *self, TnyHeader *header);
 void tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh);
 TnyStoreAccount* tny_folder_get_account (TnyFolder *self);
 const gchar* tny_folder_get_id (TnyFolder *self);

@@ -25,6 +25,45 @@
 #include <tny-folder.h>
 guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
+
+/**
+ * tny_folder_get_msg_remove_strategy:
+ * @self: a TnyFolder object
+ *
+ * Get the strategy for removing a message. The return value of this method
+ * must be unreferenced after use.
+ * 
+ * Return value: the strategy for removing a message
+ **/
+TnyMsgRemoveStrategy* 
+tny_folder_get_msg_remove_strategy (TnyFolder *self)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->get_msg_remove_strategy_func)
+		g_critical ("You must implement tny_folder_get_msg_remove_strategy\n");
+#endif
+	return TNY_FOLDER_GET_IFACE (self)->get_msg_remove_strategy_func (self);
+}
+
+/**
+ * tny_folder_set_msg_remove_strategy:
+ * @self: a TnyFolder object
+ * @st: a #TnyMsgRemoveStrategy object
+ *
+ * Set the strategy for removing a message
+ * 
+ **/
+void 
+tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->set_msg_remove_strategy_func)
+		g_critical ("You must implement tny_folder_set_msg_remove_strategy\n");
+#endif
+	TNY_FOLDER_GET_IFACE (self)->set_msg_remove_strategy_func (self, st);
+	return;
+}
+
 /**
  * tny_folder_expunge:
  * @self: a TnyFolder object
@@ -36,7 +75,7 @@ guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
  * <informalexample><programlisting>
  * TnyHeader *header = ...
  * TnyFolder *folder = tny_header_get_folder (header);
- * tny_folder_remove_message (folder, header);
+ * tny_folder_remove_msg (folder, header);
  * tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
  * tny_folder_expunge (folder);
  * g_object_unref (G_OBJECT (folder));
@@ -54,7 +93,7 @@ tny_folder_expunge (TnyFolder *self)
 }
 
 /**
- * tny_folder_remove_message:
+ * tny_folder_remove_msg:
  * @self: a TnyFolder object
  * @header: the header of the message to remove
  *
@@ -93,7 +132,7 @@ tny_folder_expunge (TnyFolder *self)
  *                TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
  *                &amp;header, -1);
  *          TnyFolder *folder = tny_header_get_folder (header);
- *          tny_folder_remove_message (folder, header);
+ *          tny_folder_remove_msg (folder, header);
  *          tny_list_remove (TNY_LIST (model), G_OBJECT (header));
  *          g_object_unref (G_OBJECT (folder));
  *          g_object_unref (G_OBJECT (header));
@@ -104,14 +143,14 @@ tny_folder_expunge (TnyFolder *self)
  *
  **/
 void 
-tny_folder_remove_message (TnyFolder *self, TnyHeader *header)
+tny_folder_remove_msg (TnyFolder *self, TnyHeader *header)
 {
 #ifdef DEBUG
-	if (!TNY_FOLDER_GET_IFACE (self)->remove_message_func)
-		g_critical ("You must implement tny_folder_remove_message\n");
+	if (!TNY_FOLDER_GET_IFACE (self)->remove_msg_func)
+		g_critical ("You must implement tny_folder_remove_msg\n");
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->remove_message_func (self, header);
+	TNY_FOLDER_GET_IFACE (self)->remove_msg_func (self, header);
 	return;
 }
 
@@ -303,7 +342,7 @@ tny_folder_get_account (TnyFolder *self)
 
 
 /**
- * tny_folder_get_message:
+ * tny_folder_get_msg:
  * @self: a TnyFolder object
  * @header: the header of the message to get
  * 
@@ -315,7 +354,7 @@ tny_folder_get_account (TnyFolder *self)
  * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
  * TnyFolder *folder = ...
  * TnyHeader *header = ...
- * TnyMsg *message = tny_folder_get_message (folder, header);
+ * TnyMsg *message = tny_folder_get_msg (folder, header);
  * tny_msg_view_set_msg (message_view, message);
  * g_object_unref (G_OBJECT (message));
  * </programlisting></informalexample>
@@ -324,14 +363,14 @@ tny_folder_get_account (TnyFolder *self)
  *
  **/
 TnyMsg*
-tny_folder_get_message (TnyFolder *self, TnyHeader *header)
+tny_folder_get_msg (TnyFolder *self, TnyHeader *header)
 {
 #ifdef DEBUG
-	if (!TNY_FOLDER_GET_IFACE (self)->get_message_func)
-		g_critical ("You must implement tny_folder_get_message\n");
+	if (!TNY_FOLDER_GET_IFACE (self)->get_msg_func)
+		g_critical ("You must implement tny_folder_get_msg\n");
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_message_func (self, header);
+	return TNY_FOLDER_GET_IFACE (self)->get_msg_func (self, header);
 }
 
 

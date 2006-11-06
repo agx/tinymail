@@ -1,3 +1,14 @@
+2006-11-06  Philip van Hoof <pvanhoof@gnome.org>
+
+	* Introduction of the TnyMsgRemoveStrategy, which makes it more
+	flexible to define how tinymail should remove messages (as this might
+	be specific per device). Although this means a major API change, not a
+	lot external API has changed. A default remove strategy is used for
+	each folder and is implemented as TnyCamelMsgRemoveStrategy. This
+	is an overwritable property.
+
+	* This was a major API change
+
 2006-11-06  Sergio Villar Senin <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-transport-account.c: adds the addresses

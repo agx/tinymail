@@ -1,7 +1,7 @@
 compile
 tags
 py*
-anjuta.anjuta
+*.anjuta
 config.h
 stamp-h1
 libtinymail-*.tar.gz
