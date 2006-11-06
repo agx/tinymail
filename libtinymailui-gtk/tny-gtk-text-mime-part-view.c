@@ -59,6 +59,12 @@ struct _TnyGtkTextMimePartViewPriv
 static TnyMimePart*
 tny_gtk_text_mime_part_view_get_part (TnyMimePartView *self)
 {
+	return TNY_GTK_TEXT_MIME_PART_VIEW_GET_CLASS (self)->get_part_func (self);
+}
+
+static TnyMimePart*
+tny_gtk_text_mime_part_view_get_part_default (TnyMimePartView *self)
+{
 	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
 	return (priv->part)?TNY_MIME_PART (g_object_ref (priv->part)):NULL;
 }
@@ -66,12 +72,19 @@ tny_gtk_text_mime_part_view_get_part (TnyMimePartView *self)
 static void 
 tny_gtk_text_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 {
+	TNY_GTK_TEXT_MIME_PART_VIEW_GET_CLASS (self)->set_part_func (self, part);
+	return;
+}
+
+static void 
+tny_gtk_text_mime_part_view_set_part_default (TnyMimePartView *self, TnyMimePart *part)
+{
 	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
-    
-    	if (part)
+
+	if (part)
 	{
 		GtkTextBuffer *buffer;
 		TnyStream *dest;
@@ -92,20 +105,27 @@ tny_gtk_text_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 		priv->part = part;
 		
 	}
-    
+
 	return;
 }
 
 static void
 tny_gtk_text_mime_part_view_clear (TnyMimePartView *self)
 {
+	TNY_GTK_TEXT_MIME_PART_VIEW_GET_CLASS (self)->clear_func (self);
+	return;
+}
+
+static void
+tny_gtk_text_mime_part_view_clear_default (TnyMimePartView *self)
+{
 	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
-    	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
 	
 	if (buffer && GTK_IS_TEXT_BUFFER (buffer))
 		gtk_text_buffer_set_text (buffer, "", 0);
-    
-    	return;
+
+	return;
 }
 
 /**
@@ -154,7 +174,7 @@ tny_mime_part_view_init (gpointer g, gpointer iface_data)
 	klass->get_part_func = tny_gtk_text_mime_part_view_get_part;
 	klass->set_part_func = tny_gtk_text_mime_part_view_set_part;
 	klass->clear_func = tny_gtk_text_mime_part_view_clear;
-	
+
 	return;
 }
 
@@ -165,6 +185,10 @@ tny_gtk_text_mime_part_view_class_init (TnyGtkTextMimePartViewClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	class->get_part_func = tny_gtk_text_mime_part_view_get_part_default;
+	class->set_part_func = tny_gtk_text_mime_part_view_set_part_default;
+	class->clear_func = tny_gtk_text_mime_part_view_clear_default;
 
 	object_class->finalize = tny_gtk_text_mime_part_view_finalize;
 
