@@ -46,6 +46,24 @@ struct _TnyCamelMimePart
 struct _TnyCamelMimePartClass 
 {
 	GObjectClass parent;
+
+	/* virtual methods */
+	const gchar* (*get_content_type_func) (TnyMimePart *self);
+	gboolean (*content_type_is_func) (TnyMimePart *self, const gchar *content_type);
+	TnyStream* (*get_stream_func) (TnyMimePart *self);
+	void (*decode_to_stream_func) (TnyMimePart *self, TnyStream *stream);
+	void (*write_to_stream_func) (TnyMimePart *self, TnyStream *stream);
+	gint (*construct_from_stream_func) (TnyMimePart *self, TnyStream *stream, const gchar *type);
+	const gchar* (*get_filename_func) (TnyMimePart *self);
+	const gchar* (*get_content_id_func) (TnyMimePart *self);
+	const gchar* (*get_description_func) (TnyMimePart *self);
+	const gchar* (*get_content_location_func) (TnyMimePart *self);
+	void (*set_content_location_func) (TnyMimePart *self, const gchar *content_location); 
+	void (*set_description_func) (TnyMimePart *self, const gchar *description); 
+	void (*set_content_id_func) (TnyMimePart *self, const gchar *content_id); 
+	void (*set_filename_func) (TnyMimePart *self, const gchar *filename);
+	void (*set_content_type_func) (TnyMimePart *self, const gchar *contenttype);
+	gboolean (*is_attachment_func) (TnyMimePart *self);
 };
 
 

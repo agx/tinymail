@@ -46,6 +46,9 @@ struct _TnyCamelTransportAccount
 struct _TnyCamelTransportAccountClass 
 {
 	TnyCamelAccountClass parent;
+
+	/* virtual methods */
+	void (*send_func) (TnyTransportAccount *self, TnyMsg *msg);
 };
 
 GType tny_camel_transport_account_get_type (void);

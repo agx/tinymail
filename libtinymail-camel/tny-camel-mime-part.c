@@ -56,20 +56,24 @@ static GObjectClass *parent_class = NULL;
 static gboolean 
 tny_camel_mime_part_is_attachment (TnyMimePart *self)
 {
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->is_attachment_func (self);
+}
+
+static gboolean 
+tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
+{
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *dw = camel_medium_get_content_object((CamelMedium *)priv->part);
-
-	/* From evolution/mail/em-format.c (func=em_format_is_attachment) */
 
 	if (G_LIKELY (dw))
 	{
 		return !(camel_content_type_is (dw->mime_type, "multipart", "*")
-                 || camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
-                 || camel_content_type_is(dw->mime_type, "application", "pkcs7-mime")
-                 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-signed")
-                 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-encrypted")
-                 || (camel_content_type_is (dw->mime_type, "text", "*")
-                     && camel_mime_part_get_filename(priv->part) == NULL));
+			 || camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
+			 || camel_content_type_is(dw->mime_type, "application", "pkcs7-mime")
+			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-signed")
+			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-encrypted")
+			 || (camel_content_type_is (dw->mime_type, "text", "*")
+			     && camel_mime_part_get_filename(priv->part) == NULL));
 	}
 
 	return FALSE;
@@ -77,6 +81,13 @@ tny_camel_mime_part_is_attachment (TnyMimePart *self)
 
 static void
 tny_camel_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->write_to_stream_func (self, stream);
+	return;
+}
+
+static void
+tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *stream)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
@@ -118,60 +129,66 @@ tny_camel_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
 static void
 camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 {
-	/* Stolen from evolution, evil evil me!! moehahah */
-
-        CamelStreamFilter *filter_stream;
-        CamelMimeFilterCharset *filter;
-        const char *charset = "UTF-8"; /* I default to UTF-8, like it or not */
-        CamelMimeFilterWindows *windows = NULL;
-
+/* Stolen from evolution, evil evil me!! moehahah */
+	
+	CamelStreamFilter *filter_stream;
+	CamelMimeFilterCharset *filter;
+	const char *charset = "UTF-8"; /* I default to UTF-8, like it or not */
+	CamelMimeFilterWindows *windows = NULL;
+	
 	if (dw->mime_type && (charset = camel_content_type_param 
-		(dw->mime_type, "charset")) && 
+			(dw->mime_type, "charset")) && 
 		g_ascii_strncasecmp(charset, "iso-8859-", 9) == 0) 
 	{
-                CamelStream *null;
-
-                /* Since a few Windows mailers like to claim they sent
-                 * out iso-8859-# encoded text when they really sent
-                 * out windows-cp125#, do some simple sanity checking
-                 * before we move on... */
-
-                null = camel_stream_null_new();
-                filter_stream = camel_stream_filter_new_with_stream(null);
-                camel_object_unref(null);
-
-                windows = (CamelMimeFilterWindows *)camel_mime_filter_windows_new(charset);
-                camel_stream_filter_add (filter_stream, (CamelMimeFilter *)windows);
-
-                camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
-                camel_stream_flush ((CamelStream *)filter_stream);
-                camel_object_unref (filter_stream);
-
-                charset = camel_mime_filter_windows_real_charset (windows);
-
-        }
-
-        filter_stream = camel_stream_filter_new_with_stream (stream);
-
-        if ((filter = camel_mime_filter_charset_new_convert (charset, "UTF-8"))) 
+		CamelStream *null;
+		
+		/* Since a few Windows mailers like to claim they sent
+		* out iso-8859-# encoded text when they really sent
+		* out windows-cp125#, do some simple sanity checking
+		* before we move on... */
+		
+		null = camel_stream_null_new();
+		filter_stream = camel_stream_filter_new_with_stream(null);
+		camel_object_unref(null);
+		
+		windows = (CamelMimeFilterWindows *)camel_mime_filter_windows_new(charset);
+		camel_stream_filter_add (filter_stream, (CamelMimeFilter *)windows);
+		
+		camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
+		camel_stream_flush ((CamelStream *)filter_stream);
+		camel_object_unref (filter_stream);
+		
+		charset = camel_mime_filter_windows_real_charset (windows);
+		
+	}
+	
+	filter_stream = camel_stream_filter_new_with_stream (stream);
+	
+	if ((filter = camel_mime_filter_charset_new_convert (charset, "UTF-8"))) 
 	{
-                camel_stream_filter_add (filter_stream, (CamelMimeFilter *) filter);
-                camel_object_unref (filter);
-        }
-
-        camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
-        camel_stream_flush ((CamelStream *)filter_stream);
-        camel_object_unref (filter_stream);
-
-        if (windows)
-                camel_object_unref(windows);
-
+		camel_stream_filter_add (filter_stream, (CamelMimeFilter *) filter);
+		camel_object_unref (filter);
+	}
+	
+	camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
+	camel_stream_flush ((CamelStream *)filter_stream);
+	camel_object_unref (filter_stream);
+	
+	if (windows)
+		camel_object_unref(windows);
+	
 	return;
 }
 
-
 static void
 tny_camel_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->decode_to_stream_func (self, stream);
+	return;
+}
+
+static void
+tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stream)
 {
 
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
@@ -199,7 +216,7 @@ tny_camel_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
 
 	if (camel_content_type_is (wrapper->mime_type, "text", "*"))
 		camel_stream_format_text (wrapper, cstream);
-        else
+	else
 		camel_data_wrapper_decode_to_stream (wrapper, cstream);
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
@@ -212,6 +229,12 @@ tny_camel_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
 
 static gint
 tny_camel_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const gchar *type)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->construct_from_stream_func (self, stream, type);
+}
+
+static gint
+tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream *stream, const gchar *type)
 {
 
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
@@ -245,6 +268,12 @@ tny_camel_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream,
 
 static TnyStream* 
 tny_camel_mime_part_get_stream (TnyMimePart *self)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_stream_func (self);
+}
+
+static TnyStream* 
+tny_camel_mime_part_get_stream_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	TnyStream *retval = NULL;
@@ -280,6 +309,12 @@ tny_camel_mime_part_get_stream (TnyMimePart *self)
 static const gchar* 
 tny_camel_mime_part_get_content_type (TnyMimePart *self)
 {
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_content_type_func (self);
+}
+
+static const gchar* 
+tny_camel_mime_part_get_content_type_default (TnyMimePart *self)
+{
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	if (G_LIKELY (!priv->cached_content_type))
@@ -298,6 +333,12 @@ tny_camel_mime_part_get_content_type (TnyMimePart *self)
 
 static gboolean 
 tny_camel_mime_part_content_type_is (TnyMimePart *self, const gchar *type)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->content_type_is_func (self, type);
+}
+
+static gboolean 
+tny_camel_mime_part_content_type_is_default (TnyMimePart *self, const gchar *type)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelContentType *ctype;
@@ -380,6 +421,12 @@ tny_camel_mime_part_get_part (TnyCamelMimePart *self)
 static const gchar*
 tny_camel_mime_part_get_filename (TnyMimePart *self)
 {
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_filename_func (self);
+}
+
+static const gchar*
+tny_camel_mime_part_get_filename_default (TnyMimePart *self)
+{
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
 
@@ -392,6 +439,12 @@ tny_camel_mime_part_get_filename (TnyMimePart *self)
 
 static const gchar*
 tny_camel_mime_part_get_content_id (TnyMimePart *self)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_content_id_func (self);
+}
+
+static const gchar*
+tny_camel_mime_part_get_content_id_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
@@ -406,6 +459,12 @@ tny_camel_mime_part_get_content_id (TnyMimePart *self)
 static const gchar*
 tny_camel_mime_part_get_description (TnyMimePart *self)
 {
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_description_func (self);
+}
+
+static const gchar*
+tny_camel_mime_part_get_description_default (TnyMimePart *self)
+{
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
 
@@ -418,6 +477,12 @@ tny_camel_mime_part_get_description (TnyMimePart *self)
 
 static const gchar*
 tny_camel_mime_part_get_content_location (TnyMimePart *self)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_content_location_func (self);
+}
+
+static const gchar*
+tny_camel_mime_part_get_content_location_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	const gchar *retval;
@@ -433,6 +498,13 @@ tny_camel_mime_part_get_content_location (TnyMimePart *self)
 static void 
 tny_camel_mime_part_set_content_location (TnyMimePart *self, const gchar *content_location)
 {
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->set_content_location_func (self, content_location);
+	return;
+}
+
+static void 
+tny_camel_mime_part_set_content_location_default (TnyMimePart *self, const gchar *content_location)
+{
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->part_lock);
@@ -444,6 +516,13 @@ tny_camel_mime_part_set_content_location (TnyMimePart *self, const gchar *conten
 
 static void 
 tny_camel_mime_part_set_description (TnyMimePart *self, const gchar *description)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->set_description_func (self, description);
+	return;
+}
+
+static void 
+tny_camel_mime_part_set_description_default (TnyMimePart *self, const gchar *description)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
@@ -457,6 +536,13 @@ tny_camel_mime_part_set_description (TnyMimePart *self, const gchar *description
 static void 
 tny_camel_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
 {
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->set_content_id_func (self, content_id);
+	return;
+}
+
+static void 
+tny_camel_mime_part_set_content_id_default (TnyMimePart *self, const gchar *content_id)
+{
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->part_lock);
@@ -469,6 +555,13 @@ tny_camel_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
 static void 
 tny_camel_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 {
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->set_filename_func (self, filename);
+	return;
+}
+
+static void 
+tny_camel_mime_part_set_filename_default (TnyMimePart *self, const gchar *filename)
+{
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->part_lock);
@@ -480,6 +573,13 @@ tny_camel_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 
 static void 
 tny_camel_mime_part_set_content_type (TnyMimePart *self, const gchar *content_type)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->set_content_type_func (self, content_type);
+	return;
+}
+
+static void 
+tny_camel_mime_part_set_content_type_default (TnyMimePart *self, const gchar *content_type)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
@@ -577,6 +677,23 @@ tny_camel_mime_part_class_init (TnyCamelMimePartClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	class->content_type_is_func = tny_camel_mime_part_content_type_is_default;
+	class->get_content_type_func = tny_camel_mime_part_get_content_type_default;
+	class->get_stream_func = tny_camel_mime_part_get_stream_default;
+	class->write_to_stream_func = tny_camel_mime_part_write_to_stream_default;
+	class->construct_from_stream_func = tny_camel_mime_part_construct_from_stream_default;
+	class->get_filename_func = tny_camel_mime_part_get_filename_default;
+	class->get_content_id_func = tny_camel_mime_part_get_content_id_default;
+	class->get_description_func = tny_camel_mime_part_get_description_default;
+	class->get_content_location_func = tny_camel_mime_part_get_content_location_default;
+	class->set_content_location_func = tny_camel_mime_part_set_content_location_default;
+	class->set_description_func = tny_camel_mime_part_set_description_default;
+	class->set_content_id_func = tny_camel_mime_part_set_content_id_default;
+	class->set_filename_func = tny_camel_mime_part_set_filename_default;
+	class->set_content_type_func = tny_camel_mime_part_set_content_type_default;
+	class->is_attachment_func = tny_camel_mime_part_is_attachment_default;
+	class->decode_to_stream_func = tny_camel_mime_part_decode_to_stream_default;
 
 	object_class->finalize = tny_camel_mime_part_finalize;
 

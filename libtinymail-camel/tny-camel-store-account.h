@@ -46,8 +46,8 @@ struct _TnyCamelStoreAccount
 struct _TnyCamelStoreAccountClass 
 {
 	TnyCamelAccountClass parent;
-    
-	/* virtual methods (they have a default implementation in TnyCamelStoreAccount */
+
+	/* virtual methods */
 	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
 	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);
 	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder);

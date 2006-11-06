@@ -80,8 +80,17 @@ tny_camel_transport_account_reconnect (TnyCamelAccount *self)
 	}
 }
 
+
 static void
 tny_camel_transport_account_send (TnyTransportAccount *self, TnyMsg *msg)
+{
+	TNY_CAMEL_TRANSPORT_ACCOUNT_GET_CLASS (self)->send_func (self, msg);
+	return;
+}
+
+
+static void
+tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyHeader *header = (TnyHeader *)tny_msg_get_header (msg);
@@ -120,7 +129,7 @@ tny_camel_transport_account_send (TnyTransportAccount *self, TnyMsg *msg)
 
 		camel_object_unref (CAMEL_OBJECT (from));
 		camel_object_unref (CAMEL_OBJECT (recipients));
-        	g_object_unref (G_OBJECT (header));
+		g_object_unref (G_OBJECT (header));
 	}
 
 	return;
@@ -146,7 +155,7 @@ tny_camel_transport_account_instance_init (GTypeInstance *instance, gpointer g_c
 {
 	TnyCamelTransportAccount *self = (TnyCamelTransportAccount *)instance;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	
+
 	apriv->connected = FALSE;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
 	apriv->account_type = TNY_ACCOUNT_TYPE_TRANSPORT;
@@ -175,16 +184,18 @@ tny_transport_account_init (gpointer g, gpointer iface_data)
 
 
 static void 
-tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *klass)
+tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *class)
 {
 	GObjectClass *object_class;
 
-	parent_class = g_type_class_peek_parent (klass);
-	object_class = (GObjectClass*) klass;
+	parent_class = g_type_class_peek_parent (class);
+	object_class = (GObjectClass*) class;
+
+	class->send_func = tny_camel_transport_account_send_default;
 
 	object_class->finalize = tny_camel_transport_account_finalize;
 
-	((TnyCamelAccountClass*)klass)->reconnect_func = tny_camel_transport_account_reconnect;
+	((TnyCamelAccountClass*)class)->reconnect_func = tny_camel_transport_account_reconnect;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelTransportAccountPriv));
 
