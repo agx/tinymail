@@ -57,6 +57,8 @@ build_demoui=true
 build_mozembed=false
 build_gtkhtml=false
 build_doxygen=false
+build_tests=false
+build_unittests=false
 PLATFORMDIR=libtinymail-gnome-desktop
 PLATFORM=1
 
@@ -108,40 +110,6 @@ esac], [PLATFORMDIR=libtinymail-gnome-desktop
 AC_SUBST(PLATFORMDIR)
 AC_SUBST(PLATFORM)
 
-
-dnl ### Enable uigtk ##
-AC_ARG_ENABLE(uigtk, 
-AC_HELP_STRING([--enable-uigtk],
-  [Build the gtk+ implementation for the ui components (yes, no)]),
-[case "${enableval}" in
-  yes) build_uigtk=true ;;
-  no)  build_uigtk=false ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-uigtk) ;;
-esac],[build_uigtk=$build_uigtk])
-AM_CONDITIONAL(BUILD_UIGTK, test x$build_uigtk = xtrue)
-
-dnl ### Enable demoui ##
-AC_ARG_ENABLE(demoui,
-AC_HELP_STRING([--enable-demoui],
-  [Build the demo user interface (yes, no)]),
-[case "${enableval}" in
-  yes) build_demoui=true ;;
-  no)  build_demoui=false ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-demoui) ;;
-esac],[build_demoui=$build_demoui])
-AM_CONDITIONAL(BUILD_DEMOUI, test x$build_demoui = xtrue)
-
-dnl ### Enable gnome features ##
-AC_ARG_ENABLE(gnome,
-AC_HELP_STRING([--enable-gnome],
-  [Build using gnome features]),
-[case "${enableval}" in
-  yes) build_gnome=true ;;
-  no)  build_gnome=false ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-gnome) ;;
-esac],[build_gnome=$build_gnome])
-AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
-
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,
 AC_HELP_STRING([--with-html-component],
@@ -170,6 +138,74 @@ esac], [build_mozembed=false
 AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
 AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
 
+dnl ### Enable demoui ##
+AC_ARG_ENABLE(demoui,
+AC_HELP_STRING([--enable-demoui],
+  [Build the demo user interface (yes, no)]),
+[case "${enableval}" in
+  yes) 
+	build_demoui=true 
+	build_uigtk=true
+  ;;
+  no)  build_demoui=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-demoui) ;;
+esac],[build_demoui=$build_demoui])
+AM_CONDITIONAL(BUILD_DEMOUI, test x$build_demoui = xtrue)
+
+dnl ### Enable gnome features ##
+AC_ARG_ENABLE(gnome,
+AC_HELP_STRING([--enable-gnome],
+  [Build using gnome features]),
+[case "${enableval}" in
+  yes) 
+	build_gnome=true 
+	build_uigtk=true
+  ;;
+  no)  build_gnome=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-gnome) ;;
+esac],[build_gnome=$build_gnome])
+AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
+
+dnl ### Enable building the unit tests ##
+AC_ARG_ENABLE(unit-tests,
+AC_HELP_STRING([--enable-unit-tests],
+  [Build unit tests (no, yes)]),
+[case "${enableval}" in
+  yes) 
+	build_tests=true 
+	build_unittests=true 
+	build_uigtk=true
+  ;;
+  no)  build_unittests=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-unit-tests) ;;
+esac],[build_unittests=$build_unittests])
+AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
+
+dnl ### Enable building the tests ##
+AC_ARG_ENABLE(tests,
+AC_HELP_STRING([--enable-tests],
+  [Build tests (no, yes)]),
+[case "${enableval}" in
+  yes) 
+	build_tests=true 
+	build_uigtk=true
+  ;;
+  no)  build_tests=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-tests) ;;
+esac],[build_tests=$build_tests])
+AM_CONDITIONAL(BUILD_TESTS, test x$build_tests = xtrue)
+
+dnl ### Enable uigtk ##
+AC_ARG_ENABLE(uigtk, 
+AC_HELP_STRING([--enable-uigtk],
+  [Build the gtk+ implementation for the ui components (yes, no)]),
+[case "${enableval}" in
+  yes) build_uigtk=true ;;
+  no)  build_uigtk=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-uigtk) ;;
+esac],[build_uigtk=$build_uigtk])
+AM_CONDITIONAL(BUILD_UIGTK, test x$build_uigtk = xtrue)
+
 dnl ### Enable the python language bindings ##
 AC_ARG_ENABLE(python-bindings,
 AC_HELP_STRING([--enable-python-bindings],
@@ -181,27 +217,6 @@ AC_HELP_STRING([--enable-python-bindings],
 esac],[build_pytinymail=false])
 AM_CONDITIONAL(BUILD_PYTINYMAIL, test x$build_pytinymail = xtrue)
 
-dnl ### Enable building the unit tests ##
-AC_ARG_ENABLE(unit-tests,
-AC_HELP_STRING([--enable-unit-tests],
-  [Build unit tests (no, yes)]),
-[case "${enableval}" in
-  yes) build_unittests=true ;;
-  no)  build_unittests=false ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-unit-tests) ;;
-esac],[build_unittests=false])
-AM_CONDITIONAL(BUILD_UNITTESTS, test x$build_unittests = xtrue)
-
-dnl ### Enable building the tests ##
-AC_ARG_ENABLE(tests,
-AC_HELP_STRING([--enable-tests],
-  [Build tests (no, yes)]),
-[case "${enableval}" in
-  yes) build_tests=true ;;
-  no)  build_tests=false ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-tests) ;;
-esac],[build_tests=false])
-AM_CONDITIONAL(BUILD_TESTS, test x$build_tests = xtrue)
 
 dnl ### doxygen
 AC_ARG_ENABLE(doxygen,

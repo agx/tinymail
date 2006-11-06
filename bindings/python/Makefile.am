@@ -11,7 +11,13 @@ pth_DATA = tinymail.pth
 
 tinymaildir = $(pythondir)/tinymail-$(API_VERSION)/tinymail
 ptinymaildir = $(pythondir)/tinymail-$(API_VERSION)/tinymail
-tinymail_LTLIBRARIES = _tinymail.la ui.la uigtk.la platform.la
+
+tinymail_LTLIBRARIES = _tinymail.la ui.la 
+if BUILD_UIGTK
+tinymail_LTLIBRARIES += uigtk.la 
+endif
+tinymail_LTLIBRARIES += platform.la 
+
 ptinymail_PYTHON = __init__.py
 
 _tinymail_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_tinymail
