@@ -42,7 +42,7 @@ static GObjectClass *parent_class = NULL;
 static void
 tny_camel_msg_remove_strategy_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
 {
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	const gchar *id;
 
 	id = tny_header_get_uid (TNY_HEADER (header));
