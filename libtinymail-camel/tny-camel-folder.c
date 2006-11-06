@@ -744,9 +744,6 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 	if (priv->folder && CAMEL_IS_FOLDER (priv->folder))
 		uids = camel_folder_get_uids (priv->folder);
 
-	/* TODO: remove this warning, as it's not really strange. But needed for debugging aid
-	   for ticket #1 on the trac. So if we fix this bug, remove this. */
-
 	if (uids)
 		g_ptr_array_foreach (uids, add_message_with_uid, ptr);
 	g_free (ptr);
