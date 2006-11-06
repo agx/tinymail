@@ -53,39 +53,39 @@ typedef gboolean (*CamelPartFunc)(CamelMimeMessage *, CamelMimePart *, void *dat
 static gboolean
 message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartFunc callback, void *data)
 {
-        CamelDataWrapper *containee;
-        int parts, i;
-        int go = TRUE;
-
-        if (callback (msg, part, data) == FALSE)
-                return FALSE;
-
-        containee = camel_medium_get_content_object (CAMEL_MEDIUM (part));
-
-        if (G_UNLIKELY (containee == NULL))
-                return go;
-
-        if (G_LIKELY (CAMEL_IS_MULTIPART (containee)))
+	CamelDataWrapper *containee;
+	int parts, i;
+	int go = TRUE;
+	
+	if (callback (msg, part, data) == FALSE)
+		return FALSE;
+	
+	containee = camel_medium_get_content_object (CAMEL_MEDIUM (part));
+	
+	if (G_UNLIKELY (containee == NULL))
+		return go;
+	
+	if (G_LIKELY (CAMEL_IS_MULTIPART (containee)))
 	{
-                parts = camel_multipart_get_number (CAMEL_MULTIPART (containee));
-                for (i = 0; go && i < parts; i++) 
+		parts = camel_multipart_get_number (CAMEL_MULTIPART (containee));
+		for (i = 0; go && i < parts; i++) 
 		{
-                        CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
+			CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
 			if (part)
 			{
-				/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
-				   and tny-mime-part.c:515 ! */
-
+			/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
+			and tny-mime-part.c:515 ! */
+				
 				go = message_foreach_part_rec (msg, part, callback, data);
 			} else go = FALSE;
-                }
-
-        } else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
+		}
+		
+	} else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
 	{
-                go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data);
-        }
-
-        return go;
+		go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data);
+	}
+	
+	return go;
 }
 
 
@@ -140,15 +140,22 @@ _tny_camel_msg_set_camel_mime_message (TnyCamelMsg *self, CamelMimeMessage *mess
 	return;
 }
 
-TnyFolder* 
+
+static TnyFolder* 
 tny_camel_msg_get_folder (TnyMsg *self)
+{
+	return TNY_CAMEL_MSG_GET_CLASS (self)->get_folder_func (self);
+}
+
+static TnyFolder* 
+tny_camel_msg_get_folder_default (TnyMsg *self)
 {
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyFolder *retval;
 
 	g_mutex_lock (priv->folder_lock);
 	retval = priv->folder;
-    	g_object_ref (G_OBJECT (retval));
+	g_object_ref (G_OBJECT (retval));
 	g_mutex_unlock (priv->folder_lock);
 
 	return retval;
@@ -170,6 +177,13 @@ _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder* folder)
 static void
 tny_camel_msg_get_parts (TnyMsg *self, TnyList *list)
 {
+	TNY_CAMEL_MSG_GET_CLASS (self)->get_parts_func (self, list);
+	return;
+}
+
+static void
+tny_camel_msg_get_parts_default (TnyMsg *self, TnyList *list)
+{
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
@@ -183,15 +197,22 @@ tny_camel_msg_get_parts (TnyMsg *self, TnyList *list)
 	return;
 }
 
+
 static TnyHeader*
 tny_camel_msg_get_header (TnyMsg *self)
+{
+	return TNY_CAMEL_MSG_GET_CLASS (self)->get_header_func (self);
+}
+
+static TnyHeader*
+tny_camel_msg_get_header_default (TnyMsg *self)
 {
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyHeader *retval;
 
 	g_mutex_lock (priv->header_lock);
 	retval = priv->header;
-    	g_object_ref (G_OBJECT (retval));
+	g_object_ref (G_OBJECT (retval));
 	g_mutex_unlock (priv->header_lock);
 
 	return retval;
@@ -200,6 +221,12 @@ tny_camel_msg_get_header (TnyMsg *self)
 
 static gint
 tny_camel_msg_add_part (TnyMsg *self, TnyMimePart *part)
+{
+	return TNY_CAMEL_MSG_GET_CLASS (self)->add_part_func (self, part);
+}
+
+static gint
+tny_camel_msg_add_part_default (TnyMsg *self, TnyMimePart *part)
 {
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
@@ -232,12 +259,11 @@ tny_camel_msg_add_part (TnyMsg *self, TnyMimePart *part)
 
 	g_mutex_lock (priv->parts_lock);
 
-    	/* TODO: Ref counting questionable ... */
+	/* TODO: Ref counting questionable ... */
 	camel_multipart_add_part ((CamelMultipart*)containee, 
 		tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part)));
-    
+
 	retval = camel_multipart_get_number ((CamelMultipart*)containee);
-    
 	g_mutex_unlock (priv->parts_lock);
 
 	/* Warning: large lock that locks code, not data */
@@ -252,6 +278,13 @@ tny_camel_msg_add_part (TnyMsg *self, TnyMimePart *part)
 static void 
 tny_camel_msg_del_part (TnyMsg *self,  TnyMimePart *part)
 {
+	TNY_CAMEL_MSG_GET_CLASS (self)->del_part_func (self, part);
+	return;
+}
+
+static void 
+tny_camel_msg_del_part_default (TnyMsg *self,  TnyMimePart *part)
+{
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *containee;
@@ -259,8 +292,8 @@ tny_camel_msg_del_part (TnyMsg *self,  TnyMimePart *part)
 	g_mutex_lock (priv->message_lock);
 
 	containee = camel_medium_get_content_object (CAMEL_MEDIUM (ppriv->part));
-    
-    	/* TODO: refcounting questionable */
+
+	/* TODO: refcounting questionable */
 	camel_multipart_remove_part (CAMEL_MULTIPART (containee), 
 		tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part)));
 
@@ -287,6 +320,13 @@ _tny_camel_msg_set_header (TnyCamelMsg *self, TnyCamelHeader *header)
 
 static void
 tny_camel_msg_set_header (TnyMsg *self, TnyHeader *header)
+{
+	TNY_CAMEL_MSG_GET_CLASS (self)->set_header_func (self, header);
+	return;
+}
+
+static void
+tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 {
 	CamelMimeMessage *msg;
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
@@ -316,10 +356,10 @@ tny_camel_msg_finalize (GObject *object)
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
-    	g_mutex_lock (priv->message_lock);
+	g_mutex_lock (priv->message_lock);
 	if (ppriv->part)
 	{
-	    	if (priv->header)
+		if (priv->header)
 		{ /* Stupid hack, else the unreffer below would fuck it up */
 			TnyCamelHeader *hdr = (TnyCamelHeader*)priv->header;
 			hdr->write = 0;
@@ -410,6 +450,14 @@ tny_camel_msg_class_init (TnyCamelMsgClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	class->get_parts_func = tny_camel_msg_get_parts_default;
+	class->get_header_func = tny_camel_msg_get_header_default;
+	class->set_header_func = tny_camel_msg_set_header_default;
+	class->add_part_func = tny_camel_msg_add_part_default;
+	class->del_part_func = tny_camel_msg_del_part_default;
+	class->get_folder_func = tny_camel_msg_get_folder_default;
+
 	object_class->finalize = tny_camel_msg_finalize;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelMsgPriv));
