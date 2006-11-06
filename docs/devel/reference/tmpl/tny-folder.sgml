@@ -28,9 +28,6 @@ A abstract type that defines a folder
 
 </para>
 
-@: 
-@:
-
 @tnyfolder: the object which received the signal.
 @arg1: 
 
@@ -38,8 +35,6 @@ A abstract type that defines a folder
 <para>
 
 </para>
-
-@:
 
 @tnyfolder: the object which received the signal.
 
@@ -51,9 +46,11 @@ A abstract type that defines a folder
 @parent: 
 @folder_inserted: 
 @folders_reloaded: 
-@remove_message_func: 
+@remove_msg_func: 
 @expunge_func: 
-@get_message_func: 
+@get_msg_remove_strategy_func: 
+@set_msg_remove_strategy_func: 
+@get_msg_func: 
 @get_headers_func: 
 @get_name_func: 
 @get_id_func: 
@@ -81,7 +78,25 @@ A abstract type that defines a folder
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_remove_message ##### -->
+<!-- ##### FUNCTION tny_folder_get_msg_remove_strategy ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_set_msg_remove_strategy ##### -->
+<para>
+
+</para>
+
+@self: 
+@st: 
+
+
+<!-- ##### FUNCTION tny_folder_remove_msg ##### -->
 <para>
 
 </para>
@@ -98,7 +113,7 @@ A abstract type that defines a folder
 @self: 
 
 
-<!-- ##### FUNCTION tny_folder_get_message ##### -->
+<!-- ##### FUNCTION tny_folder_get_msg ##### -->
 <para>
 
 </para>
