@@ -510,7 +510,7 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 	/* gidle reference */
 	g_object_ref (G_OBJECT (info->minfo->self));
 
-    	if (oinfo->depth > 0)
+	if (oinfo->depth > 0)
 	{
 		g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 			progress_func, info, destroy_progress_idle);
