@@ -50,6 +50,23 @@ struct _TnyCamelFolderClass
 	GObjectClass parent;
 
 	/* virtual methods */
+	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header);
+	void (*expunge_func) (TnyFolder *self);
+	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
+	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
+	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header);
+	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh);
+	const gchar* (*get_name_func) (TnyFolder *self);
+	const gchar* (*get_id_func) (TnyFolder *self);
+	TnyStoreAccount* (*get_account_func) (TnyFolder *self);
+	void (*set_name_func) (TnyFolder *self, const gchar *name);
+	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
+	guint (*get_all_count_func) (TnyFolder *self);
+	guint (*get_unread_count_func) (TnyFolder *self);
+	gboolean (*is_subscribed_func) (TnyFolder *self);
+	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
+	void (*refresh_func) (TnyFolder *self);
+
 	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
 	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);
 	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder);
