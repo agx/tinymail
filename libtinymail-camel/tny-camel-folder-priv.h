@@ -44,9 +44,13 @@ struct _TnyCamelFolderPriv
 	gboolean iter_parented;
 	gchar *cached_name;
 	TnyFolderType cached_folder_type;
+	TnyMsgRemoveStrategy *remove_strat;
+
+#ifdef HEALTHY_CHECK
 	GList *possible_headers;
 	GMutex *poshdr_lock;
-	TnyMsgRemoveStrategy *remove_strat;
+#endif
+
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);

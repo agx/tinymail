@@ -64,7 +64,9 @@ prepare_for_write (TnyCamelHeader *self)
 		((WriteInfo*)self->info)->msg = camel_mime_message_new ();
 		((WriteInfo*)self->info)->mime_from = NULL;
 		self->write = 1;
+#ifdef HEALTHY_CHECK
 		self->healthy = 1;
+#endif
 	}
 
 	return;
@@ -81,8 +83,9 @@ _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo
 
 	self->info = camel_message_info;
 	self->write = 0;
+#ifdef HEALTHY_CHECK
 	self->healthy = 1;
-    
+#endif
 	return;
 }
 
@@ -97,7 +100,9 @@ _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage
 
 	self->info = g_new0 (WriteInfo, 1);
 	self->write = 1;
+#ifdef HEALTHY_CHECK
 	self->healthy = 1;
+#endif
 
 	((WriteInfo*)self->info)->mime_from = NULL;
 	((WriteInfo*)self->info)->msg = camel_mime_message;
@@ -222,10 +227,12 @@ tny_camel_header_get_cc (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval;
-    
+
+#ifdef HEALTHY_CHECK
 	if (!me->healthy)
 		return invalid;
-    
+#endif
+
 	if (G_UNLIKELY (!me->info))
 		return invalid;
 
@@ -243,9 +250,11 @@ tny_camel_header_get_bcc (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval;
 
+#ifdef HEALTHY_CHECK
 	if (!me->healthy)
 		return invalid;
-    
+#endif
+
 	if (G_UNLIKELY (!me->info))
 		return invalid;
 
@@ -262,10 +271,12 @@ tny_camel_header_get_flags (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	TnyHeaderFlags retval;
-    
+
+#ifdef HEALTHY_CHECK
 	if (!me->healthy)
 		return 0;
-    
+#endif
+
 	if (me->write)
 	{
 		g_warning ("tny_camel_header_get_flags: This is a header for a new message!\n");
@@ -288,7 +299,7 @@ tny_camel_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 		return;
 	}
 
-    	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, ~0);
+	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, ~0);
 
 	return;
 }
@@ -297,17 +308,19 @@ static void
 tny_camel_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-    
+
+#ifdef HEALTHY_CHECK
 	if (!me->healthy)
 		return;
-    
+#endif
+
 	if (me->write)
 	{
 		g_warning ("tny_camel_header_get_flags: This is a header for a new message!\n");
 		return;
 	}
 
-    	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, 0);
+	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, 0);
 
 	return;
 }
@@ -317,9 +330,14 @@ tny_camel_header_get_date_received (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	time_t retval;   
-    
+
+#ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
 		return retval;
+#else
+	if (G_UNLIKELY (!me->info))
+		return retval;
+#endif
 
 	if (G_UNLIKELY (me->write))
 		retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, NULL);
@@ -335,8 +353,13 @@ tny_camel_header_get_date_sent (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	time_t retval;
 
+#ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info) || G_UNLIKELY (me->write))
 		return retval;
+#else
+	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write))
+		return retval;
+#endif
 
 	retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
 
@@ -349,8 +372,13 @@ tny_camel_header_get_from (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval;
 
+#ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
 		return invalid;
+#else
+	if (G_UNLIKELY (!me->info))
+		return invalid;
+#endif
 
 	if (G_UNLIKELY (me->write))
 	{
@@ -374,8 +402,13 @@ tny_camel_header_get_subject (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval;
 
+#ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
 		return invalid;
+#else
+	if (G_UNLIKELY (!me->info))
+		return invalid;
+#endif
 
 	if (G_UNLIKELY (me->write))
 		retval = camel_mime_message_get_subject (((WriteInfo*)me->info)->msg);
@@ -392,8 +425,13 @@ tny_camel_header_get_to (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	gchar *retval;
 
+#ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
 		return invalid;
+#else
+	if (G_UNLIKELY (!me->info))
+		return invalid;
+#endif
 
 	if (G_UNLIKELY (me->write))
 		retval = (gchar*) camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "to");
@@ -409,8 +447,13 @@ tny_camel_header_get_message_id (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	gchar *retval;
 
+#ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
 		return invalid;
+#else
+	if (G_UNLIKELY (!me->info))
+		return invalid;
+#endif
 
 	if (G_UNLIKELY (me->write))
 		retval = (gchar*) camel_mime_message_get_message_id (((WriteInfo*)me->info)->msg);
@@ -429,8 +472,13 @@ tny_camel_header_get_uid (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval;
 
+#ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info) || G_UNLIKELY (me->write))
 		return invalid;
+#else
+	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write))
+		return invalid;
+#endif
 
 	retval = camel_message_info_uid ((CamelMessageInfo*)me->info);
 
@@ -441,28 +489,30 @@ static void
 tny_camel_header_finalize (GObject *object)
 {
 	TnyCamelHeader *self = (TnyCamelHeader*) object;
-    
+
+#ifdef HEALTHY_CHECK
 	self->healthy = 0;
-    
+#endif
+
 	if (G_UNLIKELY (self->write))
 	{
 		destroy_write (self);
 	}
-    
-    	if (self->folder)
-    	{
-	    	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self->folder);
-
-	       	fpriv->headers_managed--;
-    		_tny_camel_folder_check_uncache (((TnyCamelFolder*)self->folder), fpriv);
+	
+	if (self->folder)
+	{
+		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self->folder);
+		
+		fpriv->headers_managed--;
+		_tny_camel_folder_check_uncache (((TnyCamelFolder*)self->folder), fpriv);
 	}
-
+	
 	/* Normally we do camel_folder_free_message_info here, but we already got
-	   rid of our initial reference at tny-folder.c:add_message_with_uid
-	   I know this is actually ugly */
-
+	rid of our initial reference at tny-folder.c:add_message_with_uid
+	I know this is actually ugly */
+	
 	(*parent_class->finalize) (object);
-
+	
 	return;
 }
 
@@ -479,7 +529,10 @@ tny_camel_header_new (void)
 	
 	self->info = NULL;
 	self->write = 0;
+
+#ifdef HEALTHY_CHECK
 	self->healthy = 0;
+#endif
 
 	return (TnyHeader*)self;
 }
@@ -488,9 +541,9 @@ void
 _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyCamelFolderPriv *fpriv)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-    	fpriv->headers_managed++;
+	fpriv->headers_managed++;
 	me->folder = (TnyFolder*)folder;
-    
+
 	return;
 }
 
@@ -498,10 +551,10 @@ static TnyFolder*
 tny_camel_header_get_folder (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-    
-    	if (me->folder)
-	    	g_object_ref (G_OBJECT (me->folder));
-    
+
+	if (me->folder)
+		g_object_ref (G_OBJECT (me->folder));
+
 	return (TnyFolder*)me->folder;
 }
 
