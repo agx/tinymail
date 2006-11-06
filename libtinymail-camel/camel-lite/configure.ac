@@ -243,6 +243,8 @@ else
 	],,)
 fi
 
+AC_SUBST(msg_smime)
+AC_SUBST(msg_ssl)
 AC_SUBST(SSL_LIBS)
 AC_MSG_CHECKING(Support for SSL)
 AC_MSG_RESULT($msg_ssl)
