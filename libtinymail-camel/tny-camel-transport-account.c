@@ -105,6 +105,12 @@ tny_camel_transport_account_send (TnyTransportAccount *self, TnyMsg *msg)
 		str = tny_header_get_to (header);
 		_foreach_email_add_to_inet_addr (str, recipients);
 
+		str = tny_header_get_cc (header);
+		_foreach_email_add_to_inet_addr (str, recipients);
+
+		str = tny_header_get_bcc (header);
+		_foreach_email_add_to_inet_addr (str, recipients);
+
 		apriv->connected = TRUE;
 
 		camel_transport_send_to (transport, message, (CamelAddress*)from, 
