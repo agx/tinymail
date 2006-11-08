@@ -2605,7 +2605,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	}
 
 	if (ucnt < needheaders->len)
-		g_warning ("Problem while receiving headers from MMAP "
+		g_warning ("Problem while receiving headers from IMAP "
 			"(I didn't receive enough headers %d vs %d)\n",
 			ucnt, needheaders->len);
 

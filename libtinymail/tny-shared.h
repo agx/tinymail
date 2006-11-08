@@ -72,6 +72,8 @@ typedef enum _TnyDeviceSignal TnyDeviceSignal;
 typedef enum _TnyAccountStoreSignal TnyAccountStoreSignal;
 typedef struct _TnyMsgRemoveStrategy TnyMsgRemoveStrategy;
 typedef struct _TnyMsgRemoveStrategyIface TnyMsgRemoveStrategyIface;
+typedef struct _TnySendQueue TnySendQueue;
+typedef struct _TnySendQueueIface TnySendQueueIface;
 
 G_END_DECLS
 

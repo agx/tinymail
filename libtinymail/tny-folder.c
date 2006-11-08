@@ -517,7 +517,6 @@ tny_folder_base_init (gpointer g_class)
  * TnyFolder::folder-inserted
  * @self: the object on which the signal is emitted
  * @arg1: The folder that got inserted
- * @folder: the #TnyFolder as the added folder
  *
  * Emitted when a folder gets added to the folder
  **/

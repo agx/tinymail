@@ -1,3 +1,9 @@
+2006-11-09  Philip van Hoof <pvanhoof@gnome.org>
+
+	* Introduction of the new TnySendQueue interface
+
+	* This was a major API change
+
 2006-11-06  Philip van Hoof <pvanhoof@gnome.org>
 
 	* Introduction of the TnyMsgRemoveStrategy, which makes it more

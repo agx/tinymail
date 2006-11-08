@@ -20,7 +20,8 @@ libtinymail_1_0_headers = \
 	tny-simple-list.h \
 	tny-folder-store.h \
 	tny-folder-store-query.h \
-	tny-msg-remove-strategy.h
+	tny-msg-remove-strategy.h \
+	tny-send-queue.h
 
 libtinymail_1_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
@@ -43,7 +44,8 @@ libtinymail_1_0_la_SOURCES = \
 	tny-simple-list-iterator.c \
 	tny-folder-store.c \
 	tny-folder-store-query.c \
-	tny-msg-remove-strategy.c
+	tny-msg-remove-strategy.c \
+	tny-send-queue.c
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)
 libtinymail_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
