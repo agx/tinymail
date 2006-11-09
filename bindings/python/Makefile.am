@@ -88,7 +88,8 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-store-account.h \
 	$(top_srcdir)/libtinymail/tny-stream.h \
 	$(top_srcdir)/libtinymail/tny-transport-account.h \
-	$(top_srcdir)/libtinymail/tny-msg-remove-strategy.h
+	$(top_srcdir)/libtinymail/tny-msg-remove-strategy.h \
+	$(top_srcdir)/libtinymail/tny-send-queue.h
 
 tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py 
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) | \

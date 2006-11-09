@@ -21,6 +21,7 @@ headers
 #include <tny-transport-account.h>
 #include <tny-folder-store.h>
 #include <tny-folder-store-query.h>
+#include <tny-send-queue.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
