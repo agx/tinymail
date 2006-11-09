@@ -71,11 +71,6 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * Persist changes made to a folder to its backing store, expunging deleted 
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
  *
- * It's not possible to expunge a folder that has header instances active. You
- * must first destroy these (for example destroy the #TnyList instance that 
- * is their parent, like the #TnyGtkHeaderListModel). Expunging effectively
- * also means (or should, in case you don't) reloading the entire folder. 
- *
  * Example:
  * <informalexample><programlisting>
  * TnyHeader *header = ...
@@ -83,7 +78,6 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * tny_folder_remove_msg (folder, header);
  * tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
  * g_object_unref (G_OBJECT (header));
- * (destroy all remaining header instances) ...
  * tny_folder_expunge (folder);
  * g_object_unref (G_OBJECT (folder));
  * </programlisting></informalexample>
@@ -104,22 +98,9 @@ tny_folder_expunge (TnyFolder *self)
  * @self: a TnyFolder object
  * @header: the header of the message to remove
  *
- * Remove a message from a folder. This doesn't remove it from a #TnyList 
- * that holds the headers (for example for a header summary view) if the
- * tny_folder_get_headers method happened before the deletion. You are 
- * responsible for refreshing your own lists.
- *
- * This method also doesn't truely remove the header from the folder. It only
- * marks it as removed (it sets the TNY_HEADER_FLAG_DELETED). If you perform
- * tny_folder_expunge on the folder, it will really be removed.
- *
- * This means that a tny_folder_get_headers method call will still prepend the
- * removed message to the list. It will do this until the expunge happened. You
- * are advised to hide messages that have been marked as being deleted from your
- * summary view.
- * g
- * In Gtk+ for the #GtkTreeView component, you can do this using the 
- * #GtkTreeModelFilter tree model filtering model.
+ * Remove a message from a folder. It will use a #TnyMsgRemoveStrategy to 
+ * perform the removal itself. For more details, check out the documentation
+ * of the #TnyMsgRemoveStrategy type. 
  *
  * Example:
  * <informalexample><programlisting>

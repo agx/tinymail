@@ -48,7 +48,7 @@
 
 #define CAMEL_MAILDIR_SUMMARY_VERSION (0x2000)
 
-static CamelMessageInfo *message_info_load(CamelFolderSummary *s);
+static CamelMessageInfo *message_info_load(CamelFolderSummary *s, gboolean *must_add);
 static CamelMessageInfo *message_info_new_from_header(CamelFolderSummary *, struct _camel_header_raw *);
 static void message_info_free(CamelFolderSummary *, CamelMessageInfo *mi);
 
@@ -385,12 +385,12 @@ static char *maildir_summary_next_uid_string(CamelFolderSummary *s)
 }
 
 static CamelMessageInfo *
-message_info_load(CamelFolderSummary *s)
+message_info_load(CamelFolderSummary *s, gboolean *must_add)
 {
 	CamelMessageInfo *mi;
 	CamelMaildirSummary *mds = (CamelMaildirSummary *)s;
 
-	mi = ((CamelFolderSummaryClass *) parent_class)->message_info_load(s);
+	mi = ((CamelFolderSummaryClass *) parent_class)->message_info_load(s, must_add);
 	if (mi) {
 		char *name;
 

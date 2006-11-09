@@ -235,7 +235,7 @@ struct _CamelFolderSummary {
 	char *summary_path;
 	gboolean build_content;	/* do we try and parse/index the content, or not? */
 
-	GPtrArray *messages;	/* CamelMessageInfo's */
+	GPtrArray *messages; /* CamelMessageInfo's */
 	GHashTable *messages_uid; /* CamelMessageInfo's by uid */
 
 	struct _CamelFolder *folder; /* parent folder, for events */
@@ -244,6 +244,7 @@ struct _CamelFolderSummary {
 	GMappedFile *file;
 	unsigned char *filepos;
 	GMutex *dump_lock;
+	gboolean in_reload;
 };
 
 struct _CamelFolderSummaryClass {
@@ -257,7 +258,7 @@ struct _CamelFolderSummaryClass {
 	CamelMessageInfo * (*message_info_new_from_header)(CamelFolderSummary *, struct _camel_header_raw *);
 	CamelMessageInfo * (*message_info_new_from_parser)(CamelFolderSummary *, CamelMimeParser *);
 	CamelMessageInfo * (*message_info_new_from_message)(CamelFolderSummary *, CamelMimeMessage *);
-	CamelMessageInfo * (*message_info_load)(CamelFolderSummary *);
+	CamelMessageInfo * (*message_info_load)(CamelFolderSummary *, gboolean *must_add);
  	int		   (*message_info_save)(CamelFolderSummary *, FILE *, CamelMessageInfo *);
 	int		   (*meta_message_info_save)(CamelFolderSummary *, FILE *, FILE *, CamelMessageInfo *);
 

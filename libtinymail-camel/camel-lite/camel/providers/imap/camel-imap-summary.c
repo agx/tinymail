@@ -40,7 +40,7 @@
 static int summary_header_load (CamelFolderSummary *);
 static int summary_header_save (CamelFolderSummary *, FILE *);
 
-static CamelMessageInfo *message_info_load (CamelFolderSummary *s);
+static CamelMessageInfo *message_info_load (CamelFolderSummary *s, gboolean *must_add);
 static int message_info_save (CamelFolderSummary *s, FILE *out,
 			      CamelMessageInfo *info);
 static gboolean info_set_user_tag(CamelMessageInfo *info, const char *name, const char  *value);
@@ -206,12 +206,12 @@ label_to_flags(CamelImapMessageInfo *info)
 }
 
 static CamelMessageInfo *
-message_info_load (CamelFolderSummary *s)
+message_info_load (CamelFolderSummary *s, gboolean *must_add)
 {
 	CamelMessageInfo *info;
 	CamelImapMessageInfo *iinfo;
 
-	info = camel_imap_summary_parent->message_info_load (s);
+	info = camel_imap_summary_parent->message_info_load (s, must_add);
 	iinfo = (CamelImapMessageInfo*)info;
 
 	if (info) {

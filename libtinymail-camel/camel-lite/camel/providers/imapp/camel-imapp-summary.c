@@ -40,7 +40,7 @@
 static int summary_header_load(CamelFolderSummary *);
 static int summary_header_save(CamelFolderSummary *, FILE *);
 
-static CamelMessageInfo *message_info_load(CamelFolderSummary *s);
+static CamelMessageInfo *message_info_load(CamelFolderSummary *s, gboolean *must_add);
 static int message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info);
 
 static void camel_imapp_summary_class_init(CamelIMAPPSummaryClass *klass);
@@ -159,12 +159,12 @@ summary_header_save(CamelFolderSummary *s, FILE *out)
 
 
 static CamelMessageInfo *
-message_info_load(CamelFolderSummary *s)
+message_info_load(CamelFolderSummary *s, gboolean *must_add)
 {
 	CamelMessageInfo *info;
 	CamelIMAPPMessageInfo *iinfo;
 
-	info = camel_imapp_summary_parent->message_info_load(s);
+	info = camel_imapp_summary_parent->message_info_load(s, must_add);
 	if (info) {
 		unsigned char *ptrchr = s->filepos;
 		iinfo =(CamelIMAPPMessageInfo *)info;

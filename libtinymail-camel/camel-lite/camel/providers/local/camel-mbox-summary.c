@@ -57,7 +57,7 @@ static int summary_header_save (CamelFolderSummary *, FILE *);
 
 static CamelMessageInfo * message_info_new_from_header(CamelFolderSummary *, struct _camel_header_raw *);
 static CamelMessageInfo * message_info_new_from_parser(CamelFolderSummary *, CamelMimeParser *);
-static CamelMessageInfo * message_info_load (CamelFolderSummary *);
+static CamelMessageInfo * message_info_load (CamelFolderSummary *, gboolean *);
 static int		  message_info_save (CamelFolderSummary *, FILE *, CamelMessageInfo *);
 static int 		  meta_message_info_save(CamelFolderSummary *s, FILE *out_meta, FILE *out, CamelMessageInfo *mi);
 /*static void		  message_info_free (CamelFolderSummary *, CamelMessageInfo *);*/
@@ -378,13 +378,13 @@ message_info_new_from_parser(CamelFolderSummary *s, CamelMimeParser *mp)
 
 
 static CamelMessageInfo *
-message_info_load(CamelFolderSummary *s)
+message_info_load(CamelFolderSummary *s, gboolean *must_add)
 {
 	CamelMessageInfo *mi;
 
 	io(printf("loading mbox message info\n"));
 
-	mi = ((CamelFolderSummaryClass *)camel_mbox_summary_parent)->message_info_load(s);
+	mi = ((CamelFolderSummaryClass *)camel_mbox_summary_parent)->message_info_load(s, must_add);
 	if (mi) {
 		CamelMboxMessageInfo *mbi = (CamelMboxMessageInfo *)mi;
 

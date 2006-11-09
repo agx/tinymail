@@ -294,11 +294,12 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 							(GTK_TREE_MODEL_SORT (model));
 					} else mymodel = model;
 
+					tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
 					folder = tny_header_get_folder (header);
 					tny_folder_remove_msg (folder, header);
 
-					tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
-
+tny_folder_expunge (folder);
+					
 					g_object_unref (G_OBJECT (folder));
 				}
 

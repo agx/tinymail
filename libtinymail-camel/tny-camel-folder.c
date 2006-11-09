@@ -273,6 +273,10 @@ tny_camel_folder_expunge_default (TnyFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
+	/* This is only really needed in case message_info_load in 
+	camel-folder-summary.c doesn't try to recover the original message
+	info instance 
+
 	if (priv->headers_managed > 0)
 	{
 		g_critical ("Request to expunge a folder denied: there are still "
@@ -280,6 +284,7 @@ tny_camel_folder_expunge_default (TnyFolder *self)
 			"first.");
 		return;
 	}
+	*/
 
 	g_mutex_lock (priv->folder_lock);
 

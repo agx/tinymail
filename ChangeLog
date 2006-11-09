@@ -9,6 +9,9 @@
 
 	* Introduction of the new TnySendQueue interface
 	* Added a lot assertions to check for type safety
+	* Made expunging of a folder work while headers are still active.
+	Removed the limitation (denying the expunge to happen) and fixed the
+	mmap camel-folder-summary.c implementation to support this.
 
 	* This was a major API change
 
