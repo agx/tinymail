@@ -29,7 +29,7 @@ def on_headerstree_selected (treeselection, msgview) :
 		header = model.get_value (iter, tinymail.uigtk.GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN)
 		if header:
 			folder = header.get_folder ()
-			msg = folder.get_message (header)
+			msg = folder.get_msg (header)
 			msgview.set_msg (msg)
 
 def on_folderstree_selected (treeselection, headerstree) :
