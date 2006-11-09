@@ -54,7 +54,9 @@ tny_text_buffer_write_to_stream_default (TnyStream *self, TnyStream *output)
 	gssize total = 0;
 	gssize nb_read;
 	gssize nb_written;
-	
+
+	g_assert (TNY_IS_STREAM (output));
+
 	while (G_LIKELY (!tny_stream_is_eos (self))) 
 	{
 		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));

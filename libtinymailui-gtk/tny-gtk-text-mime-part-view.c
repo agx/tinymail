@@ -81,6 +81,8 @@ tny_gtk_text_mime_part_view_set_part_default (TnyMimePartView *self, TnyMimePart
 {
 	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
 
+	g_assert (TNY_IS_MIME_PART (part));
+
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
 

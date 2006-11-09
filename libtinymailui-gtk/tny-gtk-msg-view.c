@@ -82,6 +82,8 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	TnyMimePartView *retval = NULL;
 
+	g_assert (TNY_IS_MIME_PART (part));
+
 	if (tny_mime_part_content_type_is (part, "text/*"))
 	{
 		retval = tny_gtk_text_mime_part_view_new ();
@@ -197,6 +199,8 @@ tny_gtk_msg_view_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 
 	if (msg)
 	{
+		g_assert (TNY_IS_MSG (msg));
+
 		g_object_ref (G_OBJECT (msg));
 		priv->msg = msg;
 		reload_msg (self);

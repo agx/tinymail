@@ -73,9 +73,9 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 			CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
 			if (part)
 			{
-			/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
-			and tny-mime-part.c:515 ! */
-				
+				/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
+				and tny-mime-part.c:515 ! */
+
 				go = message_foreach_part_rec (msg, part, callback, data);
 			} else go = FALSE;
 		}
@@ -97,7 +97,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 
 	if (!part)
 		return FALSE;
-	
+
 	/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 
 	   and tny-mime-part.c:515 ! */
 
@@ -167,6 +167,8 @@ _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder* folder)
 {
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 
+	g_assert (TNY_IS_CAMEL_FOLDER (folder));
+
 	g_mutex_lock (priv->folder_lock);
 	priv->folder = (TnyFolder*)folder;
 	g_mutex_unlock (priv->folder_lock);
@@ -186,6 +188,8 @@ tny_camel_msg_get_parts_default (TnyMsg *self, TnyList *list)
 {
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_LIST (list));
 
 	g_mutex_lock (priv->parts_lock);
 
@@ -234,6 +238,12 @@ tny_camel_msg_add_part_default (TnyMsg *self, TnyMimePart *part)
 	CamelDataWrapper *containee;
 	gint curl = 0, retval = 0;
 
+	/* Yes, indeed (I don't yet support non TnyCamelMimePart mime part 
+	   instances, and I know I should. Feel free to implement the copying
+	   if you really need it) */
+
+	g_assert (TNY_IS_CAMEL_MIME_PART (part));
+
 	g_mutex_lock (priv->message_lock);
 	g_mutex_lock (ppriv->part_lock);
 
@@ -253,9 +263,6 @@ tny_camel_msg_add_part_default (TnyMsg *self, TnyMimePart *part)
 		camel_multipart_set_boundary ((CamelMultipart*)containee, NULL);
 		camel_medium_set_content_object (medium, containee);
 	}
-
-	/* TODO: coupling mistake. This makes it obligated to use a specific
-	   implementation of MsgMimePart (the camel one). */
 
 	g_mutex_lock (priv->parts_lock);
 
@@ -283,11 +290,18 @@ tny_camel_msg_del_part (TnyMsg *self,  TnyMimePart *part)
 }
 
 static void 
-tny_camel_msg_del_part_default (TnyMsg *self,  TnyMimePart *part)
+tny_camel_msg_del_part_default (TnyMsg *self, TnyMimePart *part)
 {
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *containee;
+
+
+	/* Yes, indeed (I don't yet support non TnyCamelMimePart mime part 
+	   instances, and I know I should. Feel free to implement the copying
+	   if you really need it) */
+
+	g_assert (TNY_IS_CAMEL_MIME_PART (part));
 
 	g_mutex_lock (priv->message_lock);
 
@@ -330,6 +344,8 @@ tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 {
 	CamelMimeMessage *msg;
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_CAMEL_HEADER (header));
 
 	g_mutex_lock (priv->header_lock);
 

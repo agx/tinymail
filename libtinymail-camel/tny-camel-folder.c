@@ -239,6 +239,8 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	g_assert (TNY_IS_HEADER (header));
+
 	if (!priv->remove_strat)
 		return;
 
@@ -410,6 +412,9 @@ void
 _tny_camel_folder_set_account (TnyCamelFolder *self, TnyStoreAccount *account)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_CAMEL_STORE_ACCOUNT (account));
+
 	priv->account = TNY_STORE_ACCOUNT (account);
 
 	return;
@@ -588,9 +593,9 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 
 	if (!load_folder_no_lock (priv))
 	{
-		tny_camel_folder_refresh_async_destroyer (info);	    
+		tny_camel_folder_refresh_async_destroyer (info);
 		camel_exception_free (ex);
-		g_mutex_unlock (priv->folder_lock);	    
+		g_mutex_unlock (priv->folder_lock);
 		g_thread_exit (NULL);
 		return NULL;
 	}
@@ -695,7 +700,7 @@ tny_camel_folder_refresh_default (TnyFolder *self)
 	priv->cached_length = camel_folder_get_message_count (priv->folder);    
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
-	camel_exception_free (ex);	
+	camel_exception_free (ex);
 
 	g_mutex_unlock (priv->folder_lock);
 
@@ -716,6 +721,8 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 	GPtrArray *uids = NULL;
 	CamelException ex;
 	FldAndPriv *ptr = NULL;
+
+	g_assert (TNY_IS_LIST (headers));
 
 	g_mutex_lock (priv->folder_lock);
 
@@ -772,6 +779,8 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header)
 	CamelMimeMessage *camel_message = NULL;
 	const gchar *id;
 	CamelException *ex = camel_exception_new ();
+
+	g_assert (TNY_IS_HEADER (header));
 
 	g_mutex_lock (priv->folder_lock);
 

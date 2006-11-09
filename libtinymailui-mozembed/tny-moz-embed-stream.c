@@ -40,7 +40,7 @@ struct _TnyMozEmbedStreamPriv
 	gboolean htmlext;
 };
 
-#define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o)	\
+#define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MOZ_EMBED_STREAM, TnyMozEmbedStreamPriv))
 
 static gint tny_moz_embed_stream_close (TnyStream *self);
@@ -52,7 +52,9 @@ tny_moz_embed_write_to_stream (TnyStream *self, TnyStream *output)
 	ssize_t total = 0;
 	ssize_t nb_read;
 	ssize_t nb_written;
-	
+
+	g_assert (TNY_IS_STREAM (output));
+
 	while (G_LIKELY (!tny_stream_is_eos (self))) 
 	{
 		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));

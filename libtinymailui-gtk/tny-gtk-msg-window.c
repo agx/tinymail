@@ -74,13 +74,18 @@ static void
 tny_gtk_msg_window_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 {
 	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
-	TnyHeader *header = TNY_HEADER (tny_msg_get_header (msg));
+	TnyHeader *header;
 
+	if (msg)
+	{
+		g_assert (TNY_IS_MSG (msg));
+
+		header = TNY_HEADER (tny_msg_get_header (msg));
+		gtk_window_set_title (GTK_WINDOW (self), 
+			tny_header_get_subject (header));
+		g_object_unref (G_OBJECT (header));
+	}
 	tny_msg_view_set_msg (priv->msg_view, msg);
-
-	gtk_window_set_title (GTK_WINDOW (self), tny_header_get_subject (header));
-
-	g_object_unref (G_OBJECT (header));
 
 	return;
 }

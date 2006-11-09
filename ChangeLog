@@ -1,6 +1,7 @@
 2006-11-09  Philip van Hoof <pvanhoof@gnome.org>
 
 	* Introduction of the new TnySendQueue interface
+	* Added a lot assertions to check for type safety
 
 	* This was a major API change
 

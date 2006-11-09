@@ -45,7 +45,7 @@ static const gchar *invalid = "Invalid";
 static void 
 destroy_write (TnyCamelHeader *self)
 {
-    	/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
+	/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
 	if (((WriteInfo*)self->info)->msg)
 		camel_object_unref (CAMEL_OBJECT (((WriteInfo*)self->info)->msg));
 

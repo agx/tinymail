@@ -69,6 +69,9 @@ tny_gtk_header_view_set_header_default (TnyHeaderView *self, TnyHeader *header)
 {
 	TnyGtkHeaderViewPriv *priv = TNY_GTK_HEADER_VIEW_GET_PRIVATE (self);
 
+	if (header)
+		g_assert (TNY_IS_HEADER (header));
+
 	if (G_LIKELY (priv->header))
  		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;

@@ -93,10 +93,14 @@ static void
 tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	TnyHeader *header = (TnyHeader *)tny_msg_get_header (msg);
-	CamelMimeMessage *message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
+	TnyHeader *header; CamelMimeMessage *message;
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
 	CamelTransport *transport;
+
+	g_assert (TNY_IS_CAMEL_MSG (msg));
+
+	header = tny_msg_get_header (msg);
+	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
 
 	transport = camel_session_get_transport ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);

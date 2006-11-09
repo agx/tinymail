@@ -106,6 +106,8 @@ tny_gtk_mime_part_save_strategy_save_default (TnyMimePartSaveStrategy *self, Tny
 	GtkFileChooserDialog *dialog;
 	gboolean destr=FALSE;
 
+	g_assert (TNY_IS_MIME_PART (part));
+
 	dialog = GTK_FILE_CHOOSER_DIALOG 
 		(gtk_file_chooser_dialog_new (_("Save File"), NULL,
 		GTK_FILE_CHOOSER_ACTION_SAVE,

@@ -344,6 +344,8 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	gint i=0, count;
 
+	g_assert (TNY_IS_LIST (list));
+
 	count = gconf_client_get_int (priv->client, 
 			"/apps/tinymail/accounts/count", NULL);
 
@@ -525,6 +527,8 @@ tny_gnome_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	gchar *key = NULL;
 	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
+
+	g_assert (TNY_IS_ACCOUNT (account));
 
 	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
 	gconf_client_set_string (priv->client, (const gchar*) key, 

@@ -58,7 +58,7 @@ struct _TnyVfsStreamPriv
 	gboolean eos;
 };
 
-#define TNY_VFS_STREAM_GET_PRIVATE(o)	\
+#define TNY_VFS_STREAM_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_VFS_STREAM, TnyVfsStreamPriv))
 
 
@@ -159,7 +159,9 @@ tny_vfs_stream_write_to_stream (TnyStream *self, TnyStream *output)
 	gssize total = 0;
 	gssize nb_read;
 	gssize nb_written;
-	
+
+	g_assert (TNY_IS_STREAM (output));
+
 	while (G_UNLIKELY (!tny_stream_is_eos (self))) {
 		nb_read = tny_stream_read (self, tmp_buf, sizeof (tmp_buf));
 		if (G_UNLIKELY (nb_read < 0))

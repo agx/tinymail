@@ -59,6 +59,8 @@ tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart 
 {
 	TnyMimePartView *retval = NULL;
 
+	g_assert (TNY_IS_MIME_PART (part));
+
 	if (tny_mime_part_content_type_is (part, "text/html"))
 	{
 		retval = tny_moz_embed_html_mime_part_view_new ();
@@ -68,7 +70,7 @@ tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart 
 
 	if (!retval)
 		retval = TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_orig_func (self, part);
-	
+
 	return retval;
 }
 

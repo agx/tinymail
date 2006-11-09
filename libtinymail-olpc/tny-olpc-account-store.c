@@ -186,6 +186,8 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 	gchar *configd;
 	GDir *dir ;
 
+	g_assert (TNY_IS_LIST (list));
+
 	configd = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), 
 		".tinymail", "accounts", NULL);
 	dir = g_dir_open (configd, 0, NULL);

@@ -159,9 +159,8 @@ _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationS
 	g_mutex_lock (priv->cancel_lock);	
 
 	/* I know this isn't polite. But it works ;-) */
-    
 	/* camel_operation_cancel (NULL); */
-    	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
+	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
 	g_thread_join (thread);
 
 	if (priv->cancel)
@@ -176,7 +175,7 @@ _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationS
 	}
 
 	while (priv->inuse_spin); 
-    
+
 	priv->inuse_spin = TRUE;
 
 	priv->cancel = camel_operation_new (func, user_data);
@@ -227,13 +226,9 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->service_lock);
-
 	priv->session = session;
-    
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (self);
-
 	_tny_session_camel_add_account (session, self);
-    
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;

@@ -230,6 +230,8 @@ tny_maemo_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	gint i=0, count;
 
+	g_assert (TNY_IS_LIST (list));
+
 	count = gconf_client_get_int (priv->client, 
 			"/apps/tinymail/accounts/count", NULL);
 
@@ -413,6 +415,8 @@ tny_maemo_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	gchar *key = NULL;
 	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
+
+	g_assert (TNY_IS_ACCOUNT (account));
 
 	count++;
 

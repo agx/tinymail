@@ -38,13 +38,15 @@
 static GObjectClass *parent_class = NULL;
 
 
-
 static void
 tny_camel_msg_remove_strategy_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
 {
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+	TnyCamelFolderPriv *priv;
 	const gchar *id;
 
+	g_assert (TNY_IS_CAMEL_FOLDER (folder));
+
+	priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	id = tny_header_get_uid (TNY_HEADER (header));
 	camel_folder_delete_message (priv->folder, id);
 
@@ -137,7 +139,6 @@ tny_camel_msg_remove_strategy_get_type (void)
 
 		g_type_add_interface_static (type, TNY_TYPE_MSG_REMOVE_STRATEGY, 
 			&tny_camel_msg_remove_strategy_info);
-
 	}
 
 	return type;

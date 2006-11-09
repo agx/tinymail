@@ -92,7 +92,11 @@ tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *strea
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
-	CamelStream *cstream = tny_stream_camel_new (stream);
+	CamelStream *cstream;
+
+	g_assert (TNY_IS_STREAM (stream));
+
+	cstream = tny_stream_camel_new (stream);
 
 	g_mutex_lock (priv->part_lock);
 
@@ -129,13 +133,13 @@ tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *strea
 static void
 camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 {
-/* Stolen from evolution, evil evil me!! moehahah */
-	
+	/* Stolen from evolution, evil evil me!! moehahah */
+
 	CamelStreamFilter *filter_stream;
 	CamelMimeFilterCharset *filter;
 	const char *charset = "UTF-8"; /* I default to UTF-8, like it or not */
 	CamelMimeFilterWindows *windows = NULL;
-	
+
 	if (dw->mime_type && (charset = camel_content_type_param 
 			(dw->mime_type, "charset")) && 
 		g_ascii_strncasecmp(charset, "iso-8859-", 9) == 0) 
@@ -194,7 +198,11 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
-	CamelStream *cstream = tny_stream_camel_new (stream);
+	CamelStream *cstream;
+
+	g_assert (TNY_IS_STREAM (stream));
+
+	cstream = tny_stream_camel_new (stream);
 
 	g_mutex_lock (priv->part_lock);
 
@@ -236,13 +244,16 @@ tny_camel_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream,
 static gint
 tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream *stream, const gchar *type)
 {
-
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	gint retval = -1;
 	CamelMedium *medium;
-	CamelStream *cstream = tny_stream_camel_new (stream);
-	
+	CamelStream *cstream;
+
+	g_assert (TNY_IS_STREAM (stream));
+
+	cstream = tny_stream_camel_new (stream);
+
 	g_mutex_lock (priv->part_lock);
 	medium = CAMEL_MEDIUM (priv->part);
 	camel_object_ref (CAMEL_OBJECT (medium));
@@ -280,7 +291,7 @@ tny_camel_mime_part_get_stream_default (TnyMimePart *self)
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
 	CamelStream *stream = camel_stream_mem_new ();
-	
+
 	g_mutex_lock (priv->part_lock);
 	medium =  CAMEL_MEDIUM (priv->part);
 	camel_object_ref (CAMEL_OBJECT (medium));
@@ -636,7 +647,7 @@ TnyMimePart*
 tny_camel_mime_part_new (CamelMimePart *part)
 {
 	TnyCamelMimePart *self = g_object_new (TNY_TYPE_CAMEL_MIME_PART, NULL);
-	
+
 	tny_camel_mime_part_set_part (self, part);
 
 	return TNY_MIME_PART (self);
