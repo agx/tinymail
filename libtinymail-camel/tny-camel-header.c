@@ -542,7 +542,7 @@ _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyC
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	fpriv->headers_managed++;
-	me->folder = (TnyFolder*)folder;
+	me->folder = (TnyCamelFolder*)folder;
 
 	return;
 }
