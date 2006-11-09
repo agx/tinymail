@@ -273,6 +273,14 @@ tny_camel_folder_expunge_default (TnyFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
+	if (priv->headers_managed > 0)
+	{
+		g_critical ("Request to expunge a folder denied: there are still "
+			"header instances of this folder active. Destroy them "
+			"first.");
+		return;
+	}
+
 	g_mutex_lock (priv->folder_lock);
 
 	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))

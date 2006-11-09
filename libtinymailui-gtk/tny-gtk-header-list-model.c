@@ -65,7 +65,7 @@ _tny_gtk_header_list_iterator_travel_to_nth_nl (TnyGtkHeaderListIterator *self, 
 	/* Math seems faster than walking a next pointer 1000ths of times */
 
 	if G_LIKELY (idx)
-	{       
+	{
 		/* If destination is not in the beginning of the list */
 
 		while G_LIKELY (cidx++ < idx-1)
@@ -326,10 +326,9 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 
 	g_return_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp);
+	g_return_if_fail (iter->user_data != NULL);
+	g_return_if_fail (TNY_IS_HEADER (iter->user_data));
 
-	if (iter->user_data == NULL || !TNY_IS_HEADER (iter->user_data))
-		return;
-        
 	g_mutex_lock (list_model->folder_lock);
 	g_mutex_lock (list_model->iterator_lock);
 
@@ -337,7 +336,7 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	   token and return the asked-for column as a GValue instance. */
 
 	header = iter->user_data;
-	
+
 	switch (column) 
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
@@ -738,7 +737,6 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
-
 /* The "relaxed performers" uses g_idle to in a relax way perform a certain
    function on each item in the list of headers  */
 
@@ -827,9 +825,9 @@ tny_gtk_header_list_model_hdr_cache_remover_copy (TnyGtkHeaderListModel *self, G
 static void
 folder_overwrite_destruction (gpointer data, gpointer udata)
 {
-    	TnyGtkHeaderListModel *self = data;
-    
-    	/* Unreference the folder instance */
+	TnyGtkHeaderListModel *self = data;
+
+	/* Unreference the folder instance */
 	if (self->folder) 
 		g_object_unref (G_OBJECT (self->folder));
 }
@@ -838,9 +836,9 @@ folder_overwrite_destruction (gpointer data, gpointer udata)
 static void
 final_destruction (gpointer data, gpointer udata)
 {
-    	TnyGtkHeaderListModel *self = data;
-    
-    	/* Unreference the folder instance */
+	TnyGtkHeaderListModel *self = data;
+
+	/* Unreference the folder instance */
 	if (self->folder) 
 	{
 		g_object_unref (G_OBJECT (self->folder));
@@ -853,7 +851,7 @@ static void
 tny_gtk_header_list_model_finalize (GObject *object)
 {
 	TnyGtkHeaderListModel *self = (TnyGtkHeaderListModel *)object;
-    
+
 	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);
 
@@ -961,11 +959,11 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 		if (G_LIKELY (g_main_depth () > 0))
 			tny_gtk_header_list_model_hdr_cache_remover_copy (
 				self, folder_overwrite_destruction, self, NULL);
-		else {
+		else 
+		{
 			g_list_foreach (self->first, (GFunc)g_object_unref, NULL);
 			folder_overwrite_destruction (self, NULL);
 		}
-	    
 		g_list_free (self->first);
 		self->first = NULL;
 	} else 
@@ -987,25 +985,25 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	g_mutex_lock (self->iterator_lock);
 
 	/* Reset the internal iterator */
-   
-    	/* Code review question (by Philip to myself, so don't ask 
+
+	/* Code review question (by Philip to myself, so don't ask 
 	Philip), shouldn't this reset self->usable_index = FALSE ?*/
 
 	((TnyGtkHeaderListIterator*)self->iterator)->current = self->first;
 	self->last_nth = 0;
 
-    	/* Note to myself: After more code review I decided that the answer 
+	/* Note to myself: After more code review I decided that the answer 
 	was yes ;-) */
-    
-    	self->usable_index = FALSE;
+
+	self->usable_index = FALSE;
 	if (self->index)
 		g_list_free (self->index);
 	self->index = NULL;
-    
+
 	/* Reference the new folder instance */
 	g_object_ref (G_OBJECT (folder));
 	self->folder = folder;
-        
+
 	g_mutex_unlock (self->iterator_lock);
 	g_mutex_unlock (self->folder_lock);	
 

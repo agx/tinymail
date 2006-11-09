@@ -71,12 +71,19 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * Persist changes made to a folder to its backing store, expunging deleted 
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
  *
+ * It's not possible to expunge a folder that has header instances active. You
+ * must first destroy these (for example destroy the #TnyList instance that 
+ * is their parent, like the #TnyGtkHeaderListModel). Expunging effectively
+ * also means (or should, in case you don't) reloading the entire folder. 
+ *
  * Example:
  * <informalexample><programlisting>
  * TnyHeader *header = ...
  * TnyFolder *folder = tny_header_get_folder (header);
  * tny_folder_remove_msg (folder, header);
  * tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
+ * g_object_unref (G_OBJECT (header));
+ * (destroy all remaining header instances) ...
  * tny_folder_expunge (folder);
  * g_object_unref (G_OBJECT (folder));
  * </programlisting></informalexample>

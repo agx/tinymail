@@ -33,11 +33,11 @@ struct _WriteInfo
 };
 
 #pragma pack(1) /* Size will be 21 in stead of 24 */
-struct _TnyCamelHeader 
+struct _TnyCamelHeader
 {
 	GObject parent;
 	gpointer info;
-	TnyFolder *folder;
+	TnyCamelFolder *folder;
 	guchar write:1;
 #ifdef HEALTHY_CHECK
  	guchar healthy:1;

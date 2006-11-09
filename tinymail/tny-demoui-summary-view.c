@@ -299,14 +299,6 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 					tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
 
-					/* This demo-ui does not support hiding marked-as-deleted 
-					   messages. A normal deletion will only *mark* a message
-					   as deleted. That way undeletion is still possible.
-
-					   You shouldn't *use* this demo-ui, so I'm doing destructive
-					   irreversible deletes: I immediately expunge the folder! */
-
-					tny_folder_expunge (folder);
 					g_object_unref (G_OBJECT (folder));
 				}
 
