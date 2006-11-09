@@ -1,5 +1,6 @@
 <!-- ##### SECTION Title ##### -->
 TnyMsgRemoveStrategy
+
 <!-- ##### SECTION Short_Description ##### -->
 A type that implements removing a message
 
@@ -8,12 +9,10 @@ A type that implements removing a message
 A type that implements removing a message from a #TnyFolder
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyFolder, #TnyMsg, #TnyHeader
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

@@ -1,0 +1,45 @@
+<!-- ##### SECTION Title ##### -->
+TnySendQueue
+
+<!-- ##### SECTION Short_Description ##### -->
+A type for sending mail
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type for sending mail using a #TnyTransportAccount
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyTransportAccount
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnySendQueue ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnySendQueueIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@msg_sent: 
+@add_func: 
+
+<!-- ##### FUNCTION tny_send_queue_add ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+
