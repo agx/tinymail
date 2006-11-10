@@ -639,7 +639,8 @@ camel_folder_summary_load(CamelFolderSummary *s)
 		goto error;
 
 	/* now read in each message ... */
-	for (i=0;i<s->saved_count;i++) {
+	for (i=0;i<s->saved_count;i++) 
+	{
 		gboolean must_add = FALSE;
 		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_load(s, &must_add);
 
