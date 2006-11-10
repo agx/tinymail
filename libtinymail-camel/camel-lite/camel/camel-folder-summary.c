@@ -171,12 +171,14 @@ static void free_o_name(void *key, void *value, void *data)
 static inline void
 foreach_msginfo (gpointer data, gpointer user_data)
 {
-	g_slice_free1 ((gint)user_data, data);
+	camel_message_info_free (data);
+	/* g_slice_free1 ((gint)user_data, data); */
 }
 
 static inline 
 gboolean always_true (gpointer key, gpointer value, gpointer gp)
 {
+	
 	return TRUE;
 }
 
