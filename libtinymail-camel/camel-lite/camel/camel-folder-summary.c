@@ -577,7 +577,7 @@ perform_content_info_load(CamelFolderSummary *s)
 	CamelMessageContentInfo *ci, *part;
 	unsigned char *ptrchr = s->filepos;
 
-	ci = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_load(s);
+	ci = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_load (s);
 
 	if (ci == NULL)
 		return NULL;
@@ -586,20 +586,22 @@ perform_content_info_load(CamelFolderSummary *s)
 	ptrchr = camel_file_util_mmap_decode_uint32 ((unsigned char*)ptrchr, &count, FALSE);
 	s->filepos = ptrchr;
 
-	if (count > 500) {
-		camel_folder_summary_content_info_free(s, ci);
+	if (count > 500) 
+	{
+		camel_folder_summary_content_info_free (s, ci);
 		return NULL;
 	}
 
-	for (i=0;i<count;i++) {
-
+	for (i=0;i<count;i++) 
+	{
 		part = perform_content_info_load(s);
-		if (part) {
+		if (part) 
+		{
 			my_list_append((struct _node **)&ci->childs, (struct _node *)part);
 			part->parent = ci;
 		} else {
 			d(fprintf (stderr, "Summary file format messed up?"));
-			camel_folder_summary_content_info_free(s, ci);
+			camel_folder_summary_content_info_free (s, ci);
 			return NULL;
 		}
 	}
@@ -644,11 +646,10 @@ camel_folder_summary_load(CamelFolderSummary *s)
 
 		if (s->build_content) 
 		{
-
 			if (((CamelMessageInfoBase *)mi)->content != NULL)
 				camel_folder_summary_content_info_free(s, ((CamelMessageInfoBase *)mi)->content);
 
-			((CamelMessageInfoBase *)mi)->content = perform_content_info_load(s);
+			((CamelMessageInfoBase *)mi)->content = perform_content_info_load (s);
 			if (((CamelMessageInfoBase *)mi)->content == NULL) {
 				camel_message_info_free(mi);
 				goto error;
@@ -767,7 +768,7 @@ camel_folder_summary_save(CamelFolderSummary *s)
 
 		if (! (((CamelMessageInfoBase*)mi)->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
 		{
-			mi->uid = g_strdup (mi->uid);
+			mi->uid = g_strdup (mi->uid); /* Forget the mmap'ed one */
 			((CamelMessageInfoBase*)mi)->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 		}
 	}
@@ -1777,7 +1778,8 @@ summary_format_string (struct _camel_header_raw *h, const char *name, const char
 
 
 /**
- * camel_folder_summary_content_info_new:
+ * 
+ :
  * @summary: a #CamelFolderSummary object
  * 
  * Allocate a new #CamelMessageContentInfo, suitable for adding
@@ -1908,6 +1910,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	unsigned char *ptrchr = s->filepos;
 	unsigned int i;
 	gchar *theuid;
+	gboolean uidmf = FALSE;
 
 #ifndef NON_TINYMAIL_FEATURES
 	unsigned int size;
@@ -1927,31 +1930,36 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
 		*must_add = TRUE;
 		mi->uid = theuid;
+		uidmf = TRUE;
 	} else {
 		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (s, theuid);
+		mi->refcount--; /* trick, I know */
 		*must_add = FALSE;
+		uidmf = FALSE;
 	}
 
 	i = 0;
 
 	if (!mi)
 	{
-		/* printf ("%s not found\n", theuid); */
 		mi = (CamelMessageInfoBase *)camel_message_info_new(s);
 		*must_add = TRUE;
 		mi->uid = theuid;
+		uidmf = TRUE;
 	}
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
 
-	mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
+	if (uidmf)
+		mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 #ifdef NON_TINYMAIL_FEATURES
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
 #else
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &size, FALSE);
 #endif
+
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_sent);
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_received);
 
@@ -1987,7 +1995,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 #endif
 
 	ptrchr += len;
-
 	s->filepos = ptrchr;
 
 #ifdef NON_TINYMAIL_FEATURES
@@ -2003,6 +2010,8 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
 
 #ifdef NON_TINYMAIL_FEATURES
+	if (mi->references)
+		g_free (mi->references);
 	mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
 	mi->references->size = count;
 #endif
@@ -2023,9 +2032,9 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	ptrchr = s->filepos;
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
 
-	for (i=0;i<count;i++) {
+	for (i=0;i<count;i++) 
+	{
 		char *name = NULL;
-
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 		if (len) 
 			name = (char*) ptrchr;
@@ -2039,16 +2048,14 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
 	if (!ptrchr) return NULL;
 
-	for (i=0;i<count;i++) {
+	for (i=0;i<count;i++) 
+	{
 		char *name = NULL, *value = NULL;
-
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
-
 		if (len) 
 			name = (char*)ptrchr;
 		ptrchr += len;
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
-
 		if (len) 
 			value =(char*) ptrchr;
 		ptrchr += len;
@@ -2056,7 +2063,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		camel_tag_set(&mi->user_tags, name, value);
 #endif
 	}
-
 
 	s->filepos = ptrchr;
 
@@ -2077,22 +2083,26 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 
 	camel_file_util_encode_string(out, camel_message_info_uid(mi));
 	camel_file_util_encode_uint32(out, mi->flags);
+
 #ifdef NON_TINYMAIL_FEATURES
 	camel_file_util_encode_uint32(out, mi->size);
 #else
 	camel_file_util_encode_uint32(out, 0);
 #endif
+
 	camel_file_util_encode_time_t(out, mi->date_sent);
 	camel_file_util_encode_time_t(out, mi->date_received);
 	camel_file_util_encode_string(out, camel_message_info_subject(mi));
 	camel_file_util_encode_string(out, camel_message_info_from(mi));
 	camel_file_util_encode_string(out, camel_message_info_to(mi));
 	camel_file_util_encode_string(out, camel_message_info_cc(mi));
+
 #ifdef NON_TINYMAIL_FEATURES
 	camel_file_util_encode_string(out, camel_message_info_mlist(mi));
 #else
 	camel_file_util_encode_string(out, "");
 #endif
+
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.hi);
 	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.lo);
 
@@ -2108,11 +2118,14 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 		camel_file_util_encode_uint32(out, 0);
 
 #ifdef NON_TINYMAIL_FEATURES
+	}
 	count = camel_flag_list_size(&mi->user_flags);
 #else
 	count = 0;
 #endif
+
 	camel_file_util_encode_uint32(out, count);
+
 #ifdef NON_TINYMAIL_FEATURES
 	flag = mi->user_flags;
 	while (flag) {
@@ -2126,7 +2139,9 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 #else
 	count = 0;
 #endif
+
 	camel_file_util_encode_uint32(out, count);
+
 #ifdef NON_TINYMAIL_FEATURES
 	tag = mi->user_tags;
 	while (tag) {
@@ -2135,6 +2150,7 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 		tag = tag->next;
 	}
 #endif
+
 	return ferror(out);
 }
 
@@ -2154,12 +2170,14 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 			camel_pstring_free(mi->to);
 		if (mi->cc)
 			camel_pstring_free(mi->cc);
+
 #ifdef NON_TINYMAIL_FEATURES
 		if (mi->mlist)
 			camel_pstring_free(mi->mlist);
 		camel_flag_list_free(&mi->user_flags);
 		camel_tag_list_free(&mi->user_tags);
 #endif
+
 	} else if (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
 		g_free (mi->uid);
 
@@ -2196,7 +2214,6 @@ content_info_load(CamelFolderSummary *s)
 	char *type, *subtype;
 	guint32 count, i;
 	CamelContentType *ct;
-
 	unsigned char *ptrchr = s->filepos;
 
 	io(printf("Loading content info\n"));
@@ -2210,12 +2227,12 @@ content_info_load(CamelFolderSummary *s)
 	ct = camel_content_type_new(type, subtype);
 
 	ptrchr = s->filepos;
-	ptrchr = camel_file_util_mmap_decode_uint32 ((unsigned char*)ptrchr, &count, FALSE);	
+	ptrchr = camel_file_util_mmap_decode_uint32 ((unsigned char*)ptrchr, &count, FALSE);
 	s->filepos = ptrchr;
-	
-	for (i=0;i<count;i++) {
-		char *name, *value;
 
+	for (i=0; i < count; i++) 
+	{
+		char *name, *value;
 		camel_folder_summary_decode_token(s, &name);
 		camel_folder_summary_decode_token(s, &value);
 		
@@ -2274,7 +2291,8 @@ content_info_free(CamelFolderSummary *s, CamelMessageContentInfo *ci)
 {
 	camel_content_type_unref(ci->type);
 
-	if (ci->needs_free) {
+	if (ci->needs_free) 
+	{
 		token_free (ci->id);
 		token_free (ci->description);
 		token_free (ci->encoding);
