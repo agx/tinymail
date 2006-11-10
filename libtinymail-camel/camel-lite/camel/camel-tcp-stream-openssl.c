@@ -25,7 +25,8 @@
 
 #include <config.h>
 
-#ifdef HAVE_NSS
+#ifndef HAVE_NSS
+#ifdef HAVE_OPENSSL
 
 #include "camel-tcp-stream-ssl.h"
 
@@ -895,4 +896,5 @@ stream_get_remote_address (CamelTcpStream *stream, socklen_t *len)
 	return saddr;
 }
 
+#endif /* HAVE_OPENSSL */
 #endif /* HAVE_NSS */

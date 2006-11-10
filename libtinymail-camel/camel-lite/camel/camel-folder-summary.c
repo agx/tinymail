@@ -6,7 +6,7 @@
  * the header data into memory in stead of fread()ing it. It uses
  * the mmap() syscall for this.
  *
- *  Authors: _
+ *  Authors: 
  *   Michael Zucchi <notzed@ximian.com>
  *   Philip Van Hoof <pvanhoof@gnome.org>
  *
@@ -797,7 +797,6 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	s->in_reload = FALSE;
 
 	s->flags &= ~CAMEL_SUMMARY_DIRTY;
-
 	g_mutex_unlock (s->dump_lock);
 
 	return 0;
@@ -1632,7 +1631,6 @@ summary_header_load(CamelFolderSummary *s)
 		s->junk_count = g_ntohl(get_unaligned_u32(s->filepos)); 
 		s->filepos += 4;
 	}
-     
 
 	return 0;
 }
