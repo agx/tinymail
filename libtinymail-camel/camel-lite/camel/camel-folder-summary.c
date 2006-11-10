@@ -642,12 +642,11 @@ camel_folder_summary_load(CamelFolderSummary *s)
 		if (mi == NULL)
 			goto error;
 
-		/* FIXME: this should be done differently, how i don't know */
-
-		if (s->build_content) {
+		if (s->build_content) 
+		{
 
 			if (((CamelMessageInfoBase *)mi)->content != NULL)
-				content_info_free (s, ((CamelMessageInfoBase *)mi)->content);
+				camel_folder_summary_content_info_free(s, ((CamelMessageInfoBase *)mi)->content);
 
 			((CamelMessageInfoBase *)mi)->content = perform_content_info_load(s);
 			if (((CamelMessageInfoBase *)mi)->content == NULL) {
@@ -1928,8 +1927,10 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
 		*must_add = TRUE;
 		mi->uid = theuid;
-	} else
+	} else {
 		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (s, theuid);
+		*must_add = FALSE;
+	}
 
 	i = 0;
 
@@ -1986,8 +1987,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 #endif
 
 	ptrchr += len;
-
-	mi->content = NULL;
 
 	s->filepos = ptrchr;
 
