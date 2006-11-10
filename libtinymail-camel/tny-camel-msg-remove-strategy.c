@@ -45,6 +45,7 @@ tny_camel_msg_remove_strategy_remove (TnyMsgRemoveStrategy *self, TnyFolder *fol
 	const gchar *id;
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
+	g_assert (TNY_IS_HEADER (header));
 
 	priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	id = tny_header_get_uid (TNY_HEADER (header));

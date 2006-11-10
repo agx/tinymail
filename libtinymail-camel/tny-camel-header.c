@@ -502,7 +502,6 @@ tny_camel_header_finalize (GObject *object)
 	if (self->folder)
 	{
 		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self->folder);
-		
 		fpriv->headers_managed--;
 		_tny_camel_folder_check_uncache (((TnyCamelFolder*)self->folder), fpriv);
 	}
