@@ -276,6 +276,7 @@ libcamel_liteinclude_HEADERS =			\
 	camel-url-scanner.h			\
 	camel-url.h				\
 	camel-utf8.h				\
+	camel-lock-helper.h			\
 	camel.h
 
 libcamel_lite_1_2_la_LDFLAGS = -version-info 0:0:0 $(NO_UNDEFINED)
