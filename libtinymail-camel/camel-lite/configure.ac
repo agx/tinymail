@@ -707,7 +707,6 @@ camel/Makefile
 camel/providers/Makefile
 camel/providers/imap/Makefile
 camel/providers/imapp/Makefile
-camel/providers/imap4/Makefile
 camel/providers/local/Makefile
 camel/providers/nntp/Makefile
 camel/providers/pop3/Makefile
