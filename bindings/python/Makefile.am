@@ -58,6 +58,7 @@ CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c \
 
 EXTRA_DIST = \
 	filter.py \
+	scanvirtuals.py \
 	tinymail.defs.extra \
 	tinymail.override \
 	tinymailui.defs.extra \
