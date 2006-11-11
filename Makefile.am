@@ -63,5 +63,5 @@ DIST_SUBDIRS = \
 	libtinymailui-mozembed \
 	libtinymail-gnome-desktop
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-python-bindings --enable-unit-tests --enable-tests
+DISTCHECK_CONFIGURE_FLAGS = --with-html-component=mozembed --enable-gtk-doc --enable-python-bindings --enable-unit-tests --enable-tests
 
