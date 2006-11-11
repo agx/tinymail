@@ -298,8 +298,6 @@ noinst_HEADERS =				\
 
 EXTRA_DIST =					\
 	$(pkgconfig_in_files)	 		\
-	gentables.pl				\
-	ChangeLog.pre-1-4			\
-	README
+	gentables.pl
 
 DISTCLEANFILES = $(pkgconfig_DATA)

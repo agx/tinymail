@@ -4,6 +4,7 @@ py*
 *.anjuta
 config.h
 stamp-h1
+*.autogen_bak
 libtinymail-*.tar.gz
 libtinymail.spec
 .anjuta
