@@ -9,12 +9,10 @@ A type for sending mail
 A type for sending mail using a #TnyTransportAccount
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyTransportAccount
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
