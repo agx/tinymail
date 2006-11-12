@@ -1,7 +1,10 @@
 AC_INIT([camel-lite],[1.0],[http://tinymail.org/])
 AC_CONFIG_SRCDIR(camel/camel-object.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
-AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS")
+
+AC_CONFIG_MACRO_DIR([../../m4])
+AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS -I ../../m4")
+
 AC_CONFIG_HEADERS(config.h)
 
 BASE_VERSION=1.0
@@ -200,31 +203,11 @@ AC_MSG_RESULT($ac_cv_lkstrftime)
 
 msg_ssl="no"
 msg_smime="no"
-mozilla_nspr_pcs=""
-
-AC_MSG_CHECKING(Mozilla NSPR pkg-config module name)
-mozilla_nspr_pcs="nspr mozilla-nspr firefox-nspr xulrunner-nspr"
-for pc in $mozilla_nspr_pcs; do
-	if $PKG_CONFIG --exists $pc; then
-		AC_MSG_RESULT($pc)
-		mozilla_nspr=$pc
-		break;
-	fi
-done
-		
-AC_MSG_CHECKING(Mozilla NSS pkg-config module name)
-mozilla_nss_pcs="nss mozilla-nss firefox-nss xulrunner-nss"
-for pc in $mozilla_nss_pcs; do
-	if $PKG_CONFIG --exists $pc; then
-		AC_MSG_RESULT($pc)
-		mozilla_nss=$pc
-		break;
-	fi
-done
-
 SSL_LIBS=""
 
-if test -n "$mozilla_nspr" -a -n "$mozilla_nss"; then
+AC_TNY_MOZ_CHECK
+
+if test x"$mozilla_nspr" != "xno" -a x"$mozilla_nss" != "xno"; then
 	msg_ssl="yes (Mozilla NSS)"
 	msg_smime="yes (Mozilla NSS)"
 	AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
