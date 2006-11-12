@@ -73,3 +73,6 @@ The make distcheck target
 make
 make distcheck
 
+For packagers
+-------------
+Read packagers.txt
