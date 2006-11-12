@@ -37,7 +37,7 @@ AC_MSG_RESULT($pc)
 mozilla_gtkmozembed="no"
 AC_MSG_CHECKING(Mozilla gtkmozembed pkg-config module name)
 mozilla_gtkmozembed_pcs="gtkmozembed mozilla-gtkmozembed firefox-gtkmozembed xulrunner-gtkmozembed"
-for pc in $mozilla_nss_pcs; do
+for pc in $mozilla_gtkmozembed_pcs; do
         if $PKG_CONFIG --exists $pc; then
                 mozilla_gtkmozembed=$pc
                 break;
