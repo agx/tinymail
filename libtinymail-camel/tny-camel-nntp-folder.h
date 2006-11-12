@@ -25,6 +25,7 @@
 
 #include <tny-camel-account.h>
 #include <tny-store-account.h>
+#include <tny-camel-folder.h>
 
 G_BEGIN_DECLS
 
