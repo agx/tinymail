@@ -14,10 +14,6 @@ The implementation decodes the mime part of the #TnyMsg instance that has
 as mime-type "text/html" to a #TnyMozEmbedStream instance. That #TnyMozEmbedStream 
 instance will update the instance
 </para>
-<para>
-You need to construct this type with a #TnySaveStrategy. It's recommended 
-to use the #TnyGtkSaveStrategy implementation in libtinymailui-gtk.
-</para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
