@@ -31,7 +31,7 @@ A type that can save a #TnyMimePart
 @parent: 
 @get_save_strategy_func: 
 @set_save_strategy_func: 
-@perform_save_func: 
+@save_func: 
 
 <!-- ##### FUNCTION tny_mime_part_saver_get_save_strategy ##### -->
 <para>
@@ -49,14 +49,5 @@ A type that can save a #TnyMimePart
 
 @self: 
 @strategy: 
-
-
-<!-- ##### FUNCTION tny_mime_part_saver_perform_save ##### -->
-<para>
-
-</para>
-
-@self: 
-@part: 
 
 

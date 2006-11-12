@@ -118,7 +118,7 @@ tny_mime_part_saver_get_save_strategy (TnyMimePartSaver *self)
 
 
 /**
- * tny_mime_part_saver_perform_save:
+ * tny_mime_part_saver_save:
  * @self: A #TnyMimePartSaver instance
  * @mime_part: A #TnyMimePart instace
  *
@@ -126,14 +126,14 @@ tny_mime_part_saver_get_save_strategy (TnyMimePartSaver *self)
  *
  **/
 void
-tny_mime_part_saver_perform_save (TnyMimePartSaver *self, TnyMimePart *mime_part)
+tny_mime_part_saver_save (TnyMimePartSaver *self, TnyMimePart *mime_part)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->perform_save_func)
-		g_critical ("You must implement tny_mime_part_saver_perform_save\n");
+	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->save_func)
+		g_critical ("You must implement tny_mime_part_saver_save\n");
 #endif
 
-	TNY_MIME_PART_SAVER_GET_IFACE (self)->perform_save_func (self, mime_part);
+	TNY_MIME_PART_SAVER_GET_IFACE (self)->save_func (self, mime_part);
 	return;
 }
 

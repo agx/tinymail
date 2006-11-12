@@ -1,3 +1,9 @@
+2006-11-12  Philip van Hoof <pvanhoof@gnome.org>
+
+	* Corrected the MimePartSaveStrategy pattern method naming
+
+	* This was a major API change
+
 2006-11-12  Øystein Gisnås <oystein@gisnas.net>
 
 	* debian/: Added debian package information and environment

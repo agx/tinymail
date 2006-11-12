@@ -22,7 +22,7 @@
 #include <tny-mime-part-save-strategy.h>
 
 /**
- * tny_mime_part_save_strategy_save:
+ * tny_mime_part_save_strategy_perform_save:
  * @self: A #TnyMimePartSaveStrategy instance
  * @part: The #TnyMimePart instance that must be saved
  *
@@ -40,10 +40,10 @@
  * Example:
  * <informalexample><programlisting>
  * static void 
- * tny_my_msg_view_perform_save (TnyMimePartView *self_i, TnyMimePart *attachment)
+ * tny_my_msg_view_save (TnyMimePartView *self_i, TnyMimePart *attachment)
  * {
  *     TnyMyMsgView *self = TNY_MY_MSG_VIEW (self_i);
- *     tny_mime_part_save_strategy_save (self->mime_part_save_strategy, attachment);
+ *     tny_mime_part_save_strategy_perform_save (self->mime_part_save_strategy, attachment);
  * }
  * </programlisting></informalexample>
  *
@@ -60,7 +60,7 @@
  * Example:
  * <informalexample><programlisting>
  * static void
- * tny_gtk_mime_part_save_strategy_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
+ * tny_gtk_mime_part_save_strategy_perform_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
  * {
  *      GtkFileChooserDialog *dialog;
  *      dialog = GTK_FILE_CHOOSER_DIALOG 
@@ -78,7 +78,7 @@
  *                      TnyStream *stream = tny_fs_stream_new (fd);
  *                      tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
  *                      g_object_unref (G_OBJECT (stream));
- *            }		
+ *            }
  *      }
  *      gtk_widget_destroy (GTK_WIDGET (dialog));
  * }
@@ -96,14 +96,14 @@
  * save only that part.
  **/
 void
-tny_mime_part_save_strategy_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
+tny_mime_part_save_strategy_perform_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->save_func)
-		g_critical ("You must implement tny_mime_part_save_strategy_save\n");
+	if (!TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->perform_save_func)
+		g_critical ("You must implement tny_mime_part_save_strategy_perform_save\n");
 #endif
 
-	TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->save_func (self, part);
+	TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->perform_save_func (self, part);
 	return;
 }
 
