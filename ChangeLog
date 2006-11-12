@@ -1,3 +1,7 @@
+2006-11-12  Øystein Gisnås <oystein@gisnas.net>
+
+	* debian/: Added debian package information and environment
+
 2006-11-11  Øystein Gisnås <oystein@gisnas.net>
 
 	* libtinymail-camel/camel-lite/Makefile.am: make distcheck fix
