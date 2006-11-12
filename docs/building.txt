@@ -65,3 +65,11 @@ gconftool-2 -s /apps/tinymail/accounts/0/user -t string "tinymailunittest"
 
 ps. The password is "unittest"
 
+
+The make distcheck target
+-------------------------
+./autogen.sh --prefix=/opt/tinymail --with-html-component=mozembed \
+	--enable-gtk-doc --enable-tests
+make
+make distcheck
+
