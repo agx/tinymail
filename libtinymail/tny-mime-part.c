@@ -391,7 +391,7 @@ tny_mime_part_get_content_type (TnyMimePart *self)
 /**
  * tny_mime_part_content_type_is:
  * @self: a #TnyMimePart object
- * @contenttype: The content type in the string format type/subtype
+ * @type: The content type in the string format type/subtype
  * 
  * Efficiently checks whether a part is of type content_type. You can use things
  * like "type/*" for matching. Only * works, stands for 'any', and it's not 
@@ -421,14 +421,14 @@ tny_mime_part_get_content_type (TnyMimePart *self)
  *
  **/
 gboolean
-tny_mime_part_content_type_is (TnyMimePart *self, const gchar *contenttype)
+tny_mime_part_content_type_is (TnyMimePart *self, const gchar *type)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_GET_IFACE (self)->content_type_is_func)
 		g_critical ("You must implement tny_mime_part_content_type_is\n");
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->content_type_is_func (self, contenttype);
+	return TNY_MIME_PART_GET_IFACE (self)->content_type_is_func (self, type);
 }
 
 

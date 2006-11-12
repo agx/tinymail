@@ -1,6 +1,7 @@
 2006-11-12  Philip van Hoof <pvanhoof@gnome.org>
 
 	* Corrected the MimePartSaveStrategy pattern method naming
+	* Various gtk-doc fixes
 
 	* This was a major API change
 

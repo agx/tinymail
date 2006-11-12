@@ -47,7 +47,6 @@ tny_mime_part_view_clear (TnyMimePartView *self)
 /**
  * tny_mime_part_view_get_part:
  * @self: A #TnyMimePartView instance
- * @mime_part: A #TnyMimePart instace
  *
  * Get mime part of the view @self. The return value must be unreferenced after
  * use.

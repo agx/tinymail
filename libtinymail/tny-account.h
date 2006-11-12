@@ -88,7 +88,7 @@ const gchar* tny_account_get_user (TnyAccount *self);
 const gchar* tny_account_get_hostname (TnyAccount *self);
 const gchar* tny_account_get_url_string (TnyAccount *self);
 TnyGetPassFunc tny_account_get_pass_func (TnyAccount *self);
-void tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func);
+void tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pass_func);
 TnyForgetPassFunc tny_account_get_forget_pass_func (TnyAccount *self);
 
 G_END_DECLS

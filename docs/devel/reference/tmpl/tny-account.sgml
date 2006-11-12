@@ -213,7 +213,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 @self: 
-@get_forget_pass_func: 
+@forget_pass_func: 
 
 
 <!-- ##### FUNCTION tny_account_get_forget_pass_func ##### -->

@@ -119,17 +119,17 @@ tny_gtk_attachment_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_attachment_mime_part_view_new:
- * @save_strategy: The save strategy to use
+ * @iview: A #TnyGtkAttachListModel instance
  *
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*
-tny_gtk_attachment_mime_part_view_new (TnyGtkAttachListModel *imodel)
+tny_gtk_attachment_mime_part_view_new (TnyGtkAttachListModel *iview)
 {
 	TnyGtkAttachmentMimePartView *self = g_object_new (TNY_TYPE_GTK_ATTACHMENT_MIME_PART_VIEW, NULL);
 
-	g_object_ref (G_OBJECT (imodel));
-	TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self)->imodel = imodel;
+	g_object_ref (G_OBJECT (iview));
+	TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self)->imodel = iview;
 
 	return TNY_MIME_PART_VIEW (self);
 }
