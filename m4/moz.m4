@@ -1,7 +1,7 @@
 AC_DEFUN([AC_TNY_MOZ_CHECK],
 [
-mozilla_nspr="no"
 
+mozilla_nspr="no"
 AC_MSG_CHECKING(Mozilla NSPR pkg-config module name)
 mozilla_nspr_pcs="nspr mozilla-nspr firefox-nspr xulrunner-nspr"
 for pc in $mozilla_nspr_pcs; do
