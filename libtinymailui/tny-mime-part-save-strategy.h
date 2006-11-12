@@ -42,6 +42,7 @@ struct _TnyMimePartSaveStrategyIface
 };
 
 GType tny_mime_part_save_strategy_get_type (void);
+
 void tny_mime_part_save_strategy_perform_save (TnyMimePartSaveStrategy *self, TnyMimePart *part);
 
 G_END_DECLS

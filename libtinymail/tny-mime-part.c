@@ -147,20 +147,20 @@ tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 /**
  * tny_mime_part_set_content_type:
  * @self: a #TnyMimePart object
- * @content_type: the content_type 
+ * @contenttype: the content_type 
  * 
  * Set the content type of a mime part. Formatted as type/subtype
  *
  **/
 void
-tny_mime_part_set_content_type (TnyMimePart *self, const gchar *content_type)
+tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
 {
 #ifdef DEBUG
 	if (!TNY_MIME_PART_GET_IFACE (self)->set_content_type_func)
 		g_critical ("You must implement tny_mime_part_set_content_type\n");
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_content_type_func (self, content_type);
+	TNY_MIME_PART_GET_IFACE (self)->set_content_type_func (self, contenttype);
 	return;
 }
 
