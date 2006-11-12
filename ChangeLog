@@ -2,6 +2,7 @@
 
 	* Corrected the MimePartSaveStrategy pattern method naming
 	* Various gtk-doc fixes
+	* Added the tny_folder_add_msg API and implemented it for TnyCamelFolder
 
 	* This was a major API change
 

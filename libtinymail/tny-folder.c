@@ -94,6 +94,25 @@ tny_folder_expunge (TnyFolder *self)
 }
 
 /**
+ * tny_folder_add_msg:
+ * @self: a #TnyFolder object
+ * @msg: a #TnyMsg object
+ *
+ * Add a message to a folder.
+ **/
+void 
+tny_folder_add_msg (TnyFolder *self, TnyMsg *msg)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->add_msg_func)
+		g_critical ("You must implement tny_folder_add_msg\n");
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->add_msg_func (self, msg);
+	return;
+}
+
+/**
  * tny_folder_remove_msg:
  * @self: a TnyFolder object
  * @header: the header of the message to remove

@@ -77,6 +77,7 @@ struct _TnyFolderIface
 
 	/* Methods */
 	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header);
+	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg);
 	void (*expunge_func) (TnyFolder *self);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
@@ -100,6 +101,7 @@ GType tny_folder_type_get_type (void);
 TnyMsgRemoveStrategy* tny_folder_get_msg_remove_strategy (TnyFolder *self);
 void tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st);
 void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header);
+void tny_folder_add_msg (TnyFolder *self, TnyMsg *msg);
 void tny_folder_expunge (TnyFolder *self);
 TnyMsg* tny_folder_get_msg (TnyFolder *self, TnyHeader *header);
 void tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh);

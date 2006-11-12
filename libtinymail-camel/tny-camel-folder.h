@@ -50,6 +50,7 @@ struct _TnyCamelFolderClass
 	GObjectClass parent;
 
 	/* virtual methods */
+	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg);
 	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header);
 	void (*expunge_func) (TnyFolder *self);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);

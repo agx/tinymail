@@ -228,6 +228,52 @@ load_folder (TnyCamelFolderPriv *priv)
 
 
 static void 
+tny_camel_folder_add_msg (TnyFolder *self, TnyMsg *msg)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_msg_func (self, msg);
+	return;
+}
+
+static void 
+tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	CamelMimeMessage *message;
+	CamelException *ex;
+
+	g_assert (TNY_IS_CAMEL_MSG (msg));
+
+	g_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
+		{
+			g_mutex_unlock (priv->folder_lock);
+			return;
+		}
+
+	ex = camel_exception_new ();
+	camel_exception_init (ex);
+
+	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
+	camel_folder_append_message (priv->folder, message, NULL, NULL, ex);
+
+	/* TODO: improve handling of ex */
+	if (camel_exception_is_set (ex))
+		g_warning ("Adding message failed: %s\n", 
+			camel_exception_get_description (ex));
+
+	/* TODO: emit a folder-msg-inserted signal */
+
+	camel_exception_free (ex);
+
+	g_mutex_unlock (priv->folder_lock);
+
+	return;
+}
+
+
+static void 
 tny_camel_folder_remove_msg (TnyFolder *self, TnyHeader *header)
 {
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_msg_func (self, header);
@@ -296,6 +342,8 @@ tny_camel_folder_expunge_default (TnyFolder *self)
 		}
 
 	camel_folder_sync (priv->folder, TRUE, &ex);
+
+	/* TODO: handle ex */
 
 	g_mutex_unlock (priv->folder_lock);
 
@@ -623,6 +671,8 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
+
+	/* TODO: handle ex */
 	camel_exception_free (ex);
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
@@ -713,6 +763,8 @@ tny_camel_folder_refresh_default (TnyFolder *self)
 	priv->cached_length = camel_folder_get_message_count (priv->folder);    
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
+
+	/* TODO: handle ex */
 	camel_exception_free (ex);
 
 	g_mutex_unlock (priv->folder_lock);
@@ -1436,6 +1488,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->refresh_func = tny_camel_folder_refresh;
 	klass->remove_msg_func = tny_camel_folder_remove_msg;
 	klass->expunge_func = tny_camel_folder_expunge;
+	klass->add_msg_func = tny_camel_folder_add_msg;
 
 	return;
 }
@@ -1477,6 +1530,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->refresh_async_func = tny_camel_folder_refresh_async_default;
 	class->refresh_func = tny_camel_folder_refresh_default;
 	class->remove_msg_func = tny_camel_folder_remove_msg_default;
+	class->add_msg_func = tny_camel_folder_add_msg_default;
 	class->expunge_func = tny_camel_folder_expunge_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
