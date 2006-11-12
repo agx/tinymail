@@ -28,9 +28,6 @@ A abstract type that defines a folder
 
 </para>
 
-@: 
-@:
-
 @tnyfolder: the object which received the signal.
 @arg1: 
 
@@ -38,8 +35,6 @@ A abstract type that defines a folder
 <para>
 
 </para>
-
-@:
 
 @tnyfolder: the object which received the signal.
 

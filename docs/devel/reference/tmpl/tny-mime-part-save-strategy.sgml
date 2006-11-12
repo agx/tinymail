@@ -32,3 +32,12 @@ A type typically used by a #TnyMsgView implementation for saving a #TnyMimePart 
 @parent: 
 @perform_save_func: 
 
+<!-- ##### FUNCTION tny_mime_part_save_strategy_perform_save ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+
+

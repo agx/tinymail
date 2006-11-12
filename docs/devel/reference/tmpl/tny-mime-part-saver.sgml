@@ -51,3 +51,12 @@ A type that can save a #TnyMimePart
 @strategy: 
 
 
+<!-- ##### FUNCTION tny_mime_part_saver_save ##### -->
+<para>
+
+</para>
+
+@self: 
+@part: 
+
+
