@@ -3,7 +3,6 @@
 	* libtinymail-camel/camel-lite: moved some scripts in the configure.ac
 	to the m4 directory to simplify migrating to the toplevel configure.ac
 	once
-
 	* libtinymail-camel: Reference counting of returned Camel types
 
 	* This was a major API change in libtinymail-camel
