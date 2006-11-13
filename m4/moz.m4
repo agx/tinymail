@@ -10,7 +10,7 @@ for pc in $mozilla_nspr_pcs; do
                 break;
         fi
 done
-AC_MSG_RESULT($pc)
+AC_MSG_RESULT($mozilla_nspr)
 
 mozilla_nss="no"
 AC_MSG_CHECKING(Mozilla NSS pkg-config module name)
@@ -21,7 +21,7 @@ for pc in $mozilla_nss_pcs; do
                 break;
         fi
 done
-AC_MSG_RESULT($pc)
+AC_MSG_RESULT($mozilla_nss)
 
 mozilla_xpcom="no"
 AC_MSG_CHECKING(Mozilla XPCOM pkg-config module name)
@@ -32,7 +32,7 @@ for pc in $mozilla_xpcom_pcs; do
                 break;
         fi
 done
-AC_MSG_RESULT($pc)
+AC_MSG_RESULT($mozilla_xpcom)
 
 mozilla_gtkmozembed="no"
 AC_MSG_CHECKING(Mozilla gtkmozembed pkg-config module name)
@@ -43,7 +43,7 @@ for pc in $mozilla_gtkmozembed_pcs; do
                 break;
         fi
 done
-AC_MSG_RESULT($pc)
+AC_MSG_RESULT($mozilla_gtkmozembed)
 
 ])
 

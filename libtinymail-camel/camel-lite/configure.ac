@@ -159,7 +159,18 @@ AC_DEFINE(ENABLE_THREADS,1,[Required])
 
 CFLAGS="$CFLAGS $WARN_CFLAGS"
 
-PKG_CHECK_MODULES(E_DATA_SERVER, libxml-2.0 glib-2.0 gobject-2.0 $mozilla_nspr $mozilla_nss)
+mozilla_nspr_eds=""
+mozilla_nss_eds=""
+
+if test x"$mozilla_nspr" != "xno"; then
+	mozilla_nspr_eds=$mozilla_nspr
+fi
+
+if test x"$mozilla_nss" != "xno"; then
+        mozilla_nss_eds=$mozilla_nss
+fi
+
+PKG_CHECK_MODULES(E_DATA_SERVER, libxml-2.0 glib-2.0 gobject-2.0 $mozilla_nspr_eds $mozilla_nss_eds)
 AC_SUBST(E_DATA_SERVER_CFLAGS)
 AC_SUBST(E_DATA_SERVER_LIBS)
 
@@ -172,7 +183,7 @@ if test "x$zlib_found" = "xfalse"; then
     AC_MSG_ERROR([*** zlib is required])
 fi
 
-PKG_CHECK_MODULES(CAMEL, gthread-2.0 gmodule-2.0 gobject-2.0 $mozilla_nss $mozilla_nspr)
+PKG_CHECK_MODULES(CAMEL, gthread-2.0 gmodule-2.0 gobject-2.0 $mozilla_nss_eds $mozilla_nspr_eds)
 CAMEL_CFLAGS="$CAMEL_CFLAGS $THREADS_CFLAGS $KRB4_CFLAGS $KRB5_CFLAGS"
 CAMEL_LIBS="$CAMEL_LIBS -lz $THREADS_LIBS $KRB4_LDFLAGS $KRB5_LDFLAGS"
 
