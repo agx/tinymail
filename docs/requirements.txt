@@ -1,0 +1,15 @@
+Ubuntu Edgy, Dapper, etc etc
+----------------------------
+On a standard Ubuntu Edgy or Dapper all you have to do to get yourself a more
+or less interesting tinymail (interesting in terms of enabled components) is
+the following apt-get:
+
+apt-get install gnome-devel firefox-dev libnm-glib-dev subversion automake1.9 autoconf2.13 autotools-dev gnome-common
+mkdir -p $HOME/repos/tinymail/
+cd $HOME/repos/tinymail/
+svn co https://svn.tinymail.org/svn/tinymail
+cd tinymail/trunk
+./autogen.sh --prefix=/opt/tinymail
+make
+make install
+
