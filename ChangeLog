@@ -1,3 +1,9 @@
+2006-11-13  Philip van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel/camel-lite: moved some scripts in the configure.ac
+	to the m4 directory to simplify migrating to the toplevel configure.ac
+	once
+
 2006-11-13  Øystein Gisnås <oystein@gisnas.net>
 
 	* debian/: Dependencies
