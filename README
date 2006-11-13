@@ -124,7 +124,7 @@ gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string [mailserver]
 Ubuntu Breezy & Dapper
 ----------------------
 
-Packages
+Required Packages
 
   gnome-devel
   subversion
@@ -147,11 +147,20 @@ Dependencies
 
  If you want the Python bindings: python-gtk2-dev, python2.4-dev
 
+Ubuntu Edgy Eft & Debian
+------------------------
+
+See Ubuntu Breezy and Dapper above
+
+Packages
+  The debian/ directory contains ready to use packaging scripts for a desktop
+  configuration. To compile packages, run ./autogen.sh and then start the
+  packaging script with for example 'dpkg-buildpackage -rfakeroot'.
 
 Fedora Core 4 & 5
 -----------------
 
-Packages
+Required Packages
 
   Subversion
   gnome-common
