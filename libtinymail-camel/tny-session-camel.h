@@ -34,21 +34,21 @@ G_BEGIN_DECLS
 
 struct _TnySessionCamel
 {
-        CamelSession parent_object;
+	CamelSession parent_object;
 
 	gpointer device;
 	gpointer account_store;
-        gboolean interactive, prev_constat, first_switch;
+	gboolean interactive, prev_constat, first_switch;
 	guint connchanged_signal;
 	GList *current_accounts;
 };
 
 struct _TnySessionCamelClass
 {
-        CamelSessionClass parent_class;
+	CamelSessionClass parent_class;
 
-        void (*set_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
-        void (*set_forget_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc forget_pass_func);
+	void (*set_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
+	void (*set_forget_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc forget_pass_func);
 	void (*set_account_store_func) (TnySessionCamel *self, TnyAccountStore *account_store);
 
 };

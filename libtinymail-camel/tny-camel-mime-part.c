@@ -423,6 +423,8 @@ tny_camel_mime_part_get_part (TnyCamelMimePart *self)
 
 	g_mutex_lock (priv->part_lock);
 	retval = priv->part;
+	if (retval)
+		camel_object_ref (CAMEL_OBJECT (retval));
 	g_mutex_unlock (priv->part_lock);
 
 	return retval;

@@ -4,6 +4,10 @@
 	to the m4 directory to simplify migrating to the toplevel configure.ac
 	once
 
+	* libtinymail-camel: Reference counting of returned Camel types
+
+	* This was a major API change in libtinymail-camel
+
 2006-11-13  Øystein Gisnås <oystein@gisnas.net>
 
 	* debian/: Dependencies

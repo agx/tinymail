@@ -137,6 +137,26 @@ tny_camel_stream_reset (TnyStream *self)
 	return camel_stream_reset (priv->stream);
 }
 
+
+/**
+ * tny_camel_stream_get_stream:
+ * @self: A #TnyCamelStream object
+ *
+ * The returned value must be unreferenced 
+ *
+ * Return: the stream to play proxy for
+ **/
+CamelStream *
+tny_camel_stream_get_stream (TnyCamelStream *self)
+{
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
+
+	if (priv->stream)
+		camel_object_ref (CAMEL_OBJECT (priv->stream));
+
+	return priv->stream;
+}
+
 /**
  * tny_camel_stream_set_stream:
  * @self: A #TnyCamelStream object

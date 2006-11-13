@@ -237,6 +237,7 @@ tny_camel_msg_add_part_default (TnyMsg *self, TnyMimePart *part)
 	CamelMedium *medium;
 	CamelDataWrapper *containee;
 	gint curl = 0, retval = 0;
+	CamelMimePart *cpart;
 
 	/* Yes, indeed (I don't yet support non TnyCamelMimePart mime part 
 	   instances, and I know I should. Feel free to implement the copying
@@ -266,9 +267,9 @@ tny_camel_msg_add_part_default (TnyMsg *self, TnyMimePart *part)
 
 	g_mutex_lock (priv->parts_lock);
 
-	/* TODO: Ref counting questionable ... */
-	camel_multipart_add_part ((CamelMultipart*)containee, 
-		tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part)));
+	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
+	camel_multipart_add_part ((CamelMultipart*)containee, cpart);
+	camel_object_unref (CAMEL_OBJECT (cpart));
 
 	retval = camel_multipart_get_number ((CamelMultipart*)containee);
 	g_mutex_unlock (priv->parts_lock);
@@ -295,7 +296,7 @@ tny_camel_msg_del_part_default (TnyMsg *self, TnyMimePart *part)
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *containee;
-
+	CamelMimePart *cpart;
 
 	/* Yes, indeed (I don't yet support non TnyCamelMimePart mime part 
 	   instances, and I know I should. Feel free to implement the copying
@@ -307,9 +308,9 @@ tny_camel_msg_del_part_default (TnyMsg *self, TnyMimePart *part)
 
 	containee = camel_medium_get_content_object (CAMEL_MEDIUM (ppriv->part));
 
-	/* TODO: refcounting questionable */
-	camel_multipart_remove_part (CAMEL_MULTIPART (containee), 
-		tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part)));
+	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
+	camel_multipart_remove_part (CAMEL_MULTIPART (containee), cpart);
+	camel_object_unref (CAMEL_OBJECT (cpart));
 
 	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (priv->message_lock);

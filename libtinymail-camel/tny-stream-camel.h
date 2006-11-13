@@ -47,11 +47,11 @@ struct _TnyStreamCamelClass
 	CamelStreamClass parent;
 };
 
-CamelType        tny_stream_camel_get_type        (void);
-CamelStream*     tny_stream_camel_new             (TnyStream *stream);
-void             tny_stream_camel_set_stream      (TnyStreamCamel *self, TnyStream *stream);
+CamelType tny_stream_camel_get_type (void);
+CamelStream* tny_stream_camel_new (TnyStream *stream);
+void tny_stream_camel_set_stream (TnyStreamCamel *self, TnyStream *stream);
 
-gssize           tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStream *output);
+gssize tny_stream_camel_write_to_stream (TnyStreamCamel *self, TnyStream *output);
 
 G_END_DECLS
 

@@ -49,8 +49,9 @@ struct _TnyCamelStreamClass
 };
 
 GType tny_camel_stream_get_type (void);
-TnyStream* tny_camel_stream_new            (CamelStream *stream);
+TnyStream* tny_camel_stream_new (CamelStream *stream);
 void tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream);
+CamelStream *tny_camel_stream_get_stream (TnyCamelStream *self);
 
 G_END_DECLS
 

@@ -31,9 +31,7 @@
 #include <string.h>
 
 #include <tny-camel-msg-remove-strategy.h>
-
 #include <tny-camel-folder.h>
-#include "tny-camel-folder-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
@@ -41,15 +39,16 @@ static GObjectClass *parent_class = NULL;
 static void
 tny_camel_msg_remove_strategy_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
 {
-	TnyCamelFolderPriv *priv;
 	const gchar *id;
+	CamelFolder *cfolder;
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 	g_assert (TNY_IS_HEADER (header));
 
-	priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	id = tny_header_get_uid (TNY_HEADER (header));
-	camel_folder_delete_message (priv->folder, id);
+	cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
+	camel_folder_delete_message (cfolder, id);
+	camel_object_unref (CAMEL_OBJECT (cfolder));
 
 	return;
 }

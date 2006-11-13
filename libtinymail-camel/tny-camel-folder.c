@@ -1023,6 +1023,8 @@ tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder)
  * tny_camel_folder_get_folder:
  * @self: A #TnyCamelFolder object
  *
+ * You must unreference the returned value
+ *
  * Return value: The CamelFolder instance to play proxy for
  **/
 CamelFolder*
@@ -1033,6 +1035,8 @@ tny_camel_folder_get_folder (TnyCamelFolder *self)
 
 	g_mutex_lock (priv->folder_lock);
 	retval = priv->folder;
+	if (retval)
+		camel_object_ref (CAMEL_OBJECT (retval));
 	g_mutex_unlock (priv->folder_lock);
 
 	return retval;
