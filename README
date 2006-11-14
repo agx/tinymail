@@ -120,6 +120,8 @@ gconftool-2 -s /apps/tinymail/accounts/0/type -t string store
 gconftool-2 -s /apps/tinymail/accounts/0/user -t string [username]
 gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string [mailserver]
 
+Distribution specific: also check out requirements.txt
+------------------------------------------------------
 
 Ubuntu Breezy & Dapper
 ----------------------
