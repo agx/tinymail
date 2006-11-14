@@ -66,20 +66,6 @@ tny_moz_embed_html_mime_part_view_get_part (TnyMimePartView *self)
 }
 
 
-static gpointer 
-remove_html_stread_hack (gpointer data)
-{
-	/* Sigh, I don't know why I need this :-(. I think GtkMozEmbed postpones
-	   the loading of the document to the very last moment. */
-
-	sleep (5);
-
-	/* This will remove the file in /tmp/ */
-	g_object_unref (G_OBJECT (data));
-
-	return NULL;
-}
-
 static void 
 tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 {
@@ -88,7 +74,7 @@ tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
 			
-    	if (part)
+	if (part)
 	{
 		TnyStream *dest;
 
@@ -96,14 +82,11 @@ tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *
 		tny_stream_reset (dest);
 		tny_mime_part_decode_to_stream (part, dest);
 
-		/* This will do: g_object_unref (G_OBJECT (dest)); */
-		g_thread_create (remove_html_stread_hack, dest, FALSE, NULL);
-			
+		g_object_unref (G_OBJECT (dest));
 		g_object_ref (G_OBJECT (part));
 		priv->part = part;
-		
 	}
-    
+
 	return;
 }
 
@@ -111,8 +94,7 @@ static void
 tny_moz_embed_html_mime_part_view_clear (TnyMimePartView *self)
 {
 	/* Unimplemented. Clear self */
-	
-    	return;
+	return;
 }
 
 /**
@@ -128,9 +110,29 @@ tny_moz_embed_html_mime_part_view_new (void)
 	return TNY_MIME_PART_VIEW (self);
 }
 
+static gint 
+open_uri_cb (GtkMozEmbed *embed, const char *uri, gpointer data)
+{
+	return 1;
+}
+
+static void 
+new_window_cb (GtkMozEmbed *embed, GtkMozEmbed **retval, guint chromemask, gpointer data)
+{
+	*retval = NULL;
+}
+
 static void
 tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
+	TnyMozEmbedHtmlMimePartView *self  = (TnyMozEmbedHtmlMimePartView*) instance;
+
+	g_signal_connect (G_OBJECT (self), "new_window",
+		G_CALLBACK (new_window_cb), self);
+
+	g_signal_connect (G_OBJECT (self), "open_uri",
+		G_CALLBACK (open_uri_cb), self);
+
 	return;
 }
 
@@ -142,7 +144,7 @@ tny_moz_embed_html_mime_part_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
-    
+
 	(*parent_class->finalize) (object);
 
 	return;

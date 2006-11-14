@@ -82,7 +82,7 @@
  *         gtk_widget_show (GTK_WIDGET (retval));
  *     }
  *     if (!retval)
- *         retval = TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_orig_func (self, part);
+ *         retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
  *     return retval;
  * }
  * static void 
@@ -92,7 +92,6 @@
  *      parent_class = g_type_class_peek_parent (class);
  *      object_class = (GObjectClass*) class;
  *      object_class->finalize = tny_moz_embed_msg_view_finalize;
- *      class->create_mime_part_view_for_orig_func = TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func;	
  *      TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for;
  * }
  * </programlisting></informalexample>

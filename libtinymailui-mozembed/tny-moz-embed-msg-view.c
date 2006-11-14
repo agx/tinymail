@@ -54,8 +54,10 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 	return;
 }
 
+static TnyMimePartView *single = NULL;
+
 static TnyMimePartView*
-tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
+tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePart *part)
 {
 	TnyMimePartView *retval = NULL;
 
@@ -63,17 +65,27 @@ tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart 
 
 	if (tny_mime_part_content_type_is (part, "text/html"))
 	{
-		retval = tny_moz_embed_html_mime_part_view_new ();
+		if (!single)
+			single = tny_moz_embed_html_mime_part_view_new ();
+
+		/* We indeed never destroy the singleton single (as it crashes Gecko) */
+
+		retval = (TnyMimePartView*) g_object_ref (G_OBJECT (single));
 		gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), GTK_WIDGET (retval), TRUE, TRUE, 0);
 		gtk_widget_show (GTK_WIDGET (retval));
 	}
 
 	if (!retval)
-		retval = TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_orig_func (self, part);
+		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
 
 	return retval;
 }
 
+static TnyMimePartView*
+tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
+{
+	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
+}
 
 
 static void 
@@ -84,10 +96,11 @@ tny_moz_embed_msg_view_class_init (TnyMozEmbedMsgViewClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
+	class->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for_default;
+
 	object_class->finalize = tny_moz_embed_msg_view_finalize;
 
 	/* Method overloading */
-	class->create_mime_part_view_for_orig_func = TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func;	
 	TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for;
 
 	return;

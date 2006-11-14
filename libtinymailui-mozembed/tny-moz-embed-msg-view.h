@@ -40,13 +40,14 @@ typedef struct _TnyMozEmbedMsgViewClass TnyMozEmbedMsgViewClass;
 struct _TnyMozEmbedMsgView
 {
 	TnyGtkMsgView parent;
-
 };
 
 struct _TnyMozEmbedMsgViewClass
 {
 	TnyGtkMsgViewClass parent_class;
-	TnyMimePartView* (*create_mime_part_view_for_orig_func) (TnyMsgView *self, TnyMimePart *part);	
+
+	/* virtual methods */
+	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
 };
 
 GType tny_moz_embed_msg_view_get_type (void);

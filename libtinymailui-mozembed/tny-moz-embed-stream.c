@@ -36,8 +36,7 @@ typedef struct _TnyMozEmbedStreamPriv TnyMozEmbedStreamPriv;
 struct _TnyMozEmbedStreamPriv
 {
 	GtkMozEmbed *embed;
-	gchar *filename;
-	gboolean htmlext;
+	gboolean stream_open;
 };
 
 #define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o) \
@@ -83,17 +82,8 @@ tny_moz_embed_stream_read  (TnyStream *self, char *data, size_t n)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 	ssize_t retval = -1;
 
-	/* TODO: Will always return the beginning of the file (but atm unused) */
-
-	if (priv->filename)
-	{
-		FILE *file = fopen (priv->filename, "r");
-		if (file)
-		{
-			retval = fread (data, 1, n, file);
-			fclose (file);
-		}
-	}
+	/* TODO (atm this is unused, would only be useful for a writable
+	   HTML component, for example for editing E-mails with it) */
 
 	return retval;
 }
@@ -103,14 +93,11 @@ tny_moz_embed_stream_reset (TnyStream *self)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
-	if (priv->filename)
-	{
-		g_unlink (priv->filename);
-		g_free (priv->filename);
-	}
-
-	priv->htmlext = FALSE;
-	priv->filename = NULL;
+	if (priv->stream_open)
+		gtk_moz_embed_close_stream (priv->embed);
+	gtk_moz_embed_render_data (priv->embed, "", 0, "file:///", "text/html");
+	if (priv->stream_open)
+		gtk_moz_embed_open_stream (priv->embed, "file:///", "text/html");
 
 	return 0;
 }
@@ -119,64 +106,11 @@ static ssize_t
 tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
-	FILE *file = NULL;
 
-	if (!priv->filename || !g_file_test  (priv->filename, G_FILE_TEST_EXISTS))
-	{
-		gint ofile;
-		gchar *tmpl, *filename;
+	if (!priv->stream_open)
+		gtk_moz_embed_open_stream (priv->embed, "file:///", "text/html");
 
-		if (priv->filename)
-			g_free (priv->filename);
-
-		tmpl = g_strdup_printf ("tinymail.tnymozembedstream.%s.XXXXXX", g_get_user_name ());
-
-		ofile = g_file_open_tmp ((const gchar*)tmpl, &filename, NULL);
-
-		priv->filename = filename;
-		priv->htmlext = FALSE;
-
-		g_free (tmpl);
-
-
-		file = fdopen (ofile, "a");
-	}
-
-	if (!file && priv->filename)
-		file = fopen (priv->filename, "a");
-
-	if (file && priv->filename)
-	{
-
-		/* Dear free software world, do you NOW see we are fucking
-			things up?! This is insane! */
-
-		gchar *str;
-
-		fputs (data, file);
-		fclose (file);
-
-		if (!priv->htmlext)
-		{
-			gchar *better = g_strdup_printf ("%s.html", priv->filename);
-
-			if (g_rename (priv->filename, better) != 0)
-				g_warning ("Can't rename %s to %s\n", priv->filename, better);
-
-			g_free (priv->filename);
-			priv->filename = better;
-			priv->htmlext = TRUE;
-		}
-
-		str = g_strdup_printf ("file://%s", priv->filename);
-		
-		gtk_moz_embed_load_url (priv->embed, (const gchar*)str);
-		
-		g_free (str);
-
-	} else {
-		g_warning (_("Can't write %s\n"), priv->filename);
-	}
+	gtk_moz_embed_append_data (priv->embed, data, n);
 
 	return (ssize_t) n;
 }
@@ -190,7 +124,10 @@ tny_moz_embed_stream_flush (TnyStream *self)
 static gint
 tny_moz_embed_stream_close (TnyStream *self)
 {
-	tny_moz_embed_stream_reset (self);
+	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
+
+	gtk_moz_embed_close_stream (priv->embed);
+	priv->stream_open = FALSE;
 
 	return 0;
 }
@@ -200,7 +137,6 @@ tny_moz_embed_stream_is_eos   (TnyStream *self)
 {
 	return TRUE;
 }
-
 
 
 /**
@@ -221,6 +157,7 @@ tny_moz_embed_stream_set_moz_embed (TnyMozEmbedStream *self, GtkMozEmbed *embed)
 	g_object_ref (G_OBJECT (embed));
 
 	priv->embed = embed;
+	priv->stream_open = FALSE;
 
 	return;
 }
@@ -250,7 +187,7 @@ tny_moz_embed_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
 	priv->embed = NULL;
-	priv->filename = NULL;
+	priv->stream_open = FALSE;
 
 	return;
 }
@@ -261,10 +198,12 @@ tny_moz_embed_stream_finalize (GObject *object)
 	TnyMozEmbedStream *self = (TnyMozEmbedStream *)object;	
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
-	tny_moz_embed_stream_reset (TNY_STREAM (self));
-
 	if (priv->embed)
+	{
+		if (priv->stream_open)
+			tny_moz_embed_stream_close (TNY_STREAM (self));
 		g_object_unref (G_OBJECT (priv->embed));
+	}
 
 	(*parent_class->finalize) (object);
 
