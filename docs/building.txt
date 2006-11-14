@@ -58,6 +58,26 @@ Now run /opt/tinymail/bin/tinymail
 Creating the test-account for GPE, Maemo en Desktop builds
 ----------------------------------------------------------
 
+Note that this information is specific for the following platform specific
+implementations:
+
+	o. libtinymail-gnome-desktop
+	o. libtinymail-gpe
+	o. libtinymail-maemo
+
+Note that it's the developer who develops on top of tinymail who decides about
+where to put and how to store configuration. This configuration will work for
+clients that use the standard TnyAccountStore implementations.
+
+For example the libtinymail-olpc implementation uses a .ini file in stead of
+GConf. That's because the OLPC laptop doesn't come with GConf. GConf is not
+a requirement of the tinymail framework. It's an optional method for storing
+configuration data.
+
+The demo user interfaces are all demos. They are not intented to be full
+E-mail clients or PIM suites. It's you, the application developer, who's going
+to make that using tinymail. Right?
+
 gconftool-2 -s /apps/tinymail/accounts/count -t int 1
 gconftool-2 -s /apps/tinymail/accounts/0/name -t string "Test account"
 gconftool-2 -s /apps/tinymail/accounts/0/proto -t string "imap"
@@ -78,3 +98,8 @@ make distcheck
 For packagers
 -------------
 Read packagers.txt
+
+Dependencies
+------------
+Read requirements.txt
+
