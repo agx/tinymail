@@ -46,6 +46,8 @@ Now run /opt/tinymail/bin/tinymail
 A desktop
 ---------
 
+For dependencies per distribution, check out requirements.txt
+
 svn co https://svn.tinymail.org/svn/tinymail
 cd tinymail/trunk
 ./autogen.sh --prefix=/opt/tinymail
