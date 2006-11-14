@@ -31,15 +31,14 @@
 static GObjectClass *parent_class = NULL;
 
 
-typedef struct _TnyMozEmbedStreamPriv TnyMozEmbedStreamPriv;
-
 struct _TnyMozEmbedStreamPriv
 {
 	GtkMozEmbed *embed;
 };
 
-#define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o) \
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MOZ_EMBED_STREAM, TnyMozEmbedStreamPriv))
+#define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o) ((TnyMozEmbedStream*)(o))->priv
+
+/*	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MOZ_EMBED_STREAM, TnyMozEmbedStreamPriv)) */
 
 static gint tny_moz_embed_stream_close (TnyStream *self);
 
@@ -93,8 +92,9 @@ tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
-	gtk_moz_embed_append_data (priv->embed, data, n);
-
+	if (priv->embed)
+		gtk_moz_embed_append_data (priv->embed, data, n);
+	
 	return (ssize_t) n;
 }
 
@@ -109,8 +109,8 @@ tny_moz_embed_stream_close (TnyStream *self)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
-	gtk_moz_embed_close_stream (priv->embed);
-	gtk_moz_embed_reload (priv->embed, GTK_MOZ_EMBED_FLAG_RELOADNORMAL);
+	if (priv->embed)
+		gtk_moz_embed_close_stream (priv->embed);
 
 	return 0;
 }
@@ -167,10 +167,10 @@ static void
 tny_moz_embed_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMozEmbedStream *self = (TnyMozEmbedStream *)instance;
-	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
+	TnyMozEmbedStreamPriv *priv = g_slice_new (TnyMozEmbedStreamPriv);
 
 	priv->embed = NULL;
-
+	self->priv = priv;
 
 	return;
 }
@@ -181,12 +181,13 @@ tny_moz_embed_stream_finalize (GObject *object)
 	TnyMozEmbedStream *self = (TnyMozEmbedStream *)object;	
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
+	tny_moz_embed_stream_close (TNY_STREAM (self));
+	
 	if (priv->embed)
-	{
-		tny_moz_embed_stream_close (TNY_STREAM (self));
 		g_object_unref (G_OBJECT (priv->embed));
-	}
 
+	g_slice_free (TnyMozEmbedStreamPriv, priv);
+	
 	(*parent_class->finalize) (object);
 
 	return;
@@ -218,7 +219,7 @@ tny_moz_embed_stream_class_init (TnyMozEmbedStreamClass *class)
 
 	object_class->finalize = tny_moz_embed_stream_finalize;
 
-	g_type_class_add_private (object_class, sizeof (TnyMozEmbedStreamPriv));
+	/* g_type_class_add_private (object_class, sizeof (TnyMozEmbedStreamPriv)); */
 
 	return;
 }

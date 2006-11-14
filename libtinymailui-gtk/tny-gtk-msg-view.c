@@ -85,11 +85,8 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 	g_assert (TNY_IS_MIME_PART (part));
 
 	if (tny_mime_part_content_type_is (part, "text/*"))
-	{
 		retval = tny_gtk_text_mime_part_view_new ();
-		gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), GTK_WIDGET (retval), TRUE, TRUE, 0);
-		gtk_widget_show (GTK_WIDGET (retval));
-	} else if (tny_mime_part_get_content_type (part) &&
+	else if (tny_mime_part_get_content_type (part) &&
 			tny_mime_part_is_attachment (part))
 	{
 		static gboolean first = TRUE;
@@ -136,8 +133,18 @@ reload_msg (TnyMsgView *self)
 		TnyMimePartView *mpview;
 
 		mpview = tny_msg_view_create_mime_part_view_for (self, part);
-		if (mpview)
+		if (mpview) 
+		{
+			if (GTK_IS_WIDGET (mpview))
+			{
+				gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), 
+									GTK_WIDGET (mpview), TRUE, TRUE, 0);
+				gtk_widget_show (GTK_WIDGET (mpview));
+			} else if (!TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
+				g_critical ("This TnyMimePartView isn't a GtkWidget");
+			
 			tny_mime_part_view_set_part (mpview, part);
+		}
 		g_object_unref (G_OBJECT(part));
 		tny_iterator_next (iterator);
 	}

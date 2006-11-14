@@ -50,12 +50,12 @@ typedef struct _TnyMozEmbedHtmlMimePartViewPriv TnyMozEmbedHtmlMimePartViewPriv;
 
 struct _TnyMozEmbedHtmlMimePartViewPriv
 {
+	GtkMozEmbed *embed;
 	TnyMimePart *part;
 };
 
 #define TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MOZ_EMBED_HTML_MIME_PART_VIEW, TnyMozEmbedHtmlMimePartViewPriv))
-
 
 
 static TnyMimePart*
@@ -78,7 +78,7 @@ tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *
 	{
 		TnyStream *dest;
 
-		dest = tny_moz_embed_stream_new (GTK_MOZ_EMBED (self));
+		dest = tny_moz_embed_stream_new (priv->embed);
 		tny_stream_reset (dest);
 		tny_mime_part_decode_to_stream (part, dest);
 
@@ -93,7 +93,10 @@ tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *
 static void
 tny_moz_embed_html_mime_part_view_clear (TnyMimePartView *self)
 {
-	/* Unimplemented. Clear self */
+	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	gtk_moz_embed_render_data (priv->embed, "",  0, "file:///", "text/html");
+	
 	return;
 }
 
@@ -122,17 +125,27 @@ new_window_cb (GtkMozEmbed *embed, GtkMozEmbed **retval, guint chromemask, gpoin
 	*retval = NULL;
 }
 
+
 static void
 tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMozEmbedHtmlMimePartView *self  = (TnyMozEmbedHtmlMimePartView*) instance;
+	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
+	
+	gtk_moz_embed_push_startup ();
+	
+	priv->embed = (GtkMozEmbed *) gtk_moz_embed_new ();
+	gtk_moz_embed_set_chrome_mask (priv->embed, GTK_MOZ_EMBED_FLAG_DEFAULTCHROME);
+	
+	gtk_box_pack_start (GTK_BOX (self), GTK_WIDGET (priv->embed), TRUE, TRUE, 0);
+	gtk_widget_show (GTK_WIDGET (priv->embed));
 
-	g_signal_connect (G_OBJECT (self), "new_window",
+	g_signal_connect (G_OBJECT (priv->embed), "new_window",
 		G_CALLBACK (new_window_cb), self);
 
-	g_signal_connect (G_OBJECT (self), "open_uri",
+	g_signal_connect (G_OBJECT (priv->embed), "open_uri",
 		G_CALLBACK (open_uri_cb), self);
-
+	
 	return;
 }
 
@@ -205,13 +218,12 @@ tny_moz_embed_html_mime_part_view_get_type (void)
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (GTK_TYPE_MOZ_EMBED,
+		type = g_type_register_static (GTK_TYPE_VBOX,
 			"TnyMozEmbedHtmlMimePartView",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 
 			&tny_mime_part_view_info);
-
 	}
 
 	return type;

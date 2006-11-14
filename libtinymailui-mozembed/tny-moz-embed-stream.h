@@ -39,10 +39,12 @@ G_BEGIN_DECLS
 
 typedef struct _TnyMozEmbedStream TnyMozEmbedStream;
 typedef struct _TnyMozEmbedStreamClass TnyMozEmbedStreamClass;
+typedef struct _TnyMozEmbedStreamPriv TnyMozEmbedStreamPriv;
 
 struct _TnyMozEmbedStream
 {
 	GObject parent;
+	TnyMozEmbedStreamPriv *priv;
 };
 
 struct _TnyMozEmbedStreamClass 
