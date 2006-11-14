@@ -36,7 +36,6 @@ typedef struct _TnyMozEmbedStreamPriv TnyMozEmbedStreamPriv;
 struct _TnyMozEmbedStreamPriv
 {
 	GtkMozEmbed *embed;
-	gboolean stream_open;
 };
 
 #define TNY_MOZ_EMBED_STREAM_GET_PRIVATE(o) \
@@ -79,26 +78,13 @@ tny_moz_embed_write_to_stream (TnyStream *self, TnyStream *output)
 static ssize_t
 tny_moz_embed_stream_read  (TnyStream *self, char *data, size_t n)
 {
-	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 	ssize_t retval = -1;
-
-	/* TODO (atm this is unused, would only be useful for a writable
-	   HTML component, for example for editing E-mails with it) */
-
 	return retval;
 }
 
 static gint
 tny_moz_embed_stream_reset (TnyStream *self)
 {
-	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
-
-	if (priv->stream_open)
-		gtk_moz_embed_close_stream (priv->embed);
-	gtk_moz_embed_render_data (priv->embed, "", 0, "file:///", "text/html");
-	if (priv->stream_open)
-		gtk_moz_embed_open_stream (priv->embed, "file:///", "text/html");
-
 	return 0;
 }
 
@@ -106,9 +92,6 @@ static ssize_t
 tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
-
-	if (!priv->stream_open)
-		gtk_moz_embed_open_stream (priv->embed, "file:///", "text/html");
 
 	gtk_moz_embed_append_data (priv->embed, data, n);
 
@@ -127,7 +110,7 @@ tny_moz_embed_stream_close (TnyStream *self)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
 	gtk_moz_embed_close_stream (priv->embed);
-	priv->stream_open = FALSE;
+	gtk_moz_embed_reload (priv->embed, GTK_MOZ_EMBED_FLAG_RELOADNORMAL);
 
 	return 0;
 }
@@ -157,7 +140,7 @@ tny_moz_embed_stream_set_moz_embed (TnyMozEmbedStream *self, GtkMozEmbed *embed)
 	g_object_ref (G_OBJECT (embed));
 
 	priv->embed = embed;
-	priv->stream_open = FALSE;
+	gtk_moz_embed_open_stream (priv->embed, "file:///", "text/html");
 
 	return;
 }
@@ -187,7 +170,7 @@ tny_moz_embed_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
 	priv->embed = NULL;
-	priv->stream_open = FALSE;
+
 
 	return;
 }
@@ -200,8 +183,7 @@ tny_moz_embed_stream_finalize (GObject *object)
 
 	if (priv->embed)
 	{
-		if (priv->stream_open)
-			tny_moz_embed_stream_close (TNY_STREAM (self));
+		tny_moz_embed_stream_close (TNY_STREAM (self));
 		g_object_unref (G_OBJECT (priv->embed));
 	}
 
