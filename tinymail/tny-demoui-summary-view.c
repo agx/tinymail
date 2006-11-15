@@ -587,10 +587,10 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	GtkWidget *hpaned1;
 	GtkWidget *vpaned1;
 	GtkBox *vpbox;
-    
+
 	/* TODO: Persist application UI status (of the panes) */
 
-    	priv->last_mailbox_correct_select_set = FALSE;
+	priv->last_mailbox_correct_select_set = FALSE;
 	priv->online_button = gtk_toggle_button_new ();
 	priv->current_accounts = NULL;
 
@@ -612,7 +612,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 #if PLATFORM==4
 	platfact = tny_olpc_platform_factory_get_instance ();
 #endif
-    
+
 
 	hpaned1 = gtk_hpaned_new ();
 	gtk_widget_show (hpaned1);
@@ -639,18 +639,18 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
 	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
 
-    	priv->account_view = GTK_COMBO_BOX (gtk_combo_box_new ());
-    	renderer = gtk_cell_renderer_text_new();
-    	gtk_cell_layout_pack_start((GtkCellLayout *)priv->account_view, renderer, TRUE);
+	priv->account_view = GTK_COMBO_BOX (gtk_combo_box_new ());
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start((GtkCellLayout *)priv->account_view, renderer, TRUE);
 	gtk_cell_layout_set_attributes((GtkCellLayout *)priv->account_view, renderer, "text", 0, NULL);
-    
+
 	mailbox_sw = gtk_scrolled_window_new (NULL, NULL);
 	vpbox = GTK_BOX (gtk_vbox_new (FALSE, 0));
-    	gtk_box_pack_start (GTK_BOX (vpbox), GTK_WIDGET (priv->account_view), FALSE, FALSE, 0);    
-    	gtk_box_pack_start (GTK_BOX (vpbox), mailbox_sw, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (vpbox), GTK_WIDGET (priv->account_view), FALSE, FALSE, 0);    
+	gtk_box_pack_start (GTK_BOX (vpbox), mailbox_sw, TRUE, TRUE, 0);
 	gtk_widget_show (GTK_WIDGET (vpbox));    
 	gtk_widget_show (GTK_WIDGET (priv->account_view));
-    
+
 	gtk_paned_pack1 (GTK_PANED (hpaned1), GTK_WIDGET (vpbox), TRUE, TRUE);
 	gtk_paned_pack2 (GTK_PANED (hpaned1), vpaned1, TRUE, TRUE);
 	gtk_widget_show (GTK_WIDGET (mailbox_sw));

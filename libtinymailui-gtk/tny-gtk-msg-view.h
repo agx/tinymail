@@ -44,7 +44,7 @@ typedef struct _TnyGtkMsgViewClass TnyGtkMsgViewClass;
 struct _TnyGtkMsgView
 {
 	GtkScrolledWindow parent;
-	GtkBox *viewers;
+	GtkContainer *viewers;
 };
 
 struct _TnyGtkMsgViewClass

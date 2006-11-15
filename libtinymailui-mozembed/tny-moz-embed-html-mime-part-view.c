@@ -114,14 +114,12 @@ tny_moz_embed_html_mime_part_view_new (void)
 static gint 
 open_uri_cb (GtkMozEmbed *embed, const char *uri, gpointer data)
 {
-	printf ("Blocking %s\n", uri);
 	return 1;
 }
 
 static void 
 new_window_cb (GtkMozEmbed *embed, GtkMozEmbed **retval, guint chromemask, gpointer data)
 {
-	printf ("Blocking new window\n");
 	*retval = NULL;
 }
 
@@ -135,7 +133,7 @@ tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 	gtk_moz_embed_push_startup ();
 
 	gtk_moz_embed_set_chrome_mask (GTK_MOZ_EMBED (self), 
-			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME);
+			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME|GTK_MOZ_EMBED_FLAG_SCROLLBARSON);
 
 	g_signal_connect (G_OBJECT (self), "new_window",
 		G_CALLBACK (new_window_cb), self);

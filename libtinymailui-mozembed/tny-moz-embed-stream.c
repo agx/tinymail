@@ -110,7 +110,10 @@ tny_moz_embed_stream_close (TnyStream *self)
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
 	if (priv->embed)
+	{
 		gtk_moz_embed_close_stream (priv->embed);
+		gtk_moz_embed_reload (priv->embed, GTK_MOZ_EMBED_FLAG_RELOADNORMAL);
+	}
 
 	return 0;
 }

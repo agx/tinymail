@@ -158,7 +158,8 @@ reload_msg (TnyMsgView *self)
 			if (GTK_IS_WIDGET (mpview))
 			{
 				gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), 
-									GTK_WIDGET (mpview), TRUE, TRUE, 0);
+						GTK_WIDGET (mpview), TRUE, TRUE, 0);
+
 				gtk_widget_show (GTK_WIDGET (mpview));
 
 				if (!GTK_WIDGET_REALIZED (mpview))
@@ -328,7 +329,7 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->headerview = tny_gtk_header_view_new ();
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
 
-	TNY_GTK_MSG_VIEW (self)->viewers = GTK_BOX (gtk_vbox_new (FALSE, 1));
+	TNY_GTK_MSG_VIEW (self)->viewers = GTK_CONTAINER (gtk_vbox_new (FALSE, 0));
 	gtk_box_pack_start (GTK_BOX (vbox), 
 		GTK_WIDGET (TNY_GTK_MSG_VIEW (self)->viewers), FALSE, FALSE, 0);
 	gtk_widget_show (GTK_WIDGET (TNY_GTK_MSG_VIEW (self)->viewers));
