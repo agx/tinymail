@@ -42,12 +42,12 @@ typedef struct _TnyMozEmbedHtmlMimePartViewClass TnyMozEmbedHtmlMimePartViewClas
 
 struct _TnyMozEmbedHtmlMimePartView
 {
-	GtkVBox parent;
+	GtkMozEmbed parent;
 };
 
 struct _TnyMozEmbedHtmlMimePartViewClass
 {
-	GtkVBoxClass parent_class;
+	GtkMozEmbedClass parent_class;
 };
 
 GType tny_moz_embed_html_mime_part_view_get_type (void);

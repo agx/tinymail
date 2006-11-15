@@ -94,7 +94,7 @@ tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 
 	if (priv->embed)
 		gtk_moz_embed_append_data (priv->embed, data, n);
-	
+
 	return (ssize_t) n;
 }
 

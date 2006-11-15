@@ -50,7 +50,6 @@ typedef struct _TnyMozEmbedHtmlMimePartViewPriv TnyMozEmbedHtmlMimePartViewPriv;
 
 struct _TnyMozEmbedHtmlMimePartViewPriv
 {
-	GtkMozEmbed *embed;
 	TnyMimePart *part;
 };
 
@@ -73,16 +72,16 @@ tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
-			
+
 	if (part)
 	{
 		TnyStream *dest;
 
-		dest = tny_moz_embed_stream_new (priv->embed);
+		dest = tny_moz_embed_stream_new (GTK_MOZ_EMBED (self));
 		tny_stream_reset (dest);
 		tny_mime_part_decode_to_stream (part, dest);
-
 		g_object_unref (G_OBJECT (dest));
+
 		g_object_ref (G_OBJECT (part));
 		priv->part = part;
 	}
@@ -93,10 +92,9 @@ tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *
 static void
 tny_moz_embed_html_mime_part_view_clear (TnyMimePartView *self)
 {
-	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
 
-	gtk_moz_embed_render_data (priv->embed, "",  0, "file:///", "text/html");
-	
+	gtk_moz_embed_render_data (GTK_MOZ_EMBED (self), "",  0, "file:///", "text/html");
+
 	return;
 }
 
@@ -116,12 +114,14 @@ tny_moz_embed_html_mime_part_view_new (void)
 static gint 
 open_uri_cb (GtkMozEmbed *embed, const char *uri, gpointer data)
 {
+	printf ("Blocking %s\n", uri);
 	return 1;
 }
 
 static void 
 new_window_cb (GtkMozEmbed *embed, GtkMozEmbed **retval, guint chromemask, gpointer data)
 {
+	printf ("Blocking new window\n");
 	*retval = NULL;
 }
 
@@ -131,21 +131,18 @@ tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 {
 	TnyMozEmbedHtmlMimePartView *self  = (TnyMozEmbedHtmlMimePartView*) instance;
 	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
-	
-	gtk_moz_embed_push_startup ();
-	
-	priv->embed = (GtkMozEmbed *) gtk_moz_embed_new ();
-	gtk_moz_embed_set_chrome_mask (priv->embed, GTK_MOZ_EMBED_FLAG_DEFAULTCHROME);
-	
-	gtk_box_pack_start (GTK_BOX (self), GTK_WIDGET (priv->embed), TRUE, TRUE, 0);
-	gtk_widget_show (GTK_WIDGET (priv->embed));
 
-	g_signal_connect (G_OBJECT (priv->embed), "new_window",
+	gtk_moz_embed_push_startup ();
+
+	gtk_moz_embed_set_chrome_mask (GTK_MOZ_EMBED (self), 
+			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME);
+
+	g_signal_connect (G_OBJECT (self), "new_window",
 		G_CALLBACK (new_window_cb), self);
 
-	g_signal_connect (G_OBJECT (priv->embed), "open_uri",
+	g_signal_connect (G_OBJECT (self), "open_uri",
 		G_CALLBACK (open_uri_cb), self);
-	
+
 	return;
 }
 
@@ -218,7 +215,7 @@ tny_moz_embed_html_mime_part_view_get_type (void)
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (GTK_TYPE_VBOX,
+		type = g_type_register_static (GTK_TYPE_MOZ_EMBED,
 			"TnyMozEmbedHtmlMimePartView",
 			&info, 0);
 
