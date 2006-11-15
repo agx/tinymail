@@ -97,6 +97,7 @@ replace_things (const char *data, const char *tag, size_t on, size_t *nn, gboole
 		*with = g_strdup_printf ("<!-- %s", tag);
 	char *retval;
 	unsigned int oi=0,og=0,occ=0,news;
+	unsigned int withl = strlen (with), ttagl = strlen (ttag);
 
 	p = (char*) data;
 	while (p)
@@ -116,7 +117,7 @@ replace_things (const char *data, const char *tag, size_t on, size_t *nn, gboole
 
 	*is_copy = TRUE;
 
-	news = (sizeof (char)) * (on + (occ* ((8-4) + (4-1))));
+	news = (sizeof (char)) * (on + (occ* ((withl-ttagl) + (4-1))));
 	retval = g_malloc0 (news);
 	*nn = news;
 
@@ -125,13 +126,13 @@ replace_things (const char *data, const char *tag, size_t on, size_t *nn, gboole
 		char *p = (char *) &data[oi];
 		char *o = &retval[og];
 
-		if (strncasecmp (p, (const char *) ttag, 4) == 0)
+		if (strncasecmp (p, (const char *) ttag, ttagl) == 0)
 		{
 			char *np, *e;
 
-			memcpy (o, (const char *) with, 8);
-			oi += 4;
-			og += 8;
+			memcpy (o, (const char *) with, withl);
+			oi += ttagl;
+			og += withl;
 			e = (char *) &data[oi];
 			np = strchr (e, '>');
 			if (np)
