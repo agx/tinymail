@@ -178,7 +178,7 @@ reload_msg (TnyMsgView *self)
 				g_object_unref (G_OBJECT(part));
 			}
 		}
-		
+
 		tny_iterator_next (iterator);
 	}
 
