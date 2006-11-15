@@ -166,17 +166,17 @@ tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 
 	if (priv->embed)
 	{
-		size_t nn = 0;
+		size_t tn = 0, nn = 0;
 		gboolean bis_copy = FALSE, ais_copy = FALSE;
 		gchar *nndata, *ndata;
 
 		ndata = replace_things (data, "img", n, &nn, &ais_copy);
-		nndata = replace_things (ndata, "script", nn, &nn, &bis_copy);
+		nndata = replace_things (ndata, "script", nn, &tn, &bis_copy);
 
 		if (ais_copy)
 			g_free (ndata);
 
-		gtk_moz_embed_append_data (priv->embed, (const char*) nndata, nn);
+		gtk_moz_embed_append_data (priv->embed, (const char*) nndata, tn);
 
 		if (bis_copy)
 			g_free (nndata);
