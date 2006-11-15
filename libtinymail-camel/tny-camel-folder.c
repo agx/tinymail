@@ -1033,11 +1033,11 @@ tny_camel_folder_get_folder (TnyCamelFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelFolder *retval = NULL;
 
-	g_mutex_lock (priv->folder_lock);
+	/* g_mutex_lock (priv->folder_lock); */
 	retval = priv->folder;
 	if (retval)
 		camel_object_ref (CAMEL_OBJECT (retval));
-	g_mutex_unlock (priv->folder_lock);
+	/* g_mutex_unlock (priv->folder_lock); */
 
 	return retval;
 }
