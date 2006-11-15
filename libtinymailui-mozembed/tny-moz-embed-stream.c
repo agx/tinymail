@@ -88,7 +88,7 @@ tny_moz_embed_stream_reset (TnyStream *self)
 	return 0;
 }
 
-/* Ad-Hoc IMG tag commenter */
+/* Ad-Hoc tag commenter */
 
 static gchar*
 replace_things (const char *data, const char *tag, size_t on, size_t *nn, gboolean *is_copy)
@@ -169,7 +169,7 @@ tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 		size_t nn = 0;
 		gboolean bis_copy = FALSE, ais_copy = FALSE;
 		gchar *nndata, *ndata;
-		
+
 		ndata = replace_things (data, "img", n, &nn, &ais_copy);
 		nndata = replace_things (ndata, "script", nn, &nn, &bis_copy);
 
