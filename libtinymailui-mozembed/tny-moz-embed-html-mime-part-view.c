@@ -123,6 +123,7 @@ new_window_cb (GtkMozEmbed *embed, GtkMozEmbed **retval, guint chromemask, gpoin
 	*retval = NULL;
 }
 
+static guint amount_of_instances = 0;
 
 static void
 tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -132,6 +133,8 @@ tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 
 	gtk_moz_embed_push_startup ();
 
+	amount_of_instances++;
+	
 	gtk_moz_embed_set_chrome_mask (GTK_MOZ_EMBED (self), 
 			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME|GTK_MOZ_EMBED_FLAG_SCROLLBARSON);
 
@@ -152,6 +155,12 @@ tny_moz_embed_html_mime_part_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
+
+	if (amount_of_instances > 0)
+		amount_of_instances--;
+	
+	/* if (amount_of_instances == 0)
+		gtk_moz_embed_pop_startup (); */
 
 	(*parent_class->finalize) (object);
 
