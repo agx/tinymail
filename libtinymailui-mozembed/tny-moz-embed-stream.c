@@ -91,19 +91,29 @@ tny_moz_embed_stream_reset (TnyStream *self)
 /* Ad-Hoc IMG tag commenter */
 
 static gchar*
-replace_things (const char *data, size_t on, size_t *nn)
+replace_things (const char *data, const char *tag, size_t on, size_t *nn, gboolean *is_copy)
 {
-	char *p, *r;
+	char *p, *r, *ttag = g_strdup_printf ("<%s", tag), 
+		*with = g_strdup_printf ("<!-- %s", tag);
 	char *retval;
 	unsigned int oi=0,og=0,occ=0,news;
 
 	p = (char*) data;
 	while (p)
 	{
-		p = (char*) strcasestr (p, "<img");
+		p = (char*) strcasestr (p, (const char*) ttag);
 		if (p) { occ++; p++; }
 			else break;
 	}
+
+	if (occ == 0)
+	{
+		*nn = on;
+		*is_copy = FALSE;
+		return (gchar *) data;
+	}
+
+	*is_copy = TRUE;
 
 	news = (sizeof (char)) * (on + (occ* ((8-4) + (4-1))));
 	retval = g_malloc0 (news);
@@ -114,11 +124,11 @@ replace_things (const char *data, size_t on, size_t *nn)
 		char *p = (char *) &data[oi];
 		char *o = &retval[og];
 
-		if (strncasecmp (p, "<img", 4) == 0)
+		if (strncasecmp (p, (const char *) ttag, 4) == 0)
 		{
 			char *np, *e;
 
-			memcpy (o, "<!-- img", 8);
+			memcpy (o, (const char *) with, 8);
 			oi += 4;
 			og += 8;
 			e = (char *) &data[oi];
@@ -142,6 +152,8 @@ replace_things (const char *data, size_t on, size_t *nn)
 
 	}
 
+	g_free (ttag); g_free (with);
+
 	return retval;
 }
 
@@ -153,9 +165,19 @@ tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 	if (priv->embed)
 	{
 		size_t nn = 0;
-		gchar *ndata = replace_things (data, n, &nn);
-		gtk_moz_embed_append_data (priv->embed, (const char*) ndata, nn);
-		g_free (ndata);
+		gboolean bis_copy = FALSE, ais_copy = FALSE;
+		gchar *nndata, *ndata;
+		
+		ndata = replace_things (data, "img", n, &nn, &ais_copy);
+		nndata = replace_things (ndata, "script", nn, &nn, &bis_copy);
+
+		if (ais_copy)
+			g_free (ndata);
+
+		gtk_moz_embed_append_data (priv->embed, (const char*) nndata, nn);
+
+		if (bis_copy)
+			g_free (nndata);
 	}
 	return (ssize_t) n;
 }
