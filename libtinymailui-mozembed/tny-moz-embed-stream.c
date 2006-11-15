@@ -19,6 +19,7 @@
 
 #include <config.h>
 #include <glib/gi18n-lib.h>
+#include <string.h>
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -87,14 +88,75 @@ tny_moz_embed_stream_reset (TnyStream *self)
 	return 0;
 }
 
+/* Ad-Hoc IMG tag commenter */
+
+static gchar*
+replace_things (const char *data, size_t on, size_t *nn)
+{
+	char *p, *r;
+	char *retval;
+	unsigned int oi=0,og=0,occ=0,news;
+
+	p = (char*) data;
+	while (p)
+	{
+		p = (char*) strcasestr (p, "<img");
+		if (p) { occ++; p++; }
+			else break;
+	}
+
+	news = (sizeof (char)) * (on + (occ* ((8-4) + (4-1))));
+	retval = g_malloc0 (news);
+	*nn = news;
+
+	while (oi < on)
+	{
+		char *p = (char *) &data[oi];
+		char *o = &retval[og];
+
+		if (strncasecmp (p, "<img", 4) == 0)
+		{
+			char *np, *e;
+
+			memcpy (o, "<!-- img", 8);
+			oi += 4;
+			og += 8;
+			e = (char *) &data[oi];
+			np = strchr (e, '>');
+			if (np)
+			{
+				while (e < np)
+				{
+					retval[og] = data[oi];
+					oi++; og++; e++;
+				}
+				o = &retval[og];
+				memcpy (o, " -->", 4);
+				og += 4;
+				oi++;
+			}
+		} else {
+			retval[og] = data[oi];
+			og++; oi++;
+		}
+
+	}
+
+	return retval;
+}
+
 static ssize_t
 tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 {
 	TnyMozEmbedStreamPriv *priv = TNY_MOZ_EMBED_STREAM_GET_PRIVATE (self);
 
 	if (priv->embed)
-		gtk_moz_embed_append_data (priv->embed, data, n);
-
+	{
+		size_t nn = 0;
+		gchar *ndata = replace_things (data, n, &nn);
+		gtk_moz_embed_append_data (priv->embed, (const char*) ndata, nn);
+		g_free (ndata);
+	}
 	return (ssize_t) n;
 }
 
