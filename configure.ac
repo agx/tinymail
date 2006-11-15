@@ -54,7 +54,7 @@ dnl ### default values (will get overwritten)
 build_gnome=true
 build_uigtk=true
 build_demoui=true
-build_mozembed=false
+build_mozembed=true
 build_gtkhtml=false
 build_doxygen=false
 build_tests=false
@@ -113,7 +113,7 @@ AC_SUBST(PLATFORM)
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,
 AC_HELP_STRING([--with-html-component],
-  [Set which html component to use (none, mozembed, gtkhtml)]),
+  [Set which html component to use (mozembed, gtkhtml, none)]),
 [case "$with_html_component" in
   mozembed) 
 	build_mozembed=true
@@ -131,9 +131,9 @@ AC_HELP_STRING([--with-html-component],
 	build_gtkhtml=false
   ;;
   *) AC_MSG_ERROR(bad value ${with_html_component} for --with-html-component) ;;
-esac], [build_mozembed=false 
+esac], [build_mozembed=true 
 	build_gtkhtml=false
-	with_html_component=none])
+	with_html_component=mozembed])
 
 AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
 AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
