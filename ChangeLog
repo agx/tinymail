@@ -1,3 +1,7 @@
+2006-11-15  Philip van Hoof <pvanhoof@gnome.org>
+
+	* libtinymailui-mozembed: fixes for the Gecko support
+
 2006-11-14  Philip van Hoof <pvanhoof@gnome.org>
 
 	* libtinymailui-mozembed: fixes for the Gecko support
