@@ -139,7 +139,7 @@ tny_folder_store_query_item_get_type (void)
 			(GClassInitFunc) tny_folder_store_query_item_class_init,
 			NULL,		/* class_finalize */
 			NULL,		/* class_data */
-			sizeof (TnyFolderStoreQuery),
+			sizeof (TnyFolderStoreQueryItem),
 			0,              /* n_preallocs */
 			(GInstanceInitFunc) tny_folder_store_query_item_init,
 			NULL
