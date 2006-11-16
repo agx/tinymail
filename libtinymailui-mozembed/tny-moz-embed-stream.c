@@ -1,4 +1,4 @@
-/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
+/* libtinymailui-mozembed - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -88,6 +88,8 @@ tny_moz_embed_stream_reset (TnyStream *self)
 	return 0;
 }
 
+#ifdef NO_MOZ_PREFS
+
 /* Ad-Hoc tag commenter */
 
 static gchar*
@@ -159,6 +161,8 @@ replace_things (const char *data, const char *tag, size_t on, size_t *nn, gboole
 	return retval;
 }
 
+#endif
+
 static ssize_t
 tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 {
@@ -166,6 +170,7 @@ tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 
 	if (priv->embed)
 	{
+#ifdef NO_MOZ_PREFS
 		size_t tn = 0, nn = 0;
 		gboolean bis_copy = FALSE, ais_copy = FALSE;
 		gchar *nndata, *ndata;
@@ -180,6 +185,10 @@ tny_moz_embed_stream_write (TnyStream *self, const char *data, size_t n)
 
 		if (bis_copy)
 			g_free (nndata);
+#else
+		gtk_moz_embed_append_data (priv->embed, data, n);
+
+#endif
 	}
 	return (ssize_t) n;
 }

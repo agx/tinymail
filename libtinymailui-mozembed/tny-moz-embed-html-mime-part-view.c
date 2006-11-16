@@ -1,4 +1,4 @@
-/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
+/* libtinymailui-mozembed - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -19,8 +19,9 @@
 
  
 #include <config.h>
-
 #include <glib/gi18n-lib.h>
+
+#include "mozilla-preferences.h"
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -42,7 +43,6 @@
 #else
 #include <tny-fs-stream.h>
 #endif
-
 
 static GObjectClass *parent_class = NULL;
 
@@ -123,17 +123,11 @@ new_window_cb (GtkMozEmbed *embed, GtkMozEmbed **retval, guint chromemask, gpoin
 	*retval = NULL;
 }
 
-static guint amount_of_instances = 0;
-
 static void
 tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMozEmbedHtmlMimePartView *self  = (TnyMozEmbedHtmlMimePartView*) instance;
 	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
-
-	gtk_moz_embed_push_startup ();
-
-	amount_of_instances++;
 	
 	gtk_moz_embed_set_chrome_mask (GTK_MOZ_EMBED (self), 
 			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME|GTK_MOZ_EMBED_FLAG_SCROLLBARSON);
@@ -155,12 +149,6 @@ tny_moz_embed_html_mime_part_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
-
-	if (amount_of_instances > 0)
-		amount_of_instances--;
-	
-	/* if (amount_of_instances == 0)
-		gtk_moz_embed_pop_startup (); */
 
 	(*parent_class->finalize) (object);
 
@@ -190,6 +178,15 @@ tny_moz_embed_html_mime_part_view_class_init (TnyMozEmbedHtmlMimePartViewClass *
 	object_class->finalize = tny_moz_embed_html_mime_part_view_finalize;
 
 	g_type_class_add_private (object_class, sizeof (TnyMozEmbedHtmlMimePartViewPriv));
+
+	gtk_moz_embed_push_startup ();
+
+	mozilla_preference_set_int ("permissions.default.image", 2);
+	mozilla_preference_set_int ("permissions.default.script", 2);
+	mozilla_preference_set_boolean ("security.checkloaduri", FALSE);
+	mozilla_preference_set ("general.useragent.misc", "Tinymail/" VERSION);
+	mozilla_preference_set ("network.proxy.no_proxies_on", "localhost");
+
 
 	return;
 }

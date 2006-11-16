@@ -1,4 +1,4 @@
-/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
+/* libtinymailui-mozembed - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-
 /**
  * tny_moz_embed_msg_view_new:
  *
@@ -36,7 +35,7 @@ TnyMsgView*
 tny_moz_embed_msg_view_new (void)
 {
 	TnyMozEmbedMsgView *self = g_object_new (TNY_TYPE_MOZ_EMBED_MSG_VIEW, NULL);
-
+	
 	return TNY_MSG_VIEW (self);
 }
 

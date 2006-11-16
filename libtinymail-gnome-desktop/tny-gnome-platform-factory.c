@@ -59,7 +59,7 @@ static TnyMsgView*
 tny_gnome_platform_factory_new_msg_view (TnyPlatformFactory *self)
 {
 	TnyMsgView *retval;
-    
+		
 #ifdef MOZEMBED
 	retval = tny_moz_embed_msg_view_new ();
 #else
