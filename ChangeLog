@@ -2,7 +2,7 @@
 
 	* libtinymail/tny-folder-store-query.c
 	(tny_folder_store_query_item_get_type): replaced TnyFolderStoreQuery
-	by TnyFolderStoreQueryItem in the instance size field
+	by TnyFolderStoreQueryItem in the instance size field 
 
 2006-11-15  Philip van Hoof <pvanhoof@gnome.org>
 
