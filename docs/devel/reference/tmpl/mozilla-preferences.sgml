@@ -1,0 +1,51 @@
+<!-- ##### SECTION Title ##### -->
+mozilla-preferences
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION mozilla_preference_set ##### -->
+<para>
+
+</para>
+
+@preference_name: 
+@new_value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION mozilla_preference_set_boolean ##### -->
+<para>
+
+</para>
+
+@preference_name: 
+@new_boolean_value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION mozilla_preference_set_int ##### -->
+<para>
+
+</para>
+
+@preference_name: 
+@new_int_value: 
+@Returns: 
+
+

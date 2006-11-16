@@ -22,6 +22,7 @@
 <!ENTITY libtinymail-TnyMsgRemoveStrategy SYSTEM "xml/tny-msg-remove-strategy.xml">
 <!ENTITY libtinymail-TnySendQueue SYSTEM "xml/tny-send-queue.xml">
 
+<!ENTITY libtinymail-camel-TnyCamelSendQueue SYSTEM "xml/tny-camel-send-queue.xml">
 <!ENTITY libtinymail-camel-TnyCamelMsgRemoveStrategy SYSTEM "xml/tny-camel-msg-remove-strategy.xml">
 <!ENTITY libtinymail-camel-TnyCamelAccount SYSTEM "xml/tny-camel-account.xml">
 <!ENTITY libtinymail-camel-TnyCamelStoreAccount SYSTEM "xml/tny-camel-store-account.xml">
@@ -187,6 +188,7 @@
 		&libtinymail-camel-TnyCamelNNTPStoreAccount;
 		&libtinymail-camel-TnyCamelPOPStoreAccount;
 		&libtinymail-camel-TnyCamelTransportAccount;
+		&libtinymail-camel-TnyCamelSendQueue;
 		&libtinymail-camel-TnyCamelStream;
 		&libtinymail-camel-TnyCamelFolder;
 		&libtinymail-camel-TnyCamelMsgRemoveStrategy;

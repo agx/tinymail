@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+TnyCamelSendQueue
+
+<!-- ##### SECTION Short_Description ##### -->
+A send queue implemented for Camel
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+An implementation of #TnySendQueue for Camel
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnySendQueue
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyCamelSendQueue ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_camel_send_queue_new ##### -->
+<para>
+
+</para>
+
+@trans_account: 
+@Returns: 
+
+

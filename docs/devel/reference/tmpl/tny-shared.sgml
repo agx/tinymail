@@ -110,15 +110,15 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
+@tnyfolder: the object which received the signal.
+@arg1: 
 
 <!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
 <para>
 
 </para>
 
-@: 
+@tnyfolder: the object which received the signal.
 
 <!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
@@ -129,6 +129,7 @@ Shared include file with forward typedefs
 @folder_inserted: 
 @folders_reloaded: 
 @remove_msg_func: 
+@add_msg_func: 
 @expunge_func: 
 @get_msg_remove_strategy_func: 
 @set_msg_remove_strategy_func: 

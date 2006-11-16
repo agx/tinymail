@@ -17,6 +17,12 @@ This type is internally used by the #TnyMozEmbedMsgView implementation of #TnyMs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyMozEmbedStreamPriv ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT TnyMozEmbedStream ##### -->
 <para>
 

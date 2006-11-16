@@ -6,9 +6,19 @@ A type for sending mail
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A type for sending mail using a #TnyTransportAccount
+A type for sending mail. Typically using a #TnyTransportAccount. The send queue will asynchonously handle 
+sending the queued E-mails. It will signal when a message got sent. While the queue is busy, it permits
+adding new messages to it.
 </para>
-
+<para>
+The #TnySendQueue implementation does not necessarily have to classify between multiple #TnyTransportAccount 
+nor is it specified that it should not do this. The contract for the type is that it WILL send the message.
+</para>
+<para>
+It's recommended to make implementations that persist to-send messages on a persistent storage like a 
+filesystem. For example in a so called Outbox folder. Else would your user upon application or device 
+shutdown obviously lose the unsent messages.
+</para>
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyTransportAccount

@@ -43,3 +43,12 @@ libtinymail-camel library for converting a #CamelStream to a
 @stream: 
 
 
+<!-- ##### FUNCTION tny_camel_stream_get_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
