@@ -76,6 +76,15 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg)
 	
 	g_mutex_lock (priv->todo_lock);
 
+	/* TODO: In stead of a list in memory, use a persistent storage for
+	 this "todo" list. Else when the application shuts down, you would lose
+	 unsent messages. One solution would be to attach an "Outbox" to each
+ 	 TnyTransportAccount (this is probably how it will in future be 
+	 implemented).
+
+	 For now a quick solution with a doubly-linked list in memory will
+	 function for testing (until the "Outbox" solution is developed). */
+
 	priv->total = g_list_length (priv->todo);
 	launch_thread = (priv->total == 0);
 	priv->total++;
