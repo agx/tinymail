@@ -1,3 +1,8 @@
+2006-11-15  Philip van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel/camel-lite: Fixed a rather big memory leak when
+	downloading new messages happened
+
 2006-11-16  Sergio Villar Senin <svillar@igalia.com>
 
 	* libtinymail/tny-folder-store-query.c

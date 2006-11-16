@@ -2568,10 +2568,10 @@ imap_update_summary (CamelFolder *folder, int exists,
 						camel_message_info_free(&info->info);
 					  ucnt++;
 					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
-					  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
+					  //camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
 
-					  if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
-						camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
+					  //if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
+						//camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
 
 					}
 

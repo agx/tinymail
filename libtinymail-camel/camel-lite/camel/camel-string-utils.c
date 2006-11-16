@@ -141,6 +141,10 @@ char camel_toupper(char c)
 	return c;
 }
 
+#ifdef MEMDEBUG
+static int cnt=0;
+#endif
+
 /* working stuff for pstrings */
 static pthread_mutex_t pstring_lock = PTHREAD_MUTEX_INITIALIZER;
 static GHashTable *pstring_table = NULL;
@@ -184,6 +188,11 @@ camel_pstring_add (char *str, gboolean own)
 			g_free (str);
 	} else {
 		pstr = own ? str : g_strdup (str);
+
+#ifdef MEMDEBUG
+		cnt++;
+		printf ("%d\n", cnt); 
+#endif
 		g_hash_table_insert (pstring_table, pstr, GINT_TO_POINTER (1));
 	}
 	
@@ -240,6 +249,10 @@ camel_pstring_free(const char *s)
 		if (count == 0) {
 			g_hash_table_remove(pstring_table, p);
 			g_free(p);
+#ifdef MEMDEBUG
+			cnt--;
+			printf ("%d\n", cnt);
+#endif
 		} else {
 			g_hash_table_insert(pstring_table, p, GINT_TO_POINTER(count));
 		}
