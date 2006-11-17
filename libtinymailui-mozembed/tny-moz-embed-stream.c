@@ -223,7 +223,6 @@ tny_moz_embed_stream_close (TnyStream *self)
 		gtk_moz_embed_close_stream (priv->embed);
 		g_timeout_add (2000, (GSourceFunc) timeout_update_gok, priv->embed);
 		gtk_moz_embed_reload (priv->embed, GTK_MOZ_EMBED_FLAG_RELOADNORMAL);
-		
 	}
 
 	return 0;
