@@ -946,6 +946,91 @@ tny_camel_folder_get_id_default (TnyFolder *self)
 	return priv->folder_name;
 }
 
+static void
+tny_camel_folder_transfer_msgs (TnyFolder *folder_src, 
+				TnyList *headers, 
+				TnyFolder *folder_dst, 
+				gboolean delete_originals)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (folder_src)->transfer_msgs_func (folder_src, headers, folder_dst, delete_originals);
+}
+
+static void
+tny_camel_folder_transfer_msgs_default (TnyFolder *folder_src, 
+					TnyList *headers,
+					TnyFolder *folder_dst,
+					gboolean delete_originals)
+{
+	TnyCamelFolderPriv *priv_src, *priv_dst;
+	TnyIterator *iter;
+	CamelException *ex;
+	CamelFolder *cfol_src, *cfol_dst;
+	GPtrArray *uids, *transferred_uids = NULL;
+	guint list_length;
+
+	g_assert (TNY_IS_LIST   (headers));
+	g_assert (TNY_IS_FOLDER (folder_src));
+	g_assert (TNY_IS_FOLDER (folder_dst));
+
+	list_length = tny_list_get_length (headers);
+	if (list_length < 1) return;
+
+
+	/* Get privates */
+	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_src);
+	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);
+
+	g_mutex_lock (priv_src->folder_lock);
+	g_mutex_lock (priv_dst->folder_lock);
+
+	/* Get camel folders */
+	cfol_src = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder_src));
+	cfol_dst = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder_dst));
+
+	/* Create uids */
+	uids = g_ptr_array_sized_new (list_length);
+	iter = tny_list_create_iterator (headers);
+	while (!tny_iterator_is_done (iter)) {
+		TnyHeader *header;
+
+		header = TNY_HEADER (tny_iterator_get_current (iter));
+		g_ptr_array_add (uids, (gpointer) tny_header_get_uid (header));
+		tny_iterator_next (iter);
+	}
+
+	/* Initialize exception */
+	ex = camel_exception_new ();
+	camel_exception_init (ex);
+
+	camel_folder_transfer_messages_to (cfol_src,
+					   uids,
+					   cfol_dst,
+					   &transferred_uids,
+					   delete_originals,
+					   ex);
+
+	if (camel_exception_is_set (ex)) {
+		g_warning ("Transfering messages failed: %s\n",
+			   camel_exception_get_description (ex));
+	} else {
+		if (delete_originals)
+			camel_folder_sync (cfol_src, TRUE, ex);
+	
+		if (camel_exception_is_set (ex))
+			g_warning ("Expunging messages failed: %s\n",
+				   camel_exception_get_description (ex));
+	}
+	camel_exception_free (ex);
+
+	/* Frees */
+	if (transferred_uids) g_ptr_array_free (transferred_uids, FALSE);
+	g_ptr_array_free (uids, FALSE);
+
+	g_mutex_unlock (priv_dst->folder_lock);
+	g_mutex_unlock (priv_src->folder_lock);
+}
+
+
 void
 _tny_camel_folder_set_id (TnyCamelFolder *self, const gchar *id)
 {
@@ -1493,6 +1578,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->remove_msg_func = tny_camel_folder_remove_msg;
 	klass->expunge_func = tny_camel_folder_expunge;
 	klass->add_msg_func = tny_camel_folder_add_msg;
+	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
 
 	return;
 }
@@ -1536,6 +1622,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->remove_msg_func = tny_camel_folder_remove_msg_default;
 	class->add_msg_func = tny_camel_folder_add_msg_default;
 	class->expunge_func = tny_camel_folder_expunge_default;
+	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;

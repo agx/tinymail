@@ -93,6 +93,7 @@ struct _TnyFolderIface
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self);
+	void (*transfer_msgs_func) (TnyFolder *folder_src, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals);
 };
 
 GType tny_folder_get_type (void);
@@ -115,6 +116,7 @@ guint tny_folder_get_unread_count (TnyFolder *self);
 gboolean tny_folder_is_subscribed (TnyFolder *self);
 void tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 void tny_folder_refresh (TnyFolder *self);
+void tny_folder_transfer_msgs (TnyFolder *folder_src, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals);
 
 G_END_DECLS
 

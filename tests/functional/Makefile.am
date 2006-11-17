@@ -15,7 +15,7 @@ if BUILD_MOZEMBED
 INCLUDES += -DMOZEMBED
 endif
 
-bin_PROGRAMS = folder-lister folder-lister-async
+bin_PROGRAMS = folder-lister folder-lister-async msg-transfer
 
 folder_lister_SOURCES = folder-lister.c 
 folder_lister_LDADD = \
@@ -35,3 +35,11 @@ folder_lister_async_LDADD = \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
 	$(top_builddir)/tests/shared/libtestsshared.a
 
+msg_transfer_SOURCES = msg-transfer.c
+msg_transfer_LDADD = \
+	$(TINYMAIL_LIBS) $(LIBTINYMAIL_GNOME_DESKTOP_LIBS) \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
+	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
+	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
+	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
+	$(top_builddir)/tests/shared/libtestsshared.a

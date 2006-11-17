@@ -346,6 +346,29 @@ tny_folder_get_account (TnyFolder *self)
 	return TNY_FOLDER_GET_IFACE (self)->get_account_func (self);
 }
 
+/**
+ * tny_folder_transfer_msgs:
+ * @folder_src: the TnyFolder where the headers are stored
+ * @header_list: a list of TnyHeader objects
+ * @folder_dst: the TnyFolder where the msgs will be transfered
+ * @delete_originals: if TRUE then move msgs, else copy them
+ * 
+ * Transfers messages from a folder to another. They could be moved or
+ * just copied depending on the value of the delete_originals argument
+ **/
+void 
+tny_folder_transfer_msgs (TnyFolder *folder_src, 
+			  TnyList *headers, 
+			  TnyFolder *folder_dst, 
+			  gboolean delete_originals)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (folder_src)->transfer_msgs_func)
+		g_critical ("You must implement tny_folder_transfer_msgs\n");
+#endif
+
+	return TNY_FOLDER_GET_IFACE (folder_src)->transfer_msgs_func (folder_src, headers, folder_dst, delete_originals);
+}
 
 
 /**
@@ -487,8 +510,6 @@ tny_folder_set_name (TnyFolder *self, const gchar *name)
 	TNY_FOLDER_GET_IFACE (self)->set_name_func (self, name);
 	return;
 }
-
-
 
 /**
  * tny_folder_get_folder_type:

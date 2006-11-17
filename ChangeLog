@@ -1,4 +1,18 @@
-2006-11-15  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-17  Sergio Villar Senin <svillar@igalia.com>
+
+	* libtinymail/tny-folder.h
+	* libtinymail/tny-folder.c: added tny_folder_transfer_msgs for
+	copying/moving messages between folders
+
+	* libtinymail-camel/tny-camel-folder.h
+	* libtinymail-camel/tny-camel-folder.c: added a default Camel
+	implementation for tny_folder_transfer_msgs method
+
+	* test/functional/Makefile.am
+	* test/functional/msg-transfer.c: added this program to test
+	tny_folder_transfer_msgs implementation
+
+2006-11-16  Philip van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Fixed a rather big memory leak when
 	downloading new messages happened
