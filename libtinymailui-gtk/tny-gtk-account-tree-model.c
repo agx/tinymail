@@ -68,33 +68,33 @@ recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, gpointer u
 			tny_folder_get_folder_type (TNY_FOLDER (folder)),
 			TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
-	    
-		recurse_folders_async (hlrp->self, folder, hlrp->query, tree_iter);
-	    
- 		g_object_unref (G_OBJECT (folder));
 
-		tny_iterator_next (iter);	    
+		recurse_folders_async (hlrp->self, folder, hlrp->query, tree_iter);
+
+		g_object_unref (G_OBJECT (folder));
+
+		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));   
+	g_object_unref (G_OBJECT (iter));
 	g_object_unref (G_OBJECT (folders));
-    
-    	gtk_tree_iter_free (hlrp->parent_tree_iter);
-    	g_free (hlrp);
-    
+
+	gtk_tree_iter_free (hlrp->parent_tree_iter);
+	g_slice_free (AsyncHelpr, hlrp);
+
 }
 
 
 static void
 recurse_folders_async (TnyGtkAccountTreeModel *self, TnyFolderStore *store, TnyFolderStoreQuery *query, GtkTreeIter *parent_tree_iter)
 {
-	AsyncHelpr *hlrp = g_new0 (AsyncHelpr, 1);
+	AsyncHelpr *hlrp = g_slice_new0 (AsyncHelpr);
 	TnyList *folders = tny_simple_list_new ();
-    
+
 	hlrp->self = self;
 	hlrp->parent_tree_iter = parent_tree_iter;
 	hlrp->query = query;
-    
+
 	tny_folder_store_get_folders_async (store, folders,  recurse_get_folders_callback, query, hlrp);
 }
 

@@ -227,7 +227,7 @@ tny_gtk_folder_tree_model_foreach_in_the_list_impl (GtkTreeModel *model,
 	gtk_tree_model_get (model, iter, 
 		TNY_GTK_FOLDER_TREE_MODEL_INSTANCE_COLUMN, &item, -1);
 	dta->func (item, dta->user_data);
-    
+
 	g_object_unref (G_OBJECT (item));
 	return FALSE;
 }
@@ -236,11 +236,11 @@ static void
 tny_gtk_folder_tree_model_foreach_in_the_list (TnyList *self, GFunc func, gpointer user_data)
 {
 	TnyGtkFolderTreeModel *me = (TnyGtkFolderTreeModel*)self;
-	ForeachHelpr *dta = g_new0 (ForeachHelpr, 1);
-    
+	ForeachHelpr *dta = g_slice_new (ForeachHelpr);
+
 	dta->user_data = user_data;
 	dta->func = func;
-    
+
 	/* Foreach item in the list (without using a slower iterator) */
 
 	g_mutex_lock (me->iterator_lock);
@@ -248,7 +248,7 @@ tny_gtk_folder_tree_model_foreach_in_the_list (TnyList *self, GFunc func, gpoint
 		tny_gtk_folder_tree_model_foreach_in_the_list_impl, dta);
 	g_mutex_unlock (me->iterator_lock);
 
-    	g_free (dta);
+	g_slice_free (ForeachHelpr, dta);
 
 	return;
 }

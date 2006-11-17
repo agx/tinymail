@@ -1,3 +1,13 @@
+2006-11-17  Philip van Hoof <pvanhoof@gnome.org>
+
+	* A few s/g_new/g_slice replacements
+
+2006-11-17  Don Scorgie <DonScorgie@Blueyonder.co.uk>
+
+	* Fix for Mozilla bug: http://bugzilla.gnome.org/show_bug.cgi?id=157941
+	(comments #46-#51 discuss the problem)
+	* Copied the fix from Yelp to libtinymail-mozembed by Philip
+
 2006-11-17  Sergio Villar Senin <svillar@igalia.com>
 
 	* libtinymail/tny-folder.h

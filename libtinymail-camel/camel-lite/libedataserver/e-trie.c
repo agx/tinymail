@@ -121,7 +121,7 @@ e_trie_new (gboolean icase)
 {
 	ETrie *trie;
 	
-	trie = g_new (ETrie, 1);
+	trie = g_slice_new0 (ETrie);
 	trie->root.next = NULL;
 	trie->root.fail = NULL;
 	trie->root.match = NULL;
@@ -148,7 +148,7 @@ e_trie_free (ETrie *trie)
 	g_ptr_array_free (trie->fail_states, TRUE);
 	g_slice_free_chain (struct _trie_match, trie->match_mem_chain, mem_chain);
 	g_slice_free_chain (struct _trie_state, trie->state_mem_chain, mem_chain);
-	g_free (trie);
+	g_slice_free (ETrie, trie);
 }
 
 

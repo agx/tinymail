@@ -52,7 +52,7 @@ destroy_write (TnyCamelHeader *self)
 	if (((WriteInfo*)self->info)->mime_from)
 		g_free (((WriteInfo*)self->info)->mime_from);
 
-	g_free (self->info);
+	g_slice_free (WriteInfo, self->info);
 }
 
 static void
@@ -60,7 +60,7 @@ prepare_for_write (TnyCamelHeader *self)
 {
 	if (!self->write)
 	{
-		self->info = g_new0 (WriteInfo, 1);
+		self->info = g_slice_new0 (WriteInfo);
 		((WriteInfo*)self->info)->msg = camel_mime_message_new ();
 		((WriteInfo*)self->info)->mime_from = NULL;
 		self->write = 1;
@@ -98,7 +98,7 @@ _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage
 	if (self->write)
 		destroy_write (self);
 
-	self->info = g_new0 (WriteInfo, 1);
+	self->info = g_slice_new0 (WriteInfo);
 	self->write = 1;
 #ifdef HEALTHY_CHECK
 	self->healthy = 1;

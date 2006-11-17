@@ -548,7 +548,7 @@ tny_camel_folder_refresh_async_destroyer (gpointer thr_user_data)
 	/* gidle reference */
 	g_object_unref (G_OBJECT (self));
 
-	g_free (thr_user_data);
+	g_slice_free (RefreshFolderInfo, thr_user_data);
 
 	return;
 }
@@ -581,8 +581,8 @@ destroy_progress_idle (gpointer data)
 	g_object_unref (G_OBJECT (info->minfo->self));
 
 	g_free (info->what);
-	g_free (info->minfo);
-	g_free (data);
+	g_slice_free (RefreshFolderInfo, info->minfo);
+	g_slice_free (ProgressInfo, data);
 
 	return;
 }
@@ -609,12 +609,12 @@ static void
 tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
 	RefreshFolderInfo *oinfo = thr_user_data;
-	ProgressInfo *info = g_new0 (ProgressInfo, 1);
+	ProgressInfo *info = g_slice_new (ProgressInfo);
 
 	/* Camel will shredder what and thr_user_data, so we need to copy it */
 
 	info->what = g_strdup (what);
-	info->minfo = g_new0 (RefreshFolderInfo ,1);
+	info->minfo = g_slice_new (RefreshFolderInfo);
 	info->minfo->callback = oinfo->callback;
 	info->minfo->cancelled = oinfo->cancelled;
 	info->minfo->self = oinfo->self;
@@ -713,7 +713,7 @@ tny_camel_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callba
 static void
 tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
-	RefreshFolderInfo *info = g_new0 (RefreshFolderInfo, 1);
+	RefreshFolderInfo *info = g_slice_new (RefreshFolderInfo);
 	GThread *thread;
 
 	info->self = self;
@@ -799,7 +799,7 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	g_object_ref (G_OBJECT (headers));
 
-	ptr = g_new (FldAndPriv, 1);
+	ptr = g_slice_new (FldAndPriv);
 	ptr->self = self;
 	ptr->priv = priv;
 	ptr->headers = headers;
@@ -818,7 +818,7 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	if (uids)
 		g_ptr_array_foreach (uids, add_message_with_uid, ptr);
-	g_free (ptr);
+	g_slice_free (FldAndPriv, ptr);
 
 	if (uids)
 		camel_folder_free_uids (priv->folder, uids); 
