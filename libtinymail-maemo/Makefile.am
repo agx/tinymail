@@ -5,6 +5,7 @@ INCLUDES = -I. -I$(top_srcdir) \
 	-I$(top_srcdir)/libtinymailui \
 	-I$(top_srcdir)/libtinymailui-gtk \
 	-I$(top_srcdir)/libtinymail-camel \
+	-I$(top_srcdir)/libtinymail-camel/camel-lite \
 	-I$(top_srcdir)/libtinymail-gnomevfs 
 
 
