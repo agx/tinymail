@@ -60,6 +60,7 @@ camel_seekable_stream_init (void *o)
 {
 	CamelSeekableStream *stream = (CamelSeekableStream *)o;
 
+	stream->position = 0;
 	stream->bound_start = 0;
 	stream->bound_end = CAMEL_STREAM_UNBOUND;
 }

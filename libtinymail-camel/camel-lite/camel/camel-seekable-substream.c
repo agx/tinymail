@@ -74,6 +74,14 @@ camel_seekable_substream_finalize (CamelObject *object)
 }
 
 
+static void
+camel_seekable_substream_init (CamelObject *object)
+{
+	CamelSeekableStream *seekable_stream = CAMEL_SEEKABLE_STREAM (object);
+
+	seekable_stream->position = 0;
+}
+
 CamelType
 camel_seekable_substream_get_type (void)
 {
@@ -85,7 +93,7 @@ camel_seekable_substream_get_type (void)
 								     sizeof (CamelSeekableSubstreamClass),
 								     (CamelObjectClassInitFunc) camel_seekable_substream_class_init,
 								     NULL,
-								     NULL,
+								     (CamelObjectInitFunc) camel_seekable_substream_init,
 								     (CamelObjectFinalizeFunc) camel_seekable_substream_finalize);
 	}
 
