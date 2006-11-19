@@ -1,3 +1,4 @@
+iconv-detect.h
 configure
 Makefile.in
 config.log
