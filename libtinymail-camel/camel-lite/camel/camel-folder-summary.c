@@ -624,14 +624,23 @@ camel_folder_summary_load(CamelFolderSummary *s)
 {
 	int i;
 	CamelMessageInfo *mi;
+	GError *err = NULL;
 
 	if (s->summary_path == NULL || !g_file_test (s->summary_path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR))
-		return 0;
+		return -1;
 
 	CAMEL_SUMMARY_LOCK(s, io_lock);
 
 	if (!s->file)
-		s->file = g_mapped_file_new (s->summary_path, FALSE, NULL);
+	{
+		s->file = g_mapped_file_new (s->summary_path, FALSE, &err);
+		if (err != NULL)
+		{
+			g_critical ("Unable to mmap file: %s\n", err->message);
+			g_error_free (err);
+			goto error;
+		}
+	}
 
 	s->filepos = (unsigned char*) g_mapped_file_get_contents (s->file);
 
@@ -834,14 +843,23 @@ int
 camel_folder_summary_header_load(CamelFolderSummary *s)
 {
 	int ret;
+	GError *err = NULL;
 
 	if (s->summary_path == NULL || !g_file_test (s->summary_path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR))
-		return 0;
+		return -1;
 
 	CAMEL_SUMMARY_LOCK(s, io_lock);
 
 	if (!s->file)
-		s->file = g_mapped_file_new (s->summary_path, FALSE, NULL);
+	{
+		s->file = g_mapped_file_new (s->summary_path, FALSE, &err);
+		if (err != NULL)
+		{
+			g_critical ("Unable to mmap file: %s\n", err->message);
+			g_error_free (err);
+			return -1;
+		}
+	}
 
 	s->filepos = (unsigned char*) g_mapped_file_get_contents (s->file);
 
