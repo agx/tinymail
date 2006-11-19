@@ -1,3 +1,27 @@
+iconv-detect.h
+--------------
+
+Note: Unless you are cross compiling, this probably isn't needed
+
+When cross compiling there's one difficulty: the iconv-detect.h file in
+libtinymail-camel/camel-lite/ which is a file that must be generated.
+
+In case the normal configure script fails at creating this, you can or
+checking m4/ticonv.m4 to figure out why it's failing, or put a file in
+it manually.
+
+You can generate one doing this on the target platform:
+
+cd libtinymail-camel/camel-lite
+gcc -DCONFIGURE_AC iconv-detect.c -o iconv-detect
+./iconv-detect
+cat iconv-detect.h
+cd ../..
+
+This is by the way basically the procedure that ticonv.m4 will do too.
+
+Feel free to contribute a good detection that will always work with all
+cross compilation situations.
 
 One laptop per child
 --------------------
