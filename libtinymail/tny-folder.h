@@ -71,10 +71,6 @@ struct _TnyFolderIface
 {
 	GTypeInterface parent;
 	
-	/* Signals */
-	void (*folder_inserted) (TnyFolder *self, TnyFolder *folder);
-	void (*folders_reloaded) (TnyFolder *self);
-
 	/* Methods */
 	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header);
 	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg);

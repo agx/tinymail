@@ -540,41 +540,7 @@ tny_folder_base_init (gpointer g_class)
 	static gboolean tny_folder_initialized = FALSE;
 
 	if (!tny_folder_initialized) 
-	{   
-/**
- * TnyFolder::folder-inserted
- * @self: the object on which the signal is emitted
- * @arg1: The folder that got inserted
- *
- * Emitted when a folder gets added to the folder
- **/
-		tny_folder_signals[TNY_FOLDER_FOLDER_INSERTED] =
-		   g_signal_new ("folder_inserted",
-			TNY_TYPE_FOLDER,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnyFolderIface, folder_inserted),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_TYPE_FOLDER);
-
-/**
- * TnyFolder::folders-reloaded
- * @self: the object on which the signal is emitted
- *
- * Emitted when the folder gets reloaded.
- */
-		tny_folder_signals[TNY_FOLDER_FOLDERS_RELOADED] =
-		   g_signal_new ("folders_reloaded",
-			TNY_TYPE_FOLDER,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnyFolderIface, folders_reloaded),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__VOID,
-			G_TYPE_NONE, 0);
-
-
 		tny_folder_initialized = TRUE;
-	}
 }
 
 GType
