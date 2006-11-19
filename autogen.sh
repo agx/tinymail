@@ -1,6 +1,8 @@
 #!/bin/sh
 # Run this to generate all the initial makefiles, etc.
 
+export ACLOCAL_FLAGS="-I `pwd`/m4"
+
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 REQUIRED_AUTOMAKE_VERSION=1.7

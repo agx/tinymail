@@ -13,6 +13,8 @@ m4_define([lt_age], [m4_eval(tny_binary_age - tny_interface_age)])
 
 AC_INIT([libtinymail], [tny_version], [http://tinymail.org/trac/tinymail])
 
+m4_pattern_allow([^AC_TNY_])
+
 AC_CONFIG_SRCDIR(tinymail/tny-main.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AC_CONFIG_MACRO_DIR([m4])

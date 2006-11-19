@@ -2,6 +2,8 @@ AC_INIT([camel-lite],[1.0],[http://tinymail.org/])
 AC_CONFIG_SRCDIR(camel/camel-object.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
+m4_pattern_allow([^AC_TNY_])
+
 AC_CONFIG_MACRO_DIR([../../m4])
 AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS -I ../../m4")
 
