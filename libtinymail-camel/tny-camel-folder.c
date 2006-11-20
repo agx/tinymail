@@ -859,33 +859,26 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header)
 	}
 
 	camel_exception_init (ex);
-
 	camel_message = camel_folder_get_message (priv->folder, (const char *) id, ex);    
 
-	if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE)
+	if (camel_message && camel_exception_get_id (ex) == CAMEL_EXCEPTION_NONE && CAMEL_IS_OBJECT (camel_message))
 	{
 		TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
-
-		/* I don't reuse the header because that would keep a reference
-		   on it. Meaning that the CamelFolder can't be destroyed (the
-		   fpriv->headers_managed stuff in tny-header.c). The 
-		   TnyCamelHeader type can also work with a CamelMimeMessage, 
-		   so why not use that. Right? */
 
 		message = tny_camel_msg_new ();
 
 		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), self);
-		_tny_camel_msg_set_camel_mime_message (TNY_CAMEL_MSG (message), camel_message); 
-		/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
+		tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
+			CAMEL_MIME_PART (camel_message)); 
 		_tny_camel_header_set_camel_mime_message (nheader, camel_message);
 		_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
 		g_object_unref (G_OBJECT (nheader));
 
-	} else {
-		if (camel_message)
-			camel_object_unref (CAMEL_OBJECT (camel_message));
+	} else
 		message = NULL;
-	}
+
+	if (camel_message && CAMEL_IS_OBJECT (camel_message))
+		camel_object_unref (CAMEL_OBJECT (camel_message));
 
 	camel_exception_free (ex);
 
@@ -1316,6 +1309,25 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder)
 	return;
 }
 
+static void
+tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, CamelFolderInfo *info)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+
+	_tny_camel_folder_set_id (folder, info->full_name);
+	_tny_camel_folder_set_folder_type (folder, info);
+	_tny_camel_folder_set_unread_count (folder, info->unread);
+	_tny_camel_folder_set_all_count (folder, info->total);
+	_tny_camel_folder_set_name (folder, info->name);
+	_tny_camel_folder_set_iter (folder, info);
+	
+	apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
+	
+	_tny_camel_folder_set_account (folder,
+				       TNY_STORE_ACCOUNT (priv->account));
+}
+
 static TnyFolder*
 tny_camel_folder_create_folder (TnyFolderStore *self, const gchar *name)
 {
@@ -1335,16 +1347,20 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!priv->folder_name)
-		return;
+		return NULL;
 
 	folname = priv->folder_name;
 	folder = tny_camel_folder_new ();
 	info = camel_store_create_folder (store, priv->folder_name, name, &ex);
 
-	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
-	camel_store_free_folder_info (store, info);
+	if (camel_exception_is_set (&ex)) {
+		g_warning ("Creating folder failed: %s\n", 
+			camel_exception_get_description (&ex));
+		g_object_unref (G_OBJECT (folder));
+		return NULL;
+	}
 
-	/* TODO: Error handling using 'ex' */
+	tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
 
 	return folder;
 }
@@ -1428,17 +1444,7 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 		{
 			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_folder_new ());
 		    
-			_tny_camel_folder_set_id (folder, iter->full_name);
-			_tny_camel_folder_set_folder_type (folder, iter);
-			_tny_camel_folder_set_unread_count (folder, iter->unread);
-			_tny_camel_folder_set_all_count (folder, iter->total);
-			_tny_camel_folder_set_name (folder, iter->name);
-			_tny_camel_folder_set_iter (folder, iter);
-			
-			apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
-			
-			_tny_camel_folder_set_account (folder,
-						 TNY_STORE_ACCOUNT (priv->account));
+			tny_camel_folder_set_folder_info (self, folder, iter);
 
 			tny_list_prepend (list, G_OBJECT (folder));
 		}

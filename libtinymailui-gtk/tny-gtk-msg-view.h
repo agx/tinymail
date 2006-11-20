@@ -52,6 +52,8 @@ struct _TnyGtkMsgViewClass
 	GtkScrolledWindowClass parent_class;
 
 	/* virtual methods */
+	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
+	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
 	TnyMsg* (*get_msg_func) (TnyMsgView *self);
 	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
 	void (*set_unavailable_func) (TnyMsgView *self);
@@ -61,6 +63,18 @@ struct _TnyGtkMsgViewClass
 
 GType tny_gtk_msg_view_get_type (void);
 TnyMsgView* tny_gtk_msg_view_new (void);
+
+void tny_gtk_msg_view_set_display_html (TnyGtkMsgView *self, gboolean setting);
+void tny_gtk_msg_view_set_display_rfc822 (TnyGtkMsgView *self, gboolean setting);
+void tny_gtk_msg_view_set_display_attachments (TnyGtkMsgView *self, gboolean setting);
+void tny_gtk_msg_view_set_display_plain (TnyGtkMsgView *self, gboolean setting);
+void tny_gtk_msg_view_set_display_one_body (TnyGtkMsgView *self, gboolean setting);
+
+gboolean tny_gtk_msg_view_get_display_html (TnyGtkMsgView *self);
+gboolean tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self);
+gboolean tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self);
+gboolean tny_gtk_msg_view_get_display_plain (TnyGtkMsgView *self);
+gboolean tny_gtk_msg_view_get_display_one_body (TnyGtkMsgView *self);
 
 G_END_DECLS
 

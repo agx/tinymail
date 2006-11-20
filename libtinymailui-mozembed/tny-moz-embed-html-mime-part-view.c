@@ -128,7 +128,8 @@ tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 {
 	TnyMozEmbedHtmlMimePartView *self  = (TnyMozEmbedHtmlMimePartView*) instance;
 	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
-	
+
+	priv->part = NULL;
 	gtk_moz_embed_set_chrome_mask (GTK_MOZ_EMBED (self), 
 			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME|GTK_MOZ_EMBED_FLAG_SCROLLBARSON);
 

@@ -69,11 +69,9 @@ static void
 camel_stream_mem_init (CamelObject *object)
 {
 	CamelStreamMem *stream_mem = CAMEL_STREAM_MEM (object);
-	CamelSeekableStream *seekable_stream = CAMEL_SEEKABLE_STREAM (object);
 
 	stream_mem->owner = FALSE;
 	stream_mem->buffer = 0;
-	seekable_stream->position = 0;
 }
 
 /* could probably be a util method */

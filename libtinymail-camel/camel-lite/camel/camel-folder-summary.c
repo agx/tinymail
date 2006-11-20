@@ -189,18 +189,9 @@ camel_folder_summary_unload_mmap (CamelFolderSummary *s)
 
 	p = _PRIVATE(s);
 
-	/* camel_folder_summary_clear(s); */
-
 	if (s->file)
 		g_mapped_file_free (s->file);
 	s->file = NULL;
-/*
-	camel_folder_summary_remove_range (s, 0, s->messages->len-1);
-	// g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
-	//if (s->messages->len > 0)
-	//	g_ptr_array_remove_range (s->messages, 0, s->messages->len-1);
-	//g_hash_table_foreach_remove (s->messages_uid, always_true, NULL);
-*/
 
 	g_hash_table_foreach(p->filter_charset, free_o_name, 0);
 
@@ -1951,13 +1942,20 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		mi->uid = theuid;
 		uidmf = TRUE;
 	} else {
+
 		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (s, theuid);
 		if (mi) 
 		{
+			CAMEL_SUMMARY_LOCK(s, summary_lock);
+			CAMEL_SUMMARY_LOCK(s, ref_lock);
+
 			destroy_possible_pstring_stuff (s, (CamelMessageInfo*) mi, FALSE);
 			mi->refcount--; /* trick, I know */
 			*must_add = FALSE;
 			uidmf = FALSE;
+
+			CAMEL_SUMMARY_UNLOCK(s, ref_lock);
+			CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 		}
 	}
 

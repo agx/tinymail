@@ -53,8 +53,6 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 	return;
 }
 
-static TnyMimePartView *single = NULL;
-
 static void 
 parent_size_alloc (GtkWidget *widget, GtkAllocation *allocation, gpointer user_data)
 {
@@ -79,6 +77,7 @@ tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyM
 
 	g_assert (TNY_IS_MIME_PART (part));
 
+	/* HTML mime part (shows HTML using GtkMozEmbed) */
 	if (tny_mime_part_content_type_is (part, "text/html"))
 	{
 		GtkWidget *widget = (GtkWidget *) self;
@@ -87,7 +86,6 @@ tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyM
 
 		g_signal_connect (GTK_OBJECT (retval), "size_to",
 				G_CALLBACK (size_to_callback), self);
-
 		g_signal_connect (G_OBJECT (self), "size_allocate", 
 				G_CALLBACK (parent_size_alloc), retval);
 

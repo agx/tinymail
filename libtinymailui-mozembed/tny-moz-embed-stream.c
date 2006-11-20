@@ -203,15 +203,18 @@ tny_moz_embed_stream_flush (TnyStream *self)
 /* Fire "children_changed::add" event to refresh "UI-Grab" window of GOK,
 * this event is not fired when using gtk_moz_embed_xxx_stream,
 * see Mozilla bug #293670.  Done in a timeout to allow mozilla to
-* actually draw to the screen */
+* actually draw to the screen 
 
 static gboolean
 timeout_update_gok (GtkMozEmbed *html)
 {
+	GtkWidget *widget = gtk_widget_get_accessible (GTK_WIDGET (html));
+
+	if (widget
 	g_signal_emit_by_name (gtk_widget_get_accessible (GTK_WIDGET (html)),
 		"children_changed::add", -1, NULL, NULL);
 	return FALSE;
-}
+} */
 
 static gint
 tny_moz_embed_stream_close (TnyStream *self)
@@ -221,7 +224,7 @@ tny_moz_embed_stream_close (TnyStream *self)
 	if (priv->embed)
 	{
 		gtk_moz_embed_close_stream (priv->embed);
-		g_timeout_add (2000, (GSourceFunc) timeout_update_gok, priv->embed);
+		/* g_timeout_add (2000, (GSourceFunc) timeout_update_gok, priv->embed); */
 		gtk_moz_embed_reload (priv->embed, GTK_MOZ_EMBED_FLAG_RELOADNORMAL);
 	}
 

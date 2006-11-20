@@ -51,7 +51,7 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-mime-filter-windows.h>
 
 
-/* Locking warning: tny-msg.c also locks priv->part_lock */
+/* Locking warning: tny-camel-msg.c also locks priv->part_lock */
 
 static gboolean 
 tny_camel_mime_part_is_attachment (TnyMimePart *self)
@@ -398,10 +398,10 @@ tny_camel_mime_part_set_part (TnyCamelMimePart *self, CamelMimePart *part)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
 
-	/*if (priv->part)
+	if (priv->part)
 		camel_object_unref (CAMEL_OBJECT (priv->part));
-	camel_object_ref (CAMEL_OBJECT (part));*/
 
+	camel_object_ref (CAMEL_OBJECT (part));
 	priv->part = part;
 
 	g_mutex_unlock (priv->part_lock);
@@ -615,19 +615,15 @@ tny_camel_mime_part_finalize (GObject *object)
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	
 	g_mutex_lock (priv->part_lock);
+
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
+
+	if (G_LIKELY (priv->part) && CAMEL_IS_OBJECT (priv->part))
+		camel_object_unref (CAMEL_OBJECT (priv->part));
+
 	g_mutex_unlock (priv->part_lock);
-
-	if (G_LIKELY (priv->part))
-	{
-		g_mutex_lock (priv->part_lock);
-
-		/* http://bugzilla.gnome.org/show_bug.cgi?id=343683 */
-		/* camel_object_unref (CAMEL_OBJECT (priv->part)); */
-		g_mutex_unlock (priv->part_lock);
-	}
 
 	g_mutex_free (priv->part_lock);
 	priv->part_lock = NULL;

@@ -125,7 +125,12 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	/* TnyAccountTreeModel is also a TnyList (it simply implements both the
 	   TnyList and the GtkTreeModel interfaces) */
 
+#if PLATFORM==1
 	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (TRUE);
+#else
+	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (FALSE);
+#endif
+
 	TnyList *accounts = TNY_LIST (mailbox_model);
 
 	maccounts = tny_gtk_account_list_model_new ();

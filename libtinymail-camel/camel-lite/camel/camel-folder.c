@@ -347,8 +347,11 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 				/* TODO: Locking? */
 				unread = 0;
 				count = camel_folder_summary_count(folder->summary);
-				for (j=0; j<count; j++) {
-					if ((info = camel_folder_summary_index(folder->summary, j))) {
+				for (j=0; j<count; j++) 
+				{
+					info = camel_folder_summary_index(folder->summary, j);
+					if (info) 
+					{
 						guint32 flags = camel_message_info_flags(info);
 
 						if ((flags & (CAMEL_MESSAGE_SEEN|CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
@@ -359,6 +362,7 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 							junked++;
 						if ((flags & (CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
 							visible++;
+						
 						camel_message_info_free(info);
 					}
 				}

@@ -179,10 +179,14 @@ tny_camel_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
-	camel_store_subscribe_folder (store, tny_folder_get_name (folder), &ex);
+	if (camel_store_supports_subscriptions (store)
+	    && !camel_store_folder_subscribed (store, tny_folder_get_name (folder))) {
+		
+		camel_store_subscribe_folder (store, tny_folder_get_name (folder), &ex);
 
-	/* Sync */
-	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), TRUE);
+		/* Sync */
+		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), TRUE);
+	}
 
     	camel_object_unref (CAMEL_OBJECT (store));
     

@@ -94,18 +94,16 @@ tny_gtk_text_mime_part_view_set_part_default (TnyMimePartView *self, TnyMimePart
 		buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
 		if (buffer && GTK_IS_TEXT_BUFFER (buffer))
 			gtk_text_buffer_set_text (buffer, "", 0);
-	    
+
 		dest = tny_gtk_text_buffer_stream_new (buffer);
-			    
+
 		tny_stream_reset (dest);
 		tny_mime_part_decode_to_stream (part, dest);
 		tny_stream_reset (dest);
 
 		g_object_unref (G_OBJECT (dest));
-		
-		g_object_ref (G_OBJECT (part));
-		priv->part = part;
-		
+
+		priv->part = g_object_ref (G_OBJECT (part));
 	}
 
 	return;
@@ -149,6 +147,7 @@ tny_gtk_text_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_c
 	TnyGtkTextMimePartView *self = (TnyGtkTextMimePartView *)instance;
 	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
 
+	priv->part = NULL;
 	gtk_text_view_set_editable (GTK_TEXT_VIEW (self), FALSE);
 
 	return;
@@ -162,7 +161,7 @@ tny_gtk_text_mime_part_view_finalize (GObject *object)
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));
-    
+
 	(*parent_class->finalize) (object);
 
 	return;

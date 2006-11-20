@@ -88,8 +88,7 @@ tny_gtk_attachment_mime_part_view_set_part_default (TnyMimePartView *self, TnyMi
 	if (part)
 	{
 		tny_list_prepend (TNY_LIST (priv->imodel), G_OBJECT (part));
-		g_object_ref (G_OBJECT (part));
-		priv->part = part;
+		priv->part = g_object_ref (G_OBJECT (part));
 	}
 
 	return;
@@ -140,6 +139,7 @@ tny_gtk_attachment_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 	TnyGtkAttachmentMimePartView *self = (TnyGtkAttachmentMimePartView *)instance;
 	TnyGtkAttachmentMimePartViewPriv *priv = TNY_GTK_ATTACHMENT_MIME_PART_VIEW_GET_PRIVATE (self);
 
+	priv->part = NULL;
 	priv->imodel = NULL;
 
 	return;

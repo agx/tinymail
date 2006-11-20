@@ -407,7 +407,7 @@ signed_get_number(CamelMultipart *multipart)
 	if ((mps->content || mps->contentraw) && mps->signature)
 		return 2;
 
-	if (mps->start1 == -1 && parse_content(mps) == -1) {
+	if (mps->start1 == -1 /*&& parse_content(mps) == -1*/) {
 		if (dw->stream == NULL)
 			return 0;
 		else

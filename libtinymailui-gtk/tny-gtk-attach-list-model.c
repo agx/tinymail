@@ -53,7 +53,7 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 
 	static GdkPixbuf *stock_file_pixbuf = NULL;
 	GdkPixbuf *pixbuf;
-        gchar *icon;
+	gchar *icon;
 
 	if (tny_mime_part_get_content_type (part) &&
 			tny_mime_part_is_attachment (part))
@@ -208,9 +208,9 @@ tny_gtk_attach_list_model_prepend (TnyList *self, GObject* item)
 
 	/* Prepend something to the list */
 	g_object_ref (G_OBJECT (item));
-    
+
 	me->first = g_list_prepend (me->first, item);
-    
+
 	tny_gtk_attach_list_model_add (me, TNY_MIME_PART (item), 
 		gtk_list_store_prepend);
 

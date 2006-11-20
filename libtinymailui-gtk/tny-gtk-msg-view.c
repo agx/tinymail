@@ -60,11 +60,19 @@ typedef struct _TnyGtkMsgViewPriv TnyGtkMsgViewPriv;
 
 struct _TnyGtkMsgViewPriv
 {
-	TnyMsg *msg;
+	TnyMimePart *part; TnyMsg *msg;
 	TnyHeaderView *headerview;
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
 	GList *unattached_views;
+
+	gboolean display_one_body;
+	gboolean display_html;
+	gboolean display_plain;
+	gboolean display_attachments;
+	gboolean display_rfc822;
+
+	TnyMimePartView *text_body_viewer;
 };
 
 typedef struct
@@ -77,117 +85,204 @@ typedef struct
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgViewPriv))
 
 
-static TnyMimePartView*
-tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
-{
-	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
-}
+static void remove_mime_part_viewer (TnyMimePartView *mpview, GtkContainer *mpviewers);
 
-static TnyMimePartView*
-tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePart *part)
-{
-	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
-	TnyMimePartView *retval = NULL;
-
-	g_assert (TNY_IS_MIME_PART (part));
-
-	if (tny_mime_part_content_type_is (part, "text/*"))
-		retval = tny_gtk_text_mime_part_view_new ();
-	else if (tny_mime_part_get_content_type (part) &&
-			tny_mime_part_is_attachment (part))
-	{
-		static gboolean first = TRUE;
-		GtkTreeModel *model;
-
-		gtk_widget_show (priv->attachview_sw);
-		if (first)
-		{
-			model = tny_gtk_attach_list_model_new ();
-			gtk_icon_view_set_model (priv->attachview, model);
-			first = FALSE;
-		} else
-			model = gtk_icon_view_get_model (priv->attachview);
-
-		retval = tny_gtk_attachment_mime_part_view_new (TNY_GTK_ATTACH_LIST_MODEL (model));
-	}
-
-	return retval;
-}
-
-static void
-on_mpview_realize (GtkWidget *widget, gpointer user_data)
-{
-	RealizePriv *prv = user_data;
-
-	tny_mime_part_view_set_part (TNY_MIME_PART_VIEW (widget), prv->part);
-	g_object_unref (G_OBJECT(prv->part));
-	g_signal_handler_disconnect (widget, prv->signal);
-
-	g_slice_free (RealizePriv, prv);
-}
-
-static void
-reload_msg (TnyMsgView *self)
+/**
+ * tny_gtk_msg_view_get_display_one_body:
+ * @self: A #TnyGtkMsgView instance
+ *
+ * Return value: whether or not to display only one text/html or only one text/plain mime part
+ **/
+gboolean 
+tny_gtk_msg_view_get_display_one_body (TnyGtkMsgView *self)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
-	TnyHeader *header;
-	TnyIterator *iterator;
-	TnyList *list = tny_simple_list_new ();
+	return priv->display_one_body;
+}
 
-	g_return_if_fail (TNY_IS_MSG (priv->msg));
+/**
+ * tny_gtk_msg_view_get_display_html:
+ * @self: A #TnyGtkMsgView instance
+ *
+ * Return value: whether or not to display text/html mime parts
+ **/
+gboolean 
+tny_gtk_msg_view_get_display_html (TnyGtkMsgView *self)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	return priv->display_html;
+}
 
-	header = TNY_HEADER (tny_msg_get_header (priv->msg));
-	g_return_if_fail (TNY_IS_HEADER (header));
-	tny_header_view_set_header (priv->headerview, header);
-	g_object_unref (G_OBJECT (header));
+/**
+ * tny_gtk_msg_view_get_display_rfc822:
+ * @self: A #TnyGtkMsgView instance
+ *
+ * Return value: whether or not to display message/rfc822 mime parts
+ **/
+gboolean 
+tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	return priv->display_rfc822;
+}
 
-	tny_msg_get_parts (priv->msg, list);
-	iterator = tny_list_create_iterator (list);
+/**
+ * tny_gtk_msg_view_get_display_attachments:
+ * @self: A #TnyGtkMsgView instance
+ *
+ * Return value: whether or not to display attachments
+ **/
+gboolean 
+tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	return priv->display_attachments;
+}
 
-	gtk_widget_show (GTK_WIDGET (priv->headerview));
+/**
+ * tny_gtk_msg_view_get_display_plain:
+ * @self: A #TnyGtkMsgView instance
+ *
+ * Return value: whether or not to display text/plain mime parts
+ **/
+gboolean 
+tny_gtk_msg_view_get_display_plain (TnyGtkMsgView *self)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	return priv->display_plain;
+}
 
-	while (!tny_iterator_is_done (iterator))
-	{
-		TnyMimePart *part = (TnyMimePart*)tny_iterator_get_current (iterator);
-		TnyMimePartView *mpview;
 
-		mpview = tny_msg_view_create_mime_part_view_for (self, part);
-		if (mpview) 
-		{
 
-			if (GTK_IS_WIDGET (mpview))
-			{
-				gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), 
-						GTK_WIDGET (mpview), TRUE, TRUE, 0);
-
-				gtk_widget_show (GTK_WIDGET (mpview));
-
-				if (!GTK_WIDGET_REALIZED (mpview))
-				{
-					RealizePriv *prv = g_slice_new (RealizePriv);
-					prv->part = part;
-					prv->signal = g_signal_connect (G_OBJECT (mpview),
-						"realize", G_CALLBACK (on_mpview_realize), prv);
-				} else {
-					tny_mime_part_view_set_part (mpview, part);
-					g_object_unref (G_OBJECT(part));
-				}
-			} else if (!TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
-			{
-				priv->unattached_views = g_list_prepend (priv->unattached_views, mpview);
-				tny_mime_part_view_set_part (mpview, part);
-				g_object_unref (G_OBJECT(part));
-			}
-		}
-
-		tny_iterator_next (iterator);
-	}
-
-	g_object_unref (G_OBJECT (iterator));
-	g_object_unref (G_OBJECT (list));
-
+/**
+ * tny_gtk_msg_view_set_display_one_body:
+ * @self: A #TnyGtkMsgView instance
+ * @setting: whether or not to display only one text/html or only one text/plain mime part
+ *
+ * With this setting will the default implementation of #TnyGtkMsgView display
+ * only one text/html or only one text/plain mime part. Default value is FALSE.
+ *
+ * Note that these settings only affect the instance in case an overridden
+ * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * creating a viewer for a mime part.
+ * 
+ * So for example in case a more advanced implementation that inherits this
+ * type implements viewing a text/html mime part, and will therefore not call
+ * this types original tny_msg_view_create_mime_part_view_for method for the
+ * mime part anymore, the setting isn't used.
+ **/
+void 
+tny_gtk_msg_view_set_display_one_body (TnyGtkMsgView *self, gboolean setting)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	priv->display_one_body = setting;
 	return;
 }
+
+/**
+ * tny_gtk_msg_view_set_display_html:
+ * @self: A #TnyGtkMsgView instance
+ * @setting: whether or not to display text/html mime parts
+ *
+ * With this setting will the default implementation of #TnyGtkMsgView display
+ * the HTML source code of text/html mime parts. Default is FALSE.
+ *
+ * Note that these settings only affect the instance in case an overridden
+ * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * creating a viewer for a mime part.
+ * 
+ * So for example in case a more advanced implementation that inherits this
+ * type implements viewing a text/html mime part, and will therefore not call
+ * this types original tny_msg_view_create_mime_part_view_for method for the
+ * mime part anymore, the setting isn't used.
+ **/
+void 
+tny_gtk_msg_view_set_display_html (TnyGtkMsgView *self, gboolean setting)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	priv->display_html = setting;
+	return;
+}
+
+/**
+ * tny_gtk_msg_view_set_display_rfc822:
+ * @self: A #TnyGtkMsgView instance
+ * @setting: whether or not to display message/rfc822 mime parts
+ *
+ * With this setting will the default implementation of #TnyGtkMsgView display
+ * RFC822 inline message mime parts (forwards). Default is FALSE.
+ *
+ * (Note that this support is unimplemented at this moment)
+ *
+ * Note that these settings only affect the instance in case an overridden
+ * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * creating a viewer for a mime part.
+ * 
+ * So for example in case a more advanced implementation that inherits this
+ * type implements viewing a text/html mime part, and will therefore not call
+ * this types original tny_msg_view_create_mime_part_view_for method for the
+ * mime part anymore, the setting isn't used.
+ **/
+void 
+tny_gtk_msg_view_set_display_rfc822 (TnyGtkMsgView *self, gboolean setting)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	priv->display_rfc822 = setting;
+	return;
+}
+
+
+/**
+ * tny_gtk_msg_view_set_display_attachments:
+ * @self: A #TnyGtkMsgView instance
+ * @setting: whether or not to display attachment mime parts
+ *
+ * With this setting will the default implementation of #TnyGtkMsgView display
+ * attachments using a #GtkIconList and the #TnyGtkAttachListModel at the bottom
+ * of the #TnyGtkMsgView's scrollwindow. Default is TRUE.
+ *
+ * Note that these settings only affect the instance in case an overridden
+ * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * creating a viewer for a mime part.
+ * 
+ * So for example in case a more advanced implementation that inherits this
+ * type implements viewing a text/html mime part, and will therefore not call
+ * this types original tny_msg_view_create_mime_part_view_for method for the
+ * mime part anymore, the setting isn't used.
+ **/
+void 
+tny_gtk_msg_view_set_display_attachments (TnyGtkMsgView *self, gboolean setting)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	priv->display_attachments = setting;
+	return;
+}
+
+/**
+ * tny_gtk_msg_view_set_display_plain:
+ * @self: A #TnyGtkMsgView instance
+ * @setting: whether or not to display text/plain mime parts
+ *
+ * With this setting will the default implementation of #TnyGtkMsgView display
+ * text/plain mime parts. Default is TRUE.
+ *
+ * Note that these settings only affect the instance in case an overridden
+ * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * creating a viewer for a mime part.
+ * 
+ * So for example in case a more advanced implementation that inherits this
+ * type implements viewing a text/html mime part, and will therefore not call
+ * this types original tny_msg_view_create_mime_part_view_for method for the
+ * mime part anymore, the setting isn't used.
+ **/
+void 
+tny_gtk_msg_view_set_display_plain (TnyGtkMsgView *self, gboolean setting)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	priv->display_plain = setting;
+	return;
+}
+
 
 
 static void
@@ -225,11 +320,155 @@ tny_gtk_msg_view_get_msg_default (TnyMsgView *self)
 	return (priv->msg)?TNY_MSG (g_object_ref (priv->msg)):NULL;
 }
 
+
+static TnyMimePartView*
+tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
+{
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
+}
+
+static TnyMimePartView*
+tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePart *part)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	TnyMimePartView *retval = NULL;
+
+	g_assert (TNY_IS_MIME_PART (part));
+
+	/* PLAIN mime part */
+	if (priv->display_plain && tny_mime_part_content_type_is (part, "text/plain"))
+	{
+		retval = tny_gtk_text_mime_part_view_new ();
+
+	/* HTML mime part (shows HTML source code) (should be overridden in case there's
+	   support for a HTML TnyMsgView (like the TnyMozEmbedMsgView) */
+	} else if (priv->display_html && tny_mime_part_content_type_is (part, "text/html"))
+	{
+		retval = tny_gtk_text_mime_part_view_new ();
+
+	/* Inline message RFC822 (unsupported for now, it wont work) */
+	} else if (priv->display_rfc822 && TNY_IS_MSG (part) && 
+			tny_mime_part_content_type_is (part, "message/rfc822"))
+	{
+		retval = TNY_MIME_PART_VIEW (tny_gtk_msg_view_new ());
+
+	/* Attachments */
+	} else if (priv->display_attachments && tny_mime_part_get_content_type (part) &&
+				tny_mime_part_is_attachment (part))
+	{
+		static gboolean first = TRUE;
+		GtkTreeModel *model;
+
+		gtk_widget_show (priv->attachview_sw);
+		gtk_widget_show (GTK_WIDGET (priv->attachview));
+
+		if (first)
+		{
+			model = tny_gtk_attach_list_model_new ();
+			gtk_icon_view_set_model (priv->attachview, model);
+			first = FALSE;
+		} else
+			model = gtk_icon_view_get_model (priv->attachview);
+
+		retval = tny_gtk_attachment_mime_part_view_new (TNY_GTK_ATTACH_LIST_MODEL (model));
+	}
+
+	return retval;
+}
+
+
+
 static void
 tny_gtk_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg)
 {
 	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_msg_func (self, msg);
 }
+
+static void
+on_mpview_realize (GtkWidget *widget, gpointer user_data)
+{
+	RealizePriv *prv = user_data;
+
+	tny_mime_part_view_set_part (TNY_MIME_PART_VIEW (widget), prv->part);
+	g_signal_handler_disconnect (widget, prv->signal);
+
+	g_slice_free (RealizePriv, prv);
+}
+
+static void
+tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	TnyMimePartView *mpview = NULL;
+	gboolean doit = TRUE;
+
+	if (priv->display_one_body)
+	{
+		if (priv->text_body_viewer && tny_mime_part_content_type_is (part, "text/plain"))
+			return;
+
+		mpview = tny_msg_view_create_mime_part_view_for (TNY_MSG_VIEW (self), part);
+		if (tny_mime_part_content_type_is (part, "text/html") &&
+			!TNY_IS_GTK_TEXT_MIME_PART_VIEW (mpview))
+		{   
+			/* An enhanced HTML component? */
+			if (priv->text_body_viewer)
+			{
+				GtkContainer *viewers = GTK_CONTAINER (TNY_GTK_MSG_VIEW (self)->viewers);
+				remove_mime_part_viewer (priv->text_body_viewer, viewers);
+			}
+			priv->text_body_viewer = mpview;
+		}
+	}
+
+
+	if (!mpview)
+		mpview = tny_msg_view_create_mime_part_view_for (TNY_MSG_VIEW (self), part);
+
+	if (mpview) 
+	{
+		if (GTK_IS_WIDGET (mpview))
+		{
+
+			gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), 
+					GTK_WIDGET (mpview), TRUE, TRUE, 0);
+			gtk_widget_show (GTK_WIDGET (mpview));
+			if (!GTK_WIDGET_REALIZED (mpview))
+			{
+				RealizePriv *prv = g_slice_new (RealizePriv);
+				prv->part = part;
+				prv->signal = g_signal_connect (G_OBJECT (mpview),
+					"realize", G_CALLBACK (on_mpview_realize), prv);
+			} else
+				tny_mime_part_view_set_part (mpview, part);
+		} else if (TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
+			tny_mime_part_view_set_part (mpview, part);
+		else if (!TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
+		{
+			priv->unattached_views = g_list_prepend (priv->unattached_views, mpview);
+			tny_mime_part_view_set_part (mpview, part);
+		}
+	}
+}
+
+static void
+tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts)
+{
+	TnyIterator *iterator = tny_list_create_iterator (parts);
+
+	while (!tny_iterator_is_done (iterator))
+	{
+		TnyMimePart *part = (TnyMimePart*)tny_iterator_get_current (iterator);
+		tny_gtk_msg_view_display_part (self, part);
+		g_object_unref (G_OBJECT (part));
+		tny_iterator_next (iterator);
+	}
+
+	g_object_unref (G_OBJECT (iterator));
+
+}
+
+int d,i;
 
 static void 
 tny_gtk_msg_view_set_msg_default (TnyMsgView *self, TnyMsg *msg)
@@ -240,11 +479,27 @@ tny_gtk_msg_view_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 
 	if (msg)
 	{
+		TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+		TnyHeader *header;
+		TnyIterator *iterator;
+		TnyList *list;
+
 		g_assert (TNY_IS_MSG (msg));
 
-		g_object_ref (G_OBJECT (msg));
-		priv->msg = msg;
-		reload_msg (self);
+		list = tny_simple_list_new ();
+		priv->msg = g_object_ref (G_OBJECT (msg));
+
+		header = TNY_HEADER (tny_msg_get_header (priv->msg));
+		g_return_if_fail (TNY_IS_HEADER (header));
+		tny_header_view_set_header (priv->headerview, header);
+		g_object_unref (G_OBJECT (header));
+		gtk_widget_show (GTK_WIDGET (priv->headerview));
+
+		tny_gtk_msg_view_display_part (self, TNY_MIME_PART (msg));
+
+		tny_msg_get_parts (priv->msg, list);
+		tny_gtk_msg_view_display_parts (self, list);
+		g_object_unref (G_OBJECT (list));
 	}
 
 	return;
@@ -282,6 +537,7 @@ tny_gtk_msg_view_clear_default (TnyMsgView *self)
 	GtkContainer *viewers = GTK_CONTAINER (TNY_GTK_MSG_VIEW (self)->viewers);
 	GList *kids = gtk_container_get_children (viewers);
 
+	priv->text_body_viewer = NULL;
 	g_list_foreach (kids, (GFunc)remove_mime_part_viewer, viewers);
 	g_list_free (kids);
 
@@ -294,6 +550,53 @@ tny_gtk_msg_view_clear_default (TnyMsgView *self)
 
 	return;
 }
+
+
+
+static void 
+tny_gtk_msg_view_mp_set_part (TnyMimePartView *self, TnyMimePart *part)
+{
+	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_part_func (self, part);
+	return;
+}
+
+static void 
+tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+
+	if (TNY_IS_MSG (part))
+		tny_msg_view_set_msg (TNY_MSG_VIEW (self), TNY_MSG (part));
+	else
+		tny_gtk_msg_view_display_part (TNY_MSG_VIEW (self), part);
+
+	priv->part = TNY_MIME_PART (g_object_ref (part));
+
+	return;
+}
+
+
+
+static TnyMimePart* 
+tny_gtk_msg_view_mp_get_part (TnyMimePartView *self)
+{
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->get_part_func (self);
+}
+
+
+static TnyMimePart* 
+tny_gtk_msg_view_mp_get_part_default (TnyMimePartView *self)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	return TNY_MIME_PART (g_object_ref (priv->part));
+}
+
+static void 
+tny_gtk_msg_view_mp_clear (TnyMimePartView *self)
+{
+	tny_msg_view_clear (TNY_MSG_VIEW (self));
+}
+
 
 /**
  * tny_gtk_msg_view_new:
@@ -314,6 +617,15 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyGtkMsgView *self = (TnyGtkMsgView *)instance;
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
+
+	/* Defaults */
+	priv->display_html = FALSE;
+	priv->display_plain = TRUE;
+	priv->display_attachments = TRUE;
+	priv->display_rfc822 = FALSE;
+	priv->display_one_body = FALSE;
+
+	priv->text_body_viewer = NULL;
 
 	priv->unattached_views = NULL;
 	priv->msg = NULL;
@@ -382,6 +694,9 @@ tny_gtk_msg_view_finalize (GObject *object)
 	if (G_LIKELY (priv->msg))
 		g_object_unref (G_OBJECT (priv->msg));
 
+	if (G_LIKELY (priv->part))
+		g_object_unref (G_OBJECT (priv->part));
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -397,9 +712,23 @@ tny_msg_view_init (gpointer g, gpointer iface_data)
 	klass->set_unavailable_func = tny_gtk_msg_view_set_unavailable;
 	klass->clear_func = tny_gtk_msg_view_clear;
 	klass->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for;
-	
+
 	return;
 }
+
+
+static void
+tny_mime_part_view_init (gpointer g, gpointer iface_data)
+{
+	TnyMimePartViewIface *klass = (TnyMimePartViewIface *)g;
+
+	klass->get_part_func = tny_gtk_msg_view_mp_get_part;
+	klass->set_part_func = tny_gtk_msg_view_mp_set_part;
+	klass->clear_func = tny_gtk_msg_view_mp_clear;
+
+	return;
+}
+
 
 static void 
 tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
@@ -411,6 +740,8 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 
 	object_class->finalize = tny_gtk_msg_view_finalize;
 
+	class->get_part_func = tny_gtk_msg_view_mp_get_part_default;
+	class->set_part_func = tny_gtk_msg_view_mp_set_part_default;
 	class->get_msg_func = tny_gtk_msg_view_get_msg_default;
 	class->set_msg_func = tny_gtk_msg_view_set_msg_default;
 	class->set_unavailable_func = tny_gtk_msg_view_set_unavailable_default;
@@ -449,10 +780,20 @@ tny_gtk_msg_view_get_type (void)
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
-		
+
+		static const GInterfaceInfo tny_mime_part_view_info = 
+		{
+		  (GInterfaceInitFunc) tny_mime_part_view_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (GTK_TYPE_SCROLLED_WINDOW,
 			"TnyGtkMsgView",
 			&info, 0);
+
+		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 
+			&tny_mime_part_view_info);
 
 		g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW, 
 			&tny_msg_view_info);
