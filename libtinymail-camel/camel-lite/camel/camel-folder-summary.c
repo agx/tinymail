@@ -224,15 +224,15 @@ camel_folder_summary_finalize (CamelObject *obj)
 	p = _PRIVATE(obj);
 
 	g_mutex_lock (s->dump_lock);
-	camel_folder_summary_clear(s);
-	if (s->file)
-		g_mapped_file_free (s->file);
-	s->file = NULL;
+
+	camel_folder_summary_unload_mmap (s);
 
 	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
+	/* camel_folder_summary_clear(s); */
 	g_ptr_array_free(s->messages, TRUE);
 	g_hash_table_destroy(s->messages_uid);
 	s->messages_uid = NULL;
+
 	g_mutex_unlock (s->dump_lock);
 	g_mutex_free (s->dump_lock);
 
@@ -241,23 +241,6 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	g_free(s->summary_path);
 
-	if (p->filter_index)
-		camel_object_unref((CamelObject *)p->filter_index);
-	if (p->filter_64)
-		camel_object_unref((CamelObject *)p->filter_64);
-	if (p->filter_qp)
-		camel_object_unref((CamelObject *)p->filter_qp);
-	if (p->filter_uu)
-		camel_object_unref((CamelObject *)p->filter_uu);
-	if (p->filter_save)
-		camel_object_unref((CamelObject *)p->filter_save);
-	if (p->filter_html)
-		camel_object_unref((CamelObject *)p->filter_html);
-
-	if (p->filter_stream)
-		camel_object_unref((CamelObject *)p->filter_stream);
-	if (p->index)
-		camel_object_unref((CamelObject *)p->index);
 	
 	g_mutex_free(p->summary_lock);
 	g_mutex_free(p->io_lock);
@@ -2176,13 +2159,17 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	return ferror(out);
 }
 
+#ifdef MEMDEBUG
+static int freed=0;
+#endif
+
 static void
 destroy_possible_pstring_stuff(CamelFolderSummary *s, CamelMessageInfo *info, gboolean freeuid)
 {
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 
 #ifdef MEMDEBUG
-	printf ("Freeup %s\n", (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)?"YES":"NO");
+	printf ("Freeup %d, %s\n", freed++, (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)?"YES":"NO");
 #endif
 
 	if (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
@@ -2230,7 +2217,10 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 
 	destroy_possible_pstring_stuff (s, info, TRUE);
 
-	g_slice_free1 (s->message_info_size, mi);
+	if (s)
+		g_slice_free1 (s->message_info_size, mi);
+	else
+		g_slice_free (CamelMessageInfo, (CamelMessageInfo*) mi);
 }
 
 static CamelMessageContentInfo *
@@ -3058,8 +3048,8 @@ camel_message_info_free(void *o)
 		CAMEL_SUMMARY_UNLOCK(mi->summary, ref_lock);
 
 		/* FIXME: this is kinda busted, should really be handled by message info free */
-		if (mi->summary->build_content
-		    && ((CamelMessageInfoBase *)mi)->content) {
+		if (/* mi->summary->build_content
+		    && */((CamelMessageInfoBase *)mi)->content) {
 			camel_folder_summary_content_info_free(mi->summary, ((CamelMessageInfoBase *)mi)->content);
 		}
 

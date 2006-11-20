@@ -149,6 +149,7 @@ static int cnt=0;
 static pthread_mutex_t pstring_lock = PTHREAD_MUTEX_INITIALIZER;
 static GHashTable *pstring_table = NULL;
 
+
 /**
  * camel_pstring_add:
  * @str: string to add to the string pool

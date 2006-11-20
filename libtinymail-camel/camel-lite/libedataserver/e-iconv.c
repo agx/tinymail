@@ -110,6 +110,7 @@ struct {
 	   not going to bother putting them all in here... */
 	{ "windows-cp1251", "cp1251"     },
 	{ "windows-1251",   "cp1251"     },
+	{ "cp1251",         "CP1251"     },
 	{ "cp1251",         "cp1251"     },
 	/* the above mostly serves as an example for windows-style
 	   charsets, but we have code that will parse and convert them
