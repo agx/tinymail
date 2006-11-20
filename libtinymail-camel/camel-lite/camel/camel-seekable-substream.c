@@ -199,6 +199,7 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 	CamelSeekableStream *seekable_stream = CAMEL_SEEKABLE_STREAM(stream);
 	CamelSeekableSubstream *seekable_substream = CAMEL_SEEKABLE_SUBSTREAM(stream);
 	ssize_t v;
+	off_t orig;
 
 	if (n == 0)
 		return 0;
@@ -220,11 +221,15 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 		return 0;
 	}
 
+	orig = seekable_stream->position;
+
 	v = camel_stream_write((CamelStream *)parent, buffer, n);
 
 	/* ignore <0 - it's an error, let the caller deal */
-	if (v > 0)
-		seekable_stream->position += v;
+	if (v > 0) {
+		orig += v;
+		seekable_stream->position = orig;
+	}
 
 	return v;
 
