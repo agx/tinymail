@@ -109,7 +109,8 @@ tny_camel_msg_get_header_default (TnyMsg *self)
 
 	g_mutex_lock (priv->header_lock);
 	retval = priv->header;
-	g_object_ref (G_OBJECT (retval));
+	if (retval)
+		g_object_ref (G_OBJECT (retval));
 	g_mutex_unlock (priv->header_lock);
 
 	return retval;

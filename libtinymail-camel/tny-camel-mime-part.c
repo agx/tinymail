@@ -30,6 +30,8 @@
 #include <camel/camel-data-wrapper.h>
 #include <tny-camel-shared.h>
 #include <tny-list.h>
+#include <tny-camel-header.h>
+#include <tny-camel-msg.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -50,10 +52,6 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-stream-null.h>
 #include <camel/camel-mime-filter-charset.h>
 #include <camel/camel-mime-filter-windows.h>
-
-
-/* Locking warning: tny-camel-msg.c also locks priv->part_lock */
-
 
 
 typedef gboolean (*CamelPartFunc)(CamelMimeMessage *, CamelMimePart *, void *data);
@@ -104,8 +102,14 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 
 	if (camel_content_type_is (type, "message", "rfc822")) 
 	{
+		TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
 		tpart = TNY_MIME_PART (tny_camel_msg_new ());
 		tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (tpart), part);
+		if (CAMEL_IS_MIME_MESSAGE (part))
+			_tny_camel_header_set_camel_mime_message (nheader, CAMEL_MIME_MESSAGE (part));
+		_tny_camel_msg_set_header (TNY_CAMEL_MSG (tpart), nheader);
+		g_object_unref (G_OBJECT (nheader));
+
 	} else
 		tpart = tny_camel_mime_part_new (part);
 

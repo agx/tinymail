@@ -340,7 +340,22 @@ tny_camel_header_get_date_received (TnyHeader *self)
 #endif
 
 	if (G_UNLIKELY (me->write))
-		retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, NULL);
+	{
+		int tzone;
+
+		retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, &tzone);
+
+		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
+			retval = camel_mime_message_get_date (((WriteInfo*)me->info)->msg, &tzone);
+		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
+		{
+			time (&retval);
+			tzone = 0;
+		}
+
+		retval += (tzone / 100) * 60 * 60;
+		retval += (tzone % 100) * 60;
+	}
 	else
 		retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
 
@@ -361,7 +376,24 @@ tny_camel_header_get_date_sent (TnyHeader *self)
 		return retval;
 #endif
 
-	retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
+	if (G_UNLIKELY (me->write))
+	{
+		int tzone;
+		retval = camel_mime_message_get_date (((WriteInfo*)me->info)->msg, &tzone);
+
+		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
+			retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, &tzone);
+		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
+		{
+			time (&retval);
+			tzone = 0;
+		}
+
+		retval += (tzone / 100) * 60 * 60;
+		retval += (tzone % 100) * 60;
+	}
+	else
+		retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
 
 	return retval;
 }
