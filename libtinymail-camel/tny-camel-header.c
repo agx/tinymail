@@ -343,10 +343,10 @@ tny_camel_header_get_date_received (TnyHeader *self)
 	{
 		int tzone;
 
-		retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, &tzone);
+		retval = camel_mime_message_get_date (((WriteInfo*)me->info)->msg, &tzone);
 
 		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-			retval = camel_mime_message_get_date (((WriteInfo*)me->info)->msg, &tzone);
+			retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, &tzone);
 		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
 		{
 			time (&retval);

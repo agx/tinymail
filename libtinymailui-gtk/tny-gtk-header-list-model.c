@@ -253,16 +253,16 @@ tny_gtk_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 }
 
 
-gchar *
+static gchar *
 _get_readable_date (time_t file_time_raw)
 {
-	struct tm *file_time;
+	struct tm file_time;
 	static gchar readable_date[64];
 	gsize readable_date_size;
 
-	file_time = localtime (&file_time_raw);
+	gmtime_r (&file_time_raw, &file_time);
 
-	readable_date_size = strftime (readable_date, 63, _("%Y-%m-%d, %-I:%M %p"), file_time);		
+	readable_date_size = strftime (readable_date, 63, _("%Y-%m-%d, %-I:%M %p"), &file_time);
 	
 	return readable_date;
 }
