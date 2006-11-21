@@ -367,8 +367,14 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 			model = tny_gtk_attach_list_model_new ();
 			gtk_icon_view_set_model (priv->attachview, model);
 			first = FALSE;
-		} else
+		} else {
 			model = gtk_icon_view_get_model (priv->attachview);
+			if (!model || !TNY_IS_LIST (model))
+			{
+				model = tny_gtk_attach_list_model_new ();
+				gtk_icon_view_set_model (priv->attachview, model);
+			}
+		}
 
 		retval = tny_gtk_attachment_mime_part_view_new (TNY_GTK_ATTACH_LIST_MODEL (model));
 	}
