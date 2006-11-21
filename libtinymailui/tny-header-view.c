@@ -25,7 +25,7 @@
  * tny_header_view_clear:
  * @self: A #TnyHeaderView instance
  *
- * Clear the view @self (show nothing)
+ * Clear @self (show nothing)
  *
  * Implementors: this method should clear view @self (display nothing and 
  * clearup)
@@ -49,13 +49,12 @@ tny_header_view_clear (TnyHeaderView *self)
  * @self: A #TnyHeaderView instance
  * @header: A #TnyHeader instace
  *
- * Set header of the view @self
+ * Set @self to display @header
  * 
- * Implementors: this method should cause the view @self to show the header
- * @header to the user. This typically means showing the from, to, subject, date
- * and cc labels.
+ * Implementors: this method should cause @self to show @header to the user.
+ * This typically means showing the from, to, subject, date and cc labels.
  *
- * #TnyHeaderView is often used in a composition with a #TnyMsgView
+ * The #TnyHeaderView type is often used in a composition with a #TnyMsgView
  * type (the #TnyMsgView implementation contains or aggregates a #TnyHeaderView).
  *
  **/

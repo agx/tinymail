@@ -299,7 +299,7 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header)
 			return;
 		}
 
-	tny_msg_remove_strategy_remove (priv->remove_strat, self, header);
+	tny_msg_remove_strategy_perform_remove (priv->remove_strat, self, header);
 
 	g_mutex_unlock (priv->folder_lock);
 
@@ -940,20 +940,18 @@ tny_camel_folder_get_id_default (TnyFolder *self)
 }
 
 static void
-tny_camel_folder_transfer_msgs (TnyFolder *folder_src, 
+tny_camel_folder_transfer_msgs (TnyFolder *self, 
 				TnyList *headers, 
 				TnyFolder *folder_dst, 
 				gboolean delete_originals)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (folder_src)->transfer_msgs_func (folder_src, headers, folder_dst, delete_originals);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals);
 }
 
 static void
-tny_camel_folder_transfer_msgs_default (TnyFolder *folder_src, 
-					TnyList *headers,
-					TnyFolder *folder_dst,
-					gboolean delete_originals)
+tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals)
 {
+	TnyFolder *folder_src = self;
 	TnyCamelFolderPriv *priv_src, *priv_dst;
 	TnyIterator *iter;
 	CamelException *ex;

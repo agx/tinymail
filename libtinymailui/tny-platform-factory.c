@@ -28,11 +28,12 @@
  * tny_platform_factory_new_account_store:
  * @self: a TnyPlatformFactory object
  *
- * Get a new #TnyAccountStore instance. The returned instance must be 
+ * Create a new #TnyAccountStore instance. The returned instance must be 
  * unreferenced after use.
  *
  * Implementors: when implementing a platform-specific library, return a 
- * new #TnyAccountStore instance.
+ * new #TnyAccountStore instance. It's allowed to reuse one instance, just
+ * make sure that you add a reference then.
  *
  * Return value: a #TnyAccountStore instance
  **/
@@ -51,12 +52,12 @@ tny_platform_factory_new_account_store (TnyPlatformFactory *self)
  * tny_platform_factory_new_device:
  * @self: a TnyPlatformFactory object
  *
- *
- * Get a new #TnyDevice instance. The returned instance must be 
+ * Create a new #TnyDevice instance. The returned instance must be 
  * unreferenced after use.
  *
  * Implementors: when implementing a platform-specific library, return a 
- * new #TnyDevice instance.
+ * new #TnyDevice instance. It's allowed to reuse one instance, just
+ * make sure that you add a reference then.
  *
  * Return value: a #TnyDevice instance
  *
@@ -76,11 +77,12 @@ tny_platform_factory_new_device (TnyPlatformFactory *self)
  * tny_platform_factory_new_msg_view:
  * @self: a TnyPlatformFactory object
  *
- * Get a new #TnyMsgView instance. The returned instance must be 
+ * Create a new #TnyMsgView instance. The returned instance must be 
  * unreferenced after use.
  *
  * Implementors: when implementing a platform-specific library, return a 
- * new #TnyMsgView instance.
+ * new #TnyMsgView instance. It's allowed to reuse one instance, just
+ * make sure that you add a reference then.
  *
  * Return value: a #TnyMsgView instance
  **/

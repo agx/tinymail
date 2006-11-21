@@ -42,7 +42,6 @@ struct _TnyGtkHeaderViewPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_HEADER_VIEW, TnyGtkHeaderViewPriv))
 
 
-/* TODO: refactor */
 static gchar *
 _get_readable_date (time_t file_time_raw)
 {

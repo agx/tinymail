@@ -2,7 +2,9 @@
 
 	* Major changes in TnyMsg and TnyMimePart
 	* First support for message/rfc822 messages
-
+	* API documentation enhancements
+	* Date fixes in TnyCamelHeader
+	
 	* This was a major API change in all libraries
 
 2006-11-20  Philip van Hoof <pvanhoof@gnome.org>

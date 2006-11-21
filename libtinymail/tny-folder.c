@@ -32,7 +32,10 @@ guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
  *
  * Get the strategy for removing a message. The return value of this method
  * must be unreferenced after use.
- * 
+ *
+ * Implementors: This method must return the strategy for removing a message.
+ * being the implementer, you must add a reference before returning the instance.
+ *
  * Return value: the strategy for removing a message
  **/
 TnyMsgRemoveStrategy* 
@@ -51,7 +54,18 @@ tny_folder_get_msg_remove_strategy (TnyFolder *self)
  * @st: a #TnyMsgRemoveStrategy object
  *
  * Set the strategy for removing a message
- * 
+ *
+ * Implementors: This method must set (store) the strategy for removing a
+ * message.
+ *
+ * The idea is that devices can have a specific such strategy. For example a
+ * strategy that removes it immediately from both local cache and a service
+ * or a strategy that does nothing but flag the message for removal upon next
+ * expunge or a strategy that does nothing.
+ *
+ * For more information take a look at tny_msg_remove_strategy_peform_remove
+ * of #TnyMsgRemoveStrategy.
+ *
  **/
 void 
 tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
@@ -119,7 +133,9 @@ tny_folder_add_msg (TnyFolder *self, TnyMsg *msg)
  *
  * Remove a message from a folder. It will use a #TnyMsgRemoveStrategy to 
  * perform the removal itself. For more details, check out the documentation
- * of the #TnyMsgRemoveStrategy type. 
+ * of the #TnyMsgRemoveStrategy type and the implementation that you activated
+ * using tny_folder_set_msg_remove_strategy. The default implementation for
+ * libtinymail-camel is the #TnyCamelMsgRemoveStrategy.
  *
  * Example:
  * <informalexample><programlisting>
@@ -169,9 +185,9 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header)
  * @status_callback: A callback for status notifications
  * @user_data: user data for the callback
  *
- * Refresh the folder and call back when finished. This gets the summary 
- * information from the E-Mail service and writes it to the the on-disk cache 
- * and/or updates it.
+ * Refresh @self and call back when finished. This gets the summary information
+ * from the E-Mail service, writes it to the the on-disk cache and/or updates
+ * it.
  *
  * After this method, tny_folder_get_all_count and 
  * tny_folder_get_unread_count are guaranteed to be correct.
@@ -241,8 +257,8 @@ tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, Tn
  * tny_folder_refresh:
  * @self: a TnyFolder object
  *
- * Refresh the folder. This gets the summary information from the E-Mail service
- * and writes it to the the on-disk cache and/or updates it.
+ * Refresh the folder. This gets the summary information from the E-Mail
+ * service, writes it to the the on-disk cache and/or updates it.
  *
  * After this method, tny_folder_get_all_count and 
  * tny_folder_get_unread_count are guaranteed to be correct.
@@ -267,8 +283,7 @@ tny_folder_refresh (TnyFolder *self)
  * tny_folder_is_subscribed:
  * @self: a TnyFolder object
  * 
- *
- * Get the subscribed status of this folder.
+ * Get the subscribtion status of this folder.
  * 
  * Return value: subscribe status
  **/
@@ -288,7 +303,8 @@ tny_folder_is_subscribed (TnyFolder *self)
  * @self: a TnyFolder object
  * 
  * Get the amount of unread messages in this folder. The value is only
- * garuanteed to be correct after tny_folder_refresh.
+ * garuanteed to be correct after tny_folder_refresh or after the callback of
+ * a tny_folder_refresh_async happened.
  * 
  * Return value: amount of unread messages
  *
@@ -308,8 +324,9 @@ tny_folder_get_unread_count (TnyFolder *self)
  * tny_folder_get_all_count:
  * @self: a TnyFolder object
  * 
- * Get the amount of messages in this folder. The value is only
- * garuanteed to be correct after tny_folder_refresh.
+ * Get the amount of messages in this folder. The value is only garuanteed to be
+ * correct after tny_folder_refresh or after the callback of a 
+ * tny_folder_refresh_async happened.
  * 
  * Return value: amount of messages
  *
@@ -348,26 +365,25 @@ tny_folder_get_account (TnyFolder *self)
 
 /**
  * tny_folder_transfer_msgs:
- * @folder_src: the TnyFolder where the headers are stored
+ * @self: the TnyFolder where the headers are stored
  * @header_list: a list of TnyHeader objects
  * @folder_dst: the TnyFolder where the msgs will be transfered
  * @delete_originals: if TRUE then move msgs, else copy them
  * 
- * Transfers messages from a folder to another. They could be moved or
- * just copied depending on the value of the delete_originals argument
+ * Transfers messages of which the headers are in @header_list from @self to 
+ * @folder_dst. They could be moved or just copied depending on the value of 
+ * the @delete_originals argument
+ *
  **/
 void 
-tny_folder_transfer_msgs (TnyFolder *folder_src, 
-			  TnyList *headers, 
-			  TnyFolder *folder_dst, 
-			  gboolean delete_originals)
+tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals)
 {
 #ifdef DEBUG
-	if (!TNY_FOLDER_GET_IFACE (folder_src)->transfer_msgs_func)
+	if (!TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func)
 		g_critical ("You must implement tny_folder_transfer_msgs\n");
 #endif
 
-	return TNY_FOLDER_GET_IFACE (folder_src)->transfer_msgs_func (folder_src, headers, folder_dst, delete_originals);
+	return TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals);
 }
 
 

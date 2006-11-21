@@ -393,7 +393,7 @@ tny_camel_header_get_date_sent (TnyHeader *self)
 		retval += (tzone % 100) * 60;
 	}
 	else
-		retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
+		retval = camel_message_info_date_sent ((CamelMessageInfo*)me->info);
 
 	return retval;
 }

@@ -26,7 +26,7 @@
  * tny_mime_part_view_clear:
  * @self: A #TnyMimePartView instance
  *
- * Clear the view @self (show nothing)
+ * Clear @self (show nothing)
  *
  * Implementors: this method should clear @self (display nothing and cleanup)
  *
@@ -48,11 +48,21 @@ tny_mime_part_view_clear (TnyMimePartView *self)
  * tny_mime_part_view_get_part:
  * @self: A #TnyMimePartView instance
  *
- * Get mime part of the view @self. The return value must be unreferenced after
- * use.
+ * Get the current mime part of @self. If @self is not displaying any mime part,
+ * NULL will be returned. Else the return value must be unreferenced after use.
  * 
  * Implementors: this method should return the mime part this view is currently
- * viewing. If the view isn't viewing any mime part, it must return NULL.
+ * viewing. It must add a reference to the instance before returning it. If the 
+ * view isn't viewing any mime part, it must return NULL.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * static TnyMimePart* 
+ * tny_gtk_text_mime_part_view_get_part (TnyMimePartView *self)
+ * {
+ *      return TNY_MIME_PART (g_object_ref (priv->part));
+ * }
+ * </programlisting></informalexample>
  *
  * Return value: A #TnyMimePart instance or NULL
  **/
@@ -72,7 +82,7 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  * @self: A #TnyMimePartView instance
  * @mime_part: A #TnyMimePart instace
  *
- * Set mime part which the view @self should display.
+ * Set mime part which @self should display.
  * 
  * Implementors: this method should cause the view @self to show the mime part
  * @mime_part to the user. 
@@ -94,7 +104,14 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  *           tny_mime_part_decode_to_stream (part, dest);
  *           tny_stream_reset (dest);
  *           g_object_unref (G_OBJECT (dest));
+ *           priv->part = TNY_MIME_PART (g_object_ref (part));
  *      }
+ * }
+ * static void
+ * tny_gtk_text_mime_part_view_finalize (TnyGtkTextMimePartView *self)
+ * {
+ *      if (priv->part))
+ *          g_object_unref (G_OBJECT (priv->part));
  * }
  * </programlisting></informalexample>
  **/

@@ -30,44 +30,45 @@ guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
  * @type: the message type (severity)
  * @prompt: the prompt
  *
- * This jump-to-the-ui method implements showing a message dialog with prompt
- * as prompt. It will return TRUE if the reply was affirmative or FALSE if not.
+ * This jump-to-the-ui method implements showing a message dialog with @prompt
+ * as prompt and @type as message type. It will return TRUE if the reply was 
+ * affirmative or FALSE if not.
  *
  * Implementors: when implementing a platform-specific library, you must
- * implement this method. For example in Gtk+ by using the #GtkDialog API.
+ * implement this method. For example in Gtk+ by using the #GtkDialog API. The
+ * implementation will for example be used to ask the user about accepting SSL
+ * certificates. The two possible answers that must be supported are 
+ * "Yes" and "No" which must result in a TRUE or a FALSE return value.
  *
  * Example implementation for Gtk+:
  * <informalexample><programlisting>
  * static gboolean
  * tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
  * {
- * 	GtkMessageType gtktype;
- * 	gboolean retval = FALSE;
- * 	GtkWidget *dialog;
- * 	switch (type)
- * 	{
- * 		case TNY_ALERT_TYPE_INFO:
- * 		gtktype = GTK_MESSAGE_INFO;
- * 		break;
- * 		case TNY_ALERT_TYPE_WARNING:
- * 		gtktype = GTK_MESSAGE_WARNING;
- * 		break;
- * 		case TNY_ALERT_TYPE_ERROR:
- * 		default:
- * 		gtktype = GTK_MESSAGE_ERROR;
- * 		break;
- * 	}
- * 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
- *		gtktype, GTK_BUTTONS_YES_NO, prompt);
- * 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
- * 		retval = TRUE;
- * 	gtk_widget_destroy (dialog);
- * 	return retval;
+ *     GtkMessageType gtktype;
+ *     gboolean retval = FALSE;
+ *     GtkWidget *dialog;
+ *     switch (type)
+ *     {
+ *         case TNY_ALERT_TYPE_INFO:
+ *         gtktype = GTK_MESSAGE_INFO;
+ *         break;
+ *         case TNY_ALERT_TYPE_WARNING:
+ *         gtktype = GTK_MESSAGE_WARNING;
+ *         break;
+ *         case TNY_ALERT_TYPE_ERROR:
+ *         default:
+ *         gtktype = GTK_MESSAGE_ERROR;
+ *         break;
+ *     }
+ *     dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+ *            gtktype, GTK_BUTTONS_YES_NO, prompt);
+ *     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+ *            retval = TRUE;
+ *     gtk_widget_destroy (dialog);
+ *     return retval;
  * }
  * </programlisting></informalexample>
- *
- * The @prompt will be a message like a question to the user whether or not he
- * accepts the SSL certificate of the service.
  *
  * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
  *
@@ -90,10 +91,8 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *
  * value after use.
  *
  * Implementors: when implementing a platform-specific library, you must
- * implement this method and a #TnyDevice implementation. 
- 
- * As the implementor of this method, you must add a reference count before 
- * returning.
+ * implement this method by letting it return a #TnyDevice instance. You must
+ * add a reference count before returning.
  *
  * Return value: the device attached to this account store
  *
@@ -119,8 +118,8 @@ tny_account_store_get_device (TnyAccountStore *self)
  * folder in $HOME on the file system.
  *
  * Note that the callers of this method will not free the result. The
- * implementor of a #TnyAccountStore is responsible of freeing it up. For
- * example when destroying the instance.
+ * implementor of a #TnyAccountStore is responsible for freeing it up. For
+ * example when destroying @self (in its finalize method).
  *
  * Return value: the local path that will be used for storing the disk cache
  *
@@ -142,7 +141,8 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * @list: a #TnyList instance that will be filled with #TnyAccount instances
  * @types: a #TnyGetAccountsRequestType that describes which account types are needed
  * 
- * Get a read-only list of accounts in the store
+ * Get a read-only list of accounts in the store. You must not change @list 
+ * except for referencing and unreferencing.
  *
  * Example:
  * <informalexample><programlisting>
@@ -162,16 +162,16 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *
  * Implementors: when implementing a platform-specific library, you must 
  * implement this method.
- * 
+ *
  * It is allowed to cache the list (but not required). If you are implementing
  * an account store for account implementations from libtinymail-camel, you must
  * register the created accounts with a #TnySessionCamel instance using the 
  * libtinymail-camel specific tny_session_camel_set_current_accounts API.
  *
- * The implementation must obviously fillup @list with available accounts.
- * Note that if you cache the list, you must add a reference to each account
- * added to the list (else they will be unreferenced and if the reference count
- * would reach zero, an account would no longer be cached).
+ * The implementation must fillup @list with available accounts. Note that if
+ * you cache the list, you must add a reference to each account added to the
+ * list (else they will be unreferenced and if the reference count would reach
+ * zero, an account would no longer be cached).
  *
  * With libtinymail-camel each created account must also be informed about the
  * #TnySessionCamel instance being used. Read more about this at
@@ -302,6 +302,8 @@ tny_account_store_base_init (gpointer g_class)
  * @arg1: the #TnyAccount of the account that changed
  * @user_data: user data set when the signal handler was connected
  *
+ * API WARNING: This API might change
+ *
  * Emitted when an account in the store changed
  */
 		tny_account_store_signals[TNY_ACCOUNT_STORE_ACCOUNT_CHANGED] =
@@ -319,10 +321,10 @@ tny_account_store_base_init (gpointer g_class)
  * @arg1: the #TnyAccount of the account that got inserted
  * @user_data: user data set when the signal handler was connected.
  *
+ * API WARNING: This API might change
+ *
  * Emitted when an account is added to the store
  */
-
-
 		tny_account_store_signals[TNY_ACCOUNT_STORE_ACCOUNT_INSERTED] =
 		   g_signal_new ("account_inserted",
 			TNY_TYPE_ACCOUNT_STORE,
@@ -338,6 +340,8 @@ tny_account_store_base_init (gpointer g_class)
  * @arg1: the #TnyAccount of the account that got removed
  * @user_data: user data set when the signal handler was connected.
  *
+ * API WARNING: This API might change
+ *
  * Emitted when an account is removed from the store
  */
 		tny_account_store_signals[TNY_ACCOUNT_STORE_ACCOUNT_REMOVED] =
@@ -352,6 +356,8 @@ tny_account_store_base_init (gpointer g_class)
 /**
  * TnyAccountStore::accounts-reloaded
  * @self: the object on which the signal is emitted
+ *
+ * API WARNING: This API might change
  *
  * Emitted when the store reloads the accounts
  */

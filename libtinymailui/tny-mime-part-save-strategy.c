@@ -26,16 +26,17 @@
  * @self: A #TnyMimePartSaveStrategy instance
  * @part: The #TnyMimePart instance that must be saved
  *
- * Performs the saving of a mime part
+ * With @self being a delegate of a #TnyMimePartSaver, this method performs the
+ * saving of @part.
  *
  * A save strategy for a mime part is used with a type that implements the 
  * #TnyMimePartSaver interface. Types that do, will often also implement the 
- * #TnyMsgView interface (it's not a requirement). In this case they say that 
- * the view has functionality for saving mime parts.
+ * #TnyMsgView or #TnyMimePartView interface (it's not a requirement). In this
+ * case they say that the view has functionality for saving mime parts.
  *
  * You can for example inherit an implementation of a #TnyMsgView, like the 
  * #TnyGtkMsgView one, and let yours also implement #TnyMimePartSaver. The 
- * example shown here is such a situation
+ * example shown here is for example such a situation.
  *
  * Example:
  * <informalexample><programlisting>
@@ -47,15 +48,18 @@
  * }
  * </programlisting></informalexample>
  *
- * Implementors: The idea is that devices can have specific such strategies.
+ * Implementors: The idea is that devices can have specific strategies that can
+ * be changed at runtime.
+ *
  * For example a strategy that sends it to another computer and/or a strategy
  * that saves it to a flash disk. Configurable at runtime by simply switching
  * the strategy property of a #TnyMimePartSaver.
  *
- * The implementation shown in the example implements it using the gtk+ toolkit.
- * Saving a mime part can also be doing nothing, if your device doesn't support
- * it. Maybe you will implement it by letting it contact a service and sending
- * the mime part to it? It's up to you.
+ * The implementation shown in this example implements it using the gtk+ toolkit.
+ * If your device doesn't support saving mime parts, saving a mime part can also
+ * be implemented by doing nothing. For example a #TnyMyDoNothingSaveStrategy. 
+ * Maybe you will implement it by letting it contact a service and sending the
+ * mime part to it? It's up to you.
  *
  * Example:
  * <informalexample><programlisting>
@@ -69,8 +73,9 @@
  *            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_MIME_PART_SAVE, 
  *            GTK_RESPONSE_ACCEPT, NULL));
  *      gtk_file_chooser_set_current_name (dialog, 
- *            tny_mime_part_get_filename (part));
- * 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+ *                    tny_mime_part_get_filename (part));
+ *      if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) 
+ *      {
  *            gchar *uri; int fd;
  *            uri = gtk_file_chooser_get_filename (dialog);
  *            fd = open (uri, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
@@ -85,15 +90,17 @@
  * </programlisting></informalexample>
  *
  * The method is typically called by the implementation of a #TnyMsgView.
- * For example a clicked handler of a popup menu of a attachment view in the
+ * For example a clicked handler of a popup menu of a attachment view in your
  * #TnyMsgView implementation.
  * 
- * Note that a mime can mean both the entire message (without its headers) and
- * one individual mime part in such a message. A #TnyMsg inherits from #TnyMimePart
- * which means that if you use the message instance with a #TnyMimePartSaveStrategy
- * instance, that the strategy for saving it will save the entire message. Whereas
- * when you pass it just one individual mime part instance, the strategy will 
- * save only that part.
+ * Note that a mime part can mean both the entire message (without its headers)
+ * and one individual mime part in such a message or a message in a message (in 
+ * case of a messge/rfc822 mime part).
+ *
+ * A #TnyMsg inherits from #TnyMimePart which means that if you use the message
+ * instance with a #TnyMimePartSaveStrategy instance that the strategy for
+ * saving it must save the entire message. Whereas when you pass it just one
+ * individual mime part instance, the strategy must save only that part.
  **/
 void
 tny_mime_part_save_strategy_perform_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)

@@ -22,7 +22,7 @@
 #include <tny-msg-remove-strategy.h>
 
 /**
- * tny_msg_remove_strategy_remove:
+ * tny_msg_remove_strategy_peform_remove:
  * @self: A #TnyMsgRemoveStrategy instance
  * @folder: The #TnyFolder instance from which the message will be removed
  * @header: The #TnyHeader instance of the message that must be removed
@@ -58,14 +58,14 @@
  *
  **/
 void
-tny_msg_remove_strategy_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
+tny_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->remove_func)
+	if (!TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func)
 		g_critical ("You must implement tny_msg_remove_strategy_remove\n");
 #endif
 
-	TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->remove_func (self, folder, header);
+	TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func (self, folder, header);
 	return;
 }
 

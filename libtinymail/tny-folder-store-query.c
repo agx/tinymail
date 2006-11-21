@@ -37,9 +37,8 @@ static GObjectClass *item_parent_class;
 TnyFolderStoreQuery* 
 tny_folder_store_query_new (void)
 {
-    TnyFolderStoreQuery *self = g_object_new (TNY_TYPE_FOLDER_STORE_QUERY, NULL);
-    
-    return self;
+	TnyFolderStoreQuery *self = g_object_new (TNY_TYPE_FOLDER_STORE_QUERY, NULL);
+	return self;
 }
 
 static void
@@ -172,8 +171,8 @@ get_regerror (int errcode, regex_t *compiled)
  * If the options contain TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME or 
  * TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID then @pattern will be used as
  * regular expression for matching the property of the folders. What the
- * properties tny_folder_get_name and tny_folder_get_id would contain will 
- * be used in this case.
+ * properties tny_folder_get_name and tny_folder_get_id would contain, will 
+ * be used while matching.
  *
  * Example:
  * <informalexample><programlisting>
@@ -185,10 +184,10 @@ get_regerror (int errcode, regex_t *compiled)
  * iter = tny_list_create_iterator (folders);
  * while (!tny_iterator_is_done (iter))
  * {
- *  	TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
- * 	g_print ("%s\n", tny_folder_get_name (folder));
- * 	g_object_unref (G_OBJECT (folder));
- * 	tny_iterator_next (iter);	    
+ *      TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
+ *      g_print ("%s\n", tny_folder_get_name (folder));
+ *      g_object_unref (G_OBJECT (folder));
+ *      tny_iterator_next (iter);
  * }
  * g_object_unref (G_OBJECT (iter));
  * g_object_unref (G_OBJECT (folders)); 
@@ -209,10 +208,10 @@ get_regerror (int errcode, regex_t *compiled)
  * iter = tny_list_create_iterator (folders);
  * while (!tny_iterator_is_done (iter))
  * {
- *  	TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
- * 	g_print ("%s\n", tny_folder_get_name (folder));
- * 	g_object_unref (G_OBJECT (folder));
- * 	tny_iterator_next (iter);	    
+ *      TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
+ *      g_print ("%s\n", tny_folder_get_name (folder));
+ *      g_object_unref (G_OBJECT (folder));
+ *      tny_iterator_next (iter);
  * }
  * g_object_unref (G_OBJECT (iter));
  * g_object_unref (G_OBJECT (folders)); 
@@ -259,14 +258,15 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
  * tny_folder_store_query_get_items:
  * @query: a #TnyFolderStoreQuery object
  *
- * Get a list of query items 
+ * Get a list of query items in @query. The return value must be unreferenced
+ * after use.
  *
  * Return value: a list of query items
  **/
 TnyList*
 tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
 {
-	return g_object_ref (G_OBJECT (query->items));
+	return TNY_LIST (g_object_ref (G_OBJECT (query->items)));
 }
 
 
@@ -274,7 +274,7 @@ tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
  * tny_folder_store_query_item_get_options:
  * @item: a #TnyFolderStoreQueryItem object
  *
- * Get the options of @item
+ * Get the options of @item as a #TnyFolderStoreQueryOption enum.
  *
  * Return value: the options of a query item
  *

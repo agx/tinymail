@@ -26,14 +26,14 @@
  * tny_account_get_account_type:
  * @self: a #TnyAccount object
  *
- * Get the account type. There are two account types: a store and a transport
- * account type.
+ * Get the account type of @self. There are two account types: a store and 
+ * transport account type.
  *
- * A store account will implement the #TnyFolderStore 
- * interfaces which means that the type can contain folders.
+ * A store account typically contains folders and messages. Examples are NNTP,
+ * IMAP and POP accounts.
  *
  * A transport account has a send method for sending #TnyMsg instances
- * using the transport protocol of the account (for example SMTP).
+ * using the transport implemented by the account (for example SMTP).
  *
  * Return value: The account type
  **/
@@ -53,7 +53,7 @@ tny_account_get_account_type (TnyAccount *self)
  * tny_account_is_connected:
  * @self: a #TnyAccount object
  *
- * Get the connection status of an account
+ * Get the connection status of @self
  *
  * Return value: whether or not the account is connected
  **/
@@ -73,9 +73,11 @@ tny_account_is_connected (TnyAccount *self)
  * tny_account_get_id:
  * @self: a #TnyAccount object
  * 
- * Get the unique id of the account. The only certainty you have is that the
- * id is unique. The format of the id isn't specified. The implementor of the
- * #TnyAccountStore must set this id using tny_account_set_id.
+ * Get the unique id of @self
+ *
+ * The only certainty you have is that the id is unique in the #TnyAccountStore.
+ * The format of the id isn't specified. The implementor of the #TnyAccountStore
+ * must set this id using tny_account_set_id.
  * 
  * Return value: Unique id
  **/
@@ -116,8 +118,8 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
  * @id: the id
  *
  * Set the unique id of the account. You need to set this property before you 
- * can start using the account. The id must be unique and is typically set in the
- * implementation of a #TnyAccountStore.
+ * can start using the account. The id must be unique in a #TnyAccountStore and
+ * is typically set in the implementation of a #TnyAccountStore.
  * 
  **/
 void 
@@ -138,7 +140,7 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
  * @forget_pass_func: a pointer to the function
  *
  * Set the function that will be called in case the password was wrong and 
- * therefore can be forgotten by the password store.
+ * therefore can, for example, be forgotten by a password store.
  *
  * You need to set this property before you can start using the account. This
  * property is typically set in the implementation of a #TnyAccountStore.
@@ -181,7 +183,7 @@ tny_account_get_forget_pass_func (TnyAccount *self)
  * @self: a #TnyAccount object
  * @url_string: the url string (ex. mbox://path)
  *  
- * Set the url string of an account. You don't need to use this for imap and pop
+ * Set the url string of @self. You don't need to use this for imap and pop
  * where you can use the simplified API (set_proto, set_hostname, etc). This
  * property is typically set in the implementation of a #TnyAccountStore.
  * 
@@ -203,8 +205,8 @@ tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
  * @self: a #TnyAccount object
  * @proto: the protocol (ex. "imap")
  * 
- * Set the protocol of an account. You need to set this property before you can
- * start using the account. This property is typically set in the implementation
+ * Set the protocol of @self. You need to set this property before you can start
+ * using the account. This property is typically set in the implementation
  * of a #TnyAccountStore.
  * 
  **/
@@ -225,7 +227,7 @@ tny_account_set_proto (TnyAccount *self, const gchar *proto)
  * @self: a #TnyAccount object
  * @user: the username
  * 
- * Set the user or login of an account. You need to set this property before you
+ * Set the user or login of @self. You need to set this property before you
  * can start using the account. This property is typically set in the
  * implementation of a #TnyAccountStore.
  *
@@ -247,9 +249,9 @@ tny_account_set_user (TnyAccount *self, const gchar *user)
  * @self: a #TnyAccount object
  * @host: the hostname
  * 
- * Set the hostname of an account. You need to set this property before you can
- * start using the account. This property is typically set in the implementation
- * of a #TnyAccountStore.
+ * Set the hostname of @self. You need to set this property before you can start
+ * using the account. This property is typically set in the implementation of a
+ * #TnyAccountStore.
  *
  **/
 void
@@ -271,7 +273,8 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
  * @get_pass_func: a pointer to the function
  * 
  * Set the function that will be called when the password is needed. The
- * function should return the password for a specific account.
+ * function should return the password for a specific account. The password 
+ * itself is usually stored in a secured password store.
  *
  * You need to set this property before you can start using the account. This
  * property is typically set in the implementation of a #TnyAccountStore.
@@ -295,7 +298,7 @@ tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
  * tny_account_get_proto:
  * @self: a #TnyAccount object
  * 
- * Get the protocol of an account. The returned value should not be freed.
+ * Get the protocol of @self. The returned value should not be freed.
  * 
  * Return value: the protocol as a read-only string
  *
@@ -317,7 +320,7 @@ tny_account_get_proto (TnyAccount *self)
  * tny_account_get_url_string:
  * @self: a #TnyAccount object
  * 
- * Get the url string of an account. The returned value should not be freed.
+ * Get the url string of @self. The returned value should not be freed.
  * 
  * Return value: the url string as a read-only string
  *
@@ -337,7 +340,7 @@ tny_account_get_url_string (TnyAccount *self)
  * tny_account_get_user:
  * @self: a #TnyAccount object
  * 
- * Get the user or login of an account. The returned value should not be freed.
+ * Get the user or login of @self. The returned value should not be freed.
  * 
  * Return value: the user as a read-only string
  *
@@ -357,7 +360,7 @@ tny_account_get_user (TnyAccount *self)
  * tny_account_get_name:
  * @self: a #TnyAccount object
  * 
- * Get the human readable name of an account. The returned value should not 
+ * Get the human readable name of @self. The returned value should not 
  * be freed.
  * 
  * Return value: the human readable name as a read-only string
@@ -378,7 +381,7 @@ tny_account_get_name (TnyAccount *self)
  * tny_account_get_hostname:
  * @self: a #TnyAccount object
  * 
- * Get the hostname of an account. The returned value should not be freed.
+ * Get the hostname of @self. The returned value should not be freed.
  * 
  * Return value: the hostname as a read-only string
  *

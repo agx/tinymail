@@ -491,52 +491,6 @@ tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 
 
 static void
-tny_gtk_header_list_model_unref_node (GtkTreeModel *self, GtkTreeIter  *iter)
-{
-	return;
-}
-/*
-	TnyHeader *header = NULL;
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
-
-	g_return_if_fail (self);
-	g_return_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp);
-
-	* Unref node happens when the GtkTreeView no longer needs the 
-	   reference to the GtkTreeIter (nor its user_data) *
-
-	if (!iter->user_data);
-		return;
-
-	g_mutex_lock (list_model->folder_lock);
-	g_mutex_lock (list_model->iterator_lock);
-
-	header = iter->user_data;
-
-	* We can use the knowledge that it no longer needs the reference,
-	   to uncache the instance. Uncached instances are instances that
-	   typically no longer have their real subject inmem. Next time they'll
-	   get a property-request, they'll create a new real subject (which
-	   takes a certain amount of time) and will cache that before replying
-	   the request using the real subject. *
-
-	if (G_LIKELY (header))
-		tny_header_uncache (header);
-
-	g_mutex_unlock (list_model->iterator_lock);
-	g_mutex_unlock (list_model->folder_lock);
-
-	return;
-}
-*/
-
-static void
-tny_gtk_header_list_model_ref_node (GtkTreeModel *self, GtkTreeIter  *iter)
-{
-	return;
-}
-
-static void
 tny_gtk_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 {
 	iface->get_flags = tny_gtk_header_list_model_get_flags;
@@ -549,8 +503,6 @@ tny_gtk_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 	iface->iter_has_child = tny_gtk_header_list_model_iter_has_child;
 	iface->iter_n_children = tny_gtk_header_list_model_iter_n_children;
 	iface->iter_nth_child = tny_gtk_header_list_model_iter_nth_child;
-	iface->ref_node = tny_gtk_header_list_model_ref_node;
-	iface->unref_node = tny_gtk_header_list_model_unref_node;
 
 	return;
 }
@@ -813,9 +765,9 @@ tny_gtk_header_list_model_hdr_cache_remover_copy (TnyGtkHeaderListModel *self, G
 	d->relaxed_func = (GFunc)proxy_destroy_func;
 	d->list = g_list_copy (self->first);
 	d->final_func = final_func;
-    	d->ffdata = ffdata;
-    	d->ffudata = ffudata;
-    
+	d->ffdata = ffdata;
+	d->ffudata = ffudata;
+
 	g_idle_add_full (G_PRIORITY_LOW, tny_gtk_header_list_model_relaxed_performer, 
 		d, tny_gtk_header_list_model_relaxed_data_destroyer);
 
@@ -1070,10 +1022,10 @@ tny_gtk_header_list_model_get_type (void)
 						"TnyGtkHeaderListModel", &object_info, 0);
 
 		g_type_add_interface_static (object_type, GTK_TYPE_TREE_MODEL,
-					     &tree_model_info);
+						&tree_model_info);
 
 		g_type_add_interface_static (object_type, TNY_TYPE_LIST,
-					     &tny_list_info);
+						&tny_list_info);
 
 	}
 

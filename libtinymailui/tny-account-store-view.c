@@ -29,8 +29,7 @@
  *
  * Set the account store of the view.
  *
- * Implementors: This should let the account store view @self display the 
- * account store @account_store.
+ * Implementors: This should let @self display @account_store.
  **/
 void
 tny_account_store_view_set_account_store (TnyAccountStoreView *self, TnyAccountStore *account_store)

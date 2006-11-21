@@ -30,71 +30,27 @@
  * must be unreferenced after use.
  *
  * Implementors: This method should create and return a new #TnyMimePartView 
- * that is suitable for displaying the #TnyMimePart @part.
+ * that is suitable for displaying @part.
  *
  * Example:
  * <informalexample><programlisting>
  * static TnyMimePartView*
- * tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
+ * tny_my_html_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
  * {
- *     TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
- *     TnyMimePartView *retval = NULL;
- *     if (tny_mime_part_content_type_is (part, "text/*"))
- *     {
- *         retval = tny_gtk_text_mime_part_view_new ();
- *         gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), 
- *                GTK_WIDGET (retval), TRUE, TRUE, 0);
- *         gtk_widget_show (GTK_WIDGET (retval));
- *    } else if (tny_mime_part_get_content_type (part) &&
- *           tny_mime_part_is_attachment (part))
+ *    TnyMimePartView *retval = NULL;
+ *    g_assert (TNY_IS_MIME_PART (part));
+ *    if (tny_mime_part_content_type_is (part, "text/html"))
  *    {
- *         static gboolean first = TRUE;
- *         GtkTreeModel *model;
- *         gtk_widget_show (priv->attachview_sw);
- *         if (first)
- *         {
- *              model = tny_gtk_attach_list_model_new ();
- *              gtk_icon_view_set_model (priv->attachview, model);
- *              first = FALSE;
- *         } else
- *             model = gtk_icon_view_get_model (priv->attachview);
- *             retval = tny_gtk_attachment_mime_part_view_new (TNY_GTK_ATTACH_LIST_MODEL (model));
- *         }
- *         return retval;
+ *        GtkWidget *widget = (GtkWidget *) self;
+ *        retval = tny_my_html_mime_part_view_new ();
+ *    } else
+ *        retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
+ *    return retval;
  * }
  * </programlisting></informalexample>
  *
- * This example is the implementation of #TnyGtkMsgView. If you are planning to
- * use libtinymailui-gtk, which contains this type, it's also possible to inherit
- * from this type. Take for example another type in libtinymailui-mozembed that
- * implements one that adds support for a text/html mime part.
- *
- * Example:
- * <informalexample><programlisting>
- * static TnyMimePartView*
- * tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
- * {
- *     TnyMimePartView *retval = NULL;
- *     if (tny_mime_part_content_type_is (part, "text/html"))
- *     {
- *         retval = tny_moz_embed_html_mime_part_view_new ();
- *         gtk_box_pack_start (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), GTK_WIDGET (retval), TRUE, TRUE, 0);
- *         gtk_widget_show (GTK_WIDGET (retval));
- *     }
- *     if (!retval)
- *         retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
- *     return retval;
- * }
- * static void 
- * tny_moz_embed_msg_view_class_init (TnyMozEmbedMsgViewClass *class)
- * {
- *      GObjectClass *object_class;
- *      parent_class = g_type_class_peek_parent (class);
- *      object_class = (GObjectClass*) class;
- *      object_class->finalize = tny_moz_embed_msg_view_finalize;
- *      TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for;
- * }
- * </programlisting></informalexample>
+ * ps. For a real and complete working example take a look at the implementation of 
+ * #TnyMozEmbedMsgView in libtinymailui-mozembed.
  *
  * Return value: A #TnyMimePartView instance for viewing @part
  **/
@@ -113,7 +69,7 @@ tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
  * tny_msg_view_clear:
  * @self: A #TnyMsgView instance
  *
- * Clear the view @self (show nothing)
+ * Clear @self (show nothing)
  * 
  * Implementors: this method should clear @self (display nothing and clearup)
  **/
@@ -134,10 +90,10 @@ tny_msg_view_clear (TnyMsgView *self)
  * tny_msg_view_set_unavailable:
  * @self: A #TnyMsgView instance
  *
- * Set the view @self to display that the message was unavailable
+ * Set @self to display that a message was unavailable
  * 
  * Implementors: this method should set @self to display a message like
- * "Message unavailable" or any other indication that a specific message
+ * "Message unavailable" or trigger another indication that a specific message
  * isn't available.
  *
  **/
@@ -158,12 +114,15 @@ tny_msg_view_set_unavailable (TnyMsgView *self)
  * tny_msg_view_get_msg:
  * @self: A #TnyMsgView instance
  *
- * Get the current message of the view @self. The returned instance must be 
- * unreferenced after use.
- * 
- * Implementors: this method should return the message this view is currently
- * displaying. It should add a reference to the instance before returning. If
- * the view isn't viewing any message, it must return NULL.
+ * Get the current message of @self. If @self is not displaying any message,
+ * NULL will be returned. Else the return value must be unreferenced after use.
+ *
+ * Implementors: this method should return the mime part this view is currently
+ * viewing. It must add a reference to the instance before returning it. If the
+ * view isn't viewing any mime part, it must return NULL.
+ *
+ * Usually this method is an alias for tny_mime_part_view_get_part of 
+ * #TnyMimePartView
  *
  * Return value: A #TnyMsg instance or NULL
  **/
@@ -185,15 +144,17 @@ tny_msg_view_get_msg (TnyMsgView *self)
  *
  * Set the message which view @self must display.
  * 
- * Implementors: this method should cause the view @self to show the message
- * @msg to the user. This includes showing the header (for which you can
- * make a composition with a #TnyHeaderView), the message body and the
- * attachments (for which you typically use the #TnyMimePartView interface and
- * implementations).
+ * Implementors: this method should cause @self to show @msg to the user. 
+ * This includes showing the header (for which you can make a composition with 
+ * a #TnyHeaderView), the message body and the attachments (for which you 
+ * typically use the #TnyMimePartView interface and implementations).
  *
- * You can get a list of mime-parts using the tny_msg_get_parts API of
- * the #TnyMsg type. You can use the tny_msg_view_create_mime_part_view_for
+ * You can get a list of mime parts using the tny_mime_part_get_parts API of
+ * the #TnyMimePart type. You can use the tny_msg_view_create_mime_part_view_for
  * API to get an instance of a #TnyMimePartView that can view the mime part.
+ * 
+ * Usually this method is an alias or decorator for tny_mime_part_view_set_part
+ * of #TnyMimePartView
  *
  * Example:
  * <informalexample><programlisting>
@@ -206,6 +167,8 @@ tny_msg_view_get_msg (TnyMsgView *self)
  *     header = tny_msg_get_header (msg);
  *     tny_header_view_set_header (priv->headerview, header);
  *     g_object_unref (G_OBJECT (header));
+ *     tny_mime_part_view_set_part (TNY_MIME_PART_VIEW (self),
+ *                TNY_MIME_PART (msg));
  *     tny_mime_part_get_parts (TNY_MIME_PART (msg), list);
  *     iterator = tny_list_create_iterator (list);
  *     while (!tny_iterator_is_done (iterator))
@@ -222,6 +185,10 @@ tny_msg_view_get_msg (TnyMsgView *self)
  *     g_object_unref (G_OBJECT (list));
  * }
  * </programlisting></informalexample>
+ *
+ * ps. For a real and complete working example take a look at the implementation of 
+ * #TnyGtkMsgView in libtinymailui-gtk.
+ *
  **/
 void
 tny_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg)

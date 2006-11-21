@@ -67,7 +67,7 @@ struct _TnyCamelFolderClass
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self);
-	void (*transfer_msgs_func) (TnyFolder *folder_src, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals);
+	void (*transfer_msgs_func) (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals);
 
 	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
 	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);

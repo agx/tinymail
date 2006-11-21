@@ -40,11 +40,11 @@ struct _TnyMsgRemoveStrategyIface
 {
 	GTypeInterface parent;
 
-	void (*remove_func) (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header);
+	void (*perform_remove_func) (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header);
 };
 
 GType tny_msg_remove_strategy_get_type (void);
-void tny_msg_remove_strategy_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header);
+void tny_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header);
 
 G_END_DECLS
 

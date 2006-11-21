@@ -27,9 +27,9 @@
  * @self: A #TnyMimePartSaver instance
  * @strategy: A TnyMimePartSaveStrategy instace
  *
- * Set the strategy used for saving mime-parts
+ * Set the strategy for saving mime-parts
  *
- * Implementors: This method should set (store) the strategy for saving a
+ * Implementors: This method must set (store) the strategy for saving a
  * mime-part.
  *
  * Example:
@@ -55,6 +55,9 @@
  * a flash disk. However. In the message view component, you don't care about
  * that. You only care about the API of the save-strategy interface.
  *
+ * For more information take a look at tny_mime_part_save_strategy_perform_save
+ * of #TnyMimePartSaveStrategy.
+ *
  **/
 void 
 tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnyMimePartSaveStrategy *strategy)
@@ -74,7 +77,7 @@ tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnyMimePartSaveSt
  * tny_mime_part_saver_get_save_strategy:
  * @self: A #TnyMsgView instance
  *
- * Get the strategy used for saving mime-parts. The return value must be
+ * Get the strategy for saving mime-parts. The return value must be
  * unreferenced after use.
  *
  * Example:
@@ -88,7 +91,7 @@ tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnyMimePartSaveSt
  * }
  * </programlisting></informalexample>
  *
- * Implementors: This method should return the strategy for saving a mime-part.
+ * Implementors: This method must return the strategy for saving a mime-part.
  * being the implementer, you must add a reference before returning the instance.
  *
  * Example:
@@ -101,7 +104,8 @@ tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnyMimePartSaveSt
  * }
  * </programlisting></informalexample>
  *
- * Also read about tny_mime_part_saver_set_mime_part_save_strategy
+ * For more information take a look at tny_mime_part_save_strategy_perform_save
+ * of #TnyMimePartSaveStrategy.
  *
  * Return value: the #TnyMimePartSaveStrategy for @self
  **/

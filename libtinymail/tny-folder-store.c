@@ -29,23 +29,18 @@
  *
  * Removes a folder represented by @folder from the folder store @self. You are
  * responsible for unreferencing the @folder instance yourself. This method will
- * not do this for you, leaving the instance in an unusable state. The id of the
- * @folder instance will be blanked once really deleted from the service.
+ * not do this for you, leaving the @folder instance in an unusable state. The 
+ * id of the @folder instance will be blanked once really deleted from the
+ * service.
  *
  * Example:
  * <informalexample><programlisting>
- * TnyFolderStore *store = ...
- * TnyFolder *remfol;
- * TnyIterator *iter;
- * TnyList *folders = tny_simple_list_new ();
- * tny_folder_store_get_folders (store, folders, NULL);
- * iter = tny_list_create_iterator (folders);
- * tny_iterator_first (iter);
- * remfol = TNY_FOLDER (tny_iterator_get_current (iter));
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (folders)); 
- * tny_folder_store_remove_folder (store, remfol);
- * g_object_unref (G_OBJECT (remfol));
+ * static void
+ * my_remove_a_folder (TnyFolderStore *store, TnyFolder *remfol)
+ * {
+ *     tny_folder_store_remove_folder (store, remfol);
+ *     g_object_unref (G_OBJECT (remfol));
+ * }
  * </programlisting></informalexample>
  *
  **/
@@ -66,8 +61,8 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder)
  * @self: a #TnyFolderStore object
  * @name: The folder name to create
  *
- * Creates a new folder in folder store @self. The value returned is the newly
- * created folder and must be unreferenced after use.
+ * Creates a new folder in @self. The value returned is the newly created folder
+ * instance and must be unreferenced after use.
  *
  * Example:
  * <informalexample><programlisting>
@@ -97,9 +92,10 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name)
  * @list: A #TnyList to fillup
  * @query: A #TnyFolderStoreQuery object or NULL
  *
- * Get a list of child folders from the folder store @self. You can use @query 
- * to limit the list of folders with only folders that match the query.
- *  
+ * Get a list of child folders from @self. You can use @query to limit the list 
+ * of folders with only folders that match a query or NULL if you don't want
+ * to limit the list at all.
+ * 
  * Example:
  * <informalexample><programlisting>
  * TnyFolderStore *store = ...
@@ -139,7 +135,8 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * @user_data: user data for the callback
  *
  * Get a list of child folders from the folder store @self and call back when 
- * finished. 
+ * finished. You can use @query to limit the list of folders with only folders 
+ * that match a query or NULL if you don't want to limit the list at all.
  *
  * Example:
  * <informalexample><programlisting>
@@ -171,8 +168,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * </programlisting></informalexample>
  *
  * If you want to use this functionality, you are advised to let your application 
- * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
- * called.
+ * use a #GMainLoop. All Gtk+ applications have this once gtk_main () is called.
  * 
  * When using a #GMainLoop, this method will callback using g_idle_add_full.
  * Without a #GMainLoop, which the libtinymail-camel implementations detect

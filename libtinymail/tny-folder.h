@@ -64,8 +64,6 @@ enum _TnyFolderType
 	TNY_FOLDER_TYPE_SENT,
 	TNY_FOLDER_TYPE_ROOT
 };
-	
-/* TODO: Moving messages */
 
 struct _TnyFolderIface
 {
@@ -89,7 +87,7 @@ struct _TnyFolderIface
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self);
-	void (*transfer_msgs_func) (TnyFolder *folder_src, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals);
+	void (*transfer_msgs_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals);
 };
 
 GType tny_folder_get_type (void);

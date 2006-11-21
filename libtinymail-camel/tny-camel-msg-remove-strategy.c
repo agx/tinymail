@@ -37,7 +37,7 @@ static GObjectClass *parent_class = NULL;
 
 
 static void
-tny_camel_msg_remove_strategy_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
+tny_camel_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
 {
 	const gchar *id;
 	CamelFolder *cfolder;
@@ -87,7 +87,7 @@ tny_camel_msg_remove_strategy_init (gpointer g, gpointer iface_data)
 {
 	TnyMsgRemoveStrategyIface *klass = (TnyMsgRemoveStrategyIface *)g;
 
-	klass->remove_func = tny_camel_msg_remove_strategy_remove;
+	klass->perform_remove_func = tny_camel_msg_remove_strategy_perform_remove;
 
 	return;
 }
