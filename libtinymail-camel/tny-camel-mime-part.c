@@ -113,7 +113,7 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	} else
 		tpart = tny_camel_mime_part_new (part);
 
-	tny_list_prepend (list, (GObject*)tpart);
+	tny_list_prepend (list, G_OBJECT (tpart));
 	g_object_unref (G_OBJECT (tpart));
 
 	return TRUE;
