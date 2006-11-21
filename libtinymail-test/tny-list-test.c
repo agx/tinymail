@@ -52,8 +52,8 @@ tny_list_test_setup (void)
   	ifaces[0] = tny_simple_list_new ();
     	ifaces[1] = TNY_LIST (tny_gtk_account_list_model_new ());
 	ifaces[2] = TNY_LIST (tny_gtk_attach_list_model_new ());
-	ifaces[3] = TNY_LIST (tny_gtk_account_tree_model_new (FALSE));
-	ifaces[4] = TNY_LIST (tny_gtk_account_tree_model_new (TRUE));    
+	ifaces[3] = TNY_LIST (tny_gtk_account_tree_model_new (FALSE, NULL));
+	ifaces[4] = TNY_LIST (tny_gtk_account_tree_model_new (TRUE, NULL));
 	ifaces[5] = TNY_LIST (tny_gtk_header_list_model_new ());
 	
 	return;
