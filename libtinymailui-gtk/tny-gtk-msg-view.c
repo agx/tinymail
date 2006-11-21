@@ -416,6 +416,7 @@ on_mpview_realize (GtkWidget *widget, gpointer user_data)
 
 	tny_mime_part_view_proxy_func_set_part (TNY_MIME_PART_VIEW (widget), prv->part);
 	g_signal_handler_disconnect (widget, prv->signal);
+	g_object_unref (prv->part);
 
 	g_slice_free (RealizePriv, prv);
 }
@@ -462,7 +463,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			if (!GTK_WIDGET_REALIZED (mpview))
 			{
 				RealizePriv *prv = g_slice_new (RealizePriv);
-				prv->part = part;
+				prv->part = g_object_ref (part);
 				prv->signal = g_signal_connect (G_OBJECT (mpview),
 					"realize", G_CALLBACK (on_mpview_realize), prv);
 			} else
