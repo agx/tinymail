@@ -39,3 +39,93 @@ This type is coupled with the #TnyTextBufferStream.
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_gtk_msg_view_set_display_html ##### -->
+<para>
+
+</para>
+
+@self: 
+@setting: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_set_display_rfc822 ##### -->
+<para>
+
+</para>
+
+@self: 
+@setting: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_set_display_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+@setting: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_set_display_plain ##### -->
+<para>
+
+</para>
+
+@self: 
+@setting: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_set_display_one_body ##### -->
+<para>
+
+</para>
+
+@self: 
+@setting: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_get_display_html ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_get_display_rfc822 ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_get_display_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_get_display_plain ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_get_display_one_body ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

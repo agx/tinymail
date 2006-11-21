@@ -23,34 +23,12 @@ A abstract type that defines a folder
 </para>
 
 
-<!-- ##### SIGNAL TnyFolder::folder-inserted ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnyfolder: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
-<para>
-
-</para>
-
-@:
-
-@tnyfolder: the object which received the signal.
-
 <!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
 
 </para>
 
 @parent: 
-@folder_inserted: 
-@folders_reloaded: 
 @remove_msg_func: 
 @add_msg_func: 
 @expunge_func: 
@@ -68,6 +46,7 @@ A abstract type that defines a folder
 @is_subscribed_func: 
 @refresh_async_func: 
 @refresh_func: 
+@transfer_msgs_func: 
 
 <!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
 <para>
@@ -237,5 +216,16 @@ A abstract type that defines a folder
 </para>
 
 @self: 
+
+
+<!-- ##### FUNCTION tny_folder_transfer_msgs ##### -->
+<para>
+
+</para>
+
+@folder_src: 
+@header_list: 
+@folder_dst: 
+@delete_originals: 
 
 

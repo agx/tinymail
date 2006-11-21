@@ -19,6 +19,7 @@ It's recommended to make implementations that persist to-send messages on a pers
 filesystem. For example in a so called Outbox folder. Else would your user upon application or device 
 shutdown obviously lose the unsent messages.
 </para>
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyTransportAccount

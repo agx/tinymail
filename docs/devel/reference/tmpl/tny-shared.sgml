@@ -92,12 +92,9 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_parts_func: 
 @get_header_func: 
 @get_folder_func: 
 @set_header_func: 
-@del_part_func: 
-@add_part_func: 
 
 <!-- ##### STRUCT TnyFolder ##### -->
 <para>
@@ -105,29 +102,12 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### SIGNAL TnyFolder::folder-inserted ##### -->
-<para>
-
-</para>
-
-@tnyfolder: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyFolder::folders-reloaded ##### -->
-<para>
-
-</para>
-
-@tnyfolder: the object which received the signal.
-
 <!-- ##### STRUCT TnyFolderIface ##### -->
 <para>
 
 </para>
 
 @parent: 
-@folder_inserted: 
-@folders_reloaded: 
 @remove_msg_func: 
 @add_msg_func: 
 @expunge_func: 
@@ -145,6 +125,7 @@ Shared include file with forward typedefs
 @is_subscribed_func: 
 @refresh_async_func: 
 @refresh_func: 
+@transfer_msgs_func: 
 
 <!-- ##### STRUCT TnyHeader ##### -->
 <para>
@@ -207,6 +188,9 @@ Shared include file with forward typedefs
 @set_filename_func: 
 @set_content_type_func: 
 @is_attachment_func: 
+@get_parts_func: 
+@del_part_func: 
+@add_part_func: 
 
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
@@ -437,7 +421,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@remove_func: 
+@perform_remove_func: 
 
 <!-- ##### STRUCT TnySendQueue ##### -->
 <para>

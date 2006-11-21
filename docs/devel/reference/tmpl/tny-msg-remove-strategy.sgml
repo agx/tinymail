@@ -29,9 +29,9 @@ A type that implements removing a message from a #TnyFolder
 </para>
 
 @parent: 
-@remove_func: 
+@perform_remove_func: 
 
-<!-- ##### FUNCTION tny_msg_remove_strategy_remove ##### -->
+<!-- ##### FUNCTION tny_msg_remove_strategy_perform_remove ##### -->
 <para>
 
 </para>

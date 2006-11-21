@@ -30,21 +30,9 @@ therefore be used as a mime part.
 </para>
 
 @parent: 
-@get_parts_func: 
 @get_header_func: 
 @get_folder_func: 
 @set_header_func: 
-@del_part_func: 
-@add_part_func: 
-
-<!-- ##### FUNCTION tny_msg_get_parts ##### -->
-<para>
-
-</para>
-
-@self: 
-@list: 
-
 
 <!-- ##### FUNCTION tny_msg_get_header ##### -->
 <para>
@@ -53,25 +41,6 @@ therefore be used as a mime part.
 
 @self: 
 @Returns: 
-
-
-<!-- ##### FUNCTION tny_msg_add_part ##### -->
-<para>
-
-</para>
-
-@self: 
-@part: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_msg_del_part ##### -->
-<para>
-
-</para>
-
-@self: 
-@part: 
 
 
 <!-- ##### FUNCTION tny_msg_get_folder ##### -->
