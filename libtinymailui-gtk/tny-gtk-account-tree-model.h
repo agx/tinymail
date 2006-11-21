@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <tny-store-account.h>
+#include <tny-folder-store-query.h>
 #include <tny-list.h>
 
 G_BEGIN_DECLS
@@ -58,6 +59,7 @@ struct _TnyGtkAccountTreeModel
 	GList *first;
 	GMutex *iterator_lock;
 	gboolean is_async;
+	TnyFolderStoreQuery *query;
 };
 
 struct _TnyGtkAccountTreeModelClass
@@ -67,7 +69,7 @@ struct _TnyGtkAccountTreeModelClass
 
 GType tny_gtk_account_tree_model_get_type (void);
 GType tny_gtk_account_tree_model_column_get_type (void);
-GtkTreeModel* tny_gtk_account_tree_model_new (gboolean async);
+GtkTreeModel* tny_gtk_account_tree_model_new (gboolean async, TnyFolderStoreQuery *query);
 
 G_END_DECLS
 

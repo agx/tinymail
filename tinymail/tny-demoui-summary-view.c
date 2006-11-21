@@ -121,15 +121,21 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 {
 	TnyAccountStore *account_store = priv->account_store;
 	GtkTreeModel *sortable, *maccounts;
+	TnyFolderStoreQuery *query;
+
+	/* Show only subscribed folders */
+	query = tny_folder_store_query_new ();
+	tny_folder_store_query_add_item (query, NULL, 
+					 TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED);
 
 	/* TnyAccountTreeModel is also a TnyList (it simply implements both the
 	   TnyList and the GtkTreeModel interfaces) */
-
 #if PLATFORM==1
-	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (TRUE);
+	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (TRUE, NULL);
 #else
-	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (FALSE);
+	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (FALSE, NULL);
 #endif
+	g_object_unref (G_OBJECT (query));
 
 	TnyList *accounts = TNY_LIST (mailbox_model);
 

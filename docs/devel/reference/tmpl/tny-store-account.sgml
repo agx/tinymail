@@ -23,12 +23,21 @@ A store account contains the folders of an E-mail service and handles the authen
 </para>
 
 
+<!-- ##### SIGNAL TnyStoreAccount::subscription-changed ##### -->
+<para>
+
+</para>
+
+@tnystoreaccount: the object which received the signal.
+@arg1: 
+
 <!-- ##### STRUCT TnyStoreAccountIface ##### -->
 <para>
 
 </para>
 
 @parent: 
+@subscription_changed: 
 @subscribe_func: 
 @unsubscribe_func: 
 

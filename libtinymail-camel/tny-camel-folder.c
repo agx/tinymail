@@ -1110,6 +1110,10 @@ tny_camel_folder_get_folder (TnyCamelFolder *self)
 	CamelFolder *retval = NULL;
 
 	/* g_mutex_lock (priv->folder_lock); */
+	if (G_UNLIKELY (!priv->loaded))
+		if (!load_folder (priv))
+			return NULL;
+	
 	retval = priv->folder;
 	if (retval)
 		camel_object_ref (CAMEL_OBJECT (retval));
@@ -1359,6 +1363,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name)
 	}
 
 	tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
+	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE);
 
 	return folder;
 }

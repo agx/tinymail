@@ -95,6 +95,7 @@ if (type != TNY_FOLDER_TYPE_ROOT)
 </para>
 
 @async: 
+@query: 
 @Returns: 
 
 

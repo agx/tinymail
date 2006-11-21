@@ -171,6 +171,8 @@ tny_camel_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
+	CamelFolder *cfolder;
+	const gchar *folder_full_name;
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 
@@ -179,15 +181,31 @@ tny_camel_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
-	if (camel_store_supports_subscriptions (store)
-	    && !camel_store_folder_subscribed (store, tny_folder_get_name (folder))) {
-		
-		camel_store_subscribe_folder (store, tny_folder_get_name (folder), &ex);
+	/* Retrieve the folder full name */
+	cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
+	folder_full_name = camel_folder_get_full_name (cfolder);
 
-		/* Sync */
-		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), TRUE);
+	if (camel_store_supports_subscriptions (store)
+	    && !camel_store_folder_subscribed (store, folder_full_name)) {
+		
+		camel_store_subscribe_folder (store, folder_full_name, &ex);
+
+		if (camel_exception_is_set (&ex)) {
+			g_warning (N_("Could not subscribe to folder %s: %s\n"),
+				   tny_folder_get_name (folder), 
+				   camel_exception_get_description (&ex));
+			camel_exception_clear (&ex);
+		} else {
+			/* Sync */
+			_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), TRUE);
+
+			g_signal_emit (self, 
+				       tny_store_account_signals [TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED], 
+				       0, folder);
+		}
 	}
 
+	camel_object_unref (CAMEL_OBJECT (cfolder));
     	camel_object_unref (CAMEL_OBJECT (store));
     
 	return;
@@ -209,8 +227,19 @@ tny_camel_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
 
 	camel_store_unsubscribe_folder (store, tny_folder_get_name (folder), &ex);
 
-	/* Sync */
-	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE);
+	if (camel_exception_is_set (&ex)) {
+		g_warning (N_("Could not unsubscribe to folder %s: %s\n"),
+			   tny_folder_get_name (folder), 
+			   camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+	} else {
+		/* Sync */
+		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE);
+
+		g_signal_emit (self, 
+			       tny_store_account_signals [TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED], 
+			       0, folder);
+	}
 
 	camel_object_unref (CAMEL_OBJECT (store));
 

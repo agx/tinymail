@@ -581,6 +581,8 @@ tny_folder_get_type (void)
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyFolder", &info, 0);
+
+		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}
 
 	return type;

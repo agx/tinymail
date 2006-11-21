@@ -22,7 +22,7 @@
 #include <tny-store-account.h>
 #include <tny-folder-store.h>
 
-
+guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
 /**
  * tny_store_account_unsubscribe:
  * @self: a #TnyStoreAccount object
@@ -74,7 +74,24 @@ tny_store_account_base_init (gpointer g_class)
 	static gboolean initialized = FALSE;
 
 	if (!initialized) {
-		/* create interface signals here. */
+		/**
+		 * TnyStoreAccount::subscription-changed
+		 * @self: the object on which the signal is emitted
+		 * @arg1: the #TnyFolder of the folder whose subscription has changed
+		 * @user_data: user data set when the signal handler was connected
+		 *
+		 * Emitted when the subscription of a folder change
+		 */
+		tny_store_account_signals[TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED] =
+			g_signal_new ("subscription_changed",
+				      TNY_TYPE_STORE_ACCOUNT,
+				      G_SIGNAL_RUN_FIRST,
+				      G_STRUCT_OFFSET (TnyStoreAccountIface, subscription_changed),
+				      NULL, NULL,
+				      g_cclosure_marshal_VOID__POINTER,
+				      G_TYPE_NONE, 1, TNY_TYPE_FOLDER);
+
+
 		initialized = TRUE;
 	}
 }
