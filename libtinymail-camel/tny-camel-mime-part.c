@@ -29,6 +29,7 @@
 #include <camel/camel-stream-mem.h>
 #include <camel/camel-data-wrapper.h>
 #include <tny-camel-shared.h>
+#include <tny-list.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -52,6 +53,176 @@ static GObjectClass *parent_class = NULL;
 
 
 /* Locking warning: tny-camel-msg.c also locks priv->part_lock */
+
+
+
+typedef gboolean (*CamelPartFunc)(CamelMimeMessage *, CamelMimePart *, void *data);
+
+static gboolean
+message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartFunc callback, void *data, gboolean firstpart)
+{
+	CamelDataWrapper *containee;
+	int parts, i;
+	int go = TRUE;
+
+	if (!firstpart && callback (msg, part, data) == FALSE)
+			return FALSE; 
+
+	containee = camel_medium_get_content_object (CAMEL_MEDIUM (part));
+
+	if (G_UNLIKELY (containee == NULL))
+		return go;
+
+	if (G_LIKELY (CAMEL_IS_MULTIPART (containee)))
+	{
+		parts = camel_multipart_get_number (CAMEL_MULTIPART (containee));
+		for (i = 0; go && i < parts; i++) 
+		{
+			CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
+			if (part)
+				go = message_foreach_part_rec (msg, part, callback, data, FALSE);
+			else go = FALSE;
+		}
+		
+	} else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
+		go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data, FALSE);
+
+	return go;
+}
+
+static gboolean
+received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
+{
+	TnyList *list = data;
+	TnyMimePart *tpart;
+
+	if (!part)
+		return FALSE;
+
+	tpart = tny_camel_mime_part_new (part);
+
+	tny_list_prepend (list, (GObject*)tpart);
+	g_object_unref (G_OBJECT (tpart));
+
+	return TRUE;
+}
+
+static void
+tny_camel_mime_part_get_parts (TnyMimePart *self, TnyList *list)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_parts_func (self, list);
+	return;
+}
+
+static void
+tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	gboolean go = TRUE;
+
+	g_assert (TNY_IS_LIST (list));
+
+	g_mutex_lock (priv->part_lock);
+
+	message_foreach_part_rec ((CamelMimeMessage*)priv->part, 
+		(CamelMimePart *)priv->part, received_a_part, list, TRUE); 
+
+	g_mutex_unlock (priv->part_lock);
+
+	return;
+}
+
+
+
+static gint
+tny_camel_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->add_part_func (self, part);
+}
+
+static gint
+tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	CamelMedium *medium;
+	CamelDataWrapper *containee;
+	gint curl = 0, retval = 0;
+	CamelMimePart *cpart;
+
+	/* Yes, indeed (I don't yet support non TnyCamelMimePart mime part 
+	   instances, and I know I should. Feel free to implement the copying
+	   if you really need it) */
+
+	g_assert (TNY_IS_CAMEL_MIME_PART (part));
+
+	g_mutex_lock (priv->part_lock);
+
+	medium = CAMEL_MEDIUM (priv->part);
+	containee = camel_medium_get_content_object (medium);
+
+	/* Warp it into a multipart */
+	if (G_UNLIKELY (!containee) || G_LIKELY (!CAMEL_IS_MULTIPART (containee)))
+	{
+		/* TODO: restore original mime part? */
+		if (G_LIKELY (containee))
+			camel_object_unref (CAMEL_OBJECT (containee));
+
+		curl = 0;
+
+		containee = (CamelDataWrapper*)camel_multipart_new ();
+		camel_multipart_set_boundary ((CamelMultipart*)containee, NULL);
+		camel_medium_set_content_object (medium, containee);
+	}
+
+	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
+	camel_multipart_add_part ((CamelMultipart*)containee, cpart);
+	camel_object_unref (CAMEL_OBJECT (cpart));
+
+	retval = camel_multipart_get_number ((CamelMultipart*)containee);
+
+	/* Warning: large lock that locks code, not data */
+	g_mutex_unlock (priv->part_lock);
+
+	return retval;
+}
+
+/* TODO: camel_mime_message_set_date(msg, time(0), 930); */
+
+static void 
+tny_camel_mime_part_del_part (TnyMimePart *self,  TnyMimePart *part)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->del_part_func (self, part);
+	return;
+}
+
+static void 
+tny_camel_mime_part_del_part_default (TnyMimePart *self, TnyMimePart *part)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	CamelDataWrapper *containee;
+	CamelMimePart *cpart;
+
+	/* Yes, indeed (I don't yet support non TnyCamelMimePart mime part 
+	   instances, and I know I should. Feel free to implement the copying
+	   if you really need it) */
+
+	g_assert (TNY_IS_CAMEL_MIME_PART (part));
+
+	g_mutex_lock (priv->part_lock);
+
+	containee = camel_medium_get_content_object (CAMEL_MEDIUM (priv->part));
+
+	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
+	camel_multipart_remove_part (CAMEL_MULTIPART (containee), cpart);
+	camel_object_unref (CAMEL_OBJECT (cpart));
+
+	/* Warning: large lock that locks code, not data */
+	g_mutex_unlock (priv->part_lock);
+
+	return;
+}
+
+
 
 static gboolean 
 tny_camel_mime_part_is_attachment (TnyMimePart *self)
@@ -674,6 +845,9 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->set_content_type_func = tny_camel_mime_part_set_content_type;
 	klass->is_attachment_func = tny_camel_mime_part_is_attachment;
 	klass->decode_to_stream_func = tny_camel_mime_part_decode_to_stream;
+	klass->get_parts_func = tny_camel_mime_part_get_parts;
+	klass->add_part_func = tny_camel_mime_part_add_part;
+	klass->del_part_func = tny_camel_mime_part_del_part;
 
 	return;
 }
@@ -703,6 +877,9 @@ tny_camel_mime_part_class_init (TnyCamelMimePartClass *class)
 	class->set_content_type_func = tny_camel_mime_part_set_content_type_default;
 	class->is_attachment_func = tny_camel_mime_part_is_attachment_default;
 	class->decode_to_stream_func = tny_camel_mime_part_decode_to_stream_default;
+	class->get_parts_func = tny_camel_mime_part_get_parts_default;
+	class->add_part_func = tny_camel_mime_part_add_part_default;
+	class->del_part_func = tny_camel_mime_part_del_part_default;
 
 	object_class->finalize = tny_camel_mime_part_finalize;
 

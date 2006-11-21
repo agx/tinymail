@@ -21,6 +21,86 @@
 
 #include <tny-mime-part.h>
 
+
+/**
+ * tny_mime_part_get_parts:
+ * @self: a #TnyMimePart object
+ * @list: a #TnyList object
+ * 
+ * Get a read-only list of mime-parts of this mime part.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsg *message = ...
+ * TnyList *parts = tny_simple_list_new ();
+ * tny_mime_part_get_parts (TNY_MIME_PART (message), parts);
+ * iter = tny_list_create_iterator (parts);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *      TnyMimePart *part = TNY_MIME_PART (tny_iterator_get_current (iter));
+ *      g_object_unref (G_OBJECT (part));
+ *      tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (parts));
+ * </programlisting></informalexample>
+ *
+ **/
+void
+tny_mime_part_get_parts (TnyMimePart *self, TnyList *list)
+{
+#ifdef DEBUG
+	if (!TNY_MIME_PART_GET_IFACE (self)->get_parts_func)
+		g_critical ("You must implement tny_mime_part_get_parts\n");
+#endif
+
+	TNY_MIME_PART_GET_IFACE (self)->get_parts_func (self, list);
+	return;
+}
+
+
+
+/**
+ * tny_mime_part_add_part:
+ * @self: a #TnyMimePart object
+ * @part: the mime-part to add
+ * 
+ * Add a mime-part to a mime part
+ *
+ * Return value: The id of the added mime-part
+ *
+ **/
+gint
+tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
+{
+#ifdef DEBUG
+	if (!TNY_MIME_PART_GET_IFACE (self)->add_part_func)
+		g_critical ("You must implement tny_mime_part_add_part\n");
+#endif
+
+	return TNY_MIME_PART_GET_IFACE (self)->add_part_func (self, part);
+}
+
+/**
+ * tny_mime_part_del_part:
+ * @self: a #TnyMimePart object
+ * @part: the mime-part to delete
+ * 
+ * Delete a mime-part from a mime part
+ *
+ **/
+void
+tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part)
+{
+#ifdef DEBUG
+	if (!TNY_MIME_PART_GET_IFACE (self)->del_part_func)
+		g_critical ("You must implement tny_mime_part_del_part\n");
+#endif
+
+	TNY_MIME_PART_GET_IFACE (self)->del_part_func (self, part);
+	return;
+}
+
 /**
  * tny_mime_part_is_attachment:
  * @self: a #TnyMimePart object
@@ -33,7 +113,7 @@
  * <informalexample><programlisting>
  * TnyMsg *message = ...
  * TnyList *parts = tny_simple_list_new ();
- * tny_msg_get_parts (message, parts);
+ * tny_mime_part_get_parts (TNY_MIME_PART (message), parts);
  * iter = tny_list_create_iterator (parts);
  * while (!tny_iterator_is_done (iter))
  * {
@@ -401,7 +481,7 @@ tny_mime_part_get_content_type (TnyMimePart *self)
  * <informalexample><programlisting>
  * TnyMsg *message = ...
  * TnyList *parts = tny_simple_list_new ();
- * tny_msg_get_parts (message, parts);
+ * tny_mime_part_get_parts (TNY_MIME_PART (message), parts);
  * iter = tny_list_create_iterator (parts);
  * while (!tny_iterator_is_done (iter))
  * {

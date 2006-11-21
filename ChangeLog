@@ -1,3 +1,10 @@
+2006-11-21  Philip van Hoof <pvanhoof@gnome.org>
+
+	* Major changes in TnyMsg and TnyMimePart
+	* First support for message/rfc822 messages
+
+	* This was a major API change in all libraries
+
 2006-11-20  Philip van Hoof <pvanhoof@gnome.org>
 
 	* A new style of handling mime parts

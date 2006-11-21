@@ -58,6 +58,9 @@ struct _TnyMimePartIface
 	void (*set_filename_func) (TnyMimePart *self, const gchar *filename);
 	void (*set_content_type_func) (TnyMimePart *self, const gchar *contenttype);
 	gboolean (*is_attachment_func) (TnyMimePart *self);
+	void (*get_parts_func) (TnyMimePart *self, TnyList *list);
+	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);
+	gint (*add_part_func) (TnyMimePart *self, TnyMimePart *part);
 };
 
 GType tny_mime_part_get_type (void);
@@ -78,6 +81,9 @@ void tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename);
 void tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype);
 gboolean tny_mime_part_is_attachment (TnyMimePart *self);
 void tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream);
+void tny_mime_part_get_parts (TnyMimePart *self, TnyList *list);
+gint tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part);
+void tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part);
 
 G_END_DECLS
 

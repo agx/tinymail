@@ -42,20 +42,14 @@ struct _TnyMsgIface
 {
 	GTypeInterface parent;
 
-	void (*get_parts_func) (TnyMsg *self, TnyList *list);
 	TnyHeader* (*get_header_func) (TnyMsg *self);
 	TnyFolder* (*get_folder_func) (TnyMsg *self);
 	void (*set_header_func) (TnyMsg *self, TnyHeader *header);
-	void (*del_part_func) (TnyMsg *self, TnyMimePart *part);
-	gint (*add_part_func) (TnyMsg *self, TnyMimePart *part);
 };
 
 GType tny_msg_get_type (void);
 
-void tny_msg_get_parts (TnyMsg *self, TnyList *list);
 TnyHeader* tny_msg_get_header (TnyMsg *self);
-gint tny_msg_add_part (TnyMsg *self, TnyMimePart *part);
-void tny_msg_del_part (TnyMsg *self, TnyMimePart *part);
 TnyFolder* tny_msg_get_folder (TnyMsg *self);
 void tny_msg_set_header (TnyMsg *self, TnyHeader *header);
 

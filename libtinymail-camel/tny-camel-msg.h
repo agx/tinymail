@@ -51,13 +51,9 @@ struct _TnyCamelMsgClass
 	TnyCamelMimePartClass parent;
 
 	/* virtual methods */
-	void (*get_parts_func) (TnyMsg *self, TnyList *list);
 	TnyHeader* (*get_header_func) (TnyMsg *self);
 	TnyFolder* (*get_folder_func) (TnyMsg *self);
 	void (*set_header_func) (TnyMsg *self, TnyHeader *header);
-	void (*del_part_func) (TnyMsg *self, TnyMimePart *part);
-	gint (*add_part_func) (TnyMsg *self, TnyMimePart *part);
-
 };
 
 GType tny_camel_msg_get_type (void);

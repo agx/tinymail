@@ -75,9 +75,9 @@ tny_msg_test_add_part_del_part (void)
 	CamelMimePart *cpart = camel_mime_part_new ();
 	TnyMimePart *part = TNY_MIME_PART (tny_camel_mime_part_new (cpart));
     
-	tny_msg_add_part (iface, part);
+	tny_mime_part_add_part (TNY_MIME_PART (iface), part);
 
-    	tny_msg_get_parts (iface, parts);
+    	tny_mime_part_get_parts (TNY_MIME_PART (iface), parts);
 	length = tny_list_get_length (parts);
     	g_object_unref (G_OBJECT (parts));
 
@@ -87,8 +87,8 @@ tny_msg_test_add_part_del_part (void)
 	g_free (str);
 
     	parts = tny_simple_list_new ();
-    	tny_msg_del_part (iface, part);
-       	tny_msg_get_parts (iface, parts);
+    	tny_mime_part_del_part (TNY_MIME_PART (iface), part);
+       	tny_mime_part_get_parts (TNY_MIME_PART (iface), parts);
 	length = tny_list_get_length (parts);
     	g_object_unref (G_OBJECT (parts));
     

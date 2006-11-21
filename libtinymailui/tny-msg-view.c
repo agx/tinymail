@@ -206,7 +206,7 @@ tny_msg_view_get_msg (TnyMsgView *self)
  *     header = tny_msg_get_header (msg);
  *     tny_header_view_set_header (priv->headerview, header);
  *     g_object_unref (G_OBJECT (header));
- *     tny_msg_get_parts (msg, list);
+ *     tny_mime_part_get_parts (TNY_MIME_PART (msg), list);
  *     iterator = tny_list_create_iterator (list);
  *     while (!tny_iterator_is_done (iterator))
  *     {

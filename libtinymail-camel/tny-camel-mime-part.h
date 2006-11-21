@@ -64,6 +64,9 @@ struct _TnyCamelMimePartClass
 	void (*set_filename_func) (TnyMimePart *self, const gchar *filename);
 	void (*set_content_type_func) (TnyMimePart *self, const gchar *contenttype);
 	gboolean (*is_attachment_func) (TnyMimePart *self);
+	void (*get_parts_func) (TnyMimePart *self, TnyList *list);
+	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);
+	gint (*add_part_func) (TnyMimePart *self, TnyMimePart *part);
 };
 
 

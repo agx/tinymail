@@ -43,41 +43,6 @@ tny_msg_get_folder (TnyMsg *self)
 }
 
 
-/**
- * tny_msg_get_parts:
- * @self: a #TnyMsg object
- * @list: a #TnyList object
- * 
- * Get a read-only list of mime-parts of this message.
- *
- * Example:
- * <informalexample><programlisting>
- * TnyMsg *message = ...
- * TnyList *parts = tny_simple_list_new ();
- * tny_msg_get_parts (message, parts);
- * iter = tny_list_create_iterator (parts);
- * while (!tny_iterator_is_done (iter))
- * {
- *      TnyMimePart *part = TNY_MIME_PART (tny_iterator_get_current (iter));
- *      g_object_unref (G_OBJECT (part));
- *      tny_iterator_next (iter);
- * }
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (parts));
- * </programlisting></informalexample>
- *
- **/
-void
-tny_msg_get_parts (TnyMsg *self, TnyList *list)
-{
-#ifdef DEBUG
-	if (!TNY_MSG_GET_IFACE (self)->get_parts_func)
-		g_critical ("You must implement tny_msg_get_parts\n");
-#endif
-
-	TNY_MSG_GET_IFACE (self)->get_parts_func (self, list);
-	return;
-}
 
 
 /**
@@ -99,49 +64,6 @@ tny_msg_get_header (TnyMsg *self)
 
 	return TNY_MSG_GET_IFACE (self)->get_header_func (self);
 }
-
-
-/**
- * tny_msg_add_part:
- * @self: a #TnyMsg object
- * @part: the mime-part to add
- * 
- * Add a mime-part to a message
- *
- * Return value: The id of the added mime-part
- *
- **/
-gint
-tny_msg_add_part (TnyMsg *self, TnyMimePart *part)
-{
-#ifdef DEBUG
-	if (!TNY_MSG_GET_IFACE (self)->add_part_func)
-		g_critical ("You must implement tny_msg_add_part\n");
-#endif
-
-	return TNY_MSG_GET_IFACE (self)->add_part_func (self, part);
-}
-
-/**
- * tny_msg_del_part:
- * @self: a #TnyMsg object
- * @part: the mime-part to delete
- * 
- * Delete a mime-part from a message
- *
- **/
-void
-tny_msg_del_part (TnyMsg *self, TnyMimePart *part)
-{
-#ifdef DEBUG
-	if (!TNY_MSG_GET_IFACE (self)->del_part_func)
-		g_critical ("You must implement tny_msg_del_part\n");
-#endif
-
-	TNY_MSG_GET_IFACE (self)->del_part_func (self, part);
-	return;
-}
-
 
 /**
  * tny_msg_set_header:
