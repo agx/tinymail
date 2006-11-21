@@ -17,14 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* Original file: camel-stream-fs.c : file system based stream (Camel 
- * source code). Note that this implementation is heavily modified and that
- * therefore bugs aren't necessarily caused by the original authors.
- */
-
 /*
  * Authors: Bertrand Guiheneuf <bertrand@helixcode.com>
  *          Michael Zucchi <notzed@ximian.com>
+ *          Philip Van Hoof <pvanhoof@gnome.org>
  *
  * Copyright 1999-2003 Ximian, Inc. (www.ximian.com)
  *
@@ -168,7 +164,8 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
  * that you must not to close() fd yourself. The destructor will do that for
  * you.
  *
- * Therefore use it with care. It's more or less an exception in the framework.
+ * Therefore use it with care. It's more or less an exception in the framework
+ * whether or not you call it an exception depends on your point of view).
  *
  * The the instance will on top of close() when destructing, also fsync() the
  * filedescriptor. It does this depending on its mood, the weather and your

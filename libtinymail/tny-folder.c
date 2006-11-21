@@ -392,7 +392,7 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * @self: a TnyFolder object
  * @header: the header of the message to get
  * 
- * Get a message in the folder identified by a header. You must unreference the
+ * Get a message in @self identified by @header. You must unreference the
  * return value after use.
  * 
  * Example:
@@ -424,9 +424,9 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header)
  * tny_folder_get_headers:
  * @self: a TnyFolder object
  * @headers: A #TnyList instance where the headers will be put
- * @refresh: whether or not to synchronize with the server first
+ * @refresh: whether or not to synchronize with the service first
  * 
- * Get a list of message header instances that are in this folder. Also read
+ * Get the list of message header instances that are in @self. Also read
  * about tny_folder_refresh.
  *
  * Example:
@@ -462,10 +462,10 @@ tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh)
  * tny_folder_get_id:
  * @self: a TnyFolder object
  * 
- * Get an unique id for this folder (unique per account). The ID will be a 
- * a "/" separated string like "INBOX/parent-folder/folder" depending on the
- * service type (the example is for IMAP using the libtinymail-camel 
- * implementation).
+ * Get an unique id of @self (unique per account). The ID will be a "/" 
+ * separated string like (but not guaranteed) "INBOX/parent-folder/folder"
+ * depending on the service type (the example is for IMAP using the 
+ * libtinymail-camel implementation).
  *
  * The ID is guaranteed to be unique per account. You should not free the result
  * of this method.
@@ -488,7 +488,7 @@ tny_folder_get_id (TnyFolder *self)
  * tny_folder_get_name:
  * @self: a TnyFolder object
  * 
- * Get a displayable name for this folder. You should not free the result of 
+ * Get the displayable name @of self. You should not free the result of 
  * this method.
  * 
  * Return value: The folder name
@@ -531,7 +531,7 @@ tny_folder_set_name (TnyFolder *self, const gchar *name)
  * tny_folder_get_folder_type:
  * @self: a TnyFolder object
  * 
- * Get the type of the folder (Inbox, Outbox etc.) 
+ * Get the type of @self (Inbox, Outbox etc.) 
  * 
  * Return value: The folder type as a #TnyFolderType enum
  *

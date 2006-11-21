@@ -33,28 +33,27 @@
  * for a header summary view) if the tny_folder_get_headers method happened 
  * before the deletion. You are responsible for refreshing your own lists.
  *
- * This method also doesn't have to remove the header from the folder. Depending
- * on the implementation it might only marks it as removed (it for example sets
- * the TNY_HEADER_FLAG_DELETED). In that case only after performing the 
- * tny_folder_expunge method on the folder, it will really be removed.
+ * This method also doesn't "have" to remove the header from the folder. 
+ * Depending on the implementation it might only marks it as removed (it for 
+ * example sets the TNY_HEADER_FLAG_DELETED). In such a case only after
+ * performing the tny_folder_expunge method on the folder, it will really be
+ * removed.
  *
- * In that case this means that a tny_folder_get_headers method call will still
- * prepend the removed message to the list. It will do this until the expunge 
- * happened. You are advised to hide messages that have been marked as being 
- * deleted from your summary view.
- * 
- * In Gtk+ for the #GtkTreeView component, you can do this using the 
- * #GtkTreeModelFilter tree model filtering model.
+ * In such a case this means that a tny_folder_get_headers method call will
+ * still prepend the removed message to the list. It will do this until the
+ * expunge  happened. You are advised to hide messages that have been marked
+ * as being deleted from your summary view. In Gtk+, for the #GtkTreeView
+ * component, you can do this using the #GtkTreeModelFilter tree model filtering
+ * model.
  *
  * The #TnyCamelMsgRemoveStrategy implementation works this way. This 
- * implementation is also the default implementation for #TnyFolder 
+ * implementation is also the default implementation for most #TnyFolder 
  * implementations in libtinymail-camel
  * 
  * Note that it's possible that another implementation works differently. You
  * could, for example, inherit or decorate the #TnyCamelMsgRemoveStrategy 
- * implementation by adding the code that also permanently removes the message
- * in your subclassed special type. Don't forget to use the 
- * tny_folder_set_msg_remove_strategy method then.
+ * implementation by adding code that also permanently removes the message
+ * in your inherited special type.
  *
  **/
 void

@@ -27,6 +27,8 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
  * @self: A #TnySendQueue instance
  * @msg: a #TnyMsg instance
  *
+ * API WARNING: This API might change
+ *
  * Add a message to the send queue.
  *
  **/
@@ -57,6 +59,8 @@ tny_send_queue_base_init (gpointer g_class)
  * @arg1: The message that got sent
  * @arg2: The current nth number of the message that got sent
  * @arg3: The total amount of messages currently being processed
+ *
+ * API WARNING: This API might change
  *
  * Emitted when a message got sent
  **/

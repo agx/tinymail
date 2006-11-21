@@ -27,7 +27,7 @@
  * @self: a #TnyStream object
  * @output: a #TnyStream object
  * 
- * Write the stream self to the stream output in an efficient way
+ * Write @self to @output in an efficient way
  *
  * Return value: the number of bytes written to the output stream, or -1 on
  * error along with setting errno.
@@ -50,7 +50,7 @@ tny_stream_write_to_stream (TnyStream *self, TnyStream *output)
  * @buffer: a buffer that is at least n in size
  * @n: the max amount of bytes to read from self and to write into buffer
  * 
- * Read n bytes of the stream and write it into buffer. It's your responsibility
+ * Read n bytes @self and write it into @buffer. It's your responsibility
  * to pass a buffer that is large enough to hold n bytes.
  *
  * Return value: the number of bytes actually read, or -1 on error and 
@@ -74,7 +74,7 @@ tny_stream_read  (TnyStream *self, char *buffer, gsize n)
  * @buffer: a buffer that has at least n bytes
  * @n: the amount of bytes to read from buffer and to write to self
  * 
- * Write n bytes of the buffer into the stream. It's your responsibility to pass
+ * Write n bytes of @buffer into @self. It's your responsibility to pass
  * a buffer that has at least n bytes.
  *
  * Return value: the number of bytes written to the stream, or -1 on error 
@@ -137,7 +137,7 @@ tny_stream_close (TnyStream *self)
  * tny_stream_is_eos:
  * @self: a #TnyStream object
  * 
- * Tests if there are bytes left to read on the stream object.
+ * Tests if there are bytes left to read on @self.
  *
  * Return value: TRUE on EOS or FALSE otherwise.
  *
@@ -157,9 +157,8 @@ tny_stream_is_eos   (TnyStream *self)
  * tny_stream_reset:
  * @self: a #TnyStream object
  * 
- * Resets the stream. That is, put it in a state where it can be read from 
- * the beginning again. Not all streams are seekable, but they must 
- * all be resettable.
+ * Resets @self. That is, put it in a state where it can be read from 
+ * the beginning again.
  *
  * Return value: 0 on success or -1 on error along with setting errno.
  *

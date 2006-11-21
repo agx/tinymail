@@ -27,7 +27,7 @@
  * @self: a #TnyMimePart object
  * @list: a #TnyList object
  * 
- * Get a read-only list of mime-parts of this mime part.
+ * Get a read-only list of mime-parts in @self.
  *
  * Example:
  * <informalexample><programlisting>
@@ -65,7 +65,7 @@ tny_mime_part_get_parts (TnyMimePart *self, TnyList *list)
  * @self: a #TnyMimePart object
  * @part: the mime-part to add
  * 
- * Add a mime-part to a mime part
+ * Add a mime-part to @self.
  *
  * Return value: The id of the added mime-part
  *
@@ -86,7 +86,7 @@ tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
  * @self: a #TnyMimePart object
  * @part: the mime-part to delete
  * 
- * Delete a mime-part from a mime part
+ * Delete a mime-part from @self
  *
  **/
 void
@@ -149,7 +149,7 @@ tny_mime_part_is_attachment (TnyMimePart *self)
  * @self: a #TnyMimePart object
  * @content_location: the location 
  * 
- * Set the content location of a mime part.
+ * Set the content location of @self.
  *
  **/
 void
@@ -169,7 +169,7 @@ tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_loca
  * @self: a #TnyMimePart object
  * @description: the description 
  * 
- * Set the description of a mime part.
+ * Set the description of @self.
  *
  **/
 void
@@ -189,7 +189,7 @@ tny_mime_part_set_description (TnyMimePart *self, const gchar *description)
  * @self: a #TnyMimePart object
  * @content_id: the content id 
  * 
- * Set the content id of a mime part.
+ * Set the content id of @self.
  *
  **/
 void
@@ -209,7 +209,7 @@ tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
  * @self: a #TnyMimePart object
  * @filename: the filename 
  * 
- * Set the filename of a mime part.
+ * Set the filename of @self.
  *
  **/
 void
@@ -229,7 +229,7 @@ tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
  * @self: a #TnyMimePart object
  * @contenttype: the content_type 
  * 
- * Set the content type of a mime part. Formatted as type/subtype
+ * Set the content type of @self. Formatted as "type/subtype"
  *
  **/
 void
@@ -249,7 +249,7 @@ tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
  * tny_mime_part_get_filename:
  * @self: a #TnyMimePart object
  * 
- * Get the filename of a mime part. The returned value should not be freed.
+ * Get the filename of @self. The returned value should not be freed.
  *
  * Return value: the filename of a mime part as a read-only string
  *
@@ -269,7 +269,7 @@ tny_mime_part_get_filename (TnyMimePart *self)
  * tny_mime_part_get_content_id:
  * @self: a #TnyMimePart object
  * 
- * Get the content-id of a mime part. The returned value should not be freed.
+ * Get the content-id of @self. The returned value should not be freed.
  *
  * Return value: the content-id of a mime part as a read-only string
  *
@@ -289,7 +289,7 @@ tny_mime_part_get_content_id (TnyMimePart *self)
  * tny_mime_part_get_description:
  * @self: a #TnyMimePart object
  * 
- * Get the description of a mime part. The returned value should not be freed.
+ * Get the description of @self. The returned value should not be freed.
  *
  * Return value: the description of a mime part as a read-only string
  **/
@@ -308,7 +308,7 @@ tny_mime_part_get_description (TnyMimePart *self)
  * tny_mime_part_get_content_location:
  * @self: a #TnyMimePart object
  * 
- * Get the content location of a mime part. The returned value should not be freed.
+ * Get the content location of @self. The returned value should not be freed.
  *
  * Return value: the content-location of a mime part as a read-only string
  *
@@ -329,13 +329,13 @@ tny_mime_part_get_content_location (TnyMimePart *self)
  * @self: a #TnyMimePart object
  * @stream: a #TnyMsgStream stream
  * 
- * Efficiently write the mime part to a stream. This will not read the data
- * of the part in a memory buffer. In stead it will read the part data while
+ * Efficiently write the content of @self to a stream. This will not read the 
+ * data of the part in a memory buffer. In stead it will read the part data while
  * already writing it to the stream efficiently.
  *
  * You probably want to utilise the tny_mime_part_decode_to_stream
  * method in stead of this one. This method will not attempt to decode the
- * mime part. Mime parts are encoded before appending it to a message.
+ * mime part. Mime parts are usually encoded in E-mails.
  * 
  * Example:
  * <informalexample><programlisting>
@@ -367,9 +367,9 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
  * @self: a #TnyMimePart object
  * @stream: a #TnyMsgStream stream
  * 
- * Efficiently decode the message part to a stream. This will not read the data
- * of the part in a memory buffer. In stead it will read the part data while
- * already writing it to the stream efficiently.
+ * Efficiently decode @self to a stream. This will not read the data of the
+ * part in a memory buffer. In stead it will read the part data while already
+ * writing it to the stream efficiently.
  *
  * Example:
  * <informalexample><programlisting>
@@ -401,7 +401,7 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
  * @stream: a #TnyMsgStream stream
  * @type: the type like text/plain
  * 
- * Set the stream from which the message part will read its content
+ * Set the stream from which the mime part will read its content
  *
  * Example:
  * <informalexample><programlisting>
@@ -432,8 +432,8 @@ tny_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const
  * tny_mime_part_get_stream:
  * @self: a #TnyMimePart object
  * 
- * Inefficiently get a stream for a message part. The entire data of the
- * the part will be kept in memory until the stream is unreferenced.
+ * Inefficiently get a stream for @self. The entire data of the part will be
+ * kept in memory until the stream is unreferenced.
  *
  * Return value: An in-memory stream
  **/
@@ -452,7 +452,7 @@ tny_mime_part_get_stream (TnyMimePart *self)
  * tny_mime_part_get_content_type:
  * @self: a #TnyMimePart object
  * 
- * A read-only string in the format "type/subtype".  You shouldn't free the 
+ * Get the mime part type in the format "type/subtype".  You shouldn't free the 
  * returned value.
  *
  * Return value: content-type of a message part as a read-only string
@@ -473,9 +473,9 @@ tny_mime_part_get_content_type (TnyMimePart *self)
  * @self: a #TnyMimePart object
  * @type: The content type in the string format type/subtype
  * 
- * Efficiently checks whether a part is of type content_type. You can use things
- * like "type/*" for matching. Only * works, stands for 'any', and it's not 
- * (like) a regular expression.
+ * Efficiently checks whether @self is of type @type. You can use things
+ * like "type/*" for matching. Only '*' works and stands for 'any'. It's not 
+ * a regular expression nor is it like a regular expression.
  *
  * Example:
  * <informalexample><programlisting>

@@ -26,7 +26,7 @@
  * tny_msg_get_folder:
  * @self: a #TnyMsg object
  * 
- * Get the parent folder of this message. The returned folder object should be
+ * Get the parent folder of @self. The returned folder object should be
  * unreferenced after use.
  *
  * Return value: The parent folder of this message or NULL if none
@@ -49,7 +49,7 @@ tny_msg_get_folder (TnyMsg *self)
  * tny_msg_get_header:
  * @self: a #TnyMsg object
  * 
- * Get the header of the message. The returned header object should be 
+ * Get the header of @self. The returned header object should be 
  * unreferenced after use.
  *
  * Return value: The header of the message
@@ -70,7 +70,7 @@ tny_msg_get_header (TnyMsg *self)
  * @self: a #TnyMsg object
  * @header: the header to set
  * 
- * Set the header of a message
+ * Set the header of @self.
  *
  **/
 void

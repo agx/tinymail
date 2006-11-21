@@ -27,7 +27,7 @@
  * @self: a #TnyTransportAccount object
  * @msg: a #TnyMsg object
  *
- * Send a message
+ * Send @msg
  * 
  **/
 void
