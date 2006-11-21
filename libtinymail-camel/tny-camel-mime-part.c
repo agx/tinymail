@@ -95,11 +95,19 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
 	TnyList *list = data;
 	TnyMimePart *tpart;
+	CamelContentType *type; 
 
 	if (!part)
 		return FALSE;
 
-	tpart = tny_camel_mime_part_new (part);
+	type = camel_mime_part_get_content_type (part); 
+
+	if (camel_content_type_is (type, "message", "rfc822")) 
+	{
+		tpart = TNY_MIME_PART (tny_camel_msg_new ());
+		tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (tpart), part);
+	} else
+		tpart = tny_camel_mime_part_new (part);
 
 	tny_list_prepend (list, (GObject*)tpart);
 	g_object_unref (G_OBJECT (tpart));

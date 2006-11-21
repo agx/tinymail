@@ -564,10 +564,12 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 		{
 			TnyHeader *header;
 			header = TNY_HEADER (tny_msg_get_header (TNY_MSG (part)));
-			g_return_if_fail (TNY_IS_HEADER (header));
-			tny_header_view_set_header (priv->headerview, header);
-			g_object_unref (G_OBJECT (header));
-			gtk_widget_show (GTK_WIDGET (priv->headerview));
+			if (header && TNY_IS_HEADER (header))
+			{
+				tny_header_view_set_header (priv->headerview, header);
+				g_object_unref (G_OBJECT (header));
+				gtk_widget_show (GTK_WIDGET (priv->headerview));
+			}
 		} 
 
 		list = tny_simple_list_new ();
