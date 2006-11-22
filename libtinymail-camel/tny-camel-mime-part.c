@@ -78,12 +78,19 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 		{
 			CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
 			if (part)
-				go = message_foreach_part_rec (msg, part, callback, data, FALSE);
+				callback (msg, part, data); 
+
+			/* if (part)
+				go = message_foreach_part_rec (msg, part, callback, data, FALSE); */
+
 			else go = FALSE;
 		}
 		
 	} else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
-		go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data, FALSE);
+		callback (msg, part, data);
+
+	/* else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
+		go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data, FALSE); */
 
 	return go;
 }
@@ -93,20 +100,28 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
 	TnyList *list = data;
 	TnyMimePart *tpart;
-	CamelContentType *type; 
+	CamelContentType *type;
 
 	if (!part)
 		return FALSE;
 
-	type = camel_mime_part_get_content_type (part); 
-
-	if (camel_content_type_is (type, "message", "rfc822")) 
+	type = camel_mime_part_get_content_type (part);
+	if (camel_content_type_is (type, "message", "rfc822"))
 	{
+		CamelMimePart *mypart;
+
+		CamelDataWrapper *rfc822cont = camel_medium_get_content_object (CAMEL_MEDIUM (part));
+
+		if (rfc822cont)
+			mypart = CAMEL_MIME_PART (rfc822cont);
+		else
+			mypart = part;
+
 		TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
 		tpart = TNY_MIME_PART (tny_camel_msg_new ());
-		tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (tpart), part);
-		if (CAMEL_IS_MIME_MESSAGE (part))
-			_tny_camel_header_set_camel_mime_message (nheader, CAMEL_MIME_MESSAGE (part));
+		tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (tpart), mypart);
+		if (CAMEL_IS_MIME_MESSAGE (mypart))
+			_tny_camel_header_set_camel_mime_message (nheader, mypart);
 		_tny_camel_msg_set_header (TNY_CAMEL_MSG (tpart), nheader);
 		g_object_unref (G_OBJECT (nheader));
 
