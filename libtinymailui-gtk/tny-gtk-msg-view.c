@@ -458,29 +458,11 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 	{
 		if (GTK_IS_WIDGET (mpview))
 		{
+			GtkWidget *expander = NULL;
 
 			if (TNY_IS_GTK_MSG_VIEW (mpview))
 			{
-				TnyMsg *msg = NULL;
-				TnyHeader *header = NULL;
-				gchar *str = NULL;
-				GtkWidget *expander = NULL;
-
-				msg = tny_msg_view_get_msg (TNY_MSG_VIEW (mpview));
-				if (msg)
-					header = tny_msg_get_header (msg);
-				if (header)
-					str = g_strdup_printf (_("Email message attachment, \"%s\""), 
-								tny_header_get_subject (header));
-				else
-					str = g_strdup_printf (_("Email message attachment"));
-
-				expander = gtk_expander_new (str);
-				if (header)
-					g_object_unref (G_OBJECT (header));
-				if (msg)
-					g_object_unref (G_OBJECT (msg));
-				g_free (str);
+				GtkWidget *expander = gtk_expander_new (_("Email message attachment"));
 				gtk_expander_set_expanded (GTK_EXPANDER (expander), FALSE);
 				gtk_expander_set_spacing (GTK_EXPANDER (expander), 7);
 				gtk_container_add (GTK_CONTAINER (expander), GTK_WIDGET (mpview));
@@ -492,6 +474,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 						GTK_WIDGET (mpview), TRUE, TRUE, 0);
 
 			gtk_widget_show (GTK_WIDGET (mpview));
+
 			if (!GTK_WIDGET_REALIZED (mpview))
 			{
 				RealizePriv *prv = g_slice_new (RealizePriv);
@@ -500,6 +483,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 					"realize", G_CALLBACK (on_mpview_realize), prv);
 			} else
 				tny_mime_part_view_proxy_func_set_part (mpview, part);
+
 		} else if (TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
 			tny_mime_part_view_proxy_func_set_part (mpview, part);
 		else if (!TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
