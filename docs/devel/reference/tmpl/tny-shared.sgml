@@ -23,37 +23,6 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
 
@@ -259,14 +228,6 @@ Shared include file with forward typedefs
 
 </para>
 
-
-<!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
-<para>
-
-</para>
-
-@tnydevice: the object which received the signal.
-@arg1: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>

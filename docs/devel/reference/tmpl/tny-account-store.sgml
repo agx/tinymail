@@ -37,48 +37,6 @@ A abstract type that defines a store for accounts
 </para>
 
 
-<!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
-<para>
-
-</para>
-
-@:
-
-@tnyaccountstore: the object which received the signal.
-
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
 

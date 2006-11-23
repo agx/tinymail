@@ -24,17 +24,6 @@ online/offline status.
 </para>
 
 
-<!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnydevice: the object which received the signal.
-@arg1: 
-
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
 
