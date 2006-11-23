@@ -504,9 +504,12 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			priv->unattached_views = g_list_prepend (priv->unattached_views, mpview);
 			tny_mime_part_view_proxy_func_set_part (mpview, part);
 		}
-	} else if (!tny_mime_part_content_type_is (part, "multipart/mixed"))
+	} else if (!tny_mime_part_content_type_is (part, "multipart/*") &&
+		!tny_mime_part_content_type_is (part, "message/rfc822"))
+	{
 		g_warning (_("I don't have a mime part viewer for %s\n"),
 			tny_mime_part_get_content_type (part));
+	}
 }
 
 static void
