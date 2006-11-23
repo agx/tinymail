@@ -64,7 +64,16 @@ tny_moz_embed_html_mime_part_view_get_part (TnyMimePartView *self)
 	return (priv->part)?TNY_MIME_PART (g_object_ref (priv->part)):NULL;
 }
 
-
+/**
+ * tny_moz_embed_html_mime_part_view_set_part:
+ * @self: a #TnyMozEmbedMimePartView instance
+ * @part: a #TnyMimePart instance
+ *
+ * This is non-public API documentation
+ *
+ * The implementation simply decodes the part to a stream that is implemented in
+ * such a way that it will forward the stream to the GtkMozEmbed stream API.
+ **/
 static void 
 tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 {

@@ -70,6 +70,16 @@ size_to_callback (GtkMozEmbed *mozilla, gint width, gint height, TnyMsgView *sel
 	gtk_widget_set_usize (GTK_WIDGET (mozilla), width, height);
 }
 
+/**
+ * tny_moz_embed_msg_view_create_mime_part_view_for_default:
+ * @self: a #TnyMozEmbedMsgView instance
+ * @part: a #TnyMimePart instance
+ *
+ * This is non-public API documentation
+ *
+ * This implementation will return a #TnyMozEmbedHtmlMimePartView in case part
+ * is of content type text/html. Else it will call its super implementation.
+ **/
 static TnyMimePartView*
 tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePart *part)
 {
@@ -113,6 +123,15 @@ tny_moz_embed_msg_view_create_new_mytype (TnyMsgView *self)
 	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_new_mytype_func (self);
 }
 
+/**
+ * tny_moz_embed_msg_view_create_new_mytype_default:
+ * @self: a #TnyMozEmbedMsgView instance
+ *
+ * This is non-public API documentation
+ *
+ * This implementation returns a new #TnyMozEmbedMsgView instance suitable for
+ * displaying HTML messages.
+ **/
 static TnyMsgView*
 tny_moz_embed_msg_view_create_new_mytype_default (TnyMsgView *self)
 {

@@ -17,6 +17,22 @@
  * Boston, MA 02111-1307, USA.
  */
 
+
+/**
+ * TnyGtkMsgWindow:
+ *
+ * All implementations are rather simple, they all simply forward the instruction
+ * to a priv->msg_view instance which is a #TnyMsgView or the decorated one.
+ *
+ * Next to forwarding the instructions, this implementation also makes sure that
+ * priv->msg_view is embedded in a GtkWindow and that for example the window's
+ * title is set correctly (and things like that).
+ *
+ * You can inherit this type in case you want to have a more decorated windowed 
+ * message viewer. You can also again decorate it (I would recommend decorating
+ * #TnyGtkMsgView in stead, in that case).
+ **/
+
 #include <config.h>
 
 #include <tny-gtk-msg-window.h>

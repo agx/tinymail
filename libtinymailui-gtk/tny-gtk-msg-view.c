@@ -345,6 +345,8 @@ tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
  * @self: a #TnyGtkMsgView instance
  * @part: a #TnyMimePart instance
  *
+ * This is non-public API documentation
+ *
  * Default implementation for tny_msg_view_create_mime_part_view_for. You will
  * usually call this method from overridden implementations that inherit this
  * type. A.k.a. calling the super method.
