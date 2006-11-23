@@ -76,7 +76,6 @@ folder_changed (TnyFolder *self, CamelFolderChangeInfo *info, gpointer user_data
 static void
 pos_header_check (gpointer data, gpointer udata)
 {
-	/* this is a very ugly check .. let's hope that we can remove this soon */
 	/* Note: TNY_IS_CAMEL_HEADER crashes if there's a message referenced (
 	   this might imply that a header is still referenced and therefore not
 	   destroyed) .. I don't know, it's definitely a bug. Also check #1 on 
@@ -626,6 +625,19 @@ progress_func (gpointer data)
 } 
 
 
+/**
+ * tny_camel_folder_refresh_async_status:
+ *
+ * This is non-public API documentation
+ *
+ * The reason why we need to copy thist stuff is because it seems Camel has some
+ * of its stuff allocated on the stack. When you do g_idle tricks, it's possible
+ * that by the time the g_idle happens, the stack allocation is already killed.
+ *
+ * Another possibility is that Camel simply by then has freed the memory of it.
+ * You simply copy stuff, it's a little bit dirty, but just make sure that in 
+ * the idle callback you free it, right? Leaking wouldn't be smart here.
+ **/
 static void
 tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
 {
@@ -731,6 +743,19 @@ tny_camel_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callba
 	return;
 }
 
+/**
+ * tny_camel_folder_refresh_async_default:
+ *
+ * This is non-public API documentation
+ *
+ * It's actually very simple: just store all the interesting info in a struct 
+ * launch a thread and keep that struct-instance around. In the callbacks,
+ * which you stored as function pointers, recover that info and pass it to the
+ * user of the _async method.
+ *
+ * Important is to add and remove references. You don't want the reference to
+ * become zero while doing stuff on the instance in the background, don't you?
+ **/
 static void
 tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
@@ -969,6 +994,7 @@ tny_camel_folder_transfer_msgs (TnyFolder *self,
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals);
 }
 
+/* TODO: provide an _async version of this. Requested by djcb. */
 static void
 tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals)
 {

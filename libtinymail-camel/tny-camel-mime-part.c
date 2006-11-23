@@ -95,6 +95,13 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 	return go;
 }
 
+
+/** 
+ * received_a_part
+ *
+ * If the part is a message/rfc822, then we create a TnyCamelMessage, else we
+ * create a TnyCamelMimePart. 
+ **/
 static gboolean
 received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 {
