@@ -22,6 +22,45 @@
 #include <tny-msg-view.h>
 
 /**
+ * tny_msg_view_create_new_mytype:
+ * @self: A #TnyMsgView instance
+ *
+ * Create a new instance of the same type as @self.
+ *
+ * Implementors: This method should create and return a new #TnyMsgView instance 
+ * of the same type as @self. This method will be used when a #TnyMsgView needs
+ * to create a new instance of itself to display inlined messages (like what
+ * message/rfc822 mime parts are). For example the #TnyGtkMsgView implementation
+ * will use this method to create for itself a new #TnyMsgView instance that it
+ * can embed.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * static TnyMsgView*
+ * tny_my_html_msg_view_create_new_mytype (TnyMsgView *self)
+ * {
+ *    return tny_my_html_msg_view_new ();
+ * }
+ * </programlisting></informalexample>
+ *
+ * Note that if you want to pass contructor parameters, that you will have to
+ * store them yourself (for example in a static global field in the .c file) and
+ * repeat them in the new instance that will be created by this method.
+ *
+ * Return value: A #TnyMsgView instance
+ **/
+TnyMsgView* 
+tny_msg_view_create_new_mytype (TnyMsgView *self)
+{
+#ifdef DEBUG
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_new_mytype_func)
+		g_critical ("You must implement tny_msg_view_create_new_mytype\n");
+#endif
+
+	return TNY_MSG_VIEW_GET_IFACE (self)->create_new_mytype_func (self);
+}
+
+/**
  * tny_msg_view_create_mime_part_view_for:
  * @self: A #TnyMsgView instance
  * @part: A #TnyMimePart instance
@@ -234,6 +273,9 @@ tny_msg_view_get_type (void)
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyMsgView", &info, 0);
+
+		g_type_interface_add_prerequisite (type, TNY_TYPE_MIME_PART_VIEW);
+
 	}
 
 	return type;

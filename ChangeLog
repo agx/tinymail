@@ -1,3 +1,11 @@
+2006-11-23  Philip van Hoof <pvanhoof@gnome.org>
+
+	* Major fixes and refactoring for the rfc822 support
+	* Reimplemented TnyGtkMsgWindow
+	* Added a tny_msg_view_create_new_mytype API
+
+	* This was a major API change in libtinymailui & libtinymailui-gtk
+
 2006-11-23  Sergio Villar Senin <svillar@igalia.com>
 	* libtinymail-camel/tny-camel-folder.c: added support to rename
 	folders
@@ -5,6 +13,8 @@
 	subscriptions code
 	* libtinymail-gnome-desktop/tny-gnome-account-store.c: removed a small
 	leak
+
+	* This was a major API change in libtinymail
 
 2006-11-21  Sergio Villar Senin <svillar@igalia.com>
 	* Fixed a bug when subscribing new folders

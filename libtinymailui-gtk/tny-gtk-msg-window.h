@@ -58,6 +58,9 @@ struct _TnyGtkMsgWindowClass
 	void (*set_unavailable_func) (TnyMsgView *self);
 	void (*clear_func) (TnyMsgView *self);
 	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
+	TnyMsgView* (*create_new_mytype_func) (TnyMsgView *self);
+	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
+	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
 };
 
 GType tny_gtk_msg_window_get_type (void);

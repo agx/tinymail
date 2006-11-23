@@ -48,6 +48,7 @@ struct _TnyMozEmbedMsgViewClass
 
 	/* virtual methods */
 	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
+	TnyMsgView* (*create_new_mytype_func) (TnyMsgView *self);
 };
 
 GType tny_moz_embed_msg_view_get_type (void);

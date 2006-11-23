@@ -322,6 +322,18 @@ tny_gtk_msg_view_get_msg_default (TnyMsgView *self)
 }
 
 
+static TnyMsgView*
+tny_gtk_msg_view_create_new_mytype (TnyMsgView *self)
+{
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_new_mytype_func (self);
+}
+
+static TnyMsgView*
+tny_gtk_msg_view_create_new_mytype_default (TnyMsgView *self)
+{
+	return tny_gtk_msg_view_new ();
+}
+
 static TnyMimePartView*
 tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 {
@@ -350,7 +362,7 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 	/* Inline message RFC822 */
 	} else if (priv->display_rfc822 && tny_mime_part_content_type_is (part, "message/rfc822"))
 	{
-		retval = TNY_MIME_PART_VIEW (tny_gtk_msg_view_new ());
+		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_mytype (self));
 		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (retval),
 					GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 
@@ -388,10 +400,11 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 static void
 tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part)
 {
-		if (tny_mime_part_content_type_is (part, "message/rfc822"))
+
+		if (tny_mime_part_content_type_is (part, "message/rfc822") ||
+			 TNY_IS_GTK_MSG_VIEW (mpview))
 		{
 			TnyList *list = tny_simple_list_new ();
-
 			if (TNY_IS_MSG (part) && TNY_IS_GTK_MSG_VIEW (mpview))
 			{
 				TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
@@ -440,7 +453,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 		if (tny_mime_part_content_type_is (part, "text/html") &&
 			!TNY_IS_GTK_TEXT_MIME_PART_VIEW (mpview))
 		{   
-			/* An enhanced HTML component? */
+			
 			if (priv->text_body_viewer)
 			{
 				GtkContainer *viewers = GTK_CONTAINER (TNY_GTK_MSG_VIEW (self)->viewers);
@@ -491,7 +504,9 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			priv->unattached_views = g_list_prepend (priv->unattached_views, mpview);
 			tny_mime_part_view_proxy_func_set_part (mpview, part);
 		}
-	}
+	} else if (!tny_mime_part_content_type_is (part, "multipart/mixed"))
+		g_warning (_("I don't have a mime part viewer for %s\n"),
+			tny_mime_part_get_content_type (part));
 }
 
 static void
@@ -752,6 +767,7 @@ tny_msg_view_init (gpointer g, gpointer iface_data)
 	klass->set_unavailable_func = tny_gtk_msg_view_set_unavailable;
 	klass->clear_func = tny_gtk_msg_view_clear;
 	klass->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for;
+	klass->create_new_mytype_func = tny_gtk_msg_view_create_new_mytype;
 
 	return;
 }
@@ -787,7 +803,8 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 	class->set_unavailable_func = tny_gtk_msg_view_set_unavailable_default;
 	class->clear_func = tny_gtk_msg_view_clear_default;
 	class->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for_default;
-	
+	class->create_new_mytype_func = tny_gtk_msg_view_create_new_mytype_default;
+
 	g_type_class_add_private (object_class, sizeof (TnyGtkMsgViewPriv));
 
 	return;
