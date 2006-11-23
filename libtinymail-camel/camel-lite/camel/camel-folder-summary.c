@@ -2271,7 +2271,7 @@ content_info_load(CamelFolderSummary *s)
 		camel_folder_summary_decode_token(s, &name);
 		camel_folder_summary_decode_token(s, &value);
 		
-		camel_content_type_set_param (ct, name, value);
+		camel_content_type_set_param_mmap (ct, name, value);
 	}
 
 	ci->type = ct;
@@ -2324,14 +2324,15 @@ content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentInfo *ci)
 static void
 content_info_free(CamelFolderSummary *s, CamelMessageContentInfo *ci)
 {
-	camel_content_type_unref(ci->type);
 
 	if (ci->needs_free) 
 	{
 		token_free (ci->id);
 		token_free (ci->description);
 		token_free (ci->encoding);
-	}
+		camel_content_type_unref (ci->type);
+	} else
+		camel_content_type_unref_mmap (ci->type);
 
 	g_slice_free1(s->content_info_size, ci);
 }
