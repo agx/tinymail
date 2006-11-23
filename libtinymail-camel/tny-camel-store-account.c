@@ -88,7 +88,6 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 			g_free (proto);
 		
 			camel_url_set_protocol (url, priv->proto); 
-
 			camel_url_set_user (url, priv->user);
 			camel_url_set_host (url, priv->host);
 		
@@ -164,86 +163,78 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 	return;
 }
 
-
+/**
+ * This utility function performs folder subscriptions/unsubscriptions
+ * since the code for both operations is almost the same. If the
+ * subscribe parameter is TRUE, then we're asking for a folder
+ * subscription, else for a folder unsubscription */
 static void
-tny_camel_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
+set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 {
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store;
 	CamelFolder *cfolder;
 	const gchar *folder_full_name;
 
-	g_assert (TNY_IS_CAMEL_FOLDER (folder));
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	/* Get store */
 	g_static_rec_mutex_lock (apriv->service_lock);
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 	g_static_rec_mutex_unlock (apriv->service_lock);
+
+	if (!camel_store_supports_subscriptions (store)) 
+		goto cleanup;
 
 	/* Retrieve the folder full name */
 	cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
 	folder_full_name = camel_folder_get_full_name (cfolder);
 
-	if (camel_store_supports_subscriptions (store)
-	    && !camel_store_folder_subscribed (store, folder_full_name)) {
-		
+	if (camel_store_folder_subscribed (store, folder_full_name) == subscribe)
+		goto cleanup;
+
+	/* Subscribe or unsubscribe */
+	if (subscribe)
 		camel_store_subscribe_folder (store, folder_full_name, &ex);
-
-		if (camel_exception_is_set (&ex)) {
-			g_warning (N_("Could not subscribe to folder %s: %s\n"),
-				   tny_folder_get_name (folder), 
-				   camel_exception_get_description (&ex));
-			camel_exception_clear (&ex);
-		} else {
-			/* Sync */
-			_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), TRUE);
-
-			g_signal_emit (self, 
-				       tny_store_account_signals [TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED], 
-				       0, folder);
-		}
-	}
-
-	camel_object_unref (CAMEL_OBJECT (cfolder));
-    	camel_object_unref (CAMEL_OBJECT (store));
-    
-	return;
-}
-
-static void
-tny_camel_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
-{
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	CamelStore *store;
-
-	g_assert (TNY_IS_CAMEL_FOLDER (folder));
-
-	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex);
-	g_static_rec_mutex_unlock (apriv->service_lock);
-
-	camel_store_unsubscribe_folder (store, tny_folder_get_name (folder), &ex);
+	else
+		camel_store_unsubscribe_folder (store, folder_full_name, &ex);
 
 	if (camel_exception_is_set (&ex)) {
-		g_warning (N_("Could not unsubscribe to folder %s: %s\n"),
+		g_warning (N_("Could not %s folder %s: %s\n"),
+			   subscribe ? _("subscribe to") : _("unsubscribe"),
 			   tny_folder_get_name (folder), 
 			   camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 	} else {
 		/* Sync */
-		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE);
-
+		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), subscribe);
+		
 		g_signal_emit (self, 
 			       tny_store_account_signals [TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED], 
 			       0, folder);
 	}
+	camel_object_unref (CAMEL_OBJECT (cfolder));
 
-	camel_object_unref (CAMEL_OBJECT (store));
+cleanup:
+    	camel_object_unref (CAMEL_OBJECT (store));
+}
 
-	return;
+static void
+tny_camel_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
+{
+	g_assert (TNY_IS_CAMEL_FOLDER (folder));
+
+	set_subscription (self, folder, TRUE);
+}
+
+static void
+tny_camel_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
+{
+	g_assert (TNY_IS_CAMEL_FOLDER (folder));
+
+	set_subscription (self, folder, FALSE);
 }
 
 

@@ -414,13 +414,14 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 
 			if (options)
 			{
+				GSList *tmp = options;
 				while (options)
 				{
 					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), options->data);
 					g_free (options->data);
 					options = g_slist_next (options);
 				}
-				g_slist_free (options);
+				g_slist_free (tmp);
 			}
 
 			/* Because we only check for the n first bytes, the pops, imaps and smtps also work */

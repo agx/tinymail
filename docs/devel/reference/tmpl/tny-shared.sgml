@@ -291,8 +291,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnystoreaccount: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyStoreAccountIface ##### -->
 <para>

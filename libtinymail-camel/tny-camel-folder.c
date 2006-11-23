@@ -195,7 +195,10 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 			return FALSE;
 		}
 
-	priv->cached_length = camel_folder_get_message_count (priv->folder);
+		priv->subscribed = 
+			camel_store_folder_subscribed (store,
+						       camel_folder_get_full_name (priv->folder));
+		priv->cached_length = camel_folder_get_message_count (priv->folder);
 
 		/* priv->folder_changed_id = camel_object_hook_event (priv->folder, 
 			"folder_changed", (CamelObjectEventHookFunc)folder_changed, 
@@ -380,6 +383,24 @@ tny_camel_folder_is_subscribed_default (TnyFolder *self)
 	gboolean retval;
 
 	g_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+	{
+		CamelStore *store;
+		CamelFolder *cfolder;
+
+		if (!load_folder_no_lock (priv)) 
+		{
+			g_mutex_unlock (priv->folder_lock);
+			return;
+		}
+		store = (CamelStore*) _tny_camel_account_get_service 
+			(TNY_CAMEL_ACCOUNT (priv->account));
+		cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (self));
+		priv->subscribed = camel_store_folder_subscribed (store, 
+								  camel_folder_get_full_name (cfolder));
+	}
+
 	retval = priv->subscribed;
 	g_mutex_unlock (priv->folder_lock);
 
@@ -1067,18 +1088,59 @@ static void
 tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	gchar *full_name;
+	CamelFolder *cfolder;
+	CamelFolderInfo *parent_info;
+	const gchar *old_path;
+	gchar *new_path;
+	CamelException ex;
 
-	if (!load_folder (priv))
+	g_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv)) 
+		{
+			g_mutex_unlock (priv->folder_lock);
+			return;
+		}
+
+	if (!priv->iter || !priv->iter_parented)
 		return;
 
-	camel_folder_rename (priv->folder, name);
+	/* Create new full name */
+	cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (self));
+	old_path = camel_folder_get_full_name (cfolder);
+	parent_info = priv->iter->parent;
+	new_path = g_strdup_printf ("%s/%s", parent_info->name, name);
+
+	/* Check that the name really changes */
+	if (!strcmp (old_path, new_path)) 
+	{
+		g_free (new_path);
+		return;
+	}
+
+	/* Rename folder */
+	camel_exception_init (&ex);
+	camel_store_rename_folder (cfolder->parent_store, old_path, (const gchar *) new_path, &ex);
+	g_free (new_path);
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_warning (N_("Renaming folder %s to %s failed: %s\n"),
+			   camel_folder_get_name (cfolder),
+			   name,
+			   camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+		return;
+	}
 
 	if (G_UNLIKELY (priv->cached_name))
 		g_free (priv->cached_name);
 
 	priv->cached_name = g_strdup (name);
 
-	return;
+	g_mutex_unlock (priv->folder_lock);
 }
 
 /**
@@ -1355,8 +1417,9 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name)
 	folder = tny_camel_folder_new ();
 	info = camel_store_create_folder (store, priv->folder_name, name, &ex);
 
-	if (camel_exception_is_set (&ex)) {
-		g_warning ("Creating folder failed: %s\n", 
+	if (camel_exception_is_set (&ex)) 
+	{
+		g_warning (N_("Creating folder failed: %s\n"), 
 			camel_exception_get_description (&ex));
 		g_object_unref (G_OBJECT (folder));
 		return NULL;
