@@ -340,6 +340,27 @@ tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
 }
 
+/**
+ * tny_gtk_msg_view_create_mime_part_view_for_default:
+ * @self: a #TnyGtkMsgView instance
+ * @part: a #TnyMimePart instance
+ *
+ * Default implementation for tny_msg_view_create_mime_part_view_for. You will
+ * usually call this method from overridden implementations that inherit this
+ * type. A.k.a. calling the super method.
+ * 
+ * The text/plain and message/rfc822 content types and attachment mime parts
+ * are typically handled by this implementation. The text/html one is typically
+ * handled by an implementation that inherits this implementation. However, if
+ * this implementation handles the text/html mime parts, then the HTML source
+ * code will be displayed to the user. 
+ *
+ * ps. A #TnyMimePartView implementation that displays the HTML source code as
+ * plain text would be welcomed for this situation. For example links or 
+ * lynx - like.
+ *
+ * This is non-public API documentation
+ **/
 static TnyMimePartView*
 tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePart *part)
 {
@@ -397,6 +418,19 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 }
 
 
+/**
+ * tny_mime_part_view_proxy_func_set_part:
+ * @self: a #TnyGtkMsgView instance
+ * @part: a #TnyMimePart instance
+ *
+ * This is non-public API documentation
+ *
+ * A functional wrapper that detects whether part is rfc822, and if that is the
+ * case, will do something specific (like adding the header to the view). Else
+ * it will simply proxy to tny_mime_part_view_set_part which in turn will call 
+ * tny_gtk_msg_view_display_part or tny_gtk_msg_view_set_msg which will call
+ * tny_gtk_msg_view_display_parts.
+ **/
 static void
 tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part)
 {
@@ -437,6 +471,29 @@ on_mpview_realize (GtkWidget *widget, gpointer user_data)
 }
 
 
+/**
+ * tny_gtk_msg_view_display_part:
+ * @self: a #TnyGtkMsgView instance
+ * @part: a #TnyMimePart instance
+ *
+ * This is non-public API documentation
+ * 
+ * This method will display one mime part. In case display_one_body is enabled,
+ * and there was already a body viewer created and this mime part is also a 
+ * text/plain or text/html, then it will discard the request or replace the 
+ * current one with this new one (in case it's a more enhanced viewer like a
+ * HTML capable one).
+ *
+ * The method will use the tny_msg_view_create_mime_part_view_for on self to get
+ * a suitable #TnyMimePartView for part. It will attach it to the viewers GtkBox
+ * and it will show it in case it's a widget. In case the widget isn't realized,
+ * it will delay setting the mime part on the viewer until the widget is 
+ * effectively realized (using the realize signal).
+ *
+ * In case it's not a widget nor a known attachment mime part viewer, the 
+ * instance is added to a list of unattached views. Upon finalization of self,
+ * will that list be unreferenced.
+ **/
 static void
 tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 {
@@ -512,6 +569,16 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 	}
 }
 
+
+/**
+ * tny_gtk_msg_view_display_parts:
+ * @self: a #TnyGtkMsgView instance
+ * @parts: a #TnyList instance containing #TnyMimePart instances
+ *
+ * This is non-public API documentation
+ *
+ * Walks all items in parts and performs tny_gtk_msg_view_display_part on each.
+ **/
 static void
 tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts)
 {
@@ -599,7 +666,17 @@ tny_gtk_msg_view_mp_set_part (TnyMimePartView *self, TnyMimePart *part)
 	return;
 }
 
-
+/**
+ * tny_gtk_msg_view_mp_set_part_default:
+ * @self: a #TnyGtkMsgView instance
+ * @part: a #TnyMimePart instance
+ *
+ * This is non-public API documentation
+ *
+ * In case part is a TnyMsg, first show the header, then the part itself
+ * (#TnyMsg inherits from #TnyMimePart) and then dance on the 
+ * tny_gtk_msg_view_display_parts song for the parts that are in the message.
+ **/
 static void 
 tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 {
