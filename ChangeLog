@@ -1,3 +1,7 @@
+2006-11-23  Thomas Viehmann <tv@beamnet.de>
+
+	* Improvements for the debian package
+
 2006-11-23  Philip van Hoof <pvanhoof@gnome.org>
 
 	* Major fixes and refactoring for the rfc822 support
