@@ -25,7 +25,8 @@
  * tny_msg_view_create_new_mytype:
  * @self: A #TnyMsgView instance
  *
- * Create a new instance of the same type as @self.
+ * Create a new instance of the same type as @self. The returned instance
+ * must be unreferenced after use.
  *
  * Implementors: This method should create and return a new #TnyMsgView instance 
  * of the same type as @self. This method will be used when a #TnyMsgView needs
