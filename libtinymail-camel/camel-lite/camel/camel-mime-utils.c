@@ -2092,7 +2092,7 @@ camel_header_set_param (struct _camel_header_param **l, const char *name, const 
 			} else {
 				p->next = pn->next;
 				g_free (pn->name);
-				g_slice_free (struct _camel_header_param, pn);
+				g_free (pn);
 				return NULL;
 			}
 		}
@@ -2102,7 +2102,7 @@ camel_header_set_param (struct _camel_header_param **l, const char *name, const 
 	if (value == NULL)
 		return NULL;
 
-	pn = g_slice_new (struct _camel_header_param);
+	pn = g_malloc (sizeof (*pn));
 	pn->next = 0;
 	pn->name = g_strdup (name);
 	pn->value = g_strdup (value);
@@ -2111,43 +2111,6 @@ camel_header_set_param (struct _camel_header_param **l, const char *name, const 
 	return pn;
 }
 
-
-struct _camel_header_param *
-camel_header_set_param_mmap (struct _camel_header_param **l, const char *name, const char *value)
-{
-	struct _camel_header_param *p = (struct _camel_header_param *)l, *pn;
-	
-	if (name == NULL)
-		return NULL;
-	
-	while (p->next) {
-		pn = p->next;
-		if (!g_ascii_strcasecmp (pn->name, name)) {
-			g_free (pn->value);
-			if (value) {
-				pn->value = /* g_strdup */ (char*) (value); 
-				return pn;
-			} else {
-				p->next = pn->next;
-				/* g_free (pn->name); */
-				g_slice_free (struct _camel_header_param, pn);
-				return NULL;
-			}
-		}
-		p = pn;
-	}
-
-	if (value == NULL)
-		return NULL;
-
-	pn = g_slice_new (struct _camel_header_param);
-	pn->next = 0;
-	pn->name = /* g_strdup */ (char*) (name);
-	pn->value = /* g_strdup */ (char*) (value);
-	p->next = pn;
-
-	return pn;
-}
 
 /**
  * camel_content_type_param:
@@ -2182,11 +2145,6 @@ camel_content_type_set_param (CamelContentType *t, const char *name, const char 
 	camel_header_set_param (&t->params, name, value);
 }
 
-void
-camel_content_type_set_param_mmap (CamelContentType *t, const char *name, const char *value)
-{
-	camel_header_set_param_mmap (&t->params, name, value);
-}
 
 /**
  * camel_content_type_is:
@@ -2233,24 +2191,11 @@ camel_header_param_list_free(struct _camel_header_param *p)
 		n = p->next;
 		g_free(p->name);
 		g_free(p->value);
-		g_slice_free (struct _camel_header_param, p);
+		g_free(p);
 		p = n;
 	}
 }
 
-void
-camel_header_param_list_free_mmap(struct _camel_header_param *p)
-{
-	struct _camel_header_param *n;
-
-	while (p) {
-		n = p->next;
-		/* g_free(p->name) */;
-		/* g_free(p->value); */
-		g_slice_free (struct _camel_header_param, p);
-		p = n;
-	}
-}
 
 /**
  * camel_content_type_new:
@@ -2301,23 +2246,6 @@ camel_content_type_unref(CamelContentType *ct)
 	if (ct) {
 		if (ct->refcount <= 1) {
 			camel_header_param_list_free(ct->params);
-			g_free(ct->type);
-			g_free(ct->subtype);
-			g_slice_free (CamelContentType, ct);
-			ct = NULL;
-		} else {
-			ct->refcount--;
-		}
-	}
-}
-
-
-void
-camel_content_type_unref_mmap (CamelContentType *ct)
-{
-	if (ct) {
-		if (ct->refcount <= 1) {
-			camel_header_param_list_free_mmap (ct->params);
 			g_free(ct->type);
 			g_free(ct->subtype);
 			g_slice_free (CamelContentType, ct);

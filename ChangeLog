@@ -1,11 +1,4 @@
-2006-11-23  Philip van Hoof <pvanhoof@gnome.org>
-
-	* Fixed a few small memory leaks
-	* Moved content-type info to mmapped memory (which is a major memory
-	improvement)
-
 2006-11-21  Sergio Villar Senin <svillar@igalia.com>
-	
 	* Fixed a bug when subscribing new folders
 	* Added the signal "subscription_changed" to TnyStoreAccount
 	* Added a query to TnyGtkAccountTreeModel

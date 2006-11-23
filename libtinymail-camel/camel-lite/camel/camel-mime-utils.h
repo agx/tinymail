@@ -137,21 +137,17 @@ char *camel_header_address_list_format (struct _camel_header_address *addrlist);
 struct _camel_header_param *camel_header_param_list_decode (const char *in);
 char *camel_header_param (struct _camel_header_param *params, const char *name);
 struct _camel_header_param *camel_header_set_param (struct _camel_header_param **paramsp, const char *name, const char *value);
-struct _camel_header_param *camel_header_set_param_mmap (struct _camel_header_param **paramsp, const char *name, const char *value);
 void camel_header_param_list_format_append (GString *out, struct _camel_header_param *params);
 char *camel_header_param_list_format (struct _camel_header_param *params);
 void camel_header_param_list_free (struct _camel_header_param *params);
-void camel_header_param_list_free_mmap(struct _camel_header_param *p);
 
 /* Content-Type header */
 CamelContentType *camel_content_type_new (const char *type, const char *subtype);
 CamelContentType *camel_content_type_decode (const char *in);
 void camel_content_type_unref (CamelContentType *content_type);
-void camel_content_type_unref_mmap (CamelContentType *content_type);
 void camel_content_type_ref (CamelContentType *content_type);
 const char *camel_content_type_param (CamelContentType *content_type, const char *name);
 void camel_content_type_set_param (CamelContentType *content_type, const char *name, const char *value);
-void camel_content_type_set_param_mmap (CamelContentType *content_type, const char *name, const char *value);
 int camel_content_type_is (CamelContentType *content_type, const char *type, const char *subtype);
 char *camel_content_type_format (CamelContentType *content_type);
 char *camel_content_type_simple (CamelContentType *content_type);
