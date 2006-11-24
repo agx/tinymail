@@ -13,6 +13,8 @@ Philip Van Hoof <pvanhoof@gnome.org>
 Sergio Villar Senin <svillar@igalia.com>
 
 	* Work on TnyCamelFolder implementation
+	* Subscribe & unsubscribe folders functionality
+	* Moving messages around between folders
 	* Various bugfixes
 
 Tinne Hannes <tinne.hannes@gmail.com>
@@ -25,7 +27,7 @@ Raphael Slinckx <raphael@slinckx.net>
 
 	* Author of the first Python binding implementation
 
-James "Doc" Livingston <doclivingston@gmail.com>
+James Doc Livingston <doclivingston@gmail.com>
 
 	* Contributions to the language bindings for Python
 
@@ -55,14 +57,25 @@ Thomas Hisch <t.hisch@gmail.com>
 
 Yoan BLANC <greut.lists@dosimple.ch>
 
-	* Language bindings for .NET
+	* Language bindings for .NET (unfinished)
 
 Thomas Van Machelen <thomas.vanmachelen@gmail.com>
 
-	* Language bindings for .NET
+	* Language bindings for .NET (unfinished)
 
 Bart Deleye <bart.deleye@gmail.com>
 
-	* Language bindings for .NET
+	* Language bindings for .NET (unfinished)
 
+Koen Kooi <koen@dominion.kabel.utwente.nl>
+
+	* Packaging for Ångström
+
+Øystein Gisnås <oystein@gisnas.net>
+
+	* Packaging for Debian
+
+Thomas Viehmann <tv@beamnet.de>
+
+	* Packaging for Debian
 
