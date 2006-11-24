@@ -147,6 +147,36 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
  * 
  * Also see #TnyForgetPassFunc for more information about the function itself.
  *
+ * Example:
+ * <informalexample><programlisting>
+ * static GHashTable *passwords;
+ * static void
+ * per_account_forget_pass_func (TnyAccount *account)
+ * {
+ *     if (passwords)
+ *     {
+ *          const gchar *accountid = tny_account_get_id (account);
+ *          gchar *pwd = g_hash_table_lookup (passwords, accountid);
+ *          if (pwd)
+ *          {
+ *             memset (pwd, 0, strlen (pwd));
+ *             g_hash_table_remove (passwords, accountid);
+ *          }
+ *     }
+ * return;
+ * }
+ * static void
+ * tny_my_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
+ * {
+ *     TnyAccount *account = ...
+ *     ...
+ *     tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
+ *     tny_account_set_pass_func (account, per_account_get_pass_func);
+ *     tny_list_prepend (list, (GObject*)account);
+ *     g_object_unref (G_OBJECT (account));
+ *     ...
+ * }
+ * </programlisting></informalexample>
  **/
 void
 tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pass_func)
@@ -281,6 +311,51 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
  * 
  * Also see #TnyGetPassFunc for more information about the function itself. 
  *
+ * Example:
+ * <informalexample><programlisting>
+ * static GHashTable *passwords;
+ * static gchar* 
+ * per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
+ * {
+ *     gchar *retval = NULL;
+ *     const gchar *accountid = tny_account_get_id (account);
+ *     if (!passwords)
+ *         passwords = g_hash_table_new (g_str_hash, g_str_equal);
+ *     retval = g_hash_table_lookup (passwords, accountid);
+ *     if (!retval)
+ *     {
+ *         GtkDialog *dialog = GTK_DIALOG (tny_gnome_password_dialog_new ());
+ *         tny_gnome_password_dialog_set_prompt (TNY_GNOME_PASSWORD_DIALOG (dialog), prompt);
+ *         if (gtk_dialog_run (dialog) == GTK_RESPONSE_OK)
+ *         {
+ *              const gchar *pwd = tny_gnome_password_dialog_get_password 
+ *                     (TNY_GNOME_PASSWORD_DIALOG (dialog));
+ *              retval = g_strdup (pwd);
+ *              mlock (retval, strlen (retval));
+ *              g_hash_table_insert (passwords, g_strdup (accountid), retval);
+ *              *cancel = FALSE;
+ *         } else
+ *              *cancel = TRUE;
+ *         gtk_widget_destroy (GTK_WIDGET (dialog));
+ *         while (gtk_events_pending ())
+ *               gtk_main_iteration ();
+ *     } else
+ *         *cancel = FALSE;
+ *     }
+ *     return retval;
+ * }
+ * static void
+ * tny_my_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
+ * {
+ *     TnyAccount *account = ...
+ *     ...
+ *     tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
+ *     tny_account_set_pass_func (account, per_account_get_pass_func);
+ *     tny_list_prepend (list, (GObject*)account);
+ *     g_object_unref (G_OBJECT (account));
+ *     ...
+ * }
+ * </programlisting></informalexample>
  **/
 void
 tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
