@@ -29,3 +29,5 @@ patch -fp0 < gtk-doc.make.distcheck.patch
 
 ./gentypes.sh $srcdir
 
+exit 0
+
