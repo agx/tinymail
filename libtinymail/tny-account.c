@@ -341,7 +341,6 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
  *               gtk_main_iteration ();
  *     } else
  *         *cancel = FALSE;
- *     }
  *     return retval;
  * }
  * static void
