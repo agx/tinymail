@@ -326,6 +326,12 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	{
 		if (cpriv->folder_name)
 		{
+			/* Unsubscribe : camel should do it by itself
+			   but it does not do it */
+			if (camel_store_supports_subscriptions (store) &&
+			    camel_store_folder_subscribed (store, cpriv->folder_name))
+				camel_store_unsubscribe_folder (store, cpriv->folder_name, NULL);
+
 			camel_store_delete_folder (store, cpriv->folder_name, &ex);
 			if (camel_exception_is_set (&ex))
 				g_critical ("Could not delete folder %s (%s)\n",

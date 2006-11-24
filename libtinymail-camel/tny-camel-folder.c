@@ -830,7 +830,7 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	GPtrArray *uids = NULL;
-	CamelException ex;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	FldAndPriv *ptr = NULL;
 
 	g_assert (TNY_IS_LIST (headers));
