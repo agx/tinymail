@@ -141,7 +141,7 @@ tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccount *a
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 	TnyList *folders = tny_simple_list_new ();
 	GtkTreeIter name_iter;
-    
+
 	func (model, &name_iter, NULL);
 
 	gtk_tree_store_set (model, &name_iter,
@@ -154,8 +154,8 @@ tny_gtk_account_tree_model_add (TnyGtkAccountTreeModel *self, TnyStoreAccount *a
 
 	recurse_folders_sync (self, TNY_FOLDER_STORE (account), &name_iter);
 
-    	g_object_unref (G_OBJECT (folders));
-    
+	g_object_unref (G_OBJECT (folders));
+
 	return;
 }
 
@@ -165,7 +165,7 @@ tny_gtk_account_tree_model_add_async (TnyGtkAccountTreeModel *self, TnyStoreAcco
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 	GtkTreeIter first, *name_iter;
 	gboolean need_add = TRUE;
-    
+
 	if (!gtk_tree_model_get_iter_first (GTK_TREE_MODEL (self), &first))
 	{
 		func (model, &first, NULL);
@@ -186,7 +186,7 @@ tny_gtk_account_tree_model_add_async (TnyGtkAccountTreeModel *self, TnyStoreAcco
 		account, -1);
 
 	recurse_folders_async (self, TNY_FOLDER_STORE (account), name_iter);
-    
+
 	return;
 }
 
