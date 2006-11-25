@@ -24,6 +24,8 @@
 #include <tny-camel-send-queue.h>
 #include <tny-camel-shared.h>
 #include <tny-camel-msg.h>
+#include <tny-simple-list.h>
+#include <tny-folder.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -38,24 +40,85 @@ thread_main (gpointer data)
 {
 	TnySendQueue *self = (TnySendQueue *) data;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	TnyMsg *current;
-	guint i = 0;
+	TnyFolder *sentbox, *outbox;
+	guint i = 0, length = 0;
+	TnyList *list;
 
-	while (priv->todo)
+	list = tny_simple_list_new ();
+
+	g_mutex_lock (priv->todo_lock);
 	{
-		g_mutex_lock (priv->todo_lock);
-		current = priv->todo->data;
-		g_mutex_unlock (priv->todo_lock);
-
-		tny_transport_account_send (priv->trans_account, current);			
-		g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 3, current, i, priv->total);
-		i++;
-		g_object_unref (G_OBJECT (current));
-
-		g_mutex_lock (priv->todo_lock);
-		priv->todo = g_list_delete_link (priv->todo, priv->todo);
-		g_mutex_unlock (priv->todo_lock);
+		sentbox = tny_send_queue_get_sentbox (self);
+		outbox = tny_send_queue_get_outbox (self);
+		tny_folder_get_headers (outbox, list, TRUE);
+		length = tny_list_get_length (list);
+		priv->total = length;
 	}
+	g_mutex_unlock (priv->todo_lock);
+
+	g_object_unref (G_OBJECT (list));
+
+	while (length > 0)
+	{
+		TnyHeader *header;
+		TnyMsg *msg;
+
+		g_mutex_lock (priv->todo_lock);
+		{
+			TnyIterator *hdriter;
+			TnyList *headers = tny_simple_list_new ();
+			tny_folder_get_headers (outbox, headers, TRUE);
+			length = tny_list_get_length (headers);
+			priv->total = length;
+			if (length <= 0)
+			{
+				g_object_unref (G_OBJECT (headers));
+				g_mutex_unlock (priv->todo_lock);
+				break;
+			}
+			hdriter = tny_list_create_iterator (headers);
+			header = (TnyHeader *) tny_iterator_get_current (hdriter);
+			g_object_unref (G_OBJECT (hdriter));
+			g_object_unref (G_OBJECT (headers));
+		}
+		g_mutex_unlock (priv->todo_lock);
+
+		if (header && TNY_IS_HEADER (header))
+		{
+			TnyList *hassent = tny_simple_list_new ();
+
+			tny_list_prepend (hassent, G_OBJECT (header));
+			msg = tny_folder_get_msg (sentbox, header);
+			g_object_unref (G_OBJECT (header));	
+
+			tny_transport_account_send (priv->trans_account, msg);
+
+			g_mutex_lock (priv->todo_lock);
+			{
+				tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE);
+				priv->total--;
+			}
+			g_mutex_unlock (priv->todo_lock);
+
+			g_object_unref (G_OBJECT (hassent));
+
+			g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 
+				3, msg, i, priv->total);
+
+			i++;
+		} else 
+		{
+
+			/* Not good, let's just kill this thread */ 
+
+			length = 0;
+			if (header && G_IS_OBJECT (header))
+				g_object_unref (G_OBJECT (header));
+		}
+	}
+
+	g_object_unref (G_OBJECT (sentbox));
+	g_object_unref (G_OBJECT (outbox));
 
 	g_thread_exit (NULL);
 	return NULL;
@@ -71,31 +134,28 @@ static void
 tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	gboolean launch_thread = FALSE;
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 	
 	g_mutex_lock (priv->todo_lock);
+	{
+		TnyFolder *outbox;
+		TnyList *headers = tny_simple_list_new ();
 
-	/* TODO: In stead of a list in memory, use a persistent storage for
-	 this "todo" list. Else when the application shuts down, you would lose
-	 unsent messages. One solution would be to attach an "Outbox" to each
- 	 TnyTransportAccount (this is probably how it will in future be 
-	 implemented).
+		outbox = tny_send_queue_get_outbox (self);
+		tny_folder_get_headers (outbox, headers, TRUE);
+		priv->total = tny_list_get_length (headers);
+		g_object_unref (G_OBJECT (headers));
 
-	 For now a quick solution with a doubly-linked list in memory will
-	 function for testing (until the "Outbox" solution is developed). */
+		tny_folder_add_msg (outbox, msg);
+		priv->total++;
 
-	priv->total = g_list_length (priv->todo);
-	launch_thread = (priv->total == 0);
-	priv->total++;
-	priv->todo = g_list_prepend (priv->todo, g_object_ref (G_OBJECT (msg)));
+		if (priv->total == 1)
+			priv->thread = g_thread_create (thread_main, self, TRUE, NULL);
 
-	if (launch_thread)
-		priv->thread = g_thread_create (thread_main, self, TRUE, NULL);
-
+		g_object_unref (G_OBJECT (outbox));
+	}
 	g_mutex_unlock (priv->todo_lock);
-								
 
 	return;
 }
