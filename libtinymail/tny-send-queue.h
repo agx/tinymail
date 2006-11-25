@@ -56,11 +56,16 @@ struct _TnySendQueueIface
 
 	/* methods */
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg);
+	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
+	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
+
 };
 
 GType tny_send_queue_get_type (void);
 
 void tny_send_queue_add (TnySendQueue *self, TnyMsg *msg);
+TnyFolder* tny_send_queue_get_sentbox (TnySendQueue *self);
+TnyFolder* tny_send_queue_get_outbox (TnySendQueue *self);
 
 G_END_DECLS
 

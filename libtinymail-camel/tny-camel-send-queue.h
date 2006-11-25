@@ -49,6 +49,8 @@ struct _TnyCamelSendQueueClass
 
 	/* virtual methods */
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg);
+	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
+	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
 };
 
 GType tny_camel_send_queue_get_type (void);

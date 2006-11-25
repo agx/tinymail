@@ -31,6 +31,7 @@ struct _TnyCamelSendQueuePriv
 	GList *todo;
 	guint total;
 	GThread *thread;
+	gchar *path;
 };
 
 #endif

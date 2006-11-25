@@ -1,3 +1,9 @@
+2006-11-23  Philip van Hoof <pvanhoof@gnome.org>
+
+	* The mail-sending API, fine tuning
+
+	* This is a major API change in libtinymail
+
 2006-11-24  Sergio Villar Senin <svillar@igalia.com>
 	* libtinymail-camel/tny-camel-folder.c: initilize a CamelException
 	* libtinymail-camel/tny.camel-store-account.c: added a folder

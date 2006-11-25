@@ -23,11 +23,47 @@
 guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
 
 /**
+ * tny_send_queue_get_sentbox:
+ * @self: A #TnySendQueue instance
+ *
+ * Get the folder which contains the messages that have been sent. The 
+ * return value must be unreferenced after use
+ *
+ * Return value: a #TnyFolder instance
+ **/
+TnyFolder* 
+tny_send_queue_get_sentbox (TnySendQueue *self)
+{
+#ifdef DEBUG
+	if (!TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func)
+		g_critical ("You must implement tny_send_queue_get_sentbox\n");
+#endif
+	return TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func (self);
+}
+
+/**
+ * tny_send_queue_get_outbox:
+ * @self: A #TnySendQueue instance
+ *
+ * Get the folder which contains the messages that have not yet been sent. The 
+ * return value must be unreferenced after use
+ *
+ * Return value: a #TnyFolder instance
+ **/
+TnyFolder* 
+tny_send_queue_get_outbox (TnySendQueue *self)
+{
+#ifdef DEBUG
+	if (!TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func)
+		g_critical ("You must implement tny_send_queue_get_outbox\n");
+#endif
+	return TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func (self);
+}
+
+/**
  * tny_send_queue_add:
  * @self: A #TnySendQueue instance
  * @msg: a #TnyMsg instance
- *
- * API WARNING: This API might change
  *
  * Add a message to the send queue.
  *
@@ -97,8 +133,12 @@ tny_send_queue_get_type (void)
 		  NULL,    /* instance_init */
 		  NULL
 		};
+
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnySendQueue", &info, 0);
+
+		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+
 	}
 
 	return type;

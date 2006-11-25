@@ -121,6 +121,7 @@ tny_store_account_get_type (void)
 
 		g_type_interface_add_prerequisite (type, TNY_TYPE_ACCOUNT);
 		g_type_interface_add_prerequisite (type, TNY_TYPE_FOLDER_STORE);
+
 	}
 
 	return type;

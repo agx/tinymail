@@ -32,11 +32,6 @@ static GObjectClass *parent_class = NULL;
 #define TNY_CAMEL_SEND_QUEUE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_SEND_QUEUE, TnyCamelSendQueuePriv))
 
-static void
-tny_camel_send_queue_add (TnySendQueue *self, TnyMsg *msg)
-{
-	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg);
-}
 
 static gpointer
 thread_main (gpointer data)
@@ -64,6 +59,12 @@ thread_main (gpointer data)
 
 	g_thread_exit (NULL);
 	return NULL;
+}
+
+static void
+tny_camel_send_queue_add (TnySendQueue *self, TnyMsg *msg)
+{
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg);
 }
 
 static void
@@ -99,6 +100,38 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg)
 	return;
 }
 
+static TnyFolder* 
+tny_camel_send_queue_get_sentbox (TnySendQueue *self)
+{
+	return TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->get_sentbox_func (self);
+}
+
+static TnyFolder* 
+tny_camel_send_queue_get_sentbox_default (TnySendQueue *self)
+{
+	/* TODO: Implement using Maildir in priv->path + "/sentbox" */
+
+	g_critical (" This TnySendQueue implementation doesn't yet support a sentbox");
+
+	return NULL;
+}
+
+
+static TnyFolder* 
+tny_camel_send_queue_get_outbox (TnySendQueue *self)
+{
+	return TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->get_outbox_func (self);
+}
+
+static TnyFolder* 
+tny_camel_send_queue_get_outbox_default (TnySendQueue *self)
+{
+	/* TODO: Implement using Maildir in priv->path + "/outbox" */
+
+	g_critical (" This TnySendQueue implementation doesn't yet support an outbox");
+
+	return NULL;
+}
 
 static void
 tny_camel_send_queue_finalize (GObject *object)
@@ -112,6 +145,9 @@ tny_camel_send_queue_finalize (GObject *object)
 	g_list_free (priv->todo);
 	priv->todo = NULL;
 	
+	if (priv->path)
+		g_free (priv->path);
+
 	g_mutex_unlock (priv->todo_lock);
 	g_mutex_free (priv->todo_lock);
 
@@ -140,6 +176,10 @@ tny_camel_send_queue_new (TnyTransportAccount *trans_account)
 	priv->trans_account = TNY_CAMEL_TRANSPORT_ACCOUNT 
 			(g_object_ref (G_OBJECT (trans_account)));
 
+	/* TODO: Do some camel-specific stuff to get priv->path right, it's where
+	   the sentbox and the outbox are going to be located or must be located in
+	   case they are already created */
+
 	return TNY_SEND_QUEUE (self);
 }
 
@@ -150,6 +190,8 @@ tny_send_queue_init (gpointer g, gpointer iface_data)
 	TnySendQueueIface *klass = (TnySendQueueIface *)g;
 
 	klass->add_func = tny_camel_send_queue_add;
+	klass->get_outbox_func = tny_camel_send_queue_get_outbox;
+	klass->get_sentbox_func = tny_camel_send_queue_get_sentbox;
 
 	return;
 }
@@ -163,6 +205,8 @@ tny_camel_send_queue_class_init (TnyCamelSendQueueClass *class)
 	object_class = (GObjectClass*) class;
 
 	class->add_func = tny_camel_send_queue_add_default;
+	class->get_outbox_func = tny_camel_send_queue_get_outbox_default;
+	class->get_sentbox_func = tny_camel_send_queue_get_sentbox_default;
 
 	object_class->finalize = tny_camel_send_queue_finalize;
 
@@ -178,6 +222,7 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelSendQueue *self = (TnyCamelSendQueue*)instance;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
+	priv->path = NULL;
 	priv->todo = NULL;
 	priv->todo_lock = g_mutex_new ();
 
