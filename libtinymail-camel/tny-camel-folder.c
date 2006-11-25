@@ -986,10 +986,7 @@ tny_camel_folder_get_id_default (TnyFolder *self)
 }
 
 static void
-tny_camel_folder_transfer_msgs (TnyFolder *self, 
-				TnyList *headers, 
-				TnyFolder *folder_dst, 
-				gboolean delete_originals)
+tny_camel_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals)
 {
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals);
 }
@@ -1013,7 +1010,6 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 	list_length = tny_list_get_length (headers);
 	if (list_length < 1) return;
 
-
 	/* Get privates */
 	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_src);
 	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);
@@ -1028,29 +1024,29 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 	/* Create uids */
 	uids = g_ptr_array_sized_new (list_length);
 	iter = tny_list_create_iterator (headers);
-	while (!tny_iterator_is_done (iter)) {
+
+	while (!tny_iterator_is_done (iter)) 
+	{
 		TnyHeader *header;
 
 		header = TNY_HEADER (tny_iterator_get_current (iter));
 		g_ptr_array_add (uids, (gpointer) tny_header_get_uid (header));
+		g_object_unref (G_OBJECT (header));
 		tny_iterator_next (iter);
 	}
 
-	/* Initialize exception */
 	ex = camel_exception_new ();
 	camel_exception_init (ex);
 
-	camel_folder_transfer_messages_to (cfol_src,
-					   uids,
-					   cfol_dst,
-					   &transferred_uids,
-					   delete_originals,
-					   ex);
+	camel_folder_transfer_messages_to (cfol_src, uids, cfol_dst, 
+			&transferred_uids, delete_originals, ex);
 
-	if (camel_exception_is_set (ex)) {
+	if (camel_exception_is_set (ex)) 
+	{
 		g_warning ("Transfering messages failed: %s\n",
 			   camel_exception_get_description (ex));
-	} else {
+	} else 
+	{
 		if (delete_originals)
 			camel_folder_sync (cfol_src, TRUE, ex);
 	
@@ -1058,14 +1054,18 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 			g_warning ("Expunging messages failed: %s\n",
 				   camel_exception_get_description (ex));
 	}
+
 	camel_exception_free (ex);
 
-	/* Frees */
-	if (transferred_uids) g_ptr_array_free (transferred_uids, FALSE);
+	if (transferred_uids) 
+		g_ptr_array_free (transferred_uids, FALSE);
+
 	g_ptr_array_free (uids, FALSE);
 
 	g_mutex_unlock (priv_dst->folder_lock);
 	g_mutex_unlock (priv_src->folder_lock);
+
+	return;
 }
 
 
