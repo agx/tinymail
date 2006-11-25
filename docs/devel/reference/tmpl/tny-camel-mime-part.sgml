@@ -32,15 +32,6 @@ A #TnyMimePart implemented using Camel that plays proxy for a #CamelMimePart.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_camel_mime_part_set_part ##### -->
-<para>
-
-</para>
-
-@self: 
-@part: 
-
-
 <!-- ##### FUNCTION tny_camel_mime_part_get_part ##### -->
 <para>
 

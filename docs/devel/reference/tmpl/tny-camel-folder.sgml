@@ -40,15 +40,6 @@ A #TnyFolder implemented using Camel
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_camel_folder_set_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@camel_folder: 
-
-
 <!-- ##### FUNCTION tny_camel_folder_get_folder ##### -->
 <para>
 

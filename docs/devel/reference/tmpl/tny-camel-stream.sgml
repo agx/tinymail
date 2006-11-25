@@ -34,15 +34,6 @@ libtinymail-camel library for converting a #CamelStream to a
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_camel_stream_set_stream ##### -->
-<para>
-
-</para>
-
-@self: 
-@stream: 
-
-
 <!-- ##### FUNCTION tny_camel_stream_get_stream ##### -->
 <para>
 
