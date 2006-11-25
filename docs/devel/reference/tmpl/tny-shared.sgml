@@ -446,4 +446,6 @@ Shared include file with forward typedefs
 @parent: 
 @msg_sent: 
 @add_func: 
+@get_sentbox_func: 
+@get_outbox_func: 
 

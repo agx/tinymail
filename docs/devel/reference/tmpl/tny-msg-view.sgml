@@ -35,7 +35,7 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 @set_unavailable_func: 
 @clear_func: 
 @create_mime_part_view_for_func: 
-@create_new_mytype_func: 
+@create_new_inline_viewer_func: 
 
 <!-- ##### FUNCTION tny_msg_view_get_msg ##### -->
 <para>
@@ -73,7 +73,7 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_msg_view_create_new_mytype ##### -->
+<!-- ##### FUNCTION tny_msg_view_create_new_inline_viewer ##### -->
 <para>
 
 </para>

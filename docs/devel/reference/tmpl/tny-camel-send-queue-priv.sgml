@@ -24,7 +24,7 @@ tny-camel-send-queue-priv
 
 @todo_lock: 
 @trans_account: 
-@todo: 
 @total: 
 @thread: 
+@path: 
 

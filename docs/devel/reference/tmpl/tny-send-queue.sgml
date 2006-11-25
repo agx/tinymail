@@ -42,6 +42,8 @@ shutdown obviously lose the unsent messages.
 @parent: 
 @msg_sent: 
 @add_func: 
+@get_sentbox_func: 
+@get_outbox_func: 
 
 <!-- ##### FUNCTION tny_send_queue_add ##### -->
 <para>
@@ -50,5 +52,23 @@ shutdown obviously lose the unsent messages.
 
 @self: 
 @msg: 
+
+
+<!-- ##### FUNCTION tny_send_queue_get_sentbox ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_send_queue_get_outbox ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
 
 
