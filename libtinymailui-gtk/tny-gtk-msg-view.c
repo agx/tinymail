@@ -532,7 +532,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 		{
 			GtkWidget *expander = NULL;
 
-			if (TNY_IS_GTK_MSG_VIEW (mpview))
+			if (TNY_IS_GTK_MSG_VIEW (mpview) && !GTK_IS_WINDOW (mpview))
 			{
 				GtkWidget *expander = gtk_expander_new (_("Email message attachment"));
 				gtk_expander_set_expanded (GTK_EXPANDER (expander), FALSE);
@@ -541,9 +541,12 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 				gtk_widget_show (GTK_WIDGET (expander));
 				gtk_box_pack_end (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), 
 					GTK_WIDGET (expander), TRUE, TRUE, 0);
-			} else
+			} else if (!GTK_IS_WINDOW (mpview))
 				gtk_box_pack_end (GTK_BOX (TNY_GTK_MSG_VIEW (self)->viewers), 
 						GTK_WIDGET (mpview), TRUE, TRUE, 0);
+
+			/* If it's a GtkWindow, we don't pack it (but this is unusual and
+			 probably a mistake by the developer who created the mime part view) */
 
 			gtk_widget_show (GTK_WIDGET (mpview));
 
