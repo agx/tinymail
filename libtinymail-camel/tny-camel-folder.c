@@ -1134,7 +1134,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name)
 		return;
 
 	/* Create new full name */
-	cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (self));
+	cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
 	old_path = camel_folder_get_full_name (cfolder);
 	parent_info = priv->iter->parent;
 	new_path = g_strdup_printf ("%s/%s", parent_info->name, name);
@@ -1154,10 +1154,11 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name)
 	if (camel_exception_is_set (&ex))
 	{
 		g_warning (N_("Renaming folder %s to %s failed: %s\n"),
-			   camel_folder_get_name (cfolder),
-			   name,
-			   camel_exception_get_description (&ex));
+				camel_folder_get_name (cfolder), name,
+				camel_exception_get_description (&ex));
+
 		camel_exception_clear (&ex);
+
 		return;
 	}
 
