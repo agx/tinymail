@@ -118,13 +118,13 @@ tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart 
 
 
 static TnyMsgView*
-tny_moz_embed_msg_view_create_new_mytype (TnyMsgView *self)
+tny_moz_embed_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
-	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_new_mytype_func (self);
+	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer_func (self);
 }
 
 /**
- * tny_moz_embed_msg_view_create_new_mytype_default:
+ * tny_moz_embed_msg_view_create_new_inline_viewer_default:
  * @self: a #TnyMozEmbedMsgView instance
  *
  * This is non-public API documentation
@@ -133,7 +133,7 @@ tny_moz_embed_msg_view_create_new_mytype (TnyMsgView *self)
  * displaying HTML messages.
  **/
 static TnyMsgView*
-tny_moz_embed_msg_view_create_new_mytype_default (TnyMsgView *self)
+tny_moz_embed_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 {
 	return tny_moz_embed_msg_view_new ();
 }
@@ -148,12 +148,12 @@ tny_moz_embed_msg_view_class_init (TnyMozEmbedMsgViewClass *class)
 	object_class = (GObjectClass*) class;
 
 	class->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for_default;
-	class->create_new_mytype_func = tny_moz_embed_msg_view_create_new_mytype_default;
+	class->create_new_inline_viewer_func = tny_moz_embed_msg_view_create_new_inline_viewer_default;
 
 	object_class->finalize = tny_moz_embed_msg_view_finalize;
 
 	TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for;
-	TNY_GTK_MSG_VIEW_CLASS (class)->create_new_mytype_func = tny_moz_embed_msg_view_create_new_mytype;
+	TNY_GTK_MSG_VIEW_CLASS (class)->create_new_inline_viewer_func = tny_moz_embed_msg_view_create_new_inline_viewer;
 
 	return;
 }

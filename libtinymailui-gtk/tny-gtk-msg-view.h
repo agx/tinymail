@@ -59,7 +59,7 @@ struct _TnyGtkMsgViewClass
 	void (*set_unavailable_func) (TnyMsgView *self);
 	void (*clear_func) (TnyMsgView *self);
 	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
-	TnyMsgView* (*create_new_mytype_func) (TnyMsgView *self);
+	TnyMsgView* (*create_new_inline_viewer_func) (TnyMsgView *self);
 
 };
 

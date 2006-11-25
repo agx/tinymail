@@ -323,13 +323,13 @@ tny_gtk_msg_view_get_msg_default (TnyMsgView *self)
 
 
 static TnyMsgView*
-tny_gtk_msg_view_create_new_mytype (TnyMsgView *self)
+tny_gtk_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
-	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_new_mytype_func (self);
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer_func (self);
 }
 
 static TnyMsgView*
-tny_gtk_msg_view_create_new_mytype_default (TnyMsgView *self)
+tny_gtk_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 {
 	return tny_gtk_msg_view_new ();
 }
@@ -385,7 +385,7 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 	/* Inline message RFC822 */
 	} else if (priv->display_rfc822 && tny_mime_part_content_type_is (part, "message/rfc822"))
 	{
-		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_mytype (self));
+		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_inline_viewer (self));
 		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (retval),
 					GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 
@@ -852,7 +852,7 @@ tny_msg_view_init (gpointer g, gpointer iface_data)
 	klass->set_unavailable_func = tny_gtk_msg_view_set_unavailable;
 	klass->clear_func = tny_gtk_msg_view_clear;
 	klass->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for;
-	klass->create_new_mytype_func = tny_gtk_msg_view_create_new_mytype;
+	klass->create_new_inline_viewer_func = tny_gtk_msg_view_create_new_inline_viewer;
 
 	return;
 }
@@ -888,7 +888,7 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 	class->set_unavailable_func = tny_gtk_msg_view_set_unavailable_default;
 	class->clear_func = tny_gtk_msg_view_clear_default;
 	class->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for_default;
-	class->create_new_mytype_func = tny_gtk_msg_view_create_new_mytype_default;
+	class->create_new_inline_viewer_func = tny_gtk_msg_view_create_new_inline_viewer_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyGtkMsgViewPriv));
 

@@ -126,20 +126,20 @@ tny_gtk_msg_window_clear_default (TnyMsgView *self)
 }
 
 static TnyMsgView* 
-tny_gtk_msg_window_create_new_mytype (TnyMsgView *self)
+tny_gtk_msg_window_create_new_inline_viewer (TnyMsgView *self)
 {
-	return TNY_GTK_MSG_WINDOW_GET_CLASS (self)->create_new_mytype_func (self);
+	return TNY_GTK_MSG_WINDOW_GET_CLASS (self)->create_new_inline_viewer_func (self);
 }
 
 static TnyMsgView* 
-tny_gtk_msg_window_create_new_mytype_default (TnyMsgView *self)
+tny_gtk_msg_window_create_new_inline_viewer_default (TnyMsgView *self)
 {
 	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
 
 	/* This should not be a window, but the decorated one, as it has to be 
 	   embeddable within a window. So we even decorate this one as usual. */
 
-	return tny_msg_view_create_new_mytype (priv->msg_view);
+	return tny_msg_view_create_new_inline_viewer (priv->msg_view);
 }
 
 static TnyMimePartView* 
@@ -260,6 +260,8 @@ tny_msg_view_init (gpointer g, gpointer iface_data)
 	klass->set_msg_func = tny_gtk_msg_window_set_msg;
 	klass->set_unavailable_func = tny_gtk_msg_window_set_unavailable;
 	klass->clear_func = tny_gtk_msg_window_clear;
+	klass->create_mime_part_view_for_func = tny_gtk_msg_window_create_mime_part_view_for;
+	klass->create_new_inline_viewer_func = tny_gtk_msg_window_create_new_inline_viewer;
 
 	return;
 }
@@ -288,9 +290,8 @@ tny_gtk_msg_window_class_init (TnyGtkMsgWindowClass *class)
 	class->set_msg_func = tny_gtk_msg_window_set_msg_default;
 	class->set_unavailable_func = tny_gtk_msg_window_set_unavailable_default;
 	class->clear_func = tny_gtk_msg_window_clear_default;
-	class->create_new_mytype_func = tny_gtk_msg_window_create_new_mytype_default;
+	class->create_new_inline_viewer_func = tny_gtk_msg_window_create_new_inline_viewer_default;
 	class->create_mime_part_view_for_func = tny_gtk_msg_window_create_mime_part_view_for_default;
-
 	class->get_part_func = tny_gtk_msg_window_mp_get_part_default;
 	class->set_part_func = tny_gtk_msg_window_mp_set_part_default;
 

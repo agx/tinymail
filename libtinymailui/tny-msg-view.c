@@ -22,23 +22,24 @@
 #include <tny-msg-view.h>
 
 /**
- * tny_msg_view_create_new_mytype:
+ * tny_msg_view_create_new_inline_viewer:
  * @self: A #TnyMsgView instance
  *
- * Create a new instance of the same type as @self. The returned instance
- * must be unreferenced after use.
+ * Create a new #TnyMsgView that can be used to display an inline message. 
+ * Usually it will return a new instance of the same type as @self. The
+ * returned instance must be unreferenced after use.
  *
  * Implementors: This method should create and return a new #TnyMsgView instance 
- * of the same type as @self. This method will be used when a #TnyMsgView needs
- * to create a new instance of itself to display inlined messages (like what
- * message/rfc822 mime parts are). For example the #TnyGtkMsgView implementation
- * will use this method to create for itself a new #TnyMsgView instance that it
- * can embed.
+ * usually of the same type as @self. This method will be used when a
+ * #TnyMsgView needs to create a #TnyMsgView instance for displaying inlined 
+ * messages (like what message/rfc822 mime parts are). For example the 
+ * #TnyGtkMsgView implementation will use this method to create for itself a 
+ * new #TnyMsgView instance that it can embed in itself.
  *
  * Example:
  * <informalexample><programlisting>
  * static TnyMsgView*
- * tny_my_html_msg_view_create_new_mytype (TnyMsgView *self)
+ * tny_my_html_msg_view_create_new_new_inline_viewer (TnyMsgView *self)
  * {
  *    return tny_my_html_msg_view_new ();
  * }
@@ -51,14 +52,14 @@
  * Return value: A #TnyMsgView instance
  **/
 TnyMsgView* 
-tny_msg_view_create_new_mytype (TnyMsgView *self)
+tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_new_mytype_func)
-		g_critical ("You must implement tny_msg_view_create_new_mytype\n");
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_new_new_inline_viewer_func)
+		g_critical ("You must implement tny_msg_view_create_new_new_inline_viewer\n");
 #endif
 
-	return TNY_MSG_VIEW_GET_IFACE (self)->create_new_mytype_func (self);
+	return TNY_MSG_VIEW_GET_IFACE (self)->create_new_inline_viewer_func (self);
 }
 
 /**

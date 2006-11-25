@@ -17,7 +17,7 @@
 
 	* Major fixes and refactoring for the rfc822 support
 	* Reimplemented TnyGtkMsgWindow
-	* Added a tny_msg_view_create_new_mytype API
+	* Added a tny_msg_view_create_new_inline_viewer API
 
 	* This was a major API change in libtinymailui & libtinymailui-gtk
 

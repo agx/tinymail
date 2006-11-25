@@ -46,7 +46,7 @@ struct _TnyMsgViewIface
 	void (*set_unavailable_func) (TnyMsgView *self);
 	void (*clear_func) (TnyMsgView *self);
 	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
-	TnyMsgView* (*create_new_mytype_func) (TnyMsgView *self);
+	TnyMsgView* (*create_new_inline_viewer_func) (TnyMsgView *self);
 };
 
 GType tny_msg_view_get_type (void);
@@ -55,7 +55,7 @@ TnyMsg* tny_msg_view_get_msg (TnyMsgView *self);
 void  tny_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg);
 void  tny_msg_view_set_unavailable (TnyMsgView *self);
 TnyMimePartView* tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part);
-TnyMsgView* tny_msg_view_create_new_mytype (TnyMsgView *self);
+TnyMsgView* tny_msg_view_create_new_inline_viewer (TnyMsgView *self);
 
 G_END_DECLS
 
