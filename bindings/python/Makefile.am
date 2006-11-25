@@ -2,7 +2,7 @@ INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) $(PYGTK_CFLAGS) \
 	$(LIBTINYMAILUI_GTK_CFLAGS) $(TINYMAIL_PYTHON_CFLAGS) \
 	-I$(top_srcdir)/libtinymail -I$(top_srcdir)/libtinymailui \
 	-I$(top_srcdir)/libtinymailui-gtk -I$(top_srcdir)/libtinymail-camel \
-	-I$(top_srcdir)/$(PLATFORMDIR)
+	-I$(top_srcdir)/$(PLATFORMDIR) -I$(top_srcdir)/libtinymail-camel/camel-lite
 
 common_ldflags = -module -avoid-version
 
@@ -12,7 +12,7 @@ pth_DATA = tinymail.pth
 tinymaildir = $(pythondir)/tinymail-$(API_VERSION)/tinymail
 ptinymaildir = $(pythondir)/tinymail-$(API_VERSION)/tinymail
 
-tinymail_LTLIBRARIES = _tinymail.la ui.la 
+tinymail_LTLIBRARIES = _tinymail.la camel.la ui.la 
 if BUILD_UIGTK
 tinymail_LTLIBRARIES += uigtk.la 
 endif
@@ -52,9 +52,20 @@ platform_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
 platform_la_SOURCES = tinymail-platformmodule.c
 nodist_platform_la_SOURCES = tinymail-platform-glue.c
 
+camel_la_LDFLAGS = $(common_ldflags) -export-symbols-regex initcamel
+camel_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
+        $(TINYMAIL_PYTHON_LIBS) \
+        $(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
+        $(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la \
+        $(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
+camel_la_SOURCES = tinymail-camelmodule.c
+nodist_camel_la_SOURCES = tinymail-camel-glue.c
+
+
 CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c \
 	tinymail-platform-glue.c platform_include.h tinymail.defs \
-	tinymailui.defs tinymailui-gtk.defs tinymail-platform.defs
+	tinymailui.defs tinymailui-gtk.defs tinymail-platform.defs \
+	tinymail-camel.defs tinymail-camel-glue.c
 
 EXTRA_DIST = \
 	filter.py \
@@ -66,7 +77,9 @@ EXTRA_DIST = \
 	tinymailui-gtk.override \
 	tinymailui-gtk.defs.extra \
 	tinymail-platform.defs.extra \
-	tinymail-platform.override
+	tinymail-platform.override \
+	tinymail-camel.defs.extra \
+	tinymail-camel.override
 
 # To update:
 # ls DIR/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\t\\\\/g
@@ -153,8 +166,37 @@ tinymail-platform.defs : $(tinymail_platform_h_files) tinymail-platform.defs.ext
 	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
 	--extra=$(top_srcdir)/bindings/python/tinymail-platform.defs.extra \
 	--topsrcdir=$(top_srcdir) > $@
-	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
-	$(tinymail_platform_h_files) >> $@
+
+#	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
+#	$(tinymail_platform_h_files) >> $@
+
+tinymail_camel_h_files = \
+	$(top_srcdir)/libtinymail-camel/tny-camel-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-folder.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-header.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-imap-folder.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-imap-store-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-mime-part.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-msg.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-msg-remove-strategy.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-folder.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-store-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-pop-folder.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-pop-store-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-send-queue.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-shared.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-store-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-stream.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-transport-account.h 
+
+tinymail-camel.defs : $(tinymail_camel_h_files) tinymail-camel.defs.extra $(top_srcdir)/bindings/python/filter.py
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_camel_h_files) | \
+	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
+	--extra=$(top_srcdir)/bindings/python/tinymail-camel.defs.extra \
+	--topsrcdir=$(top_srcdir) > $@
+
+#	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
+#	$(tinymail_platform_h_files) >> $@
 
 tinymail-glue.c: tinymail.defs tinymail.override
 	$(PYGTK_CODEGEN) --prefix pytinymail \
@@ -180,6 +222,13 @@ tinymail-platform-glue.c: tinymail-platform.defs tinymail-platform.override plat
 	$(PYGTK_CODEGEN) --prefix pyplatform \
 	--register tinymailui.defs \
 	--register tinymail.defs \
+	--register tinymail-camel.defs \
 	--override $(top_srcdir)/bindings/python/tinymail-platform.override \
 	tinymail-platform.defs > $@
+
+tinymail-camel-glue.c: tinymail-camel.defs tinymail-camel.override
+	$(PYGTK_CODEGEN) --prefix pycamel \
+	--register tinymail.defs \
+	--override $(top_srcdir)/bindings/python/tinymail-camel.override \
+	tinymail-camel.defs > $@
 

@@ -5,6 +5,7 @@ import tinymail
 import tinymail.ui
 import tinymail.uigtk
 import tinymail.platform
+import tinymail.camel
 import gc
 
 def on_refresh_folder (folder, cancelled, headerstree):

@@ -1,0 +1,65 @@
+/* -*- Mode: C; c-basic-offset: 4 -*- */
+%%
+headers
+#include <Python.h>
+#include <pygobject.h>
+
+#include <tny-account.h>
+#include <tny-account-store.h>
+#include <tny-device.h>
+#include <tny-fs-stream.h>
+#include <tny-iterator.h>
+#include <tny-simple-list.h>
+#include <tny-list.h>
+#include <tny-folder.h>
+#include <tny-header.h>
+#include <tny-msg.h>
+#include <tny-mime-part.h>
+#include <tny-shared.h>
+#include <tny-store-account.h>
+#include <tny-stream.h>
+#include <tny-transport-account.h>
+#include <tny-folder-store.h>
+#include <tny-folder-store-query.h>
+#include <tny-send-queue.h>
+
+
+#include <tny-camel-account.h>
+#include <tny-camel-folder.h>
+#include <tny-camel-header.h>
+#include <tny-camel-imap-folder.h>
+#include <tny-camel-imap-store-account.h>
+#include <tny-camel-mime-part.h>
+#include <tny-camel-msg.h>
+#include <tny-camel-msg-remove-strategy.h>
+#include <tny-camel-nntp-folder.h>
+#include <tny-camel-nntp-store-account.h>
+#include <tny-camel-pop-folder.h>
+#include <tny-camel-pop-store-account.h>
+#include <tny-camel-send-queue.h>
+#include <tny-camel-shared.h>
+#include <tny-camel-store-account.h>
+#include <tny-camel-stream.h>
+#include <tny-camel-transport-account.h>
+#include <tny-session-camel.h>
+#include <tny-stream-camel.h>
+
+
+#define NO_IMPORT_PYGOBJECT
+#include "pygobject.h"
+
+
+%%
+modulename camel
+%%
+ignore-glob
+  *_get_type
+
+%%
+import gobject.GObject as PyGObject_Type
+
+import tinymail.AccountStore as PyTnyAccountStore_Type
+import tinymail.Device as PyTnyDevice_Type
+import tinymail.Stream as PyTnyStream_Type
+import tinymail.Header as PyTnyHeader_Type
+

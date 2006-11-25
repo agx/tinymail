@@ -21,3 +21,5 @@ tinymailui-gtk.defs
 tinymailui-gtk-glue.c
 tinymail-platform.defs
 platform_include.h
+tinymail-camel.defs
+tinymail-camel-glue.c
