@@ -662,7 +662,7 @@ tny_camel_store_account_get_type (void)
 			"TnyCamelStoreAccount",
 			&info, 0);
 
-       		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE, 
+       	g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE, 
 			&tny_folder_store_info);  
 
 		g_type_add_interface_static (type, TNY_TYPE_STORE_ACCOUNT, 
