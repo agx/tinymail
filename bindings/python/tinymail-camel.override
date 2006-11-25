@@ -62,4 +62,6 @@ import tinymail.AccountStore as PyTnyAccountStore_Type
 import tinymail.Device as PyTnyDevice_Type
 import tinymail.Stream as PyTnyStream_Type
 import tinymail.Header as PyTnyHeader_Type
-
+import tinymail.Folder as PyTnyFolder_Type
+import tinymail.FolderStore as PyTnyFolderStore_Type
+import tinymail.StoreAccount as PyTnyStoreAccount_Type
