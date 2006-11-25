@@ -25,6 +25,7 @@
 
 #include <tny-send-queue.h>
 #include <tny-msg.h>
+#include <tny-camel-transport-account.h>
 
 G_BEGIN_DECLS
 
@@ -55,7 +56,7 @@ struct _TnyCamelSendQueueClass
 
 GType tny_camel_send_queue_get_type (void);
 
-TnySendQueue* tny_camel_send_queue_new (TnyTransportAccount *trans_account);
+TnySendQueue* tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account);
 
 G_END_DECLS
 

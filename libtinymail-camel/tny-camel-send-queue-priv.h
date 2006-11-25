@@ -27,7 +27,7 @@ typedef struct _TnyCamelSendQueuePriv TnyCamelSendQueuePriv;
 struct _TnyCamelSendQueuePriv
 {
 	GMutex *todo_lock;
-	TnyCamelTransportAccount *trans_account;
+	TnyTransportAccount *trans_account;
 	GList *todo;
 	guint total;
 	GThread *thread;

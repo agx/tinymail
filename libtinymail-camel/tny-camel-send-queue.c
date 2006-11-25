@@ -47,7 +47,7 @@ thread_main (gpointer data)
 		current = priv->todo->data;
 		g_mutex_unlock (priv->todo_lock);
 
-		tny_transport_account_send (TNY_TRANSPORT_ACCOUNT (priv->trans_account), current);			
+		tny_transport_account_send (priv->trans_account, current);			
 		g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 3, current, i, priv->total);
 		i++;
 		g_object_unref (G_OBJECT (current));
@@ -166,15 +166,14 @@ tny_camel_send_queue_finalize (GObject *object)
  * Return value: A new #TnySendQueue instance implemented for Camel
  **/
 TnySendQueue*
-tny_camel_send_queue_new (TnyTransportAccount *trans_account)
+tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account)
 {
 	TnyCamelSendQueue *self = g_object_new (TNY_TYPE_CAMEL_SEND_QUEUE, NULL);
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (trans_account));
 	
-	priv->trans_account = TNY_CAMEL_TRANSPORT_ACCOUNT 
-			(g_object_ref (G_OBJECT (trans_account)));
+	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref (G_OBJECT (trans_account)));
 
 	/* TODO: Do some camel-specific stuff to get priv->path right, it's where
 	   the sentbox and the outbox are going to be located or must be located in
