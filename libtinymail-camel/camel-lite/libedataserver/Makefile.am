@@ -1,3 +1,5 @@
+AM_CFLAGS = -fPIC
+
 INCLUDES =								\
 	-I$(top_srcdir)							\
 	-DG_LOG_DOMAIN=\"e-data-server\"				\
