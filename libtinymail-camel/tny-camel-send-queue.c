@@ -200,11 +200,7 @@ tny_camel_send_queue_finalize (GObject *object)
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->todo_lock);
-	
-	g_list_foreach (priv->todo, (GFunc) g_object_unref, NULL);
-	g_list_free (priv->todo);
-	priv->todo = NULL;
-	
+		
 	if (priv->path)
 		g_free (priv->path);
 
@@ -282,7 +278,6 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
 	priv->path = NULL;
-	priv->todo = NULL;
 	priv->todo_lock = g_mutex_new ();
 
 	return;

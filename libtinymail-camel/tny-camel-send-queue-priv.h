@@ -28,7 +28,6 @@ struct _TnyCamelSendQueuePriv
 {
 	GMutex *todo_lock;
 	TnyTransportAccount *trans_account;
-	GList *todo;
 	guint total;
 	GThread *thread;
 	gchar *path;
