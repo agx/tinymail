@@ -24,7 +24,7 @@ results when using gtk-doc for API documentation generation.
 
 Development tips
 ================
-You can find the GUnit framework at http://kooditakomo.cs.tut.fi/projects/gunit
+You can find the GUnit framework at https://garage.maemo.org/projects/gunit
 You'll need it if you build with --enable-unit-tests which will compile the
 unit tests. Check the sources of the unit tests for more information.
 
