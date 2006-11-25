@@ -79,7 +79,7 @@ GType tny_camel_folder_get_type (void);
 
 TnyFolder* tny_camel_folder_new_with_folder (CamelFolder *camel_folder);
 TnyFolder* tny_camel_folder_new (void);
-void tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder);
+
 CamelFolder* tny_camel_folder_get_folder (TnyCamelFolder *self);
 
 G_END_DECLS

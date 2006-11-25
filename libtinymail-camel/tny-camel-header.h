@@ -23,7 +23,6 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-header.h>
-#include <camel/camel-folder-summary.h>
 
 G_BEGIN_DECLS
 

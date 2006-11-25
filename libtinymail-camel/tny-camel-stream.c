@@ -157,15 +157,7 @@ tny_camel_stream_get_stream (TnyCamelStream *self)
 	return priv->stream;
 }
 
-/**
- * tny_camel_stream_set_stream:
- * @self: A #TnyCamelStream object
- * @stream: A #CamelStream object
- *
- * Set the stream to play proxy for
- *
- **/
-void
+static void
 tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream)
 {
 	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);

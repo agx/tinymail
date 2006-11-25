@@ -22,6 +22,7 @@
 
 #include <glib.h>
 #include <tny-mime-part.h>
+
 #include <camel/camel-mime-part.h>
 
 #include <glib-object.h>
@@ -73,7 +74,7 @@ struct _TnyCamelMimePartClass
 GType tny_camel_mime_part_get_type (void);
 
 TnyMimePart* tny_camel_mime_part_new (CamelMimePart *part);
-void tny_camel_mime_part_set_part (TnyCamelMimePart *self, CamelMimePart *part);
+
 CamelMimePart* tny_camel_mime_part_get_part (TnyCamelMimePart *self);
 
 G_END_DECLS

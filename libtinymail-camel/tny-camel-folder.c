@@ -395,7 +395,7 @@ tny_camel_folder_is_subscribed_default (TnyFolder *self)
 		}
 		store = (CamelStore*) _tny_camel_account_get_service 
 			(TNY_CAMEL_ACCOUNT (priv->account));
-		cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (self));
+		cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
 		priv->subscribed = camel_store_folder_subscribed (store, 
 								  camel_folder_get_full_name (cfolder));
 	}
@@ -914,7 +914,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header)
 		message = tny_camel_msg_new ();
 
 		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), self);
-		tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
+		_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
 			CAMEL_MIME_PART (camel_message)); 
 		_tny_camel_header_set_camel_mime_message (nheader, camel_message);
 		_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
@@ -1170,14 +1170,9 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name)
 	g_mutex_unlock (priv->folder_lock);
 }
 
-/**
- * tny_camel_folder_set_folder:
- * @self: A #TnyCamelFolder object
- * @camel_folder: The #CamelFolder instance to play proxy for
- *
- **/
+
 void
-tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder)
+_tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder)
 {
 	_tny_camel_folder_set_id (self, camel_folder_get_full_name (camel_folder));
 
@@ -1224,7 +1219,7 @@ tny_camel_folder_new_with_folder (CamelFolder *camel_folder)
 {
 	TnyCamelFolder *self = g_object_new (TNY_TYPE_CAMEL_FOLDER, NULL);
 
-	tny_camel_folder_set_folder (self, camel_folder);
+	_tny_camel_folder_set_folder (self, camel_folder);
 
 	return TNY_FOLDER (self);
 }

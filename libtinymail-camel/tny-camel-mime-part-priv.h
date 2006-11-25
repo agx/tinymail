@@ -37,3 +37,5 @@ struct _TnyCamelMimePartPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_MIME_PART, TnyCamelMimePartPriv))
 
 #endif
+
+void _tny_camel_mime_part_set_part (TnyCamelMimePart *self, CamelMimePart *part);

@@ -206,7 +206,7 @@ tny_camel_msg_new (void)
 {
 	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
 	
-	tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), 
+	_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), 
 		CAMEL_MIME_PART (camel_mime_message_new ()));
 
 	return TNY_MSG (self);

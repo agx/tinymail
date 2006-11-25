@@ -64,6 +64,8 @@ void _tny_camel_folder_check_uncache (TnyCamelFolder *self, TnyCamelFolderPriv *
 void _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter);
 void _tny_camel_folder_set_account (TnyCamelFolder *self, TnyStoreAccount *account);
 
+void _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder);
+
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_FOLDER, TnyCamelFolderPriv))
 

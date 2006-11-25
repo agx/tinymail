@@ -23,6 +23,7 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 #include <tny-camel-folder.h>
+
 #include "tny-camel-folder-priv.h"
 
 typedef struct _WriteInfo WriteInfo;
