@@ -43,13 +43,13 @@ Nils Faerber <nils.faerber_at_kernelconcepts.de>
 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Main developer of Modest, an E-mail client on top of tinymail
-	* Co-designer of the TnyIteratorIface and TnyListIface
-	* Implementer of many TnyIteratorIface types
-	* Implementer of many TnyListIface types
+	* Co-designer of the TnyIterator and TnyList interfaces
+	* Implementer of many TnyIterator types
+	* Implementer of many TnyList types
 
 Chris Lord <chris@openedhand.com>
 
-	* Contributions to and refactoring of the TnySummaryViewIface type
+	* Contributions to and refactoring of the TnySummaryView type
 
 Thomas Hisch <t.hisch@gmail.com>
 
