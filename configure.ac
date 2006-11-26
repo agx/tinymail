@@ -357,7 +357,7 @@ AC_SUBST(LIBTINYMAIL_TEST_LIBS)
 
 dnl ### libtinymail-api-test, a library for testing API/ABI compatibility ##
 if test x$build_apitests = xtrue; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_API_TEST, gunit glib-2.0 >= 2.6 gobject-2.0 libtinymail-1.0 libtinymail-camel-1.0 libtinymailui-gtk-1.0 camel-lite-1.2)
+  PKG_CHECK_MODULES(LIBTINYMAIL_API_TEST, gunit glib-2.0 >= 2.6 gobject-2.0 libtinymail-$API_VERSION libtinymail-camel-$API_VERSION libtinymailui-gtk-$API_VERSION camel-lite-1.2)
 else
   LIBTINYMAIL_API_TEST_CFLAGS=
   LIBTINYMAIL_API_TEST_LIBS=
