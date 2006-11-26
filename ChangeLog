@@ -1,6 +1,7 @@
 2006-11-27  Øystein Gisnås <oystein@gisnas.net>
 
-	* Added an API testing unit test
+	* Added an API unit test suite for testing
+	  against libraries currently installed on the system
 
 2006-11-26  muppet <scott@asofyet.org>
 
