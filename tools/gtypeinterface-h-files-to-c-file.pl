@@ -152,7 +152,7 @@ warn Dumper(\@interfaces);
 
 
 
-print ("/* Your copyright here*/\n\n");
+print ("/* Your copyright here */\n\n");
 print ("#include <config.h>\n");
 print ("#include <glib.h>\n");
 print ("#include <glib/gi18n-lib.h>\n\n");
