@@ -17,6 +17,11 @@ lib_LTLIBRARIES = libtinymail-test-suite.la
 
 bin_PROGRAMS = tny-simple-test-runner tny-test-anything
 
+if BUILD_APITESTS
+lib_LTLIBRARIES += libtinymail-api-test-suite.la
+bin_PROGRAMS += tny-simple-api-test-runner
+endif
+
 libtinymail_test_suite_la_SOURCES = \
 	tny-folder-store-query-test.c \
 	tny-folder-store-query-test.h \
@@ -91,3 +96,35 @@ tny_test_anything_LDADD = \
 	$(top_builddir)/tests/shared/libtestsshared.a \
 	libtinymail-test-suite.la
 
+# API test suite
+
+libtinymail_api_test_suite_la_SOURCES = \
+	tny-api-test-suite.c \
+	tny-list-test.c \
+	tny-device-test.c \
+	tny-account-test.c \
+	tny-folder-test.c \
+	tny-mime-part-test.c \
+	tny-test-stream.c \
+	tny-header-test.c \
+	tny-folder-store-query-test.c \
+	tny-account-store-test.c \
+	tny-platform-factory-test.c \
+	tny-test-object.c
+
+libtinymail_api_test_suite_la_CFLAGS = -fPIC \
+	$(LIBTINYMAIL_API_TEST_CFLAGS)
+
+libtinymail_api_test_suite_la_LDFLAGS = $(LIBTINYMAIL_API_TEST_LIBS) \
+	-export-dynamic -version-info $(LT_VERSION_INFO) \
+	$(LIBTOOL_EXPORT_OPTIONS)
+
+# API test runner
+
+tny_simple_api_test_runner_SOURCES = tny-simple-api-test-runner.c
+
+tny_simple_api_test_runner_CFLAGS = $(LIBTINYMAIL_API_TEST_CFLAGS)
+
+tny_simple_api_test_runner_LDADD = \
+	libtinymail-api-test-suite.la \
+	$(top_builddir)/tests/shared/libtestsshared.a

@@ -4,3 +4,4 @@ Makefile
 tny-simple-test-runner
 tny-test-anything
 .libs
+tny-simple-api-test-runner

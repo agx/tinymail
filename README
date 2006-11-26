@@ -33,6 +33,15 @@ Unit test usage
   export LD_LIBRARY_PATH=./libtinymail-test/.libs/
   gunit-test-runner-tool -s tinymail-test-suite -v gnome
 
+API tests are unit tests that test only the public interface of tinymail.
+Instead of testing the current source, it will test the tinymail libraries
+currently installed on the system. Enable API tests with --enable-api-tests.
+Tinymail .pc files must be found by pkg-config when using this flag.
+
+API test usage
+  export LD_LIBRARY_PATH=./libtinymail-test/.libs/
+  gunit-test-runner-tool -s tinymail-api-test-suite -v gnome
+
 Building tips
 =============
 

@@ -169,6 +169,20 @@ AC_HELP_STRING([--enable-gnome],
 esac],[build_gnome=$build_gnome])
 AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
 
+dnl ### Enable building the API tests ##
+AC_ARG_ENABLE(api-tests,
+AC_HELP_STRING([--enable-api-tests],
+  [Build API tests (no, yes)]),
+[case "${enableval}" in
+  yes) 
+	build_apitests=true 
+	build_unittests=true 
+  ;;
+  no)  build_apitests=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-api-tests) ;;
+esac],[build_apitests=$build_apitests])
+AM_CONDITIONAL(BUILD_APITESTS, test x$build_apitests = xtrue)
+
 dnl ### Enable building the unit tests ##
 AC_ARG_ENABLE(unit-tests,
 AC_HELP_STRING([--enable-unit-tests],
@@ -341,6 +355,16 @@ fi
 AC_SUBST(LIBTINYMAIL_TEST_CFLAGS)
 AC_SUBST(LIBTINYMAIL_TEST_LIBS)
 
+dnl ### libtinymail-api-test, a library for testing API/ABI compatibility ##
+if test x$build_apitests = xtrue; then
+  PKG_CHECK_MODULES(LIBTINYMAIL_API_TEST, gunit glib-2.0 >= 2.6 gobject-2.0 libtinymail-1.0 libtinymail-camel-1.0 libtinymailui-gtk-1.0 camel-lite-1.2)
+else
+  LIBTINYMAIL_API_TEST_CFLAGS=
+  LIBTINYMAIL_API_TEST_LIBS=
+fi
+AC_SUBST(LIBTINYMAIL_API_TEST_CFLAGS)
+AC_SUBST(LIBTINYMAIL_API_TEST_LIBS)
+
 dnl ### tinymail, the demo-ui ##
 PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.6 gobject-2.0 gtk+-2.0 $extratnypkgs)
 AC_SUBST(TINYMAIL_CFLAGS)
@@ -415,6 +439,7 @@ echo ""
 echo "  Enable GNOME features:       $build_gnome"
 echo "  HTML component:              ${with_html_component}"
 echo "  Python language bindings:    $build_pytinymail"
+echo "  API tests:                   $build_apitests"
 echo "  Unit tests:                  $build_unittests"
 echo "  Tests:                       $build_tests"
 echo "  Target platform:             ${with_platform}"

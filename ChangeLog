@@ -1,3 +1,7 @@
+2006-11-27  Øystein Gisnås <oystein@gisnas.net>
+
+	* Added an API testing unit test
+
 2006-11-26  muppet <scott@asofyet.org>
 
 	* tools/gtypeinterface-h-files-to-c-file.pl: Rewrite and major
