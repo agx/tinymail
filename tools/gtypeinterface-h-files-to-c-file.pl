@@ -123,7 +123,7 @@ while ($line = <STDIN>)
 
 	if ($ifaisopen != 0)
 	{
-		if ($line =~ /^\s(.*)[\s|]\(\*(.*)_func\)\s(.*)\;$/)
+		if ($line =~ /^\s(.*)[\s|]\(\*(.*)[_func|]\)\s(.*)\;$/)
 		{
 			$interfaces{$ifaisopen}{"methods"}{$tel}{"return_type"} = $1;
 			$interfaces{$ifaisopen}{"methods"}{$tel}{"func_name"} = $2;
