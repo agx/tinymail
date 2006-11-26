@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-my $typename = "MyType";
+my $typename = $ARGV[0];
 # my %methods = ();
 my %interfaces = ();
 my $tel=0;
@@ -219,7 +219,7 @@ for my $key (keys(%interfaces))
 
 
 print ("\t\ttype = g_type_register_static (G_TYPE_OBJECT,\n");
-print ("\t\t\t\".$typename.\",\n");
+print ("\t\t\t\"".$typename."\",\n");
 print ("\t\t\t&info, 0);\n\n");
 
 for my $key (keys(%interfaces))
