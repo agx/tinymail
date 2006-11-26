@@ -109,7 +109,7 @@ my $ifaisopen = 0;
 while ($line = <STDIN>)
 {
 
-	if ($line =~ /struct\s_(.*)Iface$/)
+	if ($line =~ /struct\s_(.*)Iface[\s|]$/)
 	{
 		$itel++;
 		$interfaces{$itel}{"name"} = $1;
@@ -225,7 +225,7 @@ print ("\t\t\t&info, 0);\n\n");
 for my $key (keys(%interfaces))
 {
 	print ("\t\tg_type_add_interface_static (type, ".uncamel_up ($interfaces{$key}{"name"}).",\n"); 
-	print ("\t\t\t&".uncamel_low ($interfaces{$key}{"name"})."_info\n");
+	print ("\t\t\t&".uncamel_low ($interfaces{$key}{"name"})."_info\n\n");
 }
 print ("\t}\n\treturn type;\n}\n");
 
