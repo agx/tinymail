@@ -108,7 +108,7 @@ my $ifaisopen = 0;
 while ($line = <STDIN>)
 {
 
-	if ($line =~ /struct\s_(.*)Iface[\s|]$/)
+	if ($line =~ /struct\s_(.*)Iface[\s|\s\{|\s\{\s]$/)
 	{
 		$itel++;
 		$interfaces{$itel}{"name"} = $1;
@@ -116,7 +116,7 @@ while ($line = <STDIN>)
 		$tel = 0;
 	}
 
-	if ($line =~ /^\]\;$/)
+	if ($line =~ /^\}\;$/)
 	{
 		$ifaisopen = 0;
 	}
