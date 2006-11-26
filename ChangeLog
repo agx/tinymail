@@ -1,4 +1,13 @@
-2006-11-23  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-26  muppet <scott@asofyet.org>
+
+	* tools/gtypeinterface-h-files-to-c-file.pl: Rewrite and major
+	improvements
+
+2006-11-26  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* tools/gtypeinterface-h-files-to-c-file.pl: Initial implementation
+
+2006-11-23  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* The mail-sending API, fine tuning
 
@@ -13,7 +22,7 @@
 
 	* Improvements for the debian package
 
-2006-11-23  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-23  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Major fixes and refactoring for the rfc822 support
 	* Reimplemented TnyGtkMsgWindow
@@ -40,7 +49,7 @@
 
 	* This was a major API change in libtinymailui-gtk
 
-2006-11-21  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-21  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Major changes in TnyMsg and TnyMimePart
 	* First support for message/rfc822 messages
@@ -49,7 +58,7 @@
 	
 	* This was a major API change in all libraries
 
-2006-11-20  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* A new style of handling mime parts
 	* First building blocks for supporting message/rfc822
@@ -60,7 +69,7 @@
 	* Improved the support for subscribing and ubsubscribing folders
 	* Improved creating new folders
 
-2006-11-17  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-17  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* A few s/g_new/g_slice replacements
 
@@ -84,7 +93,7 @@
 	* test/functional/msg-transfer.c: added this program to test
 	tny_folder_transfer_msgs implementation
 
-2006-11-16  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-16  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Fixed a rather big memory leak when
 	downloading new messages happened
@@ -96,15 +105,15 @@
 	(tny_folder_store_query_item_get_type): replaced TnyFolderStoreQuery
 	by TnyFolderStoreQueryItem in the instance size field 
 
-2006-11-15  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-15  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymailui-mozembed: fixes for the Gecko support
 
-2006-11-14  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-14  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymailui-mozembed: fixes for the Gecko support
 
-2006-11-13  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-13  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: moved some scripts in the configure.ac
 	to the m4 directory to simplify migrating to the toplevel configure.ac
@@ -118,7 +127,7 @@
 	* debian/: Dependencies
 	* README: Some documentation updates
 
-2006-11-12  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-12  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Corrected the MimePartSaveStrategy pattern method naming
 	* Various gtk-doc fixes
@@ -141,7 +150,7 @@
 	that caused an error when trying to fetch messages from an IMAP
 	server.
 
-2006-11-09  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-09  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Introduction of the new TnySendQueue interface
 	* Added a lot assertions to check for type safety
@@ -151,7 +160,7 @@
 
 	* This was a major API change
 
-2006-11-06  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-06  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Introduction of the TnyMsgRemoveStrategy, which makes it more
 	flexible to define how tinymail should remove messages (as this might
@@ -171,7 +180,7 @@
 	of the cc and bcc fields to the list of	recipients when sending an 
 	email with camel
 	
-2006-11-06  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-06  Philip Van Hoof <pvanhoof@gnome.org>
 	
 	* Build environment improvements
 
@@ -179,11 +188,11 @@
 
 	* libtinymail-camel: Some bugfixes for when sendings E-mails
 
-2006-11-01  Philip van Hoof <pvanhoof@gnome.org>
+2006-11-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Restored the OpenSSL support
 
-2006-10-30  Philip van Hoof <pvanhoof@gnome.org>
+2006-10-30  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Build environment simplificiations
 
