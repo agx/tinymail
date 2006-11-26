@@ -1,5 +1,11 @@
 #! /usr/bin/perl
 
+#
+# Usage: cat hfiles | ./gtypeinterface-h-files-to-c-file.pl MyTypeName
+# For example: 
+# cat ../libtinymailui/tny-mime-part-view.h ../libtinymailui/tny-mime-part-saver.h | ./gtypeinterface-h-files-to-c-file.pl MyMimePartComponent
+#
+
 my $typename = $ARGV[0];
 my %interfaces = ();
 my $tel=0;
