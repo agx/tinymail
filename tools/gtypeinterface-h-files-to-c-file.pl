@@ -1,7 +1,6 @@
 #! /usr/bin/perl
 
 my $typename = $ARGV[0];
-# my %methods = ();
 my %interfaces = ();
 my $tel=0;
 my $itel=0;
