@@ -39,5 +39,6 @@ A type that implements removing a message from a #TnyFolder
 @self: 
 @folder: 
 @header: 
+@err: 
 
 

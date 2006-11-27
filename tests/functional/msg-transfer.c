@@ -46,7 +46,7 @@ find_folders (TnyFolderStore *store, TnyFolderStoreQuery *query,
 		return;
 
 	folders = tny_simple_list_new ();
-	tny_folder_store_get_folders (store, folders, query);
+	tny_folder_store_get_folders (store, folders, query, NULL);
 	iter = tny_list_create_iterator (folders);
 
 	while (!tny_iterator_is_done (iter) && (!*folder_src || !*folder_dst))
@@ -145,15 +145,15 @@ main (int argc, char **argv)
 		goto cleanup;
 
 	/* Refresh folders */
-	tny_folder_refresh (folder_src);
+	tny_folder_refresh (folder_src, NULL);
 	src_num_headers = tny_folder_get_all_count (folder_src);
 
-	tny_folder_refresh (folder_dst);
+	tny_folder_refresh (folder_dst, NULL);
 	dst_num_headers = tny_folder_get_all_count (folder_dst);
 
 	/* Get all the headers of the source & target folder */
 	src_headers = tny_simple_list_new ();
-	tny_folder_get_headers (folder_src, src_headers, TRUE);
+	tny_folder_get_headers (folder_src, src_headers, TRUE, NULL);
 		
 	g_printf ("%s %d messages from %s to %s\n",
 		  move ? "Moving" : "Copying",
@@ -162,10 +162,10 @@ main (int argc, char **argv)
 		  tny_folder_get_name (folder_dst));
 
 	/* Copy/move messages */
-	tny_folder_transfer_msgs (folder_src, src_headers, folder_dst, move);
+	tny_folder_transfer_msgs (folder_src, src_headers, folder_dst, move, NULL);
 
 	/* Check that all the messages have been transferred */
-	tny_folder_refresh (folder_dst);
+	tny_folder_refresh (folder_dst, NULL);
 	g_printf ("Transferred %d of %d messages\n",
 		  tny_folder_get_all_count (folder_dst) - dst_num_headers,
 		  src_num_headers);

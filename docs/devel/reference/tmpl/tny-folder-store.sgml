@@ -41,6 +41,7 @@ A abstract type that defines a store for child folders
 
 @self: 
 @folder: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_store_create_folder ##### -->
@@ -50,6 +51,7 @@ A abstract type that defines a store for child folders
 
 @self: 
 @name: 
+@err: 
 @Returns: 
 
 
@@ -61,6 +63,7 @@ A abstract type that defines a store for child folders
 @self: 
 @list: 
 @query: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_store_get_folders_async ##### -->

@@ -48,7 +48,7 @@ static const GOptionEntry options[] =
 
 
 static void 
-callback (TnyFolderStore *self, TnyList *list, gpointer user_data)
+callback (TnyFolderStore *self, TnyList *list, GError **err, gpointer user_data)
 {
 	TnyIterator *iter = tny_list_create_iterator (list);
     

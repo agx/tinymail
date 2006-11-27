@@ -325,6 +325,7 @@ Shared include file with forward typedefs
 
 @self: 
 @cancelled: 
+@err: 
 @user_data: 
 
 
@@ -415,6 +416,7 @@ Shared include file with forward typedefs
 
 @self: 
 @list: 
+@err: 
 @user_data: 
 
 

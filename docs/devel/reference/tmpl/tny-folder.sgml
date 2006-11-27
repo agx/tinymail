@@ -88,6 +88,7 @@ A abstract type that defines a folder
 
 @self: 
 @header: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_add_msg ##### -->
@@ -97,6 +98,7 @@ A abstract type that defines a folder
 
 @self: 
 @msg: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_expunge ##### -->
@@ -105,6 +107,7 @@ A abstract type that defines a folder
 </para>
 
 @self: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_get_msg ##### -->
@@ -114,6 +117,7 @@ A abstract type that defines a folder
 
 @self: 
 @header: 
+@err: 
 @Returns: 
 
 
@@ -125,6 +129,7 @@ A abstract type that defines a folder
 @self: 
 @headers: 
 @refresh: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_get_account ##### -->
@@ -161,6 +166,7 @@ A abstract type that defines a folder
 
 @self: 
 @name: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_get_folder_type ##### -->
@@ -216,6 +222,7 @@ A abstract type that defines a folder
 </para>
 
 @self: 
+@err: 
 
 
 <!-- ##### FUNCTION tny_folder_transfer_msgs ##### -->
@@ -227,5 +234,6 @@ A abstract type that defines a folder
 @header_list: 
 @folder_dst: 
 @delete_originals: 
+@err: 
 
 

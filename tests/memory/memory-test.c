@@ -39,7 +39,7 @@ static void
 do_get_folder (TnyFolder *folder)
 {   
 	g_print ("Getting headers of %s ...\n", tny_folder_get_id (folder));
-	tny_folder_refresh (folder);
+	tny_folder_refresh (folder, NULL);
 }
 
 
@@ -51,7 +51,7 @@ do_test_folder (TnyFolder *folder)
 	gdouble kbytes, mbytes;
     
 	g_print ("Loading headers for %s ...\n", tny_folder_get_id (folder));
-	tny_folder_get_headers (folder, headers, FALSE);
+	tny_folder_get_headers (folder, headers, FALSE, NULL);
 	length=tny_list_get_length (headers);
 	
     	bytes = (sizeof (TnyCamelHeader) + sizeof (CamelMessageInfo) + 
@@ -85,7 +85,7 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, const gchar 
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
 
-	tny_folder_store_get_folders (store, folders, query);
+	tny_folder_store_get_folders (store, folders, query, NULL);
 	iter = tny_list_create_iterator (folders);
 
 	while (!tny_iterator_is_done (iter))
