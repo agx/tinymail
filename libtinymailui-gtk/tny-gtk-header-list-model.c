@@ -931,7 +931,8 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	g_mutex_unlock (self->folder_lock);
 
 	/* Get a new list of headers */
-	tny_folder_get_headers (folder, TNY_LIST (self), refresh);
+	/* TODO add error handling and reporting here */
+	tny_folder_get_headers (folder, TNY_LIST (self), refresh, NULL);
 
 	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);

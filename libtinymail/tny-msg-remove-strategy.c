@@ -26,6 +26,7 @@
  * @self: A #TnyMsgRemoveStrategy instance
  * @folder: The #TnyFolder instance from which the message will be removed
  * @header: The #TnyHeader instance of the message that must be removed
+ * @err: A #GError instance or NULL
  *
  * Performs the removal of a message from a folder
  *
@@ -57,14 +58,14 @@
  *
  **/
 void
-tny_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
+tny_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func)
 		g_critical ("You must implement tny_msg_remove_strategy_remove\n");
 #endif
 
-	TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func (self, folder, header);
+	TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func (self, folder, header, err);
 	return;
 }
 

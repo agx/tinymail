@@ -50,7 +50,8 @@ thread_main (gpointer data)
 	{
 		sentbox = tny_send_queue_get_sentbox (self);
 		outbox = tny_send_queue_get_outbox (self);
-		tny_folder_get_headers (outbox, list, TRUE);
+		/* TODO handle and report errors here */
+		tny_folder_get_headers (outbox, list, TRUE, NULL);
 		length = tny_list_get_length (list);
 		priv->total = length;
 	}
@@ -67,7 +68,8 @@ thread_main (gpointer data)
 		{
 			TnyIterator *hdriter;
 			TnyList *headers = tny_simple_list_new ();
-			tny_folder_get_headers (outbox, headers, TRUE);
+			/* TODO handle and report errors here */
+			tny_folder_get_headers (outbox, headers, TRUE, NULL);
 			length = tny_list_get_length (headers);
 			priv->total = length;
 			if (length <= 0)
@@ -88,14 +90,16 @@ thread_main (gpointer data)
 			TnyList *hassent = tny_simple_list_new ();
 
 			tny_list_prepend (hassent, G_OBJECT (header));
-			msg = tny_folder_get_msg (sentbox, header);
+			/* TODO handle and report errors here */
+			msg = tny_folder_get_msg (sentbox, header, NULL);
 			g_object_unref (G_OBJECT (header));	
 
 			tny_transport_account_send (priv->trans_account, msg);
 
 			g_mutex_lock (priv->todo_lock);
 			{
-				tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE);
+				/* TODO handle and report errors here */
+				tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, NULL);
 				priv->total--;
 			}
 			g_mutex_unlock (priv->todo_lock);
@@ -143,11 +147,14 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg)
 		TnyList *headers = tny_simple_list_new ();
 
 		outbox = tny_send_queue_get_outbox (self);
-		tny_folder_get_headers (outbox, headers, TRUE);
+
+		/* TODO handle and report errors here */
+		tny_folder_get_headers (outbox, headers, TRUE, NULL);
 		priv->total = tny_list_get_length (headers);
 		g_object_unref (G_OBJECT (headers));
 
-		tny_folder_add_msg (outbox, msg);
+		/* TODO error checking and reporting here */
+		tny_folder_add_msg (outbox, msg, NULL);
 		priv->total++;
 
 		if (priv->total == 1)

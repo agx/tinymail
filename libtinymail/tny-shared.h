@@ -48,7 +48,7 @@ typedef struct _TnyStream TnyStream;
 typedef struct _TnyStreamIface TnyStreamIface;
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);
-typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, gpointer user_data);
+typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, GError **err, gpointer user_data);
 typedef void (*TnyRefreshFolderStatusCallback) (TnyFolder *self, const gchar *what, gint status, gpointer user_data);
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
 typedef enum _TnyAlertType TnyAlertType;
@@ -66,7 +66,7 @@ typedef struct _TnyFolderStoreQueryClass TnyFolderStoreQueryClass;
 typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
-typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, TnyList *list, gpointer user_data);
+typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, TnyList *list, GError **err, gpointer user_data);
 typedef enum _TnyFolderSignal TnyFolderSignal;
 typedef enum _TnyDeviceSignal TnyDeviceSignal;
 typedef enum _TnyAccountStoreSignal TnyAccountStoreSignal;
@@ -74,6 +74,8 @@ typedef struct _TnyMsgRemoveStrategy TnyMsgRemoveStrategy;
 typedef struct _TnyMsgRemoveStrategyIface TnyMsgRemoveStrategyIface;
 typedef struct _TnySendQueue TnySendQueue;
 typedef struct _TnySendQueueIface TnySendQueueIface;
+typedef enum _TnyError TnyError;
+typedef enum _TnyErrorDomain TnyErrorDomain;
 
 G_END_DECLS
 

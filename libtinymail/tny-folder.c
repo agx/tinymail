@@ -80,7 +80,8 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
 
 /**
  * tny_folder_expunge:
- * @self: a TnyFolder object
+ * @self: a #TnyFolder object
+ * @err: a #GError object or NULL
  *
  * Persist changes made to a folder to its backing store, expunging deleted 
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
@@ -89,7 +90,7 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * <informalexample><programlisting>
  * TnyHeader *header = ...
  * TnyFolder *folder = tny_header_get_folder (header);
- * tny_folder_remove_msg (folder, header);
+ * tny_folder_remove_msg (folder, header, NULL);
  * tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
  * g_object_unref (G_OBJECT (header));
  * tny_folder_expunge (folder);
@@ -97,13 +98,13 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * </programlisting></informalexample>
  **/
 void 
-tny_folder_expunge (TnyFolder *self)
+tny_folder_expunge (TnyFolder *self, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->expunge_func)
 		g_critical ("You must implement tny_folder_expunge\n");
 #endif
-	TNY_FOLDER_GET_IFACE (self)->expunge_func (self);
+	TNY_FOLDER_GET_IFACE (self)->expunge_func (self, err);
 	return;
 }
 
@@ -111,18 +112,19 @@ tny_folder_expunge (TnyFolder *self)
  * tny_folder_add_msg:
  * @self: a #TnyFolder object
  * @msg: a #TnyMsg object
+ * @err: a #GError object or NULL
  *
  * Add a message to a folder.
  **/
 void 
-tny_folder_add_msg (TnyFolder *self, TnyMsg *msg)
+tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->add_msg_func)
 		g_critical ("You must implement tny_folder_add_msg\n");
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->add_msg_func (self, msg);
+	TNY_FOLDER_GET_IFACE (self)->add_msg_func (self, msg, err);
 	return;
 }
 
@@ -130,6 +132,7 @@ tny_folder_add_msg (TnyFolder *self, TnyMsg *msg)
  * tny_folder_remove_msg:
  * @self: a TnyFolder object
  * @header: the header of the message to remove
+ * @err: a #GError object or NULL
  *
  * Remove a message from a folder. It will use a #TnyMsgRemoveStrategy to 
  * perform the removal itself. For more details, check out the documentation
@@ -155,7 +158,7 @@ tny_folder_add_msg (TnyFolder *self, TnyMsg *msg)
  *                TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
  *                &amp;header, -1);
  *          TnyFolder *folder = tny_header_get_folder (header);
- *          tny_folder_remove_msg (folder, header);
+ *          tny_folder_remove_msg (folder, header, NULL);
  *          tny_list_remove (TNY_LIST (model), G_OBJECT (header));
  *          g_object_unref (G_OBJECT (folder));
  *          g_object_unref (G_OBJECT (header));
@@ -166,14 +169,14 @@ tny_folder_add_msg (TnyFolder *self, TnyMsg *msg)
  *
  **/
 void 
-tny_folder_remove_msg (TnyFolder *self, TnyHeader *header)
+tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->remove_msg_func)
 		g_critical ("You must implement tny_folder_remove_msg\n");
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->remove_msg_func (self, header);
+	TNY_FOLDER_GET_IFACE (self)->remove_msg_func (self, header, err);
 	return;
 }
 
@@ -207,7 +210,7 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header)
  * Example:
  * <informalexample><programlisting>
  * static void
- * status_update_cb (TnyFolder *folder, const gchar *what, gint status, gpointer user_data)
+ * status_update_cb (TnyFolder *folder, const gchar *what, gint status, GError **err, gpointer user_data)
  * {
  *     g_print (".");
  * }
@@ -256,6 +259,7 @@ tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, Tn
 /**
  * tny_folder_refresh:
  * @self: a TnyFolder object
+ * @err: a #GError object or NULL
  *
  * Refresh the folder. This gets the summary information from the E-Mail
  * service, writes it to the the on-disk cache and/or updates it.
@@ -267,14 +271,14 @@ tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, Tn
  *
  **/
 void
-tny_folder_refresh (TnyFolder *self)
+tny_folder_refresh (TnyFolder *self, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->refresh_func)
 		g_critical ("You must implement tny_folder_refresh\n");
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->refresh_func (self);
+	TNY_FOLDER_GET_IFACE (self)->refresh_func (self, err);
 	return;
 }
 
@@ -369,6 +373,7 @@ tny_folder_get_account (TnyFolder *self)
  * @header_list: a list of TnyHeader objects
  * @folder_dst: the TnyFolder where the msgs will be transfered
  * @delete_originals: if TRUE then move msgs, else copy them
+ * @err: a #GError object or NULL
  * 
  * Transfers messages of which the headers are in @header_list from @self to 
  * @folder_dst. They could be moved or just copied depending on the value of 
@@ -376,14 +381,14 @@ tny_folder_get_account (TnyFolder *self)
  *
  **/
 void 
-tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals)
+tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func)
 		g_critical ("You must implement tny_folder_transfer_msgs\n");
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals);
+	return TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals, err);
 }
 
 
@@ -391,6 +396,7 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * tny_folder_get_msg:
  * @self: a TnyFolder object
  * @header: the header of the message to get
+ * @err: a #GError object or NULL
  * 
  * Get a message in @self identified by @header. You must unreference the
  * return value after use.
@@ -400,7 +406,7 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
  * TnyFolder *folder = ...
  * TnyHeader *header = ...
- * TnyMsg *message = tny_folder_get_msg (folder, header);
+ * TnyMsg *message = tny_folder_get_msg (folder, header, NULL);
  * tny_msg_view_set_msg (message_view, message);
  * g_object_unref (G_OBJECT (message));
  * </programlisting></informalexample>
@@ -409,14 +415,14 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  *
  **/
 TnyMsg*
-tny_folder_get_msg (TnyFolder *self, TnyHeader *header)
+tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->get_msg_func)
 		g_critical ("You must implement tny_folder_get_msg\n");
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_msg_func (self, header);
+	return TNY_FOLDER_GET_IFACE (self)->get_msg_func (self, header, err);
 }
 
 
@@ -425,6 +431,7 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header)
  * @self: a TnyFolder object
  * @headers: A #TnyList instance where the headers will be put
  * @refresh: whether or not to synchronize with the service first
+ * @err: a #GError object or NULL
  * 
  * Get the list of message header instances that are in @self. Also read
  * about tny_folder_refresh.
@@ -434,7 +441,7 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header)
  * TnyList *headers = tny_simple_list_new ();
  * TnyFolder *folder = ...;
  * TnyIterator *iter; 
- * tny_folder_get_headers (folder, headers, TRUE);
+ * tny_folder_get_headers (folder, headers, TRUE, NULL);
  * iter = tny_list_create_iterator (headers);
  * while (!tny_iterator_is_done (iter))
  * {
@@ -448,14 +455,14 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header)
  * </programlisting></informalexample>
  **/
 void
-tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh)
+tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->get_headers_func)
 		g_critical ("You must implement tny_folder_get_headers\n");
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_headers_func (self, headers, refresh);
+	return TNY_FOLDER_GET_IFACE (self)->get_headers_func (self, headers, refresh, err);
 }
 
 /**
@@ -510,20 +517,21 @@ tny_folder_get_name (TnyFolder *self)
  * tny_folder_set_name:
  * @self: a TnyFolder object
  * @name: a new name for the folder
+ * @err: a #GError object or NULL
  * 
  * Rename a folder. Most services require the name to be unique in the 
  * parent folder.
  *
  **/
 void
-tny_folder_set_name (TnyFolder *self, const gchar *name)
+tny_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_GET_IFACE (self)->set_name_func)
 		g_critical ("You must implement tny_folder_set_name\n");
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->set_name_func (self, name);
+	TNY_FOLDER_GET_IFACE (self)->set_name_func (self, name, err);
 	return;
 }
 

@@ -26,6 +26,7 @@
  * tny_folder_store_remove_folder:
  * @self: a #TnyFolderStore object
  * @folder: The folder to remove
+ * @err: a #GError object or NULL
  *
  * Removes a folder represented by @folder from the folder store @self. You are
  * responsible for unreferencing the @folder instance yourself. This method will
@@ -36,23 +37,23 @@
  * Example:
  * <informalexample><programlisting>
  * static void
- * my_remove_a_folder (TnyFolderStore *store, TnyFolder *remfol)
+ * my_remove_a_folder (TnyFolderStore *store, TnyFolder *remfol, GError **err)
  * {
- *     tny_folder_store_remove_folder (store, remfol);
+ *     tny_folder_store_remove_folder (store, remfol, err);
  *     g_object_unref (G_OBJECT (remfol));
  * }
  * </programlisting></informalexample>
  *
  **/
 void 
-tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder)
+tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func)
 		g_critical ("You must implement tny_folder_store_remove_folder\n");
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func (self, folder);
+	TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func (self, folder, err);
 	return;
 }
 
@@ -60,6 +61,7 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder)
  * tny_folder_store_create_folder:
  * @self: a #TnyFolderStore object
  * @name: The folder name to create
+ * @err: a #GError object or NULL
  *
  * Creates a new folder in @self. The value returned is the newly created folder
  * instance and must be unreferenced after use.
@@ -68,7 +70,7 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder)
  * <informalexample><programlisting>
  * TnyFolderStore *store = ...
  * TnyFolder *createfol;
- * createfol = tny_folder_store_create_folder (store, "Test");
+ * createfol = tny_folder_store_create_folder (store, "Test", NULL);
  * g_object_unref (G_OBJECT (createfol));
  * </programlisting></informalexample>
  * 
@@ -76,14 +78,14 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder)
  *
  **/
 TnyFolder *
-tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name)
+tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func)
 		g_critical ("You must implement tny_folder_store_create_folder\n");
 #endif
 
-	return TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func (self, name);
+	return TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func (self, name, err);
 }
 
 /**
@@ -91,6 +93,7 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name)
  * @self: a #TnyFolderStore object
  * @list: A #TnyList to fillup
  * @query: A #TnyFolderStoreQuery object or NULL
+ * @err: a #GError object or NULL
  *
  * Get a list of child folders from @self. You can use @query to limit the list 
  * of folders with only folders that match a query or NULL if you don't want
@@ -101,7 +104,7 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name)
  * TnyFolderStore *store = ...
  * TnyIterator *iter; TnyFolderStoreQuery *query = ...
  * TnyList *folders = tny_simple_list_new ();
- * tny_folder_store_get_folders (store, folders, query);
+ * tny_folder_store_get_folders (store, folders, query, NULL);
  * iter = tny_list_create_iterator (folders);
  * while (!tny_iterator_is_done (iter))
  * {
@@ -115,14 +118,14 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name)
  * </programlisting></informalexample>
  **/
 void 
-tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query)
+tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func)
 		g_critical ("You must implement tny_folder_store_get_folders\n");
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func (self, list, query);
+	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func (self, list, query, err);
 	return;
 }
 
@@ -132,6 +135,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * @list: A #TnyList to fillup
  * @callback: The callback handler
  * @query: A #TnyFolderStoreQuery object
+ * @err: a #GError object or NULL
  * @user_data: user data for the callback
  *
  * Get a list of child folders from the folder store @self and call back when 
@@ -141,7 +145,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * Example:
  * <informalexample><programlisting>
  * static void 
- * callback (TnyFolderStore *self, TnyList *list, gpointer user_data)
+ * callback (TnyFolderStore *self, TnyList *list, GError **err, gpointer user_data)
  * {
  *     TnyIterator *iter = tny_list_create_iterator (list);
  *     while (!tny_iterator_is_done (iter))
@@ -150,7 +154,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *         TnyList *folders = tny_simple_list_new ();
  *         g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
  *         tny_folder_store_get_folders_async (folder,
- *             folders, callback, NULL, NULL);
+ *             folders, callback, NULL, NULL, NULL);
  *         g_object_unref (G_OBJECT (folder));
  *         tny_iterator_next (iter);
  *     }
@@ -163,7 +167,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *     TnyList *folders;
  *     folders = tny_simple_list_new ();
  *     tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
- *         folders, callback, NULL, NULL);
+ *         folders, callback, NULL, NULL, NULL);
  * }
  * </programlisting></informalexample>
  *

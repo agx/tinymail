@@ -44,6 +44,9 @@ struct _TnyCamelMsgRemoveStrategy
 struct _TnyCamelMsgRemoveStrategyClass
 {
 	GObjectClass parent_class;
+
+	/* virtual methods */
+	void (*perform_remove_func) (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err);
 };
 
 GType tny_camel_msg_remove_strategy_get_type (void);

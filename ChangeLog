@@ -1,3 +1,11 @@
+2006-11-27  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added the first pieces for error reporting and support
+	* Added error reporting and checking in a lot methods and types
+	* Adapted the Python bindings to support error checking
+
+	* This was a major API change in all libraries
+
 2006-11-27  Øystein Gisnås <oystein@gisnas.net>
 
 	* Added an API unit test suite for testing

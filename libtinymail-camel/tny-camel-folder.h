@@ -50,29 +50,29 @@ struct _TnyCamelFolderClass
 	GObjectClass parent;
 
 	/* virtual methods */
-	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg);
-	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header);
-	void (*expunge_func) (TnyFolder *self);
+	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
+	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*expunge_func) (TnyFolder *self, GError **err);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
-	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header);
-	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh);
+	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
 	const gchar* (*get_name_func) (TnyFolder *self);
 	const gchar* (*get_id_func) (TnyFolder *self);
 	TnyStoreAccount* (*get_account_func) (TnyFolder *self);
-	void (*set_name_func) (TnyFolder *self, const gchar *name);
+	void (*set_name_func) (TnyFolder *self, const gchar *name, GError **err);
 	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
 	guint (*get_all_count_func) (TnyFolder *self);
 	guint (*get_unread_count_func) (TnyFolder *self);
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
-	void (*refresh_func) (TnyFolder *self);
-	void (*transfer_msgs_func) (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals);
+	void (*refresh_func) (TnyFolder *self, GError **err);
+	void (*transfer_msgs_func) (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 
 	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
-	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);
-	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder);
-	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name);
+	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
+	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder, GError **err);
+	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
 };
 
 GType tny_camel_folder_get_type (void);

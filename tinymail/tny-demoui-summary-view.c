@@ -307,8 +307,8 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 					tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
 					folder = tny_header_get_folder (header);
-					tny_folder_remove_msg (folder, header);
-					tny_folder_expunge (folder);
+					tny_folder_remove_msg (folder, header, NULL);
+					tny_folder_expunge (folder, NULL);
 					g_object_unref (G_OBJECT (folder));
 				}
 
@@ -347,7 +347,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			folder = tny_header_get_folder (header);
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_get_msg (folder, header);
+				msg = tny_folder_get_msg (folder, header, NULL);
 				if (G_LIKELY (msg))
 				{
 					tny_msg_view_set_msg (priv->msg_view, msg);
@@ -380,7 +380,7 @@ cleanup_statusbar (gpointer data)
 }
 
 static void
-refresh_current_folder (TnyFolder *folder, gboolean cancelled, gpointer user_data)
+refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
 {
 	TnyDemouiSummaryViewPriv *priv = user_data;
 
@@ -488,7 +488,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 				refresh_current_folder, 
 				refresh_current_folder_status_update, user_data);
 #else
-			refresh_current_folder (folder, FALSE, user_data);
+			refresh_current_folder (folder, FALSE, NULL, user_data);
 #endif
 	
 			g_object_unref (G_OBJECT (folder));
@@ -544,7 +544,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_get_msg (folder, header);
+				msg = tny_folder_get_msg (folder, header, NULL);
 				if (G_LIKELY (msg))
 				{
 					msgwin = tny_gtk_msg_window_new (

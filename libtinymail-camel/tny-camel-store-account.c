@@ -34,6 +34,7 @@ stay as an abstract TnyStoreAccount type. */
 #include <tny-folder.h>
 #include <tny-folder-store.h>
 #include <tny-camel-folder.h>
+#include <tny-error.h>
 
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -303,13 +304,13 @@ tny_camel_store_account_finalize (GObject *object)
 }
 
 static void 
-tny_camel_store_account_remove_folder (TnyFolderStore *self, TnyFolder *folder)
+tny_camel_store_account_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
-	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->remove_folder_func (self, folder);
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->remove_folder_func (self, folder, err);
 }
 
 static void 
-tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *folder)
+tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -322,104 +323,144 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 
-	if (store)
+	if (camel_exception_is_set (&ex)) 
 	{
-		if (cpriv->folder_name)
-		{
-			/* Unsubscribe : camel should do it by itself
-			   but it does not do it */
-			if (camel_store_supports_subscriptions (store) &&
-			    camel_store_folder_subscribed (store, cpriv->folder_name))
-				camel_store_unsubscribe_folder (store, cpriv->folder_name, NULL);
+		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+				TNY_FOLDER_STORE_REMOVE_FOLDER_ERROR,
+				camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
 
-			camel_store_delete_folder (store, cpriv->folder_name, &ex);
-			if (camel_exception_is_set (&ex))
-				g_critical ("Could not delete folder %s (%s)\n",
-				cpriv->folder_name, camel_exception_get_description (&ex));
-			g_free (cpriv->folder_name); cpriv->folder_name = NULL;
-		}
+		if (store && CAMEL_IS_OBJECT (store))
+				camel_object_unref (CAMEL_OBJECT (store));
 
-		camel_object_unref (CAMEL_OBJECT (store));
-	} else 
-		g_critical ("Store not available for %s (%s)\n", 
-			apriv->url_string, camel_exception_get_description (&ex));
+		return;
+	}
 
-	/* TODO: error handling using 'ex' */
+	g_assert (CAMEL_IS_STORE (store));
+	g_assert (cpriv->folder_name != NULL);
+
+	/* Unsubscribe : camel should do it by itself but it does not do it */
+	if (camel_store_supports_subscriptions (store) && 
+	    camel_store_folder_subscribed (store, cpriv->folder_name))
+		camel_store_unsubscribe_folder (store, cpriv->folder_name, NULL);
+
+	camel_store_delete_folder (store, cpriv->folder_name, &ex);
+
+	if (camel_exception_is_set (&ex)) 
+	{
+		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+				TNY_FOLDER_STORE_REMOVE_FOLDER_ERROR,
+				camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+	}
+
+	g_free (cpriv->folder_name); cpriv->folder_name = NULL;
+
+	camel_object_unref (CAMEL_OBJECT (store));
+
 
 	return;
 }
 
 static TnyFolder*
-tny_camel_store_account_create_folder (TnyFolderStore *self, const gchar *name)
+tny_camel_store_account_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
 {
-	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->create_folder_func (self, name);
+	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->create_folder_func (self, name, err);
 }
 
 
 static TnyFolder*
-tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar *name)
+tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar *name, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
-	TnyFolder *folder = tny_camel_folder_new ();
-	CamelFolderInfo *info;
-	CamelStore *store;
+	TnyFolder *folder; CamelFolderInfo *info; CamelStore *store;
 
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 
-	if (store)
+	if (camel_exception_is_set (&ex)) 
 	{
-		info = camel_store_create_folder (store, "/", name, &ex);
-		if (info)
-		{
-			_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
-			camel_store_free_folder_info (store, info);
-		} else
-			g_critical ("Failed to create folder %s (%s)\n", name,
+		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+				TNY_FOLDER_STORE_CREATE_FOLDER_ERROR,
 				camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
 
-		camel_object_unref (CAMEL_OBJECT (store));
-	} else 
-		g_critical ("Store not available for %s (%s)\n", 
-			apriv->url_string, camel_exception_get_description (&ex));
+		if (store && CAMEL_IS_OBJECT (store))
+				camel_object_unref (CAMEL_OBJECT (store));
 
-	/* TODO: Error handling using 'ex' */
+		return NULL;
+	}
 
-    	return folder;
+	g_assert (CAMEL_IS_STORE (store));
+
+	info = camel_store_create_folder (store, "/", name, &ex);
+
+	if (camel_exception_is_set (&ex)) 
+	{
+		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+				TNY_FOLDER_STORE_CREATE_FOLDER_ERROR,
+				camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+
+		if (CAMEL_IS_OBJECT (store))
+		{
+			if (info && CAMEL_IS_STORE (store))
+				camel_store_free_folder_info (store, info);
+			camel_object_unref (CAMEL_OBJECT (store));
+		}
+
+		return NULL;
+	}
+
+	g_assert (info != NULL);
+
+	folder = tny_camel_folder_new ();
+	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
+	camel_store_free_folder_info (store, info);
+
+	camel_object_unref (CAMEL_OBJECT (store));
+
+  	return folder;
 }
 
 static void
-tny_camel_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query)
+tny_camel_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
-	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_func (self, list, query);
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_func (self, list, query, err);
 }
 
 
 static void 
-tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query)
+tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
-	CamelFolderInfo *iter;
-	guint32 flags;
-	CamelStore *store;
+	CamelFolderInfo *iter; guint32 flags; CamelStore *store;
 
 	g_assert (TNY_IS_LIST (list));
+
 	if (query)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
 
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 
-	if (!store)
+	if (camel_exception_is_set (&ex))
 	{
-		g_critical ("Store not available for %s (%s)\n", 
-			apriv->url_string, camel_exception_get_description (&ex));
+		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+			TNY_FOLDER_STORE_GET_FOLDERS_ERROR,
+			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+
+		if (store && CAMEL_IS_OBJECT (store))
+			camel_object_unref (CAMEL_OBJECT (store));
 
 		return;
 	}
+
+	g_assert (CAMEL_IS_STORE (store));
 
 	flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
 		CAMEL_STORE_FOLDER_INFO_RECURSIVE;
@@ -427,10 +468,24 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
-	/*_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (self), 
-					NULL, NULL, NULL); */
 	iter = camel_store_get_folder_info (store, "", flags, &ex);
-	/*_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));*/
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+			TNY_FOLDER_STORE_GET_FOLDERS_ERROR,
+			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+
+		if (CAMEL_IS_OBJECT (store))
+		{
+			if (iter && CAMEL_IS_STORE (store))
+				camel_store_free_folder_info (store, iter);
+			camel_object_unref (CAMEL_OBJECT (store));
+		}
+
+		return;
+	}
 
 	priv->iter = iter;
 	priv->iter_store = store;
@@ -462,6 +517,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 
 typedef struct {
+	GError *err;
 	TnyFolderStore *self;
 	TnyList *list;
 	TnyGetFoldersCallback callback;
@@ -480,6 +536,9 @@ tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 	g_object_unref (G_OBJECT (info->self));
 	g_object_unref (G_OBJECT (info->list));
 
+	if (info->err)
+		g_error_free (info->err);
+
 	g_slice_free (GetFoldersInfo, info);
 
 	return;
@@ -491,7 +550,7 @@ tny_camel_store_account_get_folders_async_callback (gpointer thr_user_data)
 	GetFoldersInfo *info = thr_user_data;
 
 	if (info->callback)
-		info->callback (info->self, info->list, info->user_data);
+		info->callback (info->self, info->list,&info->err, info->user_data);
 
 	return FALSE;
 }
@@ -500,9 +559,15 @@ static gpointer
 tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
+	GError *err;
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (info->self),
-		info->list, info->query);
+		info->list, info->query, &err);
+
+	if (err != NULL)
+		info->err = g_error_copy ((const GError *) &err);
+	else
+		info->err = NULL;
 
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
@@ -549,6 +614,7 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 
 	info = g_slice_new0 (GetFoldersInfo);
 
+	info->err = NULL;
 	info->self = self;
 	info->list = list;
 	info->callback = callback;

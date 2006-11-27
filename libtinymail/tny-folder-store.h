@@ -45,17 +45,17 @@ struct _TnyFolderStoreIface
 {
    GTypeInterface parent;
 
-   void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder);
-   TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name);
-   void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);
+   void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder, GError **err);
+   TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
+   void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
    void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
 };
 
 GType tny_folder_store_get_type (void);
 
-void tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder);
-TnyFolder *tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name);
-void tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query);
+void tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err);
+TnyFolder *tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError **err);
+void tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
 void tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
 
 G_END_DECLS

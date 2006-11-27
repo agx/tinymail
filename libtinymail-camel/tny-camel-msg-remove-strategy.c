@@ -37,7 +37,14 @@ static GObjectClass *parent_class = NULL;
 
 
 static void
-tny_camel_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header)
+tny_camel_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
+{
+	TNY_CAMEL_MSG_REMOVE_STRATEGY_GET_CLASS (self)->perform_remove_func (self, folder, header, err);
+	return;
+}
+
+static void
+tny_camel_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
 	const gchar *id;
 	CamelFolder *cfolder;
@@ -49,6 +56,9 @@ tny_camel_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFol
 	cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
 	camel_folder_delete_message (cfolder, id);
 	camel_object_unref (CAMEL_OBJECT (cfolder));
+
+	/* Nothing can go wrong in this implementation, but others might go wrong.
+	   We just leave err untouched. */
 
 	return;
 }
@@ -99,6 +109,8 @@ tny_camel_msg_remove_strategy_class_init (TnyCamelMsgRemoveStrategyClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	class->perform_remove_func = tny_camel_msg_remove_strategy_perform_remove_default;
 
 	object_class->finalize = tny_camel_msg_remove_strategy_finalize;
 

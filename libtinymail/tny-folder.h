@@ -70,24 +70,24 @@ struct _TnyFolderIface
 	GTypeInterface parent;
 	
 	/* Methods */
-	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header);
-	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg);
-	void (*expunge_func) (TnyFolder *self);
+	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
+	void (*expunge_func) (TnyFolder *self, GError **err);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
-	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header);
-	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh);
+	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
 	const gchar* (*get_name_func) (TnyFolder *self);
 	const gchar* (*get_id_func) (TnyFolder *self);
 	TnyStoreAccount* (*get_account_func) (TnyFolder *self);
-	void (*set_name_func) (TnyFolder *self, const gchar *name);
+	void (*set_name_func) (TnyFolder *self, const gchar *name, GError **err);
 	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
 	guint (*get_all_count_func) (TnyFolder *self);
 	guint (*get_unread_count_func) (TnyFolder *self);
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
-	void (*refresh_func) (TnyFolder *self);
-	void (*transfer_msgs_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals);
+	void (*refresh_func) (TnyFolder *self, GError **err);
+	void (*transfer_msgs_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 };
 
 GType tny_folder_get_type (void);
@@ -95,22 +95,22 @@ GType tny_folder_type_get_type (void);
 
 TnyMsgRemoveStrategy* tny_folder_get_msg_remove_strategy (TnyFolder *self);
 void tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st);
-void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header);
-void tny_folder_add_msg (TnyFolder *self, TnyMsg *msg);
-void tny_folder_expunge (TnyFolder *self);
-TnyMsg* tny_folder_get_msg (TnyFolder *self, TnyHeader *header);
-void tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh);
+void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err);
+void tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err);
+void tny_folder_expunge (TnyFolder *self, GError **err);
+TnyMsg* tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err);
+void tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
 TnyStoreAccount* tny_folder_get_account (TnyFolder *self);
 const gchar* tny_folder_get_id (TnyFolder *self);
 const gchar* tny_folder_get_name (TnyFolder *self);
-void tny_folder_set_name (TnyFolder *self, const gchar *name);
+void tny_folder_set_name (TnyFolder *self, const gchar *name, GError **err);
 TnyFolderType tny_folder_get_folder_type (TnyFolder *self);
 guint tny_folder_get_all_count (TnyFolder *self);
 guint tny_folder_get_unread_count (TnyFolder *self);
 gboolean tny_folder_is_subscribed (TnyFolder *self);
 void tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
-void tny_folder_refresh (TnyFolder *self);
-void tny_folder_transfer_msgs (TnyFolder *folder_src, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals);
+void tny_folder_refresh (TnyFolder *self, GError **err);
+void tny_folder_transfer_msgs (TnyFolder *folder_src, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 
 G_END_DECLS
 

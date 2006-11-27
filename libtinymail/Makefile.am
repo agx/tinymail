@@ -4,6 +4,7 @@ lib_LTLIBRARIES = libtinymail-1.0.la
 
 libtinymail_1_0_headers = \
 	tny-shared.h \
+	tny-error.h \
 	tny-list.h \
 	tny-iterator.h \
 	tny-folder.h \
@@ -25,6 +26,7 @@ libtinymail_1_0_headers = \
 
 libtinymail_1_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
+	tny-error.c \
 	tny-list.c \
 	tny-iterator.c \
 	tny-msg.c \

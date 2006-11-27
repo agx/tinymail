@@ -45,7 +45,7 @@ typedef struct {
 } AsyncHelpr;
 
 static void
-recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, gpointer user_data)
+recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, GError **err, gpointer user_data)
 {
 	AsyncHelpr *hlrp = user_data;
 	TnyIterator *iter = tny_list_create_iterator (folders);
@@ -102,7 +102,8 @@ recurse_folders_sync (TnyGtkAccountTreeModel *self, TnyFolderStore *store, GtkTr
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
 
-	tny_folder_store_get_folders (store, folders, self->query);
+	/* TODO add error checking and reporting here */
+	tny_folder_store_get_folders (store, folders, self->query, NULL);
 	iter = tny_list_create_iterator (folders);
 
 	while (!tny_iterator_is_done (iter))

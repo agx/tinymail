@@ -85,6 +85,7 @@ EXTRA_DIST = \
 # ls DIR/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\t\\\\/g
 
 tinymail_h_files = \
+	$(top_srcdir)/libtinymail/tny-error.h \
 	$(top_srcdir)/libtinymail/tny-account.h \
 	$(top_srcdir)/libtinymail/tny-account-store.h \
 	$(top_srcdir)/libtinymail/tny-device.h \

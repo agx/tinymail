@@ -39,7 +39,7 @@ import gobject.GObject as PyGObject_Type
 override tny_folder_store_get_folders_async kwargs
 
 static void
-tny_get_folders_cb (TnyFolderStore *self, TnyList *list, gpointer user_data)
+tny_get_folders_cb (TnyFolderStore *self, TnyList *list, GError **err, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -53,6 +53,9 @@ tny_get_folders_cb (TnyFolderStore *self, TnyList *list, gpointer user_data)
     ret = PyObject_CallObject(callback, args);
     if (!ret)
 	PyErr_Print();
+
+    pyg_error_check(err);
+
     Py_XDECREF(ret);
     Py_DECREF(args);
     Py_DECREF ((PyObject *)user_data);
@@ -91,7 +94,7 @@ _wrap_tny_folder_store_get_folders_async (PyGObject *self, PyObject *args, PyObj
 override tny_folder_refresh_async kwargs
 
 static void
-tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, gpointer user_data)
+tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, GError **err, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -105,6 +108,9 @@ tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, gpointer user_data)
     ret = PyObject_CallObject(callback, args);
     if (!ret)
 	PyErr_Print();
+
+    pyg_error_check(err);
+	
     Py_XDECREF(ret);
     Py_DECREF(args);
     Py_DECREF ((PyObject *)user_data);
@@ -137,7 +143,6 @@ _wrap_tny_folder_refresh_async (PyGObject *self, PyObject *args, PyObject *kwarg
 {
     static char *kwlist[] = { "refresh_func", "status_func", "user_data", NULL };
     PyObject *refresh_func, *status_func = Py_None, *user_data = Py_None;
-
     PyObject *data;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs,
