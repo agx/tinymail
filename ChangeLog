@@ -19,6 +19,7 @@
 	* This is a major API change in libtinymail
 
 2006-11-24  Sergio Villar Senin <svillar@igalia.com>
+
 	* libtinymail-camel/tny-camel-folder.c: initilize a CamelException
 	* libtinymail-camel/tny.camel-store-account.c: added a folder
 	unsubscription before a folder delete
@@ -36,6 +37,7 @@
 	* This was a major API change in libtinymailui & libtinymailui-gtk
 
 2006-11-23  Sergio Villar Senin <svillar@igalia.com>
+
 	* libtinymail-camel/tny-camel-folder.c: added support to rename
 	folders
 	* libtinymail-camel/tny-camel-store-account.c: refactored the
@@ -46,6 +48,7 @@
 	* This was a major API change in libtinymail
 
 2006-11-21  Sergio Villar Senin <svillar@igalia.com>
+
 	* Fixed a bug when subscribing new folders
 	* Added the signal "subscription_changed" to TnyStoreAccount
 	* Added a query to TnyGtkAccountTreeModel
