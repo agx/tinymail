@@ -54,7 +54,7 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, const gchar 
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
 
-	tny_folder_store_get_folders (store, folders, query);
+	tny_folder_store_get_folders (store, folders, query, NULL);
 	iter = tny_list_create_iterator (folders);
 
 	while (!tny_iterator_is_done (iter))
@@ -130,10 +130,10 @@ tny_folder_test_get_headers_sync (void)
 	}
     
     	headers = tny_simple_list_new ();
-	tny_folder_refresh (iface);
+	tny_folder_refresh (iface, NULL);
 	all_count = tny_folder_get_all_count (iface);
     
-	tny_folder_get_headers (iface, headers, FALSE);
+	tny_folder_get_headers (iface, headers, FALSE, NULL);
 	length = tny_list_get_length (headers);
         
 	str = g_strdup_printf ("I received %d headers, the folder tells me it has %d messages\n", length, all_count);
@@ -159,9 +159,9 @@ tny_folder_test_remove_message (void)
 	}
 	
 	headers = tny_simple_list_new ();
-	tny_folder_refresh (iface);
+	tny_folder_refresh (iface, NULL);
 	
-	tny_folder_get_headers (iface, headers, FALSE);
+	tny_folder_get_headers (iface, headers, FALSE, NULL);
 	orig_length = tny_list_get_length (headers);
 	test_len = tny_folder_get_all_count (iface);
 	
@@ -174,8 +174,8 @@ tny_folder_test_remove_message (void)
 	header = (TnyHeader*)tny_iterator_get_current (iter);
 	
 	/* Flag as removed */
-	tny_folder_remove_msg (iface, header);
-	tny_folder_refresh (iface);
+	tny_folder_remove_msg (iface, header, NULL);
+	tny_folder_refresh (iface, NULL);
 	
 	g_object_unref (G_OBJECT (headers));
 	
@@ -186,7 +186,7 @@ tny_folder_test_remove_message (void)
 	g_free (str);
 	
 	headers = tny_simple_list_new ();
-	tny_folder_get_headers (iface, headers, FALSE);
+	tny_folder_get_headers (iface, headers, FALSE, NULL);
 	headers_len = tny_list_get_length (headers);
 	g_object_unref (G_OBJECT (headers));
 	
@@ -195,8 +195,8 @@ tny_folder_test_remove_message (void)
 	g_free (str);
 	
 	/* Expunge ...*/
-	tny_folder_expunge (iface);    
-	tny_folder_refresh (iface);
+	tny_folder_expunge (iface, NULL);    
+	tny_folder_refresh (iface, NULL);
 	
 	new_len = tny_folder_get_all_count (iface);
 	str = g_strdup_printf ("After removal, the new length is %d, whereas it should be %d\n", new_len, orig_length-1);
@@ -204,7 +204,7 @@ tny_folder_test_remove_message (void)
 	g_free (str);
 	
 	headers = tny_simple_list_new ();
-	tny_folder_get_headers (iface, headers, FALSE);
+	tny_folder_get_headers (iface, headers, FALSE, NULL);
 	headers_len = tny_list_get_length (headers);
 	g_object_unref (G_OBJECT (headers));
 	
