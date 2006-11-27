@@ -154,7 +154,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *         TnyList *folders = tny_simple_list_new ();
  *         g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
  *         tny_folder_store_get_folders_async (folder,
- *             folders, callback, NULL, NULL, NULL);
+ *             folders, callback, NULL, NULL);
  *         g_object_unref (G_OBJECT (folder));
  *         tny_iterator_next (iter);
  *     }
