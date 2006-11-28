@@ -17,6 +17,32 @@ Enumerations for tinymail
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### ENUM TnyErrorDomain ##### -->
+<para>
+
+</para>
+
+@TNY_FOLDER_ERROR: An error domain for errors that occured with a folder
+@TNY_FOLDER_STORE_ERROR: An error domain for errors that occured with a folder store
+@TNY_TRANSPORT_ACCOUNT_ERROR: An error domain for errors that occured with a transport account
+
+<!-- ##### ENUM TnyError ##### -->
+<para>
+
+</para>
+
+@TNY_FOLDER_ERROR_EXPUNGE: An error that occured while expunging a folder 
+@TNY_FOLDER_ERROR_REMOVE_MSG: An error that occured while removing a message
+@TNY_FOLDER_ERROR_ADD_MSG: An error that occured while adding a message
+@TNY_FOLDER_ERROR_REFRESH: An error that occured while refreshing a folder
+@TNY_FOLDER_ERROR_GET_MSG: An error that occured while getting a message
+@TNY_FOLDER_ERROR_TRANSFER_MSGS: An error that occured while transfering a message
+@TNY_FOLDER_ERROR_SET_NAME: An error that occured while renaming a folder
+@TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER: An error that occured while removing a folder
+@TNY_FOLDER_STORE_ERROR_GET_FOLDERS: An error that occured while getting folders
+@TNY_FOLDER_STORE_ERROR_CREATE_FOLDER: An error that occured while creating a folder
+@TNY_TRANSPORT_ACCOUNT_ERROR_SEND: An error that occured while sending a message
+
 <!-- ##### ENUM TnyAccountType ##### -->
 <para>
 
