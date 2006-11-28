@@ -376,6 +376,17 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 	TnyFolder *folder; CamelFolderInfo *info; CamelStore *store;
 
+	if (!name || strlen (name) <= 0)
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+				_("Failed to create folder with no name"));
+
+		return NULL;
+	}
+
+	g_assert (CAMEL_IS_SESSION (apriv->session));
+
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 
@@ -440,8 +451,8 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	CamelFolderInfo *iter; guint32 flags; CamelStore *store;
 
 	g_assert (TNY_IS_LIST (list));
-
-	if (query)
+	g_assert (CAMEL_IS_SESSION (apriv->session));
+	if (query != NULL)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
 
 	store = camel_session_get_store ((CamelSession*) apriv->session, 

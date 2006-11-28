@@ -283,6 +283,7 @@ tny_camel_header_get_flags (TnyHeader *self)
 		return retval;
 	}
 
+	/* This is only legal because the flags between CamelLite and Tinymail are equalized */
 	retval = camel_message_info_flags ((CamelMessageInfo*)me->info);
 
 	return retval;
@@ -299,6 +300,7 @@ tny_camel_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 		return;
 	}
 
+	/* This is only legal because the flags between CamelLite and Tinymail are equalized */
 	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, ~0);
 
 	return;

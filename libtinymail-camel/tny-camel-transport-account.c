@@ -97,8 +97,11 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	TnyHeader *header; CamelMimeMessage *message;
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
 	CamelTransport *transport;
+	const gchar *str = NULL;
+	CamelInternetAddress *from, *recipients;
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
+	g_assert (CAMEL_IS_SESSION (apriv->session));
 
 	transport = camel_session_get_transport ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
@@ -110,51 +113,48 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 			camel_exception_get_description (&ex));
 
 		if (transport && CAMEL_IS_TRANSPORT (transport))
-			g_object_unref (CAMEL_OBJECT (transport));
+			camel_object_unref (CAMEL_OBJECT (transport));
 
-		return;		
+		return;
 	}
+
+	g_assert (CAMEL_IS_TRANSPORT (transport));
 
 	header = tny_msg_get_header (msg);
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
+	from = camel_internet_address_new ();
+	recipients = camel_internet_address_new ();
 
-	if (G_LIKELY (transport && message && header))
-	{
-		const gchar *str = NULL;
-		CamelInternetAddress 
-			*from = camel_internet_address_new (),
-			*recipients = camel_internet_address_new ();
+	str = tny_header_get_from (header);
+	_foreach_email_add_to_inet_addr (str, from);
 
-		str = tny_header_get_from (header);
-		_foreach_email_add_to_inet_addr (str, from);
+	str = tny_header_get_to (header);
+	_foreach_email_add_to_inet_addr (str, recipients);
 
-		str = tny_header_get_to (header);
-		_foreach_email_add_to_inet_addr (str, recipients);
+	str = tny_header_get_cc (header);
+	_foreach_email_add_to_inet_addr (str, recipients);
 
-		str = tny_header_get_cc (header);
-		_foreach_email_add_to_inet_addr (str, recipients);
+	str = tny_header_get_bcc (header);
+	_foreach_email_add_to_inet_addr (str, recipients);
 
-		str = tny_header_get_bcc (header);
-		_foreach_email_add_to_inet_addr (str, recipients);
+	apriv->connected = TRUE;
 
-		apriv->connected = TRUE;
-
-		camel_transport_send_to (transport, message, (CamelAddress*)from, 
+	camel_transport_send_to (transport, message, (CamelAddress*)from, 
 			(CamelAddress*)recipients, &ex);
 
-		if (camel_exception_is_set (&ex))
-		{
-			g_set_error (err, TNY_TRANSPORT_ERROR, 
-				TNY_TRANSPORT_ERROR_ACCOUNT_SEND,
-				camel_exception_get_description (&ex));
-		}
-
-		apriv->connected = FALSE;
-
-		camel_object_unref (CAMEL_OBJECT (from));
-		camel_object_unref (CAMEL_OBJECT (recipients));
-		g_object_unref (G_OBJECT (header));
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_TRANSPORT_ERROR, 
+			TNY_TRANSPORT_ERROR_ACCOUNT_SEND,
+			camel_exception_get_description (&ex));
 	}
+
+	apriv->connected = FALSE;
+
+	camel_object_unref (CAMEL_OBJECT (from));
+	camel_object_unref (CAMEL_OBJECT (recipients));
+	g_object_unref (G_OBJECT (header));
+
 
 	return;
 }
