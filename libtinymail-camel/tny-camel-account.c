@@ -491,49 +491,51 @@ tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	/* TODO locking & error handling */
+
 	if (!priv->service)
 		return;
-
+	
 	_tny_camel_account_start_camel_operation (self, NULL, NULL, NULL);
-
+	
 	if (offline)
 		camel_service_cancel_connect (priv->service);
-
-        if (CAMEL_IS_DISCO_STORE (priv->service)) {
-                if (!offline) {
-                        camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
-                                                      CAMEL_DISCO_STORE_ONLINE, priv->ex);
-                        goto done;
-                } else if (camel_disco_store_can_work_offline (CAMEL_DISCO_STORE (priv->service))) {
-
-                        camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
-                                                      CAMEL_DISCO_STORE_OFFLINE,
-                                                      priv->ex);
-                        goto done;
-                }
-        } else if (CAMEL_IS_OFFLINE_STORE (priv->service)) {
-
-                if (!offline) {
-
-                        camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
-                                                               CAMEL_OFFLINE_STORE_NETWORK_AVAIL,
-                                                               priv->ex);
-                        goto done;
-                } else {
-                        camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
-                                                               CAMEL_OFFLINE_STORE_NETWORK_UNAVAIL,
-                                                               priv->ex);
-                        goto done;
-                }
-        }
-
-        if (offline)
-                camel_service_disconnect (CAMEL_SERVICE (priv->service),
-                                          TRUE, priv->ex);
-done:
-
-	_tny_camel_account_stop_camel_operation (self);
-
+	
+	if (CAMEL_IS_DISCO_STORE (priv->service)) {
+		if (!offline) {
+			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
+										  CAMEL_DISCO_STORE_ONLINE, priv->ex);
+			goto done;
+		} else if (camel_disco_store_can_work_offline (CAMEL_DISCO_STORE (priv->service))) {
+			
+			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
+										  CAMEL_DISCO_STORE_OFFLINE,
+										  priv->ex);
+			goto done;
+		}
+	} else if (CAMEL_IS_OFFLINE_STORE (priv->service)) {
+		
+		if (!offline) {
+			
+			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
+												   CAMEL_OFFLINE_STORE_NETWORK_AVAIL,
+												   priv->ex);
+			goto done;
+		} else {
+			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
+												   CAMEL_OFFLINE_STORE_NETWORK_UNAVAIL,
+												   priv->ex);
+			goto done;
+		}
+	}
+	
+	if (offline)
+		camel_service_disconnect (CAMEL_SERVICE (priv->service),
+								  TRUE, priv->ex);
+	done:
+		
+		_tny_camel_account_stop_camel_operation (self);
+	
 }
 
 

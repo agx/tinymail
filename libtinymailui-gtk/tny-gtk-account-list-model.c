@@ -60,24 +60,24 @@ tny_gtk_account_list_model_new (void)
 static void 
 destroy_accs (gpointer item, gpointer user_data)
 {
-    	if (item && G_IS_OBJECT (item))
+	if (item && G_IS_OBJECT (item))
 		g_object_unref (G_OBJECT (item));
-    	return;
+	return;
 }
 
 static void
 tny_gtk_account_list_model_finalize (GObject *object)
 {
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*) object;
-    
+
 	g_mutex_lock (me->iterator_lock);
-    	if (me->first)
+	if (me->first)
 	{
 		g_list_foreach (me->first, destroy_accs, NULL);
 		g_list_free (me->first); me->first = NULL;
 	}
 	g_mutex_unlock (me->iterator_lock);
-    
+
 	(*parent_class->finalize) (object);
 }
 
@@ -103,7 +103,7 @@ tny_gtk_account_list_model_instance_init (GTypeInstance *instance, gpointer g_cl
 
 	me->iterator_lock = g_mutex_new ();
 	me->first = NULL;
-    
+
 	gtk_list_store_set_column_types (store, 
 		TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS, types);
 
@@ -129,7 +129,7 @@ tny_gtk_account_list_model_prepend (TnyList *self, GObject* item)
 	GtkListStore *store = GTK_LIST_STORE (me);
 	GtkTreeIter iter;
 	TnyAccount *account = TNY_ACCOUNT (item);
-    
+
 	g_mutex_lock (me->iterator_lock);
 	g_object_ref (G_OBJECT (item));
 	me->first = g_list_prepend (me->first, item);    
@@ -147,7 +147,7 @@ tny_gtk_account_list_model_append (TnyList *self, GObject* item)
 	GtkListStore *store = GTK_LIST_STORE (me);
 	GtkTreeIter iter;
 	TnyAccount *account = TNY_ACCOUNT (item);
-        
+
 	g_mutex_lock (me->iterator_lock);
 	g_object_ref (G_OBJECT (item)); 
 	me->first = g_list_append (me->first, item);    
@@ -164,7 +164,7 @@ tny_gtk_account_list_model_get_length (TnyList *self)
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*)self;
 	guint retval = 0;
 	GtkTreeIter iter;
-    
+
 	g_mutex_lock (me->iterator_lock);
 	retval = me->first?g_list_length (me->first):0;
 	g_mutex_unlock (me->iterator_lock);
@@ -187,7 +187,7 @@ tny_gtk_account_list_model_remove (TnyList *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 	
 	me->first = g_list_remove (me->first, (gconstpointer)item);
-    
+
 	if (gtk_tree_model_get_iter_first (model, &iter))
 	  while (gtk_tree_model_iter_next (model, &iter))
 	  {
@@ -229,7 +229,7 @@ tny_gtk_account_list_model_copy_the_list (TnyList *self)
 {
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*)self;
 	TnyGtkAccountListModel *copy = g_object_new (TNY_TYPE_GTK_ACCOUNT_LIST_MODEL, NULL);
-    
+
 	g_mutex_lock (me->iterator_lock);
 	GList *list_copy = g_list_copy (me->first);
 	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
