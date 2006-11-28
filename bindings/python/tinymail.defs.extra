@@ -1,3 +1,33 @@
+(define-enum ErrorDomain
+  (in-module "Tny")
+  (c-name "TnyErrorDomain")
+  (gtype-id "TNY_TYPE_ERROR_DOMAIN")
+  (values
+    '("folder_error" "TNY_FOLDER_ERROR")
+    '("folder_store_error" "TNY_FOLDER_STORE_ERROR")
+    '("transport_account_error" "TNY_TRANSPORT_ACCOUNT_ERROR")
+  )
+)
+
+(define-enum Error
+  (in-module "Tny")
+  (c-name "TnyError")
+  (gtype-id "TNY_TYPE_ERROR")
+  (values
+	'("folder_error_expunge" "TNY_FOLDER_ERROR_EXPUNGE")
+	'("folder_error_remove_msg" "TNY_FOLDER_ERROR_REMOVE_MSG")
+	'("folder_error_add_msg" "TNY_FOLDER_ERROR_ADD_MSG")
+	'("folder_error_refresh" "TNY_FOLDER_ERROR_REFRESH")
+	'("folder_error_get_msg" "TNY_FOLDER_ERROR_GET_MSG")
+	'("folder_error_transfer_msgs" "TNY_FOLDER_ERROR_TRANSFER_MSGS")
+	'("folder_error_set_name" "TNY_FOLDER_ERROR_SET_NAME")
+	'("folder_store_error_remove_folder" "TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER")
+	'("folder_store_error_get_folders" "TNY_FOLDER_STORE_ERROR_GET_FOLDERS")
+	'("folder_store_error_create_folder" "TNY_FOLDER_STORE_ERROR_CREATE_FOLDER")
+	'("transport_account_error_send" "TNY_TRANSPORT_ACCOUNT_ERROR_SEND")
+  )
+)
+
 (define-enum GetAccountsRequestType
   (in-module "Tny")
   (c-name "TnyGetAccountsRequestType")

@@ -21,7 +21,10 @@
  */
 
 #include <glib.h>
+#include <glib-object.h>
 #include <tny-shared.h>
+
+#define TNY_TYPE_ERROR_DOMAIN (tny_error_domain_get_type())
 
 enum _TnyErrorDomain
 {
@@ -29,6 +32,8 @@ enum _TnyErrorDomain
 	TNY_FOLDER_STORE_ERROR,
 	TNY_TRANSPORT_ERROR
 };
+
+#define TNY_TYPE_ERROR (tny_error_get_type())
 
 enum _TnyError 
 {
@@ -44,8 +49,11 @@ enum _TnyError
 	TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 	TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 
-	TNY_TRANSPORT_ERROR_ACCOUNT_SEND
+	TNY_TRANSPORT_ACCOUNT_ERROR_SEND
 };
+
+GType tny_error_domain_get_type (void);
+GType tny_error_get_type (void);
 
 
 #endif
