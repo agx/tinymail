@@ -263,8 +263,8 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 
 	if (camel_exception_is_set (ex))
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_ADD_MSG_ERROR,
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_ADD_MSG,
 			camel_exception_get_description (ex));
 	} else {
 
@@ -339,8 +339,8 @@ tny_camel_folder_expunge_default (TnyFolder *self, GError **err)
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_EXPUNGE_ERROR,
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_EXPUNGE,
 			camel_exception_get_description (&ex));
 	}
 
@@ -706,8 +706,8 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 
 	if (camel_exception_is_set (ex))
 	{
-		g_set_error (&err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_REFRESH_ERROR,
+		g_set_error (&err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
 			camel_exception_get_description (ex));
 		if (err != NULL)
 			info->err = g_error_copy ((const GError *) &err);		
@@ -825,8 +825,8 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 
 	if (camel_exception_is_set (ex))
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_REFRESH_ERROR,
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
 			camel_exception_get_description (ex));
 	}
 
@@ -875,8 +875,8 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 		if (camel_exception_is_set (&ex))
 		{
-			g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-				TNY_FOLDER_REFRESH_ERROR,
+			g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_REFRESH,
 				camel_exception_get_description (&ex));
 		}
 
@@ -936,8 +936,8 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 
 	if (camel_exception_is_set (ex))
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_GET_MSG_ERROR,
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_GET_MSG,
 			camel_exception_get_description (ex));
 	}
 
@@ -1077,8 +1077,8 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 
 	if (camel_exception_is_set (ex)) 
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_TRANSFER_MSGS_ERROR,
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_TRANSFER_MSGS,
 			camel_exception_get_description (ex));
 	} else 
 	{
@@ -1188,8 +1188,8 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_SET_NAME_ERROR,
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_SET_NAME,
 			camel_exception_get_description (&ex));
 
 		camel_exception_clear (&ex);
@@ -1422,8 +1422,8 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 
 			if (camel_exception_is_set (&ex))
 			{
-				g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-					TNY_FOLDER_STORE_REMOVE_FOLDER_ERROR,
+				g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+					TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 					camel_exception_get_description (&ex));
 				camel_exception_clear (&ex);
 			} else {
@@ -1473,8 +1473,8 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 
 	if (!priv->folder_name)
 	{
-		g_set_error (err, TNY_TINYMAIL_ERROR, 
-				TNY_FOLDER_STORE_CREATE_FOLDER_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				_("Failed to create folder %s"), name);
 
 		return NULL;
@@ -1489,8 +1489,8 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-				TNY_FOLDER_STORE_CREATE_FOLDER_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 
@@ -1575,8 +1575,8 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 
 		if (camel_exception_is_set (&ex))
 		{
-			g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-				TNY_FOLDER_STORE_GET_FOLDERS_ERROR,
+			g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 				camel_exception_get_description (&ex));
 			camel_exception_clear (&ex);
 			return;

@@ -325,8 +325,8 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-				TNY_FOLDER_STORE_REMOVE_FOLDER_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 
@@ -348,8 +348,8 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-				TNY_FOLDER_STORE_REMOVE_FOLDER_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 	}
@@ -381,8 +381,8 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-				TNY_FOLDER_STORE_CREATE_FOLDER_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 
@@ -398,8 +398,8 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-				TNY_FOLDER_STORE_CREATE_FOLDER_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 
@@ -449,8 +449,8 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_STORE_GET_FOLDERS_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 			camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 
@@ -472,8 +472,8 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
-			TNY_FOLDER_STORE_GET_FOLDERS_ERROR,
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 			camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 
