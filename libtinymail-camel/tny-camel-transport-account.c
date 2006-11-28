@@ -28,6 +28,7 @@
 
 #include <tny-folder.h>
 #include <tny-camel-folder.h>
+#include <tny-error.h>
 
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -82,15 +83,15 @@ tny_camel_transport_account_reconnect (TnyCamelAccount *self)
 
 
 static void
-tny_camel_transport_account_send (TnyTransportAccount *self, TnyMsg *msg)
+tny_camel_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
-	TNY_CAMEL_TRANSPORT_ACCOUNT_GET_CLASS (self)->send_func (self, msg);
+	TNY_CAMEL_TRANSPORT_ACCOUNT_GET_CLASS (self)->send_func (self, msg, err);
 	return;
 }
 
 
 static void
-tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg)
+tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyHeader *header; CamelMimeMessage *message;
@@ -99,11 +100,23 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
-	header = tny_msg_get_header (msg);
-	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-
 	transport = camel_session_get_transport ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+			TNY_TRANSPORT_ACCOUNT_SEND_ERROR,
+			camel_exception_get_description (&ex));
+
+		if (transport && CAMEL_IS_TRANSPORT (transport))
+			g_object_unref (CAMEL_OBJECT (transport));
+
+		return;		
+	}
+
+	header = tny_msg_get_header (msg);
+	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
 
 	if (G_LIKELY (transport && message && header))
 	{
@@ -128,6 +141,13 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 		camel_transport_send_to (transport, message, (CamelAddress*)from, 
 			(CamelAddress*)recipients, &ex);
+
+		if (camel_exception_is_set (&ex))
+		{
+			g_set_error (err, TNY_CAMEL_LITE_ERROR, 
+				TNY_TRANSPORT_ACCOUNT_SEND_ERROR,
+				camel_exception_get_description (&ex));
+		}
 
 		apriv->connected = FALSE;
 

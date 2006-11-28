@@ -94,7 +94,8 @@ thread_main (gpointer data)
 			msg = tny_folder_get_msg (sentbox, header, NULL);
 			g_object_unref (G_OBJECT (header));	
 
-			tny_transport_account_send (priv->trans_account, msg);
+			/* TODO handle and report errors here */
+			tny_transport_account_send (priv->trans_account, msg, NULL);
 
 			g_mutex_lock (priv->todo_lock);
 			{

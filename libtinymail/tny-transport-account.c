@@ -26,19 +26,20 @@
  * tny_transport_account_send:
  * @self: a #TnyTransportAccount object
  * @msg: a #TnyMsg object
+ * @err: a #GError object or NULL
  *
  * Send @msg
  * 
  **/
 void
-tny_transport_account_send (TnyTransportAccount *self, TnyMsg *msg)
+tny_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func)
 		g_critical ("You must implement tny_transport_account_send\n");
 #endif
 
-	TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func (self, msg);
+	TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func (self, msg, err);
 	return;
 }
 
