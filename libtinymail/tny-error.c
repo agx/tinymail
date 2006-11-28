@@ -27,7 +27,7 @@ tny_error_domain_get_type (void)
     static const GEnumValue values[] = {
       { TNY_FOLDER_ERROR, "TNY_FOLDER_ERROR", "folder_error" },
       { TNY_FOLDER_STORE_ERROR, "TNY_FOLDER_STORE_ERROR", "folder_store_error" },
-      { TNY_TRANSPORT_ERROR, "TNY_TRANSPORT_ERROR", "transport_error" },
+      { TNY_TRANSPORT_ACCOUNT_ERROR, "TNY_TRANSPORT_ACCOUNT_ERROR", "transport_account_error" },
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyErrorDomain", values);

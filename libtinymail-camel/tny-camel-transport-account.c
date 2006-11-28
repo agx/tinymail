@@ -108,7 +108,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_TRANSPORT_ERROR, 
+		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
 			TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
 			camel_exception_get_description (&ex));
 
@@ -144,7 +144,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_TRANSPORT_ERROR, 
+		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
 			TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
 			camel_exception_get_description (&ex));
 	}

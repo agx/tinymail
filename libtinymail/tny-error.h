@@ -30,7 +30,7 @@ enum _TnyErrorDomain
 {
 	TNY_FOLDER_ERROR,
 	TNY_FOLDER_STORE_ERROR,
-	TNY_TRANSPORT_ERROR
+	TNY_TRANSPORT_ACCOUNT_ERROR
 };
 
 #define TNY_TYPE_ERROR (tny_error_get_type())
