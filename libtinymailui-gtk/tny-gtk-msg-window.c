@@ -45,6 +45,7 @@ typedef struct _TnyGtkMsgWindowPriv TnyGtkMsgWindowPriv;
 struct _TnyGtkMsgWindowPriv
 {
 	TnyMsgView *msg_view;
+	GtkScrolledWindow *widget;
 };
 
 #define TNY_GTK_MSG_WINDOW_GET_PRIVATE(o) \
@@ -220,18 +221,33 @@ tny_gtk_msg_window_new (TnyMsgView *msgview)
 	priv->msg_view = msgview;
 
 	/* This adds a reference to msgview (it's a gtkwidget) */
-	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
+	gtk_scrolled_window_add_with_viewport (priv->widget, 
+			GTK_WIDGET (msgview));
+
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));
 
 	return TNY_MSG_WINDOW (self);
 }
 
+
 static void
 tny_gtk_msg_window_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyGtkMsgWindow *self = (TnyGtkMsgWindow *)instance;
+	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
+	GtkWidget *widget = gtk_scrolled_window_new (NULL, NULL);
 
 	gtk_window_set_default_size (GTK_WINDOW (self), 640, 480);
+
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (widget), 
+				GTK_SHADOW_NONE);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (widget),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+	gtk_widget_show (widget);
+	priv->widget = GTK_SCROLLED_WINDOW (widget);
+
+	gtk_container_add (GTK_CONTAINER (self), widget);
 
 	return;
 }

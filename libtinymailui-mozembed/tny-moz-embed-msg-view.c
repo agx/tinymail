@@ -53,22 +53,6 @@ tny_moz_embed_msg_view_finalize (GObject *object)
 	return;
 }
 
-static void 
-parent_size_alloc (GtkWidget *widget, GtkAllocation *allocation, gpointer user_data)
-{
-	if (GTK_IS_WIDGET (user_data))
-	{
-		gtk_widget_set_usize(GTK_WIDGET (user_data), 
-			widget->allocation.width>11?widget->allocation.width-10:1, 
-			widget->allocation.height>11?widget->allocation.height-10:1);
-	}
-}
-
-static void
-size_to_callback (GtkMozEmbed *mozilla, gint width, gint height, TnyMsgView *self)
-{
-	gtk_widget_set_usize (GTK_WIDGET (mozilla), width, height);
-}
 
 /**
  * tny_moz_embed_msg_view_create_mime_part_view_for_default:
@@ -93,11 +77,6 @@ tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyM
 		GtkWidget *widget = (GtkWidget *) self;
 
 		retval = tny_moz_embed_html_mime_part_view_new ();
-
-		g_signal_connect (GTK_OBJECT (retval), "size_to",
-				G_CALLBACK (size_to_callback), self);
-		g_signal_connect (G_OBJECT (self), "size_allocate", 
-				G_CALLBACK (parent_size_alloc), retval);
 
 		gtk_widget_set_usize(GTK_WIDGET (retval), 
 			widget->allocation.width>11?widget->allocation.width-10:1, 

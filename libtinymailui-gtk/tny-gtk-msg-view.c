@@ -763,21 +763,6 @@ tny_gtk_msg_view_new (void)
 	return TNY_MSG_VIEW (self);
 }
 
-static GtkWidget*
-get_non_inline_container (TnyGtkMsgView *self, GtkBox *kid)
-{
-	GtkWidget *widget = gtk_scrolled_window_new (NULL, NULL);
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (widget), 
-				GTK_SHADOW_NONE);
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (widget),
-			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (widget), 
-			GTK_WIDGET (kid));
-
-	gtk_widget_show (widget);
-
-	return widget;
-}
 
 static void
 tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -828,7 +813,7 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_container_add (GTK_CONTAINER (priv->attachview_sw), GTK_WIDGET (priv->attachview));
 
 	/* Default is a non-online viewer */
-	gtk_container_add (GTK_CONTAINER (self), get_non_inline_container (self, vbox));
+	gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (vbox));
 
 	gtk_widget_show (GTK_WIDGET (vbox));
 	gtk_widget_hide (GTK_WIDGET (priv->headerview));

@@ -590,7 +590,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyPlatformFactory *platfact;
 	GtkVBox *vbox = GTK_VBOX (self);
-	GtkWidget *mailbox_sw;
+	GtkWidget *mailbox_sw, *widget;
 	GtkWidget *header_sw;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
@@ -648,7 +648,18 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->msg_view = tny_platform_factory_new_msg_view (platfact);
 
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
-	gtk_paned_pack2 (GTK_PANED (vpaned1), GTK_WIDGET (priv->msg_view), TRUE, TRUE);
+
+	widget = gtk_scrolled_window_new (NULL, NULL);
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (widget), 
+				GTK_SHADOW_NONE);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (widget),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (widget), 
+			GTK_WIDGET (priv->msg_view));
+
+	gtk_widget_show (widget);
+
+	gtk_paned_pack2 (GTK_PANED (vpaned1), widget, TRUE, TRUE);
 
 	priv->account_view = GTK_COMBO_BOX (gtk_combo_box_new ());
 	renderer = gtk_cell_renderer_text_new();
