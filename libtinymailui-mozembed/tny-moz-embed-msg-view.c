@@ -78,9 +78,8 @@ tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyM
 
 		retval = tny_moz_embed_html_mime_part_view_new ();
 
-		gtk_widget_set_usize(GTK_WIDGET (retval), 
-			widget->allocation.width>11?widget->allocation.width-10:1, 
-			widget->allocation.height>11?widget->allocation.height-10:1);
+		gtk_widget_set_usize (GTK_WIDGET (retval), 
+			widget->allocation.width>11?widget->allocation.width-10:1, 2500);
 
 	} else
 		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
