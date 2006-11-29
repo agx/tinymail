@@ -60,25 +60,25 @@ typedef struct _TnyGtkMsgViewPriv TnyGtkMsgViewPriv;
 
 struct _TnyGtkMsgViewPriv
 {
-	TnyMimePart *part;
+	TnyMimePart *part, *root_part;
 	TnyHeaderView *headerview;
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
 	GList *unattached_views;
-
 	gboolean display_one_body;
 	gboolean display_html;
 	gboolean display_plain;
 	gboolean display_attachments;
 	gboolean display_rfc822;
-
+	gboolean first_attachment;
 	TnyMimePartView *text_body_viewer;
+	GtkBox *kid;
 };
 
 typedef struct
 {
 	gulong signal;
-	TnyMimePart *part;
+	TnyMimePart *part, *root_part;
 } RealizePriv;
 
 #define TNY_GTK_MSG_VIEW_GET_PRIVATE(o)	\
@@ -331,7 +331,8 @@ tny_gtk_msg_view_create_new_inline_viewer (TnyMsgView *self)
 static TnyMsgView*
 tny_gtk_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 {
-	return tny_gtk_msg_view_new ();
+	TnyMsgView *retval = tny_gtk_msg_view_new ();
+	return retval;
 }
 
 static TnyMimePartView*
@@ -383,28 +384,26 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 		retval = tny_gtk_text_mime_part_view_new ();
 
 	/* Inline message RFC822 */
-	} else if (priv->display_rfc822 && tny_mime_part_content_type_is (part, "message/rfc822"))
+	} else if (priv->display_rfc822 && (tny_mime_part_content_type_is (part, "message/rfc822")||
+		tny_mime_part_content_type_is (part, "multipart/*")))
 	{
 		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_inline_viewer (self));
-		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (retval),
-					GTK_POLICY_NEVER, GTK_POLICY_NEVER);
 
 	/* Attachments */
-	} else if (priv->display_attachments && tny_mime_part_get_content_type (part) &&
-				tny_mime_part_is_attachment (part))
+	} else if (priv->display_attachments && tny_mime_part_is_attachment (part))
 	{
-		static gboolean first = TRUE;
 		GtkTreeModel *model;
 
 		gtk_widget_show (priv->attachview_sw);
 		gtk_widget_show (GTK_WIDGET (priv->attachview));
 
-		if (first)
+		if (priv->first_attachment)
 		{
 			model = tny_gtk_attach_list_model_new ();
 			gtk_icon_view_set_model (priv->attachview, model);
-			first = FALSE;
+			priv->first_attachment = FALSE;
 		} else {
+
 			model = gtk_icon_view_get_model (priv->attachview);
 			if (!model || !TNY_IS_LIST (model))
 			{
@@ -434,11 +433,9 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
  * tny_gtk_msg_view_display_parts.
  **/
 static void
-tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part)
+tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part, TnyMimePart *root_part)
 {
-
-		if (tny_mime_part_content_type_is (part, "message/rfc822") ||
-			 TNY_IS_GTK_MSG_VIEW (mpview))
+		if (tny_mime_part_content_type_is (part, "message/rfc822") && TNY_IS_GTK_MSG_VIEW (mpview))
 		{
 			TnyList *list = tny_simple_list_new ();
 			if (TNY_IS_MSG (part) && TNY_IS_GTK_MSG_VIEW (mpview))
@@ -456,6 +453,16 @@ tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *pa
 			tny_mime_part_get_parts (part, list);
 			tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list);
 			g_object_unref (G_OBJECT (list));
+		} else if (tny_mime_part_content_type_is (part, "multipart/*") && TNY_IS_GTK_MSG_VIEW (mpview))
+		{
+			if (part != root_part)
+			{
+				TnyList *list = tny_simple_list_new ();
+				tny_mime_part_get_parts (part, list);
+				tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list);
+				g_object_unref (G_OBJECT (list));
+			}
+
 		} else
 			tny_mime_part_view_set_part (mpview, part);
 }
@@ -465,9 +472,11 @@ on_mpview_realize (GtkWidget *widget, gpointer user_data)
 {
 	RealizePriv *prv = user_data;
 
-	tny_mime_part_view_proxy_func_set_part (TNY_MIME_PART_VIEW (widget), prv->part);
+	tny_mime_part_view_proxy_func_set_part (TNY_MIME_PART_VIEW (widget), prv->part, prv->root_part);
 	g_signal_handler_disconnect (widget, prv->signal);
 	g_object_unref (prv->part);
+	if (prv->root_part)
+		g_object_unref (G_OBJECT (prv->root_part));
 
 	g_slice_free (RealizePriv, prv);
 }
@@ -554,17 +563,18 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			{
 				RealizePriv *prv = g_slice_new (RealizePriv);
 				prv->part = g_object_ref (part);
+				prv->root_part = priv->part?g_object_ref (G_OBJECT (priv->part)):NULL;
 				prv->signal = g_signal_connect (G_OBJECT (mpview),
 					"realize", G_CALLBACK (on_mpview_realize), prv);
 			} else
-				tny_mime_part_view_proxy_func_set_part (mpview, part);
+				tny_mime_part_view_proxy_func_set_part (mpview, part, priv->part);
 
 		} else if (TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
-			tny_mime_part_view_proxy_func_set_part (mpview, part);
+			tny_mime_part_view_proxy_func_set_part (mpview, part, priv->part);
 		else if (!TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
 		{
 			priv->unattached_views = g_list_prepend (priv->unattached_views, mpview);
-			tny_mime_part_view_proxy_func_set_part (mpview, part);
+			tny_mime_part_view_proxy_func_set_part (mpview, part, priv->root_part);
 		}
 	} else if (!tny_mime_part_content_type_is (part, "multipart/*") &&
 		!tny_mime_part_content_type_is (part, "message/rfc822"))
@@ -750,8 +760,23 @@ TnyMsgView*
 tny_gtk_msg_view_new (void)
 {
 	TnyGtkMsgView *self = g_object_new (TNY_TYPE_GTK_MSG_VIEW, NULL);
-
 	return TNY_MSG_VIEW (self);
+}
+
+static GtkWidget*
+get_non_inline_container (TnyGtkMsgView *self, GtkBox *kid)
+{
+	GtkWidget *widget = gtk_scrolled_window_new (NULL, NULL);
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (widget), 
+				GTK_SHADOW_NONE);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (widget),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (widget), 
+			GTK_WIDGET (kid));
+
+	gtk_widget_show (widget);
+
+	return widget;
 }
 
 static void
@@ -759,7 +784,10 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyGtkMsgView *self = (TnyGtkMsgView *)instance;
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
-	GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
+	GtkBox *vbox;
+
+	priv->kid = GTK_BOX (gtk_vbox_new (FALSE, 0));
+	vbox = priv->kid;
 
 	/* Defaults */
 	priv->display_html = FALSE;
@@ -767,19 +795,11 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->display_attachments = TRUE;
 	priv->display_rfc822 = TRUE;
 	priv->display_one_body = FALSE;
-
 	priv->text_body_viewer = NULL;
-
+	priv->first_attachment = TRUE;
 	priv->unattached_views = NULL;
 	priv->part = NULL;
-
-	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (self), NULL);
-	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (self), NULL);
-
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (self), 
-			GTK_SHADOW_NONE);
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self),
-			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	priv->root_part = NULL;
 
 	priv->headerview = tny_gtk_header_view_new ();
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
@@ -790,34 +810,25 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	gtk_widget_show (GTK_WIDGET (TNY_GTK_MSG_VIEW (self)->viewers));
 
 	priv->attachview_sw = gtk_scrolled_window_new (NULL, NULL);
-
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (self),
-					GTK_SHADOW_NONE);
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self),
-					GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (priv->attachview_sw),
 					GTK_SHADOW_NONE);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (priv->attachview_sw),
 					GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-
 	priv->attachview = GTK_ICON_VIEW (gtk_icon_view_new ());
-
 	gtk_icon_view_set_selection_mode (priv->attachview, GTK_SELECTION_SINGLE);
-
 	gtk_icon_view_set_text_column (priv->attachview,
 			TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN);
-
 	gtk_icon_view_set_pixbuf_column (priv->attachview,
 			TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN);
-
 	gtk_icon_view_set_columns (priv->attachview, -1);
 	gtk_icon_view_set_item_width (priv->attachview, 100);
 	gtk_icon_view_set_column_spacing (priv->attachview, 10);
 
 	gtk_box_pack_start (GTK_BOX (vbox), priv->attachview_sw, FALSE, TRUE, 0);
-	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (self), 
-			GTK_WIDGET (vbox));
 	gtk_container_add (GTK_CONTAINER (priv->attachview_sw), GTK_WIDGET (priv->attachview));
+
+	/* Default is a non-online viewer */
+	gtk_container_add (GTK_CONTAINER (self), get_non_inline_container (self, vbox));
 
 	gtk_widget_show (GTK_WIDGET (vbox));
 	gtk_widget_hide (GTK_WIDGET (priv->headerview));
@@ -825,6 +836,23 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	return;
 }
+
+static void
+widget_size_request (GtkWidget *widget, GtkRequisition *requisition)
+{
+	if (((GtkBin *) widget)->child)
+		gtk_widget_size_request (((GtkBin *) widget)->child, requisition);
+}
+
+static void
+widget_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
+{
+	widget->allocation = *allocation;
+
+	if (((GtkBin *) widget)->child)
+		gtk_widget_size_allocate (((GtkBin *) widget)->child, allocation);
+}
+
 
 static void
 tny_gtk_msg_view_finalize (GObject *object)
@@ -875,9 +903,14 @@ static void
 tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 {
 	GObjectClass *object_class;
+	GtkWidgetClass *widget_class;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	widget_class = (GtkWidgetClass *) class;
+	widget_class->size_request  = widget_size_request;
+	widget_class->size_allocate = widget_size_allocate;
 
 	object_class->finalize = tny_gtk_msg_view_finalize;
 
@@ -891,6 +924,7 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 	class->create_new_inline_viewer_func = tny_gtk_msg_view_create_new_inline_viewer_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyGtkMsgViewPriv));
+
 
 	return;
 }
@@ -930,7 +964,7 @@ tny_gtk_msg_view_get_type (void)
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (GTK_TYPE_SCROLLED_WINDOW,
+		type = g_type_register_static (GTK_TYPE_BIN,
 			"TnyGtkMsgView",
 			&info, 0);
 

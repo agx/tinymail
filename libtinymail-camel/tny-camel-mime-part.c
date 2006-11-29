@@ -277,8 +277,8 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 			 || camel_content_type_is(dw->mime_type, "application", "pkcs7-mime")
 			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-signed")
 			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-encrypted")
-			 || (camel_content_type_is (dw->mime_type, "text", "*")
-			     && camel_mime_part_get_filename(priv->part) == NULL));
+			 || ( /* camel_content_type_is (dw->mime_type, "text", "*") text/x-patch 
+			     && */ camel_mime_part_get_filename(priv->part) == NULL));
 	}
 
 	return FALSE;

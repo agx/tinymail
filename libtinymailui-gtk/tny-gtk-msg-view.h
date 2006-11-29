@@ -43,13 +43,13 @@ typedef struct _TnyGtkMsgViewClass TnyGtkMsgViewClass;
 
 struct _TnyGtkMsgView
 {
-	GtkScrolledWindow parent;
+	GtkBin parent;
 	GtkContainer *viewers;
 };
 
 struct _TnyGtkMsgViewClass
 {
-	GtkScrolledWindowClass parent_class;
+	GtkBinClass parent_class;
 
 	/* virtual methods */
 	TnyMimePart* (*get_part_func) (TnyMimePartView *self);

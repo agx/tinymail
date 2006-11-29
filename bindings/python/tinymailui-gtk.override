@@ -29,6 +29,8 @@ ignore-glob
 %%
 import gobject.GObject as PyGObject_Type
 import gtk.Table as PyGtkTable_Type
+import gtk.Bin as PyGtkBin_Type
+import gtk.VBox as PyGtkVBox_Type
 import gtk.ScrolledWindow as PyGtkScrolledWindow_Type
 import gtk.TextBuffer as PyGtkTextBuffer_Type
 import gtk.ListStore as PyGtkListStore_Type
