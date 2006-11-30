@@ -100,3 +100,23 @@ if (type != TNY_FOLDER_TYPE_ROOT)
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_gtk_folder_store_tree_model_prepend ##### -->
+<para>
+
+</para>
+
+@self: 
+@item: 
+@root_name: 
+
+
+<!-- ##### FUNCTION tny_gtk_folder_store_tree_model_append ##### -->
+<para>
+
+</para>
+
+@self: 
+@item: 
+@root_name: 
+
+
