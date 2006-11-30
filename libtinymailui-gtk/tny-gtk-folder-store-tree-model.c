@@ -111,7 +111,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 		GtkTreeStore *model = GTK_TREE_STORE (self);
 		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 		GtkTreeIter tree_iter;
-	    
+
 		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
  		gtk_tree_store_set (model, &tree_iter,
@@ -123,10 +123,10 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			tny_folder_get_folder_type (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
-	    
+
 		recurse_folders_sync (self, folder, &tree_iter);
-	    
- 		g_object_unref (G_OBJECT (folder));
+
+		g_object_unref (G_OBJECT (folder));
 
 		tny_iterator_next (iter);	    
 	}
@@ -147,18 +147,16 @@ get_root_name (TnyFolderStore *folder_store)
 }
 
 static void
-tny_gtk_folder_store_tree_model_add (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *folder_store, treeaddfunc func)
+tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *folder_store, treeaddfunc func, const gchar *root_name)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 	TnyList *folders = tny_simple_list_new ();
 	GtkTreeIter name_iter;
-	const gchar *root_name;
 
 	func (model, &name_iter, NULL);
 
-
 	gtk_tree_store_set (model, &name_iter,
-		TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, get_root_name (folder_store),
+		TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, root_name,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 0,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, TNY_FOLDER_TYPE_ROOT,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
@@ -172,7 +170,7 @@ tny_gtk_folder_store_tree_model_add (TnyGtkFolderStoreTreeModel *self, TnyFolder
 }
 
 static void
-tny_gtk_folder_store_tree_model_add_async (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *folder_store, treeaddfunc func)
+tny_gtk_folder_store_tree_model_add_async_i (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *folder_store, treeaddfunc func, const gchar *root_name)
 {
 	GtkTreeStore *model = GTK_TREE_STORE (self);
 	GtkTreeIter first, *name_iter;
@@ -190,7 +188,7 @@ tny_gtk_folder_store_tree_model_add_async (TnyGtkFolderStoreTreeModel *self, Tny
 		func (model, name_iter, NULL);
 
 	gtk_tree_store_set (model, name_iter,
-		TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, get_root_name (folder_store),
+		TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, root_name,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 0,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, TNY_FOLDER_TYPE_ROOT,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
@@ -204,8 +202,7 @@ tny_gtk_folder_store_tree_model_add_async (TnyGtkFolderStoreTreeModel *self, Tny
 /**
  * tny_gtk_folder_store_tree_model_new:
  * @async: Whether or not this component should attempt to asynchronously fill the tree
- * @query: the #TnyFolderStoreQuery that will be used to retrieve the
- * folders of each folder_store
+ * @query: the #TnyFolderStoreQuery that will be used to retrieve the folders of each folder_store
  *
  * Return value: a new #GtkTreeModel instance suitable for showing  
  * #TnyFolderStore instances
@@ -233,13 +230,13 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) object;
 
 	g_mutex_lock (me->iterator_lock);
-    	if (me->first)
+	if (me->first)
 	{
 		g_list_foreach (me->first, destroy_folder_stores, NULL);
 		g_list_free (me->first); me->first = NULL;
 	}
 	g_mutex_unlock (me->iterator_lock);
-    
+
 	g_mutex_free (me->iterator_lock);
 	me->iterator_lock = NULL;
 
@@ -290,9 +287,16 @@ tny_gtk_folder_store_tree_model_create_iterator (TnyList *self)
 }
 
 
-
-static void
-tny_gtk_folder_store_tree_model_prepend (TnyList *self, GObject* item)
+/**
+ * tny_gtk_folder_store_tree_model_prepend:
+ * @self: A #TnyGtkFolderStoreTreeModel instance
+ * @item: A #TnyFolderStore instance to add
+ * @root_name: The node's root name 
+ *
+ * Prepends an item to the model
+ **/
+void
+tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name)
 {
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*)self;
 
@@ -303,17 +307,47 @@ tny_gtk_folder_store_tree_model_prepend (TnyList *self, GObject* item)
 	me->first = g_list_prepend (me->first, item);
 
 	if (me->is_async)
-		tny_gtk_folder_store_tree_model_add_async (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_prepend);
+		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_prepend, root_name);
 	else
-		tny_gtk_folder_store_tree_model_add (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_prepend);
+		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_prepend, root_name);
+
+	g_mutex_unlock (me->iterator_lock);
+}
+
+
+static void
+tny_gtk_folder_store_tree_model_prepend_i (TnyList *self, GObject* item)
+{
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*)self;
+
+	g_mutex_lock (me->iterator_lock);
+
+	/* Prepend something to the list */
+	g_object_ref (G_OBJECT (item));
+	me->first = g_list_prepend (me->first, item);
+
+	if (me->is_async)
+		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_prepend, get_root_name (TNY_FOLDER_STORE (item)));
+	else
+		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_prepend, get_root_name (TNY_FOLDER_STORE (item)));
 	
 	g_mutex_unlock (me->iterator_lock);
 }
 
-static void
-tny_gtk_folder_store_tree_model_append (TnyList *self, GObject* item)
+/**
+ * tny_gtk_folder_store_tree_model_append:
+ * @self_i: A #TnyGtkFolderStoreTreeModel instance
+ * @item: A #TnyFolderStore instance to add
+ * @root_name: The node's root name 
+ *
+ * Appends an item to the model
+ **/
+void
+tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name)
 {
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*)self;
 
@@ -324,11 +358,32 @@ tny_gtk_folder_store_tree_model_append (TnyList *self, GObject* item)
 	me->first = g_list_append (me->first, item);
 
 	if (me->is_async)
-		tny_gtk_folder_store_tree_model_add_async (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_append);
+		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_append, root_name);
 	else
-		tny_gtk_folder_store_tree_model_add (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_append);
+		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_append, root_name);
+
+	g_mutex_unlock (me->iterator_lock);
+}
+
+static void
+tny_gtk_folder_store_tree_model_append_i (TnyList *self, GObject* item)
+{
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*)self;
+
+	g_mutex_lock (me->iterator_lock);
+
+	/* Append something to the list */
+	g_object_ref (G_OBJECT (item));
+	me->first = g_list_append (me->first, item);
+
+	if (me->is_async)
+		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_append, get_root_name (TNY_FOLDER_STORE (item)));
+	else
+		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+			gtk_tree_store_append, get_root_name (TNY_FOLDER_STORE (item)));
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -374,7 +429,7 @@ tny_gtk_folder_store_tree_model_remove (TnyList *self, GObject* item)
 			&citem, -1);
 
 		if (citem == item)
-	  	{
+		{
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));
 			break;
@@ -428,8 +483,8 @@ static void
 tny_list_init (TnyListIface *klass)
 {
 	klass->get_length_func = tny_gtk_folder_store_tree_model_get_length;
-	klass->prepend_func = tny_gtk_folder_store_tree_model_prepend;
-	klass->append_func = tny_gtk_folder_store_tree_model_append;
+	klass->prepend_func = tny_gtk_folder_store_tree_model_prepend_i;
+	klass->append_func = tny_gtk_folder_store_tree_model_append_i;
 	klass->remove_func = tny_gtk_folder_store_tree_model_remove;
 	klass->create_iterator_func = tny_gtk_folder_store_tree_model_create_iterator;
 	klass->copy_func = tny_gtk_folder_store_tree_model_copy_the_list;

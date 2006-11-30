@@ -71,6 +71,9 @@ GType tny_gtk_folder_store_tree_model_get_type (void);
 GType tny_gtk_folder_store_tree_model_column_get_type (void);
 GtkTreeModel* tny_gtk_folder_store_tree_model_new (gboolean async, TnyFolderStoreQuery *query);
 
+void tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);
+void tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);
+
 G_END_DECLS
 
 #endif

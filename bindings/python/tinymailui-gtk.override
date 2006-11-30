@@ -41,6 +41,8 @@ import gtk.TextView as PyGtkTextView_Type
 
 import tinymail.Folder as PyTnyFolder_Type
 import tinymail.MimePart as PyTnyMimePart_Type
+import tinymail.List as PyTnyList_Type
+import tinymail.FolderStore as PyTnyFolderStore_Type
 import tinymail.FolderStoreQuery as PyTnyFolderStoreQuery_Type
 import tinymail.ui.MimePartSaver as PyTnyMimePartSaver_Type
 import tinymail.ui.MimePartSaveStrategy as PyTnyMimePartSaveStrategy_Type
