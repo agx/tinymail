@@ -120,6 +120,9 @@ tny_msg_get_type (void)
 			"TnyMsg", &info, 0);
 
 		g_type_interface_add_prerequisite (type, TNY_TYPE_MIME_PART); 
+
+		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+
 	}
 
 	return type;

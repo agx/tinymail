@@ -36,7 +36,7 @@ struct _TnyCamelFolderPriv
 	GMutex *folder_lock;
 	CamelFolder *folder;
 	gchar *folder_name;
-	TnyStoreAccount *account;
+	TnyAccount *account; CamelStore *store;
 	guint cached_length, unread_length;
 	gboolean subscribed;
 	gboolean has_summary_cap;
@@ -62,7 +62,7 @@ void _tny_camel_folder_set_unread_count (TnyCamelFolder *self, guint len);
 void _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len);
 void _tny_camel_folder_check_uncache (TnyCamelFolder *self, TnyCamelFolderPriv *priv);
 void _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter);
-void _tny_camel_folder_set_account (TnyCamelFolder *self, TnyStoreAccount *account);
+void _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account);
 
 void _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder);
 

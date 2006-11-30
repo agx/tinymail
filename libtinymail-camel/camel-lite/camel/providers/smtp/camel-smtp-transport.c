@@ -312,9 +312,14 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	camel_exception_clear (ex);
 	
 	if (ssl_mode != MODE_TLS) {
+
+		int i = 0;
+
+		i++;
+
 		/* we're done */
 		return TRUE;
-	}
+	} else {
 	
 #ifdef HAVE_SSL
 	if (!(transport->flags & CAMEL_SMTP_TRANSPORT_STARTTLS)) {
@@ -369,7 +374,9 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		return FALSE;
 	
 	return TRUE;
-	
+
+	}
+
  exception_cleanup:
 	
 	camel_object_unref (transport->istream);

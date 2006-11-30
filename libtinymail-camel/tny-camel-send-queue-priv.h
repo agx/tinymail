@@ -21,16 +21,17 @@
  */
 
 #include <tny-camel-transport-account.h>
+#include <tny-folder.h>
 
 typedef struct _TnyCamelSendQueuePriv TnyCamelSendQueuePriv;
 
 struct _TnyCamelSendQueuePriv
 {
-	GMutex *todo_lock;
 	TnyTransportAccount *trans_account;
+	TnyFolder *sentbox_cache, *outbox_cache;
 	guint total;
 	GThread *thread;
-	gchar *path;
+	GMutex *todo_lock; gboolean creating_spin;
 };
 
 #endif

@@ -133,6 +133,7 @@ local_init(gpointer object, gpointer klass)
 
 	folder->summary = NULL;
 	local_folder->search = NULL;
+	local_folder->index = NULL;
 
 	local_folder->priv = g_malloc0(sizeof(*local_folder->priv));
 	local_folder->priv->search_lock = g_mutex_new();
@@ -150,11 +151,11 @@ local_finalize(CamelObject * object)
 		folder->summary = NULL;
 	}
 
-	if (local_folder->search) {
+	if (local_folder->search && CAMEL_IS_OBJECT (local_folder->search)) {
 		camel_object_unref((CamelObject *)local_folder->search);
 	}
 
-	if (local_folder->index)
+	if (local_folder->index && CAMEL_IS_OBJECT (local_folder->index))
 		camel_object_unref((CamelObject *)local_folder->index);
 
 	while (local_folder->locked> 0)

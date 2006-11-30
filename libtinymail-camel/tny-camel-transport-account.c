@@ -106,13 +106,13 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	transport = camel_session_get_transport ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
 
-	if (camel_exception_is_set (&ex))
+	if (camel_exception_is_set (&ex) || !transport)
 	{
 		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
 			TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
 			camel_exception_get_description (&ex));
 
-		if (transport && CAMEL_IS_TRANSPORT (transport))
+		if (transport && CAMEL_IS_OBJECT (transport))
 			camel_object_unref (CAMEL_OBJECT (transport));
 
 		return;

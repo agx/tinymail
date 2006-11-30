@@ -430,6 +430,8 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 	if (mi) {
 		d(printf("Added, uid = %s\n", mi->uid));
 		if (info) {
+#ifdef NON_TINYMAIL_FEATURES
+
 			const CamelTag *tag = camel_message_info_user_tags(info);
 			const CamelFlag *flag = camel_message_info_user_flags(info);
 
@@ -442,6 +444,7 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 				camel_message_info_set_user_tag((CamelMessageInfo *)mi, tag->name, tag->value);
 				tag = tag->next;
 			}
+#endif
 
 			mi->info.flags |= (camel_message_info_flags(info) & 0xffff);
 #ifdef NON_TINYMAIL_FEATURES

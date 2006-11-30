@@ -59,7 +59,7 @@ struct _TnyCamelFolderClass
 	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
 	const gchar* (*get_name_func) (TnyFolder *self);
 	const gchar* (*get_id_func) (TnyFolder *self);
-	TnyStoreAccount* (*get_account_func) (TnyFolder *self);
+	TnyAccount* (*get_account_func) (TnyFolder *self);
 	void (*set_name_func) (TnyFolder *self, const gchar *name, GError **err);
 	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
 	guint (*get_all_count_func) (TnyFolder *self);

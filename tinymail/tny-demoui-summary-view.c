@@ -25,6 +25,8 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
+#include <tny-simple-list.h>
+#include <tny-iterator.h>
 #include <tny-platform-factory.h>
 
 #if PLATFORM==1
@@ -72,6 +74,10 @@
 
 static GObjectClass *parent_class = NULL;
 
+#include <tny-camel-send-queue.h>
+#include <tny-camel-transport-account.h>
+
+static TnySendQueue *queue = NULL;
 
 typedef struct _TnyDemouiSummaryViewPriv TnyDemouiSummaryViewPriv;
 
@@ -503,6 +509,7 @@ static void
 on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			GtkTreeViewColumn *col,  gpointer userdata)
 {
+	TnyDemouiSummaryViewPriv *priv = userdata;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 		
@@ -547,6 +554,26 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				msg = tny_folder_get_msg (folder, header, NULL);
 				if (G_LIKELY (msg))
 				{
+
+/* DEBUG		
+					TnyAccountStore *astore = priv->account_store;
+					TnyList *accs = tny_simple_list_new ();
+					tny_account_store_get_accounts (astore, accs, TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS);
+					TnyIterator *iter = tny_list_create_iterator (accs);
+					TnyCamelTransportAccount *acc = (TnyCamelTransportAccount *) tny_iterator_get_current (iter);
+
+					g_print ("--> %s\n", tny_account_get_name (TNY_ACCOUNT (acc)));
+		
+					if (!queue)
+						queue = tny_camel_send_queue_new (acc);
+		
+					tny_send_queue_add (queue, msg);
+
+					g_object_unref (G_OBJECT (acc));
+					g_object_unref (G_OBJECT (iter));
+					g_object_unref (G_OBJECT (accs));
+*/
+
 					msgwin = tny_gtk_msg_window_new (
 						tny_platform_factory_new_msg_view (platfact));
 
@@ -555,6 +582,9 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				} else {
+
+
+
 					msgwin = tny_gtk_msg_window_new (
 						tny_platform_factory_new_msg_view (platfact));
 
@@ -776,7 +806,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
-		G_CALLBACK (on_header_view_tree_row_activated), priv->header_view);
+		G_CALLBACK (on_header_view_tree_row_activated), priv);
 
 	g_signal_connect(G_OBJECT (priv->header_view), "key-press-event", 
 		G_CALLBACK (on_header_view_key_press_event), self);

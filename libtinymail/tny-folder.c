@@ -356,7 +356,7 @@ tny_folder_get_all_count (TnyFolder *self)
  * Return value: the account of this folder
  *
  **/
-TnyStoreAccount*  
+TnyAccount*  
 tny_folder_get_account (TnyFolder *self)
 {
 #ifdef DEBUG

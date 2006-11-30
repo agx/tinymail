@@ -516,7 +516,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 			_tny_camel_folder_set_name (folder, iter->name);
 			_tny_camel_folder_set_iter (folder, iter);
 			priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-			_tny_camel_folder_set_account (folder, TNY_STORE_ACCOUNT (self));
+			_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
 
 			tny_list_prepend (list, G_OBJECT (folder));
 		}

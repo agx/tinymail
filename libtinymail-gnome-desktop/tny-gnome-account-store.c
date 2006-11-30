@@ -185,7 +185,11 @@ static gchar*
 per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
-	const gchar *accountid = tny_account_get_id (account);
+	const gchar *accountid;
+
+	gdk_threads_enter ();
+
+	accountid = tny_account_get_id (account);
 
 	if (G_UNLIKELY (!passwords))
 		passwords = g_hash_table_new (g_str_hash, g_str_equal);
@@ -225,6 +229,8 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 	} else {
 		*cancel = FALSE;
 	}
+
+	gdk_threads_leave ();
 
 	return retval;
 }
@@ -274,6 +280,8 @@ tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const g
 		break;
 	}
 
+	gdk_threads_enter ();
+
 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
                                   gtktype, GTK_BUTTONS_YES_NO, prompt);
 
@@ -281,6 +289,8 @@ tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const g
 		retval = TRUE;
 
 	gtk_widget_destroy (dialog);
+
+	gdk_threads_leave ();
 
 	return retval;
 }
