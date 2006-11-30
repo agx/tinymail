@@ -46,7 +46,7 @@
 
 <!ENTITY libtinymailui-gtk-TnyGtkAttachmentMimePartView SYSTEM "xml/tny-gtk-attachment-mime-part-view.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkEnums SYSTEM "xml/tny-gtk-enums.xml">
-<!ENTITY libtinymailui-gtk-TnyGtkAccountTreeModel SYSTEM "xml/tny-gtk-account-tree-model.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkFolderStoreTreeModel SYSTEM "xml/tny-gtk-folder-store-tree-model.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkAccountListModel SYSTEM "xml/tny-gtk-account-list-model.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkAttachListModel SYSTEM "xml/tny-gtk-attach-list-model.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkHeaderListModel SYSTEM "xml/tny-gtk-header-list-model.xml">
@@ -147,7 +147,7 @@
 		&libtinymailui-gtk-TnyGtkMsgView;
 		&libtinymailui-gtk-TnyGtkMsgWindow;
 		&libtinymailui-gtk-TnyGtkHeaderView;
-		&libtinymailui-gtk-TnyGtkAccountTreeModel;
+		&libtinymailui-gtk-TnyGtkFolderStoreTreeModel;
 		&libtinymailui-gtk-TnyGtkAccountListModel;
 		&libtinymailui-gtk-TnyGtkHeaderListModel;
 		&libtinymailui-gtk-TnyGtkAttachListModel;

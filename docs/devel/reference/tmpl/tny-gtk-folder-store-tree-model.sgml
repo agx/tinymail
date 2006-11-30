@@ -1,25 +1,26 @@
 <!-- ##### SECTION Title ##### -->
-TnyGtkAccountTreeModel
+TnyGtkFolderStoreTreeModel
 
 <!-- ##### SECTION Short_Description ##### -->
-A tree model for account instances that lets a tree view show folders recursively
+A tree model for folder store instances that lets a tree view show folders recursively
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-A #GtkTreeModel implementation for storing #TnyStoreAccount instances.
+A #GtkTreeModel implementation for storing #TnyFolderStore instances.
 </para>
 <para>
 The implementation inherits the #GtkTreeStore, implements #GtkTreeModel and #TnyList.
-It recursively walks the folders of account instances that get added. Using it as
-a model for a #GtkTreeView will display both the account name as parent row with the
-account's folders as the child rows and the folder's child folders as sub-child rows.
+It recursively walks the folders of folder store instances that get added. Using it as
+a model for a #GtkTreeView it will display both the account name as parent row, in case
+the folder store being added is of type #TnyAccount, with the account's folders as the 
+child rows and the folder's child folders as sub-child rows.
 </para>
 <para>
 It's very important to unreference the instance you will get when doing something like this:
 <programlisting>
 TnyFolder *folder;
 gtk_tree_model_get (model, &amp;iter,
-  TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
+  TNY_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
   &amp;folder, -1);
 /* use folder */
 g_object_unref (G_OBJECT(folder));
@@ -28,31 +29,31 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 indeed add a reference.
 </para>
 <para>
-Using the TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN you can know what type of instance you will 
-get when using the TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN. If its value isn't 
+Using the TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN you can know what type of instance you will 
+get when using the TNY_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN. If its value isn't 
 TNY_FOLDER_TYPE_ROOT, the instance type will be a #TnyFolder , if it is the instance type 
 will be a #TnyAccount. Read more about the available columns and folders-types at the 
-#TnyGtkAccountTreeModelColumn, the #TnyFolderType and the #TnyFolder types.
+#TnyGtkFolderStoreTreeModelColumn, the #TnyFolderType and the #TnyFolder types.
 </para>
 <para>
 Example:
 <programlisting>
 TnyFolderType type;
 gtk_tree_model_get (model, &amp;iter,
-  TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN,
+  TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
   &amp;type, -1);
 if (type != TNY_FOLDER_TYPE_ROOT)
 {
     TnyFolder *folder;
     gtk_tree_model_get (model, &amp;iter,
-      TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
+      TNY_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
       &amp;folder, -1);
     /* use folder */
     g_object_unref (G_OBJECT(folder));
 } else {
     TnyAccount *account;
     gtk_tree_model_get (model, &amp;iter,
-      TNY_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN,
+      TNY_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
       &amp;account, -1);
     /* use account */
     g_object_unref (G_OBJECT(account));
@@ -62,7 +63,7 @@ if (type != TNY_FOLDER_TYPE_ROOT)
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-#TnyList, #TnyStoreAccount, #GtkTreeView, #GtkTreeStore, #GtkTreeModel, #TnyGtkAccountTreeModelColumn
+#TnyList, #TnyStoreAccount, #TnyFolderStore, #GtkTreeView, #GtkTreeStore, #GtkTreeModel, #TnyGtkAccountTreeModelColumn
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

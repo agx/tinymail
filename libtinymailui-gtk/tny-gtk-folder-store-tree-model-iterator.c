@@ -19,17 +19,17 @@
 
 #include <config.h>
 
-#include <tny-gtk-account-tree-model.h>
+#include <tny-gtk-folder-store-tree-model.h>
 
 static GObjectClass *parent_class = NULL;
 
-#include "tny-gtk-account-tree-model-iterator-priv.h"
+#include "tny-gtk-folder-store-tree-model-iterator-priv.h"
 
-GType _tny_gtk_account_tree_model_iterator_get_type (void);
+GType _tny_gtk_folder_store_tree_model_iterator_get_type (void);
 
 
 void 
-_tny_gtk_account_tree_model_iterator_set_model (TnyGtkAccountTreeModelIterator *self, TnyGtkAccountTreeModel *model)
+_tny_gtk_folder_store_tree_model_iterator_set_model (TnyGtkFolderStoreTreeModelIterator *self, TnyGtkFolderStoreTreeModel *model)
 {
 	self->model = model;
 	self->current = model->first;
@@ -39,20 +39,20 @@ _tny_gtk_account_tree_model_iterator_set_model (TnyGtkAccountTreeModelIterator *
 
 
 
-TnyGtkAccountTreeModelIterator*
-_tny_gtk_account_tree_model_iterator_new (TnyGtkAccountTreeModel *model)
+TnyGtkFolderStoreTreeModelIterator*
+_tny_gtk_folder_store_tree_model_iterator_new (TnyGtkFolderStoreTreeModel *model)
 {
-	TnyGtkAccountTreeModelIterator *self = g_object_new (TNY_TYPE_GTK_ACCOUNT_TREE_MODEL_ITERATOR, NULL);
+	TnyGtkFolderStoreTreeModelIterator *self = g_object_new (TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL_ITERATOR, NULL);
 
-	_tny_gtk_account_tree_model_iterator_set_model (self, model);
+	_tny_gtk_folder_store_tree_model_iterator_set_model (self, model);
 
 	return self;
 }
 
 static void
-tny_gtk_account_tree_model_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
+tny_gtk_folder_store_tree_model_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyGtkAccountTreeModelIterator *self = (TnyGtkAccountTreeModelIterator *)instance;
+	TnyGtkFolderStoreTreeModelIterator *self = (TnyGtkFolderStoreTreeModelIterator *)instance;
 
 	self->model = NULL;
 	self->current = NULL;
@@ -61,7 +61,7 @@ tny_gtk_account_tree_model_iterator_instance_init (GTypeInstance *instance, gpoi
 }
 
 static void
-tny_gtk_account_tree_model_iterator_finalize (GObject *object)
+tny_gtk_folder_store_tree_model_iterator_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
 
@@ -70,9 +70,9 @@ tny_gtk_account_tree_model_iterator_finalize (GObject *object)
 
 
 static void
-tny_gtk_account_tree_model_iterator_next (TnyIterator *self)
+tny_gtk_folder_store_tree_model_iterator_next (TnyIterator *self)
 {
-	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
+	TnyGtkFolderStoreTreeModelIterator *me = (TnyGtkFolderStoreTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -87,9 +87,9 @@ tny_gtk_account_tree_model_iterator_next (TnyIterator *self)
 }
 
 static void 
-tny_gtk_account_tree_model_iterator_prev (TnyIterator *self)
+tny_gtk_folder_store_tree_model_iterator_prev (TnyIterator *self)
 {
-	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
+	TnyGtkFolderStoreTreeModelIterator *me = (TnyGtkFolderStoreTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -105,9 +105,9 @@ tny_gtk_account_tree_model_iterator_prev (TnyIterator *self)
 
 
 static gboolean 
-tny_gtk_account_tree_model_iterator_is_done (TnyIterator *self)
+tny_gtk_folder_store_tree_model_iterator_is_done (TnyIterator *self)
 {
-	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
+	TnyGtkFolderStoreTreeModelIterator *me = (TnyGtkFolderStoreTreeModelIterator*) self;
 	
 	if (G_UNLIKELY (!me || !me->model))
 		return TRUE;
@@ -118,9 +118,9 @@ tny_gtk_account_tree_model_iterator_is_done (TnyIterator *self)
 
 
 static void 
-tny_gtk_account_tree_model_iterator_first (TnyIterator *self)
+tny_gtk_folder_store_tree_model_iterator_first (TnyIterator *self)
 {
-	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
+	TnyGtkFolderStoreTreeModelIterator *me = (TnyGtkFolderStoreTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -138,9 +138,9 @@ tny_gtk_account_tree_model_iterator_first (TnyIterator *self)
 
 
 static void 
-tny_gtk_account_tree_model_iterator_nth (TnyIterator *self, guint nth)
+tny_gtk_folder_store_tree_model_iterator_nth (TnyIterator *self, guint nth)
 {
-	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
+	TnyGtkFolderStoreTreeModelIterator *me = (TnyGtkFolderStoreTreeModelIterator*) self;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
@@ -158,9 +158,9 @@ tny_gtk_account_tree_model_iterator_nth (TnyIterator *self, guint nth)
 
 
 static GObject* 
-tny_gtk_account_tree_model_iterator_get_current (TnyIterator *self)
+tny_gtk_folder_store_tree_model_iterator_get_current (TnyIterator *self)
 {
-	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
+	TnyGtkFolderStoreTreeModelIterator *me = (TnyGtkFolderStoreTreeModelIterator*) self;
 	gpointer ptr;
 
 	if (G_UNLIKELY (!me || !me->model))
@@ -180,9 +180,9 @@ tny_gtk_account_tree_model_iterator_get_current (TnyIterator *self)
 
 
 static TnyList* 
-tny_gtk_account_tree_model_iterator_get_list (TnyIterator *self)
+tny_gtk_folder_store_tree_model_iterator_get_list (TnyIterator *self)
 {
-	TnyGtkAccountTreeModelIterator *me = (TnyGtkAccountTreeModelIterator*) self;
+	TnyGtkFolderStoreTreeModelIterator *me = (TnyGtkFolderStoreTreeModelIterator*) self;
 
 	/* Return the list */
 
@@ -197,32 +197,32 @@ tny_gtk_account_tree_model_iterator_get_list (TnyIterator *self)
 static void
 tny_iterator_init (TnyIteratorIface *klass)
 {
-	klass->next_func = tny_gtk_account_tree_model_iterator_next;
-	klass->prev_func = tny_gtk_account_tree_model_iterator_prev;
-	klass->first_func = tny_gtk_account_tree_model_iterator_first;
-	klass->nth_func = tny_gtk_account_tree_model_iterator_nth;
-	klass->get_current_func = tny_gtk_account_tree_model_iterator_get_current;
-	klass->get_list_func = tny_gtk_account_tree_model_iterator_get_list;
-	klass->is_done  = tny_gtk_account_tree_model_iterator_is_done;
+	klass->next_func = tny_gtk_folder_store_tree_model_iterator_next;
+	klass->prev_func = tny_gtk_folder_store_tree_model_iterator_prev;
+	klass->first_func = tny_gtk_folder_store_tree_model_iterator_first;
+	klass->nth_func = tny_gtk_folder_store_tree_model_iterator_nth;
+	klass->get_current_func = tny_gtk_folder_store_tree_model_iterator_get_current;
+	klass->get_list_func = tny_gtk_folder_store_tree_model_iterator_get_list;
+	klass->is_done  = tny_gtk_folder_store_tree_model_iterator_is_done;
 	
 	return;
 }
 
 static void 
-tny_gtk_account_tree_model_iterator_class_init (TnyGtkAccountTreeModelIteratorClass *klass)
+tny_gtk_folder_store_tree_model_iterator_class_init (TnyGtkFolderStoreTreeModelIteratorClass *klass)
 {
 	GObjectClass *object_class;
 
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	object_class->finalize = tny_gtk_account_tree_model_iterator_finalize;
+	object_class->finalize = tny_gtk_folder_store_tree_model_iterator_finalize;
 
 	return;
 }
 
 GType 
-_tny_gtk_account_tree_model_iterator_get_type (void)
+_tny_gtk_folder_store_tree_model_iterator_get_type (void)
 {
 	static GType type = 0;
 
@@ -230,15 +230,15 @@ _tny_gtk_account_tree_model_iterator_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyGtkAccountTreeModelIteratorClass),
+		  sizeof (TnyGtkFolderStoreTreeModelIteratorClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_gtk_account_tree_model_iterator_class_init,   /* class_init */
+		  (GClassInitFunc) tny_gtk_folder_store_tree_model_iterator_class_init,   /* class_init */
 		  NULL,   /* class_finalize */
 		  NULL,   /* class_data */
-		  sizeof (TnyGtkAccountTreeModelIterator),
+		  sizeof (TnyGtkFolderStoreTreeModelIterator),
 		  0,      /* n_preallocs */
-		  tny_gtk_account_tree_model_iterator_instance_init,    /* instance_init */
+		  tny_gtk_folder_store_tree_model_iterator_instance_init,    /* instance_init */
 		  NULL
 		};
 
@@ -250,7 +250,7 @@ _tny_gtk_account_tree_model_iterator_get_type (void)
 		};
 
 		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyGtkAccountTreeModelIterator",
+			"TnyGtkFolderStoreTreeModelIterator",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_ITERATOR, 

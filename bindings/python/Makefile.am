@@ -138,7 +138,7 @@ tinymailui.defs: $(tinymailui_h_files) tinymailui.defs.extra $(top_srcdir)/bindi
 
 tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-list-model.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-tree-model.h \
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-folder-store-tree-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attach-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attachment-mime-part-view.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-list-model.h \

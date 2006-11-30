@@ -60,7 +60,7 @@
 #include <tny-gtk-msg-window.h>
 #include <tny-folder.h>
 #include <tny-gtk-account-list-model.h>
-#include <tny-gtk-account-tree-model.h>
+#include <tny-gtk-folder-store-tree-model.h>
 #include <tny-header.h>
 #include <tny-gtk-header-list-model.h>
 #include <tny-demoui-summary-view.h>
@@ -131,9 +131,9 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	/* TnyAccountTreeModel is also a TnyList (it simply implements both the
 	   TnyList and the GtkTreeModel interfaces) */
 #if PLATFORM==1
-	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (TRUE, NULL);
+	GtkTreeModel *mailbox_model = tny_gtk_folder_store_tree_model_new (TRUE, NULL);
 #else
-	GtkTreeModel *mailbox_model = tny_gtk_account_tree_model_new (FALSE, NULL);
+	GtkTreeModel *mailbox_model = tny_gtk_folder_store_tree_model_new (FALSE, NULL);
 #endif
 	g_object_unref (G_OBJECT (query));
 
@@ -165,7 +165,7 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	/* Here we use the TnyAccountTreeModel as a GtkTreeModel */
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
-				TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
 				GTK_SORT_ASCENDING);
 
 	/* Set the model of the mailbox_view */
@@ -460,7 +460,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		gint type;
 
 		gtk_tree_model_get (model, &iter, 
-			TNY_GTK_ACCOUNT_TREE_MODEL_TYPE_COLUMN, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
 			&type, -1);
 
 		if (type == TNY_FOLDER_TYPE_ROOT) 
@@ -476,7 +476,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		} else {
 
 			gtk_tree_model_get (model, &iter, 
-				TNY_GTK_ACCOUNT_TREE_MODEL_INSTANCE_COLUMN, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 				&folder, -1);
 
 			gtk_widget_show (GTK_WIDGET (priv->progress));
@@ -712,8 +712,8 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	/* mailbox_view columns */
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes (_("Folder"), renderer,
-			"text", TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_ACCOUNT_TREE_MODEL_NAME_COLUMN);
+			"text", TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN);
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
@@ -721,8 +721,8 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	{ /* Not really working yet */
 		renderer = gtk_cell_renderer_text_new ();
 		column = gtk_tree_view_column_new_with_attributes (_("Unread"), renderer,
-			"text", TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN, NULL);
-		gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_ACCOUNT_TREE_MODEL_UNREAD_COLUMN);
+			"text", TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, NULL);
+		gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN);
 
 		gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 	}

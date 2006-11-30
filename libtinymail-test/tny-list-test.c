@@ -23,7 +23,7 @@
 #include <tny-simple-list.h>
 #include <tny-gtk-account-list-model.h>
 #include <tny-gtk-attach-list-model.h>
-#include <tny-gtk-account-tree-model.h>
+#include <tny-gtk-folder-store-tree-model.h>
 #include <tny-gtk-folder-tree-model.h>
 #include <tny-gtk-header-list-model.h>
 
@@ -45,17 +45,16 @@ static gchar *str;
 static void
 tny_list_test_setup (void)
 {
-    
-    CamelInternetAddress *addr = camel_internet_address_new ();
+	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-  	ifaces[0] = tny_simple_list_new ();
-    	ifaces[1] = TNY_LIST (tny_gtk_account_list_model_new ());
+	ifaces[0] = tny_simple_list_new ();
+	ifaces[1] = TNY_LIST (tny_gtk_account_list_model_new ());
 	ifaces[2] = TNY_LIST (tny_gtk_attach_list_model_new ());
-	ifaces[3] = TNY_LIST (tny_gtk_account_tree_model_new (FALSE, NULL));
-	ifaces[4] = TNY_LIST (tny_gtk_account_tree_model_new (TRUE, NULL));
+	ifaces[3] = TNY_LIST (tny_gtk_folder_store_tree_model_new (FALSE, NULL));
+	ifaces[4] = TNY_LIST (tny_gtk_folder_store_tree_model_new (TRUE, NULL));
 	ifaces[5] = TNY_LIST (tny_gtk_header_list_model_new ());
-	
+
 	return;
 }
 
