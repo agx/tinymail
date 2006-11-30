@@ -1,5 +1,6 @@
 2006-11-30  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Bugfixes and Maildir implementations for TnyCamelSendQueue
 	* Renamed TnyGtkAccountTreeModel to TnyGtkFolderTreeModel and adapted
 	the type to accept any TnyFolderStore instance
 
