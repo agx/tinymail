@@ -340,7 +340,7 @@ tny_gtk_folder_store_tree_model_prepend_i (TnyList *self, GObject* item)
 
 /**
  * tny_gtk_folder_store_tree_model_append:
- * @self_i: A #TnyGtkFolderStoreTreeModel instance
+ * @self: A #TnyGtkFolderStoreTreeModel instance
  * @item: A #TnyFolderStore instance to add
  * @root_name: The node's root name 
  *
