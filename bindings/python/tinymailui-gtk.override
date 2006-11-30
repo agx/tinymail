@@ -12,7 +12,6 @@ headers
 #include <tny-gtk-account-tree-model.h>
 #include <tny-gtk-attach-list-model.h>
 #include <tny-gtk-attachment-mime-part-view.h>
-#include <tny-gtk-folder-tree-model.h>
 #include <tny-gtk-header-list-model.h>
 #include <tny-gtk-header-view.h>
 #include <tny-gtk-mime-part-save-strategy.h>

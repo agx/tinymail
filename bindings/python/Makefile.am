@@ -141,7 +141,6 @@ tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-tree-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attach-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attachment-mime-part-view.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-folder-tree-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-view.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-mime-part-save-strategy.h \
