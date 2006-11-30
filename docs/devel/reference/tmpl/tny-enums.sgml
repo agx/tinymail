@@ -31,7 +31,7 @@ Enumerations for tinymail
 
 </para>
 
-@TNY_FOLDER_ERROR_EXPUNGE: An error that occured while expunging a folder 
+@TNY_FOLDER_ERROR_EXPUNGE: An error that occured while expunging a folder
 @TNY_FOLDER_ERROR_REMOVE_MSG: An error that occured while removing a message
 @TNY_FOLDER_ERROR_ADD_MSG: An error that occured while adding a message
 @TNY_FOLDER_ERROR_REFRESH: An error that occured while refreshing a folder

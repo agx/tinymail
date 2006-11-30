@@ -69,20 +69,20 @@ if (type != TNY_FOLDER_TYPE_ROOT)
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_GTK_ACCOUNT_TREE_MODEL_COLUMN ##### -->
+<!-- ##### MACRO TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL_COLUMN ##### -->
 <para>
 
 </para>
 
 
 
-<!-- ##### STRUCT TnyGtkAccountTreeModel ##### -->
+<!-- ##### STRUCT TnyGtkFolderStoreTreeModel ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### FUNCTION tny_gtk_account_tree_model_column_get_type ##### -->
+<!-- ##### FUNCTION tny_gtk_folder_store_tree_model_column_get_type ##### -->
 <para>
 
 </para>
@@ -90,7 +90,7 @@ if (type != TNY_FOLDER_TYPE_ROOT)
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_gtk_account_tree_model_new ##### -->
+<!-- ##### FUNCTION tny_gtk_folder_store_tree_model_new ##### -->
 <para>
 
 </para>
