@@ -128,7 +128,7 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	tny_folder_store_query_add_item (query, NULL, 
 					 TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED);
 
-	/* TnyAccountTreeModel is also a TnyList (it simply implements both the
+	/* TnyGtkFolderStoreTreeModel is also a TnyList (it simply implements both the
 	   TnyList and the GtkTreeModel interfaces) */
 #if PLATFORM==1
 	GtkTreeModel *mailbox_model = tny_gtk_folder_store_tree_model_new (TRUE, NULL);
@@ -154,7 +154,7 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 		priv->current_accounts = NULL;
 	}
 
-	/* This method uses the TnyAccountTreeModel as a TnyList */
+	/* This method uses the TnyFolderStoreTreeModel as a TnyList */
 	tny_account_store_get_accounts (account_store, accounts,
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
@@ -162,7 +162,7 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 	gtk_combo_box_set_model (priv->account_view, maccounts);
 
-	/* Here we use the TnyAccountTreeModel as a GtkTreeModel */
+	/* Here we use the TnyFolderStoreTreeModel as a GtkTreeModel */
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sortable),
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 

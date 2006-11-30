@@ -64,7 +64,7 @@
 
 	* Fixed a bug when subscribing new folders
 	* Added the signal "subscription_changed" to TnyStoreAccount
-	* Added a query to TnyGtkAccountTreeModel
+	* Added a query to TnyGtkFolderStoreTreeModel
 	* tinymail/tny-demoui-summary-view.c: now asks only for the
 	subscribed folders
 
@@ -372,12 +372,12 @@
 	* Bug fixes in TnySessionCamel
 	* Introduction of TnyGtkFolderTreeModel (however, it's atm unfinished)
 	* Introduction of TnyGtkAccountListModel which could be useful for for
-	example the GtkComboBox view component, the TnyGtkAccountTreeModel
+	example the GtkComboBox view component, the TnyGtkFolderStoreTreeModel
 	doesn't change in functionality. It's also likely that a
 	TnyGtkFolderStoreTreeModel will also be implemented at some point. The
 	TnyGtkAccountListModel in combination with such a
 	TnyGtkFolderStoreTreeModel used on a GtkComboBox and a GtkTreeView would
-	mimic the behaviour of the TnyGtkAccountTreeModel on a GtkTreeView by
+	mimic the behaviour of the TnyGtkFolderStoreTreeModel on a GtkTreeView by
 	separating the two views (for example a combo box with accounts and a
 	treeview with folders in the current account, rather than only support
 	for a treeview with both accounts and folders)
@@ -456,7 +456,7 @@
 	* Renamed TnySaveStrategy to TnyGtkSaveStrategy
 	* Renamed TnyTextBufferStream to TnyGtkTextBufferStream
 	* Bugfix in TnyMozEmbedMsgView and TnyGtkMsgView
-	* Renamed TnyAccountTreeModel to TnyGtkAccountTreeModel
+	* Renamed TnyAccountTreeModel to TnyGtkFolderStoreTreeModel
 	* Renamed TnyHeaderListModel to TnyGtkHeaderListModel
 	* Renamed TnyAttachListModel to TnyGtkAttachListModel
 	* Fixed several reference counting problems
