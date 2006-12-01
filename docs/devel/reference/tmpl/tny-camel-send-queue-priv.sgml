@@ -22,9 +22,11 @@ tny-camel-send-queue-priv
 
 </para>
 
-@todo_lock: 
 @trans_account: 
+@sentbox_cache: 
+@outbox_cache: 
 @total: 
 @thread: 
-@path: 
+@todo_lock: 
+@creating_spin: 
 

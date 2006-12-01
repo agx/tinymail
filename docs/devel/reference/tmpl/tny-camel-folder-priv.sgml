@@ -30,6 +30,7 @@ tny-folder-priv
 @folder: 
 @folder_name: 
 @account: 
+@store: 
 @cached_length: 
 @unread_length: 
 @subscribed: 

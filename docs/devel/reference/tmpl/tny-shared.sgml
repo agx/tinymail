@@ -440,6 +440,16 @@ Shared include file with forward typedefs
 </para>
 
 
+<!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
 
