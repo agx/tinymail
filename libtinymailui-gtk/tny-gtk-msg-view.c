@@ -547,8 +547,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			{
 				const gchar *label = tny_mime_part_get_description (part);
 				GtkWidget *expander;
-				
-				printf ("for %s\n", tny_mime_part_get_content_type (part));
+
 				if (label == NULL || strlen (label) <= 0)
 					label = _("Email message attachment");
 				expander = gtk_expander_new (label);
