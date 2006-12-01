@@ -60,7 +60,7 @@ typedef struct _TnyGtkMsgViewPriv TnyGtkMsgViewPriv;
 
 struct _TnyGtkMsgViewPriv
 {
-	TnyMimePart *part, *root_part;
+	TnyMimePart *part;
 	TnyHeaderView *headerview;
 	GtkIconView *attachview;
 	GtkWidget *attachview_sw;
@@ -78,7 +78,7 @@ struct _TnyGtkMsgViewPriv
 typedef struct
 {
 	gulong signal;
-	TnyMimePart *part, *root_part;
+	TnyMimePart *part;
 } RealizePriv;
 
 #define TNY_GTK_MSG_VIEW_GET_PRIVATE(o)	\
@@ -87,6 +87,7 @@ typedef struct
 
 static void tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts);
 static void remove_mime_part_viewer (TnyMimePartView *mpview, GtkContainer *mpviewers);
+static void tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part);
 
 /**
  * tny_gtk_msg_view_get_display_one_body:
@@ -433,35 +434,40 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
  * tny_gtk_msg_view_display_parts.
  **/
 static void
-tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part, TnyMimePart *root_part)
+tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part)
 {
 		if (tny_mime_part_content_type_is (part, "message/rfc822") && TNY_IS_GTK_MSG_VIEW (mpview))
 		{
-			TnyList *list = tny_simple_list_new ();
-			if (TNY_IS_MSG (part) && TNY_IS_GTK_MSG_VIEW (mpview))
-			{
-				TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
-				TnyHeader *header = TNY_HEADER (tny_msg_get_header (TNY_MSG (part)));
-				if (header && TNY_IS_HEADER (header))
-				{
-					tny_header_view_set_header (mppriv->headerview, header);
-					g_object_unref (G_OBJECT (header));
-					gtk_widget_show (GTK_WIDGET (mppriv->headerview));
-				}
-			}
+			TnyMimePart *content_part = tny_mime_part_get_content_object (part);
 
-			tny_mime_part_get_parts (part, list);
-			tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list);
-			g_object_unref (G_OBJECT (list));
-		} else if (tny_mime_part_content_type_is (part, "multipart/*") && TNY_IS_GTK_MSG_VIEW (mpview))
-		{
-			if (part != root_part)
+			if (!content_part)
 			{
 				TnyList *list = tny_simple_list_new ();
+
+				if (TNY_IS_MSG (part) && TNY_IS_GTK_MSG_VIEW (mpview))
+				{
+					TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
+					TnyHeader *header = TNY_HEADER (tny_msg_get_header (TNY_MSG (part)));
+					if (header && TNY_IS_HEADER (header))
+					{
+						tny_header_view_set_header (mppriv->headerview, header);
+						g_object_unref (G_OBJECT (header));
+						gtk_widget_show (GTK_WIDGET (mppriv->headerview));
+					}
+				}
+
 				tny_mime_part_get_parts (part, list);
 				tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list);
 				g_object_unref (G_OBJECT (list));
+			} else {
+				tny_mime_part_view_set_part (mpview, content_part);
 			}
+		} else if (tny_mime_part_content_type_is (part, "multipart/*") && TNY_IS_GTK_MSG_VIEW (mpview))
+		{
+			TnyList *list = tny_simple_list_new ();
+			tny_mime_part_get_parts (part, list);
+			tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list);
+			g_object_unref (G_OBJECT (list));
 
 		} else
 			tny_mime_part_view_set_part (mpview, part);
@@ -472,12 +478,9 @@ on_mpview_realize (GtkWidget *widget, gpointer user_data)
 {
 	RealizePriv *prv = user_data;
 
-	tny_mime_part_view_proxy_func_set_part (TNY_MIME_PART_VIEW (widget), prv->part, prv->root_part);
+	tny_mime_part_view_proxy_func_set_part (TNY_MIME_PART_VIEW (widget), prv->part);
 	g_signal_handler_disconnect (widget, prv->signal);
 	g_object_unref (prv->part);
-	if (prv->root_part)
-		g_object_unref (G_OBJECT (prv->root_part));
-
 	g_slice_free (RealizePriv, prv);
 }
 
@@ -531,7 +534,6 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 		}
 	}
 
-
 	if (!mpview)
 		mpview = tny_msg_view_create_mime_part_view_for (TNY_MSG_VIEW (self), part);
 
@@ -543,7 +545,13 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 
 			if (TNY_IS_GTK_MSG_VIEW (mpview) && !GTK_IS_WINDOW (mpview))
 			{
-				GtkWidget *expander = gtk_expander_new (_("Email message attachment"));
+				const gchar *label = tny_mime_part_get_description (part);
+				GtkWidget *expander;
+				
+				printf ("for %s\n", tny_mime_part_get_content_type (part));
+				if (label == NULL || strlen (label) <= 0)
+					label = _("Email message attachment");
+				expander = gtk_expander_new (label);
 				gtk_expander_set_expanded (GTK_EXPANDER (expander), FALSE);
 				gtk_expander_set_spacing (GTK_EXPANDER (expander), 7);
 				gtk_container_add (GTK_CONTAINER (expander), GTK_WIDGET (mpview));
@@ -563,18 +571,17 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			{
 				RealizePriv *prv = g_slice_new (RealizePriv);
 				prv->part = g_object_ref (part);
-				prv->root_part = priv->part?g_object_ref (G_OBJECT (priv->part)):NULL;
 				prv->signal = g_signal_connect (G_OBJECT (mpview),
 					"realize", G_CALLBACK (on_mpview_realize), prv);
 			} else
-				tny_mime_part_view_proxy_func_set_part (mpview, part, priv->part);
+				tny_mime_part_view_proxy_func_set_part (mpview, part);
 
 		} else if (TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
-			tny_mime_part_view_proxy_func_set_part (mpview, part, priv->part);
+			tny_mime_part_view_proxy_func_set_part (mpview, part);
 		else if (!TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
 		{
 			priv->unattached_views = g_list_prepend (priv->unattached_views, mpview);
-			tny_mime_part_view_proxy_func_set_part (mpview, part, priv->root_part);
+			tny_mime_part_view_proxy_func_set_part (mpview, part);
 		}
 	} else if (!tny_mime_part_content_type_is (part, "multipart/*") &&
 		!tny_mime_part_content_type_is (part, "message/rfc822"))
@@ -582,6 +589,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 		g_warning (_("I don't have a mime part viewer for %s\n"),
 			tny_mime_part_get_content_type (part));
 	}
+
 }
 
 
@@ -701,9 +709,6 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 
 	if (part)
 	{
-		TnyIterator *iterator;
-		TnyList *list;
-
 		g_assert (TNY_IS_MIME_PART (part));
 
 		if (TNY_IS_MSG (part))
@@ -717,13 +722,21 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 			}
 		}
 
-		list = tny_simple_list_new ();
 		priv->part = g_object_ref (G_OBJECT (part));
 
-		tny_gtk_msg_view_display_part (TNY_MSG_VIEW (self), part);
-		tny_mime_part_get_parts (part, list);
-		tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (self), list);
-		g_object_unref (G_OBJECT (list));
+		if (!tny_mime_part_content_type_is (part, "multipart/*"))
+			tny_gtk_msg_view_display_part (TNY_MSG_VIEW (self), part);
+		else 
+		{
+			TnyIterator *iterator;
+			TnyList *list;
+			list = tny_simple_list_new ();
+
+			tny_mime_part_get_parts (part, list);
+			tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (self), list);
+		
+			g_object_unref (G_OBJECT (list));
+		}
 	}
 
 	return;
@@ -784,7 +797,6 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->first_attachment = TRUE;
 	priv->unattached_views = NULL;
 	priv->part = NULL;
-	priv->root_part = NULL;
 
 	priv->headerview = tny_gtk_header_view_new ();
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);

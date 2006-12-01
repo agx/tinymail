@@ -95,6 +95,12 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 	return go;
 }
 
+static void 
+_tny_camel_mime_part_set_content_object (TnyCamelMimePart *self, TnyMimePart *part)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	priv->content_object = part;
+}
 
 /** 
  * received_a_part
@@ -115,18 +121,20 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	type = camel_mime_part_get_content_type (part);
 	if (camel_content_type_is (type, "message", "rfc822"))
 	{
-		CamelMimePart *mypart;
-
+		CamelMimePart *mypart = part;
 		CamelDataWrapper *rfc822cont = camel_medium_get_content_object (CAMEL_MEDIUM (part));
-
-		if (rfc822cont)
-			mypart = CAMEL_MIME_PART (rfc822cont);
-		else
-			mypart = part;
-
 		TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
 		tpart = TNY_MIME_PART (tny_camel_msg_new ());
 		_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (tpart), mypart);
+
+		if (rfc822cont)
+		{
+			TnyMimePart *prt = TNY_MIME_PART (tny_camel_msg_new ());
+			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (prt), CAMEL_MIME_PART (rfc822cont));
+			_tny_camel_mime_part_set_content_object (TNY_CAMEL_MIME_PART (tpart), prt);
+		} else 
+			_tny_camel_mime_part_set_content_object (TNY_CAMEL_MIME_PART (tpart), NULL);
+
 		if (CAMEL_IS_MIME_MESSAGE (mypart))
 			_tny_camel_header_set_camel_mime_message (nheader, mypart);
 		_tny_camel_msg_set_header (TNY_CAMEL_MSG (tpart), nheader);
@@ -783,6 +791,22 @@ tny_camel_mime_part_set_filename_default (TnyMimePart *self, const gchar *filena
 	return;
 }
 
+static TnyMimePart* 
+tny_camel_mime_part_get_content_object (TnyMimePart *self)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_content_object_func (self);
+}
+
+static TnyMimePart* 
+tny_camel_mime_part_get_content_object_default (TnyMimePart *self)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	TnyMimePart *retval = NULL;
+	if (priv->content_object)
+		retval = TNY_MIME_PART (g_object_ref (G_OBJECT (priv->content_object)));
+	return retval;
+}
+
 static void 
 tny_camel_mime_part_set_content_type (TnyMimePart *self, const gchar *content_type)
 {
@@ -821,6 +845,9 @@ tny_camel_mime_part_finalize (GObject *object)
 
 	if (G_LIKELY (priv->part) && CAMEL_IS_OBJECT (priv->part))
 		camel_object_unref (CAMEL_OBJECT (priv->part));
+
+	if (priv->content_object)
+		g_object_unref (G_OBJECT (priv->content_object));
 
 	g_mutex_unlock (priv->part_lock);
 
@@ -876,6 +903,7 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->get_parts_func = tny_camel_mime_part_get_parts;
 	klass->add_part_func = tny_camel_mime_part_add_part;
 	klass->del_part_func = tny_camel_mime_part_del_part;
+	klass->get_content_object_func = tny_camel_mime_part_get_content_object;
 
 	return;
 }
@@ -908,6 +936,7 @@ tny_camel_mime_part_class_init (TnyCamelMimePartClass *class)
 	class->get_parts_func = tny_camel_mime_part_get_parts_default;
 	class->add_part_func = tny_camel_mime_part_add_part_default;
 	class->del_part_func = tny_camel_mime_part_del_part_default;
+	class->get_content_object_func = tny_camel_mime_part_get_content_object_default;
 
 	object_class->finalize = tny_camel_mime_part_finalize;
 
@@ -922,6 +951,7 @@ tny_camel_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelMimePart *self = (TnyCamelMimePart*)instance;
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
+	priv->content_object = NULL;
 	priv->part_lock = g_mutex_new ();
 
 	return;
