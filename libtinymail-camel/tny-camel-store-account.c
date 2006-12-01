@@ -164,11 +164,11 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 	return;
 }
 
-/**
- * This utility function performs folder subscriptions/unsubscriptions
+/* This utility function performs folder subscriptions/unsubscriptions
  * since the code for both operations is almost the same. If the
  * subscribe parameter is TRUE, then we're asking for a folder
  * subscription, else for a folder unsubscription */
+
 static void
 set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 {
