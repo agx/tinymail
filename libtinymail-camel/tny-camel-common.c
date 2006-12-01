@@ -29,7 +29,7 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 {
 	gboolean retval = FALSE;
 
-	if (query)
+	if (query && (tny_list_get_length (tny_folder_store_query_get_items (query)) > 0))
 	{
 		TnyList *items = tny_folder_store_query_get_items (query);
 		TnyIterator *iterator;
