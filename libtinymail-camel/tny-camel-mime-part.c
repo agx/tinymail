@@ -123,22 +123,22 @@ received_a_part (CamelMimeMessage *message, CamelMimePart *part, void *data)
 	{
 		CamelMimePart *mypart = part;
 		CamelDataWrapper *rfc822cont = camel_medium_get_content_object (CAMEL_MEDIUM (part));
-		TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
-		tpart = TNY_MIME_PART (tny_camel_msg_new ());
-		_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (tpart), mypart);
+		tpart = TNY_MIME_PART (tny_camel_mime_part_new (mypart));
 
 		if (rfc822cont)
 		{
 			TnyMimePart *prt = TNY_MIME_PART (tny_camel_msg_new ());
+			TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
+
+			if (CAMEL_IS_MIME_MESSAGE (rfc822cont))
+				_tny_camel_header_set_camel_mime_message (nheader, rfc822cont);
+			_tny_camel_msg_set_header (TNY_CAMEL_MSG (prt), nheader);
 			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (prt), CAMEL_MIME_PART (rfc822cont));
 			_tny_camel_mime_part_set_content_object (TNY_CAMEL_MIME_PART (tpart), prt);
+			g_object_unref (G_OBJECT (nheader));
+
 		} else 
 			_tny_camel_mime_part_set_content_object (TNY_CAMEL_MIME_PART (tpart), NULL);
-
-		if (CAMEL_IS_MIME_MESSAGE (mypart))
-			_tny_camel_header_set_camel_mime_message (nheader, mypart);
-		_tny_camel_msg_set_header (TNY_CAMEL_MSG (tpart), nheader);
-		g_object_unref (G_OBJECT (nheader));
 
 	} else
 		tpart = tny_camel_mime_part_new (part);

@@ -447,7 +447,7 @@ tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *pa
 				if (TNY_IS_MSG (part) && TNY_IS_GTK_MSG_VIEW (mpview))
 				{
 					TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
-					TnyHeader *header = TNY_HEADER (tny_msg_get_header (TNY_MSG (part)));
+					TnyHeader *header = (TnyHeader *) tny_msg_get_header (TNY_MSG (part));
 					if (header && TNY_IS_HEADER (header))
 					{
 						tny_header_view_set_header (mppriv->headerview, header);
@@ -712,7 +712,7 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 
 		if (TNY_IS_MSG (part))
 		{
-			TnyHeader *header = TNY_HEADER (tny_msg_get_header (TNY_MSG (part)));
+			TnyHeader *header = (TnyHeader*) tny_msg_get_header (TNY_MSG (part));
 			if (header && TNY_IS_HEADER (header))
 			{
 				tny_header_view_set_header (priv->headerview, header);
