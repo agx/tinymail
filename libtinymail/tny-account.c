@@ -213,10 +213,14 @@ tny_account_get_forget_pass_func (TnyAccount *self)
  * @self: a #TnyAccount object
  * @url_string: the url string (ex. mbox://path)
  *  
- * Set the url string of @self. You don't need to use this for imap and pop
+ * Set the url string of @self (RFC 1808). You don't need to use this for imap and pop
  * where you can use the simplified API (set_proto, set_hostname, etc). This
  * property is typically set in the implementation of a #TnyAccountStore.
  * 
+ * For example the url_string for an SMTP account that uses SSL with authentication
+ * type PLAIN: smtp://user;auth=PLAIN@smtp.server.com/;use_ssl=always
+ * 
+ * Don't forget to set the name, type and proto setting of the account too.
  **/
 void
 tny_account_set_url_string (TnyAccount *self, const gchar *url_string)

@@ -436,8 +436,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 
 			/* Because we only check for the n first bytes, the pops, imaps and smtps also work */
 			if (!g_ascii_strncasecmp (proto, "pop", 3) ||
-				!g_ascii_strncasecmp (proto, "imap", 4)||
-				!g_ascii_strncasecmp (proto, "smtp", 4))
+				!g_ascii_strncasecmp (proto, "imap", 4))
 			{
 				gchar *user, *hostname;
 
