@@ -72,7 +72,7 @@ struct _TnyGtkMsgViewPriv
 	gboolean display_rfc822;
 	gboolean first_attachment;
 	TnyMimePartView *text_body_viewer;
-	GtkBox *kid;
+	GtkBox *kid; gboolean in_expander;
 };
 
 typedef struct
@@ -444,7 +444,7 @@ tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *pa
 			{
 				TnyList *list = tny_simple_list_new ();
 
-				if (TNY_IS_MSG (part) && TNY_IS_GTK_MSG_VIEW (mpview))
+				/* if (TNY_IS_MSG (part) && TNY_IS_GTK_MSG_VIEW (mpview))
 				{
 					TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
 					TnyHeader *header = (TnyHeader *) tny_msg_get_header (TNY_MSG (part));
@@ -454,7 +454,7 @@ tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *pa
 						g_object_unref (G_OBJECT (header));
 						gtk_widget_show (GTK_WIDGET (mppriv->headerview));
 					}
-				}
+				} */
 
 				tny_mime_part_get_parts (part, list);
 				tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list);
@@ -543,11 +543,13 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 		{
 			GtkWidget *expander = NULL;
 
-			if (TNY_IS_GTK_MSG_VIEW (mpview) && !GTK_IS_WINDOW (mpview))
+			if (TNY_IS_GTK_MSG_VIEW (mpview) && !GTK_IS_WINDOW (mpview) && !priv->in_expander)
 			{
+				TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
 				const gchar *label = tny_mime_part_get_description (part);
 				GtkWidget *expander;
 
+				mppriv->in_expander = TRUE;
 				if (label == NULL || strlen (label) <= 0)
 					label = _("Email message attachment");
 				expander = gtk_expander_new (label);
@@ -785,6 +787,8 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->kid = GTK_BOX (gtk_vbox_new (FALSE, 0));
 	vbox = priv->kid;
+
+	priv->in_expander = FALSE;
 
 	/* Defaults */
 	priv->display_html = FALSE;
