@@ -70,13 +70,11 @@ void tny_gtk_msg_view_set_display_html (TnyGtkMsgView *self, gboolean setting);
 void tny_gtk_msg_view_set_display_rfc822 (TnyGtkMsgView *self, gboolean setting);
 void tny_gtk_msg_view_set_display_attachments (TnyGtkMsgView *self, gboolean setting);
 void tny_gtk_msg_view_set_display_plain (TnyGtkMsgView *self, gboolean setting);
-void tny_gtk_msg_view_set_display_one_body (TnyGtkMsgView *self, gboolean setting);
 
 gboolean tny_gtk_msg_view_get_display_html (TnyGtkMsgView *self);
 gboolean tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self);
 gboolean tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self);
 gboolean tny_gtk_msg_view_get_display_plain (TnyGtkMsgView *self);
-gboolean tny_gtk_msg_view_get_display_one_body (TnyGtkMsgView *self);
 
 G_END_DECLS
 

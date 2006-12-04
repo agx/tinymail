@@ -255,17 +255,17 @@ dnl ### gtk-doc
 GTK_DOC_CHECK([1.0])
 
 dnl ### libtinymail, the abstraction library ##
-PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.6 gobject-2.0)
+PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_LIBS)
 
 dnl ### libtinymailui, the ui abstraction library ##
-PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.6 gobject-2.0)
+PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAILUI_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_LIBS)
 
 dnl ### libtinymail-camel, a camel implementation of libtinymail ##
-PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.6 gobject-2.0)
+PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_CAMEL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_CAMEL_LIBS)
 
@@ -273,7 +273,7 @@ dnl ### libtinymail-gnomevfs, a tnystreamiface for gnome-vfs ##
 if test x$build_gnome = xtrue; then
 extragtkpkgs="libgnomeui-2.0 gnome-keyring-1"
 extratnypkgs="gnome-vfs-2.0"
-  PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.6 gobject-2.0 gnome-vfs-2.0)
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
 else
   LIBTINYMAIL_GNOMEVFS_CFLAGS=
   LIBTINYMAIL_GNOMEVFS_LIBS=
@@ -284,7 +284,7 @@ AC_SUBST(LIBTINYMAIL_GNOMEVFS_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_LIBS)
 
 dnl ### libtinymailui-gtk, a gtk+ implementation of libtinymail-ui ##
-PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.6 gobject-2.0 $extragtkpkgs gtk+-2.0)
+PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 $extragtkpkgs gtk+-2.0)
 AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
@@ -293,7 +293,7 @@ if test x$build_mozembed = xtrue; then
   AC_TNY_MOZ_CHECK
   extraplatpkgs="$mozilla_nspr $mozilla_nss $mozilla_xpcom $mozilla_gtkmozembed"
   extratnypkgs="$extratnypkgs $extraplatpkgs"
-  PKG_CHECK_MODULES(LIBTINYMAILUI_MOZEMBED, $extraplatpkgs glib-2.0 >= 2.6 gobject-2.0 gtk+-2.0 $extragtkpkgs)
+  PKG_CHECK_MODULES(LIBTINYMAILUI_MOZEMBED, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
 else
   LIBTINYMAILUI_MOZEMBED_CFLAGS=
   LIBTINYMAILUI_MOZEMBED_LIBS=
@@ -301,7 +301,7 @@ fi
 
 dnl ### libtinymail-gnome-desktop, a GNOME platform library implementation ##
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, gconf-2.0 $extraplatpkgs libnm_glib glib-2.0 >= 2.6 gobject-2.0 gtk+-2.0 $extragtkpkgs)
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, gconf-2.0 $extraplatpkgs libnm_glib glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
 else
   LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
   LIBTINYMAIL_GNOME_DESKTOP_LIBS=
@@ -347,7 +347,7 @@ AC_SUBST(extragtkpkgs)
 
 dnl ### libtinymail-test, a library for testing purposes ##
 if test x$build_unittests = xtrue; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.6 gobject-2.0 $extratnypkgs)
+  PKG_CHECK_MODULES(LIBTINYMAIL_TEST, gunit gtk+-2.0 glib-2.0 >= 2.8 gobject-2.0 $extratnypkgs)
 else
   LIBTINYMAIL_TEST_CFLAGS=
   LIBTINYMAIL_TEST_LIBS=
@@ -357,7 +357,7 @@ AC_SUBST(LIBTINYMAIL_TEST_LIBS)
 
 dnl ### libtinymail-api-test, a library for testing API/ABI compatibility ##
 if test x$build_apitests = xtrue; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_API_TEST, gunit glib-2.0 >= 2.6 gobject-2.0 libtinymail-$API_VERSION libtinymail-camel-$API_VERSION libtinymailui-gtk-$API_VERSION camel-lite-1.2)
+  PKG_CHECK_MODULES(LIBTINYMAIL_API_TEST, gunit glib-2.0 >= 2.8 gobject-2.0 libtinymail-$API_VERSION libtinymail-camel-$API_VERSION libtinymailui-gtk-$API_VERSION camel-lite-1.2)
 else
   LIBTINYMAIL_API_TEST_CFLAGS=
   LIBTINYMAIL_API_TEST_LIBS=
@@ -366,7 +366,7 @@ AC_SUBST(LIBTINYMAIL_API_TEST_CFLAGS)
 AC_SUBST(LIBTINYMAIL_API_TEST_LIBS)
 
 dnl ### tinymail, the demo-ui ##
-PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.6 gobject-2.0 gtk+-2.0 $extratnypkgs)
+PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extratnypkgs)
 AC_SUBST(TINYMAIL_CFLAGS)
 AC_SUBST(TINYMAIL_LIBS)
 
