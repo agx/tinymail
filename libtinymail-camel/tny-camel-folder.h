@@ -56,6 +56,7 @@ struct _TnyCamelFolderClass
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
 	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*get_msg_async_func) (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data);
 	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
 	const gchar* (*get_name_func) (TnyFolder *self);
 	const gchar* (*get_id_func) (TnyFolder *self);

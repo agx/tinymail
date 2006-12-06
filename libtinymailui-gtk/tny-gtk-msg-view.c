@@ -396,7 +396,7 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 static void
 tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part)
 {
-		if (tny_mime_part_content_type_is (part, "message/rfc822") && TNY_IS_GTK_MSG_VIEW (mpview))
+		if (tny_mime_part_content_type_is (part, "message/*") && TNY_IS_GTK_MSG_VIEW (mpview))
 		{
 			TnyMimePart *content_part = tny_mime_part_get_content_object (part);
 
@@ -510,7 +510,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			tny_mime_part_view_proxy_func_set_part (mpview, part);
 		}
 	} else if (!tny_mime_part_content_type_is (part, "multipart/*") &&
-		!tny_mime_part_content_type_is (part, "message/rfc822"))
+		!tny_mime_part_content_type_is (part, "message/*"))
 	{
 		g_warning (_("I don't have a mime part viewer for %s\n"),
 			tny_mime_part_get_content_type (part));

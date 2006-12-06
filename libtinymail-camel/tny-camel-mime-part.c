@@ -63,22 +63,23 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 	int parts, i;
 	int go = TRUE;
 
-	if (!firstpart && callback (msg, part, data) == FALSE)
-			return FALSE; 
+/*		if (!firstpart && callback (msg, part, data) == FALSE)
+			return FALSE;  */
 
 	containee = camel_medium_get_content_object (CAMEL_MEDIUM (part));
-
+	
 	if (G_UNLIKELY (containee == NULL))
 		return go;
+
 
 	if (G_LIKELY (CAMEL_IS_MULTIPART (containee)))
 	{
 		parts = camel_multipart_get_number (CAMEL_MULTIPART (containee));
 		for (i = 0; go && i < parts; i++) 
 		{
-			CamelMimePart *part = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
-			if (part)
-				callback (msg, part, data); 
+			CamelMimePart *tpart = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
+			if (tpart)
+				callback (msg, tpart, data); 
 
 			/* if (part)
 				go = message_foreach_part_rec (msg, part, callback, data, FALSE); */
@@ -87,7 +88,7 @@ message_foreach_part_rec (CamelMimeMessage *msg, CamelMimePart *part, CamelPartF
 		}
 		
 	} else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
-		callback (msg, part, data);
+		callback (msg, (CamelMimePart*) containee, data);
 
 	/* else if (G_LIKELY (CAMEL_IS_MIME_MESSAGE (containee)))
 		go = message_foreach_part_rec (msg, (CamelMimePart *)containee, callback, data, FALSE); */

@@ -92,6 +92,55 @@ _wrap_tny_folder_store_get_folders_async (PyGObject *self, PyObject *args, PyObj
     return Py_None;
 }
 %%
+override tny_folder_get_msg_async kwargs
+
+static void
+tny_get_msg_cb (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+{
+    PyObject *callback, *args, *ret;
+    PyGILState_STATE state;
+
+    state = pyg_gil_state_ensure();
+    callback = PyTuple_GetItem((PyObject *)user_data, 1);
+    args = Py_BuildValue("(NO)",
+                         pygobject_new((GObject *)self),
+                         PyTuple_GetItem((PyObject *)user_data, 2));
+    ret = PyObject_CallObject(callback, args);
+    if (!ret)
+        PyErr_Print();
+
+    pyg_error_check(err);
+    Py_XDECREF(ret);
+    Py_DECREF(args);
+    Py_DECREF ((PyObject *)user_data);
+    pyg_gil_state_release(state);
+}
+
+static PyObject *
+_wrap_tny_folder_get_msg_async (PyGObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = { "header", "get_msg_func", "user_data", NULL };
+    PyObject *get_msg_func, *user_data = Py_None;
+    TnyHeader *header;
+    PyObject *data;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,
+                                     "OO|O:TnyFolder.get_msg_async",kwlist,
+                                     &header, &get_msg_func, &user_data))
+        return NULL;
+    if (!PyCallable_Check(get_msg_func)) {
+        PyErr_SetString(PyExc_TypeError, "get_msg_func must be callable");
+        return NULL;
+    }
+
+    data = Py_BuildValue("(OOO)", header, get_msg_func, user_data);
+
+    tny_folder_get_msg_async (TNY_FOLDER (self->obj), header,
+                                      tny_get_msg_cb, data);
+    return Py_None;
+}
+
+%%
 override tny_folder_refresh_async kwargs
 
 static void

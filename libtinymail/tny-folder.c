@@ -394,7 +394,7 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
 
 /**
  * tny_folder_get_msg:
- * @self: a TnyFolder object
+ * @self: a #TnyFolder object
  * @header: the header of the message to get
  * @err: a #GError object or NULL
  * 
@@ -425,6 +425,56 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
 	return TNY_FOLDER_GET_IFACE (self)->get_msg_func (self, header, err);
 }
 
+
+
+
+/**
+ * tny_folder_get_msg_async:
+ * @self: a #TnyFolder object
+ * @header: a #TnyHeader object
+ * @callback: The callback handler
+ * @user_data: user data for the callback
+ *
+ * Get a message in @self identified by @header. You must unreference the
+ * return value after use.
+ *
+ * If you want to use this functionality, it's advised to let your application 
+ * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
+ * called.
+ * 
+ * When using a #GMainLoop this method will callback using g_idle_add_full.
+ * Without a #GMainLoop, which the libtinymail-camel implementation detects
+ * using (g_main_depth > 0), the callbacks will happen in a worker thread at an
+ * unknown moment in time (check your locking).
+ *
+ * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
+ * gdk_threads_leave guards (because it happens in the #GMainLoop).
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * static void
+ * folder_get_msg_cb (TnyFolder *folder, TnyMsg *msg, GError **err, gpointer user_data)
+ * {
+ *       TnyMsgView *message_view = user_data;
+ *       tny_msg_view_set_msg (message_view, message);
+ * }
+ * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
+ * TnyFolder *folder = ...; TnyHeader *header = ...;
+ * tny_folder_get_msg_async (folder, header,
+ *          folder_get_msg_cb, message_view); 
+ * </programlisting></informalexample>
+ **/
+void
+tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->get_msg_async_func)
+		g_critical ("You must implement tny_folder_get_msg_async\n");
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->get_msg_async_func (self, header, callback, user_data);
+	return;
+}
 
 /**
  * tny_folder_get_headers:

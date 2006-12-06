@@ -1,3 +1,9 @@
+2006-12-06  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added the tny_folder_get_msg_async API
+
+	* This was a major API change in libtinymail
+
 2006-12-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Support for content-objects in RFC822 messages

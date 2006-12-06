@@ -49,6 +49,7 @@ typedef struct _TnyStreamIface TnyStreamIface;
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);
 typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, GError **err, gpointer user_data);
+typedef void (*TnyGetMsgCallback) (TnyFolder *folder, TnyMsg *msg, GError **err, gpointer user_data);
 typedef void (*TnyRefreshFolderStatusCallback) (TnyFolder *self, const gchar *what, gint status, gpointer user_data);
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
 typedef enum _TnyAlertType TnyAlertType;

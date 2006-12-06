@@ -911,6 +911,18 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 }
 
 
+static void
+tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async_func (self, header, callback, user_data);
+}
+
+static void
+tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+{
+	g_critical ("Not implemented!");
+}
+
 static TnyMsg*
 tny_camel_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
@@ -1754,6 +1766,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy;
 	klass->get_headers_func = tny_camel_folder_get_headers;
 	klass->get_msg_func = tny_camel_folder_get_msg;
+	klass->get_msg_async_func = tny_camel_folder_get_msg_async;
 	klass->get_id_func = tny_camel_folder_get_id;
 	klass->set_name_func = tny_camel_folder_set_name;
 	klass->get_name_func = tny_camel_folder_get_name;
@@ -1798,6 +1811,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy_default;
 	class->get_headers_func = tny_camel_folder_get_headers_default;
 	class->get_msg_func = tny_camel_folder_get_msg_default;
+	class->get_msg_async_func = tny_camel_folder_get_msg_async_default;
 	class->get_id_func = tny_camel_folder_get_id_default;
 	class->set_name_func = tny_camel_folder_set_name_default;
 	class->get_name_func = tny_camel_folder_get_name_default;
