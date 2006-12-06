@@ -911,6 +911,90 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 }
 
 
+
+typedef struct 
+{
+	TnyFolder *self;
+	TnyMsg *msg;
+	TnyHeader *header;
+	GError *err;
+	gpointer user_data;
+	guint depth;
+	TnyGetMsgCallback callback;
+} GetMsgInfo;
+
+
+static void
+tny_camel_folder_get_msg_async_destroyer (gpointer thr_user_data)
+{
+	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
+
+	g_object_unref (G_OBJECT (info->self));
+	if (info->msg)
+		g_object_unref (G_OBJECT (info->msg));
+
+	if (info->err)
+		g_error_free (info->err);
+
+	g_slice_free (GetMsgInfo, info);
+}
+
+
+static gboolean
+tny_camel_folder_get_msg_async_callback (gpointer thr_user_data)
+{
+	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
+
+	if (info->callback)
+		info->callback (info->self, info->msg, &info->err, info->user_data);
+
+	return FALSE;
+}
+
+static gpointer 
+tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
+{
+	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
+	GError *err = NULL;
+
+	info->msg = tny_folder_get_msg (info->self, info->header, &err);
+
+	if (err != NULL)
+	{
+		info->err = g_error_copy ((const GError *) &err);
+		if (info->msg && G_IS_OBJECT (info->msg))
+			g_object_unref (G_OBJECT (info->msg));
+		info->msg = NULL;
+	} else
+		info->err = NULL;
+
+	/* thread reference */
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->header));
+
+	if (info->callback)
+	{
+		/* gidle reference (msg has an auto-ref caused by the construction 
+		   or is NULL) */
+
+		g_object_ref (G_OBJECT (info->self));
+
+		if (info->depth > 0)
+		{
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				tny_camel_folder_get_msg_async_callback, 
+				info, tny_camel_folder_get_msg_async_destroyer);
+		} else {
+			tny_camel_folder_get_msg_async_callback (info);
+			tny_camel_folder_get_msg_async_destroyer (info);
+		}
+	}
+
+	g_thread_exit (NULL);
+
+	return NULL;
+
+}
 static void
 tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
 {
@@ -920,7 +1004,23 @@ tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 static void
 tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
 {
-	g_critical ("Not implemented!");
+	GetMsgInfo *info = g_slice_new (GetMsgInfo);
+	GThread *thread;
+
+	info->self = self;
+	info->header = header;
+	info->callback = callback;
+	info->user_data = user_data;
+	info->depth = g_main_depth ();
+
+	/* thread reference */
+	g_object_ref (G_OBJECT (info->self));
+	g_object_ref (G_OBJECT (info->header));
+
+	thread = g_thread_create (tny_camel_folder_get_msg_async_thread,
+			info, FALSE, NULL);
+
+	return;
 }
 
 static TnyMsg*
@@ -1560,7 +1660,7 @@ static gpointer
 tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
-	GError *err;
+	GError *err = NULL;
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (info->self),
 		info->list, info->query, &err);

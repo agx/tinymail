@@ -1,6 +1,7 @@
 2006-12-06  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Added the tny_folder_get_msg_async API
+	* Implemented tny_camel_folder_get_msg_async
 
 	* This was a major API change in libtinymail
 
