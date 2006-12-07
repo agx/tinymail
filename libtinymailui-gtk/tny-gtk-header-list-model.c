@@ -710,7 +710,7 @@ tny_gtk_header_list_model_relaxed_data_destroyer (gpointer data)
 	g_list_free (d->list);
 	d->list = NULL;
 	d->final_func (d->ffdata, d->ffudata);
-	g_free (d);
+	g_slice_free (RelaxedData, d);
 
 	return;
 }
@@ -757,7 +757,7 @@ proxy_destroy_func (gpointer data, gpointer user_data)
 static void 
 tny_gtk_header_list_model_hdr_cache_remover_copy (TnyGtkHeaderListModel *self, GFunc final_func, gpointer ffdata, gpointer ffudata)
 {
-	RelaxedData *d = g_new (RelaxedData, 1);
+	RelaxedData *d = g_slice_new (RelaxedData);
 
 	/* This one will perform a destruction of each item in the list. It uses 
 	   a copy of the list. */
@@ -784,28 +784,53 @@ folder_overwrite_destruction (gpointer data, gpointer udata)
 		g_object_unref (G_OBJECT (self->folder));
 }
 
+typedef struct {
+	TnyFolder *folder;
+	TnyIterator *iterator;
+} ToDestroy;
 
 static void
 final_destruction (gpointer data, gpointer udata)
 {
-	TnyGtkHeaderListModel *self = data;
+	ToDestroy *info = data;
 
 	/* Unreference the folder instance */
-	if (self->folder) 
+	
+	/* Both the async added one and the final one */
+
+	if (info->folder && G_IS_OBJECT (info->folder)) 
 	{
-		g_object_unref (G_OBJECT (self->folder));
-		if (self->iterator)
-			g_object_unref (G_OBJECT (self->iterator));
+		g_object_unref (G_OBJECT (info->folder));
+		g_object_unref (G_OBJECT (info->folder));
 	}
+
+	if (info->iterator && G_IS_OBJECT (info->folder)) 
+	{
+		g_object_unref (G_OBJECT (info->iterator));
+		g_object_unref (G_OBJECT (info->iterator));
+	}
+
+	g_slice_free (ToDestroy, info);
 }
 
 static void
 tny_gtk_header_list_model_finalize (GObject *object)
 {
 	TnyGtkHeaderListModel *self = (TnyGtkHeaderListModel *)object;
+	ToDestroy *info = g_slice_new (ToDestroy);
 
 	g_mutex_lock (self->folder_lock);
 	g_mutex_lock (self->iterator_lock);
+
+	if (self->folder)
+		info->folder = g_object_ref (G_OBJECT (self->folder));
+	else
+		info->folder = NULL;
+
+	if (self->iterator)
+		info->iterator = g_object_ref (G_OBJECT (self->iterator));
+	else
+		info->iterator = NULL;
 
 	self->usable_index = FALSE;
 
@@ -817,18 +842,18 @@ tny_gtk_header_list_model_finalize (GObject *object)
 	/* Unreference the headers */
 	if (self->first)
 	{
-
+		
 		if (G_LIKELY (g_main_depth () > 0))
 			tny_gtk_header_list_model_hdr_cache_remover_copy (
-				self, final_destruction, self, NULL);
+				self, final_destruction, info, NULL);
 		else {
 			g_list_foreach (self->first, (GFunc)g_object_unref, NULL);
-			final_destruction (self, NULL);
+			final_destruction (info, NULL);
 		}
 		g_list_free (self->first);
 		self->first = NULL;
-	} else
-		final_destruction (self, NULL);
+	} else 
+		final_destruction (info, NULL);
 
 	if (self->index)
 	{
