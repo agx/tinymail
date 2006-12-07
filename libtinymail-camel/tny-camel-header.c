@@ -115,9 +115,27 @@ _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage
 static const gchar*
 tny_camel_header_get_replyto (TnyHeader *self)
 {
-	const gchar *retval = invalid;
+	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
+	const gchar *retval;
 
-	/* TODO get_replyto */
+#ifdef HEALTHY_CHECK
+	if (!me->healthy || G_UNLIKELY (!me->info))
+		return invalid;
+#else
+	if (G_UNLIKELY (!me->info))
+		return invalid;
+#endif
+
+	if (G_UNLIKELY (me->write)) 
+	{
+		CamelInternetAddress *addr = (CamelInternetAddress*)
+			camel_mime_message_get_reply_to (((WriteInfo*)me->info)->msg);
+		if (addr)
+			retval = camel_address_format (CAMEL_ADDRESS (addr));
+		else
+			retval = NULL;
+	} else
+		retval = invalid;
 
 	return retval;
 }
@@ -214,9 +232,21 @@ tny_camel_header_set_to (TnyHeader *self, const gchar *to)
 
 
 static void
-tny_camel_header_set_replyto (TnyHeader *self, const gchar *to)
+tny_camel_header_set_replyto (TnyHeader *self, const gchar *replyto)
 {
-	/* TODO set replyto */
+	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);    
+	CamelInternetAddress *addr = camel_internet_address_new ();
+	gchar *dup;
+
+	dup = g_strdup (replyto);
+	_foreach_email_add_to_inet_addr (dup, addr);
+	g_free (dup);
+
+	prepare_for_write (me);
+
+	camel_mime_message_set_reply_to (((WriteInfo*)me->info)->msg, addr);
+
+	camel_object_unref (CAMEL_OBJECT (addr));
 
 	return;
 }
