@@ -15,6 +15,7 @@ Sergio Villar Senin <svillar@igalia.com>
 	* Work on TnyCamelFolder implementation
 	* Subscribe & unsubscribe folders functionality
 	* Moving messages around between folders
+	* Unit tests
 	* Various bugfixes
 
 Tinne Hannes <tinne.hannes@gmail.com>
@@ -38,7 +39,7 @@ Florian Boor <florian.boor@kernelconcepts.de>
 
 Nils Faerber <nils.faerber_at_kernelconcepts.de> 
 
-	* Co-developer of Modest, an E-mail client on top if tinymail
+	* Co-developer of Modest, an E-mail client on top of tinymail
 
 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
@@ -46,6 +47,7 @@ Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	* Co-designer of the TnyIterator and TnyList interfaces
 	* Implementer of many TnyIterator types
 	* Implementer of many TnyList types
+	* Co-designer of the TnySendQueue type
 
 Chris Lord <chris@openedhand.com>
 
@@ -54,14 +56,6 @@ Chris Lord <chris@openedhand.com>
 Thomas Hisch <t.hisch@gmail.com>
 
 	* Refactoring and renaming types
-
-Yoan BLANC <greut.lists@dosimple.ch>
-
-	* Language bindings for .NET (unfinished)
-
-Thomas Van Machelen <thomas.vanmachelen@gmail.com>
-
-	* Language bindings for .NET (unfinished)
 
 Bart Deleye <bart.deleye@gmail.com>
 
