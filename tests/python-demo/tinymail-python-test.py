@@ -21,8 +21,8 @@ def on_refresh_folder (folder, cancelled, headerstree):
 	gc.collect()
 
 
-def on_status (folder, what, status, headerstree) :
-	progressbar.pulse ()
+def on_status (folder, what, status, oftotal, headerstree) :
+	progressbar.set_fraction (status / oftotal)
 
 def on_headerstree_selected (treeselection, msgview) :
 	model, iter = treeselection.get_selected ()
