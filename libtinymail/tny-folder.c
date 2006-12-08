@@ -388,7 +388,45 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
 		g_critical ("You must implement tny_folder_transfer_msgs\n");
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals, err);
+	TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals, err);
+	return;
+}
+
+/**
+ * tny_folder_transfer_msgs_async:
+ * @self: the TnyFolder where the headers are stored
+ * @header_list: a list of TnyHeader objects
+ * @folder_dst: the TnyFolder where the msgs will be transfered
+ * @delete_originals: if TRUE then move msgs, else copy them
+ * @callback: The callback handler
+ * @user_data: user data for the callback
+ * 
+ * Transfers messages of which the headers are in @header_list from @self to 
+ * @folder_dst. They could be moved or just copied depending on the value of 
+ * the @delete_originals argument
+ *
+ * If you want to use this functionality, it's advised to let your application 
+ * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
+ * called.
+ * 
+ * When using a #GMainLoop this method will callback using g_idle_add_full.
+ * Without a #GMainLoop, which the libtinymail-camel implementation detects
+ * using (g_main_depth > 0), the callbacks will happen in a worker thread at an
+ * unknown moment in time (check your locking).
+ *
+ * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
+ * gdk_threads_leave guards (because it happens in the #GMainLoop).
+ **/
+void 
+tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func)
+		g_critical ("You must implement tny_folder_transfer_msgs_async\n");
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func (self, header_list, folder_dst, delete_originals, callback, user_data);
+	return;
 }
 
 

@@ -1134,13 +1134,127 @@ tny_camel_folder_get_id_default (TnyFolder *self)
 	return priv->folder_name;
 }
 
+
+
+typedef struct 
+{
+	GError *err;
+	TnyFolder *self;
+	TnyTransferMsgsCallback callback;
+	gpointer user_data;
+	guint depth;
+	TnyList *header_list;
+	TnyFolder *folder_dst;
+	gboolean delete_originals;
+} TransferMsgsInfo;
+
+static void
+tny_camel_folder_transfer_msgs_async_destroyer (gpointer thr_user_data)
+{
+	TransferMsgsInfo *info = thr_user_data;
+
+	/* gidle reference */
+	g_object_unref (G_OBJECT (info->self));
+
+	if (info->err)
+		g_error_free (info->err);
+
+	g_slice_free (TransferMsgsInfo, info);
+
+	return;
+}
+
+static gboolean
+tny_camel_folder_transfer_msgs_async_callback (gpointer thr_user_data)
+{
+	TransferMsgsInfo *info = thr_user_data;
+
+	if (info->callback)
+		info->callback (info->self, &info->err, info->user_data);
+
+	return FALSE;
+}
+
+static gpointer 
+tny_camel_folder_transfer_msgs_async_thread (gpointer thr_user_data)
+{
+	TransferMsgsInfo *info = (TransferMsgsInfo*) thr_user_data;
+	GError *err = NULL;
+
+	tny_folder_transfer_msgs (info->self, info->header_list, info->folder_dst, 
+			info->delete_originals, &err);
+
+	if (err != NULL)
+		info->err = g_error_copy ((const GError *) &err);
+	else
+		info->err = NULL;
+
+	/* thread reference */
+	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (G_OBJECT (info->header_list));
+	g_object_unref (G_OBJECT (info->folder_dst));
+
+	if (info->callback)
+	{
+		/* gidle reference */
+		g_object_ref (G_OBJECT (info->self));
+
+		if (info->depth > 0)
+		{
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				tny_camel_folder_transfer_msgs_async_callback, 
+				info, tny_camel_folder_transfer_msgs_async_destroyer);
+		} else {
+			tny_camel_folder_transfer_msgs_async_callback (info);
+			tny_camel_folder_transfer_msgs_async_destroyer (info);
+		}
+	}
+
+	g_thread_exit (NULL);
+
+	return NULL;
+}
+
+static void
+tny_camel_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_async_func (self, header_list, folder_dst, delete_originals, callback, user_data);
+	return;
+}
+
+static void
+tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data)
+{
+	TransferMsgsInfo *info = g_slice_new (TransferMsgsInfo);
+	GThread *thread;
+
+	info->self = self;
+	info->header_list = header_list; 
+	info->folder_dst = folder_dst;
+	info->callback = callback;
+	info->user_data = user_data;
+	info->delete_originals = delete_originals;
+	info->depth = g_main_depth ();
+
+	/* thread reference */
+	g_object_ref (G_OBJECT (info->header_list));
+	g_object_ref (G_OBJECT (info->self));
+	g_object_ref (G_OBJECT (info->folder_dst));
+
+	thread = g_thread_create (tny_camel_folder_transfer_msgs_async_thread,
+			info, FALSE, NULL);    
+
+	return;
+}
+
+
 static void
 tny_camel_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals, err);
+	return;
 }
 
-/* TODO: provide an _async version of this. Requested by djcb. */
 static void
 tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
@@ -1382,6 +1496,7 @@ static void
 tny_camel_folder_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_folder_func (self, folder, err);
+	return;
 }
 
 static void 
@@ -1881,6 +1996,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->expunge_func = tny_camel_folder_expunge;
 	klass->add_msg_func = tny_camel_folder_add_msg;
 	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
+	klass->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async;
 
 	return;
 }
@@ -1926,6 +2042,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->add_msg_func = tny_camel_folder_add_msg_default;
 	class->expunge_func = tny_camel_folder_expunge_default;
 	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
+	class->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;
