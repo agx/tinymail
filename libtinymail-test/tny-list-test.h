@@ -1,7 +1,7 @@
 #ifndef TNY_LIST_TEST_H
 #define TNY_LIST_TEST_H
 
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,11 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "tny-test-suite.h"
-
-#include <tny-list.h>
+/* #include "check_libtinymail.h2" */
 
 /* Test suite */
-GUnitTestSuite *create_tny_list_suite (void);
+Suite *create_tny_list_suite (void);
 
 #endif

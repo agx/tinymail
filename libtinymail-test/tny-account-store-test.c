@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
+#include "check_libtinymail.h"
 
-#include <tny-account-store-test.h>
 #include <tny-account-store.h>
 #include <tny-platform-factory.h>
 #include <platfact.h>
@@ -52,27 +51,20 @@ tny_account_store_test_teardown (void)
 */
 
 
-static void
-tny_account_store_test_something (void)
+START_TEST (tny_account_store_test_something)
 {
 }
+END_TEST
 
-GUnitTestSuite*
+Suite *
 create_tny_account_store_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     Suite *s = suite_create ("Account Store");
 
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyAccountStore");
+     TCase *tc = tcase_create ("Empty test");
+     tcase_add_checked_fixture (tc, tny_account_store_test_setup, tny_account_store_test_teardown);
+     tcase_add_test (tc, tny_account_store_test_something);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
-
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_account_store_test_something",
-                                      tny_account_store_test_setup,
-                                      tny_account_store_test_something,
-				      tny_account_store_test_teardown));
-
-
-	return suite;
+     return s;
 }

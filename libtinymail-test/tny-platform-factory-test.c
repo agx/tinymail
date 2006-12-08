@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
+#include "check_libtinymailui.h"
 
-#include <tny-platform-factory-test.h>
 #include <tny-platform-factory.h>
 
 #include <platfact.h>
@@ -43,37 +42,36 @@ tny_platform_factory_test_teardown (void)
 }
 
 
-static void
-tny_platform_factory_test_new_device (void)
+START_TEST (tny_platform_factory_test_new_device)
 {
 	GObject *obj = (GObject*)tny_platform_factory_new_device (iface);
 
 	str = g_strdup_printf ("Returned instance doesn't implement TnyDevice\n");
-	gunit_fail_unless (TNY_IS_DEVICE (obj), str);
+	fail_unless (TNY_IS_DEVICE (obj), str);
 	g_free (str);
 
 	g_object_unref (G_OBJECT (obj));
 }
+END_TEST
 
-static void
-tny_platform_factory_test_new_account_store (void)
+START_TEST (tny_platform_factory_test_new_account_store)
 {
 	GObject *obj = (GObject*)tny_platform_factory_new_account_store (iface);
 
 	str = g_strdup_printf ("Returned instance doesn't implement TnyAccountStore\n");
-	gunit_fail_unless (TNY_IS_ACCOUNT_STORE (obj), str);
+	fail_unless (TNY_IS_ACCOUNT_STORE (obj), str);
 	g_free (str);
 
 	g_object_unref (G_OBJECT (obj));
 }
+END_TEST
 
-static void
-tny_platform_factory_test_new_msg_view (void)
+START_TEST(tny_platform_factory_test_new_msg_view)
 {
 	GObject *obj = (GObject*)tny_platform_factory_new_msg_view (iface);
 
 	str = g_strdup_printf ("Returned instance doesn't implement TnyMsgView\n");
-	gunit_fail_unless (TNY_IS_MSG_VIEW (obj), str);
+	fail_unless (TNY_IS_MSG_VIEW (obj), str);
 	g_free (str);
 
 	/* It's a floating object that gets unreferenced by 
@@ -81,35 +79,28 @@ tny_platform_factory_test_new_msg_view (void)
 
 	g_object_unref (G_OBJECT (obj)); */
 }
+END_TEST
 
-GUnitTestSuite*
+Suite *
 create_tny_platform_factory_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     Suite *s = suite_create ("Platform Factory");
+     TCase *tc = NULL;
 
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyPlatformFactory");
+     tc = tcase_create ("New Device");
+     tcase_add_checked_fixture (tc, tny_platform_factory_test_setup, tny_platform_factory_test_teardown);
+     tcase_add_test (tc, tny_platform_factory_test_new_device);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
+     tc = tcase_create ("New Account Store");
+     tcase_add_checked_fixture (tc, tny_platform_factory_test_setup, tny_platform_factory_test_teardown);
+     tcase_add_test (tc, tny_platform_factory_test_new_account_store);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_platform_factory_test_new_device",
-                                      tny_platform_factory_test_setup,
-                                      tny_platform_factory_test_new_device,
-				      tny_platform_factory_test_teardown));
+     tc = tcase_create ("New Message View");
+     tcase_add_checked_fixture (tc, tny_platform_factory_test_setup, tny_platform_factory_test_teardown);
+     tcase_add_test (tc, tny_platform_factory_test_new_msg_view);
+     suite_add_tcase (s, tc);
 
-
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_platform_factory_test_new_account_store",
-                                      tny_platform_factory_test_setup,
-                                      tny_platform_factory_test_new_account_store,
-				      tny_platform_factory_test_teardown));
-
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_platform_factory_test_new_msg_view",
-                                      tny_platform_factory_test_setup,
-                                      tny_platform_factory_test_new_msg_view,
-				      tny_platform_factory_test_teardown));
-
-	return suite;
+     return s;
 }

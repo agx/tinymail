@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
-
-#include <tny-stream-test.h>
+#include "check_libtinymail.h"
 
 /* We are going to test the camel implementation */
 #include <tny-stream-camel.h>
@@ -80,8 +78,7 @@ tny_stream_test_teardown (void)
 	return;
 }
 
-static void
-tny_stream_test_stream (void)
+START_TEST (tny_stream_test_stream)
 {
     TnyStream *streams [3] = { tbstream, cmstream, fstream };
     int te=0;
@@ -112,7 +109,7 @@ tny_stream_test_stream (void)
 
 
 	str = g_strdup_printf ("At least one of the 42 first bytes changed!: (%s) vs. (%s)\n", buffer, ret);
-	gunit_fail_unless(!strncmp (buffer, ret, strlen (buffer)), str);
+	fail_unless(!strncmp (buffer, ret, strlen (buffer)), str);
 	g_free (str);
 
 	/* Check whether the stream contains nothing but the answer to all
@@ -127,35 +124,30 @@ tny_stream_test_stream (void)
 		tny_stream_read (iface, buf, 2);
 
 		str = g_strdup_printf ("These two bytes should have been '4' and '2': [%s]\n", buffer);
-		gunit_fail_unless(!strncmp (buffer, "42", 2), str);
+		fail_unless(!strncmp (buffer, "42", 2), str);
 		g_free (str);
 
 		n++;
 	}
 
 	str = g_strdup_printf ("Size in bytes (%d) isn't correct or reset didn't succeed!\n", n);
-	gunit_fail_unless (n == 21, str);
+	fail_unless (n == 21, str);
 	g_free (str);
 
 	g_free (buffer);
    }
 }
+END_TEST
 
-
-GUnitTestSuite*
+Suite *
 create_tny_stream_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     Suite *s = suite_create ("Stream");
 
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyStream");
+     TCase *tc = tcase_create ("Stream");
+     tcase_add_checked_fixture (tc, tny_stream_test_setup, tny_stream_test_teardown);
+     tcase_add_test (tc, tny_stream_test_stream);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_stream_test_stream",
-                                      tny_stream_test_setup,
-                                      tny_stream_test_stream,
-				      tny_stream_test_teardown));
-
-	return suite;
+     return s;
 }

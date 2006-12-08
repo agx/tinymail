@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,15 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
-
-#include <tny-list-test.h>
+#include "check_libtinymail.h"
 
 #include <tny-simple-list.h>
 #include <tny-gtk-account-list-model.h>
 #include <tny-gtk-attach-list-model.h>
 #include <tny-gtk-folder-store-tree-model.h>
-#include <tny-gtk-folder-tree-model.h>
 #include <tny-gtk-header-list-model.h>
 
 #include <tny-camel-imap-store-account.h>
@@ -45,9 +42,6 @@ static gchar *str;
 static void
 tny_list_test_setup (void)
 {
-	CamelInternetAddress *addr = camel_internet_address_new ();
-	camel_object_unref (CAMEL_OBJECT (addr));
-
 	ifaces[0] = tny_simple_list_new ();
 	ifaces[1] = TNY_LIST (tny_gtk_account_list_model_new ());
 	ifaces[2] = TNY_LIST (tny_gtk_attach_list_model_new ());
@@ -85,7 +79,6 @@ static TnySessionCamel *session;
 static void
 setup_objs (int num, GObject **a, GObject **b, GObject **c, GObject **d)
 {
-    
     if (session == NULL)
     {
 	astore = tny_test_account_store_new (FALSE, NULL);
@@ -140,8 +133,7 @@ setup_objs (int num, GObject **a, GObject **b, GObject **c, GObject **d)
     
 }
 
-static void
-tny_list_test_list (void)
+START_TEST (tny_list_test_list)
 {
     int t = 0;
 
@@ -156,7 +148,7 @@ tny_list_test_list (void)
 	setup_objs (t, &a, &b, &c, &d);
 	
 	tny_list_append (iface, a);
-	g_object_unref (G_OBJECT (a)); 
+	g_object_unref (G_OBJECT (a));
 	tny_list_append (iface, b);
 	g_object_unref (G_OBJECT (b));
 	tny_list_append (iface, c);
@@ -168,17 +160,17 @@ tny_list_test_list (void)
 	tny_list_foreach (iface, tny_list_test_foreach, NULL);
 	
 	str = g_strdup_printf ("Implementation: %s - Counter after foreach should be 4 but is %d\n", G_OBJECT_TYPE_NAME (iface), counter);
-	gunit_fail_unless (counter == 4, str);
+	fail_unless (counter == 4, str);
 	g_free (str);
 	
 	str = g_strdup_printf ("Implementation: %s - Length should be 4 but is %d\n", G_OBJECT_TYPE_NAME (iface), tny_list_get_length (iface));
-	gunit_fail_unless (tny_list_get_length (iface) == 4, str);
+	fail_unless (tny_list_get_length (iface) == 4, str);
 	g_free (str);
 
 	iterator = tny_list_create_iterator (iface);
 	str = g_strdup_printf ("Implementation: %s - get_list returns the wrong instance\n", G_OBJECT_TYPE_NAME (iface));
     	ref = tny_iterator_get_list (iterator);
-	gunit_fail_unless (ref == iface, str);
+	fail_unless (ref == iface, str);
 	g_free (str);
 	g_object_unref (G_OBJECT (ref));
     
@@ -186,40 +178,40 @@ tny_list_test_list (void)
 	item = tny_iterator_get_current (iterator);
 	
 	str = g_strdup_printf ("Implementation: %s - Item should be \"3\"\n", G_OBJECT_TYPE_NAME (iface));
-	gunit_fail_unless (item == b, str);
+	fail_unless (item == b, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 
 	tny_iterator_next (iterator);
-	item = tny_iterator_get_current (iterator);	
+        item = tny_iterator_get_current (iterator);
 	str = g_strdup_printf ("Implementation: %s - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
-	gunit_fail_unless (item == c, str);
+	fail_unless (item == c, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 
 	tny_iterator_prev (iterator);
-	item = tny_iterator_get_current (iterator);	
+        item = tny_iterator_get_current (iterator);
 	str = g_strdup_printf ("Implementation: %s - Item should be \"3\"\n", G_OBJECT_TYPE_NAME (iface));
-	gunit_fail_unless (item == b, str);
+	fail_unless (item == b, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 
 	tny_iterator_next (iterator);
-	item = tny_iterator_get_current (iterator);	
+        item = tny_iterator_get_current (iterator);
 	str = g_strdup_printf ("Implementation: %s - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
-	gunit_fail_unless (item == c, str);
+	fail_unless (item == c, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 
-	item = tny_iterator_get_current (iterator);
+        item = tny_iterator_get_current (iterator);
 	str = g_strdup_printf ("Implementation - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
-	gunit_fail_unless (item == c, str);
+	fail_unless (item == c, str);
 	g_free (str);
 
 	g_object_unref (G_OBJECT (iterator));
 	tny_list_remove (iface, (GObject*)item);
 	str = g_strdup_printf ("Implementation %s - Length should be 3 but is %d\n", G_OBJECT_TYPE_NAME (iface), tny_list_get_length (iface));
-	gunit_fail_unless (tny_list_get_length (iface) == 3, str);
+	fail_unless (tny_list_get_length (iface) == 3, str);
 	g_free (str);
 
 	g_object_unref (G_OBJECT(item));
@@ -227,45 +219,41 @@ tny_list_test_list (void)
 	iterator = tny_list_create_iterator (iface);
 
 	tny_iterator_first (iterator);
-	item = tny_iterator_get_current (iterator);
+        item = tny_iterator_get_current (iterator);
 
 	str = g_strdup_printf ("Implementation: %s - Item should be \"1\"\n", G_OBJECT_TYPE_NAME (iface));
-	gunit_fail_unless (item == d, str);
+	fail_unless (item == d, str);
 	g_free (str);
 	g_object_unref (G_OBJECT(item));
 	
 	for (i=0; i<3; i++)
 	{
 		str = g_strdup_printf ("Implementation %s - is_done should return FALSE\n", G_OBJECT_TYPE_NAME (iface));
-		gunit_fail_unless (tny_iterator_is_done (iterator) == FALSE, str);
+		fail_unless (tny_iterator_is_done (iterator) == FALSE, str);
 		g_free (str);
 
 		tny_iterator_next (iterator);
 	}
 
 	str = g_strdup_printf ("Implementation: %s - is_done should by now return TRUE\n", G_OBJECT_TYPE_NAME (iface));
-	gunit_fail_unless (tny_iterator_is_done (iterator) == TRUE, str);
+	fail_unless (tny_iterator_is_done (iterator) == TRUE, str);
 	g_free (str);
 
-	g_object_unref (G_OBJECT (iterator));	
+	g_object_unref (G_OBJECT (iterator));
     }
 }
+END_TEST
 
 
-GUnitTestSuite*
+Suite *
 create_tny_list_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     Suite *s = suite_create ("List");
 
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyList");
+     TCase *tc = tcase_create ("All lists");
+     tcase_add_checked_fixture (tc, tny_list_test_setup, tny_list_test_teardown);
+     tcase_add_test (tc, tny_list_test_list);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_list_test_list",
-                                      tny_list_test_setup,
-                                      tny_list_test_list,
-				      tny_list_test_teardown));
-
-	return suite;
+     return s;
 }

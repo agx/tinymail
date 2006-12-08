@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,13 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
+#include "check_libtinymail.h"
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
-
-#include <tny-header-test.h>
 
 /* We are going to test the camel implementation */
 #include <tny-camel-header.h>
@@ -43,7 +41,7 @@ tny_header_test_setup (void)
 	return;
 }
 
-static void 
+static void
 tny_header_test_teardown (void)
 {
 	g_object_unref (G_OBJECT (iface));
@@ -51,21 +49,20 @@ tny_header_test_teardown (void)
 	return;
 }
 
-static void
-tny_header_test_set_from (void)
+START_TEST (tny_header_test_set_from)
 {
 	const gchar *str_in = "Me myself and I <me.myself@and.i.com>", *str_out;
 	
 	tny_header_set_from (iface, str_in);
 	str_out = tny_header_get_from (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set from!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set from!\n");
 
 	return;
 }
+END_TEST
 
-static void
-tny_header_test_set_to (void)
+START_TEST (tny_header_test_set_to)
 {
 	gchar *str_in = g_strdup ("Myself <this@is.me>, You Do Die Daa <you.doe.die@daa.com>; patrick@test.com");
 	const gchar *str_out;
@@ -82,107 +79,95 @@ tny_header_test_set_to (void)
 		if (str_in[i] == ';')
 			str_in[i] = ',';
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set to!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set to!\n");
 
 	g_free (str_in);
 
 	return;
 }
+END_TEST
 
-static void
-tny_header_test_set_cc (void)
+START_TEST (tny_header_test_set_cc)
 {
 	const gchar *str_in = "First user <first@user.be>, Second user <second@user.com>", *str_out;
 
 	tny_header_set_cc (iface, str_in);
 	str_out = tny_header_get_cc (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set cc!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set cc!\n");
 
 	return;
 }
+END_TEST
 
-static void
-tny_header_test_set_bcc (void)
+START_TEST (tny_header_test_set_bcc)
 {
 	const gchar *str_in = "The Invisible man <the.invisible@man.com>, mark@here.there.com", *str_out;
 
 	tny_header_set_bcc (iface, str_in);
 	str_out = tny_header_get_bcc (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set bcc!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set bcc!\n");
 
 	return;
 }
+END_TEST
 
-static void
-tny_header_test_set_subject (void)
+START_TEST (tny_header_test_set_subject)
 {
 	const gchar *str_in = "I'm the nice subject", *str_out;
 	
 	tny_header_set_subject (iface, str_in);
 	str_out = tny_header_get_subject (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set subject!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set subject!\n");
 }
+END_TEST
 
-static void
-tny_header_test_set_replyto (void)
+START_TEST (tny_header_test_set_replyto)
 {
 
-	/* GUNIT_WARNING ("TODO"); */
+	/* g_warning ("TODO"); */
 
 	return;
 }
+END_TEST
 
-GUnitTestSuite*
+Suite *
 create_tny_header_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     Suite *s = suite_create ("Header");
+     TCase *tc = NULL;
 
-	
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyHeader");
+     tc = tcase_create ("Set Bcc");
+     tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
+     tcase_add_test (tc, tny_header_test_set_bcc);
+     suite_add_tcase (s, tc);
 
+     tc = tcase_create ("Set Cc");
+     tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
+     tcase_add_test (tc, tny_header_test_set_cc);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_header_test_set_bcc",
-                                      tny_header_test_setup,
-                                      tny_header_test_set_bcc,
-				      tny_header_test_teardown));
+     tc = tcase_create ("Set To");
+     tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
+     tcase_add_test (tc, tny_header_test_set_to);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_header_test_set_cc",
-                                      tny_header_test_setup,
-                                      tny_header_test_set_cc,
-				      tny_header_test_teardown));
+     tc = tcase_create ("Set From");
+     tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
+     tcase_add_test (tc, tny_header_test_set_from);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_header_test_set_to",
-                                      tny_header_test_setup,
-                                      tny_header_test_set_to,
-				      tny_header_test_teardown));
+     tc = tcase_create ("Set Replyto");
+     tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
+     tcase_add_test (tc, tny_header_test_set_replyto);
+     suite_add_tcase (s, tc);
 
+     tc = tcase_create ("Set Subject");
+     tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
+     tcase_add_test (tc, tny_header_test_set_subject);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_header_test_set_from",
-                                      tny_header_test_setup,
-                                      tny_header_test_set_from,
-				      tny_header_test_teardown));
-
-
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_header_test_set_replyto",
-                                      tny_header_test_setup,
-                                      tny_header_test_set_replyto,
-				      tny_header_test_teardown));
-
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_header_test_set_subject",
-                                      tny_header_test_setup,
-                                      tny_header_test_set_subject,
-				      tny_header_test_teardown));
-
-	return suite;
+     return s;
 }

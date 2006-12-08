@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,10 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
-#include <tny-folder-store-query-test.h>
+#include "check_libtinymail.h"
 
-#include <tny-account-test.h>
 #include <tny-account.h>
 #include <tny-folder-store.h>
 #include <tny-camel-store-account.h>
@@ -77,8 +75,8 @@ tny_folder_store_query_test_teardown (void)
 	return;
 }
 
-static void
-tny_folder_store_query_test_match_on_name (void)
+START_TEST (
+tny_folder_store_query_test_match_on_name)
 {
 	TnyFolderStoreQuery *query = NULL;
 	TnyList *folders = NULL, *subfolders;
@@ -100,7 +98,7 @@ tny_folder_store_query_test_match_on_name (void)
     	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
-	gunit_fail_unless (length == 1, str);
+	fail_unless (length == 1, str);
 	g_free (str);
     
     	if (length >= 1) 
@@ -114,7 +112,7 @@ tny_folder_store_query_test_match_on_name (void)
 		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("^tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
-		gunit_fail_unless (tny_list_get_length (subfolders) == 1, str);
+		fail_unless (tny_list_get_length (subfolders) == 1, str);
 		g_free (str);	    
 		g_object_unref (G_OBJECT (iter));
 	}
@@ -124,9 +122,10 @@ tny_folder_store_query_test_match_on_name (void)
 	g_object_unref (G_OBJECT (query));
     
 }
+END_TEST
 
-static void
-tny_folder_store_query_test_match_on_id (void)
+START_TEST (
+tny_folder_store_query_test_match_on_id)
 {
 	TnyFolderStoreQuery *query = NULL;
 	TnyList *folders = NULL, *subfolders;
@@ -148,7 +147,7 @@ tny_folder_store_query_test_match_on_id (void)
     	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
-	gunit_fail_unless (length == 1, str);
+	fail_unless (length == 1, str);
 	g_free (str);
     
     	if (length >= 1) 
@@ -161,7 +160,7 @@ tny_folder_store_query_test_match_on_id (void)
 		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("^INBOX/tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
-		gunit_fail_unless (tny_list_get_length (subfolders) == 1, str);
+		fail_unless (tny_list_get_length (subfolders) == 1, str);
 		g_object_unref (G_OBJECT (iter));
 	}
 
@@ -169,10 +168,11 @@ tny_folder_store_query_test_match_on_id (void)
 	g_object_unref (G_OBJECT (subfolders));
 	g_object_unref (G_OBJECT (query));
 }
+END_TEST
 
 
-static void
-tny_folder_store_query_test_match_subscribed (void)
+START_TEST (
+tny_folder_store_query_test_match_subscribed)
 {
 	TnyFolderStoreQuery *query = NULL;
 	TnyList *folders = NULL, *subfolders;
@@ -194,7 +194,7 @@ tny_folder_store_query_test_match_subscribed (void)
     	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
-	gunit_fail_unless (length == 1, str);
+	fail_unless (length == 1, str);
 	g_free (str);
     
     	if (length >= 1) 
@@ -207,7 +207,7 @@ tny_folder_store_query_test_match_subscribed (void)
 		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("There's 17 subscribed folders in the test account, I received %d\n", length);
-		gunit_fail_unless (tny_list_get_length (subfolders) == 17, str);
+		fail_unless (tny_list_get_length (subfolders) == 17, str);
 		g_free (str);
 		g_object_unref (G_OBJECT (iter));
 	}
@@ -216,10 +216,10 @@ tny_folder_store_query_test_match_subscribed (void)
 	g_object_unref (G_OBJECT (subfolders));
 	g_object_unref (G_OBJECT (query));
 }		
+END_TEST
 
 
-static void
-tny_folder_store_query_test_match_unsubscribed (void)
+START_TEST (tny_folder_store_query_test_match_unsubscribed)
 {
 	TnyFolderStoreQuery *query = NULL;
 	TnyList *folders = NULL, *subfolders;
@@ -241,7 +241,7 @@ tny_folder_store_query_test_match_unsubscribed (void)
     	length = tny_list_get_length (folders);
     
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
-	gunit_fail_unless (length == 1, str);
+	fail_unless (length == 1, str);
 	g_free (str);
     
     	if (length >= 1) 
@@ -254,7 +254,7 @@ tny_folder_store_query_test_match_unsubscribed (void)
 		length = tny_list_get_length (subfolders);
 	    
 		str = g_strdup_printf ("There's 1 subscribed folder in the test account, I received %d\n", length);
-		gunit_fail_unless (tny_list_get_length (subfolders) == 1, str);
+		fail_unless (tny_list_get_length (subfolders) == 1, str);
 		g_free (str);
 	    
 		g_object_unref (G_OBJECT (iter));
@@ -264,47 +264,33 @@ tny_folder_store_query_test_match_unsubscribed (void)
 	g_object_unref (G_OBJECT (subfolders));
 	g_object_unref (G_OBJECT (query));
 }
+END_TEST
 
-
-GUnitTestSuite*
+Suite *
 create_tny_folder_store_query_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
-    
-	online_tests = TRUE;
-	
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyFolderStoreQuery");
+     TCase *tc = NULL;
+     Suite *s = suite_create ("Folder Store Query");
 
-	/* Add test case objects to test suite */
-    
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_folder_store_query_test_match_on_name",
-                                      tny_folder_store_query_test_setup,
-                                      tny_folder_store_query_test_match_on_name,
-				      tny_folder_store_query_test_teardown));
+     tc = tcase_create ("Match Name");
+     tcase_add_checked_fixture (tc, tny_folder_store_query_test_setup, tny_folder_store_query_test_teardown);
+     tcase_add_test (tc, tny_folder_store_query_test_match_on_name);
+     suite_add_tcase (s, tc);
 
-    
-    	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_folder_store_query_test_match_on_id",
-                                      tny_folder_store_query_test_setup,
-                                      tny_folder_store_query_test_match_on_id,
-				      tny_folder_store_query_test_teardown));
+     tc = tcase_create ("Match Id");
+     tcase_add_checked_fixture (tc, tny_folder_store_query_test_setup, tny_folder_store_query_test_teardown);
+     tcase_add_test (tc, tny_folder_store_query_test_match_on_id);
+     suite_add_tcase (s, tc);
 
-    
-    	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_folder_store_query_test_match_subscribed",
-                                      tny_folder_store_query_test_setup,
-                                      tny_folder_store_query_test_match_subscribed,
-				      tny_folder_store_query_test_teardown));
+     tc = tcase_create ("Match Subscribed");
+     tcase_add_checked_fixture (tc, tny_folder_store_query_test_setup, tny_folder_store_query_test_teardown);
+     tcase_add_test (tc, tny_folder_store_query_test_match_subscribed);
+     suite_add_tcase (s, tc);
 
-        gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_folder_store_query_test_match_unsubscribed",
-                                      tny_folder_store_query_test_setup,
-                                      tny_folder_store_query_test_match_unsubscribed,
-				      tny_folder_store_query_test_teardown));
-    
-	online_tests = FALSE;
-    
-	return suite;
+     tc = tcase_create ("Match Unsubscribed");
+     tcase_add_checked_fixture (tc, tny_folder_store_query_test_setup, tny_folder_store_query_test_teardown);
+     tcase_add_test (tc, tny_folder_store_query_test_match_unsubscribed);
+     suite_add_tcase (s, tc);
+
+     return s;
 }

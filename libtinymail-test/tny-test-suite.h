@@ -22,7 +22,6 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-shared.h>
-#include <gunit.h>
 
 GList* gunit_get_test_suites();
 

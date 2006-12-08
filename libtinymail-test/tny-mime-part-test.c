@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
-
-#include <tny-mime-part-test.h>
+#include "check_libtinymail.h"
 
 /* We are going to test the camel implementation */
 #include <tny-camel-mime-part.h>
@@ -56,8 +54,7 @@ tny_mime_part_test_teardown (void)
 	return;
 }
 
-static void
-tny_mime_part_test_set_content_location (void)
+START_TEST (tny_mime_part_test_set_content_location)
 {
 	const gchar *str_in = "testcontentlocation", *str_out;
 	
@@ -67,68 +64,68 @@ tny_mime_part_test_set_content_location (void)
 	str = g_strdup_printf ("Unable to set content location! (%s) vs. (%s)\n",
 		str_in, str_out);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), str);
+	fail_unless(!strcmp (str_in, str_out), str);
 
 	g_free (str);
 
 	return;
 }
+END_TEST
 
 
-static void
-tny_mime_part_test_set_description (void)
+START_TEST (tny_mime_part_test_set_description)
 {
 	const gchar *str_in = "test description", *str_out;
 	
 	tny_mime_part_set_description (iface, str_in);
 	str_out = tny_mime_part_get_description (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set description!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set description!\n");
 
 	return;
 }
+END_TEST
 
-static void
-tny_mime_part_test_set_content_id (void)
+START_TEST (tny_mime_part_test_set_content_id)
 {
 	const gchar *str_in = "testcontentid", *str_out;
 	
 	tny_mime_part_set_content_id (iface, str_in);
 	str_out = tny_mime_part_get_content_id (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set content id!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set content id!\n");
 
 	return;
 }
+END_TEST
     
-static void
-tny_mime_part_test_set_filename (void)
+START_TEST (tny_mime_part_test_set_filename)
 {
 	const gchar *str_in = "test_filename.txt", *str_out;
 	
 	tny_mime_part_set_filename (iface, str_in);
 	str_out = tny_mime_part_get_filename (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to set filename!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to set filename!\n");
 
 	return;
 }
+END_TEST
        
-static void
-tny_mime_part_test_set_content_type (void)
+START_TEST (tny_mime_part_test_set_content_type)
 {
 	const gchar *str_in = "text/html", *str_out;
 	
 	tny_mime_part_set_content_type (iface, str_in);
 	str_out = tny_mime_part_get_content_type (iface);
 
-	gunit_fail_unless(!strcmp (str_in, str_out), "Unable to content type!\n");
+	fail_unless(!strcmp (str_in, str_out), "Unable to content type!\n");
 
 	return;
 }
+END_TEST
 
-static void
-tny_mime_part_test_stream (void)
+START_TEST (tny_mime_part_test_stream)
 {
 	CamelStream *real_to = camel_stream_mem_new ();
 	TnyStream *to = TNY_STREAM (tny_camel_stream_new (real_to));
@@ -145,7 +142,7 @@ tny_mime_part_test_stream (void)
 
 		buf[2] = '\0';
 
-		gunit_fail_unless(!strcmp (buf, "42"), "Unable to stream!\n");
+		fail_unless(!strcmp (buf, "42"), "Unable to stream!\n");
 
 		n++;
 	}
@@ -155,50 +152,43 @@ tny_mime_part_test_stream (void)
 
 	return;
 }
+END_TEST
 
-GUnitTestSuite*
+Suite *
 create_tny_mime_part_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     Suite *s = suite_create ("MIME Part");
+     TCase *tc = NULL;
 
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyMimePart");
+     tc = tcase_create ("Set Content Location");
+     tcase_add_checked_fixture (tc, tny_mime_part_test_setup, tny_mime_part_test_teardown);
+     tcase_add_test (tc, tny_mime_part_test_set_content_location);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_mime_part_test_set_content_location",
-                                      tny_mime_part_test_setup,
-                                      tny_mime_part_test_set_content_location,
-				      tny_mime_part_test_teardown));
+     tc = tcase_create ("Set Description");
+     tcase_add_checked_fixture (tc, tny_mime_part_test_setup, tny_mime_part_test_teardown);
+     tcase_add_test (tc, tny_mime_part_test_set_description);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_mime_part_test_set_description",
-                                      tny_mime_part_test_setup,
-                                      tny_mime_part_test_set_description,
-				      tny_mime_part_test_teardown));
+     tc = tcase_create ("Set Content ID");
+     tcase_add_checked_fixture (tc, tny_mime_part_test_setup, tny_mime_part_test_teardown);
+     tcase_add_test (tc, tny_mime_part_test_set_content_id);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_mime_part_test_set_content_id",
-                                      tny_mime_part_test_setup,
-                                      tny_mime_part_test_set_content_id,
-				      tny_mime_part_test_teardown));
-	
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_mime_part_test_set_content_type",
-                                      tny_mime_part_test_setup,
-                                      tny_mime_part_test_set_content_type,
-				      tny_mime_part_test_teardown));
+     tc = tcase_create ("Set Content Type");
+     tcase_add_checked_fixture (tc, tny_mime_part_test_setup, tny_mime_part_test_teardown);
+     tcase_add_test (tc, tny_mime_part_test_set_content_type);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_mime_part_test_set_filename",
-                                      tny_mime_part_test_setup,
-                                      tny_mime_part_test_set_filename,
-				      tny_mime_part_test_teardown));
+     tc = tcase_create ("Set Filename");
+     tcase_add_checked_fixture (tc, tny_mime_part_test_setup, tny_mime_part_test_teardown);
+     tcase_add_test (tc, tny_mime_part_test_set_filename);
+     suite_add_tcase (s, tc);
 
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_mime_part_test_stream",
-                                      tny_mime_part_test_setup,
-                                      tny_mime_part_test_stream,
-				      tny_mime_part_test_teardown));
-	return suite;
+     tc = tcase_create ("Stream");
+     tcase_add_checked_fixture (tc, tny_mime_part_test_setup, tny_mime_part_test_teardown);
+     tcase_add_test (tc, tny_mime_part_test_stream);
+     suite_add_tcase (s, tc);
+
+     return s;
 }

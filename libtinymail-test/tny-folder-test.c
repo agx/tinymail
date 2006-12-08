@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
+#include "check_libtinymail.h"
 
-#include <tny-folder-test.h>
 #include <tny-folder.h>
 #include <tny-camel-folder.h>
 #include <tny-folder-store.h>
@@ -117,15 +116,14 @@ tny_folder_test_teardown (void)
 	*/
 
 
-static void
-tny_folder_test_get_headers_sync (void)
+START_TEST (tny_folder_test_get_headers_sync)
 {
     	TnyList *headers;
 	gint length = 0, all_count;
 
     	if (iface == NULL)
 	{
-		GUNIT_WARNING ("Test cannot continue (are you online?)");
+		g_warning ("Test cannot continue (are you online?)");
 	    	return;
 	}
     
@@ -137,15 +135,15 @@ tny_folder_test_get_headers_sync (void)
 	length = tny_list_get_length (headers);
         
 	str = g_strdup_printf ("I received %d headers, the folder tells me it has %d messages\n", length, all_count);
-	gunit_fail_unless (length == all_count, str);
+	fail_unless (length == all_count, str);
 	g_free (str);
     
 	g_object_unref (G_OBJECT (headers));
 }
+END_TEST
 
 
-static void
-tny_folder_test_remove_message (void)
+START_TEST (tny_folder_test_remove_message)
 {
 	TnyList *headers;
 	gint orig_length = 0, test_len = 0, new_len = 0, headers_len = 0;
@@ -154,7 +152,7 @@ tny_folder_test_remove_message (void)
 	
 	if (iface == NULL)
 	{
-		GUNIT_WARNING ("Test cannot continue (are you online?)");
+		g_warning ("Test cannot continue (are you online?)");
 		return;
 	}
 	
@@ -166,7 +164,7 @@ tny_folder_test_remove_message (void)
 	test_len = tny_folder_get_all_count (iface);
 	
 	str = g_strdup_printf ("I received %d headers, the folder tells me it has %d messages\n", orig_length, test_len);
-	gunit_fail_unless (orig_length == test_len, str);
+	fail_unless (orig_length == test_len, str);
 	g_free (str);
 	
 	iter = tny_list_create_iterator (headers);
@@ -182,7 +180,7 @@ tny_folder_test_remove_message (void)
 	
 	new_len = tny_folder_get_all_count (iface);
 	str = g_strdup_printf ("After removal but not yet expunge, the new length is %d, whereas it should be %d\n", new_len, orig_length);
-	gunit_fail_unless (new_len == orig_length, str);
+	fail_unless (new_len == orig_length, str);
 	g_free (str);
 	
 	headers = tny_simple_list_new ();
@@ -191,7 +189,7 @@ tny_folder_test_remove_message (void)
 	g_object_unref (G_OBJECT (headers));
 	
 	str = g_strdup_printf ("After removal but not yet expunge, the header count is %d, whereas it should be %d\n", headers_len, orig_length);
-	gunit_fail_unless (new_len == orig_length, str);
+	fail_unless (new_len == orig_length, str);
 	g_free (str);
 	
 	/* Expunge ...*/
@@ -200,7 +198,7 @@ tny_folder_test_remove_message (void)
 	
 	new_len = tny_folder_get_all_count (iface);
 	str = g_strdup_printf ("After removal, the new length is %d, whereas it should be %d\n", new_len, orig_length-1);
-	gunit_fail_unless (new_len == orig_length-1, str);
+	fail_unless (new_len == orig_length-1, str);
 	g_free (str);
 	
 	headers = tny_simple_list_new ();
@@ -209,33 +207,27 @@ tny_folder_test_remove_message (void)
 	g_object_unref (G_OBJECT (headers));
 	
 	str = g_strdup_printf ("After removal, the header count is %d, whereas it should be %d\n", headers_len, orig_length-1);
-	gunit_fail_unless (new_len == orig_length-1, str);
+	fail_unless (new_len == orig_length-1, str);
 	g_free (str);
 	
 }
+END_TEST
 
-GUnitTestSuite*
+Suite *
 create_tny_folder_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     TCase *tc = NULL;
+     Suite *s = suite_create ("Folder");
 
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyFolder");
+     tc = tcase_create ("Get Headers Sync");
+     tcase_add_checked_fixture (tc, tny_folder_test_setup, tny_folder_test_teardown);
+     tcase_add_test (tc, tny_folder_test_get_headers_sync);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_folder_test_get_headers_sync",
-                                      tny_folder_test_setup,
-                                      tny_folder_test_get_headers_sync,
-				      tny_folder_test_teardown));
+     tc = tcase_create ("Remove Message");
+     tcase_add_checked_fixture (tc, tny_folder_test_setup, tny_folder_test_teardown);
+     tcase_add_test (tc, tny_folder_test_remove_message);
+     suite_add_tcase (s, tc);
 
-    
-    	/* Add test case objects to test suite */
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_folder_test_remove_message",
-                                      tny_folder_test_setup,
-                                      tny_folder_test_remove_message,
-				      tny_folder_test_teardown));
-
-	return suite;
+     return s;
 }

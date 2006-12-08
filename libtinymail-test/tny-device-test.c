@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
+#include "check_libtinymail.h"
 
-#include <tny-device-test.h>
 #include <tny-device.h>
 #include <device.h>
 
@@ -43,36 +42,31 @@ tny_device_test_teardown (void)
 
 /* TODO:  test signal connection_changed (hard to test) */
 
-static void
-tny_device_test_is_online (void)
+START_TEST (tny_device_test_is_online)
 {
 	tny_device_force_online (iface);
 		
 	str = g_strdup_printf ("Device should be online after force_online\n");
-	gunit_fail_unless (tny_device_is_online(iface) == TRUE, str);
+	fail_unless (tny_device_is_online(iface) == TRUE, str);
 	g_free (str);
 
 	tny_device_force_offline (iface);
 		
 	str = g_strdup_printf ("Device should be offline after force_online\n");
-	gunit_fail_unless (tny_device_is_online(iface) == FALSE, str);
+	fail_unless (tny_device_is_online(iface) == FALSE, str);
 	g_free (str);
 }
+END_TEST
 
-GUnitTestSuite*
+Suite *
 create_tny_device_suite (void)
 {
-	GUnitTestSuite *suite = NULL;
+     Suite *s = suite_create ("Device");
 
-	/* Create test suite */
-	suite = gunit_test_suite_new ("TnyDevice");
+     TCase *tc = tcase_create ("Is Online");
+     tcase_add_checked_fixture (tc, tny_device_test_setup, tny_device_test_teardown);
+     tcase_add_test (tc, tny_device_test_is_online);
+     suite_add_tcase (s, tc);
 
-	/* Add test case objects to test suite */
-	gunit_test_suite_add_test_case(suite,
-               gunit_test_case_new_with_funcs("tny_device_test_is_online",
-                                      tny_device_test_setup,
-                                      tny_device_test_is_online,
-				      tny_device_test_teardown));
-
-	return suite;
+     return s;
 }

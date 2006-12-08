@@ -1,4 +1,4 @@
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,6 @@
 #include "tny-list-test.h"
 #include "tny-account-test.h"
 #include "tny-device-test.h"
-#include "tny-iterator-test.h"
 #include "tny-folder-test.h"
 #include "tny-msg-test.h"
 #include "tny-platform-factory-test.h"
@@ -50,7 +49,6 @@ gunit_get_test_suites()
 	suites = g_list_append (suites, create_tny_list_suite ());
 	suites = g_list_append (suites, create_tny_account_suite ());
 	suites = g_list_append (suites, create_tny_device_suite ());
-	suites = g_list_append (suites, create_tny_iterator_suite ());
 	suites = g_list_append (suites, create_tny_folder_suite ());
 	suites = g_list_append (suites, create_tny_platform_factory_suite ());
 	suites = g_list_append (suites, create_tny_account_store_suite ());

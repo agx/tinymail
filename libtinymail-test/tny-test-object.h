@@ -1,7 +1,7 @@
 #ifndef TNY_TEST_OBJECT_H
 #define TNY_TEST_OBJECT_H
 
-/* tinymail - Tiny Mail gunit test
+/* tinymail - Tiny Mail unit test
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify

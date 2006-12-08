@@ -24,23 +24,11 @@ results when using gtk-doc for API documentation generation.
 
 Development tips
 ================
-You can find the GUnit framework at https://garage.maemo.org/projects/gunit
+You can find the Check unit test framework at http://check.sourceforge.net/
 You'll need it if you build with --enable-unit-tests which will compile the
 unit tests. Check the sources of the unit tests for more information.
 
-Unit test usage
-
-  export LD_LIBRARY_PATH=./libtinymail-test/.libs/
-  gunit-test-runner-tool -s tinymail-test-suite -v gnome
-
-API tests are unit tests that test only the public interface of tinymail.
-Instead of testing the current source, it will test the tinymail libraries
-currently installed on the system. Enable API tests with --enable-api-tests.
-Tinymail .pc files must be found by pkg-config when using this flag.
-
-API test usage
-  export LD_LIBRARY_PATH=./libtinymail-test/.libs/
-  gunit-test-runner-tool -s tinymail-api-test-suite -v gnome
+Run all unit tests with 'make check'.
 
 Building tips
 =============
@@ -156,7 +144,7 @@ Building
 Dependencies
 
   If you want the unit tests, check above at the Development tips section. You
-  can find a URL to GUnit. There's often also Debian packages that will work
+  can find a URL to Check. There's often also Debian packages that will work
   with Ubuntu Dapper & Breezy (and maybe/probably also with newer versions of
   both the Debian and Ubuntu distributions).
 
@@ -195,6 +183,6 @@ Building
 Dependencies
 
   If you want the unit tests, check above at the Development tips section. You
-  can find a URL to GUnit sources.
+  can find a URL to Check sources.
 
 
