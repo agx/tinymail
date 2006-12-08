@@ -2374,14 +2374,14 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 
 
 static guint32 
-imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, GPtrArray *needheaders, int size, int got)
+imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, GPtrArray *needheaders, int size)
 {
 	char *resp = NULL;
 	CamelImapResponseType type;
 	guint32 cnt = 0;
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
 	GData *data;
- 
+
 	while ((type = camel_imap_command_response (store, &resp, ex)) ==
 			CAMEL_IMAP_RESPONSE_UNTAGGED) 
 	{
@@ -2392,7 +2392,7 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 			continue;
 		g_ptr_array_add (needheaders, g_strdup (g_datalist_get_data (&data, "UID")));
 		if (size > 0)
-			camel_operation_progress (NULL, got * 100 / size);
+			camel_operation_progress (NULL, cnt / size);
 		g_datalist_clear (&data);
 	}
 	if (type == CAMEL_IMAP_RESPONSE_TAGGED && resp)
@@ -2418,7 +2418,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    char *uid, *resp;
    GData *data;
    gboolean more = TRUE;
-   unsigned int nextn, cnt=0, tcnt=0, ucnt=0;
+   unsigned int nextn, cnt=0, tcnt=0, ucnt=0, rec=0;
 
    if (!store->ostream || !store->istream)
 	return;
@@ -2466,7 +2466,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	needheaders = g_ptr_array_new ();
 
 	camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
-	cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+	cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq));
 	tcnt += cnt;
 	camel_operation_end (NULL);
 
@@ -2481,7 +2481,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			"UID FETCH %d:* (FLAGS)", uidval + 1 + cnt)) 
 			{ g_warning ("IMAP error getting UIDs (2)"); 
 			  camel_operation_end (NULL); return; }
-		cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+		cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - cnt);
 		tcnt += cnt;
 		/* If we still received too few */
 		if (tcnt < (exists - seq))
@@ -2493,7 +2493,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 				"UID FETCH 1:* (FLAGS)", uidval + 1 + cnt))
 				{ g_warning ("IMAP error getting UIDs (3)");
 				  camel_operation_end (NULL); return; }
-			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, size, got);
+			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
 		}
 
 		camel_operation_end (NULL);
@@ -2568,10 +2568,10 @@ imap_update_summary (CamelFolder *folder, int exists,
 						camel_message_info_free(&info->info);
 					  ucnt++;
 					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
-					  //camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
+					  /*camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
 
-					  //if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
-						//camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
+					  if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
+						camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));*/
 
 					}
 
@@ -2587,7 +2587,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 					got += IMAP_PRETEND_SIZEOF_HEADERS;
 					if (size > 0)
-						camel_operation_progress (NULL, got * 100 / size);
+						camel_operation_progress (NULL, uid / needheaders->len);
 				}
 				g_datalist_clear (&data);
 			}

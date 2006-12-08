@@ -595,7 +595,7 @@ typedef struct
 {
 	RefreshFolderInfo *minfo;
 	gchar *what;
-	gint pc;
+	gint pc, oftotal;
 } ProgressInfo;
 
 static void
@@ -617,14 +617,12 @@ static gboolean
 progress_func (gpointer data)
 {
 	ProgressInfo *info = data;
-	const gchar *what = (const gchar*)info->what;
 	RefreshFolderInfo *minfo = info->minfo;
-	gint pc = info->pc;
 
 	if (minfo && minfo->status_callback)
 	{
-		minfo->status_callback (minfo->self, 
-			(const gchar*)what, (gint)pc, minfo->user_data);
+		minfo->status_callback (minfo->self, (const gchar*)info->what, 
+			info->pc, info->oftotal, minfo->user_data);
 	}
 
 	return FALSE;
@@ -659,7 +657,15 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 	info->minfo->self = oinfo->self;
 	info->minfo->status_callback = oinfo->status_callback;
 	info->minfo->user_data = oinfo->user_data;
-	info->pc = pc;
+	info->oftotal = 100;
+
+	if (pc < 0)
+		info->pc = 0;
+	else 
+		if (pc > info->oftotal)
+			info->pc = info->oftotal;
+		else
+			info->pc = pc;
 
 	/* gidle reference */
 	g_object_ref (G_OBJECT (info->minfo->self));

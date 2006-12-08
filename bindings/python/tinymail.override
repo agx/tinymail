@@ -168,16 +168,16 @@ tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, GError **err, gpoint
 }
 
 static void
-tny_refresh_folder_status_cb (TnyFolder *self, const gchar *what, gint status, gpointer user_data)
+tny_refresh_folder_status_cb (TnyFolder *self, const gchar *what, gint status, gint oftotal, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
 
     state = pyg_gil_state_ensure();
     callback = PyTuple_GetItem((PyObject *)user_data, 1);
-    args = Py_BuildValue("(NsiO)",
+    args = Py_BuildValue("(NsiiO)",
                          pygobject_new((GObject *)self),
-			 what, status,
+			 what, status, oftotal,
                          PyTuple_GetItem((PyObject *)user_data, 2));
     ret = PyObject_CallObject(callback, args);
     if (!ret)

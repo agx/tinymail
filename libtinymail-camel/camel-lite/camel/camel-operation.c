@@ -513,6 +513,7 @@ camel_operation_start (CamelOperation *cc, char *what, ...)
 	s = g_malloc0(sizeof(*s));
 	s->msg = msg;
 	s->flags = 0;
+	s->pc = 0;
 	cc->lastreport = s;
 	cc->status_stack = g_slist_prepend(cc->status_stack, s);
 

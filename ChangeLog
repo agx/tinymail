@@ -2,6 +2,7 @@
 
 	* Added the tny_folder_transfer_msgs_async API
 	* Implemented for libtinymail-camel
+	* Fixed some progress/status numbers and changed its API
 
 	*  This was a major API change
 
