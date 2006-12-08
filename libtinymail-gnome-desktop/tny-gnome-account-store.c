@@ -187,8 +187,6 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 	gchar *retval = NULL;
 	const gchar *accountid;
 
-	gdk_threads_enter ();
-
 	accountid = tny_account_get_id (account);
 
 	if (G_UNLIKELY (!passwords))
@@ -230,10 +228,9 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 		*cancel = FALSE;
 	}
 
-	gdk_threads_leave ();
-
 	return retval;
 }
+
 
 static void
 per_account_forget_pass_func (TnyAccount *account)
@@ -258,7 +255,6 @@ per_account_forget_pass_func (TnyAccount *account)
 
 #endif
 
-
 static gboolean
 tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
 {
@@ -280,20 +276,17 @@ tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const g
 		break;
 	}
 
-	gdk_threads_enter ();
-
 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-                                  gtktype, GTK_BUTTONS_YES_NO, prompt);
+		gtktype, GTK_BUTTONS_YES_NO, prompt);
 
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 		retval = TRUE;
 
 	gtk_widget_destroy (dialog);
 
-	gdk_threads_leave ();
-
 	return retval;
 }
+
 
 static void
 gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
@@ -390,7 +383,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
 				account = TNY_ACCOUNT (tny_camel_transport_account_new ());
 		} else if (type && (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS))
-		{		
+		{
 			if (!g_ascii_strncasecmp (proto, "imap", 4))
 				account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
 			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
@@ -485,7 +478,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 
 			tny_account_set_pass_func (TNY_ACCOUNT (account),
 				per_account_get_pass_func);
-		    
+
 			tny_list_prepend (list, (GObject*)account);
 			g_object_unref (G_OBJECT (account));
 

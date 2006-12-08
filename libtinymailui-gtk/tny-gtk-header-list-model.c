@@ -263,7 +263,7 @@ _get_readable_date (time_t file_time_raw)
 	gmtime_r (&file_time_raw, &file_time);
 
 	readable_date_size = strftime (readable_date, 63, _("%Y-%m-%d, %-I:%M %p"), &file_time);
-	
+
 	return readable_date;
 }
 
@@ -696,7 +696,7 @@ typedef struct
 {
 	GList *list;
 	GFunc relaxed_func, final_func;
-    	gpointer ffdata, ffudata;
+	gpointer ffdata, ffudata;
 } RelaxedData;
 
 

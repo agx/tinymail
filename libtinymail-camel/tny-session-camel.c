@@ -161,7 +161,8 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, Tny
 	{
 		pf = copy->data;
 
-		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL))
+		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL) ||
+			!CAMEL_IS_SERVICE (pf->service) || !TNY_IS_ACCOUNT (pf->account))
 		{
 			mark_del = g_list_prepend (mark_del, copy);
 			copy = g_list_next (copy);

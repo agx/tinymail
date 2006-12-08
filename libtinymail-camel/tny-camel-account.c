@@ -89,7 +89,10 @@ tny_camel_account_set_url_string (TnyAccount *self, const gchar *url_string)
 
 	priv->url_string = g_strdup (url_string);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
+	if (G_UNLIKELY (!TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func))
+		g_error ("This TnyAccount instance isn't a fully implemented type\n");
+
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func ((TnyCamelAccount*)self);
 
 	return;
 }

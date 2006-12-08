@@ -20,6 +20,7 @@
 #include <config.h>
 
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 
 #include <string.h>
 
@@ -57,6 +58,8 @@ tny_camel_transport_account_reconnect (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	printf ("recon\n");
+
 	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && G_UNLIKELY (priv->host))
 	{
 		GString *urlstr = g_string_new ("");
@@ -77,7 +80,44 @@ tny_camel_transport_account_reconnect (TnyCamelAccount *self)
 
 		priv->url_string = urlstr->str;
 
+		/* TODO: lock ->service */
+		priv->service = camel_session_get_service
+			((CamelSession*) priv->session, priv->url_string, 
+			priv->type, priv->ex);
+		/* TODO: check ex and handle it with a GError */
+		if (camel_exception_is_set (priv->ex))
+			g_error ("Can't get service for transport account (%s)\n", 
+					 camel_exception_get_description (priv->ex));
+
+		if (!camel_service_connect (priv->service, priv->ex))
+		{
+			g_warning (_("Not connected with %s: %s\n"), priv->url_string,
+				   camel_exception_get_description (priv->ex));
+			camel_exception_clear (priv->ex);
+		}
+	
 		g_string_free (urlstr, FALSE);
+	} else if (priv->url_string)
+	{
+		
+		/* TODO: lock ->service */
+		/* TODO: check for old instance and clear it */
+
+		priv->service = camel_session_get_service
+			((CamelSession*) priv->session, priv->url_string, 
+			priv->type, priv->ex);
+
+		if (camel_exception_is_set (priv->ex))
+			g_error ("Can't get service for transport account (%s)\n", 
+					 camel_exception_get_description (priv->ex));
+		/* TODO: check ex and handle it with a GError */
+		
+		if (!camel_service_connect (priv->service, priv->ex))
+		{
+			g_warning (_("Not connected with %s: %s\n"), priv->url_string,
+				   camel_exception_get_description (priv->ex));
+			camel_exception_clear (priv->ex);
+		}
 	}
 }
 
@@ -103,8 +143,25 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
-	transport = camel_session_get_transport ((CamelSession*) apriv->session, 
+	/* TODO: lock ->service */
+	if (!apriv->service)
+	{ /* TODO do some more checking on ->service */
+		g_critical ("No service, going to try getting a forced online one");
+		transport = camel_session_get_transport ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
+		if (camel_exception_is_set (&ex))
+			g_critical ("Didn't work (%s)",
+				camel_exception_get_description (&ex));
+		apriv->service = (CamelService*) transport;
+	} else
+	{
+		if (!camel_service_connect (apriv->service, apriv->ex))
+		{
+			g_warning (_("Not connected with %s: %s\n"), apriv->url_string,
+				   camel_exception_get_description (apriv->ex));
+			camel_exception_clear (apriv->ex);
+		}
+	}
 
 	if (camel_exception_is_set (&ex) || !transport)
 	{
@@ -180,6 +237,7 @@ tny_camel_transport_account_instance_init (GTypeInstance *instance, gpointer g_c
 	TnyCamelTransportAccount *self = (TnyCamelTransportAccount *)instance;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	apriv->service = NULL;
 	apriv->connected = FALSE;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
 	apriv->account_type = TNY_ACCOUNT_TYPE_TRANSPORT;

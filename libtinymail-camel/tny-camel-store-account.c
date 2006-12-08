@@ -125,10 +125,12 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 
 			camel_url_free (url);
 
+			/* TODO: lock ->service */
 			priv->service = camel_session_get_service
 				((CamelSession*) priv->session, priv->url_string, 
 				priv->type, priv->ex);
 
+			/* TODO: lock ->service */
 			if (priv->service == NULL)
 				report_error (priv);
 		}
@@ -136,10 +138,12 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 	{
 		/* un officially supported provider */
 
+		/* TODO: lock ->service */
 		priv->service = camel_session_get_service
 			((CamelSession*) priv->session, priv->url_string, 
 			priv->type, priv->ex);
 
+		/* TODO: lock ->service */
 		if (priv->service == NULL)
 			report_error (priv);
 	}
