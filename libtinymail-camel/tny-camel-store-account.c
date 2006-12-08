@@ -73,34 +73,30 @@ report_error (TnyCamelAccountPriv *priv)
 static void 
 tny_camel_store_account_reconnect (TnyCamelAccount *self)
 {
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (G_LIKELY (priv->session) && G_UNLIKELY (priv->proto) && 
-		G_UNLIKELY (priv->user) && G_UNLIKELY (priv->host))
+	if (G_LIKELY (apriv->session) && G_UNLIKELY (apriv->proto) && 
+		G_UNLIKELY (apriv->user) && G_UNLIKELY (apriv->host))
 	{
-		if (!priv->url_string)
+		if (!apriv->url_string)
 		{
 			CamelURL *url = NULL;
-			GList *options = priv->options;
+			GList *options = apriv->options;
+			gchar *proto = g_strdup_printf ("%s://", apriv->proto); 
 
-			gchar *proto = g_strdup_printf ("%s://", priv->proto); 
-
-			url = camel_url_new (proto, priv->ex);
+			url = camel_url_new (proto, apriv->ex);
 			g_free (proto);
-		
-			camel_url_set_protocol (url, priv->proto); 
-			camel_url_set_user (url, priv->user);
-			camel_url_set_host (url, priv->host);
-		
+
+			camel_url_set_protocol (url, apriv->proto); 
+			camel_url_set_user (url, apriv->user);
+			camel_url_set_host (url, apriv->host);
+
 			while (options)
 			{
 				gchar *ptr, *dup = g_strdup (options->data);
 				gchar *option, *value;
-
 				ptr = strchr (dup, '=');
-
-				if (ptr) 
-				{
+				if (ptr) {
 					ptr++;
 					value = g_strdup (ptr); ptr--;
 					*ptr = '\0'; option = dup;
@@ -108,61 +104,61 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 					option = dup;
 					value = g_strdup ("1");
 				}
-
 				camel_url_set_param (url, option, value);
-
 				g_free (value);
-
 				g_free (dup);
-
 				options = g_list_next (options);
 			}
 
-			if (G_LIKELY (priv->url_string))
-				g_free (priv->url_string);
+			if (G_LIKELY (apriv->url_string))
+				g_free (apriv->url_string);
 
-			priv->url_string = camel_url_to_string (url, 0);
-
+			apriv->url_string = camel_url_to_string (url, 0);
 			camel_url_free (url);
 
-			/* TODO: lock ->service */
-			priv->service = camel_session_get_service
-				((CamelSession*) priv->session, priv->url_string, 
-				priv->type, priv->ex);
+			g_static_rec_mutex_lock (apriv->service_lock);
+			apriv->service = camel_session_get_service
+				((CamelSession*) apriv->session, apriv->url_string, 
+				apriv->type, apriv->ex);
+			if (apriv->service == NULL)
+				report_error (apriv);
+			g_static_rec_mutex_unlock (apriv->service_lock);
 
-			/* TODO: lock ->service */
-			if (priv->service == NULL)
-				report_error (priv);
+			/* TODO: Handle priv->ex using GError */
 		}
-	} else if (G_LIKELY (priv->session) && (priv->url_string))
+	} else if (G_LIKELY (apriv->session) && (apriv->url_string))
 	{
-		/* un officially supported provider */
-
-		/* TODO: lock ->service */
-		priv->service = camel_session_get_service
-			((CamelSession*) priv->session, priv->url_string, 
-			priv->type, priv->ex);
-
-		/* TODO: lock ->service */
-		if (priv->service == NULL)
-			report_error (priv);
+		g_static_rec_mutex_lock (apriv->service_lock);
+		/* camel_session_get_service can launch GUI things */
+		apriv->service = camel_session_get_service
+			((CamelSession*) apriv->session, apriv->url_string, 
+			apriv->type, apriv->ex);
+		if (apriv->service == NULL)
+			report_error (apriv);
+		g_static_rec_mutex_unlock (apriv->service_lock);
+		
+		/* TODO: Handle priv->ex using GError */
 	}
 
-	if ( G_LIKELY (priv->service) && G_UNLIKELY (priv->pass_func_set)
-		&& G_UNLIKELY (priv->forget_pass_func_set) )
+	if ( G_LIKELY (apriv->service) && G_UNLIKELY (apriv->pass_func_set)
+		&& G_UNLIKELY (apriv->forget_pass_func_set) )
 	{
-		priv->connected = FALSE;
+		apriv->connected = FALSE;
 
-		if (!camel_service_connect (priv->service, priv->ex))
+		g_static_rec_mutex_lock (apriv->service_lock);
+		/* camel_service_connect can launch GUI things */
+		if (!camel_service_connect (apriv->service, apriv->ex))
 		{
-			g_warning (_("Not connected with %s: %s\n"), priv->url_string,
-				   camel_exception_get_description (priv->ex));
-			camel_exception_clear (priv->ex);
-			/* camel_service_cancel_connect (priv->service);
-			camel_service_disconnect (priv->service, FALSE, priv->ex); */
+			/* TODO: Handle priv->ex using GError */
+			g_warning (_("Not connected with %s: %s\n"), apriv->url_string,
+				   camel_exception_get_description (apriv->ex));
+			camel_exception_clear (apriv->ex);
 		} else {
-			priv->connected = TRUE;
+			apriv->connected = TRUE;
 		}
+		g_static_rec_mutex_unlock (apriv->service_lock);
+		
+		/* TODO: Handle priv->ex using GError */
 	}
 
 	return;

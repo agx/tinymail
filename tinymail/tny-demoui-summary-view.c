@@ -555,7 +555,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				if (G_LIKELY (msg))
 				{
 
-/* DEBUG		*/
+/* DEBUG		
 					TnyAccountStore *astore = priv->account_store;
 					TnyList *accs = tny_simple_list_new ();
 					tny_account_store_get_accounts (astore, accs, TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS);
@@ -572,7 +572,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 					g_object_unref (G_OBJECT (acc));
 					g_object_unref (G_OBJECT (iter));
 					g_object_unref (G_OBJECT (accs));
-
+*/
 
 					msgwin = tny_gtk_msg_window_new (
 						tny_platform_factory_new_msg_view (platfact));

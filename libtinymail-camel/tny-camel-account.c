@@ -159,7 +159,7 @@ _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationS
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	GThread *thread;
 
-	g_mutex_lock (priv->cancel_lock);	
+	g_mutex_lock (priv->cancel_lock);
 
 	/* I know this isn't polite. But it works ;-) */
 	/* camel_operation_cancel (NULL); */
@@ -259,7 +259,7 @@ static void
 tny_camel_account_set_proto (TnyAccount *self, const gchar *proto)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	if (G_UNLIKELY (priv->proto))
@@ -498,9 +498,11 @@ tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline)
 
 	if (!priv->service)
 		return;
-	
+
 	_tny_camel_account_start_camel_operation (self, NULL, NULL, NULL);
-	
+
+	g_static_rec_mutex_lock (priv->service_lock);
+
 	if (offline)
 		camel_service_cancel_connect (priv->service);
 	
@@ -536,7 +538,7 @@ tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline)
 		camel_service_disconnect (CAMEL_SERVICE (priv->service),
 								  TRUE, priv->ex);
 	done:
-		
+		g_static_rec_mutex_unlock (priv->service_lock);
 		_tny_camel_account_stop_camel_operation (self);
 	
 }
@@ -545,7 +547,7 @@ tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline)
 static void
 tny_camel_account_finalize (GObject *object)
 {
-	TnyCamelAccount *self = (TnyCamelAccount *)object;	
+	TnyCamelAccount *self = (TnyCamelAccount *)object;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	_tny_session_camel_forget_account (priv->session, (TnyCamelAccount*) object);    

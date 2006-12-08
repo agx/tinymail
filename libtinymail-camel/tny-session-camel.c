@@ -202,6 +202,9 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, Tny
 	return;
 }
 
+
+/* Will be called at camel_service_connect in case the account needs a password.
+   its implementation can contani GUI things. */
 static char *
 tny_session_camel_get_password (CamelSession *session, CamelService *service, const char *domain,
 	      const char *prompt, const char *item, guint32 flags, CamelException *ex)
@@ -255,6 +258,8 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	return retval;
 }
 
+
+/* Will be called at camel_service_connect in case the entered password was wrong */
 static void
 tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
 {
@@ -282,6 +287,12 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 
 	return;
 }
+
+/* tny_session_camel_alert_user will for example be called when SSL is on and 
+   camel_session_get_service is issued (for example TnyCamelTransportAccount and
+   TnyCamelStore account issue this function). Its implementation is often done
+   with GUI components (it should therefore not be called from a thread). This
+   is a known issue (and the person who fixed this, please remove this warning) */
 
 static gboolean
 tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *prompt, gboolean cancel)
