@@ -1329,6 +1329,10 @@ noexception:
 		g_mutex_unlock (tolock);
 	g_mutex_unlock (fromlock);
 
+
+	/* urgent TODO: using tostore, create a new TnyCamelFolder and return it */
+
+	return NULL;
 }
 
 typedef struct 
