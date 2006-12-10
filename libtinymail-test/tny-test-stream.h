@@ -28,8 +28,6 @@
 
 #include <tny-test-stream.h>
 
-#include "tny-test-suite.h"
-
 
 G_BEGIN_DECLS
 
