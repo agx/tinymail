@@ -68,7 +68,7 @@ Koen Kooi <koen@dominion.kabel.utwente.nl>
 Øystein Gisnås <oystein@gisnas.net>
 
 	* Packaging for Debian
-	* Unit tests
+	* Unit tests (porting GUnit to Check)
 
 Thomas Viehmann <tv@beamnet.de>
 
