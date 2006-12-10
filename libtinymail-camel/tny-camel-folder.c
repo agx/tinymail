@@ -1160,6 +1160,11 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	CamelStore *fromstore; const gchar *frombase;
 	CamelStore *tostore; const gchar *tobase;
 	GMutex *tolock=NULL, *fromlock=NULL;
+	TnyAccount *acc;
+	TnyFolder *retval = NULL;
+	TnyCamelFolderPriv *fpriv;
+	CamelFolderInfo *iter;
+	gchar *final_name;
 
 	g_assert (TNY_IS_CAMEL_FOLDER (into) || TNY_IS_CAMEL_STORE_ACCOUNT (into));
 	g_assert (new_name != NULL && strlen (new_name) > 0);
@@ -1178,6 +1183,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		camel_object_ref (CAMEL_OBJECT (tostore));
 		tobase = topriv->folder_name;
 		tolock = topriv->folder_lock;
+		acc = topriv->account;
 
 	} else 
 	{
@@ -1186,6 +1192,9 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		tobase = "/";
 		tostore = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
+		acc = TNY_ACCOUNT (into);
+
+		/* TODO: a tolock */
 
 		if (camel_exception_is_set (&ex))
 		{
@@ -1297,6 +1306,34 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		l = l->next;
 	}
 
+	final_name = g_strdup_printf ("%s/%s", tobase, new_name);
+
+	iter = camel_store_get_folder_info (tostore, final_name, 
+			CAMEL_STORE_FOLDER_INFO_FAST|CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL,&ex);
+
+	g_free (final_name);
+
+	if (camel_exception_is_set (&ex))
+	{
+		if (iter && CAMEL_IS_STORE (tostore))
+			camel_store_free_folder_info (tostore, iter);
+
+		goto exception;
+	}
+
+	retval = tny_camel_folder_new ();
+	fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
+
+	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (retval), iter->full_name);
+	_tny_camel_folder_set_folder_type (TNY_CAMEL_FOLDER (retval), iter);
+	_tny_camel_folder_set_unread_count (TNY_CAMEL_FOLDER (retval), iter->unread);
+	_tny_camel_folder_set_all_count (TNY_CAMEL_FOLDER (retval), iter->total);
+	_tny_camel_folder_set_name (TNY_CAMEL_FOLDER (retval), iter->name);
+	_tny_camel_folder_set_iter (TNY_CAMEL_FOLDER (retval), iter);
+	_tny_camel_folder_set_account (TNY_CAMEL_FOLDER (retval), acc);
+	camel_object_ref (CAMEL_OBJECT (tostore));
+	fpriv->store = tostore;
+
 	camel_object_unref (CAMEL_OBJECT (tostore));
 	camel_object_unref (CAMEL_OBJECT (fromstore));
 
@@ -1330,9 +1367,7 @@ noexception:
 	g_mutex_unlock (fromlock);
 
 
-	/* urgent TODO: using tostore, create a new TnyCamelFolder and return it */
-
-	return NULL;
+	return retval;
 }
 
 typedef struct 

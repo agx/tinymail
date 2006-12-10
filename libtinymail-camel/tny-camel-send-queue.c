@@ -257,7 +257,8 @@ create_maildir (TnySendQueue *self, const gchar *name)
 
 				return TNY_FOLDER (folder);
 
-			}
+			} else if (iter && CAMEL_IS_STORE (mdstore))
+				camel_store_free_folder_info (mdstore, iter);
 
 		} else 
 		{
