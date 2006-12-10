@@ -27,6 +27,30 @@ guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
 
 /**
+ * tny_folder_copy:
+ * @self: a #TnyFolder object
+ * @into: a #TnyFolderStore object
+ * @new_name: the new name in @into
+ * @del: whether or not to delete the original location
+ * @err: a #GError object or NULL
+ *
+ * WARNING: highly experimental feature and new API that might change
+ *
+ * Copy @self to @into.
+ *
+ * Return value: a new folder instance to whom was copied
+ **/
+TnyFolder* 
+tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->copy_func)
+		g_critical ("You must implement tny_folder_copy\n");
+#endif
+	return TNY_FOLDER_GET_IFACE (self)->copy_func (self, into, new_name, del, err);
+}
+
+/**
  * tny_folder_get_msg_remove_strategy:
  * @self: a TnyFolder object
  *

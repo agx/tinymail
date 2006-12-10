@@ -1,3 +1,9 @@
+2006-12-10  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Committed unfinished copy/moving of folders
+
+	* This was a major API change in libtinymail
+
 2006-12-08  Øystein Gisnås  <oystein@gisnas.net>
 
 	* Ported GUnit unit tests to Check

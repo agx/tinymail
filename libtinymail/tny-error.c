@@ -50,6 +50,7 @@ tny_error_get_type (void)
       { TNY_FOLDER_ERROR_GET_MSG, "TNY_FOLDER_ERROR_GET_MSG", "folder_error_get_msg" },
       { TNY_FOLDER_ERROR_TRANSFER_MSGS, "TNY_FOLDER_ERROR_TRANSFER_MSGS", "folder_error_transfer_msgs" },
       { TNY_FOLDER_ERROR_SET_NAME, "TNY_FOLDER_ERROR_SET_NAME", "folder_error_set_name" },
+      { TNY_FOLDER_ERROR_COPY, "TNY_FOLDER_ERROR_COPY", "folder_error_copy" },
 
       { TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER, "TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER", "folder_store_error_remove_folder" },
       { TNY_FOLDER_STORE_ERROR_GET_FOLDERS, "TNY_FOLDER_STORE_ERROR_GET_FOLDERS", "folder_store_error_get_folders" },

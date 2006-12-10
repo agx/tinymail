@@ -90,6 +90,7 @@ struct _TnyFolderIface
 	void (*refresh_func) (TnyFolder *self, GError **err);
 	void (*transfer_msgs_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data);
+	TnyFolder* (*copy_func) (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
 };
 
 GType tny_folder_get_type (void);
@@ -114,6 +115,7 @@ void tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callbac
 void tny_folder_refresh (TnyFolder *self, GError **err);
 void tny_folder_transfer_msgs (TnyFolder *folder_src, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 void tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data);
+TnyFolder* tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
 
 G_END_DECLS
 

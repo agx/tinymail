@@ -1142,6 +1142,195 @@ tny_camel_folder_get_id_default (TnyFolder *self)
 
 
 
+static TnyFolder*
+tny_camel_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->copy_func (self, into, new_name, del, err);
+}
+
+static TnyFolder*
+tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | 
+		CAMEL_STORE_FOLDER_INFO_RECURSIVE | CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
+	GList *pending = NULL, *deleting = NULL, *l; GString *fromname, *toname;
+	CamelFolderInfo *fi; const char *tmp; int fromlen;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelStore *fromstore; const gchar *frombase;
+	CamelStore *tostore; const gchar *tobase;
+	GMutex *tolock=NULL, *fromlock=NULL;
+
+	g_assert (TNY_IS_CAMEL_FOLDER (into) || TNY_IS_CAMEL_STORE_ACCOUNT (into));
+	g_assert (new_name != NULL && strlen (new_name) > 0);
+
+	fromstore = priv->store;
+	camel_object_ref (CAMEL_OBJECT (fromstore));
+	frombase = priv->folder_name;
+	fromlock = priv->folder_lock;
+
+	g_assert (frombase != NULL && strlen (frombase) > 0);
+
+	if (TNY_IS_CAMEL_FOLDER (into))
+	{
+		TnyCamelFolderPriv *topriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
+		tostore = topriv->store;
+		camel_object_ref (CAMEL_OBJECT (tostore));
+		tobase = topriv->folder_name;
+		tolock = topriv->folder_lock;
+
+	} else 
+	{
+		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (into);
+
+		tobase = "/";
+		tostore = camel_session_get_store ((CamelSession*) apriv->session, 
+			apriv->url_string, &ex);
+
+		if (camel_exception_is_set (&ex))
+		{
+			g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_COPY,
+				camel_exception_get_description (&ex));
+			camel_exception_clear (&ex);
+
+			if (tostore && CAMEL_IS_OBJECT (tostore))
+				camel_object_unref (CAMEL_OBJECT (tostore));
+
+			return;
+		}		
+	}
+
+	g_assert (tobase != NULL && strlen (tobase) > 0);
+	
+	g_mutex_lock (fromlock);
+	if (tolock)
+		g_mutex_lock (tolock);
+
+	if (!(fi = camel_store_get_folder_info (fromstore, frombase, flags, &ex)))
+		goto exception;
+	
+	pending = g_list_append (pending, fi);
+	
+	toname = g_string_new ("");
+	fromname = g_string_new ("");
+	
+	tmp = strrchr (frombase, '/');
+	if (tmp == NULL)
+		fromlen = 0;
+	else
+		fromlen = tmp - frombase + 1;
+	
+	while (pending) 
+	{
+		CamelFolderInfo *info = pending->data;
+		
+		pending = g_list_remove_link (pending, pending);
+		while (info) 
+		{
+			CamelFolder *fromfolder, *tofolder;
+			GPtrArray *uids;
+			int deleted = 0;
+			
+			if (info->child)
+				pending = g_list_append (pending, info->child);
+			
+			if (tobase[0])
+				g_string_printf (toname, "%s/%s", tobase, info->full_name + fromlen);
+			else
+				g_string_printf (toname, "%s", info->full_name + fromlen);
+			
+			if ((info->flags & CAMEL_FOLDER_NOSELECT) == 0) 
+			{
+				if (tostore == fromstore && del) {
+					camel_store_rename_folder (fromstore, info->full_name, toname->str, &ex);
+					if (camel_exception_is_set (&ex))
+						goto exception;
+					
+					if (camel_store_supports_subscriptions (fromstore))
+						camel_store_unsubscribe_folder (fromstore, info->full_name, NULL);
+					
+					deleted = 1;
+				} else {
+					if (!(fromfolder = camel_store_get_folder (fromstore, info->full_name, 0, &ex)))
+						goto exception;
+					
+					if (!(tofolder = camel_store_get_folder (tostore, toname->str, CAMEL_STORE_FOLDER_CREATE, &ex))) {
+						camel_object_unref (fromfolder);
+						goto exception;
+					}
+					
+					uids = camel_folder_get_uids (fromfolder);
+					camel_folder_transfer_messages_to (fromfolder, uids, tofolder, NULL, del, &ex);
+					camel_folder_free_uids (fromfolder, uids);
+					
+					if (del)
+						camel_folder_sync(fromfolder, TRUE, NULL);
+					
+					camel_object_unref (fromfolder);
+					camel_object_unref (tofolder);
+				}
+			}
+			
+			if (camel_exception_is_set (&ex))
+				goto exception;
+			else if (del && !deleted)
+				deleting = g_list_prepend (deleting, info);
+			
+			if (camel_store_supports_subscriptions (tostore)
+				&& !camel_store_folder_subscribed (tostore, toname->str))
+				camel_store_subscribe_folder (tostore, toname->str, NULL);
+			
+			info = info->next;
+		}
+	}
+	
+	l = deleting;
+	while (l) 
+	{
+		CamelFolderInfo *info = l->data;
+		
+		if (camel_store_supports_subscriptions (fromstore))
+			camel_store_unsubscribe_folder (fromstore, info->full_name, NULL);
+		
+		camel_store_delete_folder (fromstore, info->full_name, NULL);
+		l = l->next;
+	}
+
+	camel_object_unref (CAMEL_OBJECT (tostore));
+	camel_object_unref (CAMEL_OBJECT (fromstore));
+
+	goto noexception;
+
+exception:
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_COPY,
+			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+
+		if (fromstore && CAMEL_IS_OBJECT (fromstore))
+			camel_object_unref (CAMEL_OBJECT (fromstore));
+
+		if (tostore && CAMEL_IS_OBJECT (tostore))
+			camel_object_unref (CAMEL_OBJECT (tostore));
+	}
+
+noexception:
+
+	camel_store_free_folder_info (fromstore, fi);
+	g_list_free (deleting);
+	
+	g_string_free (toname, TRUE);
+	g_string_free (fromname, TRUE);
+
+	if (tolock)
+		g_mutex_unlock (tolock);
+	g_mutex_unlock (fromlock);
+
+}
+
 typedef struct 
 {
 	GError *err;
@@ -2003,6 +2192,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->add_msg_func = tny_camel_folder_add_msg;
 	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
 	klass->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async;
+	klass->copy_func = tny_camel_folder_copy;
 
 	return;
 }
@@ -2049,6 +2239,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->expunge_func = tny_camel_folder_expunge_default;
 	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
 	class->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async_default;
+	class->copy_func = tny_camel_folder_copy_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;
