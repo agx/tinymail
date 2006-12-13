@@ -95,15 +95,16 @@ _wrap_tny_folder_store_get_folders_async (PyGObject *self, PyObject *args, PyObj
 override tny_folder_get_msg_async kwargs
 
 static void
-tny_get_msg_cb (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+tny_get_msg_cb (TnyFolder *self, TnyMsg *msg, GError **err, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
 
     state = pyg_gil_state_ensure();
     callback = PyTuple_GetItem((PyObject *)user_data, 1);
-    args = Py_BuildValue("(NO)",
+    args = Py_BuildValue("(NNO)",
                          pygobject_new((GObject *)self),
+						 pygobject_new((GObject *)msg),
                          PyTuple_GetItem((PyObject *)user_data, 2));
     ret = PyObject_CallObject(callback, args);
     if (!ret)
