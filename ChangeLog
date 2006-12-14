@@ -1,3 +1,9 @@
+2006-12-14  Sergio Villar Senin <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-store-account.c:
+	* libtinymail-camel/tny-camel-folder.c: replaced some double pointers
+	by simple pointers. Fixed some uninitialized GError's
+
 2006-12-11  Sergio Villar Senin <svillar@igalia.com>
 
 	* libtinymail/tny-folder.h: added the tny_folder_get_msg_async

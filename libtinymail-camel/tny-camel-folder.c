@@ -719,7 +719,7 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 			TNY_FOLDER_ERROR_REFRESH,
 			camel_exception_get_description (&ex));
 		if (err != NULL)
-			info->err = g_error_copy ((const GError *) &err);
+			info->err = g_error_copy ((const GError *) err);
 	}
 
 	priv->cached_length = camel_folder_get_message_count (priv->folder);
@@ -967,7 +967,7 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 
 	if (err != NULL)
 	{
-		info->err = g_error_copy ((const GError *) &err);
+		info->err = g_error_copy ((const GError *) err);
 		if (info->msg && G_IS_OBJECT (info->msg))
 			g_object_unref (G_OBJECT (info->msg));
 		info->msg = NULL;
@@ -1419,7 +1419,7 @@ tny_camel_folder_transfer_msgs_async_thread (gpointer thr_user_data)
 			info->delete_originals, &err);
 
 	if (err != NULL)
-		info->err = g_error_copy ((const GError *) &err);
+		info->err = g_error_copy ((const GError *) err);
 	else
 		info->err = NULL;
 
@@ -2015,7 +2015,7 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 		info->list, info->query, &err);
 
 	if (err != NULL)
-		info->err = g_error_copy ((const GError *) &err);
+		info->err = g_error_copy ((const GError *) err);
 	else
 		info->err = NULL;
 
