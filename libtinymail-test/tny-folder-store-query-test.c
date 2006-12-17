@@ -75,8 +75,7 @@ tny_folder_store_query_test_teardown (void)
 	return;
 }
 
-START_TEST (
-tny_folder_store_query_test_match_on_name)
+START_TEST (tny_folder_store_query_test_match_on_name)
 {
 	TnyFolderStoreQuery *query = NULL;
 	TnyList *folders = NULL, *subfolders;
@@ -124,8 +123,7 @@ tny_folder_store_query_test_match_on_name)
 }
 END_TEST
 
-START_TEST (
-tny_folder_store_query_test_match_on_id)
+START_TEST (tny_folder_store_query_test_match_on_id)
 {
 	TnyFolderStoreQuery *query = NULL;
 	TnyList *folders = NULL, *subfolders;
@@ -171,8 +169,7 @@ tny_folder_store_query_test_match_on_id)
 END_TEST
 
 
-START_TEST (
-tny_folder_store_query_test_match_subscribed)
+START_TEST (tny_folder_store_query_test_match_subscribed)
 {
 	TnyFolderStoreQuery *query = NULL;
 	TnyList *folders = NULL, *subfolders;

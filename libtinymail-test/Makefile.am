@@ -43,13 +43,14 @@ check_libtinymail_SOURCES = \
 	tny-test-object.c \
 	tny-test-stream.h \
 	tny-test-stream.c \
-	tny-list-test.c \
-	tny-folder-test.c \
-	tny-folder-store-query-test.c \
 	tny-account-store-test.c \
 	tny-account-test.c \
 	tny-device-test.c \
+	tny-folder-store-query-test.c \
+	tny-folder-store-test.c \
+	tny-folder-test.c \
 	tny-header-test.c \
+	tny-list-test.c \
 	tny-mime-part-test.c \
 	tny-msg-test.c \
 	tny-platform-factory-test.c \

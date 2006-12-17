@@ -11,13 +11,15 @@ main (void)
      gtk_init (NULL, NULL);	/* Why doesn't this require gtk CFLAGS&LIBS? */
      g_thread_init (NULL);
 
-     sr = srunner_create ((Suite *) create_tny_list_suite ());
-     srunner_add_suite (sr, (Suite *) create_tny_folder_suite ());
-     srunner_add_suite (sr, (Suite *) create_tny_folder_store_query_suite ());
+     sr = srunner_create (NULL);
      srunner_add_suite (sr, (Suite *) create_tny_account_store_suite ());
      srunner_add_suite (sr, (Suite *) create_tny_account_suite ());
      srunner_add_suite (sr, (Suite *) create_tny_device_suite ());
+     srunner_add_suite (sr, (Suite *) create_tny_folder_store_query_suite ());
+     srunner_add_suite (sr, (Suite *) create_tny_folder_store_suite ());
+     srunner_add_suite (sr, (Suite *) create_tny_folder_suite ());
      srunner_add_suite (sr, (Suite *) create_tny_header_suite ());
+     srunner_add_suite (sr, (Suite *) create_tny_list_suite ());
      srunner_add_suite (sr, (Suite *) create_tny_mime_part_suite ());
      srunner_add_suite (sr, (Suite *) create_tny_msg_suite ());
      srunner_add_suite (sr, (Suite *) create_tny_stream_suite ());
