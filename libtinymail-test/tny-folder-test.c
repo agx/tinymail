@@ -237,7 +237,6 @@ START_TEST (tny_folder_test_properties)
      fail_unless (tny_folder_get_folder_type (iface) == TNY_FOLDER_TYPE_NORMAL, "Folder type should be NORMAL");
      recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX", second_folder);
      g_object_ref (G_OBJECT (folder2));
-     g_print ("Navn: %s\n", tny_folder_get_id (folder2));
      fail_unless (tny_folder_get_folder_type (folder2) == TNY_FOLDER_TYPE_INBOX, "Folder type should be INBOX");
      g_object_unref (G_OBJECT (folder2));
 }
@@ -302,6 +301,22 @@ timeout (gpointer data)
      return FALSE;
 }
 
+START_TEST (tny_folder_test_refresh)
+{
+     GError *err;
+
+     if (iface == NULL)
+     {
+	  g_warning ("Test cannot continue (are you online?)");
+	  return;
+     }
+
+     err = NULL;
+     tny_folder_refresh (iface, &err);
+     fail_unless (tny_folder_get_unread_count (iface) == 2, "Message count not updated");
+}
+END_TEST
+
 START_TEST (tny_folder_test_refresh_async)
 {
      GError *err;
@@ -359,6 +374,7 @@ create_tny_folder_suite (void)
      tc = tcase_create ("Refresh");
      tcase_set_timeout (tc, 10);
      tcase_add_checked_fixture (tc, tny_folder_test_setup, tny_folder_test_teardown);
+     tcase_add_test (tc, tny_folder_test_refresh);
      tcase_add_test (tc, tny_folder_test_refresh_async);
      suite_add_tcase (s, tc);
 
