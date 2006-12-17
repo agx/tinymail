@@ -1,3 +1,9 @@
+2006-12-16  Øystein Gisnås  <oystein@gisnas.net>
+
+	* libtinymail-test/: Some unit test improvements and added two new
+	unit tests
+	* Documentation fixes in TnyList
+
 2006-12-15  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite/camel: merging interesting bits and
