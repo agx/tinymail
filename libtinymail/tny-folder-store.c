@@ -167,7 +167,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *     TnyList *folders;
  *     folders = tny_simple_list_new ();
  *     tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
- *         folders, callback, NULL, NULL, NULL);
+ *         folders, callback, NULL, NULL);
  * }
  * </programlisting></informalexample>
  *
