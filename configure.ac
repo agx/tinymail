@@ -333,8 +333,7 @@ AC_SUBST(extragtkpkgs)
 
 dnl ### libtinymail-test, a library for testing purposes ##
 if test x$build_unittests = xtrue; then
-  AM_PATH_CHECK(0.9.3)
-dnl  PKG_CHECK_MODULES(CHECK, check >= 0.9.4 glib-2.0)
+  PKG_CHECK_MODULES(CHECK, check >= 0.9.4 glib-2.0)
 fi
 
 dnl ### tinymail, the demo-ui ##
