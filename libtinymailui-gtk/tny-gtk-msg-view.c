@@ -83,9 +83,9 @@ typedef struct
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_MSG_VIEW, TnyGtkMsgViewPriv))
 
 
-static void tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alternatives);
+static void tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alternatives, const gchar *desc);
 static void remove_mime_part_viewer (TnyMimePartView *mpview, GtkContainer *mpviewers);
-static gboolean tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part);
+static gboolean tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar *desc);
 
 
 /**
@@ -380,54 +380,13 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 }
 
 
-/**
- * tny_mime_part_view_proxy_func_set_part:
- * @self: a #TnyGtkMsgView instance
- * @part: a #TnyMimePart instance
- *
- * This is non-public API documentation
- *
- * A functional wrapper that detects whether part is rfc822, and if that is the
- * case, will do something specific (like adding the header to the view). Else
- * it will simply proxy to tny_mime_part_view_set_part which in turn will call 
- * tny_gtk_msg_view_display_part or tny_gtk_msg_view_set_msg which will call
- * tny_gtk_msg_view_display_parts.
- **/
-static void
-tny_mime_part_view_proxy_func_set_part (TnyMimePartView *mpview, TnyMimePart *part)
-{
-		if (tny_mime_part_content_type_is (part, "message/*") && TNY_IS_GTK_MSG_VIEW (mpview))
-		{
-			TnyMimePart *content_part = tny_mime_part_get_content_object (part);
-
-			if (!content_part)
-			{
-				TnyList *list = tny_simple_list_new ();
-
-				tny_mime_part_get_parts (part, list);
-				tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list, FALSE);
-				g_object_unref (G_OBJECT (list));
-			} else {
-				tny_mime_part_view_set_part (mpview, content_part);
-			}
-		} else if (tny_mime_part_content_type_is (part, "multipart/*") && TNY_IS_GTK_MSG_VIEW (mpview))
-		{
-			TnyList *list = tny_simple_list_new ();
-			tny_mime_part_get_parts (part, list);
-			tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (mpview), list, 
-				tny_mime_part_content_type_is (part, "multipart/alternative"));
-			g_object_unref (G_OBJECT (list));
-
-		} else
-			tny_mime_part_view_set_part (mpview, part);
-}
 
 static void
 on_mpview_realize (GtkWidget *widget, gpointer user_data)
 {
 	RealizePriv *prv = user_data;
 
-	tny_mime_part_view_proxy_func_set_part (TNY_MIME_PART_VIEW (widget), prv->part);
+	tny_mime_part_view_set_part (TNY_MIME_PART_VIEW (widget), prv->part);
 	g_signal_handler_disconnect (widget, prv->signal);
 	g_object_unref (prv->part);
 	g_slice_free (RealizePriv, prv);
@@ -454,7 +413,7 @@ on_mpview_realize (GtkWidget *widget, gpointer user_data)
  * will that list be unreferenced.
  **/
 static gboolean
-tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
+tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar *desc)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	TnyMimePartView *mpview = NULL;
@@ -471,7 +430,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 			if (TNY_IS_GTK_MSG_VIEW (mpview) && !GTK_IS_WINDOW (mpview) && !priv->in_expander)
 			{
 				TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
-				const gchar *label = tny_mime_part_get_description (part);
+				const gchar *label = desc;
 				GtkWidget *expander;
 
 				mppriv->in_expander = TRUE;
@@ -500,14 +459,14 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
 				prv->signal = g_signal_connect (G_OBJECT (mpview),
 					"realize", G_CALLBACK (on_mpview_realize), prv);
 			} else
-				tny_mime_part_view_proxy_func_set_part (mpview, part);
+				tny_mime_part_view_set_part (mpview, part);
 
 		} else if (TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
-			tny_mime_part_view_proxy_func_set_part (mpview, part);
+			tny_mime_part_view_set_part (mpview, part);
 		else if (!TNY_IS_GTK_ATTACHMENT_MIME_PART_VIEW (mpview)) 
 		{
 			priv->unattached_views = g_list_prepend (priv->unattached_views, mpview);
-			tny_mime_part_view_proxy_func_set_part (mpview, part);
+			tny_mime_part_view_set_part (mpview, part);
 		}
 	} else if (!tny_mime_part_content_type_is (part, "multipart/*") &&
 		!tny_mime_part_content_type_is (part, "message/*"))
@@ -526,20 +485,21 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part)
  * tny_gtk_msg_view_display_parts:
  * @self: a #TnyGtkMsgView instance
  * @parts: a #TnyList instance containing #TnyMimePart instances
+ * @desc: description of the parent part (if any)
  *
  * This is non-public API documentation
  *
  * Walks all items in parts and performs tny_gtk_msg_view_display_part on each.
  **/
 static void
-tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alternatives)
+tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alternatives, const gchar *desc)
 {
 	TnyIterator *iterator = tny_list_create_iterator (parts);
 
 	while (!tny_iterator_is_done (iterator))
 	{
 		TnyMimePart *part = (TnyMimePart*)tny_iterator_get_current (iterator);
-		gboolean displayed = tny_gtk_msg_view_display_part (self, part);
+		gboolean displayed = tny_gtk_msg_view_display_part (self, part, desc);
 
 		g_object_unref (G_OBJECT (part));
 		if (alternatives && displayed)
@@ -655,9 +615,13 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 
 		priv->part = g_object_ref (G_OBJECT (part));
 
-		if (!tny_mime_part_content_type_is (part, "multipart/*"))
-			tny_gtk_msg_view_display_part (TNY_MSG_VIEW (self), part);
-		else
+		if (!tny_mime_part_content_type_is (part, "multipart/*") && 
+			!tny_mime_part_content_type_is (part, "message/*"))
+		{
+
+			tny_gtk_msg_view_display_part (TNY_MSG_VIEW (self), part, NULL);
+
+		} else
 		{
 			TnyIterator *iterator;
 			TnyList *list;
@@ -665,7 +629,8 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 
 			tny_mime_part_get_parts (part, list);
 			tny_gtk_msg_view_display_parts (TNY_MSG_VIEW (self), list, 
-				tny_mime_part_content_type_is (part, "multipart/alternative"));
+				tny_mime_part_content_type_is (part, "multipart/alternative"),
+				tny_mime_part_get_description (part));
 			g_object_unref (G_OBJECT (list));
 		}
 	}

@@ -68,7 +68,6 @@ struct _TnyCamelMimePartClass
 	void (*get_parts_func) (TnyMimePart *self, TnyList *list);
 	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);
 	gint (*add_part_func) (TnyMimePart *self, TnyMimePart *part);
-	TnyMimePart* (*get_content_object_func) (TnyMimePart *self);
 };
 
 

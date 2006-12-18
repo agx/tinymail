@@ -23,27 +23,6 @@
 
 
 /**
- * tny_mime_part_get_content_object:
- * @self: a #TnyMimePart object
- * 
- * Get the content-object in case @self is a RFC822 mime part. If the mime part
- * isn't a RFC822 one, it will return NULL. Else the return value must be 
- * unreferenced after use.
- *
- * Return value: a #TnyMimePart instance or NULL
- **/
-TnyMimePart* 
-tny_mime_part_get_content_object (TnyMimePart *self)
-{
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_content_object_func)
-		g_critical ("You must implement tny_mime_part_get_content_object\n");
-#endif
-
-	return TNY_MIME_PART_GET_IFACE (self)->get_content_object_func (self);
-}
-
-/**
  * tny_mime_part_get_parts:
  * @self: a #TnyMimePart object
  * @list: a #TnyList object
