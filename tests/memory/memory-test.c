@@ -156,6 +156,7 @@ main (int argc, char **argv)
 	    
 	tny_account_store_get_accounts (account_store, accounts, 
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+	g_object_unref (G_OBJECT (account_store));
 
 	aiter = tny_list_create_iterator (accounts);
 	tny_iterator_first (aiter);

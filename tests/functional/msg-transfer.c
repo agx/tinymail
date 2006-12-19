@@ -127,6 +127,7 @@ main (int argc, char **argv)
 
 	tny_account_store_get_accounts (account_store, accounts, 
 	      TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+	g_object_unref (G_OBJECT (account_store));
     
 	iter = tny_list_create_iterator (accounts);
 	account = (TnyStoreAccount*) tny_iterator_get_current (iter);
@@ -173,6 +174,8 @@ main (int argc, char **argv)
 	g_object_unref (G_OBJECT (src_headers));
 
  cleanup:
+	g_object_unref (folder_src);
+	g_object_unref (folder_dst);
 	g_object_unref (account);
 	g_object_unref (query);
     

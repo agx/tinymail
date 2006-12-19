@@ -29,42 +29,46 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 {
 	gboolean retval = FALSE;
 
-	if (query && (tny_list_get_length (tny_folder_store_query_get_items (query)) > 0))
+	if (!query)
+		return TRUE;
+
+	TnyList *items = tny_folder_store_query_get_items (query);
+	if (tny_list_get_length (items) <= 0)
 	{
-		TnyList *items = tny_folder_store_query_get_items (query);
-		TnyIterator *iterator;
-		iterator = tny_list_create_iterator (items);
-
-		while (!tny_iterator_is_done (iterator))
-		{
-			TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_get_current (iterator);
-			TnyFolderStoreQueryOption options = tny_folder_store_query_item_get_options (item);
-			regex_t *regex = tny_folder_store_query_item_get_regex (item);
-
-			if ((options & TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED) &&
-			    finfo->flags & CAMEL_FOLDER_SUBSCRIBED)
-				retval = TRUE;
-
-			if ((options & TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED) &&
-			    !(finfo->flags & CAMEL_FOLDER_SUBSCRIBED))
-				retval = TRUE;
-
-			if (regex && options & TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME)
-			    if (regexec (regex, finfo->name, 0, NULL, 0) == 0)
-				retval = TRUE;
-
-			if (regex && options & TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID)
-			    if (regexec (regex, finfo->full_name, 0, NULL, 0) == 0)
-				retval = TRUE;
-
-			g_object_unref (G_OBJECT (item));
-			tny_iterator_next (iterator);
-		}
-		 
-		g_object_unref (G_OBJECT (iterator));    
 		g_object_unref (G_OBJECT (items));
-	} else
-		retval = TRUE;
+		return TRUE;
+	}
+	TnyIterator *iterator;
+	iterator = tny_list_create_iterator (items);
+
+	while (!tny_iterator_is_done (iterator))
+	{
+		TnyFolderStoreQueryItem *item = (TnyFolderStoreQueryItem*) tny_iterator_get_current (iterator);
+		TnyFolderStoreQueryOption options = tny_folder_store_query_item_get_options (item);
+		regex_t *regex = tny_folder_store_query_item_get_regex (item);
+
+		if ((options & TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED) &&
+		    finfo->flags & CAMEL_FOLDER_SUBSCRIBED)
+			retval = TRUE;
+
+		if ((options & TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED) &&
+		    !(finfo->flags & CAMEL_FOLDER_SUBSCRIBED))
+			retval = TRUE;
+
+		if (regex && options & TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME)
+			if (regexec (regex, finfo->name, 0, NULL, 0) == 0)
+				retval = TRUE;
+
+		if (regex && options & TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID)
+			if (regexec (regex, finfo->full_name, 0, NULL, 0) == 0)
+				retval = TRUE;
+
+		g_object_unref (G_OBJECT (item));
+		tny_iterator_next (iterator);
+	}
+	     		 
+	g_object_unref (G_OBJECT (iterator));    
+	g_object_unref (G_OBJECT (items));
 
 	return retval;
 }
