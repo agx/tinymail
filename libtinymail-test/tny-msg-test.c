@@ -61,6 +61,9 @@ START_TEST (tny_msg_test_set_header)
 	str = g_strdup_printf ("Get-header should return what setheader sets\n");
 	fail_unless (header == gheader, str);
 	g_free (str);
+
+	g_object_unref (G_OBJECT (gheader));
+	g_object_unref (G_OBJECT (header));
     
     	return;
 }
