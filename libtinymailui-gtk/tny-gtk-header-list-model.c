@@ -804,7 +804,7 @@ final_destruction (gpointer data, gpointer udata)
 		g_object_unref (G_OBJECT (info->folder));
 	}
 
-	if (info->iterator && G_IS_OBJECT (info->folder)) 
+	if (info->iterator && G_IS_OBJECT (info->iterator)) 
 	{
 		g_object_unref (G_OBJECT (info->iterator));
 		g_object_unref (G_OBJECT (info->iterator));
