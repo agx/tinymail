@@ -58,14 +58,26 @@ START_TEST (tny_device_test_is_online)
 }
 END_TEST
 
+START_TEST (tny_device_test_connection_changed)
+{
+}
+END_TEST
+
 Suite *
 create_tny_device_suite (void)
 {
      Suite *s = suite_create ("Device");
+     TCase *tc = NULL;
 
-     TCase *tc = tcase_create ("Is Online");
+     tc = tcase_create ("Is Online");
      tcase_add_checked_fixture (tc, tny_device_test_setup, tny_device_test_teardown);
      tcase_add_test (tc, tny_device_test_is_online);
+     suite_add_tcase (s, tc);
+
+     /* Make sure test fails when signal is not received */
+     tc = tcase_create ("Connection Changed");
+     tcase_add_checked_fixture (tc, tny_device_test_setup, tny_device_test_teardown);
+     tcase_add_test_raise_signal (tc, tny_device_test_connection_changed, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED]);
      suite_add_tcase (s, tc);
 
      return s;

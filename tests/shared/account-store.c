@@ -156,7 +156,6 @@ tny_test_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyPlatformFactory *platfact = tny_test_platform_factory_get_instance ();
 
 	self->device = tny_platform_factory_new_device (platfact);
-	g_object_unref (G_OBJECT (platfact));
 
 	return;
 }
@@ -167,7 +166,6 @@ tny_test_account_store_finalize (GObject *object)
 {
 	TnyTestAccountStore *me = (TnyTestAccountStore*) object;
     
-	g_object_unref (G_OBJECT (me->device));
 	if (me->cache_dir)
 		g_free (me->cache_dir);
     
