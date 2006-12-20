@@ -31,6 +31,7 @@
 
 
 static GObjectClass *parent_class = NULL;
+static TnyTestPlatformFactory *the_singleton = NULL;
 
 static void
 tny_test_platform_factory_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -75,6 +76,8 @@ tny_test_platform_factory_get_instance (void)
 static void
 tny_test_platform_factory_finalize (GObject *object)
 {
+	the_singleton = NULL;
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -94,9 +97,6 @@ tny_platform_factory_init (gpointer g, gpointer iface_data)
 }
 
 
-static TnyTestPlatformFactory *the_singleton = NULL;
-
-
 static GObject*
 tny_test_platform_factory_constructor (GType type, guint n_construct_params,
 			GObjectConstructParam *construct_params)
@@ -114,8 +114,7 @@ tny_test_platform_factory_constructor (GType type, guint n_construct_params,
 	}
 	else
 	{
-		/* refdbg killed bug! 
-		object = g_object_ref (G_OBJECT (the_singleton)); */
+		object = g_object_ref (G_OBJECT (the_singleton));
 
 		object = G_OBJECT (the_singleton);
 		g_object_freeze_notify (G_OBJECT(the_singleton));

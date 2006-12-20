@@ -37,7 +37,7 @@ static void
 tny_platform_factory_test_teardown (void)
 {
 
-	/* It's a singleton */
+	g_object_unref (G_OBJECT (iface));
 	return;
 }
 
@@ -76,6 +76,8 @@ START_TEST(tny_platform_factory_test_new_msg_view)
 
 	/* It's a floating object that gets unreferenced by 
 	  gtk_widget_destroy() and likes
+
+	  TODO: Make tny-msg-view finalize properly
 
 	g_object_unref (G_OBJECT (obj)); */
 }

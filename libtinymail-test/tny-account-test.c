@@ -34,14 +34,14 @@
 
 static TnyAccount *iface = NULL;
 static TnyAccountStore *account_store;
-static TnyList *accounts;
-static TnyIterator *aiter;
 static gboolean online_tests=FALSE;
 static gchar *str;
 
 static void
 tny_account_test_setup (void)
 {
+    TnyList *accounts;
+    TnyIterator *aiter;
     iface = NULL;
     
     if (online_tests)
@@ -50,9 +50,8 @@ tny_account_test_setup (void)
 	account_store = tny_test_account_store_new (TRUE, NULL);
 	tny_account_store_get_accounts (account_store, accounts, 
 			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+
 	aiter = tny_list_create_iterator (accounts);
-	tny_iterator_first (aiter);
-    
 	iface = TNY_ACCOUNT (tny_iterator_get_current (aiter));
     
     	if (!iface)

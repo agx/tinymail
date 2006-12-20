@@ -57,8 +57,11 @@ tny_list_test_teardown (void)
 {
     int i =0;
 
-     /* TODO: Why can't i>=3 be unref'ed? */
-    for (i=0; i < 3; i++)
+    /* TODO Fix the code so that this sleep is not necessary */
+    /* The problem is that a TnyCamelIMAPStoreAccount is unrefed before */
+    /* it is unrefed in tny_camel_store_account_get_folders_async_thread */
+    sleep (1);
+    for (i=0; i < 6; i++)
     {
 	 g_object_unref (G_OBJECT (ifaces[i]));
     }

@@ -1944,6 +1944,8 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 			tny_camel_folder_set_folder_info (self, folder, iter);
 
 			tny_list_prepend (list, G_OBJECT (folder));
+
+			g_object_unref (G_OBJECT (folder));
 		}
 		iter = iter->next;
 	  }
