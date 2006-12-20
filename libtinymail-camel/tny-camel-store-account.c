@@ -583,16 +583,8 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
 
-	/* thread reference */
-	g_object_unref (G_OBJECT (info->self));
-	g_object_unref (G_OBJECT (info->list));
-
 	if (info->callback)
 	{
-		/* gidle reference */
-		g_object_ref (G_OBJECT (info->self));
-		g_object_ref (G_OBJECT (info->list));
-
 		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
@@ -602,7 +594,11 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 			tny_camel_store_account_get_folders_async_callback (info);
 			tny_camel_store_account_get_folders_async_destroyer (info);
 		}
+	} else {
+		g_object_unref (G_OBJECT (info->self));
+		g_object_unref (G_OBJECT (info->list));
 	}
+
 
 	g_thread_exit (NULL);
 

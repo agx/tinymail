@@ -569,7 +569,7 @@ tny_camel_folder_refresh_async_destroyer (gpointer thr_user_data)
 	RefreshFolderInfo *info = thr_user_data;
 	TnyFolder *self = info->self;
 
-	/* gidle reference */
+	/* thread reference */
 	g_object_unref (G_OBJECT (self));
 	if (info->err)
 		g_error_free (info->err);
@@ -732,14 +732,8 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 
 	g_mutex_unlock (priv->folder_lock);
 
-	/* thread reference */
-	g_object_unref (G_OBJECT (self));
-
 	if (info->callback)
 	{
-		/* gidle reference */
-		g_object_ref (G_OBJECT (self));
-
 		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
@@ -749,7 +743,8 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 			tny_camel_folder_refresh_async_callback (info);
 			tny_camel_folder_refresh_async_destroyer (info);
 		}
-	}
+	} else /* Thread reference */
+		g_object_unref (G_OBJECT (self));
 
 	g_thread_exit (NULL);
 
@@ -935,6 +930,7 @@ tny_camel_folder_get_msg_async_destroyer (gpointer thr_user_data)
 {
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
 
+	/* thread reference */
 	g_object_unref (G_OBJECT (info->self));
 	if (info->msg)
 		g_object_unref (G_OBJECT (info->msg));
@@ -974,17 +970,10 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	} else
 		info->err = NULL;
 
-	/* thread reference */
-	g_object_unref (G_OBJECT (info->self));
 	g_object_unref (G_OBJECT (info->header));
 
 	if (info->callback)
 	{
-		/* gidle reference (msg has an auto-ref caused by the construction 
-		   or is NULL) */
-
-		g_object_ref (G_OBJECT (info->self));
-
 		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
@@ -994,7 +983,8 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 			tny_camel_folder_get_msg_async_callback (info);
 			tny_camel_folder_get_msg_async_destroyer (info);
 		}
-	}
+	} else /* thread reference */
+		g_object_unref (G_OBJECT (info->self));
 
 	g_thread_exit (NULL);
 
@@ -1387,7 +1377,7 @@ tny_camel_folder_transfer_msgs_async_destroyer (gpointer thr_user_data)
 {
 	TransferMsgsInfo *info = thr_user_data;
 
-	/* gidle reference */
+	/* thread reference */
 	g_object_unref (G_OBJECT (info->self));
 
 	if (info->err)
@@ -1424,15 +1414,11 @@ tny_camel_folder_transfer_msgs_async_thread (gpointer thr_user_data)
 		info->err = NULL;
 
 	/* thread reference */
-	g_object_unref (G_OBJECT (info->self));
 	g_object_unref (G_OBJECT (info->header_list));
 	g_object_unref (G_OBJECT (info->folder_dst));
 
 	if (info->callback)
 	{
-		/* gidle reference */
-		g_object_ref (G_OBJECT (info->self));
-
 		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
@@ -1442,7 +1428,9 @@ tny_camel_folder_transfer_msgs_async_thread (gpointer thr_user_data)
 			tny_camel_folder_transfer_msgs_async_callback (info);
 			tny_camel_folder_transfer_msgs_async_destroyer (info);
 		}
-	}
+	} else /* thread reference */
+		g_object_unref (G_OBJECT (info->self));
+
 
 	g_thread_exit (NULL);
 
@@ -1982,7 +1970,7 @@ tny_camel_folder_get_folders_async_destroyer (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
 
-	/* gidle reference */
+	/* thread reference */
 	g_object_unref (G_OBJECT (info->self));
 	g_object_unref (G_OBJECT (info->list));
 
@@ -2022,16 +2010,9 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
 
-	/* thread reference */
-	g_object_unref (G_OBJECT (info->self));
-	g_object_unref (G_OBJECT (info->list));
 
 	if (info->callback)
 	{
-		/* gidle reference */
-		g_object_ref (G_OBJECT (info->self));
-		g_object_ref (G_OBJECT (info->list));
-
 		if (info->depth > 0)
 		{
 			g_idle_add_full (G_PRIORITY_HIGH, 
@@ -2041,6 +2022,10 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 			tny_camel_folder_get_folders_async_callback (info);
 			tny_camel_folder_get_folders_async_destroyer (info);
 		}
+	} else {
+		/* thread reference */
+		g_object_unref (G_OBJECT (info->self));
+		g_object_unref (G_OBJECT (info->list));
 	}
 
 	g_thread_exit (NULL);

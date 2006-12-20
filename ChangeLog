@@ -1,3 +1,7 @@
+2006-12-20  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed a few reference counting problems too
+
 2006-12-18  Øystein Gisnås  <oystein@gisnas.net>
 
 	* Fixed a few reference counting problems 
