@@ -23,6 +23,7 @@ DOC_SOURCE_DIR=$(top_srcdir)/libtinymail
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
 SCANGOBJ_OPTIONS=
 
+#	--source-dir=$(top_srcdir)/libtinymail-test \
 TO_SCAN = \
 	--source-dir=$(top_srcdir)/libtinymailui \
 	--source-dir=$(top_srcdir)/libtinymailui-gtk \
@@ -84,6 +85,7 @@ INCLUDES= $(LIBTINYMAIL_CFLAGS) $(LIBTINYMAILUI_CFLAGS) 		\
 	$(LIBTINYMAILUI_GTK_CFLAGS) $(LIBTINYMAILUI_MOZEMBED_CFLAGS) 	\
 	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS) $(LIBTINYMAIL_TEST_CFLAGS)  \
 	$(TINYMAIL_CFLAGS) -I$(top_srcdir)/libtinymail 			\
+	-I$(top_srcdir)/libtinymail-test				\
 	-I$(top_srcdir)/libtinymailui -I$(top_srcdir)/libtinymailui-gtk	\
 	-I$(top_srcdir)/libtinymailui-mozembed				\
 	-I$(top_srcdir)/libtinymail-camel				\
