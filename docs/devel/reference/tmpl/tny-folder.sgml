@@ -244,7 +244,7 @@ A abstract type that defines a folder
 
 </para>
 
-@folder_src: 
+@self: 
 @header_list: 
 @folder_dst: 
 @delete_originals: 
