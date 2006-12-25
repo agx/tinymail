@@ -114,7 +114,7 @@ guint tny_folder_get_unread_count (TnyFolder *self);
 gboolean tny_folder_is_subscribed (TnyFolder *self);
 void tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
 void tny_folder_refresh (TnyFolder *self, GError **err);
-void tny_folder_transfer_msgs (TnyFolder *folder_src, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
+void tny_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 void tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data);
 TnyFolder* tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
 

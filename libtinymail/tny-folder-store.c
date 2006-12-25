@@ -135,7 +135,6 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * @list: A #TnyList to fillup
  * @callback: The callback handler
  * @query: A #TnyFolderStoreQuery object
- * @err: a #GError object or NULL
  * @user_data: user data for the callback
  *
  * Get a list of child folders from the folder store @self and call back when 
