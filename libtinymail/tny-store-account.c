@@ -74,14 +74,15 @@ tny_store_account_base_init (gpointer g_class)
 	static gboolean initialized = FALSE;
 
 	if (!initialized) {
-		/**
-		 * TnyStoreAccount::subscription-changed
-		 * @self: the object on which the signal is emitted
-		 * @arg1: the #TnyFolder of the folder whose subscription has changed
-		 * @user_data: user data set when the signal handler was connected
-		 *
-		 * Emitted when the subscription of a folder change
-		 */
+		
+/** 
+ * TnyStoreAccount::subscription-changed
+ * @self: the object on which the signal is emitted
+ * @arg1: the #TnyFolder of the folder whose subscription has changed
+ * @user_data: user data set when the signal handler was connected
+ *
+ * Emitted when the subscription of a folder change
+ **/
 		tny_store_account_signals[TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED] =
 			g_signal_new ("subscription_changed",
 				      TNY_TYPE_STORE_ACCOUNT,
