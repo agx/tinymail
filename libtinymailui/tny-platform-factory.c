@@ -26,7 +26,7 @@
 
 
 /**
- * tny_platform_factory_new_header:
+ * tny_platform_factory_new_msg:
  * @self: a TnyPlatformFactory object
  *
  * Create a new #TnyMsg instance. The returned instance must be 
@@ -51,7 +51,7 @@ tny_platform_factory_new_msg (TnyPlatformFactory *self)
 
 
 /**
- * tny_platform_factory_new_header:
+ * tny_platform_factory_new_mime_part:
  * @self: a TnyPlatformFactory object
  *
  * Create a new #TnyMimePart instance. The returned instance must be 
