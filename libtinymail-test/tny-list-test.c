@@ -118,10 +118,10 @@ setup_objs (int num, GObject **a, GObject **b, GObject **c, GObject **d)
 
     if (num == 2)
     {
-	*a = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
-	*b = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
-	*c = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
-	*d = (GObject*) tny_camel_mime_part_new (camel_mime_part_new ());
+	*a = (GObject*) tny_camel_mime_part_new ();
+	*b = (GObject*) tny_camel_mime_part_new ();
+	*c = (GObject*) tny_camel_mime_part_new ();
+	*d = (GObject*) tny_camel_mime_part_new ();
     }
 
     if (num == 5)

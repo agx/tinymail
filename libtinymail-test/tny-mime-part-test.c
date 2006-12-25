@@ -40,8 +40,7 @@ tny_mime_part_test_setup (void)
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	CamelMimePart *cpart = camel_mime_part_new ();
-	iface = TNY_MIME_PART (tny_camel_mime_part_new (cpart));
+	iface = tny_camel_mime_part_new ();
 
 	return;
 }

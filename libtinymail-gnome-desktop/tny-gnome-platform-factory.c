@@ -20,13 +20,11 @@
 
 #include <tny-gnome-platform-factory.h>
 
-#include <tny-account-store.h>
 #include <tny-gnome-account-store.h>
-
-#include <tny-device.h>
 #include <tny-gnome-device.h>
-
-#include <tny-msg-view.h>
+#include <tny-camel-header.h>
+#include <tny-camel-mime-part.h>
+#include <tny-camel-msg.h>
 
 #ifdef MOZEMBED
 #include <tny-moz-embed-msg-view.h>
@@ -43,16 +41,37 @@ tny_gnome_platform_factory_instance_init (GTypeInstance *instance, gpointer g_cl
 }
 
 
+static TnyMsg*
+tny_gnome_platform_factory_new_msg (TnyPlatformFactory *self)
+{
+	return tny_camel_msg_new ();
+}
+
+
+static TnyMimePart*
+tny_gnome_platform_factory_new_mime_part (TnyPlatformFactory *self)
+{
+	return tny_camel_mime_part_new ();
+}
+
+
+static TnyHeader*
+tny_gnome_platform_factory_new_header (TnyPlatformFactory *self)
+{
+	return tny_camel_header_new ();
+}
+
+
 static TnyAccountStore*
 tny_gnome_platform_factory_new_account_store (TnyPlatformFactory *self)
 {
-	return TNY_ACCOUNT_STORE (tny_gnome_account_store_new ());
+	return tny_gnome_account_store_new ();
 }
 
 static TnyDevice*
 tny_gnome_platform_factory_new_device (TnyPlatformFactory *self)
 {
-	return TNY_DEVICE (tny_gnome_device_new ());
+	return tny_gnome_device_new ();
 }
 
 static TnyMsgView*
@@ -101,6 +120,9 @@ tny_platform_factory_init (gpointer g, gpointer iface_data)
 	klass->new_account_store_func = tny_gnome_platform_factory_new_account_store;
 	klass->new_device_func = tny_gnome_platform_factory_new_device;
 	klass->new_msg_view_func = tny_gnome_platform_factory_new_msg_view;
+	klass->new_msg_func = tny_gnome_platform_factory_new_msg;
+	klass->new_mime_part_func = tny_gnome_platform_factory_new_mime_part;
+	klass->new_header_func = tny_gnome_platform_factory_new_header;
 
 	return;
 }

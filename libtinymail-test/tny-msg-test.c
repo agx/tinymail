@@ -74,8 +74,7 @@ START_TEST (tny_msg_test_add_part_del_part)
     
     	gint length = 0;
     	TnyList *parts = tny_simple_list_new();
-	CamelMimePart *cpart = camel_mime_part_new ();
-	TnyMimePart *part = TNY_MIME_PART (tny_camel_mime_part_new (cpart));
+	TnyMimePart *part = tny_camel_mime_part_new_ ();
     
 	tny_mime_part_add_part (TNY_MIME_PART (iface), part);
 

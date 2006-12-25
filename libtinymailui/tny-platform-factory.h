@@ -44,6 +44,9 @@ struct _TnyPlatformFactoryIface
 	TnyAccountStore* (*new_account_store_func) (TnyPlatformFactory *self);
 	TnyDevice* (*new_device_func) (TnyPlatformFactory *self);
 	TnyMsgView* (*new_msg_view_func) (TnyPlatformFactory *self);
+	TnyMsg* (*new_msg_func) (TnyPlatformFactory *self);
+	TnyMimePart* (*new_mime_part_func) (TnyPlatformFactory *self);
+	TnyHeader* (*new_header_func) (TnyPlatformFactory *self);
 };
 
 GType tny_platform_factory_get_type (void);
@@ -51,6 +54,10 @@ GType tny_platform_factory_get_type (void);
 TnyAccountStore* tny_platform_factory_new_account_store (TnyPlatformFactory *self);
 TnyDevice* tny_platform_factory_new_device (TnyPlatformFactory *self);
 TnyMsgView* tny_platform_factory_new_msg_view (TnyPlatformFactory *self);
+TnyMsg* tny_platform_factory_new_msg (TnyPlatformFactory *self);
+TnyMimePart* tny_platform_factory_new_mime_part (TnyPlatformFactory *self);
+TnyHeader* tny_platform_factory_new_header (TnyPlatformFactory *self);
+
 
 G_END_DECLS
 

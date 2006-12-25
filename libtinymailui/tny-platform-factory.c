@@ -24,6 +24,78 @@
 
 #include <tny-platform-factory.h>
 
+
+/**
+ * tny_platform_factory_new_header:
+ * @self: a TnyPlatformFactory object
+ *
+ * Create a new #TnyMsg instance. The returned instance must be 
+ * unreferenced after use.
+ *
+ * Implementors: when implementing a platform-specific library, return a 
+ * new #TnyMsg instance.
+ *
+ * Return value: a #TnyMsg instance
+ **/
+TnyMsg* 
+tny_platform_factory_new_msg (TnyPlatformFactory *self)
+{
+#ifdef DEBUG
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_func)
+		g_critical ("You must implement tny_platform_factory_new_msg\n");
+#endif
+
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_func (self);
+
+}
+
+
+/**
+ * tny_platform_factory_new_header:
+ * @self: a TnyPlatformFactory object
+ *
+ * Create a new #TnyMimePart instance. The returned instance must be 
+ * unreferenced after use.
+ *
+ * Implementors: when implementing a platform-specific library, return a 
+ * new #TnyMimePart instance.
+ *
+ * Return value: a #TnyMimePart instance
+ **/
+TnyMimePart* 
+tny_platform_factory_new_mime_part (TnyPlatformFactory *self)
+{
+#ifdef DEBUG
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_mime_part_func)
+		g_critical ("You must implement tny_platform_factory_new_mime_part\n");
+#endif
+
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_mime_part_func (self);
+}
+
+/**
+ * tny_platform_factory_new_header:
+ * @self: a TnyPlatformFactory object
+ *
+ * Create a new #TnyHeader instance. The returned instance must be 
+ * unreferenced after use.
+ *
+ * Implementors: when implementing a platform-specific library, return a 
+ * new #TnyHeader instance.
+ *
+ * Return value: a #TnyHeader instance
+ **/
+TnyHeader* 
+tny_platform_factory_new_header (TnyPlatformFactory *self)
+{
+#ifdef DEBUG
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_header_func)
+		g_critical ("You must implement tny_platform_factory_new_header\n");
+#endif
+
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_header_func (self);
+}
+
 /**
  * tny_platform_factory_new_account_store:
  * @self: a TnyPlatformFactory object

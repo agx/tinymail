@@ -104,7 +104,7 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 				}
 
 			} else
-				newpart = tny_camel_mime_part_new (tpart);
+				newpart = tny_camel_mime_part_new_with_part (tpart);
 
 			tny_list_prepend (list, G_OBJECT (newpart));
 			g_object_unref (G_OBJECT (newpart));
@@ -787,12 +787,29 @@ tny_camel_mime_part_finalize (GObject *object)
 /**
  * tny_camel_mime_part_new:
  * 
+ * Return value: A new #TnyMimePart instance implemented for Camel
+ **/
+TnyMimePart*
+tny_camel_mime_part_new (void)
+{
+	TnyCamelMimePart *self = g_object_new (TNY_TYPE_CAMEL_MIME_PART, NULL);
+	CamelMimePart *cpart = camel_mime_part_new ();
+
+	_tny_camel_mime_part_set_part (self, cpart);
+
+	return TNY_MIME_PART (self);
+}
+
+
+/**
+ * tny_camel_mime_part_new_with_part:
+ * 
  * The #TnyMimePart implementation is actually a proxy for #CamelMimePart.
  *
  * Return value: A new #TnyMimePart instance implemented for Camel
  **/
 TnyMimePart*
-tny_camel_mime_part_new (CamelMimePart *part)
+tny_camel_mime_part_new_with_part (CamelMimePart *part)
 {
 	TnyCamelMimePart *self = g_object_new (TNY_TYPE_CAMEL_MIME_PART, NULL);
 

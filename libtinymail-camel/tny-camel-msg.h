@@ -60,6 +60,9 @@ GType tny_camel_msg_get_type (void);
 
 TnyMsg* tny_camel_msg_new (void);
 TnyMsg* tny_camel_msg_new_with_header (TnyHeader *header);
+TnyMsg* tny_camel_msg_new_with_part (CamelMimePart *part);
+TnyMsg* tny_camel_msg_new_with_part_and_header (CamelMimePart *part, TnyHeader *header);
+
 
 G_END_DECLS
 

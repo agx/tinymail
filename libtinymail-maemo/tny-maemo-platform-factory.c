@@ -20,14 +20,12 @@
 
 #include <tny-maemo-platform-factory.h>
 
-#include <tny-account-store.h>
 #include <tny-maemo-account-store.h>
-
-#include <tny-device.h>
 #include <tny-maemo-device.h>
-
-#include <tny-msg-view.h>
 #include <tny-gtk-msg-view.h>
+#include <tny-camel-header.h>
+#include <tny-camel-mime-part.h>
+#include <tny-camel-msg.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -35,6 +33,30 @@ static void
 tny_maemo_platform_factory_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	return;
+}
+
+
+
+
+
+static TnyMsg*
+tny_maemo_platform_factory_new_msg (TnyPlatformFactory *self)
+{
+	return tny_camel_msg_new ();
+}
+
+
+static TnyMimePart*
+tny_maemo_platform_factory_new_mime_part (TnyPlatformFactory *self)
+{
+	return tny_camel_mime_part_new ();
+}
+
+
+static TnyHeader*
+tny_maemo_platform_factory_new_header (TnyPlatformFactory *self)
+{
+	return tny_camel_header_new ();
 }
 
 
@@ -90,6 +112,9 @@ tny_platform_factory_init (gpointer g, gpointer iface_data)
 	klass->new_account_store_func = tny_maemo_platform_factory_new_account_store;
 	klass->new_device_func = tny_maemo_platform_factory_new_device;
 	klass->new_msg_view_func = tny_maemo_platform_factory_new_msg_view;
+	klass->new_msg_func = tny_maemo_platform_factory_new_msg;
+	klass->new_mime_part_func = tny_maemo_platform_factory_new_mime_part;
+	klass->new_header_func = tny_maemo_platform_factory_new_header;
 
 	return;
 }

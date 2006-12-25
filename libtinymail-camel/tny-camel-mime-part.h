@@ -73,7 +73,8 @@ struct _TnyCamelMimePartClass
 
 GType tny_camel_mime_part_get_type (void);
 
-TnyMimePart* tny_camel_mime_part_new (CamelMimePart *part);
+TnyMimePart* tny_camel_mime_part_new_with_part (CamelMimePart *part);
+TnyMimePart* tny_camel_mime_part_new (void);
 
 CamelMimePart* tny_camel_mime_part_get_part (TnyCamelMimePart *self);
 

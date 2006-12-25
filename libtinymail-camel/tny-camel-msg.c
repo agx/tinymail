@@ -226,11 +226,52 @@ tny_camel_msg_new_with_header (TnyHeader *header)
 {
 	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
 
+	_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), 
+		CAMEL_MIME_PART (camel_mime_message_new ()));
+
 	tny_camel_msg_set_header (TNY_MSG (self), header);
 
 	return TNY_MSG (self);
 }
 
+/**
+ * tny_camel_msg_new_with_part:
+ * @part: a #CamelMimePart object
+ *
+ * The #TnyMsg implementation is actually a proxy for #CamelMimePart.
+ *
+ * Return value: A new #TnyMsg instance implemented for Camel
+ **/
+TnyMsg*
+tny_camel_msg_new_with_part (CamelMimePart *part)
+{
+	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
+
+	_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), 
+		CAMEL_MIME_PART (camel_mime_message_new ()));
+
+	return TNY_MSG (self);
+}
+
+/**
+ * tny_camel_msg_new_with_part_and_header:
+ * @part: a #CamelMimePart object
+ * @header: a #TnyHeader object
+ * 
+ * The #TnyMsg implementation is actually a proxy for #CamelMimePart.
+ *
+ * Return value: A new #TnyMsg instance implemented for Camel
+ **/
+TnyMsg*
+tny_camel_msg_new_with_part_and_header (CamelMimePart *part, TnyHeader *header)
+{
+	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
+
+	_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), part);
+	tny_camel_msg_set_header (TNY_MSG (self), header);
+
+	return TNY_MSG (self);
+}
 
 static void
 tny_msg_init (gpointer g, gpointer iface_data)
