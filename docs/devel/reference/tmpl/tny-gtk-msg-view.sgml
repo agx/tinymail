@@ -75,15 +75,6 @@ This type is coupled with the #TnyTextBufferStream.
 @setting: 
 
 
-<!-- ##### FUNCTION tny_gtk_msg_view_set_display_one_body ##### -->
-<para>
-
-</para>
-
-@self: 
-@setting: 
-
-
 <!-- ##### FUNCTION tny_gtk_msg_view_get_display_html ##### -->
 <para>
 
@@ -112,15 +103,6 @@ This type is coupled with the #TnyTextBufferStream.
 
 
 <!-- ##### FUNCTION tny_gtk_msg_view_get_display_plain ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_gtk_msg_view_get_display_one_body ##### -->
 <para>
 
 </para>

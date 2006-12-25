@@ -23,12 +23,20 @@ A #TnyMimePart implemented using Camel that plays proxy for a #CamelMimePart.
 </para>
 
 
-<!-- ##### FUNCTION tny_camel_mime_part_new ##### -->
+<!-- ##### FUNCTION tny_camel_mime_part_new_with_part ##### -->
 <para>
 
 </para>
 
 @part: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_camel_mime_part_new ##### -->
+<para>
+
+</para>
+
 @Returns: 
 
 

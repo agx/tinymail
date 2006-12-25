@@ -114,6 +114,7 @@ Shared include file with forward typedefs
 @get_msg_remove_strategy_func: 
 @set_msg_remove_strategy_func: 
 @get_msg_func: 
+@get_msg_async_func: 
 @get_headers_func: 
 @get_name_func: 
 @get_id_func: 
@@ -126,6 +127,8 @@ Shared include file with forward typedefs
 @refresh_async_func: 
 @refresh_func: 
 @transfer_msgs_func: 
+@transfer_msgs_async_func: 
+@copy_func: 
 
 <!-- ##### STRUCT TnyHeader ##### -->
 <para>
@@ -301,43 +304,69 @@ Shared include file with forward typedefs
 
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
-
+This method happens whenever the password is needed. You must return the password for #TnyAccount self.
 </para>
 
-@self: 
-@prompt: 
-@cancel: 
-@Returns: 
+@self: The #TnyAccount instance for which the password is needed
+@prompt: A promp that you can display to your user
+@cancel: A by-ref boolean for if the user wants to cancel the connection request
+@Returns: Return the password for #TnyAccount self
 
 
 <!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
 <para>
-
+This method happens in case the password was wrong. Also take a look at tny_account_set_forget_pass_func
 </para>
 
-@self: 
+@self: the #TnyAccount instance of which the password was wrong
 
 
 <!-- ##### USER_FUNCTION TnyRefreshFolderCallback ##### -->
 <para>
-
+A method that gets called after tny_folder_refresh_async is finished
+refreshing the folder, in case there was an error or in case the 
+refreshing of the folder got cancelled.
 </para>
 
-@self: 
-@cancelled: 
-@err: 
-@user_data: 
+@self: the #TnyFolder instance that got refreshed
+@cancelled: whether or not the operation got cancelled
+@err: in case there was an error, this !GError instance is not NULL
+@user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnyGetMsgCallback ##### -->
+<para>
+A method that gets called after tny_folder_get_msg_async is finished
+getting the message or in case there was an error.
+</para>
+
+@folder: the #TnyFolder instance from which the message was requested
+@msg: the #TnyMsg instance that was requested
+@err: in case there was an error, this !GError instance is not NULL
+@user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
+<para>
+A method that gets called after tny_folder_transfer_msgs_async is finished
+transferring the messages.
+</para>
+
+@folder: the #TnyFolder instance from which the messages where transferred
+@err: in case there was an error, this !GError instance is not NULL
+@user_data: user data passed at the caller
 
 
 <!-- ##### USER_FUNCTION TnyRefreshFolderStatusCallback ##### -->
 <para>
-
+A method that frequently gets called while a folder is being refreshed
 </para>
 
-@self: 
-@what: 
-@status: 
-@user_data: 
+@self: the #TnyFolder instance that is being refreshed
+@what: a status message
+@status: a number that is smaller than or equal to @oftotal indicating the amount that is done
+@oftotal: the total amount that is to be done
+@user_data: user data passed at the caller
 
 
 <!-- ##### STRUCT TnySimpleList ##### -->
@@ -411,13 +440,13 @@ Shared include file with forward typedefs
 
 <!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
 <para>
-
+A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
-@self: 
-@list: 
-@err: 
-@user_data: 
+@self: the #TnyFolderStore from which the child folders where requested
+@list: a #TnyList with #TnyFolder instances (the requested children of @self)
+@err: in case there was an error, this !GError instance is not NULL
+@user_data: user data passed at the caller
 
 
 <!-- ##### STRUCT TnyMsgRemoveStrategy ##### -->

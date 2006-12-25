@@ -35,6 +35,7 @@ A abstract type that defines a folder
 @get_msg_remove_strategy_func: 
 @set_msg_remove_strategy_func: 
 @get_msg_func: 
+@get_msg_async_func: 
 @get_headers_func: 
 @get_name_func: 
 @get_id_func: 
@@ -47,6 +48,8 @@ A abstract type that defines a folder
 @refresh_async_func: 
 @refresh_func: 
 @transfer_msgs_func: 
+@transfer_msgs_async_func: 
+@copy_func: 
 
 <!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
 <para>
@@ -119,6 +122,17 @@ A abstract type that defines a folder
 @header: 
 @err: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_msg_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@callback: 
+@user_data: 
 
 
 <!-- ##### FUNCTION tny_folder_get_headers ##### -->
@@ -235,5 +249,31 @@ A abstract type that defines a folder
 @folder_dst: 
 @delete_originals: 
 @err: 
+
+
+<!-- ##### FUNCTION tny_folder_transfer_msgs_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@header_list: 
+@folder_dst: 
+@delete_originals: 
+@callback: 
+@user_data: 
+
+
+<!-- ##### FUNCTION tny_folder_copy ##### -->
+<para>
+
+</para>
+
+@self: 
+@into: 
+@new_name: 
+@del: 
+@err: 
+@Returns: 
 
 
