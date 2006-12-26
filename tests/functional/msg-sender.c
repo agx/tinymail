@@ -70,6 +70,7 @@ dance (gpointer data)
 #define HTML_PRE "<html><body><b>"
 #define HTML_POST "</b></body></html>"
 
+
 static TnyMsg*
 create_test_msg (TnyPlatformFactory *platfact)
 {
