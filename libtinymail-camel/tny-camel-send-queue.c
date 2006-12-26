@@ -40,6 +40,7 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_SEND_QUEUE, TnyCamelSendQueuePriv))
 
 
+/* TODO: jump out of the thread for error handling using g_idle_add */
 
 static gpointer
 thread_main (gpointer data)
@@ -62,6 +63,8 @@ thread_main (gpointer data)
 		tny_folder_get_headers (outbox, list, TRUE, &terror);
 		if (terror != NULL)
 		{
+			/* TODO: jump out of the thread for error handling using g_idle_add */
+
 			g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
 				0, NULL, terror, i, priv->total);
 			g_object_unref (G_OBJECT (list));
@@ -90,6 +93,8 @@ thread_main (gpointer data)
 
 			if (ferror != NULL)
 			{
+				/* TODO: jump out of the thread for error handling using g_idle_add */
+
 				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
 					0, msg, ferror, i, priv->total);
 				g_object_unref (G_OBJECT (headers));
@@ -127,10 +132,13 @@ thread_main (gpointer data)
 			if (err == NULL) 
 			{
 				tny_transport_account_send (priv->trans_account, msg, &err);
+				/* TODO: jump out of the thread for error handling using g_idle_add */
+
 				if (err != NULL)
 					g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
 						0, msg, err, i, priv->total);
 			} else
+				/* TODO: jump out of the thread for error handling using g_idle_add */
 				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
 					0, msg, err, i, priv->total);
 
@@ -141,6 +149,7 @@ thread_main (gpointer data)
 					GError *newerr = NULL;
 					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
 					if (newerr != NULL)
+						/* TODO: jump out of the thread for error handling using g_idle_add */
 						g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
 							0, msg, newerr, i, priv->total);
 
@@ -152,6 +161,7 @@ thread_main (gpointer data)
 			g_object_unref (G_OBJECT (hassent));
 
 			if (err == NULL)
+				/* TODO: jump out of the thread for error handling using g_idle_add */
 				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 
 					0, msg, i, priv->total);
 
