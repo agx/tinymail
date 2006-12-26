@@ -86,6 +86,8 @@ create_test_msg (TnyPlatformFactory *platfact)
 
 	tny_mime_part_construct_from_stream (TNY_MIME_PART (retval), stream, "text/plain"); 
 
+	g_object_unref (G_OBJECT (stream));
+
 	return retval;
 }
 
