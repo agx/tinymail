@@ -107,14 +107,14 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 	if (types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS || types == TNY_ACCOUNT_STORE_BOTH)
 	{
-		account = tny_camel_store_account_new ();
+		account = TNY_ACCOUNT (tny_camel_store_account_new ());
 
 		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
 		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online);
 
 		tny_account_set_proto (account, "imap");
-		tny_account_set_name (account, "unit test account");
+		tny_account_set_name (account, "IMAP unit test account");
 		tny_account_set_user (account, "tinymailunittest");
 		tny_account_set_hostname (account, "mail.tinymail.org");
 		tny_account_set_id (account, "unique_imap");
@@ -127,14 +127,14 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 	if (types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS || types == TNY_ACCOUNT_STORE_BOTH)
 	{
-		account = tny_camel_transport_account_new ();
+		account = TNY_ACCOUNT (tny_camel_transport_account_new ());
 
 		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
 		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online);
 
-		tny_account_set_proto (account, "smtp");
-		tny_account_set_name (account, "unit test account");
+		tny_account_set_proto (account, "something");
+		tny_account_set_name (account, "SMTP unit test account");
 		tny_account_set_id (account, "unique_smtp");
 		tny_account_set_url_string (account, "smtp://tinymailunittest;auth=PLAIN@mail.tinymail.org/;use_ssl=always");
 

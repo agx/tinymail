@@ -41,6 +41,7 @@ typedef struct _TnySendQueueIface TnySendQueueIface;
 enum _TnySendQueueSignal
 {
 	TNY_SEND_QUEUE_MSG_SENT,
+	TNY_SEND_QUEUE_ERROR_HAPPENED,
 	TNY_SEND_QUEUE_LAST_SIGNAL
 };
 
@@ -53,6 +54,7 @@ struct _TnySendQueueIface
 	
 	/* Signals */
 	void (*msg_sent) (TnySendQueue *self, TnyMsg *msg, guint nth, guint total);
+	void (*error_happened) (TnySendQueue *self, TnyMsg *msg, guint nth, guint total);
 
 	/* methods */
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg);

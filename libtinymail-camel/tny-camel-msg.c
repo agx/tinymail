@@ -153,8 +153,8 @@ tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 {
 	CamelMimeMessage *msg;
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
-	CamelInternetAddress *from, *recipients, *replyto;
-	const gchar *str;
+	/* CamelInternetAddress *from, *recipients, *replyto;
+	const gchar *str; */
 
 	g_assert (TNY_IS_CAMEL_HEADER (header));
 
@@ -170,8 +170,11 @@ tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 	{
 		TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 		g_mutex_lock (ppriv->part_lock);
-		if (ppriv->part)
+		if (ppriv->part) 
+		{
+			/* TODO: copy old part over? */
 			camel_object_unref (CAMEL_OBJECT (ppriv->part));
+		}
 		/* Add a reference? */
 		ppriv->part = (CamelMimePart *) ((WriteInfo*)((TnyCamelHeader *)header)->info)->msg;
 		g_mutex_unlock (ppriv->part_lock);

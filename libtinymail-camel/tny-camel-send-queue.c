@@ -56,10 +56,18 @@ thread_main (gpointer data)
 
 	g_mutex_lock (priv->todo_lock);
 	{
+		GError *terror = NULL;
 		sentbox = tny_send_queue_get_sentbox (self);
 		outbox = tny_send_queue_get_outbox (self);
-		/* TODO handle and report errors here */
-		tny_folder_get_headers (outbox, list, TRUE, NULL);
+		tny_folder_get_headers (outbox, list, TRUE, &terror);
+		if (terror != NULL)
+		{
+			g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+				0, NULL, terror, i, priv->total);
+			g_object_unref (G_OBJECT (list));
+			goto errorhandler;
+		}
+
 		length = tny_list_get_length (list);
 		priv->total = length;
 	}
@@ -74,13 +82,24 @@ thread_main (gpointer data)
 
 		g_mutex_lock (priv->todo_lock);
 		{
+			GError *ferror = NULL;
 			TnyIterator *hdriter;
 			TnyList *headers = tny_simple_list_new ();
-			/* TODO handle and report errors here */
-			tny_folder_get_headers (outbox, headers, TRUE, NULL);
+
+			tny_folder_get_headers (outbox, headers, TRUE, &ferror);
+
+			if (ferror != NULL)
+			{
+				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+					0, msg, ferror, i, priv->total);
+				g_object_unref (G_OBJECT (headers));
+				goto errorhandler;
+			}
+
 			length = tny_list_get_length (headers);
 
 			priv->total = length;
+
 			if (length <= 0)
 			{
 				g_object_unref (G_OBJECT (headers));
@@ -89,10 +108,12 @@ thread_main (gpointer data)
 			}
 			hdriter = tny_list_create_iterator (headers);
 			header = (TnyHeader *) tny_iterator_get_current (hdriter);
+
 			g_object_unref (G_OBJECT (hdriter));
 			g_object_unref (G_OBJECT (headers));
 		}
 		g_mutex_unlock (priv->todo_lock);
+
 
 		if (header && TNY_IS_HEADER (header))
 		{
@@ -100,30 +121,39 @@ thread_main (gpointer data)
 			GError *err = NULL;
 
 			tny_list_prepend (hassent, G_OBJECT (header));
-			/* TODO handle and report errors here */
 			msg = tny_folder_get_msg (outbox, header, &err);
-
-
-			/* TODO handle and report errors here */
 			g_object_unref (G_OBJECT (header));	
 
-			if (err == NULL)
-				tny_transport_account_send (priv->trans_account, msg, NULL);
-			else
-				g_print ("error: %s\n", err->message);
+			if (err == NULL) 
+			{
+				tny_transport_account_send (priv->trans_account, msg, &err);
+				if (err != NULL)
+					g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+						0, msg, err, i, priv->total);
+			} else
+				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+					0, msg, err, i, priv->total);
 
 			g_mutex_lock (priv->todo_lock);
 			{
-				/* TODO handle and report errors here */
-				tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, NULL);
-				priv->total--;
+				if (err == NULL)
+				{
+					GError *newerr = NULL;
+					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
+					if (newerr != NULL)
+						g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+							0, msg, newerr, i, priv->total);
+
+					priv->total--;
+				}
 			}
 			g_mutex_unlock (priv->todo_lock);
 
 			g_object_unref (G_OBJECT (hassent));
 
-			g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 
-				0, msg, i, priv->total);
+			if (err == NULL)
+				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 
+					0, msg, i, priv->total);
 
 			i++;
 		} else 
@@ -136,6 +166,8 @@ thread_main (gpointer data)
 				g_object_unref (G_OBJECT (header));
 		}
 	}
+
+errorhandler:
 
 	g_object_unref (G_OBJECT (sentbox));
 	g_object_unref (G_OBJECT (outbox));

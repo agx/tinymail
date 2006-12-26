@@ -82,6 +82,7 @@ create_test_msg (TnyPlatformFactory *platfact)
 	tny_msg_set_header (retval, header);
 
 	tny_stream_write (stream, TEST_STRING, strlen (TEST_STRING));
+	tny_stream_reset (stream);
 
 	tny_mime_part_construct_from_stream (TNY_MIME_PART (retval), stream, "text/plain"); 
 

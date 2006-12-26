@@ -109,6 +109,27 @@ tny_send_queue_base_init (gpointer g_class)
 			g_cclosure_marshal_VOID__POINTER,
 			G_TYPE_NONE, 3, TNY_TYPE_MSG, G_TYPE_UINT, G_TYPE_UINT);
 
+/**
+ * TnySendQueue::error-happened
+ * @self: the object on which the signal is emitted
+ * @arg1: The message that was supposed to be sent or NULL
+ * @arg2: a GError containing the error that happened
+ * @arg3: The current nth number of the message that was supposed to be sent
+ * @arg4: The total amount of messages currently being processed
+ *
+ * API WARNING: This API might change
+ *
+ * Emitted when a message didn't get sent because of an error
+ **/
+		tny_send_queue_signals[TNY_SEND_QUEUE_ERROR_HAPPENED] =
+		   g_signal_new ("error_happened",
+			TNY_TYPE_SEND_QUEUE,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnySendQueueIface, error_happened),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__POINTER,
+			G_TYPE_NONE, 3, TNY_TYPE_MSG, G_TYPE_POINTER, G_TYPE_UINT, G_TYPE_UINT);
+
 		initialized = TRUE;
 	}
 }
