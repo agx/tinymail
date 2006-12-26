@@ -136,7 +136,7 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 		tny_account_set_proto (account, "something");
 		tny_account_set_name (account, "SMTP unit test account");
 		tny_account_set_id (account, "unique_smtp");
-		tny_account_set_url_string (account, "smtp://tinymailunittest;auth=PLAIN@mail.tinymail.org/;use_ssl=always");
+		tny_account_set_url_string (account, "smtp://tinymailunittest;auth=PLAIN@mail.tinymail.org:2222/;use_ssl=always");
 
 		tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
 		tny_account_set_pass_func (account, per_account_get_pass_func);
