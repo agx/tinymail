@@ -26,6 +26,7 @@ libtinymail_camel_1_0_headers =	\
 	tny-stream-camel.h \
 	tny-camel-shared.h \
 	tny-camel-send-queue.h \
+	tny-camel-mem-stream.h \
 	tny-session-camel.h
 
 libtinymail_camel_priv_headers = \
@@ -39,7 +40,8 @@ libtinymail_camel_priv_headers = \
 	tny-camel-msg-priv.h \
 	tny-camel-header-priv.h \
 	tny-camel-send-queue-priv.h \
-	tny-camel-folder-priv.h 
+	tny-camel-folder-priv.h \
+	tny-camel-stream-priv.h 
 
 libtinymail_camel_1_0_la_SOURCES = \
 	$(libtinymail_camel_priv_headers) \
@@ -61,6 +63,7 @@ libtinymail_camel_1_0_la_SOURCES = \
 	tny-camel-stream.c \
 	tny-stream-camel.c \
 	tny-camel-send-queue.c \
+	tny-camel-mem-stream.c \
 	tny-session-camel.c			
 
 libtinymail_camel_1_0_la_LIBADD = \

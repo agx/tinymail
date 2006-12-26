@@ -17,22 +17,27 @@
  */
 
 #include <stdlib.h>
-#include <gtk/gtk.h>
-#include <tny-shared.h>
+#include <string.h>
+
+#include <glib.h>
+
 #include <tny-list.h>
 #include <tny-iterator.h>
 #include <tny-simple-list.h>
 #include <tny-account-store.h>
 #include <tny-store-account.h>
-#include <tny-folder.h>
-#include <tny-folder-store.h>
-#include <tny-folder-store-query.h>
+
+#include "platfact.h"
+#include <tny-platform-factory.h>
+#include <tny-send-queue.h>
+
+#include <tny-camel-send-queue.h>
+#include <tny-camel-mem-stream.h>
 
 #include <account-store.h>
 
-static gint recursion_level=0;
 static gchar *cachedir=NULL;
-static gboolean online=FALSE, mainloop=FALSE;
+static gboolean online=FALSE, mainloop=TRUE;
 
 static const GOptionEntry options[] = 
 {
@@ -42,34 +47,11 @@ static const GOptionEntry options[] =
 		"Online or offline", NULL },
 	{ "mainloop", 'm', 0, G_OPTION_ARG_NONE, &mainloop,
 		"Use the Gtk+ mainloop", NULL },
-    
+
 	{ NULL }
 };
 
 
-static void 
-callback (TnyFolderStore *self, TnyList *list, GError **err, gpointer user_data)
-{
-	TnyIterator *iter = tny_list_create_iterator (list);
-    
-	while (!tny_iterator_is_done (iter))
-	{
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
-		TnyList *folders = tny_simple_list_new ();
-
-		g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
-	    
-		tny_folder_store_get_folders_async (folder,
-			folders, callback, NULL, NULL);
-	    
-		g_object_unref (G_OBJECT (folder));
-	    
-		tny_iterator_next (iter);	    
-	}
-
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (list));
-}
 
 static gboolean
 time_s_up (gpointer data)
@@ -81,14 +63,39 @@ time_s_up (gpointer data)
 static gboolean
 dance (gpointer data)
 {
-	TnyList *folders;
-	TnyStoreAccount *account = data;
-    
-	folders = tny_simple_list_new ();
-    	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
-		folders, callback, NULL, NULL);
-    
 	return FALSE;
+}
+
+#define TEST_STRING "This is a test E-mail"
+
+static TnyMsg*
+create_test_msg (TnyPlatformFactory *platfact)
+{
+	TnyMsg *retval = tny_platform_factory_new_msg (platfact);
+	TnyStream *stream = tny_camel_mem_stream_new ();
+	TnyHeader *header = tny_platform_factory_new_header (platfact);
+
+	tny_header_set_subject (header, TEST_STRING);
+	tny_header_set_from (header, "tinymailunittest@mail.tinymail.org");
+	tny_header_set_to (header, "spam@pvanhoof.be");
+
+	tny_msg_set_header (retval, header);
+
+	tny_stream_write (stream, TEST_STRING, strlen (TEST_STRING));
+
+	tny_mime_part_construct_from_stream (TNY_MIME_PART (retval), stream, "text/plain"); 
+
+	return retval;
+}
+
+static void
+on_message_sent (TnySendQueue *queue, TnyMsg *msg, guint nth, guint total)
+{
+	TnyHeader *header;
+
+	header = tny_msg_get_header (msg);
+	g_print ("Message \"%s\" got sent", tny_header_get_subject (header));
+	g_object_unref (G_OBJECT (header));
 }
 
 int 
@@ -97,20 +104,22 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	TnyAccountStore *account_store;
 	TnyList *accounts;
+	TnyFolderStoreQuery *query;
 	TnyStoreAccount *account;
 	TnyIterator *iter;
-    
+    TnySendQueue *queue;
+	TnyMsg *msg;
+	TnyPlatformFactory *platfact;
+
 	free (malloc (10));
+    
 	g_type_init ();
-    
-    
-    	context = g_option_context_new ("- The tinymail functional tester");
+
+	platfact = tny_test_platform_factory_get_instance ();
+
+    context = g_option_context_new ("- The tinymail functional tester");
 	g_option_context_add_main_entries (context, options, "tinymail");
-
-    	g_option_context_parse (context, &argc, &argv, NULL);
-
-    	if (mainloop)
-		gtk_init (&argc, &argv);
+    g_option_context_parse (context, &argc, &argv, NULL);
 
 	account_store = tny_test_account_store_new (online, cachedir);
 
@@ -122,19 +131,23 @@ main (int argc, char **argv)
 	accounts = tny_simple_list_new ();
 
 	tny_account_store_get_accounts (account_store, accounts, 
-	      TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+	      TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS);
 	g_object_unref (G_OBJECT (account_store));
     
 	iter = tny_list_create_iterator (accounts);
 	account = (TnyStoreAccount*) tny_iterator_get_current (iter);
 
+	msg = create_test_msg (platfact);
+
+	queue = tny_camel_send_queue_new (TNY_CAMEL_TRANSPORT_ACCOUNT (account));
+	tny_send_queue_add (queue, msg);
 
     if (mainloop)
 	{
 		g_print ("Using the Gtk+ mainloop (will wait 4 seconds in the loop)\n");
 	    
 	    	g_timeout_add (1, dance, account);	    
-	    	g_timeout_add (1000 * 4, time_s_up, NULL);
+	    	g_timeout_add (5000 * 4, time_s_up, NULL);
 	    
 		gtk_main ();
 	    
@@ -148,7 +161,8 @@ main (int argc, char **argv)
 	g_object_unref (G_OBJECT (account));
 	g_object_unref (G_OBJECT (iter));
 	g_object_unref (G_OBJECT (accounts));
-    
+   	g_object_unref (G_OBJECT (platfact));
+
 	return 0;
 }
 

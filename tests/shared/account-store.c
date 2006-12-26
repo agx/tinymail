@@ -100,25 +100,50 @@ static void
 tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
 {
 	TnyTestAccountStore *me = (TnyTestAccountStore *) self;
-	TnyAccount *account = TNY_ACCOUNT (tny_camel_store_account_new ());
+	TnyAccount *account;
 
 	/* Dear visitor of the SVN-web. This is indeed a fully functional and
 	   working IMAP account. This does not mean that you need to fuck it up */
 
-	tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
-	camel_session_set_online ((CamelSession*)me->session, me->force_online); 
-	tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online);
+	if (types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS || types == TNY_ACCOUNT_STORE_BOTH)
+	{
+		account = tny_camel_store_account_new ();
 
-	tny_account_set_proto (account, "imap");
-	tny_account_set_name (account, "unit test account");
-	tny_account_set_user (account, "tinymailunittest");
-	tny_account_set_hostname (account, "mail.tinymail.org");
-	tny_account_set_id (account, "unique");
-	tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
-	tny_account_set_pass_func (account, per_account_get_pass_func);
+		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
+		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
+		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online);
 
-	tny_list_prepend (list, (GObject*)account);
-	g_object_unref (G_OBJECT (account));
+		tny_account_set_proto (account, "imap");
+		tny_account_set_name (account, "unit test account");
+		tny_account_set_user (account, "tinymailunittest");
+		tny_account_set_hostname (account, "mail.tinymail.org");
+		tny_account_set_id (account, "unique_imap");
+		tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
+		tny_account_set_pass_func (account, per_account_get_pass_func);
+
+		tny_list_prepend (list, (GObject*)account);
+		g_object_unref (G_OBJECT (account));
+	}
+
+	if (types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS || types == TNY_ACCOUNT_STORE_BOTH)
+	{
+		account = tny_camel_transport_account_new ();
+
+		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
+		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
+		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online);
+
+		tny_account_set_proto (account, "smtp");
+		tny_account_set_name (account, "unit test account");
+		tny_account_set_id (account, "unique_smtp");
+		tny_account_set_url_string (account, "smtp://tinymailunittest;auth=PLAIN@mail.tinymail.org/;use_ssl=always");
+
+		tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
+		tny_account_set_pass_func (account, per_account_get_pass_func);
+
+		tny_list_prepend (list, (GObject*)account);
+		g_object_unref (G_OBJECT (account));
+	}
 
 	return;
 }

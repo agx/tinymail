@@ -111,6 +111,14 @@ tny_camel_msg_get_header_default (TnyMsg *self)
 	retval = priv->header;
 	if (retval)
 		g_object_ref (G_OBJECT (retval));
+	else {
+		CamelMimeMessage *msg;
+		priv->header = tny_camel_header_new ();
+		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
+		_tny_camel_header_set_camel_mime_message 
+			(TNY_CAMEL_HEADER (priv->header), msg);
+		retval = priv->header;
+	}
 	g_mutex_unlock (priv->header_lock);
 
 	return retval;
@@ -145,6 +153,8 @@ tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 {
 	CamelMimeMessage *msg;
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+	CamelInternetAddress *from, *recipients, *replyto;
+	const gchar *str;
 
 	g_assert (TNY_IS_CAMEL_HEADER (header));
 
@@ -156,9 +166,52 @@ tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 
 	priv->header = header;
 
-	msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
-	_tny_camel_header_set_camel_mime_message (TNY_CAMEL_HEADER (priv->header),
-						  msg);
+	if (((TnyCamelHeader *)header)->write)
+	{
+		TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+		g_mutex_lock (ppriv->part_lock);
+		if (ppriv->part)
+			camel_object_unref (CAMEL_OBJECT (ppriv->part));
+		/* Add a reference? */
+		ppriv->part = (CamelMimePart *) ((WriteInfo*)((TnyCamelHeader *)header)->info)->msg;
+		g_mutex_unlock (ppriv->part_lock);
+	} else {
+		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
+		_tny_camel_header_set_camel_mime_message 
+			(TNY_CAMEL_HEADER (priv->header), msg);
+	}
+
+/*
+	from = camel_internet_address_new ();
+	str = tny_header_get_from (header);
+	_foreach_email_add_to_inet_addr (str, from);
+	camel_mime_message_set_from (msg, from);
+	camel_object_unref (CAMEL_OBJECT (from));
+
+	replyto = camel_internet_address_new ();
+	str = tny_header_get_replyto (header);
+	_foreach_email_add_to_inet_addr (str, replyto);
+	camel_mime_message_set_from (msg, replyto);
+	camel_object_unref (CAMEL_OBJECT (replyto));
+
+	recipients = camel_internet_address_new ();
+	str = tny_header_get_to (header);
+	_foreach_email_add_to_inet_addr (str, recipients);
+	camel_mime_message_set_recipients (msg, CAMEL_RECIPIENT_TYPE_TO, recipients);
+	camel_object_unref (CAMEL_OBJECT (recipients));
+
+	str = tny_header_get_cc (header);
+	_foreach_email_add_to_inet_addr (str, recipients);
+	camel_mime_message_set_recipients (msg, CAMEL_RECIPIENT_TYPE_CC, recipients);
+	camel_object_unref (CAMEL_OBJECT (recipients));
+
+	str = tny_header_get_bcc (header);
+	_foreach_email_add_to_inet_addr (str, recipients);
+	camel_mime_message_set_recipients (msg, CAMEL_RECIPIENT_TYPE_BCC, recipients);
+	camel_object_unref (CAMEL_OBJECT (recipients));
+
+	camel_mime_message_set_subject (msg ,tny_header_get_subject (header));
+*/
 
 	g_mutex_unlock (priv->header_lock);
 

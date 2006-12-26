@@ -1,5 +1,11 @@
 2006-12-25  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Various fixes about creating and sending E-mails
+	* Added a TnyCamelMemStream type
+	* Added a msg-send test
+
+2006-12-25  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* TnyPlatformFactory: Added new_msg, new_header and new_mime_part
 
 	* This was a major API change

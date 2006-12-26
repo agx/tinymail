@@ -39,19 +39,10 @@
 #include <tny-session-camel.h>
 
 #include <tny-camel-shared.h>
+#include "tny-camel-stream-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
-
-typedef struct _TnyCamelStreamPriv TnyCamelStreamPriv;
-
-struct _TnyCamelStreamPriv
-{
-	CamelStream *stream;
-};
-
-#define TNY_CAMEL_STREAM_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_STREAM, TnyCamelStreamPriv))
 
 static gssize
 tny_camel_stream_write_to_stream (TnyStream *self, TnyStream *output)
