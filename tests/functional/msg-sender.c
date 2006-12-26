@@ -67,26 +67,45 @@ dance (gpointer data)
 }
 
 #define TEST_STRING "This is a test E-mail"
+#define HTML_PRE "<html><body><b>"
+#define HTML_POST "</b></body></html>"
 
 static TnyMsg*
 create_test_msg (TnyPlatformFactory *platfact)
 {
 	TnyMsg *retval = tny_platform_factory_new_msg (platfact);
-	TnyStream *stream = tny_camel_mem_stream_new ();
 	TnyHeader *header = tny_platform_factory_new_header (platfact);
+
+	TnyStream *plain_stream = tny_camel_mem_stream_new ();
+	TnyStream *html_stream = tny_camel_mem_stream_new ();
+	TnyMimePart *plain_body = tny_platform_factory_new_mime_part (platfact);
+	TnyMimePart *html_body = tny_platform_factory_new_mime_part (platfact);
 
 	tny_header_set_subject (header, TEST_STRING);
 	tny_header_set_from (header, "tinymailunittest@mail.tinymail.org");
 	tny_header_set_to (header, "spam@pvanhoof.be");
 
 	tny_msg_set_header (retval, header);
+	g_object_unref (G_OBJECT (header));
 
-	tny_stream_write (stream, TEST_STRING, strlen (TEST_STRING));
-	tny_stream_reset (stream);
+	tny_stream_write (plain_stream, TEST_STRING, strlen (TEST_STRING));
+	tny_stream_reset (plain_stream);
 
-	tny_mime_part_construct_from_stream (TNY_MIME_PART (retval), stream, "text/plain"); 
+	tny_stream_write (html_stream, HTML_PRE TEST_STRING HTML_POST, 
+		strlen (HTML_PRE TEST_STRING HTML_POST));
+	tny_stream_reset (html_stream);
 
-	g_object_unref (G_OBJECT (stream));
+	tny_mime_part_construct_from_stream (plain_body, plain_stream, "text/plain; charset=utf-8"); 
+	tny_mime_part_construct_from_stream (html_body, html_stream, "text/html; charset=utf-8"); 
+
+	tny_mime_part_add_part (TNY_MIME_PART (retval), html_body);
+	tny_mime_part_add_part (TNY_MIME_PART (retval), plain_body);
+
+	g_object_unref (G_OBJECT (plain_stream));
+	g_object_unref (G_OBJECT (html_stream));
+
+	g_object_unref (G_OBJECT (plain_body));
+	g_object_unref (G_OBJECT (html_body));
 
 	return retval;
 }

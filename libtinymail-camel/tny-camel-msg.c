@@ -47,6 +47,11 @@ static GObjectClass *parent_class = NULL;
 #define TNY_CAMEL_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_MSG, TnyCamelMsgPriv))
 
+/*
+	new = ppriv->part 
+	camel_medium_add_header (CAMEL_MEDIUM (new), "Disposition-Notification-To", mdn_address);
+	camel_medium_add_header (CAMEL_MEDIUM (new), "X-Priority", "1");
+*/
 
 CamelMimeMessage* 
 _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self)
@@ -220,6 +225,7 @@ tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 
 	return;
 }
+
 
 
 static void

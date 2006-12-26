@@ -130,6 +130,7 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelMedium *medium;
 	CamelDataWrapper *containee;
+	CamelMultipart *body;
 	gint curl = 0, retval = 0;
 	CamelMimePart *cpart;
 
@@ -147,24 +148,24 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 	/* Warp it into a multipart */
 	if (G_UNLIKELY (!containee) || G_LIKELY (!CAMEL_IS_MULTIPART (containee)))
 	{
-		/* TODO: restore original mime part? */
-		if (G_LIKELY (containee))
+		if (containee)
 			camel_object_unref (CAMEL_OBJECT (containee));
 
 		curl = 0;
-
-		containee = (CamelDataWrapper*)camel_multipart_new ();
-		camel_multipart_set_boundary ((CamelMultipart*)containee, NULL);
-		camel_medium_set_content_object (medium, containee);
-	}
+		body = camel_multipart_new ();
+		camel_data_wrapper_set_mime_type (CAMEL_DATA_WRAPPER (body),
+						"multipart/alternative");
+		camel_multipart_set_boundary (body, NULL);
+		camel_medium_set_content_object (medium, CAMEL_DATA_WRAPPER (body));
+	} else
+		body = CAMEL_MULTIPART (containee);
 
 	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
-	camel_multipart_add_part ((CamelMultipart*)containee, cpart);
+	camel_multipart_add_part (body, cpart);
 	camel_object_unref (CAMEL_OBJECT (cpart));
 
-	retval = camel_multipart_get_number ((CamelMultipart*)containee);
+	retval = camel_multipart_get_number (body);
 
-	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (priv->part_lock);
 
 	return retval;
@@ -196,11 +197,13 @@ tny_camel_mime_part_del_part_default (TnyMimePart *self, TnyMimePart *part)
 
 	containee = camel_medium_get_content_object (CAMEL_MEDIUM (priv->part));
 
-	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
-	camel_multipart_remove_part (CAMEL_MULTIPART (containee), cpart);
-	camel_object_unref (CAMEL_OBJECT (cpart));
+	if (containee && CAMEL_IS_MULTIPART (containee))
+	{
+		cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
+		camel_multipart_remove_part (CAMEL_MULTIPART (containee), cpart);
+		camel_object_unref (CAMEL_OBJECT (cpart));
+	}
 
-	/* Warning: large lock that locks code, not data */
 	g_mutex_unlock (priv->part_lock);
 
 	return;
@@ -383,8 +386,6 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 		camel_data_wrapper_decode_to_stream (wrapper, cstream);
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
-
-	/* We are done, so unreference the reference above */
 	camel_object_unref (CAMEL_OBJECT (medium));
 
 	return;
@@ -426,7 +427,6 @@ tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream 
 	camel_medium_set_content_object(medium, wrapper);
 
 	camel_object_unref (CAMEL_OBJECT (cstream));
-
 	camel_object_unref (CAMEL_OBJECT (medium));
 
 	return retval;
@@ -750,9 +750,12 @@ tny_camel_mime_part_set_content_type_default (TnyMimePart *self, const gchar *co
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
+	g_assert (CAMEL_IS_MEDIUM (priv->part));
+
 	g_mutex_lock (priv->part_lock);
 
 	camel_mime_part_set_content_type (priv->part, content_type);
+
 	if (G_UNLIKELY (priv->cached_content_type))
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
