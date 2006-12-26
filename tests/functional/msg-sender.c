@@ -150,7 +150,7 @@ main (int argc, char **argv)
 		g_print ("Using the Gtk+ mainloop (will wait 4 seconds in the loop)\n");
 	    
 	    	g_timeout_add (1, dance, account);	    
-	    	g_timeout_add (5000 * 4, time_s_up, NULL);
+	    	g_timeout_add (1000 * 4, time_s_up, NULL);
 	    
 		gtk_main ();
 	    
