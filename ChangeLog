@@ -1,3 +1,7 @@
+2007-01-02  Sergio Villar Senin <svillar@igalia.com>
+	* Replaced an include that prevented the documentation from being
+	built
+
 2006-12-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Various fixes about creating and sending E-mails
