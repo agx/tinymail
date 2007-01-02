@@ -21,16 +21,12 @@ libtinymail-camel/tny-camel-stream.c
 libtinymail-camel/tny-camel-account.c
 libtinymail-camel/tny-camel-msg-remove-strategy.c
 libtinymailui-gtk/tny-gtk-header-list-iterator.c
-libtinymailui-gtk/tny-gtk-folder-tree-model.c
 libtinymailui-gtk/tny-gtk-attach-list-model.c
-libtinymailui-gtk/tny-gtk-account-tree-model-iterator.c
 libtinymailui-gtk/tny-gtk-text-buffer-stream.c
-libtinymailui-gtk/tny-gtk-account-tree-model.c
 libtinymailui-gtk/tny-gtk-text-mime-part-view.c
 libtinymailui-gtk/tny-gtk-msg-window.c
 libtinymailui-gtk/tny-gtk-account-list-model-iterator.c
 libtinymailui-gtk/tny-gtk-header-view.c
-libtinymailui-gtk/tny-gtk-folder-tree-model-iterator.c
 libtinymailui-gtk/tny-gtk-account-list-model.c
 libtinymailui-gtk/tny-gtk-mime-part-save-strategy.c
 libtinymailui-gtk/tny-gtk-attachment-mime-part-view.c
