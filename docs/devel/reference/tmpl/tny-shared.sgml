@@ -469,6 +469,16 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 
+<!-- ##### SIGNAL TnySendQueue::error-happened ##### -->
+<para>
+
+</para>
+
+@: 
+@: 
+@: 
+@: 
+
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
@@ -486,6 +496,7 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 @parent: 
 @msg_sent: 
+@error_happened: 
 @add_func: 
 @get_sentbox_func: 
 @get_outbox_func: 

@@ -1,0 +1,34 @@
+<!-- ##### SECTION Title ##### -->
+tny-camel-stream-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyCamelStreamPriv ##### -->
+<para>
+
+</para>
+
+@stream: 
+
+<!-- ##### MACRO TNY_CAMEL_STREAM_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
+

@@ -34,6 +34,16 @@ shutdown obviously lose the unsent messages.
 </para>
 
 
+<!-- ##### SIGNAL TnySendQueue::error-happened ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
@@ -51,6 +61,7 @@ shutdown obviously lose the unsent messages.
 
 @parent: 
 @msg_sent: 
+@error_happened: 
 @add_func: 
 @get_sentbox_func: 
 @get_outbox_func: 
