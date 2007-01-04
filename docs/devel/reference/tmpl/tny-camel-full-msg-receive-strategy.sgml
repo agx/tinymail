@@ -9,12 +9,10 @@ A strategy for receiving a message fully
 A #TnyMsgReceiveStrategy implementation for Camel that receives the message fully
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
