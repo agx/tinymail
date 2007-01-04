@@ -22,7 +22,7 @@
 #include <tny-msg-receive-strategy.h>
 
 /**
- * tny_msg_receive_strategy_peform_get_msg:
+ * tny_msg_receive_strategy_perform_get_msg:
  * @self: A #TnyMsgRemoveStrategy instance
  * @folder: The #TnyFolder instance from which the message will be received
  * @header: The #TnyHeader instance of the message that must be received

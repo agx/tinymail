@@ -20,11 +20,14 @@
 <!ENTITY libtinymail-TnyIterator SYSTEM "xml/tny-iterator.xml">
 <!ENTITY libtinymail-TnySimpleList SYSTEM "xml/tny-simple-list.xml">
 <!ENTITY libtinymail-TnyMsgRemoveStrategy SYSTEM "xml/tny-msg-remove-strategy.xml">
+<!ENTITY libtinymail-TnyMsgReceiveStrategy SYSTEM "xml/tny-msg-receive-strategy.xml">
 <!ENTITY libtinymail-TnySendQueue SYSTEM "xml/tny-send-queue.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
 
 <!ENTITY libtinymail-camel-TnyCamelSendQueue SYSTEM "xml/tny-camel-send-queue.xml">
 <!ENTITY libtinymail-camel-TnyCamelMsgRemoveStrategy SYSTEM "xml/tny-camel-msg-remove-strategy.xml">
+<!ENTITY libtinymail-camel-TnyCamelFullMsgReceiveStrategy SYSTEM "xml/tny-camel-full-msg-receive-strategy.xml">
+<!ENTITY libtinymail-camel-TnyCamelPartialMsgReceiveStrategy SYSTEM "xml/tny-camel-partial-msg-receive-strategy.xml">
 <!ENTITY libtinymail-camel-TnyCamelAccount SYSTEM "xml/tny-camel-account.xml">
 <!ENTITY libtinymail-camel-TnyCamelStoreAccount SYSTEM "xml/tny-camel-store-account.xml">
 <!ENTITY libtinymail-camel-TnyCamelIMAPStoreAccount SYSTEM "xml/tny-camel-imap-store-account.xml">
@@ -119,6 +122,7 @@
 		&libtinymail-TnyMimePart;
 		&libtinymail-TnyFolder;
 		&libtinymail-TnyMsgRemoveStrategy;
+		&libtinymail-TnyMsgReceiveStrategy;
 		&libtinymail-TnyHeader;
 		&libtinymail-TnyStream;
 		&libtinymail-TnyFsStream;
@@ -192,6 +196,8 @@
 		&libtinymail-camel-TnyCamelStream;
 		&libtinymail-camel-TnyCamelFolder;
 		&libtinymail-camel-TnyCamelMsgRemoveStrategy;
+		&libtinymail-camel-TnyCamelFullMsgReceiveStrategy;
+		&libtinymail-camel-TnyCamelPartialMsgReceiveStrategy;
 		&libtinymail-camel-TnyCamelIMAPFolder;
 		&libtinymail-camel-TnyCamelNNTPFolder;
 		&libtinymail-camel-TnyCamelPOPFolder;
