@@ -10,6 +10,8 @@ lib_LTLIBRARIES = libtinymail-camel-1.0.la
 libtinymail_camel_1_0_headers =	\
 	tny-camel-mime-part.h \
 	tny-camel-msg-remove-strategy.h \
+	tny-camel-full-msg-receive-strategy.h \
+	tny-camel-partial-msg-receive-strategy.h \
 	tny-camel-header.h \
 	tny-camel-msg.h \
 	tny-camel-folder.h \
@@ -31,7 +33,6 @@ libtinymail_camel_1_0_headers =	\
 
 libtinymail_camel_priv_headers = \
 	tny-session-camel-priv.h \
-	tny-camel-msg-remove-strategy.c \
 	tny-camel-common.c \
 	tny-camel-common-priv.h \
 	tny-camel-account-priv.h \
@@ -48,6 +49,9 @@ libtinymail_camel_1_0_la_SOURCES = \
 	$(libtinymail_camel_1_0_headers) \
 	tny-camel-msg.c \
 	tny-camel-header.c \
+	tny-camel-partial-msg-receive-strategy.c \
+	tny-camel-full-msg-receive-strategy.c \
+	tny-camel-msg-remove-strategy.c \
 	tny-camel-mime-part-priv.h \
 	tny-camel-mime-part.c \
 	tny-camel-folder.c \

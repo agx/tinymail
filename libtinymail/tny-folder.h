@@ -75,6 +75,8 @@ struct _TnyFolderIface
 	void (*expunge_func) (TnyFolder *self, GError **err);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
+	TnyMsgReceiveStrategy* (*get_msg_receive_strategy_func) (TnyFolder *self);
+	void (*set_msg_receive_strategy_func) (TnyFolder *self, TnyMsgReceiveStrategy *st);
 	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
 	void (*get_msg_async_func) (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data);
 	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
@@ -98,6 +100,8 @@ GType tny_folder_type_get_type (void);
 
 TnyMsgRemoveStrategy* tny_folder_get_msg_remove_strategy (TnyFolder *self);
 void tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st);
+TnyMsgReceiveStrategy* tny_folder_get_msg_receive_strategy (TnyFolder *self);
+void tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st);
 void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err);
 void tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err);
 void tny_folder_expunge (TnyFolder *self, GError **err);

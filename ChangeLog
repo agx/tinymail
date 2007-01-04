@@ -1,3 +1,22 @@
+2007-01-04  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Created the TnyMsgReceiveStrategy infrastructure
+	* Implemented TnyCamelFullMsgReceiveStrategy
+	* Implemented dummy-copy of TnyCamelPartialMsgReceiveStrategy
+
+2007-01-03  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Porting to the one laptop per child project laptop
+	* Created marketing demo video about tinymail on the OLPC, posted on 
+	tinymail.org and youtube
+	* Analysis of partial message retrieval
+	* Created documentation item about partial message retrieval
+
+2007-01-02  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Created new documentation items
+	* Created camel-lite internal documentation items
+
 2007-01-02  Sergio Villar Senin <svillar@igalia.com>
 	* Replaced an include that prevented the documentation from being
 	built

@@ -45,6 +45,8 @@
 #include <errno.h>
 
 #include <tny-camel-msg-remove-strategy.h>
+#include <tny-camel-full-msg-receive-strategy.h>
+#include <tny-camel-partial-msg-receive-strategy.h>
 #include <tny-session-camel.h>
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"
@@ -997,6 +999,41 @@ tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async_func (self, header, callback, user_data);
 }
 
+
+static TnyMsgReceiveStrategy* 
+tny_camel_folder_get_msg_receive_strategy (TnyFolder *self)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_receive_strategy_func (self);
+}
+
+static TnyMsgReceiveStrategy* 
+tny_camel_folder_get_msg_receive_strategy_default (TnyFolder *self)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	return TNY_MSG_RECEIVE_STRATEGY (g_object_ref (G_OBJECT (priv->receive_strat)));
+}
+
+static void 
+tny_camel_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->set_msg_receive_strategy_func (self, st);
+	return;
+}
+
+static void 
+tny_camel_folder_set_msg_receive_strategy_default (TnyFolder *self, TnyMsgReceiveStrategy *st)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (priv->receive_strat)
+		g_object_unref (G_OBJECT (priv->receive_strat));
+
+	priv->receive_strat = TNY_MSG_RECEIVE_STRATEGY (g_object_ref (G_OBJECT (st)));
+
+	return;
+}
+
 static void
 tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
 {
@@ -1029,53 +1066,27 @@ static TnyMsg*
 tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyMsg *message = NULL;
-	CamelMimeMessage *camel_message = NULL;
-	const gchar *id;
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	TnyMsg *retval = NULL;
 
 	g_assert (TNY_IS_HEADER (header));
 
+	if (!priv->receive_strat)
+		return;
+
 	g_mutex_lock (priv->folder_lock);
 
-	id = tny_header_get_uid (TNY_HEADER (header));
-
-	if (!load_folder_no_lock (priv))
-	{
-		g_mutex_unlock (priv->folder_lock);
-		return;
-	}
-
-	message = NULL;
-	camel_message = camel_folder_get_message (priv->folder, (const char *) id, &ex);
-
-	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_GET_MSG,
-			camel_exception_get_description (&ex));
-	} else 
-	{
-		if (camel_message && CAMEL_IS_OBJECT (camel_message))
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
 		{
-			TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
-
-			message = tny_camel_msg_new ();
-			_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), self);
-			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
-				CAMEL_MIME_PART (camel_message)); 
-			_tny_camel_header_set_camel_mime_message (nheader, camel_message);
-			_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
-			g_object_unref (G_OBJECT (nheader));
+			g_mutex_unlock (priv->folder_lock);
+			return;
 		}
-	}
 
-	if (camel_message && CAMEL_IS_OBJECT (camel_message))
-		camel_object_unref (CAMEL_OBJECT (camel_message));
+	retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, header, err);
 
 	g_mutex_unlock (priv->folder_lock);
 
-	return message;
+	return retval;
 }
 
 
@@ -2175,6 +2186,10 @@ tny_camel_folder_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->remove_strat));
 	priv->remove_strat = NULL;
 
+	if (G_LIKELY (priv->receive_strat))
+		g_object_unref (G_OBJECT (priv->receive_strat));
+	priv->receive_strat = NULL;
+
 	g_mutex_unlock (priv->folder_lock);
 
 	g_mutex_free (priv->folder_lock);
@@ -2200,6 +2215,8 @@ tny_folder_init (gpointer g, gpointer iface_data)
 
 	klass->get_msg_remove_strategy_func = tny_camel_folder_get_msg_remove_strategy;
 	klass->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy;
+	klass->get_msg_receive_strategy_func = tny_camel_folder_get_msg_receive_strategy;
+	klass->set_msg_receive_strategy_func = tny_camel_folder_set_msg_receive_strategy;
 	klass->get_headers_func = tny_camel_folder_get_headers;
 	klass->get_msg_func = tny_camel_folder_get_msg;
 	klass->get_msg_async_func = tny_camel_folder_get_msg_async;
@@ -2245,6 +2262,8 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	object_class = (GObjectClass*) class;
 	object_class->finalize = tny_camel_folder_finalize;
 
+	class->get_msg_receive_strategy_func = tny_camel_folder_get_msg_receive_strategy_default;
+	class->set_msg_receive_strategy_func = tny_camel_folder_set_msg_receive_strategy_default;
 	class->get_msg_remove_strategy_func = tny_camel_folder_get_msg_remove_strategy_default;
 	class->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy_default;
 	class->get_headers_func = tny_camel_folder_get_headers_default;
@@ -2299,6 +2318,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 
 	priv->remove_strat = tny_camel_msg_remove_strategy_new ();
+	priv->receive_strat = tny_camel_full_msg_receive_strategy_new ();
 
 	return;
 }

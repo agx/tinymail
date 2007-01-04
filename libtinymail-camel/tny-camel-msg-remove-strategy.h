@@ -1,7 +1,7 @@
 #ifndef TNY_CAMEL_MSG_REMOVE_STRATEGY_H
 #define TNY_CAMEL_MSG_REMOVE_STRATEGY_H
 
-/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
+/* libtinymailui-camel - The Tiny Mail UI library for Gtk+
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This program is free software; you can redistribute it and/or modify

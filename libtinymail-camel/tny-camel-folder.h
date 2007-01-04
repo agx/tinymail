@@ -26,6 +26,9 @@
 #include <tny-msg.h>
 #include <tny-header.h>
 
+#include <tny-msg-remove-strategy.h>
+#include <tny-msg-receive-strategy.h>
+
 #include <camel/camel-folder.h>
 
 G_BEGIN_DECLS
@@ -55,6 +58,8 @@ struct _TnyCamelFolderClass
 	void (*expunge_func) (TnyFolder *self, GError **err);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
+	TnyMsgReceiveStrategy* (*get_msg_receive_strategy_func) (TnyFolder *self);
+	void (*set_msg_receive_strategy_func) (TnyFolder *self, TnyMsgReceiveStrategy *st);
 	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
 	void (*get_msg_async_func) (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data);
 	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);

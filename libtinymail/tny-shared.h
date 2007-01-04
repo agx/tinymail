@@ -78,6 +78,8 @@ typedef struct _TnySendQueue TnySendQueue;
 typedef struct _TnySendQueueIface TnySendQueueIface;
 typedef enum _TnyError TnyError;
 typedef enum _TnyErrorDomain TnyErrorDomain;
+typedef struct _TnyMsgReceiveStrategy TnyMsgReceiveStrategy;
+typedef struct _TnyMsgReceiveStrategyIface TnyMsgReceiveStrategyIface;
 
 G_END_DECLS
 

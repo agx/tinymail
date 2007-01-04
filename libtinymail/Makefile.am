@@ -22,6 +22,7 @@ libtinymail_1_0_headers = \
 	tny-folder-store.h \
 	tny-folder-store-query.h \
 	tny-msg-remove-strategy.h \
+	tny-msg-receive-strategy.h \
 	tny-send-queue.h
 
 libtinymail_1_0_la_SOURCES = \
@@ -47,6 +48,7 @@ libtinymail_1_0_la_SOURCES = \
 	tny-folder-store.c \
 	tny-folder-store-query.c \
 	tny-msg-remove-strategy.c \
+	tny-msg-receive-strategy.c \
 	tny-send-queue.c
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)

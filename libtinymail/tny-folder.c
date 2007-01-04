@@ -26,6 +26,62 @@
 guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
 
+
+
+
+/**
+ * tny_folder_get_msg_receive_strategy:
+ * @self: a TnyFolder object
+ *
+ * Get the strategy for receiving a message. The return value of this method
+ * must be unreferenced after use.
+ *
+ * Implementors: This method must return the strategy for receiving a message.
+ * being the implementer, you must add a reference before returning the instance.
+ *
+ * Return value: the strategy for receiving a message
+ **/
+TnyMsgReceiveStrategy* 
+tny_folder_get_msg_receive_strategy (TnyFolder *self)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->get_msg_receive_strategy_func)
+		g_critical ("You must implement tny_folder_get_msg_receive_strategy\n");
+#endif
+	return TNY_FOLDER_GET_IFACE (self)->get_msg_receive_strategy_func (self);
+}
+
+/**
+ * tny_folder_set_msg_receive_strategy:
+ * @self: a TnyFolder object
+ * @st: a #TnyMsgReceiveStrategy object
+ *
+ * Set the strategy for receiving a message
+ *
+ * Implementors: This method must set (store) the strategy for receiving a
+ * message.
+ *
+ * The idea is that devices can have a specific such strategy. For example a
+ * strategy that receives the message fully from the service or a strategy that
+ * receives it partially from the service (only the body)
+ *
+ * For more information take a look at tny_msg_receive_strategy_peform_remove
+ * of #TnyMsgReceiveStrategy.
+ *
+ **/
+void 
+tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->set_msg_receive_strategy_func)
+		g_critical ("You must implement tny_folder_set_msg_receive_strategy\n");
+#endif
+	TNY_FOLDER_GET_IFACE (self)->set_msg_receive_strategy_func (self, st);
+	return;
+}
+
+
+
 /**
  * tny_folder_copy:
  * @self: a #TnyFolder object
