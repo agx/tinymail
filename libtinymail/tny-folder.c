@@ -65,7 +65,7 @@ tny_folder_get_msg_receive_strategy (TnyFolder *self)
  * strategy that receives the message fully from the service or a strategy that
  * receives it partially from the service (only the body)
  *
- * For more information take a look at tny_msg_receive_strategy_peform_remove
+ * For more information take a look at tny_msg_receive_strategy_peform_get_msg
  * of #TnyMsgReceiveStrategy.
  *
  **/
