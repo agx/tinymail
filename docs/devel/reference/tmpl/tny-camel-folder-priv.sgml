@@ -40,6 +40,7 @@ tny-folder-priv
 @cached_name: 
 @cached_folder_type: 
 @remove_strat: 
+@receive_strat: 
 @poshdr_lock: 
 
 <!-- ##### MACRO TNY_CAMEL_FOLDER_GET_PRIVATE ##### -->

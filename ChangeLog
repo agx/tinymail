@@ -3,6 +3,7 @@
 	* Created the TnyMsgReceiveStrategy infrastructure
 	* Implemented TnyCamelFullMsgReceiveStrategy
 	* Implemented dummy-copy of TnyCamelPartialMsgReceiveStrategy
+	* Updated the documentation
 
 2007-01-03  Philip Van Hoof <pvanhoof@gnome.org>
 
