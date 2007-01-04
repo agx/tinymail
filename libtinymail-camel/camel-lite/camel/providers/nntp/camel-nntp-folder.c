@@ -187,7 +187,7 @@ nntp_folder_cache_message (CamelDiscoFolder *disco_folder, const char *uid, Came
 }
 
 static CamelMimeMessage *
-nntp_folder_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
+nntp_folder_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
 {
 	CamelMimeMessage *message = NULL;
 	CamelNNTPStore *nntp_store;
@@ -195,6 +195,8 @@ nntp_folder_get_message (CamelFolder *folder, const char *uid, CamelException *e
 	CamelNNTPFolder *nntp_folder;
 	CamelStream *stream = NULL;
 	char *article, *msgid;
+
+	/* TNY TODO: Implement partial message retrieval if full==TRUE */
 
 	nntp_store = (CamelNNTPStore *) folder->parent_store;
 	nntp_folder = (CamelNNTPFolder *) folder;

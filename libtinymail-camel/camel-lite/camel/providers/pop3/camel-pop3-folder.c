@@ -54,7 +54,7 @@ static void pop3_refresh_info (CamelFolder *folder, CamelException *ex);
 static void pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex);
 static gint pop3_get_message_count (CamelFolder *folder);
 static GPtrArray *pop3_get_uids (CamelFolder *folder);
-static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, CamelException *ex);
+static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex);
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
 
 static void
@@ -367,7 +367,8 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete,	CamelException *e
 	for (i = 0; i < pop3_folder->uids->len; i++) {
 	fi = pop3_folder->uids->pdata[i];
 
-	CamelMimeMessage *message = pop3_get_message (folder, fi->uid, ex);	
+	/* TNY TODO, questionable: Persist partial message retrieval? */
+	CamelMimeMessage *message = pop3_get_message (folder, fi->uid, FALSE, ex);	
 	time_t message_time = message->date + message->date_offset;
 	if(message) {
 		double time_diff = difftime(temp,message_time);
@@ -454,7 +455,7 @@ done:
 }
 
 static CamelMimeMessage *
-pop3_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
+pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
 {
 	CamelMimeMessage *message = NULL;
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
@@ -464,6 +465,8 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
 	char buffer[1];
 	int i, last;
 	CamelStream *stream = NULL;
+
+	/* TNY TODO: Implement partial message retrieval if full==TRUE */
 
 	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
 	if (fi == NULL) {

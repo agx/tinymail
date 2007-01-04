@@ -69,7 +69,7 @@ static int mbox_lock(CamelLocalFolder *lf, CamelLockType type, CamelException *e
 static void mbox_unlock(CamelLocalFolder *lf);
 
 static void mbox_append_message(CamelFolder *folder, CamelMimeMessage * message, const CamelMessageInfo * info,	char **appended_uid, CamelException *ex);
-static CamelMimeMessage *mbox_get_message(CamelFolder *folder, const gchar * uid, CamelException *ex);
+static CamelMimeMessage *mbox_get_message(CamelFolder *folder, const gchar * uid, gboolean full, CamelException *ex);
 static CamelLocalSummary *mbox_create_summary(CamelLocalFolder *lf, const char *path, const char *folder, CamelIndex *index);
 
 static void mbox_finalise(CamelObject * object);
@@ -323,7 +323,7 @@ fail:
 }
 
 static CamelMimeMessage *
-mbox_get_message(CamelFolder *folder, const gchar * uid, CamelException *ex)
+mbox_get_message(CamelFolder *folder, const gchar * uid, gboolean full, CamelException *ex)
 {
 	CamelLocalFolder *lf = (CamelLocalFolder *)folder;
 	CamelMimeMessage *message = NULL;
@@ -334,6 +334,10 @@ mbox_get_message(CamelFolder *folder, const gchar * uid, CamelException *ex)
 	off_t frompos;
 
 	d(printf("Getting message %s\n", uid));
+
+	/* TNY TODO: Implement partial message retrieval if full==TRUE 
+	   maybe remove the attachments if it happens to be FALSE in this case?
+	 */
 
 	/* lock the folder first, burn if we can't, need write lock for summary check */
 	if (camel_local_folder_lock(lf, CAMEL_LOCK_WRITE, ex) == -1)

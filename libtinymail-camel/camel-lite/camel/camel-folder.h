@@ -160,7 +160,7 @@ typedef struct {
 					  const char *value);
 
 	CamelMimeMessage * (*get_message)  (CamelFolder *folder, 
-					    const char *uid, 
+					    const char *uid, gboolean full, 
 					    CamelException *ex);
 
 	GPtrArray * (*get_uids)       (CamelFolder *folder);
@@ -280,7 +280,7 @@ void               camel_folder_free_summary          (CamelFolder *folder,
 
 /* uid based access operations */
 CamelMimeMessage * camel_folder_get_message           (CamelFolder *folder, 
-						       const char *uid, 
+						       const char *uid, gboolean full,
 						       CamelException *ex);
 #define camel_folder_delete_message(folder, uid) \
 	camel_folder_set_message_flags (folder, uid, CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_SEEN, CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_SEEN)

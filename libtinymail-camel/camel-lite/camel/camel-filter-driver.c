@@ -484,8 +484,9 @@ do_copy (struct _ESExp *f, int argc, struct _ESExpResult **argv, CamelFilterDriv
 				camel_folder_transfer_messages_to (p->source, uids, outbox, NULL, FALSE, p->ex);
 				g_ptr_array_free (uids, TRUE);
 			} else {
+				/* TNY TODO: Partial message retrieval exception */
 				if (p->message == NULL)
-					p->message = camel_folder_get_message (p->source, p->uid, p->ex);
+					p->message = camel_folder_get_message (p->source, p->uid, TRUE, p->ex);
 				
 				if (!p->message)
 					continue;
@@ -537,8 +538,9 @@ do_move (struct _ESExp *f, int argc, struct _ESExpResult **argv, CamelFilterDriv
 				camel_folder_transfer_messages_to (p->source, uids, outbox, NULL, last, p->ex);
 				g_ptr_array_free (uids, TRUE);
 			} else {
+				/* TNY TODO: Partial message retrieval exception */
 				if (p->message == NULL)
-					p->message = camel_folder_get_message (p->source, p->uid, p->ex);
+					p->message = camel_folder_get_message (p->source, p->uid, TRUE, p->ex);
 				
 				if (!p->message)
 					continue;
@@ -722,7 +724,8 @@ pipe_to_system (struct _ESExp *f, int argc, struct _ESExpResult **argv, CamelFil
 	
 	/* make sure we have the message... */
 	if (p->message == NULL) {
-		if (!(p->message = camel_folder_get_message (p->source, p->uid, p->ex)))
+		/* TNY TODO: Partial message retrieval exception */
+		if (!(p->message = camel_folder_get_message (p->source, p->uid, TRUE, p->ex)))
 			return -1;
 	}
 	
@@ -1341,7 +1344,8 @@ get_message_cb (void *data, CamelException *ex)
 		else
 			uid = camel_message_info_uid (p->info);
 		
-		message = camel_folder_get_message (p->source, uid, ex);
+		/* TNY TODO: Partial message retrieval exception */
+		message = camel_folder_get_message (p->source, uid, TRUE, ex);
 	}
 	
 	if (source_url && message && camel_mime_message_get_source (message) == NULL)
@@ -1397,7 +1401,8 @@ camel_filter_driver_filter_message (CamelFilterDriver *driver, CamelMimeMessage 
 		if (message) {
 			camel_object_ref (message);
 		} else {
-			message = camel_folder_get_message (source, uid, ex);
+			/* TNY TODO: Partial message retrieval exception */
+			message = camel_folder_get_message (source, uid, TRUE, ex);
 			if (!message)
 				return -1;
 		}
@@ -1505,7 +1510,8 @@ camel_filter_driver_filter_message (CamelFilterDriver *driver, CamelMimeMessage 
 			g_ptr_array_free (uids, TRUE);
 		} else {
 			if (p->message == NULL) {
-				p->message = camel_folder_get_message (source, uid, ex);
+				/* TNY TODO: Partial message retrieval exception */
+				p->message = camel_folder_get_message (source, uid, TRUE, ex);
 				if (!p->message)
 					goto error;
 			}

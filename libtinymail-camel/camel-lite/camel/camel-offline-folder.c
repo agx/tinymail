@@ -113,7 +113,9 @@ offline_downsync_sync (CamelSession *session, CamelSessionThreadMsg *mm)
 			int pc = i * 100 / m->changes->uid_added->len;
 			
 			camel_operation_progress (NULL, pc);
-			if ((message = camel_folder_get_message (m->folder, m->changes->uid_added->pdata[i], &mm->ex)))
+			/* TNY: Partial message retrieval here is always body only */
+			/* TODO: Maybe detect what the original message was, if there was a message? */
+			if ((message = camel_folder_get_message (m->folder, m->changes->uid_added->pdata[i], FALSE, &mm->ex)))
 				camel_object_unref (message);
 		}
 	} else {
@@ -263,8 +265,9 @@ offline_folder_downsync (CamelOfflineFolder *offline, const char *expression, Ca
 	
 	for (i = 0; i < uids->len; i++) {
 		int pc = i * 100 / uids->len;
-		
-		message = camel_folder_get_message (folder, uids->pdata[i], ex);
+		/* TNY: Partial message retrieval here is always body only */
+		/* TODO: Maybe detect what the original message was, if there was a message? */		
+		message = camel_folder_get_message (folder, uids->pdata[i], FALSE, ex);
 		camel_operation_progress (NULL, pc);
 		if (message == NULL)
 			break;

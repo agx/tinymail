@@ -1124,7 +1124,8 @@ match_words_message(CamelFolder *folder, const char *uid, struct _camel_search_w
 	CamelException x = CAMEL_EXCEPTION_INITIALISER;
 	int truth;
 
-	msg = camel_folder_get_message(folder, uid, &x);
+	/* TNY TODO: Partial message retrieval exception */
+	msg = camel_folder_get_message(folder, uid, TRUE, &x);
 	if (msg) {
 		mask = 0;
 		truth = match_words_1message((CamelDataWrapper *)msg, words, &mask);

@@ -5,6 +5,8 @@
 	* Implemented dummy-copy of TnyCamelPartialMsgReceiveStrategy
 	* Updated the documentation
 	* Updated the Python bindings for this
+	* Adjusted the camel-lite API to cope with upcoming partial message
+	retrieval features
 
 	* This was a major API change
 

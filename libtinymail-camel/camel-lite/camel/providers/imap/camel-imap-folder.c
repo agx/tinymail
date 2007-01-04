@@ -102,7 +102,7 @@ static void imap_rename (CamelFolder *folder, const char *new);
 
 /* message manipulation */
 static CamelMimeMessage *imap_get_message (CamelFolder *folder, const gchar *uid,
-					   CamelException *ex);
+					   gboolean full, CamelException *ex);
 static void imap_append_online (CamelFolder *folder, CamelMimeMessage *message,
 				const CamelMessageInfo *info, char **appended_uid,
 				CamelException *ex);
@@ -1436,7 +1436,8 @@ imap_transfer_offline (CamelFolder *source, GPtrArray *uids,
 		mi = camel_folder_summary_uid (source->summary, uid);
 		g_return_if_fail (mi != NULL);
 
-		message = camel_folder_get_message (source, uid, NULL);
+		/* TNY TODO: detect whether or not to persist partial message retrieval */
+		message = camel_folder_get_message (source, uid, TRUE, NULL);
 
 		if (message) {
 			camel_imap_summary_add_offline (dest->summary, destuid, message, mi);
@@ -1636,7 +1637,9 @@ imap_transfer_resyncing (CamelFolder *source, GPtrArray *uids,
 		       !isdigit (*(unsigned char *)(uids->pdata[i])) &&
 		       !camel_exception_is_set (ex)) {
 			uid = uids->pdata[i];
-			message = camel_folder_get_message (source, uid, NULL);
+
+			/* TNY TODO: detect whether or not to persist partial message retrieval */
+			message = camel_folder_get_message (source, uid, TRUE, NULL);
 			if (!message) {
 				/* Message must have been expunged */
 				continue;
@@ -2053,7 +2056,7 @@ content_info_incomplete (CamelMessageContentInfo *ci)
 }
 
 static CamelMimeMessage *
-imap_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
+imap_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
@@ -2061,6 +2064,8 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
 	CamelMimeMessage *msg = NULL;
 	CamelStream *stream = NULL;
 	int retry;
+
+	/* TNY TODO: Implement partial message retrieval if full==TRUE */
 
 	mi = (CamelImapMessageInfo *)camel_folder_summary_uid (folder->summary, uid);
 	if (mi == NULL) {

@@ -59,7 +59,7 @@ static void vee_expunge (CamelFolder *folder, CamelException *ex);
 static void vee_freeze(CamelFolder *folder);
 static void vee_thaw(CamelFolder *folder);
 
-static CamelMimeMessage *vee_get_message (CamelFolder *folder, const gchar *uid, CamelException *ex);
+static CamelMimeMessage *vee_get_message (CamelFolder *folder, const gchar *uid, gboolean full, CamelException *ex);
 static void vee_append_message(CamelFolder *folder, CamelMimeMessage *message, const CamelMessageInfo *info, char **appended_uid, CamelException *ex);
 static void vee_transfer_messages_to(CamelFolder *source, GPtrArray *uids, CamelFolder *dest, GPtrArray **transferred_uids, gboolean delete_originals, CamelException *ex);
 
@@ -508,14 +508,14 @@ vee_expunge (CamelFolder *folder, CamelException *ex)
 }
 
 static CamelMimeMessage *
-vee_get_message(CamelFolder *folder, const char *uid, CamelException *ex)
+vee_get_message(CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
 {
 	CamelVeeMessageInfo *mi;
 	CamelMimeMessage *msg = NULL;
 
 	mi = (CamelVeeMessageInfo *)camel_folder_summary_uid(folder->summary, uid);
 	if (mi) {
-		msg =  camel_folder_get_message(mi->real->summary->folder, camel_message_info_uid(mi)+8, ex);
+		msg =  camel_folder_get_message(mi->real->summary->folder, camel_message_info_uid(mi)+8, full, ex);
 		camel_message_info_free((CamelMessageInfo *)mi);
 	} else {
 		camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,

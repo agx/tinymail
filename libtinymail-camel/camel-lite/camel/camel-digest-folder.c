@@ -54,7 +54,7 @@ static void digest_expunge (CamelFolder *folder, CamelException *ex);
 
 /* message manipulation */
 static CamelMimeMessage *digest_get_message (CamelFolder *folder, const gchar *uid,
-					     CamelException *ex);
+					     gboolean full, CamelException *ex);
 static void digest_append_message (CamelFolder *folder, CamelMimeMessage *message,
 				   const CamelMessageInfo *info, char **appended_uid, CamelException *ex);
 static void digest_transfer_messages_to (CamelFolder *source, GPtrArray *uids,
@@ -283,7 +283,7 @@ digest_transfer_messages_to (CamelFolder *source, GPtrArray *uids,
 }
 
 static CamelMimeMessage *
-digest_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
+digest_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
 {
 	CamelDigestFolder *digest = CAMEL_DIGEST_FOLDER (folder);
 	CamelDataWrapper *wrapper;
@@ -291,6 +291,9 @@ digest_get_message (CamelFolder *folder, const char *uid, CamelException *ex)
 	CamelMimePart *part;
 	char *subuid;
 	int id;
+
+	/* TNY TODO: Implement partial message retrieval if full==TRUE 
+	   (after figuring out what a digest folder does, of course) */
 	
 	part = CAMEL_MIME_PART (digest->priv->message);
 	wrapper = camel_medium_get_content_object (CAMEL_MEDIUM (part));

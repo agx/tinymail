@@ -53,7 +53,7 @@ static CamelLocalFolderClass *parent_class = NULL;
 static CamelLocalSummary *maildir_create_summary(CamelLocalFolder *lf, const char *path, const char *folder, CamelIndex *index);
 
 static void maildir_append_message(CamelFolder * folder, CamelMimeMessage * message, const CamelMessageInfo *info, char **appended_uid, CamelException * ex);
-static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, CamelException * ex);
+static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, gboolean full, CamelException * ex);
 
 static void maildir_finalize(CamelObject * object);
 
@@ -227,7 +227,7 @@ maildir_append_message (CamelFolder *folder, CamelMimeMessage *message, const Ca
 	g_free (dest);
 }
 
-static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, CamelException * ex)
+static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, gboolean full, CamelException * ex)
 {
 	CamelLocalFolder *lf = (CamelLocalFolder *)folder;
 	CamelStream *message_stream = NULL;
@@ -237,6 +237,10 @@ static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar *
 	CamelMaildirMessageInfo *mdi;
 
 	d(printf("getting message: %s\n", uid));
+
+	/* TNY TODO: Implement partial message retrieval if full==TRUE 
+	   maybe remove the attachments if it happens to be FALSE in this case?
+	 */
 
 	/* get the message summary info */
 	if ((info = camel_folder_summary_uid(folder->summary, uid)) == NULL) {
