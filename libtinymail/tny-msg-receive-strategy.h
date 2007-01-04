@@ -26,7 +26,7 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MSG_RECEIVE_STRATEGY             (tny_msg_remove_strategy_get_type ())
+#define TNY_TYPE_MSG_RECEIVE_STRATEGY             (tny_msg_receive_strategy_get_type ())
 #define TNY_MSG_RECEIVE_STRATEGY(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MSG_RECEIVE_STRATEGY, TnyMsgReceiveStrategy))
 #define TNY_IS_MSG_RECEIVE_STRATEGY(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MSG_RECEIVE_STRATEGY))
 #define TNY_MSG_RECEIVE_STRATEGY_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_MSG_RECEIVE_STRATEGY, TnyMsgReceiveStrategyIface))

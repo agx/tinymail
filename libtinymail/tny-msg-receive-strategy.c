@@ -23,7 +23,7 @@
 
 /**
  * tny_msg_receive_strategy_perform_get_msg:
- * @self: A #TnyMsgRemoveStrategy instance
+ * @self: A #TnyMsgReceiveStrategy instance
  * @folder: The #TnyFolder instance from which the message will be received
  * @header: The #TnyHeader instance of the message that must be received
  * @err: A #GError instance or NULL
