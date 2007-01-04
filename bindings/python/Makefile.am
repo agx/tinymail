@@ -104,6 +104,7 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-stream.h \
 	$(top_srcdir)/libtinymail/tny-transport-account.h \
 	$(top_srcdir)/libtinymail/tny-msg-remove-strategy.h \
+	$(top_srcdir)/libtinymail/tny-msg-receive-strategy.h \
 	$(top_srcdir)/libtinymail/tny-send-queue.h
 
 tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py 
@@ -179,6 +180,8 @@ tinymail_camel_h_files = \
 	$(top_srcdir)/libtinymail-camel/tny-camel-mime-part.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-msg.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-msg-remove-strategy.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-full-msg-receive-strategy.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-partial-msg-receive-strategy.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-folder.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-store-account.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-pop-folder.h \

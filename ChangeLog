@@ -4,6 +4,9 @@
 	* Implemented TnyCamelFullMsgReceiveStrategy
 	* Implemented dummy-copy of TnyCamelPartialMsgReceiveStrategy
 	* Updated the documentation
+	* Updated the Python bindings for this
+
+	* This was a major API change
 
 2007-01-03  Philip Van Hoof <pvanhoof@gnome.org>
 

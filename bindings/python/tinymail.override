@@ -23,6 +23,8 @@ headers
 #include <tny-folder-store.h>
 #include <tny-folder-store-query.h>
 #include <tny-send-queue.h>
+#include <tny-msg-remove-strategy.h>
+#include <tny-msg-receive-strategy.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
