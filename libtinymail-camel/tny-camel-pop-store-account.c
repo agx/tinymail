@@ -340,11 +340,6 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->remove_folder_func = tny_camel_pop_store_account_remove_folder;
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->create_folder_func = tny_camel_pop_store_account_create_folder;
 
-
-   	/* TODO: implement custom get_folders and get_folders_async for POP */
-	/* TODO: implement a TnyCamelPOPFolder (that uses the local provider of Camel) */
-	/* TODO: implement do-nothing create_folder and remove_folder for POP */
-    
 	object_class->finalize = tny_camel_pop_store_account_finalize;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelPopStoreAccountPriv));
