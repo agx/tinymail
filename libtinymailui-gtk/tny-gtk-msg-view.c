@@ -502,8 +502,12 @@ tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alter
 		gboolean displayed = tny_gtk_msg_view_display_part (self, part, desc);
 
 		g_object_unref (G_OBJECT (part));
-		if (alternatives && displayed)
-			break;
+
+		/* TNY TODO: partial message retrieval: temporarily disabled 
+			alternatives detection */
+
+		/* if (alternatives && displayed)
+			break; */
 		tny_iterator_next (iterator);
 	}
 

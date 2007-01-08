@@ -52,6 +52,31 @@ struct _TnyCamelAccountClass
 	   TnyCamelAccount, it's also not virtual) */
 
 	void (*reconnect_func) (TnyCamelAccount *self);
+
+	/* Virtual methods */
+
+	gboolean (*is_connected_func)(TnyAccount *self);
+	void (*set_id_func) (TnyAccount *self, const gchar *id);
+	void (*set_name_func) (TnyAccount *self, const gchar *name);
+	void (*set_proto_func) (TnyAccount *self, const gchar *proto);
+	void (*set_user_func) (TnyAccount *self, const gchar *user);
+	void (*set_hostname_func) (TnyAccount *self, const gchar *host);
+	void (*set_url_string_func) (TnyAccount *self, const gchar *url_string);
+	void (*set_pass_func_func) (TnyAccount *self, TnyGetPassFunc get_pass_func);
+	void (*set_forget_pass_func_func) (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func);
+	TnyGetPassFunc (*get_pass_func_func) (TnyAccount *self);
+	TnyForgetPassFunc (*get_forget_pass_func_func) (TnyAccount *self);
+	const gchar* (*get_id_func) (TnyAccount *self);
+	const gchar* (*get_name_func) (TnyAccount *self);
+	const gchar* (*get_proto_func) (TnyAccount *self);
+	const gchar* (*get_user_func) (TnyAccount *self);
+	const gchar* (*get_hostname_func) (TnyAccount *self);
+	const gchar* (*get_url_string_func) (TnyAccount *self);
+	TnyAccountType (*get_account_type_func) (TnyAccount *self);
+
+	void (*add_option_func) (TnyCamelAccount *self, const gchar *option);
+	void (*set_online_status_func) (TnyCamelAccount *self, gboolean offline);
+
 };
 
 GType tny_camel_account_get_type (void);

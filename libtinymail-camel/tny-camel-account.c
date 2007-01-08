@@ -51,6 +51,12 @@ static GObjectClass *parent_class = NULL;
 static TnyAccountType
 tny_camel_account_get_account_type (TnyAccount *self)
 {
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_account_type_func (self);
+}
+
+static TnyAccountType
+tny_camel_account_get_account_type_default (TnyAccount *self)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	return priv->account_type;
@@ -69,6 +75,12 @@ tny_camel_account_get_account_type (TnyAccount *self)
 void 
 tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option)
 {
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->add_option_func (self, option);
+}
+
+void 
+tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	priv->options = g_list_prepend (priv->options, g_strdup (option));
@@ -81,6 +93,12 @@ tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option)
 
 static void
 tny_camel_account_set_url_string (TnyAccount *self, const gchar *url_string)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_url_string_func (self, url_string);
+}
+
+static void
+tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_string)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -100,6 +118,12 @@ tny_camel_account_set_url_string (TnyAccount *self, const gchar *url_string)
 static const gchar*
 tny_camel_account_get_url_string (TnyAccount *self)
 {
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_url_string_func (self);
+}
+
+static const gchar*
+tny_camel_account_get_url_string_default (TnyAccount *self)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	return (const gchar*)priv->url_string;
@@ -108,6 +132,12 @@ tny_camel_account_get_url_string (TnyAccount *self)
 
 static void
 tny_camel_account_set_name (TnyAccount *self, const gchar *name)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_name_func (self, name);
+}
+
+static void
+tny_camel_account_set_name_default (TnyAccount *self, const gchar *name)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -121,6 +151,12 @@ tny_camel_account_set_name (TnyAccount *self, const gchar *name)
 
 static const gchar*
 tny_camel_account_get_name (TnyAccount *self)
+{
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_name_func (self);
+}
+
+static const gchar*
+tny_camel_account_get_name_default (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -211,6 +247,12 @@ _tny_camel_account_stop_camel_operation (TnyCamelAccount *self)
 static gboolean 
 tny_camel_account_is_connected (TnyAccount *self)
 {
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->is_connected_func (self);
+}
+
+static gboolean 
+tny_camel_account_is_connected_default (TnyAccount *self)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	return priv->connected;
 }
@@ -237,9 +279,14 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
 	return;
 }
 
-
 static void
 tny_camel_account_set_id (TnyAccount *self, const gchar *id)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_id_func (self, id);
+}
+
+static void
+tny_camel_account_set_id_default (TnyAccount *self, const gchar *id)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -257,6 +304,12 @@ tny_camel_account_set_id (TnyAccount *self, const gchar *id)
 
 static void
 tny_camel_account_set_proto (TnyAccount *self, const gchar *proto)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_proto_func (self, proto);
+}
+
+static void
+tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -277,6 +330,12 @@ tny_camel_account_set_proto (TnyAccount *self, const gchar *proto)
 static void
 tny_camel_account_set_user (TnyAccount *self, const gchar *user)
 {
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_user_func (self, user);
+}
+
+static void
+tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	
 	g_static_rec_mutex_lock (priv->service_lock);
@@ -296,6 +355,12 @@ tny_camel_account_set_user (TnyAccount *self, const gchar *user)
 static void
 tny_camel_account_set_hostname (TnyAccount *self, const gchar *host)
 {
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_hostname_func (self, host);
+}
+
+static void
+tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	
 	g_static_rec_mutex_lock (priv->service_lock);
@@ -314,6 +379,12 @@ tny_camel_account_set_hostname (TnyAccount *self, const gchar *host)
 
 static void
 tny_camel_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_pass_func_func (self, get_pass_func);
+}
+
+static void
+tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pass_func)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -336,6 +407,12 @@ tny_camel_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
 static void
 tny_camel_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func)
 {
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_forget_pass_func_func (self, get_forget_pass_func);
+}
+
+static void
+tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->service_lock);
@@ -352,6 +429,12 @@ tny_camel_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc get_
 static const gchar*
 tny_camel_account_get_id (TnyAccount *self)
 {
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_id_func (self);
+}
+
+static const gchar*
+tny_camel_account_get_id_default (TnyAccount *self)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);	
 	const gchar *retval;
 
@@ -364,6 +447,12 @@ tny_camel_account_get_id (TnyAccount *self)
 
 static const gchar*
 tny_camel_account_get_proto (TnyAccount *self)
+{
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_proto_func (self);
+}
+
+static const gchar*
+tny_camel_account_get_proto_default (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
@@ -378,6 +467,12 @@ tny_camel_account_get_proto (TnyAccount *self)
 static const gchar*
 tny_camel_account_get_user (TnyAccount *self)
 {
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_user_func (self);
+}
+
+static const gchar*
+tny_camel_account_get_user_default (TnyAccount *self)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
 
@@ -390,6 +485,12 @@ tny_camel_account_get_user (TnyAccount *self)
 
 static const gchar*
 tny_camel_account_get_hostname (TnyAccount *self)
+{
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_hostname_func (self);
+}
+
+static const gchar*
+tny_camel_account_get_hostname_default (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);	
 	const gchar *retval;
@@ -404,6 +505,12 @@ tny_camel_account_get_hostname (TnyAccount *self)
 static TnyGetPassFunc
 tny_camel_account_get_pass_func (TnyAccount *self)
 {
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_pass_func_func (self);
+}
+
+static TnyGetPassFunc
+tny_camel_account_get_pass_func_default (TnyAccount *self)
+{
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyGetPassFunc retval;
 
@@ -416,6 +523,12 @@ tny_camel_account_get_pass_func (TnyAccount *self)
 
 static TnyForgetPassFunc
 tny_camel_account_get_forget_pass_func (TnyAccount *self)
+{
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_forget_pass_func_func (self);
+}
+
+static TnyForgetPassFunc
+tny_camel_account_get_forget_pass_func_default (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyForgetPassFunc retval;
@@ -491,6 +604,12 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
  **/
 void 
 tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_online_status_func (self, offline);
+}
+
+void 
+tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean offline)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -634,6 +753,29 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+
+	class->get_hostname_func = tny_camel_account_get_hostname_default;
+	class->set_hostname_func = tny_camel_account_set_hostname_default;
+	class->get_proto_func = tny_camel_account_get_proto_default;
+	class->set_proto_func = tny_camel_account_set_proto_default;
+	class->get_user_func = tny_camel_account_get_user_default;
+	class->set_user_func = tny_camel_account_set_user_default;
+	class->get_pass_func_func = tny_camel_account_get_pass_func_default;
+	class->set_pass_func_func = tny_camel_account_set_pass_func_default;
+	class->get_forget_pass_func_func = tny_camel_account_get_forget_pass_func_default;
+	class->set_forget_pass_func_func = tny_camel_account_set_forget_pass_func_default;
+	class->set_id_func = tny_camel_account_set_id_default;
+	class->get_id_func = tny_camel_account_get_id_default;
+	class->is_connected_func = tny_camel_account_is_connected_default;
+	class->set_url_string_func = tny_camel_account_set_url_string_default;
+	class->get_url_string_func = tny_camel_account_get_url_string_default;
+	class->get_name_func = tny_camel_account_get_name_default;
+	class->set_name_func = tny_camel_account_set_name_default;
+	class->get_account_type_func = tny_camel_account_get_account_type_default;
+
+	class->add_option_func = tny_camel_account_add_option_default;
+	class->set_online_status_func = tny_camel_account_set_online_status_default;
 
 	object_class->finalize = tny_camel_account_finalize;
 

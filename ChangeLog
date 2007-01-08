@@ -1,3 +1,8 @@
+2007-01-08  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Implemented first pieces of the partial message retrieval
+	* Further implemented TnyCamelPopFolder and TnyCamelPopAccount
+
 2007-01-04  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Created the TnyMsgReceiveStrategy infrastructure

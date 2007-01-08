@@ -135,7 +135,10 @@ static void imap_thaw (CamelFolder *folder);
 
 static CamelObjectClass *parent_class;
 
+
 static GData *parse_fetch_response (CamelImapFolder *imap_folder, char *msg_att);
+
+static GData *parse_partial_fetch_response (CamelImapFolder *imap_folder, char *response, GData *data, const gchar *part_spec);
 
 #ifdef G_OS_WIN32
 /* The strtok() in Microsoft's C library is MT-safe (but still uses
@@ -1718,7 +1721,7 @@ imap_search_free (CamelFolder *folder, GPtrArray *uids)
 static CamelMimeMessage *get_message (CamelImapFolder *imap_folder,
 				      const char *uid,
 				      CamelMessageContentInfo *ci,
-				      CamelException *ex);
+				      gboolean full, CamelException *ex);
 
 struct _part_spec_stack {
 	struct _part_spec_stack *parent;
@@ -1839,7 +1842,8 @@ get_content (CamelImapFolder *imap_folder, const char *uid,
 			strcpy(spec, part_spec);
 		g_free(part_spec);
 		
-		stream = camel_imap_folder_fetch_data (imap_folder, uid, spec, FALSE, ex);
+		/* TNY TODO: partial message retrieval exception */
+		stream = camel_imap_folder_fetch_data (imap_folder, uid, spec, FALSE, TRUE, ex);
 		if (stream) {
 			ret = camel_data_wrapper_construct_from_stream (CAMEL_DATA_WRAPPER (body_mp), stream);
 			camel_object_unref (CAMEL_OBJECT (stream));
@@ -1876,7 +1880,8 @@ get_content (CamelImapFolder *imap_folder, const char *uid,
 		num = 1;
 		while (ci) {
 			sprintf (child_spec + speclen, "%d.MIME", num++);
-			stream = camel_imap_folder_fetch_data (imap_folder, uid, child_spec, FALSE, ex);
+			/* TNY TODO: partial message retrieval exception */
+			stream = camel_imap_folder_fetch_data (imap_folder, uid, child_spec, FALSE, TRUE, ex);
 			if (stream) {
 				int ret;
 				
@@ -1932,7 +1937,8 @@ get_content (CamelImapFolder *imap_folder, const char *uid,
 		
 		return (CamelDataWrapper *) body_mp;
 	} else if (camel_content_type_is (ci->type, "message", "rfc822")) {
-		content = (CamelDataWrapper *) get_message (imap_folder, uid, ci->childs, ex);
+		/* TNY TODO: partial message retrieval exception */
+		content = (CamelDataWrapper *) get_message (imap_folder, uid, ci->childs, TRUE, ex);
 		g_free (part_spec);
 		return content;
 	} else {
@@ -1956,7 +1962,7 @@ get_content (CamelImapFolder *imap_folder, const char *uid,
 static CamelMimeMessage *
 get_message (CamelImapFolder *imap_folder, const char *uid,
 	     CamelMessageContentInfo *ci,
-	     CamelException *ex)
+	     gboolean full, CamelException *ex)
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (CAMEL_FOLDER (imap_folder)->parent_store);
 	CamelDataWrapper *content;
@@ -1970,7 +1976,8 @@ get_message (CamelImapFolder *imap_folder, const char *uid,
 	section_text = g_strdup_printf ("%s%s%s", part_spec, *part_spec ? "." : "",
 					store->server_level >= IMAP_LEVEL_IMAP4REV1 ? "HEADER" : "0");
 
-	stream = camel_imap_folder_fetch_data (imap_folder, uid, section_text, FALSE, ex);
+	/* TNY: partial message retrieval */
+	stream = camel_imap_folder_fetch_data (imap_folder, uid, section_text, FALSE, full, ex);
 	g_free (section_text);
 	g_free(part_spec);
 	if (!stream)
@@ -2010,14 +2017,14 @@ get_message (CamelImapFolder *imap_folder, const char *uid,
 
 static CamelMimeMessage *
 get_message_simple (CamelImapFolder *imap_folder, const char *uid,
-		    CamelStream *stream, CamelException *ex)
+		    CamelStream *stream, gboolean full, CamelException *ex)
 {
 	CamelMimeMessage *msg;
 	int ret;
 	
 	if (!stream) {
 		stream = camel_imap_folder_fetch_data (imap_folder, uid, "",
-						       FALSE, ex);
+						       FALSE, full, ex);
 		if (!stream)
 			return NULL;
 	}
@@ -2076,8 +2083,8 @@ imap_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 
 	/* If its cached in full, just get it as is, this is only a shortcut,
 	   since we get stuff from the cache anyway.  It affects a busted connection though. */
-	if ( (stream = camel_imap_folder_fetch_data(imap_folder, uid, "", TRUE, NULL))
-	     && (msg = get_message_simple(imap_folder, uid, stream, ex)))
+	if ( (stream = camel_imap_folder_fetch_data(imap_folder, uid, "", TRUE, full, NULL))
+	     && (msg = get_message_simple(imap_folder, uid, stream, full, ex)))
 		goto done;
 
 	/* All this mess is so we silently retry a fetch if we fail with
@@ -2094,7 +2101,7 @@ imap_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		    || mi->info.size < IMAP_SMALL_BODY_SIZE
 #endif
 		    || (!content_info_incomplete(mi->info.content) && !mi->info.content->childs)) {
-			msg = get_message_simple (imap_folder, uid, NULL, ex);
+			msg = get_message_simple (imap_folder, uid, NULL, full, ex);
 		} else {
 			if (content_info_incomplete (mi->info.content)) {
 				/* For larger messages, fetch the structure and build a message
@@ -2160,9 +2167,9 @@ imap_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 			 * let the mailer's "bad MIME" code handle it.
 			 */
 			if (content_info_incomplete (mi->info.content))
-				msg = get_message_simple (imap_folder, uid, NULL, ex);
+				msg = get_message_simple (imap_folder, uid, NULL, full, ex);
 			else
-				msg = get_message (imap_folder, uid, mi->info.content, ex);
+				msg = get_message (imap_folder, uid, mi->info.content, full, ex);
 		}
 	} while (msg == NULL
 		 && retry < 2
@@ -2184,7 +2191,8 @@ imap_cache_message (CamelDiscoFolder *disco_folder, const char *uid,
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (disco_folder);
 	CamelStream *stream;
 
-	stream = camel_imap_folder_fetch_data (imap_folder, uid, "", FALSE, ex);
+	/* TNY TODO: partial message retrieval exception */
+	stream = camel_imap_folder_fetch_data (imap_folder, uid, "", FALSE, TRUE, ex);
 	if (stream)
 		camel_object_unref (CAMEL_OBJECT (stream));
 }
@@ -2682,19 +2690,23 @@ imap_thaw (CamelFolder *folder)
 	}
 }
 
+typedef struct {
+	const gchar *part_spec;
+	GData *data;
+} PartialRetrieveInfo;
 
 CamelStream *
 camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			      const char *section_text, gboolean cache_only,
-			      CamelException *ex)
+			      gboolean full, CamelException *ex)
 {
 	CamelFolder *folder = CAMEL_FOLDER (imap_folder);
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
 	CamelImapResponse *response;
 	CamelStream *stream;
-	GData *fetch_data;
-	char *found_uid;
-	int i;
+	GData *fetch_data=NULL;
+	char *found_uid = NULL, *boundary = NULL;
+	int i; gboolean free_fuid = FALSE;
 	
 	/* EXPUNGE responses have to modify the cache, which means
 	 * they have to grab the cache_lock while holding the
@@ -2708,7 +2720,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	 */
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 	stream = camel_imap_message_cache_get (imap_folder->cache, uid, section_text, ex);
-	if (!stream && (!strcmp (section_text, "HEADER") || !strcmp (section_text, "0"))) {
+	if (!stream && (!strcmp (section_text, "HEADER") || !strcmp (section_text, "0"))) 
+	{
 		camel_exception_clear (ex);
 		stream = camel_imap_message_cache_get (imap_folder->cache, uid, "", ex);
 	}
@@ -2731,44 +2744,249 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	}
 	
 	camel_exception_clear (ex);
-	if (store->server_level < IMAP_LEVEL_IMAP4REV1 && !*section_text) {
+
+	if (full)
+	{
+	    if (store->server_level < IMAP_LEVEL_IMAP4REV1 && !*section_text) {
+		    response = camel_imap_command (store, folder, ex,
+						   "UID FETCH %s RFC822.PEEK",
+						   uid);
+	    } else {
+		    response = camel_imap_command (store, folder, ex,
+						   "UID FETCH %s BODY.PEEK[%s]",
+						   uid, section_text);
+	    }
+	    /* We won't need the connect_lock again after this. */
+	    CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+	    
+	    if (!response) {
+		    CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+		    return NULL;
+	    }
+	    
+	    for (i = 0; i < response->untagged->len; i++) {
+		    fetch_data = parse_fetch_response (imap_folder, response->untagged->pdata[i]);
+		    found_uid = g_datalist_get_data (&fetch_data, "UID");
+		    stream = g_datalist_get_data (&fetch_data, "BODY_PART_STREAM");
+		    if (found_uid && stream && !strcmp (uid, found_uid))
+			    break;
+		    
+		    g_datalist_clear (&fetch_data);
+		    stream = NULL;
+	    }
+	    camel_imap_response_free (store, response);
+	} else 
+	{
+
+ 	    /* Partial message retrieval feature 
+	       { HEADER boundary 1.HEADER 1 boundary } */
+
+	    int t = 0, boundary_len = 0;
+	    PartialRetrieveInfo infos[3] = {
+		{ "HEADER", NULL },
+		{ "1.HEADER", NULL }, 
+		{ "1", NULL },
+	    };
+
+/* TODO: It's better to use BODYSTRUCTURE to get 1.HEADER (Cyrus doesn't support 1.HEADER, Courier does)
+ * * 1 FETCH (BODYSTRUCTURE (("TEXT" "PLAIN" NIL NIL NIL "7BIT" 144 9 NIL NIL NIL)("IMAGE" "PNG" ("NAME" "drawing.png") NIL NIL "BASE64" 1005522 NIL ("ATTACHMENT" ("FILENAME" "drawing.png")) NIL) "MIXED" ("BOUNDARY" "=-7wX60rl1FvrW91cX0wLC") NIL NIL))
+ */
+	    for (t=0; t < 3; t++)
+	    {
 		response = camel_imap_command (store, folder, ex,
-					       "UID FETCH %s RFC822.PEEK",
-					       uid);
-	} else {
-		response = camel_imap_command (store, folder, ex,
-					       "UID FETCH %s BODY.PEEK[%s]",
-					       uid, section_text);
-	}
-	/* We won't need the connect_lock again after this. */
-	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-	
-	if (!response) {
+			   "UID FETCH %s BODY.PEEK[%s]", uid, infos[t].part_spec);
+
+		if (!response)
+		    goto errorh;
+
+		for (i = 0; i < response->untagged->len; i++)
+		    infos[t].data = parse_partial_fetch_response (imap_folder, response->untagged->pdata[0], infos[t].data, infos[t].part_spec);
+		camel_imap_response_free (store, response);
+
+		if (!boundary) {
+			boundary = g_strdup (g_datalist_get_data (&(infos[t].data), "BOUNDARY"));
+			if (boundary) boundary_len = strlen (boundary);
+		}
+		if (!found_uid) {
+			found_uid = g_strdup (g_datalist_get_data (&(infos[t].data), "UID"));
+			free_fuid = TRUE;
+		}
+	    }
+
+		
+	    CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
+	    stream = NULL;
+
+	    if (found_uid)
+	    {
+		CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
+
+		for (t=0; t < 3; t++)
+		{
+		    gchar *data = g_datalist_get_data (&(infos[t].data), "PART_BODY");
+		    size_t len = GPOINTER_TO_INT (g_datalist_get_data (&(infos[t].data), "PART_LEN"));
+
+		    if (!stream)
+		    {
+			    stream = camel_imap_message_cache_insert (imap_folder->cache, 
+				found_uid, "", (len>0&&data)?data:"", len, NULL);
+			    if (stream == NULL)
+				    stream = camel_stream_mem_new_with_buffer ((len>0&&data)?data:"", len);
+			    if (stream == NULL) { /* wtf? */
+				int x=0;
+				for (x=0; x < 3; x++)
+				   g_datalist_clear (&(infos[x].data)); 
+				goto errorh; 
+			    }
+		    } else 
+		    {
+			    camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
+
+			    if (boundary && !strcmp (infos[t].part_spec, "1.HEADER")) 
+			    {
+				    camel_stream_write (stream, "\n--", 3);
+				    camel_stream_write (stream, boundary, boundary_len);
+				    camel_stream_write (stream, "\n", 1);
+			    }
+			    camel_stream_write (stream, data, len);
+			    if (boundary && !strcmp (infos[t].part_spec, "1"))
+			    {
+				    camel_stream_write (stream, "\n--", 3);
+				    camel_stream_write (stream, boundary, boundary_len);
+				    camel_stream_write (stream, "\n", 1);
+			    }
+		    }
+
+		    g_datalist_clear (&(infos[t].data));
+		}
+
+		if (stream)
+			camel_stream_reset (stream);
+
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+	    } else {
+		int x=0;
+		for (x=0; x < 3; x++) 
+			g_datalist_clear (&(infos[x].data)); 
+		goto errorh;
+	    }
+
+	}
+
+errorh:
+
+	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+
+	if (!stream) camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		    _("Could not find message body in FETCH response."));
+
+	if (free_fuid)
+		g_free (found_uid);
+
+	if (boundary)
+		g_free (boundary);
+
+	return stream;
+}
+
+
+
+static GData *
+parse_partial_fetch_response (CamelImapFolder *imap_folder, char *response, GData *data, const gchar *part_spec)
+{
+	if (*response != '(') 
+	{
+		long seq;
+		
+		if (*response != '*' || *(response + 1) != ' ')
+			return NULL;
+		seq = strtol (response + 2, &response, 10);
+		if (seq == 0)
+			return NULL;
+		if (g_ascii_strncasecmp (response, " FETCH (", 8) != 0)
+			return NULL;
+		response += 7;		
+	}
+
+	do {
+		/* Skip the initial '(' or the ' ' between elements */
+		response++;
+		
+		if (!g_ascii_strncasecmp (response, "FLAGS ", 6))			
+			response += 6;
+		else if (!g_ascii_strncasecmp (response, "RFC822.SIZE ", 12)) 
+		{ /* REMOVE THIS? */
+			unsigned long size;
+			response += 12;
+			size = strtoul (response, &response, 10);
+			g_datalist_set_data (&data, "RFC822.SIZE", GUINT_TO_POINTER (size));
+		} else if (!g_ascii_strncasecmp (response, "BODY[", 5) ||
+			   !g_ascii_strncasecmp (response, "RFC822 ", 7)) 
+		{
+			char *body = NULL, *p = NULL, *boundary = NULL;
+			size_t body_len = 0;
+
+			if (*response == 'B') 
+			{
+				response += 5;
+				p = strchr (response, ']');
+				if (!p || *(p + 1) != ' ')
+					break;
+				response = p + 2;
+			} else 
+				response += 7;
+			
+			body = imap_parse_nstring ((const char **) &response, &body_len);
+
+			if (!response) break;
+			if (!body) body = g_strdup ("");
+
+			if (!strcmp (part_spec, "HEADER"))
+			{
+			   CamelContentType *ct = NULL;
+			   const char *bound=NULL;
+			   char *pstr = (char*)strcasestr (body, "Content-Type:");
+
+			   if (pstr) { 
+				pstr = strchr (pstr, ':'); 
+				if (pstr) { pstr++;
+				ct = camel_content_type_decode(pstr); } 
+			   }
+
+			   if (ct) { 
+				bound = camel_content_type_param(ct, "boundary");
+				if (bound) {
+					boundary = g_strdup (bound);
+					g_datalist_set_data_full (&data, "BOUNDARY", boundary, g_free);
+				}
+			   }
+			}
+
+		  	g_datalist_set_data_full (&data, "PART_BODY", body, g_free);
+			g_datalist_set_data (&data, "PART_LEN", GINT_TO_POINTER (body_len));
+
+
+		} else if (!g_ascii_strncasecmp (response, "UID ", 4)) 
+		{
+			int len = strcspn (response + 4, " )");
+			char *uid = g_strndup (response + 4, len);
+			g_datalist_set_data_full (&data, "UID", uid, g_free);
+			response += 4 + len;
+		} else {
+			g_warning ("Unexpected FETCH response from server: (%s", response);
+			break;
+		}
+	} while (response && *response != ')');
+	
+	if (!response || *response != ')') 
+	{
+		g_warning ("Unexpected FETCH response from server: (%s", response);
+		g_datalist_clear (&data);
 		return NULL;
 	}
 	
-	for (i = 0; i < response->untagged->len; i++) {
-		fetch_data = parse_fetch_response (imap_folder, response->untagged->pdata[i]);
-		found_uid = g_datalist_get_data (&fetch_data, "UID");
-		stream = g_datalist_get_data (&fetch_data, "BODY_PART_STREAM");
-		if (found_uid && stream && !strcmp (uid, found_uid))
-			break;
-		
-		g_datalist_clear (&fetch_data);
-		stream = NULL;
-	}
-	camel_imap_response_free (store, response);
-	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
-	if (!stream) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-				      _("Could not find message body in FETCH response."));
-	} else {
-		camel_object_ref (CAMEL_OBJECT (stream));
-		g_datalist_clear (&fetch_data);
-	}
-	
-	return stream;
+	return data;
 }
 
 static GData *

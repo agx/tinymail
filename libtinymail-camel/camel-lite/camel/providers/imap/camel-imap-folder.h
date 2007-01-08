@@ -80,7 +80,7 @@ CamelStream *camel_imap_folder_fetch_data (CamelImapFolder *imap_folder,
 					   const char *uid,
 					   const char *section_text,
 					   gboolean cache_only,
-					   CamelException *ex);
+					   gboolean full, CamelException *ex);
 
 /* Standard Camel function */
 CamelType camel_imap_folder_get_type (void);

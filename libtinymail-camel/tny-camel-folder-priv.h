@@ -64,7 +64,7 @@ void _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len);
 void _tny_camel_folder_check_uncache (TnyCamelFolder *self, TnyCamelFolderPriv *priv);
 void _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter);
 void _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account);
-
+gboolean _tny_camel_folder_load_folder_no_lock (TnyCamelFolderPriv *priv);
 void _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder);
 
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
