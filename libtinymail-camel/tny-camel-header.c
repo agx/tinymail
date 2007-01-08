@@ -49,7 +49,7 @@ destroy_write (TnyCamelHeader *self)
 	if (((WriteInfo*)self->info)->msg)
 		camel_object_unref (CAMEL_OBJECT (((WriteInfo*)self->info)->msg));
 
-	if (((WriteInfo*)self->info)->mime_from)
+	if (((WriteInfo*)self->info)->mime_from && ((WriteInfo*)self->info)->mime_from != invalid)
 		g_free (((WriteInfo*)self->info)->mime_from);
 
 	g_slice_free (WriteInfo, self->info);
@@ -133,7 +133,7 @@ tny_camel_header_get_replyto (TnyHeader *self)
 		if (addr)
 			retval = camel_address_format (CAMEL_ADDRESS (addr));
 		else
-			retval = NULL;
+			retval = invalid;
 	} else
 		retval = invalid;
 
@@ -450,7 +450,9 @@ tny_camel_header_get_from (TnyHeader *self)
 		{
 			CamelInternetAddress *addr = (CamelInternetAddress*)
 				camel_mime_message_get_from (((WriteInfo*)me->info)->msg);
-			((WriteInfo*)me->info)->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
+				if (addr)
+					((WriteInfo*)me->info)->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
+				else ((WriteInfo*)me->info)->mime_from = (gchar*) invalid;
 		}
 
 		retval = (const gchar*)((WriteInfo*)me->info)->mime_from;
