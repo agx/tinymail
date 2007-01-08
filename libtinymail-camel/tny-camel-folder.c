@@ -2324,7 +2324,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 
 	priv->remove_strat = tny_camel_msg_remove_strategy_new ();
-	priv->receive_strat = tny_camel_partial_msg_receive_strategy_new ();
+	priv->receive_strat = tny_camel_full_msg_receive_strategy_new ();
 
 	return;
 }
