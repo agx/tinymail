@@ -10,6 +10,7 @@ libtinymail_1_0_headers = \
 	tny-folder.h \
 	tny-mime-part.h \
 	tny-header.h \
+	tny-pair.h \
 	tny-msg.h \
 	tny-device.h \
 	tny-account.h \
@@ -32,6 +33,7 @@ libtinymail_1_0_la_SOURCES = \
 	tny-iterator.c \
 	tny-msg.c \
 	tny-header.c \
+	tny-pair.c \
 	tny-mime-part.c \
 	tny-folder.c \
 	tny-device.c \

@@ -25,6 +25,7 @@
 #include <tny-shared.h>
 
 #include <tny-stream.h>
+#include <tny-pair.h>
 
 G_BEGIN_DECLS
 
@@ -61,6 +62,7 @@ struct _TnyMimePartIface
 	void (*get_parts_func) (TnyMimePart *self, TnyList *list);
 	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);
 	gint (*add_part_func) (TnyMimePart *self, TnyMimePart *part);
+	void (*get_header_pairs_func) (TnyMimePart *self, TnyList *list);
 };
 
 GType tny_mime_part_get_type (void);
@@ -84,6 +86,7 @@ void tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream);
 void tny_mime_part_get_parts (TnyMimePart *self, TnyList *list);
 gint tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part);
 void tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part);
+void tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list);
 
 G_END_DECLS
 

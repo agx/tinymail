@@ -4,6 +4,10 @@
 	camel-lite (it uses streams rather than copying things in memory)
 	* Improved the partial message retrieval with this new method too
 	* Partial retrieval status detection
+	* Added the TnyPair type
+	* Added the tny_mime_part_get_header_pairs API
+
+	* This was a major API change
 
 2007-01-08  Philip Van Hoof <pvanhoof@gnome.org>
 

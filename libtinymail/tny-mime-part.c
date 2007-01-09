@@ -22,6 +22,46 @@
 #include <tny-mime-part.h>
 
 
+
+/**
+ * tny_mime_part_get_header_pairs:
+ * @self: a #TnyMimePart object
+ * @list: a #TnyList object
+ * 
+ * Get a read-only list of header pairs in @self.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsg *message = ...
+ * TnyList *pairs = tny_simple_list_new ();
+ * tny_mime_part_get_headerpairs (TNY_MIME_PART (message), pairs);
+ * iter = tny_list_create_iterator (pairs);
+ * while (!tny_iterator_is_done (iter))
+ * {
+ *      TnyPair *pair = TNY_PAIR (tny_iterator_get_current (iter));
+ *      g_print (%s: %s", tny_pair_get_name (pair), 
+ *           tny_pair_get_value (pair));
+ *      g_object_unref (G_OBJECT (pair));
+ *      tny_iterator_next (iter);
+ * }
+ * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (G_OBJECT (pairs));
+ * </programlisting></informalexample>
+ *
+ **/
+void 
+tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
+{
+#ifdef DEBUG
+	if (!TNY_MIME_PART_GET_IFACE (self)->get_header_pairs_func)
+		g_critical ("You must implement tny_mime_part_get_parts\n");
+#endif
+
+	TNY_MIME_PART_GET_IFACE (self)->get_header_pairs_func (self, list);
+	return;
+}
+
+
 /**
  * tny_mime_part_get_parts:
  * @self: a #TnyMimePart object

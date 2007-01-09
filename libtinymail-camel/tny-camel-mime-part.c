@@ -54,6 +54,31 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-mime-filter-windows.h>
 
 
+static void 
+tny_camel_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_header_pairs_func (self, list);
+	return;
+}
+
+static void 
+tny_camel_mime_part_get_header_pairs_default (TnyMimePart *self, TnyList *list)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	guint i = 0;
+	GArray *headers = camel_medium_get_headers (CAMEL_MEDIUM (priv->part));
+	
+	for (i=0; i < headers->len; i++)
+	{
+		CamelMediumHeader *header = &g_array_index (headers, CamelMediumHeader, i);
+		tny_list_append (list, G_OBJECT (tny_pair_new (header->name, header->value)));
+	}
+
+	camel_medium_free_headers (CAMEL_MEDIUM (priv->part), headers);
+
+	return;
+}
+
 static void
 tny_camel_mime_part_get_parts (TnyMimePart *self, TnyList *list)
 {
@@ -851,6 +876,7 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->get_parts_func = tny_camel_mime_part_get_parts;
 	klass->add_part_func = tny_camel_mime_part_add_part;
 	klass->del_part_func = tny_camel_mime_part_del_part;
+	klass->get_header_pairs_func = tny_camel_mime_part_get_header_pairs;
 
 	return;
 }
@@ -883,6 +909,7 @@ tny_camel_mime_part_class_init (TnyCamelMimePartClass *class)
 	class->get_parts_func = tny_camel_mime_part_get_parts_default;
 	class->add_part_func = tny_camel_mime_part_add_part_default;
 	class->del_part_func = tny_camel_mime_part_del_part_default;
+	class->get_header_pairs_func = tny_camel_mime_part_get_header_pairs_default;
 
 	object_class->finalize = tny_camel_mime_part_finalize;
 

@@ -80,6 +80,8 @@ typedef enum _TnyError TnyError;
 typedef enum _TnyErrorDomain TnyErrorDomain;
 typedef struct _TnyMsgReceiveStrategy TnyMsgReceiveStrategy;
 typedef struct _TnyMsgReceiveStrategyIface TnyMsgReceiveStrategyIface;
+typedef struct _TnyPair TnyPair;
+typedef struct _TnyPairClass TnyPairClass;
 
 G_END_DECLS
 
