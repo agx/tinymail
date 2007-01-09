@@ -90,6 +90,12 @@ CamelStream *camel_imap_message_cache_get    (CamelImapMessageCache *cache,
 					      const char *part_spec,
 					      CamelException *ex);
 
+gboolean     camel_imap_message_cache_is_partial (CamelImapMessageCache *cache,
+					      const char *uid);
+
+void         camel_imap_message_cache_set_partial (CamelImapMessageCache *cache,
+					      const char *uid, gboolean partial);
+
 void         camel_imap_message_cache_remove (CamelImapMessageCache *cache,
 					      const char *uid);
 

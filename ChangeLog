@@ -3,6 +3,7 @@
 	* Implemented a very memory efficient message fetching mechanism in
 	camel-lite (it uses streams rather than copying things in memory)
 	* Improved the partial message retrieval with this new method too
+	* Partial retrieval status detection
 
 2007-01-08  Philip Van Hoof <pvanhoof@gnome.org>
 

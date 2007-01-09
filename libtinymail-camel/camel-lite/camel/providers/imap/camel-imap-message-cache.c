@@ -328,6 +328,42 @@ camel_imap_message_cache_insert (CamelImapMessageCache *cache, const char *uid,
 	return insert_finish (cache, uid, path, key, stream);
 }
 
+
+
+gboolean
+camel_imap_message_cache_is_partial (CamelImapMessageCache *cache, const char *uid)
+{
+	gchar *path = g_strdup_printf ("%s/%s.ispartial", cache->path, uid);
+	gboolean retval = FALSE;
+
+	retval = g_file_test (path, G_FILE_TEST_IS_REGULAR);
+
+	g_free (path);
+
+	return retval;
+}
+
+void
+camel_imap_message_cache_set_partial (CamelImapMessageCache *cache, const char *uid, gboolean partial)
+{
+	gchar *path = g_strdup_printf ("%s/%s.ispartial", cache->path, uid);
+	int fd;
+
+	if (!partial)
+	{
+		if (g_file_test (path, G_FILE_TEST_IS_REGULAR))
+			g_unlink (path);
+	} else {
+		if (!g_file_test (path, G_FILE_TEST_IS_REGULAR))
+		{
+		    fd = g_open (path, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600);
+		    if (fd) close (fd);
+		}
+	}
+
+	g_free (path);
+}
+
 /**
  * camel_imap_message_cache_insert_stream:
  * @cache: the cache

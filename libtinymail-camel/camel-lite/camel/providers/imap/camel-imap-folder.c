@@ -2712,8 +2712,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 {
 	CamelFolder *folder = CAMEL_FOLDER (imap_folder);
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
-	CamelStream *stream;
-	
+	CamelStream *stream = NULL;
+	gboolean connected = FALSE;
+
 	/* EXPUNGE responses have to modify the cache, which means
 	 * they have to grab the cache_lock while holding the
 	 * connect_lock.
@@ -2726,14 +2727,22 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	 */
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
-	stream = camel_imap_message_cache_get (imap_folder->cache, uid, section_text, ex);
 
-	/* TNY TODO: if (full) Detect retrieval status (if partial refetch) */
+	connected = camel_imap_store_connected(store, ex);
 
-	if (!stream && (!strcmp (section_text, "HEADER") || !strcmp (section_text, "0"))) 
+	if (connected && (full && camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
+		camel_imap_message_cache_remove (imap_folder->cache, uid);
+	else if (connected && (!full && !camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
+		camel_imap_message_cache_remove (imap_folder->cache, uid);
+	else
 	{
-		camel_exception_clear (ex);
-		stream = camel_imap_message_cache_get (imap_folder->cache, uid, "", ex);
+	    stream = camel_imap_message_cache_get (imap_folder->cache, uid, section_text, ex);
+
+	    if (!stream && (!strcmp (section_text, "HEADER") || !strcmp (section_text, "0"))) 
+	    {
+		    camel_exception_clear (ex);
+		    stream = camel_imap_message_cache_get (imap_folder->cache, uid, "", ex);
+	    }
 	}
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 	
@@ -2771,6 +2780,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	    gchar *tag;
 	    guint taglen;
 	    gboolean isnextdone = FALSE;
+
+	    camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
 
 	    if (store->server_level < IMAP_LEVEL_IMAP4REV1 && !*section_text)
 		    camel_imap_command_start (store, folder, ex,
@@ -2839,6 +2850,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	    int t = 0, boundary_len = 0;
 	    const gchar *infos[2] = { "HEADER", /*"1.HEADER",*/ "1" };
 
+
+	    camel_imap_message_cache_set_partial (imap_folder->cache, uid, TRUE);
 
 	    for (t=0; t < 2; t++)
 	    {
