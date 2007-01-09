@@ -1,3 +1,8 @@
+2007-01-09   Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+
+	* Added some extra TnyFolderType's for use in tinymail clients
+
+
 2007-01-09   Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implemented a very memory efficient message fetching mechanism in

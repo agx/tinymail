@@ -62,7 +62,14 @@ enum _TnyFolderType
 	TNY_FOLDER_TYPE_TRASH,
 	TNY_FOLDER_TYPE_JUNK,
 	TNY_FOLDER_TYPE_SENT,
-	TNY_FOLDER_TYPE_ROOT
+	TNY_FOLDER_TYPE_ROOT,
+
+	/* below:not really TnyFolderTypes,
+	 * but useful for clients */
+	TNY_FOLDER_TYPE_NOTES,
+	TNY_FOLDER_TYPE_DRAFTS,
+	TNY_FOLDER_TYPE_CONTACTS,
+	TNY_FOLDER_TYPE_CALENDAR
 };
 
 struct _TnyFolderIface
