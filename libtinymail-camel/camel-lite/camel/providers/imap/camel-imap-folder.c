@@ -2779,7 +2779,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	    CamelStreamBuffer *server_stream = CAMEL_STREAM_BUFFER (store->istream);
 	    gchar *tag;
 	    guint taglen;
-	    gboolean isnextdone = FALSE;
+	    gboolean isnextdone = FALSE, hadr = FALSE;
 
 	    camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
 
@@ -2800,6 +2800,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		    /* It might be the line before the last line */
 		    if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
 		    {
+			    if (line[1] == '\r')
+				hadr = TRUE;
 			    isnextdone = TRUE;
 			    continue;
 		    }
@@ -2811,7 +2813,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			    break;
 		    } else if (linenum == 0) { linenum++; continue; }
 
-		    /* It's the last line */
+		    /* It's the last line (isnextdone will be ignored if that is the case) */
 		    if (!strncmp (line, tag, taglen))
 			    break;
 
@@ -2819,7 +2821,12 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 		    if (isnextdone)
 		    {
-			    camel_stream_write (stream, ")\n", 2);
+			    if (hadr)
+				    camel_stream_write (stream, ")\n", 2);
+			    else
+				    camel_stream_write (stream, ")\r\n", 3);
+
+			    hadr = FALSE;
 			    isnextdone = FALSE;
 		    }
 
