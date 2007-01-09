@@ -675,7 +675,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 
 	/* Tinymail hack: always use IMAP4, not IMAP4rev1 (sorry) */
 
-	force_imap4 = TRUE;
+	/* force_imap4 = TRUE; */
 	store->braindamaged = TRUE;
 
 	/* end of hack :) */
