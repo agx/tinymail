@@ -1,3 +1,9 @@
+2007-01-09   Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Implemented a very memory efficient memory fetching mechanism in
+	camel-lite (it uses streams rather than copying things in memory)
+	* Improved the partial message retrieval with this new method too
+
 2007-01-08  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implemented first pieces of the partial message retrieval
