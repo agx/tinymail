@@ -22,7 +22,9 @@
 <!ENTITY libtinymail-TnyMsgRemoveStrategy SYSTEM "xml/tny-msg-remove-strategy.xml">
 <!ENTITY libtinymail-TnyMsgReceiveStrategy SYSTEM "xml/tny-msg-receive-strategy.xml">
 <!ENTITY libtinymail-TnySendQueue SYSTEM "xml/tny-send-queue.xml">
+<!ENTITY libtinymail-TnyPair SYSTEM "xml/tny-pair.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
+
 
 <!ENTITY libtinymail-camel-TnyCamelSendQueue SYSTEM "xml/tny-camel-send-queue.xml">
 <!ENTITY libtinymail-camel-TnyCamelMsgRemoveStrategy SYSTEM "xml/tny-camel-msg-remove-strategy.xml">
@@ -130,6 +132,7 @@
 		&libtinymail-TnyList;
 		&libtinymail-TnyIterator;
 		&libtinymail-TnySimpleList;
+		&libtinymail-TnyPair;
 		&libtinymail-TnyEnums;
 		&libtinymail-TnyShared;
 	</chapter>

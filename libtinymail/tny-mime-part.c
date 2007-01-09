@@ -28,13 +28,13 @@
  * @self: a #TnyMimePart object
  * @list: a #TnyList object
  * 
- * Get a read-only list of header pairs in @self.
+ * Get a read-only list of header pairs (#TnyPair) in @self.
  *
  * Example:
  * <informalexample><programlisting>
  * TnyMsg *message = ...
  * TnyList *pairs = tny_simple_list_new ();
- * tny_mime_part_get_headerpairs (TNY_MIME_PART (message), pairs);
+ * tny_mime_part_get_header_pairs (TNY_MIME_PART (message), pairs);
  * iter = tny_list_create_iterator (pairs);
  * while (!tny_iterator_is_done (iter))
  * {

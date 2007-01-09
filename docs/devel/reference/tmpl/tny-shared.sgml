@@ -196,6 +196,7 @@ Shared include file with forward typedefs
 @get_parts_func: 
 @del_part_func: 
 @add_part_func: 
+@get_header_pairs_func: 
 
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
@@ -476,20 +477,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -516,4 +517,17 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 @parent: 
 @perform_get_msg_func: 
+
+<!-- ##### STRUCT TnyPair ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyPairClass ##### -->
+<para>
+
+</para>
+
+@parent: 
 

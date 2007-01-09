@@ -48,6 +48,7 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 @get_parts_func: 
 @del_part_func: 
 @add_part_func: 
+@get_header_pairs_func: 
 
 <!-- ##### FUNCTION tny_mime_part_get_content_type ##### -->
 <para>
@@ -222,5 +223,14 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 
 @self: 
 @part: 
+
+
+<!-- ##### FUNCTION tny_mime_part_get_header_pairs ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
 
 

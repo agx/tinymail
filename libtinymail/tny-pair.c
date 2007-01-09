@@ -53,7 +53,7 @@ tny_pair_set_name (TnyPair *self, const gchar *name)
 }
 
 /**
- * tny_pair_get_value:
+ * tny_pair_get_name:
  * @self: a #TnyPair instance
  *
  * Return value: the name of the pair, the result must not be freed
