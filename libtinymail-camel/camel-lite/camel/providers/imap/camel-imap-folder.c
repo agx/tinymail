@@ -2899,7 +2899,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			/* It's the last line */
 			if (!strncmp (line, tag, taglen))
 			{
-				if ((t == 0 || t == 2) && boundary_len > 0)
+				if ((t == 0 || t == 1 /* 2 */) && boundary_len > 0)
 				{
 					camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
 					camel_stream_write (stream, "\n--", 3);
