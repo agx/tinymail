@@ -25,6 +25,7 @@ headers
 #include <tny-send-queue.h>
 #include <tny-msg-remove-strategy.h>
 #include <tny-msg-receive-strategy.h>
+#include <tny-pair.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
