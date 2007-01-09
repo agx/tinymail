@@ -68,7 +68,7 @@ tny_camel_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStrategy *self
  * tny_camel_msg_remove_strategy_new:
  *
  *
- * Return value: a new #TnyMimePartSaveStrategy instance implemented for Gtk+
+ * Return value: a new #TnyMsgRemoveStrategy instance implemented for a #TnyCamelFolder
  **/
 TnyMsgRemoveStrategy*
 tny_camel_msg_remove_strategy_new (void)
