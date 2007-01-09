@@ -120,7 +120,7 @@ tny_camel_partial_msg_receive_strategy_instance_init (GTypeInstance *instance, g
 }
 
 /**
- * tny_camel_full_msg_receive_strategy_new:
+ * tny_camel_partial_msg_receive_strategy_new:
  * 
  * A message receiver that fetches partial messages (only the body)
  *
