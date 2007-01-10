@@ -17,10 +17,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* TODO: Refactor to a TnyIMAPStoreAccount, TnyPOPStoreAccount and 
-TnyNNTPStoreAccount. Maybe also add a TnyExchangeStoreAccount? This file can 
-stay as an abstract TnyStoreAccount type. */
-
 #include <config.h>
 #include <glib/gi18n-lib.h>
 #include <glib.h>

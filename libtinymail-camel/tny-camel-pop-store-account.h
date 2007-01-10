@@ -51,6 +51,9 @@ struct _TnyCamelPOPStoreAccountClass
 GType tny_camel_pop_store_account_get_type (void);
 TnyStoreAccount* tny_camel_pop_store_account_new (void);
 
+gboolean tny_camel_pop_store_account_get_delete_originals (TnyCamelPOPStoreAccount *self);
+void tny_camel_pop_store_account_set_delete_originals (TnyCamelPOPStoreAccount *self, gboolean delete_originals);
+
 G_END_DECLS
 
 #endif

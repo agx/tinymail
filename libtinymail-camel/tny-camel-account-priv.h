@@ -39,6 +39,7 @@ struct _TnyCamelAccountPriv
 	GMutex *cancel_lock;
 	gboolean connected, inuse_spin;
 	gchar *name; GList *options;
+	gchar *cache_location;
 	TnyAccountType account_type;
 };
 

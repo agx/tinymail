@@ -51,20 +51,154 @@ static GObjectClass *parent_class = NULL;
 
 
 static void 
+tny_camel_pop_folder_refresh_impl (TnyFolder *self, GError **err, CamelOperationStatusFunc status_func)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelPopStoreAccountPriv *poppriv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelURL *url = NULL;
+	GList *options = apriv->options;
+	TnyCamelFolderPriv *priv_dst;
+	TnyIterator *iter;
+	GPtrArray *uids, *transferred_uids = NULL;
+	guint list_length;
+	CamelFolder *pop_folder, *cfol_dst;
+	CamelStore *pop_store;
+	const gchar *myerr = NULL;
+	TnyFolder *to_folder = NULL;
+
+	to_folder = self;
+
+	url = camel_url_new ("pop://", &ex);
+
+	if (camel_exception_is_set (&ex)) 
+		goto errorhandler;
+
+	camel_url_set_protocol (url, "pop"); 
+	camel_url_set_user (url, apriv->user);
+	camel_url_set_host (url, apriv->host);
+
+	while (options)
+	{
+		gchar *ptr, *dup = g_strdup (options->data);
+		gchar *option, *value;
+		ptr = strchr (dup, '=');
+		if (ptr) {
+			ptr++;
+			value = g_strdup (ptr); ptr--;
+			*ptr = '\0'; option = dup;
+		} else {
+			option = dup;
+			value = g_strdup ("1");
+		}
+		camel_url_set_param (url, option, value);
+		g_free (value);
+		g_free (dup);
+		options = g_list_next (options);
+	}
+
+	if (G_LIKELY (apriv->url_string))
+		g_free (apriv->url_string);
+
+	apriv->url_string = camel_url_to_string (url, 0);
+	camel_url_free (url); url = NULL;
+
+	g_static_rec_mutex_lock (apriv->service_lock);
+	apriv->service = camel_session_get_service
+		((CamelSession*) apriv->session, apriv->url_string, 
+		apriv->type, &ex);
+	g_static_rec_mutex_unlock (apriv->service_lock);
+
+	/* TODO: Clean these up when done */
+	tny_session_camel_set_pass_func (apriv->session, priv->account, apriv->get_pass_func);
+	tny_session_camel_set_forget_pass_func (apriv->session, priv->account, apriv->forget_pass_func);
+
+	if (apriv->service == NULL || camel_exception_is_set (&ex))
+		goto errorhandler;
+
+	if (!camel_service_connect (apriv->service, &ex))
+		goto errorhandler;
+
+	if (camel_exception_is_set (&ex))
+		goto errorhandler;
+
+	pop_store = CAMEL_STORE (apriv->service);
+
+	pop_folder = camel_store_get_folder (pop_store, "INBOX", 0, &ex);
+	if (pop_folder == NULL || camel_exception_is_set (&ex))
+		goto errorhandler;
+
+	camel_folder_refresh_info (pop_folder, &ex);
+	if (camel_exception_is_set (&ex))
+		goto errorhandler;
+
+	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (to_folder);
+
+	cfol_dst = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (to_folder));
+
+	uids = camel_folder_get_uids (pop_folder);
+
+	camel_folder_transfer_messages_to (pop_folder, uids, cfol_dst, 
+			&transferred_uids, poppriv->delete_originals, &ex);
+
+	if (camel_exception_is_set (&ex)) {
+		g_mutex_unlock (priv_dst->folder_lock);
+		goto errorhandler;
+	}
+
+	if (poppriv->delete_originals)
+		camel_folder_sync (pop_folder, TRUE, &ex);
+
+	if (camel_exception_is_set (&ex)) {
+		g_mutex_unlock (priv_dst->folder_lock);
+		goto errorhandler;
+	}
+
+	/* Why don't these delete the arrays with TRUE? */
+
+	if (transferred_uids) 
+		g_ptr_array_free (transferred_uids, FALSE);
+	g_ptr_array_free (uids, FALSE);
+
+	return;
+
+errorhandler:
+
+	if (camel_exception_is_set (&ex))
+	{
+		if (!myerr) myerr = camel_exception_get_description (&ex);
+		camel_exception_clear (&ex);
+	} else
+		if (!myerr) myerr = "Unknown error";
+
+	g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH, myerr);
+
+	if (apriv->service) /* Must this one be unreffed? */
+		apriv->service = NULL;
+
+	if (pop_folder)
+		camel_object_unref (CAMEL_OBJECT (pop_folder));
+
+	if (url)
+		camel_url_free (url);
+
+	return;
+}
+
+static void 
 tny_camel_pop_folder_refresh (TnyFolder *self, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelPopStoreAccountPriv *poppriv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 
-	/* 
-	 * TODO: Reimplement this one for POP (you have poppriv->inbox)
-	 *
-	 * camel_folder_refresh_info (priv->folder, &ex); 
-	 *
-	 * You don't need to do any status reporting in this one
-	 */
+	g_mutex_lock (priv->folder_lock);
 
-	g_warning ("tny_camel_pop_folder_refresh unimplemented");
+	tny_camel_pop_folder_refresh_impl (self, err, NULL);
+
+	g_mutex_unlock (priv->folder_lock);
+
 }
 
 typedef struct 
@@ -77,7 +211,6 @@ typedef struct
 	guint depth;
 	GError *err;
 } RefreshPopFolderInfo;
-
 
 
 static void
@@ -197,11 +330,7 @@ tny_camel_pop_folder_refresh_async_thread (gpointer thr_user_data)
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-
-	TnyCamelPopStoreAccountPriv *poppriv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (priv->account);
-
-	gchar *str;
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	gchar *str; CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	GError *err = NULL;
 
 	g_mutex_lock (priv->folder_lock);
@@ -220,18 +349,8 @@ tny_camel_pop_folder_refresh_async_thread (gpointer thr_user_data)
 		tny_camel_pop_folder_refresh_async_status, info, str);
 	g_free (str);
 
-
-	/* 
-	 * TODO: Reimplement this one for POP (you have poppriv->inbox)
-	 *
-	 * camel_folder_refresh_info (priv->folder, &ex); 
-	 *
-	 * Oh and, please tell something to tny_camel_folder_refresh_async_status
-	 * from time to times.
-	 */
-
-	g_warning ("tny_camel_pop_folder_refresh_async unimplemented");
-
+	tny_camel_pop_folder_refresh_impl (self, &err, 
+		tny_camel_pop_folder_refresh_async_status);
 
 	info->err = NULL;
 
@@ -276,21 +395,40 @@ tny_camel_pop_folder_refresh_async_thread (gpointer thr_user_data)
 static void
 tny_camel_pop_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
-	RefreshPopFolderInfo *info = g_slice_new (RefreshPopFolderInfo);
-	GThread *thread;
+	if (TRUE)
+	{
+		/* Temporary solution until multithreaded authentication works */
 
-	info->err = NULL;
-	info->self = self;
-	info->callback = callback;
-	info->status_callback = status_callback;
-	info->user_data = user_data;
-	info->depth = g_main_depth ();
+		GError *err = NULL;
 
-	/* thread reference */
-	g_object_ref (G_OBJECT (self));
+		tny_camel_pop_folder_refresh_impl (self, &err, NULL);
 
-	thread = g_thread_create (tny_camel_pop_folder_refresh_async_thread,
-			info, FALSE, NULL);
+		if (callback)
+			callback (self, FALSE, &err, user_data);
+
+		if (err != NULL)
+			g_error_free (err);
+
+	} else 
+	{
+
+		RefreshPopFolderInfo *info = g_slice_new (RefreshPopFolderInfo);
+		GThread *thread;
+
+		info->err = NULL;
+		info->self = self;
+		info->callback = callback;
+		info->status_callback = status_callback;
+		info->user_data = user_data;
+		info->depth = g_main_depth ();
+
+		/* thread reference */
+		g_object_ref (G_OBJECT (self));
+
+		thread = g_thread_create (tny_camel_pop_folder_refresh_async_thread,
+				info, FALSE, NULL);
+
+	}
 
 	return;
 }

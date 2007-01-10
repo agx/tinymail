@@ -1494,6 +1494,7 @@ tny_camel_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *fo
 	return;
 }
 
+
 static void
 tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
@@ -1539,6 +1540,8 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 		tny_iterator_next (iter);
 	}
 
+	g_object_unref (G_OBJECT (iter));
+
 	ex = camel_exception_new ();
 	camel_exception_init (ex);
 
@@ -1562,7 +1565,8 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 
 	camel_exception_free (ex);
 
-	if (transferred_uids) 
+	/* Why don't these delete the arrays with TRUE? */
+	if (transferred_uids)
 		g_ptr_array_free (transferred_uids, FALSE);
 
 	g_ptr_array_free (uids, FALSE);
@@ -1573,26 +1577,24 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 	return;
 }
 
-
 void
 _tny_camel_folder_set_id (TnyCamelFolder *self, const gchar *id)
 {
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+       TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	g_mutex_lock (priv->folder_lock);
+       g_mutex_lock (priv->folder_lock);
 
-	/* unload_folder_no_lock (priv, TRUE); */
+       /* unload_folder_no_lock (priv, TRUE); */
 
-	if (G_UNLIKELY (priv->folder_name))
-		g_free (priv->folder_name);
+       if (G_UNLIKELY (priv->folder_name))
+               g_free (priv->folder_name);
 
-	priv->folder_name = g_strdup (id);
+       priv->folder_name = g_strdup (id);
 
-	g_mutex_unlock (priv->folder_lock);
+       g_mutex_unlock (priv->folder_lock);
 
-	return;
+       return;
 }
-
 
 void
 _tny_camel_folder_set_name (TnyCamelFolder *self, const gchar *name)

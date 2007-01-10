@@ -41,6 +41,7 @@ struct _TnySessionCamel
 	gboolean interactive, prev_constat, first_switch;
 	guint connchanged_signal;
 	GList *current_accounts;
+	gchar *camel_dir;
 };
 
 struct _TnySessionCamelClass

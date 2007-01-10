@@ -102,8 +102,6 @@ create_maildir (TnyCamelAccount *self, TnyCamelAccountPriv *apriv, const gchar *
 
 				fpriv->store = mdstore;
 
-				g_free (full_path);
-
 				return TNY_FOLDER (folder);
 
 			} else if (iter && CAMEL_IS_STORE (mdstore))
@@ -127,67 +125,22 @@ create_maildir (TnyCamelAccount *self, TnyCamelAccountPriv *apriv, const gchar *
 
 
 static void
-report_error (TnyCamelAccountPriv *priv)
-{
-	if (G_UNLIKELY (priv->service == NULL))
-	{
-		g_error (_("Couldn't get service %s: %s\n"), priv->url_string,
-			   camel_exception_get_description (priv->ex));
-		camel_exception_clear (priv->ex);
-		return;
-	}
-}
-
-static void
 tny_camel_pop_store_account_reconnect (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
-	CamelSession *session = (CamelSession*) apriv->session;
 
 	g_mutex_lock (priv->lock);
 
-	if (G_LIKELY (apriv->session) && G_UNLIKELY (apriv->user) 
-		&& G_UNLIKELY (apriv->host))
+	if (G_UNLIKELY (apriv->user) && G_UNLIKELY (apriv->host))
 	{
-		if (!apriv->url_string)
+		if (!priv->inbox)
 		{
-			gchar *name = NULL;
-
-			if (G_LIKELY (apriv->url_string))
-				g_free (apriv->url_string);
-
-			name = g_strdup_printf ("%s@%s", apriv->user, apriv->host);
-			apriv->url_string = g_strdup_printf ("maildir://%s/mail/pop/%s/maildir",
-				session->storage_path, name);
-			if (priv->inbox != NULL)
-				g_object_unref (G_OBJECT (priv->inbox));
-			priv->inbox = create_maildir (self, apriv, name, apriv->url_string);
-			g_free (name);
-
-			/* camel_session_get_service can launch GUI things */
-
-			g_static_rec_mutex_lock (apriv->service_lock);
-			apriv->service = camel_session_get_service (session, 
-				apriv->url_string, apriv->type, apriv->ex);
-			if (apriv->service == NULL)
-				report_error (apriv);
-			g_static_rec_mutex_unlock (apriv->service_lock);
-
-			/* TODO: Handle priv->ex using GError */
-
-		} else if (G_LIKELY (apriv->session) && (apriv->url_string))
-		{
-			/* camel_session_get_service can launch GUI things */
-
-			g_static_rec_mutex_lock (apriv->service_lock);
-			apriv->service = camel_session_get_service (session, 
-				apriv->url_string, apriv->type, apriv->ex);
-			if (apriv->service == NULL)
-				report_error (apriv);
-			g_static_rec_mutex_unlock (apriv->service_lock);
-			
-			/* TODO: Handle priv->ex using GError */
+			gchar *maildirpath = NULL;
+			maildirpath = g_strdup_printf ("maildir://%s/pop/%s@%s/maildir",
+				apriv->cache_location, apriv->user, apriv->host);
+			priv->inbox = create_maildir (self, apriv, "inbox", maildirpath);
+			g_free (maildirpath);
 		}
 	}
 
@@ -313,9 +266,15 @@ tny_camel_pop_store_account_new (void)
 static void
 tny_camel_pop_store_account_finalize (GObject *object)
 {
-    
-    	/* The abstract CamelStoreAccount finalizes everything correctly */
-    
+    TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (object);
+
+	g_mutex_lock (priv->lock);
+	if (priv->inbox)
+		g_object_unref (G_OBJECT (priv->inbox));
+	g_mutex_unlock (priv->lock);
+
+	g_mutex_free (priv->lock);
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -347,12 +306,48 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 	return;
 }
 
+/**
+ * tny_camel_pop_store_account_get_delete_originals:
+ * @self: a TnyCamelPOPStoreAccount
+ *
+ * Get the delete originals property of @self.
+ *
+ * Return value: Whether or not to delete original messages from the service
+ **/
+gboolean 
+tny_camel_pop_store_account_get_delete_originals (TnyCamelPOPStoreAccount *self)
+{
+	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	return priv->delete_originals;
+}
+
+/**
+ * tny_camel_pop_store_account_set_delete_originals:
+ * @self: a TnyCamelPOPStoreAccount
+ * @delete_originals: Whether or not to delete original messages from the service
+ *
+ * Set the delete originals property of @self.
+ *
+ **/
+void 
+tny_camel_pop_store_account_set_delete_originals (TnyCamelPOPStoreAccount *self, gboolean delete_originals)
+{
+	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->delete_originals = delete_originals;
+}
 
 static void
 tny_camel_pop_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	/* The abstract CamelStoreAccount initializes everything correctly */
-    
+	
+	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (instance);
+
+	priv->lock = g_mutex_new ();
+	priv->inbox = NULL;
+	priv->delete_originals = FALSE;
+
 	return;
 }
 

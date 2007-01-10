@@ -211,6 +211,12 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 			continue;
 		}
 
+		if (g_key_file_get_boolean (keyfile, "tinymail", "disabled", NULL))
+		{
+			g_free (fullfilen);
+			continue;
+		}
+
 		type = g_key_file_get_value (keyfile, "tinymail", "type", NULL);
 		proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
 	    
@@ -224,7 +230,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 				account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
 			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
 				account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
-			else if (!g_ascii_strncasecmp (proto, "pop", 4))
+			else if (!g_ascii_strncasecmp (proto, "pop", 3))
 				account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
 			else	/* Unknown, create a generic one? */
 			        account = TNY_ACCOUNT (tny_camel_store_account_new ());

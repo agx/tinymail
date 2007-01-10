@@ -249,6 +249,14 @@ tny_gpe_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGet
 		}
 		g_free (key);
 
+		key = g_strdup_printf ("/apps/tinymail/accounts/%d/disabled", i);
+		if (gconf_client_get_bool (priv->client, (const gchar*) key, NULL))
+		{
+			g_free (key);
+			continue;
+		}
+		g_free (key);
+
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", i);
 		type = gconf_client_get_string (priv->client, 
 			(const gchar*) key, NULL);
@@ -270,7 +278,7 @@ tny_gpe_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGet
 				account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
 			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
 				account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
-			else if (!g_ascii_strncasecmp (proto, "pop", 4))
+			else if (!g_ascii_strncasecmp (proto, "pop", 3))
 				account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
 			else	/* Unknown, create a generic one? */
 			        account = TNY_ACCOUNT (tny_camel_store_account_new ());

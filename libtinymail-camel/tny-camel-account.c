@@ -573,6 +573,11 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->cache_location = NULL;
+	priv->service = NULL;
+	priv->session = NULL;
+	priv->url_string = NULL;
+
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
 
@@ -688,6 +693,9 @@ tny_camel_account_finalize (GObject *object)
 	}
 
 	g_static_rec_mutex_lock (priv->service_lock);
+
+	if (G_LIKELY (priv->cache_location))
+		g_free (priv->cache_location);
 
 	if (G_LIKELY (priv->id))
 		g_free (priv->id);

@@ -451,17 +451,30 @@ tny_session_camel_init (TnySessionCamel *instance)
 	/* Avoid the first question in connection_changed */
 	instance->prev_constat = FALSE;
 	instance->device = NULL;
+	instance->camel_dir = NULL;
 }
 
 void 
 _tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
 {
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+
+	if (apriv->cache_location)
+		g_free (apriv->cache_location);
+	apriv->cache_location = g_strdup (self->camel_dir);
+
 	self->current_accounts = g_list_prepend (self->current_accounts, account);
 }
 
 void 
 _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account)
 {
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+
+	if (apriv->cache_location)
+		g_free (apriv->cache_location);
+	apriv->cache_location = NULL;
+
 	self->current_accounts = g_list_remove (self->current_accounts, account);
 }
 
@@ -538,7 +551,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	gchar *camel_dir = NULL;
 
 	self->account_store = (gpointer)account_store;    
-    	base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
+    base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
     
 	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
 	{
@@ -557,12 +570,12 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	camel_session_set_online ((CamelSession *) session, 
 		self->first_switch); 
 
-	g_free (camel_dir);
+	self->camel_dir = camel_dir;
 	g_free (base_directory);
 
 	tny_session_camel_set_device (self, device);
     
-    	g_object_unref (G_OBJECT (device));
+    g_object_unref (G_OBJECT (device));
 
 	return;
 }
@@ -582,6 +595,7 @@ tny_session_camel_new (TnyAccountStore *account_store)
 	TnySessionCamel *retval = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
 
+	retval->camel_dir = NULL;
 	tny_session_camel_set_account_store (retval, account_store);
 
 	return retval;
@@ -598,6 +612,9 @@ tny_session_camel_finalise (CamelObject *object)
 		g_signal_handler_disconnect (G_OBJECT (self->device), 
 			self->connchanged_signal);
 	}
+
+	if (self->camel_dir)
+		g_free (self->camel_dir);
 
 	/* CamelObject types don't need parent finalization (build-in camel)
 	(*((CamelObjectClass*)ms_parent_class)->finalise) (object); */
