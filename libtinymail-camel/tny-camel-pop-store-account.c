@@ -58,6 +58,7 @@ stay as an abstract TnyStoreAccount type. */
 
 static GObjectClass *parent_class = NULL;
 
+#if 0
 static TnyFolder*
 create_maildir (TnyCamelAccount *self, TnyCamelAccountPriv *apriv, const gchar *name, const gchar *url_string)
 {
@@ -123,7 +124,6 @@ create_maildir (TnyCamelAccount *self, TnyCamelAccountPriv *apriv, const gchar *
 	return NULL;
 }
 
-
 static void
 tny_camel_pop_store_account_reconnect (TnyCamelAccount *self)
 {
@@ -149,6 +149,8 @@ tny_camel_pop_store_account_reconnect (TnyCamelAccount *self)
 	return;
 }
 
+#endif
+
 static const gchar* 
 tny_camel_pop_store_account_get_url_string (TnyAccount *self)
 {
@@ -171,11 +173,49 @@ tny_camel_pop_store_account_add_option (TnyCamelAccount *self, const gchar *opti
 static void 
 tny_camel_pop_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
-	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
 
-	g_assert (list != NULL);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
+	CamelStore *store;
+	TnyCamelFolder *folder;
+
 	g_assert (TNY_IS_LIST (list));
 
+	store = camel_session_get_store ((CamelSession*) apriv->session, 
+			apriv->url_string, &ex);
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
+			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+
+		if (store && CAMEL_IS_OBJECT (store))
+			camel_object_unref (CAMEL_OBJECT (store));
+
+		return;
+	}
+
+	g_assert (CAMEL_IS_STORE (store));
+
+	folder = TNY_CAMEL_FOLDER (tny_camel_pop_folder_new ());
+
+	_tny_camel_folder_set_id (folder, "INBOX");
+	/* _tny_camel_folder_set_unread_count (folder, iter->unread);
+	_tny_camel_folder_set_all_count (folder, iter->total); */
+	_tny_camel_folder_set_name (folder, "Inbox");
+	priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+	_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
+	tny_list_prepend (list, G_OBJECT (folder));
+
+	g_object_unref (G_OBJECT (folder));
+
+	return;
+
+
+#if 0
 	if (!priv->inbox)
 		tny_camel_pop_store_account_reconnect (TNY_CAMEL_ACCOUNT (self));
 
@@ -205,8 +245,13 @@ errorh:
 				"Can't get the INBOX folder");
 
 	return;
+
+
+#endif
+
 }
 
+#if 0
 static void
 tny_camel_pop_store_account_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
 {
@@ -234,6 +279,7 @@ tny_camel_pop_store_account_get_folders_async (TnyFolderStore *self, TnyList *li
 		g_error_free (err);
 }
 
+#endif
 
 
 static void 
@@ -289,12 +335,17 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
+#if 0
 	TNY_CAMEL_ACCOUNT_CLASS (class)->reconnect_func = tny_camel_pop_store_account_reconnect;
+#endif
+
 	TNY_CAMEL_ACCOUNT_CLASS (class)->get_url_string_func = tny_camel_pop_store_account_get_url_string;
 	TNY_CAMEL_ACCOUNT_CLASS (class)->set_url_string_func = tny_camel_pop_store_account_set_url_string;
 	TNY_CAMEL_ACCOUNT_CLASS (class)->add_option_func = tny_camel_pop_store_account_add_option;
-
+#if 0
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->get_folders_async_func = tny_camel_pop_store_account_get_folders_async;
+#endif
+
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->get_folders_func = tny_camel_pop_store_account_get_folders;
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->remove_folder_func = tny_camel_pop_store_account_remove_folder;
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->create_folder_func = tny_camel_pop_store_account_create_folder;

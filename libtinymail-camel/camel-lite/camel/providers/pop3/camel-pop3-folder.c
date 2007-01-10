@@ -123,19 +123,44 @@ CamelFolder *
 camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 {
 	CamelFolder *folder;
+	CamelPOP3Store *p3store = (CamelPOP3Store*) parent;
+	gchar *summary_file;
 
 	d(printf("opening pop3 INBOX folder\n"));
 	
 	folder = CAMEL_FOLDER (camel_object_new (CAMEL_POP3_FOLDER_TYPE));
 	camel_folder_construct (folder, parent, "inbox", "inbox");
 	
+	summary_file = g_strdup_printf ("%s/summary.mmap", p3store->root);
+	folder->summary = camel_folder_summary_new (folder);
+	camel_folder_summary_set_build_content (folder->summary, TRUE);
+	camel_folder_summary_set_filename (folder->summary, summary_file);
+
+	if (camel_folder_summary_load (folder->summary) == -1) {
+		camel_folder_summary_clear (folder->summary);
+		camel_folder_summary_touch (folder->summary);
+		camel_folder_summary_save (folder->summary);
+		camel_folder_summary_load (folder->summary);
+	}
+	g_free (summary_file);
+
+
 	/* mt-ok, since we dont have the folder-lock for new() */
 	camel_folder_refresh_info (folder, ex);/* mt-ok */
 	if (camel_exception_is_set (ex)) {
 		camel_object_unref (CAMEL_OBJECT (folder));
 		folder = NULL;
 	}
+
+	if (!folder->summary) {
+		camel_object_unref (CAMEL_OBJECT (folder));
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				      _("Could not load summary for INBOX"));
+		return NULL;
+	}
 	
+	folder->folder_flags |= CAMEL_FOLDER_HAS_SUMMARY_CAPABILITY;
+
 	return folder;
 }
 
@@ -271,11 +296,20 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	
 	camel_pop3_engine_command_free(pop3_store->engine, pcl);
 	
+	for (i=0;i<pop3_folder->uids->len;i++) 
+	{
+		CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
+
+		/* TNY TODO: only get the HEAD if the service is capable of that */
+		pop3_get_message (folder, fi->uid, FALSE, NULL);
+	}
+
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) {
 		camel_pop3_engine_command_free(pop3_store->engine, pcu);
 	} else {
 		for (i=0;i<pop3_folder->uids->len;i++) {
 			CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
+
 			if (fi->cmd) {
 				camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
 				fi->cmd = NULL;
@@ -465,6 +499,8 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 	char buffer[1];
 	int i, last;
 	CamelStream *stream = NULL;
+	CamelFolderSummary *summary = folder->summary;
+	CamelMessageInfoBase *mi;
 
 	/* TNY TODO: Implement partial message retrieval if full==TRUE */
 
@@ -584,6 +620,14 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		camel_object_unref((CamelObject *)message);
 		message = NULL;
 	}
+
+	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
+
+	mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+	mi->uid = g_strdup (fi->uid);
+
+	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
+
 done:
 	camel_object_unref((CamelObject *)stream);
 fail:

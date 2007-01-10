@@ -49,7 +49,7 @@
 
 static GObjectClass *parent_class = NULL;
 
-
+#if 0
 static void 
 tny_camel_pop_folder_refresh_impl (TnyFolder *self, GError **err, CamelOperationStatusFunc status_func)
 {
@@ -186,6 +186,7 @@ errorhandler:
 
 	return;
 }
+
 
 static void 
 tny_camel_pop_folder_refresh (TnyFolder *self, GError **err)
@@ -432,6 +433,7 @@ tny_camel_pop_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback ca
 
 	return;
 }
+#endif
 
 /**
  * tny_camel_pop_folder_new:
@@ -464,8 +466,10 @@ tny_camel_pop_folder_class_init (TnyCamelPOPFolderClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
+	/*
 	TNY_CAMEL_FOLDER_CLASS (class)->refresh_async_func = tny_camel_pop_folder_refresh_async;
-	TNY_CAMEL_FOLDER_CLASS (class)->refresh_func = tny_camel_pop_folder_refresh;
+	TNY_CAMEL_FOLDER_CLASS (class)->refresh_func = tny_camel_pop_folder_refresh; 
+	*/
 
 	object_class->finalize = tny_camel_pop_folder_finalize;
 

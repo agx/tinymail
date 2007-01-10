@@ -51,6 +51,8 @@ typedef struct {
 	struct _CamelDataCache *cache;
 	
 	guint delete_after;
+	gchar *root;
+
 } CamelPOP3Store;
 
 

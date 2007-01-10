@@ -132,6 +132,8 @@ finalize (CamelObject *object)
 		camel_object_unref((CamelObject *)pop3_store->engine);
 	if (pop3_store->cache)
 		camel_object_unref((CamelObject *)pop3_store->cache);
+	if (pop3_store->root)
+		g_free (pop3_store->root);
 }
 
 enum {
@@ -567,9 +569,10 @@ pop3_connect (CamelService *service, CamelException *ex)
 		char *root;
 
 		root = camel_session_get_storage_path (session, service, ex);
+		store->root = root;
 		if (root) {
 			store->cache = camel_data_cache_new(root, 0, ex);
-			g_free(root);
+			/*g_free(root);*/
 			if (store->cache) {
 				/* Default cache expiry - 1 week or not visited in a day */
 				camel_data_cache_set_expire_age(store->cache, 60*60*24*7);

@@ -399,7 +399,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 			else if (!g_ascii_strncasecmp (proto, "pop", 3))
 				account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
 			else	/* Unknown, create a generic one? */
-			        account = TNY_ACCOUNT (tny_camel_store_account_new ());
+			    account = TNY_ACCOUNT (tny_camel_store_account_new ());
 		}
 
 		if (type)

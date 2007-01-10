@@ -2,8 +2,11 @@
 
 	* Added some extra TnyFolderType's for use in tinymail clients
 
-
 2007-01-09   Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Temporary POP implementation (CamelFolderSummary support)
+
+2007-01-09  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implemented a very memory efficient message fetching mechanism in
 	camel-lite (it uses streams rather than copying things in memory)
