@@ -148,18 +148,7 @@ tny_camel_pop_store_account_reconnect (TnyCamelAccount *self)
 
 #endif
 
-static const gchar* 
-tny_camel_pop_store_account_get_url_string (TnyAccount *self)
-{
-	g_warning ("You can't use the tny_account_get_url_string API on POP accounts");
-	return NULL;
-}
 
-static void
-tny_camel_pop_store_account_set_url_string (TnyAccount *self, const gchar *url_string)
-{
-	g_warning ("You can't use the tny_account_set_url_string API on POP accounts");
-}
 
 static void
 tny_camel_pop_store_account_add_option (TnyCamelAccount *self, const gchar *option)
@@ -336,8 +325,6 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 	TNY_CAMEL_ACCOUNT_CLASS (class)->reconnect_func = tny_camel_pop_store_account_reconnect;
 #endif
 
-	TNY_CAMEL_ACCOUNT_CLASS (class)->get_url_string_func = tny_camel_pop_store_account_get_url_string;
-	TNY_CAMEL_ACCOUNT_CLASS (class)->set_url_string_func = tny_camel_pop_store_account_set_url_string;
 	TNY_CAMEL_ACCOUNT_CLASS (class)->add_option_func = tny_camel_pop_store_account_add_option;
 #if 0
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->get_folders_async_func = tny_camel_pop_store_account_get_folders_async;
