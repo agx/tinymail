@@ -56,6 +56,7 @@ static gint pop3_get_message_count (CamelFolder *folder);
 static GPtrArray *pop3_get_uids (CamelFolder *folder);
 static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex);
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
+static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex);
 
 static void
 camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
@@ -299,10 +300,20 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	for (i=0;i<pop3_folder->uids->len;i++) 
 	{
 		CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
+		CamelMessageInfoBase *mi;
 
-		/* TNY TODO: only get the HEAD if the service is capable of that */
-		CamelMimeMessage *msg = pop3_get_message (folder, fi->uid, FALSE, NULL);
-		camel_object_unref (CAMEL_OBJECT (msg));
+		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
+		if (!mi)
+		{
+			if (pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) {
+			    CamelMimeMessage *msg = pop3_get_top (folder, fi->uid, FALSE, NULL);
+			    if (msg) camel_object_unref (CAMEL_OBJECT (msg));
+			} else {
+			    CamelMimeMessage *msg = pop3_get_message (folder, fi->uid, FALSE, NULL);
+			    if (msg) camel_object_unref (CAMEL_OBJECT (msg));
+			}
+		} else
+			camel_message_info_free (mi);
 	}
 
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) {
@@ -494,6 +505,8 @@ done:
 	fi->stream = NULL;
 }
 
+
+
 static CamelMimeMessage *
 pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
 {
@@ -626,6 +639,142 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		camel_object_unref((CamelObject *)message);
 		message = NULL;
 	}
+
+	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
+	if (mi) camel_message_info_free (mi);
+
+	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
+
+	mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+	mi->uid = g_strdup (fi->uid);
+
+	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
+
+done:
+	camel_object_unref((CamelObject *)stream);
+fail:
+	camel_operation_end(NULL);
+
+	return message;
+}
+
+
+
+static CamelMimeMessage *
+pop3_get_top (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+{
+	CamelMimeMessage *message = NULL;
+	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
+	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *)folder;
+	CamelPOP3Command *pcr;
+	CamelPOP3FolderInfo *fi;
+	char buffer[1];
+	int i, last;
+	CamelStream *stream = NULL, *old;
+	CamelFolderSummary *summary = folder->summary;
+	CamelMessageInfoBase *mi;
+
+	/* TNY TODO: Implement partial message retrieval if full==TRUE */
+
+	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
+
+	if (fi == NULL) {
+		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
+				      _("No message with UID %s"), uid);
+		return NULL;
+	}
+
+	old = fi->stream;
+
+	/* Sigh, most of the crap in this function is so that the cancel button
+	   returns the proper exception code.  Sigh. */
+
+	camel_operation_start_transient(NULL, _("Retrieving POP message %d"), fi->id);
+
+	/* If we have an oustanding retrieve message running, wait for that to complete
+	   & then retrieve from cache, otherwise, start a new one, and similar */
+
+	if (fi->cmd != NULL) {
+		while ((i = camel_pop3_engine_iterate(pop3_store->engine, fi->cmd)) > 0)
+			;
+
+		if (i == -1)
+			fi->err = errno;
+
+		/* getting error code? */
+		/*g_assert (fi->cmd->state == CAMEL_POP3_COMMAND_DATA);*/
+		camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
+		fi->cmd = NULL;
+
+		if (fi->err != 0) {
+			if (fi->err == EINTR)
+				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
+			else
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+						      _("Cannot get message %s: %s"),
+						      uid, g_strerror (fi->err));
+			goto fail;
+		}
+	}
+	
+	/* check to see if we have safely written flag set */
+	if (pop3_store->cache == NULL
+	    || (stream = camel_data_cache_get(pop3_store->cache, "cache", fi->uid, NULL)) == NULL
+	    || camel_stream_read(stream, buffer, 1) != 1
+	    || buffer[0] != '#') {
+			
+		stream = camel_stream_mem_new();
+		camel_object_ref (CAMEL_OBJECT (stream));
+
+		fi->stream = stream;
+		fi->err = EIO;
+
+		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
+			cmd_tocache, fi, "TOP %u 1\r\n", fi->id);
+
+		/* now wait for the first one to finish */
+		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
+			;
+		if (i == -1)
+			fi->err = errno;
+
+		camel_pop3_engine_command_free(pop3_store->engine, pcr);
+		camel_stream_reset(stream);
+
+		fi->stream = old;
+
+		/* Check to see we have safely written flag set */
+		if (fi->err != 0) {
+			if (fi->err == EINTR)
+				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
+			else
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+						      _("Cannot get message %s: %s"),
+						      uid, g_strerror (fi->err));
+			goto done;
+		}
+
+		if (camel_stream_read(stream, buffer, 1) != 1 || buffer[0] != '#') {
+			camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM,
+					     _("Cannot get message %s: %s"), uid, _("Unknown reason"));
+			goto done;
+		}
+	}
+
+	message = camel_mime_message_new ();
+	if (camel_data_wrapper_construct_from_stream((CamelDataWrapper *)message, stream) == -1) {
+		if (errno == EINTR)
+			camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
+		else
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+					      _("Cannot get message %s: %s"),
+					      uid, g_strerror (errno));
+		camel_object_unref((CamelObject *)message);
+		message = NULL;
+	}
+
+	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
+	if (mi) camel_message_info_free (mi);
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
 

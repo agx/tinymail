@@ -1,8 +1,13 @@
-2007-01-09   Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+2007-01-10  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Improved the camel-lite POP summary support by detecting the TOP
+	capability
+
+2007-01-09  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
 	* Added some extra TnyFolderType's for use in tinymail clients
 
-2007-01-09   Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-09  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Temporary POP implementation (CamelFolderSummary support)
 
