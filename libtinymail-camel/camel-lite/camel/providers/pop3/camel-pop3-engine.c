@@ -261,7 +261,8 @@ engine_command_queue(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 	} else {
 		/* ??? */
 
-		/* TNY TODO: Check online status here, else it will crash */
+		/* TNY TODO: Check online status here, else it will crash 
+			Correction, it will not crash but will emit a SIGPIPE */
 
 		if (camel_stream_write((CamelStream *)pe->stream, pc->data, strlen(pc->data)) == -1) {
 			e_dlist_addtail(&pe->queue, (EDListNode *)pc);
