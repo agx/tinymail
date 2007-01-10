@@ -553,7 +553,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	self->account_store = (gpointer)account_store;    
     base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
     
-	if (G_LIKELY (camel_init (base_directory, TRUE) != 0))
+	if (camel_init (base_directory, TRUE) != 0)
 	{
 		g_error (_("Critical ERROR: Cannot init %s as camel directory\n"), base_directory);
 	    	g_object_unref (G_OBJECT (device));
