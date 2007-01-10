@@ -260,6 +260,9 @@ engine_command_queue(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 		return FALSE;
 	} else {
 		/* ??? */
+
+		/* TNY TODO: Check online status here, else it will crash */
+
 		if (camel_stream_write((CamelStream *)pe->stream, pc->data, strlen(pc->data)) == -1) {
 			e_dlist_addtail(&pe->queue, (EDListNode *)pc);
 			return FALSE;

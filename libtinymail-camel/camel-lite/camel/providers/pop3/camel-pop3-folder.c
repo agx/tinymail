@@ -301,7 +301,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
 
 		/* TNY TODO: only get the HEAD if the service is capable of that */
-		pop3_get_message (folder, fi->uid, FALSE, NULL);
+		CamelMimeMessage *msg = pop3_get_message (folder, fi->uid, FALSE, NULL);
+		camel_object_unref (CAMEL_OBJECT (msg));
 	}
 
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) {
@@ -421,6 +422,11 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete,	CamelException *e
 		if (pop3_store->cache && fi->uid)
 			camel_data_cache_remove(pop3_store->cache, "cache", fi->uid, NULL);
 		}
+
+
+		/* TNY TODO Shouldn't this remove message from memory? Oh well, adding it */
+		camel_object_unref (CAMEL_OBJECT (message));
+
 	     }
 
 	}
