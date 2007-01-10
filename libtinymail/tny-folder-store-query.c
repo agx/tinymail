@@ -45,8 +45,10 @@ static void
 tny_folder_store_query_item_finalize (GObject *object)
 {
 	TnyFolderStoreQueryItem *self = (TnyFolderStoreQueryItem*) object;
-	if (self->regex)
+	if (self->regex) {
 		regfree (self->regex);
+		g_free (self->regex);
+	}
 	item_parent_class->finalize (object);
 }
 
