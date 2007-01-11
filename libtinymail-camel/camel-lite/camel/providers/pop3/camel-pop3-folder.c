@@ -56,7 +56,7 @@ static gint pop3_get_message_count (CamelFolder *folder);
 static GPtrArray *pop3_get_uids (CamelFolder *folder);
 static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex);
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
-static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex);
+static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex);
 
 static void
 camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
@@ -297,21 +297,26 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	
 	camel_pop3_engine_command_free(pop3_store->engine, pcl);
 	
+
+	/* Update the summary.mmap file */
 	for (i=0;i<pop3_folder->uids->len;i++) 
 	{
 		CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
-		CamelMessageInfoBase *mi;
+		CamelMessageInfoBase *mi = NULL;
 
 		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
 		if (!mi)
 		{
-			if (pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) {
-			    CamelMimeMessage *msg = pop3_get_top (folder, fi->uid, FALSE, NULL);
-			    if (msg) camel_object_unref (CAMEL_OBJECT (msg));
-			} else {
-			    CamelMimeMessage *msg = pop3_get_message (folder, fi->uid, FALSE, NULL);
-			    if (msg) camel_object_unref (CAMEL_OBJECT (msg));
-			}
+			CamelMimeMessage *msg = NULL;
+
+			if (pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) 
+				msg = pop3_get_top (folder, fi->uid, NULL);
+			else
+				msg = pop3_get_message (folder, fi->uid, FALSE, NULL);
+
+			if (msg) 
+				camel_object_unref (CAMEL_OBJECT (msg));
+
 		} else
 			camel_message_info_free (mi);
 	}
@@ -343,8 +348,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 {
 	CamelPOP3Folder *pop3_folder;
 	CamelPOP3Store *pop3_store;
-	int i;
-	CamelPOP3FolderInfo *fi;
+	int i; CamelPOP3FolderInfo *fi;
 
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (folder->parent_store);
@@ -355,9 +359,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		camel_pop3_delete_old(folder, pop3_store->delete_after,ex);	
 	}	
 
-	if (!expunge) {
+	if (!expunge)
 		return;
-	}	
 	
 	camel_operation_start(NULL, _("Expunging deleted messages"));
 	
@@ -410,39 +413,41 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete,	CamelException *e
 	pop3_store = CAMEL_POP3_STORE (CAMEL_FOLDER(pop3_folder)->parent_store);	
 	temp = time(&temp);
 
-	for (i = 0; i < pop3_folder->uids->len; i++) {
-	fi = pop3_folder->uids->pdata[i];
+	for (i = 0; i < pop3_folder->uids->len; i++) 
+	{
+		CamelMimeMessage *message = NULL;
 
-	/* TNY TODO, questionable: Persist partial message retrieval? */
-	CamelMimeMessage *message = pop3_get_message (folder, fi->uid, FALSE, ex);	
-	time_t message_time = message->date + message->date_offset;
-	if(message) {
-		double time_diff = difftime(temp,message_time);
-		int day_lag = time_diff/(60*60*24);
-		if( day_lag > days_to_delete)
+		fi = pop3_folder->uids->pdata[i];
+		message = pop3_get_message (folder, fi->uid, TRUE, ex);	
+		time_t message_time = message->date + message->date_offset;
+
+		if (message) 
 		{
-			if (fi->cmd) {
-			while (camel_pop3_engine_iterate(pop3_store->engine, fi->cmd) > 0)
-				;
-			camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
-			fi->cmd = NULL;
-		}
+		    double time_diff = difftime(temp,message_time);
+		    int day_lag = time_diff/(60*60*24);
+		    if (day_lag > days_to_delete)
+		    {
+			if (fi->cmd) 
+			{
+			    while (camel_pop3_engine_iterate(pop3_store->engine, fi->cmd) > 0)
+				    ;
+			    camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
+			    fi->cmd = NULL;
+		    	}
 
-		fi->cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", fi->id);
+		    	fi->cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", fi->id);
 			/* also remove from cache */
-		if (pop3_store->cache && fi->uid)
-			camel_data_cache_remove(pop3_store->cache, "cache", fi->uid, NULL);
+		    	if (pop3_store->cache && fi->uid)
+			    camel_data_cache_remove(pop3_store->cache, "cache", fi->uid, NULL);
+		    }
+
+		    camel_object_unref (CAMEL_OBJECT (message));
 		}
-
-
-		/* TNY TODO Shouldn't this remove message from memory? Oh well, adding it */
-		camel_object_unref (CAMEL_OBJECT (message));
-
-	     }
 
 	}
 
-	for (i = 0; i < pop3_folder->uids->len; i++) {
+	for (i = 0; i < pop3_folder->uids->len; i++) 
+	{
 		fi = pop3_folder->uids->pdata[i];
 		/* wait for delete commands to finish */
 		if (fi->cmd) {
@@ -470,13 +475,14 @@ cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	int w = 0, n;
 
 	/* What if it fails? */
-
 	/* We write an '*' to the start of the stream to say its not complete yet */
 	/* This should probably be part of the cache code */
+
 	if ((n = camel_stream_write(fi->stream, "*", 1)) == -1)
 		goto done;
 
-	while ((n = camel_stream_read((CamelStream *)stream, buffer, sizeof(buffer))) > 0) {
+	while ((n = camel_stream_read((CamelStream *)stream, buffer, sizeof(buffer))) > 0) 
+	{
 		n = camel_stream_write(fi->stream, buffer, n);
 		if (n == -1)
 			break;
@@ -647,8 +653,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *)folder;
 	CamelPOP3Command *pcr;
 	CamelPOP3FolderInfo *fi;
-	char buffer[1];
-	int i, last;
+	char buffer[1]; int i;
 	CamelStream *stream = NULL;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi;
@@ -710,30 +715,8 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		fi->err = EIO;
 		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_tocache /*_partial*/, fi, "RETR %u\r\n", fi->id);
 
-/*
-		if (pop3_store->cache != NULL) {
-
-			i = fi->index+1;
-			last = MIN(i+10, pop3_folder->uids->len);
-			for (;i<last;i++) {
-				CamelPOP3FolderInfo *pfi = pop3_folder->uids->pdata[i];
-				
-				if (pfi->uid && pfi->cmd == NULL) {
-					pfi->stream = camel_data_cache_add(pop3_store->cache, "cache", pfi->uid, NULL);
-					if (pfi->stream) {
-						pfi->err = EIO;
-						pfi->cmd = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI,
-											TRUE?cmd_tocache_partial:cmd_tocache, pfi, "RETR %u\r\n", pfi->id);
-					}
-				}
-			}
-		}
-*/
-
-		/* now wait for the first one to finish */
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;
-
 		if (i == -1)
 			fi->err = errno;
 
@@ -793,20 +776,17 @@ fail:
 
 
 static CamelMimeMessage *
-pop3_get_top (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 {
 	CamelMimeMessage *message = NULL;
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
 	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *)folder;
 	CamelPOP3Command *pcr;
 	CamelPOP3FolderInfo *fi;
-	char buffer[1];
-	int i, last;
+	char buffer[1]; int i; 
 	CamelStream *stream = NULL, *old;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi;
-
-	/* TNY TODO: Implement partial message retrieval if full==TRUE */
 
 	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
 
@@ -855,16 +835,24 @@ pop3_get_top (CamelFolder *folder, const char *uid, gboolean full, CamelExceptio
 	    || camel_stream_read(stream, buffer, 1) != 1
 	    || buffer[0] != '#') {
 			
+
 		stream = camel_stream_mem_new();
+
+		/* the cmd_tocache thing unrefs it, therefore this is to keep it
+		   compatible with existing code */
 		camel_object_ref (CAMEL_OBJECT (stream));
 
 		fi->stream = stream;
 		fi->err = EIO;
 
+		/* TOP %s 1 only returns the headers of a message and the first
+		   line. Which is fine and to make sure broken POP servers also
+		   return something (in case TOP %s 0 would otherwise be 
+		   misinterpreted by the POP server) */
+
 		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
 			cmd_tocache, fi, "TOP %u 1\r\n", fi->id);
 
-		/* now wait for the first one to finish */
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;
 		if (i == -1)
