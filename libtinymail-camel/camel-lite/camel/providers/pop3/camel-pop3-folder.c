@@ -506,6 +506,138 @@ done:
 }
 
 
+static void
+cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
+{
+	CamelPOP3FolderInfo *fi = data;
+	char buffer[2048];
+	int w = 0, n;
+	char boundary[1024];
+	char search[9] = "boundary=";
+	int bpos = 0;
+	gboolean continue_next = FALSE;
+	gboolean have_boundary = FALSE, will_have_boundary = FALSE;
+
+	/* We write an '*' to the start of the stream to say its not complete yet */
+	if ((n = camel_stream_write(fi->stream, "*", 1)) == -1)
+		goto done;
+
+	while ((n = camel_stream_read((CamelStream *)stream, buffer, sizeof(buffer))) > 0) 
+	{
+		char *p = NULL;
+
+		n = camel_stream_write(fi->stream, buffer, n);
+		if (n == -1)
+			break;
+
+		if (!have_boundary)
+		{
+		    if (!continue_next)
+			    p = strchr (buffer, search[0]);
+
+		    if (p || continue_next)
+		    {
+			    gint pos = continue_next ? 0 : (gint) (p-buffer);
+			    gboolean detected_end = FALSE;
+			    gboolean first_dq = FALSE;
+
+			    while (!detected_end && p)
+			    {
+				if (bpos < sizeof (boundary) && pos < sizeof (buffer))
+				{
+
+					if (bpos == 8 && buffer[pos] == '=')
+						will_have_boundary = TRUE;
+					else if (bpos == 8) 
+					{
+						will_have_boundary = FALSE;
+						continue_next = FALSE;
+						first_dq = FALSE;
+						p = strchr (buffer + pos, search[0]);
+						bpos = 0;
+						if (p) 
+							pos = (gint) (p - buffer);
+						else
+							detected_end = TRUE;
+						continue;
+					}
+
+					if (buffer[pos] != '\n')
+					{
+					    if (buffer[pos] == '\"')
+					    {
+						    if (first_dq) {
+							    if (will_have_boundary) {
+								have_boundary = TRUE;
+							    	detected_end = TRUE;
+							    	continue_next = FALSE;
+							    }
+						    }
+						    first_dq = TRUE;
+					    }
+
+					    boundary[bpos] = buffer[pos];
+					} else {
+						if (will_have_boundary) {
+							have_boundary = TRUE;
+	 					    	detected_end = TRUE;
+						    	continue_next = FALSE;
+						} else {
+
+						    will_have_boundary = FALSE;
+						    continue_next = FALSE;
+						    first_dq = FALSE;						  
+						    p = strchr (buffer + pos, search[0]);
+						    bpos = 0;
+						    if (p) 
+							    pos = (gint) (p - buffer);
+						    else 
+							    detected_end = TRUE;
+						    continue;						
+						}
+					}
+
+					bpos++;
+					pos++;
+
+				} else {
+				    detected_end = TRUE;
+				    if (!(bpos < sizeof (boundary)))
+					    continue_next = TRUE;
+				    else
+					    continue_next = FALSE;
+				}
+			    }
+		    }
+		}
+
+		w += n;
+		if (w > fi->size)
+			w = fi->size;
+		if (fi->size != 0)
+			camel_operation_progress(NULL, (w * 100) / fi->size);
+	}
+
+	/* it all worked, output a '#' to say we're a-ok */
+	if (n != -1) {
+		camel_stream_reset(fi->stream);
+		n = camel_stream_write(fi->stream, "#", 1);
+	}
+done:
+	if (n == -1) {
+		fi->err = errno;
+		g_warning("POP3 retrieval failed: %s", strerror(errno));
+	} else {
+		fi->err = 0;
+	}
+	
+	camel_object_unref((CamelObject *)fi->stream);
+	fi->stream = NULL;
+
+	if (have_boundary)
+		printf ("Boundary=%s\n", boundary);
+}
+
 
 static CamelMimeMessage *
 pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
@@ -576,12 +708,11 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		camel_object_ref((CamelObject *)stream);
 		fi->stream = stream;
 		fi->err = EIO;
-		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_tocache, fi, "RETR %u\r\n", fi->id);
+		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_tocache /*_partial*/, fi, "RETR %u\r\n", fi->id);
 
-		/* Also initiate retrieval of some of the following messages, assume we'll be receiving them */
+/*
 		if (pop3_store->cache != NULL) {
-			/* This should keep track of the last one retrieved, also how many are still
-			   oustanding incase of random access on large folders */
+
 			i = fi->index+1;
 			last = MIN(i+10, pop3_folder->uids->len);
 			for (;i<last;i++) {
@@ -592,11 +723,12 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 					if (pfi->stream) {
 						pfi->err = EIO;
 						pfi->cmd = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI,
-											 cmd_tocache, pfi, "RETR %u\r\n", pfi->id);
+											TRUE?cmd_tocache_partial:cmd_tocache, pfi, "RETR %u\r\n", pfi->id);
 					}
 				}
 			}
 		}
+*/
 
 		/* now wait for the first one to finish */
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
