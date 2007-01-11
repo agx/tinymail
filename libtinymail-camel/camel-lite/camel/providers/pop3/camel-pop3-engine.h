@@ -113,6 +113,7 @@ struct _CamelPOP3Engine {
 	EDList done;		/* list of done commands, awaiting free */
 
 	CamelPOP3Command *current; /* currently busy (downloading) response */
+	void *store; gboolean partial_happening;
 };
 
 struct _CamelPOP3EngineClass {

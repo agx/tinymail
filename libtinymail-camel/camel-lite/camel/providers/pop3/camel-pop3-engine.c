@@ -316,7 +316,9 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 			/* Make sure we get all data before going back to command mode */
 			while (camel_pop3_stream_getd(pe->stream, &p, &len) > 0)
 				;
-			camel_pop3_stream_set_mode(pe->stream, CAMEL_POP3_STREAM_LINE);
+			if (!pe->partial_happening)
+				camel_pop3_stream_set_mode(pe->stream, CAMEL_POP3_STREAM_LINE);
+			pe->partial_happening = FALSE;
 		} else {
 			pc->state = CAMEL_POP3_COMMAND_OK;
 		}

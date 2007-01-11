@@ -31,6 +31,7 @@
 
 #include "camel-pop3-folder.h"
 #include "camel-pop3-store.h"
+#include "camel-pop3-stream.h"
 #include "camel-exception.h"
 #include "camel-stream-mem.h"
 #include "camel-stream-filter.h"
@@ -516,108 +517,72 @@ static void
 cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 {
 	CamelPOP3FolderInfo *fi = data;
-	char buffer[2048];
+	unsigned char *buffer;
 	int w = 0, n;
-	char boundary[1024];
-	char search[9] = "boundary=";
-	int bpos = 0;
-	gboolean continue_next = FALSE;
-	gboolean have_boundary = FALSE, will_have_boundary = FALSE;
+	CamelMimeParser *mp;
+	struct _camel_header_raw *h;
+	gchar *boundary = NULL;
+	gboolean occurred = FALSE, theend = FALSE;
+	unsigned int len;
 
 	/* We write an '*' to the start of the stream to say its not complete yet */
 	if ((n = camel_stream_write(fi->stream, "*", 1)) == -1)
 		goto done;
 
-	while ((n = camel_stream_read((CamelStream *)stream, buffer, sizeof(buffer))) > 0) 
+
+	while (!theend && camel_pop3_stream_line (stream, &buffer, &len) > 0)
 	{
 		char *p = NULL;
 
-		n = camel_stream_write(fi->stream, buffer, n);
-		if (n == -1)
-			break;
+		if (!buffer)
+			continue;
 
-		if (!have_boundary)
+		if (boundary == NULL)
 		{
-		    if (!continue_next)
-			    p = strchr (buffer, search[0]);
+			   CamelContentType *ct = NULL;
+			   const char *bound=NULL;
+			   char *pstr = (char*)strcasestr (buffer, "Content-Type:");
 
-		    if (p || continue_next)
-		    {
-			    gint pos = continue_next ? 0 : (gint) (p-buffer);
-			    gboolean detected_end = FALSE;
-			    gboolean first_dq = FALSE;
+			   if (pstr) 
+			   {
+				pstr = strchr (pstr, ':'); 
+				if (pstr) { pstr++;
+				ct = camel_content_type_decode(pstr); } 
+			   }
 
-			    while (!detected_end && p)
-			    {
-				if (bpos < sizeof (boundary) && pos < sizeof (buffer))
-				{
+			   if (ct) 
+			   { 
+				bound = camel_content_type_param(ct, "boundary");
+				if (bound && strlen (bound) > 0) 
+					boundary = g_strdup (bound);
+			   }
+		} else if (strstr (buffer, boundary))
+		{
+			if (occurred)
+			{
+				CamelException myex = CAMEL_EXCEPTION_INITIALISER;
+				camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &myex);
+				camel_service_connect (CAMEL_SERVICE (pe->store), &myex);
+				pe->partial_happening = TRUE;
+				theend = TRUE;
+			} 
 
-					if (bpos == 8 && buffer[pos] == '=')
-						will_have_boundary = TRUE;
-					else if (bpos == 8) 
-					{
-						will_have_boundary = FALSE;
-						continue_next = FALSE;
-						first_dq = FALSE;
-						p = strchr (buffer + pos, search[0]);
-						bpos = 0;
-						if (p) 
-							pos = (gint) (p - buffer);
-						else
-							detected_end = TRUE;
-						continue;
-					}
-
-					if (buffer[pos] != '\n')
-					{
-					    if (buffer[pos] == '\"')
-					    {
-						    if (first_dq) {
-							    if (will_have_boundary) {
-								have_boundary = TRUE;
-							    	detected_end = TRUE;
-							    	continue_next = FALSE;
-							    }
-						    }
-						    first_dq = TRUE;
-					    }
-
-					    boundary[bpos] = buffer[pos];
-					} else {
-						if (will_have_boundary) {
-							have_boundary = TRUE;
-	 					    	detected_end = TRUE;
-						    	continue_next = FALSE;
-						} else {
-
-						    will_have_boundary = FALSE;
-						    continue_next = FALSE;
-						    first_dq = FALSE;						  
-						    p = strchr (buffer + pos, search[0]);
-						    bpos = 0;
-						    if (p) 
-							    pos = (gint) (p - buffer);
-						    else 
-							    detected_end = TRUE;
-						    continue;						
-						}
-					}
-
-					bpos++;
-					pos++;
-
-				} else {
-				    detected_end = TRUE;
-				    if (!(bpos < sizeof (boundary)))
-					    continue_next = TRUE;
-				    else
-					    continue_next = FALSE;
-				}
-			    }
-		    }
+			occurred = TRUE;
 		}
 
-		w += n;
+		if (!theend)
+		{
+		    n = camel_stream_write(fi->stream, buffer, len);		    
+		    if (n == -1 || camel_stream_write(fi->stream, "\n", 1) == -1)
+			break;
+		    w += n+1;
+		} else if (boundary != NULL)
+		{
+		    gchar *nb = g_strdup_printf ("\n--%s\n", boundary);
+		    n = camel_stream_write(fi->stream, nb, strlen (nb));
+		    g_free (nb);
+		}
+
 		if (w > fi->size)
 			w = fi->size;
 		if (fi->size != 0)
@@ -625,12 +590,12 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	}
 
 	/* it all worked, output a '#' to say we're a-ok */
-	if (n != -1) {
+	if (n != -1 || theend) {
 		camel_stream_reset(fi->stream);
 		n = camel_stream_write(fi->stream, "#", 1);
 	}
 done:
-	if (n == -1) {
+	if (n == -1 && !theend) {
 		fi->err = errno;
 		g_warning("POP3 retrieval failed: %s", strerror(errno));
 	} else {
@@ -640,8 +605,9 @@ done:
 	camel_object_unref((CamelObject *)fi->stream);
 	fi->stream = NULL;
 
-	if (have_boundary)
-		printf ("Boundary=%s\n", boundary);
+ending:
+	if (boundary)
+		g_free (boundary);
 }
 
 
@@ -713,7 +679,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		camel_object_ref((CamelObject *)stream);
 		fi->stream = stream;
 		fi->err = EIO;
-		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_tocache /*_partial*/, fi, "RETR %u\r\n", fi->id);
+		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, full?cmd_tocache:cmd_tocache_partial, fi, "RETR %u\r\n", fi->id);
 
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;

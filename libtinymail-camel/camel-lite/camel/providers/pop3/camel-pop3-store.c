@@ -210,7 +210,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		camel_object_unref (tcp_stream);
 		return FALSE;
 	}
-	
+
+	store->engine->store = store;
+	store->engine->partial_happening = FALSE;
+
 	if (ssl_mode != MODE_TLS) {
 		camel_object_unref (tcp_stream);
 		return TRUE;
