@@ -1,6 +1,7 @@
 2007-01-11  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implemented partial message retrieval for POP
+	* Implemented detecting partial retrieval status for POP
 
 2007-01-10  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 

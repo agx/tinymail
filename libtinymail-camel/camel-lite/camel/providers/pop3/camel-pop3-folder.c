@@ -471,6 +471,7 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete,	CamelException *e
 static void
 cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 {
+	CamelPOP3Store *tstore = (CamelPOP3Store *) pe->store;
 	CamelPOP3FolderInfo *fi = data;
 	char buffer[2048];
 	int w = 0, n;
@@ -499,6 +500,8 @@ cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	if (n != -1) {
 		camel_stream_reset(fi->stream);
 		n = camel_stream_write(fi->stream, "#", 1);
+
+		camel_data_cache_set_partial (tstore->cache, "cache", fi->uid, FALSE);
 	}
 done:
 	if (n == -1) {
@@ -516,6 +519,7 @@ done:
 static void
 cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 {
+	CamelPOP3Store *tstore = (CamelPOP3Store *) pe->store;
 	CamelPOP3FolderInfo *fi = data;
 	unsigned char *buffer;
 	int w = 0, n;
@@ -561,8 +565,8 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			if (occurred)
 			{
 				CamelException myex = CAMEL_EXCEPTION_INITIALISER;
-				camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &myex);
-				camel_service_connect (CAMEL_SERVICE (pe->store), &myex);
+				camel_service_disconnect (CAMEL_SERVICE (tstore), FALSE, &myex);
+				camel_service_connect (CAMEL_SERVICE (tstore), &myex);
 				pe->partial_happening = TRUE;
 				theend = TRUE;
 			} 
@@ -593,6 +597,11 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	if (n != -1 || theend) {
 		camel_stream_reset(fi->stream);
 		n = camel_stream_write(fi->stream, "#", 1);
+		if (theend)
+			camel_data_cache_set_partial (tstore->cache, "cache", fi->uid, TRUE);
+		else
+ 			camel_data_cache_set_partial (tstore->cache, "cache", fi->uid, FALSE);
+
 	}
 done:
 	if (n == -1 && !theend) {
@@ -622,7 +631,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 	char buffer[1]; int i;
 	CamelStream *stream = NULL;
 	CamelFolderSummary *summary = folder->summary;
-	CamelMessageInfoBase *mi;
+	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
 
 	/* TNY TODO: Implement partial message retrieval if full==TRUE */
 
@@ -664,8 +673,23 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		}
 	}
 	
+	if (pop3_store->cache != NULL)
+	{
+		CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+
+		if (full && camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
+		{
+			camel_data_cache_remove (pop3_store->cache, "cache", fi->uid, &tex);
+			im_certain = TRUE;
+		} else if (!full && !camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
+		{
+			camel_data_cache_remove (pop3_store->cache, "cache", fi->uid, &tex);
+			im_certain = TRUE;
+		}
+	}
+
 	/* check to see if we have safely written flag set */
-	if (pop3_store->cache == NULL
+	if (im_certain || pop3_store->cache == NULL
 	    || (stream = camel_data_cache_get(pop3_store->cache, "cache", fi->uid, NULL)) == NULL
 	    || camel_stream_read(stream, buffer, 1) != 1
 	    || buffer[0] != '#') {
@@ -679,7 +703,10 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		camel_object_ref((CamelObject *)stream);
 		fi->stream = stream;
 		fi->err = EIO;
-		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, full?cmd_tocache:cmd_tocache_partial, fi, "RETR %u\r\n", fi->id);
+
+
+		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
+			full?cmd_tocache:cmd_tocache_partial, fi, "RETR %u\r\n", fi->id);
 
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;

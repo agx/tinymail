@@ -88,6 +88,13 @@ int             camel_data_cache_remove(CamelDataCache *cache,
 int             camel_data_cache_clear(CamelDataCache *cache,
 				       const char *path, CamelException *ex);
 
+
+gboolean     camel_data_cache_is_partial (CamelDataCache *cache, const char *path,
+					      const char *uid);
+
+void         camel_data_cache_set_partial (CamelDataCache *cache, const char *path,
+					      const char *uid, gboolean partial);
+
 /* Standard Camel function */
 CamelType camel_data_cache_get_type (void);
 
