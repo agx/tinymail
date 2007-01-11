@@ -564,7 +564,7 @@ pop3_connect (CamelService *service, CamelException *ex)
 	int status;
 	
 	session = camel_service_get_session (service);
-	
+
 	if (store->cache == NULL) {
 		char *root;
 
@@ -596,6 +596,7 @@ pop3_connect (CamelService *service, CamelException *ex)
 			service->url->passwd = NULL;
 			reprompt = TRUE;
 			camel_exception_clear (ex);
+			sleep (5); /* For example Cyrus-POPd dislikes hammering */
 		} else
 			break;
 	}
