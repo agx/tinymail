@@ -46,6 +46,8 @@
 #include <tny-gnome-device.h>
 #include <tny-session-camel.h>
 
+#include <tny-gtk-lockable.h>
+
 #ifdef GNOME
 #include <libgnomeui/gnome-password-dialog.h>
 #include <gnome-keyring.h>
@@ -138,6 +140,7 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
+
 	} else {
 
 		GnomeKeyringNetworkPasswordData *pwd_data;
@@ -614,6 +617,9 @@ tny_gnome_account_store_new (void)
 	TnyGnomeAccountStore *self = g_object_new (TNY_TYPE_GNOME_ACCOUNT_STORE, NULL);
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
+
+	tny_session_camel_set_ui_locker (priv->session, tny_gtk_lockable_new ());
+
 
 	return TNY_ACCOUNT_STORE (self);
 }

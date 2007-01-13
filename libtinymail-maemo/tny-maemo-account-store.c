@@ -44,6 +44,7 @@
 #include <tny-session-camel.h>
 #include <tny-maemo-device.h>
 
+#include <tny-gtk-lockable.h>
 
 /* "GConf vs. Camel" account implementation */
 
@@ -502,6 +503,8 @@ tny_maemo_account_store_new (void)
 	TnyMaemoAccountStore *self = g_object_new (TNY_TYPE_MAEMO_ACCOUNT_STORE, NULL);
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
+
+	tny_session_camel_set_ui_locker (priv->session, tny_gtk_lockable_new ());
 
 	return TNY_ACCOUNT_STORE (self);
 }

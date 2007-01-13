@@ -82,6 +82,10 @@ typedef struct _TnyMsgReceiveStrategy TnyMsgReceiveStrategy;
 typedef struct _TnyMsgReceiveStrategyIface TnyMsgReceiveStrategyIface;
 typedef struct _TnyPair TnyPair;
 typedef struct _TnyPairClass TnyPairClass;
+typedef struct _TnyLockable TnyLockable;
+typedef struct _TnyLockableIface TnyLockableIface;
+typedef struct _TnyNoopLockable TnyNoopLockable;
+typedef struct _TnyNoopLockableClass TnyNoopLockableClass;
 
 G_END_DECLS
 

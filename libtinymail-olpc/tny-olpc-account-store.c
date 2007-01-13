@@ -43,6 +43,8 @@
 #include <tny-session-camel.h>
 #include <tny-olpc-device.h>
 
+#include <tny-gtk-lockable.h>
+
 /* GKeyFile vs. Camel implementation */
 
 static GObjectClass *parent_class = NULL;
@@ -369,6 +371,8 @@ tny_olpc_account_store_new (void)
 	TnyOlpcAccountStore *self = g_object_new (TNY_TYPE_OLPC_ACCOUNT_STORE, NULL);
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
+
+	tny_session_camel_set_ui_locker (priv->session, tny_gtk_lockable_new ());
 
 	return TNY_ACCOUNT_STORE (self);
 }

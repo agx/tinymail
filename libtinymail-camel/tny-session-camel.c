@@ -40,6 +40,8 @@
 #include <tny-camel-store-account.h>
 #include <tny-camel-transport-account.h>
 
+#include <tny-noop-lockable.h>
+
 #include "tny-session-camel-priv.h"
 #include "tny-camel-store-account-priv.h"
 #include "tny-camel-transport-account-priv.h"
@@ -203,17 +205,53 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, Tny
 }
 
 
-/* Will be called at camel_service_connect in case the account needs a password.
-   its implementation can contani GUI things. */
+typedef struct
+{
+	TnySessionCamel *self;
+	GMainLoop *loop;
+	gchar* data;
+	TnyGetPassFunc func;
+	gboolean cancel;
+	gchar *prompt;
+	TnyAccount *account;
+} GetPassWaitResults;
+
+static gboolean
+get_pwd_idle_handler (gpointer data)
+{
+	GetPassWaitResults *results = data;
+
+	tny_lockable_lock (results->self->ui_lock);
+	results->data = results->func (results->account, results->prompt, &results->cancel);
+	tny_lockable_unlock (results->self->ui_lock);
+
+	g_main_loop_quit (results->loop);
+
+	return FALSE;
+}
+
+static gpointer 
+get_pwd_thread (gpointer results)
+{
+	g_idle_add (get_pwd_idle_handler, results);
+	g_thread_exit (NULL);
+	return NULL;
+}
+
+
 static char *
 tny_session_camel_get_password (CamelSession *session, CamelService *service, const char *domain,
 	      const char *prompt, const char *item, guint32 flags, CamelException *ex)
 {
+	TnySessionCamel *self = (TnySessionCamel *) session;
+
 	GList *copy = password_funcs;
 	TnyGetPassFunc func;
 	TnyAccount *account;
 	gboolean found = FALSE, freeprmpt = FALSE, cancel = FALSE;
 	gchar *retval = NULL, *prmpt = (gchar*)prompt;
+	GetPassWaitResults results;
+	GThread *thread;
 
 	while (G_LIKELY (copy))
 	{
@@ -245,7 +283,33 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_session_camel_forget_password (session, service, domain, item, ex);
 		}
 
-		retval = func (account, prompt, &cancel);
+		self->in_auth_function = TRUE;
+	
+		results.self = self;
+		results.account = account;
+		results.prompt = prmpt;
+		results.data = NULL;
+		results.cancel = FALSE;
+		results.func = func;
+
+		results.loop = g_main_loop_new (NULL, TRUE);
+
+		thread = g_thread_create (get_pwd_thread, &results, TRUE, NULL);
+		g_thread_join (thread);
+		
+		if (g_main_loop_is_running (results.loop))
+		{
+				tny_lockable_unlock (self->ui_lock);
+				g_main_loop_run (results.loop);
+				tny_lockable_lock (self->ui_lock);
+		}
+
+		g_main_loop_unref (results.loop);
+
+		retval = results.data;
+		cancel = results.cancel;
+
+		self->in_auth_function = FALSE;
 
 		if (freeprmpt)
 			g_free (prmpt);
@@ -258,15 +322,68 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	return retval;
 }
 
+/**
+ * tny_session_camel_set_ui_locker:
+ * @self: a #TnySessionCamel instance
+ * @ui_lock: a #TnyLockable instance 
+ *
+ * Set the user interface toolkit locker. The lock and unlock methods of this
+ * locker should be implemented with the lock and unlock functionality of your
+ * user interface toolkit.
+ *
+ * Good examples are gdk_threads_enter () and gdk_threads_leave () in gtk+.
+ **/
+void 
+tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_lock)
+{
+	if (self->ui_lock)
+		g_object_unref (G_OBJECT (self->ui_lock));
+	self->ui_lock = TNY_LOCKABLE (g_object_ref (ui_lock));
+}
 
-/* Will be called at camel_service_connect in case the entered password was wrong */
+
+
+typedef struct
+{
+	TnySessionCamel *self;
+	GMainLoop *loop;
+	TnyForgetPassFunc func;
+	TnyAccount *account;
+} ForGetPassWaitResults;
+
+static gboolean
+forget_pwd_idle_handler (gpointer data)
+{
+	ForGetPassWaitResults *results = data;
+
+	tny_lockable_lock (results->self->ui_lock);
+	results->func (results->account);
+	tny_lockable_unlock (results->self->ui_lock);
+
+	g_main_loop_quit (results->loop);
+
+	return FALSE;
+}
+
+static gpointer 
+forget_pwd_thread (gpointer results)
+{
+	g_idle_add (forget_pwd_idle_handler, results);
+	g_thread_exit (NULL);
+	return NULL;
+}
+
 static void
 tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
 {
+	TnySessionCamel *self = (TnySessionCamel *)session;
+
 	GList *copy = forget_password_funcs;
 	TnyForgetPassFunc func;
 	TnyAccount *account;
 	gboolean found = FALSE;
+	ForGetPassWaitResults results;
+	GThread *thread;
 
 	while (G_LIKELY (copy))
 	{
@@ -283,9 +400,66 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	}
 
 	if (G_LIKELY (found))
-		func (account);
+	{
+		self->in_auth_function = TRUE;
+	
+		results.self = self;
+		results.account = account;
+		results.func = func;
+
+		results.loop = g_main_loop_new (NULL, TRUE);
+
+		thread = g_thread_create (forget_pwd_thread, &results, TRUE, NULL);
+		g_thread_join (thread);
+		
+		if (g_main_loop_is_running (results.loop))
+		{
+				tny_lockable_unlock (self->ui_lock);
+				g_main_loop_run (results.loop);
+				tny_lockable_lock (self->ui_lock);
+		}
+
+		g_main_loop_unref (results.loop);
+
+		self->in_auth_function = FALSE;
+	}
 
 	return;
+}
+
+
+
+typedef struct
+{
+	TnySessionCamel *self;
+	GMainLoop *loop;
+	TnyAlertType tnytype;
+	gchar *prompt;
+	gboolean retval;
+} AlertWaitResults;
+
+static gboolean
+alert_idle_handler (gpointer data)
+{
+	AlertWaitResults *results = data;
+
+	tny_lockable_lock (results->self->ui_lock);
+	results->retval = tny_account_store_alert (
+		(TnyAccountStore*)results->self->account_store, 
+		results->tnytype, (const gchar *) results->prompt);
+	tny_lockable_unlock (results->self->ui_lock);
+
+	g_main_loop_quit (results->loop);
+
+	return FALSE;
+}
+
+static gpointer 
+alert_thread (gpointer results)
+{
+	g_idle_add (alert_idle_handler, results);
+	g_thread_exit (NULL);
+	return NULL;
 }
 
 /* tny_session_camel_alert_user will for example be called when SSL is on and 
@@ -298,11 +472,13 @@ static gboolean
 tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *prompt, gboolean cancel)
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
+	GThread *thread;
 
 	if (self->account_store)
 	{
 		TnyAccountStore *account_store = (TnyAccountStore*)self->account_store;
 		TnyAlertType tnytype;
+		AlertWaitResults results;
 
 		switch (type)
 		{
@@ -318,7 +494,31 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
-		return tny_account_store_alert (account_store, tnytype, prompt);
+		self->in_auth_function = TRUE;
+	
+		results.self = self;
+		results.tnytype = tnytype;
+		results.prompt = g_strdup (prompt);
+		results.retval = FALSE;
+
+		results.loop = g_main_loop_new (NULL, TRUE);
+
+		thread = g_thread_create (alert_thread, &results, TRUE, NULL);
+		g_thread_join (thread);
+		
+		if (g_main_loop_is_running (results.loop))
+		{					
+				tny_lockable_unlock (self->ui_lock);
+				g_main_loop_run (results.loop);
+				tny_lockable_lock (self->ui_lock);
+		}
+		g_main_loop_unref (results.loop);
+
+		self->in_auth_function = FALSE;
+
+		g_free (results.prompt);
+
+		return results.retval;
 	}
 	
 	return FALSE;
@@ -452,6 +652,11 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->prev_constat = FALSE;
 	instance->device = NULL;
 	instance->camel_dir = NULL;
+	instance->ui_lock = tny_noop_lockable_new ();
+	instance->camel_dir = NULL;
+	instance->in_auth_function = FALSE;
+
+	return;
 }
 
 void 
@@ -491,6 +696,9 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 {
 	TnySessionCamel *self = user_data;
 	
+	if (self->in_auth_function)
+		return;
+
 	camel_session_set_online ((CamelSession *) self, online); 
 
 	if (self->current_accounts && !self->first_switch && self->prev_constat != online 
@@ -595,7 +803,6 @@ tny_session_camel_new (TnyAccountStore *account_store)
 	TnySessionCamel *retval = TNY_SESSION_CAMEL 
 			(camel_object_new (TNY_TYPE_SESSION_CAMEL));
 
-	retval->camel_dir = NULL;
 	tny_session_camel_set_account_store (retval, account_store);
 
 	return retval;
@@ -612,6 +819,9 @@ tny_session_camel_finalise (CamelObject *object)
 		g_signal_handler_disconnect (G_OBJECT (self->device), 
 			self->connchanged_signal);
 	}
+
+	if (self->ui_lock)
+		g_object_unref (G_OBJECT (self->ui_lock));
 
 	if (self->camel_dir)
 		g_free (self->camel_dir);
@@ -635,10 +845,6 @@ tny_session_camel_class_init (TnySessionCamelClass *tny_session_camel_class)
 	camel_session_class->thread_msg_new = tny_session_camel_ms_thread_msg_new;
 	camel_session_class->thread_msg_free = tny_session_camel_ms_thread_msg_free;
 	camel_session_class->thread_status = tny_session_camel_ms_thread_status;
-
-	tny_session_camel_class->set_pass_func_func = tny_session_camel_set_pass_func;
-	tny_session_camel_class->set_forget_pass_func_func = tny_session_camel_set_forget_pass_func;
-	tny_session_camel_class->set_account_store_func = tny_session_camel_set_account_store;
 
 	return;
 }

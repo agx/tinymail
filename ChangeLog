@@ -1,3 +1,13 @@
+2007-01-13  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Introduction of the TnyLockable type
+	* Implementation of TnyGtkLockable and TnyNoopLockable
+	* Ui locking in TnySessionCamel
+	* Async authentication in TnySessionCamel
+	* Async alerts in TnySessionCamel
+
+	* This was a major API change
+
 2007-01-12  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Refreshing POP folders, bugfix

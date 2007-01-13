@@ -13,6 +13,8 @@ libtinymail_1_0_headers = \
 	tny-pair.h \
 	tny-msg.h \
 	tny-device.h \
+	tny-lockable.h \
+	tny-noop-lockable.h \
 	tny-account.h \
 	tny-store-account.h \
 	tny-transport-account.h \
@@ -37,6 +39,8 @@ libtinymail_1_0_la_SOURCES = \
 	tny-mime-part.c \
 	tny-folder.c \
 	tny-device.c \
+	tny-lockable.c \
+	tny-noop-lockable.c \
 	tny-account.c \
 	tny-store-account.c \
 	tny-transport-account.c \

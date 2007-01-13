@@ -44,6 +44,7 @@
 #include <tny-session-camel.h>
 #include <tny-gpe-device.h>
 
+#include <tny-gtk-lockable.h>
 
 /* "GConf vs. Camel" account implementation */
 
@@ -500,6 +501,8 @@ tny_gpe_account_store_new (void)
 	TnyGpeAccountStore *self = g_object_new (TNY_TYPE_GPE_ACCOUNT_STORE, NULL);
 	TnyGpeAccountStorePriv *priv = TNY_GPE_ACCOUNT_STORE_GET_PRIVATE (self);
 	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
+
+	tny_session_camel_set_ui_locker (priv->session, tny_gtk_lockable_new ());
 
 	return TNY_ACCOUNT_STORE (self);
 }

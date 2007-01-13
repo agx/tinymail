@@ -12,6 +12,7 @@ lib_LTLIBRARIES = libtinymailui-gtk-1.0.la
 libtinymailui_gtk_1_0_headers = \
 	tny-gtk-mime-part-save-strategy.h \
 	tny-gtk-msg-view.h \
+	tny-gtk-lockable.h \
 	tny-gtk-msg-window.h \
 	tny-gtk-text-mime-part-view.h \
 	tny-gtk-attachment-mime-part-view.h\
@@ -26,6 +27,7 @@ libtinymailui_gtk_1_0_la_SOURCES = \
 	$(libtinymailui_gtk_1_0_headers) \
 	tny-gtk-mime-part-save-strategy.c \
 	tny-gtk-msg-view.c \
+	tny-gtk-lockable.c \
 	tny-gtk-text-mime-part-view.c \
 	tny-gtk-attachment-mime-part-view.c \
 	tny-gtk-msg-window.c \

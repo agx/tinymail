@@ -24,6 +24,7 @@
 #include <camel/camel-session.h>
 #include <tny-shared.h>
 #include <tny-camel-shared.h>
+#include <tny-lockable.h>
 
 G_BEGIN_DECLS
 
@@ -42,16 +43,13 @@ struct _TnySessionCamel
 	guint connchanged_signal;
 	GList *current_accounts;
 	gchar *camel_dir;
+	gboolean in_auth_function;
+	TnyLockable *ui_lock;
 };
 
 struct _TnySessionCamelClass
 {
 	CamelSessionClass parent_class;
-
-	void (*set_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
-	void (*set_forget_pass_func_func) (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc forget_pass_func);
-	void (*set_account_store_func) (TnySessionCamel *self, TnyAccountStore *account_store);
-
 };
 
 CamelType tny_session_camel_get_type (void);
@@ -60,6 +58,8 @@ void tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account
 void tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc get_forget_pass_func);
 void tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store);
 void tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device);
+
+void tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_lock);
 
 G_END_DECLS
 
