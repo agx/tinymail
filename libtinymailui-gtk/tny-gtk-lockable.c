@@ -29,7 +29,6 @@ static void
 tny_gtk_lockable_lock (TnyLockable *self)
 {
 	gdk_threads_enter ();
-	gdk_flush ();
 }
 
 static void

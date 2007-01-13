@@ -769,7 +769,7 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	/* TODO: This makes a mainloop (above) take over in the new thread 
+	/* TODO: This makes a mainloop (above) take over in the new thread
 	g_thread_create (background_connect_thread, info, FALSE, NULL); */
 
 	background_connect_thread (info);
