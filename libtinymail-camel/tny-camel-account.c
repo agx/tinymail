@@ -290,14 +290,10 @@ tny_camel_account_set_id_default (TnyAccount *self, const gchar *id)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	g_static_rec_mutex_lock (priv->service_lock);
-
 	if (G_UNLIKELY (priv->id))
 		g_free (priv->id);
 
 	priv->id = g_strdup (id);
-
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
@@ -337,7 +333,7 @@ static void
 tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	if (G_UNLIKELY (priv->user))
@@ -438,9 +434,7 @@ tny_camel_account_get_id_default (TnyAccount *self)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);	
 	const gchar *retval;
 
-	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->id;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -456,10 +450,8 @@ tny_camel_account_get_proto_default (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
-	
-	g_static_rec_mutex_lock (priv->service_lock);
+
 	retval = (const gchar*)priv->proto;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -476,9 +468,7 @@ tny_camel_account_get_user_default (TnyAccount *self)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
 
-	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->user;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -495,9 +485,7 @@ tny_camel_account_get_hostname_default (TnyAccount *self)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);	
 	const gchar *retval;
 
-	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->host;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -514,9 +502,7 @@ tny_camel_account_get_pass_func_default (TnyAccount *self)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyGetPassFunc retval;
 
-	g_static_rec_mutex_lock (priv->service_lock);
 	retval = priv->get_pass_func;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -533,9 +519,7 @@ tny_camel_account_get_forget_pass_func_default (TnyAccount *self)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyForgetPassFunc retval;
 
-	g_static_rec_mutex_lock (priv->service_lock);
 	retval = priv->forget_pass_func;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -546,9 +530,7 @@ _tny_camel_account_get_service (TnyCamelAccount *self)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const CamelService *retval;
 
-	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const CamelService *)priv->service;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }
@@ -559,9 +541,7 @@ _tny_camel_account_get_url_string (TnyCamelAccount *self)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
 
-	g_static_rec_mutex_lock (priv->service_lock);
 	retval = (const gchar*)priv->url_string;
-	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return retval;
 }

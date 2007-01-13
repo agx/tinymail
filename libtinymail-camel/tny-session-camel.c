@@ -197,7 +197,6 @@ tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, Tny
 			password_funcs = g_list_remove (password_funcs, mark_del->data);
 			mark_del = g_list_next (mark_del);
 		}
-
 		g_list_free (mark_del);
 	}
 
@@ -216,8 +215,9 @@ typedef struct
 	TnyAccount *account;
 } GetPassWaitResults;
 
-static gboolean
-get_pwd_idle_handler (gpointer data)
+
+static gpointer 
+get_pwd_thread (gpointer data)
 {
 	GetPassWaitResults *results = data;
 
@@ -227,13 +227,6 @@ get_pwd_idle_handler (gpointer data)
 
 	g_main_loop_quit (results->loop);
 
-	return FALSE;
-}
-
-static gpointer 
-get_pwd_thread (gpointer results)
-{
-	g_idle_add (get_pwd_idle_handler, results);
 	g_thread_exit (NULL);
 	return NULL;
 }
@@ -296,7 +289,6 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		results.loop = g_main_loop_new (NULL, TRUE);
 
 		thread = g_thread_create (get_pwd_thread, &results, TRUE, NULL);
-		g_thread_join (thread);
 
 		if (g_main_loop_is_running (results.loop))
 		{
@@ -304,8 +296,10 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 			g_main_loop_run (results.loop);
 			tny_lockable_lock (priv->ui_lock);
 		}
-
 		g_main_loop_unref (results.loop);
+
+		tny_lockable_unlock (priv->ui_lock);
+		tny_lockable_lock (priv->ui_lock);
 
 		retval = results.data;
 		cancel = results.cancel;
@@ -345,7 +339,6 @@ tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_lock)
 }
 
 
-
 typedef struct
 {
 	TnySessionCamel *self;
@@ -354,8 +347,9 @@ typedef struct
 	TnyAccount *account;
 } ForGetPassWaitResults;
 
-static gboolean
-forget_pwd_idle_handler (gpointer data)
+
+static gpointer 
+forget_pwd_thread (gpointer data)
 {
 	ForGetPassWaitResults *results = data;
 
@@ -365,13 +359,6 @@ forget_pwd_idle_handler (gpointer data)
 
 	g_main_loop_quit (results->loop);
 
-	return FALSE;
-}
-
-static gpointer 
-forget_pwd_thread (gpointer results)
-{
-	g_idle_add (forget_pwd_idle_handler, results);
 	g_thread_exit (NULL);
 	return NULL;
 }
@@ -410,20 +397,20 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		results.self = self;
 		results.account = account;
 		results.func = func;
-
 		results.loop = g_main_loop_new (NULL, TRUE);
 
 		thread = g_thread_create (forget_pwd_thread, &results, TRUE, NULL);
-		g_thread_join (thread);
-		
+
 		if (g_main_loop_is_running (results.loop))
 		{
 			tny_lockable_unlock (priv->ui_lock);
 			g_main_loop_run (results.loop);
 			tny_lockable_lock (priv->ui_lock);
 		}
-
 		g_main_loop_unref (results.loop);
+
+		tny_lockable_unlock (priv->ui_lock);
+		tny_lockable_lock (priv->ui_lock);
 
 		priv->in_auth_function = FALSE;
 	}
@@ -442,8 +429,9 @@ typedef struct
 	gboolean retval;
 } AlertWaitResults;
 
-static gboolean
-alert_idle_handler (gpointer data)
+
+static gpointer 
+alert_thread (gpointer data)
 {
 	AlertWaitResults *results = data;
 
@@ -455,13 +443,6 @@ alert_idle_handler (gpointer data)
 
 	g_main_loop_quit (results->loop);
 
-	return FALSE;
-}
-
-static gpointer 
-alert_thread (gpointer results)
-{
-	g_idle_add (alert_idle_handler, results);
 	g_thread_exit (NULL);
 	return NULL;
 }
@@ -508,7 +489,6 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 		results.loop = g_main_loop_new (NULL, TRUE);
 
 		thread = g_thread_create (alert_thread, &results, TRUE, NULL);
-		g_thread_join (thread);
 
 		if (g_main_loop_is_running (results.loop))
 		{
@@ -516,8 +496,10 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			g_main_loop_run (results.loop);
 			tny_lockable_lock (priv->ui_lock);
 		}
-
 		g_main_loop_unref (results.loop);
+
+		tny_lockable_unlock (priv->ui_lock);
+		tny_lockable_lock (priv->ui_lock);
 
 		priv->in_auth_function = FALSE;
 
