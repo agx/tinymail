@@ -298,6 +298,8 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		}
 		g_main_loop_unref (results.loop);
 
+		g_thread_join (thread);
+
 		tny_lockable_unlock (priv->ui_lock);
 		tny_lockable_lock (priv->ui_lock);
 
@@ -409,6 +411,8 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		}
 		g_main_loop_unref (results.loop);
 
+		g_thread_join (thread);
+
 		tny_lockable_unlock (priv->ui_lock);
 		tny_lockable_lock (priv->ui_lock);
 
@@ -497,6 +501,8 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			tny_lockable_lock (priv->ui_lock);
 		}
 		g_main_loop_unref (results.loop);
+
+		g_thread_join (thread);
 
 		tny_lockable_unlock (priv->ui_lock);
 		tny_lockable_lock (priv->ui_lock);
