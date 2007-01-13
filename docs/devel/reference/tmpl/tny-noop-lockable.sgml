@@ -1,36 +1,35 @@
 <!-- ##### SECTION Title ##### -->
-tny-camel-pop-store-account-priv
+TnyNoopLockable
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A do-nothing lockable
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyLockable implementation that, well, doesn't lock. One that, in other words, does nothing
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelPopStoreAccountPriv ##### -->
+<!-- ##### STRUCT TnyNoopLockable ##### -->
 <para>
 
 </para>
 
-@inbox: 
-@lock: 
-@delete_originals: 
 
-<!-- ##### MACRO TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE ##### -->
+<!-- ##### FUNCTION tny_noop_lockable_new ##### -->
 <para>
 
 </para>
 
-@o: 
+@Returns: 
 
 

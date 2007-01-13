@@ -48,6 +48,9 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @first_switch: 
 @connchanged_signal: 
 @current_accounts: 
+@camel_dir: 
+@in_auth_function: 
+@ui_lock: 
 
 <!-- ##### FUNCTION tny_session_camel_set_pass_func ##### -->
 <para>
@@ -85,5 +88,14 @@ develop against the #TnyAccountStore interface API using an instance of their im
 
 @self: 
 @device: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_ui_locker ##### -->
+<para>
+
+</para>
+
+@self: 
+@ui_lock: 
 
 

@@ -66,6 +66,14 @@ tny_gtk_lockable_instance_init (GTypeInstance *instance, gpointer g_class)
 	return;
 }
 
+/**
+ * tny_gtk_lockable_new:
+ *
+ * Create a #TnyLockable instance that uses gdk_threads_enter and gdk_threads_leave
+ * as lock and unlock implementations.
+ *
+ * Return value: a new #TnyLockable instance implemented for Gtk+
+ **/
 TnyLockable*
 tny_gtk_lockable_new (void)
 {

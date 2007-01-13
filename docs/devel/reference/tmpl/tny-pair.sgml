@@ -9,12 +9,10 @@ A type that has a name and a value property
 A type that has a name and a valye property. For example a single header line of a mime part
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyMimePart
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

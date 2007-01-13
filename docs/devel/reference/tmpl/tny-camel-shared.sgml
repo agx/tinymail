@@ -36,6 +36,9 @@ A few shared camel routines
 @first_switch: 
 @connchanged_signal: 
 @current_accounts: 
+@camel_dir: 
+@in_auth_function: 
+@ui_lock: 
 
 <!-- ##### STRUCT TnySessionCamelClass ##### -->
 <para>
@@ -43,9 +46,6 @@ A few shared camel routines
 </para>
 
 @parent_class: 
-@set_pass_func_func: 
-@set_forget_pass_func_func: 
-@set_account_store_func: 
 
 <!-- ##### FUNCTION tny_session_camel_new ##### -->
 <para>

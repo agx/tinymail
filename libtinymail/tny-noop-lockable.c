@@ -66,6 +66,11 @@ tny_noop_lockable_instance_init (GTypeInstance *instance, gpointer g_class)
 	return;
 }
 
+/**
+ * tny_noop_lockable_new:
+ *
+ * Return value: a #TnyLockable instance that does nothing
+ **/
 TnyLockable*
 tny_noop_lockable_new (void)
 {

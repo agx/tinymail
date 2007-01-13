@@ -477,20 +477,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -525,6 +525,34 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 
 <!-- ##### STRUCT TnyPairClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyLockable ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyLockableIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@lock_func: 
+@unlock_func: 
+
+<!-- ##### STRUCT TnyNoopLockable ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyNoopLockableClass ##### -->
 <para>
 
 </para>

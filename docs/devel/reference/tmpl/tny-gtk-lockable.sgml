@@ -1,36 +1,35 @@
 <!-- ##### SECTION Title ##### -->
-tny-camel-pop-store-account-priv
+TnyGtkLockable
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A lockable for Gdk-Threads
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyLockable implementation that uses gdk_threads_enter and gdk_threads_leave to implement the lock and unlock operations
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelPopStoreAccountPriv ##### -->
+<!-- ##### STRUCT TnyGtkLockable ##### -->
 <para>
 
 </para>
 
-@inbox: 
-@lock: 
-@delete_originals: 
 
-<!-- ##### MACRO TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE ##### -->
+<!-- ##### FUNCTION tny_gtk_lockable_new ##### -->
 <para>
 
 </para>
 
-@o: 
+@Returns: 
 
 

@@ -5,6 +5,7 @@
 	* Ui locking in TnySessionCamel
 	* Async authentication in TnySessionCamel
 	* Async alerts in TnySessionCamel
+	* Updated API documentation
 
 	* This was a major API change
 

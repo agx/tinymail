@@ -42,6 +42,7 @@ tny-camel-account-priv
 @inuse_spin: 
 @name: 
 @options: 
+@cache_location: 
 @account_type: 
 
 <!-- ##### MACRO TNY_CAMEL_ACCOUNT_GET_PRIVATE ##### -->

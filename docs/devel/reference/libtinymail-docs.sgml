@@ -23,6 +23,8 @@
 <!ENTITY libtinymail-TnyMsgReceiveStrategy SYSTEM "xml/tny-msg-receive-strategy.xml">
 <!ENTITY libtinymail-TnySendQueue SYSTEM "xml/tny-send-queue.xml">
 <!ENTITY libtinymail-TnyPair SYSTEM "xml/tny-pair.xml">
+<!ENTITY libtinymail-TnyLockable SYSTEM "xml/tny-lockable.xml">
+<!ENTITY libtinymail-TnyNoopLockable SYSTEM "xml/tny-noop-lockable.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
 
 
@@ -62,6 +64,7 @@
 <!ENTITY libtinymailui-gtk-TnyGtkMsgWindow SYSTEM "xml/tny-gtk-msg-window.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkMimePartSaveStrategy SYSTEM "xml/tny-gtk-mime-part-save-strategy.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkTextMimePartView SYSTEM "xml/tny-gtk-text-mime-part-view.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkLockable SYSTEM "xml/tny-gtk-lockable.xml">
 
 <!ENTITY libtinymailui-TnyMimePartSaver SYSTEM "xml/tny-mime-part-saver.xml">
 <!ENTITY libtinymailui-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
@@ -133,6 +136,8 @@
 		&libtinymail-TnyIterator;
 		&libtinymail-TnySimpleList;
 		&libtinymail-TnyPair;
+		&libtinymail-TnyLockable;
+		&libtinymail-TnyNoopLockable;
 		&libtinymail-TnyEnums;
 		&libtinymail-TnyShared;
 	</chapter>
@@ -164,6 +169,7 @@
 		&libtinymailui-gtk-TnyGtkMimePartSaveStrategy;
 		&libtinymailui-gtk-TnyGtkTextMimePartView;
 		&libtinymailui-gtk-TnyGtkAttachmentMimePartView;
+		&libtinymailui-gtk-TnyGtkLockable;
 		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 
