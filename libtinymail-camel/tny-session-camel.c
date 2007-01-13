@@ -297,12 +297,12 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 
 		thread = g_thread_create (get_pwd_thread, &results, TRUE, NULL);
 		g_thread_join (thread);
-		
+
 		if (g_main_loop_is_running (results.loop))
 		{
-				tny_lockable_unlock (priv->ui_lock);
-				g_main_loop_run (results.loop);
-				tny_lockable_lock (priv->ui_lock);
+			tny_lockable_unlock (priv->ui_lock);
+			g_main_loop_run (results.loop);
+			tny_lockable_lock (priv->ui_lock);
 		}
 
 		g_main_loop_unref (results.loop);
@@ -418,9 +418,9 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		
 		if (g_main_loop_is_running (results.loop))
 		{
-				tny_lockable_unlock (priv->ui_lock);
-				g_main_loop_run (results.loop);
-				tny_lockable_lock (priv->ui_lock);
+			tny_lockable_unlock (priv->ui_lock);
+			g_main_loop_run (results.loop);
+			tny_lockable_lock (priv->ui_lock);
 		}
 
 		g_main_loop_unref (results.loop);
@@ -509,13 +509,14 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 
 		thread = g_thread_create (alert_thread, &results, TRUE, NULL);
 		g_thread_join (thread);
-		
+
 		if (g_main_loop_is_running (results.loop))
-		{					
-				tny_lockable_unlock (priv->ui_lock);
-				g_main_loop_run (results.loop);
-				tny_lockable_lock (priv->ui_lock);
+		{
+			tny_lockable_unlock (priv->ui_lock);
+			g_main_loop_run (results.loop);
+			tny_lockable_lock (priv->ui_lock);
 		}
+
 		g_main_loop_unref (results.loop);
 
 		priv->in_auth_function = FALSE;
@@ -562,7 +563,7 @@ mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, 
 			else
 				name = "";
 		}
-		
+
 		if (offset) 
 		{
 			if (offset == 7)
@@ -575,10 +576,10 @@ mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, 
 			folder = (CamelFolder*)camel_store_get_folder (store, name, flags, ex);
 		camel_object_unref (store);
 	}
-	
+
 	camel_url_free (url);
 	g_free(curi);
-	
+
 	return folder;
 }
 
@@ -785,7 +786,9 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 	info->user_data = user_data;
 
 	camel_session_set_online ((CamelSession *) self, online); 
-	/* g_thread_create (background_connect_thread, info, FALSE, NULL); */
+
+	/* TODO: This makes a mainloop (above) take over in the new thread 
+	g_thread_create (background_connect_thread, info, FALSE, NULL); */
 
 	background_connect_thread (info);
 
