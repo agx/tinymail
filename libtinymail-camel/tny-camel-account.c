@@ -623,9 +623,9 @@ tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean off
 	if (!priv->service)
 		return;
 
-	_tny_camel_account_start_camel_operation (self, NULL, NULL, NULL);
+	/* _tny_camel_account_start_camel_operation (self, NULL, NULL, NULL); */
 
-	g_static_rec_mutex_lock (priv->service_lock);
+	/* g_static_rec_mutex_lock (priv->service_lock); */
 
 	if (offline)
 		camel_service_cancel_connect (priv->service);
@@ -661,10 +661,12 @@ tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean off
 	if (offline)
 		camel_service_disconnect (CAMEL_SERVICE (priv->service),
 								  TRUE, priv->ex);
-	done:
-		g_static_rec_mutex_unlock (priv->service_lock);
-		_tny_camel_account_stop_camel_operation (self);
-	
+
+done:
+		/* g_static_rec_mutex_unlock (priv->service_lock); */
+		/* _tny_camel_account_stop_camel_operation (self); */
+
+	return;
 }
 
 
