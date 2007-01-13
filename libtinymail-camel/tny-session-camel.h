@@ -33,18 +33,12 @@ G_BEGIN_DECLS
 #define TNY_SESSION_CAMEL_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_TYPE_SESSION_CAMEL, TnySessionCamelClass))
 #define TNY_IS_SESSION_CAMEL(o)    (CAMEL_CHECK_TYPE((o), TNY_TYPE_SESSION_CAMEL))
 
+typedef struct _TnySessionCamelPriv TnySessionCamelPriv;
+
 struct _TnySessionCamel
 {
 	CamelSession parent_object;
-
-	gpointer device;
-	gpointer account_store;
-	gboolean interactive, prev_constat, first_switch;
-	guint connchanged_signal;
-	GList *current_accounts;
-	gchar *camel_dir;
-	gboolean in_auth_function;
-	TnyLockable *ui_lock;
+	TnySessionCamelPriv *priv;
 };
 
 struct _TnySessionCamelClass
@@ -58,7 +52,6 @@ void tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account
 void tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc get_forget_pass_func);
 void tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store);
 void tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device);
-
 void tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_lock);
 
 G_END_DECLS

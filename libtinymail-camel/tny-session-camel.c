@@ -221,9 +221,9 @@ get_pwd_idle_handler (gpointer data)
 {
 	GetPassWaitResults *results = data;
 
-	tny_lockable_lock (results->self->ui_lock);
+	tny_lockable_lock (results->self->priv->ui_lock);
 	results->data = results->func (results->account, results->prompt, &results->cancel);
-	tny_lockable_unlock (results->self->ui_lock);
+	tny_lockable_unlock (results->self->priv->ui_lock);
 
 	g_main_loop_quit (results->loop);
 
@@ -241,9 +241,10 @@ get_pwd_thread (gpointer results)
 
 static char *
 tny_session_camel_get_password (CamelSession *session, CamelService *service, const char *domain,
-	      const char *prompt, const char *item, guint32 flags, CamelException *ex)
+		const char *prompt, const char *item, guint32 flags, CamelException *ex)
 {
 	TnySessionCamel *self = (TnySessionCamel *) session;
+	TnySessionCamelPriv *priv = self->priv;
 
 	GList *copy = password_funcs;
 	TnyGetPassFunc func;
@@ -283,8 +284,8 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_session_camel_forget_password (session, service, domain, item, ex);
 		}
 
-		self->in_auth_function = TRUE;
-	
+		priv->in_auth_function = TRUE;
+
 		results.self = self;
 		results.account = account;
 		results.prompt = prmpt;
@@ -299,9 +300,9 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		
 		if (g_main_loop_is_running (results.loop))
 		{
-				tny_lockable_unlock (self->ui_lock);
+				tny_lockable_unlock (priv->ui_lock);
 				g_main_loop_run (results.loop);
-				tny_lockable_lock (self->ui_lock);
+				tny_lockable_lock (priv->ui_lock);
 		}
 
 		g_main_loop_unref (results.loop);
@@ -309,7 +310,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		retval = results.data;
 		cancel = results.cancel;
 
-		self->in_auth_function = FALSE;
+		priv->in_auth_function = FALSE;
 
 		if (freeprmpt)
 			g_free (prmpt);
@@ -336,9 +337,11 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 void 
 tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_lock)
 {
-	if (self->ui_lock)
-		g_object_unref (G_OBJECT (self->ui_lock));
-	self->ui_lock = TNY_LOCKABLE (g_object_ref (ui_lock));
+	TnySessionCamelPriv *priv = self->priv;
+	if (priv->ui_lock)
+		g_object_unref (G_OBJECT (priv->ui_lock));
+	priv->ui_lock = TNY_LOCKABLE (g_object_ref (ui_lock));
+	return;
 }
 
 
@@ -356,9 +359,9 @@ forget_pwd_idle_handler (gpointer data)
 {
 	ForGetPassWaitResults *results = data;
 
-	tny_lockable_lock (results->self->ui_lock);
+	tny_lockable_lock (results->self->priv->ui_lock);
 	results->func (results->account);
-	tny_lockable_unlock (results->self->ui_lock);
+	tny_lockable_unlock (results->self->priv->ui_lock);
 
 	g_main_loop_quit (results->loop);
 
@@ -377,6 +380,7 @@ static void
 tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
+	TnySessionCamelPriv *priv = self->priv;
 
 	GList *copy = forget_password_funcs;
 	TnyForgetPassFunc func;
@@ -401,8 +405,8 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 
 	if (G_LIKELY (found))
 	{
-		self->in_auth_function = TRUE;
-	
+		priv->in_auth_function = TRUE;
+
 		results.self = self;
 		results.account = account;
 		results.func = func;
@@ -414,14 +418,14 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		
 		if (g_main_loop_is_running (results.loop))
 		{
-				tny_lockable_unlock (self->ui_lock);
+				tny_lockable_unlock (priv->ui_lock);
 				g_main_loop_run (results.loop);
-				tny_lockable_lock (self->ui_lock);
+				tny_lockable_lock (priv->ui_lock);
 		}
 
 		g_main_loop_unref (results.loop);
 
-		self->in_auth_function = FALSE;
+		priv->in_auth_function = FALSE;
 	}
 
 	return;
@@ -443,11 +447,11 @@ alert_idle_handler (gpointer data)
 {
 	AlertWaitResults *results = data;
 
-	tny_lockable_lock (results->self->ui_lock);
+	tny_lockable_lock (results->self->priv->ui_lock);
 	results->retval = tny_account_store_alert (
-		(TnyAccountStore*)results->self->account_store, 
+		(TnyAccountStore*)results->self->priv->account_store, 
 		results->tnytype, (const gchar *) results->prompt);
-	tny_lockable_unlock (results->self->ui_lock);
+	tny_lockable_unlock (results->self->priv->ui_lock);
 
 	g_main_loop_quit (results->loop);
 
@@ -472,11 +476,12 @@ static gboolean
 tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *prompt, gboolean cancel)
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
+	TnySessionCamelPriv *priv = self->priv;
 	GThread *thread;
 
-	if (self->account_store)
+	if (priv->account_store)
 	{
-		TnyAccountStore *account_store = (TnyAccountStore*)self->account_store;
+		TnyAccountStore *account_store = (TnyAccountStore*) priv->account_store;
 		TnyAlertType tnytype;
 		AlertWaitResults results;
 
@@ -494,13 +499,12 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
-		self->in_auth_function = TRUE;
-	
+		priv->in_auth_function = TRUE;
+
 		results.self = self;
 		results.tnytype = tnytype;
 		results.prompt = g_strdup (prompt);
 		results.retval = FALSE;
-
 		results.loop = g_main_loop_new (NULL, TRUE);
 
 		thread = g_thread_create (alert_thread, &results, TRUE, NULL);
@@ -508,13 +512,13 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 		
 		if (g_main_loop_is_running (results.loop))
 		{					
-				tny_lockable_unlock (self->ui_lock);
+				tny_lockable_unlock (priv->ui_lock);
 				g_main_loop_run (results.loop);
-				tny_lockable_lock (self->ui_lock);
+				tny_lockable_lock (priv->ui_lock);
 		}
 		g_main_loop_unref (results.loop);
 
-		self->in_auth_function = FALSE;
+		priv->in_auth_function = FALSE;
 
 		g_free (results.prompt);
 
@@ -591,7 +595,6 @@ tny_session_camel_get_filter_driver (CamelSession *session, const char *type, Ca
 {
 	CamelFilterDriver *driver = camel_filter_driver_new (session);
 	camel_filter_driver_set_folder_func (driver, get_folder, session);
-
 	return driver; 
 }
 
@@ -634,7 +637,6 @@ static void
 tny_session_camel_ms_thread_msg_free (CamelSession *session, CamelSessionThreadMsg *m)
 {
 	ms_parent_class->thread_msg_free(session, m);
-	
 	return;
 }
 
@@ -648,13 +650,16 @@ tny_session_camel_ms_thread_status (CamelSession *session, CamelSessionThreadMsg
 static void
 tny_session_camel_init (TnySessionCamel *instance)
 {
-	/* Avoid the first question in connection_changed */
-	instance->prev_constat = FALSE;
-	instance->device = NULL;
-	instance->camel_dir = NULL;
-	instance->ui_lock = tny_noop_lockable_new ();
-	instance->camel_dir = NULL;
-	instance->in_auth_function = FALSE;
+	TnySessionCamelPriv *priv;
+	instance->priv = g_slice_new (TnySessionCamelPriv);
+	priv = instance->priv;
+
+	priv->prev_constat = FALSE;
+	priv->device = NULL;
+	priv->camel_dir = NULL;
+	priv->ui_lock = tny_noop_lockable_new ();
+	priv->camel_dir = NULL;
+	priv->in_auth_function = FALSE;
 
 	return;
 }
@@ -663,24 +668,32 @@ void
 _tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+	TnySessionCamelPriv *priv = self->priv;
 
 	if (apriv->cache_location)
 		g_free (apriv->cache_location);
-	apriv->cache_location = g_strdup (self->camel_dir);
+	apriv->cache_location = g_strdup (priv->camel_dir);
 
-	self->current_accounts = g_list_prepend (self->current_accounts, account);
+	priv->current_accounts = g_list_prepend (priv->current_accounts, account);
+
+	/* TODO: Register forget and get passwords here maybe? */
 }
 
 void 
 _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+	TnySessionCamelPriv *priv = self->priv;
 
 	if (apriv->cache_location)
 		g_free (apriv->cache_location);
 	apriv->cache_location = NULL;
 
-	self->current_accounts = g_list_remove (self->current_accounts, account);
+	priv->current_accounts = g_list_remove (priv->current_accounts, account);
+
+	/* TODO: forget and get pass funcs cleanup */
+
+	return;
 }
 
 static void
@@ -695,25 +708,26 @@ static void
 connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 {
 	TnySessionCamel *self = user_data;
-	
-	if (self->in_auth_function)
+	TnySessionCamelPriv *priv = self->priv;
+
+	if (priv->in_auth_function)
 		return;
 
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	if (self->current_accounts && !self->first_switch && self->prev_constat != online 
-		&& self->account_store)
+	if (priv->current_accounts && !priv->first_switch && priv->prev_constat != online 
+		&& priv->account_store)
 	{
-		g_list_foreach (self->current_accounts, 
+		g_list_foreach (priv->current_accounts, 
 			foreach_account_set_connectivity, (gpointer) online);
 	}
 
-	if (self->account_store && !self->first_switch)
-		g_signal_emit (self->account_store, 
+	if (priv->account_store && !priv->first_switch)
+		g_signal_emit (priv->account_store, 
 			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
 
-	self->first_switch = FALSE;
-	self->prev_constat = online;
+	priv->first_switch = FALSE;
+	priv->prev_constat = online;
 
 	return;
 }
@@ -728,17 +742,19 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 void 
 tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 {
+	TnySessionCamelPriv *priv = self->priv;
 
-	if (self->device && g_signal_handler_is_connected (G_OBJECT (self->device), self->connchanged_signal))
+	if (priv->device && g_signal_handler_is_connected (G_OBJECT (priv->device), 
+		priv->connchanged_signal))
 	{
 		g_signal_handler_disconnect (G_OBJECT (device), 
-			self->connchanged_signal);
+			priv->connchanged_signal);
 	}
 
-	self->device = device;
-	self->connchanged_signal = 
-		g_signal_connect (G_OBJECT (device), "connection_changed",
-			G_CALLBACK (connection_changed), self);	
+	priv->device = device;
+	priv->connchanged_signal = g_signal_connect (
+			G_OBJECT (device), "connection_changed",
+			G_CALLBACK (connection_changed), self);
 
 	return;
 }
@@ -757,14 +773,15 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	TnyDevice *device = (TnyDevice*)tny_account_store_get_device (account_store);
 	gchar *base_directory = NULL;
 	gchar *camel_dir = NULL;
+	TnySessionCamelPriv *priv = self->priv;
 
-	self->account_store = (gpointer)account_store;    
-    base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
-    
+	priv->account_store = (gpointer)account_store;    
+	base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
+
 	if (camel_init (base_directory, TRUE) != 0)
 	{
 		g_error (_("Critical ERROR: Cannot init %s as camel directory\n"), base_directory);
-	    	g_object_unref (G_OBJECT (device));
+		g_object_unref (G_OBJECT (device));
 		exit (1);
 	}
 
@@ -773,17 +790,13 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	camel_session_construct (session, camel_dir);
 
 	/* Avoid the first question in connection_changed */
-	self->first_switch = tny_device_is_online (device);
-
+	priv->first_switch = tny_device_is_online (device);
 	camel_session_set_online ((CamelSession *) session, 
-		self->first_switch); 
-
-	self->camel_dir = camel_dir;
+		priv->first_switch); 
+	priv->camel_dir = camel_dir;
 	g_free (base_directory);
-
 	tny_session_camel_set_device (self, device);
-    
-    g_object_unref (G_OBJECT (device));
+	g_object_unref (G_OBJECT (device));
 
 	return;
 }
@@ -813,21 +826,23 @@ static void
 tny_session_camel_finalise (CamelObject *object)
 {
 	TnySessionCamel *self = (TnySessionCamel*)object;
+	TnySessionCamelPriv *priv = self->priv;
 
-	if (self->device && g_signal_handler_is_connected (G_OBJECT (self->device), self->connchanged_signal))
+	if (priv->device && g_signal_handler_is_connected (G_OBJECT (priv->device), priv->connchanged_signal))
 	{
-		g_signal_handler_disconnect (G_OBJECT (self->device), 
-			self->connchanged_signal);
+		g_signal_handler_disconnect (G_OBJECT (priv->device), 
+			priv->connchanged_signal);
 	}
 
-	if (self->ui_lock)
-		g_object_unref (G_OBJECT (self->ui_lock));
+	if (priv->ui_lock)
+		g_object_unref (G_OBJECT (priv->ui_lock));
 
-	if (self->camel_dir)
-		g_free (self->camel_dir);
+	if (priv->camel_dir)
+		g_free (priv->camel_dir);
 
-	/* CamelObject types don't need parent finalization (build-in camel)
-	(*((CamelObjectClass*)ms_parent_class)->finalise) (object); */
+	g_slice_free (TnySessionCamelPriv, self->priv);
+
+	/* CamelObject types don't need parent finalization (build-in camel) */
 
 	return;
 }
@@ -836,12 +851,11 @@ static void
 tny_session_camel_class_init (TnySessionCamelClass *tny_session_camel_class)
 {
 	CamelSessionClass *camel_session_class = CAMEL_SESSION_CLASS (tny_session_camel_class);
-	
+
 	camel_session_class->get_password = tny_session_camel_get_password;
 	camel_session_class->forget_password = tny_session_camel_forget_password;
 	camel_session_class->alert_user = tny_session_camel_alert_user;
 	camel_session_class->get_filter_driver = tny_session_camel_get_filter_driver;
-
 	camel_session_class->thread_msg_new = tny_session_camel_ms_thread_msg_new;
 	camel_session_class->thread_msg_free = tny_session_camel_ms_thread_msg_free;
 	camel_session_class->thread_status = tny_session_camel_ms_thread_status;
@@ -853,12 +867,11 @@ CamelType
 tny_session_camel_get_type (void)
 {
 	static CamelType tny_session_camel_type = CAMEL_INVALID_TYPE;
-	
+
 	if (G_UNLIKELY (!camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
-
 		camel_type_init ();
 		camel_type_init_done = TRUE;
 	}
@@ -876,6 +889,6 @@ tny_session_camel_get_type (void)
 			(CamelObjectInitFunc) tny_session_camel_init,
 			(CamelObjectFinalizeFunc) tny_session_camel_finalise);
 	}
-	
+
 	return tny_session_camel_type;
 }
