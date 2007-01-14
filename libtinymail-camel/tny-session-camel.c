@@ -20,6 +20,7 @@
 #include <config.h>
 #include <glib/gi18n-lib.h>
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -221,6 +222,9 @@ get_pwd_thread (gpointer data)
 {
 	GetPassWaitResults *results = data;
 
+	while (!(g_main_loop_is_running (results->loop)))
+		usleep (100);
+
 	tny_lockable_lock (results->self->priv->ui_lock);
 	results->data = results->func (results->account, results->prompt, &results->cancel);
 	tny_lockable_unlock (results->self->priv->ui_lock);
@@ -286,19 +290,18 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		results.cancel = FALSE;
 		results.func = func;
 
-		results.loop = g_main_loop_new (NULL, TRUE);
+		results.loop = g_main_loop_new (NULL, FALSE);
 
 		thread = g_thread_create (get_pwd_thread, &results, TRUE, NULL);
 
-		if (g_main_loop_is_running (results.loop))
-		{
-			tny_lockable_unlock (priv->ui_lock);
-			g_main_loop_run (results.loop);
-			tny_lockable_lock (priv->ui_lock);
-		}
+		tny_lockable_unlock (priv->ui_lock);
+		g_main_loop_run (results.loop);
+		tny_lockable_lock (priv->ui_lock);
+
 		g_main_loop_unref (results.loop);
 
 		g_thread_join (thread);
+
 
 		tny_lockable_unlock (priv->ui_lock);
 		tny_lockable_lock (priv->ui_lock);
@@ -355,6 +358,9 @@ forget_pwd_thread (gpointer data)
 {
 	ForGetPassWaitResults *results = data;
 
+	while (!(g_main_loop_is_running (results->loop)))
+		usleep (100);
+
 	tny_lockable_lock (results->self->priv->ui_lock);
 	results->func (results->account);
 	tny_lockable_unlock (results->self->priv->ui_lock);
@@ -399,22 +405,17 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		results.self = self;
 		results.account = account;
 		results.func = func;
-		results.loop = g_main_loop_new (NULL, TRUE);
+		results.loop = g_main_loop_new (NULL, FALSE);
 
 		thread = g_thread_create (forget_pwd_thread, &results, TRUE, NULL);
 
-		if (g_main_loop_is_running (results.loop))
-		{
-			tny_lockable_unlock (priv->ui_lock);
-			g_main_loop_run (results.loop);
-			tny_lockable_lock (priv->ui_lock);
-		}
+		tny_lockable_unlock (priv->ui_lock);
+		g_main_loop_run (results.loop);
+		tny_lockable_lock (priv->ui_lock);
+
 		g_main_loop_unref (results.loop);
 
 		g_thread_join (thread);
-
-		tny_lockable_unlock (priv->ui_lock);
-		tny_lockable_lock (priv->ui_lock);
 
 		priv->in_auth_function = FALSE;
 	}
@@ -438,6 +439,9 @@ static gpointer
 alert_thread (gpointer data)
 {
 	AlertWaitResults *results = data;
+
+	while (!(g_main_loop_is_running (results->loop)))
+		usleep (100);
 
 	tny_lockable_lock (results->self->priv->ui_lock);
 	results->retval = tny_account_store_alert (
@@ -490,22 +494,17 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 		results.tnytype = tnytype;
 		results.prompt = g_strdup (prompt);
 		results.retval = FALSE;
-		results.loop = g_main_loop_new (NULL, TRUE);
+		results.loop = g_main_loop_new (NULL, FALSE);
 
 		thread = g_thread_create (alert_thread, &results, TRUE, NULL);
 
-		if (g_main_loop_is_running (results.loop))
-		{
-			tny_lockable_unlock (priv->ui_lock);
-			g_main_loop_run (results.loop);
-			tny_lockable_lock (priv->ui_lock);
-		}
+		tny_lockable_unlock (priv->ui_lock);
+		g_main_loop_run (results.loop);
+		tny_lockable_lock (priv->ui_lock);
+
 		g_main_loop_unref (results.loop);
 
 		g_thread_join (thread);
-
-		tny_lockable_unlock (priv->ui_lock);
-		tny_lockable_lock (priv->ui_lock);
 
 		priv->in_auth_function = FALSE;
 
