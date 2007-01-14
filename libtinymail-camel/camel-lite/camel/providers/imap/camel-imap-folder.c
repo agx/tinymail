@@ -243,6 +243,10 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 	}
 
 	folder = CAMEL_FOLDER (camel_object_new (camel_imap_folder_get_type ()));
+	imap_folder = CAMEL_IMAP_FOLDER (folder);
+
+	imap_folder->folder_dir = g_strdup (folder_dir);
+
 	short_name = strrchr (folder_name, '/');
 	if (short_name)
 		short_name++;
@@ -267,12 +271,13 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 	g_free(state_file);
 	camel_object_state_read(folder);
 
-	imap_folder = CAMEL_IMAP_FOLDER (folder);
 	imap_folder->cache = camel_imap_message_cache_new (folder_dir, folder->summary, ex);
+
 	if (!imap_folder->cache) {
 		camel_object_unref (CAMEL_OBJECT (folder));
 		return NULL;
 	}
+
 
 	if (!g_ascii_strcasecmp (folder_name, "INBOX")) {
 		if ((imap_store->parameters & IMAP_PARAM_FILTER_INBOX))
@@ -428,6 +433,9 @@ imap_finalize (CamelObject *object)
 		camel_object_unref (CAMEL_OBJECT (imap_folder->search));
 	if (imap_folder->cache)
 		camel_object_unref (CAMEL_OBJECT (imap_folder->cache));
+
+	if (imap_folder->folder_dir)
+		g_free (imap_folder->folder_dir);
 
 #ifdef ENABLE_THREADS
 	g_static_mutex_free(&imap_folder->priv->search_lock);

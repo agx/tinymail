@@ -226,6 +226,32 @@ data_cache_expire(CamelDataCache *cdc, const char *path, const char *keep, time_
 	g_dir_close(dir);
 }
 
+
+void 
+camel_data_cache_set_flags (CamelDataCache *cdc, const char *path, CamelMessageInfoBase *mi)
+{
+	char mystring [512];
+	gchar *mpath; char *dir;
+	guint32 hash;
+	hash = g_str_hash(mi->uid);
+	hash = (hash>>5)&CAMEL_DATA_CACHE_MASK;
+
+	snprintf (mystring, 512, "%s/%s/%02x/%s", cdc->path, path, hash, mi->uid);
+
+	if (g_file_test (mystring, G_FILE_TEST_IS_REGULAR))
+	{
+		mi->flags |= CAMEL_MESSAGE_CACHED;
+		snprintf (mystring, 512, "%s/%s/%02x/%s.ispartial", cdc->path, path, hash, mi->uid);
+		if (g_file_test (mystring, G_FILE_TEST_IS_REGULAR))
+			mi->flags |= CAMEL_MESSAGE_PARTIAL;
+		else
+			mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
+	} else {
+		mi->flags &= ~CAMEL_MESSAGE_CACHED;
+		mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
+	}
+}
+
 gboolean
 camel_data_cache_is_partial (CamelDataCache *cdc, const char *path,
 					      const char *uid)

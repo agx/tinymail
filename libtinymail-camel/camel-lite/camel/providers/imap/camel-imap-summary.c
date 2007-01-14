@@ -34,6 +34,7 @@
 #include "camel-imap-summary.h"
 #include "camel-imap-utils.h"
 #include "camel-file-utils.h"
+#include "camel-imap-folder.h"
 
 #define CAMEL_IMAP_SUMMARY_VERSION (3)
 
@@ -107,10 +108,18 @@ camel_imap_summary_class_init (CamelImapSummaryClass *klass)
 }
 
 static void
+camel_imap_summary_set_extra_flags (CamelFolder *folder, CamelMessageInfoBase *mi)
+{
+	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+	camel_imap_message_cache_set_flags (imap_folder->folder_dir, mi);
+}
+
+static void
 camel_imap_summary_init (CamelImapSummary *obj)
 {
 	CamelFolderSummary *s = (CamelFolderSummary *)obj;
 
+	s->set_extra_flags_func = camel_imap_summary_set_extra_flags;
 	/* subclasses need to set the right instance data sizes */
 	s->message_info_size = sizeof(CamelImapMessageInfo);
 	s->content_info_size = sizeof(CamelImapMessageContentInfo);

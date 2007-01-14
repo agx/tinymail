@@ -131,6 +131,8 @@ messages_uid_destroy_key (gpointer key)
 	g_free (key);
 }
 
+static void do_nothing (CamelFolder *folder, CamelMessageInfoBase *mi) { }
+ 
 static void
 camel_folder_summary_init (CamelFolderSummary *s)
 {
@@ -142,6 +144,7 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	s->dump_lock = g_mutex_new ();
 	s->message_info_size = sizeof(CamelMessageInfoBase);
 	s->content_info_size = sizeof(CamelMessageContentInfo);
+	s->set_extra_flags_func = do_nothing;
 
 #if defined (DOESTRV) || defined (DOEPOOLV)
 	s->message_info_strings = CAMEL_MESSAGE_INFO_LAST;
@@ -1954,8 +1957,10 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
-	if (uidmf)
+	if (uidmf) /* TNY TODO: Is this correct? Please debug and check */
 		mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+
+	s->set_extra_flags_func (s->folder, mi);
 
 #ifdef NON_TINYMAIL_FEATURES
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);

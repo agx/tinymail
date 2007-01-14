@@ -328,7 +328,24 @@ camel_imap_message_cache_insert (CamelImapMessageCache *cache, const char *uid,
 	return insert_finish (cache, uid, path, key, stream);
 }
 
-
+void
+camel_imap_message_cache_set_flags (const gchar *folder_dir, CamelMessageInfoBase *mi)
+{
+	char mystring [512];
+	snprintf (mystring, 512, "%s/%s.", folder_dir, mi->uid);
+	if (g_file_test (mystring, G_FILE_TEST_IS_REGULAR))
+	{
+		mi->flags |= CAMEL_MESSAGE_CACHED;
+		snprintf (mystring, 512, "%s/%s.partial", folder_dir, mi->uid);
+		if (g_file_test (mystring, G_FILE_TEST_IS_REGULAR))
+			mi->flags |= CAMEL_MESSAGE_PARTIAL;
+		else
+			mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
+	} else {
+		mi->flags &= ~CAMEL_MESSAGE_CACHED;
+		mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
+	}
+}
 
 gboolean
 camel_imap_message_cache_is_partial (CamelImapMessageCache *cache, const char *uid)

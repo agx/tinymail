@@ -33,6 +33,7 @@ extern "C" {
 
 #include <camel/camel-stream.h>
 #include <camel/camel-exception.h>
+#include <camel/camel-folder-summary.h>
 
 #define CAMEL_DATA_CACHE_TYPE     (camel_data_cache_get_type ())
 #define CAMEL_DATA_CACHE(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_DATA_CACHE_TYPE, CamelFolder))
@@ -94,6 +95,8 @@ gboolean     camel_data_cache_is_partial (CamelDataCache *cache, const char *pat
 
 void         camel_data_cache_set_partial (CamelDataCache *cache, const char *path,
 					      const char *uid, gboolean partial);
+
+void camel_data_cache_set_flags (CamelDataCache *cdc, const char *path, CamelMessageInfoBase *mi);
 
 /* Standard Camel function */
 CamelType camel_data_cache_get_type (void);

@@ -121,6 +121,8 @@ Enumerations for tinymail
 @TNY_HEADER_FLAG_ANSWERED_ALL: Unknown
 @TNY_HEADER_FLAG_JUNK: This message is detected as junk mail
 @TNY_HEADER_FLAG_SECURE: Unknown
+@TNY_HEADER_FLAG_CACHED: The message is cached
+@TNY_HEADER_FLAG_PARTIAL: The message is retrieved partially 
 @TNY_HEADER_FLAG_FOLDER_FLAGGED: Unknown
 @TNY_HEADER_FLAG_JUNK_LEARN: This message is flagged to be junk-learned
 @TNY_HEADER_FLAG_USER: Unknown

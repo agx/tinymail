@@ -121,6 +121,13 @@ pop3_finalize (CamelObject *object)
 	}
 }
 
+static void
+camel_pop3_summary_set_extra_flags (CamelFolder *folder, CamelMessageInfoBase *mi)
+{
+	CamelPOP3Store *pop3_store = (CamelPOP3Store *)folder->parent_store;
+	camel_data_cache_set_flags (pop3_store->cache, "cache", mi);
+}
+
 CamelFolder *
 camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 {
@@ -132,9 +139,10 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 	
 	folder = CAMEL_FOLDER (camel_object_new (CAMEL_POP3_FOLDER_TYPE));
 	camel_folder_construct (folder, parent, "inbox", "inbox");
-	
+
 	summary_file = g_strdup_printf ("%s/summary.mmap", p3store->root);
 	folder->summary = camel_folder_summary_new (folder);
+	folder->summary->set_extra_flags_func = camel_pop3_summary_set_extra_flags;
 	camel_folder_summary_set_build_content (folder->summary, TRUE);
 	camel_folder_summary_set_filename (folder->summary, summary_file);
 
@@ -321,6 +329,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		} else
 			camel_message_info_free (mi);
 	}
+
+	camel_folder_summary_save (folder->summary);
 
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) {
 		camel_pop3_engine_command_free(pop3_store->engine, pcu);

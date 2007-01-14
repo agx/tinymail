@@ -1165,7 +1165,7 @@ imap_forget_folder (CamelImapStore *imap_store, const char *folder_name, CamelEx
 	cache = camel_imap_message_cache_new (folder_dir, summary, ex);
 	if (cache)
 		camel_imap_message_cache_clear (cache);
-	
+
 	camel_object_unref (cache);
 	camel_object_unref (summary);
 	

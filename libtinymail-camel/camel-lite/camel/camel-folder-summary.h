@@ -79,7 +79,9 @@ typedef enum _CamelMessageFlags {
 	CAMEL_MESSAGE_JUNK = 1<<7,
 	CAMEL_MESSAGE_SECURE = 1<<8,
 	CAMEL_MESSAGE_FREED = 1<<9,
-	
+
+	CAMEL_MESSAGE_CACHED = 1<<10,
+	CAMEL_MESSAGE_PARTIAL = 1<<11,
 
 	/* following flags are for the folder, and are not really permanent flags */
 	CAMEL_MESSAGE_FOLDER_FLAGGED = 1<<16, /* for use by the folder implementation */
@@ -213,6 +215,7 @@ typedef enum _CamelFolderSummaryFlags {
 	CAMEL_SUMMARY_DIRTY = 1<<0,
 } CamelFolderSummaryFlags;
 
+
 struct _CamelFolderSummary {
 	CamelObject parent;
 
@@ -245,6 +248,8 @@ struct _CamelFolderSummary {
 	unsigned char *filepos;
 	GMutex *dump_lock;
 	gboolean in_reload;
+
+	void (*set_extra_flags_func) (CamelFolder *folder, CamelMessageInfoBase *mi);
 };
 
 struct _CamelFolderSummaryClass {
@@ -294,6 +299,7 @@ struct _CamelFolderSummaryClass {
 	gboolean (*info_set_user_flag)(CamelMessageInfo *mi, const char *id, gboolean state);
 	gboolean (*info_set_user_tag)(CamelMessageInfo *mi, const char *id, const char *val);
 	gboolean (*info_set_flags)(CamelMessageInfo *mi, guint32 mask, guint32 set);
+
 };
 
 /* Meta-summary info */
