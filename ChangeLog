@@ -4,8 +4,9 @@
 	TNY_HEADER_FLAG_PARTIAL for IMAP and POP3
 	* Introduction of TNY_HEADER_FLAG_CACHED and 
 	TNY_HEADER_FLAG_PARTIAL in the TnyHeader type
-
 	* Introduction of new API tny_send_queue_cancel
+	* Improvements on status reporting (percentage completed when
+	refreshing summary information of both POP3 and IMAP folders)
 
 	* This was a major API change
 

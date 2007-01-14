@@ -2411,8 +2411,8 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 		if (!data)
 			continue;
 		g_ptr_array_add (needheaders, g_strdup (g_datalist_get_data (&data, "UID")));
-		if (size > 0)
-			camel_operation_progress (NULL, cnt / size);
+		/* if (size > 0)
+			camel_operation_progress (NULL, cnt * 100 / size); */
 		g_datalist_clear (&data);
 	}
 	if (type == CAMEL_IMAP_RESPONSE_TAGGED && resp)
@@ -2438,7 +2438,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    char *uid, *resp;
    GData *data;
    gboolean more = TRUE;
-   unsigned int nextn, cnt=0, tcnt=0, ucnt=0, rec=0;
+   unsigned int nextn, cnt=0, tcnt=0, ucnt=0, rec=0, ineed = 0, allhdrs = 0;
 
    if (!store->ostream || !store->istream)
 	return;
@@ -2459,6 +2459,10 @@ imap_update_summary (CamelFolder *folder, int exists,
 
    nextn = 1;
    tcnt = 0;
+
+  ineed = (exists - seq);
+  camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
+
    while (more)
    {
 	gboolean did_hack = FALSE;
@@ -2485,10 +2489,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 	more = FALSE; 
 	needheaders = g_ptr_array_new ();
 
-	camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 	cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq));
 	tcnt += cnt;
-	camel_operation_end (NULL);
 
 	/* Figure out whether we need more */
 	more = (cnt < (exists - seq));
@@ -2496,7 +2498,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 	/* If we received less than what we asked for, yet need more */
 	if ((cnt < nextn) && more)
 	{
-		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 		if (!camel_imap_command_start (store, folder, ex,
 			"UID FETCH %d:* (FLAGS)", uidval + 1 + cnt)) 
 			{ g_warning ("IMAP error getting UIDs (2)"); 
@@ -2532,7 +2533,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 		qsort (needheaders->pdata, needheaders->len,
 			sizeof (void *), uid_compar);
 
-		camel_operation_start (NULL, _("Fetching summary information for new messages in %s"), folder->name);
 		while (uid < needheaders->len) 
 		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
@@ -2587,12 +2587,19 @@ imap_update_summary (CamelFolder *folder, int exists,
 					  if (info)
 						camel_message_info_free(&info->info);
 					  ucnt++;
+
+					  allhdrs++;
+					  camel_operation_progress (NULL, allhdrs * 100 / ineed);
+
 					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
-					  /*camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
 
-					  if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
-						camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));*/
+					  /* WE can re-enable this if it's interesting:
 
+					   camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
+
+					    if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
+						camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
+					  */
 					}
 
 					if (did_hack)
@@ -2600,19 +2607,20 @@ imap_update_summary (CamelFolder *folder, int exists,
 						hcnt++;
 						if (hcnt > 1000)
 						{
+							/* Periodically save the summary (this reduces 
+							   memory usage too) */
 							camel_folder_summary_save (folder->summary);
 							hcnt = 0;
 						}
 					}
 
 					got += IMAP_PRETEND_SIZEOF_HEADERS;
-					if (size > 0)
-						camel_operation_progress (NULL, uid / needheaders->len);
 				}
 				g_datalist_clear (&data);
 			}
-			
-			if (type == CAMEL_IMAP_RESPONSE_ERROR) {
+
+			if (type == CAMEL_IMAP_RESPONSE_ERROR) 
+			{
 				g_warning ("IMAP error getting headers (2)");
 				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 				g_ptr_array_free (needheaders, TRUE);
@@ -2620,8 +2628,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 				more = FALSE;
 				return;
 			}
+
 		}
-		camel_operation_end (NULL);
 	}
 
 	if (ucnt < needheaders->len)
@@ -2635,6 +2643,8 @@ imap_update_summary (CamelFolder *folder, int exists,
    } /* more */
 
    camel_folder_summary_save (folder->summary);
+
+   camel_operation_end (NULL);
 
 }
 
@@ -2970,7 +2980,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	    if (boundary_len > 0)
 	   	 g_free (boundary);
 
-	    camel_stream_reset (stream);		
+	    camel_stream_reset (stream);
 	}
 
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);

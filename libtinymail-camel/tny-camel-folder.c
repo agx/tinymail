@@ -713,7 +713,7 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	}
 
 	info->cancelled = FALSE;
-	str = g_strdup_printf (_("Reading folder `%s'"), priv->folder->full_name);
+	str = g_strdup_printf (_("Fetching summary information for new messages in folder"));
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
 		tny_camel_folder_refresh_async_status, info, str);
 	g_free (str);

@@ -277,9 +277,9 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
 	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *) folder;
 	CamelPOP3Command *pcl, *pcu = NULL;
-	int i;
+	int i, hcnt = 0;
 
-	camel_operation_start (NULL, _("Retrieving POP summary"));
+	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
 	pop3_folder->uids = g_ptr_array_new ();
 	pop3_folder->uids_uid = g_hash_table_new(g_str_hash, g_str_equal);
@@ -287,13 +287,12 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	pop3_folder->uids_id = g_hash_table_new(NULL, NULL);
 
 	pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
-	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) {
+	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
 		pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
-	}
-	while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
-		;
+	while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0);
 
-	if (i == -1) {
+	if (i == -1) 
+	{
 		if (errno == EINTR)
 			camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
 		else
@@ -305,7 +304,6 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	/* TODO: check every id has a uid & commands returned OK too? */
 	
 	camel_pop3_engine_command_free(pop3_store->engine, pcl);
-	
 
 	/* Update the summary.mmap file */
 	for (i=0;i<pop3_folder->uids->len;i++) 
@@ -324,10 +322,24 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 				msg = pop3_get_message (folder, fi->uid, FALSE, NULL);
 
 			if (msg) 
+			{
 				camel_object_unref (CAMEL_OBJECT (msg));
 
-		} else
+				hcnt++;
+				if (hcnt > 1000)
+				{
+					/* Periodically save the summary (this reduces 
+					   memory usage too) */
+					camel_folder_summary_save (folder->summary);
+					hcnt = 0;
+				}
+			}
+
+		} else 
 			camel_message_info_free (mi);
+
+		camel_operation_progress (NULL, i * 100 / pop3_folder->uids->len);
+
 	}
 
 	camel_folder_summary_save (folder->summary);
