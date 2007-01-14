@@ -31,7 +31,9 @@ struct _TnyCamelSendQueuePriv
 	TnyFolder *sentbox_cache, *outbox_cache;
 	guint total;
 	GThread *thread;
-	GMutex *todo_lock; gboolean creating_spin;
+	GMutex *todo_lock, *sending_lock; 
+	gboolean creating_spin;
+	gboolean do_continue;
 };
 
 #endif

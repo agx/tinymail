@@ -78,10 +78,14 @@ thread_main (gpointer data)
 
 	g_object_unref (G_OBJECT (list));
 
-	while (length > 0)
+	priv->do_continue = TRUE;
+
+	while (length > 0 && priv->do_continue)
 	{
 		TnyHeader *header;
 		TnyMsg *msg;
+
+		g_mutex_lock (priv->sending_lock);
 
 		g_mutex_lock (priv->todo_lock);
 		{
@@ -175,6 +179,9 @@ thread_main (gpointer data)
 			if (header && G_IS_OBJECT (header))
 				g_object_unref (G_OBJECT (header));
 		}
+
+		g_mutex_unlock (priv->sending_lock);
+
 	}
 
 errorhandler:
@@ -197,6 +204,52 @@ create_worker (TnySendQueue *self)
 
 	priv->creating_spin = TRUE;
 	priv->thread = g_thread_create (thread_main, self, TRUE, NULL);
+
+	return;
+}
+
+
+static void
+tny_camel_send_queue_cancel (TnySendQueue *self, gboolean remove)
+{
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->cancel_func (self, remove);
+}
+
+static void
+tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove)
+{
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->sending_lock);
+
+	priv->do_continue = FALSE;
+
+	if (remove)
+	{
+		TnyFolder *outbox;
+		TnyList *headers = tny_simple_list_new ();
+		TnyIterator *iter;
+
+		outbox = tny_send_queue_get_outbox (self);
+
+		tny_folder_get_headers (outbox, headers, TRUE, NULL);
+		iter = tny_list_create_iterator (headers);
+		while (!tny_iterator_is_done (iter))
+		{
+			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+			tny_folder_remove_msg (outbox, header, NULL);
+			g_object_unref (G_OBJECT (header));
+			tny_iterator_next (iter);
+		}
+		g_object_unref (G_OBJECT (iter));
+		g_object_unref (G_OBJECT (headers));
+
+		tny_folder_expunge (outbox, NULL);
+
+		g_object_unref (G_OBJECT (outbox));
+	}
+
+	g_mutex_unlock (priv->sending_lock);
 
 	return;
 }
@@ -362,7 +415,7 @@ tny_camel_send_queue_finalize (GObject *object)
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->todo_lock);
-		
+
 	if (priv->sentbox_cache)
 		g_object_unref (G_OBJECT (priv->sentbox_cache));
 
@@ -370,10 +423,12 @@ tny_camel_send_queue_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->outbox_cache));
 
 	g_mutex_unlock (priv->todo_lock);
+
 	g_mutex_free (priv->todo_lock);
+	g_mutex_free (priv->sending_lock);
 
 	g_object_unref (G_OBJECT (priv->trans_account));
-	
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -428,6 +483,7 @@ tny_send_queue_init (gpointer g, gpointer iface_data)
 	klass->add_func = tny_camel_send_queue_add;
 	klass->get_outbox_func = tny_camel_send_queue_get_outbox;
 	klass->get_sentbox_func = tny_camel_send_queue_get_sentbox;
+	klass->cancel_func = tny_camel_send_queue_cancel;
 
 	return;
 }
@@ -443,6 +499,7 @@ tny_camel_send_queue_class_init (TnyCamelSendQueueClass *class)
 	class->add_func = tny_camel_send_queue_add_default;
 	class->get_outbox_func = tny_camel_send_queue_get_outbox_default;
 	class->get_sentbox_func = tny_camel_send_queue_get_sentbox_default;
+	class->cancel_func = tny_camel_send_queue_cancel_default;
 
 	object_class->finalize = tny_camel_send_queue_finalize;
 
@@ -462,6 +519,8 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->sentbox_cache = NULL;
 	priv->outbox_cache = NULL;
 	priv->todo_lock = g_mutex_new ();
+	priv->sending_lock = g_mutex_new ();
+	priv->do_continue = FALSE;
 
 	return;
 }

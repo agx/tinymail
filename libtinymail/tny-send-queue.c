@@ -22,6 +22,25 @@
 #include <tny-send-queue.h>
 guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
 
+
+/**
+ * tny_send_queue_cancel:
+ * @self: A #TnySendQueue instance
+ * @remove: Whether or not to also remove queued messages
+ *
+ * Cancel the current operation
+ **/
+void 
+tny_send_queue_cancel (TnySendQueue *self, gboolean remove)
+{
+#ifdef DEBUG
+	if (!TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func)
+		g_critical ("You must implement tny_send_queue_cancel\n");
+#endif
+	TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func (self, remove);
+	return;
+}
+
 /**
  * tny_send_queue_get_sentbox:
  * @self: A #TnySendQueue instance

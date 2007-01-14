@@ -5,6 +5,8 @@
 	* Introduction of TNY_HEADER_FLAG_CACHED and 
 	TNY_HEADER_FLAG_PARTIAL in the TnyHeader type
 
+	* Introduction of new API tny_send_queue_cancel
+
 	* This was a major API change
 
 2007-01-13  Philip Van Hoof <pvanhoof@gnome.org>

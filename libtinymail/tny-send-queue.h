@@ -60,6 +60,7 @@ struct _TnySendQueueIface
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg);
 	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
 	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
+	void (*cancel_func) (TnySendQueue *self, gboolean remove);
 
 };
 
@@ -68,6 +69,7 @@ GType tny_send_queue_get_type (void);
 void tny_send_queue_add (TnySendQueue *self, TnyMsg *msg);
 TnyFolder* tny_send_queue_get_sentbox (TnySendQueue *self);
 TnyFolder* tny_send_queue_get_outbox (TnySendQueue *self);
+void tny_send_queue_cancel (TnySendQueue *self, gboolean remove);
 
 G_END_DECLS
 
