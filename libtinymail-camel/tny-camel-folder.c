@@ -667,8 +667,11 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 	info->minfo->user_data = oinfo->user_data;
 	info->oftotal = oftotal;
 
-	if (sofar < 0)
-		info->sofar = 0;
+	if (info->oftotal < 1)
+		info->oftotal = 1;
+
+	if (sofar < 1)
+		info->sofar = 1;
 	else 
 		if (sofar > info->oftotal)
 			info->sofar = info->oftotal;
