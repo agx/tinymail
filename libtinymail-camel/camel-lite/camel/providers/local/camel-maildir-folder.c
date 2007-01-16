@@ -53,7 +53,7 @@ static CamelLocalFolderClass *parent_class = NULL;
 static CamelLocalSummary *maildir_create_summary(CamelLocalFolder *lf, const char *path, const char *folder, CamelIndex *index);
 
 static void maildir_append_message(CamelFolder * folder, CamelMimeMessage * message, const CamelMessageInfo *info, char **appended_uid, CamelException * ex);
-static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, gboolean full, CamelException * ex);
+static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveType type, gint param, CamelException * ex);
 
 static void maildir_finalize(CamelObject * object);
 
@@ -227,7 +227,7 @@ maildir_append_message (CamelFolder *folder, CamelMimeMessage *message, const Ca
 	g_free (dest);
 }
 
-static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, gboolean full, CamelException * ex)
+static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveType type, gint param, CamelException * ex)
 {
 	CamelLocalFolder *lf = (CamelLocalFolder *)folder;
 	CamelStream *message_stream = NULL;

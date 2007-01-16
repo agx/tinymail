@@ -59,7 +59,7 @@ tny_camel_full_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrate
 	id = tny_header_get_uid (TNY_HEADER (header));
 
 	message = NULL;
-	camel_message = camel_folder_get_message (priv->folder, (const char *) id, TRUE, &ex);
+	camel_message = camel_folder_get_message (priv->folder, (const char *) id, CAMEL_FOLDER_RECEIVE_FULL, -1, &ex);
 
 	if (camel_exception_is_set (&ex))
 	{

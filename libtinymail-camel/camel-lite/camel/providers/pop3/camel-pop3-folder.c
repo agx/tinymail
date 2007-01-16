@@ -55,7 +55,7 @@ static void pop3_refresh_info (CamelFolder *folder, CamelException *ex);
 static void pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex);
 static gint pop3_get_message_count (CamelFolder *folder);
 static GPtrArray *pop3_get_uids (CamelFolder *folder);
-static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex);
+static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex);
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
 static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex);
 
@@ -319,7 +319,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 			if (pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) 
 				msg = pop3_get_top (folder, fi->uid, NULL);
 			else
-				msg = pop3_get_message (folder, fi->uid, FALSE, NULL);
+				msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_PARTIAL, -1, NULL);
 
 			if (msg) 
 			{
@@ -379,8 +379,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	if(pop3_store->delete_after && !expunge)
 	{	
 		camel_operation_start(NULL, _("Expunging old messages"));
-		camel_pop3_delete_old(folder, pop3_store->delete_after,ex);	
-	}	
+		camel_pop3_delete_old(folder, pop3_store->delete_after,ex);
+	}
 
 	if (!expunge)
 		return;
@@ -424,7 +424,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 }
 
 int
-camel_pop3_delete_old(CamelFolder *folder, int days_to_delete,	CamelException *ex)
+camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *ex)
 {
 	CamelPOP3Folder *pop3_folder;
 	CamelPOP3FolderInfo *fi;
@@ -433,7 +433,7 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete,	CamelException *e
 	time_t temp;
 
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
-	pop3_store = CAMEL_POP3_STORE (CAMEL_FOLDER(pop3_folder)->parent_store);	
+	pop3_store = CAMEL_POP3_STORE (CAMEL_FOLDER(pop3_folder)->parent_store);
 	temp = time(&temp);
 
 	for (i = 0; i < pop3_folder->uids->len; i++) 
@@ -441,7 +441,12 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete,	CamelException *e
 		CamelMimeMessage *message = NULL;
 
 		fi = pop3_folder->uids->pdata[i];
-		message = pop3_get_message (folder, fi->uid, TRUE, ex);	
+
+		if (pop3_store->cache && fi->uid && !camel_data_cache_is_partial(pop3_store->cache, "cache", fi->uid))
+			message = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_FULL, -1, ex);
+		else if (fi->uid)
+			message = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_PARTIAL, -1, ex);
+
 		time_t message_time = message->date + message->date_offset;
 
 		if (message) 
@@ -643,7 +648,7 @@ ending:
 
 
 static CamelMimeMessage *
-pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
 	CamelMimeMessage *message = NULL;
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
@@ -654,8 +659,6 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 	CamelStream *stream = NULL;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
-
-	/* TNY TODO: Implement partial message retrieval if full==TRUE */
 
 	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
 	if (fi == NULL) {
@@ -699,11 +702,12 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 	{
 		CamelException tex = CAMEL_EXCEPTION_INITIALISER;
 
-		if (full && camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
+		if ((type & CAMEL_FOLDER_RECEIVE_FULL) && camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
 		{
 			camel_data_cache_remove (pop3_store->cache, "cache", fi->uid, &tex);
 			im_certain = TRUE;
-		} else if (!full && !camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
+		} else if ((type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_SIZE_LIMITED) 
+			&& !camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
 		{
 			camel_data_cache_remove (pop3_store->cache, "cache", fi->uid, &tex);
 			im_certain = TRUE;
@@ -727,8 +731,15 @@ pop3_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelExce
 		fi->err = EIO;
 
 
-		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
-			full?cmd_tocache:cmd_tocache_partial, fi, "RETR %u\r\n", fi->id);
+		pop3_store->engine->type = type;
+		pop3_store->engine->param = param;
+
+		if (type & CAMEL_FOLDER_RECEIVE_FULL)
+			pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
+				cmd_tocache, fi, "RETR %u\r\n", fi->id);
+		else if (type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_SIZE_LIMITED)
+			pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
+				cmd_tocache_partial, fi, "RETR %u\r\n", fi->id);
 
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;

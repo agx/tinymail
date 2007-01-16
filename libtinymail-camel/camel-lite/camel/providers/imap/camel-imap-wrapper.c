@@ -144,7 +144,7 @@ write_to_stream (CamelDataWrapper *data_wrapper, CamelStream *stream)
 		/* TNY TODO: partial message retrieval exception */
 		datastream = camel_imap_folder_fetch_data (
 			imap_wrapper->folder, imap_wrapper->uid,
-			imap_wrapper->part_spec, FALSE, TRUE, NULL);
+			imap_wrapper->part_spec, FALSE, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 		if (!datastream) {
 			CAMEL_IMAP_WRAPPER_UNLOCK (imap_wrapper, lock);
 #ifdef ENETUNREACH
@@ -191,7 +191,7 @@ camel_imap_wrapper_new (CamelImapFolder *imap_folder,
 	/* Try the cache. */
 	/* TNY TODO: Partial message retrieval exception */
 	stream = camel_imap_folder_fetch_data (imap_folder, uid, part_spec,
-					       TRUE, TRUE, NULL);
+					       TRUE, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 	if (stream) {
 		imap_wrapper_hydrate (imap_wrapper, stream);
 		camel_object_unref (stream);

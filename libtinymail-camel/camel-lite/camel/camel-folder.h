@@ -40,6 +40,16 @@ extern "C" {
 #define CAMEL_FOLDER_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), CAMEL_FOLDER_TYPE, CamelFolderClass))
 #define CAMEL_IS_FOLDER(o)    (CAMEL_CHECK_TYPE((o), CAMEL_FOLDER_TYPE))
 
+
+typedef enum _CamelFolderReceiveType CamelFolderReceiveType;
+
+enum _CamelFolderReceiveType 
+{
+	CAMEL_FOLDER_RECEIVE_FULL = 1<<0,
+	CAMEL_FOLDER_RECEIVE_PARTIAL = 1<<1,
+	CAMEL_FOLDER_RECEIVE_SIZE_LIMITED = CAMEL_FOLDER_RECEIVE_PARTIAL<<2
+};
+
 typedef struct _CamelFolderChangeInfo CamelFolderChangeInfo;
 
 enum {
@@ -160,7 +170,8 @@ typedef struct {
 					  const char *value);
 
 	CamelMimeMessage * (*get_message)  (CamelFolder *folder, 
-					    const char *uid, gboolean full, 
+					    const char *uid, CamelFolderReceiveType type,
+					    gint param, 
 					    CamelException *ex);
 
 	GPtrArray * (*get_uids)       (CamelFolder *folder);
@@ -280,8 +291,8 @@ void               camel_folder_free_summary          (CamelFolder *folder,
 
 /* uid based access operations */
 CamelMimeMessage * camel_folder_get_message           (CamelFolder *folder, 
-						       const char *uid, gboolean full,
-						       CamelException *ex);
+						       const char *uid, CamelFolderReceiveType type,
+						       gint param, CamelException *ex);
 #define camel_folder_delete_message(folder, uid) \
 	camel_folder_set_message_flags (folder, uid, CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_SEEN, CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_SEEN)
 

@@ -89,7 +89,7 @@ static GPtrArray        *get_summary         (CamelFolder *folder);
 static void              free_summary        (CamelFolder *folder,
 					      GPtrArray *array);
 
-static CamelMimeMessage *get_message         (CamelFolder *folder, const gchar *uid, gboolean full, CamelException *ex);
+static CamelMimeMessage *get_message         (CamelFolder *folder, const gchar *uid, CamelFolderReceiveType type, gint param, CamelException *ex);
 
 static CamelMessageInfo *get_message_info    (CamelFolder *folder, const char *uid);
 static void		 free_message_info   (CamelFolder *folder, CamelMessageInfo *info);
@@ -1043,7 +1043,7 @@ camel_folder_has_summary_capability (CamelFolder *folder)
 /* UIDs stuff */
 
 static CamelMimeMessage *
-get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
 	w(g_warning ("CamelFolder::get_message not implemented for `%s'",
 		     camel_type_to_name (CAMEL_OBJECT_GET_TYPE (folder))));
@@ -1063,7 +1063,7 @@ get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException
  * Returns a #CamelMimeMessage corresponding to @uid
  **/
 CamelMimeMessage *
-camel_folder_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+camel_folder_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
 	CamelMimeMessage *ret;
 
@@ -1071,7 +1071,7 @@ camel_folder_get_message (CamelFolder *folder, const char *uid, gboolean full, C
 
 	CAMEL_FOLDER_REC_LOCK(folder, lock);
 
-	ret = CF_CLASS (folder)->get_message (folder, uid, full, ex);
+	ret = CF_CLASS (folder)->get_message (folder, uid, type, param, ex);
 
 	CAMEL_FOLDER_REC_UNLOCK(folder, lock);
 
@@ -1357,7 +1357,7 @@ transfer_message_to (CamelFolder *source, const char *uid, CamelFolder *dest,
 	
 	/* TNY: Partial message retrieval exception (always transfer the full 
 		message, not just the body part) */
-	msg = camel_folder_get_message(source, uid, TRUE, ex);
+	msg = camel_folder_get_message(source, uid, CAMEL_FOLDER_RECEIVE_FULL, -1, ex);
 	if (!msg)
 		return;
 
@@ -1655,7 +1655,7 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 
 		for (i = 0; i < m->junk->len; i ++) {
 			/* TNY TODO: Partial message retrieval exception */
-			CamelMimeMessage *msg = camel_folder_get_message(m->folder, m->junk->pdata[i], TRUE, NULL);
+			CamelMimeMessage *msg = camel_folder_get_message(m->folder, m->junk->pdata[i], CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 			int pc = 100 * i / m->junk->len;
 			
 			camel_operation_progress(NULL, pc);
@@ -1672,7 +1672,7 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 		camel_operation_start (NULL, _("Learning non-junk"));
 		for (i = 0; i < m->notjunk->len; i ++) {
 			/* TNY TODO: Partial message retrieval exception */
-			CamelMimeMessage *msg = camel_folder_get_message(m->folder, m->notjunk->pdata[i], TRUE, NULL);
+			CamelMimeMessage *msg = camel_folder_get_message(m->folder, m->notjunk->pdata[i], CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 			int pc = 100 * i / m->notjunk->len;
 
 			camel_operation_progress(NULL, pc);

@@ -508,14 +508,14 @@ vee_expunge (CamelFolder *folder, CamelException *ex)
 }
 
 static CamelMimeMessage *
-vee_get_message(CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+vee_get_message(CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
 	CamelVeeMessageInfo *mi;
 	CamelMimeMessage *msg = NULL;
 
 	mi = (CamelVeeMessageInfo *)camel_folder_summary_uid(folder->summary, uid);
 	if (mi) {
-		msg =  camel_folder_get_message(mi->real->summary->folder, camel_message_info_uid(mi)+8, full, ex);
+		msg =  camel_folder_get_message(mi->real->summary->folder, camel_message_info_uid(mi)+8, type, param, ex);
 		camel_message_info_free((CamelMessageInfo *)mi);
 	} else {
 		camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,

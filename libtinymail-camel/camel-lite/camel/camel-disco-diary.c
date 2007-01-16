@@ -337,7 +337,7 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 			}
 
 			/* TNY TODO Partial message retrieval exception */
-			message = camel_folder_get_message (folder, uid, TRUE, NULL);
+			message = camel_folder_get_message (folder, uid, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 			if (!message) {
 				/* The message was appended and then deleted. */
 				g_free (uid);

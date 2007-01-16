@@ -54,7 +54,7 @@ static void digest_expunge (CamelFolder *folder, CamelException *ex);
 
 /* message manipulation */
 static CamelMimeMessage *digest_get_message (CamelFolder *folder, const gchar *uid,
-					     gboolean full, CamelException *ex);
+					     CamelFolderReceiveType type, gint param, CamelException *ex);
 static void digest_append_message (CamelFolder *folder, CamelMimeMessage *message,
 				   const CamelMessageInfo *info, char **appended_uid, CamelException *ex);
 static void digest_transfer_messages_to (CamelFolder *source, GPtrArray *uids,
@@ -283,7 +283,7 @@ digest_transfer_messages_to (CamelFolder *source, GPtrArray *uids,
 }
 
 static CamelMimeMessage *
-digest_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+digest_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
 	CamelDigestFolder *digest = CAMEL_DIGEST_FOLDER (folder);
 	CamelDataWrapper *wrapper;

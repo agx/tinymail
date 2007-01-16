@@ -187,7 +187,7 @@ nntp_folder_cache_message (CamelDiscoFolder *disco_folder, const char *uid, Came
 }
 
 static CamelMimeMessage *
-nntp_folder_get_message (CamelFolder *folder, const char *uid, gboolean full, CamelException *ex)
+nntp_folder_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
 	CamelMimeMessage *message = NULL;
 	CamelNNTPStore *nntp_store;
