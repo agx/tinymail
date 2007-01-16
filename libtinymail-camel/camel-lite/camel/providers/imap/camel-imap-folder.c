@@ -2316,6 +2316,7 @@ message_from_data (CamelFolder *folder, GData *data)
 	CamelStream *stream;
 	CamelImapMessageInfo *mi;
 	const char *idate;
+	gint size = 0;
 
 	stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
 	if (!stream)
@@ -2329,6 +2330,10 @@ message_from_data (CamelFolder *folder, GData *data)
 
 	mi = (CamelImapMessageInfo *)camel_folder_summary_info_new_from_message (folder->summary, msg);
 	camel_object_unref (CAMEL_OBJECT (msg));
+
+	size = GPOINTER_TO_INT (g_datalist_get_data (&data, "RFC822.SIZE"));
+	if (size)
+		mi->info.size = size;
 
 	if ((idate = g_datalist_get_data (&data, "INTERNALDATE")))
 		mi->info.date_received = decode_internaldate ((const unsigned char *) idate);
@@ -2536,7 +2541,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
 
 			if (!camel_imap_command_start (store, folder, ex,
-						       "UID FETCH %s (FLAGS INTERNALDATE BODY.PEEK[%s])",
+						       "UID FETCH %s (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
 						       uidset, header_spec)) 
 			{
 				g_warning ("IMAP error getting headers (1)");
