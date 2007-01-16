@@ -177,10 +177,13 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	/* Get store */
-	g_static_rec_mutex_lock (apriv->service_lock);
+
+/*	g_static_rec_mutex_lock (apriv->service_lock);
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
-	g_static_rec_mutex_unlock (apriv->service_lock);
+	g_static_rec_mutex_unlock (apriv->service_lock); */
+
+	store = CAMEL_STORE (apriv->service);
 
 	if (!camel_store_supports_subscriptions (store)) 
 		goto cleanup;
@@ -294,6 +297,8 @@ tny_camel_store_account_finalize (GObject *object)
 		camel_object_unref (CAMEL_OBJECT (priv->iter_store));
 	}
 
+	/* Disco store ? */
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -316,8 +321,15 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 
+/*	store = camel_session_get_store ((CamelSession*) apriv->session, 
+			apriv->url_string, &ex); */
+
+/*	g_static_rec_mutex_lock (apriv->service_lock);
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
+	g_static_rec_mutex_unlock (apriv->service_lock); */
+
+	store = CAMEL_STORE (apriv->service);
 
 	if (camel_exception_is_set (&ex)) 
 	{
@@ -383,8 +395,15 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
+/*	store = camel_session_get_store ((CamelSession*) apriv->session, 
+			apriv->url_string, &ex); */
+
+/*	g_static_rec_mutex_lock (apriv->service_lock);
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
+	g_static_rec_mutex_unlock (apriv->service_lock); */
+
+	store = CAMEL_STORE (apriv->service);
 
 	if (camel_exception_is_set (&ex)) 
 	{
@@ -451,8 +470,15 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	if (query != NULL)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
 
+/*	store = camel_session_get_store ((CamelSession*) apriv->session, 
+			apriv->url_string, &ex); */
+
+/*	g_static_rec_mutex_lock (apriv->service_lock);
 	store = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
+	g_static_rec_mutex_unlock (apriv->service_lock); */
+
+	store = CAMEL_STORE (apriv->service);
 
 	if (camel_exception_is_set (&ex))
 	{

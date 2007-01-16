@@ -211,7 +211,7 @@ GtkTreeModel*
 tny_gtk_folder_store_tree_model_new (gboolean async, TnyFolderStoreQuery *query)
 {
 	TnyGtkFolderStoreTreeModel *self = g_object_new (TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL, NULL);
-	self->is_async = async;
+	self->is_async = FALSE;
 	if (query) self->query = g_object_ref (G_OBJECT (query));
 	return GTK_TREE_MODEL (self);
 }
