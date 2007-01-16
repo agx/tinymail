@@ -109,7 +109,10 @@ Enumerations for tinymail
 
 <!-- ##### ENUM TnyHeaderFlags ##### -->
 <para>
-
+When defining new flags, please stay below 1&lt;&lt;12. Starting 1&lt;&lt;12 is being used internally (and you would overwrite that,
+which can cause severe defects like crashes and memory leaks). You are rather advised not to add any new flags unless
+there is really no other way to achieve what you are trying to do (and then still, consider talking to the tinymail
+framework developers about simply getting your "special" cool flag added to tinymail itself).
 </para>
 
 @TNY_HEADER_FLAG_ANSWERED: The messages was answered
