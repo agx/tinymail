@@ -981,6 +981,8 @@ pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, gui
 		}
 	}
 
+	/* TNY TODO: Sync to POP server and in the summary.mmap file */
+
 	return res;
 }
 
