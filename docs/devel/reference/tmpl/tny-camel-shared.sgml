@@ -29,16 +29,7 @@ A few shared camel routines
 </para>
 
 @parent_object: 
-@device: 
-@account_store: 
-@interactive: 
-@prev_constat: 
-@first_switch: 
-@connchanged_signal: 
-@current_accounts: 
-@camel_dir: 
-@in_auth_function: 
-@ui_lock: 
+@priv: 
 
 <!-- ##### STRUCT TnySessionCamelClass ##### -->
 <para>

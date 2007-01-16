@@ -39,6 +39,11 @@ shutdown obviously lose the unsent messages.
 
 </para>
 
+@: 
+@: 
+@: 
+@:
+
 @tnysendqueue: the object which received the signal.
 @arg1: 
 @arg2: 
@@ -48,6 +53,11 @@ shutdown obviously lose the unsent messages.
 <para>
 
 </para>
+
+@: 
+@: 
+@: 
+@:
 
 @tnysendqueue: the object which received the signal.
 @arg1: 
@@ -65,6 +75,7 @@ shutdown obviously lose the unsent messages.
 @add_func: 
 @get_sentbox_func: 
 @get_outbox_func: 
+@cancel_func: 
 
 <!-- ##### FUNCTION tny_send_queue_add ##### -->
 <para>
@@ -91,5 +102,14 @@ shutdown obviously lose the unsent messages.
 
 @self: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_send_queue_cancel ##### -->
+<para>
+
+</para>
+
+@self: 
+@remove: 
 
 

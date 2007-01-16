@@ -28,5 +28,7 @@ tny-camel-send-queue-priv
 @total: 
 @thread: 
 @todo_lock: 
+@sending_lock: 
 @creating_spin: 
+@do_continue: 
 

@@ -152,6 +152,7 @@ Shared include file with forward typedefs
 @get_from_func: 
 @get_replyto_func: 
 @get_message_id_func: 
+@get_message_size_func: 
 @get_date_received_func: 
 @get_date_sent_func: 
 @set_bcc_func: 
@@ -477,20 +478,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -503,6 +504,7 @@ A method that happens after tny_folder_store_get_folders_async is finished
 @add_func: 
 @get_sentbox_func: 
 @get_outbox_func: 
+@cancel_func: 
 
 <!-- ##### STRUCT TnyMsgReceiveStrategy ##### -->
 <para>

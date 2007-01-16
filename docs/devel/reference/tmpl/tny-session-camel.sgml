@@ -35,12 +35,11 @@ develop against the #TnyAccountStore interface API using an instance of their im
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnySessionCamel ##### -->
+<!-- ##### STRUCT TnySessionCamelPriv ##### -->
 <para>
 
 </para>
 
-@parent_object: 
 @device: 
 @account_store: 
 @interactive: 
@@ -51,6 +50,14 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @camel_dir: 
 @in_auth_function: 
 @ui_lock: 
+
+<!-- ##### STRUCT TnySessionCamel ##### -->
+<para>
+
+</para>
+
+@parent_object: 
+@priv: 
 
 <!-- ##### FUNCTION tny_session_camel_set_pass_func ##### -->
 <para>

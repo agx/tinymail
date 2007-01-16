@@ -119,7 +119,7 @@ Enumerations for tinymail
 @TNY_HEADER_FLAG_SEEN: The message is seen
 @TNY_HEADER_FLAG_ATTACHMENTS: The message has attachments
 @TNY_HEADER_FLAG_CACHED: The message is cached
-@TNY_HEADER_FLAG_PARTIAL: The message is retrieved partially 
+@TNY_HEADER_FLAG_PARTIAL: The message is retrieved partially
 
 <!-- ##### ENUM TnyFolderType ##### -->
 <para>

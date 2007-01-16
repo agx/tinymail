@@ -9,12 +9,10 @@ A do-nothing lockable
 A #TnyLockable implementation that, well, doesn't lock. One that, in other words, does nothing
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

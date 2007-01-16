@@ -9,12 +9,10 @@ A lockable for Gdk-Threads
 A #TnyLockable implementation that uses gdk_threads_enter and gdk_threads_leave to implement the lock and unlock operations
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

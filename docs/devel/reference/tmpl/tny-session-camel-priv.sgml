@@ -17,3 +17,19 @@ tny-session-camel-priv
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnySessionCamelPriv ##### -->
+<para>
+
+</para>
+
+@device: 
+@account_store: 
+@interactive: 
+@prev_constat: 
+@first_switch: 
+@connchanged_signal: 
+@current_accounts: 
+@camel_dir: 
+@in_auth_function: 
+@ui_lock: 
+

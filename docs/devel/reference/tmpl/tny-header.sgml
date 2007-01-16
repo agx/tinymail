@@ -49,6 +49,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @get_from_func: 
 @get_replyto_func: 
 @get_message_id_func: 
+@get_message_size_func: 
 @get_date_received_func: 
 @get_date_sent_func: 
 @set_bcc_func: 
@@ -116,6 +117,15 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 
 
 <!-- ##### FUNCTION tny_header_get_message_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_header_get_message_size ##### -->
 <para>
 
 </para>
