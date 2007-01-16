@@ -96,15 +96,16 @@ camel_pop3_folder_get_type (void)
 	return camel_pop3_folder_type;
 }
 
-static void
-pop3_finalize (CamelObject *object)
+static void 
+destroy_lists (CamelPOP3Folder *pop3_folder)
 {
-	CamelPOP3Folder *pop3_folder = CAMEL_POP3_FOLDER (object);
-	CamelPOP3FolderInfo **fi = (CamelPOP3FolderInfo **)pop3_folder->uids->pdata;
-	CamelPOP3Store *pop3_store = (CamelPOP3Store *)((CamelFolder *)pop3_folder)->parent_store;
-	int i;
 
-	if (pop3_folder->uids) {
+	if (pop3_folder->uids != NULL) 
+	{
+		CamelPOP3FolderInfo **fi = (CamelPOP3FolderInfo **)pop3_folder->uids->pdata;
+		CamelPOP3Store *pop3_store = (CamelPOP3Store *)((CamelFolder *)pop3_folder)->parent_store;
+		int i;
+
 		for (i=0;i<pop3_folder->uids->len;i++,fi++) {
 			if (fi[0]->cmd) {
 				while (camel_pop3_engine_iterate(pop3_store->engine, fi[0]->cmd) > 0)
@@ -122,6 +123,15 @@ pop3_finalize (CamelObject *object)
 }
 
 static void
+pop3_finalize (CamelObject *object)
+{
+	CamelPOP3Folder *pop3_folder = CAMEL_POP3_FOLDER (object);
+
+	destroy_lists (pop3_folder);
+
+}
+
+static void
 camel_pop3_summary_set_extra_flags (CamelFolder *folder, CamelMessageInfoBase *mi)
 {
 	CamelPOP3Store *pop3_store = (CamelPOP3Store *)folder->parent_store;
@@ -134,10 +144,14 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 	CamelFolder *folder;
 	CamelPOP3Store *p3store = (CamelPOP3Store*) parent;
 	gchar *summary_file;
+	CamelPOP3Folder *pop3_folder;
 
 	d(printf("opening pop3 INBOX folder\n"));
 	
 	folder = CAMEL_FOLDER (camel_object_new (CAMEL_POP3_FOLDER_TYPE));
+	pop3_folder = CAMEL_POP3_FOLDER (folder);
+	pop3_folder->uids = NULL;
+
 	camel_folder_construct (folder, parent, "inbox", "inbox");
 
 	summary_file = g_strdup_printf ("%s/summary.mmap", p3store->root);
@@ -279,12 +293,19 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, hcnt = 0;
 
-	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
+
+	destroy_lists (pop3_folder);
 
 	pop3_folder->uids = g_ptr_array_new ();
 	pop3_folder->uids_uid = g_hash_table_new(g_str_hash, g_str_equal);
 	/* only used during setup */
 	pop3_folder->uids_id = g_hash_table_new(NULL, NULL);
+
+	/* TNY TODO: Implement this correctly with CamelDiscoFolder */
+	if (pop3_store->engine == NULL)
+		return;
+
+	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
 	pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
@@ -967,7 +988,10 @@ static gint
 pop3_get_message_count (CamelFolder *folder)
 {
 	CamelPOP3Folder *pop3_folder = CAMEL_POP3_FOLDER (folder);
-	
+
+	if (!pop3_folder->uids)
+		return 0;
+
 	return pop3_folder->uids->len;
 }
 

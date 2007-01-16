@@ -529,7 +529,7 @@ iconv_t e_iconv_open(const char *oto, const char *ofrom)
 			in->busy = TRUE;
 		} else {
 			errnosav = errno;
-			g_warning("Could not open converter for '%s' to '%s' charset", from, to);
+			/* g_warning("Could not open converter for '%s' to '%s' charset", from, to); */
 			in->busy = FALSE;
 			errno = errnosav;
 		}
