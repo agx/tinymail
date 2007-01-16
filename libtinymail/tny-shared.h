@@ -51,7 +51,7 @@ typedef void (*TnyForgetPassFunc) (TnyAccount *self);
 typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, GError **err, gpointer user_data);
 typedef void (*TnyGetMsgCallback) (TnyFolder *folder, TnyMsg *msg, GError **err, gpointer user_data);
 typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, GError **err, gpointer user_data);
-typedef void (*TnyRefreshFolderStatusCallback) (TnyFolder *self, const gchar *what, gint status, gint oftotal, gpointer user_data);
+typedef void (*TnyRefreshFolderStatusCallback) (TnyFolder *self, const gchar *what, gint sofar, gint oftotal, gpointer user_data);
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
 typedef enum _TnyAlertType TnyAlertType;
 typedef enum _TnyFolderType TnyFolderType;

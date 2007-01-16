@@ -290,7 +290,7 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * Example:
  * <informalexample><programlisting>
  * static void
- * status_update_cb (TnyFolder *folder, const gchar *what, gint status, gpointer user_data)
+ * status_update_cb (TnyFolder *folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
  * {
  *     g_print (".");
  * }
