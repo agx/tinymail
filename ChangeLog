@@ -1,3 +1,9 @@
+2007-01-16  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Added the MESSAGE_SIZE column to the TnyGtkHeaderListModel
+
+	* This was a API change in libtinymailui-gtk
+
 2007-01-16  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Preparations for size limited retrieval
