@@ -154,6 +154,7 @@ tny_gtk_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN:
 		case TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			retval = G_TYPE_INT;
 			break;
@@ -363,6 +364,11 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			g_value_set_int (value, 
 					 tny_header_get_date_received (header));
 			break;
+
+		case TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN:
+			g_value_init (value, G_TYPE_INT);
+			g_value_set_int (value, tny_header_get_message_size(header));
+			break;			
 		case TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_OBJECT);
 			g_value_set_object (value, header);
@@ -1072,6 +1078,7 @@ tny_gtk_header_list_model_column_get_type (void)
       { TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN", "date_sent" },
       { TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN", "date_received_t" },
       { TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN", "date_sent_t" },
+      { TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN", "message_size"},
       { TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN", "date_received" },
       { TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN", "instance" },
       { TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN", "flags" },

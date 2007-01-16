@@ -1110,7 +1110,7 @@ camel_folder_summary_info_new_from_parser(CamelFolderSummary *s, CamelMimeParser
 		}
 
 		CAMEL_SUMMARY_UNLOCK(s, filter_lock);
-		((CamelMessageInfoBase *)info)->size = (guint16) ( (camel_mime_parser_tell(mp) - start) / 1024 );
+		((CamelMessageInfoBase *)info)->size = ( (camel_mime_parser_tell(mp) - start) );
 	}
 	return info;
 }
@@ -1904,7 +1904,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	unsigned int i;
 	gchar *theuid;
 	gboolean uidmf = FALSE;
-	guint32 tempor;
 
 	io(printf("Loading message info\n"));
 
@@ -1949,13 +1948,9 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		uidmf = TRUE;
 	}
 
-	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &tempor, FALSE);
+	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
 
-	mi->size = (guint16) ( tempor / 1024 );
-
-	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &tempor, FALSE);
-
-	mi->flags = tempor;
+	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
 	if (uidmf)
@@ -2088,7 +2083,7 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	camel_file_util_encode_string(out, camel_message_info_uid(mi));
 	camel_file_util_encode_uint32(out, mi->flags);
 
-	camel_file_util_encode_uint32(out, mi->size * 1024);
+	camel_file_util_encode_uint32(out, mi->size);
 
 	camel_file_util_encode_time_t(out, mi->date_sent);
 	camel_file_util_encode_time_t(out, mi->date_received);
@@ -3315,7 +3310,7 @@ camel_message_info_user_tag(const CamelMessageInfo *mi, const char *id)
 static gboolean
 info_set_flags(CamelMessageInfo *info, guint32 flags, guint32 set)
 {
-	guint32 old;
+	guint16 old;
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 
 	/* TODO: locking? */

@@ -325,7 +325,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 			{
 				mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
 				if (mi) {
-				    mi->size = (guint16) (fi->size / 1024);
+				    mi->size = (fi->size);
 				    camel_message_info_free (mi);
 				}
 

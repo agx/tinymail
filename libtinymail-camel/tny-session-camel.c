@@ -275,12 +275,13 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_account_get_name (account));
 		}
 		
+		/* TODO: fix this in camel-lite !
+
 		if (!g_ascii_strncasecmp (tny_account_get_proto (account), "pop", 3))
 		{
 			if (flags & CAMEL_SESSION_PASSWORD_REPROMPT)
 				tny_session_camel_forget_password (session, service, domain, item, ex);
-		}
-
+		}*/
 
 
 		inf = priv->in_auth_function;

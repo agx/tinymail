@@ -455,7 +455,7 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 			CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
 
 			camel_data_wrapper_write_to_stream((CamelDataWrapper *)msg, (CamelStream *)sn);
-			mi->info.size = (guint16) (sn->written / 1024);
+			mi->info.size = (sn->written);
 			camel_object_unref((CamelObject *)sn);
 		}
 

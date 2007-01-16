@@ -802,6 +802,23 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
 
+	renderer = gtk_cell_renderer_text_new ();
+	column = gtk_tree_view_column_new_with_attributes (_("Flags"), renderer,
+		"text", TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN);
+	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
+	gtk_tree_view_column_set_fixed_width (column, 100);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
+
+
+	renderer = gtk_cell_renderer_text_new ();
+	column = gtk_tree_view_column_new_with_attributes (_("Size"), renderer,
+		"text", TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN);
+	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
+	gtk_tree_view_column_set_fixed_width (column, 100);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
+
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->mailbox_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	priv->mailbox_select = select;

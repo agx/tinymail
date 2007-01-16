@@ -173,8 +173,8 @@ struct _CamelMessageInfoBase {
 	CamelMessageContentInfo *content;
 	CamelSummaryMessageID message_id;
 
-	guint16 flags;
-	guint16 size;
+	guint32 flags;
+	guint32 size;
 
 	time_t date_sent;
 	time_t date_received;
@@ -402,7 +402,7 @@ time_t camel_message_info_time(const CamelMessageInfo *mi, int id);
 #endif
 
 #define camel_message_info_flags(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_FLAGS)
-#define camel_message_info_size(mi) (camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE) * 1024)
+#define camel_message_info_size(mi) (camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE))
 
 #define camel_message_info_date_sent(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_SENT)
 #define camel_message_info_date_received(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_RECEIVED)
