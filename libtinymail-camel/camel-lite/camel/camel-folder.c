@@ -1408,7 +1408,7 @@ transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder *dest, G
 		if (transferred_uids)
 			ret_uid = (char **)&((*transferred_uids)->pdata[i]);
 		transfer_message_to (source, uids->pdata[i], dest, ret_uid, delete_originals, ex);
-		camel_operation_progress(NULL, i * 100 / uids->len);
+		camel_operation_progress(NULL, i , uids->len);
 	}
 	if (uids->len > 1) {
 		camel_folder_thaw(dest);
@@ -1656,9 +1656,8 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 		for (i = 0; i < m->junk->len; i ++) {
 			/* TNY TODO: Partial message retrieval exception */
 			CamelMimeMessage *msg = camel_folder_get_message(m->folder, m->junk->pdata[i], CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
-			int pc = 100 * i / m->junk->len;
 			
-			camel_operation_progress(NULL, pc);
+			camel_operation_progress(NULL, i, m->junk->len);
 
 			if (msg) {
 				camel_junk_plugin_report_junk (csp, msg);
@@ -1673,9 +1672,8 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 		for (i = 0; i < m->notjunk->len; i ++) {
 			/* TNY TODO: Partial message retrieval exception */
 			CamelMimeMessage *msg = camel_folder_get_message(m->folder, m->notjunk->pdata[i], CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
-			int pc = 100 * i / m->notjunk->len;
-
-			camel_operation_progress(NULL, pc);
+			
+			camel_operation_progress(NULL, i, m->notjunk->len);
 
 			if (msg) {
 				camel_junk_plugin_report_notjunk (csp, msg);
@@ -1706,9 +1704,8 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 
 		for (i=0;status == 0 && i<m->recents->len;i++) {
 			char *uid = m->recents->pdata[i];
-			int pc = 100 * i / m->recents->len;
 
-			camel_operation_progress(NULL, pc);
+			camel_operation_progress(NULL, i, m->recents->len);
 
 			info = camel_folder_get_message_info(m->folder, uid);
 			if (info == NULL) {

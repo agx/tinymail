@@ -441,15 +441,19 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 
 
 static void
-refresh_current_folder_status_update (TnyFolder *folder, const gchar *what, gint status, gint oftotal, gpointer user_data)
+refresh_current_folder_status_update (TnyFolder *folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
 {
+	gchar *new_what;
+
 	TnyDemouiSummaryViewPriv *priv = user_data;
-	gdouble fraq = (((gdouble) status) / (( gdouble) oftotal));
+	gdouble fraq = (((gdouble) sofar) / (( gdouble) oftotal));
 
 	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress), fraq);
-	/* gtk_progress_bar_pulse (GTK_PROGRESS_BAR (priv->progress)); */
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
-	gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, what);
+
+	new_what = g_strdup_printf ("%s (%d/%d)", what, sofar, oftotal);
+	gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, new_what);
+	g_free (new_what);
 
 	return;
 }

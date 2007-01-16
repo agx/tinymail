@@ -4,7 +4,9 @@
 	* Major refactoring for the flags of messages
 	* Support for the size attribute in TnyHeader on IMAP
 	* Support for the size attribute in TnyHeader on POP
-
+	* More precision in the status handling (for progressbars). No more
+	percentages but actual "sofar" and "oftotal" numbers
+	
 	* This was a major API change in camel-lite
 	* This was a major API change in all
 	* This change influenced the on-disk cache

@@ -678,7 +678,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 			continue;
 		}
 		
-		camel_operation_progress (NULL, ++summary_got * 100 / summary_len);
+		camel_operation_progress (NULL, ++summary_got , summary_len);
 		new[seq - 1].uid = g_strdup (uid);
 		new[seq - 1].flags = flags;
 		g_datalist_clear (&data);
@@ -2410,7 +2410,7 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 			continue;
 		g_ptr_array_add (needheaders, g_strdup (g_datalist_get_data (&data, "UID")));
 		/* if (size > 0)
-			camel_operation_progress (NULL, cnt * 100 / size); */
+			camel_operation_progress (NULL, cnt , size); */
 		g_datalist_clear (&data);
 	}
 	if (type == CAMEL_IMAP_RESPONSE_TAGGED && resp)
@@ -2587,7 +2587,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 					  ucnt++;
 
 					  allhdrs++;
-					  camel_operation_progress (NULL, allhdrs * 100 / ineed);
+					  camel_operation_progress (NULL, allhdrs , ineed);
 
 					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
 

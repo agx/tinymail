@@ -284,7 +284,6 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 {
 	guint32 action;
 	off_t size;
-	double pc;
 
 	d(printf("disco diary replay\n"));
 
@@ -295,8 +294,7 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 
 	camel_operation_start (NULL, _("Resynchronizing with server"));
 	while (!camel_exception_is_set (ex)) {
-		pc = ftell (diary->file) / size;
-		camel_operation_progress (NULL, pc * 100);
+		camel_operation_progress (NULL, ftell (diary->file) , size);
 
 		if (camel_file_util_decode_uint32 (diary->file, &action) == -1)
 			break;

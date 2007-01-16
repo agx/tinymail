@@ -603,7 +603,7 @@ typedef struct
 {
 	RefreshFolderInfo *minfo;
 	gchar *what;
-	gint pc, oftotal;
+	gint sofar, oftotal;
 } ProgressInfo;
 
 static void
@@ -630,7 +630,7 @@ progress_func (gpointer data)
 	if (minfo && minfo->status_callback)
 	{
 		minfo->status_callback (minfo->self, (const gchar*)info->what, 
-			info->pc, info->oftotal, minfo->user_data);
+			info->sofar, info->oftotal, minfo->user_data);
 	}
 
 	return FALSE;
@@ -651,7 +651,7 @@ progress_func (gpointer data)
  * the idle callback you free it, right? Leaking wouldn't be smart here.
  **/
 static void
-tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int pc, void *thr_user_data)
+tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *thr_user_data)
 {
 	RefreshFolderInfo *oinfo = thr_user_data;
 	ProgressInfo *info = g_slice_new (ProgressInfo);
@@ -665,15 +665,15 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 	info->minfo->self = oinfo->self;
 	info->minfo->status_callback = oinfo->status_callback;
 	info->minfo->user_data = oinfo->user_data;
-	info->oftotal = 100;
+	info->oftotal = oftotal;
 
-	if (pc < 0)
-		info->pc = 0;
+	if (sofar < 0)
+		info->sofar = 0;
 	else 
-		if (pc > info->oftotal)
-			info->pc = info->oftotal;
+		if (sofar > info->oftotal)
+			info->sofar = info->oftotal;
 		else
-			info->pc = pc;
+			info->sofar = sofar;
 
 	/* gidle reference */
 	g_object_ref (G_OBJECT (info->minfo->self));

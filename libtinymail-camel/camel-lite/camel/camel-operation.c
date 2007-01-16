@@ -45,7 +45,7 @@
 struct _status_stack {
 	guint32 flags;
 	char *msg;
-	int pc;				/* last pc reported */
+	int sofar, oftotal;
 	unsigned int stamp;		/* last stamp reported */
 };
 
@@ -513,13 +513,14 @@ camel_operation_start (CamelOperation *cc, char *what, ...)
 	s = g_malloc0(sizeof(*s));
 	s->msg = msg;
 	s->flags = 0;
-	s->pc = 0;
+	s->sofar = 0;
+	s->oftotal = 100;
 	cc->lastreport = s;
 	cc->status_stack = g_slist_prepend(cc->status_stack, s);
 
 	UNLOCK();
 
-	cc->status(cc, msg, CAMEL_OPERATION_START, cc->status_data);
+	cc->status(cc, msg, CAMEL_OPERATION_START, 100, cc->status_data);
 
 	d(printf("start '%s'\n", msg, pc));
 }
@@ -578,17 +579,17 @@ static unsigned int stamp(void)
 /**
  * camel_operation_progress:
  * @cc: Operation to report to.
- * @pc: Percent complete, 0 to 100.
+ * @sofar: Amount complete
+ * @oftotal: Max amount (or, amount when completed)
  * 
  * Report progress on the current operation.  If @cc is NULL, then the
- * currently registered operation is used.  @pc reports the current
- * percentage of completion, which should be in the range of 0 to 100.
+ * currently registered operation is used.  @
  *
  * If the total percentage is not know, then use
  * camel_operation_progress_count().
  **/
 void
-camel_operation_progress (CamelOperation *cc, int pc)
+camel_operation_progress (CamelOperation *cc, int sofar, int oftotal)
 {
 	unsigned int now;
 	struct _status_stack *s;
@@ -608,7 +609,8 @@ camel_operation_progress (CamelOperation *cc, int pc)
 	}
 
 	s = cc->status_stack->data;
-	s->pc = pc;
+	s->sofar = sofar;
+	s->oftotal = oftotal;
 
 	/* Transient messages dont start updating till 4 seconds after
 	   they started, then they update every second */
@@ -632,7 +634,7 @@ camel_operation_progress (CamelOperation *cc, int pc)
 	UNLOCK();
 
 	if (cc) {
-		cc->status(cc, msg, pc, cc->status_data);
+		cc->status(cc, msg, sofar, oftotal, cc->status_data);
 		g_free(msg);
 	}
 }
@@ -646,7 +648,7 @@ camel_operation_progress (CamelOperation *cc, int pc)
 void
 camel_operation_progress_count (CamelOperation *cc, int sofar)
 {
-	camel_operation_progress(cc, sofar);
+	camel_operation_progress(cc, sofar, 100);
 }
 
 /**
@@ -664,7 +666,8 @@ camel_operation_end (CamelOperation *cc)
 	struct _status_stack *s, *p;
 	unsigned int now;
 	char *msg = NULL;
-	int pc = 0;
+	int sofar = 0;
+	int oftotal = 100;
 
 	if (cc == NULL)
 		cc = co_getcc();
@@ -693,13 +696,15 @@ camel_operation_end (CamelOperation *cc)
 				if (p->flags & CAMEL_OPERATION_TRANSIENT) {
 					if (p->stamp + CAMEL_OPERATION_TRANSIENT_DELAY < now) {
 						msg = g_strdup(p->msg);
-						pc = p->pc;
+						sofar = p->sofar;
+						oftotal = p->oftotal;
 						cc->lastreport = p;
 						break;
 					}
 				} else {
 					msg = g_strdup(p->msg);
-					pc = p->pc;
+					sofar = p->sofar;
+					oftotal = p->oftotal;
 					cc->lastreport = p;
 					break;
 				}
@@ -709,7 +714,8 @@ camel_operation_end (CamelOperation *cc)
 		g_free(s->msg);
 	} else {
 		msg = s->msg;
-		pc = CAMEL_OPERATION_END;
+		sofar = CAMEL_OPERATION_END;
+		oftotal = 100;
 		cc->lastreport = s;
 	}
 	g_free(s);
@@ -718,7 +724,7 @@ camel_operation_end (CamelOperation *cc)
 	UNLOCK();
 
 	if (msg) {
-		cc->status(cc, msg, pc, cc->status_data);
+		cc->status(cc, msg, sofar, oftotal, cc->status_data);
 		g_free(msg);
 	}
 }

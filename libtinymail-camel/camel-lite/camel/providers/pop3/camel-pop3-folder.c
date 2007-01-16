@@ -260,7 +260,7 @@ cmd_uidl(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			if (sscanf((char *) line, "%u %s", &id, uid) == 2) {
 				fi = g_hash_table_lookup(folder->uids_id, GINT_TO_POINTER(id));
 				if (fi) {
-					camel_operation_progress(NULL, (fi->index+1) * 100 / folder->uids->len);
+					camel_operation_progress(NULL, (fi->index+1) , folder->uids->len);
 					fi->uid = g_strdup(uid);
 					g_hash_table_insert(folder->uids_uid, fi->uid, fi);
 				} else {
@@ -344,7 +344,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		} else 
 			camel_message_info_free (mi);
 
-		camel_operation_progress (NULL, i * 100 / pop3_folder->uids->len);
+		camel_operation_progress (NULL, i , pop3_folder->uids->len);
 
 	}
 
@@ -421,7 +421,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
 			fi->cmd = NULL;
 		}
-		camel_operation_progress(NULL, (i+1) * 100 / pop3_folder->uids->len);
+		camel_operation_progress(NULL, (i+1) , pop3_folder->uids->len);
 	}
 
 	camel_operation_end(NULL);
@@ -490,7 +490,7 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 			camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
 			fi->cmd = NULL;
 		}
-		camel_operation_progress(NULL, (i+1) * 100 / pop3_folder->uids->len);
+		camel_operation_progress(NULL, (i+1) , pop3_folder->uids->len);
 	}
 
 	camel_operation_end(NULL);
@@ -526,7 +526,7 @@ cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		if (w > fi->size)
 			w = fi->size;
 		if (fi->size != 0)
-			camel_operation_progress(NULL, (w * 100) / fi->size);
+			camel_operation_progress(NULL, w , fi->size);
 	}
 
 	/* it all worked, output a '#' to say we're a-ok */
@@ -609,7 +609,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 
 		if (!theend)
 		{
-		    n = camel_stream_write(fi->stream, buffer, len);		    
+		    n = camel_stream_write(fi->stream, buffer, len);
 		    if (n == -1 || camel_stream_write(fi->stream, "\n", 1) == -1)
 			break;
 		    w += n+1;
@@ -623,7 +623,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		if (w > fi->size)
 			w = fi->size;
 		if (fi->size != 0)
-			camel_operation_progress(NULL, (w * 100) / fi->size);
+			camel_operation_progress(NULL, w , fi->size);
 	}
 
 	/* it all worked, output a '#' to say we're a-ok */

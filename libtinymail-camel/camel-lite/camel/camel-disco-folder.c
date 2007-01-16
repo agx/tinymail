@@ -105,9 +105,8 @@ cdf_sync_offline(CamelSession *session, CamelSessionThreadMsg *mm)
 
 	if (m->changes) {
 		for (i=0;i<m->changes->uid_added->len;i++) {
-			int pc = i * 100 / m->changes->uid_added->len;
-
-			camel_operation_progress(NULL, pc);
+			
+			camel_operation_progress(NULL, i, m->changes->uid_added->len);
 			camel_disco_folder_cache_message((CamelDiscoFolder *)m->folder,
 							 m->changes->uid_added->pdata[i],
 							 &mm->ex);
@@ -477,10 +476,9 @@ disco_prepare_for_offline (CamelDiscoFolder *disco_folder,
 	}
 
 	for (i = 0; i < uids->len; i++) {
-		int pc = i * 100 / uids->len;
-
+		
 		camel_disco_folder_cache_message (disco_folder, uids->pdata[i], ex);
-		camel_operation_progress(NULL, pc);
+		camel_operation_progress(NULL, i, uids->len);
 		if (camel_exception_is_set (ex))
 			break;
 	}

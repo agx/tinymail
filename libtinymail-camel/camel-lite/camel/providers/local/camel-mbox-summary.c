@@ -493,7 +493,7 @@ summary_update(CamelLocalSummary *cls, off_t offset, CamelFolderChangeInfo *chan
 		CamelMessageInfo *info;
 		off_t pc = camel_mime_parser_tell_start_from (mp) + 1;
 		
-		camel_operation_progress (NULL, (int) (((float) pc / size) * 100));
+		camel_operation_progress (NULL, pc, size);
 
 		info = camel_folder_summary_add_from_parser(s, mp);
 		if (info == NULL) {
@@ -741,9 +741,8 @@ mbox_summary_sync_quick(CamelMboxSummary *mbs, gboolean expunge, CamelFolderChan
 	count = camel_folder_summary_count(s);
 	for (i = 0; i < count; i++) {
 		int xevoffset;
-		int pc = (i+1)*100/count;
 
-		camel_operation_progress(NULL, pc);
+		camel_operation_progress(NULL, i+1, count);
 
 		info = (CamelMboxMessageInfo *)camel_folder_summary_index(s, i);
 
@@ -945,9 +944,8 @@ camel_mbox_summary_sync_mbox(CamelMboxSummary *cls, guint32 flags, CamelFolderCh
 
 	count = camel_folder_summary_count(s);
 	for (i = 0; i < count; i++) {
-		int pc = (i + 1) * 100 / count;
 
-		camel_operation_progress(NULL, pc);
+		camel_operation_progress(NULL, i + 1, count);
 
 		info = (CamelMboxMessageInfo *)camel_folder_summary_index(s, i);
 

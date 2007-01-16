@@ -31,7 +31,7 @@ extern "C" {
 
 typedef struct _CamelOperation CamelOperation;
 
-typedef void (*CamelOperationStatusFunc)(struct _CamelOperation *op, const char *what, int pc, void *data);
+typedef void (*CamelOperationStatusFunc)(struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *data);
 
 typedef enum _camel_operation_status_t {
 	CAMEL_OPERATION_START = -1,
@@ -62,7 +62,7 @@ CamelOperation *camel_operation_registered(void);
 
 void camel_operation_start(CamelOperation *cc, char *what, ...);
 void camel_operation_start_transient(CamelOperation *cc, char *what, ...);
-void camel_operation_progress(CamelOperation *cc, int pc);
+void camel_operation_progress(CamelOperation *cc, int sofar, int oftotal);
 void camel_operation_progress_count(CamelOperation *cc, int sofar);
 void camel_operation_end(CamelOperation *cc);
 

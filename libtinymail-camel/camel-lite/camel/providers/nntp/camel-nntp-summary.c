@@ -238,7 +238,7 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 	count = 0;
 	total = high-low+1;
 	while ((ret = camel_nntp_stream_line(store->stream, (unsigned char **)&line, (unsigned int *) &len)) > 0) {
-		camel_operation_progress(NULL, (count * 100) / total);
+		camel_operation_progress(NULL, (count) , total);
 		count++;
 		n = strtoul(line, &tab, 10);
 		if (*tab != '\t')
@@ -331,7 +331,7 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 	count = 0;
 	total = high-low+1;
 	for (i=low;i<high+1;i++) {
-		camel_operation_progress(NULL, (count * 100) / total);
+		camel_operation_progress(NULL, (count) , total);
 		count++;
 		ret = camel_nntp_raw_command_auth(store, ex, &line, "head %u", i);
 		/* unknown article, ignore */

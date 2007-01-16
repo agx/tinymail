@@ -580,9 +580,8 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 	rewinddir(dir);
 
 	while ( (d = readdir(dir)) ) {
-		int pc = count * 100 / total;
 
-		camel_operation_progress(NULL, pc);
+		camel_operation_progress(NULL, count, total);
 		count++;
 
 		/* FIXME: also run stat to check for regular file */
@@ -663,9 +662,8 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 		while ( (d = readdir(dir)) ) {
 			char *name, *newname, *destname, *destfilename;
 			char *src, *dest;
-			int pc = count * 100 / total;
-
-			camel_operation_progress(NULL, pc);
+			
+			camel_operation_progress(NULL, count, total);
 			count++;
 
 			name = d->d_name;
@@ -742,7 +740,7 @@ maildir_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChange
 
 	count = camel_folder_summary_count((CamelFolderSummary *)cls);
 	for (i=count-1;i>=0;i--) {
-		camel_operation_progress(NULL, (count-i)*100/count);
+		camel_operation_progress(NULL, (count-i), count);
 
 		info = camel_folder_summary_index((CamelFolderSummary *)cls, i);
 		mdi = (CamelMaildirMessageInfo *)info;

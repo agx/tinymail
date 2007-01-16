@@ -472,11 +472,11 @@ camel_session_get_filter_driver (CamelSession *session,
 }
 
 static void
-cs_thread_status(CamelOperation *op, const char *what, int pc, void *data)
+cs_thread_status(CamelOperation *op, const char *what, int sofar, int oftotal, void *data)
 {
 	CamelSessionThreadMsg *m = data;
 
-	CS_CLASS(m->session)->thread_status(m->session, m, what, pc);
+	CS_CLASS(m->session)->thread_status(m->session, m, what, sofar * 100 / oftotal);
 }
 
 static void *session_thread_msg_new(CamelSession *session, CamelSessionThreadOps *ops, unsigned int size)
