@@ -904,7 +904,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 		   misinterpreted by the POP server) */
 
 		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
-			cmd_tocache, fi, "TOP %u 1\r\n", fi->id);
+			cmd_tocache, fi, "TOP %u 0\r\n", fi->id);
 
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;
