@@ -289,9 +289,7 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 				acnt++;
 				mi = (CamelMessageInfoBase *)camel_folder_summary_add_from_header(s, headers);
 				if (mi) {
-#ifdef NON_TINYMAIL_FEATURES
-					mi->size = size;
-#endif
+					mi->size = (guint16) (size / 1024);
 					cns->high = n;
 					camel_folder_change_info_add_uid(changes, camel_message_info_uid(mi));
 				}

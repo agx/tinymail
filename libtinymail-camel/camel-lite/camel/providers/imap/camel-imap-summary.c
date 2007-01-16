@@ -309,9 +309,7 @@ camel_imap_summary_add_offline (CamelFolderSummary *summary, const char *uid,
 		tag = tag->next;
 	}
 
-#ifdef NON_TINYMAIL_FEATURES
-	mi->info.size = camel_message_info_size(info);
-#endif
+	mi->info.size = ((CamelMessageInfoBase *)info)->size;
 	mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	mi->info.uid = g_strdup (uid);
 
