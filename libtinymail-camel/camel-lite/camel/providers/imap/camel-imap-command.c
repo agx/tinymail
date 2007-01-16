@@ -785,8 +785,9 @@ imap_command_strdup_vprintf (CamelImapStore *store, const char *fmt,
 			} else if (*p == 'G') {
 				string = camel_utf8_utf7(string);
 			}
-				
-			arglen = strlen (string);
+
+			if (string)
+				arglen = strlen (string);
 			g_ptr_array_add (args, string);
 			if (imap_is_atom (string)) {
 				len += arglen;

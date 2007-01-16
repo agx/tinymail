@@ -131,7 +131,7 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 					"password", tny_account_get_proto (account), 
 					"PLAIN", 0, retval, &item_id);
 			}
-		}
+		} else retval = NULL;
 
 		*cancel = (!canc);
 

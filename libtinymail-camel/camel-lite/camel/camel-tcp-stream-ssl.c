@@ -91,6 +91,7 @@ struct _CamelTcpStreamSSLPrivate {
 	char *expected_host;
 	gboolean ssl_mode;
 	guint32 flags;
+	gboolean accepted;
 };
 
 static void
@@ -858,6 +859,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 	CamelTcpStreamSSL *ssl;
 	CERTCertificate *cert;
 	SECStatus status = SECFailure;
+	struct _CamelTcpStreamSSLPrivate *priv = ssl->priv;
 
 	g_return_val_if_fail (data != NULL, SECFailure);
 	g_return_val_if_fail (CAMEL_IS_TCP_STREAM_SSL (data), SECFailure);
@@ -906,6 +908,8 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 
 	camel_certdb_cert_unref(certdb, ccert);
 	camel_object_unref(certdb);
+
+	priv->accepted = accept;
 
 	return accept ? SECSuccess : SECFailure;
 

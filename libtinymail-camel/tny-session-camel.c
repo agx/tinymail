@@ -249,7 +249,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	gboolean found = FALSE, freeprmpt = FALSE, cancel = FALSE;
 	gchar *retval = NULL, *prmpt = (gchar*)prompt;
 	GetPassWaitResults results;
-	GThread *thread;
+	GThread *thread; gboolean inf;
 
 	while (G_LIKELY (copy))
 	{
@@ -281,6 +281,13 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_session_camel_forget_password (session, service, domain, item, ex);
 		}
 
+
+
+		inf = priv->in_auth_function;
+		if (inf) return;
+
+		g_mutex_lock (priv->colock);
+
 		priv->in_auth_function = TRUE;
 
 		results.self = self;
@@ -302,22 +309,23 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 
 		g_thread_join (thread);
 
-
-		tny_lockable_unlock (priv->ui_lock);
-		tny_lockable_lock (priv->ui_lock);
-
 		retval = results.data;
 		cancel = results.cancel;
 
 		priv->in_auth_function = FALSE;
 
+		g_mutex_unlock (priv->colock);
+
 		if (freeprmpt)
 			g_free (prmpt);
+
 	}
 
-	if (cancel)
+	if (cancel || retval == NULL) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 			_("You cancelled when you had to enter a password"));
+		retval = NULL;
+	}
 
 	return retval;
 }
@@ -382,7 +390,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	TnyAccount *account;
 	gboolean found = FALSE;
 	ForGetPassWaitResults results;
-	GThread *thread;
+	GThread *thread; gboolean inf;
 
 	while (G_LIKELY (copy))
 	{
@@ -400,6 +408,12 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 
 	if (G_LIKELY (found))
 	{
+
+		inf = priv->in_auth_function;
+		if (inf) return;
+
+		g_mutex_lock (priv->colock);
+
 		priv->in_auth_function = TRUE;
 
 		results.self = self;
@@ -418,6 +432,9 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		g_thread_join (thread);
 
 		priv->in_auth_function = FALSE;
+
+		g_mutex_unlock (priv->colock);
+
 	}
 
 	return;
@@ -466,7 +483,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
 	TnySessionCamelPriv *priv = self->priv;
-	GThread *thread;
+	GThread *thread; gboolean inf;
 
 	if (priv->account_store)
 	{
@@ -488,6 +505,11 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
+		inf = priv->in_auth_function;
+		if (inf) return;
+
+		g_mutex_lock (priv->colock);
+
 		priv->in_auth_function = TRUE;
 
 		results.self = self;
@@ -507,6 +529,8 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 		g_thread_join (thread);
 
 		priv->in_auth_function = FALSE;
+
+		g_mutex_unlock (priv->colock);
 
 		g_free (results.prompt);
 
@@ -601,7 +625,7 @@ my_free_func (CamelSession *session, struct _CamelSessionThreadMsg *m)
 
 
 static void 
-my_cancel_func (struct _CamelOperation *op, const char *what, int pc, void *data)
+my_cancel_func (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *data)
 {
 	return;
 }
@@ -642,6 +666,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->priv = g_slice_new (TnySessionCamelPriv);
 	priv = instance->priv;
 
+	priv->colock = g_mutex_new ();
 	priv->prev_constat = FALSE;
 	priv->device = NULL;
 	priv->camel_dir = NULL;
@@ -762,9 +787,10 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 	TnySessionCamel *self = user_data;
 	TnySessionCamelPriv *priv = self->priv;
 	BackgroundConnectInfo *info;
+	gboolean inf;
 
-	if (priv->in_auth_function)
-		return;
+	inf = priv->in_auth_function;
+	if (inf) return;
 
 	info = g_slice_new (BackgroundConnectInfo);
 
@@ -889,6 +915,8 @@ tny_session_camel_finalise (CamelObject *object)
 
 	if (priv->camel_dir)
 		g_free (priv->camel_dir);
+
+	g_mutex_free (priv->colock);
 
 	g_slice_free (TnySessionCamelPriv, self->priv);
 

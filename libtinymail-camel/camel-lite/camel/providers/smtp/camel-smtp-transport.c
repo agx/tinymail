@@ -530,7 +530,7 @@ smtp_connect (CamelService *service, CamelException *ex)
 							  service->url->host);
 				
 				service->url->passwd = camel_session_get_password (session, service, NULL,
-										   prompt, "password", CAMEL_SESSION_PASSWORD_SECRET, ex);
+						prompt, "password", CAMEL_SESSION_PASSWORD_SECRET, ex);
 				
 				g_free (prompt);
 				g_free (errbuf);

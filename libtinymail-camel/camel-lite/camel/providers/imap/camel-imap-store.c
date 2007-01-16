@@ -1414,6 +1414,14 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 		if (authtype)
 			authenticated = try_auth (store, authtype->authproto, ex);
 		else {
+
+			if (!service->url->passwd)
+			{
+				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
+						     _("You did not enter a password."));
+				return FALSE;
+			}
+
 			response = camel_imap_command (store, NULL, ex,
 						       "LOGIN %S %S",
 						       service->url->user,

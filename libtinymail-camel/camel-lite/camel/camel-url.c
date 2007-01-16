@@ -205,7 +205,9 @@ camel_url_new_with_base (CamelURL *base, const char *url_string)
 		url->protocol = g_strdup (base->protocol);
 		url->user = g_strdup (base->user);
 		url->authmech = g_strdup (base->authmech);
-		url->passwd = g_strdup (base->passwd);
+		if (base->passwd)
+			url->passwd = g_strdup (base->passwd);
+		else url->passwd = NULL;
 		url->host = g_strdup (base->host);
 		url->port = base->port;
 
@@ -413,7 +415,8 @@ camel_url_free (CamelURL *url)
 		g_datalist_clear (&url->params);
 		g_free (url->query);
 		g_free (url->fragment);
-		
+
+		memset (url, 0, sizeof (CamelURL));
 		g_free (url);
 	}
 }
@@ -703,11 +706,12 @@ camel_url_copy(const CamelURL *in)
 {
 	CamelURL *out;
 
-	out = g_malloc(sizeof(*out));
+	out = g_malloc0(sizeof(*out));
 	out->protocol = g_strdup(in->protocol);
 	out->user = g_strdup(in->user);
 	out->authmech = g_strdup(in->authmech);
-	out->passwd = g_strdup(in->passwd);
+	if (in->passwd)
+		out->passwd = g_strdup(in->passwd);
 	out->host = g_strdup(in->host);
 	out->port = in->port;
 	out->path = g_strdup(in->path);
