@@ -1,8 +1,13 @@
 2007-01-16  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Preparations for size limited retrieval
+	* Major refactoring for the flags of messages
+	* Support for the size attribute in TnyHeader on IMAP
+	* Support for the size attribute in TnyHeader on POP
 
 	* This was a major API change in camel-lite
+	* This was a major API change in all
+	* This change influenced the on-disk cache
 
 2007-01-14  Philip Van Hoof <pvanhoof@gnome.org>
 

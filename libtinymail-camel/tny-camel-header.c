@@ -37,6 +37,7 @@
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
+#include <camel/camel-stream-null.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -532,6 +533,35 @@ tny_camel_header_get_message_id (TnyHeader *self)
 }
 
 
+
+static guint
+tny_camel_header_get_message_size (TnyHeader *self)
+{
+	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
+	guint retval;
+
+#ifdef HEALTHY_CHECK
+	if (!me->healthy || G_UNLIKELY (!me->info))
+		return 0;
+#else
+	if (G_UNLIKELY (!me->info))
+		return 0;
+#endif
+
+	if (G_UNLIKELY (me->write))
+	{
+		CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
+		camel_data_wrapper_write_to_stream((CamelDataWrapper *)((WriteInfo*)me->info)->msg, (CamelStream *)sn);
+		retval = (guint) sn->written;
+		camel_object_unref((CamelObject *)sn);
+	} else
+		retval = (guint) camel_message_info_size ((CamelMessageInfo*)me->info);
+
+	return retval;
+
+
+}
+
 static const gchar*
 tny_camel_header_get_uid (TnyHeader *self)
 {
@@ -630,6 +660,7 @@ tny_header_init (gpointer g, gpointer iface_data)
 
 	klass->get_from_func = tny_camel_header_get_from;
 	klass->get_message_id_func = tny_camel_header_get_message_id;
+	klass->get_message_size_func = tny_camel_header_get_message_size;
 	klass->get_to_func = tny_camel_header_get_to;
 	klass->get_subject_func = tny_camel_header_get_subject;
 	klass->get_date_received_func = tny_camel_header_get_date_received;

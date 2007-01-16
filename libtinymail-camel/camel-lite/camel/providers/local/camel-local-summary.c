@@ -447,12 +447,9 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 #endif
 
 			mi->info.flags |= (camel_message_info_flags(info) & 0xffff);
-#ifdef NON_TINYMAIL_FEATURES
 			mi->info.size = camel_message_info_size(info);
-#endif
 		}
 
-#ifdef NON_TINYMAIL_FEATURES
 		/* we need to calculate the size ourselves */
 		if (mi->info.size == 0) {
 			CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
@@ -461,7 +458,6 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 			mi->info.size = sn->written;
 			camel_object_unref((CamelObject *)sn);
 		}
-#endif
 
 		mi->info.flags &= ~(CAMEL_MESSAGE_FOLDER_NOXEV|CAMEL_MESSAGE_FOLDER_FLAGGED);
 		xev = camel_local_summary_encode_x_evolution(cls, mi);

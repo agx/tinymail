@@ -2104,9 +2104,7 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		/* If the message is small or only 1 part, or server doesn't do 4v1 (properly) fetch it in one piece. */
 		if (store->server_level < IMAP_LEVEL_IMAP4REV1
 		    || store->braindamaged
-#ifdef NON_TINYMAIL_FEATURES
 		    || mi->info.size < IMAP_SMALL_BODY_SIZE
-#endif
 		    || (!content_info_incomplete(mi->info.content) && !mi->info.content->childs)) {
 			msg = get_message_simple (imap_folder, uid, NULL, type, param, ex);
 		} else {

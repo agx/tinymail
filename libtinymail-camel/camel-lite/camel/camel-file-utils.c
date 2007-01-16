@@ -137,6 +137,7 @@ camel_file_util_mmap_decode_uint32 (unsigned char *start, guint32 *dest, gboolea
 	return start;
 }
 
+
 /* This casting should be okay, because it also gets BOTH written and read from
    the file using a 4 byte integer. */
 

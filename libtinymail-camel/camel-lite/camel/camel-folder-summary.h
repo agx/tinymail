@@ -67,36 +67,27 @@ struct _CamelMessageContentInfo {
 
 /* system flag bits */
 typedef enum _CamelMessageFlags {
-	CAMEL_MESSAGE_ANSWERED = 1<<0,
-	CAMEL_MESSAGE_DELETED = 1<<1,
-	CAMEL_MESSAGE_DRAFT = 1<<2,
-	CAMEL_MESSAGE_FLAGGED = 1<<3,
-	CAMEL_MESSAGE_SEEN = 1<<4,
-	
+	CAMEL_MESSAGE_ANSWERED = 1<<0, /* used */
+	CAMEL_MESSAGE_DELETED = 1<<1, /* used */
+	CAMEL_MESSAGE_DRAFT = 1<<2, /* used */
+	CAMEL_MESSAGE_FLAGGED = 1<<3, /* used */
+	CAMEL_MESSAGE_SEEN = 1<<4, /* used */
+	CAMEL_MESSAGE_ATTACHMENTS = 1<<5, /* used */
+	CAMEL_MESSAGE_CACHED = 1<<6, /* used */
+	CAMEL_MESSAGE_PARTIAL = 1<<7, /* used */
+
 	/* these aren't really system flag bits, but are convenience flags */
-	CAMEL_MESSAGE_ATTACHMENTS = 1<<5,
-	CAMEL_MESSAGE_ANSWERED_ALL = 1<<6,
-	CAMEL_MESSAGE_JUNK = 1<<7,
-	CAMEL_MESSAGE_SECURE = 1<<8,
-	CAMEL_MESSAGE_FREED = 1<<9,
+	CAMEL_MESSAGE_SECURE = 1<<8, /* free slot */
+	CAMEL_MESSAGE_FREED = 1<<9, /* free slot */
+	CAMEL_MESSAGE_ANSWERED_ALL = 1<<10, /* free slot */
+	CAMEL_MESSAGE_JUNK = 1<<11, /* free slot */
 
-	CAMEL_MESSAGE_CACHED = 1<<10,
-	CAMEL_MESSAGE_PARTIAL = 1<<11,
-
-	/* following flags are for the folder, and are not really permanent flags */
-	CAMEL_MESSAGE_FOLDER_FLAGGED = 1<<16, /* for use by the folder implementation */
-
-
-	/* flags after 1<<16 are used by camel providers,
-	   if adding non permanent flags, add them to the end  */
-
-	CAMEL_MESSAGE_INFO_NEEDS_FREE = 1<<28, /* internally used */
-	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE = 1<<29, /* internally used */
-	CAMEL_MESSAGE_JUNK_LEARN = 1<<30, /* used when setting CAMEL_MESSAGE_JUNK flag
-					     to say that we request junk plugin
-					     to learn that message as junk/non junk */
-	
-	CAMEL_MESSAGE_USER = 1<<31 /* supports user flags */
+	/* internally used */
+	CAMEL_MESSAGE_FOLDER_FLAGGED = 1<<12, /* internally used */
+	CAMEL_MESSAGE_INFO_NEEDS_FREE = 1<<13,/* internally used */
+	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE = 1<<14, /* internally used */
+	CAMEL_MESSAGE_JUNK_LEARN = 1<<15,  /* free slot */
+	CAMEL_MESSAGE_USER = 1<<16  /* free slot */
 } CamelMessageFlags;
 
 /* Changes to system flags will NOT trigger a folder changed event */
@@ -158,7 +149,6 @@ enum {
 /* information about a given message, use accessors */
 struct _CamelMessageInfo {
 	CamelFolderSummary *summary;
-
 	guint32 refcount;	/* ??? */
 	char *uid;
 };
@@ -168,7 +158,6 @@ struct _CamelMessageInfo {
 /* Otherwise they can do their own thing entirely */
 struct _CamelMessageInfoBase {
 	CamelFolderSummary *summary;
-
 	guint32 refcount;	/* ??? */
 	char *uid;
 
@@ -179,14 +168,16 @@ struct _CamelMessageInfoBase {
 #ifdef NON_TINYMAIL_FEATURES
 	const char *mlist;
 #endif
-	guint32 flags;
-#ifdef NON_TINYMAIL_FEATURES
-	guint32 size;
-#endif
+
+	/* tree of content description - NULL if it is not available */
+	CamelMessageContentInfo *content;
+	CamelSummaryMessageID message_id;
+
+	guint16 flags;
+	guint16 size;
+
 	time_t date_sent;
 	time_t date_received;
-
-	CamelSummaryMessageID message_id;
 
 #ifdef NON_TINYMAIL_FEATURES
 	CamelSummaryReferences *references;/* from parent to root */
@@ -197,8 +188,6 @@ struct _CamelMessageInfoBase {
 	struct _CamelTag *user_tags;
 #endif
 
-	/* tree of content description - NULL if it is not available */
-	CamelMessageContentInfo *content;
 };
 
 /* probably do this as well, removing CamelFolderChangeInfo and interfaces 
@@ -413,10 +402,7 @@ time_t camel_message_info_time(const CamelMessageInfo *mi, int id);
 #endif
 
 #define camel_message_info_flags(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_FLAGS)
-
-#ifdef NON_TINYMAIL_FEATURES
 #define camel_message_info_size(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE)
-#endif
 
 #define camel_message_info_date_sent(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_SENT)
 #define camel_message_info_date_received(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_RECEIVED)

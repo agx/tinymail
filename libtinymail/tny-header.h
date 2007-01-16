@@ -59,15 +59,12 @@ enum _TnyHeaderFlags
 	TNY_HEADER_FLAG_FLAGGED = 1<<3,
 	TNY_HEADER_FLAG_SEEN = 1<<4,
 	TNY_HEADER_FLAG_ATTACHMENTS = 1<<5,
-	TNY_HEADER_FLAG_ANSWERED_ALL = 1<<6,
-	TNY_HEADER_FLAG_JUNK = 1<<7,
-	TNY_HEADER_FLAG_SECURE = 1<<8,
-	TNY_HEADER_FLAG_CACHED = 1<<10,
-	TNY_HEADER_FLAG_PARTIAL = 1<<11,
-	TNY_HEADER_FLAG_FOLDER_FLAGGED = 1<<16,
-	TNY_HEADER_FLAG_JUNK_LEARN = 1<<30,
-	TNY_HEADER_FLAG_USER = 1<<31
+	TNY_HEADER_FLAG_CACHED = 1<<6,
+	TNY_HEADER_FLAG_PARTIAL = 1<<7
+
+	/* Keep below 1<<12 (internally used bits) */
 };
+
 
 struct _TnyHeaderIface
 {
@@ -81,6 +78,7 @@ struct _TnyHeaderIface
 	const gchar* (*get_from_func) (TnyHeader *self);
 	const gchar* (*get_replyto_func) (TnyHeader *self);
 	const gchar* (*get_message_id_func) (TnyHeader *self);
+	guint (*get_message_size_func) (TnyHeader *self);
 	time_t (*get_date_received_func) (TnyHeader *self);
 	time_t (*get_date_sent_func) (TnyHeader *self);
 	void (*set_bcc_func) (TnyHeader *self, const gchar *bcc);
@@ -104,6 +102,7 @@ const gchar* tny_header_get_cc (TnyHeader *self);
 time_t tny_header_get_date_received (TnyHeader *self);
 time_t tny_header_get_date_sent (TnyHeader *self);
 const gchar* tny_header_get_message_id (TnyHeader *self);
+guint tny_header_get_message_size (TnyHeader *self);
 const gchar* tny_header_get_from (TnyHeader *self);
 const gchar* tny_header_get_to (TnyHeader *self);
 const gchar* tny_header_get_subject (TnyHeader *self);

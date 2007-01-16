@@ -1110,9 +1110,7 @@ camel_folder_summary_info_new_from_parser(CamelFolderSummary *s, CamelMimeParser
 		}
 
 		CAMEL_SUMMARY_UNLOCK(s, filter_lock);
-#ifdef NON_TINYMAIL_FEATURES
 		((CamelMessageInfoBase *)info)->size = camel_mime_parser_tell(mp) - start;
-#endif
 	}
 	return info;
 }
@@ -1906,10 +1904,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	unsigned int i;
 	gchar *theuid;
 	gboolean uidmf = FALSE;
-
-#ifndef NON_TINYMAIL_FEATURES
-	unsigned int size;
-#endif
+	guint32 tempor;
 
 	io(printf("Loading message info\n"));
 
@@ -1954,19 +1949,19 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		uidmf = TRUE;
 	}
 
-	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
+	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &tempor, FALSE);
+
+	mi->size = tempor;
+
+	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &tempor, FALSE);
+
+	mi->flags = tempor;
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
-	if (uidmf) /* TNY TODO: Is this correct? Please debug and check */
+	if (uidmf)
 		mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 	s->set_extra_flags_func (s->folder, mi);
-
-#ifdef NON_TINYMAIL_FEATURES
-	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
-#else
-	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &size, FALSE);
-#endif
 
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_sent);
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_received);
@@ -2093,11 +2088,7 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	camel_file_util_encode_string(out, camel_message_info_uid(mi));
 	camel_file_util_encode_uint32(out, mi->flags);
 
-#ifdef NON_TINYMAIL_FEATURES
 	camel_file_util_encode_uint32(out, mi->size);
-#else
-	camel_file_util_encode_uint32(out, 0);
-#endif
 
 	camel_file_util_encode_time_t(out, mi->date_sent);
 	camel_file_util_encode_time_t(out, mi->date_received);
@@ -3187,10 +3178,8 @@ info_uint32(const CamelMessageInfo *mi, int id)
 	switch (id) {
 	case CAMEL_MESSAGE_INFO_FLAGS:
 		return ((const CamelMessageInfoBase *)mi)->flags;
-#ifdef NON_TINYMAIL_FEATURES
 	case CAMEL_MESSAGE_INFO_SIZE:
 		return ((const CamelMessageInfoBase *)mi)->size;
-#endif
 	default:
 		abort();
 	}

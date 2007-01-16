@@ -288,6 +288,28 @@ tny_header_get_message_id (TnyHeader *self)
 	return TNY_HEADER_GET_IFACE (self)->get_message_id_func (self);
 }
 
+
+/**
+ * tny_header_get_message_size:
+ * @self: a #TnyHeader object
+ * 
+ * Get the expected message size
+ * 
+ * Return value: expected message size
+ *
+ **/
+guint
+tny_header_get_message_size (TnyHeader *self)
+{
+#ifdef DEBUG
+	if (!TNY_HEADER_GET_IFACE (self)->get_message_size_func)
+		g_critical ("You must implement tny_header_get_message_size\n");
+#endif
+
+	return TNY_HEADER_GET_IFACE (self)->get_message_size_func (self);
+}
+
+
 /**
  * tny_header_get_from:
  * @self: a #TnyHeader object
@@ -484,12 +506,8 @@ tny_header_flags_get_type (void)
       { TNY_HEADER_FLAG_FLAGGED, "TNY_HEADER_FLAG_FLAGGED", "flagged" },
       { TNY_HEADER_FLAG_SEEN, "TNY_HEADER_FLAG_SEEN", "seen" },
       { TNY_HEADER_FLAG_ATTACHMENTS, "TNY_HEADER_FLAG_ATTACHMENTS", "attachments" },
-      { TNY_HEADER_FLAG_ANSWERED_ALL, "TNY_HEADER_FLAG_ANSWERED_ALL", "answered_all" },
-      { TNY_HEADER_FLAG_JUNK, "TNY_HEADER_FLAG_JUNK", "junk" },
-      { TNY_HEADER_FLAG_SECURE, "TNY_HEADER_FLAG_SECURE", "secure" },
-      { TNY_HEADER_FLAG_FOLDER_FLAGGED, "TNY_HEADER_FLAG_FLAGGED", "flagged" },
-      { TNY_HEADER_FLAG_JUNK_LEARN, "TNY_HEADER_FLAG_LEARN", "learn" },
-      { TNY_HEADER_FLAG_USER, "TNY_HEADER_FLAG_USER", "user" },
+      { TNY_HEADER_FLAG_CACHED, "TNY_HEADER_FLAG_CACHED", "cached" },
+      { TNY_HEADER_FLAG_PARTIAL, "TNY_HEADER_FLAG_PARTIAL", "partial" },
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyHeaderFlags", values);

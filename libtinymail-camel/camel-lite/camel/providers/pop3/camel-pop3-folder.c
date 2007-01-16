@@ -323,6 +323,12 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 			if (msg) 
 			{
+				mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
+				if (mi) {
+				    mi->size = fi->size;
+				    camel_message_info_free (mi);
+				}
+
 				camel_object_unref (CAMEL_OBJECT (msg));
 
 				hcnt++;
