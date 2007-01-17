@@ -111,7 +111,8 @@ tny_folder_monitor_invoke_default (TnyFolderMonitor *self)
 	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->lock);
-	tny_folder_poke_recent_changes (priv->folder);
+	if (priv->folder && TNY_IS_FOLDER (priv->folder))
+		tny_folder_poke_recent_changes (priv->folder);
 	g_mutex_unlock (priv->lock);
 
 	return;
@@ -195,6 +196,30 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 	return;
 }
 
+
+/**
+ * tny_folder_monitor_new:
+ * @folder: a #TnyFolder instance
+ *
+ * Creates a folder monitor for @folder
+ *
+ * Return value: a new #TnyFolderMonitor instance
+ **/
+TnyFolderObserver*
+tny_folder_monitor_new (TnyFolder *folder)
+{
+	TnyFolderMonitor *self = g_object_new (TNY_TYPE_FOLDER_MONITOR, NULL);
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_FOLDER (folder));
+
+	priv->folder = folder; /* not referenced to avoid cross references */
+	tny_folder_add_observer (priv->folder, TNY_FOLDER_OBSERVER (self));
+
+	return TNY_FOLDER_OBSERVER (self);
+}
+
+
 static void
 tny_folder_monitor_finalize (GObject *object)
 {
@@ -202,8 +227,11 @@ tny_folder_monitor_finalize (GObject *object)
 
 	g_mutex_lock (priv->lock);
 
-	if (priv->folder)
-		g_object_unref (G_OBJECT (priv->folder));
+/*  This does not make a lot sense, removing the observer *is* going to finalize
+    this. Not visa versa. Right?
+
+	if (priv->folder && TNY_IS_FOLDER (priv->folder))
+		tny_folder_remove_observer (priv->folder, TNY_FOLDER_OBSERVER (object)); */
 
 	g_object_unref (G_OBJECT (priv->lists));
 

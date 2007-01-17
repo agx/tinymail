@@ -239,10 +239,9 @@ tny_folder_change_reset (TnyFolderChange *self)
 
 /**
  * tny_folder_change_new:
- * @name: the name of the folder_change
- * @value: the value of the folder_change
+ * @folder: a #TnyFolder instance
  *
- * Creates an instance of a type that holds a name and a value folder_change
+ * Creates a changeset for @folder
  *
  * Return value: a new #TnyFolderChange instance
  **/
