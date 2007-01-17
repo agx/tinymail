@@ -53,6 +53,7 @@ GType tny_msg_view_get_type (void);
 
 TnyMsg* tny_msg_view_get_msg (TnyMsgView *self);
 void  tny_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg);
+void  tny_msg_view_clear (TnyMsgView *self);
 void  tny_msg_view_set_unavailable (TnyMsgView *self);
 TnyMimePartView* tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part);
 TnyMsgView* tny_msg_view_create_new_inline_viewer (TnyMsgView *self);

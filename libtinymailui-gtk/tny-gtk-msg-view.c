@@ -600,7 +600,7 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 
-	tny_msg_view_clear (self);
+	tny_msg_view_clear (TNY_MSG_VIEW (self));
 
 	if (part)
 	{
