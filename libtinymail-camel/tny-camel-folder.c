@@ -1647,7 +1647,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 	cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
 	old_path = camel_folder_get_full_name (cfolder);
 	parent_info = priv->iter->parent;
-	new_path = g_strdup_printf ("%s/%s", parent_info->name, name);
+	new_path = g_strdup_printf ("%s/%s", parent_info->full_name, name);
 
 	/* Check that the name really changes */
 	if (!strcmp (old_path, new_path)) 

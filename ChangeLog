@@ -1,5 +1,6 @@
 2007-01-17  Sergio Villar Senin <svillar@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c: fixed a bug in folder renaming
 	* libtinymailui-gtk/tny-gtk-msg-view.c: added a missing macro in a
 	function call
 	* libtinymailui/tny-msg-view.c: added tny_msg_view_clear prototype to
