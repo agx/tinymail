@@ -46,7 +46,7 @@ headers
 #include <tny-camel-msg-remove-strategy.h>
 #include <tny-camel-full-msg-receive-strategy.h>
 #include <tny-camel-partial-msg-receive-strategy.h>
-
+#include <tny-camel-mem-stream.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"

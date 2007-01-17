@@ -105,7 +105,13 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-transport-account.h \
 	$(top_srcdir)/libtinymail/tny-msg-remove-strategy.h \
 	$(top_srcdir)/libtinymail/tny-msg-receive-strategy.h \
-	$(top_srcdir)/libtinymail/tny-send-queue.h
+	$(top_srcdir)/libtinymail/tny-send-queue.h \
+	$(top_srcdir)/libtinymail/tny-pair.h \
+	$(top_srcdir)/libtinymail/tny-lockable.h \
+	$(top_srcdir)/libtinymail/tny-noop-lockable.h \
+	$(top_srcdir)/libtinymail/tny-folder-change.h \
+	$(top_srcdir)/libtinymail/tny-folder-observer.h \
+	$(top_srcdir)/libtinymail/tny-folder-monitor.h
 
 tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py 
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) | \
@@ -148,7 +154,8 @@ tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-view.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h \
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-lockable.h
 
 tinymailui-gtk.defs: $(tinymailui_gtk_h_files) tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_gtk_h_files) | \
@@ -190,7 +197,8 @@ tinymail_camel_h_files = \
 	$(top_srcdir)/libtinymail-camel/tny-camel-shared.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-store-account.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-stream.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-transport-account.h 
+	$(top_srcdir)/libtinymail-camel/tny-camel-transport-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-mem-stream.h
 
 tinymail-camel.defs : $(tinymail_camel_h_files) tinymail-camel.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_camel_h_files) | \

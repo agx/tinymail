@@ -46,6 +46,7 @@ struct _TnyCamelFolderPriv
 	TnyFolderType cached_folder_type;
 	TnyMsgRemoveStrategy *remove_strat;
 	TnyMsgReceiveStrategy *receive_strat;
+	TnyList *observers;
 
 #ifdef HEALTHY_CHECK
 	GList *possible_headers;

@@ -34,6 +34,9 @@
 #include <tny-camel-store-account.h>
 #include <tny-list.h>
 #include <tny-error.h>
+#include <tny-folder-change.h>
+#include <tny-folder-observer.h>
+#include <tny-simple-list.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
@@ -2124,6 +2127,102 @@ tny_camel_folder_get_folder (TnyCamelFolder *self)
 	return retval;
 }
 
+
+static void 
+tny_camel_folder_poke_recent_changes (TnyFolder *self)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->poke_recent_changes_func (self);
+	return;
+}
+
+static gboolean
+tny_camel_folder_poke_recent_changes_callback (gpointer data)
+{
+	TnyFolder *self = data;
+	TnyFolderChange *change = tny_folder_change_new (self);
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+
+	/* TNY TODO: Implement getting the latest changes */
+
+	iter = tny_list_create_iterator (priv->observers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (tny_iterator_get_current (iter));
+		tny_folder_observer_update (observer, change);
+		g_object_unref (G_OBJECT (observer));
+	}
+	g_object_unref (G_OBJECT (iter));
+
+	g_object_unref (G_OBJECT (change));
+
+	return FALSE;
+}
+
+static void
+tny_camel_folder_poke_recent_changes_destroyer (gpointer data)
+{
+	g_object_unref (G_OBJECT (data));
+}
+
+static void 
+tny_camel_folder_poke_recent_changes_default (TnyFolder *self)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	GObject *info = g_object_ref (G_OBJECT (self));
+
+	if (g_main_depth () > 0)
+	{
+		g_idle_add_full (G_PRIORITY_HIGH, 
+				tny_camel_folder_poke_recent_changes_callback, 
+				info, tny_camel_folder_poke_recent_changes_destroyer);
+	} else 
+	{
+		tny_camel_folder_poke_recent_changes_callback (info);
+		tny_camel_folder_poke_recent_changes_destroyer (info);
+	}
+
+	return;
+}
+
+static void
+tny_camel_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_observer_func (self, observer);
+}
+
+static void
+tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *observer)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
+
+	tny_list_prepend (priv->observers, G_OBJECT (observer));
+
+	return;
+}
+
+
+static void
+tny_camel_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_observer_func (self, observer);
+}
+
+static void
+tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *observer)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
+
+	tny_list_remove (priv->observers, G_OBJECT (observer));
+
+	return;
+}
+
+
 /**
  * tny_camel_folder_new_with_folder:
  * @camel_folder: CamelFolder instance to play proxy for 
@@ -2168,6 +2267,8 @@ tny_camel_folder_finalize (GObject *object)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folder_lock);
+
+	g_object_unref (priv->observers);
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
 	{
@@ -2247,6 +2348,9 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
 	klass->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async;
 	klass->copy_func = tny_camel_folder_copy;
+	klass->poke_recent_changes_func = tny_camel_folder_poke_recent_changes;
+	klass->add_observer_func = tny_camel_folder_add_observer;
+	klass->remove_observer_func = tny_camel_folder_remove_observer;
 
 	return;
 }
@@ -2296,6 +2400,9 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
 	class->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async_default;
 	class->copy_func = tny_camel_folder_copy_default;
+	class->poke_recent_changes_func = tny_camel_folder_poke_recent_changes_default;
+	class->add_observer_func = tny_camel_folder_add_observer_default;
+	class->remove_observer_func = tny_camel_folder_remove_observer_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;
@@ -2315,6 +2422,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelFolder *self = (TnyCamelFolder *)instance;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	priv->observers = tny_simple_list_new ();
 	priv->iter = NULL;
 	priv->iter_parented = FALSE;
 	priv->headers_managed = 0;
@@ -2327,7 +2435,6 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folder_lock = g_mutex_new ();
 	priv->cached_name = NULL;
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
-
 	priv->remove_strat = tny_camel_msg_remove_strategy_new ();
 	priv->receive_strat = tny_camel_full_msg_receive_strategy_new ();
 

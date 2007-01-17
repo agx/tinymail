@@ -26,6 +26,11 @@ headers
 #include <tny-msg-remove-strategy.h>
 #include <tny-msg-receive-strategy.h>
 #include <tny-pair.h>
+#include <tny-folder-monitor.h>
+#include <tny-folder-change.h>
+#include <tny-lockable.h>
+#include <tny-noop-lockable.h>
+#include <tny-folder-observer.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"

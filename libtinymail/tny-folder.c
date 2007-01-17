@@ -25,8 +25,67 @@
 #include <tny-folder.h>
 guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
+/**
+ * tny_folder_add_observer:
+ * @self: a #TnyFolder instance
+ * @observer: a #TnyFolderObserver instance
+ *
+ * Add @observer to the list of interested observers for the 
+ * event that could happen caused by a tny_folder_poke_recent_changes or
+ * other urgent changes.
+ *
+ **/
+void 
+tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->add_observer_func)
+		g_critical ("You must implement tny_folder_add_observer\n");
+#endif
+	TNY_FOLDER_GET_IFACE (self)->add_observer_func (self, observer);
+	return;
+}
 
 
+/**
+ * tny_folder_remove_observer:
+ * @self: a #TnyFolder instance
+ * @observer: a #TnyFolderObserver instance
+ *
+ * Remove @observer from the list of interested observers for the 
+ * event that could happen caused by a tny_folder_poke_recent_changes or
+ * other urgent changes.
+ *
+ **/
+void 
+tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->remove_observer_func)
+		g_critical ("You must implement tny_folder_remove_observer\n");
+#endif
+	TNY_FOLDER_GET_IFACE (self)->remove_observer_func (self, observer);
+	return;
+
+}
+
+/**
+ * tny_folder_poke_recent_changes:
+ * @self: a TnyFolder object
+ *
+ * Poke for recent changes
+ *
+ **/
+void 
+tny_folder_poke_recent_changes (TnyFolder *self)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->poke_recent_changes_func)
+		g_critical ("You must implement tny_folder_get_recent_changes\n");
+#endif
+	TNY_FOLDER_GET_IFACE (self)->poke_recent_changes_func (self);
+	return;
+}
 
 
 /**

@@ -1,0 +1,293 @@
+/* libtinymail - The Tiny Mail base library
+ * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with self library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
+
+#include <config.h>
+#include <glib.h>
+#include <glib/gi18n-lib.h>
+
+#include <tny-folder-monitor.h>
+#include <tny-simple-list.h>
+
+static GObjectClass *parent_class = NULL;
+
+typedef struct _TnyFolderMonitorPriv TnyFolderMonitorPriv;
+
+struct _TnyFolderMonitorPriv
+{
+	TnyList *lists;
+	TnyFolder *folder;
+	GMutex *lock;
+};
+
+
+#define TNY_FOLDER_MONITOR_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER_MONITOR, TnyFolderMonitorPriv))
+
+/**
+ * tny_folder_monitor_add_list:
+ * @self: a #TnyFolderChange instance
+ * @list: a #TnyList instance
+ *
+ * Add @list to the lists that are interested in changes. The list will remain
+ * referenced until it's unregisterd or this instance is finalized.
+ *
+ **/
+void 
+tny_folder_monitor_add_list (TnyFolderMonitor *self, TnyList *list)
+{
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->add_list_func (self, list);
+	return;
+}
+
+static void 
+tny_folder_monitor_add_list_default (TnyFolderMonitor *self, TnyList *list)
+{
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_LIST (list));
+
+	g_mutex_lock (priv->lock);
+	tny_list_prepend (priv->lists, G_OBJECT (list));
+	g_mutex_unlock (priv->lock);
+
+	return;
+}
+
+/**
+ * tny_folder_monitor_remove_list:
+ * @self: a #TnyFolderChange instance
+ * @list: a #TnyList instance
+ *
+ * Remove @list from the lists that are interested in changes.
+ *
+ **/
+void 
+tny_folder_monitor_remove_list (TnyFolderMonitor *self, TnyList *list)
+{
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->remove_list_func (self, list);
+	return;
+}
+
+static void 
+tny_folder_monitor_remove_list_default (TnyFolderMonitor *self, TnyList *list)
+{
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_LIST (list));
+
+	g_mutex_lock (priv->lock);
+	tny_list_remove (priv->lists, G_OBJECT (list));
+	g_mutex_unlock (priv->lock);
+
+	return;
+}
+
+void 
+tny_folder_monitor_invoke (TnyFolderMonitor *self)
+{
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->invoke_func (self);
+	return;
+}
+
+static void 
+tny_folder_monitor_invoke_default (TnyFolderMonitor *self)
+{
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->lock);
+	tny_folder_poke_recent_changes (priv->folder);
+	g_mutex_unlock (priv->lock);
+
+	return;
+}
+
+
+static void
+tny_folder_monitor_update (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->update_func (self, change);
+	return;
+}
+
+static void
+foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
+{
+	TnyIterator *iter;
+
+	iter = tny_list_create_iterator (priv->lists);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
+		tny_list_prepend (list, G_OBJECT (header));
+		g_object_unref (G_OBJECT (list));
+	}
+	g_object_unref (G_OBJECT (iter));
+}
+
+static void
+foreach_list_remove_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
+{
+	TnyIterator *iter;
+
+	iter = tny_list_create_iterator (priv->lists);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
+		tny_list_remove (list, G_OBJECT (header));
+		g_object_unref (G_OBJECT (list));
+	}
+	g_object_unref (G_OBJECT (iter));
+}
+
+static void
+tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+	TnyIterator *iter;
+	TnyList *list;
+
+	g_mutex_lock (priv->lock);
+
+	/* The added headers */
+	list = tny_simple_list_new ();
+	tny_folder_change_get_added_headers (change, list);
+	iter = tny_list_create_iterator (list);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+		foreach_list_add_header (priv, header);
+		g_object_unref (G_OBJECT (header));
+	}
+	g_object_unref (G_OBJECT (iter));
+	g_object_unref (G_OBJECT (list));
+
+	/* The removed headers */
+	list = tny_simple_list_new ();
+	tny_folder_change_get_removed_headers (change, list);
+	iter = tny_list_create_iterator (list);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+		foreach_list_remove_header (priv, header);
+		g_object_unref (G_OBJECT (header));
+	}
+	g_object_unref (G_OBJECT (iter));
+	g_object_unref (G_OBJECT (list));
+
+	g_mutex_unlock (priv->lock);
+
+	return;
+}
+
+static void
+tny_folder_monitor_finalize (GObject *object)
+{
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (object);
+
+	g_mutex_lock (priv->lock);
+
+	if (priv->folder)
+		g_object_unref (G_OBJECT (priv->folder));
+
+	g_object_unref (G_OBJECT (priv->lists));
+
+	g_mutex_unlock (priv->lock);
+
+	g_mutex_free (priv->lock);
+
+	parent_class->finalize (object);
+}
+
+static void
+tny_folder_monitor_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	TnyFolderMonitor *self = (TnyFolderMonitor *)instance;
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+
+	priv->lock = g_mutex_new ();
+
+	g_mutex_lock (priv->lock);
+
+	priv->folder = NULL;
+	priv->lists = tny_simple_list_new ();
+
+	g_mutex_unlock (priv->lock);
+
+	return;
+}
+
+static void
+tny_folder_observer_init (TnyFolderObserverIface *klass)
+{
+	klass->update_func = tny_folder_monitor_update;
+}
+
+static void
+tny_folder_monitor_class_init (TnyFolderMonitorClass *klass)
+{
+	GObjectClass *object_class;
+
+	parent_class = g_type_class_peek_parent (klass);
+	object_class = (GObjectClass*) klass;
+
+	klass->update_func = tny_folder_monitor_update_default;
+	klass->invoke_func = tny_folder_monitor_invoke_default;
+
+	object_class->finalize = tny_folder_monitor_finalize;
+	g_type_class_add_private (object_class, sizeof (TnyFolderMonitorPriv));
+}
+
+GType
+tny_folder_monitor_get_type (void)
+{
+	static GType type = 0;
+	if (G_UNLIKELY(type == 0))
+	{
+		static const GTypeInfo info = 
+		{
+			sizeof (TnyFolderMonitorClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_folder_monitor_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyFolderMonitor),
+			0,      /* n_preallocs */
+			tny_folder_monitor_instance_init,    /* instance_init */
+			NULL
+		};
+
+
+		static const GInterfaceInfo tny_folder_observer_info = 
+		{
+			(GInterfaceInitFunc) tny_folder_observer_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+
+		type = g_type_register_static (G_TYPE_OBJECT,
+			"TnyFolderMonitor",
+			&info, 0);
+
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
+			&tny_folder_observer_info);
+
+	}
+	return type;
+}

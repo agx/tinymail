@@ -86,6 +86,12 @@ typedef struct _TnyLockable TnyLockable;
 typedef struct _TnyLockableIface TnyLockableIface;
 typedef struct _TnyNoopLockable TnyNoopLockable;
 typedef struct _TnyNoopLockableClass TnyNoopLockableClass;
+typedef struct _TnyFolderObserver TnyFolderObserver;
+typedef struct _TnyFolderObserverIface TnyFolderObserverIface;
+typedef struct _TnyFolderChange TnyFolderChange;
+typedef struct _TnyFolderChangeClass TnyFolderChangeClass;
+typedef struct _TnyFolderMonitor TnyFolderMonitor;
+typedef struct _TnyFolderMonitorClass TnyFolderMonitorClass;
 
 G_END_DECLS
 
