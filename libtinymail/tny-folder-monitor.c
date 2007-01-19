@@ -141,8 +141,31 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
 	g_object_unref (G_OBJECT (iter));
 }
 
+static void 
+remove_header_from_list (TnyList *list, const gchar *uid)
+{
+	TnyIterator *iter;
+	TnyHeader *header = NULL;
+
+	iter = tny_list_create_iterator (list);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+		if (!strcmp (tny_header_get_uid (header), uid))
+			break;
+		g_object_unref (G_OBJECT (header));
+	}
+	g_object_unref (G_OBJECT (iter));
+
+	if (header)
+	{
+		g_object_unref (G_OBJECT (header)); /* from the loop */
+		tny_list_remove (list, G_OBJECT (header));
+	}
+}
+
 static void
-foreach_list_remove_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
+foreach_list_remove_header (TnyFolderMonitorPriv *priv, const gchar *uid)
 {
 	TnyIterator *iter;
 
@@ -150,7 +173,7 @@ foreach_list_remove_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
-		tny_list_remove (list, G_OBJECT (header));
+		remove_header_from_list (list, uid);
 		g_object_unref (G_OBJECT (list));
 	}
 	g_object_unref (G_OBJECT (iter));
@@ -185,7 +208,7 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-		foreach_list_remove_header (priv, header);
+		foreach_list_remove_header (priv, tny_header_get_uid (header));
 		g_object_unref (G_OBJECT (header));
 	}
 	g_object_unref (G_OBJECT (iter));

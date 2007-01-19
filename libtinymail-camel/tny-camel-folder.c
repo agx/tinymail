@@ -103,6 +103,8 @@ on_header_got_added (TnyCamelFolder *self)
 	TnyHeader *hdr_addded = tny_camel_header_new ();
 	MemInfo *added = g_slice_new0 (MemInfo);
 
+	/* For removals, just fill in the uid */
+
 	added->uid = NULL;
 	added->bcc = NULL;
 	added->cc = NULL;
