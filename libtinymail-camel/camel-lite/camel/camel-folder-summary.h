@@ -285,6 +285,7 @@ struct _CamelFolderSummaryClass {
 	void (*info_set_time)(CamelMessageInfo *mi, int id, time_t val);
 	void (*info_set_references)(CamelMessageInfo *mi, CamelSummaryReferences *);
 #endif
+
 	gboolean (*info_set_user_flag)(CamelMessageInfo *mi, const char *id, gboolean state);
 	gboolean (*info_set_user_tag)(CamelMessageInfo *mi, const char *id, const char *val);
 	gboolean (*info_set_flags)(CamelMessageInfo *mi, guint32 mask, guint32 set);
@@ -333,6 +334,7 @@ CamelMessageInfo *camel_folder_summary_add_from_parser(CamelFolderSummary *summa
 CamelMessageInfo *camel_folder_summary_add_from_message(CamelFolderSummary *summary, CamelMimeMessage *message);
 
 /* Just build raw summary items */
+CamelMessageInfo *camel_folder_summary_info_new_from_header_with_uid (CamelFolderSummary *s, struct _camel_header_raw *h, const gchar *uid);
 CamelMessageInfo *camel_folder_summary_info_new_from_header(CamelFolderSummary *summary, struct _camel_header_raw *headers);
 CamelMessageInfo *camel_folder_summary_info_new_from_parser(CamelFolderSummary *summary, CamelMimeParser *parser);
 CamelMessageInfo *camel_folder_summary_info_new_from_message(CamelFolderSummary *summary, CamelMimeMessage *message);
@@ -402,7 +404,7 @@ time_t camel_message_info_time(const CamelMessageInfo *mi, int id);
 #endif
 
 #define camel_message_info_flags(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_FLAGS)
-#define camel_message_info_size(mi) (camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE))
+#define camel_message_info_size(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE)
 
 #define camel_message_info_date_sent(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_SENT)
 #define camel_message_info_date_received(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_RECEIVED)

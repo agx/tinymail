@@ -101,27 +101,29 @@ on_header_got_added (TnyCamelFolder *self)
 {
 	TnyFolderChange *change = tny_folder_change_new (TNY_FOLDER (self));
 	TnyHeader *hdr_addded = tny_camel_header_new ();
-	MemInfo *added = g_slice_new0 (MemInfo);
+	CamelMessageInfo *added;
+	struct _camel_header_raw *headers = NULL;
 
-	/* For removals, just fill in the uid */
+	camel_header_raw_clear(&headers);
+	camel_header_raw_append(&headers, "From", "me@me.com", -1);
+	camel_header_raw_append(&headers, "Cc", "me@me.com", -1);
+	camel_header_raw_append(&headers, "To", "me@me.com", -1);
+	camel_header_raw_append(&headers, "Subject", "me@me.com", -1);
+	camel_header_raw_append(&headers, "Date", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
+	camel_header_raw_append(&headers, "Received", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
 
-	added->uid = NULL;
-	added->bcc = NULL;
-	added->cc = NULL;
-	added->message_id = NULL;
-	added->from = NULL;
-	added->to = NULL;
-	added->subject = NULL;
-	added->replyto = NULL;
-	added->date_received = 0;
-	added->date_sent = 0;
-	added->message_size = 0;
-	added->flags = 0;
+	/* For removals, just fill in the uid (and use NULL for headers) */
+	added = camel_folder_summary_info_new_from_header_with_uid (NULL, headers, "1");
+	((CamelMessageInfoBase *) added)->size = 1024;
+	camel_message_info_set_flags (added, 1, ~0);
 
+	/* Prepare the TnyHeader instance (it becomes the owner too) */
 	_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr_addded), added);
-	/* added is freed in TnyCamelHeader's finalize */
 
+	/* Add it to the TnyFolderChange */
 	tny_folder_change_add_added_header (change, hdr_addded);
+
+	/* And notify everybody about this great event! */
 	notify_observers_about (TNY_FOLDER (self), change);
 
 	g_object_unref (G_OBJECT (hdr_addded));

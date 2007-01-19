@@ -1045,6 +1045,16 @@ camel_folder_summary_info_new_from_header(CamelFolderSummary *s, struct _camel_h
 	return ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_header(s, h);
 }
 
+CamelMessageInfo *
+camel_folder_summary_info_new_from_header_with_uid (CamelFolderSummary *s, struct _camel_header_raw *h, const gchar *uid)
+{
+	CamelMessageInfo *mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_header(s, h);
+
+	((CamelMessageInfoBase *)mi)->uid = g_strdup (uid);
+	((CamelMessageInfoBase*)mi)->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+
+	return mi;
+}
 
 /**
  * camel_folder_summary_info_new_from_parser:

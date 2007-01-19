@@ -33,15 +33,6 @@ struct _WriteInfo
 	gchar *mime_from;
 };
 
-typedef struct _MemInfo MemInfo;
-struct _MemInfo
-{
-	gchar *uid, *bcc, *cc, *message_id, 
-		  *from, *to, *subject, *replyto;
-	time_t date_received, date_sent;
-	guint message_size;
-	TnyHeaderFlags flags;
-};
 
 #pragma pack(1)
 struct _TnyCamelHeader
@@ -63,6 +54,6 @@ struct _TnyCamelHeaderClass
 void _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit);
 void _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyCamelFolderPriv *tpriv);
 void _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage *camel_mime_message);
-void _tny_camel_header_set_as_memory (TnyCamelHeader *self, MemInfo *info);
+void _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *camel_message_info);
 
 #endif

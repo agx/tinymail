@@ -3848,7 +3848,7 @@ camel_header_raw_append(struct _camel_header_raw **list, const char *name, const
 		camel_header_to_decode(value);
 	} else if (!g_ascii_strcasecmp(name, "Content-type")) {
 		printf("- Decoding content-type\n");
-		camel_content_type_dump(camel_content_type_decode(value));		
+		camel_content_type_dump(camel_content_type_decode(value));
 	} else if (!g_ascii_strcasecmp(name, "MIME-Version")) {
 		printf("- Decoding mime version\n");
 		camel_header_mime_decode(value);
