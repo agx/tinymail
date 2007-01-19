@@ -49,7 +49,7 @@ struct _TnyFolderMonitorClass
 
 	/* virtuals */
 	void (*update_func) (TnyFolderObserver *self, TnyFolderChange *change);
-	void (*invoke_func) (TnyFolderMonitor *self);
+	void (*poke_status_func) (TnyFolderMonitor *self);
 	void (*add_list_func) (TnyFolderMonitor *self, TnyList *list);
 	void (*remove_list_func) (TnyFolderMonitor *self, TnyList *list);
 };
@@ -57,7 +57,7 @@ struct _TnyFolderMonitorClass
 GType tny_folder_monitor_get_type (void);
 TnyFolderObserver* tny_folder_monitor_new (TnyFolder *folder);
 
-void tny_folder_monitor_invoke (TnyFolderMonitor *self);
+void tny_folder_monitor_poke_status (TnyFolderMonitor *self);
 void tny_folder_monitor_add_list (TnyFolderMonitor *self, TnyList *list);
 void tny_folder_monitor_remove_list (TnyFolderMonitor *self, TnyList *list);
 

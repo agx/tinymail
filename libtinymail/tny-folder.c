@@ -70,20 +70,24 @@ tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
 }
 
 /**
- * tny_folder_poke_recent_changes:
+ * tny_folder_poke_status:
  * @self: a TnyFolder object
  *
- * Poke for recent changes
+ * Poke for the status, this might ignite the event that a !TnyFolderChange is 
+ * to be sent to the observers (tny_folder_add_observer and !TnyFolderObserver).
  *
+ * This functionality is to be used for E-mail services that don't do what for
+ * example the Push-IMAP (P-IMAP) protocol promises (the pushing of changes, as
+ * described in draft-maes-lemonade-p-imap-12).
  **/
 void 
-tny_folder_poke_recent_changes (TnyFolder *self)
+tny_folder_poke_status (TnyFolder *self)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_GET_IFACE (self)->poke_recent_changes_func)
-		g_critical ("You must implement tny_folder_get_recent_changes\n");
+#ifdef DEBUG 
+	if (!TNY_FOLDER_GET_IFACE (self)->poke_status_func)
+		g_critical ("You must implement tny_folder_poke_status\n");
 #endif
-	TNY_FOLDER_GET_IFACE (self)->poke_recent_changes_func (self);
+	TNY_FOLDER_GET_IFACE (self)->poke_status_func (self);
 	return;
 }
 

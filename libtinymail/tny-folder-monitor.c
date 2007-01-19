@@ -99,20 +99,20 @@ tny_folder_monitor_remove_list_default (TnyFolderMonitor *self, TnyList *list)
 }
 
 void 
-tny_folder_monitor_invoke (TnyFolderMonitor *self)
+tny_folder_monitor_poke_status (TnyFolderMonitor *self)
 {
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->invoke_func (self);
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->poke_status_func (self);
 	return;
 }
 
 static void 
-tny_folder_monitor_invoke_default (TnyFolderMonitor *self)
+tny_folder_monitor_poke_status_default (TnyFolderMonitor *self)
 {
 	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->lock);
 	if (priv->folder && TNY_IS_FOLDER (priv->folder))
-		tny_folder_poke_recent_changes (priv->folder);
+		tny_folder_poke_status (priv->folder);
 	g_mutex_unlock (priv->lock);
 
 	return;
@@ -226,15 +226,7 @@ tny_folder_monitor_finalize (GObject *object)
 	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (object);
 
 	g_mutex_lock (priv->lock);
-
-/*  This does not make a lot sense, removing the observer *is* going to finalize
-    this. Not visa versa. Right?
-
-	if (priv->folder && TNY_IS_FOLDER (priv->folder))
-		tny_folder_remove_observer (priv->folder, TNY_FOLDER_OBSERVER (object)); */
-
 	g_object_unref (G_OBJECT (priv->lists));
-
 	g_mutex_unlock (priv->lock);
 
 	g_mutex_free (priv->lock);
@@ -275,7 +267,7 @@ tny_folder_monitor_class_init (TnyFolderMonitorClass *klass)
 	object_class = (GObjectClass*) klass;
 
 	klass->update_func = tny_folder_monitor_update_default;
-	klass->invoke_func = tny_folder_monitor_invoke_default;
+	klass->poke_status_func = tny_folder_monitor_poke_status_default;
 
 	object_class->finalize = tny_folder_monitor_finalize;
 	g_type_class_add_private (object_class, sizeof (TnyFolderMonitorPriv));
