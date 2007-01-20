@@ -96,7 +96,7 @@ _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo
 		destroy_mem (self);
 
 	self->info = camel_message_info;
-	self->write = 2;
+	self->write = 0;
 #ifdef HEALTHY_CHECK
 	self->healthy = 1;
 #endif
@@ -116,7 +116,7 @@ _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *info)
 		destroy_mem (self);
 
 	self->info = info;
-	self->write = 0;
+	self->write = 2;
 #ifdef HEALTHY_CHECK
 	self->healthy = 1;
 #endif
