@@ -188,6 +188,10 @@ typedef struct {
 						     CamelException *ex);
 	void            (*noop)                     (CamelStore *store,
 						     CamelException *ex);
+	GPtrArray*      (*get_recent_messages)      (CamelStore *store, 
+						     const char *folder_name, 
+						     int *unseen, int *messages);
+
 } CamelStoreClass;
 
 /* Standard Camel function */
@@ -257,6 +261,11 @@ void             camel_store_noop                     (CamelStore *store,
 int              camel_store_folder_uri_equal         (CamelStore *store,
 						       const char *uri0,
 						       const char *uri1);
+
+GPtrArray*       camel_store_get_recent_messages      (CamelStore *store, 
+						       const char *folder_name, 
+						       int *unseen, int *messages);
+
 
 typedef struct _CamelISubscribe CamelISubscribe;
 struct _CamelISubscribe {

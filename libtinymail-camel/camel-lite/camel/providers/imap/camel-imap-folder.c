@@ -139,6 +139,8 @@ static CamelObjectClass *parent_class;
 
 static GData *parse_fetch_response (CamelImapFolder *imap_folder, char *msg_att);
 
+GPtrArray* _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *folder_name, int *messages, int *unseen, gboolean withthem);
+
 #ifdef G_OS_WIN32
 /* The strtok() in Microsoft's C library is MT-safe (but still uses
  * only one buffer pointer per thread, but for the use of strtok_r()
@@ -277,7 +279,6 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 		camel_object_unref (CAMEL_OBJECT (folder));
 		return NULL;
 	}
-
 
 	if (!g_ascii_strcasecmp (folder_name, "INBOX")) {
 		if ((imap_store->parameters & IMAP_PARAM_FILTER_INBOX))
@@ -2646,6 +2647,9 @@ imap_update_summary (CamelFolder *folder, int exists,
    } /* more */
 
    camel_folder_summary_save (folder->summary);
+
+   /* Updates the fdr-dir/status file */
+   _camel_imap_store_get_recent_messages (store, folder->full_name, &i, &got, FALSE);
 
    camel_operation_end (NULL);
 

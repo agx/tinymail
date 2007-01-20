@@ -116,6 +116,7 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 	return imap_read_response (store, ex);
 }
 
+
 /**
  * camel_imap_command_start:
  * @store: the IMAP store

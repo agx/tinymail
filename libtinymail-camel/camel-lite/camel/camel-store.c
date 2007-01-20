@@ -82,6 +82,8 @@ static void construct (CamelService *service, CamelSession *session,
 static int store_setv (CamelObject *object, CamelException *ex, CamelArgV *args);
 static int store_getv (CamelObject *object, CamelException *ex, CamelArgGetV *args);
 
+static GPtrArray* get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
+
 static void
 camel_store_class_init (CamelStoreClass *camel_store_class)
 {
@@ -107,7 +109,8 @@ camel_store_class_init (CamelStoreClass *camel_store_class)
 	camel_store_class->subscribe_folder = subscribe_folder;
 	camel_store_class->unsubscribe_folder = unsubscribe_folder;
 	camel_store_class->noop = noop;
-	
+	camel_store_class->get_recent_messages = get_recent_messages;
+
 	/* virtual method overload */
 	camel_service_class->construct = construct;
 	
@@ -174,6 +177,14 @@ camel_store_get_type (void)
 
 	return camel_store_type;
 }
+
+static GPtrArray* 
+get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages)
+{
+	*unseen = 0;
+	*messages = 0;
+}
+
 
 static int
 store_setv (CamelObject *object, CamelException *ex, CamelArgV *args)

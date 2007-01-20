@@ -49,6 +49,8 @@
 #include "camel/camel-stream-fs.h"
 #include "camel/camel-stream-process.h"
 #include "camel/camel-stream.h"
+#include "camel/camel-stream-mem.h"
+#include "camel/camel-mime-message.h"
 #include "camel/camel-string-utils.h"
 #include "camel/camel-tcp-stream-raw.h"
 #include "camel/camel-tcp-stream-ssl.h"
@@ -132,6 +134,9 @@ static gboolean imap_check_folder_still_extant (CamelImapStore *imap_store, cons
 static void imap_forget_folder(CamelImapStore *imap_store, const char *folder_name, CamelException *ex);
 static void imap_set_server_level (CamelImapStore *store);
 
+static GPtrArray* imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
+
+
 static void
 camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 {
@@ -166,7 +171,8 @@ camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 	camel_store_class->noop = imap_noop;
 	camel_store_class->get_trash = imap_get_trash;
 	camel_store_class->get_junk = imap_get_junk;
-	
+	camel_store_class->get_recent_messages = imap_get_recent_messages;
+
 	camel_disco_store_class->can_work_offline = can_work_offline;
 	camel_disco_store_class->connect_online = imap_connect_online;
 	camel_disco_store_class->connect_offline = imap_connect_offline;
@@ -1789,9 +1795,10 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	struct imap_status_item *items, *item, *tail;
 	CamelImapResponse *response;
 	char *status, *name, *p;
-	
-	/* FIXME: we assume the server is STATUS-capable */
-	
+
+	if (!(imap_store->capabilities & IMAP_CAPABILITY_STATUS))
+		return NULL;
+
 	response = camel_imap_command (imap_store, NULL, NULL,
 				       "STATUS %F (%s)",
 				       folder_name,
@@ -1873,6 +1880,250 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	return items;
 }
 
+static void
+camel_imap_store_set_status_for (CamelImapStore *imap_store, const char *folder_name, guint32 messages, guint32 unseen, guint32 uidnext)
+{
+	char *storage_path, *folder_dir, *filename;
+	FILE *file = NULL;
+
+	storage_path = g_strdup_printf("%s/folders", imap_store->storage_path);
+	folder_dir = imap_path_to_physical (storage_path, folder_name);
+	g_free(storage_path);
+	filename = g_strdup_printf ("%s/status", folder_dir);
+	g_free (folder_dir);
+
+	file = fopen (filename, "w");
+	g_free (filename);
+
+	if (file != NULL)
+	{
+		fprintf (file, "%#d %#d %#d", messages, unseen, uidnext);
+		fclose (file);
+	}
+
+	return;
+}
+
+static void 
+camel_imap_store_get_status_for (CamelImapStore *imap_store, const char *folder_name, guint32 *messages, guint32 *unseen, guint32 *uidnext)
+{
+	char *storage_path, *folder_dir, *filename;
+	FILE *file = NULL;
+	int nmessages, nunseen, nuidnext;
+
+	storage_path = g_strdup_printf("%s/folders", imap_store->storage_path);
+	folder_dir = imap_path_to_physical (storage_path, folder_name);
+	g_free(storage_path);
+	filename = g_strdup_printf ("%s/status", folder_dir);
+	g_free (folder_dir);
+
+	file = fopen (filename, "r");
+	g_free (filename);
+
+	if (file != NULL)
+	{
+		fscanf (file, "%i %i %i", &nmessages, &nunseen, &nuidnext);
+		*messages = nmessages; 
+		*unseen = nunseen; 
+		*uidnext = nuidnext;
+		fclose (file);
+	}
+
+	return;
+}
+
+static CamelMessageInfo*
+parse_message_header (char *response)
+{
+	CamelMessageInfoBase *mi = NULL;
+	char *uid = NULL, *idate = NULL;
+	size_t body_len = 0;
+	guint32 flags = 0, size = 0;
+
+	if (*response != '(') {
+		long seq;
+		
+		if (*response != '*' || *(response + 1) != ' ')
+			return NULL;
+		seq = strtol (response + 2, &response, 10);
+		if (seq == 0)
+			return NULL;
+		if (g_ascii_strncasecmp (response, " FETCH (", 8) != 0)
+			return NULL;
+		response += 7;
+	}
+	
+	do {
+		response++;
+		if (!g_ascii_strncasecmp (response, "FLAGS ", 6)) {
+			response += 6;
+			flags = imap_parse_flag_list (&response);
+		} else if (!g_ascii_strncasecmp (response, "RFC822.SIZE ", 12)) {
+			response += 12;
+			size = strtoul (response, &response, 10);
+		} else if (!g_ascii_strncasecmp (response, "BODY[", 5) ||
+			   !g_ascii_strncasecmp (response, "RFC822 ", 7)) 
+		{
+			char *p, *body;
+			if (*response == 'B') {
+				response += 5;
+				p = strchr (response, ']');
+				if (!p || *(p + 1) != ' ')
+					break;
+				response = p + 2;
+			} else
+				response += 7;
+
+			body = imap_parse_nstring ((const char **) &response, &body_len);
+			if (!response)
+				break;
+			if (body)
+			{
+				CamelMimeMessage *msg = camel_mime_message_new ();
+				CamelStream *stream = camel_stream_mem_new_with_buffer (body, body_len);
+				g_free (body);
+
+				if (camel_data_wrapper_construct_from_stream (CAMEL_DATA_WRAPPER (msg), stream) == -1) {
+					camel_object_unref (CAMEL_OBJECT (msg));
+					break;
+				}
+
+				mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (NULL, msg);
+				camel_object_unref (CAMEL_OBJECT (msg));
+			}
+		} else if (!g_ascii_strncasecmp (response, "UID ", 4)) {
+			int len = strcspn (response + 4, " )");
+			uid = g_strndup (response + 4, len);
+			response += 4 + len;
+		} else if (!g_ascii_strncasecmp (response, "INTERNALDATE ", 13)) {
+			int len; response += 13;
+			if (*response == '"') {
+				response++;
+				len = strcspn (response, "\"");
+				idate = g_strndup (response, len);
+				response += len + 1;
+			}
+		} else {
+			g_warning ("Unexpected FETCH response from server: (%s", response);
+			break;
+		}
+	} while (response && *response != ')');
+
+	if (mi)
+	{
+		mi->flags |= flags;
+		if (uid) {
+			mi->uid = uid;
+			mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+		}
+		if (idate) {
+			mi->date_received = decode_internaldate ((const unsigned char *) idate);
+			g_free (idate);
+		}
+		mi->size = size;
+	}
+
+	return (CamelMessageInfo *) mi;
+}
+
+GPtrArray*
+_camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *folder_name, int *unseen, int *messages, gboolean withthem)
+{
+	guint32 uidnext=-1;
+	struct imap_status_item *items, *item;
+	guint ounseen, omessages, ouidnext;
+	GPtrArray *retval = NULL;
+
+/*
+      Example:    C: A042 STATUS blurdybloop (UIDNEXT MESSAGES)
+                  S: * STATUS blurdybloop (MESSAGES 231 UIDNEXT 44292)
+                  S: A042 OK STATUS completed
+*/
+
+	item = items = get_folder_status (imap_store, folder_name, "MESSAGES UNSEEN UIDNEXT");
+	while (item != NULL) {
+		if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
+			*messages = item->value;
+		if (!g_ascii_strcasecmp (item->name, "UNSEEN"))
+			*unseen = item->value;
+		if (!g_ascii_strcasecmp (item->name, "UIDNEXT"))
+			uidnext = item->value;
+		item = item->next;
+	}
+	imap_status_item_free (items);
+
+	if (withthem)
+	{
+		camel_imap_store_get_status_for (imap_store, folder_name, &omessages, &ounseen, &ouidnext);
+
+		if (ouidnext != uidnext)
+		{
+			CamelImapResponse *response;
+			CamelImapResponseType type;
+			CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+			char *resp; 
+
+			if (!camel_imap_store_connected (imap_store, &tex))
+				goto done;
+			response = camel_imap_command (imap_store, NULL, &tex,
+					"SELECT %F", folder_name);
+			if (!response)
+				goto done;
+			camel_imap_response_free (imap_store, response);
+
+			if (!camel_imap_command_start (imap_store, NULL, &tex,
+				"UID FETCH %d:* (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[HEADER])", ouidnext-1))
+				goto done;
+
+			while ((type = camel_imap_command_response (imap_store, &resp, &tex))
+				== CAMEL_IMAP_RESPONSE_UNTAGGED) 
+			{
+			   if (resp)
+			   {
+				CamelMessageInfo *mi = parse_message_header (resp);
+				g_free (resp);
+
+				if (mi)
+				{
+					if (retval == NULL)
+						retval = g_ptr_array_new ();
+					g_ptr_array_add (retval, mi);
+				}
+			   }
+			}
+
+			camel_imap_response_free (imap_store, response);
+
+			/* Restore the original folder selection */
+			if (imap_store->current_folder != NULL && imap_store->current_folder->full_name != NULL)
+			{
+				response = camel_imap_command (imap_store, NULL, &tex,
+						"SELECT %F", imap_store->current_folder->full_name);
+				if (response)
+					camel_imap_response_free (imap_store, response);
+			}
+		}
+	}
+
+done:
+
+	camel_imap_store_set_status_for (imap_store, folder_name, *messages, *unseen, uidnext);
+
+	return retval;
+}
+
+static GPtrArray*
+imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages)
+{
+	GPtrArray *retval = NULL;
+	CamelImapStore *imap_store = CAMEL_IMAP_STORE (store);
+
+	CAMEL_SERVICE_REC_LOCK(imap_store, connect_lock);
+	retval = _camel_imap_store_get_recent_messages (imap_store, folder_name, unseen, messages, TRUE);
+	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
+
+	return retval;
+}
 
 static CamelFolder *
 get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, CamelException *ex)
@@ -2931,7 +3182,7 @@ subscribe_folder (CamelStore *store, const char *folder_name,
 	if (!response)
 		goto done;
 	camel_imap_response_free (imap_store, response);
-	
+
 	si = camel_store_summary_path((CamelStoreSummary *)imap_store->summary, folder_name);
 	if (si) {
 		if ((si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) == 0) {
