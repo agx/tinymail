@@ -258,7 +258,7 @@ tny_folder_monitor_stop_default (TnyFolderMonitor *self)
  * tny_folder_monitor_start:
  * @self: a #TnyFolderMonitor instance
  *
- * Start monitoring the folder. The starting of monitoring implies that @self
+ * Start monitoring the folder. The starting of a monitor implies that @self
  * will become an observer of the folder instance, adding a reference to @self
  * that at some point in time must be removed using tny_folder_monitor_stop.
  *
