@@ -266,10 +266,10 @@ tny_folder_monitor_stop_default (TnyFolderMonitor *self)
  * This means that if you start the monitor, you must also stop it somewhere.
  * Which makes perfect sense, but I bet that I'm going to be surprised to see
  * the vast amounts of people that are not going to stop their monitors, and be
- * surprised to have memory leaks (which is normal, if the folder never gets
+ * surprised to have memory leaks (which is normal, if the lists never get
  * unreferenced, of course).
  * 
- * Keep this in mind: monitoring means that the folder is kept alive. A folder
+ * Keep this in mind: monitoring means that the lists are kept alive. A list
  * that is alive means that it's consuming memory. Simple and plain. Or not?
  **/
 void 
