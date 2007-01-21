@@ -2335,7 +2335,7 @@ tny_camel_folder_finalize (GObject *object)
 
 	g_mutex_lock (priv->folder_lock);
 
-	g_object_unref (priv->observers);
+	g_object_unref (G_OBJECT (priv->observers));
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
 	{
