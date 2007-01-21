@@ -2247,7 +2247,7 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 	if (s)
 		g_slice_free1 (s->message_info_size, mi);
 	else
-		g_slice_free (CamelMessageInfo, (CamelMessageInfo*) mi);
+		g_slice_free (CamelMessageInfoBase, (CamelMessageInfoBase*) mi);
 }
 
 static CamelMessageContentInfo *

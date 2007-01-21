@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* #define IM_TESTING */
+
 #include <config.h>
 
 #include <glib/gi18n-lib.h>

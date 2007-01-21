@@ -222,6 +222,52 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 	return;
 }
 
+/**
+ * tny_folder_monitor_stop:
+ * @self: a #TnyFolderMonitor instance
+ *
+ * Stop monitoring the folder. You must perform this one after using
+ * tny_folder_monitor_start at some point in time (for example before
+ * unreferencing @self). If you don't, the instance will never loose the
+ * reference with the folder (being an observer of it).
+ *
+ **/
+void 
+tny_folder_monitor_stop (TnyFolderMonitor *self)
+{
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->stop_func (self);
+	return;
+}
+
+static void 
+tny_folder_monitor_stop_default (TnyFolderMonitor *self)
+{
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+	tny_folder_remove_observer (priv->folder, TNY_FOLDER_OBSERVER (self));
+	return;
+}
+
+/**
+ * tny_folder_monitor_start:
+ * @self: a #TnyFolderMonitor instance
+ *
+ * Start monitoring the folder
+ *
+ **/
+void 
+tny_folder_monitor_start (TnyFolderMonitor *self)
+{
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->start_func (self);
+	return;
+}
+
+static void 
+tny_folder_monitor_start_default (TnyFolderMonitor *self)
+{
+	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
+	tny_folder_add_observer (priv->folder, TNY_FOLDER_OBSERVER (self));
+	return;
+}
 
 /**
  * tny_folder_monitor_new:
@@ -240,7 +286,6 @@ tny_folder_monitor_new (TnyFolder *folder)
 	g_assert (TNY_IS_FOLDER (folder));
 
 	priv->folder = folder; /* not referenced to avoid cross references */
-	tny_folder_add_observer (priv->folder, TNY_FOLDER_OBSERVER (self));
 
 	return TNY_FOLDER_OBSERVER (self);
 }
@@ -295,6 +340,8 @@ tny_folder_monitor_class_init (TnyFolderMonitorClass *klass)
 	klass->update_func = tny_folder_monitor_update_default;
 	klass->poke_status_func = tny_folder_monitor_poke_status_default;
 	klass->add_list_func = tny_folder_monitor_add_list_default;
+	klass->stop_func = tny_folder_monitor_stop_default;
+	klass->start_func = tny_folder_monitor_start_default;
 
 	object_class->finalize = tny_folder_monitor_finalize;
 	g_type_class_add_private (object_class, sizeof (TnyFolderMonitorPriv));
