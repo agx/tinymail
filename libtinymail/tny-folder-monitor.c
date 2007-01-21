@@ -148,19 +148,22 @@ remove_header_from_list (TnyList *list, const gchar *uid)
 {
 	TnyIterator *iter;
 	TnyHeader *header = NULL;
+	gboolean found = FALSE;
 
 	iter = tny_list_create_iterator (list);
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+		found = TRUE;
 		if (!strcmp (tny_header_get_uid (header), uid))
 			break;
+		found = FALSE;
 		g_object_unref (G_OBJECT (header));
 		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
 
-	if (header)
+	if (header && found)
 	{
 		g_object_unref (G_OBJECT (header)); /* from the loop */
 		tny_list_remove (list, G_OBJECT (header));
