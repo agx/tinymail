@@ -63,7 +63,6 @@ TnyFolderObserver* tny_folder_monitor_new (TnyFolder *folder);
 void tny_folder_monitor_poke_status (TnyFolderMonitor *self);
 void tny_folder_monitor_add_list (TnyFolderMonitor *self, TnyList *list);
 void tny_folder_monitor_remove_list (TnyFolderMonitor *self, TnyList *list);
-
 void tny_folder_monitor_stop (TnyFolderMonitor *self);
 void tny_folder_monitor_start (TnyFolderMonitor *self);
 
