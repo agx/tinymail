@@ -1048,8 +1048,16 @@ camel_folder_summary_info_new_from_header(CamelFolderSummary *s, struct _camel_h
 CamelMessageInfo *
 camel_folder_summary_info_new_from_header_with_uid (CamelFolderSummary *s, struct _camel_header_raw *h, const gchar *uid)
 {
-	CamelMessageInfo *mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_header(s, h);
-	CamelMessageInfoBase *bi = (CamelMessageInfoBase *)mi;
+
+	CamelMessageInfo *mi;
+	CamelMessageInfoBase *bi;
+
+	if (s != NULL)
+		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_header(s, h);
+	else 
+		mi = message_info_new_from_header(s, h);
+
+	bi = (CamelMessageInfoBase *)mi;
 
 	if (bi->uid && (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
 		g_free (bi->uid);
@@ -1807,9 +1815,12 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	const char *received;
 	guchar digest[16];
 	struct _camel_header_references *refs, *irt, *scan;
-	char *msgid;
+	char *msgid, *r=NULL;
 	int count;
-	char *subject, *from, *to, *cc, *mlist;
+	char *subject, *from, *to, *cc;
+#ifdef NON_TINYMAIL_FEATURES
+	char *mlist;
+#endif
 	CamelContentType *ct = NULL;
 	const char *content, *charset = NULL;
 
@@ -1828,31 +1839,39 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	from = summary_format_address(h, "from", charset);
 	to = summary_format_address(h, "to", charset);
 	cc = summary_format_address(h, "cc", charset);
+
+#ifdef NON_TINYMAIL_FEATURES
 	mlist = camel_header_raw_check_mailing_list(&h);
+#endif
 
 	if (ct)
 		camel_content_type_unref(ct);
 
 	if (subject)
 		mi->subject = camel_pstring_add (subject, TRUE);
-	else mi->subject = NULL;
+	else 
+		mi->subject = camel_pstring_add (g_strdup (""), TRUE);
 
 	if (from)
 		mi->from = camel_pstring_add (from, TRUE);
-	else mi->from = NULL;
+	else 
+		mi->from = camel_pstring_add (g_strdup (""), TRUE);
 
 	if (to)
 		mi->to = camel_pstring_add (to, TRUE);
-	else mi->to = NULL;
+	else 
+		mi->to = camel_pstring_add (g_strdup (""), TRUE);
 
 	if (cc)
 		mi->cc = camel_pstring_add (cc, TRUE);
-	else mi->cc = NULL;
+	else 
+		mi->cc = camel_pstring_add (g_strdup (""), TRUE);
 
 #ifdef NON_TINYMAIL_FEATURES
 	if (mlist)
 		mi->mlist = camel_pstring_add (mlist, TRUE);
-	else mi->mlist = NULL;
+	else 
+		mi->mlist = camel_pstring_add (g_strdup (""), TRUE);
 
 	mi->user_flags = NULL;
 	mi->user_tags = NULL;
@@ -1862,14 +1881,18 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	received = camel_header_raw_find(&h, "received", NULL);
 
 	if (received)
-		received = strrchr(received, ';');
-	if (received)
-		mi->date_received = camel_header_decode_date(received + 1, NULL);
-	else
+		r = strrchr(received, ';');
+	if (r)
+		mi->date_received = camel_header_decode_date(r + 1, NULL);
+
+	else if (received)
+		mi->date_received = camel_header_decode_date(received, NULL);
+	else 
 		mi->date_received = 0;
 
 	msgid = camel_header_msgid_decode(camel_header_raw_find(&h, "message-id", NULL));
-	if (msgid) {
+	if (msgid) 
+	{
 		md5_get_digest(msgid, strlen(msgid), digest);
 		memcpy(mi->message_id.id.hash, digest, sizeof(mi->message_id.id.hash));
 		g_free(msgid);
@@ -2970,7 +2993,7 @@ camel_message_info_new (CamelFolderSummary *s)
 	if (s)
 		info = g_slice_alloc0(s->message_info_size);
 	else
-		info = g_slice_new0(CamelMessageInfo);
+		info = (CamelMessageInfo *) g_slice_new0(CamelMessageInfoBase);
 
 	info->refcount = 1;
 	info->summary = s;

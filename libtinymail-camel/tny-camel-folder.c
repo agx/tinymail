@@ -80,6 +80,46 @@ folder_changed (TnyFolder *self, CamelFolderChangeInfo *info, gpointer user_data
 }
 */
 
+#ifdef IM_TESTING
+static void 
+add_dummy_test_header (TnyFolder *self, TnyFolderChange *change)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyHeader *hdr_addded = tny_camel_header_new ();
+	CamelMessageInfo *added;
+	struct _camel_header_raw *headers = NULL;
+	static int nextuid = 0;
+
+	gchar *uid = g_strdup_printf ("%d", nextuid);
+
+	camel_header_raw_clear(&headers);
+	camel_header_raw_append(&headers, "From", "me@me.com", -1);
+	camel_header_raw_append(&headers, "Cc", "me@cc.com", -1);
+	camel_header_raw_append(&headers, "To", "me@to.com", -1);
+	camel_header_raw_append(&headers, "Subject", "Test subject", -1);
+	camel_header_raw_append(&headers, "Date", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
+	camel_header_raw_append(&headers, "Received", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
+	camel_header_raw_append(&headers, "Message-Id", "MyMEID", -1);
+	camel_header_raw_append(&headers, "Content-Type", "text/plain; charset=utf-8", -1);
+
+	/* For removals, just fill in the uid (and use NULL for headers) */
+	added = camel_folder_summary_info_new_from_header_with_uid (NULL, headers, uid);
+	g_free (uid); nextuid++;
+
+	((CamelMessageInfoBase *) added)->size = 1024;
+	camel_message_info_set_flags (added, 1, ~0);
+
+	/* Prepare the TnyHeader instance (it becomes the owner too) */
+	_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr_addded), added);
+
+	/* Add it to the TnyFolderChange */
+	tny_folder_change_add_added_header (change, hdr_addded);
+
+	g_object_unref (G_OBJECT (hdr_addded));
+}
+
+#endif
+
 static void
 notify_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
@@ -92,41 +132,23 @@ notify_observers_about (TnyFolder *self, TnyFolderChange *change)
 		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (tny_iterator_get_current (iter));
 		tny_folder_observer_update (observer, change);
 		g_object_unref (G_OBJECT (observer));
+		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
 }
 
 static void
-on_header_got_added (TnyCamelFolder *self)
+on_header_got_added (TnyCamelFolder *self, TnyHeader *added_header)
 {
 	TnyFolderChange *change = tny_folder_change_new (TNY_FOLDER (self));
-	TnyHeader *hdr_addded = tny_camel_header_new ();
-	CamelMessageInfo *added;
-	struct _camel_header_raw *headers = NULL;
 
-	camel_header_raw_clear(&headers);
-	camel_header_raw_append(&headers, "From", "me@me.com", -1);
-	camel_header_raw_append(&headers, "Cc", "me@me.com", -1);
-	camel_header_raw_append(&headers, "To", "me@me.com", -1);
-	camel_header_raw_append(&headers, "Subject", "me@me.com", -1);
-	camel_header_raw_append(&headers, "Date", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
-	camel_header_raw_append(&headers, "Received", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
-
-	/* For removals, just fill in the uid (and use NULL for headers) */
-	added = camel_folder_summary_info_new_from_header_with_uid (NULL, headers, "1");
-	((CamelMessageInfoBase *) added)->size = 1024;
-	camel_message_info_set_flags (added, 1, ~0);
-
-	/* Prepare the TnyHeader instance (it becomes the owner too) */
-	_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr_addded), added);
-
-	/* Add it to the TnyFolderChange */
-	tny_folder_change_add_added_header (change, hdr_addded);
+#ifdef IM_TESTING
+	add_dummy_test_header (TNY_FOLDER (self), change); /* added_header*/
+#endif
 
 	/* And notify everybody about this great event! */
 	notify_observers_about (TNY_FOLDER (self), change);
 
-	g_object_unref (G_OBJECT (hdr_addded));
 	g_object_unref (G_OBJECT (change));
 }
 
@@ -2190,6 +2212,10 @@ tny_camel_folder_poke_status_callback (gpointer data)
 {
 	TnyFolder *self = data;
 	TnyFolderChange *change = tny_folder_change_new (self);
+
+#ifdef IM_TESTING
+	add_dummy_test_header (self, change);
+#endif
 
 	notify_observers_about (self, change);
 

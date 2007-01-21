@@ -110,10 +110,8 @@ tny_folder_monitor_poke_status_default (TnyFolderMonitor *self)
 {
 	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
 
-	g_mutex_lock (priv->lock);
 	if (priv->folder && TNY_IS_FOLDER (priv->folder))
 		tny_folder_poke_status (priv->folder);
-	g_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -137,6 +135,7 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
 		tny_list_prepend (list, G_OBJECT (header));
 		g_object_unref (G_OBJECT (list));
+		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
 }
@@ -154,6 +153,7 @@ remove_header_from_list (TnyList *list, const gchar *uid)
 		if (!strcmp (tny_header_get_uid (header), uid))
 			break;
 		g_object_unref (G_OBJECT (header));
+		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
 
@@ -175,6 +175,7 @@ foreach_list_remove_header (TnyFolderMonitorPriv *priv, const gchar *uid)
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
 		remove_header_from_list (list, uid);
 		g_object_unref (G_OBJECT (list));
+		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
 }
@@ -197,6 +198,7 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 		foreach_list_add_header (priv, header);
 		g_object_unref (G_OBJECT (header));
+		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
 	g_object_unref (G_OBJECT (list));
@@ -210,6 +212,7 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 		foreach_list_remove_header (priv, tny_header_get_uid (header));
 		g_object_unref (G_OBJECT (header));
+		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
 	g_object_unref (G_OBJECT (list));
@@ -291,6 +294,7 @@ tny_folder_monitor_class_init (TnyFolderMonitorClass *klass)
 
 	klass->update_func = tny_folder_monitor_update_default;
 	klass->poke_status_func = tny_folder_monitor_poke_status_default;
+	klass->add_list_func = tny_folder_monitor_add_list_default;
 
 	object_class->finalize = tny_folder_monitor_finalize;
 	g_type_class_add_private (object_class, sizeof (TnyFolderMonitorPriv));

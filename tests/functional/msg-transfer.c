@@ -67,7 +67,7 @@ find_folders (TnyFolderStore *store, TnyFolderStoreQuery *query,
 	    
  		g_object_unref (G_OBJECT (folder));
 
-		tny_iterator_next (iter);	    
+		tny_iterator_next (iter);
 	}
 
 	 g_object_unref (G_OBJECT (iter));

@@ -1,3 +1,12 @@
+2007-01-21  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Preperation for notification of changes in folders, mostly bugfixes
+	* Important bugfix for camel-folder-summar.c when creating new
+	CamelMessageInfo instances without having a summary instance (the size
+	was too small)
+	* Compile with -DIM_TESTING in the CFLAGS to see the TnyFolderMonitor
+	in action already
+
 2007-01-19  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Preparations for notification of changes in folders

@@ -61,6 +61,7 @@ destroy_write (TnyCamelHeader *self)
 static void 
 destroy_mem (TnyCamelHeader *self)
 {
+printf ("D\n");
 	camel_message_info_free ((CamelMessageInfo*) self->info);
 	self->info = NULL;
 	self->write = 3;
