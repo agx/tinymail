@@ -45,7 +45,8 @@ struct _TnyFolderMonitorPriv
  * @list: a #TnyList instance
  *
  * Add @list to the lists that are interested in changes. The list will remain
- * referenced until it's unregisterd or this instance is finalized.
+ * referenced until it's unregisterd using tny_folder_monitor_remove_list or 
+ * until @self is finalized.
  *
  **/
 void 
@@ -74,7 +75,9 @@ tny_folder_monitor_add_list_default (TnyFolderMonitor *self, TnyList *list)
  * @self: a #TnyFolderChange instance
  * @list: a #TnyList instance
  *
- * Remove @list from the lists that are interested in changes.
+ * Remove @list from the lists that are interested in changes. This will remove
+ * the reference added to @list that got added when you ussed the 
+ * tny_folder_monitor_add_list API.
  *
  **/
 void 
@@ -226,10 +229,14 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
  * tny_folder_monitor_stop:
  * @self: a #TnyFolderMonitor instance
  *
- * Stop monitoring the folder. You must perform this one after using
- * tny_folder_monitor_start at some point in time (for example before
- * unreferencing @self). If you don't, the instance will never loose the
- * reference with the folder (being an observer of it).
+ * Stop monitoring the folder. At some point in time you must perform method 
+ * after you used tny_folder_monitor_start (for example before unreferencing 
+ * @self). 
+ *
+ * The reason for that is that unless otherwise the folder is finalized, @self
+ * would still have a reference being held by the TnyFolder instance being
+ * monitored. By stopping this monitor, you explicitly ask that folder instance
+ * to unregister @self as an observer. And by that loosing that reference too.
  *
  **/
 void 
@@ -251,8 +258,18 @@ tny_folder_monitor_stop_default (TnyFolderMonitor *self)
  * tny_folder_monitor_start:
  * @self: a #TnyFolderMonitor instance
  *
- * Start monitoring the folder
+ * Start monitoring the folder. The starting of monitoring implies that @self
+ * will become an observer of the folder instance, adding a reference to @self
+ * that at some point in time must be removed using tny_folder_monitor_stop.
  *
+ * This means that if you start the monitor, you must also stop it somewhere.
+ * Which makes perfect sense, but I bet that I'm going to be surprised to see
+ * the vast amounts of people that are not going to stop their monitors, and be
+ * surprised to have memory leaks (which is normal, if the folder never gets
+ * unreferenced, of course).
+ * 
+ * Keep this in mind: monitoring means that the folder is kept alive. A folder
+ * that is alive means that it's consuming memory. Simple and plain. Or not?
  **/
 void 
 tny_folder_monitor_start (TnyFolderMonitor *self)
