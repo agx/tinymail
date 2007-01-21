@@ -2013,9 +2013,10 @@ parse_message_header (char *response)
 	{
 		mi->flags |= flags;
 		if (uid) {
-			mi->uid = uid;
 			if (mi->uid && (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
 				g_free (mi->uid);
+
+			mi->uid = uid;
 			mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 		}
 		if (idate) {
