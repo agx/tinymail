@@ -129,16 +129,18 @@ static CamelMessageInfo*
 find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 {
 	CamelMessageInfo *retval = NULL;
-	guint i = 0;
-	for (i=0; i < s->messages->len; i++)
+	guint i = 0, len = strlen (uid);
+
+	for (i=0; G_LIKELY (i < s->messages->len) ; i++)
 	{
 		CamelMessageInfo *info = s->messages->pdata[i];
-		if (info && !strcmp (info->uid, uid))
+		if (G_UNLIKELY (!strncmp (info->uid, uid, len)))
 		{
 			retval = info;
 			break;
 		}
 	}
+
 	return retval;
 }
 

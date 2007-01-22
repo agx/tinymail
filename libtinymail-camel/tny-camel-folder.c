@@ -586,54 +586,6 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 	return;
 }
 
-typedef struct 
-{ 	/* This is a speedup trick */
-	TnyFolder *self;
-	TnyCamelFolderPriv *priv;
-	TnyList *headers;
-} FldAndPriv;
-
-static void
-add_message_with_uid (gpointer data, gpointer user_data)
-{
-	TnyHeader *header = NULL;
-	FldAndPriv *ptr = user_data;
-	const char *uid = (const char*)data;
-
-	/* Unpack speedup trick */
-	TnyFolder *self = ptr->self;
-	TnyCamelFolderPriv *priv = ptr->priv;
-	TnyList *headers = ptr->headers;
-	CamelFolder *cfol = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
-	CamelMessageInfo *mi = camel_folder_get_message_info (cfol, uid);
-	CamelMessageFlags flags = camel_message_info_flags (mi);
-
-	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
-	header = tny_camel_header_new ();
-
-	_tny_camel_header_set_folder (TNY_CAMEL_HEADER (header), TNY_CAMEL_FOLDER (self), priv);
-	_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (header), mi, FALSE);
-
-	/* Get rid of the reference already. I know this is ugly */
-	camel_folder_free_message_info (cfol, mi);
-
-	tny_list_prepend (headers, (GObject*)header);
-
-#ifdef HEALTHY_CHECK
-	g_mutex_lock (priv->poshdr_lock);
-	priv->possible_headers = g_list_prepend (priv->possible_headers, header);    
-	g_mutex_unlock (priv->poshdr_lock);
-#endif
-
-	if (!(flags & CAMEL_MESSAGE_SEEN))
-		priv->unread_length++;
-
-	g_object_unref (G_OBJECT (header));
-
-	priv->cached_length++;
-
-	return;
-}
 
 typedef struct 
 {
@@ -928,6 +880,56 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	return;
 }
 
+
+
+typedef struct 
+{ 	/* This is a speedup trick */
+	TnyFolder *self;
+	TnyCamelFolderPriv *priv;
+	TnyList *headers;
+} FldAndPriv;
+
+static void
+add_message_with_uid (gpointer data, gpointer user_data)
+{
+	TnyHeader *header = NULL;
+	FldAndPriv *ptr = user_data;
+	CamelMessageInfo *mi = (CamelMessageInfo *) data;
+
+	/* Unpack speedup trick */
+	TnyFolder *self = ptr->self;
+	TnyCamelFolderPriv *priv = ptr->priv;
+	TnyList *headers = ptr->headers;
+	CamelFolder *cfol = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
+	CamelMessageFlags flags = camel_message_info_flags (mi);
+
+	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
+	header = tny_camel_header_new ();
+
+	_tny_camel_header_set_folder (TNY_CAMEL_HEADER (header), TNY_CAMEL_FOLDER (self), priv);
+	_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (header), mi, FALSE);
+
+	/* Get rid of the reference already. I know this is ugly */
+	/* camel_folder_free_message_info (cfol, mi); */
+
+	tny_list_prepend (headers, (GObject*)header);
+
+#ifdef HEALTHY_CHECK
+	g_mutex_lock (priv->poshdr_lock);
+	priv->possible_headers = g_list_prepend (priv->possible_headers, header);    
+	g_mutex_unlock (priv->poshdr_lock);
+#endif
+
+	if (!(flags & CAMEL_MESSAGE_SEEN))
+		priv->unread_length++;
+
+	g_object_unref (G_OBJECT (header));
+
+	priv->cached_length++;
+
+	return;
+}
+
 static void
 tny_camel_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err)
 {
@@ -939,7 +941,6 @@ static void
 tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	GPtrArray *uids = NULL;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	FldAndPriv *ptr = NULL;
 
@@ -979,19 +980,14 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 
 	if (priv->folder && CAMEL_IS_FOLDER (priv->folder))
-		uids = camel_folder_get_uids (priv->folder);
-
-	if (uids)
 	{
 		priv->cached_length = 0;
 		priv->unread_length = 0;
-		g_ptr_array_foreach (uids, add_message_with_uid, ptr);
+		g_ptr_array_foreach (priv->folder->summary->messages, add_message_with_uid, ptr);
 	}
 
 	g_slice_free (FldAndPriv, ptr);
 
-	if (uids)
-		camel_folder_free_uids (priv->folder, uids); 
 
 	g_object_unref (G_OBJECT (headers));
 	g_mutex_unlock (priv->folder_lock);
