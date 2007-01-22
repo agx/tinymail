@@ -55,6 +55,14 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 @msg: 
 
 
+<!-- ##### FUNCTION tny_msg_view_clear ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
 <!-- ##### FUNCTION tny_msg_view_set_unavailable ##### -->
 <para>
 

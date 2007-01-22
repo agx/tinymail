@@ -79,6 +79,8 @@ tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_
  * @self: a #TnyFolderChange instance
  *
  * Get the unread count of the changeset
+ *
+ * Return value: the new unread-count
  **/
 guint 
 tny_folder_change_get_new_unread_count (TnyFolderChange *self)
@@ -93,6 +95,8 @@ tny_folder_change_get_new_unread_count (TnyFolderChange *self)
  * @self: a #TnyFolderChange instance
  *
  * Get the all count of the changeset
+ *
+ * Return value: the new all-count
  **/
 guint 
 tny_folder_change_get_new_all_count (TnyFolderChange *self)
@@ -180,7 +184,7 @@ tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers)
 
 
 /**
- * tny_folder_change_get_added_headers:
+ * tny_folder_change_get_removed_headers:
  * @self: a #TnyFolderChange instance
  * @headers: the #TnyList where the removed headers will be put it
  *

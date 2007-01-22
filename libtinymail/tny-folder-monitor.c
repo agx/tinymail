@@ -101,6 +101,14 @@ tny_folder_monitor_remove_list_default (TnyFolderMonitor *self, TnyList *list)
 	return;
 }
 
+/**
+ * tny_folder_monitor_poke_status
+ * @self: a #TnyFolderMonitor instance
+ *
+ * Trigger the poke method on the folder instance being monitored.
+ * Also take a look at the tny_folder_poke_status API.
+ *
+ **/
 void 
 tny_folder_monitor_poke_status (TnyFolderMonitor *self)
 {

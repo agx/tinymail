@@ -52,6 +52,9 @@ A abstract type that defines a folder
 @transfer_msgs_func: 
 @transfer_msgs_async_func: 
 @copy_func: 
+@poke_status_func: 
+@add_observer_func: 
+@remove_observer_func: 
 
 <!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
 <para>
@@ -295,5 +298,31 @@ A abstract type that defines a folder
 @del: 
 @err: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_poke_status ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_folder_add_observer ##### -->
+<para>
+
+</para>
+
+@self: 
+@observer: 
+
+
+<!-- ##### FUNCTION tny_folder_remove_observer ##### -->
+<para>
+
+</para>
+
+@self: 
+@observer: 
 
 

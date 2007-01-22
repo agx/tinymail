@@ -50,6 +50,7 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @camel_dir: 
 @in_auth_function: 
 @ui_lock: 
+@colock: 
 
 <!-- ##### STRUCT TnySessionCamel ##### -->
 <para>

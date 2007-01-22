@@ -41,6 +41,7 @@ tny-folder-priv
 @cached_folder_type: 
 @remove_strat: 
 @receive_strat: 
+@observers: 
 @poshdr_lock: 
 
 <!-- ##### MACRO TNY_CAMEL_FOLDER_GET_PRIVATE ##### -->

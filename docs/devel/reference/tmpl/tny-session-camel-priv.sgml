@@ -32,4 +32,5 @@ tny-session-camel-priv
 @camel_dir: 
 @in_auth_function: 
 @ui_lock: 
+@colock: 
 

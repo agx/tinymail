@@ -1,0 +1,126 @@
+<!-- ##### SECTION Title ##### -->
+TnyFolderChange
+
+<!-- ##### SECTION Short_Description ##### -->
+A type with the changes between two states of a folder
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A type with the delta or changes between two states of a #TnyFolder. The #TnyFolderObserver will receive instances of this type
+as information about what got changed.
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#TnyFolderObserver, #TnyFolder, #TnyFolderMonitor
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyFolderChange ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_folder_change_new ##### -->
+<para>
+
+</para>
+
+@folder: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_change_set_new_all_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@new_all_count: 
+
+
+<!-- ##### FUNCTION tny_folder_change_set_new_unread_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@new_unread_count: 
+
+
+<!-- ##### FUNCTION tny_folder_change_get_new_unread_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_change_get_new_all_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_change_add_added_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+
+<!-- ##### FUNCTION tny_folder_change_add_removed_header ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+
+
+<!-- ##### FUNCTION tny_folder_change_get_added_headers ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+
+
+<!-- ##### FUNCTION tny_folder_change_get_removed_headers ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+
+
+<!-- ##### FUNCTION tny_folder_change_reset ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_folder_change_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

@@ -131,6 +131,9 @@ Shared include file with forward typedefs
 @transfer_msgs_func: 
 @transfer_msgs_async_func: 
 @copy_func: 
+@poke_status_func: 
+@add_observer_func: 
+@remove_observer_func: 
 
 <!-- ##### STRUCT TnyHeader ##### -->
 <para>
@@ -368,9 +371,11 @@ A method that frequently gets called while a folder is being refreshed
 
 @self: the #TnyFolder instance that is being refreshed
 @what: a status message
-@status: a number that is smaller than or equal to @oftotal indicating the amount that is done
+@sofar: 
 @oftotal: the total amount that is to be done
 @user_data: user data passed at the caller
+<!-- # Unused Parameters # -->
+@status: a number that is smaller than or equal to @oftotal indicating the amount that is done
 
 
 <!-- ##### STRUCT TnySimpleList ##### -->
@@ -478,20 +483,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -560,4 +565,50 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @parent: 
+
+<!-- ##### STRUCT TnyFolderObserver ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderObserverIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@update_func: 
+
+<!-- ##### STRUCT TnyFolderChange ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderChangeClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyFolderMonitor ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderMonitorClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@update_func: 
+@poke_status_func: 
+@add_list_func: 
+@remove_list_func: 
+@stop_func: 
+@start_func: 
 

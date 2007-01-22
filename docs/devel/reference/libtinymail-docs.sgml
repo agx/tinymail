@@ -25,6 +25,9 @@
 <!ENTITY libtinymail-TnyPair SYSTEM "xml/tny-pair.xml">
 <!ENTITY libtinymail-TnyLockable SYSTEM "xml/tny-lockable.xml">
 <!ENTITY libtinymail-TnyNoopLockable SYSTEM "xml/tny-noop-lockable.xml">
+<!ENTITY libtinymail-TnyFolderMonitor SYSTEM "xml/tny-folder-monitor.xml">
+<!ENTITY libtinymail-TnyFolderObserver SYSTEM "xml/tny-folder-observer.xml">
+<!ENTITY libtinymail-TnyFolderChange SYSTEM "xml/tny-folder-change.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
 
 
@@ -138,6 +141,9 @@
 		&libtinymail-TnyPair;
 		&libtinymail-TnyLockable;
 		&libtinymail-TnyNoopLockable;
+		&libtinymail-TnyFolderObserver;
+		&libtinymail-TnyFolderChange;
+		&libtinymail-TnyFolderMonitor;
 		&libtinymail-TnyEnums;
 		&libtinymail-TnyShared;
 	</chapter>
