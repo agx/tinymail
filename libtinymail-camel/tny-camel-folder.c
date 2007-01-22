@@ -2213,11 +2213,43 @@ static gboolean
 tny_camel_folder_poke_status_callback (gpointer data)
 {
 	TnyFolder *self = data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
 	TnyFolderChange *change = tny_folder_change_new (self);
+	GPtrArray *items = NULL;
+	CamelStore *store = priv->store;
+	gint unseen = -1, msgs = -1;
 
 #ifdef IM_TESTING
 	add_dummy_test_header (self, change);
 #endif
+
+	/* items = camel_store_get_recent_messages (store, priv->folder_name, 
+			&unseen, &msgs); */
+
+	if (unseen != 0)
+		priv->unread_length = unseen;
+	if (msgs != 0)
+		priv->cached_length = msgs;
+
+	if (items)
+	{
+		int i;
+
+		printf ("Have %d items (%d,%d)\n",
+			items->len, unseen, msgs);
+
+		for (i=0; i< items->len; i++)
+		{
+			CamelMessageInfo *info = g_ptr_array_index (items, i);
+			TnyHeader *hdr_addded = tny_camel_header_new ();
+			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr_addded), info);
+			tny_folder_change_add_added_header (change, hdr_addded);
+			g_object_unref (G_OBJECT (hdr_addded));
+		}
+		g_ptr_array_free (items, TRUE);
+
+	}
 
 	notify_observers_about (self, change);
 

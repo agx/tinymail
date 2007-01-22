@@ -178,6 +178,20 @@ camel_store_get_type (void)
 	return camel_store_type;
 }
 
+
+GPtrArray* 
+camel_store_get_recent_messages (CamelStore *store, const char *folder_name, 
+			int *unseen, int *messages)
+{
+	GPtrArray *ret;
+
+	CAMEL_STORE_LOCK(store, folder_lock);
+	ret = CS_CLASS (store)->get_recent_messages (store, folder_name, unseen, messages);
+	CAMEL_STORE_UNLOCK(store, folder_lock);
+
+	return ret;
+}
+
 static GPtrArray* 
 get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages)
 {
@@ -1120,6 +1134,8 @@ camel_store_folder_subscribed(CamelStore *store, const char *folder_name)
 
 	return ret;
 }
+
+
 
 static void
 subscribe_folder(CamelStore *store, const char *folder_name, CamelException *ex)

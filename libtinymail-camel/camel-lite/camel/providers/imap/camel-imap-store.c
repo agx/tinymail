@@ -1795,11 +1795,12 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	struct imap_status_item *items, *item, *tail;
 	CamelImapResponse *response;
 	char *status, *name, *p;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!(imap_store->capabilities & IMAP_CAPABILITY_STATUS))
 		return NULL;
 
-	response = camel_imap_command (imap_store, NULL, NULL,
+	response = camel_imap_command (imap_store, NULL, &ex,
 				       "STATUS %F (%s)",
 				       folder_name,
 				       type);
@@ -2036,12 +2037,33 @@ _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *f
 	struct imap_status_item *items, *item;
 	guint ounseen, omessages, ouidnext;
 	GPtrArray *retval = NULL;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelImapResponse *response;
+	CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+
+	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (imap_store), &ex))
+		return NULL;
 
 /*
       Example:    C: A042 STATUS blurdybloop (UIDNEXT MESSAGES)
                   S: * STATUS blurdybloop (MESSAGES 231 UIDNEXT 44292)
                   S: A042 OK STATUS completed
 */
+
+	camel_operation_uncancel (NULL);
+
+
+	/* On for example courier, the selected's STATUS is cached (kill that cache) */
+	if (withthem)
+	{
+	    response = camel_imap_command (imap_store, NULL, &tex,
+			    "SELECT"/*, folder_name*/);
+
+printf ("SELECT %s\n", folder_name);
+
+	    if (response)
+		    camel_imap_response_free (imap_store, response);
+	}
 
 	item = items = get_folder_status (imap_store, folder_name, "MESSAGES UNSEEN UIDNEXT");
 	while (item != NULL) {
@@ -2054,6 +2076,7 @@ _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *f
 		item = item->next;
 	}
 	imap_status_item_free (items);
+printf ("%d %d %d\n", *messages, *unseen, uidnext);
 
 	if (withthem)
 	{
@@ -2061,18 +2084,10 @@ _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *f
 
 		if (ouidnext != uidnext)
 		{
-			CamelImapResponse *response;
 			CamelImapResponseType type;
-			CamelException tex = CAMEL_EXCEPTION_INITIALISER;
 			char *resp; 
 
-			if (!camel_imap_store_connected (imap_store, &tex))
-				goto done;
-			response = camel_imap_command (imap_store, NULL, &tex,
-					"SELECT %F", folder_name);
-			if (!response)
-				goto done;
-			camel_imap_response_free (imap_store, response);
+			camel_exception_clear (&tex);
 
 			if (!camel_imap_command_start (imap_store, NULL, &tex,
 				"UID FETCH %d:* (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[HEADER])", ouidnext-1))
@@ -2094,8 +2109,6 @@ _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *f
 				}
 			   }
 			}
-
-			camel_imap_response_free (imap_store, response);
 
 			/* Restore the original folder selection */
 			if (imap_store->current_folder != NULL && imap_store->current_folder->full_name != NULL)

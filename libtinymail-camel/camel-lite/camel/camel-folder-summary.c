@@ -1152,19 +1152,27 @@ CamelMessageInfo *
 camel_folder_summary_info_new_from_message(CamelFolderSummary *s, CamelMimeMessage *msg)
 {
 	CamelMessageInfo *info;
-	struct _CamelFolderSummaryPrivate *p = _PRIVATE(s);
+	struct _CamelFolderSummaryPrivate *p;
 	CamelIndexName *name = NULL;
 
-	info = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_message(s, msg);
+	if (s != NULL)
+	{
+		info = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_message(s, msg);
 
-	/* assign a unique uid, this is slightly 'wrong' as we do not really
-	 * know if we are going to store this in the summary, but we need it set for indexing */
-	if (p->index)
-		summary_assign_uid(s, info);
+		p = _PRIVATE(s);
 
-	CAMEL_SUMMARY_LOCK(s, filter_lock);
+		/* assign a unique uid, this is slightly 'wrong' as we do not really
+		 * know if we are going to store this in the summary, but we need it set for indexing */
+		if (p->index)
+			summary_assign_uid(s, info);
+	} else
+		info = message_info_new_from_message(s, msg);
 
-	if (p->index) {
+
+	if (s!=NULL)
+		CAMEL_SUMMARY_LOCK(s, filter_lock);
+
+	if (s != NULL && p->index) {
 		if (p->filter_index == NULL)
 			p->filter_index = camel_mime_filter_index_new_index(p->index);
 		camel_index_delete_name(p->index, camel_message_info_uid(info));
@@ -1181,13 +1189,15 @@ camel_folder_summary_info_new_from_message(CamelFolderSummary *s, CamelMimeMessa
 
 	((CamelMessageInfoBase *)info)->content = summary_build_content_info_message(s, info, (CamelMimePart *)msg);
 
-	if (name) {
+	if (s != NULL && name) 
+	{
 		camel_index_write_name(p->index, name);
 		camel_object_unref((CamelObject *)name);
 		camel_mime_filter_index_set_name(p->filter_index, NULL);
 	}
 
-	CAMEL_SUMMARY_UNLOCK(s, filter_lock);
+	if (s!=NULL)
+		CAMEL_SUMMARY_UNLOCK(s, filter_lock);
 
 	return info;
 }
@@ -1206,7 +1216,12 @@ camel_folder_summary_content_info_free(CamelFolderSummary *s, CamelMessageConten
 	CamelMessageContentInfo *pw, *pn;
 
 	pw = ci->childs;
-	((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_free(s, ci);
+
+	if (s != NULL)
+		((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_free(s, ci);
+	else
+		content_info_free (NULL, ci);
+
 	while (pw) {
 		pn = pw->next;
 		camel_folder_summary_content_info_free(s, pw);
@@ -1741,7 +1756,10 @@ message_info_new_from_message(CamelFolderSummary *s, CamelMimeMessage *msg)
 {
 	CamelMessageInfo *mi;
 
-	mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_header(s, ((CamelMimePart *)msg)->headers);
+	if (s != NULL)
+		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_new_from_header(s, ((CamelMimePart *)msg)->headers);
+	else
+		mi = message_info_new_from_header(s, ((CamelMimePart *)msg)->headers);
 
 	return mi;
 }
@@ -1751,7 +1769,10 @@ content_info_new_from_message(CamelFolderSummary *s, CamelMimePart *mp)
 {
 	CamelMessageContentInfo *ci;
 
-	ci = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_new_from_header(s, mp->headers);
+	if (s != NULL)
+		ci = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_new_from_header(s, mp->headers);
+	else
+		ci = content_info_new_from_header(NULL, mp->headers);
 
 	return ci;
 }
@@ -1805,7 +1826,9 @@ summary_format_string (struct _camel_header_raw *h, const char *name, const char
 CamelMessageContentInfo *
 camel_folder_summary_content_info_new(CamelFolderSummary *s)
 {
-	return g_slice_alloc0(s->content_info_size);
+	if (s != NULL)
+		return g_slice_alloc0(s->content_info_size);
+	return g_slice_new0 (CamelMessageContentInfo);
 }
 
 static CamelMessageInfo *
@@ -2360,7 +2383,10 @@ content_info_free(CamelFolderSummary *s, CamelMessageContentInfo *ci)
 		token_free (ci->encoding);
 	}
 
-	g_slice_free1(s->content_info_size, ci);
+	if (s != NULL)
+		g_slice_free1(s->content_info_size, ci);
+	else
+		g_slice_free (CamelMessageContentInfo, ci);
 }
 
 static char *
@@ -2536,13 +2562,18 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 {
 	CamelDataWrapper *containee;
 	int parts, i;
-	struct _CamelFolderSummaryPrivate *p = _PRIVATE(s);
+	struct _CamelFolderSummaryPrivate *p;
 	CamelMessageContentInfo *info = NULL, *child;
 	CamelContentType *ct;
 
-	if (s->build_content)
+	if (s != NULL && s->build_content)
 		info = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_new_from_message(s, object);
-	
+	else
+		info = content_info_new_from_message(NULL, object);
+
+	if (s != NULL)
+		p = _PRIVATE(s);
+
 	containee = camel_medium_get_content_object(CAMEL_MEDIUM(object));
 
 	if (containee == NULL)
@@ -2587,7 +2618,7 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 			child->parent = info;
 			my_list_append((struct _node **)&info->childs, (struct _node *)child);
 		}
-	} else if (p->filter_stream
+	} else if (s != NULL && p->filter_stream
 		   && camel_content_type_is(ct, "text", "*")) {
 		int html_id = -1, idx_id = -1;
 
@@ -3090,7 +3121,11 @@ camel_message_info_free(void *o)
 		}
 		GLOBAL_INFO_UNLOCK(info);
 
+		if (((CamelMessageInfoBase *)mi)->content)
+			camel_folder_summary_content_info_free(NULL, ((CamelMessageInfoBase *)mi)->content);
+
 		message_info_free(NULL, mi);
+
 	}
 }
 

@@ -1,7 +1,15 @@
+2007-01-22  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Preperation for notification of changes in folders, mostly bugfixes
+	* More camel-folder-summary.c memory corruption bugfixes 
+	* Added for-now unstable camel-lite API: camel_store_get_recent_messages
+	Do not yet use this API, unless you want to screwup your IMAP
+	connection significantly enough to make using tinymail impossible.
+
 2007-01-21  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Preperation for notification of changes in folders, mostly bugfixes
-	* Important bugfix for camel-folder-summar.c when creating new
+	* Important bugfix for camel-folder-summary.c when creating new
 	CamelMessageInfo instances without having a summary instance (the size
 	was too small)
 	* Compile with -DIM_TESTING in the CFLAGS to see the TnyFolderMonitor

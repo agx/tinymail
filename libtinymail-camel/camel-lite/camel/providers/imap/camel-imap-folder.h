@@ -83,6 +83,8 @@ CamelStream *camel_imap_folder_fetch_data (CamelImapFolder *imap_folder,
 					   gboolean cache_only,
 					   CamelFolderReceiveType type, gint param, CamelException *ex);
 
+time_t decode_internaldate (const unsigned char *in);
+
 /* Standard Camel function */
 CamelType camel_imap_folder_get_type (void);
 

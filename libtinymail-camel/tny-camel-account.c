@@ -213,9 +213,12 @@ _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationS
 		tny_camel_account_stop_camel_operation_priv (priv);
 	}
 
+	camel_operation_uncancel (NULL);
+
 	while (priv->inuse_spin); 
 
 	priv->inuse_spin = TRUE;
+
 
 	priv->cancel = camel_operation_new (func, user_data);
 	

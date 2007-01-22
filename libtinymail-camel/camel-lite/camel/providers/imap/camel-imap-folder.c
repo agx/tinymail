@@ -2252,7 +2252,7 @@ decode_time (const unsigned char **in, int *hour, int *min, int *sec)
 	return TRUE;
 }
 
-static time_t
+time_t
 decode_internaldate (const unsigned char *in)
 {
 	const unsigned char *inptr = in;
@@ -2649,7 +2649,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    camel_folder_summary_save (folder->summary);
 
    /* Updates the fdr-dir/status file */
-   _camel_imap_store_get_recent_messages (store, folder->full_name, &i, &got, FALSE);
+   /* _camel_imap_store_get_recent_messages (store, folder->full_name, &i, &got, FALSE); */
 
    camel_operation_end (NULL);
 
