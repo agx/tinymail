@@ -7,6 +7,8 @@
 	connection significantly enough to make using tinymail impossible.
 	* Several bugfixes in CamelImapFolder
 	* Invalid UTF-8 in TnyGtkTextBufferStream solution
+	* Removed an unneeded hashtable from CamelFolderSummary, reducing
+	memory consumption
 
 2007-01-21  Philip Van Hoof <pvanhoof@gnome.org>
 

@@ -231,7 +231,6 @@ struct _CamelFolderSummary {
 	gboolean build_content;	/* do we try and parse/index the content, or not? */
 
 	GPtrArray *messages; /* CamelMessageInfo's */
-	GHashTable *messages_uid; /* CamelMessageInfo's by uid */
 
 	struct _CamelFolder *folder; /* parent folder, for events */
 	struct _CamelFolderMetaSummary *meta_summary; /* Meta summary */

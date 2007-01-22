@@ -125,11 +125,23 @@ static void camel_folder_summary_unload_mmap (CamelFolderSummary *s);
 
 static CamelObjectClass *camel_folder_summary_parent;
 
-static void 
-messages_uid_destroy_key (gpointer key)
+static CamelMessageInfo*
+find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 {
-	g_free (key);
+	CamelMessageInfo *retval = NULL;
+	guint i = 0;
+	for (i=0; i < s->messages->len; i++)
+	{
+		CamelMessageInfo *info = s->messages->pdata[i];
+		if (info && !strcmp (info->uid, uid))
+		{
+			retval = info;
+			break;
+		}
+	}
+	return retval;
 }
+
 
 static void do_nothing (CamelFolder *folder, CamelMessageInfoBase *mi) { }
  
@@ -157,8 +169,7 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	s->in_reload = FALSE;
 
 	s->messages = g_ptr_array_new();
-	s->messages_uid = g_hash_table_new_full (g_str_hash, g_str_equal, messages_uid_destroy_key, NULL);
-	
+
 	p->summary_lock = g_mutex_new();
 	p->io_lock = g_mutex_new();
 	p->filter_lock = g_mutex_new();
@@ -232,8 +243,6 @@ camel_folder_summary_finalize (CamelObject *obj)
 	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
 	/* camel_folder_summary_clear(s); */
 	g_ptr_array_free(s->messages, TRUE);
-	g_hash_table_destroy(s->messages_uid);
-	s->messages_uid = NULL;
 
 	g_mutex_unlock (s->dump_lock);
 	g_mutex_free (s->dump_lock);
@@ -471,7 +480,7 @@ camel_folder_summary_uid(CamelFolderSummary *s, const char *uid)
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 	CAMEL_SUMMARY_LOCK(s, ref_lock);
 
-	info = g_hash_table_lookup(s->messages_uid, uid);
+	info = find_message_info_with_uid (s, uid);
 
 	if (info)
 		info->refcount++;
@@ -848,6 +857,8 @@ camel_folder_summary_header_load(CamelFolderSummary *s)
 	return ret;
 }
 
+
+
 static int
 summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 {
@@ -866,15 +877,18 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 
-	while ((mi = g_hash_table_lookup(s->messages_uid, uid))) {
+	while ((mi = find_message_info_with_uid (s, uid))) 
+	{
 		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+
 		if (mi == info)
 			return 0;
-		d(printf ("Trying to insert message with clashing uid (%s).  new uid re-assigned", camel_message_info_uid(info)));
 
+		d(printf ("Trying to insert message with clashing uid (%s).  new uid re-assigned", camel_message_info_uid(info)));
 
 		if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
 			g_free(info->uid);
+
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
 		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
@@ -904,7 +918,6 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 void
 camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 {
-	gchar *uidn;
 
 	g_mutex_lock (s->dump_lock);
 
@@ -930,8 +943,6 @@ camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 #endif
 
 	g_ptr_array_add(s->messages, info);
-	uidn = g_strdup (camel_message_info_uid(info));
-	g_hash_table_insert(s->messages_uid, uidn, info);
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
@@ -942,8 +953,6 @@ camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 static void
 camel_folder_summary_mmap_add(CamelFolderSummary *s, CamelMessageInfo *info)
 {
-	gchar *uidn;
-
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 
 /* unnecessary for pooled vectors */
@@ -954,8 +963,6 @@ camel_folder_summary_mmap_add(CamelFolderSummary *s, CamelMessageInfo *info)
 #endif
 
 	g_ptr_array_add(s->messages, info);
-	uidn = g_strdup (camel_message_info_uid(info));
-	g_hash_table_insert(s->messages_uid, uidn, info);
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
@@ -1267,8 +1274,6 @@ camel_folder_summary_clear(CamelFolderSummary *s)
 		camel_message_info_free(s->messages->pdata[i]);
 
 	g_ptr_array_set_size(s->messages, 0);
-	g_hash_table_destroy(s->messages_uid);
-	s->messages_uid = g_hash_table_new(g_str_hash, g_str_equal);
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 }
@@ -1286,7 +1291,6 @@ camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 {
 	g_mutex_lock (s->dump_lock);
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
-	g_hash_table_remove(s->messages_uid, camel_message_info_uid(info));
 	g_ptr_array_remove(s->messages, info);
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
@@ -1305,19 +1309,22 @@ camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 void
 camel_folder_summary_remove_uid(CamelFolderSummary *s, const char *uid)
 {
-        CamelMessageInfo *oldinfo;
-        char *olduid;
+	CamelMessageInfo *oldinfo = NULL;
 
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 	CAMEL_SUMMARY_LOCK(s, ref_lock);
-        if (g_hash_table_lookup_extended(s->messages_uid, uid, (void *)&olduid, (void *)&oldinfo)) {
+
+	oldinfo = find_message_info_with_uid (s, uid);
+
+	if (oldinfo) 
+	{
 		/* make sure it doesn't vanish while we're removing it */
 		oldinfo->refcount++;
 		CAMEL_SUMMARY_UNLOCK(s, ref_lock);
 		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 		camel_folder_summary_remove(s, oldinfo);
 		camel_message_info_free(oldinfo);
-        } else {
+	} else {
 		CAMEL_SUMMARY_UNLOCK(s, ref_lock);
 		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 	}
@@ -1338,7 +1345,6 @@ camel_folder_summary_remove_index(CamelFolderSummary *s, int index)
 	if (index < s->messages->len) {
 		CamelMessageInfo *info = s->messages->pdata[index];
 
-		g_hash_table_remove(s->messages_uid, camel_message_info_uid(info));
 		g_ptr_array_remove_index(s->messages, index);
 		s->flags |= CAMEL_SUMMARY_DIRTY;
 
@@ -1372,13 +1378,6 @@ camel_folder_summary_remove_range(CamelFolderSummary *s, int start, int end)
 
 		end = MIN(end+1, s->messages->len);
 		infos = g_malloc((end-start)*sizeof(infos[0]));
-
-		for (i=start;i<end;i++) {
-			CamelMessageInfo *info = s->messages->pdata[i];
-
-			infos[i-start] = info;
-			g_hash_table_remove(s->messages_uid, camel_message_info_uid(info));
-		}
 
 		memmove(s->messages->pdata+start, s->messages->pdata+end, (s->messages->len-end)*sizeof(s->messages->pdata[0]));
 		g_ptr_array_set_size(s->messages, s->messages->len - (end - start));
