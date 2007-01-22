@@ -397,7 +397,7 @@ check_new_messages (gpointer user_data)
 	g_mutex_lock (priv->monitor_lock);
 	retval = priv->monitor_continue;
 	if (retval) {
-		g_print ("Check for new messages\n");
+		g_print ("Check for new messages (this isn't yet working)\n");
 		tny_folder_monitor_poke_status (priv->monitor);
 	} else 
 		priv->monitor_timeout = 0;
