@@ -436,23 +436,24 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 			tny_gtk_header_list_model_sent_date_sort_func, 
 			NULL, NULL);
 
-		set_header_view_model (header_view, sortable);
-
 		g_mutex_lock (priv->monitor_lock);
-		if (priv->monitor)
 		{
-			tny_folder_monitor_stop (priv->monitor);
-			g_object_unref (G_OBJECT (priv->monitor));
-		}
+/*			if (priv->monitor)
+			{
+				tny_folder_monitor_stop (priv->monitor);
+				g_object_unref (G_OBJECT (priv->monitor));
+			}
+			priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
+			tny_folder_monitor_add_list (priv->monitor, TNY_LIST (model));
+			tny_folder_monitor_start (priv->monitor);
 
-		priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
-		tny_folder_monitor_add_list (priv->monitor, TNY_LIST (model));
-		tny_folder_monitor_start (priv->monitor);
-
-		priv->monitor_continue = TRUE;
-		if (priv->monitor_timeout == 0)
-			priv->monitor_timeout = g_timeout_add (5000, check_new_messages, priv);
+			priv->monitor_continue = TRUE;
+			if (priv->monitor_timeout == 0)
+				priv->monitor_timeout = g_timeout_add (5000, check_new_messages, priv);
+*/		}
 		g_mutex_unlock (priv->monitor_lock);
+
+		set_header_view_model (header_view, sortable);
 
 		g_idle_add (cleanup_statusbar, priv);
 
