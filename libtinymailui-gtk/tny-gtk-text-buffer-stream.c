@@ -128,8 +128,12 @@ static gssize
 tny_gtk_text_buffer_stream_write_default (TnyStream *self, const char *buffer, gsize n)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
+	const gchar *end;
 
-	gtk_text_buffer_insert (priv->buffer, &(priv->cur), buffer, (gint)n);
+	if (g_utf8_validate (buffer, n, &end))
+		gtk_text_buffer_insert (priv->buffer, &(priv->cur), buffer, (gint)n);
+	else
+		gtk_text_buffer_insert (priv->buffer, &(priv->cur), end, (gint) (end - buffer));
 
 	return (gssize) n;
 }

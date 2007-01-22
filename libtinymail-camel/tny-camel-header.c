@@ -308,7 +308,7 @@ tny_camel_header_get_cc (TnyHeader *self)
 	else
 		retval = camel_message_info_cc ((CamelMessageInfo*)me->info);
 
-	return retval;
+	return retval?retval:invalid;
 }
 
 static const gchar*
@@ -330,7 +330,7 @@ tny_camel_header_get_bcc (TnyHeader *self)
 	else
 		retval = invalid;
 
-	return retval;
+	return retval?retval:invalid;
 }
 
 static TnyHeaderFlags
@@ -494,7 +494,7 @@ tny_camel_header_get_from (TnyHeader *self)
 	} else
 		retval = camel_message_info_from ((CamelMimeMessage*)me->info);
 
-	return retval;
+	return retval?retval:invalid;
 }
 
 static const gchar*
@@ -516,7 +516,7 @@ tny_camel_header_get_subject (TnyHeader *self)
 	else
 		retval = camel_message_info_subject ((CamelMessageInfo*)me->info);
 
-	return retval;
+	return retval?retval:invalid;
 }
 
 
@@ -539,7 +539,7 @@ tny_camel_header_get_to (TnyHeader *self)
 	else
 		retval = (gchar*) camel_message_info_to ((CamelMessageInfo*)me->info);
 
-	return (const gchar*)retval;
+	return retval?(const gchar*)retval:invalid;
 }
 
 static const gchar*
@@ -561,9 +561,7 @@ tny_camel_header_get_message_id (TnyHeader *self)
 	else
 		retval = (gchar*) camel_message_info_message_id ((CamelMessageInfo*)me->info);
 
-	return (const gchar*)retval;
-
-
+	return retval?(const gchar*)retval:invalid;
 }
 
 
@@ -612,7 +610,7 @@ tny_camel_header_get_uid (TnyHeader *self)
 
 	retval = camel_message_info_uid ((CamelMessageInfo*)me->info);
 
-	return retval;
+	return retval?retval:invalid;
 }
 
 static void

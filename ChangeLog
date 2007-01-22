@@ -5,6 +5,8 @@
 	* Added for-now unstable camel-lite API: camel_store_get_recent_messages
 	Do not yet use this API, unless you want to screwup your IMAP
 	connection significantly enough to make using tinymail impossible.
+	* Several bugfixes in CamelImapFolder
+	* Invalid UTF-8 in TnyGtkTextBufferStream solution
 
 2007-01-21  Philip Van Hoof <pvanhoof@gnome.org>
 

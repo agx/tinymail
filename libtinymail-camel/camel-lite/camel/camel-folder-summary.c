@@ -2267,10 +2267,17 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 
 	destroy_possible_pstring_stuff (s, info, TRUE);
 
+	/* memset: Trash it, makes debugging more easy */
+
 	if (s)
+	{
+		memset (info, 0, s->message_info_size);
 		g_slice_free1 (s->message_info_size, mi);
-	else
+	} else
+	{
+		memset (info, 0, sizeof (CamelMessageInfoBase));
 		g_slice_free (CamelMessageInfoBase, (CamelMessageInfoBase*) mi);
+	}
 }
 
 static CamelMessageContentInfo *
@@ -3198,6 +3205,9 @@ camel_message_info_clone(const void *o)
 {
 	const CamelMessageInfo *mi = o;
 
+	if (mi == NULL || mi->refcount <=0)
+		return NULL;
+
 	if (mi->summary)
 		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->message_info_clone(mi->summary, mi);
 	else
@@ -3207,6 +3217,9 @@ camel_message_info_clone(const void *o)
 static const void *
 info_ptr(const CamelMessageInfo *mi, int id)
 {
+	if (mi == NULL || mi->refcount <=0)
+		return 0;
+
 	switch (id) {
 	case CAMEL_MESSAGE_INFO_SUBJECT:
 		return ((const CamelMessageInfoBase *)mi)->subject;
@@ -3241,6 +3254,9 @@ info_ptr(const CamelMessageInfo *mi, int id)
 static guint32
 info_uint32(const CamelMessageInfo *mi, int id)
 {
+	if (mi == NULL || mi->refcount <=0)
+		return 0;
+
 	switch (id) {
 	case CAMEL_MESSAGE_INFO_FLAGS:
 		return ((const CamelMessageInfoBase *)mi)->flags;
@@ -3254,6 +3270,9 @@ info_uint32(const CamelMessageInfo *mi, int id)
 static time_t
 info_time(const CamelMessageInfo *mi, int id)
 {
+	if (mi == NULL || mi->refcount <=0)
+		return 0;
+
 	switch (id) {
 	case CAMEL_MESSAGE_INFO_DATE_SENT:
 		return ((const CamelMessageInfoBase *)mi)->date_sent;
@@ -3297,6 +3316,9 @@ info_user_tag(const CamelMessageInfo *mi, const char *id)
 const void *
 camel_message_info_ptr(const CamelMessageInfo *mi, int id)
 {
+	if (mi==NULL || mi->refcount <= 0)
+		return NULL;
+
 	if (mi->summary)
 		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_ptr(mi, id);
 	else
@@ -3316,6 +3338,9 @@ camel_message_info_ptr(const CamelMessageInfo *mi, int id)
 guint32
 camel_message_info_uint32(const CamelMessageInfo *mi, int id)
 {
+	if (mi == NULL || mi->refcount <=0)
+		return 0;
+
 	if (mi->summary)
 		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_uint32(mi, id);
 	else
@@ -3335,6 +3360,9 @@ camel_message_info_uint32(const CamelMessageInfo *mi, int id)
 time_t
 camel_message_info_time(const CamelMessageInfo *mi, int id)
 {
+	if (mi == NULL || mi->refcount <=0)
+		return 0;
+
 	if (mi->summary)
 		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_time(mi, id);
 	else

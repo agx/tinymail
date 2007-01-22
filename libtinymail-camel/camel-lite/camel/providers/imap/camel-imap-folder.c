@@ -2091,7 +2091,7 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 	/* If its cached in full, just get it as is, this is only a shortcut,
 	   since we get stuff from the cache anyway.  It affects a busted connection though. */
-	if ( (stream = camel_imap_folder_fetch_data(imap_folder, uid, "", TRUE, type, param, NULL))
+	if ( (stream = camel_imap_folder_fetch_data (imap_folder, uid, "", TRUE, type, param, NULL))
 	     && (msg = get_message_simple(imap_folder, uid, stream, type, param, ex)))
 		goto done;
 
@@ -2739,6 +2739,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
 	CamelStream *stream = NULL;
 	gboolean connected = FALSE;
+	CamelException tex = CAMEL_EXCEPTION_INITIALISER;
 
 	/* EXPUNGE responses have to modify the cache, which means
 	 * they have to grab the cache_lock while holding the
@@ -2753,7 +2754,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
-	connected = camel_imap_store_connected(store, ex);
+	connected = camel_imap_store_connected(store, &tex);
 
 	if (connected && ((type & CAMEL_FOLDER_RECEIVE_FULL) && camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
 		camel_imap_message_cache_remove (imap_folder->cache, uid);

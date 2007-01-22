@@ -156,29 +156,32 @@ struct _CamelMessageInfo {
 /* For classes wishing to do the provided i/o, or for anonymous users,
  * they must subclass or use this messageinfo structure */
 /* Otherwise they can do their own thing entirely */
-struct _CamelMessageInfoBase {
-	CamelFolderSummary *summary;
-	guint32 refcount;	/* ??? */
-	char *uid;
 
-	const char *subject;
-	const char *from;
-	const char *to;
-	const char *cc;
+/*                                          on x86_32 */
+struct _CamelMessageInfoBase 
+{
+	CamelFolderSummary *summary;       /* 4 bytes */
+	guint32 refcount;                  /* 4 bytes */
+	char *uid;                         /* 4 bytes */
+	const char *subject;               /* 4 bytes */
+	const char *from;                  /* 4 bytes */
+	const char *to;                    /* 4 bytes */
+	const char *cc;                    /* 4 bytes */
 #ifdef NON_TINYMAIL_FEATURES
 	const char *mlist;
 #endif
 
 	/* tree of content description - NULL if it is not available */
-	CamelMessageContentInfo *content;
-	CamelSummaryMessageID message_id;
+	CamelMessageContentInfo *content;  /* 4 bytes */
+	CamelSummaryMessageID message_id;  /* 8 bytes */
 
-	guint32 flags;
-	guint32 size;
+	guint32 flags;                     /* 4 bytes */
+	guint32 size;                      /* 4 bytes */
 
-	time_t date_sent;
-	time_t date_received;
+	time_t date_sent;                  /* 4 bytes */
+	time_t date_received;              /* 4 bytes */
 
+                                          /* 56 bytes */
 #ifdef NON_TINYMAIL_FEATURES
 	CamelSummaryReferences *references;/* from parent to root */
 #endif
