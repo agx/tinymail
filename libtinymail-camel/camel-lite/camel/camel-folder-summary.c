@@ -1970,7 +1970,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	unsigned char *ptrchr = s->filepos;
 	unsigned int i;
 	gchar *theuid;
-	gboolean uidmf = FALSE;
 
 	io(printf("Loading message info\n"));
 
@@ -1988,7 +1987,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
 		*must_add = TRUE;
 		mi->uid = theuid;
-		uidmf = TRUE;
 	} else 
 	{
 		/* We are reloading, it's likely that we will find recoverable
@@ -2006,7 +2004,9 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 			CAMEL_SUMMARY_LOCK(s, ref_lock);
 			destroy_possible_pstring_stuff (s, (CamelMessageInfo*) mi, FALSE);
 			*must_add = FALSE;
-			uidmf = FALSE;
+			if (mi->uid && (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
+				g_free (mi->uid);
+			mi->uid = theuid;
 			CAMEL_SUMMARY_UNLOCK(s, ref_lock);
 		}
 
@@ -2017,10 +2017,9 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	if (!mi)
 	{
-		mi = (CamelMessageInfoBase *)camel_message_info_new(s);
+		mi = (CamelMessageInfoBase *) camel_message_info_new(s);
 		*must_add = TRUE;
 		mi->uid = theuid;
-		uidmf = TRUE;
 	}
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
@@ -2028,8 +2027,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
-	if (uidmf)
-		mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+	mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 	s->set_extra_flags_func (s->folder, mi);
 
