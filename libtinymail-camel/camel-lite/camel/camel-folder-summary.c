@@ -125,15 +125,20 @@ static void camel_folder_summary_unload_mmap (CamelFolderSummary *s);
 
 static CamelObjectClass *camel_folder_summary_parent;
 
-static CamelMessageInfo*
+static CamelMessageInfo* /* This is a slow function, avoid using it */
 find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 {
 	CamelMessageInfo *retval = NULL;
 	guint i = 0;
 
+	if (uid == NULL || strlen (uid) <= 0)
+		return NULL;
+	
 	for (i=0; G_LIKELY (i < s->messages->len) ; i++)
 	{
 		CamelMessageInfo *info = s->messages->pdata[i];
+
+		/* This can cause cache trashing */
 		if (G_UNLIKELY (info->uid[0] == uid[0]) && 
 		    G_UNLIKELY (!strcmp (info->uid, uid)))
 		{
@@ -1978,26 +1983,34 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	if (!s->in_reload)
 	{
+		/* We are not reloading, so searching for recoverable 
+		 * CamelMessageInfo struct instances is avoidable */
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
 		*must_add = TRUE;
 		mi->uid = theuid;
 		uidmf = TRUE;
-	} else {
+	} else 
+	{
+		/* We are reloading, it's likely that we will find recoverable
+		 * CamelMessageInfo instances, so we will search
+		 *
+		 * TODO: Enable and fill the hashtable (at the beginning of the
+		 * reload somewhere in camel_folder_summary_save and use that 
+		 * for looking up rather than this cache trashing slow linear
+		 * search). Also disable and clear the hashtable afterwards. */
 
-		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (s, theuid);
+		CAMEL_SUMMARY_LOCK(s, summary_lock);
+		mi = (CamelMessageInfoBase *) find_message_info_with_uid (s, (const gchar*) theuid);
 		if (mi) 
 		{
-			CAMEL_SUMMARY_LOCK(s, summary_lock);
 			CAMEL_SUMMARY_LOCK(s, ref_lock);
-
 			destroy_possible_pstring_stuff (s, (CamelMessageInfo*) mi, FALSE);
-			mi->refcount--; /* trick, I know */
 			*must_add = FALSE;
 			uidmf = FALSE;
-
 			CAMEL_SUMMARY_UNLOCK(s, ref_lock);
-			CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 		}
+
+		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 	}
 
 	i = 0;
