@@ -2388,7 +2388,11 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 
 /* #define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE " */
 
-#define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE"
+#ifdef NON_TINYMAIL_FEATURES
+#define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE"
+#else
+#define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT MESSAGE-ID CONTENT-TYPE"
+#endif
 
 
 /* FIXME: this needs to be kept in sync with camel-mime-utils.c's list
@@ -2485,6 +2489,9 @@ imap_update_summary (CamelFolder *folder, int exists,
   ineed = (exists - seq);
   camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
+   if (ineed == 0)
+	more = FALSE;
+
    while (more)
    {
 	gboolean did_hack = FALSE;
@@ -2497,7 +2504,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	if (seq > 0) {
 		mi = (CamelImapMessageInfo *)camel_folder_summary_index (folder->summary, seq - 1);
 		uidval = strtoul(camel_message_info_uid (mi), NULL, 10);
-		camel_message_info_free(&mi->info);
+		camel_message_info_free((CamelMessageInfo *)mi);
 	} else
 		uidval = 0;
 

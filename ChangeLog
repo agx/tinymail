@@ -2,6 +2,7 @@
 
 	* Several locking fixes when retrieving summary info
 	* Performance improvements in camel-imap-folder.c
+	* Bandwidth improvements for the IMAP provider
 
 2007-01-22  Philip Van Hoof <pvanhoof@gnome.org>
 

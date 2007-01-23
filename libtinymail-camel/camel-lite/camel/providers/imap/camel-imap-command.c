@@ -162,7 +162,7 @@ camel_imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	va_start (ap, fmt);
 	cmd = imap_command_strdup_vprintf (store, fmt, ap);
 	va_end (ap);
-	
+
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 	ok = imap_command_start (store, folder, cmd, ex);
 	g_free (cmd);
