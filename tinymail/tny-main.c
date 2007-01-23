@@ -116,6 +116,7 @@ main (int argc, char **argv)
 		window = gtk_plug_new (plug);
 	} else {
 		window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+		gtk_window_set_title (GTK_WINDOW (window), "Demo ui");
 	}
 
 	gtk_container_add (GTK_CONTAINER (window), view);
