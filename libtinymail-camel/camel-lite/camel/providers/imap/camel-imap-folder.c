@@ -2489,8 +2489,9 @@ imap_update_summary (CamelFolder *folder, int exists,
   ineed = (exists - seq);
   camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
-   if (ineed == 0)
-	more = FALSE;
+
+   /*if (exists <= camel_folder_summary_count (folder->summary))
+	more = FALSE;*/
 
    while (more)
    {
@@ -2651,18 +2652,20 @@ imap_update_summary (CamelFolder *folder, int exists,
 					  muid = g_datalist_get_data (&data, "UID");
 					  if (muid) 
 					  {
+						if (mi->info.uid && mi->info.flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
+							g_free (mi->info.uid);
+
 						mi->info.uid = g_strdup (muid);
 						mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 					  }
 
-					  info = (CamelImapMessageInfo *)camel_folder_summary_uid(folder->summary, muid);
+					 /* info = (CamelImapMessageInfo *)camel_folder_summary_uid (folder->summary, muid);
 					  if (info)
-						camel_message_info_free(&info->info);
+						camel_message_info_free(&info->info); */
 					  ucnt++;
 
 					  allhdrs++;
 					  camel_operation_progress (NULL, allhdrs , ineed);
-
 					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
 
 					  /* WE can re-enable this if it's interesting:

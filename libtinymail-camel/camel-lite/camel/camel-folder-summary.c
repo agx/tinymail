@@ -2153,8 +2153,8 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	int i;
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 
-	if (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
-	       return -1;
+	/* if (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
+	       return -1; */
 
 	io(printf("Saving message info\n"));
 
