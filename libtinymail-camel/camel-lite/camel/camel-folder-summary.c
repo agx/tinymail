@@ -129,12 +129,13 @@ static CamelMessageInfo*
 find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 {
 	CamelMessageInfo *retval = NULL;
-	guint i = 0, len = strlen (uid);
+	guint i = 0;
 
 	for (i=0; G_LIKELY (i < s->messages->len) ; i++)
 	{
 		CamelMessageInfo *info = s->messages->pdata[i];
-		if (G_UNLIKELY (!strncmp (info->uid, uid, len)))
+		if (G_UNLIKELY (info->uid[0] == uid[0]) && 
+		    G_UNLIKELY (!strcmp (info->uid, uid)))
 		{
 			retval = info;
 			break;
@@ -2138,6 +2139,9 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	CamelTag *tag;
 	int i;
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
+
+	if (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
+	       return -1;
 
 	io(printf("Saving message info\n"));
 
