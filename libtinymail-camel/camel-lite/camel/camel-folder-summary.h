@@ -231,13 +231,14 @@ struct _CamelFolderSummary {
 	gboolean build_content;	/* do we try and parse/index the content, or not? */
 
 	GPtrArray *messages; /* CamelMessageInfo's */
+	GHashTable *uidhash;
 
 	struct _CamelFolder *folder; /* parent folder, for events */
 	struct _CamelFolderMetaSummary *meta_summary; /* Meta summary */
 
 	GMappedFile *file;
 	unsigned char *filepos;
-	GMutex *dump_lock;
+	GMutex *dump_lock, *hash_lock;
 	gboolean in_reload;
 
 	void (*set_extra_flags_func) (CamelFolder *folder, CamelMessageInfoBase *mi);
@@ -429,6 +430,9 @@ gboolean camel_message_info_set_user_tag(CamelMessageInfo *mi, const char *id, c
 void camel_content_info_dump (CamelMessageContentInfo *ci, int depth);
 
 void camel_message_info_dump (CamelMessageInfo *mi);
+
+void camel_folder_summary_prepare_hash (CamelFolderSummary *summary);
+void camel_folder_summary_kill_hash (CamelFolderSummary *summary);
 
 #ifdef __cplusplus
 }

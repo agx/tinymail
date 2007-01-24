@@ -659,6 +659,8 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 			total++;
 		rewinddir(dir);
 
+		camel_folder_summary_prepare_hash (s);
+
 		while ( (d = readdir(dir)) ) {
 			char *name, *newname, *destname, *destfilename;
 			char *src, *dest;
@@ -703,6 +705,8 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 			g_free(src);
 			g_free(dest);
 		}
+		camel_folder_summary_kill_hash (s);
+
 		camel_operation_end(NULL);
 	}
 	closedir(dir);

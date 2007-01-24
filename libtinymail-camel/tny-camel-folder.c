@@ -171,6 +171,15 @@ pos_header_check (gpointer data, gpointer udata)
 }
 #endif
 
+static gpointer 
+folder_destroyer_thread (gpointer data)
+{
+	while (((CamelObject*)data)->ref_count >= 1)
+		camel_object_unref (CAMEL_OBJECT (data));
+
+	return NULL;
+}
+
 static void
 unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 {
@@ -215,8 +224,8 @@ unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 		g_mutex_unlock (priv->poshdr_lock);
 #endif
 
-		while (((CamelObject*)priv->folder)->ref_count >= 1)
-			camel_object_unref (CAMEL_OBJECT (priv->folder));
+		g_thread_create (folder_destroyer_thread, priv->folder, FALSE, NULL);
+		priv->folder = NULL;
 
 	}
 

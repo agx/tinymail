@@ -1336,6 +1336,7 @@ folder_changed_change(CamelSession *session, CamelSessionThreadMsg *msg)
 			g_hash_table_insert(matches_hash, matches_changed->pdata[i], matches_changed->pdata[i]);
 		}
 		dd(printf("\n"));
+
 		for (i=0;i<changed->len;i++) {
 			uid = changed->pdata[i];
 			if (strlen(uid)+9 > vuidlen) {

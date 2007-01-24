@@ -327,6 +327,9 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	camel_pop3_engine_command_free(pop3_store->engine, pcl);
 
 	/* Update the summary.mmap file */
+
+	camel_folder_summary_prepare_hash (folder->summary);
+
 	for (i=0;i<pop3_folder->uids->len;i++) 
 	{
 		CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
@@ -370,6 +373,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	}
 
 	camel_folder_summary_save (folder->summary);
+
+	camel_folder_summary_kill_hash (folder->summary);
 
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) {
 		camel_pop3_engine_command_free(pop3_store->engine, pcu);

@@ -169,6 +169,9 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 	cache->parts = g_hash_table_new (g_str_hash, g_str_equal);
 	cache->cached = g_hash_table_new (NULL, NULL);
 	deletes = g_ptr_array_new ();
+
+	camel_folder_summary_prepare_hash (summary);
+
 	while ((dname = g_dir_read_name (dir))) {
 		if (!isdigit (dname[0]))
 			continue;
@@ -187,6 +190,7 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 		g_free (uid);
 	}
 	g_dir_close (dir);
+	camel_folder_summary_kill_hash (summary);
 
 	while (deletes->len) {
 		g_unlink (deletes->pdata[0]);

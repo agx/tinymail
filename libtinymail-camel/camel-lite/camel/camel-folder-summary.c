@@ -125,7 +125,7 @@ static void camel_folder_summary_unload_mmap (CamelFolderSummary *s);
 
 static CamelObjectClass *camel_folder_summary_parent;
 
-static CamelMessageInfo* /* This is a slow function, avoid using it */
+static CamelMessageInfo* 
 find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 {
 	CamelMessageInfo *retval = NULL;
@@ -133,19 +133,25 @@ find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 
 	if (uid == NULL || strlen (uid) <= 0)
 		return NULL;
-	
-	for (i=0; G_LIKELY (i < s->messages->len) ; i++)
-	{
-		CamelMessageInfo *info = s->messages->pdata[i];
 
-		/* This can cause cache trashing */
-		if (G_UNLIKELY (info->uid[0] == uid[0]) && 
-		    G_UNLIKELY (!strcmp (info->uid, uid)))
+	g_mutex_lock (s->hash_lock);
+	if (s->uidhash != NULL)
+		retval = g_hash_table_lookup (s->uidhash, uid);
+	g_mutex_unlock (s->hash_lock);
+
+	if (retval == NULL)
+		for (i=0; G_LIKELY (i < s->messages->len) ; i++)
 		{
-			retval = info;
-			break;
+			CamelMessageInfo *info = s->messages->pdata[i];
+
+			/* This can cause cache trashing */
+			if (G_UNLIKELY (info->uid[0] == uid[0]) && 
+			    G_UNLIKELY (!strcmp (info->uid, uid)))
+			{
+				retval = info;
+				break;
+			}
 		}
-	}
 
 	return retval;
 }
@@ -177,12 +183,48 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	s->in_reload = FALSE;
 
 	s->messages = g_ptr_array_new();
+	s->uidhash = NULL;
+	s->hash_lock = g_mutex_new ();
 
 	p->summary_lock = g_mutex_new();
 	p->io_lock = g_mutex_new();
 	p->filter_lock = g_mutex_new();
 	p->ref_lock = g_mutex_new();
 }
+
+void
+camel_folder_summary_prepare_hash (CamelFolderSummary *s)
+{
+	guint i = 0;
+
+	g_mutex_lock (s->hash_lock);
+
+	if (s->uidhash == NULL)
+	{
+		s->uidhash = g_hash_table_new_full (g_str_hash, g_str_equal, 
+			(GDestroyNotify)g_free, NULL);
+
+		for (i=0; G_LIKELY (i < s->messages->len) ; i++)
+		{
+			CamelMessageInfo *info = s->messages->pdata[i];
+			g_hash_table_insert(s->uidhash, g_strdup (info->uid), info);
+		}
+	}
+
+	g_mutex_unlock (s->hash_lock);
+
+}
+
+void
+camel_folder_summary_kill_hash (CamelFolderSummary *s)
+{
+	g_mutex_lock (s->hash_lock);
+	if (s->uidhash != NULL)
+		g_hash_table_destroy (s->uidhash);
+	s->uidhash = NULL;
+	g_mutex_unlock (s->hash_lock);
+}
+
 
 static void free_o_name(void *key, void *value, void *data)
 {
@@ -260,11 +302,15 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	g_free(s->summary_path);
 
-	
+	if (s->uidhash != NULL)
+		g_hash_table_destroy (s->uidhash);
+	g_mutex_free(s->hash_lock);
+
 	g_mutex_free(p->summary_lock);
 	g_mutex_free(p->io_lock);
 	g_mutex_free(p->filter_lock);
 	g_mutex_free(p->ref_lock);
+
 
 	g_slice_free1 (sizeof (*p), p);
 }
@@ -724,8 +770,11 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	CamelMessageInfo *mi;
 	char *path;
 	gboolean herr = FALSE;
+	gboolean hadhash;
 
 	g_mutex_lock (s->dump_lock);
+
+	hadhash = (s->uidhash != NULL);
 
 	g_assert(s->message_info_size >= sizeof(CamelMessageInfoBase));
 
@@ -736,11 +785,16 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	path = alloca(strlen(s->summary_path)+4);
 	sprintf(path, "%s~", s->summary_path);
 	fd = g_open(path, O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0600);
+
 	if (fd == -1) 
-	{ g_mutex_unlock (s->dump_lock); return -1; }
+	{ 
+	  g_mutex_unlock (s->dump_lock);
+	  return -1; 
+	}
 
 	out = fdopen(fd, "wb");
-	if (out == NULL) {
+	if (out == NULL) 
+	{
 		i = errno;
 		g_unlink(path);
 		close(fd);
@@ -802,12 +856,14 @@ haerror:
 
 	CAMEL_SUMMARY_UNLOCK(s, io_lock);
 
-	if (herr)
+	if (herr) 
 		goto exception;
 
 	fclose (out);
 	s->in_reload = TRUE;
 
+	if (!hadhash)
+		camel_folder_summary_prepare_hash (s);
 
 	camel_folder_summary_unload_mmap (s);
 
@@ -821,6 +877,9 @@ haerror:
 		return -1;
 	}
 	camel_folder_summary_load (s);
+
+	if (!hadhash)
+		camel_folder_summary_kill_hash (s);
 
 	s->in_reload = FALSE;
 
@@ -970,6 +1029,12 @@ camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 #endif
 
 	g_ptr_array_add(s->messages, info);
+
+	g_mutex_lock (s->hash_lock);
+	if (s->uidhash != NULL)
+		g_hash_table_insert (s->uidhash, g_strdup (info->uid), info);
+	g_mutex_unlock (s->hash_lock);
+
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
@@ -990,6 +1055,12 @@ camel_folder_summary_mmap_add(CamelFolderSummary *s, CamelMessageInfo *info)
 #endif
 
 	g_ptr_array_add(s->messages, info);
+
+	g_mutex_lock (s->hash_lock);
+	if (s->uidhash != NULL)
+		g_hash_table_insert (s->uidhash, g_strdup (info->uid), info);
+	g_mutex_unlock (s->hash_lock);
+
 	s->flags |= CAMEL_SUMMARY_DIRTY;
 
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);

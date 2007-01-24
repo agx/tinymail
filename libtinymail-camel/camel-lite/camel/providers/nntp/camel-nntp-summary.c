@@ -237,6 +237,9 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 
 	count = 0;
 	total = high-low+1;
+
+	camel_folder_summary_prepare_hash (s);
+
 	while ((ret = camel_nntp_stream_line(store->stream, (unsigned char **)&line, (unsigned int *) &len)) > 0) {
 		camel_operation_progress(NULL, (count) , total);
 		count++;
@@ -306,6 +309,8 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 		camel_header_raw_clear(&headers);
 	}
 
+	camel_folder_summary_kill_hash (s);
+
 	camel_operation_end(NULL);
 
 	return ret;
@@ -330,6 +335,9 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 
 	count = 0;
 	total = high-low+1;
+
+	camel_folder_summary_prepare_hash (s);
+
 	for (i=low;i<high+1;i++) {
 		camel_operation_progress(NULL, (count) , total);
 		count++;
@@ -391,6 +399,8 @@ error:
 			camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM, _("Operation failed: %s"), strerror(errno));
 	}
 ioerror:
+
+	camel_folder_summary_kill_hash (s);
 
 	if (cns->priv->uid) {
 		g_free(cns->priv->uid);

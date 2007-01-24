@@ -259,7 +259,9 @@ mh_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changeinfo, Came
 		}
 	}
 
-	while ( (d = readdir(dir)) ) {
+	camel_folder_summary_prepare_hash ((CamelFolderSummary *)cls);
+	while ( (d = readdir(dir)) ) 
+	{
 		/* FIXME: also run stat to check for regular file */
 		p = d->d_name;
 		while ( (c = *p++) ) {
@@ -289,6 +291,8 @@ mh_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changeinfo, Came
 		}
 	}
 	closedir(dir);
+	camel_folder_summary_kill_hash ((CamelFolderSummary *)cls);
+
 	g_hash_table_foreach(left, (GHFunc)remove_summary, cls);
 	g_hash_table_destroy(left);
 
