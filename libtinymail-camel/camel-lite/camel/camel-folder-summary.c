@@ -723,6 +723,7 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	guint32 count;
 	CamelMessageInfo *mi;
 	char *path;
+	gboolean herr = FALSE;
 
 	g_mutex_lock (s->dump_lock);
 
@@ -753,22 +754,29 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	CAMEL_SUMMARY_LOCK(s, io_lock);
 
 	if (((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_save(s, out) == -1)
-		goto exception;
-	
+		goto haerror;
+
 	/* now write out each message ... */
 	/* we check ferorr when done for i/o errors */
-	
+
 	count = s->messages->len;
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < count; i++) 
+	{
 		mi = s->messages->pdata[i];
 
 		if (((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS (s)))->message_info_save (s, out, mi) == -1)
-			goto exception;
+		{
+			herr = TRUE;
+			goto haerror;
+		}
 
 		if (s->build_content) {
 			if (perform_content_info_save (s, out, ((CamelMessageInfoBase *)mi)->content) == -1)
-				goto exception;
+			{
+				herr = TRUE;
+				goto haerror;
+			}
 		}
 
 		if (! (((CamelMessageInfoBase*)mi)->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
@@ -779,15 +787,30 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	}
 
 	if (fflush (out) != 0 || fsync (fileno (out)) == -1)
-		goto exception;
+		herr = TRUE;
+
+haerror:
+
+	if (s->build_content) 
+		for (i = 0; i < count; i++)
+		{
+			mi = s->messages->pdata[i];
+			if (((CamelMessageInfoBase *)mi)->content != NULL)
+				camel_folder_summary_content_info_free (s, ((CamelMessageInfoBase *)mi)->content); 
+			((CamelMessageInfoBase *)mi)->content = NULL;
+		}
 
 	CAMEL_SUMMARY_UNLOCK(s, io_lock);
-	
-	fclose (out);
 
+	if (herr)
+		goto exception;
+
+	fclose (out);
 	s->in_reload = TRUE;
 
+
 	camel_folder_summary_unload_mmap (s);
+
 #ifdef G_OS_WIN32
 	g_unlink(s->summary_path);
 #endif
@@ -805,15 +828,11 @@ camel_folder_summary_save(CamelFolderSummary *s)
 	g_mutex_unlock (s->dump_lock);
 
 	return 0;
-	
- exception:
 
-	CAMEL_SUMMARY_UNLOCK(s, io_lock);
-	
+exception:
+
 	i = errno;
-	
 	fclose (out);
-		
 	g_unlink (path);
 	errno = i;
 	g_mutex_unlock (s->dump_lock);
