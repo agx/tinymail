@@ -98,8 +98,10 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 
 	containee = camel_medium_get_content_object (CAMEL_MEDIUM (priv->part));
 	
-	if (G_UNLIKELY (containee == NULL))
+	if (G_UNLIKELY (containee == NULL)) {
+		g_mutex_unlock (priv->part_lock);
 		return;
+	}
 
 	if (CAMEL_IS_MULTIPART (containee))
 	{
