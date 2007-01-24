@@ -64,6 +64,7 @@ extern "C" {
 #include <camel/camel-stream-filter.h>
 #include <camel/camel-stream-fs.h>
 #include <camel/camel-stream-mem.h>
+#include <camel/camel-stream-gzip.h>
 #include <camel/camel-stream.h>
 #include <camel/camel-transport.h>
 #include <camel/camel-url.h>

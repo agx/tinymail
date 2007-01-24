@@ -201,6 +201,7 @@ libcamel_lite_1_2_la_SOURCES = 			\
 	camel-stream-filter.c			\
 	camel-stream-fs.c			\
 	camel-stream-mem.c			\
+	camel-stream-gzip.c			\
 	camel-stream-null.c			\
 	camel-stream.c				\
 	camel-string-utils.c			\
@@ -269,6 +270,7 @@ libcamel_liteinclude_HEADERS =			\
 	camel-stream-filter.h			\
 	camel-stream-fs.h			\
 	camel-stream-mem.h			\
+	camel-stream-gzip.h			\
 	camel-stream-null.h			\
 	camel-stream-process.h			\
 	camel-stream.h				\

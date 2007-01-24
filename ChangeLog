@@ -1,3 +1,9 @@
+2007-01-25  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added a CamelStreamGZip which might someday be used to support the
+	COMPRESS capability of some LEMONADE-enabled IMAP servers. This new
+	type is experimental and not sufficiently tested for real use.
+
 2007-01-24  Sergio Villar Senin <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c: added a missing unlock

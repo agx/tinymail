@@ -63,6 +63,7 @@ typedef struct _CamelSimpleDataWrapper CamelSimpleDataWrapper;
 typedef struct _CamelStore CamelStore;
 typedef struct _CamelStream CamelStream;
 typedef struct _CamelStreamNull CamelStreamNull;
+typedef struct _CamelStreamGZip CamelStreamGZip;
 typedef struct _CamelStreamBuffer CamelStreamBuffer;
 typedef struct _CamelStreamDataWrapper CamelStreamDataWrapper;
 typedef struct _CamelStreamFilter CamelStreamFilter;
