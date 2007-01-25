@@ -71,6 +71,8 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
  * "use_ssl=always" is the typical option added. Other possibilities for
  * the "use_ssl" option are "never" and "when-possible".
  *
+ * The "always" means that normal SSL is used whereas "when-possible" means 
+ * that TLS is tried (the STARTTLS capability of IMAP servers).
  **/
 void 
 tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option)
