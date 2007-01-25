@@ -2413,21 +2413,14 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 	while ((type = camel_imap_command_response (store, &resp, ex)) ==
 			CAMEL_IMAP_RESPONSE_UNTAGGED) 
 	{
-		uid = strstr (resp, "UID");
-		if (G_LIKELY (uid))
-		{
-			char *flags;
-			/* * 5233 FETCH (UID 34318 FLAGS (\Seen)) */
-			uid+=4; 
-			flags = strstr (uid, "FLAGS");
-			if (G_LIKELY (flags))
-			{
-				flags--;
-				*flags='\0';
-				g_ptr_array_add (needheaders, g_strdup (uid));
-				cnt++;
-			}
+
+		GData *data = parse_fetch_response (imap_folder, resp);
+		char *uid = g_datalist_get_data (&data, "UID");
+		if (uid) {
+			g_ptr_array_add (needheaders, g_strdup (uid));
+			cnt++;
 		}
+		g_datalist_clear (&data);
 		g_free (resp); 
 		resp=NULL;
 	}
