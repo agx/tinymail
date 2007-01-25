@@ -16,14 +16,14 @@ if BUILD_MOZEMBED
 INCLUDES += -DMOZEMBED
 endif
 
-bin_PROGRAMS = tinymail
+bin_PROGRAMS = tny-demoui
 
-tinymail_SOURCES = 				\
+tny_demoui_SOURCES = 				\
 	tny-main.c				\
 	tny-demoui-summary-view.c		\
 	tny-demoui-summary-view.h
 
-tinymail_LDADD = 							        \
+tny_demoui_LDADD = 							        \
 	$(TINYMAIL_LIBS)						        \
 	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS)					\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 	        \

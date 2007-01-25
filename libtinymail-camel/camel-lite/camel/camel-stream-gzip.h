@@ -48,8 +48,8 @@ struct _CamelStreamGZip
 	CamelStream parent;
 
 	CamelStream *real;
-	z_stream *stream;
-	int mode, level;
+	z_stream *r_stream, *w_stream;
+	int read_mode, write_mode, level;
 };
 
 struct _CamelStreamGZipClass {
@@ -58,7 +58,7 @@ struct _CamelStreamGZipClass {
 
 CamelType camel_stream_gzip_get_type (void);
 
-CamelStream *camel_stream_gzip_new (CamelStream *real, int level, int mode);
+CamelStream *camel_stream_gzip_new (CamelStream *real, int level, int read_mode, int write_mode);
 
 #ifdef __cplusplus
 }
