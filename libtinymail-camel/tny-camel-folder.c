@@ -271,6 +271,17 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
 
+		if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
+		{
+			guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
+
+			if (priv->iter && !priv->iter_parented)
+				camel_folder_info_free  (priv->iter);
+
+			priv->iter = camel_store_get_folder_info (store, priv->folder_name, flags, &ex);
+			priv->iter_parented = TRUE;
+		}
+
 		if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
 		{
 			if (priv->folder)
@@ -1711,7 +1722,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 	CamelFolderInfo *parent_info;
 	const gchar *old_path;
 	gchar *new_path;
-	CamelException ex;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	g_mutex_lock (priv->folder_lock);
 
@@ -1722,24 +1733,51 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 			return;
 		}
 
-	if (!priv->iter || !priv->iter_parented)
+	if (!priv->iter)
 		return;
 
 	/* Create new full name */
 	cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
 	old_path = camel_folder_get_full_name (cfolder);
 	parent_info = priv->iter->parent;
-	new_path = g_strdup_printf ("%s/%s", parent_info->full_name, name);
+
+	if (parent_info)
+		new_path = g_strdup_printf ("%s/%s", parent_info->full_name, name);
+	else
+	{
+		if (!priv->iter_parented)
+		{
+			char *nold_path = g_strdup (old_path);
+			char *lastslash = strrchr (nold_path, '/');
+			if (lastslash)
+			{
+				*lastslash = '\0';
+				new_path = g_strdup_printf ("%s/%s", nold_path, name);
+				g_free (nold_path);
+			} else {
+				g_free (nold_path);
+				g_set_error (err, TNY_FOLDER_ERROR, 
+					TNY_FOLDER_ERROR_SET_NAME,
+					_("Can't rename %s to %s"), old_path, name);
+				goto errorh;
+			}
+		} else {
+				g_set_error (err, TNY_FOLDER_ERROR, 
+					TNY_FOLDER_ERROR_SET_NAME,
+					_("Can't rename to root INBOX folder"));
+				goto errorh;
+		}
+	}
 
 	/* Check that the name really changes */
 	if (!strcmp (old_path, new_path)) 
 	{
-		g_free (new_path);
-		return;
+		g_free (new_path); 
+		/* It's not really an error, just a NOOP */
+		goto errorh;
 	}
 
 	/* Rename folder */
-	camel_exception_init (&ex);
 	camel_store_rename_folder (cfolder->parent_store, old_path, (const gchar *) new_path, &ex);
 	g_free (new_path);
 
@@ -1756,6 +1794,8 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 		g_free (priv->cached_name);
 		priv->cached_name = g_strdup (name);
 	}
+
+errorh:
 
 	g_mutex_unlock (priv->folder_lock);
 }
