@@ -1,3 +1,7 @@
+2007-01-25 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+
+	* Added TNY_FOLDER_TYPE_ARCHIVE and TNY_FOLDER_TYPE_NUM
+
 2007-01-25  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added a CamelStreamGZip which might someday be used to support the
