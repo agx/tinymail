@@ -1124,7 +1124,9 @@ camel_store_folder_subscribed(CamelStore *store, const char *folder_name)
 	gboolean ret;
 
 	g_return_val_if_fail (CAMEL_IS_STORE (store), FALSE);
-	g_return_val_if_fail (store->flags & CAMEL_STORE_SUBSCRIPTIONS, FALSE);
+
+	if (! (store->flags & CAMEL_STORE_SUBSCRIPTIONS) ) 
+		return FALSE;
 
 	CAMEL_STORE_LOCK(store, folder_lock);
 
