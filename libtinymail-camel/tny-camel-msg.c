@@ -171,7 +171,7 @@ tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
 
 	priv->header = header;
 
-	if (((TnyCamelHeader *)header)->write)
+	if (((TnyCamelHeader *)header)->write == 1)
 	{
 		TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 		g_mutex_lock (ppriv->part_lock);
