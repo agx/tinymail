@@ -61,7 +61,7 @@ static ssize_t z_stream_read (CamelStream *stream, char *buffer, size_t n)
 			haveread = camel_stream_read (self->real, mem, block_size);
 			c_stream.next_in  = (Bytef *) mem;
 			c_stream.avail_in = haveread;
-			inflate (&c_stream, Z_FINISH);
+			inflate (&c_stream, Z_NO_FLUSH);
 		}
 		retval = n - c_stream.avail_out;
 		g_free (mem);
@@ -104,7 +104,7 @@ static ssize_t z_stream_write (CamelStream *stream, const char *buffer, size_t n
 
 		while (c_stream.avail_in > 0)
 		{
-			inflate (&c_stream, Z_FINISH);
+			inflate (&c_stream, Z_NO_FLUSH);
 
 			camel_stream_write (self->real, mem, n - c_stream.avail_out);
 			retval += n - c_stream.avail_out;
