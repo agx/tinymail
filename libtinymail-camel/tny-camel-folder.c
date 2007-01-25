@@ -1764,7 +1764,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 		} else {
 				g_set_error (err, TNY_FOLDER_ERROR, 
 					TNY_FOLDER_ERROR_SET_NAME,
-					_("Can't rename to root INBOX folder"));
+					_("Can't rename the root INBOX folder"));
 				goto errorh;
 		}
 	}
