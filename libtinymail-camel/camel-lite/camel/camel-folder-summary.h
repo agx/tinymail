@@ -434,6 +434,8 @@ void camel_message_info_dump (CamelMessageInfo *mi);
 void camel_folder_summary_prepare_hash (CamelFolderSummary *summary);
 void camel_folder_summary_kill_hash (CamelFolderSummary *summary);
 
+void camel_message_info_clear_normal_flags (CamelMessageInfo *min);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

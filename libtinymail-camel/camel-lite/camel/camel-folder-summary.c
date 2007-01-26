@@ -125,6 +125,33 @@ static void camel_folder_summary_unload_mmap (CamelFolderSummary *s);
 
 static CamelObjectClass *camel_folder_summary_parent;
 
+
+void
+camel_message_info_clear_normal_flags (CamelMessageInfo *min)
+{
+
+	CamelMessageInfoBase *mi = (CamelMessageInfoBase*) min;
+
+	mi->flags &= ~CAMEL_MESSAGE_ANSWERED;
+	mi->flags &= ~CAMEL_MESSAGE_DELETED;
+	mi->flags &= ~CAMEL_MESSAGE_DRAFT;
+	mi->flags &= ~CAMEL_MESSAGE_FLAGGED;
+	mi->flags &= ~CAMEL_MESSAGE_SEEN;
+	mi->flags &= ~CAMEL_MESSAGE_ATTACHMENTS;
+	mi->flags &= ~CAMEL_MESSAGE_CACHED;
+	mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
+	mi->flags &= ~CAMEL_MESSAGE_SECURE;
+	mi->flags &= ~CAMEL_MESSAGE_FREED;
+	mi->flags &= ~CAMEL_MESSAGE_ANSWERED_ALL;
+	mi->flags &= ~CAMEL_MESSAGE_JUNK;
+	mi->flags &= ~CAMEL_MESSAGE_FOLDER_FLAGGED;
+	/* CAMEL_MESSAGE_INFO_NEEDS_FREE 
+	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE */
+	mi->flags &= ~CAMEL_MESSAGE_JUNK_LEARN;
+	mi->flags &= ~CAMEL_MESSAGE_USER;
+
+}
+
 static CamelMessageInfo* 
 find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 {
