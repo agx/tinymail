@@ -61,23 +61,48 @@ tny_camel_transport_account_reconnect (TnyCamelAccount *self)
 
 	if (G_LIKELY (apriv->session) && G_UNLIKELY (apriv->proto) && G_UNLIKELY (apriv->host))
 	{
-		GString *urlstr = g_string_new ("");
+		CamelURL *url = NULL;
+		GList *options = apriv->options;
+		gchar *proto = g_strdup_printf ("%s://", apriv->proto); 
+			
+		url = camel_url_new (proto, apriv->ex);
+		g_free (proto);
 
-		if (apriv->url_string)
-			g_free (apriv->url_string);
-
-		urlstr = g_string_append (urlstr, apriv->proto);
-		urlstr = g_string_append (urlstr, "://");
+		camel_url_set_protocol (url, apriv->proto); 
 
 		if (apriv->user)
+			camel_url_set_user (url, apriv->user);
+
+		camel_url_set_host (url, apriv->host);
+
+		if (apriv->mech)
+			camel_url_set_authmech (url, apriv->mech);
+
+		while (options)
 		{
-			urlstr = g_string_append (urlstr, apriv->user);
-			urlstr = g_string_append (urlstr, "@");
+			gchar *ptr, *dup = g_strdup (options->data);
+			gchar *option, *value;
+			ptr = strchr (dup, '=');
+			if (ptr) {
+				ptr++;
+				value = g_strdup (ptr); ptr--;
+				*ptr = '\0'; option = dup;
+			} else {
+				option = dup;
+				value = g_strdup ("1");
+			}
+			camel_url_set_param (url, option, value);
+			g_free (value);
+			g_free (dup);
+			options = g_list_next (options);
 		}
 
-		urlstr = g_string_append (urlstr, apriv->host);
+		if (G_LIKELY (apriv->url_string))
+			g_free (apriv->url_string);
 
-		apriv->url_string = urlstr->str;
+		apriv->url_string = camel_url_to_string (url, 0);
+		camel_url_free (url);
+
 
 		/* TODO: check for old instance and clear it */
 		g_static_rec_mutex_lock (apriv->service_lock);
@@ -91,7 +116,6 @@ tny_camel_transport_account_reconnect (TnyCamelAccount *self)
 					 camel_exception_get_description (&ex));
 		g_static_rec_mutex_unlock (apriv->service_lock);
 
-		g_string_free (urlstr, FALSE);
 	} else if (apriv->url_string)
 	{
 
@@ -214,6 +238,10 @@ tny_camel_transport_account_instance_init (GTypeInstance *instance, gpointer g_c
 	apriv->connected = FALSE;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
 	apriv->account_type = TNY_ACCOUNT_TYPE_TRANSPORT;
+
+	if (apriv->mech) /* Remove the PLAIN default */
+		g_free (apriv->mech);
+	apriv->mech = NULL;
 
 	return;
 }
