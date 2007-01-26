@@ -10,12 +10,10 @@ A type with the delta or changes between two states of a #TnyFolder. The #TnyFol
 as information about what got changed.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyFolderObserver, #TnyFolder, #TnyFolderMonitor
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

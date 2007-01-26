@@ -9,12 +9,10 @@ A folder observer that updates lists
 A #TnyFolderObserver implementation that updates #TnyList implementations by adding and removing #TnyHeader instances
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

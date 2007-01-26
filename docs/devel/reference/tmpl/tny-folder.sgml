@@ -31,7 +31,7 @@ A abstract type that defines a folder
 @parent: 
 @remove_msg_func: 
 @add_msg_func: 
-@expunge_func: 
+@sync_func: 
 @get_msg_remove_strategy_func: 
 @set_msg_remove_strategy_func: 
 @get_msg_receive_strategy_func: 
@@ -127,12 +127,13 @@ A abstract type that defines a folder
 @err: 
 
 
-<!-- ##### FUNCTION tny_folder_expunge ##### -->
+<!-- ##### FUNCTION tny_folder_sync ##### -->
 <para>
 
 </para>
 
 @self: 
+@expunge: 
 @err: 
 
 

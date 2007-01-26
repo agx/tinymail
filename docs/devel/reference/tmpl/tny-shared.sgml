@@ -110,7 +110,7 @@ Shared include file with forward typedefs
 @parent: 
 @remove_msg_func: 
 @add_msg_func: 
-@expunge_func: 
+@sync_func: 
 @get_msg_remove_strategy_func: 
 @set_msg_remove_strategy_func: 
 @get_msg_receive_strategy_func: 
@@ -483,20 +483,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
