@@ -117,7 +117,10 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
  * @self: a #TnyAccount object
  * @mech: the authentication mechanism
  * 
- * Set the account's authentication mechanism
+ * Set the account's authentication mechanism. For example in case of plain
+ * you use "PLAIN" here. For anonymous you use "ANONYMOUS". This last one 
+ * will for example result in a AUTHENTICATE ANONYMOUS request, as specified
+ * in RFC 2245.
  * 
  **/
 void
