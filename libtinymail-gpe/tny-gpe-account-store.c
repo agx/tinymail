@@ -237,7 +237,7 @@ tny_gpe_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGet
 
 	for (i=0; i < count; i++)
 	{
-		gchar *proto, *type, *key, *name;
+		gchar *proto, *type, *key, *name, *mech;
 		TnyAccount *account = NULL;
 		GSList *options;
 
@@ -265,6 +265,11 @@ tny_gpe_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGet
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
 		proto = gconf_client_get_string (priv->client, 
+			(const gchar*) key, NULL);
+		g_free (key);
+
+		key = g_strdup_printf ("/apps/tinymail/accounts/%d/mech", i);
+		mech = gconf_client_get_string (priv->client, 
 			(const gchar*) key, NULL);
 		g_free (key);
 	    
@@ -297,8 +302,15 @@ tny_gpe_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGet
 			name = gconf_client_get_string (priv->client, 
 				(const gchar*) key, NULL);
 			g_free (key);
-			tny_account_set_name (TNY_ACCOUNT (account), name);
-			g_free (name);
+		
+			if (name)
+			{
+				tny_account_set_name (TNY_ACCOUNT (account), name);
+				g_free (name);
+			}
+
+			if (mech)
+				tny_account_set_mech (TNY_ACCOUNT (account), mech);
 
 
 			key = g_strdup_printf ("/apps/tinymail/accounts/%d/options", i);
@@ -377,6 +389,10 @@ tny_gpe_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGet
 
 		if (proto)
 			g_free (proto);
+
+		if (mech)
+			g_free (mech);
+
 	}
 
 	return;	

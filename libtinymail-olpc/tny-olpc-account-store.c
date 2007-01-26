@@ -201,7 +201,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 	for (filen = g_dir_read_name (dir); filen; filen = g_dir_read_name (dir))
 	{
 		GKeyFile *keyfile;
-		gchar *proto, *type, *key, *name;
+		gchar *proto, *type, *key, *name, *mech;
 		TnyAccount *account = NULL;
 		gchar *fullfilen = g_build_filename (g_get_home_dir(), 
 			".tinymail", "accounts", filen);
@@ -221,6 +221,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 		type = g_key_file_get_value (keyfile, "tinymail", "type", NULL);
 		proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
+		mech = g_key_file_get_value (keyfile, "tinymail", "mech", NULL);
 	    
 		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
 		{
@@ -250,8 +251,15 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 			tny_account_set_proto (TNY_ACCOUNT (account), proto);
 
 			name = g_key_file_get_value (keyfile, "tinymail", "name", NULL);
-			tny_account_set_name (TNY_ACCOUNT (account), name);
-			g_free (name);
+
+			if (name) 
+			{
+				tny_account_set_name (TNY_ACCOUNT (account), name);
+				g_free (name);
+			}
+
+			if (mech)
+				tny_account_set_mech (TNY_ACCOUNT (account), mech);
 
 			options = g_key_file_get_string_list (keyfile, "tinymail", "options", &options_len, NULL);
 			if (options)
@@ -307,6 +315,8 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 		if (proto)
 			g_free (proto);
+		if (mech)
+			g_free (mech);
 
 		g_key_file_free (keyfile);
 	}	

@@ -113,6 +113,26 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
 }
 
 /**
+ * tny_account_set_mech:
+ * @self: a #TnyAccount object
+ * @mech: the authentication mechanism
+ * 
+ * Set the account's authentication mechanism
+ * 
+ **/
+void
+tny_account_set_mech (TnyAccount *self, const gchar *mech)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_GET_IFACE (self)->set_mech_func)
+		g_critical ("You must implement tny_account_set_mech\n");
+#endif
+
+	TNY_ACCOUNT_GET_IFACE (self)->set_mech_func (self, mech);
+	return;
+}
+
+/**
  * tny_account_set_id:
  * @self: a #TnyAccount object
  * @id: the id
@@ -454,6 +474,28 @@ tny_account_get_name (TnyAccount *self)
 
 	return TNY_ACCOUNT_GET_IFACE (self)->get_name_func (self);
 }
+
+
+/**
+ * tny_account_get_mech:
+ * @self: a #TnyAccount object
+ * 
+ * Get the authentication mechanism for this account. Default is "PLAIN".
+ * 
+ * Return value: the authentication mechanism as a read-only string
+ *
+ **/
+const gchar*
+tny_account_get_mech (TnyAccount *self)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_GET_IFACE (self)->get_mech_func)
+		g_critical ("You must implement tny_account_get_mech\n");
+#endif
+
+	return TNY_ACCOUNT_GET_IFACE (self)->get_mech_func (self);
+}
+
 
 /**
  * tny_account_get_hostname:

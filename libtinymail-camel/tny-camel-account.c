@@ -73,6 +73,7 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
  *
  * The "always" means that normal SSL is used whereas "when-possible" means 
  * that TLS is tried (the STARTTLS capability of IMAP servers).
+ *
  **/
 void 
 tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option)
@@ -304,6 +305,31 @@ tny_camel_account_set_id_default (TnyAccount *self, const gchar *id)
 }
 
 static void
+tny_camel_account_set_mech (TnyAccount *self, const gchar *mech)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_mech_func (self, mech);
+}
+
+static void
+tny_camel_account_set_mech_default (TnyAccount *self, const gchar *mech)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->service_lock);
+
+	if (G_UNLIKELY (priv->mech))
+		g_free (priv->mech);
+
+	priv->mech = g_strdup (mech);
+
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
+	
+	g_static_rec_mutex_unlock (priv->service_lock);
+
+	return;
+}
+
+static void
 tny_camel_account_set_proto (TnyAccount *self, const gchar *proto)
 {
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_proto_func (self, proto);
@@ -445,6 +471,23 @@ tny_camel_account_get_id_default (TnyAccount *self)
 }
 
 static const gchar*
+tny_camel_account_get_mech (TnyAccount *self)
+{
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_mech_func (self);
+}
+
+static const gchar*
+tny_camel_account_get_mech_default (TnyAccount *self)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	const gchar *retval;
+
+	retval = (const gchar*)priv->mech;
+
+	return retval;
+}
+
+static const gchar*
 tny_camel_account_get_proto (TnyAccount *self)
 {
 	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_proto_func (self);
@@ -574,6 +617,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->user = NULL;
 	priv->host = NULL;
 	priv->proto = NULL;
+	priv->mech = g_strdup ("PLAIN");
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
 	priv->cancel = NULL;
@@ -696,6 +740,9 @@ tny_camel_account_finalize (GObject *object)
 	if (G_LIKELY (priv->host))
 		g_free (priv->host);
 
+	if (G_LIKELY (priv->mech))
+		g_free (priv->mech);
+
 	if (G_LIKELY (priv->proto))
 		g_free (priv->proto);
 
@@ -723,6 +770,8 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->set_hostname_func = tny_camel_account_set_hostname;
 	klass->get_proto_func = tny_camel_account_get_proto;
 	klass->set_proto_func = tny_camel_account_set_proto;
+	klass->get_mech_func = tny_camel_account_get_mech;
+	klass->set_mech_func = tny_camel_account_set_mech;
 	klass->get_user_func = tny_camel_account_get_user;
 	klass->set_user_func = tny_camel_account_set_user;
 	klass->get_pass_func_func = tny_camel_account_get_pass_func;
@@ -754,6 +803,8 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->set_hostname_func = tny_camel_account_set_hostname_default;
 	class->get_proto_func = tny_camel_account_get_proto_default;
 	class->set_proto_func = tny_camel_account_set_proto_default;
+	class->get_mech_func = tny_camel_account_get_mech_default;
+	class->set_mech_func = tny_camel_account_set_mech_default;
 	class->get_user_func = tny_camel_account_get_user_default;
 	class->set_user_func = tny_camel_account_set_user_default;
 	class->get_pass_func_func = tny_camel_account_get_pass_func_default;

@@ -1,3 +1,9 @@
+2007-01-26  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added the tny_account_set/get_mech API
+
+	* This was a major API change
+
 2007-01-26  Sergio Villar Senin <svillar@igalia.com>
 
 	* Fixed the implementation of tny_camel_header_get_xxx methods. Now
