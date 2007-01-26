@@ -325,6 +325,7 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 {
 	TnyHeader *header = NULL;
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
+	const gchar *str;
 
 	g_return_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp);
 	g_return_if_fail (iter->user_data != NULL);
@@ -342,7 +343,9 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_get_cc (header));
+			str = tny_header_get_cc (header);
+			if (str)
+				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
@@ -375,15 +378,21 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_get_to (header));
+			str = tny_header_get_to (header);
+			if (str)
+				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_get_subject (header));
+			str = tny_header_get_subject (header);
+			if (str)
+				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, tny_header_get_from (header));
+			str = tny_header_get_from (header);
+			if (str)
+				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			g_value_init (value, G_TYPE_INT);

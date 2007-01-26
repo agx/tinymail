@@ -78,12 +78,20 @@ tny_gtk_header_view_set_header_default (TnyHeaderView *self, TnyHeader *header)
 	if (header && G_IS_OBJECT (header))
 	{
 		gchar *str;
+		const gchar *to, *from, *subject;
 		g_object_ref (G_OBJECT (header)); 
 		priv->header = header;
 
-		gtk_label_set_text (GTK_LABEL (priv->to_label), tny_header_get_to (header));
-		gtk_label_set_text (GTK_LABEL (priv->from_label), tny_header_get_from (header));
-		gtk_label_set_text (GTK_LABEL (priv->subject_label), tny_header_get_subject (header));
+		to = tny_header_get_to (header);
+		from = tny_header_get_from (header);
+		subject = tny_header_get_subject (header);
+
+		if (to)
+			gtk_label_set_text (GTK_LABEL (priv->to_label), to);
+		if (from)
+			gtk_label_set_text (GTK_LABEL (priv->from_label), from);
+		if (subject)
+			gtk_label_set_text (GTK_LABEL (priv->subject_label), subject);
 
 		str = _get_readable_date (tny_header_get_date_sent (header));
 		gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);

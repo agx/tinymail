@@ -1,3 +1,10 @@
+2007-01-26  Sergio Villar Senin <svillar@igalia.com>
+
+	* Fixed the implementation of tny_camel_header_get_xxx methods. Now
+	they return NULL whenever an error happens (or if the attribute hasn't
+	a value yet) instead of the string "Invalid". The documentation has
+	been updated also.
+
 2007-01-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Renamed tny_folder_expunge to tny_folder_sync, and made it possible

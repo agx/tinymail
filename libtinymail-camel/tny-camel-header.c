@@ -41,8 +41,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-static const gchar *invalid = "Invalid";
-
 static void 
 destroy_write (TnyCamelHeader *self)
 {
@@ -50,7 +48,7 @@ destroy_write (TnyCamelHeader *self)
 	if (((WriteInfo*)self->info)->msg)
 		camel_object_unref (CAMEL_OBJECT (((WriteInfo*)self->info)->msg));
 
-	if (((WriteInfo*)self->info)->mime_from && ((WriteInfo*)self->info)->mime_from != invalid)
+	if (((WriteInfo*)self->info)->mime_from && ((WriteInfo*)self->info)->mime_from != NULL)
 		g_free (((WriteInfo*)self->info)->mime_from);
 
 	g_slice_free (WriteInfo, self->info);
@@ -154,14 +152,14 @@ static const gchar*
 tny_camel_header_get_replyto (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #else
 	if (G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #endif
 
 	if (G_UNLIKELY (me->write == 1)) 
@@ -170,10 +168,7 @@ tny_camel_header_get_replyto (TnyHeader *self)
 			camel_mime_message_get_reply_to (((WriteInfo*)me->info)->msg);
 		if (addr)
 			retval = camel_address_format (CAMEL_ADDRESS (addr));
-		else
-			retval = invalid;
-	} else
-		retval = invalid;
+	}
 
 	return retval;
 }
@@ -293,44 +288,42 @@ static const gchar*
 tny_camel_header_get_cc (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy)
-		return invalid;
+		return NULL;
 #endif
 
 	if (G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 
 	if (G_UNLIKELY (me->write == 1))
 		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "cc");
 	else
 		retval = camel_message_info_cc ((CamelMessageInfo*)me->info);
 
-	return retval?retval:invalid;
+	return retval;
 }
 
 static const gchar*
 tny_camel_header_get_bcc (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy)
-		return invalid;
+		return NULL;
 #endif
 
 	if (G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 
 	if (G_UNLIKELY (me->write == 1))
 		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "bcc");
-	else
-		retval = invalid;
 
-	return retval?retval:invalid;
+	return retval;
 }
 
 static TnyHeaderFlags
@@ -469,14 +462,14 @@ static const gchar*
 tny_camel_header_get_from (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #else
 	if (G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #endif
 
 	if (G_UNLIKELY (me->write == 1))
@@ -487,28 +480,28 @@ tny_camel_header_get_from (TnyHeader *self)
 				camel_mime_message_get_from (((WriteInfo*)me->info)->msg);
 				if (addr)
 					((WriteInfo*)me->info)->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
-				else ((WriteInfo*)me->info)->mime_from = (gchar*) invalid;
+				else ((WriteInfo*)me->info)->mime_from = NULL;
 		}
 
 		retval = (const gchar*)((WriteInfo*)me->info)->mime_from;
 	} else
 		retval = camel_message_info_from ((CamelMimeMessage*)me->info);
 
-	return retval?retval:invalid;
+	return retval;
 }
 
 static const gchar*
 tny_camel_header_get_subject (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #else
 	if (G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #endif
 
 	if (G_UNLIKELY (me->write == 1))
@@ -516,7 +509,7 @@ tny_camel_header_get_subject (TnyHeader *self)
 	else
 		retval = camel_message_info_subject ((CamelMessageInfo*)me->info);
 
-	return retval?retval:invalid;
+	return retval;
 }
 
 
@@ -524,44 +517,44 @@ static const gchar*
 tny_camel_header_get_to (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #else
 	if (G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #endif
 
 	if (G_UNLIKELY (me->write == 1))
-		retval = (gchar*) camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "to");
+		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "to");
 	else
-		retval = (gchar*) camel_message_info_to ((CamelMessageInfo*)me->info);
+		retval = camel_message_info_to ((CamelMessageInfo*)me->info);
 
-	return retval?(const gchar*)retval:invalid;
+	return retval;
 }
 
 static const gchar*
 tny_camel_header_get_message_id (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #else
 	if (G_UNLIKELY (!me->info))
-		return invalid;
+		return NULL;
 #endif
 
 	if (G_UNLIKELY (me->write == 1))
-		retval = (gchar*) camel_mime_message_get_message_id (((WriteInfo*)me->info)->msg);
+		retval = camel_mime_message_get_message_id (((WriteInfo*)me->info)->msg);
 	else
-		retval = (gchar*) camel_message_info_message_id ((CamelMessageInfo*)me->info);
+		retval = camel_message_info_message_id ((CamelMessageInfo*)me->info);
 
-	return retval?(const gchar*)retval:invalid;
+	return retval;
 }
 
 
@@ -598,19 +591,19 @@ static const gchar*
 tny_camel_header_get_uid (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval;
+	const gchar *retval = NULL;
 
 #ifdef HEALTHY_CHECK
 	if (!me->healthy || G_UNLIKELY (!me->info) || G_UNLIKELY (me->write == 1))
-		return invalid;
+		return NULL;
 #else
 	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write == 1))
-		return invalid;
+		return NULL;
 #endif
 
 	retval = camel_message_info_uid ((CamelMessageInfo*)me->info);
 
-	return retval?retval:invalid;
+	return retval;
 }
 
 static void

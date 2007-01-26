@@ -48,7 +48,7 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
  * 
  * Get the reply-to header
  * 
- * Return value: reply-to header
+ * Return value: reply-to header, or NULL if not found
  **/
 const gchar*
 tny_header_get_replyto (TnyHeader *self)
@@ -173,7 +173,7 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
  * 
  * Get the CC header. The returned value should not be freed.
  * 
- * Return value: cc header as a read-only string
+ * Return value: cc header as a read-only string, or NULL if not found
  *
  **/
 const gchar*
@@ -193,7 +193,7 @@ tny_header_get_cc (TnyHeader *self)
  * 
  * Get the BCC header. The returned value should not be freed.
  * 
- * Return value: bcc header as a read-only string
+ * Return value: bcc header as a read-only string, or NULL if not found
  *
  **/
 const gchar*
@@ -253,7 +253,7 @@ tny_header_get_date_sent (TnyHeader *self)
  * Get an unique id of the message of which self is a message header. The 
  * returned value should not be freed.
  * 
- * Return value: Unique follow-up uid as a read-only string
+ * Return value: Unique follow-up uid as a read-only string, or NULL if not found
  *
  **/
 const gchar*
@@ -274,7 +274,7 @@ tny_header_get_uid (TnyHeader *self)
  * Get an unique id of the message of which self is a message header. The 
  * returned value should not be freed.
  * 
- * Return value: message-id header as a read-only string
+ * Return value: message-id header as a read-only string, or NULL if not found
  *
  **/
 const gchar*
@@ -316,7 +316,7 @@ tny_header_get_message_size (TnyHeader *self)
  * 
  * Get the from header. The returned value should not be freed.
  * 
- * Return value: from header as a read-only string.
+ * Return value: from header as a read-only string, or NULL if not found
  *
  **/
 const gchar* 
@@ -336,7 +336,7 @@ tny_header_get_from (TnyHeader *self)
  * 
  * Get the subject header. The returned value should not be freed.
  * 
- * Return value: subject header as a read-only string.
+ * Return value: subject header as a read-only string, or NULL if not found
  *
  **/
 const gchar*
@@ -357,7 +357,7 @@ tny_header_get_subject (TnyHeader *self)
  * 
  * Get the to header. The returned value should not be freed.
  * 
- * Return value: to header as a read-only string
+ * Return value: to header as a read-only string, or NULL if not found
  *
  **/
 const gchar* 

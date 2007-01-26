@@ -96,10 +96,12 @@ tny_gtk_msg_window_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 	if (msg)
 	{
 		g_assert (TNY_IS_MSG (msg));
+		const gchar *subject;
 
 		header = TNY_HEADER (tny_msg_get_header (msg));
-		gtk_window_set_title (GTK_WINDOW (self), 
-			tny_header_get_subject (header));
+		subject = tny_header_get_subject (header);
+		if (subject)
+			gtk_window_set_title (GTK_WINDOW (self), subject);
 		g_object_unref (G_OBJECT (header));
 	}
 	tny_msg_view_set_msg (priv->msg_view, msg);

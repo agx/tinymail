@@ -161,8 +161,10 @@ remove_header_from_list (TnyList *list, const gchar *uid)
 	iter = tny_list_create_iterator (list);
 	while (!tny_iterator_is_done (iter))
 	{
+		const gchar *id;
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-		if (!strcmp (tny_header_get_uid (header), uid))
+		id = tny_header_get_uid (header);
+		if (id && (!strcmp (id, uid)))
 		{ found = TRUE; break; }
 		g_object_unref (G_OBJECT (header));
 		tny_iterator_next (iter);
@@ -221,8 +223,11 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 	iter = tny_list_create_iterator (list);
 	while (!tny_iterator_is_done (iter))
 	{
+		const gchar *uid;
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-		foreach_list_remove_header (priv, tny_header_get_uid (header));
+		uid = tny_header_get_uid (header);
+		if (uid)
+			foreach_list_remove_header (priv, uid);
 		g_object_unref (G_OBJECT (header));
 		tny_iterator_next (iter);
 	}
