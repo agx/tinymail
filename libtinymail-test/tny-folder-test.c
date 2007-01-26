@@ -233,7 +233,7 @@ START_TEST (tny_folder_test_msg)
 	g_free (str);
 	
 	/* Expunge ...*/
-	tny_folder_expunge (iface, NULL);    
+	tny_folder_sync (iface, TRUE, NULL);    
 	tny_folder_refresh (iface, NULL);
 	
 	new_len = tny_folder_get_all_count (iface);

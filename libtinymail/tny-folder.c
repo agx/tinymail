@@ -222,12 +222,14 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
 }
 
 /**
- * tny_folder_expunge:
+ * tny_folder_sync:
  * @self: a #TnyFolder object
+ * @expunge: whether or not to also expunge deleted messages
  * @err: a #GError object or NULL
  *
  * Persist changes made to a folder to its backing store, expunging deleted 
- * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well.
+ * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well if @expunge
+ * is TRUE.
  *
  * Example:
  * <informalexample><programlisting>
@@ -236,18 +238,18 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * tny_folder_remove_msg (folder, header, NULL);
  * tny_list_remove (TNY_LIST (mymodel), G_OBJECT (header));
  * g_object_unref (G_OBJECT (header));
- * tny_folder_expunge (folder);
+ * tny_folder_sync (folder, TRUE, NULL);
  * g_object_unref (G_OBJECT (folder));
  * </programlisting></informalexample>
  **/
 void 
-tny_folder_expunge (TnyFolder *self, GError **err)
+tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 {
 #ifdef DEBUG
-	if (!TNY_FOLDER_GET_IFACE (self)->expunge_func)
-		g_critical ("You must implement tny_folder_expunge\n");
+	if (!TNY_FOLDER_GET_IFACE (self)->sync_func)
+		g_critical ("You must implement tny_folder_sync\n");
 #endif
-	TNY_FOLDER_GET_IFACE (self)->expunge_func (self, err);
+	TNY_FOLDER_GET_IFACE (self)->sync_func (self, expunge, err);
 	return;
 }
 

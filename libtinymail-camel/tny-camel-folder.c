@@ -422,14 +422,14 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 }
 
 static void 
-tny_camel_folder_expunge (TnyFolder *self, GError **err)
+tny_camel_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->expunge_func (self, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync_func (self, expunge, err);
 	return;
 }
 
 static void 
-tny_camel_folder_expunge_default (TnyFolder *self, GError **err)
+tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -443,12 +443,12 @@ tny_camel_folder_expunge_default (TnyFolder *self, GError **err)
 			return;
 		}
 
-	camel_folder_sync (priv->folder, TRUE, &ex);
+	camel_folder_sync (priv->folder, expunge, &ex);
 
 	if (camel_exception_is_set (&ex))
 	{
 		g_set_error (err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_EXPUNGE,
+			TNY_FOLDER_ERROR_SYNC,
 			camel_exception_get_description (&ex));
 	}
 
@@ -2487,7 +2487,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->refresh_async_func = tny_camel_folder_refresh_async;
 	klass->refresh_func = tny_camel_folder_refresh;
 	klass->remove_msg_func = tny_camel_folder_remove_msg;
-	klass->expunge_func = tny_camel_folder_expunge;
+	klass->sync_func = tny_camel_folder_sync;
 	klass->add_msg_func = tny_camel_folder_add_msg;
 	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
 	klass->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async;
@@ -2540,7 +2540,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->refresh_func = tny_camel_folder_refresh_default;
 	class->remove_msg_func = tny_camel_folder_remove_msg_default;
 	class->add_msg_func = tny_camel_folder_add_msg_default;
-	class->expunge_func = tny_camel_folder_expunge_default;
+	class->sync_func = tny_camel_folder_sync_default;
 	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
 	class->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async_default;
 	class->copy_func = tny_camel_folder_copy_default;

@@ -37,7 +37,7 @@
  * This method also doesn't "have" to remove the header from the folder. 
  * Depending on the implementation it might only marks it as removed (it for 
  * example sets the TNY_HEADER_FLAG_DELETED). In such a case only after
- * performing the tny_folder_expunge method on the folder, it will really be
+ * performing the tny_folder_sync method on the folder, it will really be
  * removed.
  *
  * In such a case this means that a tny_folder_get_headers method call will

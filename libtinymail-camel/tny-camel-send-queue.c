@@ -244,7 +244,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove)
 		g_object_unref (G_OBJECT (iter));
 		g_object_unref (G_OBJECT (headers));
 
-		tny_folder_expunge (outbox, NULL);
+		tny_folder_sync (outbox, TRUE, NULL);
 
 		g_object_unref (G_OBJECT (outbox));
 	}

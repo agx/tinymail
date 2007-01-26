@@ -1,3 +1,10 @@
+2007-01-26  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Renamed tny_folder_expunge to tny_folder_sync, and made it possible
+	to sync without expunging
+
+	* This was a major API change
+
 2007-01-25  Sergio Villar Senin <svillar@igalia.com>
 
 	* Fixed a comparison in an if statement

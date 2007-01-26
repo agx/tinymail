@@ -14,7 +14,7 @@
   (c-name "TnyError")
   (gtype-id "TNY_TYPE_ERROR")
   (values
-	'("folder_error_expunge" "TNY_FOLDER_ERROR_EXPUNGE")
+	'("folder_error_sync" "TNY_FOLDER_ERROR_SYNC")
 	'("folder_error_remove_msg" "TNY_FOLDER_ERROR_REMOVE_MSG")
 	'("folder_error_add_msg" "TNY_FOLDER_ERROR_ADD_MSG")
 	'("folder_error_refresh" "TNY_FOLDER_ERROR_REFRESH")

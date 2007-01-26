@@ -43,7 +43,7 @@ tny_error_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
-      { TNY_FOLDER_ERROR_EXPUNGE, "TNY_FOLDER_ERROR_EXPUNGE", "folder_error_expunge" },
+      { TNY_FOLDER_ERROR_SYNC, "TNY_FOLDER_ERROR_SYNC", "folder_error_sync" },
       { TNY_FOLDER_ERROR_REMOVE_MSG, "TNY_FOLDER_ERROR_REMOVE_MSG", "folder_error_remove_msg" },
       { TNY_FOLDER_ERROR_ADD_MSG, "TNY_FOLDER_ERROR_ADD_MSG", "folder_error_add_msg" },
       { TNY_FOLDER_ERROR_REFRESH, "TNY_FOLDER_ERROR_REFRESH", "folder_error_refresh" },
