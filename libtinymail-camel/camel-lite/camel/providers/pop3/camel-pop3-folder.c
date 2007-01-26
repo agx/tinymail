@@ -619,7 +619,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 				if (bound && strlen (bound) > 0) 
 					boundary = g_strdup (bound);
 			   }
-		} else if (strstr (buffer, boundary))
+		} else if (strstr ((const char*) buffer, (const char*) boundary))
 		{
 			if (occurred)
 			{
@@ -635,7 +635,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 
 		if (!theend)
 		{
-		    n = camel_stream_write(fi->stream, buffer, len);
+		    n = camel_stream_write(fi->stream, (const char*) buffer, len);
 		    if (n == -1 || camel_stream_write(fi->stream, "\n", 1) == -1)
 			break;
 		    w += n+1;
