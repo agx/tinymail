@@ -217,11 +217,11 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		fprintf (stderr, "sending : %c%.5u %s\r\n", store->tag_prefix, store->command, mask);
 	}
 
-	/* printf ("--> %s\n", cmd); */
-
 	nwritten = camel_stream_printf (store->ostream, "%c%.5u %s\r\n",
 					store->tag_prefix, store->command++, cmd);
-	
+
+	/* printf ("%c%.5u %s\r\n", store->tag_prefix, store->command, cmd); */
+
 	if (nwritten == -1) {
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,

@@ -2421,6 +2421,9 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 			cnt++;
 		}
 		g_datalist_clear (&data);
+
+		/* printf ("%s\n", resp); */
+
 		g_free (resp); 
 		resp=NULL;
 	}
@@ -2506,7 +2509,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	got = 0;
 
 	if (!camel_imap_command_start (store, folder, ex,
-		"UID FETCH %d:%d (FLAGS)", uidval + 1, uidval + 1 + nextn)) 
+		"UID FETCH %d:%d (UID)", uidval + 1, uidval + 1 + nextn)) 
 		{ if (!camel_operation_cancel_check (NULL))
 			g_warning ("IMAP error getting UIDs (1)"); 
 		 camel_operation_end (NULL); return; }
@@ -2537,7 +2540,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	{
 
 		if (!camel_imap_command_start (store, folder, ex,
-			"UID FETCH %d:* (FLAGS)", uidval + 1 + cnt)) 
+			"UID FETCH %d:* (UID)", uidval + 1 + cnt)) 
 			{ if (!camel_operation_cancel_check (NULL))
 				g_warning ("IMAP error getting UIDs (2)"); 
 			  camel_operation_end (NULL); return; }
@@ -2563,7 +2566,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			g_ptr_array_free (needheaders, TRUE);
 			needheaders = g_ptr_array_new ();
 			if (!camel_imap_command_start (store, folder, ex,
-				"UID FETCH 1:* (FLAGS)", uidval + 1 + cnt))
+				"UID FETCH 1:* (UID)", uidval + 1 + cnt))
 				{ if (!camel_operation_cancel_check (NULL)) 
 					g_warning ("IMAP error getting UIDs (3)");
 				  camel_operation_end (NULL); return; }
