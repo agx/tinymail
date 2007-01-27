@@ -88,7 +88,21 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 
 	priv->options = g_list_prepend (priv->options, g_strdup (option));
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self);
+
+	return;
+}
+
+static void
+tny_camel_account_try_connect (TnyAccount *self, GError **err)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->try_connect_func (self, err);
+}
+
+static void
+tny_camel_account_try_connect_default (TnyAccount *self, GError **err)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
 
 	return;
 }
@@ -110,10 +124,7 @@ tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_str
 
 	priv->url_string = g_strdup (url_string);
 
-	if (G_UNLIKELY (!TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func))
-		g_error ("This TnyAccount instance isn't a fully implemented type\n");
-
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func ((TnyCamelAccount*)self);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
 
 	return;
 }
@@ -278,8 +289,10 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
 
 	g_static_rec_mutex_lock (priv->service_lock);
 	priv->session = session;
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (self);
 	_tny_session_camel_add_account (session, self);
+
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self);
+
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
@@ -322,8 +335,8 @@ tny_camel_account_set_mech_default (TnyAccount *self, const gchar *mech)
 
 	priv->mech = g_strdup (mech);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
-	
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
@@ -347,8 +360,8 @@ tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 
 	priv->proto = g_strdup (proto);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
-	
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
@@ -372,7 +385,7 @@ tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 
 	priv->user = g_strdup (user);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -397,12 +410,37 @@ tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
 
 	priv->host = g_strdup (host);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
 	return;
 }
+
+
+
+static void
+tny_camel_account_set_port (TnyAccount *self, guint port)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_port_func (self, port);
+}
+
+static void
+tny_camel_account_set_port_default (TnyAccount *self, guint port)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	
+	g_static_rec_mutex_lock (priv->service_lock);
+
+	priv->port = (gint) port;
+
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+
+	g_static_rec_mutex_unlock (priv->service_lock);
+
+	return;
+}
+
 
 static void
 tny_camel_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
@@ -421,10 +459,7 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
-	if (G_UNLIKELY (!TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func))
-		g_error ("This TnyAccount instance isn't a fully implemented type\n");
-
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->reconnect_func ((TnyCamelAccount*)self);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -447,6 +482,8 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 	tny_session_camel_set_forget_pass_func (priv->session, self, get_forget_pass_func);
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
+
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -530,12 +567,27 @@ tny_camel_account_get_hostname (TnyAccount *self)
 static const gchar*
 tny_camel_account_get_hostname_default (TnyAccount *self)
 {
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);	
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
 
 	retval = (const gchar*)priv->host;
 
 	return retval;
+}
+
+
+
+static guint 
+tny_camel_account_get_port (TnyAccount *self)
+{
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_port_func (self);
+}
+
+static guint 
+tny_camel_account_get_port_default (TnyAccount *self)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	return (guint)priv->port;
 }
 
 static TnyGetPassFunc
@@ -601,6 +653,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->port = -1;
 	priv->cache_location = NULL;
 	priv->service = NULL;
 	priv->session = NULL;
@@ -766,6 +819,9 @@ tny_account_init (gpointer g, gpointer iface_data)
 {
 	TnyAccountIface *klass = (TnyAccountIface *)g;
 
+	klass->try_connect_func = tny_camel_account_try_connect;
+	klass->get_port_func = tny_camel_account_get_port;
+	klass->set_port_func = tny_camel_account_set_port;
 	klass->get_hostname_func = tny_camel_account_get_hostname;
 	klass->set_hostname_func = tny_camel_account_set_hostname;
 	klass->get_proto_func = tny_camel_account_get_proto;
@@ -798,7 +854,9 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-
+	class->try_connect_func = tny_camel_account_try_connect_default;
+	class->get_port_func = tny_camel_account_get_port_default;
+	class->set_port_func = tny_camel_account_set_port_default;
 	class->get_hostname_func = tny_camel_account_get_hostname_default;
 	class->set_hostname_func = tny_camel_account_set_hostname_default;
 	class->get_proto_func = tny_camel_account_get_proto_default;

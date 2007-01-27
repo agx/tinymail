@@ -348,7 +348,7 @@ static void
 tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-	gint i=0, count;
+	gint i=0, count, port;
 
 	g_assert (TNY_IS_LIST (list));
 
@@ -470,7 +470,14 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 				g_free (key); 
 				tny_account_set_hostname (TNY_ACCOUNT (account), 
 					hostname);
-				
+
+				key = g_strdup_printf ("/apps/tinymail/accounts/%d/port", i);
+				port = gconf_client_get_int (priv->client, 
+					(const gchar*) key, NULL);
+				g_free (key); 
+				if (port != 0) tny_account_set_port (TNY_ACCOUNT (account), 
+					port);
+
 				g_free (hostname); g_free (user);
 			} else {
 				gchar *url_string;

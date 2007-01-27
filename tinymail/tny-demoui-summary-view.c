@@ -99,6 +99,7 @@ struct _TnyDemouiSummaryViewPriv
 	TnyList *current_accounts;
 	TnyFolderMonitor *monitor; GMutex *monitor_lock;
 	guint monitor_timeout; gboolean monitor_continue;
+	gboolean handle_recon;
 };
 
 #define TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE(o)	\
@@ -167,6 +168,8 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	tny_account_store_get_accounts (account_store, accounts,
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
+	priv->current_accounts = TNY_LIST (g_object_ref (G_OBJECT (accounts)));
+
 	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
 			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 	gtk_combo_box_set_model (priv->account_view, maccounts);
@@ -188,9 +191,7 @@ static void
 accounts_reloaded (TnyAccountStore *store, gpointer user_data)
 {
 	TnyDemouiSummaryViewPriv *priv = user_data;
-	
 	reload_accounts (priv);
-	
 	return;
 }
 
@@ -200,6 +201,9 @@ online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 	TnySummaryView *self = user_data;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
+	if (!priv->handle_recon)
+		return;
+
 	if (priv->account_store)
 	{
 		TnyDevice *device = tny_account_store_get_device (priv->account_store);
@@ -208,7 +212,7 @@ online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 			tny_device_force_online (device);
 		else
 			tny_device_force_offline (device);
-	    
+
 		g_object_unref (G_OBJECT (device));
 	}
 }
@@ -218,6 +222,8 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 {
 	TnySummaryView *self = user_data;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
+	priv->handle_recon = FALSE;
 
 	if (online)
 	{
@@ -232,6 +238,8 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->online_button), FALSE);
 		g_signal_handler_unblock (G_OBJECT (priv->online_button), priv->online_button_signal);
 	}
+
+	priv->handle_recon = TRUE;
 
 	return;
 }
@@ -675,6 +683,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	/* TODO: Persist application UI status (of the panes) */
 
+	priv->handle_recon = TRUE;
 	priv->monitor_lock = g_mutex_new ();
 	priv->monitor_timeout = 0;
 	priv->monitor = NULL;
@@ -891,6 +900,9 @@ tny_demoui_summary_view_finalize (GObject *object)
 {
 	TnyDemouiSummaryView *self = (TnyDemouiSummaryView *)object;	
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
+	if (priv->current_accounts)
+		g_object_unref (G_OBJECT (priv->current_accounts));
 
 	if (G_LIKELY (priv->account_store))
 	{

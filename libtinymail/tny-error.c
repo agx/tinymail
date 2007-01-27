@@ -28,6 +28,7 @@ tny_error_domain_get_type (void)
       { TNY_FOLDER_ERROR, "TNY_FOLDER_ERROR", "folder_error" },
       { TNY_FOLDER_STORE_ERROR, "TNY_FOLDER_STORE_ERROR", "folder_store_error" },
       { TNY_TRANSPORT_ACCOUNT_ERROR, "TNY_TRANSPORT_ACCOUNT_ERROR", "transport_account_error" },
+      { TNY_ACCOUNT_ERROR, "TNY_ACCOUNT_ERROR", "account_error" },
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyErrorDomain", values);
@@ -56,7 +57,9 @@ tny_error_get_type (void)
       { TNY_FOLDER_STORE_ERROR_GET_FOLDERS, "TNY_FOLDER_STORE_ERROR_GET_FOLDERS", "folder_store_error_get_folders" },
       { TNY_FOLDER_STORE_ERROR_CREATE_FOLDER, "TNY_FOLDER_STORE_ERROR_CREATE_FOLDER", "folder_store_error_create_folder" },
 
-      { TNY_TRANSPORT_ACCOUNT_ERROR_SEND, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND", "transport_error_account_send" },
+      { TNY_TRANSPORT_ACCOUNT_ERROR_SEND, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND", "transport_account_error_send" },
+
+      { TNY_ACCOUNT_ERROR_TRY_CONNECT, "TNY_ACCOUNT_ERROR_TRY_CONNECT", "account_error_try_connect" },
 
       { 0, NULL, NULL }
     };

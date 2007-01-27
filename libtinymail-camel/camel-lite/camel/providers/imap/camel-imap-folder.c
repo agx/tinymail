@@ -2344,8 +2344,6 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelStream *stream = NULL;
 	int retry;
 
-	/* TNY TODO: Implement partial message retrieval if full==TRUE */
-
 	mi = (CamelImapMessageInfo *)camel_folder_summary_uid (folder->summary, uid);
 	if (mi == NULL) {
 		camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
@@ -2357,6 +2355,10 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	   since we get stuff from the cache anyway.  It affects a busted connection though. */
 	if ( (stream = camel_imap_folder_fetch_data (imap_folder, uid, "", TRUE, type, param, NULL))
 	     && (msg = get_message_simple(imap_folder, uid, stream, type, param, ex)))
+		goto done;
+
+
+	if (camel_disco_store_status (CAMEL_DISCO_STORE (folder->parent_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		goto done;
 
 	/* All this mess is so we silently retry a fetch if we fail with
@@ -2445,9 +2447,8 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		 && retry < 2
 		 && camel_exception_get_id(ex) == CAMEL_EXCEPTION_SERVICE_UNAVAILABLE);
 
-done:	/* FIXME, this shouldn't be done this way. */
-	if (msg)
-		camel_medium_set_header (CAMEL_MEDIUM (msg), "X-Evolution-Source", store->base_url);
+done:
+
 fail:
 	camel_message_info_free(&mi->info);
 	

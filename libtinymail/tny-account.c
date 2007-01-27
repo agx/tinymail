@@ -23,6 +23,24 @@
 
 
 /**
+ * tny_account_try_connect:
+ * @self: a #TnyAccount object
+ * @err: a #GError instance or NULL
+ * 
+ * Try to connect. This can put a reason why connecting failed in @err.
+ **/
+void
+tny_account_try_connect (TnyAccount *self, GError **err)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_GET_IFACE (self)->try_connect_func)
+		g_critical ("You must implement tny_account_get_id\n");
+#endif
+
+	return TNY_ACCOUNT_GET_IFACE (self)->try_connect_func (self, err);
+}
+
+/**
  * tny_account_get_account_type:
  * @self: a #TnyAccount object
  *
@@ -324,6 +342,28 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
 }
 
 
+
+/**
+ * tny_account_set_port:
+ * @self: a #TnyAccount object
+ * @port: the port to connect to on the hostname
+ * 
+ * Set the port of @self. If you don't set this property, the default port for
+ * the protocol will be used (for example 143 and 993 for IMAP and 110 for POP3).
+ *
+ **/
+void
+tny_account_set_port (TnyAccount *self, guint port)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_GET_IFACE (self)->set_port_func)
+		g_critical ("You must implement tny_account_set_port\n");
+#endif
+
+	TNY_ACCOUNT_GET_IFACE (self)->set_port_func (self, port);
+	return;
+}
+
 /**
  * tny_account_set_pass_func:
  * @self: a #TnyAccount object
@@ -520,6 +560,25 @@ tny_account_get_hostname (TnyAccount *self)
 	return TNY_ACCOUNT_GET_IFACE (self)->get_hostname_func (self);
 }
 
+
+/**
+ * tny_account_get_port:
+ * @self: a #TnyAccount object
+ * 
+ * Get the port of @self. 
+ * 
+ * Return value: the port
+ **/
+guint
+tny_account_get_port (TnyAccount *self)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_GET_IFACE (self)->get_port_func)
+		g_critical ("You must implement tny_account_get_port\n");
+#endif
+
+	return TNY_ACCOUNT_GET_IFACE (self)->get_port_func (self);
+}
 /**
  * tny_account_get_pass_func:
  * @self: a #TnyAccount object

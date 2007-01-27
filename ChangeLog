@@ -8,6 +8,11 @@
 
 	* First LEMONADE feature, implemented support for the CONDSTORE 
 	capability in camel-lite's IMAP provider (RFC 4551)
+	* Changed some things about connecting, including the introduction of
+	a new api tny_account_try_connect. All this connecting stuff is yet
+	uncertain though.
+
+	* This was a major API change
 
 2007-01-26  Philip Van Hoof  <pvanhoof@gnome.org>
 

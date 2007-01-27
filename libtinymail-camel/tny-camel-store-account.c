@@ -53,111 +53,128 @@
 
 static GObjectClass *parent_class = NULL;
 
-static void
-report_error (TnyCamelAccountPriv *priv)
-{
-	if (G_UNLIKELY (priv->service == NULL))
-	{
-		g_error (_("Couldn't get service %s: %s\n"), priv->url_string,
-			   camel_exception_get_description (priv->ex));
-		camel_exception_clear (priv->ex);
-		return;
-	}
-}
-
-
 static void 
-tny_camel_store_account_reconnect (TnyCamelAccount *self)
+tny_camel_store_account_prepare (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (G_LIKELY (apriv->session) && G_UNLIKELY (apriv->proto) && 
-		G_UNLIKELY (apriv->user) && G_UNLIKELY (apriv->host))
+	CamelURL *url = NULL;
+	GList *options = apriv->options;
+	gchar *proto;
+
+	if (apriv->proto == NULL)
+		return;
+
+	proto = g_strdup_printf ("%s://", apriv->proto); 
+
+	url = camel_url_new (proto, apriv->ex);
+	g_free (proto);
+
+	if (!url)
+		return;
+
+	camel_url_set_protocol (url, apriv->proto); 
+	camel_url_set_user (url, apriv->user);
+	camel_url_set_host (url, apriv->host);
+
+	if (apriv->port != -1)
+		camel_url_set_port (url, (int)apriv->port);
+
+	if (apriv->mech)
+		camel_url_set_authmech (url, apriv->mech);
+
+	while (options)
 	{
-		if (!apriv->url_string)
-		{
-			CamelURL *url = NULL;
-			GList *options = apriv->options;
-			gchar *proto = g_strdup_printf ("%s://", apriv->proto); 
-			
-			url = camel_url_new (proto, apriv->ex);
-			g_free (proto);
-
-			camel_url_set_protocol (url, apriv->proto); 
-			camel_url_set_user (url, apriv->user);
-			camel_url_set_host (url, apriv->host);
-
-			if (apriv->mech)
-				camel_url_set_authmech (url, apriv->mech);
-
-			while (options)
-			{
-				gchar *ptr, *dup = g_strdup (options->data);
-				gchar *option, *value;
-				ptr = strchr (dup, '=');
-				if (ptr) {
-					ptr++;
-					value = g_strdup (ptr); ptr--;
-					*ptr = '\0'; option = dup;
-				} else {
-					option = dup;
-					value = g_strdup ("1");
-				}
-				camel_url_set_param (url, option, value);
-				g_free (value);
-				g_free (dup);
-				options = g_list_next (options);
-			}
-
-			if (G_LIKELY (apriv->url_string))
-				g_free (apriv->url_string);
-
-			apriv->url_string = camel_url_to_string (url, 0);
-			camel_url_free (url);
-
-			g_static_rec_mutex_lock (apriv->service_lock);
-			apriv->service = camel_session_get_service
-				((CamelSession*) apriv->session, apriv->url_string, 
-				apriv->type, apriv->ex);
-			if (apriv->service == NULL)
-				report_error (apriv);
-			g_static_rec_mutex_unlock (apriv->service_lock);
-
-			/* TODO: Handle priv->ex using GError */
+		gchar *ptr, *dup = g_strdup (options->data);
+		gchar *option, *value;
+		ptr = strchr (dup, '=');
+		if (ptr) {
+			ptr++;
+			value = g_strdup (ptr); ptr--;
+			*ptr = '\0'; option = dup;
+		} else {
+			option = dup;
+			value = g_strdup ("1");
 		}
-	} else if (G_LIKELY (apriv->session) && (apriv->url_string))
-	{
-		g_static_rec_mutex_lock (apriv->service_lock);
-		/* camel_session_get_service can launch GUI things */
+		camel_url_set_param (url, option, value);
+		g_free (value);
+		g_free (dup);
+		options = g_list_next (options);
+	}
+
+	if (G_LIKELY (apriv->url_string))
+		g_free (apriv->url_string);
+
+	apriv->url_string = camel_url_to_string (url, 0);
+	camel_url_free (url);
+
+	/* TODO: check for old instance and clear it */
+
+	g_static_rec_mutex_lock (apriv->service_lock);
+	if (apriv->session)
 		apriv->service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
-		if (apriv->service == NULL)
-			report_error (apriv);
-		g_static_rec_mutex_unlock (apriv->service_lock);
-		
-		/* TODO: Handle priv->ex using GError */
-	}
+	g_static_rec_mutex_unlock (apriv->service_lock);
+}
 
-	if ( G_LIKELY (apriv->service) && G_UNLIKELY (apriv->pass_func_set)
-		&& G_UNLIKELY (apriv->forget_pass_func_set) )
+static void 
+tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	if (!apriv->url_string || !apriv->service)
 	{
-		apriv->connected = FALSE;
-
-		g_static_rec_mutex_lock (apriv->service_lock);
-		/* camel_service_connect can launch GUI things */
-		if (!camel_service_connect (apriv->service, apriv->ex))
+		if (camel_exception_is_set (apriv->ex))
 		{
-			/* TODO: Handle priv->ex using GError */
-			g_warning (_("Not connected with %s: %s\n"), apriv->url_string,
-				   camel_exception_get_description (apriv->ex));
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				camel_exception_get_description (apriv->ex));
 			camel_exception_clear (apriv->ex);
 		} else {
-			apriv->connected = TRUE;
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				_("Account not yet fully configured"));
 		}
+
+		return;
+	}
+
+	if (apriv->pass_func_set && apriv->forget_pass_func_set)
+	{
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+		apriv->connected = FALSE;
+
+		if (camel_exception_is_set (apriv->ex))
+			camel_exception_clear (apriv->ex);
+
+		g_static_rec_mutex_lock (apriv->service_lock);
+
+		/* camel_service_connect can launch GUI things */
+		if (!camel_service_connect (apriv->service, &ex))
+		{
+			if (camel_exception_is_set (&ex))
+			{
+				g_set_error (err, TNY_ACCOUNT_ERROR, 
+					TNY_ACCOUNT_ERROR_TRY_CONNECT,
+					camel_exception_get_description (&ex));
+				camel_exception_clear (&ex);
+			} else {
+				g_set_error (err, TNY_ACCOUNT_ERROR, 
+					TNY_ACCOUNT_ERROR_TRY_CONNECT,
+					_("Unknown error while connecting"));
+			}
+		} else {
+			apriv->connected = TRUE;
+			/* tny_camel_account_set_online_status (self, !apriv->connected); */
+		}
+
 		g_static_rec_mutex_unlock (apriv->service_lock);
-		
-		/* TODO: Handle priv->ex using GError */
+
+	} else {
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				_("Get and Forget password functions not yet set"));
 	}
 
 	return;
@@ -703,13 +720,14 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 
 	object_class->finalize = tny_camel_store_account_finalize;
 
-	((TnyCamelAccountClass*)class)->reconnect_func = tny_camel_store_account_reconnect;
+	TNY_CAMEL_ACCOUNT_CLASS (class)->try_connect_func = tny_camel_store_account_try_connect;
+	TNY_CAMEL_ACCOUNT_CLASS (class)->prepare_func = tny_camel_store_account_prepare;
 
 	class->get_folders_async_func = tny_camel_store_account_get_folders_async_default;
 	class->get_folders_func = tny_camel_store_account_get_folders_default;
 	class->create_folder_func = tny_camel_store_account_create_folder_default;
 	class->remove_folder_func = tny_camel_store_account_remove_folder_default;
-    
+
 	g_type_class_add_private (object_class, sizeof (TnyCamelStoreAccountPriv));
 
 	return;
@@ -757,18 +775,17 @@ tny_camel_store_account_get_type (void)
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
-	    
+
 		type = g_type_register_static (TNY_TYPE_CAMEL_ACCOUNT,
 			"TnyCamelStoreAccount",
 			&info, 0);
 
-       	g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE, 
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE, 
 			&tny_folder_store_info);  
 
 		g_type_add_interface_static (type, TNY_TYPE_STORE_ACCOUNT, 
 			&tny_store_account_info);
-	    
-	    
+
 	}
 
 	return type;

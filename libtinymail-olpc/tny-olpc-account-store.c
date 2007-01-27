@@ -186,7 +186,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 	const gchar *filen;
 	gchar *configd;
-	GDir *dir ;
+	GDir *dir;
 
 	g_assert (TNY_IS_LIST (list));
 
@@ -202,7 +202,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 	{
 		GKeyFile *keyfile;
 		gchar *proto, *type, *key, *name, *mech;
-		TnyAccount *account = NULL;
+		TnyAccount *account = NULL; gint port = 0;
 		gchar *fullfilen = g_build_filename (g_get_home_dir(), 
 			".tinymail", "accounts", filen);
 		keyfile = g_key_file_new ();
@@ -274,6 +274,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 				!g_ascii_strncasecmp (proto, "imap", 4))
 			{
 				gchar *user, *hostname;
+				GError *err = NULL;
 
 				/* TODO: Add other supported and tested providers here */
 				user = g_key_file_get_value (keyfile, "tinymail", "user", NULL);
@@ -281,7 +282,11 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 				hostname = g_key_file_get_value (keyfile, "tinymail", "hostname", NULL);
 				tny_account_set_hostname (TNY_ACCOUNT (account), hostname);
-				
+
+				port = g_key_file_get_value (keyfile, "tinymail", "port", &err);
+				if (err != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
+					tny_account_set_port (TNY_ACCOUNT (account), port);
+
 				g_free (hostname); g_free (user);
 			} else {
 				gchar *url_string;

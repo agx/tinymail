@@ -35,6 +35,7 @@
 #include <camel/camel-session.h>
 
 #include <tny-session-camel.h>
+#include <tny-account.h>
 
 #include <tny-device.h>
 #include <tny-account-store.h>
@@ -710,21 +711,31 @@ _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *accou
 	return;
 }
 
-static void
-foreach_account_set_connectivity (gpointer data, gpointer udata)
-{
-	gboolean online = (gboolean)udata;
-	if (data && TNY_IS_CAMEL_ACCOUNT (data))
-		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (data), !online);
-}
-
-
 typedef struct
 {
 	TnyDevice *device;
 	gboolean online;
 	gpointer user_data;
 } BackgroundConnectInfo;
+
+static void
+foreach_account_set_connectivity (gpointer data, gpointer udata)
+{
+	BackgroundConnectInfo *info = udata;
+	gboolean online = (gboolean)udata;
+	CamelSession *session = info->user_data;
+
+	if (data && TNY_IS_CAMEL_ACCOUNT (data))
+	{
+		GError *err = NULL;
+
+		tny_account_try_connect (TNY_ACCOUNT (data), &err);
+		if (err == NULL)
+			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (data), !online);
+		else 
+			tny_session_camel_alert_user (session, CAMEL_SESSION_ALERT_ERROR, err->message, FALSE);
+	}
+}
 
 
 static void
@@ -763,7 +774,7 @@ background_connect_thread (gpointer data)
 		priv->prev_constat != info->online && priv->account_store)
 	{
 		g_list_foreach (priv->current_accounts, 
-			foreach_account_set_connectivity, (gpointer) info->online);
+			foreach_account_set_connectivity, info);
 	}
 
 	if (g_main_depth () > 0)
@@ -808,6 +819,7 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 
 	return;
 }
+
 
 /**
  * tny_session_camel_set_device:

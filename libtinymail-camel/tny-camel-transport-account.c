@@ -54,83 +54,140 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT, TnyCamelTransportAccountPriv))
 
 static void 
-tny_camel_transport_account_reconnect (TnyCamelAccount *self)
+tny_camel_transport_account_prepare (TnyCamelAccount *self)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	CamelURL *url = NULL;
+	GList *options = apriv->options;
+	gchar *proto;
+
+	if (apriv->proto == NULL)
+		return;
+
+	proto = g_strdup_printf ("%s://", apriv->proto); 
+
+	url = camel_url_new (proto, apriv->ex);
+	g_free (proto);
+
+	if (!url)
+		return;
+
+	camel_url_set_protocol (url, apriv->proto); 
+
+	if (apriv->user)
+		camel_url_set_user (url, apriv->user);
+
+	camel_url_set_host (url, apriv->host);
+
+	if (apriv->port != -1)
+		camel_url_set_port (url, (int)apriv->port);
+
+	if (apriv->mech)
+		camel_url_set_authmech (url, apriv->mech);
+
+	while (options)
+	{
+		gchar *ptr, *dup = g_strdup (options->data);
+		gchar *option, *value;
+		ptr = strchr (dup, '=');
+		if (ptr) {
+			ptr++;
+			value = g_strdup (ptr); ptr--;
+			*ptr = '\0'; option = dup;
+		} else {
+			option = dup;
+			value = g_strdup ("1");
+		}
+		camel_url_set_param (url, option, value);
+		g_free (value);
+		g_free (dup);
+		options = g_list_next (options);
+	}
+
+	if (G_LIKELY (apriv->url_string))
+		g_free (apriv->url_string);
+
+	apriv->url_string = camel_url_to_string (url, 0);
+	camel_url_free (url);
+
+	/* TODO: check for old instance and clear it */
+
+	g_static_rec_mutex_lock (apriv->service_lock);
+	/* camel_session_get_service can launch GUI things */
+	if (apriv->session)
+		apriv->service = camel_session_get_service
+			((CamelSession*) apriv->session, apriv->url_string, 
+			apriv->type, apriv->ex);
+	g_static_rec_mutex_unlock (apriv->service_lock);
+
+	return;
+}
+
+static void 
+tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
-	if (G_LIKELY (apriv->session) && G_UNLIKELY (apriv->proto) && G_UNLIKELY (apriv->host))
+	if (!apriv->url_string || !apriv->service)
 	{
-		CamelURL *url = NULL;
-		GList *options = apriv->options;
-		gchar *proto = g_strdup_printf ("%s://", apriv->proto); 
-			
-		url = camel_url_new (proto, apriv->ex);
-		g_free (proto);
-
-		camel_url_set_protocol (url, apriv->proto); 
-
-		if (apriv->user)
-			camel_url_set_user (url, apriv->user);
-
-		camel_url_set_host (url, apriv->host);
-
-		if (apriv->mech)
-			camel_url_set_authmech (url, apriv->mech);
-
-		while (options)
+		if (camel_exception_is_set (apriv->ex))
 		{
-			gchar *ptr, *dup = g_strdup (options->data);
-			gchar *option, *value;
-			ptr = strchr (dup, '=');
-			if (ptr) {
-				ptr++;
-				value = g_strdup (ptr); ptr--;
-				*ptr = '\0'; option = dup;
-			} else {
-				option = dup;
-				value = g_strdup ("1");
-			}
-			camel_url_set_param (url, option, value);
-			g_free (value);
-			g_free (dup);
-			options = g_list_next (options);
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				camel_exception_get_description (apriv->ex));
+			camel_exception_clear (apriv->ex);
+		} else {
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				_("Account not yet fully configured"));
 		}
 
-		if (G_LIKELY (apriv->url_string))
-			g_free (apriv->url_string);
-
-		apriv->url_string = camel_url_to_string (url, 0);
-		camel_url_free (url);
+		return;
+	}
 
 
-		/* TODO: check for old instance and clear it */
-		g_static_rec_mutex_lock (apriv->service_lock);
-		/* camel_session_get_service can launch GUI things */
-		apriv->service = camel_session_get_service
-			((CamelSession*) apriv->session, apriv->url_string, 
-			apriv->type, &ex);
-		/* TODO: check ex and handle it with a GError */
-		if (camel_exception_is_set (&ex))
-			g_error ("Can't get service for transport account (%s)\n", 
-					 camel_exception_get_description (&ex));
-		g_static_rec_mutex_unlock (apriv->service_lock);
-
-	} else if (apriv->url_string)
+	if (apriv->pass_func_set && apriv->forget_pass_func_set)
 	{
 
-		/* TODO: check for old instance and clear it */
-		g_static_rec_mutex_lock (apriv->service_lock);
-		/* camel_session_get_service can launch GUI things */
-		apriv->service = camel_session_get_service
-			((CamelSession*) apriv->session, apriv->url_string, 
-			apriv->type, &ex);
-		/* TODO: check ex and handle it with a GError */
-		if (camel_exception_is_set (&ex))
-			g_error ("Can't get service for transport account (%s)\n", 
-					 camel_exception_get_description (&ex));
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+		apriv->connected = FALSE;
+
+		if (camel_exception_is_set (apriv->ex))
+			camel_exception_clear (apriv->ex);
+
+	/* g_static_rec_mutex_lock (apriv->service_lock);
+
+		camel_service_connect can launch GUI things 
+
+		if (!camel_service_connect (apriv->service, &ex))
+		{
+			if (camel_exception_is_set (&ex))
+			{
+				g_set_error (err, TNY_ACCOUNT_ERROR, 
+					TNY_ACCOUNT_ERROR_TRY_CONNECT,
+					camel_exception_get_description (&ex));
+				camel_exception_clear (apriv->ex);
+			} else {
+				g_set_error (err, TNY_ACCOUNT_ERROR, 
+					TNY_ACCOUNT_ERROR_TRY_CONNECT,
+					_("Unknown error while connecting"));
+			}
+		} else {
+			apriv->connected = TRUE;
+			tny_camel_account_set_online_status (self, !apriv->connected);
+		}
+
 		g_static_rec_mutex_unlock (apriv->service_lock);
+	*/
+
+	} else {
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				_("Get and Forget password functions not yet set"));
 	}
+
 }
 
 
@@ -156,6 +213,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	g_assert (CAMEL_IS_SERVICE (apriv->service));
 	transport = (CamelTransport *) apriv->service;
 	g_assert (CAMEL_IS_TRANSPORT (transport));
+
+	/* TODO: Why not simply use tny_account_try_connect here ? */
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	/* camel_service_connect can launch GUI things */
@@ -278,7 +337,7 @@ tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *class)
 
 	object_class->finalize = tny_camel_transport_account_finalize;
 
-	TNY_CAMEL_ACCOUNT_CLASS (class)->reconnect_func = tny_camel_transport_account_reconnect;
+	TNY_CAMEL_ACCOUNT_CLASS (class)->try_connect_func = tny_camel_transport_account_try_connect;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelTransportAccountPriv));
 

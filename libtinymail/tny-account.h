@@ -56,6 +56,7 @@ struct _TnyAccountIface
 	void (*set_proto_func) (TnyAccount *self, const gchar *proto);
 	void (*set_user_func) (TnyAccount *self, const gchar *user);
 	void (*set_hostname_func) (TnyAccount *self, const gchar *host);
+	void (*set_port_func) (TnyAccount *self, guint port);
 	void (*set_url_string_func) (TnyAccount *self, const gchar *url_string);
 	void (*set_pass_func_func) (TnyAccount *self, TnyGetPassFunc get_pass_func);
 	void (*set_forget_pass_func_func) (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func);
@@ -67,8 +68,10 @@ struct _TnyAccountIface
 	const gchar* (*get_proto_func) (TnyAccount *self);
 	const gchar* (*get_user_func) (TnyAccount *self);
 	const gchar* (*get_hostname_func) (TnyAccount *self);
+	guint (*get_port_func) (TnyAccount *self);
 	const gchar* (*get_url_string_func) (TnyAccount *self);
 	TnyAccountType (*get_account_type_func) (TnyAccount *self);
+	void (*try_connect_func) (TnyAccount *self, GError **err);
 };
 
 GType tny_account_get_type (void);
@@ -81,6 +84,7 @@ void tny_account_set_mech (TnyAccount *self, const gchar *name);
 void tny_account_set_proto (TnyAccount *self, const gchar *proto);
 void tny_account_set_user (TnyAccount *self, const gchar *user);
 void tny_account_set_hostname (TnyAccount *self, const gchar *host);
+void tny_account_set_port (TnyAccount *self, guint port);
 void tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func);
 void tny_account_set_url_string (TnyAccount *self, const gchar *url_string);
 TnyAccountType tny_account_get_account_type (TnyAccount *self);
@@ -90,10 +94,12 @@ const gchar* tny_account_get_mech (TnyAccount *self);
 const gchar* tny_account_get_proto (TnyAccount *self);
 const gchar* tny_account_get_user (TnyAccount *self);
 const gchar* tny_account_get_hostname (TnyAccount *self);
+guint tny_account_get_port (TnyAccount *self);
 const gchar* tny_account_get_url_string (TnyAccount *self);
 TnyGetPassFunc tny_account_get_pass_func (TnyAccount *self);
 void tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pass_func);
 TnyForgetPassFunc tny_account_get_forget_pass_func (TnyAccount *self);
+void tny_account_try_connect (TnyAccount *self, GError **err);
 
 G_END_DECLS
 
