@@ -307,6 +307,12 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
+	#warning FIXME
+	if (!pop3_store->engine) {
+		g_warning ("FIXME: pop3_store->engine == NULL in %s", __FUNCTION__);
+		return;
+	}
+
 	pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
 		pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
@@ -959,7 +965,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	if (mi->uid && (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
 		g_free (mi->uid);
 	mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
-	mi->uid = g_strdup (fi->uid);
+	mi->uid = g_strdup(fi->uid);
 
 	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 

@@ -1,3 +1,9 @@
+2007-01-27  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+
+	* Added some temporary hack for the pop3 provider to not
+	  crash; this will be replaced by a real solution later, but for now
+	  we just don't want the crashes.
+
 2007-01-27  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* First LEMONADE feature, implemented support for the CONDSTORE 

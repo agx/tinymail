@@ -254,6 +254,13 @@ get_capabilities(CamelPOP3Engine *pe)
 static int
 engine_command_queue(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 {
+
+#warning FIXME
+	if (!pe) {
+		g_warning ("FIXME: pe == NULL in %s", __FUNCTION__);
+		return FALSE;
+	}
+
 	if (((pe->capa & CAMEL_POP3_CAP_PIPE) == 0 || (pe->sentlen + strlen(pc->data)) > CAMEL_POP3_SEND_LIMIT)
 	    && pe->current != NULL) {
 		e_dlist_addtail(&pe->queue, (EDListNode *)pc);
@@ -290,6 +297,12 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	unsigned int len;
 	CamelPOP3Command *pc, *pw, *pn;
 
+#warning FIXME
+	if (!pe) {
+		g_warning ("FIXME: pe == NULL in %s", __FUNCTION__);
+		return 0;
+	}
+	
 	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK)
 		return 0;
 
@@ -418,6 +431,12 @@ camel_pop3_engine_command_new(CamelPOP3Engine *pe, guint32 flags, CamelPOP3Comma
 void
 camel_pop3_engine_command_free(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 {
+	#warning FIXME
+	if (!pe) {
+		g_warning ("FIXME: pe == NULL in %s", __FUNCTION__);
+		return;
+	}
+	
 	if (pe->current != pc)
 		e_dlist_remove((EDListNode *)pc);
 	g_free(pc->data);
