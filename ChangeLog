@@ -1,3 +1,8 @@
+2007-01-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* First LEMONADE feature, implemented support for the CONDSTORE 
+	capability in camel-lite's IMAP provider (RFC 4551)
+
 2007-01-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added the tny_account_set/get_mech API

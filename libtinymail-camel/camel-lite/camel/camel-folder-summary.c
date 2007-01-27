@@ -183,6 +183,29 @@ find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 	return retval;
 }
 
+int 
+camel_folder_summary_get_index_for (CamelFolderSummary *s, const char *uid) 
+{
+	int retval = -1, i;
+
+	if (uid == NULL || strlen (uid) == 0)
+		return -1;
+
+	for (i=0; G_LIKELY (i < s->messages->len) ; i++)
+	{
+		CamelMessageInfo *info = s->messages->pdata[i];
+
+		/* This can cause cache trashing */
+		if (G_UNLIKELY (info->uid[0] == uid[0]) && 
+		    G_UNLIKELY (!strcmp (info->uid, uid)))
+		{
+			retval = i;
+			break;
+		}
+	}
+
+	return retval;
+}
 
 static void do_nothing (CamelFolder *folder, CamelMessageInfoBase *mi) { }
  

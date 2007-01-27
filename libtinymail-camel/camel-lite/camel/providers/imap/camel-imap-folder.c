@@ -92,6 +92,7 @@ static CamelDiscoFolderClass *disco_folder_class = NULL;
 static void imap_finalize (CamelObject *object);
 static int imap_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args);
 
+static void imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodseq, CamelException *ex);
 static void imap_rescan (CamelFolder *folder, int exists, CamelException *ex);
 static void imap_refresh_info (CamelFolder *folder, CamelException *ex);
 static void imap_sync_online (CamelFolder *folder, CamelException *ex);
@@ -295,6 +296,45 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 	return folder;
 }
 
+
+static void 
+put_highestmodseq (CamelImapFolder *imap_folder, const char *highestmodseq)
+{
+	char *filename = g_strdup_printf ("%s/status", imap_folder->folder_dir);
+	FILE *file;
+	
+	file = fopen (filename, "w");
+	g_free (filename);
+
+	if (file != NULL)
+	{
+		fprintf (file, "%s", highestmodseq);
+		fclose (file);
+	}	
+}
+
+static char* 
+get_highestmodseq (CamelImapFolder *imap_folder)
+{
+	char *filename = g_strdup_printf ("%s/status", imap_folder->folder_dir);
+	/* max length in chars is that one, yes (the char values themselve 
+	   don't matter for this sizeof. It's just to reflect the RFC as-is) */
+	char *retval = NULL;
+	FILE *file;
+	
+	file = fopen (filename, "r");
+	g_free (filename);
+
+	if (file != NULL)
+	{
+		retval = g_malloc0 (sizeof ("18446744073709551615")); 
+		fscanf (file, "%s", retval);
+		fclose (file);
+	}
+
+	return retval;
+}
+
 /* Called with the store's connect_lock locked */
 void
 camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
@@ -306,13 +346,30 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	CamelMessageInfo *info;
 	guint32 perm_flags = 0;
 	GData *fetch_data;
-	int i, count;
-	char *resp;
-	
+	int i, count, uidnext = -1;
+	char *resp, *phighestmodseq = NULL;
+	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
+	gboolean removals = FALSE;
+
 	count = camel_folder_summary_count (folder->summary);
-	
-	for (i = 0; i < response->untagged->len; i++) {
+
+/*
+      C: A142 SELECT INBOX (CONDSTORE)
+      S: * 172 EXISTS
+      S: * 1 RECENT
+      S: * OK [UNSEEN 12] Message 12 is first unseen
+      S: * OK [UIDVALIDITY 3857529045] UIDs valid
+      S: * OK [UIDNEXT 4392] Predicted next UID
+      S: * FLAGS (\Answered \Flagged \Deleted \Seen \Draft)
+      S: * OK [PERMANENTFLAGS (\Deleted \Seen \*)] Limited
+      S: * OK [HIGHESTMODSEQ 715194045007]
+      S: A142 OK [READ-WRITE] SELECT completed, CONDSTORE is now enabled
+*/
+
+	for (i = 0; i < response->untagged->len; i++) 
+	{
 		resp = response->untagged->pdata[i] + 2;
+
 		if (!g_ascii_strncasecmp (resp, "FLAGS ", 6) && !perm_flags) {
 			resp += 6;
 			folder->permanent_flags = imap_parse_flag_list (&resp);
@@ -323,6 +380,40 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			 * even tho they do allow storing flags. *Sigh* So many fucking broken IMAP servers out there. */
 			if ((perm_flags = imap_parse_flag_list (&resp)) != 0)
 				folder->permanent_flags = perm_flags;
+		} else if (!g_ascii_strncasecmp (resp, "OK [UIDNEXT ", 12)) {
+			char *marker = strchr (resp, ']');
+			if (marker) *marker='\0';
+			uidnext = strtoul (resp + 12, NULL, 10);
+		} else if (!g_ascii_strncasecmp (resp, "OK [HIGHESTMODSEQ ", 18)) {
+			char *marker;
+			unsigned int len;
+			resp += 18;
+
+			marker = strchr (resp, ']');
+
+			if (marker) 
+			{
+				char *highestmodseq = NULL;
+
+				len = (unsigned int) (marker - resp);
+				highestmodseq = g_strndup (resp, len);
+				phighestmodseq = get_highestmodseq (imap_folder);
+
+				if (phighestmodseq!=NULL && !strcmp (phighestmodseq, highestmodseq)) 
+				{
+					g_free (phighestmodseq);
+					phighestmodseq = NULL;
+					imap_folder->need_rescan = FALSE;
+				} else { 
+					/* free phighestmodseq later */
+					put_highestmodseq (imap_folder, (const char *) highestmodseq);
+				}
+
+				if (highestmodseq)
+					g_free (highestmodseq);
+			} else 
+				phighestmodseq = NULL;
+
 		} else if (!g_ascii_strncasecmp (resp, "OK [UIDVALIDITY ", 16)) {
 			validity = strtoul (resp + 16, NULL, 10);
 		} else if (isdigit ((unsigned char)*resp)) {
@@ -331,8 +422,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			if (!g_ascii_strncasecmp (resp, " EXISTS", 7)) {
 				exists = num;
 				/* Remove from the response so nothing
-				 * else tries to interpret it.
-				 */
+				 * else tries to interpret it. */
 				g_free (response->untagged->pdata[i]);
 				g_ptr_array_remove_index (response->untagged, i--);
 			}
@@ -342,17 +432,22 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	if (camel_strstrcase (response->status, "OK [READ-ONLY]"))
 		imap_folder->read_only = TRUE;
 
-	if (camel_disco_store_status (CAMEL_DISCO_STORE (folder->parent_store)) == CAMEL_DISCO_STORE_RESYNCING) {
+	if (camel_disco_store_status (CAMEL_DISCO_STORE (folder->parent_store)) == CAMEL_DISCO_STORE_RESYNCING) 
+	{
 		if (validity != imap_summary->validity) {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_SUMMARY_INVALID,
 					      _("Folder was destroyed and recreated on server."));
+			if (phighestmodseq != NULL)
+				g_free (phighestmodseq);
 			return;
 		}
-		
+
+		if (phighestmodseq != NULL)
+			g_free (phighestmodseq);
 		/* FIXME: find missing UIDs ? */
 		return;
 	}
-	
+
 	if (!imap_summary->validity)
 		imap_summary->validity = validity;
 	else if (validity != imap_summary->validity) {
@@ -363,26 +458,69 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 		imap_folder->need_rescan = FALSE;
 		camel_imap_folder_changed (folder, exists, NULL, ex);
+		if (phighestmodseq != NULL)
+			g_free (phighestmodseq);
 		return;
 	}
-	
-	/* If we've lost messages, we have to rescan everything */
-	if (exists < count)
+
+	if (count > 0)
+	{
+		info = camel_folder_summary_index (folder->summary, count - 1);
+		val = strtoul (camel_message_info_uid (info), NULL, 10);
+		camel_message_info_free(info);
+	} else 
+		val = -1;
+
+
+	/* If we are going the CONDSTORE route and if (uidnext-1) is not the 
+	   same as the last uid in our summary, it's very likely that expunges
+	   happened. This CONDSTORE code does not yet support expunges. 
+	   Therefore we will simply use the old code. */
+
+	if (phighestmodseq != NULL && ((val != uidnext-1) || (exists < count)))
+	{
+		g_free (phighestmodseq); 
+		phighestmodseq = NULL;
+		removals = TRUE;
+	}
+
+	if (phighestmodseq == NULL && (exists < count && !imap_folder->need_rescan))
+		removals = TRUE;
+
+	if (removals)
+	{
+
+		/* If we've lost messages, we have to rescan everything 
+		   TODO: Update the CONDSTORE code to cope with expunged
+		   messages, and move this if-block lower */
+
 		imap_folder->need_rescan = TRUE;
-	else if (count != 0 && !imap_folder->need_rescan) {
-		CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
-		
-		/* Similarly, if the UID of the highest message we
-		 * know about has changed, then that indicates that
-		 * messages have been both added and removed, so we
-		 * have to rescan to find the removed ones. (We pass
-		 * NULL for the folder since we know that this folder
-		 * is selected, and we don't want camel_imap_command
-		 * to worry about it.)
-		 */
+
+	/* We shouldn't have gotten the phighestmodseq if CONDSTORE ain't
+	   supported. But I'll nevertheless double check the capability. */
+	} else if (phighestmodseq != NULL && (store->capabilities & IMAP_CAPABILITY_CONDSTORE))
+	{
+		/* The CONDSTORE code. Moehaha! */
+
+		/* This performs camel_imap_folder_changed too */
+		imap_rescan_condstore (folder, exists, phighestmodseq, ex);
+		imap_folder->need_rescan = FALSE;
+
+	} else if (count != 0 && !imap_folder->need_rescan) 
+	{
+		/* If the UID of the highest message we know about has changed, 
+		 * then that indicates that messages have been both added and 
+		 * removed, so we have to rescan to find the removed ones. (We
+		 * pass NULL for the folder since we know that this folder is
+		 * selected, and we don't want camel_imap_command to worry about
+		 * it.) */
+
 		response = camel_imap_command (store, NULL, ex, "FETCH %d UID", count);
-		if (!response)
-			return;
+		if (!response) {
+			if (phighestmodseq != NULL)
+				g_free (phighestmodseq);
+			return; 
+		}
 		uid = 0;
 		for (i = 0; i < response->untagged->len; i++) {
 			resp = response->untagged->pdata[i];
@@ -402,30 +540,24 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			g_datalist_clear (&fetch_data);
 		}
 		camel_imap_response_free_without_processing (store, response);
-		
-		info = camel_folder_summary_index (folder->summary, count - 1);
-		val = strtoul (camel_message_info_uid (info), NULL, 10);
-		camel_message_info_free(info);
 		if (uid == 0 || uid != val)
 			imap_folder->need_rescan = TRUE;
 	}
-	
-	/* Now rescan if we need to */
-	if (imap_folder->need_rescan) {
-		imap_rescan (folder, exists, ex);
-		return;
-	}
-	
-	/* If we don't need to rescan completely, but new messages
-	 * have been added, find out about them.
-	 */
-	if (exists > count)
-		camel_imap_folder_changed (folder, exists, NULL, ex);
-	
-	/* And we're done. */
+
+	/* Now rescan if we need to, non-CONDSTORE or removals happened */
+	if (phighestmodseq == NULL)
+	{
+		/* This performs camel_imap_folder_changed too */
+		if (imap_folder->need_rescan)
+			imap_rescan (folder, exists, ex);
+		else if (exists > count)
+			camel_imap_folder_changed (folder, exists, NULL, ex);
+	} else
+		g_free (phighestmodseq);
+
 }
 
-static void           
+static void 
 imap_finalize (CamelObject *object)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (object);
@@ -618,6 +750,137 @@ flags_to_label(CamelFolder *folder, CamelImapMessageInfo *mi)
 	}
 }
 
+static void 
+imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodseq, CamelException *ex)
+{
+
+/*
+              C: s100 UID FETCH 1:* (FLAGS) (CHANGEDSINCE 12345)
+              S: * 1 FETCH (UID 4 MODSEQ (65402) FLAGS (\Seen))
+              S: * 2 FETCH (UID 6 MODSEQ (75403) FLAGS (\Deleted))
+              S: * 4 FETCH (UID 8 MODSEQ (29738) FLAGS ($NoJunk $AutoJunk $MDNSent))
+              S: s100 OK FETCH completed
+*/
+
+	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
+	struct {
+		char *uid;
+		guint32 flags;
+	} *new;
+	char *resp;
+	CamelImapResponseType type;
+	int i, summary_len, summary_got;
+	CamelMessageInfo *info;
+	CamelImapMessageInfo *iinfo;
+	GArray *removed = NULL;
+	gboolean ok;
+	CamelFolderChangeInfo *changes = NULL;
+
+	imap_folder->need_rescan = FALSE;
+	
+	summary_len = camel_folder_summary_count (folder->summary);
+	if (summary_len == 0) {
+		if (exists)
+			camel_imap_folder_changed (folder, exists, NULL, ex);
+		return;
+	}
+
+	camel_operation_start (NULL, _("Scanning for changed messages in %s"), folder->name);
+	ok = camel_imap_command_start (store, folder, ex,
+				       "UID FETCH 1:* (FLAGS) (CHANGEDSINCE %s)",
+				       highestmodseq);
+	if (!ok) {
+		imap_folder->need_rescan = TRUE;
+		camel_operation_end (NULL);
+		return;
+	}
+
+/*
+a01 UID FETCH 1:* (FLAGS) (CHANGEDSINCE 60)
+* 1 EXISTS
+* 1 RECENT
+* 1 FETCH (FLAGS (\Recent $Label2) UID 635 MODSEQ (81))
+a01 OK Completed (0.000 sec)
+*/
+
+	removed = g_array_new (FALSE, FALSE, sizeof (int));
+	summary_got = 0;
+	while ((type = camel_imap_command_response (store, &resp, ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
+	{
+		GData *data;
+		char *uid;
+		guint32 flags;
+
+		data = parse_fetch_response (imap_folder, resp);
+		g_free (resp);
+
+		if (!data)
+			continue;
+
+		uid = g_datalist_get_data (&data, "UID");
+		flags = GPOINTER_TO_UINT (g_datalist_get_data (&data, "FLAGS"));
+
+		if (!uid) {
+			g_datalist_clear (&data);
+			continue;
+		}
+
+		info = camel_folder_summary_uid (folder->summary, uid);
+		iinfo = (CamelImapMessageInfo *) info;
+		if (info) {
+
+			if (flags != iinfo->server_flags) {
+				guint32 server_set, server_cleared;
+
+				server_set = flags & ~iinfo->server_flags;
+				server_cleared = iinfo->server_flags & ~flags;
+
+				iinfo->info.flags = (iinfo->info.flags | server_set) & ~server_cleared;
+				iinfo->server_flags = flags;
+
+				if (changes == NULL)
+					changes = camel_folder_change_info_new();
+				camel_folder_change_info_change_uid(changes, g_strdup (uid));
+				flags_to_label(folder, (CamelImapMessageInfo *)info);
+			}
+
+			camel_message_info_free (info);
+		} else {
+			int a = camel_folder_summary_get_index_for (folder->summary, uid);
+			if (a != -1)
+			{ 
+				a++;
+				g_array_append_val (removed, a); 
+				summary_len--;
+			}
+		}
+
+		camel_operation_progress (NULL, ++summary_got , summary_len);
+		g_datalist_clear (&data);
+	}
+
+	camel_operation_end (NULL);
+
+	if (type == CAMEL_IMAP_RESPONSE_ERROR)
+		return;
+
+	/* Free the final tagged response */
+	g_free (resp);
+
+	if (changes) {
+		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
+		camel_folder_change_info_free(changes);
+	}
+
+	/* And finally update the summary. */
+	camel_imap_folder_changed (folder, exists, removed, ex);
+	g_array_free (removed, TRUE);
+
+	return;
+}
+
+
 /* Called with the store's connect_lock locked */
 static void
 imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
@@ -654,6 +917,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 				       camel_message_info_uid (info));
 	camel_message_info_free(info);
 	if (!ok) {
+		imap_folder->need_rescan = TRUE;
 		camel_operation_end (NULL);
 		return;
 	}
@@ -3195,6 +3459,13 @@ parse_fetch_response (CamelImapFolder *imap_folder, char *response)
 				g_datalist_set_data_full (&data, "INTERNALDATE", idate, g_free);
 				response += len + 1;
 			}
+		} else if (!g_ascii_strncasecmp (response, "MODSEQ ", 7)) {
+			char *marker = strchr (response + 7, ')');
+			if (marker)
+				response = marker + 1;
+			
+			if (!marker)
+				g_warning ("Unexpected MODSEQ format: %s", response); 
 		} else {
 			g_warning ("Unexpected FETCH response from server: (%s", response);
 			break;

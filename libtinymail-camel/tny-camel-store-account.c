@@ -86,7 +86,9 @@ tny_camel_store_account_reconnect (TnyCamelAccount *self)
 			camel_url_set_protocol (url, apriv->proto); 
 			camel_url_set_user (url, apriv->user);
 			camel_url_set_host (url, apriv->host);
-			camel_url_set_authmech (url, apriv->mech);
+
+			if (apriv->mech)
+				camel_url_set_authmech (url, apriv->mech);
 
 			while (options)
 			{

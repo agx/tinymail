@@ -103,7 +103,10 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder))
 			camel_object_unref(store->current_folder);
 		store->current_folder = folder;
-		cmd = imap_command_strdup_printf (store, "SELECT %F", folder->full_name);
+		if (store->capabilities & IMAP_CAPABILITY_CONDSTORE) 
+			cmd = imap_command_strdup_printf (store, "SELECT %F (CONDSTORE)", folder->full_name);
+		else 
+			cmd = imap_command_strdup_printf (store, "SELECT %F", folder->full_name);
 	}
 	
 	if (!imap_command_start (store, folder, cmd, ex)) {

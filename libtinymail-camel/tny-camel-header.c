@@ -552,7 +552,7 @@ tny_camel_header_get_message_id (TnyHeader *self)
 	if (G_UNLIKELY (me->write == 1))
 		retval = camel_mime_message_get_message_id (((WriteInfo*)me->info)->msg);
 	else
-		retval = camel_message_info_message_id ((CamelMessageInfo*)me->info);
+		retval = (const gchar*) camel_message_info_message_id ((CamelMessageInfo*)me->info);
 
 	return retval;
 }

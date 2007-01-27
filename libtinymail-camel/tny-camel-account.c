@@ -617,7 +617,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->user = NULL;
 	priv->host = NULL;
 	priv->proto = NULL;
-	priv->mech = g_strdup ("PLAIN");
+	priv->mech = NULL;
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
 	priv->cancel = NULL;
