@@ -349,7 +349,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	int i, count, uidnext = -1;
 	char *resp, *phighestmodseq = NULL;
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
-	gboolean removals = FALSE;
+	gboolean removals = FALSE, condstore = FALSE;
 
 	count = camel_folder_summary_count (folder->summary);
 
@@ -395,6 +395,8 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			{
 				char *highestmodseq = NULL;
 
+				condstore = TRUE;
+
 				len = (unsigned int) (marker - resp);
 				highestmodseq = g_strndup (resp, len);
 				phighestmodseq = get_highestmodseq (imap_folder);
@@ -403,7 +405,6 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 				{
 					g_free (phighestmodseq);
 					phighestmodseq = NULL;
-					imap_folder->need_rescan = FALSE;
 				} else { 
 					/* free phighestmodseq later */
 					put_highestmodseq (imap_folder, (const char *) highestmodseq);
@@ -496,18 +497,17 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 
 		imap_folder->need_rescan = TRUE;
 
-	/* We shouldn't have gotten the phighestmodseq if CONDSTORE ain't
-	   supported. But I'll nevertheless double check the capability. */
-	} else if (phighestmodseq != NULL && (store->capabilities & IMAP_CAPABILITY_CONDSTORE))
+	} else if (condstore && (store->capabilities & IMAP_CAPABILITY_CONDSTORE))
 	{
-		/* The CONDSTORE code. Moehaha! */
-
 		/* This performs camel_imap_folder_changed too */
-		imap_rescan_condstore (folder, exists, phighestmodseq, ex);
+		if (phighestmodseq != NULL)
+			imap_rescan_condstore (folder, exists, phighestmodseq, ex);
 		imap_folder->need_rescan = FALSE;
 
-	} else if (count != 0 && !imap_folder->need_rescan) 
+	} else if (count != 0) 
 	{
+		int mval = 0;
+
 		/* If the UID of the highest message we know about has changed, 
 		 * then that indicates that messages have been both added and 
 		 * removed, so we have to rescan to find the removed ones. (We
@@ -524,15 +524,15 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		uid = 0;
 		for (i = 0; i < response->untagged->len; i++) {
 			resp = response->untagged->pdata[i];
-			val = strtoul (resp + 2, &resp, 10);
-			if (val == 0)
+			mval = strtoul (resp + 2, &resp, 10);
+			if (mval == 0)
 				continue;
 			if (!g_ascii_strcasecmp (resp, " EXISTS")) {
 				/* Another one?? */
-				exists = val;
+				exists = mval;
 				continue;
 			}
-			if (uid != 0 || val != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
+			if (uid != 0 || mval != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
 				continue;
 			
 			fetch_data = parse_fetch_response (imap_folder, resp + 7);
@@ -542,6 +542,8 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		camel_imap_response_free_without_processing (store, response);
 		if (uid == 0 || uid != val)
 			imap_folder->need_rescan = TRUE;
+		/* else 
+			imap_folder->need_rescan = FALSE; */
 	}
 
 	/* Now rescan if we need to, non-CONDSTORE or removals happened */
@@ -711,7 +713,9 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 done:
 	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 
-	camel_folder_summary_save(folder->summary);
+	/* TNY TOCHECK: I think all situations are already saving the summary?!
+	  camel_folder_summary_save(folder->summary); */
+
 	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary);
 }
 
@@ -778,7 +782,7 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 	CamelFolderChangeInfo *changes = NULL;
 
 	imap_folder->need_rescan = FALSE;
-	
+
 	summary_len = camel_folder_summary_count (folder->summary);
 	if (summary_len == 0) {
 		if (exists)
@@ -791,6 +795,7 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 				       "UID FETCH 1:* (FLAGS) (CHANGEDSINCE %s)",
 				       highestmodseq);
 	if (!ok) {
+		/* TNY TODO: turn-off the CONDSTORE capability? */
 		imap_folder->need_rescan = TRUE;
 		camel_operation_end (NULL);
 		return;
@@ -901,7 +906,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 	CamelFolderChangeInfo *changes = NULL;
 
 	imap_folder->need_rescan = FALSE;
-	
+
 	summary_len = camel_folder_summary_count (folder->summary);
 	if (summary_len == 0) {
 		if (exists)

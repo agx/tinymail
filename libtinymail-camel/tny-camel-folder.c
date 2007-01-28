@@ -350,7 +350,8 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelMimeMessage *message;
-	CamelException *ex;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	gboolean haderr = FALSE;
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
@@ -363,26 +364,39 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 			return;
 		}
 
-	ex = camel_exception_new ();
-	camel_exception_init (ex);
-
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-	camel_folder_append_message (priv->folder, message, NULL, NULL, ex);
+	if (message && CAMEL_IS_MIME_MESSAGE (message))
+		camel_folder_append_message (priv->folder, message, NULL, NULL, &ex);
+	else {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_ADD_MSG,
+			_("Malformed message"));
+		haderr = TRUE;
+	}
 
-	if (camel_exception_is_set (ex))
+	g_mutex_unlock (priv->folder_lock);
+
+	if (camel_exception_is_set (&ex))
 	{
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_ADD_MSG,
-			camel_exception_get_description (ex));
-	} else {
+			camel_exception_get_description (&ex));
+	} else if (!haderr)
+	{
+		TnyHeader *header = tny_msg_get_header (msg);
 
-		/* TODO: emit a folder-msg-inserted signal */
-	
+		if (header && TNY_IS_HEADER (header))
+		{
+			TnyFolderChange *change = tny_folder_change_new (self);
+			tny_folder_change_add_added_header (change, header);
+			notify_observers_about (self, change);
+			g_object_unref (G_OBJECT (change));
+
+		}
+
+		if (header && G_IS_OBJECT (header))
+			g_object_unref (G_OBJECT (header));
 	}
-
-	camel_exception_free (ex);
-
-	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -445,6 +459,8 @@ tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
 
 	camel_folder_sync (priv->folder, expunge, &ex);
 
+	g_mutex_unlock (priv->folder_lock);
+
 	if (camel_exception_is_set (&ex))
 	{
 		g_set_error (err, TNY_FOLDER_ERROR, 
@@ -452,7 +468,6 @@ tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
 			camel_exception_get_description (&ex));
 	}
 
-	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -498,6 +513,7 @@ tny_camel_folder_is_subscribed_default (TnyFolder *self)
 			g_mutex_unlock (priv->folder_lock);
 			return;
 		}
+
 		store = priv->store;
 		cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
 		priv->subscribed = camel_store_folder_subscribed (store, 
@@ -602,6 +618,9 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 
 	priv->account = account;
 	priv->store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
+
+	if (!priv->store || !CAMEL_IS_STORE (priv->store))
+		g_error ("Trying to create folder out of invalid account");
 
 	return;
 }
@@ -750,7 +769,6 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-	gchar *str;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	GError *err = NULL;
 
@@ -765,11 +783,14 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	}
 
 	info->cancelled = FALSE;
-	str = g_strdup_printf (_("Fetching summary information for new messages in folder"));
+
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
-		tny_camel_folder_refresh_async_status, info, str);
-	g_free (str);
+		tny_camel_folder_refresh_async_status, info, 
+		_("Fetching summary information for new messages in folder"));
+
 	camel_folder_refresh_info (priv->folder, &ex);
+
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
 
@@ -788,7 +809,6 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	g_mutex_unlock (priv->folder_lock);
 
