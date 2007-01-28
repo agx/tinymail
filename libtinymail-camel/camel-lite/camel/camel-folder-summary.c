@@ -1395,9 +1395,9 @@ camel_folder_summary_content_info_free(CamelFolderSummary *s, CamelMessageConten
 void
 camel_folder_summary_touch(CamelFolderSummary *s)
 {
-	//CAMEL_SUMMARY_LOCK(s, summary_lock);
+	/* CAMEL_SUMMARY_LOCK(s, summary_lock); */
 	s->flags |= CAMEL_SUMMARY_DIRTY;
-	//CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+	/* CAMEL_SUMMARY_UNLOCK(s, summary_lock); */
 }
 
 

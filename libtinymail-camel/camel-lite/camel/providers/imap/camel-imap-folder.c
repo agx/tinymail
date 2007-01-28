@@ -300,7 +300,7 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 static void 
 put_highestmodseq (CamelImapFolder *imap_folder, const char *highestmodseq)
 {
-	char *filename = g_strdup_printf ("%s/status", imap_folder->folder_dir);
+	char *filename = g_strdup_printf ("%s/highestmodseq", imap_folder->folder_dir);
 	FILE *file;
 	
 	file = fopen (filename, "w");
@@ -310,13 +310,13 @@ put_highestmodseq (CamelImapFolder *imap_folder, const char *highestmodseq)
 	{
 		fprintf (file, "%s", highestmodseq);
 		fclose (file);
-	}	
+	}
 }
 
 static char* 
 get_highestmodseq (CamelImapFolder *imap_folder)
 {
-	char *filename = g_strdup_printf ("%s/status", imap_folder->folder_dir);
+	char *filename = g_strdup_printf ("%s/highestmodseq", imap_folder->folder_dir);
 	/* max length in chars is that one, yes (the char values themselve 
 	   don't matter for this sizeof. It's just to reflect the RFC as-is) */
 	char *retval = NULL;
@@ -327,7 +327,7 @@ get_highestmodseq (CamelImapFolder *imap_folder)
 
 	if (file != NULL)
 	{
-		retval = g_malloc0 (sizeof ("18446744073709551615")); 
+		retval = g_malloc0 (25); /* a 64bit number must fit in it */
 		fscanf (file, "%s", retval);
 		fclose (file);
 	}
@@ -2869,6 +2869,41 @@ imap_update_summary (CamelFolder *folder, int exists,
 		while (uid < needheaders->len) 
 		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
+
+/*
+This reply consumed 800 bytes. This is how it's currently done
+==============================================================
+a03 UID FETCH 1:2 (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[HEADER.FIELDS (DATE FROM TO CC SUBJECT MESSAGE-ID)])
+----------------------------------------------------------------------------------------------------------------
+* 1 FETCH (FLAGS (NonJunk) UID 1 INTERNALDATE "17-Oct-2006 20:26:17 +0100" RFC822.SIZE 1809 BODY[HEADER.FIELDS (DATE FROM TO CC SUBJECT MESSAGE-ID)] {192}
+Message-ID: <353B8E77.C1FE410D@rip.cz>
+Date: Mon, 20 Apr 1998 20:05:43 +0200
+From: Milan Riha <milan@rip.cz>
+To: zmailer <zmailer@nic.funet.fi>
+Subject: Re: Where to find Zmailer-FAQ ?
+
+)
+* 2 FETCH (FLAGS (NonJunk) UID 2 INTERNALDATE "17-Oct-2006 20:26:17 +0100" RFC822.SIZE 1571 BODY[HEADER.FIELDS (DATE FROM TO CC SUBJECT MESSAGE-ID)] {281}
+Date: Mon, 20 Apr 1998 19:24:47 +0200 (MET DST)
+From: Andrzej Stella-Sawicki <savit@Sav.NET>
+To: Milan Riha <milan@rip.cz>
+cc: zmailer <zmailer@nic.funet.fi>
+Subject: Re: Where to find Zmailer-FAQ ?
+Message-ID: <Pine.LNX.3.96.980420192200.25200A-100000@lama.supermedia.pl>
+
+)
+a03 OK UID FETCH Completed
+
+
+This reply consumed 812 bytes (and we have reply-to for free). The IMAP server will be faster too
+=================================================================================================
+a03 UID FETCH 1:2 (UID FLAGS RFC822.SIZE ENVELOPE)
+--------------------------------------------------
+* 1 FETCH (FLAGS (NonJunk) UID 1 RFC822.SIZE 1809 ENVELOPE ("Mon, 20 Apr 1998 20:05:43 +0200" "Re: Where to find Zmailer-FAQ ?" (("Milan Riha" NIL "milan" "rip.cz")) (("Milan Riha" NIL "milan" "rip.cz")) (("Milan Riha" NIL "milan" "rip.cz")) (("zmailer" NIL "zmailer" "nic.funet.fi")) NIL NIL NIL "<353B8E77.C1FE410D@rip.cz>"))
+* 2 FETCH (FLAGS (NonJunk) UID 2 RFC822.SIZE 1571 ENVELOPE ("Mon, 20 Apr 1998 19:24:47 +0200 (MET DST)" "Re: Where to find Zmailer-FAQ ?" (("Andrzej Stella-Sawicki" NIL "savit" "Sav.NET")) (("Andrzej Stella-Sawicki" NIL "savit" "Sav.NET")) (("Andrzej Stella-Sawicki" NIL "savit" "Sav.NET")) (("Milan Riha" NIL "milan" "rip.cz")) (("zmailer" NIL "zmailer" "nic.funet.fi")) NIL "<353B61BD.9978FB42@rip.cz>" "<Pine.LNX.3.96.980420192200.25200A-100000@lama.supermedia.pl>"))
+a03 OK UID FETCH Completed
+
+*/
 
 			if (!camel_imap_command_start (store, folder, ex,
 						       "UID FETCH %s (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
