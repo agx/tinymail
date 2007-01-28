@@ -504,7 +504,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			imap_rescan_condstore (folder, exists, phighestmodseq, ex);
 		imap_folder->need_rescan = FALSE;
 
-	} else if (count != 0) 
+	} else if (count != 0 && !imap_folder->need_rescan) 
 	{
 		int mval = 0;
 
