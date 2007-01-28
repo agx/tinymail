@@ -1,3 +1,7 @@
+2007-01-28  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Lots of small bugfixes and testing. Also a few code boutifications
+
 2007-01-27  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
 	* Added some temporary hack for the pop3 provider to not
