@@ -196,12 +196,11 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	/* Get store */
-
-/*	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex);
-	g_static_rec_mutex_unlock (apriv->service_lock); */
+	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
+	{
+		g_error ("Account not ready in set_subscription\n");
+		return;
+	}
 
 	store = CAMEL_STORE (apriv->service);
 
@@ -341,13 +340,14 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 
-/*	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex); */
-
-/*	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex);
-	g_static_rec_mutex_unlock (apriv->service_lock); */
+	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
+				_("Account not ready for this operation (%s)"),
+				camel_exception_get_description (apriv->ex));
+		return;
+	}
 
 	store = CAMEL_STORE (apriv->service);
 
@@ -415,13 +415,14 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
-/*	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex); */
-
-/*	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex);
-	g_static_rec_mutex_unlock (apriv->service_lock); */
+	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+				_("Account not ready for this operation (%s)"),
+				camel_exception_get_description (apriv->ex));
+		return NULL;
+	}
 
 	store = CAMEL_STORE (apriv->service);
 
@@ -487,16 +488,18 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	g_assert (TNY_IS_LIST (list));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
+
 	if (query != NULL)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
 
-/*	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex); */
-
-/*	g_static_rec_mutex_lock (apriv->service_lock);
-	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex);
-	g_static_rec_mutex_unlock (apriv->service_lock); */
+	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
+				_("Account not ready for this operation (%s)"),
+				camel_exception_get_description (apriv->ex));
+		return;
+	}
 
 	store = CAMEL_STORE (apriv->service);
 
@@ -695,7 +698,7 @@ tny_folder_store_init (gpointer g, gpointer iface_data)
 	klass->get_folders_func = tny_camel_store_account_get_folders;
 	klass->get_folders_async_func = tny_camel_store_account_get_folders_async;
 
-    	return;
+	return;
 }
 
 static void
@@ -768,7 +771,7 @@ tny_camel_store_account_get_type (void)
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
-	    
+
 		static const GInterfaceInfo tny_folder_store_info = 
 		{
 		  (GInterfaceInitFunc) tny_folder_store_init, /* interface_init */
