@@ -67,6 +67,9 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 
 	proto = g_strdup_printf ("%s://", apriv->proto); 
 
+	if (camel_exception_is_set (apriv->ex))
+		camel_exception_clear (apriv->ex);
+
 	url = camel_url_new (proto, apriv->ex);
 	g_free (proto);
 
@@ -108,13 +111,27 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 	apriv->url_string = camel_url_to_string (url, 0);
 	camel_url_free (url);
 
-	/* TODO: check for old instance and clear it */
-
 	g_static_rec_mutex_lock (apriv->service_lock);
 	if (apriv->session)
+	{
+		if (camel_exception_is_set (apriv->ex))
+			camel_exception_clear (apriv->ex);
+
+		if (apriv->service) 
+		{
+			camel_object_unref (CAMEL_OBJECT (apriv->service));
+			apriv->service = NULL;
+		}
+
 		apriv->service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
+
+	} else {
+		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
+			_("Session not yet set, use tny_camel_account_set_session"));
+	}
+
 	g_static_rec_mutex_unlock (apriv->service_lock);
 }
 
@@ -123,7 +140,7 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (!apriv->url_string || !apriv->service)
+	if (!apriv->url_string || !apriv->service || !CAMEL_IS_SERVICE (apriv->service))
 	{
 		if (camel_exception_is_set (apriv->ex))
 		{
@@ -368,8 +385,9 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	g_assert (cpriv->folder_name != NULL);
 
 	/* Unsubscribe : camel should do it by itself but it does not do it */
-	if (camel_store_supports_subscriptions (store) && 
-	    camel_store_folder_subscribed (store, cpriv->folder_name))
+
+	if (camel_store_supports_subscriptions (store) &&  
+			camel_store_folder_subscribed (store, cpriv->folder_name))
 		camel_store_unsubscribe_folder (store, cpriv->folder_name, NULL);
 
 	camel_store_delete_folder (store, cpriv->folder_name, &ex);
@@ -382,7 +400,8 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 		camel_exception_clear (&ex);
 	}
 
-	g_free (cpriv->folder_name); cpriv->folder_name = NULL;
+	g_free (cpriv->folder_name); 
+	cpriv->folder_name = NULL;
 
 	camel_object_unref (CAMEL_OBJECT (store));
 

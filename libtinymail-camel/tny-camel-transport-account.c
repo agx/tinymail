@@ -67,6 +67,9 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self)
 
 	proto = g_strdup_printf ("%s://", apriv->proto); 
 
+	if (camel_exception_is_set (apriv->ex))
+		camel_exception_clear (apriv->ex);
+
 	url = camel_url_new (proto, apriv->ex);
 	g_free (proto);
 
@@ -111,14 +114,28 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self)
 	apriv->url_string = camel_url_to_string (url, 0);
 	camel_url_free (url);
 
-	/* TODO: check for old instance and clear it */
-
 	g_static_rec_mutex_lock (apriv->service_lock);
 	/* camel_session_get_service can launch GUI things */
 	if (apriv->session)
+	{
+		if (camel_exception_is_set (apriv->ex))
+			camel_exception_clear (apriv->ex);
+
+		if (apriv->service) 
+		{
+			camel_object_unref (CAMEL_OBJECT (apriv->service));
+			apriv->service = NULL;
+		}
+
 		apriv->service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
+
+	} else {
+		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
+			_("Session not yet set, use tny_camel_account_set_session"));
+	}
+
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	return;
@@ -130,7 +147,7 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
-	if (!apriv->url_string || !apriv->service)
+	if (!apriv->url_string || !apriv->service || !CAMEL_IS_SERVICE (apriv->service))
 	{
 		if (camel_exception_is_set (apriv->ex))
 		{
@@ -147,11 +164,10 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 		return;
 	}
 
-
 	if (apriv->pass_func_set && apriv->forget_pass_func_set)
 	{
 
-		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	/*	CamelException ex = CAMEL_EXCEPTION_INITIALISER; */
 		apriv->connected = FALSE;
 
 		if (camel_exception_is_set (apriv->ex))
@@ -207,10 +223,20 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
 	CamelTransport *transport; const gchar *str = NULL;
 	CamelInternetAddress *from, *recipients;
+	gboolean reperr = TRUE;
 
-	g_assert (TNY_IS_CAMEL_MSG (msg));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
-	g_assert (CAMEL_IS_SERVICE (apriv->service));
+	g_assert (TNY_IS_CAMEL_MSG (msg));
+
+	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
+	{
+		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
+				TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+				_("Account not ready for this operation (%s)"),
+				camel_exception_get_description (apriv->ex));
+		return;
+	}
+
 	transport = (CamelTransport *) apriv->service;
 	g_assert (CAMEL_IS_TRANSPORT (transport));
 
@@ -228,9 +254,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 			g_static_rec_mutex_unlock (apriv->service_lock);
 			return;
 		}
-	} else {
-		apriv->connected = TRUE;
-	}
+	} 
+
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	header = tny_msg_get_header (msg);
@@ -260,14 +285,24 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
 			TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
 			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+		reperr = FALSE;
 	}
 
+	camel_service_disconnect (apriv->service, FALSE, &ex);
 	apriv->connected = FALSE;
+
+	if (reperr && camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
+			TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+	}
 
 	camel_object_unref (CAMEL_OBJECT (from));
 	camel_object_unref (CAMEL_OBJECT (recipients));
 	g_object_unref (G_OBJECT (header));
-
 
 	return;
 }

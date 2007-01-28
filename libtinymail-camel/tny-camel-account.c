@@ -702,7 +702,7 @@ tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean off
 
 	/* TODO locking & error handling */
 
-	if (!priv->service)
+	if (!priv->service || !CAMEL_IS_SERVICE (priv->service))
 		return;
 
 	/* _tny_camel_account_start_camel_operation (self, NULL, NULL, NULL); */
