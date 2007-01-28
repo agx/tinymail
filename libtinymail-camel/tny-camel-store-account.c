@@ -58,58 +58,61 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	CamelURL *url = NULL;
-	GList *options = apriv->options;
-	gchar *proto;
-
-	if (apriv->proto == NULL)
-		return;
-
-	proto = g_strdup_printf ("%s://", apriv->proto); 
-
-	if (camel_exception_is_set (apriv->ex))
-		camel_exception_clear (apriv->ex);
-
-	url = camel_url_new (proto, apriv->ex);
-	g_free (proto);
-
-	if (!url)
-		return;
-
-	camel_url_set_protocol (url, apriv->proto); 
-	camel_url_set_user (url, apriv->user);
-	camel_url_set_host (url, apriv->host);
-
-	if (apriv->port != -1)
-		camel_url_set_port (url, (int)apriv->port);
-
-	if (apriv->mech)
-		camel_url_set_authmech (url, apriv->mech);
-
-	while (options)
+	if (!apriv->custom_url_string)
 	{
-		gchar *ptr, *dup = g_strdup (options->data);
-		gchar *option, *value;
-		ptr = strchr (dup, '=');
-		if (ptr) {
-			ptr++;
-			value = g_strdup (ptr); ptr--;
-			*ptr = '\0'; option = dup;
-		} else {
-			option = dup;
-			value = g_strdup ("1");
+		CamelURL *url = NULL;
+		GList *options = apriv->options;
+		gchar *proto;
+
+		if (apriv->proto == NULL)
+			return;
+
+		proto = g_strdup_printf ("%s://", apriv->proto); 
+
+		if (camel_exception_is_set (apriv->ex))
+			camel_exception_clear (apriv->ex);
+
+		url = camel_url_new (proto, apriv->ex);
+		g_free (proto);
+
+		if (!url)
+			return;
+
+		camel_url_set_protocol (url, apriv->proto); 
+		camel_url_set_user (url, apriv->user);
+		camel_url_set_host (url, apriv->host);
+
+		if (apriv->port != -1)
+			camel_url_set_port (url, (int)apriv->port);
+
+		if (apriv->mech)
+			camel_url_set_authmech (url, apriv->mech);
+
+		while (options)
+		{
+			gchar *ptr, *dup = g_strdup (options->data);
+			gchar *option, *value;
+			ptr = strchr (dup, '=');
+			if (ptr) {
+				ptr++;
+				value = g_strdup (ptr); ptr--;
+				*ptr = '\0'; option = dup;
+			} else {
+				option = dup;
+				value = g_strdup ("1");
+			}
+			camel_url_set_param (url, option, value);
+			g_free (value);
+			g_free (dup);
+			options = g_list_next (options);
 		}
-		camel_url_set_param (url, option, value);
-		g_free (value);
-		g_free (dup);
-		options = g_list_next (options);
+
+		if (G_LIKELY (apriv->url_string))
+			g_free (apriv->url_string);
+
+		apriv->url_string = camel_url_to_string (url, 0);
+		camel_url_free (url);
 	}
-
-	if (G_LIKELY (apriv->url_string))
-		g_free (apriv->url_string);
-
-	apriv->url_string = camel_url_to_string (url, 0);
-	camel_url_free (url);
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	if (apriv->session)

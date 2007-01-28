@@ -41,6 +41,7 @@ struct _TnyCamelAccountPriv
 	gchar *name; GList *options;
 	gchar *cache_location; gint port;
 	TnyAccountType account_type;
+	gboolean custom_url_string;
 };
 
 const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);

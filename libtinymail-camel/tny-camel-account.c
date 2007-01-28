@@ -122,6 +122,7 @@ tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_str
 	if (priv->url_string)
 		g_free (priv->url_string);
 
+	priv->custom_url_string = TRUE;
 	priv->url_string = g_strdup (url_string);
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
@@ -330,6 +331,8 @@ tny_camel_account_set_mech_default (TnyAccount *self, const gchar *mech)
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
+	priv->custom_url_string = FALSE;
+
 	if (G_UNLIKELY (priv->mech))
 		g_free (priv->mech);
 
@@ -354,6 +357,8 @@ tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->service_lock);
+
+	priv->custom_url_string = FALSE;
 
 	if (G_UNLIKELY (priv->proto))
 		g_free (priv->proto);
@@ -380,6 +385,8 @@ tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
+	priv->custom_url_string = FALSE;
+
 	if (G_UNLIKELY (priv->user))
 		g_free (priv->user);
 
@@ -404,6 +411,8 @@ tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	
 	g_static_rec_mutex_lock (priv->service_lock);
+
+	priv->custom_url_string = FALSE;
 
 	if (G_UNLIKELY (priv->host))
 		g_free (priv->host);
@@ -431,6 +440,8 @@ tny_camel_account_set_port_default (TnyAccount *self, guint port)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	
 	g_static_rec_mutex_lock (priv->service_lock);
+
+	priv->custom_url_string = FALSE;
 
 	priv->port = (gint) port;
 
@@ -662,6 +673,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
 
+	priv->custom_url_string = FALSE;
 	priv->cancel_lock = g_mutex_new ();
 	priv->inuse_spin = FALSE;
 
