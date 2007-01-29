@@ -6,6 +6,9 @@
 
 	* Finally, asynchronously connecting. Though, it's experimental.
 	* Various error checking and while-connecting error throwing
+	* Bugfix when an account was unable to connect (the other accounts did
+	strange things when trying to get messages), on the camel-lite IMAP
+	provider.
 
 2007-01-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
