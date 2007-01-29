@@ -531,7 +531,11 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 				g_signal_handler_unblock (G_OBJECT (priv->mailbox_select), priv->mailbox_select_sid);
 			}
 
+			priv->last_mailbox_correct_select_set = FALSE;
+
 		} else {
+
+			priv->last_mailbox_correct_select_set = FALSE;
 
 			gtk_tree_model_get (model, &iter, 
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 

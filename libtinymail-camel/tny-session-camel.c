@@ -251,25 +251,12 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_session_camel_forget_password (session, service, domain, item, ex);
 		}*/
 
-
-		if (priv->in_auth_function) 
-			return;
-
-		g_mutex_lock (priv->colock);
-
-		priv->in_auth_function = TRUE;
-
 		tny_lockable_lock (self->priv->ui_lock);
 		retval = func (account, prmpt, &cancel);
 		tny_lockable_unlock (self->priv->ui_lock);
 
-		priv->in_auth_function = FALSE;
-
-		g_mutex_unlock (priv->colock);
-
 		if (freeprmpt)
 			g_free (prmpt);
-
 	}
 
 	if (cancel || retval == NULL) {
@@ -332,27 +319,13 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 
 	if (G_LIKELY (found))
 	{
-
-		if (priv->in_auth_function) 
-			return;
-
-		g_mutex_lock (priv->colock);
-
-		priv->in_auth_function = TRUE;
-
 		tny_lockable_lock (self->priv->ui_lock);
 		func (account);
 		tny_lockable_unlock (self->priv->ui_lock);
-
-		priv->in_auth_function = FALSE;
-
-		g_mutex_unlock (priv->colock);
-
 	}
 
 	return;
 }
-
 
 
 /* tny_session_camel_alert_user will for example be called when SSL is on and 
@@ -388,23 +361,11 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
-		if (priv->in_auth_function) 
-			return FALSE;
-
-		g_mutex_lock (priv->colock);
-
-		priv->in_auth_function = TRUE;
-
 		tny_lockable_lock (self->priv->ui_lock);
 		retval = tny_account_store_alert (
 			(TnyAccountStore*) self->priv->account_store, 
 			tnytype, (const gchar *) prompt);
 		tny_lockable_unlock (self->priv->ui_lock);
-
-		priv->in_auth_function = FALSE;
-
-		g_mutex_unlock (priv->colock);
-
 	}
 
 	return retval;
@@ -645,15 +606,9 @@ background_connect_thread (gpointer data)
 			foreach_account_set_connectivity, info);
 	}
 
-	if (g_main_depth () > 0)
-	{
-		g_idle_add_full (G_PRIORITY_HIGH, 
-			background_connect_idle, 
-			info, background_connect_destroy);
-	} else {
-		background_connect_idle (info);
-		background_connect_destroy (info);
-	}
+	g_idle_add_full (G_PRIORITY_HIGH, 
+		background_connect_idle, 
+		info, background_connect_destroy);
 
 	priv->first_switch = FALSE;
 	priv->prev_constat = info->online;
