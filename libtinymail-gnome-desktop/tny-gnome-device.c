@@ -41,7 +41,7 @@ emit_status (TnyDevice *self)
 	if (tny_gnome_device_is_online (self))
 		tny_gnome_device_on_online (self);
 	else
-	tny_gnome_device_on_offline (self);
+		tny_gnome_device_on_offline (self);
 }
 
 
