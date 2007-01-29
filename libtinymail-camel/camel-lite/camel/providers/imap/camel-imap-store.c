@@ -1635,11 +1635,10 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 	g_mutex_unlock (store->stream_lock);
 
 	store->connected = FALSE;
-	if (store->current_folder) {
+	if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder)) 
 		camel_object_unref (store->current_folder);
-		store->current_folder = NULL;
-	}
-	
+	store->current_folder = NULL;
+
 	if (store->authtypes) {
 		g_hash_table_foreach_remove (store->authtypes,
 					     free_key, NULL);
