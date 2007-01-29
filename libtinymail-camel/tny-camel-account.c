@@ -703,6 +703,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
  * tny_camel_account_set_online_status:
  * @self: a #TnyCamelAccount object
  * @offline: whether or not the account is offline
+ * @err: a #GError instance or NULL
  *
  * Set the connectivity status of an account
  *
