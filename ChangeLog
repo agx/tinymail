@@ -1,3 +1,7 @@
+2007-01-29 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Implement tny-maemo-device (first version)
+
 2007-01-29  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Finally, asynchronously connecting. Though, it's experimental.
@@ -28,6 +32,7 @@
 
 	* This was a major API change
 
+>>>>>>> .r1500
 2007-01-26  Sergio Villar Senin <svillar@igalia.com>
 
 	* Fixed the implementation of tny_camel_header_get_xxx methods. Now

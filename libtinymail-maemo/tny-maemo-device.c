@@ -18,80 +18,119 @@
  */
 
 #include <config.h>
-
+#include <glib.h>
+#include <glib-object.h>
 #include <glib/gi18n-lib.h>
-
 #include <tny-maemo-device.h>
+#include <coniciap.h>
+#include <conicconnection.h>
+#include <conicconnectionevent.h>
+
 
 static GObjectClass *parent_class = NULL;
 
-#include "tny-maemo-device-priv.h"
+typedef struct {
+	ConIcConnection *cnx;
+	gboolean        is_online;
+} TnyMaemoDevicePriv;
 
-static void tny_maemo_device_on_online (TnyDevice *self);
-static void tny_maemo_device_on_offline (TnyDevice *self);
-static gboolean tny_maemo_device_is_online (TnyDevice *self);
+#define TNY_MAEMO_DEVICE_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MAEMO_DEVICE, TnyMaemoDevicePriv))
 
 
 static void 
 tny_maemo_device_reset (TnyDevice *self)
 {
-	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-
-	priv->fset = FALSE;
-	priv->forced = FALSE;
-
+	//TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
+	/* FIXME: hmm... what to do here? */
 }
+
+
+static void
+on_connection_event (ConIcConnection *self, ConIcConnectionEvent *event, gpointer user_data)
+{
+	TnyMaemoDevice *device; 
+	TnyMaemoDevicePriv *priv;
+	
+	g_return_if_fail (event);
+	g_return_if_fail (user_data);
+
+	device = TNY_MAEMO_DEVICE(user_data);
+	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (device);
+
+	/* FIXME: do something useful with errors */
+	switch (con_ic_connection_event_get_error(event)) {
+	case CON_IC_CONNECTION_ERROR_NONE:
+		break;
+	case CON_IC_CONNECTION_ERROR_INVALID_IAP:
+		break;
+	case CON_IC_CONNECTION_ERROR_CONNECTION_FAILED:
+		break;
+	case CON_IC_CONNECTION_ERROR_USER_CANCELED:
+		break;
+	default:
+		g_return_if_reached ();
+	}
+
+	switch (con_ic_connection_event_get_status(event)) {
+		
+	case CON_IC_STATUS_CONNECTED:
+		priv->is_online = TRUE;
+		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+			       0, TRUE);
+		break;
+
+	case CON_IC_STATUS_DISCONNECTED:		
+		priv->is_online = FALSE;
+		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+			       0, FALSE);
+		break;
+	case CON_IC_STATUS_DISCONNECTING:
+		/* nothing to do */
+		break;
+	default:
+		g_return_if_reached (); /* should not happen */
+	}
+}
+
+
 
 static void 
 tny_maemo_device_force_online (TnyDevice *self)
 {
-	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
+	TnyMaemoDevicePriv *priv;	
+	
+	g_return_if_fail (TNY_IS_DEVICE(self));
 
-	priv->fset = TRUE;
-	priv->forced = TRUE;
+	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
-	tny_maemo_device_on_online (self);
-
-	return;
+	if (!con_ic_connection_connect (priv->cnx,
+					CON_IC_CONNECT_FLAG_NONE))
+		g_warning ("could not send connect dbus message");
 }
 
 
 static void
 tny_maemo_device_force_offline (TnyDevice *self)
 {
-	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
+	TnyMaemoDevicePriv *priv;	
 
-	priv->fset = TRUE;
-	priv->forced = FALSE;
+	g_return_if_fail (TNY_IS_DEVICE(self));
 
-
-	tny_maemo_device_on_offline (self);
+	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 	
-	return;
+	if (!con_ic_connection_disconnect (priv->cnx))
+		g_warning ("could not send disconnect dbus message");
 }
 
-static void
-tny_maemo_device_on_online (TnyDevice *self)
-{
-	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
-
-	return;
-}
-
-static void
-tny_maemo_device_on_offline (TnyDevice *self)
-{
-	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
-
-	return;
-}
 
 static gboolean
 tny_maemo_device_is_online (TnyDevice *self)
 {
-	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-	gboolean retval = FALSE;
-	return retval;
+	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
+	
+	/* FIXME: get the info directly from iap? */
+	return TNY_MAEMO_DEVICE_GET_PRIVATE (self)->is_online;
 }
 
 static void
@@ -99,8 +138,8 @@ tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMaemoDevice *self = (TnyMaemoDevice *)instance;
 	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-
-	return;
+	
+	priv->is_online     = FALSE; /* FIXME: get this from IAP somehow? */
 }
 
 
@@ -113,18 +152,37 @@ tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 TnyDevice*
 tny_maemo_device_new (void)
 {
-	TnyMaemoDevice *self = g_object_new (TNY_TYPE_MAEMO_DEVICE, NULL);
+	TnyMaemoDevice *self; 
+	TnyMaemoDevicePriv *priv;
 
+	self = g_object_new (TNY_TYPE_MAEMO_DEVICE, NULL);
+	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
+
+	priv->cnx = con_ic_connection_new ();
+	if (!priv->cnx) {
+		g_warning ("con_ic_connection_new failed");
+		g_object_unref (self);
+		return NULL;
+	}
+
+	g_signal_connect (priv->cnx, "connection-event",
+			  G_CALLBACK(on_connection_event), self);
+	
 	return TNY_DEVICE (self);
 }
 
 
 static void
-tny_maemo_device_finalize (GObject *object)
+tny_maemo_device_finalize (GObject *obj)
 {
-	(*parent_class->finalize) (object);
+	TnyMaemoDevicePriv *priv;
+	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (obj);
 
-	return;
+	con_ic_connection_disconnect (priv->cnx);
+	g_object_unref (priv->cnx);
+	priv->cnx = NULL;
+	
+	(*parent_class->finalize) (obj);
 }
 
 
@@ -133,12 +191,10 @@ tny_device_init (gpointer g, gpointer iface_data)
 {
 	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
-	klass->is_online_func = tny_maemo_device_is_online;
-	klass->reset_func = tny_maemo_device_reset;
+	klass->is_online_func     = tny_maemo_device_is_online;
+	klass->reset_func         = tny_maemo_device_reset;
 	klass->force_offline_func = tny_maemo_device_force_offline;
-	klass->force_online_func = tny_maemo_device_force_online;
-
-	return;
+	klass->force_online_func  = tny_maemo_device_force_online;
 }
 
 
@@ -154,8 +210,6 @@ tny_maemo_device_class_init (TnyMaemoDeviceClass *class)
 	object_class->finalize = tny_maemo_device_finalize;
 
 	g_type_class_add_private (object_class, sizeof (TnyMaemoDevicePriv));
-
-	return;
 }
 
 GType 
@@ -193,6 +247,5 @@ tny_maemo_device_get_type (void)
 			&tny_device_info);
 
 	}
-
 	return type;
 }
