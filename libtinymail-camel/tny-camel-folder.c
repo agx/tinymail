@@ -803,6 +803,8 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 
 	camel_folder_refresh_info (priv->folder, &ex);
 
+	info->cancelled = camel_operation_cancel_check (apriv->cancel);
+
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
@@ -821,7 +823,6 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 
-	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 
 	g_mutex_unlock (priv->folder_lock);
 
