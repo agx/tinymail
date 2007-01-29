@@ -137,13 +137,13 @@ setup_objs (int num, GObject **a, GObject **b, GObject **c, GObject **d)
 
 START_TEST (tny_list_test_list)
 {
-	TnyList *iface = ifaces [i];
+	TnyList *iface = ifaces [0];
 	TnyList *ref;
 	TnyIterator *iterator;
 	GObject *item;
 	gint j;
 	GObject *a, *b, *c, *d;
-	setup_objs (i, &a, &b, &c, &d);
+	setup_objs (0, &a, &b, &c, &d);
 	
 	tny_list_append (iface, a);
 	g_object_unref (G_OBJECT (a));
