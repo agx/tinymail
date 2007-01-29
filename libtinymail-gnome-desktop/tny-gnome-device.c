@@ -132,6 +132,10 @@ tny_gnome_device_is_online (TnyDevice *self)
 			case LIBNM_INVALID_CONTEXT:
 			g_print (_("Invalid network manager installation. Going to assume Offline status\n"));
 			priv->invnm = TRUE;
+
+			libnm_glib_unregister_callback (priv->nm_ctx, priv->callback_id);
+			libnm_glib_shutdown (priv->nm_ctx);
+
 			case LIBNM_NO_NETWORK_CONNECTION:
 			default:
 			retval = FALSE;

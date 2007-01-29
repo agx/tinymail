@@ -1,3 +1,7 @@
+2007-01-29  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Finally, asynchronously connecting. Though, it's experimental.
+
 2007-01-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Lots of small bugfixes and testing. Also a few code boutifications

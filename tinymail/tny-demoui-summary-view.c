@@ -690,7 +690,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->monitor_continue = FALSE;
 
 	priv->last_mailbox_correct_select_set = FALSE;
-	priv->online_button = gtk_toggle_button_new ();
+	priv->online_button = gtk_toggle_button_new_with_label (GO_ONLINE_TXT);
 	priv->current_accounts = NULL;
 
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
