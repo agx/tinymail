@@ -35,16 +35,23 @@ static void tny_gnome_device_on_online (TnyDevice *self);
 static void tny_gnome_device_on_offline (TnyDevice *self);
 static gboolean tny_gnome_device_is_online (TnyDevice *self);
 
+static void
+emit_status (TnyDevice *self)
+{
+	if (tny_gnome_device_is_online (self))
+		tny_gnome_device_on_online (self);
+	else
+	tny_gnome_device_on_offline (self);
+}
+
+
 #ifdef GNOME
 static void 
 nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 {
 	TnyDevice *self = (TnyDevice *)user_data;
 
-	if (tny_gnome_device_is_online (self))
-		tny_gnome_device_on_online (self);
-	else
-		tny_gnome_device_on_offline (self);
+	emit_status (self);
 
 	return;
 }
@@ -58,9 +65,7 @@ tny_gnome_device_reset (TnyDevice *self)
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
-#ifdef GNOME
-	nm_callback (priv->nm_ctx, self);
-#endif
+	emit_status (self);
 }
 
 static void 
@@ -71,10 +76,8 @@ tny_gnome_device_force_online (TnyDevice *self)
 	priv->fset = TRUE;
 	priv->forced = TRUE;
 
-#ifdef GNOME
-	nm_callback (priv->nm_ctx, self);
-#endif
-
+	emit_status (self);
+	
 	return;
 }
 
@@ -87,10 +90,8 @@ tny_gnome_device_force_offline (TnyDevice *self)
 	priv->fset = TRUE;
 	priv->forced = FALSE;
 
-#ifdef GNOME
-	nm_callback (priv->nm_ctx, self);
-#endif
-
+	emit_status (self);
+	
 	return;
 }
 
