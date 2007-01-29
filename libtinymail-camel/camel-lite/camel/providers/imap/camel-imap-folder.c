@@ -3181,7 +3181,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	    gchar line[512];
 	    guint linenum = 0;
 	    ssize_t nread; 
-	    CamelStreamBuffer *server_stream = CAMEL_STREAM_BUFFER (store->istream);
+	    CamelStreamBuffer *server_stream;
 	    gchar *tag;
 	    guint taglen;
 	    gboolean isnextdone = FALSE, hadr = FALSE;
@@ -3197,9 +3197,19 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	    tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
 	    taglen = strlen (tag);
-	    store->command++;
 
-	    while (nread = camel_stream_buffer_gets (server_stream, line, 512) > 0)
+	    g_mutex_lock (store->stream_lock);
+
+	    if (camel_imap_store_restore_stream_buffer (store))
+		server_stream = store->istream ? CAMEL_STREAM_BUFFER (store->istream) : NULL;
+	    else server_stream = NULL;
+
+	    if (!server_stream)
+		err = TRUE;
+	    else
+		store->command++;
+
+	    if (server_stream) while (nread = camel_stream_buffer_gets (server_stream, line, 512) > 0)
 	    {
 
 		    /* It might be the line before the last line */
@@ -3240,6 +3250,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		    linenum++;
 	    }
 
+	    g_mutex_unlock (store->stream_lock);
 	    CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
 	    if (nread <= 0) 
@@ -3284,17 +3295,16 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 		g_mutex_lock (store->stream_lock);
 
-		if (!store->istream || !CAMEL_IS_STREAM_BUFFER (store->istream))
-		{
-			camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Locking problem"));
-			g_mutex_unlock (store->stream_lock);
-			return NULL;
-		}
-		server_stream = CAMEL_STREAM_BUFFER (store->istream);
+		if (camel_imap_store_restore_stream_buffer (store))
+			server_stream = store->istream ? CAMEL_STREAM_BUFFER (store->istream) : NULL;
+		else server_stream = NULL;
 
-		store->command++;
+		if (server_stream == NULL)
+			err = TRUE;
+		else
+			store->command++;
 
-		while (nread = camel_stream_buffer_gets (server_stream, line, 512) > 0)
+		if (server_stream) while (nread = camel_stream_buffer_gets (server_stream, line, 512) > 0)
 		{
 
 			/* It might be the line before the last line */

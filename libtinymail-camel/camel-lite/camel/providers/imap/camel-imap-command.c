@@ -234,6 +234,10 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 					     g_strerror (errno));
 		
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+
+		/* Let's try .. */
+		camel_service_connect (CAMEL_SERVICE (store), NULL);
+
 		return FALSE;
 	}
 	

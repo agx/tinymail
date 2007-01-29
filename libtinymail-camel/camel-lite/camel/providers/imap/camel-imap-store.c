@@ -564,6 +564,34 @@ enum {
 #define STARTTLS_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_TLS)
 #endif
 
+gboolean 
+camel_imap_store_restore_stream_buffer (CamelImapStore *store)
+{
+	if (store->istream == NULL || !CAMEL_IS_STREAM_BUFFER (store->istream))
+	{
+		if (store->ostream && CAMEL_IS_STREAM (store->ostream))
+		{
+			/* This is a recoverable situation. It's strange though */
+			store->istream = camel_stream_buffer_new (store->ostream, CAMEL_STREAM_BUFFER_READ);
+		} else {
+			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+			g_mutex_unlock (store->stream_lock);
+			camel_operation_uncancel (NULL);
+			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &ex);
+			camel_exception_clear (&ex);
+			g_warning ("Something terrible happened with your connection.\nTrying to recover. (%s)\n", 
+				g_strerror (errno));
+			camel_service_connect (CAMEL_SERVICE (store), &ex);
+			if (camel_exception_is_set (&ex))
+				g_warning ("Connection recovery failed: %s",
+					camel_exception_get_description (&ex));
+			g_mutex_lock (store->stream_lock);
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
 static gboolean
 connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, CamelException *ex)
 {
@@ -3317,16 +3345,19 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 	
 	if (!camel_imap_store_connected (store, ex))
 		return -1;
-	
+
+	g_mutex_lock (store->stream_lock);
+	camel_imap_store_restore_stream_buffer (store);
 	stream = CAMEL_STREAM_BUFFER (store->istream);
-	
+
 	ba = g_byte_array_new ();
 	while ((nread = camel_stream_buffer_gets (stream, linebuf, sizeof (linebuf))) > 0) {
 		g_byte_array_append (ba, (const guchar*) linebuf, nread);
 		if (linebuf[nread - 1] == '\n')
 			break;
 	}
-	
+	g_mutex_unlock (store->stream_lock);
+
 	if (nread <= 0) {
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
