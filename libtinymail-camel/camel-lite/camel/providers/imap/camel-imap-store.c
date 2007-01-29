@@ -1503,7 +1503,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	if (!connect_to_server_wrapper (service, ex) ||
 	    !imap_auth_loop (service, ex)) {
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-		camel_service_disconnect (service, TRUE, NULL);
+		/* camel_service_disconnect (service, TRUE, NULL); */
 		return FALSE;
 	}
 	
