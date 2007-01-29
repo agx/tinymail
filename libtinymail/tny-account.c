@@ -23,24 +23,6 @@
 
 
 /**
- * tny_account_try_connect:
- * @self: a #TnyAccount object
- * @err: a #GError instance or NULL
- * 
- * Try to connect. This can put a reason why connecting failed in @err.
- **/
-void
-tny_account_try_connect (TnyAccount *self, GError **err)
-{
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->try_connect_func)
-		g_critical ("You must implement tny_account_get_id\n");
-#endif
-
-	return TNY_ACCOUNT_GET_IFACE (self)->try_connect_func (self, err);
-}
-
-/**
  * tny_account_get_account_type:
  * @self: a #TnyAccount object
  *

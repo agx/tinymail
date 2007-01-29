@@ -74,7 +74,7 @@ struct _TnyCamelAccountClass
 	void (*try_connect_func) (TnyAccount *self, GError **err);
 
 	void (*add_option_func) (TnyCamelAccount *self, const gchar *option);
-	void (*set_online_status_func) (TnyCamelAccount *self, gboolean offline);
+	void (*set_online_status_func) (TnyCamelAccount *self, gboolean offline, GError **err);
 
 	/* Abstract methods */
 	void (*prepare_func) (TnyCamelAccount *self);
@@ -84,7 +84,7 @@ GType tny_camel_account_get_type (void);
 
 void tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option);
 void tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session);
-void tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline);
+void tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline, GError **err);
 
 G_END_DECLS
 

@@ -287,6 +287,9 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 				if (err != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
 					tny_account_set_port (TNY_ACCOUNT (account), port);
 
+				if (err != NULL)
+					g_error_free (err);
+
 				g_free (hostname); g_free (user);
 			} else {
 				gchar *url_string;

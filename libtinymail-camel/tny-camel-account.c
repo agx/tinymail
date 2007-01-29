@@ -28,6 +28,7 @@
 #include <tny-account-store.h>
 #include <tny-folder.h>
 #include <tny-camel-folder.h>
+#include <tny-error.h>
 
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -93,19 +94,24 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 	return;
 }
 
-static void
-tny_camel_account_try_connect (TnyAccount *self, GError **err)
+void 
+_tny_camel_account_try_connect (TnyCamelAccount *self, GError **err)
 {
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->try_connect_func (self, err);
-}
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-static void
-tny_camel_account_try_connect_default (TnyAccount *self, GError **err)
-{
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+
+	if (camel_exception_is_set (priv->ex))
+	{
+		g_set_error (err, TNY_ACCOUNT_ERROR, 
+			TNY_ACCOUNT_ERROR_TRY_CONNECT,
+			camel_exception_get_description (priv->ex));
+	}
 
 	return;
 }
+
+
 
 
 static void
@@ -702,38 +708,46 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
  *
  **/
 void 
-tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline)
+tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline, GError **err)
 {
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_online_status_func (self, offline);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_online_status_func (self, offline, err);
 }
 
 void 
-tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean offline)
+tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean offline, GError **err)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-
-	/* TODO locking & error handling */
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!priv->service || !CAMEL_IS_SERVICE (priv->service))
+	{
+		if (camel_exception_is_set (priv->ex))
+		{
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				camel_exception_get_description (priv->ex));
+		} else {
+			g_set_error (err, TNY_ACCOUNT_ERROR, 
+				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				_("Account not yet fully configured"));
+		}
+
 		return;
-
-	/* _tny_camel_account_start_camel_operation (self, NULL, NULL, NULL); */
-
-	/* g_static_rec_mutex_lock (priv->service_lock); */
+	}
 
 	if (offline)
 		camel_service_cancel_connect (priv->service);
-	
+
 	if (CAMEL_IS_DISCO_STORE (priv->service)) {
 		if (!offline) {
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
-										  CAMEL_DISCO_STORE_ONLINE, priv->ex);
+										  CAMEL_DISCO_STORE_ONLINE, &ex);
 			goto done;
 		} else if (camel_disco_store_can_work_offline (CAMEL_DISCO_STORE (priv->service))) {
 			
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
 										  CAMEL_DISCO_STORE_OFFLINE,
-										  priv->ex);
+										  &ex);
 			goto done;
 		}
 	} else if (CAMEL_IS_OFFLINE_STORE (priv->service)) {
@@ -742,23 +756,28 @@ tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean off
 			
 			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
 												   CAMEL_OFFLINE_STORE_NETWORK_AVAIL,
-												   priv->ex);
+												   &ex);
 			goto done;
 		} else {
 			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
 												   CAMEL_OFFLINE_STORE_NETWORK_UNAVAIL,
-												   priv->ex);
+												   &ex);
 			goto done;
 		}
 	}
-	
+
 	if (offline)
 		camel_service_disconnect (CAMEL_SERVICE (priv->service),
-								  TRUE, priv->ex);
+								  TRUE, &ex);
 
 done:
-		/* g_static_rec_mutex_unlock (priv->service_lock); */
-		/* _tny_camel_account_stop_camel_operation (self); */
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_ACCOUNT_ERROR, 
+			TNY_ACCOUNT_ERROR_TRY_CONNECT,
+			camel_exception_get_description (&ex));
+	}
 
 	return;
 }
@@ -834,7 +853,6 @@ tny_account_init (gpointer g, gpointer iface_data)
 {
 	TnyAccountIface *klass = (TnyAccountIface *)g;
 
-	klass->try_connect_func = tny_camel_account_try_connect;
 	klass->get_port_func = tny_camel_account_get_port;
 	klass->set_port_func = tny_camel_account_set_port;
 	klass->get_hostname_func = tny_camel_account_get_hostname;
@@ -869,7 +887,6 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->try_connect_func = tny_camel_account_try_connect_default;
 	class->get_port_func = tny_camel_account_get_port_default;
 	class->set_port_func = tny_camel_account_set_port_default;
 	class->get_hostname_func = tny_camel_account_get_hostname_default;

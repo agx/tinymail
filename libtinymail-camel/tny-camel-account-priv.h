@@ -48,6 +48,7 @@ const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);
 const gchar* _tny_camel_account_get_url_string (TnyCamelAccount *self);
 void _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what);
 void _tny_camel_account_stop_camel_operation (TnyCamelAccount *self);
+void _tny_camel_account_try_connect (TnyCamelAccount *self, GError **err);
 
 #define TNY_CAMEL_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountPriv))

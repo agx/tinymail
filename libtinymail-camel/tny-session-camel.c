@@ -558,11 +558,16 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 	{
 		GError *err = NULL;
 
-		tny_account_try_connect (TNY_ACCOUNT (data), &err);
+		_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (data), &err);
+
 		if (err == NULL)
-			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (data), !online);
-		else 
+			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (data), !online, &err);
+
+		if (err != NULL) 
+		{
 			tny_session_camel_alert_user (session, CAMEL_SESSION_ALERT_ERROR, err->message, FALSE);
+			g_error_free (err);
+		}
 	}
 }
 
