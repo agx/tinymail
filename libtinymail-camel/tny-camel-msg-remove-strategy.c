@@ -30,8 +30,30 @@
 
 #include <string.h>
 
+#include <tny-error.h>
+
 #include <tny-camel-msg-remove-strategy.h>
 #include <tny-camel-folder.h>
+
+#include <tny-session-camel.h>
+#include <tny-account.h>
+#include <tny-camel-account.h>
+
+#include <camel/camel-folder.h>
+#include <camel/camel.h>
+#include <camel/camel-session.h>
+#include <camel/camel-service.h>
+#include <camel/camel-store.h>
+
+#include <tny-session-camel.h>
+#include <tny-account.h>
+#include <tny-camel-account.h>
+
+#include "tny-camel-account-priv.h"
+#include "tny-camel-folder-priv.h"
+
+#include "tny-camel-account-priv.h"
+#include "tny-camel-folder-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
@@ -48,6 +70,11 @@ tny_camel_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStrategy *self
 {
 	const gchar *id;
 	CamelFolder *cfolder;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION (priv), err, 
+			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REMOVE_MSG))
+		return;
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 	g_assert (TNY_IS_HEADER (header));
