@@ -11,7 +11,8 @@ struct _TnySessionCamelPriv
 	gchar *camel_dir;
 	gboolean in_auth_function;
 	TnyLockable *ui_lock;
-	GMutex *colock;
+	GMutex *conlock;
+	GThread *conthread;
 };
 
 void _tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account);

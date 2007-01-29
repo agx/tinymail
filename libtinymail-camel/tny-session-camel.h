@@ -53,6 +53,7 @@ void tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *
 void tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store);
 void tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device);
 void tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_lock);
+void tny_session_camel_join_connecting (TnySessionCamel *self);
 
 G_END_DECLS
 

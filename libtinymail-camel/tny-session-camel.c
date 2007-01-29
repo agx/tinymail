@@ -497,7 +497,8 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->priv = g_slice_new (TnySessionCamelPriv);
 	priv = instance->priv;
 
-	priv->colock = g_mutex_new ();
+	priv->conlock = g_mutex_new ();
+	priv->conthread = NULL;
 	priv->prev_constat = FALSE;
 	priv->device = NULL;
 	priv->camel_dir = NULL;
@@ -604,6 +605,8 @@ background_connect_thread (gpointer data)
 	TnySessionCamel *self = info->user_data;
 	TnySessionCamelPriv *priv = self->priv;
 
+	g_mutex_lock (priv->conlock);
+	
 	if (priv->current_accounts && !priv->first_switch && 
 		priv->prev_constat != info->online && priv->account_store)
 	{
@@ -617,6 +620,8 @@ background_connect_thread (gpointer data)
 
 	priv->first_switch = FALSE;
 	priv->prev_constat = info->online;
+
+	g_mutex_unlock (priv->conlock);
 
 	return NULL;
 }
@@ -640,11 +645,26 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	g_thread_create (background_connect_thread, info, FALSE, NULL);
+	priv->conthread = g_thread_create (background_connect_thread, info, TRUE, NULL);
 
 	/* background_connect_thread (info); */
 
 	return;
+}
+
+/**
+ * tny_session_camel_join_connecting
+ * @self: a #TnySessionCamel object
+ * 
+ * Join the connection thread
+ **/ 
+void 
+tny_session_camel_join_connecting (TnySessionCamel *self)
+{
+	TnySessionCamelPriv *priv = self->priv;
+	
+	if (priv->conthread)
+		g_thread_join (priv->conthread);
 }
 
 
@@ -756,7 +776,7 @@ tny_session_camel_finalise (CamelObject *object)
 	if (priv->camel_dir)
 		g_free (priv->camel_dir);
 
-	g_mutex_free (priv->colock);
+	g_mutex_free (priv->conlock);
 
 	g_slice_free (TnySessionCamelPriv, self->priv);
 
