@@ -191,8 +191,11 @@ tny_gnome_device_finalize (GObject *object)
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
 #ifdef GNOME
-	libnm_glib_unregister_callback (priv->nm_ctx, priv->callback_id);
-	libnm_glib_shutdown (priv->nm_ctx);
+	if (!priv->invnm)
+	{
+		libnm_glib_unregister_callback (priv->nm_ctx, priv->callback_id);
+		libnm_glib_shutdown (priv->nm_ctx);
+	}
 #endif
 
 	(*parent_class->finalize) (object);
