@@ -21,8 +21,36 @@
 #include <glib/gi18n-lib.h>
 #include <string.h>
 
+#include <tny-camel-account.h>
+#include <tny-session-camel.h>
+
+#include "tny-session-camel-priv.h"
 #include "tny-camel-common-priv.h"
+
 #include <tny-folder-store-query.h>
+
+gboolean 
+_tny_session_check_operation (TnySessionCamel *session, GError **err, GQuark domain, gint code)
+{
+	TnySessionCamel *in = (TnySessionCamel *) session;
+
+	if (in == NULL || !CAMEL_IS_SESSION (in))
+	{
+		g_set_error (err, domain, code,
+			_("Operating can't continue: account not ready"));
+		return FALSE;
+	}
+
+	if (in->priv->is_connecting)
+	{
+		g_set_error (err, domain, code,
+			_("Operating can't continue: connecting in progress"));
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 
 gboolean 
 _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *finfo)

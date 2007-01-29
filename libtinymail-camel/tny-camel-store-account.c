@@ -360,6 +360,10 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 
+	if (!_tny_session_check_operation (apriv->session, err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
+		return;
+
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
@@ -423,8 +427,12 @@ static TnyFolder*
 tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar *name, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	TnyFolder *folder; CamelFolderInfo *info; CamelStore *store;
+
+	if (!_tny_session_check_operation (apriv->session, err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
+		return;
 
 	if (!name || strlen (name) <= 0)
 	{
@@ -490,7 +498,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	camel_object_unref (CAMEL_OBJECT (store));
 
-  	return folder;
+	return folder;
 }
 
 static void
@@ -510,6 +518,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	g_assert (TNY_IS_LIST (list));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
+
+	if (!_tny_session_check_operation (apriv->session, err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
+		return;
 
 	if (query != NULL)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
@@ -685,11 +697,21 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 {
 	GetFoldersInfo *info;
 	GThread *thread;
+	GError *err = NULL;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_LIST (list));
 
-	info = g_slice_new0 (GetFoldersInfo);
+	if (!_tny_session_check_operation (apriv->session, &err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
+	{
+		if (callback)
+			callback (self, list, &err, user_data);
+		g_error_free (err);
+		return;
+	}
 
+	info = g_slice_new0 (GetFoldersInfo);
 	info->err = NULL;
 	info->self = self;
 	info->list = list;

@@ -9,7 +9,7 @@ struct _TnySessionCamelPriv
 	guint connchanged_signal;
 	GList *current_accounts;
 	gchar *camel_dir;
-	gboolean in_auth_function;
+	gboolean in_auth_function, is_connecting;
 	TnyLockable *ui_lock;
 	GMutex *conlock;
 	GThread *conthread;

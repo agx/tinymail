@@ -736,7 +736,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		g_mutex_lock (store->stream_lock);
 		camel_object_unref (store->istream);
 		camel_object_unref (store->ostream);
-		store->istream = store->ostream = NULL;
+		store->istream = NULL;
+		store->ostream = NULL;
 		g_mutex_unlock (store->stream_lock);
 
 		return FALSE;

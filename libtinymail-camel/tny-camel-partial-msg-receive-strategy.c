@@ -33,8 +33,14 @@
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-session.h>
+#include <camel/camel-service.h>
 #include <camel/camel-store.h>
 
+#include <tny-session-camel.h>
+#include <tny-account.h>
+#include <tny-camel-account.h>
+
+#include "tny-camel-account-priv.h"
 #include "tny-camel-folder-priv.h"
 
 static GObjectClass *parent_class = NULL;
@@ -53,6 +59,10 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 	CamelMimeMessage *camel_message = NULL;
 	const gchar *id;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION (priv), err, 
+			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
+		return;
 
 	g_assert (TNY_IS_HEADER (header));
 

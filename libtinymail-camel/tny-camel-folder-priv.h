@@ -71,4 +71,8 @@ void _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_fold
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_FOLDER, TnyCamelFolderPriv))
 
+#define TNY_FOLDER_PRIV_GET_SESSION(o) \
+	((o)&&(o)->account?TNY_CAMEL_ACCOUNT_GET_PRIVATE ((o)->account)->session:NULL)
+
+
 #endif

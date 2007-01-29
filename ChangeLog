@@ -5,6 +5,7 @@
 2007-01-29  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Finally, asynchronously connecting. Though, it's experimental.
+	* Various error checking and while-connecting error throwing
 
 2007-01-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
@@ -32,7 +33,6 @@
 
 	* This was a major API change
 
->>>>>>> .r1500
 2007-01-26  Sergio Villar Senin <svillar@igalia.com>
 
 	* Fixed the implementation of tny_camel_header_get_xxx methods. Now

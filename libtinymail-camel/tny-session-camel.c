@@ -505,7 +505,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 	priv->ui_lock = tny_noop_lockable_new ();
 	priv->camel_dir = NULL;
 	priv->in_auth_function = FALSE;
-
+	priv->is_connecting = FALSE;
 	return;
 }
 
@@ -606,13 +606,17 @@ background_connect_thread (gpointer data)
 	TnySessionCamelPriv *priv = self->priv;
 
 	g_mutex_lock (priv->conlock);
-	
+
+	priv->is_connecting = TRUE;
+
 	if (priv->current_accounts && !priv->first_switch && 
 		priv->prev_constat != info->online && priv->account_store)
 	{
 		g_list_foreach (priv->current_accounts, 
 			foreach_account_set_connectivity, info);
 	}
+
+	priv->is_connecting = FALSE;
 
 	g_idle_add_full (G_PRIORITY_HIGH, 
 		background_connect_idle, 

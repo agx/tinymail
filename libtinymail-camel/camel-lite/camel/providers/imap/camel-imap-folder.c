@@ -3271,7 +3271,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		gchar line[512];
 		guint linenum = 0;
 		ssize_t nread; 
-		CamelStreamBuffer *server_stream = CAMEL_STREAM_BUFFER (store->istream);
+		CamelStreamBuffer *server_stream;
 		gchar *tag;
 		guint taglen;
 		gboolean isnextdone = FALSE;
@@ -3281,6 +3281,16 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 		tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
 		taglen = strlen (tag);
+
+		g_mutex_lock (store->stream_lock);
+
+		if (!store->istream || !CAMEL_IS_STREAM_BUFFER (store->istream))
+		{
+			camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Locking problem"));
+			g_mutex_unlock (store->stream_lock);
+			return NULL;
+		}
+		server_stream = CAMEL_STREAM_BUFFER (store->istream);
 
 		store->command++;
 
@@ -3351,6 +3361,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 			linenum++;
 		}
+		g_mutex_unlock (store->stream_lock);
 
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
