@@ -58,15 +58,18 @@ on_connection_event (ConIcConnection *self, ConIcConnectionEvent *event, gpointe
 	device = TNY_MAEMO_DEVICE(user_data);
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (device);
 
-	/* FIXME: do something useful with errors */
+	
 	switch (con_ic_connection_event_get_error(event)) {
 	case CON_IC_CONNECTION_ERROR_NONE:
 		break;
 	case CON_IC_CONNECTION_ERROR_INVALID_IAP:
+		g_warning ("conic: IAP is invalid");
 		break;
 	case CON_IC_CONNECTION_ERROR_CONNECTION_FAILED:
+		g_warning ("conic: connection failed");
 		break;
 	case CON_IC_CONNECTION_ERROR_USER_CANCELED:
+		g_warning ("conic: user cancelled");
 		break;
 	default:
 		g_return_if_reached ();
@@ -79,14 +82,13 @@ on_connection_event (ConIcConnection *self, ConIcConnectionEvent *event, gpointe
 		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 			       0, TRUE);
 		break;
-
 	case CON_IC_STATUS_DISCONNECTED:		
 		priv->is_online = FALSE;
 		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 			       0, FALSE);
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
-		/* nothing to do */
+		priv->is_online = FALSE;
 		break;
 	default:
 		g_return_if_reached (); /* should not happen */
@@ -101,12 +103,11 @@ tny_maemo_device_force_online (TnyDevice *self)
 	TnyMaemoDevicePriv *priv;	
 	
 	g_return_if_fail (TNY_IS_DEVICE(self));
-
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
-	if (!con_ic_connection_connect (priv->cnx,
-					CON_IC_CONNECT_FLAG_NONE))
-		g_warning ("could not send connect dbus message");
+	if (!priv->is_online) 
+		if (!con_ic_connection_connect (priv->cnx,CON_IC_CONNECT_FLAG_NONE))
+			g_warning ("could not send connect dbus message");
 }
 
 
@@ -116,11 +117,11 @@ tny_maemo_device_force_offline (TnyDevice *self)
 	TnyMaemoDevicePriv *priv;	
 
 	g_return_if_fail (TNY_IS_DEVICE(self));
-
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-	
-	if (!con_ic_connection_disconnect (priv->cnx))
-		g_warning ("could not send disconnect dbus message");
+
+	if (priv->is_online)
+		if (!con_ic_connection_disconnect (priv->cnx))
+			g_warning ("could not send disconnect dbus message");
 }
 
 
@@ -139,7 +140,7 @@ tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMaemoDevice *self = (TnyMaemoDevice *)instance;
 	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 	
-	priv->is_online     = FALSE; /* FIXME: get this from IAP somehow? */
+	priv->is_online     = FALSE; 
 }
 
 
@@ -164,9 +165,15 @@ tny_maemo_device_new (void)
 		g_object_unref (self);
 		return NULL;
 	}
-
 	g_signal_connect (priv->cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), self);
+	
+	/*
+	 * this will get us in connected state, but only if there is already a connection.
+	 * thus, this will setup our state correctly when we receive the signals
+	 */
+	if (!con_ic_connection_connect (priv->cnx,CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
+		g_warning ("could not send auto-connect dbus message");
 	
 	return TNY_DEVICE (self);
 }
