@@ -1,3 +1,8 @@
+2007-01-31  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Support for BINARY responses from IMAP servers that have the BINARY
+	capability
+
 2007-01-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Little bugfix. Max line size of an E-mail is now MAX_LINE_SIZE

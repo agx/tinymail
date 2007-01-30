@@ -3119,6 +3119,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	CamelStream *stream = NULL;
 	gboolean connected = FALSE;
 	CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+	ssize_t nread = 0; 
 
 	/* EXPUNGE responses have to modify the cache, which means
 	 * they have to grab the cache_lock while holding the
@@ -3185,94 +3186,114 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
 		
 		/* Disabled because not yet tested */
-		if (FALSE && store->capabilities & IMAP_CAPABILITY_BINARY)
+		if (store->capabilities & IMAP_CAPABILITY_BINARY)
 		{
-			/* "~{" number "}" CRLF *OCTET
-			   <number> represents the number of OCTETs in the response  */
-
-			/* "{" number "}" CRLF STRINGS
-			   <number> represents the number of OCTETs in the response  */
-			
-			gchar *line = NULL;
+			gchar line[MAX_LINE_LEN];
 			gboolean err = FALSE;
 			char two_bytes[2];
 			char t_str [1024];
 			int f = 0;
 			ssize_t hread = 1;
 			gint length=0, rec=0;
-			   
+			long seq;
+			char *pos, *ppos;
+
+			nread = 1;
+
 			camel_imap_command_start (store, folder, ex,
-				"UID FETCH %s BINARY.PEEK[%s]",uid, section_text);
-			   
+				"UID FETCH %s BINARY.PEEK[%s]", uid, section_text);
+
 			g_mutex_lock (store->stream_lock);
 
-			camel_stream_read (store->ostream, two_bytes, 1);
-			if (two_bytes[0] == '~')
-				camel_stream_read (store->ostream, two_bytes, 1);
-			    
-			while (two_bytes[0] != '}' && f < 1023 && hread != 1)
+			/*
+			a01 uid fetch 1 BINARY.PEEK[]
+			* 1 FETCH (UID 1 BINARY[] {24693}\r\n
+			Subject: Testing....
+			)\r\n
+			a01 OK .... \r\n
+			*/
+
+			/* Read the length in the "\*.*[~|]{<LENGTH>}" */
+			while (two_bytes[0] != '\n' && f < 1023 && nread > 0)
 			{
-				hread = camel_stream_read (store->ostream, two_bytes, 1);
-				t_str [f] = two_bytes[0];
+				nread = camel_stream_read (store->ostream, two_bytes, 1);
+				line [f] = two_bytes [0];
 				f++;
 			}
+			line[f] = '\0';
 
-			if (f >= 1024 || hread != 1)
-				goto errorhander;
+			/* The first line is very unlikely going to consume 1023 bytes */
+			if (f > 1023 || nread <= 0)
+				goto berrorhander;
 
-			t_str[f] = '\0';
-			length = strtol (t_str, NULL, 10);
+			/* If the line doesn't start with "* " */
+			if (*line != '*' || *(line + 1) != ' ')
+				{ err = TRUE; goto berrorhander; }
+			pos = strchr (line, '{');
 
+			/* If we don't find a '{' character */
+			if (!pos) 
+				{ err = TRUE; goto berrorhander; }
+
+			/* Set the '}' character to \0 */
+			ppos = strchr (pos, '}');
+			if (ppos) 
+				*ppos = '\0';
+			else /* If we didn't find it */
+				{ err = TRUE; goto berrorhander; }
+
+			length = strtol (pos + 1, NULL, 10);
+
+			/* If strtol failed (it's important enough to check this) */
 			if (errno == ERANGE)
-				goto errorhander;
+				{ err = TRUE; goto berrorhander; }
 
-			/* CRLF */
-			hread = camel_stream_read (store->ostream, two_bytes, 2);
-
-			if (hread != 2)
-				goto errorhander;
-			    
-			if (two_bytes[0] != '\n' || two_bytes[1] != '\r')
-				goto errorhander;
-
+			/* Until we have reached the length, read 1024 at the time */
 			while (hread > 0 && rec < length)
 			{
 				int wread = (length - rec);
-				
 				if (wread < 1 || wread > 1024)
 					wread = 1024;
-				
 				hread = camel_stream_read (store->ostream, t_str, wread);
-				if (hread > 0) {
+				if (hread > 0) 
+				{
+					/* And write them too */
 					camel_stream_write (stream, t_str, hread);
 					rec += hread;
 				}
 			}
-			
+			camel_stream_reset (stream);
+
+			/* Read away the last two lines */
+			for (f = 0; f < 2; f++) { 
+				nread = 1; two_bytes[0] = 'x';
+				while (two_bytes[0] != '\n' && nread > 0)
+					nread = camel_stream_read (store->ostream, two_bytes, 1); 
+			}
+berrorhander:
 			g_mutex_unlock (store->stream_lock);
-			line = NULL;
-			/* Read the OK */
-			/*camel_imap_store_readline (store, &line, ex);*/
-			if (line) g_free (line);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-			
+
+			if (err)
+				goto errorhander;
 		} else 
 		{
 			gboolean first = TRUE, err=FALSE;
-			gchar *line = g_malloc0 (MAX_LINE_LEN);
+			gchar line [MAX_LINE_LEN];
 			guint linenum = 0;
-			ssize_t nread; 
 			CamelStreamBuffer *server_stream;
 			gchar *tag;
 			guint taglen;
 			gboolean isnextdone = FALSE, hadr = FALSE;
 
+			nread = 0;
+
 			if (store->server_level < IMAP_LEVEL_IMAP4REV1 && !*section_text)
 				camel_imap_command_start (store, folder, ex,
-					"UID FETCH %s RFC822.PEEK",uid);
+					"UID FETCH %s RFC822.PEEK", uid);
 			else
 				camel_imap_command_start (store, folder, ex,
-					"UID FETCH %s BODY.PEEK[%s]",uid, section_text);
+					"UID FETCH %s BODY.PEEK[%s]", uid, section_text);
 
 			tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
 			taglen = strlen (tag);
@@ -3293,194 +3314,193 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 			  {
 
-			    /* It might be the line before the last line */
-			    if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
-			    {
-				    if (line[1] == '\r')
-					hadr = TRUE;
-				    isnextdone = TRUE;
-				    continue;
-			    }
+				/* It might be the line before the last line */
+				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
+				{
+					if (line[1] == '\r')
+						hadr = TRUE;
+					isnextdone = TRUE;
+					continue;
+				}
 
-			    /* It's the first line */
-			    if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
-			    {
-				    err=TRUE;
-				    break;
-			    } else if (linenum == 0) { linenum++; continue; }
+				/* It's the first line */
+				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
+					{ err=TRUE; break; } 
+				else if (linenum == 0) 
+					{ linenum++; continue; }
 
-			    /* It's the last line (isnextdone will be ignored if that is the case) */
-			    if (!strncmp (line, tag, taglen))
-				    break;
+				/* It's the last line (isnextdone will be ignored if that is the case) */
+			 	if (!strncmp (line, tag, taglen))
+					break;
 
-			    camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
+				camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
 
-			    if (isnextdone)
-			    {
-				    if (hadr)
-					    camel_stream_write (stream, ")\n", 2);
-				    else
-					    camel_stream_write (stream, ")\r\n", 3);
+				if (isnextdone)
+				{
+					if (hadr)
+						camel_stream_write (stream, ")\n", 2);
+					else
+						camel_stream_write (stream, ")\r\n", 3);
 
-				    hadr = FALSE;
-				    isnextdone = FALSE;
-			    }
+					hadr = FALSE;
+					isnextdone = FALSE;
+				}
 
-			    camel_stream_write (stream, line, strlen (line));
+				camel_stream_write (stream, line, strlen (line));
 
-			    linenum++;
-			    memset (line, 0, MAX_LINE_LEN);
+				linenum++;
+				memset (line, 0, MAX_LINE_LEN);
 			  }
-			g_free (line); line = NULL;
 
 			g_mutex_unlock (store->stream_lock);
-			/* Read the OK */
-			/*camel_imap_store_readline (store, &line, ex);*/
-			if (line) g_free (line);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
 			if (nread <= 0) 
-				handle_freeup (store, nread, ex);
-		
+				err = TRUE;
+
 			g_free (tag);
 
-	    if (err)
-		goto errorhander;
+			if (err)
+				goto errorhander;
 
-	    camel_stream_reset (stream);		   
+			camel_stream_reset (stream);
 
-	   } /* NON-BINARY */
-	
+		} /* NON-BINARY */
+
 	} else 
 	{
 
-	    /* Partial message retrieval feature gets the message like this: 
-	       { HEADER boundary 1.HEADER 1 boundary } */
+		/* Partial message retrieval feature gets the message like this: 
+		   { HEADER boundary 1.HEADER 1 boundary } */
 
-	    char *boundary = NULL;
-	    int t = 0, boundary_len = 0;
-	    const gchar *infos[2] = { "HEADER", /*"1.HEADER",*/ "1" };
+		char *boundary = NULL;
+		int t = 0, boundary_len = 0;
+		const gchar *infos[2] = { "HEADER", /*"1.HEADER",*/ "1" };
 
-	    camel_imap_message_cache_set_partial (imap_folder->cache, uid, TRUE);
+		camel_imap_message_cache_set_partial (imap_folder->cache, uid, TRUE);
 
-	    for (t=0; t < 2; t++)
-	    {
-		gboolean first = TRUE, err=FALSE;
-		gchar *line = g_malloc0 (MAX_LINE_LEN);
-		guint linenum = 0;
-		ssize_t nread; 
-		CamelStreamBuffer *server_stream;
-		gchar *tag;
-		guint taglen;
-		gboolean isnextdone = FALSE;
-
-		camel_imap_command_start (store, folder, ex,
-			"UID FETCH %s BODY.PEEK[%s]", uid, infos[t]);
-
-		tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
-		taglen = strlen (tag);
-
-		g_mutex_lock (store->stream_lock);
-
-		if (camel_imap_store_restore_stream_buffer (store))
-			server_stream = store->istream ? CAMEL_STREAM_BUFFER (store->istream) : NULL;
-		else server_stream = NULL;
-
-		if (server_stream == NULL)
-			err = TRUE;
-		else
-			store->command++;
-
-		if (server_stream) while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
+		for (t=0; t < 2; t++)
 		{
+			gboolean first = TRUE, err=FALSE;
+			gchar line[MAX_LINE_LEN];
+			guint linenum = 0; 
+			CamelStreamBuffer *server_stream;
+			gchar *tag;
+			guint taglen;
+			gboolean isnextdone = FALSE;
 
-			/* It might be the line before the last line */
-			if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
-			{
-				isnextdone = TRUE;
-				continue;
-			}
+			nread = 0;
 
-			/* It's the first line */
-			if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
-			{
-				err=TRUE;
-				break;
-			} else if (linenum == 0) { linenum++; continue; }
+			camel_imap_command_start (store, folder, ex,
+				"UID FETCH %s BODY.PEEK[%s]", uid, infos[t]);
 
-			/* It's the last line */
-			if (!strncmp (line, tag, taglen))
-			{
-				if ((t == 0 || t == 1 /* 2 */) && boundary_len > 0)
+			tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
+			taglen = strlen (tag);
+
+			g_mutex_lock (store->stream_lock);
+
+			if (camel_imap_store_restore_stream_buffer (store))
+				server_stream = store->istream ? CAMEL_STREAM_BUFFER (store->istream) : NULL;
+			else server_stream = NULL;
+
+			if (server_stream == NULL)
+				err = TRUE;
+			else
+				store->command++;
+
+			if (server_stream) 
+			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
+			  {
+
+				/* It might be the line before the last line */
+				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
+					{ isnextdone = TRUE; continue; }
+
+				/* It's the first line */
+				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
+					{ err=TRUE; break; } 
+				else if (linenum == 0) 
+					{ linenum++; continue; }
+
+				/* It's the last line */
+				if (!strncmp (line, tag, taglen))
 				{
-					camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
-					camel_stream_write (stream, "\n--", 3);
-					camel_stream_write (stream, boundary, boundary_len);
-					camel_stream_write (stream, "\n", 1);
+					if ((t == 0 || t == 1 /* 2 */) && boundary_len > 0)
+					{
+						camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
+						camel_stream_write (stream, "\n--", 3);
+						camel_stream_write (stream, boundary, boundary_len);
+						camel_stream_write (stream, "\n", 1);
+					}
+					break;
 				}
-				break;
-			}
 
-			if (t == 0 && boundary_len == 0 && !boundary)
-			{
-			   CamelContentType *ct = NULL;
-			   const char *bound=NULL;
-			   char *pstr = (char*)strcasestr (line, "Content-Type:");
+				if (t == 0 && boundary_len == 0 && !boundary)
+				{
+					CamelContentType *ct = NULL;
+					const char *bound=NULL;
+					char *pstr = (char*)strcasestr (line, "Content-Type:");
 
-			   /* If it's the Content-Type line (TODO: use BODYSTRUCTURE for this) */
+					/* If it's the Content-Type line (TODO: use BODYSTRUCTURE for this) */
 
-			   if (pstr) {
-				pstr = strchr (pstr, ':'); 
-				if (pstr) { pstr++;
-				ct = camel_content_type_decode(pstr); } 
-			   }
+					if (pstr) 
+					{
+						pstr = strchr (pstr, ':'); 
+						if (pstr) 
+						{ 
+							pstr++;
+							ct = camel_content_type_decode(pstr); 
+						} 
+					}
 
-			   if (ct) { 
-				bound = camel_content_type_param(ct, "boundary");
-				if (bound) { 
-					boundary_len = strlen (bound);
-					if (boundary_len > 0) 
-						boundary = g_strdup (bound);
-					else boundary_len = 0;
+					if (ct) 
+					{ 
+						bound = camel_content_type_param(ct, "boundary");
+						if (bound) 
+						{ 
+							boundary_len = strlen (bound);
+							if (boundary_len > 0) 
+								boundary = g_strdup (bound);
+							else 
+								boundary_len = 0;
+						}
+					}
 				}
-			   }
-			}
 
-			camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
+				camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
 
-			if (isnextdone)
+				if (isnextdone)
+				{
+					camel_stream_write (stream, ")\n", 2);
+					isnextdone = FALSE;
+				}
+
+				camel_stream_write (stream, line, strlen (line));
+
+				linenum++;
+				memset (line, 0, MAX_LINE_LEN);
+			  }
+
+			g_mutex_unlock (store->stream_lock);
+			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
+			if (nread <= 0) 
+				err = TRUE;
+
+			g_free (tag);
+
+			if (err) 
 			{
-				camel_stream_write (stream, ")\n", 2);
-				isnextdone = FALSE;
+				if (boundary_len > 0)
+					g_free (boundary);
+				goto errorhander;
 			}
-
-			camel_stream_write (stream, line, strlen (line));
-
-			linenum++;
-			memset (line, 0, MAX_LINE_LEN);
 		}
-   		g_free (line); line = NULL;
 
-		g_mutex_unlock (store->stream_lock);
-		/* Read the OK */
-		/*camel_imap_store_readline (store, &line, ex);*/
-		if (line) g_free (line);
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		if (boundary_len > 0)
+			g_free (boundary);
 
-	        if (nread <= 0) 
-		    handle_freeup (store, nread, ex);
-
-		g_free (tag);
-
-		if (err)
-			goto errorhander;
-	    
-	    }
-
-	    if (boundary_len > 0)
-	   	 g_free (boundary);
-
-	    camel_stream_reset (stream);
+		camel_stream_reset (stream);
 	}
 
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
@@ -3493,6 +3513,8 @@ errorhander:
 
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 		    _("Could not find message body in FETCH response."));
+
+	handle_freeup (store, nread, ex);
 
 	if (stream)
 		camel_object_unref (CAMEL_OBJECT (stream));
