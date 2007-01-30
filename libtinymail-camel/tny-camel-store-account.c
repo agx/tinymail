@@ -122,6 +122,9 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
+		if (apriv->service && CAMEL_IS_OBJECT (apriv->service))
+			camel_object_unref (CAMEL_OBJECT (apriv->service));
+
 		apriv->service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
