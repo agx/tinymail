@@ -55,106 +55,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-#if 0
-static TnyFolder*
-create_maildir (TnyCamelAccount *self, TnyCamelAccountPriv *apriv, const gchar *name, const gchar *url_string)
-{
-	CamelStore *store = (CamelStore*) apriv->service;
-	CamelSession *session = (CamelSession*) apriv->session;
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	gchar *full_path = (gchar*) url_string;
-	CamelStore *mdstore = NULL;
-
-	mdstore = camel_session_get_store(session, full_path, &ex);
-
-	if (!camel_exception_is_set (&ex) && mdstore)
-	{
-		CamelFolder *cfolder = NULL;
-
-		cfolder = camel_store_get_folder (mdstore, name, CAMEL_STORE_FOLDER_CREATE, &ex);
-		if (!camel_exception_is_set (&ex) && cfolder)
-		{
-			CamelFolderInfo *iter;
-
-			/* camel_object_unref (CAMEL_OBJECT (cfolder)); */
-
-			iter = camel_store_get_folder_info (mdstore, name, 
-					CAMEL_STORE_FOLDER_INFO_FAST|CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL,&ex);
-
-			if (!camel_exception_is_set (&ex) && iter)
-			{
-
-				/* This MUST be a TnyCamelPOPFolder (as that one overrides some 
-				   important methods) */
-
-				TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_pop_folder_new ());
-				TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
-
-				_tny_camel_folder_set_id (folder, iter->full_name);
-				_tny_camel_folder_set_folder_type (folder, iter);
-				_tny_camel_folder_set_unread_count (folder, iter->unread);
-				_tny_camel_folder_set_all_count (folder, iter->total);
-				_tny_camel_folder_set_name (folder, iter->name);
-				_tny_camel_folder_set_iter (folder, iter);
-				_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
-
-				fpriv->store = mdstore;
-
-				return TNY_FOLDER (folder);
-
-			} else if (iter && CAMEL_IS_STORE (mdstore))
-				camel_store_free_folder_info (mdstore, iter);
-
-		} else 
-		{
-			g_critical (_("Can't create folder \"%s\" in %s"), name, full_path);
-			if (cfolder && CAMEL_IS_OBJECT (cfolder))
-				camel_object_unref (CAMEL_OBJECT (cfolder));
-		}
-	} else 
-	{
-		g_critical (_("Can't create store on %s"), full_path);
-		if (store && CAMEL_IS_OBJECT (mdstore))
-			camel_object_unref (CAMEL_OBJECT (mdstore));
-	}
-
-	return NULL;
-}
-
-static void
-tny_camel_pop_store_account_reconnect (TnyCamelAccount *self)
-{
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
-
-	g_mutex_lock (priv->lock);
-
-	if (G_UNLIKELY (apriv->user) && G_UNLIKELY (apriv->host))
-	{
-		if (!priv->inbox)
-		{
-			gchar *maildirpath = NULL;
-			maildirpath = g_strdup_printf ("maildir://%s/pop/%s@%s/maildir",
-				apriv->cache_location, apriv->user, apriv->host);
-			priv->inbox = create_maildir (self, apriv, "inbox", maildirpath);
-			g_free (maildirpath);
-		}
-	}
-
-	g_mutex_unlock (priv->lock);
-
-	return;
-}
-
-#endif
-
-
-
-static void
-tny_camel_pop_store_account_add_option (TnyCamelAccount *self, const gchar *option)
-{
-	g_warning ("You can't use the tny_camel_account_add_option API on POP accounts");
-}
 
 static void 
 tny_camel_pop_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
@@ -168,23 +68,13 @@ tny_camel_pop_store_account_get_folders (TnyFolderStore *self, TnyList *list, Tn
 
 	g_assert (TNY_IS_LIST (list));
 
-	store = camel_session_get_store ((CamelSession*) apriv->session, 
-			apriv->url_string, &ex);
-
-	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-			camel_exception_get_description (&ex));
-		camel_exception_clear (&ex);
-
-		if (store && CAMEL_IS_OBJECT (store))
-			camel_object_unref (CAMEL_OBJECT (store));
-
+	if (!_tny_session_check_operation (apriv->session, err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 		return;
-	}
 
-	g_assert (CAMEL_IS_STORE (store));
+	g_assert (CAMEL_IS_STORE (apriv->service));
+
+	store = CAMEL_STORE (apriv->service);
 
 	folder = TNY_CAMEL_FOLDER (tny_camel_pop_folder_new ());
 
@@ -199,73 +89,7 @@ tny_camel_pop_store_account_get_folders (TnyFolderStore *self, TnyList *list, Tn
 	g_object_unref (G_OBJECT (folder));
 
 	return;
-
-
-#if 0
-	if (!priv->inbox)
-		tny_camel_pop_store_account_reconnect (TNY_CAMEL_ACCOUNT (self));
-
-	if (priv->inbox)
-	{
-		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->inbox);
-
-		if (!fpriv || !fpriv->iter)
-			goto errorh;
-
-		/* There's only one folder, would be silly if the developer filters it
-		   away. But the developer being silly doesn't mean that we shouldn't
-		   filter it away, in that case. Right? :-) */
-
-		if (_tny_folder_store_query_passes (query, fpriv->iter))
-			tny_list_prepend (list, g_object_ref (G_OBJECT (priv->inbox)));
-	} else
-		goto errorh;
-
-	return;
-
-errorh:
-
-	/* TODO: maybe use the error from the url_string and service getting? */
-	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-				"Can't get the INBOX folder");
-
-	return;
-
-
-#endif
-
 }
-
-#if 0
-static void
-tny_camel_pop_store_account_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
-{
-	GError *err = NULL;
-
-	/* There's no need to do this really async, it's just setting some 
-	   pointers right. 
-
-	   But maybe it could use a gidle in case there's a GMainLoop being used?
-
-	   With using gidle being the point that the callback should happen in the
-	   same thread as the caller, while this also causes the callback to happen
-	   in that thread, I personally don't see a point in using gidle here.
-
-	   As usual I'm of course interested in other peoples opinion on this. */
-
-	tny_camel_pop_store_account_get_folders (self, list, query, &err);
-
-	/* So, I just call the callback here  ... */
-
-	if (callback)
-		callback (self, list, &err, user_data);
-
-	if (err != NULL)
-		g_error_free (err);
-}
-
-#endif
 
 
 static void 
@@ -298,7 +122,7 @@ tny_camel_pop_store_account_new (void)
 static void
 tny_camel_pop_store_account_finalize (GObject *object)
 {
-    TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (object);
+	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (object);
 
 	g_mutex_lock (priv->lock);
 	if (priv->inbox)
@@ -320,15 +144,6 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-
-#if 0
-	TNY_CAMEL_ACCOUNT_CLASS (class)->reconnect_func = tny_camel_pop_store_account_reconnect;
-#endif
-
-	TNY_CAMEL_ACCOUNT_CLASS (class)->add_option_func = tny_camel_pop_store_account_add_option;
-#if 0
-	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->get_folders_async_func = tny_camel_pop_store_account_get_folders_async;
-#endif
 
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->get_folders_func = tny_camel_pop_store_account_get_folders;
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->remove_folder_func = tny_camel_pop_store_account_remove_folder;

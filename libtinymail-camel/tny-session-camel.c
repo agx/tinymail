@@ -55,6 +55,8 @@ gboolean camel_type_init_done = FALSE;
 
 static CamelSessionClass *ms_parent_class;
 
+static void tny_session_camel_forget_password (CamelSession *, CamelService *, const char *, const char *, CamelException *);
+
 static char *
 tny_session_camel_get_password (CamelSession *session, CamelService *service, const char *domain,
 		const char *prompt, const char *item, guint32 flags, CamelException *ex)
@@ -83,13 +85,13 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_account_get_name (account));
 		}
 		
-		/* TODO: fix this in camel-lite !
+		/* TODO: fix this in camel-lite ! */
 
 		if (!g_ascii_strncasecmp (tny_account_get_proto (account), "pop", 3))
 		{
 			if (flags & CAMEL_SESSION_PASSWORD_REPROMPT)
 				tny_session_camel_forget_password (session, service, domain, item, ex);
-		}*/
+		}
 
 		tny_lockable_lock (self->priv->ui_lock);
 		retval = func (account, prmpt, &cancel);
