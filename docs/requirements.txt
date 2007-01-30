@@ -11,6 +11,22 @@ When adding requirements here:
     automatically (for example of there's no package management on the
     platform)
 
+Debian based distributions (Ubuntu, Debian etc)
+-----------------------------------------------
+The easiest way to build tinymail is to use the Debian package builder. There
+are several ways to do that, but a common way is to run:
+    dpkg-buildpackage -rfakeroot
+If you don't have dpkg-buildpackage, install dpkg-dev. This command if
+you have any missing dependencies. Install dependency $DEP with root command
+    apt-get install $DEP
+
+Before you can build the first time, you must choose the control file for your
+distribution. The control files have names debian/control.debian-unstable,
+debian/control.ubuntu-edgy and so on. If you run Debian Unstable, link with
+    ln -s debian/control.debian-unstable debian/control
+
+All Debian specific files reside in debian/.
+
 Ubuntu Edgy, Dapper, etc etc
 ----------------------------
 On a standard Ubuntu Edgy or Dapper all you have to do to get yourself a more
