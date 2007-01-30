@@ -24,6 +24,10 @@ Before you can build the first time, you must choose the control file for your
 distribution. The control files have names debian/control.debian-unstable,
 debian/control.ubuntu-edgy and so on. If you run Debian Unstable, link with
     ln -s debian/control.debian-unstable debian/control
+You must do something similar with the rules file
+    ln -s debian/control.debian debian/control
+And you must also make sure ./autogen.sh is run the first time after checkout
+from svn.
 
 All Debian specific files reside in debian/.
 
