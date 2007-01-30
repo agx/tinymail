@@ -28,6 +28,8 @@
  * USA
  */
 
+#define MAX_LINE_LEN 65535 
+
 #include <config.h> 
 
 #include <stdlib.h>
@@ -3178,7 +3180,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	if (type & CAMEL_FOLDER_RECEIVE_FULL)
 	{
 	    gboolean first = TRUE, err=FALSE;
-	    gchar line[512];
+	    gchar *line = g_malloc0 (MAX_LINE_LEN);
 	    guint linenum = 0;
 	    ssize_t nread; 
 	    CamelStreamBuffer *server_stream;
@@ -3209,7 +3211,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	    else
 		store->command++;
 
-	    if (server_stream) while (nread = camel_stream_buffer_gets (server_stream, line, 512) > 0)
+	    if (server_stream) while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 	    {
 
 		    /* It might be the line before the last line */
@@ -3248,7 +3250,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		    camel_stream_write (stream, line, strlen (line));
 
 		    linenum++;
+		    memset (line, 0, MAX_LINE_LEN);
 	    }
+	    g_free (line);
 
 	    g_mutex_unlock (store->stream_lock);
 	    CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
@@ -3279,7 +3283,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	    for (t=0; t < 2; t++)
 	    {
 		gboolean first = TRUE, err=FALSE;
-		gchar line[512];
+		gchar *line = g_malloc0 (MAX_LINE_LEN);
 		guint linenum = 0;
 		ssize_t nread; 
 		CamelStreamBuffer *server_stream;
@@ -3304,7 +3308,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		else
 			store->command++;
 
-		if (server_stream) while (nread = camel_stream_buffer_gets (server_stream, line, 512) > 0)
+		if (server_stream) while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 		{
 
 			/* It might be the line before the last line */
@@ -3370,8 +3374,10 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			camel_stream_write (stream, line, strlen (line));
 
 			linenum++;
+			memset (line, 0, MAX_LINE_LEN);
 		}
 		g_mutex_unlock (store->stream_lock);
+		g_free (line);
 
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
