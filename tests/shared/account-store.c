@@ -89,7 +89,7 @@ tny_test_account_store_get_cache_dir (TnyAccountStore *self)
 			} else 
 				me->cache_dir = str;
 			att++;
-		} while (dir != NULL);          
+		} while (dir != NULL);
 	}
     
 	return me->cache_dir;
@@ -145,6 +145,11 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 		g_object_unref (G_OBJECT (account));
 	}
 
+	if (me->force_online)
+		tny_device_force_online (me->device);
+	else
+		tny_device_force_offline (me->device);
+
 	return;
 }
 
@@ -163,12 +168,10 @@ tny_test_account_store_new (gboolean force_online, const gchar *cachedir)
 	}
 
 	self->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
+	tny_session_camel_set_async_connecting (self->session, FALSE);
+
 	self->force_online = force_online;
 
-	if (self->force_online)
-		tny_device_force_online (self->device);
-	else
-		tny_device_force_offline (self->device);
 
 	return TNY_ACCOUNT_STORE (self);
 }

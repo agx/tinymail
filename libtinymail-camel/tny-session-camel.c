@@ -54,156 +54,6 @@
 gboolean camel_type_init_done = FALSE;
 
 static CamelSessionClass *ms_parent_class;
-static GList *password_funcs = NULL;
-static GList *forget_password_funcs = NULL;
-
-typedef struct
-{
-	CamelService *service;
-	TnyGetPassFunc func;
-	TnyAccount *account;
-
-} PrivPassFunc;
-
-typedef struct
-{
-	CamelService *service;
-	TnyForgetPassFunc func;
-	TnyAccount *account;
-
-} PrivForgetPassFunc;
-
-static void
-tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex);
-
-/**
- * tny_session_camel_set_forget_pass_func:
- * @self: a #TnySessionCamel object
- * @account: the #TnyAccount account instance
- * @get_forget_pass_func: The function that will forget the password for the account
- *
- * For each account you can set a password handler. This makes it possible to
- * use your own password-store implementation for storing passwords. You set
- * the handler that tells that store to forget the password, using this method.
- *
- * It's recommended to also memset (buffer, 0, len) the memory where the
- * password was stored. You can do it in the forget_pass_func handler.
- *
- **/
-void
-tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc get_forget_pass_func)
-{
-	GList *copy = forget_password_funcs, *mark_del = NULL;
-	PrivForgetPassFunc *pf;
-	gboolean found = FALSE;
-	CamelService *service = (CamelService*)_tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (account));
-
-	while (G_LIKELY (copy))
-	{
-		pf = copy->data;
-
-		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL))
-		{
-			mark_del = g_list_prepend (mark_del, copy);
-			copy = g_list_next (copy);
-			continue;
-		}
-
-		if (G_UNLIKELY (pf->service == service))
-		{
-			found = TRUE;
-			break;
-		}
-
-		copy = g_list_next (copy);
-	}
-
-	if (G_UNLIKELY (!found))
-		pf = g_new0 (PrivForgetPassFunc, 1);
-
-	pf->account = account;
-	pf->func = get_forget_pass_func;
-	pf->service = service;
-
-	if (G_UNLIKELY (!found))
-		forget_password_funcs = g_list_prepend (forget_password_funcs, pf);
-
-	if (G_UNLIKELY (mark_del)) 
-	{
-		while (G_LIKELY (mark_del))
-		{
-			forget_password_funcs = g_list_remove (forget_password_funcs, mark_del->data);
-			mark_del = g_list_next (mark_del);
-		}
-
-		g_list_free (mark_del);
-	}
-
-	return;
-}
-
-/**
- * tny_session_camel_set_pass_func:
- * @self: a #TnySessionCamel object
- * @account: the #TnyAccount account instance
- * @get_pass_func: The function that will return the password for the account
- *
- * For each account you can set a password handler. This makes it possible to
- * use your own password-store implementation for storing passwords. You set
- * that password handler method using this method.
- *
- **/
-void
-tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func)
-{
-	GList *copy = password_funcs, *mark_del = NULL;
-	PrivPassFunc *pf;
-	gboolean found = FALSE;
-	CamelService *service = (CamelService*)_tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (account));
-
-	while (G_LIKELY (copy))
-	{
-		pf = copy->data;
-
-		if (G_UNLIKELY (pf->service == NULL) || G_UNLIKELY (pf->account == NULL) ||
-			!CAMEL_IS_SERVICE (pf->service) || !TNY_IS_ACCOUNT (pf->account))
-		{
-			mark_del = g_list_prepend (mark_del, copy);
-			copy = g_list_next (copy);
-			continue;
-		}
-
-		if (G_UNLIKELY (pf->service == service))
-		{
-			found = TRUE;
-			break;
-		}
-
-		copy = g_list_next (copy);
-	}
-
-	if (G_UNLIKELY (!found))
-		pf = g_new0 (PrivPassFunc, 1);
-
-	pf->account = account;
-	pf->func = get_pass_func;
-	pf->service = service;
-
-	if (G_UNLIKELY (!found))
-		password_funcs = g_list_prepend (password_funcs, pf);
-
-	if (G_UNLIKELY (mark_del))
-	{
-		while (G_LIKELY (mark_del))
-		{
-			password_funcs = g_list_remove (password_funcs, mark_del->data);
-			mark_del = g_list_next (mark_del);
-		}
-		g_list_free (mark_del);
-	}
-
-	return;
-}
 
 static char *
 tny_session_camel_get_password (CamelSession *session, CamelService *service, const char *domain,
@@ -212,30 +62,20 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	TnySessionCamel *self = (TnySessionCamel *) session;
 	TnySessionCamelPriv *priv = self->priv;
 
-	GList *copy = password_funcs;
 	TnyGetPassFunc func;
 	TnyAccount *account;
-	gboolean found = FALSE, freeprmpt = FALSE, cancel = FALSE;
+	gboolean freeprmpt = FALSE, cancel = FALSE;
 	gchar *retval = NULL, *prmpt = (gchar*)prompt;
-	GThread *thread;
 
-	while (G_LIKELY (copy))
+	account = service->data;
+	if (account)
 	{
-		PrivPassFunc *pf = copy->data;
 
-		if (G_UNLIKELY (pf->service == service) && pf->account)
-		{
-			found = TRUE;
-			func = pf->func;
-			account = pf->account;
-			break;
-		}
+		func = tny_account_get_pass_func (account);
 
-		copy = g_list_next (copy);
-	}
+		if (!func)
+			return g_strdup ("");
 
-	if (G_LIKELY (found))
-	{
 		if (prmpt == NULL)
 		{
 			freeprmpt = TRUE;
@@ -264,6 +104,8 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 			_("You cancelled when you had to enter a password"));
 		retval = NULL;
 	}
+
+emptypass:
 
 	return retval;
 }
@@ -297,28 +139,18 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	TnySessionCamel *self = (TnySessionCamel *)session;
 	TnySessionCamelPriv *priv = self->priv;
 
-	GList *copy = forget_password_funcs;
 	TnyForgetPassFunc func;
 	TnyAccount *account;
-	gboolean found = FALSE;
-	GThread *thread;
 
-	while (G_LIKELY (copy))
+	account = service->data;
+
+	if (account)
 	{
-		PrivForgetPassFunc *pf = copy->data;
+		func = tny_account_get_forget_pass_func (account);
 
-		if (G_UNLIKELY (pf->service == service) && pf->account)
-		{
-			found = TRUE;
-			func = pf->func;
-			account = pf->account;
-			break;
-		}
-		copy = g_list_next (copy);
-	}
+		if (!func)
+			return;
 
-	if (G_LIKELY (found))
-	{
 		tny_lockable_lock (self->priv->ui_lock);
 		func (account);
 		tny_lockable_unlock (self->priv->ui_lock);
@@ -489,6 +321,21 @@ tny_session_camel_ms_thread_status (CamelSession *session, CamelSessionThreadMsg
 	return;
 }
 
+/**
+ * tny_session_camel_set_async_connecting:
+ * @self: a #TnySessionCamel object
+ * @enable: Whether or not to asynchronously connect
+ *
+ * Set connection strategy
+ **/
+void 
+tny_session_camel_set_async_connecting (TnySessionCamel *self, gboolean enable)
+{
+	g_mutex_lock (self->priv->conlock);
+	self->priv->async_connect = enable;
+	g_mutex_unlock (self->priv->conlock);
+}
+
 
 static void
 tny_session_camel_init (TnySessionCamel *instance)
@@ -506,6 +353,8 @@ tny_session_camel_init (TnySessionCamel *instance)
 	priv->camel_dir = NULL;
 	priv->in_auth_function = FALSE;
 	priv->is_connecting = FALSE;
+	priv->async_connect = TRUE;
+
 	return;
 }
 
@@ -649,9 +498,10 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	priv->conthread = g_thread_create (background_connect_thread, info, TRUE, NULL);
-
-	/* background_connect_thread (info); */
+	if (priv->async_connect)
+		priv->conthread = g_thread_create (background_connect_thread, info, TRUE, NULL);
+	else
+		background_connect_thread (info);
 
 	return;
 }

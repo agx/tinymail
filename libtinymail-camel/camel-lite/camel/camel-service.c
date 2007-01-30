@@ -91,7 +91,8 @@ static void
 camel_service_init (void *o, void *k)
 {
 	CamelService *service = o;
-	
+
+	service->data = NULL;
 	service->priv = g_malloc0(sizeof(*service->priv));
 	g_static_rec_mutex_init(&service->priv->connect_lock);
 	g_static_mutex_init(&service->priv->connect_op_lock);
@@ -118,7 +119,8 @@ camel_service_finalize (CamelObject *object)
 		camel_url_free (service->url);
 	if (service->session)
 		camel_object_unref (service->session);
-	
+	service->data = NULL;
+
 	g_static_rec_mutex_free (&service->priv->connect_lock);
 	g_static_mutex_free (&service->priv->connect_op_lock);
 	

@@ -121,18 +121,17 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self)
 	/* camel_session_get_service can launch GUI things */
 	if (apriv->session)
 	{
+		CamelService *oservice = apriv->service;
+
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
-
-		if (apriv->service) 
-		{
-			camel_object_unref (CAMEL_OBJECT (apriv->service));
-			apriv->service = NULL;
-		}
 
 		apriv->service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
+
+		if (apriv->service)
+			apriv->service->data = self;
 
 	} else {
 		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,

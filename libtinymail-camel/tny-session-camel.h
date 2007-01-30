@@ -48,12 +48,11 @@ struct _TnySessionCamelClass
 
 CamelType tny_session_camel_get_type (void);
 
-void tny_session_camel_set_pass_func (TnySessionCamel *self, TnyAccount *account, TnyGetPassFunc get_pass_func);
-void tny_session_camel_set_forget_pass_func (TnySessionCamel *self, TnyAccount *account, TnyForgetPassFunc get_forget_pass_func);
 void tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store);
 void tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device);
 void tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_lock);
 void tny_session_camel_join_connecting (TnySessionCamel *self);
+void tny_session_camel_set_async_connecting (TnySessionCamel *self, gboolean enable);
 
 G_END_DECLS
 

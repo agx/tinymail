@@ -72,6 +72,7 @@ struct _CamelService {
 	CamelServiceConnectionStatus status;
 	CamelOperation *connect_op;
 	CamelURL *url;
+	gpointer data;
 };
 
 typedef struct {

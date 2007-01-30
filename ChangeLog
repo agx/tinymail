@@ -1,6 +1,7 @@
 2007-01-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Little bugfix. Max line size of an E-mail is now MAX_LINE_SIZE
+	* Cleaning up old code, fixing bug in the tny-session-camel.c
 
 2007-01-29 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 

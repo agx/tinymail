@@ -472,7 +472,6 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	tny_session_camel_set_pass_func (priv->session, self, get_pass_func);
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
@@ -496,7 +495,6 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	tny_session_camel_set_forget_pass_func (priv->session, self, get_forget_pass_func);
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
@@ -670,6 +668,8 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->get_pass_func = NULL;
+	priv->forget_pass_func = NULL;
 	priv->port = -1;
 	priv->cache_location = NULL;
 	priv->service = NULL;
