@@ -2,10 +2,13 @@
 
 	* Little bugfix. Max line size of an E-mail is now MAX_LINE_SIZE
 	* Cleaning up old code, fixing bug in the tny-session-camel.c
+	* Cleaned up the support for POP3 in tny-camel-pop-store-account.c
+		* Cleaned up the connecting
+		* Cleaned up the disabled old code
 
-2007-01-29 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+2007-01-29  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
-	* Implement tny-maemo-device (first version)
+	* Implemented tny-maemo-device (first version)
 
 2007-01-29  Philip Van Hoof  <pvanhoof@gnome.org>
 
