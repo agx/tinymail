@@ -371,8 +371,6 @@ _tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
 	apriv->cache_location = g_strdup (priv->camel_dir);
 
 	priv->current_accounts = g_list_prepend (priv->current_accounts, account);
-
-	/* TODO: Register forget and get passwords here maybe? */
 }
 
 void 
@@ -386,8 +384,6 @@ _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *accou
 	apriv->cache_location = NULL;
 
 	priv->current_accounts = g_list_remove (priv->current_accounts, account);
-
-	/* TODO: forget and get pass funcs cleanup */
 
 	return;
 }

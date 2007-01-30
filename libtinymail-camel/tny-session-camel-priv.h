@@ -16,7 +16,6 @@ struct _TnySessionCamelPriv
 	GThread *conthread;
 };
 
-void _tny_session_camel_fixup (TnySessionCamel *self, CamelService *oservice, TnyAccount *account);
 void _tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account);
 void _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account);
 
