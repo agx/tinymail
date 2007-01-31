@@ -348,6 +348,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 
 	priv->conlock = g_mutex_new ();
 	priv->conthread = NULL;
+	priv->current_accounts = NULL;
 	priv->prev_constat = FALSE;
 	priv->device = NULL;
 	priv->camel_dir = NULL;
@@ -399,7 +400,6 @@ static void
 foreach_account_set_connectivity (gpointer data, gpointer udata)
 {
 	BackgroundConnectInfo *info = udata;
-	gboolean online = (gboolean)udata;
 	CamelSession *session = info->user_data;
 
 	if (data && TNY_IS_CAMEL_ACCOUNT (data))
@@ -409,7 +409,7 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 		_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (data), &err);
 
 		if (err == NULL)
-			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (data), !online, &err);
+			tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (data), !info->online, &err);
 
 		if (err != NULL) 
 		{

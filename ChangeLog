@@ -1,3 +1,8 @@
+2007-01-31  Sergio Villar Senin <svillar@igalia.com>
+
+	* libtinymail-camel/tny-session-camel: fixed some wrong
+	initializations
+
 2007-01-31  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Support for BINARY responses from IMAP servers that have the BINARY
