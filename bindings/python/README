@@ -1,8 +1,8 @@
 What will happen
 ----------------
 
-The generator will generate a binding for libtinymail, libtinymailui and the
-selected platform library $(PLATFORMDIR)
+The generator will generate a binding for libtinymail, libtinymailui, the
+selected platform library $(PLATFORMDIR) and libtinymail-camel.
 
 o. It will first use h2def.py to generate out of the .h files of each target
 a list of defines to the standard output
