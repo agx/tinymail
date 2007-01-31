@@ -124,6 +124,9 @@ camel_store_summary_finalise (CamelObject *obj)
 
 	g_free(s->summary_path);
 
+	if (s->uri_base)
+                camel_url_free(s->uri_base);
+
 	g_mutex_free(p->summary_lock);
 	g_mutex_free(p->io_lock);
 	g_mutex_free(p->ref_lock);
