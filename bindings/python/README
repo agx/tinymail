@@ -12,10 +12,6 @@ also read a .defs.extra file. It will avoid duplicate defines where it will
 prefer the define in the .defs.extra file. It will also append all the other
 defines of the .defs.extra file to the standard output
 
-o. The filter.py script will also replace "define-object (.*)Iface" with 
-"define-interface ".$1."Iface". In tinymail, type-names ending on "Iface"
-are always interfaces.
-
 o. The standard output is set to $@ in the Makefile.am. It generates tinymail.defs,
 tinymailui.defs, tinymailui-gtk.defs and tinymail-platform.defs
 
