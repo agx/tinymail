@@ -33,25 +33,7 @@ Run all unit tests with 'make check'.
 Building tips
 =============
 
-Camel-lite via camel-lite-builder
----------------------------------
-More info: http://tinymail.org/trac/camel-lite-builder. Camel-lite is a lite
-version of Camel that you can build using camel-lite-builder.
-
-Install firefox-nspr and firefox-nns (or the mozilla equivalents) to have
-a Camel with SSL and NSS support. Else use --enable-ssl=no and --enable-ssl=no
-when building Camel using the camel-lite-builder. But make sure that you also
-read the buildme.txt file in the root of the camel-lite-builder source tree.
-
-You can also compile using your platform's camel-dev(el) packages. But then
-you'll be using a camel as shipped with Evolution or evolution-devel or
-evolution-data-server(-devel) which is a quite large package comared to what
-you really need (which camel-lite extracts).
-
-Other
------
-
-Also checkout docs/building.txt !
+Checkout docs/building.txt 
 
 You can set the CFLAGS="-DDEVEL" environment variable to enable a debug build.
 
