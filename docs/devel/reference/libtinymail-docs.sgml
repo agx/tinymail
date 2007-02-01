@@ -118,7 +118,7 @@
     <title>API Reference</title>
 
 	<chapter id="libtinymail">
-		<title>libtinymail</title>
+		<title>libtinymail - main abstraction library</title>
 		&libtinymail-TnyAccountStore;
 		&libtinymail-TnyFolderStore;
 		&libtinymail-TnyFolderStoreQuery;
@@ -148,7 +148,7 @@
 		&libtinymail-TnyShared;
 	</chapter>
 
-	<chapter id="libtinymailui">
+	<chapter id="libtinymailui - ui abstraction library">
 		<title>libtinymailui</title>
 		&libtinymailui-TnyAccountStoreView;
 		&libtinymailui-TnyHeaderView;
@@ -162,7 +162,7 @@
 		&libtinymailui-TnyMimePartSaver;
 	</chapter>
 
-	<chapter id="libtinymailui-gtk">
+	<chapter id="libtinymailui-gtk - an optional ui implementation library">
 	<title>libtinymailui-gtk</title>
 		&libtinymailui-gtk-TnyGtkMsgView;
 		&libtinymailui-gtk-TnyGtkMsgWindow;
@@ -179,12 +179,12 @@
 		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 
-        <chapter id="libtinymail-gnomevfs">
+        <chapter id="libtinymail-gnomevfs - an optional implementation library">
                 <title>libtinymail-gnomevfs</title>
                 &libtinymail-gnomevfs-TnyVfsStream;
         </chapter>
 
-	<chapter id="libtinymailui-mozembed">
+	<chapter id="libtinymailui-mozembed - an optional ui implementation library">
 	<title>libtinymailui-mozembed</title>
 		&libtinymailui-mozembed-TnyMozEmbedMsgView;
 		&libtinymailui-mozembed-TnyMozEmbedStream;
@@ -192,7 +192,7 @@
 	</chapter>
 
 	<chapter id="libtinymail-gnome-desktop">
-	<title>libtinymail-gnome-desktop</title>
+	<title>libtinymail-gnome-desktop - implementations for a gnome desktop</title>
 		&libtinymail-gnome-desktop-TnyGnomeAccountStore;
 		&libtinymail-gnome-desktop-TnyGnomePasswordDialog;
 		&libtinymail-gnome-desktop-TnyGnomePlatformFactory;
@@ -200,7 +200,7 @@
 	</chapter>
 
 	<chapter id="libtinymail-camel">
-		<title>libtinymail-camel</title>
+		<title>libtinymail-camel - implementation of the main library</title>
 		&libtinymail-camel-TnyCamelAccount;
 		&libtinymail-camel-TnyCamelStoreAccount;
 		&libtinymail-camel-TnyCamelIMAPStoreAccount;
