@@ -49,8 +49,11 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @current_accounts: 
 @camel_dir: 
 @in_auth_function: 
+@is_connecting: 
+@async_connect: 
 @ui_lock: 
-@colock: 
+@conlock: 
+@conthread: 
 
 <!-- ##### STRUCT TnySessionCamel ##### -->
 <para>
@@ -59,26 +62,6 @@ develop against the #TnyAccountStore interface API using an instance of their im
 
 @parent_object: 
 @priv: 
-
-<!-- ##### FUNCTION tny_session_camel_set_pass_func ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
-@get_pass_func: 
-
-
-<!-- ##### FUNCTION tny_session_camel_set_forget_pass_func ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
-@get_forget_pass_func: 
-
 
 <!-- ##### FUNCTION tny_session_camel_set_account_store ##### -->
 <para>
@@ -105,5 +88,22 @@ develop against the #TnyAccountStore interface API using an instance of their im
 
 @self: 
 @ui_lock: 
+
+
+<!-- ##### FUNCTION tny_session_camel_join_connecting ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_async_connecting ##### -->
+<para>
+
+</para>
+
+@self: 
+@enable: 
 
 

@@ -148,8 +148,8 @@
 		&libtinymail-TnyShared;
 	</chapter>
 
-	<chapter id="libtinymailui - ui abstraction library">
-		<title>libtinymailui</title>
+	<chapter id="libtinymailui">
+		<title>libtinymailui - ui abstraction library</title>
 		&libtinymailui-TnyAccountStoreView;
 		&libtinymailui-TnyHeaderView;
 		&libtinymailui-TnyMsgView;
@@ -162,8 +162,8 @@
 		&libtinymailui-TnyMimePartSaver;
 	</chapter>
 
-	<chapter id="libtinymailui-gtk - an optional ui implementation library">
-	<title>libtinymailui-gtk</title>
+	<chapter id="libtinymailui-gtk">
+	<title>libtinymailui-gtk - an optional ui implementation library</title>
 		&libtinymailui-gtk-TnyGtkMsgView;
 		&libtinymailui-gtk-TnyGtkMsgWindow;
 		&libtinymailui-gtk-TnyGtkHeaderView;
@@ -179,13 +179,13 @@
 		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 
-        <chapter id="libtinymail-gnomevfs - an optional implementation library">
-                <title>libtinymail-gnomevfs</title>
+        <chapter id="libtinymail-gnomevfs">
+                <title>libtinymail-gnomevfs - an optional implementation library</title>
                 &libtinymail-gnomevfs-TnyVfsStream;
         </chapter>
 
-	<chapter id="libtinymailui-mozembed - an optional ui implementation library">
-	<title>libtinymailui-mozembed</title>
+	<chapter id="libtinymailui-mozembed">
+	<title>libtinymailui-mozembed - an optional ui implementation library</title>
 		&libtinymailui-mozembed-TnyMozEmbedMsgView;
 		&libtinymailui-mozembed-TnyMozEmbedStream;
 		&libtinymailui-mozembed-TnyMozEmbedHtmlMimePartView;

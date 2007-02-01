@@ -39,9 +39,11 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @is_connected_func: 
 @set_id_func: 
 @set_name_func: 
+@set_mech_func: 
 @set_proto_func: 
 @set_user_func: 
 @set_hostname_func: 
+@set_port_func: 
 @set_url_string_func: 
 @set_pass_func_func: 
 @set_forget_pass_func_func: 
@@ -49,9 +51,11 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @get_forget_pass_func_func: 
 @get_id_func: 
 @get_name_func: 
+@get_mech_func: 
 @get_proto_func: 
 @get_user_func: 
 @get_hostname_func: 
+@get_port_func: 
 @get_url_string_func: 
 @get_account_type_func: 
 
@@ -90,6 +94,15 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @name: 
 
 
+<!-- ##### FUNCTION tny_account_set_mech ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+
+
 <!-- ##### FUNCTION tny_account_set_proto ##### -->
 <para>
 
@@ -115,6 +128,15 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 
 @self: 
 @host: 
+
+
+<!-- ##### FUNCTION tny_account_set_port ##### -->
+<para>
+
+</para>
+
+@self: 
+@port: 
 
 
 <!-- ##### FUNCTION tny_account_set_pass_func ##### -->
@@ -162,6 +184,15 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_account_get_mech ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_account_get_proto ##### -->
 <para>
 
@@ -181,6 +212,15 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 
 
 <!-- ##### FUNCTION tny_account_get_hostname ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_get_port ##### -->
 <para>
 
 </para>

@@ -31,6 +31,7 @@ tny-camel-account-priv
 @user: 
 @host: 
 @proto: 
+@mech: 
 @get_pass_func: 
 @forget_pass_func: 
 @pass_func_set: 
@@ -43,7 +44,9 @@ tny-camel-account-priv
 @name: 
 @options: 
 @cache_location: 
+@port: 
 @account_type: 
+@custom_url_string: 
 
 <!-- ##### MACRO TNY_CAMEL_ACCOUNT_GET_PRIVATE ##### -->
 <para>

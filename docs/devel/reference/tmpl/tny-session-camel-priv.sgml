@@ -31,6 +31,9 @@ tny-session-camel-priv
 @current_accounts: 
 @camel_dir: 
 @in_auth_function: 
+@is_connecting: 
+@async_connect: 
 @ui_lock: 
-@colock: 
+@conlock: 
+@conthread: 
 

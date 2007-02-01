@@ -217,9 +217,11 @@ Shared include file with forward typedefs
 @is_connected_func: 
 @set_id_func: 
 @set_name_func: 
+@set_mech_func: 
 @set_proto_func: 
 @set_user_func: 
 @set_hostname_func: 
+@set_port_func: 
 @set_url_string_func: 
 @set_pass_func_func: 
 @set_forget_pass_func_func: 
@@ -227,9 +229,11 @@ Shared include file with forward typedefs
 @get_forget_pass_func_func: 
 @get_id_func: 
 @get_name_func: 
+@get_mech_func: 
 @get_proto_func: 
 @get_user_func: 
 @get_hostname_func: 
+@get_port_func: 
 @get_url_string_func: 
 @get_account_type_func: 
 
@@ -483,20 +487,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
