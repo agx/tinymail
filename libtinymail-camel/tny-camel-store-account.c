@@ -249,7 +249,8 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 			   tny_folder_get_name (folder), 
 			   camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
-	} else {
+	} else 
+	{
 		/* Sync */
 		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), subscribe);
 		
@@ -260,7 +261,7 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	camel_object_unref (CAMEL_OBJECT (cfolder));
 
 cleanup:
-    	camel_object_unref (CAMEL_OBJECT (store));
+	camel_object_unref (CAMEL_OBJECT (store));
 }
 
 static void
