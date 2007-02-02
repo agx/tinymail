@@ -242,7 +242,8 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	else
 		camel_store_unsubscribe_folder (store, folder_full_name, &ex);
 
-	if (camel_exception_is_set (&ex)) {
+	if (camel_exception_is_set (&ex)) 
+	{
 		g_warning (N_("Could not %s folder %s: %s\n"),
 			   subscribe ? _("subscribe to") : _("unsubscribe"),
 			   tny_folder_get_name (folder), 
