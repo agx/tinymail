@@ -1,4 +1,10 @@
-2007-01-31 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+2007-02-02  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* CamelDiscoStore and CamelDiscoFolder implementation of the POP3
+	provider of camel-lite. This means that the POP3 support now supports
+	offline viewing E-mails
+
+2007-01-31  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
 	* fix some camel leaks
 

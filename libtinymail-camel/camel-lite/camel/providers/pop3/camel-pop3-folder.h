@@ -31,7 +31,8 @@ extern "C" {
 #pragma }
 #endif /* __cplusplus }*/
 
-#include "camel-folder.h"
+#include <camel/camel-folder.h>
+#include <camel/camel-disco-folder.h>
 
 #define CAMEL_POP3_FOLDER_TYPE     (camel_pop3_folder_get_type ())
 #define CAMEL_POP3_FOLDER(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_POP3_FOLDER_TYPE, CamelPOP3Folder))
@@ -50,7 +51,7 @@ typedef struct {
 } CamelPOP3FolderInfo;
 
 typedef struct {
-	CamelFolder parent_object;
+	CamelDiscoFolder parent_object;
 
 	GPtrArray *uids;
 	GHashTable *uids_uid;	/* messageinfo by uid */
@@ -58,7 +59,7 @@ typedef struct {
 } CamelPOP3Folder;
 
 typedef struct {
-	CamelFolderClass parent_class;
+	CamelDiscoFolderClass parent_class;
 
 	/* Virtual methods */	
 	

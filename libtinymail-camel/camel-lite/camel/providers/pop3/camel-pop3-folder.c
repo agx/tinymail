@@ -39,6 +39,7 @@
 #include "camel-operation.h"
 #include "camel-data-cache.h"
 #include "camel-i18n.h"
+#include "camel-disco-diary.h"
 
 #include <libedataserver/md5-utils.h>
 
@@ -49,6 +50,7 @@
 
 #define CF_CLASS(o) (CAMEL_FOLDER_CLASS (CAMEL_OBJECT_GET_CLASS(o)))
 static CamelFolderClass *parent_class;
+static CamelDiscoFolderClass *disco_folder_class = NULL;
 
 static void pop3_finalize (CamelObject *object);
 static void pop3_refresh_info (CamelFolder *folder, CamelException *ex);
@@ -59,42 +61,6 @@ static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid,
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
 static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex);
 
-static void
-camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
-{
-	CamelFolderClass *camel_folder_class = CAMEL_FOLDER_CLASS(camel_pop3_folder_class);
-	
-	parent_class = CAMEL_FOLDER_CLASS(camel_folder_get_type());
-	
-	/* virtual method overload */
-	camel_folder_class->refresh_info = pop3_refresh_info;
-	camel_folder_class->sync = pop3_sync;
-	
-	camel_folder_class->get_message_count = pop3_get_message_count;
-	camel_folder_class->get_uids = pop3_get_uids;
-	camel_folder_class->free_uids = camel_folder_free_shallow;
-	
-	camel_folder_class->get_message = pop3_get_message;
-	camel_folder_class->set_message_flags = pop3_set_message_flags;
-}
-
-CamelType
-camel_pop3_folder_get_type (void)
-{
-	static CamelType camel_pop3_folder_type = CAMEL_INVALID_TYPE;
-	
-	if (!camel_pop3_folder_type) {
-		camel_pop3_folder_type = camel_type_register (CAMEL_FOLDER_TYPE, "CamelPOP3Folder",
-							      sizeof (CamelPOP3Folder),
-							      sizeof (CamelPOP3FolderClass),
-							      (CamelObjectClassInitFunc) camel_pop3_folder_class_init,
-							      NULL,
-							      NULL,
-							      (CamelObjectFinalizeFunc) pop3_finalize);
-	}
-	
-	return camel_pop3_folder_type;
-}
 
 static void 
 destroy_lists (CamelPOP3Folder *pop3_folder)
@@ -154,7 +120,7 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 
 	camel_folder_construct (folder, parent, "inbox", "inbox");
 
-	summary_file = g_strdup_printf ("%s/summary.mmap", p3store->root);
+	summary_file = g_strdup_printf ("%s/summary.mmap", p3store->storage_path);
 	folder->summary = camel_folder_summary_new (folder);
 	folder->summary->set_extra_flags_func = camel_pop3_summary_set_extra_flags;
 	camel_folder_summary_set_build_content (folder->summary, TRUE);
@@ -166,6 +132,7 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 		camel_folder_summary_save (folder->summary);
 		camel_folder_summary_load (folder->summary);
 	}
+
 	g_free (summary_file);
 
 
@@ -293,6 +260,11 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, hcnt = 0;
 
+	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
+		return;
+
+	if (pop3_store->engine == NULL)
+		return;
 
 	destroy_lists (pop3_folder);
 
@@ -301,17 +273,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	/* only used during setup */
 	pop3_folder->uids_id = g_hash_table_new(NULL, NULL);
 
-	/* TNY TODO: Implement this correctly with CamelDiscoFolder */
-	if (pop3_store->engine == NULL)
-		return;
-
 	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
-	#warning FIXME
-	if (!pop3_store->engine) {
-		g_warning ("FIXME: pop3_store->engine == NULL in %s", __FUNCTION__);
-		return;
-	}
 
 	pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
@@ -698,6 +661,25 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
 
+	stream = camel_data_cache_get(pop3_store->cache, "cache", uid, NULL);
+	if (stream)
+	{
+		message = camel_mime_message_new ();
+		if (camel_data_wrapper_construct_from_stream((CamelDataWrapper *)message, stream) == -1) {
+			if (errno == EINTR)
+				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
+			else
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+						      _("Cannot get message %s: %s"),
+						      uid, g_strerror (errno));
+			camel_object_unref((CamelObject *)message);
+			message = NULL;
+		}
+
+		camel_object_unref (CAMEL_OBJECT (stream));
+		return message;
+	}
+
 	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
 	if (fi == NULL) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
@@ -1024,4 +1006,173 @@ pop3_get_uids (CamelFolder *folder)
 	}
 	
 	return uids;
+}
+
+
+static void
+pop3_sync_offline (CamelFolder *folder, CamelException *ex)
+{
+	camel_folder_summary_save (folder->summary);
+}
+
+static void
+pop3_sync_online (CamelFolder *folder, CamelException *ex)
+{
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+
+	pop3_sync_offline (folder, ex);
+
+	return;
+}
+
+static void
+pop3_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *ex)
+{
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+
+	return;
+}
+
+
+static int
+uid_compar (const void *va, const void *vb)
+{
+	const char **sa = (const char **)va, **sb = (const char **)vb;
+	unsigned long a, b;
+
+	a = strtoul (*sa, NULL, 10);
+	b = strtoul (*sb, NULL, 10);
+	if (a < b)
+		return -1;
+	else if (a == b)
+		return 0;
+	else
+		return 1;
+}
+
+static void
+pop3_expunge_uids_offline (CamelFolder *folder, GPtrArray *uids, CamelException *ex)
+{
+	CamelFolderChangeInfo *changes;
+	int i;
+	
+	qsort (uids->pdata, uids->len, sizeof (void *), uid_compar);
+	
+	changes = camel_folder_change_info_new ();
+	
+	for (i = 0; i < uids->len; i++) {
+		camel_folder_summary_remove_uid (folder->summary, uids->pdata[i]);
+		camel_folder_change_info_remove_uid (changes, uids->pdata[i]);
+		/* We intentionally don't remove it from the cache because
+		 * the cached data may be useful in replaying a COPY later.
+		 */
+	}
+	camel_folder_summary_save (folder->summary);
+
+	camel_disco_diary_log (CAMEL_DISCO_STORE (folder->parent_store)->diary,
+			       CAMEL_DISCO_DIARY_FOLDER_EXPUNGE, folder, uids);
+
+	camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+	camel_folder_change_info_free (changes);
+
+	return;
+}
+
+static void
+pop3_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelException *ex)
+{
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+
+	return;
+}
+
+
+static void
+pop3_append_offline (CamelFolder *folder, CamelMimeMessage *message,
+		     const CamelMessageInfo *info, char **appended_uid,
+		     CamelException *ex)
+{
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+
+	return;
+}
+
+static void
+pop3_transfer_offline (CamelFolder *source, GPtrArray *uids,
+		       CamelFolder *dest, GPtrArray **transferred_uids,
+		       gboolean delete_originals, CamelException *ex)
+{
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+	return;
+}
+
+static void
+pop3_cache_message (CamelDiscoFolder *disco_folder, const char *uid,
+		    CamelException *ex)
+{
+	CamelMimeMessage *msg = pop3_get_message (CAMEL_FOLDER (disco_folder), uid,
+		 CAMEL_FOLDER_RECEIVE_FULL, -1, ex);
+
+	if (msg) 
+		camel_object_unref (CAMEL_OBJECT (msg));
+
+}
+
+static void
+camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
+{
+	CamelFolderClass *camel_folder_class = CAMEL_FOLDER_CLASS(camel_pop3_folder_class);
+	CamelDiscoFolderClass *camel_disco_folder_class = CAMEL_DISCO_FOLDER_CLASS (camel_pop3_folder_class);
+
+	disco_folder_class = CAMEL_DISCO_FOLDER_CLASS (camel_type_get_global_classfuncs (camel_disco_folder_get_type ()));
+
+	parent_class = CAMEL_FOLDER_CLASS(camel_folder_get_type());
+	
+	/* virtual method overload */
+	camel_folder_class->refresh_info = pop3_refresh_info;
+	camel_folder_class->sync = pop3_sync;
+	
+	camel_folder_class->get_message_count = pop3_get_message_count;
+	camel_folder_class->get_uids = pop3_get_uids;
+	camel_folder_class->free_uids = camel_folder_free_shallow;
+	camel_folder_class->get_message = pop3_get_message;
+	camel_folder_class->set_message_flags = pop3_set_message_flags;
+
+	camel_disco_folder_class->refresh_info_online = pop3_refresh_info;
+	camel_disco_folder_class->sync_online = pop3_sync_online;
+	camel_disco_folder_class->sync_offline = pop3_sync_offline;
+
+	camel_disco_folder_class->sync_resyncing = pop3_sync_offline;
+
+	camel_disco_folder_class->expunge_uids_online = pop3_expunge_uids_online;
+	camel_disco_folder_class->expunge_uids_offline = pop3_expunge_uids_offline;
+	camel_disco_folder_class->expunge_uids_resyncing = pop3_expunge_uids_resyncing;
+
+	camel_disco_folder_class->append_online = pop3_append_offline;
+	camel_disco_folder_class->append_offline = pop3_append_offline;
+	camel_disco_folder_class->append_resyncing = pop3_append_offline;
+
+	camel_disco_folder_class->transfer_online = pop3_transfer_offline;
+	camel_disco_folder_class->transfer_offline = pop3_transfer_offline;
+	camel_disco_folder_class->transfer_resyncing = pop3_transfer_offline;
+
+	camel_disco_folder_class->cache_message = pop3_cache_message;
+}
+
+CamelType
+camel_pop3_folder_get_type (void)
+{
+	static CamelType camel_pop3_folder_type = CAMEL_INVALID_TYPE;
+	
+	if (!camel_pop3_folder_type) {
+		camel_pop3_folder_type = camel_type_register (CAMEL_DISCO_FOLDER_TYPE, "CamelPOP3Folder",
+							      sizeof (CamelPOP3Folder),
+							      sizeof (CamelPOP3FolderClass),
+							      (CamelObjectClassInitFunc) camel_pop3_folder_class_init,
+							      NULL,
+							      NULL,
+							      (CamelObjectFinalizeFunc) pop3_finalize);
+	}
+	
+	return camel_pop3_folder_type;
 }

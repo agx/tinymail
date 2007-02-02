@@ -55,77 +55,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-static void 
-tny_camel_pop_store_account_set_online_status (TnyCamelAccount *self, gboolean offline, GError **err)
-{
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-
-	if (!priv->service || !CAMEL_IS_SERVICE (priv->service))
-	{
-		if (camel_exception_is_set (priv->ex))
-		{
-			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				camel_exception_get_description (priv->ex));
-		} else {
-			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				_("Account not yet fully configured"));
-		}
-
-		return;
-	}
-
-	if (offline)
-		camel_service_disconnect (priv->service, TRUE, &ex);
-	else
-		camel_service_connect (priv->service, &ex);
-
-	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (err, TNY_ACCOUNT_ERROR, 
-			TNY_ACCOUNT_ERROR_TRY_CONNECT,
-			camel_exception_get_description (&ex));
-	}
-
-	return;
-}
-
-static void 
-tny_camel_pop_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
-{
-
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
-	CamelStore *store;
-	TnyCamelFolder *folder;
-
-	g_assert (TNY_IS_LIST (list));
-
-	if (!_tny_session_check_operation (apriv->session, err, 
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
-		return;
-
-	g_assert (CAMEL_IS_STORE (apriv->service));
-
-	store = CAMEL_STORE (apriv->service);
-
-	folder = TNY_CAMEL_FOLDER (tny_camel_pop_folder_new ());
-
-	_tny_camel_folder_set_id (folder, "INBOX");
-	/* _tny_camel_folder_set_unread_count (folder, iter->unread);
-	_tny_camel_folder_set_all_count (folder, iter->total); */
-	_tny_camel_folder_set_name (folder, "Inbox");
-	priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-	_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
-	tny_list_prepend (list, G_OBJECT (folder));
-
-	g_object_unref (G_OBJECT (folder));
-
-	return;
-}
 
 
 static void 
@@ -181,9 +110,6 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	TNY_CAMEL_ACCOUNT_CLASS (class)->set_online_status_func = tny_camel_pop_store_account_set_online_status;
-
-	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->get_folders_func = tny_camel_pop_store_account_get_folders;
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->remove_folder_func = tny_camel_pop_store_account_remove_folder;
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->create_folder_func = tny_camel_pop_store_account_create_folder;
 
@@ -222,6 +148,8 @@ void
 tny_camel_pop_store_account_set_delete_originals (TnyCamelPOPStoreAccount *self, gboolean delete_originals)
 {
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	g_warning ("tny_camel_pop_store_account_set_delete_originals is not yet supported\n");
 
 	priv->delete_originals = delete_originals;
 }

@@ -73,31 +73,6 @@ tny_camel_pop_folder_finalize (GObject *object)
 	return;
 }
 
-static void
-tny_camel_pop_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
-{
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-
-	/* camel_service_disconnect (apriv->service, FALSE, &ex);
-	camel_service_connect (apriv->service, &ex); */
-
-	TNY_CAMEL_FOLDER_CLASS (parent_class)->refresh_async_func (self, callback, status_callback, user_data);
-}
-
-static void 
-tny_camel_pop_folder_refresh (TnyFolder *self, GError **err)
-{
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-
-	/* camel_service_disconnect (apriv->service, FALSE, &ex);
-	camel_service_connect (apriv->service, &ex); */
-
-	TNY_CAMEL_FOLDER_CLASS (parent_class)->refresh_func (self, err);
-}
 
 static void 
 tny_camel_pop_folder_class_init (TnyCamelPOPFolderClass *class)
@@ -106,9 +81,6 @@ tny_camel_pop_folder_class_init (TnyCamelPOPFolderClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-
-	TNY_CAMEL_FOLDER_CLASS (class)->refresh_async_func = tny_camel_pop_folder_refresh_async;
-	TNY_CAMEL_FOLDER_CLASS (class)->refresh_func = tny_camel_pop_folder_refresh; 
 
 	object_class->finalize = tny_camel_pop_folder_finalize;
 

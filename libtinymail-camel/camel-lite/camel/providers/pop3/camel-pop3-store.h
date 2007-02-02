@@ -36,6 +36,7 @@ extern "C" {
 #include <camel/camel-types.h>
 #include <camel/camel-store.h>
 #include "camel-pop3-engine.h"
+#include <camel/camel-disco-store.h>
 
 #define CAMEL_POP3_STORE_TYPE     (camel_pop3_store_get_type ())
 #define CAMEL_POP3_STORE(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_POP3_STORE_TYPE, CamelPOP3Store))
@@ -44,21 +45,21 @@ extern "C" {
 
 
 typedef struct {
-	CamelStore parent_object;
+	CamelDiscoStore parent_object;
 
 	CamelPOP3Engine *engine; /* pop processing engine */
 
 	struct _CamelDataCache *cache;
-	
 	guint delete_after;
-	gchar *root;
+	gchar *storage_path, *base_url;
+	gboolean connected;
 
 } CamelPOP3Store;
 
 
 
 typedef struct {
-	CamelStoreClass parent_class;
+	CamelDiscoStoreClass parent_class;
 
 } CamelPOP3StoreClass;
 

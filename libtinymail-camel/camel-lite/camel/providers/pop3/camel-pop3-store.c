@@ -54,6 +54,7 @@
 #endif
 #include "camel-i18n.h"
 #include "camel-net-utils.h"
+#include "camel-disco-diary.h"
 
 /* Specified in RFC 1939 */
 #define POP3_PORT "110"
@@ -72,69 +73,113 @@ static CamelFolder *get_folder (CamelStore *store, const char *folder_name,
 
 static CamelFolder *get_trash  (CamelStore *store, CamelException *ex);
 
-static void
-camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
+static gboolean
+pop3_can_work_offline (CamelDiscoStore *disco_store)
 {
-	CamelServiceClass *camel_service_class =
-		CAMEL_SERVICE_CLASS (camel_pop3_store_class);
-	CamelStoreClass *camel_store_class =
-		CAMEL_STORE_CLASS (camel_pop3_store_class);
+	return TRUE;
+}
 
-	parent_class = CAMEL_STORE_CLASS (camel_type_get_global_classfuncs (camel_store_get_type ()));
+static gboolean
+pop3_connect_offline (CamelService *service, CamelException *ex)
+{
+	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
+	store->connected = !camel_exception_is_set (ex);
+	return store->connected;
+
+}
+
+static gboolean
+pop3_connect_online (CamelService *service, CamelException *ex)
+{
+	return pop3_connect (service, ex);
+}
+
+
+static gboolean
+pop3_disconnect_offline (CamelService *service, gboolean clean, CamelException *ex)
+{
+	return TRUE;
+}
+
+static gboolean
+pop3_disconnect_online (CamelService *service, gboolean clean, CamelException *ex)
+{
+
+	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
 	
-	/* virtual method overload */
-	camel_service_class->query_auth_types = query_auth_types;
-	camel_service_class->connect = pop3_connect;
-	camel_service_class->disconnect = pop3_disconnect;
-
-	camel_store_class->get_folder = get_folder;
-	camel_store_class->get_trash = get_trash;
-}
-
-
-
-static void
-camel_pop3_store_init (gpointer object, gpointer klass)
-{
-	;
-}
-
-CamelType
-camel_pop3_store_get_type (void)
-{
-	static CamelType camel_pop3_store_type = CAMEL_INVALID_TYPE;
-
-	if (!camel_pop3_store_type) {
-		camel_pop3_store_type = camel_type_register (CAMEL_STORE_TYPE,
-							     "CamelPOP3Store",
-							     sizeof (CamelPOP3Store),
-							     sizeof (CamelPOP3StoreClass),
-							     (CamelObjectClassInitFunc) camel_pop3_store_class_init,
-							     NULL,
-							     (CamelObjectInitFunc) camel_pop3_store_init,
-							     finalize);
+	if (clean) {
+		CamelPOP3Command *pc;
+		
+		pc = camel_pop3_engine_command_new(store->engine, 0, NULL, NULL, "QUIT\r\n");
+		while (camel_pop3_engine_iterate(store->engine, NULL) > 0)
+			;
+		camel_pop3_engine_command_free(store->engine, pc);
 	}
 
-	return camel_pop3_store_type;
+	camel_object_unref((CamelObject *)store->engine);
+	store->engine = NULL;
+
+	return TRUE;
 }
 
-static void
-finalize (CamelObject *object)
+static CamelFolder *
+pop3_get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, CamelException *ex)
 {
-	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (object);
-
-	/* force disconnect so we dont have it run later, after we've cleaned up some stuff */
-	/* SIGH */
-
-	camel_service_disconnect((CamelService *)pop3_store, TRUE, NULL);
-
-	if (pop3_store->engine)
-		camel_object_unref((CamelObject *)pop3_store->engine);
-	if (pop3_store->cache)
-		camel_object_unref((CamelObject *)pop3_store->cache);
-	if (pop3_store->root)
-		g_free (pop3_store->root);
+	return get_folder (store, folder_name, flags, ex);
 }
+
+
+static CamelFolderInfo *
+pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
+{
+	CamelURL *url;
+	const char *name;
+	CamelFolderInfo *fi;
+
+	fi = camel_folder_info_new ();
+	
+	fi->full_name = g_strdup(folder_name);
+	fi->unread = -1;
+	fi->total = -1;
+
+	fi->uri = g_strdup ("");
+	name = strrchr (fi->full_name, '/');
+	if (name == NULL)
+		name = fi->full_name;
+	else
+		name++;
+	if (!g_ascii_strcasecmp (fi->full_name, "INBOX"))
+		fi->name = g_strdup (_("Inbox"));
+	else
+		fi->name = g_strdup (name);
+
+	return fi;
+}
+
+static CamelFolder *
+pop3_get_folder_offline (CamelStore *store, const char *folder_name,
+		    guint32 flags, CamelException *ex)
+{
+	return get_folder (store, folder_name, flags, ex);
+}
+
+
+static CamelFolderInfo *
+pop3_get_folder_info_offline (CamelStore *store, const char *top, guint32 flags, CamelException *ex)
+{
+	return pop3_build_folder_info (CAMEL_POP3_STORE (store), "INBOX");
+}
+
+static CamelFolderInfo *
+pop3_get_folder_info_online (CamelStore *store, const char *top, guint32 flags, CamelException *ex)
+{
+	CamelFolderInfo *info =  pop3_get_folder_info_offline (store, top, flags, ex);
+
+	/* TODO: get read and unread count into info->unread & info->total */
+
+	return info;
+}
+
 
 enum {
 	MODE_CLEAR,
@@ -157,7 +202,9 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	int clean_quit = TRUE;
 	int ret;
 	gchar *delete_days;
-	
+
+	store->connected = FALSE;
+
 	if (ssl_mode != MODE_CLEAR) {
 #ifdef HAVE_SSL
 		if (ssl_mode == MODE_TLS) {
@@ -192,10 +239,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	}
 	
 	/* parent class connect initialization */
-	if (CAMEL_SERVICE_CLASS (parent_class)->connect (service, ex) == FALSE) {
+	/*if (CAMEL_SERVICE_CLASS (parent_class)->connect (service, ex) == FALSE) {
 		camel_object_unref (tcp_stream);
 		return FALSE;
-	}
+	}*/
 	
 	if (camel_url_get_param (service->url, "disable_extensions"))
 		flags |= CAMEL_POP3_ENGINE_DISABLE_EXTENSIONS;
@@ -216,6 +263,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 
 	if (ssl_mode != MODE_TLS) {
 		camel_object_unref (tcp_stream);
+		store->connected = TRUE;
 		return TRUE;
 	}
 	
@@ -265,7 +313,9 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	/* rfc2595, section 4 states that after a successful STLS
            command, the client MUST discard prior CAPA responses */
 	camel_pop3_engine_reget_capabilities (store->engine);
-	
+
+	store->connected = TRUE;
+
 	return TRUE;
 	
  stls_exception:
@@ -568,22 +618,6 @@ pop3_connect (CamelService *service, CamelException *ex)
 	
 	session = camel_service_get_session (service);
 
-	if (store->cache == NULL) {
-		char *root;
-
-		root = camel_session_get_storage_path (session, service, ex);
-		store->root = root;
-		if (root) {
-			store->cache = camel_data_cache_new(root, 0, ex);
-			/*g_free(root);*/
-			if (store->cache) {
-				/* Default cache expiry - 1 week or not visited in a day */
-				camel_data_cache_set_expire_age(store->cache, 60*60*24*7);
-				camel_data_cache_set_expire_access(store->cache, 60*60*24);
-			}
-		}
-	}
-	
 	if (!connect_to_server_wrapper (service, ex))
 		return FALSE;
 	
@@ -632,9 +666,9 @@ pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 	
-	if (!CAMEL_SERVICE_CLASS (parent_class)->disconnect (service, clean, ex))
-		return FALSE;
-	
+	/* if (!CAMEL_SERVICE_CLASS (parent_class)->disconnect (service, clean, ex))
+		return FALSE;  */
+
 	camel_object_unref((CamelObject *)store->engine);
 	store->engine = NULL;
 	
@@ -657,4 +691,125 @@ get_trash (CamelStore *store, CamelException *ex)
 {
 	/* no-op */
 	return NULL;
+}
+
+
+static void
+finalize (CamelObject *object)
+{
+	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (object);
+
+	/* force disconnect so we dont have it run later, after we've cleaned up some stuff */
+	/* SIGH */
+
+	camel_service_disconnect((CamelService *)pop3_store, TRUE, NULL);
+
+	if (pop3_store->engine)
+		camel_object_unref((CamelObject *)pop3_store->engine);
+	if (pop3_store->cache)
+		camel_object_unref((CamelObject *)pop3_store->cache);
+	if (pop3_store->storage_path)
+		g_free (pop3_store->storage_path);
+}
+
+
+
+static void
+pop3_construct (CamelService *service, CamelSession *session,
+	   CamelProvider *provider, CamelURL *url,
+	   CamelException *ex)
+{
+	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (service);
+	CamelStore *store = CAMEL_STORE (service);
+	CamelDiscoStore *disco_store = CAMEL_DISCO_STORE (service);
+	char *tmp, *path;
+	CamelURL *summary_url;
+
+	CAMEL_SERVICE_CLASS (parent_class)->construct (service, session, provider, url, ex);
+	if (camel_exception_is_set (ex))
+		return;
+
+	pop3_store->storage_path = camel_session_get_storage_path (session, service, ex);
+	if (!pop3_store->storage_path)
+		return;
+
+	pop3_store->cache = camel_data_cache_new(pop3_store->storage_path, 0, ex);
+	if (pop3_store->cache) {
+		/* Default cache expiry - 1 week or not visited in a day */
+		camel_data_cache_set_expire_age (pop3_store->cache, 60*60*24*7);
+		camel_data_cache_set_expire_access (pop3_store->cache, 60*60*24);
+	}
+
+	pop3_store->base_url = camel_url_to_string (service->url, (CAMEL_URL_HIDE_PASSWORD |
+								   CAMEL_URL_HIDE_PARAMS |
+								   CAMEL_URL_HIDE_AUTH));
+
+	/* setup journal*/
+	path = g_strdup_printf ("%s/journal", pop3_store->storage_path);
+	disco_store->diary = camel_disco_diary_new (disco_store, path, ex);
+	g_free (path);
+
+}
+
+static void
+camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
+{
+	CamelServiceClass *camel_service_class =
+		CAMEL_SERVICE_CLASS (camel_pop3_store_class);
+	CamelStoreClass *camel_store_class =
+		CAMEL_STORE_CLASS (camel_pop3_store_class);
+	CamelDiscoStoreClass *camel_disco_store_class =
+		CAMEL_DISCO_STORE_CLASS (camel_pop3_store_class);
+
+	parent_class = CAMEL_STORE_CLASS (camel_type_get_global_classfuncs (camel_disco_store_get_type ()));
+
+	/* virtual method overload */
+	camel_service_class->construct = pop3_construct;
+	camel_service_class->query_auth_types = query_auth_types;
+
+	/* camel_service_class->connect = pop3_connect; */
+	/* camel_service_class->disconnect = pop3_disconnect; */
+
+	camel_store_class->get_folder = get_folder;
+	camel_store_class->get_trash = get_trash;
+
+	camel_disco_store_class->can_work_offline = pop3_can_work_offline;
+	camel_disco_store_class->connect_online = pop3_connect_online;
+	camel_disco_store_class->connect_offline = pop3_connect_offline;
+	camel_disco_store_class->disconnect_online = pop3_disconnect_online;
+	camel_disco_store_class->disconnect_offline = pop3_disconnect_offline;
+	camel_disco_store_class->get_folder_online = pop3_get_folder_online;
+	camel_disco_store_class->get_folder_offline = pop3_get_folder_offline;
+	camel_disco_store_class->get_folder_resyncing = pop3_get_folder_online;
+	camel_disco_store_class->get_folder_info_online = pop3_get_folder_info_online;
+	camel_disco_store_class->get_folder_info_offline = pop3_get_folder_info_offline;
+	camel_disco_store_class->get_folder_info_resyncing = pop3_get_folder_info_online;
+}
+
+
+
+static void
+camel_pop3_store_init (gpointer object, gpointer klass)
+{
+
+	return;
+}
+
+CamelType
+camel_pop3_store_get_type (void)
+{
+	static CamelType camel_pop3_store_type = CAMEL_INVALID_TYPE;
+
+	if (!camel_pop3_store_type) {
+		camel_pop3_store_type = camel_type_register (CAMEL_DISCO_STORE_TYPE,
+							     "CamelPOP3Store",
+							     sizeof (CamelPOP3Store),
+							     sizeof (CamelPOP3StoreClass),
+							     (CamelObjectClassInitFunc) camel_pop3_store_class_init,
+							     NULL,
+							     (CamelObjectInitFunc) camel_pop3_store_init,
+							     finalize);
+	}
+
+	return camel_pop3_store_type;
 }
