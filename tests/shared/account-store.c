@@ -50,7 +50,7 @@ static GObjectClass *parent_class = NULL;
 static gchar* 
 per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
-	return g_strdup ("unittest");
+	return g_strdup ("tnytest");
 }
 
 static void
@@ -114,10 +114,10 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 		tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), me->force_online, NULL);
 
 		tny_account_set_proto (account, "imap");
-		tny_account_set_name (account, "IMAP unit test account");
-		tny_account_set_user (account, "tinymailunittest");
-		tny_account_set_hostname (account, "mail.tinymail.org");
-		tny_account_set_id (account, "unique_imap");
+		tny_account_set_name (account, "imap1.tinymail.org");
+		tny_account_set_user (account, "tnytest");
+		tny_account_set_hostname (account, "imap1.tinymail.org");
+		tny_account_set_id (account, "tnytest@imap1.tinymail.org");
 		tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
 		tny_account_set_pass_func (account, per_account_get_pass_func);
 
