@@ -700,22 +700,22 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 /**
- * tny_camel_account_set_online_status:
+ * tny_camel_account_set_online:
  * @self: a #TnyCamelAccount object
- * @offline: whether or not the account is offline
+ * @online: whether or not the account is online
  * @err: a #GError instance or NULL
  *
  * Set the connectivity status of an account
  *
  **/
 void 
-tny_camel_account_set_online_status (TnyCamelAccount *self, gboolean offline, GError **err)
+tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **err)
 {
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_online_status_func (self, offline, err);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_online_func (self, online, err);
 }
 
 void 
-tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean offline, GError **err)
+tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GError **err)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -736,11 +736,11 @@ tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean off
 		return;
 	}
 
-	if (offline)
-		camel_service_cancel_connect (priv->service);
+	/* if (offline)
+		camel_service_cancel_connect (priv->service); */
 
 	if (CAMEL_IS_DISCO_STORE (priv->service)) {
-		if (!offline) {
+		if (online) {
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
 										  CAMEL_DISCO_STORE_ONLINE, &ex);
 			goto done;
@@ -753,7 +753,7 @@ tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean off
 		}
 	} else if (CAMEL_IS_OFFLINE_STORE (priv->service)) {
 		
-		if (!offline) {
+		if (online) {
 			
 			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
 												   CAMEL_OFFLINE_STORE_NETWORK_AVAIL,
@@ -767,7 +767,7 @@ tny_camel_account_set_online_status_default (TnyCamelAccount *self, gboolean off
 		}
 	}
 
-	if (offline)
+	if (!online)
 		camel_service_disconnect (CAMEL_SERVICE (priv->service),
 								  TRUE, &ex);
 
@@ -912,7 +912,7 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->get_account_type_func = tny_camel_account_get_account_type_default;
 
 	class->add_option_func = tny_camel_account_add_option_default;
-	class->set_online_status_func = tny_camel_account_set_online_status_default;
+	class->set_online_func = tny_camel_account_set_online_default;
 
 	object_class->finalize = tny_camel_account_finalize;
 

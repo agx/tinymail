@@ -111,7 +111,7 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
-		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online, NULL);
+		tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), me->force_online, NULL);
 
 		tny_account_set_proto (account, "imap");
 		tny_account_set_name (account, "IMAP unit test account");
@@ -131,7 +131,7 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
-		tny_camel_account_set_online_status (TNY_CAMEL_ACCOUNT (account), !me->force_online, NULL);
+		tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), me->force_online, NULL);
 
 		tny_account_set_proto (account, "something");
 		tny_account_set_name (account, "SMTP unit test account");

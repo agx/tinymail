@@ -197,7 +197,7 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 			}
 		} else {
 			apriv->connected = TRUE;
-			tny_camel_account_set_online_status (self, !apriv->connected);
+			tny_camel_account_set_online (self, apriv->connected);
 		}
 
 		g_static_rec_mutex_unlock (apriv->service_lock);

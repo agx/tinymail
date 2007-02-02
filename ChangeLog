@@ -3,6 +3,9 @@
 	* CamelDiscoStore and CamelDiscoFolder implementation of the POP3
 	provider of camel-lite. This means that the POP3 support now supports
 	offline viewing E-mails
+	* Changed a silly internal libtinymail-camel API
+
+	* This was a major API change in libtinymail-camel
 
 2007-01-31  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
