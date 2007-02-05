@@ -372,10 +372,14 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 {
 	CamelPOP3Folder *pop3_folder;
 	CamelPOP3Store *pop3_store;
-	int i; CamelPOP3FolderInfo *fi;
+	int i, max; CamelPOP3FolderInfo *fi;
+	CamelMessageInfoBase *info;
 
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (folder->parent_store);
+
+	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
+		return;
 
 	if(pop3_store->delete_after && !expunge)
 	{	
@@ -385,10 +389,13 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	if (!expunge)
 		return;
-	
+
 	camel_operation_start(NULL, _("Expunging deleted messages"));
-	
-	for (i = 0; i < pop3_folder->uids->len; i++) {
+
+	if (pop3_folder->uids)
+	{
+	  for (i = 0; i < pop3_folder->uids->len; i++) 
+	  {
 		fi = pop3_folder->uids->pdata[i];
 		/* busy already?  wait for that to finish first */
 		if (fi->cmd) {
@@ -405,9 +412,9 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			if (pop3_store->cache && fi->uid)
 				camel_data_cache_remove(pop3_store->cache, "cache", fi->uid, NULL);
 		}
-	}
+	  }
 
-	for (i = 0; i < pop3_folder->uids->len; i++) {
+	  for (i = 0; i < pop3_folder->uids->len; i++) {
 		fi = pop3_folder->uids->pdata[i];
 		/* wait for delete commands to finish */
 		if (fi->cmd) {
@@ -417,11 +424,29 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			fi->cmd = NULL;
 		}
 		camel_operation_progress(NULL, (i+1) , pop3_folder->uids->len);
+	  }
+	}
+
+	max = camel_folder_summary_count (folder->summary);
+	for (i = 0; i < max; i++) 
+	{
+		if (!(info = (CamelMessageInfoBase*) camel_folder_summary_index (folder->summary, i)))
+			continue;
+
+		if (info->flags & CAMEL_MESSAGE_DELETED) 
+		{
+			struct _CamelPOP3Command *cmd;
+			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", info->uid);
+			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
+			if (pop3_store->cache && info->uid)
+				camel_data_cache_remove(pop3_store->cache, "cache", info->uid, NULL);
+			camel_pop3_engine_command_free(pop3_store->engine, cmd);
+		}
+
 	}
 
 	camel_operation_end(NULL);
 
-	camel_pop3_store_expunge (pop3_store, ex);
 }
 
 int
