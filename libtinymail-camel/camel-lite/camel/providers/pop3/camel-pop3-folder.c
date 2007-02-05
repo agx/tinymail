@@ -441,6 +441,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			if (pop3_store->cache && info->uid)
 				camel_data_cache_remove(pop3_store->cache, "cache", info->uid, NULL);
 			camel_pop3_engine_command_free(pop3_store->engine, cmd);
+			camel_message_info_free((CamelMessageInfo *)info);
 		}
 
 	}
