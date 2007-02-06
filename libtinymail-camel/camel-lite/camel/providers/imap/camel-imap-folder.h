@@ -59,7 +59,7 @@ struct _CamelImapFolder {
 typedef struct {
 	CamelDiscoFolderClass parent_class;
 
-	/* Virtual methods */	
+	/* Virtual methods */
 	
 } CamelImapFolderClass;
 
@@ -87,6 +87,10 @@ time_t decode_internaldate (const unsigned char *in);
 
 /* Standard Camel function */
 CamelType camel_imap_folder_get_type (void);
+
+void camel_imap_folder_stop_idle (CamelFolder *folder);
+void camel_imap_folder_start_idle (CamelFolder *folder);
+
 
 #ifdef __cplusplus
 }

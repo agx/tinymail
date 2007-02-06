@@ -77,4 +77,7 @@ CamelImapResponseType camel_imap_command_response  (CamelImapStore *store,
 						    char **respbuf,
 						    CamelException *ex);
 
+CamelImapResponseType camel_imap_command_response_idle (CamelImapStore *store, char **response,
+						        CamelException *ex);
+
 #endif /* CAMEL_IMAP_COMMAND_H */

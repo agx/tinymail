@@ -79,6 +79,8 @@ ssize_t camel_write (int fd, const char *buf, size_t n);
 ssize_t camel_read_socket (int fd, char *buf, size_t n);
 ssize_t camel_write_socket (int fd, const char *buf, size_t n);
 
+ssize_t camel_read_socket_nb (int fd, char *buf, size_t n);
+
 char *camel_file_util_savename(const char *filename);
 
 #define get_unaligned_u32(p) ((((unsigned char*)(p))[0]) | \

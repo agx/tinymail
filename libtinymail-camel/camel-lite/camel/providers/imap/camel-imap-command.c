@@ -44,6 +44,7 @@
 #include <camel/camel-session.h>
 #include <camel/camel-i18n.h>
 #include <camel/camel-debug.h>
+#include <camel/camel-tcp-stream.h>
 
 extern int camel_verbose_debug;
 
@@ -57,6 +58,7 @@ static char *imap_command_strdup_vprintf (CamelImapStore *store,
 					  const char *fmt, va_list ap);
 static char *imap_command_strdup_printf (CamelImapStore *store,
 					 const char *fmt, ...);
+
 
 /**
  * camel_imap_command:
@@ -187,6 +189,9 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	g_return_val_if_fail(store->ostream!=NULL, FALSE);
 	g_return_val_if_fail(store->istream!=NULL, FALSE);
 	
+	if (store->current_folder)
+		camel_imap_folder_stop_idle (store->current_folder);
+
 	/* Check for current folder */
 	if (folder && folder != store->current_folder) {
 		CamelImapResponse *response;
@@ -286,6 +291,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 	return imap_read_response (store, ex);
 }
 
+
 /**
  * camel_imap_command_response:
  * @store: the IMAP store
@@ -358,9 +364,67 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 	}
 	*response = respbuf;
 	
+	
 	if (type == CAMEL_IMAP_RESPONSE_ERROR ||
 	    type == CAMEL_IMAP_RESPONSE_TAGGED)
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);	
+
+	return type;
+}
+
+
+CamelImapResponseType
+camel_imap_command_response_idle (CamelImapStore *store, char **response,
+			     CamelException *ex)
+{
+	CamelImapResponseType type;
+	char *respbuf;
+
+	if (camel_imap_store_readline (store, &respbuf, ex) < 0)
+		return CAMEL_IMAP_RESPONSE_ERROR;
+
+	switch (*respbuf) {
+	case '*':
+		if (!g_ascii_strncasecmp (respbuf, "* BYE", 5)) {
+			/* Connection was lost, no more data to fetch */
+			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+					      _("Server unexpectedly disconnected: %s"),
+					      _("Unknown error")); /* g_strerror (104));  FIXME after 1.0 is released */
+			store->connected = FALSE;
+			g_free (respbuf);
+			respbuf = NULL;
+			type = CAMEL_IMAP_RESPONSE_ERROR;
+			break;
+		}
+		
+		/* Read the rest of the response. */
+		type = CAMEL_IMAP_RESPONSE_UNTAGGED;
+		respbuf = imap_read_untagged (store, respbuf, ex);
+		if (!respbuf)
+			type = CAMEL_IMAP_RESPONSE_ERROR;
+		else if (!g_ascii_strncasecmp (respbuf, "* OK [ALERT]", 12)
+			 || !g_ascii_strncasecmp (respbuf, "* NO [ALERT]", 12)
+			 || !g_ascii_strncasecmp (respbuf, "* BAD [ALERT]", 13)) {
+			char *msg;
+
+			/* for imap ALERT codes, account user@host */
+			/* we might get a ']' from a BAD response since we +12, but who cares? */
+			msg = g_strdup_printf(_("Alert from IMAP server %s@%s:\n%s"),
+					      ((CamelService *)store)->url->user, ((CamelService *)store)->url->host, respbuf+12);
+			camel_session_alert_user(((CamelService *)store)->session, CAMEL_SESSION_ALERT_WARNING, msg, FALSE);
+			g_free(msg);
+		}
+		
+		break;
+	case '+':
+		type = CAMEL_IMAP_RESPONSE_CONTINUATION;
+		break;
+	default:
+		type = CAMEL_IMAP_RESPONSE_TAGGED;
+		break;
+	}
+	*response = respbuf;
 	
 	return type;
 }

@@ -40,6 +40,7 @@ static int tcp_getsockopt (CamelTcpStream *stream, CamelSockOptData *data);
 static int tcp_setsockopt (CamelTcpStream *stream, const CamelSockOptData *data);
 static struct sockaddr *tcp_get_local_address (CamelTcpStream *stream, socklen_t *len);
 static struct sockaddr *tcp_get_remote_address (CamelTcpStream *stream, socklen_t *len);
+static ssize_t tcp_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
 
 static void
 camel_tcp_stream_class_init (CamelTcpStreamClass *camel_tcp_stream_class)
@@ -49,6 +50,7 @@ camel_tcp_stream_class_init (CamelTcpStreamClass *camel_tcp_stream_class)
 	parent_class = CAMEL_STREAM_CLASS (camel_type_get_global_classfuncs (CAMEL_STREAM_TYPE));
 	
 	/* tcp stream methods */
+	camel_tcp_stream_class->read_nb            = tcp_read_nb;
 	camel_tcp_stream_class->connect            = tcp_connect;
 	camel_tcp_stream_class->getsockopt         = tcp_getsockopt;
 	camel_tcp_stream_class->setsockopt         = tcp_setsockopt;
@@ -81,6 +83,12 @@ camel_tcp_stream_get_type (void)
 	return type;
 }
 
+static ssize_t
+tcp_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
+{
+	w(g_warning ("CamelTcpStream::read_nb called on default implementation"));
+	return -1;
+}
 
 static int
 tcp_connect (CamelTcpStream *stream, struct addrinfo *host)
@@ -180,6 +188,13 @@ camel_tcp_stream_get_local_address (CamelTcpStream *stream, socklen_t *len)
 	
 	return CTS_CLASS (stream)->get_local_address (stream, len);
 }
+
+int 
+camel_tcp_stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
+{
+	return CTS_CLASS (stream)->read_nb (stream, buffer, n);
+}
+
 
 static struct sockaddr *
 tcp_get_remote_address (CamelTcpStream *stream, socklen_t *len)

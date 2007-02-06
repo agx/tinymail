@@ -98,6 +98,7 @@ CamelStream *camel_stream_buffer_new_with_vbuf (CamelStream *stream,
 int camel_stream_buffer_gets (CamelStreamBuffer *sbf, char *buf, unsigned int max);
 
 char *camel_stream_buffer_read_line (CamelStreamBuffer *sbf);
+int camel_tcp_stream_buffer_gets_nb (CamelStreamBuffer *sbf, char *buf, unsigned int max);
 
 #ifdef __cplusplus
 }

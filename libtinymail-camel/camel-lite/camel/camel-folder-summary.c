@@ -3220,6 +3220,16 @@ camel_message_info_ref(void *o)
 	}
 }
 
+void *
+camel_message_info_new_uid (CamelFolderSummary *summary, const char *uid)
+{
+	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)camel_message_info_new(summary);
+	mi->uid = g_strdup (uid);
+	mi->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;
+	mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+	return mi;
+}
+
 
 /**
  * camel_message_info_new_from_header:

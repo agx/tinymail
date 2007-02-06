@@ -199,6 +199,9 @@ camel_imap_store_finalize (CamelObject *object)
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 	CamelDiscoStore *disco = CAMEL_DISCO_STORE (object);
 
+	if (imap_store->current_folder)
+		camel_imap_folder_stop_idle (CAMEL_FOLDER (imap_store->current_folder));
+
 	/* This frees current_folder, folders, authtypes, streams, and namespace. */
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
 
@@ -217,6 +220,9 @@ camel_imap_store_finalize (CamelObject *object)
 		disco->diary = NULL;
 	}
 
+	if (imap_store->idle_prefix)
+		g_free (imap_store->idle_prefix);
+	
 	g_mutex_free (imap_store->stream_lock);
 
 }
@@ -226,6 +232,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 
+	imap_store->idle_prefix = NULL;
 	imap_store->istream = NULL;
 	imap_store->ostream = NULL;
 	imap_store->stream_lock = g_mutex_new ();
@@ -3373,6 +3380,65 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 		return -1;
 	}
 	
+	if (camel_verbose_debug) {
+		fprintf (stderr, "received: ");
+		fwrite (ba->data, 1, ba->len, stderr);
+	}
+	
+	/* camel-imap-command.c:imap_read_untagged expects the CRLFs
+           to be stripped off and be nul-terminated *sigh* */
+	nread = ba->len - 1;
+	ba->data[nread] = '\0';
+	if (ba->data[nread - 1] == '\r') {
+		ba->data[nread - 1] = '\0';
+		nread--;
+	}
+	
+	*dest = (char *) ba->data;
+	g_byte_array_free (ba, FALSE);
+	
+	return nread;
+}
+
+
+ssize_t
+camel_imap_store_readline_nb (CamelImapStore *store, char **dest, CamelException *ex)
+{
+	CamelStreamBuffer *stream;
+	char linebuf[1024] = {0};
+	GByteArray *ba;
+	ssize_t nread;
+	
+	g_return_val_if_fail (CAMEL_IS_IMAP_STORE (store), -1);
+	g_return_val_if_fail (dest, -1);
+	
+	*dest = NULL;
+	
+	/* Check for connectedness. Failed (or cancelled) operations will
+	 * close the connection. We can't expect a read to have any
+	 * meaning if we reconnect, so always set an exception.
+	 */
+	
+	if (!camel_imap_store_connected (store, ex))
+		return -1;
+
+	g_mutex_lock (store->stream_lock);
+	camel_imap_store_restore_stream_buffer (store); 
+	stream = CAMEL_STREAM_BUFFER (store->istream);
+
+	ba = g_byte_array_new ();
+	while ((nread = camel_tcp_stream_buffer_gets_nb (stream, linebuf, sizeof (linebuf))) > 0) {
+		g_byte_array_append (ba, (const guchar*) linebuf, nread);
+		if (linebuf[nread - 1] == '\n')
+			break;
+	}
+	g_mutex_unlock (store->stream_lock);
+
+	if (nread <= 0) {
+		g_byte_array_free (ba, TRUE);
+		return -1;
+	}
+
 	if (camel_verbose_debug) {
 		fprintf (stderr, "received: ");
 		fwrite (ba->data, 1, ba->len, stderr);

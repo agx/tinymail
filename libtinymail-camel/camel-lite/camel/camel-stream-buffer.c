@@ -32,6 +32,7 @@
 #include <errno.h>
 
 #include "camel-stream-buffer.h"
+#include "camel-tcp-stream.h"
 
 static CamelStreamClass *parent_class = NULL;
 
@@ -409,6 +410,50 @@ camel_stream_buffer_gets(CamelStreamBuffer *sbf, char *buf, unsigned int max)
 			break;
 
 		bytes_read = camel_stream_read (sbf->stream, (char*)sbf->buf, sbf->size);
+		if (bytes_read == -1) {
+			if (buf == outptr)
+				return -1;
+			else
+				bytes_read = 0;
+		}
+		sbf->ptr = sbf->buf;
+		sbf->end = sbf->buf + bytes_read;
+		inptr = (char*)sbf->ptr;
+		inend = (char*)sbf->end;
+	} while (bytes_read>0);
+
+	sbf->ptr = (unsigned char*)inptr;
+	*outptr = 0;
+
+	return (int)(outptr - buf);
+}
+
+
+int
+camel_tcp_stream_buffer_gets_nb (CamelStreamBuffer *sbf, char *buf, unsigned int max)
+{
+	register char *outptr, *inptr, *inend, c, *outend;
+	int bytes_read;
+
+	outptr = buf;
+	inptr = (char*)sbf->ptr;
+	inend = (char*)sbf->end;
+	outend = buf+max-1;	/* room for NUL */
+
+	do {
+		while (inptr<inend && outptr<outend) {
+			c = *inptr++;
+			*outptr++ = c;
+			if (c == '\n') {
+				*outptr = 0;
+				sbf->ptr = (unsigned char*) inptr;
+				return outptr-buf;
+			}
+		}
+		if (outptr == outend)
+			break;
+
+		bytes_read = camel_tcp_stream_read_nb ((CamelTcpStream *)sbf->stream, (char*)sbf->buf, sbf->size);
 		if (bytes_read == -1) {
 			if (buf == outptr)
 				return -1;

@@ -98,7 +98,6 @@ struct _TnyDemouiSummaryViewPriv
 	guint connchanged_signal, online_button_signal;
 	TnyList *current_accounts;
 	TnyFolderMonitor *monitor; GMutex *monitor_lock;
-	guint monitor_timeout; gboolean monitor_continue;
 	gboolean handle_recon;
 };
 
@@ -396,23 +395,6 @@ cleanup_statusbar (gpointer data)
 	return FALSE;
 }
 
-static gboolean
-check_new_messages (gpointer user_data)
-{
-	TnyDemouiSummaryViewPriv *priv = user_data;
-	gboolean retval = FALSE;
-
-	g_mutex_lock (priv->monitor_lock);
-	retval = priv->monitor_continue;
-	if (retval) {
-		g_print ("Check for new messages (this isn't yet working)\n");
-		tny_folder_monitor_poke_status (priv->monitor);
-	} else 
-		priv->monitor_timeout = 0;
-	g_mutex_unlock (priv->monitor_lock);
-
-	return priv->monitor_continue;
-}
 
 static void
 refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
@@ -446,19 +428,17 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 
 		g_mutex_lock (priv->monitor_lock);
 		{
-/*			if (priv->monitor)
+
+			if (priv->monitor)
 			{
 				tny_folder_monitor_stop (priv->monitor);
 				g_object_unref (G_OBJECT (priv->monitor));
 			}
+
 			priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
 			tny_folder_monitor_add_list (priv->monitor, TNY_LIST (model));
 			tny_folder_monitor_start (priv->monitor);
-
-			priv->monitor_continue = TRUE;
-			if (priv->monitor_timeout == 0)
-				priv->monitor_timeout = g_timeout_add (5000, check_new_messages, priv);
-*/		}
+		}
 		g_mutex_unlock (priv->monitor_lock);
 
 		set_header_view_model (header_view, sortable);
@@ -689,9 +669,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	priv->handle_recon = TRUE;
 	priv->monitor_lock = g_mutex_new ();
-	priv->monitor_timeout = 0;
 	priv->monitor = NULL;
-	priv->monitor_continue = FALSE;
 
 	priv->last_mailbox_correct_select_set = FALSE;
 	priv->online_button = gtk_toggle_button_new_with_label (GO_ONLINE_TXT);
@@ -917,7 +895,6 @@ tny_demoui_summary_view_finalize (GObject *object)
 	}
 
 	g_mutex_lock (priv->monitor_lock);
-	priv->monitor_continue = FALSE;
 	if (priv->monitor)
 	{
 		tny_folder_monitor_stop (priv->monitor);

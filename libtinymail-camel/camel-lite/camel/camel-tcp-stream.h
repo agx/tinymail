@@ -110,6 +110,8 @@ typedef struct {
 	
 	struct sockaddr * (*get_local_address)  (CamelTcpStream *stream, socklen_t *len);
 	struct sockaddr * (*get_remote_address) (CamelTcpStream *stream, socklen_t *len);
+	ssize_t (*read_nb)   (CamelTcpStream *stream, char *buffer, size_t n);
+	
 } CamelTcpStreamClass;
 
 /* Standard Camel function */
@@ -122,6 +124,8 @@ int         camel_tcp_stream_setsockopt (CamelTcpStream *stream, const CamelSock
 
 struct sockaddr *camel_tcp_stream_get_local_address  (CamelTcpStream *stream, socklen_t *len);
 struct sockaddr *camel_tcp_stream_get_remote_address (CamelTcpStream *stream, socklen_t *len);
+
+int         camel_tcp_stream_read_nb    (CamelTcpStream *stream, char *buffer, size_t n);
 
 #ifdef __cplusplus
 }

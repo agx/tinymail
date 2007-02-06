@@ -81,6 +81,7 @@
 #include "camel-debug.h"
 #include "camel-i18n.h"
 #include "camel/camel-store-summary.h"
+#include <camel/camel-tcp-stream.h>
 
 #define d(x) 
 
@@ -154,6 +155,9 @@ GPtrArray* _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, co
  */
 #define strtok_r(s,sep,lasts) (*(lasts)=strtok((s),(sep)))
 #endif
+
+
+
 
 static void
 camel_imap_folder_class_init (CamelImapFolderClass *camel_imap_folder_class)
@@ -561,13 +565,16 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			camel_imap_folder_changed (folder, exists, NULL, ex);
 	} else
 		g_free (phighestmodseq);
-
+	
+	camel_imap_folder_start_idle (folder);
+	
 }
 
 static void 
 imap_finalize (CamelObject *object)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (object);
+
 
 	if (imap_folder->search)
 		camel_object_unref (CAMEL_OBJECT (imap_folder->search));
@@ -2731,7 +2738,6 @@ imap_update_summary (CamelFolder *folder, int exists,
    CamelImapResponseType type;
    const char *header_spec;
    CamelImapMessageInfo *mi, *info;
-   CamelStream *stream;
    char *uid, *resp;
    GData *data;
    gboolean more = TRUE;
@@ -2936,69 +2942,65 @@ a03 OK UID FETCH Completed
 				gchar *muid;
 
 				data = parse_fetch_response (imap_folder, resp);
-				g_free (resp);
+				g_free (resp); resp = NULL;
+
 				if (!data)
 					continue;
 
-				stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
-				if (stream) 
+				mi = message_from_data (folder, data);
+
+				if (mi) 
 				{
-					mi = message_from_data (folder, data);
+				  flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
+				  if (flags) 
+				  {
+					mi->server_flags = flags;
+					mi->info.flags |= flags;
+					flags_to_label(folder, mi);
+				  }
 
-					if (mi) 
-					{
-					  flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
-					  if (flags) 
-					  {
-						mi->server_flags = flags;
-						mi->info.flags |= flags;
-						flags_to_label(folder, mi);
-					  }
+				  muid = g_datalist_get_data (&data, "UID");
+				  if (muid) 
+				  {
+					if (mi->info.uid && mi->info.flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
+						g_free (mi->info.uid);
+					mi->info.uid = g_strdup (muid);
+					mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+				  }
 
-					  muid = g_datalist_get_data (&data, "UID");
-					  if (muid) 
-					  {
-						if (mi->info.uid && mi->info.flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
-							g_free (mi->info.uid);
+				 /* info = (CamelImapMessageInfo *)camel_folder_summary_uid (folder->summary, muid);
+				  if (info)
+					camel_message_info_free(&info->info); */
+				  ucnt++;
 
-						mi->info.uid = g_strdup (muid);
-						mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
-					  }
+				  allhdrs++;
+				  camel_operation_progress (NULL, allhdrs , ineed);
+				  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
 
-					 /* info = (CamelImapMessageInfo *)camel_folder_summary_uid (folder->summary, muid);
-					  if (info)
-						camel_message_info_free(&info->info); */
-					  ucnt++;
+				  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
+				   if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
+					camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
 
-					  allhdrs++;
-					  camel_operation_progress (NULL, allhdrs , ineed);
-					  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
-
-					  /* WE can re-enable this if it's interesting:
-
-					   camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
-
-					    if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
-						camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
-					  */
-					}
-
-					if (did_hack)
-					{
-						hcnt++;
-						if (hcnt > 1000)
-						{
-							/* Periodically save the summary (this reduces 
-							   memory usage too) */
-							camel_folder_summary_save (folder->summary);
-							hcnt = 0;
-						}
-					}
-
-					got += IMAP_PRETEND_SIZEOF_HEADERS;
 				}
+
+				if (did_hack)
+				{
+					hcnt++;
+					if (hcnt > 1000)
+					{
+						/* Periodically save the summary (this reduces 
+						   memory usage too) */
+						camel_folder_summary_save (folder->summary);
+						hcnt = 0;
+					}
+				}
+
+				got += IMAP_PRETEND_SIZEOF_HEADERS;
 				g_datalist_clear (&data);
 			}
+
+			if (resp) 
+				g_free (resp);
 
 			if (type == CAMEL_IMAP_RESPONSE_ERROR) 
 			{
@@ -3031,6 +3033,282 @@ a03 OK UID FETCH Completed
 
    camel_operation_end (NULL);
 
+}
+
+
+typedef struct {
+	guint32 exists;
+	guint32 recent;
+	guint32 expunge;
+} IdleResponse;
+
+static void 
+process_idle_response (CamelFolder *folder, IdleResponse *idle_resp)
+{
+	CamelImapStore *store;
+	char *resp = NULL;
+	const char *header_spec;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelImapResponseType type;
+	CamelImapMessageInfo *mi, *info;
+	CamelFolderChangeInfo *changes = NULL;
+
+	if (!folder)
+		return;
+
+	if (!idle_resp)
+		return;
+
+	printf ("Processing IDLE: %d, %d, %d\n",
+		idle_resp->exists, idle_resp->recent,
+		idle_resp->expunge);
+
+	store = CAMEL_IMAP_STORE (folder->parent_store);
+
+	if (!store || !CAMEL_IS_IMAP_STORE (store))
+		return;
+
+	if (store->server_level >= IMAP_LEVEL_IMAP4REV1)
+		header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS ")";
+	else
+		header_spec = "0";
+
+	if( g_getenv ("TNY_IMAP_FETCH_ALL_HEADERS") )
+		header_spec = "HEADER";
+
+	if (!camel_imap_command_start (store, folder, &ex,
+		"UID FETCH %d:%d (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
+		idle_resp->exists - idle_resp->recent, idle_resp->exists, header_spec)) 
+			return;
+
+	while ((type = camel_imap_command_response (store, &resp, &ex))
+		== CAMEL_IMAP_RESPONSE_UNTAGGED) 
+	{
+		gchar *muid;
+		CamelStream *stream;
+		GData *data = parse_fetch_response (CAMEL_IMAP_FOLDER (folder), resp);
+		g_free (resp); resp=NULL;
+		
+		if (!data)
+			continue;
+
+		mi = message_from_data (folder, data);
+
+		if (mi) 
+		{
+		  guint32 flags = GPOINTER_TO_INT (g_datalist_get_data (&data, "FLAGS"));
+
+		  if (flags) 
+		  {
+			mi->server_flags = flags;
+			mi->info.flags |= flags;
+			flags_to_label(folder, mi);
+		  }
+
+		  muid = g_datalist_get_data (&data, "UID");
+		  if (muid) 
+		  {
+			if (mi->info.uid && mi->info.flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
+				g_free (mi->info.uid);
+			mi->info.uid = g_strdup (muid);
+			mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+		  }
+
+		  printf ("Added %s using IDLE\n", mi->info.uid);
+		  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
+
+		  if (!changes)
+			changes = camel_folder_change_info_new ();
+
+		  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
+		   if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
+			camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
+
+		}
+
+		g_datalist_clear (&data);
+	}
+
+	if (resp)
+		g_free (resp);
+
+	if (type == CAMEL_IMAP_RESPONSE_ERROR) 
+		return;
+
+	if (camel_folder_change_info_changed (changes))
+		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+
+	camel_folder_change_info_free (changes);
+	camel_folder_summary_save (folder->summary);
+}
+
+static void
+read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
+{
+	char *ptr = strchr (resp, '*');
+
+	if (ptr && strstr (resp, "EXISTS") != NULL)
+		idle_resp->exists = strtoul (resp + 1, NULL, 10);
+
+	if (ptr && strstr (resp, "RECENT") != NULL)
+		idle_resp->recent = strtoul (resp + 1, NULL, 10);
+
+	if (ptr && strstr (resp, "EXPUNGE") != NULL)
+		idle_resp->expunge = strtoul (resp + 1, NULL, 10);
+}
+
+static IdleResponse*
+idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done)
+{
+	IdleResponse *idle_resp = NULL;
+
+	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+
+	if (store->current_folder && store->idle_prefix)
+	{
+		CamelImapResponseType type;
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+		char *resp = NULL;
+
+		while (camel_imap_store_readline_nb (store, &resp, &ex) > 0)
+		{
+			if (strchr (resp, '*') != NULL && (strstr (resp, "EXISTS") || strstr (resp, "EXPUNGE") || strstr (resp, "RECENT")))
+			{
+				if (!idle_resp)
+					idle_resp = g_slice_new0 (IdleResponse);
+				read_idle_response (folder, resp, idle_resp);
+			}
+			g_free (resp); resp=NULL;
+		}
+
+		if (resp)
+			g_free (resp);
+
+		if (done)
+		{
+			g_mutex_lock (store->stream_lock);
+			camel_stream_printf (store->ostream, "DONE\r\n",
+						store->idle_prefix);
+			g_mutex_unlock (store->stream_lock);
+
+			while ((type = camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
+			{
+				if (strchr (resp, '*') != NULL && (strstr (resp, "EXISTS") || strstr (resp, "EXPUNGE") || strstr (resp, "RECENT")))
+				{
+					if (!idle_resp)
+						idle_resp = g_slice_new0 (IdleResponse);
+					read_idle_response (folder, resp, idle_resp);
+				}
+				g_free (resp); resp=NULL;
+			}
+
+			if (resp)
+				g_free (resp);
+
+			g_free (store->idle_prefix);
+			store->idle_prefix = NULL;
+		}
+
+	}
+
+	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
+	return idle_resp;
+}
+
+void
+camel_imap_folder_stop_idle (CamelFolder *folder)
+{
+	CamelImapStore *store;
+	IdleResponse *idle_resp = NULL;
+
+	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
+		return;
+
+	store = CAMEL_IMAP_STORE (folder->parent_store);
+
+	if (!store || !CAMEL_IS_IMAP_STORE (store))
+		return;
+
+	if (store->capabilities & IMAP_CAPABILITY_IDLE)
+	{
+
+		idle_resp = idle_deal_with_stuff (folder, store, TRUE);
+
+		/* Outside of the lock of course */
+		if (idle_resp)
+		{
+			process_idle_response (folder, idle_resp);
+			g_slice_free (IdleResponse, idle_resp);
+		}
+	}
+}
+
+static gboolean 
+idle_timeout_checker (gpointer data)
+{
+	CamelFolder *folder = (CamelFolder *) data;
+	CamelImapStore *store;
+
+	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
+		return FALSE;
+
+	store = CAMEL_IMAP_STORE (folder->parent_store);
+
+	if (!store || !CAMEL_IS_IMAP_STORE (store))
+		return FALSE;
+
+	if (store->idle_prefix == NULL)
+		return FALSE;
+
+printf ("CHECKER 1)\n");
+
+	if (store->capabilities & IMAP_CAPABILITY_IDLE)
+	{
+		IdleResponse * idle_resp = idle_deal_with_stuff (folder, store, FALSE);
+
+printf ("CHECKER (%s)\n", idle_resp ? "YES" : "NO");
+		/* Outside of the lock of course */
+		if (idle_resp)
+		{
+			process_idle_response (folder, idle_resp);
+			g_slice_free (IdleResponse, idle_resp);
+		}
+printf ("DONE\n");
+
+	}
+
+	return (store->idle_prefix != NULL);
+}
+
+void
+camel_imap_folder_start_idle (CamelFolder *folder)
+{
+	CamelImapStore *store;
+
+	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
+		return;
+
+	store = CAMEL_IMAP_STORE (folder->parent_store);
+
+	if (!store || !CAMEL_IS_IMAP_STORE (store))
+		return;
+
+	if (store->capabilities & IMAP_CAPABILITY_IDLE)
+	{
+		if (store->current_folder && !store->idle_prefix)
+		{
+
+			g_mutex_lock (store->stream_lock);
+			store->idle_prefix = g_strdup_printf ("%c%.5u", 
+				store->tag_prefix, store->command++);
+			camel_stream_printf (store->ostream, "%s IDLE\r\n",
+				store->idle_prefix);
+			g_mutex_unlock (store->stream_lock);
+
+			store->idle_signal = g_timeout_add (10 * 1000, idle_timeout_checker, folder);
+		}
+	}
 }
 
 /* Called with the store's connect_lock locked */
