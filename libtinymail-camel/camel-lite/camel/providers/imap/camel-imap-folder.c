@@ -108,6 +108,7 @@ static void imap_expunge_uids_offline (CamelFolder *folder, GPtrArray *uids, Cam
 static void imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelException *ex);
 static void imap_cache_message (CamelDiscoFolder *disco_folder, const char *uid, CamelException *ex);
 static void imap_rename (CamelFolder *folder, const char *new);
+static void imap_set_push_email (CamelFolder *folder, gboolean setting);
 
 /* message manipulation */
 static CamelMimeMessage *imap_get_message (CamelFolder *folder, const gchar *uid,
@@ -158,7 +159,6 @@ GPtrArray* _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, co
 
 
 
-
 static void
 camel_imap_folder_class_init (CamelImapFolderClass *camel_imap_folder_class)
 {
@@ -170,6 +170,7 @@ camel_imap_folder_class_init (CamelImapFolderClass *camel_imap_folder_class)
 	/* virtual method overload */
 	((CamelObjectClass *)camel_imap_folder_class)->getv = imap_getv;
 
+	camel_folder_class->set_push_email = imap_set_push_email;
 	camel_folder_class->get_message = imap_get_message;
 	camel_folder_class->rename = imap_rename;
 	camel_folder_class->search_by_expression = imap_search_by_expression;
@@ -201,7 +202,8 @@ camel_imap_folder_init (gpointer object, gpointer klass)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (object);
 	CamelFolder *folder = CAMEL_FOLDER (object);
-	
+
+	imap_folder->do_push_email = TRUE;
 	folder->permanent_flags = CAMEL_MESSAGE_ANSWERED | CAMEL_MESSAGE_DELETED |
 		CAMEL_MESSAGE_DRAFT | CAMEL_MESSAGE_FLAGGED | CAMEL_MESSAGE_SEEN;
 	
@@ -3192,10 +3194,15 @@ static gboolean
 idle_timeout_checker (gpointer data)
 {
 	CamelFolder *folder = (CamelFolder *) data;
+	CamelImapFolder *imap_folder;
 	CamelImapStore *store;
 	gboolean had_err = FALSE;
 
 	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
+		return FALSE;
+
+	imap_folder = CAMEL_IMAP_FOLDER (folder);
+	if (!imap_folder->do_push_email)
 		return FALSE;
 
 	store = CAMEL_IMAP_STORE (folder->parent_store);
@@ -3221,10 +3228,26 @@ idle_timeout_checker (gpointer data)
 	return (store->idle_prefix != NULL);
 }
 
+static void 
+imap_set_push_email (CamelFolder *folder, gboolean setting)
+{
+	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+
+	if (imap_folder->do_push_email && !setting)
+		camel_imap_folder_stop_idle (folder);
+
+	if (!imap_folder->do_push_email && setting)
+		camel_imap_folder_start_idle (folder);
+
+	imap_folder->do_push_email = setting;
+
+}
+
 void
 camel_imap_folder_start_idle (CamelFolder *folder)
 {
 	CamelImapStore *store;
+	CamelImapFolder *imap_folder;
 
 	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
 		return;

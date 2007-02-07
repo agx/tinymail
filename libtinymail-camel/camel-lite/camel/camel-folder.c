@@ -112,6 +112,18 @@ static gboolean        is_frozen             (CamelFolder *folder);
 static gboolean        folder_changed        (CamelObject *object,
 					      gpointer event_data);
 
+static void 
+folder_set_push_email (CamelFolder *folder, gboolean setting)
+{
+	return;
+}
+
+void 
+camel_folder_set_push_email (CamelFolder *folder, gboolean setting)
+{
+	CF_CLASS (folder)->set_push_email (folder, setting);
+}
+
 static void
 camel_folder_class_init (CamelFolderClass *camel_folder_class)
 {
@@ -120,6 +132,7 @@ camel_folder_class_init (CamelFolderClass *camel_folder_class)
 	parent_class = camel_type_get_global_classfuncs (camel_object_get_type ());
 
 	/* virtual method definition */
+	camel_folder_class->set_push_email = folder_set_push_email;
 	camel_folder_class->sync = folder_sync;
 	camel_folder_class->refresh_info = refresh_info;
 	camel_folder_class->get_name = get_name;

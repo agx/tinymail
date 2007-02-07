@@ -206,6 +206,8 @@ typedef struct {
 	void     (*freeze)    (CamelFolder *folder);
 	void     (*thaw)      (CamelFolder *folder);
 	gboolean (*is_frozen) (CamelFolder *folder);
+	void (*set_push_email) (CamelFolder *folder, gboolean setting);
+
 } CamelFolderClass;
 
 /* Standard Camel function */
@@ -350,6 +352,8 @@ void			camel_folder_change_info_add_uid	(CamelFolderChangeInfo *info, const char
 void			camel_folder_change_info_remove_uid	(CamelFolderChangeInfo *info, const char *uid);
 void			camel_folder_change_info_change_uid	(CamelFolderChangeInfo *info, const char *uid);
 void			camel_folder_change_info_recent_uid	(CamelFolderChangeInfo *info, const char *uid);
+
+void camel_folder_set_push_email (CamelFolder *folder, gboolean setting);
 
 #ifdef __cplusplus
 }

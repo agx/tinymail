@@ -295,6 +295,19 @@ unload_folder (TnyCamelFolderPriv *priv, gboolean destroy)
 	g_mutex_unlock (priv->folder_lock);
 }
 
+static void
+determine_push_email (TnyCamelFolderPriv *priv)
+{
+	if (!priv->folder || !CAMEL_IS_FOLDER (priv->folder))
+		return;
+
+	if (priv->observers && tny_list_get_length (priv->observers) > 0)
+		camel_folder_set_push_email (priv->folder, TRUE);
+	else
+		camel_folder_set_push_email (priv->folder, FALSE);
+
+	return;
+}
 
 static gboolean
 load_folder_no_lock (TnyCamelFolderPriv *priv)
@@ -342,6 +355,8 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 			priv->loaded = FALSE;
 			return FALSE;
 		}
+
+		determine_push_email (priv);
 
 		if (store->flags & CAMEL_STORE_SUBSCRIPTIONS)
 			priv->subscribed = 
@@ -2516,6 +2531,8 @@ tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *obser
 
 	tny_list_prepend (priv->observers, G_OBJECT (observer));
 
+	determine_push_email (priv);
+
 	return;
 }
 
@@ -2534,6 +2551,8 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
 	tny_list_remove (priv->observers, G_OBJECT (observer));
+
+	determine_push_email (priv);
 
 	return;
 }
