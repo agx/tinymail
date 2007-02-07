@@ -136,6 +136,20 @@ static void imap_set_server_level (CamelImapStore *store);
 
 static GPtrArray* imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
 
+void
+camel_imap_store_stop_idle (CamelImapStore *store)
+{
+	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder))
+		camel_imap_folder_stop_idle (store->current_folder);
+}
+
+
+void
+camel_imap_store_start_idle (CamelImapStore *store)
+{
+	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder))
+		camel_imap_folder_start_idle (store->current_folder);
+}
 
 static void
 camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
@@ -1089,12 +1103,13 @@ query_auth_types (CamelService *service, CamelException *ex)
 	
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex))
 		return NULL;
-	
+
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 	connected = store->istream != NULL && store->connected;
 	if (!connected)
 		connected = connect_to_server_wrapper (service, ex);
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
 	if (!connected)
 		return NULL;
 	
@@ -1509,6 +1524,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	CamelImapStoreNamespace *ns;
 
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+
 	if (!connect_to_server_wrapper (service, ex) ||
 	    !imap_auth_loop (service, ex)) {
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);

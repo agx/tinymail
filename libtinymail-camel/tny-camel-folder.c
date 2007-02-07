@@ -169,6 +169,8 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 			TnyHeader *hdr = tny_camel_header_new ();
 			if (!change)
 				change = tny_folder_change_new (TNY_FOLDER (self));
+			_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+				TNY_CAMEL_FOLDER (self), priv);
 			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
 			tny_folder_change_add_added_header (change, hdr);
 			g_object_unref (G_OBJECT (hdr));

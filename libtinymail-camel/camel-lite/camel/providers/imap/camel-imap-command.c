@@ -60,6 +60,9 @@ static char *imap_command_strdup_printf (CamelImapStore *store,
 					 const char *fmt, ...);
 
 
+
+
+
 /**
  * camel_imap_command:
  * @store: the IMAP store
@@ -93,9 +96,9 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 {
 	va_list ap;
 	char *cmd;
-	
+
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
-	
+
 	if (fmt) {
 		va_start (ap, fmt);
 		cmd = imap_command_strdup_vprintf (store, fmt, ap);
@@ -169,11 +172,13 @@ camel_imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	va_end (ap);
 
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+
 	ok = imap_command_start (store, folder, cmd, ex);
 	g_free (cmd);
-	
+
 	if (!ok)
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
 	return ok;
 }
 
@@ -188,9 +193,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 	g_return_val_if_fail(store->ostream!=NULL, FALSE);
 	g_return_val_if_fail(store->istream!=NULL, FALSE);
-	
-	if (store->current_folder)
-		camel_imap_folder_stop_idle (store->current_folder);
+
+	camel_imap_store_stop_idle (store);
 
 	/* Check for current folder */
 	if (folder && folder != store->current_folder) {
@@ -284,6 +288,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     g_strerror (errno));
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		return NULL;
 	}
@@ -363,11 +368,10 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 		break;
 	}
 	*response = respbuf;
-	
-	
+
 	if (type == CAMEL_IMAP_RESPONSE_ERROR ||
-	    type == CAMEL_IMAP_RESPONSE_TAGGED)
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);	
+	    type == CAMEL_IMAP_RESPONSE_TAGGED) 
+		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
 	return type;
 }
@@ -441,8 +445,9 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
 	 * we're still locked. This lock is owned by response
 	 * and gets unlocked when response is freed.
 	 */
+
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
-	
+
 	response = g_new0 (CamelImapResponse, 1);
 	if (store->current_folder && camel_disco_store_status (CAMEL_DISCO_STORE (store)) != CAMEL_DISCO_STORE_RESYNCING) {
 		response->folder = store->current_folder;
@@ -699,6 +704,7 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 	}
 	
 	g_free (response);
+
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 }
 
