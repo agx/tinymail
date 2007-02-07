@@ -20,7 +20,6 @@
 #include <config.h>
 #include <glib.h>
 #include <glib-object.h>
-#include <glib/gi18n-lib.h>
 #include <tny-maemo-device.h>
 #include <coniciap.h>
 #include <conicconnection.h>
@@ -32,6 +31,7 @@ static GObjectClass *parent_class = NULL;
 typedef struct {
 	ConIcConnection *cnx;
 	gboolean        is_online;
+	const gchar     *iap;
 } TnyMaemoDevicePriv;
 
 #define TNY_MAEMO_DEVICE_GET_PRIVATE(o)	\
@@ -39,25 +39,24 @@ typedef struct {
 
 
 static void 
-tny_maemo_device_reset (TnyDevice *self)
+tny_maemo_device_reset (TnyDevice *device)
 {
-	//TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-	/* FIXME: hmm... what to do here? */
+	/* intentionally left blank */
 }
 
 
 static void
-on_connection_event (ConIcConnection *self, ConIcConnectionEvent *event, gpointer user_data)
+on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer user_data)
 {
 	TnyMaemoDevice *device; 
 	TnyMaemoDevicePriv *priv;
-	
-	g_return_if_fail (event);
+	gboolean is_online;
+
+	g_return_if_fail (CON_IC_IS_CONNECTION(cnx));
 	g_return_if_fail (user_data);
 
 	device = TNY_MAEMO_DEVICE(user_data);
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (device);
-
 	
 	switch (con_ic_connection_event_get_error(event)) {
 	case CON_IC_CONNECTION_ERROR_NONE:
@@ -76,25 +75,25 @@ on_connection_event (ConIcConnection *self, ConIcConnectionEvent *event, gpointe
 	}
 
 	switch (con_ic_connection_event_get_status(event)) {
-		
 	case CON_IC_STATUS_CONNECTED:
-		priv->is_online = TRUE;
-		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
-			       0, TRUE);
+		is_online = TRUE;
 		break;
 	case CON_IC_STATUS_DISCONNECTED:		
-		priv->is_online = FALSE;
-		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
-			       0, FALSE);
+		is_online = FALSE;
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
-		priv->is_online = FALSE;
+		is_online = FALSE;
 		break;
 	default:
 		g_return_if_reached (); /* should not happen */
 	}
-}
 
+	if (is_online != priv->is_online) { /* was there a change? */
+		priv->is_online = is_online;
+		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+			       0, is_online);
+	}
+}
 
 
 static void 
@@ -104,7 +103,7 @@ tny_maemo_device_force_online (TnyDevice *self)
 	
 	g_return_if_fail (TNY_IS_DEVICE(self));
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-
+	
 	if (!priv->is_online) 
 		if (!con_ic_connection_connect (priv->cnx,CON_IC_CONNECT_FLAG_NONE))
 			g_warning ("could not send connect dbus message");
@@ -128,11 +127,10 @@ tny_maemo_device_force_offline (TnyDevice *self)
 static gboolean
 tny_maemo_device_is_online (TnyDevice *self)
 {
-	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
-	
-	/* FIXME: get the info directly from iap? */
+	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);	
 	return TNY_MAEMO_DEVICE_GET_PRIVATE (self)->is_online;
 }
+
 
 static void
 tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -167,17 +165,17 @@ tny_maemo_device_new (void)
 	}
 	g_signal_connect (priv->cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), self);
-	
+
 	/*
-	 * this will get us in connected state, but only if there is already a connection.
+	 * this will get us in connected state only if there is already a connection.
 	 * thus, this will setup our state correctly when we receive the signals
 	 */
-	if (!con_ic_connection_connect (priv->cnx,CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
-		g_warning ("could not send auto-connect dbus message");
-	
+	if (!con_ic_connection_connect (priv->cnx,
+					CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
+		g_warning ("could not send connect dbus message");
+
 	return TNY_DEVICE (self);
 }
-
 
 static void
 tny_maemo_device_finalize (GObject *obj)
@@ -185,9 +183,11 @@ tny_maemo_device_finalize (GObject *obj)
 	TnyMaemoDevicePriv *priv;
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (obj);
 
-	con_ic_connection_disconnect (priv->cnx);
-	g_object_unref (priv->cnx);
-	priv->cnx = NULL;
+	if (priv->cnx) {
+		con_ic_connection_disconnect (priv->cnx);
+		g_object_unref (priv->cnx);
+		priv->cnx = NULL;
+	}
 	
 	(*parent_class->finalize) (obj);
 }
