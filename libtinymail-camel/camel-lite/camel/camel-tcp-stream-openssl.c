@@ -293,7 +293,8 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 		int error, flags, fdmax;
 		struct timeval timeout;
 		fd_set rdset;
-		
+		int res;
+
 		flags = fcntl (openssl->priv->sockfd, F_GETFL);
 		fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
 		
@@ -302,12 +303,18 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 		do {
 			FD_ZERO (&rdset);
 			FD_SET (openssl->priv->sockfd, &rdset);
-			
+			nread = -1;
 			timeout.tv_sec = 0;
 			timeout.tv_usec = 0;
-			select (fdmax, &rdset, 0, 0, &timeout);
+			res = select (fdmax, &rdset, 0, 0, &timeout);
 			
-			do {
+			if (res == -1)
+                                ;
+                        else if (res == 0)
+                                errno = ETIMEDOUT;
+                        else {
+
+			  do {
 				if (ssl) {
 					nread = SSL_read (ssl, buffer, n);
 					if (nread < 0)
@@ -315,7 +322,8 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 				} else {
 					nread = read (openssl->priv->sockfd, buffer, n);
 				}
-			} while (0 && (nread < 0 && errno == EINTR));
+			  } while (0 && (nread < 0 && errno == EINTR));
+			}
 		} while (0 && (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)));
 		
 		error = errno;
@@ -325,7 +333,8 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 		int error, flags, fdmax;
 		struct timeval timeout;
 		fd_set rdset;
-		
+		int res;
+
 		flags = fcntl (openssl->priv->sockfd, F_GETFL);
 		fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
 		
@@ -335,7 +344,7 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (openssl->priv->sockfd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			
+			nread = -1;
 			timeout.tv_sec = 0;
 			timeout.tv_usec = 0;
 			select (fdmax, &rdset, 0, 0, &timeout);
@@ -345,7 +354,13 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 				return -1;
 			}
 			
-			do {
+			if (res == -1)
+                                ;
+                        else if (res == 0)
+                                errno = ETIMEDOUT;
+                        else 
+
+			  do {
 				if (ssl) {
 					nread = SSL_read (ssl, buffer, n);
 					if (nread < 0)
@@ -353,7 +368,8 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 				} else {
 					nread = read (openssl->priv->sockfd, buffer, n);
 				}
-			} while (0 && (nread < 0 && errno == EINTR));
+			  } while (0 && (nread < 0 && errno == EINTR));
+			}
 		} while (0 && (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)));
 		
 		error = errno;
