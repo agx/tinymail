@@ -304,7 +304,7 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 			FD_SET (openssl->priv->sockfd, &rdset);
 			
 			timeout.tv_sec = 0;
-			timeout.tv_usec = TIMEOUT_USEC;
+			timeout.tv_usec = 0;
 			select (fdmax, &rdset, 0, 0, &timeout);
 			
 			do {
@@ -337,7 +337,7 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 			FD_SET (cancel_fd, &rdset);
 			
 			timeout.tv_sec = 0;
-			timeout.tv_usec = TIMEOUT_USEC;
+			timeout.tv_usec = 0;
 			select (fdmax, &rdset, 0, 0, &timeout);
 			if (FD_ISSET (cancel_fd, &rdset)) {
 				fcntl (openssl->priv->sockfd, F_SETFL, flags);

@@ -383,7 +383,9 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 #endif
 			} else {
 				 do { 
-					nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
+					nread = -1;
+					if (PR_Available (tcp_stream_ssl->priv->sockfd) != 0)
+						nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
 					if (nread == -1)
 						set_errno (PR_GetError ());
 				 } while (0 && (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR)); 
@@ -433,7 +435,9 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 				goto failed;
 			} else {
 				 do { 
-					nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
+					nread = -1;
+					if (PR_Available (tcp_stream_ssl->priv->sockfd) != 0)
+						nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
 					if (nread == -1)
 						set_errno (PR_GetError ());
 				 } while (0 && (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR)); 
