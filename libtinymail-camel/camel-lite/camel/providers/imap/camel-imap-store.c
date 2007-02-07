@@ -136,6 +136,21 @@ static void imap_set_server_level (CamelImapStore *store);
 
 static GPtrArray* imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
 
+static void let_idle_die (CamelImapStore *imap_store)
+{
+	if (imap_store->idle_signal > 0) 
+		g_source_remove (imap_store->idle_signal);
+
+	if (imap_store->idle_prefix)
+	{
+		g_free (imap_store->idle_prefix); 
+		imap_store->idle_prefix=NULL;
+		g_mutex_lock (imap_store->stream_lock);
+		camel_stream_printf (imap_store->ostream, "DONE\r\n");
+		g_mutex_unlock (imap_store->stream_lock);
+	}
+}
+
 void
 camel_imap_store_stop_idle (CamelImapStore *store)
 {
@@ -213,19 +228,9 @@ camel_imap_store_finalize (CamelObject *object)
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 	CamelDiscoStore *disco = CAMEL_DISCO_STORE (object);
 
-	if (imap_store->idle_signal > 0)
-		g_source_remove (imap_store->idle_signal);
-	
-        if (imap_store->idle_prefix)
-	{
-		g_free (imap_store->idle_prefix); 
-		imap_store->idle_prefix=NULL;
-		g_mutex_lock (imap_store->stream_lock);
-		camel_stream_printf (imap_store->ostream, "DONE\r\n");
-		g_mutex_unlock (imap_store->stream_lock);
-	}
-	
-	
+
+	let_idle_die (imap_store);
+
 	/* This frees current_folder, folders, authtypes, streams, and namespace. */
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
 
@@ -1531,6 +1536,8 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	size_t len;
 	CamelImapStoreNamespace *ns;
 
+	let_idle_die (store);
+
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 
 	if (!connect_to_server_wrapper (service, ex) ||
@@ -1670,9 +1677,11 @@ imap_connect_offline (CamelService *service, CamelException *ex)
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 	CamelDiscoStore *disco_store = CAMEL_DISCO_STORE (service);
 
+	let_idle_die (store);
+
 	if (!disco_store->diary)
 		return FALSE;
-	
+
 	store->connected = !camel_exception_is_set (ex);
 	return store->connected;
 }
@@ -1681,6 +1690,8 @@ static gboolean
 imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *ex)
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
+
+	let_idle_die (store);
 
 	g_mutex_lock (store->stream_lock);
 	if (store->istream) {
@@ -1721,7 +1732,9 @@ imap_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 	CamelImapResponse *response;
-	
+
+	let_idle_die (store);
+
 	if (store->connected && clean) {
 		response = camel_imap_command (store, NULL, NULL, "LOGOUT");
 		camel_imap_response_free (store, response);

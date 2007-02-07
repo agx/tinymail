@@ -858,7 +858,7 @@ tny_gtk_header_list_model_finalize (GObject *object)
 	if (self->first)
 	{
 		/* TNY TODO: For debugging reasons disabled */
-		if (FALSE && G_LIKELY (g_main_depth () > 0))
+		if (/* FALSE && */ G_LIKELY (g_main_depth () > 0))
 			tny_gtk_header_list_model_hdr_cache_remover_copy (
 				self, final_destruction, info, NULL);
 		else {
