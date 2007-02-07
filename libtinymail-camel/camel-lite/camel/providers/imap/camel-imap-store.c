@@ -213,9 +213,19 @@ camel_imap_store_finalize (CamelObject *object)
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 	CamelDiscoStore *disco = CAMEL_DISCO_STORE (object);
 
-	if (imap_store->current_folder)
-		camel_imap_folder_stop_idle (CAMEL_FOLDER (imap_store->current_folder));
-
+	if (imap_store->idle_signal > 0)
+		g_source_remove (imap_store->idle_signal);
+	
+        if (imap_store->idle_prefix)
+	{
+		g_free (imap_store->idle_prefix); 
+		imap_store->idle_prefix=NULL;
+		g_mutex_lock (imap_store->stream_lock);
+		camel_stream_printf (imap_store->ostream, "DONE\r\n");
+		g_mutex_unlock (imap_store->stream_lock);
+	}
+	
+	
 	/* This frees current_folder, folders, authtypes, streams, and namespace. */
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
 
@@ -234,8 +244,6 @@ camel_imap_store_finalize (CamelObject *object)
 		disco->diary = NULL;
 	}
 
-	if (imap_store->idle_prefix)
-		g_free (imap_store->idle_prefix);
 	
 	g_mutex_free (imap_store->stream_lock);
 

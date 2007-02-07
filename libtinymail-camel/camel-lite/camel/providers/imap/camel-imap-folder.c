@@ -3122,8 +3122,7 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done)
 				goto outofhere;
 
 			g_mutex_lock (store->stream_lock);
-			camel_stream_printf (store->ostream, "DONE\r\n",
-						store->idle_prefix);
+			camel_stream_printf (store->ostream, "DONE\r\n");
 			g_mutex_unlock (store->stream_lock);
 
 			while ((type = camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
