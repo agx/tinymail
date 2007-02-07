@@ -3058,10 +3058,6 @@ process_idle_response (CamelFolder *folder, IdleResponse *idle_resp)
 	if (!idle_resp)
 		return;
 
-	printf ("Processing IDLE: %d, %d, %d\n",
-		idle_resp->exists, idle_resp->recent,
-		idle_resp->expunge);
-
 	changes = camel_folder_change_info_new ();
 
 	imap_update_summary (folder, idle_resp->exists, changes, &ex);
@@ -3078,8 +3074,6 @@ static void
 read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 {
 	char *ptr = strchr (resp, '*');
-
-printf ("IDLE: %s\n", resp);
 
 	if (ptr && strstr (resp, "EXISTS") != NULL)
 		idle_resp->exists = strtoul (resp + 1, NULL, 10);
@@ -3114,8 +3108,8 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done)
 				if (!idle_resp)
 					idle_resp = g_slice_new0 (IdleResponse);
 				read_idle_response (folder, resp, idle_resp);
-			} else
-				printf ("IDLE: %s\n", resp);
+			}
+
 			g_free (resp); resp=NULL;
 		}
 
@@ -3210,20 +3204,16 @@ idle_timeout_checker (gpointer data)
 	if (store->idle_prefix == NULL)
 		return FALSE;
 
-printf ("CHECKER 1)\n");
-
 	if (store->capabilities & IMAP_CAPABILITY_IDLE)
 	{
 		IdleResponse * idle_resp = idle_deal_with_stuff (folder, store, FALSE);
 
-printf ("CHECKER (%s)\n", idle_resp ? "YES" : "NO");
 		/* Outside of the lock of course */
 		if (idle_resp)
 		{
 			process_idle_response (folder, idle_resp);
 			g_slice_free (IdleResponse, idle_resp);
 		}
-printf ("DONE\n");
 
 	}
 
