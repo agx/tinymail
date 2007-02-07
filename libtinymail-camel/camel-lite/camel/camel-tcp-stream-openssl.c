@@ -347,7 +347,7 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 			nread = -1;
 			timeout.tv_sec = 0;
 			timeout.tv_usec = 0;
-			select (fdmax, &rdset, 0, 0, &timeout);
+			res = select (fdmax, &rdset, 0, 0, &timeout);
 			if (FD_ISSET (cancel_fd, &rdset)) {
 				fcntl (openssl->priv->sockfd, F_SETFL, flags);
 				errno = EINTR;
