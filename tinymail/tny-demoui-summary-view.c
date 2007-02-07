@@ -109,10 +109,11 @@ static void
 set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
 {
 	GtkTreeModel *oldsortable = gtk_tree_view_get_model (GTK_TREE_VIEW (header_view));
+
 	if (oldsortable && GTK_IS_TREE_MODEL_SORT (oldsortable))
 	{ 
 		GtkTreeModel *oldmodel = gtk_tree_model_sort_get_model 
-			(GTK_TREE_MODEL_SORT (oldsortable));
+					(GTK_TREE_MODEL_SORT (oldsortable));
 		if (oldmodel)
 			g_object_unref (G_OBJECT (oldmodel));
 		g_object_unref (G_OBJECT (oldsortable));
@@ -129,8 +130,20 @@ static void
 reload_accounts (TnyDemouiSummaryViewPriv *priv)
 {
 	TnyAccountStore *account_store = priv->account_store;
-	GtkTreeModel *sortable, *maccounts;
+	GtkTreeModel *sortable, *maccounts, *mailbox_model;
 	TnyFolderStoreQuery *query;
+
+	g_mutex_lock (priv->monitor_lock);
+	{
+
+		if (priv->monitor)
+		{
+			tny_folder_monitor_stop (priv->monitor);
+			g_object_unref (G_OBJECT (priv->monitor));
+		}
+		priv->monitor = NULL;
+	}
+	g_mutex_unlock (priv->monitor_lock);
 
 	/* Show only subscribed folders */
 	query = tny_folder_store_query_new ();
@@ -140,10 +153,11 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	/* TnyGtkFolderStoreTreeModel is also a TnyList (it simply implements both the
 	   TnyList and the GtkTreeModel interfaces) */
 #if PLATFORM==1
-	GtkTreeModel *mailbox_model = tny_gtk_folder_store_tree_model_new (TRUE, NULL);
+	mailbox_model = tny_gtk_folder_store_tree_model_new (TRUE, NULL);
 #else
-	GtkTreeModel *mailbox_model = tny_gtk_folder_store_tree_model_new (FALSE, NULL);
+	mailbox_model = tny_gtk_folder_store_tree_model_new (FALSE, NULL);
 #endif
+
 	g_object_unref (G_OBJECT (query));
 
 	TnyList *accounts = TNY_LIST (mailbox_model);
