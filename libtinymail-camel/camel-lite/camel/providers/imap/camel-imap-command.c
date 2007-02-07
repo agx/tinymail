@@ -418,8 +418,8 @@ camel_imap_command_response_idle (CamelImapStore *store, char **response,
 					      ((CamelService *)store)->url->user, ((CamelService *)store)->url->host, respbuf+12);
 			camel_session_alert_user(((CamelService *)store)->session, CAMEL_SESSION_ALERT_WARNING, msg, FALSE);
 			g_free(msg);
-		}
-		
+		} else if (!g_ascii_strncasecmp (respbuf, "* BAD Invalid tag",17))
+			type = CAMEL_IMAP_RESPONSE_ERROR;
 		break;
 	case '+':
 		type = CAMEL_IMAP_RESPONSE_CONTINUATION;

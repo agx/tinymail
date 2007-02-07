@@ -3486,7 +3486,10 @@ camel_message_info_ptr(const CamelMessageInfo *mi, int id)
 		return NULL;
 
 	if (mi->summary)
-		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_ptr(mi, id);
+		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
+			return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_ptr(mi, id);
+		else 
+			return NULL;
 	else
 		return info_ptr(mi, id);
 }
@@ -3508,7 +3511,10 @@ camel_message_info_uint32(const CamelMessageInfo *mi, int id)
 		return 0;
 
 	if (mi->summary)
-		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_uint32(mi, id);
+		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
+			return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_uint32(mi, id);
+		else
+			return 0;
 	else
 		return info_uint32(mi, id);
 }
@@ -3530,7 +3536,10 @@ camel_message_info_time(const CamelMessageInfo *mi, int id)
 		return 0;
 
 	if (mi->summary)
-		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_time(mi, id);
+		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
+			return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_time(mi, id);
+		else 
+			return -1;
 	else
 		return info_time(mi, id);
 }
@@ -3549,7 +3558,10 @@ gboolean
 camel_message_info_user_flag(const CamelMessageInfo *mi, const char *id)
 {
 	if (mi->summary)
-		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_user_flag(mi, id);
+		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
+			return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_user_flag(mi, id);
+		else
+			return FALSE;
 	else
 		return info_user_flag(mi, id);
 }
@@ -3568,7 +3580,10 @@ const char *
 camel_message_info_user_tag(const CamelMessageInfo *mi, const char *id)
 {
 	if (mi->summary)
-		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_user_tag(mi, id);
+		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
+			return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_user_tag(mi, id);
+		else
+			return NULL;
 	else
 		return info_user_tag(mi, id);
 }
@@ -3618,7 +3633,10 @@ gboolean
 camel_message_info_set_flags(CamelMessageInfo *mi, guint32 flags, guint32 set)
 {
 	if (mi->summary)
-		return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_set_flags(mi, flags, set);
+		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
+			return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_set_flags(mi, flags, set);
+		else
+			return FALSE;
 	else
 		return info_set_flags(mi, flags, set);
 }

@@ -3208,12 +3208,15 @@ idle_timeout_checker (gpointer data)
 		IdleResponse * idle_resp = idle_deal_with_stuff (folder, store, FALSE);
 
 		/* Outside of the lock of course */
-		if (idle_resp)
+		if (idle_resp && store->idle_prefix)
 		{
 			process_idle_response (folder, idle_resp);
 			g_slice_free (IdleResponse, idle_resp);
+		} else {
+			if (idle_resp)
+				g_slice_free (IdleResponse, idle_resp);
+			return FALSE;
 		}
-
 	}
 
 	return (store->idle_prefix != NULL);
