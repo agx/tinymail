@@ -568,6 +568,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	} else
 		g_free (phighestmodseq);
 
+	/* Maybe we can remove this one , soon */
 	camel_imap_folder_start_idle (folder);
 
 }
@@ -690,6 +691,7 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 		if (response) {
 			camel_imap_folder_selected (folder, response, ex);
 			camel_imap_response_free (imap_store, response);
+			camel_imap_folder_start_idle (folder);
 		}
 	} else if (imap_folder->need_rescan) {
 		/* Otherwise, if we need a rescan, do it, and if not, just do
@@ -704,10 +706,12 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 		if (g_ascii_strcasecmp(folder->full_name, "INBOX") == 0) {
 			response = camel_imap_command (imap_store, folder, ex, "CHECK");
 			camel_imap_response_free (imap_store, response);
+			camel_imap_folder_start_idle (folder);
 		}
 #endif
 		response = camel_imap_command (imap_store, folder, ex, "NOOP");
 		camel_imap_response_free (imap_store, response);
+		camel_imap_folder_start_idle (folder);
 	}
 
 	si = camel_store_summary_path((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary, folder->full_name);
@@ -1216,6 +1220,7 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 	imap_sync_offline (folder, ex);
 	
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+	camel_imap_folder_start_idle (folder);
 }
 
 static int
@@ -1304,6 +1309,9 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 	}
 	
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
+	camel_imap_folder_start_idle (folder);
+
 }
 
 static void
@@ -1409,6 +1417,7 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 				return;
 			}
 			camel_imap_response_free (store, response);
+
 		}
 	}
 	
@@ -1432,7 +1441,6 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 				CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 				return;
 			}
-			camel_imap_response_free (store, response);
 		}
 
 		if (mark_uids != uids)
@@ -1470,6 +1478,9 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 	g_free (result);
 	
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
+	camel_imap_folder_start_idle (folder);
+
 }
 
 static gchar *
@@ -1655,6 +1666,9 @@ imap_append_online (CamelFolder *folder, CamelMimeMessage *message,
 	    camel_folder_summary_count (folder->summary) == count)
 		imap_refresh_info (folder, ex);
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
+	camel_imap_folder_start_idle (folder);
+
 }
 
 static void
@@ -1878,6 +1892,9 @@ imap_transfer_online (CamelFolder *source, GPtrArray *uids,
 	/* FIXME */
 	if (transferred_uids)
 		*transferred_uids = NULL;
+
+	camel_imap_folder_start_idle (source);
+
 }
 
 static void
