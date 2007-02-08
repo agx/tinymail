@@ -374,6 +374,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 				_("Account not ready for this operation (%s)"),
 				camel_exception_get_description (apriv->ex));
+		_tny_session_stop_operation (apriv->session);
 		return;
 	}
 
@@ -388,7 +389,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 		if (store && CAMEL_IS_OBJECT (store))
 				camel_object_unref (CAMEL_OBJECT (store));
-
+		_tny_session_stop_operation (apriv->session);
 		return;
 	}
 
@@ -416,6 +417,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	camel_object_unref (CAMEL_OBJECT (store));
 
+	_tny_session_stop_operation (apriv->session);
 
 	return;
 }
@@ -443,7 +445,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				_("Failed to create folder with no name"));
-
+		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
 
@@ -455,6 +457,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				_("Account not ready for this operation (%s)"),
 				camel_exception_get_description (apriv->ex));
+		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
 
@@ -469,7 +472,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 		if (store && CAMEL_IS_OBJECT (store))
 				camel_object_unref (CAMEL_OBJECT (store));
-
+		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
 
@@ -490,7 +493,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 				camel_store_free_folder_info (store, info);
 			camel_object_unref (CAMEL_OBJECT (store));
 		}
-
+		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
 
@@ -501,6 +504,8 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	camel_store_free_folder_info (store, info);
 
 	camel_object_unref (CAMEL_OBJECT (store));
+
+	_tny_session_stop_operation (apriv->session);
 
 	return folder;
 }
@@ -562,6 +567,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 				_("Account not ready for this operation (%s)"),
 				camel_exception_get_description (apriv->ex));
+		_tny_session_stop_operation (apriv->session);
 		return;
 	}
 
@@ -576,7 +582,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 		if (store && CAMEL_IS_OBJECT (store))
 			camel_object_unref (CAMEL_OBJECT (store));
-
+		_tny_session_stop_operation (apriv->session);
 		return;
 	}
 
@@ -603,7 +609,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 				camel_store_free_folder_info (store, iter);
 			camel_object_unref (CAMEL_OBJECT (store));
 		}
-
+		_tny_session_stop_operation (apriv->session);
 		return;
 	}
 
@@ -638,6 +644,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 		iter = iter->next;
 	  }
 	}
+	_tny_session_stop_operation (apriv->session);
 	return;
 }
 
@@ -649,7 +656,7 @@ typedef struct {
 	TnyGetFoldersCallback callback;
 	TnyFolderStoreQuery *query;
 	gpointer user_data;
-	guint depth;
+	guint depth; TnySessionCamel *session;
 } GetFoldersInfo;
 
 
@@ -664,6 +671,8 @@ tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 
 	if (info->err)
 		g_error_free (info->err);
+
+	_tny_session_stop_operation (info->session);
 
 	g_slice_free (GetFoldersInfo, info);
 
@@ -746,6 +755,7 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	}
 
 	info = g_slice_new0 (GetFoldersInfo);
+	info->session = apriv->session;
 	info->err = NULL;
 	info->self = self;
 	info->list = list;

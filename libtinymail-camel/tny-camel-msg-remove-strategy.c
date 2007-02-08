@@ -72,10 +72,6 @@ tny_camel_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStrategy *self
 	CamelFolder *cfolder;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION (priv), err, 
-			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REMOVE_MSG))
-		return;
-
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 	g_assert (TNY_IS_HEADER (header));
 

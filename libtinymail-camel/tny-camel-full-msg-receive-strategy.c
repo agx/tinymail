@@ -60,10 +60,6 @@ tny_camel_full_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrate
 	const gchar *id;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION (priv), err, 
-			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
-		return;
-
 	g_assert (TNY_IS_HEADER (header));
 
 	id = tny_header_get_uid (TNY_HEADER (header));

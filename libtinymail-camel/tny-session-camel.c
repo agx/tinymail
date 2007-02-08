@@ -346,6 +346,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->priv = g_slice_new (TnySessionCamelPriv);
 	priv = instance->priv;
 
+	priv->is_inuse = FALSE;
 	priv->conlock = g_mutex_new ();
 	priv->conthread = NULL;
 	priv->current_accounts = NULL;

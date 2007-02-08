@@ -48,7 +48,16 @@ _tny_session_check_operation (TnySessionCamel *session, GError **err, GQuark dom
 		return FALSE;
 	}
 
+	in->priv->is_inuse = TRUE; /* Not yet used */
+
 	return TRUE;
+}
+
+void 
+_tny_session_stop_operation (TnySessionCamel *session)
+{
+	TnySessionCamel *in = (TnySessionCamel *) session;
+	in->priv->is_inuse = FALSE;
 }
 
 
