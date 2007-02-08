@@ -3090,10 +3090,11 @@ read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 static IdleResponse*
 idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done, gboolean *had_err)
 {
-	IdleResponse *idle_resp = NULL;
+  IdleResponse *idle_resp = NULL;
 
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
-
+  gboolean locked = CAMEL_SERVICE_REC_TRYLOCK (store, connect_lock);
+  if (locked)
+  {
 	if (store->current_folder && store->idle_prefix)
 	{
 		CamelImapResponseType type;
@@ -3154,8 +3155,10 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done,
 outofhere:
 
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+  }
 
-	return idle_resp;
+
+  return idle_resp;
 }
 
 void
