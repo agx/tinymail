@@ -3243,7 +3243,7 @@ imap_set_push_email (CamelFolder *folder, gboolean setting)
 		camel_imap_folder_start_idle (folder);
 	}
 
-
+	return;
 }
 
 void
