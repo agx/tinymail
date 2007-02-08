@@ -29,6 +29,8 @@ struct _TnyCamelStoreAccountPriv
 	GList *managed_folders;
 };
 
+gpointer _tny_camel_store_account_folder_factory_get_folder (TnyCamelStoreAccountPriv *priv, const gchar *full_name, gboolean *was_new);
+
 #define TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_STORE_ACCOUNT, TnyCamelStoreAccountPriv))
 

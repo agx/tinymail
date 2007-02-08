@@ -511,6 +511,32 @@ tny_camel_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFol
 	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_func (self, list, query, err);
 }
 
+gpointer 
+_tny_camel_store_account_folder_factory_get_folder (TnyCamelStoreAccountPriv *priv, const gchar *full_name, gboolean *was_new)
+{
+	TnyCamelFolder *folder = NULL;
+
+	GList *copy = priv->managed_folders;
+	while (copy)
+	{
+		TnyFolder *fnd = (TnyFolder*) copy->data;
+		const gchar *name = tny_folder_get_id (fnd);
+		if (!strcmp (name, full_name))
+		{
+			folder = TNY_CAMEL_FOLDER (g_object_ref (G_OBJECT (fnd)));
+			*was_new = FALSE;
+			break;
+		}
+		copy = g_list_next (copy);
+	}
+
+	if (!folder) {
+		folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
+		*was_new = TRUE;
+	}
+
+	return folder;
+}
 
 static void 
 tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
@@ -590,19 +616,23 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	  {
 		if (_tny_folder_store_query_passes (query, iter))
 		{
-			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
+			gboolean was_new = FALSE;
 
-			_tny_camel_folder_set_id (folder, iter->full_name);
-			_tny_camel_folder_set_folder_type (folder, iter);
-			_tny_camel_folder_set_unread_count (folder, iter->unread);
-			_tny_camel_folder_set_all_count (folder, iter->total);
-			_tny_camel_folder_set_name (folder, iter->name);
-			_tny_camel_folder_set_iter (folder, iter);
-			priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-			_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
+			TnyCamelFolder *folder = _tny_camel_store_account_folder_factory_get_folder (priv, iter->full_name, &was_new);
+
+			if (was_new)
+			{
+				_tny_camel_folder_set_id (folder, iter->full_name);
+				_tny_camel_folder_set_folder_type (folder, iter);
+				_tny_camel_folder_set_unread_count (folder, iter->unread);
+				_tny_camel_folder_set_all_count (folder, iter->total);
+				_tny_camel_folder_set_name (folder, iter->name);
+				_tny_camel_folder_set_iter (folder, iter);
+				priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+				_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
+			}
 
 			tny_list_prepend (list, G_OBJECT (folder));
-
 			g_object_unref (G_OBJECT (folder));
 		}
 		iter = iter->next;

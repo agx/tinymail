@@ -2222,6 +2222,7 @@ static void
 tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 	CamelFolderInfo *iter;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
@@ -2258,12 +2259,17 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	  {
 		if (_tny_folder_store_query_passes (query, iter))
 		{
-			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
-		    
-			tny_camel_folder_set_folder_info (self, folder, iter);
+			gboolean was_new = FALSE;
+
+			TnyCamelFolder *folder = _tny_camel_store_account_folder_factory_get_folder (apriv, iter->full_name, &was_new);
+
+			if (was_new)
+			{
+				tny_camel_folder_set_folder_info (self, folder, iter);
+				apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
+			}
 
 			tny_list_prepend (list, G_OBJECT (folder));
-
 			g_object_unref (G_OBJECT (folder));
 		}
 		iter = iter->next;
