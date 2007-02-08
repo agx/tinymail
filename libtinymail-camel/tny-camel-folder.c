@@ -1565,7 +1565,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		goto exception;
 	}
 
-	retval = tny_camel_folder_new ();
+	retval = _tny_camel_folder_new ();
 	fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
 
 	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (retval), iter->full_name);
@@ -2161,7 +2161,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 		return NULL;
 	}
 
-	folder = tny_camel_folder_new ();
+	folder = _tny_camel_folder_new ();
 	tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
 	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE);
 
@@ -2258,7 +2258,7 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	  {
 		if (_tny_folder_store_query_passes (query, iter))
 		{
-			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_folder_new ());
+			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
 		    
 			tny_camel_folder_set_folder_info (self, folder, iter);
 
@@ -2558,16 +2558,9 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 }
 
 
-/**
- * tny_camel_folder_new_with_folder:
- * @camel_folder: CamelFolder instance to play proxy for 
- *
- * The #TnyCamelFolder implementation is actually a proxy for #CamelFolder
- *
- * Return value: A new #TnyFolder instance implemented for Camel
- **/
+
 TnyFolder*
-tny_camel_folder_new_with_folder (CamelFolder *camel_folder)
+_tny_camel_folder_new_with_folder (CamelFolder *camel_folder)
 {
 	TnyCamelFolder *self = g_object_new (TNY_TYPE_CAMEL_FOLDER, NULL);
 
@@ -2577,17 +2570,9 @@ tny_camel_folder_new_with_folder (CamelFolder *camel_folder)
 }
 
 
-/**
- * tny_camel_folder_new:
- * 
- * The #TnyCamelFolder implementation is actually a proxy for #CamelFolder.
- * You need to set the #CamelFolder after using this constructor using
- * tny_camel_folder_set_folder
- *
- * Return value: A new #TnyFolder instance implemented for Camel
- **/
+
 TnyFolder*
-tny_camel_folder_new (void)
+_tny_camel_folder_new (void)
 {
 	TnyCamelFolder *self = g_object_new (TNY_TYPE_CAMEL_FOLDER, NULL);
 

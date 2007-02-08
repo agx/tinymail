@@ -88,8 +88,6 @@ struct _TnyCamelFolderClass
 
 GType tny_camel_folder_get_type (void);
 
-TnyFolder* tny_camel_folder_new_with_folder (CamelFolder *camel_folder);
-TnyFolder* tny_camel_folder_new (void);
 
 CamelFolder* tny_camel_folder_get_folder (TnyCamelFolder *self);
 

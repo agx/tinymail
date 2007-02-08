@@ -335,7 +335,7 @@ create_maildir (TnySendQueue *self, const gchar *name)
 
 			if (!camel_exception_is_set (&ex) && iter)
 			{
-				TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_folder_new ());
+				TnyCamelFolder *folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
 				TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 
 				_tny_camel_folder_set_id (folder, iter->full_name);

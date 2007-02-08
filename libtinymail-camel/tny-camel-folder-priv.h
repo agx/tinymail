@@ -76,4 +76,7 @@ void _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_fold
 	((o)&&(o)->account?TNY_CAMEL_ACCOUNT_GET_PRIVATE ((o)->account)->session:NULL)
 
 
+TnyFolder* _tny_camel_folder_new_with_folder (CamelFolder *camel_folder);
+TnyFolder* _tny_camel_folder_new (void);
+
 #endif

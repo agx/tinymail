@@ -496,7 +496,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	g_assert (info != NULL);
 
-	folder = tny_camel_folder_new ();
+	folder = _tny_camel_folder_new ();
 	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
 	camel_store_free_folder_info (store, info);
 
@@ -590,7 +590,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	  {
 		if (_tny_folder_store_query_passes (query, iter))
 		{
-			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (tny_camel_folder_new ());
+			TnyCamelFolder *folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
 
 			_tny_camel_folder_set_id (folder, iter->full_name);
 			_tny_camel_folder_set_folder_type (folder, iter);
