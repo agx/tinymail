@@ -223,8 +223,10 @@ pos_header_check (gpointer data, gpointer udata)
 static gpointer 
 folder_destroyer_thread (gpointer data)
 {
-	while (((CamelObject*)data)->ref_count >= 1) {
-	/*	printf ("%d\n", (((CamelObject*)data)->ref_count)); */
+
+	while (CAMEL_IS_OBJECT (data) && CAMEL_OBJECT (data)->ref_count >= 1) 
+	{
+		/* printf ("%d\n", (((CamelObject*)data)->ref_count)); */
 		camel_object_unref (CAMEL_OBJECT (data));
 	}
 
