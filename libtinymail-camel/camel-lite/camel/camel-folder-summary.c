@@ -338,11 +338,11 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	g_mutex_lock (s->dump_lock);
 
-	camel_folder_summary_unload_mmap (s);
-
 	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
 	/* camel_folder_summary_clear(s); */
 	g_ptr_array_free(s->messages, TRUE);
+
+	camel_folder_summary_unload_mmap (s);
 
 	g_mutex_unlock (s->dump_lock);
 	g_mutex_free (s->dump_lock);
