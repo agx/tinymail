@@ -355,10 +355,10 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 			}
 			
 			if (res == -1)
-                                ;
-                        else if (res == 0)
-                                errno = ETIMEDOUT;
-                        else {
+				;
+			else if (res == 0)
+				errno = ETIMEDOUT;
+			else {
 
 			  do {
 				if (ssl) {
