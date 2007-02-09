@@ -309,7 +309,7 @@ AC_SUBST(LIBTINYMAIL_OLPC_LIBS)
 
 dnl ### libtinymail-maemo, a platform library implementation for the maemo platform ##
 if test x$PLATFORMDIR = xlibtinymail-maemo; then
- PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+ PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 hildon-libs libosso   conic)
 else
  LIBTINYMAIL_MAEMO_CFLAGS=
  LIBTINYMAIL_MAEMO_LIBS=
