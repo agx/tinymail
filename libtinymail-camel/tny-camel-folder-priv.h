@@ -47,7 +47,7 @@ struct _TnyCamelFolderPriv
 	TnyMsgRemoveStrategy *remove_strat;
 	TnyMsgReceiveStrategy *receive_strat;
 	TnyList *observers; TnyFolder *self;
-	gboolean want_changes;
+	gboolean want_changes, dont_fkill;
 
 #ifdef HEALTHY_CHECK
 	GList *possible_headers;

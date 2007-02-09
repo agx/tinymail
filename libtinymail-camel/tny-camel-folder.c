@@ -236,6 +236,8 @@ folder_destroyer_thread (gpointer data)
 static void
 unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 {
+	if (priv->dont_fkill)
+		return;
 
 	if (priv->folder && !CAMEL_IS_FOLDER (priv->folder))
 	{
@@ -2657,6 +2659,7 @@ tny_camel_folder_finalize (GObject *object)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->folder_lock);
+	priv->dont_fkill = FALSE;
 
 	g_object_unref (G_OBJECT (priv->observers));
 
@@ -2816,6 +2819,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->self = (TnyFolder *) self;
 	priv->want_changes = TRUE;
 
+	priv->dont_fkill = FALSE;
 	priv->observers = tny_simple_list_new ();
 	priv->iter = NULL;
 	priv->iter_parented = FALSE;
