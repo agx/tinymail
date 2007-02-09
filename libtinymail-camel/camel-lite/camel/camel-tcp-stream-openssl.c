@@ -95,7 +95,7 @@ camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_cl
 	camel_stream_class->flush = stream_flush;
 	camel_stream_class->close = stream_close;
 	
-	camel_tcp_stream_class->connect = stream_read_nb;
+	camel_tcp_stream_class->read_nb = stream_read_nb;
 	camel_tcp_stream_class->connect = stream_connect;
 	camel_tcp_stream_class->getsockopt = stream_getsockopt;
 	camel_tcp_stream_class->setsockopt = stream_setsockopt;
@@ -358,7 +358,7 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
                                 ;
                         else if (res == 0)
                                 errno = ETIMEDOUT;
-                        else 
+                        else {
 
 			  do {
 				if (ssl) {
