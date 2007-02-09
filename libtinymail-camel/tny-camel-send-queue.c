@@ -166,6 +166,7 @@ thread_main (gpointer data)
 				g_mutex_unlock (priv->todo_lock);
 				break;
 			}
+
 			hdriter = tny_list_create_iterator (headers);
 			header = (TnyHeader *) tny_iterator_get_current (hdriter);
 
