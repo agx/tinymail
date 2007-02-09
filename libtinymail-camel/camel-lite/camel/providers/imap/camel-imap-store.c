@@ -1512,9 +1512,17 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 						    "to IMAP server.\n%s\n\n"),
 						  camel_exception_get_description (ex));
 			camel_exception_clear (ex);
-		}
+		} else
+			if (!imap_get_capability (service, ex))
+			{
+				errbuf = g_strdup_printf (_("Unable to authenticate "
+							    "to IMAP server.\n%s\n\n"),
+							  camel_exception_get_description (ex));
+				camel_exception_clear (ex);
+				return FALSE;
+			}
 	}
-	
+
 	return TRUE;
 }
 
