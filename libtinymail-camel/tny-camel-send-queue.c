@@ -39,9 +39,6 @@ static GObjectClass *parent_class = NULL;
 #define TNY_CAMEL_SEND_QUEUE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_SEND_QUEUE, TnyCamelSendQueuePriv))
 
-
-/* TODO: jump out of the thread for error handling using g_idle_add */
-
 typedef struct
 {
 	TnySendQueue *self;
