@@ -49,10 +49,10 @@ struct _TnyCamelSendQueueClass
 	GObjectClass parent;
 
 	/* virtual methods */
-	void (*add_func) (TnySendQueue *self, TnyMsg *msg);
+	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);
 	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
 	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
-	void (*cancel_func) (TnySendQueue *self, gboolean remove);
+	void (*cancel_func) (TnySendQueue *self, gboolean remove, GError **err);
 };
 
 GType tny_camel_send_queue_get_type (void);

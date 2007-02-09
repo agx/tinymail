@@ -42,6 +42,62 @@ static GObjectClass *parent_class = NULL;
 
 /* TODO: jump out of the thread for error handling using g_idle_add */
 
+typedef struct
+{
+	TnySendQueue *self;
+	TnyMsg *msg;
+	GError *error;
+	gint i, total;
+
+} ErrorInfo;
+
+static gboolean 
+emit_error_on_mainloop (gpointer data)
+{
+	ErrorInfo *info = data;
+
+	g_signal_emit (info->self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+				0, info->msg, info->error, info->i, info->total);
+
+	return FALSE;
+}
+
+static void
+destroy_error_info (gpointer data)
+{
+	ErrorInfo *info = data;
+
+	if (info->msg)
+		g_object_unref (G_OBJECT (info->msg));
+	if (info->self)
+		g_object_unref (G_OBJECT (info->self));
+	if (info->error)
+		g_error_free (info->error);
+
+	g_slice_free (ErrorInfo, info);
+}
+
+static void
+emit_error (TnySendQueue *self, TnyMsg *msg, GError *error, int i, int total)
+{
+	ErrorInfo *info = g_slice_new0 (ErrorInfo);
+
+	if (error != NULL)
+		info->error = g_error_copy ((const GError *) error);
+	if (self)
+		info->self = TNY_SEND_QUEUE (g_object_ref (G_OBJECT (self)));
+	if (msg)
+		info->msg = TNY_MSG (g_object_ref (G_OBJECT (msg)));
+
+	info->i = i;
+	info->total = total;
+
+	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+		emit_error_on_mainloop, info, destroy_error_info);
+
+	return;
+}
+
 static gpointer
 thread_main (gpointer data)
 {
@@ -60,13 +116,13 @@ thread_main (gpointer data)
 		GError *terror = NULL;
 		sentbox = tny_send_queue_get_sentbox (self);
 		outbox = tny_send_queue_get_outbox (self);
+
 		tny_folder_get_headers (outbox, list, TRUE, &terror);
+
 		if (terror != NULL)
 		{
-			/* TODO: jump out of the thread for error handling using g_idle_add */
-
-			g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-				0, NULL, terror, i, priv->total);
+			emit_error (self, NULL, terror, i, priv->total);
+			g_error_free (terror);
 			g_object_unref (G_OBJECT (list));
 			goto errorhandler;
 		}
@@ -97,10 +153,8 @@ thread_main (gpointer data)
 
 			if (ferror != NULL)
 			{
-				/* TODO: jump out of the thread for error handling using g_idle_add */
-
-				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-					0, msg, ferror, i, priv->total);
+				emit_error (self, msg, ferror, i, priv->total);
+				g_error_free (ferror);
 				g_object_unref (G_OBJECT (headers));
 				goto errorhandler;
 			}
@@ -136,15 +190,12 @@ thread_main (gpointer data)
 			if (err == NULL) 
 			{
 				tny_transport_account_send (priv->trans_account, msg, &err);
-				/* TODO: jump out of the thread for error handling using g_idle_add */
 
 				if (err != NULL)
-					g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-						0, msg, err, i, priv->total);
-			} else
-				/* TODO: jump out of the thread for error handling using g_idle_add */
-				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-					0, msg, err, i, priv->total);
+					emit_error (self, msg, err, i, priv->total);
+
+			} else 
+				emit_error (self, msg, err, i, priv->total);
 
 			g_mutex_lock (priv->todo_lock);
 			{
@@ -152,11 +203,11 @@ thread_main (gpointer data)
 				{
 					GError *newerr = NULL;
 					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
-					if (newerr != NULL)
-						/* TODO: jump out of the thread for error handling using g_idle_add */
-						g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-							0, msg, newerr, i, priv->total);
-
+					if (newerr != NULL) 
+					{
+						emit_error (self, msg, newerr, i, priv->total);
+						g_error_free (newerr);
+					}
 					priv->total--;
 				}
 			}
@@ -164,17 +215,13 @@ thread_main (gpointer data)
 
 			g_object_unref (G_OBJECT (hassent));
 
-			if (err == NULL)
-				/* TODO: jump out of the thread for error handling using g_idle_add */
-				g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 
-					0, msg, i, priv->total);
+			if (err != NULL)
+				g_error_free (err);
 
 			i++;
 		} else 
 		{
-
 			/* Not good, let's just kill this thread */ 
-
 			length = 0;
 			if (header && G_IS_OBJECT (header))
 				g_object_unref (G_OBJECT (header));
@@ -210,13 +257,13 @@ create_worker (TnySendQueue *self)
 
 
 static void
-tny_camel_send_queue_cancel (TnySendQueue *self, gboolean remove)
+tny_camel_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
 {
-	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->cancel_func (self, remove);
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->cancel_func (self, remove, err);
 }
 
 static void
-tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove)
+tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove, GError **err)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
@@ -232,19 +279,40 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove)
 
 		outbox = tny_send_queue_get_outbox (self);
 
-		tny_folder_get_headers (outbox, headers, TRUE, NULL);
+		tny_folder_get_headers (outbox, headers, TRUE, err);
+
+		if (err != NULL && *err != NULL)
+		{
+			g_object_unref (G_OBJECT (headers));
+			g_object_unref (G_OBJECT (outbox));
+			g_mutex_unlock (priv->sending_lock);
+			return;
+		}
+
 		iter = tny_list_create_iterator (headers);
+
 		while (!tny_iterator_is_done (iter))
 		{
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-			tny_folder_remove_msg (outbox, header, NULL);
+			tny_folder_remove_msg (outbox, header, err);
+
+			if (err != NULL && *err != NULL)
+			{
+				g_object_unref (G_OBJECT (header));
+				g_object_unref (G_OBJECT (iter));
+				g_object_unref (G_OBJECT (headers));
+				g_object_unref (G_OBJECT (outbox));
+				g_mutex_unlock (priv->sending_lock);
+				return;
+			}
+
 			g_object_unref (G_OBJECT (header));
 			tny_iterator_next (iter);
 		}
 		g_object_unref (G_OBJECT (iter));
 		g_object_unref (G_OBJECT (headers));
 
-		tny_folder_sync (outbox, TRUE, NULL);
+		tny_folder_sync (outbox, TRUE, err);
 
 		g_object_unref (G_OBJECT (outbox));
 	}
@@ -256,18 +324,18 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove)
 
 
 static void
-tny_camel_send_queue_add (TnySendQueue *self, TnyMsg *msg)
+tny_camel_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
-	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg);
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg, err);
 }
 
 static void
-tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg)
+tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
-	
+
 	g_mutex_lock (priv->todo_lock);
 	{
 		TnyFolder *outbox;
@@ -275,13 +343,22 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg)
 
 		outbox = tny_send_queue_get_outbox (self);
 
-		/* TODO handle and report errors here */
-		tny_folder_get_headers (outbox, headers, TRUE, NULL);
+		tny_folder_get_headers (outbox, headers, TRUE, err);
+
+		if (err!= NULL && *err != NULL)
+		{
+			g_object_unref (G_OBJECT (headers));
+			return;
+		}
+
 		priv->total = tny_list_get_length (headers);
 		g_object_unref (G_OBJECT (headers));
 
-		/* TODO error checking and reporting here */
-		tny_folder_add_msg (outbox, msg, NULL);
+		tny_folder_add_msg (outbox, msg, err);
+
+		if (err!= NULL && *err != NULL)
+			return;
+
 		priv->total++;
 
 		if (priv->total >= 1 && !priv->thread && !priv->creating_spin)

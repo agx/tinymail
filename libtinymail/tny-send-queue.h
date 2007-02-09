@@ -57,19 +57,19 @@ struct _TnySendQueueIface
 	void (*error_happened) (TnySendQueue *self, TnyMsg *msg, guint nth, guint total);
 
 	/* methods */
-	void (*add_func) (TnySendQueue *self, TnyMsg *msg);
+	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);
 	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
 	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
-	void (*cancel_func) (TnySendQueue *self, gboolean remove);
+	void (*cancel_func) (TnySendQueue *self, gboolean remove, GError **err);
 
 };
 
 GType tny_send_queue_get_type (void);
 
-void tny_send_queue_add (TnySendQueue *self, TnyMsg *msg);
+void tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err);
 TnyFolder* tny_send_queue_get_sentbox (TnySendQueue *self);
 TnyFolder* tny_send_queue_get_outbox (TnySendQueue *self);
-void tny_send_queue_cancel (TnySendQueue *self, gboolean remove);
+void tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err);
 
 G_END_DECLS
 

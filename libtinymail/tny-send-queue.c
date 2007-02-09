@@ -27,17 +27,18 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
  * tny_send_queue_cancel:
  * @self: A #TnySendQueue instance
  * @remove: Whether or not to also remove queued messages
+ * @err: a #GError instance or NULL
  *
  * Cancel the current operation
  **/
 void 
-tny_send_queue_cancel (TnySendQueue *self, gboolean remove)
+tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func)
 		g_critical ("You must implement tny_send_queue_cancel\n");
 #endif
-	TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func (self, remove);
+	TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func (self, remove, err);
 	return;
 }
 
@@ -83,18 +84,19 @@ tny_send_queue_get_outbox (TnySendQueue *self)
  * tny_send_queue_add:
  * @self: A #TnySendQueue instance
  * @msg: a #TnyMsg instance
+ * @err: a #GError instance or NULL
  *
  * Add a message to the send queue.
  *
  **/
 void 
-tny_send_queue_add (TnySendQueue *self, TnyMsg *msg)
+tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
 #ifdef DEBUG
 	if (!TNY_SEND_QUEUE_GET_IFACE (self)->add_func)
 		g_critical ("You must implement tny_send_queue_add\n");
 #endif
-	TNY_SEND_QUEUE_GET_IFACE (self)->add_func (self, msg);
+	TNY_SEND_QUEUE_GET_IFACE (self)->add_func (self, msg, err);
 	return;
 }
 
