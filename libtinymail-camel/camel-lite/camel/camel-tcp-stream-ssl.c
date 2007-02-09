@@ -1183,19 +1183,22 @@ enable_ssl (CamelTcpStreamSSL *ssl, PRFileDesc *fd)
 		return NULL;
 	
 	SSL_OptionSet (ssl_fd, SSL_SECURITY, PR_TRUE);
+
 	if (ssl->priv->flags & CAMEL_TCP_STREAM_SSL_ENABLE_SSL2)
 		SSL_OptionSet (ssl_fd, SSL_ENABLE_SSL2, PR_TRUE);
 	else
 		SSL_OptionSet (ssl_fd, SSL_ENABLE_SSL2, PR_FALSE);
+
 	if (ssl->priv->flags & CAMEL_TCP_STREAM_SSL_ENABLE_SSL3)
 		SSL_OptionSet (ssl_fd, SSL_ENABLE_SSL3, PR_TRUE);
 	else
 		SSL_OptionSet (ssl_fd, SSL_ENABLE_SSL3, PR_FALSE);
+
 	if (ssl->priv->flags & CAMEL_TCP_STREAM_SSL_ENABLE_TLS)
 		SSL_OptionSet (ssl_fd, SSL_ENABLE_TLS, PR_TRUE);
 	else
 		SSL_OptionSet (ssl_fd, SSL_ENABLE_TLS, PR_FALSE);
-	
+
 	SSL_SetURL (ssl_fd, ssl->priv->expected_host);
 	
 	/*SSL_GetClientAuthDataHook (sslSocket, ssl_get_client_auth, (void *) certNickname);*/
