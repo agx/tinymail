@@ -348,6 +348,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		if (err!= NULL && *err != NULL)
 		{
 			g_object_unref (G_OBJECT (headers));
+			g_object_unref (G_OBJECT (outbox));
 			return;
 		}
 
@@ -357,7 +358,10 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		tny_folder_add_msg (outbox, msg, err);
 
 		if (err!= NULL && *err != NULL)
+		{
+			g_object_unref (G_OBJECT (outbox));
 			return;
+		}
 
 		priv->total++;
 
