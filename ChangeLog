@@ -1,3 +1,11 @@
+2007-02-10  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Various bugfixes for the IDLE feature
+	* Error reporting for the TnySendQueue
+	* Bugfix for the Maildirs of the tnycamelsendqueue
+
+	* This was a major API change
+
 2007-02-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Removed the public constructor of TnyCamelFolder, use the private
