@@ -195,10 +195,10 @@ maildir_append_message (CamelFolder *folder, CamelMimeMessage *message, const Ca
 	g_free (dest);
 	g_free (name);
 	
-	camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed",
+	/*camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed",
 				    ((CamelLocalFolder *)maildir_folder)->changes);
-	camel_folder_change_info_clear (((CamelLocalFolder *)maildir_folder)->changes);
-	
+	camel_folder_change_info_clear (((CamelLocalFolder *)maildir_folder)->changes);*/
+
 	if (appended_uid)
 		*appended_uid = g_strdup(camel_message_info_uid(mi));
 
