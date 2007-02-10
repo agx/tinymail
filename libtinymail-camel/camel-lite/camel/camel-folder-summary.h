@@ -75,11 +75,11 @@ typedef enum _CamelMessageFlags {
 	CAMEL_MESSAGE_ATTACHMENTS = 1<<5, /* used */
 	CAMEL_MESSAGE_CACHED = 1<<6, /* used */
 	CAMEL_MESSAGE_PARTIAL = 1<<7, /* used */
+	CAMEL_MESSAGE_EXPUNGED = 1<<8, /* used */
 
 	/* these aren't really system flag bits, but are convenience flags */
-	CAMEL_MESSAGE_SECURE = 1<<8, /* free slot */
 	CAMEL_MESSAGE_FREED = 1<<9, /* free slot */
-	CAMEL_MESSAGE_ANSWERED_ALL = 1<<10, /* free slot */
+	CAMEL_MESSAGE_SECURE = 1<<10, /* free slot */
 	CAMEL_MESSAGE_JUNK = 1<<11, /* free slot */
 
 	/* internally used */

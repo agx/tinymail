@@ -140,9 +140,9 @@ camel_message_info_clear_normal_flags (CamelMessageInfo *min)
 	mi->flags &= ~CAMEL_MESSAGE_ATTACHMENTS;
 	mi->flags &= ~CAMEL_MESSAGE_CACHED;
 	mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
-	mi->flags &= ~CAMEL_MESSAGE_SECURE;
+	mi->flags &= ~CAMEL_MESSAGE_EXPUNGED;
 	mi->flags &= ~CAMEL_MESSAGE_FREED;
-	mi->flags &= ~CAMEL_MESSAGE_ANSWERED_ALL;
+	mi->flags &= ~CAMEL_MESSAGE_SECURE;
 	mi->flags &= ~CAMEL_MESSAGE_JUNK;
 	mi->flags &= ~CAMEL_MESSAGE_FOLDER_FLAGGED;
 	/* CAMEL_MESSAGE_INFO_NEEDS_FREE 
@@ -2591,6 +2591,8 @@ summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, Cam
 		/* check content type for indexing, then read body */
 		ct = camel_mime_parser_content_type(mp);
 		/* update attachments flag as we go */
+
+
 		if (camel_content_type_is(ct, "application", "pgp-signature")
 #ifdef ENABLE_SMIME
 		    || camel_content_type_is(ct, "application", "x-pkcs7-signature")
@@ -2598,6 +2600,7 @@ summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, Cam
 #endif
 			)
 			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
+
 
 		if (p->index && camel_content_type_is(ct, "text", "*")) {
 			char *encoding;

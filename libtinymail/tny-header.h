@@ -60,7 +60,8 @@ enum _TnyHeaderFlags
 	TNY_HEADER_FLAG_SEEN = 1<<4,
 	TNY_HEADER_FLAG_ATTACHMENTS = 1<<5,
 	TNY_HEADER_FLAG_CACHED = 1<<6,
-	TNY_HEADER_FLAG_PARTIAL = 1<<7
+	TNY_HEADER_FLAG_PARTIAL = 1<<7,
+	TNY_HEADER_FLAG_EXPUNGED = 1<<7
 
 	/* Keep below 1<<12 (internally used bits) */
 };
