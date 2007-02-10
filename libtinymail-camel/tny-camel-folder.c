@@ -68,58 +68,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-#ifdef IM_TESTING
-static void 
-add_dummy_test_header (TnyFolder *self, TnyFolderChange *change)
-{
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyHeader *hdr_addded = tny_camel_header_new ();
-	CamelMessageInfo *added;
-	struct _camel_header_raw *headers = NULL;
-	static int nextuid = 0;
-
-	gchar *uid = g_strdup_printf ("%d", nextuid);
-
-	camel_header_raw_clear(&headers);
-	camel_header_raw_append(&headers, "From", "me@me.com", -1);
-	camel_header_raw_append(&headers, "Cc", "me@cc.com", -1);
-	camel_header_raw_append(&headers, "To", "me@to.com", -1);
-	camel_header_raw_append(&headers, "Subject", "Test subject", -1);
-	camel_header_raw_append(&headers, "Date", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
-	camel_header_raw_append(&headers, "Received", "Fri, 19 Jan 2007 20:31:12 +0100", -1);
-	camel_header_raw_append(&headers, "Message-Id", "MyMEID", -1);
-	camel_header_raw_append(&headers, "Content-Type", "text/plain; charset=utf-8", -1);
-
-	/* For removals, just fill in the uid (and use NULL for headers) */
-	added = camel_folder_summary_info_new_from_header_with_uid (NULL, headers, uid);
-	g_free (uid); nextuid++;
-
-	((CamelMessageInfoBase *) added)->size = 1024;
-	camel_message_info_set_flags (added, 1, ~0);
-
-	/* Prepare the TnyHeader instance (it becomes the owner too) */
-	_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr_addded), added);
-
-	/* Add it to the TnyFolderChange */
-	tny_folder_change_add_added_header (change, hdr_addded);
-
-	g_object_unref (G_OBJECT (hdr_addded));
-}
-
-static void
-on_header_got_added (TnyCamelFolder *self, TnyHeader *added_header)
-{
-	TnyFolderChange *change = tny_folder_change_new (TNY_FOLDER (self));
-
-	add_dummy_test_header (TNY_FOLDER (self), change); /* added_header*/
-
-	/* And notify everybody about this great event! */
-	notify_observers_about (TNY_FOLDER (self), change);
-
-	g_object_unref (G_OBJECT (change));
-}
-
-#endif
 
 static void
 notify_observers_about (TnyFolder *self, TnyFolderChange *change)
@@ -146,6 +94,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	TnyFolderChange *change = NULL;
 	gint i = 0;
 	CamelFolderSummary *summary;
+	gboolean old = priv->dont_fkill;
 
 	if (!priv->want_changes)
 		return;
@@ -195,8 +144,10 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 
 	if (change)
 	{
+		priv->dont_fkill = TRUE;
 		notify_observers_about (TNY_FOLDER (self), change);
 		g_object_unref (G_OBJECT (change));
+		priv->dont_fkill = old;
 	}
 
 	/* g_mutex_unlock (priv->folder_lock); */
@@ -226,9 +177,9 @@ unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 		if (priv->folder_changed_id != 0)
 			camel_object_remove_event (priv->folder, priv->folder_changed_id);
 
-		printf ("UNLOAD (%s): %d\n",
-			priv->folder_name?priv->folder_name:"NUL",
-			(((CamelObject*)priv->folder)->ref_count)); 
+		/* printf ("UNLOAD (%s): %d\n",
+				priv->folder_name?priv->folder_name:"NUL",
+				(((CamelObject*)priv->folder)->ref_count));  */
 
 		camel_object_unref (CAMEL_OBJECT (priv->folder));
 		priv->folder = NULL;
@@ -279,9 +230,9 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
 
-		printf ("LOAD (%s): %d\n",
-			priv->folder_name?priv->folder_name:"NUL",
-			(((CamelObject*)priv->folder)->ref_count)); 
+		/* printf ("LOAD (%s): %d\n",
+				priv->folder_name?priv->folder_name:"NUL",
+				(((CamelObject*)priv->folder)->ref_count)); */
 
 		if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
 		{
