@@ -55,6 +55,7 @@ struct _CamelImapFolder {
 	unsigned int read_only:1;
 	gchar *folder_dir;
 	gboolean do_push_email;
+	guint idle_signal;
 };
 
 typedef struct {

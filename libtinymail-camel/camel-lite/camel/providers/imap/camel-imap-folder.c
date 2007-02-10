@@ -572,6 +572,10 @@ imap_finalize (CamelObject *object)
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (object);
 	CamelImapStore *store = CAMEL_IMAP_STORE (CAMEL_FOLDER(imap_folder)->parent_store);
 
+	imap_folder->do_push_email = FALSE;
+	if (imap_folder->idle_signal > 0) 
+		g_source_remove (imap_folder->idle_signal);
+
 	if (store->current_folder == (CamelFolder*) object)
 		store->current_folder = NULL;
 
@@ -3247,7 +3251,7 @@ idle_timeout_checker (gpointer data)
 
 	/* printf ("idle\n"); */
 
-	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
+	if (!folder || ((CamelObject *)data)->ref_count <= 0 && !CAMEL_IS_IMAP_FOLDER (folder))
 		return FALSE;
 
 	store = CAMEL_IMAP_STORE (folder->parent_store);
@@ -3294,7 +3298,7 @@ void
 camel_imap_folder_start_idle (CamelFolder *folder)
 {
 	CamelImapStore *store;
-	CamelImapFolder *imap_folder;
+	CamelImapFolder *imap_folder = (CamelImapFolder *) folder;
 
 	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
 		return;
@@ -3316,7 +3320,7 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 			g_mutex_unlock (store->stream_lock);
 
 			store->idle_signal = g_timeout_add (1 * 1000, idle_timeout_checker, folder);
-
+			imap_folder->idle_signal = store->idle_signal;
 		}
 	}
 }
