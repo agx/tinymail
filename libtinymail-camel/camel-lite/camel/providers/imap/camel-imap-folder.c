@@ -3280,12 +3280,12 @@ static void
 imap_set_push_email (CamelFolder *folder, gboolean setting)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
-/*
+
 	if (imap_folder->do_push_email && !setting) {
 		imap_folder->do_push_email = setting;
 		camel_imap_folder_stop_idle (folder);
 	}
-*/
+
 	if (!imap_folder->do_push_email && setting) {
 		imap_folder->do_push_email = setting;
 		camel_imap_folder_start_idle (folder);
