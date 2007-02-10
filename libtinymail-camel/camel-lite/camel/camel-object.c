@@ -828,6 +828,11 @@ camel_object_new(CamelType type)
 
 	camel_object_init(o, type, type);
 
+	if (o->flags & CAMEL_OBJECT_REF_DEBUG)
+	{
+		printf ("An object of the type that you are debugging got created\n");
+	}
+
 	d(printf("%p: new %s()\n", o, o->klass->name));
 
 	return o;
@@ -838,7 +843,14 @@ camel_object_ref(void *vo)
 {
 	register CamelObject *o = vo;
 
-	g_return_if_fail(CAMEL_IS_OBJECT(o));
+	if (o->ref_count > 0)
+		g_return_if_fail(CAMEL_IS_OBJECT(o));
+
+
+	if (o->flags & CAMEL_OBJECT_REF_DEBUG)
+	{
+		printf ("An object of the type that you are debugging got referenced\n");
+	}
 
 	REF_LOCK();
 
@@ -858,6 +870,11 @@ camel_object_unref(void *vo)
 	g_return_if_fail(CAMEL_IS_OBJECT(o));
 	klass = o->klass;
 
+	if (o->flags & CAMEL_OBJECT_REF_DEBUG)
+	{
+		printf ("An object of the type that you are debugging got unreferenced\n");
+	}
+
 	if (o->hooks)
 		hooks = camel_object_get_hooks(o);
 
@@ -873,6 +890,11 @@ camel_object_unref(void *vo)
 		if (hooks)
 			camel_object_unget_hooks(o);
 		return;
+	}
+
+	if (o->flags & CAMEL_OBJECT_REF_DEBUG)
+	{
+		printf ("An object of the type that you are debugging is about to be finalized\n");
 	}
 
 	o->flags |= CAMEL_OBJECT_DESTROY;
@@ -895,6 +917,9 @@ camel_object_unref(void *vo)
 	}
 
 	CLASS_LOCK(klass);
+
+	memset (o, 0, klass->object_size);
+	o->flags |= CAMEL_OBJECT_DESTROYED;
 
 	g_slice_free1 (klass->object_size, o);
 
@@ -929,7 +954,11 @@ camel_object_is(CamelObject *o, CamelType ctype)
 {
 	CamelObjectClass *k;
 
-	g_return_val_if_fail(o != NULL, FALSE);
+	if (o == NULL)
+		return FALSE;
+
+	if (o->flags & CAMEL_OBJECT_DESTROYED)
+		return FALSE;
 
 	k = o->klass;
 	while (k) {
@@ -1334,7 +1363,8 @@ camel_object_trigger_event(void *vo, const char * name, void *event_data)
 	int i, size;
 	const char *prepname;
 
-	g_return_if_fail (CAMEL_IS_OBJECT (obj));
+	if (obj->ref_count > 0)
+		g_return_if_fail (CAMEL_IS_OBJECT (obj));
 	g_return_if_fail (name);
 
 	hook = co_find_pair(obj->klass, name);

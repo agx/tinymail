@@ -41,9 +41,6 @@ struct _TnyCamelHeader
 	gpointer info;
 	TnyCamelFolder *folder;
 	guchar write:2;
-#ifdef HEALTHY_CHECK
- 	guchar healthy:1;
-#endif
 };
 
 struct _TnyCamelHeaderClass 

@@ -149,6 +149,7 @@ static void let_idle_die (CamelImapStore *imap_store)
 		camel_stream_printf (imap_store->ostream, "DONE\r\n");
 		g_mutex_unlock (imap_store->stream_lock);
 	}
+
 }
 
 void
@@ -228,7 +229,6 @@ camel_imap_store_finalize (CamelObject *object)
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 	CamelDiscoStore *disco = CAMEL_DISCO_STORE (object);
 
-
 	let_idle_die (imap_store);
 
 	/* This frees current_folder, folders, authtypes, streams, and namespace. */
@@ -259,6 +259,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 
+	imap_store->idle_signal = 0;
 	imap_store->idle_prefix = NULL;
 	imap_store->istream = NULL;
 	imap_store->ostream = NULL;
@@ -1716,8 +1717,8 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 	g_mutex_unlock (store->stream_lock);
 
 	store->connected = FALSE;
-	if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder)) 
-		camel_object_unref (store->current_folder);
+	/* if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder)) 
+		camel_object_unref (store->current_folder); */
 	store->current_folder = NULL;
 
 	if (store->authtypes) {
@@ -1786,7 +1787,7 @@ imap_noop (CamelStore *store, CamelException *ex)
 		goto done;
 
 	current_folder = imap_store->current_folder;
-	if (current_folder && imap_summary_is_dirty (current_folder->summary)) {
+	if (current_folder && CAMEL_IS_IMAP_FOLDER (current_folder) && imap_summary_is_dirty (current_folder->summary)) {
 		/* let's sync the flags instead.  NB: must avoid folder lock */
 		((CamelFolderClass *)((CamelObject *)current_folder)->klass)->sync(current_folder, FALSE, ex);
 	} else {
@@ -2250,9 +2251,10 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		folder_name = "INBOX";
 
 	if (imap_store->current_folder) {
-		camel_object_unref (imap_store->current_folder);
+		/* camel_object_unref (imap_store->current_folder); */
 		imap_store->current_folder = NULL;
 	}
+
 	response = camel_imap_command (imap_store, NULL, ex, "SELECT %F", folder_name);
 	if (!response) {
 		char *folder_real, *parent_name, *parent_real;
@@ -2416,13 +2418,13 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		CamelException local_ex;
 
 		imap_store->current_folder = new_folder;
-		camel_object_ref (new_folder);
+		/* camel_object_ref (new_folder); */
 		camel_exception_init (&local_ex);
 		camel_imap_folder_selected (new_folder, response, &local_ex);
 
 		if (camel_exception_is_set (&local_ex)) {
 			camel_exception_xfer (ex, &local_ex);
-			camel_object_unref (imap_store->current_folder);
+			/* camel_object_unref (imap_store->current_folder); */
 			imap_store->current_folder = NULL;
 			camel_object_unref (new_folder);
 			new_folder = NULL;
@@ -2482,8 +2484,9 @@ delete_folder (CamelStore *store, const char *folder_name, CamelException *ex)
 		goto fail;
 
 	camel_imap_response_free_without_processing (imap_store, response);
-	if (imap_store->current_folder)
-		camel_object_unref (imap_store->current_folder);
+	/*if (imap_store->current_folder)
+		camel_object_unref (imap_store->current_folder);*/
+
 	/* no need to actually create a CamelFolder for INBOX */
 	imap_store->current_folder = NULL;
 
@@ -2584,8 +2587,8 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 		goto fail;
 
 	camel_imap_response_free_without_processing (imap_store, response);
-	if (imap_store->current_folder)
-		camel_object_unref (imap_store->current_folder);
+	/*if (imap_store->current_folder)
+		camel_object_unref (imap_store->current_folder); */
 	/* no need to actually create a CamelFolder for INBOX */
 	imap_store->current_folder = NULL;
 

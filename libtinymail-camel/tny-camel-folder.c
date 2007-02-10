@@ -203,35 +203,6 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 
 }
 
-#ifdef HEALTHY_CHECK
-static void
-pos_header_check (gpointer data, gpointer udata)
-{
-	/* Note: TNY_IS_CAMEL_HEADER crashes if there's a message referenced (
-	   this might imply that a header is still referenced and therefore not
-	   destroyed) .. I don't know, it's definitely a bug. Also check #1 on 
-	   the trac's tickets. */
-
-	if (data)
-	{
-		TnyCamelHeader *hdr = data;
-		hdr->healthy = 0;
-	}
-}
-#endif
-
-static gpointer 
-folder_destroyer_thread (gpointer data)
-{
-
-	while (CAMEL_IS_OBJECT (data) && CAMEL_OBJECT (data)->ref_count >= 1) 
-	{
-		/* printf ("%d\n", (((CamelObject*)data)->ref_count)); */
-		camel_object_unref (CAMEL_OBJECT (data));
-	}
-
-	return NULL;
-}
 
 static void
 unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
@@ -241,18 +212,6 @@ unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 
 	if (priv->folder && !CAMEL_IS_FOLDER (priv->folder))
 	{
-
-#ifdef HEALTHY_CHECK
-		g_mutex_lock (priv->poshdr_lock);
-		if (priv->possible_headers) 
-		{
-			g_list_foreach (priv->possible_headers, pos_header_check, NULL);
-			g_list_free (priv->possible_headers);
-		}
-		priv->possible_headers = NULL;
-		g_mutex_unlock (priv->poshdr_lock);
-#endif
-
 		if (CAMEL_IS_OBJECT (priv->folder))
 		{
 			g_critical ("Killing invalid CamelObject (should be a Camelfolder) at 0x%x\n", priv->folder);
@@ -267,18 +226,11 @@ unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 		if (priv->folder_changed_id != 0)
 			camel_object_remove_event (priv->folder, priv->folder_changed_id);
 
-#ifdef HEALTHY_CHECK
-		g_mutex_lock (priv->poshdr_lock);
-		if (priv->possible_headers) 
-		{
-			g_list_foreach (priv->possible_headers, pos_header_check, NULL);
-			g_list_free (priv->possible_headers);
-		}
-		priv->possible_headers = NULL;
-		g_mutex_unlock (priv->poshdr_lock);
-#endif
+		printf ("UNLOAD (%s): %d\n",
+			priv->folder_name?priv->folder_name:"NUL",
+			(((CamelObject*)priv->folder)->ref_count)); 
 
-		g_thread_create (folder_destroyer_thread, priv->folder, FALSE, NULL);
+		camel_object_unref (CAMEL_OBJECT (priv->folder));
 		priv->folder = NULL;
 
 	}
@@ -302,7 +254,7 @@ unload_folder (TnyCamelFolderPriv *priv, gboolean destroy)
 static void
 determine_push_email (TnyCamelFolderPriv *priv)
 {
-	if (!priv->folder || !CAMEL_IS_FOLDER (priv->folder))
+	if (!priv->folder || (((CamelObject *)priv->folder)->ref_count <= 0) || !CAMEL_IS_FOLDER (priv->folder))
 		return;
 
 	if (priv->observers && tny_list_get_length (priv->observers) > 0)
@@ -324,19 +276,12 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelStore *store = priv->store;
 
-#ifdef HEALTHY_CHECK
-		g_mutex_lock (priv->poshdr_lock);
-		if (priv->possible_headers)
-		{
-			g_list_foreach (priv->possible_headers, pos_header_check, NULL);
-			g_list_free (priv->possible_headers);
-		}
-		priv->possible_headers = NULL;
-		g_mutex_unlock (priv->poshdr_lock);
-#endif
-
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
+
+		printf ("LOAD (%s): %d\n",
+			priv->folder_name?priv->folder_name:"NUL",
+			(((CamelObject*)priv->folder)->ref_count)); 
 
 		if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
 		{
@@ -1070,11 +1015,6 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	tny_list_prepend (headers, (GObject*)header);
 
-#ifdef HEALTHY_CHECK
-	g_mutex_lock (priv->poshdr_lock);
-	priv->possible_headers = g_list_prepend (priv->possible_headers, header);    
-	g_mutex_unlock (priv->poshdr_lock);
-#endif
 
 	if (!(flags & CAMEL_MESSAGE_SEEN))
 		priv->unread_length++;
@@ -2017,6 +1957,7 @@ static void
 tny_camel_folder_uncache (TnyCamelFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	GError *err = NULL;
 
 	if (G_LIKELY (priv->folder != NULL))
 		unload_folder (priv, FALSE);
@@ -2699,11 +2640,6 @@ tny_camel_folder_finalize (GObject *object)
 	g_mutex_free (priv->folder_lock);
 	priv->folder_lock = NULL;
 
-#ifdef HEALTHY_CHECK
-	g_mutex_free (priv->poshdr_lock);
-	priv->poshdr_lock = NULL;
-#endif
-
 	if (priv->folder_name)
 		g_free (priv->folder_name);
 
@@ -2826,9 +2762,6 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->loaded = FALSE;
 	priv->folder_changed_id = 0;
 	priv->folder = NULL;
-#ifdef HEALTHY_CHECK
-	priv->poshdr_lock = g_mutex_new ();
-#endif
 	priv->folder_lock = g_mutex_new ();
 	priv->cached_name = NULL;
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;

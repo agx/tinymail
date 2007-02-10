@@ -48,12 +48,6 @@ struct _TnyCamelFolderPriv
 	TnyMsgReceiveStrategy *receive_strat;
 	TnyList *observers; TnyFolder *self;
 	gboolean want_changes, dont_fkill;
-
-#ifdef HEALTHY_CHECK
-	GList *possible_headers;
-	GMutex *poshdr_lock;
-#endif
-
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);

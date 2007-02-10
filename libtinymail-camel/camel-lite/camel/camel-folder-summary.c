@@ -3486,7 +3486,7 @@ camel_message_info_ptr(const CamelMessageInfo *mi, int id)
 		return NULL;
 
 	if (mi->summary)
-		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
+		if (((CamelObject*)mi->summary)->ref_count > 0 && CAMEL_IS_FOLDER_SUMMARY (mi->summary))
 			return ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_ptr(mi, id);
 		else 
 			return NULL;

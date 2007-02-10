@@ -82,9 +82,6 @@ prepare_for_write (TnyCamelHeader *self)
 		((WriteInfo*)self->info)->msg = camel_mime_message_new ();
 		((WriteInfo*)self->info)->mime_from = NULL;
 		self->write = 1;
-#ifdef HEALTHY_CHECK
-		self->healthy = 1;
-#endif
 	} 
 
 	return;
@@ -107,9 +104,6 @@ _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo
 
 	self->info = camel_message_info;
 	self->write = 0;
-#ifdef HEALTHY_CHECK
-	self->healthy = 1;
-#endif
 
 	return;
 }
@@ -129,10 +123,6 @@ _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *info)
 
 	self->info = info;
 	self->write = 2;
-#ifdef HEALTHY_CHECK
-	self->healthy = 1;
-#endif
-
 
 	return;
 }
@@ -154,9 +144,6 @@ _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage
 	self->info = g_slice_new0 (WriteInfo);
 	((WriteInfo*)self->info)->mime_from = NULL;
 	self->write = 1;
-#ifdef HEALTHY_CHECK
-		self->healthy = 1;
-#endif
 
 	((WriteInfo*)self->info)->msg = camel_mime_message;
 	camel_object_ref (CAMEL_OBJECT (camel_mime_message));
@@ -169,13 +156,8 @@ tny_camel_header_get_replyto (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return NULL;
-#else
 	if (G_UNLIKELY (!me->info))
 		return NULL;
-#endif
 
 	if (G_UNLIKELY (me->write == 1)) 
 	{
@@ -305,11 +287,6 @@ tny_camel_header_get_cc (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy)
-		return NULL;
-#endif
-
 	if (G_UNLIKELY (!me->info))
 		return NULL;
 
@@ -327,11 +304,6 @@ tny_camel_header_get_bcc (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy)
-		return NULL;
-#endif
-
 	if (G_UNLIKELY (!me->info))
 		return NULL;
 
@@ -346,11 +318,6 @@ tny_camel_header_get_flags (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	TnyHeaderFlags retval = 0;
-
-#ifdef HEALTHY_CHECK
-	if (!me->healthy)
-		return 0;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 	{
@@ -386,11 +353,6 @@ tny_camel_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy)
-		return;
-#endif
-
 	if (G_UNLIKELY (me->write == 1))
 	{
 		g_warning ("tny_camel_header_get_flags: This is a header for a new message!\n");
@@ -408,13 +370,8 @@ tny_camel_header_get_date_received (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	time_t retval = 0;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return retval;
-#else
 	if (G_UNLIKELY (!me->info))
 		return retval;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 	{
@@ -444,13 +401,8 @@ tny_camel_header_get_date_sent (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	time_t retval = 0;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return retval;
-#else
 	if (G_UNLIKELY (!me->info))
 		return retval;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 	{
@@ -479,13 +431,8 @@ tny_camel_header_get_from (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return NULL;
-#else
 	if (G_UNLIKELY (!me->info))
 		return NULL;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 	{
@@ -511,13 +458,8 @@ tny_camel_header_get_subject (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return NULL;
-#else
 	if (G_UNLIKELY (!me->info))
 		return NULL;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 		retval = camel_mime_message_get_subject (((WriteInfo*)me->info)->msg);
@@ -534,13 +476,8 @@ tny_camel_header_get_to (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return NULL;
-#else
 	if (G_UNLIKELY (!me->info))
 		return NULL;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "to");
@@ -556,13 +493,8 @@ tny_camel_header_get_message_id (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return NULL;
-#else
 	if (G_UNLIKELY (!me->info))
 		return NULL;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 		retval = camel_mime_message_get_message_id (((WriteInfo*)me->info)->msg);
@@ -580,13 +512,8 @@ tny_camel_header_get_message_size (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	guint retval;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info))
-		return 0;
-#else
 	if (G_UNLIKELY (!me->info))
 		return 0;
-#endif
 
 	if (G_UNLIKELY (me->write == 1))
 	{
@@ -608,13 +535,8 @@ tny_camel_header_get_uid (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-#ifdef HEALTHY_CHECK
-	if (!me->healthy || G_UNLIKELY (!me->info) || G_UNLIKELY (me->write == 1))
-		return NULL;
-#else
 	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write == 1))
 		return NULL;
-#endif
 
 	retval = camel_message_info_uid ((CamelMessageInfo*)me->info);
 
@@ -625,10 +547,6 @@ static void
 tny_camel_header_finalize (GObject *object)
 {
 	TnyCamelHeader *self = (TnyCamelHeader*) object;
-
-#ifdef HEALTHY_CHECK
-	self->healthy = 0;
-#endif
 
 	if (G_UNLIKELY (self->write == 1))
 		destroy_write (self);
@@ -666,10 +584,6 @@ tny_camel_header_new (void)
 	
 	self->info = NULL;
 	self->write = 3;
-
-#ifdef HEALTHY_CHECK
-	self->healthy = 0;
-#endif
 
 	return (TnyHeader*)self;
 }

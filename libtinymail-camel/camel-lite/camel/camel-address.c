@@ -233,7 +233,7 @@ camel_address_copy (CamelAddress *dest, const CamelAddress *source)
 void
 camel_address_remove (CamelAddress *addr, int index)
 {
-	g_return_if_fail(CAMEL_IS_ADDRESS(addr));
+	/* g_return_if_fail(CAMEL_IS_ADDRESS(addr)); */
 
 	if (index == -1) {
 		for (index = addr->addresses->len; index>-1; index--)

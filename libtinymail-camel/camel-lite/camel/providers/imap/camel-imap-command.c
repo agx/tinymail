@@ -104,9 +104,11 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		cmd = imap_command_strdup_vprintf (store, fmt, ap);
 		va_end (ap);
 	} else {
-		camel_object_ref(folder);
+
+		/* camel_object_ref(folder); 
 		if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder))
-			camel_object_unref(store->current_folder);
+			camel_object_unref(store->current_folder); */
+
 		store->current_folder = folder;
 		if (store->capabilities & IMAP_CAPABILITY_CONDSTORE) 
 			cmd = imap_command_strdup_printf (store, "SELECT %F (CONDSTORE)", folder->full_name);
@@ -235,6 +237,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	/* printf ("%c%.5u %s\r\n", store->tag_prefix, store->command, cmd); */
 
 	if (nwritten == -1) {
+		CamelException mex = CAMEL_EXCEPTION_INITIALISER;
+
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					     _("Operation cancelled"));
@@ -242,10 +246,10 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     g_strerror (errno));
 		
-		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
 
 		/* Let's try .. */
-		camel_service_connect (CAMEL_SERVICE (store), NULL);
+		camel_service_connect (CAMEL_SERVICE (store), &mex);
 
 		return FALSE;
 	}

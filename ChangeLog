@@ -4,6 +4,13 @@
 	* Error reporting for the TnySendQueue
 	* Bugfix for the Maildirs of the tnycamelsendqueue
 	* Support in the IDLE (Push E-mail) feature for EXPUNGE
+	* Major rewrites in camel-lite and important changes related to memory
+	and reference counting in TnyCamelFolder and CamelFolder. Please keep
+	an eye on memory from now on, as things related to reference counting
+	of folders has changed.
+	* Added reference debugging instrumentation to camel-lite
+	* Rewrote certain parts of the IDLE support
+	* Bugfixes in the condstore support
 
 	* This was a major API change
 

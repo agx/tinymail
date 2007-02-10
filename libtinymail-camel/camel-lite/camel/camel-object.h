@@ -104,6 +104,8 @@ enum {
 
 typedef enum _CamelObjectFlags {
 	CAMEL_OBJECT_DESTROY = (1<<0),
+	CAMEL_OBJECT_DESTROYED = (1<<1),
+	CAMEL_OBJECT_REF_DEBUG = (1<<2),
 } CamelObjectFlags;
 
 /* returned by get::CAMEL_OBJECT_METADATA */
