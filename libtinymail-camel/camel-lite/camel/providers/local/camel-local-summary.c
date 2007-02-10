@@ -463,7 +463,8 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 		xev = camel_local_summary_encode_x_evolution(cls, mi);
 		camel_medium_set_header((CamelMedium *)msg, "X-Evolution", xev);
 		g_free(xev);
-		camel_folder_change_info_add_uid(ci, camel_message_info_uid(mi));
+		if (camel_message_info_uid(mi))
+			camel_folder_change_info_add_uid(ci, camel_message_info_uid(mi));
 	} else {
 		d(printf("Failed!\n"));
 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
