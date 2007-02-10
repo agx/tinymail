@@ -1941,6 +1941,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 
 	if (!priv->iter) {
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+		g_mutex_unlock (priv->folder_lock);
 		return;
 	}
 
@@ -2492,7 +2493,6 @@ tny_camel_folder_get_folder (TnyCamelFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelFolder *retval = NULL;
 
-	/* g_mutex_lock (priv->folder_lock); */
 	if (G_UNLIKELY (!priv->loaded))
 		if (!load_folder (priv))
 			return NULL;
@@ -2500,7 +2500,6 @@ tny_camel_folder_get_folder (TnyCamelFolder *self)
 	retval = priv->folder;
 	if (retval)
 		camel_object_ref (CAMEL_OBJECT (retval));
-	/* g_mutex_unlock (priv->folder_lock); */
 
 	return retval;
 }
