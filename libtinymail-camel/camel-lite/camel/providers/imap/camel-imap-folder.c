@@ -3337,7 +3337,7 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 				store->idle_prefix);
 			g_mutex_unlock (store->stream_lock);
 
-			store->idle_signal = g_timeout_add (1 * 1000, idle_timeout_checker, folder);
+			store->idle_signal = g_timeout_add (5 * 1000, idle_timeout_checker, folder);
 			imap_folder->idle_signal = store->idle_signal;
 		}
 	}
