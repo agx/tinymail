@@ -3,6 +3,7 @@
 	* Various bugfixes for the IDLE feature
 	* Error reporting for the TnySendQueue
 	* Bugfix for the Maildirs of the tnycamelsendqueue
+	* Support in the IDLE (Push E-mail) feature for EXPUNGE
 
 	* This was a major API change
 

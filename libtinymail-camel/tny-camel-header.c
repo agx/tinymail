@@ -42,6 +42,13 @@
 static GObjectClass *parent_class = NULL;
 
 static void 
+unref_info (TnyCamelHeader *self)
+{
+	if (self->info && self->write == 0)
+		camel_message_info_free (self->info);
+}
+
+static void 
 destroy_write (TnyCamelHeader *self)
 {
 	/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
@@ -78,7 +85,7 @@ prepare_for_write (TnyCamelHeader *self)
 #ifdef HEALTHY_CHECK
 		self->healthy = 1;
 #endif
-	}
+	} 
 
 	return;
 }
@@ -93,6 +100,10 @@ _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo
 		destroy_write (self);
 	else if (self->write == 2)
 		destroy_mem (self);
+	else if (self->write == 0)
+		unref_info (self);
+
+	camel_message_info_ref (camel_message_info);
 
 	self->info = camel_message_info;
 	self->write = 0;
@@ -113,6 +124,8 @@ _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *info)
 		destroy_write (self);
 	else if (self->write == 2)
 		destroy_mem (self);
+	else if (self->write == 0)
+		unref_info (self);
 
 	self->info = info;
 	self->write = 2;
@@ -135,6 +148,8 @@ _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage
 		destroy_write (self);
 	else if (self->write == 2)
 		destroy_mem (self);
+	else if (self->write == 0)
+		unref_info (self);
 
 	self->info = g_slice_new0 (WriteInfo);
 	((WriteInfo*)self->info)->mime_from = NULL;
@@ -619,6 +634,8 @@ tny_camel_header_finalize (GObject *object)
 		destroy_write (self);
 	else if (G_UNLIKELY (self->write == 2))
 		destroy_mem (self);
+	else if (self->write == 0)
+		unref_info (self);
 
 	if (self->folder)
 	{

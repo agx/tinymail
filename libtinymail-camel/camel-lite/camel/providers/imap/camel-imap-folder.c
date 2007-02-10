@@ -3057,7 +3057,7 @@ a03 OK UID FETCH Completed
 typedef struct {
 	guint32 exists;
 	guint32 recent;
-	guint32 expunge;
+	GArray *expunged;
 } IdleResponse;
 
 static void 
@@ -3077,16 +3077,9 @@ process_idle_response (CamelFolder *folder, IdleResponse *idle_resp)
 	if (!idle_resp)
 		return;
 
-	changes = camel_folder_change_info_new ();
+	camel_imap_folder_changed (folder, idle_resp->exists, 
+		idle_resp->expunged, &ex);
 
-	imap_update_summary (folder, idle_resp->exists, changes, &ex);
-	camel_imap_folder_start_idle (folder);
-
-	if (camel_folder_change_info_changed (changes))
-		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
-
-	camel_folder_change_info_free (changes);
-	camel_folder_summary_save (folder->summary);
 }
 
 static void
@@ -3100,8 +3093,20 @@ read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 	if (ptr && strstr (resp, "RECENT") != NULL)
 		idle_resp->recent = strtoul (resp + 1, NULL, 10);
 
-	if (ptr && strstr (resp, "EXPUNGE") != NULL)
-		idle_resp->expunge = strtoul (resp + 1, NULL, 10);
+	/* TODO, dealing with FETCH responses (you might avoid having to do
+	   a full summary update)
+
+	if (ptr && strstr (resp, "FETCH") != NULL)
+		idle_resp->recent = strtoul (resp + 1, NULL, 10); */
+
+	if (ptr && strstr (resp, "EXPUNGE") != NULL) 
+	{
+		guint32 id = strtoul (resp + 1, NULL, 10);
+
+		if (idle_resp->expunged == NULL)
+			idle_resp->expunged = g_array_new (FALSE, FALSE, sizeof (int));
+		g_array_append_val (idle_resp->expunged, id);
+	}
 }
 
 static IdleResponse*
@@ -3117,6 +3122,7 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done,
 		CamelImapResponseType type;
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		char *resp = NULL;
+		GArray *expunged = NULL;
 
 		while (camel_imap_store_readline_nb (store, &resp, &ex) > 0)
 		{
@@ -3205,8 +3211,12 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 		if (idle_resp && !had_err)
 			process_idle_response (folder, idle_resp);
 
-		if (idle_resp)
+		if (idle_resp) 
+		{
+			if (idle_resp->expunged)
+				g_array_free (idle_resp->expunged, TRUE);
 			g_slice_free (IdleResponse, idle_resp);
+		}
 	}
 }
 
@@ -3241,8 +3251,12 @@ idle_timeout_checker (gpointer data)
 		if (idle_resp && !had_err)
 			process_idle_response (folder, idle_resp);
 
-		if (idle_resp)
+		if (idle_resp) 
+		{
+			if (idle_resp->expunged)
+				g_array_free (idle_resp->expunged, TRUE);
 			g_slice_free (IdleResponse, idle_resp);
+		}
 	}
 
 	return (store->idle_prefix != NULL);
