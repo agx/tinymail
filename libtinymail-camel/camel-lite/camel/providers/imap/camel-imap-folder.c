@@ -417,7 +417,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 				highestmodseq = g_strndup (resp, len);
 				phighestmodseq = get_highestmodseq (imap_folder);
 
-				if (phighestmodseq!=NULL && !strcmp (phighestmodseq, highestmodseq)) 
+				if (phighestmodseq !=NULL && !strcmp (phighestmodseq, highestmodseq)) 
 				{
 					g_free (phighestmodseq);
 					phighestmodseq = NULL;
