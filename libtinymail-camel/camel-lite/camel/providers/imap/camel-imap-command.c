@@ -189,6 +189,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		    const char *cmd, CamelException *ex)
 {
 	ssize_t nwritten;
+	gchar *resp = NULL;
+	CamelException myex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (store->ostream == NULL)
 		connect_to_server_wrapper ((CamelService*)store, ex);
@@ -230,6 +232,15 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		
 		fprintf (stderr, "sending : %c%.5u %s\r\n", store->tag_prefix, store->command, mask);
 	}
+
+	/* Read away whatever we got */
+	while (camel_imap_store_readline_nb (store, &resp, &myex) > 0)
+	{
+		g_free (resp);
+		resp=NULL;
+	}
+	if (resp)
+		g_free (resp);
 
 	nwritten = camel_stream_printf (store->ostream, "%c%.5u %s\r\n",
 					store->tag_prefix, store->command++, cmd);
