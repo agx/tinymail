@@ -905,6 +905,10 @@ a01 OK Completed (0.000 sec)
 	return;
 }
 
+typedef struct {
+	char *uid;
+	guint32 flags;
+} NewInfo;
 
 /* Called with the store's connect_lock locked */
 static void
@@ -912,17 +916,14 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
-	struct {
-		char *uid;
-		guint32 flags;
-	} *new;
-	char *resp;
+	GPtrArray *newstuff;
+	char *resp=NULL;
 	CamelImapResponseType type;
-	int i, seq, summary_len, summary_got;
+	int i=0, summary_len=0, summary_got=0;
 	CamelMessageInfo *info;
 	CamelImapMessageInfo *iinfo;
-	GArray *removed;
-	gboolean ok;
+	GPtrArray *removed=NULL;
+	gboolean ok=FALSE;
 	CamelFolderChangeInfo *changes = NULL;
 
 	imap_folder->need_rescan = FALSE;
@@ -933,7 +934,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 			camel_imap_folder_changed (folder, exists, NULL, ex);
 		return;
 	}
-	
+
 	/* Check UIDs and flags of all messages we already know of. */
 	camel_operation_start (NULL, _("Scanning for changed messages in %s"), folder->name);
 	info = camel_folder_summary_index (folder->summary, summary_len - 1);
@@ -941,121 +942,152 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 				       "UID FETCH 1:%s (FLAGS)",
 				       camel_message_info_uid (info));
 	camel_message_info_free(info);
-	if (!ok) {
+
+	if (!ok) 
+	{
 		imap_folder->need_rescan = TRUE;
 		camel_operation_end (NULL);
 		return;
 	}
-	
-	new = g_malloc0 (summary_len * sizeof (*new));
+
 	summary_got = 0;
-	while ((type = camel_imap_command_response (store, &resp, ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) {
+	newstuff = g_ptr_array_sized_new (summary_len);
+	while ((type = camel_imap_command_response (store, &resp, ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
+	{
+		NewInfo *newinfo = g_slice_new0 (NewInfo);
 		GData *data;
 		char *uid;
 		guint32 flags;
-		
+
 		data = parse_fetch_response (imap_folder, resp);
 		g_free (resp);
+
 		if (!data)
 			continue;
-		
-		seq = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
+
 		uid = g_datalist_get_data (&data, "UID");
 		flags = GPOINTER_TO_UINT (g_datalist_get_data (&data, "FLAGS"));
-		
-		if (!uid || !seq || seq > summary_len) {
+
+		if (!uid) {
 			g_datalist_clear (&data);
 			continue;
 		}
-		
+
 		camel_operation_progress (NULL, ++summary_got , summary_len);
-		new[seq - 1].uid = g_strdup (uid);
-		new[seq - 1].flags = flags;
+		newinfo->uid = g_strdup (uid);
+		newinfo->flags = flags;
+		g_ptr_array_add (newstuff, newinfo);
 		g_datalist_clear (&data);
 	}
 	
 	camel_operation_end (NULL);
-	if (type == CAMEL_IMAP_RESPONSE_ERROR) {
-		for (i = 0; i < summary_len && new[i].uid; i++)
-			g_free (new[i].uid);
-		g_free (new);
+
+	if (type == CAMEL_IMAP_RESPONSE_ERROR) 
+	{
+		for (i = 0; i < newstuff->len; i++)
+		{
+			NewInfo *newst = g_ptr_array_index (newstuff, i);
+			if (newst->uid)
+				g_free (newst->uid);
+			g_slice_free (NewInfo, newst);
+		}
+		g_ptr_array_free (newstuff, TRUE);
 		return;
 	}
-	
-	/* Free the final tagged response */
+
 	if (resp)
 		g_free (resp);
 
-	/* If we find a UID in the summary that doesn't correspond to
-	 * the UID in the folder, then either: (a) it's a real UID,
-	 * but the message was deleted on the server, or (b) it's a
-	 * fake UID, and needs to be removed from the summary in order
-	 * to sync up with the server. So either way, we remove it
-	 * from the summary.
-	 */
-	removed = g_array_new (FALSE, FALSE, sizeof (int));
-	for (i = 0; i < summary_len /* && new[i].uid */; i++) 
+	for (i = 0; i < summary_len; i++) 
 	{
-		info = camel_folder_summary_index (folder->summary, i);
-		iinfo = (CamelImapMessageInfo *)info;
+		int z = 0;
+		const char *truid;
+		NewInfo *ninfo = NULL;
+		gboolean found = FALSE;
 
-		if (new[i].uid == NULL || strcmp (camel_message_info_uid (info), new[i].uid) != 0) 
-		{
-			camel_message_info_free(info);
-			seq = i + 1;
-			g_array_append_val (removed, seq);
-			i--;
-			summary_len--;
+		info = camel_folder_summary_index (folder->summary, i);
+
+		if (!info)
 			continue;
-		}
-		
-		/* Update summary flags */
-		if (new[i].flags != iinfo->server_flags) 
+
+		iinfo = (CamelImapMessageInfo *) info;
+		truid = camel_message_info_uid (info);
+
+		for (z=0; z < newstuff->len ; z++)
 		{
+			ninfo = g_ptr_array_index (newstuff, z);
+			if (!strcmp (ninfo->uid, truid)) {
+				found = TRUE;
+				break;
+			}
+		}
+
+		if (!found)
+		{
+			if (!removed)
+				removed = g_ptr_array_new ();
+			g_ptr_array_add (removed, (char*) truid);
+
+		} else if (ninfo->flags != iinfo->server_flags) 
+		{
+			/* Update summary flags (the continue secured seq) */
 			guint32 server_set, server_cleared;
 			
-			server_set = new[i].flags & ~iinfo->server_flags;
-			server_cleared = iinfo->server_flags & ~new[i].flags;
+			server_set = (ninfo->flags) & ~iinfo->server_flags;
+			server_cleared = iinfo->server_flags & ~(ninfo->flags);
 
 			iinfo->info.flags = (iinfo->info.flags | server_set) & ~server_cleared;
-			iinfo->server_flags = new[i].flags;
+			iinfo->server_flags = (ninfo->flags);
 
 			if (changes == NULL)
 				changes = camel_folder_change_info_new();
-			camel_folder_change_info_change_uid(changes, new[i].uid);
+			camel_folder_change_info_change_uid(changes, ninfo->uid);
 			flags_to_label(folder, (CamelImapMessageInfo *)info);
 		}
 
 		camel_message_info_free(info);
-		g_free (new[i].uid);
 	}
 
-	if (changes) {
+	if (removed)
+	{
+	 for (i = 0; i< removed->len; i++)
+	 {
+		const char *truid = g_ptr_array_index (removed, i);
+		info = camel_folder_summary_uid (folder->summary, truid);
+		if (info)
+		{
+			if (changes == NULL)
+				changes = camel_folder_change_info_new();
+			camel_folder_change_info_remove_uid (changes, truid);
+
+			CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
+			camel_imap_message_cache_remove (imap_folder->cache, truid);
+			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+			((CamelMessageInfoBase *)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
+			camel_folder_summary_remove (folder->summary, info);
+			camel_message_info_free (info);
+		}
+	 }
+	 g_ptr_array_free (removed, TRUE);
+	}
+
+	for (i = 0; i < newstuff->len; i++)
+	{
+		NewInfo *newst = g_ptr_array_index (newstuff, i);
+		if (newst->uid)
+			g_free (newst->uid);
+		g_slice_free (NewInfo, newst);
+	}
+	g_ptr_array_free (newstuff, TRUE);
+
+
+	if (changes) 
+	{
 		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
 		camel_folder_change_info_free(changes);
 	}
-	
-	seq = i + 1;
-	
-	/* Free remaining memory. */
-	while (i < summary_len)
-	{
-		if (new[i].uid)
-			g_free (new[i++].uid);
-	}
-	g_free (new);
 
-	/* Remove any leftover cached summary messages. (Yes, we
-	 * repeatedly add the same number to the removed array.
-	 * See RFC2060 7.4.1)
-	 */
-
-	for (i = seq; i <= summary_len; i++)
-		g_array_append_val (removed, seq);
-
-	/* And finally update the summary. */
-	camel_imap_folder_changed (folder, exists, removed, ex);
-	g_array_free (removed, TRUE);
+	camel_imap_folder_changed (folder, exists, NULL, ex);
 }
 
 /* the max number of chars that an unsigned 32-bit int can be is 10 chars plus 1 for a possible : */
@@ -3126,7 +3158,7 @@ read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 	if (ptr && strstr (resp, "FETCH") != NULL)
 		idle_resp->fetch_happened = TRUE;
 
-	if (FALSE && ptr && strstr (resp, "EXPUNGE") != NULL) 
+	if (ptr && strstr (resp, "EXPUNGE") != NULL) 
 	{
 		guint32 id = strtoul (resp + 1, NULL, 10);
 
