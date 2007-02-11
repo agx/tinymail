@@ -3067,8 +3067,9 @@ a03 OK UID FETCH Completed
 
    } /* more */
 
-   camel_folder_summary_kill_hash (folder->summary);
    camel_folder_summary_save (folder->summary);
+
+   camel_folder_summary_kill_hash (folder->summary);
 
    /* Updates the fdr-dir/status file */
    /* _camel_imap_store_get_recent_messages (store, folder->full_name, &i, &got, FALSE); */
