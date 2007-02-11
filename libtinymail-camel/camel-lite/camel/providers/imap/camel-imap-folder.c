@@ -3533,7 +3533,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
-	connected = camel_imap_store_connected(store, &tex);
+	connected = camel_disco_store_check_online((CamelDiscoStore *)store, &tex);
 
 	if (connected && ((type & CAMEL_FOLDER_RECEIVE_FULL) && camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
 		camel_imap_message_cache_remove (imap_folder->cache, uid);
