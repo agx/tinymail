@@ -2993,10 +2993,13 @@ a03 OK UID FETCH Completed
 					mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 				  }
 
-				/*  camel_folder_summary_prepare_hash (folder->summary);
+				  camel_folder_summary_prepare_hash (folder->summary);
 				  info = (CamelImapMessageInfo *) camel_folder_summary_uid (folder->summary, muid);
-				  if (info)
-					camel_message_info_free (info); */
+
+				  if (info) {
+					camel_folder_summary_remove (folder->summary, (CamelMessageInfo*) info);
+					camel_message_info_free (info); 
+				  }
 
 				  ucnt++;
 
