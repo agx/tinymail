@@ -1016,7 +1016,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		for (z=0; z < newstuff->len ; z++)
 		{
 			ninfo = g_ptr_array_index (newstuff, z);
-			if ((ninfo->seq == i) && !strcmp (ninfo->uid, truid)) 
+			if ((ninfo->seq-1 == i) && !strcmp (ninfo->uid, truid)) 
 			{
 				found = TRUE;
 				break;
