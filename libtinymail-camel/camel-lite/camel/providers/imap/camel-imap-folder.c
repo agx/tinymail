@@ -955,7 +955,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		uid = g_datalist_get_data (&data, "UID");
 		flags = GPOINTER_TO_UINT (g_datalist_get_data (&data, "FLAGS"));
 		
-		if (!uid || !seq || seq > summary_len) {
+		if (!uid || !seq || seq > summary_len || seq < 0) {
 			g_datalist_clear (&data);
 			continue;
 		}
