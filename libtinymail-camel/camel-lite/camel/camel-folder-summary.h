@@ -230,7 +230,7 @@ struct _CamelFolderSummary {
 	char *summary_path;
 	gboolean build_content;	/* do we try and parse/index the content, or not? */
 
-	GPtrArray *messages; /* CamelMessageInfo's */
+	GPtrArray *messages, *expunged; /* CamelMessageInfo's */
 	GHashTable *uidhash;
 
 	struct _CamelFolder *folder; /* parent folder, for events */

@@ -1,4 +1,10 @@
-2007-02-12 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+2007-02-12  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Support for EXPUNGE and FETCH unsolicited events during IDLE. This
+	should complete the support for IDLE and Push-Email. From now on we
+	can start truly testing this.
+
+2007-02-12  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
 	* Make TnyCamelSendQueue subclassable - add accessors
 	  for setting the TnyCamelTransportAccount, and _flush

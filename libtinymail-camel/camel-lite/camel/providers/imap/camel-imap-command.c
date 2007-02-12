@@ -236,6 +236,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	/* Read away whatever we got */
 	while (camel_imap_store_readline_nb (store, &resp, &myex) > 0)
 	{
+		/* printf ("unsolitcited [%s]\n", resp); */
 		g_free (resp);
 		resp=NULL;
 	}
@@ -256,10 +257,10 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		else
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     g_strerror (errno));
-		
-		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
 
-		/* Let's try .. */
+		/* TNY TODO: Remove this (it can disturb the ui using ->alert 
+		   and ->get_pass_func) */
+		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
 		camel_service_connect (CAMEL_SERVICE (store), &mex);
 
 		return FALSE;
