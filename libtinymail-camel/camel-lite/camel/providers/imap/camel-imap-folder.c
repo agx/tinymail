@@ -3009,19 +3009,25 @@ a03 OK UID FETCH Completed
 
 				  sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
 				  curlen = camel_folder_summary_count (folder->summary);
-				  if (sequence > 0 && sequence != curlen)
+
+				  if (sequence > 0 && sequence != curlen && sequence <= exists)
 				  {
-					int r = curlen;
+					int r;
 					if (curlen > sequence)
 					{
 						for (r = curlen-1; r >= sequence -1; r--)
 						{ 
 							CamelMessageInfo *ri = camel_folder_summary_index (folder->summary, r);
-							if (ri) { /* printf ("rm idx=%d, uid=%s\n", r, ri->uid); */
-							camel_folder_summary_remove (folder->summary, ri); }
+							if (ri)
+								camel_folder_summary_remove (folder->summary, ri); }
 						}
 					} else {
-						
+						for (r=0; r < sequence - curlen - 1; r++)
+						{
+							CamelMessageInfo *ni = camel_message_info_clone (mi);
+							if (ni)
+								camel_folder_summary_add (folder->summary, (CamelMessageInfo *)ni)
+						}
 					}
 
 					oosync = TRUE;
