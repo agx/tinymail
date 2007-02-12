@@ -525,12 +525,82 @@ TnySendQueue*
 tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account)
 {
 	TnyCamelSendQueue *self = g_object_new (TNY_TYPE_CAMEL_SEND_QUEUE, NULL);
-	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (trans_account));
+
+	tny_camel_send_queue_set_transport_account (self, trans_account);
+	tny_camel_send_queue_flush (self);
 	
-	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref (G_OBJECT (trans_account)));
+	return TNY_SEND_QUEUE (self);
+}
+
+
+/**
+ * tny_camel_send_queue_set_transport_account:
+ * @self: a valid #TnyCamelSendQueue instance
+ * @trans_account: A #TnyCamelTransportAccount instance
+ *
+ * set the transport account for this send queue.
+ * 
+ **/
+void
+tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
+					    TnyCamelTransportAccount *acc)
+{
+	TnyCamelSendQueuePriv *priv;
 	
+	g_return_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self));
+	g_return_if_fail (TNY_IS_CAMEL_TRANSPORT_ACCOUNT(acc));
+
+	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+	if (priv->trans_account)
+		g_object_unref (G_OBJECT(priv->trans_account));
+	
+	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(acc)));
+}
+
+/**
+ * tny_camel_send_queue_get_transport_account:
+ * @self: a valid #TnyCamelSendQueue instance
+ *
+ * get the transport account for this send queue.
+ *
+ * Return value: A #TnyCamelTransportAccount instance or NULL; unref it
+ * when you no longer need it.
+ **/
+TnyCamelTransportAccount*
+tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
+{
+	TnyCamelSendQueuePriv *priv;
+	
+	g_return_val_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self), NULL);
+
+	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+
+	if (!priv->trans_account)
+		return NULL;
+
+	g_object_ref (G_OBJECT(priv->trans_account));
+	return TNY_CAMEL_TRANSPORT_ACCOUNT(priv->trans_account);
+}
+
+/**
+ * tny_camel_send_queue_new:
+ * @self: a valid #TnyCamelSendQueue instance
+ *
+ * (try to) flush the messages which are currently in this send queue
+ *  (persisted in the outbox folder)
+ * 
+ **/
+void
+tny_camel_send_queue_flush (TnyCamelSendQueue *self)
+{
+	TnyCamelSendQueuePriv *priv;
+	
+	g_return_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self));
+
+	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+
 	g_mutex_lock (priv->todo_lock);
 	{
 		TnyFolder *outbox;
@@ -549,10 +619,8 @@ tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account)
 		g_object_unref (G_OBJECT (outbox));
 	}
 	g_mutex_unlock (priv->todo_lock);
-
-
-	return TNY_SEND_QUEUE (self);
 }
+
 
 
 static void
