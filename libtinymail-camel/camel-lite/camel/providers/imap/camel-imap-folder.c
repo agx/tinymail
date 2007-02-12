@@ -685,7 +685,7 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 	 * should do it.  */
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
-	if (!camel_imap_store_connected(imap_store, ex))
+	if (!camel_disco_store_check_online ((CamelDiscoStore*)imap_store, ex))
 		goto done;
 
 	if (imap_store->current_folder != folder
@@ -1211,7 +1211,7 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 			continue;
 		
 		/* Make sure we're connected before issuing commands */
-		if (!camel_imap_store_connected(store, ex)) {
+		if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
 			g_free(set);
 			break;
 		}
@@ -2464,7 +2464,7 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 				int i;
 				
 				CAMEL_SERVICE_REC_LOCK(store, connect_lock);
-				if (!camel_imap_store_connected(store, ex)) {
+				if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
 					CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     _("This message is not currently available"));
@@ -3559,7 +3559,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
-	if (!camel_imap_store_connected(store, ex)) {
+	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 				     _("This message is not currently available"));
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
