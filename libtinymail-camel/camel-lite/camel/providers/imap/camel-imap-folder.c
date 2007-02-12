@@ -3020,7 +3020,10 @@ a03 OK UID FETCH Completed
 							if (ri) { /* printf ("rm idx=%d, uid=%s\n", r, ri->uid); */
 							camel_folder_summary_remove (folder->summary, ri); }
 						}
+					} else {
+						
 					}
+
 					oosync = TRUE;
 				  }
 
