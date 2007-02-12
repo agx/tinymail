@@ -685,7 +685,7 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 	 * should do it.  */
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
-	if (!camel_disco_store_check_online ((CamelDiscoStore*)imap_store, ex))
+	if (!camel_imap_store_connected(imap_store, ex))
 		goto done;
 
 	if (imap_store->current_folder != folder
@@ -1164,7 +1164,7 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 			continue;
 		
 		/* Make sure we're connected before issuing commands */
-		if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
+		if (!camel_imap_store_connected(store, ex)) {
 			g_free(set);
 			break;
 		}
@@ -2417,7 +2417,7 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 				int i;
 				
 				CAMEL_SERVICE_REC_LOCK(store, connect_lock);
-				if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
+				if (!camel_imap_store_connected(store, ex)) {
 					CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     _("This message is not currently available"));
@@ -2864,11 +2864,12 @@ imap_update_summary (CamelFolder *folder, int exists,
 			g_ptr_array_free (needheaders, TRUE);
 			needheaders = g_ptr_array_new ();
 			if (!camel_imap_command_start (store, folder, ex,
-				"UID FETCH 1:* (UID)", uidval + 1 + cnt))
+				"UID FETCH 1:* (UID)"))
 				{ if (!camel_operation_cancel_check (NULL)) 
 					g_warning ("IMAP error getting UIDs (3)");
 					camel_folder_summary_kill_hash (folder->summary);
 				  camel_operation_end (NULL); return; }
+			camel_folder_summary_clear (folder->summary);
 			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
 
 			if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
@@ -2962,12 +2963,17 @@ a03 OK UID FETCH Completed
 				== CAMEL_IMAP_RESPONSE_UNTAGGED) 
 			{
 				gchar *muid;
+				guint32 sequence, curlen;
 
 				data = parse_fetch_response (imap_folder, resp);
 				g_free (resp); resp = NULL;
 
 				if (!data)
 					continue;
+				sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
+				curlen = camel_folder_summary_count (folder->summary);
+				if (sequence - 1 != curlen)
+					printf ("%d vs %d\n", sequence, curlen);
 
 				mi = message_from_data (folder, data);
 
@@ -3588,7 +3594,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
-	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
+	if (!camel_imap_store_connected(store, ex)) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 				     _("This message is not currently available"));
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
