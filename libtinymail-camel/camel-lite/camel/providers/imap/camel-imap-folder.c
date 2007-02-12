@@ -2970,10 +2970,7 @@ a03 OK UID FETCH Completed
 
 				if (!data)
 					continue;
-				sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
-				curlen = camel_folder_summary_count (folder->summary);
-				if (sequence - 1 != curlen)
-					oosync = TRUE;
+
 
 				mi = message_from_data (folder, data);
 
@@ -2996,15 +2993,34 @@ a03 OK UID FETCH Completed
 					mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 				  }
 
-				  camel_folder_summary_prepare_hash (folder->summary);
+				/*  camel_folder_summary_prepare_hash (folder->summary);
 				  info = (CamelImapMessageInfo *) camel_folder_summary_uid (folder->summary, muid);
 				  if (info)
-					camel_message_info_free (info);
+					camel_message_info_free (info); */
 
 				  ucnt++;
 
 				  allhdrs++;
 				  camel_operation_progress (NULL, allhdrs , ineed);
+
+
+				  sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
+				  curlen = camel_folder_summary_count (folder->summary);
+				  if (sequence != curlen)
+				  {
+					int r = curlen;
+					if (curlen > sequence)
+					{
+						for (r = curlen-1; r > sequence -1; r--)
+						{ 
+							CamelMessageInfo *ri = camel_folder_summary_index (folder->summary, r);
+							if (ri) { /* printf ("rm idx=%d, uid=%s\n", r, ri->uid); */
+							camel_folder_summary_remove (folder->summary, ri); }
+						}
+					}
+					oosync = TRUE;
+				  }
+
 				  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
 
 				  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
