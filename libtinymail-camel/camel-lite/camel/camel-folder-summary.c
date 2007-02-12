@@ -3279,8 +3279,8 @@ camel_message_info_free(void *o)
 {
 	CamelMessageInfo *mi = o;
 
-	camel_message_info_set_flags(mi, CAMEL_MESSAGE_FREED, CAMEL_MESSAGE_FREED);
-	
+	/* camel_message_info_set_flags(mi, CAMEL_MESSAGE_FREED, CAMEL_MESSAGE_FREED); */
+
 	g_return_if_fail(mi != NULL);
 
 	if (mi->summary) {
