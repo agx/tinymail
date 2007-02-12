@@ -3009,7 +3009,7 @@ a03 OK UID FETCH Completed
 
 				  sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
 				  curlen = camel_folder_summary_count (folder->summary);
-				  if (sequence != curlen)
+				  if (sequence > 0 && sequence != curlen)
 				  {
 					int r = curlen;
 					if (curlen > sequence)
