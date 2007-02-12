@@ -3014,7 +3014,7 @@ a03 OK UID FETCH Completed
 					int r = curlen;
 					if (curlen > sequence)
 					{
-						for (r = curlen-1; r > sequence -1; r--)
+						for (r = curlen-1; r >= sequence -1; r--)
 						{ 
 							CamelMessageInfo *ri = camel_folder_summary_index (folder->summary, r);
 							if (ri) { /* printf ("rm idx=%d, uid=%s\n", r, ri->uid); */
