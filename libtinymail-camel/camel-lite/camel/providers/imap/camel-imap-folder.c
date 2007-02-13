@@ -3329,6 +3329,7 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 	IdleResponse *idle_resp = NULL;
 	GSource *src;
 	gboolean had_err = FALSE;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
 		return;
@@ -3336,6 +3337,15 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 	store = CAMEL_IMAP_STORE (folder->parent_store);
 
 	if (!store || !CAMEL_IS_IMAP_STORE (store))
+		return;
+
+	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
+		return;
+
+	if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
+		return;
+
+	if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
 		return;
 
 	if (store->capabilities & IMAP_CAPABILITY_IDLE)
@@ -3365,6 +3375,7 @@ idle_timeout_checker (gpointer data)
 	CamelImapFolder *imap_folder;
 	CamelImapStore *store;
 	gboolean had_err = FALSE;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	/* printf ("idle\n"); */
 
@@ -3374,6 +3385,15 @@ idle_timeout_checker (gpointer data)
 	store = CAMEL_IMAP_STORE (folder->parent_store);
 
 	if (!(store->capabilities & IMAP_CAPABILITY_IDLE))
+		return FALSE;
+
+	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
+		return FALSE;
+
+	if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
+		return FALSE;
+
+	if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
 		return FALSE;
 
 	imap_folder = CAMEL_IMAP_FOLDER (folder);
@@ -3416,6 +3436,7 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 {
 	CamelImapStore *store;
 	CamelImapFolder *imap_folder = (CamelImapFolder *) folder;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
 		return;
@@ -3423,6 +3444,15 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 	store = CAMEL_IMAP_STORE (folder->parent_store);
 
 	if (!store || !CAMEL_IS_IMAP_STORE (store))
+		return;
+
+	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
+		return;
+
+	if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
+		return;
+
+	if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
 		return;
 
 	if (store->capabilities & IMAP_CAPABILITY_IDLE)

@@ -260,8 +260,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 		/* TNY TODO: Remove this (it can disturb the ui using ->alert 
 		   and ->get_pass_func) */
-		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
-		camel_service_connect (CAMEL_SERVICE (store), &mex);
+		/*camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
+		camel_service_connect (CAMEL_SERVICE (store), &mex); */
 
 		return FALSE;
 	}

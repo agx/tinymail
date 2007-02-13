@@ -3459,16 +3459,24 @@ camel_imap_store_readline_nb (CamelImapStore *store, char **dest, CamelException
 	
 	g_return_val_if_fail (CAMEL_IS_IMAP_STORE (store), -1);
 	g_return_val_if_fail (dest, -1);
-	
+
 	*dest = NULL;
 
+	g_mutex_lock (store->stream_lock);
+	if (stream == NULL || ((CamelObject *)stream)->ref_count <= 0)
+	{
+		g_mutex_unlock (store->stream_lock);
+		return -1;
+	}
 	stream = CAMEL_STREAM_BUFFER (store->istream);
 	ba = g_byte_array_new ();
-	while ((nread = camel_tcp_stream_buffer_gets_nb (stream, linebuf, sizeof (linebuf))) > 0) {
+	while ((nread = camel_tcp_stream_buffer_gets_nb (stream, linebuf, sizeof (linebuf))) > 0) 
+	{
 		g_byte_array_append (ba, (const guchar*) linebuf, nread);
 		if (linebuf[nread - 1] == '\n')
 			break;
 	}
+	g_mutex_unlock (store->stream_lock);
 
 	if (nread <= 0) {
 		g_byte_array_free (ba, TRUE);
