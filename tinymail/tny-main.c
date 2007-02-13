@@ -80,7 +80,8 @@ main (int argc, char **argv)
 	g_option_context_add_group (context, gtk_get_option_group (TRUE));
 	g_option_context_parse (context, &argc, &argv, NULL);
 
-	g_thread_init (NULL);
+	if (!g_thread_supported ()) 
+		g_thread_init (NULL);
 	gdk_threads_init ();
 
 	gdk_threads_enter ();
