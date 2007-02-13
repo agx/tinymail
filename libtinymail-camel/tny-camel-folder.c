@@ -498,7 +498,7 @@ tny_camel_folder_is_subscribed_default (TnyFolder *self)
 		if (!load_folder_no_lock (priv)) 
 		{
 			g_mutex_unlock (priv->folder_lock);
-			return;
+			return FALSE;
 		}
 
 		store = priv->store;
