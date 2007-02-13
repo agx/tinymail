@@ -1230,7 +1230,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 
 	if (!priv->receive_strat) {
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-		return;
+		return NULL;
 	}
 
 	g_mutex_lock (priv->folder_lock);
@@ -1240,7 +1240,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 		{
 			g_mutex_unlock (priv->folder_lock);
 			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-			return;
+			return NULL;
 		}
 
 	retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, header, err);
