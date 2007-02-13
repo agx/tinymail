@@ -816,7 +816,6 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 				       highestmodseq);
 	if (!ok) {
 		/* TNY TODO: turn-off the CONDSTORE capability? */
-		imap_folder->need_rescan = TRUE;
 		camel_operation_end (NULL);
 		return;
 	}
@@ -882,15 +881,16 @@ a01 OK Completed (0.000 sec)
 		return;
 
 	/* Free the final tagged response */
-	g_free (resp);
-
-	if (imap_folder->need_rescan)
-		imap_rescan (folder, exists, ex);
+	if (resp)
+		g_free (resp);
 
 	if (changes) {
 		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
 		camel_folder_change_info_free(changes);
 	}
+
+	if (imap_folder->need_rescan)
+		imap_rescan (folder, exists, ex);
 
 	/* And finally update the summary. */
 	camel_imap_folder_changed (folder, exists, removed, ex);
