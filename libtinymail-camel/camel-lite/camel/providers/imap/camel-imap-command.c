@@ -188,21 +188,21 @@ static gboolean
 imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		    const char *cmd, CamelException *ex)
 {
+	GThread *thread;
 	ssize_t nwritten;
 	gchar *resp = NULL;
 	CamelException myex = CAMEL_EXCEPTION_INITIALISER;
+	gchar *full_cmd = NULL;
+	guint len = 0;
 
 	if (store->ostream == NULL || ((CamelObject *)store->ostream)->ref_count <= 0)
-		connect_to_server_wrapper ((CamelService*)store, ex);
-	else if (store->istream==NULL || ((CamelObject *)store->istream)->ref_count <= 0) 
-		connect_to_server_wrapper ((CamelService*)store, ex);
+		if (!camel_service_connect ((CamelService*)store, ex))
+			return FALSE;
 
 	/* g_mutex_lock (store->stream_lock); */
 
-	if (store->ostream==NULL || ((CamelObject *)store->ostream)->ref_count <= 0) 
-		{ /* g_mutex_unlock (store->stream_lock); */ return FALSE; }
-	if (store->istream==NULL || ((CamelObject *)store->istream)->ref_count <= 0) 
-		{ /* g_mutex_unlock (store->stream_lock);*/ return FALSE; }
+	if (store->ostream==NULL) return FALSE;
+	if (store->istream==NULL) return FALSE;
 
 	/* g_mutex_unlock (store->stream_lock);*/
 
@@ -259,14 +259,16 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	if (resp)
 		g_free (resp);
 
-	nwritten = camel_stream_printf (store->ostream, "%c%.5u %s\r\n",
-					store->tag_prefix, store->command++, cmd);
+	full_cmd = g_strdup_printf ("%c%.5u %s\r\n", store->tag_prefix, 
+		store->command++, cmd);
+	len = strlen (full_cmd);
+
+	nwritten = camel_stream_write (store->ostream, full_cmd, len);
 
 	/* g_mutex_unlock (store->stream_lock); */
 
-	/* printf ("%c%.5u %s\r\n", store->tag_prefix, store->command, cmd); */
-
-	if (nwritten == -1) {
+	if (nwritten != len) 
+	{
 		CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 
 		if (errno == EINTR)
@@ -276,10 +278,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     g_strerror (errno));
 
-		/* TNY TODO: Remove this (it can disturb the ui using ->alert 
-		   and ->get_pass_func) */
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
-		/* camel_service_connect (CAMEL_SERVICE (store), &mex); */
+		camel_service_connect (CAMEL_SERVICE (store), &mex);
 
 		return FALSE;
 	}
@@ -499,7 +499,7 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
 	}
 	
 	response->status = respbuf;
-	
+
 	/* Check for OK or continuation response. */
 	if (*respbuf == '+')
 		return response;

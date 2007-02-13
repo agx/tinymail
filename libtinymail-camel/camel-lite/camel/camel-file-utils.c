@@ -47,7 +47,7 @@
 #include "camel-operation.h"
 #include "camel-url.h"
 
-#define IO_TIMEOUT (60*4)
+#define IO_TIMEOUT (15*4)
 
 
 /**
@@ -453,7 +453,7 @@ camel_read (int fd, char *buf, size_t n)
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
 			fdmax = MAX (fd, cancel_fd) + 1;
-			tv.tv_sec = 15 /*IO_TIMEOUT*/;
+			tv.tv_sec = IO_TIMEOUT;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -576,7 +576,7 @@ camel_write (int fd, const char *buf, size_t n)
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = 15 /*IO_TIMEOUT*/;
+			tv.tv_sec = IO_TIMEOUT;
 			tv.tv_usec = 0;
 			w = -1;
 
@@ -645,7 +645,7 @@ camel_read_socket (int fd, char *buf, size_t n)
 	if (cancel_fd == -1) {
 		do {
 			nread = recv (fd, buf, n, 0);
-		} while (0 && (nread == SOCKET_ERROR && WSAGetLastError () == WSAEWOULDBLOCK));
+		} while ((nread == SOCKET_ERROR && WSAGetLastError () == WSAEWOULDBLOCK));
 	} else {
 		int fdmax;
 		fd_set rdset;
@@ -660,7 +660,7 @@ camel_read_socket (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = 15 /*IO_TIMEOUT*/;
+			tv.tv_sec = IO_TIMEOUT;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -675,7 +675,7 @@ camel_read_socket (int fd, char *buf, size_t n)
 			} else {				
 				nread = recv (fd, buf, n, 0);
 			}
-		} while (0 && (nread == -1 && WSAGetLastError () == WSAEWOULDBLOCK));
+		} while ((nread == -1 && WSAGetLastError () == WSAEWOULDBLOCK));
 	failed:
 		;
 	}
@@ -702,7 +702,7 @@ camel_read_socket_nb (int fd, char *buf, size_t n)
 	if (cancel_fd == -1) {
 		do {
 			nread = recv (fd, buf, n, 0);
-		} while (nread == SOCKET_ERROR && WSAGetLastError () == WSAEWOULDBLOCK);
+		} while (0&&(nread == SOCKET_ERROR && WSAGetLastError () == WSAEWOULDBLOCK));
 	} else {
 		int fdmax;
 		fd_set rdset;
@@ -717,7 +717,7 @@ camel_read_socket_nb (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = 15 /*IO_TIMEOUT*/;
+			tv.tv_sec = IO_TIMEOUT;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -732,7 +732,7 @@ camel_read_socket_nb (int fd, char *buf, size_t n)
 			} else {				
 				nread = recv (fd, buf, n, 0);
 			}
-		} while (nread == -1 && WSAGetLastError () == WSAEWOULDBLOCK);
+		} while (0&&(nread == -1 && WSAGetLastError () == WSAEWOULDBLOCK));
 	failed:
 		;
 	}
@@ -792,7 +792,7 @@ camel_write_socket (int fd, const char *buf, size_t n)
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = 15 /*IO_TIMEOUT*/;
+			tv.tv_sec = IO_TIMEOUT;
 			tv.tv_usec = 0;
 			w = -1;
 

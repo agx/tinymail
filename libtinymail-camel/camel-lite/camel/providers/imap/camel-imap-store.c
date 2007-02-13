@@ -639,8 +639,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	gboolean force_imap4 = FALSE;
 	gboolean clean_quit = TRUE;
 	char *buf;
-	
+	gboolean not_ssl = TRUE;
+
 	if (ssl_mode != MODE_CLEAR) {
+		not_ssl = FALSE;
 #ifdef HAVE_SSL
 		if (ssl_mode == MODE_TLS) {
 			tcp_stream = camel_tcp_stream_ssl_new_raw (service->session, service->url->host, STARTTLS_FLAGS);
@@ -778,9 +780,12 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		store->server_level = IMAP_LEVEL_IMAP4;
 	}
 	
-	if (ssl_mode != MODE_TLS) {
+	if (not_ssl || ssl_mode != MODE_TLS) {
+
 		/* we're done */
+
 		return TRUE;
+
 	}
 	
 #ifdef HAVE_SSL
@@ -1056,7 +1061,7 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 {
 	const char *ssl_mode;
 	struct addrinfo hints, *ai;
-	int mode, ret, i;
+	int mode = -1, ret, i;
 	char *serv;
 	const char *port;
 

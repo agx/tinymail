@@ -2,6 +2,7 @@
 
 	* Various error handling situations when the IMAP service went offline
 	or something with the connection happened
+	* Connection fails, retry after reconnect stuff
 
 2007-02-13  Oystein Gisnas  <oystein@gisnas.net>
 

@@ -22,6 +22,7 @@
 
 #include <config.h>
 
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
@@ -63,6 +64,11 @@ static struct sockaddr *stream_get_local_address (CamelTcpStream *stream, sockle
 static struct sockaddr *stream_get_remote_address (CamelTcpStream *stream, socklen_t *len);
 static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
 
+static void signal_swallow( int num )
+{
+	printf ("Connection troubles\n");
+}
+
 static void
 camel_tcp_stream_raw_class_init (CamelTcpStreamRawClass *camel_tcp_stream_raw_class)
 {
@@ -72,7 +78,9 @@ camel_tcp_stream_raw_class_init (CamelTcpStreamRawClass *camel_tcp_stream_raw_cl
 		CAMEL_STREAM_CLASS (camel_tcp_stream_raw_class);
 	
 	parent_class = CAMEL_TCP_STREAM_CLASS (camel_type_get_global_classfuncs (camel_tcp_stream_get_type ()));
-	
+
+	signal( SIGPIPE, signal_swallow );
+
 	/* virtual method overload */
 	camel_stream_class->read = stream_read;
 	camel_stream_class->write = stream_write;
