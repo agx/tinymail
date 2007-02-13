@@ -3398,7 +3398,7 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done,
   CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
   if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
-	return;
+	return NULL;
 
   if (!store || !CAMEL_IS_IMAP_STORE (store))
 	return NULL;

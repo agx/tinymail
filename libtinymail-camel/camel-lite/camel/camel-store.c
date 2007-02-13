@@ -197,6 +197,7 @@ get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, in
 {
 	*unseen = 0;
 	*messages = 0;
+	return NULL;
 }
 
 
