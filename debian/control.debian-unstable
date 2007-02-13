@@ -66,6 +66,30 @@ Description: memory-effective framework for accessing e-mail - development files
  .
  This package contains the development files for camel-lite.
 
+Package: libtinymailui-1.0-0
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: memory-effective framework for accessing e-mail - Camel library
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the user interface library.
+
+Package: libtinymailui-1.0-0-dev
+Architecture: any
+Depends: libtinymailui-1.0-0 (= ${binary:Version})
+Description: memory-effective framework for accessing e-mail - development files
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the development files for libtinymailui.
+
 Package: libtinymailui-gtk-1.0-0
 Architecture: any
 Depends: ${shlibs:Depends}
@@ -78,7 +102,7 @@ Description: memory-effective framework for accessing e-mail - Camel library
  .
  This package contains the library for GTK operations.
 
-Package: libtinymailui-1.0-0-dev
+Package: libtinymailui-gtk-1.0-0-dev
 Architecture: any
 Depends: libtinymailui-1.0-0 (= ${binary:Version})
 Description: memory-effective framework for accessing e-mail - development files
@@ -90,7 +114,7 @@ Description: memory-effective framework for accessing e-mail - development files
  .
  This package contains the development files for libtinymailui-gtk.
 
-Package: libtinymailui-gnome-desktop-1.0-0
+Package: libtinymail-gnome-desktop-1.0-0
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: memory-effective framework for accessing e-mail - Camel library
@@ -150,9 +174,9 @@ Description: memory-effective framework for accessing e-mail - Camel library
  .
  This package contains the library for rendering HTML.
 
-Package: libtinymail-mozembed-1.0-0-dev
+Package: libtinymailui-mozembed-1.0-0-dev
 Architecture: any
-Depends: libtinymail-mozembed-1.0-0 (= ${binary:Version})
+Depends: libtinymailui-mozembed-1.0-0 (= ${binary:Version})
 Description: memory-effective framework for accessing e-mail - development files
  Tinymail is a development framework for accessing E-mail services using
  devices with few memory resources.
