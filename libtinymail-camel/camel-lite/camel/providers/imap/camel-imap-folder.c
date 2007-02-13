@@ -2838,23 +2838,28 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 {
 	char *resp = NULL;
 	CamelImapResponseType type;
-	guint32 cnt = 0;
+	guint32 cnt = 0, slen;
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
-	gchar *uid, *flags;
+	gchar *uid, *str;
 
 	while ((type = camel_imap_command_response (store, &resp, ex)) ==
 			CAMEL_IMAP_RESPONSE_UNTAGGED) 
 	{
+		str = strstr (resp, "SEARCH");
 
-		GData *data = parse_fetch_response (imap_folder, resp);
-		char *uid = g_datalist_get_data (&data, "UID");
-		if (uid) {
-			g_ptr_array_add (needheaders, g_strdup (uid));
-			cnt++;
+		if (str)
+		{
+			str+=7;
+			uid = strtok (str, " ");
+
+			while (uid != NULL)
+			{
+				if (uid)
+					g_ptr_array_add (needheaders, g_strdup (uid));
+				uid = strtok (NULL, " ");
+				cnt++;
+			}
 		}
-		g_datalist_clear (&data);
-
-		/* printf ("%s\n", resp); */
 
 		g_free (resp); 
 		resp=NULL;
@@ -2947,7 +2952,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	got = 0;
 
 	if (!camel_imap_command_start (store, folder, ex,
-		"UID FETCH %d:%d (UID)", uidval + 1, uidval + 1 + nextn)) 
+		"UID SEARCH %d:%d ALL", uidval + 1, uidval + 1 + nextn)) 
 		{ if (!camel_operation_cancel_check (NULL))
 			g_warning ("IMAP error getting UIDs (1)"); 
 		 camel_operation_end (NULL); return; }
@@ -2979,7 +2984,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	{
 
 		if (!camel_imap_command_start (store, folder, ex,
-			"UID FETCH %d:* (UID)", uidval + 1 + cnt)) 
+			"UID SEARCH %d:* ALL", uidval + 1 + cnt)) 
 			{ if (!camel_operation_cancel_check (NULL))
 				g_warning ("IMAP error getting UIDs (2)"); 
 			  camel_operation_end (NULL); return; }
@@ -3006,7 +3011,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			g_ptr_array_free (needheaders, TRUE);
 			needheaders = g_ptr_array_new ();
 			if (!camel_imap_command_start (store, folder, ex,
-				"UID FETCH 1:* (UID)"))
+				"UID SEARCH 1:* ALL"))
 				{ if (!camel_operation_cancel_check (NULL)) 
 					g_warning ("IMAP error getting UIDs (3)");
 					camel_folder_summary_kill_hash (folder->summary);
@@ -3133,14 +3138,6 @@ a03 OK UID FETCH Completed
 						g_free (mi->info.uid);
 					mi->info.uid = g_strdup (muid);
 					mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
-				  }
-
-				  camel_folder_summary_prepare_hash (folder->summary);
-				  info = (CamelImapMessageInfo *) camel_folder_summary_uid (folder->summary, muid);
-
-				  if (info) {
-					camel_folder_summary_remove (folder->summary, (CamelMessageInfo*) info);
-					camel_message_info_free (info); 
 				  }
 
 				  ucnt++;
