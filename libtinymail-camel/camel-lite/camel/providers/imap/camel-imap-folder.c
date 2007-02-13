@@ -3251,6 +3251,23 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done,
 {
   IdleResponse *idle_resp = NULL;
 
+  CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+  if (!folder || !CAMEL_IS_IMAP_FOLDER (folder))
+	return;
+
+  if (!store || !CAMEL_IS_IMAP_STORE (store))
+	return NULL;
+
+  if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
+	return NULL;
+
+  if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
+	return NULL;
+
+  if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
+	return NULL;
+
   gboolean locked = CAMEL_SERVICE_REC_TRYLOCK (store, connect_lock);
   if (locked)
   {
@@ -3284,8 +3301,19 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done,
 		if (done)
 		{
 			g_mutex_lock (store->stream_lock);
+
+			if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
+				{ g_mutex_unlock (store->stream_lock); return NULL; }
+
+			if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
+				{ g_mutex_unlock (store->stream_lock); return NULL; }
+
+			if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
+				{ g_mutex_unlock (store->stream_lock); return NULL; }
+
 			if (store->ostream && CAMEL_IS_STREAM (store->ostream))
-				camel_stream_printf (store->ostream, "DONE\r\n");
+
+			camel_stream_printf (store->ostream, "DONE\r\n");
 			g_mutex_unlock (store->stream_lock);
 
 			while ((type = camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
