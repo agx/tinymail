@@ -617,7 +617,7 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 					if (!queue)
 						queue = tny_camel_send_queue_new (acc);
 		
-					tny_send_queue_add (queue, msg);
+					tny_send_queue_add (queue, msg, NULL);
 
 					g_object_unref (G_OBJECT (acc));
 					g_object_unref (G_OBJECT (iter));

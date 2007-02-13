@@ -163,7 +163,7 @@ main (int argc, char **argv)
 	msg = create_test_msg (platfact);
 
 	queue = tny_camel_send_queue_new (TNY_CAMEL_TRANSPORT_ACCOUNT (account));
-	tny_send_queue_add (queue, msg);
+	tny_send_queue_add (queue, msg, NULL);
 
     if (mainloop)
 	{
