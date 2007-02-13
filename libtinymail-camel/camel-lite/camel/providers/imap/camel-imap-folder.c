@@ -3026,7 +3026,7 @@ a03 OK UID FETCH Completed
 						{
 							CamelMessageInfo *ni = camel_message_info_clone (mi);
 							if (ni)
-								camel_folder_summary_add (folder->summary, (CamelMessageInfo *)ni)
+								camel_folder_summary_add (folder->summary, (CamelMessageInfo *)ni);
 						}
 					}
 
