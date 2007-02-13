@@ -339,122 +339,54 @@ static ssize_t
 stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 {
 	CamelTcpStreamSSL *tcp_stream_ssl = CAMEL_TCP_STREAM_SSL (stream);
-	PRFileDesc *cancel_fd;
 	ssize_t nread;
+	PRSocketOptionData sockopts;
+	PRPollDesc pollfds[2];
+	gboolean nonblock;
+	int error;
+
+	/* get O_NONBLOCK options */
+	sockopts.option = PR_SockOpt_Nonblocking;
+	PR_GetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
+	sockopts.option = PR_SockOpt_Nonblocking;
+	nonblock = sockopts.value.non_blocking;
+	sockopts.value.non_blocking = TRUE;
+	PR_SetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
+
+	pollfds[0].fd = tcp_stream_ssl->priv->sockfd;
+	pollfds[0].in_flags = PR_POLL_READ;
 	
-	if (camel_operation_cancel_check (NULL)) {
-		errno = EINTR;
-		return -1;
-	}
-	
-	cancel_fd = camel_operation_cancel_prfd (NULL);
-	if (cancel_fd == NULL) {
-		PRSocketOptionData sockopts;
-		PRPollDesc pollfds[2];
-		gboolean nonblock;
-		int error;
-		
-		/* get O_NONBLOCK options */
-		sockopts.option = PR_SockOpt_Nonblocking;
-		PR_GetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
-		sockopts.option = PR_SockOpt_Nonblocking;
-		nonblock = sockopts.value.non_blocking;
-		sockopts.value.non_blocking = TRUE;
-		PR_SetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
+	do {
+		PRInt32 res;
 
-		pollfds[0].fd = tcp_stream_ssl->priv->sockfd;
-		pollfds[0].in_flags = PR_POLL_READ;
-		
-		do {
-			PRInt32 res;
+		pollfds[0].out_flags = 0;
+		pollfds[1].out_flags = 0;
+		nread = -1;
 
-			pollfds[0].out_flags = 0;
-			pollfds[1].out_flags = 0;
-			nread = -1;
-
-			res = PR_Poll(pollfds, 1, 0);
-			if (res == -1)
-				set_errno(PR_GetError());
-			else if (res == 0) {
+		res = PR_Poll(pollfds, 1, 0);
+		if (res == -1)
+			set_errno(PR_GetError());
+		else if (res == 0) {
 #ifdef ETIMEDOUT
-				errno = ETIMEDOUT;
+			errno = ETIMEDOUT;
 #else
-				errno = EIO;
+			errno = EIO;
 #endif
-			} else {
-				 do { 
-					nread = -1;
-					if (PR_Available (tcp_stream_ssl->priv->sockfd) != 0)
-						nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
-					if (nread == -1)
-						set_errno (PR_GetError ());
-				 } while (0 && (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR)); 
-			}
-		} while (0 && (nread == -1 && (PR_GetError () == PR_PENDING_INTERRUPT_ERROR ||
-					 PR_GetError () == PR_IO_PENDING_ERROR ||
-					 PR_GetError () == PR_WOULD_BLOCK_ERROR)));
-		
-		/* restore O_NONBLOCK options */
-	} else {
-		PRSocketOptionData sockopts;
-		PRPollDesc pollfds[2];
-		gboolean nonblock;
-		int error;
-		
-		/* get O_NONBLOCK options */
-		sockopts.option = PR_SockOpt_Nonblocking;
-		PR_GetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
-		sockopts.option = PR_SockOpt_Nonblocking;
-		nonblock = sockopts.value.non_blocking;
-		sockopts.value.non_blocking = TRUE;
-		PR_SetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
-
-		pollfds[0].fd = tcp_stream_ssl->priv->sockfd;
-		pollfds[0].in_flags = PR_POLL_READ;
-		pollfds[1].fd = cancel_fd;
-		pollfds[1].in_flags = PR_POLL_READ;
-		
-		do {
-			PRInt32 res;
-
-			pollfds[0].out_flags = 0;
-			pollfds[1].out_flags = 0;
-			nread = -1;
-
-			res = PR_Poll(pollfds, 2, 0);
-			if (res == -1)
-				set_errno(PR_GetError());
-			else if (res == 0) {
-#ifdef ETIMEDOUT
-				errno = ETIMEDOUT;
-#else
-				errno = EIO;
-#endif
-			} else if (pollfds[1].out_flags == PR_POLL_READ) {
-				errno = EINTR;
-				goto failed;
-			} else {
-				 do { 
-					nread = -1;
-					if (PR_Available (tcp_stream_ssl->priv->sockfd) != 0)
-						nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
-					if (nread == -1)
-						set_errno (PR_GetError ());
-				 } while (0 && (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR)); 
-			}
-		} while (0 && (nread == -1 && (PR_GetError () == PR_PENDING_INTERRUPT_ERROR ||
-					 PR_GetError () == PR_IO_PENDING_ERROR ||
-					 PR_GetError () == PR_WOULD_BLOCK_ERROR)));
-		
-		/* restore O_NONBLOCK options */
-	failed:
-		error = errno;
-		sockopts.option = PR_SockOpt_Nonblocking;
-		sockopts.value.non_blocking = nonblock;
-		PR_SetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
-		errno = error;
-	}
+		} else {
+			 do { 
+				nread = -1;
+				if (PR_Available (tcp_stream_ssl->priv->sockfd) != 0)
+					nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
+				if (nread == -1)
+					set_errno (PR_GetError ());
+			 } while (0 && (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR)); 
+		}
+	} while (0 && (nread == -1 && (PR_GetError () == PR_PENDING_INTERRUPT_ERROR ||
+				 PR_GetError () == PR_IO_PENDING_ERROR ||
+				 PR_GetError () == PR_WOULD_BLOCK_ERROR)));
 	
+	/* restore O_NONBLOCK options */
+
 	return nread;
 }
 
@@ -505,7 +437,8 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 			pollfds[1].out_flags = 0;
 			nread = -1;
 
-			res = PR_Poll(pollfds, 2, IO_TIMEOUT);
+			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * 15 /*IO_TIMEOUT*/);
+
 			if (res == -1)
 				set_errno(PR_GetError());
 			else if (res == 0) {
@@ -592,7 +525,7 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 			pollfds[1].out_flags = 0;
 			w = -1;
 
-			res = PR_Poll (pollfds, 2, IO_TIMEOUT);
+			res = PR_Poll (pollfds, 2, PR_TicksPerSecond () * 15 /*IO_TIMEOUT*/);
 			if (res == -1) {
 				set_errno(PR_GetError());
 				if (PR_GetError () == PR_PENDING_INTERRUPT_ERROR)

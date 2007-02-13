@@ -453,7 +453,7 @@ camel_read (int fd, char *buf, size_t n)
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
 			fdmax = MAX (fd, cancel_fd) + 1;
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = 15 /*IO_TIMEOUT*/;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -485,91 +485,40 @@ ssize_t
 camel_read_nb (int fd, char *buf, size_t n)
 {
 	ssize_t nread;
-	int cancel_fd;
+
+	int errnosav, flags, fdmax;
+	fd_set rdset;
 	
-	if (camel_operation_cancel_check (NULL)) {
-		errno = EINTR;
-		return -1;
-	}
-#ifndef G_OS_WIN32
-	cancel_fd = camel_operation_cancel_fd (NULL);
-#else
-	cancel_fd = -1;
-#endif
-	if (cancel_fd == -1) {
-		int errnosav, flags, fdmax;
-		fd_set rdset;
-		
-		flags = fcntl (fd, F_GETFL);
-		fcntl (fd, F_SETFL, flags | O_NONBLOCK);
-		
-		do {
-			struct timeval tv;
-			int res;
-
-			FD_ZERO (&rdset);
-			FD_SET (fd, &rdset);
-			fdmax = fd + 1;
-			tv.tv_sec = 0;
-			tv.tv_usec = 0;
-			nread = -1;
-
-			res = select(fdmax, &rdset, 0, 0, &tv);
-			if (res == -1)
-				;
-			else if (res == 0)
-				errno = ETIMEDOUT;
-			else {
-				do {
-					nread = read (fd, buf, n);
-				} while (0 && (nread == -1 && errno == EINTR));
-			}
-		} while (0 && (nread == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)));
-
-		errnosav = errno;
-		fcntl (fd, F_SETFL, flags);
-		errno = errnosav;
-	} else {
-#ifndef G_OS_WIN32
-		int errnosav, flags, fdmax;
-		fd_set rdset;
-		
-		flags = fcntl (fd, F_GETFL);
-		fcntl (fd, F_SETFL, flags | O_NONBLOCK);
-		
-		do {
-			struct timeval tv;
-			int res;
-
-			FD_ZERO (&rdset);
-			FD_SET (fd, &rdset);
-			FD_SET (cancel_fd, &rdset);
-			fdmax = MAX (fd, cancel_fd) + 1;
-			tv.tv_sec = 0;
-			tv.tv_usec = 0;
-			nread = -1;
-
-			res = select(fdmax, &rdset, 0, 0, &tv);
-			if (res == -1)
-				;
-			else if (res == 0)
-				errno = ETIMEDOUT;
-			else if (FD_ISSET (cancel_fd, &rdset)) {
-				errno = EINTR;
-				goto failed;
-			} else {				
-				do {
-					nread = read (fd, buf, n);
-				} while (0 && (nread == -1 && errno == EINTR));
-			}
-		} while (0 && (nread == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)));
-	failed:
-		errnosav = errno;
-		fcntl (fd, F_SETFL, flags);
-		errno = errnosav;
-#endif
-	}
+	flags = fcntl (fd, F_GETFL);
+	fcntl (fd, F_SETFL, flags | O_NONBLOCK);
 	
+	do {
+		struct timeval tv;
+		int res;
+
+		FD_ZERO (&rdset);
+		FD_SET (fd, &rdset);
+		fdmax = fd + 1;
+		tv.tv_sec = 0;
+		tv.tv_usec = 0;
+		nread = -1;
+
+		res = select(fdmax, &rdset, 0, 0, &tv);
+		if (res == -1)
+			;
+		else if (res == 0)
+			errno = ETIMEDOUT;
+		else {
+			do {
+				nread = read (fd, buf, n);
+			} while (0 && (nread == -1 && errno == EINTR));
+		}
+	} while (0 && (nread == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)));
+
+	errnosav = errno;
+	fcntl (fd, F_SETFL, flags);
+	errno = errnosav;
+
 	return nread;
 }
 
@@ -627,8 +576,8 @@ camel_write (int fd, const char *buf, size_t n)
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
-			tv.tv_usec = 0;			
+			tv.tv_sec = 15 /*IO_TIMEOUT*/;
+			tv.tv_usec = 0;
 			w = -1;
 
 			res = select (fdmax, &rdset, &wrset, 0, &tv);
@@ -711,7 +660,7 @@ camel_read_socket (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = 15 /*IO_TIMEOUT*/;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -768,7 +717,7 @@ camel_read_socket_nb (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = 15 /*IO_TIMEOUT*/;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -843,8 +792,8 @@ camel_write_socket (int fd, const char *buf, size_t n)
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
-			tv.tv_usec = 0;			
+			tv.tv_sec = 15 /*IO_TIMEOUT*/;
+			tv.tv_usec = 0;
 			w = -1;
 
 			res = select (fdmax, &rdset, &wrset, 0, &tv);

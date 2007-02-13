@@ -281,101 +281,47 @@ stream_read_nb (CamelStream *stream, char *buffer, size_t n)
 	CamelTcpStreamSSL *openssl = CAMEL_TCP_STREAM_SSL (stream);
 	SSL *ssl = openssl->priv->ssl;
 	ssize_t nread;
-	int cancel_fd;
+
+	int error, flags, fdmax;
+	struct timeval timeout;
+	fd_set rdset;
+	int res;
+
+	flags = fcntl (openssl->priv->sockfd, F_GETFL);
+	fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
 	
-	if (camel_operation_cancel_check (NULL)) {
-		errno = EINTR;
-		return -1;
-	}
-
-	cancel_fd = camel_operation_cancel_fd (NULL);
-	if (cancel_fd == -1) {
-		int error, flags, fdmax;
-		struct timeval timeout;
-		fd_set rdset;
-		int res;
-
-		flags = fcntl (openssl->priv->sockfd, F_GETFL);
-		fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
+	fdmax = openssl->priv->sockfd + 1;
+	
+	do {
+		FD_ZERO (&rdset);
+		FD_SET (openssl->priv->sockfd, &rdset);
+		nread = -1;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 0;
+		res = select (fdmax, &rdset, 0, 0, &timeout);
 		
-		fdmax = openssl->priv->sockfd + 1;
-		
-		do {
-			FD_ZERO (&rdset);
-			FD_SET (openssl->priv->sockfd, &rdset);
-			nread = -1;
-			timeout.tv_sec = 0;
-			timeout.tv_usec = 0;
-			res = select (fdmax, &rdset, 0, 0, &timeout);
-			
-			if (res == -1)
-				;
-			else if (res == 0)
-				errno = ETIMEDOUT;
-			else {
+		if (res == -1)
+			;
+		else if (res == 0)
+			errno = ETIMEDOUT;
+		else {
 
-			  do {
-				if (ssl) {
-					nread = SSL_read (ssl, buffer, n);
-					if (nread < 0)
-						errno = ssl_errno (ssl, nread);
-				} else {
-					nread = read (openssl->priv->sockfd, buffer, n);
-				}
-			  } while (0 && (nread < 0 && errno == EINTR));
+		  do {
+			if (ssl) {
+				nread = SSL_read (ssl, buffer, n);
+				if (nread < 0)
+					errno = ssl_errno (ssl, nread);
+			} else {
+				nread = read (openssl->priv->sockfd, buffer, n);
 			}
-		} while (0 && (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)));
-		
-		error = errno;
-		fcntl (openssl->priv->sockfd, F_SETFL, flags);
-		errno = error;
-	} else {
-		int error, flags, fdmax;
-		struct timeval timeout;
-		fd_set rdset;
-		int res;
+		  } while (0 && (nread < 0 && errno == EINTR));
+		}
+	} while (0 && (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)));
+	
+	error = errno;
+	fcntl (openssl->priv->sockfd, F_SETFL, flags);
+	errno = error;
 
-		flags = fcntl (openssl->priv->sockfd, F_GETFL);
-		fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
-		
-		fdmax = MAX (openssl->priv->sockfd, cancel_fd) + 1;
-		
-		do {
-			FD_ZERO (&rdset);
-			FD_SET (openssl->priv->sockfd, &rdset);
-			FD_SET (cancel_fd, &rdset);
-			nread = -1;
-			timeout.tv_sec = 0;
-			timeout.tv_usec = 0;
-			res = select (fdmax, &rdset, 0, 0, &timeout);
-			if (FD_ISSET (cancel_fd, &rdset)) {
-				fcntl (openssl->priv->sockfd, F_SETFL, flags);
-				errno = EINTR;
-				return -1;
-			}
-			
-			if (res == -1)
-				;
-			else if (res == 0)
-				errno = ETIMEDOUT;
-			else {
-
-			  do {
-				if (ssl) {
-					nread = SSL_read (ssl, buffer, n);
-					if (nread < 0)
-						errno = ssl_errno (ssl, nread);
-				} else {
-					nread = read (openssl->priv->sockfd, buffer, n);
-				}
-			  } while (0 && (nread < 0 && errno == EINTR));
-			}
-		} while (0 && (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)));
-		
-		error = errno;
-		fcntl (openssl->priv->sockfd, F_SETFL, flags);
-		errno = error;
-	}
 
 	return nread;
 }

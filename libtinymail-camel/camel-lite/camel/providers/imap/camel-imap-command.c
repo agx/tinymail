@@ -192,16 +192,25 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	gchar *resp = NULL;
 	CamelException myex = CAMEL_EXCEPTION_INITIALISER;
 
-	if (store->ostream == NULL)
+	if (store->ostream == NULL || ((CamelObject *)store->ostream)->ref_count <= 0)
+		connect_to_server_wrapper ((CamelService*)store, ex);
+	else if (store->istream==NULL || ((CamelObject *)store->istream)->ref_count <= 0) 
 		connect_to_server_wrapper ((CamelService*)store, ex);
 
-	if (store->ostream==NULL) return FALSE;
-	if (store->istream==NULL) return FALSE;
+	/* g_mutex_lock (store->stream_lock); */
+
+	if (store->ostream==NULL || ((CamelObject *)store->ostream)->ref_count <= 0) 
+		{ /* g_mutex_unlock (store->stream_lock); */ return FALSE; }
+	if (store->istream==NULL || ((CamelObject *)store->istream)->ref_count <= 0) 
+		{ /* g_mutex_unlock (store->stream_lock);*/ return FALSE; }
+
+	/* g_mutex_unlock (store->stream_lock);*/
 
 	camel_imap_store_stop_idle (store);
 
 	/* Check for current folder */
-	if (folder && folder != store->current_folder) {
+	if (folder && folder != store->current_folder) 
+	{
 		CamelImapResponse *response;
 		CamelException internal_ex;
 		
@@ -233,6 +242,13 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		fprintf (stderr, "sending : %c%.5u %s\r\n", store->tag_prefix, store->command, mask);
 	}
 
+	/* g_mutex_lock (store->stream_lock); */
+
+	if (store->ostream==NULL || ((CamelObject *)store->ostream)->ref_count <= 0) 
+		{ /* g_mutex_unlock (store->stream_lock); */ return FALSE; }
+	if (store->istream==NULL || ((CamelObject *)store->istream)->ref_count <= 0) 
+		{ /* g_mutex_unlock (store->stream_lock); */ return FALSE; }
+
 	/* Read away whatever we got */
 	while (camel_imap_store_readline_nb (store, &resp, &myex) > 0)
 	{
@@ -245,6 +261,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 	nwritten = camel_stream_printf (store->ostream, "%c%.5u %s\r\n",
 					store->tag_prefix, store->command++, cmd);
+
+	/* g_mutex_unlock (store->stream_lock); */
 
 	/* printf ("%c%.5u %s\r\n", store->tag_prefix, store->command, cmd); */
 
@@ -260,8 +278,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 		/* TNY TODO: Remove this (it can disturb the ui using ->alert 
 		   and ->get_pass_func) */
-		/*camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
-		camel_service_connect (CAMEL_SERVICE (store), &mex); */
+		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
+		/* camel_service_connect (CAMEL_SERVICE (store), &mex); */
 
 		return FALSE;
 	}

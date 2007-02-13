@@ -2884,7 +2884,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
    GPtrArray *needheaders;
    guint32 flags, uidval;
-   int i, seq, first, size, got;
+   int i, seq=0, first, size, got;
    CamelImapResponseType type;
    const char *header_spec;
    CamelImapMessageInfo *mi, *info;
@@ -2907,13 +2907,16 @@ imap_update_summary (CamelFolder *folder, int exists,
    nextn = 0;
    if (folder->summary)
    	nextn = camel_folder_summary_count (folder->summary);
-   if (nextn <= 0)
+   if (nextn <= 0) {
    	camel_folder_summary_load (folder->summary);
+   	nextn = camel_folder_summary_count (folder->summary);
+   }
+
+   ineed = (exists - nextn);
 
    nextn = 1;
    tcnt = 0;
 
-  ineed = (exists - seq);
   camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
 
@@ -3441,6 +3444,8 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done,
 
 		if (done)
 		{
+			int nwritten;
+
 			g_mutex_lock (store->stream_lock);
 
 			if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
@@ -3454,8 +3459,12 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean done,
 
 			if (store->ostream && CAMEL_IS_STREAM (store->ostream))
 
-			camel_stream_printf (store->ostream, "DONE\r\n");
+			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
+
 			g_mutex_unlock (store->stream_lock);
+
+			if (nwritten == -1) 
+				goto outofhere;
 
 			while ((type = camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
 			{
