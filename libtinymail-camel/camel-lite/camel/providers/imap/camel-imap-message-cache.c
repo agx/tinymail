@@ -485,6 +485,12 @@ camel_imap_message_cache_get (CamelImapMessageCache *cache, const char *uid,
 		return stream;
 	}
 	
+	if (!g_file_test (path, G_FILE_TEST_IS_REGULAR))
+	{
+		g_free (path);
+		return NULL;
+	}
+	
 	stream = camel_stream_fs_new_with_name (path, O_RDONLY, 0);
 	if (stream) {
 		cache_put (cache, uid, key, stream);
