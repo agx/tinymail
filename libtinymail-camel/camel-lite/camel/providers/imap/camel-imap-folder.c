@@ -2890,7 +2890,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    CamelImapMessageInfo *mi, *info;
    char *uid, *resp;
    GData *data;
-   gboolean more = TRUE, oosync = FALSE;
+   gboolean more = TRUE, oosync = FALSE, oldrescval = imap_folder->need_rescan;
    unsigned int nextn, cnt=0, tcnt=0, ucnt=0, rec=0, ineed = 0, allhdrs = 0;
 
    if (!store->ostream || !store->istream)
@@ -2926,6 +2926,8 @@ imap_update_summary (CamelFolder *folder, int exists,
    {
 	gboolean did_hack = FALSE;
 	gint hcnt = 0;
+
+	imap_folder->need_rescan = TRUE;
 
 	camel_folder_summary_save (folder->summary);
 	seq = camel_folder_summary_count (folder->summary);
@@ -3234,6 +3236,8 @@ a03 OK UID FETCH Completed
    /* _camel_imap_store_get_recent_messages (store, folder->full_name, &i, &got, FALSE); */
 
    camel_operation_end (NULL);
+
+   imap_folder->need_rescan = oldrescval;
 
 }
 
