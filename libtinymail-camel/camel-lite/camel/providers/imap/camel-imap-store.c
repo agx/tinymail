@@ -3468,7 +3468,7 @@ camel_imap_store_readline_nb (CamelImapStore *store, char **dest, CamelException
 	*dest = NULL;
 
 	g_mutex_lock (store->stream_lock);
-	if (stream == NULL || ((CamelObject *)stream)->ref_count <= 0)
+	if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
 	{
 		g_mutex_unlock (store->stream_lock);
 		return -1;
