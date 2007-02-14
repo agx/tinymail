@@ -1103,7 +1103,10 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 	{
 		info = camel_folder_summary_index (folder->summary, i);
 		iinfo = (CamelImapMessageInfo *)info;
-	
+
+		if (!info)
+			continue;
+
 		/* This is where it gets hairy. It tries to mimic what an 
 		   EXPUNGE would cause. That's because we will pass the removed
 		   sequences to the same handler for it (check below and in
@@ -2941,18 +2944,18 @@ imap_update_summary (CamelFolder *folder, int exists,
 	seq = camel_folder_summary_count (folder->summary);
 
 	first = seq + 1;
-	if (seq > 0) {
+	/*if (seq > 0) {
 		mi = (CamelImapMessageInfo *)camel_folder_summary_index (folder->summary, seq - 1);
 		uidval = strtoul(camel_message_info_uid (mi), NULL, 10);
 		camel_message_info_free((CamelMessageInfo *)mi);
 	} else
-		uidval = 0;
+		uidval = 0;*/
 
 	size = (exists - seq) * (IMAP_PRETEND_SIZEOF_FLAGS + IMAP_PRETEND_SIZEOF_SIZE + IMAP_PRETEND_SIZEOF_HEADERS);
 	got = 0;
 
 	if (!camel_imap_command_start (store, folder, ex,
-		"UID SEARCH %d:%d ALL", uidval + 1, uidval + 1 + nextn)) 
+		"UID SEARCH %d:%d ALL", seq + 1, seq + 1 + nextn)) 
 		{ if (!camel_operation_cancel_check (NULL))
 			g_warning ("IMAP error getting UIDs (1)"); 
 		 camel_operation_end (NULL); return; }
@@ -2984,7 +2987,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	{
 
 		if (!camel_imap_command_start (store, folder, ex,
-			"UID SEARCH %d:* ALL", uidval + 1 + cnt)) 
+			"UID SEARCH %d:* ALL", seq + 1 + cnt)) 
 			{ if (!camel_operation_cancel_check (NULL))
 				g_warning ("IMAP error getting UIDs (2)"); 
 			  camel_operation_end (NULL); return; }
