@@ -26,6 +26,9 @@
 #include <tny-account.h>
 #include <tny-store-account.h>
 #include <tny-camel-store-account.h>
+#include <tny-folder-store-change.h>
+#include <tny-folder-store-observer.h>
+#include <tny-simple-list.h>
 
 #include <tny-folder.h>
 #include <tny-folder-store.h>
@@ -52,6 +55,24 @@
 
 
 static GObjectClass *parent_class = NULL;
+
+
+static void
+notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange *change)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+	TnyIterator *iter;
+
+	iter = tny_list_create_iterator (priv->sobservers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
+		tny_folder_store_observer_update (observer, change);
+		g_object_unref (G_OBJECT (observer));
+		tny_iterator_next (iter);
+	}
+	g_object_unref (G_OBJECT (iter));
+}
 
 static void 
 tny_camel_store_account_prepare (TnyCamelAccount *self)
@@ -306,6 +327,7 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	apriv->connected = FALSE;
 	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
 	priv->managed_folders = NULL;
+	priv->sobservers = tny_simple_list_new ();
 
 	return;
 }
@@ -330,6 +352,7 @@ tny_camel_store_account_finalize (GObject *object)
 	TnyCamelStoreAccount *self = (TnyCamelStoreAccount *)object;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
+	g_object_unref (G_OBJECT (priv->sobservers));
 	g_list_foreach (priv->managed_folders, foreach_managed_folder, self);
 	g_list_free (priv->managed_folders);
 	priv->managed_folders = NULL;
@@ -776,6 +799,48 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	return;
 }
 
+
+
+
+static void
+tny_camel_store_account_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->add_observer_func (self, observer);
+}
+
+static void
+tny_camel_store_account_add_observer_default (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+
+	tny_list_prepend (priv->sobservers, G_OBJECT (observer));
+
+	return;
+}
+
+
+
+static void
+tny_camel_store_account_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->remove_observer_func (self, observer);
+}
+
+static void
+tny_camel_store_account_remove_observer_default (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+
+	tny_list_remove (priv->sobservers, G_OBJECT (observer));
+
+	return;
+}
+
+
 static void
 tny_folder_store_init (gpointer g, gpointer iface_data)
 {
@@ -785,6 +850,8 @@ tny_folder_store_init (gpointer g, gpointer iface_data)
 	klass->create_folder_func = tny_camel_store_account_create_folder;
 	klass->get_folders_func = tny_camel_store_account_get_folders;
 	klass->get_folders_async_func = tny_camel_store_account_get_folders_async;
+	klass->add_observer_func = tny_camel_store_account_add_observer;
+	klass->remove_observer_func = tny_camel_store_account_remove_observer;
 
 	return;
 }
@@ -818,6 +885,8 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	class->get_folders_func = tny_camel_store_account_get_folders_default;
 	class->create_folder_func = tny_camel_store_account_create_folder_default;
 	class->remove_folder_func = tny_camel_store_account_remove_folder_default;
+	class->add_observer_func = tny_camel_store_account_add_observer_default;
+	class->remove_observer_func = tny_camel_store_account_remove_observer_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelStoreAccountPriv));
 

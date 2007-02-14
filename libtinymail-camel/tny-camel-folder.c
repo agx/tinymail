@@ -38,6 +38,8 @@
 #include <tny-error.h>
 #include <tny-folder-change.h>
 #include <tny-folder-observer.h>
+#include <tny-folder-store-change.h>
+#include <tny-folder-store-observer.h>
 #include <tny-simple-list.h>
 
 #include <camel/camel-folder.h>
@@ -68,9 +70,25 @@
 
 static GObjectClass *parent_class = NULL;
 
+static void
+notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange *change)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+
+	iter = tny_list_create_iterator (priv->sobservers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
+		tny_folder_store_observer_update (observer, change);
+		g_object_unref (G_OBJECT (observer));
+		tny_iterator_next (iter);
+	}
+	g_object_unref (G_OBJECT (iter));
+}
 
 static void
-notify_observers_about (TnyFolder *self, TnyFolderChange *change)
+notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
@@ -145,7 +163,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	if (change)
 	{
 		priv->dont_fkill = TRUE;
-		notify_observers_about (TNY_FOLDER (self), change);
+		notify_folder_observers_about (TNY_FOLDER (self), change);
 		g_object_unref (G_OBJECT (change));
 		priv->dont_fkill = old;
 	}
@@ -359,7 +377,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		{
 			TnyFolderChange *change = tny_folder_change_new (self);
 			tny_folder_change_add_added_header (change, header);
-			notify_observers_about (self, change);
+			notify_folder_observers_about (self, change);
 			g_object_unref (G_OBJECT (change));
 
 		}
@@ -2446,7 +2464,7 @@ tny_camel_folder_poke_status_callback (gpointer data)
 
 	}
 
-	notify_observers_about (self, change);
+	notify_folder_observers_about (self, change);
 
 	g_object_unref (G_OBJECT (change));
 
@@ -2521,6 +2539,43 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 }
 
 
+
+static void
+tny_camel_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_store_observer_func (self, observer);
+}
+
+static void
+tny_camel_folder_store_add_observer_default (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+
+	tny_list_prepend (priv->sobservers, G_OBJECT (observer));
+
+	return;
+}
+
+
+static void
+tny_camel_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_store_observer_func (self, observer);
+}
+
+static void
+tny_camel_folder_store_remove_observer_default (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+
+	tny_list_remove (priv->sobservers, G_OBJECT (observer));
+
+	return;
+}
 
 TnyFolder*
 _tny_camel_folder_new_with_folder (CamelFolder *camel_folder)
@@ -2643,6 +2698,9 @@ tny_folder_store_init (gpointer g, gpointer iface_data)
 	klass->create_folder_func = tny_camel_folder_create_folder;
 	klass->get_folders_func = tny_camel_folder_get_folders;
 	klass->get_folders_async_func = tny_camel_folder_get_folders_async;
+	klass->add_observer_func = tny_camel_folder_store_add_observer;
+	klass->remove_observer_func = tny_camel_folder_store_remove_observer;
+
 
 	return;
 }
@@ -2687,6 +2745,8 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->get_folders_func = tny_camel_folder_get_folders_default;
 	class->create_folder_func = tny_camel_folder_create_folder_default;
 	class->remove_folder_func = tny_camel_folder_remove_folder_default;
+	class->add_store_observer_func = tny_camel_folder_store_add_observer_default;
+	class->remove_store_observer_func = tny_camel_folder_store_remove_observer_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelFolderPriv));
 

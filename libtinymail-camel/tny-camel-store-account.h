@@ -52,6 +52,8 @@ struct _TnyCamelStoreAccountClass
 	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
 	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder, GError **err);
 	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
+	void (*add_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
+	void (*remove_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 };
 
 GType tny_camel_store_account_get_type (void);

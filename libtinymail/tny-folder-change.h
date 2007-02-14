@@ -40,6 +40,14 @@ typedef struct _TnyFolderChange TnyFolderChange;
 typedef struct _TnyFolderChangeClass TnyFolderChangeClass;
 #endif
 
+enum _TnyFolderChangeChanged
+{
+	TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT,
+	TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT,
+	TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS,
+	TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS,
+};
+
 struct _TnyFolderChange
 {
 	GObject parent;
@@ -63,6 +71,7 @@ void tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *header
 void tny_folder_change_get_removed_headers (TnyFolderChange *self, TnyList *headers);
 void tny_folder_change_reset (TnyFolderChange *self);
 TnyFolder* tny_folder_change_get_folder (TnyFolderChange *self);
+TnyFolderChangeChanged tny_folder_change_get_changed  (TnyFolderChange *self);
 
 G_END_DECLS
 

@@ -12,7 +12,9 @@ libtinymail_1_0_headers = \
 	tny-header.h \
 	tny-pair.h \
 	tny-folder-change.h \
+	tny-folder-store-change.h \
 	tny-folder-observer.h \
+	tny-folder-store-observer.h \
 	tny-folder-monitor.h \
 	tny-msg.h \
 	tny-device.h \
@@ -40,7 +42,9 @@ libtinymail_1_0_la_SOURCES = \
 	tny-header.c \
 	tny-pair.c \
 	tny-folder-change.c \
+	tny-folder-store-change.c \
 	tny-folder-observer.c \
+	tny-folder-store-observer.c \
 	tny-folder-monitor.c \
 	tny-mime-part.c \
 	tny-folder.c \

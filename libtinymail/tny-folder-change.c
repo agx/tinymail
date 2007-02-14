@@ -33,11 +33,26 @@ struct _TnyFolderChangePriv
 	guint new_all_count;
 	GMutex *lock;
 	TnyFolder *folder;
+	TnyFolderChangeChanged changed;
 };
 
 #define TNY_FOLDER_CHANGE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER_CHANGE, TnyFolderChangePriv))
 
+
+/**
+ * tny_folder_change_get_changed:
+ * @self: a #TnyFolderChange instance
+ *
+ * Get an enum with all the changed things
+ **/
+TnyFolderChangeChanged 
+tny_folder_change_get_changed  (TnyFolderChange *self)
+{
+	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
+
+	return priv->changed;
+}
 
 /**
  * tny_folder_change_set_new_all_count:
@@ -69,6 +84,7 @@ tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
 	priv->new_unread_count = new_unread_count;
+	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT;
 
 	return;
 }
@@ -120,7 +136,10 @@ tny_folder_change_add_added_header (TnyFolderChange *self, TnyHeader *header)
 
 	g_mutex_lock (priv->lock);
 
+	if (!priv->added)
+		priv->added = tny_simple_list_new ();
 	tny_list_prepend (priv->added, G_OBJECT (header));
+	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS;
 
 	g_mutex_unlock (priv->lock);
 
@@ -141,7 +160,10 @@ tny_folder_change_add_removed_header (TnyFolderChange *self, TnyHeader *header)
 
 	g_mutex_lock (priv->lock);
 
+	if (!priv->removed)
+		priv->removed = tny_simple_list_new ();
 	tny_list_prepend (priv->removed, G_OBJECT (header));
+	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS;
 
 	g_mutex_unlock (priv->lock);
 
@@ -164,6 +186,12 @@ tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers)
 	g_assert (TNY_IS_LIST (headers));
 
 	g_mutex_lock (priv->lock);
+
+	if (!priv->added)
+	{
+		g_mutex_unlock (priv->lock);
+		return;
+	}
 
 	iter = tny_list_create_iterator (priv->added);
 
@@ -200,6 +228,12 @@ tny_folder_change_get_removed_headers (TnyFolderChange *self, TnyList *headers)
 
 	g_mutex_lock (priv->lock);
 
+	if (!priv->removed)
+	{
+		g_mutex_unlock (priv->lock);
+		return;
+	}
+
 	iter = tny_list_create_iterator (priv->removed);
 
 	while (!tny_iterator_is_done (iter))
@@ -230,12 +264,15 @@ tny_folder_change_reset (TnyFolderChange *self)
 
 	g_mutex_lock (priv->lock);
 
+	priv->changed = 0;
 	priv->new_unread_count = 0;
 	priv->new_all_count = 0;
-	g_object_unref (G_OBJECT (priv->added));
-	g_object_unref (G_OBJECT (priv->removed));
-	priv->added = tny_simple_list_new ();
-	priv->removed = tny_simple_list_new ();
+	if (priv->added)
+		g_object_unref (G_OBJECT (priv->added));
+	if (priv->removed)
+		g_object_unref (G_OBJECT (priv->removed));
+	priv->added = NULL;
+	priv->removed = NULL;
 
 	g_mutex_unlock (priv->lock);
 }
@@ -294,10 +331,11 @@ tny_folder_change_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	g_mutex_lock (priv->lock);
 
+	priv->changed = 0;
 	priv->new_unread_count = 0;
 	priv->new_all_count = 0;
-	priv->added = tny_simple_list_new ();
-	priv->removed = tny_simple_list_new ();
+	priv->added = NULL;
+	priv->removed = NULL;
 	priv->folder = NULL;
 
 	g_mutex_unlock (priv->lock);
@@ -312,9 +350,11 @@ tny_folder_change_finalize (GObject *object)
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->lock);
-	g_object_unref (G_OBJECT (priv->added));
-	g_object_unref (G_OBJECT (priv->removed));
 
+	if (priv->added)
+		g_object_unref (G_OBJECT (priv->added));
+	if (priv->removed)
+		g_object_unref (G_OBJECT (priv->removed));
 	priv->added = NULL;
 	priv->removed = NULL;
 

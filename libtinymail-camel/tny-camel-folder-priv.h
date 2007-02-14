@@ -46,7 +46,7 @@ struct _TnyCamelFolderPriv
 	TnyFolderType cached_folder_type;
 	TnyMsgRemoveStrategy *remove_strat;
 	TnyMsgReceiveStrategy *receive_strat;
-	TnyList *observers; TnyFolder *self;
+	TnyList *observers, *sobservers; TnyFolder *self;
 	gboolean want_changes, dont_fkill;
 };
 

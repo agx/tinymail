@@ -204,39 +204,48 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
 	TnyIterator *iter;
 	TnyList *list;
+	TnyFolderChangeChanged changed;
 
 	g_mutex_lock (priv->lock);
 
-	/* The added headers */
-	list = tny_simple_list_new ();
-	tny_folder_change_get_added_headers (change, list);
-	iter = tny_list_create_iterator (list);
-	while (!tny_iterator_is_done (iter))
-	{
-		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-		foreach_list_add_header (priv, header);
-		g_object_unref (G_OBJECT (header));
-		tny_iterator_next (iter);
-	}
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (list));
+	changed = tny_folder_change_get_changed (change);
 
-	/* The removed headers */
-	list = tny_simple_list_new ();
-	tny_folder_change_get_removed_headers (change, list);
-	iter = tny_list_create_iterator (list);
-	while (!tny_iterator_is_done (iter))
+	if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS)
 	{
-		const gchar *uid;
-		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-		uid = tny_header_get_uid (header);
-		if (uid)
-			foreach_list_remove_header (priv, uid);
-		g_object_unref (G_OBJECT (header));
-		tny_iterator_next (iter);
+		/* The added headers */
+		list = tny_simple_list_new ();
+		tny_folder_change_get_added_headers (change, list);
+		iter = tny_list_create_iterator (list);
+		while (!tny_iterator_is_done (iter))
+		{
+			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+			foreach_list_add_header (priv, header);
+			g_object_unref (G_OBJECT (header));
+			tny_iterator_next (iter);
+		}
+		g_object_unref (G_OBJECT (iter));
+		g_object_unref (G_OBJECT (list));
 	}
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (list));
+
+	if (changed & TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS)
+	{
+		/* The removed headers */
+		list = tny_simple_list_new ();
+		tny_folder_change_get_removed_headers (change, list);
+		iter = tny_list_create_iterator (list);
+		while (!tny_iterator_is_done (iter))
+		{
+			const gchar *uid;
+			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+			uid = tny_header_get_uid (header);
+			if (uid)
+				foreach_list_remove_header (priv, uid);
+			g_object_unref (G_OBJECT (header));
+			tny_iterator_next (iter);
+		}
+		g_object_unref (G_OBJECT (iter));
+		g_object_unref (G_OBJECT (list));
+	}
 
 	g_mutex_unlock (priv->lock);
 

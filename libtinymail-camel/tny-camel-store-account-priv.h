@@ -27,6 +27,7 @@ struct _TnyCamelStoreAccountPriv
 	CamelStore *iter_store;
 	CamelFolderInfo *iter;
 	GList *managed_folders;
+	TnyList *sobservers;
 };
 
 gpointer _tny_camel_store_account_folder_factory_get_folder (TnyCamelStoreAccountPriv *priv, const gchar *full_name, gboolean *was_new);

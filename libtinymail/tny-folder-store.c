@@ -22,6 +22,49 @@
 #include <tny-folder-store.h>
 
 
+
+/**
+ * tny_folder_store_add_observer:
+ * @self: a #TnyFolder instance
+ * @observer: a #TnyFolderStoreObserver instance
+ *
+ * Add @observer to the list of interested observers for the 
+ * event that could happen.
+ *
+ **/
+void 
+tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_STORE_GET_IFACE (self)->add_observer_func)
+		g_critical ("You must implement tny_folder_store_add_observer\n");
+#endif
+	TNY_FOLDER_STORE_GET_IFACE (self)->add_observer_func (self, observer);
+	return;
+}
+
+
+/**
+ * tny_folder_store_remove_observer:
+ * @self: a #TnyFolderStore instance
+ * @observer: a #TnyFolderStoreObserver instance
+ *
+ * Remove @observer from the list of interested observers for the 
+ * event that could happen.
+ *
+ **/
+void 
+tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer_func)
+		g_critical ("You must implement tny_folder_store_remove_observer\n");
+#endif
+	TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer_func (self, observer);
+	return;
+
+}
+
 /**
  * tny_folder_store_remove_folder:
  * @self: a #TnyFolderStore object
