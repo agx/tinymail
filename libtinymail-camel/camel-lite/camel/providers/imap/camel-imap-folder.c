@@ -2891,12 +2891,12 @@ imap_update_summary (CamelFolder *folder, int exists,
    CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
    CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
    GPtrArray *needheaders;
-   guint32 flags, uidval;
-   int i, seq=0, first, size, got;
+   guint32 flags;
+   int i, seq=0;
    CamelImapResponseType type;
    const char *header_spec;
-   CamelImapMessageInfo *mi, *info;
-   char *uid, *resp;
+   CamelImapMessageInfo *mi;
+   char *resp;
    GData *data;
    gboolean more = TRUE, oosync = FALSE, oldrescval = imap_folder->need_rescan;
    unsigned int nextn, cnt=0, tcnt=0, ucnt=0, rec=0, ineed = 0, allhdrs = 0;
@@ -2921,17 +2921,12 @@ imap_update_summary (CamelFolder *folder, int exists,
    }
 
    ineed = (exists - nextn);
-
    nextn = 1;
    tcnt = 0;
 
-  camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
+   camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
-
-   /*if (exists <= camel_folder_summary_count (folder->summary))
-	more = FALSE;*/
-
-  camel_folder_summary_prepare_hash (folder->summary);
+   camel_folder_summary_prepare_hash (folder->summary);
 
    while (more)
    {
@@ -2939,20 +2934,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 	gint hcnt = 0;
 
 	imap_folder->need_rescan = TRUE;
-
 	camel_folder_summary_save (folder->summary);
 	seq = camel_folder_summary_count (folder->summary);
-
-	first = seq + 1;
-	/*if (seq > 0) {
-		mi = (CamelImapMessageInfo *)camel_folder_summary_index (folder->summary, seq - 1);
-		uidval = strtoul(camel_message_info_uid (mi), NULL, 10);
-		camel_message_info_free((CamelMessageInfo *)mi);
-	} else
-		uidval = 0;*/
-
-	size = (exists - seq) * (IMAP_PRETEND_SIZEOF_FLAGS + IMAP_PRETEND_SIZEOF_SIZE + IMAP_PRETEND_SIZEOF_HEADERS);
-	got = 0;
 
 	if (!camel_imap_command_start (store, folder, ex,
 		"UID SEARCH %d:%d ALL", seq + 1, seq + 1 + nextn)) 
@@ -2962,7 +2945,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	more = FALSE; 
 	needheaders = g_ptr_array_new ();
-
 	cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq));
 
 	if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
@@ -2985,7 +2967,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 	/* If we received less than what we asked for, yet need more */
 	if ((cnt < nextn) && more)
 	{
-
 		if (!camel_imap_command_start (store, folder, ex,
 			"UID SEARCH %d:* ALL", seq + 1 + cnt)) 
 			{ if (!camel_operation_cancel_check (NULL))
@@ -3035,13 +3016,12 @@ imap_update_summary (CamelFolder *folder, int exists,
 				return;
 			}
 		}
-
 		camel_operation_end (NULL);
 		more = FALSE;
 		did_hack = TRUE;
 	}
 
-	nextn = (nextn < 1000) ? nextn+nextn+5 : 1000;
+	nextn = (nextn < 1000) ? nextn+nextn+25 : 1000;
 
 	if (needheaders->len) 
 	{
@@ -3055,42 +3035,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 		while (uid < needheaders->len) 
 		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
-
-/*
-This reply consumed 800 bytes. This is how it's currently done
-==============================================================
-a03 UID FETCH 1:2 (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[HEADER.FIELDS (DATE FROM TO CC SUBJECT MESSAGE-ID)])
-----------------------------------------------------------------------------------------------------------------
-* 1 FETCH (FLAGS (NonJunk) UID 1 INTERNALDATE "17-Oct-2006 20:26:17 +0100" RFC822.SIZE 1809 BODY[HEADER.FIELDS (DATE FROM TO CC SUBJECT MESSAGE-ID)] {192}
-Message-ID: <353B8E77.C1FE410D@rip.cz>
-Date: Mon, 20 Apr 1998 20:05:43 +0200
-From: Milan Riha <milan@rip.cz>
-To: zmailer <zmailer@nic.funet.fi>
-Subject: Re: Where to find Zmailer-FAQ ?
-
-)
-* 2 FETCH (FLAGS (NonJunk) UID 2 INTERNALDATE "17-Oct-2006 20:26:17 +0100" RFC822.SIZE 1571 BODY[HEADER.FIELDS (DATE FROM TO CC SUBJECT MESSAGE-ID)] {281}
-Date: Mon, 20 Apr 1998 19:24:47 +0200 (MET DST)
-From: Andrzej Stella-Sawicki <savit@Sav.NET>
-To: Milan Riha <milan@rip.cz>
-cc: zmailer <zmailer@nic.funet.fi>
-Subject: Re: Where to find Zmailer-FAQ ?
-Message-ID: <Pine.LNX.3.96.980420192200.25200A-100000@lama.supermedia.pl>
-
-)
-a03 OK UID FETCH Completed
-
-
-This reply consumed 812 bytes (and we have reply-to for free). The IMAP server will be faster too
-=================================================================================================
-a03 UID FETCH 1:2 (UID FLAGS RFC822.SIZE ENVELOPE)
---------------------------------------------------
-* 1 FETCH (FLAGS (NonJunk) UID 1 RFC822.SIZE 1809 ENVELOPE ("Mon, 20 Apr 1998 20:05:43 +0200" "Re: Where to find Zmailer-FAQ ?" (("Milan Riha" NIL "milan" "rip.cz")) (("Milan Riha" NIL "milan" "rip.cz")) (("Milan Riha" NIL "milan" "rip.cz")) (("zmailer" NIL "zmailer" "nic.funet.fi")) NIL NIL NIL "<353B8E77.C1FE410D@rip.cz>"))
-* 2 FETCH (FLAGS (NonJunk) UID 2 RFC822.SIZE 1571 ENVELOPE ("Mon, 20 Apr 1998 19:24:47 +0200 (MET DST)" "Re: Where to find Zmailer-FAQ ?" (("Andrzej Stella-Sawicki" NIL "savit" "Sav.NET")) (("Andrzej Stella-Sawicki" NIL "savit" "Sav.NET")) (("Andrzej Stella-Sawicki" NIL "savit" "Sav.NET")) (("Milan Riha" NIL "milan" "rip.cz")) (("zmailer" NIL "zmailer" "nic.funet.fi")) NIL "<353B61BD.9978FB42@rip.cz>" "<Pine.LNX.3.96.980420192200.25200A-100000@lama.supermedia.pl>"))
-a03 OK UID FETCH Completed
-
-*/
-
 			if (!camel_imap_command_start (store, folder, ex,
 						       "UID FETCH %s (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
 						       uidset, header_spec)) 
@@ -3108,7 +3052,6 @@ a03 OK UID FETCH Completed
 			g_free (uidset);
 
 			resp = NULL;
-
 			while ((type = camel_imap_command_response (store, &resp, ex))
 				== CAMEL_IMAP_RESPONSE_UNTAGGED) 
 			{
@@ -3120,7 +3063,6 @@ a03 OK UID FETCH Completed
 
 				if (!data)
 					continue;
-
 
 				mi = message_from_data (folder, data);
 
@@ -3147,8 +3089,6 @@ a03 OK UID FETCH Completed
 
 				  allhdrs++;
 				  camel_operation_progress (NULL, allhdrs , ineed);
-
-
 				  sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
 				  curlen = camel_folder_summary_count (folder->summary);
 
@@ -3171,32 +3111,24 @@ a03 OK UID FETCH Completed
 								camel_folder_summary_add (folder->summary, (CamelMessageInfo *)ni);
 						}
 					}
-
 					oosync = TRUE;
 				  }
 
 				  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
-
 				  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
 				   if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
 					camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
-
 				}
 
-				if (did_hack)
-				{
+				if (did_hack) {
 					hcnt++;
-					if (hcnt > 1000)
-					{
-						/* Periodically save the summary (this reduces 
-						   memory usage too) */
+					if (hcnt > 1000) {
 						camel_folder_summary_save (folder->summary);
 						camel_folder_summary_prepare_hash (folder->summary);
 						hcnt = 0;
 					}
 				}
 
-				got += IMAP_PRETEND_SIZEOF_HEADERS;
 				g_datalist_clear (&data);
 			}
 
@@ -3232,12 +3164,7 @@ a03 OK UID FETCH Completed
 	imap_folder->need_rescan = TRUE;
 
    camel_folder_summary_save (folder->summary);
-
    camel_folder_summary_kill_hash (folder->summary);
-
-   /* Updates the fdr-dir/status file */
-   /* _camel_imap_store_get_recent_messages (store, folder->full_name, &i, &got, FALSE); */
-
    camel_operation_end (NULL);
 
    imap_folder->need_rescan = oldrescval;
