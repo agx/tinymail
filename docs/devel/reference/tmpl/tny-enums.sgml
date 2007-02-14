@@ -17,6 +17,25 @@ Enumerations for tinymail
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### ENUM TnyFolderStoreChangeChanged ##### -->
+<para>
+
+</para>
+
+@TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS: 
+@TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS: 
+@TNY_FOLDER_STORE_CHANGE_CHANGED_RENAMED_FOLDERS: 
+
+<!-- ##### ENUM TnyFolderChangeChanged ##### -->
+<para>
+
+</para>
+
+@TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT: 
+@TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT: 
+@TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS: 
+@TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS: 
+
 <!-- ##### ENUM TnyErrorDomain ##### -->
 <para>
 
@@ -123,7 +142,7 @@ framework developers about simply getting your "special" cool flag added to tiny
 @TNY_HEADER_FLAG_ATTACHMENTS: The message has attachments
 @TNY_HEADER_FLAG_CACHED: The message is cached
 @TNY_HEADER_FLAG_PARTIAL: The message is retrieved partially
-@TNY_HEADER_FLAG_EXUNGED: The message is recently expunged and wont be available on the server
+@TNY_HEADER_FLAG_EXPUNGED: 
 
 <!-- ##### ENUM TnyFolderType ##### -->
 <para>

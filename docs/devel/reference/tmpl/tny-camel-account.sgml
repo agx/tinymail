@@ -80,13 +80,13 @@ A abstract account type implemented for Camel
 @session: 
 
 
-<!-- ##### FUNCTION tny_camel_account_set_online_status ##### -->
+<!-- ##### FUNCTION tny_camel_account_set_online ##### -->
 <para>
 
 </para>
 
 @self: 
-@offline: 
+@online: 
 @err: 
 
 

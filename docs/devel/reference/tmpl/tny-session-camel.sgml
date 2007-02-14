@@ -54,6 +54,7 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @ui_lock: 
 @conlock: 
 @conthread: 
+@is_inuse: 
 
 <!-- ##### STRUCT TnySessionCamel ##### -->
 <para>

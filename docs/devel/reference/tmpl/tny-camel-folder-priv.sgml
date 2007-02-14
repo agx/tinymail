@@ -42,7 +42,10 @@ tny-folder-priv
 @remove_strat: 
 @receive_strat: 
 @observers: 
-@poshdr_lock: 
+@sobservers: 
+@self: 
+@want_changes: 
+@dont_fkill: 
 
 <!-- ##### MACRO TNY_CAMEL_FOLDER_GET_PRIVATE ##### -->
 <para>

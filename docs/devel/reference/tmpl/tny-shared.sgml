@@ -424,6 +424,8 @@ A method that frequently gets called while a folder is being refreshed
 @create_folder_func: 
 @get_folders_func: 
 @get_folders_async_func: 
+@add_observer_func: 
+@remove_observer_func: 
 
 <!-- ##### STRUCT TnyFolderStoreQuery ##### -->
 <para>
@@ -487,20 +489,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -615,4 +617,31 @@ A method that happens after tny_folder_store_get_folders_async is finished
 @remove_list_func: 
 @stop_func: 
 @start_func: 
+
+<!-- ##### STRUCT TnyFolderStoreChange ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderStoreChangeClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT TnyFolderStoreObserver ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderStoreObserverIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@update_func: 
 

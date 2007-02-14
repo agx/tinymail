@@ -23,23 +23,6 @@ A #TnyFolder implemented using Camel
 </para>
 
 
-<!-- ##### FUNCTION tny_camel_folder_new_with_folder ##### -->
-<para>
-
-</para>
-
-@camel_folder: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_camel_folder_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_camel_folder_get_folder ##### -->
 <para>
 

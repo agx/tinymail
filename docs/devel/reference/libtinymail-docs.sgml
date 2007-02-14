@@ -28,6 +28,8 @@
 <!ENTITY libtinymail-TnyFolderMonitor SYSTEM "xml/tny-folder-monitor.xml">
 <!ENTITY libtinymail-TnyFolderObserver SYSTEM "xml/tny-folder-observer.xml">
 <!ENTITY libtinymail-TnyFolderChange SYSTEM "xml/tny-folder-change.xml">
+<!ENTITY libtinymail-TnyFolderStoreObserver SYSTEM "xml/tny-folder-store-observer.xml">
+<!ENTITY libtinymail-TnyFolderStoreChange SYSTEM "xml/tny-folder-store-change.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
 
 
@@ -104,7 +106,7 @@
 	and building a user interface for it.</para>
     <para>It will make sure that you as a developer can do this on devices with
 	low memory resources.</para>
-    <para>It supports IMAP, Exchange and NNTP. It can be used to send 
+    <para>It supports IMAP, POP and NNTP. It can be used to send 
 	messages over SMTP.</para>
     <para>It's licensed as LGPL.</para>
   </preface>
@@ -144,6 +146,8 @@
 		&libtinymail-TnyFolderObserver;
 		&libtinymail-TnyFolderChange;
 		&libtinymail-TnyFolderMonitor;
+		&libtinymail-TnyFolderStoreObserver;
+		&libtinymail-TnyFolderStoreChange;
 		&libtinymail-TnyEnums;
 		&libtinymail-TnyShared;
 	</chapter>

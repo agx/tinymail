@@ -32,3 +32,29 @@ An implementation of #TnySendQueue for Camel
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_camel_send_queue_flush ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_camel_send_queue_get_transport_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_camel_send_queue_set_transport_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@trans_account: 
+
+

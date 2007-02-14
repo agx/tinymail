@@ -36,4 +36,5 @@ tny-session-camel-priv
 @ui_lock: 
 @conlock: 
 @conthread: 
+@is_inuse: 
 

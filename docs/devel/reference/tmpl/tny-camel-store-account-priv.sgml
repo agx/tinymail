@@ -25,6 +25,7 @@ tny-store-account-priv
 @iter_store: 
 @iter: 
 @managed_folders: 
+@sobservers: 
 
 <!-- ##### MACRO TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE ##### -->
 <para>
