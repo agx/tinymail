@@ -111,7 +111,9 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-noop-lockable.h \
 	$(top_srcdir)/libtinymail/tny-folder-change.h \
 	$(top_srcdir)/libtinymail/tny-folder-observer.h \
-	$(top_srcdir)/libtinymail/tny-folder-monitor.h
+	$(top_srcdir)/libtinymail/tny-folder-monitor.h \
+	$(top_srcdir)/libtinymail/tny-folder-store-observer.h \
+	$(top_srcdir)/libtinymail/tny-folder-store-change.h
 
 tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py 
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) | \

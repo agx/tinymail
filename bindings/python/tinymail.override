@@ -31,6 +31,8 @@ headers
 #include <tny-lockable.h>
 #include <tny-noop-lockable.h>
 #include <tny-folder-observer.h>
+#include <tny-folder-store-observer.h>
+#include <tny-folder-store-change.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
