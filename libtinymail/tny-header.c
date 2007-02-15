@@ -247,7 +247,7 @@ tny_header_get_date_sent (TnyHeader *self)
 
 
 /**
- * tny_header_get_id:
+ * tny_header_get_uid:
  * @self: a #TnyHeader object
  * 
  * Get an unique id of the message of which self is a message header. The 
