@@ -2029,7 +2029,15 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 					TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 					camel_exception_get_description (&ex));
 				camel_exception_clear (&ex);
-			} else {
+			} else 
+			{
+				TnyFolderStoreChange *change;
+				
+				change = tny_folder_store_change_new (self);
+				tny_folder_store_change_add_removed_folder (change, folder);
+				notify_folder_store_observers_about (self, change);
+				g_object_unref (G_OBJECT (change));	
+				
 				g_free (cpriv->folder_name); 
 				cpriv->folder_name = NULL;
 			}
@@ -2056,11 +2064,15 @@ tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, 
 	_tny_camel_folder_set_name (folder, info->name);
 	_tny_camel_folder_set_iter (folder, info);
 
-	if (TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
+	/* TNY TODO: I think that this is wrong 
+	
+	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
 	{
 		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);	
 		apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
 	}
+	
+	*/
 
 	_tny_camel_folder_set_account (folder, priv->account);
 }
@@ -2076,9 +2088,12 @@ static TnyFolder*
 tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);	
+	
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *store; gchar *folname;
 	TnyFolder *folder; CamelFolderInfo *info;
+	TnyFolderStoreChange *change;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
@@ -2132,8 +2147,16 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 
 	folder = _tny_camel_folder_new ();
 	tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
-	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE);
-
+	apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
+	
+	/* This this needed?
+	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE); */
+	
+	change = tny_folder_store_change_new (self);
+	tny_folder_store_change_add_created_folder (change, folder);
+	notify_folder_store_observers_about (self, change);
+	g_object_unref (G_OBJECT (change));		
+	
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
 	return folder;

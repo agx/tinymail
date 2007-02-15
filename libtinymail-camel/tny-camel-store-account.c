@@ -384,7 +384,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
 	CamelStore *store;
-
+	
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 
 	if (!_tny_session_check_operation (apriv->session, err, 
@@ -413,6 +413,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 		if (store && CAMEL_IS_OBJECT (store))
 				camel_object_unref (CAMEL_OBJECT (store));
 		_tny_session_stop_operation (apriv->session);
+
 		return;
 	}
 
@@ -426,13 +427,20 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 		camel_store_unsubscribe_folder (store, cpriv->folder_name, NULL);
 
 	camel_store_delete_folder (store, cpriv->folder_name, &ex);
-
+	
 	if (camel_exception_is_set (&ex)) 
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
+	} else 
+	{
+		TnyFolderStoreChange *change;	
+		change = tny_folder_store_change_new (self);
+		tny_folder_store_change_add_removed_folder (change, folder);
+		notify_folder_store_observers_about (self, change);
+		g_object_unref (G_OBJECT (change));		
 	}
 
 	g_free (cpriv->folder_name); 
@@ -458,6 +466,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	TnyFolder *folder; CamelFolderInfo *info; CamelStore *store;
+	TnyFolderStoreChange *change;
 
 	if (!_tny_session_check_operation (apriv->session, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
@@ -526,6 +535,11 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
 	camel_store_free_folder_info (store, info);
 
+	change = tny_folder_store_change_new (self);
+	tny_folder_store_change_add_created_folder (change, folder);
+	notify_folder_store_observers_about (self, change);
+	g_object_unref (G_OBJECT (change));	
+	
 	camel_object_unref (CAMEL_OBJECT (store));
 
 	_tny_session_stop_operation (apriv->session);
