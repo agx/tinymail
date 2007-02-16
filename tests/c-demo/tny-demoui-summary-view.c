@@ -702,12 +702,19 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 					if (err != NULL)
 					{
-						GtkWidget *edialog = gtk_message_dialog_new (
+						GtkWidget *edialog;
+
+						gtk_widget_destroy (dialog);
+						dialog = NULL;
+
+						edialog = gtk_message_dialog_new (
 										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
 										  GTK_DIALOG_DESTROY_WITH_PARENT,
 										  GTK_MESSAGE_ERROR,
 										  GTK_BUTTONS_CLOSE,
 										  err->message);
+						g_signal_connect_swapped (edialog, "response",
+							G_CALLBACK (gtk_widget_destroy), edialog);
 						gtk_widget_show_all (edialog);
 						g_error_free (err);
 					}
@@ -717,7 +724,9 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				default:
 				break;
 			}
-			gtk_widget_destroy (dialog);
+
+			if (dialog)
+				gtk_widget_destroy (dialog);
 			g_object_unref (G_OBJECT (folder));
 		}
 
@@ -777,12 +786,19 @@ on_delete_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 					if (err != NULL)
 					{
-						GtkWidget *edialog = gtk_message_dialog_new (
+						GtkWidget *edialog;
+
+						gtk_widget_destroy (dialog);
+						dialog = NULL;
+
+						edialog = gtk_message_dialog_new (
 										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
 										  GTK_DIALOG_DESTROY_WITH_PARENT,
 										  GTK_MESSAGE_ERROR,
 										  GTK_BUTTONS_CLOSE,
 										  err->message);
+						g_signal_connect_swapped (edialog, "response",
+							G_CALLBACK (gtk_widget_destroy), edialog);
 						gtk_widget_show_all (edialog);
 						g_error_free (err);
 					}
@@ -794,7 +810,9 @@ on_delete_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				default:
 				break;
 			}
-			gtk_widget_destroy (dialog);
+
+			if (dialog)
+				gtk_widget_destroy (dialog);
 			g_object_unref (G_OBJECT (folder));
 		}
 
@@ -854,12 +872,19 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 					if (err != NULL)
 					{
-						GtkWidget *edialog = gtk_message_dialog_new (
+						GtkWidget *edialog;
+
+						gtk_widget_destroy (dialog);
+						dialog = NULL;
+
+						edialog = gtk_message_dialog_new (
 										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
 										  GTK_DIALOG_DESTROY_WITH_PARENT,
 										  GTK_MESSAGE_ERROR,
 										  GTK_BUTTONS_CLOSE,
 										  err->message);
+						g_signal_connect_swapped (edialog, "response",
+							G_CALLBACK (gtk_widget_destroy), edialog);
 						gtk_widget_show_all (edialog);
 						g_error_free (err);
 					}
@@ -869,7 +894,9 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				default:
 				break;
 			}
-			gtk_widget_destroy (dialog);
+
+			if (dialog)
+				gtk_widget_destroy (dialog);
 			g_object_unref (G_OBJECT (folderstore));
 		}
 
