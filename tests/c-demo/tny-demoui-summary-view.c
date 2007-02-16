@@ -728,13 +728,152 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 static void 
 on_delete_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 {
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
 
+	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
+	{
+		gint type;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{ 
+			TnyFolder *folder;
+			GtkWidget *dialog, *label;
+			gint result;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
+
+			dialog = gtk_dialog_new_with_buttons (_("Delete a folder"),
+												  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+												  GTK_DIALOG_MODAL,
+												  GTK_STOCK_OK,
+												  GTK_RESPONSE_ACCEPT,
+												  GTK_STOCK_CANCEL,
+												  GTK_RESPONSE_REJECT,
+												  NULL);
+
+			label = gtk_label_new (_("Are you sure you want to delete this folder?"));
+			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
+			gtk_widget_show (label);
+
+			result = gtk_dialog_run (GTK_DIALOG (dialog));
+
+			switch (result)
+			{
+				case GTK_RESPONSE_ACCEPT: 
+				{
+					GError *err = NULL;
+					TnyFolderStore *folderstore = tny_folder_get_folder_store (folder);
+
+					tny_folder_store_remove_folder (folderstore, folder, &err);
+
+					if (err != NULL)
+					{
+						GtkWidget *edialog = gtk_message_dialog_new (
+										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+										  GTK_DIALOG_DESTROY_WITH_PARENT,
+										  GTK_MESSAGE_ERROR,
+										  GTK_BUTTONS_CLOSE,
+										  err->message);
+						gtk_widget_show_all (edialog);
+						g_error_free (err);
+					}
+
+					g_object_unref (G_OBJECT (folderstore));
+				}
+				break;
+
+				default:
+				break;
+			}
+			gtk_widget_destroy (dialog);
+			g_object_unref (G_OBJECT (folder));
+		}
+
+	}
 }
 
 static void 
 on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 {
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
 
+	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
+	{
+		gint type;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{ 
+			TnyFolderStore *folderstore;
+			GtkWidget *dialog, *entry;
+			gint result;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folderstore, -1);
+
+			dialog = gtk_dialog_new_with_buttons (_("Create a folder"),
+												  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+												  GTK_DIALOG_MODAL,
+												  GTK_STOCK_OK,
+												  GTK_RESPONSE_ACCEPT,
+												  GTK_STOCK_CANCEL,
+												  GTK_RESPONSE_REJECT,
+												  NULL);
+
+			entry = gtk_entry_new ();
+			gtk_entry_set_text (GTK_ENTRY (entry), _("New folder"));
+			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry);
+			gtk_widget_show (entry);
+
+			result = gtk_dialog_run (GTK_DIALOG (dialog));
+
+			switch (result)
+			{
+				case GTK_RESPONSE_ACCEPT: 
+				{
+					GError *err = NULL;
+					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
+
+					tny_folder_store_create_folder (folderstore, newname, &err);
+
+					if (err != NULL)
+					{
+						GtkWidget *edialog = gtk_message_dialog_new (
+										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+										  GTK_DIALOG_DESTROY_WITH_PARENT,
+										  GTK_MESSAGE_ERROR,
+										  GTK_BUTTONS_CLOSE,
+										  err->message);
+						gtk_widget_show_all (edialog);
+						g_error_free (err);
+					}
+				}
+				break;
+
+				default:
+				break;
+			}
+			gtk_widget_destroy (dialog);
+			g_object_unref (G_OBJECT (folderstore));
+		}
+
+	}
 }
 
 static void
@@ -802,7 +941,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	g_signal_connect (G_OBJECT (mrename), "activate",
 		G_CALLBACK (on_rename_folder_activate), user_data);
 	g_signal_connect (G_OBJECT (mcreate), "activate",
-		G_CALLBACK (on_rename_folder_activate), user_data);
+		G_CALLBACK (on_create_folder_activate), user_data);
 	g_signal_connect (G_OBJECT (mdelete), "activate",
 		G_CALLBACK (on_delete_folder_activate), user_data);
 

@@ -74,6 +74,8 @@ recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, GError **e
 			tny_folder_get_name (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
 			tny_folder_get_unread_count (TNY_FOLDER (folder)),
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+			tny_folder_get_all_count (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
 			tny_folder_get_folder_type (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
@@ -136,6 +138,8 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			tny_folder_get_name (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
 			tny_folder_get_unread_count (TNY_FOLDER (folder)),
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+			tny_folder_get_all_count (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
 			tny_folder_get_folder_type (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
@@ -175,6 +179,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 	gtk_tree_store_set (model, &name_iter,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, root_name,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 0,
+		TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 0,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, TNY_FOLDER_TYPE_ROOT,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 		folder_store, -1);
@@ -307,7 +312,7 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 {
 	GtkTreeStore *store = (GtkTreeStore*) instance;
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) instance;
-	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
+	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
 
 	me->iterator_lock = g_mutex_new ();
 	me->folder_observables = NULL;
@@ -526,19 +531,6 @@ tny_gtk_folder_store_tree_model_foreach_in_the_list (TnyList *self, GFunc func, 
 	return;
 }
 
-static void
-tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
-{
-	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
-
-	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
-	{
-	}
-
-	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
-	{
-	}
-}
 
 typedef void (*pernodeexec) (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2);
 
@@ -581,6 +573,8 @@ updater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer u
 				tny_folder_get_name (TNY_FOLDER (folder)),
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
 				tny_folder_get_unread_count (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+				tny_folder_get_all_count (TNY_FOLDER (folder)),
 				-1);
 		}
 
@@ -590,25 +584,176 @@ updater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer u
 	g_object_unref (G_OBJECT (changed_folder));
 }
 
+
+static void
+creater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2)
+{
+	gint type;
+	TnyFolderStoreChange *change = user_data1;
+	TnyFolderStore *parentstore = tny_folder_store_change_get_folder_store (change);
+
+	gtk_tree_model_get (model, iter, 
+		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+		&type, -1);
+
+	if (type != TNY_FOLDER_TYPE_ROOT) 
+	{
+		TnyFolderStore *fol;
+
+		gtk_tree_model_get (model, iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&fol, -1);
+
+		if (fol == parentstore)
+		{
+			TnyList *created = tny_simple_list_new ();
+			TnyIterator *miter;
+
+			tny_folder_store_change_get_created_folders (change, created);
+			miter = tny_list_create_iterator (created);
+
+			while (!tny_iterator_is_done (miter))
+			{
+				GtkTreeIter newiter;
+				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+
+				gtk_tree_store_append (GTK_TREE_STORE (model), &newiter, iter);
+
+				gtk_tree_store_set (GTK_TREE_STORE (model), &newiter,
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+					tny_folder_get_name (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
+					tny_folder_get_unread_count (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+					tny_folder_get_all_count (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
+					tny_folder_get_folder_type (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
+					folder, -1);
+
+				g_object_unref (G_OBJECT (folder));
+
+				tny_iterator_next (miter);
+			}
+
+			g_object_unref (G_OBJECT (miter));
+			g_object_unref (G_OBJECT (created));
+
+		}
+
+		g_object_unref (G_OBJECT (fol));
+	}
+
+	g_object_unref (G_OBJECT (parentstore));
+}
+
+
+
+static void
+deleter (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2)
+{
+	gint type;
+	TnyFolderStoreChange *change = user_data1;
+	TnyFolderStore *parentstore = tny_folder_store_change_get_folder_store (change);
+
+	gtk_tree_model_get (model, iter, 
+		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+		&type, -1);
+
+	if (type != TNY_FOLDER_TYPE_ROOT) 
+	{
+		TnyFolderStore *fol;
+
+		gtk_tree_model_get (model, iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&fol, -1);
+
+		if (fol == parentstore)
+		{
+			TnyList *removed = tny_simple_list_new ();
+			TnyIterator *miter;
+
+			tny_folder_store_change_get_removed_folders (change, removed);
+			miter = tny_list_create_iterator (removed);
+
+			while (!tny_iterator_is_done (miter))
+			{
+				GtkTreeIter kids;
+				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+
+				if (gtk_tree_model_iter_children (model, &kids, iter))
+				  while (gtk_tree_model_iter_next (model, &kids))
+				  {
+					gint ntype;
+					gtk_tree_model_get (model, &kids, 
+						TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+						&ntype, -1);
+
+					if (ntype != TNY_FOLDER_TYPE_ROOT)
+					{
+						TnyFolder *nfol;
+						gtk_tree_model_get (model, &kids, 
+							TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+							&nfol, -1);
+
+						if (nfol == folder)
+							gtk_tree_store_remove (GTK_TREE_STORE (model), &kids);
+
+						g_object_unref (G_OBJECT (nfol));
+					}
+				  }
+				g_object_unref (G_OBJECT (folder));
+
+				tny_iterator_next (miter);
+			}
+
+			g_object_unref (G_OBJECT (miter));
+			g_object_unref (G_OBJECT (removed));
+
+		}
+
+		g_object_unref (G_OBJECT (fol));
+	}
+
+	g_object_unref (G_OBJECT (parentstore));
+}
+
 static void
 tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
 {
 	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
 
-
 	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME ||
-		/* changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || */
+		changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || 
 		changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
 	{
-		const gchar *oldname, *newname;
 		GtkTreeIter iter;
-
 		if (gtk_tree_model_get_iter_first (model, &iter))
 			foreach_node_execute (model, &iter, updater, change, NULL);
+	}
+}
 
+
+static void
+tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
+{
+	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
+	GtkTreeModel *model = GTK_TREE_MODEL (self);
+
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
+	{
+		GtkTreeIter iter;
+		if (gtk_tree_model_get_iter_first (model, &iter))
+			foreach_node_execute (model, &iter, creater, change, NULL);
 	}
 
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
+	{
+		GtkTreeIter iter;
+		if (gtk_tree_model_get_iter_first (model, &iter))
+			foreach_node_execute (model, &iter, deleter, change, NULL);
+	}
 }
 
 static void
@@ -699,6 +844,7 @@ tny_gtk_folder_store_tree_model_column_get_type (void)
     static const GEnumValue values[] = {
       { TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN", "name" },
       { TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN", "unread" },
+      { TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN", "all" },
       { TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN", "type" },
       { TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN", "instance" },
       { TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS, "TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS", "n" },
