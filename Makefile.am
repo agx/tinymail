@@ -17,10 +17,6 @@ endif
 
 SUBDIRS += libtinymail-camel $(PLATFORMDIR) 
 
-if BUILD_DEMOUI
-SUBDIRS += tinymail 
-endif
-
 SUBDIRS += tests bindings po 
 
 #### Funny OR simulation :)

@@ -15,7 +15,7 @@ AC_INIT([libtinymail], [tny_version], [http://tinymail.org/trac/tinymail])
 
 m4_pattern_allow([^AC_TNY_])
 
-AC_CONFIG_SRCDIR(tinymail/tny-main.c)
+AC_CONFIG_SRCDIR(libtinymail/tny-folder.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AC_CONFIG_MACRO_DIR([m4])
 AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS -I m4")
@@ -395,8 +395,8 @@ libtinymail-maemo/libtinymail-maemo.pc
 libtinymail-gpe/Makefile
 libtinymail-gpe/libtinymail-gpe.pc
 libtinymail-test/Makefile
-tinymail/Makefile
 tests/Makefile
+tests/tinymail/Makefile
 tests/shared/Makefile
 tests/python-demo/Makefile
 tests/memory/Makefile

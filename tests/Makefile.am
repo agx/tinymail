@@ -1,5 +1,9 @@
 SUBDIRS = python-demo
 
+if BUILD_DEMOUI
+SUBDIRS += tinymail 
+endif
+
 #### Funny OR simulation :)
 if BUILD_TESTS
 if !BUILD_UNITTESTS
