@@ -464,6 +464,9 @@ tny_gtk_folder_store_tree_model_remove (TnyList *self, GObject* item)
 
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 
+	/* This doesn't have to be recursive as only the first-level folders are
+	   actually really part of the list. */
+
 	if (gtk_tree_model_get_iter_first (model, &iter))
 	  while (gtk_tree_model_iter_next (model, &iter))
 	  {
@@ -537,19 +540,73 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 	}
 }
 
+typedef void (*pernodeexec) (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2);
+
+static void
+foreach_node_execute (GtkTreeModel *model, GtkTreeIter *iter, pernodeexec func, gpointer user_data1, gpointer user_data2) 
+{
+	do 
+	{
+			GtkTreeIter kids;
+			if (gtk_tree_model_iter_children (model, &kids, iter))
+				foreach_node_execute (model, &kids, func, user_data1, user_data2);
+
+			func (model, iter, user_data1, user_data2);
+	} while (gtk_tree_model_iter_next (model, iter));
+}
+
+static void
+updater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2)
+{
+	gint type;
+	TnyFolderChange *change = user_data1;
+	TnyFolder *changed_folder = tny_folder_change_get_folder (change);
+
+	gtk_tree_model_get (model, iter, 
+		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+		&type, -1);
+
+	if (type != TNY_FOLDER_TYPE_ROOT) 
+	{
+		TnyFolder *folder;
+
+		gtk_tree_model_get (model, iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&folder, -1);
+
+		if (folder == changed_folder)
+		{
+			gtk_tree_store_set (GTK_TREE_STORE (model), iter,
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+				tny_folder_get_name (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
+				tny_folder_get_unread_count (TNY_FOLDER (folder)),
+				-1);
+		}
+
+		g_object_unref (G_OBJECT (folder));
+	}
+
+	g_object_unref (G_OBJECT (changed_folder));
+}
 
 static void
 tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
 {
 	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
+	GtkTreeModel *model = GTK_TREE_MODEL (self);
 
-	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME)
+
+	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME ||
+		/* changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || */
+		changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
 	{
 		const gchar *oldname, *newname;
+		GtkTreeIter iter;
 
-		newname = tny_folder_change_get_rename (change, &oldname);
+		if (gtk_tree_model_get_iter_first (model, &iter))
+			foreach_node_execute (model, &iter, updater, change, NULL);
 
-		printf ("Renamed %s to %s\n", oldname, newname);
 	}
 
 }

@@ -314,15 +314,6 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 
 		newlen = camel_folder_get_message_count (priv->folder);
 
-		if (newlen != priv->cached_length)
-		{
-			TnyFolderChange *change = tny_folder_change_new (priv->self);
-			priv->cached_length = newlen;
-			tny_folder_change_set_new_all_count (change, priv->cached_length);
-			notify_folder_observers_about (priv->self, change);
-			g_object_unref (change);
-		}
-
 		priv->folder_changed_id = camel_object_hook_event (priv->folder, 
 			"folder_changed", (CamelObjectEventHookFunc)folder_changed, 
 			priv);
@@ -417,7 +408,6 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 			tny_folder_change_add_added_header (change, header);
 			notify_folder_observers_about (self, change);
 			g_object_unref (G_OBJECT (change));
-
 		}
 
 		if (header && G_IS_OBJECT (header))
@@ -573,11 +563,7 @@ void
 _tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-
-	g_mutex_lock (priv->folder_lock);
 	priv->subscribed = subscribed;
-	g_mutex_unlock (priv->folder_lock);
-
 	return;
 }
 
@@ -592,13 +578,8 @@ static guint
 tny_camel_folder_get_unread_count_default (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	guint retval;
 
-	g_mutex_lock (priv->folder_lock);
-	retval = priv->unread_length;
-	g_mutex_unlock (priv->folder_lock);
-
-	return retval;
+	return priv->unread_length;
 }
 
 void
@@ -629,13 +610,8 @@ static guint
 tny_camel_folder_get_all_count_default (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	guint retval;
 
-	g_mutex_lock (priv->folder_lock);
-	retval = priv->cached_length;
-	g_mutex_unlock (priv->folder_lock);
-
-	return retval;
+	return priv->cached_length;
 }
 
 
@@ -996,6 +972,17 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
+			camel_exception_get_description (&ex));
+	}
+
+	g_mutex_unlock (priv->folder_lock);
+
+	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+
 	if (oldlen != priv->cached_length || oldurlen != priv->unread_length)
 	{
 		TnyFolderChange *change = tny_folder_change_new (self);
@@ -1006,17 +993,6 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 		notify_folder_observers_about (self, change);
 		g_object_unref (change);
 	}
-
-	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_REFRESH,
-			camel_exception_get_description (&ex));
-	}
-
-	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-
-	g_mutex_unlock (priv->folder_lock);
 
 	return;
 }
@@ -1078,6 +1054,8 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	FldAndPriv *ptr = NULL;
+	guint oldlen = priv->cached_length;
+	guint oldurlen = priv->unread_length;
 
 	g_assert (TNY_IS_LIST (headers));
 
@@ -1117,30 +1095,26 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	if (priv->folder && CAMEL_IS_FOLDER (priv->folder))
 	{
-		guint oldlen = priv->cached_length;
-		guint oldurlen = priv->unread_length;
-
 		priv->cached_length = 0;
 		priv->unread_length = 0;
 		g_ptr_array_foreach (priv->folder->summary->messages, add_message_with_uid, ptr);
-
-		if (oldlen != priv->cached_length || oldurlen != priv->unread_length)
-		{
-			TnyFolderChange *change = tny_folder_change_new (self);
-			if (oldlen != priv->cached_length)
-				tny_folder_change_set_new_all_count (change, priv->cached_length);
-			if (oldurlen != priv->unread_length)
-				tny_folder_change_set_new_unread_count (change, priv->unread_length);
-			notify_folder_observers_about (self, change);
-			g_object_unref (change);
-		}
-
 	}
 
 	g_slice_free (FldAndPriv, ptr);
 
 	g_object_unref (G_OBJECT (headers));
 	g_mutex_unlock (priv->folder_lock);
+
+	if (oldlen != priv->cached_length || oldurlen != priv->unread_length)
+	{
+		TnyFolderChange *change = tny_folder_change_new (self);
+		if (oldlen != priv->cached_length)
+			tny_folder_change_set_new_all_count (change, priv->cached_length);
+		if (oldurlen != priv->unread_length)
+			tny_folder_change_set_new_unread_count (change, priv->unread_length);
+		notify_folder_observers_about (self, change);
+		g_object_unref (change);
+	}
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
@@ -1896,6 +1870,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 	const gchar *old_path;
 	gchar *new_path;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	gboolean changed = FALSE;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_SET_NAME))
@@ -1973,13 +1948,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 
 	} else if (priv->cached_name)
 	{
-		TnyFolderChange *change;
-
-		change = tny_folder_change_new (self);
-		tny_folder_change_set_rename (change, name);
-		notify_folder_observers_about (self, change);
-		g_object_unref (G_OBJECT (change));
-
+		changed = TRUE;
 		g_free (priv->cached_name);
 		priv->cached_name = g_strdup (name);
 	}
@@ -1987,6 +1956,16 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 errorh:
 
 	g_mutex_unlock (priv->folder_lock);
+
+	if (changed)
+	{
+		TnyFolderChange *change;
+
+		change = tny_folder_change_new (self);
+		tny_folder_change_set_rename (change, name);
+		notify_folder_observers_about (self, change);
+		g_object_unref (G_OBJECT (change));
+	}
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 }
@@ -2066,6 +2045,7 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
 	gchar *cfolname; gchar *folname; gint parlen;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	gboolean changed = FALSE;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
@@ -2102,13 +2082,7 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 				camel_exception_clear (&ex);
 			} else 
 			{
-				TnyFolderStoreChange *change;
-				
-				change = tny_folder_store_change_new (self);
-				tny_folder_store_change_add_removed_folder (change, folder);
-				notify_folder_store_observers_about (self, change);
-				g_object_unref (G_OBJECT (change));	
-				
+				changed = TRUE;
 				g_free (cpriv->folder_name); 
 				cpriv->folder_name = NULL;
 			}
@@ -2117,6 +2091,16 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 
 	g_mutex_unlock (cpriv->folder_lock);
 	g_mutex_unlock (priv->folder_lock);
+
+	if (changed)
+	{
+		TnyFolderStoreChange *change;
+
+		change = tny_folder_store_change_new (self);
+		tny_folder_store_change_add_removed_folder (change, folder);
+		notify_folder_store_observers_about (self, change);
+		g_object_unref (G_OBJECT (change));
+	}
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
@@ -2133,15 +2117,6 @@ _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder,
 	_tny_camel_folder_set_name (folder, info->name);
 	_tny_camel_folder_set_iter (folder, info);
 
-	/* TNY TODO: I think that this is wrong 
-	
-	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
-	{
-		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);	
-		apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
-	}
-	
-	*/
 	if (TNY_IS_CAMEL_FOLDER (self)) {
 		TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 		_tny_camel_folder_set_account (folder, priv->account);
@@ -2545,6 +2520,8 @@ tny_camel_folder_poke_status_callback (gpointer data)
 			return;
 		}
 
+	g_mutex_unlock (priv->folder_lock);
+
 	if (newlen != priv->cached_length || newurlen != priv->unread_length)
 	{
 		TnyFolderChange *change = tny_folder_change_new (self);
@@ -2565,7 +2542,6 @@ tny_camel_folder_poke_status_callback (gpointer data)
 		g_object_unref (change);
 	}
 
-	g_mutex_unlock (priv->folder_lock);
 
 	return FALSE;
 }
@@ -2653,6 +2629,9 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
+	if (!priv->observers)
+		return;
+
 	tny_list_remove (priv->observers, G_OBJECT (observer));
 
 	determine_push_email (priv);
@@ -2698,6 +2677,9 @@ tny_camel_folder_store_remove_observer_default (TnyFolderStore *self, TnyFolderS
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+
+	if (!priv->sobservers)
+		return;
 
 	tny_list_remove (priv->sobservers, G_OBJECT (observer));
 
