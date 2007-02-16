@@ -33,6 +33,7 @@ struct _TnyFolderChangePriv
 	guint new_all_count;
 	GMutex *lock;
 	TnyFolder *folder;
+	gchar *oldname, *newname;
 	TnyFolderChangeChanged changed;
 };
 
@@ -277,6 +278,60 @@ tny_folder_change_reset (TnyFolderChange *self)
 	g_mutex_unlock (priv->lock);
 }
 
+/**
+ * tny_folder_change_get_rename:
+ * @self: a #TnyFolderChange instance
+ * @oldname: a pointer to a string
+ *
+ * Get the new name of the folder in case of a rename. This will return NULL
+ * of nu rename happened. You can pass a pointer if you need the old folder
+ * name too.
+ *
+ * You must not free the return value nor the @oldname pointer. It's handled
+ * internally in the TnyFolderChange type.
+ **/
+const gchar *
+tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname)
+{
+	const gchar *retval = NULL;
+	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->lock);
+
+	if (priv->changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME)
+	{
+		retval = priv->newname;
+		if (oldname)
+			*oldname = priv->oldname;
+	}
+
+	g_mutex_unlock (priv->lock);
+
+	return retval;
+}
+
+/**
+ * tny_folder_change_set_rename:
+ * @self: a #TnyFolderChange instance
+ * @newname: the new name of the folder
+ *
+ * Mark the change in such a way that the user can know that a rename has 
+ * happened. The TnyFolderChange will copy your @newname internally, so you
+ * can do whatever you want with what you passed afterwards.
+ **/
+void 
+tny_folder_change_set_rename (TnyFolderChange *self, const gchar *newname)
+{
+	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->lock);
+	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME;
+	if (priv->newname)
+		g_free (priv->newname);
+	priv->newname = g_strdup (newname);
+	g_mutex_unlock (priv->lock);
+}
+
 
 /**
  * tny_folder_change_new:
@@ -293,6 +348,7 @@ tny_folder_change_new (TnyFolder *folder)
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
 	priv->folder = TNY_FOLDER (g_object_ref (G_OBJECT (folder)));
+	priv->oldname = g_strdup (tny_folder_get_name (folder));
 
 	return self;
 }
@@ -337,6 +393,8 @@ tny_folder_change_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->added = NULL;
 	priv->removed = NULL;
 	priv->folder = NULL;
+	priv->oldname = NULL;
+	priv->newname = NULL;
 
 	g_mutex_unlock (priv->lock);
 
@@ -357,6 +415,11 @@ tny_folder_change_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->removed));
 	priv->added = NULL;
 	priv->removed = NULL;
+
+	if (priv->oldname)
+		g_free (priv->oldname);
+	if (priv->newname)
+		g_free (priv->newname);
 
 	if (priv->folder)
 		g_object_unref (G_OBJECT (priv->folder));

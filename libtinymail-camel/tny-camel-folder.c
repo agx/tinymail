@@ -76,6 +76,9 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
 
+	if (!priv->sobservers)
+		return;
+
 	iter = tny_list_create_iterator (priv->sobservers);
 	while (!tny_iterator_is_done (iter))
 	{
@@ -92,6 +95,9 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
+
+	if (!priv->observers)
+		return;
 
 	iter = tny_list_create_iterator (priv->observers);
 	while (!tny_iterator_is_done (iter))
@@ -606,16 +612,8 @@ _tny_camel_folder_set_unread_count (TnyCamelFolder *self, guint len)
 void
 _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len)
 {
-
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	if (len != priv->cached_length)
-	{
-		TnyFolderChange *change = tny_folder_change_new (TNY_FOLDER (self));
-		priv->cached_length = len;
-		tny_folder_change_set_new_all_count (change, priv->cached_length);
-		notify_folder_observers_about (TNY_FOLDER (self), change);
-		g_object_unref (change);
-	}
+	priv->cached_length = len;
 
 	return;
 }
@@ -1975,6 +1973,13 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 
 	} else if (priv->cached_name)
 	{
+		TnyFolderChange *change;
+
+		change = tny_folder_change_new (self);
+		tny_folder_change_set_rename (change, name);
+		notify_folder_observers_about (self, change);
+		g_object_unref (G_OBJECT (change));
+
 		g_free (priv->cached_name);
 		priv->cached_name = g_strdup (name);
 	}
@@ -2622,6 +2627,11 @@ tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *obser
 
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
+	/* TNY TODO: locking */
+
+	if (!priv->observers)
+		priv->observers = tny_simple_list_new ();
+
 	tny_list_prepend (priv->observers, G_OBJECT (observer));
 
 	determine_push_email (priv);
@@ -2664,6 +2674,11 @@ tny_camel_folder_store_add_observer_default (TnyFolderStore *self, TnyFolderStor
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+
+	/* TNY TODO: locking */
+
+	if (!priv->sobservers)
+		priv->sobservers = tny_simple_list_new ();
 
 	tny_list_prepend (priv->sobservers, G_OBJECT (observer));
 
@@ -2719,7 +2734,10 @@ tny_camel_folder_finalize (GObject *object)
 	g_mutex_lock (priv->folder_lock);
 	priv->dont_fkill = FALSE;
 
-	g_object_unref (G_OBJECT (priv->observers));
+	if (priv->observers)
+		g_object_unref (G_OBJECT (priv->observers));
+	if (priv->sobservers)
+		g_object_unref (G_OBJECT (priv->sobservers));
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
 	{
@@ -2885,7 +2903,8 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->unread_sync = 0;
 	priv->dont_fkill = FALSE;
-	priv->observers = tny_simple_list_new ();
+	priv->observers = NULL;
+	priv->sobservers = NULL;
 	priv->iter = NULL;
 	priv->iter_parented = FALSE;
 	priv->headers_managed = 0;

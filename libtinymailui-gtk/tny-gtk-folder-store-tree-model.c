@@ -29,6 +29,11 @@
 #include <tny-folder-store.h>
 #include <tny-simple-list.h>
 
+#include <tny-folder-store-change.h>
+#include <tny-folder-store-observer.h>
+#include <tny-folder-change.h>
+#include <tny-folder-observer.h>
+
 #include <tny-gtk-folder-store-tree-model.h>
 
 #include "tny-gtk-folder-store-tree-model-iterator-priv.h"
@@ -49,12 +54,18 @@ recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, GError **e
 {
 	AsyncHelpr *hlrp = user_data;
 	TnyIterator *iter = tny_list_create_iterator (folders);
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
 
 	while (!tny_iterator_is_done (iter))
 	{
 		GtkTreeStore *model = GTK_TREE_STORE (hlrp->self);
 		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 		GtkTreeIter *tree_iter = gtk_tree_iter_copy (hlrp->parent_tree_iter);
+
+		tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
+		tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+		me->folder_observables = g_list_prepend (me->folder_observables, folder);
+		me->store_observables = g_list_prepend (me->store_observables, folder);
 
 		gtk_tree_store_append (model, tree_iter, hlrp->parent_tree_iter);
 
@@ -101,6 +112,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 {
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
 
 	/* TODO add error checking and reporting here */
 	tny_folder_store_get_folders (store, folders, self->query, NULL);
@@ -114,7 +126,12 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 
 		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
- 		gtk_tree_store_set (model, &tree_iter,
+		tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
+		tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+		me->folder_observables = g_list_prepend (me->folder_observables, folder);
+		me->store_observables = g_list_prepend (me->store_observables, folder);
+
+		gtk_tree_store_set (model, &tree_iter,
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
 			tny_folder_get_name (TNY_FOLDER (folder)),
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
@@ -128,7 +145,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 
 		g_object_unref (G_OBJECT (folder));
 
-		tny_iterator_next (iter);	    
+		tny_iterator_next (iter);
 	}
 
 	g_object_unref (G_OBJECT (iter));
@@ -224,6 +241,20 @@ destroy_folder_stores (gpointer item, gpointer user_data)
 	return;
 }
 
+static void 
+unregister_folder_observerable (gpointer item, gpointer user_data)
+{
+	TnyFolder *f = (TnyFolder *) item;
+	tny_folder_remove_observer (f, TNY_FOLDER_OBSERVER (user_data));
+}
+
+static void 
+unregister_store_observerable (gpointer item, gpointer user_data)
+{
+	TnyFolderStore *fstore = (TnyFolderStore *) item;
+	tny_folder_store_remove_observer (fstore, TNY_FOLDER_STORE_OBSERVER (user_data));
+}
+
 static void
 tny_gtk_folder_store_tree_model_finalize (GObject *object)
 {
@@ -236,6 +267,18 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 		g_list_free (me->first); me->first = NULL;
 	}
 	g_mutex_unlock (me->iterator_lock);
+
+	if (me->folder_observables)
+	{
+		g_list_foreach (me->folder_observables, unregister_folder_observerable, me);
+		g_list_free (me->store_observables);
+	}
+
+	if (me->store_observables)
+	{
+		g_list_foreach (me->store_observables, unregister_store_observerable, me);
+		g_list_free (me->store_observables);
+	}
 
 	g_mutex_free (me->iterator_lock);
 	me->iterator_lock = NULL;
@@ -267,6 +310,8 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
 
 	me->iterator_lock = g_mutex_new ();
+	me->folder_observables = NULL;
+	me->store_observables = NULL;
 
 	gtk_tree_store_set_column_types (store, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS, types);
@@ -478,6 +523,48 @@ tny_gtk_folder_store_tree_model_foreach_in_the_list (TnyList *self, GFunc func, 
 	return;
 }
 
+static void
+tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
+{
+	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
+
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
+	{
+	}
+
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
+	{
+	}
+}
+
+
+static void
+tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
+
+	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME)
+	{
+		const gchar *oldname, *newname;
+
+		newname = tny_folder_change_get_rename (change, &oldname);
+
+		printf ("Renamed %s to %s\n", oldname, newname);
+	}
+
+}
+
+static void
+tny_folder_store_observer_init (TnyFolderStoreObserverIface *klass)
+{
+	klass->update_func = tny_gtk_folder_store_tree_model_store_obsr_update;
+}
+
+static void
+tny_folder_observer_init (TnyFolderObserverIface *klass)
+{
+	klass->update_func = tny_gtk_folder_store_tree_model_folder_obsr_update;
+}
 
 static void
 tny_list_init (TnyListIface *klass)
@@ -522,8 +609,25 @@ tny_gtk_folder_store_tree_model_get_type (void)
 			NULL
 		};
 
+		static const GInterfaceInfo tny_folder_store_observer_info = {
+			(GInterfaceInitFunc) tny_folder_store_observer_init,
+			NULL,
+			NULL
+		};
+
+		static const GInterfaceInfo tny_folder_observer_info = {
+			(GInterfaceInitFunc) tny_folder_observer_init,
+			NULL,
+			NULL
+		};
+
 		g_type_add_interface_static (type, TNY_TYPE_LIST,
 					     &tny_list_info);
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE_OBSERVER,
+					     &tny_folder_store_observer_info);
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
+					     &tny_folder_observer_info);
+
 	}
 
 	return type;

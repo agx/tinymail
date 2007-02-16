@@ -3,6 +3,10 @@
 	* TnyFolderObserver notifications
 	* TnyFolderStoreObserver notifications
 	* Implementation for poke() in tnycamelfolder
+	* Lot's of fixes to the TnyFolderStoreObserver infrastructure
+	* First pieces of letting TnyGtkFolderStoreTreeModel become a
+	self-responsible TnyFolderStoreObserver and TnyFolderObserver (letting
+	it act on changes)
 
 2007-02-16  Sergio Villar Senin  <svillar@igalia.com>
 

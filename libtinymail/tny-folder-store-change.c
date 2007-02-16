@@ -28,7 +28,7 @@ typedef struct _TnyFolderStoreChangePriv TnyFolderStoreChangePriv;
 
 struct _TnyFolderStoreChangePriv
 {
-	TnyList *created, *removed, *renamed;
+	TnyList *created, *removed;
 	GMutex *lock;
 	TnyFolderStore *folderstore;
 	TnyFolderStoreChangeChanged changed;
@@ -79,32 +79,9 @@ tny_folder_store_change_add_created_folder (TnyFolderStoreChange *self, TnyFolde
 
 
 
-/**
- * tny_folder_store_change_add_renamed_folder:
- * @self: a #TnyFolderStoreChange instance
- * @folder: the folder to add to the changeset
- *
- * Add @folder to the changeset of renamed folders
- **/
-void 
-tny_folder_store_change_add_renamed_folder (TnyFolderStoreChange *self, TnyFolder *folder)
-{
-	TnyFolderStoreChangePriv *priv = TNY_FOLDER_STORE_CHANGE_GET_PRIVATE (self);
-
-	g_mutex_lock (priv->lock);
-
-	if (!priv->renamed)
-		priv->renamed = tny_simple_list_new ();
-	tny_list_prepend (priv->renamed, G_OBJECT (folder));
-	priv->changed |= TNY_FOLDER_STORE_CHANGE_CHANGED_RENAMED_FOLDERS;
-
-	g_mutex_unlock (priv->lock);
-
-	return;
-}
 
 /**
- * tny_folder_store_change_add_removed_header:
+ * tny_folder_store_change_add_removed_folder:
  * @self: a #TnyFolderStoreChange instance
  * @folder: the folder to add to the changeset
  *
@@ -169,46 +146,6 @@ tny_folder_store_change_get_created_folders (TnyFolderStoreChange *self, TnyList
 
 
 
-/**
- * tny_folder_store_change_get_renamed_folders:
- * @self: a #TnyFolderStoreChange instance
- * @folders: the #TnyList where the renamed folders will be put it
- *
- * Get the renamed folders in this changeset
- **/
-void 
-tny_folder_store_change_get_renamed_folders (TnyFolderStoreChange *self, TnyList *folders)
-{
-	TnyFolderStoreChangePriv *priv = TNY_FOLDER_STORE_CHANGE_GET_PRIVATE (self);
-	TnyIterator *iter;
-
-	g_assert (TNY_IS_LIST (folders));
-
-	g_mutex_lock (priv->lock);
-
-	if (!priv->created)
-	{
-		g_mutex_unlock (priv->lock);
-		return;
-	}
-
-	iter = tny_list_create_iterator (priv->renamed);
-
-	while (!tny_iterator_is_done (iter))
-	{
-		GObject *folder = tny_iterator_get_current (iter);
-		tny_list_prepend (folders, folder);
-		g_object_unref (folder);
-		tny_iterator_next (iter);
-	}
-
-	g_object_unref (G_OBJECT (iter));
-
-	g_mutex_unlock (priv->lock);
-
-	return;
-}
-
 
 /**
  * tny_folder_store_change_get_removed_folders:
@@ -268,11 +205,8 @@ tny_folder_store_change_reset (TnyFolderStoreChange *self)
 		g_object_unref (G_OBJECT (priv->created));
 	if (priv->removed)
 		g_object_unref (G_OBJECT (priv->removed));
-	if (priv->renamed)
-		g_object_unref (G_OBJECT (priv->removed));
 	priv->created = NULL;
 	priv->removed = NULL;
-	priv->renamed = NULL;
 
 	g_mutex_unlock (priv->lock);
 }
@@ -334,7 +268,6 @@ tny_folder_store_change_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->changed = 0;
 	priv->created = NULL;
 	priv->removed = NULL;
-	priv->renamed = NULL;
 	priv->folderstore = NULL;
 
 	g_mutex_unlock (priv->lock);
@@ -350,15 +283,12 @@ tny_folder_store_change_finalize (GObject *object)
 
 	g_mutex_lock (priv->lock);
 
-	if (priv->renamed)
-		g_object_unref (G_OBJECT (priv->renamed));
 	if (priv->created)
 		g_object_unref (G_OBJECT (priv->created));
 	if (priv->removed)
 		g_object_unref (G_OBJECT (priv->removed));
 	priv->created = NULL;
 	priv->removed = NULL;
-	priv->renamed = NULL;
 
 	if (priv->folderstore)
 		g_object_unref (G_OBJECT (priv->folderstore));

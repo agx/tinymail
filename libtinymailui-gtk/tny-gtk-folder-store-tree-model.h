@@ -60,6 +60,7 @@ struct _TnyGtkFolderStoreTreeModel
 	GMutex *iterator_lock;
 	gboolean is_async;
 	TnyFolderStoreQuery *query;
+	GList *store_observables, *folder_observables;
 };
 
 struct _TnyGtkFolderStoreTreeModelClass

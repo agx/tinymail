@@ -506,7 +506,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 
-	if (G_LIKELY (gtk_tree_selection_get_selected (selection, &model, &iter)))
+	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
 		TnyFolder *folder;
 		gint type;
@@ -649,6 +649,207 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	}
 }
 
+
+static void 
+on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
+{
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+
+	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
+	{
+		gint type;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{ 
+			TnyFolder *folder;
+			GtkWidget *dialog, *entry;
+			gint result;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
+
+			dialog = gtk_dialog_new_with_buttons (_("Rename a folder"),
+												  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+												  GTK_DIALOG_MODAL,
+												  GTK_STOCK_OK,
+												  GTK_RESPONSE_ACCEPT,
+												  GTK_STOCK_CANCEL,
+												  GTK_RESPONSE_REJECT,
+												  NULL);
+
+			entry = gtk_entry_new ();
+			gtk_entry_set_text (GTK_ENTRY (entry), tny_folder_get_name (folder));
+			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry);
+			gtk_widget_show (entry);
+
+			result = gtk_dialog_run (GTK_DIALOG (dialog));
+
+			switch (result)
+			{
+				case GTK_RESPONSE_ACCEPT: 
+				{
+					GError *err = NULL;
+					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
+					tny_folder_set_name (folder, newname, &err);
+
+					if (err != NULL)
+					{
+						GtkWidget *edialog = gtk_message_dialog_new (
+										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+										  GTK_DIALOG_DESTROY_WITH_PARENT,
+										  GTK_MESSAGE_ERROR,
+										  GTK_BUTTONS_CLOSE,
+										  err->message);
+						gtk_widget_show_all (edialog);
+						g_error_free (err);
+					}
+				}
+				break;
+
+				default:
+				break;
+			}
+			gtk_widget_destroy (dialog);
+			g_object_unref (G_OBJECT (folder));
+		}
+
+	}
+
+}
+
+static void 
+on_delete_folder_activate (GtkMenuItem *mitem, gpointer user_data)
+{
+
+}
+
+static void 
+on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
+{
+
+}
+
+static void
+header_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointer user_data)
+{
+	GtkWidget *menu;
+	int button, event_time;
+
+	menu = gtk_menu_new ();
+	g_signal_connect (menu, "deactivate", G_CALLBACK (gtk_widget_destroy), NULL);
+
+	/* ... add menu items ... */
+
+	if (event)
+	{
+		button = event->button;
+		event_time = event->time;
+	}
+	else
+	{
+		button = 0;
+		event_time = gtk_get_current_event_time ();
+	}
+
+	gtk_menu_attach_to_widget (GTK_MENU (menu), my_widget, NULL);
+	gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, 
+					button, event_time);
+}
+
+static gboolean 
+on_header_view_button_press_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	if (event->button == 3 && event->type == GDK_BUTTON_PRESS)
+	{
+		header_view_do_popup_menu (widget, event, user_data);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+static gboolean
+header_view_popup_menu_event (GtkWidget *widget, gpointer user_data)
+{
+	header_view_do_popup_menu (widget, NULL, user_data);
+	return TRUE;
+}
+
+
+
+static void
+mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointer user_data)
+{
+	GtkWidget *menu;
+	GtkWidget *mrename, *mdelete, *mcreate;
+	int button, event_time;
+
+	menu = gtk_menu_new ();
+	//g_signal_connect (menu, "deactivate", G_CALLBACK (gtk_widget_destroy), NULL);
+
+	mrename = gtk_menu_item_new_with_label (_("Rename folder"));
+	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
+	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
+
+	g_signal_connect (G_OBJECT (mrename), "activate",
+		G_CALLBACK (on_rename_folder_activate), user_data);
+	g_signal_connect (G_OBJECT (mcreate), "activate",
+		G_CALLBACK (on_rename_folder_activate), user_data);
+	g_signal_connect (G_OBJECT (mdelete), "activate",
+		G_CALLBACK (on_delete_folder_activate), user_data);
+
+	gtk_menu_prepend (menu, mrename);
+	gtk_menu_prepend (menu, mcreate);
+	gtk_menu_prepend (menu, mdelete);
+
+	gtk_widget_show (mrename);
+	gtk_widget_show (mcreate);
+	gtk_widget_show (mdelete);
+
+
+	if (event)
+	{
+		button = event->button;
+		event_time = event->time;
+	}
+	else
+	{
+		button = 0;
+		event_time = gtk_get_current_event_time ();
+	}
+
+	gtk_menu_attach_to_widget (GTK_MENU (menu), my_widget, NULL);
+	gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, 
+					button, event_time);
+}
+
+static gboolean 
+on_mailbox_view_button_press_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	if (event->button == 3 && event->type == GDK_BUTTON_PRESS)
+	{
+		mailbox_view_do_popup_menu (widget, event, user_data);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+static gboolean
+mailbox_view_popup_menu_event (GtkWidget *widget, gpointer user_data)
+{
+	mailbox_view_do_popup_menu (widget, NULL, user_data);
+	return FALSE;
+}
+
 /**
  * tny_demoui_summary_view_new:
  * 
@@ -731,7 +932,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	
 	priv->msg_view = tny_platform_factory_new_msg_view (platfact);
 
-	gtk_widget_show (GTK_WIDGET (priv->msg_view));	
+	gtk_widget_show (GTK_WIDGET (priv->msg_view));
 
 	widget = gtk_scrolled_window_new (NULL, NULL);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (widget), 
@@ -816,7 +1017,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes (_("From"), renderer,
 		"text", TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN);			  
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN);
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 100);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
@@ -826,7 +1027,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 		renderer = gtk_cell_renderer_text_new ();
 		column = gtk_tree_view_column_new_with_attributes (_("To"), renderer,
 			"text", TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN, NULL);
-		gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN);			  
+		gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN);
 		gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 		gtk_tree_view_column_set_fixed_width (column, 100);
 		gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
@@ -835,7 +1036,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes (_("Subject"), renderer,
 		"text", TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN);			  
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN);
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 200);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
@@ -885,6 +1086,16 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	g_signal_connect (G_OBJECT (select), "changed",
 		G_CALLBACK (on_header_view_tree_selection_changed), self);
 
+
+	g_signal_connect (G_OBJECT (priv->header_view), "button-press-event",
+		G_CALLBACK (on_header_view_button_press_event), self);
+	g_signal_connect (G_OBJECT (priv->header_view), "popup-menu",
+		G_CALLBACK (header_view_popup_menu_event), self);
+
+	g_signal_connect (G_OBJECT (priv->mailbox_view), "button-press-event",
+		G_CALLBACK (on_mailbox_view_button_press_event), self);
+	g_signal_connect (G_OBJECT (priv->mailbox_view), "popup-menu",
+		G_CALLBACK (mailbox_view_popup_menu_event), self);
 
 	gtk_widget_hide (priv->progress);
 

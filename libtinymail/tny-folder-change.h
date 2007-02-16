@@ -45,7 +45,8 @@ enum _TnyFolderChangeChanged
 	TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT,
 	TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT,
 	TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS,
-	TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS
+	TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS,
+	TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME
 };
 
 struct _TnyFolderChange
@@ -61,6 +62,8 @@ struct _TnyFolderChangeClass
 GType  tny_folder_change_get_type (void);
 TnyFolderChange* tny_folder_change_new (TnyFolder *folder);
 
+const gchar *tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname);
+void tny_folder_change_set_rename (TnyFolderChange *self, const gchar *newname);
 void tny_folder_change_set_new_all_count (TnyFolderChange *self, guint new_all_count);
 void tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_count);
 guint tny_folder_change_get_new_unread_count (TnyFolderChange *self);

@@ -43,8 +43,7 @@ typedef struct _TnyFolderStoreChangeClass TnyFolderStoreChangeClass;
 enum _TnyFolderStoreChangeChanged
 {
 	TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS,
-	TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS,
-	TNY_FOLDER_STORE_CHANGE_CHANGED_RENAMED_FOLDERS
+	TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS
 };
 
 struct _TnyFolderStoreChange
@@ -61,11 +60,9 @@ GType  tny_folder_store_change_get_type (void);
 TnyFolderStoreChange* tny_folder_store_change_new (TnyFolderStore *folderstore);
 
 void tny_folder_store_change_add_created_folder (TnyFolderStoreChange *self, TnyFolder *folder);
-void tny_folder_store_change_add_renamed_folder (TnyFolderStoreChange *self, TnyFolder *folder);
 void tny_folder_store_change_add_removed_folder (TnyFolderStoreChange *self, TnyFolder *folder);
 
 void tny_folder_store_change_get_created_folders (TnyFolderStoreChange *self, TnyList *folders);
-void tny_folder_store_change_get_renamed_folders (TnyFolderStoreChange *self, TnyList *folders);
 void tny_folder_store_change_get_removed_folders (TnyFolderStoreChange *self, TnyList *folders);
 
 void tny_folder_store_change_reset (TnyFolderStoreChange *self);
