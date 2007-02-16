@@ -50,7 +50,7 @@ DIST_SUBDIRS = \
 	libtinymail-gnomevfs \
 	libtinymailui-gtk \
 	libtinymail-camel \
-	tinymail docs \
+	docs \
 	libtinymail-test tests \
 	bindings po \
 	libtinymail-maemo \

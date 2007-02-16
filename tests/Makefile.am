@@ -1,7 +1,7 @@
 SUBDIRS = python-demo
 
 if BUILD_DEMOUI
-SUBDIRS += tinymail 
+SUBDIRS += c-demo
 endif
 
 #### Funny OR simulation :)
