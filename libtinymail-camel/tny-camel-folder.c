@@ -2883,6 +2883,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->self = (TnyFolder *) self;
 	priv->want_changes = TRUE;
 
+	priv->unread_sync = 0;
 	priv->dont_fkill = FALSE;
 	priv->observers = tny_simple_list_new ();
 	priv->iter = NULL;
