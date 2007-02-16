@@ -789,6 +789,28 @@ tny_folder_get_folder_type  (TnyFolder *self)
 }
 
 
+/**
+ * tny_folder_get_folder_store:
+ * @self: a TnyFolder object
+ * 
+ * Get a the parent account of this folder. You must unreference the
+ * return value after use. Note that not every folder strictly has to
+ * be inside a folder store.
+ * 
+ * Return value: the folder store of this folder, or NULL if the
+ * folder is not inside a folder store
+ *
+ **/
+TnyFolderStore*  
+tny_folder_get_folder_store (TnyFolder *self)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->get_folder_store_func)
+		g_critical ("You must implement tny_folder_get_folder_store\n");
+#endif
+
+	return TNY_FOLDER_GET_IFACE (self)->get_folder_store_func (self);
+}
 
 
 static void

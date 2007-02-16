@@ -48,6 +48,7 @@ struct _TnyCamelFolderPriv
 	TnyMsgReceiveStrategy *receive_strat;
 	TnyList *observers, *sobservers; TnyFolder *self;
 	gboolean want_changes, dont_fkill;
+	TnyFolderStore *parent;
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);
@@ -62,6 +63,8 @@ void _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter);
 void _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account);
 gboolean _tny_camel_folder_load_folder_no_lock (TnyCamelFolderPriv *priv);
 void _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder);
+void _tny_camel_folder_set_parent (TnyCamelFolder *self, TnyFolderStore *parent);
+void _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, CamelFolderInfo *info);
 
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_FOLDER, TnyCamelFolderPriv))

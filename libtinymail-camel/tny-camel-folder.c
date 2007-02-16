@@ -1409,7 +1409,6 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	CamelStore *fromstore; const gchar *frombase;
 	CamelStore *tostore; const gchar *tobase;
 	GMutex *tolock=NULL, *fromlock=NULL;
-	TnyAccount *acc;
 	TnyFolder *retval = NULL;
 	TnyCamelFolderPriv *fpriv;
 	CamelFolderInfo *iter;
@@ -1436,7 +1435,6 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		camel_object_ref (CAMEL_OBJECT (tostore));
 		tobase = topriv->folder_name;
 		tolock = topriv->folder_lock;
-		acc = topriv->account;
 
 	} else 
 	{
@@ -1445,7 +1443,6 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		tobase = "/";
 		tostore = camel_session_get_store ((CamelSession*) apriv->session, 
 			apriv->url_string, &ex);
-		acc = TNY_ACCOUNT (into);
 
 		/* TODO: a tolock */
 
@@ -1577,13 +1574,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	retval = _tny_camel_folder_new ();
 	fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
 
-	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (retval), iter->full_name);
-	_tny_camel_folder_set_folder_type (TNY_CAMEL_FOLDER (retval), iter);
-	_tny_camel_folder_set_unread_count (TNY_CAMEL_FOLDER (retval), iter->unread);
-	_tny_camel_folder_set_all_count (TNY_CAMEL_FOLDER (retval), iter->total);
-	_tny_camel_folder_set_name (TNY_CAMEL_FOLDER (retval), iter->name);
-	_tny_camel_folder_set_iter (TNY_CAMEL_FOLDER (retval), iter);
-	_tny_camel_folder_set_account (TNY_CAMEL_FOLDER (retval), acc);
+	_tny_camel_folder_set_folder_info (into, TNY_CAMEL_FOLDER (retval), iter);
 	camel_object_ref (CAMEL_OBJECT (tostore));
 	fpriv->store = tostore;
 
@@ -2119,11 +2110,9 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 	return;
 }
 
-static void
-tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, CamelFolderInfo *info)
+void
+_tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, CamelFolderInfo *info)
 {
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-
 	_tny_camel_folder_set_id (folder, info->full_name);
 	_tny_camel_folder_set_folder_type (folder, info);
 	_tny_camel_folder_set_unread_count (folder, info->unread);
@@ -2140,8 +2129,14 @@ tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, 
 	}
 	
 	*/
+	if (TNY_IS_CAMEL_FOLDER (self)) {
+		TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+		_tny_camel_folder_set_account (folder, priv->account);
+	} else if (TNY_IS_CAMEL_STORE_ACCOUNT (self)){
+		_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
+	}
 
-	_tny_camel_folder_set_account (folder, priv->account);
+	_tny_camel_folder_set_parent (folder, self);
 }
 
 static TnyFolder*
@@ -2213,11 +2208,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	}
 
 	folder = _tny_camel_folder_new ();
-	tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
-	apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
-	
-	/* This this needed?
-	_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), FALSE); */
+	_tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
 	
 	change = tny_folder_store_change_new (self);
 	tny_folder_store_change_add_created_folder (change, folder);
@@ -2229,6 +2220,23 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	return folder;
 }
 
+/*
+ * Sets a TnyFolderStore as the parent of a TnyCamelFolder. Note that
+ * this code could cause a cross-reference situation, if the parent
+ * was used to create the child.
+ */
+void
+_tny_camel_folder_set_parent (TnyCamelFolder *self, TnyFolderStore *parent)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (priv->parent)
+		g_object_unref (G_OBJECT (priv->parent));
+
+	priv->parent = g_object_ref (G_OBJECT (parent));
+
+	return;
+}
 
 void 
 _tny_camel_folder_set_folder_type (TnyCamelFolder *folder, CamelFolderInfo *folder_info)
@@ -2326,10 +2334,7 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 			TnyCamelFolder *folder = _tny_camel_store_account_folder_factory_get_folder (apriv, iter->full_name, &was_new);
 
 			if (was_new)
-			{
-				tny_camel_folder_set_folder_info (self, folder, iter);
-				apriv->managed_folders = g_list_prepend (apriv->managed_folders, folder);
-			}
+				_tny_camel_folder_set_folder_info (self, folder, iter);
 
 			tny_list_prepend (list, G_OBJECT (folder));
 			g_object_unref (G_OBJECT (folder));
@@ -2587,6 +2592,24 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 	return;
 }
 
+static TnyFolderStore*  
+tny_camel_folder_get_folder_store (TnyFolder *self)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folder_store_func (self);
+}
+
+static TnyFolderStore*  
+tny_camel_folder_get_folder_store_default (TnyFolder *self)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (priv->parent)
+		g_object_ref (priv->parent);
+
+	return priv->parent;
+}
+
+
 static void
 tny_camel_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
 {
@@ -2731,6 +2754,10 @@ tny_camel_folder_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->receive_strat));
 	priv->receive_strat = NULL;
 
+	if (G_LIKELY (priv->parent))
+		g_object_unref (G_OBJECT (priv->parent));
+	priv->parent = NULL;
+
 	g_mutex_unlock (priv->folder_lock);
 
 	g_mutex_free (priv->folder_lock);
@@ -2775,6 +2802,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->poke_status_func = tny_camel_folder_poke_status;
 	klass->add_observer_func = tny_camel_folder_add_observer;
 	klass->remove_observer_func = tny_camel_folder_remove_observer;
+	klass->get_folder_store_func = tny_camel_folder_get_folder_store;
 
 	return;
 }
@@ -2830,6 +2858,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->poke_status_func = tny_camel_folder_poke_status_default;
 	class->add_observer_func = tny_camel_folder_add_observer_default;
 	class->remove_observer_func = tny_camel_folder_remove_observer_default;
+	class->get_folder_store_func = tny_camel_folder_get_folder_store_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;

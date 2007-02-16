@@ -533,6 +533,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	folder = _tny_camel_folder_new ();
 	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);
+	_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (folder), self);
 	camel_store_free_folder_info (store, info);
 
 	change = tny_folder_store_change_new (self);
@@ -664,16 +665,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 			TnyCamelFolder *folder = _tny_camel_store_account_folder_factory_get_folder (priv, iter->full_name, &was_new);
 
 			if (was_new)
-			{
-				_tny_camel_folder_set_id (folder, iter->full_name);
-				_tny_camel_folder_set_folder_type (folder, iter);
-				_tny_camel_folder_set_unread_count (folder, iter->unread);
-				_tny_camel_folder_set_all_count (folder, iter->total);
-				_tny_camel_folder_set_name (folder, iter->name);
-				_tny_camel_folder_set_iter (folder, iter);
-				priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-				_tny_camel_folder_set_account (folder, TNY_ACCOUNT (self));
-			}
+				_tny_camel_folder_set_folder_info (self, folder, iter);
 
 			tny_list_prepend (list, G_OBJECT (folder));
 			g_object_unref (G_OBJECT (folder));
