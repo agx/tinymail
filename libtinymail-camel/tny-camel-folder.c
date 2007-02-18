@@ -1871,6 +1871,7 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 	gchar *new_path;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	gboolean changed = FALSE;
+	gboolean was_sub = FALSE;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_SET_NAME))
@@ -1935,7 +1936,22 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 	}
 
 	/* Rename folder */
+
+	if (camel_store_supports_subscriptions (cfolder->parent_store))
+		was_sub = camel_store_folder_subscribed (cfolder->parent_store, old_path);
+
 	camel_store_rename_folder (cfolder->parent_store, old_path, (const gchar *) new_path, &ex);
+
+	if (camel_store_supports_subscriptions (cfolder->parent_store))
+	{
+		camel_store_unsubscribe_folder (cfolder->parent_store, old_path, NULL);
+
+		if (was_sub)
+			camel_store_subscribe_folder (cfolder->parent_store, new_path, NULL);
+		else
+			camel_store_unsubscribe_folder (cfolder->parent_store, new_path, NULL);
+	}
+
 	g_free (new_path);
 
 	if (camel_exception_is_set (&ex))
