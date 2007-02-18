@@ -106,18 +106,18 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
  * @name: The folder name to create
  * @err: a #GError object or NULL
  *
- * Creates a new folder in @self. The value returned is the newly created folder
- * instance and must be unreferenced after use.
+ * Creates a new folder in @self. If not NULL, the value returned is the newly 
+ * created folder instance and must be unreferenced after use.
  *
  * Example:
  * <informalexample><programlisting>
  * TnyFolderStore *store = ...
  * TnyFolder *createfol;
  * createfol = tny_folder_store_create_folder (store, "Test", NULL);
- * g_object_unref (G_OBJECT (createfol));
+ * if (createfol) g_object_unref (G_OBJECT (createfol));
  * </programlisting></informalexample>
  * 
- * Return value: A new folder instance representing the folder that was created
+ * Return value: A new folder instance representing the folder that was created or NULL in case of failure
  *
  **/
 TnyFolder *

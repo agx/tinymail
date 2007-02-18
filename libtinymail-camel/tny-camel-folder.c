@@ -2072,6 +2072,11 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 		gchar *ccfoln = cfolname + parlen;
 		if ((*ccfoln == '/') && (strrchr (ccfoln, '/') == ccfoln))
 		{
+			CamelException subex = CAMEL_EXCEPTION_INITIALISER;
+
+			if (camel_store_supports_subscriptions (store))
+				camel_store_subscribe_folder (store, cfolname, &subex);
+
 			camel_store_delete_folder (store, cfolname, &ex);
 
 			if (camel_exception_is_set (&ex))
@@ -2082,6 +2087,9 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 				camel_exception_clear (&ex);
 			} else 
 			{
+				if (camel_store_supports_subscriptions (store))
+					camel_store_unsubscribe_folder (store, cfolname, &subex);
+
 				changed = TRUE;
 				g_free (cpriv->folder_name); 
 				cpriv->folder_name = NULL;
@@ -2144,6 +2152,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	CamelStore *store; gchar *folname;
 	TnyFolder *folder; CamelFolderInfo *info;
 	TnyFolderStoreChange *change;
+	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
@@ -2193,6 +2202,11 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 
 		return NULL;
 	}
+
+	g_assert (info != NULL);
+
+	if (camel_store_supports_subscriptions (store))
+		camel_store_subscribe_folder (store, info->full_name, &subex);
 
 	folder = _tny_camel_folder_new ();
 	_tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);

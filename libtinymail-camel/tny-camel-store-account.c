@@ -388,7 +388,8 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
 	CamelStore *store;
-	
+	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
+
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 
 	if (!_tny_session_check_operation (apriv->session, err, 
@@ -424,14 +425,11 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	g_assert (CAMEL_IS_STORE (store));
 	g_assert (cpriv->folder_name != NULL);
 
-	/* Unsubscribe : camel should do it by itself but it does not do it */
-
-	if (camel_store_supports_subscriptions (store) &&  
-			camel_store_folder_subscribed (store, cpriv->folder_name))
-		camel_store_unsubscribe_folder (store, cpriv->folder_name, NULL);
+	if (camel_store_supports_subscriptions (store))
+		camel_store_subscribe_folder (store, cpriv->folder_name, &subex);
 
 	camel_store_delete_folder (store, cpriv->folder_name, &ex);
-	
+
 	if (camel_exception_is_set (&ex)) 
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
@@ -440,11 +438,14 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 		camel_exception_clear (&ex);
 	} else 
 	{
-		TnyFolderStoreChange *change;	
+		if (camel_store_supports_subscriptions (store))
+			camel_store_unsubscribe_folder (store, cpriv->folder_name, &subex);
+
+		TnyFolderStoreChange *change;
 		change = tny_folder_store_change_new (self);
 		tny_folder_store_change_add_removed_folder (change, folder);
 		notify_folder_store_observers_about (self, change);
-		g_object_unref (G_OBJECT (change));		
+		g_object_unref (G_OBJECT (change));	
 	}
 
 	g_free (cpriv->folder_name); 
@@ -471,6 +472,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	TnyFolder *folder; CamelFolderInfo *info; CamelStore *store;
 	TnyFolderStoreChange *change;
+	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!_tny_session_check_operation (apriv->session, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
@@ -534,6 +536,9 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	}
 
 	g_assert (info != NULL);
+
+	if (camel_store_supports_subscriptions (store))
+		camel_store_subscribe_folder (store, info->full_name, &subex);
 
 	folder = _tny_camel_folder_new ();
 	_tny_camel_folder_set_id (TNY_CAMEL_FOLDER (folder), info->full_name);

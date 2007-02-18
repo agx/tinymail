@@ -868,7 +868,10 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 					GError *err = NULL;
 					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
 
-					tny_folder_store_create_folder (folderstore, newname, &err);
+					TnyFolder *created = tny_folder_store_create_folder (folderstore, newname, &err);
+
+					if (created) /* Can be NULL on failure */
+						g_object_unref (G_OBJECT (created));
 
 					if (err != NULL)
 					{

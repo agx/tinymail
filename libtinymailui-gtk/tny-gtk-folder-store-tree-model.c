@@ -69,6 +69,10 @@ recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, GError **e
 
 		gtk_tree_store_append (model, tree_iter, hlrp->parent_tree_iter);
 
+		/* This adds a reference count to folder too. When it gets removed, that
+		   reference count is decreased automatically by the gtktreestore infra-
+		   structure. */
+
 		gtk_tree_store_set (model, tree_iter,
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
 			tny_folder_get_name (TNY_FOLDER (folder)),
@@ -132,6 +136,10 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 		tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
 		me->folder_observables = g_list_prepend (me->folder_observables, folder);
 		me->store_observables = g_list_prepend (me->store_observables, folder);
+
+		/* This adds a reference count to folder too. When it gets removed, that
+		   reference count is decreased automatically by the gtktreestore infra-
+		   structure. */
 
 		gtk_tree_store_set (model, &tree_iter,
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
@@ -208,6 +216,10 @@ tny_gtk_folder_store_tree_model_add_async_i (TnyGtkFolderStoreTreeModel *self, T
 
 	if (need_add)
 		func (model, name_iter, NULL);
+
+	/* This adds a reference count to folder_store too. When it gets removed,
+	   that reference count is decreased automatically by the gtktreestore
+	   infrastructure. */
 
 	gtk_tree_store_set (model, name_iter,
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, root_name,
@@ -483,6 +495,7 @@ tny_gtk_folder_store_tree_model_remove (TnyList *self, GObject* item)
 
 		if (citem == item)
 		{
+			/* This removes a reference count */
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
 			g_object_unref (G_OBJECT (item));
 			break;
@@ -500,13 +513,12 @@ tny_gtk_folder_store_tree_model_copy_the_list (TnyList *self)
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*)self;
 	TnyGtkFolderStoreTreeModel *copy = g_object_new (TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL, NULL);
 
-	/* This only copies the TnyList pieces. The result is not a
-	   correct or good TnyHeaderListModel. But it will be a correct
-	   TnyList instance. It is the only thing the user of this
-	   method expects.
+	/* This only copies the TnyList pieces. The result is not a correct or good
+	   TnyHeaderListModel. But it will be a correct TnyList instance. It's the 
+	   only thing the user of this method expects (that is the contract of it).
 
-	   The new list will point to the same instances, of course. It's
-	   only a copy of the list-nodes of course. */
+	   The new list will point to the same instances, of course. It's only a 
+	   copy of the list-nodes of course. */
 
 	g_mutex_lock (me->iterator_lock);
 	GList *list_copy = g_list_copy (me->first);
@@ -532,23 +544,8 @@ tny_gtk_folder_store_tree_model_foreach_in_the_list (TnyList *self, GFunc func, 
 }
 
 
-typedef void (*pernodeexec) (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2);
-
-static void
-foreach_node_execute (GtkTreeModel *model, GtkTreeIter *iter, pernodeexec func, gpointer user_data1, gpointer user_data2) 
-{
-	do 
-	{
-			GtkTreeIter kids;
-			if (gtk_tree_model_iter_children (model, &kids, iter))
-				foreach_node_execute (model, &kids, func, user_data1, user_data2);
-
-			func (model, iter, user_data1, user_data2);
-	} while (gtk_tree_model_iter_next (model, iter));
-}
-
-static void
-updater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2)
+static gboolean 
+updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
 {
 	gint type;
 	TnyFolderChange *change = user_data1;
@@ -582,11 +579,13 @@ updater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer u
 	}
 
 	g_object_unref (G_OBJECT (changed_folder));
+
+	return FALSE;
 }
 
 
-static void
-creater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2)
+static gboolean 
+creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
 {
 	gint type;
 	TnyFolderStoreChange *change = user_data1;
@@ -619,6 +618,10 @@ creater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer u
 
 				gtk_tree_store_append (GTK_TREE_STORE (model), &newiter, iter);
 
+				/* This adds a reference count to folder_store too. When it gets 
+				   removed, that reference count is decreased automatically by 
+				   the gtktreestore infrastructure. */
+
 				gtk_tree_store_set (GTK_TREE_STORE (model), &newiter,
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
 					tny_folder_get_name (TNY_FOLDER (folder)),
@@ -645,16 +648,16 @@ creater (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer u
 	}
 
 	g_object_unref (G_OBJECT (parentstore));
+
+	return FALSE;
 }
 
 
-
-static void
-deleter (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer user_data2)
+static gboolean 
+deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
 {
 	gint type;
-	TnyFolderStoreChange *change = user_data1;
-	TnyFolderStore *parentstore = tny_folder_store_change_get_folder_store (change);
+	GObject *folder = user_data1;
 
 	gtk_tree_model_get (model, iter, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
@@ -662,60 +665,19 @@ deleter (GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data1, gpointer u
 
 	if (type != TNY_FOLDER_TYPE_ROOT) 
 	{
-		TnyFolderStore *fol;
+		GObject *fol;
 
 		gtk_tree_model_get (model, iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 			&fol, -1);
 
-		if (fol == parentstore)
-		{
-			TnyList *removed = tny_simple_list_new ();
-			TnyIterator *miter;
-
-			tny_folder_store_change_get_removed_folders (change, removed);
-			miter = tny_list_create_iterator (removed);
-
-			while (!tny_iterator_is_done (miter))
-			{
-				GtkTreeIter kids;
-				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
-
-				if (gtk_tree_model_iter_children (model, &kids, iter))
-				  while (gtk_tree_model_iter_next (model, &kids))
-				  {
-					gint ntype;
-					gtk_tree_model_get (model, &kids, 
-						TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
-						&ntype, -1);
-
-					if (ntype != TNY_FOLDER_TYPE_ROOT)
-					{
-						TnyFolder *nfol;
-						gtk_tree_model_get (model, &kids, 
-							TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
-							&nfol, -1);
-
-						if (nfol == folder)
-							gtk_tree_store_remove (GTK_TREE_STORE (model), &kids);
-
-						g_object_unref (G_OBJECT (nfol));
-					}
-				  }
-				g_object_unref (G_OBJECT (folder));
-
-				tny_iterator_next (miter);
-			}
-
-			g_object_unref (G_OBJECT (miter));
-			g_object_unref (G_OBJECT (removed));
-
-		}
+		if (fol == folder)
+			gtk_tree_store_remove (GTK_TREE_STORE (model), iter);
 
 		g_object_unref (G_OBJECT (fol));
 	}
 
-	g_object_unref (G_OBJECT (parentstore));
+	return FALSE;
 }
 
 static void
@@ -728,12 +690,53 @@ tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, Tny
 		changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || 
 		changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
 	{
-		GtkTreeIter iter;
-		if (gtk_tree_model_get_iter_first (model, &iter))
-			foreach_node_execute (model, &iter, updater, change, NULL);
+		gtk_tree_model_foreach (model, updater, change);
 	}
 }
 
+
+static gboolean
+find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointer user_data)
+{
+	do
+	{
+		GtkTreeIter child;
+		gint type;
+
+		gtk_tree_model_get (model, iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{
+			TnyFolderStore *fol;
+			gboolean found = FALSE;
+
+			gtk_tree_model_get (model, iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&fol, -1);
+
+			if (fol == user_data)
+				found = TRUE;
+
+			g_object_unref (G_OBJECT (fol));
+
+			if (found) {
+				*f = *iter;
+				return TRUE;
+			}
+		}
+
+		if (gtk_tree_model_iter_children (model, &child, iter))
+		{
+			if (find_store_iter (model, &child, f, user_data))
+				return TRUE;
+		}
+
+	} while (gtk_tree_model_iter_next (model, iter));
+
+	return FALSE;
+}
 
 static void
 tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
@@ -743,16 +746,67 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 
 	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
 	{
-		GtkTreeIter iter;
-		if (gtk_tree_model_get_iter_first (model, &iter))
-			foreach_node_execute (model, &iter, creater, change, NULL);
+		TnyFolderStore *parentstore = tny_folder_store_change_get_folder_store (change);
+		GtkTreeIter first, iter;
+
+		if (gtk_tree_model_get_iter_first (model, &first) && 
+			find_store_iter (model, &first, &iter, parentstore))
+		{
+			TnyList *created = tny_simple_list_new ();
+			TnyIterator *miter;
+
+			tny_folder_store_change_get_created_folders (change, created);
+			miter = tny_list_create_iterator (created);
+
+			while (!tny_iterator_is_done (miter))
+			{
+				GtkTreeIter newiter;
+				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+
+				gtk_tree_store_append (GTK_TREE_STORE (model), &newiter, &iter);
+
+				/* This adds a reference count to folder_store too. When it gets 
+				   removed, that reference count is decreased automatically by 
+				   the gtktreestore infrastructure. */
+
+				gtk_tree_store_set (GTK_TREE_STORE (model), &newiter,
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+					tny_folder_get_name (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
+					tny_folder_get_unread_count (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+					tny_folder_get_all_count (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
+					tny_folder_get_folder_type (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
+					folder, -1);
+
+				g_object_unref (G_OBJECT (folder));
+				tny_iterator_next (miter);
+			}
+			g_object_unref (G_OBJECT (miter));
+			g_object_unref (G_OBJECT (created));
+		}
+		g_object_unref (G_OBJECT (parentstore));
 	}
 
 	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
 	{
-		GtkTreeIter iter;
-		if (gtk_tree_model_get_iter_first (model, &iter))
-			foreach_node_execute (model, &iter, deleter, change, NULL);
+		TnyList *removed = tny_simple_list_new ();
+		TnyIterator *miter;
+
+		tny_folder_store_change_get_removed_folders (change, removed);
+		miter = tny_list_create_iterator (removed);
+
+		while (!tny_iterator_is_done (miter))
+		{
+			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+			gtk_tree_model_foreach (model, deleter, folder);
+			g_object_unref (G_OBJECT (folder));
+			tny_iterator_next (miter);
+		}
+		g_object_unref (G_OBJECT (miter));
+		g_object_unref (G_OBJECT (removed));
 	}
 }
 
