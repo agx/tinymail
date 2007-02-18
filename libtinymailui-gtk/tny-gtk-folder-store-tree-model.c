@@ -674,6 +674,7 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 {
 	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
 
 	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
 	{
@@ -693,6 +694,11 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 			{
 				GtkTreeIter newiter;
 				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+
+				tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
+				tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+				me->folder_observables = g_list_prepend (me->folder_observables, folder);
+				me->store_observables = g_list_prepend (me->store_observables, folder);
 
 				gtk_tree_store_append (GTK_TREE_STORE (model), &newiter, &iter);
 
