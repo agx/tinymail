@@ -1,3 +1,8 @@
+2007-02-19  Sergio Villar Senin  <svillar@igalia.com>
+
+	* TnyCamelFolder: Replaced the folder lock by a recursive static
+	folder lock
+
 2007-02-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Various fixes for the folder create, rename and delete functionality
