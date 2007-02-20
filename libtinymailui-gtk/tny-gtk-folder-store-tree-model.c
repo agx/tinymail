@@ -565,6 +565,10 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 
 		if (folder == changed_folder)
 		{
+
+			/* TNY TODO: This is not enough: Subfolders will be incorrect because the
+			   the full_name of the subfolders will still be the old full_name!*/
+
 			gtk_tree_store_set (GTK_TREE_STORE (model), iter,
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
 				tny_folder_get_name (TNY_FOLDER (folder)),
