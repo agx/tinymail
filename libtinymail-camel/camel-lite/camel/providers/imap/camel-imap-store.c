@@ -2912,8 +2912,12 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 	/* We do a LIST followed by LSUB, and merge the results.  LSUB may not be a strict
 	   subset of LIST for some servers, so we can't use either or separately */
+
+	/* TNY TODO! It used to loop until 2, but I think it's just wrong to 
+	   merge with LSUB?! (It doesn't make any sense) */
+
 	present = g_hash_table_new(folder_hash, folder_eq);
-	for (j=0;j<2;j++) {
+	for (j=0;j<1;j++) {
 		response = camel_imap_command (imap_store, NULL, ex,
 					       "%s \"\" %G", j==1 ? "LSUB" : "LIST",
 					       pattern);
