@@ -308,25 +308,7 @@ camel_folder_summary_unload_mmap (CamelFolderSummary *s)
 		g_mapped_file_free (s->file);
 	s->file = NULL;
 
-	g_hash_table_foreach(p->filter_charset, free_o_name, 0);
-
-	if (p->filter_index && CAMEL_IS_OBJECT (p->filter_index))
-		camel_object_unref((CamelObject *)p->filter_index);
-	if (p->filter_64 && CAMEL_IS_OBJECT (p->filter_64))
-		camel_object_unref((CamelObject *)p->filter_64);
-	if (p->filter_qp && CAMEL_IS_OBJECT (p->filter_qp))
-		camel_object_unref((CamelObject *)p->filter_qp);
-	if (p->filter_uu && CAMEL_IS_OBJECT (p->filter_uu))
-		camel_object_unref((CamelObject *)p->filter_uu);
-	if (p->filter_save && CAMEL_IS_OBJECT (p->filter_save))
-		camel_object_unref((CamelObject *)p->filter_save);
-	if (p->filter_html && CAMEL_IS_OBJECT (p->filter_html))
-		camel_object_unref((CamelObject *)p->filter_html);
-	if (p->filter_stream && CAMEL_IS_OBJECT (p->filter_stream))
-		camel_object_unref((CamelObject *)p->filter_stream);
-	if (p->index && CAMEL_IS_OBJECT (p->index))
-		camel_object_unref((CamelObject *)p->index);
-
+	return;
 }
 
 static void
@@ -353,6 +335,23 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	g_hash_table_foreach(p->filter_charset, free_o_name, 0);
 	g_hash_table_destroy(p->filter_charset);
+
+	if (p->filter_index && CAMEL_IS_OBJECT (p->filter_index))
+		camel_object_unref((CamelObject *)p->filter_index);
+	if (p->filter_64 && CAMEL_IS_OBJECT (p->filter_64))
+		camel_object_unref((CamelObject *)p->filter_64);
+	if (p->filter_qp && CAMEL_IS_OBJECT (p->filter_qp))
+		camel_object_unref((CamelObject *)p->filter_qp);
+	if (p->filter_uu && CAMEL_IS_OBJECT (p->filter_uu))
+		camel_object_unref((CamelObject *)p->filter_uu);
+	if (p->filter_save && CAMEL_IS_OBJECT (p->filter_save))
+		camel_object_unref((CamelObject *)p->filter_save);
+	if (p->filter_html && CAMEL_IS_OBJECT (p->filter_html))
+		camel_object_unref((CamelObject *)p->filter_html);
+	if (p->filter_stream && CAMEL_IS_OBJECT (p->filter_stream))
+		camel_object_unref((CamelObject *)p->filter_stream);
+	if (p->index && CAMEL_IS_OBJECT (p->index))
+		camel_object_unref((CamelObject *)p->index);
 
 	g_free(s->summary_path);
 

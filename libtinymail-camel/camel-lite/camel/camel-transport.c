@@ -66,7 +66,10 @@ static void
 camel_transport_finalize (CamelObject *object)
 {
 	CamelTransport *xport = CAMEL_TRANSPORT (object);
-	
+
+	g_mutex_lock (xport->priv->send_lock);
+	g_mutex_unlock (xport->priv->send_lock);
+
 	g_mutex_free (xport->priv->send_lock);
 	g_free (xport->priv);
 }
