@@ -615,20 +615,6 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	return FALSE;
 }
 
-static void
-tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
-{
-	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
-	GtkTreeModel *model = GTK_TREE_MODEL (self);
-
-	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME ||
-		changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || 
-		changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
-	{
-		gtk_tree_model_foreach (model, updater, change);
-	}
-}
-
 
 static gboolean
 find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointer user_data)
@@ -672,6 +658,23 @@ find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointe
 
 	return FALSE;
 }
+
+static void
+tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
+	GtkTreeModel *model = GTK_TREE_MODEL (self);
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel *) self;
+
+	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME ||
+		changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || 
+		changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
+	{
+		gtk_tree_model_foreach (model, updater, change);
+	}
+}
+
+
 
 static void
 tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
