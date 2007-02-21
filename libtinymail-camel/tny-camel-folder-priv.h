@@ -33,7 +33,7 @@ struct _TnyCamelFolderPriv
 	GType headers_list_type;
 	guint folder_changed_id;
 	guint headers_managed;
-	GMutex *folder_lock;
+	GStaticRecMutex *folder_lock;
 	CamelFolder *folder;
 	gchar *folder_name;
 	TnyAccount *account; CamelStore *store;
