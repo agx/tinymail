@@ -917,12 +917,13 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 	CamelTcpStreamSSL *ssl;
 	CERTCertificate *cert;
 	SECStatus status = SECFailure;
-	struct _CamelTcpStreamSSLPrivate *priv = ssl->priv;
+	struct _CamelTcpStreamSSLPrivate *priv;
 
 	g_return_val_if_fail (data != NULL, SECFailure);
 	g_return_val_if_fail (CAMEL_IS_TCP_STREAM_SSL (data), SECFailure);
 
 	ssl = data;
+	priv = ssl->priv;
 	
 	cert = SSL_PeerCertificate (sockfd);
 	if (cert == NULL)
