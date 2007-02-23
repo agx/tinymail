@@ -2081,6 +2081,7 @@ imap_transfer_resyncing (CamelFolder *source, GPtrArray *uids,
 			/* TNY TODO: detect whether or not to persist partial message retrieval */
 			message = camel_folder_get_message (source, uid, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 			if (!message) {
+				i++;
 				/* Message must have been expunged */
 				continue;
 			}

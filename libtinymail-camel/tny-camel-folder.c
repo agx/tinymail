@@ -1765,8 +1765,10 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_src);
 	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);
 
-	g_static_rec_mutex_lock (priv_src->folder_lock);
-	g_static_rec_mutex_lock (priv_dst->folder_lock);
+	/* TNY TODO: solve this lock */
+
+	/*g_static_rec_mutex_lock (priv_src->folder_lock);
+	g_static_rec_mutex_lock (priv_dst->folder_lock);*/
 
 	/* Get camel folders */
 	cfol_src = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder_src));
@@ -1812,8 +1814,8 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 		g_ptr_array_free (transferred_uids, TRUE);
 	g_ptr_array_free (uids, TRUE);
 
-	g_static_rec_mutex_unlock (priv_dst->folder_lock);
-	g_static_rec_mutex_unlock (priv_src->folder_lock);
+	/*g_static_rec_mutex_unlock (priv_dst->folder_lock);
+	g_static_rec_mutex_unlock (priv_src->folder_lock);*/
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
