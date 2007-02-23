@@ -298,6 +298,7 @@ camel_imap_summary_add_offline (CamelFolderSummary *summary, const char *uid,
 	/* Copy flags 'n' tags */
 	mi->info.flags = camel_message_info_flags(info);
 
+#ifdef NON_TINYMAIL_FEATURES
 	flag = camel_message_info_user_flags(info);
 	while (flag) {
 		camel_message_info_set_user_flag((CamelMessageInfo *)mi, flag->name, TRUE);
@@ -308,6 +309,7 @@ camel_imap_summary_add_offline (CamelFolderSummary *summary, const char *uid,
 		camel_message_info_set_user_tag((CamelMessageInfo *)mi, tag->name, tag->value);
 		tag = tag->next;
 	}
+#endif
 
 	mi->info.size = ((CamelMessageInfoBase *)info)->size;
 	mi->info.flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;

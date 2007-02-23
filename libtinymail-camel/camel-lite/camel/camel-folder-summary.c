@@ -3428,8 +3428,6 @@ info_ptr(const CamelMessageInfo *mi, int id)
 		return ((const CamelMessageInfoBase *)mi)->user_tags;
 #endif
 
-	default:
-		abort();
 	}
 }
 
@@ -3444,8 +3442,6 @@ info_uint32(const CamelMessageInfo *mi, int id)
 		return ((const CamelMessageInfoBase *)mi)->flags;
 	case CAMEL_MESSAGE_INFO_SIZE:
 		return ((const CamelMessageInfoBase *)mi)->size;
-	default:
-		abort();
 	}
 }
 
