@@ -1350,7 +1350,7 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 	imap_sync_offline (folder, ex);
 	
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-	camel_imap_folder_start_idle (folder);
+	/* camel_imap_folder_start_idle (folder); */
 }
 
 static int
@@ -2015,10 +2015,11 @@ imap_transfer_online (CamelFolder *source, GPtrArray *uids,
 		return;
 
 	/* Make the destination notice its new messages */
-	if (store->current_folder != dest ||
+
+	/*if (store->current_folder != dest ||
 	    camel_folder_summary_count (dest->summary) == count)
-		camel_folder_refresh_info (dest, ex);
-	
+		camel_folder_refresh_info (dest, ex); */
+
 	/* FIXME */
 	if (transferred_uids)
 		*transferred_uids = NULL;
