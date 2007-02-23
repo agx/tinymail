@@ -3834,7 +3834,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 				nread = -1;
 				goto berrorhander;
 			}
-	
+
+			two_bytes [0] = ' ';
+
 			/*
 			a01 uid fetch 1 BINARY.PEEK[]
 			* 1 FETCH (UID 1 BINARY[] {24693}\r\n
