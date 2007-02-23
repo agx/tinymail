@@ -23,6 +23,25 @@
 
 
 /**
+ * tny_account_cancel:
+ * @self: a #TnyAccount object
+ *
+ * Cancels the current operation
+ *
+ **/
+void 
+tny_account_cancel (TnyAccount *self)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_GET_IFACE (self)->cancel_func)
+		g_critical ("You must implement tny_account_cancel\n");
+#endif
+
+	TNY_ACCOUNT_GET_IFACE (self)->cancel_func (self);
+	return;
+}
+
+/**
  * tny_account_get_account_type:
  * @self: a #TnyAccount object
  *

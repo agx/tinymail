@@ -1,3 +1,9 @@
+2007-02-23  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* tny_account_cancel API
+
+	* This was a major API change
+
 2007-02-20  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Disabled the LIST with LSUB merging (it just doesn't sound right to

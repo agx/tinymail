@@ -591,6 +591,43 @@ tny_camel_account_get_hostname_default (TnyAccount *self)
 }
 
 
+static void 
+tny_camel_account_cancel (TnyAccount *self)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->cancel_func (self);
+}
+
+static void 
+tny_camel_account_cancel_default (TnyAccount *self)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	GThread *thread;
+
+	g_mutex_lock (priv->cancel_lock);
+
+	/* I know this isn't polite. But it works ;-) */
+	/* camel_operation_cancel (NULL); */
+	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
+	g_thread_join (thread);
+
+	if (priv->cancel)
+	{
+		while (!camel_operation_cancel_check (priv->cancel)) 
+		{ 
+			g_warning (_("Cancellation failed, retrying\n"));
+			thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
+			g_thread_join (thread);
+		}
+		tny_camel_account_stop_camel_operation_priv (priv);
+	}
+
+	camel_operation_uncancel (NULL);
+
+	g_mutex_unlock (priv->cancel_lock);
+
+	return;
+}
+
 
 static guint 
 tny_camel_account_get_port (TnyAccount *self)
@@ -876,6 +913,7 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->get_name_func = tny_camel_account_get_name;
 	klass->set_name_func = tny_camel_account_set_name;
 	klass->get_account_type_func = tny_camel_account_get_account_type;
+	klass->cancel_func = tny_camel_account_cancel;
 
 	return;
 }
@@ -910,6 +948,7 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->get_name_func = tny_camel_account_get_name_default;
 	class->set_name_func = tny_camel_account_set_name_default;
 	class->get_account_type_func = tny_camel_account_get_account_type_default;
+	class->cancel_func = tny_camel_account_cancel_default;
 
 	class->add_option_func = tny_camel_account_add_option_default;
 	class->set_online_func = tny_camel_account_set_online_default;
