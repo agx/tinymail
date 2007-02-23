@@ -510,17 +510,20 @@ get_folder_info (CamelStore *store, const char *top, guint32 flags, CamelExcepti
 
 		/* create a dummy "." parent inbox, use to scan, then put back at the top level */
 		fi = scan_fi(store, flags, url, ".", _("Inbox"));
+
 		if (scan_dirs(store, flags, fi, url, ex) == -1)
 			goto fail;
+
 		fi->next = fi->child;
 		scan = fi->child;
 		fi->child = NULL;
+
 		while (scan) {
 			scan->parent = NULL;
 			scan = scan->next;
 		}
 		fi->flags &= ~CAMEL_FOLDER_CHILDREN;
-		fi->flags |= CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_NOCHILDREN|CAMEL_FOLDER_NOINFERIORS|CAMEL_FOLDER_TYPE_INBOX;
+		fi->flags |= CAMEL_FOLDER_VIRTUAL|CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_NOCHILDREN|CAMEL_FOLDER_NOINFERIORS|CAMEL_FOLDER_TYPE_INBOX;
 	} else if (!strcmp(top, ".")) {
 		fi = scan_fi(store, flags, url, ".", _("Inbox"));
 		fi->flags |= CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_NOCHILDREN|CAMEL_FOLDER_NOINFERIORS|CAMEL_FOLDER_TYPE_INBOX;

@@ -2344,7 +2344,8 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	  iter = iter->child;
 	  while (iter)
 	  {
-		if (_tny_folder_store_query_passes (query, iter))
+		/* Also take a look at camel-maildir-store.c:525 */
+		if (!(iter->flags & CAMEL_FOLDER_VIRTUAL) && _tny_folder_store_query_passes (query, iter))
 		{
 			gboolean was_new = FALSE;
 
