@@ -377,7 +377,9 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			folder = tny_header_get_folder (header);
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_get_msg (folder, header, NULL);
+				GError *err = NULL;
+
+				msg = tny_folder_get_msg (folder, header, &err);
 				if (G_LIKELY (msg))
 				{
 					tny_msg_view_set_msg (priv->msg_view, msg);
@@ -385,6 +387,23 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 				} else { 
 					tny_msg_view_set_unavailable (priv->msg_view);
 				}
+
+				if (err != NULL)
+				{
+					GtkWidget *edialog;
+
+					edialog = gtk_message_dialog_new (
+							  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+							  GTK_DIALOG_DESTROY_WITH_PARENT,
+							  GTK_MESSAGE_ERROR,
+							  GTK_BUTTONS_CLOSE,
+							  err->message);
+					g_signal_connect_swapped (edialog, "response",
+						G_CALLBACK (gtk_widget_destroy), edialog);
+					gtk_widget_show_all (edialog);
+					g_error_free (err);
+				}
+
 				g_object_unref (G_OBJECT (folder));
 			}
 
