@@ -26,6 +26,13 @@
 #include <config.h>
 #endif
 
+/*
+ * this is a bit ugly, but required for compilation on Maemo
+ */
+#ifndef ICONV_10646
+#define ICONV_10646 "iso-10646" 
+#endif /*ICONV_10646*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
