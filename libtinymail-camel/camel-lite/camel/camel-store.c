@@ -912,8 +912,8 @@ CamelFolderInfo*
 camel_folder_info_new (void)
 {
 	CamelFolderInfo *retval = g_slice_new0 (CamelFolderInfo);
-	retval->unread = -1;
-	retval->total = -1;
+	retval->unread = 0;
+	retval->total = 0;
 	return retval;
 }
 

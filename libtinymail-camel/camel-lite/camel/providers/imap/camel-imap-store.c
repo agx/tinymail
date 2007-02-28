@@ -2931,16 +2931,14 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 			if (fi) 
 			{
-				if (j == 0)
+				if (FALSE && j == 0)
 				{
 					struct imap_status_item *item, *items;
-					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES UNSEEN");
+					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES");
 					while (item != NULL) 
 					{
-						if (!g_ascii_strcasecmp (item->name, "MESSAGES")) {
-							fi->total = item->value; }
-						if (!g_ascii_strcasecmp (item->name, "UNSEEN"))
-							fi->unread = item->value;
+						if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
+							fi->total = item->value;
 						item = item->next;
 					}
 					imap_status_item_free (items);
@@ -2983,19 +2981,22 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 	/* FIXME: we need to emit folder_create/subscribed/etc events for any new folders */
 	count = camel_store_summary_count((CamelStoreSummary *)imap_store->summary);
-	for (i=0;i<count;i++) {
+
+	for (i=0;i<count;i++) 
+	{
 		si = camel_store_summary_index((CamelStoreSummary *)imap_store->summary, i);
 		if (si == NULL)
 			continue;
 
-		if (imap_match_pattern(imap_store->dir_sep, pattern, camel_imap_store_info_full_name(imap_store->summary, si))) {
-			if ((fi = g_hash_table_lookup(present, camel_store_info_path(imap_store->summary, si))) != NULL) {
-				if (((fi->flags ^ si->flags) & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED)) {
+		if (imap_match_pattern(imap_store->dir_sep, pattern, camel_imap_store_info_full_name(imap_store->summary, si))) 
+		{
+			if ((fi = g_hash_table_lookup(present, camel_store_info_path(imap_store->summary, si))) != NULL) 
+			{
+				if (((fi->flags ^ si->flags) & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED))
 					si->flags = (si->flags & ~CAMEL_FOLDER_SUBSCRIBED) | (fi->flags & CAMEL_FOLDER_SUBSCRIBED);
-					si->unread = fi->unread;
-					si->total = fi->total;
-					camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
-				}
+				si->unread = fi->unread;
+				si->total = fi->total;
+				camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
 			} else {
 				camel_store_summary_remove((CamelStoreSummary *)imap_store->summary, si);
 				count--;

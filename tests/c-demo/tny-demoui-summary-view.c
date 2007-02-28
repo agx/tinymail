@@ -1190,15 +1190,17 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
-	if (G_UNLIKELY (FALSE))
-	{ /* Not really working yet */
-		renderer = gtk_cell_renderer_text_new ();
-		column = gtk_tree_view_column_new_with_attributes (_("Unread"), renderer,
-			"text", TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, NULL);
-		gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN);
+	renderer = gtk_cell_renderer_text_new ();
+	column = gtk_tree_view_column_new_with_attributes (_("Unread"), renderer,
+		"text", TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
-		gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
-	}
+	renderer = gtk_cell_renderer_text_new ();
+	column = gtk_tree_view_column_new_with_attributes (_("Total"), renderer,
+		"text", TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, NULL);
+	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->mailbox_view), column);
 
 	/* TODO: Persist application UI status */
 	/* header_view columns */
