@@ -1397,7 +1397,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | 
 		CAMEL_STORE_FOLDER_INFO_RECURSIVE | CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
-	GList *pending = NULL, *deleting = NULL, *l; GString *fromname, *toname;
+	GList *pending = NULL, *deleting = NULL, *l; GString *fromname=NULL, *toname=NULL;
 	CamelFolderInfo *fi; const char *tmp; int fromlen;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelStore *fromstore; const gchar *frombase;
@@ -1596,9 +1596,11 @@ noexception:
 
 	camel_store_free_folder_info (fromstore, fi);
 	g_list_free (deleting);
-	
-	g_string_free (toname, TRUE);
-	g_string_free (fromname, TRUE);
+
+	if (toname)
+		g_string_free (toname, TRUE);
+	if (fromname)
+		g_string_free (fromname, TRUE);
 
 	if (tolock)
 		g_static_rec_mutex_unlock (tolock);
