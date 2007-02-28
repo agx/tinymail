@@ -37,7 +37,7 @@ struct _TnyCamelFolderPriv
 	CamelFolder *folder;
 	gchar *folder_name;
 	TnyAccount *account; CamelStore *store;
-	guint cached_length, unread_length, unread_sync;
+	guint cached_length, unread_length, unread_sync, local_size;
 	gboolean subscribed;
 	gboolean has_summary_cap;
 	CamelFolderInfo *iter;
@@ -56,8 +56,6 @@ void _tny_camel_folder_set_id (TnyCamelFolder *self, const gchar *id);
 void _tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed);
 void _tny_camel_folder_set_name (TnyCamelFolder *self, const gchar *name);
 void _tny_camel_folder_set_folder_type (TnyCamelFolder *folder, CamelFolderInfo *folder_info);
-void _tny_camel_folder_set_unread_count (TnyCamelFolder *self, guint len);
-void _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len);
 void _tny_camel_folder_check_uncache (TnyCamelFolder *self, TnyCamelFolderPriv *priv);
 void _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter);
 void _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account);
@@ -65,6 +63,9 @@ gboolean _tny_camel_folder_load_folder_no_lock (TnyCamelFolderPriv *priv);
 void _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder);
 void _tny_camel_folder_set_parent (TnyCamelFolder *self, TnyFolderStore *parent);
 void _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, CamelFolderInfo *info);
+void _tny_camel_folder_set_local_size (TnyCamelFolder *self, guint len);
+void _tny_camel_folder_set_unread_count (TnyCamelFolder *self, guint len);
+void _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len);
 
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_FOLDER, TnyCamelFolderPriv))

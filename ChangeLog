@@ -1,3 +1,7 @@
+2007-02-28  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Folder's unread count, total count and local size fixes
+
 2007-02-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* tny_account_cancel API

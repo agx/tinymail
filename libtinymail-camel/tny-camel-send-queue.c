@@ -422,6 +422,7 @@ create_maildir (TnySendQueue *self, const gchar *name)
 				_tny_camel_folder_set_folder_type (folder, iter);
 				_tny_camel_folder_set_unread_count (folder, iter->unread);
 				_tny_camel_folder_set_all_count (folder, iter->total);
+				_tny_camel_folder_set_local_size (folder, iter->local_size);
 				_tny_camel_folder_set_name (folder, iter->name);
 				_tny_camel_folder_set_iter (folder, iter);
 				_tny_camel_folder_set_account (folder, TNY_ACCOUNT (priv->trans_account));

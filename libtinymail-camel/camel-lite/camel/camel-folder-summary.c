@@ -38,6 +38,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <ctype.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "libedataserver/e-iconv.h"
 
@@ -293,7 +297,6 @@ foreach_msginfo (gpointer data, gpointer user_data)
 static inline 
 gboolean always_true (gpointer key, gpointer value, gpointer gp)
 {
-	
 	return TRUE;
 }
 
@@ -781,6 +784,7 @@ error:
 
 	return -1;
 }
+
 
 /* saves the content descriptions, recursively */
 static int
@@ -1813,7 +1817,6 @@ summary_header_load(CamelFolderSummary *s)
 	s->filepos += 4;
 	s->saved_count = g_ntohl(get_unaligned_u32(s->filepos)); 
 	s->filepos += 4;
-
 
 	if (s->version < 0x100 && s->version >= 13) {
 		s->unread_count = g_ntohl(get_unaligned_u32(s->filepos)); 

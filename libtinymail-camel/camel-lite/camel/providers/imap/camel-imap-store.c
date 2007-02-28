@@ -34,6 +34,9 @@
 
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "camel/camel-debug.h"
 #include "camel/camel-disco-diary.h"
@@ -2999,17 +3002,114 @@ dumpfi(CamelFolderInfo *fi)
 }
 #endif
 
+
+static int
+isdir (char *name)
+{
+	struct stat st;
+	if (stat (name, &st))
+	{
+		perror (name);
+		return 0;
+	}
+	return S_ISDIR (st.st_mode);
+}
+
+static char *ignored_names[] = { ".", "..", NULL };
+
+int
+ignorent (char *name)
+{
+	char **p;
+	for (p = ignored_names; *p; p++)
+		if (strcmp (name, *p) == 0)
+			return 1;
+	return 0;
+}
+
+
+void
+my_du (char *name, int *my_size)
+{
+	DIR *dir;
+	struct dirent *ent;
+
+	chdir (name);
+	dir = opendir (name);
+
+	if (!dir)
+	{
+		perror (name);
+		return;
+	}
+
+	while ((ent = readdir (dir)))
+	{
+		if (!ignorent (ent->d_name))
+		{
+			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
+			if (isdir (p))
+				my_du (p, my_size);
+			else 
+			{
+				struct stat st;
+				if (stat (p, &st) == 0)
+					*my_size += st.st_size;
+			}
+			g_free (p);
+		}
+	}
+
+	closedir (dir);
+}
+
 static void
 fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 {
 	CamelFolder *folder;
+	CamelImapStore *imap_store = (CamelImapStore *) store;
+	gint msize = 0;
+	char *storage_path = g_strdup_printf("%s/folders", imap_store->storage_path);
+	char *folder_dir = imap_path_to_physical (storage_path, fi->full_name);
+
+	g_free(storage_path);
+	my_du (folder_dir, &msize);
+
+	fi->unread = -1;
+	fi->total = -1;
 
 	folder = camel_object_bag_peek(store->folders, fi->full_name);
 	if (folder) {
 		fi->unread = camel_folder_get_unread_message_count(folder);
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
+	} else {
+		gchar *spath = g_strdup_printf ("%s/summary.mmap", folder_dir);
+		FILE *f = fopen (spath, "r");
+		g_free (spath);
+		if (f) {
+			gint tsize = ((sizeof (guint32) * 5) + sizeof (time_t));
+			char *buffer = malloc (tsize), *ptr;
+			guint32 version, a;
+			a = fread (buffer, 1, tsize, f);
+			if (a == tsize) 
+			{
+				ptr = buffer;
+				version = g_ntohl(get_unaligned_u32(ptr));
+				ptr += 16;
+				fi->total = g_ntohl(get_unaligned_u32(ptr));
+				ptr += 4;
+				if (version < 0x100 && version >= 13)
+					fi->unread = g_ntohl(get_unaligned_u32(ptr));
+			}
+			g_free (buffer);
+			fclose (f);
+		} 
 	}
+
+	fi->local_size = msize;
+	g_free (folder_dir);
+
 }
 
 struct _refresh_msg {

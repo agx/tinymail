@@ -600,6 +600,15 @@ _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len)
 }
 
 
+void
+_tny_camel_folder_set_local_size (TnyCamelFolder *self, guint len)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	priv->local_size = len;
+
+	return;
+}
+
 static guint
 tny_camel_folder_get_all_count (TnyFolder *self)
 {
@@ -2138,6 +2147,7 @@ _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder,
 	_tny_camel_folder_set_folder_type (folder, info);
 	_tny_camel_folder_set_unread_count (folder, info->unread);
 	_tny_camel_folder_set_all_count (folder, info->total);
+	_tny_camel_folder_set_local_size (folder, info->local_size);
 	_tny_camel_folder_set_name (folder, info->name);
 	_tny_camel_folder_set_iter (folder, info);
 
@@ -2914,6 +2924,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->self = (TnyFolder *) self;
 	priv->want_changes = TRUE;
 
+	priv->local_size = 0;
 	priv->unread_sync = 0;
 	priv->dont_fkill = FALSE;
 	priv->observers = NULL;
