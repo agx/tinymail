@@ -911,7 +911,10 @@ camel_folder_info_free (CamelFolderInfo *fi)
 CamelFolderInfo* 
 camel_folder_info_new (void)
 {
-	return g_slice_new0 (CamelFolderInfo);
+	CamelFolderInfo *retval = g_slice_new0 (CamelFolderInfo);
+	retval->unread = -1;
+	retval->total = -1;
+	return retval;
 }
 
 static int

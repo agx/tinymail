@@ -1158,10 +1158,8 @@ imap_build_folder_info(CamelImapStore *imap_store, const char *folder_name)
 	CamelFolderInfo *fi;
 
 	fi = camel_folder_info_new ();
-	
 	fi->full_name = g_strdup(folder_name);
-	fi->unread = -1;
-	fi->total = -1;
+
 
 	url = camel_url_new (imap_store->base_url, NULL);
 	g_free (url->path);
@@ -2841,9 +2839,6 @@ parse_list_response_as_folder_info (CamelImapStore *imap_store,
 	fi->uri = camel_url_to_string (url, 0);
 	camel_url_free (url);
 
-	fi->total = -1;
-	fi->unread = -1;
-
 	return fi;
 }
 
@@ -2920,28 +2915,63 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 	   merge with LSUB?! (It doesn't make any sense) */
 
 	present = g_hash_table_new(folder_hash, folder_eq);
-	for (j=0;j<1;j++) {
+
+	for (j=0;j<2;j++) 
+	{
 		response = camel_imap_command (imap_store, NULL, ex,
 					       "%s \"\" %G", j==1 ? "LSUB" : "LIST",
 					       pattern);
 		if (!response)
 			goto fail;
 
-		for (i = 0; i < response->untagged->len; i++) {
+		for (i = 0; i < response->untagged->len; i++) 
+		{
 			list = response->untagged->pdata[i];
 			fi = parse_list_response_as_folder_info (imap_store, list);
-			if (fi) {
+
+			if (fi) 
+			{
+				if (j == 0)
+				{
+					struct imap_status_item *item, *items;
+					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES UNSEEN");
+					while (item != NULL) 
+					{
+						if (!g_ascii_strcasecmp (item->name, "MESSAGES")) {
+							fi->total = item->value; }
+						if (!g_ascii_strcasecmp (item->name, "UNSEEN"))
+							fi->unread = item->value;
+						item = item->next;
+					}
+					imap_status_item_free (items);
+				}
+
 				hfi = g_hash_table_lookup(present, fi->full_name);
-				if (hfi == NULL) {
-					if (j==1) {
+
+				if (hfi == NULL) 
+				{
+					if (j == 1) 
+					{
+						/* It's in LSUB but not in LIST? */
+
 						fi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
 						if ((fi->flags & (CAMEL_IMAP_FOLDER_MARKED | CAMEL_IMAP_FOLDER_UNMARKED)))
 							imap_store->capabilities |= IMAP_CAPABILITY_useful_lsub;
 					}
-					g_hash_table_insert(present, fi->full_name, fi);
+
+					if (j == 0) /* From the LSUB we don't add folders */
+						g_hash_table_insert(present, fi->full_name, fi);
+					else 
+						camel_folder_info_free(fi);
 				} else {
 					if (j == 1)
 						hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
+
+					if (j == 0) 
+					{
+						hfi->unread = fi->unread;
+						hfi->total = fi->total;
+					}
 					camel_folder_info_free(fi);
 				}
 			}
@@ -2962,6 +2992,8 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 			if ((fi = g_hash_table_lookup(present, camel_store_info_path(imap_store->summary, si))) != NULL) {
 				if (((fi->flags ^ si->flags) & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED)) {
 					si->flags = (si->flags & ~CAMEL_FOLDER_SUBSCRIBED) | (fi->flags & CAMEL_FOLDER_SUBSCRIBED);
+					si->unread = fi->unread;
+					si->total = fi->total;
 					camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
 				}
 			} else {
@@ -3069,19 +3101,21 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 	g_free(storage_path);
 	my_du (folder_dir, &msize);
 
-	fi->unread = -1;
-	fi->total = -1;
-
 	folder = camel_object_bag_peek(store->folders, fi->full_name);
-	if (folder) {
+
+	if (folder) 
+	{
 		fi->unread = camel_folder_get_unread_message_count(folder);
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
-	} else {
+
+	} else if ((fi->unread == -1) || (fi->total == -1)) {
 		gchar *spath = g_strdup_printf ("%s/summary.mmap", folder_dir);
 		FILE *f = fopen (spath, "r");
 		g_free (spath);
+
 		if (f) {
+
 			gint tsize = ((sizeof (guint32) * 5) + sizeof (time_t));
 			char *buffer = malloc (tsize), *ptr;
 			guint32 version, a;
@@ -3091,19 +3125,19 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 				ptr = buffer;
 				version = g_ntohl(get_unaligned_u32(ptr));
 				ptr += 16;
-				fi->total = g_ntohl(get_unaligned_u32(ptr));
+				if (fi->total == -1)
+					fi->total = g_ntohl(get_unaligned_u32(ptr));
 				ptr += 4;
-				if (version < 0x100 && version >= 13)
+				if (fi->unread == -1 && (version < 0x100 && version >= 13))
 					fi->unread = g_ntohl(get_unaligned_u32(ptr));
 			}
 			g_free (buffer);
 			fclose (f);
-		} 
+		}
 	}
 
 	fi->local_size = msize;
 	g_free (folder_dir);
-
 }
 
 struct _refresh_msg {
@@ -3313,11 +3347,14 @@ get_folder_info_offline (CamelStore *store, const char *top,
 		     || (include_inbox && !g_ascii_strcasecmp (camel_imap_store_info_full_name(imap_store->summary, si), "INBOX")))
 		    && ((imap_store->parameters & IMAP_PARAM_SUBSCRIPTIONS) == 0
 			|| (flags & CAMEL_STORE_FOLDER_INFO_SUBSCRIBED) == 0
-			|| (si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED))) {
+			|| (si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED))) 
+		{
+
 			fi = imap_build_folder_info(imap_store, camel_store_info_path((CamelStoreSummary *)imap_store->summary, si));
+			fi->flags = si->flags;
 			fi->unread = si->unread;
 			fi->total = si->total;
-			fi->flags = si->flags;
+
 			/* HACK: some servers report noinferiors for all folders (uw-imapd)
 			   We just translate this into nochildren, and let the imap layer enforce
 			   it.  See create folder */
