@@ -34,6 +34,18 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <dirent.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <stdio.h>
+#include <sys/types.h>
 
 #include "camel-operation.h"
 
@@ -129,18 +141,104 @@ pop3_get_folder_online (CamelStore *store, const char *folder_name, guint32 flag
 }
 
 
+
+static int
+isdir (char *name)
+{
+	struct stat st;
+	if (stat (name, &st))
+		return 0;
+	return S_ISDIR (st.st_mode);
+}
+
+static char *ignored_names[] = { ".", "..", NULL };
+
+int
+ignorent (char *name)
+{
+	char **p;
+	for (p = ignored_names; *p; p++)
+		if (strcmp (name, *p) == 0)
+			return 1;
+	return 0;
+}
+
+
+void
+my_du (char *name, int *my_size)
+{
+	DIR *dir;
+	struct dirent *ent;
+
+	chdir (name);
+	dir = opendir (name);
+
+	if (!dir)
+		return;
+
+	while ((ent = readdir (dir)))
+	{
+		if (!ignorent (ent->d_name))
+		{
+			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
+			if (isdir (p))
+				my_du (p, my_size);
+			else 
+			{
+				struct stat st;
+				if (stat (p, &st) == 0)
+					*my_size += st.st_size;
+			}
+			g_free (p);
+		}
+	}
+
+	closedir (dir);
+}
+
 static CamelFolderInfo *
 pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 {
 	CamelURL *url;
 	const char *name;
 	CamelFolderInfo *fi;
+	guint msize;
+	gchar *folder_dir = store->storage_path;
+	gchar *spath;
+	FILE *f;
 
 	fi = camel_folder_info_new ();
-	
+
 	fi->full_name = g_strdup(folder_name);
 	fi->unread = -1;
 	fi->total = -1;
+
+
+	my_du (folder_dir, &msize);
+	spath = g_strdup_printf ("%s/summary.mmap", folder_dir);
+	f = fopen (spath, "r");
+	g_free (spath);
+	if (f) {
+		gint tsize = ((sizeof (guint32) * 5) + sizeof (time_t));
+		char *buffer = malloc (tsize), *ptr;
+		guint32 version, a;
+		a = fread (buffer, 1, tsize, f);
+		if (a == tsize) 
+		{
+			ptr = buffer;
+			version = g_ntohl(get_unaligned_u32(ptr));
+			ptr += 16;
+			fi->total = g_ntohl(get_unaligned_u32(ptr));
+			ptr += 4;
+			if (version < 0x100 && version >= 13)
+				fi->unread = g_ntohl(get_unaligned_u32(ptr));
+		}
+		g_free (buffer);
+		fclose (f);
+	} 
+
+	fi->local_size = msize;
+	g_free (folder_dir);
 
 	fi->uri = g_strdup ("");
 	name = strrchr (fi->full_name, '/');

@@ -3008,10 +3008,7 @@ isdir (char *name)
 {
 	struct stat st;
 	if (stat (name, &st))
-	{
-		perror (name);
 		return 0;
-	}
 	return S_ISDIR (st.st_mode);
 }
 
@@ -3038,10 +3035,7 @@ my_du (char *name, int *my_size)
 	dir = opendir (name);
 
 	if (!dir)
-	{
-		perror (name);
 		return;
-	}
 
 	while ((ent = readdir (dir)))
 	{
