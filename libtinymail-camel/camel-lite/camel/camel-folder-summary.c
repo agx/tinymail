@@ -1012,8 +1012,8 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 	uid = camel_message_info_uid(info);
 	if (uid == NULL || uid[0] == 0) {
 
-		if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
-			g_free(info->uid);
+		/* if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
+			g_free(info->uid); */
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
 		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	}
@@ -2180,7 +2180,8 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
 
-	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
+	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE); 
+
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
 	mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
@@ -2313,9 +2314,9 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	io(printf("Saving message info\n"));
 
 	camel_file_util_encode_string(out, camel_message_info_uid(mi));
-	camel_file_util_encode_uint32(out, mi->flags);
 
 	camel_file_util_encode_uint32(out, mi->size);
+	camel_file_util_encode_uint32(out, mi->flags);
 
 	camel_file_util_encode_time_t(out, mi->date_sent);
 	camel_file_util_encode_time_t(out, mi->date_received);
@@ -3207,6 +3208,8 @@ camel_message_info_new (CamelFolderSummary *s)
 		info = g_slice_alloc0(s->message_info_size);
 	else
 		info = (CamelMessageInfo *) g_slice_new0(CamelMessageInfoBase);
+
+	((CamelMessageInfoBase *)info)->flags = 0;
 
 	info->refcount = 1;
 	info->summary = s;

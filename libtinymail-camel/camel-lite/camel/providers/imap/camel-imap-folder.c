@@ -970,7 +970,7 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 				if (changes == NULL)
 					changes = camel_folder_change_info_new();
 				camel_folder_change_info_change_uid(changes, uid);
-				flags_to_label(folder, (CamelImapMessageInfo *)info);
+				/* flags_to_label(folder, (CamelImapMessageInfo *)info); */
 			  }
 			  camel_message_info_free (info);
 			} else {
@@ -1174,7 +1174,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 			if (changes == NULL)
 				changes = camel_folder_change_info_new();
 			camel_folder_change_info_change_uid(changes, new[i].uid);
-			flags_to_label(folder, (CamelImapMessageInfo *)info);
+			/* flags_to_label(folder, (CamelImapMessageInfo *)info); */
 		}
 
 		camel_message_info_free(info);
@@ -3106,7 +3106,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 				  {
 					mi->server_flags = flags;
 					mi->info.flags |= flags;
-					flags_to_label(folder, mi);
+					/* flags_to_label(folder, mi); */
 				  }
 
 				  muid = g_datalist_get_data (&data, "UID");
@@ -3257,7 +3257,7 @@ process_idle_response (IdleResponse *idle_resp)
 					if (changes == NULL)
 						changes = camel_folder_change_info_new();
 					camel_folder_change_info_change_uid(changes, info->uid);
-					flags_to_label(idle_resp->folder, (CamelImapMessageInfo *)info);
+					/* flags_to_label(idle_resp->folder, (CamelImapMessageInfo *)info); */
 				}
 				camel_message_info_free (info);
 			}
