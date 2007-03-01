@@ -2934,11 +2934,13 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 				if (FALSE && j == 0)
 				{
 					struct imap_status_item *item, *items;
-					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES");
+					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES UNSEEN");
 					while (item != NULL) 
 					{
 						if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
 							fi->total = item->value;
+						if (!g_ascii_strcasecmp (item->name, "UNSEEN"))
+							fi->unread = item->value;
 						item = item->next;
 					}
 					imap_status_item_free (items);
