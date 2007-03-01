@@ -47,6 +47,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+#include "camel-file-utils.h"
 #include "camel-operation.h"
 
 #include "camel-pop3-store.h"
