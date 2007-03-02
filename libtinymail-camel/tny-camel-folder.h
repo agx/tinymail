@@ -79,6 +79,7 @@ struct _TnyCamelFolderClass
 	void (*poke_status_func) (TnyFolder *self);
 	void (*add_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
 	void (*remove_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
+	TnyFolderStats* (*get_stats_func) (TnyFolder *self);
 
 	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
 	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);

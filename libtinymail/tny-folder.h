@@ -104,6 +104,7 @@ struct _TnyFolderIface
 	void (*add_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
 	void (*remove_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
 	TnyFolderStore* (*get_folder_store_func) (TnyFolder *self);
+	TnyFolderStats* (*get_stats_func) (TnyFolder *self);
 
 };
 
@@ -137,6 +138,7 @@ void tny_folder_poke_status (TnyFolder *self);
 void tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer);
 void tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer);
 TnyFolderStore* tny_folder_get_folder_store (TnyFolder *self);
+TnyFolderStats* tny_folder_get_stats (TnyFolder *self);
 
 
 G_END_DECLS

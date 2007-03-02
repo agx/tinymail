@@ -27,6 +27,7 @@
 
 #include <tny-folder-store.h>
 #include <tny-folder.h>
+#include <tny-folder-stats.h>
 #include <tny-camel-folder.h>
 #include <tny-msg.h>
 #include <tny-header.h>
@@ -2683,6 +2684,24 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 }
 
 
+static TnyFolderStats *
+tny_camel_folder_get_stats (TnyFolder *self)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_stats_func (self);
+}
+
+static TnyFolderStats * 
+tny_camel_folder_get_stats_default (TnyFolder *self)
+{
+	TnyFolderStats *retval = tny_folder_stats_new (self);
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	/* TNY TODO: update unread, all_count and local_size here ! */
+
+	tny_folder_stats_set_local_size (retval, priv->local_size);
+
+	return retval;
+}
 
 static void
 tny_camel_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
@@ -2845,6 +2864,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->add_observer_func = tny_camel_folder_add_observer;
 	klass->remove_observer_func = tny_camel_folder_remove_observer;
 	klass->get_folder_store_func = tny_camel_folder_get_folder_store;
+	klass->get_stats_func = tny_camel_folder_get_stats;
 
 	return;
 }
@@ -2901,6 +2921,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->add_observer_func = tny_camel_folder_add_observer_default;
 	class->remove_observer_func = tny_camel_folder_remove_observer_default;
 	class->get_folder_store_func = tny_camel_folder_get_folder_store_default;
+	class->get_stats_func = tny_camel_folder_get_stats_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;

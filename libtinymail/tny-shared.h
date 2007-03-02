@@ -98,6 +98,8 @@ typedef struct _TnyFolderStoreChangeClass TnyFolderStoreChangeClass;
 typedef enum _TnyFolderStoreChangeChanged TnyFolderStoreChangeChanged;
 typedef struct _TnyFolderStoreObserver TnyFolderStoreObserver;
 typedef struct _TnyFolderStoreObserverIface TnyFolderStoreObserverIface;
+typedef struct _TnyFolderStats TnyFolderStats;
+typedef struct _TnyFolderStatsClass TnyFolderStatsClass;
 
 
 G_END_DECLS

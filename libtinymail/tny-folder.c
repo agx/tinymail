@@ -25,6 +25,27 @@
 #include <tny-folder.h>
 guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
+
+
+/**
+ * tny_folder_get_stats:
+ * @self: a TnyFolder object
+ *
+ * Get some statistics of the folder @self. You must unreference the return 
+ * value after use.
+ *
+ * Return value: some stats of the folder
+ **/
+TnyFolderStats* 
+tny_folder_get_stats (TnyFolder *self)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->get_stats_func)
+		g_critical ("You must implement tny_folder_get_stats\n");
+#endif
+	return TNY_FOLDER_GET_IFACE (self)->get_stats_func (self);
+}
+
 /**
  * tny_folder_add_observer:
  * @self: a #TnyFolder instance

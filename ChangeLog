@@ -1,3 +1,9 @@
+2007-03-02  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added the TnyFolderStats type
+
+	* This was a major API change
+
 2007-03-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed THE flags bug (size was swapped with the flags field when
