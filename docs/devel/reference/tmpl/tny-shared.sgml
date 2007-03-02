@@ -134,6 +134,8 @@ Shared include file with forward typedefs
 @poke_status_func: 
 @add_observer_func: 
 @remove_observer_func: 
+@get_folder_store_func: 
+@get_stats_func: 
 
 <!-- ##### STRUCT TnyHeader ##### -->
 <para>
@@ -236,6 +238,7 @@ Shared include file with forward typedefs
 @get_port_func: 
 @get_url_string_func: 
 @get_account_type_func: 
+@cancel_func: 
 
 <!-- ##### STRUCT TnyDevice ##### -->
 <para>
@@ -489,20 +492,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -644,4 +647,17 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 @parent: 
 @update_func: 
+
+<!-- ##### STRUCT TnyFolderStats ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyFolderStatsClass ##### -->
+<para>
+
+</para>
+
+@parent: 
 

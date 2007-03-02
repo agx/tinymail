@@ -58,6 +58,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @get_port_func: 
 @get_url_string_func: 
 @get_account_type_func: 
+@cancel_func: 
 
 <!-- ##### FUNCTION tny_account_type_get_type ##### -->
 <para>
@@ -263,5 +264,13 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 
 @self: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_account_cancel ##### -->
+<para>
+
+</para>
+
+@self: 
 
 

@@ -33,6 +33,8 @@ tny-folder-priv
 @store: 
 @cached_length: 
 @unread_length: 
+@unread_sync: 
+@local_size: 
 @subscribed: 
 @has_summary_cap: 
 @iter: 
@@ -46,6 +48,7 @@ tny-folder-priv
 @self: 
 @want_changes: 
 @dont_fkill: 
+@parent: 
 
 <!-- ##### MACRO TNY_CAMEL_FOLDER_GET_PRIVATE ##### -->
 <para>

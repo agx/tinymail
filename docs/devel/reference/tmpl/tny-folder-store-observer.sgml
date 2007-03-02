@@ -9,12 +9,10 @@ A type for observing changes to a folder store
 A type that observes changes that happen to a #TnyFolderStore
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

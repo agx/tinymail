@@ -4,19 +4,16 @@ TnyFolderStoreChange
 <!-- ##### SECTION Short_Description ##### -->
 A type with the changes between two states of a folder store
 
-
 <!-- ##### SECTION Long_Description ##### -->
 <para>
 A type with the delta or changes between two states of a #TnyFolderStore. The #TnyFolderStoreObserver will receive instances of this type
 as information about what got changed.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -45,15 +42,6 @@ as information about what got changed.
 @folder: 
 
 
-<!-- ##### FUNCTION tny_folder_store_change_add_renamed_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-
-
 <!-- ##### FUNCTION tny_folder_store_change_add_removed_folder ##### -->
 <para>
 
@@ -64,15 +52,6 @@ as information about what got changed.
 
 
 <!-- ##### FUNCTION tny_folder_store_change_get_created_folders ##### -->
-<para>
-
-</para>
-
-@self: 
-@folders: 
-
-
-<!-- ##### FUNCTION tny_folder_store_change_get_renamed_folders ##### -->
 <para>
 
 </para>

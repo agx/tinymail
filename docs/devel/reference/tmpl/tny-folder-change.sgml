@@ -33,6 +33,25 @@ as information about what got changed.
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_folder_change_get_rename ##### -->
+<para>
+
+</para>
+
+@self: 
+@oldname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_change_set_rename ##### -->
+<para>
+
+</para>
+
+@self: 
+@newname: 
+
+
 <!-- ##### FUNCTION tny_folder_change_set_new_all_count ##### -->
 <para>
 

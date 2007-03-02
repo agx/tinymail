@@ -17,15 +17,6 @@ Enumerations for tinymail
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### ENUM TnyFolderStoreChangeChanged ##### -->
-<para>
-
-</para>
-
-@TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS: 
-@TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS: 
-@TNY_FOLDER_STORE_CHANGE_CHANGED_RENAMED_FOLDERS: 
-
 <!-- ##### ENUM TnyFolderChangeChanged ##### -->
 <para>
 
@@ -35,6 +26,15 @@ Enumerations for tinymail
 @TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT: 
 @TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS: 
 @TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS: 
+@TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME: 
+
+<!-- ##### ENUM TnyFolderStoreChangeChanged ##### -->
+<para>
+
+</para>
+
+@TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS: 
+@TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS: 
 
 <!-- ##### ENUM TnyErrorDomain ##### -->
 <para>
