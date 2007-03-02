@@ -3047,7 +3047,7 @@ isdir (char *name)
 	return S_ISDIR (st.st_mode);
 }
 
-static char *ignored_names[] = { ".", "..", NULL };
+static char *ignored_names[] = { ".", "..", "subfolders", NULL };
 
 int
 ignorent (char *name)
