@@ -481,6 +481,8 @@ static int camel_maildir_summary_add(CamelLocalSummary *cls, const char *name, i
 	if (cls->index && (forceindex || !camel_index_has_name(cls->index, name))) {
 		d(printf("forcing indexing of message content\n"));
 		camel_folder_summary_set_index((CamelFolderSummary *)maildirs, cls->index);
+		/* TNY TODO: Cleanly solve this by removing the index code */
+		camel_folder_summary_set_index((CamelFolderSummary *)maildirs, NULL);
 	} else {
 		camel_folder_summary_set_index((CamelFolderSummary *)maildirs, NULL);
 	}

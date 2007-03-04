@@ -659,6 +659,10 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 			|| !camel_index_has_name(cls->index, camel_message_info_uid(mi)))) {
 			d(printf("Am indexing message %s\n", camel_message_info_uid(mi)));
 			camel_folder_summary_set_index(s, cls->index);
+
+			/* TNY TODO: Cleanly solve this by removing the index code */
+			camel_folder_summary_set_index(s, NULL);
+
 		} else {
 			d(printf("Not indexing message %s\n", camel_message_info_uid(mi)));
 			camel_folder_summary_set_index(s, NULL);

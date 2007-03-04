@@ -2566,7 +2566,11 @@ tny_camel_folder_poke_status_callback (gpointer data)
 			return;
 		}
 
+	newurlen = camel_folder_get_unread_message_count (priv->folder);
+	newlen = camel_folder_get_message_count (priv->folder);
+
 	g_static_rec_mutex_unlock (priv->folder_lock);
+
 
 	if (newlen != priv->cached_length || newurlen != priv->unread_length)
 	{
@@ -2577,6 +2581,7 @@ tny_camel_folder_poke_status_callback (gpointer data)
 			priv->cached_length = newlen;
 			tny_folder_change_set_new_all_count (change, priv->cached_length);
 		}
+
 
 		if (newurlen != priv->unread_length) 
 		{
