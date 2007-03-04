@@ -60,7 +60,7 @@ _tny_camel_imap_folder_new (void)
 static void
 tny_camel_imap_folder_finalize (GObject *object)
 {
-    
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -114,7 +114,7 @@ tny_camel_imap_folder_get_type (void)
 		  0,      /* n_preallocs */
 		  tny_camel_imap_folder_instance_init    /* instance_init */
 		};
-	    
+
 		type = g_type_register_static (TNY_TYPE_CAMEL_FOLDER,
 			"TnyCamelIMAPFolder",
 			&info, 0);	    

@@ -129,7 +129,7 @@ tny_camel_pop_folder_get_type (void)
 		  0,      /* n_preallocs */
 		  tny_camel_pop_folder_instance_init    /* instance_init */
 		};
-	    
+
 		type = g_type_register_static (TNY_TYPE_CAMEL_FOLDER,
 			"TnyCamelPOPFolder",
 			&info, 0);

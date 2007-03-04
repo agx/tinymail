@@ -197,7 +197,6 @@ tny_camel_pop_store_account_set_delete_originals (TnyCamelPOPStoreAccount *self,
 static void
 tny_camel_pop_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (instance);
 
 	priv->lock = g_mutex_new ();
@@ -235,7 +234,7 @@ tny_camel_pop_store_account_get_type (void)
 		  0,      /* n_preallocs */
 		  tny_camel_pop_store_account_instance_init    /* instance_init */
 		};
-	    
+
 		type = g_type_register_static (TNY_TYPE_CAMEL_STORE_ACCOUNT,
 			"TnyCamelPOPStoreAccount",
 			&info, 0);

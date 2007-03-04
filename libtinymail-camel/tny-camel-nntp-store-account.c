@@ -124,12 +124,6 @@ tny_camel_nntp_store_account_class_init (TnyCamelNNTPStoreAccountClass *class)
 	/* Protected override */
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder_func = tny_camel_nntp_store_account_factor_folder;
 
-	/* TODO: implement custom get_folders and get_folders_async for NNTP */
-	/* TODO: implement a TnyCamelNNTPFolder (that implements get_folders 
-	   and get_folders_async) */
-	/* TODO: Implement a TnyAccountStoreView that loads child folders on-demand */
-	/* TODO: implement do-nothing create_folder and remove_folder for NNTP */
-
 	object_class->finalize = tny_camel_nntp_store_account_finalize;
 
 	return;

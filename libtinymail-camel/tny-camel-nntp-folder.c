@@ -114,7 +114,7 @@ tny_camel_nntp_folder_get_type (void)
 		  0,      /* n_preallocs */
 		  tny_camel_nntp_folder_instance_init    /* instance_init */
 		};
-	    
+
 		type = g_type_register_static (TNY_TYPE_CAMEL_FOLDER,
 			"TnyCamelNNTPFolder",
 			&info, 0);	    
