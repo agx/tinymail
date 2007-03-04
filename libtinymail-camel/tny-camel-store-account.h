@@ -56,7 +56,7 @@ struct _TnyCamelStoreAccountClass
 	void (*add_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 	void (*remove_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 
-	/* protected methods*/
+	/* protected virtual methods*/
 	TnyFolder * (*factor_folder_func) (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new);
 };
 
