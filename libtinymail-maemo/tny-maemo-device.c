@@ -103,9 +103,8 @@ tny_maemo_device_force_online (TnyDevice *self)
 	
 	g_return_if_fail (TNY_IS_DEVICE(self));
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-	
-	if (!priv->is_online) 
-		if (!con_ic_connection_connect (priv->cnx,CON_IC_CONNECT_FLAG_NONE))
+
+	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE))
 			g_warning ("could not send connect dbus message");
 }
 
@@ -118,9 +117,8 @@ tny_maemo_device_force_offline (TnyDevice *self)
 	g_return_if_fail (TNY_IS_DEVICE(self));
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
-	if (priv->is_online)
-		if (!con_ic_connection_disconnect (priv->cnx))
-			g_warning ("could not send disconnect dbus message");
+	if (!con_ic_connection_disconnect (priv->cnx))
+		g_warning ("could not send disconnect dbus message");
 }
 
 
@@ -170,8 +168,7 @@ tny_maemo_device_new (void)
 	 * this will get us in connected state only if there is already a connection.
 	 * thus, this will setup our state correctly when we receive the signals
 	 */
-	if (!con_ic_connection_connect (priv->cnx,
-					CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
+	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
 		g_warning ("could not send connect dbus message");
 
 	return TNY_DEVICE (self);
@@ -183,12 +180,12 @@ tny_maemo_device_finalize (GObject *obj)
 	TnyMaemoDevicePriv *priv;
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (obj);
 
-	if (priv->cnx) {
-		con_ic_connection_disconnect (priv->cnx);
+	if (CON_IC_IS_CONNECTION(priv->cnx)) {
+		if (!con_ic_connection_disconnect (priv->cnx))
+			g_warning ("failed to send disconnect dbus message");
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
-	}
-	
+	}	
 	(*parent_class->finalize) (obj);
 }
 
