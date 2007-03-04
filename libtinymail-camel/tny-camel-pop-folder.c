@@ -62,7 +62,7 @@ _tny_camel_pop_folder_new (void)
 static void
 tny_camel_pop_folder_finalize (GObject *object)
 {
-    
+
 	(*parent_class->finalize) (object);
 
 	return;
