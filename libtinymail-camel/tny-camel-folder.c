@@ -2362,7 +2362,9 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 		{
 			gboolean was_new = FALSE;
 
-			TnyCamelFolder *folder = _tny_camel_store_account_folder_factory_get_folder (apriv, iter->full_name, &was_new);
+			TnyCamelFolder *folder = (TnyCamelFolder *) tny_camel_store_account_factor_folder (
+				TNY_CAMEL_STORE_ACCOUNT (priv->account), 
+				iter->full_name, &was_new);
 
 			if (was_new)
 				_tny_camel_folder_set_folder_info (self, folder, iter);

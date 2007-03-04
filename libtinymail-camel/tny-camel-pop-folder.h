@@ -51,7 +51,6 @@ struct _TnyCamelPOPFolderClass
 };
 
 GType tny_camel_pop_folder_get_type (void);
-TnyFolder* tny_camel_pop_folder_new (void);
 
 G_END_DECLS
 

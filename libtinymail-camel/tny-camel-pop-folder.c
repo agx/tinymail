@@ -41,6 +41,7 @@
 #include "tny-camel-folder-priv.h"
 #include "tny-camel-common-priv.h"
 
+#include "tny-camel-pop-folder-priv.h"
 #include "tny-camel-pop-store-account-priv.h"
 
 #include <tny-camel-shared.h>
@@ -57,7 +58,7 @@ static GObjectClass *parent_class = NULL;
  * Return value: A new POP #TnyFolder instance implemented for Camel
  **/
 TnyFolder*
-tny_camel_pop_folder_new (void)
+_tny_camel_pop_folder_new (void)
 {
 	TnyCamelPOPFolder *self = g_object_new (TNY_TYPE_CAMEL_POP_FOLDER, NULL);
 

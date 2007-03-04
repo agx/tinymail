@@ -1,6 +1,12 @@
 2007-03-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix for trac ticket #25
+	* Created a new libtinymail-camel API:
+	tny_camel_store_account_factor_folder
+	* Implemented a factor_folder for TnyCamelPopStoreAccount
+	* Implemented a rename for TnyCamelPopFolder
+
+	* This was an API change for libtinymail-camel
 
 2007-03-02  Philip Van Hoof  <pvanhoof@gnome.org>
 

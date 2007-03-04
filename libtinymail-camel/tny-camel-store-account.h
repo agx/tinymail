@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <tny-folder.h>
 #include <tny-camel-account.h>
 #include <tny-store-account.h>
 
@@ -54,10 +55,15 @@ struct _TnyCamelStoreAccountClass
 	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
 	void (*add_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 	void (*remove_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
+
+	/* protected methods*/
+	TnyFolder * (*factor_folder_func) (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new);
 };
 
 GType tny_camel_store_account_get_type (void);
 TnyStoreAccount* tny_camel_store_account_new (void);
+
+TnyFolder* tny_camel_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new);
 
 G_END_DECLS
 

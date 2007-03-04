@@ -557,15 +557,25 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	return folder;
 }
 
+
+
+
 static void
 tny_camel_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
 	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_func (self, list, query, err);
 }
 
-gpointer 
-_tny_camel_store_account_folder_factory_get_folder (TnyCamelStoreAccountPriv *priv, const gchar *full_name, gboolean *was_new)
+TnyFolder *
+tny_camel_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
 {
+	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->factor_folder_func (self, full_name, was_new);
+}
+
+static TnyFolder * 
+tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelFolder *folder = NULL;
 
 	GList *copy = priv->managed_folders;
@@ -587,7 +597,7 @@ _tny_camel_store_account_folder_factory_get_folder (TnyCamelStoreAccountPriv *pr
 		*was_new = TRUE;
 	}
 
-	return folder;
+	return (TnyFolder *) folder;
 }
 
 static void 
@@ -672,7 +682,9 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 		{
 			gboolean was_new = FALSE;
 
-			TnyCamelFolder *folder = _tny_camel_store_account_folder_factory_get_folder (priv, iter->full_name, &was_new);
+			TnyCamelFolder *folder = (TnyCamelFolder *) tny_camel_store_account_factor_folder (
+				TNY_CAMEL_STORE_ACCOUNT (self), 
+				iter->full_name, &was_new);
 
 			if (was_new && folder != NULL)
 				_tny_camel_folder_set_folder_info (self, folder, iter);
@@ -910,6 +922,9 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	class->remove_folder_func = tny_camel_store_account_remove_folder_default;
 	class->add_observer_func = tny_camel_store_account_add_observer_default;
 	class->remove_observer_func = tny_camel_store_account_remove_observer_default;
+
+	/* Protected default implementation */
+	class->factor_folder_func = tny_camel_store_account_factor_folder_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelStoreAccountPriv));
 
