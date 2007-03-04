@@ -70,6 +70,27 @@ tny_camel_pop_folder_finalize (GObject *object)
 
 
 static void 
+tny_camel_pop_folder_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
+{
+	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
+			"You can't use the tny_folder_store_remove_folder API on POP accounts");
+
+	return;
+}
+
+static TnyFolder* 
+tny_camel_pop_folder_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
+{
+	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+				"You can't use the tny_folder_store_create_folder API on POP accounts");
+
+	return NULL;
+}
+
+
+static void 
 tny_camel_pop_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
 {
 	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
@@ -88,6 +109,8 @@ tny_camel_pop_folder_class_init (TnyCamelPOPFolderClass *class)
 	object_class = (GObjectClass*) class;
 
 	TNY_CAMEL_FOLDER_CLASS (class)->set_name_func = tny_camel_pop_folder_set_name;
+	TNY_CAMEL_FOLDER_CLASS (class)->remove_folder_func = tny_camel_pop_folder_remove_folder;
+	TNY_CAMEL_FOLDER_CLASS (class)->create_folder_func = tny_camel_pop_folder_create_folder;
 
 	object_class->finalize = tny_camel_pop_folder_finalize;
 
