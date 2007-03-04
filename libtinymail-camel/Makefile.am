@@ -34,6 +34,8 @@ libtinymail_camel_1_0_headers =	\
 libtinymail_camel_priv_headers = \
 	tny-camel-pop-store-account-priv.h \
 	tny-camel-pop-folder-priv.h \
+	tny-camel-nntp-folder-priv.h \
+	tny-camel-imap-folder-priv.h \
 	tny-session-camel-priv.h \
 	tny-camel-common.c \
 	tny-camel-common-priv.h \

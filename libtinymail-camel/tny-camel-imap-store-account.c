@@ -50,6 +50,7 @@ stay as an abstract TnyStoreAccount type. */
 #include "tny-camel-store-account-priv.h"
 #include "tny-camel-folder-priv.h"
 #include "tny-camel-common-priv.h"
+#include "tny-camel-imap-folder-priv.h"
 
 #include <tny-camel-shared.h>
 #include <tny-account-store.h>
@@ -57,6 +58,35 @@ stay as an abstract TnyStoreAccount type. */
 
 static GObjectClass *parent_class = NULL;
 
+
+
+static TnyFolder * 
+tny_camel_imap_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelFolder *folder = NULL;
+
+	GList *copy = priv->managed_folders;
+	while (copy)
+	{
+		TnyFolder *fnd = (TnyFolder*) copy->data;
+		const gchar *name = tny_folder_get_id (fnd);
+		if (!strcmp (name, full_name))
+		{
+			folder = TNY_CAMEL_FOLDER (g_object_ref (G_OBJECT (fnd)));
+			*was_new = FALSE;
+			break;
+		}
+		copy = g_list_next (copy);
+	}
+
+	if (!folder) {
+		folder = TNY_CAMEL_FOLDER (_tny_camel_imap_folder_new ());
+		*was_new = TRUE;
+	}
+
+	return (TnyFolder *) folder;
+}
 
 /**
  * tny_camel_imap_store_account_new:
@@ -75,9 +105,9 @@ tny_camel_imap_store_account_new (void)
 static void
 tny_camel_imap_store_account_finalize (GObject *object)
 {
-    
-    	/* The abstract CamelStoreAccount finalizes everything correctly */
-    
+
+	/* The abstract CamelStoreAccount finalizes everything correctly */
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -91,7 +121,10 @@ tny_camel_imap_store_account_class_init (TnyCamelIMAPStoreAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-    	/* The abstract CamelStoreAccount has good default implementations
+	/* Protected override */
+	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder_func = tny_camel_imap_store_account_factor_folder;
+
+	/* The abstract CamelStoreAccount has good default implementations
 	of get_folders and get_folders_async for IMAP */
 
 	object_class->finalize = tny_camel_imap_store_account_finalize;
@@ -104,7 +137,7 @@ static void
 tny_camel_imap_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	/* The abstract CamelStoreAccount initializes everything correctly */
-    
+
 	return;
 }
 

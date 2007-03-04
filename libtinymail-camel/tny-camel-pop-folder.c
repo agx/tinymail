@@ -51,12 +51,6 @@
 static GObjectClass *parent_class = NULL;
 
 
-/**
- * tny_camel_pop_folder_new:
- * 
- *
- * Return value: A new POP #TnyFolder instance implemented for Camel
- **/
 TnyFolder*
 _tny_camel_pop_folder_new (void)
 {

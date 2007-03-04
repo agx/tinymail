@@ -50,7 +50,6 @@ struct _TnyCamelNNTPFolderClass
 };
 
 GType tny_camel_nntp_folder_get_type (void);
-TnyFolder* tny_camel_nntp_folder_new (void);
 
 G_END_DECLS
 

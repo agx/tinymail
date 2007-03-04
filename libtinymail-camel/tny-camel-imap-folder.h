@@ -49,7 +49,6 @@ struct _TnyCamelIMAPFolderClass
 };
 
 GType tny_camel_imap_folder_get_type (void);
-TnyFolder* tny_camel_imap_folder_new (void);
 
 G_END_DECLS
 

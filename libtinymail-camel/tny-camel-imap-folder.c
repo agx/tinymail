@@ -49,15 +49,8 @@ stay as an abstract TnyStoreAccount type. */
 
 static GObjectClass *parent_class = NULL;
 
-
-/**
- * tny_camel_imap_folder_new:
- * 
- *
- * Return value: A new IMAP #TnyFolder instance implemented for Camel
- **/
 TnyFolder*
-tny_camel_imap_folder_new (void)
+_tny_camel_imap_folder_new (void)
 {
 	TnyCamelIMAPFolder *self = g_object_new (TNY_TYPE_CAMEL_IMAP_FOLDER, NULL);
 

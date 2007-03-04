@@ -50,14 +50,8 @@ stay as an abstract TnyStoreAccount type. */
 static GObjectClass *parent_class = NULL;
 
 
-/**
- * tny_camel_nntp_folder_new:
- * 
- *
- * Return value: A new NNTP #TnyFolder instance implemented for Camel
- **/
 TnyFolder*
-tny_camel_nntp_folder_new (void)
+_tny_camel_nntp_folder_new (void)
 {
 	TnyCamelNNTPFolder *self = g_object_new (TNY_TYPE_CAMEL_NNTP_FOLDER, NULL);
 
@@ -67,7 +61,6 @@ tny_camel_nntp_folder_new (void)
 static void
 tny_camel_nntp_folder_finalize (GObject *object)
 {
-    
 	(*parent_class->finalize) (object);
 
 	return;
