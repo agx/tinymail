@@ -45,9 +45,20 @@ stay as an abstract TnyStoreAccount type. */
 
 #include <tny-camel-shared.h>
 #include <tny-account-store.h>
+#include <tny-error.h>
 
 
 static GObjectClass *parent_class = NULL;
+
+
+static void 
+tny_camel_nntp_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
+{
+	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+				"You can't use the tny_folder_set_name API on NNTP folders");
+	return;
+}
 
 
 TnyFolder*
@@ -73,6 +84,8 @@ tny_camel_nntp_folder_class_init (TnyCamelNNTPFolderClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+	TNY_CAMEL_FOLDER_CLASS (class)->set_name_func = tny_camel_nntp_folder_set_name;
 
 	object_class->finalize = tny_camel_nntp_folder_finalize;
 

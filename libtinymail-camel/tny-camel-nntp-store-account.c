@@ -54,10 +54,33 @@ stay as an abstract TnyStoreAccount type. */
 
 #include <tny-camel-shared.h>
 #include <tny-account-store.h>
+#include <tny-error.h>
 
 
 static GObjectClass *parent_class = NULL;
 
+
+
+
+static void 
+tny_camel_nntp_store_account_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
+{
+	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
+			"You can't use the tny_folder_store_remove_folder API on NNTP accounts");
+
+	return;
+}
+
+static TnyFolder* 
+tny_camel_nntp_store_account_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
+{
+	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+				"You can't use the tny_folder_store_create_folder API on NNTP accounts");
+
+	return NULL;
+}
 
 
 static TnyFolder * 
@@ -121,6 +144,9 @@ tny_camel_nntp_store_account_class_init (TnyCamelNNTPStoreAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
+	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->remove_folder_func = tny_camel_nntp_store_account_remove_folder;
+	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->create_folder_func = tny_camel_nntp_store_account_create_folder;
+
 	/* Protected override */
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder_func = tny_camel_nntp_store_account_factor_folder;
 
@@ -166,10 +192,10 @@ tny_camel_nntp_store_account_get_type (void)
 		  0,      /* n_preallocs */
 		  tny_camel_nntp_store_account_instance_init    /* instance_init */
 		};
-	    
+
 		type = g_type_register_static (TNY_TYPE_CAMEL_STORE_ACCOUNT,
 			"TnyCamelNNTPStoreAccount",
-			&info, 0);	    
+			&info, 0);
 	}
 
 	return type;

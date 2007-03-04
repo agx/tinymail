@@ -54,6 +54,7 @@ stay as an abstract TnyStoreAccount type. */
 
 #include <tny-camel-shared.h>
 #include <tny-account-store.h>
+#include <tny-error.h>
 
 
 static GObjectClass *parent_class = NULL;
@@ -124,9 +125,6 @@ tny_camel_imap_store_account_class_init (TnyCamelIMAPStoreAccountClass *class)
 	/* Protected override */
 	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder_func = tny_camel_imap_store_account_factor_folder;
 
-	/* The abstract CamelStoreAccount has good default implementations
-	of get_folders and get_folders_async for IMAP */
-
 	object_class->finalize = tny_camel_imap_store_account_finalize;
 
 	return;
@@ -169,10 +167,10 @@ tny_camel_imap_store_account_get_type (void)
 		  0,      /* n_preallocs */
 		  tny_camel_imap_store_account_instance_init    /* instance_init */
 		};
-	    
+
 		type = g_type_register_static (TNY_TYPE_CAMEL_STORE_ACCOUNT,
 			"TnyCamelIMAPStoreAccount",
-			&info, 0);	    
+			&info, 0);
 	}
 
 	return type;
