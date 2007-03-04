@@ -388,7 +388,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 	else {
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_ADD_MSG,
-			_("Malformed message"));
+			"Malformed message");
 		haderr = TRUE;
 	}
 
@@ -833,7 +833,7 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
 		tny_camel_folder_refresh_async_status, info, 
-		_("Fetching summary information for new messages in folder"));
+		"Fetching summary information for new messages in folder");
 
 	priv->want_changes = FALSE;
 	camel_folder_refresh_info (priv->folder, &ex);
@@ -1928,13 +1928,13 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 				g_free (nold_path);
 				g_set_error (err, TNY_FOLDER_ERROR, 
 					TNY_FOLDER_ERROR_SET_NAME,
-					_("Can't rename %s to %s"), old_path, name);
+					"Can't rename %s to %s", old_path, name);
 				goto errorh;
 			}
 		} else {
 				g_set_error (err, TNY_FOLDER_ERROR, 
 					TNY_FOLDER_ERROR_SET_NAME,
-					_("Can't rename the root INBOX folder"));
+					"Can't rename the root INBOX folder");
 				goto errorh;
 		}
 	}
@@ -2191,7 +2191,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				_("Failed to create folder with no name"));
+				"Failed to create folder with no name");
 
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
@@ -2202,7 +2202,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				_("Failed to create folder %s"), name);
+				"Failed to create folder %s", name);
 
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 

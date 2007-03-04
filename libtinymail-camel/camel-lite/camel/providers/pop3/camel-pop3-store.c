@@ -214,8 +214,8 @@ pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 	fi->unread = -1;
 	fi->total = -1;
 
-
 	my_du (folder_dir, &msize);
+
 	spath = g_strdup_printf ("%s/summary.mmap", folder_dir);
 	f = fopen (spath, "r");
 	g_free (spath);
@@ -239,7 +239,6 @@ pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 	} 
 
 	fi->local_size = msize;
-	g_free (folder_dir);
 
 	fi->uri = g_strdup ("");
 	name = strrchr (fi->full_name, '/');
@@ -744,12 +743,9 @@ pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 	
-	/* if (!CAMEL_SERVICE_CLASS (parent_class)->disconnect (service, clean, ex))
-		return FALSE;  */
-
 	camel_object_unref((CamelObject *)store->engine);
 	store->engine = NULL;
-	
+
 	return TRUE;
 }
 
@@ -777,17 +773,15 @@ finalize (CamelObject *object)
 {
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (object);
 
-	/* force disconnect so we dont have it run later, after we've cleaned up some stuff */
-	/* SIGH */
-
-	camel_service_disconnect((CamelService *)pop3_store, TRUE, NULL);
-
 	if (pop3_store->engine)
 		camel_object_unref((CamelObject *)pop3_store->engine);
+	pop3_store->engine = NULL;
 	if (pop3_store->cache)
 		camel_object_unref((CamelObject *)pop3_store->cache);
+	pop3_store->cache = NULL;
 	if (pop3_store->storage_path)
 		g_free (pop3_store->storage_path);
+	pop3_store->storage_path = NULL;
 }
 
 

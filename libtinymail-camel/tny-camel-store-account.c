@@ -158,7 +158,7 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 
 	} else {
 		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
-			_("Session not yet set, use tny_camel_account_set_session"));
+			"Session not yet set, use tny_camel_account_set_session");
 	}
 
 	g_static_rec_mutex_unlock (apriv->service_lock);
@@ -180,7 +180,7 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 		} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				_("Account not yet fully configured"));
+				"Account not yet fully configured");
 		}
 
 		return;
@@ -208,7 +208,7 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 			} else {
 				g_set_error (err, TNY_ACCOUNT_ERROR, 
 					TNY_ACCOUNT_ERROR_TRY_CONNECT,
-					_("Unknown error while connecting"));
+					"Unknown error while connecting");
 			}
 		} else {
 			apriv->connected = TRUE;
@@ -220,7 +220,7 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 	} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				_("Get and Forget password functions not yet set"));
+				"Get and Forget password functions not yet set");
 	}
 
 	return;
@@ -268,8 +268,8 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_warning (N_("Could not %s folder %s: %s\n"),
-			   subscribe ? _("subscribe to") : _("unsubscribe"),
+		g_warning ("Could not %s folder %s: %s\n",
+			   subscribe ? "subscribe to" : "unsubscribe",
 			   tny_folder_get_name (folder), 
 			   camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
@@ -400,7 +400,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
-				_("Account not ready for this operation (%s)"),
+				"Account not ready for this operation (%s)",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
 		return;
@@ -482,7 +482,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				_("Failed to create folder with no name"));
+				"Failed to create folder with no name");
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
@@ -493,7 +493,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				_("Account not ready for this operation (%s)"),
+				"Account not ready for this operation (%s)",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
@@ -612,7 +612,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-				_("Account not ready for this operation (%s)"),
+				"Account not ready for this operation (%s)",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
 		return;
@@ -674,11 +674,14 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 			TnyCamelFolder *folder = _tny_camel_store_account_folder_factory_get_folder (priv, iter->full_name, &was_new);
 
-			if (was_new)
+			if (was_new && folder != NULL)
 				_tny_camel_folder_set_folder_info (self, folder, iter);
 
-			tny_list_prepend (list, G_OBJECT (folder));
-			g_object_unref (G_OBJECT (folder));
+			if (folder != NULL)
+			{
+				tny_list_prepend (list, G_OBJECT (folder));
+				g_object_unref (G_OBJECT (folder));
+			}
 		}
 		iter = iter->next;
 	  }

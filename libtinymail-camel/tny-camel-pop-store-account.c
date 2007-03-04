@@ -60,13 +60,21 @@ static GObjectClass *parent_class = NULL;
 static void 
 tny_camel_pop_store_account_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
-	g_warning ("You can't use the tny_store_account_remove_folder API on POP accounts");
+	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
+			"You can't use the tny_folder_store_remove_folder API on POP accounts");
+
+	return;
 }
 
 static TnyFolder* 
 tny_camel_pop_store_account_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
 {
-	g_warning ("You can't use the tny_store_account_create_folder API on POP accounts");
+	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+				"You can't use the tny_folder_store_create_folder API on POP accounts");
+
+	return NULL;
 }
 
 
@@ -198,7 +206,7 @@ tny_camel_pop_store_account_get_type (void)
 	    
 		type = g_type_register_static (TNY_TYPE_CAMEL_STORE_ACCOUNT,
 			"TnyCamelPOPStoreAccount",
-			&info, 0);	    
+			&info, 0);
 	}
 
 	return type;
