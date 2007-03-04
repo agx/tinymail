@@ -132,10 +132,18 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 
 		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
-		tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
-		tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
-		me->folder_observables = g_list_prepend (me->folder_observables, folder);
-		me->store_observables = g_list_prepend (me->store_observables, folder);
+		if (TNY_IS_FOLDER (folder))
+		{
+			tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
+			me->folder_observables = g_list_prepend (me->folder_observables, folder);
+		}
+
+		if (TNY_IS_FOLDER_STORE (folder))
+		{
+			tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+			me->store_observables = g_list_prepend (me->store_observables, folder);
+		}
+
 
 		/* This adds a reference count to folder too. When it gets removed, that
 		   reference count is decreased automatically by the gtktreestore infra-
