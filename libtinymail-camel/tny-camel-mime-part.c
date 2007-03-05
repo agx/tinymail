@@ -30,12 +30,12 @@
 #include <camel/camel-data-wrapper.h>
 #include <tny-camel-shared.h>
 #include <tny-list.h>
-#include <tny-camel-header.h>
 #include <tny-camel-msg.h>
 
 static GObjectClass *parent_class = NULL;
 
 #include "tny-camel-mime-part-priv.h"
+#include "tny-camel-msg-header-priv.h"
 
 #include <camel/camel-url.h>
 #include <camel/camel-stream.h>
@@ -118,13 +118,12 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 			type = camel_mime_part_get_content_type (tpart);
 			if (camel_content_type_is (type, "message", "rfc822"))
 			{
-				TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
 				CamelDataWrapper *c = camel_medium_get_content_object (CAMEL_MEDIUM (tpart));
 			
 				if (c) 
 				{
+					TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (c), NULL);
 					newpart = TNY_MIME_PART (tny_camel_msg_new ());
-					_tny_camel_header_set_camel_mime_message (nheader, CAMEL_MIME_MESSAGE (c));
 					_tny_camel_msg_set_header (TNY_CAMEL_MSG (newpart), nheader);
 					_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (newpart), CAMEL_MIME_PART (c));
 					g_object_unref (G_OBJECT (nheader));

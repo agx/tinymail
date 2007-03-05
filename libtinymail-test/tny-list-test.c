@@ -126,10 +126,10 @@ setup_objs (int num, GObject **a, GObject **b, GObject **c, GObject **d)
 
     if (num == 5)
     {
-	*a = (GObject*) tny_camel_header_new ();
+/*	*a = (GObject*) tny_camel_header_new ();
 	*b = (GObject*) tny_camel_header_new ();
 	*c = (GObject*) tny_camel_header_new ();
-	*d = (GObject*) tny_camel_header_new ();
+	*d = (GObject*) tny_camel_header_new (); */
     }
 
     

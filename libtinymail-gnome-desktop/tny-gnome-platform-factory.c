@@ -22,7 +22,6 @@
 
 #include <tny-gnome-account-store.h>
 #include <tny-gnome-device.h>
-#include <tny-camel-header.h>
 #include <tny-camel-mime-part.h>
 #include <tny-camel-msg.h>
 
@@ -52,13 +51,6 @@ static TnyMimePart*
 tny_gnome_platform_factory_new_mime_part (TnyPlatformFactory *self)
 {
 	return tny_camel_mime_part_new ();
-}
-
-
-static TnyHeader*
-tny_gnome_platform_factory_new_header (TnyPlatformFactory *self)
-{
-	return tny_camel_header_new ();
 }
 
 
@@ -122,7 +114,6 @@ tny_platform_factory_init (gpointer g, gpointer iface_data)
 	klass->new_msg_view_func = tny_gnome_platform_factory_new_msg_view;
 	klass->new_msg_func = tny_gnome_platform_factory_new_msg;
 	klass->new_mime_part_func = tny_gnome_platform_factory_new_mime_part;
-	klass->new_header_func = tny_gnome_platform_factory_new_header;
 
 	return;
 }

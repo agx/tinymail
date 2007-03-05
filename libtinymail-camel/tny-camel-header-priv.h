@@ -20,27 +20,36 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <glib.h>
+#include <glib-object.h>
+#include <tny-header.h>
+
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 #include <tny-camel-folder.h>
 
 #include "tny-camel-folder-priv.h"
 
-typedef struct _WriteInfo WriteInfo;
-struct _WriteInfo
-{
-	CamelMimeMessage *msg;
-	gchar *mime_from;
-};
+
+G_BEGIN_DECLS
+
+#define TNY_TYPE_CAMEL_HEADER             (tny_camel_header_get_type ())
+#define TNY_CAMEL_HEADER(obj)             ((TnyCamelHeader*)obj)
+#define TNY_CAMEL_HEADER_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_HEADER, TnyCamelHeaderClass))
+#define TNY_IS_CAMEL_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_HEADER))
+#define TNY_IS_CAMEL_HEADER_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_HEADER))
+#define TNY_CAMEL_HEADER_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_HEADER, TnyCamelHeaderClass))
+
+typedef struct _TnyCamelHeader TnyCamelHeader;
+typedef struct _TnyCamelHeaderClass TnyCamelHeaderClass;
 
 
 #pragma pack(1)
 struct _TnyCamelHeader
 {
 	GObject parent;
-	gpointer info;
+	CamelMessageInfo *info;
 	TnyCamelFolder *folder;
-	guchar write:2;
 };
 
 struct _TnyCamelHeaderClass 
@@ -48,9 +57,14 @@ struct _TnyCamelHeaderClass
 	GObjectClass parent_class;
 };
 
+GType tny_camel_header_get_type (void);
+TnyHeader* _tny_camel_header_new (void);
+
 void _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit);
 void _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyCamelFolderPriv *tpriv);
-void _tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage *camel_mime_message);
 void _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *camel_message_info);
 
+G_END_DECLS
+
 #endif
+

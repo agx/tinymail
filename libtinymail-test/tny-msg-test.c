@@ -52,22 +52,6 @@ tny_msg_test_teardown (void)
 	return;
 }
 
-START_TEST (tny_msg_test_set_header)
-{
-	TnyHeader *header = TNY_HEADER (tny_camel_header_new ()), *gheader;
-	tny_msg_set_header (iface, header);
-	gheader = tny_msg_get_header (iface);
-	    
-	str = g_strdup_printf ("Get-header should return what setheader sets\n");
-	fail_unless (header == gheader, str);
-	g_free (str);
-
-	g_object_unref (G_OBJECT (gheader));
-	g_object_unref (G_OBJECT (header));
-    
-    	return;
-}
-END_TEST
 
 START_TEST (tny_msg_test_add_part_del_part)
 {
@@ -106,11 +90,6 @@ create_tny_msg_suite (void)
 {
      Suite *s = suite_create ("Message");
      TCase *tc = NULL;
-
-     tc = tcase_create ("Set Header");
-     tcase_add_checked_fixture (tc, tny_msg_test_setup, tny_msg_test_teardown);
-     tcase_add_test (tc, tny_msg_test_set_header);
-     suite_add_tcase (s, tc);
 
      tc = tcase_create ("Add Part Delete Part");
      tcase_add_checked_fixture (tc, tny_msg_test_setup, tny_msg_test_teardown);

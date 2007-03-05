@@ -26,6 +26,7 @@
 #include <tny-camel-header.h>
 
 static TnyHeader *iface = NULL;
+static TnyMsg *msg = NULL;
 
 /* TODO: Check wether we are missing testing properties here */
 
@@ -36,7 +37,8 @@ tny_header_test_setup (void)
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	iface = TNY_HEADER (tny_camel_header_new ());
+	msg = tny_camel_msg_new ();
+	iface = tny_msg_get_header (msg);
 
 	return;
 }
@@ -45,6 +47,8 @@ static void
 tny_header_test_teardown (void)
 {
 	g_object_unref (G_OBJECT (iface));
+	g_object_unref (G_OBJECT (msg));
+
 
 	return;
 }

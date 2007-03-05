@@ -146,7 +146,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 			if ((flags & (CAMEL_MESSAGE_SEEN|CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
 				priv->unread_length++;
 			priv->cached_length++;
-			TnyHeader *hdr = tny_camel_header_new ();
+			TnyHeader *hdr = _tny_camel_header_new ();
 			if (!change)
 				change = tny_folder_change_new (TNY_FOLDER (self));
 			_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
@@ -164,7 +164,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		CamelMessageInfo *info = camel_message_info_new_uid (NULL, uid);
 		if (info)
 		{
-			TnyHeader *hdr = tny_camel_header_new ();
+			TnyHeader *hdr = _tny_camel_header_new ();
 			priv->cached_length--;
 			priv->unread_sync++;
 			if (!change)
@@ -1031,13 +1031,11 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	CamelMessageFlags flags = camel_message_info_flags (mi);
 
 	/* TODO: Proxy instantiation (happens a lot, could use a pool) */
-	header = tny_camel_header_new ();
+
+	header = _tny_camel_header_new ();
 
 	_tny_camel_header_set_folder (TNY_CAMEL_HEADER (header), TNY_CAMEL_FOLDER (self), priv);
 	_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (header), mi, FALSE);
-
-	/* Get rid of the reference already. I know this is ugly */
-	/* camel_folder_free_message_info (cfol, mi); */
 
 	tny_list_prepend (headers, (GObject*)header);
 

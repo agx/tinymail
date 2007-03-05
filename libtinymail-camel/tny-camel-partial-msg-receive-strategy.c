@@ -28,7 +28,6 @@
 #include <tny-msg.h>
 #include <tny-header.h>
 #include <tny-camel-msg.h>
-#include <tny-camel-header.h>
 
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
@@ -42,6 +41,7 @@
 
 #include "tny-camel-account-priv.h"
 #include "tny-camel-folder-priv.h"
+#include "tny-camel-msg-header-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
@@ -76,14 +76,12 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 	{
 		if (camel_message && CAMEL_IS_OBJECT (camel_message))
 		{
-			TnyCamelHeader *nheader = TNY_CAMEL_HEADER (tny_camel_header_new ());
-
+			TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (camel_message), folder);
 			message = tny_camel_msg_new ();
 			_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), folder);
-			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
-				CAMEL_MIME_PART (camel_message)); 
-			_tny_camel_header_set_camel_mime_message (nheader, camel_message);
 			_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
+			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
+						CAMEL_MIME_PART (camel_message)); 
 			g_object_unref (G_OBJECT (nheader));
 		}
 	}

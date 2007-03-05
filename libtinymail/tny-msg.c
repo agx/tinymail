@@ -65,25 +65,6 @@ tny_msg_get_header (TnyMsg *self)
 	return TNY_MSG_GET_IFACE (self)->get_header_func (self);
 }
 
-/**
- * tny_msg_set_header:
- * @self: a #TnyMsg object
- * @header: the header to set
- * 
- * Set the header of @self.
- *
- **/
-void
-tny_msg_set_header (TnyMsg *self, TnyHeader *header)
-{
-#ifdef DEBUG
-	if (!TNY_MSG_GET_IFACE (self)->set_header_func)
-		g_critical ("You must implement tny_msg_set_header\n");
-#endif
-
-	TNY_MSG_GET_IFACE (self)->set_header_func (self, header);
-	return;
-}
 
 static void
 tny_msg_base_init (gpointer g_class)

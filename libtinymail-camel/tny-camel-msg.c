@@ -42,7 +42,7 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-camel-msg-priv.h"
 #include "tny-camel-mime-part-priv.h"
-#include "tny-camel-header-priv.h"
+#include "tny-camel-msg-header-priv.h"
 
 #define TNY_CAMEL_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_MSG, TnyCamelMsgPriv))
@@ -62,7 +62,6 @@ _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self)
 }
 
 
-
 static TnyFolder* 
 tny_camel_msg_get_folder (TnyMsg *self)
 {
@@ -77,7 +76,8 @@ tny_camel_msg_get_folder_default (TnyMsg *self)
 
 	g_mutex_lock (priv->folder_lock);
 	retval = priv->folder;
-	g_object_ref (G_OBJECT (retval));
+	if (retval)
+		g_object_ref (G_OBJECT (retval));
 	g_mutex_unlock (priv->folder_lock);
 
 	return retval;
@@ -106,6 +106,16 @@ tny_camel_msg_get_header (TnyMsg *self)
 	return TNY_CAMEL_MSG_GET_CLASS (self)->get_header_func (self);
 }
 
+void 
+_tny_camel_msg_set_header (TnyCamelMsg *self, TnyHeader *header)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+	g_mutex_lock (priv->header_lock);
+	priv->header = TNY_HEADER (g_object_ref (G_OBJECT (header)));
+	g_mutex_unlock (priv->header_lock);
+	return;
+}
+
 static TnyHeader*
 tny_camel_msg_get_header_default (TnyMsg *self)
 {
@@ -113,119 +123,21 @@ tny_camel_msg_get_header_default (TnyMsg *self)
 	TnyHeader *retval;
 
 	g_mutex_lock (priv->header_lock);
-	retval = priv->header;
-	if (retval)
-		g_object_ref (G_OBJECT (retval));
-	else {
+
+	if (!priv->header)
+	{
 		CamelMimeMessage *msg;
-		priv->header = tny_camel_header_new ();
 		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
-		_tny_camel_header_set_camel_mime_message 
-			(TNY_CAMEL_HEADER (priv->header), msg);
-		retval = priv->header;
+		/* Read _tny_camel_msg_header_new too! */
+		priv->header = _tny_camel_msg_header_new (msg, priv->folder);
 	}
+
+	retval = TNY_HEADER (g_object_ref (G_OBJECT (priv->header)));
+
 	g_mutex_unlock (priv->header_lock);
 
 	return retval;
 }
-
-
-
-void
-_tny_camel_msg_set_header (TnyCamelMsg *self, TnyCamelHeader *header)
-{
-	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
-	g_mutex_lock (priv->header_lock);
-
-	if (priv->header)
-		g_object_unref (G_OBJECT (priv->header));
-
-	g_object_ref (G_OBJECT (header));
-	priv->header = TNY_HEADER (header);
-	g_mutex_unlock (priv->header_lock);
-	return;
-}
-
-static void
-tny_camel_msg_set_header (TnyMsg *self, TnyHeader *header)
-{
-	TNY_CAMEL_MSG_GET_CLASS (self)->set_header_func (self, header);
-	return;
-}
-
-static void
-tny_camel_msg_set_header_default (TnyMsg *self, TnyHeader *header)
-{
-	CamelMimeMessage *msg;
-	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
-	/* CamelInternetAddress *from, *recipients, *replyto;
-	const gchar *str; */
-
-	g_assert (TNY_IS_CAMEL_HEADER (header));
-
-	g_mutex_lock (priv->header_lock);
-
-	if (priv->header)
-		g_object_unref (G_OBJECT (priv->header));
-	g_object_ref (G_OBJECT (header));
-
-	priv->header = header;
-
-	if (((TnyCamelHeader *)header)->write == 1)
-	{
-		TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-		g_mutex_lock (ppriv->part_lock);
-		if (ppriv->part) 
-		{
-			/* TODO: copy old part over? */
-			camel_object_unref (CAMEL_OBJECT (ppriv->part));
-		}
-		/* Add a reference? */
-		ppriv->part = (CamelMimePart *) ((WriteInfo*)((TnyCamelHeader *)header)->info)->msg;
-		g_mutex_unlock (ppriv->part_lock);
-	} else {
-		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
-		_tny_camel_header_set_camel_mime_message 
-			(TNY_CAMEL_HEADER (priv->header), msg);
-	}
-
-/*
-	from = camel_internet_address_new ();
-	str = tny_header_get_from (header);
-	_foreach_email_add_to_inet_addr (str, from);
-	camel_mime_message_set_from (msg, from);
-	camel_object_unref (CAMEL_OBJECT (from));
-
-	replyto = camel_internet_address_new ();
-	str = tny_header_get_replyto (header);
-	_foreach_email_add_to_inet_addr (str, replyto);
-	camel_mime_message_set_from (msg, replyto);
-	camel_object_unref (CAMEL_OBJECT (replyto));
-
-	recipients = camel_internet_address_new ();
-	str = tny_header_get_to (header);
-	_foreach_email_add_to_inet_addr (str, recipients);
-	camel_mime_message_set_recipients (msg, CAMEL_RECIPIENT_TYPE_TO, recipients);
-	camel_object_unref (CAMEL_OBJECT (recipients));
-
-	str = tny_header_get_cc (header);
-	_foreach_email_add_to_inet_addr (str, recipients);
-	camel_mime_message_set_recipients (msg, CAMEL_RECIPIENT_TYPE_CC, recipients);
-	camel_object_unref (CAMEL_OBJECT (recipients));
-
-	str = tny_header_get_bcc (header);
-	_foreach_email_add_to_inet_addr (str, recipients);
-	camel_mime_message_set_recipients (msg, CAMEL_RECIPIENT_TYPE_BCC, recipients);
-	camel_object_unref (CAMEL_OBJECT (recipients));
-
-	camel_mime_message_set_subject (msg ,tny_header_get_subject (header));
-*/
-
-	g_mutex_unlock (priv->header_lock);
-
-	return;
-}
-
 
 
 static void
@@ -267,34 +179,13 @@ TnyMsg*
 tny_camel_msg_new (void)
 {
 	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
-	
+
 	_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), 
 		CAMEL_MIME_PART (camel_mime_message_new ()));
 
 	return TNY_MSG (self);
 }
 
-/**
- * tny_camel_msg_new_with_header:
- * @header: a #TnyHeader object
- *
- * The #TnyCamelMsg implementation is actually a proxy for #CamelMimeMessage (and
- * a few other Camel types)
- *
- * Return value: A new #TnyMsg instance implemented for Camel
- **/
-TnyMsg*
-tny_camel_msg_new_with_header (TnyHeader *header)
-{
-	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
-
-	_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), 
-		CAMEL_MIME_PART (camel_mime_message_new ()));
-
-	tny_camel_msg_set_header (TNY_MSG (self), header);
-
-	return TNY_MSG (self);
-}
 
 /**
  * tny_camel_msg_new_with_part:
@@ -315,25 +206,6 @@ tny_camel_msg_new_with_part (CamelMimePart *part)
 	return TNY_MSG (self);
 }
 
-/**
- * tny_camel_msg_new_with_part_and_header:
- * @part: a #CamelMimePart object
- * @header: a #TnyHeader object
- * 
- * The #TnyMsg implementation is actually a proxy for #CamelMimePart.
- *
- * Return value: A new #TnyMsg instance implemented for Camel
- **/
-TnyMsg*
-tny_camel_msg_new_with_part_and_header (CamelMimePart *part, TnyHeader *header)
-{
-	TnyCamelMsg *self = g_object_new (TNY_TYPE_CAMEL_MSG, NULL);
-
-	_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (self), part);
-	tny_camel_msg_set_header (TNY_MSG (self), header);
-
-	return TNY_MSG (self);
-}
 
 static void
 tny_msg_init (gpointer g, gpointer iface_data)
@@ -341,7 +213,6 @@ tny_msg_init (gpointer g, gpointer iface_data)
 	TnyMsgIface *klass = (TnyMsgIface *)g;
 
 	klass->get_header_func = tny_camel_msg_get_header;
-	klass->set_header_func = tny_camel_msg_set_header;
 	klass->get_folder_func = tny_camel_msg_get_folder;
 
 	return;
@@ -356,7 +227,6 @@ tny_camel_msg_class_init (TnyCamelMsgClass *class)
 	object_class = (GObjectClass*) class;
 
 	class->get_header_func = tny_camel_msg_get_header_default;
-	class->set_header_func = tny_camel_msg_set_header_default;
 	class->get_folder_func = tny_camel_msg_get_folder_default;
 
 	object_class->finalize = tny_camel_msg_finalize;
@@ -374,7 +244,6 @@ tny_camel_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
 
 	priv->header = NULL;
-
 	priv->message_lock = g_mutex_new ();
 	priv->parts_lock = g_mutex_new ();
 	priv->header_lock = g_mutex_new ();

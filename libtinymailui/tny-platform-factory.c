@@ -73,28 +73,6 @@ tny_platform_factory_new_mime_part (TnyPlatformFactory *self)
 	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_mime_part_func (self);
 }
 
-/**
- * tny_platform_factory_new_header:
- * @self: a TnyPlatformFactory object
- *
- * Create a new #TnyHeader instance. The returned instance must be 
- * unreferenced after use.
- *
- * Implementors: when implementing a platform-specific library, return a 
- * new #TnyHeader instance.
- *
- * Return value: a #TnyHeader instance
- **/
-TnyHeader* 
-tny_platform_factory_new_header (TnyPlatformFactory *self)
-{
-#ifdef DEBUG
-	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_header_func)
-		g_critical ("You must implement tny_platform_factory_new_header\n");
-#endif
-
-	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_header_func (self);
-}
 
 /**
  * tny_platform_factory_new_account_store:

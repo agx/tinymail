@@ -53,6 +53,8 @@ libtinymail_camel_1_0_la_SOURCES = \
 	$(libtinymail_camel_1_0_headers) \
 	tny-camel-msg.c \
 	tny-camel-header.c \
+	tny-camel-msg-header-priv.h \
+	tny-camel-msg-header.c \
 	tny-camel-partial-msg-receive-strategy.c \
 	tny-camel-full-msg-receive-strategy.c \
 	tny-camel-msg-remove-strategy.c \

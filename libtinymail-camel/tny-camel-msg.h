@@ -53,15 +53,12 @@ struct _TnyCamelMsgClass
 	/* virtual methods */
 	TnyHeader* (*get_header_func) (TnyMsg *self);
 	TnyFolder* (*get_folder_func) (TnyMsg *self);
-	void (*set_header_func) (TnyMsg *self, TnyHeader *header);
 };
 
 GType tny_camel_msg_get_type (void);
 
 TnyMsg* tny_camel_msg_new (void);
-TnyMsg* tny_camel_msg_new_with_header (TnyHeader *header);
 TnyMsg* tny_camel_msg_new_with_part (CamelMimePart *part);
-TnyMsg* tny_camel_msg_new_with_part_and_header (CamelMimePart *part, TnyHeader *header);
 
 
 G_END_DECLS

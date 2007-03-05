@@ -29,14 +29,14 @@ struct _TnyCamelMsgPriv
 {
 	GMutex *message_lock;
 	GMutex *header_lock;
-	TnyHeader *header;
 	GMutex *parts_lock;
 	GMutex *folder_lock;
 	TnyFolder *folder;
+	TnyHeader *header;
 };
 
 CamelMimeMessage* _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self);
 void _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder *folder);
-void _tny_camel_msg_set_header (TnyCamelMsg *self, TnyCamelHeader *header);
+void _tny_camel_msg_set_header (TnyCamelMsg *self, TnyHeader *header);
 
 #endif

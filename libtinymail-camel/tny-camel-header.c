@@ -41,51 +41,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-static void 
-unref_info (TnyCamelHeader *self)
-{
-	if (self->info && self->write == 0)
-		camel_message_info_free (self->info);
-}
-
-static void 
-destroy_write (TnyCamelHeader *self)
-{
-	/* Also check out tny-msg.c: tny_msg_finalize (read the stupid hack) */
-	if (((WriteInfo*)self->info)->msg)
-		camel_object_unref (CAMEL_OBJECT (((WriteInfo*)self->info)->msg));
-
-	if (((WriteInfo*)self->info)->mime_from && ((WriteInfo*)self->info)->mime_from != NULL)
-		g_free (((WriteInfo*)self->info)->mime_from);
-
-	g_slice_free (WriteInfo, self->info);
-	self->info = NULL;
-	self->write = 3;
-}
-
-static void 
-destroy_mem (TnyCamelHeader *self)
-{
-	if (self->info)
-		camel_message_info_free ((CamelMessageInfo*) self->info);
-	self->info = NULL;
-	self->write = 3;
-}
-
-
-static void
-prepare_for_write (TnyCamelHeader *self)
-{
-	if (self->write != 1)
-	{
-		self->info = g_slice_new0 (WriteInfo);
-		((WriteInfo*)self->info)->msg = camel_mime_message_new ();
-		((WriteInfo*)self->info)->mime_from = NULL;
-		self->write = 1;
-	} 
-
-	return;
-}
 
 void 
 _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit)
@@ -93,17 +48,11 @@ _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo
 	if (!knowit && G_UNLIKELY (self->info))
 		g_warning ("Strange behaviour: Overwriting existing message info");
 
-	if (self->write == 1)
-		destroy_write (self);
-	else if (self->write == 2)
-		destroy_mem (self);
-	else if (self->write == 0)
-		unref_info (self);
+	if (self->info)
+		camel_message_info_free (self->info);
 
 	camel_message_info_ref (camel_message_info);
-
 	self->info = camel_message_info;
-	self->write = 0;
 
 	return;
 }
@@ -114,58 +63,20 @@ _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *info)
 	if (G_UNLIKELY (self->info))
 		g_warning ("Strange behaviour: Overwriting existing message info");
 
-	if (self->write == 1)
-		destroy_write (self);
-	else if (self->write == 2)
-		destroy_mem (self);
-	else if (self->write == 0)
-		unref_info (self);
+	if (self->info)
+		camel_message_info_free (self->info);
 
 	self->info = info;
-	self->write = 2;
 
 	return;
 }
 
 
-void 
-_tny_camel_header_set_camel_mime_message (TnyCamelHeader *self, CamelMimeMessage *camel_mime_message)
-{
-	if (G_UNLIKELY (self->info))
-		g_warning ("Strange behaviour: Overwriting existing message info");
-
-	if (self->write == 1)
-		destroy_write (self);
-	else if (self->write == 2)
-		destroy_mem (self);
-	else if (self->write == 0)
-		unref_info (self);
-
-	self->info = g_slice_new0 (WriteInfo);
-	((WriteInfo*)self->info)->mime_from = NULL;
-	self->write = 1;
-
-	((WriteInfo*)self->info)->msg = camel_mime_message;
-	camel_object_ref (CAMEL_OBJECT (camel_mime_message));
-
-	return;
-}
 static const gchar*
 tny_camel_header_get_replyto (TnyHeader *self)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
-
-	if (G_UNLIKELY (!me->info))
-		return NULL;
-
-	if (G_UNLIKELY (me->write == 1)) 
-	{
-		CamelInternetAddress *addr = (CamelInternetAddress*)
-			camel_mime_message_get_reply_to (((WriteInfo*)me->info)->msg);
-		if (addr)
-			retval = camel_address_format (CAMEL_ADDRESS (addr));
-	}
 
 	return retval;
 }
@@ -174,88 +85,35 @@ tny_camel_header_get_replyto (TnyHeader *self)
 static void
 tny_camel_header_set_bcc (TnyHeader *self, const gchar *bcc)
 {
-	TnyCamelHeader *me;
-	CamelInternetAddress *addr;
-
-	me = TNY_CAMEL_HEADER (self);
-	addr = camel_internet_address_new ();
-
-	_foreach_email_add_to_inet_addr (bcc, addr);
-
-	prepare_for_write (me);
-
-	camel_mime_message_set_recipients (((WriteInfo*)me->info)->msg, 
-		CAMEL_RECIPIENT_TYPE_BCC, addr);
-
-	camel_object_unref (CAMEL_OBJECT (addr));
-
+	g_warning ("tny_header_set_bcc: This is a summary header instance. You can't modify it.\n");
 	return;
 }
 
 static void
 tny_camel_header_set_cc (TnyHeader *self, const gchar *cc)
 {
-	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);    
-	CamelInternetAddress *addr = camel_internet_address_new ();
-
-	_foreach_email_add_to_inet_addr (cc, addr);
-
-	prepare_for_write (me);
-
-	camel_mime_message_set_recipients (((WriteInfo*)me->info)->msg, 
-		CAMEL_RECIPIENT_TYPE_CC, addr);
-	camel_object_unref (CAMEL_OBJECT (addr));
-
+	g_warning ("tny_header_set_cc: This is a summary header instance. You can't modify it.\n");
 	return;
 }
 
 static void
 tny_camel_header_set_from (TnyHeader *self, const gchar *from)
 {
-	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);    
-	CamelInternetAddress *addr = camel_internet_address_new ();
-	gchar *dup;
-
-	dup = g_strdup (from);
-	_string_to_camel_inet_addr (dup, addr);
-	g_free (dup);
-
-	prepare_for_write (me);
-
-	camel_mime_message_set_from (((WriteInfo*)me->info)->msg, addr);
-	camel_object_unref (CAMEL_OBJECT (addr));
-
+	g_warning ("tny_header_set_from: This is a summary header instance. You can't modify it.\n");
 	return;
 }
 
 static void
 tny_camel_header_set_subject (TnyHeader *self, const gchar *subject)
 {
-	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);    
-	prepare_for_write (me);
-	camel_mime_message_set_subject (((WriteInfo*)me->info)->msg, subject);
-
+	g_warning ("tny_header_set_subject: This is a summary header instance. You can't modify it.\n");
 	return;
 }
 
 static void
 tny_camel_header_set_to (TnyHeader *self, const gchar *to)
 {
-	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);    
-	CamelInternetAddress *addr = camel_internet_address_new ();
-	gchar *dup;
-
-	dup = g_strdup (to);
-	_foreach_email_add_to_inet_addr (dup, addr);
-	g_free (dup);
-
-	prepare_for_write (me);
-
-	camel_mime_message_set_recipients (((WriteInfo*)me->info)->msg, 
-		CAMEL_RECIPIENT_TYPE_TO, addr);
-
-	camel_object_unref (CAMEL_OBJECT (addr));
-
+	g_warning ("tny_header_set_to: This is a summary header instance. You can't modify it.\n");
 	return;
 }
 
@@ -263,20 +121,7 @@ tny_camel_header_set_to (TnyHeader *self, const gchar *to)
 static void
 tny_camel_header_set_replyto (TnyHeader *self, const gchar *replyto)
 {
-	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);    
-	CamelInternetAddress *addr = camel_internet_address_new ();
-	gchar *dup;
-
-	dup = g_strdup (replyto);
-	_foreach_email_add_to_inet_addr (dup, addr);
-	g_free (dup);
-
-	prepare_for_write (me);
-
-	camel_mime_message_set_reply_to (((WriteInfo*)me->info)->msg, addr);
-
-	camel_object_unref (CAMEL_OBJECT (addr));
-
+	g_warning ("tny_header_set_bcc: This is a summary header instance. You can't modify it.\n");
 	return;
 }
 
@@ -287,13 +132,7 @@ tny_camel_header_get_cc (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-	if (G_UNLIKELY (!me->info))
-		return NULL;
-
-	if (G_UNLIKELY (me->write == 1))
-		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "cc");
-	else
-		retval = camel_message_info_cc ((CamelMessageInfo*)me->info);
+	retval = camel_message_info_cc (me->info);
 
 	return retval;
 }
@@ -301,16 +140,8 @@ tny_camel_header_get_cc (TnyHeader *self)
 static const gchar*
 tny_camel_header_get_bcc (TnyHeader *self)
 {
-	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval = NULL;
-
-	if (G_UNLIKELY (!me->info))
-		return NULL;
-
-	if (G_UNLIKELY (me->write == 1))
-		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "bcc");
-
-	return retval;
+	g_warning ("tny_header_get_bcc: This is a summary header instance. It has no bcc.\n");
+	return NULL;
 }
 
 static TnyHeaderFlags
@@ -319,14 +150,8 @@ tny_camel_header_get_flags (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	TnyHeaderFlags retval = 0;
 
-	if (G_UNLIKELY (me->write == 1))
-	{
-		g_warning ("tny_camel_header_get_flags: This is a header for a new message!\n");
-		return retval;
-	}
-
 	/* This is only legal because the flags between CamelLite and Tinymail are equalized */
-	retval = camel_message_info_flags ((CamelMessageInfo*)me->info);
+	retval = camel_message_info_flags (me->info);
 
 	return retval;
 }
@@ -336,14 +161,8 @@ tny_camel_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 
-	if (G_UNLIKELY (me->write == 1))
-	{
-		g_warning ("tny_camel_header_get_flags: This is a header for a new message!\n");
-		return;
-	} 
-
 	/* This is only legal because the flags between CamelLite and Tinymail are equalized */
-	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, ~0);
+	camel_message_info_set_flags (me->info, mask, ~0);
 
 	return;
 }
@@ -353,13 +172,7 @@ tny_camel_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 
-	if (G_UNLIKELY (me->write == 1))
-	{
-		g_warning ("tny_camel_header_get_flags: This is a header for a new message!\n");
-		return;
-	}
-
-	camel_message_info_set_flags ((CamelMessageInfo*)me->info, mask, 0);
+	camel_message_info_set_flags (me->info, mask, 0);
 
 	return;
 }
@@ -370,27 +183,7 @@ tny_camel_header_get_date_received (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	time_t retval = 0;
 
-	if (G_UNLIKELY (!me->info))
-		return retval;
-
-	if (G_UNLIKELY (me->write == 1))
-	{
-		int tzone;
-
-		retval = camel_mime_message_get_date (((WriteInfo*)me->info)->msg, &tzone);
-
-		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-			retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, &tzone);
-		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-		{
-			time (&retval);
-			tzone = 0;
-		}
-
-		retval += (tzone / 100) * 60 * 60;
-		retval += (tzone % 100) * 60;
-	} else
-		retval = camel_message_info_date_received ((CamelMessageInfo*)me->info);
+	retval = camel_message_info_date_received (me->info);
 
 	return retval;
 }
@@ -401,26 +194,7 @@ tny_camel_header_get_date_sent (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	time_t retval = 0;
 
-	if (G_UNLIKELY (!me->info))
-		return retval;
-
-	if (G_UNLIKELY (me->write == 1))
-	{
-		int tzone;
-		retval = camel_mime_message_get_date (((WriteInfo*)me->info)->msg, &tzone);
-
-		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-			retval = camel_mime_message_get_date_received (((WriteInfo*)me->info)->msg, &tzone);
-		if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-		{
-			time (&retval);
-			tzone = 0;
-		}
-
-		retval += (tzone / 100) * 60 * 60;
-		retval += (tzone % 100) * 60;
-	} else
-		retval = camel_message_info_date_sent ((CamelMessageInfo*)me->info);
+	retval = camel_message_info_date_sent (me->info);
 
 	return retval;
 }
@@ -431,23 +205,7 @@ tny_camel_header_get_from (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-	if (G_UNLIKELY (!me->info))
-		return NULL;
-
-	if (G_UNLIKELY (me->write == 1))
-	{
-		if (G_LIKELY (!((WriteInfo*)me->info)->mime_from))
-		{
-			CamelInternetAddress *addr = (CamelInternetAddress*)
-				camel_mime_message_get_from (((WriteInfo*)me->info)->msg);
-				if (addr)
-					((WriteInfo*)me->info)->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
-				else ((WriteInfo*)me->info)->mime_from = NULL;
-		}
-
-		retval = (const gchar*)((WriteInfo*)me->info)->mime_from;
-	} else
-		retval = camel_message_info_from ((CamelMimeMessage*)me->info);
+	retval = camel_message_info_from (me->info);
 
 	return retval;
 }
@@ -458,13 +216,7 @@ tny_camel_header_get_subject (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-	if (G_UNLIKELY (!me->info))
-		return NULL;
-
-	if (G_UNLIKELY (me->write == 1))
-		retval = camel_mime_message_get_subject (((WriteInfo*)me->info)->msg);
-	else
-		retval = camel_message_info_subject ((CamelMessageInfo*)me->info);
+	retval = camel_message_info_subject (me->info);
 
 	return retval;
 }
@@ -476,13 +228,7 @@ tny_camel_header_get_to (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-	if (G_UNLIKELY (!me->info))
-		return NULL;
-
-	if (G_UNLIKELY (me->write == 1))
-		retval = camel_medium_get_header (CAMEL_MEDIUM (((WriteInfo*)me->info)->msg), "to");
-	else
-		retval = camel_message_info_to ((CamelMessageInfo*)me->info);
+	retval = camel_message_info_to (me->info);
 
 	return retval;
 }
@@ -493,13 +239,7 @@ tny_camel_header_get_message_id (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-	if (G_UNLIKELY (!me->info))
-		return NULL;
-
-	if (G_UNLIKELY (me->write == 1))
-		retval = camel_mime_message_get_message_id (((WriteInfo*)me->info)->msg);
-	else
-		retval = (const gchar*) camel_message_info_message_id ((CamelMessageInfo*)me->info);
+	retval = (const gchar*) camel_message_info_message_id (me->info);
 
 	return retval;
 }
@@ -512,17 +252,7 @@ tny_camel_header_get_message_size (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	guint retval;
 
-	if (G_UNLIKELY (!me->info))
-		return 0;
-
-	if (G_UNLIKELY (me->write == 1))
-	{
-		CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
-		camel_data_wrapper_write_to_stream((CamelDataWrapper *)((WriteInfo*)me->info)->msg, (CamelStream *)sn);
-		retval = (guint) sn->written;
-		camel_object_unref((CamelObject *)sn);
-	} else
-		retval = (guint) camel_message_info_size ((CamelMessageInfo*)me->info);
+	retval = (guint) camel_message_info_size (me->info);
 
 	return retval;
 
@@ -535,10 +265,7 @@ tny_camel_header_get_uid (TnyHeader *self)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	const gchar *retval = NULL;
 
-	if (G_UNLIKELY (!me->info) || G_UNLIKELY (me->write == 1))
-		return NULL;
-
-	retval = camel_message_info_uid ((CamelMessageInfo*)me->info);
+	retval = camel_message_info_uid (me->info);
 
 	return retval;
 }
@@ -548,12 +275,8 @@ tny_camel_header_finalize (GObject *object)
 {
 	TnyCamelHeader *self = (TnyCamelHeader*) object;
 
-	if (G_UNLIKELY (self->write == 1))
-		destroy_write (self);
-	else if (G_UNLIKELY (self->write == 2))
-		destroy_mem (self);
-	else if (self->write == 0)
-		unref_info (self);
+	if (self->info)
+		camel_message_info_free (self->info);
 
 	if (self->folder)
 	{
@@ -562,30 +285,20 @@ tny_camel_header_finalize (GObject *object)
 		_tny_camel_folder_check_uncache (((TnyCamelFolder*)self->folder), fpriv);
 	}
 
-	/* Normally we do camel_folder_free_message_info here, but we already got
-	rid of our initial reference at tny-folder.c:add_message_with_uid
-	I know this is actually ugly */
-
 	(*parent_class->finalize) (object);
 
 	return;
 }
 
-/**
- * tny_camel_header_new:
- *
- *
- * Return value: A new #TnyHeader instance implemented for Camel
- **/
 TnyHeader*
-tny_camel_header_new (void)
+_tny_camel_header_new (void)
 {
 	TnyCamelHeader *self = g_object_new (TNY_TYPE_CAMEL_HEADER, NULL);
-	
-	self->info = NULL;
-	self->write = 3;
 
-	return (TnyHeader*)self;
+	self->info = NULL;
+	self->folder = NULL;
+
+	return (TnyHeader*) self;
 }
 
 void
@@ -593,7 +306,7 @@ _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyC
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	fpriv->headers_managed++;
-	me->folder = (TnyCamelFolder*)folder;
+	me->folder = (TnyCamelFolder*) folder;
 
 	return;
 }
@@ -606,7 +319,7 @@ tny_camel_header_get_folder (TnyHeader *self)
 	if (me->folder)
 		g_object_ref (G_OBJECT (me->folder));
 
-	return (TnyFolder*)me->folder;
+	return (TnyFolder*) me->folder;
 }
 
 static void
