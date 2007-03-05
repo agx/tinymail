@@ -196,9 +196,11 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	guint len = 0;
 
 	if (store->ostream == NULL || ((CamelObject *)store->ostream)->ref_count <= 0)
-		if (!camel_service_connect ((CamelService*)store, ex))
+	{
+		/*if (!camel_service_connect ((CamelService*)store, ex)) */
 			return FALSE;
-
+	}
+	
 	/* g_mutex_lock (store->stream_lock); */
 
 	if (store->ostream==NULL) return FALSE;
