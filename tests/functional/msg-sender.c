@@ -75,7 +75,7 @@ static TnyMsg*
 create_test_msg (TnyPlatformFactory *platfact)
 {
 	TnyMsg *retval = tny_platform_factory_new_msg (platfact);
-	TnyHeader *header = tny_platform_factory_new_header (platfact);
+	TnyHeader *header = tny_msg_get_header (retval);
 
 	TnyStream *plain_stream = tny_camel_mem_stream_new ();
 	TnyStream *html_stream = tny_camel_mem_stream_new ();
@@ -86,7 +86,6 @@ create_test_msg (TnyPlatformFactory *platfact)
 	tny_header_set_from (header, "tinymailunittest@mail.tinymail.org");
 	tny_header_set_to (header, "spam@pvanhoof.be");
 
-	tny_msg_set_header (retval, header);
 	g_object_unref (G_OBJECT (header));
 
 	tny_stream_write (plain_stream, TEST_STRING, strlen (TEST_STRING));
