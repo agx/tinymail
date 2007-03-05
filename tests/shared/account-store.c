@@ -50,13 +50,16 @@ static GObjectClass *parent_class = NULL;
 static gchar* 
 per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
-	return g_strdup ("tnytest");
+	if (strstr (tny_account_get_name (account), "SMTP"))
+		return g_strdup ("unittest");
+	else
+		return g_strdup ("tnytest");
 }
 
 static void
 per_account_forget_pass_func (TnyAccount *account)
 {
-	g_print ("Invalid test account\n");
+	g_print ("Invalid test account (password incorrect)\n");
 	return;
 }
 

@@ -649,8 +649,11 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 	priv->account = account;
 	priv->store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
 
-	if (!priv->store || !CAMEL_IS_STORE (priv->store))
-		g_error ("Trying to create folder out of invalid account");
+	/*
+		This is incorrect! TnyTransportAccount's don't need a service to be correct
+
+		 if (!priv->store || !CAMEL_IS_STORE (priv->store))
+		g_warning ("Trying to create folder out of invalid account"); */
 
 	return;
 }
