@@ -68,9 +68,13 @@ _tny_gtk_header_list_iterator_travel_to_nth_nl (TnyGtkHeaderListIterator *self, 
 	{
 		/* If destination is not in the beginning of the list */
 
-		while G_LIKELY (cidx++ < idx-1)
+		while G_LIKELY (cidx++ < idx-1 && start)
 			start = start->next;
-		ret = start->data;
+
+		if G_LIKELY (start)
+			ret = start->data;
+		else 
+			ret = self->model->first;
 
 	} else  ret = self->model->first;
 
@@ -265,7 +269,10 @@ _get_readable_date (time_t file_time_raw)
 
 	readable_date_size = strftime (readable_date, 63, _("%Y-%m-%d, %-I:%M %p"), &file_time);
 
-	return readable_date;
+	if (readable_date_size > 0)
+		return readable_date;
+
+	return NULL;
 }
 
 /**
@@ -326,6 +333,7 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	TnyHeader *header = NULL;
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 	const gchar *str;
+	gchar *rdate = NULL;
 
 	g_return_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp);
 	g_return_if_fail (iter->user_data != NULL);
@@ -339,6 +347,13 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 
 	header = iter->user_data;
 
+	if (((GObject*)header)->ref_count <= 0)
+	{
+		g_mutex_unlock (list_model->iterator_lock);
+		g_mutex_unlock (list_model->folder_lock);
+		return;
+	}
+
 	switch (column) 
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
@@ -349,13 +364,19 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, 
-				_get_readable_date (tny_header_get_date_sent (header)));
+			rdate = _get_readable_date (tny_header_get_date_sent (header));
+			if (rdate)
+				g_value_set_string (value, rdate);
+			else
+				g_value_set_string (value, "");
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			g_value_set_string (value, 
-				_get_readable_date (tny_header_get_date_received (header)));
+			rdate = _get_readable_date (tny_header_get_date_received (header));
+			if (rdate)
+				g_value_set_string (value, rdate);
+			else
+				g_value_set_string (value, "");
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
 			g_value_init (value, G_TYPE_INT);
