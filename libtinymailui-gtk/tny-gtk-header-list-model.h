@@ -63,7 +63,8 @@ struct _TnyGtkHeaderListModel
 {
 	GObject parent;
 
-	GMutex *folder_lock, *iterator_lock;
+	GMutex *folder_lock;
+	GStaticRecMutex *iterator_lock;
 	TnyFolder *folder;
 	gint length;
 	gint stamp;

@@ -42,12 +42,12 @@ _tny_gtk_header_list_iterator_set_model (TnyGtkHeaderListIterator *self, TnyGtkH
 	   the first node in the list. */
 
 	if (lock)
-		g_mutex_lock (self->model->iterator_lock);
+		g_static_rec_mutex_lock (self->model->iterator_lock);
 
 	self->current = model->first;
 
 	if (lock)
-		g_mutex_unlock (self->model->iterator_lock);
+		g_static_rec_mutex_unlock (self->model->iterator_lock);
 
 	return;
 }
@@ -102,9 +102,9 @@ tny_gtk_header_list_iterator_next (TnyIterator *self)
 
 	/* Move the iterator to the next node */
 
-	g_mutex_lock (me->model->iterator_lock);
+	g_static_rec_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_next (me->current);
-	g_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (me->model->iterator_lock);
 
 	return;
 }
@@ -127,9 +127,9 @@ tny_gtk_header_list_iterator_prev (TnyIterator *self)
 
 	/* Move the iterator to the previous node */
 
-	g_mutex_lock (me->model->iterator_lock);
+	g_static_rec_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_previous (me->current);
-	g_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (me->model->iterator_lock);
 
 	return;
 }
@@ -148,15 +148,17 @@ tny_gtk_header_list_iterator_is_done (TnyIterator *self)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
 	gboolean retval = FALSE;
-	
-	g_mutex_lock (me->model->iterator_lock);
-	
-	if (G_UNLIKELY (!me  || !me->model))
+
+	g_static_rec_mutex_lock (me->model->iterator_lock);
+
+	if (G_UNLIKELY (!me  || !me->model)) {
+		g_static_rec_mutex_unlock (me->model->iterator_lock);
 		return TRUE;
+	}
 
 	retval = (me->current == NULL);
-	g_mutex_unlock (me->model->iterator_lock);
-	
+	g_static_rec_mutex_unlock (me->model->iterator_lock);
+
 	return retval;
 }
 
@@ -181,9 +183,9 @@ tny_gtk_header_list_iterator_first (TnyIterator *self)
 	   keeps a reference to the first node, there's nothing wrong with 
 	   using that one. */
 
-	g_mutex_lock (me->model->iterator_lock);
+	g_static_rec_mutex_lock (me->model->iterator_lock);
 	me->current = me->model->first;
-	g_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (me->model->iterator_lock);
 
 	return;
 }
@@ -209,9 +211,9 @@ tny_gtk_header_list_iterator_nth (TnyIterator *self, guint nth)
 	   so we start with the first node of which we know the model
 	   stored a reference. */
 
-	g_mutex_lock (me->model->iterator_lock);
+	g_static_rec_mutex_lock (me->model->iterator_lock);
 	me->current = g_list_nth (me->model->first, nth);
-	g_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (me->model->iterator_lock);
 
 	return;
 }
@@ -234,12 +236,13 @@ tny_gtk_header_list_iterator_get_current (TnyIterator *self)
 
 	/* Give the data of the current node */
 
-	g_mutex_lock (me->model->iterator_lock);
+	g_static_rec_mutex_lock (me->model->iterator_lock);
 	retval = (G_UNLIKELY (me->current)) ? me->current->data : NULL;
-	g_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (me->model->iterator_lock);
 
 	if (retval)
-		g_object_ref (G_OBJECT(retval));	
+		g_object_ref (G_OBJECT(retval));
+
 	return (GObject*)retval;
 }
 
@@ -254,7 +257,7 @@ tny_gtk_header_list_iterator_get_list (TnyIterator *self)
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
 
-       	g_object_ref (G_OBJECT (me->model));
+	g_object_ref (G_OBJECT (me->model));
 
 	return TNY_LIST (me->model);
 }
@@ -269,7 +272,7 @@ tny_iterator_init (TnyIteratorIface *klass)
 	klass->get_current_func = tny_gtk_header_list_iterator_get_current;
 	klass->get_list_func = tny_gtk_header_list_iterator_get_list;
 	klass->is_done = tny_gtk_header_list_iterator_is_done;
-	
+
 	return;
 }
 
