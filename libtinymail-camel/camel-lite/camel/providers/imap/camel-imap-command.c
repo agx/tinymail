@@ -307,7 +307,7 @@ CamelImapResponse *
 camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 				 size_t cmdlen, CamelException *ex)
 {
-	if (!camel_imap_store_connected (store, ex))
+	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex))
 		return NULL;
 
 	g_return_val_if_fail(store->ostream!=NULL, NULL);
