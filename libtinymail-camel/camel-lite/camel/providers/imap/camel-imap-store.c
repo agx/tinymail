@@ -1789,7 +1789,7 @@ imap_noop (CamelStore *store, CamelException *ex)
 	
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
-	if (!camel_imap_store_connected(imap_store, ex))
+	if (!camel_disco_store_check_online((CamelDiscoStore *)store, ex))
 		goto done;
 
 	current_folder = imap_store->current_folder;
@@ -2248,7 +2248,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 
 	CAMEL_SERVICE_REC_LOCK(imap_store, connect_lock);
 
-	if (!camel_imap_store_connected(imap_store, ex)) {
+	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex)) {
 		CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 		return NULL;
 	}
@@ -2481,7 +2481,7 @@ delete_folder (CamelStore *store, const char *folder_name, CamelException *ex)
 
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
-	if (!camel_imap_store_connected(imap_store, ex))
+	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto fail;
 	
 	/* make sure this folder isn't currently SELECTed */
@@ -2582,7 +2582,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
-	if (!camel_imap_store_connected(imap_store, ex))
+	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto fail;
 	
 	/* make sure this folder isn't currently SELECTed - it's
@@ -3158,7 +3158,7 @@ refresh_refresh(CamelSession *session, CamelSessionThreadMsg *msg)
 
 	CAMEL_SERVICE_REC_LOCK(m->store, connect_lock);
 
-	if (!camel_imap_store_connected((CamelImapStore *)m->store, &m->ex))
+	if (!camel_disco_store_check_online((CamelDiscoStore *)m->store, &m->ex))
 		goto done;
 
 	if (store->namespace && store->namespace[0]) {
@@ -3240,7 +3240,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 		CAMEL_SERVICE_REC_LOCK(store, connect_lock);
 
-		if (!camel_imap_store_connected((CamelImapStore *)store, ex))
+		if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 			goto fail;
 
 		if (top[0] == 0) {
@@ -3419,7 +3419,7 @@ subscribe_folder (CamelStore *store, const char *folder_name,
 
 	CAMEL_SERVICE_REC_LOCK(store, connect_lock);
 
-	if (!camel_imap_store_connected (imap_store, ex))
+	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto done;
 	
 	response = camel_imap_command (imap_store, NULL, ex,
@@ -3463,7 +3463,7 @@ unsubscribe_folder (CamelStore *store, const char *folder_name,
 
 	CAMEL_SERVICE_REC_LOCK(store, connect_lock);
 	
-	if (!camel_imap_store_connected (imap_store, ex))
+	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto done;
 	
 	response = camel_imap_command (imap_store, NULL, ex,
@@ -3542,8 +3542,8 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 	 * close the connection. We can't expect a read to have any
 	 * meaning if we reconnect, so always set an exception.
 	 */
-	
-	if (!camel_imap_store_connected (store, ex))
+
+	if (!camel_disco_store_check_online((CamelDiscoStore *)store, ex))
 		return -1;
 
 	g_mutex_lock (store->stream_lock);
