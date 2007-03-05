@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-tny-header-priv
+tny-camel-imap-folder-priv
 
 <!-- ##### SECTION Short_Description ##### -->
 
@@ -9,17 +9,13 @@ tny-header-priv
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
+
 <!-- ##### SECTION Stability_Level ##### -->
-
-
-<!-- ##### STRUCT TnyCamelHeader ##### -->
-<para>
-
-</para>
 
 

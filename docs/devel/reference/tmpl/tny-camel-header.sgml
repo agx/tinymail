@@ -24,24 +24,3 @@ removing the GObject type-check.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyCamelHeader ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT TnyCamelHeaderClass ##### -->
-<para>
-
-</para>
-
-@parent_class: 
-
-<!-- ##### FUNCTION tny_camel_header_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-

@@ -23,11 +23,3 @@ A NNTP #TnyFolder implementation implemented using Camel
 </para>
 
 
-<!-- ##### FUNCTION tny_camel_nntp_folder_new ##### -->
-<para>
-
-</para>
-
-@Returns: 
-
-

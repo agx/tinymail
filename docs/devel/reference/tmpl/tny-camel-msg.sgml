@@ -34,31 +34,12 @@ This implementation is coupled with #TnyCamelMimePart.
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_camel_msg_new_with_header ##### -->
-<para>
-
-</para>
-
-@header: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_camel_msg_new_with_part ##### -->
 <para>
 
 </para>
 
 @part: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_camel_msg_new_with_part_and_header ##### -->
-<para>
-
-</para>
-
-@part: 
-@header: 
 @Returns: 
 
 

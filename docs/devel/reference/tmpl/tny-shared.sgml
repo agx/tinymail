@@ -94,7 +94,6 @@ Shared include file with forward typedefs
 @parent: 
 @get_header_func: 
 @get_folder_func: 
-@set_header_func: 
 
 <!-- ##### STRUCT TnyFolder ##### -->
 <para>
@@ -492,20 +491,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>

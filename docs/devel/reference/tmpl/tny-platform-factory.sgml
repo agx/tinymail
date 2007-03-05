@@ -34,7 +34,6 @@ A factory type that returns specific implementations for a specific platform.
 @new_msg_view_func: 
 @new_msg_func: 
 @new_mime_part_func: 
-@new_header_func: 
 
 <!-- ##### FUNCTION tny_platform_factory_new_account_store ##### -->
 <para>
@@ -73,15 +72,6 @@ A factory type that returns specific implementations for a specific platform.
 
 
 <!-- ##### FUNCTION tny_platform_factory_new_mime_part ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_platform_factory_new_header ##### -->
 <para>
 
 </para>

@@ -24,8 +24,8 @@ tny-camel-msg-priv
 
 @message_lock: 
 @header_lock: 
-@header: 
 @parts_lock: 
 @folder_lock: 
 @folder: 
+@header: 
 

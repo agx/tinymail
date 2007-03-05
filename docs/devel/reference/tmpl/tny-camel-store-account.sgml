@@ -31,3 +31,14 @@ A #TnyStoreAccount implemented using camel.
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_camel_store_account_factor_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@full_name: 
+@was_new: 
+@Returns: 
+
+
