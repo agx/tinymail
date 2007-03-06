@@ -615,12 +615,7 @@ camel_folder_summary_next_uid(CamelFolderSummary *s)
 void
 camel_folder_summary_set_uid(CamelFolderSummary *s, guint32 uid)
 {
-	/* TODO: sync to disk? */
-	CAMEL_SUMMARY_LOCK(s, summary_lock);
-
 	s->nextuid = MAX(s->nextuid, uid);
-
-	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 }
 
 
@@ -978,37 +973,27 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 	CamelMessageInfo *mi;
 	CamelMessageInfoBase *bi = (CamelMessageInfoBase*)info;
 
-	uid = camel_message_info_uid(info);
+	uid = camel_message_info_uid (info);
 	if (uid == NULL || uid[0] == 0) {
-
-		/* if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
-			g_free(info->uid); */
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
 		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	}
 
-	CAMEL_SUMMARY_LOCK(s, summary_lock);
-
 	while ((mi = find_message_info_with_uid (s, uid))) 
 	{
-		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
-
-		if (mi == info)
+		if (mi == info) 
 			return 0;
 
 		d(printf ("Trying to insert message with clashing uid (%s).  new uid re-assigned", camel_message_info_uid(info)));
 
 		if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
 			g_free(info->uid);
-
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
 		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 		camel_message_info_set_flags(info, CAMEL_MESSAGE_FOLDER_FLAGGED, CAMEL_MESSAGE_FOLDER_FLAGGED);
-		CAMEL_SUMMARY_LOCK(s, summary_lock);
 	}
 
-	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 
 	return 1;
 }
