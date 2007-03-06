@@ -38,93 +38,6 @@ static GObjectClass *parent_class;
 
 #include "tny-gtk-header-list-iterator-priv.h"
 
-/* The function is locked, so this is secure (and might cause less
-stack allocations)? It's probably a naïve manual optimization.*/
-
-
-void /* When sorting, this method is called a gazillion times */
-_tny_gtk_header_list_iterator_travel_to_nth_nl (TnyGtkHeaderListIterator *self, guint cur, guint nth)
-{
-
-  /* If we have a usable index table, we'll use it. This happens when as only
-     add operation the prepend has happened more than INDEX_THRESHOLD times.
-     This will trigger on folders larger than INDEX_THRESHOLD headers that have
-     never had appends nor removes of headers.
-
-     Therefore, TODO: rapidly update the index table on append and remove. ;-) 
-
-     Currently, the only adder that keeps the index correct is the prepend.
-     The other ones will set usable_index FALSE. Hev phun .. */
-
-  if G_UNLIKELY (self->model->usable_index)
-  {
-	/* register guint idx = nth / INDEX_OFFSET, remain = nth % INDEX_OFFSET, cidx = 0; */
-	guint idx = nth >> 6, remain = nth & 0x3F, cidx = 0;
-	GList *start = self->model->index, *ret;
-
-	/* Math seems faster than walking a next pointer 1000ths of times */
-
-	if G_LIKELY (idx)
-	{
-		/* If destination is not in the beginning of the list */
-
-		while G_LIKELY (cidx++ < idx-1 && start)
-			start = start->next;
-
-		if G_LIKELY (start)
-			ret = start->data;
-		else 
-			ret = self->model->first;
-
-	} else  ret = self->model->first;
-
-	/* So we are now at 0 or at (50 * index), walk the remainder */
-
-	while G_LIKELY (remain--)
-		ret = ret->next;
-
-	self->current = ret;
-
-  } else {
-	
-	/* First we check whether we are walking somewhere in the beginning 
-	   of the list: We know the first location, so ... (faster to start 
-	   from the first than from the current) */
-
-
-	if (G_UNLIKELY (nth - cur < nth) || G_UNLIKELY (nth == 0))
-	{
-		self->current = self->model->first;
-		cur = 0;
-	}
-
-	/* If nth is 0, then we are fine. Leave it then. */
-	if (G_LIKELY (nth != 0))
-	{
-
-		/* If the current location is less than the destination location */
-		if G_LIKELY (cur < nth)
-			while G_LIKELY (cur++ < nth)
-				self->current = self->current->next;
-
-		/* And if not ... */
-		else if G_LIKELY (cur > nth)
-			while G_LIKELY (cur-- > nth)
-				if (G_LIKELY (self->current))
-					self->current = self->current->prev;
-				else 
-				{	
-					/* This is a strange case, but it means that we must 
-					   be at the first item */
-
-					self->current = self->model->first; 
-					break; 
-				}
-	}
-  }
-
-  return;
-}
 
 static guint
 tny_gtk_header_list_model_get_flags (GtkTreeModel *self)
@@ -176,38 +89,26 @@ static gboolean
 tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePath *path)
 {
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
-	gint i; gpointer ptr;
-	gboolean retval=FALSE;
+	gint i; gboolean retval=FALSE;
 
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
 	g_mutex_lock (list_model->folder_lock);
-
-	/* Fill an GtkTreeIter (this is not a TnyIterator!) using a path */
-
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
 	i = gtk_tree_path_get_indices (path)[0];
 
-	if (G_UNLIKELY (i >= list_model->length))
-	{
+	if (i >= list_model->items->len) {
 		g_static_rec_mutex_unlock (list_model->iterator_lock);
 		g_mutex_unlock (list_model->folder_lock);
 		return FALSE;
 	}
 
-	/* We walk the iter to the nth position and we store the current postition */
-	_tny_gtk_header_list_iterator_travel_to_nth_nl
-		((TnyGtkHeaderListIterator*)list_model->iterator, 
-		list_model->last_nth, i);
-
-	/* We will store this as user_data of the GtkTreeIter */
-	/* don't unref */	
-	ptr = _tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
-	list_model->last_nth = i;
-	iter->stamp = list_model->stamp;
-	iter->user_data = ptr;
-	retval = (iter->user_data != NULL);
+	if (i >= 0 && i < list_model->items->len) {
+		iter->stamp = list_model->stamp;
+		iter->user_data = (gpointer) i;
+		retval = TRUE;
+	}
 
 	g_static_rec_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
@@ -230,26 +131,10 @@ tny_gtk_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 	g_mutex_lock (list_model->folder_lock);
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
-	while (!_tny_gtk_header_list_iterator_is_done_nl ((TnyGtkHeaderListIterator*)list_model->iterator))
-	{
-		/* header list iterator does not need to be unref'd */
-		if (_tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator) == iter->user_data)
-			break;
-		
-		_tny_gtk_header_list_iterator_next_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
-
-		i++;
-	}
-
-	/* Reset the internal iterator */
-	((TnyGtkHeaderListIterator*)list_model->iterator)->current = list_model->first;
-	list_model->last_nth = 0;
-
 	tree_path = gtk_tree_path_new ();
-	gtk_tree_path_append_index (tree_path, i);
+	gtk_tree_path_append_index (tree_path, (gint) iter->user_data);
 
 	g_static_rec_mutex_unlock (list_model->iterator_lock);
-
 	g_mutex_unlock (list_model->folder_lock);
 
 	return tree_path;
@@ -287,11 +172,13 @@ _get_readable_date (time_t file_time_raw)
 gint 
 tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
+	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (model);
+
 	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
 
-	hdr_a = a->user_data;
-	hdr_b = b->user_data;
+	hdr_a = list_model->items->pdata[(gint)a->user_data];
+	hdr_b = list_model->items->pdata[(gint)b->user_data];
 
 	recv_a = tny_header_get_date_received (hdr_a);
 	recv_b = tny_header_get_date_received (hdr_b);
@@ -313,11 +200,13 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 gint  
 tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
+	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (model);
+
 	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
 
-	hdr_a = a->user_data;
-	hdr_b = b->user_data;
+	hdr_a = list_model->items->pdata[(gint)a->user_data];
+	hdr_b = list_model->items->pdata[(gint)b->user_data];
 
 	recv_a = tny_header_get_date_sent (hdr_a);
 	recv_b = tny_header_get_date_sent (hdr_b);
@@ -333,20 +222,17 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	const gchar *str;
 	gchar *rdate = NULL;
 
-	g_return_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp);
-	g_return_if_fail (iter->user_data != NULL);
-	g_return_if_fail (TNY_IS_HEADER (iter->user_data));
+	if (iter->stamp != TNY_GTK_HEADER_LIST_MODEL (self)->stamp)
+		return;
 
 	g_mutex_lock (list_model->folder_lock);
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
-	/* Remember the ptr we've set above? Get the header instance out of the
-	   token and return the asked-for column as a GValue instance. */
-
-	header = iter->user_data;
+	header = list_model->items->pdata[(gint) iter->user_data];
 
 	if (((GObject*)header)->ref_count <= 0)
 	{
+		g_warning ("GtkTreeModel in invalid state\n");
 		g_static_rec_mutex_unlock (list_model->iterator_lock);
 		g_mutex_unlock (list_model->folder_lock);
 		return;
@@ -432,23 +318,20 @@ tny_gtk_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 {
 	gboolean retval;
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
-	gpointer ptr;
+	gint newv;
 
-	/* Move the GtkTreeIter to the next item */
-
-	g_return_val_if_fail (iter->stamp == TNY_GTK_HEADER_LIST_MODEL 
-		(self)->stamp, FALSE);
+	if (iter->stamp != TNY_GTK_HEADER_LIST_MODEL (self)->stamp, FALSE)
+		return FALSE;
 
 	g_mutex_lock (list_model->folder_lock);
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
-	/* We simply move the iterator and get the value */
-	_tny_gtk_header_list_iterator_next_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
-	/* the ptr needs not to be unref'd... */
-	ptr = _tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
-	list_model->last_nth++;
-	iter->user_data = ptr;
-	retval = (iter->user_data != NULL);
+	newv = ((gint)iter->user_data);
+	newv++;
+
+	iter->user_data = (gpointer) newv;
+
+	retval = (((gint)iter->user_data) >=0 && ((gint)iter->user_data) < list_model->items->len);
 
 	g_static_rec_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
@@ -476,7 +359,7 @@ tny_gtk_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
 	if (G_LIKELY (!iter))
-		retval = list_model->length;
+		retval = list_model->items->len;
 
 	g_static_rec_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
@@ -487,9 +370,8 @@ tny_gtk_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter
 static gboolean
 tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter, GtkTreeIter *parent, gint n)
 {
-	GList *child;
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
-	GList *restore;
+	gboolean retval = FALSE;
 
 	if (G_UNLIKELY (parent))
 		return FALSE;
@@ -497,30 +379,17 @@ tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	g_mutex_lock (list_model->folder_lock);
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
-	restore = ((TnyGtkHeaderListIterator*)list_model->iterator)->current;
-	/* Move the GtkTreeIter to the nth child */
-	_tny_gtk_header_list_iterator_nth_nl ((TnyGtkHeaderListIterator*)list_model->iterator, n);
-	/* child needs not to be unref'd */
-	child = _tny_gtk_header_list_iterator_get_current_nl ((TnyGtkHeaderListIterator*)list_model->iterator);
-	 
-	if (G_LIKELY (child))
+	if (n >= 0 && n < list_model->items->len) 
 	{
-		list_model->last_nth = n;
 		iter->stamp = TNY_GTK_HEADER_LIST_MODEL (self)->stamp;
-		iter->user_data = child;
-
-		g_static_rec_mutex_unlock (list_model->iterator_lock);
-		g_mutex_unlock (list_model->folder_lock);
-
-		return TRUE;
+		iter->user_data = (gpointer) n;
+		retval = TRUE;
 	}
-
-	((TnyGtkHeaderListIterator*)list_model->iterator)->current = restore;
 
 	g_static_rec_mutex_unlock (list_model->iterator_lock);
 	g_mutex_unlock (list_model->folder_lock);
 
-	return FALSE;
+	return retval;
 }
 
 
@@ -554,23 +423,12 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	path = gtk_tree_path_new ();
 	gtk_tree_path_append_index (path, 0);
 	iter.stamp = me->stamp;
-	iter.user_data = item;
+	iter.user_data = (gpointer) me->items->len;
 
 	/* Prepend something to the list */
 
 	g_object_ref (G_OBJECT (item));
-	me->first = g_list_prepend (me->first, item);
-	me->length++;
-
-	if G_UNLIKELY (me->length % INDEX_OFFSET == 0)
-		me->index = g_list_append (me->index, me->first);
-
-	if G_UNLIKELY (!me->usable_index && me->length >= INDEX_THRESHOLD)
-		me->usable_index = TRUE;
-
-	/* Reset the internal iterator */
-	((TnyGtkHeaderListIterator*)me->iterator)->current = me->first;
-	me->last_nth = 0;
+	g_ptr_array_add (me->items, item);
 
 	/* Letting the observers know about this (the GtkTreeView) */
 	gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
@@ -578,43 +436,14 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
+	return;
 }
 
 static void
 tny_gtk_header_list_model_append (TnyList *self, GObject* item)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
-	GtkTreePath *path;
-	GtkTreeIter iter;
-
-	g_static_rec_mutex_lock (me->iterator_lock);
-
-	path = gtk_tree_path_new ();
-	iter.stamp = me->stamp;
-	iter.user_data = item;
-
-	/* Append something to the list */
-
-	g_object_ref (G_OBJECT (item));
-	me->first = g_list_append (me->first, item);
-	me->length++;
-
-	me->usable_index = FALSE;
-	if (me->index)
-		g_list_free (me->index);
-	me->index = NULL;
-
-	/* Reset the internal iterator */
-	((TnyGtkHeaderListIterator*)me->iterator)->current = me->first;
-	me->last_nth = 0;
-
-	/* Letting the observers know about this (the GtkTreeView) */
-	gtk_tree_path_append_index (path, me->length-1);
-	gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
-	gtk_tree_path_free (path);
-
-	g_static_rec_mutex_unlock (me->iterator_lock);
-
+	/* Not really correct, but what the heck */
+	tny_gtk_header_list_model_prepend (self, item);
 }
 
 static guint
@@ -624,7 +453,7 @@ tny_gtk_header_list_model_get_length (TnyList *self)
 	guint retval = 0;
 
 	g_static_rec_mutex_lock (me->iterator_lock);
-	retval = me->first?g_list_length (me->first):0;
+	retval = me->items->len;
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
 	return retval;
@@ -636,37 +465,37 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	GtkTreePath *path;
 	GtkTreeIter iter;
+	gint i; gboolean found = FALSE;
 
 	g_return_if_fail (G_IS_OBJECT (item));
 	g_return_if_fail (G_IS_OBJECT (me));
 
 	g_static_rec_mutex_lock (me->iterator_lock);
 
+	for (i=0; i < me->items->len; i++)
+		if (me->items->pdata[i] == item)
+		{
+			found = TRUE;
+			break;
+		}
+
 	iter.stamp = me->stamp;
-	iter.user_data = item;
-	path = tny_gtk_header_list_model_get_path (GTK_TREE_MODEL (me), &iter);
+	iter.user_data = (gpointer) i;
 
 	/* Remove something from the list */
 
-	me->first = g_list_remove (me->first, (gconstpointer)item);
-	me->length--;
-	me->usable_index = FALSE;
-	if (me->index)
-		g_list_free (me->index);
-	me->index = NULL;
-
-	/* Reset the internal iterator */
-	((TnyGtkHeaderListIterator*)me->iterator)->current = me->first;
-	me->last_nth = 0;
-
-	/* Letting the observers know about this (the GtkTreeView) */
-	gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
-	gtk_tree_path_free (path);
+	if (found)
+	{
+		path = tny_gtk_header_list_model_get_path (GTK_TREE_MODEL (me), &iter);
+		g_ptr_array_remove (me->items, item);
+		/* Letting the observers know about this (the GtkTreeView) */
+		gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
+		gtk_tree_path_free (path);
+	}
 
 	g_object_unref (G_OBJECT (item));
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
-
 }
 
 static TnyIterator*
@@ -676,7 +505,15 @@ tny_gtk_header_list_model_create_iterator (TnyList *self)
 
 	/* Return a new iterator */
 
-	return _tny_gtk_header_list_iterator_new (me, TRUE);
+	return _tny_gtk_header_list_iterator_new (me);
+}
+
+static void
+copy_it (gpointer data, gpointer user_data)
+{
+	GPtrArray *items = user_data;
+	g_ptr_array_add (items, g_object_ref (G_OBJECT (data)));
+	return;
 }
 
 static TnyList*
@@ -695,10 +532,9 @@ tny_gtk_header_list_model_copy_the_list (TnyList *self)
 
 	g_static_rec_mutex_lock (me->iterator_lock);
 
-	GList *list_copy = g_list_copy (me->first);
-	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
-	copy->first = list_copy;
-	copy->usable_index = FALSE;
+	GPtrArray *items_copy = g_ptr_array_sized_new (me->items->len);
+	g_ptr_array_foreach (me->items, copy_it, items_copy);
+	copy->items = items_copy;
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
@@ -714,7 +550,7 @@ tny_gtk_header_list_model_foreach_in_the_list (TnyList *self, GFunc func, gpoint
 
 	g_static_rec_mutex_lock (me->iterator_lock);
 
-	g_list_foreach (me->first, func, user_data);
+	g_ptr_array_foreach (me->items, func, user_data);
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
@@ -735,178 +571,20 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
-/* The "relaxed performers" uses g_idle to in a relax way perform a certain
-   function on each item in the list of headers  */
-
-typedef struct
-{
-	GList *list;
-	GFunc relaxed_func, final_func;
-	gpointer ffdata, ffudata;
-} RelaxedData;
-
-
-static void
-tny_gtk_header_list_model_relaxed_data_destroyer (gpointer data)
-{
-	RelaxedData *d = data;
-
-	/* The destroyer */
-
-	g_list_free (d->list);
-	d->list = NULL;
-	d->final_func (d->ffdata, d->ffudata);
-	g_slice_free (RelaxedData, d);
-
-	return;
-}
-
-static gboolean
-tny_gtk_header_list_model_relaxed_performer (gpointer data)
-{
-	RelaxedData *d = data;
-	GList *list = d->list;
-	gint count = 0;
-
-	/* The performer itself */
-
-	while ((count < 5) && list)
-	{
-		GList *element = list;
-		if (element && element->data)
-			d->relaxed_func (element->data, NULL);
-		list = g_list_remove_link (list, element);
-		g_list_free (element);
-		count++;
-	}
-	d->list = list;
-
-	if (count <= 1)
-		return FALSE;
-
-	return TRUE;
-}
-
-
-static void
-proxy_destroy_func (gpointer data, gpointer user_data)
-{
-	if (data)
-		g_object_unref (G_OBJECT (data));
-	data = NULL;
-
-	return;
-}
-
-
-
-static void 
-tny_gtk_header_list_model_hdr_cache_remover_copy (TnyGtkHeaderListModel *self, GFunc final_func, gpointer ffdata, gpointer ffudata)
-{
-	RelaxedData *d = g_slice_new (RelaxedData);
-
-	/* This one will perform a destruction of each item in the list. It uses 
-	   a copy of the list. */
-
-	d->relaxed_func = (GFunc)proxy_destroy_func;
-	d->list = g_list_copy (self->first);
-	d->final_func = final_func;
-	d->ffdata = ffdata;
-	d->ffudata = ffudata;
-
-	g_idle_add_full (G_PRIORITY_LOW, tny_gtk_header_list_model_relaxed_performer, 
-		d, tny_gtk_header_list_model_relaxed_data_destroyer);
-
-	return;
-} 
-
-static void
-folder_overwrite_destruction (gpointer data, gpointer udata)
-{
-	TnyGtkHeaderListModel *self = data;
-
-	/* Unreference the folder instance */
-	if (self->folder) 
-		g_object_unref (G_OBJECT (self->folder));
-}
-
-typedef struct {
-	TnyFolder *folder;
-	TnyIterator *iterator;
-} ToDestroy;
-
-static void
-final_destruction (gpointer data, gpointer udata)
-{
-	ToDestroy *info = data;
-
-	/* Unreference the folder instance */
-	
-	/* Both the async added one and the final one */
-
-	if (info->folder && G_IS_OBJECT (info->folder)) 
-	{
-		g_object_unref (G_OBJECT (info->folder));
-		g_object_unref (G_OBJECT (info->folder));
-	}
-
-	if (info->iterator && G_IS_OBJECT (info->iterator)) 
-	{
-		g_object_unref (G_OBJECT (info->iterator));
-		g_object_unref (G_OBJECT (info->iterator));
-	}
-
-	g_slice_free (ToDestroy, info);
-}
 
 static void
 tny_gtk_header_list_model_finalize (GObject *object)
 {
 	TnyGtkHeaderListModel *self = (TnyGtkHeaderListModel *)object;
-	ToDestroy *info = g_slice_new (ToDestroy);
 
 	g_mutex_lock (self->folder_lock);
 	g_static_rec_mutex_lock (self->iterator_lock);
 
+	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
 	if (self->folder)
-		info->folder = g_object_ref (G_OBJECT (self->folder));
-	else
-		info->folder = NULL;
-
-	if (self->iterator)
-		info->iterator = g_object_ref (G_OBJECT (self->iterator));
-	else
-		info->iterator = NULL;
-
-	self->usable_index = FALSE;
-
-	/* Reset the internal iterator */
-	self->length = 0;
-	((TnyGtkHeaderListIterator*)self->iterator)->current = self->first;
-	self->last_nth = 0;
-
-	/* Unreference the headers */
-	if (self->first)
-	{
-		/* TNY TODO: For debugging reasons disabled */
-		if (/* FALSE && */ G_LIKELY (g_main_depth () > 0))
-			tny_gtk_header_list_model_hdr_cache_remover_copy (
-				self, final_destruction, info, NULL);
-		else {
-			g_list_foreach (self->first, (GFunc)g_object_unref, NULL);
-			final_destruction (info, NULL);
-		}
-		g_list_free (self->first);
-		self->first = NULL;
-	} else 
-		final_destruction (info, NULL);
-
-	if (self->index)
-	{
-		g_list_free (self->index);
-		self->index = NULL;
-	}
-
+		g_object_unref (G_OBJECT (self->folder));
+	g_ptr_array_free (self->items, TRUE);
+	self->items = NULL;
 
 	g_static_rec_mutex_unlock (self->iterator_lock);
 	g_mutex_unlock (self->folder_lock);
@@ -943,12 +621,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->folder_lock = g_mutex_new ();
 	self->iterator_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->iterator_lock);
-	self->first = NULL;
-	self->length = 0;
-	self->usable_index = FALSE;
-
-	/* This is an internal iterator used by this GtkTreeModel implementation */
-	self->iterator = _tny_gtk_header_list_iterator_new (self, FALSE);
+	self->items = g_ptr_array_sized_new (1000);
 
 	return;
 }
@@ -970,33 +643,18 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	GtkTreePath *path;
 
 	iter.stamp = self->stamp;
-	iter.user_data = self->first;
+	iter.user_data = (gpointer) 0;
 	path = tny_gtk_header_list_model_get_path (GTK_TREE_MODEL (self), &iter);
 
 	g_mutex_lock (self->folder_lock);
 	g_static_rec_mutex_lock (self->iterator_lock);
 
-	/* Unreference the previous headers */
-	if (self->first)
-	{
-		if (G_LIKELY (g_main_depth () > 0))
-			tny_gtk_header_list_model_hdr_cache_remover_copy (
-				self, folder_overwrite_destruction, self, NULL);
-		else 
-		{
-			g_list_foreach (self->first, (GFunc)g_object_unref, NULL);
-			folder_overwrite_destruction (self, NULL);
-		}
-		g_list_free (self->first);
-		self->first = NULL;
-	} else 
-		folder_overwrite_destruction (self, NULL);
-	
-
-	/* Reset the internal iterator */
-	self->length = 0;
-	((TnyGtkHeaderListIterator*)self->iterator)->current = self->first;
-	self->last_nth = 0;
+	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
+	if (self->folder)
+		g_object_unref (G_OBJECT (self->folder));
+	self->folder = TNY_FOLDER (g_object_ref (G_OBJECT (folder)));
+	g_ptr_array_free (self->items, TRUE);
+	self->items = g_ptr_array_sized_new (tny_folder_get_all_count (folder));
 
 	g_static_rec_mutex_unlock (self->iterator_lock);
 	g_mutex_unlock (self->folder_lock);
@@ -1008,25 +666,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	g_mutex_lock (self->folder_lock);
 	g_static_rec_mutex_lock (self->iterator_lock);
 
-	/* Reset the internal iterator */
-
-	/* Code review question (by Philip to myself, so don't ask 
-	Philip), shouldn't this reset self->usable_index = FALSE ?*/
-
-	((TnyGtkHeaderListIterator*)self->iterator)->current = self->first;
-	self->last_nth = 0;
-
-	/* Note to myself: After more code review I decided that the answer 
-	was yes ;-) */
-
-	self->usable_index = FALSE;
-	if (self->index)
-		g_list_free (self->index);
-	self->index = NULL;
-
 	/* Reference the new folder instance */
-	g_object_ref (G_OBJECT (folder));
-	self->folder = folder;
 
 	/* Notify the observers (the GtkTreeView) */
 	gtk_tree_path_append_index (path, 0);

@@ -604,10 +604,10 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 		} else {
 			const char *filename;
 
-			if (cls->index && (!camel_index_has_name(cls->index, uid))) {
-				/* message_info_new will handle duplicates */
+			/*if (cls->index && (!camel_index_has_name(cls->index, uid))) {
+				 message_info_new will handle duplicates 
 				camel_maildir_summary_add(cls, d->d_name, forceindex);
-			}
+			}*/
 
 			mdi = (CamelMaildirMessageInfo *)info;
 			filename = camel_maildir_info_filename(mdi);

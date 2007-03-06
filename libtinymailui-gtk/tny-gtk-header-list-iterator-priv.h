@@ -43,7 +43,7 @@ struct _TnyGtkHeaderListIterator
 {
 	GObject parent;
 	TnyGtkHeaderListModel *model;
-	GList *current;
+	guint current;
 };
 
 struct _TnyGtkHeaderListIteratorClass 
@@ -51,8 +51,7 @@ struct _TnyGtkHeaderListIteratorClass
 	GObjectClass parent;
 };
 
-void _tny_gtk_header_list_iterator_set_model (TnyGtkHeaderListIterator *self, TnyGtkHeaderListModel *model, gboolean lock);
-TnyIterator* _tny_gtk_header_list_iterator_new (TnyGtkHeaderListModel *model, gboolean lock);
+TnyIterator* _tny_gtk_header_list_iterator_new (TnyGtkHeaderListModel *model);
 
 gboolean _tny_gtk_header_list_iterator_is_done_nl (TnyGtkHeaderListIterator *self);
 gpointer _tny_gtk_header_list_iterator_get_current_nl (TnyGtkHeaderListIterator *me);

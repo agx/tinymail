@@ -66,13 +66,10 @@ struct _TnyGtkHeaderListModel
 	GMutex *folder_lock;
 	GStaticRecMutex *iterator_lock;
 	TnyFolder *folder;
-	gint length;
 	gint stamp;
 
-	gboolean usable_index;
-	GList *first, *index;
+	GPtrArray *items;
 	TnyIterator *iterator;
-	guint last_nth;
 };
 
 struct _TnyGtkHeaderListModelClass 

@@ -1,3 +1,11 @@
+2007-03-06  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Bugfixes for summary items and writing them to disk, keeping the
+	local array in sync with that is on disk
+	* Reimplementation of the TnyGtkHeaderListModel, to use a GPtrArray in
+	stead of a GList: should be both faster and less memory consuming
+	* Removed some non-used camel-lite functionality and symbols
+
 2007-03-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix for ticket #26
