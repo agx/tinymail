@@ -478,19 +478,10 @@ static int camel_maildir_summary_add(CamelLocalSummary *cls, const char *name, i
 	mp = camel_mime_parser_new();
 	camel_mime_parser_scan_from(mp, FALSE);
 	camel_mime_parser_init_with_fd(mp, fd);
-	if (cls->index && (forceindex || !camel_index_has_name(cls->index, name))) {
-		d(printf("forcing indexing of message content\n"));
-		camel_folder_summary_set_index((CamelFolderSummary *)maildirs, cls->index);
-		/* TNY TODO: Cleanly solve this by removing the index code */
-		camel_folder_summary_set_index((CamelFolderSummary *)maildirs, NULL);
-	} else {
-		camel_folder_summary_set_index((CamelFolderSummary *)maildirs, NULL);
-	}
 	maildirs->priv->current_file = (char *)name;
 	camel_folder_summary_add_from_parser((CamelFolderSummary *)maildirs, mp);
 	camel_object_unref((CamelObject *)mp);
 	maildirs->priv->current_file = NULL;
-	camel_folder_summary_set_index((CamelFolderSummary *)maildirs, NULL);
 	g_free(filename);
 	return 0;
 }

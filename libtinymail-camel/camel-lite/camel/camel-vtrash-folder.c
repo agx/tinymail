@@ -47,8 +47,6 @@ static struct {
 } vdata[] = {
 	{ CAMEL_VTRASH_NAME, N_("Trash"), "(match-all (system-flag \"Deleted\"))", CAMEL_MESSAGE_DELETED, CAMEL_FOLDER_IS_TRASH,
 	  N_("Cannot copy messages to the Trash folder") },
-	{ CAMEL_VJUNK_NAME, N_("Junk"), "(match-all (system-flag \"Junk\"))", CAMEL_MESSAGE_JUNK, CAMEL_FOLDER_IS_JUNK,
-	  N_("Cannot copy messages to the Junk folder") },
 };
 
 static CamelVeeFolderClass *camel_vtrash_folder_parent;
@@ -127,8 +125,6 @@ vtrash_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 		switch (tag & CAMEL_ARG_TAG) {
 		case CAMEL_FOLDER_ARG_UNREAD:
 		case CAMEL_FOLDER_ARG_DELETED:
-		case CAMEL_FOLDER_ARG_JUNKED:
-		case CAMEL_FOLDER_ARG_VISIBLE:
 			/* This is so we can get the values atomically, and also so we can calculate them only once */
 			if (unread == -1) {
 				int j;
@@ -144,10 +140,6 @@ vtrash_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 							unread++;
 						if (flags & CAMEL_MESSAGE_DELETED)
 							deleted++;
-						if (flags & CAMEL_MESSAGE_JUNK)
-							junked++;
-						if ((flags & (CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
-							visible++;
 						camel_message_info_free(info);
 					}
 				}
@@ -159,12 +151,6 @@ vtrash_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 				break;
 			case CAMEL_FOLDER_ARG_DELETED:
 				count = deleted;
-				break;
-			case CAMEL_FOLDER_ARG_JUNKED:
-				count = junked;
-				break;
-			case CAMEL_FOLDER_ARG_VISIBLE:
-				count = visible;
 				break;
 			}
 

@@ -31,7 +31,6 @@ extern "C" {
 #include <time.h>
 #include <camel/camel-mime-parser.h>
 #include <camel/camel-object.h>
-#include <camel/camel-index.h>
 
 
 struct _CamelFolder;
@@ -80,13 +79,13 @@ typedef enum _CamelMessageFlags {
 	/* these aren't really system flag bits, but are convenience flags */
 	CAMEL_MESSAGE_FREED = 1<<9, /* free slot */
 	CAMEL_MESSAGE_SECURE = 1<<10, /* free slot */
-	CAMEL_MESSAGE_JUNK = 1<<11, /* free slot */
+	CAMEL_MESSAGE_ABCDEF = 1<<11, /* free slot */
 
 	/* internally used */
 	CAMEL_MESSAGE_FOLDER_FLAGGED = 1<<12, /* internally used */
 	CAMEL_MESSAGE_INFO_NEEDS_FREE = 1<<13,/* internally used */
 	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE = 1<<14, /* internally used */
-	CAMEL_MESSAGE_JUNK_LEARN = 1<<15,  /* free slot */
+	CAMEL_MESSAGE_DEFGH = 1<<15,  /* free slot */
 	CAMEL_MESSAGE_USER = 1<<16  /* free slot */
 } CamelMessageFlags;
 
@@ -116,13 +115,6 @@ typedef struct _CamelSummaryMessageID {
 	} id;
 } CamelSummaryMessageID;
 
-#ifdef NON_TINYMAIL_FEATURES
-/* summary references is a fixed size array of references */
-typedef struct _CamelSummaryReferences {
-	int size;
-	CamelSummaryMessageID references[1];
-} CamelSummaryReferences;
-#endif
 
 /* accessor id's */
 enum {
@@ -167,9 +159,6 @@ struct _CamelMessageInfoBase
 	const char *from;                  /* 4 bytes */
 	const char *to;                    /* 4 bytes */
 	const char *cc;                    /* 4 bytes */
-#ifdef NON_TINYMAIL_FEATURES
-	const char *mlist;
-#endif
 
 	/* tree of content description - NULL if it is not available */
 	CamelMessageContentInfo *content;  /* 4 bytes */
@@ -182,26 +171,8 @@ struct _CamelMessageInfoBase
 	time_t date_received;              /* 4 bytes */
 
                                           /* 56 bytes */
-#ifdef NON_TINYMAIL_FEATURES
-	CamelSummaryReferences *references;/* from parent to root */
-#endif
-
-#ifdef NON_TINYMAIL_FEATURES
-	struct _CamelFlag *user_flags;
-	struct _CamelTag *user_tags;
-#endif
-
 };
 
-/* probably do this as well, removing CamelFolderChangeInfo and interfaces 
-typedef struct _CamelChangeInfo CamelChangeInfo;
-struct _CamelChangeInfo {
-	GPtrArray *added;
-	GPtrArray *removed;
-	GPtrArray *changed;
-	GPtrArray *recent;
-};
-*/
 
 typedef enum _CamelFolderSummaryFlags {
 	CAMEL_SUMMARY_DIRTY = 1<<0,
@@ -240,6 +211,7 @@ struct _CamelFolderSummary {
 	unsigned char *filepos;
 	GMutex *dump_lock, *hash_lock;
 	gboolean in_reload;
+	gint idx;
 
 	void (*set_extra_flags_func) (CamelFolder *folder, CamelMessageInfoBase *mi);
 };
@@ -281,14 +253,6 @@ struct _CamelFolderSummaryClass {
 	gboolean    (*info_user_flag)(const CamelMessageInfo *mi, const char *id);
 	const char *(*info_user_tag)(const CamelMessageInfo *mi, const char *id);
 
-	/* set accessors for the modifyable bits */
-#if 0
-	void (*info_set_ptr)(CamelMessageInfo *mi, int id, const void *val);
-	void (*info_set_uint32)(CamelMessageInfo *mi, int id, guint32 val);
-	void (*info_set_time)(CamelMessageInfo *mi, int id, time_t val);
-	void (*info_set_references)(CamelMessageInfo *mi, CamelSummaryReferences *);
-#endif
-
 	gboolean (*info_set_user_flag)(CamelMessageInfo *mi, const char *id, gboolean state);
 	gboolean (*info_set_user_tag)(CamelMessageInfo *mi, const char *id, const char *val);
 	gboolean (*info_set_flags)(CamelMessageInfo *mi, guint32 mask, guint32 set);
@@ -311,7 +275,6 @@ unsigned char*
 decode_uint32 (unsigned char *start, guint32 *dest, gboolean is_string);
 
 void camel_folder_summary_set_filename(CamelFolderSummary *summary, const char *filename);
-void camel_folder_summary_set_index(CamelFolderSummary *summary, CamelIndex *index);
 void camel_folder_summary_set_build_content(CamelFolderSummary *summary, gboolean state);
 
 guint32  camel_folder_summary_next_uid        (CamelFolderSummary *summary);
@@ -404,10 +367,6 @@ time_t camel_message_info_time(const CamelMessageInfo *mi, int id);
 #define camel_message_info_to(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_TO))
 #define camel_message_info_cc(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_CC))
 
-#ifdef NON_TINYMAIL_FEATURES
-#define camel_message_info_mlist(mi) ((const char *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_MLIST))
-#endif
-
 #define camel_message_info_flags(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_FLAGS)
 #define camel_message_info_size(mi) camel_message_info_uint32((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_SIZE)
 
@@ -415,9 +374,6 @@ time_t camel_message_info_time(const CamelMessageInfo *mi, int id);
 #define camel_message_info_date_received(mi) camel_message_info_time((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_DATE_RECEIVED)
 
 #define camel_message_info_message_id(mi) ((const CamelSummaryMessageID *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_MESSAGE_ID))
-#ifdef NON_TINYMAIL_FEATURES
-#define camel_message_info_references(mi) ((const CamelSummaryReferences *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_REFERENCES))
-#endif
 #define camel_message_info_user_flags(mi) ((const CamelFlag *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_USER_FLAGS))
 #define camel_message_info_user_tags(mi) ((const CamelTag *)camel_message_info_ptr((const CamelMessageInfo *)mi, CAMEL_MESSAGE_INFO_USER_TAGS))
 

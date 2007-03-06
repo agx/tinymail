@@ -638,36 +638,5 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	CamelLocalSummary *cls = (CamelLocalSummary *)s;
 
 	mi = (CamelLocalMessageInfo *)((CamelFolderSummaryClass *)camel_local_summary_parent)->message_info_new_from_header(s, h);
-	if (mi) {
-		const char *xev;
-		int doindex = FALSE;
-
-		xev = camel_header_raw_find(&h, "X-Evolution", NULL);
-		if (xev==NULL || camel_local_summary_decode_x_evolution(cls, xev, mi) == -1) {
-			/* to indicate it has no xev header */
-			mi->info.flags |= CAMEL_MESSAGE_FOLDER_FLAGGED | CAMEL_MESSAGE_FOLDER_NOXEV;
-			g_free (mi->info.uid);
-			mi->info.uid = camel_folder_summary_next_uid_string(s);
-
-			/* shortcut, no need to look it up in the index library */
-			doindex = TRUE;
-		}
-		
-		if (cls->index
-		    && (doindex
-			|| cls->index_force
-			|| !camel_index_has_name(cls->index, camel_message_info_uid(mi)))) {
-			d(printf("Am indexing message %s\n", camel_message_info_uid(mi)));
-			camel_folder_summary_set_index(s, cls->index);
-
-			/* TNY TODO: Cleanly solve this by removing the index code */
-			camel_folder_summary_set_index(s, NULL);
-
-		} else {
-			d(printf("Not indexing message %s\n", camel_message_info_uid(mi)));
-			camel_folder_summary_set_index(s, NULL);
-		}
-	}
-	
 	return (CamelMessageInfo *)mi;
 }

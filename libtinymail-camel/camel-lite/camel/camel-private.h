@@ -119,8 +119,6 @@ struct _CamelFolderSummaryPrivate {
 
 	struct _CamelStreamFilter *filter_stream;
 
-	struct _CamelIndex *index;
-	
 	GMutex *summary_lock;	/* for the summary hashtable/array */
 	GMutex *io_lock;	/* load/save lock, for access to saved_count, etc */
 	GMutex *filter_lock;	/* for accessing any of the filtering/indexing stuff, since we share them */

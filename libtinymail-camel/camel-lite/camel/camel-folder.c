@@ -350,8 +350,6 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 			break;
 		case CAMEL_FOLDER_ARG_UNREAD:
 		case CAMEL_FOLDER_ARG_DELETED:
-		case CAMEL_FOLDER_ARG_JUNKED:
-		case CAMEL_FOLDER_ARG_VISIBLE:
 			/* This is so we can get the values atomically, and also so we can calculate them only once */
 			if (unread == -1) {
 				int j;
@@ -367,15 +365,10 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 					{
 						guint32 flags = camel_message_info_flags(info);
 
-						if ((flags & (CAMEL_MESSAGE_SEEN|CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
+						if ((flags & CAMEL_MESSAGE_SEEN) == 0)
 							unread++;
 						if (flags & CAMEL_MESSAGE_DELETED)
 							deleted++;
-						if (flags & CAMEL_MESSAGE_JUNK)
-							junked++;
-						if ((flags & (CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
-							visible++;
-						
 						camel_message_info_free(info);
 					}
 				}
@@ -387,12 +380,6 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 				break;
 			case CAMEL_FOLDER_ARG_DELETED:
 				count = deleted;
-				break;
-			case CAMEL_FOLDER_ARG_JUNKED:
-				count = junked;
-				break;
-			case CAMEL_FOLDER_ARG_VISIBLE:
-				count = visible;
 				break;
 			}
 
@@ -774,11 +761,6 @@ gboolean
 camel_folder_set_message_flags(CamelFolder *folder, const char *uid, guint32 flags, guint32 set)
 {
 	g_return_val_if_fail(CAMEL_IS_FOLDER(folder), FALSE);
-
-	if ((flags & (CAMEL_MESSAGE_JUNK|CAMEL_MESSAGE_JUNK_LEARN)) == CAMEL_MESSAGE_JUNK) {
-		flags |= CAMEL_MESSAGE_JUNK_LEARN;
-		set &= ~CAMEL_MESSAGE_JUNK_LEARN;
-	}
 
 	return CF_CLASS(folder)->set_message_flags(folder, uid, flags, set);
 }
@@ -1773,8 +1755,6 @@ folder_changed (CamelObject *obj, gpointer event_data)
 	CamelFolderChangeInfo *changed = event_data;
 	CamelSession *session = ((CamelService *)folder->parent_store)->session;
 	CamelFilterDriver *driver = NULL;
-	GPtrArray *junk = NULL;
-	GPtrArray *notjunk = NULL;
 	GPtrArray *recents = NULL;
 	int i;
 
@@ -1798,56 +1778,17 @@ folder_changed (CamelObject *obj, gpointer event_data)
 	}
 	CAMEL_FOLDER_UNLOCK(folder, change_lock);
 
-	if (session->junk_plugin && changed->uid_changed->len) {
-		guint32 flags;
 
-		for (i = 0; i < changed->uid_changed->len; i ++) {
-			flags = camel_folder_get_message_flags (folder, changed->uid_changed->pdata [i]);
-			if (flags & CAMEL_MESSAGE_JUNK_LEARN) {
-				if (flags & CAMEL_MESSAGE_JUNK) {
-					if (!junk)
-						junk = g_ptr_array_new();
-					g_ptr_array_add (junk, g_strdup (changed->uid_changed->pdata [i]));
-				} else {
-					if (!notjunk)
-						notjunk = g_ptr_array_new();
-					g_ptr_array_add (notjunk, g_strdup (changed->uid_changed->pdata [i]));
-				}
-				/* reset junk learn flag so that we don't process it again*/ 
-				camel_folder_set_message_flags (folder, changed->uid_changed->pdata [i], CAMEL_MESSAGE_JUNK_LEARN, 0);
-			}
-		}
-	}
-
-	if ((folder->folder_flags & (CAMEL_FOLDER_FILTER_RECENT|CAMEL_FOLDER_FILTER_JUNK))
+	if ((folder->folder_flags & CAMEL_FOLDER_FILTER_RECENT)
 	    && changed->uid_recent->len > 0)
-		driver = camel_session_get_filter_driver(session,
-							 (folder->folder_flags & CAMEL_FOLDER_FILTER_RECENT) 
-							 ? "incoming":"junktest", NULL);
-		
+		driver = camel_session_get_filter_driver(session, "incoming", NULL);
+
 	if (driver) {
 		recents = g_ptr_array_new();
 		for (i=0;i<changed->uid_recent->len;i++)
 			g_ptr_array_add(recents, g_strdup(changed->uid_recent->pdata[i]));
 	}
 
-	if (driver || junk || notjunk) {
-		struct _folder_filter_msg *msg;
-
-		d(printf("* launching filter thread %d new mail, %d junk and %d not junk\n",
-			 recents?recents->len:0, junk?junk->len:0, notjunk?notjunk->len:0));
-
-		msg = camel_session_thread_msg_new(session, &filter_ops, sizeof(*msg));
-		msg->recents = recents;
-		msg->junk = junk;
-		msg->notjunk = notjunk;
-		msg->folder = folder;
-		camel_object_ref(folder);
-		camel_folder_freeze(folder);
-		msg->driver = driver;
-		camel_exception_init(&msg->ex);
-		camel_session_thread_queue(session, &msg->msg, 0);
-	}
 
 	return TRUE;
 }

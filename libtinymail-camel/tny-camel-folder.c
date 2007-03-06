@@ -143,7 +143,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		if (info)
 		{
 			guint32 flags = camel_message_info_flags(info);
-			if ((flags & (CAMEL_MESSAGE_SEEN|CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
+			if ((flags & CAMEL_MESSAGE_SEEN) == 0)
 				priv->unread_length++;
 			priv->cached_length++;
 			TnyHeader *hdr = _tny_camel_header_new ();
@@ -1042,7 +1042,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	tny_list_prepend (headers, (GObject*)header);
 
-	if ((flags & (CAMEL_MESSAGE_SEEN|CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_JUNK)) == 0)
+	if ((flags & CAMEL_MESSAGE_SEEN) == 0)
 		priv->unread_length++;
 
 	g_object_unref (G_OBJECT (header));

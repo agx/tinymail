@@ -479,8 +479,6 @@ imap_create_flag_list (guint32 flags)
 		g_string_append (gstr, "\\Flagged ");
 	if (flags & CAMEL_MESSAGE_SEEN)
 		g_string_append (gstr, "\\Seen ");
-	if (flags & CAMEL_MESSAGE_JUNK)
-		g_string_append (gstr, "Junk ");
 	if (flags & CAMEL_IMAP_MESSAGE_LABEL1)
 		g_string_append(gstr, "$Label1 ");
 	if (flags & CAMEL_IMAP_MESSAGE_LABEL2)
@@ -554,9 +552,7 @@ imap_parse_flag_list (char **flag_list_p)
 		else if (!g_ascii_strncasecmp (flag_list, "\\Recent", len))
 			flags |= CAMEL_IMAP_MESSAGE_RECENT;
 		else if (!g_ascii_strncasecmp(flag_list, "\\*", len))
-			flags |= CAMEL_MESSAGE_USER|CAMEL_MESSAGE_JUNK|CAMEL_IMAP_MESSAGE_LABEL_MASK;
-		else if (!g_ascii_strncasecmp(flag_list, "Junk", len))
-			flags |= CAMEL_MESSAGE_JUNK;
+			flags |= CAMEL_MESSAGE_USER|CAMEL_IMAP_MESSAGE_LABEL_MASK;
 		else if (!g_ascii_strncasecmp(flag_list, "$Label1", len))
 			flags |= CAMEL_IMAP_MESSAGE_LABEL1;
 		else if (!g_ascii_strncasecmp(flag_list, "$Label2", len))
