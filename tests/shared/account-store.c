@@ -105,6 +105,7 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 	TnyTestAccountStore *me = (TnyTestAccountStore *) self;
 	TnyAccount *account;
 
+
 	/* Dear visitor of the SVN-web. This is indeed a fully functional and
 	   working IMAP account. This does not mean that you need to fuck it up */
 

@@ -91,7 +91,7 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, const gchar 
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
-
+printf ("%s\n", folname);
 		if (!strcmp (tny_folder_get_id (TNY_FOLDER (folder)), folname))
 			func (TNY_FOLDER (folder));
 	    
@@ -129,11 +129,10 @@ main (int argc, char **argv)
 	TnyIterator *aiter;
 	TnyList *folders;
     	gint i=0;
-	gchar *folderids[14] = {
-	    "INBOX/1", "INBOX/10","INBOX/100","INBOX/200",
-	    "INBOX/400", "INBOX/800","INBOX/2000","INBOX/3000", "INBOX/5000",
-	    "INBOX/15000", "INBOX/20000","INBOX/30000","INBOX/40000",
-	    "INBOX/50000" };
+	gchar *folderids[12] = {
+	    "INBOX/100", "INBOX/200","INBOX/500","INBOX/700",
+	    "INBOX/1000", "INBOX/2000","INBOX/3000","INBOX/5000", "INBOX/10000",
+	    "INBOX/30000", "INBOX/40000","INBOX/50000" };
     
     	free (malloc (10));
     
@@ -162,10 +161,10 @@ main (int argc, char **argv)
 	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
     
 	if (online)
-		for (i=0; i<14; i++)
+		for (i=0; i<12; i++)
 			recurse_folders (TNY_FOLDER_STORE (account), NULL, folderids[i], do_get_folder);
 
-    	for (i=0; i<14; i++)
+    	for (i=0; i<12; i++)
 		recurse_folders (TNY_FOLDER_STORE (account), NULL, folderids[i], do_test_folder);
     
 err:
