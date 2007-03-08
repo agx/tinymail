@@ -33,11 +33,14 @@
 #include <camel/camel.h>
 #include <tny-camel-header-priv.h>
 
-typedef void (*performer) (TnyFolder *folder);
+typedef void (*performer_t) (TnyFolder *folder);
+static gint recursion_level=0;
+static gchar *cachedir=NULL;
+static gboolean online=FALSE, justget=FALSE;
 
 static void
 do_get_folder (TnyFolder *folder)
-{   
+{
 	g_print ("Getting headers of %s ...\n", tny_folder_get_id (folder));
 	tny_folder_refresh (folder, NULL);
 }
@@ -49,73 +52,44 @@ do_test_folder (TnyFolder *folder)
 	TnyList *headers = tny_simple_list_new ();
 	gint length, bytes;
 	gdouble kbytes, mbytes;
-    
+
 	g_print ("Loading headers for %s ...\n", tny_folder_get_id (folder));
 	tny_folder_get_headers (folder, headers, FALSE, NULL);
 	length=tny_list_get_length (headers);
 	
-    	bytes = (sizeof (TnyCamelHeader) + sizeof (CamelMessageInfo) + 
+	bytes = (sizeof (TnyCamelHeader) + sizeof (CamelMessageInfo) + 
 		 sizeof (CamelMessageInfoBase) + 
 		 sizeof (CamelMessageContentInfo));
-    
+
 	kbytes = ((gdouble)bytes) / 1024;
-    	mbytes = kbytes / 1024;
-    
+	mbytes = kbytes / 1024;
+
 	g_print ("Loaded %d headers\n\n", length);
 
-    	g_print ("\tsizeof (TnyHeader) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (TnyCamelHeader), length * sizeof (TnyCamelHeader), ((gdouble)length * sizeof (TnyCamelHeader))/1024);
+	g_print ("\tsizeof (TnyHeader) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (TnyCamelHeader), length * sizeof (TnyCamelHeader), ((gdouble)length * sizeof (TnyCamelHeader))/1024);
 	g_print ("\tsizeof (CamelMessageInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfo), length * sizeof (CamelMessageInfo), ((gdouble)length * sizeof (CamelMessageInfo))/1024);
 	g_print ("\tsizeof (CamelMessageInfoBase) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageInfoBase), length * sizeof (CamelMessageInfoBase), ((gdouble)length * sizeof (CamelMessageInfoBase))/1024);
 	g_print ("\tsizeof (CamelMessageContentInfo) = %d - accounts for %d bytes (~%.2lfK)\n", sizeof (CamelMessageContentInfo), length * sizeof (CamelMessageContentInfo), ((gdouble)length * sizeof (CamelMessageContentInfo))/1024);
 
 	g_print ("\nThis means that (at least) %d bytes or ~%.2lfK or ~%.2lfM are needed for this folder\n", bytes, kbytes, mbytes);
 
-    	g_print ("Sleeping to allow your valgrind to see this...\n");
+	g_print ("Sleeping to allow your valgrind to see this...\n");
 	sleep (5);
 	g_print ("Unloading headers ...\n");
 	g_object_unref (G_OBJECT (headers));
-       	g_print ("Sleeping to allow your valgrind to see this...\n");
+		g_print ("Sleeping to allow your valgrind to see this...\n");
 	sleep (5);
 }
-
-
-static void
-recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, const gchar *folname, performer func)
-{
-	TnyIterator *iter;
-	TnyList *folders = tny_simple_list_new ();
-
-	tny_folder_store_get_folders (store, folders, query, NULL);
-	iter = tny_list_create_iterator (folders);
-
-	while (!tny_iterator_is_done (iter))
-	{
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
-printf ("%s\n", folname);
-		if (!strcmp (tny_folder_get_id (TNY_FOLDER (folder)), folname))
-			func (TNY_FOLDER (folder));
-	    
-		recurse_folders (folder, query, folname, func);
-	    
- 		g_object_unref (G_OBJECT (folder));
-
-		tny_iterator_next (iter);	    
-	}
-
-	 g_object_unref (G_OBJECT (iter));
-	 g_object_unref (G_OBJECT (folders));
-}
-
-
-static gchar *cachedir=NULL;
-static gboolean online=FALSE;
 
 static const GOptionEntry options[] = 
 {
 	{ "cachedir", 'c', 0, G_OPTION_ARG_STRING, &cachedir,
 		"Cache directory", NULL },
 	{ "online", 'o', 0, G_OPTION_ARG_NONE, &online,
-		"Online or offline", NULL },    
+		"Online or offline", NULL },
+	{ "justget", 'j', 0, G_OPTION_ARG_NONE, &justget,
+		"Just get the messages", NULL },
+
 	{ NULL }
 };
 
@@ -125,23 +99,17 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	TnyAccountStore *account_store;
 	TnyList *accounts;
+	TnyFolderStoreQuery *query;
 	TnyStoreAccount *account;
-	TnyIterator *aiter;
-	TnyList *folders;
-    	gint i=0;
-	gchar *folderids[12] = {
-	    "INBOX/100", "INBOX/200","INBOX/500","INBOX/700",
-	    "INBOX/1000", "INBOX/2000","INBOX/3000","INBOX/5000", "INBOX/10000",
-	    "INBOX/30000", "INBOX/40000","INBOX/50000" };
-    
-    	free (malloc (10));
-    
+	TnyIterator *iter, *topiter;
+	TnyList *folders, *topfolders;
+	TnyFolder *inbox;
+
+	free (malloc (10));
 	g_type_init ();
 
-	context = g_option_context_new ("- The tinymail memory tester");
+	context = g_option_context_new ("- The tinymail functional tester");
 	g_option_context_add_main_entries (context, options, "tinymail");
-
-    
 	g_option_context_parse (context, &argc, &argv, NULL);
 
 	account_store = tny_test_account_store_new (online, cachedir);
@@ -150,28 +118,49 @@ main (int argc, char **argv)
 		g_print ("Using %s as cache directory\n", cachedir);
 
 	g_option_context_free (context);
-
 	accounts = tny_simple_list_new ();
-	    
+
 	tny_account_store_get_accounts (account_store, accounts, 
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+	g_object_unref (G_OBJECT (account_store));
+	iter = tny_list_create_iterator (accounts);
+	account = (TnyStoreAccount*) tny_iterator_get_current (iter);
 
-	aiter = tny_list_create_iterator (accounts);
-	tny_iterator_first (aiter);
-	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
-    
-	if (online)
-		for (i=0; i<12; i++)
-			recurse_folders (TNY_FOLDER_STORE (account), NULL, folderids[i], do_get_folder);
+	topfolders = tny_simple_list_new ();
+	folders = tny_simple_list_new ();
 
-    	for (i=0; i<12; i++)
-		recurse_folders (TNY_FOLDER_STORE (account), NULL, folderids[i], do_test_folder);
-    
-err:
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (account), topfolders, NULL, NULL);
+	topiter = tny_list_create_iterator (topfolders);
+	inbox = TNY_FOLDER (tny_iterator_get_current (topiter));
+
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (inbox), folders, NULL, NULL);
+	iter = tny_list_create_iterator (folders);
+
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *folder = (TnyFolder*) tny_iterator_get_current (iter);
+
+		printf ("NAME=%s\n", tny_folder_get_name (folder));
+
+		if (online)
+			do_get_folder (folder);
+		if (!justget)
+			do_test_folder (folder);
+		g_object_unref (G_OBJECT (folder));
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (G_OBJECT (iter));
+	g_object_unref (G_OBJECT (folders));
+
+	g_object_unref (G_OBJECT (inbox));
+	g_object_unref (G_OBJECT (topiter));
+	g_object_unref (G_OBJECT (topfolders));
+
 	g_object_unref (G_OBJECT (account));
-	g_object_unref (G_OBJECT (aiter));
 	g_object_unref (G_OBJECT (accounts));
-    
+
 	return 0;
 }
+
 

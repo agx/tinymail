@@ -215,13 +215,17 @@ _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationS
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	GThread *thread;
+	GError *err = NULL;
 
 	g_mutex_lock (priv->cancel_lock);
 
 	/* I know this isn't polite. But it works ;-) */
 	/* camel_operation_cancel (NULL); */
-	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
-	g_thread_join (thread);
+	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, &err);
+	if (err == NULL)
+		g_thread_join (thread);
+	else
+		g_error_free (err);
 
 	if (priv->cancel)
 	{
@@ -780,6 +784,9 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 		if (online) {
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
 										  CAMEL_DISCO_STORE_ONLINE, &ex);
+			if (!camel_exception_is_set (&ex))
+				camel_service_connect (CAMEL_SERVICE (priv->service), &ex);
+
 			goto done;
 		} else if (camel_disco_store_can_work_offline (CAMEL_DISCO_STORE (priv->service))) {
 			

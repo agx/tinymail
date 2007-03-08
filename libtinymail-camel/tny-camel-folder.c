@@ -969,8 +969,8 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 		return;
 	}
 
-	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
-		NULL, NULL, NULL);
+	/*_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
+		NULL, NULL, NULL); */
 
 	oldlen = priv->cached_length;
 	oldurlen = priv->unread_length;
@@ -979,7 +979,7 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	camel_folder_refresh_info (priv->folder, &ex);
 	priv->want_changes = TRUE;
 
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+	/* _tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account)); */
 
 	priv->cached_length = camel_folder_get_message_count (priv->folder);    
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
