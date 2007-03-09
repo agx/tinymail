@@ -73,6 +73,7 @@ struct _TnyCamelAccountClass
 	TnyAccountType (*get_account_type_func) (TnyAccount *self);
 	void (*try_connect_func) (TnyAccount *self, GError **err);
 	void (*cancel_func) (TnyAccount *self);
+	gboolean (*matches_url_string_func) (TnyAccount *self, const gchar *url_string);
 
 	void (*add_option_func) (TnyCamelAccount *self, const gchar *option);
 	void (*set_online_func) (TnyCamelAccount *self, gboolean online, GError **err);

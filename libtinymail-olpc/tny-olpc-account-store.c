@@ -57,6 +57,7 @@ struct _TnyOlpcAccountStorePriv
 	TnySessionCamel *session;
 	TnyDevice *device;
 	guint notify;
+	GList *accounts;
 };
 
 #define TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE(o)	\
@@ -168,27 +169,16 @@ tny_olpc_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gc
 }
 
 
-static const gchar*
-tny_olpc_account_store_get_cache_dir (TnyAccountStore *self)
-{
-	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	if (!priv->cache_dir)
-		priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".tinymail", NULL);
-
-	return priv->cache_dir;
-}
 
 
 static void
-tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
+load_accounts (TnyAccountStore *self)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
+
 	const gchar *filen;
 	gchar *configd;
 	GDir *dir;
-
-	g_assert (TNY_IS_LIST (list));
 
 	configd = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), 
 		".tinymail", "accounts", NULL);
@@ -222,22 +212,18 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 		type = g_key_file_get_value (keyfile, "tinymail", "type", NULL);
 		proto = g_key_file_get_value (keyfile, "tinymail", "proto", NULL);
 		mech = g_key_file_get_value (keyfile, "tinymail", "mech", NULL);
-	    
-		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
-		{
-			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
-				account = TNY_ACCOUNT (tny_camel_transport_account_new ());
-		} else if (type && types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS)
-		{		
-			if (!g_ascii_strncasecmp (proto, "imap", 4))
-				account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
-			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
-				account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
-			else if (!g_ascii_strncasecmp (proto, "pop", 3))
-				account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
-			else	/* Unknown, create a generic one? */
-			        account = TNY_ACCOUNT (tny_camel_store_account_new ());
-		}
+
+		if (!g_ascii_strncasecmp (proto, "smtp", 4))
+			account = TNY_ACCOUNT (tny_camel_transport_account_new ());
+		else if (!g_ascii_strncasecmp (proto, "imap", 4))
+			account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
+		else if (!g_ascii_strncasecmp (proto, "nntp", 4))
+			account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
+		else if (!g_ascii_strncasecmp (proto, "pop", 3))
+			account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
+		else	/* Unknown, create a generic one? */
+			account = TNY_ACCOUNT (tny_camel_store_account_new ());
+
 
 		if (type)
 			g_free (type);
@@ -269,14 +255,12 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 				g_strfreev (options);
 			}
 
-			/* Because we only check for the n first bytes, the pops, imaps and smtps also work */
 			if (!g_ascii_strncasecmp (proto, "pop", 3) ||
 				!g_ascii_strncasecmp (proto, "imap", 4))
 			{
 				gchar *user, *hostname;
 				GError *err = NULL;
 
-				/* TODO: Add other supported and tested providers here */
 				user = g_key_file_get_value (keyfile, "tinymail", "user", NULL);
 				tny_account_set_user (TNY_ACCOUNT (account), user);
 
@@ -296,6 +280,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 				/* Un officially supported provider */
 				/* Assuming there's a url_string in this case */
+
 				url_string = g_key_file_get_value (keyfile, "tinymail", "url_string", NULL);
 				tny_account_set_url_string (TNY_ACCOUNT (account), url_string);
 				g_free (url_string);
@@ -305,19 +290,13 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 			g_free (fullfilen);
 
-			/* 
-			 * Setting the password function must happen after
-			 * setting the host, user and protocol.
-			 */
-
 			tny_account_set_forget_pass_func (TNY_ACCOUNT (account),
 				per_account_forget_pass_func);
 	
 			tny_account_set_pass_func (TNY_ACCOUNT (account),
 				per_account_get_pass_func);
 
-			tny_list_prepend (list, (GObject*)account);
-			g_object_unref (G_OBJECT (account));
+			priv->accounts = g_list_prepend (priv->accounts, account);
 
 		}
 
@@ -327,10 +306,83 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 			g_free (mech);
 
 		g_key_file_free (keyfile);
-	}	
+	}
 	g_dir_close (dir);
+}
 
-	return;	
+static TnyAccount* 
+tny_olpc_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
+{
+	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyAccount *found = NULL;
+
+	if (!priv->accounts)
+		load_accounts (self);
+
+	if (priv->accounts)
+	{
+		GList *copy = priv->accounts;
+		while (copy)
+		{
+			TnyAccount *account = copy->data;
+
+			if (tny_account_matches_url_string (account, url_string))
+			{
+				found = TNY_ACCOUNT (g_object_ref (G_OBJECT (found)));
+				break;
+			}
+
+			copy = g_list_next (copy);
+		}
+	}
+
+	return found;
+}
+
+static const gchar*
+tny_olpc_account_store_get_cache_dir (TnyAccountStore *self)
+{
+	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	if (!priv->cache_dir)
+		priv->cache_dir = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".tinymail", NULL);
+
+	return priv->cache_dir;
+}
+
+
+static void
+tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
+{
+	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_LIST (list));
+
+	if (!priv->accounts)
+		load_accounts (priv);
+
+	if (priv->accounts)
+	{
+		GList *copy = priv->accounts;
+		while (copy)
+		{
+			TnyAccount *account = copy->data;
+
+			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS)
+			{
+				if (TNY_IS_STORE_ACCOUNT (account))
+					tny_list_prepend (list, (GObject*)account);
+			} else if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
+			{
+				if (TNY_IS_TRANSPORT_ACCOUNT (account))
+					tny_list_prepend (list, (GObject*)account);
+			}
+
+			copy = g_list_next (copy);
+		}
+	}
+
+	return;
 }
 
 
@@ -403,9 +455,9 @@ tny_olpc_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyPlatformFactory *platfact = TNY_PLATFORM_FACTORY (
 		tny_olpc_platform_factory_get_instance ());
 
+	priv->accounts = NULL;
 	priv->device = tny_platform_factory_new_device (platfact);
-	/* tny_device_force_online (priv->device); */
-	
+
 	return;
 }
 
@@ -414,6 +466,8 @@ static void
 tny_olpc_account_store_finalize (GObject *object)
 {	
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (object);
+
+	kill_stored_accounts (priv);
 
 	if (priv->cache_dir)
 		g_free (priv->cache_dir);
@@ -464,6 +518,7 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	klass->get_cache_dir_func = tny_olpc_account_store_get_cache_dir;
 	klass->get_device_func = tny_olpc_account_store_get_device;
 	klass->alert_func = tny_olpc_account_store_alert;
+	klass->find_account_func = tny_olpc_account_store_find_account;
 
 	return;
 }

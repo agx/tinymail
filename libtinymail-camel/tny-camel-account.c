@@ -49,6 +49,19 @@
 
 static GObjectClass *parent_class = NULL;
 
+static gboolean 
+tny_camel_account_matches_url_string (TnyAccount *self, const gchar *url_string)
+{
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->matches_url_string_func (self, url_string);
+}
+
+static gboolean 
+tny_camel_account_matches_url_string_default (TnyAccount *self, const gchar *url_string)
+{
+	/* TODO implement */
+	return FALSE;
+}
+
 static TnyAccountType
 tny_camel_account_get_account_type (TnyAccount *self)
 {
@@ -921,6 +934,7 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->set_name_func = tny_camel_account_set_name;
 	klass->get_account_type_func = tny_camel_account_get_account_type;
 	klass->cancel_func = tny_camel_account_cancel;
+	klass->matches_url_string_func = tny_camel_account_matches_url_string;
 
 	return;
 }
@@ -956,6 +970,7 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->set_name_func = tny_camel_account_set_name_default;
 	class->get_account_type_func = tny_camel_account_get_account_type_default;
 	class->cancel_func = tny_camel_account_cancel_default;
+	class->matches_url_string_func = tny_camel_account_matches_url_string_default;
 
 	class->add_option_func = tny_camel_account_add_option_default;
 	class->set_online_func = tny_camel_account_set_online_default;

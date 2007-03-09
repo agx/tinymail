@@ -81,6 +81,7 @@ struct _TnyAccountStoreIface {
 	const gchar* (*get_cache_dir_func) (TnyAccountStore *self);
 	TnyDevice* (*get_device_func) (TnyAccountStore *self);
 	gboolean (*alert_func) (TnyAccountStore *self, TnyAlertType type, const gchar *prompt);
+	TnyAccount* (*find_account_func) (TnyAccountStore *self, const gchar *url_string);
 };
 
 GType tny_account_store_get_type (void);
@@ -93,6 +94,7 @@ void tny_account_store_add_transport_account (TnyAccountStore *self, TnyTranspor
 const gchar*  tny_account_store_get_cache_dir (TnyAccountStore *self);
 TnyDevice* tny_account_store_get_device (TnyAccountStore *self);
 gboolean tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt);
+TnyAccount* tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string);
 
 G_END_DECLS
 

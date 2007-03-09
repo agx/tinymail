@@ -1,3 +1,22 @@
+2007-03-09  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added the tny_account_store_find_account API. It's possible that in
+	future a set and get find strategy API will be added. For now, finding
+	using only the url-string will suffice (and adding the find strategy
+	later wont break the existing API, or at least doesn't have to as far
+	as I can see now -- I might laugh at this entry in future, we'll see)
+	
+	* Changes to the TnyAccountStore implementations, it's more typical 
+	now to let the account store store the instances internally, rather 
+	than letting it always return new instances. How else are you going 
+	to find the original TnyAccount instance with 
+	tny_account_store_find_account?
+
+	* Added the tny_account_matches_url_string API, to determine whether a
+	specific account instance matches a specific url_string.
+
+	* This was a major API change
+
 2007-03-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfixes for summary items and writing them to disk, keeping the

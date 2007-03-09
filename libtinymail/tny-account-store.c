@@ -24,6 +24,34 @@
 #include <tny-account-store.h>
 guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 
+
+/**
+ * tny_account_store_find_account:
+ * @self: a #TnyAccountTransport object
+ * @url_string: the url-string of the account to find
+ *
+ * Try to find the account in @self that corresponds to @url_string. If this 
+ * method does not return NULL, the returned value is the found account and
+ * must be unreferenced after use.
+ *
+ * Implementors: when implementing a platform-specific library, you must
+ * implement this method. Let it return the account that corresponds to
+ * @url_string or NULL. Also see tny_account_matches_url_string at #TnyAccount.
+ *
+ * This method can be used to resolve url-strings to #TnyAccount instances.
+ *
+ * Return value: the found account or NULL.
+ **/
+TnyAccount* 
+tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func)
+		g_critical ("You must implement tny_account_store_find_account\n");
+#endif
+	return TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func (self, url_string);
+}
+
 /**
  * tny_account_store_alert:
  * @self: a #TnyAccountTransport object

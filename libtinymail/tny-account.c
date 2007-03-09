@@ -23,6 +23,35 @@
 
 
 /**
+ * tny_account_matches_url_string:
+ * @self: a #TnyAccount object
+ * @url_string: the url-string of the account to find
+ *
+ * Find out whether the account matches a certain url_string.
+ *
+ * Implementors: Be forgiving about things like passwords in the url_string.
+ * While matching the folder, password and message-id pieces are insignificant.
+ *
+ * An example url_string can be imap://user:password@server/INBOX/005. Only 
+ * "imap://user@server" is significant when searching. Also take a look at 
+ * RFC 1808 for more information on url_string formatting.
+ *
+ * This method must be usable with tny_account_store_find_account.
+ *
+ * Return value: whether or not @self matches with @url_string.
+ **/
+gboolean 
+tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
+{
+#ifdef DEBUG
+	if (!TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func)
+		g_critical ("You must implement tny_account_matches_url_string\n");
+#endif
+
+	return TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func (self, url_string);
+}
+
+/**
  * tny_account_cancel:
  * @self: a #TnyAccount object
  *

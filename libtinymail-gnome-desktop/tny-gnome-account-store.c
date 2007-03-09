@@ -66,6 +66,7 @@ struct _TnyGnomeAccountStorePriv
 	TnySessionCamel *session;
 	TnyDevice *device;
 	guint notify;
+	GList *accounts;
 };
 
 #define TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE(o)	\
@@ -290,21 +291,35 @@ tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const g
 	return retval;
 }
 
+static void
+kill_stored_accounts (TnyGnomeAccountStorePriv *priv)
+{
+	if (priv->accounts)
+	{
+		g_list_foreach (priv->accounts, (GFunc) g_object_unref, NULL);
+		g_list_free (priv->accounts);
+		priv->accounts = NULL;
+	}
+
+	return;
+}
 
 static void
 gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 			GConfEntry *entry, gpointer user_data)
 {
 	TnyAccountStore *self = user_data;
+	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	gchar *key = g_strdup (entry->key);
 	gchar *ptr = strrchr (key, '/'); ptr++;
 
+
 	if (!strcmp (ptr, "count"))
 	{
+		kill_stored_accounts (priv);
 		g_signal_emit (self, 
 			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
-
 	}
 
 	g_free (key);
@@ -312,45 +327,11 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	return;
 }
 
-
-static const gchar*
-tny_gnome_account_store_get_cache_dir (TnyAccountStore *self)
-{
-	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	if (G_UNLIKELY (!priv->cache_dir))
-	{
-		/* Note that there's no listener for this key. If it changes,
-		   the camelsession should be destroyed and rebuild from scratch.
-		   Which basically means reloading the accounts aswell. 
-		  
-		   So say you're a nut who wants this key to be updatable at 
-		   runtime, you'll have to unload all the accounts here, and of
-		   course reload them. All the functionality for that is already
-		   available. Perhaps I should just do it ... hmm, maybe another
-		   day. Soon. Perhaps. I don't know. Probably . . . . bleh. 
-
-		   Oh and, not to forget! You should probably also move the old
-		   cache location to the new one. Or cleanup the old one. */
-
-		gchar *cache_dir = gconf_client_get_string (priv->client, 
-			"/apps/tinymail/cache_dir", NULL);
-		priv->cache_dir = g_build_filename (g_get_home_dir (), 
-			cache_dir, NULL);
-		g_free (cache_dir);
-	}
-
-	return priv->cache_dir;
-}
-
-
 static void
-tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
+load_accounts (TnyAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	gint i=0, count, port;
-
-	g_assert (TNY_IS_LIST (list));
 
 	count = gconf_client_get_int (priv->client, 
 			"/apps/tinymail/accounts/count", NULL);
@@ -362,7 +343,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 		GSList *options;
 
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d", i);
-		
+
 		if (!gconf_client_dir_exists (priv->client, (const gchar*)key, NULL))
 		{
 			g_free (key);
@@ -370,7 +351,6 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 		}
 		g_free (key);
 
-	    
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/disabled", i);
 		if (gconf_client_get_bool (priv->client, (const gchar*) key, NULL))
 		{
@@ -383,7 +363,7 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 		type = gconf_client_get_string (priv->client, 
 			(const gchar*) key, NULL);
 		g_free (key);
-	    
+
 		key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", i);
 		proto = gconf_client_get_string (priv->client, 
 			(const gchar*) key, NULL);
@@ -393,22 +373,17 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 		mech = gconf_client_get_string (priv->client, 
 			(const gchar*) key, NULL);
 		g_free (key);
-  
-		if (type && G_LIKELY (!g_ascii_strncasecmp (type, "transport", 9)))
-		{
-			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
-				account = TNY_ACCOUNT (tny_camel_transport_account_new ());
-		} else if (type && (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS))
-		{
-			if (!g_ascii_strncasecmp (proto, "imap", 4))
-				account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
-			else if (!g_ascii_strncasecmp (proto, "nntp", 4))
-				account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
-			else if (!g_ascii_strncasecmp (proto, "pop", 3))
-				account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
-			else	/* Unknown, create a generic one? */
-			    account = TNY_ACCOUNT (tny_camel_store_account_new ());
-		}
+
+		if (!g_ascii_strncasecmp (proto, "smtp", 4))
+			account = TNY_ACCOUNT (tny_camel_transport_account_new ());
+		else if (!g_ascii_strncasecmp (proto, "imap", 4))
+			account = TNY_ACCOUNT (tny_camel_imap_store_account_new ());
+		else if (!g_ascii_strncasecmp (proto, "nntp", 4))
+			account = TNY_ACCOUNT (tny_camel_nntp_store_account_new ());
+		else if (!g_ascii_strncasecmp (proto, "pop", 3))
+			account = TNY_ACCOUNT (tny_camel_pop_store_account_new ());
+		else	/* Unknown, create a generic one? */
+			account = TNY_ACCOUNT (tny_camel_store_account_new ());
 
 		if (type)
 			g_free (type);
@@ -422,7 +397,6 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 			name = gconf_client_get_string (priv->client, 
 				(const gchar*) key, NULL);
 			g_free (key);
-
 
 			if (name)
 			{
@@ -450,13 +424,11 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 				g_slist_free (tmp);
 			}
 
-			/* Because we only check for the n first bytes, the pops, imaps and smtps also work */
 			if (!g_ascii_strncasecmp (proto, "pop", 3) ||
 				!g_ascii_strncasecmp (proto, "imap", 4))
 			{
 				gchar *user, *hostname;
 
-				/* TODO: Add other supported and tested providers here */
 				key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", i);
 				user = gconf_client_get_string (priv->client, 
 					(const gchar*) key, NULL);
@@ -498,20 +470,13 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 			tny_account_set_id (TNY_ACCOUNT (account), key);
 			g_free (key);
 
-			/* 
-			 * Setting the password function must happen after
-			 * setting the host, user and protocol.
-			 */
-
 			tny_account_set_forget_pass_func (TNY_ACCOUNT (account),
 				per_account_forget_pass_func);
 
 			tny_account_set_pass_func (TNY_ACCOUNT (account),
 				per_account_get_pass_func);
 
-			tny_list_prepend (list, (GObject*)account);
-			g_object_unref (G_OBJECT (account));
-
+			priv->accounts = g_list_prepend (priv->accounts, account);
 		}
 
 		if (mech)
@@ -520,8 +485,101 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 		if (proto)
 			g_free (proto);
 	}
+}
 
-	return;	
+static TnyAccount* 
+tny_gnome_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
+{
+	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyAccount *found = NULL;
+
+	if (!priv->accounts)
+		load_accounts (self);
+
+	if (priv->accounts)
+	{
+		GList *copy = priv->accounts;
+		while (copy)
+		{
+			TnyAccount *account = copy->data;
+
+			if (tny_account_matches_url_string (account, url_string))
+			{
+				found = TNY_ACCOUNT (g_object_ref (G_OBJECT (found)));
+				break;
+			}
+
+			copy = g_list_next (copy);
+		}
+	}
+
+	return found;
+}
+
+
+static const gchar*
+tny_gnome_account_store_get_cache_dir (TnyAccountStore *self)
+{
+	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	if (G_UNLIKELY (!priv->cache_dir))
+	{
+		/* Note that there's no listener for this key. If it changes,
+		   the camelsession should be destroyed and rebuild from scratch.
+		   Which basically means reloading the accounts aswell. 
+		  
+		   So say you're a nut who wants this key to be updatable at 
+		   runtime, you'll have to unload all the accounts here, and of
+		   course reload them. All the functionality for that is already
+		   available. Perhaps I should just do it ... hmm, maybe another
+		   day. Soon. Perhaps. I don't know. Probably . . . . bleh. 
+
+		   Oh and, not to forget! You should probably also move the old
+		   cache location to the new one. Or cleanup the old one. */
+
+		gchar *cache_dir = gconf_client_get_string (priv->client, 
+			"/apps/tinymail/cache_dir", NULL);
+		priv->cache_dir = g_build_filename (g_get_home_dir (), 
+			cache_dir, NULL);
+		g_free (cache_dir);
+	}
+
+	return priv->cache_dir;
+}
+
+
+static void
+tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
+{
+	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_LIST (list));
+
+	if (!priv->accounts)
+		load_accounts (self);
+
+	if (priv->accounts)
+	{
+		GList *copy = priv->accounts;
+		while (copy)
+		{
+			TnyAccount *account = copy->data;
+
+			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS)
+			{
+				if (TNY_IS_STORE_ACCOUNT (account))
+					tny_list_prepend (list, (GObject*)account);
+			} else if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
+			{
+				if (TNY_IS_TRANSPORT_ACCOUNT (account))
+					tny_list_prepend (list, (GObject*)account);
+			}
+
+			copy = g_list_next (copy);
+		}
+	}
+
+	return;
 }
 
 
@@ -585,7 +643,7 @@ tny_gnome_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 		tny_account_get_user (account), NULL);
 	g_free (key); 
 
-    	count++;
+	count++;
 
 	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
 		count, NULL);
@@ -642,7 +700,6 @@ tny_gnome_account_store_new (void)
 
 	tny_session_camel_set_ui_locker (priv->session, tny_gtk_lockable_new ());
 
-
 	return TNY_ACCOUNT_STORE (self);
 }
 
@@ -654,6 +711,7 @@ tny_gnome_account_store_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyPlatformFactory *platfact;
 
+	priv->accounts = NULL;
 	priv->client = gconf_client_get_default ();
 
 	gconf_client_add_dir (priv->client, "/apps/tinymail", 
@@ -662,9 +720,7 @@ tny_gnome_account_store_instance_init (GTypeInstance *instance, gpointer g_class
 	tny_gnome_account_store_notify_add (TNY_ACCOUNT_STORE (self));
 
 	platfact = TNY_PLATFORM_FACTORY (tny_gnome_platform_factory_get_instance ());
-    	priv->device = tny_platform_factory_new_device (platfact);
-	/* tny_device_force_online (priv->device); */
-	
+	priv->device = tny_platform_factory_new_device (platfact);
 
 	return;
 }
@@ -678,6 +734,8 @@ tny_gnome_account_store_finalize (GObject *object)
 
 	tny_gnome_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
 	g_object_unref (G_OBJECT (priv->client));
+
+	kill_stored_accounts (priv);
 
 	if (G_LIKELY (priv->cache_dir))
 		g_free (priv->cache_dir);
@@ -728,6 +786,7 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	klass->get_cache_dir_func = tny_gnome_account_store_get_cache_dir;
 	klass->get_device_func = tny_gnome_account_store_get_device;
 	klass->alert_func = tny_gnome_account_store_alert;
+	klass->find_account_func = tny_gnome_account_store_find_account;
 
 	return;
 }
