@@ -58,8 +58,67 @@ tny_camel_account_matches_url_string (TnyAccount *self, const gchar *url_string)
 static gboolean 
 tny_camel_account_matches_url_string_default (TnyAccount *self, const gchar *url_string)
 {
-	/* TODO implement */
-	return FALSE;
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelURL *in = NULL;
+	CamelURL *org = NULL;
+	gboolean retval = TRUE;
+
+	if (url_string)
+		camel_url_new (url_string, &ex);
+	else
+		return FALSE;
+
+	if (camel_exception_is_set (&ex) || !in)
+		return FALSE;
+
+	if (priv->url_string)
+		org = camel_url_new (priv->url_string, &ex);
+	else {
+		gchar *proto;
+		if (priv->proto == NULL)
+			return FALSE;
+		proto = g_strdup_printf ("%s://", priv->proto); 
+		org = camel_url_new (proto, &ex);
+		g_free (proto);
+		if (camel_exception_is_set (&ex) || !org)
+			return FALSE;
+		camel_url_set_protocol (org, priv->proto); 
+		if (priv->user)
+			camel_url_set_user (org, priv->user);
+		camel_url_set_host (org, priv->host);
+		if (priv->port != -1)
+			camel_url_set_port (org, (int)priv->port);
+	}
+
+	if (camel_exception_is_set (&ex) || !org)
+	{
+		if (in)
+			camel_url_free (in);
+		if (org)
+			camel_url_free (org);
+		return FALSE;
+	}
+
+	if (in && org && in->protocol && (org->protocol && strcmp (org->protocol, in->protocol) != 0))
+		retval = FALSE;
+
+	if (in && org && in->user && (org->user && strcmp (org->user, in->user) != 0))
+		retval = FALSE;
+
+	if (in && org && in->host && (org->host && strcmp (org->host, in->host) != 0))
+		retval = FALSE;
+
+	if (in && org && in->port != -1 && (org->port != in->port))
+		retval = FALSE;
+
+	if (org)
+		camel_url_free (org);
+
+	if (in)
+		camel_url_free (in);
+
+	return retval;
 }
 
 static TnyAccountType
