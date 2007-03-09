@@ -109,7 +109,7 @@ tny_camel_account_matches_url_string_default (TnyAccount *self, const gchar *url
 	if (in && org && in->host && (org->host && strcmp (org->host, in->host) != 0))
 		retval = FALSE;
 
-	if (in && org && in->port != -1 && (org->port != in->port))
+	if (in && org && in->port != 0 && (org->port != in->port))
 		retval = FALSE;
 
 	if (org)
