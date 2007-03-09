@@ -21,7 +21,11 @@
 
 #include <tny-folder-store.h>
 
-
+/* Possible future API changes:
+ * tny_folder_store_find_folder for finding a folder using an url_string, maybe 
+ * also a tny_folder_store_set_find_folder_strategy and a 
+ * tny_folder_store_get_find_folder_strategy if in future alternative ways to 
+ * find a folder are to be specified and developed */
 
 /**
  * tny_folder_store_add_observer:

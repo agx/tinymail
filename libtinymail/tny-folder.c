@@ -25,7 +25,15 @@
 #include <tny-folder.h>
 guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
-
+/* Possible future API changes:
+ * tny_folder_get_msg_async will get a status callback handler. Also take a look
+ * at the possible API changes for TnyMsgReceiveStrategy as this would affect
+ * that API too. 
+ *
+ * tny_folder_find_msg for finding a message using an url_string, maybe also a 
+ * tny_folder_set_find_msg_strategy and a tny_folder_get_find_msg_strategy if
+ * in future alternative ways to find a message are to be specified and 
+ * developed */
 
 /**
  * tny_folder_get_stats:

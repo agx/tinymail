@@ -21,6 +21,11 @@
 
 #include <tny-msg-receive-strategy.h>
 
+/* Possible future API changes:
+ * tny_msg_receive_strategy_perform_get_msg will get a status callback handler.
+ * Also take a look at the possible API changes for TnyFolder's get_msg_async 
+ * as this would affect that API too. */
+
 /**
  * tny_msg_receive_strategy_perform_get_msg:
  * @self: A #TnyMsgReceiveStrategy instance

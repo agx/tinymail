@@ -24,6 +24,9 @@
 #include <tny-account-store.h>
 guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 
+/* Possible future API changes:
+ * tny_account_store_set_find_account_strategy
+ * tny_account_store_get_find_account_strategy */
 
 /**
  * tny_account_store_find_account:
