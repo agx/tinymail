@@ -208,18 +208,18 @@ tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_str
 	return;
 }
 
-static const gchar*
+static gchar*
 tny_camel_account_get_url_string (TnyAccount *self)
 {
 	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_url_string_func (self);
 }
 
-static const gchar*
+static gchar*
 tny_camel_account_get_url_string_default (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	return (const gchar*)priv->url_string;
+	return priv->url_string?g_strdup (priv->url_string):NULL;
 }
 
 

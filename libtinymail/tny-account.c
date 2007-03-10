@@ -491,12 +491,16 @@ tny_account_get_proto (TnyAccount *self)
  * tny_account_get_url_string:
  * @self: a #TnyAccount object
  * 
- * Get the url string of @self. The returned value should not be freed.
+ * Get the url string of @self or NULL if it's impossible to determine the url
+ * string of @self. If not NULL, the returned value must be freed.
  * 
- * Return value: the url string as a read-only string
+ * The url string is specified in RFC 1808 and looks for example like this:
+ * imap://user@hostname. Note that it doesn't necessarily contain the password 
+ * of the IMAP account.
  *
+ * Return value: the url string or NULL.
  **/
-const gchar*
+gchar*
 tny_account_get_url_string (TnyAccount *self)
 {
 #ifdef DEBUG

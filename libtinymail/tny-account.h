@@ -69,7 +69,7 @@ struct _TnyAccountIface
 	const gchar* (*get_user_func) (TnyAccount *self);
 	const gchar* (*get_hostname_func) (TnyAccount *self);
 	guint (*get_port_func) (TnyAccount *self);
-	const gchar* (*get_url_string_func) (TnyAccount *self);
+	gchar* (*get_url_string_func) (TnyAccount *self);
 	TnyAccountType (*get_account_type_func) (TnyAccount *self);
 	void (*cancel_func) (TnyAccount *self);
 	gboolean (*matches_url_string_func) (TnyAccount *self, const gchar *url_string);
@@ -96,7 +96,7 @@ const gchar* tny_account_get_proto (TnyAccount *self);
 const gchar* tny_account_get_user (TnyAccount *self);
 const gchar* tny_account_get_hostname (TnyAccount *self);
 guint tny_account_get_port (TnyAccount *self);
-const gchar* tny_account_get_url_string (TnyAccount *self);
+gchar* tny_account_get_url_string (TnyAccount *self);
 TnyGetPassFunc tny_account_get_pass_func (TnyAccount *self);
 void tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pass_func);
 TnyForgetPassFunc tny_account_get_forget_pass_func (TnyAccount *self);
