@@ -35,6 +35,32 @@ guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
  * in future alternative ways to find a message are to be specified and 
  * developed */
 
+
+
+/**
+ * tny_folder_get_url_string:
+ * @self: a #TnyFolder object
+ * 
+ * Get the url_string @self or NULL if it's impossible to determine the url 
+ * string of @self. If not NULL, the returned value must be freed after use.
+ *
+ * The url string is specified in RFC 1808 and looks for example like this:
+ * imap://user@hostname/INBOX/folder. Note that it doesn't necessarily contain 
+ * the password of the IMAP account.
+ * 
+ * Return value: The url string or NULL.
+ **/
+gchar* 
+tny_folder_get_url_string (TnyFolder *self)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->get_url_string_func)
+		g_critical ("You must implement tny_folder_get_url_string\n");
+#endif
+
+	return TNY_FOLDER_GET_IFACE (self)->get_url_string_func (self);
+}
+
 /**
  * tny_folder_get_stats:
  * @self: a TnyFolder object

@@ -23,6 +23,31 @@
 
 
 /**
+ * tny_msg_get_url_string:
+ * @self: a #TnyMsg object
+ * 
+ * Get the url_string @self or NULL if it's impossible to determine the url 
+ * string of @self. If not NULL, the returned value must be freed after use.
+ *
+ * The url string is specified in RFC 1808 and looks for example like this:
+ * imap://user@hostname/INBOX/folder/000 where 000 is the UID of the message on
+ * the IMAP server. Note that it doesn't necessarily contain the password of the
+ * IMAP account.
+ * 
+ * Return value: The url string or NULL.
+ **/
+gchar* 
+tny_msg_get_url_string (TnyMsg *self)
+{
+#ifdef DEBUG
+	if (!TNY_MSG_GET_IFACE (self)->get_url_string_func)
+		g_critical ("You must implement tny_msg_get_url_string\n");
+#endif
+
+	return TNY_MSG_GET_IFACE (self)->get_url_string_func (self);
+}
+
+/**
  * tny_msg_get_folder:
  * @self: a #TnyMsg object
  * 

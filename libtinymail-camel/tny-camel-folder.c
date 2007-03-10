@@ -2756,6 +2756,38 @@ tny_camel_folder_store_remove_observer_default (TnyFolderStore *self, TnyFolderS
 	return;
 }
 
+
+static gchar* 
+tny_camel_folder_get_url_string (TnyFolder *self)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_url_string_func (self);
+}
+
+static gchar* 
+tny_camel_folder_get_url_string_default (TnyFolder *self)
+{
+	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	gchar *retval = NULL;
+
+	if (fpriv->iter && fpriv->iter->uri)
+	{
+		retval = g_strdup_printf ("%s", fpriv->iter->uri);
+	} else if (fpriv->account)
+	{
+		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
+		if (apriv->service)
+		{
+			char *urls = camel_service_get_url (apriv->service);
+			const char *foln = camel_folder_get_full_name (fpriv->folder);
+			retval = g_strdup_printf ("%s/%s", urls, foln);
+			g_free (urls);
+		}
+	}
+
+	return retval;
+}
+
+
 TnyFolder*
 _tny_camel_folder_new_with_folder (CamelFolder *camel_folder)
 {
@@ -2873,6 +2905,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->remove_observer_func = tny_camel_folder_remove_observer;
 	klass->get_folder_store_func = tny_camel_folder_get_folder_store;
 	klass->get_stats_func = tny_camel_folder_get_stats;
+	klass->get_url_string_func = tny_camel_folder_get_url_string;
 
 	return;
 }
@@ -2930,6 +2963,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->remove_observer_func = tny_camel_folder_remove_observer_default;
 	class->get_folder_store_func = tny_camel_folder_get_folder_store_default;
 	class->get_stats_func = tny_camel_folder_get_stats_default;
+	class->get_url_string_func = tny_camel_folder_get_url_string_default;
 
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;

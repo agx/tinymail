@@ -44,12 +44,15 @@ struct _TnyMsgIface
 
 	TnyHeader* (*get_header_func) (TnyMsg *self);
 	TnyFolder* (*get_folder_func) (TnyMsg *self);
+	gchar* (*get_url_string_func) (TnyMsg *self);
+
 };
 
 GType tny_msg_get_type (void);
 
 TnyHeader* tny_msg_get_header (TnyMsg *self);
 TnyFolder* tny_msg_get_folder (TnyMsg *self);
+gchar* tny_msg_get_url_string (TnyMsg *self);
 
 G_END_DECLS
 

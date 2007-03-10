@@ -105,7 +105,7 @@ struct _TnyFolderIface
 	void (*remove_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
 	TnyFolderStore* (*get_folder_store_func) (TnyFolder *self);
 	TnyFolderStats* (*get_stats_func) (TnyFolder *self);
-
+	gchar* (*get_url_string_func) (TnyFolder *self);
 };
 
 GType tny_folder_get_type (void);

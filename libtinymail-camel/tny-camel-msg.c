@@ -20,6 +20,8 @@
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
+#include <glib.h>
+#include <string.h>
 
 #include <time.h>
 
@@ -33,16 +35,46 @@
 #include <tny-camel-mime-part.h>
 #include <tny-stream-camel.h>
 #include <tny-camel-header.h>
-
 #include <tny-camel-shared.h>
-
-static GObjectClass *parent_class = NULL;
+#include <tny-account.h>
+#include <tny-folder.h>
 
 #include <camel/camel-types.h>
 
+#include <tny-camel-msg-remove-strategy.h>
+#include <tny-camel-full-msg-receive-strategy.h>
+#include <tny-camel-partial-msg-receive-strategy.h>
+#include <tny-session-camel.h>
+
+#include <tny-camel-account.h>
+#include <tny-session-camel.h>
+#include <tny-account-store.h>
+#include <tny-folder.h>
+#include <tny-camel-folder.h>
+#include <tny-error.h>
+
+#include <camel/camel.h>
+#include <camel/camel-session.h>
+#include <camel/camel-store.h>
+#include <camel/camel-offline-folder.h>
+#include <camel/camel-offline-store.h>
+#include <camel/camel-disco-folder.h>
+#include <camel/camel-disco-store.h>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+
+#include <tny-camel-shared.h>
+
+#include "tny-camel-account-priv.h"
+#include "tny-session-camel-priv.h"
 #include "tny-camel-msg-priv.h"
+#include "tny-camel-folder-priv.h"
 #include "tny-camel-mime-part-priv.h"
 #include "tny-camel-msg-header-priv.h"
+
+static GObjectClass *parent_class = NULL;
 
 #define TNY_CAMEL_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_MSG, TnyCamelMsgPriv))
@@ -114,6 +146,49 @@ _tny_camel_msg_set_header (TnyCamelMsg *self, TnyHeader *header)
 	priv->header = TNY_HEADER (g_object_ref (G_OBJECT (header)));
 	g_mutex_unlock (priv->header_lock);
 	return;
+}
+
+static gchar* 
+tny_camel_msg_get_url_string (TnyMsg *self)
+{
+	return TNY_CAMEL_MSG_GET_CLASS (self)->get_url_string_func (self);
+}
+
+static gchar* 
+tny_camel_msg_get_url_string_default (TnyMsg *self)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+	gchar *retval = NULL;
+
+	if (priv->folder)
+	{
+		TnyHeader *header = tny_msg_get_header (self);
+		const gchar *uid = tny_header_get_uid (header);
+
+		if (uid)
+		{
+			TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
+			if (fpriv->iter && fpriv->iter->uri)
+			{
+				retval = g_strdup_printf ("%s/%s", fpriv->iter->uri, uid);
+
+			} else if (fpriv->account)
+			{
+				TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
+				if (apriv->service)
+				{
+					char *urls = camel_service_get_url (apriv->service);
+					const char *foln = camel_folder_get_full_name (fpriv->folder);
+					retval = g_strdup_printf ("%s/%s/%s", urls, foln, uid);
+					g_free (urls);
+				}
+			}
+		}
+
+		g_object_unref (G_OBJECT (header));
+	}
+
+	return retval;
 }
 
 static TnyHeader*
@@ -214,6 +289,7 @@ tny_msg_init (gpointer g, gpointer iface_data)
 
 	klass->get_header_func = tny_camel_msg_get_header;
 	klass->get_folder_func = tny_camel_msg_get_folder;
+	klass->get_url_string_func = tny_camel_msg_get_url_string;
 
 	return;
 }
@@ -228,6 +304,7 @@ tny_camel_msg_class_init (TnyCamelMsgClass *class)
 
 	class->get_header_func = tny_camel_msg_get_header_default;
 	class->get_folder_func = tny_camel_msg_get_folder_default;
+	class->get_url_string_func = tny_camel_msg_get_url_string_default;
 
 	object_class->finalize = tny_camel_msg_finalize;
 

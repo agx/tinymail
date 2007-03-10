@@ -1,3 +1,9 @@
+2007-03-10  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added tny_folder_get_url_string and tny_msg_get_url_string APIs
+
+	* This was a major API change
+
 2007-03-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added the tny_account_store_find_account API. It's possible that in
