@@ -32,6 +32,7 @@ therefore be used as a mime part.
 @parent: 
 @get_header_func: 
 @get_folder_func: 
+@get_url_string_func: 
 
 <!-- ##### FUNCTION tny_msg_get_header ##### -->
 <para>
@@ -43,6 +44,15 @@ therefore be used as a mime part.
 
 
 <!-- ##### FUNCTION tny_msg_get_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_get_url_string ##### -->
 <para>
 
 </para>

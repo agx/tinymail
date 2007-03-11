@@ -49,6 +49,7 @@ tny-folder-priv
 @want_changes: 
 @dont_fkill: 
 @parent: 
+@caps: 
 
 <!-- ##### MACRO TNY_CAMEL_FOLDER_GET_PRIVATE ##### -->
 <para>

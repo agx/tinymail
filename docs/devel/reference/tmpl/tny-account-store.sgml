@@ -53,6 +53,7 @@ A abstract type that defines a store for accounts
 @get_cache_dir_func: 
 @get_device_func: 
 @alert_func: 
+@find_account_func: 
 
 <!-- ##### FUNCTION tny_get_accounts_request_type_get_type ##### -->
 <para>
@@ -124,6 +125,16 @@ A abstract type that defines a store for accounts
 @self: 
 @type: 
 @prompt: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_find_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@url_string: 
 @Returns: 
 
 

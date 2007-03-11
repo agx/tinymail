@@ -59,6 +59,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @get_url_string_func: 
 @get_account_type_func: 
 @cancel_func: 
+@matches_url_string_func: 
 
 <!-- ##### FUNCTION tny_account_type_get_type ##### -->
 <para>
@@ -272,5 +273,15 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 @self: 
+
+
+<!-- ##### FUNCTION tny_account_matches_url_string ##### -->
+<para>
+
+</para>
+
+@self: 
+@url_string: 
+@Returns: 
 
 

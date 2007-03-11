@@ -57,6 +57,8 @@ A abstract type that defines a folder
 @remove_observer_func: 
 @get_folder_store_func: 
 @get_stats_func: 
+@get_url_string_func: 
+@get_caps_func: 
 
 <!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
 <para>
@@ -339,6 +341,15 @@ A abstract type that defines a folder
 
 
 <!-- ##### FUNCTION tny_folder_get_stats ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_caps ##### -->
 <para>
 
 </para>

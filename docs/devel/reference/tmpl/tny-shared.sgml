@@ -39,6 +39,7 @@ Shared include file with forward typedefs
 @get_cache_dir_func: 
 @get_device_func: 
 @alert_func: 
+@find_account_func: 
 
 <!-- ##### STRUCT TnyList ##### -->
 <para>
@@ -94,6 +95,7 @@ Shared include file with forward typedefs
 @parent: 
 @get_header_func: 
 @get_folder_func: 
+@get_url_string_func: 
 
 <!-- ##### STRUCT TnyFolder ##### -->
 <para>
@@ -135,6 +137,8 @@ Shared include file with forward typedefs
 @remove_observer_func: 
 @get_folder_store_func: 
 @get_stats_func: 
+@get_url_string_func: 
+@get_caps_func: 
 
 <!-- ##### STRUCT TnyHeader ##### -->
 <para>
@@ -238,6 +242,7 @@ Shared include file with forward typedefs
 @get_url_string_func: 
 @get_account_type_func: 
 @cancel_func: 
+@matches_url_string_func: 
 
 <!-- ##### STRUCT TnyDevice ##### -->
 <para>
