@@ -307,6 +307,9 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 			folder->folder_flags |= CAMEL_FOLDER_FILTER_JUNK;
 	}
 
+	if (imap_store->capabilities & IMAP_CAPABILITY_IDLE)
+		folder->folder_flags |= CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY;
+
 	imap_folder->search = camel_imap_search_new(folder_dir);
 
 	return folder;
@@ -475,7 +478,10 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	}
 
 	if (camel_strstrcase (response->status, "OK [READ-ONLY]"))
+	{
+		folder->folder_flags |= CAMEL_FOLDER_IS_READONLY;
 		imap_folder->read_only = TRUE;
+	}
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (folder->parent_store)) == CAMEL_DISCO_STORE_RESYNCING) 
 	{
@@ -3597,6 +3603,8 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 	{
 		if (store->current_folder && !store->idle_prefix)
 		{
+			folder->folder_flags |= CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY;
+
 			g_mutex_lock (store->stream_lock);
 			store->idle_prefix = g_strdup_printf ("%c%.5u", 
 				store->tag_prefix, store->command++);

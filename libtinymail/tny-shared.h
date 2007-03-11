@@ -100,7 +100,7 @@ typedef struct _TnyFolderStoreObserver TnyFolderStoreObserver;
 typedef struct _TnyFolderStoreObserverIface TnyFolderStoreObserverIface;
 typedef struct _TnyFolderStats TnyFolderStats;
 typedef struct _TnyFolderStatsClass TnyFolderStatsClass;
-
+typedef enum _TnyFolderCaps TnyFolderCaps;
 
 G_END_DECLS
 

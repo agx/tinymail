@@ -49,6 +49,7 @@ struct _TnyCamelFolderPriv
 	TnyList *observers, *sobservers; TnyFolder *self;
 	gboolean want_changes, dont_fkill;
 	TnyFolderStore *parent;
+	TnyFolderCaps caps;
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);

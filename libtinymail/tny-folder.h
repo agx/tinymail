@@ -38,6 +38,7 @@ G_BEGIN_DECLS
 
 #ifndef TNY_SHARED_H
 typedef enum _TnyFolderType TnyFolderType;
+typedef enum _TnyFolderCaps TnyFolderCaps;
 typedef struct _TnyFolder TnyFolder;
 typedef struct _TnyFolderIface TnyFolderIface;
 #endif
@@ -52,6 +53,12 @@ enum _TnyFolderSignal
 extern guint tny_folder_signals[TNY_FOLDER_LAST_SIGNAL];
 
 #define TNY_TYPE_FOLDER_TYPE (tny_folder_type_get_type())
+
+enum _TnyFolderCaps
+{
+	TNY_FOLDER_CAPS_WRITABLE = 1<<0,
+	TNY_FOLDER_CAPS_PUSHEMAIL = 1<<1
+};
 
 enum _TnyFolderType
 {
@@ -106,6 +113,7 @@ struct _TnyFolderIface
 	TnyFolderStore* (*get_folder_store_func) (TnyFolder *self);
 	TnyFolderStats* (*get_stats_func) (TnyFolder *self);
 	gchar* (*get_url_string_func) (TnyFolder *self);
+	TnyFolderCaps (*get_caps_func) (TnyFolder *self);
 };
 
 GType tny_folder_get_type (void);
@@ -139,6 +147,7 @@ void tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer);
 void tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer);
 TnyFolderStore* tny_folder_get_folder_store (TnyFolder *self);
 TnyFolderStats* tny_folder_get_stats (TnyFolder *self);
+TnyFolderCaps tny_folder_get_caps (TnyFolder *self);
 
 
 G_END_DECLS

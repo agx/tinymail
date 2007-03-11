@@ -35,7 +35,25 @@ guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
  * in future alternative ways to find a message are to be specified and 
  * developed */
 
+/**
+ * tny_folder_get_caps:
+ * @self: a #TnyFolder object
+ * 
+ * Get the capabilities of @self.
+ * 
+ * Return value: The capabilities of the folder
+ **/
 
+TnyFolderCaps 
+tny_folder_get_caps (TnyFolder *self)
+{
+#ifdef DEBUG
+	if (!TNY_FOLDER_GET_IFACE (self)->get_caps_func)
+		g_critical ("You must implement tny_folder_get_caps\n");
+#endif
+
+	return TNY_FOLDER_GET_IFACE (self)->get_caps_func (self);
+}
 
 /**
  * tny_folder_get_url_string:

@@ -1,3 +1,12 @@
+2007-03-11  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added the TnyFolderCaps API
+	* Improved the tny_folder_copy and tny_folder_transfer_msgs
+	implementations to support notifying folder observers about the
+	changes that happened
+
+	* This was a major API change
+
 2007-03-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added tny_folder_get_url_string and tny_msg_get_url_string APIs
