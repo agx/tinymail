@@ -2714,7 +2714,7 @@ tny_camel_folder_poke_status_callback (gpointer data)
 		if (newurlen != priv->unread_length) 
 		{
 			priv->unread_length = newurlen;
-			tny_folder_change_set_new_all_count (change, priv->cached_length);
+			tny_folder_change_set_new_unread_count (change, priv->unread_length);
 		}
 
 		notify_folder_observers_about (self, change);
