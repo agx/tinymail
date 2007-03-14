@@ -32,12 +32,16 @@ guint tny_device_signals [TNY_DEVICE_LAST_SIGNAL];
 void 
 tny_device_reset (TnyDevice *self)
 {
-#ifdef DEBUG
-	if (!TNY_DEVICE_GET_IFACE (self)->reset_func)
-		g_critical ("You must implement tny_device_reset\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_DEVICE (self));
+	g_assert (TNY_DEVICE_GET_IFACE (self)->reset_func != NULL);
 #endif
 
 	TNY_DEVICE_GET_IFACE (self)->reset_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
 	return;
 }
 
@@ -59,12 +63,17 @@ tny_device_reset (TnyDevice *self)
 void 
 tny_device_force_online (TnyDevice *self)
 {
-#ifdef DEBUG
-	if (!TNY_DEVICE_GET_IFACE (self)->force_online_func)
-		g_critical ("You must implement tny_device_force_online\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_DEVICE (self));
+	g_assert (TNY_DEVICE_GET_IFACE (self)->force_online_func != NULL);
 #endif
 
 	TNY_DEVICE_GET_IFACE (self)->force_online_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (tny_device_is_online (self) == TRUE);
+#endif
+
 	return;
 }
 
@@ -77,12 +86,17 @@ tny_device_force_online (TnyDevice *self)
 void
 tny_device_force_offline (TnyDevice *self)
 {
-#ifdef DEBUG
-	if (!TNY_DEVICE_GET_IFACE (self)->force_offline_func)
-		g_critical ("You must implement tny_device_force_offline\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_DEVICE (self));
+	g_assert (TNY_DEVICE_GET_IFACE (self)->force_offline_func != NULL);
 #endif
 
 	TNY_DEVICE_GET_IFACE (self)->force_offline_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (tny_device_is_online (self) == FALSE);
+#endif
+
 	return;
 }
 
@@ -108,12 +122,19 @@ tny_device_force_offline (TnyDevice *self)
 gboolean 
 tny_device_is_online (TnyDevice *self)
 {
-#ifdef DEBUG
-	if (!TNY_DEVICE_GET_IFACE (self)->is_online_func)
-		g_critical ("You must implement tny_device_is_online\n");
+	gboolean retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_DEVICE (self));
+	g_assert (TNY_DEVICE_GET_IFACE (self)->is_online_func != NULL);
 #endif
 
-	return TNY_DEVICE_GET_IFACE (self)->is_online_func (self);
+	retval = TNY_DEVICE_GET_IFACE (self)->is_online_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 static void
@@ -164,7 +185,7 @@ tny_device_get_type (void)
 		  NULL,   /* instance_init */
 		  NULL
 		};
-	    
+
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyDevice", &info, 0);
 

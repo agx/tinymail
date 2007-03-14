@@ -28,6 +28,12 @@ You can find the Check unit test framework at http://check.sourceforge.net/
 You'll need it if you build with --enable-unit-tests which will compile the
 unit tests. Check the sources of the unit tests for more information.
 
+It's highly recommended to set the CFLAGS environment to include -DDEBUG and 
+-DDBC: CFLAGS="-DDBC -DDEBUG" ./autogen.sh --enable-unit-tests ....
+
+The DBC define will enable Design By Contract assertions, the DEBUG define will
+enable certain debugging checks, assertions, features and messages.
+
 Run all unit tests with 'make check'.
 
 Building tips
