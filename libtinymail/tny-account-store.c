@@ -19,7 +19,15 @@
 
 #include <config.h>
 
+#ifdef DBC
+#include <string.h>
+#endif
+
 #include <tny-account.h>
+#include <tny-transport-account.h>
+#include <tny-store-account.h>
+#include <tny-device.h>
+#include <tny-list.h>
 
 #include <tny-account-store.h>
 guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
@@ -48,11 +56,26 @@ guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 TnyAccount* 
 tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func)
-		g_critical ("You must implement tny_account_store_find_account\n");
+	TnyAccount *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE (self));
+	g_assert (url_string);
+	g_assert (strlen (url_string) > 0);
+	g_assert (strstr (url_string, "://"));
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func != NULL);
 #endif
-	return TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func (self, url_string);
+
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func (self, url_string);
+
+#ifdef DBC /* ensure */
+	if (retval) {
+		g_assert (TNY_IS_ACCOUNT (retval));
+		g_assert (tny_account_matches_url_string (retval, url_string));
+	}
+#endif
+
+	return retval;
 }
 
 /**
@@ -107,11 +130,21 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 gboolean 
 tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func)
-		g_critical ("You must implement tny_account_store_alert\n");
+	gboolean retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE (self));
+	g_assert (prompt);
+	g_assert (strlen (prompt) > 0);
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func != NULL);
 #endif
-	return TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, type, prompt);
+
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, type, prompt);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 /**
@@ -131,11 +164,21 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *
 TnyDevice* 
 tny_account_store_get_device (TnyAccountStore *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device_func)
-		g_critical ("You must implement tny_account_store_get_device\n");
+	TnyDevice *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE (self));
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device_func != NULL);
 #endif
-	return TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device_func (self);
+
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval);
+	g_assert (TNY_IS_DEVICE (retval));
+#endif
+
+	return retval;
 }
 
 /**
@@ -158,11 +201,21 @@ tny_account_store_get_device (TnyAccountStore *self)
 const gchar*
 tny_account_store_get_cache_dir (TnyAccountStore *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir_func)
-		g_critical ("You must implement tny_account_store_get_cache_dir\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE (self));
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir_func != NULL);
 #endif
-	return TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir_func (self);
+
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval);
+	g_assert (strlen (retval) > 0);
+#endif
+
+	return retval;
 }
 
 
@@ -267,11 +320,17 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
 void
 tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts_func)
-		g_critical ("You must implement tny_account_store_get_accounts\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE (self));
+	g_assert (list);
+	g_assert (TNY_IS_LIST (list));
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts_func != NULL);
 #endif
+
 	TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts_func (self, list, types);
+
+#ifdef DBC /* ensure */
+#endif
 
 	return;
 }
@@ -289,12 +348,19 @@ tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAcco
 void
 tny_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->add_transport_account_func)
-		g_critical ("You must implement tny_account_store_add_transport_account\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE (self));
+	g_assert (account);
+	g_assert (TNY_IS_TRANSPORT_ACCOUNT (account));
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->add_transport_account_func != NULL);
 #endif
 
 	TNY_ACCOUNT_STORE_GET_IFACE (self)->add_transport_account_func (self, account);
+
+
+#ifdef DBC /* ensure */
+#endif
+
 	return;
 }
 
@@ -311,11 +377,18 @@ tny_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAcco
 void
 tny_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_GET_IFACE (self)->add_store_account_func)
-		g_critical ("You must implement tny_account_store_add_store_account\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE (self));
+	g_assert (account);
+	g_assert (TNY_IS_STORE_ACCOUNT (account));
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->add_store_account_func != NULL);
 #endif
+
 	TNY_ACCOUNT_STORE_GET_IFACE (self)->add_store_account_func (self, account);
+
+#ifdef DBC /* ensure */
+#endif
+
 	return;
 }
 

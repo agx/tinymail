@@ -104,7 +104,7 @@ tny_account_cancel (TnyAccount *self)
 TnyAccountType
 tny_account_get_account_type (TnyAccount *self)
 {
-TnyAccountType retval;
+	TnyAccountType retval;
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
@@ -131,7 +131,7 @@ TnyAccountType retval;
 gboolean 
 tny_account_is_connected (TnyAccount *self)
 {
-gboolean retval;
+	gboolean retval;
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
@@ -257,7 +257,6 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_id_func (self, id);
-
 
 #ifdef DBC /* require */
 	g_assert (!strcmp (tny_account_get_id (self), id));
