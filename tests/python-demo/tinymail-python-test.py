@@ -35,7 +35,7 @@ def on_headerstree_selected (treeselection, msgview) :
 
 def on_folderstree_selected (treeselection, headerstree) :
 	model, iter = treeselection.get_selected ()
-	folder = model.get_value(iter, 3)
+	folder = model.get_value(iter, tinymail.uigtk.GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN)
 	if folder:
 		progressbar.show ()
 		folder.refresh_async (on_refresh_folder, on_status, headerstree)
