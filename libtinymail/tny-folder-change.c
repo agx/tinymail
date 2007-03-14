@@ -21,6 +21,7 @@
 
 #include <tny-folder-change.h>
 #include <tny-simple-list.h>
+#include <tny-list.h>
 
 static GObjectClass *parent_class = NULL;
 

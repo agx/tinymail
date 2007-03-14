@@ -1,3 +1,7 @@
+2007-03-14  Juerg Billeter
+
+	* libtinymail/tny-mime-part.c: Design by contract assertions
+
 2007-03-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* tny_folder_store_remove now specifies and its implementation will

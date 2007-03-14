@@ -19,9 +19,15 @@
 
 #include <config.h>
 
+#ifdef DBC
+#include <string.h>
+#endif
+
 #include <tny-mime-part.h>
+#include <tny-list.h>
 
-
+/* TNY TODO: Check MIME RFC to evaluate whether NULL string values should be
+ * allowed and strengthen contracts if not */
 
 /**
  * tny_mime_part_get_header_pairs:
@@ -52,9 +58,11 @@
 void 
 tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_header_pairs_func)
-		g_critical ("You must implement tny_mime_part_get_parts\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (list);
+	g_assert (TNY_IS_LIST (list));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_header_pairs_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->get_header_pairs_func (self, list);
@@ -89,9 +97,11 @@ tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
 void
 tny_mime_part_get_parts (TnyMimePart *self, TnyList *list)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_parts_func)
-		g_critical ("You must implement tny_mime_part_get_parts\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (list);
+	g_assert (TNY_IS_LIST (list));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_parts_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->get_parts_func (self, list);
@@ -113,9 +123,11 @@ tny_mime_part_get_parts (TnyMimePart *self, TnyList *list)
 gint
 tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->add_part_func)
-		g_critical ("You must implement tny_mime_part_add_part\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (part);
+	g_assert (TNY_IS_MIME_PART (part));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->add_part_func != NULL);
 #endif
 
 	return TNY_MIME_PART_GET_IFACE (self)->add_part_func (self, part);
@@ -132,9 +144,11 @@ tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
 void
 tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->del_part_func)
-		g_critical ("You must implement tny_mime_part_del_part\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (part);
+	g_assert (TNY_IS_MIME_PART (part));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->del_part_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->del_part_func (self, part);
@@ -176,9 +190,9 @@ tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part)
 gboolean 
 tny_mime_part_is_attachment (TnyMimePart *self)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->is_attachment_func)
-		g_critical ("You must implement tny_mime_part_is_attachment\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->is_attachment_func != NULL);
 #endif
 	return TNY_MIME_PART_GET_IFACE (self)->is_attachment_func (self);
 }
@@ -195,9 +209,10 @@ tny_mime_part_is_attachment (TnyMimePart *self)
 void
 tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_location)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->set_content_location_func)
-		g_critical ("You must implement tny_mime_part_set_content_location\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (!content_location || strlen (content_location) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_location_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->set_content_location_func (self, content_location);
@@ -215,9 +230,10 @@ tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_loca
 void
 tny_mime_part_set_description (TnyMimePart *self, const gchar *description)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->set_description_func)
-		g_critical ("You must implement tny_mime_part_set_description\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (!description || strlen (description) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_description_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->set_description_func (self, description);
@@ -235,9 +251,10 @@ tny_mime_part_set_description (TnyMimePart *self, const gchar *description)
 void
 tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->set_content_id_func)
-		g_critical ("You must implement tny_mime_part_set_content_id\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (!content_id || strlen (content_id) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_id_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->set_content_id_func (self, content_id);
@@ -255,9 +272,10 @@ tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
 void
 tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->set_filename_func)
-		g_critical ("You must implement tny_mime_part_set_filename\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (!filename || strlen (filename) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_filename_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->set_filename_func (self, filename);
@@ -275,9 +293,10 @@ tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 void
 tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->set_content_type_func)
-		g_critical ("You must implement tny_mime_part_set_content_type\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (!contenttype || strlen (contenttype) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_type_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->set_content_type_func (self, contenttype);
@@ -289,7 +308,8 @@ tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
  * tny_mime_part_get_filename:
  * @self: a #TnyMimePart object
  * 
- * Get the filename of @self. The returned value should not be freed.
+ * Get the filename of @self if it's an attachment or NULL otherwise. The
+ * returned value should not be freed.
  *
  * Return value: the filename of a mime part as a read-only string
  *
@@ -297,12 +317,20 @@ tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
 const gchar*
 tny_mime_part_get_filename (TnyMimePart *self)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_filename_func)
-		g_critical ("You must implement tny_mime_part_get_filename\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_filename_func != NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->get_filename_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_filename_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval == NULL || strlen (retval) > 0);
+#endif
+
+	return retval;
 }
 
 /**
@@ -317,12 +345,20 @@ tny_mime_part_get_filename (TnyMimePart *self)
 const gchar*
 tny_mime_part_get_content_id (TnyMimePart *self)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_content_id_func)
-		g_critical ("You must implement tny_mime_part_get_content_id\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_id_func != NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->get_content_id_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_id_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval == NULL || strlen (retval) > 0);
+#endif
+
+	return retval;
 }
 
 /**
@@ -336,12 +372,20 @@ tny_mime_part_get_content_id (TnyMimePart *self)
 const gchar*
 tny_mime_part_get_description (TnyMimePart *self)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_description_func)
-		g_critical ("You must implement tny_mime_part_get_description\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_description_func != NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->get_description_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_description_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval == NULL || strlen (retval) > 0);
+#endif
+
+	return retval;
 }
 
 /**
@@ -356,12 +400,20 @@ tny_mime_part_get_description (TnyMimePart *self)
 const gchar*
 tny_mime_part_get_content_location (TnyMimePart *self)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_content_location_func)
-		g_critical ("You must implement tny_mime_part_get_content_location\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_location_func != NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->get_content_location_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_location_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval == NULL || strlen (retval) > 0);
+#endif
+
+	return retval;
 }
 
 /**
@@ -392,9 +444,11 @@ tny_mime_part_get_content_location (TnyMimePart *self)
 void
 tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func)
-		g_critical ("You must implement tny_mime_part_write_to_stream\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (stream);
+	g_assert (TNY_IS_STREAM (stream));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func (self, stream);
@@ -427,9 +481,11 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
 void
 tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func)
-		g_critical ("You must implement tny_mime_part_decode_to_stream\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (stream);
+	g_assert (TNY_IS_STREAM (stream));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func != NULL);
 #endif
 
 	TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func (self, stream);
@@ -459,12 +515,23 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
 gint
 tny_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const gchar *type)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->construct_from_stream_func)
-		g_critical ("You must implement tny_mime_part_construct_from_stream\n");
+	gint retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_IS_STREAM (stream));
+	g_assert (type);
+	g_assert (strlen (type) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->construct_from_stream_func != NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->construct_from_stream_func (self, stream, type);
+	retval = TNY_MIME_PART_GET_IFACE (self)->construct_from_stream_func (self, stream, type);
+
+#ifdef DBC /* ensure */
+	g_assert (retval == 0 || retval == -1);
+#endif
+
+	return retval;
 }
 
 
@@ -480,12 +547,20 @@ tny_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const
 TnyStream* 
 tny_mime_part_get_stream (TnyMimePart *self)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_stream_func)
-		g_critical ("You must implement tny_mime_part_get_stream\n");
+	TnyStream *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_stream_func != NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->get_stream_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_stream_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_STREAM (retval));
+#endif
+
+	return retval;
 }
 
 /**
@@ -500,12 +575,20 @@ tny_mime_part_get_stream (TnyMimePart *self)
 const gchar*
 tny_mime_part_get_content_type (TnyMimePart *self)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->get_content_type_func)
-		g_critical ("You must implement tny_mime_part_get_content_type\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_type_func != NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->get_content_type_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_type_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval == NULL || strlen (retval) > 0);
+#endif
+
+	return retval;
 }
 
 /**
@@ -543,9 +626,10 @@ tny_mime_part_get_content_type (TnyMimePart *self)
 gboolean
 tny_mime_part_content_type_is (TnyMimePart *self, const gchar *type)
 {
-#ifdef DEBUG
-	if (!TNY_MIME_PART_GET_IFACE (self)->content_type_is_func)
-		g_critical ("You must implement tny_mime_part_content_type_is\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (type == NULL || strlen (type) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->content_type_is_func != NULL);
 #endif
 
 	return TNY_MIME_PART_GET_IFACE (self)->content_type_is_func (self, type);
