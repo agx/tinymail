@@ -392,6 +392,8 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 
+	/* TNY TODO: Support non-TnyCamelFolder TnyFolder implementations too */
+
 	if (!_tny_session_check_operation (apriv->session, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
 		return;
@@ -424,6 +426,17 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	g_assert (CAMEL_IS_STORE (store));
 	g_assert (cpriv->folder_name != NULL);
+
+	g_static_rec_mutex_lock (cpriv->obs_lock);
+	if (cpriv->observers) {
+		g_object_unref (G_OBJECT (cpriv->observers));
+		cpriv->observers = NULL;
+	}
+	if (cpriv->sobservers) {
+		g_object_unref (G_OBJECT (cpriv->sobservers));
+		cpriv->sobservers = NULL;
+	}
+	g_static_rec_mutex_unlock (cpriv->obs_lock);
 
 	if (camel_store_supports_subscriptions (store))
 		camel_store_subscribe_folder (store, cpriv->folder_name, &subex);

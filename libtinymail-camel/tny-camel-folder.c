@@ -80,6 +80,8 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 	if (!priv->sobservers)
 		return;
 
+	g_static_rec_mutex_lock (priv->obs_lock);
+
 	iter = tny_list_create_iterator (priv->sobservers);
 	while (!tny_iterator_is_done (iter))
 	{
@@ -89,6 +91,9 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
+
+	g_static_rec_mutex_unlock (priv->obs_lock);
+
 }
 
 static void
@@ -100,6 +105,8 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	if (!priv->observers)
 		return;
 
+	g_static_rec_mutex_lock (priv->obs_lock);
+
 	iter = tny_list_create_iterator (priv->observers);
 	while (!tny_iterator_is_done (iter))
 	{
@@ -109,6 +116,9 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));
+
+	g_static_rec_mutex_unlock (priv->obs_lock);
+
 }
 
 
@@ -2230,6 +2240,17 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 		{
 			CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
+			g_static_rec_mutex_lock (cpriv->obs_lock);
+			if (cpriv->observers) {
+				g_object_unref (G_OBJECT (cpriv->observers));
+				cpriv->observers = NULL;
+			}
+			if (cpriv->sobservers) {
+				g_object_unref (G_OBJECT (cpriv->sobservers));
+				cpriv->sobservers = NULL;
+			}
+			g_static_rec_mutex_unlock (priv->obs_lock);
+
 			if (camel_store_supports_subscriptions (store))
 				camel_store_subscribe_folder (store, cfolname, &subex);
 
@@ -2782,12 +2803,11 @@ tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *obser
 
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
-	/* TNY TODO: locking */
-
+	g_static_rec_mutex_lock (priv->obs_lock);
 	if (!priv->observers)
 		priv->observers = tny_simple_list_new ();
-
 	tny_list_prepend (priv->observers, G_OBJECT (observer));
+	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	determine_push_email (priv);
 
@@ -2811,7 +2831,9 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 	if (!priv->observers)
 		return;
 
+	g_static_rec_mutex_lock (priv->obs_lock);
 	tny_list_remove (priv->observers, G_OBJECT (observer));
+	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	determine_push_email (priv);
 
@@ -2851,12 +2873,11 @@ tny_camel_folder_store_add_observer_default (TnyFolderStore *self, TnyFolderStor
 
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
 
-	/* TNY TODO: locking */
-
+	g_static_rec_mutex_lock (priv->obs_lock);
 	if (!priv->sobservers)
 		priv->sobservers = tny_simple_list_new ();
-
 	tny_list_prepend (priv->sobservers, G_OBJECT (observer));
+	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;
 }
@@ -2878,7 +2899,9 @@ tny_camel_folder_store_remove_observer_default (TnyFolderStore *self, TnyFolderS
 	if (!priv->sobservers)
 		return;
 
+	g_static_rec_mutex_lock (priv->obs_lock);
 	tny_list_remove (priv->sobservers, G_OBJECT (observer));
+	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;
 }
@@ -2954,13 +2977,16 @@ tny_camel_folder_finalize (GObject *object)
 	TnyCamelFolder *self = (TnyCamelFolder*) object;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	g_static_rec_mutex_lock (priv->folder_lock);
-	priv->dont_fkill = FALSE;
 
+	g_static_rec_mutex_lock (priv->obs_lock);
 	if (priv->observers)
 		g_object_unref (G_OBJECT (priv->observers));
 	if (priv->sobservers)
 		g_object_unref (G_OBJECT (priv->sobservers));
+	g_static_rec_mutex_unlock (priv->obs_lock);
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+	priv->dont_fkill = FALSE;
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
 	{
@@ -3002,6 +3028,10 @@ tny_camel_folder_finalize (GObject *object)
 
 	g_static_rec_mutex_free (priv->folder_lock);
 	priv->folder_lock = NULL;
+
+	g_static_rec_mutex_free (priv->obs_lock);
+	priv->obs_lock = NULL;
+
 
 	if (priv->folder_name)
 		g_free (priv->folder_name);
@@ -3149,6 +3179,8 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->folder_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->folder_lock);
+	priv->obs_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->obs_lock);
 
 	return;
 }

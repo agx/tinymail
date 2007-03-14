@@ -1,3 +1,10 @@
+2007-03-14  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* tny_folder_store_remove now specifies and its implementation will
+	unsubscribe all the observers of the folder being removed.
+
+	* This was a major API change
+
 2007-03-14  Sergio Villar Senin  <svillar@igalia.com>
 
 	* Fixed an issue with ACLOCAL_FLAGS in the autogen.sh

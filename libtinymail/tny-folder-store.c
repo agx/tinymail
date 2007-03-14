@@ -79,8 +79,9 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
  * responsible for unreferencing the @folder instance yourself. This method will
  * not do this for you, leaving the @folder instance in an unusable state. The 
  * id of the @folder instance will be blanked once really deleted from the
- * service.
- *
+ * service. All the #TnyFolderObservers and #TnyFolderStoreObservers of @folder,
+ * but of course not of @self, will automatically be unsubscribed.
+ * 
  * Example:
  * <informalexample><programlisting>
  * static void
