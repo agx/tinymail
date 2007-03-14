@@ -1,3 +1,7 @@
+2007-03-14  Sergio Villar Senin  <svillar@igalia.com>
+
+	* Fixed an issue with ACLOCAL_FLAGS in the autogen.sh
+
 2007-03-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added the TnyFolderCaps API
