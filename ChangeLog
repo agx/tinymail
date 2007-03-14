@@ -2,6 +2,7 @@
 
 	* tny_folder_store_remove now specifies and its implementation will
 	unsubscribe all the observers of the folder being removed.
+	* Design by contract assertions
 
 	* This was a major API change
 

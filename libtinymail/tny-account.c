@@ -19,8 +19,11 @@
 
 #include <config.h>
 
-#include <tny-account.h>
+#ifdef DBC
+#include <string.h>
+#endif
 
+#include <tny-account.h>
 
 /**
  * tny_account_matches_url_string:
@@ -43,12 +46,21 @@
 gboolean 
 tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func)
-		g_critical ("You must implement tny_account_matches_url_string\n");
+	gboolean retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (url_string);
+	g_assert (strlen (url_string) > 0);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func (self, url_string);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func (self, url_string);
+
+#ifdef DBC /* ensure*/
+#endif
+
+	return retval;
 }
 
 /**
@@ -61,12 +73,16 @@ tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
 void 
 tny_account_cancel (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->cancel_func)
-		g_critical ("You must implement tny_account_cancel\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->cancel_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->cancel_func (self);
+
+#ifdef BDC /* ensure */
+#endif
+
 	return;
 }
 
@@ -88,12 +104,19 @@ tny_account_cancel (TnyAccount *self)
 TnyAccountType
 tny_account_get_account_type (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_account_type_func)
-		g_critical ("You must implement tny_account_get_account_type\n");
+TnyAccountType retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_account_type_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_account_type_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_account_type_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 
@@ -108,12 +131,19 @@ tny_account_get_account_type (TnyAccount *self)
 gboolean 
 tny_account_is_connected (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->is_connected_func)
-		g_critical ("You must implement tny_account_is_connected\n");
+gboolean retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->is_connected_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->is_connected_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->is_connected_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 
@@ -132,12 +162,21 @@ tny_account_is_connected (TnyAccount *self)
 const gchar*
 tny_account_get_id (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_id_func)
-		g_critical ("You must implement tny_account_get_id\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_id_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_id_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_id_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval);
+	g_assert (strlen (retval) > 0);
+#endif
+
+	return retval;
 }
 
 /**
@@ -151,12 +190,19 @@ tny_account_get_id (TnyAccount *self)
 void 
 tny_account_set_name (TnyAccount *self, const gchar *name)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_name_func)
-		g_critical ("You must implement tny_account_set_name\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (name);
+	g_assert (strlen (name) > 0);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_name_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_name_func (self, name);
+
+#ifdef DBC /* require */
+	g_assert (!strcmp (tny_account_get_name (self), name));
+#endif
+
 	return;
 }
 
@@ -174,12 +220,19 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
 void
 tny_account_set_mech (TnyAccount *self, const gchar *mech)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_mech_func)
-		g_critical ("You must implement tny_account_set_mech\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (mech);
+	g_assert (strlen (mech) > 0);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_mech_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_mech_func (self, mech);
+
+#ifdef DBC /* require */
+	g_assert (!strcmp (tny_account_get_mech (self), mech));
+#endif
+
 	return;
 }
 
@@ -196,12 +249,20 @@ tny_account_set_mech (TnyAccount *self, const gchar *mech)
 void 
 tny_account_set_id (TnyAccount *self, const gchar *id)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_id_func)
-		g_critical ("You must implement tny_account_set_id\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (id);
+	g_assert (strlen (id) > 0);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_id_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_id_func (self, id);
+
+
+#ifdef DBC /* require */
+	g_assert (!strcmp (tny_account_get_id (self), id));
+#endif
+
 	return;
 }
 
@@ -252,12 +313,17 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
 void
 tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pass_func)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_forget_pass_func_func)
-		g_critical ("You must implement tny_account_set_forget_pass_func\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_forget_pass_func_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_forget_pass_func_func (self, forget_pass_func);
+
+#ifdef DBC /* ensure */
+	g_assert (tny_account_get_forget_pass_func (self) == forget_pass_func);
+#endif
+
 	return;
 }
 
@@ -271,12 +337,19 @@ tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pas
 TnyForgetPassFunc
 tny_account_get_forget_pass_func (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func_func)
-		g_critical ("You must implement tny_account_get_forget_pass_func\n");
+	TnyForgetPassFunc retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 /**
@@ -296,12 +369,22 @@ tny_account_get_forget_pass_func (TnyAccount *self)
 void
 tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_url_string_func)
-		g_critical ("You must implement tny_account_set_url_string\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (url_string);
+	g_assert (strlen (url_string) > 0);
+	g_assert (strstr (url_string, "://") != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_url_string_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_url_string_func (self, url_string);
+
+#ifdef DBC /* ensure */
+	/* TNY TODO: It's possible that tny_account_get_url_string strips the
+	 * password. It would be interesting to have a contract check that 
+	 * deals with this. */
+#endif
+
 	return;
 }
 
@@ -318,12 +401,19 @@ tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 void
 tny_account_set_proto (TnyAccount *self, const gchar *proto)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_proto_func)
-		g_critical ("You must implement tny_account_set_proto\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (proto);
+	g_assert (strlen (proto) > 0);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_proto_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_proto_func (self, proto);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_account_get_proto (self), proto));
+#endif
+
 	return;
 }
 
@@ -340,12 +430,19 @@ tny_account_set_proto (TnyAccount *self, const gchar *proto)
 void
 tny_account_set_user (TnyAccount *self, const gchar *user)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_user_func)
-		g_critical ("You must implement tny_account_set_user\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (user);
+	g_assert (strlen (user) > 0);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_user_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_user_func (self, user);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_account_get_user (self), user));
+#endif
+
 	return;
 }
 
@@ -362,12 +459,19 @@ tny_account_set_user (TnyAccount *self, const gchar *user)
 void
 tny_account_set_hostname (TnyAccount *self, const gchar *host)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_hostname_func)
-		g_critical ("You must implement tny_account_set_hostname\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (host);
+	g_assert (strlen (host) > 0);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_hostname_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_hostname_func (self, host);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_account_get_hostname (self), host));
+#endif
+
 	return;
 }
 
@@ -385,12 +489,18 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
 void
 tny_account_set_port (TnyAccount *self, guint port)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_port_func)
-		g_critical ("You must implement tny_account_set_port\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (port <= 65536);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_port_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_port_func (self, port);
+
+#ifdef DBC /* ensure */
+	g_assert (tny_account_get_port (self) == port);
+#endif
+
 	return;
 }
 
@@ -456,12 +566,17 @@ tny_account_set_port (TnyAccount *self, guint port)
 void
 tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->set_pass_func_func)
-		g_critical ("You must implement tny_account_set_pass_func\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_pass_func_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_pass_func_func (self, get_pass_func);
+
+#ifdef DBC /* ensure */
+	g_assert (tny_account_get_pass_func (self) == get_pass_func);
+#endif
+
 	return;
 }
 
@@ -477,12 +592,19 @@ tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
 const gchar*
 tny_account_get_proto (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_proto_func)
-		g_critical ("You must implement tny_account_get_proto\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_proto_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_proto_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_proto_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 
@@ -503,19 +625,30 @@ tny_account_get_proto (TnyAccount *self)
 gchar*
 tny_account_get_url_string (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_url_string_func)
-		g_critical ("You must implement tny_account_get_url_string\n");
+	gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_url_string_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_url_string_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_url_string_func (self);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (strstr (retval, "://") != NULL);
+#endif
+
+	return retval;
+
 }
 
 /**
  * tny_account_get_user:
  * @self: a #TnyAccount object
  * 
- * Get the user or login of @self. The returned value should not be freed.
+ * Get the user or login of @self. The returned value should not be freed. The
+ * returned value van be NULL in case of no user.
  * 
  * Return value: the user as a read-only string
  *
@@ -523,12 +656,19 @@ tny_account_get_url_string (TnyAccount *self)
 const gchar*
 tny_account_get_user (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_user_func)
-		g_critical ("You must implement tny_account_get_user\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_user_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_user_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_user_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 /**
@@ -536,7 +676,7 @@ tny_account_get_user (TnyAccount *self)
  * @self: a #TnyAccount object
  * 
  * Get the human readable name of @self. The returned value should not 
- * be freed.
+ * be freed. The returned value van be NULL in case of no human reabable name.
  * 
  * Return value: the human readable name as a read-only string
  *
@@ -544,12 +684,19 @@ tny_account_get_user (TnyAccount *self)
 const gchar*
 tny_account_get_name (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_name_func)
-		g_critical ("You must implement tny_account_get_name\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_name_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_name_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_name_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 
@@ -557,7 +704,8 @@ tny_account_get_name (TnyAccount *self)
  * tny_account_get_mech:
  * @self: a #TnyAccount object
  * 
- * Get the authentication mechanism for this account. Default is "PLAIN".
+ * Get the authentication mechanism for this account. Default is "PLAIN". The
+ * returned value can be NULL, in which case a undefined default is used.
  * 
  * Return value: the authentication mechanism as a read-only string
  *
@@ -565,12 +713,19 @@ tny_account_get_name (TnyAccount *self)
 const gchar*
 tny_account_get_mech (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_mech_func)
-		g_critical ("You must implement tny_account_get_mech\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_mech_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_mech_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_mech_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 
@@ -578,7 +733,9 @@ tny_account_get_mech (TnyAccount *self)
  * tny_account_get_hostname:
  * @self: a #TnyAccount object
  * 
- * Get the hostname of @self. The returned value should not be freed.
+ * Get the hostname of @self. The returned value should not be freed. The 
+ * returned value can be NULL, in which case no hostname is set (for example 
+ * for a local account).
  * 
  * Return value: the hostname as a read-only string
  *
@@ -586,12 +743,19 @@ tny_account_get_mech (TnyAccount *self)
 const gchar*
 tny_account_get_hostname (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_hostname_func)
-		g_critical ("You must implement tny_account_get_hostname\n");
+	const gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_hostname_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_hostname_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_hostname_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 
@@ -606,12 +770,20 @@ tny_account_get_hostname (TnyAccount *self)
 guint
 tny_account_get_port (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_port_func)
-		g_critical ("You must implement tny_account_get_port\n");
+	guint retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_port_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_port_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_port_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (retval <= 65536);
+#endif
+
+	return retval;
 }
 /**
  * tny_account_get_pass_func:
@@ -623,12 +795,19 @@ tny_account_get_port (TnyAccount *self)
 TnyGetPassFunc
 tny_account_get_pass_func (TnyAccount *self)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_GET_IFACE (self)->get_pass_func_func)
-		g_critical ("You must implement tny_account_get_pass_func\n");
+	TnyGetPassFunc retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_port_func != NULL);
 #endif
 
-	return TNY_ACCOUNT_GET_IFACE (self)->get_pass_func_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_pass_func_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
 }
 
 
