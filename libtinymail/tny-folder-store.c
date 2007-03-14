@@ -19,7 +19,12 @@
 
 #include <config.h>
 
+#ifdef DBC
+#include <string.h>
+#endif
+
 #include <tny-folder-store.h>
+#include <tny-folder-store-observer.h>
 
 /* Possible future API changes:
  * tny_folder_store_find_folder for finding a folder using an url_string, maybe 
@@ -39,11 +44,19 @@
 void 
 tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_STORE_GET_IFACE (self)->add_observer_func)
-		g_critical ("You must implement tny_folder_store_add_observer\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (observer);
+	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->add_observer_func != NULL);
 #endif
+
 	TNY_FOLDER_STORE_GET_IFACE (self)->add_observer_func (self, observer);
+
+#ifdef DBC /* ensure */
+	/* TNY TODO: Check whether it's really added */
+#endif
+
 	return;
 }
 
@@ -60,11 +73,19 @@ tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *obs
 void 
 tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer_func)
-		g_critical ("You must implement tny_folder_store_remove_observer\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (observer);
+	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer_func != NULL);
 #endif
+
 	TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer_func (self, observer);
+
+#ifdef DBC /* ensure */
+	/* TNY TODO: Check whether it's really removed */
+#endif
+
 	return;
 
 }
@@ -96,12 +117,19 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
 void 
 tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func)
-		g_critical ("You must implement tny_folder_store_remove_folder\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (folder);
+	g_assert (TNY_IS_FOLDER (folder));
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func != NULL);
 #endif
 
 	TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func (self, folder, err);
+
+#ifdef DBC /* ensure */
+	/* Checking this is something for a unit test */
+#endif
+
 	return;
 }
 
@@ -125,15 +153,26 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
  * Return value: A new folder instance representing the folder that was created or NULL in case of failure
  *
  **/
-TnyFolder *
+TnyFolder*
 tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func)
-		g_critical ("You must implement tny_folder_store_create_folder\n");
+	TnyFolder *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (name);
+	g_assert (strlen (name) > 0);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func != NULL);
 #endif
 
-	return TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func (self, name, err);
+	retval = TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func (self, name, err);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (TNY_IS_FOLDER (retval));
+#endif
+
+	return retval;
 }
 
 /**
@@ -168,12 +207,20 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError 
 void 
 tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func)
-		g_critical ("You must implement tny_folder_store_get_folders\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (list);
+	g_assert (TNY_IS_LIST (list));
+	if (query)
+		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func != NULL);
 #endif
 
 	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func (self, list, query, err);
+
+#ifdef DBC /* ensure */
+#endif
+
 	return;
 }
 
@@ -233,12 +280,21 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
 void 
 tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func)
-		g_critical ("You must implement tny_folder_store_get_folders_async\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (list);
+	g_assert (callback);
+	g_assert (TNY_IS_LIST (list));
+	if (query)
+		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func != NULL);
 #endif
 
 	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func (self, list, callback, query, user_data);
+
+#ifdef DBC /* ensure */
+#endif
+
 	return;
 }
 

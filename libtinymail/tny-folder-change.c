@@ -37,7 +37,7 @@ struct _TnyFolderChangePriv
 	TnyFolderChangeChanged changed;
 };
 
-#define TNY_FOLDER_CHANGE_GET_PRIVATE(o)	\
+#define TNY_FOLDER_CHANGE_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER_CHANGE, TnyFolderChangePriv))
 
 

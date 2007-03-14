@@ -33,12 +33,18 @@
 void 
 tny_folder_store_observer_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
 {
-#ifdef DEBUG
-	if (!TNY_FOLDER_STORE_OBSERVER_GET_IFACE (self)->update_func)
-		g_critical ("You must implement tny_folder_store_observer_update\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (self));
+	g_assert (change);
+	g_assert (TNY_IS_FOLDER_STORE_CHANGE (change));
+	g_assert (TNY_FOLDER_STORE_OBSERVER_GET_IFACE (self)->update_func != NULL);
 #endif
 
 	TNY_FOLDER_STORE_OBSERVER_GET_IFACE (self)->update_func (self, change);
+
+#ifdef DBC /* ensure */
+#endif
+
 	return;
 }
 
