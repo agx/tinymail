@@ -20,6 +20,9 @@
 #include <config.h>
 
 #include <tny-msg-receive-strategy.h>
+#include <tny-folder.h>
+#include <tny-header.h>
+#include <tny-msg.h>
 
 /* Possible future API changes:
  * tny_msg_receive_strategy_perform_get_msg will get a status callback handler.
@@ -33,19 +36,34 @@
  * @header: The #TnyHeader instance of the message that must be received
  * @err: A #GError instance or NULL
  *
- * Performs the receiving of a message from a folder
+ * Performs the receiving of a message from a folder. If not NULL, the returned
+ * value must be unreferenced after use. If the returned value is NULL and @err
+ * wasn't NULL, then @err will be set.
  *
- * Return value: the received message
+ * Return value: the received message or NULL
  **/
 TnyMsg *
 tny_msg_receive_strategy_perform_get_msg (TnyMsgReceiveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg_func)
-		g_critical ("You must implement tny_msg_receive_strategy_get_msg\n");
+	TnyMsg *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG_RECEIVE_STRATEGY (self));
+	g_assert (folder);
+	g_assert (TNY_IS_FOLDER (folder));
+	g_assert (header);
+	g_assert (TNY_IS_HEADER (header));
+	g_assert (TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg_func != NULL);
 #endif
 
-	return TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg_func (self, folder, header, err);
+	retval = TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg_func (self, folder, header, err);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (TNY_IS_MSG (retval));
+#endif
+
+	return retval;
 }
 
 static void

@@ -20,6 +20,8 @@
 #include <config.h>
 
 #include <tny-msg-remove-strategy.h>
+#include <tny-folder.h>
+#include <tny-header.h>
 
 /**
  * tny_msg_remove_strategy_peform_remove:
@@ -60,9 +62,13 @@
 void
 tny_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func)
-		g_critical ("You must implement tny_msg_remove_strategy_remove\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG_REMOVE_STRATEGY (self));
+	g_assert (folder);
+	g_assert (TNY_IS_FOLDER (folder));
+	g_assert (header);
+	g_assert (TNY_IS_HEADER (header));
+	g_assert (TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func != NULL);
 #endif
 
 	TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func (self, folder, header, err);

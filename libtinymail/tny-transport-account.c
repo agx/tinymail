@@ -20,6 +20,7 @@
 #include <config.h>
 
 #include <tny-transport-account.h>
+#include <tny-msg.h>
 
 
 /**
@@ -34,10 +35,13 @@
 void
 tny_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func)
-		g_critical ("You must implement tny_transport_account_send\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_TRANSPORT_ACCOUNT (self));
+	g_assert (msg);
+	g_assert (TNY_IS_MSG (msg));
+	g_assert (TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func  != NULL);
 #endif
+
 
 	TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func (self, msg, err);
 	return;

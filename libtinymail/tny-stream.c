@@ -36,9 +36,11 @@
 gssize
 tny_stream_write_to_stream (TnyStream *self, TnyStream *output)
 {
-#ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->write_to_stream_func)
-		g_critical ("You must implement tny_stream_write_to_stream\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STREAM (self));
+	g_assert (output);
+	g_assert (TNY_IS_STREAM (output));
+	g_assert (TNY_STREAM_GET_IFACE (self)->write_to_stream_func != NULL);
 #endif
 
 	return TNY_STREAM_GET_IFACE (self)->write_to_stream_func (self, output);
@@ -60,9 +62,9 @@ tny_stream_write_to_stream (TnyStream *self, TnyStream *output)
 gssize
 tny_stream_read  (TnyStream *self, char *buffer, gsize n)
 {
-#ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->read_func)
-		g_critical ("You must implement tny_stream_read\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STREAM (self));
+	g_assert (TNY_STREAM_GET_IFACE (self)->read_func  != NULL);
 #endif
 
 	return TNY_STREAM_GET_IFACE (self)->read_func (self, buffer, n);
@@ -84,9 +86,9 @@ tny_stream_read  (TnyStream *self, char *buffer, gsize n)
 gssize
 tny_stream_write (TnyStream *self, const char *buffer, gsize n)
 {
-#ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->write_func)
-		g_critical ("You must implement tny_stream_write\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STREAM (self));
+	g_assert (TNY_STREAM_GET_IFACE (self)->write_func  != NULL);
 #endif
 
 	return TNY_STREAM_GET_IFACE (self)->write_func (self, buffer, n);
@@ -105,9 +107,9 @@ tny_stream_write (TnyStream *self, const char *buffer, gsize n)
 gint
 tny_stream_flush (TnyStream *self)
 {
-#ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->flush_func)
-		g_critical ("You must implement tny_stream_flush\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STREAM (self));
+	g_assert (TNY_STREAM_GET_IFACE (self)->flush_func  != NULL);
 #endif
 
 	return TNY_STREAM_GET_IFACE (self)->flush_func (self);
@@ -124,9 +126,9 @@ tny_stream_flush (TnyStream *self)
 gint
 tny_stream_close (TnyStream *self)
 {
-#ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->close_func)
-		g_critical ("You must implement tny_stream_close\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STREAM (self));
+	g_assert (TNY_STREAM_GET_IFACE (self)->close_func  != NULL);
 #endif
 
 	return TNY_STREAM_GET_IFACE (self)->close_func (self);
@@ -145,9 +147,9 @@ tny_stream_close (TnyStream *self)
 gboolean
 tny_stream_is_eos   (TnyStream *self)
 {
-#ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->is_eos_func)
-		g_critical ("You must implement tny_stream_is_eos\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STREAM (self));
+	g_assert (TNY_STREAM_GET_IFACE (self)->is_eos_func  != NULL);
 #endif
 
 	return TNY_STREAM_GET_IFACE (self)->is_eos_func (self);
@@ -166,9 +168,9 @@ tny_stream_is_eos   (TnyStream *self)
 gint
 tny_stream_reset (TnyStream *self)
 {
-#ifdef DEBUG
-	if (!TNY_STREAM_GET_IFACE (self)->reset_func)
-		g_critical ("You must implement tny_stream_reset\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STREAM (self));
+	g_assert (TNY_STREAM_GET_IFACE (self)->reset_func  != NULL);
 #endif
 
 	return TNY_STREAM_GET_IFACE (self)->reset_func (self);

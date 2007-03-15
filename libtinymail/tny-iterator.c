@@ -20,6 +20,7 @@
 #include <config.h>
 
 #include <tny-iterator.h>
+#include <tny-list.h>
 
 /**
  * tny_iterator_next:
@@ -31,11 +32,14 @@
 void 
 tny_iterator_next (TnyIterator *self)
 {
-#ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->next_func)
-		g_critical ("You must implement tny_iterator_next\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ITERATOR (self));
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->next_func != NULL);
 #endif
+
 	TNY_ITERATOR_GET_IFACE (self)->next_func (self);
+
+	return;
 }
 
 /**
@@ -48,11 +52,14 @@ tny_iterator_next (TnyIterator *self)
 void
 tny_iterator_prev (TnyIterator *self)
 {
-#ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->prev_func)
-		g_critical ("You must implement tny_iterator_prev\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ITERATOR (self));
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->prev_func != NULL);
 #endif
+
 	TNY_ITERATOR_GET_IFACE (self)->prev_func (self);
+
+	return;
 }
 
 
@@ -66,12 +73,14 @@ tny_iterator_prev (TnyIterator *self)
 void 
 tny_iterator_first (TnyIterator *self)
 {
-#ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->first_func)
-		g_critical ("You must implement tny_iterator_first\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ITERATOR (self));
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->first_func != NULL);
 #endif
 
 	TNY_ITERATOR_GET_IFACE (self)->first_func (self);
+
+	return;
 }
 
 /**
@@ -85,11 +94,14 @@ tny_iterator_first (TnyIterator *self)
 void
 tny_iterator_nth (TnyIterator *self, guint nth)
 {
-#ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->nth_func)
-		g_critical ("You must implement tny_iterator_nth\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ITERATOR (self));
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->nth_func != NULL);
 #endif
+
 	TNY_ITERATOR_GET_IFACE (self)->nth_func (self, nth);
+
+	return;
 }
 
 
@@ -97,22 +109,32 @@ tny_iterator_nth (TnyIterator *self, guint nth)
  * tny_iterator_get_current:
  * @self: A #TnyIterator instance
  *
- * Does not move the iterator. Returns the object at the current position.
- * The returned object should be unreferenced after use.
+ * Does not move the iterator. Returns the object at the current position. If
+ * there no current position, this method returns NULL. If not NULL, the 
+ * returned value must be unreferenced after use.
  *
- * Return value: the currect object
+ * Return value: the currect object or NULL
  *
  **/
 GObject* 
 tny_iterator_get_current (TnyIterator *self)
 {
-#ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->get_current_func)
-		g_critical ("You must implement tny_iterator_get_current\n");
-#endif
-	return TNY_ITERATOR_GET_IFACE (self)->get_current_func (self);
-}
+	GObject *retval;
 
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ITERATOR (self));
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->get_current_func != NULL);
+#endif
+
+	retval = TNY_ITERATOR_GET_IFACE (self)->get_current_func (self);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (G_IS_OBJECT (retval));
+#endif
+
+	return retval;
+}
 
 
 /**
@@ -143,9 +165,9 @@ tny_iterator_get_current (TnyIterator *self)
 gboolean
 tny_iterator_is_done (TnyIterator *self)
 {
-#ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->is_done)
-		g_critical ("You must implement tny_iterator_is_done\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ITERATOR (self));
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->is_done != NULL);
 #endif
 
 	return TNY_ITERATOR_GET_IFACE (self)->is_done (self);
@@ -167,12 +189,20 @@ tny_iterator_is_done (TnyIterator *self)
 TnyList*
 tny_iterator_get_list (TnyIterator *self)
 {
-#ifdef DEBUG
-	if (!TNY_ITERATOR_GET_IFACE (self)->get_list_func)
-		g_critical ("You must implement tny_iterator_get_list\n");
+	TnyList *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ITERATOR (self));
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->get_list_func != NULL);
 #endif
 
-	return TNY_ITERATOR_GET_IFACE (self)->get_list_func (self);
+	retval = TNY_ITERATOR_GET_IFACE (self)->get_list_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_LIST (retval));
+#endif
+
+	return retval;
 }
 
 

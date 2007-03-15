@@ -30,10 +30,11 @@
 guint
 tny_list_get_length (TnyList *self)
 {
-#ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->get_length_func)
-		g_critical ("You must implement tny_list_get_length\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_LIST (self));
+	g_assert (TNY_LIST_GET_IFACE (self)->get_length_func != NULL);
 #endif
+
 	return TNY_LIST_GET_IFACE (self)->get_length_func (self);
 }
 
@@ -72,12 +73,20 @@ tny_list_get_length (TnyList *self)
 void
 tny_list_prepend (TnyList *self, GObject* item)
 {
-#ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->prepend_func)
-		g_critical ("You must implement tny_list_prepend\n");
+#ifdef DBC /* require */
+	gint length = tny_list_get_length (self);
+	g_assert (TNY_IS_LIST (self));
+	g_assert (item);
+	g_assert (G_IS_OBJECT (item));
+	g_assert (TNY_LIST_GET_IFACE (self)->prepend_func != NULL);
 #endif
 
 	TNY_LIST_GET_IFACE (self)->prepend_func (self, item);
+
+#ifdef DBC /* ensure */
+	g_assert (tny_list_get_length (self) == length + 1);
+#endif
+
 	return;
 }
 
@@ -116,12 +125,20 @@ tny_list_prepend (TnyList *self, GObject* item)
 void 
 tny_list_append (TnyList *self, GObject* item)
 {
-#ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->append_func)
-		g_critical ("You must implement tny_list_append\n");
+#ifdef DBC /* require */
+	gint length = tny_list_get_length (self);
+	g_assert (TNY_IS_LIST (self));
+	g_assert (item);
+	g_assert (G_IS_OBJECT (item));
+	g_assert (TNY_LIST_GET_IFACE (self)->append_func != NULL);
 #endif
 
 	TNY_LIST_GET_IFACE (self)->append_func (self, item);
+
+#ifdef DBC /* ensure */
+	g_assert (tny_list_get_length (self) == length + 1);
+#endif
+
 	return;
 }
 
@@ -181,12 +198,21 @@ tny_list_append (TnyList *self, GObject* item)
 void 
 tny_list_remove (TnyList *self, GObject* item)
 {
-#ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->remove_func)
-		g_critical ("You must implement tny_list_remove\n");
+#ifdef DBC /* require */
+	gint nl, length = tny_list_get_length (self);
+	g_assert (TNY_IS_LIST (self));
+	g_assert (item);
+	g_assert (G_IS_OBJECT (item));
+	g_assert (TNY_LIST_GET_IFACE (self)->remove_func != NULL);
 #endif
 
 	TNY_LIST_GET_IFACE (self)->remove_func (self, item);
+
+#ifdef DBC /* ensure */
+	nl = tny_list_get_length (self);
+	g_assert (nl == length || nl == length - 1);
+#endif
+
 	return;
 }
 
@@ -239,12 +265,20 @@ tny_list_remove (TnyList *self, GObject* item)
 TnyIterator* 
 tny_list_create_iterator (TnyList *self)
 {
-#ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->create_iterator_func)
-		g_critical ("You must implement tny_list_create_iterator\n");
+	TnyIterator *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_LIST (self));
+	g_assert (TNY_LIST_GET_IFACE (self)->create_iterator_func != NULL);
 #endif
 
-	return TNY_LIST_GET_IFACE (self)->create_iterator_func (self);
+	retval = TNY_LIST_GET_IFACE (self)->create_iterator_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_ITERATOR (retval));
+#endif
+
+	return retval;
 }
 
 /**
@@ -287,9 +321,10 @@ tny_list_create_iterator (TnyList *self)
 void 
 tny_list_foreach (TnyList *self, GFunc func, gpointer user_data)
 {
-#ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->foreach_func)
-		g_critical ("You must implement tny_list_foreach\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_LIST (self));
+	g_assert (func);
+	g_assert (TNY_LIST_GET_IFACE (self)->foreach_func != NULL);
 #endif
 
 	TNY_LIST_GET_IFACE (self)->foreach_func (self, func, user_data);
@@ -314,12 +349,20 @@ tny_list_foreach (TnyList *self, GFunc func, gpointer user_data)
 TnyList*
 tny_list_copy (TnyList *self)
 {
-#ifdef DEBUG
-	if (!TNY_LIST_GET_IFACE (self)->copy_func)
-		g_critical ("You must implement tny_list_copy\n");
+	TnyList *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_LIST (self));
+	g_assert (TNY_LIST_GET_IFACE (self)->copy_func != NULL);
 #endif
 
-	return TNY_LIST_GET_IFACE (self)->copy_func (self);
+	retval = TNY_LIST_GET_IFACE (self)->copy_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_LIST (retval));
+#endif
+
+	return retval;
 }
 
 static void

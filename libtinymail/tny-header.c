@@ -19,6 +19,10 @@
 
 #include <config.h>
 
+#ifdef DBC
+#include <string.h>
+#endif
+
 #include <tny-header.h>
 #include <tny-folder.h>
 
@@ -33,12 +37,19 @@
 void
 tny_header_set_replyto (TnyHeader *self, const gchar *to)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->set_replyto_func)
-		g_critical ("You must implement tny_header_set_replyto\n");
-#endif	
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (to);
+	g_assert (strlen (to) > 0);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_replyto_func != NULL);
+#endif
 
 	TNY_HEADER_GET_IFACE (self)->set_replyto_func (self, to);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_header_get_replyto (self), to));
+#endif
+
 	return;
 }
 
@@ -53,10 +64,11 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
 const gchar*
 tny_header_get_replyto (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_replyto_func)
-		g_critical ("You must implement tny_header_get_replyto\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_replyto_func != NULL);
 #endif
+
 	return TNY_HEADER_GET_IFACE (self)->get_replyto_func (self);
 }
 
@@ -72,12 +84,19 @@ tny_header_get_replyto (TnyHeader *self)
 void
 tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->set_bcc_func)
-		g_critical ("You must implement tny_header_set_bcc\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (bcc);
+	g_assert (strlen (bcc) > 0);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_bcc_func != NULL);
 #endif
 
 	TNY_HEADER_GET_IFACE (self)->set_bcc_func (self, bcc);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_header_get_bcc (self), bcc));
+#endif
+
 	return;
 }
 
@@ -93,12 +112,19 @@ tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
 void
 tny_header_set_cc (TnyHeader *self, const gchar *cc)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->set_cc_func)
-		g_critical ("You must implement tny_header_set_cc\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (cc);
+	g_assert (strlen (cc) > 0);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_cc_func != NULL);
 #endif
 
 	TNY_HEADER_GET_IFACE (self)->set_cc_func (self, cc);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_header_get_cc (self), cc));
+#endif
+
 	return;
 }
 
@@ -113,12 +139,19 @@ tny_header_set_cc (TnyHeader *self, const gchar *cc)
 void
 tny_header_set_from (TnyHeader *self, const gchar *from)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->set_from_func)
-		g_critical ("You must implement tny_header_set_from\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (from);
+	g_assert (strlen (from) > 0);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_from_func != NULL);
 #endif
 
 	TNY_HEADER_GET_IFACE (self)->set_from_func (self, from);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_header_get_from (self), from));
+#endif
+
 	return;
 }
 
@@ -133,12 +166,19 @@ tny_header_set_from (TnyHeader *self, const gchar *from)
 void
 tny_header_set_subject (TnyHeader *self, const gchar *subject)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->set_subject_func)
-		g_critical ("You must implement tny_header_set_subject\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (subject);
+	g_assert (strlen (subject) > 0);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_subject_func != NULL);
 #endif
 
 	TNY_HEADER_GET_IFACE (self)->set_subject_func (self, subject);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_header_get_subject (self), subject));
+#endif
+
 	return;
 }
 
@@ -158,12 +198,19 @@ tny_header_set_subject (TnyHeader *self, const gchar *subject)
 void
 tny_header_set_to (TnyHeader *self, const gchar *to)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->set_to_func)
-		g_critical ("You must implement tny_header_set_to\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (to);
+	g_assert (strlen (to) > 0);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_to_func != NULL);
 #endif
 
 	TNY_HEADER_GET_IFACE (self)->set_to_func (self, to);
+
+#ifdef DBC /* ensure */
+	g_assert (!strcmp (tny_header_get_to (self), to));
+#endif
+
 	return;
 }
 
@@ -179,9 +226,9 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
 const gchar*
 tny_header_get_cc (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_cc_func)
-		g_critical ("You must implement tny_header_get_cc\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_cc_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_cc_func (self);
@@ -199,9 +246,9 @@ tny_header_get_cc (TnyHeader *self)
 const gchar*
 tny_header_get_bcc (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_bcc_func)
-		g_critical ("You must implement tny_header_get_bcc\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_bcc_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_bcc_func (self);
@@ -218,9 +265,9 @@ tny_header_get_bcc (TnyHeader *self)
 time_t
 tny_header_get_date_received (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_date_received_func)
-		g_critical ("You must implement tny_header_get_date_received\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_date_received_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_date_received_func (self);
@@ -237,9 +284,9 @@ tny_header_get_date_received (TnyHeader *self)
 time_t
 tny_header_get_date_sent (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_date_sent_func)
-		g_critical ("You must implement tny_header_get_date_sent\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_date_sent_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_date_sent_func (self);
@@ -259,9 +306,9 @@ tny_header_get_date_sent (TnyHeader *self)
 const gchar*
 tny_header_get_uid (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_uid_func)
-		g_critical ("You must implement tny_header_get_uid\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_uid_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_uid_func (self);
@@ -280,9 +327,9 @@ tny_header_get_uid (TnyHeader *self)
 const gchar*
 tny_header_get_message_id (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_message_id_func)
-		g_critical ("You must implement tny_header_get_message_id\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_message_id_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_message_id_func (self);
@@ -301,10 +348,11 @@ tny_header_get_message_id (TnyHeader *self)
 guint
 tny_header_get_message_size (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_message_size_func)
-		g_critical ("You must implement tny_header_get_message_size\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_message_size_func != NULL);
 #endif
+
 
 	return TNY_HEADER_GET_IFACE (self)->get_message_size_func (self);
 }
@@ -322,9 +370,9 @@ tny_header_get_message_size (TnyHeader *self)
 const gchar* 
 tny_header_get_from (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_from_func)
-		g_critical ("You must implement tny_header_get_from\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_from_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_from_func (self);
@@ -342,9 +390,9 @@ tny_header_get_from (TnyHeader *self)
 const gchar*
 tny_header_get_subject (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_subject_func)
-		g_critical ("You must implement tny_header_get_subject\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_subject_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_subject_func (self);
@@ -363,9 +411,9 @@ tny_header_get_subject (TnyHeader *self)
 const gchar* 
 tny_header_get_to (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_to_func)
-		g_critical ("You must implement tny_header_get_to\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_to_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_to_func (self);
@@ -375,21 +423,31 @@ tny_header_get_to (TnyHeader *self)
  * tny_header_get_folder:
  * @self: a #TnyHeader object
  * 
- * Get the parent folder where this message header is located.
- * The returned folder object should be unreferenced after use.
+ * Get the parent folder where this message header is located. This method can
+ * return NULL in case the folder isn't know. The returned value,i if not NULL,
+ * must be unreferenced after use.
  * 
- * Return value: The folder of the message header
+ * Return value: The folder of the message header or NULL
  *
  **/
 TnyFolder* 
 tny_header_get_folder (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_folder_func)
-		g_critical ("You must implement tny_header_get_folder\n");
+	TnyFolder *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_folder_func != NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_folder_func (self);
+	retval = TNY_HEADER_GET_IFACE (self)->get_folder_func (self);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (TNY_IS_FOLDER (retval));
+#endif
+
+	return retval;
 }
 
 
@@ -405,9 +463,9 @@ tny_header_get_folder (TnyHeader *self)
 TnyHeaderFlags
 tny_header_get_flags (TnyHeader *self)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->get_flags_func)
-		g_critical ("You must implement tny_header_get_flags\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_flags_func != NULL);
 #endif
 
 	return TNY_HEADER_GET_IFACE (self)->get_flags_func (self);
@@ -424,12 +482,18 @@ tny_header_get_flags (TnyHeader *self)
 void 
 tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->set_flags_func)
-		g_critical ("You must implement tny_header_set_flags\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_flags_func != NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->set_flags_func (self, mask);
+	TNY_HEADER_GET_IFACE (self)->set_flags_func (self, mask);
+
+#ifdef DBC /* ensure */
+	/* TNY TODO: A check that ensures that all bits in mask are set */
+#endif
+
+	return;
 }
 
 /**
@@ -443,12 +507,18 @@ tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 void 
 tny_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
-#ifdef DEBUG
-	if (!TNY_HEADER_GET_IFACE (self)->unset_flags_func)
-		g_critical ("You must implement tny_header_unset_flags\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->unset_flags_func != NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->unset_flags_func (self, mask);
+	TNY_HEADER_GET_IFACE (self)->unset_flags_func (self, mask);
+
+#ifdef DBC /* ensure */
+	/* TNY TODO: A check that ensures that all bits in mask are unset */
+#endif
+
+	return;
 }
 
 
@@ -486,8 +556,6 @@ tny_header_get_type (void)
 
 		type = g_type_register_static (G_TYPE_INTERFACE,
 			"TnyHeader", &info, 0);
-
-		/* g_type_interface_add_prerequisite (type, G_TYPE_OBJECT); */
 	}
 
 	return type;

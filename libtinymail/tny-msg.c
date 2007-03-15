@@ -19,7 +19,13 @@
 
 #include <config.h>
 
+#ifdef DBC
+#include <string.h>
+#endif
+
 #include <tny-msg.h>
+#include <tny-header.h>
+#include <tny-folder.h>
 
 
 /**
@@ -39,19 +45,30 @@
 gchar* 
 tny_msg_get_url_string (TnyMsg *self)
 {
-#ifdef DEBUG
-	if (!TNY_MSG_GET_IFACE (self)->get_url_string_func)
-		g_critical ("You must implement tny_msg_get_url_string\n");
+	gchar *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG (self));
+	g_assert (TNY_MSG_GET_IFACE (self)->get_url_string_func != NULL);
 #endif
 
-	return TNY_MSG_GET_IFACE (self)->get_url_string_func (self);
+	retval = TNY_MSG_GET_IFACE (self)->get_url_string_func (self);
+
+#ifdef DBC /* ensure */
+	if (retval) {
+		g_assert (strlen (retval) > 0);
+		g_assert (strstr (retval, "://") != NULL);
+	}
+#endif
+
+	return retval;
 }
 
 /**
  * tny_msg_get_folder:
  * @self: a #TnyMsg object
  * 
- * Get the parent folder of @self. The returned folder object should be
+ * Get the parent folder of @self. If not NULL, the returned value must be
  * unreferenced after use.
  *
  * Return value: The parent folder of this message or NULL if none
@@ -59,12 +76,21 @@ tny_msg_get_url_string (TnyMsg *self)
 TnyFolder* 
 tny_msg_get_folder (TnyMsg *self)
 {
-#ifdef DEBUG
-	if (!TNY_MSG_GET_IFACE (self)->get_folder_func)
-		g_critical ("You must implement tny_msg_get_folder\n");
+	TnyFolder *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG (self));
+	g_assert (TNY_MSG_GET_IFACE (self)->get_folder_func != NULL);
 #endif
 
-	return TNY_MSG_GET_IFACE (self)->get_folder_func (self);
+	retval = TNY_MSG_GET_IFACE (self)->get_folder_func (self);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (TNY_IS_FOLDER (retval));
+#endif
+
+	return retval;
 }
 
 
@@ -74,7 +100,7 @@ tny_msg_get_folder (TnyMsg *self)
  * tny_msg_get_header:
  * @self: a #TnyMsg object
  * 
- * Get the header of @self. The returned header object should be 
+ * Get the header of @self. The returned header object must be 
  * unreferenced after use.
  *
  * Return value: The header of the message
@@ -82,12 +108,21 @@ tny_msg_get_folder (TnyMsg *self)
 TnyHeader*
 tny_msg_get_header (TnyMsg *self)
 {
-#ifdef DEBUG
-	if (!TNY_MSG_GET_IFACE (self)->get_header_func)
-		g_critical ("You must implement tny_msg_get_header\n");
+	TnyHeader *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG (self));
+	g_assert (TNY_MSG_GET_IFACE (self)->get_header_func != NULL);
 #endif
 
-	return TNY_MSG_GET_IFACE (self)->get_header_func (self);
+	retval = TNY_MSG_GET_IFACE (self)->get_header_func (self);
+
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_HEADER (retval));
+#endif
+
+	return retval;
 }
 
 
@@ -124,11 +159,7 @@ tny_msg_get_type (void)
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyMsg", &info, 0);
-
 		g_type_interface_add_prerequisite (type, TNY_TYPE_MIME_PART); 
-
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-
 	}
 
 	return type;

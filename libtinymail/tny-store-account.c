@@ -21,8 +21,10 @@
 
 #include <tny-store-account.h>
 #include <tny-folder-store.h>
+#include <tny-folder.h>
 
 guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
+
 /**
  * tny_store_account_unsubscribe:
  * @self: a #TnyStoreAccount object
@@ -36,9 +38,11 @@ guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
 void
 tny_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
 {
-#ifdef DEBUG
-	if (!TNY_STORE_ACCOUNT_GET_IFACE (self)->unsubscribe_func)
-		g_critical ("You must implement tny_store_account_unsubscribe\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STORE_ACCOUNT (self));
+	g_assert (folder);
+	g_assert (TNY_IS_FOLDER (folder));
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->unsubscribe_func != NULL);
 #endif
 
 	TNY_STORE_ACCOUNT_GET_IFACE (self)->unsubscribe_func (self, folder);
@@ -58,9 +62,11 @@ tny_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
 void
 tny_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
 {
-#ifdef DEBUG
-	if (!TNY_STORE_ACCOUNT_GET_IFACE (self)->subscribe_func)
-		g_critical ("You must implement tny_store_account_subscribe\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STORE_ACCOUNT (self));
+	g_assert (folder);
+	g_assert (TNY_IS_FOLDER (folder));
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->subscribe_func != NULL);
 #endif
 
 	TNY_STORE_ACCOUNT_GET_IFACE (self)->subscribe_func (self, folder);

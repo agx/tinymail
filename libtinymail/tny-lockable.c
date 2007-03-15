@@ -30,9 +30,9 @@
 void 
 tny_lockable_lock (TnyLockable *self)
 {
-#ifdef DEBUG
-	if (!TNY_LOCKABLE_GET_IFACE (self)->lock_func)
-		g_critical ("You must implement tny_lockable_lock\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_LOCKABLE (self));
+	g_assert (TNY_LOCKABLE_GET_IFACE (self)->lock_func != NULL);
 #endif
 
 	TNY_LOCKABLE_GET_IFACE (self)->lock_func (self);
@@ -48,9 +48,9 @@ tny_lockable_lock (TnyLockable *self)
 void 
 tny_lockable_unlock (TnyLockable *self)
 {
-#ifdef DEBUG
-	if (!TNY_LOCKABLE_GET_IFACE (self)->unlock_func)
-		g_critical ("You must implement tny_lockable_unlock\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_LOCKABLE (self));
+	g_assert (TNY_LOCKABLE_GET_IFACE (self)->unlock_func != NULL);
 #endif
 
 	TNY_LOCKABLE_GET_IFACE (self)->unlock_func (self);
@@ -85,7 +85,6 @@ tny_lockable_get_type (void)
 		  NULL,   /* instance_init */
 		  NULL
 		};
-	    
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnyLockable", &info, 0);
 	}

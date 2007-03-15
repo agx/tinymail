@@ -20,6 +20,9 @@
 #include <config.h>
 
 #include <tny-send-queue.h>
+#include <tny-folder.h>
+#include <tny-msg.h>
+
 guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
 
 
@@ -29,15 +32,16 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
  * @remove: Whether or not to also remove queued messages
  * @err: a #GError instance or NULL
  *
- * Cancel the current operation
+ * Cancels the current operation
  **/
 void 
 tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func)
-		g_critical ("You must implement tny_send_queue_cancel\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_SEND_QUEUE (self));
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func != NULL);
 #endif
+
 	TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func (self, remove, err);
 	return;
 }
@@ -54,11 +58,20 @@ tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
 TnyFolder* 
 tny_send_queue_get_sentbox (TnySendQueue *self)
 {
-#ifdef DEBUG
-	if (!TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func)
-		g_critical ("You must implement tny_send_queue_get_sentbox\n");
+	TnyFolder *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_SEND_QUEUE (self));
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func != NULL);
 #endif
-	return TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func (self);
+
+	retval = TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_FOLDER (retval));
+#endif
+
+	return retval;
 }
 
 /**
@@ -73,11 +86,20 @@ tny_send_queue_get_sentbox (TnySendQueue *self)
 TnyFolder* 
 tny_send_queue_get_outbox (TnySendQueue *self)
 {
-#ifdef DEBUG
-	if (!TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func)
-		g_critical ("You must implement tny_send_queue_get_outbox\n");
+	TnyFolder *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_SEND_QUEUE (self));
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func != NULL);
 #endif
-	return TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func (self);
+
+	retval = TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func (self);
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_FOLDER (retval));
+#endif
+
+	return retval;
 }
 
 /**
@@ -92,10 +114,13 @@ tny_send_queue_get_outbox (TnySendQueue *self)
 void 
 tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
-#ifdef DEBUG
-	if (!TNY_SEND_QUEUE_GET_IFACE (self)->add_func)
-		g_critical ("You must implement tny_send_queue_add\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_SEND_QUEUE (self));
+	g_assert (msg);
+	g_assert (TNY_IS_MSG (msg));
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->add_func != NULL);
 #endif
+
 	TNY_SEND_QUEUE_GET_IFACE (self)->add_func (self, msg, err);
 	return;
 }
@@ -175,10 +200,8 @@ tny_send_queue_get_type (void)
 		  NULL,    /* instance_init */
 		  NULL
 		};
-
 		type = g_type_register_static (G_TYPE_INTERFACE, 
 			"TnySendQueue", &info, 0);
-
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 
 	}
