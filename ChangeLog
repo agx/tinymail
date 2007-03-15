@@ -13,7 +13,7 @@
 	Added some error management code when loading folders
 	Added notification code to tny_camel_folder_copy_folder
 
-2007-03-14  Juerg Billeter
+2007-03-14  Juerg Billeter <j@bitron.ch>
 
 	* libtinymail/tny-mime-part.c: Design by contract assertions
 
