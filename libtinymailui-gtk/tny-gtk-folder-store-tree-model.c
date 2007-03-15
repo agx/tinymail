@@ -599,6 +599,7 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 static gboolean 
 deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
 {
+	gboolean retval = FALSE;
 	gint type;
 	GObject *folder = user_data1;
 
@@ -614,13 +615,15 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 			&fol, -1);
 
-		if (fol == folder)
+		if (fol == folder) {
 			gtk_tree_store_remove (GTK_TREE_STORE (model), iter);
+			retval = TRUE;
+		}
 
 		g_object_unref (G_OBJECT (fol));
 	}
 
-	return FALSE;
+	return retval;
 }
 
 

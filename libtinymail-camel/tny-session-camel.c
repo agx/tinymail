@@ -439,7 +439,7 @@ background_connect_idle (gpointer data)
 	TnySessionCamel *self = info->user_data;
 	TnySessionCamelPriv *priv = self->priv;
 
-	if (priv->account_store && !priv->first_switch)
+	if (priv->account_store)
 		g_signal_emit (priv->account_store, 
 			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
 
@@ -457,8 +457,9 @@ background_connect_thread (gpointer data)
 
 	priv->is_connecting = TRUE;
 
-	if (priv->current_accounts && !priv->first_switch && 
+	if (priv->current_accounts &&
 		priv->prev_constat != info->online && priv->account_store)
+
 	{
 		g_list_foreach (priv->current_accounts, 
 			foreach_account_set_connectivity, info);
@@ -470,7 +471,6 @@ background_connect_thread (gpointer data)
 		background_connect_idle, 
 		info, background_connect_destroy);
 
-	priv->first_switch = FALSE;
 	priv->prev_constat = info->online;
 
 	g_mutex_unlock (priv->conlock);
@@ -562,6 +562,7 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	TnyDevice *device = (TnyDevice*)tny_account_store_get_device (account_store);
 	gchar *base_directory = NULL;
 	gchar *camel_dir = NULL;
+	gboolean online;
 	TnySessionCamelPriv *priv = self->priv;
 
 	priv->account_store = (gpointer)account_store;    
@@ -578,10 +579,8 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	camel_provider_init();
 	camel_session_construct (session, camel_dir);
 
-	/* Avoid the first question in connection_changed */
-	priv->first_switch = tny_device_is_online (device);
-	camel_session_set_online ((CamelSession *) session, 
-		priv->first_switch); 
+	online = tny_device_is_online (device);
+	camel_session_set_online ((CamelSession *) session, online); 
 	priv->camel_dir = camel_dir;
 	g_free (base_directory);
 	tny_session_camel_set_device (self, device);

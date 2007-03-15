@@ -287,29 +287,32 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
 
-		if (priv->folder->folder_flags & CAMEL_FOLDER_IS_READONLY)
-			priv->caps &= ~TNY_FOLDER_CAPS_WRITABLE;
-		else
-			priv->caps |= TNY_FOLDER_CAPS_WRITABLE;
+		if (priv->folder && !camel_exception_is_set (&ex) && CAMEL_IS_FOLDER (priv->folder)) {
 
-		if (priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY)
-			priv->caps |= TNY_FOLDER_CAPS_PUSHEMAIL;
-		else
-			priv->caps &= ~TNY_FOLDER_CAPS_PUSHEMAIL;
+			if (priv->folder->folder_flags & CAMEL_FOLDER_IS_READONLY)
+				priv->caps &= ~TNY_FOLDER_CAPS_WRITABLE;
+			else
+				priv->caps |= TNY_FOLDER_CAPS_WRITABLE;
 
-		/* printf ("LOAD (%s): %d\n",
-				priv->folder_name?priv->folder_name:"NUL",
-				(((CamelObject*)priv->folder)->ref_count)); */
+			if (priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY)
+				priv->caps |= TNY_FOLDER_CAPS_PUSHEMAIL;
+			else
+				priv->caps &= ~TNY_FOLDER_CAPS_PUSHEMAIL;
 
-		if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
-		{
-			guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
+			/* printf ("LOAD (%s): %d\n",
+			   priv->folder_name?priv->folder_name:"NUL",
+			   (((CamelObject*)priv->folder)->ref_count)); */
 
-			if (priv->iter && !priv->iter_parented)
-				camel_folder_info_free  (priv->iter);
+			if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
+				{
+					guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
 
-			priv->iter = camel_store_get_folder_info (store, priv->folder_name, flags, &ex);
-			priv->iter_parented = TRUE;
+					if (priv->iter && !priv->iter_parented)
+						camel_folder_info_free  (priv->iter);
+
+					priv->iter = camel_store_get_folder_info (store, priv->folder_name, flags, &ex);
+					priv->iter_parented = TRUE;
+				}
 		}
 
 		if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
@@ -1429,6 +1432,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	CamelFolderInfo *iter;
 	gchar *final_name;
 	TnyFolderStoreChange *change;
+	TnyFolderStore *old_parent;	
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_COPY))
@@ -1585,19 +1589,48 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		goto exception;
 	}
 
-	retval = _tny_camel_folder_new ();
-	fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
+	old_parent = tny_folder_get_folder_store (self);
+
+	if (tostore == fromstore && del) {
+		retval = self;
+
+		/* No need to notify the folder if there was not an
+		   actual change in the short (visual) name */
+		if (strcmp (tny_folder_get_name (self), new_name)) {
+			TnyFolderChange *change;
+			
+			change = tny_folder_change_new (self);
+			tny_folder_change_set_rename (change, new_name);
+			notify_folder_observers_about (self, change);
+			g_object_unref (G_OBJECT (change));
+		}
+	} else {
+		retval = _tny_camel_folder_new ();
+		
+		fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
+		camel_object_ref (CAMEL_OBJECT (tostore));
+		fpriv->store = tostore;
+	}
+
+	/* Notify the deletion before the addition because otherwise
+	   we could delete the recently created folder instead of the
+	   old one. */
+	if (del) {
+		TnyFolderStoreChange *change = tny_folder_store_change_new (old_parent);
+		tny_folder_store_change_add_removed_folder (change, self);
+		notify_folder_store_observers_about (old_parent, change);
+		g_object_unref (G_OBJECT (change));
+	}
 
 	_tny_camel_folder_set_folder_info (into, TNY_CAMEL_FOLDER (retval), iter);
-	camel_object_ref (CAMEL_OBJECT (tostore));
-	fpriv->store = tostore;
-	_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (retval), into);
 
-	change = tny_folder_store_change_new (TNY_FOLDER_STORE (self));
+	/* Notify addition */
+	change = tny_folder_store_change_new (into);
 	tny_folder_store_change_add_created_folder (change, retval);
-	notify_folder_store_observers_about (TNY_FOLDER_STORE (self), change);
+	notify_folder_store_observers_about (into, change);
 	g_object_unref (G_OBJECT (change));
 
+	g_object_unref (G_OBJECT (old_parent));
 	camel_object_unref (CAMEL_OBJECT (tostore));
 	camel_object_unref (CAMEL_OBJECT (fromstore));
 

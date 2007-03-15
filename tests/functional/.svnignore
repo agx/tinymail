@@ -11,3 +11,4 @@ config.h
 .libs
 .deps
 Makefile
+folder-transfer

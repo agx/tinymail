@@ -5,7 +5,7 @@ struct _TnySessionCamelPriv
 {
 	gpointer device;
 	gpointer account_store;
-	gboolean interactive, prev_constat, first_switch;
+	gboolean interactive, prev_constat;
 	guint connchanged_signal;
 	GList *current_accounts;
 	gchar *camel_dir;

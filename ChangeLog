@@ -1,3 +1,14 @@
+2007-03-15  Sergio Villar Senin  <svillar@igalia.com>
+
+	* tests/funtional: added a functional test to transfer folders
+	* libtinymail-camel/tny-camel-session.c: removed the first_switch
+	attribute of TnySessionCamel
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c: the deleter
+	method now returns just after deleting a row
+	* libtinymail-camel/tny-camel-folder.c: 
+	Added some error management code when loading folders
+	Added notification code to tny_camel_folder_copy_folder
+
 2007-03-14  Juerg Billeter
 
 	* libtinymail/tny-mime-part.c: Design by contract assertions
