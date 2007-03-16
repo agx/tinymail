@@ -1,7 +1,7 @@
 #ifndef TNY_MAEMO_PLATFORM_FACTORY_H
 #define TNY_MAEMO_PLATFORM_FACTORY_H
 
-/* libtinymail-camel - The Tiny Mail base library for Camel
+/* libtinymail-maemo - The Tiny Mail base library for Maemo
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or

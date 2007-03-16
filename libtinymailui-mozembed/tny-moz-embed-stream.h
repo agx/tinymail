@@ -1,7 +1,7 @@
 #ifndef TNY_MOZ_EMBED_STREAM_H
 #define TNY_MOZ_EMBED_STREAM_H
 
-/* libtinymailui-gtk - The Tiny Mail UI library for Gtk+
+/* libtinymailui-mozembed - The Tiny Mail UI library for Mozembed
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
