@@ -709,7 +709,8 @@ tny_folder_get_account (TnyFolder *self)
 
 
 #ifdef DBC /* ensure */
-	g_assert (TNY_IS_ACCOUNT (self));
+	if (retval)
+		g_assert (TNY_IS_ACCOUNT (retval));
 #endif
 
 	return retval;
