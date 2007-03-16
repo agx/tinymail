@@ -3,7 +3,15 @@
 	* changed license to LGPL for some files which were mistakenly marked
 	GPL
 
-2007-03.16  Sergio Villar Senin  <svillar@igalia.com>
+2007-03-16  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Design by contract assertions
+	* tny_account_store_find_account API added
+	* tny_folder_find_msg API added
+
+	* This was a major API change
+
+2007-03-16  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui/tny-msg-view.c: fixed a typo in a function name
 	* libtinymail/tny-folder.c: fixed a DBC assertion

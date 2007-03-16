@@ -888,6 +888,96 @@ tny_camel_store_account_remove_observer_default (TnyFolderStore *self, TnyFolder
 	return;
 }
 
+static TnyFolder*
+tny_camel_store_account_find_folder (TnyStoreAccount *self, const gchar *url_string, GError **err)
+{
+	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->find_folder_func (self, url_string, err);
+}
+
+static TnyFolder*
+tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar *url_string, GError **err)
+{
+	TnyFolder *retval = NULL;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
+	CamelFolderInfo *iter; guint32 flags; CamelStore *store;
+
+	g_assert (CAMEL_IS_SESSION (apriv->session));
+
+	if (!_tny_session_check_operation (apriv->session, err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
+		return;
+
+	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
+				"Account not ready for this operation (%s)",
+				camel_exception_get_description (apriv->ex));
+		_tny_session_stop_operation (apriv->session);
+		return;
+	}
+
+	store = CAMEL_STORE (apriv->service);
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
+			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+
+		if (store && CAMEL_IS_OBJECT (store))
+			camel_object_unref (CAMEL_OBJECT (store));
+		_tny_session_stop_operation (apriv->session);
+		return;
+	}
+
+	g_assert (CAMEL_IS_STORE (store));
+
+	flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
+
+	if (!camel_session_is_online ((CamelSession*) apriv->session))
+		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
+
+	iter = camel_store_get_folder_info (store, url_string, flags, &ex);
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
+			camel_exception_get_description (&ex));
+		camel_exception_clear (&ex);
+
+		if (CAMEL_IS_OBJECT (store))
+		{
+			if (iter && CAMEL_IS_STORE (store))
+				camel_store_free_folder_info (store, iter);
+			camel_object_unref (CAMEL_OBJECT (store));
+		}
+		_tny_session_stop_operation (apriv->session);
+		return;
+	}
+
+	if (iter)
+	{
+		gboolean was_new = FALSE;
+
+		TnyCamelFolder *folder = (TnyCamelFolder *) tny_camel_store_account_factor_folder (
+			TNY_CAMEL_STORE_ACCOUNT (self), 
+			iter->full_name, &was_new);
+
+		if (was_new && folder != NULL)
+			_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (self), folder, iter);
+
+		retval = (TnyFolder *) folder;
+	}
+
+	_tny_session_stop_operation (apriv->session);
+
+	return retval;
+}
 
 static void
 tny_folder_store_init (gpointer g, gpointer iface_data)
@@ -911,6 +1001,7 @@ tny_store_account_init (gpointer g, gpointer iface_data)
 
 	klass->subscribe_func = tny_camel_store_account_subscribe;
 	klass->unsubscribe_func = tny_camel_store_account_unsubscribe;
+	klass->find_folder_func = tny_camel_store_account_find_folder;
 
 	return;
 }
@@ -935,6 +1026,7 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	class->remove_folder_func = tny_camel_store_account_remove_folder_default;
 	class->add_observer_func = tny_camel_store_account_add_observer_default;
 	class->remove_observer_func = tny_camel_store_account_remove_observer_default;
+	class->find_folder_func = tny_camel_store_account_find_folder_default;
 
 	/* Protected default implementation */
 	class->factor_folder_func = tny_camel_store_account_factor_folder_default;

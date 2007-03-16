@@ -133,7 +133,7 @@ tny_list_append (TnyList *self, GObject* item)
 	g_assert (TNY_LIST_GET_IFACE (self)->append_func != NULL);
 #endif
 
-	TNY_LIST_GET_IFACE (self)->append_func (self, item);
+	TNY_LIST_GET_IFACE (self)->append_func (self, item); 
 
 #ifdef DBC /* ensure */
 	g_assert (tny_list_get_length (self) == length + 1);

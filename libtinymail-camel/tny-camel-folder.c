@@ -1356,6 +1356,65 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 }
 
 
+
+
+static TnyMsg*
+tny_camel_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->find_msg_func (self, url_string, err);
+}
+
+static TnyMsg*
+tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GError **err)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyMsg *retval = NULL;
+	TnyHeader *hdr;
+	CamelMessageInfo *info;
+	const gchar *uid;
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
+		return;
+
+	if (!priv->receive_strat) {
+		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+		return NULL;
+	}
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
+		{
+			g_static_rec_mutex_unlock (priv->folder_lock);
+			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+			return NULL;
+		}
+
+	uid = strrchr (url_string, '/');
+	if (uid && uid[0] != '/' && strlen (uid) > 1)
+	{
+		uid++;
+		info = camel_message_info_new_uid (NULL, uid);
+		hdr = _tny_camel_header_new ();
+		_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
+		retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, hdr, err);
+		g_object_unref (G_OBJECT (hdr));
+	} else {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_GET_MSG,
+				"This url string is malformated");
+		retval = NULL;
+	}
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+
+	return retval;
+}
+
 static const gchar*
 tny_camel_folder_get_name (TnyFolder *self)
 {
@@ -3085,6 +3144,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->set_msg_receive_strategy_func = tny_camel_folder_set_msg_receive_strategy;
 	klass->get_headers_func = tny_camel_folder_get_headers;
 	klass->get_msg_func = tny_camel_folder_get_msg;
+	klass->find_msg_func = tny_camel_folder_find_msg;
 	klass->get_msg_async_func = tny_camel_folder_get_msg_async;
 	klass->get_id_func = tny_camel_folder_get_id;
 	klass->set_name_func = tny_camel_folder_set_name;
@@ -3125,7 +3185,6 @@ tny_folder_store_init (gpointer g, gpointer iface_data)
 	klass->add_observer_func = tny_camel_folder_store_add_observer;
 	klass->remove_observer_func = tny_camel_folder_store_remove_observer;
 
-
 	return;
 }
 
@@ -3144,6 +3203,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy_default;
 	class->get_headers_func = tny_camel_folder_get_headers_default;
 	class->get_msg_func = tny_camel_folder_get_msg_default;
+	class->find_msg_func = tny_camel_folder_find_msg_default;
 	class->get_msg_async_func = tny_camel_folder_get_msg_async_default;
 	class->get_id_func = tny_camel_folder_get_id_default;
 	class->set_name_func = tny_camel_folder_set_name_default;

@@ -38,7 +38,7 @@ guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 
 /**
  * tny_account_store_find_account:
- * @self: a #TnyAccountTransport object
+ * @self: a #TnyAccountStore object
  * @url_string: the url-string of the account to find
  *
  * Try to find the account in @self that corresponds to @url_string. If this 
@@ -47,7 +47,8 @@ guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
  *
  * Implementors: when implementing a platform-specific library, you must
  * implement this method. Let it return the account that corresponds to
- * @url_string or NULL. Also see tny_account_matches_url_string at #TnyAccount.
+ * @url_string or let it return NULL. Also see 
+ * tny_account_matches_url_string at #TnyAccount.
  *
  * This method can be used to resolve url-strings to #TnyAccount instances.
  *
@@ -80,7 +81,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 
 /**
  * tny_account_store_alert:
- * @self: a #TnyAccountTransport object
+ * @self: a #TnyAccountStore object
  * @type: the message type (severity)
  * @prompt: the prompt
  *
@@ -149,7 +150,7 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *
 
 /**
  * tny_account_store_get_device:
- * @self: a #TnyAccountTransport object
+ * @self: a #TnyAccountStore object
  *
  * This method returns a #TnyDevice instance. You must unreference the return
  * value after use.
@@ -183,7 +184,7 @@ tny_account_store_get_device (TnyAccountStore *self)
 
 /**
  * tny_account_store_get_cache_dir:
- * @self: a #TnyAccountTransport object
+ * @self: a #TnyAccountStore object
  * 
  * Get the local path that will be used for storing the disk cache
  *
@@ -221,7 +222,7 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
 
 /**
  * tny_account_store_get_accounts:
- * @self: a #TnyAccountTransport object
+ * @self: a #TnyAccountStore object
  * @list: a #TnyList instance that will be filled with #TnyAccount instances
  * @types: a #TnyGetAccountsRequestType that describes which account types are needed
  * 
@@ -338,7 +339,7 @@ tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAcco
 
 /**
  * tny_account_store_add_transport_account:
- * @self: a #TnyAccountTransport object
+ * @self: a #TnyAccountStore object
  * @account: the account to add
  * 
  * API WARNING: This API might change

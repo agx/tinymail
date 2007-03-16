@@ -19,11 +19,55 @@
 
 #include <config.h>
 
+#ifdef DBC
+#include <string.h>
+#endif
+
 #include <tny-store-account.h>
 #include <tny-folder-store.h>
 #include <tny-folder.h>
 
 guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
+
+/**
+ * tny_store_account_find_folder:
+ * @self: a #TnyStoreAccount object
+ * @url_string: the url-string of the folder to find
+ *
+ * Try to find the folder in @self that corresponds to @url_string. If this 
+ * method does not return NULL, the returned value is the found folder and
+ * must be unreferenced after use.
+ *
+ * Implementors: when implementing a #TnyStoreAccount, you must implement
+ * this method. Let it return the folder that corresponds to @url_string or 
+ * let it return NULL.
+ *
+ * This method can be used to resolve url-strings to #TnyAccount instances.
+ *
+ * Return value: the found account or NULL.
+ **/
+TnyFolder* 
+tny_store_account_find_folder (TnyStoreAccount *self, const gchar *url_string, GError **err)
+{
+	TnyFolder *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STORE_ACCOUNT (self));
+	g_assert (url_string);
+	g_assert (strlen (url_string) > 0);
+	g_assert (strstr (url_string, "://"));
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->find_folder_func != NULL);
+#endif
+
+	retval = TNY_STORE_ACCOUNT_GET_IFACE (self)->find_folder_func (self, url_string, err);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (TNY_IS_FOLDER (retval));
+#endif
+
+	return retval;
+}
 
 /**
  * tny_store_account_unsubscribe:

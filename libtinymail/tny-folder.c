@@ -794,8 +794,8 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
  * @header: the header of the message to get
  * @err: a #GError object or NULL
  * 
- * Get a message in @self identified by @header. You must unreference the
- * return value after use.
+ * Get a message in @self identified by @header. If not NULL, you must 
+ * unreference the return value after use.
  * 
  * Example:
  * <informalexample><programlisting>
@@ -833,6 +833,50 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
 }
 
 
+
+/**
+ * tny_folder_find_msg:
+ * @self: a #TnyFolder object
+ * @url_string: the url string
+ * @err: a #GError object or NULL
+ * 
+ * Get a message in @self identified by @url_string. If not NULL, you must 
+ * unreference the return value after use.
+ * 
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
+ * TnyFolder *folder = ...
+ * TnyMsg *message = tny_folder_get_msg (folder, "imap://account/INBOX/100", NULL);
+ * tny_msg_view_set_msg (message_view, message);
+ * g_object_unref (G_OBJECT (message));
+ * </programlisting></informalexample>
+ *
+ * Return value: The message instance or NULL on failure
+ *
+ **/
+TnyMsg*
+tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
+{
+	TnyMsg *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (url_string);
+	g_assert (strlen (url_string) > 0);
+	g_assert (strstr (url_string, "://") != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->find_msg_func != NULL);
+#endif
+
+	retval = TNY_FOLDER_GET_IFACE (self)->find_msg_func (self, url_string, err);
+
+#ifdef DBC /* ensure */
+	if (retval)
+		g_assert (TNY_IS_MSG (retval));
+#endif
+
+	return retval;
+}
 
 
 /**

@@ -58,12 +58,14 @@ struct _TnyStoreAccountIface
 	/* Methods */
 	void (*subscribe_func) (TnyStoreAccount *self, TnyFolder *folder);
 	void (*unsubscribe_func) (TnyStoreAccount *self, TnyFolder *folder);
+	TnyFolder * (*find_folder_func) (TnyStoreAccount *self, const gchar *url_string, GError **err);
 };
 
 GType tny_store_account_get_type (void);
 
 void tny_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder);
 void tny_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder);
+TnyFolder* tny_store_account_find_folder (TnyStoreAccount *self, const gchar *url_string, GError **err);
 
 
 G_END_DECLS
