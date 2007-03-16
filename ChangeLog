@@ -1,3 +1,7 @@
+2007-03.16  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymailui/tny-msg-view.c: fixed a typo in a function name
+
 2007-03-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Design by contract assertions

@@ -39,7 +39,7 @@
  * Example:
  * <informalexample><programlisting>
  * static TnyMsgView*
- * tny_my_html_msg_view_create_new_new_inline_viewer (TnyMsgView *self)
+ * tny_my_html_msg_view_create_new_inline_viewer (TnyMsgView *self)
  * {
  *    return tny_my_html_msg_view_new ();
  * }
@@ -55,8 +55,8 @@ TnyMsgView*
 tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_new_new_inline_viewer_func)
-		g_critical ("You must implement tny_msg_view_create_new_new_inline_viewer\n");
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_new_inline_viewer_func)
+		g_critical ("You must implement tny_msg_view_create_new_inline_viewer\n");
 #endif
 
 	return TNY_MSG_VIEW_GET_IFACE (self)->create_new_inline_viewer_func (self);
