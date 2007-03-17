@@ -18,6 +18,8 @@
 
 #include "check_libtinymail.h"
 
+#include <tny-msg.h>
+#include <tny-header.h>
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
@@ -37,7 +39,7 @@ tny_header_test_setup (void)
 	CamelInternetAddress *addr = camel_internet_address_new ();
 	camel_object_unref (CAMEL_OBJECT (addr));
 
-	msg = tny_camel_msg_new ();
+	msg = TNY_MSG (tny_camel_msg_new ());
 	iface = tny_msg_get_header (msg);
 
 	return;

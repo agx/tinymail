@@ -279,7 +279,7 @@ START_TEST (tny_folder_test_properties)
 	fail_unless (tny_folder_get_all_count (iface) > 0, "Message count too small");
 	fail_unless (tny_folder_get_unread_count (iface) == 1, "Unread count is wrong");
 	TnyStoreAccount *acnt = (TnyStoreAccount *) tny_folder_get_account (iface);
-	fail_unless (acnt == TNY_ACCOUNT (account), "Property account has wrong value");
+	fail_unless (acnt == account, "Property account has wrong value");
 	g_object_unref (G_OBJECT (acnt));
 	fail_unless (tny_folder_get_folder_type (iface) == TNY_FOLDER_TYPE_NORMAL, "Folder type should be NORMAL");
 	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX", second_folder);

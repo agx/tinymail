@@ -1,3 +1,8 @@
+2007-03-17  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-test: fixed a compilation error and a compilation
+	warning in two unit tests
+
 2007-03-16  Dirk-Jan C. Binnema  <dirk-jan.binnema@nokia.com>
 	
 	* changed license to LGPL for some files which were mistakenly marked
