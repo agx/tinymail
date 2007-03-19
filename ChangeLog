@@ -1,3 +1,8 @@
+2007-03-19  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* camel-lite: added some additional locking to narrow down 
+	Ticket #27's problem
+
 2007-03-17  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-test: fixed a compilation error and a compilation
