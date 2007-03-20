@@ -148,12 +148,8 @@ camel_message_info_clear_normal_flags (CamelMessageInfo *min)
 	mi->flags &= ~CAMEL_MESSAGE_CACHED;
 	mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
 	mi->flags &= ~CAMEL_MESSAGE_EXPUNGED;
-	mi->flags &= ~CAMEL_MESSAGE_FREED;
 	mi->flags &= ~CAMEL_MESSAGE_SECURE;
 	mi->flags &= ~CAMEL_MESSAGE_FOLDER_FLAGGED;
-	/* CAMEL_MESSAGE_INFO_NEEDS_FREE 
-	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE */
-	mi->flags &= ~CAMEL_MESSAGE_USER;
 
 }
 
@@ -401,9 +397,7 @@ CamelFolderSummary *
 camel_folder_summary_new (struct _CamelFolder *folder)
 {
 	CamelFolderSummary *new = CAMEL_FOLDER_SUMMARY ( camel_object_new (camel_folder_summary_get_type ()));
-
 	new->folder = folder;
-	
 	return new;
 }
 
@@ -714,11 +708,23 @@ camel_folder_summary_load(CamelFolderSummary *s)
 	if ( ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_load(s) == -1)
 		goto error;
 
+	if (s->messages && s->messages->len > s->saved_count)
+	{
+		int r, curlen = s->messages->len;
+		for (r = curlen - 1; r >= s->saved_count - 1; r--)
+		{ 
+			CamelMessageInfo *ri = g_ptr_array_index (s->messages, r);
+			if (ri)
+				camel_folder_summary_remove (s, ri);
+		}
+	}
+
 	/* now read in each message ... */
-	for (i=0;i<s->saved_count;i++) 
+	for (i=0; i < s->saved_count; i++) 
 	{
 		gboolean must_add = FALSE;
 		s->idx = i;
+
 		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_load(s, &must_add);
 
 		if (mi == NULL)
@@ -3238,6 +3244,8 @@ info_ptr(const CamelMessageInfo *mi, int id)
 
 	if (mi == NULL || mi->refcount <=0)
 		retval = (void*) 0;
+	if (((CamelMessageInfoBase*)mi)->flags & CAMEL_MESSAGE_FREED)
+		retval = "Invalid";
 	else switch (id) 
 	{
 		case CAMEL_MESSAGE_INFO_SUBJECT:
@@ -3546,7 +3554,7 @@ camel_message_info_set_flags(CamelMessageInfo *mi, guint32 flags, guint32 set)
 	else
 		retval = info_set_flags(mi, flags, set);
 
-	g_static_rec_mutex_lock (&global_lock);
+	g_static_rec_mutex_unlock (&global_lock);
 
 	return retval;
 }

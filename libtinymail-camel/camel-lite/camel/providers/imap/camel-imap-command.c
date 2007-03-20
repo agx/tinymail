@@ -208,7 +208,12 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 	/* g_mutex_unlock (store->stream_lock);*/
 
-	camel_imap_store_stop_idle (store);
+
+	/* Also read imap_update_summary and all of the IDLE crap */
+	if (!store->dontdistridlehack) 
+		camel_imap_store_stop_idle (store);
+	/* else
+		printf ("dont distr\n"); */
 
 	/* Check for current folder */
 	if (folder && folder != store->current_folder) 

@@ -1,3 +1,7 @@
+2007-03-20  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Although this needs a lot testing, potential fix for ticket #30
+
 2007-03-19  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* camel-lite: added some additional locking to narrow down 

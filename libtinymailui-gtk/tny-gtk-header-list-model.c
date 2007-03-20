@@ -225,7 +225,6 @@ tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter 
 static void
 tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint column, GValue *value)
 {
-	TnyHeader *header = NULL;
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 	const gchar *str;
 	gchar *rdate = NULL;
@@ -247,27 +246,17 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		return;
 	}
 
-	header = list_model->items->pdata[i];
-
-	if (((GObject*)header)->ref_count <= 0)
-	{
-		g_warning ("GtkTreeModel in invalid state\n");
-		g_static_rec_mutex_unlock (list_model->iterator_lock);
-		g_mutex_unlock (list_model->folder_lock);
-		return;
-	}
-
 	switch (column) 
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_cc (header);
+			str = tny_header_get_cc ((TnyHeader*) list_model->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			rdate = _get_readable_date (tny_header_get_date_sent (header));
+			rdate = _get_readable_date (tny_header_get_date_sent ((TnyHeader*) list_model->items->pdata[i]));
 			if (rdate)
 				g_value_set_string (value, rdate);
 			else
@@ -275,7 +264,7 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			rdate = _get_readable_date (tny_header_get_date_received (header));
+			rdate = _get_readable_date (tny_header_get_date_received ((TnyHeader*) list_model->items->pdata[i]));
 			if (rdate)
 				g_value_set_string (value, rdate);
 			else
@@ -284,43 +273,43 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
 			g_value_init (value, G_TYPE_INT);
 			g_value_set_int (value, 
-					    tny_header_get_date_sent (header));
+					    tny_header_get_date_sent ((TnyHeader*) list_model->items->pdata[i]));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN:
 			g_value_init (value, G_TYPE_INT);
 			g_value_set_int (value, 
-					 tny_header_get_date_received (header));
+					 tny_header_get_date_received ((TnyHeader*) list_model->items->pdata[i]));
 			break;
 
 		case TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN:
 			g_value_init (value, G_TYPE_INT);
-			g_value_set_int (value, tny_header_get_message_size(header));
+			g_value_set_int (value, tny_header_get_message_size((TnyHeader*) list_model->items->pdata[i]));
 			break;			
 		case TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_OBJECT);
-			g_value_set_object (value, header);
+			g_value_set_object (value, (TnyHeader*) list_model->items->pdata[i]);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_to (header);
+			str = tny_header_get_to ((TnyHeader*) list_model->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_subject (header);
+			str = tny_header_get_subject ((TnyHeader*) list_model->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_from (header);
+			str = tny_header_get_from ((TnyHeader*) list_model->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			g_value_init (value, G_TYPE_INT);
-			g_value_set_int (value, tny_header_get_flags (header));
+			g_value_set_int (value, tny_header_get_flags ((TnyHeader*) list_model->items->pdata[i]));
 			break;
 		default:
 			break;

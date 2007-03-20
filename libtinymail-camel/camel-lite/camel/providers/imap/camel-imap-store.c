@@ -262,6 +262,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 
+	imap_store->dontdistridlehack = FALSE;
 	imap_store->idle_signal = 0;
 	imap_store->idle_prefix = NULL;
 	imap_store->istream = NULL;

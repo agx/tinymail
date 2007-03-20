@@ -142,6 +142,7 @@ struct _CamelImapStore {
 	time_t refresh_stamp;
 	gchar *idle_prefix;
 	guint idle_signal;
+	gboolean dontdistridlehack;
 };
 
 typedef struct {
