@@ -2092,6 +2092,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
 	mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+	mi->flags &= ~CAMEL_MESSAGE_FREED;
 
 	s->set_extra_flags_func (s->folder, mi);
 
