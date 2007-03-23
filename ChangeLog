@@ -1,6 +1,7 @@
 2007-03-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Support for X-Priority and X-MSMail-Priority
+	* Experimental support for quickly detecting attachments availability
 
 2007-03-20  Philip Van Hoof  <pvanhoof@gnome.org>
 

@@ -1920,12 +1920,10 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	char *msgid, *r=NULL;
 	int count;
 	char *subject, *from, *to, *cc;
-#ifdef NON_TINYMAIL_FEATURES
-	char *mlist;
-#endif
 	CamelContentType *ct = NULL;
 	const char *content, *charset = NULL;
 	const char *prio = NULL;
+	const char *attach = NULL;
 
 	mi = (CamelMessageInfoBase *)camel_message_info_new(s);
 	mi->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;
@@ -1954,6 +1952,17 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 		else if (strchr (prio, '1') != NULL || strchr (prio, '2') != NULL)
 			mi->flags |= CAMEL_MESSAGE_PRIORITY;
 	}
+
+	attach = camel_header_raw_find(&h, "X-MS-Has-Attach", NULL);
+	if (attach)
+		if (g_strstr_len (attach, strlen (attach), "yes") != NULL)
+			mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+	else {
+		attach = camel_header_raw_find(&h, "Content-Type", NULL);
+		if (g_strstr_len (attach, strlen (attach), "multi") != NULL)
+			mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+	}
+
 
 	if (ct)
 		camel_content_type_unref(ct);
