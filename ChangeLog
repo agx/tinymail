@@ -1,3 +1,7 @@
+2007-03-23  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Support for X-Priority and X-MSMail-Priority
+
 2007-03-20  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Although this needs a lot testing, potential fix for ticket #30

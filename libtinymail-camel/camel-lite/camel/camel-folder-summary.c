@@ -29,6 +29,9 @@
 #include <config.h>
 #endif
 
+#include <glib.h>
+#include <glib/gprintf.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -148,9 +151,10 @@ camel_message_info_clear_normal_flags (CamelMessageInfo *min)
 	mi->flags &= ~CAMEL_MESSAGE_CACHED;
 	mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
 	mi->flags &= ~CAMEL_MESSAGE_EXPUNGED;
+	mi->flags &= ~CAMEL_MESSAGE_PRIORITY;
+
 	mi->flags &= ~CAMEL_MESSAGE_SECURE;
 	mi->flags &= ~CAMEL_MESSAGE_FOLDER_FLAGGED;
-
 }
 
 static CamelMessageInfo* 
@@ -1921,6 +1925,7 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 #endif
 	CamelContentType *ct = NULL;
 	const char *content, *charset = NULL;
+	const char *prio = NULL;
 
 	mi = (CamelMessageInfoBase *)camel_message_info_new(s);
 	mi->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;
@@ -1938,9 +1943,17 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	to = summary_format_address(h, "to", charset);
 	cc = summary_format_address(h, "cc", charset);
 
-#ifdef NON_TINYMAIL_FEATURES
-	mlist = camel_header_raw_check_mailing_list(&h);
-#endif
+	prio = camel_header_raw_find(&h, "X-Priority", NULL);
+	if (!prio)
+		prio = camel_header_raw_find(&h, "X-MSMail-Priority", NULL);
+
+	if (prio) 
+	{ 
+		if (g_strstr_len (prio, strlen (prio), "high") != NULL)
+			mi->flags |= CAMEL_MESSAGE_PRIORITY;
+		else if (strchr (prio, '1') != NULL || strchr (prio, '2') != NULL)
+			mi->flags |= CAMEL_MESSAGE_PRIORITY;
+	}
 
 	if (ct)
 		camel_content_type_unref(ct);
@@ -1965,16 +1978,6 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	else 
 		mi->cc = camel_pstring_add (g_strdup (""), TRUE);
 
-#ifdef NON_TINYMAIL_FEATURES
-	if (mlist)
-		mi->mlist = camel_pstring_add (mlist, TRUE);
-	else 
-		mi->mlist = camel_pstring_add (g_strdup (""), TRUE);
-
-	mi->user_flags = NULL;
-	mi->user_tags = NULL;
-#endif
-
 	mi->date_sent = camel_header_decode_date(camel_header_raw_find(&h, "date", NULL), NULL);
 	received = camel_header_raw_find(&h, "received", NULL);
 
@@ -1996,35 +1999,6 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 		g_free(msgid);
 	}
 
-#ifdef NON_TINYMAIL_FEATURES
-	/* decode our references and in-reply-to headers */
-	refs = camel_header_references_decode (camel_header_raw_find (&h, "references", NULL));
-	irt = camel_header_references_inreplyto_decode (camel_header_raw_find (&h, "in-reply-to", NULL));
-	if (refs || irt) {
-		if (irt) {
-			/* The References field is populated from the ``References'' and/or ``In-Reply-To''
-			   headers. If both headers exist, take the first thing in the In-Reply-To header
-			   that looks like a Message-ID, and append it to the References header. */
-			
-			if (refs)
-				irt->next = refs;
-			
-			refs = irt;
-		}
-		count = camel_header_references_list_size(&refs);
-		mi->references = g_malloc(sizeof(*mi->references) + ((count-1) * sizeof(mi->references->references[0])));
-		count = 0;
-		scan = refs;
-		while (scan) {
-			md5_get_digest(scan->id, strlen(scan->id), digest);
-			memcpy(mi->references->references[count].id.hash, digest, sizeof(mi->message_id.id.hash));
-			count++;
-			scan = scan->next;
-		}
-		mi->references->size = count;
-		camel_header_references_list_clear(&refs);
-	}
-#endif
 
 	return (CamelMessageInfo *)mi;
 }
