@@ -1989,11 +1989,11 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 
 	attach = camel_header_raw_find(&h, "X-MS-Has-Attach", NULL);
 	if (attach)
-		if (g_strstr_len (attach, strlen (attach), "yes") != NULL)
+		if (strcasestr (attach, "yes") != NULL)
 			mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
 	else {
 		attach = camel_header_raw_find(&h, "Content-Type", NULL);
-		if (g_strstr_len (attach, strlen (attach), "multi") != NULL)
+		if (strcasestr (attach, "multi") != NULL)
 			mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
 	}
 
