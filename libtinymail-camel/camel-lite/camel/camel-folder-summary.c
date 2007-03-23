@@ -1891,7 +1891,41 @@ summary_format_string (struct _camel_header_raw *h, const char *name, const char
 	}
 }
 
+#ifndef _GNU_SOURCE
+static char *strcasestr(const char *haystack, const char *needle)
+{
+      const gchar *p = haystack;
+      gsize needle_len = strlen (needle);
+      gsize haystack_len;
+      const gchar *end;
+      gsize i;
 
+      if (needle_len == 0)
+	return (gchar *)haystack;
+
+      haystack_len = strlen (haystack);
+
+      if (haystack_len < needle_len)
+	return NULL;
+
+      end = haystack + haystack_len - needle_len;
+      while (*p && p <= end)
+	{
+	  for (i = 0; i < needle_len; i++)
+	    if (tolower (p[i]) != tolower (needle[i]))
+	      goto next;
+	  
+	  return (gchar *)p;
+	  
+	next:
+	  p++;
+	}
+      
+      return NULL;
+}
+#else
+char *strcasestr(const char *haystack, const char *needle);
+#endif
 /**
  * 
  :
@@ -1947,7 +1981,7 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 
 	if (prio) 
 	{ 
-		if (g_strstr_len (prio, strlen (prio), "high") != NULL)
+		if (strcasestr (prio, "high") != NULL)
 			mi->flags |= CAMEL_MESSAGE_PRIORITY;
 		else if (strchr (prio, '1') != NULL || strchr (prio, '2') != NULL)
 			mi->flags |= CAMEL_MESSAGE_PRIORITY;
