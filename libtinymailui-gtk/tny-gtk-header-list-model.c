@@ -474,6 +474,12 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 
 	/* This prepend will happen very often, the allocation and the notificating
 	 * of the view is, however, quite slow. So we delay it per 100 or so. */
+
+	/* TNY TODO: this delay is not time driven. This means that on slow
+	 * connections (fewer prepends happen per time), the updating will be
+	 * slower. This is unwanted: updating should be time, not connection 
+	 * speed, based. Therefore: alter this to use time in stead of counts. */
+
 	if (me->delayer == 100)
 	{
 		notify_views_data_t *stuff;
