@@ -133,8 +133,12 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	gboolean old = priv->dont_fkill;
 	gboolean need_unread_sync;
 
+	/* printf ("want changes: %s, have folder: %s\n", 
+		priv->want_changes?"yes":"no",
+		priv->folder?"yes":"no");
+
 	if (!priv->want_changes)
-		return;
+		return; */
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -144,6 +148,8 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	}
 
 	summary = priv->folder->summary;
+
+	/* printf ("%d added\n", info->uid_added?info->uid_added->len:-1); */
 
 	for (i = 0; i< info->uid_added->len; i++)
 	{

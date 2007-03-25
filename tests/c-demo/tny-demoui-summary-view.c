@@ -263,9 +263,8 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyDevice *device = tny_account_store_get_device (account_store);
 
-	if (G_UNLIKELY (priv->account_store))
-	{ /* You typically set it once, so unlikely */
-
+	if (priv->account_store)
+	{ 
 		TnyDevice *odevice = tny_account_store_get_device (priv->account_store);
 
 		if (g_signal_handler_is_connected (G_OBJECT (odevice), priv->connchanged_signal))
@@ -433,49 +432,10 @@ static void
 refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
 {
 	TnyDemouiSummaryViewPriv *priv = user_data;
+	GtkTreeModel *select_model;
 
 	if (!cancelled)
 	{
-		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
-		GtkTreeModel *sortable;
-		GtkTreeModel *select_model;
-		GtkTreeModel *model = tny_gtk_header_list_model_new ();
-		gboolean refresh = FALSE;
-
-#ifndef ASYNC_HEADERS
-		refresh = TRUE;
-#endif
-
-		tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (model), folder, refresh);
-		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (model));
-
-		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
-			TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
-			tny_gtk_header_list_model_received_date_sort_func, 
-			NULL, NULL);
-
-		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
-			TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
-			tny_gtk_header_list_model_sent_date_sort_func, 
-			NULL, NULL);
-
-		g_mutex_lock (priv->monitor_lock);
-		{
-
-			if (priv->monitor)
-			{
-				tny_folder_monitor_stop (priv->monitor);
-				g_object_unref (G_OBJECT (priv->monitor));
-			}
-
-			priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
-			tny_folder_monitor_add_list (priv->monitor, TNY_LIST (model));
-			tny_folder_monitor_start (priv->monitor);
-		}
-		g_mutex_unlock (priv->monitor_lock);
-
-		set_header_view_model (header_view, sortable);
-
 		g_idle_add (cleanup_statusbar, priv);
 
 		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
@@ -524,6 +484,15 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	TnyDemouiSummaryViewPriv *priv = user_data;
 	GtkTreeIter iter;
 	GtkTreeModel *model;
+	GtkTreeModel *hmodel;
+	GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
+	GtkTreeModel *sortable;
+	gboolean refresh = FALSE;
+
+#ifndef ASYNC_HEADERS
+	refresh = TRUE;
+#endif
+
 
 	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
@@ -556,16 +525,47 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			gtk_widget_show (GTK_WIDGET (priv->progress));
 			gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE);
-		
-#ifdef ASYNC_HEADERS
 
+			hmodel = tny_gtk_header_list_model_new ();
+			tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), folder, FALSE);
+
+			g_mutex_lock (priv->monitor_lock);
+			{
+
+				if (priv->monitor)
+				{
+					tny_folder_monitor_stop (priv->monitor);
+					g_object_unref (G_OBJECT (priv->monitor));
+				}
+
+				priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
+				tny_folder_monitor_add_list (priv->monitor, TNY_LIST (hmodel));
+				tny_folder_monitor_start (priv->monitor);
+			}
+			g_mutex_unlock (priv->monitor_lock);
+
+			sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (hmodel));
+
+			gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+				TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
+				tny_gtk_header_list_model_received_date_sort_func, 
+				NULL, NULL);
+
+			gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+				TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
+				tny_gtk_header_list_model_sent_date_sort_func, 
+				NULL, NULL);
+
+			set_header_view_model (header_view, sortable);
+
+#ifdef ASYNC_HEADERS
 			tny_folder_refresh_async (folder, 
 				refresh_current_folder, 
 				refresh_current_folder_status_update, user_data);
 #else
 			refresh_current_folder (folder, FALSE, NULL, user_data);
 #endif
-	
+
 			g_object_unref (G_OBJECT (folder));
 		}
 	}

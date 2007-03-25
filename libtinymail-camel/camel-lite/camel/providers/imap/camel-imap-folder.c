@@ -2976,6 +2976,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    {
 	gboolean did_hack = FALSE;
 	gint hcnt = 0;
+	CamelFolderChangeInfo *mchanges;
 
 	imap_folder->need_rescan = TRUE;
 	camel_folder_summary_save (folder->summary);
@@ -3081,6 +3082,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 		qsort (needheaders->pdata, needheaders->len,
 			sizeof (void *), uid_compar);
 
+		mchanges = camel_folder_change_info_new ();
+
 		while (uid < needheaders->len) 
 		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
@@ -3149,16 +3152,10 @@ imap_update_summary (CamelFolder *folder, int exists,
 					{
 						for (r = curlen-1; r >= sequence -1; r--)
 						{ 
-							printf ("curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
+							g_warning ("Problem with your local summary store (too much), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
 							CamelMessageInfo *ri = g_ptr_array_index (folder->summary->messages, r);
 							if (ri) {
-
-								/* CamelFolderChangeInfo *uchange = camel_folder_change_info_new ();
-								camel_folder_change_info_remove_uid (uchange, camel_message_info_uid (mi));
-								if (camel_folder_change_info_changed (uchange))
-									camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", uchange);
-								camel_folder_change_info_free (uchange); */
-
+								/* camel_folder_change_info_remove_uid (mchange, camel_message_info_uid (mi)); */
 								((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
 								((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_FREED;
 								camel_folder_summary_remove (folder->summary, ri);
@@ -3168,17 +3165,22 @@ imap_update_summary (CamelFolder *folder, int exists,
 						for (r=0; r < sequence - curlen - 1; r++)
 						{
 							CamelMessageInfo *ni = camel_message_info_clone (mi);
-							if (ni)
+							if (ni) {
+								g_warning ("Problem with your local summary store (too few), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
 								camel_folder_summary_add (folder->summary, (CamelMessageInfo *)ni);
+								/* camel_folder_change_info_add_uid (mchanges, camel_message_info_uid (ni)); */
+							}
 						}
 					}
 					oosync = TRUE;
 				  }
 
 				  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);
-				  camel_folder_change_info_add_uid (changes, camel_message_info_uid (mi));
+
+				  /* printf ("Change: %s!\n", camel_message_info_uid (mi)); */
+				  camel_folder_change_info_add_uid (mchanges, camel_message_info_uid (mi));
 				   if ((mi->info.flags & CAMEL_IMAP_MESSAGE_RECENT))
-					camel_folder_change_info_recent_uid(changes, camel_message_info_uid (mi));
+					camel_folder_change_info_recent_uid(mchanges, camel_message_info_uid (mi));
 				}
 
 				if (did_hack) {
@@ -3210,6 +3212,14 @@ imap_update_summary (CamelFolder *folder, int exists,
 			}
 
 		}
+
+		
+		if (camel_folder_change_info_changed (mchanges)) {
+			camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", mchanges);
+			/* printf ("Changes!\n"); */
+		}
+		camel_folder_change_info_free (mchanges);
+
 	}
 
 	if (ucnt < needheaders->len)

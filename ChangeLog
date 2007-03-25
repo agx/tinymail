@@ -1,3 +1,17 @@
+2007-03-25  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Support for filling up the header view (a.k.a. the summary view)
+	with already or recently downloaded information while downloading is
+	taking place. Take a look at the demo user interface's code to learn
+	how to leverage this feature: You basically need to register the list
+	(which will for example be a TnyGtkHeaderListModel instance) with the
+	TnyFolderMonitor before launching the tny_folder_refresh_async method.
+
+	* This ain't an API change, but this new feature does make more
+	possible with the same API. It might also change behaviour a little
+	bit (although it shouldn't for the old-style of using the TnyFolderMonitor,
+	or at least not as far as I know and tested).
+
 2007-03-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Support for X-Priority and X-MSMail-Priority
