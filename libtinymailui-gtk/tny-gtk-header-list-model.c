@@ -126,7 +126,7 @@ tny_gtk_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
-	i = (gint)iter->user_data;
+	i = (gint) iter->user_data;
 
 	if (i < 0 || i >= list_model->items->len) {
 		g_static_rec_mutex_unlock (list_model->iterator_lock);
@@ -178,6 +178,10 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
 
+	/* Get the index out of the iter, and use the item by looking it up in
+	 * the GPtrArray. This must be quite efficient, as this is called lots
+	 * of times while you are sorting things. */
+
 	hdr_a = list_model->items->pdata[(gint)a->user_data];
 	hdr_b = list_model->items->pdata[(gint)b->user_data];
 
@@ -206,6 +210,10 @@ tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter 
 	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
 
+	/* Get the index out of the iter, and use the item by looking it up in
+	 * the GPtrArray. This must be quite efficient, as this is called lots
+	 * of times while you are sorting things. */
+
 	hdr_a = list_model->items->pdata[(gint)a->user_data];
 	hdr_b = list_model->items->pdata[(gint)b->user_data];
 
@@ -227,6 +235,10 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		return;
 
 	g_static_rec_mutex_lock (list_model->iterator_lock);
+
+	/* Get the index out of the iter, and use the item by looking it up in
+	 * the GPtrArray. This must be quite efficient, as this is called lots
+	 * of times while you are sorting things. */
 
 	i = (gint) iter->user_data;
 
@@ -323,8 +335,13 @@ tny_gtk_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
+	/* The next will simply be the current plus one: That's because we are
+	 * storing the GPtrArray's index in the iters. Simple, efficient. Just
+	 * always make sure that such an iter doesn't contain an index that
+	 * can't be part of the GPtrArray instance (would be devastating). */
+
 	newv = ((gint)iter->user_data);
-	newv++;
+	newv++; 
 	iter->user_data = (gpointer) newv;
 
 	retval = (newv >= 0 && newv < list_model->items->len);
@@ -342,6 +359,9 @@ tny_gtk_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 static gboolean
 tny_gtk_header_list_model_iter_has_child (GtkTreeModel *self, GtkTreeIter *iter)
 {
+	/* This is a flat list (we don't yet support threaded views anyway), so
+	 * the answer is flat-out no. Always. */
+
 	return FALSE;
 }
 
@@ -422,6 +442,11 @@ notify_views_add (gpointer data)
 {
 	notify_views_data_t *stuff = data;
 
+	/* Caused by the delayer (see below), this one wont trigger for each
+	 * added item. Let's hope that the GtkTreeView copes with this by 
+	 * reading the get_length property each time. March 2007 it did, as far
+	 * as I know. */
+
 	gtk_tree_model_row_inserted (GTK_TREE_MODEL (stuff->self), stuff->path, &(stuff->iter));
 	gtk_tree_path_free (stuff->path);
 	g_object_unref (G_OBJECT (stuff->self));
@@ -430,21 +455,29 @@ notify_views_add (gpointer data)
 	return FALSE;
 }
 
+/* This will be called often while you are in tny_folder_refresh(_async). It can
+ * and will be called from a thread, so we must cope with that in case we want 
+ * to update the GtkTreeViews that have been attached to this model (self). */
 static void
 tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
-	GtkTreePath *path;
 
 	g_static_rec_mutex_lock (me->iterator_lock);
 
-	/* Prepend something to the list */
+	/* Prepend something to the list itself. The get_length will auto update
+	 * because that one uses GPtrArray's len property. We are reusing the 
+	 * iterator_lock for locking this out, by the way. */
+
 	g_object_ref (G_OBJECT (item));
 	g_ptr_array_add (me->items, item);
 
+	/* This will prepend happen very often, the allocation and the notificating
+	 * of the view is, however, quite slow. So we delay it per 100 or so. */
 	if (me->delayer == 100)
 	{
 		notify_views_data_t *stuff;
+
 		stuff = g_slice_new (notify_views_data_t);
 		stuff->self = g_object_ref (G_OBJECT (self));
 		stuff->path = gtk_tree_path_new ();
@@ -452,9 +485,9 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 		stuff->iter.stamp = me->stamp;
 		stuff->iter.user_data = (gpointer) (me->items->len - 1);
 
-		/* Letting the model observers know about this (the GtkTreeViews). The 
-		 * g_timeout_add stuff keeps it possible to launch the prepender in a 
-		 * thread. Else wouldn't the GtkTreeViews like this. */
+		/* Letting the model observers know about this (the GtkTreeViews).
+		 * The g_timeout_add stuff keeps it possible to launch the pre-
+		 * pender in a thread. Else wouldn't the GtkTreeViews like this. */
 
 		if (stuff->path)
 			g_timeout_add (0, notify_views_add, stuff);
@@ -462,6 +495,7 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 			g_object_unref (G_OBJECT (stuff->self));
 			g_slice_free (notify_views_data_t, stuff);
 		}
+
 		me->delayer = 0;
 	}
 
@@ -499,6 +533,8 @@ notify_views_delete (gpointer data)
 }
 
 
+/* TNY TODO: massive removals would be slow due to the g_timeout_add being
+ * called often. Take a look at the prepend to see how this can be solved. */
 static void
 tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 {
