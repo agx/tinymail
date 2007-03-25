@@ -472,7 +472,7 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	g_object_ref (G_OBJECT (item));
 	g_ptr_array_add (me->items, item);
 
-	/* This will prepend happen very often, the allocation and the notificating
+	/* This prepend will happen very often, the allocation and the notificating
 	 * of the view is, however, quite slow. So we delay it per 100 or so. */
 	if (me->delayer == 100)
 	{
