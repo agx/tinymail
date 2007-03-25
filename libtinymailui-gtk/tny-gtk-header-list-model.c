@@ -99,7 +99,6 @@ tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 
 	if (i >= list_model->items->len) {
 		g_static_rec_mutex_unlock (list_model->iterator_lock);
-		g_mutex_unlock (list_model->folder_lock);
 		return FALSE;
 	}
 
@@ -235,7 +234,6 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	{
 		g_warning ("GtkTreeModel in invalid state\n");
 		g_static_rec_mutex_unlock (list_model->iterator_lock);
-		g_mutex_unlock (list_model->folder_lock);
 		return;
 	}
 
@@ -438,14 +436,18 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	GtkTreePath *path;
 	notify_views_data_t *stuff;
+	static int delayer = 0;
 
 	g_static_rec_mutex_lock (me->iterator_lock);
 
-	stuff = g_slice_new (notify_views_data_t);
-	stuff->self = g_object_ref (G_OBJECT (self));
-	stuff->path = gtk_tree_path_new ();
-	gtk_tree_path_append_index (stuff->path, 0);
-	stuff->iter.stamp = me->stamp;
+	if (delayer == 100)
+	{
+		stuff = g_slice_new (notify_views_data_t);
+		stuff->self = g_object_ref (G_OBJECT (self));
+		stuff->path = gtk_tree_path_new ();
+		gtk_tree_path_append_index (stuff->path, 0);
+		stuff->iter.stamp = me->stamp;
+	}
 
 	/* Prepend something to the list */
 	g_object_ref (G_OBJECT (item));
@@ -456,12 +458,18 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	 * g_timeout_add stuff keeps it possible to launch the prepender in a 
 	 * thread. Else wouldn't the GtkTreeViews like this. */
 
-	if (stuff->path)
-		g_timeout_add (0, notify_views, stuff);
-	else {
-		g_object_unref (G_OBJECT (stuff->self));
-		g_slice_free (notify_views_data_t, stuff);
+	if (delayer == 100)
+	{
+		if (stuff->path)
+			g_timeout_add (0, notify_views, stuff);
+		else {
+			g_object_unref (G_OBJECT (stuff->self));
+			g_slice_free (notify_views_data_t, stuff);
+		}
+		delayer = 0;
 	}
+
+	delayer++;
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
