@@ -65,7 +65,7 @@ struct _TnyGtkHeaderListModel
 
 	GStaticRecMutex *iterator_lock;
 	TnyFolder *folder;
-	gint stamp;
+	gint stamp, delayer;
 
 	GPtrArray *items;
 	TnyIterator *iterator;

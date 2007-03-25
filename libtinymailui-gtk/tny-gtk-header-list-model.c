@@ -435,31 +435,37 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 	GtkTreePath *path;
-	notify_views_data_t *stuff;
 
 	g_static_rec_mutex_lock (me->iterator_lock);
-
-	stuff = g_slice_new (notify_views_data_t);
-	stuff->self = g_object_ref (G_OBJECT (self));
-	stuff->path = gtk_tree_path_new ();
-	gtk_tree_path_append_index (stuff->path, 0);
-	stuff->iter.stamp = me->stamp;
 
 	/* Prepend something to the list */
 	g_object_ref (G_OBJECT (item));
 	g_ptr_array_add (me->items, item);
-	stuff->iter.user_data = (gpointer) (me->items->len - 1);
 
-	/* Letting the model observers know about this (the GtkTreeViews). The 
-	 * g_timeout_add stuff keeps it possible to launch the prepender in a 
-	 * thread. Else wouldn't the GtkTreeViews like this. */
+	if (me->delayer == 100)
+	{
+		notify_views_data_t *stuff;
+		stuff = g_slice_new (notify_views_data_t);
+		stuff->self = g_object_ref (G_OBJECT (self));
+		stuff->path = gtk_tree_path_new ();
+		gtk_tree_path_append_index (stuff->path, 0);
+		stuff->iter.stamp = me->stamp;
+		stuff->iter.user_data = (gpointer) (me->items->len - 1);
 
-	if (stuff->path)
-		g_timeout_add (0, notify_views_add, stuff);
-	else {
-		g_object_unref (G_OBJECT (stuff->self));
-		g_slice_free (notify_views_data_t, stuff);
+		/* Letting the model observers know about this (the GtkTreeViews). The 
+		 * g_timeout_add stuff keeps it possible to launch the prepender in a 
+		 * thread. Else wouldn't the GtkTreeViews like this. */
+
+		if (stuff->path)
+			g_timeout_add (0, notify_views_add, stuff);
+		else {
+			g_object_unref (G_OBJECT (stuff->self));
+			g_slice_free (notify_views_data_t, stuff);
+		}
+		me->delayer = 0;
 	}
+
+	me->delayer++;
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
@@ -663,6 +669,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->iterator_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->iterator_lock);
 	self->items = g_ptr_array_sized_new (1000);
+	self->delayer = 0;
 
 	return;
 }
