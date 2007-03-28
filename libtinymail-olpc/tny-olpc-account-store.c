@@ -170,6 +170,18 @@ tny_olpc_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gc
 
 
 
+static void
+kill_stored_accounts (TnyOlpcAccountStorePriv *priv)
+{
+	if (priv->accounts)
+	{
+		g_list_foreach (priv->accounts, (GFunc) g_object_unref, NULL);
+		g_list_free (priv->accounts);
+		priv->accounts = NULL;
+	}
+
+	return;
+}
 
 static void
 load_accounts (TnyAccountStore *self)
@@ -267,8 +279,8 @@ load_accounts (TnyAccountStore *self)
 				hostname = g_key_file_get_value (keyfile, "tinymail", "hostname", NULL);
 				tny_account_set_hostname (TNY_ACCOUNT (account), hostname);
 
-				port = g_key_file_get_value (keyfile, "tinymail", "port", &err);
-				if (err != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
+				port = g_key_file_get_integer (keyfile, "tinymail", "port", &err);
+				if (err == NULL)
 					tny_account_set_port (TNY_ACCOUNT (account), port);
 
 				if (err != NULL)
@@ -359,7 +371,7 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 	g_assert (TNY_IS_LIST (list));
 
 	if (!priv->accounts)
-		load_accounts (priv);
+		load_accounts (self);
 
 	if (priv->accounts)
 	{
@@ -460,6 +472,7 @@ tny_olpc_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	return;
 }
+
 
 
 static void
