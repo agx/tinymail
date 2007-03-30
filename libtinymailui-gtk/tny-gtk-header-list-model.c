@@ -469,9 +469,9 @@ notify_views_add (gpointer data)
 	if (me->updating_views < 2 || me->items->len - me->recent_updated > 300) {
 		going_to_update = me->recent_updated + 300;
 		needmore = TRUE;
-	} else
+	} else 
 		going_to_update = me->items->len;
-
+	me->recent_updated = going_to_update;
 	g_mutex_unlock (me->ra_lock);
 
 	path = gtk_tree_path_new ();
@@ -485,7 +485,6 @@ notify_views_add (gpointer data)
 		iter.user_data = (gpointer) i;
 		gtk_tree_model_row_inserted ((GtkTreeModel *)me, path, &iter);
 	}
-	me->recent_updated = i;
 	gdk_threads_leave();
 
 	gtk_tree_path_free (path);
