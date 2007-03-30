@@ -459,6 +459,8 @@ notify_views_add (gpointer data)
 	gint updated, going_to_update, i, added; 
 	gboolean needmore = FALSE;
 
+	g_static_rec_mutex_lock (me->ra_l_lock);
+
 	g_mutex_lock (me->ra_lock);
 	me->updating_views++;
 	if (me->recent_updated >= me->items->len) {
@@ -491,6 +493,8 @@ notify_views_add (gpointer data)
 	}
 	gdk_threads_leave();
 
+	g_static_rec_mutex_unlock (me->ra_l_lock);
+
 
 	return needmore;
 }
@@ -504,6 +508,7 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 
 	g_static_rec_mutex_lock (me->iterator_lock);
+	g_static_rec_mutex_lock (me->ra_l_lock);
 
 	/* Prepend something to the list itself. The get_length will auto update
 	 * because that one uses GPtrArray's len property. We are reusing the 
@@ -525,6 +530,7 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	}
 	g_mutex_unlock (me->ra_lock);
 
+	g_static_rec_mutex_unlock (me->ra_l_lock);
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
 	return;
