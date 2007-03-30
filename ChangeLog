@@ -1,6 +1,8 @@
 2007-03-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Support for low, high and normal X-Priority
+	* Auto updating the unread count of TnyFolderObservers when unread
+	flags are set on a TnyHeader
 
 	* This was a major API change
 
