@@ -444,8 +444,6 @@ notify_views_add_destroy (gpointer data)
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) data;
 
 	g_mutex_lock (me->ra_lock);
-	me->recent_updated = 0;
-	me->recent_added = 0;
 	me->updating_views = FALSE;
 	g_mutex_unlock (me->ra_lock);
 	g_object_unref (me);
@@ -461,11 +459,11 @@ notify_views_add (gpointer data)
 	gboolean needmore = FALSE;
 
 	g_mutex_lock (me->ra_lock);
-	if (me->recent_added - me->recent_updated > 300) {
+	if (me->items->len - me->recent_updated > 300) {
 		going_to_update = me->recent_updated + 300;
 		needmore = TRUE;
 	} else
-		going_to_update = me->recent_added;
+		going_to_update = me->items->len;
 	updated = me->recent_updated;
 	g_mutex_unlock (me->ra_lock);
 
@@ -509,12 +507,10 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	 * however, quite slow and gdk wants us to do this from the mainloop */
 
 	g_mutex_lock (me->ra_lock);
-	me->recent_added++;
 	if (!me->updating_views)
 	{
 		g_object_ref (me);
 		me->updating_views = TRUE;
-		me->recent_updated = 0;
 		g_timeout_add_full (500, G_PRIORITY_DEFAULT_IDLE, 
 			notify_views_add, me, notify_views_add_destroy);
 	}
@@ -727,7 +723,6 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->items = g_ptr_array_sized_new (1000);
 	self->updating_views = FALSE;
 	self->ra_lock = g_mutex_new ();
-	self->recent_added = 0;
 	self->recent_updated = 0;
 
 	return;

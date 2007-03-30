@@ -65,7 +65,7 @@ struct _TnyGtkHeaderListModel
 
 	GStaticRecMutex *iterator_lock;
 	TnyFolder *folder;
-	gint stamp, recent_added, recent_updated;
+	gint stamp, recent_updated;
 	gboolean updating_views;
 	GMutex *ra_lock;
 
