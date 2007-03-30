@@ -457,7 +457,9 @@ notify_views_add (gpointer data)
 		GtkTreeIter iter;
 		iter.stamp = me->stamp;
 		iter.user_data = (gpointer) (me->items->len - 1);
+ 		gdk_threads_enter();
 		gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
+		gdk_threads_leave();
 	}
 
 	gtk_tree_path_free (path);

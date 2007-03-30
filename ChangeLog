@@ -3,7 +3,8 @@
 	* Support for low, high and normal X-Priority
 	* Auto updating the unread count of TnyFolderObservers when unread
 	flags are set on a TnyHeader
-	
+	* Fixed incrementally filling up a GtkTreeView while downloading is
+	taking place (this needs a few small performance improvements btw).	
 
 	* This was a major API change
 
