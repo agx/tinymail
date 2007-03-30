@@ -75,18 +75,18 @@ typedef enum _CamelMessageFlags {
 	CAMEL_MESSAGE_CACHED = 1<<6, /* used      TNY_HEADER_FLAG_CACHED      */
 	CAMEL_MESSAGE_PARTIAL = 1<<7, /* used     TNY_HEADER_FLAG_PARTIAL     */
 	CAMEL_MESSAGE_EXPUNGED = 1<<8, /* used    TNY_HEADER_FLAG_EXPUNGED    */
-	CAMEL_MESSAGE_PRIORITY = 1<<9, /* used    TNY_HEADER_FLAG_PRIORITY    */
-
-	/* these aren't really system flag bits, but are convenience flags */
-	CAMEL_MESSAGE_SECURE = 1<<10, /* free slot */
-	CAMEL_MESSAGE_ABCDEF = 1<<11, /* free slot */
+	CAMEL_MESSAGE_HIGH_PRIORITY = 1<<9 | 1 <<10, /* used    TNY_HEADER_FLAG_HIGH_PRIORITY    */
+	CAMEL_MESSAGE_NORMAL_PRIORITY = 0<<9|1<<10, /* used    TNY_HEADER_FLAG_NORMAL_PRIORITY    */
+	CAMEL_MESSAGE_LOW_PRIORITY = 0<<9 | 0<<10, /* used    TNY_HEADER_FLAG_LOW_PRIORITY    */
 
 	/* internally used */
 	CAMEL_MESSAGE_FOLDER_FLAGGED = 1<<12, /* internally used */
 	CAMEL_MESSAGE_INFO_NEEDS_FREE = 1<<13,/* internally used */
 	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE = 1<<14, /* internally used */
 	CAMEL_MESSAGE_FREED = 1<<15,  /* internally used */
-	CAMEL_MESSAGE_USER = 1<<16  /* free slot */
+	CAMEL_MESSAGE_USER = 1<<16,  /* free slot */
+	CAMEL_MESSAGE_SECURE = 1<<17, /* free slot */
+
 } CamelMessageFlags;
 
 /* Changes to system flags will NOT trigger a folder changed event */

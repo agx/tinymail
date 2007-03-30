@@ -151,7 +151,9 @@ camel_message_info_clear_normal_flags (CamelMessageInfo *min)
 	mi->flags &= ~CAMEL_MESSAGE_CACHED;
 	mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
 	mi->flags &= ~CAMEL_MESSAGE_EXPUNGED;
-	mi->flags &= ~CAMEL_MESSAGE_PRIORITY;
+	mi->flags &= ~CAMEL_MESSAGE_HIGH_PRIORITY;
+	mi->flags &= ~CAMEL_MESSAGE_NORMAL_PRIORITY;
+	mi->flags &= ~CAMEL_MESSAGE_LOW_PRIORITY;
 
 	mi->flags &= ~CAMEL_MESSAGE_SECURE;
 	mi->flags &= ~CAMEL_MESSAGE_FOLDER_FLAGGED;
@@ -1982,9 +1984,17 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	if (prio) 
 	{ 
 		if (strcasestr (prio, "high") != NULL)
-			mi->flags |= CAMEL_MESSAGE_PRIORITY;
-		else if (strchr (prio, '1') != NULL || strchr (prio, '2') != NULL)
-			mi->flags |= CAMEL_MESSAGE_PRIORITY;
+			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
+		else if (strchr (prio, '1') != NULL)
+			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
+		else if (strcasestr (prio, "normal") != NULL)
+			mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;
+		else if (strchr (prio, '2') != NULL)
+			mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;
+		else if (strcasestr (prio, "low") != NULL)
+			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
+		else if (strchr (prio, '3') != NULL)
+			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
 	}
 
 	attach = camel_header_raw_find(&h, "X-MS-Has-Attach", NULL);
