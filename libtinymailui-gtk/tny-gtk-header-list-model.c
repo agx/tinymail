@@ -461,13 +461,17 @@ notify_views_add (gpointer data)
 	me->updating_views++;
 
 	g_mutex_lock (me->ra_lock);
+	if (me->recent_updated > me->items->len) {
+		g_mutex_unlock (me->ra_lock);
+		return FALSE;
+	}
+	updated = me->recent_updated;
 	if (me->updating_views < 2 || me->items->len - me->recent_updated > 300) {
 		going_to_update = me->recent_updated + 300;
 		needmore = TRUE;
 	} else
 		going_to_update = me->items->len;
 
-	updated = me->recent_updated;
 	g_mutex_unlock (me->ra_lock);
 
 	path = gtk_tree_path_new ();
@@ -749,6 +753,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 
 	g_static_rec_mutex_lock (self->iterator_lock);
 
+	self->recent_updated = 0;
 	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
 	if (self->folder)
 		g_object_unref (G_OBJECT (self->folder));
