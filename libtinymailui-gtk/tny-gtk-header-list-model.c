@@ -452,15 +452,15 @@ notify_views_add (gpointer data)
 	path = gtk_tree_path_new ();
 	gtk_tree_path_append_index (path, 0);
 
+	gdk_threads_enter();
 	for (i = 0; i< added; i++)
 	{
 		GtkTreeIter iter;
 		iter.stamp = me->stamp;
 		iter.user_data = (gpointer) (me->items->len - 1);
- 		gdk_threads_enter();
 		gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
-		gdk_threads_leave();
 	}
+	gdk_threads_leave();
 
 	gtk_tree_path_free (path);
 	g_object_unref (G_OBJECT (me));
