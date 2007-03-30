@@ -476,7 +476,8 @@ tny_header_get_flags (TnyHeader *self)
  * @self: a #TnyHeader object
  * @mask: A #TnyHeaderFlags bitmask of flags to set.
  * 
- * Modify message flags.
+ * Modify message flags. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
+ * notification of folder observers if @self was originated from a folder.
  * 
  **/
 void 
@@ -501,7 +502,8 @@ tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
  * @self: a #TnyHeader object
  * @mask: A #TnyHeaderFlags bitmask of flags to clear.
  * 
- * Modify message flags.
+ * Reset message flags. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
+ * notification of folder observers if @self was originated from a folder.
  * 
  **/
 void 

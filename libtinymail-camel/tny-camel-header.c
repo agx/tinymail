@@ -181,8 +181,17 @@ static void
 tny_camel_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
+	CamelMessageInfoBase *info = (CamelMessageInfoBase *) me->info;
+	gboolean doit;
+
+	if ( ( (!(info->flags & CAMEL_MESSAGE_SEEN) && (mask & TNY_HEADER_FLAG_SEEN)) ||
+	   ((info->flags & CAMEL_MESSAGE_SEEN) && !(mask & TNY_HEADER_FLAG_SEEN)) ) 
+	   && me->folder) doit = TRUE;
 
 	camel_message_info_set_flags (me->info, mask, 0);
+
+	if (doit)
+		_tny_camel_folder_check_unread_count (me->folder);
 
 	return;
 }
