@@ -440,17 +440,28 @@ typedef struct
 static gboolean
 notify_views_add (gpointer data)
 {
-	notify_views_data_t *stuff = data;
+	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) data;
+	gint i, added; GtkTreePath *path;
 
-	/* Caused by the delayer (see below), this one wont trigger for each
-	 * added item. Let's hope that the GtkTreeView copes with this by 
-	 * reading the get_length property each time. March 2007 it did, as far
-	 * as I know. */
+	g_mutex_lock (me->ra_lock);
+	added = me->recent_added;
+	me->recent_added = 0;
+	me->going_to_update_views = FALSE;
+	g_mutex_unlock (me->ra_lock);
 
-	gtk_tree_model_row_inserted (GTK_TREE_MODEL (stuff->self), stuff->path, &(stuff->iter));
-	gtk_tree_path_free (stuff->path);
-	g_object_unref (G_OBJECT (stuff->self));
-	g_slice_free (notify_views_data_t, data);
+	path = gtk_tree_path_new ();
+	gtk_tree_path_append_index (path, 0);
+
+	for (i = 0; i< added; i++)
+	{
+		GtkTreeIter iter;
+		iter.stamp = me->stamp;
+		iter.user_data = (gpointer) (me->items->len - 1);
+		gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
+	}
+
+	gtk_tree_path_free (path);
+	g_object_unref (G_OBJECT (me));
 
 	return FALSE;
 }
@@ -480,32 +491,15 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	 * slower. This is unwanted: updating should be time, not connection 
 	 * speed, based. Therefore: alter this to use time in stead of counts. */
 
-	if (me->delayer == 100)
+	g_mutex_lock (me->ra_lock);
+	me->recent_added++;
+	if (!me->going_to_update_views)
 	{
-		notify_views_data_t *stuff;
-
-		stuff = g_slice_new (notify_views_data_t);
-		stuff->self = g_object_ref (G_OBJECT (self));
-		stuff->path = gtk_tree_path_new ();
-		gtk_tree_path_append_index (stuff->path, 0);
-		stuff->iter.stamp = me->stamp;
-		stuff->iter.user_data = (gpointer) (me->items->len - 1);
-
-		/* Letting the model observers know about this (the GtkTreeViews).
-		 * The g_timeout_add stuff keeps it possible to launch the pre-
-		 * pender in a thread. Else wouldn't the GtkTreeViews like this. */
-
-		if (stuff->path)
-			g_timeout_add (0, notify_views_add, stuff);
-		else {
-			g_object_unref (G_OBJECT (stuff->self));
-			g_slice_free (notify_views_data_t, stuff);
-		}
-
-		me->delayer = 0;
+		g_object_ref (G_OBJECT (me));
+		me->going_to_update_views = TRUE;
+		g_timeout_add (2000, notify_views_add, me);
 	}
-
-	me->delayer++;
+	g_mutex_unlock (me->ra_lock);
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
@@ -681,9 +675,10 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	g_static_rec_mutex_unlock (self->iterator_lock);
 
-
 	g_static_rec_mutex_free (self->iterator_lock);
 	self->iterator_lock = NULL;
+	g_mutex_free (self->ra_lock);
+	self->ra_lock = NULL;
 
 	parent_class->finalize (object);
 
@@ -711,7 +706,9 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->iterator_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->iterator_lock);
 	self->items = g_ptr_array_sized_new (1000);
-	self->delayer = 0;
+	self->going_to_update_views = FALSE;
+	self->ra_lock = g_mutex_new ();
+	self->recent_added = 0;
 
 	return;
 }
