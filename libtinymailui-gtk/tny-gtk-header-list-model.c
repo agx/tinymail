@@ -448,8 +448,6 @@ notify_views_add_destroy (gpointer data)
 	g_mutex_lock (me->ra_lock);
 	me->updating_views = -1;
 	g_mutex_unlock (me->ra_lock);
-
-	g_static_rec_mutex_unlock (me->ra_l_lock);
 	g_object_unref (me);
 
 }
@@ -461,8 +459,6 @@ notify_views_add (gpointer data)
 	gint updated, going_to_update, i, added; 
 	GtkTreePath *path;
 	gboolean needmore = FALSE;
-
-	g_static_rec_mutex_lock (me->ra_l_lock);
 
 	g_mutex_lock (me->ra_lock);
 	me->updating_views++;
