@@ -457,7 +457,6 @@ notify_views_add (gpointer data)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) data;
 	gint updated, going_to_update, i, added; 
-	GtkTreePath *path;
 	gboolean needmore = FALSE;
 
 	g_mutex_lock (me->ra_lock);
@@ -478,20 +477,20 @@ notify_views_add (gpointer data)
 	if (me->updating_views < 2)
 		needmore = TRUE;
 
-	path = gtk_tree_path_new ();
-	gtk_tree_path_append_index (path, 0);
-
 	gdk_threads_enter();
 	for (i = updated; i < going_to_update; i++)
 	{
 		GtkTreeIter iter;
+		GtkTreePath *path;
+		path = gtk_tree_path_new ();
+		gtk_tree_path_append_index (path, i);
 		iter.stamp = me->stamp;
 		iter.user_data = (gpointer) i;
 		gtk_tree_model_row_inserted ((GtkTreeModel *)me, path, &iter);
+		gtk_tree_path_free (path);
 	}
 	gdk_threads_leave();
 
-	gtk_tree_path_free (path);
 
 	return needmore;
 }
