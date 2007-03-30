@@ -437,35 +437,55 @@ typedef struct
 	GtkTreeIter iter;
 } notify_views_data_t;
 
+
+static void
+notify_views_add_destroy (gpointer data)
+{
+	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) data;
+
+	g_mutex_lock (me->ra_lock);
+	me->recent_updated = 0;
+	me->recent_added = 0;
+	me->updating_views = FALSE;
+	g_mutex_unlock (me->ra_lock);
+	g_object_unref (me);
+
+}
+
 static gboolean
 notify_views_add (gpointer data)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) data;
-	gint i, added; GtkTreePath *path;
+	gint updated, going_to_update, i, added; 
+	GtkTreePath *path;
+	gboolean needmore = FALSE;
 
 	g_mutex_lock (me->ra_lock);
-	added = me->recent_added;
-	me->recent_added = 0;
-	me->going_to_update_views = FALSE;
+	if (me->recent_added - me->recent_updated > 300) {
+		going_to_update = me->recent_updated + 300;
+		needmore = TRUE;
+	} else
+		going_to_update = me->recent_added;
+	updated = me->recent_updated;
 	g_mutex_unlock (me->ra_lock);
 
 	path = gtk_tree_path_new ();
 	gtk_tree_path_append_index (path, 0);
 
 	gdk_threads_enter();
-	for (i = 0; i< added; i++)
+	for (i = updated; i < going_to_update; i++)
 	{
 		GtkTreeIter iter;
 		iter.stamp = me->stamp;
-		iter.user_data = (gpointer) (me->items->len - 1);
-		gtk_tree_model_row_inserted (GTK_TREE_MODEL (me), path, &iter);
+		iter.user_data = (gpointer) i;
+		gtk_tree_model_row_inserted ((GtkTreeModel *)me, path, &iter);
 	}
+	me->recent_updated = i;
 	gdk_threads_leave();
 
 	gtk_tree_path_free (path);
-	g_object_unref (G_OBJECT (me));
 
-	return FALSE;
+	return needmore;
 }
 
 /* This will be called often while you are in tny_folder_refresh(_async). It can
@@ -482,24 +502,21 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	 * because that one uses GPtrArray's len property. We are reusing the 
 	 * iterator_lock for locking this out, by the way. */
 
-	g_object_ref (G_OBJECT (item));
+	g_object_ref (item);
 	g_ptr_array_add (me->items, item);
 
 	/* This prepend will happen very often, the allocation and the notificating
 	 * of the view is, however, quite slow. So we delay it per 100 or so. */
 
-	/* TNY TODO: this delay is not time driven. This means that on slow
-	 * connections (fewer prepends happen per time), the updating will be
-	 * slower. This is unwanted: updating should be time, not connection 
-	 * speed, based. Therefore: alter this to use time in stead of counts. */
-
 	g_mutex_lock (me->ra_lock);
 	me->recent_added++;
-	if (!me->going_to_update_views)
+	if (!me->updating_views)
 	{
-		g_object_ref (G_OBJECT (me));
-		me->going_to_update_views = TRUE;
-		g_timeout_add (2000, notify_views_add, me);
+		g_object_ref (me);
+		me->updating_views = TRUE;
+		me->recent_updated = 0;
+		g_timeout_add_full (500, G_PRIORITY_DEFAULT_IDLE, 
+			notify_views_add, me, notify_views_add_destroy);
 	}
 	g_mutex_unlock (me->ra_lock);
 
@@ -708,9 +725,10 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->iterator_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->iterator_lock);
 	self->items = g_ptr_array_sized_new (1000);
-	self->going_to_update_views = FALSE;
+	self->updating_views = FALSE;
 	self->ra_lock = g_mutex_new ();
 	self->recent_added = 0;
+	self->recent_updated = 0;
 
 	return;
 }
