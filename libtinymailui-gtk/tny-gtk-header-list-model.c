@@ -505,8 +505,8 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	g_object_ref (item);
 	g_ptr_array_add (me->items, item);
 
-	/* This prepend will happen very often, the allocation and the notificating
-	 * of the view is, however, quite slow. So we delay it per 100 or so. */
+	/* This prepend will happen very often, the notificating of the view is, 
+	 * however, quite slow and gdk wants us to do this from the mainloop */
 
 	g_mutex_lock (me->ra_lock);
 	me->recent_added++;
