@@ -67,6 +67,7 @@ void _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *fo
 void _tny_camel_folder_set_local_size (TnyCamelFolder *self, guint len);
 void _tny_camel_folder_set_unread_count (TnyCamelFolder *self, guint len);
 void _tny_camel_folder_set_all_count (TnyCamelFolder *self, guint len);
+void _tny_camel_folder_check_unread_count (TnyCamelFolder *self);
 
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_FOLDER, TnyCamelFolderPriv))

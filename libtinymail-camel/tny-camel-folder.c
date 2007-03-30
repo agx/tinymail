@@ -122,6 +122,18 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 }
 
 
+void 
+_tny_camel_folder_check_unread_count (TnyCamelFolder *self)
+{
+	TnyFolderChange *change = tny_folder_change_new (TNY_FOLDER (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+	tny_folder_change_set_new_unread_count (change, priv->unread_length);
+	notify_folder_observers_about (TNY_FOLDER (self), change);
+	g_object_unref (change);
+}
+
 static void 
 folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer user_data)
 {
