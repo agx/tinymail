@@ -458,21 +458,23 @@ notify_views_add (gpointer data)
 	GtkTreePath *path;
 	gboolean needmore = FALSE;
 
-	me->updating_views++;
-
 	g_mutex_lock (me->ra_lock);
-	if (me->recent_updated > me->items->len) {
+	me->updating_views++;
+	if (me->recent_updated >= me->items->len) {
 		g_mutex_unlock (me->ra_lock);
 		return FALSE;
 	}
 	updated = me->recent_updated;
-	if (me->updating_views < 2 || me->items->len - me->recent_updated > 300) {
+	if (me->items->len - me->recent_updated > 300) {
 		going_to_update = me->recent_updated + 300;
 		needmore = TRUE;
 	} else 
 		going_to_update = me->items->len;
 	me->recent_updated = going_to_update;
 	g_mutex_unlock (me->ra_lock);
+
+	if (me->updating_views < 2)
+		needmore = TRUE;
 
 	path = gtk_tree_path_new ();
 	gtk_tree_path_append_index (path, 0);
