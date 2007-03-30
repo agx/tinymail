@@ -1995,7 +1995,8 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
 		else if (strchr (prio, '3') != NULL)
 			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
-	}
+	} else 
+		mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;
 
 	attach = camel_header_raw_find(&h, "X-MS-Has-Attach", NULL);
 	if (attach)
