@@ -377,10 +377,8 @@ tny_gtk_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter
 
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
-	g_static_rec_mutex_lock (list_model->ra_l_lock);
 	if (G_LIKELY (!iter))
 		retval = list_model->cur_len; /* list_model->items->len; */
-	g_static_rec_mutex_unlock (list_model->ra_l_lock);
 
 	g_static_rec_mutex_unlock (list_model->iterator_lock);
 
@@ -460,7 +458,6 @@ notify_views_add (gpointer data)
 	gint updated, going_to_update, i, added; 
 	gboolean needmore = FALSE;
 
-	g_static_rec_mutex_lock (me->ra_l_lock);
 
 	g_mutex_lock (me->ra_lock);
 	me->updating_views++;
@@ -489,16 +486,13 @@ notify_views_add (gpointer data)
 		gtk_tree_path_append_index (path, i);
 		iter.stamp = me->stamp;
 		iter.user_data = (gpointer) i;
-		g_static_rec_mutex_lock (me->ra_l_lock);
 		me->cur_len = i+1;
 		gtk_tree_model_row_inserted ((GtkTreeModel *)me, path, &iter);
-		g_static_rec_mutex_lock (me->ra_l_lock);
 
 		gtk_tree_path_free (path);
 	}
 	gdk_threads_leave();
 
-	g_static_rec_mutex_unlock (me->ra_l_lock);
 
 
 	return needmore;
@@ -513,7 +507,6 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
 
 	g_static_rec_mutex_lock (me->iterator_lock);
-	g_static_rec_mutex_lock (me->ra_l_lock);
 
 	/* Prepend something to the list itself. The get_length will auto update
 	 * because that one uses GPtrArray's len property. We are reusing the 
@@ -535,7 +528,6 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	}
 	g_mutex_unlock (me->ra_lock);
 
-	g_static_rec_mutex_unlock (me->ra_l_lock);
 	g_static_rec_mutex_unlock (me->iterator_lock);
 
 	return;
@@ -713,8 +705,6 @@ tny_gtk_header_list_model_finalize (GObject *object)
 	g_static_rec_mutex_free (self->iterator_lock);
 	self->iterator_lock = NULL;
 
-	g_static_rec_mutex_free (self->ra_l_lock);
-	self->ra_l_lock = NULL;
 
 	g_mutex_free (self->ra_lock);
 	self->ra_lock = NULL;
@@ -744,8 +734,6 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->folder = NULL;
 	self->iterator_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->iterator_lock);
-	self->ra_l_lock = g_new0 (GStaticRecMutex, 1);
-	g_static_rec_mutex_init (self->ra_l_lock);
 	self->cur_len = 0;
 
 	self->items = g_ptr_array_sized_new (1000);
