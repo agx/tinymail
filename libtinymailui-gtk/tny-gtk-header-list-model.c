@@ -377,8 +377,10 @@ tny_gtk_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter
 
 	g_static_rec_mutex_lock (list_model->iterator_lock);
 
+	g_static_rec_mutex_lock (list_model->ra_l_lock);
 	if (G_LIKELY (!iter))
 		retval = list_model->items->len;
+	g_static_rec_mutex_unlock (list_model->ra_l_lock);
 
 	g_static_rec_mutex_unlock (list_model->iterator_lock);
 
@@ -446,6 +448,8 @@ notify_views_add_destroy (gpointer data)
 	g_mutex_lock (me->ra_lock);
 	me->updating_views = -1;
 	g_mutex_unlock (me->ra_lock);
+
+	g_static_rec_mutex_unlock (me->ra_l_lock);
 	g_object_unref (me);
 
 }
@@ -457,6 +461,8 @@ notify_views_add (gpointer data)
 	gint updated, going_to_update, i, added; 
 	GtkTreePath *path;
 	gboolean needmore = FALSE;
+
+	g_static_rec_mutex_lock (me->ra_l_lock);
 
 	g_mutex_lock (me->ra_lock);
 	me->updating_views++;
@@ -700,6 +706,10 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	g_static_rec_mutex_free (self->iterator_lock);
 	self->iterator_lock = NULL;
+
+	g_static_rec_mutex_free (self->ra_l_lock);
+	self->ra_l_lock = NULL;
+
 	g_mutex_free (self->ra_lock);
 	self->ra_lock = NULL;
 
@@ -728,6 +738,9 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	self->folder = NULL;
 	self->iterator_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->iterator_lock);
+	self->ra_l_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (self->ra_l_lock);
+
 	self->items = g_ptr_array_sized_new (1000);
 	self->updating_views = -1;
 	self->ra_lock = g_mutex_new ();
