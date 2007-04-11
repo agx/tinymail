@@ -1,3 +1,7 @@
+2007-04-11 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Improve tny-maemo-device so it works a bit better
+
 2007-03-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Support for low, high and normal X-Priority

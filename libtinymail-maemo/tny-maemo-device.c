@@ -117,6 +117,8 @@ tny_maemo_device_force_offline (TnyDevice *self)
 	g_return_if_fail (TNY_IS_DEVICE(self));
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
+	return;
+	
 	if (!con_ic_connection_disconnect (priv->cnx))
 		g_warning ("could not send disconnect dbus message");
 }
@@ -126,6 +128,8 @@ static gboolean
 tny_maemo_device_is_online (TnyDevice *self)
 {
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);	
+
+	return TRUE;
 	return TNY_MAEMO_DEVICE_GET_PRIVATE (self)->is_online;
 }
 
@@ -179,10 +183,9 @@ tny_maemo_device_finalize (GObject *obj)
 {
 	TnyMaemoDevicePriv *priv;
 	priv   = TNY_MAEMO_DEVICE_GET_PRIVATE (obj);
-
 	if (CON_IC_IS_CONNECTION(priv->cnx)) {
-		if (!con_ic_connection_disconnect (priv->cnx))
-			g_warning ("failed to send disconnect dbus message");
+	//	if (!con_ic_connection_disconnect (priv->cnx))
+	//		g_warning ("failed to send disconnect dbus message");
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
 	}	
