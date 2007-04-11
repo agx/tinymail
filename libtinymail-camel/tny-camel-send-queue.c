@@ -233,6 +233,7 @@ errorhandler:
 
 	g_object_unref (G_OBJECT (sentbox));
 	g_object_unref (G_OBJECT (outbox));
+	g_object_unref (G_OBJECT (self));
 
 	priv->thread = NULL;
 
@@ -248,7 +249,9 @@ create_worker (TnySendQueue *self)
 	while (priv->creating_spin);
 
 	priv->creating_spin = TRUE;
-	priv->thread = g_thread_create (thread_main, self, TRUE, NULL);
+
+	priv->thread = g_thread_create (thread_main, g_object_ref (self),
+		TRUE, NULL);
 
 	return;
 }
