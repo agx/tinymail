@@ -1,3 +1,7 @@
+2007-04-11  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed ticket #40
+
 2007-04-11 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Improve tny-maemo-device so it works a bit better
