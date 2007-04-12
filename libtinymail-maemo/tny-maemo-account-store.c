@@ -29,7 +29,9 @@
 
 
 #include <tny-platform-factory.h>
+#include <tny-password-getter.h>
 #include <tny-maemo-platform-factory.h>
+
 #include <tny-account-store.h>
 #include <tny-maemo-account-store.h>
 #include <tny-maemo-password-dialog.h>
@@ -66,75 +68,30 @@ struct _TnyMaemoAccountStorePriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MAEMO_ACCOUNT_STORE, TnyMaemoAccountStorePriv))
 
 
-static GHashTable *passwords;
-
 static gchar* 
 per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
-	gchar *retval = NULL;
-	const gchar *accountid = tny_account_get_id (account);
+	TnyPlatformFactory *platfact = tny_maemo_platform_factory_get_instance ();
+	TnyPasswordGetter *pwdgetter;
+	gchar *retval;
 
-	if (G_UNLIKELY (!passwords))
-		passwords = g_hash_table_new (g_str_hash, g_str_equal);
-
-	retval = g_hash_table_lookup (passwords, accountid);
-
-	if (G_UNLIKELY (!retval))
-	{
-		GtkDialog *dialog = GTK_DIALOG (tny_maemo_password_dialog_new ());
-	
-		tny_maemo_password_dialog_set_prompt (TNY_MAEMO_PASSWORD_DIALOG (dialog), prompt);
-
-		if (G_LIKELY (gtk_dialog_run (dialog) == GTK_RESPONSE_OK))
-		{
-			const gchar *pwd = tny_maemo_password_dialog_get_password 
-				(TNY_MAEMO_PASSWORD_DIALOG (dialog));
-	
-			retval = g_strdup (pwd);
-
-			mlock (retval, strlen (retval));
-
-			g_hash_table_insert (passwords, g_strdup (accountid), 
-				retval);
-
-			*cancel = FALSE;
-
-		} else {
-
-			*cancel = TRUE;
-
-		}
-
-		gtk_widget_destroy (GTK_WIDGET (dialog));
-
-		while (gtk_events_pending ())
-			gtk_main_iteration ();
-	} else {
-		*cancel = FALSE;
-	}
+	pwdgetter = tny_platform_factory_new_password_getter (platfact);
+	retval = (gchar*) tny_password_getter_get_password (pwdgetter, account, prompt, cancel);
+	g_object_unref (G_OBJECT (pwdgetter));
 
 	return retval;
 }
 
+
 static void
 per_account_forget_pass_func (TnyAccount *account)
 {
-	TnyGetPassFunc func;
+	TnyPlatformFactory *platfact = tny_maemo_platform_factory_get_instance ();
+	TnyPasswordGetter *pwdgetter;
 
-	if (G_LIKELY (passwords))
-	{
-		const gchar *accountid = tny_account_get_id (account);
-
-		gchar *pwd = g_hash_table_lookup (passwords, accountid);
-
-		if (G_LIKELY (pwd))
-		{
-			memset (pwd, 0, strlen (pwd));
-			/* g_free (pwd); uhm, crashed once ?! */
-			g_hash_table_remove (passwords, accountid);
-		}
-
-	}
+	pwdgetter = tny_platform_factory_new_password_getter (platfact);
+	tny_password_getter_forget_password (pwdgetter, account);
+	g_object_unref (G_OBJECT (pwdgetter));
 
 	return;
 }

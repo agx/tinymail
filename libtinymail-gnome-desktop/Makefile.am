@@ -13,14 +13,13 @@ INCLUDES += -I$(top_srcdir)/libtinymailui-mozembed -DMOZEMBED
 endif
 
 if BUILD_GNOME
-INCLUDES += -DGNOME
+INCLUDES += -I$(top_srcdir)/libtinymailui-gnome-keyring -DGNOME
 endif
 
 lib_LTLIBRARIES = libtinymail-gnome-desktop-1.0.la
 
 libtinymail_gnome_desktop_1_0_headers = \
 	tny-gnome-account-store.h \
-	tny-gnome-password-dialog.h \
 	tny-gnome-device.h \
 	tny-gnome-platform-factory.h
 
@@ -29,7 +28,6 @@ libtinymail_gnome_desktop_1_0_la_SOURCES = \
 	tny-gnome-account-store.c \
 	tny-gnome-device-priv.h \
 	tny-gnome-device.c \
-	tny-gnome-password-dialog.c \
 	tny-gnome-platform-factory.c
 
 libtinymail_gnome_desktop_1_0_la_LIBADD = \
@@ -41,6 +39,10 @@ libtinymail_gnome_desktop_1_0_la_LIBADD = \
 
 libtinymail_gnome_desktop_1_0_la_LDFLAGS = -export-dynamic \
 	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
+
+if BUILD_GNOME
+libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-gnome-keyring/libtinymailui-gnome-keyring.a
+endif
 
 if BUILD_MOZEMBED
 libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la

@@ -46,6 +46,7 @@ struct _TnyPlatformFactoryIface
 	TnyMsgView* (*new_msg_view_func) (TnyPlatformFactory *self);
 	TnyMsg* (*new_msg_func) (TnyPlatformFactory *self);
 	TnyMimePart* (*new_mime_part_func) (TnyPlatformFactory *self);
+	TnyPasswordGetter* (*new_password_getter_func) (TnyPlatformFactory *self);
 };
 
 GType tny_platform_factory_get_type (void);
@@ -55,6 +56,7 @@ TnyDevice* tny_platform_factory_new_device (TnyPlatformFactory *self);
 TnyMsgView* tny_platform_factory_new_msg_view (TnyPlatformFactory *self);
 TnyMsg* tny_platform_factory_new_msg (TnyPlatformFactory *self);
 TnyMimePart* tny_platform_factory_new_mime_part (TnyPlatformFactory *self);
+TnyPasswordGetter* tny_platform_factory_new_password_getter (TnyPlatformFactory *self);
 
 G_END_DECLS
 

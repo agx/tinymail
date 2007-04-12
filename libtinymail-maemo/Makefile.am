@@ -14,7 +14,6 @@ lib_LTLIBRARIES = libtinymail-maemo-1.0.la
 
 libtinymail_maemo_1_0_headers = \
 	tny-maemo-account-store.h \
-	tny-maemo-password-dialog.h \
 	tny-maemo-device.h \
 	tny-maemo-platform-factory.h
 
@@ -22,7 +21,6 @@ libtinymail_maemo_1_0_la_SOURCES =  \
 	$(libtinymail_maemo_1_0_headers) \
 	tny-maemo-account-store.c \
 	tny-maemo-device.c \
-	tny-maemo-password-dialog.c \
 	tny-maemo-platform-factory.c
 
 libtinymail_maemo_1_0_la_LIBADD = \

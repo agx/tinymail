@@ -22,6 +22,7 @@
 #include <tny-gpe-account-store.h>
 #include <tny-gpe-device.h>
 #include <tny-gtk-msg-view.h>
+#include <tny-gtk-password-dialog.h>
 #include <tny-camel-mime-part.h>
 #include <tny-camel-msg.h>
 
@@ -67,6 +68,12 @@ tny_gpe_platform_factory_new_msg_view (TnyPlatformFactory *self)
 	return tny_gtk_msg_view_new ();    
 }
 
+static TnyPasswordGetter*
+tny_gpe_platform_factory_new_password_getter (TnyPlatformFactory *self)
+{
+	return tny_gtk_password_dialog_new ();
+}
+
 /**
  * tny_gpe_platform_factory_get_instance:
  *
@@ -101,6 +108,7 @@ tny_platform_factory_init (gpointer g, gpointer iface_data)
 	klass->new_msg_view_func = tny_gpe_platform_factory_new_msg_view;
 	klass->new_msg_func = tny_gpe_platform_factory_new_msg;
 	klass->new_mime_part_func = tny_gpe_platform_factory_new_mime_part;
+	klass->new_password_getter_func = tny_gpe_platform_factory_new_password_getter;
 
 	return;
 }

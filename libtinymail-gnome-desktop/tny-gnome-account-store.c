@@ -28,10 +28,10 @@
 #include <gconf/gconf-client.h>
 
 #include <tny-platform-factory.h>
+#include <tny-password-getter.h>
 #include <tny-gnome-platform-factory.h>
 #include <tny-account-store.h>
 #include <tny-gnome-account-store.h>
-#include <tny-gnome-password-dialog.h>
 #include <tny-account.h>
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
@@ -48,10 +48,6 @@
 
 #include <tny-gtk-lockable.h>
 
-#ifdef GNOME
-#include <libgnomeui/gnome-password-dialog.h>
-#include <gnome-keyring.h>
-#endif
 
 /* "GConf vs. libtinymail-camel" account-store implementation */
 
@@ -73,164 +69,16 @@ struct _TnyGnomeAccountStorePriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GNOME_ACCOUNT_STORE, TnyGnomeAccountStorePriv))
 
 
-#ifdef GNOME
 static gchar* 
 per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
-	gchar *retval = NULL;
-	GList *list;
-	GnomeKeyringResult keyringret;
-	gchar *keyring;
+	TnyPlatformFactory *platfact = tny_gnome_platform_factory_get_instance ();
+	TnyPasswordGetter *pwdgetter;
+	gchar *retval;
 
-	gnome_keyring_get_default_keyring_sync (&keyring);
-
-	keyringret = gnome_keyring_find_network_password_sync (
-		tny_account_get_user (account),
-		"Mail", tny_account_get_hostname (account),
-		"password", tny_account_get_proto (account), 
-		"PLAIN", 0, &list);
-
-	if (keyringret != GNOME_KEYRING_RESULT_OK)
-	{
-		gboolean canc = FALSE;
-
-		GnomePasswordDialog *dialog = GNOME_PASSWORD_DIALOG 
-				(gnome_password_dialog_new
-					(_("Enter password"), prompt,
-					tny_account_get_user (account), 
-					NULL, TRUE));
-
-		gnome_password_dialog_set_domain (dialog, "Mail");
-		gnome_password_dialog_set_remember (dialog, 
-			GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER);
-		gnome_password_dialog_set_readonly_username (dialog, TRUE);
-		gnome_password_dialog_set_username (dialog, 
-			tny_account_get_user (account));
-
-		gnome_password_dialog_set_show_username (dialog, FALSE);
-		gnome_password_dialog_set_show_remember (dialog, 
-			gnome_keyring_is_available ());
-		gnome_password_dialog_set_show_domain (dialog, FALSE);
-		gnome_password_dialog_set_show_userpass_buttons (dialog, FALSE);
-
-		canc = gnome_password_dialog_run_and_block (dialog);
-
-		if (canc)
-		{
-			guint32 item_id;
-			GnomePasswordDialogRemember r;
-
-			retval = gnome_password_dialog_get_password (dialog);
-
-			r = gnome_password_dialog_get_remember (dialog);
-
-			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)
-			{
-				gnome_keyring_set_network_password_sync (keyring,
-					tny_account_get_user (account),
-					"Mail", tny_account_get_hostname (account),
-					"password", tny_account_get_proto (account), 
-					"PLAIN", 0, retval, &item_id);
-			}
-		} else retval = NULL;
-
-		*cancel = (!canc);
-
-		/* this causes warnings, but should be done afaik */
-		gtk_object_destroy (GTK_OBJECT (dialog));
-
-		while (gtk_events_pending ())
-			gtk_main_iteration ();
-
-	} else {
-
-		GnomeKeyringNetworkPasswordData *pwd_data;
-		pwd_data = list->data;
-		retval = g_strdup (pwd_data->password);
-
-		*cancel = FALSE;
-
-		gnome_keyring_network_password_list_free (list);
-	}
-
-	return retval;
-}
-
-static void
-per_account_forget_pass_func (TnyAccount *account)
-{
-	GList *list=NULL;
-	GnomeKeyringResult keyringret;
-	gchar *keyring;
-	GnomeKeyringNetworkPasswordData *pwd_data;
-
-	gnome_keyring_get_default_keyring_sync (&keyring);
-
-	keyringret = gnome_keyring_find_network_password_sync (
-		tny_account_get_user (account),
-		"Mail", tny_account_get_hostname (account),
-		"password", tny_account_get_proto (account), 
-		"PLAIN", 0, &list);
-
-	if (keyringret == GNOME_KEYRING_RESULT_OK)
-	{
-		pwd_data = list->data;
-		gnome_keyring_item_delete_sync (keyring, pwd_data->item_id);
-		gnome_keyring_network_password_list_free (list);
-	}
-	return;
-}
-
-#else 
-
-static GHashTable *passwords;
-
-static gchar* 
-per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
-{
-	gchar *retval = NULL;
-	const gchar *accountid;
-
-	accountid = tny_account_get_id (account);
-
-	if (G_UNLIKELY (!passwords))
-		passwords = g_hash_table_new (g_str_hash, g_str_equal);
-
-	retval = g_hash_table_lookup (passwords, accountid);
-
-	if (G_UNLIKELY (!retval))
-	{
-		GtkDialog *dialog = GTK_DIALOG (tny_gnome_password_dialog_new ());
-	
-		tny_gnome_password_dialog_set_prompt (TNY_GNOME_PASSWORD_DIALOG (dialog), prompt);
-
-		if (G_LIKELY (gtk_dialog_run (dialog) == GTK_RESPONSE_OK))
-		{
-			const gchar *pwd = tny_gnome_password_dialog_get_password 
-				(TNY_GNOME_PASSWORD_DIALOG (dialog));
-	
-			retval = g_strdup (pwd);
-
-			mlock (retval, strlen (retval));
-
-			g_hash_table_insert (passwords, g_strdup (accountid), 
-				retval);
-
-			*cancel = FALSE;
-
-		} else {
-
-			*cancel = TRUE;
-
-		}
-
-		gtk_widget_destroy (GTK_WIDGET (dialog));
-
-		while (gtk_events_pending ())
-			gtk_main_iteration ();
-	} else {
-		*cancel = FALSE;
-	}
+	pwdgetter = tny_platform_factory_new_password_getter (platfact);
+	retval = (gchar*) tny_password_getter_get_password (pwdgetter, account, prompt, cancel);
+	g_object_unref (G_OBJECT (pwdgetter));
 
 	return retval;
 }
@@ -239,25 +87,15 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 static void
 per_account_forget_pass_func (TnyAccount *account)
 {
-	if (G_LIKELY (passwords))
-	{
-		const gchar *accountid = tny_account_get_id (account);
+	TnyPlatformFactory *platfact = tny_gnome_platform_factory_get_instance ();
+	TnyPasswordGetter *pwdgetter;
 
-		gchar *pwd = g_hash_table_lookup (passwords, accountid);
-
-		if (G_LIKELY (pwd))
-		{
-			memset (pwd, 0, strlen (pwd));
-			/* g_free (pwd); uhm, crashed once */
-			g_hash_table_remove (passwords, accountid);
-		}
-
-	}
+	pwdgetter = tny_platform_factory_new_password_getter (platfact);
+	tny_password_getter_forget_password (pwdgetter, account);
+	g_object_unref (G_OBJECT (pwdgetter));
 
 	return;
 }
-
-#endif
 
 static gboolean
 tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
@@ -696,8 +534,8 @@ tny_gnome_account_store_new (void)
 {
 	TnyGnomeAccountStore *self = g_object_new (TNY_TYPE_GNOME_ACCOUNT_STORE, NULL);
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
 
+	priv->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
 	tny_session_camel_set_ui_locker (priv->session, tny_gtk_lockable_new ());
 
 	return TNY_ACCOUNT_STORE (self);

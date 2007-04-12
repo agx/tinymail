@@ -21,7 +21,8 @@ libtinymailui_gtk_1_0_headers = \
 	tny-gtk-folder-store-tree-model.h \
 	tny-gtk-attach-list-model.h \
 	tny-gtk-text-buffer-stream.h \
-	tny-gtk-header-view.h
+	tny-gtk-header-view.h \
+	tny-gtk-password-dialog.h
 
 libtinymailui_gtk_1_0_la_SOURCES = \
 	$(libtinymailui_gtk_1_0_headers) \
@@ -45,7 +46,8 @@ libtinymailui_gtk_1_0_la_SOURCES = \
 	tny-gtk-account-list-model-iterator.c \
 	tny-gtk-account-list-model-iterator-priv.h \
 	tny-gtk-text-buffer-stream.c \
-	tny-gtk-header-view.c
+	tny-gtk-header-view.c \
+	tny-gtk-password-dialog.c
 
 libtinymailui_gtk_1_0_la_LIBADD = \
 	$(LIBTINYMAILUI_GTK_LIBS) \

@@ -31,25 +31,21 @@
 
 #if PLATFORM==1
 #include <tny-gnome-platform-factory.h>
-#include <tny-gnome-password-dialog.h>
 #include <tny-gnome-account-store.h>
 #endif
 
 #if PLATFORM==2
 #include <tny-maemo-platform-factory.h>
-#include <tny-maemo-password-dialog.h>
 #include <tny-maemo-account-store.h>
 #endif
 
 #if PLATFORM==3
 #include <tny-gpe-platform-factory.h>
-#include <tny-gpe-password-dialog.h>
 #include <tny-gpe-account-store.h>
 #endif
 
 #if PLATFORM==4
 #include <tny-olpc-platform-factory.h>
-#include <tny-olpc-password-dialog.h>
 #include <tny-olpc-account-store.h>
 #endif
 

@@ -113,7 +113,7 @@ tny_acap_account_store_add_transport_account (TnyAccountStore *self, TnyTranspor
 
 	add_account_remote (self, TNY_ACCOUNT (account), "transport");
 
-	tny_account_store_add_store_account (priv->real, account);
+	tny_account_store_add_transport_account (priv->real, account);
 
 	return;
 }

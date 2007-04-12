@@ -13,7 +13,6 @@ lib_LTLIBRARIES = libtinymail-gpe-1.0.la
 
 libtinymail_gpe_1_0_headers = \
 	tny-gpe-account-store.h \
-	tny-gpe-password-dialog.h \
 	tny-gpe-device.h \
 	tny-gpe-platform-factory.h
 
@@ -22,7 +21,6 @@ libtinymail_gpe_1_0_la_SOURCES = \
 	tny-gpe-account-store.c \
 	tny-gpe-device-priv.h \
 	tny-gpe-device.c \
-	tny-gpe-password-dialog.c \
 	tny-gpe-platform-factory.c
 
 libtinymail_gpe_1_0_la_LIBADD = \

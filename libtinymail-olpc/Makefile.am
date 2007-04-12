@@ -13,7 +13,6 @@ lib_LTLIBRARIES = libtinymail-olpc-1.0.la
 
 libtinymail_olpc_1_0_headers = \
 	tny-olpc-account-store.h \
-	tny-olpc-password-dialog.h \
 	tny-olpc-device.h \
 	tny-olpc-platform-factory.h
 
@@ -22,7 +21,6 @@ libtinymail_olpc_1_0_la_SOURCES = \
 	tny-olpc-account-store.c \
 	tny-olpc-device-priv.h \
 	tny-olpc-device.c \
-	tny-olpc-password-dialog.c \
 	tny-olpc-platform-factory.c
 
 libtinymail_olpc_1_0_la_LIBADD = \

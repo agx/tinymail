@@ -4,6 +4,7 @@ SUBDIRS += libtinymail
 SUBDIRS += libtinymailui 
 
 if BUILD_GNOME
+SUBDIRS += libtinymailui-gnome-keyring
 SUBDIRS += libtinymail-gnomevfs 
 endif
 

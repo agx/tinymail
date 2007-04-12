@@ -34,6 +34,8 @@ headers
 #include <tny-folder-store-observer.h>
 #include <tny-folder-store-change.h>
 #include <tny-folder-stats.h>
+#include <tny-password-getter.h>
+
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"

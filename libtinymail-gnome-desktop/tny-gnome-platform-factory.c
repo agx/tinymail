@@ -31,6 +31,12 @@
 #include <tny-gtk-msg-view.h>
 #endif
 
+#ifdef GNOME
+#include <tny-gnome-keyring-password-getter.h>
+#else
+#include <tny-gtk-password-dialog.h>
+#endif
+
 static GObjectClass *parent_class = NULL;
 
 static void
@@ -64,6 +70,17 @@ static TnyDevice*
 tny_gnome_platform_factory_new_device (TnyPlatformFactory *self)
 {
 	return tny_gnome_device_new ();
+}
+
+
+static TnyPasswordGetter*
+tny_gnome_platform_factory_new_password_getter (TnyPlatformFactory *self)
+{
+#ifdef GNOME
+	return tny_gnome_keyring_password_getter_new ();
+#else
+	return tny_gtk_password_dialog_new ();
+#endif
 }
 
 static TnyMsgView*
@@ -114,6 +131,7 @@ tny_platform_factory_init (gpointer g, gpointer iface_data)
 	klass->new_msg_view_func = tny_gnome_platform_factory_new_msg_view;
 	klass->new_msg_func = tny_gnome_platform_factory_new_msg;
 	klass->new_mime_part_func = tny_gnome_platform_factory_new_mime_part;
+	klass->new_password_getter_func = tny_gnome_platform_factory_new_password_getter;
 
 	return;
 }

@@ -49,6 +49,28 @@ tny_platform_factory_new_msg (TnyPlatformFactory *self)
 
 }
 
+/**
+ * tny_platform_factory_new_password_getter:
+ * @self: a TnyPlatformFactory object
+ *
+ * Create a new #TnyPasswordGetter instance. The returned instance must be 
+ * unreferenced after use.
+ *
+ * Implementors: when implementing a platform-specific library, return a 
+ * new #TnyPasswordGetter instance.
+ *
+ * Return value: a #TnyPasswordGetter instance
+ **/
+TnyPasswordGetter* 
+tny_platform_factory_new_password_getter (TnyPlatformFactory *self)
+{
+#ifdef DEBUG
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_password_getter_func)
+		g_critical ("You must implement tny_platform_factory_new_password_getter\n");
+#endif
+
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_password_getter_func (self);
+}
 
 /**
  * tny_platform_factory_new_mime_part:

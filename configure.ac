@@ -401,6 +401,7 @@ libtinymailui-gtk/Makefile
 libtinymailui-gtk/libtinymailui-gtk.pc
 libtinymailui-mozembed/Makefile
 libtinymailui-mozembed/libtinymailui-mozembed.pc
+libtinymailui-gnome-keyring/Makefile
 libtinymail-gnomevfs/Makefile
 libtinymail-gnomevfs/libtinymail-gnomevfs.pc
 libtinymail-gnome-desktop/Makefile
