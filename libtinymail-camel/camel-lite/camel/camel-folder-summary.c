@@ -731,7 +731,9 @@ camel_folder_summary_load(CamelFolderSummary *s)
 		gboolean must_add = FALSE;
 		s->idx = i;
 
+		g_static_rec_mutex_lock (&global_lock);
 		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_load(s, &must_add);
+		g_static_rec_mutex_unlock (&global_lock);
 
 		if (mi == NULL)
 			goto error;
@@ -2117,7 +2119,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE); 
 
-
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
 	mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	mi->flags &= ~CAMEL_MESSAGE_FREED;
@@ -3271,9 +3272,9 @@ info_ptr(const CamelMessageInfo *mi, int id)
 	g_static_rec_mutex_lock (&global_lock);
 	g_static_mutex_lock (&global_lock2);
 
-	if (mi == NULL || mi->refcount <=0)
-		retval = (void*) 0;
-	if (((CamelMessageInfoBase*)mi)->flags & CAMEL_MESSAGE_FREED)
+	if (G_UNLIKELY (mi == NULL || mi->refcount <=0))
+		retval = "Invalid refcount";
+	if (G_UNLIKELY(((CamelMessageInfoBase*)mi)->flags & CAMEL_MESSAGE_FREED))
 		retval = "Invalid";
 	else switch (id) 
 	{

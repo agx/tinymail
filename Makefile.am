@@ -17,6 +17,10 @@ endif
 
 SUBDIRS += libtinymail-camel $(PLATFORMDIR) 
 
+if BUILD_ACAP
+SUBDIRS += libtinymail-acap
+endif
+
 SUBDIRS += tests bindings po 
 
 #### Funny OR simulation :)

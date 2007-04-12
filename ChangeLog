@@ -1,3 +1,9 @@
+2007-04-12  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added skeleton for ACAP support
+
+	* This was a major API change
+
 2007-04-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed ticket #40

@@ -54,6 +54,7 @@ AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
 dnl ### default values (will get overwritten)
+build_acap=false
 build_gnome=true
 build_uigtk=true
 build_demoui=true
@@ -155,6 +156,7 @@ AC_HELP_STRING([--enable-demoui],
 esac],[build_demoui=$build_demoui])
 AM_CONDITIONAL(BUILD_DEMOUI, test x$build_demoui = xtrue)
 
+
 dnl ### Enable gnome features ##
 AC_ARG_ENABLE(gnome,
 AC_HELP_STRING([--enable-gnome],
@@ -168,6 +170,21 @@ AC_HELP_STRING([--enable-gnome],
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-gnome) ;;
 esac],[build_gnome=$build_gnome])
 AM_CONDITIONAL(BUILD_GNOME, test x$build_gnome = xtrue)
+
+
+dnl ### Enable acap features ##
+AC_ARG_ENABLE(acap,
+AC_HELP_STRING([--enable-acap],
+  [Build using acap features]),
+[case "${enableval}" in
+  yes)
+        build_acap=true
+  ;;
+  no)  build_acap=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-acap) ;;
+esac],[build_acap=$build_acap])
+AM_CONDITIONAL(BUILD_ACAP, test x$build_acap = xtrue)
+
 
 dnl ### Enable building the unit tests ##
 AC_ARG_ENABLE(unit-tests,
@@ -395,6 +412,8 @@ libtinymail-maemo/libtinymail-maemo.pc
 libtinymail-gpe/Makefile
 libtinymail-gpe/libtinymail-gpe.pc
 libtinymail-test/Makefile
+libtinymail-acap/Makefile
+libtinymail-acap/libtinymail-acap.pc
 tests/Makefile
 tests/c-demo/Makefile
 tests/shared/Makefile
@@ -408,6 +427,7 @@ echo ""
 echo "The following options are selected:"
 echo ""
 echo "  Enable GNOME features:       $build_gnome"
+echo "  Enable ACAP features:        $build_acap"
 echo "  HTML component:              ${with_html_component}"
 echo "  Python language bindings:    $build_pytinymail"
 echo "  API tests:                   $build_apitests"
