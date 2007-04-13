@@ -37,15 +37,14 @@
  * Return value: the password
  **/
 const gchar * 
-tny_password_getter_get_password (TnyPasswordGetter *self, TnyAccount *account, const gchar *prompt, gboolean *cancel)
+tny_password_getter_get_password (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_PASSWORD_GETTER (self));
-	g_assert (TNY_IS_ACCOUNT (account));
 	g_assert (TNY_PASSWORD_GETTER_GET_IFACE (self)->get_password_func != NULL);
 #endif
 
-	return TNY_PASSWORD_GETTER_GET_IFACE (self)->get_password_func (self, account, prompt, cancel);
+	return TNY_PASSWORD_GETTER_GET_IFACE (self)->get_password_func (self, aid, prompt, cancel);
 }
 
 /**
@@ -56,15 +55,14 @@ tny_password_getter_get_password (TnyPasswordGetter *self, TnyAccount *account, 
  * Set the password question of @self
  **/
 void 
-tny_password_getter_forget_password (TnyPasswordGetter *self, TnyAccount *account)
+tny_password_getter_forget_password (TnyPasswordGetter *self, const gchar *aid)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_PASSWORD_GETTER (self));
-	g_assert (TNY_IS_ACCOUNT (account));
 	g_assert (TNY_PASSWORD_GETTER_GET_IFACE (self)->forget_password_func != NULL);
 #endif
 
-	TNY_PASSWORD_GETTER_GET_IFACE (self)->forget_password_func (self, account);
+	TNY_PASSWORD_GETTER_GET_IFACE (self)->forget_password_func (self, aid);
 
 	return;
 }

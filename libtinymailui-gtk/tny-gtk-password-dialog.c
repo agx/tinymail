@@ -46,14 +46,12 @@ static GHashTable *passwords = NULL;
 
 
 static const gchar*
-tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, TnyAccount *account, const gchar *prompt, gboolean *cancel)
+tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel)
 {
 	TnyGtkPasswordDialogPriv *priv = TNY_GTK_PASSWORD_DIALOG_GET_PRIVATE (self);
 	GtkDialog *dialog = (GtkDialog *) self;
-	const gchar *accountid;
+	const gchar *accountid = aid;
 	const gchar *retval = NULL;
-
-	accountid = tny_account_get_id (account);
 
 	if (G_UNLIKELY (!passwords))
 		passwords = g_hash_table_new (g_str_hash, g_str_equal);
@@ -84,11 +82,11 @@ tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, TnyAccount *accou
 }
 
 static void 
-tny_gtk_password_dialog_forget_password (TnyPasswordGetter *self, TnyAccount *account)
+tny_gtk_password_dialog_forget_password (TnyPasswordGetter *self, const gchar *aid)
 {
 	if (G_LIKELY (passwords))
 	{
-		const gchar *accountid = tny_account_get_id (account);
+		const gchar *accountid = aid;
 
 		gchar *pwd = g_hash_table_lookup (passwords, accountid);
 

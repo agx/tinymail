@@ -47,7 +47,7 @@ struct _TnyAcapAccountStoreClass
 };
 
 GType tny_acap_account_store_get_type (void);
-TnyAccountStore* tny_acap_account_store_new (TnyAccountStore *real);
+TnyAccountStore* tny_acap_account_store_new (TnyAccountStore *real, TnyPasswordGetter *pwdgetter);
 TnyAccountStore* tny_acap_account_store_get_real (TnyAcapAccountStore *self);
 
 G_END_DECLS

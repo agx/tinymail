@@ -21,14 +21,12 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <tny-account.h>
-
 #include <tny-gnome-keyring-password-getter.h>
 
 static GObjectClass *parent_class = NULL;
 
 static const gchar*
-tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, TnyAccount *account, const gchar *prompt, gboolean *cancel)
+tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel)
 {
 	gchar *retval = NULL;
 	GList *list;
@@ -37,10 +35,9 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, TnyAcco
 
 	gnome_keyring_get_default_keyring_sync (&keyring);
 
-	keyringret = gnome_keyring_find_network_password_sync (
-		tny_account_get_user (account),
-		"Mail", tny_account_get_hostname (account),
-		"password", tny_account_get_proto (account), 
+	keyringret = gnome_keyring_find_network_password_sync (aid, "Mail", 
+		aid /* hostname */,
+		"password", aid /* proto */, 
 		"PLAIN", 0, &list);
 
 	if (keyringret != GNOME_KEYRING_RESULT_OK)
@@ -50,15 +47,16 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, TnyAcco
 		GnomePasswordDialog *dialog = GNOME_PASSWORD_DIALOG 
 				(gnome_password_dialog_new
 					(_("Enter password"), prompt,
-					tny_account_get_user (account), 
+					NULL, 
 					NULL, TRUE));
 
 		gnome_password_dialog_set_domain (dialog, "Mail");
 		gnome_password_dialog_set_remember (dialog, 
 			GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER);
+
 		gnome_password_dialog_set_readonly_username (dialog, TRUE);
-		gnome_password_dialog_set_username (dialog, 
-			tny_account_get_user (account));
+		/* gnome_password_dialog_set_username (dialog, 
+			tny_account_get_user (account)); */
 
 		gnome_password_dialog_set_show_username (dialog, FALSE);
 		gnome_password_dialog_set_show_remember (dialog, 
@@ -80,9 +78,9 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, TnyAcco
 			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)
 			{
 				gnome_keyring_set_network_password_sync (keyring,
-					tny_account_get_user (account),
-					"Mail", tny_account_get_hostname (account),
-					"password", tny_account_get_proto (account), 
+					aid /* user */,
+					"Mail", aid /* hostname */,
+					"password", aid /* proto */, 
 					"PLAIN", 0, retval, &item_id);
 			}
 		} else retval = NULL;
@@ -110,7 +108,7 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, TnyAcco
 }
 
 static void
-tny_gnome_keyring_password_getter_forget_password (TnyPasswordGetter *self, TnyAccount *account)
+tny_gnome_keyring_password_getter_forget_password (TnyPasswordGetter *self, const gchar *aid)
 {
 	GList *list=NULL;
 	GnomeKeyringResult keyringret;
@@ -120,9 +118,9 @@ tny_gnome_keyring_password_getter_forget_password (TnyPasswordGetter *self, TnyA
 	gnome_keyring_get_default_keyring_sync (&keyring);
 
 	keyringret = gnome_keyring_find_network_password_sync (
-		tny_account_get_user (account),
-		"Mail", tny_account_get_hostname (account),
-		"password", tny_account_get_proto (account), 
+		aid /* user */,
+		"Mail", aid /* hostname */,
+		"password", aid /* proto */, 
 		"PLAIN", 0, &list);
 
 	if (keyringret == GNOME_KEYRING_RESULT_OK)

@@ -42,16 +42,16 @@ struct _TnyPasswordGetterIface
 {
 	GTypeInterface parent;
 
-	const gchar* (*get_password_func) (TnyPasswordGetter *self, TnyAccount *account, const gchar *prompt, gboolean *cancel);
-	void (*forget_password_func) (TnyPasswordGetter *self, TnyAccount *account);
+	const gchar* (*get_password_func) (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel);
+	void (*forget_password_func) (TnyPasswordGetter *self, const gchar *aid);
 
 };
 
 GType tny_password_getter_get_type (void);
 
 
-const gchar* tny_password_getter_get_password (TnyPasswordGetter *self, TnyAccount *account, const gchar *prompt, gboolean *cancel);
-void tny_password_getter_forget_password (TnyPasswordGetter *self, TnyAccount *account);
+const gchar* tny_password_getter_get_password (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel);
+void tny_password_getter_forget_password (TnyPasswordGetter *self, const gchar *aid);
 
 G_END_DECLS
 

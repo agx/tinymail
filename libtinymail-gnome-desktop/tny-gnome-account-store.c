@@ -77,7 +77,8 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 	gchar *retval;
 
 	pwdgetter = tny_platform_factory_new_password_getter (platfact);
-	retval = (gchar*) tny_password_getter_get_password (pwdgetter, account, prompt, cancel);
+	retval = (gchar*) tny_password_getter_get_password (pwdgetter, 
+		tny_account_get_id (account), prompt, cancel);
 	g_object_unref (G_OBJECT (pwdgetter));
 
 	return retval;
@@ -91,7 +92,7 @@ per_account_forget_pass_func (TnyAccount *account)
 	TnyPasswordGetter *pwdgetter;
 
 	pwdgetter = tny_platform_factory_new_password_getter (platfact);
-	tny_password_getter_forget_password (pwdgetter, account);
+	tny_password_getter_forget_password (pwdgetter, tny_account_get_id (account));
 	g_object_unref (G_OBJECT (pwdgetter));
 
 	return;

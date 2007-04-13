@@ -22,6 +22,7 @@
 #include <string.h>
 #include <glib.h>
 
+#include <tny-password-getter.h>
 #include <tny-account-store.h>
 #include <tny-acap-account-store.h>
 
@@ -37,6 +38,8 @@ typedef struct _TnyAcapAccountStorePriv TnyAcapAccountStorePriv;
 struct _TnyAcapAccountStorePriv
 {
 	TnyAccountStore *real;
+	TnyPasswordGetter *pwdgetter;
+	guint connchanged_signal;
 };
 
 #define TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE(o)	\
@@ -68,12 +71,36 @@ tny_acap_account_store_get_cache_dir (TnyAccountStore *self)
 }
 
 
+
+static void
+connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
+{
+	TnyAcapAccountStore *self;
+
+	/* TODO: sync journal! */
+}
+
+
 static void
 tny_acap_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
 {
 	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyDevice *device = tny_account_store_get_device (priv->real);
 
-	/* TODO: if online, sync local with remote */
+	if (tny_device_is_online (device))
+	{
+		gboolean cancel = FALSE;
+		const gchar *passw = tny_password_getter_get_password (priv->pwdgetter, 
+			"ACAP", _("Give the password for your ACAP server"), &cancel);
+
+		if (!cancel)
+			g_print ("Using %s as password for ACAP\n", passw);
+
+		/* TODO: if online, sync local with remote. 
+		   Don't forget the journal! */
+	}
+
+	g_object_unref (G_OBJECT (device));
 
 	tny_account_store_get_accounts (self, list, types);
 
@@ -93,13 +120,28 @@ add_account_remote (TnyAccountStore *self, TnyAccount *account, const gchar *typ
 }
 
 
+static void
+add_account_journal (TnyAccountStore *self, TnyAccount *account, const gchar *type)
+{
+	g_warning ("Not implemented\n");
+
+	/* TODO: implement for ACAP */
+
+	return;
+}
 
 static void
 tny_acap_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
 {
 	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyDevice *device = tny_account_store_get_device (priv->real);
 
-	add_account_remote (self, TNY_ACCOUNT (account), "store");
+	if (tny_device_is_online (device))
+		add_account_remote (self, TNY_ACCOUNT (account), "store");
+	else
+		add_account_journal (self, TNY_ACCOUNT (account), "store");
+
+	g_object_unref (G_OBJECT (device));
 
 	tny_account_store_add_store_account (priv->real, account);
 
@@ -110,8 +152,14 @@ static void
 tny_acap_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
 {
 	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyDevice *device = tny_account_store_get_device (priv->real);
 
-	add_account_remote (self, TNY_ACCOUNT (account), "transport");
+	if (tny_device_is_online (device))
+		add_account_remote (self, TNY_ACCOUNT (account), "transport");
+	else
+		add_account_journal (self, TNY_ACCOUNT (account), "transport");
+
+	g_object_unref (G_OBJECT (device));
 
 	tny_account_store_add_transport_account (priv->real, account);
 
@@ -133,12 +181,20 @@ tny_acap_account_store_get_device (TnyAccountStore *self)
  * Return value: A new #TnyAccountStore implemented for ACAP
  **/
 TnyAccountStore*
-tny_acap_account_store_new (TnyAccountStore *real)
+tny_acap_account_store_new (TnyAccountStore *real, TnyPasswordGetter *pwdgetter)
 {
 	TnyAcapAccountStore *self = g_object_new (TNY_TYPE_ACAP_ACCOUNT_STORE, NULL);
 	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (self);
+	TnyDevice *device;
 
 	priv->real = TNY_ACCOUNT_STORE (g_object_ref (G_OBJECT (real))); 
+	priv->pwdgetter = TNY_PASSWORD_GETTER (g_object_ref (G_OBJECT (pwdgetter))); 
+
+	device = tny_account_store_get_device (priv->real);
+	priv->connchanged_signal = g_signal_connect (
+			G_OBJECT (device), "connection_changed",
+			G_CALLBACK (connection_changed), self);
+	g_object_unref (G_OBJECT (device));
 
 	return TNY_ACCOUNT_STORE (self);
 }
@@ -150,6 +206,7 @@ tny_acap_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (instance);
 
 	priv->real = NULL;
+	priv->pwdgetter;
 
 	return;
 }
@@ -160,10 +217,18 @@ static void
 tny_acap_account_store_finalize (GObject *object)
 {	
 	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (object);
+	TnyDevice *device;
 
+	device = tny_account_store_get_device (priv->real);
+	g_signal_handler_disconnect (G_OBJECT (device), 
+			priv->connchanged_signal);
+	g_object_unref (G_OBJECT (device));
 
 	if (priv->real)
 		g_object_unref (G_OBJECT (priv->real));
+
+	if (priv->pwdgetter)
+		g_object_unref (G_OBJECT (priv->pwdgetter));
 
 	(*parent_class->finalize) (object);
 
