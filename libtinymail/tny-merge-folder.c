@@ -487,6 +487,15 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 	return;
 }
 
+TnyFolder*
+tny_merge_folder_new (void)
+{
+	TnyMergeFolder *self = g_object_new (TNY_TYPE_MERGE_FOLDER, NULL);
+
+	return TNY_FOLDER (self);
+
+}
+
 static void
 tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -568,6 +577,9 @@ tny_merge_folder_class_init (TnyMergeFolderClass *klass)
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 	object_class->finalize = tny_merge_folder_finalize;
+
+	g_type_class_add_private (object_class, sizeof (TnyMergeFolderPriv));
+
 }
 
 

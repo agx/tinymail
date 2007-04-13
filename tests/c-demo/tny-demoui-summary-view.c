@@ -64,6 +64,7 @@
 #include <tny-demoui-summary-view.h>
 #include <tny-summary-view.h>
 #include <tny-account-store-view.h>
+#include <tny-merge-folder.h>
 
 #define GO_ONLINE_TXT _("Go online")
 #define GO_OFFLINE_TXT _("Go offline")
@@ -921,6 +922,63 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 	}
 }
 
+
+static void 
+on_merge_view_activate (GtkMenuItem *mitem, gpointer user_data)
+{
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeModel *model, *hmodel;
+	GtkTreeModel *sortable;
+	GList *list;
+	TnyFolder *merge = tny_merge_folder_new ();
+	GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
+
+	list = gtk_tree_selection_get_selected_rows (priv->mailbox_select, &model);
+
+	while (list)
+	{
+		GtkTreePath *path = list->data;
+		GtkTreeIter iter;
+		TnyFolder *folder;
+
+		gtk_tree_model_get_iter (model, &iter, path);
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&folder, -1);
+
+		if (folder && TNY_IS_FOLDER (folder))
+		{
+			tny_merge_folder_add_folder (TNY_MERGE_FOLDER (merge), folder);
+			g_object_unref (folder);
+		}
+
+		gtk_tree_path_free (path);
+		list = g_list_next (list);
+	}
+
+	hmodel = tny_gtk_header_list_model_new ();
+	tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), 
+		merge, FALSE);
+
+
+	sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (hmodel));
+
+	gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+		TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
+		tny_gtk_header_list_model_received_date_sort_func, 
+		NULL, NULL);
+
+	gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+		TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
+		tny_gtk_header_list_model_sent_date_sort_func, 
+		NULL, NULL);
+
+	set_header_view_model (header_view, sortable);
+
+	g_list_free (list);
+}
+
 static void
 header_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointer user_data)
 {
@@ -973,15 +1031,15 @@ static void
 mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointer user_data)
 {
 	GtkWidget *menu;
-	GtkWidget *mrename, *mdelete, *mcreate;
+	GtkWidget *mrename, *mdelete, *mcreate, *mmerge;
 	int button, event_time;
 
 	menu = gtk_menu_new ();
-	//g_signal_connect (menu, "deactivate", G_CALLBACK (gtk_widget_destroy), NULL);
 
 	mrename = gtk_menu_item_new_with_label (_("Rename folder"));
 	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
 	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
+	mmerge = gtk_menu_item_new_with_label (_("Merge view of selected"));
 
 	g_signal_connect (G_OBJECT (mrename), "activate",
 		G_CALLBACK (on_rename_folder_activate), user_data);
@@ -989,15 +1047,18 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 		G_CALLBACK (on_create_folder_activate), user_data);
 	g_signal_connect (G_OBJECT (mdelete), "activate",
 		G_CALLBACK (on_delete_folder_activate), user_data);
+	g_signal_connect (G_OBJECT (mmerge), "activate",
+		G_CALLBACK (on_merge_view_activate), user_data);
 
 	gtk_menu_prepend (menu, mrename);
 	gtk_menu_prepend (menu, mcreate);
 	gtk_menu_prepend (menu, mdelete);
+	gtk_menu_prepend (menu, mmerge);
 
 	gtk_widget_show (mrename);
 	gtk_widget_show (mcreate);
 	gtk_widget_show (mdelete);
-
+	gtk_widget_show (mmerge);
 
 	if (event)
 	{

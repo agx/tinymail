@@ -670,26 +670,63 @@ find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointe
 	return FALSE;
 }
 
-static void
-tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
+typedef struct {
+	TnyFolderObserver *self;
+	TnyFolderChange *change;
+} FolObsUpInfo;
+
+static gboolean
+folder_obsr_update_idle (gpointer user_data)
 {
+	FolObsUpInfo *info = user_data;
+	TnyFolderObserver *self = info->self;
+	TnyFolderChange *change = info->change;
 	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel *) self;
+
 
 	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME ||
 		changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || 
 		changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
 	{
+		gdk_threads_enter ();
 		gtk_tree_model_foreach (model, updater, change);
+		gdk_threads_leave ();
 	}
+
+	g_object_unref (self);
+	g_object_unref (change);
+
+	g_slice_free (FolObsUpInfo, info);
+
+	return FALSE;
+}
+
+static void
+tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	FolObsUpInfo *info = g_slice_new (FolObsUpInfo);
+	info->self = TNY_FOLDER_OBSERVER (g_object_ref (self));
+	info->change = TNY_FOLDER_CHANGE (g_object_ref (change));
+
+	g_timeout_add (0, folder_obsr_update_idle, info);
+
+	return;
 }
 
 
+typedef struct {
+	TnyFolderObserver *self;
+	TnyFolderStoreChange *change;
+} FolStObsUpInfo;
 
-static void
-tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
+static gboolean
+folder_store_obsr_update_idle (gpointer user_data)
 {
+	FolStObsUpInfo *info = user_data;
+	TnyFolderObserver *self = info->self;
+	TnyFolderStoreChange *change = info->change;
 	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
@@ -763,6 +800,26 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 		g_object_unref (G_OBJECT (miter));
 		g_object_unref (G_OBJECT (removed));
 	}
+
+
+	g_object_unref (self);
+	g_object_unref (change);
+
+	g_slice_free (FolStObsUpInfo, info);
+
+	return FALSE;
+}
+
+static void
+tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
+{
+	FolStObsUpInfo *info = g_slice_new (FolStObsUpInfo);
+	info->self = TNY_FOLDER_OBSERVER (g_object_ref (self));
+	info->change = TNY_FOLDER_STORE_CHANGE (g_object_ref (change));
+
+	g_timeout_add (0, folder_store_obsr_update_idle, info);
+
+	return;
 }
 
 static void
