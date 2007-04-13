@@ -485,14 +485,18 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
 	GtkTreeModel *sortable;
 	gboolean refresh = FALSE;
+	GtkSelectionMode mode;
 
 #ifndef ASYNC_HEADERS
 	refresh = TRUE;
 #endif
 
+	mode = gtk_tree_selection_get_mode (selection);
 
-	if (gtk_tree_selection_get_selected (selection, &model, &iter))
+	if (mode == GTK_SELECTION_SINGLE)
 	{
+	  if (gtk_tree_selection_get_selected (selection, &model, &iter))
+	  {
 		TnyFolder *folder;
 		gint type;
 
@@ -565,6 +569,55 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			g_object_unref (G_OBJECT (folder));
 		}
+	  }
+	} else {
+		GList *list;
+		TnyFolder *merge = tny_merge_folder_new ();
+		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
+
+		list = gtk_tree_selection_get_selected_rows (priv->mailbox_select, &model);
+
+		while (list)
+		{
+			GtkTreePath *path = list->data;
+			GtkTreeIter iter;
+			TnyFolder *folder;
+
+			gtk_tree_model_get_iter (model, &iter, path);
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
+
+			if (folder && TNY_IS_FOLDER (folder))
+			{
+				tny_merge_folder_add_folder (TNY_MERGE_FOLDER (merge), folder);
+				g_object_unref (folder);
+			}
+
+			gtk_tree_path_free (path);
+			list = g_list_next (list);
+		}
+
+		hmodel = tny_gtk_header_list_model_new ();
+		tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), 
+			merge, FALSE);
+
+
+		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (hmodel));
+
+		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+			TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
+			tny_gtk_header_list_model_received_date_sort_func, 
+			NULL, NULL);
+
+		gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
+			TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
+			tny_gtk_header_list_model_sent_date_sort_func, 
+			NULL, NULL);
+
+		set_header_view_model (header_view, sortable);
+
+		g_list_free (list);
 	}
 
 	return;
@@ -928,55 +981,15 @@ on_merge_view_activate (GtkMenuItem *mitem, gpointer user_data)
 {
 	TnyDemouiSummaryView *self = user_data;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
-	GtkTreeModel *model, *hmodel;
-	GtkTreeModel *sortable;
-	GList *list;
-	TnyFolder *merge = tny_merge_folder_new ();
-	GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
+	GtkSelectionMode mode;
 
-	list = gtk_tree_selection_get_selected_rows (priv->mailbox_select, &model);
+	mode = gtk_tree_selection_get_mode (priv->mailbox_select);
 
-	while (list)
-	{
-		GtkTreePath *path = list->data;
-		GtkTreeIter iter;
-		TnyFolder *folder;
+	if (mode == GTK_SELECTION_SINGLE)
+		gtk_tree_selection_set_mode (priv->mailbox_select, GTK_SELECTION_MULTIPLE);
+	else
+		gtk_tree_selection_set_mode (priv->mailbox_select, GTK_SELECTION_SINGLE);
 
-		gtk_tree_model_get_iter (model, &iter, path);
-		gtk_tree_model_get (model, &iter, 
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
-			&folder, -1);
-
-		if (folder && TNY_IS_FOLDER (folder))
-		{
-			tny_merge_folder_add_folder (TNY_MERGE_FOLDER (merge), folder);
-			g_object_unref (folder);
-		}
-
-		gtk_tree_path_free (path);
-		list = g_list_next (list);
-	}
-
-	hmodel = tny_gtk_header_list_model_new ();
-	tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), 
-		merge, FALSE);
-
-
-	sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (hmodel));
-
-	gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
-		TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN,
-		tny_gtk_header_list_model_received_date_sort_func, 
-		NULL, NULL);
-
-	gtk_tree_sortable_set_sort_func (GTK_TREE_SORTABLE (sortable),
-		TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN,
-		tny_gtk_header_list_model_sent_date_sort_func, 
-		NULL, NULL);
-
-	set_header_view_model (header_view, sortable);
-
-	g_list_free (list);
 }
 
 static void
@@ -1030,16 +1043,26 @@ header_view_popup_menu_event (GtkWidget *widget, gpointer user_data)
 static void
 mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointer user_data)
 {
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	GtkWidget *menu;
 	GtkWidget *mrename, *mdelete, *mcreate, *mmerge;
 	int button, event_time;
+	GtkSelectionMode mode;
 
 	menu = gtk_menu_new ();
 
 	mrename = gtk_menu_item_new_with_label (_("Rename folder"));
 	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
 	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
-	mmerge = gtk_menu_item_new_with_label (_("Merge view of selected"));
+
+
+	mode = gtk_tree_selection_get_mode (priv->mailbox_select);
+
+	if (mode == GTK_SELECTION_SINGLE)
+		mmerge = gtk_menu_item_new_with_label (_("Merge view of selected mode"));
+	else
+		mmerge = gtk_menu_item_new_with_label (_("Select one folder mode"));
 
 	g_signal_connect (G_OBJECT (mrename), "activate",
 		G_CALLBACK (on_rename_folder_activate), user_data);
