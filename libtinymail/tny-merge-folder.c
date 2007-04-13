@@ -95,7 +95,7 @@ tny_merge_folder_get_msg_remove_strategy (TnyFolder *self)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	return TNY_MSG_REMOVE_STRATEGY (g_object_ref (priv->rem_strat));
+	return priv->rem_strat?TNY_MSG_REMOVE_STRATEGY (g_object_ref (priv->rem_strat)):NULL;
 }
 
 static void
@@ -116,7 +116,7 @@ tny_merge_folder_get_msg_receive_strategy (TnyFolder *self)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	return TNY_MSG_RECEIVE_STRATEGY (g_object_ref (priv->rec_strat));
+	return priv->rec_strat?TNY_MSG_RECEIVE_STRATEGY (g_object_ref (priv->rec_strat)):NULL;
 }
 
 static void
@@ -136,29 +136,70 @@ tny_merge_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrateg
 static TnyMsg*
 tny_merge_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
-	g_print ("STUB: tny_merge_folder_get_msg\n");
+	TnyFolder *fol = tny_header_get_folder (header);
+	TnyMsg *retval = tny_folder_get_msg (fol, header, err);
+	g_object_unref (fol);
 
-	return NULL;
+	return retval;
 }
 
 static TnyMsg*
 tny_merge_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
 {
-	g_print ("STUB: tny_merge_folder_find_msg\n");
 
-	return NULL;
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+	TnyMsg *retval = NULL;
+
+	iter = tny_list_create_iterator (priv->mothers);
+	while (!tny_iterator_is_done (iter) && !retval)
+	{
+		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+		retval = tny_folder_find_msg (cur, url_string, err);
+
+		/* TODO: Handle err */
+
+		g_object_unref (cur);
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (iter);
+
+	return retval;
 }
 
 static void
 tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
 {
-	g_print ("STUB: tny_merge_folder_get_msg_async\n");
+	GError *err = NULL;
+	TnyMsg *msg;
+
+	/* TODO: do this is a thread */
+	msg = tny_merge_folder_get_msg (self, header, &err);
+
+	if (callback) /* TODO: this is not always on the gmainloop */
+		callback (self, msg, &err, user_data);
 }
 
 static void
 tny_merge_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err)
 {
-	g_print ("STUB: tny_merge_folder_get_headers\n");
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+
+	iter = tny_list_create_iterator (priv->mothers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+		tny_folder_get_headers (cur, headers, refresh, err);
+
+		/* TODO: Handle err */
+
+		g_object_unref (cur);
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (iter);
 }
 
 static const gchar*
@@ -275,23 +316,62 @@ tny_merge_folder_is_subscribed (TnyFolder *self)
 }
 
 static void
-tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_merge_folder_refresh (TnyFolder *self, GError **err)
 {
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+
+	iter = tny_list_create_iterator (priv->mothers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+		tny_folder_refresh (cur, err);
+
+		/* TODO: Handler err */
+
+		g_object_unref (cur);
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (iter);
+
 }
 
 static void
-tny_merge_folder_refresh (TnyFolder *self, GError **err)
+tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
 {
+	GError *err = NULL;
+
+	/* TODO: do this is a thread */
+	tny_merge_folder_refresh (self, &err);
+
+	if (callback) /* TODO: this is not always on the gmainloop */
+		callback (self, FALSE, &err, user_data);
 }
 
 static void
 tny_merge_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
+	g_warning ("tny_merge_folder_transfer_msgs not implemented: "
+		   "transfer using the mother folders instead\n");
+
+	g_set_error (err, TNY_FOLDER_ERROR, 
+		TNY_FOLDER_ERROR_TRANSFER_MSGS,
+		"tny_merge_folder_transfer_msgs not implemented: "
+		"transfer using the mother folders instead");
 }
 
 static void
 tny_merge_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data)
 {
+	GError *err = NULL;
+
+	/* TODO: do this is a thread */
+	tny_merge_folder_transfer_msgs (self, header_list, folder_dst, delete_originals, &err);
+
+	if (callback) 	/* TODO call the callback in gmainloop */
+		callback (self, &err, user_data);
+
 }
 
 static TnyFolder*
@@ -397,6 +477,16 @@ tny_merge_folder_get_caps (TnyFolder *self)
 	return 0;
 }
 
+void 
+tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
+{
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+
+	tny_list_prepend (priv->mothers, G_OBJECT (folder));
+
+	return;
+}
+
 static void
 tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -406,6 +496,8 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->name = g_strdup ("Merged folder");
 	priv->id = g_strdup  ("");
 	priv->mothers = tny_simple_list_new ();
+	priv->rec_strat = NULL;
+	priv->rem_strat = NULL;
 
 	return;
 }
@@ -422,6 +514,12 @@ tny_merge_folder_finalize (GObject *object)
 
 	if (priv->name)
 		g_free (priv->name);
+
+	if (priv->rec_strat)
+		g_object_unref (priv->rec_strat);
+
+	if (priv->rem_strat)
+		g_object_unref (priv->rem_strat);
 
 	parent_class->finalize (object);
 }
@@ -509,5 +607,7 @@ tny_merge_folder_get_type (void)
 			&tny_folder_info);
 
 	}
+
+
 	return type;
 }

@@ -52,54 +52,12 @@ struct _TnyMergeFolder
 struct _TnyMergeFolderClass 
 {
 	GObjectClass parent;
-
-	/* virtual methods */
-	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
-	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
-	void (*sync_func) (TnyFolder *self, gboolean expunge, GError **err);
-	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
-	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
-	TnyMsgReceiveStrategy* (*get_msg_receive_strategy_func) (TnyFolder *self);
-	void (*set_msg_receive_strategy_func) (TnyFolder *self, TnyMsgReceiveStrategy *st);
-	TnyMsg* (*get_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
-	TnyMsg* (*find_msg_func) (TnyFolder *self, const gchar *url_string, GError **err);
-	void (*get_msg_async_func) (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data);
-	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
-	const gchar* (*get_name_func) (TnyFolder *self);
-	const gchar* (*get_id_func) (TnyFolder *self);
-	TnyAccount* (*get_account_func) (TnyFolder *self);
-	void (*set_name_func) (TnyFolder *self, const gchar *name, GError **err);
-	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
-	guint (*get_all_count_func) (TnyFolder *self);
-	guint (*get_unread_count_func) (TnyFolder *self);
-	gboolean (*is_subscribed_func) (TnyFolder *self);
-	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data);
-	void (*refresh_func) (TnyFolder *self, GError **err);
-	void (*transfer_msgs_func) (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
-	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data);
-	TnyFolder* (*copy_func) (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
-	void (*poke_status_func) (TnyFolder *self);
-	void (*add_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
-	void (*remove_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
-	TnyFolderStats* (*get_stats_func) (TnyFolder *self);
-	gchar* (*get_url_string_func) (TnyFolder *self);
-	TnyFolderCaps (*get_caps_func) (TnyFolder *self);
-
-	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
-	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
-	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder, GError **err);
-	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
-	TnyFolderStore* (*get_folder_store_func) (TnyFolder *self);
-	void (*add_store_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
-	void (*remove_store_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
-
 };
 
 GType tny_merge_folder_get_type (void);
 
-
 TnyFolder* tny_merge_folder_new (void);
-void tny_merge_folder_add_folder (TnyFolder *folder);
+void tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder);
 
 G_END_DECLS
 
