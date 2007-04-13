@@ -1,3 +1,8 @@
+2007-04-13 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* remove #include for removed tny-maemo-password-dialog.h,
+	  this broke the compilation
+
 2007-04-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added skeleton for ACAP support

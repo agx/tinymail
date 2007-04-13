@@ -34,7 +34,6 @@
 
 #include <tny-account-store.h>
 #include <tny-maemo-account-store.h>
-#include <tny-maemo-password-dialog.h>
 #include <tny-account.h>
 #include <tny-store-account.h>
 #include <tny-transport-account.h>
