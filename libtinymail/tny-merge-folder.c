@@ -517,7 +517,9 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	/* TODO: register self as observer of @folder */
+	/* TODO: register @self as observer of @folder and proxy the
+	 * events through to observers of @self. */
+
 	tny_list_prepend (priv->mothers, G_OBJECT (folder));
 
 	return;
