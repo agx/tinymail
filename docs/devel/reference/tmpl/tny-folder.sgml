@@ -37,6 +37,7 @@ A abstract type that defines a folder
 @get_msg_receive_strategy_func: 
 @set_msg_receive_strategy_func: 
 @get_msg_func: 
+@find_msg_func: 
 @get_msg_async_func: 
 @get_headers_func: 
 @get_name_func: 
@@ -148,6 +149,17 @@ A abstract type that defines a folder
 
 @self: 
 @header: 
+@err: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_find_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@url_string: 
 @err: 
 @Returns: 
 

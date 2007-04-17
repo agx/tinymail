@@ -44,7 +44,6 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @account_store: 
 @interactive: 
 @prev_constat: 
-@first_switch: 
 @connchanged_signal: 
 @current_accounts: 
 @camel_dir: 

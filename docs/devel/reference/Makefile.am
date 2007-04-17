@@ -29,7 +29,7 @@ TO_SCAN = \
 	--source-dir=$(top_srcdir)/libtinymailui-mozembed \
 	--source-dir=$(top_srcdir)/libtinymail-gnomevfs \
 	--source-dir=$(top_srcdir)/libtinymail-gnome-desktop \
-	--source-dir=$(top_srcdir)/libtinymail-camel
+	--source-dir=$(top_srcdir)/libtinymail-camel 
 
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED" 
@@ -106,6 +106,7 @@ GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS)						\
 	$(top_builddir)/libtinymail-gnome-desktop/libtinymail-gnome-desktop-$(API_VERSION).la	\
 	$(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la		\
 	$(top_builddir)/tests/shared/libtestsshared.a
+
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.
 include $(top_srcdir)/gtk-doc.make

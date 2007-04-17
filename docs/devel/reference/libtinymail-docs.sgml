@@ -31,6 +31,8 @@
 <!ENTITY libtinymail-TnyFolderChange SYSTEM "xml/tny-folder-change.xml">
 <!ENTITY libtinymail-TnyFolderStoreObserver SYSTEM "xml/tny-folder-store-observer.xml">
 <!ENTITY libtinymail-TnyFolderStoreChange SYSTEM "xml/tny-folder-store-change.xml">
+<!ENTITY libtinymail-TnyPasswordGetter SYSTEM "xml/tny-password-getter.xml">
+<!ENTITY libtinymail-TnyMergeFolder SYSTEM "xml/tny-merge-folder.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
 
 
@@ -70,6 +72,7 @@
 <!ENTITY libtinymailui-gtk-TnyGtkMimePartSaveStrategy SYSTEM "xml/tny-gtk-mime-part-save-strategy.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkTextMimePartView SYSTEM "xml/tny-gtk-text-mime-part-view.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkLockable SYSTEM "xml/tny-gtk-lockable.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkPasswordDialog SYSTEM "xml/tny-gtk-password-dialog.xml">
 
 <!ENTITY libtinymailui-TnyMimePartSaver SYSTEM "xml/tny-mime-part-saver.xml">
 <!ENTITY libtinymailui-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
@@ -87,7 +90,6 @@
 
 <!ENTITY libtinymail-gnome-desktop-TnyGnomePlatformFactory SYSTEM "xml/tny-gnome-platform-factory.xml">
 <!ENTITY libtinymail-gnome-desktop-TnyGnomeAccountStore SYSTEM "xml/tny-gnome-account-store.xml">
-<!ENTITY libtinymail-gnome-desktop-TnyGnomePasswordDialog SYSTEM "xml/tny-gnome-password-dialog.xml">
 <!ENTITY libtinymail-gnome-desktop-TnyGnomeDevice SYSTEM "xml/tny-gnome-device.xml">
 
 
@@ -131,6 +133,7 @@
 		&libtinymail-TnyMsg;
 		&libtinymail-TnyMimePart;
 		&libtinymail-TnyFolder;
+		&libtinymail-TnyMergeFolder;
 		&libtinymail-TnyMsgRemoveStrategy;
 		&libtinymail-TnyMsgReceiveStrategy;
 		&libtinymail-TnyHeader;
@@ -149,6 +152,7 @@
 		&libtinymail-TnyFolderStats;
 		&libtinymail-TnyFolderStoreObserver;
 		&libtinymail-TnyFolderStoreChange;
+		&libtinymail-TnyPasswordGetter;
 		&libtinymail-TnyEnums;
 		&libtinymail-TnyShared;
 	</chapter>
@@ -181,6 +185,7 @@
 		&libtinymailui-gtk-TnyGtkTextMimePartView;
 		&libtinymailui-gtk-TnyGtkAttachmentMimePartView;
 		&libtinymailui-gtk-TnyGtkLockable;
+		&libtinymailui-gtk-TnyGtkPasswordDialog;
 		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 
@@ -199,7 +204,6 @@
 	<chapter id="libtinymail-gnome-desktop">
 	<title>libtinymail-gnome-desktop - implementations for a gnome desktop</title>
 		&libtinymail-gnome-desktop-TnyGnomeAccountStore;
-		&libtinymail-gnome-desktop-TnyGnomePasswordDialog;
 		&libtinymail-gnome-desktop-TnyGnomePlatformFactory;
 		&libtinymail-gnome-desktop-TnyGnomeDevice;
 	</chapter>

@@ -27,6 +27,7 @@ tny-folder-priv
 @folder_changed_id: 
 @headers_managed: 
 @folder_lock: 
+@obs_lock: 
 @folder: 
 @folder_name: 
 @account: 

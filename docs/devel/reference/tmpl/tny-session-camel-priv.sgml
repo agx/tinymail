@@ -26,7 +26,6 @@ tny-session-camel-priv
 @account_store: 
 @interactive: 
 @prev_constat: 
-@first_switch: 
 @connchanged_signal: 
 @current_accounts: 
 @camel_dir: 

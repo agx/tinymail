@@ -1,6 +1,7 @@
 anything
 msg-sender
 msg-transfer
+folder-transfer
 folder-lister-async
 tags
 Makefile.in

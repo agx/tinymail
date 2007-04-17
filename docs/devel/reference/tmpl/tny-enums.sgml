@@ -17,6 +17,14 @@ Enumerations for tinymail
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### ENUM TnyFolderCaps ##### -->
+<para>
+
+</para>
+
+@TNY_FOLDER_CAPS_WRITABLE: 
+@TNY_FOLDER_CAPS_PUSHEMAIL: 
+
 <!-- ##### ENUM TnyFolderChangeChanged ##### -->
 <para>
 

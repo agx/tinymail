@@ -117,6 +117,7 @@ Shared include file with forward typedefs
 @get_msg_receive_strategy_func: 
 @set_msg_receive_strategy_func: 
 @get_msg_func: 
+@find_msg_func: 
 @get_msg_async_func: 
 @get_headers_func: 
 @get_name_func: 
@@ -285,6 +286,7 @@ Shared include file with forward typedefs
 @subscription_changed: 
 @subscribe_func: 
 @unsubscribe_func: 
+@find_folder_func: 
 
 <!-- ##### STRUCT TnyTransportAccount ##### -->
 <para>
@@ -491,26 +493,6 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 
-<!-- ##### SIGNAL TnySendQueue::error-happened ##### -->
-<para>
-
-</para>
-
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-
-<!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
-<para>
-
-</para>
-
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
 
@@ -664,4 +646,19 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @parent: 
+
+<!-- ##### STRUCT TnyPasswordGetter ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyPasswordGetterIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_password_func: 
+@forget_password_func: 
 
