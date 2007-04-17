@@ -391,13 +391,34 @@ tny_merge_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, Tny
 static TnyFolder*
 tny_merge_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err)
 {
-	g_warning ("tny_merge_folder_copy not implemented: "
-		   "copy it to one the mother folders instead\n");
-	
-	g_set_error (err, TNY_FOLDER_ERROR, 
-		TNY_FOLDER_ERROR_COPY,
-		"tny_merge_folder_copy not implemented: "
-		"copy it to one of the mother folders instead");
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter = tny_list_create_iterator (priv->mothers);
+	TnyFolder *nfol = NULL;
+
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
+
+		if (!nfol)
+		{
+			nfol = tny_folder_copy (folder, into, new_name, del, err);
+			/* TODO: handle err */
+		} else {
+			TnyList *nlist = tny_simple_list_new ();
+
+			tny_folder_get_headers (folder, nlist, FALSE, err);
+			/* TODO: handle err */
+			tny_folder_transfer_msgs (folder, nlist, nfol, del, err);
+			/* TODO: handle err*/
+			g_object_unref (nlist);
+		}
+
+
+		g_object_unref (folder);
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (iter);
 
 	return NULL;
 }
