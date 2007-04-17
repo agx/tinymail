@@ -1,3 +1,7 @@
+2007-04-17 Sergio Villar Senin  <svillar@igalia.com>
+
+	* Fixed a build error regarding the new TnyMaemoConicDevice
+
 2007-04-17 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Add the TnyMaemoConicDevice, which exposes libconic-specific
