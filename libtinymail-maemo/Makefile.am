@@ -1,7 +1,6 @@
 INCLUDES = -I. -I$(top_srcdir) \
 	$(LIBTINYMAIL_MAEMO_CFLAGS) \
 	$(LIBTINYMAIL_CAMEL_CFLAGS) \
-	$(LIBTINYMAIL_MAEMO_CONIC_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
 	-I$(top_srcdir)/libtinymailui \
 	-I$(top_srcdir)/libtinymailui-gtk \
@@ -28,7 +27,6 @@ libtinymail_maemo_1_0_la_SOURCES =  \
 
 libtinymail_maemo_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_MAEMO_LIBS) \
-	$(LIBTINYMAIL_MAEMO_CONIC_LIBS) \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \

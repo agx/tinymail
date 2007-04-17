@@ -330,8 +330,7 @@ AC_DEFUN([ARMEL_TARGET],
 
 dnl ### libtinymail-maemo, a platform library implementation for the maemo platform ##
 if test x$PLATFORMDIR = xlibtinymail-maemo; then
- PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 hildon-libs libosso)
- PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO_CONIC,conic,conic=yes,conic=no)
+ PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 hildon-libs libosso conic, conic=yes,conic=no)
  if test "$conic"=="yes"; then
      MAEMO_DEVICE='tny-maemo-conic-device.$(OBJEXT)'
  fi
@@ -349,8 +348,6 @@ else
 fi
 AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
-AC_SUBST(LIBTINYMAIL_MAEMO_CONIC_CFLAGS)
-AC_SUBST(LIBTINYMAIL_MAEMO_CONIC_LIBS)
 
 
 
