@@ -34,8 +34,6 @@ G_BEGIN_DECLS
 #define TNY_IS_MAEMO_DEVICE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_MAEMO_DEVICE))
 #define TNY_MAEMO_DEVICE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_MAEMO_DEVICE, TnyMaemoDeviceClass))
 
-/* This is an abstract type */
-
 typedef struct _TnyMaemoDevice TnyMaemoDevice;
 typedef struct _TnyMaemoDeviceClass TnyMaemoDeviceClass;
 

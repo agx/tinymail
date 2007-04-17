@@ -324,15 +324,38 @@ AC_SUBST(LIBTINYMAIL_OLPC_CFLAGS)
 AC_SUBST(LIBTINYMAIL_OLPC_LIBS)
 	      
 
+AC_DEFUN([ARMEL_TARGET],
+	[if sb-conf cu | grep -i 'armel' >/dev/null 2>&1; then
+	    armel_target=yes])
+
 dnl ### libtinymail-maemo, a platform library implementation for the maemo platform ##
 if test x$PLATFORMDIR = xlibtinymail-maemo; then
- PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 hildon-libs libosso   conic)
+ PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 hildon-libs libosso)
+ PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO_CONIC,conic,conic=yes,conic=no)
+ if test "$conic"=="yes"; then
+     MAEMO_DEVICE='tny-maemo-conic-device.$(OBJEXT)'
+ fi
+ dnl HACK: unless we are building for arm, make the device a 'dummy' assuming it is always online
+ dnl this is because scratcbhox-Conic does not support ethernet, and will therefore never consider
+ dnl itself 'online'	
+if test -z "`sb-conf show -c | grep arm`"; then
+ AC_DEFINE_UNQUOTED(MAEMO_CONIC_DUMMY,1,["Whether to hack the TnyMaemoConicDevice to somewhat work in sbox"])
+fi
+
+ AC_SUBST([MAEMO_DEVICE])
 else
  LIBTINYMAIL_MAEMO_CFLAGS=
  LIBTINYMAIL_MAEMO_LIBS=
 fi
 AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
+AC_SUBST(LIBTINYMAIL_MAEMO_CONIC_CFLAGS)
+AC_SUBST(LIBTINYMAIL_MAEMO_CONIC_LIBS)
+
+
+
+
+
 
 dnl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
 if test x$PLATFORMDIR = xlibtinymail-gpe; then

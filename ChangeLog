@@ -1,3 +1,14 @@
+2007-04-17 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Add the TnyMaemoConicDevice, which exposes libconic-specific
+	functionality. When built for scratchbox, it tries to work in 'dummy
+	mode', to make it still somewhat functional, even though connectivity
+	does not work in scratchbox. The conic-specifics are only lightly
+	tested. and need work, esp. for doing something in sbox
+
+	* TnyMaemoDevice goes back to the dummy it was before, so this should
+	make pre-libconic compiles (770) also possible; not tested though.
+
 2007-04-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Introduction of the TnyMergeFolder type
