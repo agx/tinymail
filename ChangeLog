@@ -1,3 +1,8 @@
+2007-04-17  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Further implementing of TnyMergeFolder
+	* Bugfix in TnyGtkHeaderListModel
+
 2007-04-17 Sergio Villar Senin  <svillar@igalia.com>
 
 	* Fixed a build error regarding the new TnyMaemoConicDevice

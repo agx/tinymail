@@ -33,8 +33,6 @@ struct _TnyMergeFolderPriv
 {
 	gchar *id, *name;
 	TnyList *mothers;
-	TnyMsgRemoveStrategy *rem_strat;
-	TnyMsgReceiveStrategy *rec_strat;
 };
 
 #define TNY_MERGE_FOLDER_GET_PRIVATE(o) \
@@ -44,15 +42,12 @@ struct _TnyMergeFolderPriv
 static void
 tny_merge_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
-	g_warning ("tny_merge_folder_remove_msg not implemented: "
-		   "remove it from the mother folder instead. "
-		   "Use tny_header_get_folder");
+	TnyFolder *fol = tny_header_get_folder (header);
 
-	g_set_error (err, TNY_FOLDER_ERROR, 
-		TNY_FOLDER_ERROR_REMOVE_MSG,
-		"tny_merge_folder_remove_msg not implemented: "
-		"remove it from the mother folder instead. "
-		"Use tny_header_get_folder");
+	tny_folder_remove_msg (fol, header, err);
+	g_object_unref (fol);
+
+	return;
 }
 
 static void
@@ -60,7 +55,7 @@ tny_merge_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 {
 	g_warning ("tny_merge_folder_add_msg not implemented: "
 		   "add it to the mother folder instead\n");
-	
+
 	g_set_error (err, TNY_FOLDER_ERROR, 
 		TNY_FOLDER_ERROR_ADD_MSG,
 		"tny_merge_folder_add_msg not implemented: "
@@ -93,20 +88,19 @@ tny_merge_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 static TnyMsgRemoveStrategy*
 tny_merge_folder_get_msg_remove_strategy (TnyFolder *self)
 {
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	return priv->rem_strat?TNY_MSG_REMOVE_STRATEGY (g_object_ref (priv->rem_strat)):NULL;
+	g_warning ("tny_merge_folder_get_msg_remove_strategy not implemented: "
+		   "add it to the mother folder instead\n");
+
+	return NULL;
 }
 
 static void
 tny_merge_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
 {
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	if (priv->rem_strat)
-		g_object_unref (priv->rem_strat);
-
-	priv->rem_strat = g_object_ref (st);
+	g_warning ("tny_merge_folder_set_msg_remove_strategy not implemented: "
+		   "add it to the mother folder instead\n");
 
 	return;
 }
@@ -114,20 +108,19 @@ tny_merge_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy 
 static TnyMsgReceiveStrategy*
 tny_merge_folder_get_msg_receive_strategy (TnyFolder *self)
 {
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	return priv->rec_strat?TNY_MSG_RECEIVE_STRATEGY (g_object_ref (priv->rec_strat)):NULL;
+	g_warning ("tny_merge_folder_get_msg_receive_strategy not implemented: "
+		   "add it to the mother folder instead\n");
+
+	return NULL;
 }
 
 static void
 tny_merge_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
 {
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	if (priv->rem_strat)
-		g_object_unref (priv->rec_strat);
-
-	priv->rec_strat = g_object_ref (st);
+	g_warning ("tny_merge_folder_set_msg_receive_strategy not implemented: "
+		   "add it to the mother folder instead\n");
 
 	return;
 
@@ -188,6 +181,7 @@ tny_merge_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refres
 	TnyIterator *iter;
 
 	iter = tny_list_create_iterator (priv->mothers);
+
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
@@ -222,6 +216,7 @@ tny_merge_folder_get_id (TnyFolder *self)
 		gboolean first = TRUE;
 
 		iter = tny_list_create_iterator (priv->mothers);
+
 		while (!tny_iterator_is_done (iter))
 		{
 			TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
@@ -258,6 +253,7 @@ tny_merge_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
 	if (priv->name)
 		g_free (priv->name);
 	priv->name = g_strdup (name);
+
 	return;
 }
 
@@ -275,6 +271,7 @@ tny_merge_folder_get_all_count (TnyFolder *self)
 	guint total = 0;
 
 	iter = tny_list_create_iterator (priv->mothers);
+
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
@@ -296,6 +293,7 @@ tny_merge_folder_get_unread_count (TnyFolder *self)
 	guint total = 0;
 
 	iter = tny_list_create_iterator (priv->mothers);
+
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
@@ -335,6 +333,7 @@ tny_merge_folder_refresh (TnyFolder *self, GError **err)
 
 	g_object_unref (iter);
 
+	return;
 }
 
 static void
@@ -352,13 +351,28 @@ tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callba
 static void
 tny_merge_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
-	g_warning ("tny_merge_folder_transfer_msgs not implemented: "
-		   "transfer using the mother folders instead\n");
+	TnyIterator *iter = tny_list_create_iterator (header_list);
 
-	g_set_error (err, TNY_FOLDER_ERROR, 
-		TNY_FOLDER_ERROR_TRANSFER_MSGS,
-		"tny_merge_folder_transfer_msgs not implemented: "
-		"transfer using the mother folders instead");
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyHeader *current = TNY_HEADER (tny_iterator_get_current (iter));
+		TnyFolder *folder = tny_header_get_folder (current);
+
+		TnyList *nlist = tny_simple_list_new ();
+		tny_list_prepend (nlist, G_OBJECT (current));
+
+		tny_folder_transfer_msgs (folder, nlist, folder_dst, delete_originals, err);
+		/* TODO: handle err*/
+
+		g_object_unref (nlist);
+		g_object_unref (folder);
+		g_object_unref (current);
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (iter);
+
+	return;
 }
 
 static void
@@ -505,8 +519,6 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->name = g_strdup ("Merged folder");
 	priv->id = g_strdup  ("");
 	priv->mothers = tny_simple_list_new ();
-	priv->rec_strat = NULL;
-	priv->rem_strat = NULL;
 
 	return;
 }
@@ -523,12 +535,6 @@ tny_merge_folder_finalize (GObject *object)
 
 	if (priv->name)
 		g_free (priv->name);
-
-	if (priv->rec_strat)
-		g_object_unref (priv->rec_strat);
-
-	if (priv->rem_strat)
-		g_object_unref (priv->rem_strat);
 
 	parent_class->finalize (object);
 }
@@ -580,6 +586,7 @@ tny_merge_folder_class_init (TnyMergeFolderClass *klass)
 
 	g_type_class_add_private (object_class, sizeof (TnyMergeFolderPriv));
 
+	return;
 }
 
 

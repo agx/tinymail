@@ -765,7 +765,12 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	g_static_rec_mutex_lock (self->iterator_lock);
 
 	self->recent_updated = 0;
-	self->cur_len = 0;
+
+	/* Set it to 1 as initial value, else you cause the length > 0 
+	 * assertion in gtk_tree_model_sort_build_level (I have no idea why the
+	 * assertion is placed there, in stead of a normal return, though) */
+ 
+	self->cur_len = 1; 
 
 	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
 	if (self->folder)
