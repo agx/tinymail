@@ -1,3 +1,7 @@
+2007-04-17  Shilpa Musti  <Shilpa.Musti@nokia.com>
+
+	* Bugfix in TnyCamelTransportAccount
+
 2007-04-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Further implementing of TnyMergeFolder

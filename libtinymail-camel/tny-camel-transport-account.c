@@ -269,16 +269,40 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	recipients = camel_internet_address_new ();
 
 	str = tny_header_get_from (header);
+         if(str)
+         {
 	_foreach_email_add_to_inet_addr (str, from);
+            camel_mime_message_set_from(message,from);
+         }
 
 	str = tny_header_get_to (header);
+          if(str)
+          {
 	_foreach_email_add_to_inet_addr (str, recipients);
+            camel_mime_message_set_recipients(message,CAMEL_RECIPIENT_TYPE_TO,recipients);
+          }
+               
 
 	str = tny_header_get_cc (header);
+          if(str)              
+          {
 	_foreach_email_add_to_inet_addr (str, recipients);
+            camel_mime_message_set_recipients(message,CAMEL_RECIPIENT_TYPE_CC,recipients);
+          }
+               
 
 	str = tny_header_get_bcc (header);
+          if(str)
+          {
 	_foreach_email_add_to_inet_addr (str, recipients);
+              camel_mime_message_set_recipients(message,CAMEL_RECIPIENT_TYPE_BCC,recipients);
+          }
+
+
+          str = tny_header_get_subject (header);
+          if(str)
+           camel_mime_message_set_subject(message,str);
+
 
 	apriv->connected = TRUE;
 
