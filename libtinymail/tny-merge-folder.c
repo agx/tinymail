@@ -512,6 +512,15 @@ tny_merge_folder_get_caps (TnyFolder *self)
 	return 0;
 }
 
+
+
+/**
+ * tny_merge_folder_add_folder:
+ * @self: a #TnyMergeFolder object
+ * @folder: a #TnyFolder object 
+ *
+ * Add @folder to the list of folders that will be merged by @self.
+ **/
 void 
 tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 {
