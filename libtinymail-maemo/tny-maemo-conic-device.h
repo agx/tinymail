@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_MAEMO_CONIC_DEVICE             (tny_maemo_device_get_type ())
+#define TNY_TYPE_MAEMO_CONIC_DEVICE             (tny_maemo_conic_device_get_type ())
 #define TNY_MAEMO_CONIC_DEVICE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_MAEMO_CONIC_DEVICE, TnyMaemoConicDevice))
 #define TNY_MAEMO_CONIC_DEVICE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_MAEMO_CONIC_DEVICE, TnyMaemoConicDeviceClass))
 #define TNY_IS_MAEMO_CONIC_DEVICE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_MAEMO_CONIC_DEVICE))
@@ -57,12 +57,12 @@ GType tny_maemo_conic_device_get_type (void);
 
 TnyDevice* tny_maemo_conic_device_new (void);
 
-gboolean tny_maemo_conic_device_connect (TnyDevice *self, const gchar* iap_id);
-gboolean tny_maemo_conic_device_disconnect (TnyDevice *self, const gchar* iap_id);
-const gchar* tny_maemo_conic_device_get_current_iap_id (TnyDevice *self);
-ConIcIap* tny_maemo_conic_device_get_iap (TnyDevice *self, const gchar *iap_id);
-GSList* tny_maemo_conic_device_get_iap_list (TnyDevice *self);
-void tny_maemo_conic_device_free_iap_list (TnyDevice *self, GSList* cnx_list);
+gboolean tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id);
+gboolean tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_id);
+const gchar* tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self);
+ConIcIap* tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id);
+GSList* tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self);
+void tny_maemo_conic_device_free_iap_list (TnyMaemoConicDevice *self, GSList* cnx_list);
 
 G_END_DECLS
 

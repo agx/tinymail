@@ -114,7 +114,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
  * Returns TRUE if sending the command worked, FALSE otherwise
  **/
 gboolean
-tny_maemo_conic_device_connect (TnyDevice *self, const gchar* iap_id)
+tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
 	TnyMaemoConicDevicePriv *priv;	
 
@@ -147,7 +147,7 @@ tny_maemo_conic_device_connect (TnyDevice *self, const gchar* iap_id)
  * Returns TRUE if sending the command worked, FALSE otherwise
  **/
 gboolean
-tny_maemo_conic_device_disconnect (TnyDevice *self, const gchar* iap_id)
+tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
 	TnyMaemoConicDevicePriv *priv;	
 	
@@ -179,12 +179,12 @@ tny_maemo_conic_device_disconnect (TnyDevice *self, const gchar* iap_id)
  * Returns: the iap-id for the current connection, or NULL in case of error
  **/
 const gchar*
-tny_maemo_conic_device_get_current_iap_id (TnyDevice *self)
+tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 {
 	TnyMaemoConicDevicePriv *priv;
 	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
-	g_return_val_if_fail (tny_maemo_conic_device_is_online(self), NULL);
+	g_return_val_if_fail (tny_maemo_conic_device_is_online(TNY_DEVICE(self)), NULL);
 
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
@@ -205,7 +205,7 @@ tny_maemo_conic_device_get_current_iap_id (TnyDevice *self)
  * Returns: ConIcIap object or NULL in case of error
  **/
 ConIcIap*
-tny_maemo_conic_device_get_iap (TnyDevice *self, const gchar *iap_id)
+tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 {
 	TnyMaemoConicDevicePriv *priv;
 
@@ -229,7 +229,7 @@ tny_maemo_conic_device_get_iap (TnyDevice *self, const gchar *iap_id)
  * Returns: the list or NULL in case of error
  **/
 GSList*
-tny_maemo_conic_device_get_iap_list (TnyDevice *self)
+tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 {
 	TnyMaemoConicDevicePriv *priv;
 	
@@ -249,7 +249,7 @@ tny_maemo_conic_device_get_iap_list (TnyDevice *self)
  *  
  **/
 void
-tny_maemo_conic_device_free_iap_list (TnyDevice *self, GSList* cnx_list)
+tny_maemo_conic_device_free_iap_list (TnyMaemoConicDevice *self, GSList* cnx_list)
 {
 	GSList *cur = cnx_list;
 	while (cur) {

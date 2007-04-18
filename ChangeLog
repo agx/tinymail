@@ -1,3 +1,17 @@
+2007-04-18  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_connect),
+	(tny_maemo_conic_device_disconnect),
+	(tny_maemo_conic_device_get_current_iap_id),
+	(tny_maemo_conic_device_get_iap),
+	(tny_maemo_conic_device_get_iap_list),
+	(tny_maemo_conic_device_free_iap_list):
+	* libtinymail-maemo/tny-maemo-conic-device.h:
+	Takea TnyMaemoConicDevice* instead of a TnyDevice, as that is 
+	the convention for derived/implemented objects.
+	Correct the TNY_TYPE_MAEMO_CONIC_DEVICE implementation so that this can be used. 
+
 2007-04-17  Shilpa Musti  <Shilpa.Musti@nokia.com>
 
 	* Bugfix in TnyCamelTransportAccount
