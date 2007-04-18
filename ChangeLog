@@ -1,7 +1,7 @@
 2007-04-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Further implementing of TnyMergeFolder
-	* Bugfixing of several trac tickets
+	* Bugfixing of several trac tickets (like #39)
 
 2007-04-18  Murray Cumming  <murrayc@murrayc.com>
 
