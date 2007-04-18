@@ -78,6 +78,8 @@ tny_gtk_account_list_model_finalize (GObject *object)
 	}
 	g_mutex_unlock (me->iterator_lock);
 
+	g_mutex_free (me->iterator_lock);
+
 	(*parent_class->finalize) (object);
 }
 
