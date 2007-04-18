@@ -24,6 +24,7 @@
 #include <tny-merge-folder.h>
 #include <tny-error.h>
 #include <tny-simple-list.h>
+#include <tny-folder-observer.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -32,11 +33,12 @@ typedef struct _TnyMergeFolderPriv TnyMergeFolderPriv;
 struct _TnyMergeFolderPriv
 {
 	gchar *id, *name;
-	TnyList *mothers;
+	TnyList *mothers, *observers;
+	GStaticRecMutex *lock;
 };
 
 #define TNY_MERGE_FOLDER_GET_PRIVATE(o) \
-        (G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MERGE_FOLDER, TnyMergeFolderPriv))
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MERGE_FOLDER, TnyMergeFolderPriv))
 
 
 static void
@@ -68,6 +70,8 @@ tny_merge_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
 
+	g_static_rec_mutex_lock (priv->lock);
+
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter))
 	{
@@ -79,8 +83,9 @@ tny_merge_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 		g_object_unref (cur);
 		tny_iterator_next (iter);
 	}
-
 	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -144,6 +149,8 @@ tny_merge_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **er
 	TnyIterator *iter;
 	TnyMsg *retval = NULL;
 
+	g_static_rec_mutex_lock (priv->lock);
+
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter) && !retval)
 	{
@@ -157,6 +164,8 @@ tny_merge_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **er
 	}
 
 	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	return retval;
 }
@@ -180,6 +189,8 @@ tny_merge_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refres
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
 
+	g_static_rec_mutex_lock (priv->lock);
+
 	iter = tny_list_create_iterator (priv->mothers);
 
 	while (!tny_iterator_is_done (iter))
@@ -194,6 +205,9 @@ tny_merge_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refres
 	}
 
 	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
+
 }
 
 static const gchar*
@@ -215,6 +229,8 @@ tny_merge_folder_get_id (TnyFolder *self)
 		GString *ids = g_string_new ("");
 		gboolean first = TRUE;
 
+		g_static_rec_mutex_lock (priv->lock);
+
 		iter = tny_list_create_iterator (priv->mothers);
 
 		while (!tny_iterator_is_done (iter))
@@ -231,6 +247,9 @@ tny_merge_folder_get_id (TnyFolder *self)
 		priv->id = ids->str;
 		g_string_free (ids, FALSE);
 		g_object_unref (iter);
+
+		g_static_rec_mutex_unlock (priv->lock);
+
 	}
 
 	return priv->id;
@@ -250,9 +269,13 @@ tny_merge_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
+	g_static_rec_mutex_lock (priv->lock);
+
 	if (priv->name)
 		g_free (priv->name);
 	priv->name = g_strdup (name);
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -270,6 +293,8 @@ tny_merge_folder_get_all_count (TnyFolder *self)
 	TnyIterator *iter;
 	guint total = 0;
 
+	g_static_rec_mutex_lock (priv->lock);
+
 	iter = tny_list_create_iterator (priv->mothers);
 
 	while (!tny_iterator_is_done (iter))
@@ -282,6 +307,8 @@ tny_merge_folder_get_all_count (TnyFolder *self)
 
 	g_object_unref (iter);
 
+	g_static_rec_mutex_unlock (priv->lock);
+
 	return total;
 }
 
@@ -291,6 +318,8 @@ tny_merge_folder_get_unread_count (TnyFolder *self)
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
 	guint total = 0;
+
+	g_static_rec_mutex_lock (priv->lock);
 
 	iter = tny_list_create_iterator (priv->mothers);
 
@@ -303,6 +332,8 @@ tny_merge_folder_get_unread_count (TnyFolder *self)
 	}
 
 	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	return total;
 }
@@ -319,6 +350,8 @@ tny_merge_folder_refresh (TnyFolder *self, GError **err)
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
 
+	g_static_rec_mutex_lock (priv->lock);
+
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter))
 	{
@@ -332,6 +365,8 @@ tny_merge_folder_refresh (TnyFolder *self, GError **err)
 	}
 
 	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -351,7 +386,12 @@ tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callba
 static void
 tny_merge_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
-	TnyIterator *iter = tny_list_create_iterator (header_list);
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+
+	g_static_rec_mutex_lock (priv->lock);
+
+	iter = tny_list_create_iterator (header_list);
 
 	while (!tny_iterator_is_done (iter))
 	{
@@ -371,6 +411,8 @@ tny_merge_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder
 	}
 
 	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -392,9 +434,12 @@ static TnyFolder*
 tny_merge_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
-	TnyIterator *iter = tny_list_create_iterator (priv->mothers);
+	TnyIterator *iter;
 	TnyFolder *nfol = NULL;
 
+	g_static_rec_mutex_lock (priv->lock);
+
+	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
@@ -420,7 +465,9 @@ tny_merge_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_n
 
 	g_object_unref (iter);
 
-	return NULL;
+	g_static_rec_mutex_unlock (priv->lock);
+
+	return nfol;
 }
 
 static void
@@ -428,6 +475,8 @@ tny_merge_folder_poke_status (TnyFolder *self)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
+
+	g_static_rec_mutex_lock (priv->lock);
 
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter))
@@ -440,19 +489,41 @@ tny_merge_folder_poke_status (TnyFolder *self)
 
 	g_object_unref (iter);
 
+	g_static_rec_mutex_unlock (priv->lock);
+
 	return;
 }
 
 static void
 tny_merge_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
 {
-	g_warning ("tny_merge_folder_add_observer not yet implemented!\n");
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->lock);
+
+	if (!priv->observers)
+		priv->observers = tny_simple_list_new ();
+
+	tny_list_prepend (priv->observers, G_OBJECT (observer));
+
+	g_static_rec_mutex_unlock (priv->lock);
+
+	return;
 }
 
 static void
 tny_merge_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
 {
-	g_warning ("tny_merge_folder_remove_observer not yet implemented!\n");
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->lock);
+
+	if (priv->observers)
+		tny_list_remove (priv->observers, G_OBJECT (observer));
+
+	g_static_rec_mutex_unlock (priv->lock);
+
+	return;
 }
 
 static TnyFolderStore*
@@ -472,6 +543,8 @@ tny_merge_folder_get_stats (TnyFolder *self)
 	TnyIterator *iter;
 	gint total_size = 0;
 
+	g_static_rec_mutex_lock (priv->lock);
+
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter))
 	{
@@ -484,6 +557,8 @@ tny_merge_folder_get_stats (TnyFolder *self)
 	}
 
 	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	/* TNY TODO: update unread, all_count and local_size here ! */
 
@@ -512,7 +587,28 @@ tny_merge_folder_get_caps (TnyFolder *self)
 	return 0;
 }
 
+static void 
+tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
+	g_static_rec_mutex_lock (priv->lock);
+
+	if (priv->observers)
+	{
+		TnyIterator *iter = tny_list_create_iterator (priv->observers);
+		while (!tny_iterator_is_done (iter))
+		{
+			TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (tny_iterator_get_current (iter));
+			tny_folder_observer_update (observer, change);
+			g_object_unref (observer);
+			tny_iterator_next (iter);
+		}
+		g_object_unref (iter);
+	}
+
+	g_static_rec_mutex_unlock (priv->lock);
+}
 
 /**
  * tny_merge_folder_add_folder:
@@ -528,8 +624,13 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 
 	/* TODO: register @self as observer of @folder and proxy the
 	 * events through to observers of @self. */
+	
+	g_static_rec_mutex_lock (priv->lock);
 
 	tny_list_prepend (priv->mothers, G_OBJECT (folder));
+	tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
+
+	g_static_rec_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -540,8 +641,8 @@ tny_merge_folder_new (void)
 	TnyMergeFolder *self = g_object_new (TNY_TYPE_MERGE_FOLDER, NULL);
 
 	return TNY_FOLDER (self);
-
 }
+
 
 static void
 tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -552,6 +653,9 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->name = g_strdup ("Merged folder");
 	priv->id = g_strdup  ("");
 	priv->mothers = tny_simple_list_new ();
+	priv->lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->lock);
+	priv->observers = NULL;
 
 	return;
 }
@@ -559,7 +663,24 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_merge_folder_finalize (GObject *object)
 {
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (object);
+	TnyMergeFolder *self = (TnyMergeFolder *) object;
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+
+	g_static_rec_mutex_lock (priv->lock);
+
+	iter = tny_list_create_iterator (priv->mothers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+		tny_folder_remove_observer (cur, TNY_FOLDER_OBSERVER (self));
+		g_object_unref (cur);
+		tny_iterator_next (iter);
+	}
+	g_object_unref (iter);
+
+	if (priv->observers) 
+		g_object_unref (priv->observers);
 
 	g_object_unref (priv->mothers);
 
@@ -569,7 +690,18 @@ tny_merge_folder_finalize (GObject *object)
 	if (priv->name)
 		g_free (priv->name);
 
+	g_static_rec_mutex_unlock (priv->lock);
+
+	g_static_rec_mutex_free (priv->lock);
+	priv->lock = NULL;
+
 	parent_class->finalize (object);
+}
+
+static void
+tny_folder_observer_init (TnyFolderObserverIface *klass)
+{
+	klass->update_func = tny_merge_folder_update;
 }
 
 static void
@@ -651,12 +783,22 @@ tny_merge_folder_get_type (void)
 			NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_folder_observer_info = 
+		{
+			(GInterfaceInitFunc) tny_folder_observer_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyMergeFolder",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_FOLDER,
 			&tny_folder_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
+			&tny_folder_observer_info);
 
 	}
 
