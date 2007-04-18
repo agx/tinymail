@@ -27,11 +27,11 @@
 	* Bugfix in TnyGtkHeaderListModel
 	* Updates to the documentation
 
-2007-04-17 Sergio Villar Senin  <svillar@igalia.com>
+2007-04-17  Sergio Villar Senin  <svillar@igalia.com>
 
 	* Fixed a build error regarding the new TnyMaemoConicDevice
 
-2007-04-17 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+2007-04-17  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Add the TnyMaemoConicDevice, which exposes libconic-specific
 	functionality. When built for scratchbox, it tries to work in 'dummy
@@ -48,7 +48,7 @@
 
 	* This was a major API change
 
-2007-04-13 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+2007-04-13  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* remove #include for removed tny-maemo-password-dialog.h,
 	  this broke the compilation
@@ -65,7 +65,7 @@
 
 	* Fixed ticket #40
 
-2007-04-11 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+2007-04-11  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Improve tny-maemo-device so it works a bit better
 

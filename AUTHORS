@@ -48,6 +48,11 @@ Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	* Implementer of many TnyIterator types
 	* Implementer of many TnyList types
 	* Co-designer of the TnySendQueue type
+	* Maintainer of the maemo-specific library
+
+Murray Cumming <murrayc@murrayc.com>
+
+	* Implementations in libtinymail-maemo
 
 Chris Lord <chris@openedhand.com>
 
