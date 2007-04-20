@@ -2427,7 +2427,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		imap_store->current_folder = new_folder;
 		/* camel_object_ref (new_folder); */
 		camel_exception_init (&local_ex);
-		camel_imap_folder_selected (new_folder, response, &local_ex);
+		camel_imap_folder_selected (new_folder, response, &local_ex, TRUE);
 
 		if (camel_exception_is_set (&local_ex)) {
 			camel_exception_xfer (ex, &local_ex);

@@ -384,7 +384,7 @@ More documentation inline
 
 void
 camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
-			    CamelException *ex)
+			    CamelException *ex, gboolean idle)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
 	CamelImapSummary *imap_summary = CAMEL_IMAP_SUMMARY (folder->summary);
@@ -636,8 +636,9 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	
 	if (highestmodseq != NULL)
 		g_free (highestmodseq);
-	
-	camel_imap_folder_start_idle (folder);
+
+	if (idle)
+		camel_imap_folder_start_idle (folder);
 }
 
 static void 
@@ -774,9 +775,8 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 	    || g_ascii_strcasecmp(folder->full_name, "INBOX") == 0) {
 		response = camel_imap_command (imap_store, folder, ex, NULL);
 		if (response) {
-			camel_imap_folder_selected (folder, response, ex);
+			camel_imap_folder_selected (folder, response, ex, TRUE);
 			camel_imap_response_free (imap_store, response);
-			camel_imap_folder_start_idle (folder);
 		}
 	} else if (imap_folder->need_rescan) {
 		/* Otherwise, if we need a rescan, do it, and if not, just do
@@ -3833,8 +3833,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
 	CamelStream *stream = NULL;
 	gboolean connected = FALSE, idle_rt = FALSE;
-	CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+	CamelException tex = CAMEL_EXCEPTION_INITIALISER, myex = CAMEL_EXCEPTION_INITIALISER;
 	ssize_t nread = 0; 
+	gchar *a_resp = NULL;
 
 	/* EXPUNGE responses have to modify the cache, which means
 	 * they have to grab the cache_lock while holding the
@@ -3875,28 +3876,19 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	if (stream || cache_only)
 		return stream;
 
-	camel_exception_clear(ex);
-
-	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
-
 	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 				     _("This message is not currently available"));
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 		return NULL;
 	}
-	
 	camel_exception_clear (ex);
 
-	if (!store->ostream || ((CamelObject *)store->ostream)->ref_count <= 0){ 
-		/* err = TRUE; */
-		goto errorhander; 
-	}
-	
-	if (!store->istream || ((CamelObject *)store->istream)->ref_count <= 0){ 
-		/* err = TRUE; */
-		goto errorhander; 
-	}
+  CAMEL_SERVICE_REC_LOCK(store, connect_lock);
+
+	camel_exception_clear(ex);
+
+	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
 	if (type & CAMEL_FOLDER_RECEIVE_FULL)
 		stream = camel_imap_message_cache_insert (imap_folder->cache, 
@@ -3908,12 +3900,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	if (stream == NULL)
 		stream = camel_stream_mem_new ();
 
-	if (!stream) { 
-		/* err = TRUE; */
-		goto errorhander; 
-	}
-
-	
 	if (type & CAMEL_FOLDER_RECEIVE_FULL)
 	{
 		camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
@@ -3938,14 +3924,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 			g_mutex_lock (store->stream_lock);
 
-			if (!store->ostream || ((CamelObject *)store->ostream)->ref_count <= 0)
-			{
-				err = TRUE;
-				two_bytes[0]='\n';
-				nread = -1;
-				goto berrorhander;
-			}
-
 			two_bytes [0] = ' ';
 
 			/* a01 uid fetch 1 BINARY.PEEK[]
@@ -3959,35 +3937,39 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			{
 				nread = camel_stream_read (store->ostream, two_bytes, 1);
 				line [f] = two_bytes [0];
+/* printf ("%c%c", two_bytes[0], two_bytes[1]); */
 				f++;
 			}
 			line[f] = '\0';
+/* printf ("\n"); */
 
 			/* The first line is very unlikely going to consume 1023 bytes */
-			if (f > 1023 || nread <= 0)
+			if (f > 1023 || nread <= 0) {
+				g_warning ("BINARY: Long first line, UID=%s", uid);
 				goto berrorhander;
+			}
 
 			/* If the line doesn't start with "* " */
 			if (*line != '*' || *(line + 1) != ' ')
-				{ err = TRUE; goto berrorhander; }
+				{ err = TRUE; g_warning ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); goto berrorhander; }
 			pos = strchr (line, '{');
 
 			/* If we don't find a '{' character */
 			if (!pos) 
-				{ err = TRUE; goto berrorhander; }
+				{ err = TRUE; g_warning ("BINARY: Line doesn't contain a {, UID=%s (%s)", uid, line); goto berrorhander; }
 
 			/* Set the '}' character to \0 */
 			ppos = strchr (pos, '}');
 			if (ppos) 
 				*ppos = '\0';
 			else /* If we didn't find it */
-				{ err = TRUE; goto berrorhander; }
+				{ err = TRUE; g_warning ("BINARY: Line doesn't contain a }, UID=%s (%s)", uid, line); goto berrorhander; }
 
 			length = strtol (pos + 1, NULL, 10);
 
 			/* If strtol failed (it's important enough to check this) */
 			if (errno == ERANGE)
-				{ err = TRUE; goto berrorhander; }
+				{ err = TRUE; g_warning ("BINARY: strtol failed, UID=%s (%s)", uid, line); goto berrorhander; }
 
 			/* Until we have reached the length, read 1024 at the time */
 			while (hread > 0 && rec < length)
@@ -4044,32 +4026,13 @@ berrorhander:
 			taglen = strlen (tag);
 
 			g_mutex_lock (store->stream_lock);
-
-			if (!store->istream || ((CamelObject *)store->istream)->ref_count <= 0)
-			{
-				err = TRUE;
-				nread = -1;
-				goto merrorhandler;
-			}
-
-			if (!store->ostream || ((CamelObject *)store->ostream)->ref_count <= 0)
-			{
-				err = TRUE;
-				nread = -1;
-				goto merrorhandler;
-			}
-
-			if (camel_imap_store_restore_stream_buffer (store))
-				server_stream = store->istream ? CAMEL_STREAM_BUFFER (store->istream) : NULL;
-			else 
-				server_stream = NULL;
+			server_stream = (CamelStreamBuffer*) store->istream;
 
 			if (!server_stream)
 				err = TRUE;
 			else
 				store->command++;
 
-			
 			if (server_stream) 
 			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 			  {
@@ -4288,6 +4251,8 @@ rerrorhandler:
 
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 
+  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+
 	return stream;
 
 errorhander:
@@ -4305,6 +4270,8 @@ errorhander:
 
 	if (stream && ((CamelObject *)stream)->ref_count > 0)
 		camel_object_unref (CAMEL_OBJECT (stream));
+
+  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 
 	return NULL;
 }
