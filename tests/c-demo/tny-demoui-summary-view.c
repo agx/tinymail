@@ -433,17 +433,23 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 
 	if (!cancelled)
 	{
+		GtkSelectionMode mode;
+
 		g_idle_add (cleanup_statusbar, priv);
 
-		gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
-			&priv->last_mailbox_correct_select);
-		priv->last_mailbox_correct_select_set = TRUE;
+		mode = gtk_tree_selection_get_mode (priv->mailbox_select);
+
+		if (mode == GTK_SELECTION_SINGLE)
+		{
+			gtk_tree_selection_get_selected (priv->mailbox_select, &select_model, 
+				&priv->last_mailbox_correct_select);
+			priv->last_mailbox_correct_select_set = TRUE;
+		}
 
 		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);
 
 	} else {
 		/* Restore selection */
-
 		g_signal_handler_block (G_OBJECT (priv->mailbox_select), 
 			priv->mailbox_select_sid);
 		gtk_tree_selection_select_iter (priv->mailbox_select, 
@@ -493,6 +499,16 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 	mode = gtk_tree_selection_get_mode (selection);
 
+	g_mutex_lock (priv->monitor_lock);
+	{
+		if (priv->monitor)
+		{
+			tny_folder_monitor_stop (priv->monitor);
+			g_object_unref (G_OBJECT (priv->monitor));
+		}
+	}
+	g_mutex_unlock (priv->monitor_lock);
+
 	if (mode == GTK_SELECTION_SINGLE)
 	{
 	  if (gtk_tree_selection_get_selected (selection, &model, &iter))
@@ -532,13 +548,6 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			g_mutex_lock (priv->monitor_lock);
 			{
-
-				if (priv->monitor)
-				{
-					tny_folder_monitor_stop (priv->monitor);
-					g_object_unref (G_OBJECT (priv->monitor));
-				}
-
 				priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
 				tny_folder_monitor_add_list (priv->monitor, TNY_LIST (hmodel));
 				tny_folder_monitor_start (priv->monitor);
@@ -559,13 +568,10 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			set_header_view_model (header_view, sortable);
 
-#ifdef ASYNC_HEADERS
 			tny_folder_refresh_async (folder, 
 				refresh_current_folder, 
 				refresh_current_folder_status_update, user_data);
-#else
-			refresh_current_folder (folder, FALSE, NULL, user_data);
-#endif
+
 
 			g_object_unref (G_OBJECT (folder));
 		}
@@ -602,6 +608,13 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), 
 			merge, FALSE);
 
+		g_mutex_lock (priv->monitor_lock);
+		{
+			priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (merge));
+			tny_folder_monitor_add_list (priv->monitor, TNY_LIST (hmodel));
+			tny_folder_monitor_start (priv->monitor);
+		}
+		g_mutex_unlock (priv->monitor_lock);
 
 		sortable = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (hmodel));
 
@@ -616,6 +629,10 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			NULL, NULL);
 
 		set_header_view_model (header_view, sortable);
+
+		tny_folder_refresh_async (merge, 
+			refresh_current_folder, 
+			refresh_current_folder_status_update, user_data);
 
 		g_list_free (list);
 	}
