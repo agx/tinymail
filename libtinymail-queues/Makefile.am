@@ -4,6 +4,7 @@ INCLUDES = $(LIBTINYMAIL_QUEUES_CFLAGS) $(LIBTINYMAIL_CFLAGS) -I. -I$(top_srcdir
 lib_LTLIBRARIES = libtinymail-queues-1.0.la
 
 libtinymail_queues_1_0_headers = \
+	tny-get-msg-queue-priv.h \
 	tny-get-msg-queue.h
 
 libtinymail_queues_1_0_la_SOURCES = \

@@ -26,20 +26,7 @@
 
 static GObjectClass *parent_class = NULL;
 
-typedef struct _TnyGetMsgQueuePriv TnyGetMsgQueuePriv;
-
-struct _TnyGetMsgQueuePriv
-{
-	OAsyncWorker *queue;
-	GMutex *lock;
-	TnyFolder *folder;
-};
-
-
-#define TNY_GET_MSG_QUEUE_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GET_MSG_QUEUE, TnyGetMsgQueuePriv))
-
-
+#include "tny-get-msg-queue-priv.h"
 
 typedef struct {
 	TnyGetMsgQueue *self;
@@ -121,7 +108,7 @@ tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCal
  * tny_get_msg_queue_new:
  * @get: a #TnyGet instance
  *
- * Creates a queue that can get message for you
+ * Creates a queue that can get messages for you
  *
  * Return value: a new #TnyGetMsgQueue instance
  **/
