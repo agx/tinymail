@@ -2816,7 +2816,7 @@ message_from_data (CamelFolder *folder, GData *data)
 	/* TNY TODO: This is a hack! But else we need to parse 
 	 * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
 	if (size > 102400)
-		mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+		((CamelMessageInfoBase *)mi)->flags |= CAMEL_MESSAGE_ATTACHMENTS;
 	/* ... it does */
 
 	if ((idate = g_datalist_get_data (&data, "INTERNALDATE")))

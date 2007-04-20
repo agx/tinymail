@@ -319,6 +319,11 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 				mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
 				if (mi) {
 				    mi->size = (fi->size);
+				   /* TNY TODO: This is a hack! But else we need to parse 
+				    * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
+				    if (mi->size > 102400)
+					mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+				    /* ... it does */
 				    camel_message_info_free (mi);
 				}
 
