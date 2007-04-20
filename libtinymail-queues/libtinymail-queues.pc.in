@@ -3,9 +3,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libtinymail-acap 
-Description: TinyMail ACAP support library
+Name: libtinymail-queues
+Description: TinyMail queues support library
 Version: @VERSION@
-Requires: libtinymail-@API_VERSION@
-Libs: -L${libdir} -libtinymail-acap-@API_VERSION@
-Cflags: -I${includedir}/libtinymail-acap-@API_VERSION@
+Requires: libtinymail-@API_VERSION@ 
+Libs: -L${libdir} -libtinymail-queues-@API_VERSION@
+Cflags: -I${includedir}/libtinymail-queues-@API_VERSION@
