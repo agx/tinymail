@@ -886,8 +886,7 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
  * @callback: The callback handler
  * @user_data: user data for the callback
  *
- * Get a message in @self identified by @header. You must unreference the
- * return value after use.
+ * Get a message in @self identified by @header. 
  *
  * If you want to use this functionality, it's advised to let your application 
  * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is

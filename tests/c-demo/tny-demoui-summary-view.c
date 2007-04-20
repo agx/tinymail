@@ -499,16 +499,6 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 	mode = gtk_tree_selection_get_mode (selection);
 
-	g_mutex_lock (priv->monitor_lock);
-	{
-		if (priv->monitor)
-		{
-			tny_folder_monitor_stop (priv->monitor);
-			g_object_unref (G_OBJECT (priv->monitor));
-		}
-	}
-	g_mutex_unlock (priv->monitor_lock);
-
 	if (mode == GTK_SELECTION_SINGLE)
 	{
 	  if (gtk_tree_selection_get_selected (selection, &model, &iter))
@@ -548,6 +538,10 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			g_mutex_lock (priv->monitor_lock);
 			{
+				if (priv->monitor) {
+					tny_folder_monitor_stop (priv->monitor);
+					g_object_unref (G_OBJECT (priv->monitor));
+				}
 				priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
 				tny_folder_monitor_add_list (priv->monitor, TNY_LIST (hmodel));
 				tny_folder_monitor_start (priv->monitor);
@@ -571,7 +565,6 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			tny_folder_refresh_async (folder, 
 				refresh_current_folder, 
 				refresh_current_folder_status_update, user_data);
-
 
 			g_object_unref (G_OBJECT (folder));
 		}
@@ -610,6 +603,10 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 		g_mutex_lock (priv->monitor_lock);
 		{
+			if (priv->monitor) {
+				tny_folder_monitor_stop (priv->monitor);
+				g_object_unref (G_OBJECT (priv->monitor));
+			}
 			priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (merge));
 			tny_folder_monitor_add_list (priv->monitor, TNY_LIST (hmodel));
 			tny_folder_monitor_start (priv->monitor);

@@ -22,6 +22,10 @@ if BUILD_ACAP
 SUBDIRS += libtinymail-acap
 endif
 
+if BUILD_QUEUES
+SUBDIRS += libtinymail-queues
+endif
+
 SUBDIRS += tests bindings po 
 
 #### Funny OR simulation :)

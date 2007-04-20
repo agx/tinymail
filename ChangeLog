@@ -1,6 +1,9 @@
 2007-04-20  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Further implementing of TnyMergeFolder
+	* Bugfixes in camel-lite (concurrent camel_folder_get_message on
+	folders that are not selected)
+	* Introduction of libtinymail-queues (which depens on asyncworker)
 
 2007-04-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
