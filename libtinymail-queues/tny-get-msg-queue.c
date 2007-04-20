@@ -131,7 +131,7 @@ tny_get_msg_queue_new (TnyFolder *folder)
 	TnyGetMsgQueue *self = g_object_new (TNY_TYPE_GET_MSG_QUEUE, NULL);
 	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
 
-	priv->folder = TNY_FOLDER (g_object_ref (folder)); /* not referenced to avoid cross references */
+	priv->folder = TNY_FOLDER (g_object_ref (folder));
 
 	return self;
 }
