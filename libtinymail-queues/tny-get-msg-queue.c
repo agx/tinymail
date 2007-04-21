@@ -42,13 +42,14 @@ get_msg_task (OAsyncWorkerTask *task, gpointer arguments)
 {
 	TnyMsg *retval = NULL;
 	GetMsgInfo *info = (GetMsgInfo *) arguments;
-	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (info->self);
+	TnyFolder *folder;
 
 	info->err = NULL;
 
-	retval = tny_folder_get_msg (priv->folder, info->header, &info->err);
+	folder = tny_header_get_folder (info->header);
+	retval = tny_folder_get_msg (folder, info->header, &info->err);
 
-	g_object_unref (info->header);
+	g_object_unref (folder);
 
 	return (gpointer) retval;
 }
@@ -58,14 +59,20 @@ get_msg_callback (OAsyncWorkerTask *task, gpointer func_result)
 {
 	GetMsgInfo *info = o_async_worker_task_get_arguments (task);
 	TnyMsg *msg = (TnyMsg *) func_result;
-	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (info->self);
+	TnyFolder *folder;
+
+	info->err = NULL;
+
+	folder = tny_header_get_folder (info->header);
 
 	if (info->callback)
-		info->callback (priv->folder, msg, &info->err, info->user_data);
+		info->callback (folder, msg, &info->err, info->user_data);
 
 	if (msg)
 		g_object_unref (msg);
 
+	g_object_unref (folder);
+	g_object_unref (info->header);
 	g_object_unref (info->self);
 
 	g_slice_free (GetMsgInfo, info);
@@ -113,12 +120,9 @@ tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCal
  * Return value: a new #TnyGetMsgQueue instance
  **/
 TnyGetMsgQueue*
-tny_get_msg_queue_new (TnyFolder *folder)
+tny_get_msg_queue_new (void)
 {
 	TnyGetMsgQueue *self = g_object_new (TNY_TYPE_GET_MSG_QUEUE, NULL);
-	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
-
-	priv->folder = TNY_FOLDER (g_object_ref (folder));
 
 	return self;
 }
@@ -130,7 +134,6 @@ tny_get_msg_queue_finalize (GObject *object)
 	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (object);
 
 	g_mutex_lock (priv->lock);
-	g_object_unref (G_OBJECT (priv->folder));
 	g_object_unref (G_OBJECT (priv->queue));
 	g_mutex_unlock (priv->lock);
 	g_mutex_free (priv->lock);
@@ -147,7 +150,6 @@ tny_get_msg_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->lock = g_mutex_new ();
 
 	g_mutex_lock (priv->lock);
-	priv->folder = NULL;
 	priv->queue = o_async_worker_new ();
 	g_mutex_unlock (priv->lock);
 

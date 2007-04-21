@@ -26,7 +26,6 @@ struct _TnyGetMsgQueuePriv
 {
 	OAsyncWorker *queue;
 	GMutex *lock;
-	TnyFolder *folder;
 };
 
 

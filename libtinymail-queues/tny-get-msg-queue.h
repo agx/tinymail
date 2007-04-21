@@ -47,7 +47,7 @@ struct _TnyGetMsgQueueClass
 };
 
 GType tny_get_msg_queue_get_type (void);
-TnyGetMsgQueue* tny_get_msg_queue_new (TnyFolder *folder);
+TnyGetMsgQueue* tny_get_msg_queue_new (void);
 
 void tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data);
 
