@@ -113,7 +113,6 @@ tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCal
 
 /**
  * tny_get_msg_queue_new:
- * @get: a #TnyGet instance
  *
  * Creates a queue that can get messages for you
  *
