@@ -338,9 +338,9 @@ tny_generic_send_queue_get_outbox_default (TnySendQueue *self)
  * Creates a queue that can send messages using @account, storing unsent 
  * messages in @outbox and sent messages in @sentbox.
  *
- * Return value: a new #TnyGenericSendQueue instance
+ * Return value: a new #TnySendQueue instance
  **/
-TnyGenericSendQueue*
+TnySendQueue*
 tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox)
 {
 	TnyGenericSendQueue *self = g_object_new (TNY_TYPE_GENERIC_SEND_QUEUE, NULL);
@@ -350,7 +350,7 @@ tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, Tny
 	priv->outbox = TNY_FOLDER (g_object_ref (outbox));
 	priv->sentbox = TNY_FOLDER (g_object_ref (sentbox));
 
-	return self;
+	return TNY_SEND_QUEUE (self);
 }
 
 
