@@ -668,8 +668,10 @@ tny_mime_part_get_type (void)
 		  NULL,   /* instance_init */
 		  NULL
 		};
+
 		type = g_type_register_static (G_TYPE_INTERFACE,
 			"TnyMimePart", &info, 0);
+
 	}
 
 	return type;
