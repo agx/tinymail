@@ -1,7 +1,7 @@
 #ifndef TNY_GENERIC_SEND_QUEUE_H
 #define TNY_GENERIC_SEND_QUEUE_H
 
-/* libtinymailui-gtk - The Tiny Mail library
+/* libtinymail-queues - The Tiny Mail queues library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
 #include <tny-send-queue.h>
 #include <tny-msg.h>
 #include <tny-folder.h>
+#include <tny-transport-account.h>
 
 G_BEGIN_DECLS
 
@@ -47,7 +48,7 @@ struct _TnyGenericSendQueueClass
 };
 
 GType tny_generic_send_queue_generic_type (void);
-TnyGenericSendQueue* tny_generic_send_queue_new (TnyFolder *outbox, TnyFolder *sentbox);
+TnyGenericSendQueue* tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox);
 
 
 G_END_DECLS

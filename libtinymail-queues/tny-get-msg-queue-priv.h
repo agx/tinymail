@@ -1,7 +1,7 @@
 #ifndef TNY_GET_MSG_QUEUE_PRIV_H
 #define TNY_GET_MSG_QUEUE_PRIV_H
 
-/* libtinymail - The Tiny Mail base library 
+/* libtinymail - The Tiny Mail queues library 
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or

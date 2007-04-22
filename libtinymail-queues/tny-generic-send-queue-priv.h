@@ -1,7 +1,7 @@
 #ifndef TNY_GENERIC_SEND_QUEUE_PRIV_H
 #define TNY_GENERIC_SEND_QUEUE_PRIV_H
 
-/* libtinymail - The Tiny Mail base library 
+/* libtinymail-queues - The Tiny Mail queues library 
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@ struct _TnyGenericSendQueuePriv
 	OAsyncWorker *queue;
 	GMutex *lock;
 	TnyFolder *outbox, *sentbox;
+	TnyTransportAccount *account;
 };
 
 

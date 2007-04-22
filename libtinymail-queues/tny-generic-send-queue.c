@@ -1,4 +1,4 @@
-/* libtinymail - The Tiny Mail base library
+/* libtinymail-queues - The Tiny Mail queues library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,8 +21,10 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <tny-generic-send-queue.h>
 #include <oasyncworker/oasyncworker.h>
+
+#include <tny-generic-send-queue.h>
+#include <tny-simple-list.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -39,8 +41,25 @@ static gpointer
 generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
 {
 	GenericSendInfo *info = (GenericSendInfo *) arguments;
+	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (info->self);
+	TnyList *list = tny_simple_list_new ();
 
-	/* TODO */
+	g_mutex_lock (priv->lock);
+
+	tny_transport_account_send (priv->account, info->msg, info->err);
+	/* TODO handle err */
+
+	if (info->err == NULL)
+	{
+		tny_list_prepend (list, G_OBJECT (info->msg));
+		tny_folder_transfer_msgs (priv->outbox, list, priv->sentbox, TRUE, info->err);
+		g_object_unref (list);
+		/* TODO handle err */
+	}
+
+	g_object_unref (info->msg);
+
+	g_mutex_unlock (priv->lock);
 
 	return NULL;
 }
@@ -50,7 +69,6 @@ generic_send_callback (OAsyncWorkerTask *task, gpointer func_result)
 {
 	GenericSendInfo *info = o_async_worker_task_get_arguments (task);
 
-	g_object_unref (info->msg);
 	g_object_unref (info->self);
 	g_slice_free (GenericSendInfo, info);
 }
@@ -59,19 +77,44 @@ static void
 tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
-	OAsyncWorkerTask *task = o_async_worker_task_new ();
-	GenericSendInfo *info = g_slice_new (GenericSendInfo);
-
-	info->self = TNY_GENERIC_SEND_QUEUE (g_object_ref (self));
-	info->msg = TNY_MSG (g_object_ref (msg));
-	info->err = err;
-
-	o_async_worker_task_set_arguments (task, info);
-	o_async_worker_task_set_func (task, generic_send_task);
-	o_async_worker_task_set_callback (task, generic_send_callback);
+	TnyIterator *iter;
+	TnyList *list = tny_simple_list_new ();
 
 	g_mutex_lock (priv->lock);
-	o_async_worker_add (priv->queue, task);
+
+	tny_folder_add_msg (priv->outbox, msg, err);
+	/* TODO: handle err */
+
+	tny_folder_get_headers (priv->outbox, list, FALSE, err);
+	/* TODO: handle err */
+
+	iter = tny_list_create_iterator (list);
+
+	while (!tny_iterator_is_done (iter))
+	{
+		OAsyncWorkerTask *task = o_async_worker_task_new ();
+		GenericSendInfo *info = g_slice_new (GenericSendInfo);
+		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+
+		info->self = TNY_GENERIC_SEND_QUEUE (g_object_ref (self));
+		info->msg = tny_folder_get_msg (priv->outbox, header, err);
+
+		/* TODO: Handle err */
+
+		info->err = err;
+		o_async_worker_task_set_arguments (task, info);
+		o_async_worker_task_set_func (task, generic_send_task);
+		o_async_worker_task_set_callback (task, generic_send_callback);
+
+		o_async_worker_add (priv->queue, task);
+
+		g_object_unref (header);
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (iter);
+	g_object_unref (list);
+
 	g_mutex_unlock (priv->lock);
 }
 
@@ -101,18 +144,22 @@ tny_generic_send_queue_get_outbox (TnySendQueue *self)
 
 /**
  * tny_generic_send_queue_new:
- * @generic: a #TnyGeneric instance
+ * @account: a #TnyTransportAccount object
+ * @outbox: a #TnyFolder object
+ * @sentbox: a #TnyFolder object
  *
- * Creates a queue that can generic messages for you
+ * Creates a queue that can send messages using @account, storing unsent 
+ * messages in @outbox and sent messages in @sentbox.
  *
  * Return value: a new #TnyGenericSendQueue instance
  **/
 TnyGenericSendQueue*
-tny_generic_send_queue_new (TnyFolder *outbox, TnyFolder *sentbox)
+tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox)
 {
 	TnyGenericSendQueue *self = g_object_new (TNY_TYPE_GENERIC_SEND_QUEUE, NULL);
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 
+	priv->account = TNY_TRANSPORT_ACCOUNT (g_object_ref (account));
 	priv->outbox = TNY_FOLDER (g_object_ref (outbox));
 	priv->sentbox = TNY_FOLDER (g_object_ref (sentbox));
 
@@ -130,6 +177,7 @@ tny_generic_send_queue_finalize (GObject *object)
 	g_object_unref (G_OBJECT (priv->queue));
 	g_object_unref (G_OBJECT (priv->sentbox));
 	g_object_unref (G_OBJECT (priv->outbox));
+	g_object_unref (G_OBJECT (priv->account));
 	g_mutex_unlock (priv->lock);
 	g_mutex_free (priv->lock);
 
@@ -146,6 +194,9 @@ tny_generic_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	g_mutex_lock (priv->lock);
 	priv->queue = o_async_worker_new ();
+	priv->account = NULL;
+	priv->sentbox = NULL;
+	priv->outbox = NULL;
 	g_mutex_unlock (priv->lock);
 
 	return;
