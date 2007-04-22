@@ -94,13 +94,8 @@ generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
 	TnyList *list;
 	GError *err = NULL;
 
-	g_mutex_lock (priv->lock);
-
 	if (priv->cancelled)
-	{
-		g_mutex_unlock (priv->lock);
 		return;
-	}
 
 	list = tny_simple_list_new ();
 	tny_transport_account_send (priv->account, info->msg, &err);
@@ -114,8 +109,13 @@ generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
 		sentbox = tny_send_queue_get_sentbox (TNY_SEND_QUEUE (info->self));
 
 		tny_list_prepend (list, G_OBJECT (info->msg));
+
+		g_mutex_lock (priv->lock);
 		tny_folder_transfer_msgs (outbox, list, sentbox, TRUE, &err);
+		g_mutex_unlock (priv->lock);
+
 		g_object_unref (list);
+
 		if (err != NULL) {
 			emit_error (self, info->msg, err, info->i, info->total);
 			g_error_free (err);
@@ -125,8 +125,6 @@ generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
 		g_object_unref (sentbox);
 	}
 	g_object_unref (info->msg);
-
-	g_mutex_unlock (priv->lock);
 
 	return NULL;
 }
