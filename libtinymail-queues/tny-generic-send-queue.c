@@ -425,7 +425,7 @@ tny_send_queue_init (gpointer g, gpointer iface_data)
 }
 
 GType
-tny_generic_send_queue_generic_type (void)
+tny_generic_send_queue_get_type (void)
 {
 	static GType type = 0;
 	if (G_UNLIKELY(type == 0))

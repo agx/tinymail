@@ -27,7 +27,7 @@
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_GENERIC_SEND_QUEUE             (tny_generic_send_queue_generic_type ())
+#define TNY_TYPE_GENERIC_SEND_QUEUE             (tny_generic_send_queue_get_type ())
 #define TNY_GENERIC_SEND_QUEUE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_GENERIC_SEND_QUEUE, TnyGenericSendQueue))
 #define TNY_GENERIC_SEND_QUEUE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GENERIC_SEND_QUEUE, TnyGenericSendQueueClass))
 #define TNY_IS_GENERIC_SEND_QUEUE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GENERIC_SEND_QUEUE))
@@ -53,7 +53,7 @@ struct _TnyGenericSendQueueClass
 	void (*cancel_func) (TnySendQueue *self, gboolean remove, GError **err);
 };
 
-GType tny_generic_send_queue_generic_type (void);
+GType tny_generic_send_queue_get_type (void);
 TnyGenericSendQueue* tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox);
 
 
