@@ -32,7 +32,7 @@ G_BEGIN_DECLS
 #define TNY_GENERIC_SEND_QUEUE_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GENERIC_SEND_QUEUE, TnyGenericSendQueueClass))
 #define TNY_IS_GENERIC_SEND_QUEUE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GENERIC_SEND_QUEUE))
 #define TNY_IS_GENERIC_SEND_QUEUE_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GENERIC_SEND_QUEUE))
-#define TNY_GENERIC_SEND_QUEUE_GENERIC_CLASS(inst)  (G_TYPE_INSTANCE_GENERIC_CLASS ((inst), TNY_TYPE_GENERIC_SEND_QUEUE, TnyGenericSendQueueClass))
+#define TNY_GENERIC_SEND_QUEUE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_GENERIC_SEND_QUEUE, TnyGenericSendQueueClass))
 
 typedef struct _TnyGenericSendQueue TnyGenericSendQueue;
 typedef struct _TnyGenericSendQueueClass TnyGenericSendQueueClass;
@@ -45,6 +45,12 @@ struct _TnyGenericSendQueue
 struct _TnyGenericSendQueueClass 
 {
 	GObjectClass parent;
+
+	/* virtual methods */
+	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);
+	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
+	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
+	void (*cancel_func) (TnySendQueue *self, gboolean remove, GError **err);
 };
 
 GType tny_generic_send_queue_generic_type (void);

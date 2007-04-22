@@ -144,6 +144,13 @@ generic_send_callback (OAsyncWorkerTask *task, gpointer func_result)
 static void
 tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
+	TNY_GENERIC_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg, err);
+	return;
+}
+
+static void
+tny_generic_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
+{
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 	TnyIterator *iter;
 	TnyList *list;
@@ -228,6 +235,13 @@ tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 static void
 tny_generic_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
 {
+	TNY_GENERIC_SEND_QUEUE_GET_CLASS (self)->cancel_func (self, remove, err);
+	return;
+}
+
+static void
+tny_generic_send_queue_cancel_default (TnySendQueue *self, gboolean remove, GError **err)
+{
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 
 	priv->cancelled = TRUE;
@@ -292,13 +306,24 @@ tny_generic_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err
 static TnyFolder*
 tny_generic_send_queue_get_sentbox (TnySendQueue *self)
 {
+	return TNY_GENERIC_SEND_QUEUE_GET_CLASS (self)->get_sentbox_func (self);
+}
+
+static TnyFolder*
+tny_generic_send_queue_get_sentbox_default (TnySendQueue *self)
+{
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 	return TNY_FOLDER (g_object_ref (priv->sentbox));
 }
 
-
 static TnyFolder*
 tny_generic_send_queue_get_outbox (TnySendQueue *self)
+{
+	return TNY_GENERIC_SEND_QUEUE_GET_CLASS (self)->get_outbox_func (self);
+}
+
+static TnyFolder*
+tny_generic_send_queue_get_outbox_default (TnySendQueue *self)
 {
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 	return TNY_FOLDER (g_object_ref (priv->outbox));
@@ -374,6 +399,12 @@ tny_generic_send_queue_class_init (TnyGenericSendQueueClass *klass)
 
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
+
+	klass->add_func = tny_generic_send_queue_add_default;
+	klass->get_sentbox_func = tny_generic_send_queue_get_sentbox_default;
+	klass->get_outbox_func = tny_generic_send_queue_get_outbox_default;
+	klass->cancel_func = tny_generic_send_queue_cancel_default;
+
 	object_class->finalize = tny_generic_send_queue_finalize;
 	g_type_class_add_private (object_class, sizeof (TnyGenericSendQueuePriv));
 

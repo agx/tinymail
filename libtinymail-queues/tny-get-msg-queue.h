@@ -44,12 +44,15 @@ struct _TnyGetMsgQueue
 struct _TnyGetMsgQueueClass 
 {
 	GObjectClass parent;
+
+	/* virtual methods */
+	void (*get_msg_func) (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 };
 
 GType tny_get_msg_queue_get_type (void);
 TnyGetMsgQueue* tny_get_msg_queue_new (void);
 
-void tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data);
+void tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 
 
 G_END_DECLS

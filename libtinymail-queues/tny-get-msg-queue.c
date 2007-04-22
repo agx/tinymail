@@ -32,6 +32,7 @@ typedef struct {
 	TnyGetMsgQueue *self;
 	TnyHeader *header;
 	TnyGetMsgCallback callback;
+	TnyStatusCallback status_callback;
 	gpointer user_data;
 	GError *err;
 } GetMsgInfo;
@@ -84,13 +85,21 @@ get_msg_callback (OAsyncWorkerTask *task, gpointer func_result)
  * @self: a #TnyGetMsgQueue object
  * @header: a #TnyHeader object
  * @callback: The callback handler
+ * @status_callback: The status_callback handler
  * @user_data: user data for the callback
  *
  * Queue getting a message identified by @header
  *
  **/
 void
-tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_GET_MSG_QUEUE_GET_CLASS (self)->get_msg_func (self, header, callback, status_callback, user_data);
+	return;
+}
+
+static void
+tny_get_msg_queue_get_msg_default (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
 	OAsyncWorkerTask *task = o_async_worker_task_new ();
@@ -99,6 +108,7 @@ tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCal
 	info->self = TNY_GET_MSG_QUEUE (g_object_ref (self));
 	info->header = TNY_HEADER (g_object_ref (header));
 	info->callback = callback;
+	info->status_callback = status_callback;
 	info->user_data = user_data;
 
 	o_async_worker_task_set_arguments (task, info);
@@ -162,6 +172,9 @@ tny_get_msg_queue_class_init (TnyGetMsgQueueClass *klass)
 
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
+
+	klass->get_msg_func = tny_get_msg_queue_get_msg_default;
+
 	object_class->finalize = tny_get_msg_queue_finalize;
 	g_type_class_add_private (object_class, sizeof (TnyGetMsgQueuePriv));
 }
