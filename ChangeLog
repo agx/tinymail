@@ -2,7 +2,7 @@
 
 	* Created a TnyGenericSendQueue which implements TnySendQueue in a
 	generic way (doesn't strictly depend on the libtinymail-camel impl
-	libraries) 		* unfinished implementation *
+	libraries like the TnyCamelSendQueue type)
 
 	* This was a minor API change (new type added)
 

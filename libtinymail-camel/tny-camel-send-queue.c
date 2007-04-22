@@ -39,23 +39,19 @@ static GObjectClass *parent_class = NULL;
 #define TNY_CAMEL_SEND_QUEUE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_SEND_QUEUE, TnyCamelSendQueuePriv))
 
-typedef struct
-{
+typedef struct {
 	TnySendQueue *self;
 	TnyMsg *msg;
 	GError *error;
 	gint i, total;
-
 } ErrorInfo;
 
 static gboolean 
 emit_error_on_mainloop (gpointer data)
 {
 	ErrorInfo *info = data;
-
 	g_signal_emit (info->self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
 				0, info->msg, info->error, info->i, info->total);
-
 	return FALSE;
 }
 

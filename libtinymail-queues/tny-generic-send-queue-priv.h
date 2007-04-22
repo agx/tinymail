@@ -28,6 +28,7 @@ struct _TnyGenericSendQueuePriv
 	GMutex *lock;
 	TnyFolder *outbox, *sentbox;
 	TnyTransportAccount *account;
+	gboolean cancelled;
 };
 
 

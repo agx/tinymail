@@ -30,10 +30,58 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-generic-send-queue-priv.h"
 
+
+typedef struct {
+	TnySendQueue *self;
+	TnyMsg *msg;
+	GError *error;
+	gint i, total;
+} ErrorInfo;
+
+static gboolean 
+emit_error_on_mainloop (gpointer data)
+{
+	ErrorInfo *info = data;
+	g_signal_emit (info->self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+		0, info->msg, info->error, info->i, info->total);
+	return FALSE;
+}
+
+
+static void
+destroy_error_info (gpointer data)
+{
+	ErrorInfo *info = data;
+	if (info->msg)
+		g_object_unref (G_OBJECT (info->msg));
+	if (info->self)
+		g_object_unref (G_OBJECT (info->self));
+	if (info->error)
+		g_error_free (info->error);
+	g_slice_free (ErrorInfo, info);
+}
+
+static void
+emit_error (TnySendQueue *self, TnyMsg *msg, GError *error, int i, int total)
+{
+	ErrorInfo *info = g_slice_new0 (ErrorInfo);
+	if (error != NULL)
+		info->error = g_error_copy ((const GError *) error);
+	if (self)
+		info->self = TNY_SEND_QUEUE (g_object_ref (G_OBJECT (self)));
+	if (msg)
+		info->msg = TNY_MSG (g_object_ref (G_OBJECT (msg)));
+	info->i = i;
+	info->total = total;
+	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+		emit_error_on_mainloop, info, destroy_error_info);
+	return;
+}
+
 typedef struct {
 	TnyGenericSendQueue *self;
 	TnyMsg *msg;
-	GError **err;
+	gint i, total;
 } GenericSendInfo;
 
 
@@ -41,22 +89,41 @@ static gpointer
 generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
 {
 	GenericSendInfo *info = (GenericSendInfo *) arguments;
+	TnySendQueue *self = (TnySendQueue *) info->self;
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (info->self);
-	TnyList *list = tny_simple_list_new ();
+	TnyList *list;
+	GError *err = NULL;
 
 	g_mutex_lock (priv->lock);
 
-	tny_transport_account_send (priv->account, info->msg, info->err);
-	/* TODO handle err */
-
-	if (info->err == NULL)
+	if (priv->cancelled)
 	{
-		tny_list_prepend (list, G_OBJECT (info->msg));
-		tny_folder_transfer_msgs (priv->outbox, list, priv->sentbox, TRUE, info->err);
-		g_object_unref (list);
-		/* TODO handle err */
+		g_mutex_unlock (priv->lock);
+		return;
 	}
 
+	list = tny_simple_list_new ();
+	tny_transport_account_send (priv->account, info->msg, &err);
+	if (err != NULL) {
+		emit_error (self, info->msg, err, info->i, info->total);
+		g_error_free (err);
+	} else {
+		TnyFolder *outbox, *sentbox;
+
+		outbox = tny_send_queue_get_outbox (TNY_SEND_QUEUE (info->self));
+		sentbox = tny_send_queue_get_sentbox (TNY_SEND_QUEUE (info->self));
+
+		tny_list_prepend (list, G_OBJECT (info->msg));
+		tny_folder_transfer_msgs (outbox, list, sentbox, TRUE, &err);
+		g_object_unref (list);
+		if (err != NULL) {
+			emit_error (self, info->msg, err, info->i, info->total);
+			g_error_free (err);
+		}
+
+		g_object_unref (outbox);
+		g_object_unref (sentbox);
+	}
 	g_object_unref (info->msg);
 
 	g_mutex_unlock (priv->lock);
@@ -68,6 +135,7 @@ static void
 generic_send_callback (OAsyncWorkerTask *task, gpointer func_result)
 {
 	GenericSendInfo *info = o_async_worker_task_get_arguments (task);
+	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (info->self);
 
 	g_object_unref (info->self);
 	g_slice_free (GenericSendInfo, info);
@@ -78,16 +146,35 @@ tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 	TnyIterator *iter;
-	TnyList *list = tny_simple_list_new ();
+	TnyList *list;
+	gint i=1, total;
+
+	TnyFolder *outbox;
 
 	g_mutex_lock (priv->lock);
 
-	tny_folder_add_msg (priv->outbox, msg, err);
-	/* TODO: handle err */
+	outbox = tny_send_queue_get_outbox (self);
 
-	tny_folder_get_headers (priv->outbox, list, FALSE, err);
-	/* TODO: handle err */
+	tny_folder_add_msg (outbox, msg, err);
 
+	if (err!= NULL && *err != NULL) {
+		g_object_unref (G_OBJECT (outbox));
+		g_mutex_unlock (priv->lock);
+		return;
+	}
+
+	list = tny_simple_list_new ();
+	tny_folder_get_headers (outbox, list, FALSE, err);
+
+	if (err != NULL && *err != NULL)
+	{
+		g_object_unref (G_OBJECT (outbox));
+		g_object_unref (G_OBJECT (list));
+		g_mutex_unlock (priv->lock);
+		return;
+	}
+
+	total = tny_list_get_length (list);
 	iter = tny_list_create_iterator (list);
 
 	while (!tny_iterator_is_done (iter))
@@ -95,25 +182,43 @@ tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 		OAsyncWorkerTask *task = o_async_worker_task_new ();
 		GenericSendInfo *info = g_slice_new (GenericSendInfo);
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+		guint item = 0;
 
+		info->msg = NULL;
+		info->i = i;
+		info->total = total;
 		info->self = TNY_GENERIC_SEND_QUEUE (g_object_ref (self));
 		info->msg = tny_folder_get_msg (priv->outbox, header, err);
 
-		/* TODO: Handle err */
+		if (err != NULL && *err != NULL)
+		{
+			g_object_unref (G_OBJECT (task));
+			g_object_unref (G_OBJECT (info->self));
+			if (info->msg)
+				g_object_unref (G_OBJECT (info->msg));
+			g_object_unref (G_OBJECT (header));
+			g_object_unref (G_OBJECT (iter));
+			g_object_unref (G_OBJECT (list));
+			g_slice_free (GenericSendInfo, info);
+			g_object_unref (G_OBJECT (outbox));
+			g_mutex_unlock (priv->lock);
+			return;
+		}
 
-		info->err = err;
 		o_async_worker_task_set_arguments (task, info);
 		o_async_worker_task_set_func (task, generic_send_task);
 		o_async_worker_task_set_callback (task, generic_send_callback);
 
-		o_async_worker_add (priv->queue, task);
+		item = o_async_worker_add (priv->queue, task);
 
 		g_object_unref (header);
-		tny_iterator_next (iter);
+		tny_iterator_next (iter); 
+		i++;
 	}
 
 	g_object_unref (iter);
 	g_object_unref (list);
+	g_object_unref (G_OBJECT (outbox));
 
 	g_mutex_unlock (priv->lock);
 }
@@ -123,7 +228,64 @@ tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 static void
 tny_generic_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
 {
-	/* TODO */
+	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
+
+	priv->cancelled = TRUE;
+	o_async_worker_join (priv->queue);
+
+	g_mutex_lock (priv->lock);
+	if (remove)
+	{
+		TnyFolder *outbox;
+		TnyList *headers = tny_simple_list_new ();
+		TnyIterator *iter;
+
+		outbox = tny_send_queue_get_outbox (self);
+
+		tny_folder_get_headers (outbox, headers, TRUE, err);
+
+		if (err != NULL && *err != NULL)
+		{
+			g_object_unref (G_OBJECT (headers));
+			g_object_unref (G_OBJECT (outbox));
+			priv->cancelled = FALSE;
+			g_mutex_unlock (priv->lock);
+			return;
+		}
+
+		iter = tny_list_create_iterator (headers);
+
+		while (!tny_iterator_is_done (iter))
+		{
+			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+			tny_folder_remove_msg (outbox, header, err);
+
+			if (err != NULL && *err != NULL)
+			{
+				g_object_unref (G_OBJECT (header));
+				g_object_unref (G_OBJECT (iter));
+				g_object_unref (G_OBJECT (headers));
+				g_object_unref (G_OBJECT (outbox));
+				priv->cancelled = FALSE;
+				g_mutex_unlock (priv->lock);
+				return;
+			}
+
+			g_object_unref (G_OBJECT (header));
+			tny_iterator_next (iter);
+		}
+		g_object_unref (G_OBJECT (iter));
+		g_object_unref (G_OBJECT (headers));
+
+		tny_folder_sync (outbox, TRUE, err);
+
+		g_object_unref (G_OBJECT (outbox));
+	}
+
+	priv->cancelled = FALSE;
+	g_mutex_unlock (priv->lock);
+
+	return;
 }
 
 
@@ -172,8 +334,10 @@ tny_generic_send_queue_finalize (GObject *object)
 {
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (object);
 
-	g_mutex_lock (priv->lock);
+	priv->cancelled = TRUE;
 	o_async_worker_join (priv->queue);
+
+	g_mutex_lock (priv->lock);
 	g_object_unref (G_OBJECT (priv->queue));
 	g_object_unref (G_OBJECT (priv->sentbox));
 	g_object_unref (G_OBJECT (priv->outbox));
@@ -197,6 +361,7 @@ tny_generic_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->account = NULL;
 	priv->sentbox = NULL;
 	priv->outbox = NULL;
+	priv->cancelled = FALSE;
 	g_mutex_unlock (priv->lock);
 
 	return;
