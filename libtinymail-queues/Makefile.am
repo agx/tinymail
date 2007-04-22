@@ -5,11 +5,14 @@ lib_LTLIBRARIES = libtinymail-queues-1.0.la
 
 libtinymail_queues_1_0_headers = \
 	tny-get-msg-queue-priv.h \
-	tny-get-msg-queue.h
+	tny-get-msg-queue.h \
+	tny-generic-send-queue-priv.h \
+	tny-generic-send-queue.h
 
 libtinymail_queues_1_0_la_SOURCES = \
 	$(libtinymail_queues_1_0_headers) \
-	tny-get-msg-queue.c
+	tny-get-msg-queue.c \
+	tny-generic-send-queue.c
 
 libtinymail_queues_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS) $(LIBTINYMAIL_QUEUES_LIBS)
 libtinymail_queues_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

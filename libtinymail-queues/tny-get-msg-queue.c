@@ -70,7 +70,7 @@ get_msg_callback (OAsyncWorkerTask *task, gpointer func_result)
 
 	if (msg)
 		g_object_unref (msg);
-
+ 
 	g_object_unref (folder);
 	g_object_unref (info->header);
 	g_object_unref (info->self);
