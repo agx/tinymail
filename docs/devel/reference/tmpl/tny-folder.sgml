@@ -172,6 +172,7 @@ A abstract type that defines a folder
 @self: 
 @header: 
 @callback: 
+@status_callback: 
 @user_data: 
 
 

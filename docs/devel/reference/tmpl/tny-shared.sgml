@@ -377,18 +377,16 @@ transferring the messages.
 @user_data: user data passed at the caller
 
 
-<!-- ##### USER_FUNCTION TnyRefreshFolderStatusCallback ##### -->
+<!-- ##### USER_FUNCTION TnyStatusCallback ##### -->
 <para>
-A method that frequently gets called while a folder is being refreshed
+
 </para>
 
-@self: the #TnyFolder instance that is being refreshed
-@what: a status message
+@self: 
+@what: 
 @sofar: 
-@oftotal: the total amount that is to be done
-@user_data: user data passed at the caller
-<!-- # Unused Parameters # -->
-@status: a number that is smaller than or equal to @oftotal indicating the amount that is done
+@oftotal: 
+@user_data: 
 
 
 <!-- ##### STRUCT TnySimpleList ##### -->
@@ -492,6 +490,26 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
+
+<!-- ##### SIGNAL TnySendQueue::error-happened ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+
+<!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
