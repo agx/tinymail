@@ -703,7 +703,7 @@ typedef struct
 {
 	TnyFolder *self;
 	TnyRefreshFolderCallback callback;
-	TnyRefreshFolderStatusCallback status_callback;
+	TnyStatusCallback status_callback;
 	gpointer user_data;
 	gboolean cancelled;
 	guint depth;
@@ -925,7 +925,7 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 }
 
 static void
-tny_camel_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_camel_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->refresh_async_func (self, callback, status_callback, user_data);
 	return;
@@ -945,7 +945,7 @@ tny_camel_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callba
  * become zero while doing stuff on the instance in the background, don't you?
  **/
 static void
-tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info;
 	GThread *thread;
@@ -1183,6 +1183,7 @@ typedef struct
 	gpointer user_data;
 	guint depth;
 	TnyGetMsgCallback callback;
+	TnyStatusCallback status_callback;
 	TnySessionCamel *session;
 } GetMsgInfo;
 
@@ -1256,9 +1257,9 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 
 }
 static void
-tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async_func (self, header, callback, user_data);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async_func (self, header, callback, status_callback, user_data);
 }
 
 
@@ -1297,7 +1298,7 @@ tny_camel_folder_set_msg_receive_strategy_default (TnyFolder *self, TnyMsgReceiv
 }
 
 static void
-tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetMsgInfo *info;
 	GThread *thread;
@@ -1318,6 +1319,7 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	info->self = self;
 	info->header = header;
 	info->callback = callback;
+	info->status_callback = status_callback;
 	info->user_data = user_data;
 	info->depth = g_main_depth ();
 

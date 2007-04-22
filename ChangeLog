@@ -3,8 +3,12 @@
 	* Created a TnyGenericSendQueue which implements TnySendQueue in a
 	generic way (doesn't strictly depend on the libtinymail-camel impl
 	libraries like the TnyCamelSendQueue type)
+	* Added the status_callback to tny_folder_get_msg_async
+	* Renamed the TnyFolderRefreshStatusCallback to TnyStatusCallback
 
 	* This was a minor API change (new type added)
+	* This was a major API change for tny_folder_get_msg_async and
+	tny_folder_refresh_async (TnyStatusCallback added and renamed)
 
 2007-04-21  Philip Van Hoof  <pvanhoof@gnome.org>
 

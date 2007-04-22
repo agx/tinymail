@@ -579,7 +579,7 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * </programlisting></informalexample>
  **/
 void
-tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
@@ -884,6 +884,7 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
  * @self: a #TnyFolder object
  * @header: a #TnyHeader object
  * @callback: The callback handler
+ * @status_callback: the status callback handler
  * @user_data: user data for the callback
  *
  * Get a message in @self identified by @header. 
@@ -902,6 +903,11 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
  *
  * Example:
  * <informalexample><programlisting>
+ * static void 
+ * status_cb (gpointer folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
+ * {
+ *       printf (".");
+ * }
  * static void
  * folder_get_msg_cb (TnyFolder *folder, TnyMsg *msg, GError **err, gpointer user_data)
  * {
@@ -911,21 +917,22 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
  * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
  * TnyFolder *folder = ...; TnyHeader *header = ...;
  * tny_folder_get_msg_async (folder, header,
- *          folder_get_msg_cb, message_view); 
+ *          folder_get_msg_cb, status_cb, message_view); 
  * </programlisting></informalexample>
  **/
 void
-tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (header);
 	g_assert (TNY_IS_HEADER (header));
 	g_assert (callback);
+	g_assert (status_callback);
 	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_async_func != NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->get_msg_async_func (self, header, callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->get_msg_async_func (self, header, callback, status_callback, user_data);
 
 	return;
 }

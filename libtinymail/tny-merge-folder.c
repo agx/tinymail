@@ -207,6 +207,7 @@ typedef struct
 	gpointer user_data;
 	guint depth;
 	TnyGetMsgCallback callback;
+	TnyStatusCallback status_callback;
 } GetMsgInfo;
 
 static void
@@ -277,7 +278,7 @@ get_msg_async_thread (gpointer thr_user_data)
 }
 
 static void
-tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, gpointer user_data)
+tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetMsgInfo *info;
 	GThread *thread;
@@ -287,6 +288,7 @@ tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 	info->self = self;
 	info->header = header;
 	info->callback = callback;
+	info->status_callback = status_callback;
 	info->user_data = user_data;
 	info->depth = g_main_depth ();
 
@@ -493,7 +495,7 @@ typedef struct
 {
 	TnyFolder *self;
 	TnyRefreshFolderCallback callback;
-	TnyRefreshFolderStatusCallback status_callback;
+	TnyStatusCallback status_callback;
 	gpointer user_data;
 	gboolean cancelled;
 	guint depth;
@@ -599,7 +601,7 @@ refresh_async_thread (gpointer thr_user_data)
 
 
 static void
-tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyRefreshFolderStatusCallback status_callback, gpointer user_data)
+tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info;
 	GThread *thread;

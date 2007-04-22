@@ -463,7 +463,7 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 
 
 static void
-refresh_current_folder_status_update (TnyFolder *folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
+refresh_current_folder_status_update (gpointer folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
 {
 	gchar *new_what;
 
