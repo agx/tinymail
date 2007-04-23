@@ -88,6 +88,8 @@ tny_status_new_valist (GQuark domain, int code, guint position, guint of_total, 
  * tny_status_new:
  * @domain: status domain 
  * @code: status code
+ * @position: the position
+ * @of_total: the total amount of events to happen
  * @format: printf()-style format for status message
  * @Varargs: parameters for message format
  * 
@@ -116,6 +118,8 @@ tny_status_new (GQuark domain, gint code, guint position, guint of_total, const 
  * tny_status_new_literal:
  * @domain: status domain
  * @code: status code
+ * @position: the position
+ * @of_total: the total amount of events to happen
  * @message: status message
  * 
  * Creates a new #TnyStatus; unlike tny_status_new(), @message is not
@@ -209,6 +213,8 @@ tny_status_matches (const TnyStatus *status, GQuark domain, gint code)
  * @status: a return location for a #TnyStatus, or %NULL
  * @domain: status domain
  * @code: status code 
+ * @position: the position
+ * @of_total: the total amount of events to happen
  * @format: printf()-style format
  * @Varargs: args for @format 
  * 
