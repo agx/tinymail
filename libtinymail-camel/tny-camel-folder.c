@@ -25,6 +25,7 @@
 
 #include <string.h>
 
+#include <tny-status.h>
 #include <tny-folder-store.h>
 #include <tny-folder.h>
 #include <tny-folder-stats.h>
@@ -787,8 +788,14 @@ progress_func (gpointer data)
 
 	if (minfo && minfo->status_callback)
 	{
-		minfo->status_callback (minfo->self, (const gchar*)info->what, 
-			info->sofar, info->oftotal, minfo->user_data);
+		TnyStatus *status = tny_status_new (TNY_FOLDER_STATUS, 
+			TNY_FOLDER_STATUS_CODE_REFRESH,
+			info->sofar, info->oftotal, info->what);
+
+		minfo->status_callback (G_OBJECT (minfo->self), status, 
+			minfo->user_data);
+
+		tny_status_free (status);
 	}
 
 	return FALSE;

@@ -21,9 +21,11 @@
  */
 
 #include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
+typedef struct _TnyStatus TnyStatus;
 typedef struct _TnyAccountStore TnyAccountStore;
 typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
 typedef struct _TnyList TnyList;
@@ -53,7 +55,7 @@ typedef void (*TnyForgetPassFunc) (TnyAccount *self);
 typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, GError **err, gpointer user_data);
 typedef void (*TnyGetMsgCallback) (TnyFolder *folder, TnyMsg *msg, GError **err, gpointer user_data);
 typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, GError **err, gpointer user_data);
-typedef void (*TnyStatusCallback) (gpointer self, const gchar *what, gint sofar, gint oftotal, gpointer user_data);
+typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
 typedef enum _TnyHeaderPriorityFlags TnyHeaderPriorityFlags;
 typedef enum _TnyAlertType TnyAlertType;
@@ -81,6 +83,8 @@ typedef struct _TnySendQueue TnySendQueue;
 typedef struct _TnySendQueueIface TnySendQueueIface;
 typedef enum _TnyError TnyError;
 typedef enum _TnyErrorDomain TnyErrorDomain;
+typedef enum _TnyStatusCode TnyStatusCode;
+typedef enum _TnyStatusDomain TnyStatusDomain;
 typedef struct _TnyMsgReceiveStrategy TnyMsgReceiveStrategy;
 typedef struct _TnyMsgReceiveStrategyIface TnyMsgReceiveStrategyIface;
 typedef struct _TnyPair TnyPair;
@@ -106,6 +110,7 @@ typedef struct _TnyFolderStatsClass TnyFolderStatsClass;
 typedef enum _TnyFolderCaps TnyFolderCaps;
 typedef struct _TnyPasswordGetter TnyPasswordGetter;
 typedef struct _TnyPasswordGetterIface TnyPasswordGetterIface;
+
 
 G_END_DECLS
 

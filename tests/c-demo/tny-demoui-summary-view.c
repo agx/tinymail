@@ -49,6 +49,7 @@
 #include <tny-olpc-account-store.h>
 #endif
 
+#include <tny-status.h>
 #include <tny-account-store.h>
 #include <tny-account.h>
 #include <tny-store-account.h>
@@ -463,17 +464,19 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 
 
 static void
-refresh_current_folder_status_update (gpointer folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
+refresh_current_folder_status_update (GObject *sender, TnyStatus *status, gpointer user_data)
 {
 	gchar *new_what;
 
 	TnyDemouiSummaryViewPriv *priv = user_data;
-	gdouble fraq = (((gdouble) sofar) / (( gdouble) oftotal));
-
-	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress), fraq);
+	
+	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress), 
+		tny_status_get_percentage (status));
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
 
-	new_what = g_strdup_printf ("%s (%d/%d)", what, sofar, oftotal);
+	new_what = g_strdup_printf ("%s (%d/%d)", status->message, status->position, 
+		status->of_total);
+
 	gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, new_what);
 	g_free (new_what);
 
