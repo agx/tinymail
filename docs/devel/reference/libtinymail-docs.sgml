@@ -10,6 +10,7 @@
 <!ENTITY libtinymail-TnyTransportAccount SYSTEM "xml/tny-transport-account.xml">
 <!ENTITY libtinymail-TnyAccountStore SYSTEM "xml/tny-account-store.xml">
 <!ENTITY libtinymail-TnyHeader SYSTEM "xml/tny-header.xml">
+<!ENTITY libtinymail-TnyStatus SYSTEM "xml/tny-status.xml">
 <!ENTITY libtinymail-TnyMsg SYSTEM "xml/tny-msg.xml">
 <!ENTITY libtinymail-TnyMimePart SYSTEM "xml/tny-mime-part.xml">
 <!ENTITY libtinymail-TnyStream SYSTEM "xml/tny-stream.xml">
@@ -155,6 +156,7 @@
 		&libtinymail-TnyPasswordGetter;
 		&libtinymail-TnyEnums;
 		&libtinymail-TnyShared;
+		&libtinymail-TnyStatus;
 	</chapter>
 
 	<chapter id="libtinymailui">

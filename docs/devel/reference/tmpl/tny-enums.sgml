@@ -22,42 +22,42 @@ Enumerations for tinymail
 
 </para>
 
-@TNY_FOLDER_STATUS_CODE_REFRESH: 
-@TNY_FOLDER_STATUS_CODE_GET_MSG: 
+@TNY_FOLDER_STATUS_CODE_REFRESH: a status that occurs while a folder is being refreshed 
+@TNY_FOLDER_STATUS_CODE_GET_MSG: a status that occurs while a message is being downloaded
 
 <!-- ##### ENUM TnyStatusDomain ##### -->
 <para>
 
 </para>
 
-@TNY_FOLDER_STATUS: 
+@TNY_FOLDER_STATUS: a status domain code for folder
 
 <!-- ##### ENUM TnyFolderCaps ##### -->
 <para>
 
 </para>
 
-@TNY_FOLDER_CAPS_WRITABLE: 
-@TNY_FOLDER_CAPS_PUSHEMAIL: 
+@TNY_FOLDER_CAPS_WRITABLE: indicates that the folder is writable
+@TNY_FOLDER_CAPS_PUSHEMAIL: indicates that the folder supports Push E-mail
 
 <!-- ##### ENUM TnyFolderChangeChanged ##### -->
 <para>
 
 </para>
 
-@TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT: 
-@TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT: 
-@TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS: 
-@TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS: 
-@TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME: 
+@TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT: indicates that the total count of the folder got changed
+@TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT: indicates that the unread count of the folder got changed
+@TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS: indicates that a summary item or header got added (that a message got added, this is a typical Push E-mail event)
+@TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS: indicates that a summary item or header got removed (that a message got removed, this is a typical Push E-mail event)
+@TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME: indicates that the folder got renamed
 
 <!-- ##### ENUM TnyFolderStoreChangeChanged ##### -->
 <para>
 
 </para>
 
-@TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS: 
-@TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS: 
+@TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS: indicates that a folder got created in the store
+@TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS: indicates that a folder got removed from the store
 
 <!-- ##### ENUM TnyErrorDomain ##### -->
 <para>
@@ -67,26 +67,26 @@ Enumerations for tinymail
 @TNY_FOLDER_ERROR: An error domain for errors that occured with a folder
 @TNY_FOLDER_STORE_ERROR: An error domain for errors that occured with a folder store
 @TNY_TRANSPORT_ACCOUNT_ERROR: An error domain for errors that occured with a transport account
-@TNY_ACCOUNT_ERROR: 
+@TNY_ACCOUNT_ERROR: An error domain for errors that occured with a account
 
 <!-- ##### ENUM TnyError ##### -->
 <para>
 
 </para>
 
-@TNY_ERROR_UNSPEC: 
+@TNY_ERROR_UNSPEC: An unspecified error occured
 @TNY_FOLDER_ERROR_REMOVE_MSG: An error that occured while removing a message
 @TNY_FOLDER_ERROR_ADD_MSG: An error that occured while adding a message
 @TNY_FOLDER_ERROR_REFRESH: An error that occured while refreshing a folder
 @TNY_FOLDER_ERROR_GET_MSG: An error that occured while getting a message
 @TNY_FOLDER_ERROR_TRANSFER_MSGS: An error that occured while transfering a message
 @TNY_FOLDER_ERROR_SET_NAME: An error that occured while renaming a folder
-@TNY_FOLDER_ERROR_COPY: 
+@TNY_FOLDER_ERROR_COPY: An error that occured while copying a folder
 @TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER: An error that occured while removing a folder
 @TNY_FOLDER_STORE_ERROR_GET_FOLDERS: An error that occured while getting folders
 @TNY_FOLDER_STORE_ERROR_CREATE_FOLDER: An error that occured while creating a folder
 @TNY_TRANSPORT_ACCOUNT_ERROR_SEND: An error that occured while sending a message
-@TNY_ACCOUNT_ERROR_TRY_CONNECT: 
+@TNY_ACCOUNT_ERROR_TRY_CONNECT: An error that occured while trying to connect to an account
 
 <!-- ##### ENUM TnyAccountType ##### -->
 <para>

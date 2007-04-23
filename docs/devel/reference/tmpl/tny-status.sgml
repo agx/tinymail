@@ -1,17 +1,17 @@
 <!-- ##### SECTION Title ##### -->
-tny-status
+TnyStatus
 
 <!-- ##### SECTION Short_Description ##### -->
-
+An object containing status information
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+An object containing status information
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyFolder
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->

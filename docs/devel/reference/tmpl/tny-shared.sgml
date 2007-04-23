@@ -390,12 +390,12 @@ transferring the messages.
 
 <!-- ##### USER_FUNCTION TnyStatusCallback ##### -->
 <para>
-
+A method that gets called whenever there's a status event
 </para>
 
-@self: 
-@status: 
-@user_data: 
+@self: The sender of the status 
+@status: a #TnyStatus object
+@user_data: user data passed by the caller
 
 
 <!-- ##### STRUCT TnySimpleList ##### -->
