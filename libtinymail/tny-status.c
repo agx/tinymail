@@ -61,6 +61,9 @@ tny_status_set_percentage (TnyStatus *status, gdouble percentage)
 gdouble 
 tny_status_get_percentage (TnyStatus *status)
 {
+	if (status->of_total == 0)
+		return 1;
+
 	return (gdouble) ( ((gdouble) status->position) / ((gdouble)status->of_total) );
 }
 
