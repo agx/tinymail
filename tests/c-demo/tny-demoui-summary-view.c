@@ -471,7 +471,7 @@ refresh_current_folder_status_update (GObject *sender, TnyStatus *status, gpoint
 	TnyDemouiSummaryViewPriv *priv = user_data;
 	
 	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress), 
-		tny_status_get_percentage (status));
+		tny_status_get_fraction (status));
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
 
 	new_what = g_strdup_printf ("%s (%d/%d)", status->message, status->position, 

@@ -63,7 +63,7 @@ gboolean tny_status_matches (const TnyStatus *status, GQuark domain, gint code);
 void tny_set_status (TnyStatus **status, GQuark domain, gint code, guint position, guint of_total, gchar *format, ...);
 void tny_clear_status (TnyStatus **status);
 
-void tny_status_set_percentage (TnyStatus *status, gdouble percentage);
-gdouble tny_status_get_percentage (TnyStatus *status);
+void tny_status_set_fraction (TnyStatus *status, gdouble percentage);
+gdouble tny_status_get_fraction (TnyStatus *status);
 
 #endif

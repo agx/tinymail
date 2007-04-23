@@ -52,14 +52,14 @@ tny_status_code_get_type (void)
 }
 
 void 
-tny_status_set_percentage (TnyStatus *status, gdouble percentage)
+tny_status_set_fraction (TnyStatus *status, gdouble percentage)
 {
 	status->of_total = 100;
 	status->position = percentage * 100;
 }
 
 gdouble 
-tny_status_get_percentage (TnyStatus *status)
+tny_status_get_fraction (TnyStatus *status)
 {
 	if (status->of_total == 0)
 		return 1;
