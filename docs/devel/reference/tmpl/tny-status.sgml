@@ -1,0 +1,137 @@
+<!-- ##### SECTION Title ##### -->
+tny-status
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TNY_TYPE_STATUS_DOMAIN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT TnyStatus ##### -->
+<para>
+
+</para>
+
+@domain: 
+@code: 
+@message: 
+@position: 
+@of_total: 
+
+<!-- ##### MACRO TNY_TYPE_STATUS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION tny_status_domain_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_status_code_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_status_new ##### -->
+<para>
+
+</para>
+
+@domain: 
+@code: 
+@position: 
+@of_total: 
+@format: 
+@Varargs: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_status_new_literal ##### -->
+<para>
+
+</para>
+
+@domain: 
+@code: 
+@position: 
+@of_total: 
+@message: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_status_free ##### -->
+<para>
+
+</para>
+
+@status: 
+
+
+<!-- ##### FUNCTION tny_status_copy ##### -->
+<para>
+
+</para>
+
+@status: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_status_matches ##### -->
+<para>
+
+</para>
+
+@status: 
+@domain: 
+@code: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_set_status ##### -->
+<para>
+
+</para>
+
+@status: 
+@domain: 
+@code: 
+@position: 
+@of_total: 
+@format: 
+@Varargs: 
+
+
+<!-- ##### FUNCTION tny_clear_status ##### -->
+<para>
+
+</para>
+
+@status: 
+
+

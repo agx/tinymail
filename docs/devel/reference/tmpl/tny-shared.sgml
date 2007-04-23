@@ -17,6 +17,17 @@ Shared include file with forward typedefs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### STRUCT TnyStatus ##### -->
+<para>
+
+</para>
+
+@domain: 
+@code: 
+@message: 
+@position: 
+@of_total: 
+
 <!-- ##### STRUCT TnyAccountStore ##### -->
 <para>
 
@@ -383,9 +394,7 @@ transferring the messages.
 </para>
 
 @self: 
-@what: 
-@sofar: 
-@oftotal: 
+@status: 
 @user_data: 
 
 
