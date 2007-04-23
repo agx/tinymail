@@ -55,6 +55,7 @@ typedef void (*TnyGetMsgCallback) (TnyFolder *folder, TnyMsg *msg, GError **err,
 typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, GError **err, gpointer user_data);
 typedef void (*TnyStatusCallback) (gpointer self, const gchar *what, gint sofar, gint oftotal, gpointer user_data);
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
+typedef enum _TnyHeaderPriorityFlags TnyHeaderPriorityFlags;
 typedef enum _TnyAlertType TnyAlertType;
 typedef enum _TnyFolderType TnyFolderType;
 typedef struct _TnySimpleList TnySimpleList;

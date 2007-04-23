@@ -49,6 +49,7 @@ G_BEGIN_DECLS
 typedef struct _TnyHeader TnyHeader;
 typedef struct _TnyHeaderIface TnyHeaderIface;
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
+typedef enum _TnyHeaderPriorityFlags TnyHeaderPriorityFlags;
 #endif
 
 enum _TnyHeaderFlags 
@@ -62,13 +63,16 @@ enum _TnyHeaderFlags
 	TNY_HEADER_FLAG_CACHED = 1<<6,
 	TNY_HEADER_FLAG_PARTIAL = 1<<7,
 	TNY_HEADER_FLAG_EXPUNGED = 1<<8,
-	TNY_HEADER_FLAG_HIGH_PRIORITY = 1<<9|1<<10,
-	TNY_HEADER_FLAG_NORMAL_PRIORITY = 0<<9|0<<10,
-	TNY_HEADER_FLAG_LOW_PRIORITY = 0<<9|1<<10
-
+	TNY_HEADER_FLAG_PRIORITY = 1<<9|1<<10,
 	/* Keep below 1<<12 (internally used bits) */
 };
 
+enum _TnyHeaderPriorityFlags 
+{
+	TNY_HEADER_FLAG_HIGH_PRIORITY = 1<<9|1<<10,
+	TNY_HEADER_FLAG_NORMAL_PRIORITY = 0<<9|0<<10,
+	TNY_HEADER_FLAG_LOW_PRIORITY = 0<<9|1<<10
+};
 
 struct _TnyHeaderIface
 {
