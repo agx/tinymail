@@ -63,10 +63,10 @@ struct _TnyFolderChangeClass
 GType  tny_folder_change_get_type (void);
 TnyFolderChange* tny_folder_change_new (TnyFolder *folder);
 
-const gchar *tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname);
+const gchar* tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname);
 void tny_folder_change_set_rename (TnyFolderChange *self, const gchar *newname);
 void tny_folder_change_set_received_msg (TnyFolderChange *self, TnyMsg *msg);
-TnyMsg *tny_folder_change_get_received_msg (TnyFolderChange *self);
+TnyMsg* tny_folder_change_get_received_msg (TnyFolderChange *self);
 void tny_folder_change_set_new_all_count (TnyFolderChange *self, guint new_all_count);
 void tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_count);
 guint tny_folder_change_get_new_unread_count (TnyFolderChange *self);
