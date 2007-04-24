@@ -19,6 +19,11 @@
 
 	* This was a major API change
 
+2007-04-23 Javier Fernandez Garcia-Boente
+
+	* Change priority flags management, using a bit mask to get assigned priority.
+        * New enumeration to define available priority flags. 
+
 2007-04-21  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Created a TnyGenericSendQueue which implements TnySendQueue in a
