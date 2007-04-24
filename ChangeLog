@@ -1,3 +1,7 @@
+2007-04-24 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Make tinymail/maemo buildable with or without libconic
+
 2007-04-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Introduction of the TnyStatus infrastructure

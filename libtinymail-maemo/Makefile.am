@@ -1,6 +1,7 @@
 INCLUDES = -I. -I$(top_srcdir) \
 	$(LIBTINYMAIL_MAEMO_CFLAGS) \
 	$(LIBTINYMAIL_CAMEL_CFLAGS) \
+	$(LIBTINYMAIL_MAEMO_CONIC_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
 	-I$(top_srcdir)/libtinymailui \
 	-I$(top_srcdir)/libtinymailui-gtk \
@@ -16,21 +17,28 @@ libtinymail_maemo_1_0_headers = \
 	tny-maemo-account-store.h \
 	tny-maemo-device.h \
 	tny-maemo-platform-factory.h \
-	tny-maemo-conic-device.h
+	tny-maemo-conic-device.h 	
 
 libtinymail_maemo_1_0_la_SOURCES =  \
 	$(libtinymail_maemo_1_0_headers) \
 	tny-maemo-account-store.c \
 	tny-maemo-device.c \
-	tny-maemo-platform-factory.c \
-	tny-maemo-conic-device.c
+	tny-maemo-platform-factory.c
 
+EXTRA_libtinymail_maemo_1_0_la_SOURCES = \
+	tny-maemo-conic-device.c				 
+					
 libtinymail_maemo_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_MAEMO_LIBS) \
+	$(LIBTINYMAIL_MAEMO_CONIC_LIBS) \
+	@MAEMO_DEVICE@ \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
+
+libtinymail_maemo_1_0_la_DEPENDENCIES=\
+	@MAEMO_DEVICE@
 
 libtinymail_maemo_1_0_la_LDFLAGS = -export-dynamic \
 	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
