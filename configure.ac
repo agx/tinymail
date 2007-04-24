@@ -354,9 +354,7 @@ dnl ### libtinymail-maemo, a platform library implementation for the maemo platf
 if test x$PLATFORMDIR = xlibtinymail-maemo; then
 	PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 libosso) 
 	PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO_CONIC,conic,HAVE_CONIC=yes,HAVE_CONIC=no)
- 	if test "x$HAVE_CONIC"=="xno"; then
-		MAEMO_DEVICE=""
-	else
+ 	if test "x$HAVE_CONIC"="xyes"; then
      		MAEMO_DEVICE='tny-maemo-conic-device.$(OBJEXT)'
 		AC_SUBST(LIBYINYMAIL_MAEMO_CONIC_CFLAGS)
 		AC_SUBST(LIBTINYMAIL_MAEMO_CONIC_LIBS)
@@ -367,7 +365,6 @@ if test x$PLATFORMDIR = xlibtinymail-maemo; then
  			AC_DEFINE_UNQUOTED(MAEMO_CONIC_DUMMY,1,["Whether to hack the TnyMaemoConicDevice to somewhat work in sbox"])
  		fi
 	fi	
-
 	AC_SUBST([MAEMO_DEVICE])
 	AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 	AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
