@@ -1,3 +1,11 @@
+2007-04-23  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* tny_folder_change_set_received_msg,
+	tny_folder_change_get_received_msg and
+	TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED added
+
+	* This was a major API change
+
 2007-04-24 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Make tinymail/maemo buildable with or without libconic

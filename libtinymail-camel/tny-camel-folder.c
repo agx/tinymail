@@ -1199,11 +1199,20 @@ static void
 tny_camel_folder_get_msg_async_destroyer (gpointer thr_user_data)
 {
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
+	TnyFolderChange *change;
+
+	if (info->msg) 
+	{
+		change = tny_folder_change_new (info->self);
+		tny_folder_change_set_received_msg (change, info->msg);
+		notify_folder_observers_about (info->self, change);
+		g_object_unref (G_OBJECT (change));
+
+		g_object_unref (G_OBJECT (info->msg));
+	}
 
 	/* thread reference */
 	g_object_unref (G_OBJECT (info->self));
-	if (info->msg)
-		g_object_unref (G_OBJECT (info->msg));
 
 	if (info->err)
 		g_error_free (info->err);
@@ -1351,6 +1360,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyMsg *retval = NULL;
+	TnyFolderChange *change;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
@@ -1374,6 +1384,14 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 		}
 
 	retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, header, err);
+
+	if (retval)
+	{
+		change = tny_folder_change_new (self);
+		tny_folder_change_set_received_msg (change, retval);
+		notify_folder_observers_about (self, change);
+		g_object_unref (G_OBJECT (change));
+	}
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 

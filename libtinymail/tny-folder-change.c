@@ -36,17 +36,61 @@ struct _TnyFolderChangePriv
 	TnyFolder *folder;
 	gchar *oldname, *newname;
 	TnyFolderChangeChanged changed;
+	TnyMsg *msg;
 };
 
 #define TNY_FOLDER_CHANGE_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER_CHANGE, TnyFolderChangePriv))
 
+/**
+ * tny_folder_change_set_received_msg:
+ * @self: a #TnyFolderChange instance
+ * @msg: a #TnyMsg instance
+ *
+ * Set the message that got received
+ **/
+void 
+tny_folder_change_set_received_msg (TnyFolderChange *self, TnyMsg *msg)
+{
+	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->lock);
+	if (priv->msg)
+		g_object_unref (priv->msg);
+	priv->msg = TNY_MSG (g_object_ref (msg));
+	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED;
+	g_mutex_unlock (priv->lock);
+}
+
+/**
+ * tny_folder_change_get_received_msg:
+ * @self: a #TnyFolderChange instance
+ *
+ * Get the message that got received
+ *
+ * Return value: the message that got received
+ **/
+TnyMsg *
+tny_folder_change_get_received_msg (TnyFolderChange *self)
+{
+	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
+	TnyMsg *msg = NULL;
+
+	g_mutex_lock (priv->lock);
+	if (priv->msg)
+		msg = TNY_MSG (g_object_ref (priv->msg));
+	g_mutex_unlock (priv->lock);
+
+	return msg;
+}
 
 /**
  * tny_folder_change_get_changed:
  * @self: a #TnyFolderChange instance
  *
  * Get an enum with all the changed things
+ *
+ * Return value: the changed-flags
  **/
 TnyFolderChangeChanged 
 tny_folder_change_get_changed  (TnyFolderChange *self)
@@ -275,7 +319,9 @@ tny_folder_change_reset (TnyFolderChange *self)
 		g_object_unref (G_OBJECT (priv->removed));
 	priv->added = NULL;
 	priv->removed = NULL;
-
+	if (priv->msg)
+		g_object_unref (priv->msg);
+	priv->msg = NULL;
 	g_mutex_unlock (priv->lock);
 }
 
@@ -388,6 +434,7 @@ tny_folder_change_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	g_mutex_lock (priv->lock);
 
+	priv->msg = NULL;
 	priv->changed = 0;
 	priv->new_unread_count = 0;
 	priv->new_all_count = 0;
@@ -417,11 +464,12 @@ tny_folder_change_finalize (GObject *object)
 	priv->added = NULL;
 	priv->removed = NULL;
 
+	if (priv->msg)
+		g_object_unref (priv->msg);
 	if (priv->oldname)
 		g_free (priv->oldname);
 	if (priv->newname)
 		g_free (priv->newname);
-
 	if (priv->folder)
 		g_object_unref (G_OBJECT (priv->folder));
 
