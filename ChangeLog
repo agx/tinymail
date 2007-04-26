@@ -1,3 +1,22 @@
+2007-04-26  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_instance_init),
+	(tny_maemo_conic_device_new): Do all the initialization in init, because 
+	_new functions should just call g_object_new() and not access private API, 
+	because they are just C convenience functions.
+	(on_connection_event), (tny_maemo_conic_device_connect),
+	(tny_maemo_conic_device_disconnect),
+	(tny_maemo_conic_device_get_iap),
+	(tny_maemo_conic_device_get_iap_list),
+	(tny_maemo_conic_device_force_online),
+	(tny_maemo_conic_device_force_offline),
+	(tny_maemo_conic_device_finalize): 
+	Copy the iap string instead of just storing the pointer, because we have no 
+	guarantees about the lifetime of the string that con_ic_event_get_iap_id() 
+	returns. Free it in finalize.
+	Added g_return_if*() checks for priv->cnx, without which nothing could work.
+
 2007-04-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* tny_folder_change_set_received_msg,

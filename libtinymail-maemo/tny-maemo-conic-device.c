@@ -29,7 +29,7 @@ static GObjectClass *parent_class = NULL;
 typedef struct {
 	ConIcConnection *cnx;
 	gboolean        is_online;
-	const gchar     *iap;
+	gchar     *iap;
 } TnyMaemoConicDevicePriv;
 
 #define TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE(o)	\
@@ -48,7 +48,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 {
 	TnyMaemoConicDevice *device; 
 	TnyMaemoConicDevicePriv *priv;
-	gboolean is_online;
+	gboolean is_online = FALSE;
 
 	g_return_if_fail (CON_IC_IS_CONNECTION(cnx));
 	g_return_if_fail (user_data);
@@ -82,7 +82,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	
 	switch (con_ic_connection_event_get_status(event)) {
 	case CON_IC_STATUS_CONNECTED:
-		priv->iap = con_ic_event_get_iap_id ((ConIcEvent*)(event));
+		priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
 		is_online = TRUE;
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
@@ -116,11 +116,13 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 gboolean
 tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
-	TnyMaemoConicDevicePriv *priv;	
+	TnyMaemoConicDevicePriv *priv;
 
 	g_return_if_fail (TNY_IS_DEVICE(self));
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
+	g_return_val_if_fail (priv->cnx, FALSE);
+
 	if (iap_id) {
 		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect_by_id dbus message");
@@ -152,7 +154,10 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 	TnyMaemoConicDevicePriv *priv;	
 	
 	g_return_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self));
+	g_return_val_if_fail (priv->cnx, FALSE);
+
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+
 
 	if (iap_id) {
 		if (!con_ic_connection_disconnect_by_id (priv->cnx, iap_id)) {
@@ -211,6 +216,7 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (iap_id, NULL);
+	g_return_val_if_fail (priv->cnx, NULL);
 
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
@@ -234,6 +240,7 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	TnyMaemoConicDevicePriv *priv;
 	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
+	g_return_val_if_fail (priv->cnx, NULL);
 
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
@@ -271,6 +278,8 @@ tny_maemo_conic_device_force_online (TnyDevice *self)
 #endif /*MAEMO_CONIC_DUMMY*/
 	
 	g_return_if_fail (TNY_IS_DEVICE(self));
+	g_return_if_fail (priv->cnx);
+
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE))
@@ -288,6 +297,8 @@ tny_maemo_conic_device_force_offline (TnyDevice *self)
 #endif /*MAEMO_CONIC_DUMMY*/
 
 	g_return_if_fail (TNY_IS_DEVICE(self));
+	g_return_if_fail (priv->cnx);
+
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 	if (!con_ic_connection_disconnect (priv->cnx))
@@ -312,7 +323,23 @@ static void
 tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMaemoConicDevice *self = (TnyMaemoConicDevice *)instance;
+
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	priv->iap = NULL;
+	priv->cnx = con_ic_connection_new ();
+	if (!priv->cnx) {
+		g_warning ("con_ic_connection_new failed. The TnyMaemoConicDevice will be useless.");
+	}
+	g_signal_connect (priv->cnx, "connection-event",
+			  G_CALLBACK(on_connection_event), self);
+
+	/*
+	 * this will get us in connected state only if there is already a connection.
+	 * thus, this will setup our state correctly when we receive the signals
+	 */
+	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
+		g_warning ("could not send connect dbus message");
+	
 	
 	priv->is_online     = FALSE; 
 }
@@ -327,29 +354,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 TnyDevice*
 tny_maemo_conic_device_new (void)
 {
-	TnyMaemoConicDevice *self; 
-	TnyMaemoConicDevicePriv *priv;
-
-	self = g_object_new (TNY_TYPE_MAEMO_CONIC_DEVICE, NULL);
-	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-
-	priv->iap = NULL;
-	priv->cnx = con_ic_connection_new ();
-	if (!priv->cnx) {
-		g_warning ("con_ic_connection_new failed");
-		g_object_unref (self);
-		return NULL;
-	}
-	g_signal_connect (priv->cnx, "connection-event",
-			  G_CALLBACK(on_connection_event), self);
-
-	/*
-	 * this will get us in connected state only if there is already a connection.
-	 * thus, this will setup our state correctly when we receive the signals
-	 */
-	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
-		g_warning ("could not send connect dbus message");
-	
+	TnyMaemoConicDevice *self = g_object_new (TNY_TYPE_MAEMO_CONIC_DEVICE, NULL);
 	return TNY_DEVICE (self);
 }
 
@@ -358,13 +363,17 @@ tny_maemo_conic_device_finalize (GObject *obj)
 {
 	TnyMaemoConicDevicePriv *priv;
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
-	if (CON_IC_IS_CONNECTION(priv->cnx)) {
+	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
 		if (!con_ic_connection_disconnect (priv->cnx))
 			g_warning ("failed to send disconnect dbus message");
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
+	}
+
+	if (priv->iap) {
+		g_free (priv->iap);
 		priv->iap = NULL;
-	}	
+	}
 
 	(*parent_class->finalize) (obj);
 }
