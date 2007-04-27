@@ -1,3 +1,11 @@
+2007-04-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Getting the unread and total counts correct. Latest changes
+	introduce a memory peak at application startup. This peak can be
+	improved by only reading the unread and total counts from the
+	summary.mmap files in camel-lite (right now, the entire folder's info
+	is read and parsed, causing the peak to occur)
+
 2007-04-27  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail/tny-device.c: Improve the documentation for 
