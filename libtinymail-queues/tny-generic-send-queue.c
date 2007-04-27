@@ -440,6 +440,8 @@ tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, Tny
 	priv->outbox = TNY_FOLDER (g_object_ref (outbox));
 	priv->sentbox = TNY_FOLDER (g_object_ref (sentbox));
 
+	tny_folder_add_observer (priv->outbox, TNY_FOLDER_OBSERVER (self));
+
 	process_current_items (TNY_SEND_QUEUE (self));
 
 	return TNY_SEND_QUEUE (self);
@@ -457,6 +459,7 @@ tny_generic_send_queue_finalize (GObject *object)
 	g_mutex_lock (priv->lock);
 	g_object_unref (G_OBJECT (priv->queue));
 	g_object_unref (G_OBJECT (priv->sentbox));
+	tny_folder_remove_observer (priv->outbox, TNY_FOLDER_OBSERVER (object));
 	g_object_unref (G_OBJECT (priv->outbox));
 	g_object_unref (G_OBJECT (priv->account));
 	g_mutex_unlock (priv->lock);
