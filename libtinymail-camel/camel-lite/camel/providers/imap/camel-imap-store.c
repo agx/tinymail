@@ -3103,6 +3103,11 @@ my_du (char *name, int *my_size)
 }
 
 static void
+get_some_numbers (CamelStore *store, CamelFolderInfo *fi)
+{
+}
+
+static void
 fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 {
 	CamelFolder *folder;
@@ -3368,6 +3373,12 @@ get_folder_info_offline (CamelStore *store, const char *top,
 			fi->unread = si->unread;
 			fi->total = si->total;
 
+			if (fi->unread == 0 || fi->total == 0) 
+			{ 
+				fi->unread = -1;
+				fi->total = -1;
+			}
+
 			/* HACK: some servers report noinferiors for all folders (uw-imapd)
 			   We just translate this into nochildren, and let the imap layer enforce
 			   it.  See create folder */
@@ -3387,6 +3398,11 @@ get_folder_info_offline (CamelStore *store, const char *top,
 				camel_url_free (url);
 			} else {
 				fill_fi((CamelStore *)imap_store, fi, 0);
+				if (fi->unread == -1)
+					fi->unread = 0;
+
+				if (fi->total == -1) 
+					fi->total = 0;
 			}
 			g_ptr_array_add (folders, fi);
 		}
@@ -3397,6 +3413,8 @@ get_folder_info_offline (CamelStore *store, const char *top,
 	fi = camel_folder_info_build (folders, top, '/', TRUE);
 	g_ptr_array_free (folders, TRUE);
 	g_free(name);
+
+	camel_store_summary_save ((CamelStoreSummary *)imap_store->summary);
 
 	return fi;
 }

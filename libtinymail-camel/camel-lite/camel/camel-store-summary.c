@@ -118,6 +118,8 @@ camel_store_summary_finalise (CamelObject *obj)
 
 	p = _PRIVATE(obj);
 
+	camel_store_summary_save (s);
+
 	camel_store_summary_clear(s);
 	g_ptr_array_free(s->folders, TRUE);
 	g_hash_table_destroy(s->folders_path);
