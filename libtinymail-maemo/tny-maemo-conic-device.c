@@ -30,6 +30,7 @@ typedef struct {
 	ConIcConnection *cnx;
 	gboolean        is_online;
 	gchar     *iap;
+	gboolean 	forced; /* Whether the is_online value is forced rather than real. */
 } TnyMaemoConicDevicePriv;
 
 #define TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE(o)	\
@@ -39,7 +40,19 @@ typedef struct {
 static void 
 tny_maemo_conic_device_reset (TnyDevice *device)
 {
-	g_message (__FUNCTION__);
+	TnyMaemoConicDevice *self;
+	TnyMaemoConicDevicePriv *priv;
+	g_return_if_fail (TNY_IS_DEVICE(device));
+	self = TNY_MAEMO_CONIC_DEVICE (device);
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+
+	const gboolean status_before = tny_maemo_conic_device_is_online (device);
+
+	priv->forced = FALSE;
+
+	if (status_before != tny_maemo_conic_device_is_online (device))
+		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+		       0, !status_before);
 }
 
 
@@ -97,6 +110,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	}
 
 	priv->is_online = is_online;
+	priv->forced = FALSE; /* is_online is now accurate. */
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, is_online);
 }
@@ -274,40 +288,52 @@ tny_maemo_conic_device_free_iap_list (TnyMaemoConicDevice *self, GSList* cnx_lis
 
 
 static void 
-tny_maemo_conic_device_force_online (TnyDevice *self)
+tny_maemo_conic_device_force_online (TnyDevice *device)
 {
-	TnyMaemoConicDevicePriv *priv;	
+	TnyMaemoConicDevice *self;
+	TnyMaemoConicDevicePriv *priv;
+	g_return_if_fail (TNY_IS_DEVICE(device));
+	self = TNY_MAEMO_CONIC_DEVICE (device);
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 #ifdef MAEMO_CONIC_DUMMY
 	return;
 #endif /*MAEMO_CONIC_DUMMY*/
-	
-	g_return_if_fail (TNY_IS_DEVICE(self));
-	g_return_if_fail (priv->cnx);
 
-	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	const gboolean already_online = tny_maemo_conic_device_is_online (device);
 
-	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE))
-			g_warning ("could not send connect dbus message");
+	priv->forced = TRUE;
+
+	/* Signal if it changed: */
+	if (!already_online)
+		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+		       0, TRUE);
 }
 
 
 static void
-tny_maemo_conic_device_force_offline (TnyDevice *self)
+tny_maemo_conic_device_force_offline (TnyDevice *device)
 {
-	TnyMaemoConicDevicePriv *priv;	
+	TnyMaemoConicDevice *self;
+	TnyMaemoConicDevicePriv *priv;
+	g_return_if_fail (TNY_IS_DEVICE(device));
+	self = TNY_MAEMO_CONIC_DEVICE (device);
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 #ifdef MAEMO_CONIC_DUMMY
 	return;
 #endif /*MAEMO_CONIC_DUMMY*/
 
-	g_return_if_fail (TNY_IS_DEVICE(self));
-	g_return_if_fail (priv->cnx);
 
-	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
-	if (!con_ic_connection_disconnect (priv->cnx))
-		g_warning ("could not send disconnect dbus message");
+	const gboolean already_offline = !tny_maemo_conic_device_is_online (device);
+
+	priv->forced = TRUE;
+
+	/* Signal if it changed: */
+	if (!already_offline)
+		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+		       0, FALSE);
 }
 
 
@@ -347,6 +373,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	
 	
 	priv->is_online     = FALSE; 
+	priv->forced = FALSE;
 }
 
 

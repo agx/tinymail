@@ -1,3 +1,21 @@
+2007-04-27  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-device.c: Improve the documentation for 
+	tny_device_force_online(), tny_device_force_offline(), and 
+	tny_device_reset(), describing why/when you might want to use them, 
+	and describing how they affect the behaviour of this object. This 
+	helps us to implement the underlying vfuncs.
+
+	* libtinymail-gnome-desktop/tny-gnome-device.c:
+	(tny_gnome_device_reset), (tny_gnome_device_force_online),
+	(tny_gnome_device_force_offline):
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_reset), (on_connection_event),
+	(tny_maemo_conic_device_force_online),
+	(tny_maemo_conic_device_force_offline),
+	(tny_maemo_conic_device_instance_init): Improve the implementation, 
+	to match the documented behaviour.
+
 2007-04-27  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Creating a new connection for getting uncached messages 

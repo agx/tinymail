@@ -62,10 +62,14 @@ tny_gnome_device_reset (TnyDevice *self)
 {
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
+	const gboolean status_before = tny_gnome_device_is_online (self);
+
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
-	emit_status (self);
+	/* Signal if it changed: */
+	if (status_before != tny_gnome_device_is_online (self))
+		emit_status (self);
 }
 
 static void 
@@ -73,10 +77,14 @@ tny_gnome_device_force_online (TnyDevice *self)
 {
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
+	const gboolean already_online = tny_gnome_device_is_online (self);
+
 	priv->fset = TRUE;
 	priv->forced = TRUE;
 
-	emit_status (self);
+	/* Signal if it changed: */
+	if (!already_online)
+		emit_status (self);
 	
 	return;
 }
@@ -87,10 +95,14 @@ tny_gnome_device_force_offline (TnyDevice *self)
 {
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
+	const gboolean already_offline = !tny_gnome_device_is_online (self);
+
 	priv->fset = TRUE;
 	priv->forced = FALSE;
 
-	emit_status (self);
+	/* Signal if it changed: */
+	if (!already_offline)
+		emit_status (self);
 	
 	return;
 }
