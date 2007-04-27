@@ -3830,32 +3830,19 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			      CamelFolderReceiveType type, gint param, CamelException *ex)
 {
 	CamelFolder *folder = CAMEL_FOLDER (imap_folder);
-	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
+	CamelImapStore *store = NULL;
 	CamelStream *stream = NULL;
 	gboolean connected = FALSE, idle_rt = FALSE;
-	CamelException tex = CAMEL_EXCEPTION_INITIALISER, myex = CAMEL_EXCEPTION_INITIALISER;
-	ssize_t nread = 0; 
+	CamelException  tex = CAMEL_EXCEPTION_INITIALISER, 
+			myex = CAMEL_EXCEPTION_INITIALISER,
+			cex = CAMEL_EXCEPTION_INITIALISER;
+	ssize_t nread = 0; gboolean amcon = FALSE;
 	gchar *a_resp = NULL;
-
-	/* EXPUNGE responses have to modify the cache, which means
-	 * they have to grab the cache_lock while holding the
-	 * connect_lock.
-
-	 * Because getting the service lock may cause MUCH unecessary
-	 * delay when we already have the data locally, we do the
-	 * locking separately.  This could cause a race
-	 * getting the same data from the cache, but that is only
-	 * an inefficiency, and bad luck. */
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
-	connected = camel_disco_store_check_online((CamelDiscoStore *)store, &tex);
+	connected = camel_disco_store_check_online(CAMEL_DISCO_STORE (folder->parent_store), &tex);
 
-	if (!store->istream || ((CamelObject *)store->istream)->ref_count <= 0)
-		connected = FALSE;
-	if (!store->ostream || ((CamelObject *)store->ostream)->ref_count <= 0)
-		connected = FALSE;
-	
 	if (connected && ((type & CAMEL_FOLDER_RECEIVE_FULL) && camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
 		camel_imap_message_cache_remove (imap_folder->cache, uid);
 	else if (connected && ((type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_SIZE_LIMITED) 
@@ -3863,20 +3850,20 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		camel_imap_message_cache_remove (imap_folder->cache, uid);
 	else
 	{
-	    stream = camel_imap_message_cache_get (imap_folder->cache, uid, section_text, ex);
-
-	    if (!stream && (!strcmp (section_text, "HEADER") || !strcmp (section_text, "0"))) 
-	    {
-		    camel_exception_clear (ex);
-		    stream = camel_imap_message_cache_get (imap_folder->cache, uid, "", ex);
-	    }
+		stream = camel_imap_message_cache_get (imap_folder->cache, uid, section_text, ex);
+		if (!stream && (!strcmp (section_text, "HEADER") || !strcmp (section_text, "0"))) 
+		{
+			camel_exception_clear (ex);
+			stream = camel_imap_message_cache_get (imap_folder->cache, uid, "", ex);
+		}
 	}
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
-	
+
 	if (stream || cache_only)
 		return stream;
 
-	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
+	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (folder->parent_store), ex)) 
+	{
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 				     _("This message is not currently available"));
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
@@ -3884,9 +3871,35 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	}
 	camel_exception_clear (ex);
 
-  CAMEL_SERVICE_REC_LOCK(store, connect_lock);
+	store = CAMEL_IMAP_STORE (camel_object_new (CAMEL_IMAP_STORE_TYPE));
 
-	camel_exception_clear(ex);
+	camel_service_construct (CAMEL_SERVICE (store), 
+		camel_service_get_session (CAMEL_SERVICE (folder->parent_store)),
+		camel_service_get_provider (CAMEL_SERVICE (folder->parent_store)),
+		CAMEL_SERVICE (folder->parent_store)->url, ex);
+
+	if (camel_exception_is_set (ex))
+	{
+		g_critical ("Severe interal error while trying to construct a new connection\n");
+		camel_object_unref (store);
+		return NULL;
+	}
+
+	/* amcon = camel_imap_service_connect (CAMEL_SERVICE (store), ex); */
+	amcon = camel_service_connect (CAMEL_SERVICE (store), ex);
+
+	if (!amcon || camel_exception_is_set (ex) || !camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex)) 
+	{
+		camel_object_unref (store);
+		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+					_("This message is not currently available"
+					" (can't let a new connection go online)"));
+		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+		return NULL;
+	}
+	camel_exception_clear (ex);
+
+  CAMEL_SERVICE_REC_LOCK(store, connect_lock); 
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
@@ -4251,7 +4264,10 @@ rerrorhandler:
 
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 
-  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock); 
+
+	camel_service_disconnect (CAMEL_SERVICE (store), TRUE, NULL);
+	camel_object_unref (CAMEL_OBJECT (store));
 
 	return stream;
 
@@ -4271,8 +4287,13 @@ errorhander:
 	if (stream && ((CamelObject *)stream)->ref_count > 0)
 		camel_object_unref (CAMEL_OBJECT (stream));
 
-  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+  if (store)
+  {
 
+  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+	camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+	camel_object_unref (CAMEL_OBJECT (store));
+  }
 	return NULL;
 }
 

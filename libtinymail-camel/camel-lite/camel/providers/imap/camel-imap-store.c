@@ -374,6 +374,8 @@ construct (CamelService *service, CamelSession *session,
 	}
 }
 
+
+
 static int
 imap_setv (CamelObject *object, CamelException *ex, CamelArgV *args)
 {
@@ -1060,7 +1062,8 @@ static struct {
 	{ NULL,            "imap",  IMAP_PORT,  MODE_CLEAR },
 };
 
-gboolean
+
+static gboolean
 connect_to_server_wrapper (CamelService *service, CamelException *ex)
 {
 	const char *ssl_mode;
@@ -1112,6 +1115,12 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	camel_freeaddrinfo (ai);
 	
 	return ret;
+}
+
+gboolean 
+camel_imap_service_connect (CamelService *service, CamelException *ex)
+{
+	return connect_to_server_wrapper (service, ex);
 }
 
 extern CamelServiceAuthType camel_imap_password_authtype;

@@ -271,6 +271,8 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		store->command++, cmd);
 	len = strlen (full_cmd);
 
+	/* printf ("-> %s\n", full_cmd); */
+
 	nwritten = camel_stream_write (store->ostream, full_cmd, len);
 
 	/* g_mutex_unlock (store->stream_lock); */

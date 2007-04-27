@@ -1,8 +1,14 @@
+2007-04-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Creating a new connection for getting uncached messages 
+	with the IMAP code.
+
 2007-04-27  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
-	(on_connection_event), (tny_maemo_conic_device_get_iap): Added some comments and 
-	improved the (temporary) debug output so its more obvious what is happening.
+	(on_connection_event), (tny_maemo_conic_device_get_iap): Added some 
+	comments and  improved the (temporary) debug output so its more 
+	obvious what is happening.
 
 	* libtinymail/tny-device.c: Correct the tny_device_force_offline() and 
 	tny_device_force_online() documentation. They were swapped.
@@ -12,9 +18,9 @@
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
 	(tny_maemo_conic_device_instance_init),
-	(tny_maemo_conic_device_new): Do all the initialization in init, because 
-	_new functions should just call g_object_new() and not access private API, 
-	because they are just C convenience functions.
+	(tny_maemo_conic_device_new): Do all the initialization in init, 
+	because _new functions should just call g_object_new() and not 
+	access private API, because they are just C convenience functions.
 	(on_connection_event), (tny_maemo_conic_device_connect),
 	(tny_maemo_conic_device_disconnect),
 	(tny_maemo_conic_device_get_iap),
@@ -22,10 +28,11 @@
 	(tny_maemo_conic_device_force_online),
 	(tny_maemo_conic_device_force_offline),
 	(tny_maemo_conic_device_finalize): 
-	Copy the iap string instead of just storing the pointer, because we have no 
-	guarantees about the lifetime of the string that con_ic_event_get_iap_id() 
-	returns. Free it in finalize.
-	Added g_return_if*() checks for priv->cnx, without which nothing could work.
+	Copy the iap string instead of just storing the pointer, because 
+	we have no guarantees about the lifetime of the string that 
+	con_ic_event_get_iap_id() returns. Free it in finalize.
+	Added g_return_if*() checks for priv->cnx, without which nothing 
+	could work.
 
 2007-04-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
@@ -50,7 +57,8 @@
 
 2007-04-23 Javier Fernandez Garcia-Boente
 
-	* Change priority flags management, using a bit mask to get assigned priority.
+	* Change priority flags management, using a bit mask to get assigned 
+	priority.
         * New enumeration to define available priority flags. 
 
 2007-04-21  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -98,7 +106,8 @@
 	* libtinymail-maemo/tny-maemo-conic-device.h:
 	Take a TnyMaemoConicDevice* instead of a TnyDevice, as that is 
 	the convention for derived/implemented objects.
-	Correct the TNY_TYPE_MAEMO_CONIC_DEVICE implementation so that this can be used. 
+	Correct the TNY_TYPE_MAEMO_CONIC_DEVICE implementation so that 
+	this can be used. 
 
 2007-04-17  Shilpa Musti  <Shilpa.Musti@nokia.com>
 
@@ -178,8 +187,8 @@
 
 	* This ain't an API change, but this new feature does make more
 	possible with the same API. It might also change behaviour a little
-	bit (although it shouldn't for the old-style of using the TnyFolderMonitor,
-	or at least not as far as I know and tested).
+	bit (although it shouldn't for the old-style of using the 
+	TnyFolderMonitor, or at least not as far as I know and tested).
 
 2007-03-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
