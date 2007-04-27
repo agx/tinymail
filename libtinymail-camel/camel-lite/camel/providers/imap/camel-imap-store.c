@@ -3128,6 +3128,16 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		camel_object_unref(folder);
 
 	} else if ((fi->unread == -1) || (fi->total == -1)) {
+
+
+		/* This code reads the beginning of the summary.mmap file for
+		 * the length and unread-count of the folder. It makes it 
+		 * possible to read the total and unread values of the 
+		 * CamelFolderInfo structure without having to read the entire
+		 * folder in (mmap it) 
+		 * It's called by get_folder_info_offline and therefore also by 
+		 * get_folder_info_online for each node in the tree. */
+
 		gchar *spath = g_strdup_printf ("%s/summary.mmap", folder_dir);
 		FILE *f = fopen (spath, "r");
 		g_free (spath);
