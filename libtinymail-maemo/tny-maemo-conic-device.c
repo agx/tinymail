@@ -57,7 +57,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
 
 #ifdef MAEMO_CONIC_DUMMY
-	g_message ("outsmarting libconic");
+	g_message ("%s: HACK: outsmarting libconic by emitting signal regardless of the reported connection status.", __FUNCTION__);
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, TRUE);
 	return;
@@ -202,7 +202,7 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
  * @self: a #TnyDevice object
  * @iap_id: the id of the IAP to get
  * 
- * get the IAP object (#ConIcIap) for the give iap-id. The returned GObject must be
+ * get the IAP object (#ConIcIap) for the given iap-id. The returned GObject must be
  * freed with g_object_unref after use. Refer to the ConIc documentation for details about
  * the #ConICIap.
  
@@ -220,6 +220,11 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
+	/* Note that it is very unusual to return a reference from a get_() function, 
+	 * but we must do so because that mistake has already been made in 
+	 * con_ic_connection_get_iap().
+	 * If we just unref immediately then libconic might destroy the object.
+	 */
 	return con_ic_connection_get_iap (priv->cnx, iap_id);
 }
 

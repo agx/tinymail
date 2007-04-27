@@ -46,19 +46,10 @@ tny_device_reset (TnyDevice *self)
 }
 
 /**
- * tny_device_force_offline:
+ * tny_device_force_online:
  * @self: a #TnyDevice object
  * 
- * Force offline status
- * 
- * Example:
- * <informalexample><programlisting>
- * TnyDevice *device = ...
- * tny_device_force_offline (device);
- * if (tny_device_is_online (device))
- *      g_print ("Something is wrong\n");
- * tny_device_reset (device);
- * </programlisting></informalexample>
+ * Force online status
  **/
 void 
 tny_device_force_online (TnyDevice *self)
@@ -78,10 +69,19 @@ tny_device_force_online (TnyDevice *self)
 }
 
 /**
- * tny_device_force_online:
+ * tny_device_force_offline:
  * @self: a #TnyDevice object
  * 
- * Force online status
+ * Force offline status
+ * 
+ * Example:
+ * <informalexample><programlisting>
+ * TnyDevice *device = ...
+ * tny_device_force_offline (device);
+ * if (tny_device_is_online (device))
+ *      g_print ("Something is wrong\n");
+ * tny_device_reset (device);
+ * </programlisting></informalexample>
  **/
 void
 tny_device_force_offline (TnyDevice *self)

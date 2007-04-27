@@ -1,3 +1,13 @@
+2007-04-27  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(on_connection_event), (tny_maemo_conic_device_get_iap): Added some comments and 
+	improved the (temporary) debug output so its more obvious what is happening.
+
+	* libtinymail/tny-device.c: Correct the tny_device_force_offline() and 
+	tny_device_force_online() documentation. They were swapped.
+	This still needs more documentation describing how these behave.
+
 2007-04-26  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
