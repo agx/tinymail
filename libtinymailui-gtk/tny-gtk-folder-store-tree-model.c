@@ -85,6 +85,11 @@ recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, GError **e
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 			folder, -1);
 
+		/* TODO: This causes a memory peak at the application's startup.
+	 	*Also look at tny-camel-folder:c:2818... for more information */
+
+		tny_folder_poke_status (TNY_FOLDER (folder));
+
 		recurse_folders_async (hlrp->self, folder, tree_iter);
 
 		g_object_unref (G_OBJECT (folder));
@@ -162,6 +167,12 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			folder, -1);
 
 		recurse_folders_sync (self, folder, &tree_iter);
+
+
+		/* TODO: This causes a memory peak at the application's startup.
+	 	*Also look at tny-camel-folder:c:2818... for more information */
+
+		tny_folder_poke_status (TNY_FOLDER (folder));
 
 		g_object_unref (G_OBJECT (folder));
 

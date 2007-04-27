@@ -319,13 +319,15 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 	guint32 tag;
 	int unread = -1, deleted = 0, junked = 0, visible = 0, count = -1;
 
-	for (i=0;i<args->argc;i++) {
-		CamelArgGet *arg = &args->argv[i];
+	for (i=0; i < args->argc; i++) 
+	{
+	  CamelArgGet *arg = &args->argv[i];
 
-		tag = arg->tag;
+	  tag = arg->tag;
 
-		switch (tag & CAMEL_ARG_TAG) {
-			/* CamelObject args */
+	  switch (tag & CAMEL_ARG_TAG) 
+	  {
+		/* CamelObject args */
 		case CAMEL_OBJECT_ARG_DESCRIPTION:
 			if (folder->description == NULL)
 				folder->description = g_strdup_printf("%s", folder->full_name);
@@ -350,25 +352,30 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 			break;
 		case CAMEL_FOLDER_ARG_UNREAD:
 		case CAMEL_FOLDER_ARG_DELETED:
-			/* This is so we can get the values atomically, and also so we can calculate them only once */
+
+			/* This is so we can get the values atomically, and also 
+			 * so we can calculate them only once */
+
 			if (unread == -1) {
 				int j;
 				CamelMessageInfo *info;
 
 				/* TODO: Locking? */
 				unread = 0;
-				count = camel_folder_summary_count(folder->summary);
-				for (j=0; j<count; j++) 
+				count = camel_folder_summary_count (folder->summary);
+				for (j=0; j < count; j++) 
 				{
-					info = camel_folder_summary_index(folder->summary, j);
+					info = camel_folder_summary_index (folder->summary, j);
 					if (info) 
 					{
-						guint32 flags = camel_message_info_flags(info);
+						guint32 flags = camel_message_info_flags (info);
 
-						if ((flags & CAMEL_MESSAGE_SEEN) == 0)
-							unread++;
 						if (flags & CAMEL_MESSAGE_DELETED)
 							deleted++;
+						else
+							if ((flags & CAMEL_MESSAGE_SEEN) == 0)
+								unread++;
+
 						camel_message_info_free(info);
 					}
 				}
@@ -409,9 +416,9 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 			break;
 		default:
 			continue;
-		}
+	  }
 
-		arg->tag = (tag & CAMEL_ARG_TYPE) | CAMEL_ARG_IGNORE;
+	  arg->tag = (tag & CAMEL_ARG_TYPE) | CAMEL_ARG_IGNORE;
 	}
 
 	return parent_class->getv(object, ex, args);
