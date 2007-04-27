@@ -176,7 +176,7 @@ process_current_items (TnySendQueue *self)
 
 	while (!tny_iterator_is_done (iter))
 	{
-		OAsyncWorkerTask *task = o_async_worker_task_new ();
+		OAsyncWorkerTask *task;
 		GenericSendInfo *info = g_slice_new (GenericSendInfo);
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 		guint item = 0;
@@ -192,7 +192,6 @@ process_current_items (TnySendQueue *self)
 			emit_error (TNY_SEND_QUEUE (self), NULL, err, info->i, info->total);
 			g_error_free (err);
 
-			g_object_unref (G_OBJECT (task));
 			g_object_unref (G_OBJECT (info->self));
 			if (info->msg)
 				g_object_unref (G_OBJECT (info->msg));
@@ -205,6 +204,7 @@ process_current_items (TnySendQueue *self)
 			return;
 		}
 
+		task = o_async_worker_task_new ();
 		o_async_worker_task_set_arguments (task, info);
 		o_async_worker_task_set_func (task, generic_send_task);
 		o_async_worker_task_set_callback (task, generic_send_callback);
@@ -279,7 +279,6 @@ tny_generic_send_queue_update_default (TnyFolderObserver *self, TnyFolderChange 
 			GError *err = NULL;
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 
-			task = o_async_worker_task_new ();
 			info = g_slice_new (GenericSendInfo);
 
 			info->total = tny_folder_get_all_count (outbox);
@@ -302,6 +301,7 @@ tny_generic_send_queue_update_default (TnyFolderObserver *self, TnyFolderChange 
 				return;
 			}
 
+			task = o_async_worker_task_new ();
 			o_async_worker_task_set_arguments (task, info);
 			o_async_worker_task_set_func (task, generic_send_task);
 			o_async_worker_task_set_callback (task, generic_send_callback);
