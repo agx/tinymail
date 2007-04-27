@@ -3361,8 +3361,7 @@ get_folder_info_offline (CamelStore *store, const char *top,
 	/* folder_info_build will insert parent nodes as necessary and mark
 	 * them as noselect, which is information we actually don't have at
 	 * the moment. So let it do the right thing by bailing out if it's
-	 * not a folder we're explicitly interested in.
-	 */
+	 * not a folder we're explicitly interested in. */
 
 	for (i=0;i<camel_store_summary_count((CamelStoreSummary *)imap_store->summary);i++) {
 		CamelStoreInfo *si = camel_store_summary_index((CamelStoreSummary *)imap_store->summary, i);
@@ -3394,7 +3393,7 @@ get_folder_info_offline (CamelStore *store, const char *top,
 			   it.  See create folder */
 			if (fi->flags & CAMEL_FOLDER_NOINFERIORS)
 				fi->flags = (fi->flags & ~CAMEL_FOLDER_NOINFERIORS) | CAMEL_FOLDER_NOCHILDREN;
-			
+
 			/* blah, this gets lost somewhere, i can't be bothered finding out why */
 			if (!g_ascii_strcasecmp(fi->full_name, "inbox"))
 				fi->flags = (fi->flags & ~CAMEL_FOLDER_TYPE_MASK) | CAMEL_FOLDER_TYPE_INBOX;
