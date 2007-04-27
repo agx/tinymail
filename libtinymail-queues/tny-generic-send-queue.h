@@ -51,10 +51,10 @@ struct _TnyGenericSendQueueClass
 	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
 	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
 	void (*cancel_func) (TnySendQueue *self, gboolean remove, GError **err);
+	void (*update_func) (TnyFolderObserver *self, TnyFolderChange *change);
 };
 
 GType tny_generic_send_queue_get_type (void);
-TnySendQueue* tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox);
 
 
 G_END_DECLS

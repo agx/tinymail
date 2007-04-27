@@ -23,8 +23,10 @@
 
 #include <oasyncworker/oasyncworker.h>
 
+
 #include <tny-generic-send-queue.h>
 #include <tny-simple-list.h>
+#include <tny-folder-observer.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -139,40 +141,30 @@ generic_send_callback (OAsyncWorkerTask *task, gpointer func_result)
 	g_slice_free (GenericSendInfo, info);
 }
 
-static void
-tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
-{
-	TNY_GENERIC_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg, err);
-	return;
-}
+
 
 static void
-tny_generic_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
+process_current_items (TnySendQueue *self)
 {
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 	TnyIterator *iter;
 	TnyList *list;
 	gint i=1, total;
-
+	GError *err = NULL;
 	TnyFolder *outbox;
 
 	g_mutex_lock (priv->lock);
 
 	outbox = tny_send_queue_get_outbox (self);
 
-	tny_folder_add_msg (outbox, msg, err);
-
-	if (err!= NULL && *err != NULL) {
-		g_object_unref (G_OBJECT (outbox));
-		g_mutex_unlock (priv->lock);
-		return;
-	}
-
 	list = tny_simple_list_new ();
-	tny_folder_get_headers (outbox, list, FALSE, err);
+	tny_folder_get_headers (outbox, list, FALSE, &err);
 
-	if (err != NULL && *err != NULL)
+	if (err != NULL)
 	{
+		emit_error (TNY_SEND_QUEUE (self), NULL, err, 0, 0);
+		g_error_free (err);
+
 		g_object_unref (G_OBJECT (outbox));
 		g_object_unref (G_OBJECT (list));
 		g_mutex_unlock (priv->lock);
@@ -193,10 +185,13 @@ tny_generic_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **er
 		info->i = i;
 		info->total = total;
 		info->self = TNY_GENERIC_SEND_QUEUE (g_object_ref (self));
-		info->msg = tny_folder_get_msg (priv->outbox, header, err);
+		info->msg = tny_folder_get_msg (outbox, header, &err);
 
-		if (err != NULL && *err != NULL)
+		if (err != NULL)
 		{
+			emit_error (TNY_SEND_QUEUE (self), NULL, err, info->i, info->total);
+			g_error_free (err);
+
 			g_object_unref (G_OBJECT (task));
 			g_object_unref (G_OBJECT (info->self));
 			if (info->msg)
@@ -228,6 +223,103 @@ tny_generic_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **er
 	g_mutex_unlock (priv->lock);
 }
 
+static void
+tny_generic_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
+{
+	TNY_GENERIC_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg, err);
+	return;
+}
+
+
+static void
+tny_generic_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
+{
+	TnyFolder *outbox = tny_send_queue_get_outbox (self);
+
+	tny_folder_add_msg (outbox, msg, err);
+
+	g_object_unref (outbox);
+	return;
+}
+
+
+static void
+tny_generic_send_queue_update (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TNY_GENERIC_SEND_QUEUE_GET_CLASS (self)->update_func (self, change);
+	return;
+}
+
+static void
+tny_generic_send_queue_update_default (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
+	GError *err = NULL;
+	TnyFolder *outbox;
+	OAsyncWorkerTask *task;
+	GenericSendInfo *info;
+	TnyFolderChangeChanged changed;
+	TnyList *list; TnyIterator *iter;
+	gint i = 0;
+
+	g_mutex_lock (priv->lock);
+
+	changed = tny_folder_change_get_changed (change);
+
+	if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS)
+	{
+		outbox = tny_send_queue_get_outbox (TNY_SEND_QUEUE (self));
+
+		/* The added headers */
+		list = tny_simple_list_new ();
+		tny_folder_change_get_added_headers (change, list);
+		iter = tny_list_create_iterator (list);
+		while (!tny_iterator_is_done (iter))
+		{
+			GError *err = NULL;
+			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+
+			task = o_async_worker_task_new ();
+			info = g_slice_new (GenericSendInfo);
+
+			info->total = tny_folder_get_all_count (outbox);
+			info->i = i++;
+			info->self = TNY_GENERIC_SEND_QUEUE (g_object_ref (self));
+			info->msg = tny_folder_get_msg (outbox, header, &err);
+
+			if (err != NULL)
+			{
+				emit_error (TNY_SEND_QUEUE (self), NULL, err, info->i, info->total);
+				g_error_free (err);
+
+				if (info->msg)
+					g_object_unref (info->msg);
+				g_slice_free (GenericSendInfo, info);
+				g_object_unref (header);
+				g_object_unref (iter);
+				g_object_unref (list);
+				g_object_unref (outbox);
+				return;
+			}
+
+			o_async_worker_task_set_arguments (task, info);
+			o_async_worker_task_set_func (task, generic_send_task);
+			o_async_worker_task_set_callback (task, generic_send_callback);
+
+			o_async_worker_add (priv->queue, task);
+
+			g_object_unref (G_OBJECT (header));
+			tny_iterator_next (iter);
+		}
+		g_object_unref (G_OBJECT (iter));
+		g_object_unref (G_OBJECT (list));
+		g_object_unref (outbox);
+	}
+
+	g_mutex_lock (priv->lock);
+
+	return;
+}
 
 
 static void
@@ -348,6 +440,8 @@ tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, Tny
 	priv->outbox = TNY_FOLDER (g_object_ref (outbox));
 	priv->sentbox = TNY_FOLDER (g_object_ref (sentbox));
 
+	process_current_items (TNY_SEND_QUEUE (self));
+
 	return TNY_SEND_QUEUE (self);
 }
 
@@ -402,11 +496,18 @@ tny_generic_send_queue_class_init (TnyGenericSendQueueClass *klass)
 	klass->get_sentbox_func = tny_generic_send_queue_get_sentbox_default;
 	klass->get_outbox_func = tny_generic_send_queue_get_outbox_default;
 	klass->cancel_func = tny_generic_send_queue_cancel_default;
+	klass->update_func = tny_generic_send_queue_update_default;
 
 	object_class->finalize = tny_generic_send_queue_finalize;
 	g_type_class_add_private (object_class, sizeof (TnyGenericSendQueuePriv));
 
 	return;
+}
+
+static void
+tny_folder_observer_init (TnyFolderObserverIface *klass)
+{
+	klass->update_func = tny_generic_send_queue_update;
 }
 
 static void
@@ -442,6 +543,12 @@ tny_generic_send_queue_get_type (void)
 			NULL
 		};
 
+		static const GInterfaceInfo tny_folder_observer_info = {
+			(GInterfaceInitFunc) tny_folder_observer_init,
+			NULL,
+			NULL
+		};
+
 		static const GInterfaceInfo tny_send_queue_info = 
 		{
 		  (GInterfaceInitFunc) tny_send_queue_init, /* interface_init */
@@ -455,6 +562,9 @@ tny_generic_send_queue_get_type (void)
 
 		g_type_add_interface_static (type, TNY_TYPE_SEND_QUEUE,
 			&tny_send_queue_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
+			&tny_folder_observer_info);
 
 	}
 	return type;

@@ -6,6 +6,8 @@
 	summary.mmap files in camel-lite (right now, the entire folder's info
 	is read and parsed, causing the peak to occur)
 
+	* Fixed the TnyGenericSendQueue implementation
+
 2007-04-27  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail/tny-device.c: Improve the documentation for 
