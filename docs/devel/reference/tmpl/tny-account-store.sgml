@@ -79,8 +79,6 @@ A abstract type that defines a store for accounts
 @account_removed: 
 @accounts_reloaded: 
 @get_accounts_func: 
-@add_store_account_func: 
-@add_transport_account_func: 
 @get_cache_dir_func: 
 @get_device_func: 
 @alert_func: 
@@ -110,24 +108,6 @@ A abstract type that defines a store for accounts
 @self: 
 @list: 
 @types: 
-
-
-<!-- ##### FUNCTION tny_account_store_add_store_account ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
-
-
-<!-- ##### FUNCTION tny_account_store_add_transport_account ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
 
 
 <!-- ##### FUNCTION tny_account_store_get_cache_dir ##### -->

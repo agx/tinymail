@@ -224,18 +224,6 @@ tny_test_account_store_class_init (TnyTestAccountStoreClass *class)
 }
 
 
-static void
-tny_test_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
-{
-	return;
-}
-
-static void
-tny_test_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
-{
-	return;
-}
-
 static TnyDevice*
 tny_test_account_store_get_device (TnyAccountStore *self)
 {
@@ -253,8 +241,6 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	klass->get_accounts_func = tny_test_account_store_get_accounts;
 	klass->get_cache_dir_func = tny_test_account_store_get_cache_dir;
 	klass->alert_func = tny_test_account_store_alert;
-	klass->add_store_account_func = tny_test_account_store_add_store_account;
-	klass->add_transport_account_func = tny_test_account_store_add_transport_account;
 	klass->get_device_func = tny_test_account_store_get_device;
     
 	return;
