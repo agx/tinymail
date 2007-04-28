@@ -34,6 +34,37 @@ Shared include file with forward typedefs
 </para>
 
 
+<!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
+<para>
+
+</para>
+
+@tnyaccountstore: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
+<para>
+
+</para>
+
+@tnyaccountstore: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
+<para>
+
+</para>
+
+@tnyaccountstore: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
+<para>
+
+</para>
+
+@tnyaccountstore: the object which received the signal.
+
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
 
@@ -262,6 +293,14 @@ Shared include file with forward typedefs
 </para>
 
 
+<!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
+<para>
+
+</para>
+
+@tnydevice: the object which received the signal.
+@arg1: 
+
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
 
@@ -393,7 +432,7 @@ transferring the messages.
 A method that gets called whenever there's a status event
 </para>
 
-@self: The sender of the status 
+@self: The sender of the status
 @status: a #TnyStatus object
 @user_data: user data passed by the caller
 
@@ -505,20 +544,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>

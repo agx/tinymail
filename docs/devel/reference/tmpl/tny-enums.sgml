@@ -22,7 +22,7 @@ Enumerations for tinymail
 
 </para>
 
-@TNY_FOLDER_STATUS_CODE_REFRESH: a status that occurs while a folder is being refreshed 
+@TNY_FOLDER_STATUS_CODE_REFRESH: a status that occurs while a folder is being refreshed
 @TNY_FOLDER_STATUS_CODE_GET_MSG: a status that occurs while a message is being downloaded
 
 <!-- ##### ENUM TnyStatusDomain ##### -->

@@ -135,3 +135,21 @@ An object containing status information
 @status: 
 
 
+<!-- ##### FUNCTION tny_status_set_fraction ##### -->
+<para>
+
+</para>
+
+@status: 
+@fraction: 
+
+
+<!-- ##### FUNCTION tny_status_get_fraction ##### -->
+<para>
+
+</para>
+
+@status: 
+@Returns: 
+
+

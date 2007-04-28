@@ -52,6 +52,24 @@ as information about what got changed.
 @newname: 
 
 
+<!-- ##### FUNCTION tny_folder_change_set_received_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+
+<!-- ##### FUNCTION tny_folder_change_get_received_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_folder_change_set_new_all_count ##### -->
 <para>
 

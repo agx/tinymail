@@ -2,7 +2,7 @@
 srcdir=$1
 echo "#include <glib.h>" > docs/devel/reference/libtinymail.types
 
-find $srcdir -maxdepth 2 -type f -iname '*.h' -printf '#include <%f>\n' | grep -v "\-priv" | grep -v "\-test" | grep -v platform_include.h | grep -v camel.h | grep -v config.h | grep -v tny-demoui-summary-view.h | grep -v olpc | grep -v gnome | grep -v maemo | grep -v gpe | grep -v acap | grep -v tny-gtk-enums.h | grep -v tny-enums.h | grep -v tny-get-msg-queue.h | grep -v tny-generic-send-queue.h >> docs/devel/reference/libtinymail.types
+find $srcdir -maxdepth 2 -type f -iname '*.h' -printf '#include <%f>\n' | grep -v "\-priv" | grep -v "\-test" | grep -v platform_include.h | grep -v camel.h | grep -v config.h | grep -v tny-demoui-summary-view.h | grep -v olpc | grep -v gnome | grep -v maemo | grep -v gpe | grep -v acap | grep -v tny-gtk-enums.h | grep -v tny-enums.h | grep -v tny-get-msg-queue.h | grep -v tny-generic-send-queue.h | grep -v check >> docs/devel/reference/libtinymail.types
 
 echo >> docs/devel/reference/libtinymail.types
 
