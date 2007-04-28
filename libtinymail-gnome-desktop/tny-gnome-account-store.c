@@ -526,6 +526,8 @@ tny_gnome_account_store_get_device (TnyAccountStore *self)
 /**
  * tny_gnome_account_store_new:
  *
+ * Create a #TnyAccountStore for GNOME desktops that uses GConf for storing 
+ * the account information and detecting changes to that configuration.
  *
  * Return value: A new #TnyAccountStore instance
  **/

@@ -92,6 +92,8 @@ static gboolean tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *pa
  * tny_gtk_msg_view_get_display_html:
  * @self: A #TnyGtkMsgView instance
  *
+ * Get whether or not to display text/html mime parts
+ * 
  * Return value: whether or not to display text/html mime parts
  **/
 gboolean 
@@ -104,6 +106,8 @@ tny_gtk_msg_view_get_display_html (TnyGtkMsgView *self)
 /**
  * tny_gtk_msg_view_get_display_rfc822:
  * @self: A #TnyGtkMsgView instance
+ *
+ * Get whether or not to display message/rfc822 mime parts
  *
  * Return value: whether or not to display message/rfc822 mime parts
  **/
@@ -118,6 +122,8 @@ tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self)
  * tny_gtk_msg_view_get_display_attachments:
  * @self: A #TnyGtkMsgView instance
  *
+ * Get whether or not to display attachments
+ *
  * Return value: whether or not to display attachments
  **/
 gboolean 
@@ -131,6 +137,8 @@ tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self)
  * tny_gtk_msg_view_get_display_plain:
  * @self: A #TnyGtkMsgView instance
  *
+ * Get whether or not to display text/plain mime parts
+ * 
  * Return value: whether or not to display text/plain mime parts
  **/
 gboolean 

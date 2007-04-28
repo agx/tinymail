@@ -110,9 +110,9 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 /**
  * tny_gtk_attach_list_model_new:
  *
+ * Get a new #GtkTreeModel instance suitable for showing #TnyMimePart.
  *
- * Return value: a new #GtkTreeModel instance suitable for showing  
- * #TnyMimePart instances
+ * Return value: a new #GtkTreeModel instance suitable for showing a #TnyMimePart
  **/
 GtkTreeModel*
 tny_gtk_attach_list_model_new (void)

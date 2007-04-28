@@ -55,8 +55,10 @@ tny_pair_set_name (TnyPair *self, const gchar *name)
 /**
  * tny_pair_get_name:
  * @self: a #TnyPair instance
+ * 
+ * Get the name of the pair, the returned value must not be freed
  *
- * Return value: the name of the pair, the result must not be freed
+ * Return value: the name of the pair
  **/
 const gchar* 
 tny_pair_get_name (TnyPair *self)
@@ -87,7 +89,9 @@ tny_pair_set_value (TnyPair *self, const gchar *value)
  * tny_pair_get_value:
  * @self: a #TnyPair instance
  *
- * Return value: the value of the pair, the result must not be freed
+ * Get the value of the pair, the returned value must not be freed
+ *
+ * Return value: the value of the pair
  **/
 const gchar* 
 tny_pair_get_value (TnyPair *self)

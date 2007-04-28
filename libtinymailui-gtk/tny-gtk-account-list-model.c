@@ -45,9 +45,9 @@ static GObjectClass *parent_class = NULL;
 /**
  * tny_gtk_account_list_model_new:
  *
+ * Create a new #GtkTreeModel instance suitable for showing a #TnyMimePart.
  *
- * Return value: a new #GtkTreeModel instance suitable for showing  
- * #TnyMimePart instances
+ * Return value: a new #GtkTreeModel instance suitable for showing a #TnyMimePart
  **/
 GtkTreeModel*
 tny_gtk_account_list_model_new (void)

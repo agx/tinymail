@@ -131,6 +131,8 @@ tny_gtk_text_mime_part_view_clear_default (TnyMimePartView *self)
 /**
  * tny_gtk_text_mime_part_view_new:
  *
+ * Create a new #TnyMimePartView for Gtk+
+ *
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*

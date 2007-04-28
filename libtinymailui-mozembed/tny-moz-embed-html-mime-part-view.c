@@ -110,6 +110,8 @@ tny_moz_embed_html_mime_part_view_clear (TnyMimePartView *self)
 /**
  * tny_moz_embed_html_mime_part_view_new:
  *
+ * Create a #TnyMimePartView that can display HTML mime parts
+ *
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*

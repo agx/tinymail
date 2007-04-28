@@ -29,6 +29,8 @@ static GObjectClass *parent_class = NULL;
 /**
  * tny_moz_embed_msg_view_new:
  *
+ * Create a new #TnyMsgView that can display HTML messages.
+ *
  * Return value: a new #TnyMsgView instance implemented for Gtk+
  **/
 TnyMsgView*

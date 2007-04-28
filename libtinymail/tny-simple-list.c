@@ -193,6 +193,8 @@ tny_simple_list_init (TnySimpleList *self)
 /**
  * tny_simple_list_new:
  * 
+ * Create a general purpose #TnyList instance
+ *
  * Return value: A general purpose #TnyList instance
  **/
 TnyList*

@@ -52,7 +52,7 @@ struct _TnyAccountIface
 	gboolean (*is_connected_func)(TnyAccount *self);
 	void (*set_id_func) (TnyAccount *self, const gchar *id);
 	void (*set_name_func) (TnyAccount *self, const gchar *name);
-	void (*set_mech_func) (TnyAccount *self, const gchar *name);
+	void (*set_mech_func) (TnyAccount *self, const gchar *mech);
 	void (*set_proto_func) (TnyAccount *self, const gchar *proto);
 	void (*set_user_func) (TnyAccount *self, const gchar *user);
 	void (*set_hostname_func) (TnyAccount *self, const gchar *host);
@@ -81,7 +81,7 @@ GType tny_account_type_get_type (void);
 gboolean tny_account_is_connected (TnyAccount *self);
 void tny_account_set_id (TnyAccount *self, const gchar *id);
 void tny_account_set_name (TnyAccount *self, const gchar *name);
-void tny_account_set_mech (TnyAccount *self, const gchar *name);
+void tny_account_set_mech (TnyAccount *self, const gchar *mech);
 void tny_account_set_proto (TnyAccount *self, const gchar *proto);
 void tny_account_set_user (TnyAccount *self, const gchar *user);
 void tny_account_set_hostname (TnyAccount *self, const gchar *host);

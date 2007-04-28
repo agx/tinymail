@@ -120,6 +120,7 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 	gtk_file_chooser_set_current_folder 
 		(GTK_FILE_CHOOSER (dialog), g_get_home_dir ());
 
+/* TNY TODO: detect this at runtime */
 #ifndef GNOME
 	gtk_file_chooser_set_local_only (GTK_FILE_CHOOSER (dialog), TRUE);
 #endif
@@ -130,6 +131,8 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 	if (G_LIKELY (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT))
 	{
 		gchar *uri;
+
+/* TNY TODO: detect this at runtime */
 #ifdef GNOME
 		uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (dialog));
 #else
@@ -165,6 +168,8 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 /**
  * tny_gtk_mime_part_save_strategy_new:
  *
+ * Create a new #TnyMimePartSaveStrategy instance implemented for Gtk+. It will
+ * use the GtkFileChooserDialog type and if available support for GnomeVFS.
  *
  * Return value: a new #TnyMimePartSaveStrategy instance implemented for Gtk+
  **/

@@ -25,6 +25,8 @@
  * tny_list_get_length:
  * @self: A #TnyList instance
  *
+ * Get the amount of items in @self.
+ *
  * Return value: the length of the list
  **/
 guint

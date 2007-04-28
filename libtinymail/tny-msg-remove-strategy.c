@@ -24,7 +24,7 @@
 #include <tny-header.h>
 
 /**
- * tny_msg_remove_strategy_peform_remove:
+ * tny_msg_remove_strategy_perform_remove:
  * @self: A #TnyMsgRemoveStrategy instance
  * @folder: The #TnyFolder instance from which the message will be removed
  * @header: The #TnyHeader instance of the message that must be removed

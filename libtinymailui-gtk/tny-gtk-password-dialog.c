@@ -103,6 +103,7 @@ tny_gtk_password_dialog_forget_password (TnyPasswordGetter *self, const gchar *a
 /**
  * tny_gtk_password_dialog_new:
  * 
+ * Create a dialog window that will ask the user for a password
  *
  * Return value: A new #GtkDialog password dialog instance implemented for Gtk+
  **/

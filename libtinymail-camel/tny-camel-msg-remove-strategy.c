@@ -90,6 +90,7 @@ tny_camel_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStrategy *self
 /**
  * tny_camel_msg_remove_strategy_new:
  *
+ * Create a default remove strategy for TnyCamelFolder instances.
  *
  * Return value: a new #TnyMsgRemoveStrategy instance implemented for a #TnyCamelFolder
  **/

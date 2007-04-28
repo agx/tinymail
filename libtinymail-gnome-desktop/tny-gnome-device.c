@@ -181,10 +181,12 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 
-
 /**
  * tny_gnome_device_new:
  *
+ * Create a #TnyDevice for GNOME desktops. If available, it uses NetworkManager
+ * to know about the network status and changes of your computer.
+ * 
  * Return value: A new #TnyDevice instance
  **/
 TnyDevice*

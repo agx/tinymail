@@ -28,7 +28,7 @@
 
 
 /**
- * tny_header_set_bcc:
+ * tny_header_set_replyto:
  * @self: a #TnyHeader object
  * @to: the reply-to header
  * 

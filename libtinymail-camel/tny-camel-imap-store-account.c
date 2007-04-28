@@ -92,6 +92,7 @@ tny_camel_imap_store_account_factor_folder (TnyCamelStoreAccount *self, const gc
 /**
  * tny_camel_imap_store_account_new:
  * 
+ * Create a imap store account
  *
  * Return value: A new IMAP #TnyStoreAccount instance implemented for Camel
  **/

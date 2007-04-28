@@ -207,7 +207,9 @@ tny_gtk_msg_window_mp_get_part_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_msg_window_new:
+ * @msgview: a #TnyMsgView to decorate
  *
+ * Create a GtkWindow that implements #TnyMsgView by decorating @msgview.
  *
  * Return value: a new #TnyMsgWindow instance implemented for Gtk+
  **/

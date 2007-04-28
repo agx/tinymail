@@ -526,6 +526,7 @@ tny_session_camel_join_connecting (TnySessionCamel *self)
  * @self: a #TnySessionCamel object
  * @device: a #TnyDevice instance
  *
+ * Set the device of @self.
  *
  **/
 void 
@@ -553,7 +554,7 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
  * @self: a #TnySessionCamel object
  * @account_store: A #TnyAccountStore account store instance
  *
- *
+ * Set the account store of @self.
  **/
 void 
 tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *account_store)
@@ -595,6 +596,8 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 /**
  * tny_session_camel_new:
  * @account_store: A TnyAccountStore instance
+ *
+ * A #CamelSession for tinymail
  *
  * Return value: The #TnySessionCamel singleton instance
  **/
