@@ -52,6 +52,9 @@ GType tny_gnome_account_store_get_type (void);
 TnyAccountStore* tny_gnome_account_store_new (void);
 TnySessionCamel* tny_gnome_account_store_get_session (TnyGnomeAccountStore *self);
 
+void tny_gnome_account_store_add_store_account (TnyGnomeAccountStore *self, TnyStoreAccount *account);
+void tny_gnome_account_store_add_transport_account (TnyGnomeAccountStore *self, TnyTransportAccount *account);
+
 G_END_DECLS
 
 #endif

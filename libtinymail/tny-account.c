@@ -32,14 +32,15 @@
  *
  * Find out whether the account matches a certain url_string.
  *
- * Implementors: Be forgiving about things like passwords in the url_string.
- * While matching the folder, password and message-id pieces are insignificant.
+ * Implementors: Be forgiving about things like passwords in the url_string:
+ * while matching the folder, password and message-id pieces are insignificant.
  *
  * An example url_string can be imap://user:password@server/INBOX/005. Only 
  * "imap://user@server" is significant when searching. Also take a look at 
  * RFC 1808 for more information on url_string formatting.
  *
- * This method must be usable with tny_account_store_find_account.
+ * This method must be usable with and will be used for 
+ * tny_account_store_find_account.
  *
  * Return value: whether or not @self matches with @url_string.
  **/
@@ -67,8 +68,8 @@ tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
  * tny_account_cancel:
  * @self: a #TnyAccount object
  *
- * Cancels the current operation
- *
+ * Forcefully cancels the current operation that is happening on @self.
+ * 
  **/
 void 
 tny_account_cancel (TnyAccount *self)
@@ -153,7 +154,9 @@ tny_account_is_connected (TnyAccount *self)
  * 
  * Get the unique id of @self
  *
- * The only certainty you have is that the id is unique in the #TnyAccountStore.
+ * A certainty you have about this property is that the id is unique in the 
+ * #TnyAccountStore. It doesn't have to be unique in the entire application.
+ *
  * The format of the id isn't specified. The implementor of the #TnyAccountStore
  * must set this id using tny_account_set_id.
  * 
@@ -214,7 +217,7 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
  * Set the account's authentication mechanism. For example in case of plain
  * you use "PLAIN" here. For anonymous you use "ANONYMOUS". This last one 
  * will for example result in a AUTHENTICATE ANONYMOUS request, as specified
- * in RFC 2245.
+ * in RFC 2245, on for example IMAP servers.
  * 
  **/
 void
@@ -284,17 +287,12 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
  * static void
  * per_account_forget_pass_func (TnyAccount *account)
  * {
- *     if (passwords)
- *     {
- *          const gchar *accountid = tny_account_get_id (account);
- *          gchar *pwd = g_hash_table_lookup (passwords, accountid);
- *          if (pwd)
- *          {
- *             memset (pwd, 0, strlen (pwd));
- *             g_hash_table_remove (passwords, accountid);
- *          }
- *     }
- * return;
+ *    TnyPlatformFactory *platfact = tny_my_platform_factory_get_instance ();
+ *    TnyPasswordGetter *pwdgetter;
+ *    pwdgetter = tny_platform_factory_new_password_getter (platfact);
+ *    tny_password_getter_forget_password (pwdgetter, tny_account_get_id (account));
+ *    g_object_unref (G_OBJECT (pwdgetter));
+ *    return;
  * }
  * static void
  * tny_my_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
@@ -356,9 +354,9 @@ tny_account_get_forget_pass_func (TnyAccount *self)
  * @self: a #TnyAccount object
  * @url_string: the url string (ex. mbox://path)
  *  
- * Set the url string of @self (RFC 1808). You don't need to use this for imap and pop
- * where you can use the simplified API (set_proto, set_hostname, etc). This
- * property is typically set in the implementation of a #TnyAccountStore.
+ * Set the url string of @self (RFC 1808). You don't need to use this for imap
+ * and pop where you can use the simplified API (set_proto, set_hostname, etc).
+ * This property is typically set in the implementation of a #TnyAccountStore.
  * 
  * For example the url_string for an SMTP account that uses SSL with authentication
  * type PLAIN: smtp://user;auth=PLAIN@smtp.server.com/;use_ssl=always
@@ -369,6 +367,7 @@ void
 tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 {
 #ifdef DBC /* require */
+	gchar *ptr1, *ptr2;
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
@@ -379,9 +378,16 @@ tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 	TNY_ACCOUNT_GET_IFACE (self)->set_url_string_func (self, url_string);
 
 #ifdef DBC /* ensure */
+
 	/* TNY TODO: It's possible that tny_account_get_url_string strips the
 	 * password. It would be interesting to have a contract check that 
 	 * deals with this. */
+
+	/* TNY TODO: check this DBC implementation for correctness: */
+	ptr1 = tny_account_get_url_string (self);
+	ptr2 = strchr (ptr1, '@');
+	ptr1 = strchr (url_string, '@');
+	g_assert (!strcmp (ptr1, ptr2));
 #endif
 
 	return;
@@ -523,31 +529,14 @@ tny_account_set_port (TnyAccount *self, guint port)
  * static gchar* 
  * per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
  * {
- *     gchar *retval = NULL;
- *     const gchar *accountid = tny_account_get_id (account);
- *     if (!passwords)
- *         passwords = g_hash_table_new (g_str_hash, g_str_equal);
- *     retval = g_hash_table_lookup (passwords, accountid);
- *     if (!retval)
- *     {
- *         GtkDialog *dialog = GTK_DIALOG (tny_gnome_password_dialog_new ());
- *         tny_gnome_password_dialog_set_prompt (TNY_GNOME_PASSWORD_DIALOG (dialog), prompt);
- *         if (gtk_dialog_run (dialog) == GTK_RESPONSE_OK)
- *         {
- *              const gchar *pwd = tny_gnome_password_dialog_get_password 
- *                     (TNY_GNOME_PASSWORD_DIALOG (dialog));
- *              retval = g_strdup (pwd);
- *              mlock (retval, strlen (retval));
- *              g_hash_table_insert (passwords, g_strdup (accountid), retval);
- *              *cancel = FALSE;
- *         } else
- *              *cancel = TRUE;
- *         gtk_widget_destroy (GTK_WIDGET (dialog));
- *         while (gtk_events_pending ())
- *               gtk_main_iteration ();
- *     } else
- *         *cancel = FALSE;
- *     return retval;
+ *    TnyPlatformFactory *platfact = tny_my_platform_factory_get_instance ();
+ *    TnyPasswordGetter *pwdgetter;
+ *    gchar *retval;
+ *    pwdgetter = tny_platform_factory_new_password_getter (platfact);
+ *    retval = (gchar*) tny_password_getter_get_password (pwdgetter, 
+ *       tny_account_get_id (account), prompt, cancel);
+ *    g_object_unref (G_OBJECT (pwdgetter));
+ *    return retval;
  * }
  * static void
  * tny_my_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)

@@ -493,28 +493,28 @@ tny_maemo_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 
 
 
-static void
-tny_maemo_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
+void
+tny_maemo_account_store_add_store_account (TnyMaemoAccountStore *self, TnyStoreAccount *account)
 {
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_maemo_account_store_notify_remove (self);
-	tny_maemo_account_store_add_account (self, TNY_ACCOUNT (account), "store");
-	tny_maemo_account_store_notify_add (self);
+	tny_maemo_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
+	tny_maemo_account_store_add_account (NY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
+	tny_maemo_account_store_notify_add (NY_ACCOUNT_STORE (self));
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
 
-static void
+void
 tny_maemo_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
 {
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_maemo_account_store_notify_remove (self);
-	tny_maemo_account_store_add_account (self, TNY_ACCOUNT (account), "transport");
-	tny_maemo_account_store_notify_add (self);
+	tny_maemo_account_store_notify_remove (NY_ACCOUNT_STORE (self));
+	tny_maemo_account_store_add_account (NY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
+	tny_maemo_account_store_notify_add (NY_ACCOUNT_STORE (self));
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
@@ -627,8 +627,6 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
 	klass->get_accounts_func = tny_maemo_account_store_get_accounts;
-	klass->add_store_account_func = tny_maemo_account_store_add_store_account;
-	klass->add_transport_account_func = tny_maemo_account_store_add_transport_account;
 	klass->get_cache_dir_func = tny_maemo_account_store_get_cache_dir;
 	klass->get_device_func = tny_maemo_account_store_get_device;
 	klass->alert_func = tny_maemo_account_store_alert;

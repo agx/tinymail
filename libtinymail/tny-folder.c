@@ -33,15 +33,6 @@
 #include <tny-folder.h>
 guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
 
-/* Possible future API changes:
- * tny_folder_get_msg_async will get a status callback handler. Also take a look
- * at the possible API changes for TnyMsgReceiveStrategy as this would affect
- * that API too. 
- *
- * tny_folder_find_msg for finding a message using an url_string, maybe also a 
- * tny_folder_set_find_msg_strategy and a tny_folder_get_find_msg_strategy if
- * in future alternative ways to find a message are to be specified and 
- * developed */
 
 /**
  * tny_folder_get_caps:
@@ -67,12 +58,12 @@ tny_folder_get_caps (TnyFolder *self)
  * tny_folder_get_url_string:
  * @self: a #TnyFolder object
  * 
- * Get the url_string @self or NULL if it's impossible to determine the url 
+ * Get the url_string of @self or NULL if it's impossible to determine the url 
  * string of @self. If not NULL, the returned value must be freed after use.
  *
- * The url string is specified in RFC 1808 and looks for example like this:
+ * The url string is specified in RFC 1808 and looks like this:
  * imap://user@hostname/INBOX/folder. Note that it doesn't necessarily contain 
- * the password of the IMAP account.
+ * the password of the IMAP account but can contain it.
  * 
  * Return value: The url string or NULL.
  **/
@@ -102,10 +93,11 @@ tny_folder_get_url_string (TnyFolder *self)
  * tny_folder_get_stats:
  * @self: a TnyFolder object
  *
- * Get some statistics of the folder @self. You must unreference the return 
- * value after use.
+ * Get some statistics of the folder @self. The returned statistics object will
+ * not change after you got it. If you need an updated version, you need to call
+ * this method again. You must unreference the return value after use.
  *
- * Return value: some stats of the folder
+ * Return value: some statistics of the folder
  **/
 TnyFolderStats* 
 tny_folder_get_stats (TnyFolder *self)
@@ -131,9 +123,17 @@ tny_folder_get_stats (TnyFolder *self)
  * @self: a #TnyFolder instance
  * @observer: a #TnyFolderObserver instance
  *
- * Add @observer to the list of interested observers for the 
- * event that could happen caused by a tny_folder_poke_recent_changes or
- * other urgent changes.
+ * Add @observer to the list of interested observers for evemts that could happen
+ * caused by for example a tny_folder_poke_status and other spontaneous changes 
+ * (like Push E-mail events).
+ *
+ * After this, @observer will start receiving notification of changes about @self. 
+ * 
+ * You must use tny_folder_remove_observer, in for example the finalization of 
+ * your type if you used this method. Adding an observer to @self, changes
+ * reference counting of the objects involved. Removing the observer will undo
+ * those reference counting changes. Therefore if you don't, you will introduce
+ * memory leaks.
  *
  **/
 void 
@@ -156,9 +156,17 @@ tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
  * @self: a #TnyFolder instance
  * @observer: a #TnyFolderObserver instance
  *
- * Remove @observer from the list of interested observers for the 
- * event that could happen caused by a tny_folder_poke_recent_changes or
- * other urgent changes.
+ * Remove @observer from the list of interested observers for events that could
+ * happen caused by for example a tny_folder_poke_status and other spontaneous 
+ * changes (like Push E-mail events).
+ *
+ * After this, @observer will no longer receive notification of changes about @self. 
+ * 
+ * You must use this method, in for example the finalization of your type
+ * if you used tny_folder_add_observer. Adding an observer to @self, changes
+ * reference counting of the objects involved. Removing the observer will undo
+ * those reference counting changes. Therefore if you don't, you will introduce
+ * memory leaks.
  *
  **/
 void 
@@ -180,12 +188,13 @@ tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
  * tny_folder_poke_status:
  * @self: a TnyFolder object
  *
- * Poke for the status, this might ignite the event that a !TnyFolderChange is 
- * to be sent to the observers (tny_folder_add_observer and !TnyFolderObserver).
+ * Poke for the status, this will invoke the event of sending a #TnyFolderChange  
+ * to the observers. The change will always at least contain the unread and total
+ * folder count. It will also invoke if the unread and total didn't change at 
+ * all. This makes it possible for a model or view that shows folders to get the
+ * initial folder unread and total counts (the #TnyGtkFolderListModel uses this
+ * method internally, for example).
  *
- * This functionality is to be used for E-mail services that don't do what for
- * example the Push-IMAP (P-IMAP) protocol promises (the pushing of changes, as
- * described in draft-maes-lemonade-p-imap-12).
  **/
 void 
 tny_folder_poke_status (TnyFolder *self)
@@ -438,10 +447,10 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
  * @msg: a #TnyMsg object
  * @err: a #GError object or NULL
  *
- * Add a message to a folder. It's recommended to destroy @msg afterwards as 
- * after receiving the message from the folder again, the instance wont be the
- * same anymore and property like the tny_msg_get_id might have changed and
- * assigned too.
+ * Add a message to a folder. It's recommended to destroy @msg afterwards because 
+ * after receiving the same message from the folder again, the instance wont be
+ * the same anymore and a property like the tny_msg_get_id might have changed
+ * and assigned too.
  * 
  * Folder observers of @self will get a header-added trigger caused by this
  * action.
@@ -531,14 +540,14 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * After this method, tny_folder_get_all_count and 
  * tny_folder_get_unread_count are guaranteed to be correct.
  *
- * If you want to use this functionality, it's advised to let your application 
+ * If you want to use this method, it's advised to let your application 
  * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
  * called.
  * 
  * When using a #GMainLoop this method will callback using g_idle_add_full.
  * Without a #GMainLoop, which the libtinymail-camel implementation detects
  * using (g_main_depth > 0), the callbacks will happen in a worker thread at an
- * unknown moment in time (check your locking).
+ * unknown moment in time (check your locking in this case).
  *
  * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
  * gdk_threads_leave guards (because it happens in the #GMainLoop).
@@ -546,7 +555,7 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * Example:
  * <informalexample><programlisting>
  * static void
- * status_update_cb (TnyFolder *folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
+ * status_update_cb (GObject *sender, TnyStatus *status, gpointer user_data)
  * {
  *     g_print (".");
  * }
@@ -689,10 +698,10 @@ tny_folder_get_all_count (TnyFolder *self)
  * tny_folder_get_account:
  * @self: a TnyFolder object
  * 
- * Get a the parent account of this folder. You must unreference the return
- * value after use.
+ * Get a the parent account of this folder or NULL. If not NULL, you must 
+ * unreference the return value after use.
  * 
- * Return value: the account of this folder
+ * Return value: the account of this folder or NULL
  *
  **/
 TnyAccount* 
@@ -726,7 +735,7 @@ tny_folder_get_account (TnyFolder *self)
  * 
  * Transfers messages of which the headers are in @header_list from @self to 
  * @folder_dst. They could be moved or just copied depending on the value of 
- * the @delete_originals argument
+ * the @delete_originals argument.
  *
  **/
 void 
@@ -769,6 +778,10 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  *
  * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
  * gdk_threads_leave guards (because it happens in the #GMainLoop).
+ *
+ * API warning: It's possible that this API will change (it might get a status
+ * callback handler after the callback and before the user_data). Don't use
+ * this method if you want API or ABI compatibility with your binary.
  **/
 void 
 tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data)
@@ -847,7 +860,7 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * <informalexample><programlisting>
  * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
  * TnyFolder *folder = ...
- * TnyMsg *message = tny_folder_get_msg (folder, "imap://account/INBOX/100", NULL);
+ * TnyMsg *message = tny_folder_find_msg (folder, "imap://account/INBOX/100", NULL);
  * tny_msg_view_set_msg (message_view, message);
  * g_object_unref (G_OBJECT (message));
  * </programlisting></informalexample>
@@ -904,7 +917,7 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
  * Example:
  * <informalexample><programlisting>
  * static void 
- * status_cb (gpointer folder, const gchar *what, gint sofar, gint oftotal, gpointer user_data)
+ * status_cb (GObject *sender, TnyStatus *status, gpointer user_data)
  * {
  *       printf (".");
  * }
@@ -983,7 +996,7 @@ tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GEr
  * tny_folder_get_id:
  * @self: a TnyFolder object
  * 
- * Get an unique id of @self (unique per account). The ID will be a "/" 
+ * Get an unique id of @self (unique per account). The ID will usually be a "/" 
  * separated string like (but not guaranteed) "INBOX/parent-folder/folder"
  * depending on the service type (the example is for IMAP using the 
  * libtinymail-camel implementation).
@@ -1052,7 +1065,8 @@ tny_folder_get_name (TnyFolder *self)
  * @err: a #GError object or NULL
  * 
  * Rename a folder. Most services require the name to be unique in the 
- * parent folder.
+ * parent folder. A rename operation that didn't succeed will put an error 
+ * in @err.
  *
  **/
 void
@@ -1099,7 +1113,7 @@ tny_folder_get_folder_type  (TnyFolder *self)
  * tny_folder_get_folder_store:
  * @self: a TnyFolder object
  * 
- * Get a the parent account of this folder. You must unreference the
+ * Get a the parent store of this folder. You must unreference the
  * return value after use. Note that not every folder strictly has to
  * be inside a folder store.
  * 
@@ -1180,6 +1194,13 @@ tny_folder_type_get_type (void)
       { TNY_FOLDER_TYPE_TRASH, "TNY_FOLDER_TYPE_TRASH", "trash" },
       { TNY_FOLDER_TYPE_JUNK, "TNY_FOLDER_TYPE_JUNK", "junk" },
       { TNY_FOLDER_TYPE_SENT, "TNY_FOLDER_TYPE_SENT", "sent" },
+      { TNY_FOLDER_TYPE_ROOT, "TNY_FOLDER_TYPE_ROOT", "root" },
+      { TNY_FOLDER_TYPE_NOTES, "TNY_FOLDER_TYPE_NOTES", "notes" },
+      { TNY_FOLDER_TYPE_DRAFTS, "TNY_FOLDER_TYPE_DRAFTS", "drafts" },
+      { TNY_FOLDER_TYPE_CONTACTS, "TNY_FOLDER_TYPE_CONTACTS", "contacts" },
+      { TNY_FOLDER_TYPE_CALENDAR, "TNY_FOLDER_TYPE_CALENDAR", "calendar" },
+      { TNY_FOLDER_TYPE_ARCHIVE, "TNY_FOLDER_TYPE_ARCHIVE", "archive" },
+      { TNY_FOLDER_TYPE_MERGE, "TNY_FOLDER_TYPE_MERGE", "merge" },
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyFolderType", values);

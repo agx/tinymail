@@ -28,11 +28,18 @@
 /**
  * tny_password_getter_get_password:
  * @self: a #TnyPasswordGetter object
- * @account: a #TnyAccount object
+ * @aid: a unique string identifying the requested password
  * @prompt: the password question
  * @cancel: whether or not the user cancelled
  * 
- * Get the password of @self
+ * Get the password of @self identified by @aid. If you set the by reference
+ * boolean @cancel to TRUE, the caller (who requested the password) will see 
+ * this as a negative answer (For example when the user didn't know the password,
+ * and therefore pressed a cancel button).
+ *
+ * The @aid string can be used for so called password stores. It will contain 
+ * a unique string. Possible values of this string are "acap.server.com" or the
+ * result of a tny_account_get_id.
  *
  * Return value: the password
  **/
@@ -50,9 +57,9 @@ tny_password_getter_get_password (TnyPasswordGetter *self, const gchar *aid, con
 /**
  * tny_password_getter_forget_password:
  * @self: a #TnyPasswordGetter object
- * @account: a #TnyAccount object
+ * @aid: a unique string identifying the requested password
  * 
- * Set the password question of @self
+ * Forget the password in @self identified by @aid.
  **/
 void 
 tny_password_getter_forget_password (TnyPasswordGetter *self, const gchar *aid)

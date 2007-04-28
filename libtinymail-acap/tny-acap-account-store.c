@@ -108,64 +108,6 @@ tny_acap_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 }
 
 
-
-static void
-add_account_remote (TnyAccountStore *self, TnyAccount *account, const gchar *type)
-{
-	g_warning ("Not implemented\n");
-
-	/* TODO: implement for ACAP */
-
-	return;
-}
-
-
-static void
-add_account_journal (TnyAccountStore *self, TnyAccount *account, const gchar *type)
-{
-	g_warning ("Not implemented\n");
-
-	/* TODO: implement for ACAP */
-
-	return;
-}
-
-static void
-tny_acap_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
-{
-	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (self);
-	TnyDevice *device = tny_account_store_get_device (priv->real);
-
-	if (tny_device_is_online (device))
-		add_account_remote (self, TNY_ACCOUNT (account), "store");
-	else
-		add_account_journal (self, TNY_ACCOUNT (account), "store");
-
-	g_object_unref (G_OBJECT (device));
-
-	tny_account_store_add_store_account (priv->real, account);
-
-	return;
-}
-
-static void
-tny_acap_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
-{
-	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (self);
-	TnyDevice *device = tny_account_store_get_device (priv->real);
-
-	if (tny_device_is_online (device))
-		add_account_remote (self, TNY_ACCOUNT (account), "transport");
-	else
-		add_account_journal (self, TNY_ACCOUNT (account), "transport");
-
-	g_object_unref (G_OBJECT (device));
-
-	tny_account_store_add_transport_account (priv->real, account);
-
-	return;
-}
-
 static TnyDevice*
 tny_acap_account_store_get_device (TnyAccountStore *self)
 {
@@ -274,8 +216,6 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
 	klass->get_accounts_func = tny_acap_account_store_get_accounts;
-	klass->add_store_account_func = tny_acap_account_store_add_store_account;
-	klass->add_transport_account_func = tny_acap_account_store_add_transport_account;
 	klass->get_cache_dir_func = tny_acap_account_store_get_cache_dir;
 	klass->get_device_func = tny_acap_account_store_get_device;
 	klass->alert_func = tny_acap_account_store_alert;

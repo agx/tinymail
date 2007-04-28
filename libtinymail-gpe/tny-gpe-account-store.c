@@ -492,28 +492,28 @@ tny_gpe_account_store_add_account (TnyAccountStore *self, TnyAccount *account, c
 
 
 
-static void
-tny_gpe_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
+void
+tny_gpe_account_store_add_store_account (TnyGpeAccountStore *self, TnyStoreAccount *account)
 {
 	TnyGpeAccountStorePriv *priv = TNY_GPE_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_gpe_account_store_notify_remove (self);
-	tny_gpe_account_store_add_account (self, TNY_ACCOUNT (account), "store");
-	tny_gpe_account_store_notify_add (self);
+	tny_gpe_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
+	tny_gpe_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
+	tny_gpe_account_store_notify_add (TNY_ACCOUNT_STORE (self));
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
 
-static void
-tny_gpe_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
+void
+tny_gpe_account_store_add_transport_account (TnyGpeAccountStore *self, TnyTransportAccount *account)
 {
 	TnyGpeAccountStorePriv *priv = TNY_GPE_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_gpe_account_store_notify_remove (self);
-	tny_gpe_account_store_add_account (self, TNY_ACCOUNT (account), "transport");
-	tny_gpe_account_store_notify_add (self);
+	tny_gpe_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
+	tny_gpe_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
+	tny_gpe_account_store_notify_add (TNY_ACCOUNT_STORE (self));
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
@@ -625,8 +625,6 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
 	klass->get_accounts_func = tny_gpe_account_store_get_accounts;
-	klass->add_store_account_func = tny_gpe_account_store_add_store_account;
-	klass->add_transport_account_func = tny_gpe_account_store_add_transport_account;
 	klass->get_cache_dir_func = tny_gpe_account_store_get_cache_dir;
 	klass->get_device_func = tny_gpe_account_store_get_device;
 	klass->alert_func = tny_gpe_account_store_alert;

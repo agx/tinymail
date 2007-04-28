@@ -32,9 +32,6 @@
 #include <tny-account-store.h>
 guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 
-/* Possible future API changes:
- * tny_account_store_set_find_account_strategy
- * tny_account_store_get_find_account_strategy */
 
 /**
  * tny_account_store_find_account:
@@ -47,8 +44,8 @@ guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
  *
  * Implementors: when implementing a platform-specific library, you must
  * implement this method. Let it return the account that corresponds to
- * @url_string or let it return NULL. Also see 
- * tny_account_matches_url_string at #TnyAccount.
+ * @url_string or let it return NULL. Also see tny_account_matches_url_string
+ * at #TnyAccount.
  *
  * This method can be used to resolve url-strings to #TnyAccount instances.
  *
@@ -256,7 +253,7 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * The implementation must fillup @list with available accounts. Note that if
  * you cache the list, you must add a reference to each account added to the
  * list (else they will be unreferenced and if the reference count would reach
- * zero, an account would no longer be cached).
+ * zero, an account would no longer be correctly cached).
  *
  * With libtinymail-camel each created account must also be informed about the
  * #TnySessionCamel instance being used. Read more about this at
@@ -267,6 +264,10 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * libtinymail-gnome-desktop, libtinymail-olpc, libtinymail-gpe, 
  * libtinymail-maemo and tests/shared/account-store.c which is being used by
  * the unit tests and the normal tests.
+ *
+ * The get_pass and forget_pass functionality of the example below is usually
+ * implemented by utilizing a #TnyPasswordGetter that is returned by the 
+ * #TnyPlatformFactory, that is usually available from the #TnyAccountStore. 
  *
  * Example (that uses a cache):
  * <informalexample><programlisting>
@@ -329,63 +330,6 @@ tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAcco
 #endif
 
 	TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts_func (self, list, types);
-
-#ifdef DBC /* ensure */
-#endif
-
-	return;
-}
-
-
-/**
- * tny_account_store_add_transport_account:
- * @self: a #TnyAccountStore object
- * @account: the account to add
- * 
- * API WARNING: This API might change
- *
- * Add a transport account to the store
- **/
-void
-tny_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
-{
-#ifdef DBC /* require */
-	g_assert (TNY_IS_ACCOUNT_STORE (self));
-	g_assert (account);
-	g_assert (TNY_IS_TRANSPORT_ACCOUNT (account));
-	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->add_transport_account_func != NULL);
-#endif
-
-	TNY_ACCOUNT_STORE_GET_IFACE (self)->add_transport_account_func (self, account);
-
-
-#ifdef DBC /* ensure */
-#endif
-
-	return;
-}
-
-
-/**
- * tny_account_store_add_store_account:
- * @self: a #TnyAccountStore object
- * @account: the account to add
- * 
- * API WARNING: This API might change
- * 
- * Add a storage account to the store
- **/
-void
-tny_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
-{
-#ifdef DBC /* require */
-	g_assert (TNY_IS_ACCOUNT_STORE (self));
-	g_assert (account);
-	g_assert (TNY_IS_STORE_ACCOUNT (account));
-	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->add_store_account_func != NULL);
-#endif
-
-	TNY_ACCOUNT_STORE_GET_IFACE (self)->add_store_account_func (self, account);
 
 #ifdef DBC /* ensure */
 #endif

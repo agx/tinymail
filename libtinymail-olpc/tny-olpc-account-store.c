@@ -367,24 +367,24 @@ tny_olpc_account_store_add_account (TnyAccountStore *self, TnyAccount *account, 
 
 
 
-static void
-tny_olpc_account_store_add_store_account (TnyAccountStore *self, TnyStoreAccount *account)
+void
+tny_olpc_account_store_add_store_account (TnyOlpcAccountStore *self, TnyStoreAccount *account)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_olpc_account_store_add_account (self, TNY_ACCOUNT (account), "store");
+	tny_olpc_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
 	return;
 }
 
-static void
-tny_olpc_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
+void
+tny_olpc_account_store_add_transport_account (TnyOlpcAccountStore *self, TnyTransportAccount *account)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_olpc_account_store_add_account (self, TNY_ACCOUNT (account), "transport");
+	tny_olpc_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 

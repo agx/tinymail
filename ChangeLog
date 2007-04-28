@@ -1,3 +1,10 @@
+2007-04-28  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Documentation updates
+	* Changes to the TnyAccountStore API
+
+	* This was a major API change
+
 2007-04-27  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Getting the unread and total counts correct. Latest changes
