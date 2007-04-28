@@ -66,9 +66,12 @@ tny_folder_change_set_received_msg (TnyFolderChange *self, TnyMsg *msg)
  * tny_folder_change_get_received_msg:
  * @self: a #TnyFolderChange instance
  *
- * Get the message that got received
+ * Get the message that got received, if the change includes receiving a message.
+ * If no message was received, NULL will be returned. If not NULL, the returned
+ * value must be unreferenced after use.
  *
- * Return value: the message that got received
+ * Return value: the message that got received or NULL if no message was received
+ * during this change.
  **/
 TnyMsg *
 tny_folder_change_get_received_msg (TnyFolderChange *self)
@@ -112,7 +115,10 @@ tny_folder_change_set_new_all_count (TnyFolderChange *self, guint new_all_count)
 {
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
+	g_mutex_lock (priv->lock);
 	priv->new_all_count = new_all_count;
+	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT;
+	g_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -129,8 +135,10 @@ tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_
 {
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
+	g_mutex_lock (priv->lock);
 	priv->new_unread_count = new_unread_count;
 	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT;
+	g_mutex_unlock (priv->lock);
 
 	return;
 }
@@ -328,14 +336,15 @@ tny_folder_change_reset (TnyFolderChange *self)
 /**
  * tny_folder_change_get_rename:
  * @self: a #TnyFolderChange instance
- * @oldname: a pointer to a string
+ * @oldname: a pointer to a string (by reference)
  *
  * Get the new name of the folder in case of a rename. This will return NULL
- * of nu rename happened. You can pass a pointer if you need the old folder
+ * of no rename happened. You can pass a pointer if you need the old folder
  * name too.
  *
- * You must not free the return value nor the @oldname pointer. It's handled
- * internally in the TnyFolderChange type.
+ * You should not free the returned value nor the @oldname pointer.
+ *
+ * Return value: The new folder name or NULL
  **/
 const gchar *
 tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname)
@@ -364,7 +373,7 @@ tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname)
  *
  * Mark the change in such a way that the user can know that a rename has 
  * happened. The TnyFolderChange will copy your @newname internally, so you
- * can do whatever you want with what you passed afterwards.
+ * can do whatever you want with what you passed afterwards (like freeing it).
  **/
 void 
 tny_folder_change_set_rename (TnyFolderChange *self, const gchar *newname)
@@ -405,9 +414,9 @@ tny_folder_change_new (TnyFolder *folder)
  * @self: a #TnyFolderChange instance
  *
  * Get the folder of @self. The return value of this method must be unreferenced 
- * after use
+ * after use.
  *
- * Return value: the #TnyFolder instance related to this changeset
+ * Return value: the #TnyFolder related to this changeset
  **/
 TnyFolder* 
 tny_folder_change_get_folder (TnyFolderChange *self)
@@ -463,7 +472,6 @@ tny_folder_change_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->removed));
 	priv->added = NULL;
 	priv->removed = NULL;
-
 	if (priv->msg)
 		g_object_unref (priv->msg);
 	if (priv->oldname)

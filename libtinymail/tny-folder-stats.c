@@ -76,7 +76,9 @@ tny_folder_stats_get_all_count (TnyFolderStats *self)
  * @self: a #TnyFolderStats instance
  * @local_size: the local size of the folder
  *
- * Set the local disk space that @self is consuming
+ * Set the local disk space that @self is consuming (should probably only be
+ * used by the #TnyFolder implementation internally: it'll define the value
+ * that tny_folder_stats_get_local_size will return).
  **/
 void 
 tny_folder_stats_set_local_size (TnyFolderStats *self, gsize local_size)

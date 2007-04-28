@@ -28,9 +28,9 @@
  * @self: A #TnyFolderObserver instance
  * @change: A #TnyFolderChange instance
  *
- * Observer's update method, @change is the delta of changes between the last 
- * and the current state. Containing the added and removed headers, and the
- * new all -and unread count of the #TnyFolder. 
+ * Observer's update method. The @change is the delta of changes between the last 
+ * and the current state. It contains for example the added and removed headers
+ * and the new all and unread count of the #TnyFolder. 
  *
  **/
 void 

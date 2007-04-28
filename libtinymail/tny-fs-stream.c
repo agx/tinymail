@@ -17,7 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/*
+/* Parts of this file were copied from the Evolution project. This is the
+ * original copyright of that file. The file's source code was distributed as 
+ * LGPL content. Therefore the copyright of Tinymail is compatible with this.
+ *
  * Authors: Bertrand Guiheneuf <bertrand@helixcode.com>
  *          Michael Zucchi <notzed@ximian.com>
  *          Philip Van Hoof <pvanhoof@gnome.org>
@@ -164,10 +167,10 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
  * that you must not to close() fd yourself. The destructor will do that for
  * you.
  *
- * Therefore use it with care. It's more or less an exception in the framework
+ * Therefore use it with care. It's more or less an exception in the framework,
  * whether or not you call it an exception depends on your point of view).
  *
- * The the instance will on top of close() when destructing, also fsync() the
+ * The the instance will on top of close() when destructing also fsync() the
  * filedescriptor. It does this depending on its mood, the weather and your
  * wives periods using a complex algorithm that abuses your privacy and might
  * kill your cat and dog.

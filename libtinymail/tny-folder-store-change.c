@@ -235,8 +235,8 @@ tny_folder_store_change_new (TnyFolderStore *folderstore)
  * tny_folder_store_change_get_folder_store:
  * @self: a #TnyFolderStoreChange instance
  *
- * Get the folderstore of @self. The return value of this method must be unreferenced 
- * after use
+ * Get the folderstore of @self. The return value of this method must be 
+ * unreferenced after use
  *
  * Return value: the #TnyFolderStore instance related to this changeset
  **/

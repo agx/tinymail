@@ -67,8 +67,11 @@ tny_list_get_length (TnyList *self)
  * Reparenting indeed means reparenting. Okay? Loosing your parent reference
  * means loosing your reason of existance. So you'll get destroyed.
  *
- * Implementers: if you have to choose, make this one the fast one
+ * You should not prepend, remove nor append items while iterating @self. There's
+ * no guarantee whatsoever that existing iterators of @self will be valid after 
+ * this method returned.
  *
+ * Implementers: if you have to choose, make this one the fast one
  **/
 void
 tny_list_prepend (TnyList *self, GObject* item)
@@ -119,8 +122,11 @@ tny_list_prepend (TnyList *self, GObject* item)
  * Reparenting indeed means reparenting. Okay? Loosing your parent reference
  * means loosing your reason of existance. So you'll get destroyed.
  *
- * Implementers: if you have to choose, make the prepend one the fast one
+ * You should not prepend, remove nor append items while iterating @self. There's
+ * no guarantee whatsoever that existing iterators of @self will be valid after 
+ * this method returned.
  *
+ * Implementers: if you have to choose, make the prepend one the fast one
  **/
 void 
 tny_list_append (TnyList *self, GObject* item)
@@ -149,7 +155,7 @@ tny_list_append (TnyList *self, GObject* item)
  *
  * Removes an item from a list.  Removing a item might invalidate all existing
  * iterators or put them in an unknown and unspecified state. You'll need to 
- * recreate the iterator(s) if you remove an item to be certain.
+ * recreate the iterator(s) if you removed an item.
  *
  * If you want to clear a list, consider using the tny_list_foreach or simply
  * destroy the list instance and construct a new one. If you want to remove

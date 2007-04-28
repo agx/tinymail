@@ -27,19 +27,23 @@
 #include <tny-folder-store-observer.h>
 #include <tny-list.h>
 
-/* Possible future API changes:
- * tny_folder_store_find_folder for finding a folder using an url_string, maybe 
- * also a tny_folder_store_set_find_folder_strategy and a 
- * tny_folder_store_get_find_folder_strategy if in future alternative ways to 
- * find a folder are to be specified and developed */
 
 /**
  * tny_folder_store_add_observer:
  * @self: a #TnyFolder instance
  * @observer: a #TnyFolderStoreObserver instance
  *
- * Add @observer to the list of interested observers for the 
- * event that could happen.
+ * Add @observer to the list of interested observers for events that could happen
+ * caused by for example folder creates and deletions and other spontaneous 
+ * changes.
+ *
+ * After this, @observer will start receiving notification of changes about @self. 
+ * 
+ * You must use tny_folder_store_remove_observer, in for example the finalization
+ * of your type if you used this method. Adding an observer to @self, changes
+ * reference counting of the objects involved. Removing the observer will undo
+ * those reference counting changes. Therefore if you don't, you will introduce
+ * memory leaks.
  *
  **/
 void 
@@ -67,8 +71,17 @@ tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *obs
  * @self: a #TnyFolderStore instance
  * @observer: a #TnyFolderStoreObserver instance
  *
- * Remove @observer from the list of interested observers for the 
- * event that could happen.
+ * Remove @observer from the list of interested observers for events that could
+ * happen caused by for example folder creates and deletions and other 
+ * spontaneous changes.
+ *
+ * After this, @observer will no longer receive notification of changes about @self. 
+ * 
+ * You must use this method, in for example the finalization of your type
+ * if you used tny_folder_store_add_observer. Adding an observer to @self, changes
+ * reference counting of the objects involved. Removing the observer will undo
+ * those reference counting changes. Therefore if you don't, you will introduce
+ * memory leaks.
  *
  **/
 void 
@@ -104,6 +117,8 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
  * service. All the #TnyFolderObservers and #TnyFolderStoreObservers of @folder,
  * but of course not of @self, will automatically be unsubscribed.
  * 
+ * API question and TODO (undetermined): what about recursive deleting?
+ *
  * Example:
  * <informalexample><programlisting>
  * static void
@@ -151,7 +166,8 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
  * if (createfol) g_object_unref (G_OBJECT (createfol));
  * </programlisting></informalexample>
  * 
- * Return value: A new folder instance representing the folder that was created or NULL in case of failure
+ * Return value: A new folder instance representing the folder that was created 
+ * or NULL in case of failure
  *
  **/
 TnyFolder*

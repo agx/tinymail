@@ -110,7 +110,7 @@ tny_iterator_nth (TnyIterator *self, guint nth)
  * @self: A #TnyIterator instance
  *
  * Does not move the iterator. Returns the object at the current position. If
- * there no current position, this method returns NULL. If not NULL, the 
+ * there's no current position, this method returns NULL. If not NULL, the 
  * returned value must be unreferenced after use.
  *
  * Return value: the currect object or NULL

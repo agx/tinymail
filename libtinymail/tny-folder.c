@@ -123,7 +123,7 @@ tny_folder_get_stats (TnyFolder *self)
  * @self: a #TnyFolder instance
  * @observer: a #TnyFolderObserver instance
  *
- * Add @observer to the list of interested observers for evemts that could happen
+ * Add @observer to the list of interested observers for events that could happen
  * caused by for example a tny_folder_poke_status and other spontaneous changes 
  * (like Push E-mail events).
  *

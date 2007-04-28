@@ -953,6 +953,14 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 	return;
 }
 
+/**
+ * tny_merge_folder_new:
+ *
+ * Creates a a new TnyMergeFolder instance that can merge multiple #TnyFolder 
+ * instances together (partly read only, though).
+ *
+ * Return value: a new #TnyMergeFolder instance
+ **/
 TnyFolder*
 tny_merge_folder_new (void)
 {

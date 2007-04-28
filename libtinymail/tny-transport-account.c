@@ -29,7 +29,8 @@
  * @msg: a #TnyMsg object
  * @err: a #GError object or NULL
  *
- * Send @msg
+ * Send @msg. Note that @msg must be a correct #TnyMsg instance with a correct
+ * #TnyHeader, which can be used as the envelope while sending.
  * 
  **/
 void
@@ -42,8 +43,8 @@ tny_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err
 	g_assert (TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func  != NULL);
 #endif
 
-
 	TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func (self, msg, err);
+
 	return;
 }
 

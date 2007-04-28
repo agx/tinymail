@@ -79,7 +79,13 @@ tny_send_queue_get_sentbox (TnySendQueue *self)
  * @self: A #TnySendQueue instance
  *
  * Get the folder which contains the messages that have not yet been sent. The 
- * return value must be unreferenced after use
+ * return value must be unreferenced after use. It's not guaranteed that when
+ * changing the content of @outbox, @self will automatically adjust itself to
+ * the new situation. Although some implementations of #TnySendQueue might
+ * indeed do this, it's advisable to use tny_send_queue_add in stead of 
+ * tny_folder_add_msg on @outbox. The reason for that is lack of specification
+ * and a #TnySendQueue implementation not having to implement #TnyFolderObserver
+ * too (which makes it possible to act on changes happening to @outbox).
  *
  * Return value: a #TnyFolder instance
  **/
