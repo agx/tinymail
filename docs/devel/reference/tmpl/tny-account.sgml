@@ -102,7 +102,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 @self: 
-@name: 
+@mech: 
 
 
 <!-- ##### FUNCTION tny_account_set_proto ##### -->
