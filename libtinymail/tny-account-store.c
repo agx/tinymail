@@ -425,6 +425,13 @@ tny_account_store_base_init (gpointer g_class)
 }
 
 
+/**
+ * tny_account_store_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_account_store_get_type (void)
 {
@@ -453,6 +460,13 @@ tny_account_store_get_type (void)
 	return type;
 }
 
+/**
+ * tny_alert_type_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_alert_type_get_type (void)
 {
@@ -469,6 +483,13 @@ tny_alert_type_get_type (void)
   return etype;
 }
 
+/**
+ * tny_get_accounts_request_type_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_get_accounts_request_type_get_type (void)
 {

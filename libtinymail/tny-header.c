@@ -563,7 +563,13 @@ tny_header_get_type (void)
 	return type;
 }
 
-
+/**
+ * tny_header_flags_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_header_flags_get_type (void)
 {

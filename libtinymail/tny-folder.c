@@ -1180,7 +1180,13 @@ tny_folder_get_type (void)
 	return type;
 }
 
-
+/**
+ * tny_folder_type_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_folder_type_get_type (void)
 {

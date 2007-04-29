@@ -100,6 +100,7 @@ tny_gnome_platform_factory_new_msg_view (TnyPlatformFactory *self)
 /**
  * tny_gnome_platform_factory_get_instance:
  *
+ * Get the platform factory singleton instance implemented for GNOME desktops
  *
  * Return value: The #TnyPlatformFactory singleton instance implemented for GNOME desktops
  **/

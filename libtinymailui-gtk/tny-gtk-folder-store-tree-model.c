@@ -862,6 +862,13 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
+/**
+ * tny_gtk_folder_store_tree_model_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_gtk_folder_store_tree_model_get_type (void)
 {
@@ -916,6 +923,13 @@ tny_gtk_folder_store_tree_model_get_type (void)
 }
 
 
+/**
+ * tny_gtk_folder_store_tree_model_column_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_gtk_folder_store_tree_model_column_get_type (void)
 {

@@ -148,6 +148,13 @@ tny_stream_camel_class_init (TnyStreamCamelClass *klass)
 	return;
 }
 
+/**
+ * tny_stream_camel_get_type:
+ *
+ * CamelType system helper function
+ *
+ * Return value: a CamelType
+ **/
 CamelType
 tny_stream_camel_get_type (void)
 {

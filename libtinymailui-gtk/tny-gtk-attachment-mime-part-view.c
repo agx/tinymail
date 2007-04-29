@@ -197,6 +197,13 @@ tny_gtk_attachment_mime_part_view_class_init (TnyGtkAttachmentMimePartViewClass 
 	return;
 }
 
+/**
+ * tny_gtk_attachment_mime_part_view_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_gtk_attachment_mime_part_view_get_type (void)
 {

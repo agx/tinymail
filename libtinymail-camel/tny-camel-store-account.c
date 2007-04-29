@@ -1051,6 +1051,13 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	return;
 }
 
+/**
+ * tny_camel_store_account_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_camel_store_account_get_type (void)
 {

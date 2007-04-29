@@ -824,6 +824,13 @@ tny_gtk_header_list_model_new (void)
 	return GTK_TREE_MODEL (model);
 }
 
+/**
+ * tny_gtk_header_list_model_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_gtk_header_list_model_get_type (void)
 {
@@ -872,6 +879,13 @@ tny_gtk_header_list_model_get_type (void)
 	return object_type;
 }
 
+/**
+ * tny_gtk_header_list_model_column_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_gtk_header_list_model_column_get_type (void)
 {

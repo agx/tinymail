@@ -812,6 +812,13 @@ tny_account_base_init (gpointer g_class)
 	}
 }
 
+/**
+ * tny_account_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_account_get_type (void)
 {
@@ -841,7 +848,13 @@ tny_account_get_type (void)
 	return type;
 }
 
-
+/**
+ * tny_account_type_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_account_type_get_type (void)
 {

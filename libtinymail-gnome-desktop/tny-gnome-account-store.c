@@ -488,7 +488,13 @@ tny_gnome_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 	return;
 }
 
-
+/**
+ * tny_gnome_account_store_add_store_account:
+ * @self: a #TnyGnomeAccountStore instance
+ * @account: a #TnyStoreAccount instance to add
+ * 
+ * Add @account to @self
+ **/
 void
 tny_gnome_account_store_add_store_account (TnyGnomeAccountStore *self, TnyStoreAccount *account)
 {
@@ -501,6 +507,13 @@ tny_gnome_account_store_add_store_account (TnyGnomeAccountStore *self, TnyStoreA
 	return;
 }
 
+/**
+ * tny_gnome_account_store_add_transport_account:
+ * @self: a #TnyGnomeAccountStore instance
+ * @account: a #TnyTransportAccount instance to add
+ * 
+ * Add @account to @self
+ **/
 void
 tny_gnome_account_store_add_transport_account (TnyGnomeAccountStore *self, TnyTransportAccount *account)
 {
@@ -588,6 +601,8 @@ tny_gnome_account_store_finalize (GObject *object)
  * tny_gnome_account_store_get_session:
  * @self: The #TnyGnomeAccountStore instance
  *
+ * Get the #CamelSession being used
+ *
  * Return value: A #TnySessionCamel instance
  **/
 TnySessionCamel*
@@ -627,7 +642,13 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	return;
 }
 
-
+/**
+ * tny_gnome_account_store_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_gnome_account_store_get_type (void)
 {

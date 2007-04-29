@@ -591,6 +591,8 @@ _tny_camel_mime_part_set_part (TnyCamelMimePart *self, CamelMimePart *part)
 /**
  * tny_camel_mime_part_get_part:
  * @self: The #TnyCamelMimePart instance
+ * 
+ * Get the #CamelMimePart instance that is being proxied by @self.
  *
  * Return value: The #CamelMimePart instance
  **/
@@ -933,6 +935,13 @@ tny_camel_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
 	return;
 }
 
+/**
+ * tny_camel_mime_part_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_camel_mime_part_get_type (void)
 {

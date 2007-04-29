@@ -140,6 +140,13 @@ tny_camel_imap_store_account_instance_init (GTypeInstance *instance, gpointer g_
 	return;
 }
 
+/**
+ * tny_camel_imap_store_account_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_camel_imap_store_account_get_type (void)
 {

@@ -21,6 +21,13 @@
 
 #include <tny-status.h>
 
+/**
+ * tny_status_domain_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_status_domain_get_type (void)
 {
@@ -36,7 +43,13 @@ tny_status_domain_get_type (void)
 }
 
 
-
+/**
+ * tny_status_code_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_status_code_get_type (void)
 {

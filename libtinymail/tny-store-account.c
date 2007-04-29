@@ -148,6 +148,13 @@ tny_store_account_base_init (gpointer g_class)
 	}
 }
 
+/**
+ * tny_store_account_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_store_account_get_type (void)
 {

@@ -263,6 +263,13 @@ tny_gtk_header_view_class_init (TnyGtkHeaderViewClass *class)
 	return;
 }
 
+/**
+ * tny_gtk_header_view_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_gtk_header_view_get_type (void)
 {

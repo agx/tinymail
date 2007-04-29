@@ -86,6 +86,13 @@ tny_camel_imap_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	return;
 }
 
+/**
+ * tny_camel_imap_folder_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_camel_imap_folder_get_type (void)
 {

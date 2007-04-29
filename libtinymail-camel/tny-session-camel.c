@@ -656,6 +656,13 @@ tny_session_camel_class_init (TnySessionCamelClass *tny_session_camel_class)
 	return;
 }
 
+/**
+ * tny_session_camel_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 CamelType
 tny_session_camel_get_type (void)
 {

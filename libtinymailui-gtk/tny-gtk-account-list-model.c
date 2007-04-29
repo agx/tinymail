@@ -294,7 +294,13 @@ tny_gtk_account_list_model_get_type (void)
 	return type;
 }
 
-
+/**
+ * tny_gtk_account_list_model_column_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_gtk_account_list_model_column_get_type (void)
 {

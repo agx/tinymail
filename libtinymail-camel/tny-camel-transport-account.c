@@ -410,6 +410,13 @@ tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *class)
 	return;
 }
 
+/**
+ * tny_camel_transport_account_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_camel_transport_account_get_type (void)
 {

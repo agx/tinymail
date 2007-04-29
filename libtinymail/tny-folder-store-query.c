@@ -128,7 +128,13 @@ tny_folder_store_query_get_type (void)
 	return object_type;
 }
 
-
+/**
+ * tny_folder_store_query_item_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_folder_store_query_item_get_type (void)
 {
@@ -307,7 +313,13 @@ tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item)
 	return item->regex;
 }
 
-
+/**
+ * tny_folder_store_query_option_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_folder_store_query_option_get_type (void)
 {

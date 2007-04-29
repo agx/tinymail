@@ -162,7 +162,7 @@ tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream)
 }
 
 /**
- * tny_camel_stream_camel_new:
+ * tny_camel_stream_new:
  * @stream: A #CamelStream stream to play proxy for
  *
  * Create a new #TnyStream instance implemented as a proxy
@@ -239,6 +239,13 @@ tny_camel_stream_class_init (TnyCamelStreamClass *class)
 	return;
 }
 
+/**
+ * tny_camel_stream_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_camel_stream_get_type (void)
 {

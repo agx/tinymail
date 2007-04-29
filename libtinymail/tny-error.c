@@ -19,6 +19,13 @@
 
 #include <tny-error.h>
 
+/**
+ * tny_error_domain_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_error_domain_get_type (void)
 {
@@ -37,7 +44,13 @@ tny_error_domain_get_type (void)
 }
 
 
-
+/**
+ * tny_error_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType
 tny_error_get_type (void)
 {

@@ -409,6 +409,13 @@ tny_camel_msg_header_class_init (TnyCamelMsgHeaderClass *class)
 }
 
 
+/**
+ * tny_camel_msg_header_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
 GType 
 tny_camel_msg_header_get_type (void)
 {
