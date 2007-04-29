@@ -29,6 +29,8 @@
 
 	* Documentation updates
 	* Changes to the TnyAccountStore API
+	* Removed the memory peak of yesterday (for the unread and total
+	count)
 
 	* This was a major API change
 
