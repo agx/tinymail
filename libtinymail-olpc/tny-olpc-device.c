@@ -32,26 +32,45 @@ static void tny_olpc_device_on_offline (TnyDevice *self);
 static gboolean tny_olpc_device_is_online (TnyDevice *self);
 
 
+static void
+emit_status (TnyDevice *self)
+{
+	if (tny_gnome_device_is_online (self))
+		tny_gnome_device_on_online (self);
+	else
+		tny_gnome_device_on_offline (self);
+}
+
 static void 
 tny_olpc_device_reset (TnyDevice *self)
 {
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
 
+	const gboolean status_before = tny_gnome_device_is_online (self);
+
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
+	/* Signal if it changed: */
+	if (status_before != tny_gnome_device_is_online (self))
+		emit_status (self);
 }
 
 static void 
 tny_olpc_device_force_online (TnyDevice *self)
 {
+
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
+
+	const gboolean already_online = tny_gnome_device_is_online (self);
 
 	priv->fset = TRUE;
 	priv->forced = TRUE;
 
-	tny_olpc_device_on_online (self);
-
+	/* Signal if it changed: */
+	if (!already_online)
+		emit_status (self);
+	
 	return;
 }
 
@@ -61,11 +80,14 @@ tny_olpc_device_force_offline (TnyDevice *self)
 {
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
 
+	const gboolean already_offline = !tny_gnome_device_is_online (self);
+
 	priv->fset = TRUE;
 	priv->forced = FALSE;
 
-
-	tny_olpc_device_on_offline (self);
+	/* Signal if it changed: */
+	if (!already_offline)
+		emit_status (self);
 	
 	return;
 }
@@ -199,3 +221,4 @@ tny_olpc_device_get_type (void)
 
 	return type;
 }
+

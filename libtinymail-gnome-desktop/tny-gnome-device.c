@@ -286,3 +286,4 @@ tny_gnome_device_get_type (void)
 
 	return type;
 }
+

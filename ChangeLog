@@ -1,3 +1,16 @@
+2007-04-29  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-gnome-desktop/tny-gnome-device.c:
+	* libtinymail-gpe/tny-gpe-device.c: (emit_status),
+	(tny_gpe_device_reset), (tny_gpe_device_force_online),
+	(tny_gpe_device_force_offline):
+	* libtinymail-olpc/tny-olpc-device.c: (emit_status),
+	(tny_olpc_device_reset), (tny_olpc_device_force_online),
+	(tny_olpc_device_force_offline): 
+	Copy/Paste the implementations from TnyGnomeDevice, so these implementations 
+	also match the documented behaviour. I wish that GInterfaces could have default 
+	implementations that could be shared.
+
 2007-04-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Documentation updates
