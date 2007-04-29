@@ -171,6 +171,15 @@ framework developers about simply getting your "special" cool flag added to tiny
 @TNY_HEADER_FLAG_EXPUNGED: The message got expunged and therefore is the header instance invalid
 @TNY_HEADER_FLAG_PRIORITY: Priority information is available, use the TnyHeaderPriorityFlags type as mask
 
+<!-- ##### ENUM TnyHeaderPriorityFlags ##### -->
+<para>
+
+</para>
+
+@TNY_HEADER_FLAG_HIGH_PRIORITY: 
+@TNY_HEADER_FLAG_NORMAL_PRIORITY: 
+@TNY_HEADER_FLAG_LOW_PRIORITY: 
+
 <!-- ##### ENUM TnyFolderType ##### -->
 <para>
 
