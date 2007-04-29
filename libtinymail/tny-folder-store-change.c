@@ -43,6 +43,8 @@ struct _TnyFolderStoreChangePriv
  * @self: a #TnyFolderStoreChange instance
  *
  * Get an enum with all the changed things
+ *
+ * Return value: An enum with all the changed things
  **/
 TnyFolderStoreChangeChanged 
 tny_folder_store_change_get_changed  (TnyFolderStoreChange *self)

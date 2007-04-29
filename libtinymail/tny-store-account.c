@@ -33,6 +33,7 @@ guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
  * tny_store_account_find_folder:
  * @self: a #TnyStoreAccount object
  * @url_string: the url-string of the folder to find
+ * @err: a #GError object
  *
  * Try to find the folder in @self that corresponds to @url_string. If this 
  * method does not return NULL, the returned value is the found folder and

@@ -308,6 +308,7 @@ tny_camel_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
 /**
  * tny_camel_store_account_new:
  * 
+ * Create a new #TnyStoreAccount instance implemented for Camel
  *
  * Return value: A new #TnyStoreAccount instance implemented for Camel
  **/
@@ -579,6 +580,19 @@ tny_camel_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFol
 	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_func (self, list, query, err);
 }
 
+/**
+ * tny_camel_store_account_factor_folder:
+ * @self: a valid #TnyCamelStoreAccount instance
+ * @full_name: the name of the folder to create
+ * @was_new: whether or not a new instance got created (by reference)
+ * 
+ * Factor a new TnyFolder instance. It's possible that an existing one is reused
+ * In that case will a reference be added to the instance. If an existing
+ * instance was not available, a new one will be created and remembered for in 
+ * case a new request happens.
+ * 
+ * Return value: A #TnyCamelTransportAccount instance or NULL
+ **/
 TnyFolder *
 tny_camel_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
 {
@@ -1042,13 +1056,13 @@ tny_camel_store_account_get_type (void)
 {
 	static GType type = 0;
 
-	if (G_UNLIKELY (!camel_type_init_done))
+	if (G_UNLIKELY (!_camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
 
 		camel_type_init ();
-		camel_type_init_done = TRUE;
+		_camel_type_init_done = TRUE;
 	}
 
 	if (G_UNLIKELY(type == 0))

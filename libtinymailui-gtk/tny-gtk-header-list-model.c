@@ -808,6 +808,8 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 /**
  * tny_gtk_header_list_model_new:
  *
+ * Create a new #GtkTreeModel instance suitable for showing lots of 
+ * #TnyHeader instances
  *
  * Return value: a new #GtkTreeModel instance suitable for showing lots of 
  * #TnyHeader instances

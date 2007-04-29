@@ -193,11 +193,11 @@ tny_moz_embed_html_mime_part_view_class_init (TnyMozEmbedHtmlMimePartViewClass *
 
 	gtk_moz_embed_push_startup ();
 
-	mozilla_preference_set_int ("permissions.default.image", 2);
-	mozilla_preference_set_int ("permissions.default.script", 2);
-	mozilla_preference_set_boolean ("security.checkloaduri", FALSE);
-	mozilla_preference_set ("general.useragent.misc", "Tinymail/" VERSION);
-	mozilla_preference_set ("network.proxy.no_proxies_on", "localhost");
+	_mozilla_preference_set_int ("permissions.default.image", 2);
+	_mozilla_preference_set_int ("permissions.default.script", 2);
+	_mozilla_preference_set_boolean ("security.checkloaduri", FALSE);
+	_mozilla_preference_set ("general.useragent.misc", "Tinymail/" VERSION);
+	_mozilla_preference_set ("network.proxy.no_proxies_on", "localhost");
 
 
 	return;

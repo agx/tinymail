@@ -22,7 +22,7 @@
 
 #include <tny-shared.h>
 
-extern gboolean camel_type_init_done;
+extern gboolean _camel_type_init_done;
 
 typedef struct _TnySessionCamel TnySessionCamel;
 typedef struct _TnySessionCamelClass TnySessionCamelClass;

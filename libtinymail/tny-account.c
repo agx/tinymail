@@ -328,8 +328,9 @@ tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pas
  * tny_account_get_forget_pass_func:
  * @self: a #TnyAccount object
  * 
- * Return value: A pointer to the forget-password function
+ * Get a pointer to the forget-password function
  *
+ * Return value: A pointer to the forget-password function
  **/
 TnyForgetPassFunc
 tny_account_get_forget_pass_func (TnyAccount *self)
@@ -777,8 +778,9 @@ tny_account_get_port (TnyAccount *self)
  * tny_account_get_pass_func:
  * @self: a #TnyAccount object
  * 
- * Return value: A pointer to the get-password function
+ * Get a pointer to the get-password function
  *
+ * Return value: A pointer to the get-password function
  **/
 TnyGetPassFunc
 tny_account_get_pass_func (TnyAccount *self)

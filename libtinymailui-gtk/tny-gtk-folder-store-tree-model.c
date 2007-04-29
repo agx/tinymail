@@ -257,6 +257,9 @@ tny_gtk_folder_store_tree_model_add_async_i (TnyGtkFolderStoreTreeModel *self, T
  * @async: Whether or not this component should attempt to asynchronously fill the tree
  * @query: the #TnyFolderStoreQuery that will be used to retrieve the folders of each folder_store
  *
+ * Create a new #GtkTreeModel instance suitable for showing  
+ * #TnyFolderStore instances
+ * 
  * Return value: a new #GtkTreeModel instance suitable for showing  
  * #TnyFolderStore instances
  **/

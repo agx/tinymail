@@ -135,7 +135,7 @@ tny_camel_stream_reset (TnyStream *self)
  *
  * The returned value must be unreferenced 
  *
- * Return: the stream to play proxy for
+ * Return value: the stream to play proxy for
  **/
 CamelStream *
 tny_camel_stream_get_stream (TnyCamelStream *self)
@@ -165,6 +165,9 @@ tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream)
  * tny_camel_stream_camel_new:
  * @stream: A #CamelStream stream to play proxy for
  *
+ * Create a new #TnyStream instance implemented as a proxy
+ * for a #CamelStream
+ * 
  * Return value: A new #TnyStream instance implemented as a proxy
  * for a #CamelStream
  **/
@@ -241,13 +244,13 @@ tny_camel_stream_get_type (void)
 {
 	static GType type = 0;
 
-	if (G_UNLIKELY (!camel_type_init_done))
+	if (G_UNLIKELY (!_camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
 
 		camel_type_init ();
-		camel_type_init_done = TRUE;
+		_camel_type_init_done = TRUE;
 	}
 
 	if (G_UNLIKELY(type == 0))

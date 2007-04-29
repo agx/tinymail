@@ -340,7 +340,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 /**
  * tny_camel_transport_account_new:
  * 
- *
+ * Create a new #TnyTransportAccount instance implemented for Camel
+ * 
  * Return value: A new #TnyTransportAccount instance implemented for Camel
  **/
 TnyTransportAccount*
@@ -414,13 +415,13 @@ tny_camel_transport_account_get_type (void)
 {
 	static GType type = 0;
 
-	if (G_UNLIKELY (!camel_type_init_done))
+	if (G_UNLIKELY (!_camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
 
 		camel_type_init ();
-		camel_type_init_done = TRUE;
+		_camel_type_init_done = TRUE;
 	}
 
 	if (G_UNLIKELY(type == 0))

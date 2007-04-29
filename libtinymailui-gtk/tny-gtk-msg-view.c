@@ -675,6 +675,8 @@ tny_gtk_msg_view_mp_clear (TnyMimePartView *self)
 /**
  * tny_gtk_msg_view_new:
  *
+ * Create a new #TnyMsgView instance implemented for Gtk+
+ *
  * Return value: a new #TnyMsgView instance implemented for Gtk+
  **/
 TnyMsgView*

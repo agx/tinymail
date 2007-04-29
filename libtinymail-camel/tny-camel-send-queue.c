@@ -518,6 +518,7 @@ tny_camel_send_queue_finalize (GObject *object)
  * tny_camel_send_queue_new:
  * @trans_account: A #TnyCamelTransportAccount instance
  *
+ * Create a new #TnySendQueue instance implemented for Camel
  *
  * Return value: A new #TnySendQueue instance implemented for Camel
  **/
@@ -545,28 +546,28 @@ tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account)
  **/
 void
 tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
-					    TnyCamelTransportAccount *acc)
+					    TnyCamelTransportAccount *trans_account)
 {
 	TnyCamelSendQueuePriv *priv;
 	
 	g_return_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self));
-	g_return_if_fail (TNY_IS_CAMEL_TRANSPORT_ACCOUNT(acc));
+	g_return_if_fail (TNY_IS_CAMEL_TRANSPORT_ACCOUNT(trans_account));
 
 	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	if (priv->trans_account)
 		g_object_unref (G_OBJECT(priv->trans_account));
 	
-	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(acc)));
+	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(trans_account)));
 }
 
 /**
  * tny_camel_send_queue_get_transport_account:
  * @self: a valid #TnyCamelSendQueue instance
  *
- * get the transport account for this send queue.
+ * Get the transport account for this send queue. If not NULL, the returned value 
+ * must be unreferences when no longer needed.
  *
- * Return value: A #TnyCamelTransportAccount instance or NULL; unref it
- * when you no longer need it.
+ * Return value: A #TnyCamelTransportAccount instance or NULL
  **/
 TnyCamelTransportAccount*
 tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
@@ -585,7 +586,7 @@ tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
 }
 
 /**
- * tny_camel_send_queue_new:
+ * tny_camel_send_queue_flush:
  * @self: a valid #TnyCamelSendQueue instance
  *
  * (try to) flush the messages which are currently in this send queue
@@ -678,13 +679,13 @@ tny_camel_send_queue_get_type (void)
 {
 	static GType type = 0;
 
-	if (G_UNLIKELY (!camel_type_init_done))
+	if (G_UNLIKELY (!_camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
 
 		camel_type_init ();
-		camel_type_init_done = TRUE;
+		_camel_type_init_done = TRUE;
 	}
 
 	if (G_UNLIKELY(type == 0))

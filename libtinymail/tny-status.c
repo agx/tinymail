@@ -53,6 +53,7 @@ tny_status_code_get_type (void)
 
 /**
  * tny_status_set_fraction:
+ * @status: a #TnyStatus instance
  * @fraction: the fraction to set
  * 
  * Set the fraction of @status. The of_total member of @status will be set to 100
@@ -68,6 +69,7 @@ tny_status_set_fraction (TnyStatus *status, gdouble fraction)
 
 /**
  * tny_status_get_fraction:
+ * @status: a #TnyStatus instance
  * 
  * Get the fraction of @status
  *

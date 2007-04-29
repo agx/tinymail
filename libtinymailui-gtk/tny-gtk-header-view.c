@@ -130,6 +130,8 @@ tny_gtk_header_view_clear_default (TnyHeaderView *self)
 /**
  * tny_gtk_header_view_new:
  *
+ * Create a new #TnyHeaderView instance implemented for Gtk+
+ *
  * Return value: a new #TnyHeaderView instance implemented for Gtk+
  **/
 TnyHeaderView*

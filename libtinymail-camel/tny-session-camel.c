@@ -51,7 +51,7 @@
 
 #include <tny-camel-shared.h>
 
-gboolean camel_type_init_done = FALSE;
+gboolean _camel_type_init_done = FALSE;
 
 static CamelSessionClass *ms_parent_class;
 
@@ -661,12 +661,12 @@ tny_session_camel_get_type (void)
 {
 	static CamelType tny_session_camel_type = CAMEL_INVALID_TYPE;
 
-	if (G_UNLIKELY (!camel_type_init_done))
+	if (G_UNLIKELY (!_camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
 		camel_type_init ();
-		camel_type_init_done = TRUE;
+		_camel_type_init_done = TRUE;
 	}
 
 	if (G_UNLIKELY (tny_session_camel_type == CAMEL_INVALID_TYPE)) 

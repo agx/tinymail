@@ -120,7 +120,9 @@ tny_gtk_attachment_mime_part_view_clear_default (TnyMimePartView *self)
 /**
  * tny_gtk_attachment_mime_part_view_new:
  * @iview: A #TnyGtkAttachListModel instance
- *
+ * 
+ * Create a new #TnyMimePartView instance implemented for Gtk+
+ * 
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*

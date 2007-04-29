@@ -442,11 +442,9 @@ tny_gnome_account_store_notify_remove (TnyAccountStore *self)
 
 /*
 	gconftool-2 -s /apps/tinymail/cache_dir -t string .tinymail
-
 	gconftool-2 -s /apps/tinymail/accounts/count -t int COUNT
 	gconftool-2 -s /apps/tinymail/accounts/0/proto -t string [smtp|imap|pop]
 	gconftool-2 -s /apps/tinymail/accounts/0/type -t string [transport|store]
-
 	gconftool-2 -s /apps/tinymail/accounts/0/user -t string username
 	gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string mailserver
 or

@@ -820,6 +820,8 @@ tny_camel_mime_part_finalize (GObject *object)
 /**
  * tny_camel_mime_part_new:
  * 
+ * Create a new MIME part instance
+ * 
  * Return value: A new #TnyMimePart instance implemented for Camel
  **/
 TnyMimePart*
@@ -836,8 +838,9 @@ tny_camel_mime_part_new (void)
 
 /**
  * tny_camel_mime_part_new_with_part:
+ * @part: a #CamelMimePart object
  * 
- * The #TnyMimePart implementation is actually a proxy for #CamelMimePart.
+ * Create a new MIME part instance that is a proxy for a #CamelMimePart one
  *
  * Return value: A new #TnyMimePart instance implemented for Camel
  **/
@@ -935,13 +938,13 @@ tny_camel_mime_part_get_type (void)
 {
 	static GType type = 0;
 
-	if (G_UNLIKELY (!camel_type_init_done))
+	if (G_UNLIKELY (!_camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
 
 		camel_type_init ();
-		camel_type_init_done = TRUE;
+		_camel_type_init_done = TRUE;
 	}
 
 	if (G_UNLIKELY(type == 0))

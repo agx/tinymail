@@ -17,33 +17,3 @@ mozilla-preferences
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### FUNCTION mozilla_preference_set ##### -->
-<para>
-
-</para>
-
-@preference_name: 
-@new_value: 
-@Returns: 
-
-
-<!-- ##### FUNCTION mozilla_preference_set_boolean ##### -->
-<para>
-
-</para>
-
-@preference_name: 
-@new_boolean_value: 
-@Returns: 
-
-
-<!-- ##### FUNCTION mozilla_preference_set_int ##### -->
-<para>
-
-</para>
-
-@preference_name: 
-@new_int_value: 
-@Returns: 
-
-

@@ -153,13 +153,13 @@ tny_stream_camel_get_type (void)
 {
 	static CamelType type = CAMEL_INVALID_TYPE;
 	
-	if (G_UNLIKELY (!camel_type_init_done))
+	if (G_UNLIKELY (!_camel_type_init_done))
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
 
 		camel_type_init ();
-		camel_type_init_done = TRUE;
+		_camel_type_init_done = TRUE;
 	}
 
 	if (G_UNLIKELY (type == CAMEL_INVALID_TYPE)) 
@@ -205,6 +205,9 @@ tny_stream_camel_set_stream (TnyStreamCamel *self, TnyStream *stream)
  * tny_stream_camel_new:
  * @stream: A #TnyStream stream to play proxy for
  *
+ * Create a new #CamelStream instance implemented as a proxy
+ * for a #TnyStream
+ * 
  * Return value: A new #CamelStream instance implemented as a proxy
  * for a #TnyStream
  **/

@@ -31,8 +31,9 @@ static GObjectClass *item_parent_class;
 /**
  * tny_folder_store_query_new:
  *
- * Return value: a new #TnyFolderStoreQuery instance
- *
+ * Create a new #TnyFolderStoreQuery instance
+ * 
+ * Return value: A new #TnyFolderStoreQuery instance
  **/
 TnyFolderStoreQuery* 
 tny_folder_store_query_new (void)
