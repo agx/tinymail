@@ -1,3 +1,9 @@
+2007-04-29   Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Documentation updates
+	* Made a few symbols start with an underscore, so that they are not
+	exported by the linker
+
 2007-04-29  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-account-store.c:
