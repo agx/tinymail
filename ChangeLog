@@ -1,5 +1,13 @@
 2007-04-29  Murray Cumming  <murrayc@murrayc.com>
 
+	* libtinymail-maemo/tny-maemo-account-store.c:
+	(tny_maemo_account_store_add_store_account),
+	(tny_maemo_account_store_add_transport_account):
+	Correct NY_ACCOUNT_STORE typos to TNY_ACCOUNT_STORE, to avoid an undefined 
+	symbol build error.
+
+2007-04-29  Murray Cumming  <murrayc@murrayc.com>
+
 	* libtinymail-gnome-desktop/tny-gnome-device.c:
 	* libtinymail-gpe/tny-gpe-device.c: (emit_status),
 	(tny_gpe_device_reset), (tny_gpe_device_force_online),

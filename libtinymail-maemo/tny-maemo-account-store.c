@@ -499,8 +499,8 @@ tny_maemo_account_store_add_store_account (TnyMaemoAccountStore *self, TnyStoreA
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
 	tny_maemo_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
-	tny_maemo_account_store_add_account (NY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
-	tny_maemo_account_store_notify_add (NY_ACCOUNT_STORE (self));
+	tny_maemo_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
+	tny_maemo_account_store_notify_add (TNY_ACCOUNT_STORE (self));
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
@@ -512,9 +512,9 @@ tny_maemo_account_store_add_transport_account (TnyAccountStore *self, TnyTranspo
 {
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	tny_maemo_account_store_notify_remove (NY_ACCOUNT_STORE (self));
-	tny_maemo_account_store_add_account (NY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
-	tny_maemo_account_store_notify_add (NY_ACCOUNT_STORE (self));
+	tny_maemo_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
+	tny_maemo_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
+	tny_maemo_account_store_notify_add (TNY_ACCOUNT_STORE (self));
 
 	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
 
