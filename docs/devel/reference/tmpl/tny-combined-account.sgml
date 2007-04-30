@@ -2,11 +2,11 @@
 TnyCombinedAccount
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A account type that can combine a store and a transport account
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyAccount implementation that decorates a #TnyStoreAccount and a #TnyTransportAccount
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
