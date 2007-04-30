@@ -35,7 +35,7 @@
 <!ENTITY libtinymail-TnyPasswordGetter SYSTEM "xml/tny-password-getter.xml">
 <!ENTITY libtinymail-TnyMergeFolder SYSTEM "xml/tny-merge-folder.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
-
+<!ENTITY libtinymail-TnyCombinedAccount SYSTEM "xml/tny-combined-account.xml">
 
 <!ENTITY libtinymail-camel-TnyCamelSendQueue SYSTEM "xml/tny-camel-send-queue.xml">
 <!ENTITY libtinymail-camel-TnyCamelMsgRemoveStrategy SYSTEM "xml/tny-camel-msg-remove-strategy.xml">
@@ -130,6 +130,7 @@
 		&libtinymail-TnyAccount;
 		&libtinymail-TnyStoreAccount;
 		&libtinymail-TnyTransportAccount;
+		&libtinymail-TnyCombinedAccount;
 		&libtinymail-TnySendQueue;
 		&libtinymail-TnyMsg;
 		&libtinymail-TnyMimePart;

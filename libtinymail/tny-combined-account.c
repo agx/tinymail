@@ -343,7 +343,7 @@ on_subscription_changed_signal (TnyStoreAccount *sa, TnyFolder *folder, gpointer
  *
  * Note though that you must not use instances created by this constructor for
  * either setting or getting members of the #TnyAccount type. You must get the
- * actualy instances to read this from using either 
+ * actual instances to read this from using either 
  * tny_combined_account_get_transport_account or tny_combined_account_get_store_account.
  *
  * Return value: A new account instance that decorates both @ta and @sa

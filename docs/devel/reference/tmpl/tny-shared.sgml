@@ -726,3 +726,16 @@ A method that happens after tny_folder_store_get_folders_async is finished
 @get_password_func: 
 @forget_password_func: 
 
+<!-- ##### STRUCT TnyCombinedAccount ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyCombinedAccountClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
