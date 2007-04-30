@@ -23,10 +23,6 @@ struct _TnyCombinedAccountPriv
 	guint subs_changed_signal;
 };
 
-static void
-tny_combined_account_subscription_changed (TnyStoreAccount *self, TnyFolder *folder)
-{
-}
 
 static void
 tny_combined_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
