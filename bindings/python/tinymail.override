@@ -36,7 +36,8 @@ headers
 #include <tny-folder-stats.h>
 #include <tny-password-getter.h>
 #include <tny-merge-folder.h>
-
+#include <tny-combined-account.h>
+#
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
 
