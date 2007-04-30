@@ -549,17 +549,18 @@ tny_combined_account_get_type (void)
 			"TnyCombinedAccount",
 			&info, 0);
 
+		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT,
+			&tny_account_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE,
+			&tny_folder_store_info);
+
 		g_type_add_interface_static (type, TNY_TYPE_STORE_ACCOUNT,
 			&tny_store_account_info);
 
 		g_type_add_interface_static (type, TNY_TYPE_TRANSPORT_ACCOUNT,
 			&tny_transport_account_info);
 
-		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT,
-			&tny_account_info);
-
-		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE,
-			&tny_folder_store_info);
 
 	}
 	return type;
