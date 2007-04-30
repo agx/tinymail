@@ -35,7 +35,8 @@ libtinymail_1_0_headers = \
 	tny-msg-receive-strategy.h \
 	tny-send-queue.h \
 	tny-password-getter.h \
-	tny-merge-folder.h
+	tny-merge-folder.h \
+	tny-combined-account.h
 
 libtinymail_1_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
@@ -73,7 +74,8 @@ libtinymail_1_0_la_SOURCES = \
 	tny-msg-receive-strategy.c \
 	tny-send-queue.c \
 	tny-password-getter.c \
-	tny-merge-folder.c
+	tny-merge-folder.c \
+	tny-combined-account.c
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)
 libtinymail_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

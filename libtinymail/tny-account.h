@@ -42,7 +42,8 @@ typedef struct _TnyAccountIface TnyAccountIface;
 enum _TnyAccountType
 {
 	TNY_ACCOUNT_TYPE_STORE,
-	TNY_ACCOUNT_TYPE_TRANSPORT
+	TNY_ACCOUNT_TYPE_TRANSPORT,
+	TNY_ACCOUNT_TYPE_COMBINED
 };
 
 struct _TnyAccountIface

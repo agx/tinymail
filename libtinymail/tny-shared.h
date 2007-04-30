@@ -110,7 +110,8 @@ typedef struct _TnyFolderStatsClass TnyFolderStatsClass;
 typedef enum _TnyFolderCaps TnyFolderCaps;
 typedef struct _TnyPasswordGetter TnyPasswordGetter;
 typedef struct _TnyPasswordGetterIface TnyPasswordGetterIface;
-
+typedef struct _TnyCombinedAccount TnyCombinedAccount;
+typedef struct _TnyCombinedAccountClass TnyCombinedAccountClass;
 
 G_END_DECLS
 

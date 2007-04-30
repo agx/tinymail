@@ -1,4 +1,10 @@
-2007-04-29   Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-30  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added a TnyCombinedAccount type
+
+	* This was a major API change
+
+2007-04-29  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Documentation updates
 	* Made a few symbols start with an underscore, so that they are not
