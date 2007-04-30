@@ -368,7 +368,8 @@ tny_combined_account_new (TnyTransportAccount *ta, TnyStoreAccount *sa)
  * tny_combined_account_get_transport_account:
  * @self: a #TnyCombinedAccount instance
  * 
- * Get the transport account that is being decorated by @self.
+ * Get the transport account that is being decorated by @self. You must unreference
+ * the returned value if not needed anymore.
  *
  * Return value: the transport account being decorated
  **/
@@ -384,7 +385,8 @@ tny_combined_account_get_transport_account (TnyCombinedAccount *self)
  * tny_combined_account_get_store_account:
  * @self: a #TnyCombinedAccount instance
  * 
- * Get the store account that is being decorated by @self.
+ * Get the store account that is being decorated by @self. You must unreference
+ * the returned value if not needed anymore.
  *
  * Return value: the store account being decorated
  **/
