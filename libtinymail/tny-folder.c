@@ -761,6 +761,7 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * @folder_dst: the TnyFolder where the msgs will be transfered
  * @delete_originals: if TRUE then move msgs, else copy them
  * @callback: The callback handler
+ * @status_callback: the status callback handler
  * @user_data: user data for the callback
  * 
  * Transfers messages of which the headers are in @header_list from @self to 
@@ -784,7 +785,7 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * this method if you want API or ABI compatibility with your binary.
  **/
 void 
-tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data)
+tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
@@ -796,7 +797,7 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
 	g_assert (TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func != NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func (self, header_list, folder_dst, delete_originals, callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func (self, header_list, folder_dst, delete_originals, callback, status_callback, user_data);
 	return;
 }
 

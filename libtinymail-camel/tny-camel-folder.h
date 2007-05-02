@@ -75,7 +75,7 @@ struct _TnyCamelFolderClass
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self, GError **err);
 	void (*transfer_msgs_func) (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
-	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data);
+	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	TnyFolder* (*copy_func) (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
 	void (*poke_status_func) (TnyFolder *self);
 	void (*add_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
@@ -84,7 +84,7 @@ struct _TnyCamelFolderClass
 	gchar* (*get_url_string_func) (TnyFolder *self);
 	TnyFolderCaps (*get_caps_func) (TnyFolder *self);
 
-	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data);
+	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data);
 	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
 	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder, GError **err);
 	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);

@@ -115,7 +115,7 @@ recurse_folders_async (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, 
 	hlrp->self = self;
 	hlrp->parent_tree_iter = parent_tree_iter;
 
-	tny_folder_store_get_folders_async (store, folders, recurse_get_folders_callback, self->query, hlrp);
+	tny_folder_store_get_folders_async (store, folders, recurse_get_folders_callback, NULL, self->query, hlrp);
 }
 
 static void

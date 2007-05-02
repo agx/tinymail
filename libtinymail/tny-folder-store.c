@@ -295,7 +295,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *
  **/
 void 
-tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, gpointer user_data)
+tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER_STORE (self));
@@ -307,7 +307,7 @@ tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetF
 	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func != NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func (self, list, callback, query, user_data);
+	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func (self, list, callback, query, status_callback, user_data);
 
 #ifdef DBC /* ensure */
 #endif

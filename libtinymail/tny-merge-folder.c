@@ -737,7 +737,7 @@ transfer_msgs_async_thread (gpointer thr_user_data)
 }
 
 static void
-tny_merge_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, gpointer user_data)
+tny_merge_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TransferMsgsInfo *info;
 	GThread *thread;

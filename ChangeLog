@@ -1,3 +1,12 @@
+2007-05-02  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+
+	* Change API headers of async functions to pass a status callback
+	method to get progress information about task execution. 
+        	* transfer_msgs_async_fun
+		* get_folders_async_func
+	* Camel implementation functions have been changed, but NULL was assigned
+	to status_callback, for the moment.	
+
 2007-04-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added a TnyCombinedAccount type
