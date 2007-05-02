@@ -4,8 +4,8 @@
 	method to get progress information about task execution. 
         	* transfer_msgs_async_fun
 		* get_folders_async_func
-	* Camel implementation functions have been changed, but NULL was assigned
-	to status_callback, for the moment.	
+	* Camel implementation functions have been changed, but NULL 
+	was assigned to status_callback, for the moment.	
 
 2007-04-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
