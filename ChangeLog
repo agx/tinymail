@@ -1,6 +1,9 @@
 2007-05-03  Sergio Villar Senin  <svillar@igalia.com>
 	* tests/functional/folder-lister-async.c: Fixed a build error in the
 	tests caused by the API changes of yesterday
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c: Fixed a call to
+	_get_folders_async() that was receiving the arguments in a wrong
+	order
 
 2007-05-02  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
