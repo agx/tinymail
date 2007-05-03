@@ -28,7 +28,7 @@ ifneq (,$(findstring thumb,$(DEB_BUILD_OPTIONS)))
 endif
 
 config.status:
-	if [ ! -x configure ]; then ./autogen.sh; fi
+	if [ ! -x configure ]; then ./autogen.sh --with-platform=maemo; fi
 	dh_testdir
 	# Add here commands to configure the package.
 	CFLAGS="$(CFLAGS)" ./configure --with-platform=maemo --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
@@ -68,7 +68,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tinymail
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/tinymail
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 
 
 # Build architecture-independent files here.
@@ -82,7 +82,7 @@ binary-arch: build install
 #	dh_installchangelogs ChangeLog
 #	dh_installdocs
 #	dh_installexamples
-#	dh_install
+	dh_install
 #	dh_installmenu
 #	dh_installdebconf	
 #	dh_installlogrotate
@@ -99,7 +99,7 @@ binary-arch: build install
 	dh_fixperms
 #	dh_perl
 #	dh_python
-#	dh_makeshlibs
+	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
