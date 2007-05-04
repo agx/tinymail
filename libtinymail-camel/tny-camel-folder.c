@@ -44,6 +44,10 @@
 #include <tny-folder-store-observer.h>
 #include <tny-simple-list.h>
 
+#define TINYMAIL_ENABLE_PRIVATE_API
+#include <tny-idle-stopper-priv.h>
+#undef TINYMAIL_ENABLE_PRIVATE_API
+
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -705,13 +709,20 @@ typedef struct
 	TnyStatusCallback status_callback;
 	gpointer user_data;
 	gboolean cancelled;
+	
+	/* This stops us from calling a status callback after the operation has 
+	 * finished. */
+	TnyIdleStopper* stopper;
+	
 	guint depth;
 	GError *err;
 	TnySessionCamel *session;
 } RefreshFolderInfo;
 
 
-
+/** This is the GDestroyNotify callback provided to g_idle_add_full()
+ * for tny_camel_folder_refresh_async_callback().
+ */
 static void
 tny_camel_folder_refresh_async_destroyer (gpointer thr_user_data)
 {
@@ -728,6 +739,9 @@ tny_camel_folder_refresh_async_destroyer (gpointer thr_user_data)
 
 	_tny_session_stop_operation (info->session);
 
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+	
 	g_slice_free (RefreshFolderInfo, thr_user_data);
 
 	return;
@@ -744,6 +758,11 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 	if (info->callback)
 		info->callback (info->self, info->cancelled, &info->err, info->user_data);
 
+	/* Prevent status callbacks from being called after this
+	 * (can happen because the 2 idle callbacks have different priorities)
+	 * by causing tny_idle_stopper_is_stopped() to return TRUE. */
+	tny_idle_stopper_stop (info->stopper);
+	
 	tny_folder_change_set_new_all_count (change, priv->cached_length);
 	tny_folder_change_set_new_unread_count (change, priv->unread_length);
 	notify_folder_observers_about (self, change);
@@ -771,6 +790,9 @@ destroy_progress_idle (gpointer data)
 	g_object_unref (G_OBJECT (info->minfo->self));
 	g_free (info->what);
 
+	tny_idle_stopper_destroy (info->minfo->stopper);
+	info->minfo->stopper = NULL;
+    
 	g_slice_free (RefreshFolderInfo, info->minfo);
 	g_slice_free (ProgressInfo, data);
 
@@ -782,7 +804,13 @@ progress_func (gpointer data)
 {
 	ProgressInfo *info = data;
 	RefreshFolderInfo *minfo = info->minfo;
-
+	
+	/* Do not call the status callback after the main callback 
+	 * has already been called, because we should assume that 
+	 * the user_data is invalid after that time: */
+	if (tny_idle_stopper_is_stopped (minfo->stopper))
+		return FALSE;
+	
 	if (minfo && minfo->status_callback)
 	{
 		TnyStatus *status = tny_status_new (TNY_FOLDER_STATUS, 
@@ -804,7 +832,7 @@ progress_func (gpointer data)
  *
  * This is non-public API documentation
  *
- * The reason why we need to copy thist stuff is because it seems Camel has some
+ * The reason why we need to copy this stuff is because it seems Camel has some
  * of its stuff allocated on the stack. When you do g_idle tricks, it's possible
  * that by the time the g_idle happens, the stack allocation is already killed.
  *
@@ -829,6 +857,11 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 	info->minfo->status_callback = oinfo->status_callback;
 	info->minfo->user_data = oinfo->user_data;
 	info->oftotal = oftotal;
+	
+	/* Share the TnyIdleStopper, so one callback can tell the other to stop,
+	 * because they may be called in an unexpected sequence: */
+	/* This is destroyed in the idle GDestroyNotify callback. */
+	info->minfo->stopper = tny_idle_stopper_copy(oinfo->stopper);
 
 	if (info->oftotal < 1)
 		info->oftotal = 1;
@@ -969,6 +1002,7 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 		return;
 	}
 
+	/* Idle info for the status callback: */
 	info = g_slice_new (RefreshFolderInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
 	info->err = NULL;
@@ -977,14 +1011,22 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 	info->status_callback = status_callback;
 	info->user_data = user_data;
 	info->depth = g_main_depth ();
+	
+	/* Use a ref count because we do not know which of the 2 idle callbacks 
+	 * will be the last, and we can only unref self in the last callback:
+	 * This is destroyed in the idle GDestroyNotify callback.
+	 */
+	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
 	g_object_ref (G_OBJECT (self));
 	_tny_camel_folder_reason (priv);
 
+	/* This will cause the idle status callback to be called,
+	 * via _tny_camel_account_start_camel_operation,
+	 * and also calls the idle main callback: */
 	thread = g_thread_create (tny_camel_folder_refresh_async_thread,
 			info, FALSE, NULL);
-
 	return;
 }
 

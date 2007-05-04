@@ -529,8 +529,8 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 /**
  * tny_folder_refresh_async:
  * @self: a TnyFolder object
- * @callback: The callback handler
- * @status_callback: A callback for status notifications
+ * @callback: The callback handler. This is called last.
+ * @status_callback: A callback for status notifications. This is never called after @callback.
  * @user_data: user data for the callback
  *
  * Refresh @self and call back when finished. This gets the summary information

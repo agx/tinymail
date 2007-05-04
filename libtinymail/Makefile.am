@@ -2,6 +2,8 @@ INCLUDES = $(LIBTINYMAIL_CFLAGS) -I. -I$(top_srcdir)
 
 lib_LTLIBRARIES = libtinymail-1.0.la
 
+private_headers = tny-idle-stopper-priv.h
+
 libtinymail_1_0_headers = \
 	tny-shared.h \
 	tny-error.h \
@@ -75,7 +77,9 @@ libtinymail_1_0_la_SOURCES = \
 	tny-send-queue.c \
 	tny-password-getter.c \
 	tny-merge-folder.c \
-	tny-combined-account.c
+	tny-combined-account.c \
+	tny-idle-stopper-priv.c \
+	$(private_headers)
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)
 libtinymail_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

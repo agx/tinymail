@@ -1,3 +1,26 @@
+2007-05-04  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/Makefile.am:
+	* libtinymail/tny-idle-stopper-priv.c:
+	* libtinymail/tny-idle-stopper-priv.h: Added a helper API to allow 2 or more 
+	idle handler callbacks to cooperate, so that one can stop the other one, in 
+	case they are called in an unexpected sequence, which happens when they 
+	have different idle priorities.
+	See the API documentation here fore more details.
+
+	* libtinymail-camel/tny-camel-folder.c:
+	(tny_camel_folder_refresh_async_destroyer),
+	(tny_camel_folder_refresh_async_callback), (destroy_progress_idle),
+	(progress_func), (tny_camel_folder_refresh_async_status),
+	(tny_camel_folder_refresh_async_default): Use shared TnyIdleHandler instances, 
+	so that the main idle callback can stop the progress idle callback from calling 
+	the status callback after the main callback, which causes freed memory to be used, 
+	crashing modest. See the comments here fore more details.
+
+	* libtinymail/tny-folder.c: Added some text to the tny_folder_refresh_async() 
+	callbacks to make the sequence clearer. I think that language bindings will 
+	actually need one or more destroy callbacks eventually.
+
 2007-05-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Massive changes to TnyGetMsgQueue (unfinished, experimental)
