@@ -3885,6 +3885,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		return NULL;
 	}
 
+	camel_operation_start (NULL, _("Preparing to get message"));
+
 	/* amcon = camel_imap_service_connect (CAMEL_SERVICE (store), ex); */
 	amcon = camel_service_connect (CAMEL_SERVICE (store), ex);
 
@@ -3898,6 +3900,10 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		return NULL;
 	}
 	camel_exception_clear (ex);
+
+	camel_operation_end (NULL);
+
+	camel_operation_start (NULL, _("Getting message"));
 
   CAMEL_SERVICE_REC_LOCK(store, connect_lock); 
 
@@ -3997,6 +4003,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					camel_stream_write (stream, t_str, hread);
 					rec += hread;
 				}
+				camel_operation_progress (NULL, rec, length);
 			}
 			camel_stream_reset (stream);
 
@@ -4024,6 +4031,7 @@ berrorhander:
 			gchar *tag;
 			guint taglen;
 			gboolean isnextdone = FALSE, hadr = FALSE;
+			guint tread = 0, exread = 0;
 
 			nread = 0;
 
@@ -4049,6 +4057,7 @@ berrorhander:
 			if (server_stream) 
 			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 			  {
+				tread += nread;
 
 				/* It might be the line before the last line */
 				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
@@ -4063,7 +4072,19 @@ berrorhander:
 				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
 					{ err=TRUE; break; } 
 				else if (linenum == 0) 
-					{ linenum++; continue; }
+				{ 
+					char *pos, *ppos;
+					pos = strchr (line, '{');
+					if (pos) { 
+						ppos = strchr (pos, '}');
+						if (ppos) {
+							*ppos = '\0';
+							exread = strtol (pos + 1, NULL, 10);
+						}
+					}
+					linenum++; 
+					continue; 
+				}
 
 				/* It's the last line (isnextdone will be ignored if that is the case) */
 			 	if (!strncmp (line, tag, taglen))
@@ -4085,6 +4106,9 @@ berrorhander:
 				camel_stream_write (stream, line, strlen (line));
 
 				linenum++;
+
+				camel_operation_progress (NULL, tread, exread);
+
 				memset (line, 0, MAX_LINE_LEN);
 			  }
 merrorhandler:
@@ -4128,6 +4152,7 @@ merrorhandler:
 			gchar *tag;
 			guint taglen;
 			gboolean isnextdone = FALSE;
+			guint tread = 0, exread = 0;
 
 			nread = 0;
 
@@ -4166,6 +4191,7 @@ merrorhandler:
 			if (server_stream) 
 			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 			  {
+				tread += nread;
 
 				/* It might be the line before the last line */
 				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
@@ -4175,7 +4201,20 @@ merrorhandler:
 				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
 					{ err=TRUE; break; } 
 				else if (linenum == 0) 
-					{ linenum++; continue; }
+				{ 
+					char *pos, *ppos;
+					pos = strchr (line, '{');
+					if (pos) { 
+						ppos = strchr (pos, '}');
+						if (ppos) {
+							*ppos = '\0';
+							exread = strtol (pos + 1, NULL, 10);
+						}
+					}
+					linenum++; 
+					continue; 
+				}
+
 
 				/* It's the last line */
 				if (!strncmp (line, tag, taglen))
@@ -4232,6 +4271,8 @@ merrorhandler:
 
 				camel_stream_write (stream, line, strlen (line));
 
+				camel_operation_progress (NULL, tread, exread);
+
 				linenum++;
 				memset (line, 0, MAX_LINE_LEN);
 			  }
@@ -4269,6 +4310,8 @@ rerrorhandler:
 	camel_service_disconnect (CAMEL_SERVICE (store), TRUE, NULL);
 	camel_object_unref (CAMEL_OBJECT (store));
 
+	camel_operation_end (NULL);
+
 	return stream;
 
 errorhander:
@@ -4294,6 +4337,9 @@ errorhander:
 	camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 	camel_object_unref (CAMEL_OBJECT (store));
   }
+
+	camel_operation_end (NULL);
+
 	return NULL;
 }
 

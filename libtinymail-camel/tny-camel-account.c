@@ -283,7 +283,7 @@ camel_cancel_hack_thread (gpointer data)
 }
 
 void 
-_tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what)
+_tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what, gboolean cancel)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	GThread *thread;
@@ -291,34 +291,37 @@ _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationS
 
 	g_mutex_lock (priv->cancel_lock);
 
-	/* I know this isn't polite. But it works ;-) */
-	/* camel_operation_cancel (NULL); */
-	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, &err);
-	if (err == NULL)
-		g_thread_join (thread);
-	else
-		g_error_free (err);
-
-	if (priv->cancel)
+	if (cancel)
 	{
-		while (!camel_operation_cancel_check (priv->cancel)) 
-		{ 
-			g_warning (_("Cancellation failed, retrying\n"));
-			thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
+		/* I know this isn't polite. But it works ;-) */
+		/* camel_operation_cancel (NULL); */
+		thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, &err);
+		if (err == NULL)
 			g_thread_join (thread);
-		}
-		tny_camel_account_stop_camel_operation_priv (priv);
-	}
+		else
+			g_error_free (err);
+	
 
-	camel_operation_uncancel (NULL);
+		if (priv->cancel)
+		{
+			while (!camel_operation_cancel_check (priv->cancel)) 
+			{ 
+				g_warning (_("Cancellation failed, retrying\n"));
+				thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
+				g_thread_join (thread);
+			}
+			tny_camel_account_stop_camel_operation_priv (priv);
+		}
+
+		camel_operation_uncancel (NULL);
+	}
 
 	while (priv->inuse_spin); 
 
 	priv->inuse_spin = TRUE;
 
-
 	priv->cancel = camel_operation_new (func, user_data);
-	
+
 	camel_operation_ref (priv->cancel);
 	camel_operation_register (priv->cancel);
 	camel_operation_start (priv->cancel, (char*)what);
@@ -326,6 +329,12 @@ _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationS
 	g_mutex_unlock (priv->cancel_lock);
 
 	return;
+}
+
+void 
+_tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what)
+{
+	_tny_camel_account_start_camel_operation_n (self, func, user_data, what, TRUE);
 }
 
 void 

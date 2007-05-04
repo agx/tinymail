@@ -108,6 +108,42 @@ struct _TnyDemouiSummaryViewPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_DEMOUI_SUMMARY_VIEW, TnyDemouiSummaryViewPriv))
 
 
+static gboolean
+cleanup_statusbar (gpointer data)
+{
+	TnyDemouiSummaryViewPriv *priv = data;
+
+	gtk_widget_hide (GTK_WIDGET (priv->progress));
+	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
+
+	return FALSE;
+}
+
+
+static void
+status_update (GObject *sender, TnyStatus *status, gpointer user_data)
+{
+	TnySummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
+	gchar *new_what;
+
+	if (!user_data)
+		return;
+
+	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress), 
+		tny_status_get_fraction (status));
+	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
+
+	new_what = g_strdup_printf ("%s (%d/%d)", status->message, status->position, 
+		status->of_total);
+
+	gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, new_what);
+	g_free (new_what);
+
+	return;
+}
+
 static void
 set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
 {
@@ -355,6 +391,40 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 }
 
 static void
+on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data)
+{
+	TnyDemouiSummaryView *self  = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GError *merr = *err;
+
+	g_idle_add (cleanup_statusbar, priv);
+
+	if (cancelled)
+		return;
+
+	if (msg)
+		tny_msg_view_set_msg (priv->msg_view, msg);
+	else 
+		tny_msg_view_set_unavailable (priv->msg_view);
+
+	if (merr != NULL)
+	{
+		GtkWidget *edialog;
+
+		edialog = gtk_message_dialog_new (
+				  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+				  GTK_DIALOG_DESTROY_WITH_PARENT,
+				  GTK_MESSAGE_ERROR,
+				  GTK_BUTTONS_CLOSE,
+				  merr->message);
+		g_signal_connect_swapped (edialog, "response",
+			G_CALLBACK (gtk_widget_destroy), edialog);
+		gtk_widget_show_all (edialog);
+		g_error_free (merr);
+	}
+}
+
+static void
 on_header_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
 {
@@ -374,38 +444,13 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 		if (G_LIKELY (header))
 		{
 			TnyFolder *folder;
-			TnyMsg *msg;
-
 			folder = tny_header_get_folder (header);
-			if (G_LIKELY (folder))
+			if (folder)
 			{
-				GError *err = NULL;
+				gtk_widget_show (GTK_WIDGET (priv->progress));
 
-				msg = tny_folder_get_msg (folder, header, &err);
-				if (G_LIKELY (msg))
-				{
-					tny_msg_view_set_msg (priv->msg_view, msg);
-					g_object_unref (G_OBJECT (msg));
-				} else { 
-					tny_msg_view_set_unavailable (priv->msg_view);
-				}
-
-				if (err != NULL)
-				{
-					GtkWidget *edialog;
-
-					edialog = gtk_message_dialog_new (
-							  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
-							  GTK_DIALOG_DESTROY_WITH_PARENT,
-							  GTK_MESSAGE_ERROR,
-							  GTK_BUTTONS_CLOSE,
-							  err->message);
-					g_signal_connect_swapped (edialog, "response",
-						G_CALLBACK (gtk_widget_destroy), edialog);
-					gtk_widget_show_all (edialog);
-					g_error_free (err);
-				}
-
+				tny_folder_get_msg_async (folder, header, 
+					on_get_msg, status_update, self);
 				g_object_unref (G_OBJECT (folder));
 			}
 
@@ -419,22 +464,13 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 	return;
 }
 
-static gboolean
-cleanup_statusbar (gpointer data)
-{
-	TnyDemouiSummaryViewPriv *priv = data;
-
-	gtk_widget_hide (GTK_WIDGET (priv->progress));
-	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
-
-	return FALSE;
-}
-
 
 static void
 refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
 {
-	TnyDemouiSummaryViewPriv *priv = user_data;
+	TnySummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
 	GtkTreeModel *select_model;
 
 	if (!cancelled)
@@ -468,34 +504,14 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 }
 
 
-static void
-refresh_current_folder_status_update (GObject *sender, TnyStatus *status, gpointer user_data)
-{
-	gchar *new_what;
-
-	TnyDemouiSummaryViewPriv *priv = user_data;
-
-	if (!user_data)
-		return;
-
-	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress), 
-		tny_status_get_fraction (status));
-	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
-
-	new_what = g_strdup_printf ("%s (%d/%d)", status->message, status->position, 
-		status->of_total);
-
-	gtk_statusbar_push (GTK_STATUSBAR (priv->status), priv->status_id, new_what);
-	g_free (new_what);
-
-	return;
-}
 
 static void
 on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection, 
 		gpointer user_data)
 {
-	TnyDemouiSummaryViewPriv *priv = user_data;
+	TnySummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 	GtkTreeModel *hmodel;
@@ -575,7 +591,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			tny_folder_refresh_async (folder, 
 				refresh_current_folder, 
-				refresh_current_folder_status_update, user_data);
+				status_update, self);
 
 			g_object_unref (G_OBJECT (folder));
 		}
@@ -640,7 +656,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 		tny_folder_refresh_async (merge, 
 			refresh_current_folder, 
-			refresh_current_folder_status_update, user_data);
+			status_update, self);
 
 		g_list_free (list);
 	}
@@ -774,7 +790,7 @@ on_full_download_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				fullqueue = tny_get_msg_queue_new ();
 
 			tny_get_msg_queue_full_msg_retrieval (fullqueue, folder, 
-				NULL, NULL, refresh_current_folder_status_update, priv);
+				NULL, NULL, status_update, self);
 
 			g_object_unref (G_OBJECT (folder));
 
@@ -1419,7 +1435,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	priv->mailbox_select = select;
 	priv->mailbox_select_sid = g_signal_connect (G_OBJECT (select), "changed",
-		G_CALLBACK (on_mailbox_view_tree_selection_changed), priv);
+		G_CALLBACK (on_mailbox_view_tree_selection_changed), self);
 
 
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));

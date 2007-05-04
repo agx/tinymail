@@ -95,7 +95,7 @@ get_msg_callback (OAsyncWorkerTask *task, gpointer func_result)
 	folder = tny_header_get_folder (info->header);
 
 	if (info->callback)
-		info->callback (folder, msg, &info->err, info->user_data);
+		info->callback (folder, FALSE, msg, &info->err, info->user_data);
 
 	if (msg)
 		g_object_unref (msg);

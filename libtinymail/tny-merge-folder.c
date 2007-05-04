@@ -231,8 +231,8 @@ get_msg_async_callback (gpointer thr_user_data)
 {
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
 
-	if (info->callback)
-		info->callback (info->self, info->msg, &info->err, info->user_data);
+	if (info->callback) /* TODO: the cancelled field */
+		info->callback (info->self, FALSE, info->msg, &info->err, info->user_data);
 
 	return FALSE;
 }
