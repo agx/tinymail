@@ -34,7 +34,9 @@ tny_status_domain_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
-      { TNY_FOLDER_STATUS, "TNY_FOLDER_STTUS", "folder_status" },
+      { TNY_FOLDER_STATUS, "TNY_FOLDER_STATUS", "folder_status" },
+      { TNY_GET_MSG_QUEUE_STATUS, "TNY_GET_MSG_QUEUE_STATUS", "get_msg_queue_status" },
+
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyStatusDomain", values);
@@ -58,6 +60,7 @@ tny_status_code_get_type (void)
     static const GEnumValue values[] = {
       { TNY_FOLDER_STATUS_CODE_REFRESH, "TNY_FOLDER_STATUS_CODE_REFRESH", "folder_status_code_refresh" },
       { TNY_FOLDER_STATUS_CODE_GET_MSG, "TNY_FOLDER_STATUS_CODE_GET_MSG", "folder_status_code_get_msg" },
+      { TNY_GET_MSG_QUEUE_STATUS_GET_MSG, "TNY_GET_MSG_QUEUE_STATUS_GET_MSG", "get_msg_queue_status_get_msg" },
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyStatus", values);

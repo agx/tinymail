@@ -26,6 +26,7 @@ struct _TnyGetMsgQueuePriv
 {
 	OAsyncWorker *queue;
 	GMutex *lock;
+	guint total;
 };
 
 

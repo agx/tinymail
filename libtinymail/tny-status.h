@@ -32,7 +32,8 @@ typedef struct _TnyStatus TnyStatus;
 
 enum _TnyStatusDomain
 {
-	TNY_FOLDER_STATUS = 1
+	TNY_FOLDER_STATUS = 1,
+	TNY_GET_MSG_QUEUE_STATUS = 2
 };
 
 #define TNY_TYPE_STATUS (tny_status_get_type())
@@ -40,7 +41,8 @@ enum _TnyStatusDomain
 enum _TnyStatusCode 
 {
 	TNY_FOLDER_STATUS_CODE_REFRESH = 1,
-	TNY_FOLDER_STATUS_CODE_GET_MSG = 2
+	TNY_FOLDER_STATUS_CODE_GET_MSG = 2,
+	TNY_GET_MSG_QUEUE_STATUS_GET_MSG = 3,
 };
 
 struct _TnyStatus 

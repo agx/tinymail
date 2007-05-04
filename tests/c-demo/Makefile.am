@@ -12,6 +12,10 @@ if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
 
+if BUILD_QUEUES
+INCLUDES += -DQUEUES -I$(top_srcdir)/libtinymail-queues
+endif
+
 if BUILD_MOZEMBED
 INCLUDES += -DMOZEMBED
 endif
@@ -31,4 +35,8 @@ tny_demoui_LDADD = 							        \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la   \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la	\
 	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la
+
+if BUILD_QUEUES
+tny_demoui_LDADD +=  $(top_builddir)/libtinymail-queues/libtinymail-queues-$(API_VERSION).la
+endif
 

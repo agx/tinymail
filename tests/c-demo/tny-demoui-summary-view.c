@@ -76,6 +76,11 @@ static GObjectClass *parent_class = NULL;
 #include <tny-camel-transport-account.h>
 #include <tny-folder-monitor.h>
 
+
+#ifdef QUEUES
+#include <tny-get-msg-queue.h>
+#endif
+
 static TnySendQueue *queue = NULL;
 
 typedef struct _TnyDemouiSummaryViewPriv TnyDemouiSummaryViewPriv;
@@ -469,7 +474,10 @@ refresh_current_folder_status_update (GObject *sender, TnyStatus *status, gpoint
 	gchar *new_what;
 
 	TnyDemouiSummaryViewPriv *priv = user_data;
-	
+
+	if (!user_data)
+		return;
+
 	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (priv->progress), 
 		tny_status_get_fraction (status));
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
@@ -735,6 +743,45 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	}
 }
 
+#ifdef QUEUES
+static TnyGetMsgQueue *fullqueue = NULL;
+
+static void 
+on_full_download_folder_activate (GtkMenuItem *mitem, gpointer user_data)
+{
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+
+	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
+	{
+		gint type;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{ 
+			TnyFolder *folder;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
+
+			if (!fullqueue)
+				fullqueue = tny_get_msg_queue_new ();
+
+			tny_get_msg_queue_full_msg_retrieval (fullqueue, folder, 
+				NULL, NULL, refresh_current_folder_status_update, priv);
+
+			g_object_unref (G_OBJECT (folder));
+
+		}
+	}
+}
+#endif
 
 static void 
 on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
@@ -1056,16 +1103,18 @@ header_view_popup_menu_event (GtkWidget *widget, gpointer user_data)
 }
 
 
-
 static void
 mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointer user_data)
 {
 	TnyDemouiSummaryView *self = user_data;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	GtkWidget *menu;
-	GtkWidget *mrename, *mdelete, *mcreate, *mmerge;
 	int button, event_time;
 	GtkSelectionMode mode;
+	GtkWidget *mrename, *mdelete, *mcreate, *mmerge;
+#ifdef QUEUES
+	GtkWidget *fdown;
+#endif
 
 	menu = gtk_menu_new ();
 
@@ -1073,6 +1122,9 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
 	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
 
+#ifdef QUEUES
+	fdown = gtk_menu_item_new_with_label (_("Download entire folder"));
+#endif
 
 	mode = gtk_tree_selection_get_mode (priv->mailbox_select);
 
@@ -1089,12 +1141,20 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 		G_CALLBACK (on_delete_folder_activate), user_data);
 	g_signal_connect (G_OBJECT (mmerge), "activate",
 		G_CALLBACK (on_merge_view_activate), user_data);
+#ifdef QUEUES
+	g_signal_connect (G_OBJECT (fdown), "activate",
+		G_CALLBACK (on_full_download_folder_activate), user_data);
+#endif
 
 	gtk_menu_prepend (menu, mrename);
 	gtk_menu_prepend (menu, mcreate);
 	gtk_menu_prepend (menu, mdelete);
 	gtk_menu_prepend (menu, mmerge);
+#ifdef QUEUES
+	gtk_menu_prepend (menu, fdown);
 
+	gtk_widget_show (fdown);
+#endif
 	gtk_widget_show (mrename);
 	gtk_widget_show (mcreate);
 	gtk_widget_show (mdelete);

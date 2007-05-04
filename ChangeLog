@@ -1,3 +1,8 @@
+2007-05-04  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Massive changes to TnyGetMsgQueue (unfinished, experimental)
+	* Fix for urgent ticket #43
+
 2007-05-03  Sergio Villar Senin  <svillar@igalia.com>
 	* tests/functional/folder-lister-async.c: Fixed a build error in the
 	tests caused by the API changes of yesterday
