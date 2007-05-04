@@ -712,6 +712,8 @@ typedef struct
 	gpointer user_data;
 	TnyStatusCallback status_callback;
 	gchar *what;
+	TnyStatusDomain domain;
+	TnyStatusCode code;
 	gint sofar, oftotal;
 	TnyIdleStopper* stopper;
 } ProgressInfo;
@@ -748,9 +750,9 @@ progress_func (gpointer data)
 
 	if (info && info->status_callback)
 	{
-		TnyStatus *status = tny_status_new (TNY_FOLDER_STATUS, 
-			TNY_FOLDER_STATUS_CODE_REFRESH,
-			info->sofar, info->oftotal, info->what);
+		TnyStatus *status = tny_status_new (info->domain, 
+			info->code, info->sofar, info->oftotal, 
+			info->what);
 
 		info->status_callback (G_OBJECT (info->self), status, 
 			info->user_data);
@@ -852,6 +854,8 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 
 	/* Camel will shredder what and thr_user_data, so we need to copy it */
 
+	info->domain = TNY_FOLDER_STATUS;
+	info->code = TNY_FOLDER_STATUS_CODE_REFRESH;
 	info->what = g_strdup (what);
 	/* gidle reference */
 	info->self = TNY_FOLDER (g_object_ref (oinfo->self));
@@ -1273,6 +1277,8 @@ tny_camel_folder_get_msg_async_status (struct _CamelOperation *op, const char *w
 
 	/* Camel will shredder what and thr_user_data, so we need to copy it */
 
+	info->domain = TNY_FOLDER_STATUS;
+	info->code = TNY_FOLDER_STATUS_CODE_GET_MSG;
 	info->what = g_strdup (what);
 	/* gidle reference */
 	info->self = TNY_FOLDER (g_object_ref (oinfo->self));
