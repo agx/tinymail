@@ -23,7 +23,8 @@
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
-/** TnyIdleStopper:
+/**
+ * TnyIdleStopper:
  * 
  * This API can be used to allow 2 idle callbacks to cooperate, 
  * so that one idle callback (for instance the main callback)
@@ -37,35 +38,48 @@
  * released, meaning that their use in a further status/referesh callback might 
  * access invalid or released memory.
  * 
- * Instantiate an TnyIdleStopper with tny_idle_stopper_new() and create a second shared 
- * instance with tny_idle_stopper_copy(). Calling tny_idle_stopper_stopped() on one 
- * instance will then cause tny_idle_stopper_is_stopped() to return TRUE for either 
- * instance.
- * Call tny_idle_stopper_destroy() on each instance when you are finished with it.
- */
+ * Instantiate an TnyIdleStopper with tny_idle_stopper_new() and create a second 
+ * shared  instance with tny_idle_stopper_copy(). Calling tny_idle_stopper_stopped()
+ * on one instance will then cause tny_idle_stopper_is_stopped() to return TRUE 
+ * for either instance. Call tny_idle_stopper_destroy() on each instance when you 
+ * are finished with it.
+ *
+ * This is INTERNAL API
+ * 
+ **/
 struct _TnyIdleStopper
 {
 	/* This is a pointer to a gboolean so we can share the value with both 
-	 * idle callbacks, so that each callback can stop the the other from calling 
-	 * the callbacks. */
+	 * idle callbacks, so that each callback can stop the the other from 
+	 * calling the callbacks. */
+
 	gboolean* stopped;
 
-	/* This is a pointer an int so we can share a refcount,
-	 * so we can release the shared stopped and ref_count only 
-	 * when nobody else needs to check stopped. */
+	/* This is a pointer an int so we can share a refcount, so we can release 
+	 * the shared stopped and ref_count only when nobody else needs to check 
+	 * stopped. */
+
 	gint* refcount;
 };
 
-/** tny_idle_stopper_new:
- * @returns: A new TnyIdleStopper instance. Release this with tny_idle_stopper_destroy().
+/** 
+ * tny_idle_stopper_new:
  * 
  * Creates a new ref count object, with an initial ref count.
  * Use tny_idle_stopper_copy() to create a second instance sharing 
  * the same underlying stopped status.
  * You must call tny_idle_stopper_stop() on one of these instances,
  * and call tny_idle_stopper_destroy() on all instances.
- */
-TnyIdleStopper* tny_idle_stopper_new()
+ *
+ * Return value: A new TnyIdleStopper instance. Release this with
+ * tny_idle_stopper_destroy().
+ *
+ * This is INTERNAL API
+ * 
+ * Return value: a new #TnyIdleStopper instance
+ **/
+TnyIdleStopper*
+tny_idle_stopper_new (void)
 {
 	TnyIdleStopper *result = g_slice_new0 (TnyIdleStopper);
 	
@@ -78,13 +92,18 @@ TnyIdleStopper* tny_idle_stopper_new()
 	return result;
 }
 
-/** tny_idle_stopper_copy
+/** 
+ * tny_idle_stopper_copy:
  * @stopper: The TnyIdleStopper instance to be shared.
  * 
- * Create a shared copy of the stopper, 
- * so that you can call tny_idle_stopper_stop() on one instance, 
- * so that tny_idle_stopper_is_stopped() returns TRUE for ther other instance.
- */
+ * Create a shared copy of the stopper, so that you can call tny_idle_stopper_stop
+ * on one instance, so that tny_idle_stopper_is_stopped returns TRUE for the other 
+ * instance.
+ *
+ * This is INTERNAL API
+ * 
+ * Return value: a shared copy of the stopper
+ **/
 TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper)
 {
 	g_return_val_if_fail (stopper, NULL);
@@ -101,13 +120,18 @@ TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper)
 	return result;
 }
 
-/** tny_idle_stopper_stop:
+/** 
+ * tny_idle_stopper_stop:
  * @stopper: The TnyIdleStopper instance.
  * 
  * Call this to make tny_idle_stopper_is_stopped() return TRUE for all 
  * instances of the stopper.
- */
-void tny_idle_stopper_stop (TnyIdleStopper *stopper)
+ *
+ * This is INTERNAL API
+ * 
+ **/
+void 
+tny_idle_stopper_stop (TnyIdleStopper *stopper)
 {
 	g_return_if_fail (stopper);
 	g_return_if_fail(stopper->stopped);
@@ -116,14 +140,19 @@ void tny_idle_stopper_stop (TnyIdleStopper *stopper)
 	*(stopper->stopped) = TRUE;
 }
 
-/** tny_idle_stopper_destroy:
+/** 
+ * tny_idle_stopper_destroy:
  * @stopper: The TnyIdleStopper instance.
  * 
  * Call this when you are sure that the callback will never be called again.
  * For instance, in your GDestroyNotify callback provided to g_idle_add_full().
  * Do not attempt to use @stopper after calling this.
- */
-void tny_idle_stopper_destroy(TnyIdleStopper *stopper)
+ *
+ * This is INTERNAL API
+ * 
+ **/
+void 
+tny_idle_stopper_destroy(TnyIdleStopper *stopper)
 {
 	g_return_if_fail (stopper);
 		
@@ -140,14 +169,20 @@ void tny_idle_stopper_destroy(TnyIdleStopper *stopper)
 	g_slice_free (TnyIdleStopper, stopper);
 }
 
-/* tny_idle_stopper_is_stopped:
+/**
+ * tny_idle_stopper_is_stopped:
  * @stopper: The TnyIdleStopper instance.
- * @returns: Whether tny_idle_stopper_stop() has been called on one of the shared instances.
  * 
- * This returns TRUE is tny_idle_stopper_stop() was called 
- * one one of the shared instances.
- */
-gboolean tny_idle_stopper_is_stopped(TnyIdleStopper* stopper) 
+ * This returns TRUE is tny_idle_stopper_stop() was called on one of the shared 
+ * instances.
+ *
+ * This is INTERNAL API
+ * 
+ * Return value: Whether tny_idle_stopper_stop() has been called on one of the
+ * shared instances.
+ **/
+gboolean 
+tny_idle_stopper_is_stopped(TnyIdleStopper* stopper) 
 {
 	g_return_val_if_fail(stopper, FALSE);
 	g_return_val_if_fail(stopper->stopped, FALSE);

@@ -23,6 +23,44 @@
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
+/**
+ * TnyProgressInfo:
+ *
+ *
+ * A progress info can be launched in for example the #GMainLoop. Such an event
+ * will cause a TnyStatusCallback handler to be triggered and a TnyStatus to be
+ * created.
+ *
+ * You can use tny_progress_info_destroy and tny_progress_info_idle_func for 
+ * this.
+ *
+ * For example:
+ * <informalexample><programlisting>
+ * static void
+ * refresh_async_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *thr_user_data) 
+ * { 
+ *   RefreshFolderInfo *oinfo = thr_user_data;
+ *   TnyProgressInfo *info = NULL;
+ *   TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (oinfo->self);
+ *   info = tny_progress_info_new (G_OBJECT (oinfo->self), oinfo->status_callback, 
+ *      TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_REFRESH, what, sofar, 
+ *      oftotal, oinfo->stopper, oinfo->user_data);
+ *   if (oinfo->depth > 0) {
+ *      g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+ *         tny_progress_info_idle_func, info, 
+ *         tny_progress_info_destroy);
+ *      return;
+ *   }
+ *   tny_progress_info_idle_func (info);
+ *   tny_progress_info_destroy (info);
+ * }
+ *
+ * </programlisting></informalexample>
+ *
+ * This is INTERNAL API
+ * 
+ **/
+
 struct _TnyProgressInfo 
 {
 	GObject *self;
@@ -36,6 +74,26 @@ struct _TnyProgressInfo
 	gpointer user_data;
 };
 
+
+/** 
+ * tny_progress_info_new:
+ * @self: the sender of the status event
+ * @status_callback: a #TnyStatusCallback function
+ * @domain: the #TnyStatusDomain
+ * @code: the #TnyStatusCode
+ * @what: a little text that describes what has happened
+ * @sofar: How much of the task is done 
+ * @oftotal: How much of the task is to be done
+ * @stopper: an #TnyIdleStopper
+ * @user_data: user data
+ * 
+ * Create a progress-info instance that can be used with tny_progress_info_destroy 
+ * and tny_progress_info_idle_func.
+ *
+ * This is INTERNAL API
+ * 
+ * Return value: a #TnyProgressInfo instance that is ready to launch
+ **/
 TnyProgressInfo*
 tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStatusDomain domain, TnyStatusCode code, const gchar *what, gint sofar, gint oftotal, TnyIdleStopper* stopper, gpointer user_data)
 {
@@ -70,7 +128,15 @@ tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStat
 }
 
 
-
+/** 
+ * tny_progress_info_destroy:
+ * @data: The #TnyProgressInfo instace to launch
+ * 
+ * Destroy a progress info.
+ *
+ * This is INTERNAL API
+ * 
+ **/
 void 
 tny_progress_info_destroy (gpointer data)
 {
@@ -86,6 +152,20 @@ tny_progress_info_destroy (gpointer data)
 	return;
 }
 
+/** 
+ * tny_progress_info_idle_func:
+ * @data: The #TnyProgressInfo instace to launch
+ * 
+ * Launch a progress info. This function is useful for letting @data's
+ * status_callback happen once in the #GMainLoop using g_idle_add_full.
+ *
+ * You can use tny_progress_info_destroy as a destroyer for the #TnyProgressInfo
+ * instance, @data.
+ *
+ * This is INTERNAL API
+ * 
+ * Return value: FALSE, always
+ **/
 gboolean 
 tny_progress_info_idle_func (gpointer data)
 {
@@ -94,6 +174,7 @@ tny_progress_info_idle_func (gpointer data)
 	/* Do not call the status callback after the main callback 
 	 * has already been called, because we should assume that 
 	 * the user_data is invalid after that time: */
+
 	if (tny_idle_stopper_is_stopped (info->stopper))
 		return FALSE;
 

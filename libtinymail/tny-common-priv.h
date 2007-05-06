@@ -35,7 +35,7 @@ G_BEGIN_DECLS
 typedef struct _TnyIdleStopper TnyIdleStopper;
 typedef struct _TnyProgressInfo TnyProgressInfo;
 
-TnyIdleStopper* tny_idle_stopper_new();
+TnyIdleStopper* tny_idle_stopper_new (void);
 TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper);
 
 TnyProgressInfo* tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStatusDomain domain, TnyStatusCode code, const gchar *what, gint sofar, gint oftotal, TnyIdleStopper* stopper, gpointer user_data);
