@@ -88,10 +88,18 @@ tny_gtk_header_view_set_header_default (TnyHeaderView *self, TnyHeader *header)
 
 		if (to)
 			gtk_label_set_text (GTK_LABEL (priv->to_label), to);
+		else
+			gtk_label_set_text (GTK_LABEL (priv->to_label), "");
+
 		if (from)
 			gtk_label_set_text (GTK_LABEL (priv->from_label), from);
+		else
+			gtk_label_set_text (GTK_LABEL (priv->from_label), "");
+
 		if (subject)
 			gtk_label_set_text (GTK_LABEL (priv->subject_label), subject);
+		else
+			gtk_label_set_text (GTK_LABEL (priv->subject_label), "");
 
 		str = _get_readable_date (tny_header_get_date_sent (header));
 		gtk_label_set_text (GTK_LABEL (priv->date_label), (const gchar*)str);

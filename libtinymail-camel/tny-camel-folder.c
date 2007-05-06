@@ -1172,8 +1172,8 @@ tny_camel_folder_get_msg_async_status (struct _CamelOperation *op, const char *w
 			tny_progress_info_idle_func, info, 
 			tny_progress_info_destroy);
 	} else {
-		/*tny_progress_info_idle_func (info);
-		tny_progress_info_destroy (info);*/
+		tny_progress_info_idle_func (info);
+		tny_progress_info_destroy (info);
 	}
 
 	return;
