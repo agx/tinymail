@@ -20,7 +20,7 @@
 #include <config.h>
 
 #define TINYMAIL_ENABLE_PRIVATE_API
-#include "tny-common-priv.h"
+#include "tny-idle-stopper-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
 /** TnyIdleStopper:
@@ -49,7 +49,7 @@ struct _TnyIdleStopper
 	 * idle callbacks, so that each callback can stop the the other from calling 
 	 * the callbacks. */
 	gboolean* stopped;
-
+	
 	/* This is a pointer an int so we can share a refcount,
 	 * so we can release the shared stopped and ref_count only 
 	 * when nobody else needs to check stopped. */
@@ -67,14 +67,14 @@ struct _TnyIdleStopper
  */
 TnyIdleStopper* tny_idle_stopper_new()
 {
-	TnyIdleStopper *result = g_slice_new0 (TnyIdleStopper);
+	TnyIdleStopper *result = g_new0(TnyIdleStopper, 1);
 	
-	result->stopped = g_slice_new (gboolean);
+	result->stopped = g_malloc0(sizeof(gboolean));
 	*(result->stopped) = FALSE;
-
-	result->refcount = g_slice_new (gint);
+	
+	result->refcount = g_malloc0(sizeof(gint));
 	*(result->refcount) = 1;
-
+	
 	return result;
 }
 
@@ -89,15 +89,15 @@ TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper)
 {
 	g_return_val_if_fail (stopper, NULL);
 	g_return_val_if_fail (stopper->refcount, NULL);
-
-	TnyIdleStopper *result = g_slice_new0 (TnyIdleStopper);
-
+	
+	TnyIdleStopper *result = g_new0(TnyIdleStopper, 1);
+	
 	/* Share the gboolean: */
 	result->stopped = stopper->stopped;
-
+	
 	result->refcount = stopper->refcount;
 	++(*(result->refcount));
-
+	
 	return result;
 }
 
@@ -112,7 +112,7 @@ void tny_idle_stopper_stop (TnyIdleStopper *stopper)
 	g_return_if_fail (stopper);
 	g_return_if_fail(stopper->stopped);
 	g_return_if_fail (stopper->refcount);
-
+	
 	*(stopper->stopped) = TRUE;
 }
 
@@ -128,16 +128,17 @@ void tny_idle_stopper_destroy(TnyIdleStopper *stopper)
 	g_return_if_fail (stopper);
 		
 	--(*(stopper->refcount));
-
+	
 	/* Free the shared variables if this is the last destroy: */
 	if(*(stopper->refcount) == 0) {
-		g_slice_free (gint, stopper->refcount);
+		g_free (stopper->refcount);
 		stopper->refcount = 0;
-		g_slice_free (gboolean, stopper->stopped);
+		
+		g_free (stopper->stopped);
 		stopper->stopped = 0;
 	}
-
-	g_slice_free (TnyIdleStopper, stopper);
+	
+	g_free (stopper);
 }
 
 /* tny_idle_stopper_is_stopped:
@@ -151,6 +152,6 @@ gboolean tny_idle_stopper_is_stopped(TnyIdleStopper* stopper)
 {
 	g_return_val_if_fail(stopper, FALSE);
 	g_return_val_if_fail(stopper->stopped, FALSE);
-
+	
 	return *(stopper->stopped);
 }

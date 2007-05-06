@@ -1,5 +1,5 @@
-#ifndef TNY_IDLE_STOPPER_PRIV_H
-#define TNY_IDLE_STOPPER_PRIV_H
+#ifndef TNY_COMMON_PRIV_H
+#define TNY_COMMON_PRIV_H
 
 /* libtinymail - The Tiny Mail base library
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
@@ -20,23 +20,32 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <glib.h>
+#include <tny-shared.h>
+#include <tny-status.h>
+#include <tny-error.h>
 
 #ifndef TINYMAIL_ENABLE_PRIVATE_API
-#error "This is private API that should only be used by tinymail itself."
+#error "This is private API that should only be used by tinymail internally."
 #endif
 
 G_BEGIN_DECLS
 
+/* Implementations in tny-progress-info.c and tny-idle-stopper.c */
+
 typedef struct _TnyIdleStopper TnyIdleStopper;
+typedef struct _TnyProgressInfo TnyProgressInfo;
 
 TnyIdleStopper* tny_idle_stopper_new();
 TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper);
 
+TnyProgressInfo* tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStatusDomain domain, TnyStatusCode code, const gchar *what, gint sofar, gint oftotal, TnyIdleStopper* stopper, gpointer user_data);
+gboolean tny_progress_info_idle_func (gpointer data);
+void tny_progress_info_destroy (gpointer data);
+
 void tny_idle_stopper_stop (TnyIdleStopper *stopper);
 void tny_idle_stopper_destroy(TnyIdleStopper *stopper);
-gboolean tny_idle_stopper_is_stopped(TnyIdleStopper* stopper);
+gboolean tny_idle_stopper_is_stopped (TnyIdleStopper* stopper);
 
 G_END_DECLS
 
-#endif /* TNY_IDLE_STOPPER_PRIV_H */
+#endif 
