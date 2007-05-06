@@ -3887,7 +3887,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	camel_operation_start (NULL, _("Preparing to get message"));
 
-	/* amcon = camel_imap_service_connect (CAMEL_SERVICE (store), ex); */
 	amcon = camel_service_connect (CAMEL_SERVICE (store), ex);
 
 	if (!amcon || camel_exception_is_set (ex) || !camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex)) 
@@ -3903,7 +3902,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	camel_operation_end (NULL);
 
-	camel_operation_start (NULL, _("Getting message"));
+	camel_operation_start (NULL, _("Retrieving message"));
 
   CAMEL_SERVICE_REC_LOCK(store, connect_lock); 
 
@@ -4002,8 +4001,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					/* And write them too */
 					camel_stream_write (stream, t_str, hread);
 					rec += hread;
-				}
-				camel_operation_progress (NULL, rec, length);
+					camel_operation_progress (NULL, rec, length);
+				} 
 			}
 			camel_stream_reset (stream);
 
@@ -4057,9 +4056,11 @@ berrorhander:
 			if (server_stream) 
 			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 			  {
-				tread += nread;
+				gint llen = 0;
 
-				/* It might be the line before the last line */
+				/* It might be the line before the last line
+				 * TNY TODO: why no check for (linenum != 0) then ? */
+
 				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
 				{
 					if (line[1] == '\r')
@@ -4103,9 +4104,10 @@ berrorhander:
 					isnextdone = FALSE;
 				}
 
-				camel_stream_write (stream, line, strlen (line));
-
+				llen = strlen (line);
+				camel_stream_write (stream, line, llen);
 				linenum++;
+				tread += llen;
 
 				camel_operation_progress (NULL, tread, exread);
 
@@ -4191,7 +4193,7 @@ merrorhandler:
 			if (server_stream) 
 			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
 			  {
-				tread += nread;
+				gint llen = 0;
 
 				/* It might be the line before the last line */
 				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
@@ -4269,8 +4271,10 @@ merrorhandler:
 					isnextdone = FALSE;
 				}
 
-				camel_stream_write (stream, line, strlen (line));
+				llen = strlen (line);
+				camel_stream_write (stream, line, llen);
 
+				tread += llen;
 				camel_operation_progress (NULL, tread, exread);
 
 				linenum++;

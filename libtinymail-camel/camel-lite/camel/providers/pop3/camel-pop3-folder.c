@@ -721,7 +721,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	/* Sigh, most of the crap in this function is so that the cancel button
 	   returns the proper exception code.  Sigh. */
 
-	camel_operation_start_transient(NULL, _("Retrieving POP message %d"), fi->id);
+	camel_operation_start (NULL, _("Retrieving message"));
 
 	/* If we have an oustanding retrieve message running, wait for that to complete
 	   & then retrieve from cache, otherwise, start a new one, and similar */
