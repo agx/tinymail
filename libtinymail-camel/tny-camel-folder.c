@@ -17,8 +17,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* #define IM_TESTING */
-
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
@@ -150,13 +148,6 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	gboolean old = priv->dont_fkill;
 	gboolean need_unread_sync;
 
-	/* printf ("want changes: %s, have folder: %s\n", 
-		priv->want_changes?"yes":"no",
-		priv->folder?"yes":"no");
-
-	if (!priv->want_changes)
-		return; */
-
 	g_static_rec_mutex_lock (priv->folder_lock);
 
 	if (!priv->folder) {
@@ -214,9 +205,10 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		{
 
 			/* The unread-sync is to avoid the expensive counting of unread
-			   unread messages (yes I know it sucks, but get_unread_msg_cnt
-			   walks the entire summary to count the unread ones).
-			   TNY TODO: a better solution for this */
+			 * unread messages (yes I know it sucks, but get_unread_msg_cnt
+			 * walks the entire summary to count the unread ones).
+			 * TNY TODO: a better solution for this */
+
 			priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 			priv->unread_sync = 0;
 		}
@@ -320,10 +312,6 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 			else
 				priv->caps &= ~TNY_FOLDER_CAPS_PUSHEMAIL;
 
-			/* printf ("LOAD (%s): %d\n",
-			   priv->folder_name?priv->folder_name:"NUL",
-			   (((CamelObject*)priv->folder)->ref_count)); */
-
 			if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
 				{
 					guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
@@ -352,7 +340,7 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		if (store->flags & CAMEL_STORE_SUBSCRIPTIONS)
 			priv->subscribed = 
 				camel_store_folder_subscribed (store,
-						       camel_folder_get_full_name (priv->folder));
+					camel_folder_get_full_name (priv->folder));
 		else 
 			priv->subscribed = TRUE;
 
@@ -594,7 +582,7 @@ tny_camel_folder_is_subscribed_default (TnyFolder *self)
 		store = priv->store;
 		cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
 		priv->subscribed = camel_store_folder_subscribed (store, 
-								  camel_folder_get_full_name (cfolder));
+					camel_folder_get_full_name (cfolder));
 	}
 
 	retval = priv->subscribed;
@@ -692,18 +680,8 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 	priv->account = account;
 	priv->store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
 
-	/*
-		This is incorrect! TnyTransportAccount's don't need a service to be correct
-
-		 if (!priv->store || !CAMEL_IS_STORE (priv->store))
-		g_warning ("Trying to create folder out of invalid account"); */
-
 	return;
 }
-
-
-
-
 
 
 
@@ -775,19 +753,6 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 }
 
 
-/**
- * tny_camel_folder_refresh_async_status:
- *
- * This is non-public API documentation
- *
- * The reason why we need to copy this stuff is because it seems Camel has some
- * of its stuff allocated on the stack. When you do g_idle tricks, it's possible
- * that by the time the g_idle happens, the stack allocation is already killed.
- *
- * Another possibility is that Camel simply by then has freed the memory of it.
- * You simply copy stuff, it's a little bit dirty, but just make sure that in 
- * the idle callback you free it, right? Leaking wouldn't be smart here.
- **/
 static void
 tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *thr_user_data)
 {
@@ -924,6 +889,7 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 	}
 
 	/* Idle info for the status callback: */
+
 	info = g_slice_new (RefreshFolderInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
 	info->err = NULL;
@@ -935,8 +901,8 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 	
 	/* Use a ref count because we do not know which of the 2 idle callbacks 
 	 * will be the last, and we can only unref self in the last callback:
-	 * This is destroyed in the idle GDestroyNotify callback.
-	 */
+	 * This is destroyed in the idle GDestroyNotify callback.*/
+
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
@@ -946,8 +912,10 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 	/* This will cause the idle status callback to be called,
 	 * via _tny_camel_account_start_camel_operation,
 	 * and also calls the idle main callback: */
+
 	thread = g_thread_create (tny_camel_folder_refresh_async_thread,
 			info, FALSE, NULL);
+
 	return;
 }
 
@@ -1307,8 +1275,8 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 
 	/* Use a ref count because we do not know which of the 2 idle callbacks 
 	 * will be the last, and we can only unref self in the last callback:
-	 * This is destroyed in the idle GDestroyNotify callback.
-	 */
+	 * This is destroyed in the idle GDestroyNotify callback. */
+
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
@@ -1545,7 +1513,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	CamelFolderInfo *iter;
 	gchar *final_name;
 	TnyFolderStoreChange *change;
-	TnyFolderStore *old_parent;	
+	TnyFolderStore *old_parent;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_COPY))
@@ -1708,7 +1676,8 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		retval = self;
 
 		/* No need to notify the folder if there was not an
-		   actual change in the short (visual) name */
+		 * actual change in the short (visual) name */
+
 		if (strcmp (tny_folder_get_name (self), new_name)) {
 			TnyFolderChange *change;
 			
@@ -1726,8 +1695,9 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	}
 
 	/* Notify the deletion before the addition because otherwise
-	   we could delete the recently created folder instead of the
-	   old one. */
+	 * we could delete the recently created folder instead of the
+	 * old one. */
+
 	if (del) {
 		TnyFolderStoreChange *change = tny_folder_store_change_new (old_parent);
 		tny_folder_store_change_add_removed_folder (change, self);
@@ -2136,7 +2106,7 @@ _tny_camel_folder_set_id (TnyCamelFolder *self, const gchar *id)
 	/* unload_folder_no_lock (priv, TRUE); */
 
 	if (G_UNLIKELY (priv->folder_name))
-			g_free (priv->folder_name);
+		g_free (priv->folder_name);
 
 	priv->folder_name = g_strdup (id);
 
@@ -2226,10 +2196,10 @@ tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **
 				goto errorh;
 			}
 		} else {
-				g_set_error (err, TNY_FOLDER_ERROR, 
-					TNY_FOLDER_ERROR_SET_NAME,
-					"Can't rename the root INBOX folder");
-				goto errorh;
+			g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_SET_NAME,
+				"Can't rename the root INBOX folder");
+			goto errorh;
 		}
 	}
 
@@ -2356,7 +2326,6 @@ tny_camel_folder_set_msg_remove_strategy_default (TnyFolder *self, TnyMsgRemoveS
 
 	return;
 }
-
 
 
 static void 
@@ -2505,9 +2474,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				"Failed to create folder with no name");
-
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-
 		return NULL;
 	}
 
@@ -2516,9 +2483,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				"Failed to create folder %s", name);
-
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-
 		return NULL;
 	}
 
@@ -2536,12 +2501,9 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				camel_exception_get_description (&ex));
-
 		if (info)
 			camel_store_free_folder_info (store, info);
-
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-
 		return NULL;
 	}
 
@@ -2563,21 +2525,17 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	return folder;
 }
 
-/*
- * Sets a TnyFolderStore as the parent of a TnyCamelFolder. Note that
+/* Sets a TnyFolderStore as the parent of a TnyCamelFolder. Note that
  * this code could cause a cross-reference situation, if the parent
- * was used to create the child.
- */
+ * was used to create the child. */
+
 void
 _tny_camel_folder_set_parent (TnyCamelFolder *self, TnyFolderStore *parent)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-
 	if (priv->parent)
 		g_object_unref (G_OBJECT (priv->parent));
-
 	priv->parent = g_object_ref (G_OBJECT (parent));
-
 	return;
 }
 
@@ -2904,7 +2862,7 @@ tny_camel_folder_poke_status_callback (gpointer data)
 		g_object_unref (change);
 	}
 
-	/* _tny_camel_folder_unreason (priv); */
+	/* XAFC881 _tny_camel_folder_unreason (priv); */
 
 	return FALSE;
 }
@@ -2921,7 +2879,7 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	GObject *info = g_object_ref (G_OBJECT (self));
 
-	/* _tny_camel_folder_reason (priv); */
+	/* XAFC881 _tny_camel_folder_reason (priv); */
 
 	if (g_main_depth () > 0)
 	{
@@ -3323,10 +3281,8 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelFolder *self = (TnyCamelFolder *)instance;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	/* Little hackie */
 	priv->self = (TnyFolder *) self;
 	priv->want_changes = TRUE;
-
 	priv->caps = 0;
 	priv->local_size = 0;
 	priv->unread_sync = 0;
@@ -3344,7 +3300,6 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->remove_strat = tny_camel_msg_remove_strategy_new ();
 	priv->receive_strat = tny_camel_full_msg_receive_strategy_new ();
 	priv->reason_lock = g_mutex_new ();
-
 	priv->folder_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->folder_lock);
 	priv->obs_lock = g_new0 (GStaticRecMutex, 1);
