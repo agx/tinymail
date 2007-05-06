@@ -26,7 +26,6 @@
 /**
  * TnyProgressInfo:
  *
- *
  * A progress info can be launched in for example the #GMainLoop. Such an event
  * will cause a TnyStatusCallback handler to be triggered and a TnyStatus to be
  * created.
