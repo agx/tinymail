@@ -18,7 +18,10 @@
  */
 
 #include <config.h>
+
+#define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-idle-stopper-priv.h"
+#undef TINYMAIL_ENABLE_PRIVATE_API
 
 /** TnyIdleStopper:
  * 

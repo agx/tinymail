@@ -78,7 +78,7 @@ libtinymail_1_0_la_SOURCES = \
 	tny-password-getter.c \
 	tny-merge-folder.c \
 	tny-combined-account.c \
-	tny-idle-stopper-priv.c \
+	tny-idle-stopper.c \
 	$(private_headers)
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)

@@ -22,12 +22,9 @@
 
 #include <glib.h>
 
-/* This could be useful, though it's difficult to even use this header 
- * because it is not installed: 
 #ifndef TINYMAIL_ENABLE_PRIVATE_API
 #error "This is private API that should only be used by tinymail itself."
 #endif
-*/
 
 G_BEGIN_DECLS
 
