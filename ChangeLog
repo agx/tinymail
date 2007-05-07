@@ -1,3 +1,14 @@
+2007-05-08  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Real fix for a gtk_tree_model_row_inserted oddity
+	* The problem was that me->cur_len was set to 1 to avoid an assertion
+	in gtktreemodelsort.c (in gtk_tree_model_sort_build_level). The real
+	fix was to check for list_model->cur_len in various GtkTreeModel
+	implementations, rather than the list_model->items->len (only
+	registered items are valid for GtkTreeModel, while registering is
+	slower than simple appends or prepend, as registered requires the
+	registration event to happen in the mainloop)
+
 2007-05-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Workaround for a gtk_tree_model_row_inserted oddity 
