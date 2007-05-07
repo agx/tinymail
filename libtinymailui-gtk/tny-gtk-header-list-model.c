@@ -465,11 +465,11 @@ notify_views_add (gpointer data)
 		return FALSE;
 	}
 	updated = me->recent_updated;
-	if (me->items->len - me->recent_updated > 300) {
-		going_to_update = me->recent_updated + 300;
+	if (me->items->len - me->recent_updated > 600) {
+		going_to_update = me->recent_updated + 600;
 		needmore = TRUE;
 	} else 
-		going_to_update = me->items->len;
+		going_to_update = me->items->len - 1;
 	me->recent_updated = going_to_update;
 	g_mutex_unlock (me->ra_lock);
 
@@ -508,7 +508,7 @@ static void
 tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
-
+	gint depth = g_main_depth ();
 	g_static_rec_mutex_lock (me->iterator_lock);
 
 	/* Prepend something to the list itself. The get_length will auto update
@@ -528,9 +528,10 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	{
 		me->updating_views = 0;
 		g_object_ref (me);
-		g_timeout_add_full (500, G_PRIORITY_DEFAULT_IDLE, 
+		g_timeout_add_full (1000, G_PRIORITY_DEFAULT_IDLE, 
 			notify_views_add, me, notify_views_add_destroy);
 	}
+
 	g_mutex_unlock (me->ra_lock);
 
 	g_static_rec_mutex_unlock (me->iterator_lock);
