@@ -4002,8 +4002,14 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					camel_stream_write (stream, t_str, hread);
 					rec += hread;
 					camel_operation_progress (NULL, rec, length);
-				} 
+				} else {
+					g_warning ("BINARY: read failed, UID=%s (%s)", uid);
+					err = TRUE;
+					goto berrorhander;
+				}
 			}
+
+
 			camel_stream_reset (stream);
 
 			/* Read away the last two lines */
