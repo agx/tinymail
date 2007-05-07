@@ -69,6 +69,7 @@ struct _TnyGtkHeaderListModel
 	gint updating_views;
 	GMutex *ra_lock;
 	gint cur_len;
+	guint add_timeout;
 
 	GPtrArray *items;
 	TnyIterator *iterator;

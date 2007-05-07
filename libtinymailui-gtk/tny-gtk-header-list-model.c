@@ -449,6 +449,9 @@ notify_views_add_destroy (gpointer data)
 
 	g_object_unref (me);
 
+	me->add_timeout = 0;
+
+	return;
 }
 
 static gboolean
@@ -496,8 +499,6 @@ notify_views_add (gpointer data)
 	}
 	gdk_threads_leave();
 
-
-
 	return needmore;
 }
 
@@ -528,7 +529,13 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	{
 		me->updating_views = 0;
 		g_object_ref (me);
-		g_timeout_add_full (1000, G_PRIORITY_DEFAULT_IDLE, 
+
+		if (me->add_timeout > 0) {
+			g_source_remove (me->add_timeout);
+			me->add_timeout = 0;
+		}
+
+		me->add_timeout = g_timeout_add_full (1000, G_PRIORITY_DEFAULT_IDLE, 
 			notify_views_add, me, notify_views_add_destroy);
 	}
 
@@ -700,6 +707,11 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	g_static_rec_mutex_lock (self->iterator_lock);
 
+	if (self->add_timeout > 0) {
+		g_source_remove (self->add_timeout);
+		self->add_timeout = 0;
+	}
+
 	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
 	if (self->folder)
 		g_object_unref (G_OBJECT (self->folder));
@@ -742,6 +754,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	g_static_rec_mutex_init (self->iterator_lock);
 	self->cur_len = 0;
 
+	self->add_timeout = 0;
 	self->items = g_ptr_array_sized_new (1000);
 	self->updating_views = -1;
 	self->ra_lock = g_mutex_new ();
@@ -767,6 +780,11 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	GtkTreePath *path;
 
 	g_static_rec_mutex_lock (self->iterator_lock);
+
+	if (self->add_timeout > 0) {
+		g_source_remove (self->add_timeout);
+		self->add_timeout = 0;
+	}
 
 	self->recent_updated = 0;
 
@@ -822,9 +840,7 @@ GtkTreeModel*
 tny_gtk_header_list_model_new (void)
 {
 	TnyGtkHeaderListModel *model;
-
 	model = g_object_new (TNY_TYPE_GTK_HEADER_LIST_MODEL, NULL);
-	
 	return GTK_TREE_MODEL (model);
 }
 
