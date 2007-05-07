@@ -479,11 +479,7 @@ notify_views_add (gpointer data)
 	gdk_threads_enter();
 /* printf ("updated=%d, goingto=%d\n", updated, going_to_update); */
 
-/* TNY TODO: I'm -1-ing this because it looks like it (GtkTreeView) doesn't
- * want you to gtk_tree_model_row_inserted all the rows ?! The TODO item here
- * is to figure out what is wrong or why it works if I -1 it?! */
-
-	for (i = updated; i < going_to_update-1; i++)
+	for (i = updated; i < going_to_update; i++)
 	{
 		GtkTreeIter iter;
 		GtkTreePath *path;
