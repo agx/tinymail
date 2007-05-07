@@ -458,7 +458,6 @@ notify_views_add (gpointer data)
 	gint updated, going_to_update, i, added; 
 	gboolean needmore = FALSE;
 
-
 	g_mutex_lock (me->ra_lock);
 	me->updating_views++;
 	if (me->recent_updated >= me->items->len) {
@@ -478,7 +477,13 @@ notify_views_add (gpointer data)
 		needmore = TRUE;
 
 	gdk_threads_enter();
-	for (i = updated; i < going_to_update; i++)
+/* printf ("updated=%d, goingto=%d\n", updated, going_to_update); */
+
+/* TNY TODO: I'm -1-ing this because it looks like it (GtkTreeView) doesn't
+ * want you to gtk_tree_model_row_inserted all the rows ?! The TODO item here
+ * is to figure out what is wrong or why it works if I -1 it?! */
+
+	for (i = updated; i < going_to_update-1; i++)
 	{
 		GtkTreeIter iter;
 		GtkTreePath *path;
@@ -487,6 +492,8 @@ notify_views_add (gpointer data)
 		iter.stamp = me->stamp;
 		iter.user_data = (gpointer) i;
 		me->cur_len = i+1;
+/* printf ("cur_len=%d\n", me->cur_len); */
+
 		gtk_tree_model_row_inserted ((GtkTreeModel *)me, path, &iter);
 
 		gtk_tree_path_free (path);
