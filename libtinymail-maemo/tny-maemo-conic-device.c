@@ -132,7 +132,7 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
 	TnyMaemoConicDevicePriv *priv;
 
-	g_return_if_fail (TNY_IS_DEVICE(self));
+	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
 	g_return_val_if_fail (priv->cnx, FALSE);
@@ -165,13 +165,16 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 gboolean
 tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
+/* don't try to disconnect if we're in dummy mode, as we're not "really"
+ * connected in that case either
+ */
+#ifndef MAEMO_CONIC_DUMMY 
 	TnyMaemoConicDevicePriv *priv;	
 	
-	g_return_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self));
+	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), FALSE);
 	g_return_val_if_fail (priv->cnx, FALSE);
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-
 
 	if (iap_id) {
 		if (!con_ic_connection_disconnect_by_id (priv->cnx, iap_id)) {
@@ -183,6 +186,7 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 			g_warning ("could not send disconnect dbus message");
 			return FALSE;
 		}
+#endif /* MAEMO_CONIC_DUMMY*/
 	return TRUE;
 }
 
@@ -230,9 +234,9 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (iap_id, NULL);
-	g_return_val_if_fail (priv->cnx, NULL);
 
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	g_return_val_if_fail (priv->cnx, NULL);
 
 	/* Note that it is very unusual to return a reference from a get_() function, 
 	 * but we must do so because that mistake has already been made in 
@@ -259,9 +263,9 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	TnyMaemoConicDevicePriv *priv;
 	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
-	g_return_val_if_fail (priv->cnx, NULL);
 
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	g_return_val_if_fail (priv->cnx, NULL);
 
 	return con_ic_connection_get_all_iaps (priv->cnx);
 }
