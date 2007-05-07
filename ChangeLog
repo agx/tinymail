@@ -1,3 +1,7 @@
+2007-05-07  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Workaround for a gtk_tree_model_row_inserted oddity 
+
 2007-05-07 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Fixed some use-before-initalization bugs in tny-maemo-conic-device
