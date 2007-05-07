@@ -2286,12 +2286,21 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 
 	if (priv->reason_to_live == 0) 
 	{
-		/* This special case is for when the amount of items is ZERO
+		/* The special case is for when the amount of items is ZERO
 		 * while we are listening for Push E-mail events. That's a
 		 * reason by itself not to destroy priv->folder */
 
-		if (!(priv->push && priv->folder && priv->folder->summary && priv->folder->summary->messages && priv->folder->summary->messages->len == 0))
+		if (!(priv->push && priv->folder && priv->folder->summary && 
+			priv->folder->summary->messages && 
+			priv->folder->summary->messages->len == 0)) {
+
+			/* For any other folder that has no more reason to live,
+			 * we'll uncache (this means destroying the CamelFolder
+			 * instance and freeing up memory */
+
 			tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+
+		}
 	}
 	g_mutex_unlock (priv->reason_lock);
 }
