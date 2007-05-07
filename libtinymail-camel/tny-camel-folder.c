@@ -277,10 +277,13 @@ determine_push_email (TnyCamelFolderPriv *priv)
 	if (!priv->folder || (((CamelObject *)priv->folder)->ref_count <= 0) || !CAMEL_IS_FOLDER (priv->folder))
 		return;
 
-	if (priv->observers && tny_list_get_length (priv->observers) > 0)
+	if (priv->observers && tny_list_get_length (priv->observers) > 0) {
 		camel_folder_set_push_email (priv->folder, TRUE);
-	else
+		priv->push = TRUE;
+	} else {
 		camel_folder_set_push_email (priv->folder, FALSE);
+		priv->push = FALSE;
+	}
 
 	return;
 }
@@ -2280,8 +2283,16 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 {
 	g_mutex_lock (priv->reason_lock);
 	priv->reason_to_live--;
-	if (priv->reason_to_live == 0)
-		tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+
+	if (priv->reason_to_live == 0) 
+	{
+		/* This special case is for when the amount of items is ZERO
+		 * while we are listening for Push E-mail events. That's a
+		 * reason by itself not to destroy priv->folder */
+
+		if (!(priv->push && priv->folder && priv->folder->summary && priv->folder->summary->messages && priv->folder->summary->messages->len == 0))
+			tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+	}
 	g_mutex_unlock (priv->reason_lock);
 }
 

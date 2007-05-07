@@ -578,35 +578,31 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		 * removed, so we have to rescan to find the removed ones */
 
 		response = camel_imap_command (store, NULL, ex, "FETCH %d UID", count);
-		if (!response) {
-			if (phighestmodseq != NULL)
-				g_free (phighestmodseq);
-			if (highestmodseq != NULL)
-				g_free (highestmodseq);
-			return; 
-		}
-		uid = 0;
-		for (i = 0; i < response->untagged->len; i++) 
-		{
-			resp = response->untagged->pdata[i];
-			mval = strtoul (resp + 2, &resp, 10);
-			if (mval == 0)
-				continue;
-			if (!g_ascii_strcasecmp (resp, " EXISTS")) 
+		if (response) {
+			uid = 0;
+			for (i = 0; i < response->untagged->len; i++) 
 			{
-				/* Another one?? */
-				exists = mval;
-				continue;
+				resp = response->untagged->pdata[i];
+				mval = strtoul (resp + 2, &resp, 10);
+				if (mval == 0)
+					continue;
+				if (!g_ascii_strcasecmp (resp, " EXISTS")) 
+				{
+					/* Another one?? */
+					exists = mval;
+					continue;
+				}
+				if (uid != 0 || mval != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
+					continue;
+				
+				fetch_data = parse_fetch_response (imap_folder, resp + 7);
+				uid = strtoul (g_datalist_get_data (&fetch_data, "UID"), NULL, 10);
+				g_datalist_clear (&fetch_data);
 			}
-			if (uid != 0 || mval != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
-				continue;
-			
-			fetch_data = parse_fetch_response (imap_folder, resp + 7);
-			uid = strtoul (g_datalist_get_data (&fetch_data, "UID"), NULL, 10);
-			g_datalist_clear (&fetch_data);
-		}
-		camel_imap_response_free_without_processing (store, response);
-		if (uid == 0 || uid != val)
+			camel_imap_response_free_without_processing (store, response);
+			if (uid == 0 || uid != val)
+				imap_folder->need_rescan = TRUE;
+		} else 
 			imap_folder->need_rescan = TRUE;
 	}
 
@@ -3561,6 +3557,13 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 	g_static_rec_mutex_unlock (((CamelImapFolder *)folder)->idle_lock);
 }
 
+static void
+idle_timeout_checker_destroy (gpointer data)
+{
+	/* printf ("got destroyed\n"); */
+	return;
+}
+
 static gboolean 
 idle_timeout_checker (gpointer data)
 {
@@ -3657,7 +3660,9 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 
 			idle_real_start (store);
 
-			store->idle_signal = g_timeout_add (5 * 1000, idle_timeout_checker, folder);
+			store->idle_signal = g_timeout_add_full (5 * 1000, G_PRIORITY_DEFAULT_IDLE, 
+				idle_timeout_checker, folder, idle_timeout_checker_destroy);
+
 			imap_folder->idle_signal = store->idle_signal;
 		}
 	}

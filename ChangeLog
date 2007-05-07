@@ -9,6 +9,9 @@
 	slower than simple appends or prepend, as registered requires the
 	registration event to happen in the mainloop)
 
+	* Fixes for a bunch of tickets
+	* Fixed the IDLE support for folders with == 0 items
+
 2007-05-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Workaround for a gtk_tree_model_row_inserted oddity 

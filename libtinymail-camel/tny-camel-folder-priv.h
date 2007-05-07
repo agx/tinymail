@@ -42,7 +42,7 @@ struct _TnyCamelFolderPriv
 	gboolean subscribed;
 	gboolean has_summary_cap;
 	CamelFolderInfo *iter;
-	gboolean iter_parented;
+	gboolean iter_parented, push;
 	gchar *cached_name;
 	TnyFolderType cached_folder_type;
 	TnyMsgRemoveStrategy *remove_strat;
