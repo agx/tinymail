@@ -4003,7 +4003,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					rec += hread;
 					camel_operation_progress (NULL, rec, length);
 				} else {
-					g_warning ("BINARY: read failed, UID=%s (%s)", uid);
+					g_warning ("BINARY: read failed, UID=%s", uid);
 					err = TRUE;
 					goto berrorhander;
 				}
