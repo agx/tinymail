@@ -454,7 +454,7 @@ notify_views_add_destroy (gpointer data)
 
 	g_mutex_lock (me->ra_lock);
 	me->updating_views = -1;
-	me->registered = 0;
+	/* me->registered = 0; */
 	g_mutex_unlock (me->ra_lock);
 	g_object_unref (me);
 	me->add_timeout = 0;
@@ -614,6 +614,7 @@ notify_views_delete (gpointer data)
 		{
 			gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
 			me->cur_len--;
+			me->registered--;
 			gtk_tree_path_free (path);
 		}
 
@@ -820,6 +821,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	if (self->folder)
 		g_object_unref (G_OBJECT (self->folder));
 	self->folder = TNY_FOLDER (g_object_ref (G_OBJECT (folder)));
+	self->registered = 0;
 	g_ptr_array_free (self->items, TRUE);
 	self->items = g_ptr_array_sized_new (tny_folder_get_all_count (folder));
 
