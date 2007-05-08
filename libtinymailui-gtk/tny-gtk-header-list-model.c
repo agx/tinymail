@@ -496,7 +496,7 @@ notify_views_add_destroy (gpointer data)
 	g_mutex_unlock (me->ra_lock);
 
 	if (me->timeout_span < 5000)
-		me->timeout_span += 100;
+		me->timeout_span += 300;
 	me->add_timeout = 0;
 	g_object_unref (me);
 
@@ -522,9 +522,9 @@ notify_views_add (gpointer data)
 
 	already_registered = me->registered;
 
-	if (me->items->len - already_registered > 600) 
+	if (me->items->len - already_registered > 1000) 
 	{
-		going_tb_registered = already_registered + 600;
+		going_tb_registered = already_registered + 1000;
 		needmore = TRUE;
 	} else
 		going_tb_registered = me->items->len;
