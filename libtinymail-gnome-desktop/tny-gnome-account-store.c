@@ -120,7 +120,7 @@ tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const G
 	}
 
 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-		gtktype, GTK_BUTTONS_YES_NO, prompt);
+		gtktype, GTK_BUTTONS_YES_NO, error->message);
 
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 		retval = TRUE;

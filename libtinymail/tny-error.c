@@ -74,6 +74,7 @@ tny_error_get_type (void)
       { TNY_TRANSPORT_ACCOUNT_ERROR_SEND, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND", "transport_account_error_send" },
 
       { TNY_ACCOUNT_ERROR_TRY_CONNECT, "TNY_ACCOUNT_ERROR_TRY_CONNECT", "account_error_try_connect" },
+      { TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, "TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT", "account_store_error_unknown_alert" },
 
       { 0, NULL, NULL }
     };

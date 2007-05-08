@@ -32,6 +32,7 @@ enum _TnyErrorDomain
 	TNY_FOLDER_STORE_ERROR = 2,
 	TNY_TRANSPORT_ACCOUNT_ERROR = 3,
 	TNY_ACCOUNT_ERROR = 4,
+	TNY_ACCOUNT_STORE_ERROR = 5
 };
 
 #define TNY_TYPE_ERROR (tny_error_get_type())
@@ -56,6 +57,8 @@ enum _TnyError
 	TNY_TRANSPORT_ACCOUNT_ERROR_SEND = 13,
 
 	TNY_ACCOUNT_ERROR_TRY_CONNECT = 14,
+
+	TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT = 15
 };
 
 GType tny_error_domain_get_type (void);
