@@ -1,0 +1,109 @@
+<!-- ##### SECTION Title ##### -->
+tny-common-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyIdleStopper ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyProgressInfo ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_idle_stopper_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_idle_stopper_copy ##### -->
+<para>
+
+</para>
+
+@stopper: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_progress_info_new ##### -->
+<para>
+
+</para>
+
+@self: 
+@status_callback: 
+@domain: 
+@code: 
+@what: 
+@sofar: 
+@oftotal: 
+@stopper: 
+@user_data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_progress_info_idle_func ##### -->
+<para>
+
+</para>
+
+@data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_progress_info_destroy ##### -->
+<para>
+
+</para>
+
+@data: 
+
+
+<!-- ##### FUNCTION tny_idle_stopper_stop ##### -->
+<para>
+
+</para>
+
+@stopper: 
+
+
+<!-- ##### FUNCTION tny_idle_stopper_destroy ##### -->
+<para>
+
+</para>
+
+@stopper: 
+
+
+<!-- ##### FUNCTION tny_idle_stopper_is_stopped ##### -->
+<para>
+
+</para>
+
+@stopper: 
+@Returns: 
+
+

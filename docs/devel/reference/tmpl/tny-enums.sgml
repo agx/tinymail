@@ -24,6 +24,7 @@ Enumerations for tinymail
 
 @TNY_FOLDER_STATUS_CODE_REFRESH: a status that occurs while a folder is being refreshed
 @TNY_FOLDER_STATUS_CODE_GET_MSG: a status that occurs while a message is being downloaded
+@TNY_GET_MSG_QUEUE_STATUS_GET_MSG: 
 
 <!-- ##### ENUM TnyStatusDomain ##### -->
 <para>
@@ -31,6 +32,7 @@ Enumerations for tinymail
 </para>
 
 @TNY_FOLDER_STATUS: a status domain code for folder
+@TNY_GET_MSG_QUEUE_STATUS: 
 
 <!-- ##### ENUM TnyFolderCaps ##### -->
 <para>
@@ -68,6 +70,7 @@ Enumerations for tinymail
 @TNY_FOLDER_STORE_ERROR: An error domain for errors that occured with a folder store
 @TNY_TRANSPORT_ACCOUNT_ERROR: An error domain for errors that occured with a transport account
 @TNY_ACCOUNT_ERROR: An error domain for errors that occured with a account
+@TNY_ACCOUNT_STORE_ERROR: 
 
 <!-- ##### ENUM TnyError ##### -->
 <para>
@@ -87,6 +90,7 @@ Enumerations for tinymail
 @TNY_FOLDER_STORE_ERROR_CREATE_FOLDER: An error that occured while creating a folder
 @TNY_TRANSPORT_ACCOUNT_ERROR_SEND: An error that occured while sending a message
 @TNY_ACCOUNT_ERROR_TRY_CONNECT: An error that occured while trying to connect to an account
+@TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT: 
 
 <!-- ##### ENUM TnyAccountType ##### -->
 <para>

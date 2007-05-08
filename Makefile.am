@@ -66,6 +66,9 @@ DIST_SUBDIRS = \
 	libtinymail-olpc \
 	libtinymail-gpe m4 \
 	libtinymailui-mozembed \
+	libtinymailui-gnome-keyring \
+	libtinymail-acap \
+	libtinymail-queues \
 	libtinymail-gnome-desktop
 
 DISTCHECK_CONFIGURE_FLAGS = --with-html-component=mozembed --enable-gtk-doc --enable-python-bindings --enable-unit-tests --enable-tests

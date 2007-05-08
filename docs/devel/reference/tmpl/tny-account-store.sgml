@@ -42,6 +42,9 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@: 
+@:
+
 @tnyaccountstore: the object which received the signal.
 @arg1: 
 
@@ -49,6 +52,9 @@ A abstract type that defines a store for accounts
 <para>
 
 </para>
+
+@: 
+@:
 
 @tnyaccountstore: the object which received the signal.
 @arg1: 
@@ -58,6 +64,9 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@: 
+@:
+
 @tnyaccountstore: the object which received the signal.
 @arg1: 
 
@@ -65,6 +74,8 @@ A abstract type that defines a store for accounts
 <para>
 
 </para>
+
+@:
 
 @tnyaccountstore: the object which received the signal.
 
@@ -135,7 +146,7 @@ A abstract type that defines a store for accounts
 
 @self: 
 @type: 
-@prompt: 
+@error: 
 @Returns: 
 
 
