@@ -839,6 +839,12 @@ tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **e
 void 
 tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GError **err)
 {
+	/* Note that the human-readable GError:message strings here are only for debugging.
+	 * They should never be shown to the user. The application should make its own 
+	 * decisions about how to show these errors in the UI, and should make sure that 
+	 * they are translated in the user's locale.
+	 */
+
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 

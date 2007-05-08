@@ -80,25 +80,27 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * tny_account_store_alert:
  * @self: a #TnyAccountStore object
  * @type: the message type (severity)
- * @prompt: the prompt
+ * @error: A GError, of domain TNY_ACCOUNT_ERROR, which should be used to determine what to show to the user.
  *
- * This jump-to-the-ui method implements showing a message dialog with @prompt
- * as prompt and @type as message type. It will return TRUE if the reply was 
+ * This jump-to-the-ui method implements showing a message dialog appropriate for the @error
+ * and @type as message type. It will return TRUE if the reply was 
  * affirmative or FALSE if not.
  *
  * Implementors: when implementing a platform-specific library, you must
- * implement this method. For example in Gtk+ by using the #GtkDialog API. The
- * implementation will for example be used to ask the user about accepting SSL
+ * implement this method. For example in GTK+ by using the #GtkDialog API. The
+ * implementation will, for example, be used to ask the user about accepting SSL
  * certificates. The two possible answers that must be supported are 
- * "Yes" and "No" which must result in a TRUE or a FALSE return value.
+ * "Yes" and "No" which must result in a TRUE or a FALSE return value, though 
+ * your implementation should attempt to use explicit button names such as 
+ * "Accept Certificate" and "Reject Certificate". Likewise, the dialog should be 
+ * arranged according the the user interface guidelines of your target platform.
  *
- * Example implementation for Gtk+:
+ * Example implementation for GTK+:
  * <informalexample><programlisting>
  * static gboolean
- * tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
+ * tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError *error)
  * {
  *     GtkMessageType gtktype;
- *     gboolean retval = FALSE;
  *     GtkWidget *dialog;
  *     switch (type)
  *     {
@@ -113,6 +115,23 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  *         gtktype = GTK_MESSAGE_ERROR;
  *         break;
  *     }
+ *
+ *     const gchar *prompt = NULL;
+ *     switch (error->code)
+ *     {
+ *         case TNY_ACCOUNT_ERROR_TRY_CONNECT:
+ *             prompt = _("Account not yet fully configured");
+ *             break;
+ *         default:
+ *             g_warning ("%s: Unhandled GError code.", __FUNCTION__);
+ *             prompt = NULL;
+ *             break;
+ *      }
+ *	
+ *	if (!prompt)
+ *		return FALSE;
+ *
+ *     gboolean retval = FALSE;
  *     dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
  *            gtktype, GTK_BUTTONS_YES_NO, prompt);
  *     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
@@ -126,7 +145,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  *
  **/
 gboolean 
-tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *prompt)
+tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError *error)
 {
 	gboolean retval;
 
@@ -137,7 +156,7 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const gchar *
 	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, type, prompt);
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, type, error);
 
 #ifdef DBC /* ensure */
 #endif

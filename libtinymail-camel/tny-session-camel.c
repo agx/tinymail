@@ -169,7 +169,7 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
    is a known issue (and the person who fixed this, please remove this warning) */
 
 static gboolean
-tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *prompt, gboolean cancel)
+tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const GError *error, gboolean cancel)
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
 	TnySessionCamelPriv *priv = self->priv;
@@ -198,7 +198,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 		tny_lockable_lock (self->priv->ui_lock);
 		retval = tny_account_store_alert (
 			(TnyAccountStore*) self->priv->account_store, 
-			tnytype, (const gchar *) prompt);
+			tnytype, error);
 		tny_lockable_unlock (self->priv->ui_lock);
 	}
 
@@ -414,7 +414,7 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 
 		if (err != NULL) 
 		{
-			tny_session_camel_alert_user (session, CAMEL_SESSION_ALERT_ERROR, err->message, FALSE);
+			tny_session_camel_alert_user (session, CAMEL_SESSION_ALERT_ERROR, err, FALSE);
 			g_error_free (err);
 		}
 	}

@@ -1,3 +1,32 @@
+2007-05-08  Murray Cumming  <murrayc@murrayc.com
+
+	* libtinymail/tny-account-store.c:
+	* libtinymail/tny-account-store.h: Change the alert_func vfunc to 
+	provide a GError instead of a human-readable error string.
+	(tny_account_store_alert): The documentation for this vfunc invoker seems to 
+	refer to the vfunc (as is also normal in GTK+), so document how the GError 
+	should be used and point out that the application should translate the 
+	message and show an appropriate dialog.
+	This does not seem to require the definition of a new GError domain - 
+	the existing one seems suitable.
+	
+	* libtinymail-acap/tny-acap-account-store.c:
+	(tny_acap_account_store_alert):
+	* libtinymail-camel/tny-camel-account.c:
+	(tny_camel_account_set_online_default):
+	* libtinymail-camel/tny-session-camel.c:
+	(tny_session_camel_alert_user), (foreach_account_set_connectivity):
+	* libtinymail-gnome-desktop/tny-gnome-account-store.c:
+	(tny_gnome_account_store_alert):
+	* libtinymail-gpe/tny-gpe-account-store.c:
+	(tny_gpe_account_store_alert):
+	* libtinymail-maemo/tny-maemo-account-store.c:
+	(tny_maemo_account_store_alert):
+	* libtinymail-olpc/tny-olpc-account-store.c:
+	(tny_olpc_account_store_alert):
+	* tests/shared/account-store.c: (tny_test_account_store_alert):
+	Use the GError instead of the message string.
+
 2007-05-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Real fix for a gtk_tree_model_row_inserted oddity
