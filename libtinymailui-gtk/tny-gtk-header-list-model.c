@@ -454,7 +454,6 @@ notify_views_add_destroy (gpointer data)
 
 	g_mutex_lock (me->ra_lock);
 	me->updating_views = -1;
-	/* me->registered = 0; */
 	g_mutex_unlock (me->ra_lock);
 	g_object_unref (me);
 	me->add_timeout = 0;
