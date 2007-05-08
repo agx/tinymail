@@ -611,7 +611,7 @@ typedef struct
 	TnyGtkHeaderListModel *self;
 	GObject *item;
 	GMainLoop *loop;
-	guint src;
+	gint src;
 } notify_views_data_t;
 
 
@@ -622,8 +622,8 @@ notify_views_delete_destroy (gpointer data)
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) stuff->self;
 
 	g_mutex_lock (me->to_lock);
-	if (stuff->src != 0 && stuff->src < me->del_timeouts->len)
-		g_array_index (me->del_timeouts, guint, stuff->src) = 0;
+	if (stuff->src != -1 && stuff->src < me->del_timeouts->len)
+		g_array_index (me->del_timeouts, guint, (guint) stuff->src) = 0;
 	g_mutex_unlock (me->to_lock);
 
 	g_object_unref (stuff->item);
@@ -689,7 +689,7 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 	guint src;
 
 	stuff = g_slice_new (notify_views_data_t);
-	stuff->src = 0;
+	stuff->src = -1;
 	stuff->self = g_object_ref (self);
 	stuff->item = g_object_ref (item);
 
@@ -697,7 +697,7 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 
 	src = g_timeout_add_full (0, G_PRIORITY_HIGH_IDLE, 
 		notify_views_delete, stuff, notify_views_delete_destroy);
-	stuff->src = add_del_timeout (me, src);
+	stuff->src = (gint) add_del_timeout (me, src);
 
 	/* This truly sucks :-( */
 	g_main_loop_run (stuff->loop);
