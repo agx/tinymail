@@ -1200,11 +1200,17 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 
 	cancel = camel_operation_new (tny_camel_folder_get_msg_async_status, info);
 
+	/* TNY TODO:  For now (these locks must be removed once parallel getting 
+	 * messages actually works */
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
 	camel_operation_ref (cancel);
 	camel_operation_register (cancel);
 	camel_operation_start (cancel, (char *) "Getting message");
 
-	info->msg = tny_folder_get_msg (info->self, info->header, &err);
+	info->msg = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, info->self, info->header, &err);
+
 
 	info->cancelled = camel_operation_cancel_check (cancel);
 
@@ -1212,6 +1218,11 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	camel_operation_end (cancel);
 	if (cancel)
 		camel_operation_unref (cancel);
+
+	/* TNY TODO:  For now (these locks must be removed once parallel getting 
+	 * messages actually works */
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
 
 	if (err != NULL)
 	{

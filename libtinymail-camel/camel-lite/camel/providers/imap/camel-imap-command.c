@@ -259,7 +259,10 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	/* Read away whatever we got */
 	while (camel_imap_store_readline_nb (store, &resp, &myex) > 0)
 	{
-		printf ("unsolitcited [%s]\n", resp);
+		imap_debug ("unsolitcited: ");
+		imap_debug (resp);
+		imap_debug ("\n");
+
 		g_free (resp);
 		resp=NULL;
 	}

@@ -487,7 +487,7 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpo
 			priv->last_mailbox_correct_select_set = TRUE;
 		}
 
-		gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE);
+		/* gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), TRUE); */
 
 	} else {
 		/* Restore selection */
@@ -552,7 +552,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 				&folder, -1);
 
 			gtk_widget_show (GTK_WIDGET (priv->progress));
-			gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE);
+			/* gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE); */
 
 			hmodel = tny_gtk_header_list_model_new ();
 			tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), folder, FALSE);
