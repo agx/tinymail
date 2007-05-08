@@ -38,6 +38,44 @@ static GObjectClass *parent_class;
 
 #include "tny-gtk-header-list-iterator-priv.h"
 
+static gint 
+add_del_timeout (TnyGtkHeaderListModel *me, guint num)
+{
+	gint retval = 0;
+	g_mutex_lock (me->to_lock);
+	if (!me->del_timeouts)
+		me->del_timeouts = g_array_new (FALSE, FALSE, sizeof (guint));
+	g_array_append_val (me->del_timeouts, num);
+	retval = me->del_timeouts->len-1;
+	g_mutex_unlock (me->to_lock);
+	return retval;
+}
+
+static void
+remove_del_timeouts (TnyGtkHeaderListModel *me)
+{
+	gint i;
+	guint src;
+
+	g_mutex_lock (me->to_lock);
+
+	if (!me->del_timeouts)
+	{
+		g_mutex_unlock (me->to_lock);
+		return;
+	}
+
+	for (i = 0; i < me->del_timeouts->len; i++)
+	{
+		src = g_array_index (me->del_timeouts, guint, i);
+		if (src > 0)
+			g_source_remove (src);
+		g_array_index (me->del_timeouts, guint, i) = 0;
+	}
+	g_array_free (me->del_timeouts, TRUE);
+	me->del_timeouts = NULL;
+	g_mutex_unlock (me->to_lock);
+}
 
 static guint
 tny_gtk_header_list_model_get_flags (GtkTreeModel *self)
@@ -573,6 +611,7 @@ typedef struct
 	TnyGtkHeaderListModel *self;
 	GObject *item;
 	GMainLoop *loop;
+	guint src;
 } notify_views_data_t;
 
 
@@ -582,7 +621,11 @@ notify_views_delete_destroy (gpointer data)
 	notify_views_data_t *stuff = data;
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) stuff->self;
 
-	me->del_timeout = 0;
+	g_mutex_lock (me->to_lock);
+	if (stuff->src != 0 && stuff->src < me->del_timeouts->len)
+		g_array_index (me->del_timeouts, guint, stuff->src) = 0;
+	g_mutex_unlock (me->to_lock);
+
 	g_object_unref (stuff->item);
 	g_object_unref (stuff->self);
 	g_main_loop_unref (stuff->loop);
@@ -643,20 +686,18 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 {
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) self;
 	notify_views_data_t *stuff;
+	guint src;
 
 	stuff = g_slice_new (notify_views_data_t);
+	stuff->src = 0;
 	stuff->self = g_object_ref (self);
 	stuff->item = g_object_ref (item);
 
 	stuff->loop = g_main_loop_new (NULL, FALSE);
 
-	if (me->del_timeout > 0) {
-		g_source_remove (me->del_timeout);
-		me->del_timeout = 0;
-	}
-
-	me->del_timeout = g_timeout_add_full (0, G_PRIORITY_HIGH_IDLE, 
+	src = g_timeout_add_full (0, G_PRIORITY_HIGH_IDLE, 
 		notify_views_delete, stuff, notify_views_delete_destroy);
+	stuff->src = add_del_timeout (me, src);
 
 	/* This truly sucks :-( */
 	g_main_loop_run (stuff->loop);
@@ -763,10 +804,7 @@ tny_gtk_header_list_model_finalize (GObject *object)
 		self->add_timeout = 0;
 	}
 
-	if (self->del_timeout > 0) {
-		g_source_remove (self->del_timeout);
-		self->del_timeout = 0;
-	}
+	remove_del_timeouts (self);
 
 	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
 	if (self->folder)
@@ -779,9 +817,11 @@ tny_gtk_header_list_model_finalize (GObject *object)
 	g_static_rec_mutex_free (self->iterator_lock);
 	self->iterator_lock = NULL;
 
-
 	g_mutex_free (self->ra_lock);
 	self->ra_lock = NULL;
+
+	g_mutex_free (self->to_lock);
+	self->to_lock = NULL;
 
 	parent_class->finalize (object);
 
@@ -810,11 +850,12 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	g_static_rec_mutex_init (self->iterator_lock);
 	self->cur_len = 0;
 
-	self->del_timeout = 0;
+	self->del_timeouts = NULL;
 	self->add_timeout = 0;
 	self->items = g_ptr_array_sized_new (1000);
 	self->updating_views = -1;
 	self->ra_lock = g_mutex_new ();
+	self->to_lock = g_mutex_new ();
 	self->registered = 0;
 
 	return;
@@ -843,10 +884,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 		self->add_timeout = 0;
 	}
 
-	if (self->del_timeout > 0) {
-		g_source_remove (self->del_timeout);
-		self->del_timeout = 0;
-	}
+	remove_del_timeouts (self);
 
 	/* Set it to 1 as initial value, else you cause the length > 0 
 	 * assertion in gtk_tree_model_sort_build_level (I have no idea why the

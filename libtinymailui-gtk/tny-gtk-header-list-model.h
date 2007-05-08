@@ -67,11 +67,12 @@ struct _TnyGtkHeaderListModel
 	TnyFolder *folder;
 	gint stamp, registered;
 	gint updating_views;
-	GMutex *ra_lock;
+	GMutex *ra_lock, *to_lock;
 	gint cur_len;
-	guint add_timeout, del_timeout;
+	guint add_timeout;
 
 	GPtrArray *items;
+	GArray *del_timeouts;
 	TnyIterator *iterator;
 };
 
