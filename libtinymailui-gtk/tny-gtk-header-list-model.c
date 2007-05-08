@@ -613,8 +613,10 @@ notify_views_delete (gpointer data)
 		if (G_LIKELY (path))
 		{
 			gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
+			g_mutex_lock (me->ra_lock);
 			me->cur_len--;
 			me->registered--;
+			g_mutex_unlock (me->ra_lock);
 			gtk_tree_path_free (path);
 		}
 
