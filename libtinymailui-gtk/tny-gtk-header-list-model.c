@@ -455,8 +455,9 @@ notify_views_add_destroy (gpointer data)
 	g_mutex_lock (me->ra_lock);
 	me->updating_views = -1;
 	g_mutex_unlock (me->ra_lock);
-	g_object_unref (me);
+
 	me->add_timeout = 0;
+	g_object_unref (me);
 
 	return;
 }
@@ -579,10 +580,11 @@ static void
 notify_views_delete_destroy (gpointer data)
 {
 	notify_views_data_t *stuff = data;
+	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) stuff->self;
 
+	me->del_timeout = 0;
 	g_object_unref (stuff->item);
 	g_object_unref (stuff->self);
-
 	g_main_loop_unref (stuff->loop);
 
 	g_slice_free (notify_views_data_t, data);
@@ -648,7 +650,12 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 
 	stuff->loop = g_main_loop_new (NULL, FALSE);
 
-	g_timeout_add_full (0, G_PRIORITY_HIGH_IDLE, 
+	if (me->del_timeout > 0) {
+		g_source_remove (me->del_timeout);
+		me->del_timeout = 0;
+	}
+
+	me->del_timeout = g_timeout_add_full (0, G_PRIORITY_HIGH_IDLE, 
 		notify_views_delete, stuff, notify_views_delete_destroy);
 
 	/* This truly sucks :-( */
@@ -756,6 +763,11 @@ tny_gtk_header_list_model_finalize (GObject *object)
 		self->add_timeout = 0;
 	}
 
+	if (self->del_timeout > 0) {
+		g_source_remove (self->del_timeout);
+		self->del_timeout = 0;
+	}
+
 	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
 	if (self->folder)
 		g_object_unref (G_OBJECT (self->folder));
@@ -798,6 +810,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	g_static_rec_mutex_init (self->iterator_lock);
 	self->cur_len = 0;
 
+	self->del_timeout = 0;
 	self->add_timeout = 0;
 	self->items = g_ptr_array_sized_new (1000);
 	self->updating_views = -1;
@@ -828,6 +841,11 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	if (self->add_timeout > 0) {
 		g_source_remove (self->add_timeout);
 		self->add_timeout = 0;
+	}
+
+	if (self->del_timeout > 0) {
+		g_source_remove (self->del_timeout);
+		self->del_timeout = 0;
 	}
 
 	/* Set it to 1 as initial value, else you cause the length > 0 
