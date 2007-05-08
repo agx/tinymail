@@ -1,3 +1,8 @@
+2007-05-08  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+        * make _finalize in tny-maemo-conic-device also do the dummy
+	        disconnect, so we don't crash-on-exit in scratchbox
+
 2007-05-08  Murray Cumming  <murrayc@murrayc.com
 
 	* libtinymail/tny-account-store.c:

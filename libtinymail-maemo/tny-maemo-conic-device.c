@@ -70,7 +70,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
 
 #ifdef MAEMO_CONIC_DUMMY
-	g_message ("%s: HACK: outsmarting libconic by emitting signal regardless of the reported connection status.", __FUNCTION__);
+	/* HACK: outsmarting libconic by emitting signal regardless of the reported connection status */
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, TRUE);
 	return;
@@ -169,6 +169,8 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
  * connected in that case either
  */
 #ifndef MAEMO_CONIC_DUMMY 
+
+
 	TnyMaemoConicDevicePriv *priv;	
 	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), FALSE);
@@ -400,8 +402,8 @@ tny_maemo_conic_device_finalize (GObject *obj)
 	TnyMaemoConicDevicePriv *priv;
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
-		if (!con_ic_connection_disconnect (priv->cnx))
-			g_warning ("failed to send disconnect dbus message");
+		if (!tny_maemo_conic_device_disconnect (TNY_MAEMO_CONIC_DEVICE(obj),priv->iap))
+			g_warning ("failed to disconnect dbus message");
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
 	}
