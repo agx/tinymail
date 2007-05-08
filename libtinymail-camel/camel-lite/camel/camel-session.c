@@ -334,7 +334,7 @@ camel_session_get_storage_path (CamelSession *session, CamelService *service,
  * @session: a #CamelSession object
  * @service: the #CamelService this query is being made by
  * @domain: domain of password request.  May be null to use the default.
- * @prompt: prompt to provide to user
+ * @prompt: prompt to provide to user. May be null.
  * @item: an identifier, unique within this service, for the information
  * @flags: #CAMEL_SESSION_PASSWORD_REPROMPT, the prompt should force a reprompt
  * #CAMEL_SESSION_PASSWORD_SECRET, whether the password is secret
@@ -350,6 +350,9 @@ camel_session_get_storage_path (CamelSession *session, CamelService *service,
  * @prompt is a question to ask the user (if the application doesn't
  * already have the answer cached). If #CAMEL_SESSION_PASSWORD_SECRET
  * is set, the user's input will not be echoed back.
+ * This is a human-readable password question, possibly containing an untranslated error 
+ * message directly from the server. This should be ignored by most implementations, 
+ * so NULL is an acceptable value.
  *
  * If #CAMEL_SESSION_PASSWORD_STATIC is set, it means the password returned
  * will be stored statically by the caller automatically, for the current

@@ -372,13 +372,15 @@ Shared include file with forward typedefs
 
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
-This method happens whenever the password is needed. You must return the password for #TnyAccount self.
+This method happens whenever the password must be requested from the user. You must return the password for #TnyAccount self.
 </para>
 
 @self: The #TnyAccount instance for which the password is needed
-@prompt: A promp that you can display to your user
+@prompt: A prompt that you can display to the user. This is a human-readable password question, possibly 
+containing an untranslated error message directly from the server. This should be ignored by most 
+implementations, so NULL is an acceptable value.
 @cancel: A by-ref boolean for if the user wants to cancel the connection request
-@Returns: Return the password for #TnyAccount self
+@Returns: Return the password for #TnyAccount self entered by the user.
 
 
 <!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->

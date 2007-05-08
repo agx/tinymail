@@ -1,3 +1,14 @@
+2007-05-08  Murray Cumming  <murrayc@murrayc.com
+
+	* docs/devel/reference/tmpl/tny-shared.sgml:
+	TnyGetPassFunc:
+	* libtinymail/tny-password-getter.c: 
+	tny_password_getter_get_password():
+	* camel/camel-session.c:
+	camel_session_get_password():
+	Document the prompt parameter as best ignored, because there is nothing 
+	sensible that a real-world application can do with it.
+
 2007-05-08  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
         * make _finalize in tny-maemo-conic-device also do the dummy

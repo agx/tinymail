@@ -29,7 +29,9 @@
  * tny_password_getter_get_password:
  * @self: a #TnyPasswordGetter object
  * @aid: a unique string identifying the requested password
- * @prompt: the password question
+ * @prompt: A human-readable password question, possibly containing an untranslated error 
+ * message directly from the server. This should be ignored by most implementations,
+ * so NULL is an acceptable value.
  * @cancel: whether or not the user cancelled
  * 
  * Get the password of @self identified by @aid. If you set the by reference
