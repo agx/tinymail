@@ -1,4 +1,10 @@
-2007-05-08  Javier Fernandez  <jfernandez@igalia.com
+2007-05-08  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-queues/libtinymail-queues.pc.in: Fixed the name of the
+	library in the -l option
+	* Some ChangeLog fixes
+
+2007-05-08  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
 	* libtinymail/tny-merge-folder.c: Add cancelled parameter to 
 	transfer_msgs_async function.
@@ -27,7 +33,7 @@
 
 2007-05-08  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
-        * make _finalize in tny-maemo-conic-device also do the dummy
+	* make _finalize in tny-maemo-conic-device also do the dummy
 	        disconnect, so we don't crash-on-exit in scratchbox
 
 2007-05-08  Murray Cumming  <murrayc@murrayc.com
@@ -138,8 +144,8 @@
 
 	* Change API headers of async functions to pass a status callback
 	method to get progress information about task execution. 
-        	* transfer_msgs_async_fun
-		* get_folders_async_func
+	* transfer_msgs_async_fun
+	* get_folders_async_func
 	* Camel implementation functions have been changed, but NULL 
 	was assigned to status_callback, for the moment.
 
@@ -275,7 +281,7 @@
 
 	* Change priority flags management, using a bit mask to get assigned 
 	priority.
-        * New enumeration to define available priority flags. 
+	* New enumeration to define available priority flags. 
 
 2007-04-21  Philip Van Hoof  <pvanhoof@gnome.org>
 

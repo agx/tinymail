@@ -7,5 +7,5 @@ Name: libtinymail-queues
 Description: TinyMail queues support library
 Version: @VERSION@
 Requires: libtinymail-@API_VERSION@ 
-Libs: -L${libdir} -libtinymail-queues-@API_VERSION@
+Libs: -L${libdir} -ltinymail-queues-@API_VERSION@
 Cflags: -I${includedir}/libtinymail-queues-@API_VERSION@
