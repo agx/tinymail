@@ -80,4 +80,5 @@ tny_error_get_type (void)
     };
     etype = g_enum_register_static ("TnyError", values);
   }
+  return etype;
 }

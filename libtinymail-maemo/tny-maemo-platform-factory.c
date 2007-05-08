@@ -52,7 +52,7 @@ tny_maemo_platform_factory_new_mime_part (TnyPlatformFactory *self)
 static TnyPasswordGetter*
 tny_maemo_platform_factory_new_password_getter (TnyPlatformFactory *self)
 {
-	return tny_gtk_password_dialog_new ();
+	return TNY_PASSWORD_GETTER (tny_gtk_password_dialog_new ());
 }
 
 static TnyAccountStore*

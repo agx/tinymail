@@ -132,7 +132,7 @@ thread_main (gpointer data)
 	while (length > 0 && priv->do_continue)
 	{
 		TnyHeader *header;
-		TnyMsg *msg;
+		TnyMsg *msg = NULL;
 
 		g_mutex_lock (priv->sending_lock);
 

@@ -65,6 +65,7 @@ tny_status_code_get_type (void)
     };
     etype = g_enum_register_static ("TnyStatus", values);
   }
+  return etype;
 }
 
 /**

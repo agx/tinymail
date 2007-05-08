@@ -490,7 +490,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	if (!_tny_session_check_operation (apriv->session, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
-		return;
+		return NULL;
 
 	if (!name || strlen (name) <= 0)
 	{
@@ -922,7 +922,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	if (!_tny_session_check_operation (apriv->session, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
-		return;
+		return NULL;
 
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
 	{
@@ -931,7 +931,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 				"Account not ready for this operation (%s)",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
-		return;
+		return NULL;
 	}
 
 	store = CAMEL_STORE (apriv->service);
@@ -946,7 +946,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 		if (store && CAMEL_IS_OBJECT (store))
 			camel_object_unref (CAMEL_OBJECT (store));
 		_tny_session_stop_operation (apriv->session);
-		return;
+		return NULL;
 	}
 
 	g_assert (CAMEL_IS_STORE (store));
@@ -972,7 +972,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 			camel_object_unref (CAMEL_OBJECT (store));
 		}
 		_tny_session_stop_operation (apriv->session);
-		return;
+		return NULL;
 	}
 
 	if (iter)
