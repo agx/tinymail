@@ -12,6 +12,7 @@
 2007-05-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* -Wall warnings fixed
+	* Speedups in TnyGtkHeaderListModel
 
 2007-05-08  Murray Cumming  <murrayc@murrayc.com
 
