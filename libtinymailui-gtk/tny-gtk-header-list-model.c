@@ -93,7 +93,7 @@ tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
-	g_static_rec_mutex_lock (list_model->iterator_lock);
+	g_static_rec_mutex_lock (list_model->iterator_lock); 
 
 	i = gtk_tree_path_get_indices (path)[0];
 
@@ -238,7 +238,7 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	gchar *rdate = NULL;
 	gint i;
 
-	if (iter->stamp != TNY_GTK_HEADER_LIST_MODEL (self)->stamp)
+	if (iter->stamp != list_model->stamp)
 		return;
 
 	g_static_rec_mutex_lock (list_model->iterator_lock);
@@ -571,6 +571,7 @@ typedef struct
 {
 	TnyGtkHeaderListModel *self;
 	GObject *item;
+	GMainLoop *loop;
 } notify_views_data_t;
 
 
@@ -578,8 +579,12 @@ static void
 notify_views_delete_destroy (gpointer data)
 {
 	notify_views_data_t *stuff = data;
+
 	g_object_unref (stuff->item);
 	g_object_unref (stuff->self);
+
+	g_main_loop_unref (stuff->loop);
+
 	g_slice_free (notify_views_data_t, data);
 	return;
 }
@@ -589,12 +594,13 @@ static gboolean
 notify_views_delete (gpointer data)
 {
 	notify_views_data_t *stuff = data;
-	GObject *item = stuff->item;
 	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) stuff->self;
 	GtkTreePath *path;
 	GtkTreeIter iter;
-	gint i;
-	gboolean found = FALSE;
+	gint i; gboolean found = FALSE;
+	GObject *mitem, *item = stuff->item;
+
+	g_static_rec_mutex_lock (me->iterator_lock);
 
 	for (i=0; i < me->items->len; i++)
 		if (me->items->pdata[i] == item)
@@ -609,35 +615,45 @@ notify_views_delete (gpointer data)
 		iter.user_data = (gpointer) i;
 		path = gtk_tree_path_new ();
 		gtk_tree_path_append_index (path, i);
-		if (G_LIKELY (path))
-		{
-			gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
-			g_mutex_lock (me->ra_lock);
-			me->cur_len--;
-			me->registered--;
-			g_mutex_unlock (me->ra_lock);
-			gtk_tree_path_free (path);
-		}
+		gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
+		g_mutex_lock (me->ra_lock);
+		me->cur_len--;
+		me->registered--;
+		g_mutex_unlock (me->ra_lock);
+		gtk_tree_path_free (path);
 
-		g_static_rec_mutex_lock (me->iterator_lock);
-		item = g_ptr_array_remove_index (me->items, i);
-		g_static_rec_mutex_unlock (me->iterator_lock);
-		if (G_LIKELY (item)) 
-			g_object_unref (item);
+		mitem = g_ptr_array_remove_index (me->items, i);
+		if (mitem)
+			g_object_unref (mitem);
 	}
+
+	g_static_rec_mutex_unlock (me->iterator_lock);
+
+	if (g_main_loop_is_running (stuff->loop))
+		g_main_loop_quit (stuff->loop);
 
 	return FALSE;
 }
 
+
 static void
 tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 {
+	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) self;
 	notify_views_data_t *stuff;
+
 	stuff = g_slice_new (notify_views_data_t);
-	stuff->self = g_object_ref (G_OBJECT (self));
+	stuff->self = g_object_ref (self);
 	stuff->item = g_object_ref (item);
-	g_timeout_add_full (0, G_PRIORITY_DEFAULT_IDLE, 
+
+	stuff->loop = g_main_loop_new (NULL, FALSE);
+
+	g_timeout_add_full (0, G_PRIORITY_HIGH_IDLE, 
 		notify_views_delete, stuff, notify_views_delete_destroy);
+
+	/* This truly sucks :-( */
+	g_main_loop_run (stuff->loop);
+
 	return;
 }
 

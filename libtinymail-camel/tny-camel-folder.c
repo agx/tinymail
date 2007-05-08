@@ -79,13 +79,17 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
+	TnyList *list;
 
 	if (!priv->sobservers)
 		return;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
+	list = tny_list_copy (priv->sobservers);
+	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	iter = tny_list_create_iterator (priv->sobservers);
+	iter = tny_list_create_iterator (list);
+
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
@@ -95,7 +99,7 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 	}
 	g_object_unref (G_OBJECT (iter));
 
-	g_static_rec_mutex_unlock (priv->obs_lock);
+	g_object_unref (list);
 
 }
 
@@ -104,13 +108,17 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
+	TnyList *list;
 
 	if (!priv->observers)
 		return;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
+	list = tny_list_copy (priv->observers);
+	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	iter = tny_list_create_iterator (priv->observers);
+	iter = tny_list_create_iterator (list);
+
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (tny_iterator_get_current (iter));
@@ -120,7 +128,7 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	}
 	g_object_unref (G_OBJECT (iter));
 
-	g_static_rec_mutex_unlock (priv->obs_lock);
+	g_object_unref (list);
 
 }
 
