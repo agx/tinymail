@@ -196,10 +196,10 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 	if (store->ostream == NULL || ((CamelObject *)store->ostream)->ref_count <= 0)
 	{
-		/*if (!camel_service_connect ((CamelService*)store, ex)) */
+		if (store->has_login && !camel_service_connect ((CamelService*)store, ex))
 			return FALSE;
 	}
-	
+
 	/* g_mutex_lock (store->stream_lock); */
 
 	if (store->ostream==NULL) return FALSE;
@@ -259,7 +259,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	/* Read away whatever we got */
 	while (camel_imap_store_readline_nb (store, &resp, &myex) > 0)
 	{
-		/* printf ("unsolitcited [%s]\n", resp); */
+		printf ("unsolitcited [%s]\n", resp);
 		g_free (resp);
 		resp=NULL;
 	}

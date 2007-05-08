@@ -269,6 +269,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->istream = NULL;
 	imap_store->ostream = NULL;
 	imap_store->stream_lock = g_mutex_new ();
+	imap_store->has_login = FALSE;
 
 	imap_store->dir_sep = '\0';
 	imap_store->current_folder = NULL;
@@ -1686,6 +1687,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	
 	
  done:
+
 	/* save any changes we had */
 	camel_store_summary_save((CamelStoreSummary *)store->summary);
 
@@ -1693,7 +1695,9 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	
 	if (camel_exception_is_set (ex))
 		camel_service_disconnect (service, TRUE, NULL);
-	
+	else
+		store->has_login = TRUE;
+
 	return !camel_exception_is_set (ex);
 }
 
@@ -3593,13 +3597,18 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 
 	if (nread <= 0) {
 		if (errno == EINTR)
+		{
+			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-		else
+			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			camel_service_connect (CAMEL_SERVICE (store), &mex);
+		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					      _("Server unexpectedly disconnected: %s"),
 					      g_strerror (errno));
-		
-		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+		}
+
 		g_byte_array_free (ba, TRUE);
 		return -1;
 	}
