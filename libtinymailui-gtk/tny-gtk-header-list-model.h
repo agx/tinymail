@@ -71,6 +71,7 @@ struct _TnyGtkHeaderListModel
 	gint cur_len;
 	guint add_timeout;
 
+	guint timeout_span;
 	GPtrArray *items;
 	GArray *del_timeouts;
 	TnyIterator *iterator;
