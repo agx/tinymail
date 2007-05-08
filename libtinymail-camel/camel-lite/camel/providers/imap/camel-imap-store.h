@@ -25,6 +25,13 @@
 #ifndef CAMEL_IMAP_STORE_H
 #define CAMEL_IMAP_STORE_H 1
 
+/* #define IDLE_DEBUG 1 */
+
+#ifdef IDLE_DEBUG
+#define idle_debug(o)	printf ("%s\n", o)
+#else
+#define idle_debug(o)	
+#endif
 
 #ifdef __cplusplus
 extern "C" {

@@ -588,7 +588,7 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 			me->add_timeout = 0;
 		}
 
-		me->add_timeout = g_timeout_add_full (1000, G_PRIORITY_DEFAULT_IDLE, 
+		me->add_timeout = g_timeout_add_full (G_PRIORITY_DEFAULT_IDLE,1000, 
 			notify_views_add, me, notify_views_add_destroy);
 	}
 
@@ -696,7 +696,7 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 
 	stuff->loop = g_main_loop_new (NULL, FALSE);
 
-	src = g_timeout_add_full (0, G_PRIORITY_HIGH_IDLE, 
+	src = g_timeout_add_full (G_PRIORITY_HIGH_IDLE, 0,
 		notify_views_delete, stuff, notify_views_delete_destroy);
 	stuff->src = (gint) add_del_timeout (me, src);
 

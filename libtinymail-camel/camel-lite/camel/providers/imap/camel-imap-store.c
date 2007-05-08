@@ -149,6 +149,7 @@ static void let_idle_die (CamelImapStore *imap_store)
 		g_free (imap_store->idle_prefix); 
 		imap_store->idle_prefix=NULL;
 		g_mutex_lock (imap_store->stream_lock);
+		idle_debug ("Sending DONE in let_idle_die\n");
 		camel_stream_printf (imap_store->ostream, "DONE\r\n");
 		g_mutex_unlock (imap_store->stream_lock);
 	}
