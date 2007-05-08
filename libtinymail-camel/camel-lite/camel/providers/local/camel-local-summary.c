@@ -477,9 +477,10 @@ static char *
 local_summary_encode_x_evolution(CamelLocalSummary *cls, const CamelLocalMessageInfo *mi)
 {
 	GString *out = g_string_new("");
+
+#ifdef NON_TINYMAIL_FEATURES
 	struct _camel_header_param *params = NULL;
 	GString *val = g_string_new("");
-#ifdef NON_TINYMAIL_FEATURES
 	CamelFlag *flag = mi->info.user_flags;
 	CamelTag *tag = mi->info.user_tags;
 #endif
@@ -635,7 +636,6 @@ static CamelMessageInfo *
 message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 {
 	CamelLocalMessageInfo *mi;
-	CamelLocalSummary *cls = (CamelLocalSummary *)s;
 
 	mi = (CamelLocalMessageInfo *)((CamelFolderSummaryClass *)camel_local_summary_parent)->message_info_new_from_header(s, h);
 	return (CamelMessageInfo *)mi;

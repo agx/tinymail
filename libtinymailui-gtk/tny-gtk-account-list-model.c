@@ -165,7 +165,6 @@ tny_gtk_account_list_model_get_length (TnyList *self)
 {
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*)self;
 	guint retval = 0;
-	GtkTreeIter iter;
 
 	g_mutex_lock (me->iterator_lock);
 	retval = me->first?g_list_length (me->first):0;

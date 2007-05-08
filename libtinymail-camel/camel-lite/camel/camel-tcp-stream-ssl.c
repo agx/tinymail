@@ -343,7 +343,6 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 	PRSocketOptionData sockopts;
 	PRPollDesc pollfds[2];
 	gboolean nonblock;
-	int error;
 
 	/* get O_NONBLOCK options */
 	sockopts.option = PR_SockOpt_Nonblocking;
@@ -787,7 +786,7 @@ camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert)
 		close (fd);
 		
 		if (nread != st.st_size) {
-			g_warning ("cert size read truncated %s: %u != %ld", path, nread, st.st_size);
+			/* g_warning ("cert size read truncated %s: %u != %ld", path, nread, st.st_size); */
 			g_byte_array_free(ccert->rawcert, TRUE);
 			ccert->rawcert = NULL;
 			g_free(fingerprint);

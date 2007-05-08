@@ -141,8 +141,6 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 	g_static_rec_mutex_lock (apriv->service_lock);
 	if (apriv->session)
 	{
-		CamelService *oservice = apriv->service;
-
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
@@ -914,7 +912,6 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 {
 	TnyFolder *retval = NULL;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 	CamelFolderInfo *iter; guint32 flags; CamelStore *store;
 

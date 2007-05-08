@@ -36,6 +36,7 @@ static GObjectClass *parent_class = NULL;
 
 #include "tny-camel-mime-part-priv.h"
 #include "tny-camel-msg-header-priv.h"
+#include "tny-camel-msg-priv.h"
 
 #include <camel/camel-url.h>
 #include <camel/camel-stream.h>

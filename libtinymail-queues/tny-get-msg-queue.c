@@ -86,7 +86,6 @@ static void
 get_msg_callback (OAsyncWorkerTask *task, gpointer func_result)
 {
 	GetMsgInfo *info = o_async_worker_task_get_arguments (task);
-	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (info->self);
 	TnyMsg *msg = (TnyMsg *) func_result;
 	TnyFolder *folder;
 
@@ -171,7 +170,6 @@ get_messages (TnyGetMsgQueue *self, TnyList *list, TnyGetMsgCallback callback, T
 	iter = tny_list_create_iterator (list);
 	while (!tny_iterator_is_done (iter))
 	{
-		GError *err = NULL;
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 
 		tny_get_msg_queue_get_msg (self, header, callback, status_callback, user_data);

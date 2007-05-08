@@ -317,7 +317,7 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 	CamelFolder *folder = (CamelFolder *)object;
 	int i;
 	guint32 tag;
-	int unread = -1, deleted = 0, junked = 0, visible = 0, count = -1;
+	int unread = -1, deleted = 0, count = -1;
 
 	for (i=0; i < args->argc; i++) 
 	{
@@ -1641,6 +1641,7 @@ struct _folder_filter_msg {
 	CamelException ex;
 };
 
+#if 0
 static void
 filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 {
@@ -1748,11 +1749,8 @@ filter_free(CamelSession *session, CamelSessionThreadMsg *msg)
 	camel_folder_thaw(m->folder);
 	camel_object_unref(m->folder);
 }
+#endif
 
-static CamelSessionThreadOps filter_ops = {
-	filter_filter,
-	filter_free,
-};
 
 /* Event hooks that block emission when frozen */
 static gboolean

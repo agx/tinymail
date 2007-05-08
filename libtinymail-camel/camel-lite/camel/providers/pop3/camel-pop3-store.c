@@ -200,10 +200,9 @@ my_du (char *name, int *my_size)
 static CamelFolderInfo *
 pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 {
-	CamelURL *url;
 	const char *name;
 	CamelFolderInfo *fi;
-	guint msize;
+	gint msize;
 	gchar *folder_dir = store->storage_path;
 	gchar *spath;
 	FILE *f;
@@ -238,7 +237,7 @@ pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 		fclose (f);
 	} 
 
-	fi->local_size = msize;
+	fi->local_size = (guint) msize;
 
 	fi->uri = g_strdup ("");
 	name = strrchr (fi->full_name, '/');
@@ -792,10 +791,8 @@ pop3_construct (CamelService *service, CamelSession *session,
 	   CamelException *ex)
 {
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (service);
-	CamelStore *store = CAMEL_STORE (service);
 	CamelDiscoStore *disco_store = CAMEL_DISCO_STORE (service);
-	char *tmp, *path;
-	CamelURL *summary_url;
+	char *path;
 
 	CAMEL_SERVICE_CLASS (parent_class)->construct (service, session, provider, url, ex);
 	if (camel_exception_is_set (ex))

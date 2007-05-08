@@ -56,6 +56,7 @@ container_add_child(CamelFolderThreadNode *node, CamelFolderThreadNode *child)
 	child->parent = node;
 }
 
+#if 0
 static void
 container_parent_child(CamelFolderThreadNode *parent, CamelFolderThreadNode *child)
 {
@@ -97,6 +98,8 @@ container_parent_child(CamelFolderThreadNode *parent, CamelFolderThreadNode *chi
 
 	printf("DAMN, we shouldn't  be here!\n");
 }
+#endif
+
 
 static void
 prune_empty(CamelFolderThread *thread, CamelFolderThreadNode **cp)

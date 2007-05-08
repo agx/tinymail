@@ -27,6 +27,8 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include <errno.h>
 
 #include "camel-pop3-folder.h"
@@ -521,7 +523,7 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 
 	camel_operation_end(NULL);
 
-	camel_pop3_store_expunge (pop3_store, ex);
+	/* camel_pop3_store_expunge (pop3_store, ex); */
 
 	return 0;
 	
@@ -582,8 +584,6 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	CamelPOP3FolderInfo *fi = data;
 	unsigned char *buffer;
 	int w = 0, n;
-	CamelMimeParser *mp;
-	struct _camel_header_raw *h;
 	gchar *boundary = NULL;
 	gboolean occurred = FALSE, theend = FALSE;
 	unsigned int len;
@@ -595,8 +595,6 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 
 	while (!theend && camel_pop3_stream_line (stream, &buffer, &len) > 0)
 	{
-		char *p = NULL;
-
 		if (!buffer)
 			continue;
 
@@ -673,7 +671,6 @@ done:
 	camel_object_unref((CamelObject *)fi->stream);
 	fi->stream = NULL;
 
-ending:
 	if (boundary)
 		g_free (boundary);
 }

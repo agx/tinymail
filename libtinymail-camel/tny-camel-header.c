@@ -75,10 +75,7 @@ _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *info)
 static const gchar*
 tny_camel_header_get_replyto (TnyHeader *self)
 {
-	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
-	const gchar *retval = NULL;
-
-	return retval;
+	return NULL;
 }
 
 

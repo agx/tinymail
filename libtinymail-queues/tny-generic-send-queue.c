@@ -97,7 +97,7 @@ generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
 	GError *err = NULL;
 
 	if (priv->cancelled)
-		return;
+		return NULL;
 
 	list = tny_simple_list_new ();
 	tny_transport_account_send (priv->account, info->msg, &err);
@@ -135,8 +135,6 @@ static void
 generic_send_callback (OAsyncWorkerTask *task, gpointer func_result)
 {
 	GenericSendInfo *info = o_async_worker_task_get_arguments (task);
-	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (info->self);
-
 	g_object_unref (info->self);
 	g_slice_free (GenericSendInfo, info);
 }
@@ -254,7 +252,6 @@ static void
 tny_generic_send_queue_update_default (TnyFolderObserver *self, TnyFolderChange *change)
 {
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
-	GError *err = NULL;
 	TnyFolder *outbox;
 	OAsyncWorkerTask *task;
 	GenericSendInfo *info;

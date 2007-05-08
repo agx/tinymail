@@ -121,8 +121,6 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self)
 	/* camel_session_get_service can launch GUI things */
 	if (apriv->session)
 	{
-		CamelService *oservice = apriv->service;
-
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
@@ -150,7 +148,6 @@ static void
 tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!apriv->url_string || !apriv->service || !CAMEL_IS_SERVICE (apriv->service))
 	{

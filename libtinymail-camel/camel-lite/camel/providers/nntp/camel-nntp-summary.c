@@ -162,7 +162,6 @@ static int
 summary_header_load(CamelFolderSummary *s)
 {
 	CamelNNTPSummary *cns = CAMEL_NNTP_SUMMARY(s);
-	unsigned char *ptrchr = s->filepos;
 
 	if (((CamelFolderSummaryClass *)camel_nntp_summary_parent)->summary_header_load(s) == -1)
 		return -1;

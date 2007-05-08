@@ -282,7 +282,6 @@ tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 {
 	GetMsgInfo *info;
 	GThread *thread;
-	GError *err = NULL;
 
 	info = g_slice_new (GetMsgInfo);
 	info->self = self;
@@ -523,7 +522,6 @@ static gboolean
 refresh_async_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
-	TnyFolder *self = info->self;
 
 	if (info->callback)
 		info->callback (info->self, info->cancelled, &info->err, info->user_data);
@@ -605,7 +603,6 @@ tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callba
 {
 	RefreshFolderInfo *info;
 	GThread *thread;
-	GError *err = NULL;
 
 	info = g_slice_new (RefreshFolderInfo);
 	info->err = NULL;
@@ -693,7 +690,6 @@ static gboolean
 transfer_msgs_async_callback (gpointer thr_user_data)
 {
 	TransferMsgsInfo *info = thr_user_data;
-	TnyFolder *self = info->self;
 
 	if (info->callback)
 		info->callback (info->self, &info->err, info->user_data);
@@ -708,7 +704,6 @@ transfer_msgs_async_thread (gpointer thr_user_data)
 	TransferMsgsInfo *info = thr_user_data;
 	TnyFolder *self = info->self;
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
-	TnyIterator *iter;
 
 	g_static_rec_mutex_lock (priv->lock);
 	tny_merge_folder_transfer_msgs (info->self, info->header_list, info->folder_dst, info->delete_originals, &info->err);

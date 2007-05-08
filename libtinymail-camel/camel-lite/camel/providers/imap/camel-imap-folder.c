@@ -34,6 +34,7 @@
 #define MAX_LINE_LEN 1024 
 
 #include <config.h> 
+#include <string.h>
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -627,9 +628,9 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	else if (exists > count)
 		camel_imap_folder_changed (folder, exists, NULL, ex);
 
-	if (highestmodseq != NULL & suc && needtoput)
+	if (highestmodseq != NULL && suc && needtoput)
 		put_highestmodseq (imap_folder, (const char *) highestmodseq);
-	
+
 	if (highestmodseq != NULL)
 		g_free (highestmodseq);
 
@@ -816,6 +817,7 @@ done:
 	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary);
 }
 
+#if 0
 static void
 flags_to_label(CamelFolder *folder, CamelImapMessageInfo *mi)
 {
@@ -851,6 +853,8 @@ flags_to_label(CamelFolder *folder, CamelImapMessageInfo *mi)
 	}
 }
 
+#endif
+
 static gboolean 
 imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodseq, CamelException *ex)
 {
@@ -864,13 +868,9 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
-	struct {
-		char *uid;
-		guint32 flags;
-	} *new;
 	char *resp;
 	CamelImapResponseType type;
-	int i, summary_len, summary_got;
+	int summary_len, summary_got;
 	CamelMessageInfo *info;
 	CamelImapMessageInfo *iinfo;
 	gboolean ok, retval = TRUE;
@@ -882,7 +882,7 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 	if (summary_len == 0) {
 		if (exists)
 			camel_imap_folder_changed (folder, exists, NULL, ex);
-		return;
+		return TRUE;
 	}
 
 	camel_operation_start (NULL, _("Scanning for changed messages in %s"), folder->name);
@@ -2033,9 +2033,7 @@ imap_transfer_online (CamelFolder *source, GPtrArray *uids,
 		      CamelFolder *dest, GPtrArray **transferred_uids,
 		      gboolean delete_originals, CamelException *ex)
 {
-	CamelImapStore *store = CAMEL_IMAP_STORE (source->parent_store);
 	int count;
-
 	/* Sync message flags if needed. */
 	imap_sync_online (source, ex);
 	if (camel_exception_is_set (ex))
@@ -2824,6 +2822,7 @@ message_from_data (CamelFolder *folder, GData *data)
 	return mi;
 }
 
+#if 0
 static void
 add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 		       int first, GData *data)
@@ -2865,6 +2864,8 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	return;
 }
 
+#endif
+
 /* #define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE " */
 
 #ifdef NON_TINYMAIL_FEATURES
@@ -2885,8 +2886,7 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 {
 	char *resp = NULL;
 	CamelImapResponseType type;
-	guint32 cnt = 0, slen;
-	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+	guint32 cnt = 0;
 	gchar *uid, *str;
 
 	while ((type = camel_imap_command_response (store, &resp, ex)) ==
@@ -2943,7 +2943,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    char *resp;
    GData *data;
    gboolean more = TRUE, oosync = FALSE, oldrescval = imap_folder->need_rescan;
-   unsigned int nextn, cnt=0, tcnt=0, ucnt=0, rec=0, ineed = 0, allhdrs = 0;
+   unsigned int nextn, cnt=0, tcnt=0, ucnt=0, ineed = 0, allhdrs = 0;
 
    if (!store->ostream || !store->istream)
 	return;
@@ -3263,12 +3263,7 @@ typedef struct {
 static void 
 process_idle_response (IdleResponse *idle_resp)
 {
-	CamelImapStore *store;
-	char *resp = NULL;
-	const char *header_spec;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	CamelImapResponseType type;
-	CamelImapMessageInfo *mi, *info;
 
 	if (!idle_resp)
 		return;
@@ -3427,7 +3422,6 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 
 	if (store->current_folder)
 	{
-		GArray *expunged = NULL;
 		resp = NULL;
 		while (camel_imap_store_readline_nb (store, &resp, &ex) > 0)
 		{
@@ -3513,7 +3507,6 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 {
 	CamelImapStore *store;
 	IdleResponse *idle_resp = NULL;
-	GSource *src;
 	gboolean had_err = FALSE;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
@@ -3577,7 +3570,7 @@ idle_timeout_checker (gpointer data)
 
 	/* printf ("idle\n"); */
 
-	if (!folder || ((CamelObject *)data)->ref_count <= 0 && !CAMEL_IS_IMAP_FOLDER (folder))
+	if ((!folder) || ((((CamelObject *)data)->ref_count <= 0) && (!CAMEL_IS_IMAP_FOLDER (folder))))
 		return FALSE;
 
 	store = CAMEL_IMAP_STORE (folder->parent_store);
@@ -3838,11 +3831,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	CamelImapStore *store = NULL;
 	CamelStream *stream = NULL;
 	gboolean connected = FALSE, idle_rt = FALSE;
-	CamelException  tex = CAMEL_EXCEPTION_INITIALISER, 
-			myex = CAMEL_EXCEPTION_INITIALISER,
-			cex = CAMEL_EXCEPTION_INITIALISER;
+	CamelException  tex = CAMEL_EXCEPTION_INITIALISER;
 	ssize_t nread = 0; gboolean amcon = FALSE;
-	gchar *a_resp = NULL;
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
@@ -3936,7 +3926,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			int f = 0;
 			ssize_t hread = 1;
 			gint length=0, rec=0;
-			long seq;
 			char *pos, *ppos;
 
 			nread = 1;
@@ -4036,7 +4025,7 @@ berrorhander:
 				goto errorhander;
 		} else 
 		{
-			gboolean first = TRUE, err=FALSE;
+			gboolean err=FALSE;
 			gchar line [MAX_LINE_LEN];
 			guint linenum = 0;
 			CamelStreamBuffer *server_stream;
@@ -4067,7 +4056,7 @@ berrorhander:
 				store->command++;
 
 			if (server_stream) 
-			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
+			  while ((nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0))
 			  {
 				gint llen = 0;
 
@@ -4126,7 +4115,7 @@ berrorhander:
 
 				memset (line, 0, MAX_LINE_LEN);
 			  }
-merrorhandler:
+
 			g_mutex_unlock (store->stream_lock);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			/* Starts idle */
@@ -4160,7 +4149,7 @@ merrorhandler:
 
 		for (t=0; t < 2; t++)
 		{
-			gboolean first = TRUE, err=FALSE;
+			gboolean err=FALSE;
 			gchar line[MAX_LINE_LEN];
 			guint linenum = 0; 
 			CamelStreamBuffer *server_stream;
@@ -4204,7 +4193,7 @@ merrorhandler:
 				store->command++;
 
 			if (server_stream) 
-			  while (nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0)
+			  while ((nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0))
 			  {
 				gint llen = 0;
 

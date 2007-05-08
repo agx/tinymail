@@ -327,10 +327,6 @@ tny_camel_msg_header_get_uid (TnyHeader *self)
 static void
 tny_camel_msg_header_finalize (GObject *object)
 {
-	TnyCamelMsgHeader *self = (TnyCamelMsgHeader*) object;
-
-	/* Read _tny_camel_msg_header_new too! */
-
 	(*parent_class->finalize) (object);
 
 	return;

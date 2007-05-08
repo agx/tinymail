@@ -81,7 +81,6 @@ static GObjectClass *parent_class = NULL;
 #include <tny-get-msg-queue.h>
 #endif
 
-static TnySendQueue *queue = NULL;
 
 typedef struct _TnyDemouiSummaryViewPriv TnyDemouiSummaryViewPriv;
 
@@ -517,12 +516,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	GtkTreeModel *hmodel;
 	GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
 	GtkTreeModel *sortable;
-	gboolean refresh = FALSE;
 	GtkSelectionMode mode;
-
-#ifndef ASYNC_HEADERS
-	refresh = TRUE;
-#endif
 
 	mode = gtk_tree_selection_get_mode (selection);
 
@@ -669,12 +663,11 @@ static void
 on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			GtkTreeViewColumn *col,  gpointer userdata)
 {
-	TnyDemouiSummaryViewPriv *priv = userdata;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
-		
+
 	model = gtk_tree_view_get_model(treeview);
-    
+
 	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
 	{
 		TnyHeader *header;

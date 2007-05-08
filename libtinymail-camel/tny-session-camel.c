@@ -64,8 +64,6 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		const char *prompt, const char *item, guint32 flags, CamelException *ex)
 {
 	TnySessionCamel *self = (TnySessionCamel *) session;
-	TnySessionCamelPriv *priv = self->priv;
-
 	TnyGetPassFunc func;
 	TnyAccount *account;
 	gboolean freeprmpt = FALSE, cancel = FALSE;
@@ -109,8 +107,6 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		retval = NULL;
 	}
 
-emptypass:
-
 	return retval;
 }
 
@@ -141,8 +137,6 @@ static void
 tny_session_camel_forget_password (CamelSession *session, CamelService *service, const char *domain, const char *item, CamelException *ex)
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
-	TnySessionCamelPriv *priv = self->priv;
-
 	TnyForgetPassFunc func;
 	TnyAccount *account;
 
@@ -175,13 +169,11 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
 	TnySessionCamelPriv *priv = self->priv;
-	GThread *thread; gboolean inf;
 	gboolean retval = FALSE;
 	GError *err = NULL;
 
 	if (priv->account_store)
 	{
-		TnyAccountStore *account_store = (TnyAccountStore*) priv->account_store;
 		TnyAlertType tnytype;
 
 		switch (type)

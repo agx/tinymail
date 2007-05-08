@@ -159,7 +159,6 @@ static CamelLocalSummary *maildir_create_summary(CamelLocalFolder *lf, const cha
 static void
 maildir_append_message (CamelFolder *folder, CamelMimeMessage *message, const CamelMessageInfo *info, char **appended_uid, CamelException *ex)
 {
-	CamelMaildirFolder *maildir_folder = (CamelMaildirFolder *)folder;
 	CamelLocalFolder *lf = (CamelLocalFolder *)folder;
 	CamelStream *output_stream;
 	CamelMessageInfo *mi;

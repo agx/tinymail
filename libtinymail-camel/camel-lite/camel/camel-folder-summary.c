@@ -1236,7 +1236,6 @@ camel_folder_summary_info_new_from_parser(CamelFolderSummary *s, CamelMimeParser
 	CamelMessageInfo *info = NULL;
 	char *buffer;
 	size_t len;
-	struct _CamelFolderSummaryPrivate *p = _PRIVATE(s);
 	off_t start;
 
 	/* should this check the parser is in the right state, or assume it is?? */
@@ -1265,7 +1264,6 @@ CamelMessageInfo *
 camel_folder_summary_info_new_from_message(CamelFolderSummary *s, CamelMimeMessage *msg)
 {
 	CamelMessageInfo *info;
-	struct _CamelFolderSummaryPrivate *p;
 
 	if (s != NULL)
 	{
@@ -1954,9 +1952,7 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	CamelMessageInfoBase *mi;
 	const char *received;
 	guchar digest[16];
-	struct _camel_header_references *refs, *irt, *scan;
 	char *msgid, *r=NULL;
-	int count;
 	char *subject, *from, *to, *cc;
 	CamelContentType *ct = NULL;
 	const char *content, *charset = NULL;
@@ -2233,9 +2229,11 @@ static int
 message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 {
 	guint32 count;
+#ifdef NON_TINYMAIL_FEATURES
 	CamelFlag *flag;
 	CamelTag *tag;
 	int i;
+#endif
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 
 	/* if (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
@@ -2521,8 +2519,6 @@ summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, Cam
 	CamelMessageContentInfo *info = NULL;
 	CamelContentType *ct;
 	int enc_id = -1, chr_id = -1, html_id = -1, idx_id = -1;
-	struct _CamelFolderSummaryPrivate *p = _PRIVATE(s);
-	CamelMimeFilterCharset *mfc;
 	CamelMessageContentInfo *part;
 
 	d(printf("building content info\n"));
@@ -3189,9 +3185,10 @@ static CamelMessageInfo *
 message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 {
 	CamelMessageInfoBase *to, *from = (CamelMessageInfoBase *)mi;
+#ifdef NON_TINYMAIL_FEATURES
 	CamelFlag *flag;
 	CamelTag *tag;
-
+#endif
 	to = (CamelMessageInfoBase *)camel_message_info_new(s);
 
 	to->flags = from->flags;

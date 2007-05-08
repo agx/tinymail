@@ -1,3 +1,7 @@
+2007-05-08  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* -Wall warnings fixed
+
 2007-05-08  Murray Cumming  <murrayc@murrayc.com
 
 	* docs/devel/reference/tmpl/tny-shared.sgml:

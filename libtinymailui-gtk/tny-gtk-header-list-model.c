@@ -21,6 +21,7 @@
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
+#include <gdk/gdk.h>
 
 #include <tny-gtk-header-list-model.h>
 #include <tny-gtk-header-list-iterator-priv.h>
@@ -378,7 +379,7 @@ tny_gtk_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 	gint newv;
 
-	if (iter->stamp != TNY_GTK_HEADER_LIST_MODEL (self)->stamp, FALSE)
+	if (iter->stamp != TNY_GTK_HEADER_LIST_MODEL (self)->stamp)
 		return FALSE;
 
 	g_static_rec_mutex_lock (list_model->iterator_lock);

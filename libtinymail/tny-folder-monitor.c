@@ -17,6 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <string.h>
 #include <config.h>
 #include <glib.h>
 #include <glib/gi18n-lib.h>
@@ -379,6 +380,7 @@ tny_folder_monitor_class_init (TnyFolderMonitorClass *klass)
 	klass->update_func = tny_folder_monitor_update_default;
 	klass->poke_status_func = tny_folder_monitor_poke_status_default;
 	klass->add_list_func = tny_folder_monitor_add_list_default;
+	klass->remove_list_func = tny_folder_monitor_remove_list_default;
 	klass->stop_func = tny_folder_monitor_stop_default;
 	klass->start_func = tny_folder_monitor_start_default;
 

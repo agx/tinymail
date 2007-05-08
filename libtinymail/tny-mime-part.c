@@ -597,7 +597,7 @@ tny_mime_part_get_content_type (TnyMimePart *self)
  * @type: The content type in the string format type/subtype
  * 
  * Efficiently checks whether @self is of type @type. You can use things
- * like "type/*" for matching. Only '*' works and stands for 'any'. It's not 
+ * like "type/ *" for matching. Only '*' works and stands for 'any'. It's not 
  * a regular expression nor is it like a regular expression.
  *
  * Example:
@@ -609,7 +609,7 @@ tny_mime_part_get_content_type (TnyMimePart *self)
  * while (!tny_iterator_is_done (iter))
  * {
  *      TnyMimePart *part = TNY_MIME_PART (tny_iterator_get_current (iter));
- *      if (tny_mime_part_content_type_is (part, "text/*"))
+ *      if (tny_mime_part_content_type_is (part, "text/ *"))
  *              g_print ("Found an E-mail body\n");
  *      if (tny_mime_part_content_type_is (part, "text/html"))
  *              g_print ("Found an E-mail HTML body\n"); 

@@ -697,8 +697,6 @@ folder_obsr_update_idle (gpointer user_data)
 	TnyFolderChange *change = info->change;
 	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
-	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel *) self;
-
 
 	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME ||
 		changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || 

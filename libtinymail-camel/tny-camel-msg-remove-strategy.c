@@ -70,7 +70,6 @@ tny_camel_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStrategy *self
 {
 	const gchar *id;
 	CamelFolder *cfolder;
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 	g_assert (TNY_IS_HEADER (header));

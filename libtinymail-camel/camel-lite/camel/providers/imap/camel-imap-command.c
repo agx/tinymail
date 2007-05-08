@@ -188,7 +188,6 @@ static gboolean
 imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		    const char *cmd, CamelException *ex)
 {
-	GThread *thread;
 	ssize_t nwritten;
 	gchar *resp = NULL;
 	CamelException myex = CAMEL_EXCEPTION_INITIALISER;

@@ -231,7 +231,6 @@ void
 camel_data_cache_set_flags (CamelDataCache *cdc, const char *path, CamelMessageInfoBase *mi)
 {
 	char mystring [512];
-	gchar *mpath; char *dir;
 	guint32 hash;
 	hash = g_str_hash(mi->uid);
 	hash = (hash>>5)&CAMEL_DATA_CACHE_MASK;
@@ -279,7 +278,6 @@ camel_data_cache_set_partial (CamelDataCache *cdc, const char *path,
 					      const char *uid, gboolean partial)
 {
 	int fd; char *dir;
-	gboolean retval = FALSE;
 	gchar *mpath;
 	guint32 hash;
 	hash = g_str_hash(uid);

@@ -20,6 +20,7 @@
 /* TODO: Refactory this type to libtinymailui-gtk */
 #include <config.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include <glib/gi18n-lib.h>
 

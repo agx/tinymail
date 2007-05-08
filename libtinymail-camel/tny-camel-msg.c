@@ -220,7 +220,6 @@ tny_camel_msg_finalize (GObject *object)
 {
 	TnyCamelMsg *self = (TnyCamelMsg*) object;
 	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
-	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->message_lock);
 	g_mutex_lock (priv->header_lock);

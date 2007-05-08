@@ -265,7 +265,6 @@ static void
 tny_gtk_msg_view_set_unavailable_default (TnyMsgView *self)
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
-	GtkTextBuffer *buffer;
 
 	tny_msg_view_clear (self);
 
@@ -425,7 +424,6 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar 
 {
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	TnyMimePartView *mpview = NULL;
-	gboolean doit = TRUE;
 
 	mpview = tny_msg_view_create_mime_part_view_for (TNY_MSG_VIEW (self), part);
 
@@ -433,8 +431,6 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar 
 	{
 		if (GTK_IS_WIDGET (mpview))
 		{
-			GtkWidget *expander = NULL;
-
 			if (TNY_IS_GTK_MSG_VIEW (mpview) && !GTK_IS_WINDOW (mpview) && !priv->in_expander)
 			{
 				TnyGtkMsgViewPriv *mppriv = TNY_GTK_MSG_VIEW_GET_PRIVATE (mpview);
@@ -507,7 +503,9 @@ tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alter
 	while (!tny_iterator_is_done (iterator))
 	{
 		TnyMimePart *part = (TnyMimePart*)tny_iterator_get_current (iterator);
-		gboolean displayed = tny_gtk_msg_view_display_part (self, part, desc);
+		/* gboolean displayed =  */
+
+		tny_gtk_msg_view_display_part (self, part, desc);
 
 		g_object_unref (G_OBJECT (part));
 
@@ -635,7 +633,6 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 
 		} else
 		{
-			TnyIterator *iterator;
 			TnyList *list;
 			list = tny_simple_list_new ();
 

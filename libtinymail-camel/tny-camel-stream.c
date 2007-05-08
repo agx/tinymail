@@ -148,18 +148,6 @@ tny_camel_stream_get_stream (TnyCamelStream *self)
 	return priv->stream;
 }
 
-static void
-tny_camel_stream_set_stream (TnyCamelStream *self, CamelStream *stream)
-{
-	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
-
-	if (priv->stream)
-		camel_object_unref (CAMEL_OBJECT (priv->stream));
-
-	priv->stream = stream;
-
-	return;
-}
 
 /**
  * tny_camel_stream_new:

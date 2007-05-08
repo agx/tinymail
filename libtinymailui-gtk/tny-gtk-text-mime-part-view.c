@@ -119,9 +119,8 @@ tny_gtk_text_mime_part_view_clear (TnyMimePartView *self)
 static void
 tny_gtk_text_mime_part_view_clear_default (TnyMimePartView *self)
 {
-	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-	
+
 	if (buffer && GTK_IS_TEXT_BUFFER (buffer))
 		gtk_text_buffer_set_text (buffer, "", 0);
 

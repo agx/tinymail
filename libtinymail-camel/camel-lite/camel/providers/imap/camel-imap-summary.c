@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "camel-imap-message-cache.h"
 #include "camel-imap-summary.h"
 #include "camel-imap-utils.h"
 #include "camel-file-utils.h"
@@ -289,8 +290,10 @@ camel_imap_summary_add_offline (CamelFolderSummary *summary, const char *uid,
 				const CamelMessageInfo *info)
 {
 	CamelImapMessageInfo *mi;
+#ifdef NON_TINYMAIL_FEATURES
 	const CamelFlag *flag;
 	const CamelTag *tag;
+#endif
 
 	/* Create summary entry */
 	mi = (CamelImapMessageInfo *)camel_folder_summary_info_new_from_message (summary, message);

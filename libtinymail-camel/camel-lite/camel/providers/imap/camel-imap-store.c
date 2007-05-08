@@ -1998,7 +1998,7 @@ camel_imap_store_set_status_for (CamelImapStore *imap_store, const char *folder_
 
 	if (file != NULL)
 	{
-		fprintf (file, "%#d %#d %#d", messages, unseen, uidnext);
+		fprintf (file, "%d %d %d", messages, unseen, uidnext);
 		fclose (file);
 	}
 
@@ -3100,11 +3100,6 @@ my_du (char *name, int *my_size)
 	}
 
 	closedir (dir);
-}
-
-static void
-get_some_numbers (CamelStore *store, CamelFolderInfo *fi)
-{
 }
 
 static void

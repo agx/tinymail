@@ -113,7 +113,7 @@ vtrash_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 	CamelFolder *folder = (CamelFolder *)object;
 	int i;
 	guint32 tag;
-	int unread = -1, deleted = 0, junked = 0, visible = 0, count = -1;
+	int unread = -1, deleted = 0, count = -1;
 
 	for (i=0;i<args->argc;i++) {
 		CamelArgGet *arg = &args->argv[i];

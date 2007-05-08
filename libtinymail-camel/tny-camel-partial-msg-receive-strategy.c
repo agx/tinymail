@@ -42,6 +42,7 @@
 #include "tny-camel-account-priv.h"
 #include "tny-camel-folder-priv.h"
 #include "tny-camel-msg-header-priv.h"
+#include "tny-camel-msg-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
