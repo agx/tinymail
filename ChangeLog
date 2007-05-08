@@ -1,3 +1,14 @@
+2007-05-08  Javier Fernandez  <jfernandez@igalia.com
+
+	* libtinymail/tny-merge-folder.c: Add cancelled parameter to 
+	transfer_msgs_async function.
+	* libtinymail/tny-shared.h: Change TransferMsgsAsync callback 
+	API function.
+	* libtinymail/tny-shared.h: Add a new status code for transfer_msgs_async 
+	function.
+	* ibtinymail-camel/tny-camel-folder.c : Implementation of status_callbacks 
+	calls in transfer_msgs_async function.
+
 2007-05-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* -Wall warnings fixed

@@ -691,8 +691,8 @@ transfer_msgs_async_callback (gpointer thr_user_data)
 {
 	TransferMsgsInfo *info = thr_user_data;
 
-	if (info->callback)
-		info->callback (info->self, &info->err, info->user_data);
+	if (info->callback) /* TODO: the cancelled field */
+		info->callback (info->self, FALSE, &info->err, info->user_data);
 
 	return FALSE;
 }
