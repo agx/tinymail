@@ -1,3 +1,10 @@
+2007-05-09  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* configure.ac, Makefile.am:
+	Now Maemo target also compiles gnomevfs module.
+	* debian/control.maemo:
+	Added package for gnomevfs module
+
 2007-05-08  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-queues/libtinymail-queues.pc.in: Fixed the name of the
@@ -20,7 +27,7 @@
 	* -Wall warnings fixed
 	* Speedups in TnyGtkHeaderListModel
 
-2007-05-08  Murray Cumming  <murrayc@murrayc.com
+2007-05-08  Murray Cumming  <murrayc@murrayc.com>
 
 	* docs/devel/reference/tmpl/tny-shared.sgml:
 	TnyGetPassFunc:

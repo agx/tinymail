@@ -83,6 +83,7 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
         build_gtkhtml=false
         build_mozembed=false
         build_gnome=false
+	build_maemo=true
         with_html_component=none
 	build_uigtk=true
 	build_demoui=true
@@ -299,12 +300,17 @@ if test x$build_gnome = xtrue; then
 extragtkpkgs="libgnomeui-2.0 gnome-keyring-1"
 extratnypkgs="gnome-vfs-2.0"
   PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
+elif test x$build_maemo = xtrue; then
+extragtkpkgs=
+extratnypkgs="gnome-vfs-2.0"
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
 else
   LIBTINYMAIL_GNOMEVFS_CFLAGS=
   LIBTINYMAIL_GNOMEVFS_LIBS=
   extragtkpkgs=
   extratnypkgs=
 fi
+
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_LIBS)
 
@@ -371,6 +377,7 @@ if test x$PLATFORMDIR = xlibtinymail-maemo; then
 fi
 
 
+AM_CONDITIONAL(BUILD_MAEMO, test x$build_maemo = xtrue)
 
 
 

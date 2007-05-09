@@ -16,6 +16,10 @@ if BUILD_MOZEMBED
 SUBDIRS += libtinymailui-mozembed 
 endif
 
+if BUILD_MAEMO
+SUBDIRS += libtinymail-gnomevfs
+endif
+
 SUBDIRS += libtinymail-camel $(PLATFORMDIR) 
 
 if BUILD_ACAP
