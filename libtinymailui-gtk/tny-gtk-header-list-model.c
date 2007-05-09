@@ -39,43 +39,49 @@ static GObjectClass *parent_class;
 
 #include "tny-gtk-header-list-iterator-priv.h"
 
+
 static gint 
 add_del_timeout (TnyGtkHeaderListModel *me, guint num)
 {
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me);
+
 	gint retval = 0;
-	g_mutex_lock (me->to_lock);
-	if (!me->del_timeouts)
-		me->del_timeouts = g_array_new (FALSE, FALSE, sizeof (guint));
-	g_array_append_val (me->del_timeouts, num);
-	retval = me->del_timeouts->len-1;
-	g_mutex_unlock (me->to_lock);
+	g_mutex_lock (priv->to_lock);
+	if (!priv->del_timeouts)
+		priv->del_timeouts = g_array_new (FALSE, FALSE, sizeof (guint));
+	g_array_append_val (priv->del_timeouts, num);
+	retval = priv->del_timeouts->len-1;
+	g_mutex_unlock (priv->to_lock);
+
 	return retval;
 }
 
 static void
 remove_del_timeouts (TnyGtkHeaderListModel *me)
 {
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me);
+
 	gint i;
 	guint src;
 
-	g_mutex_lock (me->to_lock);
+	g_mutex_lock (priv->to_lock);
 
-	if (!me->del_timeouts)
+	if (!priv->del_timeouts)
 	{
-		g_mutex_unlock (me->to_lock);
+		g_mutex_unlock (priv->to_lock);
 		return;
 	}
 
-	for (i = 0; i < me->del_timeouts->len; i++)
+	for (i = 0; i < priv->del_timeouts->len; i++)
 	{
-		src = g_array_index (me->del_timeouts, guint, i);
+		src = g_array_index (priv->del_timeouts, guint, i);
 		if (src > 0)
 			g_source_remove (src);
-		g_array_index (me->del_timeouts, guint, i) = 0;
+		g_array_index (priv->del_timeouts, guint, i) = 0;
 	}
-	g_array_free (me->del_timeouts, TRUE);
-	me->del_timeouts = NULL;
-	g_mutex_unlock (me->to_lock);
+	g_array_free (priv->del_timeouts, TRUE);
+	priv->del_timeouts = NULL;
+	g_mutex_unlock (priv->to_lock);
 }
 
 static guint
@@ -127,30 +133,32 @@ tny_gtk_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 static gboolean
 tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePath *path)
 {
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
-	gint i, tlen; gboolean retval=FALSE;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+
+	gint i, tlen; 
+	gboolean retval=FALSE;
 
 	g_return_val_if_fail (gtk_tree_path_get_depth (path) > 0, FALSE);
 
-	g_static_rec_mutex_lock (list_model->iterator_lock); 
+	g_static_rec_mutex_lock (priv->iterator_lock); 
 
 	i = gtk_tree_path_get_indices (path)[0];
 
-	g_mutex_lock (list_model->ra_lock);
-	tlen = list_model->cur_len;
-	g_mutex_unlock (list_model->ra_lock);
+	g_mutex_lock (priv->ra_lock);
+	tlen = priv->cur_len;
+	g_mutex_unlock (priv->ra_lock);
 
 	if (i >= tlen)
 		retval = FALSE;
 	else {
 		if (i >= 0 && i < tlen) {
-			iter->stamp = list_model->stamp;
+			iter->stamp = priv->stamp;
 			iter->user_data = (gpointer) i;
 			retval = TRUE;
 		}
 	}
 
-	g_static_rec_mutex_unlock (list_model->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return retval;
 }
@@ -158,31 +166,31 @@ tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTr
 static GtkTreePath *
 tny_gtk_header_list_model_get_path (GtkTreeModel *self, GtkTreeIter *iter)
 {
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	GtkTreePath *tree_path;
 	gint i = 0, tlen;
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 
 	/* Return the path of an existing GtkTreeIter */
-	if  (!(iter->stamp == TNY_GTK_HEADER_LIST_MODEL (self)->stamp))
+	if  (!(iter->stamp == priv->stamp))
 		return NULL;
 
-	g_static_rec_mutex_lock (list_model->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
 	i = (gint) iter->user_data;
 
-	g_mutex_lock (list_model->ra_lock);
-	tlen = list_model->cur_len;
-	g_mutex_unlock (list_model->ra_lock);
+	g_mutex_lock (priv->ra_lock);
+	tlen = priv->cur_len;
+	g_mutex_unlock (priv->ra_lock);
 
 	if (i < 0 || i >= tlen) {
-		g_static_rec_mutex_unlock (list_model->iterator_lock);
+		g_static_rec_mutex_unlock (priv->iterator_lock);
 		return NULL;
 	}
 
 	tree_path = gtk_tree_path_new ();
 	gtk_tree_path_append_index (tree_path, i);
 
-	g_static_rec_mutex_unlock (list_model->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return tree_path;
 }
@@ -219,7 +227,7 @@ _get_readable_date (time_t file_time_raw)
 gint 
 tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (model);
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (model);
 
 	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
@@ -228,8 +236,8 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 	 * the GPtrArray. This must be quite efficient, as this is called lots
 	 * of times while you are sorting things. */
 
-	hdr_a = list_model->items->pdata[(gint)a->user_data];
-	hdr_b = list_model->items->pdata[(gint)b->user_data];
+	hdr_a = priv->items->pdata[(gint)a->user_data];
+	hdr_b = priv->items->pdata[(gint)b->user_data];
 
 	recv_a = tny_header_get_date_received (hdr_a);
 	recv_b = tny_header_get_date_received (hdr_b);
@@ -251,7 +259,7 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 gint  
 tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (model);
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (model);
 
 	TnyHeader *hdr_a, *hdr_b;
 	time_t recv_a, recv_b;
@@ -260,8 +268,8 @@ tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter 
 	 * the GPtrArray. This must be quite efficient, as this is called lots
 	 * of times while you are sorting things. */
 
-	hdr_a = list_model->items->pdata[(gint)a->user_data];
-	hdr_b = list_model->items->pdata[(gint)b->user_data];
+	hdr_a = priv->items->pdata[(gint)a->user_data];
+	hdr_b = priv->items->pdata[(gint)b->user_data];
 
 	recv_a = tny_header_get_date_sent (hdr_a);
 	recv_b = tny_header_get_date_sent (hdr_b);
@@ -272,15 +280,16 @@ tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter 
 static void
 tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint column, GValue *value)
 {
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+
 	const gchar *str;
 	gchar *rdate = NULL;
 	gint i;
 
-	if (iter->stamp != list_model->stamp)
+	if (iter->stamp != priv->stamp)
 		return;
 
-	g_static_rec_mutex_lock (list_model->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
 	/* Get the index out of the iter, and use the item by looking it up in
 	 * the GPtrArray. This must be quite efficient, as this is called lots
@@ -291,10 +300,10 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	/* Exception on list_model->cur_len (this one truly allows the full 
 	 * length of the available data in the array, not only the registered
 	 * length, although in 99.999999% of the cases it's the same) */
-	if (i < 0 || i >= list_model->items->len)
+	if (i < 0 || i >= priv->items->len)
 	{
 		g_warning ("GtkTreeModel in invalid state\n");
-		g_static_rec_mutex_unlock (list_model->iterator_lock);
+		g_static_rec_mutex_unlock (priv->iterator_lock);
 		return;
 	}
 
@@ -302,13 +311,13 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_cc ((TnyHeader*) list_model->items->pdata[i]);
+			str = tny_header_get_cc ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			rdate = _get_readable_date (tny_header_get_date_sent ((TnyHeader*) list_model->items->pdata[i]));
+			rdate = _get_readable_date (tny_header_get_date_sent ((TnyHeader*) priv->items->pdata[i]));
 			if (rdate)
 				g_value_set_string (value, rdate);
 			else
@@ -316,7 +325,7 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			rdate = _get_readable_date (tny_header_get_date_received ((TnyHeader*) list_model->items->pdata[i]));
+			rdate = _get_readable_date (tny_header_get_date_received ((TnyHeader*) priv->items->pdata[i]));
 			if (rdate)
 				g_value_set_string (value, rdate);
 			else
@@ -325,49 +334,49 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
 			g_value_init (value, G_TYPE_INT);
 			g_value_set_int (value, 
-					    tny_header_get_date_sent ((TnyHeader*) list_model->items->pdata[i]));
+					    tny_header_get_date_sent ((TnyHeader*) priv->items->pdata[i]));
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN:
 			g_value_init (value, G_TYPE_INT);
 			g_value_set_int (value, 
-					 tny_header_get_date_received ((TnyHeader*) list_model->items->pdata[i]));
+					 tny_header_get_date_received ((TnyHeader*) priv->items->pdata[i]));
 			break;
 
 		case TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN:
 			g_value_init (value, G_TYPE_INT);
-			g_value_set_int (value, tny_header_get_message_size((TnyHeader*) list_model->items->pdata[i]));
+			g_value_set_int (value, tny_header_get_message_size((TnyHeader*) priv->items->pdata[i]));
 			break;			
 		case TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN:
 			g_value_init (value, G_TYPE_OBJECT);
-			g_value_set_object (value, (TnyHeader*) list_model->items->pdata[i]);
+			g_value_set_object (value, (TnyHeader*) priv->items->pdata[i]);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_to ((TnyHeader*) list_model->items->pdata[i]);
+			str = tny_header_get_to ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_subject ((TnyHeader*) list_model->items->pdata[i]);
+			str = tny_header_get_subject ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_from ((TnyHeader*) list_model->items->pdata[i]);
+			str = tny_header_get_from ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
 				g_value_set_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			g_value_init (value, G_TYPE_INT);
-			g_value_set_int (value, tny_header_get_flags ((TnyHeader*) list_model->items->pdata[i]));
+			g_value_set_int (value, tny_header_get_flags ((TnyHeader*) priv->items->pdata[i]));
 			break;
 		default:
 			break;
 	}
 
-	g_static_rec_mutex_unlock (list_model->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return;
 }
@@ -375,34 +384,34 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 static gboolean
 tny_gtk_header_list_model_iter_next (GtkTreeModel *self, GtkTreeIter *iter)
 {
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	gboolean retval;
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 	gint newv;
 
-	if (iter->stamp != TNY_GTK_HEADER_LIST_MODEL (self)->stamp)
+	if (iter->stamp != priv->stamp)
 		return FALSE;
 
-	g_static_rec_mutex_lock (list_model->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
 	/* The next will simply be the current plus one: That's because we are
 	 * storing the GPtrArray's index in the iters. Simple, efficient. Just
 	 * always make sure that such an iter doesn't contain an index that
 	 * can't be part of the GPtrArray instance (would be devastating). */
 
-	newv = ((gint)iter->user_data);
+	newv = ((gint) iter->user_data);
 	newv++; 
 	iter->user_data = (gpointer) newv;
 
-	g_mutex_lock (list_model->ra_lock);
-	retval = (newv >= 0 && newv < list_model->cur_len);
-	g_mutex_unlock (list_model->ra_lock);
+	g_mutex_lock (priv->ra_lock);
+	retval = (newv >= 0 && newv < priv->cur_len);
+	g_mutex_unlock (priv->ra_lock);
 
 	if (!retval) {
 		iter->stamp = -1;
 		iter->user_data = (gpointer) 0;
 	}
 
-	g_static_rec_mutex_unlock (list_model->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return retval;
 }
@@ -419,19 +428,19 @@ tny_gtk_header_list_model_iter_has_child (GtkTreeModel *self, GtkTreeIter *iter)
 static gint
 tny_gtk_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter)
 {
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	gint retval = -1;
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
 
 	/* Return the amount of children for this GtkTreeIter. Because this
 	   is a flat list and has_child is always FALSE, we'll just always
 	   return the full length. */
 
-	g_static_rec_mutex_lock (list_model->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
 	if (G_LIKELY (!iter))
-		retval = list_model->cur_len;
+		retval = priv->cur_len;
 
-	g_static_rec_mutex_unlock (list_model->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return retval;
 }
@@ -439,22 +448,22 @@ tny_gtk_header_list_model_iter_n_children (GtkTreeModel *self, GtkTreeIter *iter
 static gboolean
 tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter, GtkTreeIter *parent, gint n)
 {
-	TnyGtkHeaderListModel *list_model = TNY_GTK_HEADER_LIST_MODEL (self);
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	gboolean retval = FALSE;
 	gint tlen;
 
 	if (G_UNLIKELY (parent))
 		return FALSE;
 
-	g_static_rec_mutex_lock (list_model->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
-	g_mutex_lock (list_model->ra_lock);
-	tlen = list_model->cur_len;
-	g_mutex_unlock (list_model->ra_lock);
+	g_mutex_lock (priv->ra_lock);
+	tlen = priv->cur_len;
+	g_mutex_unlock (priv->ra_lock);
 
 	if (n >= 0 && n < tlen) 
 	{
-		iter->stamp = TNY_GTK_HEADER_LIST_MODEL (self)->stamp;
+		iter->stamp = priv->stamp;
 		iter->user_data = (gpointer) n;
 		retval = TRUE;
 	} else {
@@ -462,7 +471,7 @@ tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 		iter->user_data = (gpointer) 0;
 	}
 
-	g_static_rec_mutex_unlock (list_model->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return retval;
 }
@@ -489,16 +498,16 @@ tny_gtk_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 static void
 notify_views_add_destroy (gpointer data)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) data;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (data);
 
-	g_mutex_lock (me->ra_lock);
-	me->updating_views = -1;
-	g_mutex_unlock (me->ra_lock);
+	g_mutex_lock (priv->ra_lock);
+	priv->updating_views = -1;
+	g_mutex_unlock (priv->ra_lock);
 
-	if (me->timeout_span < 5000)
-		me->timeout_span += 300;
-	me->add_timeout = 0;
-	g_object_unref (me);
+	if (priv->timeout_span < 5000)
+		priv->timeout_span += 300;
+	priv->add_timeout = 0;
+	g_object_unref (data);
 
 	return;
 }
@@ -506,48 +515,48 @@ notify_views_add_destroy (gpointer data)
 static gboolean
 notify_views_add (gpointer data)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) data;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (data);
 	gint already_registered, going_tb_registered, i;
  
 	gboolean needmore = FALSE;
 	GtkTreePath *path;
 	GtkTreeIter iter;
 
-	g_mutex_lock (me->ra_lock);
-	me->updating_views++;
-	if (me->registered >= me->items->len) {
-		g_mutex_unlock (me->ra_lock);
+	g_mutex_lock (priv->ra_lock);
+	priv->updating_views++;
+	if (priv->registered >= priv->items->len) {
+		g_mutex_unlock (priv->ra_lock);
 		return FALSE;
 	}
 
-	already_registered = me->registered;
+	already_registered = priv->registered;
 
-	if (me->items->len - already_registered > 1000) 
+	if (priv->items->len - already_registered > 1000) 
 	{
 		going_tb_registered = already_registered + 1000;
 		needmore = TRUE;
 	} else
-		going_tb_registered = me->items->len;
+		going_tb_registered = priv->items->len;
 
-	me->registered = going_tb_registered;
+	priv->registered = going_tb_registered;
 
-	if (me->updating_views < 2)
+	if (priv->updating_views < 2)
 		needmore = TRUE;
 
-	g_mutex_unlock (me->ra_lock);
+	g_mutex_unlock (priv->ra_lock);
 
 	gdk_threads_enter();
 
 	for (i = already_registered; i < going_tb_registered; i++)
 	{
-		iter.stamp = me->stamp;
+		iter.stamp = priv->stamp;
 		iter.user_data = (gpointer) i;
 		path = gtk_tree_path_new ();
 		gtk_tree_path_append_index (path, i);
 		if (G_LIKELY (path))
 		{
-			me->cur_len = i+1;
-			gtk_tree_model_row_inserted ((GtkTreeModel *)me, path, &iter);
+			priv->cur_len = i+1;
+			gtk_tree_model_row_inserted ((GtkTreeModel *) data, path, &iter);
 			gtk_tree_path_free (path);
 		}
 	}
@@ -564,8 +573,9 @@ notify_views_add (gpointer data)
 static void
 tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
-	g_static_rec_mutex_lock (me->iterator_lock);
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
 	/* Prepend something to the list itself. The get_length will auto update
 	 * because that one uses GPtrArray's len property. We are reusing the 
@@ -573,31 +583,31 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 
 	g_object_ref (item);
 
-	g_mutex_lock (me->ra_lock);
+	g_mutex_lock (priv->ra_lock);
 
-	g_ptr_array_add (me->items, item);
+	g_ptr_array_add (priv->items, item);
 
 	/* This prepend will happen very often, the notificating of the view is, 
 	 * however, quite slow and gdk wants us to do this from the mainloop */
 
-	if (me->updating_views == -1)
+	if (priv->updating_views == -1)
 	{
-		me->updating_views = 0;
-		g_object_ref (me);
+		priv->updating_views = 0;
+		g_object_ref (self);
 
-		if (me->add_timeout > 0) {
-			g_source_remove (me->add_timeout);
-			me->add_timeout = 0;
+		if (priv->add_timeout > 0) {
+			g_source_remove (priv->add_timeout);
+			priv->add_timeout = 0;
 		}
 
-		me->add_timeout = g_timeout_add_full (G_PRIORITY_DEFAULT_IDLE, 
-			me->timeout_span, notify_views_add, me, 
+		priv->add_timeout = g_timeout_add_full (G_PRIORITY_DEFAULT_IDLE, 
+			priv->timeout_span, notify_views_add, self, 
 			notify_views_add_destroy);
 	}
 
-	g_mutex_unlock (me->ra_lock);
+	g_mutex_unlock (priv->ra_lock);
 
-	g_static_rec_mutex_unlock (me->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return;
 }
@@ -623,12 +633,12 @@ static void
 notify_views_delete_destroy (gpointer data)
 {
 	notify_views_data_t *stuff = data;
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) stuff->self;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (stuff->self);
 
-	g_mutex_lock (me->to_lock);
-	if (stuff->src != -1 && stuff->src < me->del_timeouts->len)
-		g_array_index (me->del_timeouts, guint, (guint) stuff->src) = 0;
-	g_mutex_unlock (me->to_lock);
+	g_mutex_lock (priv->to_lock);
+	if (stuff->src != -1 && stuff->src < priv->del_timeouts->len)
+		g_array_index (priv->del_timeouts, guint, (guint) stuff->src) = 0;
+	g_mutex_unlock (priv->to_lock);
 
 	g_object_unref (stuff->item);
 	g_object_unref (stuff->self);
@@ -643,16 +653,17 @@ static gboolean
 notify_views_delete (gpointer data)
 {
 	notify_views_data_t *stuff = data;
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) stuff->self;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (stuff->self);
+
 	GtkTreePath *path;
 	GtkTreeIter iter;
 	gint i; gboolean found = FALSE;
 	GObject *mitem, *item = stuff->item;
 
-	g_static_rec_mutex_lock (me->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
-	for (i=0; i < me->items->len; i++)
-		if (me->items->pdata[i] == item)
+	for (i=0; i < priv->items->len; i++)
+		if (priv->items->pdata[i] == item)
 		{
 			found = TRUE;
 			break;
@@ -660,23 +671,23 @@ notify_views_delete (gpointer data)
 
 	if (found)
 	{
-		iter.stamp = me->stamp;
+		iter.stamp = priv->stamp;
 		iter.user_data = (gpointer) i;
 		path = gtk_tree_path_new ();
 		gtk_tree_path_append_index (path, i);
-		gtk_tree_model_row_deleted (GTK_TREE_MODEL (me), path);
-		g_mutex_lock (me->ra_lock);
-		me->cur_len--;
-		me->registered--;
-		g_mutex_unlock (me->ra_lock);
+		gtk_tree_model_row_deleted ((GtkTreeModel *) stuff->self, path);
+		g_mutex_lock (priv->ra_lock);
+		priv->cur_len--;
+		priv->registered--;
+		g_mutex_unlock (priv->ra_lock);
 		gtk_tree_path_free (path);
 
-		mitem = g_ptr_array_remove_index (me->items, i);
+		mitem = g_ptr_array_remove_index (priv->items, i);
 		if (mitem)
 			g_object_unref (mitem);
 	}
 
-	g_static_rec_mutex_unlock (me->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	if (g_main_loop_is_running (stuff->loop))
 		g_main_loop_quit (stuff->loop);
@@ -688,7 +699,7 @@ notify_views_delete (gpointer data)
 static void
 tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*) self;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	notify_views_data_t *stuff;
 	guint src;
 
@@ -701,7 +712,7 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 
 	src = g_timeout_add_full (G_PRIORITY_HIGH_IDLE, 0,
 		notify_views_delete, stuff, notify_views_delete_destroy);
-	stuff->src = (gint) add_del_timeout (me, src);
+	stuff->src = (gint) add_del_timeout ((TnyGtkHeaderListModel *) self, src);
 
 	/* This truly sucks :-( */
 	g_main_loop_run (stuff->loop);
@@ -712,12 +723,12 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 static guint
 tny_gtk_header_list_model_get_length (TnyList *self)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	guint retval = 0;
 
-	g_static_rec_mutex_lock (me->iterator_lock);
-	retval = me->items->len;
-	g_static_rec_mutex_unlock (me->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
+	retval = priv->items->len;
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return retval;
 }
@@ -725,26 +736,23 @@ tny_gtk_header_list_model_get_length (TnyList *self)
 static TnyIterator*
 tny_gtk_header_list_model_create_iterator (TnyList *self)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
-
-	/* Return a new iterator */
-
-	return _tny_gtk_header_list_iterator_new (me);
+	return _tny_gtk_header_list_iterator_new ((TnyGtkHeaderListModel *) self);
 }
 
 static void
 copy_it (gpointer data, gpointer user_data)
 {
 	GPtrArray *items = user_data;
-	g_ptr_array_add (items, g_object_ref (G_OBJECT (data)));
+	g_ptr_array_add (items, g_object_ref (data));
 	return;
 }
 
 static TnyList*
 tny_gtk_header_list_model_copy_the_list (TnyList *self)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	TnyGtkHeaderListModel *copy = g_object_new (TNY_TYPE_GTK_HEADER_LIST_MODEL, NULL);
+	TnyGtkHeaderListModelPriv *cpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (copy);
 
 	/* This only copies the TnyList pieces. The result is not a
 	   correct or good TnyGtkHeaderListModel. But it will be a correct
@@ -754,13 +762,12 @@ tny_gtk_header_list_model_copy_the_list (TnyList *self)
 	   The new list will point to the same instances, of course. It's
 	   only a copy of the list-nodes of course. */
 
-	g_static_rec_mutex_lock (me->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
-	GPtrArray *items_copy = g_ptr_array_sized_new (me->items->len);
-	g_ptr_array_foreach (me->items, copy_it, items_copy);
-	copy->items = items_copy;
-
-	g_static_rec_mutex_unlock (me->iterator_lock);
+	GPtrArray *items_copy = g_ptr_array_sized_new (priv->items->len);
+	g_ptr_array_foreach (priv->items, copy_it, items_copy);
+	cpriv->items = items_copy;
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return TNY_LIST (copy);
 }
@@ -768,15 +775,11 @@ tny_gtk_header_list_model_copy_the_list (TnyList *self)
 static void 
 tny_gtk_header_list_model_foreach_in_the_list (TnyList *self, GFunc func, gpointer user_data)
 {
-	TnyGtkHeaderListModel *me = (TnyGtkHeaderListModel*)self;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 
-	/* Foreach item in the list (without using a slower iterator) */
-
-	g_static_rec_mutex_lock (me->iterator_lock);
-
-	g_ptr_array_foreach (me->items, func, user_data);
-
-	g_static_rec_mutex_unlock (me->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
+	g_ptr_array_foreach (priv->items, func, user_data);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return;
 }
@@ -799,33 +802,34 @@ tny_list_init (TnyListIface *klass)
 static void
 tny_gtk_header_list_model_finalize (GObject *object)
 {
-	TnyGtkHeaderListModel *self = (TnyGtkHeaderListModel *)object;
+	TnyGtkHeaderListModel *self = (TnyGtkHeaderListModel *) object;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 
-	g_static_rec_mutex_lock (self->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
-	if (self->add_timeout > 0) {
-		g_source_remove (self->add_timeout);
-		self->add_timeout = 0;
+	if (priv->add_timeout > 0) {
+		g_source_remove (priv->add_timeout);
+		priv->add_timeout = 0;
 	}
 
 	remove_del_timeouts (self);
 
-	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
-	if (self->folder)
-		g_object_unref (G_OBJECT (self->folder));
-	g_ptr_array_free (self->items, TRUE);
-	self->items = NULL;
+	g_ptr_array_foreach (priv->items, (GFunc) g_object_unref, NULL);
+	if (priv->folder)
+		g_object_unref (priv->folder);
+	g_ptr_array_free (priv->items, TRUE);
+	priv->items = NULL;
 
-	g_static_rec_mutex_unlock (self->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
-	g_static_rec_mutex_free (self->iterator_lock);
-	self->iterator_lock = NULL;
+	g_static_rec_mutex_free (priv->iterator_lock);
+	priv->iterator_lock = NULL;
 
-	g_mutex_free (self->ra_lock);
-	self->ra_lock = NULL;
+	g_mutex_free (priv->ra_lock);
+	priv->ra_lock = NULL;
 
-	g_mutex_free (self->to_lock);
-	self->to_lock = NULL;
+	g_mutex_free (priv->to_lock);
+	priv->to_lock = NULL;
 
 	parent_class->finalize (object);
 
@@ -843,25 +847,30 @@ tny_gtk_header_list_model_class_init (TnyGtkHeaderListModelClass *klass)
 
 	object_class->finalize = tny_gtk_header_list_model_finalize;
 
+	g_type_class_add_private (object_class, sizeof (TnyGtkHeaderListModelPriv));
+
+
 	return;
 }
 
 static void
 tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 {
-	self->folder = NULL;
-	self->iterator_lock = g_new0 (GStaticRecMutex, 1);
-	g_static_rec_mutex_init (self->iterator_lock);
-	self->cur_len = 0;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 
-	self->timeout_span = 100;
-	self->del_timeouts = NULL;
-	self->add_timeout = 0;
-	self->items = g_ptr_array_sized_new (1000);
-	self->updating_views = -1;
-	self->ra_lock = g_mutex_new ();
-	self->to_lock = g_mutex_new ();
-	self->registered = 0;
+	priv->folder = NULL;
+	priv->iterator_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->iterator_lock);
+	priv->cur_len = 0;
+
+	priv->timeout_span = 100;
+	priv->del_timeouts = NULL;
+	priv->add_timeout = 0;
+	priv->items = g_ptr_array_sized_new (1000);
+	priv->updating_views = -1;
+	priv->ra_lock = g_mutex_new ();
+	priv->to_lock = g_mutex_new ();
+	priv->registered = 0;
 
 	return;
 }
@@ -879,15 +888,16 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 void
 tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *folder, gboolean refresh)
 {
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	GtkTreeIter iter;
 	GtkTreePath *path;
 
-	g_static_rec_mutex_lock (self->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
-	self->timeout_span = 100;
-	if (self->add_timeout > 0) {
-		g_source_remove (self->add_timeout);
-		self->add_timeout = 0;
+	priv->timeout_span = 100;
+	if (priv->add_timeout > 0) {
+		g_source_remove (priv->add_timeout);
+		priv->add_timeout = 0;
 	}
 
 	remove_del_timeouts (self);
@@ -896,36 +906,36 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	 * assertion in gtk_tree_model_sort_build_level (I have no idea why the
 	 * assertion is placed there, in stead of a normal return, though) */
  
-	g_ptr_array_foreach (self->items, (GFunc)g_object_unref, NULL);
-	if (self->folder)
-		g_object_unref (G_OBJECT (self->folder));
-	self->folder = TNY_FOLDER (g_object_ref (G_OBJECT (folder)));
-	self->registered = 0;
-	g_ptr_array_free (self->items, TRUE);
-	self->items = g_ptr_array_sized_new (tny_folder_get_all_count (folder));
+	g_ptr_array_foreach (priv->items, (GFunc) g_object_unref, NULL);
+	if (priv->folder)
+		g_object_unref (priv->folder);
+	priv->folder = TNY_FOLDER (g_object_ref (folder));
+	priv->registered = 0;
+	g_ptr_array_free (priv->items, TRUE);
+	priv->items = g_ptr_array_sized_new (tny_folder_get_all_count (folder));
 
-	g_static_rec_mutex_unlock (self->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	/* Get a new list of headers */
 	/* TODO add error handling and reporting here */
 	tny_folder_get_headers (folder, TNY_LIST (self), refresh, NULL);
 
-	iter.stamp = self->stamp;
+	iter.stamp = priv->stamp;
 	iter.user_data = (gpointer) 0;
-	path = tny_gtk_header_list_model_get_path (GTK_TREE_MODEL (self), &iter);
+	path = tny_gtk_header_list_model_get_path ((GtkTreeModel *) self, &iter);
 
-	g_static_rec_mutex_lock (self->iterator_lock);
+	g_static_rec_mutex_lock (priv->iterator_lock);
 
 	/* Reference the new folder instance */
 
 	/* Notify the observers (the GtkTreeView) */
 	if (path) {
 		gtk_tree_path_append_index (path, 0);
-		gtk_tree_model_row_inserted (GTK_TREE_MODEL (self), path, &iter);
+		gtk_tree_model_row_inserted ((GtkTreeModel *) self, path, &iter);
 		gtk_tree_path_free (path);
 	}
 
-	g_static_rec_mutex_unlock (self->iterator_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return;
 }

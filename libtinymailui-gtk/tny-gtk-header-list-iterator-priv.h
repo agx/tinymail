@@ -61,6 +61,28 @@ void _tny_gtk_header_list_iterator_prev_nl (TnyGtkHeaderListIterator *me);
 void _tny_gtk_header_list_iterator_next_nl (TnyGtkHeaderListIterator *me);
 
 
+
+#define TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE(o)	\
+	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_HEADER_LIST_MODEL, TnyGtkHeaderListModelPriv))
+
+typedef struct _TnyGtkHeaderListModelPriv TnyGtkHeaderListModelPriv;
+
+struct _TnyGtkHeaderListModelPriv
+{
+	GStaticRecMutex *iterator_lock;
+	TnyFolder *folder;
+	gint stamp, registered;
+	gint updating_views;
+	GMutex *ra_lock, *to_lock;
+	gint cur_len;
+	guint add_timeout;
+
+	guint timeout_span;
+	GPtrArray *items;
+	GArray *del_timeouts;
+	TnyIterator *iterator;
+};
+
 G_END_DECLS
 
 #endif

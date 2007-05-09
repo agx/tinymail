@@ -1,3 +1,10 @@
+2007-05-09  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* libtinymailui-gtk/tny-gtk-header-list-model.c: Moved the private API
+	to a private type
+
+	* This was a minor API change
+
 2007-05-09  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* configure.ac, Makefile.am:

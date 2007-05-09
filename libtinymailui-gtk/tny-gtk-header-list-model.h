@@ -62,19 +62,6 @@ enum _TnyGtkHeaderListModelColumn
 struct _TnyGtkHeaderListModel 
 {
 	GObject parent;
-
-	GStaticRecMutex *iterator_lock;
-	TnyFolder *folder;
-	gint stamp, registered;
-	gint updating_views;
-	GMutex *ra_lock, *to_lock;
-	gint cur_len;
-	guint add_timeout;
-
-	guint timeout_span;
-	GPtrArray *items;
-	GArray *del_timeouts;
-	TnyIterator *iterator;
 };
 
 struct _TnyGtkHeaderListModelClass 

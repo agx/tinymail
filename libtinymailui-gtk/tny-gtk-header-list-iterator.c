@@ -89,15 +89,18 @@ static void
 tny_gtk_header_list_iterator_next (TnyIterator *self)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
+	TnyGtkHeaderListModelPriv *mpriv;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return;
 
+	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
+
 	/* Move the iterator to the next node */
 
-	g_static_rec_mutex_lock (me->model->iterator_lock);
+	g_static_rec_mutex_lock (mpriv->iterator_lock);
 	me->current++;
-	g_static_rec_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (mpriv->iterator_lock);
 
 	return;
 }
@@ -113,15 +116,18 @@ static void
 tny_gtk_header_list_iterator_prev (TnyIterator *self)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
+	TnyGtkHeaderListModelPriv *mpriv;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return;
 
 	/* Move the iterator to the previous node */
 
-	g_static_rec_mutex_lock (me->model->iterator_lock);
+	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
+
+	g_static_rec_mutex_lock (mpriv->iterator_lock);
 	me->current--;
-	g_static_rec_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (mpriv->iterator_lock);
 
 	return;
 }
@@ -129,24 +135,30 @@ tny_gtk_header_list_iterator_prev (TnyIterator *self)
 gboolean 
 _tny_gtk_header_list_iterator_is_done_nl (TnyGtkHeaderListIterator *me)
 {
+	TnyGtkHeaderListModelPriv *mpriv;
+
 	if (G_UNLIKELY (!me  || !me->model))
 		return TRUE;
 
-	return (me->current < 0 || me->current >= me->model->items->len);
+	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
+
+	return (me->current < 0 || me->current >= mpriv->items->len);
 }
 
 static gboolean 
 tny_gtk_header_list_iterator_is_done (TnyIterator *self)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
+	TnyGtkHeaderListModelPriv *mpriv;
 	gboolean retval = FALSE;
 
 	if (G_UNLIKELY (!me || !me->model))
 		return FALSE;
 
-	g_static_rec_mutex_lock (me->model->iterator_lock);
-	retval = (me->current < 0 || me->current >= me->model->items->len);
-	g_static_rec_mutex_unlock (me->model->iterator_lock);
+	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
+	g_static_rec_mutex_lock (mpriv->iterator_lock);
+	retval = (me->current < 0 || me->current >= mpriv->items->len);
+	g_static_rec_mutex_unlock (mpriv->iterator_lock);
 
 	return retval;
 }
@@ -164,13 +176,16 @@ static void
 tny_gtk_header_list_iterator_first (TnyIterator *self)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
+	TnyGtkHeaderListModelPriv *mpriv;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
-	g_static_rec_mutex_lock (me->model->iterator_lock);
+	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
+
+	g_static_rec_mutex_lock (mpriv->iterator_lock);
 	me->current = 0;
-	g_static_rec_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (mpriv->iterator_lock);
 
 	return;
 }
@@ -187,13 +202,16 @@ static void
 tny_gtk_header_list_iterator_nth (TnyIterator *self, guint nth)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
+	TnyGtkHeaderListModelPriv *mpriv;
 
 	if (G_UNLIKELY (!me || !me->current || !me->model))
 		return;
 
-	g_static_rec_mutex_lock (me->model->iterator_lock);
+	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
+
+	g_static_rec_mutex_lock (mpriv->iterator_lock);
 	me->current = nth;
-	g_static_rec_mutex_unlock (me->model->iterator_lock);
+	g_static_rec_mutex_unlock (mpriv->iterator_lock);
 
 	return;
 }
@@ -202,13 +220,15 @@ tny_gtk_header_list_iterator_nth (TnyIterator *self, guint nth)
 gpointer 
 _tny_gtk_header_list_iterator_get_current_nl (TnyGtkHeaderListIterator *me)
 {
-	return me->model->items->pdata[me->current];
+	TnyGtkHeaderListModelPriv *mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
+	return mpriv->items->pdata[me->current];
 }
 
 static GObject* 
 tny_gtk_header_list_iterator_get_current (TnyIterator *self)
 {
 	TnyGtkHeaderListIterator *me = (TnyGtkHeaderListIterator*) self;
+	TnyGtkHeaderListModelPriv *mpriv;
 	gpointer retval;
 
 	if (G_UNLIKELY (!me || !me->model))
@@ -216,14 +236,16 @@ tny_gtk_header_list_iterator_get_current (TnyIterator *self)
 
 	/* Give the data of the current node */
 
-	g_static_rec_mutex_lock (me->model->iterator_lock);
-	retval = me->model->items->pdata[me->current];
-	g_static_rec_mutex_unlock (me->model->iterator_lock);
+	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
 
+	g_static_rec_mutex_lock (mpriv->iterator_lock);
+	retval = mpriv->items->pdata[me->current];
 	if (retval)
-		g_object_ref (G_OBJECT(retval));
+		g_object_ref (retval);
+	g_static_rec_mutex_unlock (mpriv->iterator_lock);
 
-	return (GObject*)retval;
+
+	return (GObject*) retval;
 }
 
 
@@ -237,7 +259,7 @@ tny_gtk_header_list_iterator_get_list (TnyIterator *self)
 	if (G_UNLIKELY (!me || !me->model))
 		return NULL;
 
-	g_object_ref (G_OBJECT (me->model));
+	g_object_ref (me->model);
 
 	return TNY_LIST (me->model);
 }
