@@ -856,7 +856,10 @@ tny_gtk_header_list_model_class_init (TnyGtkHeaderListModelClass *klass)
 static void
 tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 {
-	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+	TnyGtkHeaderListModelPriv *priv = (G_TYPE_INSTANCE_GET_PRIVATE ((self),
+					   TNY_TYPE_GTK_HEADER_LIST_MODEL,
+					   TnyGtkHeaderListModelPriv));
+	self->priv = priv;
 
 	priv->folder = NULL;
 	priv->iterator_lock = g_new0 (GStaticRecMutex, 1);

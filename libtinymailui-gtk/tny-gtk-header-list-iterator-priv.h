@@ -62,8 +62,7 @@ void _tny_gtk_header_list_iterator_next_nl (TnyGtkHeaderListIterator *me);
 
 
 
-#define TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_HEADER_LIST_MODEL, TnyGtkHeaderListModelPriv))
+#define TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE(o)	(TnyGtkHeaderListModelPriv*)(((TnyGtkHeaderListModel*)(o))->priv)
 
 typedef struct _TnyGtkHeaderListModelPriv TnyGtkHeaderListModelPriv;
 
