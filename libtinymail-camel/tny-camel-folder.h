@@ -77,6 +77,7 @@ struct _TnyCamelFolderClass
 	void (*transfer_msgs_func) (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	TnyFolder* (*copy_func) (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
+	void (*copy_async_func) (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*poke_status_func) (TnyFolder *self);
 	void (*add_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
 	void (*remove_observer_func) (TnyFolder *self, TnyFolderObserver *observer);

@@ -1211,7 +1211,6 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 
 	info->msg = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, info->self, info->header, &err);
 
-
 	info->cancelled = camel_operation_cancel_check (cancel);
 
 	camel_operation_unregister (cancel);
@@ -1769,6 +1768,217 @@ noexception:
 
 	return retval;
 }
+
+typedef struct 
+{
+	TnyFolder *self;
+	TnyFolderStore *into;
+	gchar *new_name;
+	gboolean delete_originals;
+	GError *err;
+	gpointer user_data;
+	guint depth;
+	TnyCopyFolderCallback callback;
+	TnyStatusCallback status_callback;
+	TnySessionCamel *session;
+	TnyIdleStopper *stopper;
+	gboolean cancelled;
+} CopyFolderInfo;
+
+
+static void
+tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
+{
+	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
+
+	/* thread reference */
+	_tny_camel_folder_unreason (priv);
+	g_object_unref (G_OBJECT (info->self));
+
+	if (info->err)
+		g_error_free (info->err);
+
+	_tny_session_stop_operation (info->session);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
+	g_free(info->new_name);
+	g_slice_free (CopyFolderInfo, info);
+}
+
+static gboolean
+tny_camel_folder_copy_async_callback (gpointer thr_user_data)
+{
+	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
+
+	if (info->callback)
+		info->callback (info->self, info->into, info->new_name, info->cancelled, &info->err, info->user_data);
+
+	/* Prevent status callbacks from being called after this
+	 * (can happen because the 2 idle callbacks have different priorities)
+	 * by causing tny_idle_stopper_is_stopped() to return TRUE. */
+	tny_idle_stopper_stop (info->stopper);
+
+	return FALSE;
+}
+
+static void
+tny_camel_folder_copy_async_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *thr_user_data)
+{
+	CopyFolderInfo *oinfo = thr_user_data;
+	TnyProgressInfo *info = NULL;
+
+	info = tny_progress_info_new (G_OBJECT (oinfo->self), oinfo->status_callback, 
+		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_COPY_FOLDER, what, sofar, 
+		oftotal, oinfo->stopper, oinfo->user_data);
+
+	if (oinfo->depth > 0)
+	{
+		g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+			tny_progress_info_idle_func, info, 
+			tny_progress_info_destroy);
+	} else {
+		tny_progress_info_idle_func (info);
+		tny_progress_info_destroy (info);
+	}
+
+	return;
+}
+
+
+static gpointer 
+tny_camel_folder_copy_async_thread (gpointer thr_user_data)
+{
+	CopyFolderInfo *info = thr_user_data;
+	TnyFolder *self = info->self;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	GError *err = NULL;
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!load_folder_no_lock (priv))
+	{
+		tny_camel_folder_copy_async_destroyer (info);
+		g_static_rec_mutex_unlock (priv->folder_lock);
+		g_thread_exit (NULL);
+		return NULL;
+	}
+
+	info->cancelled = FALSE;
+
+	/* start camel operations */
+	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
+		tny_camel_folder_copy_async_status, info, 
+		"Fetching summary information for new messages in folder");
+
+	/* Do work */
+	tny_camel_folder_copy (self, info->into, info->new_name, info->delete_originals, &info->err);
+
+	/* Check cancellation and fill data */
+	info->cancelled = camel_operation_cancel_check (apriv->cancel);
+	priv->cached_length = camel_folder_get_message_count (priv->folder);
+
+	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
+		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
+
+	/* Stop operation and check errors */
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+	info->err = NULL;
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (&err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
+			camel_exception_get_description (&ex));
+		if (err != NULL)
+			info->err = g_error_copy ((const GError *) err);
+	}
+
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	/* Call calback if it exists */
+	if (info->callback)
+	{
+		if (info->depth > 0)
+		{
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				tny_camel_folder_copy_async_callback, 
+				info, tny_camel_folder_copy_async_destroyer);
+		} else {
+			tny_camel_folder_copy_async_callback (info);
+			tny_camel_folder_copy_async_destroyer (info);
+		}
+	} else { /* Thread reference */
+		g_object_unref (G_OBJECT (self));
+		_tny_camel_folder_unreason (priv);
+	}
+	g_thread_exit (NULL);
+
+	return NULL;
+}
+
+static void
+tny_camel_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->copy_async_func (self, into, new_name, del, callback, status_callback, user_data);
+	return;
+}
+
+static void
+tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	CopyFolderInfo *info = NULL;
+	GThread *thread = NULL;
+	GError *err = NULL;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), &err, 
+			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
+	{
+		if (callback)
+		        callback (self, info->into, info->new_name, TRUE, &info->err, user_data);
+		g_error_free (err);
+		return;
+	}
+
+	/* Idle info for the status callback: */
+
+	info = g_slice_new (CopyFolderInfo);
+	info->into = into;
+	info->new_name = g_strdup(new_name);
+	info->delete_originals = del;
+	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	info->err = NULL;
+	info->self = self;
+	info->callback = callback;
+	info->status_callback = status_callback;
+	info->user_data = user_data;
+	info->depth = g_main_depth ();
+	
+	/* Use a ref count because we do not know which of the 2 idle callbacks 
+	 * will be the last, and we can only unref self in the last callback:
+	 * This is destroyed in the idle GDestroyNotify callback.*/
+
+	info->stopper = tny_idle_stopper_new();
+
+	/* thread reference */
+	g_object_ref (G_OBJECT (self));
+	_tny_camel_folder_reason (priv);
+
+	/* This will cause the idle status callback to be called,
+	 * via _tny_camel_account_start_camel_operation,
+	 * and also calls the idle main callback: */
+
+	thread = g_thread_create (tny_camel_folder_copy_async_thread,
+			info, FALSE, NULL);
+
+	return;
+}
+
 
 typedef struct 
 {
@@ -3282,6 +3492,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
 	klass->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async;
 	klass->copy_func = tny_camel_folder_copy;
+	klass->copy_async_func = tny_camel_folder_copy_async;
 	klass->poke_status_func = tny_camel_folder_poke_status;
 	klass->add_observer_func = tny_camel_folder_add_observer;
 	klass->remove_observer_func = tny_camel_folder_remove_observer;
@@ -3341,6 +3552,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
 	class->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async_default;
 	class->copy_func = tny_camel_folder_copy_default;
+	class->copy_async_func = tny_camel_folder_copy_async_default;
 	class->poke_status_func = tny_camel_folder_poke_status_default;
 	class->add_observer_func = tny_camel_folder_add_observer_default;
 	class->remove_observer_func = tny_camel_folder_remove_observer_default;

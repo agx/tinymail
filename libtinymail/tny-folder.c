@@ -335,6 +335,87 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
 }
 
 /**
+ * tny_folder_copy_async:
+ * @self: a #TnyFolder object
+ * @into: a #TnyFolderStore object
+ * @new_name: the new name in @into
+ * @del: whether or not to delete the original location
+ * @err: a #GError object or NULL
+ *
+ * Copies @self to @into giving the new folder the name @new_name. Returns the
+ * newly created folder in @into, which will carry the name @new_name.
+ *
+ * After the method's callback happened, tny_folder_get_all_count and 
+ * tny_folder_get_unread_count are guaranteed to be correct.
+ *
+ * If you want to use this method, it's advised to let your application 
+ * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
+ * called.
+ * 
+ * When using a #GMainLoop this method will callback using g_idle_add_full.
+ * Without a #GMainLoop, which the libtinymail-camel implementation detects
+ * using (g_main_depth > 0), the callbacks will happen in a worker thread at an
+ * unknown moment in time (check your locking in this case).
+ *
+ * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
+ * gdk_threads_leave guards (because it happens in the #GMainLoop).
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * static void
+ * status_update_cb (GObject *sender, TnyStatus *status, gpointer user_data)
+ * {
+ *     g_print (".");
+ * }
+ * static void
+ * folder_copy_cb (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gboolean cancelled, GError **err, gpointer user_data)
+ * {
+ *     if (!cancelled)
+ *     {
+ *         TnyList *headers = tny_simple_list_new ();
+ *         TnyIterator *iter;
+ *         g_print ("done\nHeaders copied into %s are:", 
+ *                tny_folder_get_name (into));
+ *         tny_folder_get_headers (into, headers, FALSE);
+ *         iter = tny_list_create_iterator (headers);
+ *         while (!tny_iterator_is_done (iter))
+ *         {
+ *             TnyHeader *header = tny_iterator_current (iter);
+ *             g_print ("\t%s\n", tny_header_get_subject (header));
+ *             g_object_unref (G_OBJECT (header));
+ *             tny_iterator_next (iter);
+ *         }
+ *         g_object_unref (G_OBJECT (headers));
+ *     }
+ * }
+ * TnyFolder *folder = ...
+ * TnyFolderStore *into = ...
+ * gchar *new_name = ...
+ * g_print ("Getting headers ");
+ * tny_folder_copy_async (folder, into, new_name, 
+ *          folder_copy_cb, 
+ *          status_update_cb, NULL); 
+ * </programlisting></informalexample>
+ **/
+void 
+tny_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TnyFolder *retval;
+
+#ifdef DBC /* require */
+	TnyFolderStore *test;
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (TNY_IS_FOLDER_STORE (into));
+	g_assert (new_name);
+	g_assert (strlen (new_name) > 0);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->copy_func_async != NULL);
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->copy_async_func (self, into, new_name, del, callback, status_callback, user_data);
+
+}
+
+/**
  * tny_folder_get_msg_remove_strategy:
  * @self: a TnyFolder object
  *

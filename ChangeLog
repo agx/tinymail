@@ -1,3 +1,13 @@
+2007-05-10  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+        * libtinymail-camel/tny-camel-folder.c: Added a new operation 
+	tny_camel_folder_copy_async to copy one folder into other one using
+	asynchronous operations.
+	* libtinymail/tny-status.h: Added new status code for folder_copy_async
+	callbacks.
+	* libtinymail/tny-shared.h: Defined new callback function to be used in 
+	copy_async operation.
+	* libtinymail/tny-folder.c: Defined new abstract operation folder_copy_async.
+	
 2007-05-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* libtinymailui-gtk/tny-gtk-header-list-model.c: Moved the private API

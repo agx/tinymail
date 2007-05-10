@@ -109,6 +109,7 @@ struct _TnyFolderIface
 	void (*transfer_msgs_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	TnyFolder* (*copy_func) (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
+	void (*copy_async_func) (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*poke_status_func) (TnyFolder *self);
 	void (*add_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
 	void (*remove_observer_func) (TnyFolder *self, TnyFolderObserver *observer);
@@ -145,6 +146,7 @@ void tny_folder_refresh (TnyFolder *self, GError **err);
 void tny_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 void tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 TnyFolder* tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err);
+void tny_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del,  TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_poke_status (TnyFolder *self);
 void tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer);
 void tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer);
