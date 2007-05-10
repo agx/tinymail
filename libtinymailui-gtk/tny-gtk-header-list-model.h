@@ -62,6 +62,7 @@ enum _TnyGtkHeaderListModelColumn
 struct _TnyGtkHeaderListModel 
 {
 	GObject parent;
+	gpointer priv;
 };
 
 struct _TnyGtkHeaderListModelClass 

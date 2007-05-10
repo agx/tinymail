@@ -6,7 +6,8 @@
 	callbacks.
 	* libtinymail/tny-shared.h: Defined new callback function to be used in 
 	copy_async operation.
-	* libtinymail/tny-folder.c: Defined new abstract operation folder_copy_async.
+	* libtinymail/tny-folder.c: Defined new abstract operation 
+	folder_copy_async.
 	
 2007-05-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
