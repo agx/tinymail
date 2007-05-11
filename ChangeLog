@@ -1,3 +1,8 @@
+2007-05-10  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Implemented Rob's priv->stamp++ idea for removing things from an
+	TnyGtkHeaderListModel
+
 2007-05-10  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail/tny-account-store.c: tny_account_store_alert(): 

@@ -624,7 +624,7 @@ typedef struct
 {
 	TnyGtkHeaderListModel *self;
 	GObject *item;
-	GMainLoop *loop;
+	/* GMainLoop *loop; */
 	gint src;
 } notify_views_data_t;
 
@@ -642,7 +642,7 @@ notify_views_delete_destroy (gpointer data)
 
 	g_object_unref (stuff->item);
 	g_object_unref (stuff->self);
-	g_main_loop_unref (stuff->loop);
+	/* g_main_loop_unref (stuff->loop); */
 
 	g_slice_free (notify_views_data_t, data);
 	return;
@@ -676,6 +676,7 @@ notify_views_delete (gpointer data)
 		path = gtk_tree_path_new ();
 		gtk_tree_path_append_index (path, i);
 		gtk_tree_model_row_deleted ((GtkTreeModel *) stuff->self, path);
+		priv->stamp++;
 		g_mutex_lock (priv->ra_lock);
 		priv->cur_len--;
 		priv->registered--;
@@ -689,8 +690,8 @@ notify_views_delete (gpointer data)
 
 	g_static_rec_mutex_unlock (priv->iterator_lock);
 
-	if (g_main_loop_is_running (stuff->loop))
-		g_main_loop_quit (stuff->loop);
+	/* if (g_main_loop_is_running (stuff->loop))
+		g_main_loop_quit (stuff->loop); */
 
 	return FALSE;
 }
@@ -708,14 +709,14 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 	stuff->self = g_object_ref (self);
 	stuff->item = g_object_ref (item);
 
-	stuff->loop = g_main_loop_new (NULL, FALSE);
+	/* stuff->loop = g_main_loop_new (NULL, FALSE); */
 
 	src = g_timeout_add_full (G_PRIORITY_HIGH_IDLE, 0,
 		notify_views_delete, stuff, notify_views_delete_destroy);
 	stuff->src = (gint) add_del_timeout ((TnyGtkHeaderListModel *) self, src);
 
-	/* This truly sucks :-( */
-	g_main_loop_run (stuff->loop);
+	/* This truly sucks :-( 
+	g_main_loop_run (stuff->loop); */
 
 	return;
 }
