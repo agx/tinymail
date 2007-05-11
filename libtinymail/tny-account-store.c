@@ -80,7 +80,8 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * tny_account_store_alert:
  * @self: a #TnyAccountStore object
  * @type: the message type (severity)
- * @error: A GError, of domain TNY_ACCOUNT_ERROR, which should be used to determine what to show to the user.
+ * @error: A GError, of domain TNY_ACCOUNT_ERROR or TNY_ACCOUNT_STORE_ERROR, 
+ * which should be used to determine what to show to the user.
  *
  * This jump-to-the-ui method implements showing a message dialog appropriate for the @error
  * and @type as message type. It will return TRUE if the reply was 

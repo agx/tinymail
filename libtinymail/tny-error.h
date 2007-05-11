@@ -37,6 +37,42 @@ enum _TnyErrorDomain
 
 #define TNY_TYPE_ERROR (tny_error_get_type())
 
+/* TODO: These should probably be split into separate enums, one for each 
+ * error domain. Error codes from one error domain should not be used with 
+ * a separate error domain. The hard-coding of the numbers should then not 
+ * be necessary or useful.
+ */
+ 
+/**
+ * TnyError:
+ *
+ * An GError error code.
+ * 
+ * TODO: Ideally, we would have more error codes, one for each specific error, 
+ * such as "hostname not accepted", so that the application can identify the 
+ * exact error, and respond accordingly. However, these error codes are not 
+ * yet present because the implementations do not yet provide such 
+ * fine-grained information.
+ * TODO: Document the other error codes.
+ * 
+ * TNY_ACCOUNT_ERROR_TRY_CONNECT: This can possibly indicate such errors as 
+ * "hostname not resolved", "no network", or "password not accepted", 
+ * though some implementations might return TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT 
+ * (in the TNY_ACCOUNT_STORE_ERROR error domain) in these cases
+ * Currently, the application must know whether it is using our camel 
+ * implementation, in order to know whether it can expect to receive a 
+ * TNY_ACCOUNT_ERROR_TRY_CONNECT (in the TNY_ACCOUNT_ERROR error domain) rather 
+ * than a TNY_ACCOUNT_ERROR_UNKNOWN_ALERT (in the TNY_ACCOUNT_STORE_ERROR 
+ * error domain) in these situations. If using our camel implementation then 
+ * even this level of exact detection of the particular error is not currently 
+ * possible, so a generic error dialog should probably be shown, though the 
+ * application could choose to suggest possible causes for the error.
+ * 
+ * TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT: This indicates that an unknown error 
+ * has occurred. Depending on the implementation being used, and the server 
+ * being used, this could have multiple possible causes. More exact error 
+ * information is only possible with other servers, and/or othre implementations.
+ */
 enum _TnyError 
 {
 	TNY_ERROR_UNSPEC = 1,
