@@ -24,11 +24,6 @@
 #ifndef CAMEL_DATA_CACHE_H
 #define CAMEL_DATA_CACHE_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus }*/
-
 #include <glib.h>
 
 #include <camel/camel-stream.h>
@@ -39,6 +34,8 @@ extern "C" {
 #define CAMEL_DATA_CACHE(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_DATA_CACHE_TYPE, CamelFolder))
 #define CAMEL_DATA_CACHE_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), CAMEL_DATA_CACHE_TYPE, CamelFolderClass))
 #define CAMEL_IS_DATA_CACHE(o)    (CAMEL_CHECK_TYPE((o), CAMEL_DATA_CACHE_TYPE))
+
+G_BEGIN_DECLS
 
 typedef struct _CamelDataCache CamelDataCache;
 typedef struct _CamelDataCacheClass CamelDataCacheClass;
@@ -101,8 +98,6 @@ void camel_data_cache_set_flags (CamelDataCache *cdc, const char *path, CamelMes
 /* Standard Camel function */
 CamelType camel_data_cache_get_type (void);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+G_END_DECLS
 
 #endif /* CAMEL_DATA_CACHE_H */

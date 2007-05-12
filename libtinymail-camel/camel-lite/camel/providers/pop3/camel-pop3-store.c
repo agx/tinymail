@@ -28,12 +28,12 @@
 #endif
 
 #include <sys/types.h>
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 #include <dirent.h>
 
 #include <stdio.h>
@@ -48,30 +48,31 @@
 #include <sys/types.h>
 
 #include "camel-file-utils.h"
-#include "camel-operation.h"
 
-#include "camel-pop3-store.h"
-#include "camel-pop3-folder.h"
-#include "camel-stream-buffer.h"
-#include "camel-session.h"
-#include "camel-exception.h"
-#include "camel-url.h"
-#include "libedataserver/md5-utils.h"
-#include "camel-pop3-engine.h"
-#include "camel-sasl.h"
 #include "camel-data-cache.h"
-#include "camel-tcp-stream.h"
+#include "camel-exception.h"
+#include "camel-net-utils.h"
+#include "camel-operation.h"
+#include "camel-pop3-engine.h"
+#include "camel-pop3-folder.h"
+#include "camel-pop3-store.h"
+#include "camel-sasl.h"
+#include "camel-session.h"
+#include "camel-stream-buffer.h"
 #include "camel-tcp-stream-raw.h"
+#include "camel-tcp-stream.h"
+#include "camel-url.h"
+
 #ifdef HAVE_SSL
 #include "camel-tcp-stream-ssl.h"
 #endif
-#include "camel-i18n.h"
-#include "camel-net-utils.h"
 #include "camel-disco-diary.h"
 
 /* Specified in RFC 1939 */
 #define POP3_PORT "110"
 #define POP3S_PORT "995"
+
+#define _(o) o
 
 static CamelStoreClass *parent_class = NULL;
 
@@ -246,7 +247,7 @@ pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 	else
 		name++;
 	if (!g_ascii_strcasecmp (fi->full_name, "INBOX"))
-		fi->name = g_strdup (_("Inbox"));
+		fi->name = g_strdup ((const gchar *) _("Inbox"));
 	else
 		fi->name = g_strdup (name);
 
@@ -620,6 +621,21 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 	} else if (strcmp(service->url->authmech, "+APOP") == 0 && store->engine->apop) {
 		char *secret, md5asc[33], *d;
 		unsigned char md5sum[16], *s;
+
+		d = store->engine->apop;
+
+		while (*d != '\0') {
+			if (!isascii((int)*d)) {
+
+				/* README for Translators: The string APOP should not be translated */
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_URL_INVALID,
+						_("Unable to connect to POP server %s:	Invalid APOP ID received. Impersonation attack suspected. Please contact your admin."),
+						CAMEL_SERVICE (store)->url->host);
+
+				return FALSE;
+			}
+			d++;
+		}
 		
 		secret = g_alloca(strlen(store->engine->apop)+strlen(service->url->passwd)+1);
 		sprintf(secret, "%s%s",  store->engine->apop, service->url->passwd);

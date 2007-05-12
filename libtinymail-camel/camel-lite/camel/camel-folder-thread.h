@@ -22,13 +22,10 @@
 #ifndef _CAMEL_FOLDER_THREAD_H
 #define _CAMEL_FOLDER_THREAD_H
 
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus */
-
 #include <camel/camel-folder-summary.h>
 #include <camel/camel-folder.h>
+
+G_BEGIN_DECLS
 
 typedef struct _CamelFolderThreadNode {
 	struct _CamelFolderThreadNode *mem_chain;
@@ -69,8 +66,6 @@ int camel_folder_threaded_messages_dump(CamelFolderThreadNode *c);
 
 CamelFolderThreadNode *camel_folder_thread_node_new(CamelFolderThread *thread);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+G_END_DECLS
 
 #endif /* !_CAMEL_FOLDER_THREAD_H */

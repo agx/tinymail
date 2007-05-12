@@ -25,16 +25,17 @@
 #include <config.h>
 #endif
 
-#include <sys/stat.h>
-#include <unistd.h>
 #include <errno.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#include "camel-file-utils.h"
 
 #include "camel-imap-message-cache.h"
 #include "camel-imap-summary.h"
 #include "camel-imap-utils.h"
-#include "camel-file-utils.h"
 #include "camel-imap-folder.h"
 
 #define CAMEL_IMAP_SUMMARY_VERSION (3)

@@ -27,26 +27,26 @@
 #include <config.h>
 #endif
 
+#include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include <errno.h>
-
-#include "camel-pop3-folder.h"
-#include "camel-pop3-store.h"
-#include "camel-pop3-stream.h"
-#include "camel-exception.h"
-#include "camel-stream-mem.h"
-#include "camel-stream-filter.h"
-#include "camel-mime-message.h"
-#include "camel-operation.h"
-#include "camel-data-cache.h"
-#include "camel-i18n.h"
-#include "camel-disco-diary.h"
+#include <glib/gi18n-lib.h>
 
 #include <libedataserver/md5-utils.h>
 
-#include <stdlib.h>
-#include <string.h>
+#include "camel-data-cache.h"
+#include "camel-exception.h"
+#include "camel-mime-message.h"
+#include "camel-operation.h"
+
+#include "camel-pop3-folder.h"
+#include "camel-pop3-store.h"
+#include "camel-stream-filter.h"
+#include "camel-pop3-stream.h"
+#include "camel-stream-mem.h"
+
+#include "camel-disco-diary.h"
 
 #define d(x) 
 

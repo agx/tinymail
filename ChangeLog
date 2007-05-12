@@ -1,6 +1,7 @@
 2007-05-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improved connection / error handling when trying to connect fails
+	* Merged camel-lite with camel-svn7713
 
 	* This was a major API change
 

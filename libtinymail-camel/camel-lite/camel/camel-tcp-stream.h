@@ -24,12 +24,6 @@
 #ifndef CAMEL_TCP_STREAM_H
 #define CAMEL_TCP_STREAM_H
 
-
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus }*/
-
 #include <glibconfig.h>
 
 #ifndef G_OS_WIN32
@@ -50,6 +44,8 @@ extern "C" {
 #define CAMEL_TCP_STREAM(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_TCP_STREAM_TYPE, CamelTcpStream))
 #define CAMEL_TCP_STREAM_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), CAMEL_TCP_STREAM_TYPE, CamelTcpStreamClass))
 #define CAMEL_IS_TCP_STREAM(o)    (CAMEL_CHECK_TYPE((o), CAMEL_TCP_STREAM_TYPE))
+
+G_BEGIN_DECLS
 
 typedef enum {
 	CAMEL_SOCKOPT_NONBLOCKING,     /* nonblocking io */
@@ -127,8 +123,6 @@ struct sockaddr *camel_tcp_stream_get_remote_address (CamelTcpStream *stream, so
 
 int         camel_tcp_stream_read_nb    (CamelTcpStream *stream, char *buffer, size_t n);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+G_END_DECLS
 
 #endif /* CAMEL_TCP_STREAM_H */

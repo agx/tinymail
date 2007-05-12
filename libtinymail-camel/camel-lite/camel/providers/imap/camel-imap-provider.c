@@ -25,12 +25,14 @@
 #include <config.h>
 
 #include <string.h>
+
+#include <glib/gi18n-lib.h>
+
 #include "camel-imap-store.h"
 #include "camel-provider.h"
+#include "camel-sasl.h"
 #include "camel-session.h"
 #include "camel-url.h"
-#include "camel-sasl.h"
-#include "camel-i18n.h"
 
 static void add_hash (guint *hash, char *s);
 static guint imap_url_hash (gconstpointer key);
@@ -65,9 +67,9 @@ CamelProviderConfEntry imap_conf_entries[] = {
 	{ CAMEL_PROVIDER_CONF_CHECKBOX, "filter", NULL,
 	  N_("_Apply filters to new messages in INBOX on this server"), "0" },
 	{ CAMEL_PROVIDER_CONF_CHECKBOX, "filter_junk", NULL,
-	  N_("Check new messages for _Junk contents"), "0" },
+	  N_("Check new messages for Jun_k contents"), "0" },
 	{ CAMEL_PROVIDER_CONF_CHECKBOX, "filter_junk_inbox", "filter_junk",
-	  N_("Only check for Junk messa_ges in the INBOX folder"), "0" },
+	  N_("Only check for Junk messages in the IN_BOX folder"), "0" },
 	{ CAMEL_PROVIDER_CONF_CHECKBOX, "offline_sync", NULL,
 	  N_("Automatically synchroni_ze remote mail locally"), "0" },
 	{ CAMEL_PROVIDER_CONF_SECTION_END },

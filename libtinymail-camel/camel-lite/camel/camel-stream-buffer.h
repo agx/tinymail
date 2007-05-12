@@ -27,12 +27,6 @@
 #ifndef CAMEL_STREAM_BUFFER_H
 #define CAMEL_STREAM_BUFFER_H 1
 
-
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus }*/
-
 #include <stdio.h>
 #include <camel/camel-seekable-stream.h>
 
@@ -40,6 +34,8 @@ extern "C" {
 #define CAMEL_STREAM_BUFFER(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_STREAM_BUFFER_TYPE, CamelStreamBuffer))
 #define CAMEL_STREAM_BUFFER_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), CAMEL_STREAM_BUFFER_TYPE, CamelStreamBufferClass))
 #define CAMEL_IS_STREAM_BUFFER(o)    (CAMEL_CHECK_TYPE((o), CAMEL_STREAM_BUFFER_TYPE))
+
+G_BEGIN_DECLS
 
 typedef enum {
 	CAMEL_STREAM_BUFFER_BUFFER = 0,
@@ -100,8 +96,6 @@ int camel_stream_buffer_gets (CamelStreamBuffer *sbf, char *buf, unsigned int ma
 char *camel_stream_buffer_read_line (CamelStreamBuffer *sbf);
 int camel_tcp_stream_buffer_gets_nb (CamelStreamBuffer *sbf, char *buf, unsigned int max);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+G_END_DECLS
 
 #endif /* CAMEL_STREAM_BUFFER_H */

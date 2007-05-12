@@ -29,46 +29,50 @@
 #include <config.h>
 #endif
 
-#include <glib.h>
-#include <glib/gprintf.h>
-
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pthread.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <ctype.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include <glib.h>
+#include <glib/gstdio.h>
+
+#include <libedataserver/e-iconv.h>
+#include <libedataserver/e-memory.h>
+#include <libedataserver/md5-utils.h>
+
+
+#include "camel-file-utils.h"
+#include "camel-folder-summary.h"
+#include "camel-folder.h"
+#include "camel-mime-filter-basic.h"
+#include "camel-mime-filter-charset.h"
+#include "camel-mime-filter-html.h"
+#include "camel-mime-filter-index.h"
+#include "camel-mime-filter.h"
+#include "camel-mime-message.h"
+#include "camel-multipart.h"
+#include "camel-private.h"
+#include "camel-stream-filter.h"
+#include "camel-stream-mem.h"
+#include "camel-stream-null.h"
+#include "camel-string-utils.h"
+#include "camel-disco-folder.h"
+
+
+
 #include <stddef.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <dirent.h>
 
-#include "libedataserver/e-iconv.h"
-
-#include "camel-folder.h"
-#include "camel-folder-summary.h"
-#include "camel-file-utils.h"
-#include "camel-mime-filter.h"
-#include "camel-mime-filter-index.h"
-#include "camel-mime-filter-charset.h"
-#include "camel-mime-filter-basic.h"
-#include "camel-mime-filter-html.h"
-#include "camel-mime-message.h"
-#include "camel-multipart.h"
-#include "camel-private.h"
-#include "camel-stream-mem.h"
-#include "camel-stream-null.h"
-#include "camel-stream-filter.h"
-#include "camel-string-utils.h"
-#include "camel-disco-folder.h"
-
-#include "libedataserver/md5-utils.h"
-#include "libedataserver/e-memory.h"
-
-#include <glib/gstdio.h>
+#include <glib.h>
+#include <glib/gprintf.h>
 
 static pthread_mutex_t info_lock = PTHREAD_MUTEX_INITIALIZER;
 

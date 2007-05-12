@@ -20,16 +20,12 @@
  *
  */
 
+#ifndef CAMEL_DISABLE_DEPRECATED
 
 #ifndef __CAMEL_I18N_H__
 #define __CAMEL_I18N_H__
 
 #include <glib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus */
 
 #ifdef ENABLE_NLS
 #    include <libintl.h>
@@ -46,17 +42,23 @@ extern "C" {
 #    endif
 #else
 /* Stubs that do something close enough.  */
-#    define textdomain(String) (String)
+#    define textdomain(String) (String
+#ifndef gettext
 #    define gettext(String) (String)
+#endif
+#ifndef dgettext
 #    define dgettext(Domain,Message) (Message)
+#endif
+#ifndef dcgettext
 #    define dcgettext(Domain,Message,Type) (Message)
+#endif
 #    define bindtextdomain(Domain,Directory) (Domain)
+#ifndef _
 #    define _(String) (String)
+#endif
 #    define N_(String) (String)
 #endif
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
 #endif /* __CAMEL_I18N_H__ */
+
+#endif /* CAMEL_DISABLE_DEPRECATED */

@@ -23,21 +23,23 @@
 #include <config.h>
 #endif
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #ifndef _LARGEFILE64_SOURCE
 #define O_LARGEFILE 0
 #endif
 
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
 #include <libedataserver/e-data-server-util.h>
+
 #include "camel/camel-exception.h"
 #include "camel/camel-file-utils.h"
 #include "camel/camel-i18n.h"

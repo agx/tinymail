@@ -22,10 +22,6 @@
 #ifndef _CAMEL_FOLDER_SUMMARY_H
 #define _CAMEL_FOLDER_SUMMARY_H
 
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus */
 
 #include <stdio.h>
 #include <time.h>
@@ -33,12 +29,14 @@ extern "C" {
 #include <camel/camel-object.h>
 
 
-struct _CamelFolder;
-
 #define CAMEL_FOLDER_SUMMARY_TYPE         camel_folder_summary_get_type ()
 #define CAMEL_FOLDER_SUMMARY(obj)         CAMEL_CHECK_CAST (obj, camel_folder_summary_get_type (), CamelFolderSummary)
 #define CAMEL_FOLDER_SUMMARY_CLASS(klass) CAMEL_CHECK_CLASS_CAST (klass, camel_folder_summary_get_type (), CamelFolderSummaryClass)
 #define CAMEL_IS_FOLDER_SUMMARY(obj)      CAMEL_CHECK_TYPE (obj, camel_folder_summary_get_type ())
+
+G_BEGIN_DECLS
+
+struct _CamelFolder;
 
 /*typedef struct _CamelFolderSummary      CamelFolderSummary;*/
 typedef struct _CamelFolderSummaryClass CamelFolderSummaryClass;
@@ -396,8 +394,6 @@ void camel_message_info_clear_normal_flags (CamelMessageInfo *min);
 int camel_folder_summary_get_index_for (CamelFolderSummary *s, const char *uid);
 
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+G_END_DECLS
 
 #endif /* ! _CAMEL_FOLDER_SUMMARY_H */

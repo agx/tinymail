@@ -40,10 +40,6 @@
 #define imap_debug(o)	
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus */
 
 #include "camel-imap-types.h"
 #include <camel/camel-disco-store.h>
@@ -51,6 +47,8 @@ extern "C" {
 
 #ifdef ENABLE_THREADS
 #include <libedataserver/e-msgport.h>
+
+G_BEGIN_DECLS
 
 typedef struct _CamelImapMsg CamelImapMsg;
 
@@ -66,12 +64,16 @@ CamelImapMsg *camel_imap_msg_new(void (*receive)(CamelImapStore *store, struct _
 				 size_t size);
 void camel_imap_msg_queue(CamelImapStore *store, CamelImapMsg *msg);
 
+G_END_DECLS
+
 #endif
 
 #define CAMEL_IMAP_STORE_TYPE     (camel_imap_store_get_type ())
 #define CAMEL_IMAP_STORE(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_IMAP_STORE_TYPE, CamelImapStore))
 #define CAMEL_IMAP_STORE_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), CAMEL_IMAP_STORE_TYPE, CamelImapStoreClass))
 #define CAMEL_IS_IMAP_STORE(o)    (CAMEL_CHECK_TYPE((o), CAMEL_IMAP_STORE_TYPE))
+
+G_BEGIN_DECLS
 
 enum {
 	CAMEL_IMAP_STORE_ARG_FIRST  = CAMEL_DISCO_STORE_ARG_FIRST + 100,
@@ -180,9 +182,6 @@ gboolean camel_imap_store_restore_stream_buffer (CamelImapStore *store);
 void camel_imap_store_stop_idle (CamelImapStore *store);
 void camel_imap_store_start_idle (CamelImapStore *store);
 
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+G_END_DECLS
 
 #endif /* CAMEL_IMAP_STORE_H */
