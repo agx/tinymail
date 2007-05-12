@@ -157,6 +157,13 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 	return;
 }
 
+static gboolean
+tny_session_camel_do_an_error (TnySessionCamel *self, TnyAlertType tnytype, GError *err)
+{
+	return tny_account_store_alert (
+		(TnyAccountStore*) self->priv->account_store, 
+		tnytype, (const GError *) err);
+}
 
 /* tny_session_camel_alert_user will for example be called when SSL is on and 
    camel_session_get_service is issued (for example TnyCamelTransportAccount and
@@ -195,9 +202,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 
 		tny_lockable_lock (self->priv->ui_lock);
 
-		retval = tny_account_store_alert (
-			(TnyAccountStore*) self->priv->account_store, 
-			tnytype, (const GError *) err);
+		tny_session_camel_do_an_error (self, tnytype, err);
 
 		tny_lockable_unlock (self->priv->ui_lock);
 
@@ -395,7 +400,7 @@ _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *accou
 typedef struct
 {
 	TnyDevice *device;
-	gboolean online;
+	gboolean online, as_thread;
 	gpointer user_data;
 } BackgroundConnectInfo;
 
@@ -403,7 +408,7 @@ static void
 foreach_account_set_connectivity (gpointer data, gpointer udata)
 {
 	BackgroundConnectInfo *info = udata;
-	CamelSession *session = info->user_data;
+	TnySessionCamel *self = info->user_data;
 
 	if (data && TNY_IS_CAMEL_ACCOUNT (data))
 	{
@@ -416,7 +421,16 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 
 		if (err != NULL) 
 		{
-			tny_session_camel_alert_user (session, CAMEL_SESSION_ALERT_ERROR, err->message, FALSE);
+			if (self->priv->account_store)
+			{
+				if (info->as_thread)
+					tny_lockable_lock (self->priv->ui_lock);
+
+				tny_session_camel_do_an_error (self, TNY_ALERT_TYPE_ERROR, err);
+
+				if (info->as_thread)
+					tny_lockable_unlock (self->priv->ui_lock);
+			}
 			g_error_free (err);
 		}
 	}
@@ -499,10 +513,13 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 
 	camel_session_set_online ((CamelSession *) self, online); 
 
-	if (priv->async_connect)
+	if (priv->async_connect) {
+		info->as_thread = TRUE;
 		priv->conthread = g_thread_create (background_connect_thread, info, TRUE, NULL);
-	else
+	} else {
+		info->as_thread = FALSE;
 		background_connect_thread (info);
+	}
 
 	return;
 }

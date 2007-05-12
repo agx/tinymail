@@ -1,4 +1,10 @@
-2007-05-10  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-12  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Improved connection / error handling when trying to connect fails
+
+	* This was a major API change
+
+2007-05-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Implemented Rob's priv->stamp++ idea for removing things from an
 	TnyGtkHeaderListModel
@@ -11,7 +17,9 @@
 	* libtinymail/tny-error.h: Document the TNY_ACCOUNT_ERROR_TRY_CONNECT 
 	and TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT error codes, including their 
 	awkward realities, based on discussion with Philip.
-	
+
+	* This was a major API change (due to documentation enhancements)
+
 2007-05-10  Rob Taylor  <rob.taylor@codethink.co.uk>
 
 	* libtinymailui-gtk/tny-gtk-header-list-model.c: Performance
