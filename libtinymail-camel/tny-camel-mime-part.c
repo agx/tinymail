@@ -485,10 +485,13 @@ tny_camel_mime_part_get_stream_default (TnyMimePart *self)
 	{
 		wrapper = camel_data_wrapper_new (); 
 		camel_medium_set_content_object (medium, wrapper);
-	}
+	} 
 
-	camel_stream_reset (wrapper->stream);
-	camel_stream_write_to_stream (wrapper->stream, stream);
+	if (wrapper->stream)
+	{
+		camel_stream_reset (wrapper->stream);
+		camel_stream_write_to_stream (wrapper->stream, stream);
+	}
 
 	retval = TNY_STREAM (tny_camel_stream_new (stream));
 
