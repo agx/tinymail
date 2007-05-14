@@ -51,7 +51,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @get_forget_pass_func_func: 
 @get_id_func: 
 @get_name_func: 
-@get_mech_func: 
+@get_secure_auth_mech_func: 
 @get_proto_func: 
 @get_user_func: 
 @get_hostname_func: 
@@ -186,7 +186,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_account_get_mech ##### -->
+<!-- ##### FUNCTION tny_account_get_secure_auth_mech ##### -->
 <para>
 
 </para>

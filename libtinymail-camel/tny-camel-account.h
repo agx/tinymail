@@ -64,7 +64,7 @@ struct _TnyCamelAccountClass
 	TnyForgetPassFunc (*get_forget_pass_func_func) (TnyAccount *self);
 	const gchar* (*get_id_func) (TnyAccount *self);
 	const gchar* (*get_name_func) (TnyAccount *self);
-	const gchar* (*get_mech_func) (TnyAccount *self);
+	const gchar* (*get_secure_auth_mech_func) (TnyAccount *self);
 	const gchar* (*get_proto_func) (TnyAccount *self);
 	const gchar* (*get_user_func) (TnyAccount *self);
 	const gchar* (*get_hostname_func) (TnyAccount *self);

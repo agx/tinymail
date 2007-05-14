@@ -1,5 +1,23 @@
 2007-05-14  Murray Cumming  <murrayc@murrayc.com>
 
+	* docs/devel/reference/tmpl/tny-account.sgml:
+	* docs/devel/reference/tmpl/tny-shared.sgml:
+	* libtinymail-camel/tny-camel-account.c:
+	(tny_camel_account_get_secure_auth_mech),
+	(tny_camel_account_get_secure_auth_mech_default),
+	(tny_account_init), (tny_camel_account_class_init):
+	* libtinymail-camel/tny-camel-account.h:
+	* libtinymail/tny-account.c: (tny_account_set_secure_auth_mech),
+	(tny_account_get_secure_auth_mech):
+	* libtinymail/tny-account.h:
+	* libtinymail/tny-combined-account.c:
+	(tny_combined_account_get_secure_auth_mech), (tny_account_init):
+	Renamed tny_account_get_mech() to tny_account_get_secure_auth_mech()
+	and TnyAccount::get_mech_func() to get_secure_auth_mech(),
+	to be consistent with the renamed set function.
+
+2007-05-14  Murray Cumming  <murrayc@murrayc.com>
+
 	* libtinymail/tny-account.c: (tny_account_set_secure_auth_mech):
 	* libtinymail/tny-account.h:
 	* docs/devel/reference/tmpl/tny-account.sgml:

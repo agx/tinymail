@@ -187,13 +187,13 @@ tny_combined_account_get_name (TnyAccount *self)
 }
 
 static const gchar*
-tny_combined_account_get_mech (TnyAccount *self)
+tny_combined_account_get_secure_auth_mech (TnyAccount *self)
 {
 	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
 
-	g_warning ("Don't use tny_account_get_mech on TnyCombinedAccount");
+	g_warning ("Don't use tny_account_get_secure_auth_mech on TnyCombinedAccount");
 
-	return tny_account_get_mech (TNY_ACCOUNT (priv->store_account));
+	return tny_account_get_secure_auth_mech (TNY_ACCOUNT (priv->store_account));
 }
 
 static const gchar*
@@ -464,7 +464,7 @@ tny_account_init (TnyAccountIface *klass)
 	klass->get_forget_pass_func_func = tny_combined_account_get_forget_pass_func;
 	klass->get_id_func = tny_combined_account_get_id;
 	klass->get_name_func = tny_combined_account_get_name;
-	klass->get_mech_func = tny_combined_account_get_mech;
+	klass->get_secure_auth_mech_func = tny_combined_account_get_secure_auth_mech;
 	klass->get_proto_func = tny_combined_account_get_proto;
 	klass->get_user_func = tny_combined_account_get_user;
 	klass->get_hostname_func = tny_combined_account_get_hostname;

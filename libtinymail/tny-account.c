@@ -257,7 +257,7 @@ tny_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech)
 	TNY_ACCOUNT_GET_IFACE (self)->set_secure_auth_mech_func (self, mech);
 
 #ifdef DBC /* require */
-	g_assert (!strcmp (tny_account_get_mech (self), mech));
+	g_assert (!strcmp (tny_account_get_secure_auth_mech (self), mech));
 #endif
 
 	return;
@@ -714,26 +714,26 @@ tny_account_get_name (TnyAccount *self)
 
 
 /**
- * tny_account_get_mech:
+ * tny_account_get_secure_auth_mech:
  * @self: a #TnyAccount object
  * 
- * Get the authentication mechanism for this account. Default is "PLAIN". The
+ * Get the secure authentication mechanism for this account. Default is "PLAIN". The
  * returned value can be NULL, in which case a undefined default is used.
  * 
  * Return value: the authentication mechanism as a read-only string
  *
  **/
 const gchar*
-tny_account_get_mech (TnyAccount *self)
+tny_account_get_secure_auth_mech (TnyAccount *self)
 {
 	const gchar *retval;
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_mech_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_secure_auth_mech_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_mech_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_secure_auth_mech_func (self);
 
 #ifdef DBC /* ensure */
 #endif
