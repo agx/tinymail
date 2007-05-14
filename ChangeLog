@@ -1,3 +1,32 @@
+2007-05-14  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-account.c: (tny_account_set_secure_auth_mech):
+	* libtinymail/tny-account.h:
+	* docs/devel/reference/tmpl/tny-account.sgml:
+	* docs/devel/reference/tmpl/tny-shared.sgml:
+	Renamed tny_account_set_mech() to tny_account_set_secure_auth_mech(), 
+	because that is clearer, after discussion with Philip.
+	Also renamed the TnyAccount::set_mech_func() vfunc to 
+	set_secure_auth_mech_func().
+	Attempted to document the possible values, but I have not achieved that 
+	completely.
+	
+	* libtinymail-camel/tny-camel-account.c:
+	(tny_camel_account_set_secure_auth_mech),
+	(tny_camel_account_set_secure_auth_mech_default),
+	(tny_account_init), (tny_camel_account_class_init):
+	* libtinymail-camel/tny-camel-account.h:
+	* libtinymail-camel/tny-camel-store-account.c:
+	(tny_camel_store_account_prepare):
+	* libtinymail-gnome-desktop/tny-gnome-account-store.c:
+	(load_accounts):
+	* libtinymail-gpe/tny-gpe-account-store.c: (load_accounts):
+	* libtinymail-maemo/tny-maemo-account-store.c: (load_accounts):
+	* libtinymail-olpc/tny-olpc-account-store.c: (load_accounts):
+	* libtinymail/tny-combined-account.c:
+	(tny_combined_account_set_secure_auth_mech), (tny_account_init):
+	Adapted to the changed API.
+
 2007-05-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improved connection / error handling when trying to connect fails

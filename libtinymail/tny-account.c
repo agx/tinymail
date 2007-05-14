@@ -209,28 +209,52 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
 	return;
 }
 
+ /* TODO: It would be nice to have a tny_account_set_secure_auth_mech_from_enum() 
+  * convenience function, with common clearly-defined and documented choices. */
+ /* TODO: Document how to discover the possible values, by getting the 
+  * capabilities from the server. */
+ /* TODO: Document _all_ of these possible values in terms of what kind of 
+  * authentication behaviour they specify, and which are even possible for 
+  * IMAP, POP, or SMTP. */
+  
 /**
- * tny_account_set_mech:
+ * tny_account_set_secure_auth_mech:
  * @self: a #TnyAccount object
  * @mech: the authentication mechanism
  * 
- * Set the account's authentication mechanism. For example in case of plain
- * you use "PLAIN" here. For anonymous you use "ANONYMOUS". This last one 
- * will for example result in a AUTHENTICATE ANONYMOUS request, as specified
- * in RFC 2245, on for example IMAP servers.
+ * Set the account's secure authentication mechanism. The possible values depend on 
+ * the capabilities of the server, but here are some possible values:
+ * - "ANONYMOUS": Results in an AUTHENTICATE ANONYMOUS request, as specified
+ * in <ulink url="http://www.faqs.org/rfcs/rfc2245.html">RFC 2245</ulink>.
+ * - "CRAM-MD5": Challenge-Response Authentication Mechanism, as specified in 
+ * <ulink url="http://www.faqs.org/rfcs/rfc2195.html">RFC 2195</ulink>.
+ * - "DIGEST-MD5": Digest Authentication, as specified in 
+ * <ulink url="http://www.faqs.org/rfcs/rfc2831.html">RFC 2831</ulink>.
+ * - GSSAPI: Generic Security Service Application Program Interface, as 
+ * specified in <ulink url="http://www.faqs.org/rfcs/rfc2222.html">RFC 2222</ulink> 
+ * and <ulink url="http://www.faqs.org/rfcs/rfc2078.html.html">RFC 2078</ulink>.
+ * - Kerberos 4: as specified in 
+ * <ulink url="http://www.faqs.org/rfcs/rfc2222.htmll">RFC 2222</ulink>.
+ * - "NTLM / SPA": Secure Password Authentication, as used by Outlook Express.
+ * - "Login"
+ * - "PLAIN"
+ * - "POP before SMTP".
+ * 
+ * Other relevant standards:
+ * - <ulink url="http://www.faqs.org/rfcs/rfc1731.html">RFC 1731 - IMAP4 Authentication Mechanisms</ulink> 
  * 
  **/
 void
-tny_account_set_mech (TnyAccount *self, const gchar *mech)
+tny_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (mech);
 	g_assert (strlen (mech) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_mech_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_secure_auth_mech_func != NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_mech_func (self, mech);
+	TNY_ACCOUNT_GET_IFACE (self)->set_secure_auth_mech_func (self, mech);
 
 #ifdef DBC /* require */
 	g_assert (!strcmp (tny_account_get_mech (self), mech));

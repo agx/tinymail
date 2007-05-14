@@ -263,7 +263,7 @@ Shared include file with forward typedefs
 @is_connected_func: 
 @set_id_func: 
 @set_name_func: 
-@set_mech_func: 
+@set_secure_auth_mech_func: 
 @set_proto_func: 
 @set_user_func: 
 @set_hostname_func: 

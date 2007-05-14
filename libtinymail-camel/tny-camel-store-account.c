@@ -84,6 +84,9 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 
 	if (!apriv->custom_url_string)
 	{
+		/* Prepare the URL string that Camel needs to identify 
+		 * the protocol, hostname, user, security options, etc:
+		 */
 		CamelURL *url = NULL;
 		GList *options = apriv->options;
 		gchar *proto;

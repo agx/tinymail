@@ -39,7 +39,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @is_connected_func: 
 @set_id_func: 
 @set_name_func: 
-@set_mech_func: 
+@set_secure_auth_mech_func: 
 @set_proto_func: 
 @set_user_func: 
 @set_hostname_func: 
@@ -96,7 +96,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @name: 
 
 
-<!-- ##### FUNCTION tny_account_set_mech ##### -->
+<!-- ##### FUNCTION tny_account_set_secure_auth_mech ##### -->
 <para>
 
 </para>

@@ -96,9 +96,9 @@ tny_combined_account_set_name (TnyAccount *self, const gchar *name)
 }
 
 static void
-tny_combined_account_set_mech (TnyAccount *self, const gchar *mech)
+tny_combined_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech)
 {
-	g_warning ("Don't use tny_account_set_mech on TnyCombinedAccount");
+	g_warning ("Don't use tny_account_set_secure_auth_mech on TnyCombinedAccount");
 }
 
 static void
@@ -452,7 +452,7 @@ tny_account_init (TnyAccountIface *klass)
 	klass->is_connected_func = tny_combined_account_is_connected;
 	klass->set_id_func = tny_combined_account_set_id;
 	klass->set_name_func = tny_combined_account_set_name;
-	klass->set_mech_func = tny_combined_account_set_mech;
+	klass->set_secure_auth_mech_func = tny_combined_account_set_secure_auth_mech;
 	klass->set_proto_func = tny_combined_account_set_proto;
 	klass->set_user_func = tny_combined_account_set_user;
 	klass->set_hostname_func = tny_combined_account_set_hostname;

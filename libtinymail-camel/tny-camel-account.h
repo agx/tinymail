@@ -52,7 +52,7 @@ struct _TnyCamelAccountClass
 	gboolean (*is_connected_func)(TnyAccount *self);
 	void (*set_id_func) (TnyAccount *self, const gchar *id);
 	void (*set_name_func) (TnyAccount *self, const gchar *name);
-	void (*set_mech_func) (TnyAccount *self, const gchar *name);
+	void (*set_secure_auth_mech_func) (TnyAccount *self, const gchar *name);
 	void (*set_proto_func) (TnyAccount *self, const gchar *proto);
 	void (*set_user_func) (TnyAccount *self, const gchar *user);
 	void (*set_hostname_func) (TnyAccount *self, const gchar *host);

@@ -410,13 +410,13 @@ tny_camel_account_set_id_default (TnyAccount *self, const gchar *id)
 }
 
 static void
-tny_camel_account_set_mech (TnyAccount *self, const gchar *mech)
+tny_camel_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech)
 {
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_mech_func (self, mech);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_secure_auth_mech_func (self, mech);
 }
 
 static void
-tny_camel_account_set_mech_default (TnyAccount *self, const gchar *mech)
+tny_camel_account_set_secure_auth_mech_default (TnyAccount *self, const gchar *mech)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -992,7 +992,7 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->get_proto_func = tny_camel_account_get_proto;
 	klass->set_proto_func = tny_camel_account_set_proto;
 	klass->get_mech_func = tny_camel_account_get_mech;
-	klass->set_mech_func = tny_camel_account_set_mech;
+	klass->set_secure_auth_mech_func = tny_camel_account_set_secure_auth_mech;
 	klass->get_user_func = tny_camel_account_get_user;
 	klass->set_user_func = tny_camel_account_set_user;
 	klass->get_pass_func_func = tny_camel_account_get_pass_func;
@@ -1028,7 +1028,7 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->get_proto_func = tny_camel_account_get_proto_default;
 	class->set_proto_func = tny_camel_account_set_proto_default;
 	class->get_mech_func = tny_camel_account_get_mech_default;
-	class->set_mech_func = tny_camel_account_set_mech_default;
+	class->set_secure_auth_mech_func = tny_camel_account_set_secure_auth_mech_default;
 	class->get_user_func = tny_camel_account_get_user_default;
 	class->set_user_func = tny_camel_account_set_user_default;
 	class->get_pass_func_func = tny_camel_account_get_pass_func_default;

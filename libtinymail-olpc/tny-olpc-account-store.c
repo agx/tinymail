@@ -215,7 +215,7 @@ load_accounts (TnyAccountStore *self)
 			}
 
 			if (mech)
-				tny_account_set_mech (TNY_ACCOUNT (account), mech);
+				tny_account_set_secure_auth_mech (TNY_ACCOUNT (account), mech);
 
 			options = g_key_file_get_string_list (keyfile, "tinymail", "options", &options_len, NULL);
 			if (options)
