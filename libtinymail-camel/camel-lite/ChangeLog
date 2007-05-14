@@ -1,15 +1,3 @@
-2007-05-14  set REAL_NAME environment variable  <murrayc@murrayc-desktop>
-
-	reviewed by: <delete if not using a buddy>
-
-	* COPYING:
-
-2007-05-08  set REAL_NAME environment variable  <murrayc@murrayc-desktop>
-
-	reviewed by: <delete if not using a buddy>
-
-	* camel/camel-session.c:
-
 2006-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merged a lot code. Synced with latest version in CVS
