@@ -144,6 +144,7 @@ static void let_idle_die (CamelImapStore *imap_store)
 	if (imap_store->idle_signal > 0) 
 		g_source_remove (imap_store->idle_signal);
 
+	g_static_rec_mutex_lock (imap_store->idle_prefix_lock);
 	if (imap_store->idle_prefix)
 	{
 		g_free (imap_store->idle_prefix); 
@@ -153,6 +154,7 @@ static void let_idle_die (CamelImapStore *imap_store)
 		camel_stream_printf (imap_store->ostream, "DONE\r\n");
 		g_mutex_unlock (imap_store->stream_lock);
 	}
+	g_static_rec_mutex_unlock (imap_store->idle_prefix_lock);
 
 }
 
@@ -253,7 +255,8 @@ camel_imap_store_finalize (CamelObject *object)
 		disco->diary = NULL;
 	}
 
-	
+	g_static_rec_mutex_free (imap_store->idle_prefix_lock);
+	imap_store->idle_prefix_lock = NULL;
 	g_mutex_free (imap_store->stream_lock);
 
 }
@@ -262,6 +265,9 @@ static void
 camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
+
+	imap_store->idle_prefix_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (imap_store->idle_prefix_lock);
 
 	imap_store->dontdistridlehack = FALSE;
 	imap_store->idle_signal = 0;

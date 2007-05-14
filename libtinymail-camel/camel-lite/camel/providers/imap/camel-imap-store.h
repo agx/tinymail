@@ -159,6 +159,7 @@ struct _CamelImapStore {
 	gchar *idle_prefix;
 	guint idle_signal;
 	gboolean dontdistridlehack, has_login;
+	GStaticRecMutex *idle_prefix_lock;
 };
 
 typedef struct {
