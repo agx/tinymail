@@ -3399,6 +3399,19 @@ idle_real_start (CamelImapStore *store)
 	camel_stream_printf (store->ostream, "%s IDLE\r\n",
 		store->idle_prefix);
 
+	/* The IDLE command is sent from the client to the server when the
+	 *  client is ready to accept unsolicited mailbox update messages.  The
+	 *  server requests a response to the IDLE command using the continuation
+	 * ("+") response.  The IDLE command remains active until the client
+	 * responds to the continuation, and as long as an IDLE command is
+	 * active, the server is now free to send untagged EXISTS, EXPUNGE, and
+	 *  other messages at any time. */
+
+
+	/* So according to the RFC, we will wait for the server for its + 
+	 * continuation. If the server doesn't do this, it's an incorrect 
+	 * IDLE implementation at the server. Right? */
+
 	resp = NULL;
 	while (camel_imap_store_readline_nl (store, &resp, &ex) > 0)
 	{
@@ -3470,6 +3483,16 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 			{ g_mutex_unlock (store->stream_lock); return NULL; }
 		if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
 			{ g_mutex_unlock (store->stream_lock); return NULL; }
+
+		/* Here we force the server to tell us about the changes: */
+
+		/* The IDLE command is terminated by the receipt of a "DONE"
+		 * continuation from the client; such response satisfies the server's
+		 * continuation request.  At that point, the server MAY send any
+		 * remaining queued untagged responses and then MUST immediately send
+		 * the tagged response to the IDLE command and prepare to process other
+		 * commands. */
+
 		if (store->ostream && CAMEL_IS_STREAM (store->ostream)) {
 			idle_debug ("Sending DONE in idle_deal_with_stuff (nb)\n");
 			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
