@@ -3388,6 +3388,9 @@ idle_response_free (IdleResponse *idle_resp)
 static void
 idle_real_start (CamelImapStore *store)
 {
+	char *resp;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
 	idle_debug ("idle_real_start\n");
 
 	g_mutex_lock (store->stream_lock);
@@ -3395,6 +3398,21 @@ idle_real_start (CamelImapStore *store)
 		store->tag_prefix, store->command++);
 	camel_stream_printf (store->ostream, "%s IDLE\r\n",
 		store->idle_prefix);
+
+	resp = NULL;
+	while (camel_imap_store_readline_nl (store, &resp, &ex) > 0)
+	{
+		gboolean tbreak = FALSE;
+		if (!strncmp (resp, "+ ", 2))
+			tbreak = TRUE;
+		/* printf ("-> %s\n", resp); */
+		g_free (resp); resp=NULL;
+		if (tbreak)
+			break;
+	}
+	if (resp)
+		g_free (resp);
+
 	g_mutex_unlock (store->stream_lock);
 
 }

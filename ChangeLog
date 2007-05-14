@@ -1,3 +1,8 @@
+2007-05-14  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Waiting for the + continuation after IDLE
+	* Please watch this fix with different IMAP implementations
+
 2007-05-14  Sergio Villar Senin  <svillar@igalia.com>
 
 	* tests/functional/account-refresh.c: added this new test that
