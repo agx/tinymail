@@ -3418,9 +3418,9 @@ idle_real_start (CamelImapStore *store)
 		gboolean tbreak = FALSE;
 		if (!strncmp (resp, "+ ", 2))
 			tbreak = TRUE;
-		if (!strncasecmp (resp, "NO", 2))
+		if (strcasestr (resp, "NO") != NULL)
 			tbreak = TRUE;
-		if (!strncasecmp (resp, "BAD", 3))
+		if (strcasestr (resp, "BAD") != NULL)
 			tbreak = TRUE;
 		/* printf ("-> %s\n", resp); */
 		g_free (resp); resp=NULL;
