@@ -8,7 +8,7 @@
  *
  * Authors:
  *   Dan Winship <danw@ximian.com>
- *   Jeffrey Stedfast <fejj@ximian.com> 
+ *   Jeffrey Stedfast <fejj@ximian.com> s
  *   Philip Van Hoof <pvanhoof@gnome.org>
  *
  * Copyright (C) 2000, 2001 Ximian, Inc.
@@ -3417,6 +3417,10 @@ idle_real_start (CamelImapStore *store)
 	{
 		gboolean tbreak = FALSE;
 		if (!strncmp (resp, "+ ", 2))
+			tbreak = TRUE;
+		if (!strncasecmp (resp, "NO", 2))
+			tbreak = TRUE;
+		if (!strncasecmp (resp, "BAD", 3))
 			tbreak = TRUE;
 		/* printf ("-> %s\n", resp); */
 		g_free (resp); resp=NULL;
