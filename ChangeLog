@@ -1,3 +1,9 @@
+2007-05-14  Sergio Villar Senin  <svillar@igalia.com>
+
+	* tests/functional/account-refresh.c: added this new test that
+	refreshes all the subscribed folders of an store account inside a
+	different thread
+	
 2007-05-14  Murray Cumming  <murrayc@murrayc.com>
 
 	* docs/devel/reference/tmpl/tny-account.sgml:
