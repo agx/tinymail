@@ -133,8 +133,8 @@ _tny_async_worker_queue_task_new (OAsyncWorkerTask *r_task)
 static void
 tny_async_worker_queue_task_finalize (GObject *object)
 {
-	TnyAsyncWorkerQueueTask *self = (TnyAsyncWorkerQueueTask*) object;
-	TnyAsyncWorkerQueueTaskPriv *priv = TNY_ASYNC_WORKER_QUEUE_TASK_GET_PRIVATE (self);
+	/* TnyAsyncWorkerQueueTask *self = (TnyAsyncWorkerQueueTask*) object;
+	 * TnyAsyncWorkerQueueTaskPriv *priv = TNY_ASYNC_WORKER_QUEUE_TASK_GET_PRIVATE (self); */
 
 	/* This is done right after the callback in OAsyncWorker
 	 * g_object_unref (priv->real); 
