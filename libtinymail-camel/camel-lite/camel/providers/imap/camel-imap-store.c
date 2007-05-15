@@ -2594,12 +2594,73 @@ rename_folder_info (CamelImapStore *imap_store, const char *old_name, const char
 	}
 }
 
+static int
+make_path (char *path, int nmode, int parent_mode)
+{
+  int oumask;
+  struct stat sb;
+  char *p, *npath;
+
+  if (stat (path, &sb) == 0)
+    {
+      if (S_ISDIR (sb.st_mode) == 0)
+	  return 1;
+      if (chmod (path, nmode))
+          return 1;
+      return 0;
+    }
+
+  oumask = umask (0);
+  npath = g_strdup (path);	/* So we can write to it. */
+    
+  /* Check whether or not we need to do anything with intermediate dirs. */
+
+  /* Skip leading slashes. */
+  p = npath;
+  while (*p == '/')
+    p++;
+
+  while (p = strchr (p, '/'))
+    {
+      *p = '\0';
+      if (stat (npath, &sb) != 0)
+	{
+	  if (mkdir (npath, parent_mode))
+	    {
+	      free (npath);
+	      return 1;
+	    }
+	}
+      else if (S_ISDIR (sb.st_mode) == 0)
+        {
+          free (npath);
+          return 1;
+        }
+
+      *p++ = '/';	/* restore slash */
+      while (*p == '/')
+	p++;
+    }
+
+  /* Create the final directory component. */
+  if (stat (npath, &sb) && mkdir (npath, nmode))
+    {
+      free (npath);
+      return 1;
+    }
+
+  free (npath);
+  return 0;
+}
+
+
 static void
 rename_folder (CamelStore *store, const char *old_name, const char *new_name_in, CamelException *ex)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (store);
 	CamelImapResponse *response;
 	char *oldpath, *newpath, *storage_path;
+	char *tpath, *lslash;
 
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
@@ -2644,6 +2705,15 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 	g_free(storage_path);
 
 	/* So do we care if this didn't work?  Its just a cache? */
+	tpath = g_strdup (newpath);
+	/* TNY TODO: Win32 portage needed */
+	lslash = strrchr (tpath, '/');
+	if (lslash) {
+		lslash = '\0';
+		make_path (tpath, S_IRWXU, S_IRWXU);
+	}
+	g_free (tpath);
+
 	if (g_rename (oldpath, newpath) == -1) {
 		g_warning ("Could not rename message cache '%s' to '%s': %s: cache reset",
 			   oldpath, newpath, strerror (errno));

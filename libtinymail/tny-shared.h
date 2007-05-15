@@ -23,6 +23,12 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#ifdef DEBUG
+#define tny_debug g_print
+#else
+#define tny_debug(o, ...)	
+#endif
+
 G_BEGIN_DECLS
 
 typedef struct _TnyStatus TnyStatus;

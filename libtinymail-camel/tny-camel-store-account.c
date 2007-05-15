@@ -258,6 +258,9 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
 	folder_full_name = camel_folder_get_full_name (cfolder);
 
+	if (folder_full_name == NULL)
+		goto cleanup;
+
 	if (camel_store_folder_subscribed (store, folder_full_name) == subscribe)
 		goto cleanup;
 
