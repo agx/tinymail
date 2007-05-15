@@ -1,6 +1,10 @@
 2007-05-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* A new implementation for tny_folder_copy in libtinymail-camel
+	* A new implementation for tny_folder_copy_async in libtinymail-camel
+	* Changed the TnyCopyFolderCallback function description
+
+	* This was a major API change
 
 2007-05-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
