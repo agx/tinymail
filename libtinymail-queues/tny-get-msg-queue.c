@@ -28,7 +28,6 @@
 #include <tny-folder-observer.h>
 
 #include <tny-get-msg-queue.h>
-#include <oasyncworker/oasyncworker.h>
 
 static GObjectClass *parent_class = NULL;
 static GObjectClass *int_parent_class = NULL;
@@ -42,13 +41,14 @@ typedef struct {
 	TnyGetMsgCallback callback;
 	TnyStatusCallback status_callback;
 	gpointer user_data;
+	TnyFolder *folder;
 	guint i;
 	GError *err;
 } GetMsgInfo;
 
 
 static gpointer
-get_msg_task (OAsyncWorkerTask *task, gpointer arguments)
+get_msg_task (TnyQueueTask *task, gpointer arguments)
 {
 	TnyMsg *retval = NULL;
 	GetMsgInfo *info = (GetMsgInfo *) arguments;
@@ -59,7 +59,7 @@ get_msg_task (OAsyncWorkerTask *task, gpointer arguments)
 
 	g_print ("Getting message (%d of %d): %s\n", info->i, priv->total, 
 		tny_header_get_subject (info->header));
-	folder = tny_header_get_folder (info->header);
+	info->folder = tny_header_get_folder (info->header);
 
 	if (info->status_callback) {
 
@@ -75,32 +75,34 @@ get_msg_task (OAsyncWorkerTask *task, gpointer arguments)
 		tny_status_free (status);
 	}
 
-	retval = tny_folder_get_msg (folder, info->header, &info->err);
-
-	g_object_unref (folder);
+	if (info->folder)
+		retval = tny_folder_get_msg (info->folder, info->header, &info->err);
 
 	return (gpointer) retval;
 }
 
 static void 
-get_msg_callback (OAsyncWorkerTask *task, gpointer func_result)
+get_msg_callback (TnyQueueTask *task, gpointer func_result)
 {
-	GetMsgInfo *info = o_async_worker_task_get_arguments (task);
+	GetMsgInfo *info = tny_queue_task_get_arguments (task);
 	TnyMsg *msg = (TnyMsg *) func_result;
 	TnyFolder *folder;
 
 	info->err = NULL;
 
-	folder = tny_header_get_folder (info->header);
-
-	if (info->callback)
-		info->callback (folder, FALSE, msg, &info->err, info->user_data);
+	
+	if (info->callback && info->folder)
+		info->callback (info->folder, FALSE, msg, &info->err, info->user_data);
 
 	if (msg)
 		g_object_unref (msg);
- 
-	g_object_unref (folder);
+
+
 	g_object_unref (info->header);
+
+	if (info->folder)
+		g_object_unref (info->folder);
+
 	g_object_unref (info->self);
 
 	g_slice_free (GetMsgInfo, info);
@@ -129,7 +131,7 @@ static void
 tny_get_msg_queue_get_msg_default (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
-	OAsyncWorkerTask *task = o_async_worker_task_new ();
+	TnyQueueTask *task = tny_queue_create_task (priv->queue);
 	GetMsgInfo *info = g_slice_new (GetMsgInfo);
 
 	priv->total++;
@@ -140,12 +142,12 @@ tny_get_msg_queue_get_msg_default (TnyGetMsgQueue *self, TnyHeader *header, TnyG
 	info->status_callback = status_callback;
 	info->user_data = user_data;
 
-	o_async_worker_task_set_arguments (task, info);
-	o_async_worker_task_set_func (task, get_msg_task);
-	o_async_worker_task_set_callback (task, get_msg_callback);
+	tny_queue_task_set_arguments (task, info);
+	tny_queue_task_set_func (task, get_msg_task);
+	tny_queue_task_set_callback (task, get_msg_callback);
 
 	g_mutex_lock (priv->lock);
-	o_async_worker_add (priv->queue, task);
+	tny_queue_add_task (priv->queue, task);
 	g_mutex_unlock (priv->lock);
 
 }
@@ -305,17 +307,53 @@ tny_get_msg_queue_full_msg_retrieval (TnyGetMsgQueue *self, TnyFolder *folder, T
 
 /**
  * tny_get_msg_queue_new:
+ * @decorated: The #TnyQueue to decorate with this queue
  *
  * Creates a queue that can get messages for you
  *
- * Return value: a new #TnyGetMsgQueue instance
+ * Return value: a new #TnyQueue instance
  **/
-TnyGetMsgQueue*
-tny_get_msg_queue_new (void)
+TnyQueue*
+tny_get_msg_queue_new (TnyQueue *decorated)
 {
 	TnyGetMsgQueue *self = g_object_new (TNY_TYPE_GET_MSG_QUEUE, NULL);
+	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
 
-	return self;
+	priv->queue = TNY_QUEUE (g_object_ref (decorated));
+
+	return TNY_QUEUE (self);
+}
+
+static gint
+tny_get_msg_queue_add_task (TnyQueue *self, TnyQueueTask *task)
+{
+	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
+	return tny_queue_add_task (priv->queue, task);
+}
+
+
+static void
+tny_get_msg_queue_join (TnyQueue *self)
+{
+	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
+	tny_queue_join (priv->queue);
+	return;
+}
+
+static TnyQueueTask*
+tny_get_msg_queue_create_task (TnyQueue *self)
+{
+	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (self);
+	return tny_queue_create_task (priv->queue);
+}
+
+
+static void
+tny_queue_init (TnyQueueIface *klass)
+{
+	klass->add_task_func = tny_get_msg_queue_add_task;
+	klass->join_func = tny_get_msg_queue_join;
+	klass->create_task_func = tny_get_msg_queue_create_task;
 }
 
 
@@ -325,7 +363,7 @@ tny_get_msg_queue_finalize (GObject *object)
 	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (object);
 
 	g_mutex_lock (priv->lock);
-	g_object_unref (G_OBJECT (priv->queue));
+	g_object_unref (priv->queue);
 	g_mutex_unlock (priv->lock);
 	g_mutex_free (priv->lock);
 
@@ -341,7 +379,7 @@ tny_get_msg_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->lock = g_mutex_new ();
 	priv->total = 0;
 	g_mutex_lock (priv->lock);
-	priv->queue = o_async_worker_new ();
+	priv->queue = NULL;
 	g_mutex_unlock (priv->lock);
 
 	return;
@@ -382,9 +420,19 @@ tny_get_msg_queue_get_type (void)
 			NULL
 		};
 
+		static const GInterfaceInfo tny_queue_info = 
+		{
+			(GInterfaceInitFunc) tny_queue_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyGetMsgQueue",
 			&info, 0);
+
+		g_type_add_interface_static (type, TNY_TYPE_QUEUE,
+			&tny_queue_info);
 	}
 	return type;
 }

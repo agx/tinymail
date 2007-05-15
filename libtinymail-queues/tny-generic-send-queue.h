@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 #include <tny-shared.h>
+#include <tny-queue.h>
+#include <tny-queue-task.h>
 #include <tny-send-queue.h>
 #include <tny-msg.h>
 #include <tny-folder.h>

@@ -20,7 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 #include <tny-shared.h>
-
+#include <tny-queue.h>
+#include <tny-queue-task.h>
 #include <tny-folder.h>
 #include <tny-msg.h>
 
@@ -51,7 +52,7 @@ struct _TnyGetMsgQueueClass
 };
 
 GType tny_get_msg_queue_get_type (void);
-TnyGetMsgQueue* tny_get_msg_queue_new (void);
+TnyQueue* tny_get_msg_queue_new (TnyQueue *decorated);
 
 void tny_get_msg_queue_get_msg (TnyGetMsgQueue *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_get_msg_queue_full_msg_retrieval (TnyGetMsgQueue *self, TnyFolder *folder, TnyList *headers, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);

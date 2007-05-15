@@ -24,7 +24,7 @@ typedef struct _TnyGenericSendQueuePriv TnyGenericSendQueuePriv;
 
 struct _TnyGenericSendQueuePriv
 {
-	OAsyncWorker *queue;
+	TnyQueue *queue;
 	GMutex *lock;
 	TnyFolder *outbox, *sentbox;
 	TnyTransportAccount *account;

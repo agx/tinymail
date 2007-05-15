@@ -21,9 +21,6 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
-#include <oasyncworker/oasyncworker.h>
-
-
 #include <tny-generic-send-queue.h>
 #include <tny-simple-list.h>
 #include <tny-folder-observer.h>
@@ -88,7 +85,7 @@ typedef struct {
 
 
 static gpointer
-generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
+generic_send_task (TnyQueueTask *task, gpointer arguments)
 {
 	GenericSendInfo *info = (GenericSendInfo *) arguments;
 	TnySendQueue *self = (TnySendQueue *) info->self;
@@ -132,9 +129,9 @@ generic_send_task (OAsyncWorkerTask *task, gpointer arguments)
 }
 
 static void 
-generic_send_callback (OAsyncWorkerTask *task, gpointer func_result)
+generic_send_callback (TnyQueueTask *task, gpointer func_result)
 {
-	GenericSendInfo *info = o_async_worker_task_get_arguments (task);
+	GenericSendInfo *info = tny_queue_task_get_arguments (task);
 	g_object_unref (info->self);
 	g_slice_free (GenericSendInfo, info);
 }
@@ -174,7 +171,7 @@ process_current_items (TnySendQueue *self)
 
 	while (!tny_iterator_is_done (iter))
 	{
-		OAsyncWorkerTask *task;
+		TnyQueueTask *task;
 		GenericSendInfo *info = g_slice_new (GenericSendInfo);
 		TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 		guint item = 0;
@@ -202,12 +199,12 @@ process_current_items (TnySendQueue *self)
 			return;
 		}
 
-		task = o_async_worker_task_new ();
-		o_async_worker_task_set_arguments (task, info);
-		o_async_worker_task_set_func (task, generic_send_task);
-		o_async_worker_task_set_callback (task, generic_send_callback);
+		task = tny_queue_create_task (priv->queue);
+		tny_queue_task_set_arguments (task, info);
+		tny_queue_task_set_func (task, generic_send_task);
+		tny_queue_task_set_callback (task, generic_send_callback);
 
-		item = o_async_worker_add (priv->queue, task);
+		item = tny_queue_add_task (priv->queue, task);
 
 		g_object_unref (header);
 		tny_iterator_next (iter); 
@@ -253,7 +250,7 @@ tny_generic_send_queue_update_default (TnyFolderObserver *self, TnyFolderChange 
 {
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 	TnyFolder *outbox;
-	OAsyncWorkerTask *task;
+	TnyQueueTask *task;
 	GenericSendInfo *info;
 	TnyFolderChangeChanged changed;
 	TnyList *list; TnyIterator *iter;
@@ -298,12 +295,12 @@ tny_generic_send_queue_update_default (TnyFolderObserver *self, TnyFolderChange 
 				return;
 			}
 
-			task = o_async_worker_task_new ();
-			o_async_worker_task_set_arguments (task, info);
-			o_async_worker_task_set_func (task, generic_send_task);
-			o_async_worker_task_set_callback (task, generic_send_callback);
+			task = tny_queue_create_task (priv->queue);
+			tny_queue_task_set_arguments (task, info);
+			tny_queue_task_set_func (task, generic_send_task);
+			tny_queue_task_set_callback (task, generic_send_callback);
 
-			o_async_worker_add (priv->queue, task);
+			tny_queue_add_task (priv->queue, task);
 
 			g_object_unref (G_OBJECT (header));
 			tny_iterator_next (iter);
@@ -332,7 +329,7 @@ tny_generic_send_queue_cancel_default (TnySendQueue *self, gboolean remove, GErr
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 
 	priv->cancelled = TRUE;
-	o_async_worker_join (priv->queue);
+	tny_queue_join (priv->queue);
 
 	g_mutex_lock (priv->lock);
 	if (remove)
@@ -416,8 +413,34 @@ tny_generic_send_queue_get_outbox_default (TnySendQueue *self)
 	return TNY_FOLDER (g_object_ref (priv->outbox));
 }
 
+
+
+static gint
+tny_generic_send_queue_add_task (TnyQueue *self, TnyQueueTask *task)
+{
+	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
+	return tny_queue_add_task (priv->queue, task);
+}
+
+static void
+tny_generic_send_queue_join (TnyQueue *self)
+{
+	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
+	tny_queue_join (priv->queue);
+	return;
+}
+
+
+static TnyQueueTask*
+tny_generic_send_queue_create_task (TnyQueue *self)
+{
+	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
+	return tny_queue_create_task (priv->queue);
+}
+
 /**
  * tny_generic_send_queue_new:
+ * @decorated: The #TnyQueue to decorate with this queue
  * @account: a #TnyTransportAccount object
  * @outbox: a #TnyFolder object
  * @sentbox: a #TnyFolder object
@@ -428,11 +451,12 @@ tny_generic_send_queue_get_outbox_default (TnySendQueue *self)
  * Return value: a new #TnySendQueue instance
  **/
 TnySendQueue*
-tny_generic_send_queue_new (TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox)
+tny_generic_send_queue_new (TnyQueue *decorated, TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox)
 {
 	TnyGenericSendQueue *self = g_object_new (TNY_TYPE_GENERIC_SEND_QUEUE, NULL);
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (self);
 
+	priv->queue = TNY_QUEUE (g_object_ref (decorated));
 	priv->account = TNY_TRANSPORT_ACCOUNT (g_object_ref (account));
 	priv->outbox = TNY_FOLDER (g_object_ref (outbox));
 	priv->sentbox = TNY_FOLDER (g_object_ref (sentbox));
@@ -451,7 +475,7 @@ tny_generic_send_queue_finalize (GObject *object)
 	TnyGenericSendQueuePriv *priv = TNY_GENERIC_SEND_QUEUE_GET_PRIVATE (object);
 
 	priv->cancelled = TRUE;
-	o_async_worker_join (priv->queue);
+	tny_queue_join (priv->queue);
 
 	g_mutex_lock (priv->lock);
 	g_object_unref (G_OBJECT (priv->queue));
@@ -474,7 +498,7 @@ tny_generic_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->lock = g_mutex_new ();
 
 	g_mutex_lock (priv->lock);
-	priv->queue = o_async_worker_new ();
+	priv->queue = NULL;
 	priv->account = NULL;
 	priv->sentbox = NULL;
 	priv->outbox = NULL;
@@ -509,6 +533,15 @@ tny_folder_observer_init (TnyFolderObserverIface *klass)
 {
 	klass->update_func = tny_generic_send_queue_update;
 }
+
+static void
+tny_queue_init (TnyQueueIface *klass)
+{
+	klass->add_task_func = tny_generic_send_queue_add_task;
+	klass->join_func = tny_generic_send_queue_join;
+	klass->create_task_func = tny_generic_send_queue_create_task;
+}
+
 
 static void
 tny_send_queue_init (gpointer g, gpointer iface_data)
@@ -556,6 +589,13 @@ tny_generic_send_queue_get_type (void)
 		  NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_queue_info = 
+		{
+			(GInterfaceInitFunc) tny_queue_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyGenericSendQueue",
 			&info, 0);
@@ -565,6 +605,9 @@ tny_generic_send_queue_get_type (void)
 
 		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
 			&tny_folder_observer_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_QUEUE,
+			&tny_queue_info);
 
 	}
 	return type;

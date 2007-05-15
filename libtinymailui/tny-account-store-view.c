@@ -34,11 +34,13 @@
 void
 tny_account_store_view_set_account_store (TnyAccountStoreView *self, TnyAccountStore *account_store)
 {
-#ifdef DEBUG
-	if (!TNY_ACCOUNT_STORE_VIEW_GET_IFACE (self)->set_account_store_func)
-		g_critical ("You must implement tny_account_store_view_set_account_store\n");
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT_STORE_VIEW (self));
+	g_assert (TNY_ACCOUNT_STORE_VIEW_GET_IFACE (self)->set_account_store_func != NULL);
 #endif
+
 	TNY_ACCOUNT_STORE_VIEW_GET_IFACE (self)->set_account_store_func (self, account_store);
+
 	return;
 }
 

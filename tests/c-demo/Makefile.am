@@ -16,6 +16,10 @@ if BUILD_QUEUES
 INCLUDES += -DQUEUES -I$(top_srcdir)/libtinymail-queues
 endif
 
+if BUILD_ASYNCWORKER
+INCLUDES += -DASYNCWORKER -I$(top_srcdir)/libtinymail-asyncworker $(LIBTINYMAIL_ASYNCWORKER_CFLAGS)
+endif
+
 if BUILD_MOZEMBED
 INCLUDES += -DMOZEMBED
 endif
@@ -38,5 +42,10 @@ tny_demoui_LDADD = 							        \
 
 if BUILD_QUEUES
 tny_demoui_LDADD +=  $(top_builddir)/libtinymail-queues/libtinymail-queues-$(API_VERSION).la
+endif
+
+if BUILD_ASYNCWORKER
+tny_demoui_LDADD +=  $(top_builddir)/libtinymail-asyncworker/libtinymail-asyncworker-$(API_VERSION).la \
+	$(LIBTINYMAIL_ASYNCWORKER_LIBS)
 endif
 

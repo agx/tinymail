@@ -77,7 +77,8 @@ static GObjectClass *parent_class = NULL;
 #include <tny-folder-monitor.h>
 
 
-#ifdef QUEUES
+#ifdef ASYNCWORKER
+#include <tny-async-worker-queue.h>
 #include <tny-get-msg-queue.h>
 #endif
 
@@ -752,8 +753,17 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	}
 }
 
-#ifdef QUEUES
-static TnyGetMsgQueue *fullqueue = NULL;
+#ifdef ASYNCWORKER
+static TnyQueue *fullqueue = NULL;
+static TnyQueue *real_queue = NULL;
+
+static TnyQueue*
+get_queue (void)
+{
+	if (!real_queue)
+		real_queue = tny_async_worker_queue_new_from_scratch ();
+	return real_queue;
+}
 
 static void 
 on_full_download_folder_activate (GtkMenuItem *mitem, gpointer user_data)
@@ -779,11 +789,12 @@ on_full_download_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 				&folder, -1);
 
-			if (!fullqueue)
-				fullqueue = tny_get_msg_queue_new ();
 
-			tny_get_msg_queue_full_msg_retrieval (fullqueue, folder, 
-				NULL, NULL, status_update, self);
+			if (!fullqueue)
+				fullqueue = tny_get_msg_queue_new (get_queue ());
+
+			tny_get_msg_queue_full_msg_retrieval (TNY_GET_MSG_QUEUE (fullqueue), 
+				folder, NULL, NULL, status_update, self);
 
 			g_object_unref (G_OBJECT (folder));
 
@@ -1121,7 +1132,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	int button, event_time;
 	GtkSelectionMode mode;
 	GtkWidget *mrename, *mdelete, *mcreate, *mmerge;
-#ifdef QUEUES
+#ifdef ASYNCWORKER
 	GtkWidget *fdown;
 #endif
 
@@ -1131,7 +1142,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
 	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
 
-#ifdef QUEUES
+#ifdef ASYNCWORKER
 	fdown = gtk_menu_item_new_with_label (_("Download entire folder"));
 #endif
 
@@ -1150,7 +1161,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 		G_CALLBACK (on_delete_folder_activate), user_data);
 	g_signal_connect (G_OBJECT (mmerge), "activate",
 		G_CALLBACK (on_merge_view_activate), user_data);
-#ifdef QUEUES
+#ifdef ASYNCWORKER
 	g_signal_connect (G_OBJECT (fdown), "activate",
 		G_CALLBACK (on_full_download_folder_activate), user_data);
 #endif
@@ -1159,7 +1170,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	gtk_menu_prepend (menu, mcreate);
 	gtk_menu_prepend (menu, mdelete);
 	gtk_menu_prepend (menu, mmerge);
-#ifdef QUEUES
+#ifdef ASYNCWORKER
 	gtk_menu_prepend (menu, fdown);
 
 	gtk_widget_show (fdown);

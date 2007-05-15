@@ -55,6 +55,7 @@ AC_PROG_LIBTOOL
 
 dnl ### default values (will get overwritten)
 build_queues=false
+build_asyncworker=false
 build_acap=false
 build_gnome=true
 build_uigtk=true
@@ -198,8 +199,25 @@ AC_HELP_STRING([--enable-queues],
   no)  build_queues=false ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-queues) ;;
 esac],[build_queues=$build_queues])
-AM_CONDITIONAL(BUILD_QUEUES, test x$build_queues = xtrue)
 
+dnl ### Enable asyncworker ##
+AC_ARG_ENABLE(asyncworker,
+AC_HELP_STRING([--enable-asyncworker],
+  [Build using asyncworker]),
+[case "${enableval}" in
+  yes)
+        build_queues=true
+	build_asyncworker=true
+  ;;
+  no)  
+	build_asyncworker=false 
+	build_queues=false
+  ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-asyncworker) ;;
+esac],[build_asyncworker=$build_asyncworker])
+
+AM_CONDITIONAL(BUILD_ASYNCWORKER, test x$build_asyncworker = xtrue)
+AM_CONDITIONAL(BUILD_QUEUES, test x$build_queues = xtrue)
 
 
 dnl ### Enable building the unit tests ##
@@ -279,9 +297,14 @@ AC_SUBST(LIBTINYMAIL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_LIBS)
 
 if test x$build_queues = xtrue; then
-PKG_CHECK_MODULES(LIBTINYMAIL_QUEUES, oasyncworker-1.0 glib-2.0 >= 2.8 gobject-2.0)
+PKG_CHECK_MODULES(LIBTINYMAIL_QUEUES, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_QUEUES_CFLAGS)
 AC_SUBST(LIBTINYMAIL_QUEUES_LIBS)
+ if test x$build_asyncworker = xtrue; then
+  PKG_CHECK_MODULES(LIBTINYMAIL_ASYNCWORKER, oasyncworker-1.0 glib-2.0 >= 2.8 gobject-2.0)
+  AC_SUBST(LIBTINYMAIL_ASYNCWORKER_CFLAGS)
+  AC_SUBST(LIBTINYMAIL_ASYNCWORKER_LIBS)
+ fi
 fi
 
 
@@ -464,6 +487,8 @@ libtinymail-acap/Makefile
 libtinymail-acap/libtinymail-acap.pc
 libtinymail-queues/Makefile
 libtinymail-queues/libtinymail-queues.pc
+libtinymail-asyncworker/Makefile
+libtinymail-asyncworker/libtinymail-asyncworker.pc
 tests/Makefile
 tests/c-demo/Makefile
 tests/shared/Makefile
@@ -479,6 +504,7 @@ echo ""
 echo "  Enable GNOME features:       $build_gnome"
 echo "  Enable ACAP features:        $build_acap"
 echo "  Build the queues library:    $build_queues"
+echo "   Build the asyncworker impl: $build_asyncworker"
 echo "  HTML component:              ${with_html_component}"
 echo "  Python language bindings:    $build_pytinymail"
 echo "  API tests:                   $build_apitests"

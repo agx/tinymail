@@ -24,7 +24,7 @@ typedef struct _TnyGetMsgQueuePriv TnyGetMsgQueuePriv;
 
 struct _TnyGetMsgQueuePriv
 {
-	OAsyncWorker *queue;
+	TnyQueue *queue;
 	GMutex *lock;
 	guint total;
 };

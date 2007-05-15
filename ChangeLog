@@ -1,5 +1,15 @@
 2007-05-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
+	* The new TnyQueue and TnyQueueTasks types
+	* Major rewrites of libtinymail-queues
+	* It's not stricly depending on AsyncWorker anymore
+	* Introduction of libtinymail-asyncworker
+
+	* This was a major API change in libtinymail-queues
+	* This was a major API change in libtinymail-asyncworker
+
+2007-05-15  Philip Van Hoof  <pvanhoof@gnome.org>
+
 	* A new implementation for tny_folder_copy in libtinymail-camel
 	* A new implementation for tny_folder_copy_async in libtinymail-camel
 	* Changed the TnyCopyFolderCallback function description
