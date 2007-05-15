@@ -119,7 +119,7 @@ _tny_async_worker_queue_task_new (OAsyncWorkerTask *r_task)
 	TnyAsyncWorkerQueueTaskPriv *priv = TNY_ASYNC_WORKER_QUEUE_TASK_GET_PRIVATE (self);
 	TheArgs *args = g_slice_new0 (TheArgs);
 
-	priv->real = O_ASYNC_WORKER_TASK (g_object_ref (r_task));
+	priv->real = O_ASYNC_WORKER_TASK (r_task);
 
 	args->self = (TnyQueueTask *) self;
 	o_async_worker_task_set_func (priv->real, launcher);
