@@ -136,7 +136,9 @@ tny_async_worker_queue_task_finalize (GObject *object)
 	TnyAsyncWorkerQueueTask *self = (TnyAsyncWorkerQueueTask*) object;
 	TnyAsyncWorkerQueueTaskPriv *priv = TNY_ASYNC_WORKER_QUEUE_TASK_GET_PRIVATE (self);
 
-	/* g_object_unref (priv->real); */
+	/* This is done right after the callback in OAsyncWorker
+	 * g_object_unref (priv->real); 
+	 * Let's nevertheless measure this soon */
 
 	parent_class->finalize (object);
 }
