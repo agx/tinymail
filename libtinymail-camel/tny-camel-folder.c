@@ -2279,9 +2279,32 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	while (!tny_iterator_is_done (iter)) 
 	{
 		TnyHeader *header;
+		const gchar *uid;
 
 		header = TNY_HEADER (tny_iterator_get_current (iter));
-		g_ptr_array_add (uids, (gpointer) tny_header_get_uid (header));
+		uid = tny_header_get_uid (header);
+
+		if (G_UNLIKELY (uid == NULL)) 
+		{
+			g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_TRANSFER_MSGS,
+				"You can only pass summary items as headers. "
+				"These are instances that you got with the "
+				"tny_folder_get_headers API. You can't use "
+				"the header instances that tny_msg_get_header "
+				"will return you");
+
+			g_object_unref (G_OBJECT (header));
+			g_object_unref (G_OBJECT (iter));
+			g_ptr_array_free (uids, TRUE);
+
+			g_static_rec_mutex_unlock (priv_dst->folder_lock);
+			g_static_rec_mutex_unlock (priv_src->folder_lock);
+
+			return;
+		} else
+			g_ptr_array_add (uids, (gpointer) uid);
+
 		g_object_unref (G_OBJECT (header));
 		tny_iterator_next (iter);
 	}
