@@ -100,8 +100,16 @@ tny_msg_get_folder (TnyMsg *self)
  * tny_msg_get_header:
  * @self: a #TnyMsg object
  * 
- * Get the header of @self. The returned header object must be 
- * unreferenced after use.
+ * Get the header of @self. The returned header object must be unreferenced 
+ * after use. You can't use the returned instance with the #TnyFolder operations
+ * like tny_folder_transfer_msgs and tny_folder_transfer_msgs_async.
+ *
+ * Once the header instance comes from a #TnyMsg instance, it means that it has
+ * been permanently detached from any folder instance. To get a header instance
+ * that will work with these folder methods, you can use tny_folder_get_headers.
+ *
+ * These instances are not the same as the ones that you will get using this 
+ * API, indeed.
  *
  * Return value: The header of the message
  **/
