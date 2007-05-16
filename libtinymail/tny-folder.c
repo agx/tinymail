@@ -903,8 +903,17 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
  * g_object_unref (G_OBJECT (message));
  * </programlisting></informalexample>
  *
+ * Note that once you received the message this way, the entire message instance
+ * is detached from any folder. This means that if you get the header using the
+ * tny_msg_get_header API, that this header can't be used with folder API like
+ * tny_folder_transfer_msgs and tny_folder_transfer_msgs_async. You can only
+ * use header instances that you got with tny_folder_get_headers for these and
+ * other such methods. The message's instance nor its header also wont receive 
+ * updates from the observable folder (like what a TnyFolderObserver would do,
+ * for example in case a message got removed from the remote store, like the
+ * folder on the IMAP server).
+ * 
  * Return value: The message instance or NULL on failure
- *
  **/
 TnyMsg*
 tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
