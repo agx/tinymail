@@ -1150,7 +1150,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 
 	menu = gtk_menu_new ();
 
-	mrename = gtk_menu_item_new_with_label (_("Rename folder"));
+	mrename = gtk_menu_item_new_with_label (_("Rename or Copy folder"));
 	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
 	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
 

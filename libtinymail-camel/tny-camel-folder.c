@@ -1568,6 +1568,7 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 		goto exception;
 	}
 
+	tny_debug ("recurse_copy: adding to adds: %s\n", tny_folder_get_name (retval));
 	adds = g_list_append (adds, cpy_event_new (TNY_FOLDER_STORE (into), retval));
 
 	if (TNY_IS_FOLDER_STORE (folder))
@@ -1618,6 +1619,7 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 	}
 
 	a_store = tny_folder_get_folder_store (folder);
+	tny_debug ("recurse_copy: prepending to rems: %s\n", tny_folder_get_name (folder));
 	rems = g_list_append (rems, cpy_event_new (a_store, folder));
 	g_object_unref (a_store);
 
@@ -1748,11 +1750,11 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del)
 			else
 				notify_folder_store_observers_about (evt->str, change);
 
+			tny_debug ("tny_folder_copy: observers notify folder-del %s\n", 
+				tny_folder_get_name (evt->fol));
+
 			g_object_unref (G_OBJECT (change));
 		}
-
-		tny_debug ("tny_folder_copy: observers notify folder-del %s\n", 
-			tny_folder_get_name (evt->fol));
 
 		cpy_event_free (evt);
 		rems = g_list_next (rems);
@@ -1843,9 +1845,6 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				CamelFolderInfo *iter;
 
 				gboolean was_new=FALSE;
-				adds = recurse_evt (self, TNY_FOLDER_STORE (into), 
-					adds, g_list_append, FALSE);
-
 				retval = tny_camel_store_account_factor_folder 
 					(TNY_CAMEL_STORE_ACCOUNT (a), to, &was_new);
 
@@ -1865,11 +1864,14 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 						camel_exception_clear (&ex);
 						succeeded = FALSE; tried=TRUE;
 					}
-
 					if (succeeded)
 						_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (a), 
 							TNY_CAMEL_FOLDER (retval), iter);
 				}
+
+				if (succeeded)
+					adds = recurse_evt (retval, TNY_FOLDER_STORE (into), 
+						adds, g_list_append, FALSE);
 
 
 			} else {
@@ -1889,15 +1891,20 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 	if (!succeeded)
 	{
 		CpyRecRet *cpyr;
+
 		tny_debug ("tny_folder_copy: recurse_copy\n");
+
 		cpyr = recurse_copy (self, into, new_name, del, &nerr, adds, rems);
+
 		if (nerr != NULL) {
 			g_propagate_error (err, nerr);
 			g_error_free (nerr);
 		}
+
 		retval = cpyr->created;
 		adds = cpyr->adds;
 		rems = cpyr->rems;
+
 		g_slice_free (CpyRecRet, cpyr);
 	}
 
