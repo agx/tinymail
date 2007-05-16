@@ -818,6 +818,8 @@ tny_folder_get_account (TnyFolder *self)
  * @folder_dst. They could be moved or just copied depending on the value of 
  * the @delete_originals argument.
  *
+ * You must not use header instances that you got from tny_msg_get_header with
+ * this API. You must only use instances that you got from tny_folder_get_headers!
  **/
 void 
 tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
@@ -861,9 +863,8 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * When using Gtk+, the callback doesn't need the gdk_threads_enter and 
  * gdk_threads_leave guards (because it happens in the #GMainLoop).
  *
- * API warning: It's possible that this API will change (it might get a status
- * callback handler after the callback and before the user_data). Don't use
- * this method if you want API or ABI compatibility with your binary.
+ * You must not use header instances that you got from tny_msg_get_header with
+ * this API. You must only use instances that you got from tny_folder_get_headers!
  **/
 void 
 tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data)
