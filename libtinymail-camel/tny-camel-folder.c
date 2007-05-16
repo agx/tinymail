@@ -1804,9 +1804,9 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 	{
 		g_set_error (err, TNY_FOLDER_ERROR, 
 				TNY_FOLDER_ERROR_COPY,
-				"You should not use this operation while the "
-				"folder is still in use. There are still %d "
-				"users of this folder", priv->reason_to_live);
+				"You should not use this operation with del=TRUE "
+				"while the folder is still in use. There are "
+				"still %d users of this folder", priv->reason_to_live);
 		return retc;
 	}
 
