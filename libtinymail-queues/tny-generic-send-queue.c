@@ -476,7 +476,6 @@ tny_generic_send_queue_finalize (GObject *object)
 
 	g_mutex_lock (priv->lock);
 	priv->cancelled = TRUE;
-	tny_queue_join (priv->queue);
 	g_object_unref (G_OBJECT (priv->queue));
 	g_object_unref (G_OBJECT (priv->sentbox));
 	tny_folder_remove_observer (priv->outbox, TNY_FOLDER_OBSERVER (object));
