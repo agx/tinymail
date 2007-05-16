@@ -834,7 +834,7 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 							  GTK_DIALOG_MODAL,
 							  GTK_STOCK_OK,
 							  GTK_RESPONSE_ACCEPT,
-							  GTK_STOCK_OK,
+							  GTK_STOCK_COPY,
 							  GTK_RESPONSE_YES,
 							  GTK_STOCK_CANCEL,
 							  GTK_RESPONSE_REJECT,
@@ -852,11 +852,11 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				case GTK_RESPONSE_YES:
 				case GTK_RESPONSE_ACCEPT: 
 				{
-					gboolean copy = (result == GTK_RESPONSE_YES);
+					gboolean move = (result == GTK_RESPONSE_ACCEPT);
 					GError *err = NULL;
 					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
 					TnyFolderStore *into = tny_folder_get_folder_store (folder);
-					TnyFolder *nfol = tny_folder_copy (folder, into, newname, copy, &err);
+					TnyFolder *nfol = tny_folder_copy (folder, into, newname, move, &err);
 
 					if (err != NULL)
 					{
