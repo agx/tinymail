@@ -1,3 +1,10 @@
+2007-05-16  Murray Cumming  <murrayc@murrayc.com>
+
+	* camel/camel-mime-message.c: (camel_mime_message_set_subject):
+	Prevent memory corruption. g_strstrip() does not return a newly 
+	allocated string. Also, camel_header_encode_string() doesn't seem to like 
+	being given NULL.
+
 2006-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merged a lot code. Synced with latest version in CVS

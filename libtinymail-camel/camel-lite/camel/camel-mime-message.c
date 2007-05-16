@@ -399,13 +399,21 @@ camel_mime_message_get_reply_to (CamelMimeMessage *mime_message)
 void
 camel_mime_message_set_subject (CamelMimeMessage *mime_message, const char *subject)
 {
-	char *text;
+	char *text = NULL;
 	
 	g_assert(mime_message);
 	
 	g_free (mime_message->subject);
-	mime_message->subject = g_strstrip (g_strdup (subject));
-	text = camel_header_encode_string((unsigned char *)mime_message->subject);
+	mime_message->subject = NULL;
+	
+	if (subject) {
+		mime_message->subject = g_strdup (subject);
+		g_strstrip (mime_message->subject);
+	}
+	
+	if (mime_message->subject)
+		text = camel_header_encode_string((unsigned char *)mime_message->subject);
+		
 	CAMEL_MEDIUM_CLASS(parent_class)->set_header(CAMEL_MEDIUM (mime_message), "Subject", text);
 	g_free (text);
 }
