@@ -1846,8 +1846,11 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 				rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
 
-				rpriv->folder = priv->folder;
-				camel_object_ref (rpriv->folder);
+				if (priv->folder)
+				{
+					rpriv->folder = priv->folder;
+					camel_object_ref (rpriv->folder);
+				}
 
 				if (rpriv->folder_name)
 					g_free (rpriv->folder_name);
