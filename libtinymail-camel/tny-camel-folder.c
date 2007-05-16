@@ -1863,7 +1863,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 					}
 
 					if (succeeded)
-						_tny_camel_folder_set_folder_info (into, 
+						_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (a), 
 							TNY_CAMEL_FOLDER (retval), iter);
 				}
 
