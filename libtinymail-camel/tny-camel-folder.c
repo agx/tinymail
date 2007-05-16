@@ -1516,6 +1516,7 @@ typedef struct {
 	GList *rems;
 	GList *adds;
 	TnyFolder *created;
+	gboolean observers_ready;
 } CpyRecRet;
 
 typedef struct {
@@ -1798,6 +1799,8 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
+	retc->observers_ready = FALSE;
+
 	if (TNY_IS_CAMEL_FOLDER (into) || TNY_IS_CAMEL_STORE_ACCOUNT (into))
 	{
 		a = tny_folder_get_account (self);
@@ -1809,7 +1812,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 		if (del && (a == b))
 		{
-			TnyFolderStore *a_store;
+			TnyFolderStore *a_store, *b_store;
 			TnyCamelFolderPriv *tpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
 			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (a);
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -1830,7 +1833,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			a_store = tny_folder_get_folder_store (self);
 			rems = recurse_evt (self, a_store,
 				rems, g_list_prepend, TRUE);
-			g_object_unref (a_store);
+			
 
 			/* This does a g_rename on the mmap()ed file! */
 			camel_store_rename_folder (CAMEL_STORE (apriv->service), from, to, &ex);
@@ -1876,6 +1879,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				tried=TRUE;
 			}
 
+			g_object_unref (a_store);
 			g_free (to);
 		}
 		g_object_unref (a);
