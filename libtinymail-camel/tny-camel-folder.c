@@ -2614,139 +2614,6 @@ _tny_camel_folder_set_name (TnyCamelFolder *self, const gchar *name)
 }
 
 
-static void
-tny_camel_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
-{
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->set_name_func (self, name, err);
-	return;
-}
-
-static void
-tny_camel_folder_set_name_default (TnyFolder *self, const gchar *name, GError **err)
-{
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	CamelFolder *cfolder;
-	CamelFolderInfo *parent_info;
-	const gchar *old_path;
-	gchar *new_path;
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	gboolean changed = FALSE;
-	gboolean was_sub = FALSE;
-
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
-			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_SET_NAME))
-		return;
-
-
-	g_static_rec_mutex_lock (priv->folder_lock);
-
-	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
-		if (!load_folder_no_lock (priv)) 
-		{
-			g_static_rec_mutex_unlock (priv->folder_lock);
-			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-			return;
-		}
-
-	if (!priv->iter) {
-		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-		g_static_rec_mutex_unlock (priv->folder_lock);
-		return;
-	}
-
-	/* Create new full name */
-	cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (self));
-	old_path = camel_folder_get_full_name (cfolder);
-	parent_info = priv->iter->parent;
-
-	if (parent_info)
-		new_path = g_strdup_printf ("%s/%s", parent_info->full_name, name);
-	else
-	{
-		if (!priv->iter_parented)
-		{
-			char *nold_path = g_strdup (old_path);
-			char *lastslash = strrchr (nold_path, '/');
-			if (lastslash)
-			{
-				*lastslash = '\0';
-				new_path = g_strdup_printf ("%s/%s", nold_path, name);
-				g_free (nold_path);
-			} else {
-				g_free (nold_path);
-				g_set_error (err, TNY_FOLDER_ERROR, 
-					TNY_FOLDER_ERROR_SET_NAME,
-					"Can't rename %s to %s", old_path, name);
-				goto errorh;
-			}
-		} else {
-			g_set_error (err, TNY_FOLDER_ERROR, 
-				TNY_FOLDER_ERROR_SET_NAME,
-				"Can't rename the root INBOX folder");
-			goto errorh;
-		}
-	}
-
-	/* Check that the name really changes */
-	if (!strcmp (old_path, new_path)) 
-	{
-		g_free (new_path); 
-		/* It's not really an error, just a NOOP */
-		goto errorh;
-	}
-
-	/* Rename folder */
-
-	if (camel_store_supports_subscriptions (cfolder->parent_store))
-		was_sub = camel_store_folder_subscribed (cfolder->parent_store, old_path);
-
-	camel_store_rename_folder (cfolder->parent_store, old_path, (const gchar *) new_path, &ex);
-
-	if (camel_store_supports_subscriptions (cfolder->parent_store))
-	{
-		camel_store_unsubscribe_folder (cfolder->parent_store, old_path, NULL);
-
-		if (was_sub)
-			camel_store_subscribe_folder (cfolder->parent_store, new_path, NULL);
-		else
-			camel_store_unsubscribe_folder (cfolder->parent_store, new_path, NULL);
-	}
-
-	g_free (new_path);
-
-	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_SET_NAME,
-			camel_exception_get_description (&ex));
-
-		camel_exception_clear (&ex);
-
-	} else if (priv->cached_name)
-	{
-		changed = TRUE;
-		g_free (priv->cached_name);
-		priv->cached_name = g_strdup (name);
-	}
-
-errorh:
-
-	g_static_rec_mutex_unlock (priv->folder_lock);
-
-	if (changed)
-	{
-		TnyFolderChange *change;
-
-		change = tny_folder_change_new (self);
-		tny_folder_change_set_rename (change, name);
-		notify_folder_observers_about (self, change);
-		g_object_unref (G_OBJECT (change));
-	}
-
-	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-}
-
-
 
 static void
 tny_camel_folder_uncache (TnyCamelFolder *self)
@@ -3676,7 +3543,6 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->find_msg_func = tny_camel_folder_find_msg;
 	klass->get_msg_async_func = tny_camel_folder_get_msg_async;
 	klass->get_id_func = tny_camel_folder_get_id;
-	klass->set_name_func = tny_camel_folder_set_name;
 	klass->get_name_func = tny_camel_folder_get_name;
 	klass->get_folder_type_func = tny_camel_folder_get_folder_type;
 	klass->get_unread_count_func = tny_camel_folder_get_unread_count;
@@ -3736,7 +3602,6 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->find_msg_func = tny_camel_folder_find_msg_default;
 	class->get_msg_async_func = tny_camel_folder_get_msg_async_default;
 	class->get_id_func = tny_camel_folder_get_id_default;
-	class->set_name_func = tny_camel_folder_set_name_default;
 	class->get_name_func = tny_camel_folder_get_name_default;
 	class->get_folder_type_func = tny_camel_folder_get_folder_type_default;
 	class->get_unread_count_func = tny_camel_folder_get_unread_count_default;

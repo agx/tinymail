@@ -1150,35 +1150,6 @@ tny_folder_get_name (TnyFolder *self)
 }
 
 
-/**
- * tny_folder_set_name:
- * @self: a TnyFolder object
- * @name: a new name for the folder
- * @err: a #GError object or NULL
- * 
- * Rename a folder. Most services require the name to be unique in the 
- * parent folder. A rename operation that didn't succeed will put an error 
- * in @err.
- *
- **/
-void
-tny_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
-{
-#ifdef DBC /* require */
-	g_assert (TNY_IS_FOLDER (self));
-	g_assert (name);
-	g_assert (strlen (name) > 0);
-	g_assert (TNY_FOLDER_GET_IFACE (self)->set_name_func != NULL);
-#endif
-
-	TNY_FOLDER_GET_IFACE (self)->set_name_func (self, name, err);
-
-#ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_folder_get_name (self), name));
-#endif
-
-	return;
-}
 
 /**
  * tny_folder_get_folder_type:

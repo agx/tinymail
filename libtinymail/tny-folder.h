@@ -99,7 +99,6 @@ struct _TnyFolderIface
 	const gchar* (*get_name_func) (TnyFolder *self);
 	const gchar* (*get_id_func) (TnyFolder *self);
 	TnyAccount* (*get_account_func) (TnyFolder *self);
-	void (*set_name_func) (TnyFolder *self, const gchar *name, GError **err);
 	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
 	guint (*get_all_count_func) (TnyFolder *self);
 	guint (*get_unread_count_func) (TnyFolder *self);
@@ -136,7 +135,6 @@ void tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh
 TnyAccount* tny_folder_get_account (TnyFolder *self);
 const gchar* tny_folder_get_id (TnyFolder *self);
 const gchar* tny_folder_get_name (TnyFolder *self);
-void tny_folder_set_name (TnyFolder *self, const gchar *name, GError **err);
 TnyFolderType tny_folder_get_folder_type (TnyFolder *self);
 guint tny_folder_get_all_count (TnyFolder *self);
 guint tny_folder_get_unread_count (TnyFolder *self);

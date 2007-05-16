@@ -829,14 +829,16 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 				&folder, -1);
 
-			dialog = gtk_dialog_new_with_buttons (_("Rename a folder"),
-												  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
-												  GTK_DIALOG_MODAL,
-												  GTK_STOCK_OK,
-												  GTK_RESPONSE_ACCEPT,
-												  GTK_STOCK_CANCEL,
-												  GTK_RESPONSE_REJECT,
-												  NULL);
+			dialog = gtk_dialog_new_with_buttons (_("Rename or copy a folder (first OK=rename)"),
+							  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+							  GTK_DIALOG_MODAL,
+							  GTK_STOCK_OK,
+							  GTK_RESPONSE_ACCEPT,
+							  GTK_STOCK_OK,
+							  GTK_RESPONSE_YES,
+							  GTK_STOCK_CANCEL,
+							  GTK_RESPONSE_REJECT,
+							  NULL);
 
 			entry = gtk_entry_new ();
 			gtk_entry_set_text (GTK_ENTRY (entry), tny_folder_get_name (folder));
@@ -847,11 +849,14 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 			switch (result)
 			{
+				case GTK_RESPONSE_YES:
 				case GTK_RESPONSE_ACCEPT: 
 				{
+					gboolean copy = (result == GTK_RESPONSE_YES);
 					GError *err = NULL;
 					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
-					tny_folder_set_name (folder, newname, &err);
+					TnyFolderStore *into = tny_folder_get_folder_store (folder);
+					TnyFolder *nfol = tny_folder_copy (folder, into, newname, copy, &err);
 
 					if (err != NULL)
 					{
@@ -871,6 +876,13 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 						gtk_widget_show_all (edialog);
 						g_error_free (err);
 					}
+
+					if (into)
+						g_object_unref (into);
+
+					if (nfol)
+						g_object_unref (nfol);
+
 				}
 				break;
 

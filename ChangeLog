@@ -1,3 +1,11 @@
+2007-05-16  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Removed the unworkable tny_folder_set_name, old code should replace
+	this with tny_folder_copy with the del parameter set to TRUE and the
+	folder store being the one you get using tny_folder_get_folder_store
+
+	* This was a major API change
+
 2007-05-16  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-store-account.c:

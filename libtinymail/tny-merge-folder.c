@@ -381,21 +381,6 @@ tny_merge_folder_get_account (TnyFolder *self)
 	return NULL;
 }
 
-static void
-tny_merge_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
-{
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
-
-	g_static_rec_mutex_lock (priv->lock);
-
-	if (priv->name)
-		g_free (priv->name);
-	priv->name = g_strdup (name);
-
-	g_static_rec_mutex_unlock (priv->lock);
-
-	return;
-}
 
 static TnyFolderType
 tny_merge_folder_get_folder_type (TnyFolder *self)
@@ -1042,7 +1027,6 @@ tny_folder_init (TnyFolderIface *klass)
 	klass->get_name_func = tny_merge_folder_get_name;
 	klass->get_id_func = tny_merge_folder_get_id;
 	klass->get_account_func = tny_merge_folder_get_account;
-	klass->set_name_func = tny_merge_folder_set_name;
 	klass->get_folder_type_func = tny_merge_folder_get_folder_type;
 	klass->get_all_count_func = tny_merge_folder_get_all_count;
 	klass->get_unread_count_func = tny_merge_folder_get_unread_count;
