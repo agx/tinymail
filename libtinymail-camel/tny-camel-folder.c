@@ -1800,7 +1800,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 	if (TNY_IS_CAMEL_FOLDER (into) || TNY_IS_CAMEL_STORE_ACCOUNT (into))
 	{
 		a = tny_folder_get_account (self);
-	
+
 		if (TNY_IS_FOLDER (into))
 			b = tny_folder_get_account (TNY_FOLDER (into));
 		else
@@ -1809,7 +1809,6 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 		if (del && (a == b))
 		{
 			TnyFolderStore *a_store;
-			TnyCamelFolderPriv *rpriv;
 			TnyCamelFolderPriv *tpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
 			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (a);
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -1836,14 +1835,24 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 			if (!camel_exception_is_set (&ex))
 			{
+				TnyCamelFolderPriv *rpriv=NULL;
+
+				gboolean was_new=FALSE;
 				adds = recurse_evt (self, TNY_FOLDER_STORE (into), 
 					adds, g_list_append, FALSE);
 
-				retval = g_object_ref (self);
-				rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
-				unload_folder_no_lock (rpriv, TRUE);
-				g_free (rpriv->folder_name);
-				rpriv->folder_name = g_strdup (to);
+				retval = tny_camel_store_account_factor_folder 
+					(TNY_CAMEL_STORE_ACCOUNT (a), to, &was_new);
+
+				rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
+
+				rpriv->folder = priv->folder;
+				camel_object_ref (rpriv->folder);
+
+				if (rpriv->folder_name)
+					g_free (rpriv->folder_name);
+				rpriv->folder_name = g_strdup (priv->folder_name);
+
 				succeeded = TRUE;
 			} else {
 				g_set_error (&nerr, TNY_FOLDER_ERROR, 
