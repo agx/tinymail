@@ -93,6 +93,7 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
+
 		tny_folder_store_observer_update (observer, change);
 		g_object_unref (G_OBJECT (observer));
 		tny_iterator_next (iter);
@@ -1550,16 +1551,13 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 	TnyFolder *retval = NULL;
 	TnyStoreAccount *acc_to, *acc_from;
 	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
-	TnyCamelFolderPriv *tpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
 	TnyList *headers;
 
 	GError *nerr = NULL;
 
 	g_static_rec_mutex_lock (fpriv->folder_lock);
-	g_static_rec_mutex_lock (tpriv->folder_lock);
 
 	load_folder_no_lock (fpriv);
-	load_folder_no_lock (tpriv);
 
 	retval = tny_folder_store_create_folder (into, new_name, &nerr);
 	if (nerr != NULL) {
@@ -1568,8 +1566,8 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 		goto exception;
 	}
 
-	tny_debug ("recurse_copy: adding to adds: %s\n", tny_folder_get_name (retval));
-	adds = g_list_append (adds, cpy_event_new (TNY_FOLDER_STORE (into), retval));
+	/* tny_debug ("recurse_copy: adding to adds: %s\n", tny_folder_get_name (retval));
+	 * adds = g_list_append (adds, cpy_event_new (TNY_FOLDER_STORE (into), retval)); */
 
 	if (TNY_IS_FOLDER_STORE (folder))
 	{
@@ -1618,11 +1616,6 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 		g_object_unref (folders);
 	}
 
-	a_store = tny_folder_get_folder_store (folder);
-	tny_debug ("recurse_copy: prepending to rems: %s\n", tny_folder_get_name (folder));
-	rems = g_list_append (rems, cpy_event_new (a_store, folder));
-	g_object_unref (a_store);
-
 	headers = tny_simple_list_new ();
 	tny_folder_get_headers (folder, headers, TRUE, &nerr);
 	if (nerr != NULL) {
@@ -1648,13 +1641,20 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 		tny_store_account_subscribe (acc_to, retval);
 	g_object_unref (acc_to);
 
+	if (del)
+	{
+		a_store = tny_folder_get_folder_store (folder);
+		/* tny_debug ("recurse_copy: prepending to rems: %s\n", tny_folder_get_name (folder));
+		rems = g_list_append (rems, cpy_event_new (a_store, folder)); */
+		tny_folder_store_remove_folder (a_store, folder, &nerr);
+		g_object_unref (a_store);
+	}
 
 exception:
 
 	if (nerr != NULL)
 		g_propagate_error (err, nerr);
 
-	g_static_rec_mutex_unlock (tpriv->folder_lock);
 	g_static_rec_mutex_unlock (fpriv->folder_lock);
 
 	cpyr->created = retval;
@@ -1835,7 +1835,6 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			a_store = tny_folder_get_folder_store (self);
 			rems = recurse_evt (self, a_store,
 				rems, g_list_prepend, TRUE);
-			
 
 			/* This does a g_rename on the mmap()ed file! */
 			camel_store_rename_folder (CAMEL_STORE (apriv->service), from, to, &ex);
@@ -1899,6 +1898,14 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 		if (nerr != NULL) {
 			g_propagate_error (err, nerr);
 			g_error_free (nerr);
+		} else if (del) {
+			TnyFolderStore *from = tny_folder_get_folder_store (self);
+			tny_folder_store_remove_folder (from, self, &nerr);
+			g_object_unref (from);
+			if (nerr != NULL) {
+				g_propagate_error (err, nerr);
+				g_error_free (nerr);
+			}
 		}
 
 		retval = cpyr->created;

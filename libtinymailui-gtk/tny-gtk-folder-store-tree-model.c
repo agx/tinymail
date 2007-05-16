@@ -706,13 +706,19 @@ folder_obsr_update_idle (gpointer user_data)
 		gtk_tree_model_foreach (model, updater, change);
 		gdk_threads_leave ();
 	}
+	return FALSE;
+}
+
+static void 
+folder_obsr_update_idle_destroy (gpointer user_data)
+{
+	FolObsUpInfo *info = user_data;
+	TnyFolderObserver *self = info->self;
+	TnyFolderChange *change = info->change;
 
 	g_object_unref (self);
 	g_object_unref (change);
-
 	g_slice_free (FolObsUpInfo, info);
-
-	return FALSE;
 }
 
 static void
@@ -722,7 +728,9 @@ tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, Tny
 	info->self = TNY_FOLDER_OBSERVER (g_object_ref (self));
 	info->change = TNY_FOLDER_CHANGE (g_object_ref (change));
 
-	g_timeout_add (0, folder_obsr_update_idle, info);
+	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+		folder_obsr_update_idle, info,
+		folder_obsr_update_idle_destroy);
 
 	return;
 }
@@ -814,12 +822,20 @@ folder_store_obsr_update_idle (gpointer user_data)
 	}
 
 
+	return FALSE;
+}
+
+static void
+folder_store_obsr_update_idle_destroy (gpointer user_data)
+{
+	FolStObsUpInfo *info = user_data;
+	TnyFolderObserver *self = info->self;
+	TnyFolderStoreChange *change = info->change;
+
 	g_object_unref (self);
 	g_object_unref (change);
 
 	g_slice_free (FolStObsUpInfo, info);
-
-	return FALSE;
 }
 
 static void
@@ -829,7 +845,9 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 	info->self = TNY_FOLDER_OBSERVER (g_object_ref (self));
 	info->change = TNY_FOLDER_STORE_CHANGE (g_object_ref (change));
 
-	g_timeout_add (0, folder_store_obsr_update_idle, info);
+	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+			folder_store_obsr_update_idle, info, 
+			folder_store_obsr_update_idle_destroy);
 
 	return;
 }

@@ -295,6 +295,21 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
  * Copies @self to @into giving the new folder the name @new_name. Returns the
  * newly created folder in @into, which will carry the name @new_name.
  *
+ * Very important note: 
+ * When you are moving @self to @into by setting @del to true, you MUST make 
+ * sure that @self is not used anymore. For example if you have gotten its 
+ * headers using tny_folder_get_headers, you need to get rid of those first.
+ * In case you used a default component like the TnyGtkHeaderListModel or 
+ * TnyGtkHeaderListTree as TnyList for storing the headers in, you can easily
+ * get rid if your headers by setting the model of the GtkTreeView to an empty
+ * one. You MUST NOT try to keep using it further (as the original folder, its 
+ * memory caches and it's offline on-disk cache will have been removed
+ * permanently behind your back). Especially the memory caches will get you in
+ * severe problems, like segmentation errors when trying to access the now 
+ * invalid TnyHeader's properties. This is a design decision and can't be fixed
+ * (it's not a bug): a removed folder is permanently destroyed. Moving a folder
+ * is the same as removing it and creating a new one.
+ * 
  * Implementors: The return value must be the new folder in @into carrying the 
  * name @new_name. Invoking the tny_folder_get_folder_store API on the return 
  * value must return the @into instance. The implementation must copy all 

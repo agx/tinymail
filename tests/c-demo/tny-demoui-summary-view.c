@@ -166,12 +166,8 @@ set_header_view_model (GtkTreeView *header_view, GtkTreeModel *model)
 static GtkTreeModel *empty_model;
 
 static void 
-reload_accounts (TnyDemouiSummaryViewPriv *priv)
+clear_header_view (TnyDemouiSummaryViewPriv *priv)
 {
-	TnyAccountStore *account_store = priv->account_store;
-	GtkTreeModel *sortable, *maccounts, *mailbox_model;
-	TnyFolderStoreQuery *query;
-
 	g_mutex_lock (priv->monitor_lock);
 	{
 
@@ -183,6 +179,23 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 		priv->monitor = NULL;
 	}
 	g_mutex_unlock (priv->monitor_lock);
+
+
+	/* Clear the header_view by giving it an empty model */
+	if (G_UNLIKELY (!empty_model))
+		empty_model = GTK_TREE_MODEL (gtk_list_store_new (1, G_TYPE_STRING));
+	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
+
+	tny_msg_view_clear (priv->msg_view);
+}
+
+static void 
+reload_accounts (TnyDemouiSummaryViewPriv *priv)
+{
+	TnyAccountStore *account_store = priv->account_store;
+	GtkTreeModel *sortable, *maccounts, *mailbox_model;
+	TnyFolderStoreQuery *query;
+
 
 	/* Show only subscribed folders */
 	query = tny_folder_store_query_new ();
@@ -203,12 +216,8 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 
 	maccounts = tny_gtk_account_list_model_new ();
 
-	/* Clear the header_view by giving it an empty model */
-	if (G_UNLIKELY (!empty_model))
-		empty_model = GTK_TREE_MODEL (gtk_list_store_new (1, G_TYPE_STRING));
-	set_header_view_model (GTK_TREE_VIEW (priv->header_view), empty_model);
 
-	tny_msg_view_clear (priv->msg_view);
+	clear_header_view (priv);
 
 	if (priv->current_accounts)
 	{
@@ -855,8 +864,13 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 					gboolean move = (result == GTK_RESPONSE_ACCEPT);
 					GError *err = NULL;
 					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
-					TnyFolderStore *into = tny_folder_get_folder_store (folder);
-					TnyFolder *nfol = tny_folder_copy (folder, into, newname, move, &err);
+					TnyFolderStore *into;
+					TnyFolder *nfol;
+
+					clear_header_view (priv);
+
+					into = tny_folder_get_folder_store (folder);
+					nfol = tny_folder_copy (folder, into, newname, move, &err);
 
 					if (err != NULL)
 					{
