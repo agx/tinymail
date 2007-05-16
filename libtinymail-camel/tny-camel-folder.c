@@ -1802,11 +1802,13 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 	if (del && priv->reason_to_live != 0)
 	{
-		g_set_error (err, TNY_FOLDER_ERROR, 
+		g_set_error (&nerr, TNY_FOLDER_ERROR, 
 				TNY_FOLDER_ERROR_COPY,
 				"You should not use this operation with del=TRUE "
 				"while the folder is still in use. There are "
 				"still %d users of this folder", priv->reason_to_live);
+		g_propagate_error (err, nerr);
+		/* g_error_free (nerr); */
 		return retc;
 	}
 
@@ -1826,20 +1828,21 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 		if (del && (a == b))
 		{
 			TnyFolderStore *a_store, *b_store;
-			TnyCamelFolderPriv *tpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
 			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (a);
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 			gchar *from, *to;
 
-			load_folder_no_lock (priv);
-			load_folder_no_lock (tpriv);
+			/* load_folder_no_lock (priv);
+			   load_folder_no_lock (tpriv); */
 
 			from = priv->folder_name;
 
-			if (TNY_IS_CAMEL_STORE_ACCOUNT (into))
-				to = g_strdup (new_name);
-			else
+			if (TNY_IS_CAMEL_FOLDER (into)) {
+				TnyCamelFolderPriv *tpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
 				to = g_strdup_printf ("%s/%s", tpriv->folder_name, new_name);
+			} else
+				to = g_strdup (new_name);
+
 
 			tny_debug ("tny_folder_copy: rename %s to %s\n", from, to);
 
@@ -1874,9 +1877,12 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 						camel_exception_clear (&ex);
 						succeeded = FALSE; tried=TRUE;
 					}
-					if (succeeded)
+					if (succeeded) {
+						TnyCamelFolderPriv *rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
 						_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (a), 
 							TNY_CAMEL_FOLDER (retval), iter);
+						_tny_camel_folder_set_parent (retval, into);
+					}
 				}
 
 				if (succeeded)
@@ -1904,18 +1910,26 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 		tny_debug ("tny_folder_copy: recurse_copy\n");
 
+		if (nerr != NULL)
+			g_error_free (nerr);
+		nerr = NULL;
+
 		cpyr = recurse_copy (self, into, new_name, del, &nerr, adds, rems);
 
 		if (nerr != NULL) {
-			g_propagate_error (err, nerr);
-			g_error_free (nerr);
+			if (!tried)
+				g_propagate_error (err, nerr);
+			else
+				g_error_free (nerr);
 		} else if (del) {
 			TnyFolderStore *from = tny_folder_get_folder_store (self);
 			tny_folder_store_remove_folder (from, self, &nerr);
 			g_object_unref (from);
-			if (nerr != NULL) {
-				g_propagate_error (err, nerr);
-				g_error_free (nerr);
+			if (nerr != NULL ) {
+				if (!tried)
+					g_propagate_error (err, nerr);
+				else
+					g_error_free (nerr);
 			}
 		}
 
@@ -1929,7 +1943,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 	if (tried && terr)
 		g_propagate_error (err, terr);
 
-	if (terr)
+	if (!tried && terr)
 		g_error_free (terr);
 
 	retc->created = retval;
@@ -1965,7 +1979,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	if (nerr != NULL)
 	{
 		g_propagate_error (err, nerr);
-		g_error_free (nerr);
+		/* g_error_free (nerr); */
 	} else
 		notify_folder_observers_about_copy (adds, rems, del);
 
