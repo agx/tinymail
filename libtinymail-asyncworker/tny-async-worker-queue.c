@@ -63,6 +63,7 @@ tny_async_worker_queue_finalize (GObject *object)
 	TnyAsyncWorkerQueue *self = (TnyAsyncWorkerQueue*) object;
 	TnyAsyncWorkerQueuePriv *priv = TNY_ASYNC_WORKER_QUEUE_GET_PRIVATE (self);
 
+	o_async_worker_join (priv->real);
 	g_object_unref (priv->real);
 
 	parent_class->finalize (object);
