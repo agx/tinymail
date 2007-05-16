@@ -1545,6 +1545,7 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 {
 	CpyRecRet *cpyr = g_slice_new0 (CpyRecRet);
 
+	TnyFolderStore *a_store=NULL;
 	TnyFolder *retval = NULL;
 	TnyStoreAccount *acc_to, *acc_from;
 	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
@@ -1615,9 +1616,9 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 		g_object_unref (folders);
 	}
 
-	acc_from = TNY_STORE_ACCOUNT (tny_folder_get_account (folder));
-	rems = g_list_append (rems, cpy_event_new (TNY_FOLDER_STORE (acc_from), folder));
-	g_object_unref (acc_from);
+	a_store = tny_folder_get_folder_store (folder);
+	rems = g_list_append (rems, cpy_event_new (a_store, folder));
+	g_object_unref (a_store);
 
 	headers = tny_simple_list_new ();
 	tny_folder_get_headers (folder, headers, TRUE, &nerr);
@@ -1807,6 +1808,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 		if (del && (a == b))
 		{
+			TnyFolderStore *a_store;
 			TnyCamelFolderPriv *rpriv;
 			TnyCamelFolderPriv *tpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
 			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (a);
@@ -1825,8 +1827,10 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 			tny_debug ("tny_folder_copy: rename %s to %s\n", from, to);
 
-			rems = recurse_evt (self, TNY_FOLDER_STORE (a),
+			a_store = tny_folder_get_folder_store (self);
+			rems = recurse_evt (self, a_store,
 				rems, g_list_prepend, TRUE);
+			g_object_unref (a_store);
 
 			camel_store_rename_folder (CAMEL_STORE (apriv->service), from, to, &ex);
 
