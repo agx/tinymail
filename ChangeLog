@@ -1,3 +1,9 @@
+2007-05-16  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-store-account.c:
+	(tny_camel_store_account_prepare): Remove a warning that I shouldn't 
+	have added in my last commit.
+
 2007-05-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Some clarity for tny_folder_transfer_msgs in a GError for the

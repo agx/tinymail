@@ -92,8 +92,12 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 		gchar *proto;
 
 		if (apriv->proto == NULL) {
-			g_warning ("%s: apriv->proto is NULL. "
+			/* Don't warn, because this seems to be normal.
+			 * Presumably this will be called again later.
+			 * 
+			 * g_warning ("%s: apriv->proto is NULL. "
 				"You might need to call tny_account_set_proto().", __FUNCTION__);
+			*/
 			return;
 		}
 
