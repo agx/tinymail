@@ -1870,9 +1870,10 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 
 			} else {
-				g_set_error (&nerr, TNY_FOLDER_ERROR, 
+				g_set_error (&terr, TNY_FOLDER_ERROR, 
 					TNY_FOLDER_ERROR_COPY,
 					camel_exception_get_description (&ex));
+				tried=TRUE;
 			}
 
 			g_free (to);
@@ -1886,6 +1887,10 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 		CpyRecRet *cpyr;
 		tny_debug ("tny_folder_copy: recurse_copy\n");
 		cpyr = recurse_copy (self, into, new_name, del, &nerr, adds, rems);
+		if (nerr != NULL) {
+			g_propagate_error (err, nerr);
+			g_error_free (nerr);
+		}
 		retval = cpyr->created;
 		adds = cpyr->adds;
 		rems = cpyr->rems;
