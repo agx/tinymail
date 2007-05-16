@@ -1836,6 +1836,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			if (!camel_exception_is_set (&ex))
 			{
 				TnyCamelFolderPriv *rpriv=NULL;
+				CamelFolderInfo *iter;
 
 				gboolean was_new=FALSE;
 				adds = recurse_evt (self, TNY_FOLDER_STORE (into), 
@@ -1857,6 +1858,28 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				rpriv->folder_name = g_strdup (priv->folder_name);
 
 				succeeded = TRUE;
+
+				if (was_new)
+				{
+					CamelStore *store = priv->store;
+					CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+					iter = camel_store_get_folder_info (store, to, 0, &ex);
+					if (camel_exception_is_set (&ex))
+					{
+						g_set_error (err, TNY_FOLDER_ERROR, 
+							TNY_FOLDER_ERROR_COPY,
+							camel_exception_get_description (&ex));
+						camel_exception_clear (&ex);
+						succeeded = FALSE;
+					}
+
+					if (succeeded)
+						_tny_camel_folder_set_folder_info (into, 
+							TNY_CAMEL_FOLDER (retval), iter);
+				}
+
+
 			} else {
 				g_set_error (&nerr, TNY_FOLDER_ERROR, 
 					TNY_FOLDER_ERROR_COPY,
