@@ -362,9 +362,8 @@ tny_get_msg_queue_finalize (GObject *object)
 {
 	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (object);
 
-	tny_queue_join (priv->queue);
-
 	g_mutex_lock (priv->lock);
+	tny_queue_join (priv->queue);
 	g_object_unref (priv->queue);
 	g_mutex_unlock (priv->lock);
 	g_mutex_free (priv->lock);
