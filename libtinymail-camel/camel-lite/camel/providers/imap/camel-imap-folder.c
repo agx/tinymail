@@ -35,6 +35,8 @@
 
 #include <config.h> 
 
+#define _GNU_SOURCE
+
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -3440,7 +3442,7 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
   IdleResponse *idle_resp = NULL;
   CamelException ex = CAMEL_EXCEPTION_INITIALISER;
   char *resp = NULL;
-  int nwritten;
+  int nwritten=0;
   CamelImapResponseType type;
   gboolean hlock = FALSE;
 
@@ -3658,7 +3660,6 @@ idle_timeout_checker (gpointer data)
 	g_static_rec_mutex_lock (store->idle_prefix_lock);
 	if (store->idle_prefix != NULL)
 	{
-		gboolean had_lock = FALSE;
 		IdleResponse *idle_resp = idle_deal_with_stuff (folder, store, &had_err,&hadlock);
 
 		if (idle_resp && !had_err)

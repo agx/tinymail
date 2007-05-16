@@ -158,7 +158,7 @@ tny_camel_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	CamelMessageInfoBase *info = (CamelMessageInfoBase *) me->info;
-	gboolean doit;
+	gboolean doit=FALSE;
 
 	if ( ( (!(info->flags & CAMEL_MESSAGE_SEEN) && (mask & TNY_HEADER_FLAG_SEEN)) ||
 	   ((info->flags & CAMEL_MESSAGE_SEEN) && !(mask & TNY_HEADER_FLAG_SEEN)) ) 
@@ -179,7 +179,7 @@ tny_camel_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	CamelMessageInfoBase *info = (CamelMessageInfoBase *) me->info;
-	gboolean doit;
+	gboolean doit=FALSE;
 
 	if ( ( (!(info->flags & CAMEL_MESSAGE_SEEN) && (mask & TNY_HEADER_FLAG_SEEN)) ||
 	   ((info->flags & CAMEL_MESSAGE_SEEN) && !(mask & TNY_HEADER_FLAG_SEEN)) ) 

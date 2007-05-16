@@ -110,7 +110,7 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 		for (i = 0; i < parts; i++) 
 		{
 			CamelMimePart *tpart = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
-			TnyMimePart *newpart;
+			TnyMimePart *newpart=NULL;
 			CamelContentType *type;
 
 			if (!tpart || !CAMEL_IS_MIME_PART (tpart))

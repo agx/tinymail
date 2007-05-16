@@ -27,6 +27,8 @@
 #include <config.h>
 #endif
 
+#define _GNU_SOURCE
+
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -682,7 +684,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelMimeMessage *message = NULL;
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
 	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *)folder;
-	CamelPOP3Command *pcr;
+	CamelPOP3Command *pcr=NULL;
 	CamelPOP3FolderInfo *fi;
 	char buffer[1]; int i;
 	CamelStream *stream = NULL;

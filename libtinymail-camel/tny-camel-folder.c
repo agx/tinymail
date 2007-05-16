@@ -1930,7 +1930,6 @@ static void
 tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
 {
 	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
-	TnyFolderChange *change;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 
 	if (info->err == NULL)
