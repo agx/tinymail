@@ -20,6 +20,9 @@ libtinymail_queues_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS) $(LIBTINYMAIL_QUEUES_LIBS
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
 libtinymail_queues_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 
+libtinymailqueuesincludedir = $(includedir)/libtinymail-queues-$(API_VERSION)
+libtinymailqueuesinclude_HEADERS = $(libtinymail_queues_1_0_headers)
+
 %-$(API_VERSION).pc: %.pc
 	cp $< $@
 
