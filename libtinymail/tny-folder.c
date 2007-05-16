@@ -310,6 +310,9 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
  * (it's not a bug): a removed folder is permanently destroyed. Moving a folder
  * is the same as removing it and creating a new one.
  * 
+ * Note, though, that you need to give a @self with one reference count. And get
+ * rid of that reference once you are done.
+ * 
  * Implementors: The return value must be the new folder in @into carrying the 
  * name @new_name. Invoking the tny_folder_get_folder_store API on the return 
  * value must return the @into instance. The implementation must copy all 

@@ -1796,8 +1796,19 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 	TnyAccount *a, *b;
 	GError *nerr = NULL;
 	GError *terr = NULL;
+	CpyRecRet *retc;
 
-	CpyRecRet *retc = g_slice_new0 (CpyRecRet);
+	retc = g_slice_new0 (CpyRecRet);
+
+	if (del && priv->reason_to_live != 0)
+	{
+		g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_COPY,
+				"You should not use this operation while the "
+				"folder is still in use. There are still %d "
+				"users of this folder", priv->reason_to_live);
+		return retc;
+	}
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
