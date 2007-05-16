@@ -1836,7 +1836,6 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 			if (!camel_exception_is_set (&ex))
 			{
-				TnyCamelFolderPriv *rpriv=NULL;
 				CamelFolderInfo *iter;
 
 				gboolean was_new=FALSE;
@@ -1845,18 +1844,6 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 				retval = tny_camel_store_account_factor_folder 
 					(TNY_CAMEL_STORE_ACCOUNT (a), to, &was_new);
-
-				rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
-
-				if (priv->folder)
-				{
-					rpriv->folder = priv->folder;
-					camel_object_ref (rpriv->folder);
-				}
-
-				if (rpriv->folder_name)
-					g_free (rpriv->folder_name);
-				rpriv->folder_name = g_strdup (priv->folder_name);
 
 				succeeded = TRUE;
 
