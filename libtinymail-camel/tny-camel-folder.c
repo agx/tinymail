@@ -1841,7 +1841,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 				retval = g_object_ref (self);
 				rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
-				unload_folder_no_lock (rpriv);
+				unload_folder_no_lock (rpriv, TRUE);
 				g_free (rpriv->folder_name);
 				rpriv->folder_name = g_strdup (to);
 				succeeded = TRUE;
