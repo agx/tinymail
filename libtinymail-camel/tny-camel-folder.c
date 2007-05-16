@@ -1789,9 +1789,10 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyFolder *retval;
-	gboolean succeeded = FALSE;
+	gboolean succeeded = FALSE, tried=FALSE;
 	TnyAccount *a, *b;
 	GError *nerr = NULL;
+	GError *terr = NULL;
 
 	CpyRecRet *retc = g_slice_new0 (CpyRecRet);
 
@@ -1855,11 +1856,11 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 					iter = camel_store_get_folder_info (store, to, 0, &ex);
 					if (camel_exception_is_set (&ex))
 					{
-						g_set_error (err, TNY_FOLDER_ERROR, 
+						g_set_error (&terr, TNY_FOLDER_ERROR, 
 							TNY_FOLDER_ERROR_COPY,
 							camel_exception_get_description (&ex));
 						camel_exception_clear (&ex);
-						succeeded = FALSE;
+						succeeded = FALSE; tried=TRUE;
 					}
 
 					if (succeeded)
@@ -1890,6 +1891,12 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 		rems = cpyr->rems;
 		g_slice_free (CpyRecRet, cpyr);
 	}
+
+	if (tried && terr)
+		g_propagate_error (err, terr);
+
+	if (terr)
+		g_error_free (terr);
 
 	retc->created = retval;
 	retc->adds = adds;
