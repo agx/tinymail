@@ -29,6 +29,18 @@
 
 #include <tny-folder-store-query.h>
 
+/* TODOL Rename to tny_camel_session_check_operation. */
+/** _tny_session_check_operation:
+ * @session: A camel session.
+ * @err: A pointer to a GError*, which will be set if the session is not ready. 
+ * This should be freed with g_error_free().
+ * @domain The error domain for the GError, if necessary.
+ * @code The error code for the GError if necessary.
+ * @result: TRUE if the session is ready to be used.
+ *
+ * Check that the session is ready to be used, and create a GError with the specified 
+ * domain and code if the session is not ready.
+ **/
 gboolean 
 _tny_session_check_operation (TnySessionCamel *session, GError **err, GQuark domain, gint code)
 {

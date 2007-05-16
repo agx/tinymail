@@ -74,6 +74,8 @@ struct _TnyProgressInfo
 };
 
 
+/* TODO: What is the purpose of the status domain and code?
+ */
 /** 
  * tny_progress_info_new:
  * @self: the sender of the status event

@@ -88,6 +88,33 @@ void tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option);
 void tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session);
 void tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **err);
 
+
+/** TnyCamelGetSupportedSecureAuthCallback:
+ *
+ * @self: The TnyCamelAccount on which 
+ * tny_camel_account_get_supported_secure_authentication() was called.
+ * @cancelled: Whether the operation was cancelled.
+ * @auth_types: A TnyList of TnyPair objects. Each TnyPair in the list has a 
+ * supported secure authentication method name as its name. This list must 
+ * be freed with g_object_unref().
+ * @err: A GError if an error occurred, or NULL. This must be freed with 
+ * g_error_free().
+ * @user_data: The user data that was provided to 
+ * tny_camel_account_get_supported_secure_authentication().
+ * 
+ * The callback for tny_camel_account_get_supported_secure_authentication().
+ **/
+typedef void (*TnyCamelGetSupportedSecureAuthCallback) (
+  TnyCamelAccount *self, gboolean cancelled,
+  TnyList *auth_types, GError **err, 
+  gpointer user_data);
+
+void tny_camel_account_get_supported_secure_authentication(
+  TnyCamelAccount *self,
+  TnyCamelGetSupportedSecureAuthCallback callback,
+  TnyStatusCallback status_callback,
+  gpointer user_data);
+
 G_END_DECLS
 
 #endif

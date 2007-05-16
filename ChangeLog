@@ -1,3 +1,14 @@
+2007-05-16  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-account.h:
+	* libtinymail-camel/tny-camel-account.c:
+	Added tny_camel_account_get_supported_secure_authentication(), 
+	to get a list of strings for use with tny_account_set_secure_auth_mech(),
+	by querying the server. This is async, providing the result via a callback.
+
+	* libtinymail/tny-error.h: Added TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH, 
+	for use by tny_camel_account_get_supported_secure_authentication
+	
 2007-05-16  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-queues/Makefile.am: install libtinymail-queues header

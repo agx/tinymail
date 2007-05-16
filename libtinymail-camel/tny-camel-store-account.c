@@ -91,8 +91,11 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 		GList *options = apriv->options;
 		gchar *proto;
 
-		if (apriv->proto == NULL)
+		if (apriv->proto == NULL) {
+			g_warning ("%s: apriv->proto is NULL. "
+				"You might need to call tny_account_set_proto().", __FUNCTION__);
 			return;
+		}
 
 		proto = g_strdup_printf ("%s://", apriv->proto); 
 
