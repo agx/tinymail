@@ -1443,7 +1443,7 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 	} else {
 		g_set_error (err, TNY_FOLDER_ERROR, 
 				TNY_FOLDER_ERROR_GET_MSG,
-				"This url string is malformated");
+				"This url string is malformated.");
 		retval = NULL;
 	}
 
@@ -1659,7 +1659,8 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 			g_set_error (&nerr, TNY_FOLDER_ERROR, 
 				TNY_FOLDER_ERROR_COPY,
 				"The folder (%s) didn't have a parent, therefore "
-				"failed to remove it while moving", 
+				"failed to remove it while moving. This problem "
+				"indicates a bug in the software.", 
 				folder ? tny_folder_get_name (folder):"none");
 		}
 	}
@@ -1820,7 +1821,10 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				TNY_FOLDER_ERROR_COPY,
 				"You should not use this operation with del=TRUE "
 				"while the folder is still in use. There are "
-				"still %d users of this folder", priv->reason_to_live);
+				"still %d users of this folder. This problem "
+				"indicates a bug in the software.", 
+				priv->reason_to_live);
+
 		g_propagate_error (err, nerr);
 		/* g_error_free (nerr); */
 		return retc;
@@ -2394,7 +2398,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 				"These are instances that you got with the "
 				"tny_folder_get_headers API. You can't use "
 				"the header instances that tny_msg_get_header "
-				"will return you");
+				"will return you. This problem indicates a bug "
+				"in the software.");
 
 			g_object_unref (G_OBJECT (header));
 			g_object_unref (G_OBJECT (iter));

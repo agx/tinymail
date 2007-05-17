@@ -49,14 +49,16 @@ _tny_session_check_operation (TnySessionCamel *session, GError **err, GQuark dom
 	if (in == NULL || !CAMEL_IS_SESSION (in))
 	{
 		g_set_error (err, domain, code,
-			_("Operating can't continue: account not ready"));
+			"Operating can't continue: account not ready. "
+			"This problem indicates a bug in the software.");
 		return FALSE;
 	}
 
 	if (in->priv->is_connecting)
 	{
 		g_set_error (err, domain, code,
-			_("Operating can't continue: connecting in progress"));
+			"Operating can't continue: connecting in progress. "
+			"This problem indicates a bug in the software.");
 		return FALSE;
 	}
 

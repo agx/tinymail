@@ -160,7 +160,8 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 		} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				_("Account not yet fully configured"));
+				"Account not yet fully configured. "
+				"This problem indicates a bug in the software.");
 		}
 
 		return;
@@ -168,42 +169,16 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 
 	if (apriv->pass_func_set && apriv->forget_pass_func_set)
 	{
-
-	/*	CamelException ex = CAMEL_EXCEPTION_INITIALISER; */
 		apriv->connected = FALSE;
 
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
-	/* g_static_rec_mutex_lock (apriv->service_lock);
-
-		camel_service_connect can launch GUI things 
-
-		if (!camel_service_connect (apriv->service, &ex))
-		{
-			if (camel_exception_is_set (&ex))
-			{
-				g_set_error (err, TNY_ACCOUNT_ERROR, 
-					TNY_ACCOUNT_ERROR_TRY_CONNECT,
-					camel_exception_get_description (&ex));
-				camel_exception_clear (apriv->ex);
-			} else {
-				g_set_error (err, TNY_ACCOUNT_ERROR, 
-					TNY_ACCOUNT_ERROR_TRY_CONNECT,
-					_("Unknown error while connecting"));
-			}
-		} else {
-			apriv->connected = TRUE;
-			tny_camel_account_set_online (self, apriv->connected);
-		}
-
-		g_static_rec_mutex_unlock (apriv->service_lock);
-	*/
-
 	} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				_("Get and Forget password functions not yet set"));
+				"Get and Forget password functions not yet set "
+				"This problem indicates a bug in the software.");
 	}
 
 }
@@ -234,7 +209,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	{
 		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
 				TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
-				_("Account not ready for this operation (%s)"),
+				"Account not ready for this operation (%s). "
+				"This problem indicates a bug in the software.",
 				camel_exception_get_description (apriv->ex));
 		return;
 	}

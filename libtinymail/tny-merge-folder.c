@@ -87,8 +87,8 @@ tny_merge_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 
 	g_set_error (err, TNY_FOLDER_ERROR, 
 		TNY_FOLDER_ERROR_ADD_MSG,
-		"tny_merge_folder_add_msg not implemented: "
-		"add it to the mother folder instead");
+		"tny_merge_folder_add_msg not implemented: add it to the mother "
+		"folder instead. This problem indicates a bug in the software.");
 }
 
 static void

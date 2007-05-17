@@ -188,7 +188,8 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 		} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				"Account not yet fully configured");
+				"Account not yet fully configured. "
+				"This problem indicates a bug in the software.");
 		}
 
 		return;
@@ -228,7 +229,8 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 	} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				"Get and Forget password functions not yet set");
+				"Get and Forget password functions not yet set. "
+				"This problem indicates a bug in the software.");
 	}
 
 	return;
@@ -414,7 +416,8 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
-				"Account not ready for this operation (%s)",
+				"Account not ready for this operation (%s)."
+				"This problem indicates a bug in the software.",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
 		return;
@@ -470,7 +473,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 		change = tny_folder_store_change_new (self);
 		tny_folder_store_change_add_removed_folder (change, folder);
 		notify_folder_store_observers_about (self, change);
-		g_object_unref (G_OBJECT (change));	
+		g_object_unref (G_OBJECT (change));
 	}
 
 	g_free (cpriv->folder_name); 
@@ -518,7 +521,8 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				"Account not ready for this operation (%s)",
+				"Account not ready for this operation (%s). "
+				"This problem indicates a bug in the softare.",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
@@ -660,7 +664,8 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-				"Account not ready for this operation (%s)",
+				"Account not ready for this operation (%s). "
+				"This problem indicates a bug in the software.",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
 		return;
@@ -938,7 +943,8 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-				"Account not ready for this operation (%s)",
+				"Account not ready for this operation (%s)."
+				"This problem indicates a bug in the software.",
 				camel_exception_get_description (apriv->ex));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;

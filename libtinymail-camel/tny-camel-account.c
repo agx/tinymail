@@ -876,7 +876,8 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 		} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				_("Account not yet fully configured"));
+				"Account not yet fully configured. "
+				"This problem indicates a bug in the software.");
 		}
 
 		return;
