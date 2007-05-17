@@ -1,2 +1,3 @@
 *.bak
 libtinymail-unused.sgml
+*-priv.sgml
