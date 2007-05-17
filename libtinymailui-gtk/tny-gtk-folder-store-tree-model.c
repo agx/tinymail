@@ -859,9 +859,18 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 		while (!tny_iterator_is_done (miter))
 		{
 			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
-			/* Already added! */
+
+			/* Already added! 
+			 * We can't add these in the idle because the thread might
+			 * be added subfolders right now! (the idle would register
+			 * self as an observer too late!) 
+			 * Question. though: is there any reason why not to do the
+			 * doubly-linked lists here too? (except for locking, which
+			 * would then be necessary of course) */
+
 			tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
 			tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+
 			g_object_unref (G_OBJECT (folder));
 			tny_iterator_next (miter);
 		}
