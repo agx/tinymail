@@ -1,0 +1,44 @@
+<!-- ##### SECTION Title ##### -->
+TnyAsyncWorkerQueue
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyAsyncWorkerQueue ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_async_worker_queue_new ##### -->
+<para>
+
+</para>
+
+@r_queue: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_async_worker_queue_new_from_scratch ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

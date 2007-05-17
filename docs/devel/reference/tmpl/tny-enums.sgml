@@ -33,6 +33,7 @@ Enumerations for tinymail
 
 @TNY_FOLDER_STATUS: a status domain code for folder
 @TNY_GET_MSG_QUEUE_STATUS: 
+@TNY_GET_SUPPORTED_SECURE_AUTH_STATUS: 
 
 <!-- ##### ENUM TnyFolderCaps ##### -->
 <para>

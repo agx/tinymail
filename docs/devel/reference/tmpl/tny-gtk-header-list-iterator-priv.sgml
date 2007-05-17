@@ -26,3 +26,30 @@ tny-msg-header-list-iterator-priv
 @model: 
 @current: 
 
+<!-- ##### MACRO TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
+
+<!-- ##### STRUCT TnyGtkHeaderListModelPriv ##### -->
+<para>
+
+</para>
+
+@iterator_lock: 
+@folder: 
+@stamp: 
+@registered: 
+@updating_views: 
+@ra_lock: 
+@to_lock: 
+@cur_len: 
+@add_timeout: 
+@timeout_span: 
+@items: 
+@del_timeouts: 
+@iterator: 
+

@@ -90,3 +90,26 @@ A abstract account type implemented for Camel
 @err: 
 
 
+<!-- ##### USER_FUNCTION TnyCamelGetSupportedSecureAuthCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@auth_types: 
+@err: 
+@user_data: 
+
+
+<!-- ##### FUNCTION tny_camel_account_get_supported_secure_authentication ##### -->
+<para>
+
+</para>
+
+@self: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+

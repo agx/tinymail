@@ -43,7 +43,6 @@ A abstract type that defines a folder
 @get_name_func: 
 @get_id_func: 
 @get_account_func: 
-@set_name_func: 
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
@@ -53,6 +52,7 @@ A abstract type that defines a folder
 @transfer_msgs_func: 
 @transfer_msgs_async_func: 
 @copy_func: 
+@copy_async_func: 
 @poke_status_func: 
 @add_observer_func: 
 @remove_observer_func: 
@@ -214,16 +214,6 @@ A abstract type that defines a folder
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_set_name ##### -->
-<para>
-
-</para>
-
-@self: 
-@name: 
-@err: 
-
-
 <!-- ##### FUNCTION tny_folder_get_folder_type ##### -->
 <para>
 
@@ -317,6 +307,20 @@ A abstract type that defines a folder
 @del: 
 @err: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_copy_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@into: 
+@new_name: 
+@del: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 
 <!-- ##### FUNCTION tny_folder_poke_status ##### -->

@@ -1,0 +1,123 @@
+<!-- ##### SECTION Title ##### -->
+tny-queue-task
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyQueueTask ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyQueueTaskIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@set_arguments_func: 
+@set_func_func: 
+@set_callback_func: 
+@set_priority_func: 
+@get_arguments_func: 
+@get_func_func: 
+@get_callback_func: 
+
+<!-- ##### USER_FUNCTION TnyQueueTaskFunc ##### -->
+<para>
+
+</para>
+
+@task: 
+@arguments: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION TnyQueueTaskCallback ##### -->
+<para>
+
+</para>
+
+@task: 
+@func_result: 
+
+
+<!-- ##### FUNCTION tny_queue_task_set_arguments ##### -->
+<para>
+
+</para>
+
+@task: 
+@arguments: 
+
+
+<!-- ##### FUNCTION tny_queue_task_set_func ##### -->
+<para>
+
+</para>
+
+@task: 
+@func: 
+
+
+<!-- ##### FUNCTION tny_queue_task_set_callback ##### -->
+<para>
+
+</para>
+
+@task: 
+@callback: 
+
+
+<!-- ##### FUNCTION tny_queue_task_set_priority ##### -->
+<para>
+
+</para>
+
+@task: 
+@priority: 
+
+
+<!-- ##### FUNCTION tny_queue_task_get_arguments ##### -->
+<para>
+
+</para>
+
+@task: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_queue_task_get_func ##### -->
+<para>
+
+</para>
+
+@task: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_queue_task_get_callback ##### -->
+<para>
+
+</para>
+
+@task: 
+@Returns: 
+
+

@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+tny-async-worker-queue-task-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyAsyncWorkerQueueTaskPriv ##### -->
+<para>
+
+</para>
+
+@real: 
+
+<!-- ##### MACRO TNY_ASYNC_WORKER_QUEUE_TASK_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
+

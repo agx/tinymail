@@ -93,13 +93,16 @@ INCLUDES= $(LIBTINYMAIL_CFLAGS) $(LIBTINYMAILUI_CFLAGS) 		\
 	-I$(top_srcdir)/libtinymail-camel/camel-lite			\
 	-I$(top_srcdir)/libtinymail-gnomevfs				\
 	-I$(top_srcdir)/tinymail					\
-	-I$(top_srcdir)/tests/shared
+	-I$(top_srcdir)/tests/shared					\
+	-I$(top_srcdir)/libtinymail-queues				\
+	-I$(top_srcdir)/libtinymail-asyncworker				\
+	$(LIBTINYMAIL_ASYNCWORKER_CFLAGS)
 
 GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS)						\
 	$(LIBTINYMAIL_CAMEL_LIBS) $(LIBTINYMAIL_GNOMEVFS_LIBS)      				\
 	$(LIBTINYMAILUI_GTK_LIBS) $(LIBTINYMAILUI_MOZEMBED_LIBS)    				\
 	$(LIBTINYMAIL_GNOME_DESKTOP_LIBS) $(LIBTINYMAIL_TEST_LIBS)  				\
-	$(TINYMAIL_LIBS)									\
+	$(TINYMAIL_LIBS) $(LIBTINYMAIL_ASYNCWORKER_LIBS)					\
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 				\
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la			\
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la				\
@@ -107,6 +110,8 @@ GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS)						\
 	$(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la		\
 	$(top_builddir)/libtinymail-gnome-desktop/libtinymail-gnome-desktop-$(API_VERSION).la	\
 	$(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la		\
+	$(top_builddir)/libtinymail-queues/libtinymail-queues-$(API_VERSION).la			\
+	$(top_builddir)/libtinymail-asyncworker/libtinymail-asyncworker-$(API_VERSION).la 	\
 	$(top_builddir)/tests/shared/libtestsshared.a
 
 

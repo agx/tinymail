@@ -17,6 +17,13 @@ Shared include file with forward typedefs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO tny_debug ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyStatus ##### -->
 <para>
 
@@ -39,31 +46,31 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -163,7 +170,6 @@ Shared include file with forward typedefs
 @get_name_func: 
 @get_id_func: 
 @get_account_func: 
-@set_name_func: 
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
@@ -173,6 +179,7 @@ Shared include file with forward typedefs
 @transfer_msgs_func: 
 @transfer_msgs_async_func: 
 @copy_func: 
+@copy_async_func: 
 @poke_status_func: 
 @add_observer_func: 
 @remove_observer_func: 
@@ -296,8 +303,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnydevice: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -521,6 +528,19 @@ A method that happens after tny_folder_store_get_folders_async is finished
 @user_data: user data passed at the caller
 
 
+<!-- ##### USER_FUNCTION TnyCopyFolderCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@into: 
+@cancelled: 
+@new_folder: 
+@err: 
+@user_data: 
+
+
 <!-- ##### STRUCT TnyMsgRemoveStrategy ##### -->
 <para>
 
@@ -546,20 +566,20 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>

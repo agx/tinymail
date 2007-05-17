@@ -1,0 +1,38 @@
+<!-- ##### SECTION Title ##### -->
+tny-get-msg-queue-priv
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyGetMsgQueuePriv ##### -->
+<para>
+
+</para>
+
+@queue: 
+@lock: 
+@total: 
+
+<!-- ##### MACRO TNY_GET_MSG_QUEUE_GET_PRIVATE ##### -->
+<para>
+
+</para>
+
+@o: 
+
+

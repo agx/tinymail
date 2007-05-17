@@ -1,0 +1,64 @@
+<!-- ##### SECTION Title ##### -->
+tny-queue
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyQueue ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyQueueIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@add_task_func: 
+@join_func: 
+@create_task_func: 
+
+<!-- ##### FUNCTION tny_queue_add_task ##### -->
+<para>
+
+</para>
+
+@self: 
+@task: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_queue_join ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_queue_create_task ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

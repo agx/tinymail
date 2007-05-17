@@ -1,0 +1,61 @@
+<!-- ##### SECTION Title ##### -->
+TnyGetMsgQueue
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT TnyGetMsgQueue ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_get_msg_queue_new ##### -->
+<para>
+
+</para>
+
+@decorated: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_get_msg_queue_get_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
+<!-- ##### FUNCTION tny_get_msg_queue_full_msg_retrieval ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+@headers: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
