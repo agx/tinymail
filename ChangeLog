@@ -1,3 +1,16 @@
+2007-05-17  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_get_iap_list): When MAEMO_CONIC_DUMMY 
+	hack together a list of fake debug* connection IDs as the result, 
+	so we can simulate libconic in scratchbox.
+	
+	(tny_maemo_conic_device_get_current_iap_id): When MAEMO_CONIC_DUMMY, 
+	return a fake debug* connection ID based on the value of a 
+	MAEMO_CONIC_DUMMY_IAP_ID environment variable, so we can fake a 
+	connection change (though the signal will not be emitted when the 
+	environment variable changes.)
+	
 2007-05-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Removed the unworkable tny_folder_set_name, old code should replace

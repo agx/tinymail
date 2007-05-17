@@ -22,6 +22,24 @@
 #include <glib-object.h>
 #include <tny-maemo-conic-device.h>
 
+#ifdef MAEMO_CONIC_DUMMY
+/* #include "coniciap-private.h"
+ * This is not installed, so we predeclare 
+ * the struct instead.
+ * Of course, this is a hack and could break if the private API 
+ * changes.
+ * It would be better for libconic to support scratchbox.
+ */
+struct _ConIcIap 
+{
+	GObject parent_instance;
+	gboolean dispose_has_run;
+	gchar *id;
+	gchar *name;
+	gchar *bearer;
+};
+#endif /* MAEMO_CONIC_DUMMY */
+
 static gboolean tny_maemo_conic_device_is_online (TnyDevice *self);
 
 static GObjectClass *parent_class = NULL;
@@ -206,14 +224,23 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 const gchar*
 tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 {
-	TnyMaemoConicDevicePriv *priv;
+	
 	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (tny_maemo_conic_device_is_online(TNY_DEVICE(self)), NULL);
 
-	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
+	#ifdef MAEMO_CONIC_DUMMY
+	/* Allow debuggers to fake a connection change by setting an environment 
+	 * variable. This should match one of the fake iap IDs that we 
+	 * created in tny_maemo_conic_device_get_iap_list().
+	 */
+	const gchar *env = g_getenv ("MAEMO_CONIC_DUMMY_IAP_ID");
+	return env;
+	#else
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	return priv->iap;
+	#endif
 }
 
 
@@ -266,10 +293,40 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 
+#ifdef MAEMO_CONIC_DUMMY
+	/* libconic does not return a list of connections when running 
+	 * in scratchbox, though it might do this in future when 
+	 * "ethernet support" is implemented.
+	 * So we return a fake list so we can exercise funcationality 
+	 * that uses connections: */
+	 GSList* result = NULL;
+	 
+	 int i = 0;
+	 for (i = 0; i < 10; ++i) {
+	 	/* con_ic_iap_new (id) would checkc for a gconf dir and 
+	 	 * fails, though _new() functions should just call g_object_new().
+	 	 *
+	 	gchar *id = g_strdup_printf("debug id%d", i);
+	 	ConIcIap *iap = con_ic_iap_new (id);
+	 	g_free (id);
+	 	*/
+	 	
+	 	/* Note that we have re-declared the private struct so that we 
+	 	 * can do this, which is very bad and fragile: */
+	 	ConIcIap *iap = g_object_new (CON_IC_TYPE_IAP, NULL);
+	 	iap->id = g_strdup_printf("debug id%d", i);
+	 	iap->name = g_strdup_printf("debug name%d", i);
+
+	 	result = g_slist_append (result, iap);	
+	 }
+	 
+	 return result;
+#else
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
 	return con_ic_connection_get_all_iaps (priv->cnx);
+#endif
 }
 
 
