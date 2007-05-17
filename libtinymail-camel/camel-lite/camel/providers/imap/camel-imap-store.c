@@ -163,6 +163,20 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 {
 	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder))
 		camel_imap_folder_stop_idle (store->current_folder);
+	else {
+		g_static_rec_mutex_lock (store->idle_prefix_lock);
+		if (store->idle_prefix) 
+		{
+			int nwritten=0;
+			idle_debug ("Sending DONE in camel_imap_store_stop_idle (no current folder?)\n");
+			CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
+			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+			g_free (store->idle_prefix);
+			store->idle_prefix = NULL;
+		}
+		g_static_rec_mutex_unlock (store->idle_prefix_lock);
+	}
 }
 
 
