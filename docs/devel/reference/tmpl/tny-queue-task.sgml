@@ -1,18 +1,20 @@
 <!-- ##### SECTION Title ##### -->
-tny-queue-task
+TnyQueueTask
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A task for a queue
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type that you need to implement that represents a task for a queue.
+You can take a look at TnyAsyncWorkerQueueTask and TnyAsyncWorkerQueue if
+you prefer not to implement it yourself.
 </para>
 
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyQueue, #TnyAsyncWorkerQueueTask
 </para>
 
 

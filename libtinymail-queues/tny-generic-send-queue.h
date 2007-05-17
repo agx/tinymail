@@ -58,6 +58,7 @@ struct _TnyGenericSendQueueClass
 
 GType tny_generic_send_queue_get_type (void);
 
+TnySendQueue* tny_generic_send_queue_new (TnyQueue *decorated, TnyTransportAccount *account, TnyFolder *outbox, TnyFolder *sentbox);
 
 G_END_DECLS
 

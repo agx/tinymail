@@ -2,17 +2,17 @@
 TnyAsyncWorkerQueue
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A queue implementation
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A #TnyQueue implementation that uses AsyncWorker
 </para>
 
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#OAsyncWorker, #OAsyncWorkerTas,k #TnyQueueTask
 </para>
 
 

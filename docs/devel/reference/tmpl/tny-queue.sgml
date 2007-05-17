@@ -1,18 +1,20 @@
 <!-- ##### SECTION Title ##### -->
-tny-queue
+TnyQueue
 
 <!-- ##### SECTION Short_Description ##### -->
-
+A queue type
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+A type that you must implement to have a queue mechanism. You can 
+use the TnyAsyncWorkerQueue if you prefer not to implement it 
+yourself
 </para>
 
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
-
+#TnyQueueTask, #TnyAsyncWorkerQueue
 </para>
 
 
