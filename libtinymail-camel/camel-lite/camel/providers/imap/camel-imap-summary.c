@@ -112,8 +112,11 @@ camel_imap_summary_class_init (CamelImapSummaryClass *klass)
 static void
 camel_imap_summary_set_extra_flags (CamelFolder *folder, CamelMessageInfoBase *mi)
 {
-	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
-	camel_imap_message_cache_set_flags (imap_folder->folder_dir, mi);
+	if (folder && CAMEL_IS_OBJECT (folder) && CAMEL_IS_IMAP_FOLDER (folder))
+	{
+		CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+		camel_imap_message_cache_set_flags (imap_folder->folder_dir, mi);
+	}
 }
 
 static void

@@ -1637,17 +1637,27 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 	}
 
 	acc_to = TNY_STORE_ACCOUNT (tny_folder_get_account (retval));
-	if (tny_folder_is_subscribed (folder))
-		tny_store_account_subscribe (acc_to, retval);
-	g_object_unref (acc_to);
+	if (acc_to) {
+		if (tny_folder_is_subscribed (folder))
+			tny_store_account_subscribe (acc_to, retval);
+		g_object_unref (acc_to);
+	}
 
 	if (del)
 	{
 		a_store = tny_folder_get_folder_store (folder);
-		/* tny_debug ("recurse_copy: prepending to rems: %s\n", tny_folder_get_name (folder));
-		rems = g_list_append (rems, cpy_event_new (a_store, folder)); */
-		tny_folder_store_remove_folder (a_store, folder, &nerr);
-		g_object_unref (a_store);
+		if (a_store) {
+			/* tny_debug ("recurse_copy: prepending to rems: %s\n", tny_folder_get_name (folder));
+			rems = g_list_append (rems, cpy_event_new (a_store, folder)); */
+			tny_folder_store_remove_folder (a_store, folder, &nerr);
+			g_object_unref (a_store);
+		} else {
+			g_set_error (&nerr, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_COPY,
+				"The folder (%s) didn't have a parent, therefore "
+				"failed to remove it while moving", 
+				folder ? tny_folder_get_name (folder):"none");
+		}
 	}
 
 exception:
@@ -1822,12 +1832,12 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 		if (TNY_IS_FOLDER (into))
 			b = tny_folder_get_account (TNY_FOLDER (into));
-		else
+		else /* it's a TnyCamelStoreAccount in this case */
 			b = g_object_ref (into);
 
-		if (del && (a == b))
+		if (a && b && (del && (a == b)))
 		{
-			TnyFolderStore *a_store, *b_store;
+			TnyFolderStore *a_store;
 			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (a);
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 			gchar *from, *to;
@@ -1843,12 +1853,14 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			} else
 				to = g_strdup (new_name);
 
-
 			tny_debug ("tny_folder_copy: rename %s to %s\n", from, to);
 
 			a_store = tny_folder_get_folder_store (self);
-			rems = recurse_evt (self, a_store,
-				rems, g_list_prepend, TRUE);
+			if (a_store) {
+				rems = recurse_evt (self, a_store,
+					rems, g_list_prepend, TRUE);
+				g_object_unref (a_store);
+			}
 
 			/* This does a g_rename on the mmap()ed file! */
 			camel_store_rename_folder (CAMEL_STORE (apriv->service), from, to, &ex);
@@ -1881,7 +1893,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 						TnyCamelFolderPriv *rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
 						_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (a), 
 							TNY_CAMEL_FOLDER (retval), iter);
-						_tny_camel_folder_set_parent (retval, into);
+						_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (retval), into);
 					}
 				}
 
@@ -1897,11 +1909,14 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				tried=TRUE;
 			}
 
-			g_object_unref (a_store);
 			g_free (to);
 		}
-		g_object_unref (a);
-		g_object_unref (b);
+
+		if (a)
+			g_object_unref (a);
+
+		if (b)
+			g_object_unref (b);
 	}
 
 	if (!succeeded)
