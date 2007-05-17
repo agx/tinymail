@@ -770,8 +770,10 @@ folder_store_obsr_update_idle (gpointer user_data)
 				GtkTreeIter newiter;
 				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
 
+				/* See early added below! 
 				tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
-				tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+				tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));*/
+
 				me->folder_observables = g_list_prepend (me->folder_observables, folder);
 				me->store_observables = g_list_prepend (me->store_observables, folder);
 
@@ -841,9 +843,31 @@ folder_store_obsr_update_idle_destroy (gpointer user_data)
 static void
 tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
 {
+	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
 	FolStObsUpInfo *info = g_slice_new (FolStObsUpInfo);
 	info->self = TNY_FOLDER_OBSERVER (g_object_ref (self));
 	info->change = TNY_FOLDER_STORE_CHANGE (g_object_ref (change));
+	
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
+	{
+		TnyList *created = tny_simple_list_new ();
+		TnyIterator *miter;
+
+		tny_folder_store_change_get_created_folders (change, created);
+		miter = tny_list_create_iterator (created);
+
+		while (!tny_iterator_is_done (miter))
+		{
+			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+			/* Already added! */
+			tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
+			tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+			g_object_unref (G_OBJECT (folder));
+			tny_iterator_next (miter);
+		}
+		g_object_unref (G_OBJECT (miter));
+		g_object_unref (G_OBJECT (created));
+	}
 
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 			folder_store_obsr_update_idle, info, 

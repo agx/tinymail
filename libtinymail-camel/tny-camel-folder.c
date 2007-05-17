@@ -1559,6 +1559,8 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 
 	load_folder_no_lock (fpriv);
 
+	tny_debug ("tny_folder_copy: create %s\n", new_name);
+
 	retval = tny_folder_store_create_folder (into, new_name, &nerr);
 	if (nerr != NULL) {
 		if (retval)
@@ -1645,6 +1647,8 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 
 	if (del)
 	{
+		tny_debug ("tny_folder_copy: del orig %s\n", tny_folder_get_name (folder));
+
 		a_store = tny_folder_get_folder_store (folder);
 		if (a_store) {
 			/* tny_debug ("recurse_copy: prepending to rems: %s\n", tny_folder_get_name (folder));
