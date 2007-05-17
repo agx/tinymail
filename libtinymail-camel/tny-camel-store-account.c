@@ -395,7 +395,7 @@ tny_camel_store_account_remove_folder (TnyFolderStore *self, TnyFolder *folder, 
 }
 
 static void 
-tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *folder, GError **err)
+tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -408,20 +408,6 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	/* TNY TODO: Support non-TnyCamelFolder TnyFolder implementations too */
 
-	if (!_tny_session_check_operation (apriv->session, err, 
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
-		return;
-
-	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
-	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
-				"Account not ready for this operation (%s)."
-				"This problem indicates a bug in the software.",
-				camel_exception_get_description (apriv->ex));
-		_tny_session_stop_operation (apriv->session);
-		return;
-	}
 
 	store = CAMEL_STORE (apriv->service);
 
@@ -481,7 +467,99 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 
 	camel_object_unref (CAMEL_OBJECT (store));
 
+	return;
+}
+
+
+static void
+recurse_remove (TnyFolderStore *from, TnyFolder *folder, GError **err)
+{
+	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (from);
+	GError *nerr = NULL;
+
+	g_static_rec_mutex_lock (fpriv->folder_lock);
+
+	if (TNY_IS_FOLDER_STORE (folder))
+	{
+		TnyList *folders = tny_simple_list_new ();
+		TnyIterator *iter;
+
+		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder), 
+				folders, NULL, &nerr);
+
+		if (nerr != NULL)
+		{
+			g_object_unref (folders);
+			goto exception;
+		}
+
+		iter = tny_list_create_iterator (folders);
+		while (!tny_iterator_is_done (iter))
+		{
+			TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+
+			recurse_remove (TNY_FOLDER_STORE (folder), cur, &nerr);
+
+			if (nerr != NULL)
+			{
+				g_object_unref (cur);
+				g_object_unref (iter);
+				g_object_unref (folders);
+				goto exception;
+			}
+
+			g_object_unref (cur);
+			tny_iterator_next (iter);
+		}
+		g_object_unref (iter);
+		g_object_unref (folders);
+	}
+
+	tny_debug ("tny_folder_store_remove: actual removal of %s\n", 
+			tny_folder_get_name (folder));
+
+	tny_camel_store_account_remove_folder_actual (from, folder, &nerr);
+
+
+exception:
+
+	if (nerr != NULL)
+		g_propagate_error (err, nerr);
+
+	g_static_rec_mutex_unlock (fpriv->folder_lock);
+
+	return;
+}
+
+static void 
+tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *folder, GError **err)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	GError *nerr = NULL;
+
+	if (!_tny_session_check_operation (apriv->session, err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
+		return;
+
+	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
+	{
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
+				"Account not ready for this operation (%s)."
+				"This problem indicates a bug in the software.",
+				camel_exception_get_description (apriv->ex));
+		_tny_session_stop_operation (apriv->session);
+		return;
+	}
+
+	recurse_remove (self, folder, &nerr);
+
+	if (nerr != NULL)
+		g_propagate_error (err, nerr);
+
+
 	_tny_session_stop_operation (apriv->session);
+
 
 	return;
 }
