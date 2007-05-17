@@ -1898,6 +1898,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 						_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (a), 
 							TNY_CAMEL_FOLDER (retval), iter);
 						_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (retval), into);
+						rpriv->folder = NULL;
 					}
 				}
 
