@@ -178,6 +178,10 @@ print "static void\n";
 print uncamel_low($typename)."_finalize (GObject *object)\n";
 print "{\n\tparent_class->finalize (object);\n}\n";
 
+print "static void\n";
+print uncamel_low($typename)."_instance_init (GTypeInstance *instance, gpointer g_class)\n";
+print "{\n}\n";
+
 foreach my $iface (@interfaces)
 {
 	print ("\nstatic void\n");
@@ -225,7 +229,7 @@ foreach my $iface (@interfaces)
 	print ("\t\tstatic const GInterfaceInfo ".$iface_low."_info = \n\t\t{\n");
 	print ("\t\t\t(GInterfaceInitFunc) ".$iface_low."_init, /* interface_init */\n");
 	print ("\t\t\tNULL,         /* interface_finalize */\n");
-	print ("\t\t\tNULL          /* interface_data */\n\t\t}\n\n");
+	print ("\t\t\tNULL          /* interface_data */\n\t\t};\n\n");
 }
 
 
@@ -237,8 +241,8 @@ foreach my $iface (@interfaces)
 {
         my $iface_up = uncamel_up ($iface->{name});
         my $iface_low = uncamel_low ($iface->{name});
-	print "\t\tg_type_add_interface_static (type, $iface_up,\n";
-	print "\t\t\t&".$iface_low."_info\n\n";
+	print "\t\tFIX THIS (ADD _TYPE):\n\t\tg_type_add_interface_static (type, $iface_up,\n";
+	print "\t\t\t&".$iface_low."_info);\n\n";
 }
 print "\t}\n\treturn type;\n}\n";
 
