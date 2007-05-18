@@ -165,6 +165,8 @@ tny_camel_msg_get_url_string_default (TnyMsg *self)
 		TnyHeader *header = tny_msg_get_header (self);
 		const gchar *uid = tny_header_get_uid (header);
 
+		/* This is incorrect, the UID will always be NULL */
+
 		if (uid)
 		{
 			TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);

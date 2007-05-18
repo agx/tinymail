@@ -151,7 +151,7 @@ void tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer);
 TnyFolderStore* tny_folder_get_folder_store (TnyFolder *self);
 TnyFolderStats* tny_folder_get_stats (TnyFolder *self);
 TnyFolderCaps tny_folder_get_caps (TnyFolder *self);
-
+gchar* tny_folder_get_url_string (TnyFolder *self);
 
 G_END_DECLS
 
