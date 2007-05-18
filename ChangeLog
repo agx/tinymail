@@ -1,3 +1,8 @@
+2007-05-18  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+
+   	* folder was 'reason' unnecesary in copy_folder_async.
+        * fix bug: g_error_free not neccesary after g_error_propagate
+
 2007-05-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Recursively removing folders

@@ -42,6 +42,8 @@
 #include <tny-folder-store-observer.h>
 #include <tny-simple-list.h>
 
+#define DEBUG
+
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
@@ -2140,7 +2142,6 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 	if (nerr != NULL)
 	{
 		g_propagate_error (&info->err, nerr);
-		g_error_free (nerr);
 	}
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
@@ -2159,7 +2160,7 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 	} else { /* Thread reference */
 		g_object_ref (info->into);
 		g_object_unref (info->self);
-		_tny_camel_folder_unreason (priv);
+/* 		_tny_camel_folder_unreason (priv); */
 	}
 	g_thread_exit (NULL);
 
@@ -2195,6 +2196,7 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	info->cancelled = FALSE;
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
 	info->self = self;
+	info->new_folder = NULL;
 	info->into = into;
 	info->callback = callback;
 	info->status_callback = status_callback;
@@ -2211,7 +2213,7 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
-	_tny_camel_folder_reason (priv);
+/* 	_tny_camel_folder_reason (priv); */
 	g_object_ref (G_OBJECT (info->self));
 	g_object_ref (G_OBJECT (info->into));
 
@@ -2295,7 +2297,7 @@ tny_camel_folder_transfer_msgs_async_destroyer (gpointer thr_user_data)
 	_tny_camel_folder_unreason (priv_dst);
 	g_object_unref (G_OBJECT (info->folder_dst));
 
-	if (info->err)
+	if (info->err) 
 		g_error_free (info->err);
 
 	_tny_session_stop_operation (info->session);
@@ -2346,7 +2348,9 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_TRANSFER_MSGS))
 		return;
 
+	iter = tny_list_create_iterator (headers);
 	list_length = tny_list_get_length (headers);
+	uids = g_ptr_array_sized_new (list_length);
 
 	if (list_length < 1) {
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
@@ -2379,9 +2383,6 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	cfol_dst = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder_dst));
 
 	/* Create uids */
-	uids = g_ptr_array_sized_new (list_length);
-	iter = tny_list_create_iterator (headers);
-
 	while (!tny_iterator_is_done (iter)) 
 	{
 		TnyHeader *header;
