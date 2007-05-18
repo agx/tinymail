@@ -346,13 +346,16 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
 	return retval;
 }
 
+
 /**
  * tny_folder_copy_async:
  * @self: a #TnyFolder object
  * @into: a #TnyFolderStore object
  * @new_name: the new name in @into
  * @del: whether or not to delete the original location
- * @err: a #GError object or NULL
+ * @callback: callback that happens when the operation finished
+ * @status_callback: cllback that'll happen whenever there's status
+ * @user_data: user data
  *
  * Copies @self to @into giving the new folder the name @new_name. Returns the
  * newly created folder in @into, which will carry the name @new_name. For some
