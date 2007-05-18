@@ -37,7 +37,7 @@
  *
  * An example url_string can be imap://user:password@server/INBOX/005. Only 
  * "imap://user@server" is significant when searching. Also take a look at 
- * RFC 1808 for more information on url_string formatting.
+ * RFC 1808 and RFC 4467 for more information on url_string formatting.
  *
  * This method must be usable with and will be used for 
  * tny_account_store_find_account.
@@ -67,9 +67,9 @@ tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
 /**
  * tny_account_cancel:
  * @self: a #TnyAccount object
- *
- * Forcefully cancels the current operation that is happening on @self.
  * 
+ * Try to cancel the current operation that is happening. This API, though,
+ * guarantees nothing about any cancelations.
  **/
 void 
 tny_account_cancel (TnyAccount *self)

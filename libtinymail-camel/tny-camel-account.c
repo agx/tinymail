@@ -1313,11 +1313,22 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
  * TnyAccount instance, so we need to find some other object to put the vfunc. 
  */
  
-/* tny_camel_account_get_supported_secure_authentication:
+/** 
+ * TnyCamelGetSupportedSecureAuthCallback:
+ * @self: The TnyCamelAccount on which tny_camel_account_get_supported_secure_authentication() was called.
+ * @cancelled: Whether the operation was cancelled.
+ * @auth_types: A TnyList of TnyPair objects. Each TnyPair in the list has a supported secure authentication method name as its name. This list must be freed with g_object_unref().
+ * @err: A GError if an error occurred, or NULL. This must be freed with g_error_free().
+ * @user_data: The user data that was provided to tny_camel_account_get_supported_secure_authentication().
+ * 
+ * The callback for tny_camel_account_get_supported_secure_authentication().
+ **/
+
+/**
+ * tny_camel_account_get_supported_secure_authentication:
  * @self: a #TnyCamelAccount object.
  * @callback: A function to be called when the operation is complete.
- * @status_callback: A function to be called one or more times while the 
- * operation is in progress.
+ * @status_callback: A function to be called one or more times while the operation is in progress.
  * @user_data: Data to be passed to the callback and status callback.
  * 
  * Query the server for the list of supported secure authentication mechanisms.
@@ -1325,18 +1336,14 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
  * must be set if appropriate.
  * The returned strings may be used as parameters to 
  * tny_account_set_secure_auth_mech().
- */
-void tny_camel_account_get_supported_secure_authentication (
-  TnyCamelAccount *self,
-  TnyCamelGetSupportedSecureAuthCallback callback,
-  TnyStatusCallback status_callback,
-  gpointer user_data)
+ **/
+void 
+tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, TnyCamelGetSupportedSecureAuthCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 { 
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	g_return_if_fail (callback);
 	g_return_if_fail (priv->session);
-	
-	
+
 	/* Store all the interesting info in a struct 
 	 * launch a thread and keep that struct-instance around.
 	 * - While the thread is running, we regularly call the status callback in 

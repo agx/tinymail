@@ -112,12 +112,19 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
  *
  * Removes a folder represented by @folder from the folder store @self. You are
  * responsible for unreferencing the @folder instance yourself. This method will
- * not do this for you, leaving the @folder instance in an unusable state. The 
- * id of the @folder instance will be blanked once really deleted from the
- * service. All the #TnyFolderObservers and #TnyFolderStoreObservers of @folder,
- * but of course not of @self, will automatically be unsubscribed.
+ * not do this for you, leaving the @folder instance in an unusable state.
+ *
+ * All the #TnyFolderObservers and #TnyFolderStoreObservers of @folder, but of 
+ * course not of @self, will automatically be unsubscribed.
  * 
- * API question and TODO (undetermined): what about recursive deleting?
+ * This method will always recursively delete all child folders of @self. While
+ * deleting folders, the folders will also always get unsubscribed (for example
+ * in case of IMAP, which means that the folder wont be in LSUB either anymore).
+ *
+ * Observers of @self and of any the child folders of @self will receive delete
+ * observer events in deletion order (childs first, parents after that). Types
+ * like the #TnyGtkFolderStoreListModel know about this and act on folder 
+ * deletions by automatically updating themselves.
  *
  * Example:
  * <informalexample><programlisting>

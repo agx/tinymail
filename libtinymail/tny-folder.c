@@ -38,11 +38,10 @@ guint tny_folder_signals [TNY_FOLDER_LAST_SIGNAL];
  * tny_folder_get_caps:
  * @self: a #TnyFolder object
  * 
- * Get the capabilities of @self.
+ * Get a few relevant capabilities of @self.
  * 
  * Return value: The capabilities of the folder
  **/
-
 TnyFolderCaps 
 tny_folder_get_caps (TnyFolder *self)
 {
@@ -61,8 +60,8 @@ tny_folder_get_caps (TnyFolder *self)
  * Get the url_string of @self or NULL if it's impossible to determine the url 
  * string of @self. If not NULL, the returned value must be freed after use.
  *
- * The url string is specified in RFC 1808 and looks like this:
- * imap://user@hostname/INBOX/folder. Note that it doesn't necessarily contain 
+ * The url string is specified in RFC 1808 and / or RFC 4467 and looks like 
+ * this: imap://server/INBOX/folder. Note that it doesn't necessarily contain 
  * the password of the IMAP account but can contain it.
  * 
  * Return value: The url string or NULL.
@@ -129,12 +128,11 @@ tny_folder_get_stats (TnyFolder *self)
  *
  * After this, @observer will start receiving notification of changes about @self. 
  * 
- * You must use tny_folder_remove_observer, in for example the finalization of 
+ * You must use tny_folder_remove_observer in for example the finalization of 
  * your type if you used this method. Adding an observer to @self, changes
  * reference counting of the objects involved. Removing the observer will undo
  * those reference counting changes. Therefore if you don't, you will introduce
  * memory leaks.
- *
  **/
 void 
 tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
@@ -162,12 +160,11 @@ tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
  *
  * After this, @observer will no longer receive notification of changes about @self. 
  * 
- * You must use this method, in for example the finalization of your type
- * if you used tny_folder_add_observer. Adding an observer to @self, changes
- * reference counting of the objects involved. Removing the observer will undo
- * those reference counting changes. Therefore if you don't, you will introduce
- * memory leaks.
- *
+ * You must use this method in for example the finalization of your type if you
+ * used tny_folder_add_observer. Adding an observer to @self, changes reference 
+ * counting of the objects involved. Removing the observer will undo those 
+ * reference counting changes. Therefore if you don't, you will introduce memory
+ * leaks.
  **/
 void 
 tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
@@ -190,11 +187,10 @@ tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
  *
  * Poke for the status, this will invoke the event of sending a #TnyFolderChange  
  * to the observers. The change will always at least contain the unread and total
- * folder count. It will also invoke if the unread and total didn't change at 
- * all. This makes it possible for a model or view that shows folders to get the
- * initial folder unread and total counts (the #TnyGtkFolderListModel uses this
- * method internally, for example).
- *
+ * folder count, also if the unread and total didn't change at all. This makes 
+ * it possible for a model or view that shows folders to get the initial folder 
+ * unread and total counts (the #TnyGtkFolderStoreListModel uses this method 
+ * internally, for example).
  **/
 void 
 tny_folder_poke_status (TnyFolder *self)
@@ -215,9 +211,6 @@ tny_folder_poke_status (TnyFolder *self)
  *
  * Get the strategy for receiving a message. The return value of this method
  * must be unreferenced after use.
- *
- * Implementors: This method must return the strategy for receiving a message.
- * being the implementer, you must add a reference before returning the instance.
  *
  * Return value: the strategy for receiving a message
  **/
@@ -246,9 +239,6 @@ tny_folder_get_msg_receive_strategy (TnyFolder *self)
  * @st: a #TnyMsgReceiveStrategy object
  *
  * Set the strategy for receiving a message
- *
- * Implementors: This method must set (store) the strategy for receiving a
- * message.
  *
  * The idea is that devices can have a specific such strategy. For example a
  * strategy that receives the message fully from the service or a strategy that
@@ -293,33 +283,37 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
  * @err: a #GError object or NULL
  *
  * Copies @self to @into giving the new folder the name @new_name. Returns the
- * newly created folder in @into, which will carry the name @new_name.
+ * newly created folder in @into, which will carry the name @new_name. For some
+ * remote services this functionality is implemented as a rename operation.
  *
- * Very important note: 
- * When you are moving @self to @into by setting @del to true, you MUST make 
- * sure that @self is not used anymore. For example if you have gotten its 
- * headers using tny_folder_get_headers, you need to get rid of those first.
- * In case you used a default component like the TnyGtkHeaderListModel or 
- * TnyGtkHeaderListTree as TnyList for storing the headers in, you can easily
- * get rid if your headers by setting the model of the GtkTreeView to an empty
- * one. You MUST NOT try to keep using it further (as the original folder, its 
- * memory caches and it's offline on-disk cache will have been removed
- * permanently behind your back). Especially the memory caches will get you in
- * severe problems, like segmentation errors when trying to access the now 
- * invalid TnyHeader's properties. This is a design decision and can't be fixed
- * (it's not a bug): a removed folder is permanently destroyed. Moving a folder
- * is the same as removing it and creating a new one.
+ * It will do both copying and in case of @del being TRUE, removing too, 
+ * recursively. If you don't want it to be recursive, you should in stead create
+ * the folder @new_name in @into manually using tny_folder_store_create_folder
+ * and then use the tny_folder_transfer_msgs API.
+ *
+ * This method will always result in create observer events being throw for each
+ * subfolder of @self that is copied or moved to @new_name in creation order 
+ * (parents first, childs after that). 
+ *
+ * In case of @del being TRUE it will on top of that and before those create
+ * events also result in remove observer events being throw for each subfolder
+ * of @self in deletion order (the exact reversed order: childs first, parents
+ * after that)
+ *
+ * Standard folder models like the #TnyGtkFolderStoreListModel know about this
+ * behavior and will act by updating themselves automatically.
  * 
- * Note, though, that you need to give a @self with one reference count. And get
- * rid of that reference once you are done.
+ * When you are moving @self to @into with @del set to TRUE (moving @self), you
+ * MUST make sure that @self nor any of its sub folders are used anymore. For
+ * example if you have gotten headers using tny_folder_get_headers, you MUST get 
+ * rid of those first. In case you used a default component like the 
+ * TnyGtkHeaderListModel or any other TnyList for storing the headers, you can 
+ * easily get rid if your headers by setting the model of the GtkTreeView to
+ * an empty one or unreferencing the list. You MUST NOT try to keep using it nor
+ * any of its headers. These instances will be invalid and in a destroyed state.
  * 
- * Implementors: The return value must be the new folder in @into carrying the 
- * name @new_name. Invoking the tny_folder_get_folder_store API on the return 
- * value must return the @into instance. The implementation must copy all 
- * messages from @self to @into. In case @del was TRUE, the messages that got
- * successfully copied must be removed from @self. If @new_name already exists
- * in @into and @err is not NULL, then an error must be set in @err and no 
- * further action may be performed.
+ * If @new_name already exists in @into and @err is not NULL, then an error will
+ * be set in @err and no further action will be performed.
  * 
  * Return value: a new folder instance to whom was copied
  **/
@@ -361,10 +355,37 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
  * @err: a #GError object or NULL
  *
  * Copies @self to @into giving the new folder the name @new_name. Returns the
- * newly created folder in @into, which will carry the name @new_name.
+ * newly created folder in @into, which will carry the name @new_name. For some
+ * remote services this functionality is implemented as a rename operation.
  *
- * After the method's callback happened, tny_folder_get_all_count and 
- * tny_folder_get_unread_count are guaranteed to be correct.
+ * It will do both copying and in case of @del being TRUE, removing too, 
+ * recursively. If you don't want it to be recursive, you should in stead create
+ * the folder @new_name in @into manually using tny_folder_store_create_folder
+ * and then use the tny_folder_transfer_msgs API.
+ *
+ * This method will always result in create observer events being throw for each
+ * subfolder of @self that is copied or moved to @new_name in creation order 
+ * (parents first, childs after that). 
+ *
+ * In case of @del being TRUE it will on top of that and before those create
+ * events also result in remove observer events being throw for each subfolder
+ * of @self in deletion order (the exact reversed order: childs first, parents
+ * after that)
+ *
+ * Standard folder models like the #TnyGtkFolderStoreListModel know about this
+ * behavior and will act by updating themselves automatically.
+ * 
+ * When you are moving @self to @into with @del set to TRUE (moving @self), you
+ * MUST make sure that @self nor any of its sub folders are used anymore. For
+ * example if you have gotten headers using tny_folder_get_headers, you MUST get 
+ * rid of those first. In case you used a default component like the 
+ * TnyGtkHeaderListModel or any other TnyList for storing the headers, you can 
+ * easily get rid if your headers by setting the model of the GtkTreeView to
+ * an empty one or unreferencing the list. You MUST NOT try to keep using it nor
+ * any of its headers. These instances will be invalid and in a destroyed state.
+ * 
+ * If @new_name already exists in @into and @err is not NULL, then an error will
+ * be set in @err and no further action will be performed.
  *
  * If you want to use this method, it's advised to let your application 
  * use the #GMainLoop. All Gtk+ applications have this once gtk_main () is
@@ -418,7 +439,6 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
 void 
 tny_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TnyFolder *retval;
 
 #ifdef DBC /* require */
 	TnyFolderStore *test;
@@ -1070,6 +1090,10 @@ tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback 
  * Get the list of message header instances that are in @self. Also read
  * about tny_folder_refresh.
  *
+ * API warning: it's possible that between the @refresh and @err, a pointer to
+ * a query object will be placed. This will introduce both an API and ABI 
+ * breakage.
+ *
  * Example:
  * <informalexample><programlisting>
  * TnyList *headers = tny_simple_list_new ();
@@ -1176,7 +1200,6 @@ tny_folder_get_name (TnyFolder *self)
  * Get the type of @self (Inbox, Outbox etc.) 
  * 
  * Return value: The folder type as a #TnyFolderType enum
- *
  **/
 TnyFolderType 
 tny_folder_get_folder_type  (TnyFolder *self)
