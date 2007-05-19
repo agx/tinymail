@@ -87,6 +87,8 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	device = TNY_MAEMO_CONIC_DEVICE(user_data);
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
 
+	g_message (__FUNCTION__);
+	
 #ifdef MAEMO_CONIC_DUMMY
 	/* HACK: outsmarting libconic by emitting signal regardless of the reported connection status */
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
@@ -115,13 +117,16 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	case CON_IC_STATUS_CONNECTED:
 		priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
 		is_online = TRUE;
+		g_message ("new status: CONNECTED (%s)", priv->iap);
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
 		priv->iap = NULL;
 		is_online = FALSE;
+		g_message ("new status: DISCONNECTED", priv->iap);
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
 		is_online = FALSE;
+		g_message ("new status: DISCONNECTING", priv->iap);
 		break;
 	default:
 		g_return_if_reached (); 
@@ -129,6 +134,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	priv->is_online = is_online;
 	priv->forced = FALSE; /* is_online is now accurate. */
+	g_message ("emitting signa CONNECTION_CHANGED: %s", is_online ? "online" : "offline");
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, is_online);
 }
@@ -155,6 +161,9 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 	
 	g_return_val_if_fail (priv->cnx, FALSE);
 
+	g_message (__FUNCTION__);
+	g_message ("connecting to %s", iap_id ? iap_id : "<any>");
+	
 	if (iap_id) {
 		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect_by_id dbus message");
@@ -187,14 +196,15 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
  * connected in that case either
  */
 #ifndef MAEMO_CONIC_DUMMY 
-
-
 	TnyMaemoConicDevicePriv *priv;	
 	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), FALSE);
 	g_return_val_if_fail (priv->cnx, FALSE);
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	
+	g_message (__FUNCTION__);
+	g_message ("disconnecting from %s", iap_id ? iap_id : "<any>");
 
 	if (iap_id) {
 		if (!con_ic_connection_disconnect_by_id (priv->cnx, iap_id)) {
@@ -223,9 +233,7 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
  **/
 const gchar*
 tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
-{
-	
-	
+{	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (tny_maemo_conic_device_is_online(TNY_DEVICE(self)), NULL);
 
@@ -361,10 +369,12 @@ tny_maemo_conic_device_force_online (TnyDevice *device)
 
 #ifdef MAEMO_CONIC_DUMMY
 	return;
-#endif /*MAEMO_CONIC_DUMMY*/
-
+#endif /*MAEMO_CONIC_DUMMY*/	
 	const gboolean already_online = tny_maemo_conic_device_is_online (device);
 
+	g_message (__FUNCTION__);
+	g_message ("force online, current status is: %s", already_online ? "online" : "offline");
+	
 	priv->forced = TRUE;
 
 	/* Signal if it changed: */
