@@ -1,3 +1,9 @@
+2007-05-20  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* TnyAccountStore's alert_func has a 'question' parameter now
+
+	* This was a major API change
+
 2007-05-18  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
    	* folder was 'reason' unnecesary in copy_folder_async.
