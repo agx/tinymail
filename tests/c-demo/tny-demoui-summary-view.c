@@ -429,7 +429,6 @@ on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gp
 		g_signal_connect_swapped (edialog, "response",
 			G_CALLBACK (gtk_widget_destroy), edialog);
 		gtk_widget_show_all (edialog);
-		g_error_free (merr);
 	}
 }
 

@@ -1136,7 +1136,7 @@ tny_camel_folder_get_msg_async_destroyer (gpointer thr_user_data)
 	_tny_camel_folder_unreason (priv);
 	g_object_unref (G_OBJECT (info->self));
 
-	if (info->err)
+	  if (info->err)
 		g_error_free (info->err);
 
 	_tny_session_stop_operation (info->session);
@@ -1226,6 +1226,7 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
+	info->err = NULL;
 	if (err != NULL)
 	{
 		info->err = g_error_copy ((const GError *) err);
