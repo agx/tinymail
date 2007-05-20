@@ -83,9 +83,9 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * @error: A GError, of domain TNY_ACCOUNT_ERROR or TNY_ACCOUNT_STORE_ERROR, 
  * which should be used to determine what to show to the user.
  *
- * This jump-to-the-ui method implements showing a message dialog appropriate for the @error
- * and @type as message type. It will return TRUE if the reply was 
- * affirmative or FALSE if not.
+ * This jump-to-the-ui method implements showing a message dialog appropriate 
+ * for the @error and @type as message type. It will return TRUE if the reply 
+ * was affirmative or FALSE if not.
  *
  * Implementors: when implementing a platform-specific library, you must
  * implement this method. For example in GTK+ by using the #GtkDialog API. The
@@ -116,7 +116,6 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  *         gtktype = GTK_MESSAGE_ERROR;
  *         break;
  *     }
- *
  *     const gchar *prompt = NULL;
  *     switch (error->code)
  *     {
@@ -128,10 +127,8 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  *             prompt = NULL;
  *             break;
  *      }
- *	
- *	if (!prompt)
- *		return FALSE;
- *
+ *      if (!prompt)
+ *        return FALSE;
  *     gboolean retval = FALSE;
  *     dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
  *            gtktype, GTK_BUTTONS_YES_NO, prompt);
@@ -143,7 +140,6 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * </programlisting></informalexample>
  *
  * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
- *
  **/
 gboolean 
 tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError *error)
