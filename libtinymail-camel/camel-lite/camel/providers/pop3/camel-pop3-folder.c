@@ -27,7 +27,9 @@
 #include <config.h>
 #endif
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include <errno.h>
 #include <stdlib.h>
@@ -307,6 +309,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	{
 		CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
 		CamelMessageInfoBase *mi = NULL;
+		CamelFolderChangeInfo *changes;
 
 		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
 		if (!mi)
@@ -341,10 +344,19 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 					camel_folder_summary_save (folder->summary);
 					hcnt = 0;
 				}
+
+
+				
 			}
 
 		} else 
 			camel_message_info_free (mi);
+
+		changes = camel_folder_change_info_new ();
+		camel_folder_change_info_add_uid (changes, fi->uid);
+		if (camel_folder_change_info_changed (changes))
+			camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+		camel_folder_change_info_free (changes);
 
 		camel_operation_progress (NULL, i , pop3_folder->uids->len);
 
@@ -604,7 +616,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		{
 			   CamelContentType *ct = NULL;
 			   const char *bound=NULL;
-			   char *pstr = (char*)strcasestr (buffer, "Content-Type:");
+			   char *pstr = (char*)strcasestr ((const char *) buffer, "Content-Type:");
 
 			   if (pstr) 
 			   {
