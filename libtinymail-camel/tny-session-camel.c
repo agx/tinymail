@@ -202,7 +202,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 
 		tny_lockable_lock (self->priv->ui_lock);
 
-		tny_session_camel_do_an_error (self, tnytype, err);
+		retval = tny_session_camel_do_an_error (self, tnytype, err);
 
 		tny_lockable_unlock (self->priv->ui_lock);
 

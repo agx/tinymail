@@ -700,7 +700,6 @@ notify_views_delete (gpointer data)
 static void
 tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 {
-	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	notify_views_data_t *stuff;
 	guint src;
 
