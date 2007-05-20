@@ -30,7 +30,6 @@
 
 #include <account-store.h>
 
-static gint recursion_level=0;
 static gchar *cachedir=NULL;
 static gboolean online=FALSE, mainloop=FALSE;
 

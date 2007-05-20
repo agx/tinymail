@@ -34,7 +34,6 @@
 #include <tny-camel-header-priv.h>
 
 typedef void (*performer_t) (TnyFolder *folder);
-static gint recursion_level=0;
 static gchar *cachedir=NULL;
 static gboolean online=FALSE, justget=FALSE;
 
@@ -99,7 +98,6 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	TnyAccountStore *account_store;
 	TnyList *accounts;
-	TnyFolderStoreQuery *query;
 	TnyStoreAccount *account;
 	TnyIterator *iter, *topiter;
 	TnyList *folders, *topfolders;

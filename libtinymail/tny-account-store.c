@@ -80,6 +80,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * tny_account_store_alert:
  * @self: a #TnyAccountStore object
  * @type: the message type (severity)
+ * @question: whether or not this is a question
  * @error: A GError, of domain TNY_ACCOUNT_ERROR or TNY_ACCOUNT_STORE_ERROR, 
  * which should be used to determine what to show to the user.
  *
@@ -95,6 +96,11 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * your implementation should attempt to use explicit button names such as 
  * "Accept Certificate" and "Reject Certificate". Likewise, the dialog should be 
  * arranged according the the user interface guidelines of your target platform.
+ *
+ * Although there is a @question parameter, there is not always certainty about
+ * whether or not the warning actually is a question. It's save to say, however
+ * that in case @question is FALSE, that the return value of the function's 
+ * implementation is not considered. In case of TRUE, it usually is.
  *
  * Example implementation for GTK+:
  * <informalexample><programlisting>
@@ -142,7 +148,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
  **/
 gboolean 
-tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError *error)
+tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error)
 {
 	gboolean retval;
 
@@ -153,7 +159,7 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError 
 	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, type, error);
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, type, question, error);
 
 #ifdef DBC /* ensure */
 #endif

@@ -158,11 +158,11 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 }
 
 static gboolean
-tny_session_camel_do_an_error (TnySessionCamel *self, TnyAlertType tnytype, GError *err)
+tny_session_camel_do_an_error (TnySessionCamel *self, TnyAlertType tnytype, gboolean question, GError *err)
 {
 	return tny_account_store_alert (
 		(TnyAccountStore*) self->priv->account_store, 
-		tnytype, (const GError *) err);
+		tnytype, question, (const GError *) err);
 }
 
 /* tny_session_camel_alert_user will for example be called when SSL is on and 
@@ -202,7 +202,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 
 		tny_lockable_lock (self->priv->ui_lock);
 
-		retval = tny_session_camel_do_an_error (self, tnytype, err);
+		retval = tny_session_camel_do_an_error (self, tnytype, TRUE, err);
 
 		tny_lockable_unlock (self->priv->ui_lock);
 
@@ -426,7 +426,7 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 				if (info->as_thread)
 					tny_lockable_lock (self->priv->ui_lock);
 
-				tny_session_camel_do_an_error (self, TNY_ALERT_TYPE_ERROR, err);
+				tny_session_camel_do_an_error (self, TNY_ALERT_TYPE_ERROR, FALSE, err);
 
 				if (info->as_thread)
 					tny_lockable_unlock (self->priv->ui_lock);

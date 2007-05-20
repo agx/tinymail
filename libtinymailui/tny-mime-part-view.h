@@ -44,7 +44,7 @@ struct _TnyMimePartViewIface
 	void (*clear_func) (TnyMimePartView *self); 
 };
 
-GType tny_mime_part_view_get_type();
+GType tny_mime_part_view_get_type (void);
 
 void tny_mime_part_view_clear (TnyMimePartView *self);
 void tny_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *mime_part);

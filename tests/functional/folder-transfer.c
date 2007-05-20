@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <string.h>
+
 #include <glib.h>
 #include <stdlib.h>
 
@@ -99,7 +101,6 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	TnyAccountStore *account_store;
 	TnyList *accounts;
-	TnyFolderStoreQuery *query;
 	TnyStoreAccount *account;
 	TnyIterator *iter;
 	gint i;

@@ -18,6 +18,8 @@
 
 #include <glib.h>
 
+#include <string.h>
+
 #include <tny-list.h>
 #include <tny-iterator.h>
 #include <tny-simple-list.h>
@@ -52,7 +54,6 @@ find_folders (TnyFolderStore *store, TnyFolderStoreQuery *query,
 	while (!tny_iterator_is_done (iter) && (!*folder_src || !*folder_dst))
 	{
 		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
-		gint i=0;
 		const gchar *folder_name = NULL;
 
 		folder_name = tny_folder_get_name (TNY_FOLDER (folder));
@@ -93,7 +94,7 @@ main (int argc, char **argv)
 {
 	GOptionContext *context;
 	TnyAccountStore *account_store;
-	TnyList *accounts, *src_headers, *dst_headers;
+	TnyList *accounts, *src_headers;
 	TnyFolderStoreQuery *query;
 	TnyStoreAccount *account;
 	TnyIterator *iter;
@@ -156,7 +157,7 @@ main (int argc, char **argv)
 	src_headers = tny_simple_list_new ();
 	tny_folder_get_headers (folder_src, src_headers, TRUE, NULL);
 		
-	g_printf ("%s %d messages from %s to %s\n",
+	g_print ("%s %d messages from %s to %s\n",
 		  move ? "Moving" : "Copying",
 		  src_num_headers,
 		  tny_folder_get_name (folder_src),
@@ -167,7 +168,7 @@ main (int argc, char **argv)
 
 	/* Check that all the messages have been transferred */
 	tny_folder_refresh (folder_dst, NULL);
-	g_printf ("Transferred %d of %d messages\n",
+	g_print ("Transferred %d of %d messages\n",
 		  tny_folder_get_all_count (folder_dst) - dst_num_headers,
 		  src_num_headers);
 	

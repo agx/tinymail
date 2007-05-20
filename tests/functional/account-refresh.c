@@ -161,7 +161,6 @@ int main (int argc, char **argv)
 	TnyList *accounts;
 	TnyStoreAccount *account;
 	TnyIterator *iter;
-	gint i;
 
 	g_type_init ();
 

@@ -56,7 +56,7 @@ static const GOptionEntry options[] =
 static gboolean
 time_s_up (gpointer data)
 {
-	gtk_main_quit ();
+	exit (0);
 	return FALSE;
 }
 
@@ -110,6 +110,7 @@ create_test_msg (TnyPlatformFactory *platfact)
 	return retval;
 }
 
+#if 0
 static void
 on_message_sent (TnySendQueue *queue, TnyMsg *msg, guint nth, guint total)
 {
@@ -119,6 +120,8 @@ on_message_sent (TnySendQueue *queue, TnyMsg *msg, guint nth, guint total)
 	g_print ("Message \"%s\" got sent", tny_header_get_subject (header));
 	g_object_unref (G_OBJECT (header));
 }
+#endif
+
 
 int 
 main (int argc, char **argv)
@@ -126,22 +129,21 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	TnyAccountStore *account_store;
 	TnyList *accounts;
-	TnyFolderStoreQuery *query;
 	TnyStoreAccount *account;
 	TnyIterator *iter;
-    TnySendQueue *queue;
+	TnySendQueue *queue;
 	TnyMsg *msg;
 	TnyPlatformFactory *platfact;
 
 	free (malloc (10));
-    
+
 	g_type_init ();
 
 	platfact = tny_test_platform_factory_get_instance ();
 
-    context = g_option_context_new ("- The tinymail functional tester");
-	g_option_context_add_main_entries (context, options, "tinymail");
-    g_option_context_parse (context, &argc, &argv, NULL);
+	context = g_option_context_new ("- The tinymail functional tester");
+		g_option_context_add_main_entries (context, options, "tinymail");
+	g_option_context_parse (context, &argc, &argv, NULL);
 
 	account_store = tny_test_account_store_new (online, cachedir);
 
@@ -149,13 +151,13 @@ main (int argc, char **argv)
 		g_print ("Using %s as cache directory\n", cachedir);
 
 	g_option_context_free (context);
-    
+
 	accounts = tny_simple_list_new ();
 
 	tny_account_store_get_accounts (account_store, accounts, 
-	      TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS);
+		TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS);
 	/*g_object_unref (G_OBJECT (account_store));*/
-    
+
 	iter = tny_list_create_iterator (accounts);
 	account = (TnyStoreAccount*) tny_iterator_get_current (iter);
 
@@ -164,26 +166,22 @@ main (int argc, char **argv)
 	queue = tny_camel_send_queue_new (TNY_CAMEL_TRANSPORT_ACCOUNT (account));
 	tny_send_queue_add (queue, msg, NULL);
 
-    if (mainloop)
+	if (mainloop)
 	{
 		g_print ("Using the Gtk+ mainloop (will wait 4 seconds in the loop)\n");
-	    
-	    	g_timeout_add (1, dance, account);	    
-	    	g_timeout_add (1000 * 4, time_s_up, NULL);
-	    
+		g_timeout_add (1, dance, account);	    
+		g_timeout_add (1000 * 4, time_s_up, NULL);
 		gtk_main ();
-	    
 	} else {
 		g_print ("Not using a mainloop (will sleep 4 seconds)\n");
-	    
 		dance (account);
 		sleep (4);
 	}
-    
+
 	g_object_unref (G_OBJECT (account));
 	g_object_unref (G_OBJECT (iter));
 	g_object_unref (G_OBJECT (accounts));
-   	g_object_unref (G_OBJECT (platfact));
+	g_object_unref (G_OBJECT (platfact));
 
 	return 0;
 }

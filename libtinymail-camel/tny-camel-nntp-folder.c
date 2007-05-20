@@ -76,17 +76,6 @@ tny_camel_nntp_folder_create_folder (TnyFolderStore *self, const gchar *name, GE
 	return NULL;
 }
 
-static void 
-tny_camel_nntp_folder_set_name (TnyFolder *self, const gchar *name, GError **err)
-{
-	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-			"You can't use the tny_folder_set_name API on "
-			"NNTP folders. This problem indicates a bug "
-			"in the software.");
-	return;
-}
-
 
 TnyFolder*
 _tny_camel_nntp_folder_new (void)

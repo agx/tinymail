@@ -1178,7 +1178,6 @@ tny_camel_account_get_supported_secure_authentication_async_destroyer (gpointer 
 		
 	GetSupportedAuthInfo *info = thr_user_data;
 	TnyCamelAccount *self = info->self;
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	/* thread reference */
 	g_object_unref (G_OBJECT (self));
@@ -1202,7 +1201,6 @@ tny_camel_account_get_supported_secure_authentication_async_callback (gpointer t
 		
 	GetSupportedAuthInfo *info = thr_user_data;
 	TnyCamelAccount *self = info->self;
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	if (info->callback) {
 		printf ("DEBUG: %s: Calling callback.\n", __FUNCTION__);
@@ -1389,8 +1387,8 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 	 * via _tny_camel_account_start_camel_operation,
 	 * and also calls the idle main callback: */
 	printf ("DEBUG: %s: before calling g_thread_create()\n", __FUNCTION__);
-	GThread *thread = g_thread_create (
-		tny_camel_account_get_supported_secure_authentication_async_thread,
+
+	g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
 		info, FALSE, NULL);
 }
 

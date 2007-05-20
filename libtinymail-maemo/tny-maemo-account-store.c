@@ -98,7 +98,7 @@ per_account_forget_pass_func (TnyAccount *account)
 }
 
 static gboolean
-tny_maemo_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError *error)
+tny_maemo_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error)
 {
 	GtkMessageType gtktype;
 	GtkWidget *dialog;
