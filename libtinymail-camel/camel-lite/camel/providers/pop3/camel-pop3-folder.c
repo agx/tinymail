@@ -141,11 +141,11 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 
 
 	/* mt-ok, since we dont have the folder-lock for new() */
-	camel_folder_refresh_info (folder, ex);/* mt-ok */
+	/* camel_folder_refresh_info (folder, ex); 
 	if (camel_exception_is_set (ex)) {
 		camel_object_unref (CAMEL_OBJECT (folder));
 		folder = NULL;
-	}
+	}*/
 
 	if (!folder->summary) {
 		camel_object_unref (CAMEL_OBJECT (folder));
