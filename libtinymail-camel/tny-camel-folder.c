@@ -2088,6 +2088,7 @@ tny_camel_folder_copy_async_status (struct _CamelOperation *op, const char *what
 	CopyFolderInfo *oinfo = thr_user_data;
 	TnyProgressInfo *info = NULL;
 
+	/* Send back progress data only for these internal operations */
 	if ((g_ascii_strcasecmp(what, "Renaming folder")) &&
 	    (g_ascii_strcasecmp(what, "Moving messages")) &&
 	    (g_ascii_strcasecmp(what, "Copying messages"))) 
