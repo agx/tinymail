@@ -2051,7 +2051,7 @@ tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
 	/* thread reference */
 	g_object_ref (G_OBJECT (info->into));
 	g_object_unref (G_OBJECT (info->self));
-	_tny_camel_folder_unreason (priv);
+	/* _tny_camel_folder_unreason (priv); */
 
 	if (info->err)
 		g_error_free (info->err);
