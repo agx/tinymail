@@ -18,6 +18,8 @@
 
 #include "check_libtinymail.h"
 
+#include <gtk/gtk.h>
+
 #include <tny-folder.h>
 #include <tny-camel-folder.h>
 #include <tny-folder-store.h>
@@ -101,6 +103,8 @@ timeout (gpointer data)
      return FALSE;
 }
 
+static void status_cb (GObject *self, TnyStatus *status, gpointer user_data) {}
+
 START_TEST (tny_folder_store_test_get_folders_async)
 {
      TnyList *folders;
@@ -112,7 +116,7 @@ START_TEST (tny_folder_store_test_get_folders_async)
      }
 
      folders = tny_simple_list_new ();
-     tny_folder_store_get_folders_async (account, folders, callback, NULL, NULL);
+     tny_folder_store_get_folders_async (account, folders, callback, NULL, status_cb, NULL);
      g_timeout_add (1000*4, timeout, NULL);
      gtk_main ();
      fail_unless (tny_list_get_length (folders) == 1, "Did not find one root folder as expected");
@@ -147,7 +151,6 @@ START_TEST (tny_folder_store_test_create_remove_folder)
      TnyFolderStore *inbox;
      TnyFolder *new_folder;
      const gchar *new_folder_name = "tny-folder-store-test_temp-folder";
-     gchar *str;
 
      /* Make sure errors are set - cannot add folder to root */
      err = NULL;

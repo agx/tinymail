@@ -20,6 +20,9 @@
 
 #include <tny-msg.h>
 #include <tny-header.h>
+
+#include <tny-camel-msg.h>
+
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>

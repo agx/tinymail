@@ -202,7 +202,7 @@ START_TEST (tny_list_test_list)
 	g_object_unref (G_OBJECT(item));
 
 	item = tny_iterator_get_current (iterator);
-	str = g_strdup_printf ("Implementation - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
+	str = g_strdup_printf ("Implementation %s - Item should be \"4\"\n", G_OBJECT_TYPE_NAME (iface));
 	fail_unless (item == c, str);
 	g_free (str);
 

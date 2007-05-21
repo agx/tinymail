@@ -180,9 +180,7 @@ AC_ARG_ENABLE(acap,
 AC_HELP_STRING([--enable-acap],
   [Build using acap features]),
 [case "${enableval}" in
-  yes)
-        build_acap=true
-  ;;
+  yes) build_acap=true ;;
   no)  build_acap=false ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-acap) ;;
 esac],[build_acap=$build_acap])
@@ -193,9 +191,7 @@ AC_ARG_ENABLE(queues,
 AC_HELP_STRING([--enable-queues],
   [Build using queues]),
 [case "${enableval}" in
-  yes)
-        build_queues=true
-  ;;
+  yes) build_queues=true ;;
   no)  build_queues=false ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-queues) ;;
 esac],[build_queues=$build_queues])
@@ -307,7 +303,6 @@ AC_SUBST(LIBTINYMAIL_QUEUES_LIBS)
  fi
 fi
 
-
 dnl ### libtinymailui, the ui abstraction library ##
 PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAILUI_CFLAGS)
@@ -344,7 +339,22 @@ AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
 dnl ### libtinymailui-mozembed, a library that wraps the gtkmozembed widget ##
 if test x$build_mozembed = xtrue; then
+
   AC_TNY_MOZ_CHECK
+
+  if test x$mozilla_nspr = xno; then
+    AC_MSG_ERROR("You need Mozilla's NSPR") 
+  fi
+  if test x$mozilla_nss = xno; then
+    AC_MSG_ERROR("You need Mozilla's NSS")
+  fi
+  if test x$mozilla_xpcom = xno; then
+    AC_MSG_ERROR("You need Mozilla's XPCOM")
+  fi
+  if test x$mozilla_gtkmozembed = xno; then
+   AC_MSG_ERROR("You need Mozilla's GtkMozEmbed")
+  fi
+
   extraplatpkgs="$mozilla_nspr $mozilla_nss $mozilla_xpcom $mozilla_gtkmozembed"
   extratnypkgs="$extratnypkgs $extraplatpkgs"
   PKG_CHECK_MODULES(LIBTINYMAILUI_MOZEMBED, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)

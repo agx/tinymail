@@ -18,6 +18,8 @@
 
 #include "check_libtinymail.h"
 
+#include <gtk/gtk.h>
+
 #include <tny-folder.h>
 #include <tny-camel-folder.h>
 #include <tny-folder-store.h>
@@ -37,7 +39,10 @@ static gchar *str;
 static gboolean callback_completed;
 static GError *err;
 
+
 typedef void (*performer) (TnyFolder *folder);
+
+static void status_cb (GObject *self, TnyStatus *status, gpointer user_data) {}
 
 static void
 do_test_folder (TnyFolder *folder)
@@ -158,7 +163,7 @@ END_TEST
 
 
 static void
-message_received (TnyFolder *folder, TnyMsg *msg, GError **err, gpointer user_data)
+message_received (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data)
 {
 	fail_unless (*err == NULL, "Error receiving message async");
 
@@ -173,8 +178,7 @@ START_TEST (tny_folder_test_msg)
 	TnyIterator *iter;
 	TnyHeader *header;
 	TnyMsg *msg;
-	TnyHeaderFlags hflags;
-	
+
 	if (iface == NULL)
 	{
 		g_warning ("Test cannot continue (are you online?)");
@@ -205,7 +209,7 @@ START_TEST (tny_folder_test_msg)
 	/* Test get_msg_async */
 	callback_completed = FALSE;
 	err = NULL;
-	tny_folder_get_msg_async (iface, header, message_received, NULL);
+	tny_folder_get_msg_async (iface, header, message_received, status_cb, NULL);
 	g_timeout_add (1000*6, timeout, NULL);
 	gtk_main ();
 	fail_unless (callback_completed, "Message was never received");
@@ -264,8 +268,6 @@ END_TEST
 
 START_TEST (tny_folder_test_properties)
 {
-	gint count;
-
 	if (iface == NULL)
 	{
 		g_warning ("Test cannot continue (are you online?)");
@@ -288,33 +290,8 @@ START_TEST (tny_folder_test_properties)
 }
 END_TEST
 
-START_TEST (tny_folder_test_name)
-{
-	const gchar *name = "tny-folder-iface-test";
-	const gchar *temp_name = "tny-folder-iface-test_temp";
-
-	if (iface == NULL)
-	{
-		g_warning ("Test cannot continue (are you online?)");
-		return;
-	}
-
-	fail_unless (strcmp (tny_folder_get_name (iface), name) == 0, "Folder had wrong name property");
-	err = NULL;
-	tny_folder_set_name (iface, temp_name, &err);
-	fail_unless (err == NULL, "An error occured while renaming folder");
-	fail_unless (strcmp (tny_folder_get_name (iface), temp_name) == 0, "Folder had wrong name property");
-	err = NULL;
-	tny_folder_set_name (iface, name, &err);
-	fail_unless (err == NULL, "An error occured while renaming folder");
-	fail_unless (strcmp (tny_folder_get_name (iface), name) == 0, "Folder had wrong name property");
-}
-END_TEST
-
 START_TEST (tny_folder_test_subscribed)
 {
-	TnyFolder *folder;
-
 	fail_unless (tny_folder_is_subscribed (iface), "Subscription property should be set");
 	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/unsubscribed_folder", second_folder);
 	fail_unless (!tny_folder_is_subscribed (folder2), "Subscription property should be unset");
@@ -336,11 +313,6 @@ START_TEST (tny_folder_test_refresh)
 }
 END_TEST
 
-static void
-refresh_progress (TnyFolder *folder, const gchar *what, gint status, gint oftotal, gpointer user_data)
-{
-	g_print (".");
-}
 
 static void
 folder_refreshed (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
@@ -362,7 +334,7 @@ START_TEST (tny_folder_test_refresh_async)
 	err = NULL;
 	g_print ("Refreshing folder..");
 	callback_completed = FALSE;
-	tny_folder_refresh_async (iface, folder_refreshed, refresh_progress, &err);
+	tny_folder_refresh_async (iface, folder_refreshed, status_cb, &err);
 	g_timeout_add (1000*6, timeout, NULL);
 	gtk_main ();
 	fail_unless (callback_completed, "Refresh callback was never called");
@@ -391,12 +363,6 @@ create_tny_folder_suite (void)
 	tc = tcase_create ("Properties");
 	tcase_add_checked_fixture (tc, tny_folder_test_setup, tny_folder_test_teardown);
 	tcase_add_test (tc, tny_folder_test_properties);
-	suite_add_tcase (s, tc);
-
-	tc = tcase_create ("Name");
-	tcase_set_timeout (tc, 15);
-	tcase_add_checked_fixture (tc, tny_folder_test_setup, tny_folder_test_teardown);
-	tcase_add_test (tc, tny_folder_test_name);
 	suite_add_tcase (s, tc);
 
 	tc = tcase_create ("Subscribed");
