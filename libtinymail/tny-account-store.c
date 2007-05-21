@@ -88,6 +88,8 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * for the @error and @type as message type. It will return TRUE if the reply 
  * was affirmative or FALSE if not.
  *
+ * You must not try reconnecting in the implementation of this method.
+ *
  * Implementors: when implementing a platform-specific library, you must
  * implement this method. For example in GTK+ by using the #GtkDialog API. The
  * implementation will, for example, be used to ask the user about accepting SSL
