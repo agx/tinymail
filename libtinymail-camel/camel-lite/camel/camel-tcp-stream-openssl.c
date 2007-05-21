@@ -522,7 +522,6 @@ socket_connect (struct addrinfo *host)
 {
 	struct sockaddr *saddr = host->ai_addr;
 	struct timeval tv;
-	socklen_t len;
 	int cancel_fd;
 	int ret, fd;
 	
@@ -536,7 +535,7 @@ socket_connect (struct addrinfo *host)
 	
 	cancel_fd = camel_operation_cancel_fd (NULL);
 	if (cancel_fd == -1) {
-		ret = connect (fd, saddr, len);
+		ret = connect (fd, saddr, sizeof (struct sockaddr));
 		if (ret == -1) {
 			close (fd);
 			return -1;
@@ -550,7 +549,7 @@ socket_connect (struct addrinfo *host)
 		flags = fcntl (fd, F_GETFL);
 		fcntl (fd, F_SETFL, flags | O_NONBLOCK);
 		
-		ret = connect (fd, saddr, len);
+		ret = connect (fd, saddr, sizeof (struct sockaddr));
 		if (ret == 0) {
 			fcntl (fd, F_SETFL, flags);
 			return fd;
@@ -580,7 +579,7 @@ socket_connect (struct addrinfo *host)
 			errno = EINTR;
 			return -1;
 		} else {
-			len = sizeof (int);
+			socklen_t len = sizeof (int);
 			
 			if (getsockopt (fd, SOL_SOCKET, SO_ERROR, &ret, &len) == -1) {
 				close (fd);

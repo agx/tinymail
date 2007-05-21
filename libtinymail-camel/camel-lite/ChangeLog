@@ -1,3 +1,10 @@
+2007-05-21  Murray Cumming  <murrayc@murrayc.com>
+
+	* camel/camel-tcp-stream-openssl.c: (socket_connect): When calling 
+	the standard connect () function, use sizeof (struct sockaddr) instead of 
+	just passing an uninitialized socklen_t, so that this can actually succeed, 
+	instead of failing with an Invalid Argument errno.
+
 2007-05-16  Murray Cumming  <murrayc@murrayc.com>
 
 	* camel/camel-mime-message.c: (camel_mime_message_set_subject):
