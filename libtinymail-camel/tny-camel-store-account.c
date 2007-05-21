@@ -178,19 +178,6 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 
 		if (apriv->service) {
 			apriv->service->data = self;
-
-			if (!camel_exception_is_set (apriv->ex))
-			{
-				g_idle_add_full (G_PRIORITY_HIGH, 
-					connection_status_idle, 
-					g_object_ref (self), 
-					connection_status_idle_destroy);
-
-				/* TNY TODO: Listen for disconnections here,
-				 * and report those as a connection_status_changed
-				 * event on TnyAccount too! */
-
-			}
 		}
 
 	} else {
@@ -250,6 +237,16 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 			}
 		} else {
 			apriv->connected = TRUE;
+
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				connection_status_idle, 
+				g_object_ref (self), 
+				connection_status_idle_destroy);
+
+				/* TNY TODO: Listen for disconnections here,
+				 * and report those as a connection_status_changed
+				 * event on TnyAccount too! */
+
 			/* tny_camel_account_set_online (self, apriv->connected); */
 		}
 
