@@ -2684,7 +2684,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 		goto fail;
 	
 	/* Undefined progress */
-	camel_operation_progress(NULL, 0, -1);
+	camel_operation_progress(NULL, 0, 0);
 
 	/* make sure this folder isn't currently SELECTed - it's
            actually possible to rename INBOX but if you do another
@@ -2694,7 +2694,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 		goto fail;
 
 	/* Undefined progress */
-	camel_operation_progress(NULL, 0, -1);
+	camel_operation_progress(NULL, 0, 0);
 
 	camel_imap_response_free_without_processing (imap_store, response);
 	/*if (imap_store->current_folder)
@@ -2703,7 +2703,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 	imap_store->current_folder = NULL;
 
 	/* Undefined progress */
-	camel_operation_progress(NULL, 0, -1);
+	camel_operation_progress(NULL, 0, 0);
 
 	imap_store->renaming = TRUE;
 	if (imap_store->parameters & IMAP_PARAM_SUBSCRIPTIONS)
@@ -2717,7 +2717,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 	}
 	
 	/* Undefined progress */
-	camel_operation_progress(NULL, 0, -1);
+	camel_operation_progress(NULL, 0, 0);
 
 	camel_imap_response_free (imap_store, response);
 
@@ -2728,7 +2728,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 		manage_subscriptions(store, new_name_in, TRUE);
 
 	/* Undefined progress */
-	camel_operation_progress(NULL, 0, -1);
+	camel_operation_progress(NULL, 0, 0);
 
 	storage_path = g_strdup_printf("%s/folders", imap_store->storage_path);
 	oldpath = imap_path_to_physical (storage_path, old_name);
