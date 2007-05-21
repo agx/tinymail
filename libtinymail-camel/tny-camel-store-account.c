@@ -113,7 +113,8 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 			return;
 
 		camel_url_set_protocol (url, apriv->proto); 
-		camel_url_set_user (url, apriv->user);
+		 if (apriv->user)
+			camel_url_set_user (url, apriv->user);
 		camel_url_set_host (url, apriv->host);
 
 		if (apriv->port != -1)
