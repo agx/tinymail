@@ -42,8 +42,6 @@
 #include <tny-folder-store-observer.h>
 #include <tny-simple-list.h>
 
-#define DEBUG
-
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
@@ -2040,7 +2038,6 @@ static void
 tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
 {
 	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 
 	if (info->err == NULL)
 	{

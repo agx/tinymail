@@ -53,7 +53,6 @@ get_msg_task (TnyQueueTask *task, gpointer arguments)
 	TnyMsg *retval = NULL;
 	GetMsgInfo *info = (GetMsgInfo *) arguments;
 	TnyGetMsgQueuePriv *priv = TNY_GET_MSG_QUEUE_GET_PRIVATE (info->self);
-	TnyFolder *folder;
 
 	info->err = NULL;
 
@@ -86,11 +85,9 @@ get_msg_callback (TnyQueueTask *task, gpointer func_result)
 {
 	GetMsgInfo *info = tny_queue_task_get_arguments (task);
 	TnyMsg *msg = (TnyMsg *) func_result;
-	TnyFolder *folder;
 
 	info->err = NULL;
 
-	
 	if (info->callback && info->folder)
 		info->callback (info->folder, FALSE, msg, &info->err, info->user_data);
 

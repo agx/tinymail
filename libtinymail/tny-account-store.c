@@ -441,6 +441,41 @@ tny_account_store_base_init (gpointer g_class)
 			g_cclosure_marshal_VOID__VOID,
 			G_TYPE_NONE, 0);
 
+
+
+/**
+ * TnyAccountStore::connecting-started
+ * @self: the object on which the signal is emitted
+ * @user_data: user data set when the signal handler was connected.
+ *
+ * Emitted when the store starts trying to connect the accounts
+ */
+	tny_account_store_signals[TNY_ACCOUNT_STORE_CONNECTING_STARTED] =
+	   g_signal_new ("connecting_started",
+		TNY_TYPE_ACCOUNT_STORE,
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET (TnyAccountStoreIface, connecting_started),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID, 
+		G_TYPE_NONE, 0);
+
+
+/**
+ * TnyAccountStore::connecting-finished
+ * @self: the object on which the signal is emitted
+ * @user_data: user data set when the signal handler was connected.
+ *
+ * Emitted when the store finished trying to connect the accounts
+ */
+	tny_account_store_signals[TNY_ACCOUNT_STORE_CONNECTING_FINISHED] =
+	   g_signal_new ("connecting_finished",
+		TNY_TYPE_ACCOUNT_STORE,
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET (TnyAccountStoreIface, connecting_finished),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID, 
+		G_TYPE_NONE, 0);
+
 		tny_account_store_initialized = TRUE;
 	}
 	return;

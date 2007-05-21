@@ -1197,15 +1197,10 @@ tny_camel_account_get_supported_secure_authentication_async_destroyer (gpointer 
 static gboolean
 tny_camel_account_get_supported_secure_authentication_async_callback (gpointer thr_user_data)
 {
-	printf ("DEBUG: %s\n", __FUNCTION__);
-		
 	GetSupportedAuthInfo *info = thr_user_data;
-	TnyCamelAccount *self = info->self;
 
-	if (info->callback) {
-		printf ("DEBUG: %s: Calling callback.\n", __FUNCTION__);
+	if (info->callback)
 		info->callback (info->self, info->cancelled, info->result, &info->err, info->user_data);
-	}
 
 	/* Prevent status callbacks from being called after this
 	 * (can happen because the 2 idle callbacks have different priorities)

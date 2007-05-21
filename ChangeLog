@@ -1,3 +1,7 @@
+2007-05-21  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added a couple of new signals on TnyAccountStore and TnyAccount
+
 2007-05-201 Javier Fernandez Garcia-Boente <jfernandez@igalia.com>
 
 	* Use 'what' string parameter of asyn status callback to knonw 

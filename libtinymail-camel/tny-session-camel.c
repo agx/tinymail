@@ -456,8 +456,12 @@ background_connect_idle (gpointer data)
 	TnySessionCamelPriv *priv = self->priv;
 
 	if (priv->account_store)
+	{
 		g_signal_emit (priv->account_store, 
 			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
+		g_signal_emit (priv->account_store,
+			tny_account_store_signals [TNY_ACCOUNT_STORE_CONNECTING_FINISHED], 0);
+	}
 
 	return FALSE;
 }
@@ -512,6 +516,13 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 	info->user_data = user_data;
 
 	camel_session_set_online ((CamelSession *) self, online); 
+
+	if (priv->account_store)
+	{
+		g_signal_emit (priv->account_store,
+			tny_account_store_signals [TNY_ACCOUNT_STORE_CONNECTING_STARTED], 0);
+	}
+
 
 	if (priv->async_connect) {
 		info->as_thread = TRUE;
@@ -671,6 +682,7 @@ tny_session_camel_class_init (TnySessionCamelClass *tny_session_camel_class)
 	camel_session_class->thread_msg_new = tny_session_camel_ms_thread_msg_new;
 	camel_session_class->thread_msg_free = tny_session_camel_ms_thread_msg_free;
 	camel_session_class->thread_status = tny_session_camel_ms_thread_status;
+
 
 	return;
 }

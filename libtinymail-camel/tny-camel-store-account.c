@@ -77,6 +77,20 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 	g_object_unref (G_OBJECT (iter));
 }
 
+static gboolean
+connection_status_idle (gpointer data)
+{
+	g_signal_emit (data, tny_account_signals [TNY_ACCOUNT_CONNECTION_STATUS_CHANGED], 0);
+
+	return FALSE;
+}
+
+static void
+connection_status_idle_destroy (gpointer data)
+{
+	g_object_unref (data);
+}
+
 static void 
 tny_camel_store_account_prepare (TnyCamelAccount *self)
 {
@@ -162,8 +176,22 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
 
-		if (apriv->service)
+		if (apriv->service) {
 			apriv->service->data = self;
+
+			if (!camel_exception_is_set (apriv->ex))
+			{
+				g_idle_add_full (G_PRIORITY_HIGH, 
+					connection_status_idle, 
+					g_object_ref (self), 
+					connection_status_idle_destroy);
+
+				/* TNY TODO: Listen for disconnections here,
+				 * and report those as a connection_status_changed
+				 * event on TnyAccount too! */
+
+			}
+		}
 
 	} else {
 		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,

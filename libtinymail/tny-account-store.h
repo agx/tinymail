@@ -37,6 +37,8 @@ enum _TnyAccountStoreSignal
 	TNY_ACCOUNT_STORE_ACCOUNT_INSERTED,
 	TNY_ACCOUNT_STORE_ACCOUNT_REMOVED,
 	TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED,
+	TNY_ACCOUNT_STORE_CONNECTING_STARTED,
+	TNY_ACCOUNT_STORE_CONNECTING_FINISHED,
 	TNY_ACCOUNT_STORE_LAST_SIGNAL
 };
 
@@ -68,18 +70,21 @@ typedef struct _TnyAccountStoreIface TnyAccountStoreIface;
 struct _TnyAccountStoreIface {
 	GTypeInterface parent;
 
-	/* Signals */
-	void (*account_changed) (TnyAccountStore *self, TnyAccount *account);
-	void (*account_inserted) (TnyAccountStore *self, TnyAccount *account);
-	void (*account_removed) (TnyAccountStore *self, TnyAccount *account);
-	void (*accounts_reloaded) (TnyAccountStore *self);
-
 	/* Methods */
 	void (*get_accounts_func) (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types);
 	const gchar* (*get_cache_dir_func) (TnyAccountStore *self);
 	TnyDevice* (*get_device_func) (TnyAccountStore *self);
 	gboolean (*alert_func) (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error);
 	TnyAccount* (*find_account_func) (TnyAccountStore *self, const gchar *url_string);
+
+	/* Signals */
+	void (*account_changed) (TnyAccountStore *self, TnyAccount *account);
+	void (*account_inserted) (TnyAccountStore *self, TnyAccount *account);
+	void (*account_removed) (TnyAccountStore *self, TnyAccount *account);
+	void (*accounts_reloaded) (TnyAccountStore *self);
+
+	void (*connecting_started) (TnyAccountStore *self);
+	void (*connecting_finished) (TnyAccountStore *self);
 };
 
 GType tny_account_store_get_type (void);

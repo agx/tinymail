@@ -37,6 +37,7 @@ G_BEGIN_DECLS
 typedef enum _TnyAccountType TnyAccountType;
 typedef struct _TnyAccount TnyAccount;
 typedef struct _TnyAccountIface TnyAccountIface;
+typedef enum _TnyAccountSignal TnyAccountSignal;
 #endif
 
 enum _TnyAccountType
@@ -46,10 +47,19 @@ enum _TnyAccountType
 	TNY_ACCOUNT_TYPE_COMBINED
 };
 
+enum _TnyAccountSignal
+{
+	TNY_ACCOUNT_CONNECTION_STATUS_CHANGED,
+	TNY_ACCOUNT_LAST_SIGNAL
+};
+
+extern guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
+
 struct _TnyAccountIface
 {
 	GTypeInterface parent;
 
+	/* Methods */
 	gboolean (*is_connected_func)(TnyAccount *self);
 	void (*set_id_func) (TnyAccount *self, const gchar *id);
 	void (*set_name_func) (TnyAccount *self, const gchar *name);
@@ -74,6 +84,9 @@ struct _TnyAccountIface
 	TnyAccountType (*get_account_type_func) (TnyAccount *self);
 	void (*cancel_func) (TnyAccount *self);
 	gboolean (*matches_url_string_func) (TnyAccount *self, const gchar *url_string);
+
+	/* Signals*/
+	void (*connection_status_changed) (TnyAccount *self);
 };
 
 GType tny_account_get_type (void);

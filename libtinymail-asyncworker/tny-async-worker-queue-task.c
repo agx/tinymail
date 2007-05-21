@@ -85,7 +85,6 @@ tny_async_worker_queue_task_get_arguments (TnyQueueTask *self)
 static TnyQueueTaskFunc
 tny_async_worker_queue_task_get_func (TnyQueueTask *self)
 {
-	TnyAsyncWorkerQueueTaskPriv *priv = TNY_ASYNC_WORKER_QUEUE_TASK_GET_PRIVATE (self);
 	TheArgs *args = tny_queue_task_get_arguments (self);
 
 	return args->func;
@@ -94,7 +93,6 @@ tny_async_worker_queue_task_get_func (TnyQueueTask *self)
 static TnyQueueTaskCallback
 tny_async_worker_queue_task_get_callback (TnyQueueTask *self)
 {
-	TnyAsyncWorkerQueueTaskPriv *priv = TNY_ASYNC_WORKER_QUEUE_TASK_GET_PRIVATE (self);
 	TheArgs *args = tny_queue_task_get_arguments (self);
 
 	return args->cb;

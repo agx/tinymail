@@ -25,6 +25,8 @@
 
 #include <tny-account.h>
 
+guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
+
 /**
  * tny_account_matches_url_string:
  * @self: a #TnyAccount object
@@ -832,6 +834,24 @@ tny_account_base_init (gpointer g_class)
 
 	if (!initialized) {
 		/* create interface signals here. */
+
+/**
+ * TnyAccount::connection-status-changed
+ * @self: the object on which the signal is emitted
+ * @user_data: user data set when the signal handler was connected.
+ *
+ * Emitted when the connection status of an account changes. You can get the
+ * connection status with the tny_account_is_connected API in the handler.
+ **/
+		tny_account_signals[TNY_ACCOUNT_CONNECTION_STATUS_CHANGED] =
+		   g_signal_new ("connection_status_changed",
+			TNY_TYPE_ACCOUNT,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyAccountIface, connection_status_changed),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__VOID, 
+			G_TYPE_NONE, 0);
+
 		initialized = TRUE;
 	}
 }

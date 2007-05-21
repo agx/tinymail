@@ -83,6 +83,7 @@ typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, TnyList *list, GErr
 typedef void (*TnyCopyFolderCallback) (TnyFolder *self, TnyFolderStore *into, gboolean cancelled, TnyFolder *new_folder, GError **err, gpointer user_data);
 typedef enum _TnyFolderSignal TnyFolderSignal;
 typedef enum _TnyDeviceSignal TnyDeviceSignal;
+typedef enum _TnyAccountSignal TnyAccountSignal;
 typedef enum _TnyAccountStoreSignal TnyAccountStoreSignal;
 typedef struct _TnyMsgRemoveStrategy TnyMsgRemoveStrategy;
 typedef struct _TnyMsgRemoveStrategyIface TnyMsgRemoveStrategyIface;
