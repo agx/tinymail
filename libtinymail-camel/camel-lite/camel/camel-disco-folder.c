@@ -102,7 +102,7 @@ cdf_sync_offline(CamelSession *session, CamelSessionThreadMsg *mm)
 	struct _cdf_sync_msg *m = (struct _cdf_sync_msg *)mm;
 	int i;
 
-	camel_operation_start(NULL, _("Downloading new messages for offline mode"));
+	camel_operation_start(NULL, "Downloading new messages for offline mode");
 
 	if (m->changes) {
 		for (i=0;i<m->changes->uid_added->len;i++) {
@@ -464,7 +464,7 @@ disco_prepare_for_offline (CamelDiscoFolder *disco_folder,
 	GPtrArray *uids;
 	int i;
 
-	camel_operation_start(NULL, _("Preparing folder '%s' for offline"), folder->full_name);
+	camel_operation_start(NULL, "Preparing folder '%s' for offline", folder->full_name);
 
 	if (expression)
 		uids = camel_folder_search_by_expression (folder, expression, ex);

@@ -1,3 +1,11 @@
+2007-05-201 Javier Fernandez Garcia-Boente <jfernandez@igalia.com>
+
+	* Use 'what' string parameter of asyn status callback to knonw 
+	what operaiton is being executed, in oder to decide if progress
+	data is send back or not.a
+
+	* Add camel operation and progress call to 'folder_rename' operation.
+	
 2007-05-20  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* TnyAccountStore's alert_func has a 'question' parameter now

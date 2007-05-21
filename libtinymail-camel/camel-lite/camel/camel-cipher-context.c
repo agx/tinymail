@@ -125,7 +125,7 @@ camel_cipher_sign (CamelCipherContext *context, const char *userid, CamelCipherH
 	
 	g_return_val_if_fail (CAMEL_IS_CIPHER_CONTEXT (context), -1);
 
-	camel_operation_start(NULL, _("Signing message"));
+	camel_operation_start(NULL, "Signing message");
 
 	CIPHER_LOCK(context);
 	
@@ -168,7 +168,7 @@ camel_cipher_verify (CamelCipherContext *context, struct _CamelMimePart *ipart, 
 	
 	g_return_val_if_fail (CAMEL_IS_CIPHER_CONTEXT (context), NULL);
 	
-	camel_operation_start(NULL, _("Verifying message"));
+	camel_operation_start(NULL, "Verifying message");
 
 	CIPHER_LOCK(context);
 	
@@ -212,7 +212,7 @@ camel_cipher_encrypt (CamelCipherContext *context, const char *userid, GPtrArray
 	
 	g_return_val_if_fail (CAMEL_IS_CIPHER_CONTEXT (context), -1);
 
-	camel_operation_start(NULL, _("Encrypting message"));
+	camel_operation_start(NULL, "Encrypting message");
 	
 	CIPHER_LOCK(context);
 	
@@ -251,7 +251,7 @@ camel_cipher_decrypt(CamelCipherContext *context, struct _CamelMimePart *ipart, 
 
 	g_return_val_if_fail (CAMEL_IS_CIPHER_CONTEXT (context), NULL);
 
-	camel_operation_start(NULL, _("Decrypting message"));
+	camel_operation_start(NULL, "Decrypting message");
 	
 	CIPHER_LOCK(context);
 	

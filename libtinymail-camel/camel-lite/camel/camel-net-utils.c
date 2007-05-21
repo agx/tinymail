@@ -661,7 +661,7 @@ camel_getaddrinfo(const char *name, const char *service, const struct addrinfo *
 		return NULL;
 	}
 
-	camel_operation_start_transient(NULL, _("Resolving: %s"), name);
+	camel_operation_start_transient(NULL, "Resolving: %s", name);
 
 	/* force ipv4 addresses only */
 #ifndef ENABLE_IPv6
@@ -792,7 +792,7 @@ camel_getnameinfo(const struct sockaddr *sa, socklen_t salen, char **host, char 
 		return -1;
 	}
 
-	camel_operation_start_transient(NULL, _("Resolving address"));
+	camel_operation_start_transient(NULL, "Resolving address");
 
 	msg = g_malloc0(sizeof(*msg));
 	msg->addr = sa;

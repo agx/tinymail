@@ -108,7 +108,7 @@ offline_downsync_sync (CamelSession *session, CamelSessionThreadMsg *mm)
 	CamelMimeMessage *message;
 	int i;
 	
-	camel_operation_start (NULL, _("Downloading new messages for offline mode"));
+	camel_operation_start (NULL, "Downloading new messages for offline mode");
 	
 	if (m->changes) {
 		for (i = 0; i < m->changes->uid_added->len; i++) {
@@ -252,7 +252,7 @@ offline_folder_downsync (CamelOfflineFolder *offline, const char *expression, Ca
 	GPtrArray *uids;
 	int i;
 	
-	camel_operation_start (NULL, _("Syncing messages in folder '%s' to disk"), folder->full_name);
+	camel_operation_start (NULL, "Syncing messages in folder '%s' to disk", folder->full_name);
 	
 	if (expression)
 		uids = camel_folder_search_by_expression (folder, expression, ex);

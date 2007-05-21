@@ -1403,7 +1403,7 @@ transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder *dest, G
 	if (ex == NULL)
 		ex = &local;
 
-	camel_operation_start(NULL, delete_originals ? _("Moving messages") : _("Copying messages"));
+	camel_operation_start(NULL, delete_originals ? "Moving messages" : "Copying messages");
 
 	if (uids->len > 1) {
 		camel_folder_freeze(dest);
@@ -1658,7 +1658,7 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 	CamelJunkPlugin *csp = ((CamelService *)m->folder->parent_store)->session->junk_plugin;
 
 	if (m->junk) {
-		camel_operation_start (NULL, _("Learning junk"));
+		camel_operation_start (NULL, "Learning junk");
 
 		for (i = 0; i < m->junk->len; i ++) {
 			/* TNY TODO: Partial message retrieval exception */
@@ -1675,7 +1675,7 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 	}
 
 	if (m->notjunk) {
-		camel_operation_start (NULL, _("Learning non-junk"));
+		camel_operation_start (NULL, "Learning non-junk");
 		for (i = 0; i < m->notjunk->len; i ++) {
 			/* TNY TODO: Partial message retrieval exception */
 			CamelMimeMessage *msg = camel_folder_get_message(m->folder, m->notjunk->pdata[i], CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
@@ -1694,7 +1694,7 @@ filter_filter(CamelSession *session, CamelSessionThreadMsg *tmsg)
 		camel_junk_plugin_commit_reports (csp);
 
 	if (m->driver && m->recents) {
-		camel_operation_start(NULL, _("Filtering new message(s)"));
+		camel_operation_start(NULL, "Filtering new message(s)");
 
 		source_url = camel_service_get_url((CamelService *)m->folder->parent_store);
 		uri = camel_url_new(source_url, NULL);

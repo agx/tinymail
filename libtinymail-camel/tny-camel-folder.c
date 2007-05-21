@@ -2088,6 +2088,11 @@ tny_camel_folder_copy_async_status (struct _CamelOperation *op, const char *what
 	CopyFolderInfo *oinfo = thr_user_data;
 	TnyProgressInfo *info = NULL;
 
+	if ((g_ascii_strcasecmp(what, "Renaming folder")) &&
+	    (g_ascii_strcasecmp(what, "Moving messages")) &&
+	    (g_ascii_strcasecmp(what, "Copying messages"))) 
+		return;
+	
 	info = tny_progress_info_new (G_OBJECT (oinfo->self), oinfo->status_callback, 
 		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_COPY_FOLDER, what, sofar, 
 		oftotal, oinfo->stopper, oinfo->user_data);
@@ -2121,7 +2126,9 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 	info->cancelled = FALSE;
 
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
-		tny_camel_folder_copy_async_status, info, "Copying folder");
+						  tny_camel_folder_copy_async_status, 
+						  info, 
+						  "Copying folder");
 
 	info->adds = NULL; info->rems = NULL;
 

@@ -293,7 +293,7 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 	g_return_if_fail (size != 0);
 	rewind (diary->file);
 
-	camel_operation_start (NULL, _("Resynchronizing with server"));
+	camel_operation_start (NULL, "Resynchronizing with server");
 	while (!camel_exception_is_set (ex)) {
 		camel_operation_progress (NULL, ftell (diary->file) , size);
 
