@@ -3107,12 +3107,13 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 		return;
 
-	g_assert (priv->folder_name != NULL);
 
 	if (!priv->iter && priv->iter_parented)
 	{
 		CamelStore *store = priv->store;
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+		g_return_if_fail (priv->folder_name != NULL);
 
 		priv->iter = camel_store_get_folder_info (store, priv->folder_name, 0, &ex);
 
