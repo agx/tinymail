@@ -1,22 +1,10 @@
-2007-05-22  Murray Cumming  <murrayc@murrayc.com>
+Note: Please use this ChangeLog file only for merge changes (from upstream to
+this version, and the other way around)
 
-	* camel/camel-tcp-stream-openssl.c:
-	(camel_tcp_stream_ssl_class_init): Add a g_warning() to warn people about 
-	using this unsupported alternative to NSS.
+2007-05-20  Philip Van Hoof  <pvanhoof@gnome.org>
 
-2007-05-21  Murray Cumming  <murrayc@murrayc.com>
-
-	* camel/camel-tcp-stream-openssl.c: (socket_connect): When calling 
-	the standard connect () function, use sizeof (struct sockaddr) instead of 
-	just passing an uninitialized socklen_t, so that this can actually succeed, 
-	instead of failing with an Invalid Argument errno.
-
-2007-05-16  Murray Cumming  <murrayc@murrayc.com>
-
-	* camel/camel-mime-message.c: (camel_mime_message_set_subject):
-	Prevent memory corruption. g_strstrip() does not return a newly 
-	allocated string. Also, camel_header_encode_string() doesn't seem to like 
-	being given NULL.
+	* Merged a few patches from Matthew Barnes into this version
+	* Synchronized with the newer stuff in upstream a little bit
 
 2006-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 

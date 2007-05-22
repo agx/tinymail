@@ -1,3 +1,23 @@
+2007-05-22  Murray Cumming  <murrayc@murrayc.com>
+
+	* camel/camel-tcp-stream-openssl.c:
+	(camel_tcp_stream_ssl_class_init): Add a g_warning() to warn people
+	about using this unsupported alternative to NSS.
+
+2007-05-21  Murray Cumming  <murrayc@murrayc.com>
+
+	* camel/camel-tcp-stream-openssl.c: (socket_connect): When calling
+	the standard connect () function, use sizeof (struct sockaddr) instead
+	of just passing an uninitialized socklen_t, so that this can actually
+	succeed, instead of failing with an Invalid Argument errno.
+
+2007-05-16  Murray Cumming  <murrayc@murrayc.com>
+
+	* camel/camel-mime-message.c: (camel_mime_message_set_subject):
+	Prevent memory corruption. g_strstrip() does not return a newly
+	allocated string. Also, camel_header_encode_string() doesn't seem to
+	like being given NULL.
+
 2007-05-22  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Shaped up the Unit tests
@@ -8,7 +28,7 @@
 
 	* Added a couple of new signals on TnyAccountStore and TnyAccount
 
-2007-05-201 Javier Fernandez Garcia-Boente <jfernandez@igalia.com>
+2007-05-21 Javier Fernandez Garcia-Boente <jfernandez@igalia.com>
 
 	* Use 'what' string parameter of asyn status callback to knonw 
 	what operaiton is being executed, in oder to decide if progress
