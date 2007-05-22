@@ -208,7 +208,10 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
 	TNY_HEADER_GET_IFACE (self)->set_to_func (self, to);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_header_get_to (self), to));
+	/* TNY TODO: A nice check would be one that checks whether the new to
+	 * matches the just-set to, just comparing is not good enough, though:
+	 * The implementation is allowed to change the formatting slightly. */
+	g_assert (tny_header_get_to (self) != NULL);
 #endif
 
 	return;
