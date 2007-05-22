@@ -2,6 +2,7 @@
 
 	* Shaped up the Unit tests
 	* Fixed a bunch of -Wall warnings
+	* Fixed some of the Design By Contract clausules
 
 2007-05-21  Philip Van Hoof  <pvanhoof@gnome.org>
 
