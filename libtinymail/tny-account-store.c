@@ -156,8 +156,6 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean ques
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT_STORE (self));
-	g_assert (prompt);
-	g_assert (strlen (prompt) > 0);
 	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func != NULL);
 #endif
 

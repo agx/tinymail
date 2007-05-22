@@ -129,6 +129,6 @@ Read requirements.txt
 
 For debugging
 -------------
-CFLAGS="-DDEBUG -D_GNU_SOURCE -O0 -Wstrict-prototypes -Wall -g -ggdb" PKG_CONFIG_PATH=/opt/asyncworker/lib/pkgconfig \
-	./autogen.sh --prefix=/opt/tinymail --enable-asyncworker --enable-tests && make && sudo make install
+CFLAGS="-DDEBUG -DDBC -D_GNU_SOURCE -O0 -Wstrict-prototypes -Wall -g -ggdb" PKG_CONFIG_PATH=/opt/asyncworker/lib/pkgconfig \
+	./autogen.sh --prefix=/opt/tinymail --enable-asyncworker --enable-tests --enable-unit-tests && make && sudo make install
 

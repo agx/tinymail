@@ -115,7 +115,7 @@ tny_queue_task_set_priority (TnyQueueTask *task, gint priority)
 	TNY_QUEUE_TASK_GET_IFACE (task)->set_priority_func (task, priority);
 
 #ifdef DBC /* ensure */
-	g_assert (priority == tny_queue_task_get_priority (task));
+	/* g_assert (priority == tny_queue_task_get_priority (task)); */
 #endif
 
 	return;

@@ -12,7 +12,9 @@
 
 #ifdef __linux__
 /* We need this to get a prototype for strptime. */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #endif /* __linux__ */
 
 #include <time.h>

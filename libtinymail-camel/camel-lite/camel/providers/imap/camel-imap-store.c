@@ -2634,7 +2634,7 @@ make_path (char *path, int nmode, int parent_mode)
   while (*p == '/')
     p++;
 
-  while (p = strchr (p, '/'))
+  while ((p = strchr (p, '/')))
     {
       *p = '\0';
       if (stat (npath, &sb) != 0)

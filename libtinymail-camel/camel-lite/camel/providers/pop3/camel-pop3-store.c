@@ -68,6 +68,8 @@
 #endif
 #include "camel-disco-diary.h"
 
+#include <libedataserver/md5-utils.h>
+
 /* Specified in RFC 1939 */
 #define POP3_PORT "110"
 #define POP3S_PORT "995"

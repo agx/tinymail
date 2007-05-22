@@ -1,3 +1,8 @@
+2007-05-22  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Shaped up the Unit tests
+	* Fixed a bunch of -Wall warnings
+
 2007-05-21  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added a couple of new signals on TnyAccountStore and TnyAccount

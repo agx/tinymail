@@ -1,9 +1,11 @@
 #include <string.h>
 #include <camel/camel.h>
 
+#include <gtk/gtk.h>
+
 #define TEST "This is a test to compres to compress to compres"
 
-int main ()
+int main (int argc, char **argv)
 {
 	CamelStream *in, *out, *com, *de;
 	CamelInternetAddress *addr;

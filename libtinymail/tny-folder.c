@@ -444,12 +444,11 @@ tny_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_n
 {
 
 #ifdef DBC /* require */
-	TnyFolderStore *test;
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (TNY_IS_FOLDER_STORE (into));
 	g_assert (new_name);
 	g_assert (strlen (new_name) > 0);
-	g_assert (TNY_FOLDER_GET_IFACE (self)->copy_func_async != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->copy_async_func != NULL);
 #endif
 
 	TNY_FOLDER_GET_IFACE (self)->copy_async_func (self, into, new_name, del, callback, status_callback, user_data);

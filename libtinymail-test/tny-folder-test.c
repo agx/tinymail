@@ -104,7 +104,7 @@ tny_folder_test_setup (void)
 	g_object_unref (G_OBJECT (aiter));
 	g_object_unref (G_OBJECT (accounts));
 	
-	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/tny-folder-iface-test", do_test_folder);
+	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/2000", do_test_folder);
 
 	return;
 }
@@ -199,10 +199,12 @@ START_TEST (tny_folder_test_msg)
 	iter = tny_list_create_iterator (headers);
 	tny_iterator_first (iter);
 	header = (TnyHeader*)tny_iterator_get_current (iter);
-	g_object_unref (G_OBJECT (iter));
+	/* g_object_unref (G_OBJECT (iter)); */
 
 	/* Test get_msg */
 	err = NULL;
+	fail_unless (header != NULL, "Header is NULL (not items in folder?)");
+
 	msg = tny_folder_get_msg (iface, header, &err);
 	fail_unless (err == NULL, "Error fetching message");
 
@@ -274,12 +276,13 @@ START_TEST (tny_folder_test_properties)
 		return;
 	}
 
-	fail_unless (strcmp (tny_folder_get_id (iface), "INBOX/tny-folder-iface-test") == 0, "Folder had wrong ID property");
+	fail_unless (strcmp (tny_folder_get_id (iface), "INBOX/2000") == 0, "Folder had wrong ID property");
 	err = NULL;
 	tny_folder_refresh (iface, &err); 
 	fail_unless (err == NULL, "Error refreshing folder");
 	fail_unless (tny_folder_get_all_count (iface) > 0, "Message count too small");
-	fail_unless (tny_folder_get_unread_count (iface) == 1, "Unread count is wrong");
+	/*fail_unless (tny_folder_get_unread_count (iface) == 0, "Unread count is wrong");*/
+
 	TnyStoreAccount *acnt = (TnyStoreAccount *) tny_folder_get_account (iface);
 	fail_unless (acnt == account, "Property account has wrong value");
 	g_object_unref (G_OBJECT (acnt));
@@ -293,9 +296,12 @@ END_TEST
 START_TEST (tny_folder_test_subscribed)
 {
 	fail_unless (tny_folder_is_subscribed (iface), "Subscription property should be set");
+	
+	/* UNIT test todo: setup imap1 for this
 	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/unsubscribed_folder", second_folder);
 	fail_unless (!tny_folder_is_subscribed (folder2), "Subscription property should be unset");
-	g_object_unref (G_OBJECT (folder2));
+	g_object_unref (G_OBJECT (folder2));*/
+
 }
 END_TEST
 
@@ -309,7 +315,8 @@ START_TEST (tny_folder_test_refresh)
 
 	err = NULL;
 	tny_folder_refresh (iface, &err);
-	fail_unless (tny_folder_get_unread_count (iface) == 1, "Message count not updated");
+	fail_unless (tny_folder_get_unread_count (iface) == 0, "Message unread count not updated");
+	fail_unless (tny_folder_get_all_count (iface) == 2000, "Message count not updated");
 }
 END_TEST
 
@@ -317,9 +324,10 @@ END_TEST
 static void
 folder_refreshed (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
 {
-	g_print ("done\n");
 	fail_unless (!cancelled, "Async refresh cancelled");
 	callback_completed = TRUE;
+	fail_unless (tny_folder_get_unread_count (folder) == 0, "Message unread count not updated");
+	fail_unless (tny_folder_get_all_count (folder) == 2000, "Message count not updated");
 	gtk_main_quit ();
 }
 
@@ -334,7 +342,7 @@ START_TEST (tny_folder_test_refresh_async)
 	err = NULL;
 	g_print ("Refreshing folder..");
 	callback_completed = FALSE;
-	tny_folder_refresh_async (iface, folder_refreshed, status_cb, &err);
+	tny_folder_refresh_async (iface, folder_refreshed, status_cb, NULL);
 	g_timeout_add (1000*6, timeout, NULL);
 	gtk_main ();
 	fail_unless (callback_completed, "Refresh callback was never called");

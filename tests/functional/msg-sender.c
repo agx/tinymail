@@ -21,6 +21,8 @@
 
 #include <glib.h>
 
+#include <gtk/gtk.h>
+
 #include <tny-list.h>
 #include <tny-iterator.h>
 #include <tny-simple-list.h>
