@@ -88,6 +88,7 @@ struct _CamelTcpStreamSSLPrivate {
 static void
 camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_class)
 {
+	g_warning ("tinymail: Using openssl, which is not fully tested or supported. NSS is recommended instead.");
 	CamelTcpStreamClass *camel_tcp_stream_class =
 		CAMEL_TCP_STREAM_CLASS (camel_tcp_stream_ssl_class);
 	CamelStreamClass *camel_stream_class =

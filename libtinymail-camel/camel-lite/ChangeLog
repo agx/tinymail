@@ -1,3 +1,9 @@
+2007-05-22  Murray Cumming  <murrayc@murrayc.com>
+
+	* camel/camel-tcp-stream-openssl.c:
+	(camel_tcp_stream_ssl_class_init): Add a g_warning() to warn people about 
+	using this unsupported alternative to NSS.
+
 2007-05-21  Murray Cumming  <murrayc@murrayc.com>
 
 	* camel/camel-tcp-stream-openssl.c: (socket_connect): When calling 
