@@ -345,18 +345,16 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 					hcnt = 0;
 				}
 
+				changes = camel_folder_change_info_new ();
+				camel_folder_change_info_add_uid (changes, fi->uid);
+				if (camel_folder_change_info_changed (changes))
+					camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+				camel_folder_change_info_free (changes);
 
-				
 			}
 
 		} else 
 			camel_message_info_free (mi);
-
-		changes = camel_folder_change_info_new ();
-		camel_folder_change_info_add_uid (changes, fi->uid);
-		if (camel_folder_change_info_changed (changes))
-			camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
-		camel_folder_change_info_free (changes);
 
 		camel_operation_progress (NULL, i , pop3_folder->uids->len);
 
