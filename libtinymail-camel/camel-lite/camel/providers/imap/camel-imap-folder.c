@@ -642,6 +642,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		camel_imap_folder_start_idle (folder);
 }
 
+
 static void 
 imap_finalize (CamelObject *object)
 {
@@ -4089,7 +4090,7 @@ berrorhander:
 			g_mutex_unlock (store->stream_lock);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			/* Starts idle */
-			camel_imap_folder_start_idle ((CamelFolder *) imap_folder);
+			/* camel_imap_folder_start_idle ((CamelFolder *) imap_folder); */
 			idle_rt = TRUE;
 
 			if (err)
@@ -4190,7 +4191,7 @@ berrorhander:
 			g_mutex_unlock (store->stream_lock);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			/* Starts idle */
-			camel_imap_folder_start_idle ((CamelFolder *) imap_folder);
+			/* camel_imap_folder_start_idle ((CamelFolder *) imap_folder); */
 			idle_rt = TRUE;
 
 			if (nread <= 0) 
@@ -4357,7 +4358,7 @@ rerrorhandler:
 			g_mutex_unlock (store->stream_lock);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			/* Starts idle */
-			camel_imap_store_start_idle (store);
+			/* camel_imap_store_start_idle (store); */
 			idle_rt = TRUE;
 
 			if (nread <= 0) 

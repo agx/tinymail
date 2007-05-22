@@ -195,6 +195,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	CamelException myex = CAMEL_EXCEPTION_INITIALISER;
 	gchar *full_cmd = NULL;
 	guint len = 0;
+	gboolean fetching_message = (folder && (folder->parent_store != (CamelStore *) store));
 
 	if (store->ostream == NULL || ((CamelObject *)store->ostream)->ref_count <= 0)
 	{
@@ -210,25 +211,34 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	/* g_mutex_unlock (store->stream_lock);*/
 
 
-	/* Also read imap_update_summary and all of the IDLE crap */
-	if (!store->dontdistridlehack) 
+	/* Also read imap_update_summary and all of the IDLE crap. The fetching 
+	 * message and the LOGOUT exception are for camel_imap_folder_fetch_data's 
+	 * case (I know this is a hack): In those cases, store is not the 
+	 * connection where the IDLE is happening, so there's no need to stop it 
+	 * either! On top of that is stopping the IDLE in case of LOGOUT handled 
+	 * elsewere too */
+
+	if (!store->dontdistridlehack && !fetching_message && strcmp (cmd, "LOGOUT")) 
 		camel_imap_store_stop_idle (store);
-	/* else
-		printf ("dont distr\n"); */
 
 	/* Check for current folder */
 	if (folder && folder != store->current_folder) 
 	{
 		CamelImapResponse *response;
-		CamelException internal_ex;
+		CamelException internal_ex = CAMEL_EXCEPTION_INITIALISER;
 
 		response = camel_imap_command (store, folder, ex, NULL);
 		if (!response)
 			return FALSE;
-		camel_exception_init (&internal_ex);
-		/* g_print ("select\n"); */
-		camel_imap_folder_selected (folder, response, &internal_ex, FALSE);
+
+		/* It'll not be the same instances when called for camel_imap_folder_fetch_data.
+		 * That's because a all-new connection will be used for getting messages */
+
+		if (!fetching_message)
+			camel_imap_folder_selected (folder, response, &internal_ex, FALSE);
+
 		camel_imap_response_free (store, response);
+
 		if (camel_exception_is_set (&internal_ex)) {
 			camel_exception_xfer (ex, &internal_ex);
 			return FALSE;

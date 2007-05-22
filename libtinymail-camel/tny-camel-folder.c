@@ -1222,7 +1222,7 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	/* TNY TODO:  For now (these locks must be removed once parallel getting 
 	 * messages actually works */
 
-	g_static_rec_mutex_unlock (priv->folder_lock);
+	g_static_rec_mutex_unlock (priv->folder_lock); 
 
 	info->err = NULL;
 	if (err != NULL)
