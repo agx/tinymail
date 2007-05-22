@@ -842,7 +842,8 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
-	if (mi) camel_message_info_free (mi);
+	if (mi) 
+		camel_folder_summary_remove (summary, (CamelMessageInfo *) mi);
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
 
@@ -980,7 +981,8 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
-	if (mi) camel_message_info_free (mi);
+	if (mi) 
+		camel_folder_summary_remove (summary, (CamelMessageInfo *) mi);
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
 
