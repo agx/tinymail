@@ -403,12 +403,14 @@ camel_mime_message_set_subject (CamelMimeMessage *mime_message, const char *subj
 	
 	g_assert(mime_message);
 	
-	g_free (mime_message->subject);
-	mime_message->subject = NULL;
-	
-	if (subject) {
-		mime_message->subject = g_strdup (subject);
-		g_strstrip (mime_message->subject);
+	if (subject != mime_message->subject) {
+		g_free (mime_message->subject);
+		mime_message->subject = NULL;
+		
+		if (subject) {
+			mime_message->subject = g_strdup (subject);
+			g_strstrip (mime_message->subject);
+		}
 	}
 	
 	if (mime_message->subject)

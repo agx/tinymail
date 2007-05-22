@@ -1,5 +1,13 @@
 2007-05-22  Murray Cumming  <murrayc@murrayc.com>
 
+	* camel/camel-mime-message.c: (camel_mime_message_set_subject):
+	Check that the input char* is not the same as the existing char*, 
+	so we do not delete the input before using the input. This happens 
+	when get_subject() is given directly to set_subject without a g_strdup(), 
+	for instance.
+
+2007-05-22  Murray Cumming  <murrayc@murrayc.com>
+
 	* camel/camel-tcp-stream-openssl.c:
 	(camel_tcp_stream_ssl_class_init): Add a g_warning() to warn people
 	about using this unsupported alternative to NSS.
