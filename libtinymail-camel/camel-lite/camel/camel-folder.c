@@ -205,8 +205,10 @@ camel_folder_finalize (CamelObject *object)
 	if (camel_folder->parent_store)
 		camel_object_unref (camel_folder->parent_store);
 
-	if (camel_folder->summary)
+	if (camel_folder->summary) {
+		camel_folder_summary_save (camel_folder->summary);
 		camel_object_unref (camel_folder->summary);
+	}
 
 	camel_folder_change_info_free(p->changed_frozen);
 	

@@ -815,8 +815,7 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 done:
 	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 
-	/* TNY TOCHECK: I think all situations are already saving the summary?!
-	 * camel_folder_summary_save(folder->summary); */
+	camel_folder_summary_save(folder->summary);
 
 	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary);
 }
