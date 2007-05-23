@@ -113,6 +113,10 @@ tny_olpc_device_is_online (TnyDevice *self)
 {
 	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
 	gboolean retval = FALSE;
+
+	if (priv->fset)
+		retval = priv->forced;
+
 	return retval;
 }
 
