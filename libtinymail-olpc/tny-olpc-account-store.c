@@ -116,7 +116,7 @@ tny_olpc_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean
 	}
 
 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-                                  gtktype, GTK_BUTTONS_YES_NO, prompt);
+                                  gtktype, GTK_BUTTONS_YES_NO, error->message);
 
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 		retval = TRUE;
@@ -356,41 +356,6 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 }
 
 
-
-static void
-tny_olpc_account_store_add_account (TnyAccountStore *self, TnyAccount *account, const gchar *type)
-{
-	g_warning ("Not implemented\n");
-
-	return;
-}
-
-
-
-void
-tny_olpc_account_store_add_store_account (TnyOlpcAccountStore *self, TnyStoreAccount *account)
-{
-	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	tny_olpc_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
-
-	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
-
-	return;
-}
-
-void
-tny_olpc_account_store_add_transport_account (TnyOlpcAccountStore *self, TnyTransportAccount *account)
-{
-	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	tny_olpc_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
-
-	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
-
-	return;
-}
-
 static TnyDevice*
 tny_olpc_account_store_get_device (TnyAccountStore *self)
 {
@@ -484,8 +449,6 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
 	klass->get_accounts_func = tny_olpc_account_store_get_accounts;
-	klass->add_store_account_func = tny_olpc_account_store_add_store_account;
-	klass->add_transport_account_func = tny_olpc_account_store_add_transport_account;
 	klass->get_cache_dir_func = tny_olpc_account_store_get_cache_dir;
 	klass->get_device_func = tny_olpc_account_store_get_device;
 	klass->alert_func = tny_olpc_account_store_alert;
