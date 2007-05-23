@@ -132,20 +132,29 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 	while (!tny_iterator_is_done (iter))
 	{
 		GtkTreeStore *model = GTK_TREE_STORE (self);
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
+		GObject *instance = G_OBJECT (tny_iterator_get_current (iter));
 		GtkTreeIter tree_iter;
 
 		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
-		if (TNY_IS_FOLDER (folder))
+		TnyFolder *folder = NULL;
+		TnyFolderStore *folder_store = NULL;
+		
+		if (TNY_IS_FOLDER (instance))
+			folder = TNY_FOLDER (instance);
+		
+		if (TNY_IS_FOLDER_STORE (folder))
+			folder_store =  TNY_FOLDER_STORE (instance);
+			
+		if (folder)
 		{
-			tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
+			tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
 			me->folder_observables = g_list_prepend (me->folder_observables, folder);
 		}
 
-		if (TNY_IS_FOLDER_STORE (folder))
+		if (folder_store)
 		{
-			tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+			tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
 			me->store_observables = g_list_prepend (me->store_observables, folder);
 		}
 
@@ -153,28 +162,34 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 		/* This adds a reference count to folder too. When it gets removed, that
 		   reference count is decreased automatically by the gtktreestore infra-
 		   structure. */
+		if (folder)
+		{
+			TnyFolder *folder = TNY_FOLDER (instance);
+			
+			gtk_tree_store_set (model, &tree_iter,
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+				tny_folder_get_name (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
+				tny_folder_get_unread_count (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+				tny_folder_get_all_count (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
+				tny_folder_get_folder_type (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
+				folder, -1);
+		}
 
-		gtk_tree_store_set (model, &tree_iter,
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
-			tny_folder_get_name (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
-			tny_folder_get_unread_count (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
-			tny_folder_get_all_count (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
-			tny_folder_get_folder_type (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
-			folder, -1);
-
-		recurse_folders_sync (self, folder, &tree_iter);
+		if (folder_store)
+			recurse_folders_sync (self, folder_store, &tree_iter);
 
 
 		/* TODO: This causes a memory peak at the application's startup.
 	 	*Also look at tny-camel-folder:c:2818... for more information */
 
-		tny_folder_poke_status (TNY_FOLDER (folder));
+		if (folder)
+			tny_folder_poke_status (TNY_FOLDER (folder));
 
-		g_object_unref (G_OBJECT (folder));
+		g_object_unref (G_OBJECT (instance));
 
 		tny_iterator_next (iter);
 	}

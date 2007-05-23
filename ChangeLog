@@ -1,3 +1,10 @@
+2007-05-23  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c:
+	(recurse_folders_sync): Do not assume that the row instance is a 
+	TnyFolderStore, because not all TnyFolders are TnyFolderStores. 
+	This allows us to use this tree model with TnyMergeFolder.
+
 2007-05-22  Murray Cumming  <murrayc@murrayc.com>
 
 	* camel/camel-mime-message.c: (camel_mime_message_set_subject):
