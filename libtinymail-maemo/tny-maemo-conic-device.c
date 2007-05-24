@@ -267,12 +267,18 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 ConIcIap*
 tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 {
-	TnyMaemoConicDevicePriv *priv;
-
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (iap_id, NULL);
 
-	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	#ifdef MAEMO_CONIC_DUMMY 
+	/* Note that we have re-declared the private struct so that we 
+	 * can do this, which is very bad and fragile: */
+ 	ConIcIap *iap = g_object_new (CON_IC_TYPE_IAP, NULL);
+ 	iap->id = g_strdup(iap_id);
+ 	iap->name = g_strdup_printf("%s name", iap->id);
+ 	return iap;
+	#else
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
 	/* Note that it is very unusual to return a reference from a get_() function, 
@@ -281,6 +287,7 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 	 * If we just unref immediately then libconic might destroy the object.
 	 */
 	return con_ic_connection_get_iap (priv->cnx, iap_id);
+	#endif
 }
 
 
@@ -323,7 +330,7 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	 	 * can do this, which is very bad and fragile: */
 	 	ConIcIap *iap = g_object_new (CON_IC_TYPE_IAP, NULL);
 	 	iap->id = g_strdup_printf("debug id%d", i);
-	 	iap->name = g_strdup_printf("debug name%d", i);
+	 	iap->name = g_strdup_printf("%s name", iap->id);
 
 	 	result = g_slist_append (result, iap);	
 	 }
