@@ -3764,6 +3764,10 @@ camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException
 		return -1;
 
 	camel_imap_store_restore_stream_buffer (store);
+
+	if (!store->istream)
+		return -1;
+
 	stream = CAMEL_STREAM_BUFFER (store->istream);
 
 	ba = g_byte_array_new ();
