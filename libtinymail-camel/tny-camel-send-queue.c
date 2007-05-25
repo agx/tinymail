@@ -26,6 +26,7 @@
 #include <tny-camel-msg.h>
 #include <tny-simple-list.h>
 #include <tny-folder.h>
+#include <tny-error.h>
 
 #include <tny-camel-folder.h>
 #include <tny-transport-account.h>
@@ -339,6 +340,18 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		TnyList *headers = tny_simple_list_new ();
 
 		outbox = tny_send_queue_get_outbox (self);
+
+		if (!outbox || !TNY_IS_FOLDER (outbox))
+		{
+			g_set_error (err, TNY_SEND_QUEUE_ERROR, 
+				TNY_SEND_QUEUE_ERROR_ADD,
+				"Operating can't continue: send queue not ready "
+				"because it does not have a valid outbox. "
+				"This problem indicates a bug in the software.");
+			g_object_unref (headers);
+			g_mutex_unlock (priv->todo_lock);
+			return;
+		}
 
 		tny_folder_get_headers (outbox, headers, TRUE, err);
 

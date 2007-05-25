@@ -36,6 +36,8 @@ tny_error_domain_get_type (void)
       { TNY_FOLDER_STORE_ERROR, "TNY_FOLDER_STORE_ERROR", "folder_store_error" },
       { TNY_TRANSPORT_ACCOUNT_ERROR, "TNY_TRANSPORT_ACCOUNT_ERROR", "transport_account_error" },
       { TNY_ACCOUNT_ERROR, "TNY_ACCOUNT_ERROR", "account_error" },
+      { TNY_SEND_QUEUE_ERROR, "TNY_SEND_QUEUE_ERROR", "send_queue_error" },
+
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyErrorDomain", values);
@@ -76,6 +78,7 @@ tny_error_get_type (void)
       { TNY_ACCOUNT_ERROR_TRY_CONNECT, "TNY_ACCOUNT_ERROR_TRY_CONNECT", "account_error_try_connect" },
       { TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, "TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT", "account_store_error_unknown_alert" },
 
+      { TNY_SEND_QUEUE_ERROR_ADD, "TNY_SEND_QUEUE_ERROR_ADD", "send_queue_error_add"},
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyError", values);
