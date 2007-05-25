@@ -118,6 +118,7 @@ thread_main (gpointer data)
 			emit_error (self, NULL, terror, i, priv->total);
 			g_error_free (terror);
 			g_object_unref (G_OBJECT (list));
+			g_mutex_unlock (priv->todo_lock);
 			goto errorhandler;
 		}
 
@@ -150,6 +151,8 @@ thread_main (gpointer data)
 				emit_error (self, msg, ferror, i, priv->total);
 				g_error_free (ferror);
 				g_object_unref (G_OBJECT (headers));
+				g_mutex_unlock (priv->todo_lock);
+				g_mutex_unlock (priv->sending_lock);
 				goto errorhandler;
 			}
 
@@ -161,6 +164,7 @@ thread_main (gpointer data)
 			{
 				g_object_unref (G_OBJECT (headers));
 				g_mutex_unlock (priv->todo_lock);
+				g_mutex_unlock (priv->sending_lock);
 				break;
 			}
 
@@ -359,6 +363,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		{
 			g_object_unref (G_OBJECT (headers));
 			g_object_unref (G_OBJECT (outbox));
+			g_mutex_unlock (priv->todo_lock);
 			return;
 		}
 
@@ -370,6 +375,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		if (err!= NULL && *err != NULL)
 		{
 			g_object_unref (G_OBJECT (outbox));
+			g_mutex_unlock (priv->todo_lock);
 			return;
 		}
 
