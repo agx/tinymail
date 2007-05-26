@@ -56,12 +56,16 @@ typedef struct {
 	gboolean  (*eos)        (CamelStream *stream);
 	int       (*reset)      (CamelStream *stream);
 
+	ssize_t   (*read_idle)  (CamelStream *stream, char *buffer, size_t n);
+
 } CamelStreamClass;
 
 /* Standard Camel function */
 CamelType camel_stream_get_type (void);
 
 /* public methods */
+ssize_t    camel_stream_read_idle  (CamelStream *stream, char *buffer, size_t n);
+
 ssize_t    camel_stream_read       (CamelStream *stream, char *buffer, size_t n);
 ssize_t    camel_stream_write      (CamelStream *stream, const char *buffer, size_t n);
 int        camel_stream_flush      (CamelStream *stream);

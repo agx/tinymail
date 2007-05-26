@@ -65,6 +65,7 @@ static int stream_setsockopt (CamelTcpStream *stream, const CamelSockOptData *da
 static struct sockaddr *stream_get_local_address (CamelTcpStream *stream, socklen_t *len);
 static struct sockaddr *stream_get_remote_address (CamelTcpStream *stream, socklen_t *len);
 static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
+static ssize_t stream_read_idle (CamelStream *stream, char *buffer, size_t n);
 
 static void signal_swallow( int num )
 {
@@ -84,11 +85,12 @@ camel_tcp_stream_raw_class_init (CamelTcpStreamRawClass *camel_tcp_stream_raw_cl
 	signal( SIGPIPE, signal_swallow );
 
 	/* virtual method overload */
+	camel_stream_class->read_idle = stream_read_idle;
 	camel_stream_class->read = stream_read;
 	camel_stream_class->write = stream_write;
 	camel_stream_class->flush = stream_flush;
 	camel_stream_class->close = stream_close;
-	
+
 	camel_tcp_stream_class->read_nb = stream_read_nb;
 	camel_tcp_stream_class->connect = stream_connect;
 	camel_tcp_stream_class->getsockopt = stream_getsockopt;
@@ -260,6 +262,15 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 	CamelTcpStreamRaw *raw = CAMEL_TCP_STREAM_RAW (stream);
 	
 	return camel_read_socket (raw->sockfd, buffer, n);
+}
+
+
+static ssize_t 
+stream_read_idle (CamelStream *stream, char *buffer, size_t n)
+{
+	CamelTcpStreamRaw *raw = CAMEL_TCP_STREAM_RAW (stream);
+	
+	return camel_read_socket_idle (raw->sockfd, buffer, n);
 }
 
 static ssize_t

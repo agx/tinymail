@@ -3398,10 +3398,16 @@ idle_real_start (CamelImapStore *store)
 	idle_debug ("idle_real_start\n");
 
 	g_mutex_lock (store->stream_lock);
-	store->idle_prefix = g_strdup_printf ("%c%.5u", 
-		store->tag_prefix, store->command++);
-	camel_stream_printf (store->ostream, "%s IDLE\r\n",
-		store->idle_prefix);
+	if (store->ostream && store->istream && CAMEL_IS_STREAM (store->ostream))
+	{
+		store->idle_prefix = g_strdup_printf ("%c%.5u", 
+			store->tag_prefix, store->command++);
+		camel_stream_printf (store->ostream, "%s IDLE\r\n",
+			store->idle_prefix);
+	} else {
+		idle_debug ("idle_real_start connection lost\n");
+		goto errh;
+	}
 
 	/* The IDLE command is sent from the client to the server when the
 	 *  client is ready to accept unsolicited mailbox update messages.  The
@@ -3434,6 +3440,7 @@ idle_real_start (CamelImapStore *store)
 	if (resp)
 		g_free (resp);
 
+errh:
 	g_mutex_unlock (store->stream_lock);
 
 }

@@ -98,6 +98,19 @@ camel_stream_read (CamelStream *stream, char *buffer, size_t n)
 	return (CS_CLASS (stream)->read) (stream, buffer, n);
 }
 
+ssize_t
+camel_stream_read_idle (CamelStream *stream, char *buffer, size_t n)
+{
+	g_return_val_if_fail (CAMEL_IS_STREAM (stream), -1);
+	g_return_val_if_fail (n == 0 || buffer, -1);
+
+	/* Default impl */
+	if (!CS_CLASS (stream)->read_idle)
+		return (CS_CLASS (stream)->read) (stream, buffer, n);
+
+	return (CS_CLASS (stream)->read_idle) (stream, buffer, n);
+}
+
 
 /**
  * camel_stream_write:

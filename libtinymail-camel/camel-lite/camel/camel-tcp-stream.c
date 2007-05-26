@@ -90,6 +90,8 @@ tcp_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 	return -1;
 }
 
+
+
 static int
 tcp_connect (CamelTcpStream *stream, struct addrinfo *host)
 {

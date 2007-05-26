@@ -3742,6 +3742,80 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 }
 
 
+
+/* FIXME: please god, when will the hurting stop? Thus function is so
+   fucking broken it's not even funny. */
+ssize_t
+camel_imap_store_readline_idle (CamelImapStore *store, char **dest, CamelException *ex)
+{
+	CamelStreamBuffer *stream;
+	char linebuf[1024] = {0};
+	GByteArray *ba;
+	ssize_t nread;
+	
+	g_return_val_if_fail (CAMEL_IS_IMAP_STORE (store), -1);
+	g_return_val_if_fail (dest, -1);
+	
+	*dest = NULL;
+	
+	/* Check for connectedness. Failed (or cancelled) operations will
+	 * close the connection. We can't expect a read to have any
+	 * meaning if we reconnect, so always set an exception.
+	 */
+
+	if (!camel_disco_store_check_online((CamelDiscoStore *)store, ex))
+		return -1;
+
+	g_mutex_lock (store->stream_lock);
+	camel_imap_store_restore_stream_buffer (store);
+	stream = CAMEL_STREAM_BUFFER (store->istream);
+
+	ba = g_byte_array_new ();
+	while ((nread = camel_stream_buffer_gets_idle (stream, linebuf, sizeof (linebuf))) > 0) {
+		g_byte_array_append (ba, (const guchar*) linebuf, nread);
+		if (linebuf[nread - 1] == '\n')
+			break;
+	}
+	g_mutex_unlock (store->stream_lock);
+
+	if (nread <= 0) {
+		if (errno == EINTR)
+		{
+			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
+			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
+			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			camel_service_connect (CAMEL_SERVICE (store), &mex);
+		} else {
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+					      _("Server unexpectedly disconnected: %s"),
+					      g_strerror (errno));
+			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+		}
+
+		g_byte_array_free (ba, TRUE);
+		return -1;
+	}
+	
+	if (camel_verbose_debug) {
+		fprintf (stderr, "received: ");
+		fwrite (ba->data, 1, ba->len, stderr);
+	}
+	
+	/* camel-imap-command.c:imap_read_untagged expects the CRLFs
+           to be stripped off and be nul-terminated *sigh* */
+	nread = ba->len - 1;
+	ba->data[nread] = '\0';
+	if (ba->data[nread - 1] == '\r') {
+		ba->data[nread - 1] = '\0';
+		nread--;
+	}
+	
+	*dest = (char *) ba->data;
+	g_byte_array_free (ba, FALSE);
+	
+	return nread;
+}
+
 ssize_t
 camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException *ex)
 {

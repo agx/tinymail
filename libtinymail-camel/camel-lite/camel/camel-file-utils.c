@@ -522,6 +522,49 @@ camel_read_nb (int fd, char *buf, size_t n)
 	return nread;
 }
 
+
+
+ssize_t
+camel_read_idle (int fd, char *buf, size_t n)
+{
+	ssize_t nread;
+
+	int errnosav, flags, fdmax;
+	fd_set rdset;
+	
+	flags = fcntl (fd, F_GETFL);
+	fcntl (fd, F_SETFL, flags | O_NONBLOCK);
+	
+	do {
+		struct timeval tv;
+		int res;
+
+		FD_ZERO (&rdset);
+		FD_SET (fd, &rdset);
+		fdmax = fd + 1;
+		tv.tv_sec = 5;
+		tv.tv_usec = 0;
+		nread = -1;
+
+		res = select(fdmax, &rdset, 0, 0, &tv);
+		if (res == -1)
+			;
+		else if (res == 0)
+			errno = ETIMEDOUT;
+		else {
+			do {
+				nread = read (fd, buf, n);
+			} while (0 && (nread == -1 && errno == EINTR));
+		}
+	} while (0 && (nread == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)));
+
+	errnosav = errno;
+	fcntl (fd, F_SETFL, flags);
+	errno = errnosav;
+
+	return nread;
+}
+
 /**
  * camel_write:
  * @fd: file descriptor
@@ -684,6 +727,63 @@ camel_read_socket (int fd, char *buf, size_t n)
 #endif
 }
 
+
+ssize_t
+camel_read_socket_idle (int fd, char *buf, size_t n)
+{
+#ifndef G_OS_WIN32
+	return camel_read_idle (fd, buf, n);
+#else
+	ssize_t nread;
+	int cancel_fd;
+	
+	if (camel_operation_cancel_check (NULL)) {
+		errno = EINTR;
+		return -1;
+	}
+	cancel_fd = camel_operation_cancel_fd (NULL);
+
+	if (cancel_fd == -1) {
+		do {
+			nread = recv (fd, buf, n, 0);
+		} while ((nread == SOCKET_ERROR && WSAGetLastError () == WSAEWOULDBLOCK));
+	} else {
+		int fdmax;
+		fd_set rdset;
+		u_long yes = 1;
+
+		ioctlsocket (fd, FIONBIO, &yes);
+		fdmax = MAX (fd, cancel_fd) + 1;
+		do {
+			struct timeval tv;
+			int res;
+
+			FD_ZERO (&rdset);
+			FD_SET (fd, &rdset);
+			FD_SET (cancel_fd, &rdset);
+			tv.tv_sec = 1;
+			tv.tv_usec = 0;
+			nread = -1;
+
+			res = select(fdmax, &rdset, 0, 0, &tv);
+			if (res == -1)
+				;
+			else if (res == 0)
+				errno = ETIMEDOUT;
+			else if (FD_ISSET (cancel_fd, &rdset)) {
+				errno = EINTR;
+				goto failed;
+			} else {				
+				nread = recv (fd, buf, n, 0);
+			}
+		} while ((nread == -1 && WSAGetLastError () == WSAEWOULDBLOCK));
+	failed:
+		;
+	}
+	
+	return nread;
+#endif
+}
 ssize_t
 camel_read_socket_nb (int fd, char *buf, size_t n)
 {
@@ -740,6 +840,8 @@ camel_read_socket_nb (int fd, char *buf, size_t n)
 	return nread;
 #endif
 }
+
+
 
 /**
  * camel_write_socket:
