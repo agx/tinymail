@@ -461,6 +461,14 @@ AC_OUTPUT([
 po/Makefile.in
 libtinymail.spec
 Makefile
+docs/Makefile
+docs/devel/Makefile
+docs/devel/reference/Makefile
+docs/devel/doxygen/Makefile
+docs/devel/doxygen/libtinymail
+docs/devel/doxygen/libtinymail-camel
+docs/devel/doxygen/libtinymailui
+docs/devel/doxygen/libtinymailui-gtk
 bindings/Makefile
 bindings/python/Makefile
 bindings/python/tinymail.pth
