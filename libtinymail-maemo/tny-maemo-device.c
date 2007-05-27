@@ -71,9 +71,8 @@ tny_maemo_device_force_offline (TnyDevice *self)
 	priv->fset = TRUE;
 	priv->forced = FALSE;
 
-
 	tny_maemo_device_on_offline (self);
-	
+
 	return;
 }
 
@@ -97,7 +96,11 @@ static gboolean
 tny_maemo_device_is_online (TnyDevice *self)
 {
 	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-	gboolean retval = TRUE;
+	gboolean retval = FALSE;
+
+	if (priv->fset)
+		retval = priv->forced;
+
 	return retval;
 }
 
@@ -130,7 +133,7 @@ static void
 tny_maemo_device_finalize (GObject *object)
 {
 	(*parent_class->finalize) (object);
-    
+
 	return;
 }
 

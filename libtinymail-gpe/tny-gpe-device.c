@@ -34,10 +34,10 @@ static gboolean tny_gpe_device_is_online (TnyDevice *self);
 static void
 emit_status (TnyDevice *self)
 {
-	if (tny_gnome_device_is_online (self))
-		tny_gnome_device_on_online (self);
+	if (tny_gpe_device_is_online (self))
+		tny_gpe_device_on_online (self);
 	else
-		tny_gnome_device_on_offline (self);
+		tny_gpe_device_on_offline (self);
 }
 
 static void 
@@ -45,13 +45,13 @@ tny_gpe_device_reset (TnyDevice *self)
 {
 	TnyGpeDevicePriv *priv = TNY_GPE_DEVICE_GET_PRIVATE (self);
 
-	const gboolean status_before = tny_gnome_device_is_online (self);
+	const gboolean status_before = tny_gpe_device_is_online (self);
 
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
 	/* Signal if it changed: */
-	if (status_before != tny_gnome_device_is_online (self))
+	if (status_before != tny_gpe_device_is_online (self))
 		emit_status (self);
 }
 
@@ -60,7 +60,7 @@ tny_gpe_device_force_online (TnyDevice *self)
 {
 	TnyGpeDevicePriv *priv = TNY_GPE_DEVICE_GET_PRIVATE (self);
 
-	const gboolean already_online = tny_gnome_device_is_online (self);
+	const gboolean already_online = tny_gpe_device_is_online (self);
 
 	priv->fset = TRUE;
 	priv->forced = TRUE;
@@ -78,7 +78,7 @@ tny_gpe_device_force_offline (TnyDevice *self)
 {
 	TnyGpeDevicePriv *priv = TNY_GPE_DEVICE_GET_PRIVATE (self);
 
-	const gboolean already_offline = !tny_gnome_device_is_online (self);
+	const gboolean already_offline = !tny_gpe_device_is_online (self);
 
 	priv->fset = TRUE;
 	priv->forced = FALSE;
@@ -86,7 +86,7 @@ tny_gpe_device_force_offline (TnyDevice *self)
 	/* Signal if it changed: */
 	if (!already_offline)
 		emit_status (self);
-	
+
 	return;
 }
 
@@ -110,7 +110,11 @@ static gboolean
 tny_gpe_device_is_online (TnyDevice *self)
 {
 	TnyGpeDevicePriv *priv = TNY_GPE_DEVICE_GET_PRIVATE (self);
-	gboolean retval = TRUE;
+	gboolean retval = FALSE;
+
+	if (priv->fset)
+		retval = priv->forced;
+
 	return retval;
 }
 

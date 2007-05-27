@@ -32,7 +32,7 @@
 #include <tny-gpe-platform-factory.h>
 #include <tny-account-store.h>
 #include <tny-gpe-account-store.h>
-#include <tny-gpe-password-dialog.h>
+#include <tny-gtk-password-dialog.h>
 
 #include <tny-account.h>
 #include <tny-store-account.h>
@@ -118,7 +118,7 @@ tny_gpe_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean 
 	}
 
 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-                                  gtktype, GTK_BUTTONS_YES_NO, prompt);
+		gtktype, GTK_BUTTONS_YES_NO, error->message);
 
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 		retval = TRUE;
