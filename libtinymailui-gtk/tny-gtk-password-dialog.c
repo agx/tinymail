@@ -30,27 +30,11 @@
 #include <tny-account.h>
 
 static GObjectClass *parent_class = NULL;
-
-typedef struct _TnyGtkPasswordDialogPriv TnyGtkPasswordDialogPriv;
-
-struct _TnyGtkPasswordDialogPriv
-{
-	GtkEntry *pwd_entry;
-	GtkLabel *prompt_label;
-};
-
-#define TNY_GTK_PASSWORD_DIALOG_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_PASSWORD_DIALOG, TnyGtkPasswordDialogPriv))
-
 static GHashTable *passwords = NULL;
-
-
 
 static const gchar*
 tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel)
 {
-	TnyGtkPasswordDialogPriv *priv = TNY_GTK_PASSWORD_DIALOG_GET_PRIVATE (self);
-	GtkDialog *dialog = (GtkDialog *) self;
 	const gchar *accountid = aid;
 	const gchar *retval = NULL;
 
@@ -60,11 +44,39 @@ tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, const gchar *aid,
 
 	if (G_UNLIKELY (!retval))
 	{
-		gtk_label_set_text (priv->prompt_label, prompt);
+		GtkDialog *dialog = NULL;
+		GtkEntry *pwd_entry;
+		GtkLabel *prompt_label;
+
+		dialog = GTK_DIALOG (gtk_dialog_new_with_buttons (_("Password input"), NULL,
+			GTK_DIALOG_MODAL, 
+			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, 
+			NULL));
+
+		gtk_window_set_title (GTK_WINDOW (dialog), _("Password input"));
+
+		/* TODO: Add key icon or something */
+
+		pwd_entry = GTK_ENTRY (gtk_entry_new ());
+		prompt_label = GTK_LABEL (gtk_label_new (""));
+
+		gtk_entry_set_visibility (pwd_entry, FALSE);
+
+		gtk_widget_show (GTK_WIDGET (pwd_entry));
+		gtk_widget_show (GTK_WIDGET (prompt_label));
+
+		gtk_box_pack_start (GTK_BOX (dialog->vbox), 
+			GTK_WIDGET (prompt_label), TRUE, TRUE, 0);
+
+		gtk_box_pack_start (GTK_BOX (dialog->vbox), 
+			GTK_WIDGET (pwd_entry), TRUE, TRUE, 0);
+
+		gtk_label_set_text (prompt_label, prompt);
 
 		if (G_LIKELY (gtk_dialog_run (dialog) == GTK_RESPONSE_OK))
 		{
-			const gchar *pwd = gtk_entry_get_text (priv->pwd_entry);
+			const gchar *pwd = gtk_entry_get_text (pwd_entry);
 			retval = g_strdup (pwd);
 			mlock (pwd, strlen (pwd));
 			mlock (retval, strlen (retval));
@@ -72,7 +84,9 @@ tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, const gchar *aid,
 		} else {
 			*cancel = TRUE;
 		}
+
 		gtk_widget_destroy (GTK_WIDGET (dialog));
+
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
 	} else {
@@ -108,41 +122,17 @@ tny_gtk_password_dialog_forget_password (TnyPasswordGetter *self, const gchar *a
  *
  * Return value: A new #GtkDialog password dialog instance implemented for Gtk+
  **/
-GtkDialog*
+TnyPasswordGetter*
 tny_gtk_password_dialog_new (void)
 {
 	TnyGtkPasswordDialog *self = g_object_new (TNY_TYPE_GTK_PASSWORD_DIALOG, NULL);
 
-	return GTK_DIALOG (self);
+	return TNY_PASSWORD_GETTER (self);
 }
 
 static void
 tny_gtk_password_dialog_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyGtkPasswordDialog *self = (TnyGtkPasswordDialog *)instance;
-	TnyGtkPasswordDialogPriv *priv = TNY_GTK_PASSWORD_DIALOG_GET_PRIVATE (self);
-
-	gtk_dialog_add_buttons (GTK_DIALOG (self), GTK_STOCK_OK, GTK_RESPONSE_OK,
-				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
-
-	gtk_window_set_title (GTK_WINDOW (self), _("Password input"));
-
-	/* TODO: Add key icon or something */
-
-	priv->pwd_entry = GTK_ENTRY (gtk_entry_new ());
-	priv->prompt_label = GTK_LABEL (gtk_label_new (""));
-
-	gtk_entry_set_visibility (priv->pwd_entry, FALSE);
-
-	gtk_widget_show (GTK_WIDGET (priv->pwd_entry));
-	gtk_widget_show (GTK_WIDGET (priv->prompt_label));
-
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (self)->vbox), 
-		GTK_WIDGET (priv->prompt_label), TRUE, TRUE, 0);
-
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (self)->vbox), 
-		GTK_WIDGET (priv->pwd_entry), TRUE, TRUE, 0);
-
 	return;
 }
 
@@ -160,7 +150,6 @@ static void
 tny_password_getter_init (gpointer g, gpointer iface_data)
 {
 	TnyPasswordGetterIface *klass = (TnyPasswordGetterIface *)g;
-
 	klass->forget_password_func = tny_gtk_password_dialog_forget_password;
 	klass->get_password_func = tny_gtk_password_dialog_get_password;
 }
@@ -171,13 +160,9 @@ tny_gtk_password_dialog_class_init (TnyGtkPasswordDialogClass *class)
 {
 	GObjectClass *object_class;
 
-	/* parent_class = g_type_class_peek_parent (class); */
-
+	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-
 	object_class->finalize = tny_gtk_password_dialog_finalize;
-
-	g_type_class_add_private (object_class, sizeof (TnyGtkPasswordDialogPriv));
 
 	return;
 }
@@ -202,7 +187,7 @@ tny_gtk_password_dialog_get_type (void)
 		  tny_gtk_password_dialog_instance_init    /* instance_init */
 		};
 
-		type = g_type_register_static (GTK_TYPE_DIALOG,
+		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyGtkPasswordDialog",
 			&info, 0);
 
@@ -215,8 +200,6 @@ tny_gtk_password_dialog_get_type (void)
 
 		g_type_add_interface_static (type, TNY_TYPE_PASSWORD_GETTER, 
 			&tny_password_getter_info);
-
-		parent_class = g_type_class_ref (gtk_dialog_get_type());
 	}
 
 	return type;

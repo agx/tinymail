@@ -39,16 +39,16 @@ typedef struct _TnyGtkPasswordDialogClass TnyGtkPasswordDialogClass;
 
 struct _TnyGtkPasswordDialog
 {
-	GtkDialog parent;
+	GObject parent;
 };
 
 struct _TnyGtkPasswordDialogClass
 {
-	GtkDialogClass parent_class;
+	GObjectClass parent_class;
 };
 
 GType tny_gtk_password_dialog_get_type (void);
-GtkDialog* tny_gtk_password_dialog_new (void);
+TnyPasswordGetter* tny_gtk_password_dialog_new (void);
 
 G_END_DECLS
 

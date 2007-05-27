@@ -1,7 +1,13 @@
+2007-05-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Refactored the TnyGtkPasswordDialog
+	* Various fixes for the OLPC build
+	* Various fixes for the Maemo mistal and gregale builds
+
 2007-05-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Experimental connection recovery for IMAP
-	* Letting IDLE support cope with connection failures
+	* Letting IDLE/PushE-mail support code cope with connection failures
 
 2007-05-25  Philip Van Hoof  <pvanhoof@gnome.org>
 

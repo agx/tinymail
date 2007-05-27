@@ -66,6 +66,7 @@ struct _TnyOlpcAccountStorePriv
 
 
 static gchar* 
+
 per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	TnyPlatformFactory *platfact = tny_olpc_platform_factory_get_instance ();

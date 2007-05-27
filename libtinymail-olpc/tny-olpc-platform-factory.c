@@ -91,7 +91,7 @@ tny_olpc_platform_factory_get_instance (void)
 static void
 tny_olpc_platform_factory_finalize (GObject *object)
 {
-	TnyOlpcPlatformFactory *self = (TnyOlpcPlatformFactory *)object;	
+	TnyOlpcPlatformFactory *self = (TnyOlpcPlatformFactory *)object;
 
 	(*parent_class->finalize) (object);
 
