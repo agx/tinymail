@@ -53,6 +53,10 @@ struct _CamelImapFolder {
 	gboolean do_push_email, stopping, in_idle;
 	guint idle_signal;
 	GStaticRecMutex *idle_lock;
+
+	CamelImapStore *gmsgstore;
+	GMutex *gmsgstore_lock;
+	gint gmsgstore_ticks;
 };
 
 typedef struct {

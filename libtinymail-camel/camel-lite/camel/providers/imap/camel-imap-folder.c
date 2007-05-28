@@ -219,6 +219,10 @@ camel_imap_folder_init (gpointer object, gpointer klass)
 	imap_folder->stopping = FALSE;
 	imap_folder->in_idle = FALSE;
 
+	imap_folder->gmsgstore = NULL;
+	imap_folder->gmsgstore_lock = g_mutex_new ();
+	imap_folder->gmsgstore_ticks = 0;
+
 	imap_folder->do_push_email = TRUE;
 	folder->permanent_flags = CAMEL_MESSAGE_ANSWERED | CAMEL_MESSAGE_DELETED |
 		CAMEL_MESSAGE_DRAFT | CAMEL_MESSAGE_FLAGGED | CAMEL_MESSAGE_SEEN;
@@ -672,6 +676,8 @@ imap_finalize (CamelObject *object)
 
 	if (imap_folder->folder_dir)
 		g_free (imap_folder->folder_dir);
+
+	g_mutex_free (imap_folder->gmsgstore_lock);
 
 #ifdef ENABLE_THREADS
 	g_static_mutex_free(&imap_folder->priv->search_lock);
@@ -3900,6 +3906,28 @@ handle_freeup (CamelImapStore *store, gint nread, CamelException *ex)
 	}
 }
 
+static gboolean 
+check_gmsgstore_die (gpointer user_data)
+{
+	CamelImapFolder *imap_folder = user_data;
+	gboolean retval = TRUE;
+
+	g_mutex_lock (imap_folder->gmsgstore_lock);
+	imap_folder->gmsgstore_ticks--;
+	if (imap_folder->gmsgstore_ticks <= 0)
+	{
+		if (imap_folder->gmsgstore) {
+			imap_debug ("Get-Message service dies\n");
+			camel_service_disconnect (CAMEL_SERVICE (imap_folder->gmsgstore), TRUE, NULL);
+			camel_object_unref (CAMEL_OBJECT (imap_folder->gmsgstore));
+			imap_folder->gmsgstore = NULL; 
+		}
+		retval = FALSE;
+	}
+	g_mutex_unlock (imap_folder->gmsgstore_lock);
+
+	return retval;
+}
 
 CamelStream *
 camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
@@ -3909,7 +3937,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	CamelFolder *folder = CAMEL_FOLDER (imap_folder);
 	CamelImapStore *store = NULL;
 	CamelStream *stream = NULL;
-	gboolean connected = FALSE, idle_rt = FALSE;
+	gboolean connected = FALSE, idle_rt = FALSE, ctchecker=FALSE;
 	CamelException  tex = CAMEL_EXCEPTION_INITIALISER;
 	ssize_t nread = 0; gboolean amcon = FALSE;
 
@@ -3945,36 +3973,49 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	}
 	camel_exception_clear (ex);
 
-	store = CAMEL_IMAP_STORE (camel_object_new (CAMEL_IMAP_STORE_TYPE));
-
-	camel_service_construct (CAMEL_SERVICE (store), 
-		camel_service_get_session (CAMEL_SERVICE (folder->parent_store)),
-		camel_service_get_provider (CAMEL_SERVICE (folder->parent_store)),
-		CAMEL_SERVICE (folder->parent_store)->url, ex);
-
-	if (camel_exception_is_set (ex))
+	g_mutex_lock (imap_folder->gmsgstore_lock);
+	if (imap_folder->gmsgstore) {
+		imap_debug ("Get-Message service reused\n");
+		store = imap_folder->gmsgstore;
+		imap_folder->gmsgstore_ticks = 5;
+		ctchecker=FALSE;
+	} else
 	{
-		g_critical ("Severe interal error while trying to construct a new connection\n");
-		camel_object_unref (store);
-		return NULL;
+		store = CAMEL_IMAP_STORE (camel_object_new (CAMEL_IMAP_STORE_TYPE));
+		imap_debug ("Get-Message service created\n");
+		camel_service_construct (CAMEL_SERVICE (store), 
+			camel_service_get_session (CAMEL_SERVICE (folder->parent_store)),
+			camel_service_get_provider (CAMEL_SERVICE (folder->parent_store)),
+			CAMEL_SERVICE (folder->parent_store)->url, ex);
+
+		if (camel_exception_is_set (ex))
+		{
+			g_critical ("Severe interal error while trying to construct a new connection\n");
+			camel_object_unref (store);
+			return NULL;
+		}
+
+		camel_operation_start (NULL, _("Preparing to get message"));
+
+		amcon = camel_service_connect (CAMEL_SERVICE (store), ex);
+
+		if (!amcon || camel_exception_is_set (ex) || !camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex)) 
+		{
+			camel_object_unref (store);
+			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+						_("This message is not currently available"
+						" (can't let a new connection go online)"));
+			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+			return NULL;
+		}
+		camel_exception_clear (ex);
+		camel_operation_end (NULL);
+
+		imap_folder->gmsgstore = store;
+		imap_folder->gmsgstore_ticks = 5;
+		ctchecker=TRUE;
 	}
-
-	camel_operation_start (NULL, _("Preparing to get message"));
-
-	amcon = camel_service_connect (CAMEL_SERVICE (store), ex);
-
-	if (!amcon || camel_exception_is_set (ex) || !camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex)) 
-	{
-		camel_object_unref (store);
-		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-					_("This message is not currently available"
-					" (can't let a new connection go online)"));
-		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
-		return NULL;
-	}
-	camel_exception_clear (ex);
-
-	camel_operation_end (NULL);
+	g_mutex_unlock (imap_folder->gmsgstore_lock);
 
 	camel_operation_start (NULL, _("Retrieving message"));
 
@@ -4392,8 +4433,8 @@ rerrorhandler:
 
   CAMEL_SERVICE_REC_UNLOCK(store, connect_lock); 
 
-	camel_service_disconnect (CAMEL_SERVICE (store), TRUE, NULL);
-	camel_object_unref (CAMEL_OBJECT (store));
+	if (ctchecker)
+		g_timeout_add (1000, check_gmsgstore_die, imap_folder);
 
 	camel_operation_end (NULL);
 
@@ -4417,10 +4458,12 @@ errorhander:
 
   if (store)
   {
-
   CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
-	camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-	camel_object_unref (CAMEL_OBJECT (store));
+	if (ctchecker)
+		g_timeout_add (1000, check_gmsgstore_die, imap_folder);
+
+	/* camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+	camel_object_unref (CAMEL_OBJECT (store)); */
   }
 
 	camel_operation_end (NULL);
