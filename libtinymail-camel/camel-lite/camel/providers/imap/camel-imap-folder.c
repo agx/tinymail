@@ -4017,6 +4017,11 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		imap_folder->gmsgstore_ticks = 5;
 		ctchecker=TRUE;
 	}
+
+	/* Question: in case of being reused, I think this unlock must be moved 
+	 * all the way below (so that all code using store is included in the
+	 * lock */
+
 	g_static_mutex_unlock (&gmsgstore_lock);
 
 	camel_operation_start (NULL, _("Retrieving message"));
