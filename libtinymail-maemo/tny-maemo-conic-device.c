@@ -38,6 +38,9 @@ struct _ConIcIap
 	gchar *name;
 	gchar *bearer;
 };
+
+#define MAEMO_CONIC_DUMMY_IAP_ID_FILENAME "maemo_conic_dummy_id"
+static gboolean on_dummy_connection_check (gpointer user_data);
 #endif /* MAEMO_CONIC_DUMMY */
 
 static gboolean tny_maemo_conic_device_is_online (TnyDevice *self);
@@ -49,6 +52,10 @@ typedef struct {
 	gboolean        is_online;
 	gchar     *iap;
 	gboolean 	forced; /* Whether the is_online value is forced rather than real. */
+	
+#ifdef MAEMO_CONIC_DUMMY	
+	gint dummy_env_check_timeout;
+#endif /* MAEMO_CONIC_DUMMY */
 } TnyMaemoConicDevicePriv;
 
 #define TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE(o)	\
@@ -88,15 +95,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
 
 	g_message (__FUNCTION__);
-	
-#ifdef MAEMO_CONIC_DUMMY
-	/* HACK: outsmarting libconic by emitting signal regardless of the reported connection status */
-	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
-		       0, TRUE);
-	return;
-#endif /*MAEMO_CONIC_DUMMY*/
 
-	
 	switch (con_ic_connection_event_get_error(event)) {
 	case CON_IC_CONNECTION_ERROR_NONE:
 		break;
@@ -237,19 +236,17 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (tny_maemo_conic_device_is_online(TNY_DEVICE(self)), NULL);
 
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
 	#ifdef MAEMO_CONIC_DUMMY
-	/* Allow debuggers to fake a connection change by setting an environment 
-	 * variable. This should match one of the fake iap IDs that we 
-	 * created in tny_maemo_conic_device_get_iap_list().
-	 */
-	const gchar *env = g_getenv ("MAEMO_CONIC_DUMMY_IAP_ID");
-	return env;
-	#else
-	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-	return priv->iap;
+	if (!(priv->iap)) {
+		on_dummy_connection_check (self);
+	}
 	#endif
+	
+	return priv->iap;
 }
+
 
 
 /**
@@ -429,6 +426,49 @@ tny_maemo_conic_device_is_online (TnyDevice *self)
 	return TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self)->is_online;
 }
 
+#ifdef MAEMO_CONIC_DUMMY
+static gboolean on_dummy_connection_check (gpointer user_data)
+{
+	TnyMaemoConicDevice *self = TNY_MAEMO_CONIC_DEVICE (user_data);
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+		
+	/* Check whether the enviroment variable has changed, 
+	 * so we can fake a connection change: */
+	gchar *filename = g_build_filename (
+		g_get_home_dir (), 
+		MAEMO_CONIC_DUMMY_IAP_ID_FILENAME,
+		NULL);
+		
+	gchar *contents = 0;
+	GError* error = 0;
+	gboolean test = g_file_get_contents (filename, &contents, NULL, &error);
+	if(error) {
+		/* printf("%s: error from g_file_get_contents(): %s\n", __FUNCTION__, error->message); */
+		g_error_free (error);
+		error = NULL;
+	}
+	
+	if (!test || !contents) {
+		/* Default to the first debug connection: */
+		contents = g_strdup ("debug id0");
+	}
+
+	if (!(priv->iap) || (strcmp (contents, priv->iap) != 0)) {
+		priv->iap = g_strdup (contents);
+		
+		printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changing to %s\n", __FUNCTION__, priv->iap);
+		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+		       0, TRUE);
+	}
+	
+	g_free (contents);
+	g_free (filename);
+	
+	return TRUE;
+}
+#endif /* MAEMO_CONIC_DUMMY */
+
+
 
 static void
 tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -454,8 +494,17 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	
 	priv->is_online     = FALSE; 
 	priv->forced = FALSE;
+	
+	#ifdef MAEMO_CONIC_DUMMY
+	/* Allow debuggers to fake a connection change by setting an environment 
+	 * variable, which we check ever 1 second.
+	 * This should match one of the fake iap IDs that we created in 
+	 * tny_maemo_conic_device_get_iap_list().
+	 */
+	priv->dummy_env_check_timeout = 
+		g_timeout_add (1000, on_dummy_connection_check, self);
+	#endif /* MAEMO_CONIC_DUMMY */
 }
-
 
 
 /**
@@ -482,10 +531,18 @@ tny_maemo_conic_device_finalize (GObject *obj)
 		priv->cnx = NULL;
 	}
 
+	#ifdef MAEMO_CONIC_DUMMY
+	if (priv->dummy_env_check_timeout) {
+		g_source_remove (priv->dummy_env_check_timeout);
+		priv->dummy_env_check_timeout = 0;
+	}
+	#endif /* MAEMO_CONIC_DUMMY */
+	
 	if (priv->iap) {
 		g_free (priv->iap);
 		priv->iap = NULL;
 	}
+	
 
 	(*parent_class->finalize) (obj);
 }
