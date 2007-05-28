@@ -452,6 +452,9 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 		/* Default to the first debug connection: */
 		contents = g_strdup ("debug id0");
 	}
+	
+	if (contents)
+		g_strstrip(contents);
 
 	if (!(priv->iap) || (strcmp (contents, priv->iap) != 0)) {
 		priv->iap = g_strdup (contents);

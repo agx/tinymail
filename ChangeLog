@@ -1,6 +1,12 @@
 2007-05-28  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(on_dummy_connection_check): Strip whitespace from the dummy account ID 
+	found in the special file.
+	
+2007-05-28  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
 	(tny_maemo_conic_device_get_current_iap_id),
 	(on_dummy_connection_check),
 	(tny_maemo_conic_device_instance_init),
