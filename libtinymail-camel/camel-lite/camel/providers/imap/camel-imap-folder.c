@@ -3912,6 +3912,9 @@ check_gmsgstore_die (gpointer user_data)
 	CamelImapFolder *imap_folder = user_data;
 	gboolean retval = TRUE;
 
+	if (imap_folder->stopping)
+		return FALSE;
+
 	g_mutex_lock (imap_folder->gmsgstore_lock);
 	imap_folder->gmsgstore_ticks--;
 	if (imap_folder->gmsgstore_ticks <= 0)
