@@ -4018,11 +4018,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		ctchecker=TRUE;
 	}
 
-	/* Question: in case of being reused, I think this unlock must be moved 
-	 * all the way below (so that all code using store is included in the
-	 * lock */
-
-	g_static_mutex_unlock (&gmsgstore_lock);
 
 	camel_operation_start (NULL, _("Retrieving message"));
 
@@ -4446,6 +4441,8 @@ rerrorhandler:
 			check_gmsgstore_die, imap_folder);
 	}
 
+	g_static_mutex_unlock (&gmsgstore_lock);
+
 	camel_operation_end (NULL);
 
 	return stream;
@@ -4478,6 +4475,8 @@ errorhander:
 	/* camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 	camel_object_unref (CAMEL_OBJECT (store)); */
   }
+
+	g_static_mutex_unlock (&gmsgstore_lock);
 
 	camel_operation_end (NULL);
 
