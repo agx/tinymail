@@ -219,8 +219,8 @@ camel_imap_folder_init (gpointer object, gpointer klass)
 	imap_folder->stopping = FALSE;
 	imap_folder->in_idle = FALSE;
 
+	
 	imap_folder->gmsgstore = NULL;
-	imap_folder->gmsgstore_lock = g_mutex_new ();
 	imap_folder->gmsgstore_ticks = 0;
 
 	imap_folder->do_push_email = TRUE;
@@ -677,7 +677,6 @@ imap_finalize (CamelObject *object)
 	if (imap_folder->folder_dir)
 		g_free (imap_folder->folder_dir);
 
-	g_mutex_free (imap_folder->gmsgstore_lock);
 
 #ifdef ENABLE_THREADS
 	g_static_mutex_free(&imap_folder->priv->search_lock);
@@ -3906,16 +3905,15 @@ handle_freeup (CamelImapStore *store, gint nread, CamelException *ex)
 	}
 }
 
+static GStaticMutex gmsgstore_lock = G_STATIC_MUTEX_INIT;
+
 static gboolean 
 check_gmsgstore_die (gpointer user_data)
 {
 	CamelImapFolder *imap_folder = user_data;
 	gboolean retval = TRUE;
 
-	if (imap_folder->stopping)
-		return FALSE;
-
-	g_mutex_lock (imap_folder->gmsgstore_lock);
+	g_static_mutex_lock (&gmsgstore_lock);
 	imap_folder->gmsgstore_ticks--;
 	if (imap_folder->gmsgstore_ticks <= 0)
 	{
@@ -3924,10 +3922,11 @@ check_gmsgstore_die (gpointer user_data)
 			camel_service_disconnect (CAMEL_SERVICE (imap_folder->gmsgstore), TRUE, NULL);
 			camel_object_unref (CAMEL_OBJECT (imap_folder->gmsgstore));
 			imap_folder->gmsgstore = NULL; 
+			camel_object_unref (imap_folder);
 		}
 		retval = FALSE;
 	}
-	g_mutex_unlock (imap_folder->gmsgstore_lock);
+	g_static_mutex_unlock (&gmsgstore_lock);
 
 	return retval;
 }
@@ -3976,7 +3975,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	}
 	camel_exception_clear (ex);
 
-	g_mutex_lock (imap_folder->gmsgstore_lock);
+	g_static_mutex_lock (&gmsgstore_lock);
 	if (imap_folder->gmsgstore) {
 		imap_debug ("Get-Message service reused\n");
 		store = imap_folder->gmsgstore;
@@ -4018,7 +4017,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		imap_folder->gmsgstore_ticks = 5;
 		ctchecker=TRUE;
 	}
-	g_mutex_unlock (imap_folder->gmsgstore_lock);
+	g_static_mutex_unlock (&gmsgstore_lock);
 
 	camel_operation_start (NULL, _("Retrieving message"));
 
@@ -4436,8 +4435,11 @@ rerrorhandler:
 
   CAMEL_SERVICE_REC_UNLOCK(store, connect_lock); 
 
-	if (ctchecker)
-		g_timeout_add (1000, check_gmsgstore_die, imap_folder);
+	if (ctchecker) {
+		camel_object_ref (imap_folder);
+		imap_folder->gmsgstore_signal = g_timeout_add (1000, 
+			check_gmsgstore_die, imap_folder);
+	}
 
 	camel_operation_end (NULL);
 
@@ -4462,8 +4464,11 @@ errorhander:
   if (store)
   {
   CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
-	if (ctchecker)
-		g_timeout_add (1000, check_gmsgstore_die, imap_folder);
+	if (ctchecker) {
+		camel_object_ref (imap_folder);
+		imap_folder->gmsgstore_signal = g_timeout_add (1000, 
+			check_gmsgstore_die, imap_folder);
+	}
 
 	/* camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 	camel_object_unref (CAMEL_OBJECT (store)); */

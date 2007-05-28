@@ -51,11 +51,10 @@ struct _CamelImapFolder {
 	unsigned int read_only:1;
 	gchar *folder_dir;
 	gboolean do_push_email, stopping, in_idle;
-	guint idle_signal;
+	guint idle_signal, gmsgstore_signal;
 	GStaticRecMutex *idle_lock;
 
 	CamelImapStore *gmsgstore;
-	GMutex *gmsgstore_lock;
 	gint gmsgstore_ticks;
 };
 
