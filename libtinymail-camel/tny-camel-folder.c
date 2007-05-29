@@ -2046,7 +2046,7 @@ tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
 	}
 
 	/* thread reference */
-	g_object_ref (G_OBJECT (info->into));
+	g_object_unref (G_OBJECT (info->into));
 	g_object_unref (G_OBJECT (info->self));
 	/* _tny_camel_folder_unreason (priv); */
 
@@ -2164,7 +2164,7 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 			tny_camel_folder_copy_async_destroyer (info);
 		}
 	} else { /* Thread reference */
-		g_object_ref (info->into);
+		g_object_unref (info->into);
 		g_object_unref (info->self);
 /* 		_tny_camel_folder_unreason (priv); */
 	}

@@ -1,3 +1,8 @@
+2007-05-29  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c: replaced two wrong
+	g_object_ref's by g_object_unref's in the copy_async implementation
+
 2007-05-28  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
