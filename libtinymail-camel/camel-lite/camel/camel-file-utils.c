@@ -47,7 +47,7 @@
 #include "camel-operation.h"
 #include "camel-url.h"
 
-#define IO_TIMEOUT (15*4)
+#define IO_TIMEOUT (15/**4*/)
 
 
 /**

@@ -2569,7 +2569,11 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (folder->parent_store)) == CAMEL_DISCO_STORE_OFFLINE)
-		goto done;
+	{
+		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			     _("This message is not currently available"));
+		goto fail;
+	}
 
 	/* All this mess is so we silently retry a fetch if we fail with
 	   service_unavailable, without an (equivalent) mess of gotos */

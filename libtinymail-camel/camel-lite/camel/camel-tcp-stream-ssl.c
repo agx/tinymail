@@ -66,8 +66,8 @@
 #include "camel-stream-fs.h"
 #include "camel-tcp-stream-ssl.h"
 
-#define IO_TIMEOUT (PR_TicksPerSecond() * 4 * 60)
-#define CONNECT_TIMEOUT (PR_TicksPerSecond () * 4 * 60)
+#define IO_TIMEOUT (PR_TicksPerSecond() 15 /** 4 * 60*/)
+#define CONNECT_TIMEOUT (PR_TicksPerSecond () *15 /** 4 * 60*/)
 
 static CamelTcpStreamClass *parent_class = NULL;
 
