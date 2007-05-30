@@ -3,6 +3,7 @@
 	* Fixed an error message when the account's status is offline and a
 	cached version of a message is not available in tny_folder_get_msg and
 	tny_folder_get_msg_async
+	* Lowered the TCP and SSL timeouts
 
 2007-05-29  Sergio Villar Senin  <svillar@igalia.com>
 
