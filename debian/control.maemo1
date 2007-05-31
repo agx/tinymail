@@ -140,7 +140,7 @@ Description: memory-effective framework for accessing e-mail - Camel library
 
 Package: libtinymail-gnomevfs-1.0-0-dev
 Architecture: any
-Depends: libtinymail-gnomevfs-1.0-0 (= ${binary:Version})
+Depends: libtinymail-gnomevfs-1.0-0 
 Description: memory-effective framework for accessing e-mail - development files
  Tinymail is a development framework for accessing E-mail services using
  devices with few memory resources.
