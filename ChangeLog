@@ -1,3 +1,19 @@
+2007-05-31  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_connect): Block until the result is received by  
+	the on_connection_event() signal handler. This always seems to indicate 
+	failure on Maemo Bora, but maybe it works properly in later versions.
+	It is OK for this to block because the Maemo connection dialog is totally 
+	modal anyway, and because most applications will not be able to do anything 
+	sensible while waiting, because the user is already waiting for an operation 
+	that he has initiated.
+
+	* libtinymail/tny-folder.c: (tny_folder_get_all_count): Warn when this 
+	is not implemented. Maybe not very necessary, but I seem to have had this 
+	in my local checkout and maybe things crash without the check. Can be removed 
+	later if you like.
+
 2007-05-29  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed an error message when the account's status is offline and a

@@ -53,6 +53,9 @@ typedef struct {
 	gchar     *iap;
 	gboolean 	forced; /* Whether the is_online value is forced rather than real. */
 	
+	/* When TRUE, we are waiting for the success or failure signal. */
+	gboolean attempting_connection;
+	
 #ifdef MAEMO_CONIC_DUMMY	
 	gint dummy_env_check_timeout;
 #endif /* MAEMO_CONIC_DUMMY */
@@ -116,11 +119,23 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	case CON_IC_STATUS_CONNECTED:
 		priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
 		is_online = TRUE;
+		
+		/* Set this to FALSE to stop blocking 
+		 * tny_maemo_conic_device_connect(): */
+		if (priv->attempting_connection)
+			priv->attempting_connection = FALSE;
+			
 		g_message ("new status: CONNECTED (%s)", priv->iap);
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
 		priv->iap = NULL;
 		is_online = FALSE;
+		
+		/* Set this to FALSE to stop blocking 
+		 * tny_maemo_conic_device_connect(): */
+		if (priv->attempting_connection)
+			priv->attempting_connection = FALSE;
+			
 		g_message ("new status: DISCONNECTED", priv->iap);
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
@@ -133,7 +148,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	priv->is_online = is_online;
 	priv->forced = FALSE; /* is_online is now accurate. */
-	g_message ("emitting signa CONNECTION_CHANGED: %s", is_online ? "online" : "offline");
+	g_message ("emitting signal CONNECTION_CHANGED: %s", is_online ? "online" : "offline");
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, is_online);
 }
@@ -145,10 +160,13 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
  * @self: a #TnyDevice object
  * @iap_id: the id of the Internet Access Point (IAP), or NULL for 'any;
  * 
- * try to connect to a specific IAP, or to any if @iap_id == NULL
- * this calls con_ic_connection_connect(_by_id)
+ * Try to connect to a specific IAP, or to any if @iap_id == NULL
+ * this calls con_ic_connection_connect(_by_id).
+ * This may show a dialog to allow the user to select a connection, or 
+ * may otherwise take a significant amount of time. This function blocks until 
+ * the connection has either succeeded or failed.
  * 
- * Returns TRUE if sending the command worked, FALSE otherwise
+ * Returns TRUE if a connection was made, FALSE otherwise.
  **/
 gboolean
 tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
@@ -164,17 +182,34 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 	g_message ("connecting to %s", iap_id ? iap_id : "<any>");
 	
 	if (iap_id) {
+		priv->attempting_connection = TRUE;
+		
 		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect_by_id dbus message");
 			return FALSE;
 		}
-	} else
+	} else {
+		priv->attempting_connection = TRUE;
+		
 		if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect dbus message");
 			return FALSE;
 		}
+	}
 	
-	return TRUE;
+	/* Wait for the CON_IC_STATUS_CONNECTED (succeeded) or 
+	 * CON_IC_STATUS_DISCONNECTED event: */
+	 
+	/* When the signal has been handled, 
+	 * attempting_connection will be reset to FALSE. */
+	while (priv->attempting_connection) {
+		/* Iterate the main loop so that the signal can be called. */
+		if (g_main_context_pending (NULL)) {
+			g_main_context_iteration (NULL, FALSE);
+		}
+	}
+	
+	return priv->is_online;
 }
 
 
