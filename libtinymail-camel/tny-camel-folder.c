@@ -1807,9 +1807,9 @@ static CpyRecRet*
 tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err, GList *rems, GList *adds)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyFolder *retval;
+	TnyFolder *retval = NULL;
 	gboolean succeeded = FALSE, tried=FALSE;
-	TnyAccount *a, *b;
+	TnyAccount *a, *b = NULL;
 	GError *nerr = NULL;
 	GError *terr = NULL;
 	CpyRecRet *retc;

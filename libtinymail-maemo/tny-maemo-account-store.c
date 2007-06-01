@@ -43,6 +43,9 @@
 #include <tny-camel-account.h>
 #include <tny-camel-store-account.h>
 #include <tny-camel-transport-account.h>
+#include <tny-camel-imap-store-account.h>
+#include <tny-camel-nntp-store-account.h>
+#include <tny-camel-pop-store-account.h>
 #include <tny-session-camel.h>
 #include <tny-maemo-device.h>
 
@@ -521,8 +524,6 @@ tny_maemo_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 void
 tny_maemo_account_store_add_store_account (TnyMaemoAccountStore *self, TnyStoreAccount *account)
 {
-	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
-
 	tny_maemo_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
 	tny_maemo_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
 	tny_maemo_account_store_notify_add (TNY_ACCOUNT_STORE (self));
@@ -535,8 +536,6 @@ tny_maemo_account_store_add_store_account (TnyMaemoAccountStore *self, TnyStoreA
 void
 tny_maemo_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account)
 {
-	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
-
 	tny_maemo_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
 	tny_maemo_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
 	tny_maemo_account_store_notify_add (TNY_ACCOUNT_STORE (self));

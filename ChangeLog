@@ -1,3 +1,13 @@
+2007-06-01  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	(tny_camel_folder_copy_shared): Initialize some variables 
+	to avoid warnings.
+	* libtinymail-maemo/tny-maemo-account-store.c:
+	(tny_maemo_account_store_add_store_account),
+	(tny_maemo_account_store_add_transport_account):
+	Remove unused priv variables, to avoid warnings.
+
 2007-05-31  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
