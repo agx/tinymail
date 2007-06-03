@@ -21,8 +21,7 @@
 2007-05-31  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
-	(tny_maemo_conic_device_connect): Block until the result is received by  
-	the on_connection_event() signal handler. This always seems to indicate 
+	(tny_maemo_conic_device_connect): Block until the result is received by  	the on_connection_event() signal handler. This always seems to indicate 
 	failure on Maemo Bora, but maybe it works properly in later versions.
 	It is OK for this to block because the Maemo connection dialog is 
 	totally modal anyway, and because most applications will not be able 
@@ -58,9 +57,10 @@
 	(tny_maemo_conic_device_get_current_iap_id),
 	(on_dummy_connection_check),
 	(tny_maemo_conic_device_instance_init),
-	(tny_maemo_conic_device_finalize): Use a file ($HOME/maemo_conic_dummy_id) 
-	instead of an environment variable to set the dummy ID when using 
-	scratchbox so we can check it for changes every 1 second.
+	(tny_maemo_conic_device_finalize): Use a file 
+	($HOME/maemo_conic_dummy_id) instead of an environment variable to 
+	set the dummy ID when using scratchbox so we can check it for changes 
+	every 1 second.
 	
 2007-05-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
@@ -100,8 +100,8 @@
 	* camel/camel-mime-message.c: (camel_mime_message_set_subject):
 	Check that the input char* is not the same as the existing char*, 
 	so we do not delete the input before using the input. This happens 
-	when get_subject() is given directly to set_subject without a g_strdup(), 
-	for instance.
+	when get_subject() is given directly to set_subject without a 
+	g_strdup(), for instance.
 
 2007-05-22  Murray Cumming  <murrayc@murrayc.com>
 
@@ -195,12 +195,15 @@
 	* libtinymail-camel/tny-camel-account.h:
 	* libtinymail-camel/tny-camel-account.c:
 	Added tny_camel_account_get_supported_secure_authentication(), 
-	to get a list of strings for use with tny_account_set_secure_auth_mech(),
-	by querying the server. This is async, providing the result via a callback.
+	to get a list of strings for use with 
+	tny_account_set_secure_auth_mech(), by querying the server. This is 
+	async, providing the result via a callback.
 
 	* libtinymail/tny-error.h: Added TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH, 
 	for use by tny_camel_account_get_supported_secure_authentication
 	
+	* This was a major API change
+
 2007-05-16  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-queues/Makefile.am: install libtinymail-queues header
@@ -379,10 +382,10 @@
 	* libtinymail/tny-account-store.c:
 	* libtinymail/tny-account-store.h: Change the alert_func vfunc to 
 	provide a GError instead of a human-readable error string.
-	(tny_account_store_alert): The documentation for this vfunc invoker seems to 
-	refer to the vfunc (as is also normal in GTK+), so document how the GError 
-	should be used and point out that the application should translate the 
-	message and show an appropriate dialog.
+	(tny_account_store_alert): The documentation for this vfunc invoker 
+	seems to refer to the vfunc (as is also normal in GTK+), so document 
+	how the GError should be used and point out that the application 
+	should translate the message and show an appropriate dialog.
 	This does not seem to require the definition of a new GError domain - 
 	the existing one seems suitable.
 	
@@ -506,8 +509,8 @@
 	* libtinymail-maemo/tny-maemo-account-store.c:
 	(tny_maemo_account_store_add_store_account),
 	(tny_maemo_account_store_add_transport_account):
-	Correct NY_ACCOUNT_STORE typos to TNY_ACCOUNT_STORE, to avoid an undefined 
-	symbol build error.
+	Correct NY_ACCOUNT_STORE typos to TNY_ACCOUNT_STORE, to avoid an 
+	undefined symbol build error.
 
 2007-04-29  Murray Cumming  <murrayc@murrayc.com>
 
@@ -518,9 +521,9 @@
 	* libtinymail-olpc/tny-olpc-device.c: (emit_status),
 	(tny_olpc_device_reset), (tny_olpc_device_force_online),
 	(tny_olpc_device_force_offline): 
-	Copy/Paste the implementations from TnyGnomeDevice, so these implementations 
-	also match the documented behaviour. I wish that GInterfaces could have default 
-	implementations that could be shared.
+	Copy/Paste the implementations from TnyGnomeDevice, so these 
+	implementations also match the documented behaviour. I wish that 
+	GInterfaces could have default implementations that could be shared.
 
 2007-04-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
