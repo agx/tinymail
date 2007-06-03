@@ -812,10 +812,6 @@ tny_folder_get_all_count (TnyFolder *self)
 	g_assert (TNY_FOLDER_GET_IFACE (self)->get_all_count_func != NULL);
 #endif
 
-	if (TNY_FOLDER_GET_IFACE (self)->get_all_count_func == NULL) {
-		g_warning ("get_all_count_func() not implemented in %s", G_OBJECT_TYPE_NAME(self));
-	}
-
 	return TNY_FOLDER_GET_IFACE (self)->get_all_count_func (self);
 }
 
