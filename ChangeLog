@@ -2,6 +2,9 @@
 
 	* Support for removing messages from a POP server after retrieval
 	* Support for tny_header_get_uid on TnyMsg's header instance
+	* Removed the warning in libtinymail/tny-folder.c: please use the
+	support for DBC in stead. It's specifically designed for this. Read
+	the documentation in building.txt to find out how to enable it.
 
 	* This was a major API change
 
