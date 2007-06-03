@@ -878,6 +878,9 @@ camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
 static void
 camel_pop3_store_init (gpointer object, gpointer klass)
 {
+	CamelPOP3Store *store = (CamelPOP3Store *) object;
+
+	store->immediate_delete_after = FALSE;
 
 	return;
 }

@@ -321,12 +321,26 @@ tny_camel_msg_header_get_message_size (TnyHeader *self)
 static const gchar*
 tny_camel_msg_header_get_uid (TnyHeader *self)
 {
-	return NULL;
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (!me->old_uid)
+	{
+		g_warning ("tny_header_get_uid: This is a header instance for a new message. "
+			"The uid of it is therefore not available. This indicates a problem "
+			"in the software.");
+	}
+
+	return me->old_uid;
 }
 
 static void
 tny_camel_msg_header_finalize (GObject *object)
 {
+	TnyCamelMsgHeader *me = (TnyCamelMsgHeader *) object;
+
+	if (me->old_uid)
+		g_free (me->old_uid);
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -352,6 +366,7 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder)
 		owns this msg. If this ever changes then we need to add a reference here, 
 		and remove it in the finalize. Same for folder. */
 
+	self->old_uid = NULL;
 	self->msg = msg; 
 	self->folder = folder;
 

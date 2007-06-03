@@ -26,7 +26,6 @@ struct _TnyCamelPopStoreAccountPriv
 {
 	TnyFolder *inbox;
 	GMutex *lock;
-	gboolean delete_originals;
 };
 
 #define TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE(o)	\

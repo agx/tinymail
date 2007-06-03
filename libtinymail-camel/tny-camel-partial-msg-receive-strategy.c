@@ -81,6 +81,7 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 			TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (camel_message), folder);
 			message = tny_camel_msg_new ();
 			_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), folder);
+			TNY_CAMEL_MSG_HEADER (nheader)->old_uid = g_strdup (tny_header_get_uid (header));
 			_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
 			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
 						CAMEL_MIME_PART (camel_message)); 

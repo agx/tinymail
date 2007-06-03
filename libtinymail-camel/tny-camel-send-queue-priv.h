@@ -33,7 +33,7 @@ struct _TnyCamelSendQueuePriv
 	GThread *thread;
 	GMutex *todo_lock, *sending_lock; 
 	gboolean creating_spin;
-	gboolean do_continue;
+	gboolean do_continue, is_running;
 };
 
 #endif

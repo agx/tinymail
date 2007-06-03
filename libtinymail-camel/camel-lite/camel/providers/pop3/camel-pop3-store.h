@@ -46,6 +46,7 @@ typedef struct {
 
 	struct _CamelDataCache *cache;
 	guint delete_after;
+	gboolean immediate_delete_after;
 	gchar *storage_path, *base_url;
 	gboolean connected;
 

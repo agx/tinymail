@@ -48,7 +48,7 @@ struct _TnyCamelMsgHeader
 	GObject parent;
 	TnyFolder *folder;
 	CamelMimeMessage *msg;
-	gchar *mime_from;
+	gchar *mime_from, *old_uid;
 };
 
 struct _TnyCamelMsgHeaderClass 

@@ -101,6 +101,7 @@ thread_main (gpointer data)
 	guint i = 0, length = 0;
 	TnyList *list;
 
+	priv->is_running = TRUE;
 	priv->creating_spin = FALSE;
 
 	list = tny_simple_list_new ();
@@ -232,6 +233,8 @@ thread_main (gpointer data)
 
 errorhandler:
 
+	priv->is_running = FALSE;
+
 	g_object_unref (G_OBJECT (sentbox));
 	g_object_unref (G_OBJECT (outbox));
 	g_object_unref (G_OBJECT (self));
@@ -247,12 +250,13 @@ create_worker (TnySendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
-	while (priv->creating_spin);
-
-	priv->creating_spin = TRUE;
-
-	priv->thread = g_thread_create (thread_main, g_object_ref (self),
-		TRUE, NULL);
+	if (!priv->is_running)
+	{
+		while (priv->creating_spin);
+		priv->creating_spin = TRUE;
+		priv->thread = g_thread_create (thread_main, 
+			g_object_ref (self), TRUE, NULL);
+	}
 
 	return;
 }
@@ -608,15 +612,13 @@ tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
  * tny_camel_send_queue_flush:
  * @self: a valid #TnyCamelSendQueue instance
  *
- * (try to) flush the messages which are currently in this send queue
- *  (persisted in the outbox folder)
- * 
+ * Flush the messages which are currently in this send queue
  **/
 void
 tny_camel_send_queue_flush (TnyCamelSendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv;
-	
+
 	g_return_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self));
 
 	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
@@ -689,6 +691,7 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->todo_lock = g_mutex_new ();
 	priv->sending_lock = g_mutex_new ();
 	priv->do_continue = FALSE;
+	priv->is_running = FALSE;
 
 	return;
 }

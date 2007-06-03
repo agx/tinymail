@@ -839,6 +839,14 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 					      uid, g_strerror (errno));
 		camel_object_unref((CamelObject *)message);
 		message = NULL;
+	} else {
+		if (type & CAMEL_FOLDER_RECEIVE_FULL && pop3_store->immediate_delete_after)
+		{
+			struct _CamelPOP3Command *cmd = NULL;
+			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", uid);
+			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
+			camel_pop3_engine_command_free(pop3_store->engine, cmd);
+		}
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);

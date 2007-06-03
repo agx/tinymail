@@ -36,6 +36,7 @@
 #include <camel/camel.h>
 #include <camel/camel-session.h>
 #include <camel/camel-store.h>
+#include <camel/providers/pop3/camel-pop3-store.h>
 
 #ifndef CAMEL_FOLDER_TYPE_SENT
 #define CAMEL_FOLDER_TYPE_SENT (5 << 10)
@@ -165,48 +166,35 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 	return;
 }
 
-/**
- * tny_camel_pop_store_account_get_delete_originals:
- * @self: a TnyCamelPOPStoreAccount
- *
- * Get the delete originals property of @self.
- *
- * Return value: Whether or not to delete original messages from the service
- **/
-gboolean 
-tny_camel_pop_store_account_get_delete_originals (TnyCamelPOPStoreAccount *self)
-{
-	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
-
-	return priv->delete_originals;
-}
 
 /**
- * tny_camel_pop_store_account_set_delete_originals:
+ * tny_camel_pop_store_account_set_leave_messages_on_server:
  * @self: a TnyCamelPOPStoreAccount
- * @delete_originals: Whether or not to delete original messages from the service
+ * @enabled: whether to leave messages on the server
  *
- * Set the delete originals property of @self.
- *
+ * Set whether messages should be left on the server. The initialization value
+ * of @enabled is TRUE (so by default, messages are left on the server).
  **/
 void 
-tny_camel_pop_store_account_set_delete_originals (TnyCamelPOPStoreAccount *self, gboolean delete_originals)
+tny_camel_pop_store_account_set_leave_messages_on_server (TnyCamelPOPStoreAccount *self, gboolean enabled)
 {
-	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
+	const CamelService *service = _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (self));
+	CamelPOP3Store *pop3_store = (CamelPOP3Store *) service;
 
-	g_warning ("tny_camel_pop_store_account_set_delete_originals is not yet supported\n");
-
-	priv->delete_originals = delete_originals;
+	pop3_store->immediate_delete_after = !enabled;
 }
+
 
 static void
 tny_camel_pop_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (instance);
+	const CamelService *service = _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (instance));
+	CamelPOP3Store *pop3_store = (CamelPOP3Store *) service;
 
+	pop3_store->immediate_delete_after = FALSE;
 	priv->lock = g_mutex_new ();
 	priv->inbox = NULL;
-	priv->delete_originals = FALSE;
 
 	return;
 }
