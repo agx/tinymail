@@ -370,7 +370,6 @@ _tny_camel_account_stop_camel_operation (TnyCamelAccount *self)
 	return;
 }
 
-
 static gboolean 
 tny_camel_account_is_connected (TnyAccount *self)
 {
@@ -1144,73 +1143,6 @@ typedef struct
 	TnySessionCamel *session;
 } GetSupportedAuthInfo;
 
-
-static void
-tny_camel_account_get_supported_secure_authentication_async_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *thr_user_data)
-{
-	printf ("DEBUG: %s\n", __FUNCTION__);
-	
-	/* Use the generic tny_progress* idle callback system 
-	 * to call our status callback,
-	 * using the IdleStopper to stop the status callback 
-	 * from being called after the main callback: */
-	GetSupportedAuthInfo *info = thr_user_data;
-	TnyProgressInfo *progress_info = tny_progress_info_new (
-		G_OBJECT (info->self), 
-		info->status_callback, 
-		TNY_GET_SUPPORTED_SECURE_AUTH_STATUS, 
-		TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, 
-		what, sofar, 
-		oftotal, info->stopper, info->user_data);
-
-	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
-		tny_progress_info_idle_func, progress_info, 
-		tny_progress_info_destroy);
-}
-		
-/** This is the GDestroyNotify callback provided to g_idle_add_full()
- * for tny_camel_account_get_supported_secure_authentication_async_callback().
- */
-static void
-tny_camel_account_get_supported_secure_authentication_async_destroyer (gpointer thr_user_data)
-{
-	printf ("DEBUG: %s)\n", __FUNCTION__);
-		
-	GetSupportedAuthInfo *info = thr_user_data;
-	TnyCamelAccount *self = info->self;
-
-	/* thread reference */
-	g_object_unref (G_OBJECT (self));
-	if (info->err) {
-		g_error_free (info->err);
-		info->err = NULL;	
-	}
-
-	_tny_session_stop_operation (info->session);
-
-	tny_idle_stopper_destroy (info->stopper);
-	info->stopper = NULL;
-	
-	g_slice_free (GetSupportedAuthInfo, thr_user_data);
-}
-
-static gboolean
-tny_camel_account_get_supported_secure_authentication_async_callback (gpointer thr_user_data)
-{
-	GetSupportedAuthInfo *info = thr_user_data;
-
-	if (info->callback)
-		info->callback (info->self, info->cancelled, info->result, &info->err, info->user_data);
-
-	/* Prevent status callbacks from being called after this
-	 * (can happen because the 2 idle callbacks have different priorities)
-	 * by causing tny_idle_stopper_is_stopped() to return TRUE. */
-	tny_idle_stopper_stop (info->stopper);
-
-	return FALSE;
-}
-
-
 /* Starts the operation in the thread: */
 static gpointer 
 tny_camel_account_get_supported_secure_authentication_async_thread (
@@ -1223,23 +1155,29 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	GError *err = NULL;
-
+  TnyStatus* status;
+  
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	info->cancelled = FALSE;
-
-	/* Make sure that the status callback is called (in an idle handler) 
-	 * while this thread is running: */
-	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (self), 
-		tny_camel_account_get_supported_secure_authentication_async_status, info, 
-		"Querying supported secure authentication methods from server.");
-
+  status =  tny_status_new_literal(TNY_GET_SUPPORTED_SECURE_AUTH_STATUS, 
+                                       TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, 0, 1,
+                                       "Get secure authentication methods");
+  
+  info->status_callback(G_OBJECT(self), 
+                        status,
+                        info->user_data);
+  
 	/* Do the actual work:
 	 * This is happening in a thread, 
 	 * and the status callback is being called regularly while this is 
 	 * happening. */	
 	GList *authtypes = camel_service_query_auth_types (priv->service, &ex);
-	
+  
+  tny_status_set_fraction(status, 1);
+  info->status_callback(G_OBJECT(self), 
+                       status,
+                       info->user_data);
+  
 	/* The result will be a TnyList of TnyPairs: */
 	TnyList *result = tny_simple_list_new ();
 	GList *iter = authtypes;
@@ -1252,7 +1190,7 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 			printf ("DEBUG: %s: authproto =%s, name=%s\n", __FUNCTION__, item->authproto, item->name);
 			
 			/* We don't use the value part of the TnyPair. */
-			TnyPair *pair = tny_pair_new (item->authproto, NULL);
+			TnyPair *pair = tny_pair_new (item->name, NULL);
 			tny_list_append (result, G_OBJECT (pair));
 			g_object_unref (pair);
 		}
@@ -1266,10 +1204,6 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	/* The work has finished, so clean up and provide the result via the 
 	 * main callback: */
 	info->result = result;
-	
-	info->cancelled = camel_operation_cancel_check (priv->cancel);
-	
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));
 
 	/* Create the GError if necessary,
 	 * from the CamelException: */
@@ -1288,13 +1222,12 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	/* Call the callback, with the result, in an idle thread,
 	 * and stop this thread: */
 	if (info->callback) {
-		g_idle_add_full (G_PRIORITY_HIGH, 
-				tny_camel_account_get_supported_secure_authentication_async_callback, 
-				info, tny_camel_account_get_supported_secure_authentication_async_destroyer);
+		info->callback (info->self, info->cancelled, info->result, &info->err, info->user_data);
 	} else {
 		/* Thread reference */
 		g_object_unref (G_OBJECT (self));
 	}
+  tny_status_free(status);
 	g_thread_exit (NULL);
 
 	return NULL;

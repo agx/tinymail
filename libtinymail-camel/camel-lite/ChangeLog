@@ -1,3 +1,10 @@
+2007-06-03  Johannes Schmid  <johannes.schmid@openismus.com>
+
+	* camel/camel-service.c: (camel_service_query_auth_types):
+
+	Added a g_return_if_fail to avoid crashes with buggy code if
+	no service is set for the account.
+
 Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around)
 

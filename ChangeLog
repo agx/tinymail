@@ -1,3 +1,12 @@
+2007-06-03  Johannes Schmid  <johannes.schmid@openismus.com>
+
+	* libtinymail-camel/tny-camel-account.c:
+	(tny_camel_account_get_supported_secure_authentication_async_thread
+	):
+
+	Fixed implementation to get the secure authentication support
+	methods and simplied them a lot.
+
 2007-06-03  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Support for removing messages from a POP server after retrieval
