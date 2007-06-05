@@ -1,6 +1,7 @@
 2007-06-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix for LOGINDISABLED on IMAP
+	* Bugfix when connecting (connection status problem)
 
 2007-06-03  Johannes Schmid  <johannes.schmid@openismus.com>
 
