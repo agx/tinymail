@@ -67,23 +67,37 @@ SSL_LIBS=""
 
 AC_TNY_MOZ_CHECK
 
-if test x"$mozilla_nspr" != "xno" -a x"$mozilla_nss" != "xno"; then
+dnl ### Select the SSL implementation ##
+AC_ARG_WITH(ssl,
+AC_HELP_STRING([--with-ssl],
+  [Set which SSL library to use (nss, openssl, none)]),
+  [case "$with_ssl" in
+    nss) ;;
+    openssl) ;;
+    none) ;;
+    *) AC_MSG_ERROR(bad value ${with_ssl} for --with-ssl) ;;
+esac], [with_ssl="nss"])
+
+if test x"$with_ssl" != "xnone"; then
+  if test x"$with_ssl" == "xnss" -a x"$mozilla_nspr" != "xno" -a x"$mozilla_nss" != "xno"; then
 	msg_ssl="yes (Mozilla NSS)"
 	msg_smime="yes (Mozilla NSS)"
 	AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
 	AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
 	AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
 	AC_DEFINE(HAVE_OPENSSL,0,[Define if you want to use OpenSSL as SSL library])
-else
-	AC_MSG_CHECKING(for NSPR and NSS)
-	AC_MSG_RESULT(no)
-
+  else
+   AC_MSG_CHECKING(for NSPR and NSS)
+   AC_MSG_RESULT(no)
+   if test x"$with_ssl" == "xopenssl"; then
 	AC_CHECK_LIB(crypto, EVP_md5, [
 		SSL_LIBS="-lcrypto -lssl"
 		msg_ssl="yes (OpenSSL)"
 		AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
 		AC_DEFINE(HAVE_OPENSSL,1,[Define if you want to use OpenSSL as SSL library])
 	],,)
+   fi
+  fi
 fi
 
 AC_SUBST(msg_smime)

@@ -22,7 +22,7 @@
  *
  */
 
-#error "The Tinymail OpenSSL implementation is unfinished and hence unsupported"
+/* #error "The Tinymail OpenSSL implementation is unfinished and hence unsupported" */
 
 #include <config.h>
 
@@ -53,16 +53,15 @@
 
 #include "camel-tcp-stream-ssl.h"
 
-#define d(x)
-
-#define TIMEOUT_USEC  (10000)
+#define d(x) g_print (x)
 
 static CamelTcpStreamClass *parent_class = NULL;
 
 /* Returns the class for a CamelTcpStreamSSL */
 #define CTSR_CLASS(so) CAMEL_TCP_STREAM_SSL_CLASS (CAMEL_OBJECT_GET_CLASS (so))
 
-static ssize_t stream_read_nb (CamelStream *stream, char *buffer, size_t n);
+static ssize_t stream_read_idle (CamelStream *stream, char *buffer, size_t n);
+static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
 static ssize_t stream_read (CamelStream *stream, char *buffer, size_t n);
 static ssize_t stream_write (CamelStream *stream, const char *buffer, size_t n);
 static int stream_flush  (CamelStream *stream);
@@ -86,18 +85,23 @@ struct _CamelTcpStreamSSLPrivate {
 	guint32 flags;
 };
 
+
 static void
 camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_class)
 {
-	g_warning ("tinymail: Using openssl, which is not fully tested or supported. NSS is recommended instead.");
 	CamelTcpStreamClass *camel_tcp_stream_class =
 		CAMEL_TCP_STREAM_CLASS (camel_tcp_stream_ssl_class);
 	CamelStreamClass *camel_stream_class =
 		CAMEL_STREAM_CLASS (camel_tcp_stream_ssl_class);
-	
+
+	g_warning ("tinymail: Using openssl, which is not fully tested or supported. NSS is recommended instead.");
+
+
 	parent_class = CAMEL_TCP_STREAM_CLASS (camel_type_get_global_classfuncs (camel_tcp_stream_get_type ()));
 	
 	/* virtual method overload */
+	camel_stream_class->read_idle = stream_read_idle;
+
 	camel_stream_class->read = stream_read;
 	camel_stream_class->write = stream_write;
 	camel_stream_class->flush = stream_flush;
@@ -282,9 +286,60 @@ camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *stream)
 	return 0;
 }
 
+static ssize_t 
+stream_read_idle (CamelStream *stream, char *buffer, size_t n)
+{
+	CamelTcpStreamSSL *openssl = CAMEL_TCP_STREAM_SSL (stream);
+	SSL *ssl = openssl->priv->ssl;
+	ssize_t nread;
+
+	int error, flags, fdmax;
+	struct timeval timeout;
+	fd_set rdset;
+	int res;
+
+	flags = fcntl (openssl->priv->sockfd, F_GETFL);
+	fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
+	
+	fdmax = openssl->priv->sockfd + 1;
+	
+	do {
+		FD_ZERO (&rdset);
+		FD_SET (openssl->priv->sockfd, &rdset);
+		nread = -1;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 0;
+		res = select (fdmax, &rdset, 0, 0, &timeout);
+		
+		if (res == -1)
+			;
+		else if (res == 0)
+			errno = ETIMEDOUT;
+		else {
+
+		  do {
+			if (ssl) {
+				nread = SSL_read (ssl, buffer, n);
+				if (nread < 0)
+					errno = ssl_errno (ssl, nread);
+			} else {
+				nread = read (openssl->priv->sockfd, buffer, n);
+			}
+		  } while (0 && (nread < 0 && errno == EINTR));
+		}
+	} while (0 && (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)));
+	
+	error = errno;
+	fcntl (openssl->priv->sockfd, F_SETFL, flags);
+	errno = error;
+
+
+	return nread;
+}
+
 
 static ssize_t
-stream_read_nb (CamelStream *stream, char *buffer, size_t n)
+stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 {
 	CamelTcpStreamSSL *openssl = CAMEL_TCP_STREAM_SSL (stream);
 	SSL *ssl = openssl->priv->ssl;
@@ -374,8 +429,8 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 			FD_SET (openssl->priv->sockfd, &rdset);
 			FD_SET (cancel_fd, &rdset);
 			
-			timeout.tv_sec = 0;
-			timeout.tv_usec = TIMEOUT_USEC;
+			timeout.tv_sec = 15;
+			timeout.tv_usec = 0;
 			select (fdmax, &rdset, 0, 0, &timeout);
 			if (FD_ISSET (cancel_fd, &rdset)) {
 				fcntl (openssl->priv->sockfd, F_SETFL, flags);
@@ -446,8 +501,8 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 			FD_SET (openssl->priv->sockfd, &wrset);
 			FD_SET (cancel_fd, &rdset);
 			
-			timeout.tv_sec = 0;
-			timeout.tv_usec = TIMEOUT_USEC;
+			timeout.tv_sec = 15;
+			timeout.tv_usec = 0;
 			select (fdmax, &rdset, &wrset, 0, &timeout);
 			if (FD_ISSET (cancel_fd, &rdset)) {
 				fcntl (openssl->priv->sockfd, F_SETFL, flags);

@@ -37,12 +37,6 @@ INCLUDES = -I.. -I$(srcdir)/.. \
 	-DLOCALEDIR=\""$(localedir)"\" \
 	$(CAMEL_CFLAGS)
 
-if ENABLE_OPENSSL
-SSL_FILE = camel-tcp-stream-openssl.c
-else
-SSL_FILE = camel-tcp-stream-ssl.c
-endif
-
 libcamel_lite_provider_1_2_la_SOURCES = 	\
 	camel-cipher-context.c			\
 	camel-digest-folder.c			\
@@ -78,7 +72,6 @@ libcamel_lite_provider_1_2_la_SOURCES = 	\
 	camel-smime-context.c			\
 	camel-store-summary.c			\
 	camel-store.c				\
-	$(SSL_FILE)				\
 	camel-tcp-stream-raw.c			\
 	camel-tcp-stream.c			\
 	camel-transport.c			\
@@ -88,6 +81,12 @@ libcamel_lite_provider_1_2_la_SOURCES = 	\
 	camel-vee-summary.c			\
 	camel-vtrash-folder.c			\
 	$(LIBCAMEL_PROVIDER_PLATFORM_DEP_SOURCES)
+
+if ENABLE_OPENSSL
+libcamel_lite_provider_1_2_la_SOURCES += camel-tcp-stream-openssl.c
+else
+libcamel_lite_provider_1_2_la_SOURCES += camel-tcp-stream-ssl.c
+endif
 
 libcamel_lite_providerinclude_HEADERS =		\
 	camel-cipher-context.h			\
