@@ -189,10 +189,7 @@ static void
 tny_camel_pop_store_account_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (instance);
-	const CamelService *service = _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (instance));
-	CamelPOP3Store *pop3_store = (CamelPOP3Store *) service;
 
-	pop3_store->immediate_delete_after = FALSE;
 	priv->lock = g_mutex_new ();
 	priv->inbox = NULL;
 

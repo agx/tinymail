@@ -1450,7 +1450,11 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 	char *errbuf = NULL;
 	gboolean authenticated = FALSE;
 	const char *auth_domain;
-	
+
+	/* Bugfix for #432234 */
+	if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED)
+		return TRUE;
+
 	auth_domain = camel_url_get_param (service->url, "auth-domain");
 	
 	if (store->preauthed) {

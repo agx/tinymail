@@ -22,6 +22,7 @@
  *
  */
 
+#error "The Tinymail OpenSSL implementation is unfinished and hence unsupported"
 
 #include <config.h>
 

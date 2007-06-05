@@ -1,9 +1,11 @@
+2007-06-05  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Bugfix for LOGINDISABLED on IMAP
+
 2007-06-03  Johannes Schmid  <johannes.schmid@openismus.com>
 
 	* libtinymail-camel/tny-camel-account.c:
-	(tny_camel_account_get_supported_secure_authentication_async_thread
-	):
-
+	tny_camel_account_get_supported_secure_authentication_async_thread
 	Fixed implementation to get the secure authentication support
 	methods and simplied them a lot.
 
