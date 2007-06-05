@@ -45,6 +45,7 @@
 #include "camel/camel-file-utils.h"
 #include "camel/camel-folder.h"
 #include "camel/camel-net-utils.h"
+#include "camel/camel-string-utils.h"
 #include "camel/camel-private.h"
 #include "camel/camel-sasl.h"
 #include "camel/camel-session.h"
@@ -139,7 +140,17 @@ static void imap_set_server_level (CamelImapStore *store);
 
 static GPtrArray* imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
 
-static void let_idle_die (CamelImapStore *imap_store)
+
+static void 
+imap_delete_cache  (CamelStore *store)
+{
+	CamelImapStore *imap_store = (CamelImapStore *) store;
+	gchar *folder_dir = imap_store->storage_path;
+	camel_rm (folder_dir);
+}
+
+static void 
+let_idle_die (CamelImapStore *imap_store)
 {
 	if (imap_store->idle_signal > 0) 
 		g_source_remove (imap_store->idle_signal);
@@ -208,7 +219,8 @@ camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 	camel_service_class->construct = construct;
 	camel_service_class->query_auth_types = query_auth_types;
 	camel_service_class->get_name = imap_get_name;
-	
+
+	camel_store_class->delete_cache = imap_delete_cache;
 	camel_store_class->hash_folder_name = hash_folder_name;
 	camel_store_class->compare_folder_name = compare_folder_name;
 	camel_store_class->create_folder = create_folder;
@@ -3166,59 +3178,7 @@ dumpfi(CamelFolderInfo *fi)
 #endif
 
 
-static int
-isdir (char *name)
-{
-	struct stat st;
-	if (stat (name, &st))
-		return 0;
-	return S_ISDIR (st.st_mode);
-}
 
-static char *ignored_names[] = { ".", "..", "subfolders", NULL };
-
-int
-ignorent (char *name)
-{
-	char **p;
-	for (p = ignored_names; *p; p++)
-		if (strcmp (name, *p) == 0)
-			return 1;
-	return 0;
-}
-
-
-void
-my_du (char *name, int *my_size)
-{
-	DIR *dir;
-	struct dirent *ent;
-
-	chdir (name);
-	dir = opendir (name);
-
-	if (!dir)
-		return;
-
-	while ((ent = readdir (dir)))
-	{
-		if (!ignorent (ent->d_name))
-		{
-			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
-			if (isdir (p))
-				my_du (p, my_size);
-			else 
-			{
-				struct stat st;
-				if (stat (p, &st) == 0)
-					*my_size += st.st_size;
-			}
-			g_free (p);
-		}
-	}
-
-	closedir (dir);
-}
 
 static void
 fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
@@ -3230,7 +3190,7 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 	char *folder_dir = imap_path_to_physical (storage_path, fi->full_name);
 
 	g_free(storage_path);
-	my_du (folder_dir, &msize);
+	camel_du (folder_dir, &msize);
 
 	folder = camel_object_bag_peek(store->folders, fi->full_name);
 

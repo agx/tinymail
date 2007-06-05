@@ -190,6 +190,7 @@ typedef struct {
 	GPtrArray*      (*get_recent_messages)      (CamelStore *store, 
 						     const char *folder_name, 
 						     int *unseen, int *messages);
+	void             (*delete_cache)              (CamelStore *store);
 
 } CamelStoreClass;
 
@@ -264,6 +265,8 @@ int              camel_store_folder_uri_equal         (CamelStore *store,
 GPtrArray*       camel_store_get_recent_messages      (CamelStore *store, 
 						       const char *folder_name, 
 						       int *unseen, int *messages);
+
+void             camel_store_delete_cache            (CamelStore *store);
 
 
 typedef struct _CamelISubscribe CamelISubscribe;

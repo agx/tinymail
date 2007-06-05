@@ -30,6 +30,103 @@
 
 #include "camel-string-utils.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <dirent.h>
+
+
+static int
+isdir (char *name)
+{
+	struct stat st;
+	if (stat (name, &st))
+		return 0;
+	return S_ISDIR (st.st_mode);
+}
+
+static char *ignored_names[] = { ".", "..", NULL };
+static int ignorent (char *name)
+{
+	char **p;
+	for (p = ignored_names; *p; p++)
+		if (strcmp (name, *p) == 0)
+			return 1;
+	return 0;
+}
+
+void camel_du (char *name, int *my_size)
+{
+	DIR *dir;
+	struct dirent *ent;
+
+	chdir (name);
+	dir = opendir (name);
+
+	if (!dir)
+		return;
+
+	while ((ent = readdir (dir)))
+	{
+		if (!ignorent (ent->d_name))
+		{
+			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
+			if (isdir (p))
+				camel_du (p, my_size);
+			else 
+			{
+				struct stat st;
+				if (stat (p, &st) == 0)
+					*my_size += st.st_size;
+			}
+			g_free (p);
+		}
+	}
+
+	closedir (dir);
+}
+
+static char *ignored_dnames[] = { ".", "..", NULL };
+static int ignorentd (char *name)
+{
+	char **p;
+	for (p = ignored_dnames; *p; p++)
+		if (strcmp (name, *p) == 0)
+			return 1;
+	return 0;
+}
+
+void 
+camel_rm (char *name)
+{
+	DIR *dir;
+	struct dirent *ent;
+
+	chdir (name);
+	dir = opendir (name);
+
+	if (!dir)
+		return;
+
+	while ((ent = readdir (dir)))
+	{
+		if (!ignorentd (ent->d_name))
+		{
+			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
+			if (isdir (p))
+				camel_rm (p);
+			else 
+				remove (p);
+			g_free (p);
+		}
+	}
+
+	closedir (dir);
+
+	remove (name);
+}
+
 int
 camel_strcase_equal (gconstpointer a, gconstpointer b)
 {

@@ -2,6 +2,9 @@
 
 	* Bugfix for LOGINDISABLED on IMAP
 	* Bugfix when connecting (connection status problem)
+	* Added the tny_store_account_delete_cache API
+
+	* This was a major API change
 
 2007-06-03  Johannes Schmid  <johannes.schmid@openismus.com>
 

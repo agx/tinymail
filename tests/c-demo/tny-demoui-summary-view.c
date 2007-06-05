@@ -997,6 +997,77 @@ on_delete_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 	}
 }
 
+
+static void 
+on_uncache_account_activate (GtkMenuItem *mitem, gpointer user_data)
+{
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+
+	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
+	{
+		gint type;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{ 
+			TnyFolder *folder;
+			TnyStoreAccount *acc;
+			GtkWidget *dialog, *label;
+			gint result;
+			gchar *str = NULL;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
+
+			dialog = gtk_dialog_new_with_buttons (_("Uncache an account"),
+				  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+				  GTK_DIALOG_MODAL,
+				  GTK_STOCK_OK,
+				  GTK_RESPONSE_ACCEPT,
+				  GTK_STOCK_CANCEL,
+				  GTK_RESPONSE_REJECT,
+				  NULL);
+
+			acc = TNY_STORE_ACCOUNT (tny_folder_get_account (folder));
+
+			str = g_strdup_printf (_("Are you sure you want to uncache the account %s?"),
+				tny_account_get_name (TNY_ACCOUNT (acc)));
+			label = gtk_label_new (str);
+			g_free (str);
+
+			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
+			gtk_widget_show (label);
+
+			result = gtk_dialog_run (GTK_DIALOG (dialog));
+
+			switch (result)
+			{
+				case GTK_RESPONSE_ACCEPT: 
+					tny_store_account_delete_cache (acc);
+				break;
+
+				default:
+				break;
+			}
+
+			g_object_unref (acc);
+
+			if (dialog)
+				gtk_widget_destroy (dialog);
+			g_object_unref (folder);
+		}
+
+	}
+}
+
+
 static void 
 on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 {
@@ -1156,7 +1227,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	GtkWidget *menu;
 	int button, event_time;
 	GtkSelectionMode mode;
-	GtkWidget *mrename, *mdelete, *mcreate, *mmerge;
+	GtkWidget *mrename, *mdelete, *mcreate, *mmerge, *muncache;
 #ifdef ASYNCWORKER
 	GtkWidget *fdown;
 #endif
@@ -1166,6 +1237,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	mrename = gtk_menu_item_new_with_label (_("Rename or Copy folder"));
 	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
 	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
+	muncache = gtk_menu_item_new_with_label (_("Uncache account of this folder"));
 
 #ifdef ASYNCWORKER
 	fdown = gtk_menu_item_new_with_label (_("Download entire folder"));
@@ -1178,6 +1250,8 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	else
 		mmerge = gtk_menu_item_new_with_label (_("Select one folder mode"));
 
+	g_signal_connect (G_OBJECT (muncache), "activate",
+		G_CALLBACK (on_uncache_account_activate), user_data);
 	g_signal_connect (G_OBJECT (mrename), "activate",
 		G_CALLBACK (on_rename_folder_activate), user_data);
 	g_signal_connect (G_OBJECT (mcreate), "activate",
@@ -1194,6 +1268,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	gtk_menu_prepend (menu, mrename);
 	gtk_menu_prepend (menu, mcreate);
 	gtk_menu_prepend (menu, mdelete);
+	gtk_menu_prepend (menu, muncache);
 	gtk_menu_prepend (menu, mmerge);
 #ifdef ASYNCWORKER
 	gtk_menu_prepend (menu, fdown);
@@ -1203,6 +1278,7 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	gtk_widget_show (mrename);
 	gtk_widget_show (mcreate);
 	gtk_widget_show (mdelete);
+	gtk_widget_show (muncache);
 	gtk_widget_show (mmerge);
 
 	if (event)

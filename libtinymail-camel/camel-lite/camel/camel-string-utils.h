@@ -28,6 +28,9 @@
 
 G_BEGIN_DECLS
 
+void camel_du (char *name, int *my_size);
+void camel_rm (char *name);
+
 int   camel_strcase_equal (gconstpointer a, gconstpointer b);
 guint camel_strcase_hash  (gconstpointer v);
 

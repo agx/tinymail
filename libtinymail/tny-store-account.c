@@ -29,6 +29,27 @@
 
 guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
 
+
+/**
+ * tny_store_account_delete_cache:
+ * @self: a #TnyStoreAccount object
+ *
+ * Delete the cache of a store account
+ **/
+void 
+tny_store_account_delete_cache (TnyStoreAccount *self)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_STORE_ACCOUNT (self));
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->delete_cache_func != NULL);
+#endif
+
+	TNY_STORE_ACCOUNT_GET_IFACE (self)->delete_cache_func (self);
+
+	return;
+}
+
+
 /**
  * tny_store_account_find_folder:
  * @self: a #TnyStoreAccount object

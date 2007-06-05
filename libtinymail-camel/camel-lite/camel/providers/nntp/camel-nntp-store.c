@@ -46,6 +46,7 @@
 #include "camel/camel-tcp-stream-raw.h"
 #include "camel/camel-tcp-stream-ssl.h"
 #include "camel/camel-url.h"
+#include "camel/camel-string-utils.h"
 
 #include "camel-nntp-summary.h"
 #include "camel-nntp-store.h"
@@ -76,6 +77,14 @@ static void nntp_construct (CamelService *service, CamelSession *session,
 		            CamelProvider *provider, CamelURL *url,
 		            CamelException *ex);
 
+
+static void 
+nntp_delete_cache  (CamelStore *store)
+{
+	CamelNNTPStore *nntp_store = (CamelNNTPStore *) store;
+	gchar *folder_dir = nntp_store->storage_path;
+	camel_rm (folder_dir);
+}
 
 static gboolean
 nntp_can_work_offline(CamelDiscoStore *store)
@@ -1014,7 +1023,8 @@ nntp_store_class_init (CamelNNTPStoreClass *camel_nntp_store_class)
 	camel_service_class->construct = nntp_construct;
 	camel_service_class->query_auth_types = nntp_store_query_auth_types;
 	camel_service_class->get_name = nntp_store_get_name;
-	
+
+	camel_store_class->delete_cache = nntp_delete_cache;
 	camel_disco_store_class->can_work_offline = nntp_can_work_offline;
 	camel_disco_store_class->connect_online = nntp_connect_online;
 	camel_disco_store_class->connect_offline = nntp_connect_offline;

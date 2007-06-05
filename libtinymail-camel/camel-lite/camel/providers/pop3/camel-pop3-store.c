@@ -62,6 +62,7 @@
 #include "camel-tcp-stream-raw.h"
 #include "camel-tcp-stream.h"
 #include "camel-url.h"
+#include "camel/camel-string-utils.h"
 
 #ifdef HAVE_SSL
 #include "camel-tcp-stream-ssl.h"
@@ -88,6 +89,17 @@ static CamelFolder *get_folder (CamelStore *store, const char *folder_name,
 				guint32 flags, CamelException *ex);
 
 static CamelFolder *get_trash  (CamelStore *store, CamelException *ex);
+
+
+
+static void 
+pop3_delete_cache  (CamelStore *store)
+{
+	CamelPOP3Store *pop3_store = (CamelPOP3Store *) store;
+	gchar *folder_dir = pop3_store->storage_path;
+	camel_rm (folder_dir);
+}
+
 
 static gboolean
 pop3_can_work_offline (CamelDiscoStore *disco_store)
@@ -145,61 +157,6 @@ pop3_get_folder_online (CamelStore *store, const char *folder_name, guint32 flag
 }
 
 
-
-static int
-isdir (char *name)
-{
-	struct stat st;
-	if (stat (name, &st))
-		return 0;
-	return S_ISDIR (st.st_mode);
-}
-
-static char *ignored_names[] = { ".", "..", NULL };
-
-int
-ignorent (char *name)
-{
-	char **p;
-	for (p = ignored_names; *p; p++)
-		if (strcmp (name, *p) == 0)
-			return 1;
-	return 0;
-}
-
-
-void
-my_du (char *name, int *my_size)
-{
-	DIR *dir;
-	struct dirent *ent;
-
-	chdir (name);
-	dir = opendir (name);
-
-	if (!dir)
-		return;
-
-	while ((ent = readdir (dir)))
-	{
-		if (!ignorent (ent->d_name))
-		{
-			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
-			if (isdir (p))
-				my_du (p, my_size);
-			else 
-			{
-				struct stat st;
-				if (stat (p, &st) == 0)
-					*my_size += st.st_size;
-			}
-			g_free (p);
-		}
-	}
-
-	closedir (dir);
-}
-
 static CamelFolderInfo *
 pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 {
@@ -216,7 +173,7 @@ pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 	fi->unread = 0;
 	fi->total = 0;
 
-	my_du (folder_dir, &msize);
+	camel_du (folder_dir, &msize);
 
 	spath = g_strdup_printf ("%s/summary.mmap", folder_dir);
 	f = fopen (spath, "r");
@@ -859,6 +816,8 @@ camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
 
 	camel_store_class->get_folder = get_folder;
 	camel_store_class->get_trash = get_trash;
+
+	camel_store_class->delete_cache = pop3_delete_cache;
 
 	camel_disco_store_class->can_work_offline = pop3_can_work_offline;
 	camel_disco_store_class->connect_online = pop3_connect_online;

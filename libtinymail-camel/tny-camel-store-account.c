@@ -92,6 +92,21 @@ connection_status_idle_destroy (gpointer data)
 }
 
 static void 
+tny_camel_store_account_delete_cache (TnyStoreAccount *self)
+{
+	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->delete_cache_func (self);
+}
+
+static void 
+tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	CamelStore *store = CAMEL_STORE (apriv->service);
+
+	camel_store_delete_cache (store);
+}
+
+static void 
 tny_camel_store_account_prepare (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
@@ -1137,6 +1152,7 @@ tny_store_account_init (gpointer g, gpointer iface_data)
 	klass->subscribe_func = tny_camel_store_account_subscribe;
 	klass->unsubscribe_func = tny_camel_store_account_unsubscribe;
 	klass->find_folder_func = tny_camel_store_account_find_folder;
+	klass->delete_cache_func = tny_camel_store_account_delete_cache;
 
 	return;
 }
@@ -1162,6 +1178,7 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	class->add_observer_func = tny_camel_store_account_add_observer_default;
 	class->remove_observer_func = tny_camel_store_account_remove_observer_default;
 	class->find_folder_func = tny_camel_store_account_find_folder_default;
+	class->delete_cache_func = tny_camel_store_account_delete_cache_default;
 
 	/* Protected default implementation */
 	class->factor_folder_func = tny_camel_store_account_factor_folder_default;

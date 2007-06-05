@@ -76,6 +76,7 @@ static void subscribe_folder (CamelStore *store, const char *folder_name, CamelE
 static void unsubscribe_folder (CamelStore *store, const char *folder_name, CamelException *ex);
 
 static void noop (CamelStore *store, CamelException *ex);
+static void delete_cache (CamelStore *store);
 
 static void construct (CamelService *service, CamelSession *session,
 		       CamelProvider *provider, CamelURL *url,
@@ -112,6 +113,7 @@ camel_store_class_init (CamelStoreClass *camel_store_class)
 	camel_store_class->unsubscribe_folder = unsubscribe_folder;
 	camel_store_class->noop = noop;
 	camel_store_class->get_recent_messages = get_recent_messages;
+	camel_store_class->delete_cache = delete_cache;
 
 	/* virtual method overload */
 	camel_service_class->construct = construct;
@@ -180,6 +182,17 @@ camel_store_get_type (void)
 	return camel_store_type;
 }
 
+
+static void 
+delete_cache (CamelStore *store)
+{
+}
+
+void 
+camel_store_delete_cache (CamelStore *store)
+{
+	CS_CLASS (store)->delete_cache (store);
+}
 
 GPtrArray* 
 camel_store_get_recent_messages (CamelStore *store, const char *folder_name, 
