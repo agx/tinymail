@@ -150,7 +150,7 @@ imap_delete_cache  (CamelStore *store)
 }
 
 static void 
-let_idle_die (CamelImapStore *imap_store)
+let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 {
 	if (imap_store->idle_signal > 0) 
 		g_source_remove (imap_store->idle_signal);
@@ -160,10 +160,8 @@ let_idle_die (CamelImapStore *imap_store)
 	{
 		g_free (imap_store->idle_prefix); 
 		imap_store->idle_prefix=NULL;
-		g_mutex_lock (imap_store->stream_lock);
 		idle_debug ("Sending DONE in let_idle_die\n");
 		camel_stream_printf (imap_store->ostream, "DONE\r\n");
-		g_mutex_unlock (imap_store->stream_lock);
 	}
 	g_static_rec_mutex_unlock (imap_store->idle_prefix_lock);
 
@@ -261,7 +259,7 @@ camel_imap_store_finalize (CamelObject *object)
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 	CamelDiscoStore *disco = CAMEL_DISCO_STORE (object);
 
-	let_idle_die (imap_store);
+	let_idle_die (imap_store, TRUE);
 
 	/* This frees current_folder, folders, authtypes, streams, and namespace. */
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
@@ -283,8 +281,6 @@ camel_imap_store_finalize (CamelObject *object)
 
 	g_static_rec_mutex_free (imap_store->idle_prefix_lock);
 	imap_store->idle_prefix_lock = NULL;
-	g_mutex_free (imap_store->stream_lock);
-
 }
 
 static void
@@ -300,7 +296,6 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->idle_prefix = NULL;
 	imap_store->istream = NULL;
 	imap_store->ostream = NULL;
-	imap_store->stream_lock = g_mutex_new ();
 	imap_store->has_login = FALSE;
 
 	imap_store->dir_sep = '\0';
@@ -653,7 +648,6 @@ camel_imap_store_restore_stream_buffer (CamelImapStore *store)
 			store->istream = camel_stream_buffer_new (store->ostream, CAMEL_STREAM_BUFFER_READ);
 		} else {
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-			g_mutex_unlock (store->stream_lock);
 			camel_operation_uncancel (NULL);
 			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &ex);
 			camel_exception_clear (&ex);
@@ -663,7 +657,6 @@ camel_imap_store_restore_stream_buffer (CamelImapStore *store)
 			if (camel_exception_is_set (&ex))
 				g_warning ("Connection recovery failed: %s",
 					camel_exception_get_description (&ex));
-			g_mutex_lock (store->stream_lock);
 			return FALSE;
 		}
 	}
@@ -717,10 +710,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		return FALSE;
 	}
 
-	g_mutex_lock (store->stream_lock);
 	store->ostream = tcp_stream;
 	store->istream = camel_stream_buffer_new (tcp_stream, CAMEL_STREAM_BUFFER_READ);
-	g_mutex_unlock (store->stream_lock);
 
 	store->connected = TRUE;
 	store->preauthed = FALSE;
@@ -831,12 +822,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	response = camel_imap_command (store, NULL, ex, "STARTTLS");
 	if (!response) 
 	{
-		g_mutex_lock (store->stream_lock);
 		camel_object_unref (store->istream);
 		camel_object_unref (store->ostream);
 		store->istream = NULL;
 		store->ostream = NULL;
-		g_mutex_unlock (store->stream_lock);
 		clean_quit = FALSE;
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				_("Failed to connect to IMAP server %s in secure mode: %s"),
@@ -893,7 +882,6 @@ exception:
 			camel_imap_response_free_without_processing (store, response);
 	}
 
-	g_mutex_lock (store->stream_lock);
 	if (store->istream) {
 		camel_object_unref (store->istream);
 		store->istream = NULL;
@@ -902,7 +890,6 @@ exception:
 		camel_object_unref (store->ostream);
 		store->ostream = NULL;
 	}
-	g_mutex_unlock (store->stream_lock);
 	store->connected = FALSE;
 
 	return FALSE;
@@ -1009,10 +996,8 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 	}
 	g_free (full_cmd);
 
-	g_mutex_lock (store->stream_lock);
 	store->ostream = cmd_stream;
 	store->istream = camel_stream_buffer_new (cmd_stream, CAMEL_STREAM_BUFFER_READ);
-	g_mutex_unlock (store->stream_lock);
 
 	store->connected = TRUE;
 	store->preauthed = FALSE;
@@ -1021,7 +1006,6 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 	/* Read the greeting, if any, and deal with PREAUTH */
 	if (camel_imap_store_readline (store, &buf, ex) < 0) 
 	{
-		g_mutex_lock (store->stream_lock);
 		if (store->istream) {
 			camel_object_unref (store->istream);
 			store->istream = NULL;
@@ -1031,7 +1015,6 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
 		}
-		g_mutex_unlock (store->stream_lock);
 
 		store->connected = FALSE;
 		return FALSE;
@@ -1044,7 +1027,6 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 	/* get the imap server capabilities */
 	if (!imap_get_capability (service, ex)) 
 	{
-		g_mutex_lock (store->stream_lock);
 		if (store->istream) {
 			camel_object_unref (store->istream);
 			store->istream = NULL;
@@ -1053,7 +1035,6 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
 		}
-		g_mutex_unlock (store->stream_lock);
 
 		store->connected = FALSE;
 		return FALSE;
@@ -1097,6 +1078,9 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	    && (command = camel_url_get_param(service->url, "command")))
 		return connect_to_server_process(service, command, ex);
 #endif
+
+	if (ex)
+		camel_exception_clear (ex);
 
 	if ((ssl_mode = camel_url_get_param (service->url, "use_ssl"))) 
 	{
@@ -1597,7 +1581,11 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	size_t len;
 	CamelImapStoreNamespace *ns;
 
-	let_idle_die (store);
+	camel_operation_uncancel (NULL);
+
+	imap_debug ("imap_connect_online\n");
+
+	let_idle_die (store, TRUE);
 
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 
@@ -1746,7 +1734,9 @@ imap_connect_offline (CamelService *service, CamelException *ex)
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 	CamelDiscoStore *disco_store = CAMEL_DISCO_STORE (service);
 
-	let_idle_die (store);
+	imap_debug ("imap_connect_offline\n");
+
+	let_idle_die (store, TRUE);
 
 	if (!disco_store->diary)
 		return FALSE;
@@ -1760,9 +1750,10 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 
-	let_idle_die (store);
+	imap_debug ("imap_disconnect_offline\n");
 
-	g_mutex_lock (store->stream_lock);
+	let_idle_die (store, TRUE);
+
 	if (store->istream) {
 		camel_stream_close(store->istream);
 		camel_object_unref(store->istream);
@@ -1774,7 +1765,6 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 		camel_object_unref(store->ostream);
 		store->ostream = NULL;
 	}
-	g_mutex_unlock (store->stream_lock);
 
 	store->connected = FALSE;
 	/* if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder)) 
@@ -1802,7 +1792,9 @@ imap_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 	CamelImapResponse *response;
 
-	let_idle_die (store);
+	imap_debug ("imap_disconnect_online\n");
+
+	let_idle_die (store, TRUE);
 
 	if (store->connected && clean) {
 		response = camel_imap_command (store, NULL, NULL, "LOGOUT");
@@ -3658,7 +3650,6 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 	if (!camel_disco_store_check_online((CamelDiscoStore *)store, ex))
 		return -1;
 
-	g_mutex_lock (store->stream_lock);
 	camel_imap_store_restore_stream_buffer (store);
 	stream = CAMEL_STREAM_BUFFER (store->istream);
 
@@ -3668,7 +3659,6 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 		if (linebuf[nread - 1] == '\n')
 			break;
 	}
-	g_mutex_unlock (store->stream_lock);
 
 	if (nread <= 0) {
 		if (errno == EINTR)
@@ -3677,6 +3667,7 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
 			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 			camel_service_connect (CAMEL_SERVICE (store), &mex);
+			imap_debug ("Recon: %s\n", camel_exception_get_description (&mex));
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					      _("Server unexpectedly disconnected: %s"),
@@ -3733,7 +3724,6 @@ camel_imap_store_readline_idle (CamelImapStore *store, char **dest, CamelExcepti
 	if (!camel_disco_store_check_online((CamelDiscoStore *)store, ex))
 		return -1;
 
-	g_mutex_lock (store->stream_lock);
 	camel_imap_store_restore_stream_buffer (store);
 	stream = CAMEL_STREAM_BUFFER (store->istream);
 
@@ -3743,7 +3733,6 @@ camel_imap_store_readline_idle (CamelImapStore *store, char **dest, CamelExcepti
 		if (linebuf[nread - 1] == '\n')
 			break;
 	}
-	g_mutex_unlock (store->stream_lock);
 
 	if (nread <= 0) {
 		if (errno == EINTR)
@@ -3752,6 +3741,7 @@ camel_imap_store_readline_idle (CamelImapStore *store, char **dest, CamelExcepti
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
 			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 			camel_service_connect (CAMEL_SERVICE (store), &mex);
+			imap_debug ("Recon in idle: %s\n", camel_exception_get_description (&mex));
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					      _("Server unexpectedly disconnected: %s"),
@@ -3825,6 +3815,7 @@ camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
 			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 			camel_service_connect (CAMEL_SERVICE (store), &mex);
+			imap_debug ("Recon in nl: %s\n", camel_exception_get_description (&mex));
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					      _("Server unexpectedly disconnected: %s"),
@@ -3869,12 +3860,9 @@ camel_imap_store_readline_nb (CamelImapStore *store, char **dest, CamelException
 
 	*dest = NULL;
 
-	g_mutex_lock (store->stream_lock);
 	if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
-	{
-		g_mutex_unlock (store->stream_lock);
 		return -1;
-	}
+
 	stream = CAMEL_STREAM_BUFFER (store->istream);
 	ba = g_byte_array_new ();
 	while ((nread = camel_tcp_stream_buffer_gets_nb (stream, linebuf, sizeof (linebuf))) > 0) 
@@ -3883,7 +3871,6 @@ camel_imap_store_readline_nb (CamelImapStore *store, char **dest, CamelException
 		if (linebuf[nread - 1] == '\n')
 			break;
 	}
-	g_mutex_unlock (store->stream_lock);
 
 	if (nread <= 0) {
 		g_byte_array_free (ba, TRUE);

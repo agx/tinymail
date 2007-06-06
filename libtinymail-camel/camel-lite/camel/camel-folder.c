@@ -1758,21 +1758,31 @@ filter_free(CamelSession *session, CamelSessionThreadMsg *msg)
 #endif
 
 
+struct _CamelFolderChangeInfoPrivate {
+	GHashTable *uid_stored;	/* what we have stored, which array they're in */
+	GHashTable *uid_source;	/* used to create unique lists */
+	GPtrArray  *uid_filter; /* uids to be filtered */
+	struct _EMemPool *uid_pool;	/* pool used to store copies of uid strings */
+};
+
+
 /* Event hooks that block emission when frozen */
 static gboolean
 folder_changed (CamelObject *obj, gpointer event_data)
 {
 	CamelFolder *folder = (CamelFolder *)obj;
 	CamelFolderChangeInfo *changed = event_data;
+	struct _CamelFolderChangeInfoPrivate *p = changed->priv;
 	CamelSession *session = ((CamelService *)folder->parent_store)->session;
 	CamelFilterDriver *driver = NULL;
 	GPtrArray *recents = NULL;
 	int i;
 
 	d(printf ("folder_changed(%p:'%s', %p), frozen=%d\n", obj, folder->full_name, event_data, folder->priv->frozen));
-	d(printf(" added %d removed %d changed %d recent %d\n",
+	d(printf(" added %d removed %d changed %d recent %d filter %d\n",
 		 changed->uid_added->len, changed->uid_removed->len,
-		 changed->uid_changed->len, changed->uid_recent->len));
+		 changed->uid_changed->len, changed->uid_recent->len,
+		 p->uid_filter->len));
 
 	if (changed == NULL) {
 		w(g_warning ("Class %s is passing NULL to folder_changed event",
@@ -1857,12 +1867,6 @@ camel_folder_free_deep (CamelFolder *folder, GPtrArray *array)
 	g_ptr_array_free (array, TRUE);
 }
 
-struct _CamelFolderChangeInfoPrivate {
-	GHashTable *uid_stored;	/* what we have stored, which array they're in */
-	GHashTable *uid_source;	/* used to create unique lists */
-	struct _EMemPool *uid_pool;	/* pool used to store copies of uid strings */
-};
-
 
 /**
  * camel_folder_change_info_new:
@@ -1887,6 +1891,7 @@ camel_folder_change_info_new(void)
 	info->priv = g_malloc0(sizeof(*info->priv));
 	info->priv->uid_stored = g_hash_table_new(g_str_hash, g_str_equal);
 	info->priv->uid_source = NULL;
+	info->priv->uid_filter = g_ptr_array_new();
 	info->priv->uid_pool = e_mempool_new(512, 256, E_MEMPOOL_ALIGN_BYTE);
 
 	return info;
@@ -2044,6 +2049,38 @@ camel_folder_change_info_build_diff(CamelFolderChangeInfo *info)
 }
 
 static void
+change_info_recent_uid(CamelFolderChangeInfo *info, const char *uid)
+{
+	struct _CamelFolderChangeInfoPrivate *p;
+	GPtrArray *olduids;
+	char *olduid;
+	
+	p = info->priv;
+
+	/* always add to recent, but dont let anyone else know */	
+	if (!g_hash_table_lookup_extended(p->uid_stored, uid, (void **)&olduid, (void **)&olduids)) {
+		olduid = e_mempool_strdup(p->uid_pool, uid);
+	}
+	g_ptr_array_add(info->uid_recent, olduid);
+}
+
+static void
+change_info_filter_uid(CamelFolderChangeInfo *info, const char *uid)
+{
+	struct _CamelFolderChangeInfoPrivate *p;
+	GPtrArray *olduids;
+	char *olduid;
+	
+	p = info->priv;
+
+	/* always add to filter, but dont let anyone else know */	
+	if (!g_hash_table_lookup_extended(p->uid_stored, uid, (void **)&olduid, (void **)&olduids)) {
+		olduid = e_mempool_strdup(p->uid_pool, uid);
+	}
+	g_ptr_array_add(p->uid_filter, olduid);
+}
+
+static void
 change_info_cat(CamelFolderChangeInfo *info, GPtrArray *source, void (*add)(CamelFolderChangeInfo *info, const char *uid))
 {
 	int i;
@@ -2070,7 +2107,8 @@ camel_folder_change_info_cat(CamelFolderChangeInfo *info, CamelFolderChangeInfo 
 	change_info_cat(info, source->uid_added, camel_folder_change_info_add_uid);
 	change_info_cat(info, source->uid_removed, camel_folder_change_info_remove_uid);
 	change_info_cat(info, source->uid_changed, camel_folder_change_info_change_uid);
-	change_info_cat(info, source->uid_recent, camel_folder_change_info_recent_uid);
+	change_info_cat(info, source->uid_recent, change_info_recent_uid);
+	change_info_cat(info, source->priv->uid_filter, change_info_filter_uid);
 }
 
 /**
@@ -2177,23 +2215,16 @@ camel_folder_change_info_change_uid(CamelFolderChangeInfo *info, const char *uid
  * @uid: a uid
  *
  * Add a recent uid to the changedinfo.
+ * This will also add the uid to the uid_filter array for potential
+ * filtering
  **/
 void
 camel_folder_change_info_recent_uid(CamelFolderChangeInfo *info, const char *uid)
 {
-	struct _CamelFolderChangeInfoPrivate *p;
-	GPtrArray *olduids;
-	char *olduid;
-	
 	g_assert(info != NULL);
 	
-	p = info->priv;
-
-	/* always add to recent, but dont let anyone else know */	
-	if (!g_hash_table_lookup_extended(p->uid_stored, uid, (void **)&olduid, (void **)&olduids)) {
-		olduid = e_mempool_strdup(p->uid_pool, uid);
-	}
-	g_ptr_array_add(info->uid_recent, olduid);
+	change_info_recent_uid(info, uid);
+	change_info_filter_uid(info, uid);
 }
 
 /**
@@ -2240,6 +2271,7 @@ camel_folder_change_info_clear(CamelFolderChangeInfo *info)
 	}
 	g_hash_table_destroy(p->uid_stored);
 	p->uid_stored = g_hash_table_new(g_str_hash, g_str_equal);
+	g_ptr_array_set_size(p->uid_filter, 0);
 	e_mempool_flush(p->uid_pool, TRUE);
 }
 
@@ -2263,6 +2295,7 @@ camel_folder_change_info_free(CamelFolderChangeInfo *info)
 		g_hash_table_destroy(p->uid_source);
 
 	g_hash_table_destroy(p->uid_stored);
+	g_ptr_array_free(p->uid_filter, TRUE);
 	e_mempool_destroy(p->uid_pool);
 	g_free(p);
 

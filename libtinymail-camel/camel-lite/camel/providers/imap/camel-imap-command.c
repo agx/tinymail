@@ -296,15 +296,16 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	{
 		CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 
-		if (errno == EINTR)
+		if (errno == EINTR) {
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					     _("Operation cancelled"));
-		else
+		} else
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     g_strerror (errno));
 
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &mex);
 		camel_service_connect (CAMEL_SERVICE (store), &mex);
+		imap_debug ("Recon in start: %s\n", camel_exception_get_description (&mex));
 
 		return FALSE;
 	}
@@ -340,10 +341,14 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 	
 	if (camel_stream_write (store->ostream, cmd, cmdlen) == -1 ||
 	    camel_stream_write (store->ostream, "\r\n", 2) == -1) {
-		if (errno == EINTR)
+		if (errno == EINTR) {
+			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					     _("Operation cancelled"));
-		else
+			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			camel_service_connect (CAMEL_SERVICE (store), &mex);
+			imap_debug ("Recon in cont: %s\n", camel_exception_get_description (&mex));
+		} else
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     g_strerror (errno));
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
@@ -383,7 +388,7 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 		return CAMEL_IMAP_RESPONSE_ERROR;
 	}
 
-	/* printf ("<-- %s\n", respbuf); */
+	imap_debug ("(.., ..) <- %s\n", respbuf);
 
 	switch (*respbuf) {
 	case '*':
@@ -608,10 +613,15 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 		
 		do {
 			if ((n = camel_stream_read (store->istream, str->str + nread + 1, length - nread)) == -1) {
-				if (errno == EINTR)
+				if (errno == EINTR) 
+				{
+					CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 					camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 							     _("Operation cancelled"));
-				else
+					camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+					camel_service_connect (CAMEL_SERVICE (store), &mex);
+					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
+				} else
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     g_strerror (errno));
 				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
@@ -758,10 +768,14 @@ imap_read_untagged_idle (CamelImapStore *store, char *line, CamelException *ex)
 		
 		do {
 			if ((n = camel_stream_read_idle (store->istream, str->str + nread + 1, length - nread)) == -1) {
-				if (errno == EINTR)
+				if (errno == EINTR) {
+					CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 					camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 							     _("Operation cancelled"));
-				else
+					camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+					camel_service_connect (CAMEL_SERVICE (store), &mex);
+					imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
+				} else
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     g_strerror (errno));
 				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);

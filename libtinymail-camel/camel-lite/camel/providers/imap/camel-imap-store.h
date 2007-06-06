@@ -128,11 +128,10 @@ typedef enum {
 #define IMAP_PARAM_SUBSCRIPTIONS		(1 << 5)
 
 struct _CamelImapStore {
-	CamelDiscoStore parent_object;	
+	CamelDiscoStore parent_object;
 	
 	CamelStream *istream;
 	CamelStream *ostream;
-	GMutex *stream_lock;
 
 	struct _CamelImapStoreSummary *summary;
 	

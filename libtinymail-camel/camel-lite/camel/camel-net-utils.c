@@ -656,10 +656,10 @@ camel_getaddrinfo(const char *name, const char *service, const struct addrinfo *
 #endif
 	g_return_val_if_fail(name != NULL, NULL);
 	
-	if (camel_operation_cancel_check(NULL)) {
+	/*if (camel_operation_cancel_check(NULL)) {
 		camel_exception_set(ex, CAMEL_EXCEPTION_USER_CANCEL, _("Canceled"));
 		return NULL;
-	}
+	}*/
 
 	camel_operation_start_transient(NULL, "Resolving: %s", name);
 

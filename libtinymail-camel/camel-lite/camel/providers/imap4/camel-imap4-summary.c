@@ -1,6 +1,8 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /*  Camel
- *  Copyright (C) 1999-2006 Jeffrey Stedfast
+ *  Copyright (C) 1999-2007 Novell, Inc. (www.novell.com)
+ *
+ *  Authors: Jeffrey Stedfast <fejj@novell.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -14,7 +16,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+ *  Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -725,7 +727,7 @@ imap4_fetch_all_free (struct imap4_fetch_all_t *fetch)
 		if (!(envelope = fetch->added->pdata[i]))
 			continue;
 		
-		camel_message_info_free(envelope->info);
+		camel_message_info_free (envelope->info);
 		g_free (envelope);
 	}
 	
@@ -811,18 +813,18 @@ imap4_fetch_all_update (struct imap4_fetch_all_t *fetch)
 	CamelMessageInfo *info;
 	guint32 first = 0;
 	guint32 flags;
-	int scount, i;
+	int total, i;
 	
 	changes = fetch->changes;
 	
-	scount = camel_folder_summary_count (fetch->summary);
-	for (i = fetch->first - 1; i < scount; i++) {
+	total = camel_folder_summary_count (fetch->summary);
+	for (i = 0; i < total; i++) {
 		info = camel_folder_summary_index (fetch->summary, i);
 		if (!(envelope = g_hash_table_lookup (fetch->uid_hash, camel_message_info_uid (info)))) {
 			/* remove it */
 			camel_folder_change_info_remove_uid (changes, camel_message_info_uid (info));
 			camel_folder_summary_remove (fetch->summary, info);
-			scount--;
+			total--;
 			i--;
 		} else if (envelope->changed & IMAP4_FETCH_FLAGS) {
 			/* update it with the new flags */

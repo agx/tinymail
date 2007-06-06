@@ -3406,7 +3406,6 @@ idle_real_start (CamelImapStore *store)
 
 	idle_debug ("idle_real_start\n");
 
-	g_mutex_lock (store->stream_lock);
 	if (store->ostream && store->istream && CAMEL_IS_STREAM (store->ostream))
 	{
 		store->idle_prefix = g_strdup_printf ("%c%.5u", 
@@ -3450,8 +3449,8 @@ idle_real_start (CamelImapStore *store)
 		g_free (resp);
 
 errh:
-	g_mutex_unlock (store->stream_lock);
 
+	return;
 }
 
 static IdleResponse*
@@ -3500,13 +3499,12 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 		if (resp)
 			g_free (resp);
 
-		g_mutex_lock (store->stream_lock);
 		if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
-			{ g_mutex_unlock (store->stream_lock); return NULL; }
+			return NULL;
 		if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
-			{ g_mutex_unlock (store->stream_lock); return NULL; }
+			return NULL;
 		if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
-			{ g_mutex_unlock (store->stream_lock); return NULL; }
+			return NULL;
 
 		/* Here we force the server to tell us about the changes: */
 
@@ -3521,7 +3519,6 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 			idle_debug ("Sending DONE in idle_deal_with_stuff (nb)\n");
 			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
 		}
-		g_mutex_unlock (store->stream_lock);
 
 		if (nwritten == -1) 
 			goto outofhere;
@@ -3548,18 +3545,16 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 			g_free (resp);
 
 	} else {
-		g_mutex_lock (store->stream_lock);
 		if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
-			{ g_mutex_unlock (store->stream_lock); return NULL; }
+			return NULL;
 		if (store->istream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
-			{ g_mutex_unlock (store->stream_lock); return NULL; }
+			return NULL;
 		if (store->ostream == NULL || ((CamelObject *)store->istream)->ref_count <= 0)
-			{ g_mutex_unlock (store->stream_lock); return NULL; }
+			return NULL;
 		if (store->ostream && CAMEL_IS_STREAM (store->ostream)) {
 			idle_debug ("Sending DONE in idle_deal_with_stuff (b)\n");
 			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
 		}
-		g_mutex_unlock (store->stream_lock);
 		if (nwritten == -1) 
 			goto outofhere;
 		resp = NULL;
@@ -4060,8 +4055,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			camel_imap_command_start (store, folder, ex,
 				"UID FETCH %s BINARY.PEEK[%s]", uid, section_text);
 
-			g_mutex_lock (store->stream_lock);
-
 			two_bytes [0] = ' ';
 
 			/* a01 uid fetch 1 BINARY.PEEK[]
@@ -4141,7 +4134,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					nread = camel_stream_read (store->ostream, two_bytes, 1); 
 			}
 berrorhander:
-			g_mutex_unlock (store->stream_lock);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			/* Starts idle */
 			/* camel_imap_folder_start_idle ((CamelFolder *) imap_folder); */
@@ -4173,7 +4165,6 @@ berrorhander:
 			tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
 			taglen = strlen (tag);
 
-			g_mutex_lock (store->stream_lock);
 			server_stream = (CamelStreamBuffer*) store->istream;
 
 			if (!server_stream)
@@ -4242,7 +4233,6 @@ berrorhander:
 				memset (line, 0, MAX_LINE_LEN);
 			  }
 
-			g_mutex_unlock (store->stream_lock);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			/* Starts idle */
 			/* camel_imap_folder_start_idle ((CamelFolder *) imap_folder); */
@@ -4293,7 +4283,6 @@ berrorhander:
 			tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
 			taglen = strlen (tag);
 
-			g_mutex_lock (store->stream_lock);
 
 			if (!store->istream || ((CamelObject *)store->istream)->ref_count <= 0)
 			{
@@ -4409,7 +4398,6 @@ berrorhander:
 				memset (line, 0, MAX_LINE_LEN);
 			  }
 rerrorhandler:
-			g_mutex_unlock (store->stream_lock);
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			/* Starts idle */
 			/* camel_imap_store_start_idle (store); */

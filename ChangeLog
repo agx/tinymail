@@ -1,3 +1,8 @@
+2007-06-07  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Merged camel-lite with upstream Camel revision 7777
+	* Various connection cancellation problems fixed in the IMAP code
+
 2007-06-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed the OpenSSL support, although I'm leaving the warnings in

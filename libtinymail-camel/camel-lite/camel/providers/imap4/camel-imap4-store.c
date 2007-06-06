@@ -1,8 +1,8 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
-/*
- *  Authors: Jeffrey Stedfast <fejj@novell.com>
+/*  Camel
+ *  Copyright (C) 1999-2007 Novell, Inc. (www.novell.com)
  *
- *  Copyright 2005 Novell, Inc. (www.novell.com)
+ *  Authors: Jeffrey Stedfast <fejj@novell.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -16,8 +16,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
- *
+ *  Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 
@@ -321,7 +320,14 @@ connect_to_server (CamelIMAP4Engine *engine, struct addrinfo *ai, int ssl_mode, 
 	}
 	
 	camel_imap4_command_unref (ic);
-	
+
+	if (camel_tcp_stream_ssl_enable_ssl ((CamelTcpStreamSSL *) tcp_stream) == -1) {
+                camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+                                      _("Failed to connect to IMAP server %s in secure mode: %s"),
+                                      service->url->host, _("TLS negotiations failed"));
+		return FALSE;
+	}
+
 	return TRUE;
 #else
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
