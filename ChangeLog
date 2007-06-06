@@ -8,6 +8,8 @@
 	* Changed the use_ssl options to "wrapped", "tls", "when-possible" and
 	"never" for both POP3 and IMAP
 	* Some connection fixes in the IMAP and POP3 connection procedures
+	* Fixed the configure.ac of camel-lite, it had a small OpenSSL vs. NSS
+	mixup
 
 2007-06-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
