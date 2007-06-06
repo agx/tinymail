@@ -4,7 +4,7 @@ related to Tinymail go into ../../ChangeLog
 
 2007-06-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
-	* Merged with upstream Camel revision 7810
+	* Merged with upstream Camel revision 7812
 	* http://svn.gnome.org/svn/evolution-data-server/trunk/camel
 
 2007-05-20  Philip Van Hoof  <pvanhoof@gnome.org>
