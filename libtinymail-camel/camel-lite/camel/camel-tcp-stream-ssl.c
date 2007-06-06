@@ -350,6 +350,8 @@ camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *ssl)
 		}
 	}
 
+	/* restore O_NONBLOCK options */
+	sockopts.option = PR_SockOpt_Nonblocking;
 	sockopts.value.non_blocking = nonblock;
 	PR_SetSocketOption (ssl->priv->sockfd, &sockopts);
 
@@ -409,6 +411,9 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 				 PR_GetError () == PR_WOULD_BLOCK_ERROR)));
 	
 	/* restore O_NONBLOCK options */
+	sockopts.option = PR_SockOpt_Nonblocking;
+	sockopts.value.non_blocking = nonblock;
+	PR_SetSocketOption (tcp_stream_ssl->priv->sockfd, &sockopts);
 
 	return nread;
 }
