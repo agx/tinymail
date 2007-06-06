@@ -638,8 +638,9 @@ enum {
 
 #ifdef HAVE_SSL
 #define SSL_PORT_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_SSL2 | CAMEL_TCP_STREAM_SSL_ENABLE_SSL3)
-#define STARTTLS_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_TLS) /* | CAMEL_TCP_STREAM_SSL_ENABLE_SSL3)*/
+#define STARTTLS_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_TLS)
 #endif
+
 
 gboolean 
 camel_imap_store_restore_stream_buffer (CamelImapStore *store)

@@ -313,7 +313,17 @@ int
 camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *ssl)
 {
 	PRFileDesc *fd;
-	
+	int nonblock;
+	PRSocketOptionData sockopts;
+
+	/* get O_NONBLOCK options */
+	sockopts.option = PR_SockOpt_Nonblocking;
+	PR_GetSocketOption (ssl->priv->sockfd, &sockopts);
+	sockopts.option = PR_SockOpt_Nonblocking;
+	nonblock = sockopts.value.non_blocking;
+	sockopts.value.non_blocking = FALSE;
+	PR_SetSocketOption (ssl->priv->sockfd, &sockopts);
+
 	g_return_val_if_fail (CAMEL_IS_TCP_STREAM_SSL (ssl), -1);
 	
 	if (ssl->priv->sockfd && !ssl->priv->ssl_mode) 
@@ -339,6 +349,9 @@ camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *ssl)
 			return -1;
 		}
 	}
+
+	sockopts.value.non_blocking = nonblock;
+	PR_SetSocketOption (ssl->priv->sockfd, &sockopts);
 
 	ssl->priv->ssl_mode = TRUE;
 
