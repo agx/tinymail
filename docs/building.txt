@@ -132,3 +132,12 @@ For debugging
 CFLAGS="-DDEBUG -DDBC -D_GNU_SOURCE -O0 -Wstrict-prototypes -Wall -g -ggdb" PKG_CONFIG_PATH=/opt/asyncworker/lib/pkgconfig \
 	./autogen.sh --prefix=/opt/tinymail --enable-asyncworker --enable-tests --enable-unit-tests && make && sudo make install
 
+SSL support
+-----------
+If you want to build with support for SSL, you can either choose for Mozilla's NSS or OpenSSL:
+
+  --with-ssl=nss        Detect NSS and if available, use it
+  --with-ssl=nss-must   Require NSS and it not available, fail the build
+  --with-ssl=openssl    Detect OpenSSL and if available, use it
+  --with-ssl=none       Do NOT detect any SSL, and DON'T use it
+
