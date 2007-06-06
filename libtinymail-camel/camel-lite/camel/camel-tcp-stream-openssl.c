@@ -53,7 +53,7 @@
 
 #include "camel-tcp-stream-ssl.h"
 
-#define d(x) g_print (x)
+#define d(x)
 
 static CamelTcpStreamClass *parent_class = NULL;
 

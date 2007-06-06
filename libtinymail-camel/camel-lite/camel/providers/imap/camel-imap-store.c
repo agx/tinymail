@@ -638,7 +638,7 @@ enum {
 
 #ifdef HAVE_SSL
 #define SSL_PORT_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_SSL2 | CAMEL_TCP_STREAM_SSL_ENABLE_SSL3)
-#define STARTTLS_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_TLS | CAMEL_TCP_STREAM_SSL_ENABLE_SSL3)
+#define STARTTLS_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_TLS) /* | CAMEL_TCP_STREAM_SSL_ENABLE_SSL3)*/
 #endif
 
 gboolean 
@@ -849,8 +849,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (camel_tcp_stream_ssl_enable_ssl (CAMEL_TCP_STREAM_SSL (tcp_stream)) == -1) 
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				_("Failed to connect to IMAP server %s in secure mode: %s"),
-				service->url->host, _("SSL negotiations failed"));
+				_("Failed to connect to IMAP server %s in secure mode: %s (%s)"),
+				service->url->host, _("SSL negotiations failed"), strerror (errno));
 		goto exception;
 	}
 
@@ -868,7 +868,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (!imap_get_capability (service, ex)) 
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-			_("Failed to connect to IMAP server %s"),
+			_("Failed to connect to IMAP server %s (%s)"),
 			service->url->host, _("Reading second CAPABILITY failed"));
 		goto exception;
 	}

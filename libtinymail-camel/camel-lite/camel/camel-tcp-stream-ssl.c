@@ -316,27 +316,32 @@ camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *ssl)
 	
 	g_return_val_if_fail (CAMEL_IS_TCP_STREAM_SSL (ssl), -1);
 	
-	if (ssl->priv->sockfd && !ssl->priv->ssl_mode) {
-		if (!(fd = enable_ssl (ssl, NULL))) {
+	if (ssl->priv->sockfd && !ssl->priv->ssl_mode) 
+	{
+
+		if (!(fd = enable_ssl (ssl, NULL))) 
+		{
 			set_errno (PR_GetError ());
 			return -1;
 		}
-		
+
 		ssl->priv->sockfd = fd;
-		
-		if (SSL_ResetHandshake (fd, FALSE) == SECFailure) {
+
+		if (SSL_ResetHandshake (fd, FALSE) == SECFailure) 
+		{
 			set_errno (PR_GetError ());
 			return -1;
 		}
-		
-		if (SSL_ForceHandshake (fd) == -1) {
+
+		if (SSL_ForceHandshake (fd) == SECFailure) 
+		{
 			set_errno (PR_GetError ());
 			return -1;
 		}
 	}
-	
+
 	ssl->priv->ssl_mode = TRUE;
-	
+
 	return 0;
 }
 
@@ -527,7 +532,7 @@ stream_read_idle (CamelStream *stream, char *buffer, size_t n)
 			pollfds[1].out_flags = 0;
 			nread = -1;
 
-			res = PR_Poll(pollfds, 2, 5);
+			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * 5);
 
 			if (res == -1)
 				set_errno(PR_GetError());
