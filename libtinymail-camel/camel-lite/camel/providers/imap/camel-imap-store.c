@@ -140,6 +140,18 @@ static void imap_set_server_level (CamelImapStore *store);
 
 static GPtrArray* imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
 
+void
+camel_imap_recon (CamelImapStore *store, CamelException *mex)
+{
+	camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+	camel_service_connect (CAMEL_SERVICE (store), mex);
+	if (mex && camel_exception_is_set (mex))
+	{
+		camel_exception_clear (mex);
+		sleep (1);
+		camel_service_connect (CAMEL_SERVICE (store), mex);
+	}
+}
 
 static void 
 imap_delete_cache  (CamelStore *store)
@@ -3665,8 +3677,7 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 		{
 			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-			camel_service_connect (CAMEL_SERVICE (store), &mex);
+			camel_imap_recon (store, &mex);
 			imap_debug ("Recon: %s\n", camel_exception_get_description (&mex));
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
@@ -3739,8 +3750,7 @@ camel_imap_store_readline_idle (CamelImapStore *store, char **dest, CamelExcepti
 		{
 			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-			camel_service_connect (CAMEL_SERVICE (store), &mex);
+			camel_imap_recon (store, &mex);
 			imap_debug ("Recon in idle: %s\n", camel_exception_get_description (&mex));
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
@@ -3813,8 +3823,7 @@ camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException
 		{
 			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-			camel_service_connect (CAMEL_SERVICE (store), &mex);
+			camel_imap_recon (store, &mex);
 			imap_debug ("Recon in nl: %s\n", camel_exception_get_description (&mex));
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,

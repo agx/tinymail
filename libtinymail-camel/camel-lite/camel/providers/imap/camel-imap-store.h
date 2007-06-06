@@ -185,6 +185,7 @@ gboolean camel_imap_store_restore_stream_buffer (CamelImapStore *store);
 
 void camel_imap_store_stop_idle (CamelImapStore *store);
 void camel_imap_store_start_idle (CamelImapStore *store);
+void camel_imap_recon (CamelImapStore *store, CamelException *mex);
 
 G_END_DECLS
 
