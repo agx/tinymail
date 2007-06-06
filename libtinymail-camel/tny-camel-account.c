@@ -148,11 +148,21 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
  * @option: a "key=value" Camel option
  *
  * Add a Camel option to this #TnyCamelAccount instance. For example
- * "use_ssl=always" is the typical option added. Other possibilities for
- * the "use_ssl" option are "never" and "when-possible".
+ * "use_ssl=wrapped" or "use_ssl=starttls" are the typical options added. 
+ * Other possibilities for the "use_ssl" option are "never" and "when-possible".
  *
- * The "always" means that normal SSL is used whereas "when-possible" means 
- * that TLS is tried (the STARTTLS capability of IMAP servers).
+ * use_ssl=wrapped will wrap the connection on default port 993 with SSL or
+ * also called "imaps"
+ *
+ * use_ssl=tls will connect using default port 143 and will require the
+ * support for STARTTLS, which is the command for letting the connection be
+ * encrypted in IMAP.
+ *
+ * use_ssl=when-possible will try to do a STARTTLS, but will fallback to a non
+ * encrypted session if it fails (not recommended, as your users will want SSL
+ * if they specify this)
+ *
+ * use_ssl=never will forcefully make sure that no SSL is to be used
  *
  **/
 void 

@@ -77,7 +77,7 @@ AC_HELP_STRING([--with-ssl],
     openssl) ;;
     none) ;;
     *) AC_MSG_ERROR(bad value ${with_ssl} for --with-ssl) ;;
-esac], [with_ssl="nss"])
+   esac], [with_ssl="nss"])
 
 if test x"$with_ssl" != "xnone"; then
 

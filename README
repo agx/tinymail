@@ -107,7 +107,7 @@ gconftool-2 -s /apps/tinymail/accounts/0/hostname -t string [mailserver]
 
 To use SSL (other values are "never" and "when-possible"):
 
-gconftool-2 -s /apps/tinymail/accounts/0/options -t list --list-type=string '[use_ssl=always]'
+gconftool-2 -s /apps/tinymail/accounts/0/options -t list --list-type=string '[use_ssl=wrapped]'
 
 Distribution specific: also check out requirements.txt
 ------------------------------------------------------

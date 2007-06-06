@@ -670,7 +670,7 @@ camel_imap_store_restore_stream_buffer (CamelImapStore *store)
 }
 
 static gboolean
-connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, CamelException *ex)
+connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int must_tls, CamelException *ex)
 {
 	CamelImapStore *store = (CamelImapStore *) service;
 	CamelImapResponse *response;
@@ -681,26 +681,29 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	char *buf;
 	gboolean not_ssl = TRUE;
 
-	if (ssl_mode != MODE_CLEAR) {
+	if (ssl_mode != MODE_CLEAR) 
+	{
 		not_ssl = FALSE;
+
 #ifdef HAVE_SSL
-		if (ssl_mode == MODE_TLS) {
+		if (ssl_mode == MODE_TLS)
 			tcp_stream = camel_tcp_stream_ssl_new_raw (service->session, service->url->host, STARTTLS_FLAGS);
-		} else {
+		else 
 			tcp_stream = camel_tcp_stream_ssl_new (service->session, service->url->host, SSL_PORT_FLAGS);
-		}
 #else
+
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-				      _("Could not connect to %s: %s"),
-				      service->url->host, _("SSL unavailable"));
-		
+				_("Could not connect to %s: %s"),
+				service->url->host, _("SSL unavailable in this build"));
+
 		return FALSE;
+
 #endif /* HAVE_SSL */
-	} else {
+	} else
 		tcp_stream = camel_tcp_stream_raw_new ();
-	}
-	
-	if (camel_tcp_stream_connect ((CamelTcpStream *) tcp_stream, ai) == -1) {
+
+	if (camel_tcp_stream_connect ((CamelTcpStream *) tcp_stream, ai) == -1) 
+	{
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					     _("Connection cancelled"));
@@ -709,9 +712,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 					      _("Could not connect to %s: %s"),
 					      service->url->host,
 					      g_strerror (errno));
-		
 		camel_object_unref (tcp_stream);
-		
 		return FALSE;
 	}
 
@@ -737,28 +738,17 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	/* Read the greeting, if any, and deal with PREAUTH */
 	if (camel_imap_store_readline (store, &buf, ex) < 0) 
 	{
-
-		g_mutex_lock (store->stream_lock);
-		if (store->istream) {
-			camel_object_unref (store->istream);
-			store->istream = NULL;
-		}
-		
-		if (store->ostream) {
-			camel_object_unref (store->ostream);
-			store->ostream = NULL;
-		}
-		g_mutex_unlock (store->stream_lock);
-
-		store->connected = FALSE;
-		
-		return FALSE;
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			_("Failed to connect to IMAP server %s"),
+			service->url->host, _("Reading IMAP greeting failed"));
+		goto exception;
 	}
-	
+
 	if (!strncmp(buf, "* PREAUTH", 9))
 		store->preauthed = TRUE;
-	
-	if (strstr (buf, "Courier-IMAP") || getenv("CAMEL_IMAP_BRAINDAMAGED")) {
+
+	if (strstr (buf, "Courier-IMAP") || getenv("CAMEL_IMAP_BRAINDAMAGED")) 
+	{
 		/* Courier-IMAP is braindamaged. So far this flag only
 		 * works around the fact that Courier-IMAP is known to
 		 * give invalid BODY responses seemingly because its
@@ -766,7 +756,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		 * them so we always have to request the full messages
 		 * rather than getting individual parts. */
 		store->braindamaged = TRUE;
-	} else if (strstr (buf, "WEB.DE") || strstr (buf, "Mail2World")) {
+	} else if (strstr (buf, "WEB.DE") || strstr (buf, "Mail2World")) 
+	{
 		/* This is a workaround for servers which advertise
 		 * IMAP4rev1 but which can sometimes subtly break in
 		 * various ways if we try to use IMAP4rev1 queries.
@@ -785,61 +776,57 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		 **/
 		force_imap4 = TRUE;
 	}
-	
 
 	/* Tinymail hack: always use IMAP4, not IMAP4rev1 (sorry) */
-
 	/* force_imap4 = TRUE; */
 	store->braindamaged = TRUE;
-
 	/* end of hack :) */
 
 	g_free (buf);
-	
+
 	/* get the imap server capabilities */
 	if (!imap_get_capability (service, ex)) 
 	{
-		g_mutex_lock (store->stream_lock);
-		if (store->istream) {
-			camel_object_unref (store->istream);
-			store->istream = NULL;
-		}
-		
-		if (store->ostream) {
-			camel_object_unref (store->ostream);
-			store->ostream = NULL;
-		}
-		g_mutex_unlock (store->stream_lock);
-
-		store->connected = FALSE;
-		return FALSE;
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			_("Failed to connect to IMAP server %s"),
+			service->url->host, _("Reading first CAPABILITY failed"));
+		goto exception;
 	}
-	
-	if (force_imap4) {
+
+	if (must_tls && !(store->capabilities & IMAP_CAPABILITY_STARTTLS))
+	{
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			_("Failed to connect to IMAP server %s"),
+			service->url->host, _("STARTTLS not announced as supported on this server"));
+		goto exception;
+	}
+
+	if (force_imap4) 
+	{
 		store->capabilities &= ~IMAP_CAPABILITY_IMAP4REV1;
 		store->server_level = IMAP_LEVEL_IMAP4;
 	}
-	
-	if (not_ssl || ssl_mode != MODE_TLS) {
 
+	if (!must_tls && (not_ssl || ssl_mode != MODE_TLS)) 
+	{
 		/* we're done */
-
 		return TRUE;
-
 	}
-	
+
+
 #ifdef HAVE_SSL
-	if (!(store->capabilities & IMAP_CAPABILITY_STARTTLS)) {
+
+	if (!(store->capabilities & IMAP_CAPABILITY_STARTTLS)) 
+	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Failed to connect to IMAP server %s in secure mode: %s"),
 				      service->url->host, _("STARTTLS not supported"));
-		
 		goto exception;
 	}
-	
+
 	/* as soon as we send a STARTTLS command, all hope is lost of a clean QUIT if problems arise */
 	clean_quit = FALSE;
-	
+
 	response = camel_imap_command (store, NULL, ex, "STARTTLS");
 	if (!response) 
 	{
@@ -849,60 +836,56 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		store->istream = NULL;
 		store->ostream = NULL;
 		g_mutex_unlock (store->stream_lock);
-
-		return FALSE;
-	}
-	
-	camel_imap_response_free_without_processing (store, response);
-	
-	/* Okay, now toggle SSL/TLS mode */
-	if (camel_tcp_stream_ssl_enable_ssl (CAMEL_TCP_STREAM_SSL (tcp_stream)) == -1) {
+		clean_quit = FALSE;
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				      _("Failed to connect to IMAP server %s in secure mode: %s"),
-				      service->url->host, _("SSL negotiations failed"));
+				_("Failed to connect to IMAP server %s in secure mode: %s"),
+				service->url->host, _("STARTTLS not supported"));
 		goto exception;
 	}
+
+	camel_imap_response_free_without_processing (store, response);
+
+	/* Okay, now toggle SSL/TLS mode */
+	if (camel_tcp_stream_ssl_enable_ssl (CAMEL_TCP_STREAM_SSL (tcp_stream)) == -1) 
+	{
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				_("Failed to connect to IMAP server %s in secure mode: %s"),
+				service->url->host, _("SSL negotiations failed"));
+		goto exception;
+	}
+
 #else
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 			      _("Failed to connect to IMAP server %s in secure mode: %s"),
 			      service->url->host, _("SSL is not available in this build"));
 	goto exception;
 #endif /* HAVE_SSL */
-	
+
+
 	/* rfc2595, section 4 states that after a successful STLS
-           command, the client MUST discard prior CAPA responses */
+	   command, the client MUST discard prior CAPA responses */
+
 	if (!imap_get_capability (service, ex)) 
 	{
-
-		g_mutex_lock (store->stream_lock);
-		if (store->istream) {
-			camel_object_unref (store->istream);
-			store->istream = NULL;
-		}
-		
-		if (store->ostream) {
-			camel_object_unref (store->ostream);
-			store->ostream = NULL;
-		}
-		g_mutex_unlock (store->stream_lock);
-
-		store->connected = FALSE;
-		
-		return FALSE;
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			_("Failed to connect to IMAP server %s"),
+			service->url->host, _("Reading second CAPABILITY failed"));
+		goto exception;
 	}
 
 	if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED ) { 
-		clean_quit = TRUE;
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				_("Failed to connect to IMAP server %s in secure mode: %s"), service->url->host, _("Unknown error"));
+				_("Failed to connect to IMAP server %s in secure mode: %s"), 
+				service->url->host, _("Unknown error, LOGINDISABLED with SSL"));
 		goto exception;
 	}
 
 	return TRUE;
-	
- exception:
-	
-	if (clean_quit && store->connected) {
+
+exception:
+
+	if (clean_quit && store->connected) 
+	{
 		/* try to disconnect cleanly */
 		response = camel_imap_command (store, NULL, ex, "LOGOUT");
 		if (response)
@@ -914,15 +897,13 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 		camel_object_unref (store->istream);
 		store->istream = NULL;
 	}
-	
 	if (store->ostream) {
 		camel_object_unref (store->ostream);
 		store->ostream = NULL;
 	}
 	g_mutex_unlock (store->stream_lock);
-
 	store->connected = FALSE;
-	
+
 	return FALSE;
 }
 
@@ -1011,7 +992,7 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 
 	while (i)
 		g_free(child_env[--i]);
-		
+
 	if (ret == -1) {
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
@@ -1035,7 +1016,7 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 	store->connected = TRUE;
 	store->preauthed = FALSE;
 	store->command = 0;
-	
+
 	/* Read the greeting, if any, and deal with PREAUTH */
 	if (camel_imap_store_readline (store, &buf, ex) < 0) 
 	{
@@ -1054,10 +1035,11 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 		store->connected = FALSE;
 		return FALSE;
 	}
+
 	if (!strncmp(buf, "* PREAUTH", 9))
 		store->preauthed = TRUE;
 	g_free (buf);
-	
+
 	/* get the imap server capabilities */
 	if (!imap_get_capability (service, ex)) 
 	{
@@ -1066,7 +1048,6 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 			camel_object_unref (store->istream);
 			store->istream = NULL;
 		}
-		
 		if (store->ostream) {
 			camel_object_unref (store->ostream);
 			store->ostream = NULL;
@@ -1076,7 +1057,7 @@ connect_to_server_process (CamelService *service, const char *cmd, CamelExceptio
 		store->connected = FALSE;
 		return FALSE;
 	}
-	
+
 	return TRUE;
 	
 }
@@ -1088,12 +1069,14 @@ static struct {
 	char *serv;
 	char *port;
 	int mode;
+	int must_tls;
 } ssl_options[] = {
-	{ "",              "imaps", IMAPS_PORT, MODE_SSL   },  /* really old (1.x) */
-	{ "always",        "imaps", IMAPS_PORT, MODE_SSL   },
-	{ "when-possible", "imap",  IMAP_PORT,  MODE_TLS   },
-	{ "never",         "imap",  IMAP_PORT,  MODE_CLEAR },
-	{ NULL,            "imap",  IMAP_PORT,  MODE_CLEAR },
+	{ "",              "imaps", IMAPS_PORT, MODE_SSL, 0   },  /* really old (1.x) */
+	{ "wrapped",       "imaps", IMAPS_PORT, MODE_SSL, 0   },
+	{ "tls",           "imap",  IMAPS_PORT, MODE_TLS, 1   },
+	{ "when-possible", "imap",  IMAP_PORT,  MODE_TLS, 0   },
+	{ "never",         "imap",  IMAP_PORT,  MODE_CLEAR, 0 },
+	{ NULL,            "imap",  IMAP_PORT,  MODE_CLEAR, 0 },
 };
 
 
@@ -1102,7 +1085,7 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 {
 	const char *ssl_mode;
 	struct addrinfo hints, *ai;
-	int mode = -1, ret, i;
+	int mode = -1, ret, i, must_tls = 0;
 	char *serv;
 	const char *port;
 
@@ -1112,42 +1095,50 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	if (camel_url_get_param(service->url, "use_command")
 	    && (command = camel_url_get_param(service->url, "command")))
 		return connect_to_server_process(service, command, ex);
-#endif	
-	if ((ssl_mode = camel_url_get_param (service->url, "use_ssl"))) {
+#endif
+
+	if ((ssl_mode = camel_url_get_param (service->url, "use_ssl"))) 
+	{
 		for (i = 0; ssl_options[i].value; i++)
 			if (!strcmp (ssl_options[i].value, ssl_mode))
 				break;
 		mode = ssl_options[i].mode;
 		serv = ssl_options[i].serv;
 		port = ssl_options[i].port;
-	} else {
+		must_tls = ssl_options[i].must_tls;
+	} else 
+	{
 		mode = MODE_CLEAR;
 		serv = "imap";
 		port = IMAP_PORT;
+		must_tls = 0;
 	}
-	
-	if (service->url->port) {
+
+	if (service->url->port) 
+	{
 		serv = g_alloca (16);
 		sprintf (serv, "%d", service->url->port);
 		port = NULL;
 	}
-	
+
 	memset (&hints, 0, sizeof (hints));
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_family = PF_UNSPEC;
+
 	ai = camel_getaddrinfo(service->url->host, serv, &hints, ex);
-	if (ai == NULL && port != NULL && camel_exception_get_id(ex) != CAMEL_EXCEPTION_USER_CANCEL) {
+
+	if (ai == NULL && port != NULL && camel_exception_get_id(ex) != CAMEL_EXCEPTION_USER_CANCEL) 
+	{
 		camel_exception_clear (ex);
 		ai = camel_getaddrinfo(service->url->host, port, &hints, ex);
 	}
-	
+
 	if (ai == NULL)
 		return FALSE;
-	
-	ret = connect_to_server (service, ai, mode, ex);
-	
+
+	ret = connect_to_server (service, ai, mode, must_tls, ex);
 	camel_freeaddrinfo (ai);
-	
+
 	return ret;
 }
 
@@ -1468,24 +1459,26 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 		return TRUE;
 
 	auth_domain = camel_url_get_param (service->url, "auth-domain");
-	
-	if (store->preauthed) {
+
+	if (store->preauthed) 
+	{
 		if (camel_verbose_debug)
 			fprintf(stderr, "Server %s has preauthenticated us.\n",
 				service->url->host);
 		return TRUE;
 	}
 
-	if (service->url->authmech) {
+	if (service->url->authmech) 
+	{
 		if (!g_hash_table_lookup (store->authtypes, service->url->authmech)) {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
-					      _("IMAP server %s does not support requested "
-						"authentication type %s"),
-					      service->url->host,
-					      service->url->authmech);
+					_("IMAP server %s does not support requested "
+					"authentication type %s"),
+					service->url->host,
+					service->url->authmech);
 			return FALSE;
 		}
-		
+
 		authtype = camel_sasl_authtype (service->url->authmech);
 		if (!authtype) {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
@@ -1493,52 +1486,56 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 					      service->url->authmech);
 			return FALSE;
 		}
-		
-		if (!authtype->need_password) {
+
+		if (!authtype->need_password) 
+		{
 			authenticated = try_auth (store, authtype->authproto, ex);
 			if (!authenticated)
 				return FALSE;
 		}
 	}
-	
-	while (!authenticated) {
-		if (errbuf) {
+
+	while (!authenticated) 
+	{
+		if (errbuf) 
+		{
 			/* We need to un-cache the password before prompting again */
 			camel_session_forget_password (session, service, auth_domain, "password", ex);
 			g_free (service->url->passwd);
 			service->url->passwd = NULL;
 		}
-		
-		if (!service->url->passwd) {
+
+		if (!service->url->passwd) 
+		{
 			char *prompt;
 			
 			prompt = g_strdup_printf (_("%sPlease enter the IMAP "
-						    "password for %s@%s"),
-						  errbuf ? errbuf : "",
-						  service->url->user,
-						  service->url->host);
+						  "password for %s@%s"),
+						errbuf ? errbuf : "",
+						service->url->user,
+						service->url->host);
 			service->url->passwd =
 				camel_session_get_password (session, service, auth_domain,
-							    prompt, "password", CAMEL_SESSION_PASSWORD_SECRET, ex);
+					prompt, "password", CAMEL_SESSION_PASSWORD_SECRET, ex);
 			g_free (prompt);
 			g_free (errbuf);
 			errbuf = NULL;
-			
+
 			if (!service->url->passwd) {
 				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
-						     _("You did not enter a password."));
+						_("You did not enter a password."));
 				return FALSE;
 			}
 		}
 		
-		if (!store->connected) {
+		if (!store->connected) 
+		{
 			/* Some servers (eg, courier) will disconnect on
-			 * a bad password. So reconnect here.
-			 */
+			 * a bad password. So reconnect here. */
 			if (!connect_to_server_wrapper (service, ex))
 				return FALSE;
 		}
-		
+
 		if (authtype)
 			authenticated = try_auth (store, authtype->authproto, ex);
 		else {
@@ -1571,8 +1568,8 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 			if (!imap_get_capability (service, ex))
 			{
 				errbuf = g_strdup_printf (_("Unable to authenticate "
-							    "to IMAP server.\n%s\n\n"),
-							  camel_exception_get_description (ex));
+							"to IMAP server.\n%s\n\n"),
+							camel_exception_get_description (ex));
 				camel_exception_clear (ex);
 				return FALSE;
 			}
@@ -1585,7 +1582,7 @@ static gboolean
 can_work_offline (CamelDiscoStore *disco_store)
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (disco_store);
-	
+
 	return camel_store_summary_count((CamelStoreSummary *)store->summary) != 0;
 }
 
@@ -1603,8 +1600,8 @@ imap_connect_online (CamelService *service, CamelException *ex)
 
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 
-	if (!connect_to_server_wrapper (service, ex) ||
-	    !imap_auth_loop (service, ex)) {
+	if (!connect_to_server_wrapper (service, ex) || !imap_auth_loop (service, ex)) 
+	{
 		CAMEL_DISCO_STORE (store)->status = CAMEL_DISCO_STORE_OFFLINE;
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		/* camel_service_disconnect (service, TRUE, NULL); */
@@ -1613,26 +1610,27 @@ imap_connect_online (CamelService *service, CamelException *ex)
 
 	/* Get namespace and hierarchy separator */
 	if ((store->capabilities & IMAP_CAPABILITY_NAMESPACE) &&
-	    !(store->parameters & IMAP_PARAM_OVERRIDE_NAMESPACE)) {
+		!(store->parameters & IMAP_PARAM_OVERRIDE_NAMESPACE)) 
+	{
 		response = camel_imap_command (store, NULL, ex, "NAMESPACE");
 		if (!response)
 			goto done;
-		
+
 		result = camel_imap_response_extract (store, response, "NAMESPACE", ex);
 		if (!result)
 			goto done;
-		
+
 #if 0
 		/* new code... */
 		namespaces = imap_parse_namespace_response (result);
 		imap_namespaces_destroy (namespaces);
 		/* end new code */
 #endif
-		
+
 		name = camel_strstrcase (result, "NAMESPACE ((");
-		if (name) {
+		if (name) 
+		{
 			char *sep;
-			
 			name += 12;
 			store->namespace = imap_parse_string ((const char **) &name, &len);
 			if (name && *name++ == ' ') {
@@ -1645,12 +1643,13 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		}
 		g_free (result);
 	}
-	
+
 	if (!store->namespace)
 		store->namespace = g_strdup ("");
-	
+
 	if (!store->dir_sep) {
-		if (store->server_level >= IMAP_LEVEL_IMAP4REV1) {
+		if (store->server_level >= IMAP_LEVEL_IMAP4REV1) 
+		{
 			/* This idiom means "tell me the hierarchy separator
 			 * for the given path, even if that path doesn't exist.
 			 */
@@ -1666,37 +1665,38 @@ imap_connect_online (CamelService *service, CamelException *ex)
 						       "LIST \"\" %G",
 						       store->namespace);
 		}
+
 		if (!response)
 			goto done;
-		
+
 		result = camel_imap_response_extract (store, response, "LIST", NULL);
-		if (result) {
+		if (result) 
+		{
 			imap_parse_list_response (store, result, NULL, &store->dir_sep, NULL);
 			g_free (result);
 		}
-		if (!store->dir_sep) {
+		if (!store->dir_sep)
 			store->dir_sep = '/';	/* Guess */
-		}
 	}
-	
+
 	/* canonicalize the namespace to end with dir_sep */
 	len = strlen (store->namespace);
-	if (len && store->namespace[len - 1] != store->dir_sep) {
-		gchar *tmp;
-		
-		tmp = g_strdup_printf ("%s%c", store->namespace, store->dir_sep);
+	if (len && store->namespace[len - 1] != store->dir_sep) 
+	{
+		gchar *tmp = g_strdup_printf ("%s%c", store->namespace, store->dir_sep);
 		g_free (store->namespace);
 		store->namespace = tmp;
 	}
-	
+
 	ns = camel_imap_store_summary_namespace_new(store->summary, store->namespace, store->dir_sep);
 	camel_imap_store_summary_namespace_set(store->summary, ns);
 	
 	if ((store->parameters & IMAP_PARAM_SUBSCRIPTIONS)
-	    && camel_store_summary_count((CamelStoreSummary *)store->summary) == 0) {
+	    && camel_store_summary_count((CamelStoreSummary *)store->summary) == 0) 
+	{
 		CamelStoreInfo *si;
 		char *pattern;
-		
+
 		get_folders_sync(store, store->namespace, ex);
 		if (camel_exception_is_set(ex))
 			goto done;
@@ -1708,7 +1708,9 @@ imap_connect_online (CamelService *service, CamelException *ex)
 
 		/* Make sure INBOX is present/subscribed */
 		si = camel_store_summary_path((CamelStoreSummary *)store->summary, "INBOX");
-		if (si == NULL || (si->flags & CAMEL_FOLDER_SUBSCRIBED) == 0) {
+
+		if (si == NULL || (si->flags & CAMEL_FOLDER_SUBSCRIBED) == 0) 
+		{
 			response = camel_imap_command (store, NULL, ex, "SUBSCRIBE INBOX");
 			if (response != NULL) {
 				camel_imap_response_free (store, response);
@@ -1719,17 +1721,16 @@ imap_connect_online (CamelService *service, CamelException *ex)
 				goto done;
 			get_folders_sync(store, "INBOX", ex);
 		}
+
 		store->refresh_stamp = time(0);
 	}
-	
-	
+
  done:
 
 	/* save any changes we had */
 	camel_store_summary_save((CamelStoreSummary *)store->summary);
 
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-	
 	if (camel_exception_is_set (ex))
 		camel_service_disconnect (service, TRUE, NULL);
 	else
@@ -1766,7 +1767,7 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 		camel_object_unref(store->istream);
 		store->istream = NULL;
 	}
-	
+
 	if (store->ostream) {
 		camel_stream_close(store->ostream);
 		camel_object_unref(store->ostream);
@@ -1785,12 +1786,12 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 		g_hash_table_destroy (store->authtypes);
 		store->authtypes = NULL;
 	}
-	
+
 	if (store->namespace && !(store->parameters & IMAP_PARAM_OVERRIDE_NAMESPACE)) {
 		g_free (store->namespace);
 		store->namespace = NULL;
 	}
-		
+
 	return TRUE;
 }
 
@@ -1806,9 +1807,9 @@ imap_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 		response = camel_imap_command (store, NULL, NULL, "LOGOUT");
 		camel_imap_response_free (store, response);
 	}
-	
+
 	imap_disconnect_offline (service, clean, ex);
-	
+
 	return TRUE;
 }
 
@@ -1828,7 +1829,7 @@ imap_summary_is_dirty (CamelFolderSummary *summary)
 			camel_message_info_free(info);
 		}
 	}
-	
+
 	return FALSE;
 }
 
@@ -1838,7 +1839,7 @@ imap_noop (CamelStore *store, CamelException *ex)
 	CamelImapStore *imap_store = (CamelImapStore *) store;
 	CamelImapResponse *response;
 	CamelFolder *current_folder;
-	
+
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
 	if (!camel_disco_store_check_online((CamelDiscoStore *)store, ex))

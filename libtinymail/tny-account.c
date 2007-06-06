@@ -386,7 +386,7 @@ tny_account_get_forget_pass_func (TnyAccount *self)
  * This property is typically set in the implementation of a #TnyAccountStore.
  * 
  * For example the url_string for an SMTP account that uses SSL with authentication
- * type PLAIN: smtp://user;auth=PLAIN@smtp.server.com/;use_ssl=always
+ * type PLAIN: smtp://user;auth=PLAIN@smtp.server.com/;use_ssl=wrapped
  * 
  * Don't forget to set the name, type and proto setting of the account too.
  **/
