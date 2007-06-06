@@ -65,6 +65,9 @@ msg_ssl="no"
 msg_smime="no"
 SSL_LIBS=""
 
+mozilla_nspr_eds=""
+mozilla_nss_eds=""
+
 AC_TNY_MOZ_CHECK
 
 dnl ### Select the SSL implementation ##
@@ -72,50 +75,54 @@ AC_ARG_WITH(ssl,
 AC_HELP_STRING([--with-ssl],
   [Set which SSL library to use (nss, openssl, none)]),
   [case "$with_ssl" in
-    nss) ;;
-    nss-must) ;;
-    openssl) ;;
+
+    nss)
+	if test x"$mozilla_nspr" != "xno" -a x"$mozilla_nss" != "xno"; then
+		mozilla_nss_eds=$mozilla_nss
+		mozilla_nspr_eds=$mozilla_nspr
+		msg_ssl="yes (Mozilla NSS)"
+		msg_smime="yes (Mozilla NSS)"
+		AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
+	        AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
+        	AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
+	        AC_DEFINE(HAVE_OPENSSL,0,[Define if you want to use OpenSSL as SSL library])
+	else
+		AC_MSG_ERROR([Mozilla NSS not found and must be installed])
+ 	fi
+    ;;
+
+    openssl) 
+	    AC_CHECK_LIB(crypto, EVP_md5, [
+                SSL_LIBS="-lcrypto -lssl"
+                msg_ssl="yes (OpenSSL)"
+                AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
+                AC_DEFINE(HAVE_OPENSSL,1,[Define if you want to use OpenSSL as SSL library])
+        	],,)
+    ;;
+
     none) ;;
+
     *) AC_MSG_ERROR(bad value ${with_ssl} for --with-ssl) ;;
-   esac], [with_ssl="nss"])
 
-if test x"$with_ssl" != "xnone"; then
+   esac], [
+	if test x"$mozilla_nspr" != "xno" -a x"$mozilla_nss" != "xno"; then
+		mozilla_nspr_eds=$mozilla_nspr
+		mozilla_nss_eds=$mozilla_nss
+                msg_ssl="yes (Mozilla NSS)"
+                msg_smime="yes (Mozilla NSS)"
+                AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
+                AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
+                AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
+                AC_DEFINE(HAVE_OPENSSL,0,[Define if you want to use OpenSSL as SSL library])
+        fi
+   ])
 
-dnl Mozilla NSS and NSPR support check --with-ssl=nss,nss-must
-
-  if test x"$with_ssl" == "xnss" -o x"$with_ssl" == "xnss-must"; then
-    if test x"$mozilla_nspr" != "xno" -a x"$mozilla_nss" != "xno"; then
-	msg_ssl="yes (Mozilla NSS)"
-	msg_smime="yes (Mozilla NSS)"
-	AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
-	AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
-	AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
-	AC_DEFINE(HAVE_OPENSSL,0,[Define if you want to use OpenSSL as SSL library])
-   else
-    if test x"$with_ssl" == "xnss-must"; then
-        AC_MSG_ERROR([Mozilla NSS not found and must be installed])
-    fi
-   fi
- fi
-
-dnl OpenSSL support check --with-ssl=openssl
-
- if test x"$with_ssl" == "xopenssl"; then
-	AC_CHECK_LIB(crypto, EVP_md5, [
-		SSL_LIBS="-lcrypto -lssl"
-		msg_ssl="yes (OpenSSL)"
-		AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
-		AC_DEFINE(HAVE_OPENSSL,1,[Define if you want to use OpenSSL as SSL library])
-	],,)
- fi
-
-fi
 
 AC_SUBST(msg_smime)
 AC_SUBST(msg_ssl)
 AC_SUBST(SSL_LIBS)
 AC_MSG_CHECKING(Support for SSL)
-AC_MSG_RESULT($msg_ssl)
+AC_MSG_RESULT($msg_ssl $SSL_LIBS)
 AC_MSG_CHECKING(Support for SMIME)
 AC_MSG_RESULT($msg_smime)
 
@@ -185,17 +192,6 @@ AC_DEFINE(ENABLE_THREADS,1,[Required])
 
 
 CFLAGS="$CFLAGS $WARN_CFLAGS"
-
-mozilla_nspr_eds=""
-mozilla_nss_eds=""
-
-if test x"$mozilla_nspr" != "xno"; then
-	mozilla_nspr_eds=$mozilla_nspr
-fi
-
-if test x"$mozilla_nss" != "xno"; then
-        mozilla_nss_eds=$mozilla_nss
-fi
 
 PKG_CHECK_MODULES(E_DATA_SERVER, libxml-2.0 glib-2.0 gobject-2.0 $mozilla_nspr_eds $mozilla_nss_eds)
 AC_SUBST(E_DATA_SERVER_CFLAGS)
