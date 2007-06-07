@@ -3912,20 +3912,23 @@ check_gmsgstore_die (gpointer user_data)
 	CamelImapFolder *imap_folder = user_data;
 	gboolean retval = TRUE;
 
-	g_static_mutex_lock (&gmsgstore_lock);
-	imap_folder->gmsgstore_ticks--;
-	if (imap_folder->gmsgstore_ticks <= 0)
+	if (g_static_mutex_trylock (&gmsgstore_lock))
 	{
-		if (imap_folder->gmsgstore) {
-			imap_debug ("Get-Message service dies\n");
-			camel_service_disconnect (CAMEL_SERVICE (imap_folder->gmsgstore), TRUE, NULL);
-			camel_object_unref (CAMEL_OBJECT (imap_folder->gmsgstore));
-			imap_folder->gmsgstore = NULL; 
-			camel_object_unref (imap_folder);
+		imap_folder->gmsgstore_ticks--;
+		if (imap_folder->gmsgstore_ticks <= 0)
+		{
+			if (imap_folder->gmsgstore) {
+				imap_debug ("Get-Message service dies\n");
+				camel_service_disconnect (CAMEL_SERVICE (imap_folder->gmsgstore), TRUE, NULL);
+				camel_object_unref (CAMEL_OBJECT (imap_folder->gmsgstore));
+				imap_folder->gmsgstore = NULL; 
+				camel_object_unref (imap_folder);
+			}
+			retval = FALSE;
 		}
-		retval = FALSE;
-	}
-	g_static_mutex_unlock (&gmsgstore_lock);
+		g_static_mutex_unlock (&gmsgstore_lock);
+	} else 
+		retval = TRUE;
 
 	return retval;
 }
