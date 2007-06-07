@@ -2,6 +2,9 @@
 
 	* libtinymail-camel: Fixed a problem when deleting folders that were
 	just under an store account.
+	* libtibymailui-gtk/tny-gtk-folder-store-tree-model.c: fixed a problem
+	when notifying the observers when a folder was added just under an
+	account
 
 2007-06-07  Philip Van Hoof  <pvanhoof@gnome.org>
 

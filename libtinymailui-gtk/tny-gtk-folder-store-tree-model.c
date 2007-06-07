@@ -663,29 +663,26 @@ find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointe
 	{
 		GtkTreeIter child;
 		gint type;
+		TnyFolderStore *fol;
+		gboolean found = FALSE;
 
 		gtk_tree_model_get (model, iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
 			&type, -1);
 
-		if (type != TNY_FOLDER_TYPE_ROOT) 
-		{
-			TnyFolderStore *fol;
-			gboolean found = FALSE;
-
-			gtk_tree_model_get (model, iter, 
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
-				&fol, -1);
-
-			if (fol == user_data)
-				found = TRUE;
-
+		gtk_tree_model_get (model, iter, 
+				    TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				    &fol, -1);
+		
+		if (fol == user_data)
+			found = TRUE;
+		
+		if (fol != NULL)
 			g_object_unref (G_OBJECT (fol));
 
-			if (found) {
-				*f = *iter;
-				return TRUE;
-			}
+		if (found) {
+			*f = *iter;
+			return TRUE;
 		}
 
 		if (gtk_tree_model_iter_children (model, &child, iter))
