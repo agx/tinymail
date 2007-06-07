@@ -3367,7 +3367,8 @@ tny_camel_folder_poke_status_callback (gpointer data)
 
 		g_static_rec_mutex_lock (priv->folder_lock);
 
-		if (store && priv->folder_name && camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
+		if (store && CAMEL_IS_DISCO_STORE (store)  && priv->folder_name 
+		&& camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
 		{
 			int uidnext;
 			camel_store_get_folder_status (store, priv->folder_name, 
