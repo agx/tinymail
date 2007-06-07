@@ -2788,7 +2788,8 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 
 	if (apriv->iter)
 	{
-		camel_store_free_folder_info (apriv->iter_store, apriv->iter);
+		/* Known memleak
+		camel_store_free_folder_info (apriv->iter_store, apriv->iter); */
 		apriv->iter = NULL;
 	}
 

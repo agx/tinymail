@@ -496,7 +496,8 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 	{
 		if (aspriv->iter)
 		{
-			camel_store_free_folder_info (aspriv->iter_store, aspriv->iter);
+			/* Known memleak
+			camel_store_free_folder_info (aspriv->iter_store, aspriv->iter); */
 			aspriv->iter = NULL;
 		}
 
