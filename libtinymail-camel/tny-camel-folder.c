@@ -2771,8 +2771,8 @@ tny_camel_folder_set_msg_remove_strategy_default (TnyFolder *self, TnyMsgRemoveS
 }
 
 
-static void 
-tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err)
+void 
+_tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelStore *store = priv->store;
@@ -2896,7 +2896,7 @@ recurse_remove (TnyFolderStore *from, TnyFolder *folder, GError **err)
 	tny_debug ("tny_folder_store_remove: actual removal of %s\n", 
 			tny_folder_get_name (folder));
 
-	tny_camel_folder_remove_folder_actual (from, folder, &nerr);
+	_tny_camel_folder_remove_folder_actual (from, folder, &nerr);
 
 
 exception:

@@ -28,7 +28,7 @@ struct _TnyCamelAccountPriv
 {
 	TnySessionCamel *session;
 	
-	GStaticRecMutex *service_lock;
+	GStaticRecMutex *service_lock, *account_lock;
 	
 	/* Set in tny_camel_store_account_prepare(). */
 	CamelService *service;

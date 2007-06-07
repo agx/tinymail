@@ -846,6 +846,9 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->service_lock = g_new (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->service_lock);
 
+	priv->account_lock = g_new (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->account_lock);
+
 	return;
 }
 
@@ -1002,6 +1005,7 @@ tny_camel_account_finalize (GObject *object)
 	camel_exception_free (priv->ex);
 
 	g_static_rec_mutex_free (priv->service_lock);
+	g_static_rec_mutex_free (priv->account_lock);
 
 	(*parent_class->finalize) (object);
 

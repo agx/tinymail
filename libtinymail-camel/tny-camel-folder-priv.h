@@ -72,6 +72,9 @@ void _tny_camel_folder_check_unread_count (TnyCamelFolder *self);
 void _tny_camel_folder_unreason (TnyCamelFolderPriv *priv);
 void _tny_camel_folder_reason (TnyCamelFolderPriv *priv);
 
+void _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err);
+
+
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_FOLDER, TnyCamelFolderPriv))
 
