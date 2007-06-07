@@ -138,7 +138,7 @@ static gboolean imap_check_folder_still_extant (CamelImapStore *imap_store, cons
 static void imap_forget_folder(CamelImapStore *imap_store, const char *folder_name, CamelException *ex);
 static void imap_set_server_level (CamelImapStore *store);
 
-static GPtrArray* imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
+static void imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext);
 
 void
 camel_imap_recon (CamelImapStore *store, CamelException *mex)
@@ -243,7 +243,7 @@ camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 	camel_store_class->noop = imap_noop;
 	camel_store_class->get_trash = imap_get_trash;
 	camel_store_class->get_junk = imap_get_junk;
-	camel_store_class->get_recent_messages = imap_get_recent_messages;
+	camel_store_class->get_folder_status = imap_get_folder_status;
 
 	camel_disco_store_class->can_work_offline = can_work_offline;
 	camel_disco_store_class->connect_online = imap_connect_online;
@@ -2276,17 +2276,38 @@ done:
 	return retval;
 }
 
-static GPtrArray*
-imap_get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages)
+static void
+imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext)
 {
-	GPtrArray *retval = NULL;
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (store);
+	struct imap_status_item *items, *item;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
-	CAMEL_SERVICE_REC_LOCK(imap_store, connect_lock);
-	retval = _camel_imap_store_get_recent_messages (imap_store, folder_name, unseen, messages, TRUE);
+	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (imap_store), &ex))
+		return;
+
+	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
+
+	/*
+	 *  Example: C: A042 STATUS blurdybloop (UIDNEXT MESSAGES)
+	 *           S: * STATUS blurdybloop (MESSAGES 231 UIDNEXT 44292)
+	 *           S: A042 OK STATUS completed */
+
+	item = items = get_folder_status (imap_store, folder_name, "MESSAGES UNSEEN UIDNEXT");
+	while (item != NULL) {
+		if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
+			*messages = item->value;
+		if (!g_ascii_strcasecmp (item->name, "UNSEEN"))
+			*unseen = item->value;
+		if (!g_ascii_strcasecmp (item->name, "UIDNEXT"))
+			*uidnext = item->value;
+		item = item->next;
+	}
+	imap_status_item_free (items);
+
 	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 
-	return retval;
+	return;
 }
 
 static CamelFolder *

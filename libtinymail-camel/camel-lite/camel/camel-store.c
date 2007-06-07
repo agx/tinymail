@@ -85,7 +85,7 @@ static void construct (CamelService *service, CamelSession *session,
 static int store_setv (CamelObject *object, CamelException *ex, CamelArgV *args);
 static int store_getv (CamelObject *object, CamelException *ex, CamelArgGetV *args);
 
-static GPtrArray* get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages);
+static void get_folder_status_impl (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext);
 
 static void
 camel_store_class_init (CamelStoreClass *camel_store_class)
@@ -112,7 +112,7 @@ camel_store_class_init (CamelStoreClass *camel_store_class)
 	camel_store_class->subscribe_folder = subscribe_folder;
 	camel_store_class->unsubscribe_folder = unsubscribe_folder;
 	camel_store_class->noop = noop;
-	camel_store_class->get_recent_messages = get_recent_messages;
+	camel_store_class->get_folder_status = get_folder_status_impl;
 	camel_store_class->delete_cache = delete_cache;
 
 	/* virtual method overload */
@@ -194,25 +194,25 @@ camel_store_delete_cache (CamelStore *store)
 	CS_CLASS (store)->delete_cache (store);
 }
 
-GPtrArray* 
-camel_store_get_recent_messages (CamelStore *store, const char *folder_name, 
-			int *unseen, int *messages)
+void
+camel_store_get_folder_status (CamelStore *store, const char *folder_name, 
+			int *unseen, int *messages, int *uidnext)
 {
-	GPtrArray *ret;
-
 	CAMEL_STORE_LOCK(store, folder_lock);
-	ret = CS_CLASS (store)->get_recent_messages (store, folder_name, unseen, messages);
+	CS_CLASS (store)->get_folder_status (store, folder_name, unseen, messages, uidnext);
 	CAMEL_STORE_UNLOCK(store, folder_lock);
 
-	return ret;
+	return;
 }
 
-static GPtrArray* 
-get_recent_messages (CamelStore *store, const char *folder_name, int *unseen, int *messages)
+static void 
+get_folder_status_impl (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext)
 {
 	*unseen = 0;
 	*messages = 0;
-	return NULL;
+	*uidnext = 0;
+
+	return;
 }
 
 

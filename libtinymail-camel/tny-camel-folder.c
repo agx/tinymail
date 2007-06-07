@@ -3349,31 +3349,45 @@ tny_camel_folder_poke_status_callback (gpointer data)
 {
 	TnyFolder *self = data;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	guint newlen, newurlen;
+	int newlen, newurlen;
 	gboolean set=FALSE;
 	TnyFolderChange *change;
+	CamelStore *store = priv->store;
 
 	if (priv->folder)
 	{
 		g_static_rec_mutex_lock (priv->folder_lock);
+
 		set=TRUE;
 		newurlen = camel_folder_get_unread_message_count (priv->folder);
 		newlen = camel_folder_get_message_count (priv->folder);
+
 		g_static_rec_mutex_unlock (priv->folder_lock);
 	} else if (priv->iter) {
+
 		g_static_rec_mutex_lock (priv->folder_lock);
-		set=TRUE;
-		newurlen = priv->iter->unread;
-		newlen = priv->iter->total;
+
+		if (store && priv->folder_name && camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
+		{
+			int uidnext;
+			camel_store_get_folder_status (store, priv->folder_name, 
+				&newurlen, &newlen, &uidnext);
+			set = TRUE;
+		} else {
+			set=TRUE;
+			newurlen = priv->iter->unread;
+			newlen = priv->iter->total;
+		}
+
 		g_static_rec_mutex_unlock (priv->folder_lock);
 	}
 
 	if (set)
 	{
 		change = tny_folder_change_new (self);
-		priv->cached_length = newlen;
+		priv->cached_length = (guint) newlen;
 		tny_folder_change_set_new_all_count (change, priv->cached_length);
-		priv->unread_length = newurlen;
+		priv->unread_length = (guint) newurlen;
 		tny_folder_change_set_new_unread_count (change, priv->unread_length);
 		notify_folder_observers_about (self, change);
 		g_object_unref (change);

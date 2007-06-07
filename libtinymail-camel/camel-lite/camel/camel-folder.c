@@ -1772,7 +1772,6 @@ folder_changed (CamelObject *obj, gpointer event_data)
 {
 	CamelFolder *folder = (CamelFolder *)obj;
 	CamelFolderChangeInfo *changed = event_data;
-	struct _CamelFolderChangeInfoPrivate *p = changed->priv;
 	CamelSession *session = ((CamelService *)folder->parent_store)->session;
 	CamelFilterDriver *driver = NULL;
 	GPtrArray *recents = NULL;

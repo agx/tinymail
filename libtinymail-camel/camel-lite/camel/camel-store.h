@@ -187,9 +187,10 @@ typedef struct {
 						     CamelException *ex);
 	void            (*noop)                     (CamelStore *store,
 						     CamelException *ex);
-	GPtrArray*      (*get_recent_messages)      (CamelStore *store, 
+	void            (*get_folder_status)        (CamelStore *store, 
 						     const char *folder_name, 
-						     int *unseen, int *messages);
+						     int *unseen, int *messages, 
+						     int *uidnext);
 	void             (*delete_cache)              (CamelStore *store);
 
 } CamelStoreClass;
@@ -265,6 +266,11 @@ int              camel_store_folder_uri_equal         (CamelStore *store,
 GPtrArray*       camel_store_get_recent_messages      (CamelStore *store, 
 						       const char *folder_name, 
 						       int *unseen, int *messages);
+
+void            camel_store_get_folder_status        (CamelStore *store, 
+						      const char *folder_name, 
+						      int *unseen, int *messages, 
+						      int *uidnext);
 
 void             camel_store_delete_cache            (CamelStore *store);
 

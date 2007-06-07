@@ -13,7 +13,9 @@
 	* Fix for trac ticket #64
 	* Fix for sergio, when removing folders the CamelFolderInfo iter was
 	still cached
-	
+	* tny_folder_poke_status will now, for IMAP, do a STATUS command to
+	more accurately find out the UNSEEN and MESSAGES statuses
+
 2007-06-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed the OpenSSL support, although I'm leaving the warnings in

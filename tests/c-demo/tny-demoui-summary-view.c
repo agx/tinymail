@@ -92,7 +92,7 @@ struct _TnyDemouiSummaryViewPriv
 	GtkTreeView *mailbox_view, *header_view;
 	TnyMsgView *msg_view;
 	guint accounts_reloaded_signal;
-	GtkWidget *status, *progress, *online_button;
+	GtkWidget *status, *progress, *online_button, *poke_button;
 	guint status_id;
 	gulong mailbox_select_sid;
 	GtkTreeSelection *mailbox_select;
@@ -276,6 +276,57 @@ online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 
 		g_object_unref (G_OBJECT (device));
 	}
+}
+
+static void
+recurse_poke (TnyFolderStore *f_store)
+{
+	TnyList *folders = tny_simple_list_new ();
+	TnyIterator *f_iter;
+
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (f_store), folders, NULL, NULL);
+	f_iter = tny_list_create_iterator (folders);
+	while (!tny_iterator_is_done (f_iter))
+	{
+		TnyFolder *f_cur = TNY_FOLDER (tny_iterator_get_current (f_iter));
+
+		tny_folder_poke_status (f_cur);
+
+		if (TNY_IS_FOLDER_STORE (f_cur))
+			recurse_poke (TNY_FOLDER_STORE (f_cur));
+
+		g_object_unref (f_cur);
+		tny_iterator_next (f_iter);
+	}
+	g_object_unref (f_iter);
+	g_object_unref (folders);
+}
+
+static void 
+poke_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
+{
+	TnySummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyList *accounts = tny_simple_list_new ();
+	TnyIterator *a_iter;
+
+	tny_account_store_get_accounts (priv->account_store, accounts, 
+		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+
+	a_iter = tny_list_create_iterator (accounts);
+
+	while (!tny_iterator_is_done (a_iter))
+	{
+		TnyAccount *a_cur = TNY_ACCOUNT (tny_iterator_get_current (a_iter));
+
+		recurse_poke (TNY_FOLDER_STORE (a_cur));
+
+		g_object_unref (a_cur);
+		tny_iterator_next (a_iter);
+	}
+
+	g_object_unref (a_iter);
+	g_object_unref (accounts);
 }
 
 static void
@@ -1354,10 +1405,14 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	priv->last_mailbox_correct_select_set = FALSE;
 	priv->online_button = gtk_toggle_button_new_with_label (GO_ONLINE_TXT);
+	priv->poke_button = gtk_button_new_with_label ("Poke status");
 	priv->current_accounts = NULL;
 
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
 		G_CALLBACK (online_button_toggled), self);
+
+	g_signal_connect (G_OBJECT (priv->poke_button), "clicked", 
+		G_CALLBACK (poke_button_toggled), self);
 
 #if PLATFORM==1
 	platfact = tny_gnome_platform_factory_get_instance ();
@@ -1385,8 +1440,10 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->progress, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->online_button, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (priv->status), priv->poke_button, FALSE, FALSE, 0);
 
 	gtk_widget_show (priv->online_button);
+	gtk_widget_show (priv->poke_button);
 	gtk_widget_show (priv->status);
 	gtk_widget_show (GTK_WIDGET (vbox));
 
