@@ -439,6 +439,7 @@ static void
 tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
@@ -493,6 +494,12 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 		camel_exception_clear (&ex);
 	} else 
 	{
+		if (aspriv->iter)
+		{
+			camel_store_free_folder_info (aspriv->iter_store, aspriv->iter);
+			aspriv->iter = NULL;
+		}
+
 		if (camel_store_supports_subscriptions (store))
 			camel_store_unsubscribe_folder (store, cpriv->folder_name, &subex);
 

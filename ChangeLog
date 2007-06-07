@@ -11,7 +11,9 @@
 	* Merged camel-lite with upstream Camel revision 7777
 	* Various connection cancellation problems fixed in the IMAP code
 	* Fix for trac ticket #64
-
+	* Fix for sergio, when removing folders the CamelFolderInfo iter was
+	still cached
+	
 2007-06-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed the OpenSSL support, although I'm leaving the warnings in

@@ -2775,6 +2775,7 @@ void
 _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 	CamelStore *store = priv->store;
 	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
@@ -2784,6 +2785,12 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 	g_static_rec_mutex_lock (cpriv->folder_lock);
+
+	if (apriv->iter)
+	{
+		camel_store_free_folder_info (apriv->iter_store, apriv->iter);
+		apriv->iter = NULL;
+	}
 
 	cfolname = cpriv->folder_name;
 	folname = priv->folder_name;
