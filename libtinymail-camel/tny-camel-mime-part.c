@@ -244,12 +244,27 @@ tny_camel_mime_part_is_attachment (TnyMimePart *self)
 	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->is_attachment_func (self);
 }
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 static gboolean 
 tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-	CamelDataWrapper *dw = camel_medium_get_content_object((CamelMedium *)priv->part);
+	CamelDataWrapper *dw = NULL;
+	CamelMedium *medium = (CamelMedium *)priv->part;
+	const gchar *contdisp = camel_medium_get_header (medium, "content-disposition");
 
+	if (contdisp)
+	{
+		if (strcasestr (contdisp, "inline"))
+			return FALSE;
+		if (strcasestr (contdisp, "attachment"))
+			return TRUE;
+	}
+
+	dw = camel_medium_get_content_object((CamelMedium *)priv->part);
 	if (G_LIKELY (dw))
 	{
 		return !(camel_content_type_is (dw->mime_type, "multipart", "*")

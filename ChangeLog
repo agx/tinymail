@@ -8,6 +8,7 @@
 	* tny_folder_poke_status fixes
 	* Unread and total count fixes
 	* Total and ~unread even when the folder was never refreshed
+	* Support for the Content-Disposition header in mime parts
 
 2007-06-08  Jose Dapena Paz  <jdapena@igalia.com>
 
