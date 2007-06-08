@@ -2283,6 +2283,7 @@ imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 	struct imap_status_item *items, *item;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
+
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (imap_store), &ex))
 		return;
 

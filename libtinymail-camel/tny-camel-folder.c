@@ -3349,7 +3349,7 @@ tny_camel_folder_poke_status_callback (gpointer data)
 {
 	TnyFolder *self = data;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	int newlen, newurlen;
+	int newlen = -1, newurlen = -1;
 	gboolean set=FALSE;
 	TnyFolderChange *change;
 	CamelStore *store = priv->store;
@@ -3367,11 +3367,17 @@ tny_camel_folder_poke_status_callback (gpointer data)
 		g_static_rec_mutex_lock (priv->folder_lock);
 
 		if (store && CAMEL_IS_DISCO_STORE (store)  && priv->folder_name 
-		&& camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
+			&& camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
 		{
-			int uidnext;
+			int uidnext = -1;
 			camel_store_get_folder_status (store, priv->folder_name, 
 				&newurlen, &newlen, &uidnext);
+			if (newurlen == -1 || newlen == -1)
+				if (priv->iter) {
+					set=TRUE;
+					newurlen = priv->iter->unread;
+					newlen = priv->iter->total;
+				}
 			set = TRUE;
 		} else {
 			if (priv->iter) {

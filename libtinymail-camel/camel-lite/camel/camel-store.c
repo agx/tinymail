@@ -208,9 +208,20 @@ camel_store_get_folder_status (CamelStore *store, const char *folder_name,
 static void 
 get_folder_status_impl (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext)
 {
-	*unseen = 0;
-	*messages = 0;
-	*uidnext = 0;
+	CamelFolderInfo *fi = camel_store_get_folder_info (store, folder_name, 0, NULL);
+
+	if (fi)
+	{
+		*uidnext = fi->total+1;
+		*unseen = fi->unread;
+		*messages = fi->total;
+		camel_store_free_folder_info (store, fi);
+	} else {
+
+		*unseen = 0;
+		*messages = 0;
+		*uidnext = 0;
+	}
 
 	return;
 }
