@@ -9,6 +9,8 @@
 	* Unread and total count fixes
 	* Total and ~unread even when the folder was never refreshed
 	* Support for the Content-Disposition header in mime parts
+	* Some bugfixes in the SMTP support
+	* Bugfix in the TnyFolderMonitor
 
 2007-06-08  Jose Dapena Paz  <jdapena@igalia.com>
 

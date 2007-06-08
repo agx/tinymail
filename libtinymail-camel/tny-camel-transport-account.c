@@ -291,7 +291,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		reperr = FALSE;
 	}
 
-	camel_service_disconnect (apriv->service, FALSE, &ex);
+	camel_service_disconnect (apriv->service, TRUE, &ex);
 	apriv->connected = FALSE;
 
 	if (reperr && camel_exception_is_set (&ex))

@@ -185,17 +185,20 @@ thread_main (gpointer data)
 
 			tny_list_prepend (hassent, G_OBJECT (header));
 			msg = tny_folder_get_msg (outbox, header, &err);
-			g_object_unref (G_OBJECT (header));	
+			g_object_unref (G_OBJECT (header));
 
 			if (err == NULL) 
 			{
 				tny_transport_account_send (priv->trans_account, msg, &err);
 
-				if (err != NULL)
+				if (err != NULL) {
 					emit_error (self, msg, err, i, priv->total);
-
-			} else 
+					priv->do_continue = FALSE;
+				}
+			} else  {
 				emit_error (self, msg, err, i, priv->total);
+				priv->do_continue = FALSE;
+			}
 
 			g_mutex_lock (priv->todo_lock);
 			{
@@ -206,6 +209,7 @@ thread_main (gpointer data)
 					if (newerr != NULL) 
 					{
 						emit_error (self, msg, newerr, i, priv->total);
+						priv->do_continue = FALSE;
 						g_error_free (newerr);
 					}
 					priv->total--;

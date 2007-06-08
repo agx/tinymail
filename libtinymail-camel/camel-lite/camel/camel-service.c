@@ -440,7 +440,8 @@ camel_service_disconnect (CamelService *service, gboolean clean,
 		if (unreg)
 			camel_operation_unregister (service->connect_op);
 
-		camel_operation_unref (service->connect_op);
+		if (service->connect_op)
+			camel_operation_unref (service->connect_op);
 		service->connect_op = NULL;
 		CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
 	}

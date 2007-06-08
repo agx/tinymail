@@ -67,6 +67,8 @@
 #include <tny-account-store-view.h>
 #include <tny-merge-folder.h>
 
+#include <tny-camel-send-queue.h>
+
 #define GO_ONLINE_TXT _("Go online")
 #define GO_OFFLINE_TXT _("Go offline")
 
@@ -102,6 +104,7 @@ struct _TnyDemouiSummaryViewPriv
 	TnyList *current_accounts;
 	TnyFolderMonitor *monitor; GMutex *monitor_lock;
 	gboolean handle_recon;
+	TnySendQueue *send_queue;
 };
 
 #define TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE(o)	\
@@ -213,9 +216,9 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 	g_object_unref (G_OBJECT (query));
 
 	TnyList *accounts = TNY_LIST (mailbox_model);
+	TnyList *saccounts = tny_simple_list_new ();
 
 	maccounts = tny_gtk_account_list_model_new ();
-
 
 	clear_header_view (priv);
 
@@ -233,7 +236,23 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 
 	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
 			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+
 	gtk_combo_box_set_model (priv->account_view, maccounts);
+
+	tny_account_store_get_accounts (account_store, saccounts,
+			TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS);
+
+	if (tny_list_get_length (saccounts) > 0)
+	{
+		TnyIterator *iter = tny_list_create_iterator (saccounts);
+		TnyTransportAccount *tacc = (TnyTransportAccount *)tny_iterator_get_current (iter);
+		if (priv->send_queue)
+			g_object_unref (priv->send_queue);
+		priv->send_queue = tny_camel_send_queue_new ((TnyCamelTransportAccount *) tacc);
+		g_object_unref (tacc);
+		g_object_unref (iter);
+	}
+	g_object_unref (saccounts);
 
 	/* Here we use the TnyFolderStoreTreeModel as a GtkTreeModel */
 	sortable = gtk_tree_model_sort_new_with_model (mailbox_model);
@@ -401,6 +420,87 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 static void
 on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gpointer user_data)
 {
+	TnyDemouiSummaryView *self = (TnyDemouiSummaryView *) user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
+
+	if (event->keyval == GDK_Home && priv->send_queue)
+	{
+		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
+		GtkTreeModel *model;
+		GtkTreeIter iter;
+
+		if (gtk_tree_selection_get_selected (selection, &model, &iter))
+		{
+			TnyHeader *header;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+				&header, -1);
+
+			if (header)
+			{
+				GError *err = NULL;
+				TnyMsg *msg;
+				TnyFolder *folder;
+
+				GtkWidget *entry1, *entry2;
+				GtkWidget *dialog;
+
+				folder = tny_header_get_folder (header);
+				if (folder) {
+					msg = tny_folder_get_msg (folder, header, &err);
+					g_object_unref (folder);
+				}
+
+				if (!msg || err != NULL)
+				{
+					g_warning ("Can't forward message: %s\n", err->message);
+					if (msg) 
+						g_object_unref (msg);
+					g_object_unref (header);
+					return;
+				}
+
+				dialog = gtk_dialog_new_with_buttons (_("Forward a message"),
+						  NULL, GTK_DIALOG_MODAL,
+						  GTK_STOCK_OK,
+						  GTK_RESPONSE_YES,
+						  GTK_STOCK_CANCEL,
+						  GTK_RESPONSE_REJECT,
+						  NULL);
+
+				entry1 = gtk_entry_new ();
+				gtk_entry_set_text (GTK_ENTRY (entry1), _("To: "));
+				gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry1);
+				gtk_widget_show (entry1);
+
+				entry2 = gtk_entry_new ();
+				gtk_entry_set_text (GTK_ENTRY (entry2), _("From: "));
+				gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry2);
+				gtk_widget_show (entry2);
+
+				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+				{
+					TnyHeader *nheader = tny_msg_get_header (msg);
+					const gchar *to = gtk_entry_get_text (GTK_ENTRY (entry1));
+					const gchar *from = gtk_entry_get_text (GTK_ENTRY (entry2));
+
+					tny_header_set_to (nheader, to);
+					tny_header_set_to (nheader, from);
+
+					g_object_unref (nheader);
+					tny_send_queue_add (priv->send_queue, msg, NULL);
+				}
+
+				gtk_widget_destroy (dialog);
+
+				g_object_unref (msg);
+				g_object_unref (G_OBJECT (header));
+			}
+		}
+	}
+
 	if (event->keyval == GDK_Delete)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
@@ -767,26 +867,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				msg = tny_folder_get_msg (folder, header, NULL);
 				if (G_LIKELY (msg))
 				{
-
-/* DEBUG		
-					TnyAccountStore *astore = priv->account_store;
-					TnyList *accs = tny_simple_list_new ();
-					tny_account_store_get_accounts (astore, accs, TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS);
-					TnyIterator *iter = tny_list_create_iterator (accs);
-					TnyCamelTransportAccount *acc = (TnyCamelTransportAccount *) tny_iterator_get_current (iter);
-
-					g_print ("--> %s\n", tny_account_get_name (TNY_ACCOUNT (acc)));
-		
-					if (!queue)
-						queue = tny_camel_send_queue_new (acc);
-		
-					tny_send_queue_add (queue, msg, NULL);
-
-					g_object_unref (G_OBJECT (acc));
-					g_object_unref (G_OBJECT (iter));
-					g_object_unref (G_OBJECT (accs));
-*/
-
 					msgwin = tny_gtk_msg_window_new (
 						tny_platform_factory_new_msg_view (platfact));
 
@@ -795,9 +875,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				
 					gtk_widget_show (GTK_WIDGET (msgwin));
 				} else {
-
-
-
 					msgwin = tny_gtk_msg_window_new (
 						tny_platform_factory_new_msg_view (platfact));
 
@@ -1146,13 +1223,13 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				&folderstore, -1);
 
 			dialog = gtk_dialog_new_with_buttons (_("Create a folder"),
-												  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
-												  GTK_DIALOG_MODAL,
-												  GTK_STOCK_OK,
-												  GTK_RESPONSE_ACCEPT,
-												  GTK_STOCK_CANCEL,
-												  GTK_RESPONSE_REJECT,
-												  NULL);
+					  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+					  GTK_DIALOG_MODAL,
+					  GTK_STOCK_OK,
+					  GTK_RESPONSE_ACCEPT,
+					  GTK_STOCK_CANCEL,
+					  GTK_RESPONSE_REJECT,
+					  NULL);
 
 			entry = gtk_entry_new ();
 			gtk_entry_set_text (GTK_ENTRY (entry), _("New folder"));
@@ -1403,6 +1480,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->monitor_lock = g_mutex_new ();
 	priv->monitor = NULL;
 
+	priv->send_queue = NULL;
 	priv->last_mailbox_correct_select_set = FALSE;
 	priv->online_button = gtk_toggle_button_new_with_label (GO_ONLINE_TXT);
 	priv->poke_button = gtk_button_new_with_label ("Poke status");

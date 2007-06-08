@@ -164,7 +164,7 @@ remove_header_from_list (TnyList *list, const gchar *uid)
 		const gchar *id;
 		header = TNY_HEADER (tny_iterator_get_current (iter));
 		id = tny_header_get_uid (header);
-		if (id && (!strcmp (id, uid)))
+		if (id && uid && (!strcmp (id, uid)))
 		{ 
 			found = TRUE; 
 			break; 

@@ -124,6 +124,12 @@ camel_smtp_transport_init (gpointer object)
 	smtp->connected = FALSE;
 }
 
+static void
+camel_smtp_transport_finalize (CamelSmtpTransport *self)
+{
+	g_print ("debug\n");
+}
+
 CamelType
 camel_smtp_transport_get_type (void)
 {
@@ -137,7 +143,7 @@ camel_smtp_transport_get_type (void)
 					    (CamelObjectClassInitFunc) camel_smtp_transport_class_init,
 					    NULL,
 					    (CamelObjectInitFunc) camel_smtp_transport_init,
-					    NULL);
+					    (CamelObjectFinalizeFunc) camel_smtp_transport_finalize);
 	}
 	
 	return type;
@@ -494,6 +500,10 @@ smtp_connect (CamelService *service, CamelException *ex)
 					      _("SMTP server %s does not support requested "
 						"authentication type %s."),
 					      service->url->host, service->url->authmech);
+
+			camel_session_alert_user (session, CAMEL_SESSION_ALERT_ERROR, 
+				camel_exception_get_description (ex), FALSE);
+
 			camel_service_disconnect (service, TRUE, NULL);
 			return FALSE;
 		}
@@ -1393,21 +1403,27 @@ smtp_quit (CamelSmtpTransport *transport, CamelException *ex)
 		return FALSE;
 	}
 	g_free (cmdbuf);
-	
-	do {
-		/* Check for "221" */
+
+	if (FALSE && transport->istream && CAMEL_STREAM_BUFFER (transport->istream))
+	{
+		do {
+			/* Check for "221" */
+			if (respbuf) 
+				g_free (respbuf);
+			respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
+			
+			d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+			
+			if (!respbuf || strncmp (respbuf, "221", 3)) {
+				smtp_set_exception (transport, FALSE, respbuf, _("QUIT command failed"), ex);
+				g_free (respbuf);
+				return FALSE;
+			}
+		} while (*(respbuf+3) == '-'); /* if we got "221-" then loop again */
+	}
+
+	if (respbuf)
 		g_free (respbuf);
-		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
-		
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
-		
-		if (!respbuf || strncmp (respbuf, "221", 3)) {
-			smtp_set_exception (transport, FALSE, respbuf, _("QUIT command failed"), ex);
-			g_free (respbuf);
-			return FALSE;
-		}
-	} while (*(respbuf+3) == '-'); /* if we got "221-" then loop again */
-	g_free (respbuf);
-	
+
 	return TRUE;
 }
