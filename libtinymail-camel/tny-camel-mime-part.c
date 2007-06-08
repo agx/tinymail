@@ -256,6 +256,9 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 	CamelMedium *medium = (CamelMedium *)priv->part;
 	const gchar *contdisp = camel_medium_get_header (medium, "content-disposition");
 
+	/* Content-Disposition is excellent for this, of course (but we might
+	 * not actually have this header, as not all E-mail clients add it) */
+
 	if (contdisp)
 	{
 		if (strcasestr (contdisp, "inline"))
@@ -264,8 +267,10 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 			return TRUE;
 	}
 
-	dw = camel_medium_get_content_object((CamelMedium *)priv->part);
-	if (G_LIKELY (dw))
+	/* Check the old fashioned way */
+	dw = camel_medium_get_content_object(medium);
+
+	if (dw)
 	{
 		return !(camel_content_type_is (dw->mime_type, "multipart", "*")
 			 || camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
