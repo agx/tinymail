@@ -3357,13 +3357,12 @@ tny_camel_folder_poke_status_callback (gpointer data)
 	if (priv->folder)
 	{
 		g_static_rec_mutex_lock (priv->folder_lock);
-
 		set=TRUE;
 		newurlen = camel_folder_get_unread_message_count (priv->folder);
 		newlen = camel_folder_get_message_count (priv->folder);
-
 		g_static_rec_mutex_unlock (priv->folder_lock);
-	} else if (priv->iter) {
+
+	} else {
 
 		g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -3375,9 +3374,15 @@ tny_camel_folder_poke_status_callback (gpointer data)
 				&newurlen, &newlen, &uidnext);
 			set = TRUE;
 		} else {
-			set=TRUE;
-			newurlen = priv->iter->unread;
-			newlen = priv->iter->total;
+			if (priv->iter) {
+				set=TRUE;
+				newurlen = priv->iter->unread;
+				newlen = priv->iter->total;
+			} else {
+				set=TRUE;
+				newurlen = 0;
+				newlen = 0;
+			}
 		}
 
 		g_static_rec_mutex_unlock (priv->folder_lock);
