@@ -263,10 +263,6 @@ int              camel_store_folder_uri_equal         (CamelStore *store,
 						       const char *uri0,
 						       const char *uri1);
 
-GPtrArray*       camel_store_get_recent_messages      (CamelStore *store, 
-						       const char *folder_name, 
-						       int *unseen, int *messages);
-
 void            camel_store_get_folder_status        (CamelStore *store, 
 						      const char *folder_name, 
 						      int *unseen, int *messages, 
