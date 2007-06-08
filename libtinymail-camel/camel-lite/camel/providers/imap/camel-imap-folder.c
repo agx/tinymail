@@ -3306,8 +3306,10 @@ process_idle_response (IdleResponse *idle_resp)
 					server_cleared = iinfo->server_flags & ~fid->flags;
 					iinfo->info.flags = (iinfo->info.flags | server_set) & ~server_cleared;
 					iinfo->server_flags = fid->flags;
-					if (changes == NULL)
+					if (changes == NULL) {
 						changes = camel_folder_change_info_new();
+						changes->push_email_event = TRUE;
+					}
 					camel_folder_change_info_change_uid(changes, info->uid);
 				}
 				camel_message_info_free (info);
@@ -3831,6 +3833,7 @@ camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 	/* printf ("FOR IDLE: %d vs %d\n", exists, camel_folder_summary_count (folder->summary)); */
 
 	changes = camel_folder_change_info_new ();
+	changes->push_email_event = TRUE;
 	if (expunged) {
 		int i, id;
 		

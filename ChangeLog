@@ -1,3 +1,9 @@
+2007-06-08  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* tny_folder_poke_status fixes
+	* Unread and total count fixes
+	* Total and ~unread even when the folder was never refreshed
+
 2007-06-08  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-msg-header.c: added support to set

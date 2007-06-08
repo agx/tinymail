@@ -152,38 +152,44 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	TnyCamelFolderPriv *priv = (TnyCamelFolderPriv *) user_data;
 	TnyFolder *self = priv->self;
 	TnyFolderChange *change = NULL;
-	gint i = 0;
 	CamelFolderSummary *summary;
 	gboolean old = priv->dont_fkill;
+	gint i = 0;
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
-	if (!priv->folder) {
+	if (!priv->folder) 
+	{
 		g_static_rec_mutex_unlock (priv->folder_lock);
 		return;
 	}
 
 	summary = priv->folder->summary;
 
-	/* printf ("%d added\n", info->uid_added?info->uid_added->len:-1); */
-
 	for (i = 0; i< info->uid_added->len; i++)
 	{
 		const char *uid = info->uid_added->pdata[i];
 
-		CamelMessageInfo *info = camel_folder_summary_uid (summary, uid);
+		CamelMessageInfo *minfo = camel_folder_summary_uid (summary, uid);
 		if (info)
 		{
-			guint32 flags = camel_message_info_flags(info);
-			if ((flags & CAMEL_MESSAGE_DELETED) && (flags & CAMEL_MESSAGE_SEEN))
-				priv->unread_length++;
-			priv->cached_length++;
 			TnyHeader *hdr = _tny_camel_header_new ();
+			guint32 flags = camel_message_info_flags (minfo);
+
+			if (info->push_email_event) 
+			{
+				if ((flags & CAMEL_MESSAGE_DELETED) && (flags & CAMEL_MESSAGE_SEEN))
+					priv->unread_length++;
+				priv->cached_length++;
+			}
+
 			if (!change)
 				change = tny_folder_change_new (TNY_FOLDER (self));
+
 			_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 				TNY_CAMEL_FOLDER (self), priv);
-			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
+
+			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
 			tny_folder_change_add_added_header (change, hdr);
 			g_object_unref (G_OBJECT (hdr));
 		}
@@ -193,15 +199,21 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	{
 		const char *uid = info->uid_removed->pdata[i];
 
-		CamelMessageInfo *info = camel_message_info_new_uid (NULL, uid);
-		if (info)
+		CamelMessageInfo *minfo = camel_message_info_new_uid (NULL, uid);
+		if (minfo)
 		{
 			TnyHeader *hdr = _tny_camel_header_new ();
-			priv->cached_length--;
-			priv->unread_sync++;
+
+			if (info->push_email_event) 
+			{
+				priv->cached_length--;
+				priv->unread_sync++;
+			}
+
 			if (!change)
 				change = tny_folder_change_new (TNY_FOLDER (self));
-			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
+
+			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
 			tny_folder_change_add_removed_header (change, hdr);
 			g_object_unref (G_OBJECT (hdr));
 		}
@@ -231,7 +243,6 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	}
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
-
 }
 
 

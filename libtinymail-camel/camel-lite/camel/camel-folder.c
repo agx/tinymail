@@ -1882,12 +1882,13 @@ camel_folder_change_info_new(void)
 {
 	CamelFolderChangeInfo *info;
 
-	info = g_malloc(sizeof(*info));
+	info = g_slice_new (CamelFolderChangeInfo);
+	info->push_email_event = FALSE;
 	info->uid_added = g_ptr_array_new();
 	info->uid_removed = g_ptr_array_new();
 	info->uid_changed = g_ptr_array_new();
 	info->uid_recent = g_ptr_array_new();
-	info->priv = g_malloc0(sizeof(*info->priv));
+	info->priv = g_slice_new (struct _CamelFolderChangeInfoPrivate);
 	info->priv->uid_stored = g_hash_table_new(g_str_hash, g_str_equal);
 	info->priv->uid_source = NULL;
 	info->priv->uid_filter = g_ptr_array_new();
@@ -2257,7 +2258,7 @@ camel_folder_change_info_clear(CamelFolderChangeInfo *info)
 	struct _CamelFolderChangeInfoPrivate *p;
 	
 	g_assert(info != NULL);
-	
+	info->push_email_event = FALSE;
 	p = info->priv;
 	
 	g_ptr_array_set_size(info->uid_added, 0);
@@ -2296,11 +2297,11 @@ camel_folder_change_info_free(CamelFolderChangeInfo *info)
 	g_hash_table_destroy(p->uid_stored);
 	g_ptr_array_free(p->uid_filter, TRUE);
 	e_mempool_destroy(p->uid_pool);
-	g_free(p);
+	g_slice_free (struct _CamelFolderChangeInfoPrivate, p);
 
 	g_ptr_array_free(info->uid_added, TRUE);
 	g_ptr_array_free(info->uid_removed, TRUE);
 	g_ptr_array_free(info->uid_changed, TRUE);
 	g_ptr_array_free(info->uid_recent, TRUE);
-	g_free(info);
+	g_slice_free (CamelFolderChangeInfo, info);
 }

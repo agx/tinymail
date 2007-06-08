@@ -85,6 +85,7 @@ struct _CamelFolderChangeInfo {
 	GPtrArray *uid_changed;
 	GPtrArray *uid_recent;
 
+	gboolean push_email_event;
 	struct _CamelFolderChangeInfoPrivate *priv;
 };
 
