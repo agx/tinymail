@@ -1,3 +1,8 @@
+2007-06-08  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c: Add the tree
+	model as an observer of the root folder stores
+
 2007-06-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* tny_folder_poke_status fixes

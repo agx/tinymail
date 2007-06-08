@@ -228,6 +228,10 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 
 	recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter);
 
+	/* Add an observer for the root folder store */
+	tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
+	self->store_observables = g_list_prepend (self->store_observables, folder_store);
+
 	g_object_unref (G_OBJECT (folders));
 
 	return;
