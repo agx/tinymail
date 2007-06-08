@@ -3355,68 +3355,28 @@ tny_camel_folder_poke_status (TnyFolder *self)
 	return;
 }
 
+typedef struct
+{
+	TnyFolder *self;
+	gint unread;
+	gint total;
+} PokeStatusInfo;
+
 static gboolean
 tny_camel_folder_poke_status_callback (gpointer data)
 {
-	TnyFolder *self = data;
+	PokeStatusInfo *info = (PokeStatusInfo *) data;
+	TnyFolder *self = (TnyFolder *) info->self;
+	TnyFolderChange *change = tny_folder_change_new (self);
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	int newlen = -1, newurlen = -1;
-	gboolean set=FALSE;
-	TnyFolderChange *change;
-	CamelStore *store = priv->store;
 
-	if (priv->folder)
-	{
-		g_static_rec_mutex_lock (priv->folder_lock);
-		set=TRUE;
-		newurlen = camel_folder_get_unread_message_count (priv->folder);
-		newlen = camel_folder_get_message_count (priv->folder);
-		g_static_rec_mutex_unlock (priv->folder_lock);
+	priv->cached_length = (guint) info->total;
+	tny_folder_change_set_new_all_count (change, priv->cached_length);
+	priv->unread_length = (guint) info->unread;
+	tny_folder_change_set_new_unread_count (change, priv->unread_length);
+	notify_folder_observers_about (self, change);
 
-	} else {
-
-		g_static_rec_mutex_lock (priv->folder_lock);
-
-		if (store && CAMEL_IS_DISCO_STORE (store)  && priv->folder_name 
-			&& camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
-		{
-			int uidnext = -1;
-			camel_store_get_folder_status (store, priv->folder_name, 
-				&newurlen, &newlen, &uidnext);
-			if (newurlen == -1 || newlen == -1)
-				if (priv->iter) {
-					set=TRUE;
-					newurlen = priv->iter->unread;
-					newlen = priv->iter->total;
-				}
-			set = TRUE;
-		} else {
-			if (priv->iter) {
-				set=TRUE;
-				newurlen = priv->iter->unread;
-				newlen = priv->iter->total;
-			} else {
-				set=TRUE;
-				newurlen = 0;
-				newlen = 0;
-			}
-		}
-
-		g_static_rec_mutex_unlock (priv->folder_lock);
-	}
-
-	if (set)
-	{
-		change = tny_folder_change_new (self);
-		priv->cached_length = (guint) newlen;
-		tny_folder_change_set_new_all_count (change, priv->cached_length);
-		priv->unread_length = (guint) newurlen;
-		tny_folder_change_set_new_unread_count (change, priv->unread_length);
-		notify_folder_observers_about (self, change);
-		g_object_unref (change);
-	}
-
-	/* XAFC881 _tny_camel_folder_unreason (priv); */
+	g_object_unref (change);
 
 	return FALSE;
 }
@@ -3424,15 +3384,57 @@ tny_camel_folder_poke_status_callback (gpointer data)
 static void
 tny_camel_folder_poke_status_destroyer (gpointer data)
 {
-	g_object_unref (G_OBJECT (data));
+	PokeStatusInfo *info = (PokeStatusInfo *) data;
+	g_object_unref (info->self);
+	g_slice_free (PokeStatusInfo, info);
 }
 
 static void 
 tny_camel_folder_poke_status_default (TnyFolder *self)
 {
-	GObject *info = g_object_ref (G_OBJECT (self));
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	CamelStore *store = priv->store;
+	PokeStatusInfo *info = g_slice_new (PokeStatusInfo);
+	info->self = TNY_FOLDER (g_object_ref (self));
 
-	/* XAFC881 _tny_camel_folder_reason (priv); */
+	info->unread = 0;
+	info->total = 0;
+
+	if (priv->folder)
+	{
+		g_static_rec_mutex_lock (priv->folder_lock);
+		info->unread = camel_folder_get_unread_message_count (priv->folder);
+		info->total = camel_folder_get_message_count (priv->folder);
+		g_static_rec_mutex_unlock (priv->folder_lock);
+	} else {
+		int newlen = -1, newurlen = -1, uidnext = -1;
+
+		g_static_rec_mutex_lock (priv->folder_lock);
+
+		if (store && CAMEL_IS_DISCO_STORE (store)  && priv->folder_name 
+			&& camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
+		{
+			camel_store_get_folder_status (store, priv->folder_name, 
+				&newurlen, &newlen, &uidnext);
+			if (newurlen == -1 || newlen == -1)
+			{
+				if (priv->iter) {
+					info->unread = priv->iter->unread;
+					info->total = priv->iter->total;
+				}
+			} else {
+				info->unread = newurlen;
+				info->total = newlen;
+			}
+		} else {
+			if (priv->iter) {
+				info->unread = priv->iter->unread;
+				info->total = priv->iter->total;
+			}
+		}
+
+		g_static_rec_mutex_unlock (priv->folder_lock);
+	}
 
 	if (g_main_depth () > 0)
 	{

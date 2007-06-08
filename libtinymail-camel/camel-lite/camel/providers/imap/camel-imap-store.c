@@ -2025,7 +2025,9 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	} while (*p != ')');
 	
 	g_free (status);
-	
+
+	camel_imap_store_start_idle (imap_store);
+
 	return items;
 }
 
