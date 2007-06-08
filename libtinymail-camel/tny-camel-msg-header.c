@@ -190,14 +190,50 @@ tny_camel_msg_header_get_flags (TnyHeader *self)
 static void
 tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
-	g_warning ("tny_header_set_flags: This is a header instance for a new message. It has no flags.\n");
-	return;
+	TnyHeaderPriorityFlags priority_flags;
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (mask ^ TNY_HEADER_FLAG_PRIORITY) {
+		g_warning ("tny_header_set_flags: This is a header instance for a new message. Non-priority flags are not supported.\n");
+		return;
+	}
+	priority_flags = mask & TNY_HEADER_FLAG_PRIORITY;
+
+	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
+	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
+
+	switch (priority_flags) {
+	case TNY_HEADER_FLAG_HIGH_PRIORITY:
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "High");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "1");
+		break;
+	case TNY_HEADER_FLAG_LOW_PRIORITY:
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "Low");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "3");
+		break;
+	case TNY_HEADER_FLAG_NORMAL_PRIORITY:
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "Normal");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "2");
+		break;
+	};
+	
 }
 
 static void
 tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
-	g_warning ("tny_header_unset_flags: This is a header instance for a new message. It has no flags.\n");
+	TnyHeaderPriorityFlags priority_flags;
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (mask ^ TNY_HEADER_FLAG_PRIORITY) {
+		g_warning ("tny_header_set_flags: This is a header instance for a new message. Non-priority flags are not supported.\n");
+		return;
+	}
+	priority_flags = mask & TNY_HEADER_FLAG_PRIORITY;
+	if (priority_flags) {
+		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
+		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
+	}
 	return;
 }
 
