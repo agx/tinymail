@@ -394,7 +394,6 @@ void
 tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 {
 #ifdef DBC /* require */
-	gchar *ptr1, *ptr2;
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
@@ -411,10 +410,6 @@ tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 	 * deals with this. */
 
 	/* TNY TODO: check this DBC implementation for correctness: */
-	ptr1 = tny_account_get_url_string (self);
-	ptr2 = strchr (ptr1, '@');
-	ptr1 = strchr (url_string, '@');
-	g_assert (!strcmp (ptr1, ptr2));
 #endif
 
 	return;
