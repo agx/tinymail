@@ -1000,12 +1000,13 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 {
 	const char *uid;
 	CamelMessageInfo *mi;
-	CamelMessageInfoBase *bi = (CamelMessageInfoBase*)info;
 
 	uid = camel_message_info_uid (info);
+
 	if (uid == NULL || uid[0] == 0) {
+		if (info->uid)
+			g_free (info->uid);
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
-		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	}
 
 	while ((mi = find_message_info_with_uid (s, uid))) 
@@ -1015,10 +1016,9 @@ summary_assign_uid(CamelFolderSummary *s, CamelMessageInfo *info)
 
 		d(printf ("Trying to insert message with clashing uid (%s).  new uid re-assigned", camel_message_info_uid(info)));
 
-		if (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE)
+		if (info->uid)
 			g_free(info->uid);
 		uid = info->uid = camel_folder_summary_next_uid_string(s);
-		bi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 		camel_message_info_set_flags(info, CAMEL_MESSAGE_FOLDER_FLAGGED, CAMEL_MESSAGE_FOLDER_FLAGGED);
 	}
@@ -1204,11 +1204,11 @@ camel_folder_summary_info_new_from_header_with_uid (CamelFolderSummary *s, struc
 
 	bi = (CamelMessageInfoBase *)mi;
 
-	if (bi->uid && (bi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
+	g_static_rec_mutex_lock (&global_lock);
+	if (bi->uid)
 		g_free (bi->uid);
-
 	((CamelMessageInfoBase *)mi)->uid = g_strdup (uid);
-	((CamelMessageInfoBase*)mi)->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
+	g_static_rec_mutex_unlock (&global_lock);
 
 	return mi;
 }
@@ -2084,7 +2084,13 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		 * CamelMessageInfo struct instances is avoidable */
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
 		*must_add = TRUE;
-		mi->uid = theuid;
+
+		g_static_rec_mutex_lock (&global_lock);
+		if (mi->uid)
+			g_free (mi->uid);
+		mi->uid = g_strdup (theuid);
+		g_static_rec_mutex_unlock (&global_lock);
+
 	} else 
 	{
 		CAMEL_SUMMARY_LOCK(s, summary_lock);
@@ -2096,9 +2102,13 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 			mi = (CamelMessageInfoBase *) s->messages->pdata[s->idx];
 			destroy_possible_pstring_stuff (s, (CamelMessageInfo*) mi, FALSE);
 			*must_add = FALSE;
-			if (mi->uid && (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
+
+			g_static_rec_mutex_lock (&global_lock);
+			if (mi->uid)
 				g_free (mi->uid);
-			mi->uid = theuid;
+			mi->uid = g_strdup (theuid);
+			g_static_rec_mutex_unlock (&global_lock);
+
 			CAMEL_SUMMARY_UNLOCK(s, ref_lock);
 		} else
 			printf ("Problem with %s. Can't find original instance (index=%d)\n", theuid, s->idx);
@@ -2112,7 +2122,13 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	{
 		mi = (CamelMessageInfoBase *) camel_message_info_new(s);
 		*must_add = TRUE;
-		mi->uid = theuid;
+
+		g_static_rec_mutex_lock (&global_lock);
+		if (mi->uid)
+			g_free (mi->uid);
+		mi->uid = g_strdup (theuid);
+		g_static_rec_mutex_unlock (&global_lock);
+
 	}
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
@@ -2120,7 +2136,6 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE); 
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
-	mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	mi->flags &= ~CAMEL_MESSAGE_FREED;
 
 	s->set_extra_flags_func (s->folder, mi);
@@ -2155,22 +2170,14 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 
-#ifdef NON_TINYMAIL_FEATURES
-	if (len) 
-		mi->mlist = (const char*)ptrchr;
-#endif
 
 	ptrchr += len;
 	s->filepos = ptrchr;
 
-/* #ifdef NON_TINYMAIL_FEATURES */
 	mi->message_id.id.part.hi = g_ntohl(get_unaligned_u32(s->filepos)); 
 	s->filepos += 4;
 	mi->message_id.id.part.lo = g_ntohl(get_unaligned_u32(s->filepos)); 
 	s->filepos += 4;
-/* #else 
-	s->filepos += 8; 
-#endif */
 
 	ptrchr = (unsigned char*) s->filepos;
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
@@ -2329,11 +2336,8 @@ destroy_possible_pstring_stuff(CamelFolderSummary *s, CamelMessageInfo *info, gb
 
 	if (mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)
 	{
-		if (freeuid && (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
-		{
+		if (freeuid && mi->uid)
 			g_free(mi->uid);
-			mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
-		}
 
 		if (mi->subject)
 			camel_pstring_free(mi->subject);
@@ -2353,11 +2357,9 @@ destroy_possible_pstring_stuff(CamelFolderSummary *s, CamelMessageInfo *info, gb
 
 		mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
 
-	} else if (freeuid && (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
-	{
+	} else if (freeuid && mi->uid)
 		g_free (mi->uid);
-		mi->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
-	}
+
 #ifdef NON_TINYMAIL_FEATURES
 	g_free(mi->references);
 #endif
@@ -3109,7 +3111,6 @@ camel_message_info_new_uid (CamelFolderSummary *summary, const char *uid)
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)camel_message_info_new(summary);
 	mi->uid = g_strdup (uid);
 	mi->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;
-	mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 	return mi;
 }
 
@@ -3202,10 +3203,7 @@ message_info_clone(CamelFolderSummary *s, const CamelMessageInfo *mi)
 	to->date_received = from->date_received;
 	to->refcount = 1;
 
-	/* NB: We don't clone the uid */
-
 	to->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;
-	to->flags &= ~CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 
 	to->subject = camel_pstring_strdup(from->subject);
 	to->from = camel_pstring_strdup(from->from);

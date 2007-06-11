@@ -80,7 +80,7 @@ typedef enum _CamelMessageFlags {
 	/* internally used */
 	CAMEL_MESSAGE_FOLDER_FLAGGED = 1<<12, /* internally used */
 	CAMEL_MESSAGE_INFO_NEEDS_FREE = 1<<13,/* internally used */
-	CAMEL_MESSAGE_INFO_UID_NEEDS_FREE = 1<<14, /* internally used */
+	CAMEL_MESSAGE_INFO_UNUSED = 1<<14, /* internally used but available */
 	CAMEL_MESSAGE_FREED = 1<<15,  /* internally used */
 	CAMEL_MESSAGE_USER = 1<<16,  /* free slot */
 	CAMEL_MESSAGE_SECURE = 1<<17, /* free slot */

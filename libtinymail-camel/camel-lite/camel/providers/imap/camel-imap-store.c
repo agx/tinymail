@@ -164,10 +164,14 @@ imap_delete_cache  (CamelStore *store)
 static void 
 let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 {
-	if (imap_store->idle_signal > 0) 
-		g_source_remove (imap_store->idle_signal);
+
+	imap_store->idle_cont = FALSE;
+	if (imap_store->idle_thread)
+		g_thread_join (imap_store->idle_thread);
 
 	g_static_rec_mutex_lock (imap_store->idle_prefix_lock);
+	g_static_rec_mutex_lock (imap_store->idle_lock);
+
 	if (imap_store->idle_prefix)
 	{
 		g_free (imap_store->idle_prefix); 
@@ -175,8 +179,11 @@ let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 		idle_debug ("Sending DONE in let_idle_die\n");
 		camel_stream_printf (imap_store->ostream, "DONE\r\n");
 	}
+
+	g_static_rec_mutex_unlock (imap_store->idle_lock);
 	g_static_rec_mutex_unlock (imap_store->idle_prefix_lock);
 
+	return;
 }
 
 void
@@ -186,6 +193,12 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 		camel_imap_folder_stop_idle (store->current_folder);
 	else {
 		g_static_rec_mutex_lock (store->idle_prefix_lock);
+		g_static_rec_mutex_lock (store->idle_lock);
+
+		store->idle_cont = FALSE;
+		if (store->idle_thread)
+			g_thread_join (store->idle_thread);
+
 		if (store->idle_prefix) 
 		{
 			int nwritten=0;
@@ -196,6 +209,8 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 			g_free (store->idle_prefix);
 			store->idle_prefix = NULL;
 		}
+
+		g_static_rec_mutex_unlock (store->idle_lock);
 		g_static_rec_mutex_unlock (store->idle_prefix_lock);
 	}
 }
@@ -219,9 +234,9 @@ camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 		CAMEL_STORE_CLASS (camel_imap_store_class);
 	CamelDiscoStoreClass *camel_disco_store_class =
 		CAMEL_DISCO_STORE_CLASS (camel_imap_store_class);
-	
+
 	parent_class = CAMEL_DISCO_STORE_CLASS (camel_type_get_global_classfuncs (camel_disco_store_get_type ()));
-	
+
 	/* virtual method overload */
 	camel_object_class->setv = imap_setv;
 	camel_object_class->getv = imap_getv;
@@ -280,7 +295,7 @@ camel_imap_store_finalize (CamelObject *object)
 		camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
 		camel_object_unref(imap_store->summary);
 	}
-	
+
 	if (imap_store->base_url)
 		g_free (imap_store->base_url);
 	if (imap_store->storage_path)
@@ -293,6 +308,10 @@ camel_imap_store_finalize (CamelObject *object)
 
 	g_static_rec_mutex_free (imap_store->idle_prefix_lock);
 	imap_store->idle_prefix_lock = NULL;
+
+	g_static_rec_mutex_free (imap_store->idle_lock);
+	imap_store->idle_lock = NULL;
+
 }
 
 static void
@@ -303,9 +322,15 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->idle_prefix_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (imap_store->idle_prefix_lock);
 
+	imap_store->idle_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (imap_store->idle_lock);
+
 	imap_store->dontdistridlehack = FALSE;
-	imap_store->idle_signal = 0;
+
+	imap_store->idle_cont = FALSE;
+	imap_store->idle_thread = NULL;
 	imap_store->idle_prefix = NULL;
+
 	imap_store->istream = NULL;
 	imap_store->ostream = NULL;
 	imap_store->has_login = FALSE;
@@ -2164,11 +2189,9 @@ parse_message_header (char *response)
 	{
 		mi->flags |= flags;
 		if (uid) {
-			if (mi->uid && (mi->flags & CAMEL_MESSAGE_INFO_UID_NEEDS_FREE))
+			if (mi->uid)
 				g_free (mi->uid);
-
 			mi->uid = uid;
-			mi->flags |= CAMEL_MESSAGE_INFO_UID_NEEDS_FREE;
 		}
 		if (idate) {
 			mi->date_received = decode_internaldate ((const unsigned char *) idate);
