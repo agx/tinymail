@@ -3776,7 +3776,7 @@ camel_imap_folder_changed (CamelFolder *folder, int exists,
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
 	
 	camel_folder_change_info_free (changes);
-	camel_folder_summary_save (folder->summary);
+	/* IN TNY: camel_folder_summary_save (folder->summary); */
 }
 
 
@@ -3829,9 +3829,9 @@ camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 	
 	if (camel_folder_change_info_changed (changes))
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
-	
+
 	camel_folder_change_info_free (changes);
-	camel_folder_summary_save (folder->summary);
+	/* IN TNY: camel_folder_summary_save (folder->summary); */
 }
 
 static void

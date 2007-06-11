@@ -1370,13 +1370,24 @@ camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 
 	if (((CamelMessageInfoBase*)info)->flags & CAMEL_MESSAGE_EXPUNGED)
 	{
+		CamelMessageInfoBase *mi = (CamelMessageInfoBase *) info;
+
+		printf ("yooo (%s)\n", info->uid);
 		CAMEL_SUMMARY_LOCK(s, summary_lock);
+		g_static_rec_mutex_lock (&global_lock);
 		g_ptr_array_remove(s->messages, info);
 		g_ptr_array_add (s->expunged, info);
+		/* NOTE! XUI */
+		destroy_possible_pstring_stuff (s, info, FALSE);
+		mi->subject = "Expunged";
+		mi->to = "Expunged";
+		mi->from = "Expunged";
+		mi->cc = "Expunged";
 		s->flags |= CAMEL_SUMMARY_DIRTY;
+		g_static_rec_mutex_unlock (&global_lock);
+
 		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 	} else {
-
 		CAMEL_SUMMARY_LOCK(s, summary_lock);
 		g_ptr_array_remove(s->messages, info);
 		s->flags |= CAMEL_SUMMARY_DIRTY;
@@ -2372,7 +2383,12 @@ message_info_free(CamelFolderSummary *s, CamelMessageInfo *info)
 {
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
 
-	destroy_possible_pstring_stuff (s, info, TRUE);
+	/* NOTE XUI! */
+	if (!(mi->flags & CAMEL_MESSAGE_EXPUNGED))
+		destroy_possible_pstring_stuff (s, info, TRUE);
+	else
+		if (mi->uid)
+			g_free (mi->uid);
 
 	/* memset: Trash it, makes debugging more easy */
 

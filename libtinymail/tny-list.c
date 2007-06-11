@@ -207,7 +207,6 @@ void
 tny_list_remove (TnyList *self, GObject* item)
 {
 #ifdef DBC /* require */
-	gint nl, length = tny_list_get_length (self);
 	g_assert (TNY_IS_LIST (self));
 	g_assert (item);
 	g_assert (G_IS_OBJECT (item));
@@ -217,8 +216,6 @@ tny_list_remove (TnyList *self, GObject* item)
 	TNY_LIST_GET_IFACE (self)->remove_func (self, item);
 
 #ifdef DBC /* ensure */
-	nl = tny_list_get_length (self);
-	g_assert (nl == length || nl == length - 1);
 #endif
 
 	return;

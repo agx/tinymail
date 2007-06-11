@@ -242,6 +242,10 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		priv->dont_fkill = old;
 	}
 
+	/* search for IN TNY */
+	/*if (info->uid_removed && info->uid_removed->len > 0)
+		camel_folder_summary_save (camel_folder->summary);*/
+
 	g_static_rec_mutex_unlock (priv->folder_lock);
 }
 

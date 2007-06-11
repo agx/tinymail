@@ -7,6 +7,8 @@
 	hang with very high latency networks like GPRS (experimental)
 	* Parallel fetching messages while you are retrieving summary
 	(experimental)
+	* Race condition fixes when expunged messages didn't get correctly
+	removed (for whatever reason in the TnyFolderMonitor): more robust
 
 2007-06-08  Sergio Villar Senin  <svillar@igalia.com>
 
