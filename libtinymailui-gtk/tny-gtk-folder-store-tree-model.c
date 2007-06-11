@@ -591,6 +591,7 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	gint type;
 	TnyFolderChange *change = user_data1;
 	TnyFolder *changed_folder = tny_folder_change_get_folder (change);
+	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
 
 	gtk_tree_model_get (model, iter, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
@@ -599,10 +600,21 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	if (type != TNY_FOLDER_TYPE_ROOT) 
 	{
 		TnyFolder *folder;
+		gint unread, total;
 
 		gtk_tree_model_get (model, iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 			&folder, -1);
+
+		if (changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT)
+			total = tny_folder_change_get_new_all_count (change);
+		else
+			total = tny_folder_get_all_count (folder);
+
+		if (changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
+			unread = tny_folder_change_get_new_unread_count (change);
+		else
+			unread = tny_folder_get_unread_count (folder);
 
 		if (folder == changed_folder)
 		{
@@ -614,9 +626,9 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
 				tny_folder_get_name (TNY_FOLDER (folder)),
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
-				tny_folder_get_unread_count (TNY_FOLDER (folder)),
+				unread,
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
-				tny_folder_get_all_count (TNY_FOLDER (folder)),
+				total,
 				-1);
 		}
 

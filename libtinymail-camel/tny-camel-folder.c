@@ -153,7 +153,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	TnyFolder *self = priv->self;
 	TnyFolderChange *change = NULL;
 	CamelFolderSummary *summary;
-	gboolean old = priv->dont_fkill;
+	gboolean old = priv->dont_fkill, has_chg = FALSE;
 	gint i = 0;
 
 	g_static_rec_mutex_lock (priv->folder_lock);
@@ -181,6 +181,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 				if ((flags & CAMEL_MESSAGE_DELETED) && (flags & CAMEL_MESSAGE_SEEN))
 					priv->unread_length++;
 				priv->cached_length++;
+				has_chg = TRUE;
 			}
 
 			if (!change)
@@ -208,6 +209,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 			{
 				priv->cached_length--;
 				priv->unread_sync++;
+				has_chg = TRUE;
 			}
 
 			if (!change)
@@ -223,18 +225,18 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	{
 		if (priv->unread_sync > 10)
 		{
-
 			/* The unread-sync is to avoid the expensive counting of unread
 			 * unread messages (yes I know it sucks, but get_unread_msg_cnt
 			 * walks the entire summary to count the unread ones).
 			 * TNY TODO: a better solution for this */
-
 			priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 			priv->unread_sync = 0;
+			has_chg = TRUE;
+			tny_folder_change_set_new_unread_count (change, priv->unread_length);
 		}
 
-		tny_folder_change_set_new_all_count (change, priv->cached_length);
-		tny_folder_change_set_new_unread_count (change, priv->unread_length);
+		if (has_chg) 
+			tny_folder_change_set_new_all_count (change, priv->cached_length);
 
 		priv->dont_fkill = TRUE;
 		notify_folder_observers_about (TNY_FOLDER (self), change);

@@ -3095,6 +3095,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			sizeof (void *), uid_compar);
 
 		mchanges = camel_folder_change_info_new ();
+		mchanges->push_email_event = changes->push_email_event;
 
 		while (uid < needheaders->len) 
 		{

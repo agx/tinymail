@@ -1,3 +1,6 @@
+libtinymail.types
+Makefile.in
+Makefile
 *-priv.sgml
 .libs
 libtinymail.types
