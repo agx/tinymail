@@ -1372,7 +1372,6 @@ camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 	{
 		CamelMessageInfoBase *mi = (CamelMessageInfoBase *) info;
 
-		printf ("yooo (%s)\n", info->uid);
 		CAMEL_SUMMARY_LOCK(s, summary_lock);
 		g_static_rec_mutex_lock (&global_lock);
 		g_ptr_array_remove(s->messages, info);

@@ -127,7 +127,7 @@ camel_smtp_transport_init (gpointer object)
 static void
 camel_smtp_transport_finalize (CamelSmtpTransport *self)
 {
-	g_print ("debug\n");
+	return;
 }
 
 CamelType
