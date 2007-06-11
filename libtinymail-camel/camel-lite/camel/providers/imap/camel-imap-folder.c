@@ -4061,6 +4061,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			}
 
 			/* If the line doesn't start with "* " */
+
 			if (*line != '*' || *(line + 1) != ' ')
 				{ err = TRUE; g_warning ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); goto berrorhander; }
 			pos = strchr (line, '{');
