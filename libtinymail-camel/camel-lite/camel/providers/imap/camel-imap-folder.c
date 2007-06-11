@@ -3635,6 +3635,8 @@ idle_thread (gpointer data)
 
 	while (store->idle_cont && store->idle_prefix != NULL)
 	{
+		int x = 0;
+
 		g_static_rec_mutex_lock (store->idle_lock);
 		g_static_rec_mutex_lock (store->idle_prefix_lock);
 
@@ -3658,7 +3660,8 @@ idle_thread (gpointer data)
 
 		idle_debug ("idle checked in idle_thrad\n");
 
-		usleep (5000000);
+		for (x=0; x<100 && store->idle_cont; x++)
+			usleep (50000);
 	}
 
 	store->in_idle = FALSE;
