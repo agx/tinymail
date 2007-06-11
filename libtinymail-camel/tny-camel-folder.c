@@ -1212,10 +1212,10 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 
 	cancel = camel_operation_new (tny_camel_folder_get_msg_async_status, info);
 
-	/* TNY TODO:  For now (these locks must be removed once parallel getting 
-	 * messages actually works */
+	/* To disable parallel getting of messages while summary is being retreived,
+	 * restore this lock (A) */
 
-	g_static_rec_mutex_lock (priv->folder_lock);
+	/* g_static_rec_mutex_lock (priv->folder_lock); */
 
 	camel_operation_ref (cancel);
 	camel_operation_register (cancel);
@@ -1230,10 +1230,10 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	if (cancel)
 		camel_operation_unref (cancel);
 
-	/* TNY TODO:  For now (these locks must be removed once parallel getting 
-	 * messages actually works */
+	/* To disable parallel getting of messages while summary is being retreived,
+	 * restore this lock (B) */
 
-	g_static_rec_mutex_unlock (priv->folder_lock); 
+	/* g_static_rec_mutex_unlock (priv->folder_lock);  */
 
 	info->err = NULL;
 	if (err != NULL)

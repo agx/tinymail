@@ -4,7 +4,9 @@
 	* Several race conditions fixed with the IDLE support
 	* The IDLE support is no longer happening in a GMainLoop, but now in a
 	thread. This so that the ui of applications on top of Tinymail wont
-	hang with very high latency networks like GPRS
+	hang with very high latency networks like GPRS (experimental)
+	* Parallel fetching messages while you are retrieving summary
+	(experimental)
 
 2007-06-08  Sergio Villar Senin  <svillar@igalia.com>
 

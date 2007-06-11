@@ -872,6 +872,7 @@ imap_read_untagged_idle (CamelImapStore *store, char *line, CamelException *ex)
  * camel_imap_response_free:
  * @store: the CamelImapStore the response is from
  * @response: a CamelImapResponse
+ * @fetching_message: whether we're fetching a message
  *
  * Frees all of the data in @response and processes any untagged
  * EXPUNGE and EXISTS responses in it. Releases @store's connect_lock.
@@ -882,10 +883,14 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 	int i, number, exists = 0;
 	GArray *expunged = NULL;
 	char *resp, *p;
-	
+	gboolean fetching_message = FALSE;
+
+
 	if (!response)
 		return;
-	
+
+	fetching_message = (response->folder && (response->folder->parent_store != (CamelStore *) store));
+
 	for (i = 0; i < response->untagged->len; i++) {
 		resp = response->untagged->pdata[i];
 		
@@ -910,7 +915,7 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 	g_ptr_array_free (response->untagged, TRUE);
 	g_free (response->status);
 	
-	if (response->folder) {
+	if (response->folder && !fetching_message) {
 		if (exists > 0 || expunged) {
 			/* Update the summary */
 			camel_imap_folder_changed (response->folder,
