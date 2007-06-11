@@ -953,7 +953,8 @@ tny_camel_account_finalize (GObject *object)
 	TnyCamelAccount *self = (TnyCamelAccount *)object;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	_tny_session_camel_forget_account (priv->session, (TnyCamelAccount*) object);    
+	if (priv->session)
+		_tny_session_camel_forget_account (priv->session, (TnyCamelAccount*) object);    
 	_tny_camel_account_start_camel_operation (self, NULL, NULL, NULL);
 	_tny_camel_account_stop_camel_operation (self);
 
