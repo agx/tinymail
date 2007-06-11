@@ -41,6 +41,7 @@ A store account contains the folders of an E-mail service and handles the authen
 @subscribe_func: 
 @unsubscribe_func: 
 @find_folder_func: 
+@delete_cache_func: 
 
 <!-- ##### FUNCTION tny_store_account_subscribe ##### -->
 <para>
@@ -69,5 +70,13 @@ A store account contains the folders of an E-mail service and handles the authen
 @url_string: 
 @err: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_store_account_delete_cache ##### -->
+<para>
+
+</para>
+
+@self: 
 
 

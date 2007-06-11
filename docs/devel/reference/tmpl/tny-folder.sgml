@@ -376,3 +376,12 @@ A abstract type that defines a folder
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_folder_get_url_string ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

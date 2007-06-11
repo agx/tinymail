@@ -10,12 +10,10 @@ A queue that implements getting messages. Using this queue you can for example a
 right after the or a message on the queue got fetched successfully.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyQueue, #TnyQueueTask
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

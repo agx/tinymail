@@ -11,12 +11,10 @@ You can take a look at TnyAsyncWorkerQueueTask and TnyAsyncWorkerQueue if
 you prefer not to implement it yourself.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyQueue, #TnyAsyncWorkerQueueTask
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

@@ -12,12 +12,10 @@ transferred and after that is successful for a message, moved to the sentbox. Th
 implements #TnySendQueue and you can also use that API with it to add messages.
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #TnyQueue, #TnySendQueue, #TnyFolderObserver
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -26,5 +24,17 @@ implements #TnySendQueue and you can also use that API with it to add messages.
 <para>
 
 </para>
+
+
+<!-- ##### FUNCTION tny_generic_send_queue_new ##### -->
+<para>
+
+</para>
+
+@decorated: 
+@account: 
+@outbox: 
+@sentbox: 
+@Returns: 
 
 

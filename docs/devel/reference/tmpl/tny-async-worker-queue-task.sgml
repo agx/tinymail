@@ -9,12 +9,10 @@ A task for the asyncworker queue
 A #TnyQueueTask implementation for AsyncWorker
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #OAsyncWorkerTask, #OAsyncWorker, #TnyQueue
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 

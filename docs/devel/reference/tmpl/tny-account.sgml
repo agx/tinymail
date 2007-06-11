@@ -30,6 +30,13 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 
+<!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
+<para>
+
+</para>
+
+@tnyaccount: the object which received the signal.
+
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
 
@@ -60,6 +67,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @get_account_type_func: 
 @cancel_func: 
 @matches_url_string_func: 
+@connection_status_changed: 
 
 <!-- ##### FUNCTION tny_account_type_get_type ##### -->
 <para>

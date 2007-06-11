@@ -42,6 +42,9 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@: 
+@:
+
 @tnyaccountstore: the object which received the signal.
 @arg1: 
 
@@ -49,6 +52,9 @@ A abstract type that defines a store for accounts
 <para>
 
 </para>
+
+@: 
+@:
 
 @tnyaccountstore: the object which received the signal.
 @arg1: 
@@ -58,10 +64,29 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@: 
+@:
+
 @tnyaccountstore: the object which received the signal.
 @arg1: 
 
 <!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
+<para>
+
+</para>
+
+@:
+
+@tnyaccountstore: the object which received the signal.
+
+<!-- ##### SIGNAL TnyAccountStore::connecting-finished ##### -->
+<para>
+
+</para>
+
+@tnyaccountstore: the object which received the signal.
+
+<!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
 <para>
 
 </para>
@@ -74,15 +99,17 @@ A abstract type that defines a store for accounts
 </para>
 
 @parent: 
-@account_changed: 
-@account_inserted: 
-@account_removed: 
-@accounts_reloaded: 
 @get_accounts_func: 
 @get_cache_dir_func: 
 @get_device_func: 
 @alert_func: 
 @find_account_func: 
+@account_changed: 
+@account_inserted: 
+@account_removed: 
+@accounts_reloaded: 
+@connecting_started: 
+@connecting_finished: 
 
 <!-- ##### FUNCTION tny_get_accounts_request_type_get_type ##### -->
 <para>
@@ -135,6 +162,7 @@ A abstract type that defines a store for accounts
 
 @self: 
 @type: 
+@question: 
 @error: 
 @Returns: 
 

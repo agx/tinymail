@@ -9,12 +9,10 @@ A queue implementation
 A #TnyQueue implementation that uses AsyncWorker
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 #OAsyncWorker, #OAsyncWorkerTas,k #TnyQueueTask
 </para>
-
 
 <!-- ##### SECTION Stability_Level ##### -->
 
