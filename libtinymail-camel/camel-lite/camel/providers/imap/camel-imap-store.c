@@ -164,13 +164,16 @@ imap_delete_cache  (CamelStore *store)
 static void 
 let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 {
-
 	imap_store->idle_cont = FALSE;
-	if (imap_store->idle_thread)
-		g_thread_join (imap_store->idle_thread);
 
 	g_static_rec_mutex_lock (imap_store->idle_prefix_lock);
 	g_static_rec_mutex_lock (imap_store->idle_lock);
+
+	imap_store->idle_cont = FALSE;
+	if (imap_store->in_idle && imap_store->idle_thread) {
+		g_thread_join (imap_store->idle_thread);
+		imap_store->idle_thread = NULL;
+	}
 
 	if (imap_store->idle_prefix)
 	{
@@ -192,12 +195,16 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder))
 		camel_imap_folder_stop_idle (store->current_folder);
 	else {
+		store->idle_cont = FALSE;
+
 		g_static_rec_mutex_lock (store->idle_prefix_lock);
 		g_static_rec_mutex_lock (store->idle_lock);
 
 		store->idle_cont = FALSE;
-		if (store->idle_thread)
+		if (store->in_idle && store->idle_thread) {
 			g_thread_join (store->idle_thread);
+			store->idle_thread = NULL;
+		}
 
 		if (store->idle_prefix) 
 		{

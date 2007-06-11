@@ -3577,6 +3577,8 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
 		return;
 
+	store->idle_cont = FALSE;
+
 	g_static_rec_mutex_lock (store->idle_lock);
 	g_static_rec_mutex_lock (store->idle_prefix_lock);
 
@@ -3585,15 +3587,16 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 		gboolean had_lock = FALSE;
 
 		store->idle_cont = FALSE;
-		if (store->idle_thread)
+		if (store->in_idle && store->idle_thread) {
 			g_thread_join (store->idle_thread);
+			store->idle_thread = NULL;
+		}
 
 		g_free (store->idle_prefix);
 		store->idle_prefix = NULL;
 
 		idle_resp = idle_deal_with_stuff (folder, store, &had_err, &had_lock);
 
-		/* Outside of the lock of course */
 		if (idle_resp && !had_err)
 			process_idle_response (idle_resp);
 
@@ -3603,6 +3606,7 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 
 	g_static_rec_mutex_unlock (store->idle_prefix_lock);
 	g_static_rec_mutex_unlock (store->idle_lock);
+
 }
 
 
@@ -3665,8 +3669,6 @@ idle_thread (gpointer data)
 	}
 
 	store->in_idle = FALSE;
-
-	store->idle_thread = NULL;
 
 	g_thread_exit (NULL);
 	return NULL;
