@@ -238,7 +238,7 @@ enum {
 #endif
 
 static gboolean
-connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, CamelException *ex)
+connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int must_tls, CamelException *ex)
 {
 	CamelSmtpTransport *transport = CAMEL_SMTP_TRANSPORT (service);
 	CamelStream *tcp_stream;
@@ -404,12 +404,14 @@ static struct {
 	char *serv;
 	char *port;
 	int mode;
+	int must_tls;
 } ssl_options[] = {
-	{ "",              "smtps", SMTPS_PORT, MODE_SSL   },  /* really old (1.x) */
-	{ "always",        "smtps", SMTPS_PORT, MODE_SSL   },
-	{ "when-possible", "smtp",  SMTP_PORT, MODE_TLS   },
-	{ "never",         "smtp",  SMTP_PORT, MODE_CLEAR },
-	{ NULL,            "smtp",  SMTP_PORT, MODE_CLEAR },
+	{ "",              "smtps", SMTPS_PORT, MODE_SSL, 0   },  /* really old (1.x) */
+	{ "wrapped",       "smtps", SMTPS_PORT, MODE_SSL, 0   },
+	{ "tls",           "smtp",  SMTP_PORT, MODE_TLS, 1   },
+	{ "when-possible", "smtp",  SMTP_PORT, MODE_TLS, 0   },
+	{ "never",         "smtp",  SMTP_PORT, MODE_CLEAR, 0 },
+	{ NULL,            "smtp",  SMTP_PORT, MODE_CLEAR, 0 },
 };
 
 static gboolean
@@ -417,10 +419,10 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 {
 	struct addrinfo hints, *ai;
 	const char *ssl_mode;
-	int mode, ret, i;
+	int mode, ret, i, must_tls = 0;
 	char *serv;
 	const char *port;
-	
+
 	if ((ssl_mode = camel_url_get_param (service->url, "use_ssl"))) {
 		for (i = 0; ssl_options[i].value; i++)
 			if (!strcmp (ssl_options[i].value, ssl_mode))
@@ -428,10 +430,12 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 		mode = ssl_options[i].mode;
 		serv = ssl_options[i].serv;
 		port = ssl_options[i].port;
+		must_tls = ssl_options[i].must_tls;
 	} else {
 		mode = MODE_CLEAR;
 		serv = "smtp";
 		port = SMTP_PORT;
+		must_tls = 0;
 	}
 	
 	if (service->url->port) {
@@ -452,7 +456,7 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	if (ai == NULL)
 		return FALSE;
 	
-	ret = connect_to_server (service, ai, mode, ex);
+	ret = connect_to_server (service, ai, mode, must_tls, ex);
 	
 	camel_freeaddrinfo (ai);
 	
