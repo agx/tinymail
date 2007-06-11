@@ -3662,7 +3662,7 @@ idle_thread (gpointer data)
 		g_static_rec_mutex_unlock (store->idle_prefix_lock);
 		g_static_rec_mutex_unlock (store->idle_lock);
 
-		idle_debug ("idle checked in idle_thrad\n");
+		idle_debug ("idle checked in idle_thread\n");
 
 		for (x=0; x<100 && store->idle_cont; x++)
 			usleep (50000);
@@ -3697,7 +3697,14 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 		{
 			folder->folder_flags |= CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY;
 
-			if (!store->idle_thread) {
+			if (!store->in_idle && store->idle_thread)
+			{
+				store->idle_cont = FALSE;
+				g_thread_join (store->idle_thread);
+				store->idle_thread = NULL;
+			}
+
+			if (!store->in_idle) {
 				idle_real_start (store);
 				store->idle_thread = g_thread_create (idle_thread, 
 					folder, TRUE, NULL);
