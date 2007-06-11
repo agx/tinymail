@@ -63,7 +63,7 @@ stream_fill(CamelPOP3Stream *is)
 			is->end[0] = '\n';
 			return is->end - is->ptr;
 		} else {
-			dd(printf("POP3_STREAM_FILL(ERROR): '%s'\n", strerror (errno)));
+			pop3_debug ("POP3_STREAM_FILL(ERROR): '%s'\n", strerror (errno));
 			return -1;
 		}
 	}
@@ -105,7 +105,7 @@ stream_read(CamelStream *stream, char *buffer, size_t n)
 				is->ptr = p+3;
 				is->mode = CAMEL_POP3_STREAM_EOD;
 				is->state = 0;
-				dd(printf("POP3_STREAM_READ(%d):\n%.*s\n", (int)(o-buffer), (int)(o-buffer), buffer));
+				pop3_debug ("POP3_STREAM_READ(%d):\n%.*s\n", (int)(o-buffer), (int)(o-buffer), buffer);
 				return o-buffer;
 			}
 			p++;
@@ -138,7 +138,7 @@ stream_read(CamelStream *stream, char *buffer, size_t n)
 	is->ptr = p;
 	is->state = state;
 
-	dd(printf("POP3_STREAM_READ(%d):\n%.*s\n", (int)(o-buffer), (int)(o-buffer), buffer));
+	pop3_debug ("POP3_STREAM_READ(%d):\n%.*s\n", (int)(o-buffer), (int)(o-buffer), buffer);
 
 	return o-buffer;
 }
@@ -147,12 +147,13 @@ static ssize_t
 stream_write(CamelStream *stream, const char *buffer, size_t n)
 {
 	CamelPOP3Stream *is = (CamelPOP3Stream *)stream;
-	
-	if (strncmp (buffer, "PASS ", 5) != 0)
-		dd(printf("POP3_STREAM_WRITE(%d):\n%.*s\n", (int)n, (int)n, buffer));
-	else
-		dd(printf("POP3_STREAM_WRITE(%d):\nPASS xxxxxxxx\n", (int)n));
-	
+
+	if (strncmp (buffer, "PASS ", 5) != 0) {
+		pop3_debug("POP3_STREAM_WRITE(%d):\n%.*s\n", (int)n, (int)n, buffer);
+	} else {
+		pop3_debug("POP3_STREAM_WRITE(%d):\nPASS xxxxxxxx\n", (int)n);
+	}
+
 	return camel_stream_write(is->source, buffer, n);
 }
 

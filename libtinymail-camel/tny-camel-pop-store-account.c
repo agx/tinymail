@@ -36,6 +36,8 @@
 #include <camel/camel.h>
 #include <camel/camel-session.h>
 #include <camel/camel-store.h>
+#include <camel/camel-service.h>
+
 #include <camel/providers/pop3/camel-pop3-store.h>
 
 #ifndef CAMEL_FOLDER_TYPE_SENT
@@ -144,6 +146,30 @@ tny_camel_pop_store_account_finalize (GObject *object)
 	return;
 }
 
+/**
+ * tny_camel_pop_store_account_reconnect:
+ * @self: a #TnyCamelPOPStoreAccount instance
+ * 
+ * Reconnect to the POP3 service. The reason why this API exists is because
+ * certain services (like GMail in 2007) suddenly give you more messages in the
+ * LIST result of POP after you disconnected and reconnect.
+ **/
+void 
+tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self)
+{
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
+	const CamelService *service = _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (self));
+	
+	g_mutex_lock (priv->lock);
+	camel_service_disconnect ((CamelService *) service, TRUE, &ex);
+	if (camel_exception_is_set (&ex))
+		camel_exception_clear (&ex);
+	camel_service_connect ((CamelService *) service, &ex);
+	g_mutex_unlock (priv->lock);
+
+	return;
+}
 
 static void 
 tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)

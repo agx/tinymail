@@ -26,6 +26,13 @@
 
 #include <camel/camel-stream.h>
 
+#ifdef DEBUG
+#define pop3_debug	g_print 
+#else
+#define pop3_debug(o,...)	
+#endif
+
+
 #define CAMEL_POP3_STREAM(obj)         CAMEL_CHECK_CAST (obj, camel_pop3_stream_get_type (), CamelPOP3Stream)
 #define CAMEL_POP3_STREAM_CLASS(klass) CAMEL_CHECK_CLASS_CAST (klass, camel_pop3_stream_get_type (), CamelPOP3StreamClass)
 #define CAMEL_IS_POP3_STREAM(obj)      CAMEL_CHECK_TYPE (obj, camel_pop3_stream_get_type ())

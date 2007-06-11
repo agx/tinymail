@@ -53,6 +53,8 @@ TnyStoreAccount* tny_camel_pop_store_account_new (void);
 
 void tny_camel_pop_store_account_set_leave_messages_on_server (TnyCamelPOPStoreAccount *self, gboolean enabled);
 
+void tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self);
+
 G_END_DECLS
 
 #endif

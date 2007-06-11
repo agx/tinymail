@@ -10,6 +10,9 @@
 	* Race condition fixes when expunged messages didn't get correctly
 	removed (for whatever reason in the TnyFolderMonitor): more robust
 	* Fixed some IDLE deadlocks
+	* Added tny_camel_pop_store_account_reconnect
+
+	* This was a minor API change
 
 2007-06-08  Sergio Villar Senin  <svillar@igalia.com>
 
