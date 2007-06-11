@@ -3620,6 +3620,12 @@ idle_thread (gpointer data)
 
 	idle_debug ("idle_thread\n");
 
+	if (!folder || !folder->parent_store)
+		{ g_thread_exit (NULL); return NULL; }
+
+	if (!CAMEL_IS_FOLDER (folder) || !CAMEL_IS_STORE (folder->parent_store))
+		{ g_thread_exit (NULL); return NULL; }
+
 	store = CAMEL_IMAP_STORE (folder->parent_store);
 	imap_folder = CAMEL_IMAP_FOLDER (folder);
 
