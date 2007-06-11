@@ -170,10 +170,13 @@ let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 	g_static_rec_mutex_lock (imap_store->idle_lock);
 
 	imap_store->idle_cont = FALSE;
+
+	/* This one can get called from within the thread! This would deadlock
+
 	if (imap_store->in_idle && imap_store->idle_thread) {
 		g_thread_join (imap_store->idle_thread);
 		imap_store->idle_thread = NULL;
-	}
+	} */
 
 	if (imap_store->idle_prefix)
 	{
