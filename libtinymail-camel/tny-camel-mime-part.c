@@ -56,6 +56,23 @@ static GObjectClass *parent_class = NULL;
 
 
 static void 
+tny_camel_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->set_header_pair_func (self, name, value);
+	return;
+}
+
+static void 
+tny_camel_mime_part_set_header_pair_default (TnyMimePart *self, const gchar *name, const gchar *value)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+
+	camel_medium_add_header (CAMEL_MEDIUM (priv->part), name, value);
+
+	return;
+}
+
+static void 
 tny_camel_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
 {
 	TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_header_pairs_func (self, list);
@@ -907,6 +924,7 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->add_part_func = tny_camel_mime_part_add_part;
 	klass->del_part_func = tny_camel_mime_part_del_part;
 	klass->get_header_pairs_func = tny_camel_mime_part_get_header_pairs;
+	klass->set_header_pair_func = tny_camel_mime_part_set_header_pair;
 
 	return;
 }
@@ -940,6 +958,7 @@ tny_camel_mime_part_class_init (TnyCamelMimePartClass *class)
 	class->add_part_func = tny_camel_mime_part_add_part_default;
 	class->del_part_func = tny_camel_mime_part_del_part_default;
 	class->get_header_pairs_func = tny_camel_mime_part_get_header_pairs_default;
+	class->set_header_pair_func = tny_camel_mime_part_set_header_pair_default;
 
 	object_class->finalize = tny_camel_mime_part_finalize;
 

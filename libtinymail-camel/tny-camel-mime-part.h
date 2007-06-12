@@ -69,6 +69,7 @@ struct _TnyCamelMimePartClass
 	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);
 	gint (*add_part_func) (TnyMimePart *self, TnyMimePart *part);
 	void (*get_header_pairs_func) (TnyMimePart *self, TnyList *list);
+	void (*set_header_pair_func) (TnyMimePart *self, const gchar *name, const gchar *value);
 };
 
 

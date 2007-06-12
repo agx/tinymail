@@ -3,7 +3,10 @@
 	* Configurable idle delays
 	* Configurable get-message service shutdown timeouts
 	* Notifying the observers of a folder when a remove happens
+	* Added tny_mime_part_set_header_pair
 
+	* This was a major API change
+	
 2007-06-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* The summary camel-lite code no longer puts the uid field in the mmap

@@ -29,6 +29,36 @@
 /* TNY TODO: Check MIME RFC to evaluate whether NULL string values should be
  * allowed and strengthen contracts if not */
 
+
+/**
+ * tny_mime_part_set_header_pair:
+ * @self: a #TnyMimePart object
+ * @name: the name of the header
+ * @value: the value of the header or NULL to unset
+ * 
+ * Set a header pair (name: value) or delete a header (use NULL as value).
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyMsg *message = ...
+ * tny_mime_part_set_header_pair (TNY_MIME_PART (message),
+ *        "X-MS-Has-Attach", "yes");
+ * </programlisting></informalexample>
+ **/
+void 
+tny_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (name);
+	g_assert (strlen (name) > 0);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_header_pair_func != NULL);
+#endif
+
+	TNY_MIME_PART_GET_IFACE (self)->set_header_pair_func (self, name, value);
+	return;
+}
+
 /**
  * tny_mime_part_get_header_pairs:
  * @self: a #TnyMimePart object
