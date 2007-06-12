@@ -39,8 +39,8 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (to);
-	g_assert (strlen (to) > 0);
+	if (to)
+		g_assert (strlen (to) > 0);
 	g_assert (TNY_HEADER_GET_IFACE (self)->set_replyto_func != NULL);
 #endif
 
@@ -86,8 +86,8 @@ tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (bcc);
-	g_assert (strlen (bcc) > 0);
+	if (bcc)
+		g_assert (strlen (bcc) > 0);
 	g_assert (TNY_HEADER_GET_IFACE (self)->set_bcc_func != NULL);
 #endif
 
@@ -114,8 +114,8 @@ tny_header_set_cc (TnyHeader *self, const gchar *cc)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (cc);
-	g_assert (strlen (cc) > 0);
+	if (cc)
+		g_assert (strlen (cc) > 0);
 	g_assert (TNY_HEADER_GET_IFACE (self)->set_cc_func != NULL);
 #endif
 
@@ -141,8 +141,8 @@ tny_header_set_from (TnyHeader *self, const gchar *from)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (from);
-	g_assert (strlen (from) > 0);
+	if (from)
+		g_assert (strlen (from) > 0);
 	g_assert (TNY_HEADER_GET_IFACE (self)->set_from_func != NULL);
 #endif
 
@@ -168,8 +168,8 @@ tny_header_set_subject (TnyHeader *self, const gchar *subject)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (subject);
-	g_assert (strlen (subject) > 0);
+	if (subject)
+		g_assert (strlen (subject) > 0);
 	g_assert (TNY_HEADER_GET_IFACE (self)->set_subject_func != NULL);
 #endif
 
@@ -200,8 +200,8 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (to);
-	g_assert (strlen (to) > 0);
+	if (to)
+		g_assert (strlen (to) > 0);
 	g_assert (TNY_HEADER_GET_IFACE (self)->set_to_func != NULL);
 #endif
 
