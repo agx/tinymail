@@ -491,7 +491,6 @@ static void
 tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyFolderChange *change;
 
 	g_assert (TNY_IS_HEADER (header));
 
@@ -516,7 +515,7 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 
 	tny_msg_remove_strategy_perform_remove (priv->remove_strat, self, header, err);
 
-	_tny_camel_folder_check_unread_count (self);
+	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
@@ -3619,6 +3618,12 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 			retval = g_strdup_printf ("%s/%s", urls, foln);
 			g_free (urls);
 		}
+	}
+
+	if (!retval) { /* Strange, a local one?*/
+		g_warning ("tny_folder_get_url_string does not have an "
+				"iter nor account. Using maildir as type.\n");
+		retval = g_strdup_printf ("maildir://%s", priv->folder_name);
 	}
 
 	return retval;
