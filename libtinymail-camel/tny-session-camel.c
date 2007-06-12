@@ -197,8 +197,12 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
-		g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
-			TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, msg);
+		if (strstr (msg, "Canceled") != NULL)
+			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
+				TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT, "The connecting got canceled");
+		else
+			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
+				TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, msg);
 
 		tny_lockable_lock (self->priv->ui_lock);
 

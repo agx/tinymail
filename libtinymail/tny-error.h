@@ -99,7 +99,10 @@ enum _TnyError
 
 	TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH = 16,
 
-	TNY_SEND_QUEUE_ERROR_ADD = 17
+	TNY_SEND_QUEUE_ERROR_ADD = 17,
+
+	TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT = 18,
+
 };
 
 GType tny_error_domain_get_type (void);

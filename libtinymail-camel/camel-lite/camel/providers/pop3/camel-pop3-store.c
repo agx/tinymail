@@ -548,7 +548,7 @@ try_sasl(CamelPOP3Store *store, const char *mech, CamelException *ex)
 	
  ioerror:
 	if (errno == EINTR) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Canceled"));
+		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "Canceled");
 	} else {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Failed to authenticate on POP server %s: %s"),
@@ -644,7 +644,7 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 	
 	if (status == -1) {
 		if (errno == EINTR) {
-			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Canceled"));
+			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "Canceled");
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 					      _("Unable to connect to POP server %s.\n"

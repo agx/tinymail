@@ -495,7 +495,7 @@ cs_waitinfo(void *(worker)(void *), struct _addrinfo_msg *msg, const char *error
 #endif
 						     );
 			else
-				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("Canceled"));
+				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, "Canceled");
 			
 			/* We cancel so if the thread impl is decent it causes immediate exit.
 			   We detach so we dont need to wait for it to exit if it isn't.
@@ -657,7 +657,7 @@ camel_getaddrinfo(const char *name, const char *service, const struct addrinfo *
 	g_return_val_if_fail(name != NULL, NULL);
 	
 	/*if (camel_operation_cancel_check(NULL)) {
-		camel_exception_set(ex, CAMEL_EXCEPTION_USER_CANCEL, _("Canceled"));
+		camel_exception_set(ex, CAMEL_EXCEPTION_USER_CANCEL, "Canceled");
 		return NULL;
 	}*/
 
@@ -788,7 +788,7 @@ camel_getnameinfo(const struct sockaddr *sa, socklen_t salen, char **host, char 
 	int result;
 
 	if (camel_operation_cancel_check(NULL)) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Canceled"));
+		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "Canceled");
 		return -1;
 	}
 

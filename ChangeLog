@@ -17,6 +17,7 @@
 	* Configurable get-message service shutdown timeouts
 	* Notifying the observers of a folder when a remove happens
 	* Added tny_mime_part_set_header_pair
+	* Added the TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT alert situation
 
 	* This was a major API change
 	
