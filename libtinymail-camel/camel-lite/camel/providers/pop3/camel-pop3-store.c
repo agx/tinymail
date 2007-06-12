@@ -144,8 +144,10 @@ pop3_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 
+	g_static_rec_mutex_lock (store->eng_lock);
 	camel_object_unref((CamelObject *)store->engine);
 	store->engine = NULL;
+	g_static_rec_mutex_unlock (store->eng_lock);
 
 	return TRUE;
 }
@@ -310,16 +312,18 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if ((delete_days = (gchar *) camel_url_get_param(service->url,"delete_after"))) 
 		store->delete_after =  atoi(delete_days);
 
+	g_static_rec_mutex_lock (store->eng_lock);
 	if (!(store->engine = camel_pop3_engine_new (tcp_stream, flags))) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 			_("Failed to read a valid greeting from POP server %s"),
 			service->url->host);
 		camel_object_unref (tcp_stream);
+		g_static_rec_mutex_unlock (store->eng_lock);
 		return FALSE;
 	}
-
 	store->engine->store = store;
 	store->engine->partial_happening = FALSE;
+	g_static_rec_mutex_unlock (store->eng_lock);
 
 	if (!must_tls && (ssl_mode != MODE_TLS)) 
 	{
@@ -394,10 +398,12 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		camel_pop3_engine_command_free (store->engine, pc);
 	}
 
+	g_static_rec_mutex_lock (store->eng_lock);
 	camel_object_unref (CAMEL_OBJECT (store->engine));
 	camel_object_unref (CAMEL_OBJECT (tcp_stream));
 	store->engine = NULL;
 	store->connected = FALSE;
+	g_static_rec_mutex_unlock (store->eng_lock);
 
 	return FALSE;
 }
@@ -731,9 +737,11 @@ pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 			;
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
-	
+
+	g_static_rec_mutex_lock (store->eng_lock);
 	camel_object_unref((CamelObject *)store->engine);
 	store->engine = NULL;
+	g_static_rec_mutex_unlock (store->eng_lock);
 
 	return TRUE;
 }
@@ -762,15 +770,22 @@ finalize (CamelObject *object)
 {
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (object);
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine)
 		camel_object_unref((CamelObject *)pop3_store->engine);
 	pop3_store->engine = NULL;
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 	if (pop3_store->cache)
 		camel_object_unref((CamelObject *)pop3_store->cache);
 	pop3_store->cache = NULL;
 	if (pop3_store->storage_path)
 		g_free (pop3_store->storage_path);
 	pop3_store->storage_path = NULL;
+
+	g_static_rec_mutex_free (pop3_store->eng_lock);
+	pop3_store->eng_lock = NULL;
+
 }
 
 
@@ -855,6 +870,8 @@ camel_pop3_store_init (gpointer object, gpointer klass)
 	CamelPOP3Store *store = (CamelPOP3Store *) object;
 
 	store->immediate_delete_after = FALSE;
+	store->eng_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (store->eng_lock);
 
 	return;
 }

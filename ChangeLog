@@ -3,6 +3,7 @@
 	* Improved the tny_folder_poke_status implementation of TnyCamelFolder
 	(performance improvement, made it internally async)
 	* Experimental caching of root folder list
+	* Added some locking in the CamelPOP3Store and folder
 
 2007-06-12  Murray Cumming  <murrayc@murrayc.com>
 

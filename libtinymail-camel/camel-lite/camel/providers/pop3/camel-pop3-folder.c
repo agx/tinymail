@@ -219,7 +219,7 @@ cmd_list(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 				fi->size = size;
 				fi->id = id;
 				fi->index = ((CamelPOP3Folder *)folder)->uids->len;
-				if ((pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) == 0)
+				if ((pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) == 0)
 					fi->cmd = camel_pop3_engine_command_new(pe, CAMEL_POP3_COMMAND_MULTI, cmd_builduid, fi, "TOP %u 0\r\n", id);
 				g_ptr_array_add(((CamelPOP3Folder *)folder)->uids, fi);
 				g_hash_table_insert(((CamelPOP3Folder *)folder)->uids_id, GINT_TO_POINTER(id), fi);
@@ -269,8 +269,12 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL)
+	{
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		return;
+	}
 
 	destroy_lists (pop3_folder);
 
@@ -316,7 +320,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		{
 			CamelMimeMessage *msg = NULL;
 
-			if (pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) 
+			if (pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) 
 				msg = pop3_get_top (folder, fi->uid, NULL);
 			else
 				msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_PARTIAL, -1, NULL);
@@ -381,8 +385,11 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	/* dont need this anymore */
 	g_hash_table_destroy(pop3_folder->uids_id);
-	
+
 	camel_operation_end (NULL);
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 	return;
 }
 
@@ -408,6 +415,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	if (!expunge)
 		return;
+
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	camel_operation_start(NULL, _("Expunging deleted messages"));
 
@@ -467,7 +476,9 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	camel_operation_end(NULL);
 
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 }
+
 
 int
 camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *ex)
@@ -481,6 +492,8 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (CAMEL_FOLDER(pop3_folder)->parent_store);
 	temp = time(&temp);
+
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	for (i = 0; i < pop3_folder->uids->len; i++) 
 	{
@@ -537,8 +550,10 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 
 	/* camel_pop3_store_expunge (pop3_store, ex); */
 
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 	return 0;
-	
+
 }
 
 static void
@@ -701,6 +716,8 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+
 	stream = camel_data_cache_get(pop3_store->cache, "cache", uid, NULL);
 	if (stream)
 	{
@@ -717,6 +734,9 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		}
 
 		camel_object_unref (CAMEL_OBJECT (stream));
+
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 		return message;
 	}
 
@@ -724,6 +744,9 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	if (fi == NULL) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
 				      _("No message with UID %s"), uid);
+
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 		return NULL;
 	}
 
@@ -865,6 +888,8 @@ done:
 fail:
 	camel_operation_end(NULL);
 
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 	return message;
 }
 
@@ -883,11 +908,16 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi;
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+
 	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
 
 	if (fi == NULL) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
 				      _("No message with UID %s"), uid);
+
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 		return NULL;
 	}
 
@@ -1004,6 +1034,8 @@ done:
 	camel_object_unref((CamelObject *)stream);
 fail:
 	camel_operation_end(NULL);
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	return message;
 }
