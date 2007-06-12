@@ -3397,45 +3397,105 @@ tny_camel_folder_poke_status_destroyer (gpointer data)
 	g_slice_free (PokeStatusInfo, info);
 }
 
+
+static GStaticMutex poke_folders_lock = G_STATIC_MUTEX_INIT;
+static GList *poke_folders = NULL;
+static GThread *poke_folders_thread = NULL;
+
+static gpointer
+tny_camel_folder_poke_status_thread (gpointer data)
+{
+
+	while (poke_folders)
+	{
+		PokeStatusInfo *info = NULL;
+		TnyFolder *folder = NULL;
+		TnyCamelFolderPriv *priv = NULL;
+		CamelStore *store = NULL;
+		int newlen = -1, newurlen = -1, uidnext = -1;
+
+		g_static_mutex_lock (&poke_folders_lock);
+
+		folder = poke_folders->data;
+
+		priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+		store = priv->store;
+
+		camel_store_get_folder_status (store, priv->folder_name, 
+			&newurlen, &newlen, &uidnext);
+
+		if (newurlen == -1 || newlen == -1)
+		{
+			if (priv->iter) {
+				info = g_slice_new (PokeStatusInfo);
+				info->unread = priv->iter->unread;
+				info->total = priv->iter->total;
+			}
+		} else {
+			info = g_slice_new (PokeStatusInfo);
+			info->unread = newurlen;
+			info->total = newlen;
+		}
+
+		if (info && folder)
+		{
+			info->self = TNY_FOLDER (g_object_ref (folder));
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				tny_camel_folder_poke_status_callback, 
+				info, tny_camel_folder_poke_status_destroyer);
+		}
+
+		g_object_unref (folder);
+
+		poke_folders = g_list_next (poke_folders);
+
+		if (!poke_folders)
+		{
+			poke_folders_thread = NULL;
+			break; /* Reason for A */
+		} else {
+			g_static_mutex_unlock (&poke_folders_lock);
+			usleep (5000); /* Allow other folders to be added */
+		}
+	}
+
+	g_static_mutex_unlock (&poke_folders_lock); /* A */
+
+	g_thread_exit (NULL);
+	return NULL;
+}
+
+
 static void 
 tny_camel_folder_poke_status_default (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelStore *store = priv->store;
-	PokeStatusInfo *info = g_slice_new (PokeStatusInfo);
-	info->self = TNY_FOLDER (g_object_ref (self));
-
-	info->unread = 0;
-	info->total = 0;
+	PokeStatusInfo *info = NULL;
 
 	if (priv->folder)
 	{
+		info = g_slice_new (PokeStatusInfo);
 		g_static_rec_mutex_lock (priv->folder_lock);
 		info->unread = camel_folder_get_unread_message_count (priv->folder);
 		info->total = camel_folder_get_message_count (priv->folder);
 		g_static_rec_mutex_unlock (priv->folder_lock);
 	} else {
-		int newlen = -1, newurlen = -1, uidnext = -1;
-
 		g_static_rec_mutex_lock (priv->folder_lock);
 
 		if (store && CAMEL_IS_DISCO_STORE (store)  && priv->folder_name 
 			&& camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
 		{
-			camel_store_get_folder_status (store, priv->folder_name, 
-				&newurlen, &newlen, &uidnext);
-			if (newurlen == -1 || newlen == -1)
-			{
-				if (priv->iter) {
-					info->unread = priv->iter->unread;
-					info->total = priv->iter->total;
-				}
-			} else {
-				info->unread = newurlen;
-				info->total = newlen;
-			}
+			g_static_mutex_lock (&poke_folders_lock);
+
+			poke_folders = g_list_append (poke_folders, g_object_ref (self));
+			if (!poke_folders_thread)
+				poke_folders_thread = g_thread_create (tny_camel_folder_poke_status_thread, self, TRUE, NULL);
+
+			g_static_mutex_unlock (&poke_folders_lock);
 		} else {
 			if (priv->iter) {
+				info = g_slice_new (PokeStatusInfo);
 				info->unread = priv->iter->unread;
 				info->total = priv->iter->total;
 			}
@@ -3444,15 +3504,21 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 		g_static_rec_mutex_unlock (priv->folder_lock);
 	}
 
-	if (g_main_depth () > 0)
+
+	if (info)
 	{
-		g_idle_add_full (G_PRIORITY_HIGH, 
-				tny_camel_folder_poke_status_callback, 
-				info, tny_camel_folder_poke_status_destroyer);
-	} else 
-	{
-		tny_camel_folder_poke_status_callback (info);
-		tny_camel_folder_poke_status_destroyer (info);
+		info->self = TNY_FOLDER (g_object_ref (self));
+
+		if (g_main_depth () > 0)
+		{
+			g_idle_add_full (G_PRIORITY_HIGH, 
+					tny_camel_folder_poke_status_callback, 
+					info, tny_camel_folder_poke_status_destroyer);
+		} else 
+		{
+			tny_camel_folder_poke_status_callback (info);
+			tny_camel_folder_poke_status_destroyer (info);
+		}
 	}
 
 	return;

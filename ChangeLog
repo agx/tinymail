@@ -1,3 +1,8 @@
+2007-06-12  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Improved the tny_folder_poke_status implementation of TnyCamelFolder
+	(performance improvement, made it internally async)
+
 2007-06-12  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail/tny-enums.h: Resynced the fake TnyFolderType enum values 
