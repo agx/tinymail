@@ -740,7 +740,11 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		return message;
 	}
 
-	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
+	if (pop3_folder->uids_uid)
+		fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
+	else 
+		fi = NULL;
+
 	if (fi == NULL) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
 				      _("No message with UID %s"), uid);
