@@ -386,6 +386,7 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
 	priv->managed_folders = NULL;
 	priv->sobservers = NULL;
+	priv->iter = NULL;
 
 	return;
 }
@@ -828,7 +829,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
-	iter = camel_store_get_folder_info (store, "", flags, &ex);
+	if (!priv->iter)
+		iter = camel_store_get_folder_info (store, "", flags, &ex);
+	else
+		iter = priv->iter;
 
 	if (camel_exception_is_set (&ex))
 	{
