@@ -349,7 +349,11 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	}
 
 	e_dlist_addtail(&pe->done, (EDListNode *)pc);
-	pe->sentlen -= strlen(pc->data);
+
+	if (pc && pc->data)
+		pe->sentlen -= strlen(pc->data);
+	else
+		g_warning ("Unexpected, pc == NULL");
 
 	/* Set next command */
 	pe->current = (CamelPOP3Command *)e_dlist_remhead(&pe->active);
