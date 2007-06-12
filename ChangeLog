@@ -1,3 +1,16 @@
+2007-06-12  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-enums.h: Resynced the fake TnyFolderType enum values 
+	from tnyfolder.h and added comments explaining why we have these fake 
+	uninstalled enums for gtk-doc, with a link to the gtk-doc bug.
+	
+	* libtinymail/tny-folder.c:
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c: (updater),
+	(deleter), (find_store_iter): Use TnyFolderType instead of gint when 
+	using this column, and initialize it, rather than depending on 
+	gtk_tree_model_get() to initialize it. The compiler can't detect these 
+	possible unitialized uses.
+
 2007-06-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Configurable idle delays

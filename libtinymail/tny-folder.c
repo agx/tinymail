@@ -1200,6 +1200,11 @@ tny_folder_get_name (TnyFolder *self)
  * @self: a TnyFolder object
  * 
  * Get the type of @self (Inbox, Outbox etc.) 
+ * Most implementations decide the type by comparing the name of the folder 
+ * with some hardcoded values.
+ * Some implementations (such as camel) might not provide precise information 
+ * before a connection has been made. For instance, the return value might 
+ * be TNY_FOLDER_TYPE_NORMAL rather than TNY_FOLDER_TYPE_SENT.
  * 
  * Return value: The folder type as a #TnyFolderType enum
  **/

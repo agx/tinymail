@@ -1,6 +1,15 @@
 #ifdef TNY_ENUMS_H
 
-/* These are fakes for gtk-doc */
+/* These are fakes for gtk-doc.
+ * This file is not installed and should not be included.
+ * 
+ * These are duplicates of the same enums from tny-folder.h,
+ * because gtk-doc does not like the (e.g. "enum _TnyFolderType") 
+ * way that enum are defined in the main headers
+ * (http://bugzilla.gnome.org/show_bug.cgi?id=446648) 
+ * and Philip prefers to duplicate it and try to keep it in sync
+ * rather than adapt to what gtk-doc demands, or it cannot be adapted.
+ */
 
 G_BEGIN_DECLS
 
@@ -139,7 +148,15 @@ typedef enum {
 	TNY_FOLDER_TYPE_TRASH,
 	TNY_FOLDER_TYPE_JUNK,
 	TNY_FOLDER_TYPE_SENT,
-	TNY_FOLDER_TYPE_ROOT
+	TNY_FOLDER_TYPE_ROOT,
+	TNY_FOLDER_TYPE_NOTES,
+	TNY_FOLDER_TYPE_DRAFTS,
+	TNY_FOLDER_TYPE_CONTACTS,
+	TNY_FOLDER_TYPE_CALENDAR,
+	TNY_FOLDER_TYPE_ARCHIVE,
+	TNY_FOLDER_TYPE_MERGE,
+
+	TNY_FOLDER_TYPE_NUM
 } TnyFolderType;
 
 G_END_DECLS

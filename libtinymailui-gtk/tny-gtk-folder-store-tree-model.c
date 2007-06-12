@@ -588,7 +588,7 @@ tny_gtk_folder_store_tree_model_foreach_in_the_list (TnyList *self, GFunc func, 
 static gboolean 
 updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
 {
-	gint type;
+	TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
 	TnyFolderChange *change = user_data1;
 	TnyFolder *changed_folder = tny_folder_change_get_folder (change);
 	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
@@ -645,7 +645,7 @@ static gboolean
 deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
 {
 	gboolean retval = FALSE;
-	gint type;
+	TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
 	GObject *folder = user_data1;
 
 	gtk_tree_model_get (model, iter, 
@@ -678,7 +678,7 @@ find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointe
 	do
 	{
 		GtkTreeIter child;
-		gint type;
+		TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
 		TnyFolderStore *fol;
 		gboolean found = FALSE;
 
