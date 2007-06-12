@@ -219,7 +219,6 @@ camel_imap_folder_init (gpointer object, gpointer klass)
 	imap_folder->stopping = FALSE;
 	imap_folder->in_idle = FALSE;
 
-	
 	imap_folder->gmsgstore = NULL;
 	imap_folder->gmsgstore_ticks = 0;
 
@@ -3669,10 +3668,10 @@ idle_thread (gpointer data)
 		g_static_rec_mutex_unlock (store->idle_prefix_lock);
 		g_static_rec_mutex_unlock (store->idle_lock);
 
-		idle_debug ("idle checked in idle_thread\n");
+		idle_debug ("idle checked in idle_thread, waiting %ds for new check\n", store->idle_sleep);
 
-		for (x=0; x<100 && store->idle_cont; x++)
-			usleep (50000);
+		for (x=0; x<1000 && store->idle_cont; x++)
+			usleep (store->idle_sleep * 1000);
 	}
 
 	store->in_idle = FALSE;
@@ -3919,7 +3918,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	CamelFolder *folder = CAMEL_FOLDER (imap_folder);
 	CamelImapStore *store = NULL;
 	CamelStream *stream = NULL;
-	gboolean connected = FALSE, idle_rt = FALSE, ctchecker=FALSE;
+	gboolean connected = FALSE, ctchecker=FALSE;
 	CamelException  tex = CAMEL_EXCEPTION_INITIALISER;
 	ssize_t nread = 0; gboolean amcon = FALSE;
 
@@ -3959,7 +3958,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	if (imap_folder->gmsgstore) {
 		imap_debug ("Get-Message service reused\n");
 		store = imap_folder->gmsgstore;
-		imap_folder->gmsgstore_ticks = 5;
+		imap_folder->gmsgstore_ticks = 100;
 		ctchecker=FALSE;
 	} else
 	{
@@ -3994,7 +3993,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		camel_operation_end (NULL);
 
 		imap_folder->gmsgstore = store;
-		imap_folder->gmsgstore_ticks = 5;
+		imap_folder->gmsgstore_ticks = 100;
 		ctchecker=TRUE;
 	}
 
@@ -4049,11 +4048,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			{
 				nread = camel_stream_read (store->ostream, two_bytes, 1);
 				line [f] = two_bytes [0];
-/* printf ("%c%c", two_bytes[0], two_bytes[1]); */
 				f++;
 			}
 			line[f] = '\0';
-/* printf ("\n"); */
 
 			/* The first line is very unlikely going to consume 1023 bytes */
 			if (f > 1023 || nread <= 0) {
@@ -4064,25 +4061,39 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			/* If the line doesn't start with "* " */
 
 			if (*line != '*' || *(line + 1) != ' ')
-				{ err = TRUE; g_warning ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); goto berrorhander; }
+			{ 
+				err = TRUE; 
+				g_warning ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); 
+				goto berrorhander; 
+			}
+
 			pos = strchr (line, '{');
 
 			/* If we don't find a '{' character */
 			if (!pos) 
-				{ err = TRUE; g_warning ("BINARY: Line doesn't contain a {, UID=%s (%s)", uid, line); goto berrorhander; }
+			{ 
+				err = TRUE; g_warning ("BINARY: Line doesn't contain a {, UID=%s (%s)", uid, line); 
+				goto berrorhander; 
+			}
 
 			/* Set the '}' character to \0 */
 			ppos = strchr (pos, '}');
 			if (ppos) 
 				*ppos = '\0';
 			else /* If we didn't find it */
-				{ err = TRUE; g_warning ("BINARY: Line doesn't contain a }, UID=%s (%s)", uid, line); goto berrorhander; }
+			{ 
+				err = TRUE; g_warning ("BINARY: Line doesn't contain a }, UID=%s (%s)", uid, line); 
+				goto berrorhander; 
+			}
 
 			length = strtol (pos + 1, NULL, 10);
 
 			/* If strtol failed (it's important enough to check this) */
 			if (errno == ERANGE)
-				{ err = TRUE; g_warning ("BINARY: strtol failed, UID=%s (%s)", uid, line); goto berrorhander; }
+			{ 
+				err = TRUE; g_warning ("BINARY: strtol failed, UID=%s (%s)", uid, line); 
+				goto berrorhander; 
+			}
 
 			/* Until we have reached the length, read 1024 at the time */
 			while (hread > 0 && rec < length)
@@ -4117,9 +4128,6 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			}
 berrorhander:
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-			/* Starts idle */
-			/* camel_imap_folder_start_idle ((CamelFolder *) imap_folder); */
-			idle_rt = TRUE;
 
 			if (err)
 				goto errorhander;
@@ -4216,9 +4224,6 @@ berrorhander:
 			  }
 
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-			/* Starts idle */
-			/* camel_imap_folder_start_idle ((CamelFolder *) imap_folder); */
-			idle_rt = TRUE;
 
 			if (nread <= 0) 
 				err = TRUE;
@@ -4381,9 +4386,6 @@ berrorhander:
 			  }
 rerrorhandler:
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-			/* Starts idle */
-			/* camel_imap_store_start_idle (store); */
-			idle_rt = TRUE;
 
 			if (nread <= 0) 
 				err = TRUE;
@@ -4423,32 +4425,25 @@ rerrorhandler:
 
 errorhander:
 
-	if (!idle_rt)
-		camel_imap_folder_start_idle ((CamelFolder *) imap_folder);
-
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 	camel_imap_message_cache_remove (imap_folder->cache, uid);
 
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 		    _("Could not find message body in FETCH response."));
-
 	handle_freeup (store, nread, ex);
 
-	if (stream && ((CamelObject *)stream)->ref_count > 0)
+	if (stream)
 		camel_object_unref (CAMEL_OBJECT (stream));
 
-  if (store)
-  {
+	if (store)
+	{
   CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
-	if (ctchecker) {
-		camel_object_ref (imap_folder);
-		imap_folder->gmsgstore_signal = g_timeout_add (1000, 
-			check_gmsgstore_die, imap_folder);
+		if (ctchecker) {
+			camel_object_ref (imap_folder);
+			imap_folder->gmsgstore_signal = g_timeout_add (1000, 
+				check_gmsgstore_die, imap_folder);
+		}
 	}
-
-	/* camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-	camel_object_unref (CAMEL_OBJECT (store)); */
-  }
 
 	g_static_mutex_unlock (&gmsgstore_lock);
 

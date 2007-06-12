@@ -1,3 +1,8 @@
+2007-06-12  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Configurable idle delays
+	* Notifying the observers of a folder when a remove happens
+
 2007-06-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* The summary camel-lite code no longer puts the uid field in the mmap
