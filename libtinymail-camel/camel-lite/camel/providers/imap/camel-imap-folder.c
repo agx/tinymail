@@ -3958,7 +3958,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	if (imap_folder->gmsgstore) {
 		imap_debug ("Get-Message service reused\n");
 		store = imap_folder->gmsgstore;
-		imap_folder->gmsgstore_ticks = 100;
+		imap_folder->gmsgstore_ticks = store->getsrv_sleep;
 		ctchecker=FALSE;
 	} else
 	{
@@ -3993,10 +3993,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		camel_operation_end (NULL);
 
 		imap_folder->gmsgstore = store;
-		imap_folder->gmsgstore_ticks = 100;
+		imap_folder->gmsgstore_ticks = store->getsrv_sleep;;
 		ctchecker=TRUE;
 	}
-
 
 	camel_operation_start (NULL, _("Retrieving message"));
 

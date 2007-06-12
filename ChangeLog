@@ -1,6 +1,7 @@
 2007-06-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Configurable idle delays
+	* Configurable get-message service shutdown timeouts
 	* Notifying the observers of a folder when a remove happens
 
 2007-06-11  Philip Van Hoof  <pvanhoof@gnome.org>

@@ -164,7 +164,25 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
  * encrypted session if it fails (not recommended, as your users will want SSL
  * if they require this security for their accounts).
  *
- * use_ssl=never will forcefully make sure that no SSL is to be used
+ * use_ssl=never will forcefully make sure that no SSL is to be used.
+ * 
+ * One option for some accounts (like the IMAP accounts) is idle_delay. The
+ * parameter is the amount of seconds that you want to wait for the IDLE state
+ * to be stopped. Stopping the IDLE state will make the server flush all the 
+ * pending events for the IDLE state. This improve responsibility of the Push 
+ * E-mail and expunge events, although it will cause a little bit more continuous
+ * bandwidth consumption (each delayth second). For example idle_delay=20. The
+ * defualt value is 20.
+ *
+ * Another option is getsrv_delay, also for IMAP accounts, which allows you to 
+ * specify the delay before the connection that gets created for receiving 
+ * uncached messages gets shut down. If this service is not yet shut down, then
+ * it'll be reused. Else a new one will be created that will be kept around for
+ * delay seconds (in the hopes that new requests will happen). Keeping a socket
+ * open for a long period of time might not be ideal for some situations, but
+ * closing it very quickly will let almost each request create a new connection
+ * with the IMAP server. Which is why you can play with the value yourself. For
+ * example getsrv_delay=100. The default value is 100.
  **/
 void 
 tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option)

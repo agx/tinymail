@@ -338,6 +338,8 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->dontdistridlehack = FALSE;
 
 	imap_store->idle_sleep = 20; /* default of 20s */
+	imap_store->getsrv_sleep = 100; /* default of 100s */
+
 	imap_store->in_idle = FALSE;
 	imap_store->idle_cont = FALSE;
 	imap_store->idle_thread = NULL;
@@ -1114,7 +1116,7 @@ static struct {
 static gboolean
 connect_to_server_wrapper (CamelService *service, CamelException *ex)
 {
-	const char *ssl_mode, *idle_sleep;
+	const char *ssl_mode, *idle_sleep, *getsrv_sleep;
 	struct addrinfo hints, *ai;
 	int mode = -1, ret, i, must_tls = 0;
 	char *serv;
@@ -1136,6 +1138,13 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 		int tmp = atoi (idle_sleep);
 		if (tmp != -1)
 			CAMEL_IMAP_STORE (service)->idle_sleep = tmp;
+	} 
+
+	if ((getsrv_sleep = camel_url_get_param (service->url, "getsrv_delay")))
+	{
+		int tmp = atoi (getsrv_sleep);
+		if (tmp != -1)
+			CAMEL_IMAP_STORE (service)->getsrv_sleep = tmp;
 	} 
 
 	if ((ssl_mode = camel_url_get_param (service->url, "use_ssl"))) 
