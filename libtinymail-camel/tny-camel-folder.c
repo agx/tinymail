@@ -3671,6 +3671,7 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	gchar *retval = NULL;
 
+
 	if (priv->iter && priv->iter->uri && (strlen (priv->iter->uri) > 0))
 	{
 		retval = g_strdup_printf ("%s", priv->iter->uri);
