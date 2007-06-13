@@ -1,6 +1,7 @@
 2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fix for the uid of POP summary items
+	* Some bugfixing for finding messages
 
 2007-06-13  Murray Cumming  <murrayc@murrayc.com>
 

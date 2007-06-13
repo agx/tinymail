@@ -299,7 +299,7 @@ tny_olpc_account_store_find_account (TnyAccountStore *self, const gchar *url_str
 
 			if (tny_account_matches_url_string (account, url_string))
 			{
-				found = TNY_ACCOUNT (g_object_ref (G_OBJECT (found)));
+				found = TNY_ACCOUNT (g_object_ref (G_OBJECT (account)));
 				break;
 			}
 
