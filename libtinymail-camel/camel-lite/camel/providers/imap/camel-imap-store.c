@@ -5,6 +5,10 @@
  *  Authors:
  *    Dan Winship <danw@ximian.com>
  *    Jeffrey Stedfast <fejj@ximian.com>
+ *    Philip Van Hoof <pvanhoof@gnome.org>
+ *
+ * This is camel-lite's version of CamelImapStore. Take a look at camel-imap-folder.c
+ * for more information on what differs from Camel's upstream version.
  *
  *  Copyright 2000, 2003 Ximian, Inc.
  *

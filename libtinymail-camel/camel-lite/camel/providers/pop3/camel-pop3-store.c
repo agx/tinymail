@@ -5,7 +5,12 @@
  * Authors:
  *   Dan Winship <danw@ximian.com>
  *   Michael Zucchi <notzed@ximian.com>
+ *   Philip Van Hoof <pvanhoof@gnome.org>
  *
+ * This is CamelPop3Store for camel-lite that implements CamelDiscoStore. Its 
+ * implementation is significantly different from Camel's upstream version 
+ * (being used by Evolution): this version supports offline and online modes.
+ * 
  * Copyright (C) 2000-2002 Ximian, Inc. (www.ximian.com)
  *
  * This program is free software; you can redistribute it and/or 

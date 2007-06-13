@@ -1,15 +1,18 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /* camel-imap-folder.c: class for an imap folder
- * 
- * This is the mmap version of camel-imap-folder.c which has a memory
- * consumption reduced imap_update_summary implementation that will
- * periodically instruct the mmap CamelFolderSummary instance to sync
- * headers to disk.
  *
  * Authors:
  *   Dan Winship <danw@ximian.com>
  *   Jeffrey Stedfast <fejj@ximian.com> s
  *   Philip Van Hoof <pvanhoof@gnome.org>
+ *
+ * This is the mmap version of camel-imap-folder.c which has a memory consumption 
+ * reduced imap_update_summary implementation that will periodically instruct 
+ * the mmap CamelFolderSummary instance to sync headers to disk. 
+ *
+ * It has support for CONDSTORE, BINARY and IMAP IDLE. This implementation will 
+ * write received information to disk as soon as possible, and will try recover
+ * the state using this information as much as possible.
  *
  * Copyright (C) 2000, 2001 Ximian, Inc.
  *
