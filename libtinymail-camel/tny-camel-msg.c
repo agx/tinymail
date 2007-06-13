@@ -125,6 +125,7 @@ _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder* folder)
 
 	g_mutex_lock (priv->folder_lock);
 	priv->folder = (TnyFolder*)folder;
+	g_object_ref (priv->folder);
 	g_mutex_unlock (priv->folder_lock);
 
 	return;
@@ -229,6 +230,10 @@ tny_camel_msg_finalize (GObject *object)
 	if (G_LIKELY (priv->header))
 		g_object_unref (G_OBJECT (priv->header));
 	priv->header = NULL;
+	
+	if (G_LIKELY (priv->folder))
+		g_object_unref (G_OBJECT (priv->folder));
+	priv->folder = NULL;
 
 	g_mutex_unlock (priv->header_lock);
 	g_mutex_unlock (priv->message_lock);

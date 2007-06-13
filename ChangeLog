@@ -1,5 +1,11 @@
 2007-06-13  Murray Cumming  <murrayc@murrayc.com>
 
+	* libtinymail-camel/tny-camel-msg.c: (_tny_camel_msg_set_folder),
+	(tny_camel_msg_finalize): Take and release a reference, to avoid 
+	crashes.
+
+2007-06-13  Murray Cumming  <murrayc@murrayc.com>
+
 	* libtinymail-camel/tny-camel-account.c:
 	(tny_camel_account_matches_url_string_default):
 	Actually set the in variable so that the comparison actually happens.
