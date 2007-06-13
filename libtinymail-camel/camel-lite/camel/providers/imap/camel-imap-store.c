@@ -730,6 +730,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	char *buf;
 	gboolean not_ssl = TRUE;
 
+	memset (&sockopt, 0, sizeof (CamelSockOptData));
+
 	if (ssl_mode != MODE_CLEAR) 
 	{
 		not_ssl = FALSE;
