@@ -1,4 +1,7 @@
 
+	TnyAccount *ac;
+	int i=0;
+
 	const gchar *URL[] = { 
 "pop://philip.vanhoof%40gmail.com@pop.gmail.com/;use_ssl=wrapped/inbox/GmailIdfebedafcc22b9c6",
 "pop://philip.vanhoof%40gmail.com@pop.gmail.com/;use_ssl=wrapped/inbox/GmailId112b3216c72f8e46",
