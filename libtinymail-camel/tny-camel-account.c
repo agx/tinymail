@@ -72,7 +72,7 @@ tny_camel_account_matches_url_string_default (TnyAccount *self, const gchar *url
 	gboolean retval = TRUE;
 
 	if (url_string)
-		camel_url_new (url_string, &ex);
+		in = camel_url_new (url_string, &ex);
 	else
 		return FALSE;
 

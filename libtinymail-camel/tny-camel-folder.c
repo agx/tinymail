@@ -1452,18 +1452,23 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 		}
 
 	uid = strrchr (url_string, '/');
+	
+	/* Skip over the '/': */
+	if (strlen (uid))
+		++uid;
+	
 	if (uid && uid[0] != '/' && strlen (uid) > 1)
 	{
-		uid++;
 		info = camel_message_info_new_uid (NULL, uid);
 		hdr = _tny_camel_header_new ();
 		_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
 		retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, hdr, err);
 		g_object_unref (G_OBJECT (hdr));
 	} else {
+		g_warning ("%s: malformed url string: %s", __FUNCTION__, url_string);
 		g_set_error (err, TNY_FOLDER_ERROR, 
 				TNY_FOLDER_ERROR_GET_MSG,
-				"This url string is malformated.");
+				"This url string is malformed.");
 		retval = NULL;
 	}
 

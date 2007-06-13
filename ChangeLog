@@ -1,3 +1,13 @@
+2007-06-13  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-account.c:
+	(tny_camel_account_matches_url_string_default):
+	Actually set the in variable so that the comparison actually happens.
+	* libtinymail-camel/tny-camel-folder.c:
+	(tny_camel_folder_find_msg_default): Skip over the / before, not after 
+	checking for / at the start. Do a g_warning() if the format is false, 
+	to help debugging.
+
 2007-06-13  Antia Puentes Felpeto  <apuentes@igalia.com>
 	
 	* Added a test in tests/functional that tests removing folders
