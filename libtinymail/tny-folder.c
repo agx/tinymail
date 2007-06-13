@@ -987,6 +987,7 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * 
  * Get a message in @self identified by @url_string. If not NULL, you must 
  * unreference the return value after use.
+ * See tny_folder_get_url_string() for details of the @url-string syntax.
  * 
  * Example:
  * <informalexample><programlisting>

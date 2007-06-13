@@ -1,3 +1,12 @@
+2007-06-13  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	(tny_camel_folder_get_url_string_default):
+	* libtinymail/tny-folder.c:
+	* libtinymail/tny-store-account.c: Added documentation and comments 
+	about the url-string. Note that Philip fixed 
+	tny_folder_get_url_string_default() in a previous commit.
+
 2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added some extra locking into the camel-lite's POP3 code

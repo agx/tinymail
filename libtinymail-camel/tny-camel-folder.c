@@ -3671,7 +3671,9 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	gchar *retval = NULL;
 
-
+	/* iter->uri is a cache.
+	 * Check for strlen(), because camel produces an empty (non-null) 
+	 * uri for POP. */
 	if (priv->iter && priv->iter->uri && (strlen (priv->iter->uri) > 0))
 	{
 		retval = g_strdup_printf ("%s", priv->iter->uri);
@@ -3693,6 +3695,7 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 		retval = g_strdup_printf ("maildir://%s", priv->folder_name);
 	}
 
+	/* printf ("DEBUG: %s: retval='%s'\n", __FUNCTION__, retval); */
 	return retval;
 }
 

@@ -65,6 +65,7 @@ tny_store_account_delete_cache (TnyStoreAccount *self)
  * let it return NULL.
  *
  * This method can be used to resolve url-strings to #TnyAccount instances.
+ * See tny_folder_get_url_string() for details of the @url-string syntax.
  *
  * Return value: the found account or NULL.
  **/
