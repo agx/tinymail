@@ -138,7 +138,7 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 			{
 				CamelDataWrapper *c = camel_medium_get_content_object (CAMEL_MEDIUM (tpart));
 			
-				if (c) 
+				if (c && CAMEL_IS_MIME_PART (c) && CAMEL_IS_MIME_MESSAGE (c)) 
 				{
 					TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (c), NULL);
 					newpart = TNY_MIME_PART (tny_camel_msg_new ());
