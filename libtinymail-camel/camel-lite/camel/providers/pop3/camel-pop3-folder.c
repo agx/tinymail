@@ -889,7 +889,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
 	if (mi->uid)
 		g_free (mi->uid);
-	mi->uid = g_strdup (fi->uid);
+	mi->uid = g_strdup (uid);
 
 	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 
@@ -1036,7 +1036,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 
 	if (mi->uid)
 		g_free (mi->uid);
-	mi->uid = g_strdup(fi->uid);
+	mi->uid = g_strdup(uid);
 
 	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 

@@ -1,3 +1,7 @@
+2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fix for the uid of POP summary items
+
 2007-06-13  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-msg.c: (_tny_camel_msg_set_folder),
