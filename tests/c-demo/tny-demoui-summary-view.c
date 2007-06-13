@@ -328,9 +328,6 @@ poke_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 	TnyList *accounts = tny_simple_list_new ();
 	TnyIterator *a_iter;
 
-	TnyAccount *ac;
-	int i=0;
-
 	tny_account_store_get_accounts (priv->account_store, accounts, 
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
