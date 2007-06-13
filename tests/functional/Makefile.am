@@ -15,7 +15,7 @@ if BUILD_MOZEMBED
 INCLUDES += -DMOZEMBED
 endif
 
-bin_PROGRAMS = folder-lister folder-lister-async msg-transfer msg-sender anything folder-transfer account-refresh
+bin_PROGRAMS = folder-lister folder-lister-async msg-transfer msg-sender anything folder-transfer account-refresh folder-remove
 
 anything_SOURCES = anything.c
 anything_LDADD = \
@@ -73,6 +73,15 @@ folder_transfer_LDADD = \
 
 account_refresh_SOURCES = account-refresh.c
 account_refresh_LDADD = \
+	$(TINYMAIL_LIBS) $(LIBTINYMAIL_GNOME_DESKTOP_LIBS) \
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
+	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
+	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
+	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
+	$(top_builddir)/tests/shared/libtestsshared.a
+
+folder_remove_SOURCES = folder-remove.c
+folder_remove_LDADD = \
 	$(TINYMAIL_LIBS) $(LIBTINYMAIL_GNOME_DESKTOP_LIBS) \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \

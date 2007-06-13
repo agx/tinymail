@@ -1,3 +1,7 @@
+2007-06-13  Antia Puentes Felpeto  <apuentes@igalia.com>
+	
+	* Added a test in tests/functional that tests removing folders
+
 2007-06-13  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-folder.c:
