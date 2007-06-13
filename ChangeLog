@@ -1,5 +1,9 @@
 2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
+	* Added some extra locking into the camel-lite's POP3 code
+
+2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
+
 	* Added placeholder for future libtinymail-tp
 	* This is unfinished material (don't yet use it)
 

@@ -117,6 +117,8 @@ struct _CamelPOP3Engine {
 	CamelPOP3Command *current; /* currently busy (downloading) response */
 	void *store; gboolean partial_happening;
 	gint type; gint param;
+
+	GStaticRecMutex *lock;
 };
 
 struct _CamelPOP3EngineClass {

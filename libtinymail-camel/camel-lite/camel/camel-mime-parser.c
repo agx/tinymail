@@ -1304,7 +1304,7 @@ static struct _header_scan_stack *
 folder_scan_content(struct _header_scan_state *s, int *lastone, char **data, size_t *length)
 {
 	int atleast = s->atleast, newatleast;
-	register char *inptr;
+	register char *inptr=NULL;
 	char *inend;
 	char *start;
 	int len;

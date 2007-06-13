@@ -60,6 +60,9 @@ camel_pop3_engine_class_init (CamelPOP3EngineClass *camel_pop3_engine_class)
 static void
 camel_pop3_engine_init(CamelPOP3Engine *pe, CamelPOP3EngineClass *peclass)
 {
+	pe->lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (pe->lock);
+
 	e_dlist_init(&pe->active);
 	e_dlist_init(&pe->queue);
 	e_dlist_init(&pe->done);
@@ -71,12 +74,19 @@ camel_pop3_engine_finalise(CamelPOP3Engine *pe)
 {
 	/* FIXME: Also flush/free any outstanding requests, etc */
 
+	g_static_rec_mutex_lock (pe->lock);
+
 	if (pe->stream)
 		camel_object_unref(pe->stream);
 	
 	g_list_free(pe->auth);
 	if (pe->apop)
 		g_free(pe->apop);
+
+	g_static_rec_mutex_unlock (pe->lock);
+
+	g_static_rec_mutex_free (pe->lock);
+	pe->lock = NULL;
 }
 
 CamelType
@@ -105,12 +115,17 @@ read_greeting (CamelPOP3Engine *pe)
 	extern CamelServiceAuthType camel_pop3_apop_authtype;
 	unsigned char *line, *apop, *apopend;
 	unsigned int len;
-	
+
+
+	g_static_rec_mutex_lock (pe->lock);
+
 	/* first, read the greeting */
 	if (camel_pop3_stream_line (pe->stream, &line, &len) == -1
-	    || strncmp ((char *) line, "+OK", 3) != 0)
+	    || strncmp ((char *) line, "+OK", 3) != 0) {
+		g_static_rec_mutex_unlock (pe->lock);
 		return -1;
-	
+	}
+
 	if ((apop = (unsigned char *) strchr ((char *) line + 3, '<'))
 	    && (apopend = (unsigned char *) strchr ((char *) apop, '>'))) {
 		apopend[1] = 0;
@@ -120,7 +135,9 @@ read_greeting (CamelPOP3Engine *pe)
 	}
 	
 	pe->auth = g_list_prepend (pe->auth, &camel_pop3_password_authtype);
-	
+
+	g_static_rec_mutex_unlock (pe->lock);
+
 	return 0;
 }
 
@@ -141,17 +158,21 @@ camel_pop3_engine_new(CamelStream *source, guint32 flags)
 
 	pe = (CamelPOP3Engine *)camel_object_new(camel_pop3_engine_get_type ());
 
+	g_static_rec_mutex_lock (pe->lock);
+
 	pe->stream = (CamelPOP3Stream *)camel_pop3_stream_new(source);
 	pe->state = CAMEL_POP3_ENGINE_AUTH;
 	pe->flags = flags;
 	
 	if (read_greeting (pe) == -1) {
+		g_static_rec_mutex_unlock (pe->lock);
 		camel_object_unref (pe);
 		return NULL;
 	}
-	
+
 	get_capabilities (pe);
-	
+	g_static_rec_mutex_unlock (pe->lock);
+
 	return pe;
 }
 
@@ -166,8 +187,10 @@ void
 camel_pop3_engine_reget_capabilities (CamelPOP3Engine *engine)
 {
 	g_return_if_fail (CAMEL_IS_POP3_ENGINE (engine));
-	
+
+	g_static_rec_mutex_lock (engine->lock);
 	get_capabilities (engine);
+	g_static_rec_mutex_unlock (engine->lock);
 }
 
 
@@ -192,6 +215,8 @@ cmd_capa(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	int ret;
 	int i;
 	CamelServiceAuthType *auth;
+
+	g_static_rec_mutex_lock (pe->lock);
 
 	dd(printf("cmd_capa\n"));
 
@@ -222,13 +247,17 @@ cmd_capa(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			}
 		}
 	} while (ret>0);
+
+	g_static_rec_mutex_unlock (pe->lock);
 }
 
 static void
 get_capabilities(CamelPOP3Engine *pe)
 {
 	CamelPOP3Command *pc;
-	
+
+	g_static_rec_mutex_lock (pe->lock);
+
 	if (!(pe->flags & CAMEL_POP3_ENGINE_DISABLE_EXTENSIONS)) {
 		pc = camel_pop3_engine_command_new(pe, CAMEL_POP3_COMMAND_MULTI, cmd_capa, NULL, "CAPA\r\n");
 		while (camel_pop3_engine_iterate(pe, pc) > 0)
@@ -247,6 +276,9 @@ get_capabilities(CamelPOP3Engine *pe)
 			camel_pop3_engine_command_free (pe, pc);
 		}
 	}
+
+	g_static_rec_mutex_unlock (pe->lock);
+
 }
 
 /* returns true if the command was sent, false if it was just queued */
@@ -254,38 +286,36 @@ static int
 engine_command_queue(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 {
 
-#warning FIXME
-	if (!pe) {
-		g_warning ("FIXME: pe == NULL in %s", __FUNCTION__);
-		return FALSE;
-	}
+	g_static_rec_mutex_lock (pe->lock);
 
 	if (((pe->capa & CAMEL_POP3_CAP_PIPE) == 0 || (pe->sentlen + strlen(pc->data)) > CAMEL_POP3_SEND_LIMIT)
 	    && pe->current != NULL) {
 		e_dlist_addtail(&pe->queue, (EDListNode *)pc);
+		g_static_rec_mutex_unlock (pe->lock);
 		return FALSE;
-	} else {
-		/* ??? */
-
-		/* TNY TODO: Check online status here, else it will crash 
-			Correction, it will not crash but will emit a SIGPIPE */
-
-		if (camel_stream_write((CamelStream *)pe->stream, pc->data, strlen(pc->data)) == -1) {
-			e_dlist_addtail(&pe->queue, (EDListNode *)pc);
-			return FALSE;
-		}
-
-		pe->sentlen += strlen(pc->data);
-
-		pc->state = CAMEL_POP3_COMMAND_DISPATCHED;
-
-		if (pe->current == NULL)
-			pe->current = pc;
-		else
-			e_dlist_addtail(&pe->active, (EDListNode *)pc);
-
-		return TRUE;
 	}
+
+	/* TNY TODO: Check online status here, else it will crash 
+		Correction, it will not crash but will emit a SIGPIPE */
+
+	if (camel_stream_write((CamelStream *)pe->stream, pc->data, strlen(pc->data)) == -1) {
+		e_dlist_addtail(&pe->queue, (EDListNode *)pc);
+		g_static_rec_mutex_unlock (pe->lock);
+		return FALSE;
+	}
+
+	pe->sentlen += strlen(pc->data);
+
+	pc->state = CAMEL_POP3_COMMAND_DISPATCHED;
+
+	if (pe->current == NULL)
+		pe->current = pc;
+	else
+		e_dlist_addtail(&pe->active, (EDListNode *)pc);
+
+	g_static_rec_mutex_unlock (pe->lock);
+
+	return TRUE;
 }
 
 /* returns -1 on error (sets errno), 0 when no work to do, or >0 if work remaining */
@@ -296,20 +326,18 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	unsigned int len;
 	CamelPOP3Command *pc, *pw, *pn;
 
-#warning FIXME
-	if (!pe) {
-		g_warning ("FIXME: pe == NULL in %s", __FUNCTION__);
+	g_static_rec_mutex_lock (pe->lock);
+
+	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK) {
+		g_static_rec_mutex_unlock (pe->lock);
 		return 0;
 	}
-	
-	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK)
-		return 0;
 
 	pc = pe->current;
-	if (pc == NULL)
+	if (pc == NULL) {
+		g_static_rec_mutex_unlock (pe->lock);
 		return 0;
-
-	/* LOCK */
+	}
 
 	if (camel_pop3_stream_line(pe->stream, &pe->line, &pe->linelen) == -1)
 		goto ioerror;
@@ -348,7 +376,10 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 		break;
 	}
 
-	e_dlist_addtail(&pe->done, (EDListNode *)pc);
+	if (pc)
+		e_dlist_addtail(&pe->done, (EDListNode *)pc);
+	else
+		g_warning ("Unexpected, pc == NULL");
 
 	if (pc && pc->data)
 		pe->sentlen -= strlen(pc->data);
@@ -361,7 +392,9 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	/* check the queue for sending any we can now send also */
 	pw = (CamelPOP3Command *)pe->queue.head;
 	pn = pw->next;
-	while (pn) {
+
+	while (pn) 
+	{
 		if (((pe->capa & CAMEL_POP3_CAP_PIPE) == 0 || (pe->sentlen + strlen(pw->data)) > CAMEL_POP3_SEND_LIMIT)
 		    && pe->current != NULL)
 			break;
@@ -383,12 +416,14 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 		pn = pn->next;
 	}
 
-	/* UNLOCK */
-
-	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK)
+	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK) {
+		g_static_rec_mutex_unlock (pe->lock);
 		return 0;
+	}
 
+	g_static_rec_mutex_unlock (pe->lock);
 	return pe->current==NULL?0:1;
+
 ioerror:
 	/* we assume all outstanding commands are gunna fail now */
 	while ( (pw = (CamelPOP3Command*)e_dlist_remhead(&pe->active)) ) {
@@ -407,6 +442,7 @@ ioerror:
 		pe->current = NULL;
 	}
 
+	g_static_rec_mutex_unlock (pe->lock);
 	return -1;
 }
 
@@ -434,14 +470,10 @@ camel_pop3_engine_command_new(CamelPOP3Engine *pe, guint32 flags, CamelPOP3Comma
 void
 camel_pop3_engine_command_free(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 {
-	#warning FIXME
-	if (!pe) {
-		g_warning ("FIXME: pe == NULL in %s", __FUNCTION__);
-		return;
-	}
-	
+	g_static_rec_mutex_lock (pe->lock);
 	if (pe->current != pc)
 		e_dlist_remove((EDListNode *)pc);
-	g_free(pc->data);
+	g_free(pc->data); pc->data = NULL;
 	g_free(pc);
+	g_static_rec_mutex_unlock (pe->lock);
 }
