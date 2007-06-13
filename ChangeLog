@@ -1,3 +1,8 @@
+2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added placeholder for future libtinymail-tp
+	* This is unfinished material (don't yet use it)
+
 2007-06-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improved the tny_folder_poke_status implementation of TnyCamelFolder

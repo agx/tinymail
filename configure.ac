@@ -65,6 +65,7 @@ build_gtkhtml=false
 build_doxygen=false
 build_tests=false
 build_unittests=false
+build_tp=false
 PLATFORMDIR=libtinymail-gnome-desktop
 PLATFORM=1
 
@@ -256,6 +257,17 @@ AC_HELP_STRING([--enable-uigtk],
 esac],[build_uigtk=$build_uigtk])
 AM_CONDITIONAL(BUILD_UIGTK, test x$build_uigtk = xtrue)
 
+dnl ### Enable GMail support ##
+AC_ARG_ENABLE(tp,
+AC_HELP_STRING([--enable-tp],
+  [Build the integration with telepathy (yes, no)]),
+[case "${enableval}" in
+  yes) build_tp=true ;;
+  no)  build_tp=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-tp) ;;
+esac],[build_tp=$build_tp])
+AM_CONDITIONAL(BUILD_TP, test x$build_tp = xtrue)
+
 dnl ### Enable the python language bindings ##
 AC_ARG_ENABLE(python-bindings,
 AC_HELP_STRING([--enable-python-bindings],
@@ -312,6 +324,16 @@ dnl ### libtinymail-camel, a camel implementation of libtinymail ##
 PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.8 gobject-2.0)
 AC_SUBST(LIBTINYMAIL_CAMEL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_CAMEL_LIBS)
+
+dnl ### libtinymail-tp, integration with telepathy
+if test x$build_tp = xtrue; then
+PKG_CHECK_MODULES(LIBTINYMAIL_TP, telepathy-glib)
+else
+LIBTINYMAIL_TP_CFLAGS=
+LIBTINYMAIL_TP_LIBS=
+fi
+AC_SUBST(LIBTINYMAIL_TP_CFLAGS)
+AC_SUBST(LIBTINYMAIL_TP_LIBS)
 
 dnl ### libtinymail-gnomevfs, a tnystreamiface for gnome-vfs ##
 if test x$build_gnome = xtrue; then
@@ -476,6 +498,8 @@ libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
 libtinymail-camel/libtinymail-camel.pc
+libtinymail-tp/libtinymail-tp.pc
+libtinymail-tp/Makefile
 libtinymailui/Makefile
 libtinymailui/libtinymailui.pc
 libtinymailui-gtk/Makefile
@@ -514,6 +538,7 @@ echo "The following options are selected:"
 echo ""
 echo "  Enable GNOME features:       $build_gnome"
 echo "  Enable ACAP features:        $build_acap"
+echo "  Enable Telepathy features:   $build_tp"
 echo "  Build the queues library:    $build_queues"
 echo "   Build the asyncworker impl: $build_asyncworker"
 echo "  HTML component:              ${with_html_component}"
