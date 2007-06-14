@@ -4471,7 +4471,7 @@ parse_fetch_response (CamelImapFolder *imap_folder, char *response)
 		
 		if (*response != '*' || *(response + 1) != ' ')
 			return NULL;
-		seq = strtol (response + 2, &response, 10);
+		seq = strtoul (response + 2, &response, 10);
 		if (seq == 0)
 			return NULL;
 		if (g_ascii_strncasecmp (response, " FETCH (", 8) != 0)
