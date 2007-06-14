@@ -434,6 +434,8 @@ cs_freeinfo(struct _addrinfo_msg *msg)
 #ifdef NEED_ADDRINFO
 	g_free(msg->hostbufmem);
 #endif
+	memset (msg, 0, sizeof (struct _addrinfo_msg));
+
 	g_free(msg);
 }
 
@@ -634,10 +636,13 @@ cs_getaddrinfo(void *data)
 {
 	struct _addrinfo_msg *info = data;
 
+	if (!info->name)
+		g_warning ("Memory problem in cs_getaddrinfo\n");
+
 	info->result = getaddrinfo(info->name, info->service, info->hints, info->res);
-	
+
 	if (info->cancelled) {
-		g_free(info);
+		/* g_free(info); */
 	} else {
 		e_msgport_reply((EMsg *)info);
 	}
