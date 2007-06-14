@@ -2976,6 +2976,8 @@ _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder,
 	_tny_camel_folder_set_unread_count (folder, info->unread);
 	_tny_camel_folder_set_all_count (folder, info->total);
 	_tny_camel_folder_set_local_size (folder, info->local_size);
+	if (!info->name)
+		g_warning ("Creating invalid folder\n");
 	_tny_camel_folder_set_name (folder, info->name);
 	_tny_camel_folder_set_iter (folder, info);
 

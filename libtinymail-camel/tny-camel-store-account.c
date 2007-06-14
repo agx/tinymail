@@ -469,7 +469,12 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 	}
 
 	g_assert (CAMEL_IS_STORE (store));
-	g_assert (cpriv->folder_name != NULL);
+
+	if (!cpriv->folder_name)
+	{
+		g_warning ("Trying to remove an invalid folder\n");
+		return;
+	}
 
 	g_static_rec_mutex_lock (cpriv->obs_lock);
 	if (cpriv->observers) {
