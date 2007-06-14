@@ -643,6 +643,7 @@ cs_getaddrinfo(void *data)
 
 	if (info->cancelled) {
 		/* g_free(info); */
+		cs_freeinfo(info);
 	} else {
 		e_msgport_reply((EMsg *)info);
 	}
