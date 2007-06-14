@@ -3976,6 +3976,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		{
 			g_critical ("Severe interal error while trying to construct a new connection\n");
 			camel_object_unref (store);
+			g_static_mutex_unlock (&gmsgstore_lock);
 			return NULL;
 		}
 
@@ -3990,6 +3991,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 						_("This message is not currently available"
 						" (can't let a new connection go online)"));
 			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+			g_static_mutex_unlock (&gmsgstore_lock);
 			return NULL;
 		}
 		camel_exception_clear (ex);
