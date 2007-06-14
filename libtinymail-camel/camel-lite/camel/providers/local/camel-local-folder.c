@@ -316,6 +316,9 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 		fi->unread = camel_folder_get_unread_message_count(folder);
 		fi->flags = CAMEL_FOLDER_NOCHILDREN;
 	
+		if (lf->folder_path)
+			camel_du (lf->folder_path, &fi->local_size);
+
 		camel_url_free (url);
 	
 		camel_object_trigger_event(CAMEL_OBJECT (parent_store), "folder_created", fi);

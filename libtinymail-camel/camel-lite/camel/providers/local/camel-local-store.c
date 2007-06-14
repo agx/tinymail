@@ -37,6 +37,7 @@
 
 #include "camel/camel-exception.h"
 #include "camel/camel-file-utils.h"
+#include "camel/camel-string-utils.h"
 #include "camel/camel-private.h"
 #include "camel/camel-text-index.h"
 #include "camel/camel-url.h"
@@ -493,7 +494,10 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 	fi->uri = g_strdup_printf ("%s:%s#%s", ((CamelService *) store)->url->protocol,
 				   CAMEL_LOCAL_STORE(store)->toplevel_dir, folder_name);
 	fi->unread = -1;
-	
+
+	if (((CamelLocalFolder *)lf)->folder_path)
+		camel_du (((CamelLocalFolder *)lf)->folder_path, (int *) &fi->local_size);
+
 	camel_object_trigger_event (store, "folder_deleted", fi);
 	
 	camel_folder_info_free (fi);

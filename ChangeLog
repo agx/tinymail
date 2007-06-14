@@ -1,3 +1,7 @@
+2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* The cache size of local folders, feature implementation
+
 2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fix for the uid of POP summary items

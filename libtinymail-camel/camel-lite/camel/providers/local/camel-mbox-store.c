@@ -46,6 +46,7 @@
 #include "camel/camel-private.h"
 #include "camel/camel-text-index.h"
 #include "camel/camel-url.h"
+#include "camel/camel-string-utils.h"
 
 #include "camel-mbox-folder.h"
 #include "camel-mbox-store.h"
@@ -330,7 +331,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 	fi->name = g_path_get_basename(folder_name);
 	fi->uri = g_strdup_printf("mbox:%s#%s",((CamelService *) store)->url->path, folder_name);
 	fi->unread = -1;
-	
+
 	camel_object_trigger_event(store, "folder_deleted", fi);
 	
 	camel_folder_info_free(fi);
@@ -606,10 +607,16 @@ static void
 fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 {
 	CamelFolder *folder;
+	char *path, *folderpath;
 
 	fi->unread = -1;
 	fi->total = -1;
 	folder = camel_object_bag_get(store->folders, fi->full_name);
+
+	/* This should be fast enough not to have to test for INFO_FAST */
+	path = camel_local_store_get_meta_path(store, fi->full_name, ".ev-summary");
+	folderpath = camel_local_store_get_full_path(store, fi->full_name);
+
 	if (folder) {
 		if ((flags & CAMEL_STORE_FOLDER_INFO_FAST) == 0)
 			camel_folder_refresh_info(folder, NULL);
@@ -617,13 +624,8 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	} else {
-		char *path, *folderpath;
 		CamelMboxSummary *mbs;
 
-		/* This should be fast enough not to have to test for INFO_FAST */
-		path = camel_local_store_get_meta_path(store, fi->full_name, ".ev-summary");
-		folderpath = camel_local_store_get_full_path(store, fi->full_name);
-		
 		mbs = (CamelMboxSummary *)camel_mbox_summary_new(NULL, path, folderpath, NULL);
 		if (camel_folder_summary_header_load((CamelFolderSummary *)mbs) != -1) {
 			fi->unread = ((CamelFolderSummary *)mbs)->unread_count;
@@ -631,9 +633,14 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		}
 
 		camel_object_unref(mbs);
-		g_free(folderpath);
-		g_free(path);
 	}
+
+	if (folderpath)
+		camel_du (folderpath, (int*) &fi->local_size);
+
+	g_free(folderpath);
+	g_free(path);
+
 }
 
 static CamelFolderInfo *

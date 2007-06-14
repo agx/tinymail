@@ -42,6 +42,7 @@
 
 #include "camel-exception.h"
 #include "camel-file-utils.h"
+#include "camel/camel-string-utils.h"
 #include "camel-private.h"
 #include "camel-session.h"
 #include "camel-url.h"
@@ -264,6 +265,12 @@ spool_fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	}
+
+	/*TNY TODO:
+	if (fi->path)
+		camel_du (fi->path, &fi->local_size);
+	*/
+
 }
 
 static CamelFolderInfo *

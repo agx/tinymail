@@ -39,6 +39,7 @@
 #include "camel-maildir-folder.h"
 #include "camel-maildir-store.h"
 #include "camel-maildir-summary.h"
+#include "camel-string-utils.h"
 
 #define d(x)
 
@@ -298,12 +299,18 @@ static void
 fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 {
 	CamelFolder *folder;
+	char *path, *folderpath;
+	const char *root;
 
 	folder = camel_object_bag_get(store->folders, fi->full_name);
 
 	if (folder == NULL
 	    && (flags & CAMEL_STORE_FOLDER_INFO_FAST) == 0)
 		folder = camel_store_get_folder(store, fi->full_name, 0, NULL);
+
+	root = camel_local_store_get_toplevel_dir((CamelLocalStore *)store);
+	path = g_strdup_printf("%s/%s.ev-summary", root, fi->full_name);
+	folderpath = g_strdup_printf("%s/%s", root, fi->full_name);
 
 	if (folder) {
 		if ((flags & CAMEL_STORE_FOLDER_INFO_FAST) == 0)
@@ -312,23 +319,22 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	} else {
-		char *path, *folderpath;
 		CamelFolderSummary *s;
-		const char *root;
-
 		/* This should be fast enough not to have to test for INFO_FAST */
-		root = camel_local_store_get_toplevel_dir((CamelLocalStore *)store);
-		path = g_strdup_printf("%s/%s.ev-summary", root, fi->full_name);
-		folderpath = g_strdup_printf("%s/%s", root, fi->full_name);
 		s = (CamelFolderSummary *)camel_maildir_summary_new(NULL, path, folderpath, NULL);
 		if (camel_folder_summary_header_load(s) != -1) {
 			fi->unread = s->unread_count;
 			fi->total = s->saved_count;
 		}
 		camel_object_unref(s);
-		g_free(folderpath);
-		g_free(path);
+
 	}
+
+	if (folderpath)
+		camel_du (folderpath, (int *) &fi->local_size);
+
+	g_free(folderpath);
+	g_free(path);
 }
 
 struct _scan_node {

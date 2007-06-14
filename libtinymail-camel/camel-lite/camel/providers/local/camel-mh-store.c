@@ -40,6 +40,7 @@
 #include "camel-mh-folder.h"
 #include "camel-mh-store.h"
 #include "camel-mh-summary.h"
+#include "camel-string-utils.h"
 
 static CamelLocalStoreClass *parent_class = NULL;
 
@@ -308,12 +309,22 @@ static void
 fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 {
 	CamelFolder *folder;
+	char *path, *folderpath;
+	const char *root;
 
 	folder = camel_object_bag_get(store->folders, fi->full_name);
 
 	if (folder == NULL
 	    && (flags & CAMEL_STORE_FOLDER_INFO_FAST) == 0)
 		folder = camel_store_get_folder(store, fi->full_name, 0, NULL);
+
+	/* This should be fast enough not to have to test for INFO_FAST */
+	/* We could: if we have no folder, and FAST isn't specified, perform a full
+	   scan of all messages for their status flags.  But its probably not worth
+	   it as we need to read the top of every file, i.e. very very slow */
+	root = camel_local_store_get_toplevel_dir((CamelLocalStore *)store);
+	path = g_strdup_printf("%s/%s.ev-summary", root, fi->full_name);
+	folderpath = g_strdup_printf("%s/%s", root, fi->full_name);
 
 	if (folder) {
 		if ((flags & CAMEL_STORE_FOLDER_INFO_FAST) == 0)
@@ -322,28 +333,21 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	} else {
-		char *path, *folderpath;
 		CamelFolderSummary *s;
-		const char *root;
-
-		/* This should be fast enough not to have to test for INFO_FAST */
-
-		/* We could: if we have no folder, and FAST isn't specified, perform a full
-		   scan of all messages for their status flags.  But its probably not worth
-		   it as we need to read the top of every file, i.e. very very slow */
-
-		root = camel_local_store_get_toplevel_dir((CamelLocalStore *)store);
-		path = g_strdup_printf("%s/%s.ev-summary", root, fi->full_name);
-		folderpath = g_strdup_printf("%s/%s", root, fi->full_name);
 		s = (CamelFolderSummary *)camel_mh_summary_new(NULL, path, folderpath, NULL);
 		if (camel_folder_summary_header_load(s) != -1) {
 			fi->unread = s->unread_count;
 			fi->total = s->saved_count;
 		}
 		camel_object_unref(s);
-		g_free(folderpath);
-		g_free(path);
 	}
+
+	if (folderpath)
+		camel_du (folderpath, (int *) &fi->local_size);
+
+	g_free(folderpath);
+	g_free(path);
+
 }
 
 static CamelFolderInfo *
