@@ -2055,7 +2055,7 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	else if (received)
 		mi->date_received = camel_header_decode_date(received, NULL);
 	else 
-		mi->date_received = 0;
+		mi->date_received = mi->date_sent;
 
 	msgid = camel_header_msgid_decode(camel_header_raw_find(&h, "message-id", NULL));
 	if (msgid) 

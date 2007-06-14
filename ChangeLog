@@ -18,7 +18,8 @@
 
 	* The cache size of local folders, feature implementation
 	* Locking fix for the get-msg service of IMAP
-
+	* Date received fix in POP
+	
 2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fix for the uid of POP summary items
