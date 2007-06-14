@@ -1,3 +1,19 @@
+2007-06-14  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c:
+	(tny_camel_mime_part_add_part_default): now, if the
+	CamelMimePart has a multipart content type already,
+	it's used as the content type of the data wrapper
+	if it's created. This way we can create different
+	kinds of multiparts in tinymail.
+	(tny_camel_mime_part_construct_from_stream_default):
+	if the mime part is a message (mime type is
+	message/rfc822) then instead of instanciating a
+	plain data wrapper, it instanciates a
+	CamelMimeMessage. This should prevent problems
+	on adding these mime parts to a message or
+	mime part.
+
 2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* The cache size of local folders, feature implementation

@@ -192,13 +192,24 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 	/* Warp it into a multipart */
 	if (G_UNLIKELY (!containee) || G_LIKELY (!CAMEL_IS_MULTIPART (containee)))
 	{
+		CamelContentType *type;
+		gchar *applied_type = NULL;
 		if (containee)
 			camel_object_unref (CAMEL_OBJECT (containee));
 
 		curl = 0;
+		
+		type = camel_mime_part_get_content_type (priv->part);
+		if (!g_ascii_strcasecmp (type->type, "multipart")) {
+			applied_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
+		} else {
+			applied_type = g_strdup ("multipart/mixed");
+		}
+
 		body = camel_multipart_new ();
 		camel_data_wrapper_set_mime_type (CAMEL_DATA_WRAPPER (body),
-						"multipart/alternative");
+						applied_type);
+		g_free (applied_type);
 		camel_multipart_set_boundary (body, NULL);
 		camel_medium_set_content_object (medium, CAMEL_DATA_WRAPPER (body));
 	} else
@@ -484,9 +495,13 @@ tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream 
 	if (G_LIKELY (wrapper))
 		camel_object_unref (CAMEL_OBJECT (wrapper));
 
-	wrapper = camel_data_wrapper_new (); 
-	camel_data_wrapper_set_mime_type (wrapper, type);
+	if (!g_ascii_strcasecmp (type, "message/rfc822")) {
+		wrapper = (CamelDataWrapper *) camel_mime_message_new ();
+	} else {
+		wrapper = camel_data_wrapper_new ();
+	}
 	retval = camel_data_wrapper_construct_from_stream (wrapper, cstream);
+	camel_data_wrapper_set_mime_type (wrapper, type);
 
 	camel_medium_set_content_object(medium, wrapper);
 
