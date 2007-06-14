@@ -1,3 +1,7 @@
+2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed some flag values
+
 2007-06-14  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c:

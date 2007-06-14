@@ -116,8 +116,8 @@ tny_folder_change_set_new_all_count (TnyFolderChange *self, guint new_all_count)
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->lock);
-	priv->new_all_count = new_all_count;
 	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT;
+	priv->new_all_count = new_all_count;
 	g_mutex_unlock (priv->lock);
 
 	return;
@@ -136,8 +136,8 @@ tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->lock);
-	priv->new_unread_count = new_unread_count;
 	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT;
+	priv->new_unread_count = new_unread_count;
 	g_mutex_unlock (priv->lock);
 
 	return;
@@ -192,9 +192,8 @@ tny_folder_change_add_added_header (TnyFolderChange *self, TnyHeader *header)
 
 	if (!priv->added)
 		priv->added = tny_simple_list_new ();
-	tny_list_prepend (priv->added, G_OBJECT (header));
 	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS;
-
+	tny_list_prepend (priv->added, G_OBJECT (header));
 	g_mutex_unlock (priv->lock);
 
 	return;
@@ -216,9 +215,8 @@ tny_folder_change_add_removed_header (TnyFolderChange *self, TnyHeader *header)
 
 	if (!priv->removed)
 		priv->removed = tny_simple_list_new ();
-	tny_list_prepend (priv->removed, G_OBJECT (header));
 	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS;
-
+	tny_list_prepend (priv->removed, G_OBJECT (header));
 	g_mutex_unlock (priv->lock);
 
 	return;
