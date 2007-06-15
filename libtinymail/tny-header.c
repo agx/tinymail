@@ -47,7 +47,6 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
 	TNY_HEADER_GET_IFACE (self)->set_replyto_func (self, to);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_header_get_replyto (self), to));
 #endif
 
 	return;
@@ -94,7 +93,6 @@ tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
 	TNY_HEADER_GET_IFACE (self)->set_bcc_func (self, bcc);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_header_get_bcc (self), bcc));
 #endif
 
 	return;
@@ -122,7 +120,6 @@ tny_header_set_cc (TnyHeader *self, const gchar *cc)
 	TNY_HEADER_GET_IFACE (self)->set_cc_func (self, cc);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_header_get_cc (self), cc));
 #endif
 
 	return;
@@ -149,7 +146,6 @@ tny_header_set_from (TnyHeader *self, const gchar *from)
 	TNY_HEADER_GET_IFACE (self)->set_from_func (self, from);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_header_get_from (self), from));
 #endif
 
 	return;
@@ -176,7 +172,6 @@ tny_header_set_subject (TnyHeader *self, const gchar *subject)
 	TNY_HEADER_GET_IFACE (self)->set_subject_func (self, subject);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_header_get_subject (self), subject));
 #endif
 
 	return;
@@ -208,10 +203,6 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
 	TNY_HEADER_GET_IFACE (self)->set_to_func (self, to);
 
 #ifdef DBC /* ensure */
-	/* TNY TODO: A nice check would be one that checks whether the new to
-	 * matches the just-set to, just comparing is not good enough, though:
-	 * The implementation is allowed to change the formatting slightly. */
-	g_assert (tny_header_get_to (self) != NULL);
 #endif
 
 	return;
