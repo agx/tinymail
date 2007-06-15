@@ -549,21 +549,45 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 	return;
 }
 
+
+typedef struct
+{
+	TnyDemouiSummaryView *self;
+	TnyHeader *header;
+} OnGetMsgInfo;
+
+static void
+status_update_on_get_msg (GObject *sender, TnyStatus *status, gpointer user_data)
+{
+	OnGetMsgInfo *info = user_data;
+	status_update (sender, status, info->self);
+	return;
+}
+
 static void
 on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data)
 {
-	TnyDemouiSummaryView *self  = user_data;
+	OnGetMsgInfo *info = user_data;
+	TnyDemouiSummaryView *self = info->self;
+	TnyHeader *header = info->header;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	GError *merr = *err;
 
 	g_idle_add (cleanup_statusbar, priv);
 
-	if (cancelled)
+	if (cancelled) {
+		g_object_unref (self);
+		g_object_unref (header);
+		g_slice_free (OnGetMsgInfo, info);
 		return;
+	}
 
-	if (msg)
+	if (msg) {
+		TnyHeaderFlags flags = tny_header_get_flags (header);
+		if (!(flags & TNY_HEADER_FLAG_SEEN))
+			tny_header_set_flags (header, flags | TNY_HEADER_FLAG_SEEN);
 		tny_msg_view_set_msg (priv->msg_view, msg);
-	else 
+	} else 
 		tny_msg_view_set_unavailable (priv->msg_view);
 
 	if (merr != NULL)
@@ -580,6 +604,12 @@ on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gp
 			G_CALLBACK (gtk_widget_destroy), edialog);
 		gtk_widget_show_all (edialog);
 	}
+
+	g_object_unref (self);
+	g_object_unref (header);
+	g_slice_free (OnGetMsgInfo, info);
+
+	return;
 }
 
 static void
@@ -605,10 +635,12 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 			folder = tny_header_get_folder (header);
 			if (folder)
 			{
+				OnGetMsgInfo *info = g_slice_new (OnGetMsgInfo);
+				info->self = TNY_DEMOUI_SUMMARY_VIEW (g_object_ref (self));
+				info->header = TNY_HEADER (g_object_ref (header));
 				gtk_widget_show (GTK_WIDGET (priv->progress));
-
 				tny_folder_get_msg_async (folder, header, 
-					on_get_msg, status_update, self);
+					on_get_msg, status_update_on_get_msg, info);
 				g_object_unref (G_OBJECT (folder));
 			}
 
