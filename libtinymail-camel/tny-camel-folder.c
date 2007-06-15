@@ -363,7 +363,7 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 
 		if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
 		{
-
+			/* TNY TODO: Leak it? (this is "gash" anyway) */
 			priv->folder = camel_store_get_folder (store, priv->folder_name, 0, &ex);
 
 			if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
