@@ -309,7 +309,7 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		folder = camel_store_get_folder(store, fi->full_name, 0, NULL);
 
 	root = camel_local_store_get_toplevel_dir((CamelLocalStore *)store);
-	path = g_strdup_printf("%s/%s.ev-summary", root, fi->full_name);
+	path = g_strdup_printf("%s/%s.ev-summary.mmap", root, fi->full_name);
 	folderpath = g_strdup_printf("%s/%s", root, fi->full_name);
 
 	if (folder) {

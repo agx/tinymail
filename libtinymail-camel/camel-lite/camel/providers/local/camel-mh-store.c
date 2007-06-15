@@ -323,7 +323,7 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 	   scan of all messages for their status flags.  But its probably not worth
 	   it as we need to read the top of every file, i.e. very very slow */
 	root = camel_local_store_get_toplevel_dir((CamelLocalStore *)store);
-	path = g_strdup_printf("%s/%s.ev-summary", root, fi->full_name);
+	path = g_strdup_printf("%s/%s.ev-summary.mmap", root, fi->full_name);
 	folderpath = g_strdup_printf("%s/%s", root, fi->full_name);
 
 	if (folder) {

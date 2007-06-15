@@ -547,7 +547,7 @@ local_rename(CamelFolder *folder, const char *newname)
 	g_free(lf->index_path);
 
 	lf->folder_path = camel_local_store_get_full_path(ls, newname);
-	lf->summary_path = camel_local_store_get_meta_path(ls, newname, ".ev-summary");
+	lf->summary_path = camel_local_store_get_meta_path(ls, newname, ".ev-summary.mmap");
 	lf->index_path = camel_local_store_get_meta_path(ls, newname, ".ibex");
 	statepath = camel_local_store_get_meta_path(ls, newname, ".cmeta");
 	camel_object_set(lf, NULL, CAMEL_OBJECT_STATE_FILE, statepath, NULL);

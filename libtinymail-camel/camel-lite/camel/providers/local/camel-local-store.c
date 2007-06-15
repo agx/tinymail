@@ -387,7 +387,7 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 			goto ibex_failed;
 	}
 
-	if (xrename(old, new, path, ".ev-summary", TRUE, ex))
+	if (xrename(old, new, path, ".ev-summary.mmap", TRUE, ex))
 		goto summary_failed;
 
 	if (xrename(old, new, path, ".cmeta", TRUE, ex))
@@ -410,7 +410,7 @@ base_failed:
 	xrename(new, old, path, ".cmeta", TRUE, ex);
 
 cmeta_failed:
-	xrename(new, old, path, ".ev-summary", TRUE, ex);
+	xrename(new, old, path, ".ev-summary.mmap", TRUE, ex);
 
 summary_failed:
 	if (folder) {
@@ -442,7 +442,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 	
 	/* remove metadata only */
 	name = g_strdup_printf("%s%s", CAMEL_LOCAL_STORE(store)->toplevel_dir, folder_name);
-	str = g_strdup_printf("%s.ev-summary", name);
+	str = g_strdup_printf("%s.ev-summary.mmap", name);
 	if (g_unlink(str) == -1 && errno != ENOENT) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Could not delete folder summary file `%s': %s"),

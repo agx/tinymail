@@ -107,7 +107,7 @@ camel_mbox_store_get_type(void)
 }
 
 static char *extensions[] = {
-	".msf", ".ev-summary", ".ev-summary-meta", ".ibex.index", ".ibex.index.data", ".cmeta", ".lock"
+	".msf", ".ev-summary.mmap", ".ev-summary-meta", ".ibex.index", ".ibex.index.data", ".cmeta", ".lock"
 };
 
 static gboolean
@@ -276,7 +276,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 	 * naming convention is different. Need to find a way for
 	 * CamelLocalStore to be able to construct the folder & meta
 	 * paths itself */
-	path = camel_local_store_get_meta_path(store, folder_name, ".ev-summary");
+	path = camel_local_store_get_meta_path(store, folder_name, ".ev-summary.mmap");
 	if (g_unlink(path) == -1 && errno != ENOENT) {
 		camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM,
 				     _("Could not delete folder summary file `%s': %s"),
@@ -516,7 +516,7 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 		}
 	}
 	
-	if (xrename(store, old, new, ".ev-summary", TRUE) == -1) {
+	if (xrename(store, old, new, ".ev-summary.mmap", TRUE) == -1) {
 		errnosav = errno;
 		goto summary_failed;
 	}
@@ -549,7 +549,7 @@ base_failed:
 subdir_failed:
 	xrename(store, new, old, ".cmeta", TRUE);
 cmeta_failed:	
-	xrename(store, new, old, ".ev-summary", TRUE);
+	xrename(store, new, old, ".ev-summary.mmap", TRUE);
 summary_failed:
 	if (folder) {
 		if (folder->index)
@@ -614,7 +614,7 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 	folder = camel_object_bag_get(store->folders, fi->full_name);
 
 	/* This should be fast enough not to have to test for INFO_FAST */
-	path = camel_local_store_get_meta_path(store, fi->full_name, ".ev-summary");
+	path = camel_local_store_get_meta_path(store, fi->full_name, ".ev-summary.mmap");
 	folderpath = camel_local_store_get_full_path(store, fi->full_name);
 
 	if (folder) {
