@@ -3037,9 +3037,15 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 
 	if (!info || camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+		if (camel_exception_is_set (&ex))
+			g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				camel_exception_get_description (&ex));
+		else
+			g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+				"Unknown error while trying to create folder");
+
 		if (info)
 			camel_store_free_folder_info (store, info);
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
