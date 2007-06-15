@@ -4,7 +4,8 @@
 	* Experimental timeout for hostname lookups
 	* Unread and total count updating
 	* Local folders for now will no longer emit "folder_changed" signals
-
+	* The unread and total count of local folders at initial startup
+	
 2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed some flag values
