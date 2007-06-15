@@ -472,9 +472,9 @@ cs_waitinfo(void *(worker)(void *), struct _addrinfo_msg *msg, const char *error
 			polls[0].revents = 0;
 			polls[1].revents = 0;
 
-			/* Experimental: We wait 15 seconds before timeout */
+			/* Experimental: We wait 30 seconds before timeout */
 
-			status = poll(polls, 2, 15000);
+			status = poll(polls, 2, 30000);
 			if (status != -1)
 				break;
 		} while (/*status == -1 &&*/ errno == EINTR);
