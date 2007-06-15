@@ -139,12 +139,30 @@ static void
 foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
 {
 	TnyIterator *iter;
+	const gchar *uid = tny_header_get_uid (header);
 
 	iter = tny_list_create_iterator (priv->lists);
 	while (!tny_iterator_is_done (iter))
 	{
+		/*gboolean found = FALSE;*/
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
-		tny_list_prepend (list, G_OBJECT (header));
+
+		/*TnyIterator *liter = tny_list_create_iterator (list);
+		while (!tny_iterator_is_done (liter))
+		{
+			TnyHeader *hdr = (TnyHeader *) tny_iterator_get_current (liter);
+			if (!strcmp (uid, tny_header_get_uid (hdr)))
+				found = TRUE;
+			g_object_unref (hdr);
+			tny_iterator_next (liter);
+			if (found)
+				break;
+		}
+		g_object_unref (liter);
+
+		if (!found)*/
+			tny_list_prepend (list, G_OBJECT (header));
+
 		g_object_unref (G_OBJECT (list));
 		tny_iterator_next (iter);
 	}
