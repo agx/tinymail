@@ -325,6 +325,8 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		if (camel_folder_summary_header_load(s) != -1) {
 			fi->unread = s->unread_count;
 			fi->total = s->saved_count;
+		} else {
+			printf ("summary header\n");
 		}
 		camel_object_unref(s);
 
@@ -377,8 +379,10 @@ static CamelFolderInfo *scan_fi(CamelStore *store, guint32 flags, CamelURL *url,
 	fi->name = g_strdup(name);
 	camel_url_set_fragment(url, fi->full_name);
 	fi->uri = camel_url_to_string(url, 0);
+
 	fi->unread = -1;
 	fi->total = -1;
+
 	/* we only calculate nochildren properly if we're recursive */
 	if (((flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE) != 0))
 		fi->flags = CAMEL_FOLDER_NOCHILDREN;
@@ -393,6 +397,8 @@ static CamelFolderInfo *scan_fi(CamelStore *store, guint32 flags, CamelURL *url,
 	      && stat(cur, &st) == 0 && S_ISDIR(st.st_mode)
 	      && stat(new, &st) == 0 && S_ISDIR(st.st_mode)))
 		fi->flags |= CAMEL_FOLDER_NOSELECT;
+
+	
 
 	g_free(new);
 	g_free(cur);

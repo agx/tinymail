@@ -294,7 +294,7 @@ static void free_o_name(void *key, void *value, void *data)
 	g_free(key);
 }
 
-static inline void
+static void
 foreach_msginfo (gpointer data, gpointer user_data)
 {
 	camel_message_info_free (data);
