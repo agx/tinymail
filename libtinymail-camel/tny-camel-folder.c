@@ -3035,7 +3035,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	info = camel_store_create_folder (store, priv->folder_name, name, &ex);
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
-	if (camel_exception_is_set (&ex)) 
+	if (!info || camel_exception_is_set (&ex)) 
 	{
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,

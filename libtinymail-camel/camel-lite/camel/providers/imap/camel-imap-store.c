@@ -2877,6 +2877,7 @@ create_folder (CamelStore *store, const char *parent_name,
 	
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex))
 		return NULL;
+
 	if (!parent_name)
 		parent_name = "";
 	

@@ -200,13 +200,29 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	if (store->ostream == NULL || ((CamelObject *)store->ostream)->ref_count <= 0)
 	{
 		if (store->has_login && !camel_service_connect ((CamelService*)store, ex))
+		{
+			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				     _("You must be working online to "
+				       "complete this operation"));
 			return FALSE;
+		}
 	}
 
 	/* g_mutex_lock (store->stream_lock); */
 
-	if (store->ostream==NULL) return FALSE;
-	if (store->istream==NULL) return FALSE;
+	if (store->ostream==NULL) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				     _("You must be working online to "
+				       "complete this operation"));
+		 return FALSE;
+	}
+
+	if (store->istream==NULL) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				     _("You must be working online to "
+				       "complete this operation"));
+		return FALSE;
+	}
 
 	/* g_mutex_unlock (store->stream_lock);*/
 
@@ -260,13 +276,6 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		
 		fprintf (stderr, "sending : %c%.5u %s\r\n", store->tag_prefix, store->command, mask);
 	}
-
-	/* g_mutex_lock (store->stream_lock); */
-
-	if (store->ostream==NULL || ((CamelObject *)store->ostream)->ref_count <= 0) 
-		{ /* g_mutex_unlock (store->stream_lock); */ return FALSE; }
-	if (store->istream==NULL || ((CamelObject *)store->istream)->ref_count <= 0) 
-		{ /* g_mutex_unlock (store->stream_lock); */ return FALSE; }
 
 	/* Read away whatever we got */
 	while (camel_imap_store_readline_nb (store, &resp, &myex) > 0)
