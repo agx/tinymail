@@ -444,9 +444,11 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		}
 
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-	if (message && CAMEL_IS_MIME_MESSAGE (message))
+	if (message && CAMEL_IS_MIME_MESSAGE (message)) {
 		camel_folder_append_message (priv->folder, message, NULL, NULL, &ex);
-	else {
+		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+		priv->cached_length = camel_folder_get_message_count (priv->folder);
+	} else {
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_ADD_MSG,
 			"Malformed message");
@@ -468,6 +470,8 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		{
 			TnyFolderChange *change = tny_folder_change_new (self);
 			tny_folder_change_add_added_header (change, header);
+			tny_folder_change_set_new_all_count (change, priv->cached_length);
+			tny_folder_change_set_new_unread_count (change, priv->unread_length);
 			notify_folder_observers_about (self, change);
 			g_object_unref (G_OBJECT (change));
 		}
