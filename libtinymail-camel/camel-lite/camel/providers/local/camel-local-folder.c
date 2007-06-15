@@ -50,6 +50,8 @@
 #include "camel-stream-fs.h"
 #include "camel-text-index.h"
 
+#include "camel-string-utils.h"
+
 #include "camel-local-folder.h"
 #include "camel-local-private.h"
 #include "camel-local-store.h"
@@ -317,7 +319,7 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 		fi->flags = CAMEL_FOLDER_NOCHILDREN;
 	
 		if (lf->folder_path)
-			camel_du (lf->folder_path, &fi->local_size);
+			camel_du (lf->folder_path, (int *) &fi->local_size);
 
 		camel_url_free (url);
 	
@@ -479,10 +481,11 @@ local_refresh_info(CamelFolder *folder, CamelException *ex)
 	if (camel_local_summary_check((CamelLocalSummary *)folder->summary, lf->changes, ex) == -1)
 		return;
 
+	/* TNY TODO: Temporary fix (changeinfo's for local folders?! 
 	if (camel_folder_change_info_changed(lf->changes)) {
 		camel_object_trigger_event((CamelObject *)folder, "folder_changed", lf->changes);
 		camel_folder_change_info_clear(lf->changes);
-	}
+	}*/
 }
 
 static void

@@ -42,7 +42,6 @@ struct _TnyMergeFolderPriv
 
 
 
-/*
 static void
 notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
@@ -66,7 +65,7 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 
 	g_static_rec_mutex_unlock (priv->lock);
 }
-*/
+
 
 static void
 tny_merge_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
@@ -905,7 +904,7 @@ tny_merge_folder_get_caps (TnyFolder *self)
 static void 
 tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 {
-	/*notify_folder_observers_about (TNY_FOLDER (self), change);*/
+	notify_folder_observers_about (TNY_FOLDER (self), change);
 }
 
 /**

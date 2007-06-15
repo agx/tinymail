@@ -3,6 +3,7 @@
 	* Connection failure handling in the IMAP code
 	* Experimental timeout for hostname lookups
 	* Unread and total count updating
+	* Local folders for now will no longer emit "folder_changed" signals
 
 2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
