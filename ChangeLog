@@ -1,6 +1,7 @@
 2007-06-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Connection failure handling in the IMAP code
+	* Experimental timeout for hostname lookups
 
 2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
 

@@ -33,6 +33,8 @@
 #include <sys/poll.h>
 #endif
 
+#include <string.h>
+
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
@@ -41,7 +43,7 @@
 #include "camel-exception.h"
 #include "camel-net-utils.h"
 #include "camel-operation.h"
-
+#
 #define d(x)
 
 #ifdef G_OS_WIN32
@@ -469,8 +471,13 @@ cs_waitinfo(void *(worker)(void *), struct _addrinfo_msg *msg, const char *error
 		do {
 			polls[0].revents = 0;
 			polls[1].revents = 0;
-			status = poll(polls, 2, -1);
-		} while (status == -1 && errno == EINTR);
+
+			/* Experimental: We wait 15 seconds before timeout */
+
+			status = poll(polls, 2, 15000);
+			if (status != -1)
+				break;
+		} while (/*status == -1 &&*/ errno == EINTR);
 #else
 		fd_set read_set;
 
@@ -510,10 +517,27 @@ cs_waitinfo(void *(worker)(void *), struct _addrinfo_msg *msg, const char *error
 		} else {
 			struct _addrinfo_msg *reply = (struct _addrinfo_msg *)e_msgport_get(reply_port);
 
-			g_assert(reply == msg);
-			d(printf("waiting for child to exit\n"));
-			pthread_join(id, NULL);
-			d(printf("child done\n"));
+			/* Experimental: We have waited 15 seconds before timeout */
+			if (status == -1 || reply == NULL)
+			{
+				/* Experimental: and the timeout happened */
+
+				camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM, 
+					"Timeout when resolving hostname");
+				msg->cancelled = 1;
+				pthread_detach(id);
+				pthread_cancel(id);
+				cancel = 1;
+			} else {
+
+				/* Experimental: and everything succeeded (resolving 
+				   happened in time) */
+
+				g_assert(reply == msg);
+				d(printf("waiting for child to exit\n"));
+				pthread_join(id, NULL);
+				d(printf("child done\n"));
+			}
 		}
 	} else {
 		camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM, "%s: %s: %s", error, _("cannot create thread"), g_strerror(err));
