@@ -358,7 +358,7 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		{
 			if (priv->folder)
 				while (((CamelObject*)priv->folder)->ref_count >= 1)
-					camel_object_unref (CAMEL_OBJECT (priv->folder));
+					camel_object_unref ((CamelObject *) (priv->folder));
 
 			priv->folder = NULL;
 			priv->loaded = FALSE;
