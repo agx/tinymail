@@ -315,6 +315,35 @@ determine_push_email (TnyCamelFolderPriv *priv)
 	return;
 }
 
+static void 
+do_try_on_success (CamelStore *store, TnyCamelFolderPriv *priv, CamelException *ex)
+{
+	if (priv->folder && !camel_exception_is_set (ex) && CAMEL_IS_FOLDER (priv->folder)) 
+	{
+
+		if (priv->folder->folder_flags & CAMEL_FOLDER_IS_READONLY)
+			priv->caps &= ~TNY_FOLDER_CAPS_WRITABLE;
+		else
+			priv->caps |= TNY_FOLDER_CAPS_WRITABLE;
+
+		if (priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY)
+			priv->caps |= TNY_FOLDER_CAPS_PUSHEMAIL;
+		else
+			priv->caps &= ~TNY_FOLDER_CAPS_PUSHEMAIL;
+
+		if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
+		{
+			guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
+
+			if (priv->iter && !priv->iter_parented)
+				camel_folder_info_free  (priv->iter);
+
+			priv->iter = camel_store_get_folder_info (store, priv->folder_name, flags, ex);
+			priv->iter_parented = TRUE;
+		}
+	}
+}
+
 static gboolean
 load_folder_no_lock (TnyCamelFolderPriv *priv)
 {
@@ -330,39 +359,26 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &ex);
 
-		if (priv->folder && !camel_exception_is_set (&ex) && CAMEL_IS_FOLDER (priv->folder)) {
-
-			if (priv->folder->folder_flags & CAMEL_FOLDER_IS_READONLY)
-				priv->caps &= ~TNY_FOLDER_CAPS_WRITABLE;
-			else
-				priv->caps |= TNY_FOLDER_CAPS_WRITABLE;
-
-			if (priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY)
-				priv->caps |= TNY_FOLDER_CAPS_PUSHEMAIL;
-			else
-				priv->caps &= ~TNY_FOLDER_CAPS_PUSHEMAIL;
-
-			if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
-				{
-					guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
-
-					if (priv->iter && !priv->iter_parented)
-						camel_folder_info_free  (priv->iter);
-
-					priv->iter = camel_store_get_folder_info (store, priv->folder_name, flags, &ex);
-					priv->iter_parented = TRUE;
-				}
-		}
+		do_try_on_success (store, priv, &ex);
 
 		if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
 		{
-			if (priv->folder)
-				while (((CamelObject*)priv->folder)->ref_count >= 1)
-					camel_object_unref ((CamelObject *) (priv->folder));
 
-			priv->folder = NULL;
-			priv->loaded = FALSE;
-			return FALSE;
+			priv->folder = camel_store_get_folder (store, priv->folder_name, 0, &ex);
+
+			if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
+			{
+				if (priv->folder)
+					while (((CamelObject*)priv->folder)->ref_count >= 1)
+						camel_object_unref ((CamelObject *) (priv->folder));
+				priv->folder = NULL;
+				priv->loaded = FALSE;
+
+				return FALSE;
+			} else {
+				CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+				do_try_on_success (store, priv, &ex);
+			}
 		}
 
 		determine_push_email (priv);
