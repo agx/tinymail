@@ -3478,11 +3478,9 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 	if (store->current_folder)
 	{
 		/* We read-away everything non-blocking and process it */
-
 		resp = NULL;
 		while (camel_imap_store_readline_nb (store, &resp, &ex) > 0)
 		{
-			/* printf ("resp: %s\n", resp); */
 			if (strchr (resp, '*') != NULL && (strstr (resp, "EXISTS") || 
 				strstr (resp, "FETCH")|| strstr (resp, "EXPUNGE") || 
 				strstr (resp, "RECENT")))
@@ -3491,7 +3489,8 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 					idle_resp = idle_response_new (folder);
 				read_idle_response (folder, resp, idle_resp);
 			}
-			idle_debug ("(.., ..) <- %s | in idle_deal_with_stuff at nb\n", resp);
+			idle_debug ("(%d, ..) <- %s | in idle_deal_with_stuff at nb\n", 
+				strlen (resp), resp);
 			g_free (resp); resp=NULL;
 		}
 		if (resp)
@@ -3508,8 +3507,9 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 		 * commands. */
 
 		if (store->ostream && CAMEL_IS_STREAM (store->ostream)) {
-			idle_debug ("(.., ..) -> DONE | Sending DONE in idle_deal_with_stuff (nb)\n");
 			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
+			idle_debug ("(%d, 8) -> DONE | Sending DONE in idle_deal_with_stuff (nb)\n",
+				nwritten);
 		}
 
 		if (nwritten == -1) 
@@ -3527,7 +3527,8 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 					idle_resp = idle_response_new (folder);
 				read_idle_response (folder, resp, idle_resp);
 			}
-			idle_debug ("(.., ..) <- %s | in idle_deal_with_stuff at idle\n", resp);
+			idle_debug ("(%d, ..) <- %s | in idle_deal_with_stuff at idle\n", 
+				strlen (resp), resp);
 			g_free (resp); resp=NULL;
 		}
 
@@ -3540,8 +3541,9 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 	} else {
 		/* Trying to deal while the current folder is gone: just read away everything */
 		if (store->ostream && CAMEL_IS_STREAM (store->ostream)) {
-			idle_debug ("(.., ..) -> DONE | Sending DONE in idle_deal_with_stuff (b)\n");
 			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
+			idle_debug ("(%d, 8) -> DONE | Sending DONE in idle_deal_with_stuff (b)\n",
+				nwritten);
 		}
 		if (nwritten == -1) 
 			goto outofhere;
