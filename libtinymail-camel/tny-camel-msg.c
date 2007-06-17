@@ -66,6 +66,11 @@
 #include <errno.h>
 
 #include <tny-camel-shared.h>
+#include <tny-status.h>
+
+#define TINYMAIL_ENABLE_PRIVATE_API
+#include "tny-common-priv.h"
+#undef TINYMAIL_ENABLE_PRIVATE_API
 
 #include "tny-camel-account-priv.h"
 #include "tny-session-camel-priv.h"

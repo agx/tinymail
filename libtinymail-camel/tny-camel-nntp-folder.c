@@ -37,6 +37,11 @@ stay as an abstract TnyStoreAccount type. */
 #include <camel/camel-store.h>
 
 #include <tny-folder.h>
+#include <tny-status.h>
+#define TINYMAIL_ENABLE_PRIVATE_API
+#include "tny-common-priv.h"
+#undef TINYMAIL_ENABLE_PRIVATE_API
+
 
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"

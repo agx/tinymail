@@ -22,7 +22,24 @@
 
 #include <tny-session-camel.h>
 
+#include <tny-status.h>
+#define TINYMAIL_ENABLE_PRIVATE_API
+#include "tny-common-priv.h"
+#undef TINYMAIL_ENABLE_PRIVATE_API
+
 typedef struct _TnyCamelAccountPriv TnyCamelAccountPriv;
+typedef struct _RefreshStatusInfo RefreshStatusInfo;
+
+struct _RefreshStatusInfo
+{
+	TnyAccount *self;
+	TnyStatusCallback status_callback;
+	TnyStatusDomain domain;
+	TnyStatusCode code;
+	guint depth;
+	gpointer user_data;
+	TnyIdleStopper *stopper;
+};
 
 struct _TnyCamelAccountPriv
 {
@@ -46,6 +63,8 @@ struct _TnyCamelAccountPriv
 	gchar *cache_location; gint port;
 	TnyAccountType account_type;
 	gboolean custom_url_string;
+
+	RefreshStatusInfo *csyncop;
 };
 
 const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);

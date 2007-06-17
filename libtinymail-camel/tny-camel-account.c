@@ -45,14 +45,16 @@
 #include <errno.h>
 
 #include <tny-camel-shared.h>
+#include <tny-status.h>
 
-#include "tny-camel-account-priv.h"
 #include "tny-session-camel-priv.h"
 #include "tny-camel-common-priv.h"
 
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
+
+#include "tny-camel-account-priv.h"
 
 static GObjectClass *parent_class = NULL;
 
@@ -413,16 +415,6 @@ tny_camel_account_stop_operation (TnyAccount *self, gboolean *canceled)
 
 
 
-typedef struct
-{
-	TnyAccount *self;
-	TnyStatusCallback status_callback;
-	TnyStatusDomain domain;
-	TnyStatusCode code;
-	guint depth;
-	gpointer user_data;
-	TnyIdleStopper* stopper;
-} RefreshStatusInfo;
 
 static void
 refresh_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *user_data)
@@ -450,25 +442,29 @@ refresh_status (struct _CamelOperation *op, const char *what, int sofar, int oft
 static void 
 tny_camel_account_start_operation_default (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
 {
-	RefreshStatusInfo *info = g_slice_new (RefreshStatusInfo);
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	info->self = TNY_ACCOUNT (g_object_ref (self));
-	info->domain = domain;
-	info->code = code;
-	info->status_callback = status_callback;
-	info->depth = g_main_depth ();
-	info->user_data = status_user_data;
-	info->stopper = tny_idle_stopper_new();
+	if (!priv->csyncop)
+	{
+		RefreshStatusInfo *info = g_slice_new (RefreshStatusInfo);
 
-	_tny_camel_account_start_camel_operation_n (TNY_CAMEL_ACCOUNT (self), 
-			refresh_status, info, "Starting operation", FALSE);
+		info->self = TNY_ACCOUNT (g_object_ref (self));
+		info->domain = domain;
+		info->code = code;
+		info->status_callback = status_callback;
+		info->depth = g_main_depth ();
+		info->user_data = status_user_data;
+		info->stopper = tny_idle_stopper_new();
 
-	tny_idle_stopper_stop (info->stopper);
-	tny_idle_stopper_destroy (info->stopper);
-	info->stopper = NULL;
+		priv->csyncop = info;
 
-	g_object_unref (info->self);
-	g_slice_free (RefreshStatusInfo, info);
+		_tny_camel_account_start_camel_operation_n (TNY_CAMEL_ACCOUNT (self), 
+				refresh_status, info, "Starting operation", FALSE);
+
+	} else
+		g_critical ("Another synchronous operation is already in "
+				"progress. This indicates an error in the "
+				"software.");
 
 	return;
 }
@@ -478,10 +474,26 @@ tny_camel_account_stop_operation_default (TnyAccount *self, gboolean *canceled)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (canceled)
-		*canceled = camel_operation_cancel_check (priv->cancel);
+	if (priv->csyncop)
+	{
+		RefreshStatusInfo *info = priv->csyncop;
 
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));
+		tny_idle_stopper_stop (info->stopper);
+		tny_idle_stopper_destroy (info->stopper);
+		info->stopper = NULL;
+		g_object_unref (info->self);
+		g_slice_free (RefreshStatusInfo, info);
+		priv->csyncop = NULL;
+
+		if (canceled)
+			*canceled = camel_operation_cancel_check (priv->cancel);
+
+		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));
+	} else
+		g_critical ("No synchronous operation was in "
+				"progress while trying to stop one "
+				"This indicates an error in the software.");
+
 }
 
 
@@ -922,6 +934,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->csyncop = NULL;
 	priv->get_pass_func = NULL;
 	priv->forget_pass_func = NULL;
 	priv->port = -1;

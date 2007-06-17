@@ -45,6 +45,10 @@
 #include <tny-camel-transport-account.h>
 
 #include <tny-noop-lockable.h>
+#include <tny-status.h>
+#define TINYMAIL_ENABLE_PRIVATE_API
+#include "tny-common-priv.h"
+#undef TINYMAIL_ENABLE_PRIVATE_API
 
 #include "tny-session-camel-priv.h"
 #include "tny-camel-store-account-priv.h"
