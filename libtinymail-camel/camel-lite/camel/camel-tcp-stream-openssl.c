@@ -307,7 +307,7 @@ stream_read_idle (CamelStream *stream, char *buffer, size_t n)
 		FD_ZERO (&rdset);
 		FD_SET (openssl->priv->sockfd, &rdset);
 		nread = -1;
-		timeout.tv_sec = 15;
+		timeout.tv_sec = IDLE_READ_TIMEOUT;
 		timeout.tv_usec = 0;
 		res = select (fdmax, &rdset, 0, 0, &timeout);
 		
@@ -359,7 +359,7 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 		FD_ZERO (&rdset);
 		FD_SET (openssl->priv->sockfd, &rdset);
 		nread = -1;
-		timeout.tv_sec = 0;
+		timeout.tv_sec = NONBLOCKING_READ_TIMEOUT;
 		timeout.tv_usec = 0;
 		res = select (fdmax, &rdset, 0, 0, &timeout);
 		
@@ -429,7 +429,7 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 			FD_SET (openssl->priv->sockfd, &rdset);
 			FD_SET (cancel_fd, &rdset);
 			
-			timeout.tv_sec = 15;
+			timeout.tv_sec = BLOCKING_READ_TIMEOUT;
 			timeout.tv_usec = 0;
 			select (fdmax, &rdset, 0, 0, &timeout);
 			if (FD_ISSET (cancel_fd, &rdset)) {
@@ -501,7 +501,7 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 			FD_SET (openssl->priv->sockfd, &wrset);
 			FD_SET (cancel_fd, &rdset);
 			
-			timeout.tv_sec = 15;
+			timeout.tv_sec = BLOCKING_WRITE_TIMEOUT;
 			timeout.tv_usec = 0;
 			select (fdmax, &rdset, &wrset, 0, &timeout);
 			if (FD_ISSET (cancel_fd, &rdset)) {
@@ -623,7 +623,7 @@ socket_connect (struct addrinfo *host)
 		FD_SET (cancel_fd, &rdset);
 		fdmax = MAX (fd, cancel_fd) + 1;
 		tv.tv_usec = 0;
-		tv.tv_sec = 60 * 4;
+		tv.tv_sec = CONNECT_TIMEOUT;
 		
 		if (select (fdmax, &rdset, &wrset, 0, &tv) == 0) {
 			close (fd);

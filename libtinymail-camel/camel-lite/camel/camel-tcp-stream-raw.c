@@ -385,7 +385,7 @@ socket_connect(struct addrinfo *h)
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
 			fdmax = MAX (fd, cancel_fd) + 1;
-			tv.tv_sec = 60 * 4;
+			tv.tv_sec = CONNECT_TIMEOUT;
 			tv.tv_usec = 0;
 			
 			status = select (fdmax, &rdset, &wrset, 0, &tv);

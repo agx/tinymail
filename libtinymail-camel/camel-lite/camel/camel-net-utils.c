@@ -42,6 +42,7 @@
 
 #include "camel-exception.h"
 #include "camel-net-utils.h"
+#include "camel-file-utils.h"
 #include "camel-operation.h"
 #
 #define d(x)
@@ -472,9 +473,10 @@ cs_waitinfo(void *(worker)(void *), struct _addrinfo_msg *msg, const char *error
 			polls[0].revents = 0;
 			polls[1].revents = 0;
 
-			/* Experimental: We wait 30 seconds before timeout */
+			/* Experimental: We wait CONNECT_TIMEOUT seconds before timeout */
 
-			status = poll(polls, 2, 30000);
+			status = poll(polls, 2, (CONNECT_TIMEOUT * 1000));
+
 			if (status != -1)
 				break;
 		} while (/*status == -1 &&*/ errno == EINTR);
@@ -517,7 +519,7 @@ cs_waitinfo(void *(worker)(void *), struct _addrinfo_msg *msg, const char *error
 		} else {
 			struct _addrinfo_msg *reply = (struct _addrinfo_msg *)e_msgport_get(reply_port);
 
-			/* Experimental: We have waited 15 seconds before timeout */
+			/* Experimental: We have waited CONNECT_TIMEOUT seconds before timeout */
 			if (status == -1 || reply == NULL)
 			{
 				/* Experimental: and the timeout happened */

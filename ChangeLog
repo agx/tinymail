@@ -2,6 +2,9 @@
 
 	* Increased read-idle's low timeout times: now that all IDLE happens in
 	a thread, it's not necessary anymore to quickly unblock.
+	* Code cleanups
+	* Connection timeout corrections
+	* Read, Read-idle, Read-nonblock timeout corrections
 
 2007-06-15  Philip Van Hoof  <pvanhoof@gnome.org>
 

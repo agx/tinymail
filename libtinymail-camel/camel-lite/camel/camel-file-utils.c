@@ -47,7 +47,6 @@
 #include "camel-operation.h"
 #include "camel-url.h"
 
-#define IO_TIMEOUT (15/**4*/)
 
 
 /**
@@ -453,7 +452,7 @@ camel_read (int fd, char *buf, size_t n)
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
 			fdmax = MAX (fd, cancel_fd) + 1;
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = BLOCKING_READ_TIMEOUT;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -499,7 +498,7 @@ camel_read_nb (int fd, char *buf, size_t n)
 		FD_ZERO (&rdset);
 		FD_SET (fd, &rdset);
 		fdmax = fd + 1;
-		tv.tv_sec = 0;
+		tv.tv_sec = NONBLOCKING_READ_TIMEOUT;
 		tv.tv_usec = 0;
 		nread = -1;
 
@@ -542,7 +541,7 @@ camel_read_idle (int fd, char *buf, size_t n)
 		FD_ZERO (&rdset);
 		FD_SET (fd, &rdset);
 		fdmax = fd + 1;
-		tv.tv_sec = 5;
+		tv.tv_sec = IDLE_READ_TIMEOUT;
 		tv.tv_usec = 0;
 		nread = -1;
 
@@ -619,7 +618,7 @@ camel_write (int fd, const char *buf, size_t n)
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = BLOCKING_WRITE_TIMEOUT;
 			tv.tv_usec = 0;
 			w = -1;
 
@@ -703,7 +702,7 @@ camel_read_socket (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = BLOCKING_READ_TIMEOUT;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -761,7 +760,7 @@ camel_read_socket_idle (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = 15;
+			tv.tv_sec = IDLE_READ_TIMEOUT;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -817,7 +816,7 @@ camel_read_socket_nb (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = NONBLOCKING_READ_TIMEOUT;
 			tv.tv_usec = 0;
 			nread = -1;
 
@@ -894,7 +893,7 @@ camel_write_socket (int fd, const char *buf, size_t n)
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = IO_TIMEOUT;
+			tv.tv_sec = BLOCKING_WRITE_TIMEOUT;
 			tv.tv_usec = 0;
 			w = -1;
 

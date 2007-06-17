@@ -66,9 +66,6 @@
 #include "camel-stream-fs.h"
 #include "camel-tcp-stream-ssl.h"
 
-#define IO_TIMEOUT (PR_TicksPerSecond() 15 /** 4 * 60*/)
-#define CONNECT_TIMEOUT (PR_TicksPerSecond () *15 /** 4 * 60*/)
-
 static CamelTcpStreamClass *parent_class = NULL;
 
 /* Returns the class for a CamelTcpStreamSSL */
@@ -388,7 +385,7 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 		pollfds[1].out_flags = 0;
 		nread = -1;
 
-		res = PR_Poll(pollfds, 1, 0);
+		res = PR_Poll(pollfds, 1, NONBLOCKING_READ_TIMEOUT);
 		if (res == -1)
 			set_errno(PR_GetError());
 		else if (res == 0) {
@@ -465,7 +462,7 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 			pollfds[1].out_flags = 0;
 			nread = -1;
 
-			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * 15 /*IO_TIMEOUT*/);
+			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * BLOCKING_READ_TIMEOUT);
 
 			if (res == -1)
 				set_errno(PR_GetError());
@@ -550,7 +547,7 @@ stream_read_idle (CamelStream *stream, char *buffer, size_t n)
 			pollfds[1].out_flags = 0;
 			nread = -1;
 
-			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * 15);
+			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * IDLE_READ_TIMEOUT);
 
 			if (res == -1)
 				set_errno(PR_GetError());
@@ -639,7 +636,7 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 			pollfds[1].out_flags = 0;
 			w = -1;
 
-			res = PR_Poll (pollfds, 2, PR_TicksPerSecond () * 15 /*IO_TIMEOUT*/);
+			res = PR_Poll (pollfds, 2, PR_TicksPerSecond () * BLOCKING_WRITE_TIMEOUT);
 			if (res == -1) {
 				set_errno(PR_GetError());
 				if (PR_GetError () == PR_PENDING_INTERRUPT_ERROR)
@@ -1336,7 +1333,7 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 
 	cancel_fd = camel_operation_cancel_prfd(NULL);
 
-	if (PR_Connect (fd, &netaddr, cancel_fd?0:CONNECT_TIMEOUT) == PR_FAILURE) {
+	if (PR_Connect (fd, &netaddr, cancel_fd?0:(CONNECT_TIMEOUT*1000)) == PR_FAILURE) {
 		int errnosave;
 		
 		set_errno (PR_GetError ());
@@ -1355,7 +1352,7 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 				poll[0].out_flags = 0;
 				poll[1].out_flags = 0;
 
-				if (PR_Poll (poll, cancel_fd?2:1, CONNECT_TIMEOUT) == PR_FAILURE) {
+				if (PR_Poll (poll, cancel_fd?2:1, (CONNECT_TIMEOUT*1000)) == PR_FAILURE) {
 					set_errno (PR_GetError ());
 					goto exception;
 				}

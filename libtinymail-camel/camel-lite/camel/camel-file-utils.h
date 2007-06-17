@@ -37,6 +37,19 @@
 #define O_BINARY 0
 #endif
 
+
+#define IDLE_READ_TIMEOUT 15
+#define IDLE_WRITE_TIMEOUT 15
+
+#define BLOCKING_READ_TIMEOUT 15
+#define BLOCKING_WRITE_TIMEOUT 15
+
+#define NONBLOCKING_READ_TIMEOUT 0
+#define NONBLOCKING_WRITE_TIMEOUT 0
+
+#define CONNECT_TIMEOUT 30
+
+
 G_BEGIN_DECLS
 
 int camel_file_util_encode_fixed_int32 (FILE *out, gint32);
