@@ -104,6 +104,7 @@ static gboolean
 tny_maemo_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error)
 {
 	GtkMessageType gtktype;
+	gboolean retval = FALSE;
 	GtkWidget *dialog;
 
 	switch (type)
@@ -120,33 +121,8 @@ tny_maemo_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolea
 		break;
 	}
 
-	const gchar *prompt = NULL;
-	switch (error->code)
-	{
-		/* Currently, this seems to be the only possible error.
-		 * It originates from _tny_camel_account_try_connect(), 
-		 * and maybe from similar functions.
-		 * The error->message text originates from 
-		 * camel-imap-store.c:imap_auth_loop().
-		 */
-		case TNY_ACCOUNT_ERROR_TRY_CONNECT:
-			/* Use a Logical ID: */
-			prompt = _("Account not yet fully configured");
-			break;
-		default:
-			g_warning ("%s: Unhandled GError code.", __FUNCTION__);
-			prompt = NULL;
-		break;
-	}
-	
-	if (!prompt)
-		return FALSE;
-		
-	/* TODO: Show more appropriate explicitly named buttons in the dialog,
-	 * and just show one button if there is no choice to be made. */
-	gboolean retval = FALSE;
 	dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-                                  gtktype, GTK_BUTTONS_YES_NO, prompt);
+		gtktype, GTK_BUTTONS_YES_NO, error->message);
 
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 		retval = TRUE;
