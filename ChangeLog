@@ -5,6 +5,10 @@
 	* Code cleanups
 	* Connection timeout corrections
 	* Read, Read-idle, Read-nonblock timeout corrections
+	* Introduction of tny_account_start_operation and
+	tny_account_stop_operation
+
+	* This was a major API change
 
 2007-06-15  Philip Van Hoof  <pvanhoof@gnome.org>
 

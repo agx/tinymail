@@ -19,6 +19,9 @@
 
 #include <config.h>
 
+#include <tny-status.h>
+
+
 #ifdef DBC
 #include <string.h>
 #endif
@@ -26,6 +29,57 @@
 #include <tny-account.h>
 
 guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
+
+
+/**
+ * tny_account_start_operation:
+ * @self: a #TnyAccount object
+ * @mdomain: the domain of the #TnyStatus instances that will happen in @status_callback
+ * @mcode: the code of the #TnyStatus instances that will happen in @status_callback
+ * @status_callback: status callback handler
+ * @status_user_data: the user-data to give to the @status_callback
+ *
+ * Start an operation. This only works with methods that don't end with _async.
+ **/
+void 
+tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->start_operation_func != NULL);
+#endif
+
+	TNY_ACCOUNT_GET_IFACE (self)->start_operation_func (self, domain, code, status_callback, status_user_data);
+
+#ifdef DBC /* ensure*/
+#endif
+
+	return;
+}
+
+/**
+ * tny_account_stop_operation:
+ * @self: a #TnyAccount object
+ * @canceled: NULL or byref whether the operation got canceled
+ *
+ * Stop the current operation. This only works with methods that don't end 
+ * with _async.
+ **/
+void 
+tny_account_stop_operation (TnyAccount *self, gboolean *canceled)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->stop_operation_func != NULL);
+#endif
+
+	TNY_ACCOUNT_GET_IFACE (self)->stop_operation_func (self, canceled);
+
+#ifdef DBC /* ensure*/
+#endif
+
+	return;
+}
 
 /**
  * tny_account_matches_url_string:

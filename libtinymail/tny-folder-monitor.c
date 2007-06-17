@@ -139,7 +139,7 @@ static void
 foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
 {
 	TnyIterator *iter;
-	const gchar *uid = tny_header_get_uid (header);
+	/* const gchar *uid = tny_header_get_uid (header); */
 
 	iter = tny_list_create_iterator (priv->lists);
 	while (!tny_iterator_is_done (iter))

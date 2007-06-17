@@ -69,7 +69,7 @@ struct _TnyProgressInfo
 	gchar *what;
 	gint sofar;
 	gint oftotal;
-	TnyIdleStopper* stopper;
+	TnyIdleStopper *stopper;
 	gpointer user_data;
 };
 

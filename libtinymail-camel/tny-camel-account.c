@@ -399,6 +399,92 @@ _tny_camel_account_stop_camel_operation (TnyCamelAccount *self)
 	return;
 }
 
+static void 
+tny_camel_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->start_operation_func (self, domain, code, status_callback, status_user_data);
+}
+
+static void
+tny_camel_account_stop_operation (TnyAccount *self, gboolean *canceled)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->stop_operation_func (self, canceled);
+}
+
+
+
+typedef struct
+{
+	TnyAccount *self;
+	TnyStatusCallback status_callback;
+	TnyStatusDomain domain;
+	TnyStatusCode code;
+	guint depth;
+	gpointer user_data;
+	TnyIdleStopper* stopper;
+} RefreshStatusInfo;
+
+static void
+refresh_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *user_data)
+{
+	RefreshStatusInfo *oinfo = user_data;
+	TnyProgressInfo *info = NULL;
+
+	info = tny_progress_info_new (G_OBJECT (oinfo->self), oinfo->status_callback, 
+		oinfo->domain, oinfo->code, what, sofar, 
+		oftotal, oinfo->stopper, oinfo->user_data);
+
+	if (oinfo->depth > 0)
+	{
+		g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+			tny_progress_info_idle_func, info, 
+			tny_progress_info_destroy);
+	} else {
+		tny_progress_info_idle_func (info);
+		tny_progress_info_destroy (info);
+	}
+
+	return;
+}
+
+static void 
+tny_camel_account_start_operation_default (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
+{
+	RefreshStatusInfo *info = g_slice_new (RefreshStatusInfo);
+
+	info->self = TNY_ACCOUNT (g_object_ref (self));
+	info->domain = domain;
+	info->code = code;
+	info->status_callback = status_callback;
+	info->depth = g_main_depth ();
+	info->user_data = status_user_data;
+	info->stopper = tny_idle_stopper_new();
+
+	_tny_camel_account_start_camel_operation_n (TNY_CAMEL_ACCOUNT (self), 
+			refresh_status, info, "Starting operation", FALSE);
+
+	tny_idle_stopper_stop (info->stopper);
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
+	g_object_unref (info->self);
+	g_slice_free (RefreshStatusInfo, info);
+
+	return;
+}
+
+static void
+tny_camel_account_stop_operation_default (TnyAccount *self, gboolean *canceled)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	if (canceled)
+		*canceled = camel_operation_cancel_check (priv->cancel);
+
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));
+}
+
+
 static gboolean 
 tny_camel_account_is_connected (TnyAccount *self)
 {
@@ -645,7 +731,7 @@ tny_camel_account_get_id (TnyAccount *self)
 static const gchar*
 tny_camel_account_get_id_default (TnyAccount *self)
 {
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);	
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	const gchar *retval;
 
 	retval = (const gchar*)priv->id;
@@ -1061,6 +1147,8 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->get_account_type_func = tny_camel_account_get_account_type;
 	klass->cancel_func = tny_camel_account_cancel;
 	klass->matches_url_string_func = tny_camel_account_matches_url_string;
+	klass->start_operation_func = tny_camel_account_start_operation;
+	klass->stop_operation_func =  tny_camel_account_stop_operation;
 
 	return;
 }
@@ -1097,6 +1185,8 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->get_account_type_func = tny_camel_account_get_account_type_default;
 	class->cancel_func = tny_camel_account_cancel_default;
 	class->matches_url_string_func = tny_camel_account_matches_url_string_default;
+	class->start_operation_func = tny_camel_account_start_operation_default;
+	class->stop_operation_func =  tny_camel_account_stop_operation_default;
 
 	class->add_option_func = tny_camel_account_add_option_default;
 	class->set_online_func = tny_camel_account_set_online_default;
