@@ -588,32 +588,36 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		 * then that indicates that messages have been both added and 
 		 * removed, so we have to rescan to find the removed ones */
 
-		response = camel_imap_command (store, NULL, ex, "FETCH %d UID", count);
-		if (response) {
-			uid = 0;
-			for (i = 0; i < response->untagged->len; i++) 
-			{
-				resp = response->untagged->pdata[i];
-				mval = strtoul (resp + 2, &resp, 10);
-				if (mval == 0)
-					continue;
-				if (!g_ascii_strcasecmp (resp, " EXISTS")) 
+		if (count != 0)
+		{
+			response = camel_imap_command (store, NULL, ex, "FETCH %d UID", count);
+			if (response) {
+				uid = 0;
+				for (i = 0; i < response->untagged->len; i++) 
 				{
-					/* Another one?? */
-					exists = mval;
-					continue;
+					resp = response->untagged->pdata[i];
+					mval = strtoul (resp + 2, &resp, 10);
+					if (mval == 0)
+						continue;
+					if (!g_ascii_strcasecmp (resp, " EXISTS")) 
+					{
+						/* Another one?? */
+						exists = mval;
+						continue;
+					}
+					if (uid != 0 || mval != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
+						continue;
+					
+					fetch_data = parse_fetch_response (imap_folder, resp + 7);
+					uid = strtoul (g_datalist_get_data (&fetch_data, "UID"), NULL, 10);
+					g_datalist_clear (&fetch_data);
 				}
-				if (uid != 0 || mval != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
-					continue;
-				
-				fetch_data = parse_fetch_response (imap_folder, resp + 7);
-				uid = strtoul (g_datalist_get_data (&fetch_data, "UID"), NULL, 10);
-				g_datalist_clear (&fetch_data);
-			}
-			camel_imap_response_free_without_processing (store, response);
-			if (uid == 0 || uid != val)
+				camel_imap_response_free_without_processing (store, response);
+				if (uid == 0 || uid != val)
+					imap_folder->need_rescan = TRUE;
+			} else 
 				imap_folder->need_rescan = TRUE;
-		} else 
+		} else
 			imap_folder->need_rescan = TRUE;
 	}
 

@@ -333,6 +333,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 
+	imap_store->courier_crap = FALSE;
 	imap_store->idle_prefix_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (imap_store->idle_prefix_lock);
 
@@ -796,7 +797,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (!strncmp(buf, "* PREAUTH", 9))
 		store->preauthed = TRUE;
 
-	if (strstr (buf, "Courier-IMAP") || getenv("CAMEL_IMAP_BRAINDAMAGED")) 
+	if (strstr (buf, "Courier-IMAP"))
+		store->courier_crap = TRUE;
+
+	if (store->courier_crap || getenv("CAMEL_IMAP_BRAINDAMAGED")) 
 	{
 		/* Courier-IMAP is braindamaged. So far this flag only
 		 * works around the fact that Courier-IMAP is known to

@@ -164,6 +164,7 @@ struct _CamelImapStore {
 	GThread *idle_thread;
 	gboolean idle_cont, in_idle;
 	guint idle_sleep, getsrv_sleep;
+	gboolean courier_crap;
 };
 
 typedef struct {
