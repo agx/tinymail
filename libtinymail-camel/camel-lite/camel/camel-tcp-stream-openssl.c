@@ -50,6 +50,7 @@
 #include "camel-operation.h"
 #include "camel-service.h"
 #include "camel-session.h"
+#include "camel-file-utils.h"
 
 #include "camel-tcp-stream-ssl.h"
 
