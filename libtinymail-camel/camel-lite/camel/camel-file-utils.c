@@ -761,7 +761,7 @@ camel_read_socket_idle (int fd, char *buf, size_t n)
 			FD_ZERO (&rdset);
 			FD_SET (fd, &rdset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = 1;
+			tv.tv_sec = 15;
 			tv.tv_usec = 0;
 			nread = -1;
 

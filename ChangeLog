@@ -1,3 +1,8 @@
+2007-06-17  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Increased read-idle's low timeout times: now that all IDLE happens in
+	a thread, it's not necessary anymore to quickly unblock.
+
 2007-06-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Connection failure handling in the IMAP code

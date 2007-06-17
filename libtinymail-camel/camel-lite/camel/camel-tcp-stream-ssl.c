@@ -550,7 +550,7 @@ stream_read_idle (CamelStream *stream, char *buffer, size_t n)
 			pollfds[1].out_flags = 0;
 			nread = -1;
 
-			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * 5);
+			res = PR_Poll(pollfds, 2, PR_TicksPerSecond () * 15);
 
 			if (res == -1)
 				set_errno(PR_GetError());

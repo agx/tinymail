@@ -307,7 +307,7 @@ stream_read_idle (CamelStream *stream, char *buffer, size_t n)
 		FD_ZERO (&rdset);
 		FD_SET (openssl->priv->sockfd, &rdset);
 		nread = -1;
-		timeout.tv_sec = 0;
+		timeout.tv_sec = 15;
 		timeout.tv_usec = 0;
 		res = select (fdmax, &rdset, 0, 0, &timeout);
 		
