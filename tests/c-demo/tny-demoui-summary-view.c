@@ -191,26 +191,61 @@ clear_header_view (TnyDemouiSummaryViewPriv *priv)
 	tny_msg_view_clear (priv->msg_view);
 }
 
+
+typedef struct
+{
+	TnySummaryView *self;
+	TnyMsg *msg;
+	TnyHeader *header;
+} OnResponseInfo;
+
 static void
 on_response (GtkDialog *dialog, gint arg1, gpointer user_data)
 {
+	OnResponseInfo *info = (OnResponseInfo *) user_data;
+	TnySummaryView *self = info->self;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyHeader *header = info->header;
+	TnyMsg *msg = info->msg;
+
+	if (arg1 == GTK_RESPONSE_YES)
+	{
+		TnyFolder *outbox = tny_send_queue_get_outbox (priv->send_queue);
+		tny_folder_remove_msg (outbox, header, NULL);
+		tny_folder_sync (outbox, TRUE, NULL);
+		g_object_unref (outbox);
+	}
+
+	g_object_unref (msg);
+	g_object_unref (header);
+	g_object_unref (self);
+
 	gtk_widget_destroy (GTK_WIDGET (dialog));
+	g_slice_free (OnResponseInfo, info);
 }
 
 static void 
-on_send_queue_error_happened (TnySendQueue *self, TnyMsg *msg, GError *err, gpointer user_data)
+on_send_queue_error_happened (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *err, gpointer user_data)
 {
+	gchar *str = g_strdup_printf ("%s. Do you want to remove the message (%s)?",
+		err->message, tny_header_get_subject (header));
+	OnResponseInfo *info = g_slice_new (OnResponseInfo);
 	GtkWidget *dialog = gtk_message_dialog_new (NULL, 0,
-		GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, err->message);
-	g_signal_connect (G_OBJECT (dialog), "response", G_CALLBACK (on_response), NULL);
+		GTK_MESSAGE_ERROR, GTK_BUTTONS_YES_NO, str);
+	g_free (str);
+	info->self = g_object_ref (user_data);
+	info->msg = g_object_ref (msg);
+	info->header = g_object_ref (header);
+	g_signal_connect (G_OBJECT (dialog), "response",
+		G_CALLBACK (on_response), info);
 	gtk_widget_show_all (dialog);
-
 	return;
 }
 
 static void 
-reload_accounts (TnyDemouiSummaryViewPriv *priv)
+reload_accounts (TnySummaryView *self)
 {
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyAccountStore *account_store = priv->account_store;
 	GtkTreeModel *sortable, *maccounts, *mailbox_model;
 	TnyFolderStoreQuery *query;
@@ -266,7 +301,7 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 			g_object_unref (priv->send_queue);
 		priv->send_queue = tny_camel_send_queue_new ((TnyCamelTransportAccount *) tacc);
 		g_signal_connect (G_OBJECT (priv->send_queue), "error-happened",
-			G_CALLBACK (on_send_queue_error_happened), priv);
+			G_CALLBACK (on_send_queue_error_happened), self);
 		g_object_unref (tacc);
 		g_object_unref (iter);
 	}
@@ -288,8 +323,7 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 static void
 accounts_reloaded (TnyAccountStore *store, gpointer user_data)
 {
-	TnyDemouiSummaryViewPriv *priv = user_data;
-	reload_accounts (priv);
+	reload_accounts ((TnySummaryView *)user_data);
 	return;
 }
 
@@ -426,9 +460,9 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 
 	priv->accounts_reloaded_signal = g_signal_connect (
 		G_OBJECT (account_store), "accounts_reloaded",
-		G_CALLBACK (accounts_reloaded), priv);
+		G_CALLBACK (accounts_reloaded), self);
 
-	reload_accounts (priv);
+	reload_accounts ((TnySummaryView *) self);
 
 	g_object_unref (G_OBJECT (device));
 

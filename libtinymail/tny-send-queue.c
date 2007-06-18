@@ -162,9 +162,10 @@ tny_send_queue_base_init (gpointer g_class)
 /**
  * TnySendQueue::error-happened
  * @self: the object on which the signal is emitted
- * @arg1: The message that was supposed to be sent or NULL
- * @arg2: a GError containing the error that happened
- * @arg5: user data
+ * @arg1: The header of the message that was supposed to be sent or NULL
+ * @arg2: The message that was supposed to be sent or NULL
+ * @arg3: a GError containing the error that happened
+ * @arg4: user data
  *
  *
  * Emitted when a message didn't get sent because of an error
@@ -175,8 +176,8 @@ tny_send_queue_base_init (gpointer g_class)
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnySendQueueIface, error_happened),
 			NULL, NULL,
-			tny_marshal_VOID__POINTER_POINTER,
-			G_TYPE_NONE, 2, TNY_TYPE_MSG, G_TYPE_POINTER);
+			tny_marshal_VOID__POINTER_POINTER_POINTER,
+			G_TYPE_NONE, 3, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_POINTER);
 
 		initialized = TRUE;
 	}

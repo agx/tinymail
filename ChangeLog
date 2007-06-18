@@ -2,6 +2,10 @@
 
 	* Fixed the From and the Error reporting when sending messages
 	* Fixed the support for Yahoo's SMTP
+	* Added some more information to the error-happened signal for
+	TnySendQueue
+
+	* This was a major API change
 
 2007-06-17  Philip Van Hoof  <pvanhoof@gnome.org>
 

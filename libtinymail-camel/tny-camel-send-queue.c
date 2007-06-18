@@ -47,7 +47,8 @@ static GObjectClass *parent_class = NULL;
 
 typedef struct {
 	TnySendQueue *self;
-	TnyMsg *msg;
+	TnyMsg *msg; 
+	TnyHeader *header;
 	GError *error;
 	gint i, total;
 } ErrorInfo;
@@ -57,7 +58,7 @@ emit_error_on_mainloop (gpointer data)
 {
 	ErrorInfo *info = data;
 	g_signal_emit (info->self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-				0, info->msg, info->error);
+				0, info->header, info->msg, info->error);
 	return FALSE;
 }
 
@@ -77,7 +78,7 @@ destroy_error_info (gpointer data)
 }
 
 static void
-emit_error (TnySendQueue *self, TnyMsg *msg, GError *error, int i, int total)
+emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, int i, int total)
 {
 	ErrorInfo *info = g_slice_new0 (ErrorInfo);
 
@@ -87,6 +88,8 @@ emit_error (TnySendQueue *self, TnyMsg *msg, GError *error, int i, int total)
 		info->self = TNY_SEND_QUEUE (g_object_ref (G_OBJECT (self)));
 	if (msg)
 		info->msg = TNY_MSG (g_object_ref (G_OBJECT (msg)));
+	if (header)
+		info->header = TNY_HEADER (g_object_ref (G_OBJECT (header)));
 
 	info->i = i;
 	info->total = total;
@@ -121,7 +124,7 @@ thread_main (gpointer data)
 
 		if (terror != NULL)
 		{
-			emit_error (self, NULL, terror, i, priv->total);
+			emit_error (self, NULL, NULL, terror, i, priv->total);
 			g_error_free (terror);
 			g_object_unref (G_OBJECT (list));
 			g_mutex_unlock (priv->todo_lock);
@@ -154,7 +157,7 @@ thread_main (gpointer data)
 
 			if (ferror != NULL)
 			{
-				emit_error (self, msg, ferror, i, priv->total);
+				emit_error (self, NULL, NULL, ferror, i, priv->total);
 				g_error_free (ferror);
 				g_object_unref (G_OBJECT (headers));
 				g_mutex_unlock (priv->todo_lock);
@@ -190,18 +193,20 @@ thread_main (gpointer data)
 
 			tny_list_prepend (hassent, G_OBJECT (header));
 			msg = tny_folder_get_msg (outbox, header, &err);
-			g_object_unref (G_OBJECT (header));
+
+			/* hassent is owner now */
+			g_object_unref (G_OBJECT (header)); 
 
 			if (err == NULL) 
 			{
 				tny_transport_account_send (priv->trans_account, msg, &err);
 
 				if (err != NULL) {
-					emit_error (self, msg, err, i, priv->total);
+					emit_error (self, header, msg, err, i, priv->total);
 					priv->do_continue = FALSE;
 				}
 			} else  {
-				emit_error (self, msg, err, i, priv->total);
+				emit_error (self, header, msg, err, i, priv->total);
 				priv->do_continue = FALSE;
 			}
 
@@ -213,7 +218,7 @@ thread_main (gpointer data)
 					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
 					if (newerr != NULL) 
 					{
-						emit_error (self, msg, newerr, i, priv->total);
+						emit_error (self, header, msg, newerr, i, priv->total);
 						priv->do_continue = FALSE;
 						g_error_free (newerr);
 					}
