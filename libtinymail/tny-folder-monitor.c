@@ -197,7 +197,7 @@ remove_header_from_list (TnyList *list, const gchar *uid)
 	{
 		g_object_unref (G_OBJECT (header)); /* from the loop */
 		tny_list_remove (list, G_OBJECT (header));
-	}
+	} 
 }
 
 static void
