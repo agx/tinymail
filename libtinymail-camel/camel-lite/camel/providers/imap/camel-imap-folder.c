@@ -3111,7 +3111,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
 			if (!camel_imap_command_start (store, folder, ex,
-						       "UID FETCH %s (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
+						       "UID FETCH %s (FLAGS RFC822.SIZE BODY.PEEK[%s])",
 						       uidset, header_spec)) 
 			{
 				if (!camel_operation_cancel_check (NULL))

@@ -2,6 +2,7 @@
 
 	* Bugfix in IMAP, when all messages got expunged tinymail did not
 	succeed in refreshing the summary correctly
+	* Experimental removal of INTERNALDATE from the summary fetch for IMAP
 
 2007-06-18  Javier Fernandez  <jfernandez@igalia.com>
 
