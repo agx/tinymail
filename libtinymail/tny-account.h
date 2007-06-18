@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-shared.h>
+#include <tny-status.h>
 
 G_BEGIN_DECLS
 
