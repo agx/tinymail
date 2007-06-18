@@ -1,3 +1,9 @@
+2007-06-18  set REAL_NAME environment variable  <murrayc@murrayc-desktop>
+
+	reviewed by: <delete if not using a buddy>
+
+	* COPYING:
+
 Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog

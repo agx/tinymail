@@ -1,3 +1,10 @@
+2007-06-18  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(on_connection_event), (tny_maemo_conic_device_get_iap_list):
+	Fix some warnings reported in tinymail trac ticket #66:
+	http://tinymail.org/trac/tinymail/ticket/66
+
 2007-06-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed the From and the Error reporting when sending messages

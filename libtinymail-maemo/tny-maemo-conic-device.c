@@ -21,6 +21,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-maemo-conic-device.h>
+#include <string.h> /* For strcmp() */
 
 #ifdef MAEMO_CONIC_DUMMY
 /* #include "coniciap-private.h"
@@ -136,11 +137,11 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 		if (priv->attempting_connection)
 			priv->attempting_connection = FALSE;
 			
-		g_message ("new status: DISCONNECTED", priv->iap);
+		g_message ("new status: DISCONNECTED");
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
 		is_online = FALSE;
-		g_message ("new status: DISCONNECTING", priv->iap);
+		g_message ("new status: DISCONNECTING");
 		break;
 	default:
 		g_return_if_reached (); 
@@ -336,8 +337,6 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 GSList*
 tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 {
-	TnyMaemoConicDevicePriv *priv;
-	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 
 #ifdef MAEMO_CONIC_DUMMY
@@ -369,7 +368,8 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	 
 	 return result;
 #else
-	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	TnyMaemoConicDevicePriv *priv 
+		= TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
 	return con_ic_connection_get_all_iaps (priv->cnx);
