@@ -287,6 +287,7 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 	/* Content-Disposition is excellent for this, of course (but we might
 	 * not actually have this header, as not all E-mail clients add it) */
 
+
 	if (contdisp)
 	{
 		if (strcasestr (contdisp, "inline"))

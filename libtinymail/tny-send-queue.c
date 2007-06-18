@@ -22,6 +22,7 @@
 #include <tny-send-queue.h>
 #include <tny-folder.h>
 #include <tny-msg.h>
+#include <tny-signals-marshal.h>
 
 guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
 
