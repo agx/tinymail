@@ -2930,6 +2930,14 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 				uid = strtok (NULL, " ");
 				cnt++;
 			}
+		} else {
+			GData *data = parse_fetch_response ((CamelImapFolder *)folder, resp); 
+			char *uid = g_datalist_get_data (&data, "UID"); 
+			if (uid) { 
+				g_ptr_array_add (needheaders, g_strdup (uid)); 
+				cnt++; 
+			} 
+			g_datalist_clear (&data); 
 		}
 
 		g_free (resp); 
@@ -3065,7 +3073,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			g_ptr_array_free (needheaders, TRUE);
 			needheaders = g_ptr_array_new ();
 			if (!camel_imap_command_start (store, folder, ex,
-				"UID SEARCH 1:* ALL"))
+				"UID FETCH 1:* (UID)")) /* Old less efficient style */
 				{ if (!camel_operation_cancel_check (NULL)) 
 					g_warning ("IMAP error getting UIDs (3)");
 					camel_folder_summary_kill_hash (folder->summary);
