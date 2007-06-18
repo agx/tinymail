@@ -1,3 +1,8 @@
+2007-06-18  Javier Fernandez  <jfernandez@igalia.com>
+
+	* Added an implementation of iter_children function, defined on
+	GtkTreeModel interface.
+	
 2007-06-18  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:

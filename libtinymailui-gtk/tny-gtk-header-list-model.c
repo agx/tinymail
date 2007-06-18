@@ -476,6 +476,18 @@ tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	return retval;
 }
 
+static gboolean                                                                                                                                                             
+tny_gtk_header_list_model_iter_children (GtkTreeModel *tree_model,
+					 GtkTreeIter  *iter,
+					 GtkTreeIter  *parent) 
+{                                                                                                                                                                           
+	gboolean retval = FALSE;
+
+	retval = tny_gtk_header_list_model_iter_nth_child (tree_model, iter, parent, 0);
+	
+	return retval;
+}
+
 
 static void
 tny_gtk_header_list_model_tree_model_init (GtkTreeModelIface *iface)
@@ -489,6 +501,7 @@ tny_gtk_header_list_model_tree_model_init (GtkTreeModelIface *iface)
 	iface->iter_next = tny_gtk_header_list_model_iter_next;
 	iface->iter_has_child = tny_gtk_header_list_model_iter_has_child;
 	iface->iter_n_children = tny_gtk_header_list_model_iter_n_children;
+	iface->iter_children = tny_gtk_header_list_model_iter_children;
 	iface->iter_nth_child = tny_gtk_header_list_model_iter_nth_child;
 
 	return;
