@@ -200,10 +200,10 @@ static void
 tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	TnyHeader *header; CamelMimeMessage *message;
+	CamelMimeMessage *message;
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
-	CamelTransport *transport; const gchar *str = NULL;
-	CamelInternetAddress *from, *recipients;
+	CamelTransport *transport;
+	CamelAddress *from, *recipients;
 	gboolean reperr = TRUE;
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
@@ -241,17 +241,13 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-	from = camel_mime_message_get_from (message);
-	recipients = camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
-
-	gchar raw[200];
-	camel_address_decode (from, raw);
-printf ("%s\n",raw);
+	from = (CamelAddress *) camel_mime_message_get_from (message);
+	recipients = (CamelAddress *) camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
 
 	apriv->connected = TRUE;
 
-	camel_transport_send_to (transport, message, (CamelAddress*)from, 
-			(CamelAddress*)recipients, &ex);
+	camel_transport_send_to (transport, message, from, 
+			recipients, &ex);
 
 	if (camel_exception_is_set (&ex))
 	{
