@@ -53,8 +53,8 @@ struct _TnySendQueueIface
 	GTypeInterface parent;
 	
 	/* Signals */
-	void (*msg_sent) (TnySendQueue *self, TnyMsg *msg, guint nth, guint total, gpointer user_data);
-	void (*error_happened) (TnySendQueue *self, TnyMsg *msg, GError *err, gpointer user_data);
+	void (*msg_sent) (TnySendQueue *self, TnyMsg *msg, gpointer user_data);
+	void (*error_happened) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *err, gpointer user_data);
 
 	/* methods */
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);

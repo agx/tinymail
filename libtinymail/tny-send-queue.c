@@ -176,7 +176,7 @@ tny_send_queue_base_init (gpointer g_class)
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnySendQueueIface, error_happened),
 			NULL, NULL,
-			tny_marshal_VOID__POINTER_POINTER_POINTER,
+			tny_marshal_VOID__OBJECT_OBJECT_POINTER,
 			G_TYPE_NONE, 3, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_POINTER);
 
 		initialized = TRUE;
