@@ -340,7 +340,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		goto exception_cleanup;
 	}
 	
-	d(fprintf (stderr, "sending : STARTTLS\r\n"));
+	smtp_debug ("-> STARTTLS\r\n");
 	if (camel_stream_write (tcp_stream, "STARTTLS\r\n", 10) == -1) {
 		camel_exception_setv (ex, errno == EINTR ? CAMEL_EXCEPTION_USER_CANCEL : CAMEL_EXCEPTION_SYSTEM,
 				      _("STARTTLS command failed: %s"),
@@ -355,7 +355,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		g_free (respbuf);
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 		
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+		smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 		
 		if (!respbuf || strncmp (respbuf, "220", 3)) {
 			smtp_set_exception (transport, FALSE, respbuf, _("STARTTLS command failed"), ex);
