@@ -1225,6 +1225,10 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		g_array_append_val (removed, seq);
 
 	/* And finally update the summary. */
+	
+	if (removed && removed->len > 0)
+		imap_folder->need_rescan = TRUE;
+	
 	camel_imap_folder_changed (folder, exists, removed, ex);
 	g_array_free (removed, TRUE);
 
@@ -3800,7 +3804,7 @@ camel_imap_folder_changed (CamelFolder *folder, int exists,
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
 	
 	camel_folder_change_info_free (changes);
-	/* IN TNY: camel_folder_summary_save (folder->summary); */
+	camel_folder_summary_save (folder->summary);
 }
 
 
@@ -3855,7 +3859,7 @@ camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
 
 	camel_folder_change_info_free (changes);
-	/* IN TNY: camel_folder_summary_save (folder->summary); */
+	camel_folder_summary_save (folder->summary);
 }
 
 static void
