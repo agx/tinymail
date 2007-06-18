@@ -191,13 +191,19 @@ clear_header_view (TnyDemouiSummaryViewPriv *priv)
 	tny_msg_view_clear (priv->msg_view);
 }
 
-static void 
-on_send_queue_error_happened (TnySendQueue *self, TnyMsg *msg, GError *err, guint nth, guint total, gpointer user_data)
+static void
+on_response (GtkDialog *dialog, gint arg1, gpointer user_data)
 {
-	GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+	gtk_widget_destroy (GTK_WIDGET (dialog));
+}
+
+static void 
+on_send_queue_error_happened (TnySendQueue *self, TnyMsg *msg, GError *err, gpointer user_data)
+{
+	GtkWidget *dialog = gtk_message_dialog_new (NULL, 0,
 		GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, err->message);
-	gtk_dialog_run (GTK_DIALOG (dialog));
-	gtk_widget_destroy (dialog);
+	g_signal_connect (G_OBJECT (dialog), "response", G_CALLBACK (on_response), NULL);
+	gtk_widget_show_all (dialog);
 
 	return;
 }

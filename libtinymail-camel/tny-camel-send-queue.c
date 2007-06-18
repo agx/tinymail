@@ -57,7 +57,7 @@ emit_error_on_mainloop (gpointer data)
 {
 	ErrorInfo *info = data;
 	g_signal_emit (info->self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-				2, info->msg, info->error);
+				0, info->msg, info->error);
 	return FALSE;
 }
 
