@@ -1,3 +1,8 @@
+2007-06-18  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Bugfix in IMAP, when all messages got expunged tinymail did not
+	succeed in refreshing the summary correctly
+
 2007-06-18  Javier Fernandez  <jfernandez@igalia.com>
 
 	* Added an implementation of iter_children function, defined on

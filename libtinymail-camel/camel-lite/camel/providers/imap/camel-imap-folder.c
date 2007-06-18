@@ -1172,7 +1172,15 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		/* TODO: recalculating rather than marking a lot perfectly fine
 		 * material for removal */
 
-		if (strcmp (camel_message_info_uid (info), new[i].uid) != 0) {
+		if (strcmp (camel_message_info_uid (info), new[i].uid) != 0) 
+		{
+			/* CamelFolderChangeInfo *nchanges = NULL;
+			nchanges = camel_folder_change_info_new();
+			camel_folder_change_info_remove_uid (nchanges, new[i].uid);
+			camel_object_trigger_event(CAMEL_OBJECT (folder), 
+				"folder_changed", nchanges);
+			camel_folder_change_info_free (nchanges); */
+
 			camel_message_info_free(info);
 			seq = i + 1;
 			g_array_append_val (removed, seq);
@@ -1198,7 +1206,6 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 			if (changes == NULL)
 				changes = camel_folder_change_info_new();
 			camel_folder_change_info_change_uid(changes, new[i].uid);
-			/* flags_to_label(folder, (CamelImapMessageInfo *)info); */
 		}
 
 		camel_message_info_free(info);
@@ -1210,7 +1217,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
 		camel_folder_change_info_free(changes);
 	}
-	
+
 	seq = i + 1;
 	
 	/* Free remaining memory. */
@@ -1225,10 +1232,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		g_array_append_val (removed, seq);
 
 	/* And finally update the summary. */
-	
-	if (removed && removed->len > 0)
-		imap_folder->need_rescan = TRUE;
-	
+
 	camel_imap_folder_changed (folder, exists, removed, ex);
 	g_array_free (removed, TRUE);
 
@@ -2979,10 +2983,6 @@ imap_update_summary (CamelFolder *folder, int exists,
    nextn = 0;
    if (folder->summary)
    	nextn = camel_folder_summary_count (folder->summary);
-   if (nextn <= 0) {
-   	camel_folder_summary_load (folder->summary);
-   	nextn = camel_folder_summary_count (folder->summary);
-   }
 
    ineed = (exists - nextn);
    nextn = 1;
@@ -3802,7 +3802,7 @@ camel_imap_folder_changed (CamelFolder *folder, int exists,
 
 	if (camel_folder_change_info_changed (changes))
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
-	
+
 	camel_folder_change_info_free (changes);
 	camel_folder_summary_save (folder->summary);
 }

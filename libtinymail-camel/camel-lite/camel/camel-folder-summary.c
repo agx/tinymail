@@ -496,6 +496,27 @@ camel_folder_summary_index(CamelFolderSummary *s, int i)
 	return info;
 }
 
+void
+camel_folder_summary_move_up (CamelFolderSummary *s)
+{
+	guint i = 0;
+	gboolean first = TRUE;
+
+	CAMEL_SUMMARY_LOCK(s, summary_lock);
+	CAMEL_SUMMARY_LOCK(s, ref_lock);
+
+	for (i = s->messages->len; i > 0 ; i--)
+	{
+		if (first)
+			g_ptr_array_add (s->messages, s->messages->pdata[i-1]);
+		else
+			s->messages->pdata[i+1] = s->messages->pdata[i];
+	}
+
+	CAMEL_SUMMARY_UNLOCK(s, ref_lock);
+	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+
+}
 
 /**
  * camel_folder_summary_array:

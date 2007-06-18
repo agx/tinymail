@@ -393,6 +393,8 @@ void camel_folder_summary_kill_hash (CamelFolderSummary *summary);
 void camel_message_info_clear_normal_flags (CamelMessageInfo *min);
 int camel_folder_summary_get_index_for (CamelFolderSummary *s, const char *uid);
 
+void camel_folder_summary_move_up (CamelFolderSummary *s);
+
 
 G_END_DECLS
 
