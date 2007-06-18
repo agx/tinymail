@@ -192,6 +192,17 @@ clear_header_view (TnyDemouiSummaryViewPriv *priv)
 }
 
 static void 
+on_send_queue_error_happened (TnySendQueue *self, TnyMsg *msg, GError *err, guint nth, guint total, gpointer user_data)
+{
+	GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
+		GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, err->message);
+	gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+
+	return;
+}
+
+static void 
 reload_accounts (TnyDemouiSummaryViewPriv *priv)
 {
 	TnyAccountStore *account_store = priv->account_store;
@@ -248,6 +259,8 @@ reload_accounts (TnyDemouiSummaryViewPriv *priv)
 		if (priv->send_queue)
 			g_object_unref (priv->send_queue);
 		priv->send_queue = tny_camel_send_queue_new ((TnyCamelTransportAccount *) tacc);
+		g_signal_connect (G_OBJECT (priv->send_queue), "error-happened",
+			G_CALLBACK (on_send_queue_error_happened), priv);
 		g_object_unref (tacc);
 		g_object_unref (iter);
 	}
@@ -486,7 +499,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 					const gchar *from = gtk_entry_get_text (GTK_ENTRY (entry2));
 
 					tny_header_set_to (nheader, to);
-					tny_header_set_to (nheader, from);
+					tny_header_set_from (nheader, from);
 
 					g_object_unref (nheader);
 					tny_send_queue_add (priv->send_queue, msg, NULL);

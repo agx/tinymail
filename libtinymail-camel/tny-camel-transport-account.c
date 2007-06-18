@@ -240,49 +240,57 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
-	header = tny_msg_get_header (msg);
+	/*header = tny_msg_get_header (msg); */
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-	from = camel_internet_address_new ();
-	recipients = camel_internet_address_new ();
+	/* from = camel_internet_address_new (); */
+	from = camel_mime_message_get_from (message);
 
+/*
 	str = tny_header_get_from (header);
-         if(str)
-         {
-	_foreach_email_add_to_inet_addr (str, from);
-            camel_mime_message_set_from(message,from);
-         }
+	if(str)
+	{
+		_foreach_email_add_to_inet_addr (str, from);
+		camel_mime_message_set_from (message, from);
+	}
 
 	str = tny_header_get_to (header);
-          if(str)
-          {
-	_foreach_email_add_to_inet_addr (str, recipients);
-            camel_mime_message_set_recipients(message,CAMEL_RECIPIENT_TYPE_TO,recipients);
-          }
-               
+	if(str)
+	{
+		recipients = camel_internet_address_new ();
+		_foreach_email_add_to_inet_addr (str, recipients);
+		camel_mime_message_set_recipients (message, CAMEL_RECIPIENT_TYPE_TO, recipients);
+		g_object_unref (recipients);
+	}
+
 
 	str = tny_header_get_cc (header);
-          if(str)              
-          {
-	_foreach_email_add_to_inet_addr (str, recipients);
-            camel_mime_message_set_recipients(message,CAMEL_RECIPIENT_TYPE_CC,recipients);
-          }
-               
+	if(str)
+	{
+		recipients = camel_internet_address_new ();
+		_foreach_email_add_to_inet_addr (str, recipients);
+		camel_mime_message_set_recipients (message, CAMEL_RECIPIENT_TYPE_CC, recipients);
+		g_object_unref (recipients);
+	}
+
 
 	str = tny_header_get_bcc (header);
-          if(str)
-          {
-	_foreach_email_add_to_inet_addr (str, recipients);
-              camel_mime_message_set_recipients(message,CAMEL_RECIPIENT_TYPE_BCC,recipients);
-          }
+	if(str)
+	{
+		recipients = camel_internet_address_new ();
+		_foreach_email_add_to_inet_addr (str, recipients);
+		camel_mime_message_set_recipients(message, CAMEL_RECIPIENT_TYPE_BCC, recipients);
+		g_object_unref (recipients);
+	}
 
 
-          str = tny_header_get_subject (header);
-          if(str)
-           camel_mime_message_set_subject(message,str);
-
+	str = tny_header_get_subject (header);
+	if(str)
+		camel_mime_message_set_subject(message,str);
+*/
 
 	apriv->connected = TRUE;
 
+	recipients = camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
 	camel_transport_send_to (transport, message, (CamelAddress*)from, 
 			(CamelAddress*)recipients, &ex);
 
@@ -306,9 +314,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		camel_exception_clear (&ex);
 	}
 
-	camel_object_unref (CAMEL_OBJECT (from));
-	camel_object_unref (CAMEL_OBJECT (recipients));
-	g_object_unref (G_OBJECT (header));
+	/*g_object_unref (G_OBJECT (header));*/
 
 	return;
 }

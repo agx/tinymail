@@ -933,8 +933,8 @@ smtp_helo (CamelSmtpTransport *transport, CamelException *ex)
 	else
 		cmdbuf = g_strdup_printf("%s %s\r\n", token, name);
 	g_free (name);
-	
-	d(fprintf (stderr, "sending : %s", cmdbuf));
+
+	smtp_debug ("-> %s\n", cmdbuf);
 	if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 		g_free (cmdbuf);
 		camel_exception_setv (ex, errno == EINTR ? CAMEL_EXCEPTION_USER_CANCEL : CAMEL_EXCEPTION_SYSTEM,
@@ -952,7 +952,7 @@ smtp_helo (CamelSmtpTransport *transport, CamelException *ex)
 		g_free (respbuf);
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 		
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+		smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 		
 		if (!respbuf || strncmp (respbuf, "250", 3)) {
 			smtp_set_exception (transport, FALSE, respbuf, _("HELO command failed"), ex);
@@ -1040,7 +1040,7 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 		cmdbuf = g_strdup_printf ("AUTH %s\r\n", mech);
 	}
 	
-	d(fprintf (stderr, "sending : %s", cmdbuf));
+	smtp_debug ("-> %s\n", cmdbuf);
 	if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 		g_free (cmdbuf);
 		camel_exception_setv (ex, errno == EINTR ? CAMEL_EXCEPTION_USER_CANCEL : CAMEL_EXCEPTION_SYSTEM,
@@ -1050,8 +1050,8 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 	g_free (cmdbuf);
 	
 	respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
-	d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
-	
+	smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
+
 	while (!camel_sasl_authenticated (sasl)) {
 		if (!respbuf) {
 			camel_exception_setv (ex, errno == EINTR ? CAMEL_EXCEPTION_USER_CANCEL : CAMEL_EXCEPTION_SYSTEM,
@@ -1086,7 +1086,7 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 		/* send our challenge */
 		cmdbuf = g_strdup_printf ("%s\r\n", challenge);
 		g_free (challenge);
-		d(fprintf (stderr, "sending : %s", cmdbuf));
+		smtp_debug ("-> %s\n", cmdbuf);
 		if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 			g_free (cmdbuf);
 			goto lose;
@@ -1095,7 +1095,7 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 		
 		/* get the server's response */
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+		smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 	}
 	
 	/* check that the server says we are authenticated */
@@ -1115,10 +1115,10 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 	
  break_and_lose:
 	/* Get the server out of "waiting for continuation data" mode. */
-	d(fprintf (stderr, "sending : *\n"));
+	smtp_debug ("-> *\n");
 	camel_stream_write (transport->ostream, "*\r\n", 3);
 	respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
-	d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+	smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 	
  lose:
 	if (!camel_exception_is_set (ex)) {
@@ -1143,7 +1143,7 @@ smtp_mail (CamelSmtpTransport *transport, const char *sender, gboolean has_8bit_
 	else
 		cmdbuf = g_strdup_printf ("MAIL FROM:<%s>\r\n", sender);
 	
-	d(fprintf (stderr, "sending : %s", cmdbuf));
+	smtp_debug ("-> %s\n", cmdbuf);
 	
 	if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 		g_free (cmdbuf);
@@ -1162,7 +1162,7 @@ smtp_mail (CamelSmtpTransport *transport, const char *sender, gboolean has_8bit_
 		g_free (respbuf);
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 		
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+		smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 		
 		if (!respbuf || strncmp (respbuf, "250", 3)) {
 			smtp_set_exception (transport, TRUE, respbuf, _("MAIL FROM command failed"), ex);
@@ -1184,7 +1184,7 @@ smtp_rcpt (CamelSmtpTransport *transport, const char *recipient, CamelException 
 	
 	cmdbuf = g_strdup_printf ("RCPT TO:<%s>\r\n", recipient);
 	
-	d(fprintf (stderr, "sending : %s", cmdbuf));
+	smtp_debug ("-> %s", cmdbuf);
 	
 	if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 		g_free (cmdbuf);
@@ -1203,7 +1203,7 @@ smtp_rcpt (CamelSmtpTransport *transport, const char *recipient, CamelException 
 		g_free (respbuf);
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 		
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+		smtp_debug ( "<- %s\n", respbuf ? respbuf : "(null)");
 		
 		if (!respbuf || strncmp (respbuf, "250", 3)) {
 			char *message;
@@ -1242,7 +1242,7 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 	
 	cmdbuf = g_strdup ("DATA\r\n");
 	
-	d(fprintf (stderr, "sending : %s", cmdbuf));
+	smtp_debug ("-> %s\n", cmdbuf);
 	
 	if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 		g_free (cmdbuf);
@@ -1258,7 +1258,7 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 	
 	respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 	
-	d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+	smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 	
 	if (!respbuf || strncmp (respbuf, "354", 3)) {
 		/* we should have gotten instructions on how to use the DATA command:
@@ -1320,7 +1320,7 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 	
 	/* terminate the message body */
 	
-	d(fprintf (stderr, "sending : \\r\\n.\\r\\n\n"));
+	smtp_debug ("-> \\r\\n.\\r\\n\n");
 	
 	if (camel_stream_write (transport->ostream, "\r\n.\r\n", 5) == -1) {
 		camel_exception_setv (ex, errno == EINTR ? CAMEL_EXCEPTION_USER_CANCEL : CAMEL_EXCEPTION_SYSTEM,
@@ -1337,7 +1337,7 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 		g_free (respbuf);
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 		
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+		smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 		
 		if (!respbuf || strncmp (respbuf, "250", 3)) {
 			smtp_set_exception (transport, TRUE, respbuf, _("DATA command failed"), ex);
@@ -1358,7 +1358,7 @@ smtp_rset (CamelSmtpTransport *transport, CamelException *ex)
 	
 	cmdbuf = g_strdup ("RSET\r\n");
 	
-	d(fprintf (stderr, "sending : %s", cmdbuf));
+	smtp_debug ("-> %s", cmdbuf);
 	
 	if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 		g_free (cmdbuf);
@@ -1376,7 +1376,7 @@ smtp_rset (CamelSmtpTransport *transport, CamelException *ex)
 		g_free (respbuf);
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 		
-		d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+		smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 		
 		if (!respbuf || strncmp (respbuf, "250", 3)) {
 			smtp_set_exception (transport, TRUE, respbuf, _("RSET command failed"), ex);
@@ -1397,7 +1397,7 @@ smtp_quit (CamelSmtpTransport *transport, CamelException *ex)
 	
 	cmdbuf = g_strdup ("QUIT\r\n");
 	
-	d(fprintf (stderr, "sending : %s", cmdbuf));
+	smtp_debug ("-> %s", cmdbuf);
 	
 	if (camel_stream_write (transport->ostream, cmdbuf, strlen (cmdbuf)) == -1) {
 		g_free (cmdbuf);
@@ -1416,7 +1416,7 @@ smtp_quit (CamelSmtpTransport *transport, CamelException *ex)
 				g_free (respbuf);
 			respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 			
-			d(fprintf (stderr, "received: %s\n", respbuf ? respbuf : "(null)"));
+			smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 			
 			if (!respbuf || strncmp (respbuf, "221", 3)) {
 				smtp_set_exception (transport, FALSE, respbuf, _("QUIT command failed"), ex);

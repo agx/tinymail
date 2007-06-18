@@ -2,9 +2,19 @@ INCLUDES = $(LIBTINYMAIL_CFLAGS) -I. -I$(top_srcdir)
 
 lib_LTLIBRARIES = libtinymail-1.0.la
 
+tny-signals-marshal.h: tny-signals-marshal.list
+	glib-genmarshal --header --prefix=$(subst -,_,tny)_marshal $< > tny-signals-marshal.h
+
+tny-signals-marshal.c: tny-signals-marshal.list tny-signals-marshal.h
+	glib-genmarshal --body --prefix=$(subst -,_,tny)_marshal $< > tny-signals-marshal.c
+	sed -i "1i#include \"tny-signals-marshal.h\"" tny-signals-marshal.c
+
+CLEANFILES=tny-signals-marshal.c tny-signals-marshal.h
+
 private_headers = tny-common-priv.h
 
 libtinymail_1_0_headers = \
+	tny-signals-marshal.h \
 	tny-shared.h \
 	tny-error.h \
 	tny-status.h \
@@ -42,6 +52,7 @@ libtinymail_1_0_headers = \
 
 libtinymail_1_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
+	tny-signals-marshal.c \
 	tny-error.c \
 	tny-status.c \
 	tny-list.c \

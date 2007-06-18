@@ -1,3 +1,5 @@
+tny-signals-marshal.c
+tny-signals-marshal.h
 Makefile.in
 config.h
 .libs

@@ -28,6 +28,16 @@
 #include "camel-transport.h"
 #include "camel-tcp-stream.h"
 
+#ifdef DEBUG
+#define SMTP_DEBUG 1
+#endif
+
+#ifdef SMTP_DEBUG
+#define smtp_debug	g_print 
+#else
+#define smtp_debug(o, ...)	
+#endif
+
 #define CAMEL_SMTP_TRANSPORT_TYPE     (camel_smtp_transport_get_type ())
 #define CAMEL_SMTP_TRANSPORT(obj)     (CAMEL_CHECK_CAST((obj), CAMEL_SMTP_TRANSPORT_TYPE, CamelSmtpTransport))
 #define CAMEL_SMTP_TRANSPORT_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), CAMEL_SMTP_TRANSPORT_TYPE, CamelSmtpTransportClass))
