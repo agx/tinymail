@@ -1055,7 +1055,7 @@ imap_command_strdup_vprintf (CamelImapStore *store, const char *fmt,
 	GPtrArray *args;
 	const char *p, *start;
 	char *out, *outptr, *string;
-	int num, len, i, arglen;
+	int num, len, i, arglen = 0;
 
 	args = g_ptr_array_new ();
 	

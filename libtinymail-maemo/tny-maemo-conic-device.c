@@ -22,6 +22,7 @@
 #include <glib-object.h>
 #include <tny-maemo-conic-device.h>
 #include <string.h> /* For strcmp() */
+#include <stdio.h> /* for printf */
 
 #ifdef MAEMO_CONIC_DUMMY
 /* #include "coniciap-private.h"

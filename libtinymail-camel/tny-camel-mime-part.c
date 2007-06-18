@@ -21,6 +21,10 @@
 
 #include <glib/gi18n-lib.h>
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif /* GNU_SOURCE*/
+
 #include <string.h>
 #include <tny-mime-part.h>
 #include <tny-camel-mime-part.h>
@@ -53,7 +57,6 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-stream-null.h>
 #include <camel/camel-mime-filter-charset.h>
 #include <camel/camel-mime-filter-windows.h>
-
 
 static void 
 tny_camel_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value)

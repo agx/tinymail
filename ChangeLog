@@ -1,3 +1,7 @@
+2007-06-19  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Compiler warning fixes
+
 2007-06-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix in IMAP, when all messages got expunged tinymail did not

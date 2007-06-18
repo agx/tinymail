@@ -835,7 +835,7 @@ camel_folder_summary_save(CamelFolderSummary *s)
 {
 	FILE *out;
 	int fd, i;
-	guint32 count;
+	guint32 count = 0;
 	CamelMessageInfo *mi;
 	char *path;
 	gboolean herr = FALSE;
@@ -2645,15 +2645,15 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 {
 	CamelDataWrapper *containee;
 	int parts, i;
-	struct _CamelFolderSummaryPrivate *p;
+	struct _CamelFolderSummaryPrivate *p = NULL;
 	CamelMessageContentInfo *info = NULL, *child;
 	CamelContentType *ct;
-
+	
 	if (s != NULL && s->build_content)
 		info = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_new_from_message(s, object);
 	else
 		info = content_info_new_from_message(NULL, object);
-
+	
 	if (s != NULL)
 		p = _PRIVATE(s);
 
@@ -2701,7 +2701,7 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 			child->parent = info;
 			my_list_append((struct _node **)&info->childs, (struct _node *)child);
 		}
-	} else if (s != NULL && p->filter_stream
+	} else if (s != NULL && p && p->filter_stream
 		   && camel_content_type_is(ct, "text", "*")) {
 		int html_id = -1, idx_id = -1;
 
@@ -3302,7 +3302,7 @@ camel_message_info_clone(const void *o)
 static const void *
 info_ptr(const CamelMessageInfo *mi, int id)
 {
-	const void *retval;
+	const void *retval = NULL;
 
 	g_static_rec_mutex_lock (&global_lock);
 	g_static_mutex_lock (&global_lock2);
@@ -3328,6 +3328,10 @@ info_ptr(const CamelMessageInfo *mi, int id)
 		case CAMEL_MESSAGE_INFO_MESSAGE_ID:
 			retval = &((const CamelMessageInfoBase *)mi)->message_id;
 		break;
+
+		default:
+			g_warning ("%s: invalid id %d", __FUNCTION__, id);
+			
 	}
 
 	g_static_mutex_unlock (&global_lock2);
@@ -3339,7 +3343,7 @@ info_ptr(const CamelMessageInfo *mi, int id)
 static guint32
 info_uint32(const CamelMessageInfo *mi, int id)
 {
-	guint32 retval;
+	guint32 retval = 0;
 
 	g_static_rec_mutex_lock (&global_lock);
 
@@ -3353,6 +3357,9 @@ info_uint32(const CamelMessageInfo *mi, int id)
 		case CAMEL_MESSAGE_INFO_SIZE:
 			retval = ((const CamelMessageInfoBase *)mi)->size;
 		break;
+		
+	        default:
+			g_warning ("%s: invalid id %d", __FUNCTION__, id);
 	}
 
 	g_static_rec_mutex_unlock (&global_lock);
@@ -3363,7 +3370,7 @@ info_uint32(const CamelMessageInfo *mi, int id)
 static time_t
 info_time(const CamelMessageInfo *mi, int id)
 {
-	time_t retval;
+	time_t retval = 0;
 
 	g_static_rec_mutex_lock (&global_lock);
 
@@ -3378,7 +3385,8 @@ info_time(const CamelMessageInfo *mi, int id)
 			retval = ((const CamelMessageInfoBase *)mi)->date_received;
 		break;
 		default:
-			abort();
+			g_warning ("%s: invalid id %d", __FUNCTION__, id);
+
 	}
 
 	g_static_rec_mutex_unlock (&global_lock);
@@ -3628,7 +3636,7 @@ static gboolean
 info_set_user_flag(CamelMessageInfo *info, const char *name, gboolean value)
 {
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
-	int res;
+	gboolean res = FALSE;
 
 	g_static_rec_mutex_lock (&global_lock);
 
@@ -3684,10 +3692,10 @@ static gboolean
 info_set_user_tag(CamelMessageInfo *info, const char *name, const char *value)
 {
 	CamelMessageInfoBase *mi = (CamelMessageInfoBase *)info;
-	int res;
+	gboolean res = FALSE;
 
 	g_static_rec_mutex_lock (&global_lock);
-
+	
 #ifdef NON_TINYMAIL_FEATURES
 	res = camel_tag_set(&mi->user_tags, name, value);
 #endif
@@ -3701,7 +3709,7 @@ info_set_user_tag(CamelMessageInfo *info, const char *name, const char *value)
 		camel_object_trigger_event(mi->summary->folder, "folder_changed", changes);
 		camel_folder_change_info_free(changes);
 	}
-
+	
 	g_static_rec_mutex_unlock (&global_lock);
 
 	return res;
