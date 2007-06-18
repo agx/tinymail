@@ -506,8 +506,8 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 					tny_header_set_to (nheader, to);
 					tny_header_set_from (nheader, from);
-
 					g_object_unref (nheader);
+
 					tny_send_queue_add (priv->send_queue, msg, NULL);
 				}
 

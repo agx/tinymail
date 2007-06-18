@@ -1,3 +1,8 @@
+2007-06-18  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed the From and the Error reporting when sending messages
+	* Fixed the support for Yahoo's SMTP
+
 2007-06-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Increased read-idle's low timeout times: now that all IDLE happens in

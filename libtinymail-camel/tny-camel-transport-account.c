@@ -240,57 +240,16 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
-	/*header = tny_msg_get_header (msg); */
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-	/* from = camel_internet_address_new (); */
 	from = camel_mime_message_get_from (message);
+	recipients = camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
 
-/*
-	str = tny_header_get_from (header);
-	if(str)
-	{
-		_foreach_email_add_to_inet_addr (str, from);
-		camel_mime_message_set_from (message, from);
-	}
-
-	str = tny_header_get_to (header);
-	if(str)
-	{
-		recipients = camel_internet_address_new ();
-		_foreach_email_add_to_inet_addr (str, recipients);
-		camel_mime_message_set_recipients (message, CAMEL_RECIPIENT_TYPE_TO, recipients);
-		g_object_unref (recipients);
-	}
-
-
-	str = tny_header_get_cc (header);
-	if(str)
-	{
-		recipients = camel_internet_address_new ();
-		_foreach_email_add_to_inet_addr (str, recipients);
-		camel_mime_message_set_recipients (message, CAMEL_RECIPIENT_TYPE_CC, recipients);
-		g_object_unref (recipients);
-	}
-
-
-	str = tny_header_get_bcc (header);
-	if(str)
-	{
-		recipients = camel_internet_address_new ();
-		_foreach_email_add_to_inet_addr (str, recipients);
-		camel_mime_message_set_recipients(message, CAMEL_RECIPIENT_TYPE_BCC, recipients);
-		g_object_unref (recipients);
-	}
-
-
-	str = tny_header_get_subject (header);
-	if(str)
-		camel_mime_message_set_subject(message,str);
-*/
+	gchar raw[200];
+	camel_address_decode (from, raw);
+printf ("%s\n",raw);
 
 	apriv->connected = TRUE;
 
-	recipients = camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
 	camel_transport_send_to (transport, message, (CamelAddress*)from, 
 			(CamelAddress*)recipients, &ex);
 
