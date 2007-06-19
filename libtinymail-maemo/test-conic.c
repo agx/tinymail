@@ -9,6 +9,8 @@
 #include <conicconnection.h>
 #include <conicconnectionevent.h>
 
+#include <libosso.h>
+
 #include <stdio.h>
 
 static ConIcConnection *cnx = NULL;
@@ -81,6 +83,16 @@ static void on_window_destroy( GtkWidget *widget,
 int main(int argc, char *argv[])
 {
 	gtk_init (&argc, &argv);
+
+	osso_context_t * osso_context = osso_initialize(
+	    "test_hello", "0.0.1", TRUE, NULL);
+	       
+	/* Check that initialization was ok */
+	if (osso_context == NULL)
+	{
+		printf("osso_initialize() failed.\n");
+	    return OSSO_ERROR;
+	}
     
 	GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	GtkWidget *button = gtk_button_new_with_label ("Attempt connection.");
@@ -99,6 +111,14 @@ int main(int argc, char *argv[])
 	}
 	g_signal_connect (cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), NULL);
+
+	/* This might be necessary to make the connection object 
+	 * actually emit the signal, though the documentation says 
+	 * that they should be sent even when this is not set, 
+	 * when we explicitly try to connect. 
+	 * The signal still does not seem to be emitted.
+	 */
+	g_object_set (cnx, "automatic-connection-events", TRUE, NULL);
 
 
  	g_signal_connect (G_OBJECT (window), "delete_event",
