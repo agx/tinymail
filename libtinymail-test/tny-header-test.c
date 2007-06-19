@@ -142,6 +142,26 @@ START_TEST (tny_header_test_set_replyto)
 }
 END_TEST
 
+START_TEST (tny_header_test_set_priority_flags)
+{
+	TnyHeaderFlags flags;
+
+	tny_header_set_flags (iface, TNY_HEADER_FLAG_HIGH_PRIORITY);
+	flags = tny_header_get_flags (iface);
+	fail_unless (flags == TNY_HEADER_FLAG_HIGH_PRIORITY, "Unable to set high priority.\n");
+
+	tny_header_unset_flags (iface, TNY_HEADER_FLAG_PRIORITY);
+	flags = tny_header_get_flags (iface);
+	fail_unless (flags == 0, "Unable to unset priority");
+
+	tny_header_set_flags (iface, TNY_HEADER_FLAG_LOW_PRIORITY);
+	flags = tny_header_get_flags (iface);
+	fail_unless (flags == TNY_HEADER_FLAG_LOW_PRIORITY, "Unable to set low priority.\n");
+
+	return;
+}
+END_TEST
+
 Suite *
 create_tny_header_suite (void)
 {
@@ -176,6 +196,11 @@ create_tny_header_suite (void)
      tc = tcase_create ("Set Subject");
      tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
      tcase_add_test (tc, tny_header_test_set_subject);
+     suite_add_tcase (s, tc);
+
+     tc = tcase_create ("Set priority flags");
+     tcase_add_checked_fixture (tc, tny_header_test_setup, tny_header_test_teardown);
+     tcase_add_test (tc, tny_header_test_set_priority_flags);
      suite_add_tcase (s, tc);
 
      return s;

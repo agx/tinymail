@@ -183,8 +183,20 @@ tny_camel_msg_header_get_bcc (TnyHeader *self)
 static TnyHeaderFlags
 tny_camel_msg_header_get_flags (TnyHeader *self)
 {
-	g_warning ("tny_header_get_flags: This is a header instance for a new message. It has no flags.\n");
-	return 0;
+  
+	TnyHeaderPriorityFlags priority_flags;
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+	const gchar *priority_string = NULL;
+
+	priority_string = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "X-Priority");
+	if (priority_string == NULL)
+		return 0;
+	if (g_strrstr (priority_string, "1") != NULL)
+		return TNY_HEADER_FLAG_HIGH_PRIORITY;
+	else if (g_strrstr (priority_string, "3") != NULL)
+		return TNY_HEADER_FLAG_LOW_PRIORITY;
+	else 
+		return TNY_HEADER_FLAG_NORMAL_PRIORITY;
 }
 
 static void
@@ -193,7 +205,7 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
-	if (mask ^ TNY_HEADER_FLAG_PRIORITY) {
+	if (mask & (~TNY_HEADER_FLAG_PRIORITY)) {
 		g_warning ("tny_header_set_flags: This is a header instance for a new message. Non-priority flags are not supported.\n");
 		return;
 	}
@@ -225,7 +237,7 @@ tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
-	if (mask ^ TNY_HEADER_FLAG_PRIORITY) {
+	if (mask & (~TNY_HEADER_FLAG_PRIORITY)) {
 		g_warning ("tny_header_set_flags: This is a header instance for a new message. Non-priority flags are not supported.\n");
 		return;
 	}

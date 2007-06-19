@@ -1,3 +1,16 @@
+2007-06-19  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-msg-header:
+	(tny_camel_msg_header_get_flags): added implementation
+	that obtains the priority flags using the headers
+	we set in our set/unset methods.
+	(tny_camel_msg_header_set_flags, tny_camel_msg_header_set_flags):
+	fixed the check for only allowing priority flags to be set or
+	unset.
+	
+	* libtinymail-tests/tny-header-test.c: added unit test for
+	priority flags in camel msg header.
+
 2007-06-19  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-folder.c:
