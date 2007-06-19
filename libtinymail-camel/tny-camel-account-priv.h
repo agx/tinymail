@@ -74,6 +74,7 @@ struct _TnyCamelAccountPriv
 	gboolean custom_url_string;
 	RefreshStatusInfo *csyncop;
 	GList *chooks;
+	TnyConnectionStatus status;
 };
 
 const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);

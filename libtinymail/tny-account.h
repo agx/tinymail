@@ -39,7 +39,17 @@ typedef enum _TnyAccountType TnyAccountType;
 typedef struct _TnyAccount TnyAccount;
 typedef struct _TnyAccountIface TnyAccountIface;
 typedef enum _TnyAccountSignal TnyAccountSignal;
+typedef enum _TnyConnectionStatus TnyConnectionStatus;
 #endif
+
+enum _TnyConnectionStatus
+{
+	TNY_CONNECTION_STATUS_DISCONNECTED,
+	TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN,
+	TNY_CONNECTION_STATUS_CONNECTED_BROKEN,
+	TNY_CONNECTION_STATUS_CONNECTED,
+	TNY_CONNECTION_STATUS_RECONNECTING
+};
 
 enum _TnyAccountType
 {
@@ -61,7 +71,7 @@ struct _TnyAccountIface
 	GTypeInterface parent;
 
 	/* Methods */
-	gboolean (*is_connected_func)(TnyAccount *self);
+	TnyConnectionStatus (*get_connection_status_func)(TnyAccount *self);
 	void (*set_id_func) (TnyAccount *self, const gchar *id);
 	void (*set_name_func) (TnyAccount *self, const gchar *name);
 	void (*set_secure_auth_mech_func) (TnyAccount *self, const gchar *mech);
@@ -89,13 +99,13 @@ struct _TnyAccountIface
 	void (*stop_operation_func) (TnyAccount *self, gboolean *canceled);
 
 	/* Signals*/
-	void (*connection_status_changed) (TnyAccount *self);
+	void (*connection_status_changed) (TnyAccount *self, TnyConnectionStatus status);
 };
 
 GType tny_account_get_type (void);
 GType tny_account_type_get_type (void);
 
-gboolean tny_account_is_connected (TnyAccount *self);
+TnyConnectionStatus tny_account_get_connection_status (TnyAccount *self);
 void tny_account_set_id (TnyAccount *self, const gchar *id);
 void tny_account_set_name (TnyAccount *self, const gchar *name);
 void tny_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech);

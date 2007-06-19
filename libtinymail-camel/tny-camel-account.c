@@ -497,17 +497,17 @@ tny_camel_account_stop_operation_default (TnyAccount *self, gboolean *canceled)
 }
 
 
-static gboolean 
-tny_camel_account_is_connected (TnyAccount *self)
+static TnyConnectionStatus 
+tny_camel_account_get_connection_status (TnyAccount *self)
 {
-	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->is_connected_func (self);
+	return TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_connection_status_func (self);
 }
 
-static gboolean 
-tny_camel_account_is_connected_default (TnyAccount *self)
+static TnyConnectionStatus 
+tny_camel_account_get_connection_status_default (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	return priv->connected;
+	return priv->status;
 }
 
 /**
@@ -1179,7 +1179,7 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->set_forget_pass_func_func = tny_camel_account_set_forget_pass_func;
 	klass->set_id_func = tny_camel_account_set_id;
 	klass->get_id_func = tny_camel_account_get_id;
-	klass->is_connected_func = tny_camel_account_is_connected;
+	klass->get_connection_status_func = tny_camel_account_get_connection_status;
 	klass->set_url_string_func = tny_camel_account_set_url_string;
 	klass->get_url_string_func = tny_camel_account_get_url_string;
 	klass->get_name_func = tny_camel_account_get_name;
@@ -1217,7 +1217,7 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->set_forget_pass_func_func = tny_camel_account_set_forget_pass_func_default;
 	class->set_id_func = tny_camel_account_set_id_default;
 	class->get_id_func = tny_camel_account_get_id_default;
-	class->is_connected_func = tny_camel_account_is_connected_default;
+	class->get_connection_status_func = tny_camel_account_get_connection_status_default;
 	class->set_url_string_func = tny_camel_account_set_url_string_default;
 	class->get_url_string_func = tny_camel_account_get_url_string_default;
 	class->get_name_func = tny_camel_account_get_name_default;

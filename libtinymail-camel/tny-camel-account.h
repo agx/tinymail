@@ -49,7 +49,7 @@ struct _TnyCamelAccountClass
 	GObjectClass parent;
 
 	/* Virtual methods */
-	gboolean (*is_connected_func)(TnyAccount *self);
+	TnyConnectionStatus (*get_connection_status_func)(TnyAccount *self);
 	void (*set_id_func) (TnyAccount *self, const gchar *id);
 	void (*set_name_func) (TnyAccount *self, const gchar *name);
 	void (*set_secure_auth_mech_func) (TnyAccount *self, const gchar *name);

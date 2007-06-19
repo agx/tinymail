@@ -85,7 +85,12 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 static gboolean
 connection_status_idle (gpointer data)
 {
-	g_signal_emit (data, tny_account_signals [TNY_ACCOUNT_CONNECTION_STATUS_CHANGED], 0);
+	TnyAccount *self = (TnyAccount *) data;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	g_signal_emit (G_OBJECT (self), 
+		tny_account_signals [TNY_ACCOUNT_CONNECTION_STATUS_CHANGED], 
+		0, apriv->status);
 
 	return FALSE;
 }
@@ -114,6 +119,11 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 static void 
 disconnection (CamelService *service, gpointer data, TnyAccount *self)
 {
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	if (!service->reconnecting)
+		apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+
 #ifdef DEBUG
 	g_print ("TNY_DEBUG: %s disconnected %s\n", 
 		tny_account_get_name (self), 
@@ -125,32 +135,67 @@ disconnection (CamelService *service, gpointer data, TnyAccount *self)
 static void 
 connection (CamelService *service, gpointer data, TnyAccount *self)
 {
-#ifdef DEBUG
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	gboolean suc = (gboolean) data;
+
+	if (!service->reconnecting)
+	{
+		if (suc)
+			apriv->status = TNY_CONNECTION_STATUS_CONNECTED;
+		else
+			apriv->status = TNY_CONNECTION_STATUS_CONNECTED_BROKEN;
+	}
+
+	if (service->reconnecting && !suc)
+		apriv->status = TNY_CONNECTION_STATUS_CONNECTED_BROKEN;
+
 	if (CAMEL_IS_DISCO_STORE (service))
 	{
-		gboolean suc = (gboolean) data;
 
 		if (camel_disco_store_status ((CamelDiscoStore *) service) == CAMEL_DISCO_STORE_ONLINE)
 		{
+#ifdef DEBUG
 			g_print ("TNY_DEBUG: %s %s %s\n", 
 				tny_account_get_name (self), 
 				suc?"connected":"failed connecting",
 				service->reconnecting?"reconnecting":"");
+#endif
+
+			if (suc)
+				apriv->status = TNY_CONNECTION_STATUS_CONNECTED;
+			else
+				apriv->status = TNY_CONNECTION_STATUS_CONNECTED_BROKEN;
+
 		} else {
+
+#ifdef DEBUG
 			g_print ("TNY_DEBUG: %s %s\n", 
 				tny_account_get_name (self),
 				suc?"ready for offline operation":
 					"not ready for offline operation");
+#endif
+
+			if (suc)
+				apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+			else
+				apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN;
+
 		}
 	}
-#endif
 }
 
 static void 
 reconnection (CamelService *service, gpointer data, TnyAccount *self)
 {
-#ifdef DEBUG
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean suc = (gboolean) data;
+
+	if (suc)
+		apriv->status = TNY_CONNECTION_STATUS_CONNECTED;
+	else
+		apriv->status = TNY_CONNECTION_STATUS_CONNECTED_BROKEN;
+
+#ifdef DEBUG
 
 	g_print ("TNY_DEBUG: %s reconnecting %s\n", 
 		tny_account_get_name (self), 
@@ -161,6 +206,10 @@ reconnection (CamelService *service, gpointer data, TnyAccount *self)
 static void 
 reconnecting (CamelService *service, gpointer data, TnyAccount *self)
 {
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	apriv->status = TNY_CONNECTION_STATUS_RECONNECTING;
+
 #ifdef DEBUG
 	g_print ("TNY_DEBUG: %s reconnecting\n", 
 		tny_account_get_name (self));

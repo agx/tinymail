@@ -178,24 +178,24 @@ tny_account_get_account_type (TnyAccount *self)
 
 
 /**
- * tny_account_is_connected:
+ * tny_account_get_connection_status:
  * @self: a #TnyAccount object
  *
  * Get the connection status of @self
  *
- * Return value: whether or not the account is connected
+ * Return value: the status of the connection
  **/
-gboolean 
-tny_account_is_connected (TnyAccount *self)
+TnyConnectionStatus 
+tny_account_get_connection_status (TnyAccount *self)
 {
-	gboolean retval;
+	TnyConnectionStatus retval;
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->is_connected_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_status_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->is_connected_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_status_func (self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -887,10 +887,10 @@ tny_account_base_init (gpointer g_class)
 /**
  * TnyAccount::connection-status-changed
  * @self: the object on which the signal is emitted
+ * @status: the #TnyConnectionStatus
  * @user_data: user data set when the signal handler was connected.
  *
- * Emitted when the connection status of an account changes. You can get the
- * connection status with the tny_account_is_connected API in the handler.
+ * Emitted when the connection status of an account changes.
  **/
 		tny_account_signals[TNY_ACCOUNT_CONNECTION_STATUS_CHANGED] =
 		   g_signal_new ("connection_status_changed",
@@ -898,7 +898,7 @@ tny_account_base_init (gpointer g_class)
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyAccountIface, connection_status_changed),
 			NULL, NULL,
-			g_cclosure_marshal_VOID__VOID, 
+			g_cclosure_marshal_VOID__INT, 
 			G_TYPE_NONE, 0);
 
 		initialized = TRUE;

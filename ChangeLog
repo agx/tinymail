@@ -1,3 +1,9 @@
+2007-06-19  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* The connection_status_changed signal got extended a little bit
+
+	* This was a major API change
+
 2007-06-19  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-msg-header:

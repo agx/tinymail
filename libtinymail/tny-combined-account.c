@@ -73,14 +73,14 @@ tny_combined_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 	tny_transport_account_send (TNY_TRANSPORT_ACCOUNT (priv->transport_account), msg, err);
 }
 
-static gboolean
-tny_combined_account_is_connected (TnyAccount *self)
+static TnyConnectionStatus
+tny_combined_account_get_connection_status (TnyAccount *self)
 {
 	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
 
 	g_warning ("Don't use tny_account_is_connected on TnyCombinedAccount");
 
-	return tny_account_is_connected (TNY_ACCOUNT (priv->store_account));
+	return tny_account_get_connection_status (TNY_ACCOUNT (priv->store_account));
 }
 
 static void
@@ -449,7 +449,7 @@ tny_transport_account_init (TnyTransportAccountIface *klass)
 static void
 tny_account_init (TnyAccountIface *klass)
 {
-	klass->is_connected_func = tny_combined_account_is_connected;
+	klass->get_connection_status_func = tny_combined_account_get_connection_status;
 	klass->set_id_func = tny_combined_account_set_id;
 	klass->set_name_func = tny_combined_account_set_name;
 	klass->set_secure_auth_mech_func = tny_combined_account_set_secure_auth_mech;
