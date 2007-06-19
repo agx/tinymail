@@ -7,6 +7,7 @@
 
 	* Fixed reading the unread and total counts from Maildir folders
 	* First baby steps into better connection state detection and handling
+	* Reconnecting, throwing signals around for better status detection
 
 2007-06-19  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 

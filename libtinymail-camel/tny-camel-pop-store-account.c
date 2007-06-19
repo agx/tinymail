@@ -163,13 +163,46 @@ tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self)
 {
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
-	const CamelService *service = _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (self));
-	
+	CamelService *service = (CamelService *) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (self));
+	TnyCamelFolderPriv *fpriv = NULL;
+
 	g_mutex_lock (priv->lock);
+
+	if (priv->inbox && TNY_IS_FOLDER (priv->inbox))
+		fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->inbox);
+
+	if (fpriv)
+		g_static_rec_mutex_lock (fpriv->folder_lock);
+
+	service->reconnecting = TRUE;
+
+	camel_object_trigger_event (CAMEL_OBJECT (service), 
+			"reconnecting", (gpointer) FALSE);
+
 	camel_service_disconnect ((CamelService *) service, TRUE, &ex);
 	if (camel_exception_is_set (&ex))
 		camel_exception_clear (&ex);
 	camel_service_connect ((CamelService *) service, &ex);
+
+	if (camel_exception_is_set (&ex))
+	{
+		camel_exception_clear (&ex);
+		sleep (1);
+		camel_service_connect (service, &ex);
+	}
+
+	if (!camel_exception_is_set (&ex))
+		camel_object_trigger_event (CAMEL_OBJECT (service), 
+			"reconnection", (gpointer) TRUE);
+	else
+		camel_object_trigger_event (CAMEL_OBJECT (service), 
+			"reconnection", (gpointer) FALSE);
+
+	service->reconnecting = FALSE;
+
+	if (fpriv)
+		g_static_rec_mutex_unlock (fpriv->folder_lock);
+
 	g_mutex_unlock (priv->lock);
 
 	return;
