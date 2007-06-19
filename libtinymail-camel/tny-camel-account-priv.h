@@ -29,6 +29,7 @@
 
 typedef struct _TnyCamelAccountPriv TnyCamelAccountPriv;
 typedef struct _RefreshStatusInfo RefreshStatusInfo;
+typedef struct _CHookInfo CHookInfo;
 
 struct _RefreshStatusInfo
 {
@@ -39,7 +40,15 @@ struct _RefreshStatusInfo
 	guint depth;
 	gpointer user_data;
 	TnyIdleStopper *stopper;
+	GList *chooks;
 };
+
+struct _CHookInfo 
+{
+	CamelObject *instance;
+	CamelObjectHookID hook;
+};
+
 
 struct _TnyCamelAccountPriv
 {
@@ -64,6 +73,7 @@ struct _TnyCamelAccountPriv
 	TnyAccountType account_type;
 	gboolean custom_url_string;
 	RefreshStatusInfo *csyncop;
+	GList *chooks;
 };
 
 const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);
@@ -72,6 +82,7 @@ void _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOpera
 void _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what, gboolean cancel);
 void _tny_camel_account_stop_camel_operation (TnyCamelAccount *self);
 void _tny_camel_account_try_connect (TnyCamelAccount *self, GError **err);
+void _tny_camel_account_clear_hooks (TnyCamelAccount *self);
 
 #define TNY_CAMEL_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountPriv))

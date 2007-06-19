@@ -927,6 +927,30 @@ _tny_camel_account_get_url_string (TnyCamelAccount *self)
 	return retval;
 }
 
+void 
+_tny_camel_account_clear_hooks (TnyCamelAccount *self)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	GList *mhooks = NULL;
+
+	g_static_rec_mutex_lock (priv->service_lock);
+
+	mhooks = priv->chooks;
+
+	while (mhooks)
+	{
+		CHookInfo *info = mhooks->data;
+		camel_object_remove_event (info->instance, info->hook);
+		camel_object_unref (info->instance);
+		mhooks = g_list_next (mhooks);
+	}
+
+	g_list_free (priv->chooks);
+	priv->chooks = NULL;
+
+	g_static_rec_mutex_unlock (priv->service_lock);
+
+}
 
 static void
 tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -942,6 +966,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->service = NULL;
 	priv->session = NULL;
 	priv->url_string = NULL;
+	priv->chooks = NULL;
 
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
@@ -1069,6 +1094,8 @@ tny_camel_account_finalize (GObject *object)
 {
 	TnyCamelAccount *self = (TnyCamelAccount *)object;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	_tny_camel_account_clear_hooks (self);
 
 	if (priv->session)
 		_tny_session_camel_forget_account (priv->session, (TnyCamelAccount*) object);    

@@ -394,7 +394,7 @@ camel_service_connect (CamelService *service, CamelException *ex)
 	}
 
 	camel_object_trigger_event (CAMEL_OBJECT (service), 
-		"connection", NULL);
+		"connection", (gpointer) ret);
 
 	CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
 

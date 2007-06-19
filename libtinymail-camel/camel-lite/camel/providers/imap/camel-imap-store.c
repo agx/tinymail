@@ -1820,18 +1820,19 @@ imap_connect_online (CamelService *service, CamelException *ex)
 static gboolean
 imap_connect_offline (CamelService *service, CamelException *ex)
 {
-	CamelImapStore *store = CAMEL_IMAP_STORE (service);
+	/*CamelImapStore *store = CAMEL_IMAP_STORE (service);*/
 	CamelDiscoStore *disco_store = CAMEL_DISCO_STORE (service);
 
 	imap_debug ("imap_connect_offline\n");
 
-	let_idle_die (store, TRUE);
+	/* let_idle_die (store, TRUE); */
 
 	if (!disco_store->diary)
 		return FALSE;
 
-	store->connected = !camel_exception_is_set (ex);
-	return store->connected;
+	/* store->connected = !camel_exception_is_set (ex); */
+
+	return FALSE;
 }
 
 static gboolean
