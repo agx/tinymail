@@ -2015,7 +2015,7 @@ imap_status_item_free (struct imap_status_item *items)
 }
 
 static struct imap_status_item *
-get_folder_status (CamelImapStore *imap_store, const char *folder_name, const char *type)
+get_folder_status (CamelImapStore *imap_store, const char *folder_name, const char *type, gboolean err_handle_on_fail)
 {
 	struct imap_status_item *items, *item, *tail;
 	CamelImapResponse *response;
@@ -2031,14 +2031,16 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 				       type);
 
 	if (!response) {
-		CamelException ex;
+		if (err_handle_on_fail) {
+			CamelException ex;
 
-		camel_exception_init (&ex);
-		if (imap_check_folder_still_extant (imap_store, folder_name, &ex) == FALSE) {
-			imap_folder_effectively_unsubscribed (imap_store, folder_name, &ex);
-			imap_forget_folder (imap_store, folder_name, &ex);
+			camel_exception_init (&ex);
+			if (imap_check_folder_still_extant (imap_store, folder_name, &ex) == FALSE) {
+				imap_folder_effectively_unsubscribed (imap_store, folder_name, &ex);
+				imap_forget_folder (imap_store, folder_name, &ex);
+			}
+			camel_exception_clear (&ex);
 		}
-		camel_exception_clear (&ex);
 		return NULL;
 	}
 	
@@ -2290,7 +2292,7 @@ printf ("SELECT %s\n", folder_name);
 		    camel_imap_response_free (imap_store, response);
 	}
 
-	item = items = get_folder_status (imap_store, folder_name, "MESSAGES UNSEEN UIDNEXT");
+	item = items = get_folder_status (imap_store, folder_name, "MESSAGES UNSEEN UIDNEXT", FALSE);
 	while (item != NULL) {
 		if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
 			*messages = item->value;
@@ -2371,7 +2373,13 @@ imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 	 *           S: * STATUS blurdybloop (MESSAGES 231 UIDNEXT 44292)
 	 *           S: A042 OK STATUS completed */
 
-	item = items = get_folder_status (imap_store, folder_name, "MESSAGES UNSEEN UIDNEXT");
+	item = items = get_folder_status (imap_store, folder_name, "MESSAGES UNSEEN UIDNEXT", FALSE);
+
+	if (item == NULL) /* Fallback situation for bizare servers */ {
+		item = items = get_folder_status (imap_store, folder_name, "MESSAGES", FALSE);
+		*unseen = 0; *uidnext = 0;
+	}
+
 	while (item != NULL) {
 		if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
 			*messages = item->value;
@@ -2494,7 +2502,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 				CamelException lex;
 				char *name;
 				
-				item = items = get_folder_status (imap_store, parent_name, "MESSAGES");
+				item = items = get_folder_status (imap_store, parent_name, "MESSAGES", TRUE);
 				while (item != NULL) {
 					if (!g_ascii_strcasecmp (item->name, "MESSAGES")) {
 						messages = item->value;
@@ -2953,7 +2961,7 @@ create_folder (CamelStore *store, const char *parent_name,
 		guint32 messages = 0;
 		char *name;
 		
-		item = items = get_folder_status (imap_store, parent_name, "MESSAGES");
+		item = items = get_folder_status (imap_store, parent_name, "MESSAGES", TRUE);
 		while (item != NULL) {
 			if (!g_ascii_strcasecmp (item->name, "MESSAGES")) {
 				messages = item->value;
@@ -3180,7 +3188,7 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 				if (FALSE && j == 0)
 				{
 					struct imap_status_item *item, *items;
-					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES UNSEEN");
+					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES UNSEEN", TRUE);
 					while (item != NULL) 
 					{
 						if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
