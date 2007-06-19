@@ -347,7 +347,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 
 	g_return_val_if_fail(store->ostream!=NULL, NULL);
 	g_return_val_if_fail(store->istream!=NULL, NULL);
-	
+
 	if (camel_stream_write (store->ostream, cmd, cmdlen) == -1 ||
 	    camel_stream_write (store->ostream, "\r\n", 2) == -1) {
 		if (errno == EINTR) {
@@ -356,6 +356,8 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 					     _("Operation cancelled"));
 			camel_imap_recon (store, &mex);
 			imap_debug ("Recon in cont: %s\n", camel_exception_get_description (&mex));
+			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+			return NULL;
 		} else
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     g_strerror (errno));
@@ -628,10 +630,11 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 							     _("Operation cancelled"));
 					camel_imap_recon (store, &mex);
 					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
-				} else
+				} else {
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     g_strerror (errno));
-				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+					camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+				}
 				g_string_free (str, TRUE);
 				goto lose;
 			}
@@ -781,10 +784,11 @@ imap_read_untagged_idle (CamelImapStore *store, char *line, CamelException *ex)
 							     _("Operation cancelled"));
 					camel_imap_recon (store, &mex);
 					imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
-				} else
+				} else {
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     g_strerror (errno));
-				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+					camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+				}
 				g_string_free (str, TRUE);
 				goto lose;
 			}

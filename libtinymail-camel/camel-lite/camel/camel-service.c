@@ -87,6 +87,9 @@ camel_service_class_init (CamelServiceClass *camel_service_class)
 	camel_service_class->query_auth_types = query_auth_types;
 	camel_service_class->get_name = get_name;
 	camel_service_class->get_path = get_path;
+
+	camel_object_class_add_event(object_class, "disconnection", NULL);
+	camel_object_class_add_event(object_class, "connection", NULL);
 }
 
 static void
@@ -110,6 +113,10 @@ camel_service_finalize (CamelObject *object)
 		
 		camel_exception_init (&ex);
 		CSERV_CLASS (service)->disconnect (service, TRUE, &ex);
+
+		camel_object_trigger_event (CAMEL_OBJECT (service), 
+			"disconnection", (gpointer) TRUE);
+
 		if (camel_exception_is_set (&ex)) {
 			w(g_warning ("camel_service_finalize: silent disconnect failure: %s",
 				     camel_exception_get_description (&ex)));
@@ -381,6 +388,10 @@ camel_service_connect (CamelService *service, CamelException *ex)
 		camel_operation_unref (service->connect_op);
 		service->connect_op = NULL;
 	}
+
+	camel_object_trigger_event (CAMEL_OBJECT (service), 
+		"connection", NULL);
+
 	CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
 
 	CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
@@ -443,6 +454,10 @@ camel_service_disconnect (CamelService *service, gboolean clean,
 		if (service->connect_op)
 			camel_operation_unref (service->connect_op);
 		service->connect_op = NULL;
+
+		camel_object_trigger_event (CAMEL_OBJECT (service), 
+			"disconnection", (gpointer) clean);
+
 		CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
 	}
 	

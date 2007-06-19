@@ -63,7 +63,7 @@ struct _TnyCamelAccountPriv
 	gchar *cache_location; gint port;
 	TnyAccountType account_type;
 	gboolean custom_url_string;
-
+	guint dsid, csid;
 	RefreshStatusInfo *csyncop;
 };
 

@@ -1279,7 +1279,9 @@ camel_object_remove_event(void *vo, unsigned int id)
 	CamelHookPair *pair, *parent;
 
 	g_return_if_fail (CAMEL_IS_OBJECT (obj));
-	g_return_if_fail (id != 0);
+
+	if (id == 0)
+		return;
 
 	if (obj->hooks == NULL) {
 		g_warning("camel_object_unhook_event: trying to unhook `%u` from an instance of `%s' with no hooks",

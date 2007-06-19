@@ -111,6 +111,22 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 }
 
 static void 
+disconnection (CamelService *service, gpointer data, TnyAccount *self)
+{
+#ifdef DEBUG
+	g_print ("TNY_DEBUG: %s disconnected\n", tny_account_get_name (self));
+#endif
+}
+
+static void 
+connection (CamelService *service, gpointer data, TnyAccount *self)
+{
+#ifdef DEBUG
+	g_print ("TNY_DEBUG: %s connected\n", tny_account_get_name (self));
+#endif
+}
+
+static void 
 tny_camel_store_account_prepare (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
@@ -197,6 +213,12 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 
 		if (apriv->service) {
 			apriv->service->data = self;
+
+			apriv->dsid = camel_object_hook_event (apriv->service, 
+				"disconnection", (CamelObjectEventHookFunc)disconnection, self);
+			apriv->csid = camel_object_hook_event (apriv->service, 
+				"connection", (CamelObjectEventHookFunc)connection, self);
+
 		}
 
 	} else {

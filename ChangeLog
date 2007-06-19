@@ -1,6 +1,7 @@
 2007-06-19  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed reading the unread and total counts from Maildir folders
+	* First baby steps into better connection state detection and handling
 
 2007-06-19  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
