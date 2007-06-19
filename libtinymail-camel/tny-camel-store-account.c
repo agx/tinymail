@@ -38,6 +38,7 @@
 #include <camel/camel.h>
 #include <camel/camel-session.h>
 #include <camel/camel-store.h>
+#include <camel/camel-disco-store.h>
 
 #ifndef CAMEL_FOLDER_TYPE_SENT
 #define CAMEL_FOLDER_TYPE_SENT (5 << 10)
@@ -125,11 +126,23 @@ static void
 connection (CamelService *service, gpointer data, TnyAccount *self)
 {
 #ifdef DEBUG
-	gboolean suc = (gboolean) data;
-	g_print ("TNY_DEBUG: %s %s %s\n", 
-		tny_account_get_name (self), 
-		suc?"connected":"failed connecting",
-		service->reconnecting?"reconnecting":"");
+	if (CAMEL_IS_DISCO_STORE (service))
+	{
+		gboolean suc = (gboolean) data;
+
+		if (camel_disco_store_status ((CamelDiscoStore *) service) == CAMEL_DISCO_STORE_ONLINE)
+		{
+			g_print ("TNY_DEBUG: %s %s %s\n", 
+				tny_account_get_name (self), 
+				suc?"connected":"failed connecting",
+				service->reconnecting?"reconnecting":"");
+		} else {
+			g_print ("TNY_DEBUG: %s %s\n", 
+				tny_account_get_name (self),
+				suc?"ready for offline operation":
+					"not ready for offline operation");
+		}
+	}
 #endif
 }
 
@@ -286,8 +299,6 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 				g_warning ("Must cleanup service pointer\n");
 				apriv->service = NULL;
 			}
-
-printf ("%s\n", camel_exception_get_description (apriv->ex));
 
 	} else {
 		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,

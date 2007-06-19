@@ -359,7 +359,7 @@ nntp_connect_offline (CamelService *service, CamelException *ex)
 	if (!disco_store->diary)
 		return FALSE;
 	
-	return FALSE;
+	return TRUE;
 }
 
 static gboolean

@@ -115,9 +115,9 @@ pop3_can_work_offline (CamelDiscoStore *disco_store)
 static gboolean
 pop3_connect_offline (CamelService *service, CamelException *ex)
 {
-	/*CamelPOP3Store *store = CAMEL_POP3_STORE (service);
-	store->connected = !camel_exception_is_set (ex);*/
-	return FALSE;
+	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
+	store->connected = !camel_exception_is_set (ex);
+	return store->connected ;
 }
 
 static gboolean
