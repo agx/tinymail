@@ -1,5 +1,11 @@
 2007-06-19  Murray Cumming  <murrayc@murrayc.com>
 
+	* libtinymail-camel/tny-camel-folder.c:
+	(tny_camel_folder_find_msg_default): Do not require UIDs to be longer than 
+	1 character.
+
+2007-06-19  Murray Cumming  <murrayc@murrayc.com>
+
 	* libtinymail-maemo/test-conic.c: Added a simple test case to show 
 	that libconic does not seem to emit the connection-event signal.
 

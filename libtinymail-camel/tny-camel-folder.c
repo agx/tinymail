@@ -1472,12 +1472,12 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 		}
 
 	uid = strrchr (url_string, '/');
-	
+
 	/* Skip over the '/': */
-	if (strlen (uid))
+	if (uid && strlen (uid))
 		++uid;
 	
-	if (uid && uid[0] != '/' && strlen (uid) > 1)
+	if (uid && uid[0] != '/' && strlen (uid) > 0)
 	{
 		info = camel_message_info_new_uid (NULL, uid);
 		hdr = _tny_camel_header_new ();
