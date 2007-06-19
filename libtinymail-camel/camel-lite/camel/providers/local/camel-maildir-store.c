@@ -40,6 +40,7 @@
 #include "camel-maildir-store.h"
 #include "camel-maildir-summary.h"
 #include "camel-string-utils.h"
+#include "camel-file-utils.h"
 
 #define d(x)
 
@@ -319,17 +320,7 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	} else {
-		CamelFolderSummary *s;
-		/* This should be fast enough not to have to test for INFO_FAST */
-		s = (CamelFolderSummary *)camel_maildir_summary_new(NULL, path, folderpath, NULL);
-		if (camel_folder_summary_header_load(s) != -1) {
-			fi->unread = s->unread_count;
-			fi->total = s->saved_count;
-		} else {
-			printf ("summary header\n");
-		}
-		camel_object_unref(s);
-
+		camel_file_util_read_counts (path, fi);
 	}
 
 	if (folderpath)

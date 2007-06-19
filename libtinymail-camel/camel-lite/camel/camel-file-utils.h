@@ -33,6 +33,8 @@
 #include <time.h>
 #include <fcntl.h>
 
+#include <camel/camel-store.h>
+
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -93,6 +95,7 @@ ssize_t camel_read_socket (int fd, char *buf, size_t n);
 ssize_t camel_read_socket_nb (int fd, char *buf, size_t n);
 
 char *camel_file_util_savename(const char *filename);
+void camel_file_util_read_counts (const gchar *spath, CamelFolderInfo *fi);
 
 #define get_unaligned_u32(p) ((((unsigned char*)(p))[0]) | \
 	(((unsigned char*)(p))[1] << 8) | \

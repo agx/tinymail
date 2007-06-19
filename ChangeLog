@@ -1,3 +1,7 @@
+2007-06-19  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed reading the unread and total counts from Maildir folders
+
 2007-06-19  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Compiler warning fixes
