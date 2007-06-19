@@ -69,6 +69,7 @@ struct _CamelService {
 	CamelOperation *connect_op;
 	CamelURL *url;
 	gpointer data;
+	gboolean reconnecting;
 };
 
 typedef struct {

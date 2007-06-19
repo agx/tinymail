@@ -147,14 +147,28 @@ static void imap_get_folder_status (CamelStore *store, const char *folder_name, 
 void
 camel_imap_recon (CamelImapStore *store, CamelException *mex)
 {
+	CAMEL_SERVICE (store)->reconnecting = TRUE;
+
+	camel_object_trigger_event (CAMEL_OBJECT (store), 
+			"reconnecting", (gpointer) FALSE);
+
 	camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 	camel_service_connect (CAMEL_SERVICE (store), mex);
+
 	if (mex && camel_exception_is_set (mex))
 	{
 		camel_exception_clear (mex);
 		sleep (1);
 		camel_service_connect (CAMEL_SERVICE (store), mex);
 	}
+	if (!camel_exception_is_set (mex))
+		camel_object_trigger_event (CAMEL_OBJECT (store), 
+			"reconnection", (gpointer) TRUE);
+	else
+		camel_object_trigger_event (CAMEL_OBJECT (store), 
+			"reconnection", (gpointer) FALSE);
+
+	CAMEL_SERVICE (store)->reconnecting = FALSE;
 }
 
 static void 

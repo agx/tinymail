@@ -114,15 +114,41 @@ static void
 disconnection (CamelService *service, gpointer data, TnyAccount *self)
 {
 #ifdef DEBUG
-	g_print ("TNY_DEBUG: %s disconnected\n", tny_account_get_name (self));
+	g_print ("TNY_DEBUG: %s disconnected %s\n", 
+		tny_account_get_name (self), 
+		service->reconnecting?"reconnecting":"");
 #endif
 }
+
 
 static void 
 connection (CamelService *service, gpointer data, TnyAccount *self)
 {
 #ifdef DEBUG
-	g_print ("TNY_DEBUG: %s connected\n", tny_account_get_name (self));
+	g_print ("TNY_DEBUG: %s connected %s\n", 
+		tny_account_get_name (self),
+		service->reconnecting?"reconnecting":"");
+#endif
+}
+
+static void 
+reconnection (CamelService *service, gpointer data, TnyAccount *self)
+{
+#ifdef DEBUG
+	gboolean suc = (gboolean) data;
+
+	g_print ("TNY_DEBUG: %s reconnecting %s\n", 
+		tny_account_get_name (self), 
+		suc?"succeeded":"failed");
+#endif
+}
+
+static void 
+reconnecting (CamelService *service, gpointer data, TnyAccount *self)
+{
+#ifdef DEBUG
+	g_print ("TNY_DEBUG: %s reconnecting\n", 
+		tny_account_get_name (self));
 #endif
 }
 
@@ -204,21 +230,26 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
-		if (apriv->service && CAMEL_IS_OBJECT (apriv->service))
+		if (apriv->service && CAMEL_IS_OBJECT (apriv->service) && CAMEL_IS_SERVICE (apriv->service))
 			camel_object_unref (CAMEL_OBJECT (apriv->service));
-
 		apriv->service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
 
-		if (apriv->service) {
+		if (apriv->service && !camel_exception_is_set (apriv->ex)) {
 			apriv->service->data = self;
-
-			apriv->dsid = camel_object_hook_event (apriv->service, 
+			camel_object_hook_event (apriv->service, 
 				"disconnection", (CamelObjectEventHookFunc)disconnection, self);
-			apriv->csid = camel_object_hook_event (apriv->service, 
+			camel_object_hook_event (apriv->service, 
 				"connection", (CamelObjectEventHookFunc)connection, self);
-
+			camel_object_hook_event (apriv->service, 
+				"reconnection", (CamelObjectEventHookFunc)reconnection, self);
+			camel_object_hook_event (apriv->service, 
+				"reconnecting", (CamelObjectEventHookFunc)reconnecting, self);
+		} else if (camel_exception_is_set (apriv->ex) && apriv->service)
+		{
+			g_warning ("Must cleanup service pointer\n");
+			apriv->service = NULL;
 		}
 
 	} else {

@@ -90,6 +90,9 @@ camel_service_class_init (CamelServiceClass *camel_service_class)
 
 	camel_object_class_add_event(object_class, "disconnection", NULL);
 	camel_object_class_add_event(object_class, "connection", NULL);
+	camel_object_class_add_event(object_class, "reconnection", NULL);
+	camel_object_class_add_event(object_class, "reconnecting", NULL);
+
 }
 
 static void
@@ -97,6 +100,7 @@ camel_service_init (void *o, void *k)
 {
 	CamelService *service = o;
 
+	service->reconnecting = FALSE;
 	service->data = NULL;
 	service->priv = g_malloc0(sizeof(*service->priv));
 	g_static_rec_mutex_init(&service->priv->connect_lock);

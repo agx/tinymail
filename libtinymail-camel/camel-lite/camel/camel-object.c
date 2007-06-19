@@ -126,8 +126,10 @@ static CamelHookList *camel_object_get_hooks(CamelObject *o);
 static void camel_object_free_hooks(CamelObject *o);
 static void camel_object_bag_remove_unlocked(CamelObjectBag *inbag, CamelObject *o, CamelHookList *hooks);
 
+static GStaticRecMutex hooks_lock = G_STATIC_REC_MUTEX_INIT;
+
 #define camel_object_unget_hooks(o) \
-	(g_static_rec_mutex_unlock(&CAMEL_OBJECT(o)->hooks->lock))
+	(g_static_rec_mutex_unlock(&(CAMEL_OBJECT(o)->hooks->lock)))
 
 
 /* ********************************************************************** */
@@ -212,6 +214,7 @@ cobject_init(CamelObject *o, CamelObjectClass *klass)
 	o->klass = klass;
 	o->ref_count = 1;
 	o->flags = 0;
+	o->hooks = NULL;
 }
 
 static void
@@ -1167,6 +1170,8 @@ camel_object_free_hooks(CamelObject *o)
 {
 	CamelHookPair *pair, *next;
 
+	g_static_rec_mutex_lock (&hooks_lock);
+
 	if (o->hooks) {
 		g_assert(o->hooks->depth == 0);
 		g_assert((o->hooks->flags & CAMEL_HOOK_PAIR_REMOVED) == 0);
@@ -1187,6 +1192,9 @@ camel_object_free_hooks(CamelObject *o)
 		hooks_free(o->hooks);
 		o->hooks = NULL;
 	}
+
+	g_static_rec_mutex_unlock (&hooks_lock);
+
 }
 
 /* return (allocate if required) the object's hook list, locking at the same time */
@@ -1195,6 +1203,9 @@ camel_object_get_hooks(CamelObject *o)
 {
 	static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 	CamelHookList *hooks;
+	CamelHookList *retval = NULL;
+
+	g_static_rec_mutex_lock (&hooks_lock);
 
 	/* if we have it, we dont have to do any other locking,
 	   otherwise use a global lock to setup the object's hook data */
@@ -1212,9 +1223,13 @@ camel_object_get_hooks(CamelObject *o)
 		pthread_mutex_unlock(&lock);
 	}
 	
-	g_static_rec_mutex_lock(&o->hooks->lock);
-	
-	return o->hooks;	
+	g_static_rec_mutex_lock(&(o->hooks->lock));
+
+	g_static_rec_mutex_unlock (&hooks_lock);
+
+	retval = o->hooks;
+
+	return retval;
 }
 
 unsigned int
@@ -1228,6 +1243,8 @@ camel_object_hook_event(void *vo, const char * name, CamelObjectEventHookFunc fu
 	g_return_val_if_fail(CAMEL_IS_OBJECT (obj), 0);
 	g_return_val_if_fail(name != NULL, 0);
 	g_return_val_if_fail(func != NULL, 0);
+
+	g_static_rec_mutex_lock (&hooks_lock);
 
 	hook = co_find_pair(obj->klass, name);
 
@@ -1247,6 +1264,8 @@ camel_object_hook_event(void *vo, const char * name, CamelObjectEventHookFunc fu
 
 		g_warning("camel_object_hook_event: trying to hook event `%s' in class `%s' with no defined events.",
 			  name, obj->klass->name);
+
+		g_static_rec_mutex_unlock (&hooks_lock);
 
 		return 0;
 	}
@@ -1268,6 +1287,8 @@ setup:
 
 	h(printf("%p hook event '%s' %p %p = %d\n", vo, name, func, data, id));
 
+	g_static_rec_mutex_unlock (&hooks_lock);
+
 	return id;
 }
 
@@ -1280,12 +1301,16 @@ camel_object_remove_event(void *vo, unsigned int id)
 
 	g_return_if_fail (CAMEL_IS_OBJECT (obj));
 
-	if (id == 0)
+	if (id == 0) 
 		return;
+
+
+	g_static_rec_mutex_lock (&hooks_lock);
 
 	if (obj->hooks == NULL) {
 		g_warning("camel_object_unhook_event: trying to unhook `%u` from an instance of `%s' with no hooks",
 			  id, obj->klass->name);
+		g_static_rec_mutex_unlock (&hooks_lock);
 		return;
 	}
 
@@ -1307,6 +1332,7 @@ camel_object_remove_event(void *vo, unsigned int id)
 				hooks->list_length--;
 			}
 			camel_object_unget_hooks(obj);
+			g_static_rec_mutex_unlock (&hooks_lock);
 			return;
 		}
 		parent = pair;
@@ -1316,6 +1342,7 @@ camel_object_remove_event(void *vo, unsigned int id)
 
 	g_warning("camel_object_unhook_event: cannot find hook id %u in instance of `%s'",
 		  id, obj->klass->name);
+	g_static_rec_mutex_unlock (&hooks_lock);
 }
 
 void
@@ -1329,9 +1356,12 @@ camel_object_unhook_event(void *vo, const char * name, CamelObjectEventHookFunc 
 	g_return_if_fail (name != NULL);
 	g_return_if_fail (func != NULL);
 
+	g_static_rec_mutex_lock (&hooks_lock);
+
 	if (obj->hooks == NULL) {
 		g_warning("camel_object_unhook_event: trying to unhook `%s` from an instance of `%s' with no hooks",
 			  name, obj->klass->name);
+		g_static_rec_mutex_unlock (&hooks_lock);
 		return;
 	}
 
@@ -1355,6 +1385,7 @@ camel_object_unhook_event(void *vo, const char * name, CamelObjectEventHookFunc 
 				hooks->list_length--;
 			}
 			camel_object_unget_hooks(obj);
+			g_static_rec_mutex_unlock (&hooks_lock);
 			return;
 		}
 		parent = pair;
@@ -1364,6 +1395,7 @@ camel_object_unhook_event(void *vo, const char * name, CamelObjectEventHookFunc 
 
 	g_warning("camel_object_unhook_event: cannot find hook/data pair %p/%p in an instance of `%s' attached to `%s'",
 		  func, data, obj->klass->name, name);
+	g_static_rec_mutex_unlock (&hooks_lock);
 }
 
 void
@@ -1379,12 +1411,16 @@ camel_object_trigger_event(void *vo, const char * name, void *event_data)
 		g_return_if_fail (CAMEL_IS_OBJECT (obj));
 	g_return_if_fail (name);
 
+	g_static_rec_mutex_lock (&hooks_lock);
+
 	hook = co_find_pair(obj->klass, name);
 	if (hook)
 		goto trigger;
 
-	if (obj->hooks == NULL)
+	if (obj->hooks == NULL) {
+		g_static_rec_mutex_unlock (&hooks_lock);
 		return;
+	}
 
 	/* interface events can't have prep functions */
 	pair = co_find_pair_ptr(obj->klass, interface_name);
@@ -1401,16 +1437,23 @@ camel_object_trigger_event(void *vo, const char * name, void *event_data)
 	g_warning("camel_object_trigger_event: trying to trigger unknown event `%s' in class `%s'",
 		  name, obj->klass->name);
 
+	g_static_rec_mutex_unlock (&hooks_lock);
+
 	return;
 
 trigger:
 	/* try prep function, if false, then quit */
-	if (hook->func.prep != NULL && !hook->func.prep(obj, event_data))
+	if (hook->func.prep != NULL && !hook->func.prep(obj, event_data)) {
+		g_static_rec_mutex_unlock (&hooks_lock);
 		return;
+	}
 
 	/* also, no hooks, dont bother going further */
-	if (obj->hooks == NULL)
+	if (obj->hooks == NULL) {
+		g_static_rec_mutex_unlock (&hooks_lock);
 		return;
+	}
+
 trigger_interface:
 	/* lock the object for hook emission */
 	camel_object_ref(obj);
@@ -1457,6 +1500,7 @@ trigger_interface:
 
 	camel_object_unget_hooks(obj);
 	camel_object_unref(obj);
+	g_static_rec_mutex_unlock (&hooks_lock);
 }
 
 void *
@@ -1597,15 +1641,20 @@ co_metadata_pair(CamelObject *obj, int create)
 	CamelHookPair *pair;
 	CamelHookList *hooks;
 
-	if (obj->hooks == NULL && !create)
+	g_static_rec_mutex_lock (&hooks_lock);
+
+	if (obj->hooks == NULL && !create) {
+		g_static_rec_mutex_unlock (&hooks_lock);
 		return NULL;
+	}
 
 	hooks = camel_object_get_hooks(obj);
 	pair = hooks->list;
 	while (pair) {
-		if (pair->name == meta_name)
+		if (pair->name == meta_name) {
+			g_static_rec_mutex_unlock (&hooks_lock);
 			return pair;
-
+		}
 		pair = pair->next;
 	}
 
@@ -1622,6 +1671,7 @@ co_metadata_pair(CamelObject *obj, int create)
 		camel_object_unget_hooks(obj);
 	}
 
+	g_static_rec_mutex_unlock (&hooks_lock);
 	return pair;
 }
 
