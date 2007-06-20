@@ -4040,7 +4040,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	{
 		camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
 
-		if (FALSE && store->capabilities & IMAP_CAPABILITY_BINARY)
+		if (store->capabilities & IMAP_CAPABILITY_BINARY)
 		{
 			gchar line[MAX_LINE_LEN];
 			gboolean err = FALSE;
