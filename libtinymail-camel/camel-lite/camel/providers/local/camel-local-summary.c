@@ -104,9 +104,17 @@ camel_local_summary_class_init(CamelLocalSummaryClass *klass)
 }
 
 static void
+camel_local_summary_set_extra_flags (CamelFolder *folder, CamelMessageInfoBase *mi)
+{
+	mi->flags |= CAMEL_MESSAGE_CACHED;
+}
+
+static void
 camel_local_summary_init(CamelLocalSummary *obj)
 {
 	struct _CamelFolderSummary *s = (CamelFolderSummary *)obj;
+
+	s->set_extra_flags_func = camel_local_summary_set_extra_flags;
 
 	/* subclasses need to set the right instance data sizes */
 	s->message_info_size = sizeof(CamelLocalMessageInfo);
