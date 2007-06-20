@@ -2436,10 +2436,10 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	while (!tny_iterator_is_done (iter)) 
 	{
 		TnyHeader *header;
-		gchar *uid;
+		const gchar *uid;
 
 		header = TNY_HEADER (tny_iterator_get_current (iter));
-		uid = g_strdup (tny_header_get_uid (header));
+		uid = tny_header_get_uid (header);
 
 		if (G_UNLIKELY (uid == NULL)) 
 		{
@@ -2461,7 +2461,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 
 			return;
 		} else
-			g_ptr_array_add (uids, (gpointer) uid);
+			g_ptr_array_add (uids, (gpointer) g_strdup (uid));
 
 		g_object_unref (G_OBJECT (header));
 		tny_iterator_next (iter);
