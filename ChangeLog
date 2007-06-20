@@ -1,3 +1,8 @@
+2007-06-20  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed a bug in tny_folder_transfer_msgs
+	* Removed some memory problems
+
 2007-06-19  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* The connection_status_changed signal got extended a little bit

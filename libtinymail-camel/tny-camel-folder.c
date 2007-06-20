@@ -2436,7 +2436,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	while (!tny_iterator_is_done (iter)) 
 	{
 		TnyHeader *header;
-		const gchar *uid;
+		gchar *uid;
 
 		header = TNY_HEADER (tny_iterator_get_current (iter));
 		uid = g_strdup (tny_header_get_uid (header));

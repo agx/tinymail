@@ -256,8 +256,11 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 			const gchar *uid;
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 			uid = tny_header_get_uid (header);
-			if (uid)
-				foreach_list_remove_header (priv, uid);
+			if (uid) {
+				gchar *tuid = g_strdup (uid);
+				foreach_list_remove_header (priv, tuid);
+				g_free (tuid);
+			}
 			g_object_unref (G_OBJECT (header));
 			tny_iterator_next (iter);
 		}
