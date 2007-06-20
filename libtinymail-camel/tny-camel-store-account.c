@@ -988,10 +988,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
-	if (!priv->iter)
+	/*if (!priv->iter)*/
 		iter = camel_store_get_folder_info (store, "", flags, &ex);
-	else
-		iter = priv->iter;
+	/*else
+		iter = priv->iter;*/
 
 	if (camel_exception_is_set (&ex))
 	{
