@@ -4040,7 +4040,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	{
 		camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
 
-		if (store->capabilities & IMAP_CAPABILITY_BINARY)
+		if (FALSE && store->capabilities & IMAP_CAPABILITY_BINARY)
 		{
 			gchar line[MAX_LINE_LEN];
 			gboolean err = FALSE;
@@ -4050,62 +4050,63 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			ssize_t hread = 1;
 			gint length=0, rec=0;
 			char *pos, *ppos;
-
-			nread = 1;
+			gboolean unsolicited = TRUE;
 
 			/* Stops idle */
 			camel_imap_command_start (store, folder, ex,
 				"UID FETCH %s BINARY.PEEK[%s]", uid, section_text);
 
-			two_bytes [0] = ' ';
-
-			/* a01 uid fetch 1 BINARY.PEEK[]
-			 * * 1 FETCH (UID 1 BINARY[] {24693}\r\n
-			 * Subject: Testing....
-			 * )\r\n
-			 * a01 OK .... \r\n */
-
-			/* Read the length in the "\*.*[~|]{<LENGTH>}" */
-			while (two_bytes[0] != '\n' && f < 1023 && nread > 0)
+			while (unsolicited)
 			{
-				nread = camel_stream_read (store->ostream, two_bytes, 1);
-				line [f] = two_bytes [0];
-				f++;
-			}
-			line[f] = '\0';
+				two_bytes [0] = ' ';
+				f = 0;
+				nread = 1;
 
-			/* The first line is very unlikely going to consume 1023 bytes */
-			if (f > 1023 || nread <= 0) {
-				g_warning ("BINARY: Long first line, UID=%s", uid);
-				goto berrorhander;
-			}
+				/* a01 uid fetch 1 BINARY.PEEK[]
+				 * * Bla bla
+				 * * 1 FETCH (UID 1 BINARY[] {24693}\r\n
+				 * Subject: Testing....
+				 * )\r\n
+				 * a01 OK .... \r\n */
 
-			/* If the line doesn't start with "* " */
+				/* Read the length in the "\*.*[~|]{<LENGTH>}" */
+				while (two_bytes[0] != '\n' && f < 1023 && nread > 0)
+				{
+					nread = camel_stream_read (store->ostream, two_bytes, 1);
+					line [f] = two_bytes [0];
+					f++;
+				}
+				line[f] = '\0';
 
-			if (*line != '*' || *(line + 1) != ' ')
-			{ 
-				err = TRUE; 
-				g_warning ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); 
-				goto berrorhander; 
-			}
+				/* The first line is very unlikely going to consume 1023 bytes */
+				if (f > 1023 || nread <= 0) {
+					g_warning ("BINARY: Long first line, UID=%s", uid);
+					goto berrorhander;
+				}
 
-			pos = strchr (line, '{');
+				/* If the line doesn't start with "* " */
 
-			/* If we don't find a '{' character */
-			if (!pos) 
-			{ 
-				err = TRUE; g_warning ("BINARY: Line doesn't contain a {, UID=%s (%s)", uid, line); 
-				goto berrorhander; 
-			}
+				if (*line != '*' || *(line + 1) != ' ')
+				{ 
+					err = TRUE; 
+					g_warning ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); 
+					goto berrorhander; 
+				}
 
-			/* Set the '}' character to \0 */
-			ppos = strchr (pos, '}');
-			if (ppos) 
-				*ppos = '\0';
-			else /* If we didn't find it */
-			{ 
-				err = TRUE; g_warning ("BINARY: Line doesn't contain a }, UID=%s (%s)", uid, line); 
-				goto berrorhander; 
+				pos = strchr (line, '{');
+
+				/* If we don't find a '{' character */
+				if (!pos) {
+					imap_debug ("unsolicited in BINARY: %s\n", line);
+					continue; 
+				}
+
+				/* Set the '}' character to \0 */
+				ppos = strchr (pos, '}');
+				if (ppos) {
+					*ppos = '\0';
+					unsolicited = FALSE;
+				}
 			}
 
 			length = strtol (pos + 1, NULL, 10);
@@ -4166,6 +4167,13 @@ berrorhander:
 
 			nread = 0;
 
+/*
+a01 UID FETCH 1:10 BODY.PEEK[0]
+* Bla bla
+* 1 FETCH (UID 6 BODY[0] {908}
+Received: from nic.funet.fi 
+*/
+
 			/* Stops idle */
 			if (store->server_level < IMAP_LEVEL_IMAP4REV1 && !*section_text)
 				camel_imap_command_start (store, folder, ex,
@@ -4200,7 +4208,7 @@ berrorhander:
 					continue;
 				}
 
-				/* It's the first line */
+				/* It's the first line (or an unsolicited one) */
 				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
 					{ err=TRUE; break; } 
 				else if (linenum == 0) 
@@ -4213,8 +4221,10 @@ berrorhander:
 							*ppos = '\0';
 							exread = strtol (pos + 1, NULL, 10);
 						}
+						linenum++; 
+					} else {
+						imap_debug ("Unsolicited in FETCH: %s\n", line);
 					}
-					linenum++; 
 					continue; 
 				}
 
@@ -4292,24 +4302,10 @@ berrorhander:
 			tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
 			taglen = strlen (tag);
 
-
-			if (!store->istream || ((CamelObject *)store->istream)->ref_count <= 0)
-			{
-				err = TRUE;
-				nread = -1;
-				goto rerrorhandler;
-			}
-
-			if (!store->ostream || ((CamelObject *)store->ostream)->ref_count <= 0)
-			{
-				err = TRUE;
-				nread = -1;
-				goto rerrorhandler;
-			}
-			
 			if (camel_imap_store_restore_stream_buffer (store))
 				server_stream = store->istream ? CAMEL_STREAM_BUFFER (store->istream) : NULL;
-			else server_stream = NULL;
+			else 
+				server_stream = NULL;
 
 			if (server_stream == NULL)
 				err = TRUE;
@@ -4338,11 +4334,12 @@ berrorhander:
 							*ppos = '\0';
 							exread = strtol (pos + 1, NULL, 10);
 						}
+						linenum++; 
+					} else {
+						imap_debug ("Unsolicited in FETCH: %s\n", line);
 					}
-					linenum++; 
 					continue; 
 				}
-
 
 				/* It's the last line */
 				if (!strncmp (line, tag, taglen))
@@ -4406,7 +4403,7 @@ berrorhander:
 				linenum++;
 				memset (line, 0, MAX_LINE_LEN);
 			  }
-rerrorhandler:
+
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
 			if (nread <= 0) 
@@ -4448,14 +4445,15 @@ rerrorhandler:
 errorhander:
 
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+	if (stream && CAMEL_IS_OBJECT (stream))
+		camel_object_unref (stream);
 	camel_imap_message_cache_remove (imap_folder->cache, uid);
 
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 		    _("Could not find message body in FETCH response."));
 	handle_freeup (store, nread, ex);
 
-	if (stream)
-		camel_object_unref (CAMEL_OBJECT (stream));
+
 
 	if (store)
 	{
