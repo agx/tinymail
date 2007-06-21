@@ -4,6 +4,9 @@
 	* Flag handling after message retrieval
 	* Local and remove size calculations
 	* Bandwidth optimization for LIST
+	* Introduction of TnyCamelPopRemoteMsgRemoveStrategy
+
+	* This was a major API change
 
 2007-06-20  Philip Van Hoof  <pvanhoof@gnome.org>
 

@@ -37,6 +37,8 @@
 #define _GNU_SOURCE
 #endif
 
+#include <glib/gstdio.h>
+
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -441,6 +443,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	{
 	  for (i = 0; i < pop3_folder->uids->len; i++) 
 	  {
+		gchar *expunged_path = NULL;
+
 		fi = pop3_folder->uids->pdata[i];
 		/* busy already?  wait for that to finish first */
 		if (fi->cmd) {
@@ -450,13 +454,18 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			fi->cmd = NULL;
 		}
 
-		if (fi->flags & CAMEL_MESSAGE_DELETED) {
+		/* This file is written by TnyCamelPopLocalMsgRemoveStrategy */
+		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, fi->uid);
+		if (fi->flags & g_file_test (expunged_path, G_FILE_TEST_EXISTS)) 
+		{
 			fi->cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", fi->id);
-
+			g_unlink (expunged_path);
 			/* also remove from cache */
 			if (pop3_store->cache && fi->uid)
 				camel_data_cache_remove(pop3_store->cache, "cache", fi->uid, NULL);
 		}
+
+		g_free (expunged_path);
 	  }
 
 	  for (i = 0; i < pop3_folder->uids->len; i++) {
@@ -475,12 +484,16 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	max = camel_folder_summary_count (folder->summary);
 	for (i = 0; i < max; i++) 
 	{
+		gchar *expunged_path = NULL;
+
 		if (!(info = (CamelMessageInfoBase*) camel_folder_summary_index (folder->summary, i)))
 			continue;
 
-		if (info->flags & CAMEL_MESSAGE_DELETED) 
+		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, info->uid);
+		if (info->flags & g_file_test (expunged_path, G_FILE_TEST_EXISTS)) 
 		{
 			struct _CamelPOP3Command *cmd;
+			g_unlink (expunged_path);
 			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", info->uid);
 			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
 			if (pop3_store->cache && info->uid)
@@ -488,6 +501,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			camel_pop3_engine_command_free(pop3_store->engine, cmd);
 			camel_message_info_free((CamelMessageInfo *)info);
 		}
+		g_free (expunged_path);
 
 	}
 
