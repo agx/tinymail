@@ -1,3 +1,8 @@
+2007-06-21  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+
+	* Changes how set_flags function was used on get_full and
+	get_partial messages methods.
+	
 2007-06-21  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Error handling: No space left on device, when retrieving messages
