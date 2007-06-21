@@ -1014,7 +1014,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	/*if (!priv->iter)*/
 
-	if (priv->cant_reuse_iter)
+	if (!iter || priv->cant_reuse_iter)
 		iter = camel_store_get_folder_info (store, "", flags, &ex);
 
 	/*else
