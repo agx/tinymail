@@ -1,3 +1,9 @@
+2007-06-21  Sergio Villar Senin  <svillar@igalia.com>
+	
+	* libtinymail/tny-simple-list.c:
+	(tny_simple_list_remove): do not free the item unless it was
+	previously found in the list
+
 2007-06-21  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
 	* Changes how set_flags function was used on get_full and

@@ -77,10 +77,14 @@ static void
 tny_simple_list_remove (TnyList *self, GObject* item)
 {
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
+	GList *link;
 
 	g_mutex_lock (priv->iterator_lock);
-	priv->first = g_list_remove (priv->first, item);
-	g_object_unref (G_OBJECT (item));
+	link = g_list_find (priv->first, item);
+	if (link) {
+		priv->first = g_list_delete_link (priv->first, link);
+		g_object_unref (G_OBJECT (item));
+	}
 	g_mutex_unlock (priv->iterator_lock);
 
 	return;
