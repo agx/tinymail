@@ -85,7 +85,9 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 	{
 		if (camel_message && CAMEL_IS_OBJECT (camel_message))
 		{
+			TnyHeaderFlags flags = tny_header_get_flags (header);
 			TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (camel_message), folder);
+
 			message = tny_camel_msg_new ();
 			_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), folder);
 			TNY_CAMEL_MSG_HEADER (nheader)->old_uid = g_strdup (tny_header_get_uid (header));
@@ -93,6 +95,9 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
 						CAMEL_MIME_PART (camel_message)); 
 			g_object_unref (G_OBJECT (nheader));
+
+			tny_header_set_flags (header, flags | TNY_HEADER_FLAG_CACHED);
+			tny_header_set_flags (header, flags | TNY_HEADER_FLAG_PARTIAL);
 		}
 	}
 
