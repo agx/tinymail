@@ -940,8 +940,10 @@ _tny_camel_account_clear_hooks (TnyCamelAccount *self)
 	while (mhooks)
 	{
 		CHookInfo *info = mhooks->data;
-		camel_object_remove_event (info->instance, info->hook);
-		camel_object_unref (info->instance);
+		if (info->instance && CAMEL_IS_OBJECT (info->instance)) {
+			camel_object_remove_event (info->instance, info->hook);
+			camel_object_unref (info->instance);
+		}
 		mhooks = g_list_next (mhooks);
 	}
 
