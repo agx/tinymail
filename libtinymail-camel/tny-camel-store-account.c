@@ -112,7 +112,9 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelStore *store = CAMEL_STORE (apriv->service);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
+	priv->cant_reuse_iter = TRUE;
 	camel_store_delete_cache (store);
 }
 
@@ -120,6 +122,9 @@ static void
 disconnection (CamelService *service, gpointer data, TnyAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->cant_reuse_iter = TRUE;
 
 	if (!service->reconnecting)
 		apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
@@ -137,6 +142,9 @@ connection (CamelService *service, gpointer data, TnyAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean suc = (gboolean) data;
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->cant_reuse_iter = TRUE;
 
 	if (!service->reconnecting)
 	{
@@ -189,6 +197,9 @@ reconnection (CamelService *service, gpointer data, TnyAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean suc = (gboolean) data;
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->cant_reuse_iter = TRUE;
 
 	if (suc)
 		apriv->status = TNY_CONNECTION_STATUS_CONNECTED;
@@ -207,6 +218,9 @@ static void
 reconnecting (CamelService *service, gpointer data, TnyAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->cant_reuse_iter = TRUE;
 
 	apriv->status = TNY_CONNECTION_STATUS_RECONNECTING;
 
@@ -221,6 +235,9 @@ static void
 tny_camel_store_account_prepare (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->cant_reuse_iter = TRUE;
 
 	if (!apriv->custom_url_string)
 	{
@@ -361,6 +378,9 @@ static void
 tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->cant_reuse_iter = TRUE;
 
 	if (!apriv->url_string || !apriv->service || !CAMEL_IS_SERVICE (apriv->service))
 	{
@@ -444,6 +464,9 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	CamelStore *store;
 	CamelFolder *cfolder;
 	const gchar *folder_full_name;
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	priv->cant_reuse_iter = TRUE;
 
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
@@ -541,6 +564,7 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->managed_folders = NULL;
 	priv->sobservers = NULL;
 	priv->iter = NULL;
+	priv->cant_reuse_iter = TRUE;
 
 	return;
 }
@@ -989,7 +1013,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
 	/*if (!priv->iter)*/
+
+	if (priv->cant_reuse_iter)
 		iter = camel_store_get_folder_info (store, "", flags, &ex);
+
 	/*else
 		iter = priv->iter;*/
 
@@ -1011,6 +1038,8 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	}
 
 	priv->iter = iter;
+	priv->cant_reuse_iter = FALSE;
+
 	camel_object_ref (CAMEL_OBJECT (store));
 	priv->iter_store = store;
 

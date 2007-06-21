@@ -28,6 +28,7 @@ struct _TnyCamelStoreAccountPriv
 	CamelFolderInfo *iter;
 	GList *managed_folders;
 	TnyList *sobservers;
+	gboolean cant_reuse_iter;
 };
 
 #define TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE(o)	\
