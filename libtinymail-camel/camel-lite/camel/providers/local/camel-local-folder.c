@@ -90,6 +90,7 @@ static void local_delete(CamelFolder *folder);
 static void local_rename(CamelFolder *folder, const char *newname);
 
 static void local_finalize(CamelObject * object);
+static int local_get_local_size (CamelFolder *folder);
 
 static void
 camel_local_folder_class_init(CamelLocalFolderClass * camel_local_folder_class)
@@ -103,6 +104,7 @@ camel_local_folder_class_init(CamelLocalFolderClass * camel_local_folder_class)
 	oklass->getv = local_getv;
 	oklass->setv = local_setv;
 
+	camel_folder_class->get_local_size = local_get_local_size;
 	camel_folder_class->refresh_info = local_refresh_info;
 	camel_folder_class->sync = local_sync;
 	camel_folder_class->expunge = local_expunge;
@@ -172,6 +174,15 @@ local_finalize(CamelObject * object)
 	g_mutex_free(local_folder->priv->search_lock);
 	
 	g_free(local_folder->priv);
+}
+
+static int 
+local_get_local_size (CamelFolder *folder)
+{
+	CamelLocalFolder *local_folder = (CamelLocalFolder *) folder;
+	int msize = 0;
+	camel_du (local_folder->folder_path, &msize);
+	return msize;
 }
 
 static CamelProperty local_property_list[] = {

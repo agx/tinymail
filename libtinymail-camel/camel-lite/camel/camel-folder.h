@@ -134,6 +134,7 @@ typedef struct {
 			  CamelException *ex);
 
 	int   (*get_message_count)   (CamelFolder *folder);
+	int   (*get_local_size)   (CamelFolder *folder);
 
 	void (*append_message)  (CamelFolder *folder, 
 				 CamelMimeMessage *message,
@@ -356,6 +357,8 @@ void			camel_folder_change_info_change_uid	(CamelFolderChangeInfo *info, const c
 void			camel_folder_change_info_recent_uid	(CamelFolderChangeInfo *info, const char *uid);
 
 void camel_folder_set_push_email (CamelFolder *folder, gboolean setting);
+
+int camel_folder_get_local_size   (CamelFolder *folder);
 
 G_END_DECLS
 

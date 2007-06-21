@@ -55,6 +55,7 @@
 #include "camel-stream-filter.h"
 #include "camel-pop3-stream.h"
 #include "camel-stream-mem.h"
+#include "camel-string-utils.h"
 
 #include "camel-disco-diary.h"
 
@@ -72,6 +73,7 @@ static GPtrArray *pop3_get_uids (CamelFolder *folder);
 static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex);
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
 static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex);
+static int pop3_get_local_size (CamelFolder *folder);
 
 
 static void 
@@ -165,6 +167,15 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 	folder->folder_flags |= CAMEL_FOLDER_HAS_SUMMARY_CAPABILITY;
 
 	return folder;
+}
+
+static int 
+pop3_get_local_size (CamelFolder *folder)
+{
+	CamelPOP3Store *p3store = CAMEL_POP3_STORE (folder->parent_store);
+	int msize = 0;
+	camel_du (p3store->storage_path , &msize);
+	return msize;
 }
 
 /* create a uid from md5 of 'top' output */
@@ -1220,6 +1231,7 @@ camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
 	parent_class = CAMEL_FOLDER_CLASS(camel_folder_get_type());
 	
 	/* virtual method overload */
+	camel_folder_class->get_local_size = pop3_get_local_size;
 	camel_folder_class->refresh_info = pop3_refresh_info;
 	camel_folder_class->sync = pop3_sync;
 	

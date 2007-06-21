@@ -116,6 +116,8 @@ static gboolean        is_frozen             (CamelFolder *folder);
 static gboolean        folder_changed        (CamelObject *object,
 					      gpointer event_data);
 
+static int get_local_size (CamelFolder *folder);
+
 static void 
 folder_set_push_email (CamelFolder *folder, gboolean setting)
 {
@@ -136,6 +138,7 @@ camel_folder_class_init (CamelFolderClass *camel_folder_class)
 	parent_class = camel_type_get_global_classfuncs (camel_object_get_type ());
 
 	/* virtual method definition */
+	camel_folder_class->get_local_size = get_local_size;
 	camel_folder_class->set_push_email = folder_set_push_email;
 	camel_folder_class->sync = folder_sync;
 	camel_folder_class->refresh_info = refresh_info;
@@ -603,6 +606,18 @@ camel_folder_get_unread_message_count (CamelFolder *folder)
 	return count;
 }
 
+
+static int
+get_local_size (CamelFolder *folder)
+{
+	return 0;
+}
+
+int
+camel_folder_get_local_size (CamelFolder *folder)
+{
+	return CF_CLASS (folder)->get_local_size (folder);
+}
 
 /**
  * camel_folder_get_deleted_message_count:

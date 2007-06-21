@@ -3637,11 +3637,17 @@ tny_camel_folder_get_stats (TnyFolder *self)
 static TnyFolderStats * 
 tny_camel_folder_get_stats_default (TnyFolder *self)
 {
-	TnyFolderStats *retval = tny_folder_stats_new (self);
+	TnyFolderStats *retval = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	/* TNY TODO: update unread, all_count and local_size here ! */
+	if (!load_folder (priv))
+		return NULL;
 
+	retval = tny_folder_stats_new (self);
+
+	priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+	priv->cached_length = camel_folder_get_message_count (priv->folder);
+	priv->local_size = camel_folder_get_local_size (priv->folder);
 	tny_folder_stats_set_local_size (retval, priv->local_size);
 
 	return retval;

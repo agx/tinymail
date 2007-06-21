@@ -2,6 +2,7 @@
 
 	* Error handling: No space left on device, when retrieving messages
 	* Flag handling after message retrieval
+	* Local and remove size calculations
 
 2007-06-20  Philip Van Hoof  <pvanhoof@gnome.org>
 

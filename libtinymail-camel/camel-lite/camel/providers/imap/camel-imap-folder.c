@@ -149,6 +149,7 @@ static void imap_transfer_resyncing (CamelFolder *source, GPtrArray *uids,
 static GPtrArray *imap_search_by_expression (CamelFolder *folder, const char *expression, CamelException *ex);
 static GPtrArray *imap_search_by_uids	    (CamelFolder *folder, const char *expression, GPtrArray *uids, CamelException *ex);
 static void       imap_search_free          (CamelFolder *folder, GPtrArray *uids);
+static int imap_get_local_size (CamelFolder *folder);
 
 static void imap_thaw (CamelFolder *folder);
 
@@ -181,6 +182,7 @@ camel_imap_folder_class_init (CamelImapFolderClass *camel_imap_folder_class)
 	/* virtual method overload */
 	((CamelObjectClass *)camel_imap_folder_class)->getv = imap_getv;
 
+	camel_folder_class->get_local_size = imap_get_local_size;
 	camel_folder_class->set_push_email = imap_set_push_email;
 	camel_folder_class->get_message = imap_get_message;
 	camel_folder_class->rename = imap_rename;
@@ -330,6 +332,15 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 	imap_folder->search = camel_imap_search_new(folder_dir);
 
 	return folder;
+}
+
+static int 
+imap_get_local_size (CamelFolder *folder)
+{
+	CamelImapFolder *imap_folder = (CamelImapFolder *) folder;
+	int msize = 0;
+	camel_du (imap_folder->folder_dir, &msize);
+	return msize;
 }
 
 
