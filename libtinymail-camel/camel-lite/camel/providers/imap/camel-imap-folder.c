@@ -3942,6 +3942,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	gboolean connected = FALSE, ctchecker=FALSE;
 	CamelException  tex = CAMEL_EXCEPTION_INITIALISER;
 	ssize_t nread = 0; gboolean amcon = FALSE;
+	gchar *errmessage = NULL;
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
@@ -4034,7 +4035,11 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			uid, "", "", 0, NULL);
 
 	if (stream == NULL)
-		stream = camel_stream_mem_new ();
+	{
+		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			g_strerror (errno));
+		goto errorhander;
+	}
 
 	if (type & CAMEL_FOLDER_RECEIVE_FULL)
 	{
@@ -4080,7 +4085,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 				/* The first line is very unlikely going to consume 1023 bytes */
 				if (f > 1023 || nread <= 0) {
-					g_warning ("BINARY: Long first line, UID=%s", uid);
+					err = TRUE;
+					errmessage = g_strdup_printf ("BINARY: Long first line, UID=%s", uid);
 					goto berrorhander;
 				}
 
@@ -4089,7 +4095,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 				if (*line != '*' || *(line + 1) != ' ')
 				{ 
 					err = TRUE; 
-					g_warning ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); 
+					errmessage = g_strdup_printf ("BINARY: Line doesn't start with \"* \", UID=%s (%s)", uid, line); 
 					goto berrorhander; 
 				}
 
@@ -4114,7 +4120,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			/* If strtol failed (it's important enough to check this) */
 			if (errno == ERANGE)
 			{ 
-				err = TRUE; g_warning ("BINARY: strtol failed, UID=%s (%s)", uid, line); 
+				err = TRUE; 
+				errmessage = g_strdup_printf ("BINARY: strtol failed, UID=%s (%s)", uid, line); 
 				goto berrorhander; 
 			}
 
@@ -4128,12 +4135,17 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 				if (hread > 0) 
 				{
 					/* And write them too */
-					camel_stream_write (stream, t_str, hread);
+					if (camel_stream_write (stream, t_str, hread) != hread)
+					{
+						err = TRUE;
+						errmessage = g_strdup_printf ("BINARY: %s", g_strerror (errno));
+						goto berrorhander;
+					}
 					rec += hread;
 					camel_operation_progress (NULL, rec, length);
 				} else {
 					if (hread != 0) {
-						g_warning ("BINARY: read failed, UID=%s", uid);
+						errmessage = g_strdup_printf ("BINARY: read failed, UID=%s", uid);
 						err = TRUE;
 						goto berrorhander;
 					}
@@ -4187,9 +4199,10 @@ Received: from nic.funet.fi
 
 			server_stream = (CamelStreamBuffer*) store->istream;
 
-			if (!server_stream)
+			if (!server_stream) {
 				err = TRUE;
-			else
+				errmessage = g_strdup ("FETCH: Service unavailable");
+			} else
 				store->command++;
 
 			if (server_stream) 
@@ -4210,8 +4223,11 @@ Received: from nic.funet.fi
 
 				/* It's the first line (or an unsolicited one) */
 				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
-					{ err=TRUE; break; } 
-				else if (linenum == 0) 
+				{ 
+					errmessage = g_strdup ("FETCH: Unexpected result from FETCH");
+					err=TRUE; 
+					break; 
+				} else if (linenum == 0) 
 				{ 
 					char *pos, *ppos;
 					pos = strchr (line, '{');
@@ -4236,17 +4252,33 @@ Received: from nic.funet.fi
 
 				if (isnextdone)
 				{
-					if (hadr)
-						camel_stream_write (stream, ")\n", 2);
-					else
-						camel_stream_write (stream, ")\r\n", 3);
+					if (hadr) {
+						if (camel_stream_write (stream, ")\n", 2) != 2)
+						{
+							err = TRUE;
+							errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+							break;
+						}
+					} else {
+						if (camel_stream_write (stream, ")\r\n", 3) != 3)
+						{
+							err = TRUE;
+							errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+							break;
+						}
+					}
 
 					hadr = FALSE;
 					isnextdone = FALSE;
 				}
 
 				llen = strlen (line);
-				camel_stream_write (stream, line, llen);
+				if (camel_stream_write (stream, line, llen) != llen)
+				{
+					err = TRUE;
+					errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+					break;
+				}
 				linenum++;
 				tread += llen;
 
@@ -4257,8 +4289,10 @@ Received: from nic.funet.fi
 
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
-			if (nread <= 0) 
+			if (nread <= 0) {
 				err = TRUE;
+				errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+			}
 
 			if (tag)
 				g_free (tag);
@@ -4307,9 +4341,10 @@ Received: from nic.funet.fi
 			else 
 				server_stream = NULL;
 
-			if (server_stream == NULL)
+			if (server_stream == NULL) {
 				err = TRUE;
-			else
+				errmessage = g_strdup ("FETCH: Service unavailable");
+			} else
 				store->command++;
 
 			if (server_stream) 
@@ -4323,7 +4358,11 @@ Received: from nic.funet.fi
 
 				/* It's the first line */
 				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
-					{ err=TRUE; break; } 
+				{ 
+					errmessage = g_strdup ("FETCH: Unexpected result from FETCH");
+					err=TRUE; 
+					break; 
+				} 
 				else if (linenum == 0) 
 				{ 
 					char *pos, *ppos;
@@ -4347,9 +4386,24 @@ Received: from nic.funet.fi
 					if ((t == 0 || t == 1 /* 2 */) && boundary_len > 0)
 					{
 						camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
-						camel_stream_write (stream, "\n--", 3);
-						camel_stream_write (stream, boundary, boundary_len);
-						camel_stream_write (stream, "\n", 1);
+						if (camel_stream_write (stream, "\n--", 3) != 3)
+						{
+							err = TRUE;
+							errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+							break;
+						}
+						if (camel_stream_write (stream, boundary, boundary_len) != boundary_len)
+						{
+							err = TRUE;
+							errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+							break;
+						}
+						if (camel_stream_write (stream, "\n", 1) != 1)
+						{
+							err = TRUE;
+							errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+							break;
+						}
 					}
 					break;
 				}
@@ -4390,12 +4444,22 @@ Received: from nic.funet.fi
 
 				if (isnextdone)
 				{
-					camel_stream_write (stream, ")\n", 2);
+					if (camel_stream_write (stream, ")\n", 2) != 2)
+					{
+						err = TRUE;
+						errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+						break;
+					}
 					isnextdone = FALSE;
 				}
 
 				llen = strlen (line);
-				camel_stream_write (stream, line, llen);
+				if (camel_stream_write (stream, line, llen) != llen)
+				{
+					err = TRUE;
+					errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+					break;
+				}
 
 				tread += llen;
 				camel_operation_progress (NULL, tread, exread);
@@ -4406,9 +4470,11 @@ Received: from nic.funet.fi
 
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
-			if (nread <= 0) 
+			if (nread <= 0) {
 				err = TRUE;
-			
+				errmessage = g_strdup_printf ("FETCH: %s", g_strerror (errno));
+			}
+
 			if (tag)
 				g_free (tag);
 
@@ -4449,15 +4515,21 @@ errorhander:
 		camel_object_unref (stream);
 	camel_imap_message_cache_remove (imap_folder->cache, uid);
 
-	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-		    _("Could not find message body in FETCH response."));
+	if (!errmessage)
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			    "Could not find message body in FETCH response.");
+	else {
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			    errmessage);
+		g_free (errmessage);
+	}
+
 	handle_freeup (store, nread, ex);
-
-
 
 	if (store)
 	{
   CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+		imap_folder->gmsgstore_ticks = 0;
 		if (ctchecker) {
 			camel_object_ref (imap_folder);
 			imap_folder->gmsgstore_signal = g_timeout_add (1000, 

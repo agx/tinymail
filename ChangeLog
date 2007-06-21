@@ -1,3 +1,7 @@
+2007-06-21  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Error handling: No space left on device, when retrieving messages
+
 2007-06-20  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed a bug in tny_folder_transfer_msgs
