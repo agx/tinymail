@@ -138,11 +138,6 @@ tny_camel_pop_store_account_finalize (GObject *object)
 {
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (object);
 
-	g_mutex_lock (priv->lock);
-	if (priv->inbox)
-		g_object_unref (G_OBJECT (priv->inbox));
-	g_mutex_unlock (priv->lock);
-
 	g_mutex_free (priv->lock);
 
 	(*parent_class->finalize) (object);
@@ -164,15 +159,8 @@ tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
 	CamelService *service = (CamelService *) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (self));
-	TnyCamelFolderPriv *fpriv = NULL;
 
 	g_mutex_lock (priv->lock);
-
-	if (priv->inbox && TNY_IS_FOLDER (priv->inbox))
-		fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->inbox);
-
-	if (fpriv)
-		g_static_rec_mutex_lock (fpriv->folder_lock);
 
 	service->reconnecting = TRUE;
 
@@ -199,9 +187,6 @@ tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self)
 			"reconnection", (gpointer) FALSE);
 
 	service->reconnecting = FALSE;
-
-	if (fpriv)
-		g_static_rec_mutex_unlock (fpriv->folder_lock);
 
 	g_mutex_unlock (priv->lock);
 
@@ -245,6 +230,8 @@ tny_camel_pop_store_account_set_leave_messages_on_server (TnyCamelPOPStoreAccoun
 	CamelPOP3Store *pop3_store = (CamelPOP3Store *) service;
 
 	pop3_store->immediate_delete_after = !enabled;
+
+	
 }
 
 
@@ -254,10 +241,10 @@ tny_camel_pop_store_account_instance_init (GTypeInstance *instance, gpointer g_c
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (instance);
 
 	priv->lock = g_mutex_new ();
-	priv->inbox = NULL;
 
 	return;
 }
+
 
 /**
  * tny_camel_pop_store_account_get_type:

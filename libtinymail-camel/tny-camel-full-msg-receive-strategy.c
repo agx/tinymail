@@ -83,7 +83,6 @@ tny_camel_full_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrate
 	{
 		if (camel_message && CAMEL_IS_OBJECT (camel_message))
 		{
-			TnyHeaderFlags flags = tny_header_get_flags (header);
 			TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (camel_message), folder);
 
 			message = tny_camel_msg_new ();

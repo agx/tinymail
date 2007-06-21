@@ -24,7 +24,6 @@ typedef struct _TnyCamelPopStoreAccountPriv TnyCamelPopStoreAccountPriv;
 
 struct _TnyCamelPopStoreAccountPriv
 {
-	TnyFolder *inbox;
 	GMutex *lock;
 };
 
