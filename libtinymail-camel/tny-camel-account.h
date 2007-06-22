@@ -82,7 +82,7 @@ struct _TnyCamelAccountClass
 	void (*set_online_func) (TnyCamelAccount *self, gboolean online, GError **err);
 
 	/* Abstract methods */
-	void (*prepare_func) (TnyCamelAccount *self);
+	void (*prepare_func) (TnyCamelAccount *self, gboolean recon_if, gboolean reservice);
 };
 
 GType tny_camel_account_get_type (void);

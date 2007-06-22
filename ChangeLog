@@ -2,6 +2,8 @@
 
 	* The folder type of the INBOX of a POP account
 	* Folder lists when offline
+	* Connecting, reconnecting and setting account settings while
+	connecting (experimental)
 
 2007-06-21  Sergio Villar Senin  <svillar@igalia.com>
 	

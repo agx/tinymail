@@ -232,89 +232,25 @@ reconnecting (CamelService *service, gpointer data, TnyAccount *self)
 
 
 static void 
-tny_camel_store_account_prepare (TnyCamelAccount *self)
+tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gboolean reservice)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
 	priv->cant_reuse_iter = TRUE;
 
-	if (!apriv->custom_url_string)
-	{
-		/* Prepare the URL string that Camel needs to identify 
-		 * the protocol, hostname, user, security options, etc:
-		 */
-		CamelURL *url = NULL;
-		GList *options = apriv->options;
-		gchar *proto;
-
-		if (apriv->proto == NULL) {
-			/* Don't warn, because this seems to be normal.
-			 * Presumably this will be called again later.
-			 * 
-			 * g_warning ("%s: apriv->proto is NULL. "
-				"You might need to call tny_account_set_proto().", __FUNCTION__);
-			*/
-			return;
-		}
-
-		proto = g_strdup_printf ("%s://", apriv->proto); 
-
-		if (camel_exception_is_set (apriv->ex))
-			camel_exception_clear (apriv->ex);
-
-		url = camel_url_new (proto, apriv->ex);
-		g_free (proto);
-
-		if (!url)
-			return;
-
-		camel_url_set_protocol (url, apriv->proto); 
-		 if (apriv->user)
-			camel_url_set_user (url, apriv->user);
-		camel_url_set_host (url, apriv->host);
-
-		if (apriv->port != -1)
-			camel_url_set_port (url, (int)apriv->port);
-
-		if (apriv->mech)
-			camel_url_set_authmech (url, apriv->mech);
-
-		while (options)
-		{
-			gchar *ptr, *dup = g_strdup (options->data);
-			gchar *option, *value;
-			ptr = strchr (dup, '=');
-			if (ptr) {
-				ptr++;
-				value = g_strdup (ptr); ptr--;
-				*ptr = '\0'; option = dup;
-			} else {
-				option = dup;
-				value = g_strdup ("1");
-			}
-			camel_url_set_param (url, option, value);
-			g_free (value);
-			g_free (dup);
-			options = g_list_next (options);
-		}
-
-		if (G_LIKELY (apriv->url_string))
-			g_free (apriv->url_string);
-
-		apriv->url_string = camel_url_to_string (url, 0);
-		camel_url_free (url);
-	}
-
+	_tny_camel_account_refresh (self, recon_if);
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	_tny_camel_account_clear_hooks (self);
 
-	if (apriv->session)
+	if (apriv->session && apriv->url_string)
 	{
-		if (camel_exception_is_set (apriv->ex))
-			camel_exception_clear (apriv->ex);
+	  if (camel_exception_is_set (apriv->ex))
+		camel_exception_clear (apriv->ex);
 
+	  if (!apriv->service && reservice)
+	  {
 		if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
 		{
 			camel_object_unref (CAMEL_OBJECT (apriv->service));
@@ -322,50 +258,52 @@ tny_camel_store_account_prepare (TnyCamelAccount *self)
 		} 
 
 		apriv->service = camel_session_get_service
-				((CamelSession*) apriv->session, apriv->url_string, 
-				apriv->type, apriv->ex);
+			((CamelSession*) apriv->session, apriv->url_string, 
+			apriv->type, apriv->ex);
 
-			if (apriv->service && !camel_exception_is_set (apriv->ex)) 
-			{
-				CHookInfo *info1, *info2, *info3, *info4;
+printf ("%s\n", camel_exception_get_description (apriv->ex));
 
-				apriv->service->data = self;
+		if (apriv->service && !camel_exception_is_set (apriv->ex)) 
+		{
+			CHookInfo *info1, *info2, *info3, *info4;
 
-				info1 = g_slice_new0 (CHookInfo);
-				info2 = g_slice_new0 (CHookInfo);
-				info3 = g_slice_new0 (CHookInfo);
-				info4 = g_slice_new0 (CHookInfo);
+			apriv->service->data = self;
 
-				camel_object_ref (apriv->service);
-				camel_object_ref (apriv->service);
-				camel_object_ref (apriv->service);
-				camel_object_ref (apriv->service);
+			info1 = g_slice_new0 (CHookInfo);
+			info2 = g_slice_new0 (CHookInfo);
+			info3 = g_slice_new0 (CHookInfo);
+			info4 = g_slice_new0 (CHookInfo);
 
-				info1->instance = (CamelObject *) apriv->service;
-				info2->instance = (CamelObject *) apriv->service;
-				info3->instance = (CamelObject *) apriv->service;
-				info4->instance = (CamelObject *) apriv->service;
+			camel_object_ref (apriv->service);
+			camel_object_ref (apriv->service);
+			camel_object_ref (apriv->service);
+			camel_object_ref (apriv->service);
 
-				info1->hook = camel_object_hook_event (apriv->service, 
-					"disconnection", (CamelObjectEventHookFunc)disconnection, self);
-				info2->hook = camel_object_hook_event (apriv->service, 
-					"connection", (CamelObjectEventHookFunc)connection, self);
-				info3->hook = camel_object_hook_event (apriv->service, 
-					"reconnection", (CamelObjectEventHookFunc)reconnection, self);
-				info4->hook = camel_object_hook_event (apriv->service, 
-					"reconnecting", (CamelObjectEventHookFunc)reconnecting, self);
+			info1->instance = (CamelObject *) apriv->service;
+			info2->instance = (CamelObject *) apriv->service;
+			info3->instance = (CamelObject *) apriv->service;
+			info4->instance = (CamelObject *) apriv->service;
 
-				apriv->chooks = g_list_prepend (apriv->chooks, info1);
-				apriv->chooks = g_list_prepend (apriv->chooks, info2);
-				apriv->chooks = g_list_prepend (apriv->chooks, info3);
-				apriv->chooks = g_list_prepend (apriv->chooks, info4);
+			info1->hook = camel_object_hook_event (apriv->service, 
+				"disconnection", (CamelObjectEventHookFunc)disconnection, self);
+			info2->hook = camel_object_hook_event (apriv->service, 
+				"connection", (CamelObjectEventHookFunc)connection, self);
+			info3->hook = camel_object_hook_event (apriv->service, 
+				"reconnection", (CamelObjectEventHookFunc)reconnection, self);
+			info4->hook = camel_object_hook_event (apriv->service, 
+				"reconnecting", (CamelObjectEventHookFunc)reconnecting, self);
 
-			} else if (camel_exception_is_set (apriv->ex) && apriv->service)
-			{
-				g_warning ("Must cleanup service pointer\n");
-				apriv->service = NULL;
-			}
+			apriv->chooks = g_list_prepend (apriv->chooks, info1);
+			apriv->chooks = g_list_prepend (apriv->chooks, info2);
+			apriv->chooks = g_list_prepend (apriv->chooks, info3);
+			apriv->chooks = g_list_prepend (apriv->chooks, info4);
 
+		} else if (camel_exception_is_set (apriv->ex) && apriv->service)
+		{
+			g_warning ("Must cleanup service pointer\n");
+			apriv->service = NULL;
+		}
+	  }
 	} else {
 		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
 			"Session not yet set, use tny_camel_account_set_session");
@@ -431,10 +369,6 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 				connection_status_idle, 
 				g_object_ref (self), 
 				connection_status_idle_destroy);
-
-				/* TNY TODO: Listen for disconnections here,
-				 * and report those as a connection_status_changed
-				 * event on TnyAccount too! */
 
 			/* tny_camel_account_set_online (self, apriv->connected); */
 		}

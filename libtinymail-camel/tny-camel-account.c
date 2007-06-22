@@ -58,6 +58,93 @@
 
 static GObjectClass *parent_class = NULL;
 
+void
+_tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (apriv->service_lock);
+
+	if (!apriv->custom_url_string)
+	{
+		CamelURL *url = NULL;
+		GList *options = apriv->options;
+		gchar *proto;
+		gboolean urlneedfree = FALSE;
+
+		if (apriv->proto == NULL)
+			goto fail;
+
+		proto = g_strdup_printf ("%s://", apriv->proto); 
+
+		if (camel_exception_is_set (apriv->ex))
+			camel_exception_clear (apriv->ex);
+
+		if (!apriv->service) {
+			url = camel_url_new (proto, apriv->ex);
+			urlneedfree = TRUE;
+		} else
+			url = apriv->service->url;
+
+		g_free (proto);
+
+		if (!url)
+			goto fail;
+
+		camel_url_set_protocol (url, apriv->proto); 
+		 if (apriv->user)
+			camel_url_set_user (url, apriv->user);
+		camel_url_set_host (url, apriv->host);
+		if (apriv->port != -1)
+			camel_url_set_port (url, (int)apriv->port);
+		if (apriv->mech)
+			camel_url_set_authmech (url, apriv->mech);
+
+		while (options)
+		{
+			gchar *ptr, *dup = g_strdup (options->data);
+			gchar *option, *value;
+			ptr = strchr (dup, '=');
+			if (ptr) {
+				ptr++;
+				value = g_strdup (ptr); ptr--;
+				*ptr = '\0'; option = dup;
+			} else {
+				option = dup;
+				value = g_strdup ("1");
+			}
+			camel_url_set_param (url, option, value);
+			g_free (value);
+			g_free (dup);
+			options = g_list_next (options);
+		}
+		if (G_LIKELY (apriv->url_string))
+			g_free (apriv->url_string);
+		apriv->url_string = camel_url_to_string (url, 0);
+
+		if (urlneedfree)
+			camel_url_free (url);
+	}
+
+	if (recon_if && (apriv->status != TNY_CONNECTION_STATUS_DISCONNECTED))
+	{
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+		if (!apriv->service)
+			goto fail;
+
+		camel_service_disconnect (apriv->service, FALSE, &ex);
+		if (camel_exception_is_set (&ex))
+			camel_exception_clear (&ex);
+		camel_service_connect (apriv->service, &ex);
+	}
+
+fail:
+	g_static_rec_mutex_unlock (apriv->service_lock);
+
+	return;
+}
+
 static gboolean 
 tny_camel_account_matches_url_string (TnyAccount *self, const gchar *url_string)
 {
@@ -199,7 +286,7 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 
 	priv->options = g_list_prepend (priv->options, g_strdup (option));
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, TRUE, FALSE);
 
 	return;
 }
@@ -209,7 +296,7 @@ _tny_camel_account_try_connect (TnyCamelAccount *self, GError **err)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
 
 	if (camel_exception_is_set (priv->ex))
 	{
@@ -237,11 +324,10 @@ tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_str
 
 	if (priv->url_string)
 		g_free (priv->url_string);
-
 	priv->custom_url_string = TRUE;
 	priv->url_string = g_strdup (url_string);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
 
 	return;
 }
@@ -527,7 +613,7 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
 	priv->session = session;
 	_tny_session_camel_add_account (session, self);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, TRUE, TRUE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -573,7 +659,7 @@ tny_camel_account_set_secure_auth_mech_default (TnyAccount *self, const gchar *m
 
 	priv->mech = g_strdup (mech);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -600,7 +686,7 @@ tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 
 	priv->proto = g_strdup (proto);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -627,7 +713,7 @@ tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 
 	priv->user = g_strdup (user);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -654,7 +740,7 @@ tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
 
 	priv->host = g_strdup (host);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -680,7 +766,7 @@ tny_camel_account_set_port_default (TnyAccount *self, guint port)
 
 	priv->port = (gint) port;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -704,7 +790,7 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -727,7 +813,7 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self));
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -969,6 +1055,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->session = NULL;
 	priv->url_string = NULL;
 	priv->chooks = NULL;
+	priv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
 
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);

@@ -84,6 +84,7 @@ void _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOpe
 void _tny_camel_account_stop_camel_operation (TnyCamelAccount *self);
 void _tny_camel_account_try_connect (TnyCamelAccount *self, GError **err);
 void _tny_camel_account_clear_hooks (TnyCamelAccount *self);
+void _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if);
 
 #define TNY_CAMEL_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountPriv))
