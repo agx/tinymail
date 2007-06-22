@@ -116,8 +116,6 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 
 	if (apriv->pass_func_set && apriv->forget_pass_func_set)
 	{
-		apriv->connected = FALSE;
-
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
@@ -169,7 +167,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	/* camel_service_connect can launch GUI things */
-	if (!apriv->connected && !camel_service_connect (apriv->service, &ex))
+	if (!camel_service_connect (apriv->service, &ex))
 	{
 		if (camel_exception_is_set (&ex))
 		{
@@ -187,8 +185,6 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	from = (CamelAddress *) camel_mime_message_get_from (message);
 	recipients = (CamelAddress *) camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
 
-	apriv->connected = TRUE;
-
 	camel_transport_send_to (transport, message, from, 
 			recipients, &ex);
 
@@ -202,7 +198,6 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	}
 
 	camel_service_disconnect (apriv->service, TRUE, &ex);
-	apriv->connected = FALSE;
 
 	if (reperr && camel_exception_is_set (&ex))
 	{
@@ -240,7 +235,6 @@ tny_camel_transport_account_instance_init (GTypeInstance *instance, gpointer g_c
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	apriv->service = NULL;
-	apriv->connected = FALSE;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
 	apriv->account_type = TNY_ACCOUNT_TYPE_TRANSPORT;
 

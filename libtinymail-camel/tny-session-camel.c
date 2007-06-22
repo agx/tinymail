@@ -72,6 +72,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	TnyAccount *account;
 	gboolean freeprmpt = FALSE, cancel = FALSE;
 	gchar *retval = NULL, *prmpt = (gchar*)prompt;
+	TnyCamelAccountPriv *apriv = NULL;
 
 	account = service->data;
 	if (account)
@@ -97,9 +98,14 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 				tny_session_camel_forget_password (session, service, domain, item, ex);
 		}
 
+		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+		apriv->in_auth = TRUE;
+
 		tny_lockable_lock (self->priv->ui_lock);
 		retval = func (account, prmpt, &cancel);
 		tny_lockable_unlock (self->priv->ui_lock);
+
+		apriv->in_auth = FALSE;
 
 		if (freeprmpt)
 			g_free (prmpt);

@@ -341,7 +341,6 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 	if (apriv->pass_func_set && apriv->forget_pass_func_set)
 	{
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-		apriv->connected = FALSE;
 
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
@@ -363,7 +362,6 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 					"Unknown error while connecting");
 			}
 		} else {
-			apriv->connected = TRUE;
 
 			g_idle_add_full (G_PRIORITY_HIGH, 
 				connection_status_idle, 
@@ -493,7 +491,6 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	apriv->type = CAMEL_PROVIDER_STORE;
-	apriv->connected = FALSE;
 	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
 	priv->managed_folders = NULL;
 	priv->sobservers = NULL;

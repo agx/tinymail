@@ -713,7 +713,8 @@ tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 
 	priv->user = g_strdup (user);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+		!priv->in_auth, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -740,7 +741,8 @@ tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
 
 	priv->host = g_strdup (host);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+		TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -766,7 +768,8 @@ tny_camel_account_set_port_default (TnyAccount *self, guint port)
 
 	priv->port = (gint) port;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+		TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -790,7 +793,8 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+		TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -813,7 +817,8 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+		TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -1046,6 +1051,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->in_auth = FALSE;
 	priv->csyncop = NULL;
 	priv->get_pass_func = NULL;
 	priv->forget_pass_func = NULL;

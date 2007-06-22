@@ -67,7 +67,7 @@ struct _TnyCamelAccountPriv
 	CamelProviderType type;
 	CamelOperation *cancel;
 	GMutex *cancel_lock;
-	gboolean connected, inuse_spin;
+	gboolean inuse_spin, in_auth;
 	gchar *name; GList *options;
 	gchar *cache_location; gint port;
 	TnyAccountType account_type;
