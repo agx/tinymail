@@ -175,6 +175,8 @@ pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
 
 	fi = camel_folder_info_new ();
 
+	fi->flags |= CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_TYPE_INBOX;
+
 	fi->full_name = g_strdup(folder_name);
 	fi->unread = 0;
 	fi->total = 0;

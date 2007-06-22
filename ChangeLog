@@ -1,3 +1,7 @@
+2007-06-22  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* The folder type of the INBOX of a POP account
+
 2007-06-21  Sergio Villar Senin  <svillar@igalia.com>
 	
 	* libtinymail/tny-simple-list.c:
