@@ -261,8 +261,6 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
 
-printf ("%s\n", camel_exception_get_description (apriv->ex));
-
 		if (apriv->service && !camel_exception_is_set (apriv->ex)) 
 		{
 			CHookInfo *info1, *info2, *info3, *info4;
