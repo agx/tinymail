@@ -3186,7 +3186,9 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 				camel_exception_get_description (&ex));
 			camel_exception_clear (&ex);
 			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-			return;
+
+			if (priv->iter == NULL)
+				return;
 		}
 
 		priv->iter_parented = FALSE;

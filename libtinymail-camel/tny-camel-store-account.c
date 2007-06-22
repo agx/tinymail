@@ -1027,14 +1027,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 			camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 
-		if (CAMEL_IS_OBJECT (store))
-		{
-			if (iter && CAMEL_IS_STORE (store))
-				camel_store_free_folder_info (store, iter);
-			camel_object_unref (CAMEL_OBJECT (store));
-		}
 		_tny_session_stop_operation (apriv->session);
-		return;
+
+		if (iter == NULL)
+			return;
 	}
 
 	priv->iter = iter;

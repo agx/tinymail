@@ -3474,7 +3474,10 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 fail:
 	CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
-	return NULL;
+
+	tree = get_folder_info_offline(store, top, flags, ex);
+
+	return tree;
 }
 
 static CamelFolderInfo *
