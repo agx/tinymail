@@ -333,13 +333,9 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	} else {
-		CamelFolderSummary *s;
-		s = (CamelFolderSummary *)camel_mh_summary_new(NULL, path, folderpath, NULL);
-		if (camel_folder_summary_header_load(s) != -1) {
-			fi->unread = s->unread_count;
-			fi->total = s->saved_count;
-		}
-		camel_object_unref(s);
+		fi->total = -1;
+		fi->unread = -1;
+		camel_file_util_read_counts (path, fi);
 	}
 
 	if (folderpath)

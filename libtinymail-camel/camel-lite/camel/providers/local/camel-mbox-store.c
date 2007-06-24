@@ -624,15 +624,9 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	} else {
-		CamelMboxSummary *mbs;
-
-		mbs = (CamelMboxSummary *)camel_mbox_summary_new(NULL, path, folderpath, NULL);
-		if (camel_folder_summary_header_load((CamelFolderSummary *)mbs) != -1) {
-			fi->unread = ((CamelFolderSummary *)mbs)->unread_count;
-			fi->total = ((CamelFolderSummary *)mbs)->saved_count;
-		}
-
-		camel_object_unref(mbs);
+		fi->total = -1;
+		fi->unread = -1;
+		camel_file_util_read_counts (path, fi);
 	}
 
 	if (folderpath)
