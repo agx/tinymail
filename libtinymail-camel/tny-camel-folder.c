@@ -665,6 +665,11 @@ tny_camel_folder_get_unread_count_default (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	g_static_rec_mutex_lock (priv->folder_lock);
+	if (priv->unread_length == 0 && priv->folder)
+		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+	g_static_rec_mutex_unlock (priv->folder_lock);
+
 	return priv->unread_length;
 }
 
