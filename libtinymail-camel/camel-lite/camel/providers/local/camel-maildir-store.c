@@ -320,6 +320,8 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
 	} else {
+		fi->total = -1;
+		fi->unread = -1;
 		camel_file_util_read_counts (path, fi);
 	}
 
