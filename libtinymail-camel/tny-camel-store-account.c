@@ -872,6 +872,9 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 	{
 		TnyFolder *fnd = (TnyFolder*) copy->data;
 		const gchar *name = tny_folder_get_id (fnd);
+		
+		/* printf ("COMPARE: [%s] [%s]\n", name, full_name); */
+
 		if (!strcmp (name, full_name))
 		{
 			folder = TNY_CAMEL_FOLDER (g_object_ref (G_OBJECT (fnd)));
@@ -883,6 +886,10 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 
 	if (!folder) {
 		folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
+		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+
+		/* printf ("CREATE: %s\n", full_name); */
+
 		*was_new = TRUE;
 	}
 
