@@ -3617,10 +3617,13 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
-	if (!priv->observers)
-		return;
-
 	g_static_rec_mutex_lock (priv->obs_lock);
+
+	if (!priv->observers) {
+		g_static_rec_mutex_unlock (priv->obs_lock);
+		return;
+	}
+
 	tny_list_remove (priv->observers, G_OBJECT (observer));
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
@@ -3691,10 +3694,11 @@ tny_camel_folder_store_remove_observer_default (TnyFolderStore *self, TnyFolderS
 
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
 
-	if (!priv->sobservers)
-		return;
-
 	g_static_rec_mutex_lock (priv->obs_lock);
+	if (!priv->sobservers) {
+		g_static_rec_mutex_unlock (priv->obs_lock);
+		return;
+	}
 	tny_list_remove (priv->sobservers, G_OBJECT (observer));
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
