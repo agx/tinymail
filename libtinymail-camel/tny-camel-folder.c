@@ -81,10 +81,13 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 	TnyIterator *iter;
 	TnyList *list;
 
-	if (!priv->sobservers)
-		return;
-
 	g_static_rec_mutex_lock (priv->obs_lock);
+
+	if (!priv->sobservers) {
+		g_static_rec_mutex_unlock (priv->obs_lock);
+		return;
+	}
+
 	list = tny_list_copy (priv->sobservers);
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
@@ -111,10 +114,13 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	TnyIterator *iter;
 	TnyList *list;
 
-	if (!priv->observers)
-		return;
-
 	g_static_rec_mutex_lock (priv->obs_lock);
+
+	if (!priv->observers) {
+		g_static_rec_mutex_unlock (priv->obs_lock);
+		return;
+	}
+
 	list = tny_list_copy (priv->observers);
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
