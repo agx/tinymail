@@ -105,7 +105,7 @@ stream_read(CamelStream *stream, char *buffer, size_t n)
 				is->ptr = p+3;
 				is->mode = CAMEL_POP3_STREAM_EOD;
 				is->state = 0;
-				pop3_debug ("POP3_STREAM_READ(%d):\n%.*s\n", (int)(o-buffer), (int)(o-buffer), buffer);
+				pop3_debug ("POP3_STREAM_READ(%d):\n%s\n", (int)(o-buffer), buffer);
 				return o-buffer;
 			}
 			p++;
