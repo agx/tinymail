@@ -503,6 +503,7 @@ static void
 local_sync(CamelFolder *folder, gboolean expunge, CamelException *ex)
 {
 	CamelLocalFolder *lf = CAMEL_LOCAL_FOLDER(folder);
+	CamelFolderChangeInfo *changes = NULL;
 
 	d(printf("local sync '%s' , expunge=%s\n", folder->full_name, expunge?"true":"false"));
 
@@ -511,14 +512,14 @@ local_sync(CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	camel_object_state_write(lf);
 
+	changes = camel_folder_change_info_new ();
 	/* if sync fails, we'll pass it up on exit through ex */
-	camel_local_summary_sync((CamelLocalSummary *)folder->summary, expunge, lf->changes, ex);
+	camel_local_summary_sync((CamelLocalSummary *)folder->summary, expunge, changes, ex);
 	camel_local_folder_unlock(lf);
 
-	if (camel_folder_change_info_changed(lf->changes)) {
-		camel_object_trigger_event(CAMEL_OBJECT(folder), "folder_changed", lf->changes);
-		camel_folder_change_info_clear(lf->changes);
-	}
+	if (camel_folder_change_info_changed(changes))
+		camel_object_trigger_event(CAMEL_OBJECT(folder), "folder_changed", changes);
+	camel_folder_change_info_free(changes);
 }
 
 static void
