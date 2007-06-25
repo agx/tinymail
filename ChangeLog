@@ -1,6 +1,9 @@
 2007-06-25  Philip Van Hoof  <pvanhoof@gnome.org>
 	
 	* Deleting messages from local folders (bugfix about ghost rows)
+	* Deleting attachments from message cache
+
+	* This was a major API change
 
 2007-06-24  Philip Van Hoof  <pvanhoof@gnome.org>
 

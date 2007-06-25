@@ -105,6 +105,8 @@ void         camel_imap_message_cache_copy   (CamelImapMessageCache *source,
 
 void camel_imap_message_cache_set_flags (const gchar *folder_dir, CamelMessageInfoBase *mi);
 
+void camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const char *uid);
+
 
 /* Standard Camel function */
 CamelType camel_imap_message_cache_get_type (void);

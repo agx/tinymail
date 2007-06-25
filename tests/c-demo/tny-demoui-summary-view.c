@@ -599,6 +599,51 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 		
 	}
 
+
+
+	if (event->keyval == GDK_End)
+	{
+		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
+		GtkTreeModel *model;
+		GtkTreeIter iter;
+
+		if (gtk_tree_selection_get_selected (selection, &model, &iter))
+		{
+			TnyHeader *header;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+				&header, -1);
+
+			if (header)
+			{
+				GtkWidget *dialog = gtk_message_dialog_new (NULL, 
+					GTK_DIALOG_MODAL,
+					GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, 
+					_("This will uncache the message with subject \"%s\""),
+					tny_header_get_subject (header));
+
+				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+				{
+					TnyFolder *folder;
+					TnyMsg *msg;
+
+					folder = tny_header_get_folder (header);
+					msg = tny_folder_get_msg (folder, header, NULL);
+					if (msg) {
+						tny_msg_uncache_attachments (msg);
+						g_object_unref (msg);
+					}
+					g_object_unref (folder);
+				}
+
+				gtk_widget_destroy (dialog);
+				g_object_unref (G_OBJECT (header));
+			}
+		}
+		
+	}
+
 	return;
 }
 

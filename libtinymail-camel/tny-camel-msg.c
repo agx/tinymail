@@ -223,6 +223,25 @@ tny_camel_msg_get_header_default (TnyMsg *self)
 }
 
 
+static void 
+tny_camel_msg_uncache_attachments (TnyMsg *self)
+{
+	TNY_CAMEL_MSG_GET_CLASS (self)->uncache_attachments_func (self);
+}
+
+static void 
+tny_camel_msg_uncache_attachments_default (TnyMsg *self)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+
+	if (priv->folder && priv->header)
+	{
+		_tny_camel_folder_uncache_attachments (
+			TNY_CAMEL_FOLDER (priv->folder),
+			tny_header_get_uid (priv->header));
+	}
+}
+
 static void
 tny_camel_msg_finalize (GObject *object)
 {
@@ -301,6 +320,7 @@ tny_msg_init (gpointer g, gpointer iface_data)
 	klass->get_header_func = tny_camel_msg_get_header;
 	klass->get_folder_func = tny_camel_msg_get_folder;
 	klass->get_url_string_func = tny_camel_msg_get_url_string;
+	klass->uncache_attachments_func = tny_camel_msg_uncache_attachments;
 
 	return;
 }
@@ -316,6 +336,7 @@ tny_camel_msg_class_init (TnyCamelMsgClass *class)
 	class->get_header_func = tny_camel_msg_get_header_default;
 	class->get_folder_func = tny_camel_msg_get_folder_default;
 	class->get_url_string_func = tny_camel_msg_get_url_string_default;
+	class->uncache_attachments_func = tny_camel_msg_uncache_attachments_default;
 
 	object_class->finalize = tny_camel_msg_finalize;
 

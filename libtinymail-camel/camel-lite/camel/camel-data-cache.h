@@ -92,6 +92,8 @@ gboolean     camel_data_cache_is_partial (CamelDataCache *cache, const char *pat
 
 void         camel_data_cache_set_partial (CamelDataCache *cache, const char *path,
 					      const char *uid, gboolean partial);
+void         camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, 
+					      const char *key);
 
 void camel_data_cache_set_flags (CamelDataCache *cdc, const char *path, CamelMessageInfoBase *mi);
 

@@ -54,6 +54,7 @@ struct _TnyCamelMsgClass
 	TnyHeader* (*get_header_func) (TnyMsg *self);
 	TnyFolder* (*get_folder_func) (TnyMsg *self);
 	gchar* (*get_url_string_func) (TnyMsg *self);
+	void (*uncache_attachments_func) (TnyMsg *self);
 };
 
 GType tny_camel_msg_get_type (void);

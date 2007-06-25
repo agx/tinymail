@@ -37,6 +37,7 @@
 #include "camel-stream-fs.h"
 
 #include "camel-imap-message-cache.h"
+#include "camel-stream-buffer.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -504,6 +505,111 @@ camel_imap_message_cache_get (CamelImapMessageCache *cache, const char *uid,
 	g_free (path);
 	
 	return stream;
+}
+
+
+
+void
+camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const char *uid)
+{
+  CamelStream *in = camel_imap_message_cache_get (cache, uid, "", NULL);
+  gchar *real1 = g_strdup_printf ("%s/%s.", cache->path, uid);
+  gchar *real = g_strdup_printf ("%s.tmp", real1);
+  CamelStream *to = camel_stream_fs_new_with_name (real, O_RDWR|O_CREAT|O_TRUNC, 0600);
+
+  if (in && to)
+  {
+	CamelStreamBuffer *stream = (CamelStreamBuffer *) camel_stream_buffer_new (in, CAMEL_STREAM_BUFFER_READ);
+	char *buffer;
+	int w = 0, n;
+	gchar *boundary = NULL;
+	gboolean occurred = FALSE, theend = FALSE;
+	unsigned int len;
+
+	/* if ((n = camel_stream_write(to, "*", 1)) == -1)
+		theend = TRUE; */
+
+	while (!theend)
+	{
+		buffer = camel_stream_buffer_read_line (stream);
+
+		if (!buffer) {
+			theend = TRUE;
+			continue;
+		}
+
+		len = strlen (buffer);
+
+		if (boundary == NULL)
+		{
+			   CamelContentType *ct = NULL;
+			   const char *bound=NULL;
+			   char *pstr = (char*)strcasestr ((const char *) buffer, "boundary");
+
+			   if (pstr) 
+			   {
+				char *end;
+				pstr = strchr (pstr, '"'); 
+				if (pstr) { 
+					pstr++;
+					end = strchr (pstr, '"');
+					if (end) {
+						*end='\0';
+						boundary = g_strdup (pstr);
+					}
+				}
+			   }
+
+			   if (ct) 
+			   { 
+				bound = camel_content_type_param(ct, "boundary");
+				if (bound && strlen (bound) > 0) 
+					boundary = g_strdup (bound);
+			   }
+		} else if (strstr ((const char*) buffer, (const char*) boundary))
+		{
+			if (occurred)
+				theend = TRUE;
+			occurred = TRUE;
+		}
+
+		if (!theend)
+		{
+		    n = camel_stream_write(to, (const char*) buffer, len);
+		    if (n == -1 || camel_stream_write(to, "\n", 1) == -1)
+			break;
+		    w += n+1;
+		} else if (boundary != NULL)
+		{
+		    gchar *nb = g_strdup_printf ("\n--%s\n", boundary);
+		    n = camel_stream_write(to, nb, strlen (nb));
+		    g_free (nb);
+		}
+	}
+
+	/* it all worked, output a '#' to say we're a-ok */
+	if (n != -1 || theend) {
+		camel_stream_reset(to);
+		/* n = camel_stream_write(to, "#", 1); */
+		if (theend)
+			camel_imap_message_cache_set_partial (cache, uid, TRUE);
+		else
+ 			camel_imap_message_cache_set_partial (cache, uid, FALSE);
+	}
+
+	camel_object_unref (stream);
+	camel_object_unref (in);
+	if (boundary)
+		g_free (boundary);
+	camel_object_unref (to);
+
+	camel_imap_message_cache_remove (cache, uid);
+	rename (real, real1);
+  }
+
+  g_free (real);
+  g_free (real1);
+
 }
 
 /**

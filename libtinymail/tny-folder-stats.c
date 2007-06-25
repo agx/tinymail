@@ -164,6 +164,7 @@ tny_folder_stats_finalize (GObject *object)
 
 	if (priv->folder)
 		g_object_unref (G_OBJECT (priv->folder));
+	priv->folder = NULL;
 
 	(*parent_class->finalize) (object);
 

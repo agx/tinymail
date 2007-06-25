@@ -29,6 +29,29 @@
 
 
 /**
+ * tny_msg_uncache_attachments:
+ * @self: a #TnyMsg object
+ * 
+ * Uncache the attachments of @self.
+ * 
+ **/
+void 
+tny_msg_uncache_attachments (TnyMsg *self)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG (self));
+	g_assert (TNY_MSG_GET_IFACE (self)->uncache_attachments_func != NULL);
+#endif
+
+	TNY_MSG_GET_IFACE (self)->uncache_attachments_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return;
+}
+
+/**
  * tny_msg_get_url_string:
  * @self: a #TnyMsg object
  * 

@@ -61,6 +61,8 @@
 
 #include "camel-disco-diary.h"
 
+#include "camel-stream-buffer.h"
+
 #define d(x) 
 
 #define CF_CLASS(o) (CAMEL_FOLDER_CLASS (CAMEL_OBJECT_GET_CLASS(o)))
@@ -76,6 +78,8 @@ static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid,
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
 static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex);
 static int pop3_get_local_size (CamelFolder *folder);
+
+static void pop3_delete_attachments (CamelFolder *folder, const char *uid);
 
 
 static void 
@@ -734,6 +738,14 @@ done:
 }
 
 
+static void
+pop3_delete_attachments (CamelFolder *folder, const char *uid)
+{
+	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
+	camel_data_cache_delete_attachments (pop3_store->cache, "cache", uid);
+	return;
+}
+
 static CamelMimeMessage *
 pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
@@ -755,12 +767,13 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		message = camel_mime_message_new ();
 		if (camel_data_wrapper_construct_from_stream((CamelDataWrapper *)message, stream) == -1) {
 			if (errno == EINTR)
-				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
+				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, "User canceled");
 			else
 				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-						      _("Cannot get message %s: %s"),
+						      "Cannot get message %s: %s",
 						      uid, g_strerror (errno));
-			camel_object_unref((CamelObject *)message);
+			if (message)
+				camel_object_unref (message);
 			message = NULL;
 		}
 
@@ -1254,6 +1267,7 @@ camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
 	camel_folder_class->free_uids = camel_folder_free_shallow;
 	camel_folder_class->get_message = pop3_get_message;
 	camel_folder_class->set_message_flags = pop3_set_message_flags;
+	camel_folder_class->delete_attachments = pop3_delete_attachments;
 
 	camel_disco_folder_class->refresh_info_online = pop3_refresh_info;
 	camel_disco_folder_class->sync_online = pop3_sync_online;

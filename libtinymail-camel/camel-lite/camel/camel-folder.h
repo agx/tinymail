@@ -204,6 +204,8 @@ typedef struct {
 	gboolean (*is_frozen) (CamelFolder *folder);
 	void (*set_push_email) (CamelFolder *folder, gboolean setting);
 
+	void (*delete_attachments) (CamelFolder *folder, const char *uid);
+
 } CamelFolderClass;
 
 /* Standard Camel function */
@@ -359,6 +361,8 @@ void			camel_folder_change_info_recent_uid	(CamelFolderChangeInfo *info, const c
 void camel_folder_set_push_email (CamelFolder *folder, gboolean setting);
 
 int camel_folder_get_local_size   (CamelFolder *folder);
+
+void camel_folder_delete_attachments (CamelFolder *folder, const char *uid);
 
 G_END_DECLS
 

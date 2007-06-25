@@ -85,7 +85,6 @@ static void append_message (CamelFolder *folder, CamelMimeMessage *message,
 			    const CamelMessageInfo *info, char **appended_uid,
 			    CamelException *ex);
 
-
 static GPtrArray        *get_uids            (CamelFolder *folder);
 static void              free_uids           (CamelFolder *folder,
 					      GPtrArray *array);
@@ -117,6 +116,11 @@ static gboolean        folder_changed        (CamelObject *object,
 					      gpointer event_data);
 
 static int get_local_size (CamelFolder *folder);
+
+static void 
+delete_attachments (CamelFolder *folder, const char *uid)
+{
+}
 
 static void 
 folder_set_push_email (CamelFolder *folder, gboolean setting)
@@ -172,6 +176,7 @@ camel_folder_class_init (CamelFolderClass *camel_folder_class)
 	camel_folder_class->freeze = freeze;
 	camel_folder_class->thaw = thaw;
 	camel_folder_class->is_frozen = is_frozen;
+	camel_folder_class->delete_attachments = delete_attachments;
 
 	/* virtual method overload */
 	camel_object_class->getv = folder_getv;
@@ -318,6 +323,14 @@ camel_folder_refresh_info (CamelFolder *folder, CamelException *ex)
 	g_return_if_fail (CAMEL_IS_FOLDER (folder));
 
 	CF_CLASS (folder)->refresh_info (folder, ex);
+}
+
+void 
+camel_folder_delete_attachments (CamelFolder *folder, const char *uid)
+{
+	g_return_if_fail (CAMEL_IS_FOLDER (folder));
+
+	return CF_CLASS (folder)->delete_attachments (folder, uid);
 }
 
 static int
