@@ -3989,12 +3989,34 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 
 
 
+/**
+ * tny_camel_folder_set_strict_retrieval:
+ * @self: a #TnyCamelFolder instance
+ * @setting: whether or not to enforce strict retrieval
+ * 
+ * API WARNING: This API might change
+ *
+ * Sets whether or not the message retrieve strategies need to strictly enforce
+ * the retrieval type. For example in case of a partial retrieval strategy,
+ * enforce a removal of a full previously retrieved message and retrieve a
+ * new message. In case of a full retrieval strategy and a partial cache, remove
+ * the partial cache and retrieve the message again.
+ *
+ **/
+void 
+tny_camel_folder_set_strict_retrieval (TnyCamelFolder *self, gboolean setting)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	priv->strict_retrieval = setting;
+}
+
 static void
 tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyCamelFolder *self = (TnyCamelFolder *)instance;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	priv->strict_retrieval = FALSE;
 	priv->self = (TnyFolder *) self;
 	priv->want_changes = TRUE;
 	priv->caps = 0;

@@ -66,12 +66,17 @@ tny_camel_full_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrate
 	CamelMimeMessage *camel_message = NULL;
 	gchar *id;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelFolderReceiveType mtype = CAMEL_FOLDER_RECEIVE_FULL;
 
 	g_assert (TNY_IS_HEADER (header));
 
+
+	if (!priv->strict_retrieval)
+		mtype = CAMEL_FOLDER_RECEIVE_ANY_OR_FULL;
+
 	id = g_strdup (tny_header_get_uid (TNY_HEADER (header)));
 	message = NULL;
-	camel_message = camel_folder_get_message (priv->folder, (const char *) id, CAMEL_FOLDER_RECEIVE_FULL, -1, &ex);
+	camel_message = camel_folder_get_message (priv->folder, (const char *) id, mtype, -1, &ex);
 	g_free (id);
 
 	if (camel_exception_is_set (&ex))

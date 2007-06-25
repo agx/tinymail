@@ -32,6 +32,8 @@
  * tny_msg_uncache_attachments:
  * @self: a #TnyMsg object
  * 
+ * API WARNING: This API might change
+ * 
  * Uncache the attachments of @self.
  * 
  **/

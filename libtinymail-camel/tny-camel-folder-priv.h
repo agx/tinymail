@@ -39,7 +39,7 @@ struct _TnyCamelFolderPriv
 	gchar *folder_name;
 	TnyAccount *account; CamelStore *store;
 	guint cached_length, unread_length, unread_sync, local_size;
-	gboolean subscribed;
+	gboolean subscribed, strict_retrieval;
 	gboolean has_summary_cap;
 	CamelFolderInfo *iter;
 	gboolean iter_parented, push;

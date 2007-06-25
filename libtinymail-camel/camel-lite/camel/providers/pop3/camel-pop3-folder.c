@@ -835,9 +835,11 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 		if ((type & CAMEL_FOLDER_RECEIVE_FULL) && camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
 		{
+
 			camel_data_cache_remove (pop3_store->cache, "cache", fi->uid, &tex);
 			im_certain = TRUE;
-		} else if ((type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_SIZE_LIMITED) 
+
+		} else if ((type & CAMEL_FOLDER_RECEIVE_PARTIAL) 
 			&& !camel_data_cache_is_partial (pop3_store->cache, "cache", fi->uid))
 		{
 			camel_data_cache_remove (pop3_store->cache, "cache", fi->uid, &tex);
@@ -865,10 +867,11 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		pop3_store->engine->type = type;
 		pop3_store->engine->param = param;
 
-		if (type & CAMEL_FOLDER_RECEIVE_FULL)
+		if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL)
 			pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
 				cmd_tocache, fi, "RETR %u\r\n", fi->id);
-		else if (type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_SIZE_LIMITED)
+
+		else if (type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_PARTIAL)
 			pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
 				cmd_tocache_partial, fi, "RETR %u\r\n", fi->id);
 

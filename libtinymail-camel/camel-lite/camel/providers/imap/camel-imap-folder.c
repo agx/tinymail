@@ -3972,12 +3972,17 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	connected = camel_disco_store_check_online(CAMEL_DISCO_STORE (folder->parent_store), &tex);
 
 	if (connected && ((type & CAMEL_FOLDER_RECEIVE_FULL) && camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
-		camel_imap_message_cache_remove (imap_folder->cache, uid);
-	else if (connected && ((type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_SIZE_LIMITED) 
-			&& !camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
-		camel_imap_message_cache_remove (imap_folder->cache, uid);
-	else
 	{
+
+		camel_imap_message_cache_remove (imap_folder->cache, uid);
+
+	} else if (connected && ((type & CAMEL_FOLDER_RECEIVE_PARTIAL)
+			&& !camel_imap_message_cache_is_partial (imap_folder->cache, uid)))
+	{
+
+		camel_imap_message_cache_remove (imap_folder->cache, uid);
+
+	} else {
 		stream = camel_imap_message_cache_get (imap_folder->cache, uid, section_text, ex);
 		if (!stream && (!strcmp (section_text, "HEADER") || !strcmp (section_text, "0"))) 
 		{
@@ -4050,7 +4055,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
-	if (type & CAMEL_FOLDER_RECEIVE_FULL)
+	if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL)
 		stream = camel_imap_message_cache_insert (imap_folder->cache, 
 			uid, section_text, "", 0, NULL);
 	else /* CAMEL_FOLDER_RECEIVE_PARTIAL, CAMEL_FOLDER_RECEIVE_SIZE_LIMITED or any */
@@ -4064,7 +4069,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		goto errorhander;
 	}
 
-	if (type & CAMEL_FOLDER_RECEIVE_FULL)
+	if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL)
 	{
 		camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
 

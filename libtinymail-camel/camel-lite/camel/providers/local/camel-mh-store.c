@@ -41,6 +41,7 @@
 #include "camel-mh-store.h"
 #include "camel-mh-summary.h"
 #include "camel-string-utils.h"
+#include "camel-file-utils.h"
 
 static CamelLocalStoreClass *parent_class = NULL;
 
