@@ -515,10 +515,10 @@ local_sync(CamelFolder *folder, gboolean expunge, CamelException *ex)
 	camel_local_summary_sync((CamelLocalSummary *)folder->summary, expunge, lf->changes, ex);
 	camel_local_folder_unlock(lf);
 
-	/*if (camel_folder_change_info_changed(lf->changes)) {
+	if (camel_folder_change_info_changed(lf->changes)) {
 		camel_object_trigger_event(CAMEL_OBJECT(folder), "folder_changed", lf->changes);
 		camel_folder_change_info_clear(lf->changes);
-	}*/
+	}
 }
 
 static void

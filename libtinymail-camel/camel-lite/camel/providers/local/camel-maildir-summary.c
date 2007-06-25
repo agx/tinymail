@@ -751,6 +751,7 @@ maildir_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChange
 					camel_index_delete_name(cls->index, camel_message_info_uid(info));
 
 				camel_folder_change_info_remove_uid(changes, camel_message_info_uid(info));
+				((CamelMessageInfoBase*)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
 				camel_folder_summary_remove((CamelFolderSummary *)cls, info);
 			}
 			g_free(name);
