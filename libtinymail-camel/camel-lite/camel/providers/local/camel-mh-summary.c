@@ -196,6 +196,8 @@ remove_summary(char *key, CamelMessageInfo *info, CamelLocalSummary *cls)
 	d(printf("removing message %s from summary\n", key));
 	if (cls->index)
 		camel_index_delete_name(cls->index, camel_message_info_uid(info));
+
+	((CamelMessageInfoBase*)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
 	camel_folder_summary_remove((CamelFolderSummary *)cls, info);
 	camel_message_info_free(info);
 }
@@ -266,6 +268,7 @@ mh_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changeinfo, Came
 				/* need to add this file to the summary */
 				if (info != NULL) {
 					g_hash_table_remove(left, camel_message_info_uid(info));
+					((CamelMessageInfoBase*)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
 					camel_folder_summary_remove((CamelFolderSummary *)cls, info);
 					camel_message_info_free(info);
 				}
@@ -329,6 +332,7 @@ mh_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChangeInfo 
 					camel_index_delete_name(cls->index, (char *)uid);
 				
 				camel_folder_change_info_remove_uid(changes, uid);
+				((CamelMessageInfoBase*)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
 				camel_folder_summary_remove((CamelFolderSummary *)cls, (CamelMessageInfo *)info);
 			}
 			g_free(name);

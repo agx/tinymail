@@ -985,6 +985,7 @@ camel_mbox_summary_sync_mbox(CamelMboxSummary *cls, guint32 flags, CamelFolderCh
 
 			/* remove it from the change list */
 			camel_folder_change_info_remove_uid(changeinfo, uid);
+			((CamelMessageInfoBase*)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
 			camel_folder_summary_remove(s, (CamelMessageInfo *)info);
 			camel_message_info_free((CamelMessageInfo *)info);
 			count--;

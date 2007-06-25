@@ -3959,7 +3959,7 @@ camel_header_msgid_generate (void)
 	static int count = 0;
 	char *msgid;
 	int retval;
-	struct addrinfo *ai = NULL, hints = { 0 };
+	struct addrinfo *ai = NULL;/*, hints = { 0 };*/
 
 	retval = gethostname (host, sizeof (host));
 	if (retval == 0 && *host) {
