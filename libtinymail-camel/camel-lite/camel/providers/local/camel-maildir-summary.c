@@ -190,8 +190,9 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 	int i;
 
 	uid = camel_message_info_uid (info);
-	buf = g_alloca (strlen (uid) + strlen (":2,") +  (sizeof (flagbits) / sizeof (flagbits[0])) + 1);
-	p = buf + sprintf (buf, "%s:2,", uid);
+	/* TNY CHANGE: This used to he ":2,", but VFAT does not allow those characters */
+	buf = g_alloca (strlen (uid) + strlen ("_2_") +  (sizeof (flagbits) / sizeof (flagbits[0])) + 1);
+	p = buf + sprintf (buf, "%s_2_", uid);
 	for (i = 0; i < sizeof (flagbits) / sizeof (flagbits[0]); i++) {
 		if (info->info.info.flags & flagbits[i].flagbit)
 			*p++ = flagbits[i].flag;

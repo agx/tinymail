@@ -1,3 +1,7 @@
+2007-06-26  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Maildir on MMC (VFAT)
+
 2007-06-25  Philip Van Hoof  <pvanhoof@gnome.org>
 	
 	* Deleting messages from local folders (bugfix about ghost rows)
