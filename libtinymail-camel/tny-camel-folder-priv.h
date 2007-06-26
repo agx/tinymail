@@ -48,7 +48,7 @@ struct _TnyCamelFolderPriv
 	TnyMsgRemoveStrategy *remove_strat;
 	TnyMsgReceiveStrategy *receive_strat;
 	TnyList *observers, *sobservers; TnyFolder *self;
-	gboolean want_changes, dont_fkill;
+	gboolean want_changes, handle_changes, dont_fkill;
 	TnyFolderStore *parent;
 	TnyFolderCaps caps;
 };

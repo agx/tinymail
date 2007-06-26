@@ -184,7 +184,6 @@ static TnyHeaderFlags
 tny_camel_msg_header_get_flags (TnyHeader *self)
 {
   
-	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *priority_string = NULL;
 

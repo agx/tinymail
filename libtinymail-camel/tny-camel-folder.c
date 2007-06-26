@@ -163,6 +163,9 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	gboolean old = priv->dont_fkill, has_chg = FALSE;
 	gint i = 0;
 
+	if (!priv->handle_changes)
+		return;
+
 	g_static_rec_mutex_lock (priv->folder_lock);
 
 	if (!priv->folder) 
@@ -2497,8 +2500,12 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 
 	g_object_unref (G_OBJECT (iter));
 
+	priv_src->handle_changes = FALSE;
+	priv_dst->handle_changes = FALSE;
 	camel_folder_transfer_messages_to (cfol_src, uids, cfol_dst, 
 			&transferred_uids, delete_originals, &ex);
+	priv_src->handle_changes = TRUE;
+	priv_dst->handle_changes = TRUE;
 
 	if (camel_exception_is_set (&ex)) 
 	{
@@ -4028,6 +4035,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->strict_retrieval = FALSE;
 	priv->self = (TnyFolder *) self;
 	priv->want_changes = TRUE;
+	priv->handle_changes = TRUE;
 	priv->caps = 0;
 	priv->local_size = 0;
 	priv->unread_sync = 0;
