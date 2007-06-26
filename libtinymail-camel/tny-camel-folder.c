@@ -3835,7 +3835,9 @@ tny_camel_folder_finalize (GObject *object)
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
 	{
 		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+		g_static_rec_mutex_lock (apriv->factory_lock);
 		apriv->managed_folders = g_list_remove (apriv->managed_folders, self);
+		g_static_rec_mutex_unlock (apriv->factory_lock);
 	}
 
 	if (!priv->iter_parented && priv->iter)
