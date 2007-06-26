@@ -494,6 +494,8 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->sobservers = NULL;
 	priv->iter = NULL;
 	priv->cant_reuse_iter = TRUE;
+	priv->factory_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->factory_lock);
 
 	return;
 }
@@ -530,6 +532,9 @@ tny_camel_store_account_finalize (GObject *object)
 		camel_object_unref (CAMEL_OBJECT (priv->iter_store));
 	}
 
+	g_static_rec_mutex_free (priv->factory_lock);
+	priv->factory_lock = NULL;
+
 	/* Disco store ? */
 
 	(*parent_class->finalize) (object);
@@ -558,7 +563,6 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 	/* TNY TODO: Support non-TnyCamelFolder TnyFolder implementations too */
 
-
 	store = CAMEL_STORE (apriv->service);
 
 	if (camel_exception_is_set (&ex)) 
@@ -577,9 +581,13 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 	g_assert (CAMEL_IS_STORE (store));
 
+	g_static_rec_mutex_lock (aspriv->factory_lock);
+
 	if (!cpriv->folder_name)
 	{
 		g_warning ("Trying to remove an invalid folder\n");
+		g_static_rec_mutex_unlock (aspriv->factory_lock);
+
 		return;
 	}
 
@@ -626,8 +634,10 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 	g_free (cpriv->folder_name); 
 	cpriv->folder_name = NULL;
-	apriv->managed_folders = 
-		g_list_remove (apriv->managed_folders, cfol);
+	aspriv->managed_folders = 
+		g_list_remove (aspriv->managed_folders, cfol);
+
+	g_static_rec_mutex_unlock (aspriv->factory_lock);
 
 	camel_object_unref (CAMEL_OBJECT (store));
 
@@ -869,7 +879,11 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelFolder *folder = NULL;
 
-	GList *copy = priv->managed_folders;
+	GList *copy = NULL;
+
+	g_static_rec_mutex_lock (priv->factory_lock);
+
+	copy = priv->managed_folders;
 	while (copy)
 	{
 		TnyFolder *fnd = (TnyFolder*) copy->data;
@@ -894,6 +908,8 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 
 		*was_new = TRUE;
 	}
+
+	g_static_rec_mutex_unlock (priv->factory_lock);
 
 	return (TnyFolder *) folder;
 }

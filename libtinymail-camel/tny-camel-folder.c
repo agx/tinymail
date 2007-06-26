@@ -2857,6 +2857,8 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	gboolean changed = FALSE;
 
+	g_static_rec_mutex_lock (apriv->factory_lock);
+
 	g_static_rec_mutex_lock (priv->folder_lock);
 	g_static_rec_mutex_lock (cpriv->folder_lock);
 
@@ -2911,6 +2913,7 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 				changed = TRUE;
 				g_free (cpriv->folder_name); 
 				cpriv->folder_name = NULL;
+
 				apriv->managed_folders = 
 					g_list_remove (apriv->managed_folders, cfol);
 			}
@@ -2929,6 +2932,8 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 		notify_folder_store_observers_about (self, change);
 		g_object_unref (G_OBJECT (change));
 	}
+
+	g_static_rec_mutex_unlock (apriv->factory_lock);
 
 	return;
 }

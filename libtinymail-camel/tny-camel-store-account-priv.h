@@ -29,6 +29,7 @@ struct _TnyCamelStoreAccountPriv
 	GList *managed_folders;
 	TnyList *sobservers;
 	gboolean cant_reuse_iter;
+	GStaticRecMutex *factory_lock; 
 };
 
 #define TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE(o)	\
