@@ -626,6 +626,8 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 	g_free (cpriv->folder_name); 
 	cpriv->folder_name = NULL;
+	apriv->managed_folders = 
+		g_list_remove (apriv->managed_folders, cfol);
 
 	camel_object_unref (CAMEL_OBJECT (store));
 
@@ -875,7 +877,7 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 		
 		/* printf ("COMPARE: [%s] [%s]\n", name, full_name); */
 
-		if (!strcmp (name, full_name))
+		if (name && full_name && !strcmp (name, full_name))
 		{
 			folder = TNY_CAMEL_FOLDER (g_object_ref (G_OBJECT (fnd)));
 			*was_new = FALSE;

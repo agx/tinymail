@@ -2911,6 +2911,8 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 				changed = TRUE;
 				g_free (cpriv->folder_name); 
 				cpriv->folder_name = NULL;
+				apriv->managed_folders = 
+					g_list_remove (apriv->managed_folders, cfol);
 			}
 		}
 	}

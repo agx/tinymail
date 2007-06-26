@@ -1,6 +1,8 @@
 2007-06-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
-	* Maildir on MMC (VFAT)
+	* Maildir on MMC (VFAT) (non-allowed characters on that FS type)
+	* Fixed a bug when removing folders (apriv->managed_folders needed to
+	get rid of the folder instance)
 
 2007-06-25  Philip Van Hoof  <pvanhoof@gnome.org>
 	
