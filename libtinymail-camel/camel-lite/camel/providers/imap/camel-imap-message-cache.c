@@ -508,26 +508,16 @@ camel_imap_message_cache_get (CamelImapMessageCache *cache, const char *uid,
 }
 
 
-
-void
-camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const char *uid)
+static int 
+recursive_insanity (CamelStreamBuffer *stream, CamelStream *to, gchar *boundary_in, gchar *root_boundary)
 {
-  CamelStream *in = camel_imap_message_cache_get (cache, uid, "", NULL);
-  gchar *real1 = g_strdup_printf ("%s/%s.", cache->path, uid);
-  gchar *real = g_strdup_printf ("%s.tmp", real1);
-  CamelStream *to = camel_stream_fs_new_with_name (real, O_RDWR|O_CREAT|O_TRUNC, 0600);
-
-  if (in && to)
-  {
-	CamelStreamBuffer *stream = (CamelStreamBuffer *) camel_stream_buffer_new (in, CAMEL_STREAM_BUFFER_READ);
-	char *buffer;
-	int w = 0, n;
-	gchar *boundary = NULL;
-	gboolean occurred = FALSE, theend = FALSE;
+	char *buffer = NULL;
+	int w = 0, n = -1;
+	gchar *boundary = boundary_in;
+	gboolean open = FALSE, do_write = TRUE, first_write = FALSE;
 	unsigned int len;
-
-	/* if ((n = camel_stream_write(to, "*", 1)) == -1)
-		theend = TRUE; */
+	GList *keep = NULL;
+	gboolean theend = FALSE;
 
 	while (!theend)
 	{
@@ -536,18 +526,18 @@ camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const
 		if (!buffer) {
 			theend = TRUE;
 			continue;
-		}
+		} else if (n == -1)
+			n = 0;
 
 		len = strlen (buffer);
 
 		if (boundary == NULL)
 		{
-			   CamelContentType *ct = NULL;
-			   const char *bound=NULL;
 			   char *pstr = (char*)strcasestr ((const char *) buffer, "boundary");
 
 			   if (pstr) 
 			   {
+
 				char *end;
 				pstr = strchr (pstr, '"'); 
 				if (pstr) { 
@@ -556,51 +546,141 @@ camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const
 					if (end) {
 						*end='\0';
 						boundary = g_strdup (pstr);
+						root_boundary = boundary;
 					}
 				}
 			   }
 
-			   if (ct) 
-			   { 
-				bound = camel_content_type_param(ct, "boundary");
-				if (bound && strlen (bound) > 0) 
-					boundary = g_strdup (bound);
-			   }
 		} else if (strstr ((const char*) buffer, (const char*) boundary))
 		{
-			if (occurred)
-				theend = TRUE;
-			occurred = TRUE;
+			do_write = FALSE;
+
+			g_list_foreach (keep, (GFunc) g_free, NULL);
+			g_list_free (keep);
+			keep = NULL;
+
+			if (!open)
+				open = TRUE;
+			else if (open)
+				open = FALSE;
 		}
 
-		if (!theend)
+		if (open)
 		{
+			if (strstr ((const char*) buffer, (const char*) "Content-Type") &&
+					strstr ((const char*) buffer, (const char*) "multipart/alternative") &&
+					strcasestr ((const char*) buffer, (const char*) "boundary"))
+			{
+				char *nboundary = NULL;
+				char *pstr = (char*)strcasestr ((const char *) buffer, "boundary");
+
+				if (pstr) 
+				{
+					char *end;
+					pstr = strchr (pstr, '"'); 
+					if (pstr) { 
+						pstr++;
+						end = strchr (pstr, '"');
+						if (end) {
+							*end='\0';
+							nboundary = g_strdup (pstr);
+						}
+					}
+				}
+				if (nboundary) {
+					n = recursive_insanity (stream, to, nboundary, root_boundary);
+					if (n == -1)
+						break;
+				}
+			}
+
+			if (strstr ((const char*) buffer, (const char*) "Content-Type") &&
+					strstr ((const char*) buffer, (const char*) "text/"))
+			{
+
+				do_write = TRUE;
+				first_write = TRUE;
+			} else {
+				if (strchr (buffer, ':'))
+					keep = g_list_append (keep, g_strdup (buffer));
+			}
+		}
+
+		if (do_write)
+		{
+
+		    if (first_write) 
+		    {
+			GList *copy = keep;
+
+			if (root_boundary != NULL)
+			{
+				gchar *nb = g_strdup_printf ("\n--%s\n", root_boundary);
+				n = camel_stream_write(to, nb, strlen (nb));
+				g_free (nb);
+			}
+
+			while (copy) {
+				char *buf = copy->data;
+				n = camel_stream_write(to, (const char*) buf, len);
+				 if (n == -1 || camel_stream_write(to, "\n", 1) == -1)
+					break;
+				g_free (copy->data);
+				copy = g_list_next (copy);
+			}
+			g_list_free (keep);
+			keep = NULL; 
+		    }
+		    first_write = FALSE;
+
 		    n = camel_stream_write(to, (const char*) buffer, len);
 		    if (n == -1 || camel_stream_write(to, "\n", 1) == -1)
 			break;
 		    w += n+1;
-		} else if (boundary != NULL)
-		{
-		    gchar *nb = g_strdup_printf ("\n--%s\n", boundary);
-		    n = camel_stream_write(to, nb, strlen (nb));
-		    g_free (nb);
+
 		}
 	}
 
-	/* it all worked, output a '#' to say we're a-ok */
-	if (n != -1 || theend) {
+	if (boundary)
+		g_free (boundary);
+
+	return n;
+}
+
+void
+camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const char *uid)
+{
+  CamelStream *in = camel_imap_message_cache_get (cache, uid, "", NULL);
+  gchar *real1 = g_strdup_printf ("%s/%s.", cache->path, uid);
+  gchar *real = g_strdup_printf ("%s.tmp", real1);
+  CamelStream *to = camel_stream_fs_new_with_name (real, O_RDWR|O_CREAT|O_TRUNC, 0600);
+  int n;
+
+  if (in && to)
+  {
+	CamelStreamBuffer *stream = (CamelStreamBuffer *) camel_stream_buffer_new (in, CAMEL_STREAM_BUFFER_READ);
+
+	n = recursive_insanity (stream, to, NULL, NULL);
+
+	/*if (boundary != NULL)
+	{
+	    gchar *nb = g_strdup_printf ("\n--%s\n", boundary);
+	    n = camel_stream_write(to, nb, strlen (nb));
+	    g_free (nb);
+	}*/
+
+	if (n != -1) {
 		camel_stream_reset(to);
-		/* n = camel_stream_write(to, "#", 1); */
-		if (theend)
+		/*if (theend)
 			camel_imap_message_cache_set_partial (cache, uid, TRUE);
-		else
- 			camel_imap_message_cache_set_partial (cache, uid, FALSE);
+		else*/
+ 			camel_imap_message_cache_set_partial (cache, uid, TRUE);
 	}
 
 	camel_object_unref (stream);
 	camel_object_unref (in);
-	if (boundary)
-		g_free (boundary);
+	/*if (boundary)
+		g_free (boundary);*/
 	camel_object_unref (to);
 
 	camel_imap_message_cache_remove (cache, uid);
