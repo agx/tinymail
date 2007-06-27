@@ -73,6 +73,7 @@ void _tny_camel_folder_unreason (TnyCamelFolderPriv *priv);
 void _tny_camel_folder_reason (TnyCamelFolderPriv *priv);
 
 void _tny_camel_folder_uncache_attachments (TnyCamelFolder *self, const gchar *uid);
+void _tny_camel_folder_rewrite_cache (TnyCamelFolder *self, const gchar *uid, CamelMimeMessage *msg);
 
 void _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err);
 

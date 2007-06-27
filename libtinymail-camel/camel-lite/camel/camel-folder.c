@@ -123,6 +123,11 @@ delete_attachments (CamelFolder *folder, const char *uid)
 }
 
 static void 
+rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg)
+{
+}
+
+static void 
 folder_set_push_email (CamelFolder *folder, gboolean setting)
 {
 	return;
@@ -177,6 +182,7 @@ camel_folder_class_init (CamelFolderClass *camel_folder_class)
 	camel_folder_class->thaw = thaw;
 	camel_folder_class->is_frozen = is_frozen;
 	camel_folder_class->delete_attachments = delete_attachments;
+	camel_folder_class->rewrite_cache = rewrite_cache;
 
 	/* virtual method overload */
 	camel_object_class->getv = folder_getv;
@@ -331,6 +337,14 @@ camel_folder_delete_attachments (CamelFolder *folder, const char *uid)
 	g_return_if_fail (CAMEL_IS_FOLDER (folder));
 
 	return CF_CLASS (folder)->delete_attachments (folder, uid);
+}
+
+void 
+camel_folder_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg)
+{
+	g_return_if_fail (CAMEL_IS_FOLDER (folder));
+
+	return CF_CLASS (folder)->rewrite_cache (folder, uid, msg);
 }
 
 static int

@@ -1,3 +1,47 @@
+2007-06-27  Jose Dapena Paz  <jdapena@igalia.com>
+
+	These changes add support for purging specific attachments 
+	from cache, with an implementation in the IMAP backend. This
+	is a major API change.
+
+	* libtinymail/tny-msg.[ch]:
+	(tny_msg_rewrite_cache): added new method to rewrite cache
+	and expunge purged attachments if supported.
+
+	* libtinymail/tny-mime-part.[ch]:
+	(tny_mime_part_is_purged, tny_mime_part_set_purte): added two
+	methods that mark a mime part to be purged in cache (in
+	storages that support this).
+
+	* libtinymail-camel/tny-camel-folder.c:
+	(tny_camel_folder_rewrite_cache): new method that calls
+	the new Camel rewrite cache api for a message.
+
+	* libtinymail-camel/tny-camel-mime-part.[ch]:
+	implementation of tny_mime_part_is_purged and
+	tny_mime_part_set_purged, to mark parts to be purged
+	in IMAP.
+
+	* lintinymail-camel/camel-lite/camel/providers/camel-imap-folder.c:
+	(imap_rewrite_cache): new method that rewrites the cache representation
+	of a message purging attachments marked to be purged.
+
+	* libtinymail-camel/camel-lite/camel/providers/camel-imap-message-cache.[ch]:
+	(camel_imap_message_cache_replace_with_wrapper): replaces the cache
+	entry for a message with a new representation from wrapper. This should
+	purge attachments marked as purge, in collaboration with mime part.
+
+	* libtinymail-camel/camel-lite/camel/camel-folder.[ch]:
+	(rewrite_cache): added default empty implementation and virtual.
+
+	* libtinymail-camel/camel-lite/camel/camel-mime-part.c:
+	now, if message disposition is "purged", output for the attachment is
+	disabled. This should let user purge attachments on recaching.
+
+	* libtinymail-camel/tny-camel-msg.[ch]:
+	(tny_camel_msg_rewrite_cache_default, tny_camel_msg_rewrite_cache): implementation
+	of rewrite method using camel new methods to rewrite cache.
+
 2007-06-27  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c:

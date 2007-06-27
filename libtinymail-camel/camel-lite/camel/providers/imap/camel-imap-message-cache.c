@@ -451,6 +451,41 @@ camel_imap_message_cache_insert_wrapper (CamelImapMessageCache *cache,
 	}
 }
 
+/**
+ * camel_imap_message_cache_replace_with_wrapper:
+ * @cache: the cache
+ * @uid: UID of the message data to cache
+ * @part_spec: the IMAP part_spec of the data
+ * @wrapper: the wrapper to cache
+ *
+ * Caches the provided data into @cache.
+ **/
+void
+camel_imap_message_cache_replace_with_wrapper (CamelImapMessageCache *cache,
+					       const char *uid,
+					       CamelDataWrapper *wrapper, CamelException *ex)
+{
+	char *path, *key;
+	CamelStream *stream;
+	gchar *real = g_strdup_printf("%s/%s.purgetmp", cache->path, uid);
+
+	stream = camel_stream_fs_new_with_name (real, O_RDWR|O_CREAT|O_TRUNC, 0600);
+	g_free (real);
+	if (!stream)
+		return;
+	
+	if (camel_data_wrapper_write_to_stream (wrapper, stream) == -1) {
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				      _("Failed to cache message %s: %s"),
+				      uid, g_strerror (errno));
+	} else {
+		camel_object_unref (CAMEL_OBJECT (stream));
+		camel_imap_message_cache_remove (cache, uid);
+		camel_imap_message_cache_replace_cache (cache, uid, NULL, uid, "purgetmp");
+		camel_imap_message_cache_set_partial (cache, uid, TRUE);
+	}
+}
+
 
 /**
  * camel_imap_message_cache_get:
@@ -647,6 +682,18 @@ recursive_insanity (CamelStreamBuffer *stream, CamelStream *to, gchar *boundary_
 	return n;
 }
 
+void camel_imap_message_cache_replace_cache (CamelImapMessageCache *cache, const char *uid, const char *part_spec,
+					  const char *dest_uid, const char *dest_part_spec)
+{
+	gchar *real = g_strdup_printf ("%s/%s.%s", cache->path, uid, (part_spec)?part_spec:"");
+	gchar *dest_real = g_strdup_printf ("%s/%s.%s", cache->path, dest_uid, (dest_part_spec)?dest_part_spec:"");
+
+	rename (dest_real, real);
+
+	g_free (real);
+	g_free (dest_real);
+
+}
 void
 camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const char *uid)
 {

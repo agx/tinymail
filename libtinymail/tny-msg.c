@@ -54,6 +54,31 @@ tny_msg_uncache_attachments (TnyMsg *self)
 }
 
 /**
+ * tny_msg_rewrite_cache:
+ * @self: a #TnyMsg object
+ * 
+ * API WARNING: This API might change
+ * 
+ * Rewrite the message to cache, purging mime parts marked for purge.
+ * 
+ **/
+void 
+tny_msg_rewrite_cache (TnyMsg *self)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG (self));
+	g_assert (TNY_MSG_GET_IFACE (self)->rewrite_cache_func != NULL);
+#endif
+
+	TNY_MSG_GET_IFACE (self)->rewrite_cache_func (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return;
+}
+
+/**
  * tny_msg_get_url_string:
  * @self: a #TnyMsg object
  * 

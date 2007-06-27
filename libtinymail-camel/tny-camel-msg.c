@@ -201,6 +201,28 @@ tny_camel_msg_get_url_string_default (TnyMsg *self)
 	return retval;
 }
 
+static void
+tny_camel_msg_rewrite_cache_default (TnyMsg *self)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+	CamelMimeMessage *msg;
+	
+	if (priv->folder && priv->header) {
+		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
+		_tny_camel_folder_rewrite_cache (TNY_CAMEL_FOLDER(priv->folder),
+						 tny_header_get_uid (priv->header),
+						 msg);
+	}
+	return;
+}
+
+static void
+tny_camel_msg_rewrite_cache (TnyMsg *self)
+{
+	TNY_CAMEL_MSG_GET_CLASS (self)->rewrite_cache_func (self);
+	return;
+}
+
 static TnyHeader*
 tny_camel_msg_get_header_default (TnyMsg *self)
 {
@@ -326,6 +348,7 @@ tny_msg_init (gpointer g, gpointer iface_data)
 	klass->get_folder_func = tny_camel_msg_get_folder;
 	klass->get_url_string_func = tny_camel_msg_get_url_string;
 	klass->uncache_attachments_func = tny_camel_msg_uncache_attachments;
+	klass->rewrite_cache_func = tny_camel_msg_rewrite_cache;
 
 	return;
 }
@@ -334,17 +357,18 @@ static void
 tny_camel_msg_class_init (TnyCamelMsgClass *class)
 {
 	GObjectClass *object_class;
-
+	
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
-
+	
 	class->get_header_func = tny_camel_msg_get_header_default;
 	class->get_folder_func = tny_camel_msg_get_folder_default;
 	class->get_url_string_func = tny_camel_msg_get_url_string_default;
 	class->uncache_attachments_func = tny_camel_msg_uncache_attachments_default;
-
+	class->rewrite_cache_func = tny_camel_msg_rewrite_cache_default;
+	
 	object_class->finalize = tny_camel_msg_finalize;
-
+	
 	g_type_class_add_private (object_class, sizeof (TnyCamelMsgPriv));
 
 	return;
@@ -388,9 +412,9 @@ tny_camel_msg_get_type (void)
 	}
 
 	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
+	  {
+	    static const GTypeInfo info = 
+		  {
 		  sizeof (TnyCamelMsgClass),
 		  NULL,   /* base_init */
 		  NULL,   /* base_finalize */
@@ -402,21 +426,21 @@ tny_camel_msg_get_type (void)
 		  tny_camel_msg_instance_init,    /* instance_init */
 		  NULL
 		};
-
+		
 		static const GInterfaceInfo tny_msg_info = 
-		{
+		  {
 		  (GInterfaceInitFunc) tny_msg_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
-
+		
 		type = g_type_register_static (TNY_TYPE_CAMEL_MIME_PART,
-			"TnyCamelMsg",
-			&info, 0);
-
+					       "TnyCamelMsg",
+					       &info, 0);
+		
 		g_type_add_interface_static (type, TNY_TYPE_MSG,
-			&tny_msg_info);
-
+					     &tny_msg_info);
+		
 	}
 
 	return type;

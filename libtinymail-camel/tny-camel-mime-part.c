@@ -588,6 +588,22 @@ tny_camel_mime_part_get_content_type_default (TnyMimePart *self)
 	return priv->cached_content_type;
 }
 
+static gboolean
+tny_camel_mime_part_is_purged (TnyMimePart *self)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->is_purged_func (self);
+}
+
+static gboolean
+tny_camel_mime_part_is_purged_default (TnyMimePart *self)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	const gchar *disposition;
+
+	disposition = camel_mime_part_get_disposition (priv->part);
+	return (disposition != NULL) && (!strcmp (disposition, "purged"));
+}
+
 static gboolean 
 tny_camel_mime_part_content_type_is (TnyMimePart *self, const gchar *type)
 {
@@ -834,6 +850,23 @@ tny_camel_mime_part_set_content_type (TnyMimePart *self, const gchar *content_ty
 	return;
 }
 
+static void
+tny_camel_mime_part_set_purged_default (TnyMimePart *self)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+
+	g_mutex_lock (priv->part_lock);
+	camel_mime_part_set_disposition (priv->part, "purged");
+	g_mutex_unlock (priv->part_lock);
+}
+
+static void
+tny_camel_mime_part_set_purged (TnyMimePart *self)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->set_purged_func (self);
+	return;
+}
+
 static void 
 tny_camel_mime_part_set_content_type_default (TnyMimePart *self, const gchar *content_type)
 {
@@ -933,8 +966,10 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->get_content_id_func = tny_camel_mime_part_get_content_id;
 	klass->get_description_func = tny_camel_mime_part_get_description;
 	klass->get_content_location_func = tny_camel_mime_part_get_content_location;
+	klass->is_purged_func = tny_camel_mime_part_is_purged;
 	klass->set_content_location_func = tny_camel_mime_part_set_content_location;
 	klass->set_description_func = tny_camel_mime_part_set_description;
+	klass->set_purged_func = tny_camel_mime_part_set_purged;
 	klass->set_content_id_func = tny_camel_mime_part_set_content_id;
 	klass->set_filename_func = tny_camel_mime_part_set_filename;
 	klass->set_content_type_func = tny_camel_mime_part_set_content_type;
@@ -967,6 +1002,8 @@ tny_camel_mime_part_class_init (TnyCamelMimePartClass *class)
 	class->get_content_id_func = tny_camel_mime_part_get_content_id_default;
 	class->get_description_func = tny_camel_mime_part_get_description_default;
 	class->get_content_location_func = tny_camel_mime_part_get_content_location_default;
+	class->is_purged_func = tny_camel_mime_part_is_purged_default;
+	class->set_purged_func = tny_camel_mime_part_set_purged_default;
 	class->set_content_location_func = tny_camel_mime_part_set_content_location_default;
 	class->set_description_func = tny_camel_mime_part_set_description_default;
 	class->set_content_id_func = tny_camel_mime_part_set_content_id_default;

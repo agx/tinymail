@@ -456,6 +456,25 @@ _tny_camel_folder_uncache_attachments (TnyCamelFolder *self, const gchar *uid)
 	g_static_rec_mutex_unlock (priv->folder_lock);
 }
 
+void 
+_tny_camel_folder_rewrite_cache (TnyCamelFolder *self, const gchar *uid, CamelMimeMessage *msg)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
+		{
+			g_static_rec_mutex_unlock (priv->folder_lock);
+			return;
+		}
+
+	camel_folder_rewrite_cache (priv->folder, uid, msg);
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+}
+
 static void 
 tny_camel_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 {

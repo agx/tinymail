@@ -59,11 +59,13 @@ struct _TnyCamelMimePartClass
 	const gchar* (*get_content_id_func) (TnyMimePart *self);
 	const gchar* (*get_description_func) (TnyMimePart *self);
 	const gchar* (*get_content_location_func) (TnyMimePart *self);
+	gboolean (*is_purged_func) (TnyMimePart *self);
 	void (*set_content_location_func) (TnyMimePart *self, const gchar *content_location); 
 	void (*set_description_func) (TnyMimePart *self, const gchar *description); 
 	void (*set_content_id_func) (TnyMimePart *self, const gchar *content_id); 
 	void (*set_filename_func) (TnyMimePart *self, const gchar *filename);
 	void (*set_content_type_func) (TnyMimePart *self, const gchar *contenttype);
+	void (*set_purged_func) (TnyMimePart *self);
 	gboolean (*is_attachment_func) (TnyMimePart *self);
 	void (*get_parts_func) (TnyMimePart *self, TnyList *list);
 	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);

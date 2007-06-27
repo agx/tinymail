@@ -292,6 +292,25 @@ tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
 }
 
 /**
+ * tny_mime_part_set_purged:
+ * @self: a #TnyMimePart object
+ * 
+ * Set the message as purged in cache
+ *
+ **/
+void
+tny_mime_part_set_purged (TnyMimePart *self)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_purged_func != NULL);
+#endif
+
+	TNY_MIME_PART_GET_IFACE (self)->set_purged_func (self);
+	return;
+}
+
+/**
  * tny_mime_part_set_filename:
  * @self: a #TnyMimePart object
  * @filename: the filename 
@@ -387,6 +406,30 @@ tny_mime_part_get_content_id (TnyMimePart *self)
 #ifdef DBC /* ensure */
 	g_assert (retval == NULL || strlen (retval) > 0);
 #endif
+
+	return retval;
+}
+
+/**
+ * tny_mime_part_is_purged:
+ * @self: a #TnyMimePart object
+ * 
+ * Get if this attachment has been purged from cache.
+ *
+ * Return value: a #gboolean
+ *
+ **/
+gboolean
+tny_mime_part_is_purged (TnyMimePart *self)
+{
+	gboolean retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->is_purged_func != NULL);
+#endif
+
+	retval = TNY_MIME_PART_GET_IFACE (self)->is_purged_func (self);
 
 	return retval;
 }

@@ -779,6 +779,7 @@ write_to_stream (CamelDataWrapper *dw, CamelStream *stream)
 	ssize_t total = 0;
 	ssize_t count;
 	int errnosav;
+	const gchar *disposition;
 	
 	d(printf("mime_part::write_to_stream\n"));
 	
@@ -815,7 +816,13 @@ write_to_stream (CamelDataWrapper *dw, CamelStream *stream)
 	if (count == -1)
 		return -1;
 	total += count;
-	
+
+	disposition = camel_mime_part_get_disposition (mp);
+
+	if (disposition != NULL && !strcmp (disposition, "purged")) {
+		camel_mime_part_set_content (mp, " ", 1, "text/plain");
+	}
+
 	content = camel_medium_get_content_object(medium);
 	if (content) {
 		CamelMimeFilter *filter = NULL;

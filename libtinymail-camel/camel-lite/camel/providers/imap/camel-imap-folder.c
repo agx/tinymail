@@ -162,6 +162,7 @@ static void camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 GPtrArray* _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *folder_name, int *messages, int *unseen, gboolean withthem);
 
 static void imap_delete_attachments (CamelFolder *folder, const char *uid);
+static void imap_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
 
 #ifdef G_OS_WIN32
@@ -194,6 +195,7 @@ camel_imap_folder_class_init (CamelImapFolderClass *camel_imap_folder_class)
 	camel_folder_class->search_free = imap_search_free;
 	camel_folder_class->thaw = imap_thaw;
 	camel_folder_class->delete_attachments = imap_delete_attachments;
+	camel_folder_class->rewrite_cache = imap_rewrite_cache;
 
 	camel_disco_folder_class->refresh_info_online = imap_refresh_info;
 	camel_disco_folder_class->sync_online = imap_sync_online;
@@ -343,6 +345,17 @@ imap_delete_attachments (CamelFolder *folder, const char *uid)
 {
 	CamelImapMessageCache *cache = CAMEL_IMAP_FOLDER (folder)->cache;
 	camel_imap_message_cache_delete_attachments (cache, uid);
+	return;
+}
+
+static void
+imap_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg)
+{
+	CamelImapMessageCache *cache = CAMEL_IMAP_FOLDER (folder)->cache;
+
+	camel_imap_message_cache_replace_with_wrapper (cache, uid, CAMEL_DATA_WRAPPER  (msg), NULL);
+/* 	camel_imap_message_cache_remove (cache, uid); */
+/* 	camel_imap_message_cache_replace_cache (cache, uid, NULL, uid, ".purgetmp"); */
 	return;
 }
 

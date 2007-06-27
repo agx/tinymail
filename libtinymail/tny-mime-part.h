@@ -53,11 +53,14 @@ struct _TnyMimePartIface
 	const gchar* (*get_content_id_func) (TnyMimePart *self);
 	const gchar* (*get_description_func) (TnyMimePart *self);
 	const gchar* (*get_content_location_func) (TnyMimePart *self);
+	gboolean (*is_purged_func) (TnyMimePart *self);
+  
 	void (*set_content_location_func) (TnyMimePart *self, const gchar *content_location); 
 	void (*set_description_func) (TnyMimePart *self, const gchar *description); 
 	void (*set_content_id_func) (TnyMimePart *self, const gchar *content_id); 
 	void (*set_filename_func) (TnyMimePart *self, const gchar *filename);
 	void (*set_content_type_func) (TnyMimePart *self, const gchar *contenttype);
+	void (*set_purged_func) (TnyMimePart *self);
 	gboolean (*is_attachment_func) (TnyMimePart *self);
 	void (*get_parts_func) (TnyMimePart *self, TnyList *list);
 	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);
@@ -77,11 +80,13 @@ const gchar* tny_mime_part_get_filename (TnyMimePart *self);
 const gchar* tny_mime_part_get_content_id (TnyMimePart *self);
 const gchar* tny_mime_part_get_description (TnyMimePart *self);
 const gchar* tny_mime_part_get_content_location (TnyMimePart *self);
+gboolean tny_mime_part_is_purged (TnyMimePart *self);
 void tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_location);
 void tny_mime_part_set_description (TnyMimePart *self, const gchar *description); 
 void tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id); 
 void tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename);
 void tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype);
+void tny_mime_part_set_purged (TnyMimePart *self);
 gboolean tny_mime_part_is_attachment (TnyMimePart *self);
 void tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream);
 void tny_mime_part_get_parts (TnyMimePart *self, TnyList *list);

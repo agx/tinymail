@@ -206,6 +206,7 @@ typedef struct {
 	void (*set_push_email) (CamelFolder *folder, gboolean setting);
 
 	void (*delete_attachments) (CamelFolder *folder, const char *uid);
+	void (*rewrite_cache) (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
 } CamelFolderClass;
 
@@ -364,6 +365,7 @@ void camel_folder_set_push_email (CamelFolder *folder, gboolean setting);
 int camel_folder_get_local_size   (CamelFolder *folder);
 
 void camel_folder_delete_attachments (CamelFolder *folder, const char *uid);
+void camel_folder_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
 G_END_DECLS
 
