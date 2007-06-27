@@ -507,7 +507,11 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 			camel_exception_get_description (&ex));
 	} else if (!haderr)
 	{
-		TnyHeader *header = tny_msg_get_header (msg);
+		TnyHeader *header = NULL;
+
+		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (msg), self);
+
+		header = tny_msg_get_header (msg);
 
 		if (header && TNY_IS_HEADER (header))
 		{

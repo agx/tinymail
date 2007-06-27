@@ -130,6 +130,8 @@ _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder* folder)
 
 	g_mutex_lock (priv->folder_lock);
 	priv->folder = (TnyFolder*)folder;
+	if (priv->header)
+		((TnyCamelMsgHeader *)priv->header)->folder = folder;
 	g_object_ref (priv->folder);
 	g_mutex_unlock (priv->folder_lock);
 
