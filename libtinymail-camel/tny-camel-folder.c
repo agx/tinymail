@@ -341,7 +341,8 @@ do_try_on_success (CamelStore *store, TnyCamelFolderPriv *priv, CamelException *
 
 		if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
 		{
-			guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
+			guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
+				CAMEL_STORE_FOLDER_INFO_RECURSIVE;
 
 			if (priv->iter && !priv->iter_parented)
 				camel_folder_info_free  (priv->iter);
@@ -2014,6 +2015,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			g_error_free (nerr);
 		nerr = NULL;
 
+		/* The recurse_copy call deletes the original folder if del==TRUE */
 		cpyr = recurse_copy (self, into, new_name, del, &nerr, adds, rems);
 
 		if (nerr != NULL) {
@@ -2021,16 +2023,16 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				g_propagate_error (err, nerr);
 			else
 				g_error_free (nerr);
-		} else if (del) {
-			TnyFolderStore *from = tny_folder_get_folder_store (self);
-			tny_folder_store_remove_folder (from, self, &nerr);
-			g_object_unref (from);
-			if (nerr != NULL ) {
-				if (!tried)
-					g_propagate_error (err, nerr);
-				else
-					g_error_free (nerr);
-			}
+		} else {
+			/* Unload the folder. This way we'll get the
+			   right CamelFolderInfo objects for the
+			   TnyFolders */
+			TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (cpyr->created);
+			g_static_rec_mutex_lock (priv->folder_lock);
+			camel_folder_info_free  (priv->iter);
+			priv->iter = NULL;
+			unload_folder_no_lock (priv, FALSE);
+			g_static_rec_mutex_unlock (priv->folder_lock);
 		}
 
 		retval = cpyr->created;
@@ -2854,7 +2856,6 @@ tny_camel_folder_set_msg_remove_strategy_default (TnyFolder *self, TnyMsgRemoveS
 	return;
 }
 
-
 void 
 _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
@@ -2877,6 +2878,14 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 		/* Known memleak
 		camel_store_free_folder_info (apriv->iter_store, apriv->iter); */
 		apriv->iter = NULL;
+	}
+
+	if (TNY_IS_STORE_ACCOUNT (self)) {
+		TnyCamelStoreAccountPriv *ppriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+		ppriv->iter = NULL;
+	} else {
+		TnyCamelFolderPriv *ppriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+		ppriv->iter = NULL;
 	}
 
 	cfolname = cpriv->folder_name;
@@ -3033,7 +3042,6 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 
 	return;
 }
-
 
 void
 _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, CamelFolderInfo *info)
@@ -3832,12 +3840,15 @@ tny_camel_folder_finalize (GObject *object)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 
-	g_static_rec_mutex_lock (priv->obs_lock);
+	/* Commented because they should not be really needed but some
+	   times they're causing locking problems. TODO: review the
+	   source of this behaviour */
+/* 	g_static_rec_mutex_lock (priv->obs_lock); */
 	if (priv->observers)
 		g_object_unref (G_OBJECT (priv->observers));
 	if (priv->sobservers)
 		g_object_unref (G_OBJECT (priv->sobservers));
-	g_static_rec_mutex_unlock (priv->obs_lock);
+/* 	g_static_rec_mutex_unlock (priv->obs_lock); */
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 	priv->dont_fkill = FALSE;

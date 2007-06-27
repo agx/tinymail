@@ -1,3 +1,11 @@
+2007-06-27  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	Fixed an issue when removing folders. Fixed some issues when moving
+	folders, the priv->iter of the camel folders was not correctly created
+	so they do not have the right pointers to their children, parents and
+	siblings. NOTE that this is a risky patch, not completely tested.
+
 2007-06-27  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Several memory fixes, based on Valgrind error and warning reporting
