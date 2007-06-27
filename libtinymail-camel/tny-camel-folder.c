@@ -1196,13 +1196,13 @@ tny_camel_folder_get_msg_async_destroyer (gpointer thr_user_data)
 		change = tny_folder_change_new (info->self);
 		tny_folder_change_set_received_msg (change, info->msg);
 		notify_folder_observers_about (info->self, change);
-		g_object_unref (G_OBJECT (change));
-		g_object_unref (G_OBJECT (info->msg));
+		g_object_unref (change);
+		g_object_unref (info->msg);
 	}
 
 	/* thread reference */
 	_tny_camel_folder_unreason (priv);
-	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (info->self);
 
 	  if (info->err)
 		g_error_free (info->err);
