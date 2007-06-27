@@ -2120,9 +2120,12 @@ tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
 			info->delete_originals);
 	}
 
+	if (info->new_folder)
+		g_object_unref (info->new_folder);
+
 	/* thread reference */
-	g_object_unref (G_OBJECT (info->into));
-	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (info->into);
+	g_object_unref (info->self);
 	/* _tny_camel_folder_unreason (priv); */
 
 	if (info->err)
