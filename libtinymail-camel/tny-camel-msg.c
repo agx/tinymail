@@ -215,6 +215,8 @@ tny_camel_msg_get_header_default (TnyMsg *self)
 		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
 		/* Read _tny_camel_msg_header_new too! */
 		priv->header = _tny_camel_msg_header_new (msg, priv->folder);
+		if (priv->folder)
+			((TnyCamelMsgHeader *)priv->header)->folder = priv->folder;
 	}
 
 	retval = TNY_HEADER (g_object_ref (G_OBJECT (priv->header)));
