@@ -96,6 +96,12 @@ camel_folder_search_class_init (CamelFolderSearchClass *klass)
 
 	klass->not = search_not;
 
+	klass->and = NULL;
+	klass->or = NULL;
+	klass->lt = NULL;
+	klass->gt = NULL;
+	klass->eq = NULL;
+
 	klass->match_all = search_match_all;
 	klass->match_threads = search_match_threads;
 	klass->body_contains = search_body_contains;
