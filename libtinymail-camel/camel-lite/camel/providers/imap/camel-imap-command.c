@@ -293,11 +293,12 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	full_cmd = g_strdup_printf ("%c%.5u %s\r\n", store->tag_prefix, 
 		store->command++, cmd);
 	len = strlen (full_cmd);
-
 	
 	nwritten = camel_stream_write (store->ostream, full_cmd, len);
 
 	imap_debug ("(%d, %d) -> %s\n", len, nwritten, full_cmd);
+
+	g_free (full_cmd);
 
 	/* g_mutex_unlock (store->stream_lock); */
 
