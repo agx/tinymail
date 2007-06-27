@@ -1,3 +1,7 @@
+2007-06-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Several memory fixes, based on Valgrind error and warning reporting
+
 2007-06-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Maildir on MMC (VFAT) (non-allowed characters on that FS type)

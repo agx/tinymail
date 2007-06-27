@@ -1438,7 +1438,7 @@ folder_scan_init(void)
 	s->outptr = s->outbuf;
 	s->outend = s->outbuf+1024;
 
-	s->realbuf = g_malloc(SCAN_BUF + SCAN_HEAD*2);
+	s->realbuf = g_malloc0 (SCAN_BUF + SCAN_HEAD*2);
 	s->inbuf = s->realbuf + SCAN_HEAD;
 	s->inptr = s->inbuf;
 	s->inend = s->inbuf;
@@ -1839,6 +1839,7 @@ int main(int argc, char **argv)
 		s->scan_from = FALSE;
 #if 0
 		h = g_malloc0(sizeof(*h));
+		h->inptr = NULL;
 		h->savestate = CAMEL_MIME_PARSER_STATE_EOF;
 		folder_push_part(s, h);
 #endif	
