@@ -67,6 +67,7 @@
 #include "tny-camel-msg-priv.h"
 #include "tny-camel-common-priv.h"
 #include "tny-session-camel-priv.h"
+#include "tny-camel-msg-header-priv.h"
 
 #include <tny-camel-shared.h>
 
@@ -469,6 +470,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 	CamelMimeMessage *message;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	gboolean haderr = FALSE;
+	gchar *new_uid = NULL;
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
@@ -488,7 +490,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
 	if (message && CAMEL_IS_MIME_MESSAGE (message)) {
-		camel_folder_append_message (priv->folder, message, NULL, NULL, &ex);
+		camel_folder_append_message (priv->folder, message, NULL, &new_uid, &ex);
 		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 		priv->cached_length = camel_folder_get_message_count (priv->folder);
 	} else {
@@ -513,6 +515,9 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 
 		header = tny_msg_get_header (msg);
 
+		if (new_uid)
+			((TnyCamelMsgHeader *)header)->old_uid = g_strdup (new_uid);
+
 		if (header && TNY_IS_HEADER (header))
 		{
 			TnyFolderChange *change = tny_folder_change_new (self);
@@ -526,6 +531,9 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		if (header && G_IS_OBJECT (header))
 			g_object_unref (G_OBJECT (header));
 	}
+
+	if (new_uid)
+		g_free (new_uid);
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
