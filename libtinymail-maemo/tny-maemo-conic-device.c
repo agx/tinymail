@@ -531,7 +531,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	 * when we explicitly try to connect. 
 	 * The signal still does not seem to be emitted.
 	 */
-	g_object_set (cnx, "automatic-connection-events", TRUE, NULL);
+	g_object_set (priv->cnx, "automatic-connection-events", TRUE, NULL);
 
 	g_signal_connect (priv->cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), self);
