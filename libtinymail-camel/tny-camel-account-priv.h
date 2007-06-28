@@ -82,7 +82,7 @@ const gchar* _tny_camel_account_get_url_string (TnyCamelAccount *self);
 void _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what);
 void _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what, gboolean cancel);
 void _tny_camel_account_stop_camel_operation (TnyCamelAccount *self);
-void _tny_camel_account_try_connect (TnyCamelAccount *self, GError **err);
+void _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GError **err);
 void _tny_camel_account_clear_hooks (TnyCamelAccount *self);
 void _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if);
 

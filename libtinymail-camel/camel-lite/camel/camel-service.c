@@ -87,12 +87,6 @@ camel_service_class_init (CamelServiceClass *camel_service_class)
 	camel_service_class->query_auth_types = query_auth_types;
 	camel_service_class->get_name = get_name;
 	camel_service_class->get_path = get_path;
-
-	camel_object_class_add_event(object_class, "disconnection", NULL);
-	camel_object_class_add_event(object_class, "connection", NULL);
-	camel_object_class_add_event(object_class, "reconnection", NULL);
-	camel_object_class_add_event(object_class, "reconnecting", NULL);
-
 }
 
 static void
@@ -100,7 +94,12 @@ camel_service_init (void *o, void *k)
 {
 	CamelService *service = o;
 
+	service->connecting = NULL;
+	service->reconnecter = NULL;
+	service->reconnection = NULL;
+	service->disconnecting = NULL;
 	service->reconnecting = FALSE;
+
 	service->data = NULL;
 	service->priv = g_malloc0(sizeof(*service->priv));
 	g_static_rec_mutex_init(&service->priv->connect_lock);
@@ -118,8 +117,8 @@ camel_service_finalize (CamelObject *object)
 		camel_exception_init (&ex);
 		CSERV_CLASS (service)->disconnect (service, TRUE, &ex);
 
-		camel_object_trigger_event (CAMEL_OBJECT (service), 
-			"disconnection", (gpointer) TRUE);
+		if (service->disconnecting)
+			service->disconnecting (service, TRUE, service->data);
 
 		if (camel_exception_is_set (&ex)) {
 			w(g_warning ("camel_service_finalize: silent disconnect failure: %s",
@@ -393,8 +392,8 @@ camel_service_connect (CamelService *service, CamelException *ex)
 		service->connect_op = NULL;
 	}
 
-	camel_object_trigger_event (CAMEL_OBJECT (service), 
-		"connection", (gpointer) ret);
+	if (service->disconnecting)
+		service->connecting (service, ret, service->data);
 
 	CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
 
@@ -459,8 +458,8 @@ camel_service_disconnect (CamelService *service, gboolean clean,
 			camel_operation_unref (service->connect_op);
 		service->connect_op = NULL;
 
-		camel_object_trigger_event (CAMEL_OBJECT (service), 
-			"disconnection", (gpointer) clean);
+		if (service->disconnecting)
+			service->disconnecting (service, clean, service->data);
 
 		CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
 	}

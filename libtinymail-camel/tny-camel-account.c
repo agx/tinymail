@@ -56,6 +56,9 @@
 
 #include "tny-camel-account-priv.h"
 
+#include <tny-camel-store-account.h>
+#include "tny-camel-store-account-priv.h"
+
 static GObjectClass *parent_class = NULL;
 
 void
@@ -292,11 +295,11 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 }
 
 void 
-_tny_camel_account_try_connect (TnyCamelAccount *self, GError **err)
+_tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GError **err)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), for_online, TRUE);
 
 	if (camel_exception_is_set (priv->ex))
 	{
@@ -794,7 +797,7 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 	priv->pass_func_set = TRUE;
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		TRUE, FALSE);
+		TRUE, TRUE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -1139,16 +1142,38 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 	if (CAMEL_IS_DISCO_STORE (priv->service)) {
 		if (online) {
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
-										  CAMEL_DISCO_STORE_ONLINE, &ex);
+					CAMEL_DISCO_STORE_ONLINE, &ex);
+
 			if (!camel_exception_is_set (&ex))
 				camel_service_connect (CAMEL_SERVICE (priv->service), &ex);
 
+			if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) 
+			{
+				if (!camel_exception_is_set (&ex))
+					priv->status = TNY_CONNECTION_STATUS_CONNECTED;
+				else
+					priv->status = TNY_CONNECTION_STATUS_CONNECTED_BROKEN;
+
+				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
+			}
+
 			goto done;
+
 		} else if (camel_disco_store_can_work_offline (CAMEL_DISCO_STORE (priv->service))) {
 			
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
-										  CAMEL_DISCO_STORE_OFFLINE,
-										  &ex);
+					CAMEL_DISCO_STORE_OFFLINE, &ex);
+
+			if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) 
+			{
+				if (!camel_exception_is_set (&ex))
+					priv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+				else
+					priv->status = TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN;
+
+				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
+			}
+
 			goto done;
 		}
 	} else if (CAMEL_IS_OFFLINE_STORE (priv->service)) {
@@ -1156,20 +1181,52 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 		if (online) {
 			
 			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
-												   CAMEL_OFFLINE_STORE_NETWORK_AVAIL,
-												   &ex);
+					CAMEL_OFFLINE_STORE_NETWORK_AVAIL, &ex);
+
+			if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) 
+			{
+				if (!camel_exception_is_set (&ex))
+					priv->status = TNY_CONNECTION_STATUS_CONNECTED;
+				else
+					priv->status = TNY_CONNECTION_STATUS_CONNECTED_BROKEN;
+
+				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
+			}
+
 			goto done;
 		} else {
 			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
-												   CAMEL_OFFLINE_STORE_NETWORK_UNAVAIL,
-												   &ex);
+					CAMEL_OFFLINE_STORE_NETWORK_UNAVAIL, &ex);
+
+			if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) 
+			{
+				if (!camel_exception_is_set (&ex))
+					priv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+				else
+					priv->status = TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN;
+
+				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
+			}
+	
 			goto done;
 		}
 	}
 
-	if (!online)
+	if (!online) {
 		camel_service_disconnect (CAMEL_SERVICE (priv->service),
-								  TRUE, &ex);
+			  TRUE, &ex);
+
+		if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) 
+		{
+			if (!camel_exception_is_set (&ex))
+				priv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+			else
+				priv->status = TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN;
+
+			_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
+		}
+
+	}
 
 done:
 

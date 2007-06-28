@@ -59,6 +59,8 @@ typedef enum {
 	CAMEL_SERVICE_DISCONNECTING
 } CamelServiceConnectionStatus;
 
+typedef void (*con_op) (CamelService *service, gboolean suc, gpointer data);
+
 struct _CamelService {
 	CamelObject parent_object;
 	struct _CamelServicePrivate *priv;
@@ -70,6 +72,11 @@ struct _CamelService {
 	CamelURL *url;
 	gpointer data;
 	gboolean reconnecting;
+
+	con_op connecting;
+	con_op disconnecting;
+	con_op reconnecter;
+	con_op reconnection;
 };
 
 typedef struct {

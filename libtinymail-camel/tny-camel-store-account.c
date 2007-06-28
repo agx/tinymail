@@ -118,8 +118,17 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 	camel_store_delete_cache (store);
 }
 
+static void
+tny_camel_store_account_do_emit (TnyCamelStoreAccount *self)
+{
+	g_idle_add_full (G_PRIORITY_HIGH, 
+				connection_status_idle, 
+				g_object_ref (self), 
+				connection_status_idle_destroy);
+}
+
 static void 
-disconnection (CamelService *service, gpointer data, TnyAccount *self)
+disconnection (CamelService *service, gboolean suc, TnyAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
@@ -138,10 +147,7 @@ disconnection (CamelService *service, gpointer data, TnyAccount *self)
 		apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
 
 		if (emit)
-			g_idle_add_full (G_PRIORITY_HIGH, 
-				connection_status_idle, 
-				g_object_ref (self), 
-				connection_status_idle_destroy);
+			tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
 	}
 
 	/* The failure of a reconnect is handled in the connection handler */
@@ -156,10 +162,9 @@ disconnection (CamelService *service, gpointer data, TnyAccount *self)
 
 
 static void 
-connection (CamelService *service, gpointer data, TnyAccount *self)
+connection (CamelService *service, gboolean suc, TnyAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	gboolean suc = (gboolean) data;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	gboolean emit = FALSE;
 
@@ -193,9 +198,11 @@ connection (CamelService *service, gpointer data, TnyAccount *self)
 			tny_account_get_name (self));
 #endif
 
-	}
+	} else 
+		emit = FALSE;
 
-	if (CAMEL_IS_DISCO_STORE (service))
+
+	if (CAMEL_IS_DISCO_STORE (service) && !service->reconnecting)
 	{
 
 		if (camel_disco_store_status ((CamelDiscoStore *) service) == CAMEL_DISCO_STORE_ONLINE)
@@ -254,16 +261,19 @@ connection (CamelService *service, gpointer data, TnyAccount *self)
 	}
 
 	if (emit)
-		g_idle_add_full (G_PRIORITY_HIGH, 
-			connection_status_idle, 
-			g_object_ref (self), 
-			connection_status_idle_destroy);
+		tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
+
+}
+
+void 
+_tny_camel_store_account_emit_conchg_signal (TnyCamelStoreAccount *self)
+{
+	/* tny_camel_store_account_do_emit (self); */
 }
 
 static void 
-reconnection (CamelService *service, gpointer data, TnyAccount *self)
+reconnection (CamelService *service, gboolean suc, TnyAccount *self)
 {
-	gboolean suc = (gboolean) data;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
 	priv->cant_reuse_iter = TRUE;
@@ -277,7 +287,7 @@ reconnection (CamelService *service, gpointer data, TnyAccount *self)
 }
 
 static void 
-reconnecting (CamelService *service, gpointer data, TnyAccount *self)
+reconnecting (CamelService *service, gboolean suc, TnyAccount *self)
 {
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
@@ -323,38 +333,12 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 
 		if (apriv->service && !camel_exception_is_set (apriv->ex)) 
 		{
-			CHookInfo *info1, *info2, *info3, *info4;
-
 			apriv->service->data = self;
-
-			info1 = g_slice_new0 (CHookInfo);
-			info2 = g_slice_new0 (CHookInfo);
-			info3 = g_slice_new0 (CHookInfo);
-			info4 = g_slice_new0 (CHookInfo);
-
-			camel_object_ref (apriv->service);
-			camel_object_ref (apriv->service);
-			camel_object_ref (apriv->service);
-			camel_object_ref (apriv->service);
-
-			info1->instance = (CamelObject *) apriv->service;
-			info2->instance = (CamelObject *) apriv->service;
-			info3->instance = (CamelObject *) apriv->service;
-			info4->instance = (CamelObject *) apriv->service;
-
-			info1->hook = camel_object_hook_event (apriv->service, 
-				"disconnection", (CamelObjectEventHookFunc)disconnection, self);
-			info2->hook = camel_object_hook_event (apriv->service, 
-				"connection", (CamelObjectEventHookFunc)connection, self);
-			info3->hook = camel_object_hook_event (apriv->service, 
-				"reconnection", (CamelObjectEventHookFunc)reconnection, self);
-			info4->hook = camel_object_hook_event (apriv->service, 
-				"reconnecting", (CamelObjectEventHookFunc)reconnecting, self);
-
-			apriv->chooks = g_list_prepend (apriv->chooks, info1);
-			apriv->chooks = g_list_prepend (apriv->chooks, info2);
-			apriv->chooks = g_list_prepend (apriv->chooks, info3);
-			apriv->chooks = g_list_prepend (apriv->chooks, info4);
+			apriv->service->connecting = (con_op) connection;
+			apriv->service->disconnecting = (con_op) disconnection;
+			apriv->service->reconnecter = (con_op) reconnecting;
+			apriv->service->reconnection = (con_op) reconnection;
+	
 
 		} else if (camel_exception_is_set (apriv->ex) && apriv->service)
 		{
@@ -421,10 +405,7 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 			}
 		} else {
 
-			g_idle_add_full (G_PRIORITY_HIGH, 
-				connection_status_idle, 
-				g_object_ref (self), 
-				connection_status_idle_destroy);
+			tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
 
 			/* tny_camel_account_set_online (self, apriv->connected); */
 		}

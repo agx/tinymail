@@ -268,13 +268,12 @@ on_constatus_changed (TnyAccount *a, TnyConnectionStatus status, gpointer user_d
 }
 
 static void 
-reload_accounts (TnySummaryView *self)
+reload_accounts_first (TnySummaryView *self, gboolean first_time)
 {
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyAccountStore *account_store = priv->account_store;
 	GtkTreeModel *sortable, *maccounts, *mailbox_model;
 	TnyFolderStoreQuery *query;
-	TnyIterator *aiter = NULL;
 
 	/* Show only subscribed folders */
 	query = tny_folder_store_query_new ();
@@ -310,19 +309,23 @@ reload_accounts (TnySummaryView *self)
 
 	priv->current_accounts = TNY_LIST (g_object_ref (G_OBJECT (accounts)));
 
-	aiter = tny_list_create_iterator (accounts);
-	while (!tny_iterator_is_done (aiter))
+	if (first_time)
 	{
-		GObject *a = tny_iterator_get_current (aiter);
-		
-		g_signal_connect (a, "connection-status-changed",
-			G_CALLBACK (on_constatus_changed), self);
+		TnyIterator *aiter = NULL;
+		aiter = tny_list_create_iterator (accounts);
+		while (!tny_iterator_is_done (aiter))
+		{
+			GObject *a = tny_iterator_get_current (aiter);
+			
+			g_signal_connect (a, "connection-status-changed",
+				G_CALLBACK (on_constatus_changed), self);
 
-		g_object_unref (a);
-		tny_iterator_next (aiter);
+			g_object_unref (a);
+			tny_iterator_next (aiter);
+		}
+
+		g_object_unref (aiter);
 	}
-
-	g_object_unref (aiter);
 
 	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
 			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
@@ -357,6 +360,12 @@ reload_accounts (TnySummaryView *self)
 		sortable);
 
 	return;
+}
+
+static void 
+reload_accounts (TnySummaryView *self)
+{
+	reload_accounts_first (self, FALSE);
 }
 
 static void
@@ -501,7 +510,7 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 		G_OBJECT (account_store), "accounts_reloaded",
 		G_CALLBACK (accounts_reloaded), self);
 
-	reload_accounts ((TnySummaryView *) self);
+	reload_accounts_first ((TnySummaryView *) self, TRUE);
 
 	g_object_unref (G_OBJECT (device));
 

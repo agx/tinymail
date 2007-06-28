@@ -164,8 +164,8 @@ tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self)
 
 	service->reconnecting = TRUE;
 
-	camel_object_trigger_event (CAMEL_OBJECT (service), 
-			"reconnecting", (gpointer) FALSE);
+	if (service->reconnecter)
+		service->reconnecter (service, FALSE, service->data);
 
 	camel_service_disconnect ((CamelService *) service, TRUE, &ex);
 	if (camel_exception_is_set (&ex))
@@ -179,12 +179,10 @@ tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self)
 		camel_service_connect (service, &ex);
 	}
 
-	if (!camel_exception_is_set (&ex))
-		camel_object_trigger_event (CAMEL_OBJECT (service), 
-			"reconnection", (gpointer) TRUE);
+	if (service->reconnection)
+		service->reconnection (service, TRUE, service->data);
 	else
-		camel_object_trigger_event (CAMEL_OBJECT (service), 
-			"reconnection", (gpointer) FALSE);
+		service->reconnection (service, FALSE, service->data);
 
 	service->reconnecting = FALSE;
 

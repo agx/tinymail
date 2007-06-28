@@ -20,6 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <tny-camel-store-account.h>
+
 typedef struct _TnyCamelStoreAccountPriv TnyCamelStoreAccountPriv;
 
 struct _TnyCamelStoreAccountPriv
@@ -34,5 +36,7 @@ struct _TnyCamelStoreAccountPriv
 
 #define TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_STORE_ACCOUNT, TnyCamelStoreAccountPriv))
+
+void _tny_camel_store_account_emit_conchg_signal (TnyCamelStoreAccount *self);
 
 #endif

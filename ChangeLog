@@ -3,6 +3,8 @@
 	* Slowing down the STATUS commands
 	* Detecting connection changes with the connection_status_changed
 	signal on TnyAccount
+	* Multiple fixes when reconnecting
+	* Initial folder-list when starting the application offline
 
 	* This was a major API change
 

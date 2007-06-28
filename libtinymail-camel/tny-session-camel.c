@@ -428,7 +428,7 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 	{
 		GError *err = NULL;
 
-		_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (data), &err);
+		_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (data), info->online, &err);
 
 		if (err == NULL)
 			tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (data), info->online, &err);
@@ -564,6 +564,15 @@ tny_session_camel_join_connecting (TnySessionCamel *self)
 		g_thread_join (priv->conthread);
 }
 
+/*
+static gboolean
+emit_accounts_reloaded (gpointer user_data)
+{
+	g_signal_emit (G_OBJECT (user_data),
+		tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
+	return FALSE;
+}
+*/
 
 /**
  * tny_session_camel_set_device:
@@ -590,6 +599,17 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 			G_OBJECT (device), "connection_changed",
 			G_CALLBACK (connection_changed), self);
 
+	if (tny_device_is_online (device) == FALSE)
+	{
+		priv->prev_constat = TRUE;
+		connection_changed (device, FALSE, self);
+/*
+		g_idle_add_full (G_PRIORITY_HIGH,
+                	emit_accounts_reloaded,
+	                (gpointer) g_object_ref (priv->account_store), 
+			(GDestroyNotify) g_object_unref);
+*/
+	}
 	return;
 }
 
