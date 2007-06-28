@@ -23,9 +23,11 @@
 
 #include <tny-gnome-device.h>
 
+/*
 #ifdef GNOME
 #undef GNOME
 #endif
+*/
 
 #ifdef GNOME
 #include <libnm_glib.h>
