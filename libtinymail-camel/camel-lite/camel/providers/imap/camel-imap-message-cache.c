@@ -22,6 +22,11 @@
  * USA
  */
 
+/* Define this so that we have strcasestr(). */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <config.h>
 
 #include <ctype.h>
@@ -465,7 +470,7 @@ camel_imap_message_cache_replace_with_wrapper (CamelImapMessageCache *cache,
 					       const char *uid,
 					       CamelDataWrapper *wrapper, CamelException *ex)
 {
-	char *path, *key;
+	/* char *path, *key; */
 	CamelStream *stream;
 	gchar *real = g_strdup_printf("%s/%s.purgetmp", cache->path, uid);
 

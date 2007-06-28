@@ -24,10 +24,7 @@
 #include <glib-object.h>
 
 #include <tny-device.h>
-#include <conicevent.h>
 #include <coniciap.h>
-#include <conicconnection.h>
-#include <conicconnectionevent.h>
 
 G_BEGIN_DECLS
 

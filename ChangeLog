@@ -1,3 +1,19 @@
+2007-06-28  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-mess
+	age-cache.c: (camel_imap_message_cache_replace_with_wrapper):
+	Comment out unused variables to prevent warnings.
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-mess
+	age-cache.h: Actually declare 
+	camel_imap_message_cache_replace_with_wrapper(), to avoid a warning 
+	in came-imap-folder.c.
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_finalize): Add a debug printf here in case 
+	this is the cause of disconnections.
+	* libtinymail-maemo/tny-maemo-conic-device.h:
+	Do not include some unnecessary libconic headers. 
+	* tests/test-device-conic.c: New test.
+
 2007-06-27  Jose Dapena Paz  <jdapena@igalia.com>
 
 	These changes add support for purging specific attachments 

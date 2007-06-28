@@ -21,6 +21,10 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-maemo-conic-device.h>
+#include <conicevent.h>
+#include <coniciap.h>
+#include <conicconnection.h>
+#include <conicconnectionevent.h>
 #include <string.h> /* For strcmp() */
 #include <stdio.h> /* for printf */
 
@@ -561,6 +565,8 @@ tny_maemo_conic_device_new (void)
 static void
 tny_maemo_conic_device_finalize (GObject *obj)
 {
+	printf ("DEBUG: %s\n", __FUNCTION__);
+
 	TnyMaemoConicDevicePriv *priv;
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
