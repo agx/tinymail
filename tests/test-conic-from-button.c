@@ -14,8 +14,6 @@
 #include <stdio.h>
 
 static ConIcConnection *cnx = NULL;
-static gboolean attempting_connection = FALSE;
-static gboolean is_online = FALSE;
 
 static void
 on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer user_data)
@@ -44,13 +42,9 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	switch (con_ic_connection_event_get_status(event)) {
 	case CON_IC_STATUS_CONNECTED:
 		printf ("DEBUG: %s: Connected.\n", __FUNCTION__);
-		is_online = TRUE;
-		attempting_connection = FALSE; /* unblock */
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
 		printf ("DEBUG: %s: Disconnected.\n", __FUNCTION__);
-		is_online = FALSE;
-		attempting_connection = FALSE; /* unblock */
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
 		printf ("DEBUG: %s: new status: DISCONNECTING.\n", __FUNCTION__);
@@ -63,56 +57,28 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 }
 
-gboolean connect_and_wait()
+bool connect_and_wait()
 {
 	printf ("%s: Creating ConIcConnection.\n", __FUNCTION__);
-
 	cnx = con_ic_connection_new ();
 	if (!cnx) {
 		g_warning ("con_ic_connection_new failed.");
 	}
-
-	const int connection = g_signal_connect (cnx, "connection-event",
-		G_CALLBACK(on_connection_event), NULL);
-
-	/* This might be necessary to make the connection object 
-	 * actually emit the signal, though the documentation says 
-	 * that they should be sent even when this is not set, 
-	 * when we explicitly try to connect. 
-	 * The signal still does not seem to be emitted.
-	 */
-	g_object_set (cnx, "automatic-connection-events", TRUE, NULL);
+	g_signal_connect (cnx, "connection-event",
+			  G_CALLBACK(on_connection_event), NULL);
 
 	printf ("%s: Attempting to connect. Waiting for signal.\n", __FUNCTION__);
 	
-	attempting_connection = TRUE;
 	if (!con_ic_connection_connect (cnx, CON_IC_CONNECT_FLAG_NONE)) {
 		g_warning ("con_ic_connection_connect() failed.");
 	}
-
-	printf ("%s: Waiting for !attempting_connection.\n", __FUNCTION__);
-	
-	/* When the signal has been handled, 
-	 * attempting_connection will be reset to FALSE. */
-	while (attempting_connection) {
-		/* Iterate the main loop so that the signal can be called. */
-		if (g_main_context_pending (NULL)) {
-			g_main_context_iteration (NULL, FALSE);
-		}
-	}
-
-	printf ("%s: Finished waiting for !attempting_connection.\n", __FUNCTION__);
-
-	g_signal_handler_disconnect (cnx, connection);
-
-	return is_online; /* This was set by the signal handler. */
 }
 
 void on_button_clicked (gpointer user_data)
 {
-	/* This blocks the UI. That's what we want. */
+	printf ("%s: Calling connect_and_wait().\n", __FUNCTION__);
 	gboolean result = connect_and_wait();
-	printf ("%s: connect_and_wait() returned %d\n", __FUNCTION__, result);
+	printf ("%s: connect_and_wait() returned %d.\n", __FUNCTION__, result);
 }
 
 static gboolean on_window_delete_event( GtkWidget *widget,
@@ -149,6 +115,18 @@ int main(int argc, char *argv[])
 
 	g_signal_connect (G_OBJECT (button), "clicked",
 		      G_CALLBACK (on_button_clicked), NULL);
+   
+
+	
+	
+
+	/* This might be necessary to make the connection object 
+	 * actually emit the signal, though the documentation says 
+	 * that they should be sent even when this is not set, 
+	 * when we explicitly try to connect. 
+	 * The signal still does not seem to be emitted.
+	 */
+	g_object_set (cnx, "automatic-connection-events", TRUE, NULL);
 
 
  	g_signal_connect (G_OBJECT (window), "delete_event",
