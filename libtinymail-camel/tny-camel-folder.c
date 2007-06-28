@@ -3576,7 +3576,7 @@ tny_camel_folder_poke_status_thread (gpointer data)
 			break; /* Reason for A */
 		} else {
 			g_static_mutex_unlock (&poke_folders_lock);
-			usleep (5000); /* Allow other folders to be added */
+			usleep (50000); /* Allow other folders to be added */
 		}
 	}
 

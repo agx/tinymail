@@ -1,3 +1,7 @@
+2007-06-28  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Slowing down the STATUS commands
+
 2007-06-28  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-mess
