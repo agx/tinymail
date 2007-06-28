@@ -16,8 +16,9 @@ void on_button_clicked (gpointer user_data)
 	
 	TnyMaemoConicDevice* device = TNY_MAEMO_CONIC_DEVICE (tny_maemo_conic_device_new ());
 	tny_maemo_conic_device_connect (device, NULL);
-	g_object_unref (device);
 	printf ("%s: Attempting finished.\n", __FUNCTION__);
+	g_object_unref (device);
+	printf ("%s: Destroying device (causes disconnect).\n", __FUNCTION__);
 }
 
 static gboolean on_window_delete_event( GtkWidget *widget,
