@@ -1,7 +1,8 @@
 2007-06-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Slowing down the STATUS commands
-	* Detecting connection changes
+	* Detecting connection changes with the connection_status_changed
+	signal on TnyAccount
 
 	* This was a major API change
 

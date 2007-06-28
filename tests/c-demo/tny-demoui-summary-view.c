@@ -242,6 +242,31 @@ on_send_queue_error_happened (TnySendQueue *self, TnyHeader *header, TnyMsg *msg
 	return;
 }
 
+static void
+on_constatus_changed (TnyAccount *a, TnyConnectionStatus status, gpointer user_data)
+{
+	gchar *str = NULL;
+
+	if (status == TNY_CONNECTION_STATUS_DISCONNECTED)
+		str = "disconnected";
+
+	if (status == TNY_CONNECTION_STATUS_CONNECTED)
+		str = "connected";
+	
+	if (status == TNY_CONNECTION_STATUS_CONNECTED_BROKEN)
+	{
+		tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (a), FALSE, NULL);
+		str = "con broken";
+	}
+
+	if (status == TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN)
+		str = "discon broken";
+
+	g_print ("CON EVENT FOR %s: %s\n",
+		tny_account_get_name (a), str);
+
+}
+
 static void 
 reload_accounts (TnySummaryView *self)
 {
@@ -249,7 +274,7 @@ reload_accounts (TnySummaryView *self)
 	TnyAccountStore *account_store = priv->account_store;
 	GtkTreeModel *sortable, *maccounts, *mailbox_model;
 	TnyFolderStoreQuery *query;
-
+	TnyIterator *aiter = NULL;
 
 	/* Show only subscribed folders */
 	query = tny_folder_store_query_new ();
@@ -284,6 +309,20 @@ reload_accounts (TnySummaryView *self)
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
 	priv->current_accounts = TNY_LIST (g_object_ref (G_OBJECT (accounts)));
+
+	aiter = tny_list_create_iterator (accounts);
+	while (!tny_iterator_is_done (aiter))
+	{
+		GObject *a = tny_iterator_get_current (aiter);
+		
+		g_signal_connect (a, "connection-status-changed",
+			G_CALLBACK (on_constatus_changed), self);
+
+		g_object_unref (a);
+		tny_iterator_next (aiter);
+	}
+
+	g_object_unref (aiter);
 
 	tny_account_store_get_accounts (account_store, TNY_LIST (maccounts),
 			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);

@@ -899,7 +899,7 @@ tny_account_base_init (gpointer g_class)
 			G_STRUCT_OFFSET (TnyAccountIface, connection_status_changed),
 			NULL, NULL,
 			g_cclosure_marshal_VOID__INT, 
-			G_TYPE_NONE, 0);
+			G_TYPE_NONE, 1, G_TYPE_INT);
 
 		initialized = TRUE;
 	}
