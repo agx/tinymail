@@ -524,6 +524,15 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	if (!priv->cnx) {
 		g_warning ("con_ic_connection_new failed. The TnyMaemoConicDevice will be useless.");
 	}
+
+	/* This might be necessary to make the connection object 
+	 * actually emit the signal, though the documentation says 
+	 * that they should be sent even when this is not set, 
+	 * when we explicitly try to connect. 
+	 * The signal still does not seem to be emitted.
+	 */
+	g_object_set (cnx, "automatic-connection-events", TRUE, NULL);
+
 	g_signal_connect (priv->cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), self);
 
