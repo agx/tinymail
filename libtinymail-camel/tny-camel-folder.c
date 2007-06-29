@@ -140,6 +140,16 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 
 }
 
+static void 
+update_iter_counts (TnyCamelFolderPriv *priv)
+{
+	if (priv->iter)
+	{
+		priv->iter->unread = priv->unread_length;
+		priv->iter->total = priv->cached_length;
+	}
+}
+
 void 
 _tny_camel_folder_check_unread_count (TnyCamelFolder *self)
 {
@@ -148,6 +158,7 @@ _tny_camel_folder_check_unread_count (TnyCamelFolder *self)
 
 	priv->cached_length = camel_folder_get_message_count (priv->folder);
 	priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+	update_iter_counts (priv);
 	tny_folder_change_set_new_unread_count (change, priv->unread_length);
 	tny_folder_change_set_new_all_count (change, priv->cached_length);
 	notify_folder_observers_about (TNY_FOLDER (self), change);
@@ -258,6 +269,8 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	/* search for IN TNY */
 	/*if (info->uid_removed && info->uid_removed->len > 0)
 		camel_folder_summary_save (camel_folder->summary);*/
+
+	update_iter_counts (priv);
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 }
@@ -512,6 +525,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		camel_folder_append_message (priv->folder, message, NULL, &new_uid, &ex);
 		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 		priv->cached_length = camel_folder_get_message_count (priv->folder);
+		update_iter_counts (priv);
 	} else {
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_ADD_MSG,
@@ -724,8 +738,10 @@ tny_camel_folder_get_unread_count_default (TnyFolder *self)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->folder_lock);
-	if (priv->unread_length == 0 && priv->folder)
+	if (priv->unread_length == 0 && priv->folder) {
 		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+		update_iter_counts (priv);
+	}
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
 	return priv->unread_length;
@@ -927,9 +943,9 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 
 	priv->cached_length = camel_folder_get_message_count (priv->folder);
-
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
+	update_iter_counts (priv);
 
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
@@ -1076,8 +1092,10 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	/* _tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account)); */
 
 	priv->cached_length = camel_folder_get_message_count (priv->folder);    
-	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap))
+	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder) && G_LIKELY (priv->has_summary_cap)) 
 		priv->unread_length = (guint) camel_folder_get_unread_message_count (priv->folder);
+	update_iter_counts (priv);
+
 
 	if (camel_exception_is_set (&ex))
 	{
@@ -3748,6 +3766,7 @@ tny_camel_folder_get_stats_default (TnyFolder *self)
 
 	priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 	priv->cached_length = camel_folder_get_message_count (priv->folder);
+	update_iter_counts (priv);
 	priv->local_size = camel_folder_get_local_size (priv->folder);
 	tny_folder_stats_set_local_size (retval, priv->local_size);
 
