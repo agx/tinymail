@@ -3498,12 +3498,21 @@ tny_camel_folder_poke_status_callback (gpointer data)
 	TnyFolder *self = (TnyFolder *) info->self;
 	TnyFolderChange *change = tny_folder_change_new (self);
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	gboolean do_something = FALSE;
 
-	priv->cached_length = (guint) info->total;
-	tny_folder_change_set_new_all_count (change, priv->cached_length);
-	priv->unread_length = (guint) info->unread;
-	tny_folder_change_set_new_unread_count (change, priv->unread_length);
-	notify_folder_observers_about (self, change);
+	if (info->total != -1) {
+		do_something = TRUE;
+		priv->cached_length = (guint) info->total;
+		tny_folder_change_set_new_all_count (change, priv->cached_length);
+	}
+	if (info->unread != -1) {
+		do_something = TRUE;
+		priv->unread_length = (guint) info->unread;
+		tny_folder_change_set_new_unread_count (change, priv->unread_length);
+	}
+
+	if (do_something)
+		notify_folder_observers_about (self, change);
 
 	g_object_unref (change);
 
