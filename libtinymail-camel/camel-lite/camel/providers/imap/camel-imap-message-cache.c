@@ -22,16 +22,17 @@
  * USA
  */
 
-/* Define this so that we have strcasestr(). */
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
 
 #include <config.h>
 
 #include <ctype.h>
 #include <errno.h>
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <string.h>
+
 #include <sys/types.h>
 
 #include <glib/gi18n-lib.h>

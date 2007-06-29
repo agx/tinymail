@@ -1929,7 +1929,8 @@ summary_format_string (struct _camel_header_raw *h, const char *name, const char
 }
 
 #ifndef _GNU_SOURCE
-static char *strcasestr(const char *haystack, const char *needle)
+/* Non static so other users can link with it too */
+char *strcasestr(const char *haystack, const char *needle)
 {
       const gchar *p = haystack;
       gsize needle_len = strlen (needle);
@@ -1963,6 +1964,7 @@ static char *strcasestr(const char *haystack, const char *needle)
 #else
 char *strcasestr(const char *haystack, const char *needle);
 #endif
+
 /**
  * 
  :

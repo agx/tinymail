@@ -19,6 +19,11 @@
 
 #include <config.h>
 #include <glib/gi18n-lib.h>
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <string.h>
 
 #include <glib.h>
@@ -104,7 +109,7 @@ replace_things (const char *data, const char *tag, size_t on, size_t *nn, gboole
 	p = (char*) data;
 	while (p)
 	{
-		p = (char*) strcasestr (p, (const char*) ttag);
+		p = strcasestr (p, (const char*) ttag);
 		if (p) { occ++; p++; }
 			else break;
 	}

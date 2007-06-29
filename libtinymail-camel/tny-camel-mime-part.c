@@ -21,10 +21,10 @@
 
 #include <glib/gi18n-lib.h>
 
-#include <string.h>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
-#endif /* GNU_SOURCE*/
+#endif
+
 #include <string.h>
 
 #include <tny-mime-part.h>
