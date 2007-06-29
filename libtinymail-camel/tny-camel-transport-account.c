@@ -65,21 +65,35 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self, gboolean recon_if, g
 	_tny_camel_account_refresh (self, recon_if);
 
 	g_static_rec_mutex_lock (apriv->service_lock);
-	/* camel_session_get_service can launch GUI things */
-	if (apriv->session && apriv->url_string)
+
+	if (!apriv->service && reservice)
 	{
+		if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
+		{
+			camel_object_unref (CAMEL_OBJECT (apriv->service));
+			apriv->service = NULL;
+		} 
+
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
-
-		if (apriv->service && CAMEL_IS_OBJECT (apriv->service))
-			camel_object_unref (CAMEL_OBJECT (apriv->service));
 
 		apriv->service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
 
-		if (apriv->service)
+		if (apriv->service && !camel_exception_is_set (apriv->ex)) 
+		{
 			apriv->service->data = self;
+			apriv->service->connecting = (con_op) NULL;
+			apriv->service->disconnecting = (con_op) NULL;
+			apriv->service->reconnecter = (con_op) NULL;
+			apriv->service->reconnection = (con_op) NULL;
+
+		} else if (camel_exception_is_set (apriv->ex) && apriv->service)
+		{
+			g_warning ("Must cleanup service pointer\n");
+			apriv->service = NULL;
+		}
 
 	} else {
 		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
@@ -167,7 +181,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	/* camel_service_connect can launch GUI things */
-	if (!camel_service_connect (apriv->service, &ex))
+
+	if (!apriv->service || !camel_service_connect (apriv->service, &ex))
 	{
 		if (camel_exception_is_set (&ex))
 		{
