@@ -10,15 +10,15 @@
 #include <stdio.h>
 
 
+TnyMaemoConicDevice* device = NULL;
+
 void on_button_clicked (gpointer user_data)
 {
-	printf ("%s: Attempting to connect..\n", __FUNCTION__);
-	
-	TnyMaemoConicDevice* device = TNY_MAEMO_CONIC_DEVICE (tny_maemo_conic_device_new ());
+	g_return_if_fail (device);
+
+	printf ("%s: Attempting to connect...\n", __FUNCTION__);
 	tny_maemo_conic_device_connect (device, NULL);
-	printf ("%s: Attempting finished.\n", __FUNCTION__);
-	g_object_unref (device);
-	printf ("%s: Destroying device (causes disconnect).\n", __FUNCTION__);
+	printf ("%s: ...Attempting finished.\n", __FUNCTION__);
 }
 
 static gboolean on_window_delete_event( GtkWidget *widget,
@@ -31,6 +31,8 @@ static gboolean on_window_delete_event( GtkWidget *widget,
 static void on_window_destroy( GtkWidget *widget,
                      gpointer   data )
 {
+	g_object_unref (device);
+	printf ("%s: Destroying device (causes disconnect).\n", __FUNCTION__);
 	gtk_main_quit ();
 }
 
@@ -61,7 +63,11 @@ int main(int argc, char *argv[])
 		G_CALLBACK (on_window_delete_event), NULL);
 	g_signal_connect (G_OBJECT (window), "destroy",
 		G_CALLBACK (on_window_destroy), NULL);
-	gtk_widget_show  (window);    
+	gtk_widget_show  (window);
+
+
+	device = TNY_MAEMO_CONIC_DEVICE (tny_maemo_conic_device_new ());
+
 	gtk_main ();
     
 	return 0;
