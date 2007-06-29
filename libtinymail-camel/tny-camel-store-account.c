@@ -198,8 +198,7 @@ connection (CamelService *service, gboolean suc, TnyAccount *self)
 			tny_account_get_name (self));
 #endif
 
-	} else 
-		emit = FALSE;
+	}
 
 
 	if (CAMEL_IS_DISCO_STORE (service) && !service->reconnecting)
@@ -242,12 +241,13 @@ connection (CamelService *service, gboolean suc, TnyAccount *self)
 					"not ready for offline operation");
 #endif
 
+
 			if (suc) {
 				/* Preparing the offline cache succeeded */
-
-				if (apriv->status != TNY_CONNECTION_STATUS_DISCONNECTED)
+				emit = FALSE; /* Let disconnection handle it */
+				/*if (apriv->status != TNY_CONNECTION_STATUS_DISCONNECTED)
 					emit = TRUE;
-				apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+				apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED;*/
 			} else {
 
 				/* Preparing the offline cache failed */

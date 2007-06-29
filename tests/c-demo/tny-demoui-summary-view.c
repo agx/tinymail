@@ -255,7 +255,7 @@ on_constatus_changed (TnyAccount *a, TnyConnectionStatus status, gpointer user_d
 	
 	if (status == TNY_CONNECTION_STATUS_CONNECTED_BROKEN)
 	{
-		tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (a), FALSE, NULL);
+		/* tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (a), FALSE, NULL); */
 		str = "con broken";
 	}
 

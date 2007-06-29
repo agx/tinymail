@@ -136,10 +136,24 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 		if (!apriv->service)
 			goto fail;
 
+		apriv->service->reconnecting = TRUE;
+
+		if (apriv->service->reconnecter)
+			apriv->service->reconnecter (apriv->service, FALSE, apriv->service->data);
+
 		camel_service_disconnect (apriv->service, FALSE, &ex);
 		if (camel_exception_is_set (&ex))
 			camel_exception_clear (&ex);
 		camel_service_connect (apriv->service, &ex);
+
+
+		if (apriv->service->reconnection)
+			apriv->service->reconnection (apriv->service, TRUE, apriv->service->data);
+		else
+			apriv->service->reconnection (apriv->service, FALSE, apriv->service->data);
+
+		apriv->service->reconnecting = FALSE;
+		
 	}
 
 fail:
@@ -1064,7 +1078,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->session = NULL;
 	priv->url_string = NULL;
 	priv->chooks = NULL;
-	priv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+	priv->status = TNY_CONNECTION_STATUS_INIT;
 
 	priv->ex = camel_exception_new ();
 	camel_exception_init (priv->ex);
