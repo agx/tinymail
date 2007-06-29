@@ -1294,14 +1294,22 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	str = strchr (url_string, '/');
 
-	if (str)
+	if (str && strlen (str) > 1) {
+		str++;
 		str = strchr (str, '/');
-	if (str)
-		str = strchr (str, '/');
+	} else 
+		str = NULL;
 
-	if (str)
+	if (str && strlen (str) > 1) {
+		str++;
+		str = strchr (str, '/');
+	} else
+		str = NULL;
+
+	if (str && strlen (str) > 1) {
+		str++;
 		iter = camel_store_get_folder_info (store, str, flags, &ex);
-	else {
+	} else {
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 			"Invalid URL string");
