@@ -3558,8 +3558,11 @@ tny_camel_folder_poke_status_thread (gpointer data)
 		{
 			if (priv->iter) {
 				info = g_slice_new (PokeStatusInfo);
-				info->unread = priv->iter->unread;
-				info->total = priv->iter->total;
+				info->unread = MAX (priv->iter->unread, priv->unread_length);
+				info->total = MAX (priv->iter->total, priv->cached_length);
+			} else {
+				info->unread = priv->unread_length;
+				info->total = priv->cached_length;
 			}
 		} else {
 			info = g_slice_new (PokeStatusInfo);
