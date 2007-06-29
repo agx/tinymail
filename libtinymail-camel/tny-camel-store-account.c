@@ -1305,7 +1305,6 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 			"Invalid URL string");
-		camel_exception_clear (&ex);
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
