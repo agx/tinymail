@@ -814,8 +814,8 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
-	if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
-		reconf_if = TRUE;
+	/*if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
+		reconf_if = TRUE;*/
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
 		reconf_if, TRUE);
@@ -842,8 +842,8 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
-	if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
-		reconf_if = TRUE;
+	/*if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
+		reconf_if = TRUE;*/
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
 		reconf_if, FALSE);
