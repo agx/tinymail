@@ -3610,6 +3610,9 @@ tny_camel_folder_poke_status_thread (gpointer data)
 		}
 	}
 
+	g_list_free (poke_folders);
+	poke_folders = NULL;
+
 	g_static_mutex_unlock (&poke_folders_lock); /* A */
 
 	g_thread_exit (NULL);
