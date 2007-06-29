@@ -25,6 +25,7 @@
 #include <coniciap.h>
 #include <conicconnection.h>
 #include <conicconnectionevent.h>
+#include <gdk/gdk.h> /* For GDK_THREAD_ENTER/LEAVE */
 #include <string.h> /* For strcmp() */
 #include <stdio.h> /* for printf */
 
@@ -220,12 +221,12 @@ printf ("debug3\n");
 	 
 printf ("debug4\n");
 	/* This is based on code found in gtk_dialog_run(): */
-	/* GDK_THREADS_LEAVE(); */
+	GDK_THREADS_LEAVE();
 printf ("debug5\n");
 	/* Run until g_main_loop_quit() is called by our signal handler. */
 	g_main_loop_run (priv->loop);
 printf ("debug6\n");
-	/* GDK_THREADS_ENTER(); */
+	GDK_THREADS_ENTER();
 printf ("debug7\n");
 	g_main_loop_unref (priv->loop);
 printf ("debug8\n");

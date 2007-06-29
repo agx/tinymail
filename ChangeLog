@@ -1,4 +1,13 @@
 2007-06-29  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_connect): Use GDK_THREADS_ENTER/LEAVE as 
+	used by gdk_dialog_run(), because a second g_main_loop_run() seems 
+	to hang when gdk_threads_init() has been called before (by the app, 
+	for instance). I don't like having these at this level, so we 
+	should try to fix it properly later.
+
+2007-06-29  Murray Cumming  <murrayc@murrayc.com>
 	* libtinymail-maemo/tny-maemo-conic-device.c: 
 	(on_connection_event), (tny_maemo_conic_device_connect):
 	Use a second mainloop instead of iterating the main mainloop. This 
