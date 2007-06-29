@@ -2,6 +2,7 @@
 
 	* Bugfix in TnyCamelTransportAccount: rewrote the prepare method
 	implementation
+	* Bugfix in tny_camel_store_account_find_folder_default
 
 2007-06-29  Murray Cumming  <murrayc@murrayc.com>
 

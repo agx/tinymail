@@ -1251,6 +1251,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 	CamelFolderInfo *iter; guint32 flags; CamelStore *store;
+	char *str = NULL;
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
@@ -1291,7 +1292,23 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
-	iter = camel_store_get_folder_info (store, url_string, flags, &ex);
+	str = strchr (url_string, '/');
+
+	if (str)
+		str = strchr (str, '/');
+	if (str)
+		str = strchr (str, '/');
+
+	if (str)
+		iter = camel_store_get_folder_info (store, str, flags, &ex);
+	else {
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
+			"Invalid URL string");
+		camel_exception_clear (&ex);
+		_tny_session_stop_operation (apriv->session);
+		return NULL;
+	}
 
 	if (camel_exception_is_set (&ex))
 	{
