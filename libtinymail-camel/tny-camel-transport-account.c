@@ -66,7 +66,7 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self, gboolean recon_if, g
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 
-	if (!apriv->service && reservice)
+	if (!apriv->service && reservice && apriv->url_string)
 	{
 		if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
 		{
