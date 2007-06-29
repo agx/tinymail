@@ -236,12 +236,13 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
  * connected in that case either
  */
 #ifndef MAEMO_CONIC_DUMMY 
-	TnyMaemoConicDevicePriv *priv;	
-	
+	TnyMaemoConicDevicePriv *priv = NULL;
+
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), FALSE);
+
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);	
 	g_return_val_if_fail (priv->cnx, FALSE);
 
-	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
 	g_message (__FUNCTION__);
 	g_message ("disconnecting from %s", iap_id ? iap_id : "<any>");
