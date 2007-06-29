@@ -1427,8 +1427,10 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 			"Invalid URL string");
 		_tny_session_stop_operation (apriv->session);
 
-		if (nnstr)
-			g_free (nnstr);
+		if (nnstr) {
+			/* g_free (nnstr); known leak */
+			nnstr = NULL;
+		}
 
 		g_free (url_string);
 		return NULL;
