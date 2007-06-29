@@ -198,10 +198,7 @@ void
 camel_store_get_folder_status (CamelStore *store, const char *folder_name, 
 			int *unseen, int *messages, int *uidnext)
 {
-	CAMEL_STORE_LOCK(store, folder_lock);
 	CS_CLASS (store)->get_folder_status (store, folder_name, unseen, messages, uidnext);
-	CAMEL_STORE_UNLOCK(store, folder_lock);
-
 	return;
 }
 
