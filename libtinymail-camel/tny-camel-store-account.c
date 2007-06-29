@@ -20,6 +20,11 @@
 #include <config.h>
 #include <glib/gi18n-lib.h>
 #include <glib.h>
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <string.h>
 
 #include <tny-list.h>
@@ -1244,6 +1249,74 @@ tny_camel_store_account_find_folder (TnyStoreAccount *self, const gchar *url_str
 	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->find_folder_func (self, url_string, err);
 }
 
+
+static int
+hex_to_int (gchar c)
+{
+	return  c >= '0' && c <= '9' ? c - '0'
+		: c >= 'A' && c <= 'F' ? c - 'A' + 10
+		: c >= 'a' && c <= 'f' ? c - 'a' + 10
+		: -1;
+}
+
+static int
+unescape_character (const char *scanner)
+{
+	int first_digit;
+	int second_digit;
+
+	first_digit = hex_to_int (*scanner++);
+	if (first_digit < 0) {
+		return -1;
+	}
+
+	second_digit = hex_to_int (*scanner++);
+	if (second_digit < 0) {
+		return -1;
+	}
+
+	return (first_digit << 4) | second_digit;
+}
+
+
+static char *
+unescape_string (const gchar *escaped_string,
+		const gchar *illegal_characters)
+{
+	const gchar *in;
+	gchar *out, *result;
+	gint character;
+
+	if (escaped_string == NULL) {
+		return NULL;
+	}
+
+	result = g_malloc (strlen (escaped_string) + 1);
+
+	out = result;
+	for (in = escaped_string; *in != '\0'; in++) {
+		character = *in;
+		if (*in == '%') {
+			character = unescape_character (in + 1);
+
+			/* Check for an illegal character. We consider '\0' illegal here. */
+			if (character <= 0
+			    || (illegal_characters != NULL
+				&& strchr (illegal_characters, (char)character) != NULL)) {
+				g_free (result);
+				return NULL;
+			}
+			in += 2;
+		}
+		*out++ = (char)character;
+	}
+
+	*out = '\0';
+	g_assert (out - result <= strlen (escaped_string));
+	return result;
+
+}
+
 static TnyFolder*
 tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar *url_string, GError **err)
 {
@@ -1251,7 +1324,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 	CamelFolderInfo *iter = NULL; guint32 flags; CamelStore *store;
-	char *str = NULL;
+	char *str = NULL, *nnstr = NULL;
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
@@ -1292,28 +1365,67 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
 
-	str = strchr (url_string, '/');
+	if (strcasestr (url_string, "maildir"))
+	{
+		// maildir:/home/xxx/.modest/local_folders#New%20folder/1183044323.16675_6.mindcrime_2_S_2_S
 
-	if (str && strlen (str) > 1) {
-		str++;
-		str = strchr (str, '/');
-	} else 
-		str = NULL;
+		str = strchr (url_string, '#');
+		if (str && strlen (str) > 1)
+		{
+			char *nstr;
 
-	if (str && strlen (str) > 1) {
-		str++;
-		str = strchr (str, '/');
-	} else
-		str = NULL;
+			nnstr = unescape_string (str, NULL);
+			if (nnstr && strlen (nnstr) > 1)
+			{
+				nnstr++;
+				nstr = strchr (nnstr, '/');
+				if (nstr)
+					*nstr = '\0';
+			}
+			str = nnstr;
+		} else 
+			str = NULL;
+	} else {
+		str = strchr (url_string, '/');
 
-	if (str && strlen (str) > 1) {
-		str++;
+		if (str && strlen (str) > 1) {
+			str++;
+			str = strchr (str, '/');
+		} else 
+			str = NULL;
+
+		if (str && strlen (str) > 1) {
+			str++;
+			str = strchr (str, '/');
+		} else
+			str = NULL;
+
+		if (str && strlen (str) > 1) {
+			char *nstr;
+			str++;
+			nstr = strchr (str, '/');
+			if (nstr)
+				*nstr = '\0';
+		} else 
+			str = NULL;
+	}
+
+	if (str) 
+	{
 		iter = camel_store_get_folder_info (store, str, flags, &ex);
+
+		if (nnstr)
+			g_free (nnstr);
+
 	} else {
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 			"Invalid URL string");
 		_tny_session_stop_operation (apriv->session);
+
+		if (nnstr)
+			g_free (nnstr);
+
 		return NULL;
 	}
 
