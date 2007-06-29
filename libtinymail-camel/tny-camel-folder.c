@@ -3553,8 +3553,13 @@ static GThread *poke_folders_thread = NULL;
 static gpointer
 tny_camel_folder_poke_status_thread (gpointer data)
 {
+	GList *mypoke_folders;
 
-	while (poke_folders)
+	g_static_mutex_lock (&poke_folders_lock);
+	mypoke_folders = poke_folders;
+	g_static_mutex_unlock (&poke_folders_lock);
+
+	while (mypoke_folders)
 	{
 		PokeStatusInfo *info = NULL;
 		TnyFolder *folder = NULL;
@@ -3599,6 +3604,7 @@ tny_camel_folder_poke_status_thread (gpointer data)
 		g_object_unref (folder);
 
 		poke_folders = g_list_next (poke_folders);
+		mypoke_folders = poke_folders;
 
 		if (!poke_folders)
 		{
