@@ -59,8 +59,8 @@ typedef struct {
 	gchar     *iap;
 	gboolean 	forced; /* Whether the is_online value is forced rather than real. */
 	
-	/* When TRUE, we are waiting for the success or failure signal. */
-	gboolean attempting_connection;
+	/* When non-NULL, we are waiting for the success or failure signal. */
+	GMainLoop *loop;
 	
 #ifdef MAEMO_CONIC_DUMMY	
 	gint dummy_env_check_timeout;
@@ -89,6 +89,16 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 		       0, !status_before);
 }
 
+static void 
+stop_loop(TnyMaemoConicDevice *self)
+{
+	TnyMaemoConicDevicePriv *priv
+		= TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+
+	if (priv->loop) {
+		g_main_loop_quit (priv->loop);
+	}
+}
 
 static void
 on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer user_data)
@@ -126,10 +136,9 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 		priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
 		is_online = TRUE;
 		
-		/* Set this to FALSE to stop blocking 
-		 * tny_maemo_conic_device_connect(): */
-		if (priv->attempting_connection)
-			priv->attempting_connection = FALSE;
+		/* Stop blocking 
+		 * tny_maemo_conic_device_connect(), if we are: */
+		stop_loop (device);
 			
 		g_message ("new status: CONNECTED (%s)", priv->iap);
 		break;
@@ -137,10 +146,9 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 		priv->iap = NULL;
 		is_online = FALSE;
 		
-		/* Set this to FALSE to stop blocking 
-		 * tny_maemo_conic_device_connect(): */
-		if (priv->attempting_connection)
-			priv->attempting_connection = FALSE;
+		/* Stop blocking 
+		 * tny_maemo_conic_device_connect(), if we are: */
+		stop_loop (device);
 			
 		g_message ("new status: DISCONNECTED");
 		break;
@@ -158,8 +166,6 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, is_online);
 }
-
-
 
 /**
  * tny_maemo_conic_device_connect:
@@ -187,34 +193,44 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 	g_message (__FUNCTION__);
 	g_message ("connecting to %s", iap_id ? iap_id : "<any>");
 	
+	priv->loop = g_main_loop_new(NULL, FALSE /* not running immediately. */);
+
+	gboolean request_failed = FALSE;
 	if (iap_id) {
-		priv->attempting_connection = TRUE;
-		
 		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect_by_id dbus message");
-			return FALSE;
+			request_failed = TRUE;
 		}
 	} else {
-		priv->attempting_connection = TRUE;
-		
+printf ("debug2\n");
 		if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect dbus message");
-			return FALSE;
+			request_failed = TRUE;
 		}
+printf ("debug3\n");
+	}
+
+	if (request_failed) {
+		g_object_unref (priv->loop);
+		priv->loop = NULL;
 	}
 	
 	/* Wait for the CON_IC_STATUS_CONNECTED (succeeded) or 
 	 * CON_IC_STATUS_DISCONNECTED event: */
 	 
-	/* When the signal has been handled, 
-	 * attempting_connection will be reset to FALSE. */
-	while (priv->attempting_connection) {
-		/* Iterate the main loop so that the signal can be called. */
-		if (g_main_context_pending (NULL)) {
-			g_main_context_iteration (NULL, FALSE);
-		}
-	}
-	
+printf ("debug4\n");
+	/* This is based on code found in gtk_dialog_run(): */
+	/* GDK_THREADS_LEAVE(); */
+printf ("debug5\n");
+	/* Run until g_main_loop_quit() is called by our signal handler. */
+	g_main_loop_run (priv->loop);
+printf ("debug6\n");
+	/* GDK_THREADS_ENTER(); */
+printf ("debug7\n");
+	g_main_loop_unref (priv->loop);
+printf ("debug8\n");
+	priv->loop = NULL;
+
 	return priv->is_online;
 }
 
@@ -258,6 +274,8 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 			return FALSE;
 		}
 #endif /* MAEMO_CONIC_DUMMY*/
+
+	printf ("DEBUG: %s: end.\n", __FUNCTION__);
 	return TRUE;
 }
 
