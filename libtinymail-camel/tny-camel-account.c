@@ -1271,6 +1271,10 @@ tny_camel_account_finalize (GObject *object)
 {
 	TnyCamelAccount *self = (TnyCamelAccount *)object;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	if (priv->service && CAMEL_IS_SERVICE (priv->service))
+		camel_service_disconnect (CAMEL_SERVICE (priv->service), FALSE, &ex);
 
 	_tny_camel_account_clear_hooks (self);
 
