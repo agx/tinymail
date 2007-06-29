@@ -34,7 +34,12 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdlib.h>
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <string.h>
+
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
