@@ -1250,7 +1250,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	TnyFolder *retval = NULL;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
-	CamelFolderInfo *iter; guint32 flags; CamelStore *store;
+	CamelFolderInfo *iter = NULL; guint32 flags; CamelStore *store;
 	char *str = NULL;
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
