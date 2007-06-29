@@ -141,7 +141,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 		 * tny_maemo_conic_device_connect(), if we are: */
 		stop_loop (device);
 			
-		g_message ("new status: CONNECTED (%s)", priv->iap);
+		/* g_message ("new status: CONNECTED (%s)", priv->iap); */
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
 		priv->iap = NULL;
@@ -151,11 +151,11 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 		 * tny_maemo_conic_device_connect(), if we are: */
 		stop_loop (device);
 			
-		g_message ("new status: DISCONNECTED");
+		/* g_message ("new status: DISCONNECTED"); */
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
 		is_online = FALSE;
-		g_message ("new status: DISCONNECTING");
+		/* g_message ("new status: DISCONNECTING"); */
 		break;
 	default:
 		g_return_if_reached (); 
@@ -163,7 +163,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	priv->is_online = is_online;
 	priv->forced = FALSE; /* is_online is now accurate. */
-	g_message ("emitting signal CONNECTION_CHANGED: %s", is_online ? "online" : "offline");
+	g_message ("DEBUG: %s: emitting signal CONNECTION_CHANGED: %s", is_online ? "online" : "offline");
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, is_online);
 }
@@ -203,12 +203,10 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 			request_failed = TRUE;
 		}
 	} else {
-printf ("debug2\n");
 		if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect dbus message");
 			request_failed = TRUE;
 		}
-printf ("debug3\n");
 	}
 
 	if (request_failed) {
@@ -219,17 +217,13 @@ printf ("debug3\n");
 	/* Wait for the CON_IC_STATUS_CONNECTED (succeeded) or 
 	 * CON_IC_STATUS_DISCONNECTED event: */
 	 
-printf ("debug4\n");
 	/* This is based on code found in gtk_dialog_run(): */
 	GDK_THREADS_LEAVE();
-printf ("debug5\n");
 	/* Run until g_main_loop_quit() is called by our signal handler. */
 	g_main_loop_run (priv->loop);
-printf ("debug6\n");
 	GDK_THREADS_ENTER();
-printf ("debug7\n");
+
 	g_main_loop_unref (priv->loop);
-printf ("debug8\n");
 	priv->loop = NULL;
 
 	return priv->is_online;
