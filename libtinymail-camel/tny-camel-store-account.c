@@ -1417,9 +1417,10 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	{
 		iter = camel_store_get_folder_info (store, str, flags, &ex);
 
-		if (nnstr)
-			g_free (nnstr);
-
+		if (nnstr) {
+			/* g_free (nnstr); known leak */
+			nnstr = NULL;
+		}
 	} else {
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
