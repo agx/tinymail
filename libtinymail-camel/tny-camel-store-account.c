@@ -1318,13 +1318,14 @@ unescape_string (const gchar *escaped_string,
 }
 
 static TnyFolder*
-tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar *url_string, GError **err)
+tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar *url_string_in, GError **err)
 {
 	TnyFolder *retval = NULL;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 	CamelFolderInfo *iter = NULL; guint32 flags; CamelStore *store;
 	char *str = NULL, *nnstr = NULL;
+	char *url_string = NULL;
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
@@ -1343,7 +1344,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 		return NULL;
 	}
 
-	store = CAMEL_STORE (apriv->service);
+ 	store = CAMEL_STORE (apriv->service);
 
 	if (camel_exception_is_set (&ex))
 	{
@@ -1364,6 +1365,8 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	if (!camel_session_is_online ((CamelSession*) apriv->session))
 		flags |= CAMEL_STORE_FOLDER_INFO_SUBSCRIBED;
+
+	url_string = g_strdup (url_string_in);
 
 	if (strcasestr (url_string, "maildir"))
 	{
@@ -1426,6 +1429,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 		if (nnstr)
 			g_free (nnstr);
 
+		g_free (url_string);
 		return NULL;
 	}
 
@@ -1443,6 +1447,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 			camel_object_unref (CAMEL_OBJECT (store));
 		}
 		_tny_session_stop_operation (apriv->session);
+		g_free (url_string);
 		return NULL;
 	}
 
@@ -1461,6 +1466,8 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	}
 
 	_tny_session_stop_operation (apriv->session);
+
+	g_free (url_string);
 
 	return retval;
 }
