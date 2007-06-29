@@ -3,6 +3,7 @@
 	* Various connectivity bugfixes
 	* Fixed a locking problem when connectivity changes
 	* Bugfix in poke-status
+	* Crasher fixed (NULL function pointer)
 
 2007-06-28  Philip Van Hoof  <pvanhoof@gnome.org>
 

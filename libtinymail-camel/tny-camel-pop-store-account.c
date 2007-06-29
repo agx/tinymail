@@ -180,9 +180,12 @@ tny_camel_pop_store_account_reconnect (TnyCamelPOPStoreAccount *self)
 	}
 
 	if (service->reconnection)
-		service->reconnection (service, TRUE, service->data);
-	else
-		service->reconnection (service, FALSE, service->data);
+	{
+		if (!camel_exception_is_set (&ex))
+			service->reconnection (service, TRUE, service->data);
+		else
+			service->reconnection (service, FALSE, service->data);
+	}
 
 	service->reconnecting = FALSE;
 

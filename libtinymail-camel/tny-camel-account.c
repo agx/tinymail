@@ -148,9 +148,12 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 
 
 		if (apriv->service->reconnection)
-			apriv->service->reconnection (apriv->service, TRUE, apriv->service->data);
-		else
-			apriv->service->reconnection (apriv->service, FALSE, apriv->service->data);
+		{
+			if (!camel_exception_is_set (&ex))
+				apriv->service->reconnection (apriv->service, TRUE, apriv->service->data);
+			else
+				apriv->service->reconnection (apriv->service, FALSE, apriv->service->data);
+		}
 
 		apriv->service->reconnecting = FALSE;
 		
@@ -804,14 +807,18 @@ static void
 tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pass_func)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	gboolean reconf_if = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
+	if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
+		reconf_if = TRUE;
+
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		TRUE, TRUE);
+		reconf_if, TRUE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -828,14 +835,18 @@ static void
 tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	gboolean reconf_if = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
+	if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
+		reconf_if = TRUE;
+
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		TRUE, FALSE);
+		reconf_if, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
