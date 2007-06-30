@@ -163,7 +163,8 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	priv->is_online = is_online;
 	priv->forced = FALSE; /* is_online is now accurate. */
-	g_message ("DEBUG: %s: emitting signal CONNECTION_CHANGED: %s", is_online ? "online" : "offline");
+	g_message ("DEBUG: %s: emitting signal CONNECTION_CHANGED: %s", 
+		   __FUNCTION__, is_online ? "online" : "offline");
 	g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, is_online);
 }
