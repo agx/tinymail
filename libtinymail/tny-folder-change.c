@@ -531,3 +531,30 @@ tny_folder_change_get_type (void)
 	return type;
 }
 
+
+/**
+ * tny_folder_change_changed_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_folder_change_changed_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT, "TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT", "all-count" },
+      { TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT, "TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT", "unread-count" },
+      { TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS","added-headers" },
+      { TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS", "removed-headers" },
+      { TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME, "TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME", "rename" },
+      { TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED, "TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED", "received" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyFolderChangeChanged", values);
+  }
+  return etype;
+}
+

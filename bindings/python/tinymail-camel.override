@@ -23,7 +23,6 @@ headers
 #include <tny-folder-store-query.h>
 #include <tny-send-queue.h>
 
-
 #include <tny-camel-account.h>
 #include <tny-camel-folder.h>
 #include <tny-camel-header.h>
@@ -47,6 +46,7 @@ headers
 #include <tny-camel-full-msg-receive-strategy.h>
 #include <tny-camel-partial-msg-receive-strategy.h>
 #include <tny-camel-mem-stream.h>
+#include <tny-camel-pop-remote-msg-remove-strategy.h>
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
@@ -68,3 +68,8 @@ import tinymail.Header as PyTnyHeader_Type
 import tinymail.Folder as PyTnyFolder_Type
 import tinymail.FolderStore as PyTnyFolderStore_Type
 import tinymail.StoreAccount as PyTnyStoreAccount_Type
+import tinymail.Lockable as PyTnyLockable_Type
+import tinymail.camel.CamelSession as PyCamelSession_Type
+import tinymail.camel.CamelStream as PyCamelStream_Type
+
+

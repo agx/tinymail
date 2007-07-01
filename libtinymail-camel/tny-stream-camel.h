@@ -28,6 +28,9 @@
 
 G_BEGIN_DECLS
 
+/* Strange Python binding generator wants this */
+#define TNY_TYPE_STREAM_CAMEL_STREAM     (tny_stream_camel_get_type ())
+
 #define TNY_TYPE_STREAM_CAMEL     (tny_stream_camel_get_type ())
 #define TNY_STREAM_CAMEL(obj)     (CAMEL_CHECK_CAST((obj), TNY_TYPE_STREAM_CAMEL_STREAM, TnyStreamCamel))
 #define TNY_STREAM_CAMEL_CLASS(k) (CAMEL_CHECK_CLASS_CAST ((k), TNY_TYPE_STREAM_CAMEL_STREAM, TnyStreamCamelClass))

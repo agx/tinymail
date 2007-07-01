@@ -42,6 +42,8 @@ typedef enum _TnyAccountSignal TnyAccountSignal;
 typedef enum _TnyConnectionStatus TnyConnectionStatus;
 #endif
 
+#define TNY_TYPE_CONNECTION_STATUS (tny_connection_status_get_type())
+
 enum _TnyConnectionStatus
 {
 	TNY_CONNECTION_STATUS_DISCONNECTED,

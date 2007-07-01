@@ -347,3 +347,25 @@ tny_folder_store_change_get_type (void)
 	return type;
 }
 
+
+/**
+ * tny_folder_store_change_changed_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_folder_store_change_changed_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS", "created-folders" },
+      { TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS", "removed-folders" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyFolderStoreChangeChanged", values);
+  }
+  return etype;
+}

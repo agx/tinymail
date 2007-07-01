@@ -1325,3 +1325,51 @@ tny_folder_type_get_type (void)
   }
   return etype;
 }
+
+
+
+/**
+ * tny_folder_caps_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_folder_caps_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_FOLDER_CAPS_WRITABLE, "TNY_FOLDER_CAPS_WRITABLE", "writable" },
+      {TNY_FOLDER_CAPS_PUSHEMAIL, "TNY_FOLDER_CAPS_PUSHEMAIL", "pushemail" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyFolderCaps", values);
+  }
+  return etype;
+}
+
+
+/**
+ * tny_folder_signal_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_folder_signal_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_FOLDER_FOLDER_INSERTED, "TNY_FOLDER_FOLDER_INSERTED", "inserted" },
+      { TNY_FOLDER_FOLDERS_RELOADED, "TNY_FOLDER_FOLDERS_RELOADED", "reloaded" },
+      { TNY_FOLDER_LAST_SIGNAL, "TNY_FOLDER_LAST_SIGNAL", "last-signal" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyFolderSignal", values);
+  }
+  return etype;
+}

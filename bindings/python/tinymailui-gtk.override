@@ -20,6 +20,7 @@ headers
 #include <tny-gtk-text-buffer-stream.h>
 #include <tny-gtk-text-mime-part-view.h>
 #include <tny-gtk-lockable.h>
+#include <tny-gtk-password-dialog.h>
 
 %%
 modulename tinymail.uigtk
@@ -48,3 +49,4 @@ import tinymail.FolderStoreQuery as PyTnyFolderStoreQuery_Type
 import tinymail.ui.MimePartSaver as PyTnyMimePartSaver_Type
 import tinymail.ui.MimePartSaveStrategy as PyTnyMimePartSaveStrategy_Type
 import tinymail.ui.MsgView as PyTnyMsgView_Type
+

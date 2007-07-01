@@ -4,6 +4,8 @@ headers
 #include <Python.h>
 #include <pygobject.h>
 
+#include <tny-shared.h>
+
 #include <tny-error.h>
 #include <tny-account.h>
 #include <tny-account-store.h>
@@ -16,7 +18,6 @@ headers
 #include <tny-header.h>
 #include <tny-msg.h>
 #include <tny-mime-part.h>
-#include <tny-shared.h>
 #include <tny-store-account.h>
 #include <tny-stream.h>
 #include <tny-transport-account.h>
@@ -37,7 +38,14 @@ headers
 #include <tny-password-getter.h>
 #include <tny-merge-folder.h>
 #include <tny-combined-account.h>
-#
+
+#include <tny-status.h>
+#include <tny-folder-change.h>
+#include <tny-folder-store-change.h>
+#include <tny-account-store.h>
+#include <tny-device.h>
+
+
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
 

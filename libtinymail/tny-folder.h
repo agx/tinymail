@@ -43,6 +43,8 @@ typedef struct _TnyFolder TnyFolder;
 typedef struct _TnyFolderIface TnyFolderIface;
 #endif
 
+#define TNY_TYPE_FOLDER_SIGNAL (tny_folder_signal_get_type())
+
 enum _TnyFolderSignal
 {
 	TNY_FOLDER_FOLDER_INSERTED,
@@ -53,6 +55,8 @@ enum _TnyFolderSignal
 extern guint tny_folder_signals[TNY_FOLDER_LAST_SIGNAL];
 
 #define TNY_TYPE_FOLDER_TYPE (tny_folder_type_get_type())
+
+#define TNY_TYPE_FOLDER_CAPS (tny_folder_caps_get_type())
 
 enum _TnyFolderCaps
 {

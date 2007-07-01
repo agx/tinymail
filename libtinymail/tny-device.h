@@ -31,6 +31,8 @@ G_BEGIN_DECLS
 #define TNY_IS_DEVICE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_DEVICE))
 #define TNY_DEVICE_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_DEVICE, TnyDeviceIface))
 
+#define TNY_TYPE_DEVICE_SIGNAL (tny_device_signal_get_type())
+
 enum _TnyDeviceSignal
 {
 	TNY_DEVICE_CONNECTION_CHANGED,

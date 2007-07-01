@@ -234,3 +234,27 @@ tny_device_get_type (void)
 
 	return type;
 }
+
+
+
+/**
+ * tny_device_signal_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_device_signal_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_DEVICE_CONNECTION_CHANGED, "TNY_DEVICE_CONNECTION_CHANGED", "connection-changed" },
+      { TNY_DEVICE_LAST_SIGNAL, "TNY_DEVICE_LAST_SIGNAL", "last-signal" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyDeviceSignal", values);
+  }
+  return etype;
+}

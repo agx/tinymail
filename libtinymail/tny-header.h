@@ -67,6 +67,8 @@ enum _TnyHeaderFlags
 	/* Keep below 1<<12 (internally used bits) */
 };
 
+#define TNY_TYPE_HEADER_PRIORITY_FLAGS (tny_header_priority_flags_get_type())
+
 enum _TnyHeaderPriorityFlags 
 {
 	TNY_HEADER_FLAG_HIGH_PRIORITY = 1<<9|1<<10,

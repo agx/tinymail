@@ -40,6 +40,9 @@ typedef struct _TnyFolderChange TnyFolderChange;
 typedef struct _TnyFolderChangeClass TnyFolderChangeClass;
 #endif
 
+
+#define TNY_TYPE_FOLDER_CHANGE_CHANGED (tny_folder_change_changed_get_type())
+
 enum _TnyFolderChangeChanged
 {
 	TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT = 1<<0,

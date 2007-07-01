@@ -37,7 +37,7 @@ enum _TnyStatusDomain
 	TNY_GET_SUPPORTED_SECURE_AUTH_STATUS = 3
 };
 
-#define TNY_TYPE_STATUS (tny_status_get_type())
+#define TNY_TYPE_STATUS_CODE (tny_status_code_get_type())
 
 enum _TnyStatusCode 
 {

@@ -963,3 +963,31 @@ tny_account_type_get_type (void)
   return etype;
 }
 
+
+/**
+ * tny_connection_status_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_connection_status_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_CONNECTION_STATUS_DISCONNECTED, "TNY_CONNECTION_STATUS_DISCONNECTED", "disconnected" },
+      { TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN, "TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN", "disconnected-broken" },
+      { TNY_CONNECTION_STATUS_CONNECTED_BROKEN, "TNY_CONNECTION_STATUS_CONNECTED_BROKEN", "connected-broken" },
+      { TNY_CONNECTION_STATUS_CONNECTED, "TNY_CONNECTION_STATUS_CONNECTED", "connected" },
+      { TNY_CONNECTION_STATUS_RECONNECTING, "TNY_CONNECTION_STATUS_RECONNECTING", "reconnecting" },
+      { TNY_CONNECTION_STATUS_INIT, "TNY_CONNECTION_STATUS_INIT", "init" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyConnectionStatus", values);
+  }
+  return etype;
+}
+
+

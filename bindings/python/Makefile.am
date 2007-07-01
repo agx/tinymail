@@ -70,15 +70,10 @@ CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c \
 EXTRA_DIST = \
 	filter.py \
 	scanvirtuals.py \
-	tinymail.defs.extra \
 	tinymail.override \
-	tinymailui.defs.extra \
 	tinymailui.override \
 	tinymailui-gtk.override \
-	tinymailui-gtk.defs.extra \
-	tinymail-platform.defs.extra \
 	tinymail-platform.override \
-	tinymail-camel.defs.extra \
 	tinymail-camel.override
 
 # To update:
@@ -124,11 +119,8 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-transport-account.h
 
 
-tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py 
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
-	--extra=$(top_srcdir)/bindings/python/tinymail.defs.extra \
-	--topsrcdir=$(top_srcdir) > $@
+tinymail.defs: $(tinymail_h_files) 
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) > $@
 
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
 #	$(tinymail_h_files) >> $@
@@ -144,11 +136,8 @@ tinymailui_h_files = \
 	$(top_srcdir)/libtinymailui/tny-platform-factory.h \
 	$(top_srcdir)/libtinymailui/tny-summary-view.h
 
-tinymailui.defs: $(tinymailui_h_files) tinymailui.defs.extra $(top_srcdir)/bindings/python/filter.py
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_h_files) | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
-	--extra=$(top_srcdir)/bindings/python/tinymailui.defs.extra \
-	--topsrcdir=$(top_srcdir) > $@
+tinymailui.defs: $(tinymailui_h_files)
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_h_files) > $@
 
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
 #	$(tinymailui_h_files) >> $@
@@ -170,23 +159,17 @@ tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h
 
-tinymailui-gtk.defs: $(tinymailui_gtk_h_files) tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_gtk_h_files) | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py 		   \
-	--extra=$(top_srcdir)/bindings/python/tinymailui-gtk.defs.extra    \
-	--topsrcdir=$(top_srcdir) > $@
+tinymailui-gtk.defs: $(tinymailui_gtk_h_files) 
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_gtk_h_files) > $@
 
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
 #	$(tinymailui_gtk_h_files) >> $@
 
 # tinymail_platform_h_files = `ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs`
 
-tinymail-platform.defs : $(tinymail_platform_h_files) tinymail-platform.defs.extra $(top_srcdir)/bindings/python/filter.py
+tinymail-platform.defs : $(tinymail_platform_h_files) 
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py \
-	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs`	| \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
-	--extra=$(top_srcdir)/bindings/python/tinymail-platform.defs.extra \
-	--topsrcdir=$(top_srcdir) > $@
+	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs`	> $@
 
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
 #	$(tinymail_platform_h_files) >> $@
@@ -217,11 +200,8 @@ tinymail_camel_h_files = \
 	$(top_srcdir)/libtinymail-camel/tny-stream-camel.h
 
 
-tinymail-camel.defs : $(tinymail_camel_h_files) tinymail-camel.defs.extra $(top_srcdir)/bindings/python/filter.py
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_camel_h_files) | \
-	$(PYTHON) $(top_srcdir)/bindings/python/filter.py \
-	--extra=$(top_srcdir)/bindings/python/tinymail-camel.defs.extra \
-	--topsrcdir=$(top_srcdir) > $@
+tinymail-camel.defs : $(tinymail_camel_h_files)
+	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_camel_h_files) > $@
 
 #	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
 #	$(tinymail_platform_h_files) >> $@
