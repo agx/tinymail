@@ -79,6 +79,7 @@ Enumerations for tinymail
 </para>
 
 @TNY_ERROR_UNSPEC: An unspecified error occured
+@TNY_FOLDER_ERROR_SYNC: 
 @TNY_FOLDER_ERROR_REMOVE_MSG: An error that occured while removing a message
 @TNY_FOLDER_ERROR_ADD_MSG: An error that occured while adding a message
 @TNY_FOLDER_ERROR_REFRESH: An error that occured while refreshing a folder
@@ -92,6 +93,9 @@ Enumerations for tinymail
 @TNY_TRANSPORT_ACCOUNT_ERROR_SEND: An error that occured while sending a message
 @TNY_ACCOUNT_ERROR_TRY_CONNECT: An error that occured while trying to connect to an account
 @TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT: 
+@TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH: 
+@TNY_SEND_QUEUE_ERROR_ADD: 
+@TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT: 
 
 <!-- ##### ENUM TnyAccountType ##### -->
 <para>
@@ -100,6 +104,19 @@ Enumerations for tinymail
 
 @TNY_ACCOUNT_TYPE_STORE: A account that can store folders and messages
 @TNY_ACCOUNT_TYPE_TRANSPORT: A account that can send and messages (transfer them)
+@TNY_ACCOUNT_TYPE_COMBINED: 
+
+<!-- ##### ENUM TnyConnectionStatus ##### -->
+<para>
+
+</para>
+
+@TNY_CONNECTION_STATUS_DISCONNECTED: 
+@TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN: 
+@TNY_CONNECTION_STATUS_CONNECTED_BROKEN: 
+@TNY_CONNECTION_STATUS_CONNECTED: 
+@TNY_CONNECTION_STATUS_RECONNECTING: 
+@TNY_CONNECTION_STATUS_INIT: 
 
 <!-- ##### ENUM TnyAccountStoreSignal ##### -->
 <para>
@@ -153,7 +170,6 @@ Enumerations for tinymail
 </para>
 
 @TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED: Only subscribed folders will match this query
-@TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED: Only unsibscribed folders will match this query
 @TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME: Only folders that will match the pattern on folder name will match this query
 @TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID: Only folders that wil match the pattern on folder id will match this query
 
@@ -198,4 +214,11 @@ framework developers about simply getting your "special" cool flag added to tiny
 @TNY_FOLDER_TYPE_JUNK: The folder type is a JUNK folder
 @TNY_FOLDER_TYPE_SENT: The folder type is a SENT folder
 @TNY_FOLDER_TYPE_ROOT: The folder type is a #TnyAccount that contains this folder (used for the #TnyGtkAccountTreeModel)
+@TNY_FOLDER_TYPE_NOTES: 
+@TNY_FOLDER_TYPE_DRAFTS: 
+@TNY_FOLDER_TYPE_CONTACTS: 
+@TNY_FOLDER_TYPE_CALENDAR: 
+@TNY_FOLDER_TYPE_ARCHIVE: 
+@TNY_FOLDER_TYPE_MERGE: 
+@TNY_FOLDER_TYPE_NUM: 
 

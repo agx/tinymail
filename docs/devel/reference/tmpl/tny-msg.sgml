@@ -33,6 +33,8 @@ therefore be used as a mime part.
 @get_header_func: 
 @get_folder_func: 
 @get_url_string_func: 
+@uncache_attachments_func: 
+@rewrite_cache_func: 
 
 <!-- ##### FUNCTION tny_msg_get_header ##### -->
 <para>
@@ -59,5 +61,21 @@ therefore be used as a mime part.
 
 @self: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_msg_uncache_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_msg_rewrite_cache ##### -->
+<para>
+
+</para>
+
+@self: 
 
 

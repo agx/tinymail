@@ -46,45 +46,45 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::connecting-finished ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -159,6 +159,8 @@ Shared include file with forward typedefs
 @get_header_func: 
 @get_folder_func: 
 @get_url_string_func: 
+@uncache_attachments_func: 
+@rewrite_cache_func: 
 
 <!-- ##### STRUCT TnyFolder ##### -->
 <para>
@@ -260,16 +262,19 @@ Shared include file with forward typedefs
 @get_content_id_func: 
 @get_description_func: 
 @get_content_location_func: 
+@is_purged_func: 
 @set_content_location_func: 
 @set_description_func: 
 @set_content_id_func: 
 @set_filename_func: 
 @set_content_type_func: 
+@set_purged_func: 
 @is_attachment_func: 
 @get_parts_func: 
 @del_part_func: 
 @add_part_func: 
 @get_header_pairs_func: 
+@set_header_pair_func: 
 
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
@@ -282,7 +287,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccount: the object which received the signal.
+@: 
+@Param2: 
 
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
@@ -290,7 +296,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@is_connected_func: 
+@get_connection_status_func: 
 @set_id_func: 
 @set_name_func: 
 @set_secure_auth_mech_func: 
@@ -314,6 +320,8 @@ Shared include file with forward typedefs
 @get_account_type_func: 
 @cancel_func: 
 @matches_url_string_func: 
+@start_operation_func: 
+@stop_operation_func: 
 @connection_status_changed: 
 
 <!-- ##### STRUCT TnyDevice ##### -->
@@ -327,8 +335,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnydevice: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -591,20 +599,18 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>

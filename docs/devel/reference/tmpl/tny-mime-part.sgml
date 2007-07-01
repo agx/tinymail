@@ -39,16 +39,19 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 @get_content_id_func: 
 @get_description_func: 
 @get_content_location_func: 
+@is_purged_func: 
 @set_content_location_func: 
 @set_description_func: 
 @set_content_id_func: 
 @set_filename_func: 
 @set_content_type_func: 
+@set_purged_func: 
 @is_attachment_func: 
 @get_parts_func: 
 @del_part_func: 
 @add_part_func: 
 @get_header_pairs_func: 
+@set_header_pair_func: 
 
 <!-- ##### FUNCTION tny_mime_part_get_content_type ##### -->
 <para>
@@ -134,6 +137,15 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_mime_part_is_purged ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_mime_part_set_content_location ##### -->
 <para>
 
@@ -177,6 +189,14 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 
 @self: 
 @contenttype: 
+
+
+<!-- ##### FUNCTION tny_mime_part_set_purged ##### -->
+<para>
+
+</para>
+
+@self: 
 
 
 <!-- ##### FUNCTION tny_mime_part_is_attachment ##### -->
@@ -232,5 +252,15 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 
 @self: 
 @list: 
+
+
+<!-- ##### FUNCTION tny_mime_part_set_header_pair ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@value: 
 
 

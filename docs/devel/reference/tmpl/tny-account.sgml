@@ -36,6 +36,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 @tnyaccount: the object which received the signal.
+@Param2: 
 
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
@@ -43,7 +44,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 @parent: 
-@is_connected_func: 
+@get_connection_status_func: 
 @set_id_func: 
 @set_name_func: 
 @set_secure_auth_mech_func: 
@@ -67,6 +68,8 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @get_account_type_func: 
 @cancel_func: 
 @matches_url_string_func: 
+@start_operation_func: 
+@stop_operation_func: 
 @connection_status_changed: 
 
 <!-- ##### FUNCTION tny_account_type_get_type ##### -->
@@ -77,7 +80,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_account_is_connected ##### -->
+<!-- ##### FUNCTION tny_account_get_connection_status ##### -->
 <para>
 
 </para>
@@ -291,5 +294,26 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @self: 
 @url_string: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_account_start_operation ##### -->
+<para>
+
+</para>
+
+@self: 
+@domain: 
+@code: 
+@status_callback: 
+@status_user_data: 
+
+
+<!-- ##### FUNCTION tny_account_stop_operation ##### -->
+<para>
+
+</para>
+
+@self: 
+@canceled: 
 
 
