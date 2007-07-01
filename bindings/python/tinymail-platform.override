@@ -46,3 +46,6 @@ import tinymail.ui.MimePartSaveStrategy as PyTnyMimePartSaveStrategy_Type
 import tinymail.ui.PlatformFactory as PyTnyPlatformFactory_Type
 import tinymail.Device as PyTnyDevice_Type
 import tinymail.AccountStore as PyTnyAccountStore_Type
+import tinymail.StoreAccount as PyTnyStoreAccount_Type
+import tinymail.TransportAccount as PyTnyTransportAccount_Type
+

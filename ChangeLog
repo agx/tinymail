@@ -1,3 +1,10 @@
+2007-07-01  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed/updated the Python bindings
+	* Fixed the gtk-doc API documentation genation process
+	* Updated the online gtk-doc API documentation
+	* Prepared a testing QEmu virtual machine
+
 2007-06-29  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:

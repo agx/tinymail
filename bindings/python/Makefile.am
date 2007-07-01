@@ -82,42 +82,47 @@ EXTRA_DIST = \
 	tinymail-camel.override
 
 # To update:
-# ls DIR/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\t\\\\/g
+# ls libtinymail/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\\ \\\\/g
+# ls libtinymail/*h | grep -v \\-priv | sed s/^/\\$\(top_srcdir\)\\//g | sed s/$/\\\ \\\\/g
 
 tinymail_h_files = \
-	$(top_srcdir)/libtinymail/tny-error.h \
 	$(top_srcdir)/libtinymail/tny-account.h \
 	$(top_srcdir)/libtinymail/tny-account-store.h \
+	$(top_srcdir)/libtinymail/tny-combined-account.h \
 	$(top_srcdir)/libtinymail/tny-device.h \
-	$(top_srcdir)/libtinymail/tny-folder-store-query.h \
-	$(top_srcdir)/libtinymail/tny-folder-store.h \
+	$(top_srcdir)/libtinymail/tny-enums.h \
+	$(top_srcdir)/libtinymail/tny-error.h \
+	$(top_srcdir)/libtinymail/tny-folder-change.h \
 	$(top_srcdir)/libtinymail/tny-folder.h \
+	$(top_srcdir)/libtinymail/tny-folder-monitor.h \
+	$(top_srcdir)/libtinymail/tny-folder-observer.h \
+	$(top_srcdir)/libtinymail/tny-folder-stats.h \
+	$(top_srcdir)/libtinymail/tny-folder-store-change.h \
+	$(top_srcdir)/libtinymail/tny-folder-store.h \
+	$(top_srcdir)/libtinymail/tny-folder-store-observer.h \
+	$(top_srcdir)/libtinymail/tny-folder-store-query.h \
 	$(top_srcdir)/libtinymail/tny-fs-stream.h \
 	$(top_srcdir)/libtinymail/tny-header.h \
 	$(top_srcdir)/libtinymail/tny-iterator.h \
 	$(top_srcdir)/libtinymail/tny-list.h \
+	$(top_srcdir)/libtinymail/tny-lockable.h \
+	$(top_srcdir)/libtinymail/tny-merge-folder.h \
 	$(top_srcdir)/libtinymail/tny-mime-part.h \
 	$(top_srcdir)/libtinymail/tny-msg.h \
+	$(top_srcdir)/libtinymail/tny-msg-receive-strategy.h \
+	$(top_srcdir)/libtinymail/tny-msg-remove-strategy.h \
+	$(top_srcdir)/libtinymail/tny-noop-lockable.h \
+	$(top_srcdir)/libtinymail/tny-pair.h \
+	$(top_srcdir)/libtinymail/tny-password-getter.h \
+	$(top_srcdir)/libtinymail/tny-send-queue.h \
 	$(top_srcdir)/libtinymail/tny-shared.h \
+	$(top_srcdir)/libtinymail/tny-signals-marshal.h \
 	$(top_srcdir)/libtinymail/tny-simple-list.h \
+	$(top_srcdir)/libtinymail/tny-status.h \
 	$(top_srcdir)/libtinymail/tny-store-account.h \
 	$(top_srcdir)/libtinymail/tny-stream.h \
-	$(top_srcdir)/libtinymail/tny-transport-account.h \
-	$(top_srcdir)/libtinymail/tny-msg-remove-strategy.h \
-	$(top_srcdir)/libtinymail/tny-msg-receive-strategy.h \
-	$(top_srcdir)/libtinymail/tny-send-queue.h \
-	$(top_srcdir)/libtinymail/tny-pair.h \
-	$(top_srcdir)/libtinymail/tny-lockable.h \
-	$(top_srcdir)/libtinymail/tny-noop-lockable.h \
-	$(top_srcdir)/libtinymail/tny-folder-change.h \
-	$(top_srcdir)/libtinymail/tny-folder-observer.h \
-	$(top_srcdir)/libtinymail/tny-folder-monitor.h \
-	$(top_srcdir)/libtinymail/tny-folder-store-observer.h \
-	$(top_srcdir)/libtinymail/tny-folder-store-change.h \
-	$(top_srcdir)/libtinymail/tny-folder-stats.h \
-	$(top_srcdir)/libtinymail/tny-password-getter.h \
-	$(top_srcdir)/libtinymail/tny-merge-folder.h \
-	$(top_srcdir)/libtinymail/tny-combined-account.h
+	$(top_srcdir)/libtinymail/tny-transport-account.h
+
 
 tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/python/filter.py 
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) | \
@@ -131,8 +136,8 @@ tinymail.defs: $(tinymail_h_files) tinymail.defs.extra $(top_srcdir)/bindings/py
 tinymailui_h_files = \
 	$(top_srcdir)/libtinymailui/tny-account-store-view.h \
 	$(top_srcdir)/libtinymailui/tny-header-view.h \
-	$(top_srcdir)/libtinymailui/tny-mime-part-save-strategy.h \
 	$(top_srcdir)/libtinymailui/tny-mime-part-saver.h \
+	$(top_srcdir)/libtinymailui/tny-mime-part-save-strategy.h \
 	$(top_srcdir)/libtinymailui/tny-mime-part-view.h \
 	$(top_srcdir)/libtinymailui/tny-msg-view.h \
 	$(top_srcdir)/libtinymailui/tny-msg-window.h \
@@ -151,17 +156,19 @@ tinymailui.defs: $(tinymailui_h_files) tinymailui.defs.extra $(top_srcdir)/bindi
 
 tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-list-model.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-folder-store-tree-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attach-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attachment-mime-part-view.h \
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-enums.h \
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-folder-store-tree-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-view.h \
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-lockable.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-mime-part-save-strategy.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-view.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h \
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-password-dialog.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-lockable.h
+	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h
 
 tinymailui-gtk.defs: $(tinymailui_gtk_h_files) tinymailui-gtk.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_gtk_h_files) | \
@@ -187,24 +194,28 @@ tinymail-platform.defs : $(tinymail_platform_h_files) tinymail-platform.defs.ext
 tinymail_camel_h_files = \
 	$(top_srcdir)/libtinymail-camel/tny-camel-account.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-folder.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-full-msg-receive-strategy.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-header.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-imap-folder.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-imap-store-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-mem-stream.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-mime-part.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-msg.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-msg-remove-strategy.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-full-msg-receive-strategy.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-partial-msg-receive-strategy.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-folder.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-store-account.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-partial-msg-receive-strategy.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-pop-folder.h \
+	$(top_srcdir)/libtinymail-camel/tny-camel-pop-remote-msg-remove-strategy.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-pop-store-account.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-send-queue.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-shared.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-store-account.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-stream.h \
 	$(top_srcdir)/libtinymail-camel/tny-camel-transport-account.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-mem-stream.h
+	$(top_srcdir)/libtinymail-camel/tny-session-camel.h \
+	$(top_srcdir)/libtinymail-camel/tny-stream-camel.h
+
 
 tinymail-camel.defs : $(tinymail_camel_h_files) tinymail-camel.defs.extra $(top_srcdir)/bindings/python/filter.py
 	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_camel_h_files) | \

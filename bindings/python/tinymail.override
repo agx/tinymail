@@ -51,61 +51,6 @@ ignore-glob
 %%
 import gobject.GObject as PyGObject_Type
 %%
-override tny_folder_store_get_folders_async kwargs
-
-static void
-tny_get_folders_cb (TnyFolderStore *self, TnyList *list, GError **err, gpointer user_data)
-{
-    PyObject *callback, *args, *ret;
-    PyGILState_STATE state;
-
-    state = pyg_gil_state_ensure();
-    callback = PyTuple_GetItem((PyObject *)user_data, 0);
-    args = Py_BuildValue("(NNO)",
-			 pygobject_new((GObject *)self),
-			 pygobject_new((GObject *)list),
-			 PyTuple_GetItem((PyObject *)user_data, 1));
-    ret = PyObject_CallObject(callback, args);
-    if (!ret)
-	PyErr_Print();
-
-    pyg_error_check(err);
-
-    Py_XDECREF(ret);
-    Py_DECREF(args);
-    Py_DECREF ((PyObject *)user_data);
-    pyg_gil_state_release(state);
-}
-
-
-static PyObject *
-_wrap_tny_folder_store_get_folders_async (PyGObject *self, PyObject *args, PyObject *kwargs)
-{
-    static char *kwlist[] = { "list", "get_folders_func", "query", "user_data", NULL };
-    PyObject *get_folders_func = Py_None, *user_data = Py_None;
-    PyGObject *list = NULL, *query = NULL;
-    PyObject *data;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs,
-                                     "OO|OO:TnyFolderStore.get_folders_async", kwlist,
-                                     &list, &get_folders_func, &query, &user_data))
-        return NULL;
-
-    if (!PyCallable_Check(get_folders_func)) {
-	PyErr_SetString(PyExc_TypeError, "get_folders_async must be callable");
-	return NULL;
-    }
-  
-    data = Py_BuildValue("(OO)", get_folders_func, user_data);
-
-    tny_folder_store_get_folders_async (TNY_FOLDER_STORE (self->obj),
-					TNY_LIST (list->obj),
-				        tny_get_folders_cb, 
-					query!=NULL?TNY_FOLDER_STORE_QUERY (query->obj):NULL, 
-					data);
-    return Py_None;
-}
-%%
 override tny_folder_get_msg_async kwargs
 
 static void
@@ -118,8 +63,8 @@ tny_get_msg_cb (TnyFolder *self, TnyMsg *msg, GError **err, gpointer user_data)
     callback = PyTuple_GetItem((PyObject *)user_data, 1);
     args = Py_BuildValue("(NNO)",
                          pygobject_new((GObject *)self),
-						 pygobject_new((GObject *)msg),
-                         PyTuple_GetItem((PyObject *)user_data, 2));
+			 pygobject_new((GObject *)msg),
+                         PyTuple_GetItem((PyObject *)user_data, 3));
     ret = PyObject_CallObject(callback, args);
     if (!ret)
         PyErr_Print();
@@ -131,11 +76,32 @@ tny_get_msg_cb (TnyFolder *self, TnyMsg *msg, GError **err, gpointer user_data)
     pyg_gil_state_release(state);
 }
 
+
+static void
+tny_get_msg_status_cb (TnyFolder *self, TnyStatus *status, gpointer user_data)
+{
+    PyObject *callback, *args, *ret;
+    PyGILState_STATE state;
+
+    state = pyg_gil_state_ensure();
+    callback = PyTuple_GetItem((PyObject *)user_data, 2);
+    args = Py_BuildValue("(NsiiO)",
+                         pygobject_new((GObject *)self),
+			 status->message, status->position, status->of_total,
+                         PyTuple_GetItem((PyObject *)user_data, 3));
+    ret = PyObject_CallObject(callback, args);
+    if (!ret)
+        PyErr_Print();
+    Py_XDECREF(ret);
+    Py_DECREF(args);
+    pyg_gil_state_release(state);
+}
+
 static PyObject *
 _wrap_tny_folder_get_msg_async (PyGObject *self, PyObject *args, PyObject *kwargs)
 {
-    static char *kwlist[] = { "header", "get_msg_func", "user_data", NULL };
-    PyObject *get_msg_func, *user_data = Py_None;
+    static char *kwlist[] = { "header", "get_msg_func", "get_msg_status_func", "user_data", NULL };
+    PyObject *get_msg_func, *get_msg_status_func, *user_data = Py_None;
     TnyHeader *header;
     PyObject *data;
 
@@ -148,10 +114,13 @@ _wrap_tny_folder_get_msg_async (PyGObject *self, PyObject *args, PyObject *kwarg
         return NULL;
     }
 
-    data = Py_BuildValue("(OOO)", header, get_msg_func, user_data);
+    data = Py_BuildValue("(OOOO)", header, get_msg_func, 
+		get_msg_status_func, user_data);
 
     tny_folder_get_msg_async (TNY_FOLDER (self->obj), header,
-                                      tny_get_msg_cb, data);
+			tny_get_msg_cb,
+			tny_get_msg_status_cb, data);
+
     return Py_None;
 }
 
@@ -183,7 +152,7 @@ tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, GError **err, gpoint
 }
 
 static void
-tny_refresh_folder_status_cb (TnyFolder *self, const gchar *what, gint status, gint oftotal, gpointer user_data)
+tny_refresh_folder_status_cb (TnyFolder *self, TnyStatus *status, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -192,7 +161,7 @@ tny_refresh_folder_status_cb (TnyFolder *self, const gchar *what, gint status, g
     callback = PyTuple_GetItem((PyObject *)user_data, 1);
     args = Py_BuildValue("(NsiiO)",
                          pygobject_new((GObject *)self),
-			 what, status, oftotal,
+			 status->message, status->position, status->of_total,
                          PyTuple_GetItem((PyObject *)user_data, 2));
     ret = PyObject_CallObject(callback, args);
     if (!ret)
@@ -228,7 +197,8 @@ _wrap_tny_folder_refresh_async (PyGObject *self, PyObject *args, PyObject *kwarg
     data = Py_BuildValue("(OOO)", refresh_func, status_func, user_data);
 
     tny_folder_refresh_async (TNY_FOLDER (self->obj),
-				      tny_refresh_folder_cb, tny_refresh_folder_status_cb,
+				      tny_refresh_folder_cb, 
+				      tny_refresh_folder_status_cb,
 				      data);
     return Py_None;
 }

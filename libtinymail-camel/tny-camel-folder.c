@@ -2556,8 +2556,21 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 
 	priv_src->handle_changes = FALSE;
 	priv_dst->handle_changes = FALSE;
+	
+	camel_folder_freeze (cfol_src);
+	camel_folder_freeze (cfol_dst);
 	camel_folder_transfer_messages_to (cfol_src, uids, cfol_dst, 
 			&transferred_uids, delete_originals, &ex);
+	if (delete_originals && uids) {
+		int i;
+		for (i = 0; i < uids->len; i++)
+			camel_folder_set_message_flags (cfol_src, uids->pdata[i],
+				CAMEL_MESSAGE_SEEN, CAMEL_MESSAGE_SEEN);
+	}
+	camel_folder_thaw (cfol_src);
+	camel_folder_thaw (cfol_dst);
+	camel_folder_sync (cfol_dst, FALSE, NULL);
+
 	priv_src->handle_changes = TRUE;
 	priv_dst->handle_changes = TRUE;
 
