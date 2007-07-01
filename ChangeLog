@@ -4,6 +4,8 @@
 	* Fixed the gtk-doc API documentation genation process
 	* Updated the online gtk-doc API documentation
 	* Prepared a testing QEmu virtual machine
+	* Marked the Kolumbus IMAP server as an idiot's IMAP server, as it
+	doesn't correctly support UIDPLUS and BINARY
 
 2007-06-29  Murray Cumming  <murrayc@murrayc.com>
 
