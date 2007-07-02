@@ -1523,16 +1523,21 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 			return;
 		}
 		
-		if (store->capabilities & IMAP_CAPABILITY_UIDPLUS) {
+		if (store->capabilities & IMAP_CAPABILITY_UIDPLUS) 
+		{
 			response = camel_imap_command (store, folder, ex,
 						       "UID EXPUNGE %s", set);
+
+			if (camel_exception_is_set (ex)) 
+			{
+				store->capabilities &= ~IMAP_CAPABILITY_UIDPLUS;
+				((CamelFolderClass *)CAMEL_OBJECT_GET_CLASS(folder))->sync(folder, 0, ex);
+				response = camel_imap_command (store, folder, ex, "EXPUNGE");
+			}
+
 		} else
 			response = camel_imap_command (store, folder, ex, "EXPUNGE");
 
-		if (camel_exception_is_set (ex)) {
-			store->capabilities &= ~IMAP_CAPABILITY_UIDPLUS;
-			((CamelFolderClass *)CAMEL_OBJECT_GET_CLASS(folder))->sync(folder, 0, ex);
-		}
 
 		if (response)
 			camel_imap_response_free (store, response);
