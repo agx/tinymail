@@ -66,35 +66,37 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self, gboolean recon_if, g
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 
-	if (!apriv->service && reservice && apriv->url_string)
+	if (!apriv->session && reservice && apriv->url_string)
 	{
-		if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
+		if (!apriv->service && reservice && apriv->url_string)
 		{
-			camel_object_unref (CAMEL_OBJECT (apriv->service));
-			apriv->service = NULL;
-		} 
+			if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
+			{
+				camel_object_unref (CAMEL_OBJECT (apriv->service));
+				apriv->service = NULL;
+			} 
 
-		if (camel_exception_is_set (apriv->ex))
-			camel_exception_clear (apriv->ex);
+			if (camel_exception_is_set (apriv->ex))
+				camel_exception_clear (apriv->ex);
 
-		apriv->service = camel_session_get_service
-			((CamelSession*) apriv->session, apriv->url_string, 
-			apriv->type, apriv->ex);
+			apriv->service = camel_session_get_service
+				((CamelSession*) apriv->session, apriv->url_string, 
+				apriv->type, apriv->ex);
 
-		if (apriv->service && !camel_exception_is_set (apriv->ex)) 
-		{
-			apriv->service->data = self;
-			apriv->service->connecting = (con_op) NULL;
-			apriv->service->disconnecting = (con_op) NULL;
-			apriv->service->reconnecter = (con_op) NULL;
-			apriv->service->reconnection = (con_op) NULL;
+			if (apriv->service && !camel_exception_is_set (apriv->ex)) 
+			{
+				apriv->service->data = self;
+				apriv->service->connecting = (con_op) NULL;
+				apriv->service->disconnecting = (con_op) NULL;
+				apriv->service->reconnecter = (con_op) NULL;
+				apriv->service->reconnection = (con_op) NULL;
 
-		} else if (camel_exception_is_set (apriv->ex) && apriv->service)
-		{
-			g_warning ("Must cleanup service pointer\n");
-			apriv->service = NULL;
+			} else if (camel_exception_is_set (apriv->ex) && apriv->service)
+			{
+				g_warning ("Must cleanup service pointer\n");
+				apriv->service = NULL;
+			}
 		}
-
 	} else {
 		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
 			_("Session not yet set, use tny_camel_account_set_session"));
