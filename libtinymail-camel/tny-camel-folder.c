@@ -2565,11 +2565,11 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	if (uids) {
 		int i;
 		for (i = 0; i < uids->len; i++) {
-
+/*
 			guint32 flgs = camel_folder_get_message_flags (cfol_src,
 			camel_folder_set_message_flags (cfol_dst, uids->pdata[i],
 					CAMEL_MESSAGE_SEEN, CAMEL_MESSAGE_SEEN);
-
+*/
 			if (delete_originals)
 				camel_folder_set_message_flags (cfol_src, uids->pdata[i],
 					CAMEL_MESSAGE_SEEN, CAMEL_MESSAGE_SEEN);
