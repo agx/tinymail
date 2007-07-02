@@ -454,7 +454,8 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 			}
 #endif
 
-			mi->info.flags |= (camel_message_info_flags(info) & 0xffff);
+			mi->info.flags = camel_message_info_flags(info);
+			/*mi->info.flags |= (camel_message_info_flags(info) & 0xffff);*/
 			mi->info.size = ((CamelMessageInfoBase*)info)->size;
 		}
 

@@ -2461,10 +2461,6 @@ tny_camel_folder_transfer_msgs_async_callback (gpointer thr_user_data)
 	return FALSE;
 }
 
-typedef struct {
-	gchar *uid;
-	guint32 flags;
-} MyFlags;
 
 static void
 transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
@@ -2478,7 +2474,6 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	guint list_length;
 	GPtrArray *uids = NULL;
 	GPtrArray *transferred_uids = NULL;
-	GList *flags_list = NULL;
 
 	g_assert (TNY_IS_LIST (headers));
 	g_assert (TNY_IS_FOLDER (folder_src));
@@ -2565,43 +2560,17 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	camel_folder_freeze (cfol_src);
 	camel_folder_freeze (cfol_dst);
 
-	if (uids)
-	{
-		int i;
-		for (i = 0; i < uids->len; i++) {
-			if (uids->pdata[i])
-			{
-				MyFlags *flags = g_slice_new0 (MyFlags);
-				flags->flags = camel_folder_get_message_flags (cfol_src,
-					uids->pdata[i]);
-				flags->uid = g_strdup (uids->pdata[i]);
-				flags_list = g_list_prepend (flags_list, flags);
-			}
-		}
-	}
-
 	camel_folder_transfer_messages_to (cfol_src, uids, cfol_dst, 
 			&transferred_uids, delete_originals, &ex);
 
-	while (flags_list)
+	if (uids && delete_originals)
 	{
-		MyFlags *flags = flags_list->data;
-
-		camel_folder_set_message_flags (cfol_dst, flags->uid,
-			flags->flags, ~0);
-
-		if (delete_originals)
-			camel_folder_set_message_flags (cfol_src, flags->uid,
+		int i;
+		for (i = 0; i < uids->len; i++) {
+			camel_folder_set_message_flags (cfol_src, uids->pdata[i],
 				CAMEL_MESSAGE_SEEN, CAMEL_MESSAGE_SEEN);
-
-		g_free (flags->uid);
-		g_slice_free (MyFlags, flags);
-
-		flags_list = g_list_next (flags_list);
+		}
 	}
-
-	g_list_free (flags_list);
-	flags_list = NULL;
 
 	camel_folder_thaw (cfol_src);
 	camel_folder_thaw (cfol_dst);
