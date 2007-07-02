@@ -346,15 +346,19 @@ sync_match(CamelImapSearch *is, struct _match_record *mr)
 	
 	/* We only try search using utf8 if its non us-ascii text? */
 	if ((words->type & CAMEL_SEARCH_WORD_8BIT) &&  (store->capabilities & IMAP_CAPABILITY_utf8_search)) {
+
+		camel_imap_store_stop_idle ((CamelImapStore *) store);
 		response = camel_imap_command (store, folder, NULL,
 					       "UID SEARCH CHARSET UTF-8 %s", search->str);
 		/* We can't actually tell if we got a NO response, so assume always */
 		if (response == NULL)
 			store->capabilities &= ~IMAP_CAPABILITY_utf8_search;
 	}
-	if (response == NULL)
+	if (response == NULL) {
+		camel_imap_store_stop_idle ((CamelImapStore *) store);
 		response = camel_imap_command (store, folder, NULL,
 					       "UID SEARCH %s", search->str);
+	}
 	g_string_free(search, TRUE);
 
 	if (!response)

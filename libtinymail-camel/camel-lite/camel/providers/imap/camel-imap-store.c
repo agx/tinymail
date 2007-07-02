@@ -2653,7 +2653,8 @@ delete_folder (CamelStore *store, const char *folder_name, CamelException *ex)
 
 	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto fail;
-	
+
+	camel_imap_store_stop_idle (imap_store);
 	/* make sure this folder isn't currently SELECTed */
 	response = camel_imap_command (imap_store, NULL, ex, "SELECT INBOX");
 	if (!response)
@@ -3011,6 +3012,8 @@ create_folder (CamelStore *store, const char *parent_name,
 	real_name = camel_imap_store_summary_path_to_full(imap_store->summary, folder_name, imap_store->dir_sep);
 	full_name = imap_concat (imap_store, parent_real, real_name);
 	g_free(real_name);
+
+	camel_imap_store_stop_idle (imap_store);
 	response = camel_imap_command (imap_store, NULL, ex, "CREATE %G", full_name);
 	
 	if (response) {
@@ -3177,6 +3180,7 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 	for (j=0;j<2;j++) 
 	{
+		camel_imap_store_stop_idle (imap_store);
 		response = camel_imap_command (imap_store, NULL, ex,
 					       "%s \"\" %G", j==1 ? "LSUB" : "LIST",
 					       pattern);
@@ -3622,7 +3626,8 @@ subscribe_folder (CamelStore *store, const char *folder_name,
 
 	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto done;
-	
+
+	camel_imap_store_stop_idle (imap_store);
 	response = camel_imap_command (imap_store, NULL, ex,
 				       "SUBSCRIBE %F", folder_name);
 	if (!response)
@@ -3666,7 +3671,8 @@ unsubscribe_folder (CamelStore *store, const char *folder_name,
 	
 	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto done;
-	
+
+	camel_imap_store_stop_idle (imap_store);
 	response = camel_imap_command (imap_store, NULL, ex,
 				       "UNSUBSCRIBE %F", folder_name);
 	if (!response)
