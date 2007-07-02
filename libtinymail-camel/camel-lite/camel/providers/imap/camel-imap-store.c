@@ -742,7 +742,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	gboolean force_imap4 = FALSE;
 	gboolean clean_quit = TRUE;
 	char *buf;
-	gboolean not_ssl = TRUE, no_binary=FALSE, no_uidplus=FALSE;
+	gboolean not_ssl = TRUE;
 
 	memset (&sockopt, 0, sizeof (CamelSockOptData));
 
@@ -847,11 +847,6 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	 * interpretation of BINARY imo, so we just ignore its BINARY support. 
 	 * The server also claims to support UIDPLUS, but doesn't */
 
-	if (strstr (buf, "kolumbus")) {
-		no_uidplus = TRUE;
-		no_binary = TRUE;
-	}
-
 	/* Tinymail hack: always use IMAP4, not IMAP4rev1 (sorry) */
 	/* force_imap4 = TRUE; */
 	store->braindamaged = TRUE;
@@ -867,11 +862,6 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 			service->url->host, _("Reading first CAPABILITY failed"));
 		goto exception;
 	}
-
-	if (no_binary)
-		store->capabilities &= ~IMAP_CAPABILITY_BINARY;
-	if (no_uidplus)
-		store->capabilities &= ~IMAP_CAPABILITY_UIDPLUS;
 
 	if (must_tls && !(store->capabilities & IMAP_CAPABILITY_STARTTLS))
 	{
@@ -951,10 +941,6 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		goto exception;
 	}
 
-	if (no_binary)
-		store->capabilities &= ~IMAP_CAPABILITY_BINARY;
-	if (no_uidplus)
-		store->capabilities &= ~IMAP_CAPABILITY_UIDPLUS;
 
 	if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED ) { 
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,

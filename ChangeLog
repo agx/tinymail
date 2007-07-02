@@ -1,3 +1,8 @@
+2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fallback for BINARY
+	* Fallback for UIDPLUS
+
 2007-07-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed/updated the Python bindings

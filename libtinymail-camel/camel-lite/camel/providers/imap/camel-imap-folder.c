@@ -1497,7 +1497,7 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 	CamelImapResponse *response;
 	int uid = 0;
 	char *set;
-	
+
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 
 	if ((store->capabilities & IMAP_CAPABILITY_UIDPLUS) == 0) {
@@ -1528,12 +1528,18 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 						       "UID EXPUNGE %s", set);
 		} else
 			response = camel_imap_command (store, folder, ex, "EXPUNGE");
-		
+
+		if (camel_exception_is_set (ex)) {
+			store->capabilities &= ~IMAP_CAPABILITY_UIDPLUS;
+			((CamelFolderClass *)CAMEL_OBJECT_GET_CLASS(folder))->sync(folder, 0, ex);
+		}
+
 		if (response)
 			camel_imap_response_free (store, response);
 	}
 	
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
 
 	camel_imap_folder_start_idle (folder);
 
@@ -3453,6 +3459,8 @@ idle_response_free (IdleResponse *idle_resp)
 	g_slice_free (IdleResponse, idle_resp);
 }
 
+char *strcasestr(const char *haystack, const char *needle);
+
 static void
 idle_real_start (CamelImapStore *store)
 {
@@ -3908,6 +3916,9 @@ camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 }
 
 static void
+do_nothing (void) { }
+
+static void
 imap_thaw (CamelFolder *folder)
 {
 	CamelImapFolder *imap_folder;
@@ -3980,6 +3991,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	CamelException  tex = CAMEL_EXCEPTION_INITIALISER;
 	ssize_t nread = 0; gboolean amcon = FALSE;
 	gchar *errmessage = NULL;
+	gboolean retry = TRUE;
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
@@ -4083,6 +4095,10 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		goto errorhander;
 	}
 
+	while (retry)
+	{
+	retry = FALSE;
+
 	if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL)
 	{
 		camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
@@ -4133,6 +4149,14 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 				}
 
 				/* If the line doesn't start with "* " */
+
+				if (strstr (line, "BAD")) {
+					g_warning ("Server does not like how we use BINARY (%s)\n", line);
+					store->capabilities &= ~IMAP_CAPABILITY_BINARY;
+					retry = TRUE;
+					CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+					goto myretry;
+				}
 
 				if (*line != '*' || *(line + 1) != ' ')
 				{ 
@@ -4533,6 +4557,11 @@ Received: from nic.funet.fi
 
 		camel_stream_reset (stream);
 	}
+
+myretry:
+	do_nothing ();
+
+	} /* Retry loop */
 
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 
