@@ -1273,8 +1273,15 @@ tny_camel_account_finalize (GObject *object)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
+
 	if (priv->service && CAMEL_IS_SERVICE (priv->service))
+	{
+		priv->service->connecting = NULL;
+		priv->service->disconnecting = NULL;
+		priv->service->reconnecter = NULL;
+		priv->service->reconnection = NULL;
 		camel_service_disconnect (CAMEL_SERVICE (priv->service), FALSE, &ex);
+	}
 
 	_tny_camel_account_clear_hooks (self);
 
