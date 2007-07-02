@@ -2588,7 +2588,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 		MyFlags *flags = flags_list->data;
 
 		camel_folder_set_message_flags (cfol_dst, flags->uid,
-			flags->flags, flags->flags);
+			flags->flags, ~0);
 
 		if (delete_originals)
 			camel_folder_set_message_flags (cfol_src, flags->uid,
