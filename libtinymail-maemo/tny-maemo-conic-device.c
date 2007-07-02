@@ -29,6 +29,10 @@
 #include <string.h> /* For strcmp() */
 #include <stdio.h> /* for printf */
 
+#ifdef MAEMO_CONIC_DUMMY 
+#include <gtk/gtkmessagedialog.h>
+#endif
+
 #ifdef MAEMO_CONIC_DUMMY
 /* #include "coniciap-private.h"
  * This is not installed, so we predeclare 
@@ -47,6 +51,7 @@ struct _ConIcIap
 };
 
 #define MAEMO_CONIC_DUMMY_IAP_ID_FILENAME "maemo_conic_dummy_id"
+#define MAEMO_CONIC_DUMMY_IAP_ID_NONE "none"
 static gboolean on_dummy_connection_check (gpointer user_data);
 #endif /* MAEMO_CONIC_DUMMY */
 
@@ -169,6 +174,54 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 		       0, is_online);
 }
 
+#ifdef MAEMO_CONIC_DUMMY
+
+static gchar*
+get_dummy_filename ()
+{
+	gchar *filename = g_build_filename (
+		g_get_home_dir (), 
+		MAEMO_CONIC_DUMMY_IAP_ID_FILENAME,
+		NULL);
+	return filename;
+}
+
+static gboolean dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self, const gchar* iap_id)
+{
+	/* Show a dialog, because libconic would show a dialog here,
+	 * and give the user a chance to refuse a new connection, because libconic would allow that too.
+	 * This allows us to see roughly similar behaviour in scratchbox as on the device. */
+	GtkDialog *dialog = GTK_DIALOG (gtk_message_dialog_new( NULL, GTK_DIALOG_MODAL,
+			GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL, 
+			"TnyMaemoConicDevice fake scratchbox implementation:\nThe application requested a connection. Make a fake connection?"));
+	const int response = gtk_dialog_run (dialog);
+	gtk_widget_hide (GTK_WIDGET (dialog));
+	gtk_widget_destroy (GTK_WIDGET (dialog));
+	
+	if (response == GTK_RESPONSE_OK) {
+		/* Make a connection, by setting a name in our dummy text file,
+		 * which will be read later: */
+		gchar *filename = get_dummy_filename ();
+		
+		gchar *contents = 0;
+		GError* error = 0;
+		g_file_set_contents (filename, "debug id0", -1, &error);
+		if(error) {
+			printf("%s: error from g_file_set_contents(): %s\n", __FUNCTION__, error->message);
+			g_error_free (error);
+			error = NULL;
+		}
+		
+		g_free (filename);
+		
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+
+#endif /* MAEMO_CONIC_DUMMY */
+	
 /**
  * tny_maemo_conic_device_connect:
  * @self: a #TnyDevice object
@@ -185,6 +238,10 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 gboolean
 tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
+	#ifdef MAEMO_CONIC_DUMMY 
+	return dummy_con_ic_connection_connect_by_id (self, iap_id);
+	#endif /* MAEMO_CONIC_DUMMY */
+	
 	TnyMaemoConicDevicePriv *priv;
 
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
@@ -298,6 +355,10 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 	if (!(priv->iap)) {
 		on_dummy_connection_check (self);
 	}
+	
+	/* Handle the special "none" text: */
+	if (priv->iap && (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0))
+		return NULL;
 	#endif
 	
 	return priv->iap;
@@ -482,6 +543,7 @@ tny_maemo_conic_device_is_online (TnyDevice *self)
 }
 
 #ifdef MAEMO_CONIC_DUMMY
+
 static gboolean on_dummy_connection_check (gpointer user_data)
 {
 	TnyMaemoConicDevice *self = TNY_MAEMO_CONIC_DEVICE (user_data);
@@ -489,10 +551,7 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 		
 	/* Check whether the enviroment variable has changed, 
 	 * so we can fake a connection change: */
-	gchar *filename = g_build_filename (
-		g_get_home_dir (), 
-		MAEMO_CONIC_DUMMY_IAP_ID_FILENAME,
-		NULL);
+	gchar *filename = get_dummy_filename ();
 		
 	gchar *contents = 0;
 	GError* error = 0;
@@ -512,11 +571,23 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 		g_strstrip(contents);
 
 	if (!(priv->iap) || (strcmp (contents, priv->iap) != 0)) {
+		if (priv->iap) {
+			g_free (priv->iap);
+			priv->iap = NULL;
+		}
+			
+		/* We store even the special "none" text, so we can detect changes. */
 		priv->iap = g_strdup (contents);
 		
-		printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changing to %s\n", __FUNCTION__, priv->iap);
-		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+		if (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0) {		
+			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changing to no connection.\n", __FUNCTION__);
+			g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+			       0, FALSE);
+		} else {
+			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changing to '%s\n", __FUNCTION__, priv->iap);
+			g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, TRUE);
+		}
 	}
 	
 	g_free (contents);

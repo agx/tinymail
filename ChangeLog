@@ -1,3 +1,14 @@
+2007-07-02  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_connect): When using scratchbox, show an OK/Cancel dialog
+	and write a fake connection name to the text file, to simulate what libconic does on 
+	the device.
+	(on_dummy_connection_check): Interpret 'none' in the text file as meaning no connection.
+	This leaves an empty file as defaulting to a meaning of connection debugid0.
+	(tny_maemo_conic_device_get_current_iap_id): Return NULL if the iap is 'none', when in 
+	scratchbox.
+
 2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fallback for BINARY
