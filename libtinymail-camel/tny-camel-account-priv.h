@@ -29,7 +29,6 @@
 
 typedef struct _TnyCamelAccountPriv TnyCamelAccountPriv;
 typedef struct _RefreshStatusInfo RefreshStatusInfo;
-typedef struct _CHookInfo CHookInfo;
 
 struct _RefreshStatusInfo
 {
@@ -40,13 +39,6 @@ struct _RefreshStatusInfo
 	guint depth;
 	gpointer user_data;
 	TnyIdleStopper *stopper;
-	GList *chooks;
-};
-
-struct _CHookInfo 
-{
-	CamelObject *instance;
-	CamelObjectHookID hook;
 };
 
 

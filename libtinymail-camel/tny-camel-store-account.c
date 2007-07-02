@@ -317,7 +317,6 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 	_tny_camel_account_refresh (self, recon_if);
 
 	g_static_rec_mutex_lock (apriv->service_lock);
-	_tny_camel_account_clear_hooks (self);
 
 	if (apriv->session && apriv->url_string)
 	{

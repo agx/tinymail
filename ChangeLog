@@ -15,6 +15,7 @@
 	* Fallback for UIDPLUS
 	* Added a check for the session in TnyCamelTransportAccount
 	* Bugfix when finalizing an account
+	* Removed some old internal hooks-API
 
 2007-07-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
