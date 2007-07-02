@@ -210,7 +210,7 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 	/*guint32 all = 0;*/	/* all flags */
 	int i;
 
-	p = strstr(name, ":2,");
+	p = strstr(name, "_2_");
 	if (p) {
 		p+=3;
 		while ((c = *p++)) {

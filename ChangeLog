@@ -1,3 +1,7 @@
+2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed a bug in Maildir when setting flags
+
 2007-07-02  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:

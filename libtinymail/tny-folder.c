@@ -111,7 +111,6 @@ tny_folder_get_stats (TnyFolder *self)
 	retval = TNY_FOLDER_GET_IFACE (self)->get_stats_func (self);
 
 #ifdef DBC /* ensure */
-	g_assert (TNY_IS_FOLDER_STATS (retval));
 #endif
 
 	return retval;

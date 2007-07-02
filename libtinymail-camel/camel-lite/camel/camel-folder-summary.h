@@ -88,7 +88,7 @@ typedef enum _CamelMessageFlags {
 } CamelMessageFlags;
 
 /* Changes to system flags will NOT trigger a folder changed event */
-#define CAMEL_MESSAGE_SYSTEM_MASK (0xffff << 16)
+#define CAMEL_MESSAGE_SYSTEM_MASK (0xffff << 12)
 
 typedef struct _CamelFlag {
 	struct _CamelFlag *next;
