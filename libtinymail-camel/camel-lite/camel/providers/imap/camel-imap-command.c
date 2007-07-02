@@ -110,8 +110,13 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder))
 			camel_object_unref(store->current_folder); */
 
+		if (!folder)
+			store->last_folder = store->current_folder;
+		else 
+			store->last_folder = NULL;
+
 		store->current_folder = folder;
-		//store->current_folder = NULL;
+
 		if (store->capabilities & IMAP_CAPABILITY_CONDSTORE) 
 			cmd = imap_command_strdup_printf (store, "SELECT %F (CONDSTORE)", folder->full_name);
 		else 
@@ -235,7 +240,16 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	 * elsewere too */
 
 	if (!store->dontdistridlehack && !fetching_message && strcmp (cmd, "LOGOUT")) 
+	{
+		gboolean wasnull = FALSE;
+		if (!store->current_folder) {
+			store->current_folder = store->last_folder;
+			wasnull = TRUE;
+		}
 		camel_imap_store_stop_idle (store);
+		if (wasnull)
+			store->current_folder = NULL;
+	}
 
 	/* Check for current folder */
 	if (folder && folder != store->current_folder) 

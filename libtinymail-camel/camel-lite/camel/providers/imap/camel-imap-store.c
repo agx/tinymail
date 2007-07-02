@@ -197,10 +197,25 @@ let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 
 	if (imap_store->idle_prefix)
 	{
+		gchar *resp = NULL;
+		int nwritten = 0;
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
 		g_free (imap_store->idle_prefix); 
 		imap_store->idle_prefix=NULL;
 		idle_debug ("Sending DONE in let_idle_die\n");
-		camel_stream_printf (imap_store->ostream, "DONE\r\n");
+		nwritten = camel_stream_printf (imap_store->ostream, "DONE\r\n");
+		if (nwritten != -1) 
+		{
+			resp = NULL;
+			while ((camel_imap_command_response_idle (imap_store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
+			{
+				idle_debug ("(.., ..) <- %s | in idle_deal_with_stuff in let_idle_die\n", resp); 
+				g_free (resp); resp=NULL; 
+			}
+			if (resp)
+				g_free (resp);
+		}
 	}
 
 	g_static_rec_mutex_unlock (imap_store->idle_lock);
@@ -228,10 +243,26 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 
 		if (store->idle_prefix) 
 		{
-			int nwritten=0;
+			gchar *resp = NULL;
+			int nwritten = 0;
+			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
 			idle_debug ("Sending DONE in camel_imap_store_stop_idle (no current folder?)\n");
 			CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
+
+			if (nwritten != -1) 
+			{
+				resp = NULL;
+				while ((camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
+				{
+					idle_debug ("(.., ..) <- %s | in idle_deal_with_stuff (no current folder?)\n", resp); 
+					g_free (resp); resp=NULL; 
+				}
+				if (resp)
+					g_free (resp);
+			}
+
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			g_free (store->idle_prefix);
 			store->idle_prefix = NULL;
@@ -369,6 +400,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 
 	imap_store->dir_sep = '\0';
 	imap_store->current_folder = NULL;
+	imap_store->last_folder = NULL;
 	imap_store->connected = FALSE;
 	imap_store->preauthed = FALSE;
 	((CamelStore *)imap_store)->flags |= CAMEL_STORE_SUBSCRIPTIONS;
