@@ -406,15 +406,40 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 
 	cancel_fd = camel_operation_cancel_fd (NULL);
 	if (cancel_fd == -1) {
+
+		int error, flags, fdmax;
+		struct timeval timeout;
+		fd_set rdset;
+		
+		flags = fcntl (openssl->priv->sockfd, F_GETFL);
+		fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
+		
+		fdmax = openssl->priv->sockfd + 1;
+		
 		do {
-			if (ssl) {
-				nread = SSL_read (ssl, buffer, n);
-				if (nread < 0)
-					errno = ssl_errno (ssl, nread);
-			} else {
-				nread = read (openssl->priv->sockfd, buffer, n);
-			}
-		} while (nread < 0 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK));
+			FD_ZERO (&rdset);
+			FD_SET (openssl->priv->sockfd, &rdset);
+	
+			timeout.tv_sec = 0;
+			timeout.tv_usec = 0;
+
+			select (fdmax, &rdset, 0, 0, &timeout);
+			
+			do {
+				if (ssl) {
+					nread = SSL_read (ssl, buffer, n);
+					if (nread < 0)
+						errno = ssl_errno (ssl, nread);
+				} else {
+					nread = read (openssl->priv->sockfd, buffer, n);
+				}
+			} while (nread < 0 && errno == EINTR);
+		} while (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
+		
+		error = errno;
+		fcntl (openssl->priv->sockfd, F_SETFL, flags);
+		errno = error;
+
 	} else {
 		int error, flags, fdmax;
 		struct timeval timeout;
@@ -474,7 +499,26 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 	
 	cancel_fd = camel_operation_cancel_fd (NULL);
 	if (cancel_fd == -1) {
+
+
+		int error, flags, fdmax;
+		struct timeval timeout;
+		fd_set rdset, wrset;
+		
+		flags = fcntl (openssl->priv->sockfd, F_GETFL);
+		fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
+		
+		fdmax = openssl->priv->sockfd + 1;
 		do {
+			FD_ZERO (&rdset);
+			FD_ZERO (&wrset);
+			FD_SET (openssl->priv->sockfd, &wrset);
+			
+			timeout.tv_sec = BLOCKING_WRITE_TIMEOUT;
+			timeout.tv_usec = 0;
+			select (fdmax, &rdset, &wrset, 0, &timeout);
+			
+			
 			do {
 				if (ssl) {
 					w = SSL_write (ssl, buffer + written, n - written);
@@ -483,11 +527,23 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 				} else {
 					w = write (openssl->priv->sockfd, buffer + written, n - written);
 				}
-			} while (w < 0 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK));
+			} while (w < 0 && errno == EINTR);
 			
-			if (w > 0)
+			if (w < 0) {
+				if (errno == EAGAIN || errno == EWOULDBLOCK) {
+					w = 0;
+				} else {
+					error = errno;
+					fcntl (openssl->priv->sockfd, F_SETFL, flags);
+					errno = error;
+					return -1;
+				}
+			} else
 				written += w;
-		} while (w != -1 && written < n);
+		} while (w >= 0 && written < n);
+		
+		fcntl (openssl->priv->sockfd, F_SETFL, flags);
+
 	} else {
 		int error, flags, fdmax;
 		struct timeval timeout;

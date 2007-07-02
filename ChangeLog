@@ -2,6 +2,8 @@
 
 	* Fixed a bug in Maildir when setting flags
 	* Fixed empty-string folders at root's level on IMAP
+	* Fixed blocking reads and writes in camel-tcp-stream-openssl.c,
+	camel-tcp-stream-raw.c (camel-file-utils.c) and camel-tcp-stream-nss.c
 
 2007-07-02  Murray Cumming  <murrayc@murrayc.com>
 

@@ -2563,7 +2563,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	camel_folder_transfer_messages_to (cfol_src, uids, cfol_dst, 
 			&transferred_uids, delete_originals, &ex);
 
-	if (uids && delete_originals)
+	if (!camel_exception_is_set (&ex) && uids && delete_originals)
 	{
 		int i;
 		for (i = 0; i < uids->len; i++) {
