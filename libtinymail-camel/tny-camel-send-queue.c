@@ -614,9 +614,10 @@ tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
 		"set-online-happened",
 		G_CALLBACK (on_setonline_happened), self);
 
+	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(trans_account)));
+
 	tny_camel_send_queue_flush (TNY_CAMEL_SEND_QUEUE (self));
 
-	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(trans_account)));
 }
 
 /**
