@@ -7,6 +7,8 @@
 	* Bugfixed a crasher at perform_content_info_save in
 	CamelFolderSummary
 	* Fixed a bug in case From addresses become excessively long
+	* Bugfix when transferring messages (folder observers getting the
+	right TnyHeader instances)
 
 2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
