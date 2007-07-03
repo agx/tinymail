@@ -2614,7 +2614,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			{
 				TnyHeader *hdr = _tny_camel_header_new ();
 				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
-					TNY_CAMEL_FOLDER (self), priv);
+					TNY_CAMEL_FOLDER (folder_dst), priv_dst);
 				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
 				tny_list_prepend (new_headers, G_OBJECT (hdr));
 				g_object_unref (hdr);
