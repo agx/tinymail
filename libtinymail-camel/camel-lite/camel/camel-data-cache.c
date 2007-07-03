@@ -27,7 +27,13 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include <errno.h>
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <string.h>
+
 #include <stdlib.h>
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
@@ -434,9 +440,8 @@ camel_data_cache_get(CamelDataCache *cdc, const char *path, const char *key, Cam
 	return stream;
 }
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
+
+char *strcasestr(const char *haystack, const char *needle);
 
 void
 camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, const char *key)

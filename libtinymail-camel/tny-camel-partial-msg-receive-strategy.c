@@ -101,6 +101,7 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 
 			tny_header_set_flags (header, TNY_HEADER_FLAG_CACHED);
 			tny_header_set_flags (header, TNY_HEADER_FLAG_PARTIAL);
+
 		}
 	}
 

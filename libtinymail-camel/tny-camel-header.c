@@ -159,14 +159,23 @@ tny_camel_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	CamelMessageInfoBase *info = (CamelMessageInfoBase *) me->info;
 	gboolean doit=FALSE;
+	TnyCamelFolderPriv *fpriv = NULL;
 
 	if ( ( (!(info->flags & CAMEL_MESSAGE_SEEN) && (mask & TNY_HEADER_FLAG_SEEN)) ||
 	   ((info->flags & CAMEL_MESSAGE_SEEN) && !(mask & TNY_HEADER_FLAG_SEEN)) ) 
 	   && me->folder) doit = TRUE;
 
+	if (me->folder)
+	{
+		fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (me->folder);
+		fpriv->handle_changes = FALSE;
+	}
+
 	/* This is only legal because the flags between CamelLite and Tinymail are equalized */
 	camel_message_info_set_flags (me->info, mask, ~0);
 
+	if (fpriv)
+		fpriv->handle_changes = TRUE;
 
 	if (doit)
 		_tny_camel_folder_check_unread_count (me->folder);

@@ -9,6 +9,7 @@
 	* Fixed a bug in case From addresses become excessively long
 	* Bugfix when transferring messages (folder observers getting the
 	right TnyHeader instances)
+	* Fixed a lock when setting headers while fetching summary
 
 2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
