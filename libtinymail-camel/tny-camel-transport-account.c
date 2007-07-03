@@ -66,7 +66,7 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self, gboolean recon_if, g
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 
-	if (!apriv->session && reservice && apriv->url_string)
+	if (apriv->session && reservice && apriv->url_string)
 	{
 		if (!apriv->service && reservice && apriv->url_string)
 		{
@@ -98,8 +98,9 @@ tny_camel_transport_account_prepare (TnyCamelAccount *self, gboolean recon_if, g
 			}
 		}
 	} else {
-		camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
-			_("Session not yet set, use tny_camel_account_set_session"));
+		if (reservice && apriv->url_string)
+			camel_exception_set (apriv->ex, CAMEL_EXCEPTION_SYSTEM,
+				_("Session not yet set, use tny_camel_account_set_session"));
 	}
 
 	g_static_rec_mutex_unlock (apriv->service_lock);

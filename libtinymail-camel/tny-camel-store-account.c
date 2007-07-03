@@ -66,6 +66,8 @@
 
 static GObjectClass *parent_class = NULL;
 
+char *strcasestr(const char *haystack, const char *needle);
+
 
 static void
 notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange *change)

@@ -39,6 +39,15 @@ G_BEGIN_DECLS
 typedef struct _TnyCamelAccount TnyCamelAccount;
 typedef struct _TnyCamelAccountClass TnyCamelAccountClass;
 
+enum _TnyCamelAccountSignal
+{
+	TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED,
+	TNY_CAMEL_ACCOUNT_LAST_SIGNAL
+};
+
+extern guint tny_camel_account_signals [TNY_CAMEL_ACCOUNT_LAST_SIGNAL];
+
+
 struct _TnyCamelAccount
 {
 	GObject parent;
@@ -83,6 +92,10 @@ struct _TnyCamelAccountClass
 
 	/* Abstract methods */
 	void (*prepare_func) (TnyCamelAccount *self, gboolean recon_if, gboolean reservice);
+
+	/* Signals */
+	void (*set_online_happened_func) (TnyCamelAccount *self, gboolean online);
+
 };
 
 GType tny_camel_account_get_type (void);

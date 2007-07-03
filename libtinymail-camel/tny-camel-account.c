@@ -61,6 +61,8 @@
 
 static GObjectClass *parent_class = NULL;
 
+guint tny_camel_account_signals [TNY_CAMEL_ACCOUNT_LAST_SIGNAL];
+
 void
 _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 {
@@ -1137,9 +1139,6 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 		return;
 	}
 
-	/* if (offline)
-		camel_service_cancel_connect (priv->service); */
-
 	if (CAMEL_IS_DISCO_STORE (priv->service)) {
 		if (online) {
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
@@ -1157,6 +1156,10 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 
 				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
 			}
+
+			if (!camel_exception_is_set (&ex))
+				g_signal_emit (self, 
+					tny_camel_account_signals [TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED], 0, TRUE);
 
 			goto done;
 
@@ -1194,6 +1197,10 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
 			}
 
+			if (!camel_exception_is_set (&ex))
+				g_signal_emit (self, 
+					tny_camel_account_signals [TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED], 0, TRUE);
+
 			goto done;
 		} else {
 			camel_offline_store_set_network_state (CAMEL_OFFLINE_STORE (priv->service),
@@ -1208,7 +1215,7 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 
 				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
 			}
-	
+
 			goto done;
 		}
 	}
@@ -1226,6 +1233,10 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 
 			_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
 		}
+
+		if (!camel_exception_is_set (&ex))
+			g_signal_emit (self, 
+				tny_camel_account_signals [TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED], 0, FALSE);
 
 	}
 
@@ -1361,9 +1372,32 @@ static void
 tny_camel_account_class_init (TnyCamelAccountClass *class)
 {
 	GObjectClass *object_class;
+	static gboolean initialized = FALSE;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+
+
+	if (!initialized) {
+		/* create interface signals here. */
+
+/**
+ * TnyCamelAccount::set-online-happened
+ * @self: the object on which the signal is emitted
+ * @online: whether it was online
+ * @user_data: user data set when the signal handler was connected.
+ *
+ * Emitted when tny_camel_account_set_online happened
+ **/
+		tny_camel_account_signals[TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED] =
+		   g_signal_new ("set_online_happened",
+			TNY_TYPE_CAMEL_ACCOUNT,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyCamelAccountClass, set_online_happened_func),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__BOOLEAN, 
+			G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
+	}
 
 	class->get_port_func = tny_camel_account_get_port_default;
 	class->set_port_func = tny_camel_account_set_port_default;
@@ -1476,36 +1510,32 @@ static gpointer
 tny_camel_account_get_supported_secure_authentication_async_thread (
 	gpointer thr_user_data)
 {
-	printf ("DEBUG: %s\n", __FUNCTION__);
-		
 	GetSupportedAuthInfo *info = thr_user_data;
 	TnyCamelAccount *self = info->self;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	GError *err = NULL;
-  TnyStatus* status;
-  
+	TnyStatus* status;
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
-  status =  tny_status_new_literal(TNY_GET_SUPPORTED_SECURE_AUTH_STATUS, 
-                                       TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, 0, 1,
-                                       "Get secure authentication methods");
-  
-  info->status_callback(G_OBJECT(self), 
-                        status,
-                        info->user_data);
+	status =  tny_status_new_literal(TNY_GET_SUPPORTED_SECURE_AUTH_STATUS, 
+		TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, 0, 1,
+		"Get secure authentication methods");
+
+	info->status_callback(G_OBJECT(self), 
+		status, info->user_data);
   
 	/* Do the actual work:
 	 * This is happening in a thread, 
 	 * and the status callback is being called regularly while this is 
 	 * happening. */	
 	GList *authtypes = camel_service_query_auth_types (priv->service, &ex);
-  
-  tny_status_set_fraction(status, 1);
-  info->status_callback(G_OBJECT(self), 
-                       status,
-                       info->user_data);
-  
+
+	tny_status_set_fraction(status, 1);
+	info->status_callback(G_OBJECT(self), 
+		status, info->user_data);
+
 	/* The result will be a TnyList of TnyPairs: */
 	TnyList *result = tny_simple_list_new ();
 	GList *iter = authtypes;
@@ -1515,8 +1545,7 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 			/* Get the name of the auth method:
 			 * Note that, at least for IMAP, authproto=NULL when 
 			 * name=Password. */
-			printf ("DEBUG: %s: authproto =%s, name=%s\n", __FUNCTION__, item->authproto, item->name);
-			
+
 			/* We don't use the value part of the TnyPair. */
 			TnyPair *pair = tny_pair_new (item->name, NULL);
 			tny_list_append (result, G_OBJECT (pair));
@@ -1555,7 +1584,7 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 		/* Thread reference */
 		g_object_unref (G_OBJECT (self));
 	}
-  tny_status_free(status);
+	tny_status_free(status);
 	g_thread_exit (NULL);
 
 	return NULL;
@@ -1642,7 +1671,6 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 	/* This will cause the idle status callback to be called,
 	 * via _tny_camel_account_start_camel_operation,
 	 * and also calls the idle main callback: */
-	printf ("DEBUG: %s: before calling g_thread_create()\n", __FUNCTION__);
 
 	g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
 		info, FALSE, NULL);
