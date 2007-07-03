@@ -666,6 +666,14 @@ process_header (CamelMedium *medium, const char *name, const char *value)
 	switch (header_type) {
 	case HEADER_FROM:
 		addr = camel_internet_address_new();
+
+		if (strlen (value) > 10000)
+		{
+			char *str = strchr (value, ',');
+			if (str)
+				*str = '\0';
+		}
+
 		if (camel_address_decode((CamelAddress *)addr, value) <= 0) {
 			camel_object_unref(addr);
 		} else {

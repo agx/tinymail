@@ -6,6 +6,7 @@
 	* Improved the granularity of the is_connected flag
 	* Bugfixed a crasher at perform_content_info_save in
 	CamelFolderSummary
+	* Fixed a bug in case From addresses become excessively long
 
 2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
