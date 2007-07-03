@@ -2757,8 +2757,10 @@ rename_folder_info (CamelImapStore *imap_store, const char *old_name, const char
 			
 			/* workaround for broken server (courier uses '.') that doesn't rename
 			   subordinate folders as required by rfc 2060 */
-			if (imap_store->dir_sep == '.') {
+			if (imap_store->dir_sep == '.' && imap_store->courier_crap) {
 				CamelImapResponse *response;
+
+				/* TNY: I'm not sure about this one! */
 
 				response = camel_imap_command (imap_store, NULL, NULL, "RENAME %F %G", path, nfull);
 				if (response)
