@@ -811,17 +811,23 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
 
 	if (((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS (s)))->content_info_save (s, out, ci) == -1)
 		return -1;
-	
-	if (camel_file_util_encode_uint32 (out, my_list_size ((struct _node **)&ci->childs)) == -1)
-		return -1;
-	
-	part = ci->childs;
-	while (part) {
-		if (perform_content_info_save (s, out, part) == -1)
+
+	if (ci == NULL) {
+		if (camel_file_util_encode_uint32 (out, 0) == -1)
 			return -1;
-		part = part->next;
+	} else if (camel_file_util_encode_uint32 (out, my_list_size ((struct _node **)&ci->childs)) == -1)
+		return -1;
+
+	if (ci)
+	{
+		part = ci->childs;
+		while (part) {
+			if (perform_content_info_save (s, out, part) == -1)
+				return -1;
+			part = part->next;
+		}
 	}
-	
+
 	return 0;
 }
 

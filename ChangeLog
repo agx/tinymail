@@ -4,6 +4,8 @@
 	* Fixing up the TnyCamelSendQueue's at-connect
 	* Bugfix in renaming on IMAP
 	* Improved the granularity of the is_connected flag
+	* Bugfixed a crasher at perform_content_info_save in
+	CamelFolderSummary
 
 2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
 

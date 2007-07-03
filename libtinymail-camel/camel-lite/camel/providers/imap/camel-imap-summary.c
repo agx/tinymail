@@ -281,7 +281,7 @@ static int
 content_info_save (CamelFolderSummary *s, FILE *out,
 		   CamelMessageContentInfo *info)
 {
-	if (info->type) {
+	if (info && info->type) {
 		camel_file_util_encode_uint32 (out, 1);
 		return camel_imap_summary_parent->content_info_save (s, out, info);
 	} else
