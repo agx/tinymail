@@ -430,7 +430,11 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 
 		/* We don't go online on transport accounts, yet */
 		if (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (data))
+		{
+			g_signal_emit (TNY_CAMEL_ACCOUNT (data), 
+				tny_camel_account_signals [TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED], 0, info->online);
 			return;
+		}
 
 		_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (data), info->online, &err);
 
