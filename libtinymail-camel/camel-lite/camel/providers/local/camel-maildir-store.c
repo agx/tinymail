@@ -511,7 +511,7 @@ get_folder_info (CamelStore *store, const char *top, guint32 flags, CamelExcepti
 	url = camel_url_new("maildir:", NULL);
 	camel_url_set_path(url, ((CamelService *)local_store)->url->path);
 
-	if (top == NULL || top[0] == 0) {
+	if (top == NULL || top[0] == 0 || strlen (top) == 0) {
 		CamelFolderInfo *scan;
 
 		/* create a dummy "." parent inbox, use to scan, then put back at the top level */

@@ -2004,8 +2004,14 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				CamelFolderInfo *iter;
 
 				gboolean was_new=FALSE;
+
 				retval = tny_camel_store_account_factor_folder 
 					(TNY_CAMEL_STORE_ACCOUNT (a), to, &was_new);
+
+				if (priv->folder_name)
+					g_free (priv->folder_name);
+				priv->folder_name = g_strdup (to);
+				priv->iter = NULL; /* Known leak */
 
 				succeeded = TRUE;
 
