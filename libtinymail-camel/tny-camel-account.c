@@ -1112,7 +1112,7 @@ tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **e
 }
 
 void 
-tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GError **err)
+_tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **err)
 {
 	/* Note that the human-readable GError:message strings here are only for debugging.
 	 * They should never be shown to the user. The application should make its own 
@@ -1251,6 +1251,47 @@ done:
 	}
 
 	return;
+}
+
+
+typedef struct {
+	TnyCamelAccount *self;
+	gboolean online;
+	GError **err;
+} SetOnlineInfo;
+
+static gpointer
+set_online_thread (gpointer data)
+{
+	SetOnlineInfo *info = (SetOnlineInfo *) data;
+
+	_tny_camel_account_set_online (info->self, info->online, info->err);
+
+	g_object_unref (info->self);
+	g_slice_free (SetOnlineInfo, info);
+
+	g_thread_exit (NULL);
+	return NULL;
+}
+
+void 
+tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GError **err)
+{
+	if (g_main_depth () != 0)
+	{
+		/* We are being called from the mainnloop */
+		SetOnlineInfo *info = g_slice_new (SetOnlineInfo);
+		GThread *thread = NULL;
+
+		info->self = TNY_CAMEL_ACCOUNT (g_object_ref (self));
+		info->online = online;
+		info->err = err;
+
+		thread = g_thread_create (set_online_thread, info, TRUE, NULL);
+		g_thread_join (thread);
+
+	} else
+		_tny_camel_account_set_online (self, online, err);
 }
 
 

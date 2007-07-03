@@ -444,7 +444,7 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 		_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (data), info->online, &err);
 
 		if (err == NULL)
-			tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (data), info->online, &err);
+			_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (data), info->online, &err);
 
 		if (err != NULL) 
 		{

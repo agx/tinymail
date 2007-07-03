@@ -10,6 +10,8 @@
 	* Bugfix when transferring messages (folder observers getting the
 	right TnyHeader instances)
 	* Fixed a lock when setting headers while fetching summary
+	* Bugfix when tny_camel_account_set_online was called from the
+	mainloop
 
 2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
