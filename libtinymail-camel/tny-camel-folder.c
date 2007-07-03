@@ -504,6 +504,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	gboolean haderr = FALSE;
 	gchar *new_uid = NULL;
+	CamelMessageInfo *minfo = NULL;
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
@@ -526,7 +527,12 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		camel_folder_append_message (priv->folder, message, NULL, &new_uid, &ex);
 		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 		priv->cached_length = camel_folder_get_message_count (priv->folder);
+
+		if (new_uid)
+			minfo = camel_folder_summary_uid (priv->folder->summary, new_uid);
+
 		update_iter_counts (priv);
+
 	} else {
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_ADD_MSG,
@@ -546,19 +552,30 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		TnyHeader *header = NULL;
 
 		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (msg), self);
-
 		header = tny_msg_get_header (msg);
-
-		if (new_uid)
-			((TnyCamelMsgHeader *)header)->old_uid = g_strdup (new_uid);
 
 		if (header && TNY_IS_HEADER (header))
 		{
+			TnyHeader *hdr = NULL;
 			TnyFolderChange *change = tny_folder_change_new (self);
-			tny_folder_change_add_added_header (change, header);
+
+			if (new_uid)
+				((TnyCamelMsgHeader *)header)->old_uid = g_strdup (new_uid);
+
+			if (minfo)
+			{
+				TnyHeader *hdr = _tny_camel_header_new ();
+				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+					TNY_CAMEL_FOLDER (self), priv);
+				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+			} else
+				hdr = TNY_HEADER (g_object_ref (header));
+
+			tny_folder_change_add_added_header (change, hdr);
 			tny_folder_change_set_new_all_count (change, priv->cached_length);
 			tny_folder_change_set_new_unread_count (change, priv->unread_length);
 			notify_folder_observers_about (self, change);
+
 			g_object_unref (G_OBJECT (change));
 		}
 
