@@ -577,7 +577,7 @@ tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account)
 }
 
 static void
-on_setonline_happened (TnyAccount *a, gboolean online, gpointer user_data)
+on_setonline_happened (TnyCamelAccount *account, gboolean online, gpointer user_data)
 {
 	if (online)
 		tny_camel_send_queue_flush (TNY_CAMEL_SEND_QUEUE (user_data));

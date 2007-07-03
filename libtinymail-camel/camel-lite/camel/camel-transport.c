@@ -132,9 +132,21 @@ camel_transport_send_to (CamelTransport *transport, CamelMimeMessage *message,
 	
 	g_return_val_if_fail (CAMEL_IS_TRANSPORT (transport), FALSE);
 	g_return_val_if_fail (CAMEL_IS_MIME_MESSAGE (message), FALSE);
-	g_return_val_if_fail (CAMEL_IS_ADDRESS (from), FALSE);
-	g_return_val_if_fail (CAMEL_IS_ADDRESS (recipients), FALSE);
-	
+
+	if (!CAMEL_IS_ADDRESS (from))
+	{
+		camel_exception_set (ex, CAMEL_EXCEPTION_INVALID_PARAM,
+			"The From address is not well formed");
+		return FALSE;
+	}
+
+	if (!CAMEL_IS_ADDRESS (recipients))
+	{
+		camel_exception_set (ex, CAMEL_EXCEPTION_INVALID_PARAM,
+			"The recipients field is not well formed");
+		return FALSE;
+	}
+
 	CAMEL_TRANSPORT_LOCK (transport, send_lock);
 	sent = CT_CLASS (transport)->send_to (transport, message,
 					      from, recipients, ex);

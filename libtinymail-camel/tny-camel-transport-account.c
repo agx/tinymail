@@ -162,7 +162,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	CamelException ex =  CAMEL_EXCEPTION_INITIALISER;
 	CamelTransport *transport;
 	CamelAddress *from, *recipients;
-	gboolean reperr = TRUE;
+	gboolean reperr = TRUE, suc = FALSE;
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 	g_assert (TNY_IS_CAMEL_MSG (msg));
@@ -203,15 +203,22 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	from = (CamelAddress *) camel_mime_message_get_from (message);
 	recipients = (CamelAddress *) camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
 
-	camel_transport_send_to (transport, message, from, 
+	suc = camel_transport_send_to (transport, message, from, 
 			recipients, &ex);
 
-	if (camel_exception_is_set (&ex))
+	if (camel_exception_is_set (&ex) || !suc)
 	{
-		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
-			TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
-			camel_exception_get_description (&ex));
-		camel_exception_clear (&ex);
+		if (camel_exception_is_set (&ex))
+		{
+			g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
+				TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+				camel_exception_get_description (&ex));
+			camel_exception_clear (&ex);
+		} else 
+			g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
+				TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+				"Unknown error");
+
 		reperr = FALSE;
 	}
 
