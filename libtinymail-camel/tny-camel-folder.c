@@ -506,7 +506,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_ADD_MSG))
 		return;
 
@@ -588,7 +588,7 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 
 	g_assert (TNY_IS_HEADER (header));
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REMOVE_MSG))
 		return;
 
@@ -631,7 +631,7 @@ tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_SYNC))
 		return;
 
@@ -1011,7 +1011,7 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), &err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
 	{
 		if (callback)
@@ -1066,7 +1066,7 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	guint oldlen, oldurlen;
 	TnyFolderChange *change = NULL;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
 		return;
 
@@ -1168,7 +1168,7 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	g_assert (TNY_IS_LIST (headers));
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
 		return;
 
@@ -1392,7 +1392,7 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), &err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
 	{
 		if (callback)
@@ -1477,7 +1477,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 	TnyMsg *retval = NULL;
 	TnyFolderChange *change;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
 		return NULL;
 
@@ -1533,7 +1533,7 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 	CamelMessageInfo *info;
 	const gchar *uid;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
 		return NULL;
 
@@ -2121,7 +2121,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	GError *nerr = NULL;
 	CpyRecRet *cpyr;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_COPY))
 		return NULL;
 
@@ -2323,7 +2323,7 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	GThread *thread;
 	GError *err = NULL;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), &err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_COPY))
 	{
 		if (callback)
@@ -2485,7 +2485,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyFolder *folder
 	g_assert (TNY_IS_FOLDER (folder_src));
 	g_assert (TNY_IS_FOLDER (folder_dst));
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_TRANSFER_MSGS))
 		return;
 
@@ -2729,7 +2729,7 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 	TnyCamelFolderPriv *priv_src = priv;
 	TnyCamelFolderPriv *priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), &err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_TRANSFER_MSGS))
 	{
 		if (callback)
@@ -3102,7 +3102,7 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	GError *nerr = NULL;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
 		return;
 
@@ -3156,7 +3156,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	TnyFolderStoreChange *change;
 	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
 		return NULL;
 
@@ -3291,7 +3291,7 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelFolderInfo *iter;
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 		return;
 
@@ -3453,7 +3453,7 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), &err, 
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
 	{
 		if (callback)

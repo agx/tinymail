@@ -26,6 +26,7 @@
 
 #include "tny-session-camel-priv.h"
 #include "tny-camel-common-priv.h"
+#include "tny-camel-account-priv.h"
 
 #include <tny-folder-store-query.h>
 
@@ -42,9 +43,10 @@
  * domain and code if the session is not ready.
  **/
 gboolean 
-_tny_session_check_operation (TnySessionCamel *session, GError **err, GQuark domain, gint code)
+_tny_session_check_operation (TnySessionCamel *session, TnyAccount *account, GError **err, GQuark domain, gint code)
 {
 	TnySessionCamel *in = (TnySessionCamel *) session;
+	gboolean is_connecting = FALSE;
 
 	if (in == NULL || !CAMEL_IS_SESSION (in))
 	{
@@ -54,7 +56,14 @@ _tny_session_check_operation (TnySessionCamel *session, GError **err, GQuark dom
 		return FALSE;
 	}
 
-	if (in->priv->is_connecting)
+	if (account && TNY_IS_CAMEL_ACCOUNT (account))
+	{
+		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+		is_connecting = apriv->is_connecting;
+	} else 
+		is_connecting = in->priv->is_connecting;
+
+	if (is_connecting)
 	{
 		g_set_error (err, domain, code,
 			"Operating can't continue: connecting in progress. "

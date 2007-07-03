@@ -767,7 +767,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	GError *nerr = NULL;
 
-	if (!_tny_session_check_operation (apriv->session, err, 
+	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err,
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
 		return;
 
@@ -810,7 +810,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	TnyFolderStoreChange *change;
 	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
-	if (!_tny_session_check_operation (apriv->session, err, 
+	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err,
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
 		return NULL;
 
@@ -972,7 +972,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	g_assert (TNY_IS_LIST (list));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
-	if (!_tny_session_check_operation (apriv->session, err, 
+	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 		return;
 
@@ -1168,7 +1168,7 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 
 	g_assert (TNY_IS_LIST (list));
 
-	if (!_tny_session_check_operation (apriv->session, &err, 
+	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), &err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 	{
 		if (callback)
@@ -1330,7 +1330,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
-	if (!_tny_session_check_operation (apriv->session, err, 
+	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 		return NULL;
 

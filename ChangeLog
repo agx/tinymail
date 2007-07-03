@@ -3,6 +3,7 @@
 	* Bugfix in TnyCamelTransportAccount's prepare method
 	* Fixing up the TnyCamelSendQueue's at-connect
 	* Bugfix in renaming on IMAP
+	* Improved the granularity of the is_connected flag
 
 2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
 

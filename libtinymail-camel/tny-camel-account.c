@@ -1058,6 +1058,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->is_connecting = FALSE;
 	priv->in_auth = FALSE;
 	priv->csyncop = NULL;
 	priv->get_pass_func = NULL;
@@ -1637,7 +1638,7 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 
 	/* Check that the session is ready, and stop with a GError if it is not: */
 	GError *err = NULL;
-	if (!_tny_session_check_operation (priv->session, &err, 
+	if (!_tny_session_check_operation (priv->session, TNY_ACCOUNT (self), &err, 
 			TNY_ACCOUNT_ERROR, TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH))
 	{
 		if (callback)
