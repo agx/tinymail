@@ -1,12 +1,3 @@
-2007-07-04  Murray Cumming,,,  <murrayc@murrayc-desktop>
-
-	reviewed by: <delete if not using a buddy>
-
-	* camel/camel-disco-store.c: (camel_disco_store_check_online):
-	* camel/providers/imap/camel-imap-command.c: (imap_command_start):
-	* camel/providers/imap/camel-imap-store.c:
-	(camel_imap_store_connected):
-
 Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog

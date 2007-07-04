@@ -3758,7 +3758,7 @@ camel_imap_store_connected (CamelImapStore *store, CamelException *ex)
 
 	if (!camel_exception_is_set(ex))
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-				     _("camel_imap_store_connected(): You must be working online to complete this operation"));
+				     _("You must be working online to complete this operation"));
 
 	return FALSE;
 }

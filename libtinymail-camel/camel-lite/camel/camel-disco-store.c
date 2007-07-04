@@ -400,7 +400,7 @@ camel_disco_store_check_online (CamelDiscoStore *store, CamelException *ex)
 {
 	if (camel_disco_store_status (store) != CAMEL_DISCO_STORE_ONLINE) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-				     _("camel_disco_store_check_online(): You must be working online to "
+				     _("You must be working online to "
 				       "complete this operation"));
 		return FALSE;
 	}

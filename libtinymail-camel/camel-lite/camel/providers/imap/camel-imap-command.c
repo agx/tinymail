@@ -207,7 +207,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		if (store->has_login && !camel_service_connect ((CamelService*)store, ex))
 		{
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-				     _("imap_command_start()1: You must be working online to "
+				     _("You must be working online to "
 				       "complete this operation"));
 			return FALSE;
 		}
@@ -217,14 +217,14 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 	if (store->ostream==NULL) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-				     _("imap_command_start()2: You must be working online to "
+				     _("You must be working online to "
 				       "complete this operation"));
 		 return FALSE;
 	}
 
 	if (store->istream==NULL) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-				     _("imap_command_start()3: You must be working online to "
+				     _("You must be working online to "
 				       "complete this operation"));
 		return FALSE;
 	}
