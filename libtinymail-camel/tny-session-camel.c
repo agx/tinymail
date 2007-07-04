@@ -417,6 +417,7 @@ typedef struct
 	TnyDevice *device;
 	gboolean online, as_thread;
 	gpointer user_data;
+	TnySessionCamelPriv *priv;
 } BackgroundConnectInfo;
 
 static void
@@ -504,11 +505,9 @@ background_connect_thread (gpointer data)
 	TnySessionCamel *self = info->user_data;
 	TnySessionCamelPriv *priv = self->priv;
 
-	g_mutex_lock (priv->conlock);
-
 	g_mutex_lock (priv->queue_lock);
-	g_list_foreach (priv->regged_queues, (GFunc) 
-		tny_camel_send_queue_join_worker, NULL);
+	/*g_list_foreach (priv->regged_queues, (GFunc) 
+		tny_camel_send_queue_join_worker, NULL);*/
 	g_mutex_unlock (priv->queue_lock);
 
 	priv->is_connecting = TRUE;
@@ -526,11 +525,24 @@ background_connect_thread (gpointer data)
 
 	priv->prev_constat = info->online;
 
+	g_mutex_lock (priv->conlock);
 	priv->conthread = NULL;
 	g_mutex_unlock (priv->conlock);
 
 	g_thread_exit (NULL);
 	return NULL;
+}
+
+static gboolean
+delayed_background_connect_thread (gpointer data)
+{
+	BackgroundConnectInfo *info = data;
+
+	g_mutex_lock (info->priv->conlock);
+	info->priv->conthread = g_thread_create (background_connect_thread, data, TRUE, NULL);
+	g_mutex_unlock (info->priv->conlock);
+
+	return FALSE;
 }
 
 static void
@@ -549,6 +561,7 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 	info->device = g_object_ref (G_OBJECT (device));
 	info->online = online;
 	info->user_data = user_data;
+	info->priv = priv;
 
 	camel_session_set_online ((CamelSession *) self, online); 
 
@@ -561,7 +574,14 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 
 	if (priv->async_connect) {
 		info->as_thread = TRUE;
-		priv->conthread = g_thread_create (background_connect_thread, info, TRUE, NULL);
+
+		g_mutex_lock (priv->conlock);
+		if (priv->conthread)
+			g_timeout_add (5000, delayed_background_connect_thread, info); 
+		else
+			priv->conthread = g_thread_create (background_connect_thread, info, TRUE, NULL);
+		g_mutex_unlock (priv->conlock);
+
 	} else {
 		info->as_thread = FALSE;
 		background_connect_thread (info);
@@ -581,8 +601,10 @@ tny_session_camel_join_connecting (TnySessionCamel *self)
 {
 	TnySessionCamelPriv *priv = self->priv;
 
+	g_mutex_lock (priv->conlock);
 	if (priv->conthread)
 		g_thread_join (priv->conthread);
+	g_mutex_unlock (priv->conlock);
 }
 
 /*

@@ -1,6 +1,7 @@
 2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Dealing with the first connection status of the device instance
+	* Several race conditions when rapidly connecting and disconnecting
 
 2007-07-04  Murray Cumming  <murrayc@murrayc.com>
 

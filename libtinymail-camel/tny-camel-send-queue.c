@@ -106,15 +106,19 @@ thread_main (gpointer data)
 {
 	TnySendQueue *self = (TnySendQueue *) data;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+	TnyCamelAccountPriv *apriv = NULL;
 	TnyFolder *sentbox, *outbox;
 	guint i = 0, length = 0;
 	TnyList *list;
 
+	g_object_ref (self);
+
 	priv->is_running = TRUE;
 	priv->creating_spin = FALSE;
 
-	tny_session_camel_join_connecting (apriv->session);
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+	if (apriv)
+		tny_session_camel_join_connecting (apriv->session);
 
 	list = tny_simple_list_new ();
 
@@ -251,8 +255,12 @@ thread_main (gpointer data)
 
 errorhandler:
 
+
 	g_object_unref (G_OBJECT (sentbox));
 	g_object_unref (G_OBJECT (outbox));
+
+	g_object_unref (self); /* The one added here */
+
 	g_object_unref (G_OBJECT (self));
 
 	priv->thread = NULL;
@@ -271,9 +279,8 @@ create_worker (TnySendQueue *self)
 	{
 		while (priv->creating_spin);
 		priv->creating_spin = TRUE;
-		g_object_ref (self);
 		priv->thread = g_thread_create (thread_main, 
-			self, TRUE, NULL);
+			g_object_ref (self), TRUE, NULL);
 	}
 
 	return;
@@ -289,8 +296,9 @@ void
 tny_camel_send_queue_join_worker (TnyCamelSendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 
-	if (priv->thread)
+	if (!apriv->session->priv->conthread && priv->thread)
 		g_thread_join (priv->thread);
 }
 
