@@ -46,14 +46,18 @@ static void
 notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyList *copy = NULL;
 	TnyIterator *iter;
 
-	if (!priv->observers)
-		return;
-
 	g_static_rec_mutex_lock (priv->lock);
+	if (!priv->observers) {
+		g_static_rec_mutex_unlock (priv->lock);
+		return;
+	}
+	copy = tny_list_copy (priv->observers);
+	g_static_rec_mutex_unlock (priv->lock);
 
-	iter = tny_list_create_iterator (priv->observers);
+	iter = tny_list_create_iterator (copy);
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (tny_iterator_get_current (iter));
@@ -61,9 +65,9 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 		g_object_unref (G_OBJECT (observer));
 		tny_iterator_next (iter);
 	}
-	g_object_unref (G_OBJECT (iter));
 
-	g_static_rec_mutex_unlock (priv->lock);
+	g_object_unref (iter);
+	g_object_unref (copy);
 }
 
 
@@ -101,12 +105,18 @@ tny_merge_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter))
 	{
+		GError *new_err = NULL;
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
-		tny_folder_sync (cur, expunge, err);
 
-		/* TODO: Handle err ! */
-
+		tny_folder_sync (cur, expunge, &new_err);
 		g_object_unref (cur);
+
+		if (new_err != NULL)
+		{
+			g_propagate_error (err, new_err);
+			break;
+		}
+
 		tny_iterator_next (iter);
 	}
 	g_object_unref (iter);
@@ -180,12 +190,17 @@ tny_merge_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **er
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter) && !retval)
 	{
+		GError *new_err = NULL;
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
-		retval = tny_folder_find_msg (cur, url_string, err);
-
-		/* TODO: Handle err */
-
+		retval = tny_folder_find_msg (cur, url_string, &new_err);
 		g_object_unref (cur);
+
+		if (new_err != NULL)
+		{
+			g_propagate_error (err, new_err);
+			break;
+		}
+
 		tny_iterator_next (iter);
 	}
 
@@ -311,12 +326,17 @@ tny_merge_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refres
 
 	while (!tny_iterator_is_done (iter))
 	{
+		GError *new_err = NULL;
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
-		tny_folder_get_headers (cur, headers, refresh, err);
-
-		/* TODO: Handle err */
-
+		tny_folder_get_headers (cur, headers, refresh, &new_err);
 		g_object_unref (cur);
+
+		if (new_err != NULL)
+		{
+			g_propagate_error (err, new_err);
+			break;
+		}
+
 		tny_iterator_next (iter);
 	}
 
@@ -457,12 +477,17 @@ tny_merge_folder_refresh (TnyFolder *self, GError **err)
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter))
 	{
+		GError *new_err = NULL;
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
-		tny_folder_refresh (cur, err);
-
-		/* TODO: Handler err */
-
+		tny_folder_refresh (cur, &new_err);
 		g_object_unref (cur);
+
+		if (new_err != NULL)
+		{
+			g_propagate_error (err, new_err);
+			break;
+		}
+
 		tny_iterator_next (iter);
 	}
 
@@ -619,16 +644,22 @@ tny_merge_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder
 	{
 		TnyHeader *current = TNY_HEADER (tny_iterator_get_current (iter));
 		TnyFolder *folder = tny_header_get_folder (current);
-
+		GError *new_err = NULL;
 		TnyList *nlist = tny_simple_list_new ();
 		tny_list_prepend (nlist, G_OBJECT (current));
 
-		tny_folder_transfer_msgs (folder, nlist, folder_dst, delete_originals, err);
-		/* TODO: handle err*/
+		tny_folder_transfer_msgs (folder, nlist, folder_dst, delete_originals, &new_err);
 
 		g_object_unref (nlist);
 		g_object_unref (folder);
 		g_object_unref (current);
+
+		if (new_err != NULL)
+		{
+			g_propagate_error (err, new_err);
+			break;
+		}
+
 		tny_iterator_next (iter);
 	}
 
@@ -760,16 +791,32 @@ tny_merge_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_n
 
 		if (!nfol)
 		{
-			nfol = tny_folder_copy (folder, into, new_name, del, err);
-			/* TODO: handle err */
+			GError *new_err = NULL;
+			nfol = tny_folder_copy (folder, into, new_name, del, &new_err);
+
+			if (new_err != NULL)
+			{
+				g_object_unref (folder);
+				g_propagate_error (err, new_err);
+				break;
+			}
+
 		} else {
 			TnyList *nlist = tny_simple_list_new ();
+			GError *new_err = NULL;
 
-			tny_folder_get_headers (folder, nlist, FALSE, err);
-			/* TODO: handle err */
-			tny_folder_transfer_msgs (folder, nlist, nfol, del, err);
-			/* TODO: handle err*/
+			tny_folder_get_headers (folder, nlist, FALSE, &new_err);
+			if (new_err == NULL)
+				tny_folder_transfer_msgs (folder, nlist, nfol, del, &new_err);
 			g_object_unref (nlist);
+
+			if (new_err != NULL)
+			{
+				g_object_unref (folder);
+				g_propagate_error (err, new_err);
+				break;
+			}
+
 		}
 
 

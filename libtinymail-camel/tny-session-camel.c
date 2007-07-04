@@ -513,10 +513,7 @@ background_connect_thread (gpointer data)
 
 	priv->is_connecting = TRUE;
 
-	if (priv->current_accounts &&
-		priv->prev_constat != info->online && priv->account_store)
-
-	{
+	if (priv->current_accounts && priv->prev_constat != info->online && priv->account_store) {
 		g_list_foreach (priv->current_accounts, 
 			foreach_account_set_connectivity, info);
 	}
