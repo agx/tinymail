@@ -595,6 +595,20 @@ emit_accounts_reloaded (gpointer user_data)
 }
 */
 
+static gboolean
+after_one_second (gpointer data)
+{
+	TnySessionCamel *self = data;
+	TnySessionCamelPriv *priv = self->priv;
+
+	if (priv->device && TNY_IS_DEVICE (priv->device) && tny_device_is_online (priv->device))
+		connection_changed (priv->device, TRUE, self);
+
+	camel_object_unref (self);
+
+	return FALSE;
+}
+
 /**
  * tny_session_camel_set_device:
  * @self: a #TnySessionCamel object
@@ -624,8 +638,12 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 	{
 		priv->prev_constat = TRUE;
 		connection_changed (device, FALSE, self);
-
+	} else {
+		priv->prev_constat = FALSE;
+		camel_object_ref (self);
+		g_timeout_add (1000, after_one_second, self);
 	}
+
 	return;
 }
 

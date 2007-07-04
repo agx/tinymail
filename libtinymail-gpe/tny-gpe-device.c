@@ -128,7 +128,6 @@ tny_gpe_device_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 
-
 /**
  * tny_gpe_device_new:
  *

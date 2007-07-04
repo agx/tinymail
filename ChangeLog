@@ -1,3 +1,7 @@
+2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Dealing with the first connection status of the device instance
+
 2007-07-04  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:

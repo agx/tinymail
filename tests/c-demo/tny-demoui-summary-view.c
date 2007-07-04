@@ -192,6 +192,8 @@ clear_header_view (TnyDemouiSummaryViewPriv *priv)
 }
 
 
+static GtkWidget *rem_dialog = NULL;
+
 typedef struct
 {
 	TnySummaryView *self;
@@ -219,6 +221,8 @@ on_response (GtkDialog *dialog, gint arg1, gpointer user_data)
 	g_object_unref (self);
 
 	gtk_widget_destroy (GTK_WIDGET (dialog));
+	rem_dialog = NULL;
+
 	g_slice_free (OnResponseInfo, info);
 }
 
@@ -230,14 +234,18 @@ on_send_queue_error_happened (TnySendQueue *self, TnyHeader *header, TnyMsg *msg
 		gchar *str = g_strdup_printf ("%s. Do you want to remove the message (%s)?",
 			err->message, tny_header_get_subject (header));
 		OnResponseInfo *info = g_slice_new (OnResponseInfo);
-		GtkWidget *dialog = gtk_message_dialog_new (NULL, 0,
-			GTK_MESSAGE_ERROR, GTK_BUTTONS_YES_NO, str);
-		g_free (str);
-		info->self = g_object_ref (user_data);
-		info->header = g_object_ref (header);
-		g_signal_connect (G_OBJECT (dialog), "response",
-			G_CALLBACK (on_response), info);
-		gtk_widget_show_all (dialog);
+
+		if (!rem_dialog)
+		{
+			rem_dialog = gtk_message_dialog_new (NULL, 0,
+				GTK_MESSAGE_ERROR, GTK_BUTTONS_YES_NO, str);
+			g_free (str);
+			info->self = g_object_ref (user_data);
+			info->header = g_object_ref (header);
+			g_signal_connect (G_OBJECT (rem_dialog), "response",
+				G_CALLBACK (on_response), info);
+			gtk_widget_show_all (rem_dialog);
+		}
 	}
 	return;
 }

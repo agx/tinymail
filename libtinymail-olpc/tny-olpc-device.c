@@ -130,7 +130,6 @@ tny_olpc_device_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 
-
 /**
  * tny_olpc_device_new:
  *

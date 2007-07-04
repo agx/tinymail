@@ -114,7 +114,6 @@ tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 
-
 /**
  * tny_maemo_device_new:
  *
@@ -124,6 +123,7 @@ TnyDevice*
 tny_maemo_device_new (void)
 {
 	TnyMaemoDevice *self = g_object_new (TNY_TYPE_MAEMO_DEVICE, NULL);
+
 
 	return TNY_DEVICE (self);
 }

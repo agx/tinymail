@@ -191,6 +191,9 @@ tny_device_base_init (gpointer g_class)
  * This signal will not be emitted in response to actual connection changes 
  * while the status is forced with tny_device_force_online() or 
  * tny_device_force_offline().
+ *
+ * Implementors must make sure that the emissions of this signal always 
+ * happen in the mainloop.
  */
 		tny_device_signals[TNY_DEVICE_CONNECTION_CHANGED] =
 		   g_signal_new ("connection_changed",

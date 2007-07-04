@@ -685,32 +685,8 @@ tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
 void
 tny_camel_send_queue_flush (TnyCamelSendQueue *self)
 {
-	TnyCamelSendQueuePriv *priv;
-
 	g_return_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self));
-
-	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-
-	g_mutex_lock (priv->todo_lock);
-	{
-		TnyFolder *outbox;
-		TnyList *headers = tny_simple_list_new ();
-
-		outbox = tny_send_queue_get_outbox (TNY_SEND_QUEUE (self));
-		if (outbox)
-		{
-			/* TODO handle and report errors here */
-			tny_folder_get_headers (outbox, headers, TRUE, NULL);
-			priv->total = tny_list_get_length (headers);
-			g_object_unref (G_OBJECT (headers));
-
-			if (priv->total >= 1)
-				create_worker (TNY_SEND_QUEUE (self));
-
-			g_object_unref (G_OBJECT (outbox));
-		}
-	}
-	g_mutex_unlock (priv->todo_lock);
+	create_worker (TNY_SEND_QUEUE (self));
 }
 
 
