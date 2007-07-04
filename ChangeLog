@@ -1,6 +1,13 @@
 2007-07-04  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(on_dummy_connection_check): Move this to before the first use.
+	(tny_maemo_conic_device_is_online): Put use of on_dummy_connection_check() 
+	in an ifdef to avoid a linker failure.
+
+2007-07-04  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
 	(on_dummy_connection_check): Set is_online here instead of waiting for it to be 
 	set in the signal, becacuse this is used to do a quick check without waiting for the timout 
 	to check the file.

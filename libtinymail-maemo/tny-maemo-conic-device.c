@@ -335,6 +335,61 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 }
 
 
+#ifdef MAEMO_CONIC_DUMMY
+
+static gboolean on_dummy_connection_check (gpointer user_data)
+{
+	TnyMaemoConicDevice *self = TNY_MAEMO_CONIC_DEVICE (user_data);
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+		
+	/* Check whether the enviroment variable has changed, 
+	 * so we can fake a connection change: */
+	gchar *filename = get_dummy_filename ();
+		
+	gchar *contents = 0;
+	GError* error = 0;
+	gboolean test = g_file_get_contents (filename, &contents, NULL, &error);
+	if(error) {
+		/* printf("%s: error from g_file_get_contents(): %s\n", __FUNCTION__, error->message); */
+		g_error_free (error);
+		error = NULL;
+	}
+	
+	if (!test || !contents) {
+		/* Default to the first debug connection: */
+		contents = g_strdup ("debug id0");
+	}
+	
+	if (contents)
+		g_strstrip(contents);
+
+	if (!(priv->iap) || (strcmp (contents, priv->iap) != 0)) {
+		if (priv->iap) {
+			g_free (priv->iap);
+			priv->iap = NULL;
+		}
+			
+		/* We store even the special "none" text, so we can detect changes. */
+		priv->iap = g_strdup (contents);
+		
+		if (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0) {
+			priv->is_online = FALSE;
+			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to no connection.\n", __FUNCTION__);
+		} else {
+			priv->is_online = TRUE;
+			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to '%s\n", __FUNCTION__, priv->iap);
+		}
+		
+		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+		       0, priv->is_online);
+	}
+	
+	g_free (contents);
+	g_free (filename);
+	
+	return TRUE;
+}
+#endif /* MAEMO_CONIC_DUMMY */
 
 /**
  * tny_maemo_conic_device_get_current_iap_id:
@@ -529,69 +584,14 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 		       0, FALSE);
 }
 
-
-#ifdef MAEMO_CONIC_DUMMY
-
-static gboolean on_dummy_connection_check (gpointer user_data)
-{
-	TnyMaemoConicDevice *self = TNY_MAEMO_CONIC_DEVICE (user_data);
-	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-		
-	/* Check whether the enviroment variable has changed, 
-	 * so we can fake a connection change: */
-	gchar *filename = get_dummy_filename ();
-		
-	gchar *contents = 0;
-	GError* error = 0;
-	gboolean test = g_file_get_contents (filename, &contents, NULL, &error);
-	if(error) {
-		/* printf("%s: error from g_file_get_contents(): %s\n", __FUNCTION__, error->message); */
-		g_error_free (error);
-		error = NULL;
-	}
-	
-	if (!test || !contents) {
-		/* Default to the first debug connection: */
-		contents = g_strdup ("debug id0");
-	}
-	
-	if (contents)
-		g_strstrip(contents);
-
-	if (!(priv->iap) || (strcmp (contents, priv->iap) != 0)) {
-		if (priv->iap) {
-			g_free (priv->iap);
-			priv->iap = NULL;
-		}
-			
-		/* We store even the special "none" text, so we can detect changes. */
-		priv->iap = g_strdup (contents);
-		
-		if (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0) {
-			priv->is_online = FALSE;
-			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to no connection.\n", __FUNCTION__);
-		} else {
-			priv->is_online = TRUE;
-			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to '%s\n", __FUNCTION__, priv->iap);
-		}
-		
-		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
-		       0, priv->is_online);
-	}
-	
-	g_free (contents);
-	g_free (filename);
-	
-	return TRUE;
-}
-#endif /* MAEMO_CONIC_DUMMY */
-
 static gboolean
 tny_maemo_conic_device_is_online (TnyDevice *self)
 {
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);	
 
+	#ifdef MAEMO_CONIC_DUMMY
 	on_dummy_connection_check(self);
+	#endif /* MAEMO_CONIC_DUMMY */
 	
 	return TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self)->is_online;
 }
