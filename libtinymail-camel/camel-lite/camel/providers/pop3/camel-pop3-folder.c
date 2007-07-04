@@ -73,7 +73,6 @@ static CamelDiscoFolderClass *disco_folder_class = NULL;
 static void pop3_finalize (CamelObject *object);
 static void pop3_refresh_info (CamelFolder *folder, CamelException *ex);
 static void pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex);
-static gint pop3_get_message_count (CamelFolder *folder);
 static GPtrArray *pop3_get_uids (CamelFolder *folder);
 static CamelMimeMessage *pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex);
 static gboolean pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set);
@@ -82,6 +81,7 @@ static int pop3_get_local_size (CamelFolder *folder);
 
 static void pop3_delete_attachments (CamelFolder *folder, const char *uid);
 
+char *strcasestr(const char *haystack, const char *needle);
 
 static void 
 destroy_lists (CamelPOP3Folder *pop3_folder)
@@ -1114,16 +1114,6 @@ pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, gui
 	return res;
 }
 
-static gint
-pop3_get_message_count (CamelFolder *folder)
-{
-	CamelPOP3Folder *pop3_folder = CAMEL_POP3_FOLDER (folder);
-
-	if (!pop3_folder->uids)
-		return 0;
-
-	return pop3_folder->uids->len;
-}
 
 static GPtrArray *
 pop3_get_uids (CamelFolder *folder)
@@ -1266,7 +1256,6 @@ camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
 	camel_folder_class->refresh_info = pop3_refresh_info;
 	camel_folder_class->sync = pop3_sync;
 	
-	camel_folder_class->get_message_count = pop3_get_message_count;
 	camel_folder_class->get_uids = pop3_get_uids;
 	camel_folder_class->free_uids = camel_folder_free_shallow;
 	camel_folder_class->get_message = pop3_get_message;
