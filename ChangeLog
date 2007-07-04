@@ -1,3 +1,13 @@
+2007-07-04  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(on_dummy_connection_check): Changed the check for a NULL iap
+	(though it should have worked already) to ensure that the signal 
+	is always emitted at initialization.
+	(tny_maemo_conic_device_force_online): Do not just return if we 
+	are in scratchbox. Nothing here is libconic-specific. This 
+	makes is_online() return the correct value after calling force_online().
+
 2007-07-04  Johannes Schmid <johannes.schmid@openismus.com>
 
 	* libtinymail/tny-merge-folder.c:

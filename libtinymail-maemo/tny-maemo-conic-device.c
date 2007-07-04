@@ -356,6 +356,7 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 	}
 	
 	if (!test || !contents) {
+		/* printf ("DEBUG1: %s: priv->iap = %s\n", priv->iap); */
 		/* Default to the first debug connection: */
 		contents = g_strdup ("debug id0");
 	}
@@ -363,7 +364,7 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 	if (contents)
 		g_strstrip(contents);
 
-	if (!(priv->iap) || (strcmp (contents, priv->iap) != 0)) {
+	if ((priv->iap == NULL) || (strcmp (contents, priv->iap) != 0)) {
 		if (priv->iap) {
 			g_free (priv->iap);
 			priv->iap = NULL;
@@ -380,6 +381,7 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to '%s\n", __FUNCTION__, priv->iap);
 		}
 		
+		printf ("DEBUG1: %s: emitting is_online=%d\n", __FUNCTION__, priv->is_online);
 		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		       0, priv->is_online);
 	}
@@ -541,10 +543,7 @@ tny_maemo_conic_device_force_online (TnyDevice *device)
 	g_return_if_fail (TNY_IS_DEVICE(device));
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-
-#ifdef MAEMO_CONIC_DUMMY
-	return;
-#endif /*MAEMO_CONIC_DUMMY*/	
+	
 	const gboolean already_online = tny_maemo_conic_device_is_online (device);
 
 	g_message (__FUNCTION__);
