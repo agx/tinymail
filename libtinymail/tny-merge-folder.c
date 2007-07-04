@@ -190,23 +190,20 @@ tny_merge_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **er
 	iter = tny_list_create_iterator (priv->mothers);
 	while (!tny_iterator_is_done (iter) && !retval)
 	{
-		GError *new_err = NULL;
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
-		retval = tny_folder_find_msg (cur, url_string, &new_err);
+		retval = tny_folder_find_msg (cur, url_string, NULL);
 		g_object_unref (cur);
-
-		if (new_err != NULL)
-		{
-			g_propagate_error (err, new_err);
-			break;
-		}
-
 		tny_iterator_next (iter);
 	}
 
 	g_object_unref (iter);
 
 	g_static_rec_mutex_unlock (priv->lock);
+
+	if (!retval)
+		g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_GET_MSG,
+				"Message not found");
 
 	return retval;
 }
