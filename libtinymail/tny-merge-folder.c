@@ -35,6 +35,7 @@ struct _TnyMergeFolderPriv
 	gchar *id, *name;
 	TnyList *mothers, *observers;
 	GStaticRecMutex *lock;
+	TnyFolderType folder_type;
 };
 
 #define TNY_MERGE_FOLDER_GET_PRIVATE(o) \
@@ -398,10 +399,20 @@ tny_merge_folder_get_account (TnyFolder *self)
 }
 
 
+void
+tny_merge_folder_set_folder_type (TnyMergeFolder* self, TnyFolderType folder_type)
+{
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	g_return_if_fail (priv != NULL);
+	priv->folder_type = folder_type;
+}
+
 static TnyFolderType
 tny_merge_folder_get_folder_type (TnyFolder *self)
 {
-	return TNY_FOLDER_TYPE_MERGE;
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	g_return_val_if_fail (priv != NULL, TNY_FOLDER_TYPE_MERGE);
+	return priv->folder_type;
 }
 
 static guint
@@ -1005,6 +1016,7 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->lock);
 	priv->observers = NULL;
+	priv->folder_type = TNY_FOLDER_TYPE_MERGE;
 
 	return;
 }

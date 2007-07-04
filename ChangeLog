@@ -1,3 +1,9 @@
+2007-07-04  Johannes Schmid <johannes.schmid@openismus.com>
+
+	* libtinymail/tny-merge-folder.[ch]:
+	Added tny_merge_folder_set_folder_type() API to be able
+	to assing a different folder type to a tny-merger-folder
+
 2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Implementation of tny_folder_poke_status for the total count of a
