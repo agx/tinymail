@@ -663,7 +663,7 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 	} else {
 		priv->prev_constat = FALSE;
 		camel_object_ref (self);
-		g_timeout_add (1000, after_one_second, self);
+		g_timeout_add (5000, after_one_second, self);
 	}
 
 	return;
