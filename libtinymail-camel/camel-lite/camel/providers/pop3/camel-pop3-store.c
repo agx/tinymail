@@ -839,8 +839,8 @@ pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 
 	if (info->items != -1) {
 		*messages = info->items;
-		*unseen = 0;
-		printf ("Setting messages to %d\n", info->items);
+		if (*unseen == -1)
+			*unseen = 0;
 	}
 
 	g_slice_free (StatInfo, info);
