@@ -1,5 +1,10 @@
 2007-07-04  Johannes Schmid <johannes.schmid@openismus.com>
 
+	* libtinymail/tny-merge-folder.c:
+	Added API doc
+
+2007-07-04  Johannes Schmid <johannes.schmid@openismus.com>
+
 	* libtinymail/tny-merge-folder.[ch]:
 	Added tny_merge_folder_set_folder_type() API to be able
 	to assing a different folder type to a tny-merger-folder

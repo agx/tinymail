@@ -399,6 +399,17 @@ tny_merge_folder_get_account (TnyFolder *self)
 }
 
 
+/**
+ * tny_merge_folder_set_folder_type
+ * @self: a #TnyMergeFolder object
+ * @folder_type: the new folder type
+ * 
+ * Set the folder type of the TnyMergeFolder. The default is TNY_FOLDER_TYPE_MERGE
+ * but you can change this to any folder type. It will not affect anything except
+ * that get_folder_type() will return the new type now.
+ *
+ **/
+
 void
 tny_merge_folder_set_folder_type (TnyMergeFolder* self, TnyFolderType folder_type)
 {
