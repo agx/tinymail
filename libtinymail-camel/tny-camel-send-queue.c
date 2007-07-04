@@ -41,6 +41,7 @@ static GObjectClass *parent_class = NULL;
 #include "tny-camel-send-queue-priv.h"
 #include "tny-camel-folder-priv.h"
 #include "tny-camel-account-priv.h"
+#include "tny-session-camel-priv.h"
 
 #define TNY_CAMEL_SEND_QUEUE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_SEND_QUEUE, TnyCamelSendQueuePriv))
@@ -250,13 +251,12 @@ thread_main (gpointer data)
 
 errorhandler:
 
-	priv->is_running = FALSE;
-
 	g_object_unref (G_OBJECT (sentbox));
 	g_object_unref (G_OBJECT (outbox));
 	g_object_unref (G_OBJECT (self));
 
 	priv->thread = NULL;
+	priv->is_running = FALSE;
 
 	g_thread_exit (NULL);
 	return NULL;
@@ -267,13 +267,13 @@ create_worker (TnySendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
-	if (!priv->is_running)
+	if (!priv->is_running && !priv->thread)
 	{
 		while (priv->creating_spin);
 		priv->creating_spin = TRUE;
-
+		g_object_ref (self);
 		priv->thread = g_thread_create (thread_main, 
-			g_object_ref (self), TRUE, NULL);
+			self, TRUE, NULL);
 	}
 
 	return;
