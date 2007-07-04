@@ -794,6 +794,61 @@ finalize (CamelObject *object)
 
 }
 
+typedef struct {
+	guint items, bytes;
+} StatInfo;
+
+static void
+cmd_stat (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
+{
+	unsigned char *line = (unsigned char *) stream; /* moeha, ugly! */
+	StatInfo *info = data;
+
+	sscanf((char *) line, "+OK %d %d", &info->items, &info->bytes);
+
+}
+
+static void
+pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext)
+{
+	CamelPOP3Store *pop3_store = (CamelPOP3Store *) store;
+	CamelPOP3Command *cmd = NULL;
+	StatInfo *info = NULL;
+	int i = -1;
+
+	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
+		return;
+
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+	
+	if (pop3_store->engine == NULL) {
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+		return;
+	}
+
+	camel_operation_start(NULL, _("Getting POP3 status"));
+
+	info = g_slice_new (StatInfo);
+
+	info->items = -1;
+	info->bytes = -1;
+
+	cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, 
+			cmd_stat, info, "STAT\r\n");
+	while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0);
+
+	if (info->items != -1) {
+		*messages = info->items;
+		*unseen = 0;
+		printf ("Setting messages to %d\n", info->items);
+	}
+
+	g_slice_free (StatInfo, info);
+	camel_pop3_engine_command_free (pop3_store->engine, cmd);
+
+	camel_operation_end(NULL);
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+}
 
 
 static void
@@ -852,7 +907,7 @@ camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
 
 	camel_store_class->get_folder = get_folder;
 	camel_store_class->get_trash = get_trash;
-
+	camel_store_class->get_folder_status = pop3_get_folder_status;
 	camel_store_class->delete_cache = pop3_delete_cache;
 
 	camel_disco_store_class->can_work_offline = pop3_can_work_offline;

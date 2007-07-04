@@ -417,6 +417,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	return;
 }
 
+
 static void
 pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 {

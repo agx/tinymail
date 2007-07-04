@@ -363,6 +363,8 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 
 			pe->partial_happening = FALSE;
 		} else {
+			if (pc->func && pc->data && strstr (pc->data, "STAT")) /* Moeha ugly ! */
+				pc->func(pe, (CamelPOP3Stream *) pe->line, pc->func_data);
 			pc->state = CAMEL_POP3_COMMAND_OK;
 		}
 		break;

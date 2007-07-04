@@ -1,3 +1,8 @@
+2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Implementation of tny_folder_poke_status for the total count of a
+	POP folder
+
 2007-07-04  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
