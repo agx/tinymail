@@ -369,6 +369,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 
 	priv->is_inuse = FALSE;
 	priv->conlock = g_mutex_new ();
+	priv->queue_lock = g_mutex_new ();
 	priv->conthread = NULL;
 	priv->current_accounts = NULL;
 	priv->prev_constat = FALSE;
@@ -505,8 +506,10 @@ background_connect_thread (gpointer data)
 
 	g_mutex_lock (priv->conlock);
 
+	g_mutex_lock (priv->queue_lock);
 	g_list_foreach (priv->regged_queues, (GFunc) 
 		tny_camel_send_queue_join_worker, NULL);
+	g_mutex_unlock (priv->queue_lock);
 
 	priv->is_connecting = TRUE;
 
@@ -676,9 +679,9 @@ _tny_session_camel_unreg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue)
 {
 	TnySessionCamelPriv *priv = self->priv;
 
-	g_mutex_lock (priv->conlock);
+	g_mutex_lock (priv->queue_lock);
 	priv->regged_queues = g_list_remove (priv->regged_queues, queue);
-	g_mutex_unlock (priv->conlock);
+	g_mutex_unlock (priv->queue_lock);
 }
 
 void 
@@ -686,9 +689,9 @@ _tny_session_camel_reg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue)
 {
 	TnySessionCamelPriv *priv = self->priv;
 
-	g_mutex_lock (priv->conlock);
+	g_mutex_lock (priv->queue_lock);
 	priv->regged_queues = g_list_prepend (priv->regged_queues, queue);
-	g_mutex_unlock (priv->conlock);
+	g_mutex_unlock (priv->queue_lock);
 }
 
 
@@ -718,10 +721,10 @@ tny_session_camel_finalise (CamelObject *object)
 	TnySessionCamel *self = (TnySessionCamel*)object;
 	TnySessionCamelPriv *priv = self->priv;
 
-	g_mutex_lock (priv->conlock);
+	g_mutex_lock (priv->queue_lock);
 	g_list_free (priv->regged_queues);
 	priv->regged_queues = NULL;
-	g_mutex_unlock (priv->conlock);
+	g_mutex_unlock (priv->queue_lock);
 
 	if (priv->device && g_signal_handler_is_connected (G_OBJECT (priv->device), priv->connchanged_signal))
 	{
@@ -736,6 +739,7 @@ tny_session_camel_finalise (CamelObject *object)
 		g_free (priv->camel_dir);
 
 	g_mutex_free (priv->conlock);
+	g_mutex_free (priv->queue_lock);
 
 	g_slice_free (TnySessionCamelPriv, self->priv);
 

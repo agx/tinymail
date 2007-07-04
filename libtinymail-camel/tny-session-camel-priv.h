@@ -14,7 +14,7 @@ struct _TnySessionCamelPriv
 	gboolean in_auth_function, is_connecting;
 	gboolean async_connect;
 	TnyLockable *ui_lock;
-	GMutex *conlock;
+	GMutex *conlock, *queue_lock;
 	GThread *conthread;
 	gboolean is_inuse;
 	GList *regged_queues;
