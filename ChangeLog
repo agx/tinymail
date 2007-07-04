@@ -7,7 +7,7 @@
 
 	* libtinymail/tny-merge-folder.[ch]:
 	Added tny_merge_folder_set_folder_type() API to be able
-	to assing a different folder type to a tny-merger-folder
+	to assign a different folder type to a tny-merger-folder
 
 2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
