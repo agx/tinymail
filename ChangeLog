@@ -1,3 +1,16 @@
+2007-07-04  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(on_dummy_connection_check): Set is_online here instead of waiting for it to be 
+	set in the signal, becacuse this is used to do a quick check without waiting for the timout 
+	to check the file.
+	(tny_maemo_conic_device_is_online): In the dummy scratchbox implementation, call 
+	on_dummy_connection_check() before returning is_online, so that it is accurate.
+
+	(tny_maemo_conic_device_instance_init),
+	(tny_maemo_conic_device_finalize): Don't use libconic at all if we are in scratchbox, 
+	because it signals that there is no connection, which confuses our dummy implementation.
+
 2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Total count of POP3 folders

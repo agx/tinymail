@@ -194,7 +194,9 @@ static gboolean dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self
 	GtkDialog *dialog = GTK_DIALOG (gtk_message_dialog_new( NULL, GTK_DIALOG_MODAL,
 			GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL, 
 			"TnyMaemoConicDevice fake scratchbox implementation:\nThe application requested a connection. Make a fake connection?"));
+	printf ("DEBUG: %s before gtk_dialog_run()\n", __FUNCTION__);
 	const int response = gtk_dialog_run (dialog);
+	printf ("DEBUG: %s after gtk_dialog_run()\n", __FUNCTION__);
 	gtk_widget_hide (GTK_WIDGET (dialog));
 	gtk_widget_destroy (GTK_WIDGET (dialog));
 	
@@ -352,9 +354,7 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
 	#ifdef MAEMO_CONIC_DUMMY
-	if (!(priv->iap)) {
-		on_dummy_connection_check (self);
-	}
+	on_dummy_connection_check (self);
 	
 	/* Handle the special "none" text: */
 	if (priv->iap && (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0))
@@ -530,18 +530,6 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 }
 
 
-static gboolean
-tny_maemo_conic_device_is_online (TnyDevice *self)
-{
-#ifdef MAEMO_CONIC_DUMMY
-	return TRUE;
-#endif /*MAEMO_CONIC_DUMMY*/
-	
-	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);	
-
-	return TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self)->is_online;
-}
-
 #ifdef MAEMO_CONIC_DUMMY
 
 static gboolean on_dummy_connection_check (gpointer user_data)
@@ -579,15 +567,16 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 		/* We store even the special "none" text, so we can detect changes. */
 		priv->iap = g_strdup (contents);
 		
-		if (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0) {		
-			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changing to no connection.\n", __FUNCTION__);
-			g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
-			       0, FALSE);
+		if (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0) {
+			priv->is_online = FALSE;
+			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to no connection.\n", __FUNCTION__);
 		} else {
-			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changing to '%s\n", __FUNCTION__, priv->iap);
-			g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
-		       0, TRUE);
+			priv->is_online = TRUE;
+			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to '%s\n", __FUNCTION__, priv->iap);
 		}
+		
+		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+		       0, priv->is_online);
 	}
 	
 	g_free (contents);
@@ -597,6 +586,15 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 }
 #endif /* MAEMO_CONIC_DUMMY */
 
+static gboolean
+tny_maemo_conic_device_is_online (TnyDevice *self)
+{
+	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);	
+
+	on_dummy_connection_check(self);
+	
+	return TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self)->is_online;
+}
 
 
 static void
@@ -606,6 +604,8 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	priv->iap = NULL;
+	
+	#ifndef MAEMO_CONIC_DUMMY
 	priv->cnx = con_ic_connection_new ();
 	if (!priv->cnx) {
 		g_warning ("con_ic_connection_new failed. The TnyMaemoConicDevice will be useless.");
@@ -628,7 +628,8 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	 */
 	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
 		g_warning ("could not send connect dbus message");
-	
+		
+	#endif /* MAEMO_CONIC_DUMMY */
 	
 	priv->is_online     = FALSE; 
 	priv->forced = FALSE;
@@ -664,12 +665,15 @@ tny_maemo_conic_device_finalize (GObject *obj)
 
 	TnyMaemoConicDevicePriv *priv;
 	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
+	
+	#ifndef MAEMO_CONIC_DUMMY
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
 		if (!tny_maemo_conic_device_disconnect (TNY_MAEMO_CONIC_DEVICE(obj),priv->iap))
 			g_warning ("failed to disconnect dbus message");
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
 	}
+	#endif /* MAEMO_CONIC_DUMMY */
 
 	#ifdef MAEMO_CONIC_DUMMY
 	if (priv->dummy_env_check_timeout) {
