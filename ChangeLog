@@ -1,6 +1,8 @@
 2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Total count of POP3 folders
+	* Thread joining between the TnyCamelSendQueue and the TnySessionCamel
+	connection threads
 
 2007-07-03  Philip Van Hoof  <pvanhoof@gnome.org>
 

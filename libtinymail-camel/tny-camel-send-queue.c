@@ -105,12 +105,15 @@ thread_main (gpointer data)
 {
 	TnySendQueue *self = (TnySendQueue *) data;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 	TnyFolder *sentbox, *outbox;
 	guint i = 0, length = 0;
 	TnyList *list;
 
 	priv->is_running = TRUE;
 	priv->creating_spin = FALSE;
+
+	tny_session_camel_join_connecting (apriv->session);
 
 	list = tny_simple_list_new ();
 
@@ -268,6 +271,7 @@ create_worker (TnySendQueue *self)
 	{
 		while (priv->creating_spin);
 		priv->creating_spin = TRUE;
+
 		priv->thread = g_thread_create (thread_main, 
 			g_object_ref (self), TRUE, NULL);
 	}
@@ -275,6 +279,20 @@ create_worker (TnySendQueue *self)
 	return;
 }
 
+/**
+ * tny_camel_send_queue_join_worker:
+ * @self: A #TnyCamelSendQueue instance
+ *
+ * Join the worker thread of @self if it's running.
+ **/
+void 
+tny_camel_send_queue_join_worker (TnyCamelSendQueue *self)
+{
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+
+	if (priv->thread)
+		g_thread_join (priv->thread);
+}
 
 static void
 tny_camel_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
@@ -530,6 +548,13 @@ tny_camel_send_queue_finalize (GObject *object)
 {
 	TnyCamelSendQueue *self = (TnyCamelSendQueue*) object;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = NULL;
+
+	if (priv->trans_account)
+	{
+		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+		_tny_session_camel_unreg_queue (apriv->session, self);
+	}
 
 	g_mutex_lock (priv->todo_lock);
 
@@ -597,12 +622,16 @@ tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
 					    TnyCamelTransportAccount *trans_account)
 {
 	TnyCamelSendQueuePriv *priv;
-	
+	TnyCamelAccountPriv *apriv = NULL;
+
 	g_return_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self));
 	g_return_if_fail (TNY_IS_CAMEL_TRANSPORT_ACCOUNT(trans_account));
 
 	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	if (priv->trans_account) {
+		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+		_tny_session_camel_unreg_queue (apriv->session, self);
+
 		g_object_unref (G_OBJECT(priv->trans_account));
 
 		if (priv->signal != -1)
@@ -611,10 +640,12 @@ tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
 	}
 
 	priv->signal = (gint) g_signal_connect (G_OBJECT (trans_account),
-		"set-online-happened",
-		G_CALLBACK (on_setonline_happened), self);
+		"set-online-happened", G_CALLBACK (on_setonline_happened), self);
 
 	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(trans_account)));
+
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+	_tny_session_camel_reg_queue (apriv->session, self);
 
 	tny_camel_send_queue_flush (TNY_CAMEL_SEND_QUEUE (self));
 

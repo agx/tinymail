@@ -505,6 +505,9 @@ background_connect_thread (gpointer data)
 
 	g_mutex_lock (priv->conlock);
 
+	g_list_foreach (priv->regged_queues, (GFunc) 
+		tny_camel_send_queue_join_worker, NULL);
+
 	priv->is_connecting = TRUE;
 
 	if (priv->current_accounts &&
@@ -523,8 +526,10 @@ background_connect_thread (gpointer data)
 
 	priv->prev_constat = info->online;
 
+	priv->conthread = NULL;
 	g_mutex_unlock (priv->conlock);
 
+	g_thread_exit (NULL);
 	return NULL;
 }
 
@@ -575,7 +580,7 @@ void
 tny_session_camel_join_connecting (TnySessionCamel *self)
 {
 	TnySessionCamelPriv *priv = self->priv;
-	
+
 	if (priv->conthread)
 		g_thread_join (priv->conthread);
 }
@@ -619,12 +624,7 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 	{
 		priv->prev_constat = TRUE;
 		connection_changed (device, FALSE, self);
-/*
-		g_idle_add_full (G_PRIORITY_HIGH,
-                	emit_accounts_reloaded,
-	                (gpointer) g_object_ref (priv->account_store), 
-			(GDestroyNotify) g_object_unref);
-*/
+
 	}
 	return;
 }
@@ -671,6 +671,25 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 }
 
 
+void 
+_tny_session_camel_unreg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue)
+{
+	TnySessionCamelPriv *priv = self->priv;
+
+	g_mutex_lock (priv->conlock);
+	priv->regged_queues = g_list_remove (priv->regged_queues, queue);
+	g_mutex_unlock (priv->conlock);
+}
+
+void 
+_tny_session_camel_reg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue)
+{
+	TnySessionCamelPriv *priv = self->priv;
+
+	g_mutex_lock (priv->conlock);
+	priv->regged_queues = g_list_prepend (priv->regged_queues, queue);
+	g_mutex_unlock (priv->conlock);
+}
 
 
 /**
@@ -698,6 +717,11 @@ tny_session_camel_finalise (CamelObject *object)
 {
 	TnySessionCamel *self = (TnySessionCamel*)object;
 	TnySessionCamelPriv *priv = self->priv;
+
+	g_mutex_lock (priv->conlock);
+	g_list_free (priv->regged_queues);
+	priv->regged_queues = NULL;
+	g_mutex_unlock (priv->conlock);
 
 	if (priv->device && g_signal_handler_is_connected (G_OBJECT (priv->device), priv->connchanged_signal))
 	{
