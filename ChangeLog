@@ -1,3 +1,18 @@
+2007-07-05  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	The asynchronous operations now always call the callbacks in an idle
+	if the GMainLoop is available, even if the thread could not be
+	started.
+	Refactored the code that invokes the user callbacks.
+	Changed the priority of the idles, now the status callbacks have
+	higher priority than the function callbacks.
+	
+	* libtinymail-camel/tny-camel-store-account.c:
+	The asynchronous operations now always call the callbacks in an idle
+	if the GMainLoop is available, even if the thread could not be
+	started.
+
 2007-07-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Renamed removed to expunged in TnyFolderChange

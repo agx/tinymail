@@ -1153,6 +1153,29 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 }
 
 static void
+tny_camel_store_account_get_folders_async_cancelled_destroyer (gpointer thr_user_data)
+{
+	GetFoldersInfo *info = thr_user_data;
+
+	/* gidle references */
+	g_object_unref (info->self);
+	g_object_unref (info->list);
+	g_error_free (info->err);
+	g_slice_free (GetFoldersInfo, info);
+}
+
+static gboolean
+tny_camel_store_account_get_folders_async_cancelled_callback (gpointer thr_user_data)
+{
+	GetFoldersInfo *info = thr_user_data;
+
+	if (info->callback)
+		info->callback (info->self, info->list, &info->err, info->user_data);
+
+	return FALSE;
+}
+
+static void
 tny_camel_store_account_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->get_folders_async_func (self, list, callback, query, status_callback, user_data);
@@ -1168,15 +1191,7 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 
 	g_assert (TNY_IS_LIST (list));
 
-	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), &err, 
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
-	{
-		if (callback)
-			callback (self, list, &err, user_data);
-		g_error_free (err);
-		return;
-	}
-
+	/* Idle info for the callbacks */
 	info = g_slice_new0 (GetFoldersInfo);
 	info->session = apriv->session;
 	info->err = NULL;
@@ -1186,6 +1201,27 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	info->user_data = user_data;
 	info->query = query;
 	info->depth = g_main_depth ();
+
+	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), &err, 
+			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
+	{
+		if (callback) {
+			info->err = g_error_copy (err);
+			g_object_ref (info->self);
+			g_object_ref (info->list);
+
+			if (info->depth > 0){
+				g_idle_add_full (G_PRIORITY_DEFAULT, 
+						 tny_camel_store_account_get_folders_async_cancelled_callback, info,
+						 tny_camel_store_account_get_folders_async_cancelled_destroyer);
+			} else {
+				tny_camel_store_account_get_folders_async_cancelled_callback (info);
+				tny_camel_store_account_get_folders_async_cancelled_destroyer (info);
+			}
+		}
+		g_error_free (err);
+		return;
+	}
 
 	/* thread reference */
 	g_object_ref (G_OBJECT (info->self));
