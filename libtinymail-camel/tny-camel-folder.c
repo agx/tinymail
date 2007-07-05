@@ -2751,22 +2751,23 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 				no_uidplus = TRUE;
 				break;
 			}
+
+			copy = succeeded_news;
+			while (copy) {
+				TnyHeader *hdr = copy->data;
+				if (!no_uidplus)
+					tny_list_prepend (new_headers, G_OBJECT (hdr));
+				g_object_unref (hdr);
+				copy = g_list_next (copy);
+			}
+			g_list_free (succeeded_news);
+
 		  }
 		} else {
 			g_warning ("Oeps from Tinymail: refreshing the summary "
 				"failed after transferring messages to a folder");
 			no_uidplus = TRUE;
 		}
-
-		copy = succeeded_news;
-		while (copy) {
-			TnyHeader *hdr = copy->data;
-			if (!no_uidplus)
-				tny_list_prepend (new_headers, G_OBJECT (hdr));
-			g_object_unref (hdr);
-			copy = g_list_next (copy);
-		}
-		g_list_free (succeeded_news);
 	} 
 
 	if ((dst_orig_uids) && ((new_headers && !transferred_uids) || no_uidplus))
