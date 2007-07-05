@@ -2815,9 +2815,9 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 					g_object_unref (hdr);
 				} else /* Not-new message, freeup */
 					camel_message_info_free (om);
-			}
-		  } else if (om) /* arg? */
-			camel_message_info_free (om);
+			} if (om) /* arg? */
+				camel_message_info_free (om);
+		  } 
 		}
 	}
 
