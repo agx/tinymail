@@ -209,11 +209,11 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 			if (!change)
 				change = tny_folder_change_new (TNY_FOLDER (self));
 
+			/* This adds a reason to live to self */
 			_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 				TNY_CAMEL_FOLDER (self), priv);
-
+			/* hdr will take care of the freeup*/
 			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-
 			tny_folder_change_add_added_header (change, hdr);
 			g_object_unref (G_OBJECT (hdr));
 		}
@@ -238,6 +238,10 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 			if (!change)
 				change = tny_folder_change_new (self);
 
+			/* This adds a reason to live to self */
+			_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+				TNY_CAMEL_FOLDER (self), priv);
+			/* hdr will take care of the freeup */
 			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
 			tny_folder_change_add_expunged_header (change, hdr);
 			g_object_unref (hdr);
@@ -565,8 +569,10 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 			if (minfo)
 			{
 				TnyHeader *hdr = _tny_camel_header_new ();
+				/* This adds a reason to live to self */
 				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 					TNY_CAMEL_FOLDER (self), priv);
+				/* hdr will take care of the freeup */
 				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
 			} else
 				hdr = TNY_HEADER (g_object_ref (header));
@@ -1631,6 +1637,11 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 	{
 		info = camel_message_info_new_uid (NULL, uid);
 		hdr = _tny_camel_header_new ();
+
+		/* This adds a reason to live to self */
+		_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+			TNY_CAMEL_FOLDER (self), priv);
+		/* hdr will take care of the freeup */
 		_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
 		retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, hdr, err);
 		g_object_unref (G_OBJECT (hdr));
@@ -2570,6 +2581,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 	guint list_length;
 	GPtrArray *uids = NULL;
 	GPtrArray *transferred_uids = NULL;
+	GPtrArray *dst_orig_uids = NULL;
+	gboolean no_uidplus = FALSE, did_refresh = FALSE;
 
 	g_assert (TNY_IS_LIST (headers));
 	g_assert (TNY_IS_FOLDER (folder_src));
@@ -2656,6 +2669,24 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 	camel_folder_freeze (cfol_src);
 	camel_folder_freeze (cfol_dst);
 
+
+	/* We can't yet know whether the more efficient way will be 
+	 * possible. So we'll just always copy the uids temporarily,
+	 * just in case we'll need the less efficient way . . . (sorry,
+	 * we'll clean it up from your memory, don't worry) */
+	if (cfol_dst && cfol_dst->summary && cfol_dst->summary->messages)
+	{
+		gint a = 0, len = 0;
+		len = cfol_dst->summary->messages->len;
+		dst_orig_uids = g_ptr_array_sized_new (len);
+		for (a = 0; a < len; a++) {
+			CamelMessageInfo *om = (CamelMessageInfo *) cfol_dst->summary->messages->pdata[a];
+			if (om && om->uid)
+				g_ptr_array_add (dst_orig_uids, g_strdup (om->uid));
+			camel_message_info_free (om);
+		}
+	}
+
 	camel_folder_transfer_messages_to (cfol_src, uids, cfol_dst, 
 			&transferred_uids, delete_originals, &ex);
 
@@ -2672,22 +2703,106 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 	camel_folder_thaw (cfol_dst);
 	camel_folder_sync (cfol_dst, FALSE, NULL);
 
+
 	if (new_headers && transferred_uids)
 	{
-		int i;
-		for (i = 0; i < transferred_uids->len; i++) 
+		/* The more efficient way: We rely on the information that the 
+		 * service's implementation of 'append_message' gave us. If 
+		 * something, anything, goes wrong here, we'll fall back to a 
+		 * less efficient method (see below for that one) */
+
+		int i = 0;
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+		/* Refreshing is needed to get the new summary early, I know 
+		 * this pulls bandwidth. */
+
+		camel_folder_refresh_info (cfol_dst, &ex);
+		did_refresh = TRUE;
+
+		if (!camel_exception_is_set (&ex)) 
 		{
+		  for (i = 0; i < transferred_uids->len; i++) 
+		  {
 			const gchar *uid = transferred_uids->pdata[i];
-			CamelMessageInfo *minfo = camel_folder_summary_uid (cfol_dst->summary, uid);
+			CamelMessageInfo *minfo = NULL;
+
+			if (uid == NULL) {
+				/* Fallback to the less efficient way */
+				no_uidplus = TRUE;
+				break;
+			}
+
+			minfo = camel_folder_summary_uid (cfol_dst->summary, uid);
 			if (minfo)
 			{
 				TnyHeader *hdr = _tny_camel_header_new ();
+				/* This adds a reason to live for folder_dst */
 				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 					TNY_CAMEL_FOLDER (folder_dst), priv_dst);
+				/* hdr will take care of the freeup */
 				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
 				tny_list_prepend (new_headers, G_OBJECT (hdr));
 				g_object_unref (hdr);
+			} else {
+				/* Fallback to the less efficient way */
+				no_uidplus = TRUE;
+				break;
 			}
+		  }
+		} else {
+			g_warning ("Oeps from Tinymail: refreshing the summary "
+				"failed after transferring messages to a folder");
+			no_uidplus = TRUE;
+		}
+	} 
+
+	if ((dst_orig_uids) && ((new_headers && !transferred_uids) || no_uidplus))
+	{
+		/* The less efficient way: We'll compare the old uids with the
+		 * new list of uids. If we find new items, we'll create headers
+		 * for it */
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+		gint nlen = 0, a = 0;
+
+		if (!did_refresh)
+			camel_folder_refresh_info (cfol_dst, &ex);
+
+		if (did_refresh || (!did_refresh && !camel_exception_is_set (&ex))) 
+		{
+		  nlen = cfol_dst->summary->messages->len;
+
+		  for (a = 0; a < nlen; a++) 
+		  {
+			CamelMessageInfo *om = (CamelMessageInfo *) cfol_dst->summary->messages->pdata[a];
+			if (om && om->uid) {
+				gint b = 0;
+				gboolean found = FALSE;
+
+				for (b = 0; b < dst_orig_uids->len; b++) {
+					/* Finding the needle ... */
+					if (!strcmp (dst_orig_uids->pdata[b], om->uid)) {
+						found = TRUE;
+						break;
+					}
+				}
+
+				if (!found) { 
+					/* Jeej! a new one! */
+
+					TnyHeader *hdr = _tny_camel_header_new ();
+
+					/* This adds a reason to live for folder_dst */
+					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+						TNY_CAMEL_FOLDER (folder_dst), priv_dst);
+					/* hdr will take care of the freeup */
+					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), om);
+					tny_list_prepend (new_headers, G_OBJECT (hdr));
+					g_object_unref (hdr);
+				} else /* Not-new message, freeup */
+					camel_message_info_free (om);
+			}
+		  }
 		}
 	}
 
@@ -2711,8 +2826,20 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		}
 	}
 
-	if (transferred_uids)
+	if (transferred_uids) {
+		/* I think we need to g_free all too ... can somebody double 
+		 * check this? the TRUE flag just means "free the pdata" alloc,
+		 * not the items themselves. Afaik. We need to check whether 
+		 * the items are pointers to the mi->uids or copies of that,
+		 * I think they are plain simple copies and need to be freed! */
 		g_ptr_array_free (transferred_uids, TRUE);
+	}
+
+	if (dst_orig_uids) {
+		/* We do need to free these, definitely. We made it ourselves */
+		g_ptr_array_foreach (dst_orig_uids, (GFunc) g_free, NULL);
+		g_ptr_array_free (dst_orig_uids, TRUE);
+	}
 
 	g_ptr_array_foreach (uids, (GFunc) g_free, NULL);
 	g_ptr_array_free (uids, TRUE);
