@@ -1,6 +1,7 @@
 2007-07-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixes for the new headers after a transfer of messages happened
+	* Fixed for new headers after adding a message happened
 
 2007-07-05  Sergio Villar Senin  <svillar@igalia.com>
 

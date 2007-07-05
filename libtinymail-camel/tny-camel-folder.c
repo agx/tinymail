@@ -507,8 +507,6 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 	CamelMimeMessage *message;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	gboolean haderr = FALSE;
-	gchar *new_uid = NULL;
-	CamelMessageInfo *minfo = NULL;
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
@@ -527,15 +525,85 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		}
 
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-	if (message && CAMEL_IS_MIME_MESSAGE (message)) {
-		camel_folder_append_message (priv->folder, message, NULL, &new_uid, &ex);
+	if (message && CAMEL_IS_MIME_MESSAGE (message)) 
+	{
+		TnyFolderChange *change = tny_folder_change_new (self);
+		gboolean first = TRUE;
+		GPtrArray *dst_orig_uids = NULL;
+		gint a = 0, len = 0, nlen = 0;
+		CamelException ex2 = CAMEL_EXCEPTION_INITIALISER;
+		len = priv->folder->summary->messages->len;
+		dst_orig_uids = g_ptr_array_sized_new (len);
+		for (a = 0; a < len; a++) {
+			CamelMessageInfo *om = camel_folder_summary_index (priv->folder->summary, a);
+			if (om && om->uid)
+				g_ptr_array_add (dst_orig_uids, g_strdup (om->uid));
+			if (om)
+				camel_message_info_free (om);
+		}
+	
+		camel_folder_append_message (priv->folder, message, NULL, NULL, &ex);
 		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 		priv->cached_length = camel_folder_get_message_count (priv->folder);
 
-		if (new_uid)
-			minfo = camel_folder_summary_uid (priv->folder->summary, new_uid);
+		camel_folder_refresh_info (priv->folder, &ex2);
+		nlen = priv->folder->summary->messages->len;
+
+		for (a = 0; a < nlen; a++) 
+		{
+			CamelMessageInfo *om = camel_folder_summary_index (priv->folder->summary, a);
+			if (om && om->uid) {
+				gint b = 0;
+				gboolean found = FALSE;
+
+				for (b = 0; b < dst_orig_uids->len; b++) {
+					/* Finding the needle ... */
+					if (!strcmp (dst_orig_uids->pdata[b], om->uid)) {
+						found = TRUE;
+						break;
+					}
+				}
+
+				if (!found) { 
+					/* Jeej! a new one! */
+					TnyHeader *hdr = _tny_camel_header_new ();
+
+					if (first && msg) 
+					{
+						TnyHeader *header = NULL;
+						_tny_camel_msg_set_folder (TNY_CAMEL_MSG (msg), self);
+						header = tny_msg_get_header (msg);
+						((TnyCamelMsgHeader *)header)->old_uid = g_strdup (om->uid);
+						g_object_unref (header);
+						first = FALSE;
+					}
+
+					/* This adds a reason to live for folder_dst */
+					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+						TNY_CAMEL_FOLDER (self), priv);
+					/* hdr will take care of the freeup */
+					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), om);
+					tny_folder_change_add_added_header (change, hdr);
+					g_object_unref (hdr);
+				} else /* Not-new message, freeup */
+					camel_message_info_free (om);
+			} else if (om) /* arg? */
+				camel_message_info_free (om);
+		}
 
 		update_iter_counts (priv);
+
+		tny_folder_change_set_new_all_count (change, priv->cached_length);
+		tny_folder_change_set_new_unread_count (change, priv->unread_length);
+
+		notify_folder_observers_about (self, change);
+
+		g_object_unref (G_OBJECT (change));
+
+		if (dst_orig_uids) {
+			g_ptr_array_foreach (dst_orig_uids, (GFunc) g_free, NULL);
+			g_ptr_array_free (dst_orig_uids, TRUE);
+		}
 
 	} else {
 		g_set_error (err, TNY_FOLDER_ERROR, 
@@ -551,46 +619,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_ADD_MSG,
 			camel_exception_get_description (&ex));
-	} else if (!haderr)
-	{
-		TnyHeader *header = NULL;
-
-		_tny_camel_msg_set_folder (TNY_CAMEL_MSG (msg), self);
-		header = tny_msg_get_header (msg);
-
-		if (header && TNY_IS_HEADER (header))
-		{
-			TnyHeader *hdr = NULL;
-			TnyFolderChange *change = tny_folder_change_new (self);
-
-			if (new_uid)
-				((TnyCamelMsgHeader *)header)->old_uid = g_strdup (new_uid);
-
-			if (minfo)
-			{
-				TnyHeader *hdr = _tny_camel_header_new ();
-				/* This adds a reason to live to self */
-				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
-					TNY_CAMEL_FOLDER (self), priv);
-				/* hdr will take care of the freeup */
-				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-			} else
-				hdr = TNY_HEADER (g_object_ref (header));
-
-			tny_folder_change_add_added_header (change, hdr);
-			tny_folder_change_set_new_all_count (change, priv->cached_length);
-			tny_folder_change_set_new_unread_count (change, priv->unread_length);
-			notify_folder_observers_about (self, change);
-
-			g_object_unref (G_OBJECT (change));
-		}
-
-		if (header && G_IS_OBJECT (header))
-			g_object_unref (G_OBJECT (header));
 	}
-
-	if (new_uid)
-		g_free (new_uid);
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
