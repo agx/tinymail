@@ -2722,6 +2722,9 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 
 		if (!camel_exception_is_set (&ex)) 
 		{
+		  GList *succeeded_news = NULL, *copy = NULL;
+		  no_uidplus = FALSE;
+
 		  for (i = 0; i < transferred_uids->len; i++) 
 		  {
 			const gchar *uid = transferred_uids->pdata[i];
@@ -2742,8 +2745,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 					TNY_CAMEL_FOLDER (folder_dst), priv_dst);
 				/* hdr will take care of the freeup */
 				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-				tny_list_prepend (new_headers, G_OBJECT (hdr));
-				g_object_unref (hdr);
+				succeeded_news = g_list_prepend (succeeded_news, hdr);
 			} else {
 				/* Fallback to the less efficient way */
 				no_uidplus = TRUE;
@@ -2755,6 +2757,16 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 				"failed after transferring messages to a folder");
 			no_uidplus = TRUE;
 		}
+
+		copy = succeeded_news;
+		while (copy) {
+			TnyHeader *hdr = copy->data;
+			if (!no_uidplus)
+				tny_list_prepend (new_headers, G_OBJECT (hdr));
+			g_object_unref (hdr);
+			copy = g_list_next (copy);
+		}
+		g_list_free (succeeded_news);
 	} 
 
 	if ((dst_orig_uids) && ((new_headers && !transferred_uids) || no_uidplus))
