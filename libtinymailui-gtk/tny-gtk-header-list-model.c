@@ -307,6 +307,9 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 		return;
 	}
 
+	if (priv->items->pdata[i] == NULL)
+		return;
+
 	switch (column) 
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
