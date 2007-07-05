@@ -2680,7 +2680,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		len = cfol_dst->summary->messages->len;
 		dst_orig_uids = g_ptr_array_sized_new (len);
 		for (a = 0; a < len; a++) {
-			CamelMessageInfo *om = (CamelMessageInfo *) cfol_dst->summary->messages->pdata[a];
+			CamelMessageInfo *om = camel_folder_summary_index (cfol_dst->summary, a);
 			if (om && om->uid)
 				g_ptr_array_add (dst_orig_uids, g_strdup (om->uid));
 			if (om)
@@ -2788,7 +2788,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 
 		  for (a = 0; a < nlen; a++) 
 		  {
-			CamelMessageInfo *om = (CamelMessageInfo *) cfol_dst->summary->messages->pdata[a];
+			CamelMessageInfo *om = camel_folder_summary_index (cfol_dst->summary, a);
 			if (om && om->uid) {
 				gint b = 0;
 				gboolean found = FALSE;
