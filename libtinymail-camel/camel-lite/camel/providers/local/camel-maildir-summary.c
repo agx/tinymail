@@ -677,7 +677,7 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 
 			/* copy this to the destination folder, use 'standard' semantics for maildir info field */
 			src = g_strdup_printf("%s/%s", new, name);
-			destfilename = g_strdup_printf("%s:2,", destname);
+			destfilename = g_strdup_printf("%s_2_", destname);
 			dest = g_strdup_printf("%s/%s", cur, destfilename);
 
 			/* FIXME: This should probably use link/unlink */
