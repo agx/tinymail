@@ -2683,7 +2683,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			CamelMessageInfo *om = (CamelMessageInfo *) cfol_dst->summary->messages->pdata[a];
 			if (om && om->uid)
 				g_ptr_array_add (dst_orig_uids, g_strdup (om->uid));
-			camel_message_info_free (om);
+			if (om)
+				camel_message_info_free (om);
 		}
 	}
 
@@ -2815,7 +2816,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 				} else /* Not-new message, freeup */
 					camel_message_info_free (om);
 			}
-		  }
+		  } else if (om) /* arg? */
+			camel_message_info_free (om);
 		}
 	}
 
