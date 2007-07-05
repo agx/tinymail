@@ -422,7 +422,6 @@ tny_camel_account_stop_camel_operation_priv (TnyCamelAccountPriv *priv)
 static gpointer
 camel_cancel_hack_thread (gpointer data)
 {
-	printf ("CANCEL\n");
 	camel_operation_cancel (NULL);
 
 	g_thread_exit (NULL);
@@ -1124,9 +1123,6 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
-
-	printf ("SETTING ONLINE\n");
-	
 	if (!priv->service || !CAMEL_IS_SERVICE (priv->service))
 	{
 		if (camel_exception_is_set (priv->ex))
