@@ -239,7 +239,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 				change = tny_folder_change_new (self);
 
 			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-			tny_folder_change_add_removed_header (change, hdr);
+			tny_folder_change_add_expunged_header (change, hdr);
 			g_object_unref (hdr);
 		}
 	}
@@ -2417,7 +2417,7 @@ inform_observers_about_transfer (TnyFolder *from, TnyFolder *to, gboolean del_or
 		TnyHeader *header;
 		header = TNY_HEADER (tny_iterator_get_current (iter));
 		if (del_orig)
-			tny_folder_change_add_removed_header (fromchange, header);
+			tny_folder_change_add_expunged_header (fromchange, header);
 		tny_folder_change_add_added_header (tochange, header);
 		g_object_unref (G_OBJECT (header));
 		tny_iterator_next (iter);

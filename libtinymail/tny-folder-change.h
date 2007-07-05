@@ -48,7 +48,7 @@ enum _TnyFolderChangeChanged
 	TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT = 1<<0,
 	TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT = 1<<1,
 	TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS = 1<<2,
-	TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS = 1<<3,
+	TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS = 1<<3,
 	TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME = 1<<4,
 	TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED = 1<<5,
 };
@@ -75,7 +75,7 @@ void tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_un
 guint tny_folder_change_get_new_unread_count (TnyFolderChange *self);
 guint tny_folder_change_get_new_all_count (TnyFolderChange *self);
 void tny_folder_change_add_added_header (TnyFolderChange *self, TnyHeader *header);
-void tny_folder_change_add_removed_header (TnyFolderChange *self, TnyHeader *header);
+void tny_folder_change_add_expunged_header (TnyFolderChange *self, TnyHeader *header);
 void tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers);
 void tny_folder_change_get_removed_headers (TnyFolderChange *self, TnyList *headers);
 void tny_folder_change_reset (TnyFolderChange *self);

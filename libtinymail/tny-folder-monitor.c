@@ -245,11 +245,11 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 		g_object_unref (G_OBJECT (list));
 	}
 
-	if (changed & TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS)
+	if (changed & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS)
 	{
 		/* The removed headers */
 		list = tny_simple_list_new ();
-		tny_folder_change_get_removed_headers (change, list);
+		tny_folder_change_get_expunged_headers (change, list);
 		iter = tny_list_create_iterator (list);
 		while (!tny_iterator_is_done (iter))
 		{

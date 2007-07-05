@@ -200,14 +200,14 @@ tny_folder_change_add_added_header (TnyFolderChange *self, TnyHeader *header)
 }
 
 /**
- * tny_folder_change_add_removed_header:
+ * tny_folder_change_add_expunged_header:
  * @self: a #TnyFolderChange instance
  * @header: the header to add to the changeset
  *
- * Add @header to the changeset of removed headers
+ * Add @header to the changeset of expunged headers
  **/
 void 
-tny_folder_change_add_removed_header (TnyFolderChange *self, TnyHeader *header)
+tny_folder_change_add_expunged_header (TnyFolderChange *self, TnyHeader *header)
 {
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 
@@ -215,7 +215,7 @@ tny_folder_change_add_removed_header (TnyFolderChange *self, TnyHeader *header)
 
 	if (!priv->removed)
 		priv->removed = tny_simple_list_new ();
-	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS;
+	priv->changed |= TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS;
 	tny_list_prepend (priv->removed, G_OBJECT (header));
 	g_mutex_unlock (priv->lock);
 
@@ -264,14 +264,14 @@ tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers)
 
 
 /**
- * tny_folder_change_get_removed_headers:
+ * tny_folder_change_get_expunged_headers:
  * @self: a #TnyFolderChange instance
  * @headers: the #TnyList where the removed headers will be put it
  *
  * Get the removed headers in this changeset
  **/
 void 
-tny_folder_change_get_removed_headers (TnyFolderChange *self, TnyList *headers)
+tny_folder_change_get_expunged_headers (TnyFolderChange *self, TnyList *headers)
 {
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
 	TnyIterator *iter;
@@ -548,7 +548,7 @@ tny_folder_change_changed_get_type (void)
       { TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT, "TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT", "all-count" },
       { TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT, "TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT", "unread-count" },
       { TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS","added-headers" },
-      { TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS", "removed-headers" },
+      { TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS", "expunged-headers" },
       { TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME, "TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME", "rename" },
       { TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED, "TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED", "received" },
       { 0, NULL, NULL }
