@@ -35,7 +35,9 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 
 </para>
 
-@tnyaccount: the object which received the signal.
+@:
+
+@Param2: 
 @Param2: 
 
 <!-- ##### STRUCT TnyAccountIface ##### -->
@@ -71,6 +73,13 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @start_operation_func: 
 @stop_operation_func: 
 @connection_status_changed: 
+
+<!-- ##### MACRO TNY_TYPE_CONNECTION_STATUS ##### -->
+<para>
+
+</para>
+
+
 
 <!-- ##### FUNCTION tny_account_type_get_type ##### -->
 <para>

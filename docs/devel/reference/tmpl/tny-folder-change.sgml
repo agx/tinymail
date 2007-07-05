@@ -18,6 +18,13 @@ as information about what got changed.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_FOLDER_CHANGE_CHANGED ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyFolderChange ##### -->
 <para>
 
@@ -115,7 +122,7 @@ as information about what got changed.
 @header: 
 
 
-<!-- ##### FUNCTION tny_folder_change_add_removed_header ##### -->
+<!-- ##### FUNCTION tny_folder_change_add_expunged_header ##### -->
 <para>
 
 </para>

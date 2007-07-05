@@ -61,7 +61,21 @@ A abstract type that defines a folder
 @get_url_string_func: 
 @get_caps_func: 
 
+<!-- ##### MACRO TNY_TYPE_FOLDER_SIGNAL ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_TYPE_FOLDER_CAPS ##### -->
 <para>
 
 </para>

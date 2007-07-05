@@ -18,8 +18,16 @@ online/offline status.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_DEVICE_SIGNAL ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyDevice ##### -->
 <para>
+
 </para>
 
 
@@ -27,6 +35,9 @@ online/offline status.
 <para>
 
 </para>
+
+@: 
+@:
 
 @tnydevice: the object which received the signal.
 @arg1: 

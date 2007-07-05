@@ -17,6 +17,13 @@ A abstract type that defines a store for accounts
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_ACCOUNT_STORE_SIGNAL ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### MACRO TNY_TYPE_ALERT_TYPE ##### -->
 <para>
 
@@ -42,6 +49,9 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@: 
+@:
+
 @tnyaccountstore: the object which received the signal.
 @arg1: 
 
@@ -49,6 +59,9 @@ A abstract type that defines a store for accounts
 <para>
 
 </para>
+
+@: 
+@:
 
 @tnyaccountstore: the object which received the signal.
 @arg1: 
@@ -58,6 +71,9 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@: 
+@:
+
 @tnyaccountstore: the object which received the signal.
 @arg1: 
 
@@ -66,6 +82,8 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@:
+
 @tnyaccountstore: the object which received the signal.
 
 <!-- ##### SIGNAL TnyAccountStore::connecting-finished ##### -->
@@ -73,12 +91,16 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@:
+
 @tnyaccountstore: the object which received the signal.
 
 <!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
 <para>
 
 </para>
+
+@:
 
 @tnyaccountstore: the object which received the signal.
 

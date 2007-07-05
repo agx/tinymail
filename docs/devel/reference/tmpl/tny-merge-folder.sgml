@@ -40,3 +40,12 @@ A type that can merge multiple other folders together
 @folder: 
 
 
+<!-- ##### FUNCTION tny_merge_folder_set_folder_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder_type: 
+
+
