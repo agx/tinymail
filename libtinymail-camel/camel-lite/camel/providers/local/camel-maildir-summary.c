@@ -180,6 +180,13 @@ static struct {
 	{ 'R', CAMEL_MESSAGE_ANSWERED },
 	{ 'S', CAMEL_MESSAGE_SEEN },
 	{ 'T', CAMEL_MESSAGE_DELETED },
+
+	/* Non-standard flags */
+	{ 'A', CAMEL_MESSAGE_ATTACHMENTS },
+	{ 'I', CAMEL_MESSAGE_PARTIAL },
+	{ 'H', CAMEL_MESSAGE_HIGH_PRIORITY },
+	{ 'N', CAMEL_MESSAGE_NORMAL_PRIORITY },
+	{ 'L', CAMEL_MESSAGE_LOW_PRIORITY },
 };
 
 /* convert the uid + flags into a unique:info maildir format */
