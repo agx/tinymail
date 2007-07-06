@@ -1762,7 +1762,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		store->namespace = g_strdup ("");
 
 	if (!store->dir_sep) {
-		if (store->server_level >= IMAP_LEVEL_IMAP4REV1) 
+		if (FALSE && store->server_level >= IMAP_LEVEL_IMAP4REV1) 
 		{
 			/* This idiom means "tell me the hierarchy separator
 			 * for the given path, even if that path doesn't exist.

@@ -3,6 +3,7 @@
 	* Added some non standard flags to the maildir support
 	* Support for suspended items in sendqueues
 	* Fixed an API glitch in TnyFolderChange
+	* Empty folder bugfix
 
 2007-07-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
