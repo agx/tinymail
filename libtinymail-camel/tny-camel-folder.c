@@ -2789,9 +2789,11 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			copy = succeeded_news;
 			while (copy) {
 				TnyHeader *hdr = copy->data;
-				if (!no_uidplus)
-					tny_list_prepend (new_headers, G_OBJECT (hdr));
-				g_object_unref (hdr);
+				if (hdr) {
+					if (!no_uidplus)
+						tny_list_prepend (new_headers, G_OBJECT (hdr));
+					g_object_unref (hdr);
+				}
 				copy = g_list_next (copy);
 			}
 			g_list_free (succeeded_news);
