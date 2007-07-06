@@ -200,7 +200,7 @@ camel_disco_diary_log (CamelDiscoDiary *diary, CamelDiscoDiaryAction action,
 					 "will not be replayed when you\n"
 					 "reconnect to the network."),
 				       g_strerror (errno));
-		camel_session_alert_user (camel_service_get_session (CAMEL_SERVICE (diary->store)),
+		camel_session_alert_user_generic (camel_service_get_session (CAMEL_SERVICE (diary->store)),
 					  CAMEL_SESSION_ALERT_ERROR,
 					  msg, FALSE);
 		g_free (msg);
@@ -261,7 +261,7 @@ diary_decode_folder (CamelDiscoDiary *diary)
 			msg = g_strdup_printf (_("Could not open `%s':\n%s\nChanges made to this folder will not be resynchronized."),
 					       name, camel_exception_get_description (&ex));
 			camel_exception_clear (&ex);
-			camel_session_alert_user (camel_service_get_session (CAMEL_SERVICE (diary->store)),
+			camel_session_alert_user_generic (camel_service_get_session (CAMEL_SERVICE (diary->store)),
 						  CAMEL_SESSION_ALERT_WARNING,
 						  msg, FALSE);
 			g_free (msg);

@@ -1,3 +1,44 @@
+2007-07-06  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-enums.h:
+	* libtinymail/tny-error.h:
+	* libtinymail/tny-error.c: (tny_error_get_type):
+	Added TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE and documented the enum 
+	values that I added last time.
+	* libtinymail-camel/tny-camel-account.c:
+	(_tny_camel_account_get_tny_error_code_for_camel_exception_id):
+	Handle CAMEL_EXCEPTION_SERVICE_CERTIFICATE as TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE.
+	* libtinymail-camel/tny-session-camel.c:
+	(tny_session_camel_alert_user): Adapt signature, as follows.
+	Also handle the CAMEL_EXCEPTION_USER_CANCEL error ID instead of checking the message text. 
+
+	* camel/camel-exception-list.def: Added CAMEL_EXCEPTION_SERVICE_CERTIFICATE.
+	* camel/camel-session.h:
+	* camel/camel-session.c: (camel_session_alert_user): Take a CamelException 
+	instead of a message, so we don't lose the error ID sometimes.
+	(camel_session_alert_user_with_id),
+	(camel_session_alert_user_generic): Convenience functions to use when 
+	no CamelException is available.
+
+	* camel/providers/smtp/camel-smtp-transport.c: (smtp_connect):
+	Use the exception instead of just the message with camel_session_alert_user(), 
+	so that the application has the error code. 
+
+	* camel/camel-disco-diary.c: (camel_disco_diary_log),
+	(diary_decode_folder):
+	* camel/providers/imap/camel-imap-command.c:
+	(camel_imap_command_response), (camel_imap_command_response_idle):
+	* camel/providers/imap4/camel-imap4-engine.c:
+	(camel_imap4_engine_parse_resp_code):
+	* camel/providers/imap4/camel-imap4-summary.c:
+	(courier_imap_is_a_piece_of_shit): Use camel_session_alert_user_generic() 
+	instead of camel_session_alert_user(), because we have no ID or exception here.
+
+	* camel/camel-tcp-stream-openssl.c: (ssl_verify):
+	* camel/camel-tcp-stream-ssl.c: (ssl_bad_cert): Use the new 
+	CAMEL_EXCEPTION_SERVICE_CERTIFICATE error ID here. There are still many different 
+	types of certificate error, but this at least classifies them a bit.
+
 2007-07-05  Armin Burgmeier  <armin@openismus.com>
 
 	* libtinymail/tny-merge-folder.c: When propagating a TnyFolderChange

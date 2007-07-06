@@ -1199,7 +1199,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 		g_free (cert_str);
 	
 		/* query the user to find out if we want to accept this certificate */
-		accept = camel_session_alert_user (ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, prompt, TRUE);
+		accept = camel_session_alert_user_with_id (ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE);
 		g_free(prompt);
 		if (accept) {
 			camel_certdb_nss_cert_set(certdb, ccert, cert);
@@ -1242,7 +1242,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 			printf("unknown issuer, adding ... \n");
 			prompt = g_strdup_printf(_("Certificate problem: %s\nIssuer: %s"), cert->subjectName, cert->issuerName);
 
-			if (camel_session_alert_user(ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, prompt, TRUE)) {
+			if (camel_session_alert_user_with_id(ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE)) {
 
 				nick = get_nickname(cert);
 				if (NULL == nick) {
@@ -1294,7 +1294,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 
 			prompt = g_strdup_printf(_("Bad certificate domain: %s\nIssuer: %s"), cert->subjectName, cert->issuerName);
 
-			if (camel_session_alert_user (ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, prompt, TRUE)) {
+			if (camel_session_alert_user_with_id (ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE)) {
 				host = SSL_RevealURL(sockfd);
 				status = CERT_AddOKDomainName(cert, host);
 				printf("add ok domain name : %s\n", status == SECFailure?"fail":"ok");
@@ -1312,7 +1312,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 
 			prompt = g_strdup_printf(_("Certificate expired: %s\nIssuer: %s"), cert->subjectName, cert->issuerName);
 
-			if (camel_session_alert_user(ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, prompt, TRUE)) {
+			if (camel_session_alert_user_with_id(ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE)) {
 				cert->timeOK = PR_TRUE;
 				status = CERT_VerifyCertNow(cert->dbhandle, cert, TRUE, certUsageSSLClient, NULL);
 				error = PR_GetError();
@@ -1329,7 +1329,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 
 			prompt = g_strdup_printf(_("Certificate revocation list expired: %s\nIssuer: %s"), cert->subjectName, cert->issuerName);
 
-			if (camel_session_alert_user(ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, prompt, TRUE)) {
+			if (camel_session_alert_user_with_id(ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE)) {
 				host = SSL_RevealURL(sockfd);
 				status = CERT_AddOKDomainName(cert, host);
 			}

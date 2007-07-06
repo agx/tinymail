@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
-
+ 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -411,11 +411,11 @@ camel_session_forget_password (CamelSession *session, CamelService *service,
  * camel_session_alert_user:
  * @session: a #CamelSession object
  * @type: the type of alert (info, warning, or error)
- * @prompt: the message for the user
+ * @ex: A CamelException, indicating a message for the user
  * @cancel: whether or not to provide a "Cancel" option in addition to
  * an "OK" option.
  *
- * Presents the given @prompt to the user, in the style indicated by
+ * Presents an appropriate prompt to the user, in the style indicated by
  * @type. If @cancel is %TRUE, the user will be able to accept or
  * cancel. Otherwise, the message is purely informational.
  *
@@ -423,12 +423,48 @@ camel_session_forget_password (CamelSession *session, CamelService *service,
  */
 gboolean
 camel_session_alert_user (CamelSession *session, CamelSessionAlertType type,
-			  const char *prompt, gboolean cancel)
+			  CamelException *ex, gboolean cancel)
 {
 	g_return_val_if_fail (CAMEL_IS_SESSION (session), FALSE);
-	g_return_val_if_fail (prompt != NULL, FALSE);
+	g_return_val_if_fail (ex, FALSE);
 
-	return CS_CLASS (session)->alert_user (session, type, prompt, cancel);
+	return CS_CLASS (session)->alert_user (session, type, ex, cancel);
+}
+
+/**
+ * camel_session_alert_user_with_id:
+ *
+ * Like camel_session_alert_user() but constructs and uses a CamelException 
+ * with the error ID and the specified message.
+
+ */
+gboolean
+camel_session_alert_user_with_id (CamelSession *session, CamelSessionAlertType type,
+			  ExceptionId id, const gchar* message, gboolean cancel)
+{
+	g_return_val_if_fail (message, FALSE);
+
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	camel_exception_set (&ex, id, message);
+	gboolean result = camel_session_alert_user (session, type, &ex, cancel);
+	camel_exception_clear (&ex);
+	return result;
+}
+
+/**
+ * camel_session_alert_user_generic:
+ *
+ * Like camel_session_alert_user_with_id() but uses a
+ * generic error ID.
+ * camel_session_alert_user()or camel_session_alert_user_with_id() should be 
+ * used where possible, to provide a precise error ID.
+ */
+gboolean
+camel_session_alert_user_generic (CamelSession *session, CamelSessionAlertType type,
+			  const gchar* message, gboolean cancel)
+{
+	return camel_session_alert_user_with_id (session, type, 
+		CAMEL_EXCEPTION_SYSTEM, message, cancel);
 }
 
 

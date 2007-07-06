@@ -751,7 +751,7 @@ courier_imap_is_a_piece_of_shit (CamelFolderSummary *summary, guint32 msg)
 				   "message is simply unreadable by the IMAP server and will need "
 				   "to be given read permissions.", msg);
 	
-	camel_session_alert_user (session, CAMEL_SESSION_ALERT_WARNING, warning, FALSE);
+	camel_session_alert_user_generic (session, CAMEL_SESSION_ALERT_WARNING, warning, FALSE);
 	g_free (warning);
 }
 

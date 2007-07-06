@@ -175,14 +175,14 @@ tny_session_camel_do_an_error (TnySessionCamel *self, TnyAlertType tnytype, gboo
 		tnytype, question, (const GError *) err);
 }
 
-/* tny_session_camel_alert_user will for example be called when SSL is on and 
+/* tny_session_camel_alert_user will for example be called by camel when SSL is on and 
    camel_session_get_service is issued (for example TnyCamelTransportAccount and
    TnyCamelStore account issue this function). Its implementation is often done
    with GUI components (it should therefore not be called from a thread). This
    is a known issue (and if someone fixes this, please remove this warning) */
 
 static gboolean
-tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *msg, gboolean cancel)
+tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, CamelException *ex, gboolean cancel)
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
 	TnySessionCamelPriv *priv = self->priv;
@@ -207,14 +207,13 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
-		/* TODO: A string comparison is not a very safe way to do this: */
-		if (strstr (msg, "Canceled") != NULL)
+		if (ex->id == CAMEL_EXCEPTION_USER_CANCEL)
 			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
-				TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT, "The connecting got canceled");
+				TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT, "The connecting was canceled");
 		else {
-			/* TODO: Use a more specific error code, based on a CamelException ID: */
 			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
-				TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, msg);
+				_tny_camel_account_get_tny_error_code_for_camel_exception_id (ex), 
+				camel_exception_get_description (ex));
 		}
 
 		tny_lockable_lock (self->priv->ui_lock);

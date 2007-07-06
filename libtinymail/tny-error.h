@@ -68,6 +68,21 @@ enum _TnyErrorDomain
  * even this level of exact detection of the particular error is not currently 
  * possible, so a generic error dialog should probably be shown, though the 
  * application could choose to suggest possible causes for the error.
+ *
+ * TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED: The specified host name 
+ * cannot be resolved to an IP address. It is probably incorrect.
+ *
+ * TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE: No connection could be 
+ * made with the specified server. Maybe the server is not running on the 
+ * specified host.
+ *
+ * TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED: The server reported 
+ * that it does not support the specified secure authentication method. It might 
+ * support a different method instead.
+ *
+ * TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE: There was a problem with an 
+ * authentication or connection certificate. For instance, a bad certificate must 
+ * be manually accepted.
  * 
  * TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT: This indicates that an unknown error 
  * has occurred. Depending on the implementation being used, and the server 
@@ -97,6 +112,7 @@ enum _TnyError
 	TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED = 19,
 	TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE = 20,
 	TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED = 21,
+	TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE = 22,
 
 	TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT = 15,
 

@@ -82,6 +82,7 @@ tny_error_get_type (void)
       { TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED, "TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED", "account_error_try_connect_host_lookup_failed" },
       { TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE, "TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE", "account_error_try_connect_service_unavailable" },
       { TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED, "TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED", "account_error_try_connect_authentication_not_supported" },
+      { TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE, "TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE", "account_error_try_connect_certificate" },
      
       { TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, "TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT", "account_store_error_unknown_alert" },
 
