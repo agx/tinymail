@@ -168,18 +168,18 @@ _tny_camel_folder_check_unread_count (TnyCamelFolder *self)
 static void 
 folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer user_data)
 {
-	TnyCamelFolderPriv *priv = (TnyCamelFolderPriv *) user_data;
-	TnyFolder *self = priv->self;
-	TnyFolderChange *change = NULL;
-	CamelFolderSummary *summary;
-	gboolean old = priv->dont_fkill, has_chg = FALSE;
-	gint i = 0;
+  TnyCamelFolderPriv *priv = (TnyCamelFolderPriv *) user_data;
+  TnyFolder *self = priv->self;
+  TnyFolderChange *change = NULL;
+  CamelFolderSummary *summary;
+  gboolean old = priv->dont_fkill, has_chg = FALSE;
+  gint i = 0;
 
-	if (!priv->handle_changes)
-		return;
+  if (!priv->handle_changes)
+  	return;
 
-	g_static_rec_mutex_lock (priv->folder_lock);
-
+  if (g_static_rec_mutex_trylock (priv->folder_lock))
+  {
 	if (!priv->folder) 
 	{
 		g_static_rec_mutex_unlock (priv->folder_lock);
@@ -262,22 +262,24 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		has_chg = TRUE;
 	}
 
+  /* search for IN TNY */
+  /*if (info->uid_removed && info->uid_removed->len > 0)
+  	camel_folder_summary_save (camel_folder->summary);*/
+
 	g_static_rec_mutex_unlock (priv->folder_lock);
+  }
 
-	if (change)
-	{
-		tny_folder_change_set_new_unread_count (change, priv->unread_length);
-		if (has_chg) 
-			tny_folder_change_set_new_all_count (change, priv->cached_length);
-		priv->dont_fkill = TRUE;
-		notify_folder_observers_about (TNY_FOLDER (self), change);
-		g_object_unref (G_OBJECT (change));
-		priv->dont_fkill = old;
-	}
 
-	/* search for IN TNY */
-	/*if (info->uid_removed && info->uid_removed->len > 0)
-		camel_folder_summary_save (camel_folder->summary);*/
+  if (change)
+  {
+  	tny_folder_change_set_new_unread_count (change, priv->unread_length);
+  	if (has_chg) 
+  		tny_folder_change_set_new_all_count (change, priv->cached_length);
+  	priv->dont_fkill = TRUE;
+  	notify_folder_observers_about (TNY_FOLDER (self), change);
+  	g_object_unref (G_OBJECT (change));
+  	priv->dont_fkill = old;
+  }
 
 }
 

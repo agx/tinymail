@@ -935,7 +935,7 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 	{
 		TnyFolder *fnd = (TnyFolder*) copy->data;
 		const gchar *name = tny_folder_get_id (fnd);
-		
+
 		/* printf ("COMPARE: [%s] [%s]\n", name, full_name); */
 
 		if (name && full_name && !strcmp (name, full_name))
