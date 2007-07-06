@@ -970,7 +970,63 @@ tny_merge_folder_get_caps (TnyFolder *self)
 static void 
 tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 {
-	notify_folder_observers_about (TNY_FOLDER (self), change);
+	/* Create a new folder change for the merge folder to propagate.
+	 * The new folder change has the merge folder instead of the
+	 * underlaying folder as changed folder (if someone is interested
+	 * in the actual underlaying folder she should rather observe that
+	 * particular folder). We also do not propagate folder renames
+	 * because these do not rename the merge folder. */
+	TnyFolderChange* new_change = tny_folder_change_new (TNY_FOLDER (self));
+	TnyList *list;
+	TnyIterator *iter;
+
+	if (tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT)
+		tny_folder_change_set_new_all_count (new_change, tny_folder_change_get_new_all_count (change));
+
+	if (tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
+		tny_folder_change_set_new_unread_count (new_change, tny_folder_change_get_new_unread_count (change));
+
+	if (tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS)
+	{
+		list = tny_simple_list_new ();
+		tny_folder_change_get_added_headers (change, list);
+		iter = tny_list_create_iterator (list);
+		while (!tny_iterator_is_done (iter))
+		{
+			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+			tny_folder_change_add_added_header (change, header);
+			g_object_unref (header);
+			tny_iterator_next (iter);
+		}
+		g_object_unref (iter);
+		g_object_unref (list);
+	}
+
+	if(tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS)
+	{
+		list = tny_simple_list_new ();
+		tny_folder_change_get_expunged_headers (change, list);
+		iter = tny_list_create_iterator (list);
+		while (!tny_iterator_is_done (iter))
+		{
+			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
+			tny_folder_change_add_expunged_header (change, header);
+			g_object_unref (header);
+			tny_iterator_next (iter);
+		}
+		g_object_unref (iter);
+		g_object_unref (list);
+	}
+
+	if(tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED)
+	{
+		TnyMsg *msg = tny_folder_change_get_received_msg (change);
+		tny_folder_change_set_received_msg (change, msg);
+		g_object_unref (msg);
+	}
+
+	notify_folder_observers_about (TNY_FOLDER (self), new_change);
+	g_object_unref (new_change);
 }
 
 /**
@@ -991,6 +1047,7 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 	g_static_rec_mutex_lock (priv->lock);
 
 	tny_list_prepend (priv->mothers, G_OBJECT (folder));
+
 	tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
 
 	g_static_rec_mutex_unlock (priv->lock);
