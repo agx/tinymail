@@ -267,7 +267,8 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
   	camel_folder_summary_save (camel_folder->summary);*/
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
-  }
+  } else
+	g_warning ("Tinymail Oeps: Failed to lock during a notification\n");
 
 
   if (change)
