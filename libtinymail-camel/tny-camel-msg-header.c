@@ -214,6 +214,11 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
 
 	switch (priority_flags) {
+	case TNY_HEADER_FLAG_SUSPENDED_PRIORITY:
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "Suspended");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "-1");
+		break;
+
 	case TNY_HEADER_FLAG_HIGH_PRIORITY:
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "High");
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "1");
