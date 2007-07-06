@@ -1,3 +1,33 @@
+2007-07-06  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-enums.h:
+	* libtinymail/tny-error.h: Added 
+	TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED, 
+	TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE and 
+	TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED so 
+	that the TnyAccountStore::alert_func() callback can sometimes get 
+	more specific information, so that it doesn't need to just blindly show 
+	the camel internal error message.
+	* libtinymail/tny-error.c: Updated tny_error_get_type(), though this should be 
+	generated code as in GTK+.
+
+	* libtinymail-camel/tny-camel-account-priv.h:
+	* libtinymail-camel/tny-camel-account.c:
+	Added _tny_camel_account_get_tny_error_code_for_camel_exception_id() for 
+	choosing a suitable tinymail GError code.
+	(_tny_camel_account_try_connect), (_tny_camel_account_set_online):
+	Use a specific error code for the GErrors.
+
+	* libtinymail-camel/tny-session-camel.c:
+	(tny_session_camel_alert_user): Add a TODO noting that this is where we 
+	lose some specific error codes, and where we do a dodgy string comparison 
+	on the message text.
+
+	* camel/camel-exception-list.def: Added a 
+	CAMEL_EXCEPTION_SYSTEM_HOST_LOOKUP_FAILED error code enum value.
+	* camel/camel-net-utils.c: (camel_getaddrinfo):
+	Use the new error code when appropriate.
+
 2007-07-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added some non standard flags to the maildir support

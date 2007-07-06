@@ -79,6 +79,7 @@ void _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online,
 void _tny_camel_account_clear_hooks (TnyCamelAccount *self);
 void _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if);
 void _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **err);
+TnyError _tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex);
 
 
 #define TNY_CAMEL_ACCOUNT_GET_PRIVATE(o)	\

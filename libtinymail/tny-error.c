@@ -19,6 +19,9 @@
 
 #include <tny-error.h>
 
+
+/* TODO: These get_type() functions should be generated, as in GTK+, gnome-vfs, etc. */
+
 /**
  * tny_error_domain_get_type:
  *
@@ -76,6 +79,10 @@ tny_error_get_type (void)
       { TNY_TRANSPORT_ACCOUNT_ERROR_SEND, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND", "transport_account_error_send" },
 
       { TNY_ACCOUNT_ERROR_TRY_CONNECT, "TNY_ACCOUNT_ERROR_TRY_CONNECT", "account_error_try_connect" },
+      { TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED, "TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED", "account_error_try_connect_host_lookup_failed" },
+      { TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE, "TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE", "account_error_try_connect_service_unavailable" },
+      { TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED, "TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED", "account_error_try_connect_authentication_not_supported" },
+     
       { TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, "TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT", "account_store_error_unknown_alert" },
 
       { TNY_SEND_QUEUE_ERROR_ADD, "TNY_SEND_QUEUE_ERROR_ADD", "send_queue_error_add"},

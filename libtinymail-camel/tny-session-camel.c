@@ -179,7 +179,7 @@ tny_session_camel_do_an_error (TnySessionCamel *self, TnyAlertType tnytype, gboo
    camel_session_get_service is issued (for example TnyCamelTransportAccount and
    TnyCamelStore account issue this function). Its implementation is often done
    with GUI components (it should therefore not be called from a thread). This
-   is a known issue (and the person who fixed this, please remove this warning) */
+   is a known issue (and if someone fixes this, please remove this warning) */
 
 static gboolean
 tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, const char *msg, gboolean cancel)
@@ -207,12 +207,15 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
+		/* TODO: A string comparison is not a very safe way to do this: */
 		if (strstr (msg, "Canceled") != NULL)
 			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
 				TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT, "The connecting got canceled");
-		else
+		else {
+			/* TODO: Use a more specific error code, based on a CamelException ID: */
 			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
 				TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, msg);
+		}
 
 		tny_lockable_lock (self->priv->ui_lock);
 

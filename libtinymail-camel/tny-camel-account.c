@@ -146,8 +146,8 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 		camel_service_disconnect (apriv->service, FALSE, &ex);
 		if (camel_exception_is_set (&ex))
 			camel_exception_clear (&ex);
-		camel_service_connect (apriv->service, &ex);
 
+		camel_service_connect (apriv->service, &ex);
 
 		if (apriv->service->reconnection)
 		{
@@ -313,6 +313,36 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 	return;
 }
 
+TnyError
+_tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex)
+{
+	printf ("DEBUG: %s: ex->id=%d, ex->desc=%s\n", __FUNCTION__, ex->id, ex->desc);
+	if (!ex) {
+		g_warning ("%s: The exception was NULL.\n", __FUNCTION__);
+		return TNY_ACCOUNT_ERROR_TRY_CONNECT;
+	}
+
+
+	/* Try to provide a precise error code, 
+	 * as much as possible: 
+	 */
+	switch (ex->id) {
+	case CAMEL_EXCEPTION_SYSTEM_HOST_LOOKUP_FAILED:
+		return TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED;
+	case CAMEL_EXCEPTION_SERVICE_UNAVAILABLE:
+		return TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE;
+	case CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE:
+		return TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED;
+	case CAMEL_EXCEPTION_SYSTEM:
+	default:
+		/* A generic exception. 
+		 * We should always try to provide a precise error code rather than this,
+		 * so we can show a more helpful (translated) error message to the user.
+		 */
+		return TNY_ACCOUNT_ERROR_TRY_CONNECT;
+	}
+}
+
 void 
 _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GError **err)
 {
@@ -323,8 +353,9 @@ _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GErr
 	if (camel_exception_is_set (priv->ex))
 	{
 		g_set_error (err, TNY_ACCOUNT_ERROR, 
-			TNY_ACCOUNT_ERROR_TRY_CONNECT,
+			_tny_camel_account_get_tny_error_code_for_camel_exception_id (priv->ex),
 			camel_exception_get_description (priv->ex));
+		printf ("DEBUG: %s: camel exception: message=%s\n", __FUNCTION__, (*err)->message);
 	}
 
 	return;
@@ -1128,7 +1159,7 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 		if (camel_exception_is_set (priv->ex))
 		{
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				_tny_camel_account_get_tny_error_code_for_camel_exception_id (priv->ex),
 				camel_exception_get_description (priv->ex));
 		} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
@@ -1246,7 +1277,7 @@ done:
 	if (camel_exception_is_set (&ex))
 	{
 		g_set_error (err, TNY_ACCOUNT_ERROR, 
-			TNY_ACCOUNT_ERROR_TRY_CONNECT,
+			_tny_camel_account_get_tny_error_code_for_camel_exception_id (&ex),
 			camel_exception_get_description (&ex));
 	}
 
