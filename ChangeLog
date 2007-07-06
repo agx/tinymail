@@ -1,3 +1,10 @@
+2007-07-06  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-msg-header.c:
+	(tny_camel_msg_header_set_flags, tny_camel_msg_header_get_flags,
+	tny_camel_msg_header_unset_flags): added support to store and
+	retrieve the TNY_HEADER_FLAG_ATTACHMENTS.
+
 2007-07-06  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail/tny-enums.h:

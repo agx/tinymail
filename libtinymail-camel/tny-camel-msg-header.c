@@ -186,16 +186,23 @@ tny_camel_msg_header_get_flags (TnyHeader *self)
   
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *priority_string = NULL;
+	const gchar *attachments_string = NULL;
+	TnyHeaderFlags result = 0;
 
 	priority_string = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "X-Priority");
-	if (priority_string == NULL)
-		return 0;
-	if (g_strrstr (priority_string, "1") != NULL)
-		return TNY_HEADER_FLAG_HIGH_PRIORITY;
-	else if (g_strrstr (priority_string, "3") != NULL)
-		return TNY_HEADER_FLAG_LOW_PRIORITY;
-	else 
-		return TNY_HEADER_FLAG_NORMAL_PRIORITY;
+	attachments_string = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
+	if (priority_string != NULL) {
+		if (g_strrstr (priority_string, "1") != NULL)
+			result |= TNY_HEADER_FLAG_HIGH_PRIORITY;
+		else if (g_strrstr (priority_string, "3") != NULL)
+			result |= TNY_HEADER_FLAG_LOW_PRIORITY;
+		else 
+			result |= TNY_HEADER_FLAG_NORMAL_PRIORITY;
+	}
+	if (attachments_string != NULL) {
+		result |= TNY_HEADER_FLAG_ATTACHMENTS;
+	}
+	return result;
 }
 
 static void
@@ -204,8 +211,8 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
-	if (mask & (~TNY_HEADER_FLAG_PRIORITY)) {
-		g_warning ("tny_header_set_flags: This is a header instance for a new message. Non-priority flags are not supported.\n");
+	if (mask & (~(TNY_HEADER_FLAG_PRIORITY|TNY_HEADER_FLAG_ATTACHMENTS))) {
+		g_warning ("tny_header_set_flags: This is a header instance for a new message. Only priority and attachment flags are supported.\n");
 		return;
 	}
 	priority_flags = mask & TNY_HEADER_FLAG_PRIORITY;
@@ -232,6 +239,12 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "2");
 		break;
 	};
+
+	if (mask & TNY_HEADER_FLAG_ATTACHMENTS) {
+		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach", "Yes");
+	}
+	  
 	
 }
 
@@ -241,7 +254,7 @@ tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
-	if (mask & (~TNY_HEADER_FLAG_PRIORITY)) {
+	if (mask & (~(TNY_HEADER_FLAG_PRIORITY|TNY_HEADER_FLAG_ATTACHMENTS))) {
 		g_warning ("tny_header_set_flags: This is a header instance for a new message. Non-priority flags are not supported.\n");
 		return;
 	}
@@ -249,6 +262,9 @@ tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 	if (priority_flags) {
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
+	}
+	if (mask & TNY_HEADER_FLAG_ATTACHMENTS) {
+		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
 	}
 	return;
 }
