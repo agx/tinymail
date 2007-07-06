@@ -77,7 +77,7 @@ guint tny_folder_change_get_new_all_count (TnyFolderChange *self);
 void tny_folder_change_add_added_header (TnyFolderChange *self, TnyHeader *header);
 void tny_folder_change_add_expunged_header (TnyFolderChange *self, TnyHeader *header);
 void tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers);
-void tny_folder_change_get_removed_headers (TnyFolderChange *self, TnyList *headers);
+void tny_folder_change_get_expunged_headers (TnyFolderChange *self, TnyList *headers);
 void tny_folder_change_reset (TnyFolderChange *self);
 TnyFolder* tny_folder_change_get_folder (TnyFolderChange *self);
 TnyFolderChangeChanged tny_folder_change_get_changed  (TnyFolderChange *self);

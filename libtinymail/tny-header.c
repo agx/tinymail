@@ -580,6 +580,8 @@ tny_header_flags_get_type (void)
       { TNY_HEADER_FLAG_ATTACHMENTS, "TNY_HEADER_FLAG_ATTACHMENTS", "attachments" },
       { TNY_HEADER_FLAG_CACHED, "TNY_HEADER_FLAG_CACHED", "cached" },
       { TNY_HEADER_FLAG_PARTIAL, "TNY_HEADER_FLAG_PARTIAL", "partial" },
+      { TNY_HEADER_FLAG_EXPUNGED, "TNY_HEADER_FLAG_EXPUNGED", "expunged" },
+      { TNY_HEADER_FLAG_PRIORITY, "TNY_HEADER_FLAG_PRIORITY", "priority" },
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyHeaderFlags", values);
@@ -604,6 +606,7 @@ tny_header_priority_flags_get_type (void)
       { TNY_HEADER_FLAG_HIGH_PRIORITY, "TNY_HEADER_FLAG_HIGH_PRIORITY", "high-priority" },
       { TNY_HEADER_FLAG_NORMAL_PRIORITY, "TNY_HEADER_FLAG_NORMAL_PRIORITY", "normal-priority" },
       { TNY_HEADER_FLAG_LOW_PRIORITY, "TNY_HEADER_FLAG_LOW_PRIORITY", "low-priority" },
+      { TNY_HEADER_FLAG_SUSPENDED_PRIORITY, "TNY_HEADER_FLAG_SUSPENDED_PRIORITY", "suspended-priority" },
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyHeaderPriorityFlags", values);

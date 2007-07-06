@@ -130,6 +130,7 @@ thread_main (gpointer data)
 
 		tny_folder_get_headers (outbox, list, TRUE, &terror);
 
+
 		if (terror != NULL)
 		{
 			emit_error (self, NULL, NULL, terror, i, priv->total);
@@ -160,6 +161,8 @@ thread_main (gpointer data)
 			GError *ferror = NULL;
 			TnyIterator *hdriter;
 			TnyList *headers = tny_simple_list_new ();
+			GList *to_remove = NULL;
+			TnyIterator *giter;
 
 			tny_folder_get_headers (outbox, headers, TRUE, &ferror);
 
@@ -172,6 +175,30 @@ thread_main (gpointer data)
 				g_mutex_unlock (priv->sending_lock);
 				goto errorhandler;
 			}
+
+			/* Some code to remove the suspended items */
+			giter = tny_list_create_iterator (headers);
+			while (!tny_iterator_is_done (giter))
+			{
+				TnyHeader *curhdr = tny_iterator_get_current (giter);
+				TnyHeaderFlags flags = tny_header_get_flags (curhdr);
+
+				flags &= TNY_HEADER_FLAG_PRIORITY;
+				if (flags & TNY_HEADER_FLAG_SUSPENDED_PRIORITY)
+					to_remove = g_list_prepend (to_remove, curhdr);
+				g_object_unref (curhdr);
+				tny_iterator_next (giter);
+			}
+			g_object_unref (giter);
+
+			while (to_remove)
+			{
+				tny_list_remove (headers, G_OBJECT (to_remove->data));
+				to_remove = g_list_next (to_remove);
+			}
+			if (to_remove)
+				g_list_free (to_remove);
+			/**/
 
 			length = tny_list_get_length (headers);
 

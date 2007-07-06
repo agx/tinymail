@@ -24,6 +24,7 @@
 
 #include <tny-folder-monitor.h>
 #include <tny-simple-list.h>
+#include <tny-folder-change.h>
 
 static GObjectClass *parent_class = NULL;
 
