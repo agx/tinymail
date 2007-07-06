@@ -276,9 +276,7 @@ tny_camel_mime_part_is_attachment (TnyMimePart *self)
 	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->is_attachment_func (self);
 }
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
+char *strcasestr(const char *haystack, const char *needle);
 
 static gboolean 
 tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
@@ -836,7 +834,8 @@ tny_camel_mime_part_set_filename_default (TnyMimePart *self, const gchar *filena
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->part_lock);
-	camel_mime_part_set_filename (priv->part, filename);
+	if (filename) /* Q: Perhaps is this check not needed (and even invalid) */
+		camel_mime_part_set_filename (priv->part, filename);
 	g_mutex_unlock (priv->part_lock);
 
 	return;
