@@ -187,6 +187,7 @@ static struct {
 	{ 'H', CAMEL_MESSAGE_HIGH_PRIORITY },
 	{ 'N', CAMEL_MESSAGE_NORMAL_PRIORITY },
 	{ 'L', CAMEL_MESSAGE_LOW_PRIORITY },
+	{ 'O', CAMEL_MESSAGE_SUSPENDED_PRIORITY },
 };
 
 /* convert the uid + flags into a unique:info maildir format */
