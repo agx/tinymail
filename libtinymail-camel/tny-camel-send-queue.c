@@ -180,7 +180,7 @@ thread_main (gpointer data)
 			giter = tny_list_create_iterator (headers);
 			while (!tny_iterator_is_done (giter))
 			{
-				TnyHeader *curhdr = tny_iterator_get_current (giter);
+				TnyHeader *curhdr = TNY_HEADER (tny_iterator_get_current (giter));
 				TnyHeaderFlags flags = tny_header_get_flags (curhdr);
 
 				flags &= TNY_HEADER_FLAG_PRIORITY;
