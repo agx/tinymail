@@ -1060,7 +1060,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 			if (folder != NULL)
 			{
-				gchar *name = tny_folder_get_name (TNY_FOLDER(folder));
+				const gchar *name = tny_folder_get_name (TNY_FOLDER(folder));
 				/* TNY TODO: Temporary fix for empty root folders */
 				if (name && strlen(name) > 0)
 					tny_list_prepend (list, G_OBJECT (folder));

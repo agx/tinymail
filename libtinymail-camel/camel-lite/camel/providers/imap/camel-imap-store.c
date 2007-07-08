@@ -1758,10 +1758,12 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		g_free (result);
 	}
 
-	if (!store->namespace)
-		store->namespace = g_strdup ("");
+	if (store->namespace && strlen (store->namespace) == 0) {
+		g_free (store->namespace);
+		store->namespace = NULL;
+	}
 
-	if (!store->dir_sep) {
+	if (store->namespace && !store->dir_sep) {
 		if (FALSE && store->server_level >= IMAP_LEVEL_IMAP4REV1) 
 		{
 			/* This idiom means "tell me the hierarchy separator
@@ -1789,9 +1791,13 @@ imap_connect_online (CamelService *service, CamelException *ex)
 			imap_parse_list_response (store, result, NULL, &store->dir_sep, NULL);
 			g_free (result);
 		}
-		if (!store->dir_sep)
-			store->dir_sep = '/';	/* Guess */
 	}
+
+	if (!store->dir_sep)
+		store->dir_sep = '/';	/* Guess */
+
+	if (!store->namespace)
+		store->namespace = g_strdup ("");
 
 	/* canonicalize the namespace to end with dir_sep */
 	len = strlen (store->namespace);
