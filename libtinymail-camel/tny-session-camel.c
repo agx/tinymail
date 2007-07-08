@@ -369,6 +369,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->priv = g_slice_new (TnySessionCamelPriv);
 	priv = instance->priv;
 
+	priv->background_thread_running = FALSE;
 	priv->is_inuse = FALSE;
 	priv->conlock = g_mutex_new ();
 	priv->queue_lock = g_mutex_new ();
@@ -507,6 +508,13 @@ background_connect_thread (gpointer data)
 	TnySessionCamel *self = info->user_data;
 	TnySessionCamelPriv *priv = self->priv;
 
+	if (priv->background_thread_running) {
+		g_thread_exit (NULL);
+		return NULL;
+	}
+
+	priv->background_thread_running = TRUE;
+
 	g_mutex_lock (priv->queue_lock);
 	/*g_list_foreach (priv->regged_queues, (GFunc) 
 		tny_camel_send_queue_join_worker, NULL);*/
@@ -530,6 +538,8 @@ background_connect_thread (gpointer data)
 	g_mutex_lock (priv->conlock);
 	priv->conthread = NULL;
 	g_mutex_unlock (priv->conlock);
+
+	priv->background_thread_running = FALSE;
 
 	g_thread_exit (NULL);
 	return NULL;
