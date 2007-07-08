@@ -3,6 +3,7 @@
 	* Yet another attempt at fixing the namespace problem (empty root
 	folders)
 	* Fixed a disconnect at startup (temporary fix)
+	* Fixed a problem when creating folders (found by Armin Burgmeier)
 
 2007-07-08  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 

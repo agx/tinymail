@@ -853,7 +853,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	g_assert (CAMEL_IS_STORE (store));
 
-	info = camel_store_create_folder (store, "/", name, &ex);
+	info = camel_store_create_folder (store, NULL, name, &ex);
 
 	if (camel_exception_is_set (&ex)) 
 	{
