@@ -826,6 +826,28 @@ tny_folder_get_unread_count (TnyFolder *self)
 	return TNY_FOLDER_GET_IFACE (self)->get_unread_count_func (self);
 }
 
+
+/**
+ * tny_folder_get_local_size:
+ * @self: a TnyFolder object
+ * 
+ * Get the local size of this folder in bytes. Local size means the amount of
+ * disk space that this folder consumes.
+ * 
+ * Return value: get the local size of this folder
+ *
+ **/
+guint
+tny_folder_get_local_size (TnyFolder *self)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_local_size_func != NULL);
+#endif
+
+	return TNY_FOLDER_GET_IFACE (self)->get_local_size_func (self);
+}
+
 /**
  * tny_folder_get_all_count:
  * @self: a TnyFolder object

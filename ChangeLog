@@ -1,3 +1,9 @@
+2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added the tny_folder_get_local_size API
+
+	* This was a major API change
+
 2007-07-09  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail/tny-enums.h:

@@ -737,6 +737,18 @@ _tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed)
 	return;
 }
 
+static guint
+tny_camel_folder_get_local_size (TnyFolder *self)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_unread_count_func (self);
+}
+
+static guint
+tny_camel_folder_get_local_size_default (TnyFolder *self)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	return priv->local_size;
+}
 
 static guint
 tny_camel_folder_get_unread_count (TnyFolder *self)
@@ -4567,6 +4579,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->get_name_func = tny_camel_folder_get_name;
 	klass->get_folder_type_func = tny_camel_folder_get_folder_type;
 	klass->get_unread_count_func = tny_camel_folder_get_unread_count;
+	klass->get_local_size_func = tny_camel_folder_get_local_size;
 	klass->get_all_count_func = tny_camel_folder_get_all_count;
 	klass->get_account_func = tny_camel_folder_get_account;
 	klass->is_subscribed_func = tny_camel_folder_is_subscribed;
@@ -4627,6 +4640,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->get_name_func = tny_camel_folder_get_name_default;
 	class->get_folder_type_func = tny_camel_folder_get_folder_type_default;
 	class->get_unread_count_func = tny_camel_folder_get_unread_count_default;
+	class->get_local_size_func = tny_camel_folder_get_local_size_default;
 	class->get_all_count_func = tny_camel_folder_get_all_count_default;
 	class->get_account_func = tny_camel_folder_get_account_default;
 	class->is_subscribed_func = tny_camel_folder_is_subscribed_default;

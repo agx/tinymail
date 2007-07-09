@@ -107,6 +107,7 @@ struct _TnyFolderIface
 	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
 	guint (*get_all_count_func) (TnyFolder *self);
 	guint (*get_unread_count_func) (TnyFolder *self);
+	guint (*get_local_size_func) (TnyFolder *self);
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self, GError **err);
@@ -144,6 +145,7 @@ const gchar* tny_folder_get_name (TnyFolder *self);
 TnyFolderType tny_folder_get_folder_type (TnyFolder *self);
 guint tny_folder_get_all_count (TnyFolder *self);
 guint tny_folder_get_unread_count (TnyFolder *self);
+guint tny_folder_get_local_size (TnyFolder *self);
 gboolean tny_folder_is_subscribed (TnyFolder *self);
 void tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_refresh (TnyFolder *self, GError **err);

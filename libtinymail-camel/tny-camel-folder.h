@@ -71,6 +71,7 @@ struct _TnyCamelFolderClass
 	TnyFolderType (*get_folder_type_func) (TnyFolder *self);
 	guint (*get_all_count_func) (TnyFolder *self);
 	guint (*get_unread_count_func) (TnyFolder *self);
+	guint (*get_local_size_func) (TnyFolder *self);
 	gboolean (*is_subscribed_func) (TnyFolder *self);
 	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self, GError **err);
