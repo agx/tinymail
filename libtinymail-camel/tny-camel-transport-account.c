@@ -175,6 +175,9 @@ get_tny_error_code_for_camel_exception_id (CamelException* ex)
 		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE;
 	case CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE:
 		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED;
+	case CAMEL_EXCEPTION_USER_CANCEL:
+		/* TODO: This really shouldn't be shown to the user: */
+		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND_USER_CANCEL;
 	case CAMEL_EXCEPTION_SYSTEM:
 	default:
 		/* A generic exception. 

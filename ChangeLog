@@ -1,3 +1,20 @@
+2007-07-09  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-enums.h:
+	* libtinymail/tny-error.h: 
+	* libtinymail/tny-error.c: (tny_error_get_type):
+	Added TNY_TRANSPORT_ACCOUNT_ERROR_SEND_USER_CANCEL 
+	and TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL.
+	* libtinymail-camel/tny-camel-account.c:
+	(_tny_camel_account_get_tny_error_code_for_camel_exception_id):
+	Handle CAMEL_EXCEPTION_USER_CANCEL as 
+	TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL, so that applications 
+	can ignore this.
+	* libtinymail-camel/tny-camel-transport-account.c:
+	(get_tny_error_code_for_camel_exception_id):
+	Likewise, handle as CAMEL_EXCEPTION_USER_CANCE as 
+	TNY_TRANSPORT_ACCOUNT_ERROR_SEND_USER_CANCEL.
+
 2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added the tny_folder_sync_async method. Boutifully paradoxical by

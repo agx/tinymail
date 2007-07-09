@@ -148,7 +148,6 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 			camel_exception_clear (&ex);
 
 		camel_service_connect (apriv->service, &ex);
-
 		if (apriv->service->reconnection)
 		{
 			if (!camel_exception_is_set (&ex))
@@ -316,7 +315,7 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 TnyError
 _tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex)
 {
-	printf ("DEBUG: %s: ex->id=%d, ex->desc=%s\n", __FUNCTION__, ex->id, ex->desc);
+	/* printf ("DEBUG: %s: ex->id=%d, ex->desc=%s\n", __FUNCTION__, ex->id, ex->desc); */
 	if (!ex) {
 		g_warning ("%s: The exception was NULL.\n", __FUNCTION__);
 		return TNY_ACCOUNT_ERROR_TRY_CONNECT;
@@ -335,6 +334,9 @@ _tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex
 		return TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED;
 	case CAMEL_EXCEPTION_SERVICE_CERTIFICATE:
 		return TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE;
+	case CAMEL_EXCEPTION_USER_CANCEL:
+		/* TODO: This really shouldn't be shown to the user: */
+		return TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL;
 	case CAMEL_EXCEPTION_SYSTEM:
 	default:
 		/* A generic exception. 
@@ -351,13 +353,12 @@ _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GErr
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), for_online, TRUE);
-
 	if (camel_exception_is_set (priv->ex))
 	{
 		g_set_error (err, TNY_ACCOUNT_ERROR, 
 			_tny_camel_account_get_tny_error_code_for_camel_exception_id (priv->ex),
 			camel_exception_get_description (priv->ex));
-		printf ("DEBUG: %s: camel exception: message=%s\n", __FUNCTION__, (*err)->message);
+		/* printf ("DEBUG: %s: camel exception: message=%s\n", __FUNCTION__, (*err)->message); */
 	}
 
 	return;
