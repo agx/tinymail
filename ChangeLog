@@ -1,3 +1,8 @@
+2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Changed the cache-dir locations to ones that are more suitable for
+	mor types of filesystems
+
 2007-07-09  Javier Fernández García-Boente <jfernandez@igalia.com>
 
 	* Change way to manage priority flags (2 bits) 
