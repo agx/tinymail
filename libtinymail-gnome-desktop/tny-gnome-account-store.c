@@ -311,7 +311,6 @@ load_accounts (TnyAccountStore *self)
 
 			tny_account_set_forget_pass_func (TNY_ACCOUNT (account),
 				per_account_forget_pass_func);
-
 			tny_account_set_pass_func (TNY_ACCOUNT (account),
 				per_account_get_pass_func);
 

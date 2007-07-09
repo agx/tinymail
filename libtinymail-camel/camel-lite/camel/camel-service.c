@@ -556,7 +556,7 @@ get_path (CamelService *service)
 	gpath = g_string_new (service->provider->protocol);
 	if (CAMEL_PROVIDER_ALLOWS (prov, CAMEL_URL_PART_USER)) {
 		if (CAMEL_PROVIDER_ALLOWS (prov, CAMEL_URL_PART_HOST)) {
-			g_string_append_printf (gpath, "/%s_%s",
+			g_string_append_printf (gpath, "/%s__%s",
 						url->user ? url->user : "",
 						url->host ? url->host : "");
 			
@@ -564,11 +564,11 @@ get_path (CamelService *service)
 				g_string_append_printf (gpath, "_%d", url->port);
 		} else {
 			g_string_append_printf (gpath, "/%s%s", url->user ? url->user : "",
-						CAMEL_PROVIDER_NEEDS (prov, CAMEL_URL_PART_USER) ? "" : "_");
+						CAMEL_PROVIDER_NEEDS (prov, CAMEL_URL_PART_USER) ? "" : "__");
 		}
 	} else if (CAMEL_PROVIDER_ALLOWS (prov, CAMEL_URL_PART_HOST)) {
 		g_string_append_printf (gpath, "/%s%s",
-					CAMEL_PROVIDER_NEEDS (prov, CAMEL_URL_PART_HOST) ? "" : "_",
+					CAMEL_PROVIDER_NEEDS (prov, CAMEL_URL_PART_HOST) ? "" : "__",
 					url->host ? url->host : "");
 		
 		if (url->port)

@@ -2,6 +2,7 @@
 
 	* Changed the cache-dir locations to ones that are more suitable for
 	mor types of filesystems
+	* Added the user to IMAP cache-dir locations
 
 2007-07-09  Javier Fernández García-Boente <jfernandez@igalia.com>
 

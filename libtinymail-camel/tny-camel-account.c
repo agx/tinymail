@@ -671,7 +671,7 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
 
 	_tny_session_camel_add_account (session, self);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, TRUE, TRUE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, FALSE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -744,7 +744,7 @@ tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 
 	priv->proto = g_strdup (proto);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
