@@ -90,11 +90,16 @@ tny_folder_get_url_string (TnyFolder *self)
 
 /**
  * tny_folder_get_stats:
- * @self: a TnyFolder object
+ * @self: a #TnyFolder object
  *
  * Get some statistics of the folder @self. The returned statistics object will
  * not change after you got it. If you need an updated version, you need to call
  * this method again. You must unreference the return value after use.
+ *
+ * This method is a rather heavy operation that might consume a lot of memory
+ * to achieve its return value. There are more finegrained APIs available in
+ * #TnyFolder that will get you the same counts in a less expensive way. With
+ * this method you get a combined statistic, however.
  *
  * Return value: some statistics of the folder
  **/
