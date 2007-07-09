@@ -571,7 +571,9 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
  * tny_folder_sync_async:
  * @self: a #TnyFolder object
  * @expunge: whether or not to also expunge deleted messages
- * @err: a #GError object or NULL
+ * @callback: a #TnySyncFolderCallback
+ * @status_callback: a #TnyStatusCallback
+ * @user_data: user data that will be passed to the callbacks
  *
  * The authors of Tinymail know that sync async sounds paradoxical. Though if
  * you think about it, it makes perfect sense: you synchronize the content in
