@@ -303,8 +303,8 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 
 	if (dw)
 	{
-		return !(camel_content_type_is (dw->mime_type, "multipart", "*")
-			 || camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
+		return !(/*camel_content_type_is (dw->mime_type, "multipart", "*")
+			 ||*/ camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
 			 || camel_content_type_is(dw->mime_type, "application", "pkcs7-mime")
 			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-signed")
 			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-encrypted")

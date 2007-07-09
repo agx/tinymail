@@ -210,6 +210,31 @@ get_inbox (CamelStore *store, CamelException *ex)
 	return camel_store_get_folder(store, ".", CAMEL_STORE_FOLDER_CREATE, ex);
 }
 
+
+static int rem_dir (const gchar *tmp)
+{
+	DIR *dir;
+	struct dirent *d;
+	int err;
+
+	dir = opendir(tmp);
+	if (dir) {
+		while ( (d=readdir(dir)) ) {
+			char *namea = d->d_name, *file;
+			if (!strcmp(namea, ".") || !strcmp(namea, ".."))
+				continue;
+			file = g_strdup_printf("%s/%s", tmp, namea);
+			unlink(file);
+			g_free(file);
+		}
+		closedir(dir);
+	}
+	if (rmdir(tmp) == -1)
+		err = errno;
+
+	return err;
+}
+
 static void delete_folder(CamelStore * store, const char *folder_name, CamelException * ex)
 {
 	char *name, *tmp, *cur, *new;
@@ -238,30 +263,14 @@ static void delete_folder(CamelStore * store, const char *folder_name, CamelExce
 	} else {
 		int err = 0;
 
-		/* remove subdirs first - will fail if not empty */
-		if (rmdir(cur) == -1 || rmdir(new) == -1) {
-			err = errno;
-		} else {
-			DIR *dir;
-			struct dirent *d;
-
-			/* for tmp (only), its contents is irrelevant */
-			dir = opendir(tmp);
-			if (dir) {
-				while ( (d=readdir(dir)) ) {
-					char *name = d->d_name, *file;
-
-					if (!strcmp(name, ".") || !strcmp(name, ".."))
-						continue;
-					file = g_strdup_printf("%s/%s", tmp, name);
-					unlink(file);
-					g_free(file);
-				}
-				closedir(dir);
-			}
-			if (rmdir(tmp) == -1 || rmdir(name) == -1)
+		err = rem_dir (tmp);
+		if (err == 0)
+			err = rem_dir (cur);
+		if (err == 0)
+			err = rem_dir (new);
+		if (err == 0)
+			if (rmdir (name) == -1)
 				err = errno;
-		}
 
 		if (err != 0) {
 			/* easier just to mkdir all (and let them fail), than remember what we got to */

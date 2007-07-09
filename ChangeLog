@@ -1,3 +1,8 @@
+2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Improvement for tny_camel_mime_part_is_attachment_default
+	* Deleting non-empty folders of a maildir 
+
 2007-07-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Yet another attempt at fixing the namespace problem (empty root

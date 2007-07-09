@@ -3306,6 +3306,7 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 					TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 					camel_exception_get_description (&ex));
 				camel_exception_clear (&ex);
+				changed = FALSE;
 			} else 
 			{
 				if (camel_store_supports_subscriptions (store))
