@@ -194,6 +194,7 @@ static struct {
 char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 {
 	const char *uid;
+	guint32 priority_flag = 0;	/* 2 bits flags */
 	char *p, *buf;
 	int i;
 
@@ -202,7 +203,14 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 	buf = g_alloca (strlen (uid) + strlen ("_2_") +  (sizeof (flagbits) / sizeof (flagbits[0])) + 1);
 	p = buf + sprintf (buf, "%s_2_", uid);
 	for (i = 0; i < sizeof (flagbits) / sizeof (flagbits[0]); i++) {
-		if (info->info.info.flags & flagbits[i].flagbit)
+		/* Priority flags */
+		if ((info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY) != 0) {
+			priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
+			if (priority_flag == flagbits[i].flagbit)
+				*p++ = flagbits[i].flag;
+		}
+		/* Standard flags*/
+		else if (info->info.info.flags & flagbits[i].flagbit)		
 			*p++ = flagbits[i].flag;
 	}
 	*p = 0;
@@ -214,6 +222,7 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char *name)
 {
 	char *p, c;
+	guint32 priority_flag = 0;	/* 2 bits flags */
 	guint32 set = 0;	/* what we set */
 	/*guint32 all = 0;*/	/* all flags */
 	int i;
@@ -224,7 +233,14 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 		while ((c = *p++)) {
 			/* we could assume that the flags are in order, but its just as easy not to require */
 			for (i=0;i<sizeof(flagbits)/sizeof(flagbits[0]);i++) {
-				if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0) {
+				/* Priority flags */
+				if (info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY) {
+					priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;					
+					if (flagbits[i].flag == c && (priority_flag != flagbits[i].flagbit))
+						set |= flagbits[i].flagbit;
+				}
+				/* Standard flags */
+				else if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0) {
 					set |= flagbits[i].flagbit;
 				}
 				/*all |= flagbits[i].flagbit;*/

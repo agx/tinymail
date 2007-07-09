@@ -1,3 +1,10 @@
+2007-07-09  Javier Fernández García-Boente <jfernandez@igalia.com>
+
+	* Change way to manage priority flags (2 bits) 
+        on maildir folders. Now, HIGH_PRIORITY flag
+	will be used as bit mask to extract priority flags
+	and compare them with specific bits flag.
+
 2007-07-09  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* tny-camel-mime-part.c:
