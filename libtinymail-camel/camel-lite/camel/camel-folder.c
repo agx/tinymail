@@ -408,9 +408,9 @@ folder_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 
 						if (flags & CAMEL_MESSAGE_DELETED)
 							deleted++;
-						else
-							if ((flags & CAMEL_MESSAGE_SEEN) == 0)
-								unread++;
+
+						if ((flags & CAMEL_MESSAGE_SEEN) == 0)
+							unread++;
 
 						camel_message_info_free(info);
 					}

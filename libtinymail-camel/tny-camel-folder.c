@@ -200,7 +200,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 
 			if (info->push_email_event) 
 			{
-				if ((flags & CAMEL_MESSAGE_DELETED) && (flags & CAMEL_MESSAGE_SEEN))
+				if (flags & CAMEL_MESSAGE_SEEN)
 					priv->unread_length++;
 				priv->cached_length++;
 				has_chg = TRUE;

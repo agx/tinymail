@@ -1,7 +1,8 @@
 2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improvement for tny_camel_mime_part_is_attachment_default
-	* Deleting non-empty folders of a maildir 
+	* Deleting non-empty folders of a maildir
+	* Unread and seen counts are (or should be) unrelated
 
 2007-07-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
