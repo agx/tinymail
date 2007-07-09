@@ -595,7 +595,9 @@ tny_account_set_port (TnyAccount *self, guint port)
  * itself is usually stored in a secured password store.
  *
  * You need to set this property before you can start using the account. This
- * property is typically set in the implementation of a #TnyAccountStore.
+ * property is typically set in the implementation of a #TnyAccountStore. Set
+ * this property as the last of all properties that you will set to an account
+ * in the #TnyAccountStore.
  * 
  * Also see #TnyGetPassFunc for more information about the function itself. 
  *
