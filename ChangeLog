@@ -1,5 +1,12 @@
 2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
+	* Added the tny_folder_sync_async method. Boutifully paradoxical by
+	name!
+
+	* This was a major API change
+
+2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
+
 	* Changed the cache-dir locations to ones that are more suitable for
 	mor types of filesystems
 	* Added the user to IMAP cache-dir locations

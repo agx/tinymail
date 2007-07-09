@@ -566,6 +566,33 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 	return;
 }
 
+
+/**
+ * tny_folder_sync_async:
+ * @self: a #TnyFolder object
+ * @expunge: whether or not to also expunge deleted messages
+ * @err: a #GError object or NULL
+ *
+ * The authors of Tinymail know that sync async sounds paradoxical. Though if
+ * you think about it, it makes perfect sense: you synchronize the content in
+ * an asynchronous way. Nothing paradoxial about it, right?
+ *
+ * Persist changes made to a folder to its backing store, expunging deleted 
+ * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well if @expunge
+ * is TRUE.
+ **/
+void 
+tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (TNY_FOLDER_GET_IFACE (self)->sync_async_func != NULL);
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->sync_async_func (self, expunge, callback, status_callback, user_data);
+	return;
+}
+
 /**
  * tny_folder_add_msg:
  * @self: a #TnyFolder object

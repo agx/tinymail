@@ -675,51 +675,6 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 	return;
 }
 
-static void 
-tny_camel_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
-{
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync_func (self, expunge, err);
-	return;
-}
-
-static void 
-tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
-{
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
-			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_SYNC))
-		return;
-
-	g_static_rec_mutex_lock (priv->folder_lock);
-
-	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
-		if (!load_folder_no_lock (priv))
-		{
-			g_static_rec_mutex_unlock (priv->folder_lock);
-			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-			return;
-		}
-
-	camel_folder_sync (priv->folder, expunge, &ex);
-
-	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
-
-	g_static_rec_mutex_unlock (priv->folder_lock);
-
-	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_SYNC,
-			camel_exception_get_description (&ex));
-	}
-
-	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-
-	return;
-}
-
 
 CamelFolder*
 _tny_camel_folder_get_camel_folder (TnyCamelFolder *self)
@@ -894,6 +849,270 @@ execute_callback (gint depth,
 	}
 }
 
+
+
+static void 
+tny_camel_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync_func (self, expunge, err);
+	return;
+}
+
+static void 
+tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
+			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_SYNC))
+		return;
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
+		{
+			g_static_rec_mutex_unlock (priv->folder_lock);
+			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+			return;
+		}
+
+	camel_folder_sync (priv->folder, expunge, &ex);
+
+	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_SYNC,
+			camel_exception_get_description (&ex));
+	}
+
+	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+
+	return;
+}
+
+
+
+
+typedef struct 
+{
+	TnyFolder *self;
+	TnySyncFolderCallback callback;
+	TnyStatusCallback status_callback;
+	gpointer user_data;
+	gboolean cancelled, expunge;
+	TnyIdleStopper* stopper;
+	guint depth;
+	GError *err;
+	TnySessionCamel *session;
+} SyncFolderInfo;
+
+
+static void
+tny_camel_folder_sync_async_destroyer (gpointer thr_user_data)
+{
+	SyncFolderInfo *info = thr_user_data;
+	TnyFolder *self = info->self;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	_tny_camel_folder_unreason (priv);
+
+	/* thread reference */
+	g_object_unref (G_OBJECT (self));
+	if (info->err)
+		g_error_free (info->err);
+
+	_tny_session_stop_operation (info->session);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+	
+	g_slice_free (SyncFolderInfo, thr_user_data);
+
+	return;
+}
+
+static gboolean
+tny_camel_folder_sync_async_callback (gpointer thr_user_data)
+{
+	SyncFolderInfo *info = thr_user_data;
+	TnyFolder *self = info->self;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyFolderChange *change = tny_folder_change_new (self);
+
+	if (info->callback)
+		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+
+	tny_idle_stopper_stop (info->stopper);
+
+	tny_folder_change_set_new_all_count (change, priv->cached_length);
+	tny_folder_change_set_new_unread_count (change, priv->unread_length);
+	notify_folder_observers_about (self, change);
+	g_object_unref (change);
+
+	return FALSE;
+}
+
+
+static void
+tny_camel_folder_sync_async_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *thr_user_data)
+{
+	SyncFolderInfo *oinfo = thr_user_data;
+	TnyProgressInfo *info = NULL;
+
+	info = tny_progress_info_new (G_OBJECT (oinfo->self), oinfo->status_callback, 
+		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_SYNC, what, sofar, 
+		oftotal, oinfo->stopper, oinfo->user_data);
+
+	execute_callback (oinfo->depth, G_PRIORITY_HIGH,
+			  tny_progress_info_idle_func, info,
+			  tny_progress_info_destroy);
+
+	return;
+}
+
+
+static gpointer 
+tny_camel_folder_sync_async_thread (gpointer thr_user_data)
+{
+	SyncFolderInfo *info = thr_user_data;
+	TnyFolder *self = info->self;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	GError *err = NULL;
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!load_folder_no_lock (priv))
+	{
+		tny_camel_folder_sync_async_destroyer (info);
+		g_static_rec_mutex_unlock (priv->folder_lock);
+		g_thread_exit (NULL);
+		return NULL;
+	}
+
+	info->cancelled = FALSE;
+
+	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
+		tny_camel_folder_sync_async_status, info, 
+		"Synchronizing folder");
+
+	priv->want_changes = FALSE;
+	camel_folder_sync (priv->folder, info->expunge, &ex);
+	priv->want_changes = TRUE;
+
+	info->cancelled = camel_operation_cancel_check (apriv->cancel);
+
+	priv->cached_length = camel_folder_get_message_count (priv->folder);
+	priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
+	update_iter_counts (priv);
+
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+
+	info->err = NULL;
+
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (&err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
+			camel_exception_get_description (&ex));
+		if (err != NULL)
+			info->err = g_error_copy ((const GError *) err);
+	}
+
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	if (info->callback)
+	{
+		execute_callback (info->depth, G_PRIORITY_DEFAULT, 
+				  tny_camel_folder_sync_async_callback, info, 
+				  tny_camel_folder_sync_async_destroyer);
+	} else { /* Thread reference */
+		g_object_unref (G_OBJECT (self));
+		_tny_camel_folder_unreason (priv);
+	}
+	g_thread_exit (NULL);
+
+	return NULL;
+}
+
+static void
+tny_camel_folder_sync_async_cancelled_destroyer (gpointer thr_user_data)
+{
+	SyncFolderInfo *info = thr_user_data;
+
+	g_error_free (info->err);
+	g_object_unref (info->self);
+	g_slice_free (SyncFolderInfo, thr_user_data);
+}
+
+static gboolean
+tny_camel_folder_sync_async_cancelled_callback (gpointer thr_user_data)
+{
+	SyncFolderInfo *info = thr_user_data;
+
+	if (info->callback)
+		info->callback (info->self, TRUE, &info->err, info->user_data);
+
+	return FALSE;
+}
+void 
+tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	SyncFolderInfo *info;
+	GThread *thread;
+	GError *err = NULL;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	/* Idle info for the callbacks */
+	info = g_slice_new (SyncFolderInfo);
+	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	info->err = NULL;
+	info->self = self;
+	info->callback = callback;
+	info->status_callback = status_callback;
+	info->user_data = user_data;
+	info->depth = g_main_depth ();
+	info->expunge = expunge;
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
+					   TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_SYNC))
+	{
+		if (callback) {
+			info->err = g_error_copy (err);
+			g_object_ref (info->self);
+
+			execute_callback (info->depth, G_PRIORITY_DEFAULT,
+					  tny_camel_folder_sync_async_cancelled_callback, info, 
+					  tny_camel_folder_sync_async_cancelled_destroyer);
+		}
+		g_error_free (err);
+		return;
+	}
+
+	info->stopper = tny_idle_stopper_new();
+
+	/* thread reference */
+	g_object_ref (G_OBJECT (self));
+	_tny_camel_folder_reason (priv);
+
+	thread = g_thread_create (tny_camel_folder_sync_async_thread,
+			info, FALSE, NULL);
+}
+
+void 
+tny_camel_folder_sync_async (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync_async_func (self, expunge, callback, status_callback, user_data);
+	return;
+}
 
 typedef struct 
 {
@@ -4355,6 +4574,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->refresh_func = tny_camel_folder_refresh;
 	klass->remove_msg_func = tny_camel_folder_remove_msg;
 	klass->sync_func = tny_camel_folder_sync;
+	klass->sync_async_func = tny_camel_folder_sync_async;
 	klass->add_msg_func = tny_camel_folder_add_msg;
 	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
 	klass->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async;
@@ -4415,6 +4635,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->remove_msg_func = tny_camel_folder_remove_msg_default;
 	class->add_msg_func = tny_camel_folder_add_msg_default;
 	class->sync_func = tny_camel_folder_sync_default;
+	class->sync_async_func = tny_camel_folder_sync_async_default;
 	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
 	class->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async_default;
 	class->copy_func = tny_camel_folder_copy_default;
