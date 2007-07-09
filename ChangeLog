@@ -1,3 +1,11 @@
+2007-07-09  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* tny-camel-mime-part.c:
+	(tny_camel_mime_part_get_parts): now, if the mime part is a
+	multipart/related, it sets the content disposition of the children
+	to inline for parts that didn't get a disposition before. This
+	should improve handling of inline attached images.
+
 2007-07-09  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail/tny-enums.h:

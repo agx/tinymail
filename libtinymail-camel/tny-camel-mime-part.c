@@ -113,6 +113,8 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *containee;
+	gboolean is_related = FALSE;
+	CamelContentType *content_type = NULL;
 
 	g_assert (TNY_IS_LIST (list));
 
@@ -123,6 +125,14 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 	if (G_UNLIKELY (containee == NULL)) {
 		g_mutex_unlock (priv->part_lock);
 		return;
+	}
+
+	content_type = camel_mime_part_get_content_type (priv->part);
+	if (content_type != NULL) {
+		if ((strcmp (content_type->type, "multipart")==0) &&
+		    (strcmp (content_type->subtype, "related") == 0)) {
+			is_related = TRUE;
+		}
 	}
 
 	if (CAMEL_IS_MULTIPART (containee))
@@ -151,8 +161,12 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 					g_object_unref (G_OBJECT (nheader));
 				}
 
-			} else
+			} else {
 				newpart = tny_camel_mime_part_new_with_part (tpart);
+				if (is_related && (camel_mime_part_get_disposition (tpart) == NULL)) {
+					camel_mime_part_set_disposition (tpart, "inline");
+				}
+			}
 
 			tny_list_prepend (list, G_OBJECT (newpart));
 			g_object_unref (G_OBJECT (newpart));
