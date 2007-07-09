@@ -369,6 +369,7 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->priv = g_slice_new (TnySessionCamelPriv);
 	priv = instance->priv;
 
+	priv->regged_queues = NULL;
 	priv->background_thread_running = FALSE;
 	priv->is_inuse = FALSE;
 	priv->conlock = g_mutex_new ();
