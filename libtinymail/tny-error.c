@@ -77,6 +77,9 @@ tny_error_get_type (void)
       { TNY_FOLDER_STORE_ERROR_CREATE_FOLDER, "TNY_FOLDER_STORE_ERROR_CREATE_FOLDER", "folder_store_error_create_folder" },
 
       { TNY_TRANSPORT_ACCOUNT_ERROR_SEND, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND", "transport_account_error_send" },
+      { TNY_TRANSPORT_ACCOUNT_ERROR_SEND_HOST_LOOKUP_FAILED, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND_HOST_LOOKUP_FAILED", "transport_account_error_send_host_lookup_failed" },
+      { TNY_TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE", "transport_account_error_send_service_unavailable" },
+      { TNY_TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED, "TNY_TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED", "transport_account_error_send_authentication_not_supported" },
 
       { TNY_ACCOUNT_ERROR_TRY_CONNECT, "TNY_ACCOUNT_ERROR_TRY_CONNECT", "account_error_try_connect" },
       { TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED, "TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED", "account_error_try_connect_host_lookup_failed" },

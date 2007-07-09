@@ -118,7 +118,7 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 		if (camel_exception_is_set (apriv->ex))
 		{
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+				_tny_camel_account_get_tny_error_code_for_camel_exception_id (apriv->ex),
 				camel_exception_get_description (apriv->ex));
 			camel_exception_clear (apriv->ex);
 		} else {
@@ -154,6 +154,37 @@ tny_camel_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError
 }
 
 
+/** Get an appropriate Tinymail GError code for a CamelException.
+ */
+static TnyError
+get_tny_error_code_for_camel_exception_id (CamelException* ex)
+{
+	/* printf ("DEBUG: %s: ex->id=%d, ex->desc=%s\n", __FUNCTION__, ex->id, ex->desc); */
+	if (!ex) {
+		g_warning ("%s: The exception was NULL.\n", __FUNCTION__);
+		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND;
+	}
+
+	/* Try to provide a precise error code, 
+	 * as much as possible: 
+	 */
+	switch (ex->id) {
+	case CAMEL_EXCEPTION_SYSTEM_HOST_LOOKUP_FAILED:
+		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND_HOST_LOOKUP_FAILED;
+	case CAMEL_EXCEPTION_SERVICE_UNAVAILABLE:
+		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE;
+	case CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE:
+		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED;
+	case CAMEL_EXCEPTION_SYSTEM:
+	default:
+		/* A generic exception. 
+		 * We should always try to provide a precise error code rather than this,
+		 * so we can show a more helpful (translated) error message to the user.
+		 */
+		return TNY_TRANSPORT_ACCOUNT_ERROR_SEND;
+	}
+}
+
 static void
 tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
@@ -170,7 +201,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
 	{
 		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
-				TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+				get_tny_error_code_for_camel_exception_id (apriv->ex),
 				"Account not ready for this operation (%s). "
 				"This problem indicates a bug in the software.",
 				camel_exception_get_description (apriv->ex));
@@ -190,7 +221,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		if (camel_exception_is_set (&ex))
 		{
 			g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
-				TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+				get_tny_error_code_for_camel_exception_id (&ex),
 				camel_exception_get_description (&ex));
 			g_static_rec_mutex_unlock (apriv->service_lock);
 			return;
@@ -211,7 +242,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		if (camel_exception_is_set (&ex))
 		{
 			g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
-				TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+				get_tny_error_code_for_camel_exception_id (&ex),
 				camel_exception_get_description (&ex));
 			camel_exception_clear (&ex);
 		} else 
@@ -227,7 +258,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	if (reperr && camel_exception_is_set (&ex))
 	{
 		g_set_error (err, TNY_TRANSPORT_ACCOUNT_ERROR, 
-			TNY_TRANSPORT_ACCOUNT_ERROR_SEND,
+			get_tny_error_code_for_camel_exception_id (&ex),
 			camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 	}

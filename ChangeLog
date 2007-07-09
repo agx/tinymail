@@ -1,3 +1,22 @@
+2007-07-09  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-enums.h:
+	* libtinymail/tny-error.c: (tny_error_get_type):
+	* libtinymail/tny-error.h:
+	Added TNY_TRANSPORT_ACCOUNT_ERROR_SEND_HOST_LOOKUP_FAILED, 
+	TNY_TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE, 
+	TNY_TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED
+	GError enum values.
+
+	* libtinymail-camel/tny-camel-transport-account.c:
+	Added get_tny_error_code_for_camel_exception_id(),
+	(tny_camel_transport_account_send_default): Provide a 
+	more specific GError code to the caller, so that this will 
+	be provided with the TnySendQueue "error-happened" signal.
+	(tny_camel_transport_account_try_connect): 
+	Use _tny_camel_account_get_tny_error_code_for_camel_exception_id() 
+	here to provide a more specific error code.
+
 2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improvement for tny_camel_mime_part_is_attachment_default
