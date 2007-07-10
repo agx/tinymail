@@ -2111,7 +2111,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	guint count, len;
 	unsigned char *ptrchr = s->filepos;
 	unsigned int i;
-	gchar *theuid;
+	gchar *theuid = NULL;
 
 	io(printf("Loading message info\n"));
 
