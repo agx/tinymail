@@ -215,7 +215,7 @@ static int rem_dir (const gchar *tmp)
 {
 	DIR *dir;
 	struct dirent *d;
-	int err;
+	int err = 0;
 
 	dir = opendir(tmp);
 	if (dir) {
