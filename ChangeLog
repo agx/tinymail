@@ -1,6 +1,8 @@
 2007-07-09  Javier Fernández García-Boente <jfernandez@igalia.com>
 	* Implements and emits msg-sending and msg-sent signals
 	when a message is just being sent and when is fully sent. 
+        * Add a notification about EXPUNGED header change in 
+	tny_camel_folder_remove_msg_default method.
 
 2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
