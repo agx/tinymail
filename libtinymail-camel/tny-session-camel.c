@@ -522,6 +522,8 @@ account_go_online (gpointer data)
 	g_slice_free (AccGoOnlineInfo, ainfo);
 	/* ainfo->info is freed in the background_connect_destroy */
 
+	priv->conthread = NULL;
+
 	g_thread_exit (NULL);
 	return NULL;
 }
