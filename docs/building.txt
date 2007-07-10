@@ -132,6 +132,10 @@ For debugging
 CFLAGS="-DDEBUG -DDBC -D_GNU_SOURCE -O0 -Wall -g -ggdb" PKG_CONFIG_PATH=/opt/asyncworker/lib/pkgconfig \
 	./autogen.sh --prefix=/opt/tinymail --enable-asyncworker --enable-tests --enable-unit-tests && make && sudo make install
 
+Other commonly used CFLAGS
+--------------------------
+CFLAGS="-DDEBUG -DDBC -O0 -g -ggdb"
+
 Typical for development
 -----------------------
 CFLAGS="-DDEBUG -DDBC -O0 -Wstrict-prototypes -Wall -g -ggdb" ./autogen.sh --prefix=/opt/tinymail --with-platform=maemo --with-ssl=openssl && make && make install
