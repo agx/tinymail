@@ -8,6 +8,7 @@
 
 	* Made the connecting of accounts more finegrained (once more)
 	* Introduced the required tny_session_camel_set_initialized API
+	* Preserving flags on POP
 
 	* This was a major change in behaviour when connecting and at
 	initialization
