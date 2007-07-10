@@ -433,7 +433,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		return;
 
 	if(pop3_store->delete_after && !expunge)
-	{	
+	{
 		camel_operation_start(NULL, _("Expunging old messages"));
 		camel_pop3_delete_old(folder, pop3_store->delete_after,ex);
 	}
@@ -543,10 +543,9 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 		else if (fi->uid)
 			message = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_PARTIAL, -1, ex);
 
-		time_t message_time = message->date + message->date_offset;
-
 		if (message) 
 		{
+		    time_t message_time = message->date + message->date_offset;
 		    double time_diff = difftime(temp,message_time);
 		    int day_lag = time_diff/(60*60*24);
 		    if (day_lag > days_to_delete)
@@ -557,11 +556,11 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 				    ;
 			    camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
 			    fi->cmd = NULL;
-		    	}
+			}
 
-		    	fi->cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", fi->id);
+			fi->cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", fi->id);
 			/* also remove from cache */
-		    	if (pop3_store->cache && fi->uid)
+			if (pop3_store->cache && fi->uid)
 			    camel_data_cache_remove(pop3_store->cache, "cache", fi->uid, NULL);
 		    }
 
@@ -760,6 +759,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelStream *stream = NULL;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
+	int old_flags = 0;
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
@@ -926,13 +926,18 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
-	if (mi) 
+	if (mi) {
+		old_flags = mi->flags;
 		camel_folder_summary_remove (summary, (CamelMessageInfo *) mi);
+	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
 	if (mi->uid)
 		g_free (mi->uid);
 	mi->uid = g_strdup (uid);
+
+	if (old_flags)
+		mi->flags = old_flags;
 
 	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 
@@ -960,6 +965,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	CamelStream *stream = NULL, *old;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi;
+	int old_flags = 0;
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
@@ -1072,14 +1078,19 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
-	if (mi) 
+	if (mi) {
+		old_flags = mi->flags;
 		camel_folder_summary_remove (summary, (CamelMessageInfo *) mi);
+	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
 
 	if (mi->uid)
 		g_free (mi->uid);
 	mi->uid = g_strdup(uid);
+
+	if (old_flags)
+		mi->flags = old_flags;
 
 	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 
