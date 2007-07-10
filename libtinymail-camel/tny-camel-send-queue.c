@@ -54,6 +54,14 @@ typedef struct {
 	gint i, total;
 } ErrorInfo;
 
+typedef struct {
+       TnySendQueue *self;
+       TnyMsg *msg;
+       TnyHeader *header;
+       gint i, total;
+       guint signal_id;
+} ControlInfo;
+
 static gboolean 
 emit_error_on_mainloop (gpointer data)
 {
@@ -100,6 +108,54 @@ emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, i
 
 	return;
 }
+
+
+static gboolean 
+emit_control_signals_on_mainloop (gpointer data)
+{
+       ControlInfo *info = data;
+       g_signal_emit (info->self, tny_send_queue_signals [info->signal_id], 
+		      0, info->header, info->msg, info->i, info->total);
+       return FALSE;
+}
+
+static void
+destroy_control_info (gpointer data)
+{
+       ControlInfo *info = data;
+
+       if (info->msg)
+               g_object_unref (G_OBJECT (info->msg));
+       if (info->header)
+               g_object_unref (G_OBJECT (info->header));
+       if (info->self)
+               g_object_unref (G_OBJECT (info->self));
+
+       g_slice_free (ControlInfo, info);
+}
+
+static void
+emit_control (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint signal_id, int i, int total)
+{
+       ControlInfo *info = g_slice_new0 (ControlInfo);
+
+       if (self)
+               info->self = TNY_SEND_QUEUE (g_object_ref (G_OBJECT (self)));
+       if (msg)
+               info->msg = TNY_MSG (g_object_ref (G_OBJECT (msg)));
+       if (header)
+               info->header = TNY_HEADER (g_object_ref (G_OBJECT (header)));
+
+       info->signal_id = signal_id;
+       info->i = i;
+       info->total = total;
+       
+       g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+			emit_control_signals_on_mainloop, info, destroy_control_info);
+
+       return;
+}
+
 
 static gpointer
 thread_main (gpointer data)
@@ -151,7 +207,7 @@ thread_main (gpointer data)
 
 	while (length > 0 && priv->do_continue)
 	{
-		TnyHeader *header;
+		TnyHeader *header = NULL;
 		TnyMsg *msg = NULL;
 
 		g_mutex_lock (priv->sending_lock);
@@ -229,9 +285,9 @@ thread_main (gpointer data)
 			tny_list_prepend (hassent, G_OBJECT (header));
 			msg = tny_folder_get_msg (outbox, header, &err);
 
-			/* hassent is owner now */
-			g_object_unref (G_OBJECT (header)); 
-
+			/* Emits msg-sending signal to inform a new msg is being sent */
+			emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENDING, i, priv->total);
+			
 			if (err == NULL) 
 			{
 				tny_transport_account_send (priv->trans_account, msg, &err);
@@ -267,7 +323,13 @@ thread_main (gpointer data)
 			if (err != NULL)
 				g_error_free (err);
 
-			i++;
+			/* Emits msg-sent signal to inform msg has been sent */
+			emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, i, priv->total);
+			
+			i++;			
+
+			/* hassent is owner now */
+			g_object_unref (G_OBJECT (header));
 		} else 
 		{
 			/* Not good, let's just kill this thread */ 

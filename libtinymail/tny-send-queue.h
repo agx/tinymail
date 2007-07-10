@@ -40,6 +40,7 @@ typedef struct _TnySendQueueIface TnySendQueueIface;
 
 enum _TnySendQueueSignal
 {
+	TNY_SEND_QUEUE_MSG_SENDING,
 	TNY_SEND_QUEUE_MSG_SENT,
 	TNY_SEND_QUEUE_ERROR_HAPPENED,
 	TNY_SEND_QUEUE_LAST_SIGNAL
@@ -53,7 +54,8 @@ struct _TnySendQueueIface
 	GTypeInterface parent;
 	
 	/* Signals */
-	void (*msg_sent) (TnySendQueue *self, TnyMsg *msg, gpointer user_data);
+	void (*msg_sending) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint nth, guint total);
+	void (*msg_sent) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint nth, guint total);
 	void (*error_happened) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *err, gpointer user_data);
 
 	/* methods */

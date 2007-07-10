@@ -1,3 +1,7 @@
+2007-07-09  Javier Fernández García-Boente <jfernandez@igalia.com>
+	* Implements and emits msg-sending and msg-sent signals
+	when a message is just being sent and when is fully sent. 
+
 2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Made the connecting of accounts more finegrained (once more)

@@ -140,8 +140,28 @@ tny_send_queue_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
-	if (!initialized) 
-	{
+	if (!initialized) {
+/**
+ * TnySendQueue::msg-sending
+ * @self: the object on which the signal is emitted
+ * @arg1: The message that is being 
+ * @arg2: The current nth number of the message that is being sending
+ * @arg3: The total amount of messages currently being processed
+ *
+ * API WARNING: This API might change
+ *
+ * Emitted when a message is being proccessed to sending it
+ **/
+		tny_send_queue_signals[TNY_SEND_QUEUE_MSG_SENDING] =
+			g_signal_new ("msg_sending",
+				      TNY_TYPE_SEND_QUEUE,
+				      G_SIGNAL_RUN_FIRST,
+				      G_STRUCT_OFFSET (TnySendQueueIface, msg_sending),
+				      NULL, NULL,
+				      tny_marshal_VOID__OBJECT_OBJECT_INT_INT,
+				      G_TYPE_NONE, 4, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_UINT, G_TYPE_UINT);
+		
+
 /**
  * TnySendQueue::msg-sent
  * @self: the object on which the signal is emitted
@@ -151,14 +171,14 @@ tny_send_queue_base_init (gpointer g_class)
  * Emitted when a message got sent
  **/
 		tny_send_queue_signals[TNY_SEND_QUEUE_MSG_SENT] =
-		   g_signal_new ("msg_sent",
-			TNY_TYPE_SEND_QUEUE,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnySendQueueIface, msg_sent),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_TYPE_MSG);
-
+			g_signal_new ("msg_sent",
+				      TNY_TYPE_SEND_QUEUE,
+				      G_SIGNAL_RUN_FIRST,
+				      G_STRUCT_OFFSET (TnySendQueueIface, msg_sent),
+				      NULL, NULL,
+				      tny_marshal_VOID__OBJECT_OBJECT_INT_INT,
+				      G_TYPE_NONE, 4, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_UINT, G_TYPE_UINT);
+		
 /**
  * TnySendQueue::error-happened
  * @self: the object on which the signal is emitted
@@ -171,14 +191,14 @@ tny_send_queue_base_init (gpointer g_class)
  * Emitted when a message didn't get sent because of an error
  **/
 		tny_send_queue_signals[TNY_SEND_QUEUE_ERROR_HAPPENED] =
-		   g_signal_new ("error_happened",
-			TNY_TYPE_SEND_QUEUE,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnySendQueueIface, error_happened),
-			NULL, NULL,
-			tny_marshal_VOID__OBJECT_OBJECT_POINTER,
-			G_TYPE_NONE, 3, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_POINTER);
-
+			g_signal_new ("error_happened",
+				      TNY_TYPE_SEND_QUEUE,
+				      G_SIGNAL_RUN_FIRST,
+				      G_STRUCT_OFFSET (TnySendQueueIface, error_happened),
+				      NULL, NULL,
+				      tny_marshal_VOID__OBJECT_OBJECT_POINTER,
+				      G_TYPE_NONE, 3, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_POINTER);
+		
 		initialized = TRUE;
 	}
 }
