@@ -3,6 +3,7 @@
 	* Added the tny_folder_get_local_size API
 	* Fixed the folder deletion of maildir folders
 	* Added the get_local_size implementation to TnyMergeFolder
+	* Implementing missing implementation of sync_async in TnyMergeFolder
 
 	* This was a major API change
 
