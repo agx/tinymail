@@ -327,8 +327,9 @@ load_accounts (TnyAccountStore *self)
 
 		if (mech)
 			g_free (mech);
-
 	}
+
+	tny_session_camel_set_initialized (priv->session);
 }
 
 static TnyAccount* 

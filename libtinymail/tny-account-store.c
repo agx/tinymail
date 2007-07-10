@@ -273,6 +273,10 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * register the created accounts with a #TnySessionCamel instance using the 
  * libtinymail-camel specific tny_session_camel_set_current_accounts API.
  *
+ * If you use the #TnySessionCamel to register accounts, you must after 
+ * registering your last initial account call the tny_session_camel_set_initialized
+ * API.
+ *
  * The implementation must fillup @list with available accounts. Note that if
  * you cache the list, you must add a reference to each account added to the
  * list (else they will be unreferenced and if the reference count would reach
@@ -339,6 +343,7 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *        tny_iterator_next (iter);
  *    }
  *    g_object_unref (G_OBJECT (iter));
+ *    tny_session_camel_set_initialized (session);
  * }
  * </programlisting></informalexample>
  **/

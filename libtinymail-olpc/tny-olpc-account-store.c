@@ -279,6 +279,8 @@ load_accounts (TnyAccountStore *self)
 		g_key_file_free (keyfile);
 	}
 	g_dir_close (dir);
+
+	tny_session_camel_set_initialized (priv->session);
 }
 
 static TnyAccount* 

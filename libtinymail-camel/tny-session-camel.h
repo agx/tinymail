@@ -54,6 +54,8 @@ void tny_session_camel_set_ui_locker (TnySessionCamel *self, TnyLockable *ui_loc
 void tny_session_camel_join_connecting (TnySessionCamel *self);
 void tny_session_camel_set_async_connecting (TnySessionCamel *self, gboolean enable);
 
+void tny_session_camel_set_initialized (TnySessionCamel *self);
+
 G_END_DECLS
 
 #endif

@@ -166,6 +166,7 @@ tny_gnome_device_is_online (TnyDevice *self)
 	return retval;
 }
 
+/* #define IMMEDIATE_ONLINE_TEST */
 
 static void
 tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -176,11 +177,18 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
+#ifdef IMMEDIATE_ONLINE_TEST
+	priv->fset = TRUE;
+	priv->forced = TRUE;
+#endif
+
 #ifdef GNOME
 	priv->invnm = FALSE;
 	priv->nm_ctx = libnm_glib_init ();
+#ifndef IMMEDIATE_ONLINE_TEST
 	priv->callback_id = libnm_glib_register_callback 
 		(priv->nm_ctx, nm_callback, self, NULL);
+#endif
 #endif
 
 	return;

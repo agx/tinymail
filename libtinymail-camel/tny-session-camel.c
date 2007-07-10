@@ -112,6 +112,14 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	}
 
 	if (cancel || retval == NULL) {
+
+		GError *err = NULL;
+
+		_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), FALSE, &err);
+
+		if (err)
+			g_error_free (err);
+
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 			_("You cancelled when you had to enter a password"));
 		retval = NULL;
@@ -374,6 +382,8 @@ tny_session_camel_init (TnySessionCamel *instance)
 	instance->priv = g_slice_new (TnySessionCamelPriv);
 	priv = instance->priv;
 
+	priv->initialized = FALSE;
+	priv->stop_now = FALSE;
 	priv->regged_queues = NULL;
 	priv->background_thread_running = FALSE;
 	priv->is_inuse = FALSE;
@@ -393,34 +403,6 @@ tny_session_camel_init (TnySessionCamel *instance)
 	return;
 }
 
-void 
-_tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
-{
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
-	TnySessionCamelPriv *priv = self->priv;
-
-	if (apriv->cache_location)
-		g_free (apriv->cache_location);
-	apriv->cache_location = g_strdup (priv->camel_dir);
-
-	priv->current_accounts = g_list_prepend (priv->current_accounts, account);
-}
-
-void 
-_tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account)
-{
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
-	TnySessionCamelPriv *priv = self->priv;
-
-	if (apriv->cache_location)
-		g_free (apriv->cache_location);
-	apriv->cache_location = NULL;
-
-	priv->current_accounts = g_list_remove (priv->current_accounts, account);
-
-	return;
-}
-
 typedef struct
 {
 	TnyDevice *device;
@@ -428,6 +410,39 @@ typedef struct
 	gpointer user_data;
 	TnySessionCamelPriv *priv;
 } BackgroundConnectInfo;
+
+static gboolean
+background_connect_idle (gpointer data)
+{
+	BackgroundConnectInfo *info = data;
+	TnySessionCamel *self = info->user_data;
+	TnySessionCamelPriv *priv = self->priv;
+
+	if (priv->account_store)
+	{
+		g_signal_emit (priv->account_store, 
+			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
+		g_signal_emit (priv->account_store,
+			tny_account_store_signals [TNY_ACCOUNT_STORE_CONNECTING_FINISHED], 0);
+	}
+
+	return FALSE;
+}
+
+
+
+static void
+background_connect_destroy (gpointer data)
+{
+	BackgroundConnectInfo *info = data;
+
+	g_object_unref (G_OBJECT (info->device));
+	g_slice_free (BackgroundConnectInfo, data);
+
+	return;
+}
+
+
 
 static void
 foreach_account_set_connectivity (gpointer data, gpointer udata)
@@ -454,7 +469,7 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 
 		apriv->is_connecting = TRUE;
 
-		_tny_camel_account_try_connect (account, info->online, &err);
+		_tny_camel_account_try_connect (account, FALSE /* info->online */, &err);
 
 		if (err == NULL)
 			_tny_camel_account_set_online (account, info->online, &err);
@@ -479,35 +494,108 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 	}
 }
 
+typedef struct {
+	BackgroundConnectInfo *info;
+	TnyCamelAccount *account;
+} AccGoOnlineInfo;
 
-static void
-background_connect_destroy (gpointer data)
+static gpointer
+account_go_online (gpointer data)
 {
-	BackgroundConnectInfo *info = data;
+	AccGoOnlineInfo *ainfo = (AccGoOnlineInfo *) data;
+	TnySessionCamel *self = ainfo->info->user_data;
+	TnySessionCamelPriv *priv = self->priv;
 
-	g_object_unref (G_OBJECT (info->device));
-	g_slice_free (BackgroundConnectInfo, data);
+	priv->is_connecting = TRUE;
+
+	foreach_account_set_connectivity (ainfo->account, ainfo->info);
+
+	priv->is_connecting = FALSE;
+
+	camel_object_unref (ainfo->info->user_data);
+	g_object_unref (ainfo->account);
+
+	g_idle_add_full (G_PRIORITY_HIGH, 
+		background_connect_idle, 
+		ainfo->info, background_connect_destroy);
+
+	g_slice_free (AccGoOnlineInfo, ainfo);
+	/* ainfo->info is freed in the background_connect_destroy */
+
+	g_thread_exit (NULL);
+	return NULL;
+}
+
+
+void 
+_tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+	TnySessionCamelPriv *priv = self->priv;
+	gboolean doit = FALSE;
+
+	if (priv->initialized)
+	{
+		g_mutex_lock (priv->conlock);
+		doit = (priv->conthread == NULL);
+		g_mutex_unlock (priv->conlock);
+	}
+
+	if (apriv->cache_location)
+		g_free (apriv->cache_location);
+	apriv->cache_location = g_strdup (priv->camel_dir);
+	priv->current_accounts = g_list_prepend (priv->current_accounts, account);
+
+	if (priv->initialized && !priv->background_thread_running && doit)
+	{
+		if (priv->device && TNY_IS_DEVICE (priv->device))
+		{
+			AccGoOnlineInfo *ainfo = g_slice_new (AccGoOnlineInfo);
+			ainfo->info = g_slice_new (BackgroundConnectInfo);
+
+			ainfo->info->online = tny_device_is_online (priv->device);
+			ainfo->info->as_thread = TRUE;
+			ainfo->info->priv = priv;
+
+			ainfo->info->device = g_object_ref (priv->device);
+			camel_object_ref (self);
+			ainfo->info->user_data = self;
+			ainfo->account = TNY_CAMEL_ACCOUNT (g_object_ref (account));
+
+			camel_session_set_online ((CamelSession *) self, TRUE); 
+
+			if (priv->account_store)
+			{
+				g_signal_emit (priv->account_store,
+					tny_account_store_signals [TNY_ACCOUNT_STORE_CONNECTING_STARTED], 0);
+			}
+
+			g_mutex_lock (priv->conlock);
+			if (priv->conthread)
+				g_thread_join (priv->conthread);
+			priv->conthread = g_thread_create (account_go_online, ainfo, TRUE, NULL);
+			g_mutex_unlock (priv->conlock);
+		}
+	}
+}
+
+void 
+_tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+	TnySessionCamelPriv *priv = self->priv;
+
+	if (apriv->cache_location)
+		g_free (apriv->cache_location);
+	apriv->cache_location = NULL;
+
+	priv->current_accounts = g_list_remove (priv->current_accounts, account);
 
 	return;
 }
 
-static gboolean
-background_connect_idle (gpointer data)
-{
-	BackgroundConnectInfo *info = data;
-	TnySessionCamel *self = info->user_data;
-	TnySessionCamelPriv *priv = self->priv;
 
-	if (priv->account_store)
-	{
-		g_signal_emit (priv->account_store, 
-			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
-		g_signal_emit (priv->account_store,
-			tny_account_store_signals [TNY_ACCOUNT_STORE_CONNECTING_FINISHED], 0);
-	}
 
-	return FALSE;
-}
 
 static gpointer 
 background_connect_thread (gpointer data)
@@ -523,17 +611,26 @@ background_connect_thread (gpointer data)
 
 	priv->background_thread_running = TRUE;
 
-	g_mutex_lock (priv->queue_lock);
-	/*g_list_foreach (priv->regged_queues, (GFunc) 
-		tny_camel_send_queue_join_worker, NULL);*/
-	g_mutex_unlock (priv->queue_lock);
+	if (priv->stop_now) 
+		goto stop_now;
 
 	priv->is_connecting = TRUE;
 
-	if (priv->current_accounts && priv->prev_constat != info->online && priv->account_store) {
-		g_list_foreach (priv->current_accounts, 
-			foreach_account_set_connectivity, info);
+	if (priv->current_accounts && priv->prev_constat != info->online && priv->account_store) 
+	{
+		GList *copy = priv->current_accounts;
+		while (copy)
+		{
+			if (priv->stop_now) 
+				goto stop_now;
+			foreach_account_set_connectivity (copy->data, info);
+			if (priv->stop_now) 
+				goto stop_now;
+			copy = g_list_next (copy);
+		}
 	}
+
+stop_now:
 
 	priv->is_connecting = FALSE;
 
@@ -543,20 +640,21 @@ background_connect_thread (gpointer data)
 
 	priv->prev_constat = info->online;
 
-	g_mutex_lock (priv->conlock);
 	priv->conthread = NULL;
-	g_mutex_unlock (priv->conlock);
-
 	priv->background_thread_running = FALSE;
+
+	priv->stop_now = FALSE;
 
 	g_thread_exit (NULL);
 	return NULL;
 }
 
 static gboolean
-delayed_background_connect_thread (gpointer data)
+do_background_connect_thread (gpointer data)
 {
 	BackgroundConnectInfo *info = data;
+	TnySessionCamel *self = info->user_data;
+	TnySessionCamelPriv *priv = self->priv;
 
 	g_mutex_lock (info->priv->conlock);
 	info->priv->conthread = g_thread_create (background_connect_thread, data, TRUE, NULL);
@@ -566,7 +664,7 @@ delayed_background_connect_thread (gpointer data)
 }
 
 static void
-connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
+tny_session_camel_connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 {
 	TnySessionCamel *self = user_data;
 	TnySessionCamelPriv *priv = self->priv;
@@ -592,15 +690,18 @@ connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
 	}
 
 
-	if (priv->async_connect) {
+	if (priv->async_connect) 
+	{
+		gboolean doit = FALSE;
+
 		info->as_thread = TRUE;
 
 		g_mutex_lock (priv->conlock);
-		if (priv->conthread)
-			g_timeout_add (5000, delayed_background_connect_thread, info); 
-		else
-			priv->conthread = g_thread_create (background_connect_thread, info, TRUE, NULL);
+		doit = (priv->conthread == NULL);
 		g_mutex_unlock (priv->conlock);
+
+		if (doit)
+			do_background_connect_thread (info);
 
 	} else {
 		info->as_thread = FALSE;
@@ -627,28 +728,39 @@ tny_session_camel_join_connecting (TnySessionCamel *self)
 	g_mutex_unlock (priv->conlock);
 }
 
-/*
-static gboolean
-emit_accounts_reloaded (gpointer user_data)
+/**
+ * tny_session_camel_set_initialized:
+ * @self: the #TnySessionCamel instance
+ *
+ * This method must be called one the initial accounts are created in your
+ * #TnyAccountStore implementation.
+ **/
+void 
+tny_session_camel_set_initialized (TnySessionCamel *self)
 {
-	g_signal_emit (G_OBJECT (user_data),
-		tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
-	return FALSE;
-}
-*/
-
-static gboolean
-after_one_second (gpointer data)
-{
-	TnySessionCamel *self = data;
 	TnySessionCamelPriv *priv = self->priv;
+	TnyDevice *device = NULL;
 
-	if (priv->device && TNY_IS_DEVICE (priv->device) && tny_device_is_online (priv->device))
-		connection_changed (priv->device, TRUE, self);
+	if (priv->initialized)
+		return;
 
-	camel_object_unref (self);
+	device = priv->device;
 
-	return FALSE;
+	if (!device || !TNY_IS_DEVICE (device))
+	{
+		g_critical ("Please use tny_session_camel_set_device "
+			"before tny_session_camel_set_initialized");
+		return;
+	}
+
+	priv->initialized = TRUE;
+
+	priv->connchanged_signal = g_signal_connect (
+		G_OBJECT (device), "connection_changed",
+		G_CALLBACK (tny_session_camel_connection_changed), self);
+
+	tny_session_camel_connection_changed (device, 
+		tny_device_is_online (device), self);
 }
 
 /**
@@ -672,19 +784,6 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 	}
 
 	priv->device = device;
-	priv->connchanged_signal = g_signal_connect (
-			G_OBJECT (device), "connection_changed",
-			G_CALLBACK (connection_changed), self);
-
-	if (tny_device_is_online (device) == FALSE)
-	{
-		priv->prev_constat = TRUE;
-		connection_changed (device, FALSE, self);
-	} else {
-		priv->prev_constat = FALSE;
-		camel_object_ref (self);
-		g_timeout_add (5000, after_one_second, self);
-	}
 
 	return;
 }

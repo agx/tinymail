@@ -147,10 +147,10 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 		if (camel_exception_is_set (&ex))
 			camel_exception_clear (&ex);
 
-		camel_service_connect (apriv->service, &ex);
+		camel_service_connect (apriv->service, apriv->ex);
 		if (apriv->service->reconnection)
 		{
-			if (!camel_exception_is_set (&ex))
+			if (!camel_exception_is_set (apriv->ex))
 				apriv->service->reconnection (apriv->service, TRUE, apriv->service->data);
 			else
 				apriv->service->reconnection (apriv->service, FALSE, apriv->service->data);
