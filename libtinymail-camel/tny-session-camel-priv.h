@@ -21,7 +21,8 @@ struct _TnySessionCamelPriv
 	GList *regged_queues;
 };
 
-void _tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account);
+void _tny_session_camel_add_account_1 (TnySessionCamel *self, TnyCamelAccount *account);
+void _tny_session_camel_add_account_2 (TnySessionCamel *self, TnyCamelAccount *account);
 void _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account);
 void _tny_session_camel_reg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue);
 void _tny_session_camel_unreg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue);

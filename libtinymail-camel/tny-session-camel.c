@@ -530,7 +530,19 @@ account_go_online (gpointer data)
 
 
 void 
-_tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
+_tny_session_camel_add_account_1 (TnySessionCamel *self, TnyCamelAccount *account)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+	TnySessionCamelPriv *priv = self->priv;
+
+	if (apriv->cache_location)
+		g_free (apriv->cache_location);
+	apriv->cache_location = g_strdup (priv->camel_dir);
+	priv->current_accounts = g_list_prepend (priv->current_accounts, account);
+}
+
+void
+_tny_session_camel_add_account_2 (TnySessionCamel *self, TnyCamelAccount *account)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
 	TnySessionCamelPriv *priv = self->priv;
@@ -542,11 +554,6 @@ _tny_session_camel_add_account (TnySessionCamel *self, TnyCamelAccount *account)
 		doit = (priv->conthread == NULL);
 		g_mutex_unlock (priv->conlock);
 	}
-
-	if (apriv->cache_location)
-		g_free (apriv->cache_location);
-	apriv->cache_location = g_strdup (priv->camel_dir);
-	priv->current_accounts = g_list_prepend (priv->current_accounts, account);
 
 	if (priv->initialized && !priv->background_thread_running && doit)
 	{

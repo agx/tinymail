@@ -670,7 +670,7 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
 	camel_object_ref (session);
 	priv->session = session;
 
-	_tny_session_camel_add_account (session, self);
+	_tny_session_camel_add_account_1 (session, self);
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, FALSE, FALSE);
 
@@ -858,6 +858,9 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
 		reconf_if, TRUE);
+
+	if (priv->session)
+		_tny_session_camel_add_account_2 (priv->session, TNY_CAMEL_ACCOUNT (self));
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
