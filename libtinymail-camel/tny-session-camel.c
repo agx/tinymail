@@ -168,11 +168,11 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 }
 
 static gboolean
-tny_session_camel_do_an_error (TnySessionCamel *self, TnyAlertType tnytype, gboolean question, GError *err)
+tny_session_camel_do_an_error (TnySessionCamel *self, TnyAccount *account, TnyAlertType tnytype, gboolean question, GError *err)
 {
 	return tny_account_store_alert (
 		(TnyAccountStore*) self->priv->account_store, 
-		tnytype, question, (const GError *) err);
+		account, tnytype, question, (const GError *) err);
 }
 
 /* tny_session_camel_alert_user will for example be called by camel when SSL is on and 
@@ -182,12 +182,16 @@ tny_session_camel_do_an_error (TnySessionCamel *self, TnyAlertType tnytype, gboo
    is a known issue (and if someone fixes this, please remove this warning) */
 
 static gboolean
-tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, CamelException *ex, gboolean cancel)
+tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, CamelException *ex, gboolean cancel, CamelService *service)
 {
 	TnySessionCamel *self = (TnySessionCamel *)session;
 	TnySessionCamelPriv *priv = self->priv;
 	gboolean retval = FALSE;
 	GError *err = NULL;
+
+	TnyAccount *account = NULL;
+	if (service && service->data)
+		account = TNY_ACCOUNT (service->data);
 
 	if (priv->account_store)
 	{
@@ -218,7 +222,8 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 
 		tny_lockable_lock (self->priv->ui_lock);
 
-		retval = tny_session_camel_do_an_error (self, tnytype, TRUE, err);
+		TnyAccount *account = NULL; /* TODO. */
+		retval = tny_session_camel_do_an_error (self, account, tnytype, TRUE, err);
 
 		tny_lockable_unlock (self->priv->ui_lock);
 
@@ -429,28 +434,30 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 {
 	BackgroundConnectInfo *info = udata;
 	TnySessionCamel *self = info->user_data;
-
+	
 	if (data && TNY_IS_CAMEL_ACCOUNT (data))
 	{
+		TnyCamelAccount *account = TNY_CAMEL_ACCOUNT (data);
+		
 		GError *err = NULL;
 		TnyCamelAccountPriv *apriv = NULL;
 
 		/* We don't go online on transport accounts, yet */
-		if (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (data))
+		if (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (account))
 		{
-			g_signal_emit (TNY_CAMEL_ACCOUNT (data), 
+			g_signal_emit (account, 
 				tny_camel_account_signals [TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED], 0, info->online);
 			return;
 		}
 
-		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (data);
+		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
 
 		apriv->is_connecting = TRUE;
 
-		_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (data), info->online, &err);
+		_tny_camel_account_try_connect (account, info->online, &err);
 
 		if (err == NULL)
-			_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (data), info->online, &err);
+			_tny_camel_account_set_online (account, info->online, &err);
 
 		if (err != NULL) 
 		{
@@ -459,7 +466,7 @@ foreach_account_set_connectivity (gpointer data, gpointer udata)
 				if (info->as_thread)
 					tny_lockable_lock (self->priv->ui_lock);
 
-				tny_session_camel_do_an_error (self, TNY_ALERT_TYPE_ERROR, FALSE, err);
+				tny_session_camel_do_an_error (self, TNY_ACCOUNT (account), TNY_ALERT_TYPE_ERROR, FALSE, err);
 
 				if (info->as_thread)
 					tny_lockable_unlock (self->priv->ui_lock);

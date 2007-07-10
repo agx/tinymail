@@ -96,7 +96,8 @@ typedef struct {
 	gboolean        (*alert_user)        (CamelSession *session,
 					      CamelSessionAlertType type,
 					      CamelException *ex,
-					      gboolean cancel);
+					      gboolean cancel,
+					      CamelService *service);
 
 	CamelFilterDriver * (*get_filter_driver) (CamelSession *session,
 						  const char *type,
@@ -153,16 +154,19 @@ void               camel_session_forget_password    (CamelSession *session,
 gboolean           camel_session_alert_user         (CamelSession *session,
 						     CamelSessionAlertType type,
 						     CamelException *ex,
-						     gboolean cancel);
+						     gboolean cancel,
+						     CamelService *service);
 gboolean           camel_session_alert_user_generic (CamelSession *session,
 						     CamelSessionAlertType type,
 						     const gchar* message,
-						     gboolean cancel);
+						     gboolean cancel,
+						     CamelService *service);
 gboolean           camel_session_alert_user_with_id (CamelSession *session,
 						     CamelSessionAlertType type,
 						     ExceptionId id,
 						     const gchar* message,
-						     gboolean cancel);
+						     gboolean cancel,
+						     CamelService *service);
 
 gboolean           camel_session_is_online          (CamelSession *session);
 void               camel_session_set_online         (CamelSession *session,

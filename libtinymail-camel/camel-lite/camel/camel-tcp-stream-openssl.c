@@ -860,7 +860,9 @@ ssl_verify (int ok, X509_STORE_CTX *ctx)
 				    "Do you wish to accept anyway?"), 
 				    cert_str, x509_strerror (err));
 	
-	ok = camel_session_alert_user_with_id (session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE);
+	CamelService *service = NULL; /* TODO: Is there a CamelService that we can use? */
+	ok = camel_session_alert_user_with_id (session, CAMEL_SESSION_ALERT_WARNING, 
+		CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE, service);
 	g_free (prompt);
 	
 	if (ok && ccert) {

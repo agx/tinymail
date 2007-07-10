@@ -76,7 +76,7 @@ struct _TnyAccountStoreIface {
 	void (*get_accounts_func) (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types);
 	const gchar* (*get_cache_dir_func) (TnyAccountStore *self);
 	TnyDevice* (*get_device_func) (TnyAccountStore *self);
-	gboolean (*alert_func) (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error);
+	gboolean (*alert_func) (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, const GError *error);
 	TnyAccount* (*find_account_func) (TnyAccountStore *self, const gchar *url_string);
 
 	/* Signals */
@@ -96,7 +96,7 @@ GType tny_alert_type_get_type (void);
 void tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types);
 const gchar*  tny_account_store_get_cache_dir (TnyAccountStore *self);
 TnyDevice* tny_account_store_get_device (TnyAccountStore *self);
-gboolean tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error);
+gboolean tny_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, const GError *error);
 TnyAccount* tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string);
 
 G_END_DECLS

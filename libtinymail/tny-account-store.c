@@ -79,6 +79,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 /**
  * tny_account_store_alert:
  * @self: a #TnyAccountStore object
+ * @account: The account (This is NULL sometimes for some current implementations).
  * @type: the message type (severity)
  * @question: whether or not this is a question
  * @error: A GError, of domain TNY_ACCOUNT_ERROR or TNY_ACCOUNT_STORE_ERROR, 
@@ -107,7 +108,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * Example implementation for GTK+:
  * <informalexample><programlisting>
  * static gboolean
- * tny_gnome_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError *error)
+ * tny_gnome_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, const GError *error)
  * {
  *     GtkMessageType gtktype;
  *     GtkWidget *dialog;
@@ -150,7 +151,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
  **/
 gboolean 
-tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error)
+tny_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, const GError *error)
 {
 	gboolean retval;
 
@@ -159,7 +160,7 @@ tny_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean ques
 	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, type, question, error);
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, account, type, question, error);
 
 #ifdef DBC /* ensure */
 #endif

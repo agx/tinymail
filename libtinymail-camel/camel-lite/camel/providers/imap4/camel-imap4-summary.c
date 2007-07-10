@@ -750,8 +750,9 @@ courier_imap_is_a_piece_of_shit (CamelFolderSummary *summary, guint32 msg)
 				   "Hint: If your IMAP server is Courier-IMAP, it is likely that this "
 				   "message is simply unreadable by the IMAP server and will need "
 				   "to be given read permissions.", msg);
-	
-	camel_session_alert_user_generic (session, CAMEL_SESSION_ALERT_WARNING, warning, FALSE);
+
+	CamelService *service = NULL; /* TODO: Is there a CamelService that we can use? */
+	camel_session_alert_user_generic (session, CAMEL_SESSION_ALERT_WARNING, warning, FALSE, service);
 	g_free (warning);
 }
 

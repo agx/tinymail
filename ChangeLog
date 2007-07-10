@@ -1,3 +1,47 @@
+2007-07-10  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail/tny-account-store.h: alert_func vfunc:
+	* libtinymail/tny-account-store.c: (tny_account_store_alert):
+	* libtinymail-acap/tny-acap-account-store.c:
+	(tny_acap_account_store_alert):
+	* libtinymail-camel/tny-session-camel.c:
+	(tny_session_camel_do_an_error), (tny_session_camel_alert_user),
+	(foreach_account_set_connectivity):
+	* libtinymail-gnome-desktop/tny-gnome-account-store.c:
+	(tny_gnome_account_store_alert):
+	* libtinymail-gpe/tny-gpe-account-store.c:
+	(tny_gpe_account_store_alert):
+	* libtinymail-maemo/tny-maemo-account-store.c:
+	(tny_maemo_account_store_alert):
+	* libtinymail-olpc/tny-olpc-account-store.c:
+	(tny_olpc_account_store_alert):
+	* tests/shared/account-store.c: (tny_test_account_store_alert):
+	Add a TnyAcccount* parameter to the alert_func vfunc, so that 
+	applications an show information about the account (and server) 
+	that failed. This is documented as sometimes being NULL for current 
+	implementations (see the *ssl.c comment below).
+
+	* camel/camel-session.h:
+	* camel/camel-session.c: (camel_session_alert_user),
+	(camel_session_alert_user_with_id),
+	(camel_session_alert_user_generic): Added a CamelService* 
+	paramteter to these functions. For tinymail, this allows us to use 
+	CamelService::data to get the TnyAccount*. 
+	* camel/camel-disco-diary.c: (camel_disco_diary_log),
+	(diary_decode_folder):
+	* camel/providers/imap/camel-imap-command.c:
+	(camel_imap_command_response), (camel_imap_command_response_idle):
+	* camel/providers/imap4/camel-imap4-engine.c:
+	(camel_imap4_engine_parse_resp_code):
+	* camel/providers/imap4/camel-imap4-summary.c:
+	(courier_imap_is_a_piece_of_shit):
+	* camel/providers/smtp/camel-smtp-transport.c: (smtp_connect):
+	Pass the CamelService::data to camel_session_alert_user*().
+	* camel/camel-tcp-stream-openssl.c: (ssl_verify):
+	* camel/camel-tcp-stream-ssl.c: (ssl_bad_cert): Pass NULL for 
+	service_user_data because I cannot see a suitable CamelService. 
+	See the TODOs.
+
 2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added the tny_folder_get_local_size API

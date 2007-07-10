@@ -506,7 +506,7 @@ smtp_connect (CamelService *service, CamelException *ex)
 					      service->url->host, service->url->authmech);
 
 			camel_session_alert_user (session, CAMEL_SESSION_ALERT_ERROR, 
-				ex, FALSE);
+				ex, FALSE, service->data);
 
 			camel_service_disconnect (service, TRUE, NULL);
 			return FALSE;

@@ -65,7 +65,7 @@ per_account_forget_pass_func (TnyAccount *account)
 
 
 static gboolean
-tny_test_account_store_alert (TnyAccountStore *self, TnyAlertType type, gboolean question, const GError *error)
+tny_test_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, const GError *error)
 {
 	return TRUE;
 }

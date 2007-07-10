@@ -1030,7 +1030,8 @@ camel_imap4_engine_parse_resp_code (CamelIMAP4Engine *engine, CamelException *ex
 		if (camel_imap4_engine_line (engine, &linebuf, &len, ex) == -1)
 			goto exception;
 		
-		camel_session_alert_user_generic (engine->session, CAMEL_SESSION_ALERT_INFO, linebuf, FALSE);
+		CamelService *service = NULL; /* TODO: Is there a CamelService that we can use? */
+		camel_session_alert_user_generic (engine->session, CAMEL_SESSION_ALERT_INFO, linebuf, FALSE, service );
 		g_free (linebuf);
 	} else if (resp != NULL && code == CAMEL_IMAP4_RESP_CODE_PARSE) {
 		if (camel_imap4_engine_line (engine, &linebuf, &len, ex) == -1)

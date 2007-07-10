@@ -414,6 +414,7 @@ camel_session_forget_password (CamelSession *session, CamelService *service,
  * @ex: A CamelException, indicating a message for the user
  * @cancel: whether or not to provide a "Cancel" option in addition to
  * an "OK" option.
+ * @service: The CamelService.
  *
  * Presents an appropriate prompt to the user, in the style indicated by
  * @type. If @cancel is %TRUE, the user will be able to accept or
@@ -423,12 +424,12 @@ camel_session_forget_password (CamelSession *session, CamelService *service,
  */
 gboolean
 camel_session_alert_user (CamelSession *session, CamelSessionAlertType type,
-			  CamelException *ex, gboolean cancel)
+			  CamelException *ex, gboolean cancel, CamelService *service)
 {
 	g_return_val_if_fail (CAMEL_IS_SESSION (session), FALSE);
 	g_return_val_if_fail (ex, FALSE);
 
-	return CS_CLASS (session)->alert_user (session, type, ex, cancel);
+	return CS_CLASS (session)->alert_user (session, type, ex, cancel, service);
 }
 
 /**
@@ -440,13 +441,13 @@ camel_session_alert_user (CamelSession *session, CamelSessionAlertType type,
  */
 gboolean
 camel_session_alert_user_with_id (CamelSession *session, CamelSessionAlertType type,
-			  ExceptionId id, const gchar* message, gboolean cancel)
+			  ExceptionId id, const gchar* message, gboolean cancel, CamelService *service)
 {
 	g_return_val_if_fail (message, FALSE);
 
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	camel_exception_set (&ex, id, message);
-	gboolean result = camel_session_alert_user (session, type, &ex, cancel);
+	gboolean result = camel_session_alert_user (session, type, &ex, cancel, service);
 	camel_exception_clear (&ex);
 	return result;
 }
@@ -461,10 +462,10 @@ camel_session_alert_user_with_id (CamelSession *session, CamelSessionAlertType t
  */
 gboolean
 camel_session_alert_user_generic (CamelSession *session, CamelSessionAlertType type,
-			  const gchar* message, gboolean cancel)
+			  const gchar* message, gboolean cancel, CamelService *service)
 {
 	return camel_session_alert_user_with_id (session, type, 
-		CAMEL_EXCEPTION_SYSTEM, message, cancel);
+		CAMEL_EXCEPTION_SYSTEM, message, cancel, service);
 }
 
 

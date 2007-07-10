@@ -47,10 +47,10 @@ struct _TnyAcapAccountStorePriv
 
 
 static gboolean
-tny_acap_account_store_alert (TnyAccountStore *self, TnyAlertType type, const GError *error)
+tny_acap_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, const GError *error)
 {
 	TnyAcapAccountStorePriv *priv = TNY_ACAP_ACCOUNT_STORE_GET_PRIVATE (self);
-	return tny_account_store_alert (priv->real, type, error);
+	return tny_account_store_alert (priv->real, account, type, error);
 }
 
 
