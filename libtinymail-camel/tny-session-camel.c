@@ -658,9 +658,9 @@ do_background_connect_thread (gpointer data)
 	TnySessionCamel *self = info->user_data;
 	TnySessionCamelPriv *priv = self->priv;
 
-	g_mutex_lock (info->priv->conlock);
+	/* g_mutex_lock (info->priv->conlock); */
 	info->priv->conthread = g_thread_create (background_connect_thread, data, TRUE, NULL);
-	g_mutex_unlock (info->priv->conlock);
+	/* g_mutex_unlock (info->priv->conlock); */
 
 	return FALSE;
 }
@@ -698,11 +698,7 @@ tny_session_camel_connection_changed (TnyDevice *device, gboolean online, gpoint
 
 		info->as_thread = TRUE;
 
-		g_mutex_lock (priv->conlock);
-		doit = (priv->conthread == NULL);
-		g_mutex_unlock (priv->conlock);
-
-		if (doit)
+		if (!priv->conthread)
 			do_background_connect_thread (info);
 
 	} else {
