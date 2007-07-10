@@ -478,6 +478,33 @@ tny_merge_folder_get_unread_count (TnyFolder *self)
 	return total;
 }
 
+
+static guint
+tny_merge_folder_get_local_size (TnyFolder *self)
+{
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+	guint total = 0;
+
+	g_static_rec_mutex_lock (priv->lock);
+
+	iter = tny_list_create_iterator (priv->mothers);
+
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+		total += tny_folder_get_local_size (cur);
+		g_object_unref (cur);
+		tny_iterator_next (iter);
+	}
+
+	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
+
+	return total;
+}
+
 static gboolean
 tny_merge_folder_is_subscribed (TnyFolder *self)
 {
@@ -1153,6 +1180,7 @@ tny_folder_init (TnyFolderIface *klass)
 	klass->get_folder_type_func = tny_merge_folder_get_folder_type;
 	klass->get_all_count_func = tny_merge_folder_get_all_count;
 	klass->get_unread_count_func = tny_merge_folder_get_unread_count;
+	klass->get_local_size_func = tny_merge_folder_get_local_size;
 	klass->is_subscribed_func = tny_merge_folder_is_subscribed;
 	klass->refresh_async_func = tny_merge_folder_refresh_async;
 	klass->refresh_func = tny_merge_folder_refresh;

@@ -1,6 +1,8 @@
 2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added the tny_folder_get_local_size API
+	* Fixed the folder deletion of maildir folders
+	* Added the get_local_size implementation to TnyMergeFolder
 
 	* This was a major API change
 
