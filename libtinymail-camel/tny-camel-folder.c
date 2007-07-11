@@ -3415,7 +3415,10 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 	g_mutex_lock (priv->reason_lock);
 	priv->reason_to_live--;
 
-printf ("UNR (%s) : %d\n", priv->folder_name, priv->reason_to_live);
+#ifdef DEBUG
+	g_print ("_tny_camel_folder_unreason (%s) : %d\n", 
+		priv->folder_name, priv->reason_to_live);
+#endif
 
 	if (priv->reason_to_live == 0) 
 	{
