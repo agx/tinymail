@@ -313,7 +313,9 @@ static int xrename(const char *oldp, const char *newp, const char *prefix, const
 	int ret = -1;
 	int err = 0;
 
-	d(printf("renaming %s%s to %s%s\n", oldp, suffix, newp, suffix));
+#ifdef DEBUG
+	g_print ("local renaming %s%s to %s%s\n", oldp, suffix, newp, suffix);
+#endif
 
 	if (g_stat(old, &st) == -1) {
 		if (missingok && errno == ENOENT) {
