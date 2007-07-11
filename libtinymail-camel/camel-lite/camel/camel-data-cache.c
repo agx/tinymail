@@ -330,11 +330,11 @@ data_cache_path(CamelDataCache *cdc, int create, const char *path, const char *k
 	sprintf(dir, "%s/%s/%02x", cdc->path, path, hash);
 	
 #ifdef G_OS_WIN32 
-	if (g_access(dir, F_OK) == -1) {
+	if (dir && g_access(dir, F_OK) == -1) {
 #else
-	if (access (dir, F_OK) == -1) {
+	if (dir && access (dir, F_OK) == -1) {
 #endif
-		if (create)
+		if (create && dir)
 			g_mkdir_with_parents (dir, 0700);
 	} else if (cdc->priv->expire_inc == hash
 		   && (cdc->expire_age != -1 || cdc->expire_access != -1)) {

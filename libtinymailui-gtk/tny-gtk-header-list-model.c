@@ -814,6 +814,16 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
+#ifdef DEBUG
+static void forea (gpointer u, gpointer o)
+{
+	g_print ("TnyGtkHeaderListModel::finalize unrefs hdr to: %d\n", ((GObject *)u)->ref_count);
+	if (((GObject *)u)->ref_count != 1)
+		printf ("ps. Usually, this should be 1 here\n");
+	g_object_unref (u);
+}
+#endif
+
 
 static void
 tny_gtk_header_list_model_finalize (GObject *object)
@@ -823,6 +833,10 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
 
+#ifdef DEBUG
+	g_print ("tny_gtk_header_list_model_finalize\n");
+#endif
+
 	if (priv->add_timeout > 0) {
 		g_source_remove (priv->add_timeout);
 		priv->add_timeout = 0;
@@ -830,7 +844,12 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	remove_del_timeouts (self);
 
+#ifdef DEBUG
+	g_ptr_array_foreach (priv->items, (GFunc) forea, NULL);
+#else
 	g_ptr_array_foreach (priv->items, (GFunc) g_object_unref, NULL);
+#endif
+
 	if (priv->folder)
 		g_object_unref (priv->folder);
 	g_ptr_array_free (priv->items, TRUE);

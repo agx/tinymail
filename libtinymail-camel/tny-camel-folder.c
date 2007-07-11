@@ -3415,6 +3415,8 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 	g_mutex_lock (priv->reason_lock);
 	priv->reason_to_live--;
 
+printf ("UNR (%s) : %d\n", priv->folder_name, priv->reason_to_live);
+
 	if (priv->reason_to_live == 0) 
 	{
 		/* The special case is for when the amount of items is ZERO
@@ -4501,6 +4503,12 @@ tny_camel_folder_finalize (GObject *object)
 	TnyCamelFolder *self = (TnyCamelFolder*) object;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+#ifdef DEBUG
+	g_print ("Finalizing TnyCamelFolder: %s\n", priv->folder_name?priv->folder_name:"(cleared)");
+	if (priv->reason_to_live != 0)
+		g_print ("Finalizing TnyCamelFolder, yet TnyHeader instances "
+		"are still alive: %d\n", priv->reason_to_live);
+#endif
 
 	/* Commented because they should not be really needed but some
 	   times they're causing locking problems. TODO: review the
