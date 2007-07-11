@@ -1,3 +1,10 @@
+2007-07-11  Armin Burgmeier  <armin@openismus.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	* libtinymail-camel/tny-camel-store-account.c: Recreate folder list
+	after a new folder has been created so that subsequent calls to
+	_get_folder() contain the newly created folder.
+
 2007-07-11 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	* Don't set subject to 'No Subject' if it's empty
 	(camel-mime-message.c)

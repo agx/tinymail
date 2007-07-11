@@ -86,4 +86,6 @@ Javier Fernandez <jfernandez@igalia.com>
 	* Transfering of messages
 	* Unread and total count of folders
 
-	
+Armin Burgmeier <armin@openismus.com>
+
+	* Various bug fixes regarding folder handling

@@ -805,6 +805,7 @@ static TnyFolder*
 tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar *name, GError **err)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	TnyFolder *folder; CamelFolderInfo *info; CamelStore *store;
 	TnyFolderStoreChange *change;
@@ -879,6 +880,10 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	folder = _tny_camel_folder_new ();
 	_tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
+
+	/* So that the next call to get_folders() includes the newly-created
+	 * folder. */
+	priv->cant_reuse_iter = TRUE;
 
 	change = tny_folder_store_change_new (self);
 	tny_folder_store_change_add_created_folder (change, folder);
