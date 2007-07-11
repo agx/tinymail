@@ -640,7 +640,7 @@ write_to_stream (CamelDataWrapper *data_wrapper, CamelStream *stream)
 		camel_mime_message_set_date (mm, CAMEL_MESSAGE_DATE_CURRENT, 0);
 	
 	if (mm->subject == NULL)
-		camel_mime_message_set_subject (mm, "No Subject");
+		camel_mime_message_set_subject (mm, ""); /* set it to empty */
 	
 	if (mm->message_id == NULL)
 		camel_mime_message_set_message_id (mm, NULL);

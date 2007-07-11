@@ -1,3 +1,7 @@
+2007-07-11 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+	* Don't set subject to 'No Subject' if it's empty
+	(camel-mime-message.c)
+
 2007-07-09  Javier Fernández García-Boente <jfernandez@igalia.com>
 	* Implements and emits msg-sending and msg-sent signals
 	when a message is just being sent and when is fully sent. 
