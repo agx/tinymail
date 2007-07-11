@@ -29,6 +29,19 @@ Description: memory-effective framework for accessing e-mail - development files
  .
  This package contains the development files.
 
+Package: libtinymail-1.0-0-dbg
+Architecture: all
+Depends: libtinymail-1.0-0 (=${Source-Version})
+Description: memory-effective framework for accessing e-mail - debug symbol files
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the debug symbol files.
+
+
 Package: libtinymail-camel-1.0-0
 Architecture: any
 Depends: ${shlibs:Depends}
@@ -54,6 +67,18 @@ Description: memory-effective framework for accessing e-mail - development files
  .
  This package contains the development files for camel-lite.
 
+Package: libtinymail-camel-1.0-0-dbg
+Architecture: all
+Depends: libtinymail-camel-1.0-0 (=${Source-Version})
+Description: memory-effective framework for accessing e-mail - debug symbol files
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the debug symbol files for camel-lite.
+
 Package: libtinymailui-1.0-0
 Architecture: any
 Depends: ${shlibs:Depends}
@@ -77,6 +102,18 @@ Description: memory-effective framework for accessing e-mail - development files
  and NNTP. It can be used to send messages over SMTP and by using sendmail.
  .
  This package contains the development files for libtinymailui.
+
+Package: libtinymailui-1.0-0-dbg
+Architecture: all
+Depends: libtinymailui-1.0-0 (=${Source-Version})
+Description: memory-effective framework for accessing e-mail - debug symbol files
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the debug symbol files for libtinymailui.
 
 Package: libtinymailui-gtk-1.0-0
 Architecture: any
@@ -102,6 +139,18 @@ Description: memory-effective framework for accessing e-mail - development files
  .
  This package contains the development files for libtinymailui-gtk.
 
+Package: libtinymailui-gtk-1.0-0-dbg
+Architecture: all
+Depends: libtinymailui-gtk-1.0-0 (=${Source-Version})
+Description: memory-effective framework for accessing e-mail - debug symbol files
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the debug symbol files for libtinymailui-gtk.
+
 Package: libtinymail-maemo-1.0-0
 Architecture: any
 Depends: ${shlibs:Depends}
@@ -126,6 +175,18 @@ Description: memory-effective framework for accessing e-mail - development files
  .
  This package contains the development files for libtinymail-maemo.
 
+Package: libtinymail-maemo-1.0-0-dbg
+Architecture: all
+Depends: libtinymail-maemo-1.0-0 (=${Source-Version})
+Description: memory-effective framework for accessing e-mail - debug symbol files
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the debug symbol files for libtinymail-maemo.
+
 Package: libtinymail-gnomevfs-1.0-0
 Architecture: any
 Depends: ${shlibs:Depends}
@@ -149,4 +210,16 @@ Description: memory-effective framework for accessing e-mail - development files
  and NNTP. It can be used to send messages over SMTP and by using sendmail.
  .
  This package contains the development files for libtinymail-gnomevfs.
+
+Package: libtinymail-gnomevfs-1.0-0-dbg
+Architecture: all
+Depends: libtinymail-gnomevfs-1.0-0 (=${Source-Version})
+Description: memory-effective framework for accessing e-mail - debug symbol files
+ Tinymail is a development framework for accessing E-mail services using
+ devices with few memory resources.
+ .
+ It supports local mail storage (Maildir,mh,spool & mbox), IMAP, Exchange
+ and NNTP. It can be used to send messages over SMTP and by using sendmail.
+ .
+ This package contains the debug symbol files for libtinymail-gnomevfs.
 
