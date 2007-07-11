@@ -376,7 +376,7 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 	/* try to rollback failures, has obvious races */
 
 #ifdef DEBUG
-	g_print ("local rename folder '%s' '%s'\n", old, new);
+	g_print ("local rename folder '%s' '%s' '%s'\n", old, new, path);
 #endif
 
 	folder = camel_object_bag_get(store->folders, old);
