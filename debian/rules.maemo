@@ -94,7 +94,7 @@ binary-arch: build install
 #	dh_installinfo
 #	dh_installman
 	dh_link
-	dh_strip
+	dh_strip --keep-debug --dbg-package=libtinymail-1.0-0 --dbg-package=libtinymail-camel-1.0-0 --dbg-package=libtinymailui-1.0-0 --dbg-package=libtinymailui-gtk-1.0-0 --dbg-package=libtinymail-maemo-1.0-0 --dbg-package=libtinymail-gnomevfs-1.0-0
 	dh_compress
 	dh_fixperms
 #	dh_perl
