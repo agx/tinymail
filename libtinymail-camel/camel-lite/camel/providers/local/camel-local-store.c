@@ -391,14 +391,11 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 			goto ibex_failed;
 	}
 
-	if (xrename(old, new, path, ".ev-summary.mmap", TRUE, ex))
-		goto summary_failed;
+	xrename(old, new, path, ".ev-summary.mmap", TRUE, ex);
 
-	if (xrename(old, new, path, ".cmeta", TRUE, ex))
-		goto cmeta_failed;
+	xrename(old, new, path, ".cmeta", TRUE, ex);
 
-	if (xrename(old, new, path, "", FALSE, ex))
-		goto base_failed;
+	xrename(old, new, path, "", FALSE, ex);
 
 	g_free(newibex);
 	g_free(oldibex);
