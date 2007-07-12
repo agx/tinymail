@@ -1207,6 +1207,7 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 
 /**
  * tny_merge_folder_new:
+ * @folder_name: the name of the merged folder
  *
  * Creates a a new TnyMergeFolder instance that can merge multiple #TnyFolder 
  * instances together (partly read only, though).
@@ -1214,9 +1215,12 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
  * Return value: a new #TnyMergeFolder instance
  **/
 TnyFolder*
-tny_merge_folder_new (void)
+tny_merge_folder_new (const gchar *folder_name)
 {
 	TnyMergeFolder *self = g_object_new (TNY_TYPE_MERGE_FOLDER, NULL);
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+
+	priv->name = g_strdup (folder_name);
 
 	return TNY_FOLDER (self);
 }
@@ -1228,7 +1232,6 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMergeFolder *self = (TnyMergeFolder *) instance;
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	priv->name = g_strdup ("Merged folder");
 	priv->id = g_strdup  ("");
 	priv->mothers = tny_simple_list_new ();
 	priv->lock = g_new0 (GStaticRecMutex, 1);

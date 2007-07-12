@@ -1,3 +1,10 @@
+2007-07-12  Sergio Villar Senin  <svillar@igalia.com>
+
+	* Added a new parameter to the constructor of a merge folder which is
+	the name of the new merge folder
+
+	* This is a major API change
+
 2007-07-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed the POP unread count problems

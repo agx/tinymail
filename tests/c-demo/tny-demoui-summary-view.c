@@ -937,7 +937,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 	  }
 	} else {
 		GList *list;
-		TnyFolder *merge = tny_merge_folder_new ();
+		TnyFolder *merge = tny_merge_folder_new ("Merged");
 		GtkTreeView *header_view = GTK_TREE_VIEW (priv->header_view);
 
 		list = gtk_tree_selection_get_selected_rows (priv->mailbox_select, &model);
