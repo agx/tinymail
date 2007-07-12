@@ -229,6 +229,32 @@ tny_camel_account_matches_url_string_default (TnyAccount *self, const gchar *url
 	if (in && org && in->port != 0 && (org->port != in->port))
 		retval = FALSE;
 
+	/* For local maildir accounts, compare their paths, before the folder part. */
+	if (in->path && org->path && (strcmp (in->protocol, "maildir") == 0)) {
+		gchar *in_path = NULL;
+		gchar *in_pos_hash = NULL;
+		gchar *org_path = NULL;
+		gchar *org_pos_hash = NULL;
+
+		/* The folders have a # before them: */
+		/* Copy the paths and set null-termination at the #: */
+		in_path = g_strdup (in->path);
+		in_pos_hash = strchr (in_path, '#');
+		if (in_pos_hash)
+			*in_pos_hash = '\0';
+
+		org_path = g_strdup (org->path);
+		org_pos_hash = strchr (org_path, '#');
+		if (org_pos_hash)
+			*org_pos_hash = '\0';
+
+		if (strcmp (in_path, org_path) != 0)
+			retval = FALSE;
+
+		g_free (in_path);
+		g_free (org_path);
+	}
+
 	if (org)
 		camel_url_free (org);
 
