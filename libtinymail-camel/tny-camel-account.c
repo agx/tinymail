@@ -1321,6 +1321,7 @@ typedef struct {
 	TnyCamelAccount *self;
 	gboolean online;
 	GError **err;
+	GMainLoop *loop;
 } SetOnlineInfo;
 
 static gpointer
@@ -1330,8 +1331,8 @@ set_online_thread (gpointer data)
 
 	_tny_camel_account_set_online (info->self, info->online, info->err);
 
-	g_object_unref (info->self);
-	g_slice_free (SetOnlineInfo, info);
+	if (g_main_loop_is_running (info->loop))
+		g_main_loop_quit (info->loop);
 
 	g_thread_exit (NULL);
 	return NULL;
@@ -1349,9 +1350,15 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, GE
 		info->self = TNY_CAMEL_ACCOUNT (g_object_ref (self));
 		info->online = online;
 		info->err = err;
+		info->loop = g_main_loop_new (NULL, FALSE);
 
 		thread = g_thread_create (set_online_thread, info, TRUE, NULL);
-		g_thread_join (thread);
+
+		g_main_loop_run (info->loop);
+
+		g_main_loop_unref (info->loop);
+		g_object_unref (info->self);
+		g_slice_free (SetOnlineInfo, info);
 
 	} else
 		_tny_camel_account_set_online (self, online, err);

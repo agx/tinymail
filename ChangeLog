@@ -3,6 +3,7 @@
 	* Allowing the POP code to do RETRs while the TOPs are working (while
 	summary is being retrieved, allow the POP code to receive messages
 	already)
+	* Avoiding a join in the mainloop
 
 2007-07-12  Sergio Villar Senin  <svillar@igalia.com>
 
