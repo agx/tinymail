@@ -760,8 +760,6 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
 
-	g_static_rec_mutex_lock (pop3_store->eng_lock);
-
 	stream = camel_data_cache_get(pop3_store->cache, "cache", uid, NULL);
 	if (stream)
 	{
@@ -780,8 +778,6 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 		camel_object_unref (CAMEL_OBJECT (stream));
 
-		g_static_rec_mutex_unlock (pop3_store->eng_lock);
-
 		return message;
 	}
 
@@ -793,9 +789,6 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	if (fi == NULL) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
 				      _("No message with UID %s"), uid);
-
-		g_static_rec_mutex_unlock (pop3_store->eng_lock);
-
 		return NULL;
 	}
 
@@ -938,8 +931,6 @@ done:
 fail:
 	camel_operation_end(NULL);
 
-	g_static_rec_mutex_unlock (pop3_store->eng_lock);
-
 	return message;
 }
 
@@ -982,6 +973,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	   & then retrieve from cache, otherwise, start a new one, and similar */
 
 	if (fi->cmd != NULL) {
+
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, fi->cmd)) > 0)
 			;
 
