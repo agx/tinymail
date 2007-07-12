@@ -759,7 +759,6 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelStream *stream = NULL;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
-	int old_flags = 0;
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
@@ -926,20 +925,13 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
-	if (mi) {
-		old_flags = mi->flags;
-		camel_folder_summary_remove (summary, (CamelMessageInfo *) mi);
+	if (!mi) {
+		mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
+		if (mi->uid)
+			g_free (mi->uid);
+		mi->uid = g_strdup (uid);
+		camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 	}
-
-	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
-	if (mi->uid)
-		g_free (mi->uid);
-	mi->uid = g_strdup (uid);
-
-	if (old_flags)
-		mi->flags = old_flags;
-
-	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 
 done:
 	camel_object_unref((CamelObject *)stream);
@@ -965,7 +957,6 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	CamelStream *stream = NULL, *old;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi;
-	int old_flags = 0;
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
@@ -1078,21 +1069,13 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
-	if (mi) {
-		old_flags = mi->flags;
-		camel_folder_summary_remove (summary, (CamelMessageInfo *) mi);
+	if (!mi) {
+		mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
+		if (mi->uid)
+			g_free (mi->uid);
+		mi->uid = g_strdup(uid);
+		camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 	}
-
-	mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
-
-	if (mi->uid)
-		g_free (mi->uid);
-	mi->uid = g_strdup(uid);
-
-	if (old_flags)
-		mi->flags = old_flags;
-
-	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
 
 done:
 	camel_object_unref((CamelObject *)stream);

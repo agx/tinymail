@@ -95,6 +95,8 @@ static CamelFolder *get_folder (CamelStore *store, const char *folder_name,
 
 static CamelFolder *get_trash  (CamelStore *store, CamelException *ex);
 
+static void pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext);
+
 
 
 static void 
@@ -164,7 +166,7 @@ pop3_get_folder_online (CamelStore *store, const char *folder_name, guint32 flag
 
 
 static CamelFolderInfo *
-pop3_build_folder_info(CamelPOP3Store *store, const char *folder_name)
+pop3_build_folder_info (CamelPOP3Store *store, const char *folder_name)
 {
 	const char *name;
 	CamelFolderInfo *fi;
@@ -239,8 +241,12 @@ static CamelFolderInfo *
 pop3_get_folder_info_online (CamelStore *store, const char *top, guint32 flags, CamelException *ex)
 {
 	CamelFolderInfo *info =  pop3_get_folder_info_offline (store, top, flags, ex);
+	gint unseen = -1, messages = -1, uidnext = -1;
 
-	/* TODO: get read and unread count into info->unread & info->total */
+	pop3_get_folder_status (store, "INBOX", &unseen, &messages, &uidnext);
+
+	if (messages != -1)
+		info->total = messages;
 
 	return info;
 }
@@ -839,8 +845,12 @@ pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 
 	if (info->items != -1) {
 		*messages = info->items;
-		if (*unseen == -1)
-			*unseen = 0;
+		if (*unseen == -1) {
+			CamelFolderInfo *inf = pop3_build_folder_info (
+				CAMEL_POP3_STORE (store), "INBOX");
+			*unseen = inf->unread;
+			camel_folder_info_free (inf);
+		}
 	}
 
 	g_slice_free (StatInfo, info);

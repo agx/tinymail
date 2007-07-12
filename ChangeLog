@@ -1,3 +1,7 @@
+2007-07-12  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed the POP unread count problems
+
 2007-07-12  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-account.c:
