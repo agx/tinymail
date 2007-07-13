@@ -207,7 +207,7 @@ static struct {
 	{ "STLS", CAMEL_POP3_CAP_STLS },  /* STARTTLS */
 };
 
-static void
+static int
 cmd_capa(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 {
 	unsigned char *line, *tok, *next;
@@ -249,6 +249,8 @@ cmd_capa(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	} while (ret>0);
 
 	g_static_rec_mutex_unlock (pe->lock);
+
+	return 1;
 }
 
 static void
@@ -325,6 +327,8 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	unsigned char *p;
 	unsigned int len;
 	CamelPOP3Command *pc, *pw, *pn;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	gboolean have_err = FALSE;
 
 	g_static_rec_mutex_lock (pe->lock);
 
@@ -351,7 +355,10 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 			camel_pop3_stream_set_mode(pe->stream, CAMEL_POP3_STREAM_DATA);
 
 			if (pc->func)
-				pc->func(pe, pe->stream, pc->func_data);
+				if (pc->func(pe, pe->stream, pc->func_data) != 1) {
+					g_warning ("Error occured\n");
+					have_err = TRUE;
+			}
 
 			/* Make sure we get all data before going back to command mode */
 			if (!pe->partial_happening) 
@@ -419,14 +426,22 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	}
 
 	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK) {
+		if (have_err)
+			camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
 		g_static_rec_mutex_unlock (pe->lock);
 		return 0;
 	}
 
 	g_static_rec_mutex_unlock (pe->lock);
+
+	if (have_err)
+		camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
+
 	return pe->current==NULL?0:1;
 
 ioerror:
+	have_err = TRUE;
+
 	/* we assume all outstanding commands are gunna fail now */
 	while ( (pw = (CamelPOP3Command*)e_dlist_remhead(&pe->active)) ) {
 		pw->state = CAMEL_POP3_COMMAND_ERR;
@@ -443,8 +458,11 @@ ioerror:
 		e_dlist_addtail(&pe->done, (EDListNode *)pe->current);
 		pe->current = NULL;
 	}
-
 	g_static_rec_mutex_unlock (pe->lock);
+
+	/* Gah! */
+	camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
+
 	return -1;
 }
 
@@ -472,10 +490,15 @@ camel_pop3_engine_command_new(CamelPOP3Engine *pe, guint32 flags, CamelPOP3Comma
 void
 camel_pop3_engine_command_free(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 {
-	g_static_rec_mutex_lock (pe->lock);
-	if (pe->current != pc)
+
+	if (pe)
+		g_static_rec_mutex_lock (pe->lock);
+	if (pe && pe->current != pc)
 		e_dlist_remove((EDListNode *)pc);
-	g_free(pc->data); pc->data = NULL;
+	if (pc->data)
+		g_free(pc->data); 
+	pc->data = NULL;
 	g_free(pc);
-	g_static_rec_mutex_unlock (pe->lock);
+	if (pe)
+		g_static_rec_mutex_unlock (pe->lock);
 }

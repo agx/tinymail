@@ -4,6 +4,8 @@
 	summary is being retrieved, allow the POP code to receive messages
 	already)
 	* Avoiding a join in the mainloop
+	* Reconnecting and connection failing for POP, in case of connection
+	problems
 
 2007-07-12  Sergio Villar Senin  <svillar@igalia.com>
 

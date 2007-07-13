@@ -804,14 +804,18 @@ typedef struct {
 	guint items, bytes;
 } StatInfo;
 
-static void
+static int
 cmd_stat (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 {
 	unsigned char *line = (unsigned char *) stream; /* moeha, ugly! */
 	StatInfo *info = data;
 
+	if (!line)
+		return 0;
+
 	sscanf((char *) line, "+OK %d %d", &info->items, &info->bytes);
 
+	return 1;
 }
 
 static void

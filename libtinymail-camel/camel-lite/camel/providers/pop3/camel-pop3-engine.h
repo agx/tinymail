@@ -75,7 +75,7 @@ enum {
 	CAMEL_POP3_ENGINE_DISABLE_EXTENSIONS = 1<<0,
 };
 
-typedef void (*CamelPOP3CommandFunc)(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data);
+typedef int (*CamelPOP3CommandFunc)(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data);
 
 struct _CamelPOP3Command {
 	struct _CamelPOP3Command *next;
