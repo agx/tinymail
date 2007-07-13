@@ -421,8 +421,6 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	camel_operation_end (NULL);
 
-	g_static_rec_mutex_unlock (pop3_store->eng_lock);
-
 	return;
 }
 
