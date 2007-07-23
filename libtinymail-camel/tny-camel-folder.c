@@ -1503,6 +1503,9 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
 		return;
 
+	/* we reason the folder to make sure it does not
+	 * lose all the references and uncache, causing an interlock */
+	_tny_camel_folder_reason (priv);
 	g_static_rec_mutex_lock (priv->folder_lock);
 
 	if (!load_folder_no_lock (priv))
@@ -1541,6 +1544,7 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	g_object_unref (G_OBJECT (headers));
 	g_static_rec_mutex_unlock (priv->folder_lock);
+	_tny_camel_folder_unreason (priv);
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 

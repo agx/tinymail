@@ -1,5 +1,11 @@
 2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c: protect a folder lock
+	with a reason. This prevents some interlock problems, as the
+	last unreason can lead to a folder lock.
+	
+2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
+
 	* libtinymail/tny-camel-mime-part.c:
 	(tny_camel_mime_part_get_parts_default): improve detection
 	of attached messages, as we need to create a proper TnyMsg
