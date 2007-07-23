@@ -148,10 +148,19 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 				continue;
 
 			type = camel_mime_part_get_content_type (tpart);
-			if (camel_content_type_is (type, "message", "rfc822"))
+			if (CAMEL_IS_MIME_MESSAGE (tpart))
+			{
+				TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (tpart), NULL);
+
+				newpart = TNY_MIME_PART (tny_camel_msg_new ());
+				_tny_camel_msg_set_header (TNY_CAMEL_MSG (newpart), nheader);
+				_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (newpart), CAMEL_MIME_PART (tpart));
+				g_object_unref (G_OBJECT (nheader));
+			}
+			else if (camel_content_type_is (type, "message", "rfc822"))
 			{
 				CamelDataWrapper *c = camel_medium_get_content_object (CAMEL_MEDIUM (tpart));
-			
+
 				if (c && CAMEL_IS_MIME_PART (c) && CAMEL_IS_MIME_MESSAGE (c)) 
 				{
 					TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (c), NULL);
@@ -234,7 +243,26 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 		body = CAMEL_MULTIPART (containee);
 
 	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
-	camel_multipart_add_part (body, cpart);
+	if (CAMEL_IS_MIME_MESSAGE (cpart)) {
+		CamelMimePart *message_part = camel_mime_part_new ();
+		const gchar *subject;
+		gchar *description;
+
+		subject = camel_mime_message_get_subject (CAMEL_MIME_MESSAGE (cpart));
+		if (subject)
+			description = g_strdup (subject);
+		else
+			description = _("Forwarded message");
+
+		camel_mime_part_set_disposition (message_part, "inline");
+		camel_medium_set_content_object (CAMEL_MEDIUM (message_part), 
+						 CAMEL_DATA_WRAPPER (cpart));
+		camel_mime_part_set_content_type (message_part, "message/rfc822");
+		camel_multipart_add_part (body, message_part);
+		camel_object_unref (CAMEL_OBJECT (message_part));
+	} else {
+		camel_multipart_add_part (body, cpart);
+	}
 	camel_object_unref (CAMEL_OBJECT (cpart));
 
 	retval = camel_multipart_get_number (body);

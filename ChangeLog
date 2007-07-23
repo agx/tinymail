@@ -1,3 +1,14 @@
+2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail/tny-camel-mime-part.c:
+	(tny_camel_mime_part_get_parts_default): improve detection
+	of attached messages, as we need to create a proper TnyMsg
+	object when the attachment is a message.
+	(tny_camel_mime_part_add_part_default): now when we are
+	attaching a message as a part, it's created adding a 
+	message/rfc822 mime part that contains the message as
+	its content object. This fixes attaching messages.
+
 2007-07-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Allowing the POP code to do RETRs while the TOPs are working (while
