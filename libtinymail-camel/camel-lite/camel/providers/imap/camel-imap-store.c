@@ -349,6 +349,11 @@ camel_imap_store_finalize (CamelObject *object)
 	/* This frees current_folder, folders, authtypes, streams, and namespace. */
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
 
+	if (imap_store->addrinfo) {
+		freeaddrinfo (imap_store->addrinfo);
+		imap_store->addrinfo = NULL;
+	}
+
 	if (imap_store->summary) {
 		camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
 		camel_object_unref(imap_store->summary);
@@ -403,6 +408,8 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->last_folder = NULL;
 	imap_store->connected = FALSE;
 	imap_store->preauthed = FALSE;
+
+	imap_store->addrinfo = NULL;
 	((CamelStore *)imap_store)->flags |= CAMEL_STORE_SUBSCRIPTIONS;
 
 	imap_store->tag_prefix = imap_tag_prefix++;
@@ -1181,6 +1188,7 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	int mode = -1, ret, i, must_tls = 0;
 	char *serv;
 	const char *port;
+	CamelImapStore *store = (CamelImapStore *) service;
 
 #ifndef G_OS_WIN32
 	const char *command;
@@ -1235,27 +1243,22 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_family = PF_UNSPEC;
 
-	ai = camel_getaddrinfo(service->url->host, serv, &hints, ex);
+	if (store->addrinfo == NULL)
+		store->addrinfo = camel_getaddrinfo(service->url->host, serv, &hints, ex);
 
-	if (ai == NULL && port != NULL && camel_exception_get_id(ex) != CAMEL_EXCEPTION_USER_CANCEL) 
+	if (store->addrinfo == NULL && port != NULL && 
+	    camel_exception_get_id(ex) != CAMEL_EXCEPTION_USER_CANCEL) 
 	{
 		camel_exception_clear (ex);
-		ai = camel_getaddrinfo(service->url->host, port, &hints, ex);
+		store->addrinfo = camel_getaddrinfo(service->url->host, port, &hints, ex);
 	}
 
-	if (ai == NULL)
+	if (store->addrinfo == NULL)
 		return FALSE;
 
-	ret = connect_to_server (service, ai, mode, must_tls, ex);
-	camel_freeaddrinfo (ai);
+	ret = connect_to_server (service, store->addrinfo, mode, must_tls, ex);
 
 	return ret;
-}
-
-gboolean 
-camel_imap_service_connect (CamelService *service, CamelException *ex)
-{
-	return connect_to_server_wrapper (service, ex);
 }
 
 extern CamelServiceAuthType camel_imap_password_authtype;

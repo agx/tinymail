@@ -1,4 +1,23 @@
 2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
+	
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
+ 	(imap_refresh_info): now we lock the folder also, before locking the
+ 	service, in order to respect better the lock order. This should avoid
+ 	some locks.
+	
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.[ch]:
+ 	now we store a reference to the struct addrinfo used for connections. When
+ 	we are successful getting a valid addrinfo, it's stored and reused. This
+ 	way we prevent doing lots of calls to getaddrinfo and subsequent name
+ 	resolutions. As we're currently blocking while name resolution is running,
+	this should make the application more reponsive in general and avoid
+ 	flooding the connection.
+ 	We also removed the method (camel_imap_service_connect) as it's not used.
+	
+	* libtinymail-camel/camel-lite/camel/camel-private.h:
+ 	added parenthesis to some lock macros.
+ 
+2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: protect a folder lock
 	with a reason. This prevents some interlock problems, as the

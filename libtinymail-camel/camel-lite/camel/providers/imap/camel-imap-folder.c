@@ -813,6 +813,7 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 	 * Also, if this is the INBOX, some servers (cryus) wont tell
 	 * us with a NOOP of new messages, so force a reselect which
 	 * should do it.  */
+	CAMEL_FOLDER_REC_LOCK(folder, lock);
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
 
 	if (!camel_disco_store_check_online ((CamelDiscoStore*)imap_store, ex))
@@ -860,6 +861,7 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 	}
 done:
 	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
+	CAMEL_FOLDER_REC_UNLOCK(folder, lock);
 
 	camel_folder_summary_save(folder->summary);
 

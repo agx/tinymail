@@ -77,15 +77,15 @@ struct _CamelServicePrivate {
 };
 
 #define CAMEL_SERVICE_LOCK(f, l) \
-	(g_static_mutex_lock(&((CamelService *)f)->priv->l))
+	(g_static_mutex_lock(&((CamelService *)(f))->priv->l))
 #define CAMEL_SERVICE_UNLOCK(f, l) \
-	(g_static_mutex_unlock(&((CamelService *)f)->priv->l))
+	(g_static_mutex_unlock(&((CamelService *)(f))->priv->l))
 #define CAMEL_SERVICE_REC_LOCK(f, l) \
-	(g_static_rec_mutex_lock(&((CamelService *)f)->priv->l))
+	(g_static_rec_mutex_lock(&((CamelService *)(f))->priv->l))
 #define CAMEL_SERVICE_REC_UNLOCK(f, l) \
-	(g_static_rec_mutex_unlock(&((CamelService *)f)->priv->l))
+	(g_static_rec_mutex_unlock(&((CamelService *)(f))->priv->l))
 #define CAMEL_SERVICE_REC_TRYLOCK(f, l) \
-	(g_static_rec_mutex_trylock(&((CamelService *)f)->priv->l))
+	(g_static_rec_mutex_trylock(&((CamelService *)(f))->priv->l))
 
 
 struct _CamelSessionPrivate {
