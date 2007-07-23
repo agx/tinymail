@@ -162,10 +162,12 @@ camel_imap_recon (CamelImapStore *store, CamelException *mex)
 		sleep (1);
 		camel_service_connect (service, mex);
 	}
-	if (!camel_exception_is_set (mex) && service->reconnection)
-		service->reconnection (service, TRUE, service->data);
-	else
-		service->reconnection (service, FALSE, service->data);
+	if (service->reconnection) {
+		if (!camel_exception_is_set (mex))
+			service->reconnection (service, TRUE, service->data);
+		else
+			service->reconnection (service, FALSE, service->data);
+	}
 
 	service->reconnecting = FALSE;
 }
