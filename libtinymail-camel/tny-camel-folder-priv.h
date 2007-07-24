@@ -84,6 +84,12 @@ void _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *fo
 #define TNY_FOLDER_PRIV_GET_SESSION(o) \
 	((o)&&(o)->account?TNY_CAMEL_ACCOUNT_GET_PRIVATE ((o)->account)->session:NULL)
 
+#define TNY_FOLDER_PRIV_GET_QUEUE(o) \
+	((o)&&(o)->account?TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE ((o)->account)->queue:NULL)
+
+#define TNY_FOLDER_PRIV_GET_MSG_QUEUE(o) \
+	((o)&&(o)->account?TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE ((o)->account)->msg_queue:NULL)
+
 
 TnyFolder* _tny_camel_folder_new_with_folder (CamelFolder *camel_folder);
 TnyFolder* _tny_camel_folder_new (void);

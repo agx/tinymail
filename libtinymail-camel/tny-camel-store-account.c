@@ -535,6 +535,8 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->queue = _tny_camel_queue_new ();
+	priv->msg_queue = _tny_camel_queue_new ();
 	apriv->type = CAMEL_PROVIDER_STORE;
 	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
 	priv->managed_folders = NULL;
@@ -581,6 +583,9 @@ tny_camel_store_account_finalize (GObject *object)
 
 	g_static_rec_mutex_free (priv->factory_lock);
 	priv->factory_lock = NULL;
+
+	g_object_unref (priv->queue);
+	g_object_unref (priv->msg_queue);
 
 	/* Disco store ? */
 
@@ -1193,9 +1198,9 @@ static void
 tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetFoldersInfo *info;
-	GThread *thread;
 	GError *err = NULL;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_LIST (list));
 
@@ -1237,8 +1242,8 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	if (info->query)
 		g_object_ref (G_OBJECT (info->query));
 
-	thread = g_thread_create (tny_camel_store_account_get_folders_async_thread,
-			info, FALSE, NULL);    
+	_tny_camel_queue_launch (priv->queue, 
+			tny_camel_store_account_get_folders_async_thread, info);
 
 	return;
 }

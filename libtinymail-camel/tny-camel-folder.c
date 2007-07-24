@@ -46,6 +46,8 @@
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
+#include "tny-camel-queue-priv.h"
+
 #include <camel/camel-folder.h>
 #include <camel/camel.h>
 #include <camel/camel-session.h>
@@ -1088,7 +1090,6 @@ void
 tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	SyncFolderInfo *info;
-	GThread *thread;
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
@@ -1124,8 +1125,8 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnySyncF
 	g_object_ref (G_OBJECT (self));
 	_tny_camel_folder_reason (priv);
 
-	thread = g_thread_create (tny_camel_folder_sync_async_thread,
-			info, FALSE, NULL);
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_sync_async_thread, info);
 }
 
 void 
@@ -1333,7 +1334,6 @@ static void
 tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info;
-	GThread *thread;
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
@@ -1376,8 +1376,8 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 	 * via _tny_camel_account_start_camel_operation,
 	 * and also calls the idle main callback: */
 
-	thread = g_thread_create (tny_camel_folder_refresh_async_thread,
-			info, FALSE, NULL);
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_refresh_async_thread, info);
 
 	return;
 }
@@ -1734,7 +1734,6 @@ static void
 tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetMsgInfo *info;
-	GThread *thread;
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
@@ -1774,8 +1773,8 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	g_object_ref (G_OBJECT (info->self));
 	g_object_ref (G_OBJECT (info->header));
 
-	thread = g_thread_create (tny_camel_folder_get_msg_async_thread,
-			info, FALSE, NULL);
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv), 
+		tny_camel_folder_get_msg_async_thread, info);
 
 	return;
 }
@@ -2689,7 +2688,6 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CopyFolderInfo *info;
-	GThread *thread;
 	GError *err = NULL;
 
 	/* Idle info for the callbacks */
@@ -2733,8 +2731,8 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	g_object_ref (G_OBJECT (info->self));
 	g_object_ref (G_OBJECT (info->into));
 
-	thread = g_thread_create (tny_camel_folder_copy_async_thread,
-			info, FALSE, NULL);
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_copy_async_thread, info);
 
 	return;
 }
@@ -3265,7 +3263,6 @@ static void
 tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TransferMsgsInfo *info;
-	GThread *thread;
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelFolderPriv *priv_src = priv;
@@ -3312,8 +3309,8 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 	_tny_camel_folder_reason (priv_dst);
 	g_object_ref (G_OBJECT (info->folder_dst));
 
-	thread = g_thread_create (tny_camel_folder_transfer_msgs_async_thread,
-			info, FALSE, NULL);    
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv),
+		tny_camel_folder_transfer_msgs_async_thread, info);
 
 	return;
 }
@@ -4028,7 +4025,6 @@ static void
 tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetFoldersInfo *info;
-	GThread *thread;
 	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
@@ -4065,8 +4061,8 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 	if (info->query)
 		g_object_ref (G_OBJECT (info->query));
 
-	thread = g_thread_create (tny_camel_folder_get_folders_async_thread,
-			info, FALSE, NULL);    
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_get_folders_async_thread, info);
 
 	return;
 }
