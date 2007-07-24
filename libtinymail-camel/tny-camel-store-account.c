@@ -1160,7 +1160,6 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	}
 
 
-	g_thread_exit (NULL);
 
 	return NULL;
 }

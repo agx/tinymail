@@ -1016,7 +1016,6 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 	{
 		tny_camel_folder_sync_async_destroyer (info);
 		g_static_rec_mutex_unlock (priv->folder_lock);
-		g_thread_exit (NULL);
 		return NULL;
 	}
 
@@ -1061,7 +1060,6 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 		g_object_unref (G_OBJECT (self));
 		_tny_camel_folder_unreason (priv);
 	}
-	g_thread_exit (NULL);
 
 	return NULL;
 }
@@ -1238,7 +1236,6 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	{
 		tny_camel_folder_refresh_async_destroyer (info);
 		g_static_rec_mutex_unlock (priv->folder_lock);
-		g_thread_exit (NULL);
 		return NULL;
 	}
 
@@ -1283,7 +1280,6 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 		g_object_unref (G_OBJECT (self));
 		_tny_camel_folder_unreason (priv);
 	}
-	g_thread_exit (NULL);
 
 	return NULL;
 }
@@ -1695,7 +1691,6 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 		g_object_unref (G_OBJECT (info->self));
 	}
 
-	g_thread_exit (NULL);
 
 	return NULL;
 
@@ -2647,7 +2642,6 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 		g_object_unref (info->self);
 /* 		_tny_camel_folder_unreason (priv); */
 	}
-	g_thread_exit (NULL);
 
 	return NULL;
 }
@@ -3223,8 +3217,6 @@ tny_camel_folder_transfer_msgs_async_thread (gpointer thr_user_data)
 		_tny_camel_folder_unreason (priv_dst);
 		g_object_unref (G_OBJECT (info->folder_dst));
 	}
-
-	g_thread_exit (NULL);
 
 	return NULL;
 }
@@ -3988,8 +3980,6 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 		g_object_unref (G_OBJECT (info->list));
 	}
 
-	g_thread_exit (NULL);
-
 	return NULL;
 }
 
@@ -4228,7 +4218,6 @@ tny_camel_folder_poke_status_thread (gpointer data)
 
 	g_static_mutex_unlock (&poke_folders_lock); /* A */
 
-	g_thread_exit (NULL);
 	return NULL;
 }
 

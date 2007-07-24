@@ -3,6 +3,7 @@
 	* Preparing for a release candidate
 	* Added skeleton for webkit support
 	* Restructuring the internal API for async methods a bit
+	* Experimental lining up of async functions in one thread
 
 2007-07-23  Murray Cumming  <murrayc@murrayc.com>
 

@@ -39,6 +39,9 @@ struct _TnyCamelQueue
 {
 	GObject parent;
 	GList *list;
+	GThread *thread;
+	GMutex *lock;
+	gboolean stopped;
 };
 
 struct _TnyCamelQueueClass 
