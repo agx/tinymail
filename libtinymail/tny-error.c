@@ -39,8 +39,8 @@ tny_error_domain_get_type (void)
       { TNY_FOLDER_STORE_ERROR, "TNY_FOLDER_STORE_ERROR", "folder_store_error" },
       { TNY_TRANSPORT_ACCOUNT_ERROR, "TNY_TRANSPORT_ACCOUNT_ERROR", "transport_account_error" },
       { TNY_ACCOUNT_ERROR, "TNY_ACCOUNT_ERROR", "account_error" },
+      { TNY_ACCOUNT_STORE_ERROR, "TNY_ACCOUNT_STORE_ERROR", "account_store_error" },
       { TNY_SEND_QUEUE_ERROR, "TNY_SEND_QUEUE_ERROR", "send_queue_error" },
-
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyErrorDomain", values);
@@ -62,6 +62,10 @@ tny_error_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
+
+
+
+
       { TNY_ERROR_UNSPEC, "TNY_ERROR_UNSPEC", "error_unspec" },
       { TNY_FOLDER_ERROR_SYNC, "TNY_FOLDER_ERROR_SYNC", "folder_error_sync" },
       { TNY_FOLDER_ERROR_REMOVE_MSG, "TNY_FOLDER_ERROR_REMOVE_MSG", "folder_error_remove_msg" },
@@ -92,6 +96,10 @@ tny_error_get_type (void)
       { TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT, "TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT", "account_store_error_unknown_alert" },
 
       { TNY_SEND_QUEUE_ERROR_ADD, "TNY_SEND_QUEUE_ERROR_ADD", "send_queue_error_add"},
+
+      { TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT, "TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT", "account_store_cancel_alert"},
+      { TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH, "TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH", "account_get_supported_auth"},
+
       { 0, NULL, NULL }
     };
     etype = g_enum_register_static ("TnyError", values);

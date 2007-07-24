@@ -38,6 +38,8 @@ typedef struct _TnySendQueue TnySendQueue;
 typedef struct _TnySendQueueIface TnySendQueueIface;
 #endif
 
+#define TNY_TYPE_SEND_QUEUE_SIGNAL (tny_send_queue_signal_get_type ())
+
 enum _TnySendQueueSignal
 {
 	TNY_SEND_QUEUE_MSG_SENDING,

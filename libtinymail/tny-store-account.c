@@ -208,3 +208,26 @@ tny_store_account_get_type (void)
 
 	return type;
 }
+
+
+/**
+ * tny_status_code_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_store_account_signal_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED, "TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED", "subscription_changed" },
+      { TNY_STORE_ACCOUNT_LAST_SIGNAL, "TNY_STORE_ACCOUNT_LAST_SIGNAL", "last-signal" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyStoreAccountSignal", values);
+  }
+  return etype;
+}

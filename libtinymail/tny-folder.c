@@ -1395,12 +1395,12 @@ tny_folder_caps_get_type (void)
 {
   static GType etype = 0;
   if (etype == 0) {
-    static const GEnumValue values[] = {
+    static const GFlagsValue values[] = {
       { TNY_FOLDER_CAPS_WRITABLE, "TNY_FOLDER_CAPS_WRITABLE", "writable" },
-      {TNY_FOLDER_CAPS_PUSHEMAIL, "TNY_FOLDER_CAPS_PUSHEMAIL", "pushemail" },
+      { TNY_FOLDER_CAPS_PUSHEMAIL, "TNY_FOLDER_CAPS_PUSHEMAIL", "pushemail" },
       { 0, NULL, NULL }
     };
-    etype = g_enum_register_static ("TnyFolderCaps", values);
+    etype = g_flags_register_static ("TnyFolderCaps", values);
   }
   return etype;
 }

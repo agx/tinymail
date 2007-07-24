@@ -24,11 +24,11 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
-#define TNY_TYPE_STATUS_DOMAIN (tny_status_domain_get_type())
-
 #ifndef TNY_SHARED_H
 typedef struct _TnyStatus TnyStatus;
 #endif
+
+#define TNY_TYPE_STATUS_DOMAIN (tny_status_domain_get_type())
 
 enum _TnyStatusDomain
 {

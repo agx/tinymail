@@ -360,12 +360,12 @@ tny_folder_store_change_changed_get_type (void)
 {
   static GType etype = 0;
   if (etype == 0) {
-    static const GEnumValue values[] = {
+    static const GFlagsValue values[] = {
       { TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS", "created-folders" },
       { TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS", "removed-folders" },
       { 0, NULL, NULL }
     };
-    etype = g_enum_register_static ("TnyFolderStoreChangeChanged", values);
+    etype = g_flags_register_static ("TnyFolderStoreChangeChanged", values);
   }
   return etype;
 }

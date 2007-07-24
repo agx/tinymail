@@ -571,7 +571,7 @@ tny_header_flags_get_type (void)
 {
   static GType etype = 0;
   if (etype == 0) {
-    static const GEnumValue values[] = {
+    static const GFlagsValue values[] = {
       { TNY_HEADER_FLAG_ANSWERED, "TNY_HEADER_FLAG_ANSWERED", "answered" },
       { TNY_HEADER_FLAG_DELETED, "TNY_HEADER_FLAG_DELETED", "deleted" },
       { TNY_HEADER_FLAG_DRAFT, "TNY_HEADER_FLAG_DRAFT", "draft" },
@@ -584,7 +584,7 @@ tny_header_flags_get_type (void)
       { TNY_HEADER_FLAG_PRIORITY, "TNY_HEADER_FLAG_PRIORITY", "priority" },
       { 0, NULL, NULL }
     };
-    etype = g_enum_register_static ("TnyHeaderFlags", values);
+    etype = g_flags_register_static ("TnyHeaderFlags", values);
   }
   return etype;
 }
@@ -602,14 +602,14 @@ tny_header_priority_flags_get_type (void)
 {
   static GType etype = 0;
   if (etype == 0) {
-    static const GEnumValue values[] = {
+    static const GFlagsValue values[] = {
       { TNY_HEADER_FLAG_HIGH_PRIORITY, "TNY_HEADER_FLAG_HIGH_PRIORITY", "high-priority" },
       { TNY_HEADER_FLAG_NORMAL_PRIORITY, "TNY_HEADER_FLAG_NORMAL_PRIORITY", "normal-priority" },
       { TNY_HEADER_FLAG_LOW_PRIORITY, "TNY_HEADER_FLAG_LOW_PRIORITY", "low-priority" },
       { TNY_HEADER_FLAG_SUSPENDED_PRIORITY, "TNY_HEADER_FLAG_SUSPENDED_PRIORITY", "suspended-priority" },
       { 0, NULL, NULL }
     };
-    etype = g_enum_register_static ("TnyHeaderPriorityFlags", values);
+    etype = g_flags_register_static ("TnyHeaderPriorityFlags", values);
   }
   return etype;
 }

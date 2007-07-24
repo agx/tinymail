@@ -544,7 +544,7 @@ tny_folder_change_changed_get_type (void)
 {
   static GType etype = 0;
   if (etype == 0) {
-    static const GEnumValue values[] = {
+    static const GFlagsValue values[] = {
       { TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT, "TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT", "all-count" },
       { TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT, "TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT", "unread-count" },
       { TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS","added-headers" },
@@ -553,7 +553,7 @@ tny_folder_change_changed_get_type (void)
       { TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED, "TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED", "received" },
       { 0, NULL, NULL }
     };
-    etype = g_enum_register_static ("TnyFolderChangeChanged", values);
+    etype = g_flags_register_static ("TnyFolderChangeChanged", values);
   }
   return etype;
 }

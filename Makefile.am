@@ -16,6 +16,10 @@ if BUILD_MOZEMBED
 SUBDIRS += libtinymailui-mozembed 
 endif
 
+if BUILD_WEBKIT
+SUBDIRS += libtinymailui-webkit
+endif
+
 if BUILD_MAEMO
 SUBDIRS += libtinymail-gnomevfs
 endif

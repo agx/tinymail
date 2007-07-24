@@ -21,52 +21,6 @@
 
 #include <tny-status.h>
 
-/**
- * tny_status_domain_get_type:
- *
- * GType system helper function
- *
- * Return value: a GType
- **/
-GType
-tny_status_domain_get_type (void)
-{
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_FOLDER_STATUS, "TNY_FOLDER_STATUS", "folder_status" },
-      { TNY_GET_MSG_QUEUE_STATUS, "TNY_GET_MSG_QUEUE_STATUS", "get_msg_queue_status" },
-
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyStatusDomain", values);
-  }
-  return etype;
-}
-
-
-/**
- * tny_status_code_get_type:
- *
- * GType system helper function
- *
- * Return value: a GType
- **/
-GType
-tny_status_code_get_type (void)
-{
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_FOLDER_STATUS_CODE_REFRESH, "TNY_FOLDER_STATUS_CODE_REFRESH", "folder_status_code_refresh" },
-      { TNY_FOLDER_STATUS_CODE_GET_MSG, "TNY_FOLDER_STATUS_CODE_GET_MSG", "folder_status_code_get_msg" },
-      { TNY_GET_MSG_QUEUE_STATUS_GET_MSG, "TNY_GET_MSG_QUEUE_STATUS_GET_MSG", "get_msg_queue_status_get_msg" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyStatus", values);
-  }
-  return etype;
-}
 
 /**
  * tny_status_set_fraction:
@@ -311,3 +265,55 @@ tny_clear_status (TnyStatus **status)
  * 
  * Return value: the code of @status (as a TnyStatusCode)
  **/
+
+
+/**
+ * tny_status_domain_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_status_domain_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_FOLDER_STATUS, "TNY_FOLDER_STATUS", "folder_status" },
+      { TNY_GET_MSG_QUEUE_STATUS, "TNY_GET_MSG_QUEUE_STATUS", "get_msg_queue_status" },
+      { TNY_GET_SUPPORTED_SECURE_AUTH_STATUS, "TNY_GET_SUPPORTED_SECURE_AUTH_STATUS", "secured-auth-status" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyStatusDomain", values);
+  }
+  return etype;
+}
+
+
+/**
+ * tny_status_code_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_status_code_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_FOLDER_STATUS_CODE_REFRESH, "TNY_FOLDER_STATUS_CODE_REFRESH", "folder_status_code_refresh" },
+      { TNY_FOLDER_STATUS_CODE_GET_MSG, "TNY_FOLDER_STATUS_CODE_GET_MSG", "folder_status_code_get_msg" },
+      { TNY_GET_MSG_QUEUE_STATUS_GET_MSG, "TNY_GET_MSG_QUEUE_STATUS_GET_MSG", "get_msg_queue_status_get_msg" },
+      { TNY_FOLDER_STATUS_CODE_XFER_MSGS, "TNY_FOLDER_STATUS_CODE_XFER_MSGS", "xfer-msgs" },
+      { TNY_FOLDER_STATUS_CODE_COPY_FOLDER, "TNY_FOLDER_STATUS_CODE_COPY_FOLDER", "copy-folder" },
+      { TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, "TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH", "get-secure-auth" },
+      { TNY_FOLDER_STATUS_CODE_SYNC, "TNY_FOLDER_STATUS_CODE_SYNC", "code-sync" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyStatusCode", values);
+  }
+  return etype;
+}

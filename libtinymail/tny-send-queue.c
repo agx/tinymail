@@ -232,3 +232,26 @@ tny_send_queue_get_type (void)
 	return type;
 }
 
+/**
+ * tny_send_queue_signal_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_send_queue_signal_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_SEND_QUEUE_MSG_SENDING, "TNY_SEND_QUEUE_MSG_SENDING", "msg-sending" },
+      { TNY_SEND_QUEUE_MSG_SENT, "TNY_SEND_QUEUE_MSG_SENT", "msg-sent" },
+      { TNY_SEND_QUEUE_ERROR_HAPPENED, "TNY_SEND_QUEUE_ERROR_HAPPENED", "error-happened" },
+      { TNY_SEND_QUEUE_LAST_SIGNAL, "TNY_SEND_QUEUE_LAST_SIGNAL", "last-signal" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnySendQueueSignal", values);
+  }
+  return etype;
+}

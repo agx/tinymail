@@ -966,6 +966,29 @@ tny_account_type_get_type (void)
 }
 
 
+
+/**
+ * tny_account_signal_type_get_type:
+ *
+ * GType system helper function
+ *
+ * Return value: a GType
+ **/
+GType
+tny_account_signal_type_get_type (void)
+{
+  static GType etype = 0;
+  if (etype == 0) {
+    static const GEnumValue values[] = {
+      { TNY_ACCOUNT_CONNECTION_STATUS_CHANGED, "TNY_ACCOUNT_CONNECTION_STATUS_CHANGED", "connection_status" },
+      { TNY_ACCOUNT_LAST_SIGNAL, "TNY_ACCOUNT_LAST_SIGNAL", "last_signal" },
+      { 0, NULL, NULL }
+    };
+    etype = g_enum_register_static ("TnyAccountSignal", values);
+  }
+  return etype;
+}
+
 /**
  * tny_connection_status_get_type:
  *
