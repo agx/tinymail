@@ -509,6 +509,11 @@ tny_merge_folder_get_id (TnyFolder *self)
 
 	}
 
+	/* The get_id_func() DBC contract does not allow this to be NULL or "": */
+	if ( (priv->id == NULL) || (strlen (priv->id) == 0)) {
+		priv->id = g_strdup ("unknown_mergefolder");	
+	}
+	
 	return priv->id;
 }
 
@@ -1232,7 +1237,9 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMergeFolder *self = (TnyMergeFolder *) instance;
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	priv->id = g_strdup  ("");
+	/* The get_id_func() DBC contract does not allow this to be NULL or "": */
+	priv->id = g_strdup ("unknown_mergefolder");
+	
 	priv->mothers = tny_simple_list_new ();
 	priv->lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->lock);

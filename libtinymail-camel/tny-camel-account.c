@@ -1165,7 +1165,11 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
  * @online: whether or not the account is online
  * @err: a #GError instance or NULL
  *
- * Set the connectivity status of an account
+ * Set the connectivity status of an account.
+ * Setting this to FALSE means that the account will not attempt to use the network, 
+ * and will use only the cache.
+ * Setting this to TRUE means that the account may use the network to provide up-to-date 
+ * information.
  *
  **/
 void 

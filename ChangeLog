@@ -1,3 +1,14 @@
+2007-07-23  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-account.c: Improved the 
+	documentation for tny_camel_account_set_online().
+
+	* libtinymail/tny-merge-folder.c: (tny_merge_folder_get_id),
+	(tny_merge_folder_instance_init): Use 
+	unknown_mergefolder instead of an empty string for the default ID, 
+	because an empty string is not allowed by the get_func_id() DBC 
+	contract, causing a crash at runtime when DBC is enabled in the build.
+
 2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
