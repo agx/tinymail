@@ -1,6 +1,6 @@
 Makefile.in
 .libs
-libtinymailui-mozembed-1.0.pc
+libtinymailui-webkit-1.0.pc
 .deps
-libtinymailui-mozembed.pc
+libtinymailui-webkit.pc
 Makefile
