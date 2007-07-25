@@ -4,6 +4,7 @@
 	* Parallel retrieval of messages
 	* Disconnecting after summary retrieval of a POP folder
 	* Disconnecting after get-msg and sync of a POP folder
+	* Some reference counting problems when factoring folders
 
 2007-07-24  Philip Van Hoof  <pvanhoof@gnome.org>
 

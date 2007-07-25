@@ -491,6 +491,9 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (folder->parent_store);
 
+	if (!pop3_store->delete_after && !expunge)
+		return;
+
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
 
@@ -517,6 +520,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		return;
 	}
 
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 	camel_operation_start(NULL, _("Expunging deleted messages"));
 
 	if (pop3_folder->uids)
@@ -528,9 +533,16 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		fi = pop3_folder->uids->pdata[i];
 		/* busy already?  wait for that to finish first */
 		if (fi->cmd) {
+			g_static_rec_mutex_lock (pop3_store->eng_lock);
+			if (pop3_store->engine == NULL) {
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
+				return;
+			}
 			while (camel_pop3_engine_iterate(pop3_store->engine, fi->cmd) > 0)
 				;
 			camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 			fi->cmd = NULL;
 		}
 
@@ -538,7 +550,14 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, fi->uid);
 		if (fi->flags & g_file_test (expunged_path, G_FILE_TEST_EXISTS)) 
 		{
+			g_static_rec_mutex_lock (pop3_store->eng_lock);
+			if (pop3_store->engine == NULL) {
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
+				return;
+			}
 			fi->cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", fi->id);
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 			g_unlink (expunged_path);
 			/* also remove from cache */
 			if (pop3_store->cache && fi->uid)
@@ -552,10 +571,21 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		fi = pop3_folder->uids->pdata[i];
 		/* wait for delete commands to finish */
 		if (fi->cmd) {
+
+			g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+			if (pop3_store->engine == NULL) {
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
+				return;
+			}
+
 			while (camel_pop3_engine_iterate(pop3_store->engine, fi->cmd) > 0)
 				;
 			camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
 			fi->cmd = NULL;
+
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 		}
 		camel_operation_progress(NULL, (i+1) , pop3_folder->uids->len);
 	  }
@@ -573,12 +603,23 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		if (info->flags & g_file_test (expunged_path, G_FILE_TEST_EXISTS)) 
 		{
 			struct _CamelPOP3Command *cmd;
+
+			g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+			if (pop3_store->engine == NULL) {
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
+				return;
+			}
+
 			g_unlink (expunged_path);
 			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", info->uid);
 			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
 			if (pop3_store->cache && info->uid)
 				camel_data_cache_remove(pop3_store->cache, "cache", info->uid, NULL);
 			camel_pop3_engine_command_free(pop3_store->engine, cmd);
+
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 			camel_message_info_free((CamelMessageInfo *)info);
 		}
 		g_free (expunged_path);
@@ -586,8 +627,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	}
 
 	camel_operation_end(NULL);
-
-	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
 }

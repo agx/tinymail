@@ -4138,6 +4138,7 @@ static void
 tny_camel_folder_poke_status_destroyer (gpointer data)
 {
 	PokeStatusInfo *info = (PokeStatusInfo *) data;
+
 	g_object_unref (info->self);
 	g_slice_free (PokeStatusInfo, info);
 }
@@ -4168,6 +4169,9 @@ tny_camel_folder_poke_status_thread (gpointer data)
 
 		folder = poke_folders->data;
 
+		if (folder == NULL)
+			goto mycont;
+
 		priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 		store = priv->store;
 
@@ -4197,9 +4201,10 @@ tny_camel_folder_poke_status_thread (gpointer data)
 				tny_camel_folder_poke_status_callback, 
 				info, tny_camel_folder_poke_status_destroyer);
 		}
-
 		g_object_unref (folder);
+		poke_folders->data = NULL;
 
+mycont:
 		poke_folders = g_list_next (poke_folders);
 		mypoke_folders = poke_folders;
 

@@ -836,7 +836,7 @@ pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 		return;
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
-	
+
 	if (pop3_store->engine == NULL) {
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		return;

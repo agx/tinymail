@@ -94,7 +94,7 @@ struct _TnyDemouiSummaryViewPriv
 	GtkTreeView *mailbox_view, *header_view;
 	TnyMsgView *msg_view;
 	guint accounts_reloaded_signal;
-	GtkWidget *status, *progress, *online_button, *poke_button;
+	GtkWidget *status, *progress, *online_button, *poke_button, *sync_button;
 	guint status_id;
 	gulong mailbox_select_sid;
 	GtkTreeSelection *mailbox_select;
@@ -1380,6 +1380,38 @@ on_uncache_account_activate (GtkMenuItem *mitem, gpointer user_data)
 	}
 }
 
+static void
+sync_button_clicked (GtkWidget *button, gpointer user_data)
+{
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+
+	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
+	{
+		gint type;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{ 
+			TnyFolder *folder;
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
+
+			if (TNY_IS_FOLDER (folder))
+				tny_folder_sync_async (folder, TRUE, NULL, NULL, NULL);
+
+			g_object_unref (folder);
+		}
+
+	}
+}
+
 
 static void 
 on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
@@ -1669,6 +1701,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->last_mailbox_correct_select_set = FALSE;
 	priv->online_button = gtk_toggle_button_new_with_label (GO_ONLINE_TXT);
 	priv->poke_button = gtk_button_new_with_label ("Poke status");
+	priv->sync_button = gtk_button_new_with_label ("Sync");
 	priv->current_accounts = NULL;
 
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
@@ -1676,6 +1709,9 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	g_signal_connect (G_OBJECT (priv->poke_button), "clicked", 
 		G_CALLBACK (poke_button_toggled), self);
+
+	g_signal_connect (G_OBJECT (priv->sync_button), "clicked", 
+		G_CALLBACK (sync_button_clicked), self);
 
 #if PLATFORM==1
 	platfact = tny_gnome_platform_factory_get_instance ();
@@ -1704,9 +1740,11 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->progress, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->online_button, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->poke_button, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (priv->status), priv->sync_button, FALSE, FALSE, 0);
 
 	gtk_widget_show (priv->online_button);
 	gtk_widget_show (priv->poke_button);
+	gtk_widget_show (priv->sync_button);
 	gtk_widget_show (priv->status);
 	gtk_widget_show (GTK_WIDGET (vbox));
 

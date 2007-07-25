@@ -94,28 +94,20 @@ static TnyFolder *
 tny_camel_pop_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
 {
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-	TnyCamelFolder *folder = NULL;
+	TnyCamelPopStoreAccountPriv *ppriv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
 
-	GList *copy = priv->managed_folders;
-	while (copy)
+	g_static_rec_mutex_lock (priv->factory_lock);
+
+	if (!ppriv->inbox) 
 	{
-		TnyFolder *fnd = (TnyFolder*) copy->data;
-		const gchar *name = tny_folder_get_id (fnd);
-		if (!strcmp (name, full_name))
-		{
-			folder = TNY_CAMEL_FOLDER (g_object_ref (G_OBJECT (fnd)));
-			*was_new = FALSE;
-			break;
-		}
-		copy = g_list_next (copy);
-	}
-
-	if (!folder) {
-		folder = TNY_CAMEL_FOLDER (_tny_camel_pop_folder_new ());
 		*was_new = TRUE;
+		ppriv->inbox = TNY_FOLDER (_tny_camel_pop_folder_new ());
+		priv->managed_folders = g_list_prepend (priv->managed_folders, ppriv->inbox);
 	}
 
-	return (TnyFolder *) folder;
+	g_static_rec_mutex_unlock (priv->factory_lock);
+
+	return (TnyFolder *) g_object_ref (ppriv->inbox);
 }
 
 /**
@@ -137,6 +129,9 @@ static void
 tny_camel_pop_store_account_finalize (GObject *object)
 {
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (object);
+
+	if (priv->inbox)
+		g_object_unref (priv->inbox);
 
 	g_mutex_free (priv->lock);
 
@@ -231,8 +226,6 @@ tny_camel_pop_store_account_set_leave_messages_on_server (TnyCamelPOPStoreAccoun
 	CamelPOP3Store *pop3_store = (CamelPOP3Store *) service;
 
 	pop3_store->immediate_delete_after = !enabled;
-
-	
 }
 
 
@@ -241,6 +234,7 @@ tny_camel_pop_store_account_instance_init (GTypeInstance *instance, gpointer g_c
 {
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (instance);
 
+	priv->inbox = NULL;
 	priv->lock = g_mutex_new ();
 
 	return;

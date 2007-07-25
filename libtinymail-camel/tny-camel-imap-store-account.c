@@ -71,12 +71,19 @@ tny_camel_imap_store_account_factor_folder (TnyCamelStoreAccount *self, const gc
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelFolder *folder = NULL;
 
-	GList *copy = priv->managed_folders;
+	GList *copy = NULL;
+
+	g_static_rec_mutex_lock (priv->factory_lock);
+
+	copy = priv->managed_folders;
 	while (copy)
 	{
 		TnyFolder *fnd = (TnyFolder*) copy->data;
 		const gchar *name = tny_folder_get_id (fnd);
-		if (!strcmp (name, full_name))
+
+		/* printf ("COMPARE: [%s] [%s]\n", name, full_name); */
+
+		if (name && full_name && !strcmp (name, full_name))
 		{
 			folder = TNY_CAMEL_FOLDER (g_object_ref (G_OBJECT (fnd)));
 			*was_new = FALSE;
@@ -87,8 +94,14 @@ tny_camel_imap_store_account_factor_folder (TnyCamelStoreAccount *self, const gc
 
 	if (!folder) {
 		folder = TNY_CAMEL_FOLDER (_tny_camel_imap_folder_new ());
+		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+
+		/* printf ("CREATE: %s\n", full_name); */
+
 		*was_new = TRUE;
 	}
+
+	g_static_rec_mutex_unlock (priv->factory_lock);
 
 	return (TnyFolder *) folder;
 }
