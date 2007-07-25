@@ -848,15 +848,26 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	   & then retrieve from cache, otherwise, start a new one, and similar */
 
 	if (fi->cmd != NULL) {
+
+		g_static_rec_mutex_lock (pop3_store->eng_lock);
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, fi->cmd)) > 0)
 			;
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 		if (i == -1)
 			fi->err = errno;
 
 		/* getting error code? */
 		/*g_assert (fi->cmd->state == CAMEL_POP3_COMMAND_DATA);*/
+
+		g_static_rec_mutex_lock (pop3_store->eng_lock);
+		if (pop3_store->engine == NULL) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			goto fail;
+		}
 		camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 		fi->cmd = NULL;
 
 		if (fi->err != 0) {
@@ -905,16 +916,25 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		fi->err = EIO;
 
 
+		g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+		if (pop3_store->engine == NULL) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			goto done;
+		}
+
 		pop3_store->engine->type = type;
 		pop3_store->engine->param = param;
 
-		if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL)
+		if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL) {
+
 			pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
 				cmd_tocache, fi, "RETR %u\r\n", fi->id);
-
-		else if (type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_PARTIAL)
+		}
+		else if (type & CAMEL_FOLDER_RECEIVE_PARTIAL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_PARTIAL) {
 			pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
 				cmd_tocache_partial, fi, "RETR %u\r\n", fi->id);
+		}
 
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;
@@ -923,7 +943,11 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 		/* getting error code? */
 		/*g_assert (pcr->state == CAMEL_POP3_COMMAND_DATA);*/
+
 		camel_pop3_engine_command_free(pop3_store->engine, pcr);
+
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 		camel_stream_reset(stream);
 
 		/* Check to see we have safely written flag set */
@@ -958,9 +982,18 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		if (type & CAMEL_FOLDER_RECEIVE_FULL && pop3_store->immediate_delete_after)
 		{
 			struct _CamelPOP3Command *cmd = NULL;
+
+			g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+			if (pop3_store->engine == NULL) {
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
+				goto done;
+			}
+
 			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", uid);
 			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
 			camel_pop3_engine_command_free(pop3_store->engine, cmd);
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		}
 	}
 
@@ -1003,14 +1036,15 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 		return NULL;
 	}
 
-	if (pop3_store->engine == NULL)
-	{
-		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
-		if (camel_exception_is_set (ex))
-			return NULL;
-	}
-
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+	if (pop3_store->engine == NULL) {
+		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
+		if (camel_exception_is_set (ex)) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			return NULL;
+		}
+	}
 
 	fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
 
@@ -1022,6 +1056,8 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 
 		return NULL;
 	}
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	old = fi->stream;
 
@@ -1035,15 +1071,33 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 
 	if (fi->cmd != NULL) {
 
+		g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+		if (pop3_store->engine == NULL) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			goto fail;
+		}
+
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, fi->cmd)) > 0)
 			;
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 		if (i == -1)
 			fi->err = errno;
 
 		/* getting error code? */
 		/*g_assert (fi->cmd->state == CAMEL_POP3_COMMAND_DATA);*/
+
+		g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+		if (pop3_store->engine == NULL) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			goto fail;
+		}
+
 		camel_pop3_engine_command_free(pop3_store->engine, fi->cmd);
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 		fi->cmd = NULL;
 
 		if (fi->err != 0) {
@@ -1078,15 +1132,24 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 		   return something (in case TOP %s 0 would otherwise be 
 		   misinterpreted by the POP server) */
 
+
+		g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+		if (pop3_store->engine == NULL) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			goto done;
+		}
+
 		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, 
 			cmd_tocache, fi, "TOP %u 0\r\n", fi->id);
-
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;
 		if (i == -1)
 			fi->err = errno;
-
 		camel_pop3_engine_command_free(pop3_store->engine, pcr);
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+
 		camel_stream_reset(stream);
 
 		fi->stream = old;
@@ -1134,8 +1197,6 @@ done:
 	camel_object_unref((CamelObject *)stream);
 fail:
 	camel_operation_end(NULL);
-
-	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	return message;
 }
