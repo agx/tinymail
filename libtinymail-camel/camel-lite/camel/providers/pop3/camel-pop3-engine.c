@@ -288,6 +288,9 @@ static int
 engine_command_queue(CamelPOP3Engine *pe, CamelPOP3Command *pc)
 {
 
+	if (!pe)
+		return -1;
+
 	g_static_rec_mutex_lock (pe->lock);
 
 	if (((pe->capa & CAMEL_POP3_CAP_PIPE) == 0 || (pe->sentlen + strlen(pc->data)) > CAMEL_POP3_SEND_LIMIT)
