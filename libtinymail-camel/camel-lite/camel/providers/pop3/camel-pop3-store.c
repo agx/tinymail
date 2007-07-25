@@ -140,7 +140,14 @@ pop3_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 {
 
 	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
-	
+
+	g_static_rec_mutex_lock (store->eng_lock);
+
+	if (store->engine == NULL) {
+		g_static_rec_mutex_lock (store->eng_lock);
+		return TRUE;
+	}
+
 	if (clean) {
 		CamelPOP3Command *pc;
 		
@@ -150,7 +157,6 @@ pop3_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 
-	g_static_rec_mutex_lock (store->eng_lock);
 	camel_object_unref((CamelObject *)store->engine);
 	store->engine = NULL;
 	g_static_rec_mutex_unlock (store->eng_lock);
