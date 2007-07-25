@@ -295,6 +295,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *) folder;
 	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, hcnt = 0;
+	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
@@ -464,6 +465,8 @@ mfail:
 	g_hash_table_destroy(pop3_folder->uids_id);
 
 	camel_operation_end (NULL);
+
+	camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
 
 	return;
 }
