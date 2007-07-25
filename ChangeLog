@@ -3,6 +3,7 @@
 	* Various locking improvements in the POP code
 	* Parallel retrieval of messages
 	* Disconnecting after summary retrieval of a POP folder
+	* Disconnecting after get-msg and sync of a POP folder
 
 2007-07-24  Philip Van Hoof  <pvanhoof@gnome.org>
 

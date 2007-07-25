@@ -944,6 +944,7 @@ camel_pop3_store_init (gpointer object, gpointer klass)
 {
 	CamelPOP3Store *store = (CamelPOP3Store *) object;
 
+	store->is_refreshing = FALSE;
 	store->immediate_delete_after = FALSE;
 	store->eng_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (store->eng_lock);

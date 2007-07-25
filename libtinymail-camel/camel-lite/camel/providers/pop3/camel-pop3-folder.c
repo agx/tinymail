@@ -301,10 +301,12 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		return;
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
+	pop3_store->is_refreshing = TRUE;
 	if (pop3_store->engine == NULL)
 	{
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
 		if (camel_exception_is_set (ex)) {
+			pop3_store->is_refreshing = FALSE;
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			return;
 		}
@@ -324,6 +326,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	if (pop3_store->engine == NULL) {
+		pop3_store->is_refreshing = FALSE;
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		goto mfail;
 	}
@@ -351,6 +354,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	if (pop3_store->engine == NULL) {
+		pop3_store->is_refreshing = FALSE;
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		goto mfail;
 	}
@@ -434,6 +438,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	if (pop3_store->engine == NULL) {
+		pop3_store->is_refreshing = FALSE;
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		goto mfail;
 	}
@@ -461,6 +466,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 mfail:
 
+	pop3_store->is_refreshing = FALSE;
+
 	/* dont need this anymore */
 	g_hash_table_destroy(pop3_folder->uids_id);
 
@@ -479,6 +486,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	CamelPOP3Store *pop3_store;
 	int i, max; CamelPOP3FolderInfo *fi;
 	CamelMessageInfoBase *info;
+	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (folder->parent_store);
@@ -505,6 +513,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	if (!expunge) {
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+		camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
 		return;
 	}
 
@@ -579,6 +588,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	camel_operation_end(NULL);
 
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+	camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
 }
 
 
@@ -843,6 +854,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelStream *stream = NULL;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
+	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 
 	stream = camel_data_cache_get(pop3_store->cache, "cache", uid, NULL);
 	if (stream)
@@ -886,12 +898,16 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		return NULL;
 	}
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL)
 	{
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
-		if (camel_exception_is_set (ex))
+		if (camel_exception_is_set (ex)) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			return NULL;
+		}
 	}
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	camel_operation_start (NULL, _("Retrieving message"));
 
@@ -1061,6 +1077,11 @@ done:
 	camel_object_unref((CamelObject *)stream);
 fail:
 	camel_operation_end(NULL);
+
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+	if (pop3_store->is_refreshing == FALSE)
+		camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	return message;
 }

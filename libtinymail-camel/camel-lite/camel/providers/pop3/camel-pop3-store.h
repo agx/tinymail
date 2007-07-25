@@ -48,7 +48,7 @@ typedef struct {
 	guint delete_after;
 	gboolean immediate_delete_after;
 	gchar *storage_path, *base_url;
-	gboolean connected;
+	gboolean connected, is_refreshing;
 	GStaticRecMutex *eng_lock;
 
 } CamelPOP3Store;
