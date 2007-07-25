@@ -3630,8 +3630,7 @@ camel_message_info_set_flags(CamelMessageInfo *mi, guint32 flags, guint32 set)
 {
 	gboolean retval;
 
-	g_static_rec_mutex_lock (&global_lock);
-
+	/* g_static_rec_mutex_lock (&global_lock); */
 	if (mi->summary)
 		if (CAMEL_IS_FOLDER_SUMMARY (mi->summary))
 			retval = ((CamelFolderSummaryClass *)((CamelObject *)mi->summary)->klass)->info_set_flags(mi, flags, set);
@@ -3640,7 +3639,7 @@ camel_message_info_set_flags(CamelMessageInfo *mi, guint32 flags, guint32 set)
 	else
 		retval = info_set_flags(mi, flags, set);
 
-	g_static_rec_mutex_unlock (&global_lock);
+	/* g_static_rec_mutex_unlock (&global_lock); */
 
 	return retval;
 }

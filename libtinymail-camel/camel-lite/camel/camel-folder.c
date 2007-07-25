@@ -1119,11 +1119,11 @@ camel_folder_get_message (CamelFolder *folder, const char *uid, CamelFolderRecei
 
 	g_return_val_if_fail (CAMEL_IS_FOLDER (folder), NULL);
 
-	CAMEL_FOLDER_REC_LOCK(folder, lock);
+	/* CAMEL_FOLDER_REC_LOCK(folder, lock); */
 
 	ret = CF_CLASS (folder)->get_message (folder, uid, type, param, ex);
 
-	CAMEL_FOLDER_REC_UNLOCK(folder, lock);
+	/* CAMEL_FOLDER_REC_UNLOCK(folder, lock); */
 
 	if (ret && camel_debug_start(":folder")) {
 		printf("CamelFolder:get_message('%s', '%s') =\n", folder->full_name, uid);
