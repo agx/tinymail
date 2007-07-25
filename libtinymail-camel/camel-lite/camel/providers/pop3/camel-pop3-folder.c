@@ -299,12 +299,16 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL)
 	{
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
-		if (camel_exception_is_set (ex))
+		if (camel_exception_is_set (ex)) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			return;
+		}
 	}
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	destroy_lists (pop3_folder);
 
@@ -316,10 +320,20 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+	if (pop3_store->engine == NULL) {
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+		goto mfail;
+	}
+
 	pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
 	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
 		pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
-	while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0);
+	while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
+		;
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	if (i == -1) 
 	{
@@ -332,8 +346,17 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	}
 
 	/* TODO: check every id has a uid & commands returned OK too? */
-	
+
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+	if (pop3_store->engine == NULL) {
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+		goto mfail;
+	}
+
 	camel_pop3_engine_command_free(pop3_store->engine, pcl);
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	/* Update the summary.mmap file */
 
@@ -350,10 +373,19 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		{
 			CamelMimeMessage *msg = NULL;
 
+			g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+			if (pop3_store->engine == NULL) {
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
+				continue;
+			}
+
 			if (pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) 
 				msg = pop3_get_top (folder, fi->uid, NULL);
 			else if (pop3_store->engine)
 				msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_PARTIAL, -1, NULL);
+
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 			if (msg) 
 			{
@@ -398,6 +430,13 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	camel_folder_summary_kill_hash (folder->summary);
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+	if (pop3_store->engine == NULL) {
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+		goto mfail;
+	}
+
 	if (pop3_store->engine)
 	{
 		if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL) {
@@ -415,6 +454,11 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 			}
 		}
 	}
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+
+mfail:
 
 	/* dont need this anymore */
 	g_hash_table_destroy(pop3_folder->uids_id);
@@ -439,11 +483,14 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL)
 	{
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
-		if (camel_exception_is_set (ex))
+		if (camel_exception_is_set (ex)) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			return;
+		}
 	}
 
 	if(pop3_store->delete_after && !expunge)
@@ -453,10 +500,10 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		camel_operation_end (NULL);
 	}
 
-	if (!expunge)
+	if (!expunge) {
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		return;
-
-	g_static_rec_mutex_lock (pop3_store->eng_lock);
+	}
 
 	camel_operation_start(NULL, _("Expunging deleted messages"));
 
@@ -548,14 +595,15 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL)
 	{
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
-		if (camel_exception_is_set (ex))
+		if (camel_exception_is_set (ex)) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			return;
+		}
 	}
-
-	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	for (i = 0; i < pop3_folder->uids->len; i++) 
 	{
