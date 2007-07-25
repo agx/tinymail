@@ -4237,12 +4237,12 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 	if (priv->folder)
 	{
 		info = g_slice_new (PokeStatusInfo);
-		g_static_rec_mutex_lock (priv->folder_lock);
+		/*g_static_rec_mutex_lock (priv->folder_lock);*/
 		info->unread = camel_folder_get_unread_message_count (priv->folder);
 		info->total = camel_folder_get_message_count (priv->folder);
-		g_static_rec_mutex_unlock (priv->folder_lock);
+		/*g_static_rec_mutex_unlock (priv->folder_lock);*/
 	} else {
-		g_static_rec_mutex_lock (priv->folder_lock);
+		/*g_static_rec_mutex_lock (priv->folder_lock);*/
 
 		if (store && CAMEL_IS_DISCO_STORE (store)  && priv->folder_name 
 			&& camel_disco_store_status (CAMEL_DISCO_STORE (store)) == CAMEL_DISCO_STORE_ONLINE)
@@ -4262,7 +4262,7 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 			}
 		}
 
-		g_static_rec_mutex_unlock (priv->folder_lock);
+		/*g_static_rec_mutex_unlock (priv->folder_lock);*/
 	}
 
 
