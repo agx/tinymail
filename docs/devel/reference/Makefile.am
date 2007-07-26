@@ -30,8 +30,7 @@ TO_SCAN = \
 	--source-dir=$(top_srcdir)/libtinymail-gnomevfs \
 	--source-dir=$(top_srcdir)/libtinymail-gnome-desktop \
 	--source-dir=$(top_srcdir)/libtinymail-camel \
-	--source-dir=$(top_srcdir)/libtinymail-queues \
-	--source-dir=$(top_srcdir)/libtinymail-tp 
+	--source-dir=$(top_srcdir)/libtinymail-queues 
 
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED" 
@@ -55,9 +54,9 @@ FIXXREF_OPTIONS=
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/*.c
-HFILE_GLOB=$(top_srcdir)/libtinymail/*.h $(top_srcdir)/libtinymailui/*.h $(top_srcdir)/libtinymailui-gtk/*.h $(top_srcdir)/libtinymail-gnomevfs/*.h $(top_srcdir)/libtinymail-camel/*.h $(top_srcdir)/libtinymailui-mozembed/*.h $(top_srcdir)/tests/shared/*.h $(top_srcdir)/libtinymail-queues/*.h $(top_srcdir)/libtinymail-tp/*.h
+HFILE_GLOB=$(top_srcdir)/libtinymail/*.h $(top_srcdir)/libtinymailui/*.h $(top_srcdir)/libtinymailui-gtk/*.h $(top_srcdir)/libtinymail-gnomevfs/*.h $(top_srcdir)/libtinymail-camel/*.h $(top_srcdir)/libtinymailui-mozembed/*.h $(top_srcdir)/tests/shared/*.h $(top_srcdir)/libtinymail-queues/*.h
 
-CFILE_GLOB=$(top_srcdir)/libtinymail/*.c $(top_srcdir)/libtinymailui/*.c $(top_srcdir)/libtinymailui-gtk/*.c $(top_srcdir)/libtinymail-gnomevfs/*.c $(top_srcdir)/libtinymail-camel/*.c $(top_srcdir)/libtinymailui-mozembed/*.c $(top_srcdir)/tests/shared/*.c $(top_srcdir)/libtinymail-queues/*.c $(top_srcdir)/libtinymail-tp/*.c
+CFILE_GLOB=$(top_srcdir)/libtinymail/*.c $(top_srcdir)/libtinymailui/*.c $(top_srcdir)/libtinymailui-gtk/*.c $(top_srcdir)/libtinymail-gnomevfs/*.c $(top_srcdir)/libtinymail-camel/*.c $(top_srcdir)/libtinymailui-mozembed/*.c $(top_srcdir)/tests/shared/*.c $(top_srcdir)/libtinymail-queues/*.c
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
@@ -97,7 +96,6 @@ INCLUDES= $(LIBTINYMAIL_CFLAGS) $(LIBTINYMAILUI_CFLAGS) 		\
 	-I$(top_srcdir)/tinymail					\
 	-I$(top_srcdir)/tests/shared					\
 	-I$(top_srcdir)/libtinymail-queues				\
-	-I$(top_srcdir)/libtinymail-tp					\
 	$(LIBTINYMAIL_ASYNCWORKER_CFLAGS)
 
 GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS)						\
@@ -114,7 +112,6 @@ GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS)						\
 	$(top_builddir)/libtinymail-gnome-desktop/libtinymail-gnome-desktop-$(API_VERSION).la	\
 	$(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la		\
 	$(top_builddir)/libtinymail-queues/libtinymail-queues-$(API_VERSION).la			\
-	$(top_builddir)/libtinymail-tp/libtinymail-tp-$(API_VERSION).la				\
 	$(top_builddir)/tests/shared/libtestsshared.a
 
 
