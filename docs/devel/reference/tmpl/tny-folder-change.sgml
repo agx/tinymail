@@ -140,7 +140,7 @@ as information about what got changed.
 @headers: 
 
 
-<!-- ##### FUNCTION tny_folder_change_get_removed_headers ##### -->
+<!-- ##### FUNCTION tny_folder_change_get_expunged_headers ##### -->
 <para>
 
 </para>

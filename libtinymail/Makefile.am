@@ -103,6 +103,6 @@ libtinymail_1_0_include_HEADERS = $(libtinymail_1_0_headers)
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libtinymail-$(API_VERSION).pc
-EXTRA_DIST = $(pkgconfig_DATA:-$(API_VERSION).pc=.pc.in)
+EXTRA_DIST = $(pkgconfig_DATA:-$(API_VERSION).pc=.pc.in) tny-signals-marshal.list
 
 DISTCLEANFILES = $(pkgconfig_DATA)

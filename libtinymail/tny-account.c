@@ -34,8 +34,8 @@ guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
 /**
  * tny_account_start_operation:
  * @self: a #TnyAccount object
- * @mdomain: the domain of the #TnyStatus instances that will happen in @status_callback
- * @mcode: the code of the #TnyStatus instances that will happen in @status_callback
+ * @domain: the domain of the #TnyStatus instances that will happen in @status_callback
+ * @code: the code of the #TnyStatus instances that will happen in @status_callback
  * @status_callback: status callback handler
  * @status_user_data: the user-data to give to the @status_callback
  *

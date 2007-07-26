@@ -17,28 +17,11 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_ACCOUNT_TYPE ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
-<para>
-
-</para>
-
-@:
-
-@Param2: 
-@Param2: 
 
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
@@ -75,6 +58,20 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @connection_status_changed: 
 
 <!-- ##### MACRO TNY_TYPE_CONNECTION_STATUS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_TYPE_ACCOUNT_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_TYPE_ACCOUNT_SIGNAL ##### -->
 <para>
 
 </para>

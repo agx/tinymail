@@ -85,7 +85,10 @@ DIST_SUBDIRS = \
 	libtinymailui-gnome-keyring \
 	libtinymail-acap \
 	libtinymail-queues \
-	libtinymail-gnome-desktop
+	libtinymail-asyncworker \
+	libtinymail-gnome-desktop \
+	libtinymail-tp \
+	libtinymailui-webkit
 
-DISTCHECK_CONFIGURE_FLAGS = --with-html-component=mozembed --enable-gtk-doc --enable-python-bindings --enable-unit-tests --enable-tests
+DISTCHECK_CONFIGURE_FLAGS = --with-html-component=mozembed --enable-gtk-doc --enable-python-bindings --enable-unit-tests --enable-tests --enable-queues
 

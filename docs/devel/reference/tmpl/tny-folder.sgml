@@ -32,6 +32,7 @@ A abstract type that defines a folder
 @remove_msg_func: 
 @add_msg_func: 
 @sync_func: 
+@sync_async_func: 
 @get_msg_remove_strategy_func: 
 @set_msg_remove_strategy_func: 
 @get_msg_receive_strategy_func: 
@@ -46,6 +47,7 @@ A abstract type that defines a folder
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
+@get_local_size_func: 
 @is_subscribed_func: 
 @refresh_async_func: 
 @refresh_func: 
@@ -156,6 +158,18 @@ A abstract type that defines a folder
 @err: 
 
 
+<!-- ##### FUNCTION tny_folder_sync_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@expunge: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
 <!-- ##### FUNCTION tny_folder_get_msg ##### -->
 <para>
 
@@ -247,6 +261,15 @@ A abstract type that defines a folder
 
 
 <!-- ##### FUNCTION tny_folder_get_unread_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_local_size ##### -->
 <para>
 
 </para>

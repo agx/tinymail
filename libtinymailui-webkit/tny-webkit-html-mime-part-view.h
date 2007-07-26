@@ -43,12 +43,12 @@ typedef struct _TnyWebkitHtmlMimePartViewClass TnyWebkitHtmlMimePartViewClass;
 
 struct _TnyWebkitHtmlMimePartView
 {
-	GtkWebkit parent;
+	GObject parent;
 };
 
 struct _TnyWebkitHtmlMimePartViewClass
 {
-	GtkWebkitClass parent_class;
+	GObjectClass parent_class;
 };
 
 GType tny_webkit_html_mime_part_view_get_type (void);

@@ -54,7 +54,10 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @conlock: 
 @queue_lock: 
 @conthread: 
+@stop_now: 
+@initialized: 
 @is_inuse: 
+@background_thread_running: 
 @regged_queues: 
 
 <!-- ##### STRUCT TnySessionCamel ##### -->
@@ -107,5 +110,13 @@ develop against the #TnyAccountStore interface API using an instance of their im
 
 @self: 
 @enable: 
+
+
+<!-- ##### FUNCTION tny_session_camel_set_initialized ##### -->
+<para>
+
+</para>
+
+@self: 
 
 

@@ -85,7 +85,6 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-account-store.h \
 	$(top_srcdir)/libtinymail/tny-combined-account.h \
 	$(top_srcdir)/libtinymail/tny-device.h \
-	$(top_srcdir)/libtinymail/tny-enums.h \
 	$(top_srcdir)/libtinymail/tny-error.h \
 	$(top_srcdir)/libtinymail/tny-folder-change.h \
 	$(top_srcdir)/libtinymail/tny-folder.h \
@@ -147,7 +146,6 @@ tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attach-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attachment-mime-part-view.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-enums.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-folder-store-tree-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-list-model.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-view.h \

@@ -17,66 +17,16 @@ A store account contains the folders of an E-mail service and handles the authen
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_STORE_ACCOUNT_SIGNAL ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyStoreAccount ##### -->
 <para>
 
 </para>
-
-
-<!-- ##### SIGNAL TnyStoreAccount::subscription-changed ##### -->
-<para>
-
-</para>
-
-@tnystoreaccount: the object which received the signal.
-@arg1: 
-
-<!-- ##### STRUCT TnyStoreAccountIface ##### -->
-<para>
-
-</para>
-
-@parent: 
-@subscription_changed: 
-@subscribe_func: 
-@unsubscribe_func: 
-@find_folder_func: 
-@delete_cache_func: 
-
-<!-- ##### FUNCTION tny_store_account_subscribe ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-
-
-<!-- ##### FUNCTION tny_store_account_unsubscribe ##### -->
-<para>
-
-</para>
-
-@self: 
-@folder: 
-
-
-<!-- ##### FUNCTION tny_store_account_find_folder ##### -->
-<para>
-
-</para>
-
-@self: 
-@url_string: 
-@err: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_store_account_delete_cache ##### -->
-<para>
-
-</para>
-
-@self: 
 
 

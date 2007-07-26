@@ -28,6 +28,7 @@ A type that can merge multiple other folders together
 
 </para>
 
+@folder_name: 
 @Returns: 
 
 

@@ -46,45 +46,45 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::connecting-finished ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -177,6 +177,7 @@ Shared include file with forward typedefs
 @remove_msg_func: 
 @add_msg_func: 
 @sync_func: 
+@sync_async_func: 
 @get_msg_remove_strategy_func: 
 @set_msg_remove_strategy_func: 
 @get_msg_receive_strategy_func: 
@@ -191,6 +192,7 @@ Shared include file with forward typedefs
 @get_folder_type_func: 
 @get_all_count_func: 
 @get_unread_count_func: 
+@get_local_size_func: 
 @is_subscribed_func: 
 @refresh_async_func: 
 @refresh_func: 
@@ -335,8 +337,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnydevice: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -455,6 +457,17 @@ getting the message or in case there was an error.
 @msg: the #TnyMsg instance that was requested
 @err: in case there was an error, this !GError instance is not NULL
 @user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnySyncFolderCallback ##### -->
+<para>
+
+</para>
+
+@folder: 
+@cancelled: 
+@err: 
+@user_data: 
 
 
 <!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
@@ -599,18 +612,32 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+
+<!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -618,6 +645,7 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @parent: 
+@msg_sending: 
 @msg_sent: 
 @error_happened: 
 @add_func: 

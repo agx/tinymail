@@ -33,37 +33,26 @@ shutdown obviously lose the unsent messages.
 
 </para>
 
-
-<!-- ##### SIGNAL TnySendQueue::error-happened ##### -->
-<para>
-
-</para>
-
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-
-<!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
-<para>
-
-</para>
-
-@tnysendqueue: the object which received the signal.
-@arg1: 
-
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
 
 </para>
 
 @parent: 
+@msg_sending: 
 @msg_sent: 
 @error_happened: 
 @add_func: 
 @get_sentbox_func: 
 @get_outbox_func: 
 @cancel_func: 
+
+<!-- ##### MACRO TNY_TYPE_SEND_QUEUE_SIGNAL ##### -->
+<para>
+
+</para>
+
+
 
 <!-- ##### FUNCTION tny_send_queue_add ##### -->
 <para>

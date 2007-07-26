@@ -25,6 +25,10 @@ Enumerations for tinymail
 @TNY_FOLDER_STATUS_CODE_REFRESH: a status that occurs while a folder is being refreshed
 @TNY_FOLDER_STATUS_CODE_GET_MSG: a status that occurs while a message is being downloaded
 @TNY_GET_MSG_QUEUE_STATUS_GET_MSG: 
+@TNY_FOLDER_STATUS_CODE_XFER_MSGS: 
+@TNY_FOLDER_STATUS_CODE_COPY_FOLDER: 
+@TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH: 
+@TNY_FOLDER_STATUS_CODE_SYNC: 
 
 <!-- ##### ENUM TnyStatusDomain ##### -->
 <para>
@@ -51,8 +55,9 @@ Enumerations for tinymail
 @TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT: indicates that the total count of the folder got changed
 @TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT: indicates that the unread count of the folder got changed
 @TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS: indicates that a summary item or header got added (that a message got added, this is a typical Push E-mail event)
-@TNY_FOLDER_CHANGE_CHANGED_REMOVED_HEADERS: indicates that a summary item or header got removed (that a message got removed, this is a typical Push E-mail event)
+@TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS: 
 @TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME: indicates that the folder got renamed
+@TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED: 
 
 <!-- ##### ENUM TnyFolderStoreChangeChanged ##### -->
 <para>
@@ -72,6 +77,7 @@ Enumerations for tinymail
 @TNY_TRANSPORT_ACCOUNT_ERROR: An error domain for errors that occured with a transport account
 @TNY_ACCOUNT_ERROR: An error domain for errors that occured with a account
 @TNY_ACCOUNT_STORE_ERROR: 
+@TNY_SEND_QUEUE_ERROR: 
 
 <!-- ##### ENUM TnyError ##### -->
 <para>
@@ -91,7 +97,16 @@ Enumerations for tinymail
 @TNY_FOLDER_STORE_ERROR_GET_FOLDERS: An error that occured while getting folders
 @TNY_FOLDER_STORE_ERROR_CREATE_FOLDER: An error that occured while creating a folder
 @TNY_TRANSPORT_ACCOUNT_ERROR_SEND: An error that occured while sending a message
+@TNY_TRANSPORT_ACCOUNT_ERROR_SEND_HOST_LOOKUP_FAILED: 
+@TNY_TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE: 
+@TNY_TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED: 
+@TNY_TRANSPORT_ACCOUNT_ERROR_SEND_USER_CANCEL: 
 @TNY_ACCOUNT_ERROR_TRY_CONNECT: An error that occured while trying to connect to an account
+@TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED: 
+@TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE: 
+@TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED: 
+@TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE: 
+@TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL: 
 @TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT: 
 @TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH: 
 @TNY_SEND_QUEUE_ERROR_ADD: 
@@ -105,6 +120,14 @@ Enumerations for tinymail
 @TNY_ACCOUNT_TYPE_STORE: A account that can store folders and messages
 @TNY_ACCOUNT_TYPE_TRANSPORT: A account that can send and messages (transfer them)
 @TNY_ACCOUNT_TYPE_COMBINED: 
+
+<!-- ##### ENUM TnyAccountSignal ##### -->
+<para>
+
+</para>
+
+@TNY_ACCOUNT_CONNECTION_STATUS_CHANGED: 
+@TNY_ACCOUNT_LAST_SIGNAL: 
 
 <!-- ##### ENUM TnyConnectionStatus ##### -->
 <para>
@@ -127,6 +150,8 @@ Enumerations for tinymail
 @TNY_ACCOUNT_STORE_ACCOUNT_INSERTED: An account was inserted
 @TNY_ACCOUNT_STORE_ACCOUNT_REMOVED: An account was removed
 @TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED: The accounts got reloaded
+@TNY_ACCOUNT_STORE_CONNECTING_STARTED: 
+@TNY_ACCOUNT_STORE_CONNECTING_FINISHED: 
 @TNY_ACCOUNT_STORE_LAST_SIGNAL: Number of signals
 
 <!-- ##### ENUM TnyAlertType ##### -->
@@ -200,6 +225,7 @@ framework developers about simply getting your "special" cool flag added to tiny
 @TNY_HEADER_FLAG_HIGH_PRIORITY: 
 @TNY_HEADER_FLAG_NORMAL_PRIORITY: 
 @TNY_HEADER_FLAG_LOW_PRIORITY: 
+@TNY_HEADER_FLAG_SUSPENDED_PRIORITY: 
 
 <!-- ##### ENUM TnyFolderType ##### -->
 <para>
@@ -221,4 +247,22 @@ framework developers about simply getting your "special" cool flag added to tiny
 @TNY_FOLDER_TYPE_ARCHIVE: 
 @TNY_FOLDER_TYPE_MERGE: 
 @TNY_FOLDER_TYPE_NUM: 
+
+<!-- ##### ENUM TnySendQueueSignal ##### -->
+<para>
+
+</para>
+
+@TNY_SEND_QUEUE_MSG_SENDING: 
+@TNY_SEND_QUEUE_MSG_SENT: 
+@TNY_SEND_QUEUE_ERROR_HAPPENED: 
+@TNY_SEND_QUEUE_LAST_SIGNAL: 
+
+<!-- ##### ENUM TnyStoreAccountSignal ##### -->
+<para>
+
+</para>
+
+@TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED: 
+@TNY_STORE_ACCOUNT_LAST_SIGNAL: 
 
