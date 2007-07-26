@@ -330,23 +330,34 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if ((delete_days = (gchar *) camel_url_get_param(service->url,"delete_after"))) 
 		store->delete_after =  atoi(delete_days);
 
-	g_static_rec_mutex_lock (store->eng_lock);
+	g_static_rec_mutex_lock (store->eng_lock); /* ! */
+
 	if (!(store->engine = camel_pop3_engine_new (tcp_stream, flags))) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 			_("Failed to read a valid greeting from POP server %s"),
 			service->url->host);
 		camel_object_unref (tcp_stream);
-		g_static_rec_mutex_unlock (store->eng_lock);
+
+		g_static_rec_mutex_unlock (store->eng_lock); /* ! */
+
 		return FALSE;
 	}
 	store->engine->store = store;
 	store->engine->partial_happening = FALSE;
+
+#ifndef HAVE_SSL /* ! */
 	g_static_rec_mutex_unlock (store->eng_lock);
+#endif
 
 	if (!must_tls && (ssl_mode != MODE_TLS)) 
 	{
 		camel_object_unref (tcp_stream);
 		store->connected = TRUE;
+
+#ifdef HAVE_SSL /* ! */
+		g_static_rec_mutex_unlock (store->eng_lock);
+#endif
+
 		return TRUE;
 	}
 
@@ -404,9 +415,13 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	camel_pop3_engine_reget_capabilities (store->engine);
 	store->connected = TRUE;
 
+	g_static_rec_mutex_unlock (store->eng_lock); /* ! */
+
 	return TRUE;
 
  stls_exception:
+
+
 	if (clean_quit) 
 	{
 		/* try to disconnect cleanly */
@@ -416,12 +431,12 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		camel_pop3_engine_command_free (store->engine, pc);
 	}
 
-	g_static_rec_mutex_lock (store->eng_lock);
 	camel_object_unref (CAMEL_OBJECT (store->engine));
 	camel_object_unref (CAMEL_OBJECT (tcp_stream));
 	store->engine = NULL;
 	store->connected = FALSE;
-	g_static_rec_mutex_unlock (store->eng_lock);
+
+	g_static_rec_mutex_unlock (store->eng_lock); /* ! */
 
 	return FALSE;
 }
@@ -499,12 +514,22 @@ query_auth_types (CamelService *service, CamelException *ex)
 	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
 	GList *types = NULL;
 
-        types = CAMEL_SERVICE_CLASS (parent_class)->query_auth_types (service, ex);
+	types = CAMEL_SERVICE_CLASS (parent_class)->query_auth_types (service, ex);
 	if (camel_exception_is_set (ex))
 		return NULL;
 
 	if (connect_to_server_wrapper (service, NULL)) {
+
+		g_static_rec_mutex_lock (store->eng_lock);
+
+		if (store->engine == NULL) {
+			g_static_rec_mutex_unlock (store->eng_lock);
+			return NULL;
+		}
+
 		types = g_list_concat(types, g_list_copy(store->engine->auth));
+		g_static_rec_mutex_unlock (store->eng_lock);
+
 		pop3_disconnect (service, TRUE, NULL);
 	} else {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
@@ -613,9 +638,20 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 	}
 
 	if (!service->url->authmech) {
+
+		g_static_rec_mutex_lock (store->eng_lock);
+
+		if (store->engine == NULL) {
+			g_static_rec_mutex_unlock (store->eng_lock);
+			return FALSE;
+		}
+
 		/* pop engine will take care of pipelining ability */
 		pcu = camel_pop3_engine_command_new(store->engine, 0, NULL, NULL, "USER %s\r\n", service->url->user);
 		pcp = camel_pop3_engine_command_new(store->engine, 0, NULL, NULL, "PASS %s\r\n", service->url->passwd);
+
+		g_static_rec_mutex_unlock (store->eng_lock);
+
 	} else if (strcmp(service->url->authmech, "+APOP") == 0 && store->engine->apop) {
 		char *secret, md5asc[33], *d;
 		unsigned char md5sum[16], *s;
@@ -634,38 +670,67 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 			}
 			d++;
 		}
-		
+
+		g_static_rec_mutex_lock (store->eng_lock);
+
+		if (store->engine == NULL) {
+			g_static_rec_mutex_unlock (store->eng_lock);
+			return FALSE;
+		}
+
 		secret = g_alloca(strlen(store->engine->apop)+strlen(service->url->passwd)+1);
 		sprintf(secret, "%s%s",  store->engine->apop, service->url->passwd);
 		md5_get_digest(secret, strlen (secret), md5sum);
 
 		for (s = md5sum, d = md5asc; d < md5asc + 32; s++, d += 2)
 			sprintf (d, "%.2x", *s);
-		
+
 		pcp = camel_pop3_engine_command_new(store->engine, 0, NULL, NULL, "APOP %s %s\r\n",
 						    service->url->user, md5asc);
+
+		g_static_rec_mutex_unlock (store->eng_lock);
+
 	} else {
 		CamelServiceAuthType *auth;
 		GList *l;
 
+		g_static_rec_mutex_lock (store->eng_lock);
+
+		if (store->engine == NULL) {
+			g_static_rec_mutex_unlock (store->eng_lock);
+			return FALSE;
+		}
+
 		l = store->engine->auth;
 		while (l) {
 			auth = l->data;
-			if (strcmp(auth->authproto, service->url->authmech) == 0)
+			if (strcmp(auth->authproto, service->url->authmech) == 0) {
+				g_static_rec_mutex_unlock (store->eng_lock);
 				return try_sasl(store, service->url->authmech, ex) == -1;
+			}
 			l = l->next;
 		}
-		
+
+		g_static_rec_mutex_unlock (store->eng_lock);
+
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_URL_INVALID,
 				      _("Unable to connect to POP server %s: "
 					"No support for requested authentication mechanism."),
 				      CAMEL_SERVICE (store)->url->host);
 		return FALSE;
 	}
-	
+
+	g_static_rec_mutex_lock (store->eng_lock);
+
+	if (store->engine == NULL) {
+		g_static_rec_mutex_unlock (store->eng_lock);
+		return FALSE;
+	}
+
 	while ((status = camel_pop3_engine_iterate(store->engine, pcp)) > 0)
 		;
-	
+
+
 	if (status == -1) {
 		if (errno == EINTR) {
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, "Canceled");
@@ -688,12 +753,14 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 					"Error sending password: %s"),
 				      CAMEL_SERVICE (store)->url->host,
 				      store->engine->line ? (char *)store->engine->line : _("Unknown error"));
-	
-	camel_pop3_engine_command_free(store->engine, pcp);
+
+	camel_pop3_engine_command_free (store->engine, pcp);
 	
 	if (pcu)
 		camel_pop3_engine_command_free(store->engine, pcu);
-	
+
+	g_static_rec_mutex_unlock (store->eng_lock);
+
 	return status;
 }
 
@@ -705,7 +772,7 @@ pop3_connect (CamelService *service, CamelException *ex)
 	CamelSession *session;
 	char *errbuf = NULL;
 	int status;
-	
+
 	session = camel_service_get_session (service);
 
 	if (!connect_to_server_wrapper (service, ex))
@@ -736,9 +803,19 @@ pop3_connect (CamelService *service, CamelException *ex)
 	}
 	
 	/* Now that we are in the TRANSACTION state, try regetting the capabilities */
+
+	g_static_rec_mutex_lock (store->eng_lock);
+
+	if (store->engine == NULL) {
+		g_static_rec_mutex_unlock (store->eng_lock);
+		return FALSE;
+	}
+
 	store->engine->state = CAMEL_POP3_ENGINE_TRANSACTION;
 	camel_pop3_engine_reget_capabilities (store->engine);
-	
+
+	g_static_rec_mutex_unlock (store->eng_lock);
+
 	return TRUE;
 }
 
@@ -746,7 +823,13 @@ static gboolean
 pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 {
 	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
-	
+
+	g_static_rec_mutex_lock (store->eng_lock);
+	if (store->engine == NULL) {
+		g_static_rec_mutex_unlock (store->eng_lock);
+		return TRUE;
+	}
+
 	if (clean) {
 		CamelPOP3Command *pc;
 		
@@ -756,7 +839,6 @@ pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 
-	g_static_rec_mutex_lock (store->eng_lock);
 	camel_object_unref((CamelObject *)store->engine);
 	store->engine = NULL;
 	g_static_rec_mutex_unlock (store->eng_lock);

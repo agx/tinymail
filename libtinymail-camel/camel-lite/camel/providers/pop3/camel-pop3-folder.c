@@ -95,9 +95,23 @@ destroy_lists (CamelPOP3Folder *pop3_folder)
 
 		for (i=0;i<pop3_folder->uids->len;i++,fi++) {
 			if (fi[0]->cmd) {
+
+				g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+				if (pop3_store->engine == NULL) {
+					g_ptr_array_free(pop3_folder->uids, TRUE);
+					g_hash_table_destroy(pop3_folder->uids_uid);
+					g_free(fi[0]->uid);
+					g_free(fi[0]);
+					g_static_rec_mutex_unlock (pop3_store->eng_lock);
+					return;
+				}
+
 				while (camel_pop3_engine_iterate(pop3_store->engine, fi[0]->cmd) > 0)
 					;
 				camel_pop3_engine_command_free(pop3_store->engine, fi[0]->cmd);
+
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			}
 			
 			g_free(fi[0]->uid);
@@ -515,8 +529,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	}
 
 	if (!expunge) {
-		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		return;
 	}
 
@@ -956,15 +970,22 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	if (fi->cmd != NULL) {
 
 		g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+		if (pop3_store->engine == NULL) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			goto fail;
+		}
+
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, fi->cmd)) > 0)
 			;
+
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 		if (i == -1)
 			fi->err = errno;
 
 		/* getting error code? */
-		/*g_assert (fi->cmd->state == CAMEL_POP3_COMMAND_DATA);*/
+		/* g_assert (fi->cmd->state == CAMEL_POP3_COMMAND_DATA); */
 
 		g_static_rec_mutex_lock (pop3_store->eng_lock);
 		if (pop3_store->engine == NULL) {
@@ -1099,6 +1120,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", uid);
 			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
 			camel_pop3_engine_command_free(pop3_store->engine, cmd);
+
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		}
 	}
@@ -1258,6 +1280,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 		if (i == -1)
 			fi->err = errno;
 		camel_pop3_engine_command_free(pop3_store->engine, pcr);
+
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 
@@ -1407,8 +1430,7 @@ pop3_expunge_uids_offline (CamelFolder *folder, GPtrArray *uids, CamelException 
 		camel_folder_summary_remove_uid (folder->summary, uids->pdata[i]);
 		camel_folder_change_info_remove_uid (changes, uids->pdata[i]);
 		/* We intentionally don't remove it from the cache because
-		 * the cached data may be useful in replaying a COPY later.
-		 */
+		 * the cached data may be useful in replaying a COPY later. */
 	}
 	camel_folder_summary_save (folder->summary);
 

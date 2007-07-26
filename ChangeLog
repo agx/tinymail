@@ -1,3 +1,8 @@
+2007-07-26  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* More granularity in the locking of the POP code
+	* Several fixes in the POP code
+
 2007-07-25  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Various locking improvements in the POP code
