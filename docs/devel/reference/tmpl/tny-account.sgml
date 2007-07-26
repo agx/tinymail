@@ -23,6 +23,16 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 
+<!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
+<para>
+
+</para>
+
+@:
+
+@Param2: 
+@Param2: 
+
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
 

@@ -44,5 +44,148 @@ A abstract type that defines a store for accounts
 </para>
 
 
+<!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
+<para>
+
+</para>
+
+@: 
+@:
+
+@tnyaccountstore: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
+<para>
+
+</para>
+
+@: 
+@:
+
+@tnyaccountstore: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
+<para>
+
+</para>
+
+@: 
+@:
+
+@tnyaccountstore: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
+<para>
+
+</para>
+
+@:
+
+@tnyaccountstore: the object which received the signal.
+
+<!-- ##### SIGNAL TnyAccountStore::connecting-finished ##### -->
+<para>
+
+</para>
+
+@:
+
+@tnyaccountstore: the object which received the signal.
+
+<!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
+<para>
+
+</para>
+
+@:
+
+@tnyaccountstore: the object which received the signal.
+
+<!-- ##### STRUCT TnyAccountStoreIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_accounts_func: 
+@get_cache_dir_func: 
+@get_device_func: 
+@alert_func: 
+@find_account_func: 
+@account_changed: 
+@account_inserted: 
+@account_removed: 
+@accounts_reloaded: 
+@connecting_started: 
+@connecting_finished: 
+
+<!-- ##### FUNCTION tny_get_accounts_request_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_alert_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_accounts ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
+@types: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_cache_dir ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_get_device ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_alert ##### -->
+<para>
+
+</para>
+
+@self: 
+@account: 
+@type: 
+@question: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_account_store_find_account ##### -->
+<para>
+
+</para>
+
+@self: 
+@url_string: 
+@Returns: 
 
 

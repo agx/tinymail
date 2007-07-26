@@ -31,3 +31,59 @@ online/offline status.
 </para>
 
 
+<!-- ##### SIGNAL TnyDevice::connection-changed ##### -->
+<para>
+
+</para>
+
+@: 
+@:
+
+@tnydevice: the object which received the signal.
+@arg1: 
+
+<!-- ##### STRUCT TnyDeviceIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@is_online_func: 
+@force_online_func: 
+@force_offline_func: 
+@reset_func: 
+@connection_changed: 
+
+<!-- ##### FUNCTION tny_device_is_online ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_device_force_online ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_device_force_offline ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_device_reset ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

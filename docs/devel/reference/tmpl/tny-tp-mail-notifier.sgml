@@ -9,28 +9,11 @@ TnyTpMailNotifier
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
-
 <!-- ##### SECTION Stability_Level ##### -->
-
-
-<!-- ##### STRUCT TnyTpMailNotifier ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### FUNCTION tny_tp_mail_notifier_new ##### -->
-<para>
-
-</para>
-
-@folder: 
-@Returns: 
 
 

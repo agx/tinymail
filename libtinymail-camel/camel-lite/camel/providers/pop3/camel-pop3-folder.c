@@ -1161,6 +1161,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	CamelStream *stream = NULL, *old;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi;
+	CamelPOP3Engine *mengine = NULL;
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 	{
@@ -1211,17 +1212,23 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 			goto fail;
 		}
 
-		while ((i = camel_pop3_engine_iterate(pop3_store->engine, fi->cmd)) > 0)
-			;
+		mengine = pop3_store->engine;
+		camel_object_ref (mengine);
+
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+		while ((i = camel_pop3_engine_iterate(mengine, fi->cmd)) > 0)
+			;
 
 		if (i == -1)
 			fi->err = errno;
 
 		/* getting error code? */
-		/*g_assert (fi->cmd->state == CAMEL_POP3_COMMAND_DATA);*/
+		/* g_assert (fi->cmd->state == CAMEL_POP3_COMMAND_DATA); */
 
 		g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+		camel_object_unref (mengine);
 
 		if (pop3_store->engine == NULL) {
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);

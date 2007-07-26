@@ -450,8 +450,7 @@ tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (url_string);
-	g_assert (strlen (url_string) > 0);
-	g_assert (strstr (url_string, "://") != NULL);
+	g_assert (strlen (url_string) > 0); 
 	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_url_string_func != NULL);
 #endif
 
