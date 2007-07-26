@@ -538,7 +538,7 @@ get_folder_info (CamelStore *store, const char *top, guint32 flags, CamelExcepti
 			scan = scan->next;
 		}
 		fi->flags &= ~CAMEL_FOLDER_CHILDREN;
-		fi->flags |= CAMEL_FOLDER_VIRTUAL|CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_NOCHILDREN|CAMEL_FOLDER_NOINFERIORS|CAMEL_FOLDER_TYPE_INBOX;
+		fi->flags |= CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_NOCHILDREN|CAMEL_FOLDER_NOINFERIORS|CAMEL_FOLDER_TYPE_INBOX;
 	} else if (!strcmp(top, ".")) {
 		fi = scan_fi(store, flags, url, ".", _("Inbox"));
 		fi->flags |= CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_NOCHILDREN|CAMEL_FOLDER_NOINFERIORS|CAMEL_FOLDER_TYPE_INBOX;

@@ -374,6 +374,7 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 	CamelLocalFolder *folder = NULL;
 	char *newibex = g_strdup_printf("%s%s.ibex", path, new);
 	char *oldibex = g_strdup_printf("%s%s.ibex", path, old);
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	/* try to rollback failures, has obvious races */
 
@@ -391,11 +392,9 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 			goto ibex_failed;
 	}
 
-	xrename(old, new, path, ".ev-summary.mmap", TRUE, ex);
-
-	xrename(old, new, path, ".cmeta", TRUE, ex);
-
-	xrename(old, new, path, "", FALSE, ex);
+	xrename(old, new, path, ".ev-summary.mmap", TRUE, &nex);
+	xrename(old, new, path, ".cmeta", TRUE, &nex);
+	xrename(old, new, path, "", FALSE, &nex);
 
 	g_free(newibex);
 	g_free(oldibex);

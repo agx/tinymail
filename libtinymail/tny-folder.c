@@ -319,7 +319,7 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
  * If @new_name already exists in @into and @err is not NULL, then an error will
  * be set in @err and no further action will be performed.
  * 
- * Return value: a new folder instance to whom was copied
+ * Return value: a new folder instance to whom was copied or NULL in case of failure
  **/
 TnyFolder* 
 tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err)
@@ -338,13 +338,14 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
 	retval = TNY_FOLDER_GET_IFACE (self)->copy_func (self, into, new_name, del, err);
 
 #ifdef DBC /* ensure */
-	g_assert (retval);
-	g_assert (!strcmp (tny_folder_get_name (retval), new_name));
-	test = tny_folder_get_folder_store (retval);
-	g_assert (test);
-	g_assert (TNY_IS_FOLDER_STORE (test));
-	g_assert (test == into);
-	g_object_unref (G_OBJECT (test));
+	if (retval) {
+		g_assert (!strcmp (tny_folder_get_name (retval), new_name));
+		test = tny_folder_get_folder_store (retval);
+		g_assert (test);
+		g_assert (TNY_IS_FOLDER_STORE (test));
+		g_assert (test == into);
+		g_object_unref (G_OBJECT (test));
+	}
 #endif
 
 	return retval;

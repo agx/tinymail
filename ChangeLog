@@ -2,6 +2,7 @@
 
 	* More granularity in the locking of the POP code
 	* Several fixes in the POP code
+	* Folder renaming for local folders
 
 2007-07-25  Philip Van Hoof  <pvanhoof@gnome.org>
 
