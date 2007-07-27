@@ -1,3 +1,8 @@
+2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Merged tny-camel-folder.c with devel/sessionwork's version
+	* This moves the poke-status operations to the account's queue
+
 2007-07-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* More granularity in the locking of the POP code
