@@ -1,3 +1,10 @@
+2007-07-27  Murray Cumming  <murrayc@murrayc.com>
+
+	* camel/camel-mime-parser.c: (folder_scan_content),
+	(folder_scan_step): Initialize some variables because 
+	valgrind complains about uninitialized variables here. This does not 
+	fix it but it should make things clearer for someone who can fix it.
+
 2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merged tny-camel-folder.c with devel/sessionwork's version

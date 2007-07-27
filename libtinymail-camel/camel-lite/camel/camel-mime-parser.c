@@ -1303,12 +1303,13 @@ header_done:
 static struct _header_scan_stack *
 folder_scan_content(struct _header_scan_state *s, int *lastone, char **data, size_t *length)
 {
-	int atleast = s->atleast, newatleast;
+	int atleast = s->atleast;
+	int newatleast = 0;
 	register char *inptr=NULL;
-	char *inend;
-	char *start;
-	int len;
-	struct _header_scan_stack *part;
+	char *inend = NULL;
+	char *start = NULL;
+	int len = 0;
+	struct _header_scan_stack *part = NULL;
 	int onboundary = FALSE;
 
 	c(printf("scanning content\n"));
@@ -1520,13 +1521,16 @@ folder_scan_init_with_stream(struct _header_scan_state *s, CamelStream *stream)
 static void
 folder_scan_step(struct _header_scan_state *s, char **databuffer, size_t *datalength)
 {
-	struct _header_scan_stack *h, *hb;
-	const char *content;
-	const char *bound;
-	int type, state, seenlast;
+	struct _header_scan_stack *h = NULL;
+	struct _header_scan_stack **hb = NULL;
+	const char *content = NULL;
+	const char *bound = NULL;
+	int type = 0;
+	int state = 0;
+	int seenlast = 0;
 	CamelContentType *ct = NULL;
-	struct _header_scan_filter *f;
-	size_t presize;
+	struct _header_scan_filter *f = NULL;
+	size_t presize = 0;
 
 /*	printf("\nSCAN PASS: state = %d '%s'\n", s->state, states[s->state]);*/
 
