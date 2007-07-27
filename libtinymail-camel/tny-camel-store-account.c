@@ -1092,7 +1092,13 @@ typedef struct {
 	TnyGetFoldersCallback callback;
 	TnyFolderStoreQuery *query;
 	gpointer user_data;
-	guint depth; TnySessionCamel *session;
+	guint depth; 
+	TnySessionCamel *session;
+
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+
 } GetFoldersInfo;
 
 
@@ -1110,7 +1116,10 @@ tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 
 	_tny_session_stop_operation (info->session);
 
-	g_slice_free (GetFoldersInfo, info);
+	g_mutex_lock (info->mutex);
+	g_cond_broadcast (info->condition);
+	info->had_callback = TRUE;
+	g_mutex_unlock (info->mutex);
 
 	return;
 }
@@ -1143,6 +1152,10 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
 
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
 	if (info->callback)
 	{
 		if (info->depth > 0)
@@ -1159,7 +1172,16 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 		g_object_unref (G_OBJECT (info->list));
 	}
 
+	/* Wait on the queue for the mainloop callback to be finished */
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
 
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	g_slice_free (GetFoldersInfo, info);
 
 	return NULL;
 }

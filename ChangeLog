@@ -12,6 +12,8 @@
 	* Merged camel-pop3-engine.c with devel/sessionwork's version
 	* This fixes a locking problem while disconnecting the POP account
 
+	* Merging the Cond patch from devel/sessionwork
+
 2007-07-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* More granularity in the locking of the POP code
