@@ -2,6 +2,8 @@
 
 	* Merged tny-camel-folder.c with devel/sessionwork's version
 	* This moves the poke-status operations to the account's queue
+	* Merged camel-pop3-engine.c with devel/sessionwork's version
+	* This fixes a locking problem while disconnecting the POP account
 
 2007-07-26  Philip Van Hoof  <pvanhoof@gnome.org>
 

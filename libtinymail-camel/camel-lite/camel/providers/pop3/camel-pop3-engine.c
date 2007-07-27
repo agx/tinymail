@@ -435,10 +435,10 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 		return 0;
 	}
 
-	g_static_rec_mutex_unlock (pe->lock);
-
 	if (have_err)
 		camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
+
+	g_static_rec_mutex_unlock (pe->lock);
 
 	return pe->current==NULL?0:1;
 
@@ -461,10 +461,10 @@ ioerror:
 		e_dlist_addtail(&pe->done, (EDListNode *)pe->current);
 		pe->current = NULL;
 	}
-	g_static_rec_mutex_unlock (pe->lock);
 
-	/* Gah! */
 	camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
+
+	g_static_rec_mutex_unlock (pe->lock);
 
 	return -1;
 }
