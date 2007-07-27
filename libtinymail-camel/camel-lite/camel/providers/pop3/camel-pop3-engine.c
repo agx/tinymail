@@ -335,13 +335,18 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 
 	g_static_rec_mutex_lock (pe->lock);
 
+	camel_object_ref (pe);
+
 	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK) {
+		camel_object_unref (pe);
+
 		g_static_rec_mutex_unlock (pe->lock);
 		return 0;
 	}
 
 	pc = pe->current;
 	if (pc == NULL) {
+		camel_object_unref (pe);
 		g_static_rec_mutex_unlock (pe->lock);
 		return 0;
 	}
@@ -431,6 +436,8 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	if (pcwait && pcwait->state >= CAMEL_POP3_COMMAND_OK) {
 		if (have_err)
 			camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
+
+		camel_object_unref (pe);
 		g_static_rec_mutex_unlock (pe->lock);
 		return 0;
 	}
@@ -438,6 +445,7 @@ camel_pop3_engine_iterate(CamelPOP3Engine *pe, CamelPOP3Command *pcwait)
 	if (have_err)
 		camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
 
+	camel_object_unref (pe);
 	g_static_rec_mutex_unlock (pe->lock);
 
 	return pe->current==NULL?0:1;
@@ -464,6 +472,7 @@ ioerror:
 
 	camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
 
+	camel_object_unref (pe);
 	g_static_rec_mutex_unlock (pe->lock);
 
 	return -1;
