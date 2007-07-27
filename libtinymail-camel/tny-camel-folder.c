@@ -4246,11 +4246,6 @@ typedef struct
 	TnyFolder *self;
 	gint unread;
 	gint total;
-
-	GCond* condition;
-	gboolean had_callback;
-	GMutex *mutex;
-
 } PokeStatusInfo;
 
 static gboolean
@@ -4289,10 +4284,7 @@ tny_camel_folder_poke_status_destroyer (gpointer data)
 
 	g_object_unref (info->self);
 
-	g_mutex_lock (info->mutex);
-	g_cond_broadcast (info->condition);
-	info->had_callback = TRUE;
-	g_mutex_unlock (info->mutex);
+	g_slice_free (PokeStatusInfo, info);
 }
 
 
@@ -4331,25 +4323,10 @@ tny_camel_folder_poke_status_thread (gpointer user_data)
 	{
 		info->self = TNY_FOLDER (g_object_ref (folder));
 
-		info->mutex = g_mutex_new ();
-		info->condition = g_cond_new ();
-		info->had_callback = FALSE;
 
 		g_idle_add_full (G_PRIORITY_HIGH, 
 			tny_camel_folder_poke_status_callback, 
 			info, tny_camel_folder_poke_status_destroyer);
-
-
-		/* Wait on the queue for the mainloop callback to be finished */
-		g_mutex_lock (info->mutex);
-		if (!info->had_callback)
-			g_cond_wait (info->condition, info->mutex);
-		g_mutex_unlock (info->mutex);
-
-		g_mutex_free (info->mutex);
-		g_cond_free (info->condition);
-
-		g_slice_free (PokeStatusInfo, info);
 
 	} else if (info)
 		g_slice_free (PokeStatusInfo, info);
@@ -4405,6 +4382,7 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 		execute_callback (g_main_depth (), G_PRIORITY_HIGH, 
 				  tny_camel_folder_poke_status_callback, info, 
 				  tny_camel_folder_poke_status_destroyer);
+
 	}
 
 	return;
