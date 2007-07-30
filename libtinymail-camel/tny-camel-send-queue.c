@@ -316,15 +316,18 @@ thread_main (gpointer data)
 					priv->total--;
 				}
 			}
+
+			/* Emits msg-sent signal to inform msg has been sent */
+			if (priv->do_continue)
+				emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, i, priv->total);
+
 			g_mutex_unlock (priv->todo_lock);
 
 			g_object_unref (G_OBJECT (hassent));
-
+						
 			if (err != NULL)
 				g_error_free (err);
 
-			/* Emits msg-sent signal to inform msg has been sent */
-			emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, i, priv->total);
 			
 			i++;			
 

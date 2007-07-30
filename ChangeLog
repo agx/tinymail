@@ -1,7 +1,11 @@
 2007-07-30  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+
 	* Fixed some bugs in TnyMergeFolder notification function. This
         method was overwriting data into old change, rather than use the 
 	new_change structure to propagate changes to observed folders.
+
+        * Fixed bug in TnyCamelSendQueue related with msg-sent signal
+	emision. Now, when an error has detected, msg-sent is not emited.
 
 2007-07-27  Murray Cumming  <murrayc@murrayc.com>
 
