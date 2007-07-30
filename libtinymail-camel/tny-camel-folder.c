@@ -1063,15 +1063,9 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 	info->condition = g_cond_new ();
 	info->had_callback = FALSE;
 
-	if (info->callback)
-	{
-		execute_callback (info->depth, G_PRIORITY_DEFAULT, 
-				  tny_camel_folder_sync_async_callback, info, 
-				  tny_camel_folder_sync_async_destroyer);
-	} else { /* Thread reference */
-		g_object_unref (G_OBJECT (self));
-		_tny_camel_folder_unreason (priv);
-	}
+	execute_callback (info->depth, G_PRIORITY_DEFAULT, 
+			  tny_camel_folder_sync_async_callback, info, 
+			  tny_camel_folder_sync_async_destroyer);
 
 	/* Wait on the queue for the mainloop callback to be finished */
 	g_mutex_lock (info->mutex);
