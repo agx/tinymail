@@ -1,3 +1,8 @@
+2007-07-30  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+	* Fixed some bugs in TnyMergeFolder notification function. This
+        method was overwriting data into old change, rather than use the 
+	new_change structure to propagate changes to observed folders.
+
 2007-07-27  Murray Cumming  <murrayc@murrayc.com>
 
 	* camel/camel-mime-parser.c: (folder_scan_content),

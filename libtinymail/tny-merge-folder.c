@@ -1166,7 +1166,7 @@ tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 		while (!tny_iterator_is_done (iter))
 		{
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-			tny_folder_change_add_expunged_header (change, header);
+			tny_folder_change_add_expunged_header (new_change, header);
 			g_object_unref (header);
 			tny_iterator_next (iter);
 		}
@@ -1177,7 +1177,7 @@ tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 	if(tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED)
 	{
 		TnyMsg *msg = tny_folder_change_get_received_msg (change);
-		tny_folder_change_set_received_msg (change, msg);
+		tny_folder_change_set_received_msg (new_change, msg);
 		g_object_unref (msg);
 	}
 
