@@ -1185,6 +1185,38 @@ tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GEr
 	return;
 }
 
+
+/**
+ * tny_folder_get_headers_async:
+ * @self: a TnyFolder object
+ * @headers: A #TnyList instance where the headers will be put
+ * @refresh: whether or not to synchronize with the service first
+ * @callback: the callback that happens when the operation finished
+ * @status_callback: status callback
+ * @user_data: user data
+ * 
+ * Get the list of message header instances that are in @self. Also read
+ * about tny_folder_refresh.
+ *
+ * API warning: it's possible that between the @refresh and @callback, a pointer
+ * to a query object will be placed. This will introduce both an API and ABI 
+ * breakage.
+ **/
+void 
+tny_folder_get_headers_async (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (headers);
+	g_assert (TNY_IS_LIST (headers));
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_headers_async_func != NULL);
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->get_headers_async_func (self, headers, refresh, callback, status_callback, user_data);
+	return;
+}
+
+
 /**
  * tny_folder_get_id:
  * @self: a TnyFolder object

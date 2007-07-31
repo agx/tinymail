@@ -100,6 +100,7 @@ struct _TnyFolderIface
 	TnyMsg* (*find_msg_func) (TnyFolder *self, const gchar *url_string, GError **err);
 	void (*get_msg_async_func) (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*get_headers_func) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
+	void (*get_headers_async_func) (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	const gchar* (*get_name_func) (TnyFolder *self);
 	const gchar* (*get_id_func) (TnyFolder *self);
 	TnyAccount* (*get_account_func) (TnyFolder *self);
@@ -138,6 +139,7 @@ TnyMsg* tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err);
 TnyMsg* tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err);
 void tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
+void tny_folder_get_headers_async (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 TnyAccount* tny_folder_get_account (TnyFolder *self);
 const gchar* tny_folder_get_id (TnyFolder *self);
 const gchar* tny_folder_get_name (TnyFolder *self);

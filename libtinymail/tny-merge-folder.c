@@ -428,10 +428,135 @@ tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 	info->depth = g_main_depth ();
 
 	/* thread reference */
-	g_object_ref (G_OBJECT (info->self));
-	g_object_ref (G_OBJECT (info->header));
+	g_object_ref (info->self);
+	g_object_ref (info->header);
 
 	thread = g_thread_create (get_msg_async_thread, info, FALSE, NULL);
+
+	return;
+}
+
+
+
+typedef struct 
+{
+	TnyFolder *self;
+	TnyList *headers;
+	TnyRefreshFolderCallback callback;
+	TnyStatusCallback status_callback;
+	gpointer user_data;
+	gboolean cancelled, refresh;
+	guint depth;
+	GError *err;
+} GetHeadersFolderInfo;
+
+
+static void
+get_headers_async_destroyer (gpointer thr_user_data)
+{
+	GetHeadersFolderInfo *info = thr_user_data;
+
+	/* thread reference */
+	g_object_unref (info->self);
+	g_object_unref (info->headers);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	g_slice_free (GetHeadersFolderInfo, thr_user_data);
+
+	return;
+}
+
+static gboolean
+get_headers_async_callback (gpointer thr_user_data)
+{
+	GetHeadersFolderInfo *info = thr_user_data;
+	if (info->callback)
+		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+	return FALSE;
+}
+
+
+static gpointer 
+get_headers_async_thread (gpointer thr_user_data)
+{
+	GetHeadersFolderInfo *info = thr_user_data;
+	TnyFolder *self = info->self;
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	TnyIterator *iter;
+	GError *err = NULL;
+
+	g_static_rec_mutex_lock (priv->lock);
+
+	info->cancelled = FALSE;
+
+	iter = tny_list_create_iterator (priv->mothers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+
+		tny_folder_get_headers (cur, info->headers, info->refresh, &err);
+
+		/* TODO: Handler err */
+
+		/* TODO: Handle progress status callbacks ( info->status_callback )
+		 * you might have to start using refresh_async for that (in a 
+		 * serialized way, else you'd launch a buch of concurrent threads
+		 * and ain't going to be nice, perhaps). */
+
+		g_object_unref (cur);
+		tny_iterator_next (iter);
+	}
+	g_object_unref (iter);
+
+	info->err = NULL;
+
+	g_static_rec_mutex_unlock (priv->lock);
+
+	if (info->callback)
+	{
+		if (info->depth > 0)
+		{
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				get_headers_async_callback, 
+				info, get_headers_async_destroyer);
+		} else {
+			get_headers_async_callback (info);
+			get_headers_async_destroyer (info);
+		}
+	} else { /* Thread reference */
+		g_object_unref (info->self);
+		g_object_unref (info->headers);
+	}
+
+	g_thread_exit (NULL);
+
+	return NULL;
+}
+
+
+static void
+tny_merge_folder_get_headers_async (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	GetHeadersFolderInfo *info;
+	GThread *thread;
+
+	info = g_slice_new (GetHeadersFolderInfo);
+	info->err = NULL;
+	info->self = self;
+	info->headers = headers;
+	info->refresh = refresh;
+	info->callback = callback;
+	info->status_callback = status_callback;
+	info->user_data = user_data;
+	info->depth = g_main_depth ();
+
+	/* thread reference */
+	g_object_ref (self);
+	g_object_ref (headers);
+
+	thread = g_thread_create (get_headers_async_thread, info, FALSE, NULL);
 
 	return;
 }
@@ -1308,6 +1433,7 @@ tny_folder_init (TnyFolderIface *klass)
 	klass->find_msg_func = tny_merge_folder_find_msg;
 	klass->get_msg_async_func = tny_merge_folder_get_msg_async;
 	klass->get_headers_func = tny_merge_folder_get_headers;
+	klass->get_headers_async_func = tny_merge_folder_get_headers_async;
 	klass->get_name_func = tny_merge_folder_get_name;
 	klass->get_id_func = tny_merge_folder_get_id;
 	klass->get_account_func = tny_merge_folder_get_account;

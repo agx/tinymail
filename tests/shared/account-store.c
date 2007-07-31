@@ -172,7 +172,6 @@ tny_test_account_store_new (gboolean force_online, const gchar *cachedir)
 	}
 
 	self->session = tny_session_camel_new (TNY_ACCOUNT_STORE (self));
-	tny_session_camel_set_async_connecting (self->session, FALSE);
 
 	self->force_online = force_online;
 

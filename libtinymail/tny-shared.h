@@ -59,6 +59,7 @@ typedef struct _TnyStreamIface TnyStreamIface;
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);
 typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, GError **err, gpointer user_data);
+typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyList *headers, GError **err, gpointer user_data);
 typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data);
 typedef void (*TnySyncFolderCallback) (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data);
 typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data);

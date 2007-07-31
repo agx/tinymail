@@ -1517,6 +1517,168 @@ add_message_with_uid (gpointer data, gpointer user_data)
 	return;
 }
 
+
+
+typedef struct 
+{
+	GError *err;
+	TnyFolder *self;
+	TnyList *headers;
+	gboolean refresh;
+	TnyGetHeadersCallback callback;
+	gpointer user_data;
+	guint depth; 
+	TnySessionCamel *session;
+
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+
+} GetHeadersInfo;
+
+
+static void
+tny_camel_folder_get_headers_async_destroyer (gpointer thr_user_data)
+{
+	GetHeadersInfo *info = thr_user_data;
+
+	/* thread reference */
+	g_object_unref (info->self);
+	g_object_unref (info->headers);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	_tny_session_stop_operation (info->session);
+
+	if (info->condition) {
+		g_mutex_lock (info->mutex);
+		g_cond_broadcast (info->condition);
+		info->had_callback = TRUE;
+		g_mutex_unlock (info->mutex);
+	}
+
+	return;
+}
+
+static gboolean
+tny_camel_folder_get_headers_async_callback (gpointer thr_user_data)
+{
+	GetHeadersInfo *info = thr_user_data;
+	if (info->callback)
+		info->callback (info->self, FALSE, info->headers, &info->err, info->user_data);
+	return FALSE;
+}
+
+static gpointer 
+tny_camel_folder_get_headers_async_thread (gpointer thr_user_data)
+{
+	GetHeadersInfo *info = (GetHeadersInfo*) thr_user_data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
+
+	GError *err = NULL;
+
+	tny_folder_get_headers (info->self, info->headers, info->refresh, &err);
+
+	if (err != NULL)
+		info->err = g_error_copy ((const GError *) err);
+	else
+		info->err = NULL;
+
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
+	execute_callback (info->depth, G_PRIORITY_DEFAULT, 
+		tny_camel_folder_get_headers_async_callback, info, 
+		tny_camel_folder_get_headers_async_destroyer);
+
+	/* Wait on the queue for the mainloop callback to be finished */
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
+
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	g_slice_free (GetHeadersInfo, info);
+
+	return NULL;
+}
+
+static void
+tny_camel_folder_get_headers_async_cancelled_destroyer (gpointer thr_user_data)
+{
+	GetHeadersInfo *info = thr_user_data;
+	g_error_free (info->err);
+	g_object_unref (info->self);
+	g_object_unref (info->headers);
+	g_slice_free (GetHeadersInfo, info);
+	return;
+}
+
+static gboolean
+tny_camel_folder_get_headers_async_cancelled_callback (gpointer thr_user_data)
+{
+	GetHeadersInfo *info = thr_user_data;
+	if (info->callback)
+		info->callback (info->self, TRUE, info->headers, &info->err, info->user_data);
+	return FALSE;
+}
+
+static void 
+tny_camel_folder_get_headers_async (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_headers_async_func (self, headers, refresh, callback, status_callback, user_data);
+	return;
+}
+
+
+static void 
+tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	GetHeadersInfo *info;
+	GError *err = NULL;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	/* Idle info for the callbacks */
+	info = g_slice_new (GetHeadersInfo);
+	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	info->self = self;
+	info->headers = headers;
+	info->refresh = refresh;
+	info->callback = callback;
+	info->user_data = user_data;
+	info->depth = g_main_depth ();
+	info->condition = NULL;
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
+			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
+	{
+		if (callback) {
+			info->err = g_error_copy (err);
+			g_object_ref (info->self);
+			g_object_ref (info->headers);
+
+			execute_callback (info->depth, G_PRIORITY_DEFAULT,
+				tny_camel_folder_get_headers_async_cancelled_callback, info, 
+				tny_camel_folder_get_headers_async_cancelled_destroyer);
+		}
+		g_error_free (err);
+		return;
+	}
+
+	/* thread reference */
+	g_object_ref (info->self);
+	g_object_ref (info->headers);
+
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_get_headers_async_thread, info);
+
+	return;
+}
+
 static void
 tny_camel_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err)
 {
@@ -4669,6 +4831,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->get_msg_receive_strategy_func = tny_camel_folder_get_msg_receive_strategy;
 	klass->set_msg_receive_strategy_func = tny_camel_folder_set_msg_receive_strategy;
 	klass->get_headers_func = tny_camel_folder_get_headers;
+	klass->get_headers_async_func = tny_camel_folder_get_headers_async;
 	klass->get_msg_func = tny_camel_folder_get_msg;
 	klass->find_msg_func = tny_camel_folder_find_msg;
 	klass->get_msg_async_func = tny_camel_folder_get_msg_async;
@@ -4730,6 +4893,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->get_msg_remove_strategy_func = tny_camel_folder_get_msg_remove_strategy_default;
 	class->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy_default;
 	class->get_headers_func = tny_camel_folder_get_headers_default;
+	class->get_headers_async_func = tny_camel_folder_get_headers_async_default;
 	class->get_msg_func = tny_camel_folder_get_msg_default;
 	class->find_msg_func = tny_camel_folder_find_msg_default;
 	class->get_msg_async_func = tny_camel_folder_get_msg_async_default;

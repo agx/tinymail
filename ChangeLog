@@ -1,5 +1,12 @@
 2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
 
+	* Introduction of tny_folder_get_headers_async
+	* Adaptation of TnyGtkHeaderListModel to use the new API
+
+	* This was a major API change
+
+2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
+
 	* Merging back devel/pvanhoof/sessionwork to trunk/
 
 2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>

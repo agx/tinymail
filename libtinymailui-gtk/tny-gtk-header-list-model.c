@@ -913,6 +913,17 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	return;
 }
 
+static void
+get_hdrs_callback (TnyFolder *self, gboolean cancelled, TnyList *headers, GError **err, gpointer user_data)
+{
+	return;
+}
+
+static void 
+get_hdrs_status_callback (GObject *self, TnyStatus *status, gpointer user_data)
+{
+	return;
+}
 
 /**
  * tny_gtk_header_list_model_set_folder:
@@ -956,7 +967,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 
 	/* Get a new list of headers */
 	/* TODO add error handling and reporting here */
-	tny_folder_get_headers (folder, TNY_LIST (self), refresh, NULL);
+	tny_folder_get_headers_async (folder, TNY_LIST (self), refresh, get_hdrs_callback, get_hdrs_status_callback, NULL);
 
 	iter.stamp = priv->stamp;
 	iter.user_data = (gpointer) 0;
