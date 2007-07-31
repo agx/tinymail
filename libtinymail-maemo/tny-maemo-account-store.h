@@ -53,9 +53,6 @@ GType tny_maemo_account_store_get_type (void);
 TnyAccountStore* tny_maemo_account_store_new (void);
 TnySessionCamel* tny_maemo_account_store_get_session (TnyMaemoAccountStore *self);
 
-void tny_maemo_account_store_add_store_account (TnyMaemoAccountStore *self, TnyStoreAccount *account);
-void tny_maemo_account_store_add_transport_account (TnyAccountStore *self, TnyTransportAccount *account);
-
 G_END_DECLS
 
 #endif

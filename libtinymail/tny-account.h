@@ -102,6 +102,7 @@ struct _TnyAccountIface
 	gboolean (*matches_url_string_func) (TnyAccount *self, const gchar *url_string);
 	void (*start_operation_func) (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
 	void (*stop_operation_func) (TnyAccount *self, gboolean *canceled);
+	gboolean (*is_ready_func) (TnyAccount *self);
 
 	/* Signals*/
 	void (*connection_status_changed) (TnyAccount *self, TnyConnectionStatus status);
@@ -136,6 +137,8 @@ void tny_account_cancel (TnyAccount *self);
 gboolean tny_account_matches_url_string (TnyAccount *self, const gchar *url_string);
 void tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
 void tny_account_stop_operation (TnyAccount *self, gboolean *canceled);
+gboolean tny_account_is_ready (TnyAccount *self);
+
 
 G_END_DECLS
 

@@ -83,10 +83,10 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 	{
 		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
 		tny_folder_store_observer_update (observer, change);
-		g_object_unref (G_OBJECT (observer));
+		g_object_unref (observer);
 		tny_iterator_next (iter);
 	}
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 }
 
 static gboolean
@@ -97,7 +97,7 @@ connection_status_idle (gpointer data)
 
 	g_signal_emit (G_OBJECT (self), 
 		tny_account_signals [TNY_ACCOUNT_CONNECTION_STATUS_CHANGED], 
-		0, apriv->status);
+			0, apriv->status);
 
 	return FALSE;
 }
@@ -276,6 +276,7 @@ void
 _tny_camel_store_account_emit_conchg_signal (TnyCamelStoreAccount *self)
 {
 	/* tny_camel_store_account_do_emit (self); */
+	return;
 }
 
 static void 
@@ -410,10 +411,7 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 					"Unknown error while connecting");
 			}
 		} else {
-
 			tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
-
-			/* tny_camel_account_set_online (self, apriv->connected); */
 		}
 
 		g_static_rec_mutex_unlock (apriv->service_lock);
@@ -587,8 +585,6 @@ tny_camel_store_account_finalize (GObject *object)
 	g_object_unref (priv->queue);
 	g_object_unref (priv->msg_queue);
 
-	/* Disco store ? */
-
 	(*parent_class->finalize) (object);
 
 	return;
@@ -612,8 +608,6 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
-
-	/* TNY TODO: Support non-TnyCamelFolder TnyFolder implementations too */
 
 	store = CAMEL_STORE (apriv->service);
 
@@ -639,7 +633,6 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 	{
 		g_warning ("Trying to remove an invalid folder\n");
 		g_static_rec_mutex_unlock (aspriv->factory_lock);
-
 		return;
 	}
 
@@ -792,9 +785,7 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	if (nerr != NULL)
 		g_propagate_error (err, nerr);
 
-
 	_tny_session_stop_operation (apriv->session);
-
 
 	return;
 }
@@ -946,8 +937,6 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 		TnyFolder *fnd = (TnyFolder*) copy->data;
 		const gchar *name = tny_folder_get_id (fnd);
 
-		/* printf ("COMPARE: [%s] [%s]\n", name, full_name); */
-
 		if (name && full_name && !strcmp (name, full_name))
 		{
 			folder = TNY_CAMEL_FOLDER (g_object_ref (G_OBJECT (fnd)));
@@ -960,8 +949,6 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 	if (!folder) {
 		folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
 		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-
-		/* printf ("CREATE: %s\n", full_name); */
 
 		*was_new = TRUE;
 	}
@@ -1108,8 +1095,8 @@ tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 	GetFoldersInfo *info = thr_user_data;
 
 	/* gidle reference */
-	g_object_unref (G_OBJECT (info->self));
-	g_object_unref (G_OBJECT (info->list));
+	g_object_unref (info->self);
+	g_object_unref (info->list);
 
 	if (info->err)
 		g_error_free (info->err);
@@ -1128,12 +1115,33 @@ static gboolean
 tny_camel_store_account_get_folders_async_callback (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
-
 	if (info->callback)
 		info->callback (info->self, info->list,&info->err, info->user_data);
-
 	return FALSE;
 }
+
+
+/**
+ * When using a #GMainLoop this method will execute a callback using
+ * g_idle_add_full.  Note that without a #GMainLoop, the callbacks
+ * could happen in a worker thread (depends on who call it) at an
+ * unknown moment in time (check your locking in this case).
+ */
+static void
+execute_callback (gint depth, 
+		  gint priority,
+		  GSourceFunc idle_func,
+		  gpointer data, 
+		  GDestroyNotify destroy_func)
+{
+	if (depth > 0){
+		g_idle_add_full (priority, idle_func, data, destroy_func);
+	} else {
+		idle_func (data);
+		destroy_func (data);
+	}
+}
+
 
 static gpointer 
 tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
@@ -1156,21 +1164,9 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	info->condition = g_cond_new ();
 	info->had_callback = FALSE;
 
-	if (info->callback)
-	{
-		if (info->depth > 0)
-		{
-			g_idle_add_full (G_PRIORITY_HIGH, 
-				tny_camel_store_account_get_folders_async_callback, 
-				info, tny_camel_store_account_get_folders_async_destroyer);
-		} else {
-			tny_camel_store_account_get_folders_async_callback (info);
-			tny_camel_store_account_get_folders_async_destroyer (info);
-		}
-	} else {
-		g_object_unref (G_OBJECT (info->self));
-		g_object_unref (G_OBJECT (info->list));
-	}
+	execute_callback (info->depth, G_PRIORITY_DEFAULT, 
+			  tny_camel_store_account_get_folders_async_callback, info, 
+			  tny_camel_store_account_get_folders_async_destroyer);
 
 	/* Wait on the queue for the mainloop callback to be finished */
 	g_mutex_lock (info->mutex);
@@ -1190,22 +1186,20 @@ static void
 tny_camel_store_account_get_folders_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
-
 	/* gidle references */
 	g_object_unref (info->self);
 	g_object_unref (info->list);
 	g_error_free (info->err);
 	g_slice_free (GetFoldersInfo, info);
+	return;
 }
 
 static gboolean
 tny_camel_store_account_get_folders_async_cancelled_callback (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
-
 	if (info->callback)
 		info->callback (info->self, info->list, &info->err, info->user_data);
-
 	return FALSE;
 }
 
@@ -1244,24 +1238,19 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 			g_object_ref (info->self);
 			g_object_ref (info->list);
 
-			if (info->depth > 0){
-				g_idle_add_full (G_PRIORITY_DEFAULT, 
-						 tny_camel_store_account_get_folders_async_cancelled_callback, info,
-						 tny_camel_store_account_get_folders_async_cancelled_destroyer);
-			} else {
-				tny_camel_store_account_get_folders_async_cancelled_callback (info);
-				tny_camel_store_account_get_folders_async_cancelled_destroyer (info);
-			}
+			execute_callback (info->depth, G_PRIORITY_DEFAULT, 
+				tny_camel_store_account_get_folders_async_cancelled_callback, info,
+				tny_camel_store_account_get_folders_async_cancelled_destroyer);
 		}
 		g_error_free (err);
 		return;
 	}
 
 	/* thread reference */
-	g_object_ref (G_OBJECT (info->self));
-	g_object_ref (G_OBJECT (info->list)); 
+	g_object_ref (info->self);
+	g_object_ref (info->list); 
 	if (info->query)
-		g_object_ref (G_OBJECT (info->query));
+		g_object_ref (info->query);
 
 	_tny_camel_queue_launch (priv->queue, 
 			tny_camel_store_account_get_folders_async_thread, info);
@@ -1441,8 +1430,6 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	if (strcasestr (url_string, "maildir"))
 	{
-		// maildir:/home/xxx/.modest/local_folders#New%20folder/1183044323.16675_6.mindcrime_2_S_2_S
-
 		str = strchr (url_string, '#');
 		if (str && strlen (str) > 1)
 		{
@@ -1544,6 +1531,108 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	g_free (url_string);
 
 	return retval;
+}
+
+
+
+typedef struct {
+	TnySessionCamel *session;
+	TnyCamelStoreAccount *self;
+	gboolean online;
+	go_online_callback_func done_func;
+	gpointer user_data;
+} GoingOnlineInfo;
+
+static gpointer 
+tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
+{
+	GoingOnlineInfo *info = (GoingOnlineInfo*) thr_user_data;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (info->self);
+	GError *err = NULL;
+
+	/* So this happens in the queue thread. There's only one such thread
+	 * for each TnyCamelStoreAccount active at any given moment in time. 
+	 * This means that operations on the queue, while this is happening,
+	 * must wait. */
+
+	/* The info->done_func points to on_account_connect_done in the 
+	 * TnySessionCamel implementation. Or to the set_online_done handler.
+	 * Go take a look! */
+
+	apriv->is_connecting = TRUE;
+
+	/* This is one of those functions that our hero, Rob, is going to 
+	 * refactor/rename to something that does make sense :-). Isn't that
+	 * true Rob? */
+
+	_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (info->self), 
+			FALSE, &err);
+
+	if (err) {
+		info->done_func (info->session, TNY_CAMEL_ACCOUNT (info->self), err, info->user_data);
+		g_error_free (err);
+	} else {
+
+		/* This one actually sets the account to online. Although Rob 
+		 * is probably going to improve all this. Right *poke*? */
+
+		_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (info->self), 
+			info->online, &err);
+
+		if (err) {
+			info->done_func (info->session, 
+				TNY_CAMEL_ACCOUNT (info->self), err, info->user_data);
+			g_error_free (err);
+		} else
+			info->done_func (info->session, 
+				TNY_CAMEL_ACCOUNT (info->self), NULL, info->user_data);
+
+	}
+
+	apriv->is_connecting = FALSE;
+
+	/* Thread reference */
+	camel_object_unref (info->session);
+	g_object_unref (info->self);
+
+	return NULL;
+}
+
+/* This is that protected implementation that will request to go online, on the
+ * queue of this account @self. Each TnyCamelStoreAccount has two queues: One 
+ * queue is dedicated to getting messages. The other, the default queue, is
+ * dedicated to any other operation. Including getting itself connected with an 
+ * actual server (that can be both a POP or an IMAP server, depending on the 
+ * url-string and/or proto setting of @self). */
+
+void
+_tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySessionCamel *session, gboolean online, go_online_callback_func done_func, gpointer user_data)
+{
+	GoingOnlineInfo *info = NULL;
+	GError *err = NULL;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	/* Idle info for the callbacks */
+	info = g_slice_new0 (GoingOnlineInfo);
+
+	info->session = session;
+	info->self = self;
+	info->done_func = done_func;
+	info->online = online;
+	info->user_data = user_data;
+
+	/* thread reference */
+	g_object_ref (info->self);
+	camel_object_ref (info->session);
+
+
+	/* It's indeed a very typical queue operation */
+
+	_tny_camel_queue_launch (priv->queue, 
+		tny_camel_store_account_queue_going_online_thread, info);
+
+	return;
 }
 
 static void

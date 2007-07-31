@@ -93,7 +93,6 @@ struct _TnyDemouiSummaryViewPriv
  	GtkComboBox *account_view;
 	GtkTreeView *mailbox_view, *header_view;
 	TnyMsgView *msg_view;
-	guint accounts_reloaded_signal;
 	GtkWidget *status, *progress, *online_button, *poke_button, *sync_button;
 	guint status_id;
 	gulong mailbox_select_sid;
@@ -276,7 +275,7 @@ on_constatus_changed (TnyAccount *a, TnyConnectionStatus status, gpointer user_d
 }
 
 static void 
-reload_accounts_first (TnySummaryView *self, gboolean first_time)
+load_accounts (TnySummaryView *self, gboolean first_time)
 {
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyAccountStore *account_store = priv->account_store;
@@ -290,11 +289,7 @@ reload_accounts_first (TnySummaryView *self, gboolean first_time)
 
 	/* TnyGtkFolderStoreTreeModel is also a TnyList (it simply implements both the
 	   TnyList and the GtkTreeModel interfaces) */
-#if PLATFORM==1
-	mailbox_model = tny_gtk_folder_store_tree_model_new (TRUE, NULL);
-#else
-	mailbox_model = tny_gtk_folder_store_tree_model_new (FALSE, NULL);
-#endif
+	mailbox_model = tny_gtk_folder_store_tree_model_new (NULL);
 
 	g_object_unref (G_OBJECT (query));
 
@@ -370,18 +365,6 @@ reload_accounts_first (TnySummaryView *self, gboolean first_time)
 	return;
 }
 
-static void 
-reload_accounts (TnySummaryView *self)
-{
-	reload_accounts_first (self, FALSE);
-}
-
-static void
-accounts_reloaded (TnyAccountStore *store, gpointer user_data)
-{
-	reload_accounts ((TnySummaryView *)user_data);
-	return;
-}
 
 static void 
 online_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
@@ -494,16 +477,11 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 		TnyDevice *odevice = tny_account_store_get_device (priv->account_store);
 
 		if (g_signal_handler_is_connected (G_OBJECT (odevice), priv->connchanged_signal))
-		{
 			g_signal_handler_disconnect (G_OBJECT (odevice), 
 				priv->connchanged_signal);
-		}
 
-		g_signal_handler_disconnect (G_OBJECT (priv->account_store),
-			priv->accounts_reloaded_signal);
-
-		g_object_unref (G_OBJECT (priv->account_store));
-		g_object_unref (G_OBJECT (odevice));
+		g_object_unref (priv->account_store);
+		g_object_unref (odevice);
 	}
 
 	g_object_ref (G_OBJECT (account_store));
@@ -514,11 +492,7 @@ tny_demoui_summary_view_set_account_store (TnyAccountStoreView *self, TnyAccount
 
 	priv->account_store = account_store;
 
-	priv->accounts_reloaded_signal = g_signal_connect (
-		G_OBJECT (account_store), "accounts_reloaded",
-		G_CALLBACK (accounts_reloaded), self);
-
-	reload_accounts_first ((TnySummaryView *) self, TRUE);
+	load_accounts ((TnySummaryView *) self, TRUE);
 
 	g_object_unref (G_OBJECT (device));
 
@@ -1935,15 +1909,10 @@ tny_demoui_summary_view_finalize (GObject *object)
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
 	if (priv->current_accounts)
-		g_object_unref (G_OBJECT (priv->current_accounts));
+		g_object_unref (priv->current_accounts);
 
-	if (G_LIKELY (priv->account_store))
-	{
-		g_signal_handler_disconnect (G_OBJECT (priv->account_store),
-			priv->accounts_reloaded_signal);
-
-		g_object_unref (G_OBJECT (priv->account_store));
-	}
+	if (priv->account_store)
+		g_object_unref (priv->account_store);
 
 	g_mutex_lock (priv->monitor_lock);
 	if (priv->monitor)

@@ -32,6 +32,35 @@ guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
 
 
 /**
+ * tny_account_is_ready:
+ * @self: a #TnyAccount object
+ *
+ * Some implementations of #TnyAccount need registration in a subsystem or 
+ * factory before they are not only valid instances, but also ready to use. For
+ * example before their connection-status-changed signal emissions are accurate.
+ * This boolean property will tell you if @self is ready for that.
+ *
+ * Return value: whether @self is ready for use
+ **/
+gboolean 
+tny_account_is_ready (TnyAccount *self)
+{
+	gboolean retval = FALSE;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->is_ready_func != NULL);
+#endif
+
+	retval = TNY_ACCOUNT_GET_IFACE (self)->is_ready_func (self);
+
+#ifdef DBC /* ensure*/
+#endif
+
+	return retval;
+}
+
+/**
  * tny_account_start_operation:
  * @self: a #TnyAccount object
  * @domain: the domain of the #TnyStatus instances that will happen in @status_callback

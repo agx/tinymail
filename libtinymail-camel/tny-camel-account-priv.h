@@ -67,7 +67,7 @@ struct _TnyCamelAccountPriv
 	RefreshStatusInfo *csyncop;
 	GList *chooks;
 	TnyConnectionStatus status;
-	gboolean is_connecting;
+	gboolean is_connecting, is_ready;
 };
 
 const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);

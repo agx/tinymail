@@ -153,11 +153,7 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	gchar *ptr = strrchr (key, '/'); ptr++;
 
 	if (!strcmp (ptr, "count"))
-	{
 		kill_stored_accounts (priv);
-		g_signal_emit (self, 
-			tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED], 0);
-	}
 
 	g_free (key);
 
@@ -492,35 +488,6 @@ tny_gpe_account_store_add_account (TnyAccountStore *self, TnyAccount *account, c
 	return;
 }
 
-
-
-void
-tny_gpe_account_store_add_store_account (TnyGpeAccountStore *self, TnyStoreAccount *account)
-{
-	TnyGpeAccountStorePriv *priv = TNY_GPE_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	tny_gpe_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
-	tny_gpe_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "store");
-	tny_gpe_account_store_notify_add (TNY_ACCOUNT_STORE (self));
-
-	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
-
-	return;
-}
-
-void
-tny_gpe_account_store_add_transport_account (TnyGpeAccountStore *self, TnyTransportAccount *account)
-{
-	TnyGpeAccountStorePriv *priv = TNY_GPE_ACCOUNT_STORE_GET_PRIVATE (self);
-
-	tny_gpe_account_store_notify_remove (TNY_ACCOUNT_STORE (self));
-	tny_gpe_account_store_add_account (TNY_ACCOUNT_STORE (self), TNY_ACCOUNT (account), "transport");
-	tny_gpe_account_store_notify_add (TNY_ACCOUNT_STORE (self));
-
-	g_signal_emit (self, tny_account_store_signals [TNY_ACCOUNT_STORE_ACCOUNT_INSERTED], 0, account);
-
-	return;
-}
 
 static TnyDevice*
 tny_gpe_account_store_get_device (TnyAccountStore *self)

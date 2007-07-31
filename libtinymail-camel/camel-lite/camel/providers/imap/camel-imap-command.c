@@ -1006,8 +1006,8 @@ camel_imap_response_extract (CamelImapStore *store,
 			     CamelException *ex)
 {
 	int len = strlen (type), i;
-	char *resp;
-	
+	char *resp = NULL;
+
 	len = strlen (type);
 	
 	for (i = 0; i < response->untagged->len; i++) {

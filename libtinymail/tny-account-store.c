@@ -374,82 +374,6 @@ tny_account_store_base_init (gpointer g_class)
 	if (!tny_account_store_initialized) 
 	{
 /**
- * TnyAccountStore::account-changed
- * @self: the object on which the signal is emitted
- * @arg1: the #TnyAccount of the account that changed
- * @user_data: user data set when the signal handler was connected
- *
- * API WARNING: This API might change
- *
- * Emitted when an account in the store changed
- */
-		tny_account_store_signals[TNY_ACCOUNT_STORE_ACCOUNT_CHANGED] =
-		   g_signal_new ("account_changed",
-			TNY_TYPE_ACCOUNT_STORE,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnyAccountStoreIface, account_changed),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT);
-
-/**
- * TnyAccountStore::account-inserted
- * @self: the object on which the signal is emitted
- * @arg1: the #TnyAccount of the account that got inserted
- * @user_data: user data set when the signal handler was connected.
- *
- * API WARNING: This API might change
- *
- * Emitted when an account is added to the store
- */
-		tny_account_store_signals[TNY_ACCOUNT_STORE_ACCOUNT_INSERTED] =
-		   g_signal_new ("account_inserted",
-			TNY_TYPE_ACCOUNT_STORE,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnyAccountStoreIface, account_inserted),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT);
-
-/**
- * TnyAccountStore::account-removed
- * @self: the object on which the signal is emitted
- * @arg1: the #TnyAccount of the account that got removed
- * @user_data: user data set when the signal handler was connected.
- *
- * API WARNING: This API might change
- *
- * Emitted when an account is removed from the store
- */
-		tny_account_store_signals[TNY_ACCOUNT_STORE_ACCOUNT_REMOVED] =
-		   g_signal_new ("account_removed",
-			TNY_TYPE_ACCOUNT_STORE,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnyAccountStoreIface, account_removed),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__POINTER,
-			G_TYPE_NONE, 1, TNY_TYPE_ACCOUNT);
-
-/**
- * TnyAccountStore::accounts-reloaded
- * @self: the object on which the signal is emitted
- *
- * API WARNING: This API might change
- *
- * Emitted when the store reloads the accounts
- */
-		tny_account_store_signals[TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED] =
-		   g_signal_new ("accounts_reloaded",
-			TNY_TYPE_ACCOUNT_STORE,
-			G_SIGNAL_RUN_FIRST,
-			G_STRUCT_OFFSET (TnyAccountStoreIface, accounts_reloaded),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__VOID,
-			G_TYPE_NONE, 0);
-
-
-
-/**
  * TnyAccountStore::connecting-started
  * @self: the object on which the signal is emitted
  * @user_data: user data set when the signal handler was connected.
@@ -461,23 +385,6 @@ tny_account_store_base_init (gpointer g_class)
 		TNY_TYPE_ACCOUNT_STORE,
 		G_SIGNAL_RUN_FIRST,
 		G_STRUCT_OFFSET (TnyAccountStoreIface, connecting_started),
-		NULL, NULL,
-		g_cclosure_marshal_VOID__VOID, 
-		G_TYPE_NONE, 0);
-
-
-/**
- * TnyAccountStore::connecting-finished
- * @self: the object on which the signal is emitted
- * @user_data: user data set when the signal handler was connected.
- *
- * Emitted when the store finished trying to connect the accounts
- */
-	tny_account_store_signals[TNY_ACCOUNT_STORE_CONNECTING_FINISHED] =
-	   g_signal_new ("connecting_finished",
-		TNY_TYPE_ACCOUNT_STORE,
-		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET (TnyAccountStoreIface, connecting_finished),
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID, 
 		G_TYPE_NONE, 0);
@@ -584,12 +491,7 @@ tny_account_store_signal_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
-      { TNY_ACCOUNT_STORE_ACCOUNT_CHANGED, "TNY_ACCOUNT_STORE_ACCOUNT_CHANGED", "changed" },
-      { TNY_ACCOUNT_STORE_ACCOUNT_INSERTED, "TNY_ACCOUNT_STORE_ACCOUNT_INSERTED", "inserted" },
-      { TNY_ACCOUNT_STORE_ACCOUNT_REMOVED, "TNY_ACCOUNT_STORE_ACCOUNT_REMOVED", "removed" },
-      { TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED, "TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED", "reloaded" },
       { TNY_ACCOUNT_STORE_CONNECTING_STARTED, "TNY_ACCOUNT_STORE_CONNECTING_STARTED", "started" },
-      { TNY_ACCOUNT_STORE_CONNECTING_FINISHED, "TNY_ACCOUNT_STORE_CONNECTING_FINISHED", "finished" },
       { TNY_ACCOUNT_STORE_LAST_SIGNAL,  "TNY_ACCOUNT_STORE_LAST_SIGNAL", "last-signal" },
       { 0, NULL, NULL }
     };

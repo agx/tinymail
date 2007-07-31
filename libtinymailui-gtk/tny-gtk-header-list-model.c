@@ -814,7 +814,7 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_EXTRA
 static void forea (gpointer u, gpointer o)
 {
 	g_print ("TnyGtkHeaderListModel::finalize unrefs hdr to: %d\n", ((GObject *)u)->ref_count);
@@ -844,7 +844,7 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	remove_del_timeouts (self);
 
-#ifdef DEBUG
+#ifdef DEBUG_EXTRA
 	g_ptr_array_foreach (priv->items, (GFunc) forea, NULL);
 #else
 	g_ptr_array_foreach (priv->items, (GFunc) g_object_unref, NULL);

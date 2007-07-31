@@ -1,3 +1,16 @@
+2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Merging back devel/pvanhoof/sessionwork to trunk/
+
+2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Cleaning up, coding style fixes
+	* Review of TnyCamelFolder and TnyCamelStoreAccount
+
+2007-07-30  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Various fixes that make Modest actually work with this
+
 2007-07-30  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
 	* Fixed some bugs in TnyMergeFolder notification function. This
@@ -22,6 +35,47 @@
 	* This fixes a locking problem while disconnecting the POP account
 
 	* Merging the Cond patch from devel/sessionwork
+
+2007-07-29  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* The long awaited alert, get_pass and forget_pass now in the mainloop
+
+	* This was a major API and behaviour change
+
+2007-07-29  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed a race condition when the account was or is connection or not
+	yet finished connecting while the connection-status-changed signal was
+	already being used. Introduced a new API for this
+	* Introduced the tny_account_is_ready API, which indicates when an
+	account is not only valid as instance, but also fully registered
+	within the system.
+	* Implemented some missing implementations in TnyCombinedAccount
+
+	* This was a major API change
+
+2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Dealing with remotely removed folders
+	* The poke status calls are now on the same queue as the other
+	operations
+	* Rewritten the TnySessionCamel infrastructure that connects accounts
+	and sets them up
+	* Added support for detecting folder changes to
+	TnyGtkFolderStoreTreeModel
+	* API change on tny_camel_account_set_online. The last argument is now
+	a callback rather than a GError. In the callback you can know about
+	when the account got connected and if not, why it failed
+
+	* Cond locks in the queues of the store accounts while the callbacks
+	are happening. This is a significant policy change in locking
+	behaviour that should be well tested. 
+
+	* This was a major API change in TnyAccount
+
+2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Branchpoint "devel/sessionwork"
 
 2007-07-26  Philip Van Hoof  <pvanhoof@gnome.org>
 

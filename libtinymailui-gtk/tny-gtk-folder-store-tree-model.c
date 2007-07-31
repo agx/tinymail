@@ -29,6 +29,7 @@
 #include <tny-folder-store.h>
 #include <tny-simple-list.h>
 
+#include <tny-store-account.h>
 #include <tny-folder-store-change.h>
 #include <tny-folder-store-observer.h>
 #include <tny-folder-change.h>
@@ -39,84 +40,8 @@
 #include "tny-gtk-folder-store-tree-model-iterator-priv.h"
 
 static GObjectClass *parent_class = NULL;
-static void recurse_folders_async (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, GtkTreeIter *parent_tree_iter);
 
 typedef void (*treeaddfunc) (GtkTreeStore *tree_store, GtkTreeIter *iter, GtkTreeIter *parent);
-
-
-typedef struct {
-	GtkTreeIter *parent_tree_iter;
-	TnyGtkFolderStoreTreeModel *self;
-} AsyncHelpr;
-
-static void
-recurse_get_folders_callback (TnyFolderStore *self, TnyList *folders, GError **err, gpointer user_data)
-{
-	AsyncHelpr *hlrp = user_data;
-	TnyIterator *iter = tny_list_create_iterator (folders);
-	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
-
-	while (!tny_iterator_is_done (iter))
-	{
-		GtkTreeStore *model = GTK_TREE_STORE (hlrp->self);
-		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
-		GtkTreeIter *tree_iter = gtk_tree_iter_copy (hlrp->parent_tree_iter);
-
-		tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
-		tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
-		me->folder_observables = g_list_prepend (me->folder_observables, folder);
-		me->store_observables = g_list_prepend (me->store_observables, folder);
-
-		gtk_tree_store_append (model, tree_iter, hlrp->parent_tree_iter);
-
-		/* This adds a reference count to folder too. When it gets removed, that
-		   reference count is decreased automatically by the gtktreestore infra-
-		   structure. */
-
-		gtk_tree_store_set (model, tree_iter,
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
-			tny_folder_get_name (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
-			tny_folder_get_unread_count (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
-			tny_folder_get_all_count (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
-			tny_folder_get_folder_type (TNY_FOLDER (folder)),
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
-			folder, -1);
-
-		/* TODO: This causes a memory peak at the application's startup.
-	 	*Also look at tny-camel-folder:c:2818... for more information */
-
-		tny_folder_poke_status (TNY_FOLDER (folder));
-
-		recurse_folders_async (hlrp->self, folder, tree_iter);
-
-		g_object_unref (G_OBJECT (folder));
-
-		tny_iterator_next (iter);
-	}
-
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (folders));
-
-	gtk_tree_iter_free (hlrp->parent_tree_iter);
-	g_slice_free (AsyncHelpr, hlrp);
-
-}
-
-
-static void
-recurse_folders_async (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, GtkTreeIter *parent_tree_iter)
-{
-	AsyncHelpr *hlrp = g_slice_new0 (AsyncHelpr);
-	TnyList *folders = tny_simple_list_new ();
-
-	hlrp->self = self;
-	hlrp->parent_tree_iter = parent_tree_iter;
-
-	tny_folder_store_get_folders_async (store, folders, recurse_get_folders_callback, self->query, NULL, hlrp);
-}
 
 static void
 recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, GtkTreeIter *parent_tree_iter)
@@ -131,72 +56,144 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 
 	while (!tny_iterator_is_done (iter))
 	{
+		GtkTreeModel *mmodel = (GtkTreeModel *) self;
 		GtkTreeStore *model = GTK_TREE_STORE (self);
 		GObject *instance = G_OBJECT (tny_iterator_get_current (iter));
 		GtkTreeIter tree_iter;
-
-		gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
-
 		TnyFolder *folder = NULL;
 		TnyFolderStore *folder_store = NULL;
-		
+		GtkTreeIter miter;
+		gboolean found = FALSE;
+		GObject *mark_for_removal = NULL;
+
 		if (TNY_IS_FOLDER (instance))
 			folder = TNY_FOLDER (instance);
-		
+
 		if (TNY_IS_FOLDER_STORE (folder))
 			folder_store =  TNY_FOLDER_STORE (instance);
+
+		/* We check whether we have this folder already in the tree, or 
+		 * whether it's a brand new one. If it's a new one, we'll add
+		 * it, of course */
+
+		if (gtk_tree_model_iter_children (mmodel, &miter, parent_tree_iter))
+		  do
+		  {
+			GObject *citem = NULL;
+			TnyIterator *niter = NULL;
 			
-		if (folder)
+			gtk_tree_model_get (mmodel, &miter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&citem, -1);
+
+			if (citem == instance)
+			{
+				found = TRUE;
+				break;
+			}
+			if (citem)
+				g_object_unref (citem);
+
+			/* We search whether this folder that we have in the 
+			 * model, still exists in the actual list. Because if
+			 * not, it probably got removed remotely (and we need
+			 * to get rid of it in the model now) */
+
+			niter = tny_list_create_iterator (folders);
+			while (!tny_iterator_is_done (niter))
+			{
+				TnyFolder *ifound = TNY_FOLDER (tny_iterator_get_current (niter));
+				if (citem == (GObject *) ifound)
+					mark_for_removal = g_object_ref (ifound);
+				g_object_unref (ifound);
+				tny_iterator_next (niter);
+			}
+			g_object_unref (niter);
+
+		  } while (gtk_tree_model_iter_next (mmodel, &miter));
+
+		/* It was not found, so let's start adding it to the model! */
+
+		if (!found)
 		{
-			tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
-			me->folder_observables = g_list_prepend (me->folder_observables, folder);
+			gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
+
+			/* Making self both a folder-store as a folder observer
+			 * of this folder. This way we'll get notified when 
+			 * both a removal and a creation happens. Also when a 
+			 * rename happens: that's a removal and a creation. */
+
+			if (folder)
+			{
+				tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
+				me->folder_observables = g_list_prepend (me->folder_observables, folder);
+			}
+
+			if (folder_store)
+			{
+				tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
+				me->store_observables = g_list_prepend (me->store_observables, folder);
+			}
+
+
+			/* This adds a reference count to folder too. When it gets removed, that
+			   reference count is decreased automatically by the gtktreestore infra-
+			   structure. */
+
+			if (folder)
+			{
+				TnyFolder *folder = TNY_FOLDER (instance);
+				
+				gtk_tree_store_set (model, &tree_iter,
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+					tny_folder_get_name (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
+					tny_folder_get_unread_count (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+					tny_folder_get_all_count (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
+					tny_folder_get_folder_type (TNY_FOLDER (folder)),
+					TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
+					folder, -1);
+			}
+
+			/* it's a store by itself, so keep on recursing */
+			if (folder_store)
+				recurse_folders_sync (self, folder_store, &tree_iter);
+
+			/* We're a folder, we'll request a status, since we've
+			 * set self to be a folder observers of folder, we'll 
+			 * receive the status update. This makes it possible to
+			 * instantly get the unread and total counts, of course.
+			 * 
+			 * Note that the initial value is read from the cache in
+			 * case the account is set offline, in TnyCamelFolder. 
+			 * In case the account is online a STAT for POP or a 
+			 * STATUS for IMAP is asked during the poke-status impl.
+			 *
+			 * This means that no priv->folder must be loaded, no
+			 * memory peak will happen, few data must be transmitted
+			 * in case we're online. Which is perfect! */
+
+			if (folder)
+				tny_folder_poke_status (TNY_FOLDER (folder));
+		} else {
+			if (mark_for_removal)
+			{
+				printf ("We need to remove %s\n", 
+					tny_folder_get_id (TNY_FOLDER (mark_for_removal)));
+			}
 		}
 
-		if (folder_store)
-		{
-			tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
-			me->store_observables = g_list_prepend (me->store_observables, folder);
-		}
-
-
-		/* This adds a reference count to folder too. When it gets removed, that
-		   reference count is decreased automatically by the gtktreestore infra-
-		   structure. */
-		if (folder)
-		{
-			TnyFolder *folder = TNY_FOLDER (instance);
-			
-			gtk_tree_store_set (model, &tree_iter,
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
-				tny_folder_get_name (TNY_FOLDER (folder)),
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
-				tny_folder_get_unread_count (TNY_FOLDER (folder)),
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
-				tny_folder_get_all_count (TNY_FOLDER (folder)),
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
-				tny_folder_get_folder_type (TNY_FOLDER (folder)),
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
-				folder, -1);
-		}
-
-		if (folder_store)
-			recurse_folders_sync (self, folder_store, &tree_iter);
-
-
-		/* TODO: This causes a memory peak at the application's startup.
-	 	*Also look at tny-camel-folder:c:2818... for more information */
-
-		if (folder)
-			tny_folder_poke_status (TNY_FOLDER (folder));
-
-		g_object_unref (G_OBJECT (instance));
+		g_object_unref (instance);
 
 		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (folders));
+	g_object_unref (iter);
+	g_object_unref (folders);
 }
+
 
 static const gchar*
 get_root_name (TnyFolderStore *folder_store)
@@ -207,6 +204,94 @@ get_root_name (TnyFolderStore *folder_store)
 	else
 		root_name = _("Folder bag");
 	return root_name;
+}
+
+
+static void 
+tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyConnectionStatus status, TnyGtkFolderStoreTreeModel *self)
+{
+	GtkTreeModel *model = GTK_TREE_MODEL (self);
+	GtkTreeIter iter;
+	GtkTreeIter name_iter;
+	gboolean found = FALSE;
+
+	/* This callback handler deals with connection status changes. In case
+	 * we got connected, we can expect that, at least sometimes, new folders
+	 * might have arrived. We'll need to scan for those, so we'll recursively
+	 * start asking the account about its folders. */
+
+	if (status != TNY_CONNECTION_STATUS_CONNECTED)
+		return;
+
+	/* Note that the very first time, this core will pull all folder info.
+	 * Note that when it runs, you'll see LIST commands happen on the IMAP
+	 * socket. Especially the first time. You'll also see STATUS commands 
+	 * happen. This is, indeed, normal behaviour when this component is used.*/
+
+	/* But first, let's find-back that damn account so that we have the
+	 * actual iter behind it in the model. */
+
+	if (gtk_tree_model_get_iter_first (model, &iter))
+	  do 
+	  {
+		GObject *citem;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&citem, -1);
+		if (citem == (GObject *) account)
+		{
+			name_iter = iter;
+			found = TRUE;
+			break;
+		}
+		g_object_unref (G_OBJECT (citem));
+
+	  } while (gtk_tree_model_iter_next (model, &iter));
+
+	/* We found it, so we'll now just recursively start asking for all its
+	 * folders and subfolders. The recurse_folders_sync can indeed cope with
+	 * folders that already exist (it wont add them a second time). */
+
+	if (found)
+		recurse_folders_sync (self, TNY_FOLDER_STORE (account), &name_iter);
+}
+
+typedef struct
+{
+	TnyGtkFolderStoreTreeModel *self;
+	TnyAccount *account;
+} AccNotYetReadyInfo;
+
+static gboolean
+account_was_not_yet_ready_idle (gpointer user_data)
+{
+	AccNotYetReadyInfo *info = (AccNotYetReadyInfo *) user_data;
+	gboolean repeat = TRUE;
+
+	if (tny_account_is_ready (info->account))
+	{
+		g_signal_connect (info->account, "connection-status-changed",
+			G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), info->self);
+
+		tny_gtk_folder_store_tree_model_on_constatus_changed (info->account, 
+			tny_account_get_connection_status (info->account), info->self);
+
+		repeat = FALSE;
+	}
+
+	return repeat;
+}
+
+static void 
+account_was_not_yet_ready_destroy (gpointer user_data)
+{
+	AccNotYetReadyInfo *info = (AccNotYetReadyInfo *) user_data;
+
+	g_object_unref (info->account);
+	g_object_unref (info->self);
+
+	g_slice_free (AccNotYetReadyInfo, user_data);
 }
 
 static void
@@ -226,9 +311,33 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 		folder_store, -1);
 
+	/* In case we added a store account, it's possible that the account 
+	 * will have "the account just got connected" events happening. Accounts
+	 * that just got connected might have new folders for us to know about.
+	 * That's why we'll handle connection changes. */
+
+	if (TNY_IS_STORE_ACCOUNT (folder_store)) {
+		if (!tny_account_is_ready (TNY_ACCOUNT (folder_store))) 
+		{
+			AccNotYetReadyInfo *info = g_slice_new (AccNotYetReadyInfo);
+
+			info->account = TNY_ACCOUNT (g_object_ref (folder_store));
+			info->self = TNY_GTK_FOLDER_STORE_TREE_MODEL (g_object_ref (self));
+
+			g_timeout_add_full (G_PRIORITY_HIGH, 100, 
+				account_was_not_yet_ready_idle, 
+				info, account_was_not_yet_ready_destroy);
+
+		} else
+			g_signal_connect (folder_store, "connection-status-changed",
+				G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), self);
+	}
+
 	recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter);
 
-	/* Add an observer for the root folder store */
+	/* Add an observer for the root folder store, so that we can observe 
+	 * the actual account too. */
+
 	tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
 	self->store_observables = g_list_prepend (self->store_observables, folder_store);
 
@@ -237,43 +346,9 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 	return;
 }
 
-static void
-tny_gtk_folder_store_tree_model_add_async_i (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *folder_store, treeaddfunc func, const gchar *root_name)
-{
-	GtkTreeStore *model = GTK_TREE_STORE (self);
-	GtkTreeIter first, *name_iter;
-	gboolean need_add = TRUE;
-
-	if (!gtk_tree_model_get_iter_first (GTK_TREE_MODEL (self), &first))
-	{
-		func (model, &first, NULL);
-		need_add = FALSE;
-	}
-
-	name_iter = gtk_tree_iter_copy (&first);
-
-	if (need_add)
-		func (model, name_iter, NULL);
-
-	/* This adds a reference count to folder_store too. When it gets removed,
-	   that reference count is decreased automatically by the gtktreestore
-	   infrastructure. */
-
-	gtk_tree_store_set (model, name_iter,
-		TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, root_name,
-		TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 0,
-		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, TNY_FOLDER_TYPE_ROOT,
-		TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
-		folder_store, -1);
-
-	recurse_folders_async (self, TNY_FOLDER_STORE (folder_store), name_iter);
-
-	return;
-}
 
 /**
  * tny_gtk_folder_store_tree_model_new:
- * @async: Whether or not this component should attempt to asynchronously fill the tree
  * @query: the #TnyFolderStoreQuery that will be used to retrieve the folders of each folder_store
  *
  * Create a new #GtkTreeModel instance suitable for showing  
@@ -283,11 +358,13 @@ tny_gtk_folder_store_tree_model_add_async_i (TnyGtkFolderStoreTreeModel *self, T
  * #TnyFolderStore instances
  **/
 GtkTreeModel*
-tny_gtk_folder_store_tree_model_new (gboolean async, TnyFolderStoreQuery *query)
+tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query)
 {
 	TnyGtkFolderStoreTreeModel *self = g_object_new (TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL, NULL);
-	self->is_async = FALSE;
-	if (query) self->query = g_object_ref (G_OBJECT (query));
+
+	if (query) 
+		self->query = g_object_ref (G_OBJECT (query));
+
 	return GTK_TREE_MODEL (self);
 }
 
@@ -342,7 +419,7 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 	me->iterator_lock = NULL;
 
 	if (me->query)
-		g_object_unref (G_OBJECT (me->query));
+		g_object_unref (me->query);
 
 	(*parent_class->finalize) (object);
 }
@@ -406,15 +483,11 @@ tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFo
 	g_mutex_lock (me->iterator_lock);
 
 	/* Prepend something to the list */
-	g_object_ref (G_OBJECT (item));
+	g_object_ref (item);
 	me->first = g_list_prepend (me->first, item);
 
-	if (me->is_async)
-		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_prepend, root_name);
-	else
-		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_prepend, root_name);
+	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+		gtk_tree_store_prepend, root_name);
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -428,16 +501,12 @@ tny_gtk_folder_store_tree_model_prepend_i (TnyList *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Prepend something to the list */
-	g_object_ref (G_OBJECT (item));
+	g_object_ref (item);
 	me->first = g_list_prepend (me->first, item);
 
-	if (me->is_async)
-		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_prepend, get_root_name (TNY_FOLDER_STORE (item)));
-	else
-		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_prepend, get_root_name (TNY_FOLDER_STORE (item)));
-	
+	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+		gtk_tree_store_prepend, get_root_name (TNY_FOLDER_STORE (item)));
+
 	g_mutex_unlock (me->iterator_lock);
 }
 
@@ -457,15 +526,11 @@ tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFol
 	g_mutex_lock (me->iterator_lock);
 
 	/* Append something to the list */
-	g_object_ref (G_OBJECT (item));
+	g_object_ref (item);
 	me->first = g_list_append (me->first, item);
 
-	if (me->is_async)
-		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_append, root_name);
-	else
-		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_append, root_name);
+	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+		gtk_tree_store_append, root_name);
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -478,15 +543,11 @@ tny_gtk_folder_store_tree_model_append_i (TnyList *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Append something to the list */
-	g_object_ref (G_OBJECT (item));
+	g_object_ref (item);
 	me->first = g_list_append (me->first, item);
 
-	if (me->is_async)
-		tny_gtk_folder_store_tree_model_add_async_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_append, get_root_name (TNY_FOLDER_STORE (item)));
-	else
-		tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
-			gtk_tree_store_append, get_root_name (TNY_FOLDER_STORE (item)));
+	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
+		gtk_tree_store_append, get_root_name (TNY_FOLDER_STORE (item)));
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -526,14 +587,12 @@ tny_gtk_folder_store_tree_model_remove (TnyList *self, GObject* item)
 	   actually really part of the list. */
 
 	if (gtk_tree_model_get_iter_first (model, &iter))
-	  while (gtk_tree_model_iter_next (model, &iter))
+	  do 
 	  {
-		GObject *citem;
-
+		GObject *citem = NULL;
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 			&citem, -1);
-
 		if (citem == item)
 		{
 			/* This removes a reference count */
@@ -541,8 +600,10 @@ tny_gtk_folder_store_tree_model_remove (TnyList *self, GObject* item)
 			g_object_unref (G_OBJECT (item));
 			break;
 		}
-		g_object_unref (G_OBJECT (citem));
-	  }
+		if (citem)
+			g_object_unref (G_OBJECT (citem));
+
+	  } while (gtk_tree_model_iter_next (model, &iter));
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -593,6 +654,10 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	TnyFolder *changed_folder = tny_folder_change_get_folder (change);
 	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
 
+	/* This updater will get the folder out of the model, compare with 
+	 * the changed_folder pointer, and if there's a match it will update
+	 * the values of the model with the values from the folder. */
+
 	gtk_tree_model_get (model, iter, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
 		&type, -1);
@@ -628,14 +693,13 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
 				unread,
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
-				total,
-				-1);
+				total, -1);
 		}
 
-		g_object_unref (G_OBJECT (folder));
+		g_object_unref (folder);
 	}
 
-	g_object_unref (G_OBJECT (changed_folder));
+	g_object_unref (changed_folder);
 
 	return FALSE;
 }
@@ -648,13 +712,17 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
 	GObject *folder = user_data1;
 
+	/* The deleter will compare all folders in the model with the deleted 
+	 * folder @folder, and if there's a match it will delete the folder's
+	 * row from the model. */
+
 	gtk_tree_model_get (model, iter, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
 		&type, -1);
 
 	if (type != TNY_FOLDER_TYPE_ROOT) 
 	{
-		GObject *fol;
+		GObject *fol = NULL;
 
 		gtk_tree_model_get (model, iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
@@ -665,7 +733,8 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 			retval = TRUE;
 		}
 
-		g_object_unref (G_OBJECT (fol));
+		if (fol)
+			g_object_unref (fol);
 	}
 
 	return retval;
@@ -675,6 +744,8 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 static gboolean
 find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointer user_data)
 {
+	/* Finding the iter for a given folder */
+
 	do
 	{
 		GtkTreeIter child;
@@ -687,14 +758,14 @@ find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointe
 			&type, -1);
 
 		gtk_tree_model_get (model, iter, 
-				    TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
-				    &fol, -1);
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&fol, -1);
 		
 		if (fol == user_data)
 			found = TRUE;
 		
-		if (fol != NULL)
-			g_object_unref (G_OBJECT (fol));
+		if (fol)
+			g_object_unref (fol);
 
 		if (found) {
 			*f = *iter;
@@ -798,7 +869,8 @@ folder_store_obsr_update_idle (gpointer user_data)
 				GtkTreeIter newiter;
 				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
 
-				/* See early added below! 
+				/* See early added below! (#CCUX)
+
 				tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
 				tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));*/
 
@@ -823,11 +895,11 @@ folder_store_obsr_update_idle (gpointer user_data)
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 					folder, -1);
 
-				g_object_unref (G_OBJECT (folder));
+				g_object_unref (folder);
 				tny_iterator_next (miter);
 			}
-			g_object_unref (G_OBJECT (miter));
-			g_object_unref (G_OBJECT (created));
+			g_object_unref (miter);
+			g_object_unref (created);
 		}
 		g_object_unref (G_OBJECT (parentstore));
 	}
@@ -844,11 +916,11 @@ folder_store_obsr_update_idle (gpointer user_data)
 		{
 			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
 			gtk_tree_model_foreach (model, deleter, folder);
-			g_object_unref (G_OBJECT (folder));
+			g_object_unref (folder);
 			tny_iterator_next (miter);
 		}
-		g_object_unref (G_OBJECT (miter));
-		g_object_unref (G_OBJECT (removed));
+		g_object_unref (miter);
+		g_object_unref (removed);
 	}
 
 
@@ -888,7 +960,7 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 		{
 			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
 
-			/* Already added! 
+			/* Already added! (#CCUX)
 			 * We can't add these in the idle because the thread might
 			 * be added subfolders right now! (the idle would register
 			 * self as an observer too late!) 
@@ -899,11 +971,11 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 			tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
 			tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
 
-			g_object_unref (G_OBJECT (folder));
+			g_object_unref (folder);
 			tny_iterator_next (miter);
 		}
-		g_object_unref (G_OBJECT (miter));
-		g_object_unref (G_OBJECT (created));
+		g_object_unref (miter);
+		g_object_unref (created);
 	}
 
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,

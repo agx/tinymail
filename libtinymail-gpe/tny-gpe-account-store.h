@@ -52,9 +52,6 @@ GType tny_gpe_account_store_get_type (void);
 TnyAccountStore* tny_gpe_account_store_new (void);
 TnySessionCamel* tny_gpe_account_store_get_session (TnyGpeAccountStore *self);
 
-void tny_gpe_account_store_add_transport_account (TnyGpeAccountStore *self, TnyTransportAccount *account);
-void tny_gpe_account_store_add_store_account (TnyGpeAccountStore *self, TnyStoreAccount *account);
-
 G_END_DECLS
 
 #endif

@@ -59,7 +59,6 @@ struct _TnyGtkFolderStoreTreeModel
 	GtkTreeStore parent;
 	GList *first;
 	GMutex *iterator_lock;
-	gboolean is_async;
 	TnyFolderStoreQuery *query;
 	GList *store_observables, *folder_observables;
 };
@@ -71,7 +70,7 @@ struct _TnyGtkFolderStoreTreeModelClass
 
 GType tny_gtk_folder_store_tree_model_get_type (void);
 GType tny_gtk_folder_store_tree_model_column_get_type (void);
-GtkTreeModel* tny_gtk_folder_store_tree_model_new (gboolean async, TnyFolderStoreQuery *query);
+GtkTreeModel* tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query);
 
 void tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);
 void tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);

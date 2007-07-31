@@ -322,6 +322,39 @@ tny_combined_account_remove_observer (TnyFolderStore *self, TnyFolderStoreObserv
 	tny_folder_store_remove_observer (TNY_FOLDER_STORE (priv->store_account), observer);
 }
 
+static void 
+tny_combined_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
+{
+	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
+
+	tny_account_start_operation (TNY_ACCOUNT (priv->store_account), domain, code, status_callback, status_user_data);
+
+	return;
+}
+
+static void 
+tny_combined_account_stop_operation (TnyAccount *self, gboolean *canceled)
+{
+	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
+
+	tny_account_stop_operation (TNY_ACCOUNT (priv->store_account), canceled);
+
+	return;
+}
+
+static gboolean 
+tny_combined_account_is_ready (TnyAccount *self)
+{
+	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
+	gboolean retval = FALSE;
+
+	if (tny_account_is_ready (TNY_ACCOUNT (priv->store_account)) &&
+	    tny_account_is_ready (TNY_ACCOUNT (priv->transport_account))) {
+		retval = TRUE;
+	}
+	return retval;
+}
+
 
 static void
 on_subscription_changed_signal (TnyStoreAccount *sa, TnyFolder *folder, gpointer user_data)
@@ -473,6 +506,9 @@ tny_account_init (TnyAccountIface *klass)
 	klass->get_account_type_func = tny_combined_account_get_account_type;
 	klass->cancel_func = tny_combined_account_cancel;
 	klass->matches_url_string_func = tny_combined_account_matches_url_string;
+	klass->start_operation_func = tny_combined_account_start_operation;
+	klass->stop_operation_func = tny_combined_account_stop_operation;
+	klass->is_ready_func = tny_combined_account_is_ready;
 }
 
 

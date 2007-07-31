@@ -102,7 +102,7 @@ thread_main_func (gpointer user_data)
 		g_mutex_lock (queue->lock);
 		if (first)
 			queue->list = g_list_delete_link (queue->list, first);
-
+	
 		if (g_list_length (queue->list) == 0) {
 			queue->thread = NULL;
 			queue->stopped = TRUE;
@@ -114,7 +114,7 @@ thread_main_func (gpointer user_data)
 		if (item)
 			g_slice_free (QueueItem, item);
 	}
-
+	
 	queue->thread = NULL;
 	queue->stopped = TRUE;
 	g_object_unref (queue);
@@ -136,13 +136,19 @@ _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data)
 
 	g_mutex_lock (queue->lock);
 	queue->list = g_list_append (queue->list, item);
+
+	if (queue->stopped) {
+		GError *err = NULL;
+		queue->stopped = FALSE;
+		g_object_ref (queue);
+		queue->thread = g_thread_create (thread_main_func, 
+			queue, TRUE, &err);
+		if (err) {
+			queue->stopped = TRUE;	
+		}
+	}
 	g_mutex_unlock (queue->lock);
 
-	if (!queue->thread) {
-		queue->stopped = FALSE;
-		queue->thread = g_thread_create (thread_main_func, 
-			g_object_ref (queue), TRUE, NULL);
-	}
 }
 
 static void 
@@ -164,7 +170,7 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyCamelQueue *self = (TnyCamelQueue*)instance;
 
-	self->stopped = FALSE;
+	self->stopped = TRUE;
 	self->list = NULL;
 	self->thread = NULL;
 	self->lock = g_mutex_new ();

@@ -52,9 +52,6 @@ GType tny_olpc_account_store_get_type (void);
 TnyAccountStore* tny_olpc_account_store_new (void);
 TnySessionCamel* tny_olpc_account_store_get_session (TnyOlpcAccountStore *self);
 
-void tny_olpc_account_store_add_store_account (TnyOlpcAccountStore *self, TnyStoreAccount *account);
-void tny_olpc_account_store_add_transport_account (TnyOlpcAccountStore *self, TnyTransportAccount *account);
-
 G_END_DECLS
 
 #endif

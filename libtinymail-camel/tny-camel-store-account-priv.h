@@ -20,8 +20,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <tny-session-camel.h>
 #include <tny-camel-store-account.h>
+
 #include "tny-camel-queue-priv.h"
+#include "tny-session-camel-priv.h"
 
 typedef struct _TnyCamelStoreAccountPriv TnyCamelStoreAccountPriv;
 
@@ -40,5 +43,6 @@ struct _TnyCamelStoreAccountPriv
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_STORE_ACCOUNT, TnyCamelStoreAccountPriv))
 
 void _tny_camel_store_account_emit_conchg_signal (TnyCamelStoreAccount *self);
+void _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySessionCamel *session, gboolean online, go_online_callback_func err_func, gpointer user_data);
 
 #endif

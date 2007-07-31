@@ -9,21 +9,25 @@ struct _TnySessionCamelPriv
 	gpointer account_store;
 	gboolean interactive, prev_constat;
 	guint connchanged_signal;
-	GList *current_accounts;
+
+	GHashTable *current_accounts;
+	GStaticRecMutex *current_accounts_lock;
+
 	gchar *camel_dir;
 	gboolean in_auth_function, is_connecting;
-	gboolean async_connect;
 	TnyLockable *ui_lock;
-	GMutex *conlock, *queue_lock;
-	GThread *conthread;
+	GMutex *queue_lock;
+
 	gboolean stop_now, initialized;
-	gboolean is_inuse, background_thread_running;
+	gboolean is_inuse;
 	GList *regged_queues;
 };
 
-void _tny_session_camel_add_account_1 (TnySessionCamel *self, TnyCamelAccount *account);
-void _tny_session_camel_add_account_2 (TnySessionCamel *self, TnyCamelAccount *account);
-void _tny_session_camel_forget_account (TnySessionCamel *self, TnyCamelAccount *account);
+typedef void (*go_online_callback_func) (TnySessionCamel *self, TnyCamelAccount *account, GError *err, gpointer user_data);
+void _tny_session_camel_register_account (TnySessionCamel *self, TnyCamelAccount *account);
+void _tny_session_camel_activate_account (TnySessionCamel *self, TnyCamelAccount *account);
+void _tny_session_camel_unregister_account (TnySessionCamel *self, TnyCamelAccount *account);
+
 void _tny_session_camel_reg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue);
 void _tny_session_camel_unreg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue);
 
