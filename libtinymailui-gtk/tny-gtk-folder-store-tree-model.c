@@ -257,6 +257,41 @@ tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyCo
 		recurse_folders_sync (self, TNY_FOLDER_STORE (account), &name_iter);
 }
 
+
+
+static void 
+tny_gtk_folder_store_tree_model_on_changed (TnyAccount *account, TnyGtkFolderStoreTreeModel *self)
+{
+	GtkTreeModel *model = GTK_TREE_MODEL (self);
+	GtkTreeIter iter;
+	GtkTreeIter name_iter;
+	gboolean found = FALSE;
+
+	if (gtk_tree_model_get_iter_first (model, &iter))
+	  do 
+	  {
+		GObject *citem;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&citem, -1);
+		if (citem == (GObject *) account)
+		{
+			name_iter = iter;
+			found = TRUE;
+			break;
+		}
+		g_object_unref (G_OBJECT (citem));
+
+	  } while (gtk_tree_model_iter_next (model, &iter));
+
+	if (found) {
+		gtk_tree_store_set (GTK_TREE_STORE (model), &name_iter,
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+			get_root_name (TNY_FOLDER_STORE (account)), -1);
+	}
+}
+
 typedef struct
 {
 	TnyGtkFolderStoreTreeModel *self;
@@ -274,8 +309,14 @@ account_was_not_yet_ready_idle (gpointer user_data)
 		g_signal_connect (info->account, "connection-status-changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), info->self);
 
+		g_signal_connect (info->account, "changed",
+			G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), info->self);
+
 		tny_gtk_folder_store_tree_model_on_constatus_changed (info->account, 
 			tny_account_get_connection_status (info->account), info->self);
+
+		tny_gtk_folder_store_tree_model_on_changed (info->account, 
+			info->self);
 
 		repeat = FALSE;
 	}
@@ -328,9 +369,12 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 				account_was_not_yet_ready_idle, 
 				info, account_was_not_yet_ready_destroy);
 
-		} else
+		} else {
 			g_signal_connect (folder_store, "connection-status-changed",
 				G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), self);
+			g_signal_connect (folder_store, "changed",
+				G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), self);
+		}
 	}
 
 	recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter);

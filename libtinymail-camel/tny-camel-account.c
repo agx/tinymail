@@ -63,6 +63,35 @@ static GObjectClass *parent_class = NULL;
 
 guint tny_camel_account_signals [TNY_CAMEL_ACCOUNT_LAST_SIGNAL];
 
+static gboolean
+changed_idle (gpointer data)
+{
+	TnyAccount *self = (TnyAccount *) data;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	g_signal_emit (G_OBJECT (self), 
+		tny_account_signals [TNY_ACCOUNT_CHANGED], 0);
+
+	return FALSE;
+}
+
+static void
+changed_idle_destroy (gpointer data)
+{
+	g_object_unref (data);
+}
+
+
+
+void
+_tny_camel_account_emit_changed (TnyCamelAccount *self)
+{
+	g_idle_add_full (G_PRIORITY_HIGH, 
+				changed_idle, 
+				g_object_ref (self), 
+				changed_idle_destroy);
+}
+
 
 typedef struct {
 	TnyCamelAccount *self;
@@ -365,6 +394,8 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, TRUE, FALSE);
 
+	_tny_camel_account_emit_changed (self);
+
 	return;
 }
 
@@ -441,6 +472,8 @@ tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_str
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
 
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
+
 	return;
 }
 
@@ -474,6 +507,8 @@ tny_camel_account_set_name_default (TnyAccount *self, const gchar *name)
 		g_free (priv->name);
 
 	priv->name = g_strdup (name);
+
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
 
 	return;
 }
@@ -529,35 +564,6 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 
 	g_mutex_lock (priv->cancel_lock);
 
-/*
-	if (cancel)
-	{
-		/ I know this isn't polite. But it works ;-) /
-		/ camel_operation_cancel (NULL); /
-
-		thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, &err);
-		if (err == NULL)
-			g_thread_join (thread);
-		else
-			g_error_free (err);
-	
-
-		if (priv->cancel)
-		{
-			/while (!camel_operation_cancel_check (priv->cancel)) 
-			{ 
-				g_warning (_("Cancellation failed, retrying\n"));
-				thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
-				g_thread_join (thread);
-			}/
-			tny_camel_account_stop_camel_operation_priv (priv);
-		}
-
-
-		camel_operation_uncancel (NULL);
-	}
-*/
-
 	while (priv->inuse_spin); 
 
 	priv->inuse_spin = TRUE;
@@ -573,13 +579,7 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 	return;
 }
 
-/* TODO: Documentation. 
- * Why would we use this instead of just calling the callback directly in an 
- * idle handler? 
- * How does this allow the operation to be cancelled? Can the user cancel it, 
- * or does cancel happen only if there is an internal error?
- * murrayc.
- */
+
 void 
 _tny_camel_account_start_camel_operation (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what)
 {
@@ -755,6 +755,8 @@ tny_camel_account_set_id_default (TnyAccount *self, const gchar *id)
 
 	priv->id = g_strdup (id);
 
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
+
 	return;
 }
 
@@ -782,6 +784,8 @@ tny_camel_account_set_secure_auth_mech_default (TnyAccount *self, const gchar *m
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
+
 	return;
 }
 
@@ -808,6 +812,8 @@ tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
+
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
 
 	return;
 }
@@ -837,6 +843,8 @@ tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
+
 	return;
 }
 
@@ -865,6 +873,8 @@ tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
+
 	return;
 }
 
@@ -892,6 +902,8 @@ tny_camel_account_set_port_default (TnyAccount *self, guint port)
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
+	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
+
 	return;
 }
 
@@ -912,9 +924,6 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
-
-	/*if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
-		reconf_if = TRUE;*/
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
 		reconf_if, TRUE);
@@ -943,9 +952,6 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
-
-	/*if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
-		reconf_if = TRUE;*/
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
 		reconf_if, FALSE);

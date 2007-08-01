@@ -66,6 +66,7 @@ enum _TnyAccountType
 enum _TnyAccountSignal
 {
 	TNY_ACCOUNT_CONNECTION_STATUS_CHANGED,
+	TNY_ACCOUNT_CHANGED,
 	TNY_ACCOUNT_LAST_SIGNAL
 };
 
@@ -106,6 +107,7 @@ struct _TnyAccountIface
 
 	/* Signals*/
 	void (*connection_status_changed) (TnyAccount *self, TnyConnectionStatus status);
+	void (*changed) (TnyAccount *self);
 };
 
 GType tny_account_get_type (void);

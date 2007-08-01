@@ -442,7 +442,7 @@ typedef struct
 {
 	TnyFolder *self;
 	TnyList *headers;
-	TnyRefreshFolderCallback callback;
+	TnyGetHeadersCallback callback;
 	TnyStatusCallback status_callback;
 	gpointer user_data;
 	gboolean cancelled, refresh;
@@ -473,7 +473,7 @@ get_headers_async_callback (gpointer thr_user_data)
 {
 	GetHeadersFolderInfo *info = thr_user_data;
 	if (info->callback)
-		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->headers, &info->err, info->user_data);
 	return FALSE;
 }
 

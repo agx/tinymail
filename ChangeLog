@@ -5,6 +5,11 @@
 	* Tryout fix (I know this doesn't sound very promising) for password questions
 	on the mainloop (POP can cause this, in case of an auth error during
 	sync operation's reconnect)
+	* Added the changed signal to TnyAccount
+	* Making tny_account_set_name get propagated to the TnyGtkFolderStore- 
+	TreeModel instance.
+
+	* This was a major API change
 
 2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
 

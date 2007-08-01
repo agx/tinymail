@@ -931,6 +931,24 @@ tny_account_base_init (gpointer g_class)
 			g_cclosure_marshal_VOID__INT, 
 			G_TYPE_NONE, 1, G_TYPE_INT);
 
+
+
+/**
+ * TnyAccount::changed
+ * @self: the object on which the signal is emitted
+ * @user_data: user data set when the signal handler was connected.
+ *
+ * Emitted when the account changes.
+ **/
+		tny_account_signals[TNY_ACCOUNT_CHANGED] =
+		   g_signal_new ("changed",
+			TNY_TYPE_ACCOUNT,
+			G_SIGNAL_RUN_FIRST,
+			G_STRUCT_OFFSET (TnyAccountIface, changed),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__VOID, 
+			G_TYPE_NONE, 0);
+
 		initialized = TRUE;
 	}
 }
@@ -1008,7 +1026,8 @@ tny_account_signal_type_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
-      { TNY_ACCOUNT_CONNECTION_STATUS_CHANGED, "TNY_ACCOUNT_CONNECTION_STATUS_CHANGED", "connection_status" },
+      { TNY_ACCOUNT_CONNECTION_STATUS_CHANGED, "TNY_ACCOUNT_CONNECTION_STATUS_CHANGED", "connection_status_changed" },
+      { TNY_ACCOUNT_CHANGED, "TNY_ACCOUNT_CHANGED", "changed" },
       { TNY_ACCOUNT_LAST_SIGNAL, "TNY_ACCOUNT_LAST_SIGNAL", "last_signal" },
       { 0, NULL, NULL }
     };

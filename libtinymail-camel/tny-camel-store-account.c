@@ -102,6 +102,8 @@ connection_status_idle (gpointer data)
 	return FALSE;
 }
 
+
+
 static void
 connection_status_idle_destroy (gpointer data)
 {
@@ -133,6 +135,7 @@ tny_camel_store_account_do_emit (TnyCamelStoreAccount *self)
 				g_object_ref (self), 
 				connection_status_idle_destroy);
 }
+
 
 static void 
 disconnection (CamelService *service, gboolean suc, TnyAccount *self)
