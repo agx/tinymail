@@ -175,9 +175,14 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		info->cancel = FALSE;
 		info->retval = NULL;
 
-		g_idle_add_full (G_PRIORITY_DEFAULT, 
-			get_password_idle_func, info, 
-			get_password_destroy_func);
+		if (g_main_depth () == 0) {
+			g_idle_add_full (G_PRIORITY_DEFAULT, 
+				get_password_idle_func, info, 
+				get_password_destroy_func);
+		} else {
+			get_password_idle_func (info);
+			get_password_destroy_func (info);
+		}
 
 		/* Wait on the queue for the mainloop callback to be finished */
 		g_mutex_lock (info->mutex);
