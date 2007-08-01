@@ -8,6 +8,8 @@
 	* Added the changed signal to TnyAccount
 	* Making tny_account_set_name get propagated to the TnyGtkFolderStore- 
 	TreeModel instance.
+	* Fixed a kludge in the TnySessionCamel for POP accounts with wrong
+	passwords
 
 	* This was a major API change
 

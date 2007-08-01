@@ -3019,7 +3019,7 @@ inform_observers_about_transfer (TnyFolder *from, TnyFolder *to, gboolean del_or
 		if (del_orig)
 			tny_folder_change_add_expunged_header (fromchange, header);
 		tny_folder_change_add_added_header (tochange, header);
-		g_object_unref (G_OBJECT (header));
+		g_object_unref (header);
 		tny_iterator_next (iter);
 	}
 	g_object_unref (G_OBJECT (iter));

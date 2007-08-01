@@ -83,6 +83,7 @@ typedef struct
 	gchar *prompt, *retval;
 	gboolean cancel;
 	TnyGetPassFunc func;
+	guint32 flags;
 
 	GCond* condition;
 	gboolean had_callback;
@@ -100,6 +101,16 @@ get_password_idle_func (gpointer user_data)
 	TnyGetPassFunc func = info->func;
 
 	tny_lockable_lock (self->priv->ui_lock);
+
+
+	/* TODO: fix this in camel-lite ! */
+	if (!g_ascii_strncasecmp (tny_account_get_proto (account), "pop", 3))
+		if (info->flags & CAMEL_SESSION_PASSWORD_REPROMPT)
+		{
+			TnyForgetPassFunc func = tny_account_get_forget_pass_func (account);
+			func (account);
+		}
+
 	info->retval = func (account, info->prompt, &info->cancel);
 	tny_lockable_unlock (self->priv->ui_lock);
 
@@ -149,14 +160,6 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 			prmpt = g_strdup_printf (_("Enter password for %s"), 
 				tny_account_get_name (account));
 		}
-		
-		/* TODO: fix this in camel-lite ! */
-
-		if (!g_ascii_strncasecmp (tny_account_get_proto (account), "pop", 3))
-		{
-			if (flags & CAMEL_SESSION_PASSWORD_REPROMPT)
-				tny_session_camel_forget_password (session, service, domain, item, ex);
-		}
 
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
 		apriv->in_auth = TRUE;
@@ -167,6 +170,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		info->condition = g_cond_new ();
 		info->had_callback = FALSE;
 
+		info->flags = flags;
 		camel_object_ref (self);
 		info->self = self;
 		info->account = TNY_ACCOUNT (g_object_ref (account));
