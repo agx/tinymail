@@ -50,12 +50,19 @@ struct _TnyCamelQueueClass
 };
 
 
+typedef enum {
+	TNY_CAMEL_QUEUE_NORMAL_ITEM = 1<<0,
+	TNY_CAMEL_QUEUE_RECONNECT_ITEM = 1<<1,
+	TNY_CAMEL_QUEUE_CANCELLABLE_ITEM = 1<<2
+} TnyCamelQueueItemFlags;
 
 GType tny_camel_queue_get_type (void);
 
 TnyCamelQueue* _tny_camel_queue_new (void);
+void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags);
 void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data);
-
+void _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
+void _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 
 G_END_DECLS
 

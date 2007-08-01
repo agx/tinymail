@@ -75,6 +75,7 @@ typedef struct
 {
 	GThreadFunc func;
 	gpointer data;
+	TnyCamelQueueItemFlags flags;
 } QueueItem;
 
 
@@ -123,8 +124,38 @@ thread_main_func (gpointer user_data)
 	return NULL;
 }
 
+
 void 
-_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data)
+_tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
+{
+	GList *copy = NULL, *rem = NULL;
+
+	g_mutex_lock (queue->lock);
+	copy = queue->list;
+	while (copy) {
+		QueueItem *item = copy->data;
+		if (item && (item->flags & flags)) {
+			rem = g_list_prepend (rem, copy);
+			g_slice_free (QueueItem, item);
+		}
+		copy = g_list_next (copy);
+	}
+	while (rem) {
+		queue->list = g_list_delete_link (queue->list, rem->data);
+		rem = g_list_next (rem);
+	}
+	g_mutex_unlock (queue->lock);
+}
+
+void 
+_tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
+{
+	/* TNY TODO: Implement cancelling the current too */
+	_tny_camel_queue_remove_items (queue, flags);
+}
+
+void 
+_tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags)
 {
 	QueueItem *item = g_slice_new (QueueItem);
 
@@ -133,6 +164,7 @@ _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data)
 
 	item->func = func;
 	item->data = data;
+	item->flags = flags;
 
 	g_mutex_lock (queue->lock);
 	queue->list = g_list_append (queue->list, item);
@@ -149,6 +181,12 @@ _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data)
 	}
 	g_mutex_unlock (queue->lock);
 
+}
+
+void 
+_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data)
+{
+	_tny_camel_queue_launch_wflags (queue, func, data, TNY_CAMEL_QUEUE_NORMAL_ITEM);
 }
 
 static void 

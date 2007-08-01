@@ -181,8 +181,12 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 			/* thread reference */
 			g_object_ref (info->self);
 
-			_tny_camel_queue_launch (aspriv->queue, 
-				reconnect_thread, info);
+			_tny_camel_queue_remove_items (aspriv->queue,
+				TNY_CAMEL_QUEUE_RECONNECT_ITEM);
+
+			_tny_camel_queue_launch_wflags (aspriv->queue, 
+				reconnect_thread, info,
+				TNY_CAMEL_QUEUE_RECONNECT_ITEM);
 		}
 	}
 
