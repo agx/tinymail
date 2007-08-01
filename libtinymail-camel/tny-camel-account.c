@@ -63,6 +63,40 @@ static GObjectClass *parent_class = NULL;
 
 guint tny_camel_account_signals [TNY_CAMEL_ACCOUNT_LAST_SIGNAL];
 
+
+typedef struct {
+	TnyCamelAccount *self;
+} ReconInfo;
+
+static gpointer
+reconnect_thread (gpointer user_data)
+{
+	ReconInfo *info = (ReconInfo *) user_data;
+	TnyCamelAccount *self = (TnyCamelAccount *) info->self;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	apriv->service->reconnecting = TRUE;
+	if (apriv->service->reconnecter)
+		apriv->service->reconnecter (apriv->service, FALSE, apriv->service->data);
+	camel_service_disconnect (apriv->service, FALSE, &ex);
+	if (camel_exception_is_set (&ex))
+		camel_exception_clear (&ex);
+	camel_service_connect (apriv->service, &ex);
+	if (apriv->service->reconnection)
+	{
+		if (!camel_exception_is_set (&ex))
+			apriv->service->reconnection (apriv->service, TRUE, apriv->service->data);
+		else
+			apriv->service->reconnection (apriv->service, FALSE, apriv->service->data);
+	}
+	apriv->service->reconnecting = FALSE;
+
+	g_object_unref (info->self);
+	g_slice_free (ReconInfo, info);
+	return NULL;
+}
+
 void
 _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 {
@@ -138,26 +172,18 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 		if (!apriv->service)
 			goto fail;
 
-		apriv->service->reconnecting = TRUE;
-
-		if (apriv->service->reconnecter)
-			apriv->service->reconnecter (apriv->service, FALSE, apriv->service->data);
-
-		camel_service_disconnect (apriv->service, FALSE, &ex);
-		if (camel_exception_is_set (&ex))
-			camel_exception_clear (&ex);
-
-		camel_service_connect (apriv->service, &ex);
-		if (apriv->service->reconnection)
+		if (TNY_IS_STORE_ACCOUNT (self))
 		{
-			if (!camel_exception_is_set (&ex))
-				apriv->service->reconnection (apriv->service, TRUE, apriv->service->data);
-			else
-				apriv->service->reconnection (apriv->service, FALSE, apriv->service->data);
-		}
+			TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+			ReconInfo *info = g_slice_new0 (ReconInfo);
+			info->self = self;
 
-		apriv->service->reconnecting = FALSE;
-		
+			/* thread reference */
+			g_object_ref (info->self);
+
+			_tny_camel_queue_launch (aspriv->queue, 
+				reconnect_thread, info);
+		}
 	}
 
 fail:
@@ -499,10 +525,12 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 
 	g_mutex_lock (priv->cancel_lock);
 
+/*
 	if (cancel)
 	{
-		/* I know this isn't polite. But it works ;-) */
-		/* camel_operation_cancel (NULL); */
+		/ I know this isn't polite. But it works ;-) /
+		/ camel_operation_cancel (NULL); /
+
 		thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, &err);
 		if (err == NULL)
 			g_thread_join (thread);
@@ -512,17 +540,19 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 
 		if (priv->cancel)
 		{
-			/*while (!camel_operation_cancel_check (priv->cancel)) 
+			/while (!camel_operation_cancel_check (priv->cancel)) 
 			{ 
 				g_warning (_("Cancellation failed, retrying\n"));
 				thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
 				g_thread_join (thread);
-			}*/
+			}/
 			tny_camel_account_stop_camel_operation_priv (priv);
 		}
 
+
 		camel_operation_uncancel (NULL);
 	}
+*/
 
 	while (priv->inuse_spin); 
 
@@ -1037,7 +1067,7 @@ tny_camel_account_cancel_default (TnyAccount *self)
 		tny_camel_account_stop_camel_operation_priv (priv);
 	}
 
-	camel_operation_uncancel (NULL);
+	camel_operation_uncancel (NULL); 
 
 	g_mutex_unlock (priv->cancel_lock);
 

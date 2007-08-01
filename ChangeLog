@@ -1,3 +1,8 @@
+2007-08-01  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Reconnect hang fix
+	* Invalid cancelled warning fix
+
 2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Introduction of tny_folder_get_headers_async
