@@ -307,9 +307,14 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		info->account = TNY_ACCOUNT (g_object_ref (account));
 		info->func = func;
 
-		g_idle_add_full (G_PRIORITY_DEFAULT, 
-			forget_password_idle_func, info, 
-			forget_password_destroy_func);
+		if (g_main_depth () == 0) {
+			g_idle_add_full (G_PRIORITY_DEFAULT, 
+				forget_password_idle_func, info, 
+				forget_password_destroy_func);
+		} else {
+			forget_password_idle_func (info); 
+			forget_password_destroy_func (info);
+		}
 
 		/* Wait on the queue for the mainloop callback to be finished */
 		g_mutex_lock (info->mutex);
@@ -401,9 +406,14 @@ tny_session_camel_do_an_error (TnySessionCamel *self, TnyAccount *account, TnyAl
 	info->err = err;
 	info->retval = FALSE;
 
-	g_idle_add_full (G_PRIORITY_DEFAULT, 
-		alert_idle_func, info, 
-		alert_destroy_func);
+	if (g_main_depth () == 0) {
+		g_idle_add_full (G_PRIORITY_DEFAULT, 
+			alert_idle_func, info, 
+			alert_destroy_func);
+	} else {
+		alert_idle_func (info); 
+		alert_destroy_func (info);
+	}
 
 	/* Wait on the queue for the mainloop callback to be finished */
 	g_mutex_lock (info->mutex);
