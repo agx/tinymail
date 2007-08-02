@@ -162,16 +162,14 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 	g_static_rec_mutex_lock (queue->lock);
 	item = queue->current;
 
-	/* Cancel the current */
+	/* Remove all the cancellables */
+	_tny_camel_queue_remove_items (queue, flags);
 
+	/* Cancel the current */
 	if (item) {
 		if (item->flags & TNY_CAMEL_QUEUE_CANCELLABLE_ITEM)
-			tny_account_cancel (TNY_ACCOUNT (queue->account));
+			_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (queue->account));
 	}
-
-	/* Remove all the cancellables */
-
-	_tny_camel_queue_remove_items (queue, flags);
 
 	g_static_rec_mutex_unlock (queue->lock);
 

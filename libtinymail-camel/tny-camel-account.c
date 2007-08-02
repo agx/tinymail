@@ -563,7 +563,7 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 	GThread *thread;
 	GError *err = NULL;
 
-	g_mutex_lock (priv->cancel_lock);
+	g_static_rec_mutex_lock (priv->cancel_lock);
 
 	while (priv->inuse_spin); 
 
@@ -575,7 +575,7 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 	camel_operation_register (priv->cancel);
 	camel_operation_start (priv->cancel, (char*)what);
 
-	g_mutex_unlock (priv->cancel_lock);
+	g_static_rec_mutex_unlock (priv->cancel_lock);
 
 	return;
 }
@@ -596,9 +596,9 @@ _tny_camel_account_stop_camel_operation (TnyCamelAccount *self)
 
 	if (priv->cancel)
 	{
-		g_mutex_lock (priv->cancel_lock);
+		g_static_rec_mutex_lock (priv->cancel_lock);
 		tny_camel_account_stop_camel_operation_priv (priv);
-		g_mutex_unlock (priv->cancel_lock);
+		g_static_rec_mutex_unlock (priv->cancel_lock);
 	}
 
 	return;
@@ -1054,13 +1054,13 @@ tny_camel_account_cancel (TnyAccount *self)
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->cancel_func (self);
 }
 
-static void 
-tny_camel_account_cancel_default (TnyAccount *self)
+void 
+_tny_camel_account_actual_cancel (TnyCamelAccount *self)
 {
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	GThread *thread;
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	g_mutex_lock (priv->cancel_lock);
+	g_static_rec_mutex_lock (priv->cancel_lock);
 
 	/* I know this isn't polite. But it works ;-) */
 	/* camel_operation_cancel (NULL); */
@@ -1079,7 +1079,23 @@ tny_camel_account_cancel_default (TnyAccount *self)
 
 	camel_operation_uncancel (NULL); 
 
-	g_mutex_unlock (priv->cancel_lock);
+	g_static_rec_mutex_unlock (priv->cancel_lock);
+
+}
+
+static void 
+tny_camel_account_cancel_default (TnyAccount *self)
+{
+	if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
+	{
+		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+		_tny_camel_queue_cancel_remove_items (priv->queue, 
+			TNY_CAMEL_QUEUE_CANCELLABLE_ITEM);
+
+	} else {
+		_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (self));
+	}
 
 	return;
 }
@@ -1178,7 +1194,6 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	camel_exception_init (priv->ex);
 
 	priv->custom_url_string = FALSE;
-	priv->cancel_lock = g_mutex_new ();
 	priv->inuse_spin = FALSE;
 
 	priv->options = NULL;
@@ -1193,9 +1208,10 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->service_lock = g_new (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->service_lock);
-
 	priv->account_lock = g_new (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->account_lock);
+	priv->cancel_lock = g_new (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->cancel_lock);
 
 	return;
 }
@@ -1535,12 +1551,13 @@ tny_camel_account_finalize (GObject *object)
 	_tny_camel_account_start_camel_operation (self, NULL, NULL, NULL);
 	_tny_camel_account_stop_camel_operation (self);
 
-	g_mutex_lock (priv->cancel_lock);
+	g_static_rec_mutex_lock (priv->cancel_lock);
 	if (G_UNLIKELY (priv->cancel))
 		camel_operation_unref (priv->cancel);
-	g_mutex_unlock (priv->cancel_lock);
+	g_static_rec_mutex_unlock (priv->cancel_lock);
 
-	g_mutex_free (priv->cancel_lock);
+	g_static_rec_mutex_free (priv->cancel_lock);
+
 	priv->inuse_spin = FALSE;
 
 	if (priv->options)

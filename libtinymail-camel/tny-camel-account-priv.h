@@ -58,7 +58,7 @@ struct _TnyCamelAccountPriv
 	gboolean pass_func_set, forget_pass_func_set;
 	CamelProviderType type;
 	CamelOperation *cancel;
-	GMutex *cancel_lock;
+	GStaticRecMutex *cancel_lock;
 	gboolean inuse_spin, in_auth;
 	gchar *name; GList *options;
 	gchar *cache_location; gint port;
@@ -81,7 +81,7 @@ void _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if);
 void _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **err);
 TnyError _tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex);
 void _tny_camel_account_emit_changed (TnyCamelAccount *self);
-
+void _tny_camel_account_actual_cancel (TnyCamelAccount *self);
 
 #define TNY_CAMEL_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountPriv))

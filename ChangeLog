@@ -2,6 +2,8 @@
 
 	* Reintroduction of cancellation support (this is experimental)
 	* Timezone fix in the summary (remove your caches)
+	* Making tny_account_cancel actually work, or at least a little bit
+	better than before this commit (cleaning up the queue a bit)
 
 2007-08-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
