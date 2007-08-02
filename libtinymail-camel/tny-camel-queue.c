@@ -39,8 +39,6 @@ static GObjectClass *parent_class = NULL;
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_QUEUE, TnyCamelQueuePriv))
 
 
-
-
 static void
 tny_camel_queue_finalize (GObject *object)
 {
@@ -48,15 +46,16 @@ tny_camel_queue_finalize (GObject *object)
 
 	self->stopped = TRUE;
 
-	g_mutex_lock (self->lock);
+	g_static_rec_mutex_lock (self->lock);
 	g_list_free (self->list);
 	self->list = NULL;
-	g_mutex_unlock (self->lock);
+	g_static_rec_mutex_unlock (self->lock);
 
 	if (self->thread)
 		g_thread_join (self->thread);
 
-	g_mutex_free (self->lock);
+	g_static_rec_mutex_free (self->lock);
+	self->lock = NULL;
 
 	(*parent_class->finalize) (object);
 
@@ -92,19 +91,19 @@ thread_main_func (gpointer user_data)
 		GList *first = NULL;
 		QueueItem *item = NULL;
 
-		g_mutex_lock (queue->lock);
+		g_static_rec_mutex_lock (queue->lock);
 		first = g_list_first (queue->list);
 		if (first) {
 			item = first->data;
 			queue->current = item;
 		} else
 			queue->stopped = TRUE;
-		g_mutex_unlock (queue->lock);
+		g_static_rec_mutex_unlock (queue->lock);
 
 		if (item) 
 			item->func (item->data);
 
-		g_mutex_lock (queue->lock);
+		g_static_rec_mutex_lock (queue->lock);
 		if (first)
 			queue->list = g_list_delete_link (queue->list, first);
 		queue->current = NULL;
@@ -113,14 +112,14 @@ thread_main_func (gpointer user_data)
 			queue->thread = NULL;
 			queue->stopped = TRUE;
 		}
-		g_mutex_unlock (queue->lock);
+		g_static_rec_mutex_unlock (queue->lock);
 
 		/*if (first)
 			g_list_free (first);*/
 		if (item)
 			g_slice_free (QueueItem, item);
 	}
-	
+
 	queue->thread = NULL;
 	queue->stopped = TRUE;
 	g_object_unref (queue);
@@ -135,7 +134,7 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 {
 	GList *copy = NULL, *rem = NULL;
 
-	g_mutex_lock (queue->lock);
+	g_static_rec_mutex_lock (queue->lock);
 	copy = queue->list;
 	while (copy) {
 		QueueItem *item = copy->data;
@@ -152,7 +151,7 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 		queue->list = g_list_delete_link (queue->list, rem->data);
 		rem = g_list_next (rem);
 	}
-	g_mutex_unlock (queue->lock);
+	g_static_rec_mutex_unlock (queue->lock);
 }
 
 void 
@@ -160,26 +159,22 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 {
 	QueueItem *item = NULL;
 
-	g_mutex_lock (queue->lock);
+	g_static_rec_mutex_lock (queue->lock);
 	item = queue->current;
 
-printf ("cancel rem\n");
+	/* Cancel the current */
 
 	if (item) {
-
-printf ("cancel rem %d, %s\n", item->flags, item->name);
-
 		if (item->flags & TNY_CAMEL_QUEUE_CANCELLABLE_ITEM)
-		{
-			printf ("actual rem\n");
-
 			tny_account_cancel (TNY_ACCOUNT (queue->account));
-		}
 	}
 
-	g_mutex_unlock (queue->lock);
+	/* Remove all the cancellables */
 
 	_tny_camel_queue_remove_items (queue, flags);
+
+	g_static_rec_mutex_unlock (queue->lock);
+
 }
 
 void 
@@ -195,14 +190,27 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 	item->flags = flags;
 	item->name = name;
 
-	g_mutex_lock (queue->lock);
+	g_static_rec_mutex_lock (queue->lock);
 
-	if (flags & TNY_CAMEL_QUEUE_PRIORITY_ITEM)
-		queue->list = g_list_prepend (queue->list, item);
-	else
+	if (flags & TNY_CAMEL_QUEUE_PRIORITY_ITEM) 
+	{
+		/* Preserve the order for prioritized items */
+		gboolean stop = FALSE; gint cnt = 0;
+		GList *first = g_list_first (queue->list);
+		while (first && !stop) {
+			QueueItem *item = first->data;
+			if (item)
+				if (!(item->flags & TNY_CAMEL_QUEUE_PRIORITY_ITEM))
+					stop = TRUE;
+			cnt++;
+			first = g_list_next (first);
+		}
+		queue->list = g_list_insert (queue->list, item, cnt);
+	} else /* Normal items simply get appended */
 		queue->list = g_list_append (queue->list, item);
 
-	if (queue->stopped) {
+	if (queue->stopped) 
+	{
 		GError *err = NULL;
 		queue->stopped = FALSE;
 		g_object_ref (queue);
@@ -212,7 +220,8 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 			queue->stopped = TRUE;
 		}
 	}
-	g_mutex_unlock (queue->lock);
+
+	g_static_rec_mutex_unlock (queue->lock);
 
 }
 
@@ -245,7 +254,8 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	self->stopped = TRUE;
 	self->list = NULL;
 	self->thread = NULL;
-	self->lock = g_mutex_new ();
+	self->lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (self->lock);
 	self->current = NULL;
 
 	return;

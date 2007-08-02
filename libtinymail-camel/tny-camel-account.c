@@ -1071,7 +1071,6 @@ tny_camel_account_cancel_default (TnyAccount *self)
 	{
 		while (!camel_operation_cancel_check (priv->cancel)) 
 		{ 
-			g_warning (_("Cancellation failed, retrying\n"));
 			thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
 			g_thread_join (thread);
 		}

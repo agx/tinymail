@@ -44,7 +44,7 @@ struct _TnyCamelQueue
 	TnyCamelStoreAccount *account;
 	GList *list;
 	GThread *thread;
-	GMutex *lock;
+	GStaticRecMutex *lock;
 	gboolean stopped;
 	gpointer current;
 };
