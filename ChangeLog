@@ -1,6 +1,7 @@
 2007-08-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Reintroduction of cancellation support (this is experimental)
+	* Timezone fix in the summary (remove your caches)
 
 2007-08-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
