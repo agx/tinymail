@@ -1,3 +1,7 @@
+2007-08-02  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Reintroduction of cancellation support (this is experimental)
+
 2007-08-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Reconnect hang fix

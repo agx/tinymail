@@ -215,7 +215,8 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 
 			_tny_camel_queue_launch_wflags (aspriv->queue, 
 				reconnect_thread, info,
-				TNY_CAMEL_QUEUE_RECONNECT_ITEM);
+				TNY_CAMEL_QUEUE_RECONNECT_ITEM,
+				__FUNCTION__);
 		}
 	}
 

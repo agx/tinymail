@@ -536,8 +536,8 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	priv->queue = _tny_camel_queue_new ();
-	priv->msg_queue = _tny_camel_queue_new ();
+	priv->queue = _tny_camel_queue_new (self);
+	priv->msg_queue = _tny_camel_queue_new (self);
 	apriv->type = CAMEL_PROVIDER_STORE;
 	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
 	priv->managed_folders = NULL;
@@ -1256,7 +1256,8 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 		g_object_ref (info->query);
 
 	_tny_camel_queue_launch (priv->queue, 
-			tny_camel_store_account_get_folders_async_thread, info);
+			tny_camel_store_account_get_folders_async_thread, info,
+			__FUNCTION__);
 
 	return;
 }
@@ -1633,7 +1634,8 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 	/* It's indeed a very typical queue operation */
 
 	_tny_camel_queue_launch (priv->queue, 
-		tny_camel_store_account_queue_going_online_thread, info);
+		tny_camel_store_account_queue_going_online_thread, info,
+		__FUNCTION__);
 
 	return;
 }

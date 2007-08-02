@@ -64,9 +64,11 @@ tny_camel_queue_finalize (GObject *object)
 }
 
 TnyCamelQueue*
-_tny_camel_queue_new (void)
+_tny_camel_queue_new (TnyCamelStoreAccount *account)
 {
 	TnyCamelQueue *self = g_object_new (TNY_TYPE_CAMEL_QUEUE, NULL);
+
+	self->account = account;
 
 	return TNY_CAMEL_QUEUE (self);
 }
@@ -76,6 +78,7 @@ typedef struct
 	GThreadFunc func;
 	gpointer data;
 	TnyCamelQueueItemFlags flags;
+	const gchar *name;
 } QueueItem;
 
 
@@ -91,9 +94,10 @@ thread_main_func (gpointer user_data)
 
 		g_mutex_lock (queue->lock);
 		first = g_list_first (queue->list);
-		if (first)
+		if (first) {
 			item = first->data;
-		else
+			queue->current = item;
+		} else
 			queue->stopped = TRUE;
 		g_mutex_unlock (queue->lock);
 
@@ -103,7 +107,8 @@ thread_main_func (gpointer user_data)
 		g_mutex_lock (queue->lock);
 		if (first)
 			queue->list = g_list_delete_link (queue->list, first);
-	
+		queue->current = NULL;
+
 		if (g_list_length (queue->list) == 0) {
 			queue->thread = NULL;
 			queue->stopped = TRUE;
@@ -134,9 +139,12 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 	copy = queue->list;
 	while (copy) {
 		QueueItem *item = copy->data;
-		if (item && (item->flags & flags)) {
-			rem = g_list_prepend (rem, copy);
-			g_slice_free (QueueItem, item);
+		if (queue->current != item)
+		{
+			if (item && (item->flags & flags)) {
+				rem = g_list_prepend (rem, copy);
+				g_slice_free (QueueItem, item);
+			}
 		}
 		copy = g_list_next (copy);
 	}
@@ -150,12 +158,32 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 void 
 _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
 {
-	/* TNY TODO: Implement cancelling the current too */
+	QueueItem *item = NULL;
+
+	g_mutex_lock (queue->lock);
+	item = queue->current;
+
+printf ("cancel rem\n");
+
+	if (item) {
+
+printf ("cancel rem %d, %s\n", item->flags, item->name);
+
+		if (item->flags & TNY_CAMEL_QUEUE_CANCELLABLE_ITEM)
+		{
+			printf ("actual rem\n");
+
+			tny_account_cancel (TNY_ACCOUNT (queue->account));
+		}
+	}
+
+	g_mutex_unlock (queue->lock);
+
 	_tny_camel_queue_remove_items (queue, flags);
 }
 
 void 
-_tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags)
+_tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name)
 {
 	QueueItem *item = g_slice_new (QueueItem);
 
@@ -165,9 +193,14 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 	item->func = func;
 	item->data = data;
 	item->flags = flags;
+	item->name = name;
 
 	g_mutex_lock (queue->lock);
-	queue->list = g_list_append (queue->list, item);
+
+	if (flags & TNY_CAMEL_QUEUE_PRIORITY_ITEM)
+		queue->list = g_list_prepend (queue->list, item);
+	else
+		queue->list = g_list_append (queue->list, item);
 
 	if (queue->stopped) {
 		GError *err = NULL;
@@ -176,7 +209,7 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 		queue->thread = g_thread_create (thread_main_func, 
 			queue, TRUE, &err);
 		if (err) {
-			queue->stopped = TRUE;	
+			queue->stopped = TRUE;
 		}
 	}
 	g_mutex_unlock (queue->lock);
@@ -184,9 +217,9 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 }
 
 void 
-_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data)
+_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data, const gchar *name)
 {
-	_tny_camel_queue_launch_wflags (queue, func, data, TNY_CAMEL_QUEUE_NORMAL_ITEM);
+	_tny_camel_queue_launch_wflags (queue, func, data, TNY_CAMEL_QUEUE_NORMAL_ITEM, name);
 }
 
 static void 
@@ -208,10 +241,12 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyCamelQueue *self = (TnyCamelQueue*)instance;
 
+	self->account = NULL;
 	self->stopped = TRUE;
 	self->list = NULL;
 	self->thread = NULL;
 	self->lock = g_mutex_new ();
+	self->current = NULL;
 
 	return;
 }

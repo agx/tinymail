@@ -1154,7 +1154,8 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnySyncF
 	_tny_camel_folder_reason (priv);
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
-		tny_camel_folder_sync_async_thread, info);
+		tny_camel_folder_sync_async_thread, info,
+		__FUNCTION__);
 }
 
 void 
@@ -1418,8 +1419,10 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 	 * via _tny_camel_account_start_camel_operation,
 	 * and also calls the idle main callback: */
 
-	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
-		tny_camel_folder_refresh_async_thread, info);
+	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_refresh_async_thread, info, 
+		TNY_CAMEL_QUEUE_PRIORITY_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM, 
+		__FUNCTION__);
 
 	return;
 }
@@ -1673,8 +1676,13 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 	g_object_ref (info->self);
 	g_object_ref (info->headers);
 
-	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
-		tny_camel_folder_get_headers_async_thread, info);
+	_tny_camel_queue_cancel_remove_items (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		TNY_CAMEL_QUEUE_GET_HEADERS_ITEM);
+
+	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_get_headers_async_thread, info, 
+		TNY_CAMEL_QUEUE_PRIORITY_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|
+			TNY_CAMEL_QUEUE_GET_HEADERS_ITEM, __FUNCTION__);
 
 	return;
 }
@@ -1995,7 +2003,8 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	g_object_ref (info->header);
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv), 
-		tny_camel_folder_get_msg_async_thread, info);
+		tny_camel_folder_get_msg_async_thread, info,
+		__FUNCTION__);
 
 	return;
 }
@@ -2971,7 +2980,7 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	g_object_ref (G_OBJECT (info->into));
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
-		tny_camel_folder_copy_async_thread, info);
+		tny_camel_folder_copy_async_thread, info, __FUNCTION__);
 
 	return;
 }
@@ -3560,7 +3569,8 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 	g_object_ref (G_OBJECT (info->folder_dst));
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv),
-		tny_camel_folder_transfer_msgs_async_thread, info);
+		tny_camel_folder_transfer_msgs_async_thread, info,
+		__FUNCTION__);
 
 	return;
 }
@@ -4329,7 +4339,8 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 		g_object_ref (G_OBJECT (info->query));
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
-		tny_camel_folder_get_folders_async_thread, info);
+		tny_camel_folder_get_folders_async_thread, info,
+		__FUNCTION__);
 
 	return;
 }
@@ -4493,7 +4504,8 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 			/* Thread reference */
 			g_object_ref (self);
 			_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
-				tny_camel_folder_poke_status_thread, self);
+				tny_camel_folder_poke_status_thread, self,
+				__FUNCTION__);
 
 		} else {
 			if (priv->iter) {

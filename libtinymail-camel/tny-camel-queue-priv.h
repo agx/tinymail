@@ -23,6 +23,8 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <tny-camel-store-account.h>
+
 G_BEGIN_DECLS
 
 #define TNY_TYPE_CAMEL_QUEUE             (tny_camel_queue_get_type ())
@@ -38,10 +40,13 @@ typedef struct _TnyCamelQueueClass TnyCamelQueueClass;
 struct _TnyCamelQueue
 {
 	GObject parent;
+
+	TnyCamelStoreAccount *account;
 	GList *list;
 	GThread *thread;
 	GMutex *lock;
 	gboolean stopped;
+	gpointer current;
 };
 
 struct _TnyCamelQueueClass 
@@ -53,14 +58,16 @@ struct _TnyCamelQueueClass
 typedef enum {
 	TNY_CAMEL_QUEUE_NORMAL_ITEM = 1<<0,
 	TNY_CAMEL_QUEUE_RECONNECT_ITEM = 1<<1,
-	TNY_CAMEL_QUEUE_CANCELLABLE_ITEM = 1<<2
+	TNY_CAMEL_QUEUE_CANCELLABLE_ITEM = 1<<2,
+	TNY_CAMEL_QUEUE_PRIORITY_ITEM = 1<<3,
+	TNY_CAMEL_QUEUE_GET_HEADERS_ITEM = 1<<3,
 } TnyCamelQueueItemFlags;
 
 GType tny_camel_queue_get_type (void);
 
-TnyCamelQueue* _tny_camel_queue_new (void);
-void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags);
-void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data);
+TnyCamelQueue* _tny_camel_queue_new (TnyCamelStoreAccount *account);
+void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name);
+void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data, const gchar *name);
 void _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 void _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 
