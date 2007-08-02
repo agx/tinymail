@@ -459,7 +459,10 @@ static int maildir_summary_load(CamelLocalSummary *cls, int forceindex, CamelExc
 	while ( (d = readdir(dir)) ) {
 		if (d->d_name[0] == '.')
 			continue;
-		
+
+		if (!strcmp (d->d_name, "core"))
+			continue;
+
 		/* map the filename -> uid */
 		uid = strchr(d->d_name, ':');
 		if (uid) {
