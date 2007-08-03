@@ -198,8 +198,10 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 		while (first && !stop) {
 			QueueItem *item = first->data;
 			if (item)
-				if (!(item->flags & TNY_CAMEL_QUEUE_PRIORITY_ITEM))
+				if (!(item->flags & TNY_CAMEL_QUEUE_PRIORITY_ITEM)) {
 					stop = TRUE;
+					cnt--;
+				}
 			cnt++;
 			first = g_list_next (first);
 		}
