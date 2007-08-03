@@ -2674,7 +2674,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			g_static_rec_mutex_lock (priv->folder_lock);
 			camel_folder_info_free  (priv->iter);
 			priv->iter = NULL;
-			unload_folder_no_lock (priv, FALSE);
+			/* unload_folder_no_lock (priv, FALSE); */
 			g_static_rec_mutex_unlock (priv->folder_lock);
 		}
 
