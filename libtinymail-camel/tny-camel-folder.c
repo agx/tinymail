@@ -1821,11 +1821,13 @@ tny_camel_folder_get_msg_async_callback (gpointer thr_user_data)
 		tny_folder_change_set_received_msg (change, info->msg);
 		notify_folder_observers_about (info->self, change);
 		g_object_unref (change);
-		g_object_unref (info->msg);
 	}
 
 	if (info->callback)
 		info->callback (info->self, info->cancelled, info->msg, &info->err, info->user_data);
+
+	if (info->msg)
+		g_object_unref (info->msg);
 
 	/* Prevent status callbacks from being called after this
 	 * (can happen because the 2 idle callbacks have different priorities)
