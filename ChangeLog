@@ -4,6 +4,7 @@
 	* More conservatism about reconnecting
 	* Fixed a few locking problems with POP
 	* Callbacks and destroynotifies of cancelled-removed items
+	* Fetching of folders happens in a queue item now
 
 2007-08-02  Philip Van Hoof  <pvanhoof@gnome.org>
 

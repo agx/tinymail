@@ -658,11 +658,19 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 			
 			nread += n;
 		} while (n > 0 && nread < length);
-		
+
 		if (nread < length) {
-			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			if (errno == EINTR) {
+				CamelException mex = CAMEL_EXCEPTION_INITIALISER;
+				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
+						     _("Operation cancelled"));
+				camel_imap_recon (store, &mex);
+				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
+			} else {
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     _("Server response ended too soon."));
-			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			}
 			g_string_free (str, TRUE);
 			goto lose;
 		}
@@ -814,9 +822,17 @@ imap_read_untagged_idle (CamelImapStore *store, char *line, CamelException *ex)
 		} while (n > 0 && nread < length);
 		
 		if (nread < length) {
-			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			if (errno == EINTR) {
+				CamelException mex = CAMEL_EXCEPTION_INITIALISER;
+				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
+						     _("Operation cancelled"));
+				camel_imap_recon (store, &mex);
+				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
+			}  else {
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     _("Server response ended too soon."));
-			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			}
 			g_string_free (str, TRUE);
 			goto lose;
 		}

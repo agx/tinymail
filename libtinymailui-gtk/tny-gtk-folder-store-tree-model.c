@@ -207,23 +207,18 @@ get_root_name (TnyFolderStore *folder_store)
 }
 
 
-static void 
-tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyConnectionStatus status, TnyGtkFolderStoreTreeModel *self)
+static void
+get_folders_cb (TnyFolderStore *fstore, TnyList *list, GError **err, gpointer user_data)
 {
+	TnyGtkFolderStoreTreeModel *self = (TnyGtkFolderStoreTreeModel *) user_data;
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
 	GtkTreeIter iter;
 	GtkTreeIter name_iter;
 	gboolean found = FALSE;
 
-	/* This callback handler deals with connection status changes. In case
-	 * we got connected, we can expect that, at least sometimes, new folders
-	 * might have arrived. We'll need to scan for those, so we'll recursively
-	 * start asking the account about its folders. */
+	g_object_unref (list);
 
-	if (status != TNY_CONNECTION_STATUS_CONNECTED)
-		return;
-
-	/* Note that the very first time, this core will pull all folder info.
+	/* Note that the very first time, this code will pull all folder info.
 	 * Note that when it runs, you'll see LIST commands happen on the IMAP
 	 * socket. Especially the first time. You'll also see STATUS commands 
 	 * happen. This is, indeed, normal behaviour when this component is used.*/
@@ -239,7 +234,7 @@ tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyCo
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 			&citem, -1);
-		if (citem == (GObject *) account)
+		if (citem == (GObject *) fstore)
 		{
 			name_iter = iter;
 			found = TRUE;
@@ -254,7 +249,32 @@ tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyCo
 	 * folders that already exist (it wont add them a second time). */
 
 	if (found)
-		recurse_folders_sync (self, TNY_FOLDER_STORE (account), &name_iter);
+		recurse_folders_sync (self, fstore, &name_iter);
+
+	g_object_unref (self);
+
+	return;
+}
+
+static void 
+tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyConnectionStatus status, TnyGtkFolderStoreTreeModel *self)
+{
+	TnyList *list = NULL;
+
+	/* This callback handler deals with connection status changes. In case
+	 * we got connected, we can expect that, at least sometimes, new folders
+	 * might have arrived. We'll need to scan for those, so we'll recursively
+	 * start asking the account about its folders. */
+
+	if (status != TNY_CONNECTION_STATUS_CONNECTED)
+		return;
+
+
+	list = tny_simple_list_new ();
+	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account), 
+		list, get_folders_cb, NULL, NULL, g_object_ref (self));
+
+	return;
 }
 
 
