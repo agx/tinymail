@@ -398,8 +398,8 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
   	if (has_chg) 
   		tny_folder_change_set_new_all_count (change, priv->cached_length);
   	priv->dont_fkill = TRUE;
-  	notify_folder_observers_about (TNY_FOLDER (self), change);
-  	g_object_unref (G_OBJECT (change));
+  	notify_folder_observers_about_in_idle (TNY_FOLDER (self), change);
+  	g_object_unref (change);
   	priv->dont_fkill = old;
   }
 

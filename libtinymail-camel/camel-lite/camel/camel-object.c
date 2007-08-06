@@ -1411,14 +1411,14 @@ camel_object_trigger_event(void *vo, const char * name, void *event_data)
 		g_return_if_fail (CAMEL_IS_OBJECT (obj));
 	g_return_if_fail (name);
 
-	g_static_rec_mutex_lock (&hooks_lock);
+	/* g_static_rec_mutex_lock (&hooks_lock); */
 
 	hook = co_find_pair(obj->klass, name);
 	if (hook)
 		goto trigger;
 
 	if (obj->hooks == NULL) {
-		g_static_rec_mutex_unlock (&hooks_lock);
+		/* g_static_rec_mutex_unlock (&hooks_lock); */
 		return;
 	}
 
@@ -1437,20 +1437,20 @@ camel_object_trigger_event(void *vo, const char * name, void *event_data)
 	g_warning("camel_object_trigger_event: trying to trigger unknown event `%s' in class `%s'",
 		  name, obj->klass->name);
 
-	g_static_rec_mutex_unlock (&hooks_lock);
+	/* g_static_rec_mutex_unlock (&hooks_lock); */
 
 	return;
 
 trigger:
 	/* try prep function, if false, then quit */
 	if (hook->func.prep != NULL && !hook->func.prep(obj, event_data)) {
-		g_static_rec_mutex_unlock (&hooks_lock);
+		/* g_static_rec_mutex_unlock (&hooks_lock); */
 		return;
 	}
 
 	/* also, no hooks, dont bother going further */
 	if (obj->hooks == NULL) {
-		g_static_rec_mutex_unlock (&hooks_lock);
+		/* g_static_rec_mutex_unlock (&hooks_lock); */
 		return;
 	}
 
@@ -1500,7 +1500,7 @@ trigger_interface:
 
 	camel_object_unget_hooks(obj);
 	camel_object_unref(obj);
-	g_static_rec_mutex_unlock (&hooks_lock);
+	/* g_static_rec_mutex_unlock (&hooks_lock); */
 }
 
 void *

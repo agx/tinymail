@@ -980,8 +980,10 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 static void
 on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
-			GtkTreeViewColumn *col,  gpointer userdata)
+			GtkTreeViewColumn *col,  gpointer user_data)
 {
+	TnySummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 
@@ -1023,24 +1025,13 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 			if (G_LIKELY (folder))
 			{
-				msg = tny_folder_get_msg (folder, header, NULL);
-				if (G_LIKELY (msg))
-				{
-					msgwin = tny_gtk_msg_window_new (
-						tny_platform_factory_new_msg_view (platfact));
 
-					tny_msg_view_set_msg (TNY_MSG_VIEW (msgwin), msg);
-					g_object_unref (G_OBJECT (msg));
-				
-					gtk_widget_show (GTK_WIDGET (msgwin));
-				} else {
-					msgwin = tny_gtk_msg_window_new (
-						tny_platform_factory_new_msg_view (platfact));
-
-					tny_msg_view_set_unavailable (TNY_MSG_VIEW (msgwin));
-			
-					gtk_widget_show (GTK_WIDGET (msgwin));
-				}
+				OnGetMsgInfo *info = g_slice_new (OnGetMsgInfo);
+				info->self = TNY_DEMOUI_SUMMARY_VIEW (g_object_ref (self));
+				info->header = TNY_HEADER (g_object_ref (header));
+				gtk_widget_show (GTK_WIDGET (priv->progress));
+				tny_folder_get_msg_async (folder, header, 
+					on_get_msg, status_update_on_get_msg, info);
 				g_object_unref (G_OBJECT (folder));
 			}
 			g_object_unref (G_OBJECT (header));
@@ -1878,7 +1869,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->header_view));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect(G_OBJECT (priv->header_view), "row-activated", 
-		G_CALLBACK (on_header_view_tree_row_activated), priv);
+		G_CALLBACK (on_header_view_tree_row_activated), self);
 
 	g_signal_connect(G_OBJECT (priv->header_view), "key-press-event", 
 		G_CALLBACK (on_header_view_key_press_event), self);

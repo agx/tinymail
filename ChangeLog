@@ -2,6 +2,7 @@
 
 	* GDK lock awareness
 	* More conservatism about reconnecting
+	* Fixed a few locking problems with POP
 
 2007-08-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
