@@ -266,9 +266,8 @@ tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyCo
 	 * might have arrived. We'll need to scan for those, so we'll recursively
 	 * start asking the account about its folders. */
 
-	if (status != TNY_CONNECTION_STATUS_CONNECTED)
+	if (status == TNY_CONNECTION_STATUS_RECONNECTING)
 		return;
-
 
 	list = tny_simple_list_new ();
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account), 
