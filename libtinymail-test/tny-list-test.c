@@ -36,7 +36,7 @@
 #include <camel/camel.h>
 #include <camel/camel-folder-summary.h>
 
-static TnyList *ifaces[6];
+static TnyList *ifaces[5];
 static gchar *str;
 
 static void
@@ -45,9 +45,8 @@ tny_list_test_setup (void)
 	ifaces[0] = tny_simple_list_new ();
 	ifaces[1] = TNY_LIST (tny_gtk_account_list_model_new ());
 	ifaces[2] = TNY_LIST (tny_gtk_attach_list_model_new ());
-	ifaces[3] = TNY_LIST (tny_gtk_folder_store_tree_model_new (FALSE, NULL));
-	ifaces[4] = TNY_LIST (tny_gtk_folder_store_tree_model_new (TRUE, NULL));
-	ifaces[5] = TNY_LIST (tny_gtk_header_list_model_new ());
+	ifaces[3] = TNY_LIST (tny_gtk_folder_store_tree_model_new (NULL));
+	ifaces[4] = TNY_LIST (tny_gtk_header_list_model_new ());
 
 	return;
 }
@@ -61,7 +60,7 @@ tny_list_test_teardown (void)
     /* The problem is that a TnyCamelIMAPStoreAccount is unrefed before */
     /* it is unrefed in tny_camel_store_account_get_folders_async_thread */
     sleep (1);
-    for (i=0; i < 6; i++)
+    for (i=0; i < 5; i++)
     {
 	 g_object_unref (G_OBJECT (ifaces[i]));
     }
