@@ -144,7 +144,7 @@ thread_main_func (gpointer user_data)
  *
  * Internal, non-public API documentation of Tinymail
  *
- * Remove all items from the queue that their flags match @flags. As items get
+ * Remove all items from the queue where their flags match @flags. As items get
  * removed will their callback and destroyer happen and will their cancel_field
  * be set to TRUE.
  **/
@@ -188,7 +188,7 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
  *
  * Internal, non-public API documentation of Tinymail
  *
- * Remove all items from the queue that their flags match @flags. As items get
+ * Remove all items from the queue where their flags match @flags. As items get
  * removed will their callback and destroyer happen and will their cancel_field
  * be set to TRUE.
  *
