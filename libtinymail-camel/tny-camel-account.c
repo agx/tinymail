@@ -583,14 +583,6 @@ tny_camel_account_stop_camel_operation_priv (TnyCamelAccountPriv *priv)
 	return;
 }
 
-static gpointer
-camel_cancel_hack_thread (gpointer data)
-{
-	camel_operation_cancel (NULL);
-
-	g_thread_exit (NULL);
-	return NULL;
-}
 
 /* TODO: Documentation.
  */
@@ -1158,6 +1150,15 @@ tny_camel_account_cancel (TnyAccount *self)
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->cancel_func (self);
 }
 
+static gpointer
+camel_cancel_hack_thread (gpointer data)
+{
+	camel_operation_cancel (NULL);
+
+	g_thread_exit (NULL);
+	return NULL;
+}
+
 void 
 _tny_camel_account_actual_cancel (TnyCamelAccount *self)
 {
@@ -1168,6 +1169,10 @@ _tny_camel_account_actual_cancel (TnyCamelAccount *self)
 
 	/* I know this isn't polite. But it works ;-) */
 	/* camel_operation_cancel (NULL); */
+
+	camel_operation_cancel (priv->cancel);
+
+/*
 	thread = g_thread_create (camel_cancel_hack_thread, NULL, TRUE, NULL);
 	g_thread_join (thread);
 
@@ -1180,11 +1185,24 @@ _tny_camel_account_actual_cancel (TnyCamelAccount *self)
 		}
 		tny_camel_account_stop_camel_operation_priv (priv);
 	}
-
-	camel_operation_uncancel (NULL); 
+*/
 
 	g_static_rec_mutex_unlock (priv->cancel_lock);
 
+	return;
+}
+
+
+void 
+_tny_camel_account_actual_uncancel (TnyCamelAccount *self)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->cancel_lock);
+	camel_operation_uncancel (priv->cancel); 
+	g_static_rec_mutex_unlock (priv->cancel_lock);
+
+	return;
 }
 
 static void 

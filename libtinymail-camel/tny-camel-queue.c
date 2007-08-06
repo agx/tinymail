@@ -103,6 +103,13 @@ thread_main_func (gpointer user_data)
 		QueueItem *item = NULL;
 
 		g_static_rec_mutex_lock (queue->lock);
+
+		if (queue->next_uncancel)
+		{
+			_tny_camel_account_actual_uncancel (queue->account);
+			queue->next_uncancel = FALSE;
+		}
+
 		first = g_list_first (queue->list);
 		if (first) {
 			item = first->data;
@@ -212,12 +219,15 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 
 	/* Cancel the current */
 	if (item) {
-		if (item->flags & TNY_CAMEL_QUEUE_CANCELLABLE_ITEM)
+		if (item->flags & TNY_CAMEL_QUEUE_CANCELLABLE_ITEM) {
 			_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (queue->account));
+			queue->next_uncancel = TRUE;
+		}
 	}
 
 	g_static_rec_mutex_unlock (queue->lock);
 
+	return;
 }
 
 /**
@@ -344,6 +354,7 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	self->lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->lock);
 	self->current = NULL;
+	self->next_uncancel = FALSE;
 
 	return;
 }

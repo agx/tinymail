@@ -45,7 +45,7 @@ struct _TnyCamelQueue
 	GList *list;
 	GThread *thread;
 	GStaticRecMutex *lock;
-	gboolean stopped;
+	gboolean stopped, next_uncancel;
 	gpointer current;
 };
 

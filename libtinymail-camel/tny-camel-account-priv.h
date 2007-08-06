@@ -82,6 +82,7 @@ void _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GErr
 TnyError _tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex);
 void _tny_camel_account_emit_changed (TnyCamelAccount *self);
 void _tny_camel_account_actual_cancel (TnyCamelAccount *self);
+void _tny_camel_account_actual_uncancel (TnyCamelAccount *self);
 
 #define TNY_CAMEL_ACCOUNT_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountPriv))
