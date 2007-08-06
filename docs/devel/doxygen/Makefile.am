@@ -5,9 +5,10 @@ all: libtinymail
 	$(DOXYGEN) libtinymail-camel
 
 clean:
-	rm -rf out/libtinymail
-	rm -rf out/libtinymailui
-	rm -rf out/libtinymailui-gtk
-	rm -rf out/libtinymail-camel
+	rm -rf out/libtinymail libtinymail
+	rm -rf out/libtinymailui libtinymailui
+	rm -rf out/libtinymailui-gtk libtinymailui-gtk
+	rm -rf out/libtinymail-camel libtinymail-camel
 
 distclean: clean
+	rm -rf Makefile Makefile.in

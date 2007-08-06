@@ -90,5 +90,5 @@ DIST_SUBDIRS = \
 	libtinymail-tp \
 	libtinymailui-webkit
 
-DISTCHECK_CONFIGURE_FLAGS = --with-html-component=mozembed --enable-gtk-doc --enable-python-bindings --enable-unit-tests --enable-tests --enable-queues
+DISTCHECK_CONFIGURE_FLAGS = --with-html-component=mozembed --enable-gtk-doc --enable-python-bindings --enable-tests --enable-queues
 
