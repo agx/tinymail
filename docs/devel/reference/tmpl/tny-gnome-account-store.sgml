@@ -41,21 +41,3 @@ A #TnyAccountStore implementation using GNOME's GConf and libtinymail-camel
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_gnome_account_store_add_store_account ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
-
-
-<!-- ##### FUNCTION tny_gnome_account_store_add_transport_account ##### -->
-<para>
-
-</para>
-
-@self: 
-@account: 
-
-

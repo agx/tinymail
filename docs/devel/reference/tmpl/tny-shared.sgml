@@ -17,13 +17,6 @@ Shared include file with forward typedefs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO tny_debug ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### STRUCT TnyStatus ##### -->
 <para>
 
@@ -41,50 +34,12 @@ Shared include file with forward typedefs
 </para>
 
 
-<!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-
-<!-- ##### SIGNAL TnyAccountStore::connecting-finished ##### -->
-<para>
-
-</para>
-
-@tnyaccountstore: the object which received the signal.
-
 <!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
 <para>
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -97,12 +52,7 @@ Shared include file with forward typedefs
 @get_device_func: 
 @alert_func: 
 @find_account_func: 
-@account_changed: 
-@account_inserted: 
-@account_removed: 
-@accounts_reloaded: 
 @connecting_started: 
-@connecting_finished: 
 
 <!-- ##### STRUCT TnyList ##### -->
 <para>
@@ -186,6 +136,7 @@ Shared include file with forward typedefs
 @find_msg_func: 
 @get_msg_async_func: 
 @get_headers_func: 
+@get_headers_async_func: 
 @get_name_func: 
 @get_id_func: 
 @get_account_func: 
@@ -284,6 +235,13 @@ Shared include file with forward typedefs
 </para>
 
 
+<!-- ##### SIGNAL TnyAccount::changed ##### -->
+<para>
+
+</para>
+
+@tnyaccount: the object which received the signal.
+
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
 
@@ -324,7 +282,9 @@ Shared include file with forward typedefs
 @matches_url_string_func: 
 @start_operation_func: 
 @stop_operation_func: 
+@is_ready_func: 
 @connection_status_changed: 
+@changed: 
 
 <!-- ##### STRUCT TnyDevice ##### -->
 <para>
@@ -337,8 +297,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnydevice: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -363,8 +323,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnystoreaccount: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyStoreAccountIface ##### -->
 <para>
@@ -457,17 +417,6 @@ getting the message or in case there was an error.
 @msg: the #TnyMsg instance that was requested
 @err: in case there was an error, this !GError instance is not NULL
 @user_data: user data passed at the caller
-
-
-<!-- ##### USER_FUNCTION TnySyncFolderCallback ##### -->
-<para>
-
-</para>
-
-@folder: 
-@cancelled: 
-@err: 
-@user_data: 
 
 
 <!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
@@ -574,19 +523,6 @@ A method that happens after tny_folder_store_get_folders_async is finished
 @user_data: user data passed at the caller
 
 
-<!-- ##### USER_FUNCTION TnyCopyFolderCallback ##### -->
-<para>
-
-</para>
-
-@self: 
-@into: 
-@cancelled: 
-@new_folder: 
-@err: 
-@user_data: 
-
-
 <!-- ##### STRUCT TnyMsgRemoveStrategy ##### -->
 <para>
 
@@ -612,32 +548,32 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>

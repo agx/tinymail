@@ -58,11 +58,3 @@ An implementation of #TnySendQueue for Camel
 @trans_account: 
 
 
-<!-- ##### FUNCTION tny_camel_send_queue_join_worker ##### -->
-<para>
-
-</para>
-
-@self: 
-
-

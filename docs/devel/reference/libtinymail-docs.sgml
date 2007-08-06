@@ -96,10 +96,10 @@
 <!ENTITY libtinymail-asyncworker-TnyAsyncWorkerQueueTask SYSTEM "xml/tny-async-worker-queue-task.xml">
 <!ENTITY libtinymail-asyncworker-TnyAsyncWorkerQueue SYSTEM "xml/tny-async-worker-queue.xml">
 
-<!ENTITY libtinymail-queues-TnyQueue SYSTEM "xml/tny-queue.xml">
-<!ENTITY libtinymail-queues-TnyQueueTask SYSTEM "xml/tny-queue-task.xml">
-<!ENTITY libtinymail-queues-TnyGenericSendQueue SYSTEM "xml/tny-generic-send-queue.xml">
-<!ENTITY libtinymail-queues-TnyGetMsgQueue SYSTEM "xml/tny-get-msg-queue.xml">
+<!-- !ENTITY libtinymail-queues-TnyQueue SYSTEM "xml/tny-queue.xml" //-->
+<!-- !ENTITY libtinymail-queues-TnyQueueTask SYSTEM "xml/tny-queue-task.xml" //-->
+<!-- !ENTITY libtinymail-queues-TnyGenericSendQueue SYSTEM "xml/tny-generic-send-queue.xml" //-->
+<!-- !ENTITY libtinymail-queues-TnyGetMsgQueue SYSTEM "xml/tny-get-msg-queue.xml" //-->
 
 <!ENTITY index-Object-Tree SYSTEM "xml/tree_index.sgml">
 
@@ -218,19 +218,19 @@
 		&libtinymail-gnome-desktop-TnyGnomeDevice;
 	</chapter>
 
-	<chapter id="libtinymail-queues">
+	<!-- chapter id="libtinymail-queues">
 		<title>A queue library</title>
 		&libtinymail-queues-TnyQueue;
 		&libtinymail-queues-TnyQueueTask;
 		&libtinymail-queues-TnyGenericSendQueue;
 		&libtinymail-queues-TnyGetMsgQueue;
-	</chapter>
+	</chapter //-->
 
-	<chapter id="libtinymail-asyncworker">
+	<!-- chapter id="libtinymail-asyncworker">
 		<title>A library that implements TnyQueue</title>
 		&libtinymail-asyncworker-TnyAsyncWorkerQueueTask;
 		&libtinymail-asyncworker-TnyAsyncWorkerQueue;
-	</chapter>
+	</chapter //-->
 
 	<chapter id="libtinymail-camel">
 		<title>libtinymail-camel - implementation of the main library</title>

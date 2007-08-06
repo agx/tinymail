@@ -41,6 +41,7 @@ A abstract type that defines a folder
 @find_msg_func: 
 @get_msg_async_func: 
 @get_headers_func: 
+@get_headers_async_func: 
 @get_name_func: 
 @get_id_func: 
 @get_account_func: 
@@ -63,21 +64,7 @@ A abstract type that defines a folder
 @get_url_string_func: 
 @get_caps_func: 
 
-<!-- ##### MACRO TNY_TYPE_FOLDER_SIGNAL ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
-<para>
-
-</para>
-
-
-
-<!-- ##### MACRO TNY_TYPE_FOLDER_CAPS ##### -->
 <para>
 
 </para>
@@ -156,18 +143,6 @@ A abstract type that defines a folder
 @self: 
 @expunge: 
 @err: 
-
-
-<!-- ##### FUNCTION tny_folder_sync_async ##### -->
-<para>
-
-</para>
-
-@self: 
-@expunge: 
-@callback: 
-@status_callback: 
-@user_data: 
 
 
 <!-- ##### FUNCTION tny_folder_get_msg ##### -->
@@ -269,15 +244,6 @@ A abstract type that defines a folder
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_get_local_size ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_folder_is_subscribed ##### -->
 <para>
 
@@ -346,20 +312,6 @@ A abstract type that defines a folder
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_folder_copy_async ##### -->
-<para>
-
-</para>
-
-@self: 
-@into: 
-@new_name: 
-@del: 
-@callback: 
-@status_callback: 
-@user_data: 
-
-
 <!-- ##### FUNCTION tny_folder_poke_status ##### -->
 <para>
 
@@ -405,15 +357,6 @@ A abstract type that defines a folder
 
 
 <!-- ##### FUNCTION tny_folder_get_caps ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_folder_get_url_string ##### -->
 <para>
 
 </para>

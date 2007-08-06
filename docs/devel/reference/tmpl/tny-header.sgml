@@ -63,13 +63,6 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @set_flags_func: 
 @unset_flags_func: 
 
-<!-- ##### MACRO TNY_TYPE_HEADER_PRIORITY_FLAGS ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### FUNCTION tny_header_flags_get_type ##### -->
 <para>
 

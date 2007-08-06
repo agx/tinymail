@@ -17,11 +17,25 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_ACCOUNT_TYPE ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
 
 </para>
 
+
+<!-- ##### SIGNAL TnyAccount::changed ##### -->
+<para>
+
+</para>
+
+@tnyaccount: the object which received the signal.
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -65,43 +79,15 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @matches_url_string_func: 
 @start_operation_func: 
 @stop_operation_func: 
+@is_ready_func: 
 @connection_status_changed: 
-
-<!-- ##### MACRO TNY_TYPE_CONNECTION_STATUS ##### -->
-<para>
-
-</para>
-
-
-
-<!-- ##### MACRO TNY_TYPE_ACCOUNT_TYPE ##### -->
-<para>
-
-</para>
-
-
-
-<!-- ##### MACRO TNY_TYPE_ACCOUNT_SIGNAL ##### -->
-<para>
-
-</para>
-
-
+@changed: 
 
 <!-- ##### FUNCTION tny_account_type_get_type ##### -->
 <para>
 
 </para>
 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_account_get_connection_status ##### -->
-<para>
-
-</para>
-
-@self: 
 @Returns: 
 
 
@@ -121,15 +107,6 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 
 @self: 
 @name: 
-
-
-<!-- ##### FUNCTION tny_account_set_secure_auth_mech ##### -->
-<para>
-
-</para>
-
-@self: 
-@mech: 
 
 
 <!-- ##### FUNCTION tny_account_set_proto ##### -->
@@ -205,15 +182,6 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 
 
 <!-- ##### FUNCTION tny_account_get_name ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_account_get_secure_auth_mech ##### -->
 <para>
 
 </para>
@@ -310,26 +278,5 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 @self: 
 @url_string: 
 @Returns: 
-
-
-<!-- ##### FUNCTION tny_account_start_operation ##### -->
-<para>
-
-</para>
-
-@self: 
-@domain: 
-@code: 
-@status_callback: 
-@status_user_data: 
-
-
-<!-- ##### FUNCTION tny_account_stop_operation ##### -->
-<para>
-
-</para>
-
-@self: 
-@canceled: 
 
 

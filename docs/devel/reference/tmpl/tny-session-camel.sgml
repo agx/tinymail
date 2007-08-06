@@ -46,18 +46,15 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @prev_constat: 
 @connchanged_signal: 
 @current_accounts: 
+@current_accounts_lock: 
 @camel_dir: 
 @in_auth_function: 
 @is_connecting: 
-@async_connect: 
 @ui_lock: 
-@conlock: 
 @queue_lock: 
-@conthread: 
 @stop_now: 
 @initialized: 
 @is_inuse: 
-@background_thread_running: 
 @regged_queues: 
 
 <!-- ##### STRUCT TnySessionCamel ##### -->
@@ -93,30 +90,5 @@ develop against the #TnyAccountStore interface API using an instance of their im
 
 @self: 
 @ui_lock: 
-
-
-<!-- ##### FUNCTION tny_session_camel_join_connecting ##### -->
-<para>
-
-</para>
-
-@self: 
-
-
-<!-- ##### FUNCTION tny_session_camel_set_async_connecting ##### -->
-<para>
-
-</para>
-
-@self: 
-@enable: 
-
-
-<!-- ##### FUNCTION tny_session_camel_set_initialized ##### -->
-<para>
-
-</para>
-
-@self: 
 
 

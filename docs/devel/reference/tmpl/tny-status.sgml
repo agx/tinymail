@@ -17,6 +17,13 @@ An object containing status information
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_STATUS_DOMAIN ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyStatus ##### -->
 <para>
 
@@ -27,20 +34,6 @@ An object containing status information
 @message: 
 @position: 
 @of_total: 
-
-<!-- ##### MACRO TNY_TYPE_STATUS_DOMAIN ##### -->
-<para>
-
-</para>
-
-
-
-<!-- ##### MACRO TNY_TYPE_STATUS_CODE ##### -->
-<para>
-
-</para>
-
-
 
 <!-- ##### FUNCTION tny_status_domain_get_type ##### -->
 <para>

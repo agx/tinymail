@@ -17,13 +17,6 @@ A abstract type that defines a store for accounts
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TNY_TYPE_ACCOUNT_STORE_SIGNAL ##### -->
-<para>
-
-</para>
-
-
-
 <!-- ##### MACRO TNY_TYPE_ALERT_TYPE ##### -->
 <para>
 
@@ -44,63 +37,10 @@ A abstract type that defines a store for accounts
 </para>
 
 
-<!-- ##### SIGNAL TnyAccountStore::account-changed ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-inserted ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::account-removed ##### -->
-<para>
-
-</para>
-
-@: 
-@:
-
-@tnyaccountstore: the object which received the signal.
-@arg1: 
-
-<!-- ##### SIGNAL TnyAccountStore::accounts-reloaded ##### -->
-<para>
-
-</para>
-
-@:
-
-@tnyaccountstore: the object which received the signal.
-
-<!-- ##### SIGNAL TnyAccountStore::connecting-finished ##### -->
-<para>
-
-</para>
-
-@:
-
-@tnyaccountstore: the object which received the signal.
-
 <!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
 <para>
 
 </para>
-
-@:
 
 @tnyaccountstore: the object which received the signal.
 
@@ -115,12 +55,7 @@ A abstract type that defines a store for accounts
 @get_device_func: 
 @alert_func: 
 @find_account_func: 
-@account_changed: 
-@account_inserted: 
-@account_removed: 
-@accounts_reloaded: 
 @connecting_started: 
-@connecting_finished: 
 
 <!-- ##### FUNCTION tny_get_accounts_request_type_get_type ##### -->
 <para>
