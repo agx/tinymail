@@ -118,8 +118,11 @@ thread_main_func (gpointer user_data)
 			queue->stopped = TRUE;
 		g_static_rec_mutex_unlock (queue->lock);
 
-		if (item) 
+		if (item) {
+			tny_debug ("TnyCamelQueue: %s is on the stage, now performing\n", item->name);
 			item->func (item->data);
+			tny_debug ("TnyCamelQueue: %s is off the stage, done performing\n", item->name);
+		}
 
 		g_static_rec_mutex_lock (queue->lock);
 		if (first)
@@ -168,6 +171,8 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 		{
 			if (item && (item->flags & flags)) 
 			{
+				tny_debug ("TnyCamelQueue: %s 's performance is cancelled\n", item->name);
+
 				if (item->cancel_field)
 					*item->cancel_field = TRUE;
 
