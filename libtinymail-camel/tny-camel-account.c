@@ -392,12 +392,30 @@ void
 tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	GList *copy = priv->options;
+	gboolean found = FALSE;
 
-	priv->options = g_list_prepend (priv->options, g_strdup (option));
+	if (!option)
+		return;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, TRUE, FALSE);
+	while (copy) 
+	{
+		gchar *str = (gchar *) copy->data;
 
-	_tny_camel_account_emit_changed (self);
+		if (str && !strcmp (option, str))
+		{
+			found = TRUE;
+			break;
+		}
+		copy = g_list_next (copy);
+	}
+
+	if (!found)
+	{
+		priv->options = g_list_prepend (priv->options, g_strdup (option));
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, TRUE, FALSE);
+		_tny_camel_account_emit_changed (self);
+	}
 
 	return;
 }
@@ -406,35 +424,37 @@ TnyError
 _tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex)
 {
 	/* printf ("DEBUG: %s: ex->id=%d, ex->desc=%s\n", __FUNCTION__, ex->id, ex->desc); */
+
 	if (!ex) {
 		g_warning ("%s: The exception was NULL.\n", __FUNCTION__);
 		return TNY_ACCOUNT_ERROR_TRY_CONNECT;
 	}
 
-
 	/* Try to provide a precise error code, 
-	 * as much as possible: 
-	 */
-	switch (ex->id) {
-	case CAMEL_EXCEPTION_SYSTEM_HOST_LOOKUP_FAILED:
-		return TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED;
-	case CAMEL_EXCEPTION_SERVICE_UNAVAILABLE:
-		return TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE;
-	case CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE:
-		return TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED;
-	case CAMEL_EXCEPTION_SERVICE_CERTIFICATE:
-		return TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE;
-	case CAMEL_EXCEPTION_USER_CANCEL:
-		/* TODO: This really shouldn't be shown to the user: */
-		return TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL;
-	case CAMEL_EXCEPTION_SYSTEM:
-	default:
-		/* A generic exception. 
-		 * We should always try to provide a precise error code rather than this,
-		 * so we can show a more helpful (translated) error message to the user.
-		 */
-		return TNY_ACCOUNT_ERROR_TRY_CONNECT;
+	 * as much as possible: */
+	switch (ex->id) 
+	{
+		case CAMEL_EXCEPTION_SYSTEM_HOST_LOOKUP_FAILED:
+			return TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED;
+		case CAMEL_EXCEPTION_SERVICE_UNAVAILABLE:
+			return TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE;
+		case CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE:
+			return TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED;
+		case CAMEL_EXCEPTION_SERVICE_CERTIFICATE:
+			return TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE;
+		case CAMEL_EXCEPTION_USER_CANCEL:
+			/* TODO: This really shouldn't be shown to the user: */
+			return TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL;
+		case CAMEL_EXCEPTION_SYSTEM:
+		default:
+			/* A generic exception. 
+			 * We should always try to provide a precise error code rather than this,
+			 * so we can show a more helpful (translated) error message to the user.
+			 */
+			return TNY_ACCOUNT_ERROR_TRY_CONNECT;
 	}
+
+	return TNY_ACCOUNT_ERROR_TRY_CONNECT;
 }
 
 void 
@@ -448,7 +468,6 @@ _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GErr
 		g_set_error (err, TNY_ACCOUNT_ERROR, 
 			_tny_camel_account_get_tny_error_code_for_camel_exception_id (priv->ex),
 			camel_exception_get_description (priv->ex));
-		/* printf ("DEBUG: %s: camel exception: message=%s\n", __FUNCTION__, (*err)->message); */
 	}
 
 	return;
@@ -467,13 +486,31 @@ static void
 tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_string)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	gboolean changed = FALSE;
 
-	if (priv->url_string)
-		g_free (priv->url_string);
-	priv->custom_url_string = TRUE;
-	priv->url_string = g_strdup (url_string);
+	g_static_rec_mutex_lock (priv->service_lock);
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
+	if (!url_string)
+	{
+		if (priv->url_string) {
+			g_free (priv->url_string);
+			changed = TRUE;
+		}
+		priv->custom_url_string = FALSE;
+		priv->url_string = NULL;
+	} else if ((!priv->url_string && url_string) || (!(strcmp (url_string, priv->url_string) == 0)))
+	{
+		if (priv->url_string)
+			g_free (priv->url_string);
+		priv->custom_url_string = TRUE;
+		priv->url_string = g_strdup (url_string);
+		changed = TRUE;
+	}
+
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, TRUE);
+
+	g_static_rec_mutex_unlock (priv->service_lock);
 
 	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
 
@@ -508,7 +545,6 @@ tny_camel_account_set_name_default (TnyAccount *self, const gchar *name)
 
 	if (priv->name)
 		g_free (priv->name);
-
 	priv->name = g_strdup (name);
 
 	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
@@ -731,12 +767,14 @@ tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session)
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	camel_object_ref (session);
-	priv->session = session;
+	if (!priv->session)
+	{
+		camel_object_ref (session);
+		priv->session = session;
+		_tny_session_camel_register_account (session, self);
 
-	_tny_session_camel_register_account (session, self);
-
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, FALSE, FALSE);
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (self, FALSE, FALSE);
+	}
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -754,9 +792,8 @@ tny_camel_account_set_id_default (TnyAccount *self, const gchar *id)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (G_UNLIKELY (priv->id))
+	if (priv->id)
 		g_free (priv->id);
-
 	priv->id = g_strdup (id);
 
 	_tny_camel_account_emit_changed (TNY_CAMEL_ACCOUNT (self));
@@ -774,17 +811,29 @@ static void
 tny_camel_account_set_secure_auth_mech_default (TnyAccount *self, const gchar *mech)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	gboolean changed = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->custom_url_string = FALSE;
 
-	if (G_UNLIKELY (priv->mech))
-		g_free (priv->mech);
+	if (!mech)
+	{
+		if (priv->mech) {
+			g_free (priv->mech);
+			changed = TRUE;
+		}
+		priv->mech = NULL;
+	} else if ((!priv->mech && mech) || (!(strcmp (mech, priv->mech) == 0)))
+	{
+		if (priv->mech)
+			g_free (priv->mech);
+		priv->mech = g_strdup (mech);
+		changed = TRUE;
+	}
 
-	priv->mech = g_strdup (mech);
-
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -803,17 +852,29 @@ static void
 tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	gboolean changed = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->custom_url_string = FALSE;
 
-	if (G_UNLIKELY (priv->proto))
-		g_free (priv->proto);
+	if (!proto)
+	{
+		if (priv->proto) {
+			g_free (priv->proto);
+			changed = TRUE;
+		}
+		priv->proto = NULL;
+	} else if ((!priv->proto && proto) || (!(strcmp (proto, priv->proto) == 0)))
+	{
+		if (priv->proto)
+			g_free (priv->proto);
+		priv->proto = g_strdup (proto);
+		changed = TRUE;
+	}
 
-	priv->proto = g_strdup (proto);
-
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -832,18 +893,30 @@ static void
 tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	gboolean changed = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->custom_url_string = FALSE;
 
-	if (G_UNLIKELY (priv->user))
-		g_free (priv->user);
+	if (!user)
+	{
+		if (priv->user) {
+			g_free (priv->user);
+			changed = TRUE;
+		}
+		priv->user = NULL;
+	} else if ((!priv->user && user) || (!(strcmp (user, priv->user) == 0)))
+	{
+		if (priv->user)
+			g_free (priv->user);
+		priv->user = g_strdup (user);
+		changed = TRUE;
+	}
 
-	priv->user = g_strdup (user);
-
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		!priv->in_auth, FALSE);
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+			!priv->in_auth, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -862,18 +935,30 @@ static void
 tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	
+	gboolean changed = FALSE;
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->custom_url_string = FALSE;
 
-	if (G_UNLIKELY (priv->host))
-		g_free (priv->host);
+	if (!host)
+	{
+		if (priv->host) {
+			g_free (priv->host);
+			changed = TRUE;
+		}
+		priv->host = NULL;
+	} else if ((!priv->host && host) || (!(strcmp (host, priv->host) == 0)))
+	{
+		if (priv->host)
+			g_free (priv->host);
+		priv->host = g_strdup (host);
+		changed = TRUE;
+	}
 
-	priv->host = g_strdup (host);
-
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		TRUE, FALSE);
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+			TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -894,15 +979,21 @@ static void
 tny_camel_account_set_port_default (TnyAccount *self, guint port)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	
+	gboolean changed = FALSE;
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->custom_url_string = FALSE;
 
-	priv->port = (gint) port;
+	if (priv->port != (gint) port)
+	{
+		priv->port = (gint) port;
+		changed = TRUE;
+	}
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		TRUE, FALSE);
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+			TRUE, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -923,14 +1014,19 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean reconf_if = FALSE;
+	gboolean changed = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
+
+	if (priv->get_pass_func != get_pass_func)
+		changed = TRUE;
 
 	priv->get_pass_func = get_pass_func;
 	priv->pass_func_set = TRUE;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		reconf_if, TRUE);
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+			reconf_if, TRUE);
 
 	if (priv->session)
 		_tny_session_camel_activate_account (priv->session, TNY_CAMEL_ACCOUNT (self));
@@ -951,14 +1047,19 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean reconf_if = FALSE;
+	gboolean changed = FALSE;
 
 	g_static_rec_mutex_lock (priv->service_lock);
+
+	if (priv->forget_pass_func != get_forget_pass_func)
+		changed = TRUE;
 
 	priv->forget_pass_func = get_forget_pass_func;
 	priv->forget_pass_func_set = TRUE;
 
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
-		reconf_if, FALSE);
+	if (changed)
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), 
+			reconf_if, FALSE);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -1572,6 +1673,213 @@ tny_camel_account_is_ready (TnyAccount *self)
 	return priv->is_ready;
 }
 
+
+
+
+typedef struct 
+{
+	TnyCamelAccount *self;
+	TnyCamelGetSupportedSecureAuthCallback callback;
+	TnyStatusCallback status_callback;
+	gpointer user_data;
+	gboolean cancelled;
+	TnyList *result;
+	TnyIdleStopper* stopper;
+	GError *err;
+	TnySessionCamel *session;
+
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+
+} GetSupportedAuthInfo;
+
+
+static gboolean 
+on_supauth_idle_func (gpointer user_data)
+{
+	GetSupportedAuthInfo *info = (GetSupportedAuthInfo *) user_data;
+
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, info->cancelled, info->result, &info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+
+	tny_idle_stopper_stop (info->stopper);
+}
+
+static void 
+on_supauth_destroy_func (gpointer user_data)
+{
+	GetSupportedAuthInfo *info = (GetSupportedAuthInfo *) user_data;
+
+	/* Thread reference */
+	g_object_unref (info->self);
+	camel_object_ref (info->session);
+
+	/* Result reference */
+	if (info->result)
+		g_object_unref (info->result);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
+	if (info->condition) {
+		g_mutex_lock (info->mutex);
+		g_cond_broadcast (info->condition);
+		info->had_callback = TRUE;
+		g_mutex_unlock (info->mutex);
+	}
+}
+
+/* Starts the operation in the thread: */
+static gpointer 
+tny_camel_account_get_supported_secure_authentication_async_thread (
+	gpointer thr_user_data)
+{
+	GetSupportedAuthInfo *info = thr_user_data;
+	TnyCamelAccount *self = info->self;
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	GError *err = NULL;
+	TnyStatus* status;
+	GList *authtypes = NULL;
+	TnyList *result = NULL;
+	GList *iter = NULL;
+
+	g_static_rec_mutex_lock (priv->service_lock);
+
+	status =  tny_status_new_literal(TNY_GET_SUPPORTED_SECURE_AUTH_STATUS, 
+		TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, 0, 1,
+		"Get secure authentication methods");
+
+	authtypes = camel_service_query_auth_types (priv->service, &ex);
+	/* Result reference */
+	result = tny_simple_list_new ();
+	iter = authtypes;
+
+	while (iter) 
+	{
+		CamelServiceAuthType *item = (CamelServiceAuthType *)iter->data;
+		if (item) {
+			TnyPair *pair = tny_pair_new (item->name, NULL);
+			tny_list_append (result, G_OBJECT (pair));
+			g_object_unref (pair);
+		}
+		iter = g_list_next (iter);
+	}
+
+	g_list_free (authtypes);
+	authtypes = NULL;
+	info->result = result;
+
+	info->err = NULL;
+	if (camel_exception_is_set (&ex))
+	{
+		g_set_error (&err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
+			camel_exception_get_description (&ex));
+		if (err != NULL)
+			info->err = g_error_copy ((const GError *) err);
+	}
+
+	g_static_rec_mutex_unlock (priv->service_lock);
+
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
+	execute_callback (10, G_PRIORITY_HIGH, 
+		on_supauth_idle_func, 
+		info, on_supauth_destroy_func);
+
+	/* Wait on the queue for the mainloop callback to be finished */
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
+
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	g_slice_free (GetSupportedAuthInfo, info);
+
+	tny_status_free(status);
+
+	return NULL;
+}
+
+
+/** 
+ * TnyCamelGetSupportedSecureAuthCallback:
+ * @self: The TnyCamelAccount on which tny_camel_account_get_supported_secure_authentication() was called.
+ * @cancelled: Whether the operation was cancelled.
+ * @auth_types: A TnyList of TnyPair objects. Each TnyPair in the list has a supported secure authentication method name as its name. This list must be freed with g_object_unref().
+ * @err: A GError if an error occurred, or NULL. This must be freed with g_error_free().
+ * @user_data: The user data that was provided to tny_camel_account_get_supported_secure_authentication().
+ * 
+ * The callback for tny_camel_account_get_supported_secure_authentication().
+ **/
+
+/**
+ * tny_camel_account_get_supported_secure_authentication:
+ * @self: a #TnyCamelAccount object.
+ * @callback: A function to be called when the operation is complete.
+ * @status_callback: A function to be called one or more times while the operation is in progress.
+ * @user_data: Data to be passed to the callback and status callback.
+ * 
+ * Query the server for the list of supported secure authentication mechanisms.
+ * The #TnyCamelAccount must have a valid hostname and the port number 
+ * must be set if appropriate.
+ * The returned strings may be used as parameters to 
+ * tny_account_set_secure_auth_mech().
+ **/
+void 
+tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, TnyCamelGetSupportedSecureAuthCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{ 
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	GetSupportedAuthInfo *info = NULL;
+	GError *err = NULL;
+
+	if (!_tny_session_check_operation (priv->session, TNY_ACCOUNT (self), &err, 
+			TNY_ACCOUNT_ERROR, TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH))
+	{
+		if (callback)
+			callback (self, TRUE /* cancelled */, NULL, &err, user_data);
+		g_error_free (err);
+		return;
+	}
+
+	info = g_slice_new (GetSupportedAuthInfo);
+	info->session = priv->session;
+	info->err = NULL;
+	info->self = self;
+	info->callback = callback;
+	info->result = NULL;
+	info->status_callback = status_callback;
+	info->user_data = user_data;
+	
+	info->stopper = tny_idle_stopper_new();
+
+	/* thread reference */
+	g_object_ref (self);
+	camel_object_ref (info->session);
+
+
+	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) 
+	{
+		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+		_tny_camel_queue_launch (aspriv->queue, 
+			tny_camel_account_get_supported_secure_authentication_async_thread, info,
+			__FUNCTION__);
+	} else {
+		g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
+			info, FALSE, NULL);
+	}
+}
+
+
 static void
 tny_camel_account_finalize (GObject *object)
 {
@@ -1809,208 +2117,5 @@ tny_camel_account_get_type (void)
 	}
 
 	return type;
-}
-
-typedef struct 
-{
-	TnyCamelAccount *self;
-	TnyCamelGetSupportedSecureAuthCallback callback;
-	TnyStatusCallback status_callback;
-	gpointer user_data;
-	gboolean cancelled;
-	TnyList *result;
-	TnyIdleStopper* stopper;
-	GError *err;
-	TnySessionCamel *session;
-
-	GCond* condition;
-	gboolean had_callback;
-	GMutex *mutex;
-
-} GetSupportedAuthInfo;
-
-
-static gboolean 
-on_supauth_idle_func (gpointer user_data)
-{
-	GetSupportedAuthInfo *info = (GetSupportedAuthInfo *) user_data;
-
-	if (info->callback) {
-		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->cancelled, info->result, &info->err, info->user_data);
-		tny_lockable_unlock (info->session->priv->ui_lock);
-	}
-
-	tny_idle_stopper_stop (info->stopper);
-}
-
-static void 
-on_supauth_destroy_func (gpointer user_data)
-{
-	GetSupportedAuthInfo *info = (GetSupportedAuthInfo *) user_data;
-
-	/* Thread reference */
-	g_object_unref (info->self);
-	camel_object_ref (info->session);
-
-	/* Result reference */
-	if (info->result)
-		g_object_unref (info->result);
-
-	tny_idle_stopper_destroy (info->stopper);
-	info->stopper = NULL;
-
-	if (info->condition) {
-		g_mutex_lock (info->mutex);
-		g_cond_broadcast (info->condition);
-		info->had_callback = TRUE;
-		g_mutex_unlock (info->mutex);
-	}
-}
-
-/* Starts the operation in the thread: */
-static gpointer 
-tny_camel_account_get_supported_secure_authentication_async_thread (
-	gpointer thr_user_data)
-{
-	GetSupportedAuthInfo *info = thr_user_data;
-	TnyCamelAccount *self = info->self;
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	GError *err = NULL;
-	TnyStatus* status;
-	GList *authtypes = NULL;
-	TnyList *result = NULL;
-	GList *iter = NULL;
-
-	g_static_rec_mutex_lock (priv->service_lock);
-
-	status =  tny_status_new_literal(TNY_GET_SUPPORTED_SECURE_AUTH_STATUS, 
-		TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, 0, 1,
-		"Get secure authentication methods");
-
-	authtypes = camel_service_query_auth_types (priv->service, &ex);
-	/* Result reference */
-	result = tny_simple_list_new ();
-	iter = authtypes;
-
-	while (iter) 
-	{
-		CamelServiceAuthType *item = (CamelServiceAuthType *)iter->data;
-		if (item) {
-			TnyPair *pair = tny_pair_new (item->name, NULL);
-			tny_list_append (result, G_OBJECT (pair));
-			g_object_unref (pair);
-		}
-		iter = g_list_next (iter);
-	}
-
-	g_list_free (authtypes);
-	authtypes = NULL;
-	info->result = result;
-
-	info->err = NULL;
-	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (&err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_REFRESH,
-			camel_exception_get_description (&ex));
-		if (err != NULL)
-			info->err = g_error_copy ((const GError *) err);
-	}
-
-	g_static_rec_mutex_unlock (priv->service_lock);
-
-	info->mutex = g_mutex_new ();
-	info->condition = g_cond_new ();
-	info->had_callback = FALSE;
-
-	execute_callback (10, G_PRIORITY_HIGH, 
-		on_supauth_idle_func, 
-		info, on_supauth_destroy_func);
-
-	/* Wait on the queue for the mainloop callback to be finished */
-	g_mutex_lock (info->mutex);
-	if (!info->had_callback)
-		g_cond_wait (info->condition, info->mutex);
-	g_mutex_unlock (info->mutex);
-
-	g_mutex_free (info->mutex);
-	g_cond_free (info->condition);
-
-	g_slice_free (GetSupportedAuthInfo, info);
-
-	tny_status_free(status);
-
-	return NULL;
-}
-
-
-/** 
- * TnyCamelGetSupportedSecureAuthCallback:
- * @self: The TnyCamelAccount on which tny_camel_account_get_supported_secure_authentication() was called.
- * @cancelled: Whether the operation was cancelled.
- * @auth_types: A TnyList of TnyPair objects. Each TnyPair in the list has a supported secure authentication method name as its name. This list must be freed with g_object_unref().
- * @err: A GError if an error occurred, or NULL. This must be freed with g_error_free().
- * @user_data: The user data that was provided to tny_camel_account_get_supported_secure_authentication().
- * 
- * The callback for tny_camel_account_get_supported_secure_authentication().
- **/
-
-/**
- * tny_camel_account_get_supported_secure_authentication:
- * @self: a #TnyCamelAccount object.
- * @callback: A function to be called when the operation is complete.
- * @status_callback: A function to be called one or more times while the operation is in progress.
- * @user_data: Data to be passed to the callback and status callback.
- * 
- * Query the server for the list of supported secure authentication mechanisms.
- * The #TnyCamelAccount must have a valid hostname and the port number 
- * must be set if appropriate.
- * The returned strings may be used as parameters to 
- * tny_account_set_secure_auth_mech().
- **/
-void 
-tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, TnyCamelGetSupportedSecureAuthCallback callback, TnyStatusCallback status_callback, gpointer user_data)
-{ 
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	GetSupportedAuthInfo *info = NULL;
-	GError *err = NULL;
-
-	if (!_tny_session_check_operation (priv->session, TNY_ACCOUNT (self), &err, 
-			TNY_ACCOUNT_ERROR, TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH))
-	{
-		if (callback)
-			callback (self, TRUE /* cancelled */, NULL, &err, user_data);
-		g_error_free (err);
-		return;
-	}
-
-	info = g_slice_new (GetSupportedAuthInfo);
-	info->session = priv->session;
-	info->err = NULL;
-	info->self = self;
-	info->callback = callback;
-	info->result = NULL;
-	info->status_callback = status_callback;
-	info->user_data = user_data;
-	
-	info->stopper = tny_idle_stopper_new();
-
-	/* thread reference */
-	g_object_ref (self);
-	camel_object_ref (info->session);
-
-
-	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) 
-	{
-		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-		_tny_camel_queue_launch (aspriv->queue, 
-			tny_camel_account_get_supported_secure_authentication_async_thread, info,
-			__FUNCTION__);
-	} else {
-		g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
-			info, FALSE, NULL);
-	}
 }
 

@@ -1,6 +1,7 @@
 2007-08-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* GDK lock awareness
+	* More conservatism about reconnecting
 
 2007-08-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
