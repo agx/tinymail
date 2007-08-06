@@ -682,6 +682,7 @@ typedef struct
 {
 	TnyDemouiSummaryView *self;
 	TnyHeader *header;
+	TnyMsgView *msg_view;
 } OnGetMsgInfo;
 
 static void
@@ -714,9 +715,9 @@ on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gp
 		TnyHeaderFlags flags = tny_header_get_flags (header);
 		if (!(flags & TNY_HEADER_FLAG_SEEN))
 			tny_header_set_flags (header, TNY_HEADER_FLAG_SEEN);
-		tny_msg_view_set_msg (priv->msg_view, msg);
+		tny_msg_view_set_msg (info->msg_view, msg);
 	} else 
-		tny_msg_view_set_unavailable (priv->msg_view);
+		tny_msg_view_set_unavailable (info->msg_view);
 
 	if (merr != NULL)
 	{
@@ -734,6 +735,7 @@ on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gp
 	}
 
 	g_object_unref (self);
+	g_object_unref (info->msg_view);
 	g_object_unref (header);
 	g_slice_free (OnGetMsgInfo, info);
 
@@ -766,6 +768,7 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 				OnGetMsgInfo *info = g_slice_new (OnGetMsgInfo);
 				info->self = TNY_DEMOUI_SUMMARY_VIEW (g_object_ref (self));
 				info->header = TNY_HEADER (g_object_ref (header));
+				info->msg_view = TNY_MSG_VIEW (g_object_ref (priv->msg_view));
 				gtk_widget_show (GTK_WIDGET (priv->progress));
 				tny_folder_get_msg_async (folder, header, 
 					on_get_msg, status_update_on_get_msg, info);
@@ -992,7 +995,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	if (G_LIKELY (gtk_tree_model_get_iter(model, &iter, path)))
 	{
 		TnyHeader *header;
-		TnyMsgWindow *msgwin;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
@@ -1025,8 +1027,10 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 
 			if (G_LIKELY (folder))
 			{
-
 				OnGetMsgInfo *info = g_slice_new (OnGetMsgInfo);
+				info->msg_view = TNY_MSG_VIEW (tny_gtk_msg_window_new (tny_platform_factory_new_msg_view (platfact)));
+				g_object_ref (info->msg_view);
+				gtk_widget_show (GTK_WIDGET (info->msg_view));
 				info->self = TNY_DEMOUI_SUMMARY_VIEW (g_object_ref (self));
 				info->header = TNY_HEADER (g_object_ref (header));
 				gtk_widget_show (GTK_WIDGET (priv->progress));
