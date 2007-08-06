@@ -62,6 +62,14 @@ tny_camel_queue_finalize (GObject *object)
 	return;
 }
 
+/**
+ * _tny_camel_queue_new
+ * @account: the queue
+ *
+ * Internal, non-public API documentation of Tinymail
+ *
+ * Make a new queue for @account.
+ **/
 TnyCamelQueue*
 _tny_camel_queue_new (TnyCamelStoreAccount *account)
 {
@@ -117,8 +125,6 @@ thread_main_func (gpointer user_data)
 		}
 		g_static_rec_mutex_unlock (queue->lock);
 
-		/*if (first)
-			g_list_free (first);*/
 		if (item)
 			g_slice_free (QueueItem, item);
 	}
@@ -131,7 +137,17 @@ thread_main_func (gpointer user_data)
 	return NULL;
 }
 
-
+/**
+ * _tny_camel_queue_remove_items
+ * @queue: the queue
+ * @flags: flags
+ *
+ * Internal, non-public API documentation of Tinymail
+ *
+ * Remove all items from the queue that their flags match @flags. As items get
+ * removed will their callback and destroyer happen and will their cancel_field
+ * be set to TRUE.
+ **/
 void 
 _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
 {
@@ -165,6 +181,19 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 	g_static_rec_mutex_unlock (queue->lock);
 }
 
+/**
+ * _tny_camel_queue_cancel_remove_items
+ * @queue: the queue
+ * @flags: flags
+ *
+ * Internal, non-public API documentation of Tinymail
+ *
+ * Remove all items from the queue that their flags match @flags. As items get
+ * removed will their callback and destroyer happen and will their cancel_field
+ * be set to TRUE.
+ *
+ * Also cancel the current item (make the up-next read() of the operation fail)
+ **/
 void 
 _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
 {
@@ -186,6 +215,24 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 
 }
 
+/**
+ * _tny_camel_queue_launch_wflags
+ * @queue: the queue
+ * @func: the work function
+ * @callback: for in case of a cancellation, can be NULL
+ * @destroyer: for in case of a cancellation, can be NULL
+ * @cancel_field: a byref location of a gboolean that will be set to TRUE in case of a cancellation
+ * @data: data that will be passed to @func, @callback and @destroyer
+ * @flags: flags of this item
+ * @name: a name for this item for debugging (__FUNCTION__ will do)
+ *
+ * Internal, non-public API documentation of Tinymail
+ *
+ * Queue a new item. The contract is that @queue will invoke @func in future if
+ * it doesn't get cancelled. If it does get cancelled and @callback is not NULL,
+ * @callback will be called in the GMainLoop with @destroyer as GDestroyNotify.
+ * A cancelled item's @cancel_field will also be set to TRUE.
+ **/
 void 
 _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name)
 {
@@ -239,6 +286,25 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 
 }
 
+/**
+ * _tny_camel_queue_launch
+ * @queue: the queue
+ * @func: the work function
+ * @callback: for in case of a cancellation, can be NULL
+ * @destroyer: for in case of a cancellation, can be NULL
+ * @cancel_field: a byref location of a gboolean that will be set to TRUE in case of a cancellation
+ * @data: data that will be passed to @func, @callback and @destroyer
+ * @name: a name for this item for debugging (__FUNCTION__ will do)
+ *
+ * Internal, non-public API documentation of Tinymail
+ *
+ * Queue a new item. The contract is that @queue will invoke @func in future if
+ * it doesn't get cancelled. If it does get cancelled and @callback is not NULL,
+ * @callback will be called in the GMainLoop with @destroyer as GDestroyNotify.
+ * A cancelled item's @cancel_field will also be set to TRUE.
+ *
+ * The flags of the queue item will be TNY_CAMEL_QUEUE_NORMAL_ITEM.
+ **/
 void 
 _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, const gchar *name)
 {
