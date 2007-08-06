@@ -103,7 +103,7 @@ static void
 emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, int i, int total)
 {
 	ErrorInfo *info = g_slice_new0 (ErrorInfo);
-	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = NULL;
 
 	if (priv->trans_account)
