@@ -66,8 +66,8 @@ typedef enum {
 GType tny_camel_queue_get_type (void);
 
 TnyCamelQueue* _tny_camel_queue_new (TnyCamelStoreAccount *account);
-void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name);
-void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data, const gchar *name);
+void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name);
+void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, const gchar *name);
 void _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 void _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 

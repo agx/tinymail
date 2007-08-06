@@ -216,7 +216,7 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 				TNY_CAMEL_QUEUE_RECONNECT_ITEM);
 
 			_tny_camel_queue_launch_wflags (aspriv->queue, 
-				reconnect_thread, info,
+				reconnect_thread, NULL, NULL, NULL, info,
 				TNY_CAMEL_QUEUE_RECONNECT_ITEM,
 				__FUNCTION__);
 		}
@@ -1871,8 +1871,9 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 	{
 		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 		_tny_camel_queue_launch (aspriv->queue, 
-			tny_camel_account_get_supported_secure_authentication_async_thread, info,
-			__FUNCTION__);
+			tny_camel_account_get_supported_secure_authentication_async_thread, 
+			on_supauth_idle_func, on_supauth_destroy_func, &info->cancelled,
+			info, __FUNCTION__);
 	} else {
 		g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
 			info, FALSE, NULL);

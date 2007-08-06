@@ -1175,6 +1175,7 @@ typedef struct {
 	gpointer user_data;
 	guint depth; 
 	TnySessionCamel *session;
+	gboolean cancelled;
 
 	GCond* condition;
 	gboolean had_callback;
@@ -1211,7 +1212,8 @@ tny_camel_store_account_get_folders_async_callback (gpointer thr_user_data)
 	GetFoldersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->list,&info->err, info->user_data);
+		/* TNY TODO: pass info->cancelled */
+		info->callback (info->self, info->list, &info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1262,8 +1264,8 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	info->had_callback = FALSE;
 
 	execute_callback (info->depth, G_PRIORITY_DEFAULT, 
-			  tny_camel_store_account_get_folders_async_callback, info, 
-			  tny_camel_store_account_get_folders_async_destroyer);
+		tny_camel_store_account_get_folders_async_callback, info, 
+		tny_camel_store_account_get_folders_async_destroyer);
 
 	/* Wait on the queue for the mainloop callback to be finished */
 	g_mutex_lock (info->mutex);
@@ -1297,6 +1299,7 @@ tny_camel_store_account_get_folders_async_cancelled_callback (gpointer thr_user_
 	GetFoldersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
+		/* TNY TODO: pass info->cancelled */
 		info->callback (info->self, info->list, &info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
@@ -1353,8 +1356,10 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 		g_object_ref (info->query);
 
 	_tny_camel_queue_launch (priv->queue, 
-			tny_camel_store_account_get_folders_async_thread, info,
-			__FUNCTION__);
+		tny_camel_store_account_get_folders_async_thread,
+		tny_camel_store_account_get_folders_async_callback,
+		tny_camel_store_account_get_folders_async_destroyer, 
+		&info->cancelled, info, __FUNCTION__);
 
 	return;
 }
@@ -1731,8 +1736,9 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 	/* It's indeed a very typical queue operation */
 
 	_tny_camel_queue_launch (priv->queue, 
-		tny_camel_store_account_queue_going_online_thread, info,
-		__FUNCTION__);
+		tny_camel_store_account_queue_going_online_thread,
+		NULL, NULL, NULL,
+		 info, __FUNCTION__);
 
 	return;
 }

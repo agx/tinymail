@@ -75,9 +75,12 @@ _tny_camel_queue_new (TnyCamelStoreAccount *account)
 typedef struct
 {
 	GThreadFunc func;
+	GSourceFunc callback;
+	GDestroyNotify destroyer;
 	gpointer data;
 	TnyCamelQueueItemFlags flags;
 	const gchar *name;
+	gboolean *cancel_field;
 } QueueItem;
 
 
@@ -140,7 +143,15 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 		QueueItem *item = copy->data;
 		if (queue->current != item)
 		{
-			if (item && (item->flags & flags)) {
+			if (item && (item->flags & flags)) 
+			{
+				if (item->cancel_field)
+					*item->cancel_field = TRUE;
+
+				if (item->callback)
+					g_idle_add_full (G_PRIORITY_HIGH, item->callback, 
+						item->data, item->destroyer);
+
 				rem = g_list_prepend (rem, copy);
 				g_slice_free (QueueItem, item);
 			}
@@ -176,7 +187,7 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 }
 
 void 
-_tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name)
+_tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name)
 {
 	QueueItem *item = g_slice_new (QueueItem);
 
@@ -184,9 +195,12 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 		g_thread_init (NULL);
 
 	item->func = func;
+	item->callback = callback;
+	item->destroyer = destroyer;
 	item->data = data;
 	item->flags = flags;
 	item->name = name;
+	item->cancel_field = cancel_field;
 
 	g_static_rec_mutex_lock (queue->lock);
 
@@ -226,9 +240,11 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, gpointer
 }
 
 void 
-_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, gpointer data, const gchar *name)
+_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, const gchar *name)
 {
-	_tny_camel_queue_launch_wflags (queue, func, data, TNY_CAMEL_QUEUE_NORMAL_ITEM, name);
+	_tny_camel_queue_launch_wflags (queue, func, callback, destroyer, 
+		cancel_field, data, TNY_CAMEL_QUEUE_NORMAL_ITEM, name);
+	return;
 }
 
 static void 
