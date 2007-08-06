@@ -1,4 +1,4 @@
-/* libtinymail-camel - The Tiny Mail base library for Camel
+/* libtinymail-maemo - The Tiny Mail base library for maemo
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,39 +25,59 @@
 
 static GObjectClass *parent_class = NULL;
 
-
-typedef struct {
-	gboolean fset, forced;
-} TnyMaemoDevicePriv;
-
-#define TNY_MAEMO_DEVICE_GET_PRIVATE(o)	\
-	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MAEMO_DEVICE, TnyMaemoDevicePriv))
-
+#include "tny-maemo-device-priv.h"
 
 static void tny_maemo_device_on_online (TnyDevice *self);
 static void tny_maemo_device_on_offline (TnyDevice *self);
 static gboolean tny_maemo_device_is_online (TnyDevice *self);
 
 
+static gboolean
+emit_status (TnyDevice *self)
+{
+	if (tny_maemo_device_is_online (self))
+		tny_maemo_device_on_online (self);
+	else
+		tny_maemo_device_on_offline (self);
+
+	return FALSE;
+}
+
 static void 
 tny_maemo_device_reset (TnyDevice *self)
 {
 	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
+	const gboolean status_before = tny_maemo_device_is_online (self);
+
 	priv->fset = FALSE;
 	priv->forced = FALSE;
 
+	/* Signal if it changed: */
+	if (status_before != tny_maemo_device_is_online (self))
+		g_idle_add_full (G_PRIORITY_DEFAULT, 
+			(GSourceFunc) emit_status, 
+			g_object_ref (self), 
+			(GDestroyNotify) g_object_unref);
 }
 
 static void 
 tny_maemo_device_force_online (TnyDevice *self)
 {
+
 	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
+
+	const gboolean already_online = tny_maemo_device_is_online (self);
 
 	priv->fset = TRUE;
 	priv->forced = TRUE;
 
-	tny_maemo_device_on_online (self);
+	/* Signal if it changed: */
+	if (!already_online)
+		g_idle_add_full (G_PRIORITY_DEFAULT, 
+			(GSourceFunc) emit_status, 
+			g_object_ref (self), 
+			(GDestroyNotify) g_object_unref);
 
 	return;
 }
@@ -68,10 +88,17 @@ tny_maemo_device_force_offline (TnyDevice *self)
 {
 	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
 
+	const gboolean already_offline = !tny_maemo_device_is_online (self);
+
 	priv->fset = TRUE;
 	priv->forced = FALSE;
 
-	tny_maemo_device_on_offline (self);
+	/* Signal if it changed: */
+	if (!already_offline)
+		g_idle_add_full (G_PRIORITY_DEFAULT, 
+			(GSourceFunc) emit_status, 
+			g_object_ref (self), 
+			(GDestroyNotify) g_object_unref);
 
 	return;
 }
@@ -79,7 +106,9 @@ tny_maemo_device_force_offline (TnyDevice *self)
 static void
 tny_maemo_device_on_online (TnyDevice *self)
 {
+	gdk_threads_enter ();
 	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
+	gdk_threads_leave ();
 
 	return;
 }
@@ -87,7 +116,9 @@ tny_maemo_device_on_online (TnyDevice *self)
 static void
 tny_maemo_device_on_offline (TnyDevice *self)
 {
+	gdk_threads_enter ();
 	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
+	gdk_threads_leave ();
 
 	return;
 }
@@ -117,13 +148,12 @@ tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 /**
  * tny_maemo_device_new:
  *
- * Return value: A new #TnyDevice instance
+ * Return value: A new #TnyDevice implemented for MAEMO
  **/
 TnyDevice*
 tny_maemo_device_new (void)
 {
 	TnyMaemoDevice *self = g_object_new (TNY_TYPE_MAEMO_DEVICE, NULL);
-
 
 	return TNY_DEVICE (self);
 }
@@ -132,6 +162,9 @@ tny_maemo_device_new (void)
 static void
 tny_maemo_device_finalize (GObject *object)
 {
+	TnyMaemoDevice *self = (TnyMaemoDevice *) object;
+	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -206,3 +239,4 @@ tny_maemo_device_get_type (void)
 
 	return type;
 }
+

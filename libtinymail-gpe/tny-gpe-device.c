@@ -1,4 +1,4 @@
-/* libtinymail-camel - The Tiny Mail base library for Camel
+/* libtinymail-gpe - The Tiny Mail base library for gpe
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -31,13 +31,16 @@ static void tny_gpe_device_on_online (TnyDevice *self);
 static void tny_gpe_device_on_offline (TnyDevice *self);
 static gboolean tny_gpe_device_is_online (TnyDevice *self);
 
-static void
+
+static gboolean
 emit_status (TnyDevice *self)
 {
 	if (tny_gpe_device_is_online (self))
 		tny_gpe_device_on_online (self);
 	else
 		tny_gpe_device_on_offline (self);
+
+	return FALSE;
 }
 
 static void 
@@ -52,12 +55,16 @@ tny_gpe_device_reset (TnyDevice *self)
 
 	/* Signal if it changed: */
 	if (status_before != tny_gpe_device_is_online (self))
-		emit_status (self);
+		g_idle_add_full (G_PRIORITY_DEFAULT, 
+			(GSourceFunc) emit_status, 
+			g_object_ref (self), 
+			(GDestroyNotify) g_object_unref);
 }
 
 static void 
 tny_gpe_device_force_online (TnyDevice *self)
 {
+
 	TnyGpeDevicePriv *priv = TNY_GPE_DEVICE_GET_PRIVATE (self);
 
 	const gboolean already_online = tny_gpe_device_is_online (self);
@@ -67,8 +74,11 @@ tny_gpe_device_force_online (TnyDevice *self)
 
 	/* Signal if it changed: */
 	if (!already_online)
-		emit_status (self);
-	
+		g_idle_add_full (G_PRIORITY_DEFAULT, 
+			(GSourceFunc) emit_status, 
+			g_object_ref (self), 
+			(GDestroyNotify) g_object_unref);
+
 	return;
 }
 
@@ -85,7 +95,10 @@ tny_gpe_device_force_offline (TnyDevice *self)
 
 	/* Signal if it changed: */
 	if (!already_offline)
-		emit_status (self);
+		g_idle_add_full (G_PRIORITY_DEFAULT, 
+			(GSourceFunc) emit_status, 
+			g_object_ref (self), 
+			(GDestroyNotify) g_object_unref);
 
 	return;
 }
@@ -93,7 +106,9 @@ tny_gpe_device_force_offline (TnyDevice *self)
 static void
 tny_gpe_device_on_online (TnyDevice *self)
 {
+	gdk_threads_enter ();
 	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
+	gdk_threads_leave ();
 
 	return;
 }
@@ -101,7 +116,9 @@ tny_gpe_device_on_online (TnyDevice *self)
 static void
 tny_gpe_device_on_offline (TnyDevice *self)
 {
+	gdk_threads_enter ();
 	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
+	gdk_threads_leave ();
 
 	return;
 }
@@ -121,7 +138,7 @@ tny_gpe_device_is_online (TnyDevice *self)
 static void
 tny_gpe_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyGpeDevice *self = (TnyGpeDevice *)instance;
+	TnyGpeDevice *self = (TnyGpeDevice *) instance;
 	TnyGpeDevicePriv *priv = TNY_GPE_DEVICE_GET_PRIVATE (self);
 
 	return;
@@ -131,7 +148,7 @@ tny_gpe_device_instance_init (GTypeInstance *instance, gpointer g_class)
 /**
  * tny_gpe_device_new:
  *
- * Return value: A new #TnyDevice instance
+ * Return value: A new #TnyDevice implemented for GPE
  **/
 TnyDevice*
 tny_gpe_device_new (void)
@@ -145,8 +162,11 @@ tny_gpe_device_new (void)
 static void
 tny_gpe_device_finalize (GObject *object)
 {
+	TnyGpeDevice *self = (TnyGpeDevice *) object;
+	TnyGpeDevicePriv *priv = TNY_GPE_DEVICE_GET_PRIVATE (self);
+
 	(*parent_class->finalize) (object);
-    
+
 	return;
 }
 

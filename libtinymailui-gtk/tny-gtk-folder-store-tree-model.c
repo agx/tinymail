@@ -827,72 +827,51 @@ find_store_iter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeIter *f, gpointe
 	return FALSE;
 }
 
-typedef struct {
-	TnyFolderObserver *self;
-	TnyFolderChange *change;
-} FolObsUpInfo;
 
-static gboolean
-folder_obsr_update_idle (gpointer user_data)
+
+static void
+tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
 {
-	FolObsUpInfo *info = user_data;
-	TnyFolderObserver *self = info->self;
-	TnyFolderChange *change = info->change;
 	TnyFolderChangeChanged changed = tny_folder_change_get_changed (change);
-	GtkTreeModel *model = GTK_TREE_MODEL (self);
+	GtkTreeModel *model = (GtkTreeModel *) self;
 
 	if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME ||
 		changed & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT || 
 		changed & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
 	{
-		gdk_threads_enter ();
 		gtk_tree_model_foreach (model, updater, change);
-		gdk_threads_leave ();
 	}
-	return FALSE;
-}
-
-static void 
-folder_obsr_update_idle_destroy (gpointer user_data)
-{
-	FolObsUpInfo *info = user_data;
-	TnyFolderObserver *self = info->self;
-	TnyFolderChange *change = info->change;
-
-	g_object_unref (self);
-	g_object_unref (change);
-	g_slice_free (FolObsUpInfo, info);
-}
-
-static void
-tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, TnyFolderChange *change)
-{
-	FolObsUpInfo *info = g_slice_new (FolObsUpInfo);
-	info->self = TNY_FOLDER_OBSERVER (g_object_ref (self));
-	info->change = TNY_FOLDER_CHANGE (g_object_ref (change));
-
-	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
-		folder_obsr_update_idle, info,
-		folder_obsr_update_idle_destroy);
 
 	return;
 }
 
 
-typedef struct {
-	TnyFolderObserver *self;
-	TnyFolderStoreChange *change;
-} FolStObsUpInfo;
-
-static gboolean
-folder_store_obsr_update_idle (gpointer user_data)
+static void
+tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
 {
-	FolStObsUpInfo *info = user_data;
-	TnyFolderObserver *self = info->self;
-	TnyFolderStoreChange *change = info->change;
 	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
+
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
+	{
+		TnyList *created = tny_simple_list_new ();
+		TnyIterator *miter;
+
+		tny_folder_store_change_get_created_folders (change, created);
+		miter = tny_list_create_iterator (created);
+
+		while (!tny_iterator_is_done (miter))
+		{
+			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+			tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
+			tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
+			g_object_unref (folder);
+			tny_iterator_next (miter);
+		}
+		g_object_unref (miter);
+		g_object_unref (created);
+	}
 
 	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
 	{
@@ -912,11 +891,6 @@ folder_store_obsr_update_idle (gpointer user_data)
 			{
 				GtkTreeIter newiter;
 				TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
-
-				/* See early added below! (#CCUX)
-
-				tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
-				tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));*/
 
 				me->folder_observables = g_list_prepend (me->folder_observables, folder);
 				me->store_observables = g_list_prepend (me->store_observables, folder);
@@ -967,64 +941,6 @@ folder_store_obsr_update_idle (gpointer user_data)
 		g_object_unref (removed);
 	}
 
-
-	return FALSE;
-}
-
-static void
-folder_store_obsr_update_idle_destroy (gpointer user_data)
-{
-	FolStObsUpInfo *info = user_data;
-	TnyFolderObserver *self = info->self;
-	TnyFolderStoreChange *change = info->change;
-
-	g_object_unref (self);
-	g_object_unref (change);
-
-	g_slice_free (FolStObsUpInfo, info);
-}
-
-static void
-tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
-{
-	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
-	FolStObsUpInfo *info = g_slice_new (FolStObsUpInfo);
-	info->self = TNY_FOLDER_OBSERVER (g_object_ref (self));
-	info->change = TNY_FOLDER_STORE_CHANGE (g_object_ref (change));
-	
-	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
-	{
-		TnyList *created = tny_simple_list_new ();
-		TnyIterator *miter;
-
-		tny_folder_store_change_get_created_folders (change, created);
-		miter = tny_list_create_iterator (created);
-
-		while (!tny_iterator_is_done (miter))
-		{
-			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
-
-			/* Already added! (#CCUX)
-			 * We can't add these in the idle because the thread might
-			 * be added subfolders right now! (the idle would register
-			 * self as an observer too late!) 
-			 * Question. though: is there any reason why not to do the
-			 * doubly-linked lists here too? (except for locking, which
-			 * would then be necessary of course) */
-
-			tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
-			tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
-
-			g_object_unref (folder);
-			tny_iterator_next (miter);
-		}
-		g_object_unref (miter);
-		g_object_unref (created);
-	}
-
-	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
-			folder_store_obsr_update_idle, info, 
-			folder_store_obsr_update_idle_destroy);
 
 	return;
 }

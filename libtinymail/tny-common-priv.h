@@ -23,6 +23,7 @@
 #include <tny-shared.h>
 #include <tny-status.h>
 #include <tny-error.h>
+#include <tny-lockable.h>
 
 #ifndef TINYMAIL_ENABLE_PRIVATE_API
 #error "This is private API that should only be used by tinymail internally."
@@ -38,7 +39,7 @@ typedef struct _TnyProgressInfo TnyProgressInfo;
 TnyIdleStopper* tny_idle_stopper_new (void);
 TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper);
 
-TnyProgressInfo* tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStatusDomain domain, TnyStatusCode code, const gchar *what, gint sofar, gint oftotal, TnyIdleStopper* stopper, gpointer user_data);
+TnyProgressInfo* tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStatusDomain domain, TnyStatusCode code, const gchar *what, gint sofar, gint oftotal, TnyIdleStopper* stopper, TnyLockable *uid_lock, gpointer user_data);
 gboolean tny_progress_info_idle_func (gpointer data);
 void tny_progress_info_destroy (gpointer data);
 

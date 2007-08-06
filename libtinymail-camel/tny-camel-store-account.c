@@ -69,24 +69,71 @@ static GObjectClass *parent_class = NULL;
 char *strcasestr(const char *haystack, const char *needle);
 
 
+typedef struct { 
+	GObject *self;
+	GObject *change; 
+} NotFolObInIdleInfo;
+
+static void 
+do_notify_in_idle_destroy (gpointer user_data)
+{
+	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) info;
+	g_object_unref (info->self);
+	g_object_unref (info->change);
+	g_slice_free (NotFolObInIdleInfo, info);
+}
+
 static void
 notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange *change)
 {
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-	TnyIterator *iter;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (!priv->sobservers)
+	TnyIterator *iter = NULL;
+
+	TnyList *list = NULL;
+
+	g_static_rec_mutex_lock (priv->obs_lock);
+	if (!priv->sobservers) {
+		g_static_rec_mutex_unlock (priv->obs_lock);
 		return;
+	}
+	list = tny_list_copy (priv->sobservers);
+	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	iter = tny_list_create_iterator (priv->sobservers);
+	iter = tny_list_create_iterator (list);
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
+		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_store_observer_update (observer, change);
+		tny_lockable_unlock (apriv->session->priv->ui_lock);
 		g_object_unref (observer);
 		tny_iterator_next (iter);
 	}
 	g_object_unref (iter);
+	g_object_unref (list);
+
+	return;
+}
+
+static gboolean 
+notify_folder_store_observers_about_idle (gpointer user_data)
+{
+	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) info;
+	notify_folder_store_observers_about (TNY_FOLDER_STORE (info->self), 
+		TNY_FOLDER_STORE_CHANGE (info->change));
+	return FALSE;
+}
+
+static void
+notify_folder_store_observers_about_in_idle (TnyFolderStore *self, TnyFolderStoreChange *change)
+{
+	NotFolObInIdleInfo *info = g_slice_new (NotFolObInIdleInfo);
+	info->self = g_object_ref (self);
+	info->change = g_object_ref (change);
+	g_idle_add_full (G_PRIORITY_HIGH, notify_folder_store_observers_about_idle,
+		info, do_notify_in_idle_destroy);
 }
 
 static gboolean
@@ -95,9 +142,11 @@ connection_status_idle (gpointer data)
 	TnyAccount *self = (TnyAccount *) data;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	tny_lockable_lock (apriv->session->priv->ui_lock);
 	g_signal_emit (G_OBJECT (self), 
 		tny_account_signals [TNY_ACCOUNT_CONNECTION_STATUS_CHANGED], 
 			0, apriv->status);
+	tny_lockable_unlock (apriv->session->priv->ui_lock);
 
 	return FALSE;
 }
@@ -434,6 +483,36 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
  * subscribe parameter is TRUE, then we're asking for a folder
  * subscription, else for a folder unsubscription */
 
+typedef struct {
+	TnySessionCamel *session;
+	GObject *self, *folder;
+} SetSubsInfo;
+
+static gboolean 
+set_subscription_idle (gpointer user_data)
+{
+	SetSubsInfo *info = (SetSubsInfo *) user_data;
+
+	tny_lockable_lock (info->session->priv->ui_lock);
+	g_signal_emit (info->self, 
+		tny_store_account_signals [TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED], 
+		0, info->folder);
+	tny_lockable_unlock (info->session->priv->ui_lock);
+
+	return FALSE;
+}
+
+static void
+set_subscription_destroy (gpointer user_data)
+{
+	SetSubsInfo *info = (SetSubsInfo *) user_data;
+	g_object_unref (info->self);
+	g_object_unref (info->folder);
+	camel_object_unref (info->session);
+	g_slice_free (SetSubsInfo, info);
+	return;
+}
+
 static void
 set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 {
@@ -484,17 +563,24 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 		camel_exception_clear (&ex);
 	} else 
 	{
+		SetSubsInfo *info = g_slice_new (SetSubsInfo);
+
 		/* Sync */
 		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), subscribe);
-		
-		g_signal_emit (self, 
-			       tny_store_account_signals [TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED], 
-			       0, folder);
+
+		info->session = apriv->session;
+		camel_object_ref (info->session);
+		info->self = g_object_ref (self);
+		info->folder = g_object_ref (folder);
+
+		g_idle_add_full (G_PRIORITY_DEFAULT, set_subscription_idle, info,
+			set_subscription_destroy);
+
 	}
-	camel_object_unref (CAMEL_OBJECT (cfolder));
+	camel_object_unref (cfolder);
 
 cleanup:
-	camel_object_unref (CAMEL_OBJECT (store));
+	camel_object_unref (store);
 }
 
 static void
@@ -546,6 +632,8 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->cant_reuse_iter = TRUE;
 	priv->factory_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->factory_lock);
+	priv->obs_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->obs_lock);
 
 	return;
 }
@@ -584,6 +672,8 @@ tny_camel_store_account_finalize (GObject *object)
 
 	g_static_rec_mutex_free (priv->factory_lock);
 	priv->factory_lock = NULL;
+	g_static_rec_mutex_free (priv->obs_lock);
+	priv->obs_lock = NULL;
 
 	g_object_unref (priv->queue);
 	g_object_unref (priv->msg_queue);
@@ -663,6 +753,8 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 		camel_exception_clear (&ex);
 	} else 
 	{
+		TnyFolderStoreChange *change = NULL;
+
 		if (aspriv->iter)
 		{
 			/* Known memleak
@@ -673,11 +765,10 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 		if (camel_store_supports_subscriptions (store))
 			camel_store_unsubscribe_folder (store, cpriv->folder_name, &subex);
 
-		TnyFolderStoreChange *change;
 		change = tny_folder_store_change_new (self);
 		tny_folder_store_change_add_removed_folder (change, folder);
-		notify_folder_store_observers_about (self, change);
-		g_object_unref (G_OBJECT (change));
+		notify_folder_store_observers_about_in_idle (self, change);
+		g_object_unref (change);
 	}
 
 	g_free (cpriv->folder_name); 
@@ -887,8 +978,8 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	change = tny_folder_store_change_new (self);
 	tny_folder_store_change_add_created_folder (change, folder);
 	notify_folder_store_observers_about (self, change);
-	g_object_unref (G_OBJECT (change));	
-	
+	g_object_unref (change);
+
 	camel_object_unref (CAMEL_OBJECT (store));
 
 	_tny_session_stop_operation (apriv->session);
@@ -1118,8 +1209,11 @@ static gboolean
 tny_camel_store_account_get_folders_async_callback (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
-	if (info->callback)
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
 		info->callback (info->self, info->list,&info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
 	return FALSE;
 }
 
@@ -1201,8 +1295,11 @@ static gboolean
 tny_camel_store_account_get_folders_async_cancelled_callback (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
-	if (info->callback)
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
 		info->callback (info->self, info->list, &info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
 	return FALSE;
 }
 

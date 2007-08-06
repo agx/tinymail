@@ -70,6 +70,7 @@ struct _TnyProgressInfo
 	gint sofar;
 	gint oftotal;
 	TnyIdleStopper *stopper;
+	TnyLockable *ui_lock;
 	gpointer user_data;
 };
 
@@ -96,7 +97,7 @@ struct _TnyProgressInfo
  * Return value: a #TnyProgressInfo instance that is ready to launch
  **/
 TnyProgressInfo*
-tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStatusDomain domain, TnyStatusCode code, const gchar *what, gint sofar, gint oftotal, TnyIdleStopper* stopper, gpointer user_data)
+tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStatusDomain domain, TnyStatusCode code, const gchar *what, gint sofar, gint oftotal, TnyIdleStopper* stopper, TnyLockable *ui_lock, gpointer user_data)
 {
 	TnyProgressInfo *info = g_slice_new (TnyProgressInfo);
 
@@ -105,6 +106,7 @@ tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStat
 	info->status_callback = status_callback;
 	info->what = g_strdup (what);
 	info->self = g_object_ref (self);
+	info->ui_lock = g_object_ref (ui_lock);
 	info->user_data = user_data;
 	info->oftotal = oftotal;
 
@@ -143,7 +145,8 @@ tny_progress_info_destroy (gpointer data)
 {
 	TnyProgressInfo *info = data;
 
-	g_object_unref (G_OBJECT (info->self));
+	g_object_unref (info->self);
+	g_object_unref (info->ui_lock);
 	g_free (info->what);
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
@@ -185,8 +188,10 @@ tny_progress_info_idle_func (gpointer data)
 			info->code, info->sofar, info->oftotal, 
 			info->what);
 
+		tny_lockable_lock (info->ui_lock);
 		info->status_callback (G_OBJECT (info->self), status, 
 			info->user_data);
+		tny_lockable_unlock (info->ui_lock);
 
 		tny_status_free (status);
 	}

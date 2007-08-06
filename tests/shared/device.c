@@ -73,7 +73,9 @@ tny_test_device_force_offline (TnyDevice *self)
 static void
 tny_test_device_on_online (TnyDevice *self)
 {
+	/* TNY TODO: tny_lockable_lock (ui_lock); */
 	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
+	/* TNY TODO: tny_lockable_unlock (ui_lock); */
 
 	return;
 }
@@ -81,7 +83,9 @@ tny_test_device_on_online (TnyDevice *self)
 static void
 tny_test_device_on_offline (TnyDevice *self)
 {
+	/* TNY TODO: tny_lockable_lock (ui_lock); */
 	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
+	/* TNY TODO: tny_lockable_unlock (ui_lock); */
 
 	return;
 }

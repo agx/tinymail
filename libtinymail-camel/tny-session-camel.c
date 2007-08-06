@@ -719,6 +719,32 @@ on_account_connect_done (TnySessionCamel *self, TnyCamelAccount *account, GError
 	return;
 }
 
+typedef struct {
+	TnySessionCamel *self;
+	TnyAccount *account;
+	gboolean online;
+} SetOnlHapInfo;
+
+static gboolean
+set_online_happened_idle (gpointer user_data)
+{
+	SetOnlHapInfo *info = (SetOnlHapInfo *) user_data;
+	tny_lockable_lock (info->self->priv->ui_lock);
+	g_signal_emit (info->account, 
+		tny_camel_account_signals [TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED], 
+		0, info->online);
+	tny_lockable_unlock (info->self->priv->ui_lock);
+	return FALSE;
+}
+
+static void
+set_online_happened_destroy (gpointer user_data)
+{
+	SetOnlHapInfo *info = (SetOnlHapInfo *) user_data;
+	camel_object_unref (info->self);
+	g_object_unref (info->account);
+	g_slice_free (SetOnlHapInfo, info);
+}
 
 static void 
 tny_session_queue_going_online_for_account (TnySessionCamel *self, TnyCamelAccount *account, gboolean online)
@@ -741,8 +767,16 @@ tny_session_queue_going_online_for_account (TnySessionCamel *self, TnyCamelAccou
 
 	if (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (account))
 	{
-		g_signal_emit (account, 
-			tny_camel_account_signals [TNY_CAMEL_ACCOUNT_SET_ONLINE_HAPPENED], 0, online);
+		SetOnlHapInfo *info = g_slice_new (SetOnlHapInfo);
+
+		info->self = self;
+		camel_object_ref (info->self);
+		info->account = TNY_ACCOUNT (g_object_ref (account));
+		info->online = online;
+
+		g_idle_add_full (G_PRIORITY_DEFAULT, set_online_happened_idle, 
+			info, set_online_happened_destroy);
+
 		return;
 	}
 }

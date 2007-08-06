@@ -35,7 +35,7 @@ struct _TnyCamelStoreAccountPriv
 	GList *managed_folders;
 	TnyList *sobservers;
 	gboolean cant_reuse_iter;
-	GStaticRecMutex *factory_lock;
+	GStaticRecMutex *factory_lock, *obs_lock;
 	TnyCamelQueue *queue, *msg_queue;
 };
 

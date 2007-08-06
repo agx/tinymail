@@ -3206,7 +3206,8 @@ camel_message_info_free(void *o)
 
 	g_return_if_fail(mi != NULL);
 
-	if (mi->summary) {
+	if (mi->summary) 
+	{
 		CAMEL_SUMMARY_LOCK(mi->summary, ref_lock);
 
 		if (mi->refcount >= 1)

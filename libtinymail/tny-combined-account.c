@@ -361,8 +361,10 @@ on_subscription_changed_signal (TnyStoreAccount *sa, TnyFolder *folder, gpointer
 {
 	GObject *self = user_data;
 
+	/* TNY TODO: tny_lockable_lock (ui_lock); */
 	g_signal_emit (self,  tny_store_account_signals [TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED], 
 		0, folder);
+	/* TNY TODO: tny_lockable_unlock (ui_lock); */
 }
 
 /**

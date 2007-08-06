@@ -63,7 +63,9 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (tny_iterator_get_current (iter));
+		/* TNY TODO: tny_lockable_lock (ui_lock); */
 		tny_folder_observer_update (observer, change);
+		/* TNY TODO: tny_lockable_unlock (ui_lock); */
 		g_object_unref (G_OBJECT (observer));
 		tny_iterator_next (iter);
 	}
@@ -165,8 +167,11 @@ sync_async_callback (gpointer thr_user_data)
 {
 	SyncFolderInfo *info = thr_user_data;
 
-	if (info->callback)
+	if (info->callback) {
+		/* TNY TODO: tny_lockable_lock (ui_lock); */
 		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		/* TNY TODO: tny_lockable_unlock (ui_lock); */
+	}
 
 	return FALSE;
 }
@@ -367,8 +372,13 @@ get_msg_async_callback (gpointer thr_user_data)
 {
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
 
-	if (info->callback) /* TODO: the cancelled field */
+	if (info->callback) { 
+		/* TNY TODO: the cancelled field */
+
+		/* TNY TODO: tny_lockable_lock (ui_lock); */
 		info->callback (info->self, FALSE, info->msg, &info->err, info->user_data);
+		/* TNY TODO: tny_lockable_unlock (ui_lock); */
+	}
 
 	return FALSE;
 }
@@ -472,8 +482,13 @@ static gboolean
 get_headers_async_callback (gpointer thr_user_data)
 {
 	GetHeadersFolderInfo *info = thr_user_data;
-	if (info->callback)
+
+	if (info->callback) {
+		/* TNY TODO: tny_lockable_lock (ui_lock); */
 		info->callback (info->self, info->cancelled, info->headers, &info->err, info->user_data);
+		/* TNY TODO: tny_lockable_unlock (ui_lock); */
+	}
+
 	return FALSE;
 }
 
@@ -832,10 +847,14 @@ refresh_async_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
 
-	if (info->callback)
+	if (info->callback) {
+		/* TNY TODO: tny_lockable_lock (ui_lock); */
 		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		/* TNY TODO: tny_lockable_unlock (ui_lock); */
+	}
 
-	/* TODO: trigger this change notification
+	/* TNY TODO: trigger this change notification
+
 	if (info->oldlen != priv->cached_length || info->oldurlen != priv->unread_length)
 	{
 		TnyFolderChange *change = tny_folder_change_new (self);
@@ -1006,8 +1025,13 @@ transfer_msgs_async_callback (gpointer thr_user_data)
 {
 	TransferMsgsInfo *info = thr_user_data;
 
-	if (info->callback) /* TODO: the cancelled field */
+	if (info->callback) {
+		/* TNY TODO: the cancelled field */
+
+		/* TNY TODO: tny_lockable_lock (ui_lock); */
 		info->callback (info->self, FALSE, &info->err, info->user_data);
+		/* TNY TODO: tny_lockable_unlock (ui_lock); */
+	}
 
 	return FALSE;
 }
@@ -1516,9 +1540,7 @@ tny_merge_folder_get_type (void)
 
 		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
 			&tny_folder_observer_info);
-
 	}
-
 
 	return type;
 }
