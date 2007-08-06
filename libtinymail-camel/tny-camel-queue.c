@@ -192,7 +192,12 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
  * removed will their callback and destroyer happen and will their cancel_field
  * be set to TRUE.
  *
- * Also cancel the current item (make the up-next read() of the operation fail)
+ * Also cancel the current item (make the up-next read() of the operation fail).
+ * Note that the current item's @callback and @destroyer will not be called as
+ * as soon as the item's work func has been launched, it's considered to be 
+ * never cancelled. The current-item cancel just means that the operation will
+ * be set to fail at its next read() or write operation. The developer of the
+ * work func must deal with this himself.
  **/
 void 
 _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
