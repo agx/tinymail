@@ -1280,8 +1280,8 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnySyncF
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_sync_async_thread, 
-		tny_camel_folder_sync_async_callback,
-		tny_camel_folder_sync_async_destroyer, &info->cancelled,
+		tny_camel_folder_sync_async_cancelled_callback,
+		tny_camel_folder_sync_async_cancelled_destroyer, &info->cancelled,
 		info, __FUNCTION__);
 }
 
@@ -1555,8 +1555,8 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyRefreshFolderCallbac
 
 	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_refresh_async_thread, 
-		tny_camel_folder_refresh_async_callback,
-		tny_camel_folder_refresh_async_destroyer, &info->cancelled,
+		tny_camel_folder_refresh_async_cancelled_callback,
+		tny_camel_folder_refresh_async_cancelled_destroyer, &info->cancelled,
 		info, TNY_CAMEL_QUEUE_PRIORITY_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM, 
 		__FUNCTION__);
 
@@ -1826,8 +1826,8 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 
 	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_get_headers_async_thread, 
-		tny_camel_folder_get_headers_async_callback,
-		tny_camel_folder_get_headers_async_destroyer, &info->cancelled,
+		tny_camel_folder_get_headers_async_cancelled_callback,
+		tny_camel_folder_get_headers_async_cancelled_destroyer, &info->cancelled,
 		info, TNY_CAMEL_QUEUE_PRIORITY_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|
 			TNY_CAMEL_QUEUE_GET_HEADERS_ITEM, __FUNCTION__);
 
@@ -2159,8 +2159,8 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv), 
 		tny_camel_folder_get_msg_async_thread, 
-		tny_camel_folder_get_msg_async_callback,
-		tny_camel_folder_get_msg_async_destroyer, &info->cancelled,
+		tny_camel_folder_get_msg_async_cancelled_callback,
+		tny_camel_folder_get_msg_async_cancelled_destroyer, &info->cancelled,
 		info, __FUNCTION__);
 
 	return;
@@ -3174,8 +3174,8 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_copy_async_thread, 
-		tny_camel_folder_copy_async_callback,
-		tny_camel_folder_copy_async_destroyer, &info->cancelled,
+		tny_camel_folder_copy_async_cancelled_callback,
+		tny_camel_folder_copy_async_cancelled_destroyer, &info->cancelled,
 		info, __FUNCTION__);
 
 	return;
@@ -3783,8 +3783,8 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv),
 		tny_camel_folder_transfer_msgs_async_thread, 
-		tny_camel_folder_transfer_msgs_async_callback,
-		tny_camel_folder_transfer_msgs_async_destroyer, &info->cancelled,
+		tny_camel_folder_transfer_msgs_async_cancelled_callback,
+		tny_camel_folder_transfer_msgs_async_cancelled_destroyer, &info->cancelled,
 		info, __FUNCTION__);
 
 	return;
@@ -4564,8 +4564,8 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_get_folders_async_thread, 
-		tny_camel_folder_get_folders_async_callback,
-		tny_camel_folder_get_folders_async_destroyer, &info->cancelled,
+		tny_camel_folder_get_folders_async_cancelled_callback,
+		tny_camel_folder_get_folders_async_cancelled_destroyer, &info->cancelled,
 		info, __FUNCTION__);
 
 	return;

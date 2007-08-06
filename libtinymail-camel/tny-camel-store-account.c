@@ -1357,8 +1357,8 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 
 	_tny_camel_queue_launch (priv->queue, 
 		tny_camel_store_account_get_folders_async_thread,
-		tny_camel_store_account_get_folders_async_callback,
-		tny_camel_store_account_get_folders_async_destroyer, 
+		tny_camel_store_account_get_folders_async_cancelled_callback,
+		tny_camel_store_account_get_folders_async_cancelled_destroyer, 
 		&info->cancelled, info, __FUNCTION__);
 
 	return;

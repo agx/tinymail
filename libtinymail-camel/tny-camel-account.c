@@ -1709,6 +1709,7 @@ on_supauth_idle_func (gpointer user_data)
 	tny_idle_stopper_stop (info->stopper);
 }
 
+
 static void 
 on_supauth_destroy_func (gpointer user_data)
 {
@@ -1731,6 +1732,13 @@ on_supauth_destroy_func (gpointer user_data)
 		info->had_callback = TRUE;
 		g_mutex_unlock (info->mutex);
 	}
+}
+
+static void 
+on_supauth_destroy_and_kill_func (gpointer user_data)
+{
+	on_supauth_destroy_func (user_data);
+	g_slice_free (GetSupportedAuthInfo, user_data);
 }
 
 /* Starts the operation in the thread: */
@@ -1872,8 +1880,8 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 		_tny_camel_queue_launch (aspriv->queue, 
 			tny_camel_account_get_supported_secure_authentication_async_thread, 
-			on_supauth_idle_func, on_supauth_destroy_func, &info->cancelled,
-			info, __FUNCTION__);
+			on_supauth_idle_func, on_supauth_destroy_and_kill_func, 
+			&info->cancelled, info, __FUNCTION__);
 	} else {
 		g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
 			info, FALSE, NULL);
