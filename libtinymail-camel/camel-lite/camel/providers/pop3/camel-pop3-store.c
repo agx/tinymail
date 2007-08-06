@@ -125,7 +125,8 @@ pop3_connect_offline (CamelService *service, CamelException *ex)
 static gboolean
 unref_it (gpointer user_data)
 {
-	camel_object_unref (user_data);
+	if (user_data)
+		camel_object_unref (user_data);
 	return FALSE;
 }
 
@@ -164,11 +165,11 @@ pop3_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 
+	g_timeout_add (20000, unref_it, store->engine);
 	store->engine = NULL;
 	g_static_rec_mutex_unlock (store->eng_lock);
 
 	/* camel_object_unref((CamelObject *)store->engine); */
-	g_timeout_add (20000, unref_it, store->engine);
 
 	return TRUE;
 }
