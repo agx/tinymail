@@ -175,7 +175,7 @@ static void
 emit_control (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint signal_id, int i, int total)
 {
 	ControlInfo *info = g_slice_new0 (ControlInfo);
-	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = NULL;
 
 	if (priv->trans_account)
