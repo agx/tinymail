@@ -103,11 +103,6 @@ static void
 emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, int i, int total)
 {
 	ErrorInfo *info = g_slice_new0 (ErrorInfo);
-	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = NULL;
-
-	if (priv->trans_account)
-		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 
 	if (error != NULL)
 		info->error = g_error_copy ((const GError *) error);
@@ -121,14 +116,8 @@ emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, i
 	info->i = i;
 	info->total = total;
 
-	if (apriv)
-		tny_lockable_lock (apriv->session->priv->ui_lock);
-
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 		emit_error_on_mainloop, info, destroy_error_info);
-
-	if (apriv)
-		tny_lockable_unlock (apriv->session->priv->ui_lock);
 
 	return;
 }
@@ -141,7 +130,7 @@ emit_control_signals_on_mainloop (gpointer data)
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
 	TnyCamelAccountPriv *apriv = NULL;
 
-	if (priv->trans_account)
+	if (priv && priv->trans_account)
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 
 	if (apriv)
@@ -175,11 +164,6 @@ static void
 emit_control (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint signal_id, int i, int total)
 {
 	ControlInfo *info = g_slice_new0 (ControlInfo);
-	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = NULL;
-
-	if (priv->trans_account)
-		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 
 	if (self)
 		info->self = TNY_SEND_QUEUE (g_object_ref (G_OBJECT (self)));
@@ -192,14 +176,8 @@ emit_control (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint signal_i
 	info->i = i;
 	info->total = total;
 
-	if (apriv)
-		tny_lockable_lock (apriv->session->priv->ui_lock);
-
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 			emit_control_signals_on_mainloop, info, destroy_control_info);
-
-	if (apriv)
-		tny_lockable_unlock (apriv->session->priv->ui_lock);
 
 	return;
 }
