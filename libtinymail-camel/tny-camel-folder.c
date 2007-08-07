@@ -2592,7 +2592,7 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboo
 		if (del) {
 			TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
 
-			tny_folder_store_change_add_created_folder (change, evt->fol);
+			tny_folder_store_change_add_removed_folder (change, evt->fol);
 
 			if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
 				if (in_idle)
@@ -2748,6 +2748,8 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 						TnyCamelFolderPriv *rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
 						_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (a), 
 							TNY_CAMEL_FOLDER (retval), iter);
+						if (!rpriv->folder_name || strlen (rpriv->folder_name) <= 0)
+							rpriv->folder_name = g_strdup (to);
 						_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (retval), into);
 						rpriv->folder = NULL; /* This might be a leak */
 					} 
