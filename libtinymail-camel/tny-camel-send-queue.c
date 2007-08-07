@@ -860,6 +860,7 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->sending_lock = g_mutex_new ();
 	priv->do_continue = FALSE;
 	priv->is_running = FALSE;
+	priv->thread = NULL;
 
 	return;
 }
