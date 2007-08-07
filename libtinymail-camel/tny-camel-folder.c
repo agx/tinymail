@@ -2582,76 +2582,31 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 
 
 
-typedef struct {
-	TnyFolder *folder;
-	gboolean rem;
-} NotFolObsItem;
-
-static void
-not_fol_obs_foreach (gpointer key, gpointer value, gpointer user_data)
-{
-	GList *items = (GList *) value;
-	TnyFolderStore *str = (TnyFolderStore *) key;
-	TnyFolderStoreChange *change = tny_folder_store_change_new (str);
-	gboolean in_idle = (gboolean) user_data;
-
-	while (items)
-	{
-		NotFolObsItem *item = (NotFolObsItem *) items->data;
-
-		tny_debug ("tny_folder_copy: observers notify folder-%s %s\n", 
-			item->rem ? "del" : "add",
-			tny_folder_get_name (item->folder));
-
-		if (item->rem)
-			tny_folder_store_change_add_removed_folder (change, item->folder);
-		else
-			tny_folder_store_change_add_created_folder (change, item->folder);
-
-		g_slice_free (NotFolObsItem, item);
-		items = g_list_next (items);
-	}
-
-	g_list_free (items);
-
-	if (TNY_IS_CAMEL_STORE_ACCOUNT (str)) {
-		if (in_idle)
-			notify_folder_store_observers_about_for_store_acc_in_idle (str, change);
-		else
-			notify_folder_store_observers_about_for_store_acc (str, change);
-	} else {
-		if (in_idle)
-			notify_folder_store_observers_about_in_idle (str, change);
-		else
-			notify_folder_store_observers_about (str, change);
-	}
-	g_object_unref (change);
-
-	return;
-}
-
 static void
 notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboolean in_idle)
 {
-
-	GHashTable *table = g_hash_table_new_full (g_direct_hash, g_direct_equal, 
-					NULL, NULL);
-
 	rems = g_list_first (rems);
 	while (rems)
 	{
 		CpyEvent *evt = rems->data;
 		if (del) {
-			gboolean add = FALSE;
-			NotFolObsItem *item = g_slice_new (NotFolObsItem);
-			GList *items = g_hash_table_lookup (table, evt->str);
-			if (!items)
-				add = TRUE;
-			item->folder = TNY_FOLDER (g_object_ref (evt->fol));
-			item->rem = TRUE;
-			items = g_list_append (items, item);
-			if (add)
-				g_hash_table_insert (table, evt->str, items);
+			TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
+
+			tny_folder_store_change_add_created_folder (change, evt->fol);
+
+			if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
+				if (in_idle)
+					notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change);
+				else
+					notify_folder_store_observers_about_for_store_acc (evt->str, change);
+			} else {
+				if (in_idle)
+					notify_folder_store_observers_about_in_idle (evt->str, change);
+				else
+					notify_folder_store_observers_about (evt->str, change);
+			}
+
+			g_object_unref (change);
 
 		}
 		cpy_event_free (evt);
@@ -2659,26 +2614,32 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboo
 	}
 	g_list_free (rems);
 
+	adds = g_list_first (adds);
 	while (adds)
 	{
 		CpyEvent *evt = adds->data;
-		gboolean add = FALSE;
-		NotFolObsItem *item = g_slice_new (NotFolObsItem);
-		GList *items = g_hash_table_lookup (table, evt->str);
-		if (!items)
-			add = TRUE;
-		item->folder = TNY_FOLDER (g_object_ref (evt->fol));
-		item->rem = FALSE;
-		items = g_list_append (items, item);
-		if (add)
-			g_hash_table_insert (table, evt->str, items);
+		TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
+
+		tny_folder_store_change_add_created_folder (change, evt->fol);
+
+		if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
+			if (in_idle)
+				notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change);
+			else
+				notify_folder_store_observers_about_for_store_acc (evt->str, change);
+		} else {
+			if (in_idle)
+				notify_folder_store_observers_about_in_idle (evt->str, change);
+			else
+				notify_folder_store_observers_about (evt->str, change);
+		}
+		g_object_unref (change);
+
 		cpy_event_free (evt);
 		adds = g_list_next (adds);
 	}
 	g_list_free (adds);
 
-	g_hash_table_foreach (table, not_fol_obs_foreach, (gpointer) in_idle);
-	g_hash_table_destroy (table);
 
 	return;
 }
