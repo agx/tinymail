@@ -977,7 +977,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	change = tny_folder_store_change_new (self);
 	tny_folder_store_change_add_created_folder (change, folder);
-	notify_folder_store_observers_about (self, change);
+	notify_folder_store_observers_about_in_idle (self, change);
 	g_object_unref (change);
 
 	camel_object_unref (CAMEL_OBJECT (store));
