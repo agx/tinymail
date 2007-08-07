@@ -77,7 +77,7 @@ typedef struct {
 static void 
 do_notify_in_idle_destroy (gpointer user_data)
 {
-	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) info;
+	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) user_data;
 	g_object_unref (info->self);
 	g_object_unref (info->change);
 	g_slice_free (NotFolObInIdleInfo, info);
@@ -120,7 +120,7 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 static gboolean 
 notify_folder_store_observers_about_idle (gpointer user_data)
 {
-	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) info;
+	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) user_data;
 	notify_folder_store_observers_about (TNY_FOLDER_STORE (info->self), 
 		TNY_FOLDER_STORE_CHANGE (info->change));
 	return FALSE;
