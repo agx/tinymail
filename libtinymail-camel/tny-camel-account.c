@@ -1753,7 +1753,6 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	TnyCamelAccount *self = info->self;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	GError *err = NULL;
 	TnyStatus* status;
 	GList *authtypes = NULL;
 	TnyList *result = NULL;
@@ -1788,11 +1787,9 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	info->err = NULL;
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (&err, TNY_FOLDER_ERROR, 
+		g_set_error (&info->err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_REFRESH,
 			camel_exception_get_description (&ex));
-		if (err != NULL)
-			info->err = g_error_copy ((const GError *) err);
 	}
 
 	g_static_rec_mutex_unlock (priv->service_lock);

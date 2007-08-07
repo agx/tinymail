@@ -694,13 +694,12 @@ status_update_on_get_msg (GObject *sender, TnyStatus *status, gpointer user_data
 }
 
 static void
-on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data)
+on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *merr, gpointer user_data)
 {
 	OnGetMsgInfo *info = user_data;
 	TnyDemouiSummaryView *self = info->self;
 	TnyHeader *header = info->header;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
-	GError *merr = *err;
 
 	g_idle_add (cleanup_statusbar, priv);
 
@@ -787,11 +786,10 @@ on_header_view_tree_selection_changed (GtkTreeSelection *selection,
 
 
 static void
-refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
+refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
 {
 	TnySummaryView *self = user_data;
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
-
 	GtkTreeModel *select_model;
 
 	if (!cancelled)

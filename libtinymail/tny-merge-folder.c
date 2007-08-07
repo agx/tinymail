@@ -390,16 +390,14 @@ get_msg_async_thread (gpointer thr_user_data)
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
 	GError *err = NULL;
 
-	info->msg = tny_folder_get_msg (info->self, info->header, &err);
+	info->msg = tny_folder_get_msg (info->self, info->header, &info->err);
 
-	if (err != NULL)
+	if (info->err != NULL)
 	{
-		info->err = g_error_copy ((const GError *) err);
 		if (info->msg && G_IS_OBJECT (info->msg))
 			g_object_unref (G_OBJECT (info->msg));
 		info->msg = NULL;
-	} else
-		info->err = NULL;
+	}
 
 	g_object_unref (G_OBJECT (info->header));
 
@@ -436,6 +434,7 @@ tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 	info->status_callback = status_callback;
 	info->user_data = user_data;
 	info->depth = g_main_depth ();
+	info->err = NULL;
 
 	/* thread reference */
 	g_object_ref (info->self);

@@ -1248,17 +1248,13 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	GError *err = NULL;
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (info->self),
-		info->list, info->query, &err);
+		info->list, info->query, &info->err);
 
-	if (err != NULL) {
-		info->err = g_error_copy ((const GError *) err);
+	info->cancelled = FALSE;
+	if (info->err != NULL) {
 		if (strcasestr (err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
-	} else {
-		info->err = NULL;
-		info->cancelled = FALSE;
 	}
-
 
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));

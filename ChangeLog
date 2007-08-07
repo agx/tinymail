@@ -3,6 +3,7 @@
 	* Consistency in the async callback APIs
 	* Cleaning up in case of cancels
 	* Making sync_async cancellable
+	* Error reporting fixes
 
 	* This was a major API change
 
