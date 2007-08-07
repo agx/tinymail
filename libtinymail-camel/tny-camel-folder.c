@@ -3502,10 +3502,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 					TnyHeader *hdr = _tny_camel_header_new ();
 
 					/* This adds a reason to live for folder_dst */
-		printf ("B %d\n", priv_dst->reason_to_live);
 					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 						TNY_CAMEL_FOLDER (folder_dst), priv_dst);
-		printf ("B %d\n", priv_dst->reason_to_live);
 					/* hdr will take care of the freeup */
 					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), om);
 					tny_list_prepend (new_headers, G_OBJECT (hdr));
