@@ -1114,7 +1114,7 @@ tny_camel_folder_sync_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
@@ -1135,8 +1135,8 @@ tny_camel_folder_sync_async_status (struct _CamelOperation *op, const char *what
 		oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, oinfo->user_data);
 
 	execute_callback (oinfo->depth, G_PRIORITY_HIGH,
-			  tny_progress_info_idle_func, info,
-			  tny_progress_info_destroy);
+		tny_progress_info_idle_func, info,
+		tny_progress_info_destroy);
 
 	return;
 }
@@ -1221,7 +1221,8 @@ static void
 tny_camel_folder_sync_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	SyncFolderInfo *info = thr_user_data;
-	g_error_free (info->err);
+	if (info->err)
+		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_slice_free (SyncFolderInfo, thr_user_data);
 	return;
@@ -1233,7 +1234,7 @@ tny_camel_folder_sync_async_cancelled_callback (gpointer thr_user_data)
 	SyncFolderInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, TRUE, &info->err, info->user_data);
+		info->callback (info->self, TRUE, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1278,11 +1279,12 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnySyncF
 	g_object_ref (info->self);
 	_tny_camel_folder_reason (priv);
 
-	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_sync_async_thread, 
 		tny_camel_folder_sync_async_cancelled_callback,
 		tny_camel_folder_sync_async_cancelled_destroyer, &info->cancelled,
-		info, __FUNCTION__);
+		info, TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|TNY_CAMEL_QUEUE_SYNC_ITEM, 
+		__FUNCTION__);
 }
 
 void 
@@ -1358,7 +1360,7 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
@@ -1384,8 +1386,8 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 		oinfo->user_data);
 
 	execute_callback (oinfo->depth, G_PRIORITY_HIGH,
-			  tny_progress_info_idle_func, info,
-			  tny_progress_info_destroy);
+		tny_progress_info_idle_func, info,
+		tny_progress_info_destroy);
 
 	return;
 }
@@ -1447,8 +1449,8 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	info->had_callback = FALSE;
 
 	execute_callback (info->depth, G_PRIORITY_DEFAULT, 
-			  tny_camel_folder_refresh_async_callback, info, 
-			  tny_camel_folder_refresh_async_destroyer);
+		tny_camel_folder_refresh_async_callback, info, 
+		tny_camel_folder_refresh_async_destroyer);
 
 	/* Wait on the queue for the mainloop callback to be finished */
 	g_mutex_lock (info->mutex);
@@ -1474,7 +1476,8 @@ static void
 tny_camel_folder_refresh_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
-	g_error_free (info->err);
+	if (info->err)
+		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_slice_free (RefreshFolderInfo, thr_user_data);
 	return;
@@ -1484,9 +1487,10 @@ static gboolean
 tny_camel_folder_refresh_async_cancelled_callback (gpointer thr_user_data)
 {
 	RefreshFolderInfo *info = thr_user_data;
+
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, TRUE, &info->err, info->user_data);
+		info->callback (info->self, TRUE, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1707,7 +1711,7 @@ tny_camel_folder_get_headers_async_callback (gpointer thr_user_data)
 	GetHeadersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->cancelled, info->headers, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->headers, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1756,7 +1760,8 @@ static void
 tny_camel_folder_get_headers_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	GetHeadersInfo *info = thr_user_data;
-	g_error_free (info->err);
+	if (info->err)
+		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_object_unref (info->headers);
 	g_slice_free (GetHeadersInfo, info);
@@ -1769,7 +1774,7 @@ tny_camel_folder_get_headers_async_cancelled_callback (gpointer thr_user_data)
 	GetHeadersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, TRUE, info->headers, &info->err, info->user_data);
+		info->callback (info->self, TRUE, info->headers, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1972,7 +1977,7 @@ tny_camel_folder_get_msg_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->cancelled, info->msg, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->msg, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
@@ -2085,7 +2090,8 @@ static void
 tny_camel_folder_get_msg_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
-	g_error_free (info->err);
+	if (info->err)
+		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_slice_free (GetMsgInfo, info);
 	return;
@@ -2098,7 +2104,7 @@ tny_camel_folder_get_msg_async_cancelled_callback (gpointer thr_user_data)
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, TRUE, NULL, &info->err, info->user_data);
+		info->callback (info->self, TRUE, NULL, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -2990,8 +2996,8 @@ tny_camel_folder_copy_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->into, info->cancelled, 
-			info->new_folder, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->into, 
+			info->new_folder, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
@@ -3095,8 +3101,11 @@ static void
 tny_camel_folder_copy_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
-	g_free (info->new_name);
-	g_error_free (info->err);
+
+	if (info->new_name)
+		g_free (info->new_name);
+	if (info->err)
+		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_object_unref (info->into);
 	g_slice_free (CopyFolderInfo, info);
@@ -3110,7 +3119,7 @@ tny_camel_folder_copy_async_cancelled_callback (gpointer thr_user_data)
 	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->into, TRUE, NULL, &info->err, info->user_data);
+		info->callback (info->self, TRUE, info->into, NULL, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -3296,7 +3305,7 @@ tny_camel_folder_transfer_msgs_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
@@ -3703,8 +3712,10 @@ static void
 tny_camel_folder_transfer_msgs_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	TransferMsgsInfo *info = thr_user_data;
-	g_error_free (info->err);
-	g_object_unref (info->new_header_list);
+	if (info->err)
+		g_error_free (info->err);
+	if (info->new_header_list)
+		g_object_unref (info->new_header_list);
 	g_object_unref (info->self);
 	g_slice_free (TransferMsgsInfo, info);
 	return;
@@ -3716,7 +3727,7 @@ tny_camel_folder_transfer_msgs_async_cancelled_callback (gpointer thr_user_data)
 	TransferMsgsInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, TRUE, &info->err, info->user_data);
+		info->callback (info->self, TRUE, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -4443,12 +4454,13 @@ tny_camel_folder_get_folders_async_callback (gpointer thr_user_data)
 	GetFoldersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		/* TNY TODO: pass info->cancelled */
-		info->callback (info->self, info->list, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->list, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
 }
+
+char *strcasestr(const char *haystack, const char *needle);
 
 static gpointer 
 tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
@@ -4461,10 +4473,14 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (info->self),
 		info->list, info->query, &err);
 
-	if (err != NULL)
+	if (err != NULL) {
 		info->err = g_error_copy ((const GError *) err);
-	else
+		if (strcasestr (err->message, "cancel") != NULL)
+			info->cancelled = TRUE;
+	} else {
 		info->err = NULL;
+		info->cancelled = FALSE;
+	}
 
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
@@ -4474,8 +4490,8 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 	info->had_callback = FALSE;
 
 	execute_callback (info->depth, G_PRIORITY_DEFAULT, 
-			  tny_camel_folder_get_folders_async_callback, info, 
-			  tny_camel_folder_get_folders_async_destroyer);
+		tny_camel_folder_get_folders_async_callback, info, 
+		tny_camel_folder_get_folders_async_destroyer);
 
 	/* Wait on the queue for the mainloop callback to be finished */
 	g_mutex_lock (info->mutex);
@@ -4495,7 +4511,11 @@ static void
 tny_camel_folder_get_folders_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = thr_user_data;
-	g_error_free (info->err);
+	if (info->err)
+		g_error_free (info->err);
+
+	if (info->query)
+		g_object_unref (info->query);
 	g_object_unref (info->self);
 	g_object_unref (info->list);
 	g_slice_free (GetFoldersInfo, info);
@@ -4508,8 +4528,7 @@ tny_camel_folder_get_folders_async_cancelled_callback (gpointer thr_user_data)
 	GetFoldersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		/* TNY TODO: pass info->cancelled */
-		info->callback (info->self, info->list, &info->err, info->user_data);
+		info->callback (info->self, TRUE, info->list, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -4546,10 +4565,12 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 			info->err = g_error_copy (err);
 			g_object_ref (info->self);
 			g_object_ref (info->list);
+			if (info->query)
+				g_object_ref (info->query);
 
 			execute_callback (info->depth, G_PRIORITY_DEFAULT,
-					  tny_camel_folder_get_folders_async_cancelled_callback, info, 
-					  tny_camel_folder_get_folders_async_cancelled_destroyer);
+				tny_camel_folder_get_folders_async_cancelled_callback, info, 
+				tny_camel_folder_get_folders_async_cancelled_destroyer);
 		}
 		g_error_free (err);
 		return;
@@ -4557,16 +4578,16 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 
 	/* thread reference */
 	_tny_camel_folder_reason (priv);
-	g_object_ref (G_OBJECT (info->self));
-	g_object_ref (G_OBJECT (info->list));
+	g_object_ref (info->self);
+	g_object_ref (info->list);
 	if (info->query)
 		g_object_ref (G_OBJECT (info->query));
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_get_folders_async_thread, 
 		tny_camel_folder_get_folders_async_cancelled_callback,
-		tny_camel_folder_get_folders_async_cancelled_destroyer, &info->cancelled,
-		info, __FUNCTION__);
+		tny_camel_folder_get_folders_async_cancelled_destroyer, 
+		&info->cancelled, info, __FUNCTION__);
 
 	return;
 }

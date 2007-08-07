@@ -1212,8 +1212,7 @@ tny_camel_store_account_get_folders_async_callback (gpointer thr_user_data)
 	GetFoldersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		/* TNY TODO: pass info->cancelled */
-		info->callback (info->self, info->list, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->list, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1251,10 +1250,15 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (info->self),
 		info->list, info->query, &err);
 
-	if (err != NULL)
+	if (err != NULL) {
 		info->err = g_error_copy ((const GError *) err);
-	else
+		if (strcasestr (err->message, "cancel") != NULL)
+			info->cancelled = TRUE;
+	} else {
 		info->err = NULL;
+		info->cancelled = FALSE;
+	}
+
 
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
@@ -1287,8 +1291,11 @@ tny_camel_store_account_get_folders_async_cancelled_destroyer (gpointer thr_user
 	GetFoldersInfo *info = thr_user_data;
 	/* gidle references */
 	g_object_unref (info->self);
+	if (info->query)
+		g_object_unref (info->query);
 	g_object_unref (info->list);
-	g_error_free (info->err);
+	if (info->err)
+		g_error_free (info->err);
 	g_slice_free (GetFoldersInfo, info);
 	return;
 }
@@ -1299,8 +1306,7 @@ tny_camel_store_account_get_folders_async_cancelled_callback (gpointer thr_user_
 	GetFoldersInfo *info = thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		/* TNY TODO: pass info->cancelled */
-		info->callback (info->self, info->list, &info->err, info->user_data);
+		info->callback (info->self, TRUE, info->list, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1338,6 +1344,8 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	{
 		if (callback) {
 			info->err = g_error_copy (err);
+			if (info->query)
+				g_object_ref (info->query);
 			g_object_ref (info->self);
 			g_object_ref (info->list);
 

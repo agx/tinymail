@@ -121,6 +121,26 @@ Enumerations for tinymail
 @TNY_ACCOUNT_TYPE_TRANSPORT: A account that can send and messages (transfer them)
 @TNY_ACCOUNT_TYPE_COMBINED: 
 
+<!-- ##### ENUM TnyAccountSignal ##### -->
+<para>
+
+</para>
+
+@TNY_ACCOUNT_CONNECTION_STATUS_CHANGED: 
+@TNY_ACCOUNT_LAST_SIGNAL: 
+
+<!-- ##### ENUM TnyConnectionStatus ##### -->
+<para>
+
+</para>
+
+@TNY_CONNECTION_STATUS_DISCONNECTED: 
+@TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN: 
+@TNY_CONNECTION_STATUS_CONNECTED_BROKEN: 
+@TNY_CONNECTION_STATUS_CONNECTED: 
+@TNY_CONNECTION_STATUS_RECONNECTING: 
+@TNY_CONNECTION_STATUS_INIT: 
+
 <!-- ##### ENUM TnyAccountStoreSignal ##### -->
 <para>
 
@@ -227,4 +247,22 @@ framework developers about simply getting your "special" cool flag added to tiny
 @TNY_FOLDER_TYPE_ARCHIVE: 
 @TNY_FOLDER_TYPE_MERGE: 
 @TNY_FOLDER_TYPE_NUM: 
+
+<!-- ##### ENUM TnySendQueueSignal ##### -->
+<para>
+
+</para>
+
+@TNY_SEND_QUEUE_MSG_SENDING: 
+@TNY_SEND_QUEUE_MSG_SENT: 
+@TNY_SEND_QUEUE_ERROR_HAPPENED: 
+@TNY_SEND_QUEUE_LAST_SIGNAL: 
+
+<!-- ##### ENUM TnyStoreAccountSignal ##### -->
+<para>
+
+</para>
+
+@TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED: 
+@TNY_STORE_ACCOUNT_LAST_SIGNAL: 
 

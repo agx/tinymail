@@ -19,6 +19,13 @@ to a #CamelStream.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_STREAM_CAMEL_STREAM ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### MACRO TNY_TYPE_STREAM_CAMEL ##### -->
 <para>
 

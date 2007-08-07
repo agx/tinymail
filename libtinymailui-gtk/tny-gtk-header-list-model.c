@@ -914,7 +914,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 }
 
 static void
-get_hdrs_callback (TnyFolder *self, gboolean cancelled, TnyList *headers, GError **err, gpointer user_data)
+get_hdrs_callback (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data)
 {
 	return;
 }

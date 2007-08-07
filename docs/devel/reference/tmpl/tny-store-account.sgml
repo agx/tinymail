@@ -17,6 +17,13 @@ A store account contains the folders of an E-mail service and handles the authen
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO TNY_TYPE_STORE_ACCOUNT_SIGNAL ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyStoreAccount ##### -->
 <para>
 
@@ -27,8 +34,6 @@ A store account contains the folders of an E-mail service and handles the authen
 <para>
 
 </para>
-
-@:
 
 @tnystoreaccount: the object which received the signal.
 @arg1: 
@@ -72,5 +77,13 @@ A store account contains the folders of an E-mail service and handles the authen
 @url_string: 
 @err: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_store_account_delete_cache ##### -->
+<para>
+
+</para>
+
+@self: 
 
 

@@ -225,8 +225,10 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 	/* Cancel the current */
 	if (item) {
 		if (item->flags & TNY_CAMEL_QUEUE_CANCELLABLE_ITEM) {
-			_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (queue->account));
-			queue->next_uncancel = TRUE;
+			if (!(item->flags & TNY_CAMEL_QUEUE_SYNC_ITEM)) {
+				_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (queue->account));
+				queue->next_uncancel = TRUE;
+			}
 		}
 	}
 

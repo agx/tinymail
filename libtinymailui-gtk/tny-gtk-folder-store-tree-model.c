@@ -208,7 +208,7 @@ get_root_name (TnyFolderStore *folder_store)
 
 
 static void
-get_folders_cb (TnyFolderStore *fstore, TnyList *list, GError **err, gpointer user_data)
+get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GError *err, gpointer user_data)
 {
 	TnyGtkFolderStoreTreeModel *self = (TnyGtkFolderStoreTreeModel *) user_data;
 	GtkTreeModel *model = GTK_TREE_MODEL (self);

@@ -63,3 +63,19 @@ therefore be used as a mime part.
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_msg_uncache_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION tny_msg_rewrite_cache ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

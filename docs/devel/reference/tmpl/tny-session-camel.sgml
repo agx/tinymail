@@ -92,3 +92,11 @@ develop against the #TnyAccountStore interface API using an instance of their im
 @ui_lock: 
 
 
+<!-- ##### FUNCTION tny_session_camel_set_initialized ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

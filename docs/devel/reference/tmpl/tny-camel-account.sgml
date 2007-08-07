@@ -56,6 +56,15 @@ A abstract account type implemented for Camel
 @inst: 
 
 
+<!-- ##### USER_FUNCTION TnyCamelSetOnlineCallback ##### -->
+<para>
+
+</para>
+
+@account: 
+@err: 
+
+
 <!-- ##### STRUCT TnyCamelAccount ##### -->
 <para>
 
@@ -96,5 +105,28 @@ A abstract account type implemented for Camel
 @self: 
 @online: 
 @callback: 
+
+
+<!-- ##### USER_FUNCTION TnyCamelGetSupportedSecureAuthCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@auth_types: 
+@err: 
+@user_data: 
+
+
+<!-- ##### FUNCTION tny_camel_account_get_supported_secure_authentication ##### -->
+<para>
+
+</para>
+
+@self: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 

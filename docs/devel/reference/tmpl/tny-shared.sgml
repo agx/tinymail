@@ -17,6 +17,13 @@ Shared include file with forward typedefs
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### MACRO tny_debug ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyStatus ##### -->
 <para>
 
@@ -39,7 +46,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
+@tnyaccountstore: the object which received the signal.
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -240,7 +247,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccount: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -297,8 +304,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
+@tnydevice: the object which received the signal.
+@arg1: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -406,6 +413,18 @@ refreshing of the folder got cancelled.
 @user_data: user data passed at the caller
 
 
+<!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@headers: 
+@err: 
+@user_data: 
+
+
 <!-- ##### USER_FUNCTION TnyGetMsgCallback ##### -->
 <para>
 A method that gets called after tny_folder_get_msg_async is finished
@@ -417,6 +436,17 @@ getting the message or in case there was an error.
 @msg: the #TnyMsg instance that was requested
 @err: in case there was an error, this !GError instance is not NULL
 @user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnySyncFolderCallback ##### -->
+<para>
+
+</para>
+
+@folder: 
+@cancelled: 
+@err: 
+@user_data: 
 
 
 <!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
@@ -518,9 +548,23 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @self: the #TnyFolderStore from which the child folders where requested
+@cancelled: 
 @list: a #TnyList with #TnyFolder instances (the requested children of @self)
 @err: in case there was an error, this !GError instance is not NULL
 @user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnyCopyFolderCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@into: 
+@new_folder: 
+@err: 
+@user_data: 
 
 
 <!-- ##### STRUCT TnyMsgRemoveStrategy ##### -->
@@ -548,32 +592,32 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+@: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+@: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>

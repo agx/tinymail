@@ -1,3 +1,11 @@
+2007-08-07  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Consistency in the async callback APIs
+	* Cleaning up in case of cancels
+	* Making sync_async cancellable
+
+	* This was a major API change
+
 2007-08-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* GDK lock awareness

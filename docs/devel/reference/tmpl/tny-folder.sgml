@@ -64,7 +64,21 @@ A abstract type that defines a folder
 @get_url_string_func: 
 @get_caps_func: 
 
+<!-- ##### MACRO TNY_TYPE_FOLDER_SIGNAL ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### MACRO TNY_TYPE_FOLDER_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO TNY_TYPE_FOLDER_CAPS ##### -->
 <para>
 
 </para>
@@ -145,6 +159,18 @@ A abstract type that defines a folder
 @err: 
 
 
+<!-- ##### FUNCTION tny_folder_sync_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@expunge: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
 <!-- ##### FUNCTION tny_folder_get_msg ##### -->
 <para>
 
@@ -188,6 +214,19 @@ A abstract type that defines a folder
 @headers: 
 @refresh: 
 @err: 
+
+
+<!-- ##### FUNCTION tny_folder_get_headers_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+@refresh: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 
 <!-- ##### FUNCTION tny_folder_get_account ##### -->
@@ -236,6 +275,15 @@ A abstract type that defines a folder
 
 
 <!-- ##### FUNCTION tny_folder_get_unread_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_local_size ##### -->
 <para>
 
 </para>
@@ -312,6 +360,20 @@ A abstract type that defines a folder
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_folder_copy_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@into: 
+@new_name: 
+@del: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
 <!-- ##### FUNCTION tny_folder_poke_status ##### -->
 <para>
 
@@ -357,6 +419,15 @@ A abstract type that defines a folder
 
 
 <!-- ##### FUNCTION tny_folder_get_caps ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_get_url_string ##### -->
 <para>
 
 </para>

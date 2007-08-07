@@ -169,7 +169,7 @@ sync_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		/* TNY TODO: tny_lockable_lock (ui_lock); */
-		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->err, info->user_data);
 		/* TNY TODO: tny_lockable_unlock (ui_lock); */
 	}
 
@@ -376,7 +376,7 @@ get_msg_async_callback (gpointer thr_user_data)
 		/* TNY TODO: the cancelled field */
 
 		/* TNY TODO: tny_lockable_lock (ui_lock); */
-		info->callback (info->self, FALSE, info->msg, &info->err, info->user_data);
+		info->callback (info->self, FALSE, info->msg, info->err, info->user_data);
 		/* TNY TODO: tny_lockable_unlock (ui_lock); */
 	}
 
@@ -485,7 +485,7 @@ get_headers_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		/* TNY TODO: tny_lockable_lock (ui_lock); */
-		info->callback (info->self, info->cancelled, info->headers, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->headers, info->err, info->user_data);
 		/* TNY TODO: tny_lockable_unlock (ui_lock); */
 	}
 
@@ -849,7 +849,7 @@ refresh_async_callback (gpointer thr_user_data)
 
 	if (info->callback) {
 		/* TNY TODO: tny_lockable_lock (ui_lock); */
-		info->callback (info->self, info->cancelled, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->err, info->user_data);
 		/* TNY TODO: tny_lockable_unlock (ui_lock); */
 	}
 
@@ -1029,7 +1029,7 @@ transfer_msgs_async_callback (gpointer thr_user_data)
 		/* TNY TODO: the cancelled field */
 
 		/* TNY TODO: tny_lockable_lock (ui_lock); */
-		info->callback (info->self, FALSE, &info->err, info->user_data);
+		info->callback (info->self, FALSE, info->err, info->user_data);
 		/* TNY TODO: tny_lockable_unlock (ui_lock); */
 	}
 
