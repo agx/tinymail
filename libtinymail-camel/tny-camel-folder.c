@@ -513,20 +513,22 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 	if (!priv->folder && !priv->loaded && priv->folder_name)
 	{
 		guint newlen = 0;
-		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 		CamelStore *store = priv->store;
 
+		priv->load_ex.id = 0;
+		priv->load_ex.desc = NULL;
+
 		priv->folder = camel_store_get_folder 
-			(store, priv->folder_name, 0, &ex);
+			(store, priv->folder_name, 0, &priv->load_ex);
 
-		do_try_on_success (store, priv, &ex);
+		do_try_on_success (store, priv, &priv->load_ex);
 
-		if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
+		if (!priv->folder || camel_exception_is_set (&priv->load_ex) || !CAMEL_IS_FOLDER (priv->folder))
 		{
 			/* TNY TODO: Leak it? (this is "gash" anyway) */
-			priv->folder = camel_store_get_folder (store, priv->folder_name, 0, &ex);
+			priv->folder = camel_store_get_folder (store, priv->folder_name, 0, &priv->load_ex);
 
-			if (!priv->folder || camel_exception_is_set (&ex) || !CAMEL_IS_FOLDER (priv->folder))
+			if (!priv->folder || camel_exception_is_set (&priv->load_ex) || !CAMEL_IS_FOLDER (priv->folder))
 			{
 				if (priv->folder)
 					while (((CamelObject*)priv->folder)->ref_count >= 1)
@@ -537,7 +539,7 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 				return FALSE;
 			} else {
 				CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-				do_try_on_success (store, priv, &ex);
+				do_try_on_success (store, priv, &priv->load_ex);
 			}
 		}
 
@@ -3300,6 +3302,11 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 
 	if (!priv_src->folder || !priv_src->loaded || !CAMEL_IS_FOLDER (priv_src->folder))
 		if (!load_folder_no_lock (priv_src)) {
+
+			g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_TRANSFER_MSGS,
+				camel_exception_get_description (&priv->load_ex));
+
 			g_static_rec_mutex_unlock (priv_src->folder_lock);
 			g_static_rec_mutex_unlock (priv_dst->folder_lock);
 			return;
@@ -3307,6 +3314,11 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 
 	if (!priv_dst->folder || !priv_dst->loaded || !CAMEL_IS_FOLDER (priv_dst->folder))
 		if (!load_folder_no_lock (priv_dst)) {
+		
+			g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_TRANSFER_MSGS,
+				camel_exception_get_description (&priv->load_ex));
+
 			g_static_rec_mutex_unlock (priv_src->folder_lock);
 			g_static_rec_mutex_unlock (priv_dst->folder_lock);
 			return;
