@@ -1805,6 +1805,7 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 	info->user_data = user_data;
 	info->depth = g_main_depth ();
 	info->condition = NULL;
+	info->err = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
@@ -2135,6 +2136,7 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	info->user_data = user_data;
 	info->depth = g_main_depth ();
 	info->condition = NULL;
+	info->err = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG))
@@ -3154,6 +3156,7 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	info->delete_originals = del;
 	info->new_name = g_strdup (new_name);
 	info->condition = NULL;
+	info->err = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_COPY))
@@ -3764,6 +3767,7 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 	info->delete_originals = delete_originals;
 	info->depth = g_main_depth ();
 	info->condition = NULL;
+	info->err = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_TRANSFER_MSGS))
@@ -4557,6 +4561,7 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 	info->query = query;
 	info->depth = g_main_depth ();
 	info->condition = NULL;
+	info->err = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, &err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
