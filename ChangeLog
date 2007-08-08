@@ -3,6 +3,8 @@
 	* Code cleanups in TnyCamelSendQueue
 	* Introduction of tny_folder_add_msg_async
 	* Better handling of offline (because service is unavailable) cases
+	* Making TnySessionCamel's maildir folders behave a bit better
+	* Using tny_folder_add_msg_async in tny_camel_send_queue_add_default
 
 	* This was a major API change
 

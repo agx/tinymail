@@ -30,6 +30,8 @@
 
 #include <tny-camel-folder.h>
 #include <tny-transport-account.h>
+#include <tny-store-account.h>
+#include <tny-camel-store-account.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -475,6 +477,31 @@ tny_camel_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg, err);
 }
 
+typedef struct {
+	TnyMsg *msg;
+	TnySendQueue *self;
+} OnAddedInfo;
+
+static void
+on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
+{
+	OnAddedInfo *info = (OnAddedInfo *) user_data;
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
+
+	if (err)
+		emit_error (info->self, NULL, info->msg, err, priv->total, priv->total+1);
+
+	priv->total++;
+	if (priv->total >= 1 && !priv->is_running)
+		create_worker (info->self);
+
+	g_object_unref (info->self);
+	g_object_unref (info->msg);
+	g_slice_free (OnAddedInfo, info);
+
+	return;
+}
+
 static void
 tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
@@ -486,6 +513,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 	{
 		TnyFolder *outbox;
 		TnyList *headers = tny_simple_list_new ();
+		OnAddedInfo *info = NULL;
 
 		outbox = tny_send_queue_get_outbox (self);
 
@@ -505,30 +533,22 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 
 		if (err!= NULL && *err != NULL)
 		{
-			g_object_unref (G_OBJECT (headers));
-			g_object_unref (G_OBJECT (outbox));
+			g_object_unref (headers);
+			g_object_unref (outbox);
 			g_mutex_unlock (priv->todo_lock);
 			return;
 		}
 
 		priv->total = tny_list_get_length (headers);
-		g_object_unref (G_OBJECT (headers));
+		g_object_unref (headers);
 
-		tny_folder_add_msg (outbox, msg, err);
+		info = g_slice_new (OnAddedInfo);
+		info->msg = TNY_MSG (g_object_ref (msg));
+		info->self = TNY_SEND_QUEUE (g_object_ref (self));
 
-		if (err!= NULL && *err != NULL)
-		{
-			g_object_unref (G_OBJECT (outbox));
-			g_mutex_unlock (priv->todo_lock);
-			return;
-		}
+		tny_folder_add_msg_async (outbox, msg, on_added, NULL, info);
 
-		priv->total++;
-
-		if (priv->total >= 1 && !priv->is_running)
-			create_worker (self);
-
-		g_object_unref (G_OBJECT (outbox));
+		g_object_unref (outbox);
 	}
 	g_mutex_unlock (priv->todo_lock);
 
@@ -578,6 +598,7 @@ create_maildir (TnySendQueue *self, const gchar *name)
 			{
 				TnyCamelFolder *folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
 				TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+				TnyStoreAccount *saccount = tny_camel_store_account_new ();
 
 				fpriv->dont_fkill = TRUE; /* Magic :) */
 				_tny_camel_folder_set_id (folder, iter->full_name);
@@ -587,7 +608,10 @@ create_maildir (TnySendQueue *self, const gchar *name)
 				_tny_camel_folder_set_local_size (folder, iter->local_size);
 				_tny_camel_folder_set_name (folder, iter->name);
 				_tny_camel_folder_set_iter (folder, iter);
-				_tny_camel_folder_set_account (folder, TNY_ACCOUNT (priv->trans_account));
+
+				tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (saccount), 
+					(TnySessionCamel *) session);
+				_tny_camel_folder_set_account (folder, TNY_ACCOUNT (saccount));
 
 				fpriv->store = mdstore;
 
