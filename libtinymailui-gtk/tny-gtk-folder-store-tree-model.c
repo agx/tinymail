@@ -398,6 +398,12 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 
 	/* recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter); */
 
+	/* Being online at startup is being punished by this: it'll have to
+	 * wait for the connection operation to finish before this queued item
+	 * will get its turn. TNY TODO: figure out how we can avoid this and
+	 * already return the offline folders (if we had those from a session
+	 * before this one) */
+
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
 		folders, get_folders_cb, NULL, NULL, g_object_ref (self));
 
