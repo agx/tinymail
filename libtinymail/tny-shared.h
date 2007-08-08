@@ -56,14 +56,6 @@ typedef struct _TnyTransportAccount TnyTransportAccount;
 typedef struct _TnyTransportAccountIface TnyTransportAccountIface;
 typedef struct _TnyStream TnyStream;
 typedef struct _TnyStreamIface TnyStreamIface;
-typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
-typedef void (*TnyForgetPassFunc) (TnyAccount *self);
-typedef void (*TnyRefreshFolderCallback) (TnyFolder *self, gboolean cancelled, GError *err, gpointer user_data);
-typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data);
-typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
-typedef void (*TnySyncFolderCallback) (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data);
-typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data);
-typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
 typedef enum _TnyHeaderPriorityFlags TnyHeaderPriorityFlags;
 typedef enum _TnyAlertType TnyAlertType;
@@ -81,8 +73,6 @@ typedef struct _TnyFolderStoreQueryClass TnyFolderStoreQueryClass;
 typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
-typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError *err, gpointer user_data);
-typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
 typedef enum _TnyFolderSignal TnyFolderSignal;
 typedef enum _TnyDeviceSignal TnyDeviceSignal;
 typedef enum _TnyAccountSignal TnyAccountSignal;
@@ -123,6 +113,16 @@ typedef struct _TnyPasswordGetterIface TnyPasswordGetterIface;
 typedef struct _TnyCombinedAccount TnyCombinedAccount;
 typedef struct _TnyCombinedAccountClass TnyCombinedAccountClass;
 typedef enum _TnyConnectionStatus TnyConnectionStatus;
+
+typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
+typedef void (*TnyForgetPassFunc) (TnyAccount *self);
+typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean cancelled, GError *err, gpointer user_data);
+typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data);
+typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
+typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data);
+typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
+typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError *err, gpointer user_data);
+typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
 
 G_END_DECLS
 

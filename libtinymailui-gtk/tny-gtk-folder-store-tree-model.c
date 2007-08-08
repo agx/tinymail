@@ -396,7 +396,10 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 		}
 	}
 
-	recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter);
+	/* recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter); */
+
+	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
+		folders, get_folders_cb, NULL, NULL, g_object_ref (self));
 
 	/* Add an observer for the root folder store, so that we can observe 
 	 * the actual account too. */
@@ -404,7 +407,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 	tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
 	self->store_observables = g_list_prepend (self->store_observables, folder_store);
 
-	g_object_unref (G_OBJECT (folders));
+	/* g_object_unref (G_OBJECT (folders)); */
 
 	return;
 }

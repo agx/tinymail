@@ -90,8 +90,9 @@ struct _TnyFolderIface
 	/* Methods */
 	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
 	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
+	void (*add_msg_async_func) (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*sync_func) (TnyFolder *self, gboolean expunge, GError **err);
-	void (*sync_async_func) (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	void (*sync_async_func) (TnyFolder *self, gboolean expunge, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
 	TnyMsgReceiveStrategy* (*get_msg_receive_strategy_func) (TnyFolder *self);
@@ -109,7 +110,7 @@ struct _TnyFolderIface
 	guint (*get_unread_count_func) (TnyFolder *self);
 	guint (*get_local_size_func) (TnyFolder *self);
 	gboolean (*is_subscribed_func) (TnyFolder *self);
-	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	void (*refresh_async_func) (TnyFolder *self, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self, GError **err);
 	void (*transfer_msgs_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data);
@@ -132,9 +133,11 @@ void tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *
 TnyMsgReceiveStrategy* tny_folder_get_msg_receive_strategy (TnyFolder *self);
 void tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st);
 void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err);
+void tny_folder_remove_msg_async (TnyFolder *self, TnyHeader *header, GError **err);
 void tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err);
+void tny_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err);
-void tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+void tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 TnyMsg* tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err);
 TnyMsg* tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err);
 void tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
@@ -148,7 +151,7 @@ guint tny_folder_get_all_count (TnyFolder *self);
 guint tny_folder_get_unread_count (TnyFolder *self);
 guint tny_folder_get_local_size (TnyFolder *self);
 gboolean tny_folder_is_subscribed (TnyFolder *self);
-void tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+void tny_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_refresh (TnyFolder *self, GError **err);
 void tny_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 void tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data);

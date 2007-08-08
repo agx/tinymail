@@ -585,7 +585,7 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
  * is TRUE.
  **/
 void 
-tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
@@ -595,6 +595,37 @@ tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnySyncFolderCallback 
 	TNY_FOLDER_GET_IFACE (self)->sync_async_func (self, expunge, callback, status_callback, user_data);
 	return;
 }
+
+
+/**
+ * tny_folder_add_msg_async:
+ * @self: a #TnyFolder object
+ * @msg: a #TnyMsg object
+ * @callback: a callback that'll happen when adding is finished
+ * @status_callback: a status callback
+ * @user_data: user data for the status callback and callback
+ *
+ * Add a message to a folder. It's recommended to destroy @msg afterwards because 
+ * after receiving the same message from the folder again, the instance wont be
+ * the same anymore and a property like the tny_msg_get_id might have changed
+ * and assigned too.
+ * 
+ * Folder observers of @self will get a header-added trigger caused by this
+ * action.
+ **/
+void 
+tny_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (msg);
+	g_assert (TNY_IS_MSG (msg));
+	g_assert (TNY_FOLDER_GET_IFACE (self)->add_msg_async_func != NULL);
+#endif
+	TNY_FOLDER_GET_IFACE (self)->add_msg_async_func (self, msg, callback, status_callback, user_data);
+	return;
+}
+
 
 /**
  * tny_folder_add_msg:
@@ -743,7 +774,7 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * </programlisting></informalexample>
  **/
 void
-tny_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));

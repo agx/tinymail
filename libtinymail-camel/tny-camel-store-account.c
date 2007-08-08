@@ -1063,10 +1063,11 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	g_assert (TNY_IS_LIST (list));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
+/*
 	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 		return;
-
+*/
 	if (query != NULL)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
 
@@ -1161,7 +1162,9 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 		iter = iter->next;
 	  }
 	}
+/*
 	_tny_session_stop_operation (apriv->session);
+*/
 	return;
 }
 
@@ -1252,7 +1255,7 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 
 	info->cancelled = FALSE;
 	if (info->err != NULL) {
-		if (strcasestr (err->message, "cancel") != NULL)
+		if (strcasestr (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 	}
 
@@ -1335,35 +1338,18 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	info->query = query;
 	info->depth = g_main_depth ();
 
-	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), &err, 
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
-	{
-		if (callback) {
-			info->err = g_error_copy (err);
-			if (info->query)
-				g_object_ref (info->query);
-			g_object_ref (info->self);
-			g_object_ref (info->list);
-
-			execute_callback (info->depth, G_PRIORITY_DEFAULT, 
-				tny_camel_store_account_get_folders_async_cancelled_callback, info,
-				tny_camel_store_account_get_folders_async_cancelled_destroyer);
-		}
-		g_error_free (err);
-		return;
-	}
-
 	/* thread reference */
 	g_object_ref (info->self);
 	g_object_ref (info->list); 
 	if (info->query)
 		g_object_ref (info->query);
 
-	_tny_camel_queue_launch (priv->queue, 
+	_tny_camel_queue_launch_wflags (priv->queue, 
 		tny_camel_store_account_get_folders_async_thread,
 		tny_camel_store_account_get_folders_async_cancelled_callback,
 		tny_camel_store_account_get_folders_async_cancelled_destroyer, 
-		&info->cancelled, info, __FUNCTION__);
+		&info->cancelled, info, TNY_CAMEL_QUEUE_NORMAL_ITEM|
+			TNY_CAMEL_QUEUE_PRIORITY_ITEM, __FUNCTION__);
 
 	return;
 }
@@ -1715,6 +1701,22 @@ tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
  * actual server (that can be both a POP or an IMAP server, depending on the 
  * url-string and/or proto setting of @self). */
 
+static gboolean 
+cancelled_conn (gpointer user_data)
+{
+	return FALSE;
+}
+
+static void 
+cancelled_conn_destroy (gpointer user_data)
+{
+	GoingOnlineInfo *info = (GoingOnlineInfo *) user_data;
+	g_object_unref (info->self);
+	camel_object_unref (info->session);
+	g_slice_free (GoingOnlineInfo, info);
+	return;
+}
+
 void
 _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySessionCamel *session, gboolean online, go_online_callback_func done_func, gpointer user_data)
 {
@@ -1739,10 +1741,14 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 
 	/* It's indeed a very typical queue operation */
 
-	_tny_camel_queue_launch (priv->queue, 
+	_tny_camel_queue_remove_items (priv->queue,
+		TNY_CAMEL_QUEUE_RECONNECT_ITEM);
+
+	_tny_camel_queue_launch_wflags (priv->queue, 
 		tny_camel_store_account_queue_going_online_thread,
-		NULL, NULL, NULL,
-		 info, __FUNCTION__);
+		cancelled_conn, cancelled_conn_destroy, NULL,
+		 info, TNY_CAMEL_QUEUE_RECONNECT_ITEM,
+		__FUNCTION__);
 
 	return;
 }

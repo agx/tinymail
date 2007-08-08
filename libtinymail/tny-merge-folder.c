@@ -137,7 +137,7 @@ tny_merge_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 typedef struct 
 {
 	TnyFolder *self;
-	TnyRefreshFolderCallback callback;
+	TnyFolderCallback callback;
 	TnyStatusCallback status_callback;
 	gpointer user_data;
 	gboolean cancelled, expunge;
@@ -234,7 +234,7 @@ sync_async_thread (gpointer thr_user_data)
 
 
 static void
-tny_merge_folder_sync_async (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_merge_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	SyncFolderInfo *info;
 	GThread *thread;
@@ -816,7 +816,7 @@ tny_merge_folder_refresh (TnyFolder *self, GError **err)
 typedef struct 
 {
 	TnyFolder *self;
-	TnyRefreshFolderCallback callback;
+	TnyFolderCallback callback;
 	TnyStatusCallback status_callback;
 	gpointer user_data;
 	gboolean cancelled;
@@ -926,7 +926,7 @@ refresh_async_thread (gpointer thr_user_data)
 
 
 static void
-tny_merge_folder_refresh_async (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_merge_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info;
 	GThread *thread;

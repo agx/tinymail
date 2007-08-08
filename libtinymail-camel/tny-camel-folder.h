@@ -53,10 +53,11 @@ struct _TnyCamelFolderClass
 	GObjectClass parent;
 
 	/* virtual methods */
-	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
 	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
+	void (*add_msg_async_func) (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*sync_func) (TnyFolder *self, gboolean expunge, GError **err);
-	void (*sync_async_func) (TnyFolder *self, gboolean expunge, TnySyncFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	void (*sync_async_func) (TnyFolder *self, gboolean expunge, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	TnyMsgRemoveStrategy* (*get_msg_remove_strategy_func) (TnyFolder *self);
 	void (*set_msg_remove_strategy_func) (TnyFolder *self, TnyMsgRemoveStrategy *st);
 	TnyMsgReceiveStrategy* (*get_msg_receive_strategy_func) (TnyFolder *self);
@@ -74,7 +75,7 @@ struct _TnyCamelFolderClass
 	guint (*get_unread_count_func) (TnyFolder *self);
 	guint (*get_local_size_func) (TnyFolder *self);
 	gboolean (*is_subscribed_func) (TnyFolder *self);
-	void (*refresh_async_func) (TnyFolder *self, TnyRefreshFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	void (*refresh_async_func) (TnyFolder *self, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*refresh_func) (TnyFolder *self, GError **err);
 	void (*transfer_msgs_func) (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err);
 	void (*transfer_msgs_async_func) (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data);

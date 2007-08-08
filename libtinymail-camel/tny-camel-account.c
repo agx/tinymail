@@ -128,6 +128,21 @@ reconnect_thread (gpointer user_data)
 	return NULL;
 }
 
+static gboolean 
+cancelled_refresh (gpointer user_data)
+{
+	return FALSE;
+}
+
+static void 
+cancelled_refresh_destroy (gpointer user_data)
+{
+	ReconInfo *info = (ReconInfo *) user_data;
+	g_object_unref (info->self);
+	g_slice_free (ReconInfo, info);
+	return;
+}
+
 void
 _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 {
@@ -216,7 +231,8 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 				TNY_CAMEL_QUEUE_RECONNECT_ITEM);
 
 			_tny_camel_queue_launch_wflags (aspriv->queue, 
-				reconnect_thread, NULL, NULL, NULL, info,
+				reconnect_thread, cancelled_refresh, 
+				cancelled_refresh_destroy, NULL, info,
 				TNY_CAMEL_QUEUE_RECONNECT_ITEM,
 				__FUNCTION__);
 		}

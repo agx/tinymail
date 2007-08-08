@@ -1,6 +1,10 @@
 2007-08-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Code cleanups in TnyCamelSendQueue
+	* Introduction of tny_folder_add_msg_async
+	* Better handling of offline (because service is unavailable) cases
+
+	* This was a major API change
 
 2007-08-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
