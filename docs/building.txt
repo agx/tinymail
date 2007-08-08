@@ -130,15 +130,17 @@ Read requirements.txt
 For debugging
 -------------
 CFLAGS="-DDEBUG -DDBC -D_GNU_SOURCE -O0 -Wall -g -ggdb" PKG_CONFIG_PATH=/opt/asyncworker/lib/pkgconfig \
-	./autogen.sh --prefix=/opt/tinymail --enable-asyncworker --enable-tests --enable-unit-tests && make && sudo make install
+	./autogen.sh --prefix=/opt/tinymail --enable-asyncworker --enable-tests --enable-unit-tests && \
+	 make && sudo make install
 
 Other commonly used CFLAGS
 --------------------------
-CFLAGS="-DDEBUG -DDBC -O0 -g -ggdb"
+export CFLAGS="-DDEBUG -DDBC -O0 -g -ggdb"
 
 Typical for development
 -----------------------
-CFLAGS="-DDEBUG -DDBC -O0 -Wstrict-prototypes -Wall -g -ggdb" ./autogen.sh --prefix=/opt/tinymail --with-platform=maemo --with-ssl=openssl && make && make install
+CFLAGS="-DDEBUG -DDBC -O0 -Wstrict-prototypes -Wall -g -ggdb" ./autogen.sh --prefix=/opt/tinymail \
+	--with-platform=maemo --with-ssl=openssl && make && make install
 
 You typically compile E-mail clients this way now:
 PKG_CONFIG_PATH=/opt/tinymail/lib/pkgconfig/ ./autogen --prefix=/opt/myclient --with-platform=maemo
@@ -151,5 +153,57 @@ If you want to build with support for SSL, you can either choose for Mozilla's N
   --with-ssl=nss        Use NSS
   --with-ssl=openssl    Use OpenSSL
   --with-ssl=none       Do NOT detect any SSL, and DON'T use it
+
+
+-- Building Modest --
+#
+## Outside scratchbox
+#
+cd /scratchbox/users/$USER/home/$USER
+mkdir repos
+cd repos
+svn co https://svn.tinymail.org/svn/tinymail/trunk tinymail
+svn co https://garage.maemo.org/svn/modest/maemo-providers-data maemo-providers-data   
+svn co https://garage.maemo.org/svn/modest/libwpeditor-plus/trunk libwpeditor-plus 
+svn co https://garage.maemo.org/svn/modest/modest/trunk modest
+/scratchbox/login
+
+#
+## Inside scratchbox
+#
+cd $HOME/repos/tinymail
+CFLAGS="-DDEBUG -DDBC -O0 -g -ggdb" ./autogen.sh --with-ssl=openssl --prefix=/opt/tinymail \
+	--with-platform=maemo
+make && make install
+
+cd $HOME/repos/maemo-providers-data
+./autogen.sh && ./configure --prefix=/opt/modest
+make && make install
+
+cd $HOME/libwpeditor-plus
+./autogen.sh && ./configure --prefix=/opt/modest
+make && make install
+
+cd $HOME/repos/modest
+PKG_CONFIG_PATH=/opt/tinymail/lib/pkgconfig:/opt/modest/lib/pkgconfig ./autogen.sh \
+	--prefix=/opt/modest --with-platform=maemo
+make && make install
+
+#
+## Deploying to your N800
+##
+cd /opt
+sb~$ tar zcvf tny-mdst.tar.gz tinymail/ modest/
+sb~$ mv tny-mdst.tar.gz /tmp
+host~$ scp /tmp/tny-mdst.tar.gz root@yourdevice:
+yourdevice~# cd /opt
+yourdevice/opt# tar zxvf /root/tny-mdst.tar.gz
+yourdevice~$ run-standalone.sh /opt/modest/bin/modest showui
+
+Installing a debugger on a N800
+-------------------------------
+Read this documentation:
+http://tinymail.org/trac/tinymail/wiki/RecentGdbN800
+
 
 
