@@ -182,7 +182,7 @@ thread_main (gpointer data)
 {
 	TnySendQueue *self = (TnySendQueue *) data;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	TnyFolder *sentbox, *outbox;
+	TnyFolder *sentbox = NULL, *outbox = NULL;
 	guint i = 0, length = 0;
 	TnyList *list = NULL;
 
@@ -197,7 +197,6 @@ thread_main (gpointer data)
 		outbox = tny_send_queue_get_outbox (self);
 
 		tny_folder_get_headers (outbox, list, TRUE, &terror);
-
 
 		if (terror != NULL)
 		{
