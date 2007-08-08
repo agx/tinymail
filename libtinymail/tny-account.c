@@ -541,15 +541,16 @@ tny_account_set_user (TnyAccount *self, const gchar *user)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (user);
-	g_assert (strlen (user) > 0);
+	if (user)
+		g_assert (strlen (user) > 0);
 	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_user_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_user_func (self, user);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_account_get_user (self), user));
+	if (user)
+		g_assert (!strcmp (tny_account_get_user (self), user));
 #endif
 
 	return;
@@ -570,15 +571,16 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (host);
-	g_assert (strlen (host) > 0);
+	if (host)
+		g_assert (strlen (host) > 0);
 	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_hostname_func != NULL);
 #endif
 
 	TNY_ACCOUNT_GET_IFACE (self)->set_hostname_func (self, host);
 
 #ifdef DBC /* ensure */
-	g_assert (!strcmp (tny_account_get_hostname (self), host));
+	if (host)
+		g_assert (!strcmp (tny_account_get_hostname (self), host));
 #endif
 
 	return;
