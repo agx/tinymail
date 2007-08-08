@@ -525,7 +525,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 
 		priv->total++;
 
-		if (priv->total >= 1 && !priv->thread && !priv->creating_spin)
+		if (priv->total >= 1 && !priv->is_running)
 			create_worker (self);
 
 		g_object_unref (G_OBJECT (outbox));
@@ -834,7 +834,6 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
 	priv->signal = -1;
-	priv->creating_spin = FALSE;
 	priv->sentbox_cache = NULL;
 	priv->outbox_cache = NULL;
 	priv->todo_lock = g_mutex_new ();
