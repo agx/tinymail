@@ -184,7 +184,7 @@ thread_main (gpointer data)
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	TnyFolder *sentbox, *outbox;
 	guint i = 0, length = 0;
-	TnyList *list;
+	TnyList *list = NULL;
 
 	g_object_ref (self); /* My own reference */
 	priv->is_running = TRUE;
