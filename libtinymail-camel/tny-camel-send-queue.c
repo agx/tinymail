@@ -71,13 +71,10 @@ emit_error_on_mainloop (gpointer data)
 
 	if (priv->trans_account)
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
-
 	if (apriv)
 		tny_lockable_lock (apriv->session->priv->ui_lock);
-
 	g_signal_emit (info->self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
 				0, info->header, info->msg, info->error);
-
 	if (apriv)
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
 
@@ -90,13 +87,14 @@ destroy_error_info (gpointer data)
 	ErrorInfo *info = data;
 
 	if (info->msg)
-		g_object_unref (G_OBJECT (info->msg));
+		g_object_unref (info->msg);
 	if (info->self)
-		g_object_unref (G_OBJECT (info->self));
+		g_object_unref (info->self);
 	if (info->error)
 		g_error_free (info->error);
-
 	g_slice_free (ErrorInfo, info);
+
+	return;
 }
 
 static void
@@ -107,15 +105,13 @@ emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, i
 	if (error != NULL)
 		info->error = g_error_copy ((const GError *) error);
 	if (self)
-		info->self = TNY_SEND_QUEUE (g_object_ref (G_OBJECT (self)));
+		info->self = TNY_SEND_QUEUE (g_object_ref (self));
 	if (msg)
-		info->msg = TNY_MSG (g_object_ref (G_OBJECT (msg)));
+		info->msg = TNY_MSG (g_object_ref (msg));
 	if (header)
-		info->header = TNY_HEADER (g_object_ref (G_OBJECT (header)));
-
+		info->header = TNY_HEADER (g_object_ref (header));
 	info->i = i;
 	info->total = total;
-
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 		emit_error_on_mainloop, info, destroy_error_info);
 
@@ -132,13 +128,10 @@ emit_control_signals_on_mainloop (gpointer data)
 
 	if (priv && priv->trans_account)
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
-
 	if (apriv)
 		tny_lockable_lock (apriv->session->priv->ui_lock);
-
 	g_signal_emit (info->self, tny_send_queue_signals [info->signal_id], 
 		0, info->header, info->msg, info->i, info->total);
-
 	if (apriv)
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
 
@@ -151,13 +144,14 @@ destroy_control_info (gpointer data)
 	ControlInfo *info = data;
 
 	if (info->msg)
-		g_object_unref (G_OBJECT (info->msg));
+		g_object_unref (info->msg);
 	if (info->header)
-		g_object_unref (G_OBJECT (info->header));
+		g_object_unref (info->header);
 	if (info->self)
-		g_object_unref (G_OBJECT (info->self));
-
+		g_object_unref (info->self);
 	g_slice_free (ControlInfo, info);
+
+	return;
 }
 
 static void
@@ -192,11 +186,8 @@ thread_main (gpointer data)
 	guint i = 0, length = 0;
 	TnyList *list;
 
-	g_object_ref (self);
-
+	g_object_ref (self); /* My own reference */
 	priv->is_running = TRUE;
-	priv->creating_spin = FALSE;
-
 	list = tny_simple_list_new ();
 
 	g_mutex_lock (priv->todo_lock);
@@ -212,7 +203,7 @@ thread_main (gpointer data)
 		{
 			emit_error (self, NULL, NULL, terror, i, priv->total);
 			g_error_free (terror);
-			g_object_unref (G_OBJECT (list));
+			g_object_unref (list);
 			g_mutex_unlock (priv->todo_lock);
 			goto errorhandler;
 		}
@@ -222,7 +213,7 @@ thread_main (gpointer data)
 	}
 	g_mutex_unlock (priv->todo_lock);
 
-	g_object_unref (G_OBJECT (list));
+	g_object_unref (list);
 
 	priv->do_continue = TRUE;
 
@@ -236,15 +227,16 @@ thread_main (gpointer data)
 		g_mutex_lock (priv->todo_lock);
 		{
 			GError *ferror = NULL;
-			TnyIterator *hdriter;
+			TnyIterator *hdriter = NULL;
 			TnyList *headers = tny_simple_list_new ();
 			GList *to_remove = NULL;
-			TnyIterator *giter;
+			TnyIterator *giter = NULL;
 
 			tny_folder_get_headers (outbox, headers, TRUE, &ferror);
 
 			if (ferror != NULL)
 			{
+				priv->is_running = FALSE;
 				emit_error (self, NULL, NULL, ferror, i, priv->total);
 				g_error_free (ferror);
 				g_object_unref (G_OBJECT (headers));
@@ -268,8 +260,7 @@ thread_main (gpointer data)
 			}
 			g_object_unref (giter);
 
-			while (to_remove)
-			{
+			while (to_remove) {
 				tny_list_remove (headers, G_OBJECT (to_remove->data));
 				to_remove = g_list_next (to_remove);
 			}
@@ -277,11 +268,11 @@ thread_main (gpointer data)
 				g_list_free (to_remove);
 
 			length = tny_list_get_length (headers);
-
 			priv->total = length;
 
 			if (length <= 0)
 			{
+				priv->is_running = FALSE;
 				g_object_unref (G_OBJECT (headers));
 				g_mutex_unlock (priv->todo_lock);
 				g_mutex_unlock (priv->sending_lock);
@@ -295,7 +286,6 @@ thread_main (gpointer data)
 			g_object_unref (G_OBJECT (headers));
 		}
 		g_mutex_unlock (priv->todo_lock);
-
 
 		if (header && TNY_IS_HEADER (header))
 		{
@@ -355,6 +345,7 @@ thread_main (gpointer data)
 			g_object_unref (G_OBJECT (header));
 		} else 
 		{
+			priv->is_running = FALSE;
 			/* Not good, let's just kill this thread */ 
 			length = 0;
 			if (header && G_IS_OBJECT (header))
@@ -365,18 +356,18 @@ thread_main (gpointer data)
 
 	}
 
+	priv->is_running = FALSE;
+
 errorhandler:
 
+	priv->is_running = FALSE;
 
 	g_object_unref (sentbox);
 	g_object_unref (outbox);
-
-	g_object_unref (self); /* The one added here */
-
-	g_object_unref (self);
+	g_object_unref (self); /* The one added here (My own reference) */
+	g_object_unref (self); /* Thread reference (Before creation reference) */
 
 	priv->thread = NULL;
-	priv->is_running = FALSE;
 
 	g_thread_exit (NULL);
 	return NULL;
@@ -387,11 +378,9 @@ create_worker (TnySendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
-	if (!priv->is_running && !priv->thread)
+	if (!priv->is_running)
 	{
-		while (priv->creating_spin);
-		priv->creating_spin = TRUE;
-		g_object_ref (self);
+		g_object_ref (self); /* Before creation reference */
 		priv->thread = g_thread_create (thread_main, self, TRUE, NULL);
 	}
 
@@ -409,7 +398,7 @@ tny_camel_send_queue_join_worker (TnyCamelSendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
-	if (priv->thread)
+	if (priv->thread && priv->is_running)
 		g_thread_join (priv->thread);
 
 	return;
@@ -428,6 +417,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove, GError
 
 	g_mutex_lock (priv->sending_lock);
 
+	priv->is_running = FALSE;
 	priv->do_continue = FALSE;
 
 	if (remove)
@@ -442,8 +432,8 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove, GError
 
 		if (err != NULL && *err != NULL)
 		{
-			g_object_unref (G_OBJECT (headers));
-			g_object_unref (G_OBJECT (outbox));
+			g_object_unref (headers);
+			g_object_unref (outbox);
 			g_mutex_unlock (priv->sending_lock);
 			return;
 		}
@@ -457,23 +447,22 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, gboolean remove, GError
 
 			if (err != NULL && *err != NULL)
 			{
-				g_object_unref (G_OBJECT (header));
-				g_object_unref (G_OBJECT (iter));
-				g_object_unref (G_OBJECT (headers));
-				g_object_unref (G_OBJECT (outbox));
+				g_object_unref (header);
+				g_object_unref (iter);
+				g_object_unref (headers);
+				g_object_unref (outbox);
 				g_mutex_unlock (priv->sending_lock);
 				return;
 			}
 
-			g_object_unref (G_OBJECT (header));
+			g_object_unref (header);
 			tny_iterator_next (iter);
 		}
-		g_object_unref (G_OBJECT (iter));
-		g_object_unref (G_OBJECT (headers));
+		g_object_unref (iter);
+		g_object_unref (headers);
 
 		tny_folder_sync (outbox, TRUE, err);
-
-		g_object_unref (G_OBJECT (outbox));
+		g_object_unref (outbox);
 	}
 
 	g_mutex_unlock (priv->sending_lock);
@@ -682,19 +671,16 @@ tny_camel_send_queue_finalize (GObject *object)
 	if (priv->signal != -1)
 		g_signal_handler_disconnect (G_OBJECT (priv->trans_account), 
 			priv->signal);
-
 	if (priv->sentbox_cache)
-		g_object_unref (G_OBJECT (priv->sentbox_cache));
-
+		g_object_unref (priv->sentbox_cache);
 	if (priv->outbox_cache)
-		g_object_unref (G_OBJECT (priv->outbox_cache));
+		g_object_unref (priv->outbox_cache);
 
 	g_mutex_unlock (priv->todo_lock);
 
 	g_mutex_free (priv->todo_lock);
 	g_mutex_free (priv->sending_lock);
-
-	g_object_unref (G_OBJECT (priv->trans_account));
+	g_object_unref (priv->trans_account);
 
 	(*parent_class->finalize) (object);
 
@@ -716,7 +702,6 @@ tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account)
 	TnyCamelSendQueue *self = g_object_new (TNY_TYPE_CAMEL_SEND_QUEUE, NULL);
 
 	g_assert (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (trans_account));
-
 	tny_camel_send_queue_set_transport_account (self, trans_account);
 
 	return TNY_SEND_QUEUE (self);
@@ -727,6 +712,7 @@ on_setonline_happened (TnyCamelAccount *account, gboolean online, gpointer user_
 {
 	if (online)
 		tny_camel_send_queue_flush (TNY_CAMEL_SEND_QUEUE (user_data));
+	return;
 }
 
 
@@ -762,13 +748,12 @@ tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
 
 	priv->signal = (gint) g_signal_connect (G_OBJECT (trans_account),
 		"set-online-happened", G_CALLBACK (on_setonline_happened), self);
-
 	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(trans_account)));
-
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 	_tny_session_camel_reg_queue (apriv->session, self);
-
 	tny_camel_send_queue_flush (TNY_CAMEL_SEND_QUEUE (self));
+
+	return;
 
 }
 
@@ -785,15 +770,13 @@ TnyCamelTransportAccount*
 tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv;
-	
+
 	g_return_val_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self), NULL);
-
 	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-
 	if (!priv->trans_account)
 		return NULL;
-
 	g_object_ref (G_OBJECT(priv->trans_account));
+
 	return TNY_CAMEL_TRANSPORT_ACCOUNT(priv->trans_account);
 }
 
@@ -881,7 +864,6 @@ tny_camel_send_queue_get_type (void)
 	{
 		if (!g_thread_supported ()) 
 			g_thread_init (NULL);
-
 		camel_type_init ();
 		_camel_type_init_done = TRUE;
 	}
@@ -915,7 +897,6 @@ tny_camel_send_queue_get_type (void)
 
 		g_type_add_interface_static (type, TNY_TYPE_SEND_QUEUE,
 			&tny_send_queue_info);
-
 	}
 
 	return type;

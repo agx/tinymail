@@ -1,3 +1,7 @@
+2007-08-08  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Code cleanups in TnyCamelSendQueue
+
 2007-08-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Consistency in the async callback APIs
