@@ -160,11 +160,11 @@ emit_control (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint signal_i
 	ControlInfo *info = g_slice_new0 (ControlInfo);
 
 	if (self)
-		info->self = TNY_SEND_QUEUE (g_object_ref (G_OBJECT (self)));
+		info->self = TNY_SEND_QUEUE (g_object_ref (self));
 	if (msg)
-		info->msg = TNY_MSG (g_object_ref (G_OBJECT (msg)));
+		info->msg = TNY_MSG (g_object_ref (msg));
 	if (header)
-		info->header = TNY_HEADER (g_object_ref (G_OBJECT (header)));
+		info->header = TNY_HEADER (g_object_ref (header));
 
 	info->signal_id = signal_id;
 	info->i = i;
@@ -239,7 +239,7 @@ thread_main (gpointer data)
 				priv->is_running = FALSE;
 				emit_error (self, NULL, NULL, ferror, i, priv->total);
 				g_error_free (ferror);
-				g_object_unref (G_OBJECT (headers));
+				g_object_unref (headers);
 				g_mutex_unlock (priv->todo_lock);
 				g_mutex_unlock (priv->sending_lock);
 				goto errorhandler;
@@ -273,7 +273,7 @@ thread_main (gpointer data)
 			if (length <= 0)
 			{
 				priv->is_running = FALSE;
-				g_object_unref (G_OBJECT (headers));
+				g_object_unref (headers);
 				g_mutex_unlock (priv->todo_lock);
 				g_mutex_unlock (priv->sending_lock);
 				break;
@@ -282,8 +282,8 @@ thread_main (gpointer data)
 			hdriter = tny_list_create_iterator (headers);
 			header = (TnyHeader *) tny_iterator_get_current (hdriter);
 
-			g_object_unref (G_OBJECT (hdriter));
-			g_object_unref (G_OBJECT (headers));
+			g_object_unref (hdriter);
+			g_object_unref (headers);
 		}
 		g_mutex_unlock (priv->todo_lock);
 
@@ -333,23 +333,22 @@ thread_main (gpointer data)
 
 			g_mutex_unlock (priv->todo_lock);
 
-			g_object_unref (G_OBJECT (hassent));
-						
+			g_object_unref (hassent);
+
 			if (err != NULL)
 				g_error_free (err);
 
-			
-			i++;			
+			i++;
 
 			/* hassent is owner now */
-			g_object_unref (G_OBJECT (header));
+			g_object_unref (header);
 		} else 
 		{
 			priv->is_running = FALSE;
 			/* Not good, let's just kill this thread */ 
 			length = 0;
 			if (header && G_IS_OBJECT (header))
-				g_object_unref (G_OBJECT (header));
+				g_object_unref (header);
 		}
 
 		g_mutex_unlock (priv->sending_lock);
