@@ -1741,13 +1741,14 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 
 	/* It's indeed a very typical queue operation */
 
-	_tny_camel_queue_remove_items (priv->queue,
+	_tny_camel_queue_cancel_remove_items (priv->queue,
 		TNY_CAMEL_QUEUE_RECONNECT_ITEM);
 
 	_tny_camel_queue_launch_wflags (priv->queue, 
 		tny_camel_store_account_queue_going_online_thread,
 		cancelled_conn, cancelled_conn_destroy, NULL,
-		 info, TNY_CAMEL_QUEUE_RECONNECT_ITEM,
+		 info, TNY_CAMEL_QUEUE_RECONNECT_ITEM|
+			TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
 		__FUNCTION__);
 
 	return;

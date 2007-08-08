@@ -941,8 +941,8 @@ tny_session_camel_set_initialized (TnySessionCamel *self)
 		G_OBJECT (device), "connection_changed",
 		G_CALLBACK (tny_session_camel_connection_changed), self);
 
-	tny_session_camel_connection_changed (device, 
-		tny_device_is_online (device), self);
+	/* tny_session_camel_connection_changed (device, 
+		tny_device_is_online (device), self); */
 }
 
 /**
