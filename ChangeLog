@@ -2,6 +2,7 @@
 
 	* Async operations can now be queued while a connection is being made
 	* Enhancements to tny_folder_add_msg and tny_folder_add_msg_async
+	* Some improvements when getting a folder list
 
 2007-08-08  Philip Van Hoof  <pvanhoof@gnome.org>
 

@@ -356,10 +356,13 @@ camel_imap_store_finalize (CamelObject *object)
 		imap_store->addrinfo = NULL;
 	}
 
+	g_static_rec_mutex_lock (imap_store->sum_lock);
 	if (imap_store->summary) {
 		camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
 		camel_object_unref(imap_store->summary);
 	}
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
+
 
 	if (imap_store->base_url)
 		g_free (imap_store->base_url);
@@ -377,6 +380,9 @@ camel_imap_store_finalize (CamelObject *object)
 	g_static_rec_mutex_free (imap_store->idle_lock);
 	imap_store->idle_lock = NULL;
 
+	g_static_rec_mutex_free (imap_store->sum_lock);
+	imap_store->sum_lock = NULL;
+
 }
 
 static void
@@ -384,12 +390,17 @@ camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 
+	imap_store->got_online = FALSE;
+	imap_store->going_online = FALSE;
 	imap_store->courier_crap = FALSE;
 	imap_store->idle_prefix_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (imap_store->idle_prefix_lock);
 
 	imap_store->idle_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (imap_store->idle_lock);
+
+	imap_store->sum_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (imap_store->sum_lock);
 
 	imap_store->dontdistridlehack = FALSE;
 
@@ -490,6 +501,8 @@ construct (CamelService *service, CamelSession *session,
 	/* setup/load the store summary */
 	tmp = alloca(strlen(imap_store->storage_path)+32);
 	sprintf(tmp, "%s/.ev-store-summary", imap_store->storage_path);
+
+	g_static_rec_mutex_lock (imap_store->sum_lock);
 	imap_store->summary = camel_imap_store_summary_new();
 	camel_store_summary_set_filename((CamelStoreSummary *)imap_store->summary, tmp);
 	summary_url = camel_url_new(imap_store->base_url, NULL);
@@ -511,6 +524,9 @@ construct (CamelService *service, CamelSession *session,
 		imap_store->capabilities = is->capabilities;
 		imap_set_server_level(imap_store);
 	}
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
+
+	return;
 }
 
 
@@ -725,13 +741,15 @@ imap_get_capability (CamelService *service, CamelException *ex)
 	}
 	
 	imap_set_server_level (store);
-	
+
+	g_static_rec_mutex_lock (store->sum_lock);
 	if (store->summary->capabilities != store->capabilities) {
 		store->summary->capabilities = store->capabilities;
 		camel_store_summary_touch((CamelStoreSummary *)store->summary);
 		camel_store_summary_save((CamelStoreSummary *)store->summary);
 	}
-	
+	g_static_rec_mutex_unlock (store->sum_lock);
+
 	return TRUE;
 }
 
@@ -1336,6 +1354,7 @@ imap_folder_effectively_unsubscribed(CamelImapStore *imap_store,
 	CamelFolderInfo *fi;
 	CamelStoreInfo *si;
 
+	g_static_rec_mutex_lock (imap_store->sum_lock);
 	si = camel_store_summary_path((CamelStoreSummary *)imap_store->summary, folder_name);
 	if (si) {
 		if (si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) {
@@ -1345,6 +1364,7 @@ imap_folder_effectively_unsubscribed(CamelImapStore *imap_store,
 		}
 		camel_store_summary_info_free((CamelStoreSummary *)imap_store->summary, si);
 	}
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
 
 	if (imap_store->renaming) {
 		/* we don't need to emit a "folder_unsubscribed" signal
@@ -1419,8 +1439,10 @@ imap_forget_folder (CamelImapStore *imap_store, const char *folder_name, CamelEx
 	
  event:
 
+	g_static_rec_mutex_lock (imap_store->sum_lock);
 	camel_store_summary_remove_path((CamelStoreSummary *)imap_store->summary, folder_name);
 	camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
 
 	fi = imap_build_folder_info(imap_store, folder_name);
 	camel_object_trigger_event (CAMEL_OBJECT (imap_store), "folder_deleted", fi);
@@ -1711,7 +1733,11 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	size_t len;
 	CamelImapStoreNamespace *ns;
 
+	store->going_online = TRUE;
+	store->got_online = FALSE;
+
 	camel_operation_uncancel (NULL);
+
 
 	imap_debug ("imap_connect_online\n");
 
@@ -1724,6 +1750,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		/* CAMEL_DISCO_STORE (store)->status = CAMEL_DISCO_STORE_OFFLINE; */
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		/* camel_service_disconnect (service, TRUE, NULL); */
+		store->going_online = FALSE;
 		return FALSE;
 	}
 
@@ -1813,9 +1840,11 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		store->namespace = tmp;
 	}
 
+	g_static_rec_mutex_lock (store->sum_lock);
+
 	ns = camel_imap_store_summary_namespace_new(store->summary, store->namespace, store->dir_sep);
 	camel_imap_store_summary_namespace_set(store->summary, ns);
-	
+
 	if ((store->parameters & IMAP_PARAM_SUBSCRIPTIONS)
 	    && camel_store_summary_count((CamelStoreSummary *)store->summary) == 0) 
 	{
@@ -1855,13 +1884,18 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	/* save any changes we had */
 	camel_store_summary_save((CamelStoreSummary *)store->summary);
 
+	g_static_rec_mutex_unlock (store->sum_lock);
+
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 	if (camel_exception_is_set (ex))
 		camel_service_disconnect (service, TRUE, NULL);
 	else
 		store->has_login = TRUE;
 
-	return !camel_exception_is_set (ex);
+	store->going_online = FALSE;
+	store->got_online = !camel_exception_is_set (ex);
+
+	return store->got_online;
 }
 
 static gboolean
@@ -3411,6 +3445,7 @@ refresh_refresh(CamelSession *session, CamelSessionThreadMsg *msg)
 	} else {
 		get_folders_sync((CamelImapStore *)m->store, "*", &m->ex);
 	}
+	camel_store_summary_touch((CamelStoreSummary *)((CamelImapStore *)m->store)->summary);
 	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)m->store)->summary);
 done:
 	CAMEL_SERVICE_REC_UNLOCK(m->store, connect_lock);
@@ -3436,12 +3471,17 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (store);
 	CamelFolderInfo *tree = NULL;
 
+	g_static_rec_mutex_lock (imap_store->sum_lock);
+
 	/* If we have a list of folders already, use that, but if we haven't
 	   updated for a while, then trigger an asynchronous rescan.  Otherwise
 	   we update the list first, and then build it from that */
 
 	if (top == NULL)
 		top = "";
+
+	if (imap_store->going_online || !imap_store->got_online)
+		goto fail;
 
 	if (camel_debug("imap:folder_info"))
 		printf("get folder info online\n");
@@ -3518,18 +3558,23 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 			pattern[i+2] = 0;
 			get_folders_sync(imap_store, pattern, ex);
 		}
+		camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
 		camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+
 		CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 	}
 
 	tree = get_folder_info_offline(store, top, flags, ex);
+
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
 	return tree;
 
 fail:
 	CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 
-	tree = get_folder_info_offline(store, top, flags, ex);
+	tree = get_folder_info_offline (store, top, flags, ex);
 
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
 	return tree;
 }
 
@@ -3543,6 +3588,8 @@ get_folder_info_offline (CamelStore *store, const char *top,
 	GPtrArray *folders;
 	char *pattern, *name;
 	int i;
+
+	g_static_rec_mutex_lock (imap_store->sum_lock);
 
 	if (camel_debug("imap:folder_info"))
 		printf("get folder info offline\n");
@@ -3636,7 +3683,7 @@ get_folder_info_offline (CamelStore *store, const char *top,
 	g_ptr_array_free (folders, TRUE);
 	g_free(name);
 
-	camel_store_summary_save ((CamelStoreSummary *)imap_store->summary);
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
 
 	return fi;
 }
@@ -3648,11 +3695,15 @@ folder_subscribed (CamelStore *store, const char *folder_name)
 	CamelStoreInfo *si;
 	int truth = FALSE;
 
+	g_static_rec_mutex_lock (imap_store->sum_lock);
+
 	si = camel_store_summary_path((CamelStoreSummary *)imap_store->summary, folder_name);
 	if (si) {
 		truth = (si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) != 0;
 		camel_store_summary_info_free((CamelStoreSummary *)imap_store->summary, si);
 	}
+
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
 
 	return truth;
 }
@@ -3679,6 +3730,8 @@ subscribe_folder (CamelStore *store, const char *folder_name,
 		goto done;
 	camel_imap_response_free (imap_store, response);
 
+	g_static_rec_mutex_lock (imap_store->sum_lock);
+
 	si = camel_store_summary_path((CamelStoreSummary *)imap_store->summary, folder_name);
 	if (si) {
 		if ((si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) == 0) {
@@ -3688,7 +3741,9 @@ subscribe_folder (CamelStore *store, const char *folder_name,
 		}
 		camel_store_summary_info_free((CamelStoreSummary *)imap_store->summary, si);
 	}
-	
+
+	g_static_rec_mutex_unlock (imap_store->sum_lock);
+
 	if (imap_store->renaming) {
 		/* we don't need to emit a "folder_subscribed" signal
                    if we are in the process of renaming folders, so we
