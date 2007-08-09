@@ -1199,8 +1199,6 @@ tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
-	_tny_session_stop_operation (info->session);
-
 	g_mutex_lock (info->mutex);
 	g_cond_broadcast (info->condition);
 	info->had_callback = TRUE;

@@ -1,3 +1,8 @@
+2007-08-09  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Async operations can now be queued while a connection is being made
+	* Enhancements to tny_folder_add_msg and tny_folder_add_msg_async
+
 2007-08-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Code cleanups in TnyCamelSendQueue
