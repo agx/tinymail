@@ -1063,11 +1063,11 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	g_assert (TNY_IS_LIST (list));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
-/*
+
 	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
 		return;
-*/
+
 	if (query != NULL)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
 
@@ -1162,9 +1162,9 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 		iter = iter->next;
 	  }
 	}
-/*
+
 	_tny_session_stop_operation (apriv->session);
-*/
+
 	return;
 }
 
