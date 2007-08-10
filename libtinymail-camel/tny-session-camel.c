@@ -211,7 +211,7 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 	if (cancel || retval == NULL) 
 	{
 		GError *err = NULL;
-		_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), FALSE, &err);
+		/*_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), FALSE, &err);*/
 		if (err)
 			g_error_free (err);
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
