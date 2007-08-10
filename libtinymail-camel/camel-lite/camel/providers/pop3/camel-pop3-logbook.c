@@ -239,7 +239,6 @@ CamelPOP3Logbook*
 camel_pop3_logbook_new (gpointer store_in)
 {
 	CamelPOP3Logbook *book = NULL;
-	CamelPOP3Store *store = (CamelPOP3Store *) store_in;
 
 	book = CAMEL_POP3_LOGBOOK (camel_object_new (CAMEL_POP3_LOGBOOK_TYPE));
 
@@ -253,19 +252,6 @@ camel_pop3_logbook_class_init (CamelPOP3LogbookClass *camel_pop3_logbook_class)
 }
 
 
-
-static void
-camel_pop3_store_init (gpointer object, gpointer klass)
-{
-	CamelPOP3Store *store = (CamelPOP3Store *) object;
-
-	store->is_refreshing = FALSE;
-	store->immediate_delete_after = FALSE;
-	store->eng_lock = g_new0 (GStaticRecMutex, 1);
-	g_static_rec_mutex_init (store->eng_lock);
-
-	return;
-}
 
 CamelType
 camel_pop3_logbook_get_type (void)
