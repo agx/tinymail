@@ -4150,6 +4150,9 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 	g_static_rec_mutex_unlock (cpriv->folder_lock);
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
+	g_static_rec_mutex_unlock (apriv->factory_lock);
+
+
 	if (changed)
 	{
 		TnyFolderStoreChange *change;
@@ -4159,9 +4162,6 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 		notify_folder_store_observers_about_in_idle (self, change);
 		g_object_unref (change);
 	}
-
-	g_static_rec_mutex_unlock (apriv->factory_lock);
-
 	return;
 }
 
