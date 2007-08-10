@@ -895,7 +895,9 @@ finalize (CamelObject *object)
 
 	g_static_rec_mutex_free (pop3_store->eng_lock);
 	pop3_store->eng_lock = NULL;
-
+	camel_object_unref (pop3_store->book);
+	pop3_store->book = NULL;
+	return;
 }
 
 typedef struct {
@@ -977,6 +979,8 @@ pop3_construct (CamelService *service, CamelSession *session,
 		return;
 
 	pop3_store->storage_path = camel_session_get_storage_path (session, service, ex);
+	camel_pop3_logbook_set_rootpath (pop3_store->book, pop3_store->storage_path);
+
 	if (!pop3_store->storage_path)
 		return;
 
@@ -1044,6 +1048,7 @@ camel_pop3_store_init (gpointer object, gpointer klass)
 
 	store->is_refreshing = FALSE;
 	store->immediate_delete_after = FALSE;
+	store->book = camel_pop3_logbook_new (store);
 	store->eng_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (store->eng_lock);
 

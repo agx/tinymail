@@ -30,6 +30,7 @@
 #include <camel/camel-types.h>
 #include <camel/camel-store.h>
 #include "camel-pop3-engine.h"
+#include "camel-pop3-logbook.h"
 #include <camel/camel-disco-store.h>
 
 #define CAMEL_POP3_STORE_TYPE     (camel_pop3_store_get_type ())
@@ -50,6 +51,7 @@ typedef struct {
 	gchar *storage_path, *base_url;
 	gboolean connected, is_refreshing;
 	GStaticRecMutex *eng_lock;
+	gpointer book;
 
 } CamelPOP3Store;
 

@@ -57,9 +57,7 @@ typedef struct {
 
 typedef struct {
 	CamelDiscoFolderClass parent_class;
-
-	/* Virtual methods */	
-	
+	/* Virtual methods */
 } CamelPOP3FolderClass;
 
 /* public methods */

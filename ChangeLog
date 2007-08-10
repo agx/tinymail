@@ -1,3 +1,7 @@
+2007-08-10  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Enhancements in the POP code, when removing and expunging items
+
 2007-08-09  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Async operations can now be queued while a connection is being made
