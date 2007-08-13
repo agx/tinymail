@@ -162,12 +162,12 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
 		g_object_unref (liter);
 
 		if (!found)*/
-			tny_list_prepend (list, G_OBJECT (header));
+			tny_list_prepend (list, (GObject *) header);
 
-		g_object_unref (G_OBJECT (list));
+		g_object_unref (list);
 		tny_iterator_next (iter);
 	}
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 }
 
 static gboolean

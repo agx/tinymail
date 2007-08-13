@@ -3618,7 +3618,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		  	TnyHeader *hdr = copy->data;
 		  	if (hdr) {
 		  		if (!no_uidplus)
-		  			tny_list_prepend (new_headers, G_OBJECT (hdr));
+		  			tny_list_prepend (new_headers, (GObject *) hdr);
 		  		g_object_unref (hdr);
 		  	}
 		  	copy = g_list_next (copy);
@@ -3672,7 +3672,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 						TNY_CAMEL_FOLDER (folder_dst), priv_dst);
 					/* hdr will take care of the freeup */
 					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), om);
-					tny_list_prepend (new_headers, G_OBJECT (hdr));
+					tny_list_prepend (new_headers, (GObject *) hdr);
 					g_object_unref (hdr);
 				} else /* Not-new message, freeup */
 					camel_message_info_free (om);
