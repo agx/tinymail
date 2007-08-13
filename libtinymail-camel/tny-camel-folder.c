@@ -3727,10 +3727,10 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 	} else 
 	{
 		if (delete_originals) {
-			gboolean old = priv->handle_changes;
-			priv->handle_changes = FALSE;
+			gboolean old = priv_src->handle_changes;
+			priv_src->handle_changes = FALSE;
 			camel_folder_sync (cfol_src, TRUE, &ex);
-			priv->handle_changes = old;
+			priv_src->handle_changes = old;
 		}
 
 		if (camel_exception_is_set (&ex))
