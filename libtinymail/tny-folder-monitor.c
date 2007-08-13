@@ -232,6 +232,13 @@ foreach_list_remove_headers (TnyFolderMonitorPriv *priv, GPtrArray *array)
 	g_object_unref (iter);
 }
 
+static int
+cmpstringp(const void *p1, const void *p2)
+{
+	return strcmp(* (char * const *) p1, * (char * const *) p2);
+}
+
+
 static void
 tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *change)
 {
@@ -285,7 +292,7 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 		g_object_unref (iter);
 		g_object_unref (list);
 
-		g_ptr_array_sort (array, (GCompareFunc) strcmp);
+		g_ptr_array_sort (array, (GCompareFunc) cmpstringp);
 		foreach_list_remove_headers (priv, array);
 		g_ptr_array_foreach (array, (GFunc) g_free, NULL);
 		g_ptr_array_free (array, TRUE);
