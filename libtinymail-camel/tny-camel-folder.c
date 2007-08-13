@@ -3726,8 +3726,13 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			camel_exception_get_description (&ex));
 	} else 
 	{
-		if (delete_originals)
+		if (delete_originals) {
+			gboolean old = priv->handle_changes;
+			priv->handle_changes = FALSE;
 			camel_folder_sync (cfol_src, TRUE, &ex);
+			priv->handle_changes = old;
+		}
+
 		if (camel_exception_is_set (&ex))
 		{
 			g_set_error (err, TNY_FOLDER_ERROR, 
