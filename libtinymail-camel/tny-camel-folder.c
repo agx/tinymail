@@ -3236,7 +3236,6 @@ tny_camel_folder_copy_async_cancelled_destroyer (gpointer thr_user_data)
 static gboolean
 tny_camel_folder_copy_async_cancelled_callback (gpointer thr_user_data)
 {
-
 	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
@@ -3280,8 +3279,8 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
-	g_object_ref (G_OBJECT (info->self));
-	g_object_ref (G_OBJECT (info->into));
+	g_object_ref (info->self);
+	g_object_ref (info->into);
 
 	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_copy_async_thread, 

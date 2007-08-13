@@ -510,6 +510,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	CamelMessageInfoBase *info;
 	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 	GList *deleted = NULL;
+	CamelFolderChangeInfo *changes = NULL;
 
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (folder->parent_store);
@@ -557,6 +558,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		if (!info)
 			continue;
 
+
 		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, info->uid);
 
 		if ((info->flags & CAMEL_MESSAGE_DELETED)&& g_file_test (expunged_path, G_FILE_TEST_EXISTS)) 
@@ -594,9 +596,19 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	while (deleted)
 	{
 		CamelMessageInfo *info = deleted->data;
+
+		if (!changes)
+			changes = camel_folder_change_info_new ();
+		camel_folder_change_info_remove_uid (changes, info->uid);
 		camel_folder_summary_remove (folder->summary, info);
 		camel_message_info_free(info);
 		deleted = g_list_next (deleted);
+	}
+
+	if (changes)
+	{
+		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+		camel_folder_change_info_free (changes);
 	}
 
 	camel_operation_end(NULL);

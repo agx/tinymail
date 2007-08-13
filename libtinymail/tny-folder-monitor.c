@@ -170,39 +170,54 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
 	g_object_unref (G_OBJECT (iter));
 }
 
+static gboolean
+is_in_my_array (GPtrArray *array, const gchar *uid)
+{
+	gint i=0;
+	for (i=0; i<array->len; i++)
+		if (!strcmp (array->pdata[i], uid))
+			return TRUE;
+	return FALSE;
+}
+
 static void 
-remove_header_from_list (TnyList *list, const gchar *uid)
+remove_headers_from_list (TnyList *list, GPtrArray *array)
 {
 	TnyIterator *iter;
 	TnyHeader *header = NULL;
-	gboolean found = FALSE;
+	GList *to_remove = NULL;
 
 	iter = tny_list_create_iterator (list);
-	while (!tny_iterator_is_done (iter))
+	while (G_LIKELY (!tny_iterator_is_done (iter)))
 	{
 		const gchar *id;
 		header = TNY_HEADER (tny_iterator_get_current (iter));
 		id = tny_header_get_uid (header);
-		if (id && uid && (!strcmp (id, uid)))
-		{ 
-			found = TRUE; 
-			break; 
-		} 
 
-		g_object_unref (G_OBJECT (header));
+		if (is_in_my_array (array, id)) {
+			to_remove = g_list_prepend (to_remove, 
+				g_object_ref (header));
+		}
+
+		g_object_unref (header);
 		tny_iterator_next (iter);
 	}
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
-	if (header && found)
+	while (to_remove)
 	{
-		g_object_unref (G_OBJECT (header)); /* from the loop */
-		tny_list_remove (list, G_OBJECT (header));
-	} 
+		GObject *mheader = to_remove->data;
+		g_object_unref (mheader); /* from the loop */
+		tny_list_remove (list, mheader);
+		to_remove = g_list_next (to_remove);
+	}
+	g_list_free (to_remove);
+
+	return;
 }
 
 static void
-foreach_list_remove_header (TnyFolderMonitorPriv *priv, const gchar *uid)
+foreach_list_remove_headers (TnyFolderMonitorPriv *priv, GPtrArray *array)
 {
 	TnyIterator *iter;
 
@@ -210,11 +225,11 @@ foreach_list_remove_header (TnyFolderMonitorPriv *priv, const gchar *uid)
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
-		remove_header_from_list (list, uid);
-		g_object_unref (G_OBJECT (list));
+		remove_headers_from_list (list, array);
+		g_object_unref (list);
 		tny_iterator_next (iter);
 	}
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 }
 
 static void
@@ -239,18 +254,21 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 		{
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 			foreach_list_add_header (priv, header);
-			g_object_unref (G_OBJECT (header));
+			g_object_unref (header);
 			tny_iterator_next (iter);
 		}
-		g_object_unref (G_OBJECT (iter));
-		g_object_unref (G_OBJECT (list));
+		g_object_unref (iter);
+		g_object_unref (list);
 	}
 
 	if (changed & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS)
 	{
+		GPtrArray *array = NULL;
 		/* The removed headers */
 		list = tny_simple_list_new ();
 		tny_folder_change_get_expunged_headers (change, list);
+		array = g_ptr_array_sized_new (tny_list_get_length (list));
+
 		iter = tny_list_create_iterator (list);
 		while (!tny_iterator_is_done (iter))
 		{
@@ -259,15 +277,20 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 			uid = tny_header_get_uid (header);
 			if (uid) {
 				gchar *tuid = g_strdup (uid);
-				foreach_list_remove_header (priv, tuid);
-				g_free (tuid);
+				g_ptr_array_add (array, tuid);
 			}
-			g_object_unref (G_OBJECT (header));
+			g_object_unref (header);
 			tny_iterator_next (iter);
 		}
-		g_object_unref (G_OBJECT (iter));
-		g_object_unref (G_OBJECT (list));
+		g_object_unref (iter);
+		g_object_unref (list);
+
+		g_ptr_array_sort (array, (GCompareFunc) strcmp);
+		foreach_list_remove_headers (priv, array);
+		g_ptr_array_foreach (array, (GFunc) g_free, NULL);
+		g_ptr_array_free (array, TRUE);
 	}
+
 
 	g_mutex_unlock (priv->lock);
 

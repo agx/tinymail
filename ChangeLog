@@ -1,6 +1,8 @@
 2007-08-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improvements in notifying the observers when removing folders
+	* Improvements when deleting items
+	* When deleting items from a POP, notifying observers
 
 2007-08-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
