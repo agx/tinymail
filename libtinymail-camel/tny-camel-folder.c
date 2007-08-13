@@ -2676,8 +2676,23 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 
 	acc_to = TNY_STORE_ACCOUNT (tny_folder_get_account (retval));
 	if (acc_to) {
+
 		if (tny_folder_is_subscribed (folder))
-			tny_store_account_subscribe (acc_to, retval);
+		{
+			CamelFolder *cfolder = NULL;
+			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (acc_to);
+			const gchar *folder_full_name = NULL;
+			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+			CamelStore *store = NULL;
+
+			cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (retval));
+			folder_full_name = camel_folder_get_full_name (cfolder);
+			store = CAMEL_STORE (apriv->service);
+
+			if (store && folder_full_name && camel_store_supports_subscriptions (store))
+				camel_store_subscribe_folder (store, folder_full_name, &ex);
+			
+		}
 		g_object_unref (acc_to);
 	}
 
@@ -2730,28 +2745,47 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 
 	acc = TNY_STORE_ACCOUNT (tny_folder_get_account (folder));
 
-	if (rem)
-		tny_store_account_unsubscribe (acc, folder);
-	else
-	{
-		if (tny_folder_is_subscribed (folder))
-			tny_store_account_subscribe (acc, folder);
+	if (rem) {
+		if (acc) {
+			CamelFolder *cfolder = NULL;
+			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (acc);
+			const gchar *folder_full_name = NULL;
+			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+			CamelStore *store = NULL;
+
+			cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
+			folder_full_name = camel_folder_get_full_name (cfolder);
+			store = CAMEL_STORE (apriv->service);
+
+			if (store && folder_full_name && camel_store_supports_subscriptions (store))
+				camel_store_unsubscribe_folder (store, folder_full_name, &ex);
+		}
+	} else {
+		if (acc) {
+			CamelFolder *cfolder = NULL;
+			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (acc);
+			const gchar *folder_full_name = NULL;
+			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+			CamelStore *store = NULL;
+
+			cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
+			folder_full_name = camel_folder_get_full_name (cfolder);
+			store = CAMEL_STORE (apriv->service);
+
+			if (store && folder_full_name && camel_store_supports_subscriptions (store))
+				camel_store_subscribe_folder (store, folder_full_name, &ex);
+		}
 	}
 
 	g_object_unref (acc);
 
 	list = func (list, cpy_event_new (TNY_FOLDER_STORE (into), folder));
-
-
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (folder), folders, NULL, NULL);
-
 	iter = tny_list_create_iterator (folders);
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
-
 		recurse_evt (cur, TNY_FOLDER_STORE (folder), list, func, rem);
-
 		g_object_unref (cur);
 		tny_iterator_next (iter);
 	}
