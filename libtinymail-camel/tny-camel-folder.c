@@ -3536,8 +3536,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 				"will return you. This problem indicates a bug "
 				"in the software.");
 
-			g_object_unref (G_OBJECT (header));
-			g_object_unref (G_OBJECT (iter));
+			g_object_unref (header);
+			g_object_unref (iter);
 			g_ptr_array_free (uids, TRUE);
 
 			g_static_rec_mutex_unlock (priv_dst->folder_lock);
@@ -3547,11 +3547,11 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		} else
 			g_ptr_array_add (uids, (gpointer) g_strdup (uid));
 
-		g_object_unref (G_OBJECT (header));
+		g_object_unref (header);
 		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
 	priv_src->handle_changes = FALSE;
 	priv_dst->handle_changes = FALSE;
