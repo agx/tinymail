@@ -580,7 +580,8 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	camel_object_unref (cfolder);
 
 cleanup:
-	camel_object_unref (store);
+
+	return;
 }
 
 static void
@@ -710,11 +711,7 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
-
-		if (store && CAMEL_IS_OBJECT (store))
-				camel_object_unref (CAMEL_OBJECT (store));
 		_tny_session_stop_operation (apriv->session);
-
 		return;
 	}
 
@@ -771,8 +768,6 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 		g_list_remove (aspriv->managed_folders, cfol);
 
 	g_static_rec_mutex_unlock (aspriv->factory_lock);
-
-	camel_object_unref (CAMEL_OBJECT (store));
 
 	return;
 }
@@ -963,9 +958,6 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
-
-		if (store && CAMEL_IS_OBJECT (store))
-				camel_object_unref (CAMEL_OBJECT (store));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
@@ -985,7 +977,6 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 		{
 			if (info && CAMEL_IS_STORE (store))
 				camel_store_free_folder_info (store, info);
-			camel_object_unref (CAMEL_OBJECT (store));
 		}
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
@@ -1007,8 +998,6 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	tny_folder_store_change_add_created_folder (change, folder);
 	notify_folder_store_observers_about_in_idle (self, change);
 	g_object_unref (change);
-
-	camel_object_unref (CAMEL_OBJECT (store));
 
 	_tny_session_stop_operation (apriv->session);
 
@@ -1118,9 +1107,6 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 			camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
-
-		if (store && CAMEL_IS_OBJECT (store))
-			camel_object_unref (CAMEL_OBJECT (store));
 		_tny_session_stop_operation (apriv->session);
 		return;
 	}
@@ -1534,9 +1520,6 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
 			camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
-
-		if (store && CAMEL_IS_OBJECT (store))
-			camel_object_unref (CAMEL_OBJECT (store));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
@@ -1627,7 +1610,6 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 		{
 			if (iter && CAMEL_IS_STORE (store))
 				camel_store_free_folder_info (store, iter);
-			camel_object_unref (CAMEL_OBJECT (store));
 		}
 		_tny_session_stop_operation (apriv->session);
 		g_free (url_string);

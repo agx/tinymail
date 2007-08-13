@@ -6,6 +6,7 @@
 	* Detecting remotely removed objects on POP
 	* Not using the too high level subscribe API (which causes unrequired
 	signal emissions)
+	* Fixed a few memory problems in TnyCamelStoreAccount
 
 2007-08-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
