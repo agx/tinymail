@@ -861,6 +861,7 @@ notify_folder_store_observers_about_remove_in_idle (gpointer user_data)
 		TnyFolderStore *store = tny_folder_store_change_get_folder_store (change);
 		notify_folder_store_observers_about (store, change);
 
+		g_object_unref (store);
 		g_object_unref (change);
 		list = g_list_next (list);
 	}
