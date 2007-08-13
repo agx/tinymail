@@ -4064,7 +4064,7 @@ tny_camel_folder_set_msg_remove_strategy_default (TnyFolder *self, TnyMsgRemoveS
 }
 
 void 
-_tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, GError **err)
+_tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, TnyFolderStoreChange *change, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
@@ -4154,22 +4154,17 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 
 
 	if (changed)
-	{
-		TnyFolderStoreChange *change;
-
-		change = tny_folder_store_change_new (self);
 		tny_folder_store_change_add_removed_folder (change, folder);
-		notify_folder_store_observers_about_in_idle (self, change);
-		g_object_unref (change);
-	}
+
 	return;
 }
 
-static void
-recurse_remove (TnyFolderStore *from, TnyFolder *folder, GError **err)
+static GList*
+recurse_remove (TnyFolderStore *from, TnyFolder *folder, GList *changes, GError **err)
 {
 	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (from);
 	GError *nerr = NULL;
+	TnyFolderStoreChange *change = NULL;
 
 	g_static_rec_mutex_lock (fpriv->folder_lock);
 
@@ -4192,7 +4187,7 @@ recurse_remove (TnyFolderStore *from, TnyFolder *folder, GError **err)
 		{
 			TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
 
-			recurse_remove (TNY_FOLDER_STORE (folder), cur, &nerr);
+			changes = recurse_remove (TNY_FOLDER_STORE (folder), cur, changes, &nerr);
 
 			if (nerr != NULL)
 			{
@@ -4212,8 +4207,9 @@ recurse_remove (TnyFolderStore *from, TnyFolder *folder, GError **err)
 	tny_debug ("tny_folder_store_remove: actual removal of %s\n", 
 			tny_folder_get_name (folder));
 
-	_tny_camel_folder_remove_folder_actual (from, folder, &nerr);
-
+	change = tny_folder_store_change_new (from);
+	_tny_camel_folder_remove_folder_actual (from, folder, change, &nerr);
+	changes = g_list_append (changes, change);
 
 exception:
 
@@ -4222,7 +4218,7 @@ exception:
 
 	g_static_rec_mutex_unlock (fpriv->folder_lock);
 
-	return;
+	return changes;
 }
 
 static void 
@@ -4231,17 +4227,46 @@ tny_camel_folder_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_folder_func (self, folder, err);
 }
 
+static gboolean
+notify_folder_store_observers_about_remove_in_idle (gpointer user_data)
+{
+	GList *list = (GList *) user_data;
+
+	while (list) {
+		TnyFolderStoreChange *change = (TnyFolderStoreChange *) list->data;
+		TnyFolderStore *store = tny_folder_store_change_get_folder_store (change);
+		notify_folder_store_observers_about (store, change);
+
+		g_object_unref (change);
+		list = g_list_next (list);
+	}
+	return FALSE;
+}
+
+static void
+notify_folder_store_observers_about_remove_in_idle_destroy (gpointer user_data)
+{
+	g_list_free ((GList *)user_data);
+}
+
 static void 
 tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	GError *nerr = NULL;
+	GList *changes = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
 		return;
 
-	recurse_remove (self, folder, &nerr);
+	changes = recurse_remove (self, folder, changes, &nerr);
+
+	if (changes) {
+		g_idle_add_full (G_PRIORITY_HIGH, 
+			notify_folder_store_observers_about_remove_in_idle, changes,
+			notify_folder_store_observers_about_remove_in_idle_destroy);
+	}
 
 	if (nerr != NULL)
 		g_propagate_error (err, nerr);

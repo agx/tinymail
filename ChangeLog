@@ -1,3 +1,7 @@
+2007-08-13  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Improvements in notifying the observers when removing folders
+
 2007-08-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Enhancements in the POP code, when removing and expunging items
