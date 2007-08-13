@@ -3,6 +3,7 @@
 	* Improvements in notifying the observers when removing folders
 	* Improvements when deleting items
 	* When deleting items from a POP, notifying observers
+	* Detecting remotely removed observers on POP
 
 2007-08-10  Philip Van Hoof  <pvanhoof@gnome.org>
 

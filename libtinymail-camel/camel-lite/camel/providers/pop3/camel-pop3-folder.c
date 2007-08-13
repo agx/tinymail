@@ -558,7 +558,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		if (!info)
 			continue;
 
-
 		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, info->uid);
 
 		if ((info->flags & CAMEL_MESSAGE_DELETED)&& g_file_test (expunged_path, G_FILE_TEST_EXISTS)) 
@@ -586,6 +585,28 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		if (info->flags & CAMEL_MESSAGE_DELETED) {
 			camel_message_info_ref (info);
 			deleted = g_list_prepend (deleted, info);
+		} else {
+			gboolean found = FALSE;
+
+			for (i=0; i < pop3_folder->uids->len; i++)
+			{
+				CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
+				if (!strcmp (fi->uid, info->uid)) {
+					found = TRUE;
+					break;
+				}
+			}
+
+			if (!found) {
+				/* Removed remotely (only if not cached locally) */
+				CamelObject *o = (CamelObject *) camel_data_cache_get (pop3_store->cache, "cache", fi->uid, NULL);
+
+				if (!o) {
+					camel_message_info_ref (info);
+					deleted = g_list_prepend (deleted, info);
+				} else 
+					camel_object_unref (o);
+			}
 		}
 
 		camel_message_info_free((CamelMessageInfo *)info);
@@ -604,6 +625,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		camel_message_info_free(info);
 		deleted = g_list_next (deleted);
 	}
+
 
 	if (changes)
 	{
