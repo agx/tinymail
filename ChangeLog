@@ -1,3 +1,45 @@
+2007-08-14  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-account-priv.h:
+	* libtinymail-camel/tny-camel-account.c:
+	(_tny_camel_account_refresh),
+	(_tny_camel_account_start_camel_operation_n),
+	(_tny_camel_account_actual_cancel), (on_supauth_idle_func):
+	* libtinymail-camel/tny-camel-folder.c: (load_folder_no_lock),
+	(tny_camel_folder_add_msg_async_thread),
+	(tny_camel_folder_add_msg_async_default),
+	(tny_camel_folder_add_msg_default),
+	(tny_camel_folder_sync_async_default),
+	(tny_camel_folder_refresh_async_default),
+	(tny_camel_folder_get_headers_async_thread),
+	(tny_camel_folder_get_headers_async_default),
+	(tny_camel_folder_get_msg_async_callback),
+	(tny_camel_folder_get_msg_async_default),
+	(tny_camel_folder_copy_async_default),
+	(tny_camel_folder_transfer_msgs_async_callback),
+	(tny_camel_folder_transfer_msgs_async_default),
+	(tny_camel_folder_get_folders_async_thread),
+	(tny_camel_folder_get_folders_async_default):
+	* libtinymail-camel/tny-camel-queue.c: (thread_main_func):
+	* libtinymail-camel/tny-camel-store-account.c:
+	(tny_camel_store_account_get_folders_async_thread),
+	(tny_camel_store_account_get_folders_async_default),
+	(_tny_camel_store_account_queue_going_online):
+	* libtinymail-maemo/tny-maemo-account-store.c:
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(dummy_con_ic_connection_connect_by_id),
+	(on_dummy_connection_check):
+	* libtinymail-maemo/tny-maemo-device.c:
+	(tny_maemo_device_instance_init), (tny_maemo_device_finalize):
+	* libtinymail-maemo/tny-maemo-platform-factory.c:
+	(tny_maemo_platform_factory_finalize):
+	* libtinymail/tny-merge-folder.c: (get_msg_async_thread):
+	* tests/c-demo/tny-demoui-summary-view.c:
+	(on_header_view_tree_row_activated):
+	Avoid compiler warnings, such as unused variables, functions without 
+	returns, and unused functions. Tinymail now builds with -Wall -Werror 
+	again.
+
 2007-08-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improvements in notifying the observers when removing folders

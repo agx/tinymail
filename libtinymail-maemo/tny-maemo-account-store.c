@@ -456,6 +456,7 @@ or
 
 */
 
+#if 0 /* Not used. */
 static void
 tny_maemo_account_store_add_account (TnyAccountStore *self, TnyAccount *account, const gchar *type)
 {
@@ -491,6 +492,7 @@ tny_maemo_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 
 	return;
 }
+#endif
 
 
 

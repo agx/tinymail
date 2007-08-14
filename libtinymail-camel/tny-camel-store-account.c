@@ -1260,7 +1260,6 @@ static gpointer
 tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
-	GError *err = NULL;
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (info->self),
 		info->list, info->query, &info->err);
@@ -1333,7 +1332,6 @@ static void
 tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetFoldersInfo *info;
-	GError *err = NULL;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
@@ -1729,8 +1727,6 @@ void
 _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySessionCamel *session, gboolean online, go_online_callback_func done_func, gpointer user_data)
 {
 	GoingOnlineInfo *info = NULL;
-	GError *err = NULL;
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
 	/* Idle info for the callbacks */

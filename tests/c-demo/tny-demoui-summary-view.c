@@ -1000,9 +1000,8 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 		
 		if (G_LIKELY (header))
 		{
-			TnyFolder *folder;
-			TnyMsg *msg;
-			TnyPlatformFactory *platfact;
+			TnyFolder *folder = NULL;
+			TnyPlatformFactory *platfact = NULL;
 
 
 #if PLATFORM==1

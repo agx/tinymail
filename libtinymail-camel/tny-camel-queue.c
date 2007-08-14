@@ -31,6 +31,7 @@
 #include <errno.h>
 
 #include <tny-camel-shared.h>
+#include <tny-camel-account-priv.h>
 #include <tny-status.h>
 
 static GObjectClass *parent_class = NULL;
@@ -106,7 +107,7 @@ thread_main_func (gpointer user_data)
 
 		if (queue->next_uncancel)
 		{
-			_tny_camel_account_actual_uncancel (queue->account);
+			_tny_camel_account_actual_uncancel (TNY_CAMEL_ACCOUNT (queue->account));
 			queue->next_uncancel = FALSE;
 		}
 

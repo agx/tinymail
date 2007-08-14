@@ -135,6 +135,8 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 		conic_emit_status (device, !status_before);
 }
 
+#ifndef MAEMO_CONIC_DUMMY
+
 static void 
 stop_loop(TnyMaemoConicDevice *self)
 {
@@ -214,6 +216,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	conic_emit_status (device, is_online);
 
 }
+#endif /* MAEMO_CONIC_DUMMY */
 
 #ifdef MAEMO_CONIC_DUMMY
 
@@ -247,7 +250,6 @@ dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self, const gchar* i
 		 * which will be read later: */
 		gchar *filename = get_dummy_filename ();
 		
-		gchar *contents = 0;
 		GError* error = 0;
 		g_file_set_contents (filename, "debug id0", -1, &error);
 		if(error) {
@@ -424,7 +426,7 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 		
 		printf ("DEBUG1: %s: emitting is_online=%d\n", __FUNCTION__, priv->is_online);
 
-		conic_emit_status (self, priv->is_online);
+		conic_emit_status (TNY_DEVICE (self), priv->is_online);
 
 	}
 	

@@ -91,8 +91,6 @@ tny_maemo_platform_factory_get_instance (void)
 static void
 tny_maemo_platform_factory_finalize (GObject *object)
 {
-	TnyMaemoPlatformFactory *self = (TnyMaemoPlatformFactory *)object;	
-
 	(*parent_class->finalize) (object);
 
 	return;

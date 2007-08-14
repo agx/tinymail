@@ -23,9 +23,12 @@
 #include <tny-session-camel.h>
 
 #include <tny-status.h>
+
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
+
+#include <camel/camel-operation.h>
 
 typedef struct _TnyCamelAccountPriv TnyCamelAccountPriv;
 typedef struct _RefreshStatusInfo RefreshStatusInfo;

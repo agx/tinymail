@@ -22,6 +22,7 @@
 #include <glib/gi18n-lib.h>
 
 #include <tny-maemo-device.h>
+#include <gdk/gdk.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -138,9 +139,6 @@ tny_maemo_device_is_online (TnyDevice *self)
 static void
 tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyMaemoDevice *self = (TnyMaemoDevice *)instance;
-	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-
 	return;
 }
 
@@ -162,9 +160,6 @@ tny_maemo_device_new (void)
 static void
 tny_maemo_device_finalize (GObject *object)
 {
-	TnyMaemoDevice *self = (TnyMaemoDevice *) object;
-	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (self);
-
 	(*parent_class->finalize) (object);
 
 	return;

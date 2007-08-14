@@ -561,7 +561,6 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 
 				return FALSE;
 			} else {
-				CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 				do_try_on_success (store, priv, &priv->load_ex);
 			}
 		}
@@ -859,8 +858,6 @@ tny_camel_folder_add_msg_async_thread (gpointer thr_user_data)
 	AddMsgFolderInfo *info = thr_user_data;
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -954,7 +951,6 @@ tny_camel_folder_add_msg_async_default (TnyFolder *self, TnyMsg *msg, TnyFolderC
 {
 
 	AddMsgFolderInfo *info;
-	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	/* Idle info for the callbacks */
@@ -998,8 +994,6 @@ static void
 tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	gboolean haderr = FALSE;
 	TnyFolderChange *change = NULL;
 
 	if (!TNY_IS_CAMEL_MSG (msg))
@@ -1494,7 +1488,6 @@ void
 tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	SyncFolderInfo *info;
-	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	/* Idle info for the callbacks */
@@ -1736,7 +1729,6 @@ static void
 tny_camel_folder_refresh_async_default (TnyFolder *self, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	RefreshFolderInfo *info;
-	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	/* Idle info for the callbacks */
@@ -1918,7 +1910,6 @@ static gpointer
 tny_camel_folder_get_headers_async_thread (gpointer thr_user_data)
 {
 	GetHeadersInfo *info = (GetHeadersInfo*) thr_user_data;
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 
 	tny_folder_get_headers (info->self, info->headers, info->refresh, &info->err);
 	info->cancelled = FALSE;
@@ -1986,9 +1977,8 @@ static void
 tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetHeadersInfo *info;
-	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-
+	
 	/* Idle info for the callbacks */
 	info = g_slice_new (GetHeadersInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
@@ -2142,7 +2132,6 @@ tny_camel_folder_get_msg_async_callback (gpointer thr_user_data)
 {
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
 	TnyFolderChange *change;
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 
 	if (info->msg) 
 	{
@@ -2298,7 +2287,6 @@ static void
 tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetMsgInfo *info;
-	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	/* Idle info for the callbacks */
@@ -3291,7 +3279,6 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CopyFolderInfo *info;
-	GError *err = NULL;
 
 	/* Idle info for the callbacks */
 	info = g_slice_new (CopyFolderInfo);
@@ -3429,9 +3416,7 @@ static gboolean
 tny_camel_folder_transfer_msgs_async_callback (gpointer thr_user_data)
 {
 	TransferMsgsInfo *info = thr_user_data;
-	TnyCamelFolderPriv *priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
-	TnyCamelFolderPriv *priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (info->folder_dst);
-
+	
 	notify_folder_observers_about_transfer (info->self, info->folder_dst, info->delete_originals,
 		info->header_list, info->new_header_list, info->from_all, 
 		info->to_all, info->from_unread, info->to_unread, FALSE);
@@ -3892,7 +3877,6 @@ static void
 tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TransferMsgsInfo *info;
-	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelFolderPriv *priv_src = priv;
 	TnyCamelFolderPriv *priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);
@@ -4621,7 +4605,6 @@ static gpointer
 tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 {
 	GetFoldersInfo *info = (GetFoldersInfo*) thr_user_data;
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (info->self),
 		info->list, info->query, &info->err);
@@ -4698,7 +4681,6 @@ static void
 tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
 {
 	GetFoldersInfo *info;
-	GError *err = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	/* Idle info for the callbacks */

@@ -213,8 +213,6 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 
 	if (recon_if && (apriv->status != TNY_CONNECTION_STATUS_DISCONNECTED))
 	{
-		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-
 		if (!apriv->service)
 			goto fail;
 
@@ -606,8 +604,6 @@ void
 _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperationStatusFunc func, gpointer user_data, const gchar *what, gboolean cancel)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	GThread *thread;
-	GError *err = NULL;
 
 	g_static_rec_mutex_lock (priv->cancel_lock);
 
@@ -1169,6 +1165,7 @@ tny_camel_account_cancel (TnyAccount *self)
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->cancel_func (self);
 }
 
+#if 0 /* Not used. */
 static gpointer
 camel_cancel_hack_thread (gpointer data)
 {
@@ -1177,11 +1174,11 @@ camel_cancel_hack_thread (gpointer data)
 	g_thread_exit (NULL);
 	return NULL;
 }
+#endif
 
 void 
 _tny_camel_account_actual_cancel (TnyCamelAccount *self)
 {
-	GThread *thread;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->cancel_lock);
@@ -1726,6 +1723,8 @@ on_supauth_idle_func (gpointer user_data)
 	}
 
 	tny_idle_stopper_stop (info->stopper);
+	
+	return FALSE; /* Don't call this again. */
 }
 
 

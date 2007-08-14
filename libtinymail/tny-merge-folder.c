@@ -388,7 +388,6 @@ static gpointer
 get_msg_async_thread (gpointer thr_user_data)
 {
 	GetMsgInfo *info = (GetMsgInfo *) thr_user_data;
-	GError *err = NULL;
 
 	info->msg = tny_folder_get_msg (info->self, info->header, &info->err);
 
