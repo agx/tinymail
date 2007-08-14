@@ -289,7 +289,7 @@ static void delete_folder(CamelStore * store, const char *folder_name, CamelExce
 		if (err == 0)
 			err = rem_dir (new);
 		if (err == 0)
-			if (rem_dir (name) == -1)
+			if (rem_dir (name) != 0)
 				err = errno;
 
 		if (err != 0) {
