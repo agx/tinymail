@@ -382,7 +382,8 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 
 #ifdef MAEMO_CONIC_DUMMY
 
-static gboolean on_dummy_connection_check (gpointer user_data)
+static gboolean
+on_dummy_connection_check (gpointer user_data)
 {
 	TnyMaemoConicDevice *self = NULL;
 	TnyMaemoConicDevicePriv *priv = NULL;
@@ -666,6 +667,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	priv->iap = NULL;
+	priv->is_online = FALSE; 
 	
 	#ifndef MAEMO_CONIC_DUMMY
 	priv->cnx = con_ic_connection_new ();
@@ -683,17 +685,17 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	g_signal_connect (priv->cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), self);
-
+	
 	/*
-	 * this will get us in connected state only if there is already a connection.
-	 * thus, this will setup our state correctly when we receive the signals
+	 * This will get us in connected state only if there is already a connection.
+	 * thus, this will setup our state correctly when we receive the signals.
 	 */
 	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
 		g_warning ("could not send connect dbus message");
 		
 	#endif /* MAEMO_CONIC_DUMMY */
 	
-	priv->is_online     = FALSE; 
+	/* We should not have a real is_online, based on what libconic has told us: */
 	priv->forced = FALSE;
 	
 	#ifdef MAEMO_CONIC_DUMMY
