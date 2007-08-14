@@ -1,6 +1,12 @@
 2007-08-14  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(on_connection_event), (tny_maemo_conic_device_get_iap):
+	Fixed a compiler warnings and a build fix when building for the device. 
+
+2007-08-14  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
 	(tny_maemo_conic_device_instance_init): Initialize is_online before 
 	forcing the on_connection_event() signal handler to be called, not after,
 	which could explain why is_online sometimes seems to be false at the start 

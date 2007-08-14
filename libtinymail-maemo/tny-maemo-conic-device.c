@@ -214,7 +214,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	g_message ("DEBUG: %s: emitting signal CONNECTION_CHANGED: %s", 
 		   __FUNCTION__, is_online ? "online" : "offline");
 
-	conic_emit_status (device, is_online);
+	conic_emit_status (TNY_DEVICE (device), is_online);
 
 }
 #endif /* MAEMO_CONIC_DUMMY */
@@ -510,7 +510,7 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
  	iap->name = g_strdup_printf("%s name", iap->id);
  	return iap;
 	#else
-	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
 	/* Note that it is very unusual to return a reference from a get_() function, 
