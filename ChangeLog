@@ -1,3 +1,11 @@
+2007-08-14  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	(tny_camel_folder_transfer_msgs_default): Remove unused err variable 
+	to fix a compiler warning.
+	* libtinymail-maemo/tny-maemo-conic-device.c: Formatting/syntax 
+	changes requested by Philip.
+
 2007-08-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Recursively removing local directories

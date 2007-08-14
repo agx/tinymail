@@ -4000,7 +4000,6 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 	TnyList *new_headers = tny_simple_list_new ();
 	gint from = 0, to = 0, ufrom = 0, uto = 0;
 	TnyCamelFolderPriv *priv_src, *priv_dst;
-	gboolean on_err = FALSE;
 
 	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);

@@ -27,7 +27,6 @@
 #include <conicconnectionevent.h>
 #include <gdk/gdk.h> /* For GDK_THREAD_ENTER/LEAVE */
 #include <string.h> /* For strcmp() */
-#include <stdio.h> /* for printf */
 
 #ifdef MAEMO_CONIC_DUMMY 
 #include <gtk/gtkmessagedialog.h>
@@ -123,11 +122,13 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 {
 	TnyMaemoConicDevice *self;
 	TnyMaemoConicDevicePriv *priv;
+	gboolean status_before = FALSE;
+	
 	g_return_if_fail (TNY_IS_DEVICE(device));
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
-	const gboolean status_before = tny_maemo_conic_device_is_online (device);
+	status_before = tny_maemo_conic_device_is_online (device);
 
 	priv->forced = FALSE;
 
@@ -233,27 +234,28 @@ get_dummy_filename ()
 static gboolean 
 dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
+	int response = 0;
+	
 	/* Show a dialog, because libconic would show a dialog here,
 	 * and give the user a chance to refuse a new connection, because libconic would allow that too.
 	 * This allows us to see roughly similar behaviour in scratchbox as on the device. */
 	GtkDialog *dialog = GTK_DIALOG (gtk_message_dialog_new( NULL, GTK_DIALOG_MODAL,
 			GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL, 
 			"TnyMaemoConicDevice fake scratchbox implementation:\nThe application requested a connection. Make a fake connection?"));
-	printf ("DEBUG: %s before gtk_dialog_run()\n", __FUNCTION__);
-	const int response = gtk_dialog_run (dialog);
-	printf ("DEBUG: %s after gtk_dialog_run()\n", __FUNCTION__);
+
+	response = gtk_dialog_run (dialog);
 	gtk_widget_hide (GTK_WIDGET (dialog));
 	gtk_widget_destroy (GTK_WIDGET (dialog));
 	
 	if (response == GTK_RESPONSE_OK) {
+		GError* error = NULL;
 		/* Make a connection, by setting a name in our dummy text file,
 		 * which will be read later: */
 		gchar *filename = get_dummy_filename ();
 		
-		GError* error = 0;
 		g_file_set_contents (filename, "debug id0", -1, &error);
 		if(error) {
-			printf("%s: error from g_file_set_contents(): %s\n", __FUNCTION__, error->message);
+			g_warning("%s: error from g_file_set_contents(): %s\n", __FUNCTION__, error->message);
 			g_error_free (error);
 			error = NULL;
 		}
@@ -287,9 +289,9 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
 	#ifdef MAEMO_CONIC_DUMMY 
 	return dummy_con_ic_connection_connect_by_id (self, iap_id);
-	#endif /* MAEMO_CONIC_DUMMY */
-	
-	TnyMaemoConicDevicePriv *priv;
+	#else
+	TnyMaemoConicDevicePriv *priv = NULL;
+	gboolean request_failed = FALSE;
 
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
@@ -301,7 +303,6 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 
 	priv->loop = g_main_loop_new(NULL, FALSE /* not running immediately. */);
 
-	gboolean request_failed = FALSE;
 	if (iap_id) {
 		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, CON_IC_CONNECT_FLAG_NONE)) {
 			g_warning ("could not send connect_by_id dbus message");
@@ -332,6 +333,7 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 	priv->loop = NULL;
 
 	return priv->is_online;
+	#endif /* MAEMO_CONIC_DUMMY */
 }
 
 
@@ -374,7 +376,6 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 		}
 #endif /* MAEMO_CONIC_DUMMY*/
 
-	printf ("DEBUG: %s: end.\n", __FUNCTION__);
 	return TRUE;
 }
 
@@ -383,23 +384,31 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 
 static gboolean on_dummy_connection_check (gpointer user_data)
 {
-	TnyMaemoConicDevice *self = TNY_MAEMO_CONIC_DEVICE (user_data);
-	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	TnyMaemoConicDevice *self = NULL;
+	TnyMaemoConicDevicePriv *priv = NULL;
+	gchar *filename = NULL;
+	gchar *contents = NULL;
+	GError* error = NULL;
+	gboolean test = FALSE;
+		
+	self = TNY_MAEMO_CONIC_DEVICE (user_data);
+
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	
 	/* Check whether the enviroment variable has changed, 
 	 * so we can fake a connection change: */
-	gchar *filename = get_dummy_filename ();
-	gchar *contents = 0;
-	GError* error = 0;
-	gboolean test = g_file_get_contents (filename, &contents, NULL, &error);
+	filename = get_dummy_filename ();
+	
+	test = g_file_get_contents (filename, &contents, NULL, &error);
 
 	if(error) {
-		/* printf("%s: error from g_file_get_contents(): %s\n", __FUNCTION__, error->message); */
+		/* g_debug("%s: error from g_file_get_contents(): %s\n", __FUNCTION__, error->message); */
 		g_error_free (error);
 		error = NULL;
 	}
 	
 	if (!test || !contents) {
-		/* printf ("DEBUG1: %s: priv->iap = %s\n", priv->iap); */
+		/* g_debug ("DEBUG1: %s: priv->iap = %s\n", priv->iap); */
 		/* Default to the first debug connection: */
 		contents = g_strdup ("debug id0");
 	}
@@ -418,13 +427,13 @@ static gboolean on_dummy_connection_check (gpointer user_data)
 		
 		if (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0) {
 			priv->is_online = FALSE;
-			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to no connection.\n", __FUNCTION__);
+			g_debug ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to no connection.\n", __FUNCTION__);
 		} else {
 			priv->is_online = TRUE;
-			printf ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to '%s\n", __FUNCTION__, priv->iap);
+			g_debug ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to '%s\n", __FUNCTION__, priv->iap);
 		}
 		
-		printf ("DEBUG1: %s: emitting is_online=%d\n", __FUNCTION__, priv->is_online);
+		g_debug ("DEBUG1: %s: emitting is_online=%d\n", __FUNCTION__, priv->is_online);
 
 		conic_emit_status (TNY_DEVICE (self), priv->is_online);
 
@@ -483,13 +492,19 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 ConIcIap*
 tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 {
+	#ifdef MAEMO_CONIC_DUMMY
+	ConIcIap *iap = NULL;
+	#else
+	TnyMaemoConicDevicePriv *priv = NULL;
+	#endif
+	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (iap_id, NULL);
 
 	#ifdef MAEMO_CONIC_DUMMY 
 	/* Note that we have re-declared the private struct so that we 
 	 * can do this, which is very bad and fragile: */
- 	ConIcIap *iap = g_object_new (CON_IC_TYPE_IAP, NULL);
+ 	iap = g_object_new (CON_IC_TYPE_IAP, NULL);
  	iap->id = g_strdup(iap_id);
  	iap->name = g_strdup_printf("%s name", iap->id);
  	return iap;
@@ -520,6 +535,13 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 GSList*
 tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 {
+#ifdef MAEMO_CONIC_DUMMY
+	GSList* result = NULL;
+	int i = 0;
+#else
+	TnyMaemoConicDevicePriv *priv = NULL;
+#endif /* MAEMO_CONIC_DUMMY */
+	
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 
 #ifdef MAEMO_CONIC_DUMMY
@@ -528,9 +550,6 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	 * "ethernet support" is implemented.
 	 * So we return a fake list so we can exercise funcationality 
 	 * that uses connections: */
-	 GSList* result = NULL;
-	 
-	 int i = 0;
 	 for (i = 0; i < 10; ++i) {
 	 	/* con_ic_iap_new (id) would checkc for a gconf dir and 
 	 	 * fails, though _new() functions should just call g_object_new().
@@ -585,11 +604,12 @@ tny_maemo_conic_device_force_online (TnyDevice *device)
 {
 	TnyMaemoConicDevice *self;
 	TnyMaemoConicDevicePriv *priv;
+	gboolean already_online = FALSE;
 	g_return_if_fail (TNY_IS_DEVICE(device));
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	
-	const gboolean already_online = tny_maemo_conic_device_is_online (device);
+	already_online = tny_maemo_conic_device_is_online (device);
 
 	g_message (__FUNCTION__);
 	g_message ("force online, current status is: %s", already_online ? "online" : "offline");
@@ -608,6 +628,7 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 {
 	TnyMaemoConicDevice *self;
 	TnyMaemoConicDevicePriv *priv;
+	gboolean already_offline = FALSE;
 	g_return_if_fail (TNY_IS_DEVICE(device));
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
@@ -616,7 +637,7 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 	return;
 #endif /*MAEMO_CONIC_DUMMY*/
 
-	const gboolean already_offline = !tny_maemo_conic_device_is_online (device);
+	already_offline = !tny_maemo_conic_device_is_online (device);
 
 	priv->forced = TRUE;
 
@@ -631,7 +652,7 @@ tny_maemo_conic_device_is_online (TnyDevice *self)
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
 
 	#ifdef MAEMO_CONIC_DUMMY
-	on_dummy_connection_check(self);
+	on_dummy_connection_check (self);
 	#endif /* MAEMO_CONIC_DUMMY */
 	
 	return TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self)->is_online;
@@ -702,10 +723,7 @@ tny_maemo_conic_device_new (void)
 static void
 tny_maemo_conic_device_finalize (GObject *obj)
 {
-	printf ("DEBUG: %s\n", __FUNCTION__);
-
-	TnyMaemoConicDevicePriv *priv;
-	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
 	
 	#ifndef MAEMO_CONIC_DUMMY
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
