@@ -571,7 +571,7 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	 
 	 return result;
 #else
-	TnyMaemoConicDevicePriv *priv 
+	priv 
 		= TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
