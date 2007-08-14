@@ -5,6 +5,7 @@
 	* Enhanced error reporting in the async operations
 	* Dealing with certain states (where priv->folder is uninitialized) in
 	the async operations
+	* Moving observer notifies away from transfer-msgs
 
 2007-08-14  Murray Cumming  <murrayc@murrayc.com>
 

@@ -85,6 +85,8 @@ char *strcasestr(const char *haystack, const char *needle);
 static GObjectClass *parent_class = NULL;
 
 
+static void tny_camel_folder_transfer_msgs_shared (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, TnyList *new_headers, GError **err);
+
 
 
 /* When using a #GMainLoop this method will execute a callback using
@@ -2601,7 +2603,7 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 	TnyFolder *retval = NULL;
 	TnyStoreAccount *acc_to;
 	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
-	TnyList *headers;
+	TnyList *headers = NULL, *new_headers = NULL;
 
 	GError *nerr = NULL;
 
@@ -2679,10 +2681,14 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 
 	tny_debug ("tny_folder_copy: transfer %s to %s\n", tny_folder_get_name (folder), tny_folder_get_name (retval));
 
-	tny_folder_transfer_msgs (folder, headers, retval, del, &nerr);
+	new_headers = tny_simple_list_new ();
+	tny_camel_folder_transfer_msgs_shared (folder, headers, retval, del, new_headers, &nerr);
+
+	/* TNY TODO: notify observers of retval about new_headers? */
+	g_object_unref (new_headers);
+	g_object_unref (headers);
 
 	if (nerr != NULL) {
-		g_object_unref (headers);
 		g_object_unref (retval);
 		retval = NULL;
 		goto exception;
@@ -3725,8 +3731,6 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		}
 	}
 
-	priv_src->handle_changes = TRUE;
-	priv_dst->handle_changes = TRUE;
 
 	if (camel_exception_is_set (&ex)) 
 	{
@@ -3735,12 +3739,9 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			camel_exception_get_description (&ex));
 	} else 
 	{
-		if (delete_originals) {
-			gboolean old = priv_src->handle_changes;
-			priv_src->handle_changes = FALSE;
+		if (delete_originals) 
 			camel_folder_sync (cfol_src, TRUE, &ex);
-			priv_src->handle_changes = old;
-		}
+		
 
 		if (camel_exception_is_set (&ex))
 		{
@@ -3750,17 +3751,15 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		}
 	}
 
+	priv_src->handle_changes = TRUE;
+	priv_dst->handle_changes = TRUE;
+
 	if (transferred_uids) {
-		/* I think we need to g_free all too ... can somebody double 
-		 * check this? the TRUE flag just means "free the pdata" alloc,
-		 * not the items themselves. Afaik. We need to check whether 
-		 * the items are pointers to the mi->uids or copies of that,
-		 * I think they are plain simple copies and need to be freed! */
+		g_ptr_array_foreach (transferred_uids, (GFunc) g_free, NULL);
 		g_ptr_array_free (transferred_uids, TRUE);
 	}
 
 	if (dst_orig_uids) {
-		/* We do need to free these, definitely. We made it ourselves */
 		g_ptr_array_foreach (dst_orig_uids, (GFunc) g_free, NULL);
 		g_ptr_array_free (dst_orig_uids, TRUE);
 	}
@@ -3959,11 +3958,10 @@ tny_camel_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *fo
 
 
 static void
-tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
+tny_camel_folder_transfer_msgs_shared (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, TnyList *new_headers, GError **err)
 {
-	gint from, to, ufrom, uto;
 	TnyCamelFolderPriv *priv_src, *priv_dst;
-	TnyList *new_headers;
+	gboolean on_err = FALSE;
 
 	g_assert (TNY_IS_LIST (headers));
 	g_assert (TNY_IS_FOLDER (self));
@@ -3974,25 +3972,50 @@ tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFo
 
 	if (!priv_src->folder || !priv_src->loaded || !CAMEL_IS_FOLDER (priv_src->folder))
 		if (!load_folder (priv_src)) 
-			return;
+			on_err = TRUE;
 
 	if (!priv_dst->folder || !priv_dst->loaded || !CAMEL_IS_FOLDER (priv_dst->folder))
 		if (!load_folder (priv_dst)) 
-			return;
+			on_err = TRUE;
 
-	new_headers = tny_simple_list_new ();
-	transfer_msgs_thread_clean (self, headers, new_headers, folder_dst, delete_originals, err);
+	if (!on_err)
+	{
+		transfer_msgs_thread_clean (self, headers, new_headers, folder_dst, delete_originals, err);
+	} else {
+		g_set_error (err, TNY_FOLDER_ERROR,  
+			TNY_FOLDER_ERROR_TRANSFER_MSGS, 
+			"Can't load folder %s or %s\n",  
+			priv_src->folder_name?priv_src->folder_name:"(null)", 
+			priv_dst->folder_name?priv_dst->folder_name:"(null)"); 
+	}
 
-	if (!err || *err == NULL)
+	return;
+}
+
+static void
+tny_camel_folder_transfer_msgs_default (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
+{
+	GError *nerr = NULL;
+	TnyList *new_headers = tny_simple_list_new ();
+	gint from = 0, to = 0, ufrom = 0, uto = 0;
+	TnyCamelFolderPriv *priv_src, *priv_dst;
+	gboolean on_err = FALSE;
+
+	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);
+
+	tny_camel_folder_transfer_msgs_shared (self, headers, folder_dst, delete_originals, new_headers, &nerr);
+
+	if (nerr == NULL)
 	{
 		from = camel_folder_get_message_count (priv_src->folder);
 		to = camel_folder_get_message_count (priv_dst->folder);
 		ufrom = camel_folder_get_unread_message_count (priv_src->folder);
 		uto = camel_folder_get_unread_message_count (priv_dst->folder);
-
 		notify_folder_observers_about_transfer (self, folder_dst, delete_originals, 
 			headers, new_headers, from, to, ufrom, uto, TRUE);
-	}
+	} else 
+		g_propagate_error (err, nerr);
 
 	g_object_unref (new_headers);
 
