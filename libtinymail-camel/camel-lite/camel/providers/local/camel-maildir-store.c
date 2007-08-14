@@ -231,12 +231,20 @@ static int rem_dir (const gchar *tmp)
 
 	dir = opendir(tmp);
 	if (dir) {
-		while ( (d=readdir(dir)) ) {
+		while ( (d=readdir(dir)) ) 
+		{
+			struct stat st;
+
 			char *namea = d->d_name, *file;
+			
 			if (!strcmp(namea, ".") || !strcmp(namea, ".."))
 				continue;
 			file = g_strdup_printf("%s/%s", tmp, namea);
-			unlink(file);
+			stat(file, &st);
+			if (S_ISDIR(st.st_mode))
+				rem_dir (file);
+			else
+				unlink(file);
 			g_free(file);
 		}
 		closedir(dir);
