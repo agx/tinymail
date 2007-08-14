@@ -3489,7 +3489,6 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			TNY_FOLDER_ERROR_TRANSFER_MSGS))
 		return;
 
-	iter = tny_list_create_iterator (headers);
 	list_length = tny_list_get_length (headers);
 
 	if (list_length < 1) {
@@ -3497,6 +3496,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		return;
 	}
 
+	iter = tny_list_create_iterator (headers);
 	uids = g_ptr_array_sized_new (list_length);
 
 	/* Get privates */
