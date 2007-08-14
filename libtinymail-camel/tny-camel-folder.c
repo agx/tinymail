@@ -3496,9 +3496,6 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		return;
 	}
 
-	iter = tny_list_create_iterator (headers);
-	uids = g_ptr_array_sized_new (list_length);
-
 	/* Get privates */
 	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_src);
 	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_dst);
@@ -3529,6 +3526,9 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			g_static_rec_mutex_unlock (priv_dst->folder_lock);
 			return;
 		}
+
+	iter = tny_list_create_iterator (headers);
+	uids = g_ptr_array_sized_new (list_length);
 
 	/* Get camel folders */
 	cfol_src = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder_src));
