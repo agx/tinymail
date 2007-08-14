@@ -14,6 +14,7 @@
 	* Dealing with certain states (where priv->folder is uninitialized) in
 	the async operations
 	* Moving observer notifies away from transfer-msgs
+	* Moved the io_lock a bit tighter for CamelStoreSummary
 
 2007-08-14  Murray Cumming  <murrayc@murrayc.com>
 

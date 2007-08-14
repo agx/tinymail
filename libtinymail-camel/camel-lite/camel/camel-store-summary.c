@@ -97,7 +97,6 @@ camel_store_summary_init (CamelStoreSummary *s)
 	p = _PRIVATE(s) = g_malloc0(sizeof(*p));
 
 	s->store_info_size = sizeof(CamelStoreInfo);
-
 	s->version = CAMEL_STORE_SUMMARY_VERSION;
 	s->flags = 0;
 	s->count = 0;
@@ -133,7 +132,7 @@ camel_store_summary_finalise (CamelObject *obj)
 	g_mutex_free(p->summary_lock);
 	g_mutex_free(p->io_lock);
 	g_mutex_free(p->ref_lock);
-	
+
 	g_free(p);
 }
 
@@ -365,11 +364,14 @@ camel_store_summary_load(CamelStoreSummary *s)
 
 	g_assert(s->summary_path);
 
-	in = g_fopen(s->summary_path, "rb");
-	if (in == NULL)
-		return -1;
-
 	CAMEL_STORE_SUMMARY_LOCK(s, io_lock);
+
+	in = g_fopen(s->summary_path, "rb");
+	if (in == NULL) {
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		return -1;
+	}
+
 	if ( ((CamelStoreSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_load(s, in) == -1)
 		goto error;
 
@@ -383,12 +385,14 @@ camel_store_summary_load(CamelStoreSummary *s)
 		camel_store_summary_add(s, info);
 	}
 
-	CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
-	
-	if (fclose (in) != 0)
+	if (fclose (in) != 0) {
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		return -1;
+	}
 
 	s->flags &= ~CAMEL_STORE_SUMMARY_DIRTY;
+
+	CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 
 	return 0;
 
@@ -426,14 +430,18 @@ camel_store_summary_save(CamelStoreSummary *s)
 
 	io(printf("** saving summary\n"));
 
+	CAMEL_STORE_SUMMARY_LOCK(s, io_lock);
+
 	if ((s->flags & CAMEL_STORE_SUMMARY_DIRTY) == 0) {
 		io(printf("**  summary clean no save\n"));
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		return 0;
 	}
 
 	fd = g_open(s->summary_path, O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0600);
 	if (fd == -1) {
 		io(printf("**  open error: %s\n", strerror (errno)));
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		return -1;
 	}
 	out = fdopen(fd, "wb");
@@ -442,12 +450,12 @@ camel_store_summary_save(CamelStoreSummary *s)
 		printf("**  fdopen error: %s\n", strerror (errno));
 		close(fd);
 		errno = i;
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		return -1;
 	}
 
 	io(printf("saving header\n"));
 
-	CAMEL_STORE_SUMMARY_LOCK(s, io_lock);
 
 	if ( ((CamelStoreSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_save(s, out) == -1) {
 		i = errno;
@@ -457,29 +465,29 @@ camel_store_summary_save(CamelStoreSummary *s)
 		return -1;
 	}
 
-	/* now write out each message ... */
-
-	/* FIXME: Locking? */
-
 	count = s->folders->len;
 	for (i=0;i<count;i++) {
 		info = s->folders->pdata[i];
 		((CamelStoreSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->store_info_save(s, out, info);
 	}
 
-	CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
-	
 	if (fflush (out) != 0 || fsync (fileno (out)) == -1) {
 		i = errno;
 		fclose (out);
 		errno = i;
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		return -1;
 	}
 	
-	if (fclose (out) != 0)
+	if (fclose (out) != 0) {
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		return -1;
+	}
 
 	s->flags &= ~CAMEL_STORE_SUMMARY_DIRTY;
+
+	CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+
 	return 0;
 }
 

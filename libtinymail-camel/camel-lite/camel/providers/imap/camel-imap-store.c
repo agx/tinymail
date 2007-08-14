@@ -3341,8 +3341,10 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 				si->unread = fi->unread;
 				si->total = fi->total;
 				camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
+				camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
 			} else {
 				camel_store_summary_remove((CamelStoreSummary *)imap_store->summary, si);
+				camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
 				count--;
 				i--;
 			}

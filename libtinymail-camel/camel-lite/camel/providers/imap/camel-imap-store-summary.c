@@ -99,8 +99,7 @@ static void
 camel_imap_store_summary_finalise (CamelObject *obj)
 {
 	/*struct _CamelImapStoreSummaryPrivate *p;*/
-	/*CamelImapStoreSummary *s = (CamelImapStoreSummary *)obj;*/
-
+	/* CamelImapStoreSummary *s = (CamelImapStoreSummary *)obj; */
 	/*p = _PRIVATE(obj);
 	  g_free(p);*/
 }
