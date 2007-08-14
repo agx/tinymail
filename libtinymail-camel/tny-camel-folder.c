@@ -659,6 +659,14 @@ tny_camel_folder_add_msg_shared (TnyFolder *self, TnyMsg *msg, TnyFolderChange *
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	gboolean haderr = FALSE;
 
+	if (!load_folder_no_lock (priv)) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_ADD_MSG,
+			"Can't load folder %s\n", 
+			priv->folder_name?priv->folder_name:"(null)");
+		return FALSE;
+	}
+
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
 	if (message && CAMEL_IS_MIME_MESSAGE (message)) 
 	{
@@ -1405,21 +1413,28 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
+
 	info->cancelled = FALSE;
 
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
 		tny_camel_folder_sync_async_status, info, 
 		"Synchronizing folder");
 
-	priv->want_changes = FALSE;
-	camel_folder_sync (priv->folder, info->expunge, &ex);
-	priv->want_changes = TRUE;
+	if (load_folder_no_lock (priv))
+	{
+		priv->want_changes = FALSE;
+		camel_folder_sync (priv->folder, info->expunge, &ex);
+		priv->want_changes = TRUE;
 
-	info->cancelled = camel_operation_cancel_check (apriv->cancel);
+		info->cancelled = camel_operation_cancel_check (apriv->cancel);
 
-	priv->cached_length = camel_folder_get_message_count (priv->folder);
-	priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
-	update_iter_counts (priv);
+		priv->cached_length = camel_folder_get_message_count (priv->folder);
+		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
+		update_iter_counts (priv);
+	} else
+		camel_exception_setv (&ex, CAMEL_EXCEPTION_SYSTEM, 
+			"Can't load folder %s\n", 
+			priv->folder_name?priv->folder_name:"(null)");
 
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
@@ -1633,15 +1648,22 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 		tny_camel_folder_refresh_async_status, info, 
 		"Fetching summary information for new messages in folder");
 
-	priv->want_changes = FALSE;
-	camel_folder_refresh_info (priv->folder, &ex);
-	priv->want_changes = TRUE;
+	if (load_folder_no_lock (priv))
+	{
+		priv->want_changes = FALSE;
+		camel_folder_refresh_info (priv->folder, &ex);
+		priv->want_changes = TRUE;
 
-	info->cancelled = camel_operation_cancel_check (apriv->cancel);
+		info->cancelled = camel_operation_cancel_check (apriv->cancel);
 
-	priv->cached_length = camel_folder_get_message_count (priv->folder);
-	priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
-	update_iter_counts (priv);
+		priv->cached_length = camel_folder_get_message_count (priv->folder);
+		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
+		update_iter_counts (priv);
+
+	} else
+		camel_exception_setv (&ex, CAMEL_EXCEPTION_SYSTEM, 
+			"Can't load folder %s\n", 
+			priv->folder_name?priv->folder_name:"(null)");
 
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
@@ -2032,6 +2054,10 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	if (!load_folder_no_lock (priv))
 	{
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
+			"Can't load folder %s\n", 
+			priv->folder_name?priv->folder_name:"(null)");
 		g_static_rec_mutex_unlock (priv->folder_lock);
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 		return;
@@ -3617,10 +3643,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			{
 				TnyHeader *hdr = _tny_camel_header_new ();
 				/* This adds a reason to live for folder_dst */
-				printf ("A %d\n", priv_dst->reason_to_live);
 				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 					TNY_CAMEL_FOLDER (folder_dst), priv_dst);
-				printf ("A %d\n", priv_dst->reason_to_live);
 				/* hdr will take care of the freeup */
 				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
 				succeeded_news = g_list_prepend (succeeded_news, hdr);
@@ -3775,39 +3799,49 @@ tny_camel_folder_transfer_msgs_async_thread (gpointer thr_user_data)
 	TransferMsgsInfo *info = (TransferMsgsInfo*) thr_user_data;
 	TnyCamelFolderPriv *priv_src = NULL, *priv_dst = NULL;
 	TnyCamelAccountPriv *apriv = NULL;
+	gboolean on_err = FALSE;
 
 	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 	priv_dst = TNY_CAMEL_FOLDER_GET_PRIVATE (info->folder_dst);
 
-
 	if (!priv_src->folder || !priv_src->loaded || !CAMEL_IS_FOLDER (priv_src->folder))
-		if (!load_folder_no_lock (priv_src)) 
-			return NULL;
+		if (!load_folder_no_lock (priv_src))
+			on_err = TRUE;
 
 	if (!priv_dst->folder || !priv_dst->loaded || !CAMEL_IS_FOLDER (priv_dst->folder))
-		if (!load_folder_no_lock (priv_dst)) 
-			return NULL;
+		if (!load_folder_no_lock (priv_dst))
+			on_err = TRUE;
 
-	info->cancelled = FALSE;
-	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv_src->account);
-	
-	/* Start operation */
-	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv_src->account), 
-		tny_camel_folder_transfer_msgs_async_status, info, 
-		"Transfer messages between two folders");
+	if (!on_err) 
+	{
+		info->cancelled = FALSE;
+		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv_src->account);
 
-	transfer_msgs_thread_clean (info->self, info->header_list, info->new_header_list, info->folder_dst, 
-			info->delete_originals, &info->err);
+		/* Start operation */
+		_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv_src->account), 
+			tny_camel_folder_transfer_msgs_async_status, info, 
+			"Transfer messages between two folders");
 
-	/* Check cancelation and stop operation */
-	info->cancelled = camel_operation_cancel_check (apriv->cancel);
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv_src->account));
+		transfer_msgs_thread_clean (info->self, info->header_list, info->new_header_list, info->folder_dst, 
+				info->delete_originals, &info->err);
 
-	/* Get data */
-	info->from_all = camel_folder_get_message_count (priv_src->folder);
-	info->to_all = camel_folder_get_message_count (priv_dst->folder);
-	info->from_unread = camel_folder_get_unread_message_count (priv_src->folder);
-	info->to_unread = camel_folder_get_unread_message_count (priv_dst->folder);
+		/* Check cancelation and stop operation */
+		info->cancelled = camel_operation_cancel_check (apriv->cancel);
+		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv_src->account));
+
+		/* Get data */
+		info->from_all = camel_folder_get_message_count (priv_src->folder);
+		info->to_all = camel_folder_get_message_count (priv_dst->folder);
+		info->from_unread = camel_folder_get_unread_message_count (priv_src->folder);
+		info->to_unread = camel_folder_get_unread_message_count (priv_dst->folder);
+	} else {
+		info->cancelled = TRUE;
+		g_set_error (&info->err, TNY_FOLDER_ERROR, 
+				TNY_FOLDER_ERROR_TRANSFER_MSGS,
+			"Can't load folder %s or %s\n", 
+			priv_src->folder_name?priv_src->folder_name:"(null)",
+			priv_dst->folder_name?priv_dst->folder_name:"(null)");
+	}
 
 	info->mutex = g_mutex_new ();
 	info->condition = g_cond_new ();
