@@ -3491,12 +3491,13 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 
 	iter = tny_list_create_iterator (headers);
 	list_length = tny_list_get_length (headers);
-	uids = g_ptr_array_sized_new (list_length);
 
 	if (list_length < 1) {
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 		return;
 	}
+
+	uids = g_ptr_array_sized_new (list_length);
 
 	/* Get privates */
 	priv_src = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_src);
