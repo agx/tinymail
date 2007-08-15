@@ -150,7 +150,10 @@ int main(int argc, char *argv[])
 		G_CALLBACK (on_window_delete_event), NULL);
 	g_signal_connect (G_OBJECT (window), "destroy",
 		G_CALLBACK (on_window_destroy), NULL);
-	gtk_widget_show  (window);    
+	gtk_widget_show  (window);   
+
+ 	use_conic();	
+
 	gtk_main ();
     
 	return 0;
