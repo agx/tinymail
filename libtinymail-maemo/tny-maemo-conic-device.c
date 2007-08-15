@@ -351,8 +351,10 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 
 	g_return_val_if_fail (priv->cnx, FALSE);
 
+#ifdef DEBUG
 	g_message (__FUNCTION__);
 	g_message ("connecting to %s", iap_id ? iap_id : "<any>");
+#endif
 
 	priv->loop = g_main_loop_new(NULL, FALSE /* not running immediately. */);
 
@@ -414,8 +416,10 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, FALSE);
 
+#ifdef DEBUG
 	g_message (__FUNCTION__);
 	g_message ("disconnecting from %s", iap_id ? iap_id : "<any>");
+#endif
 
 	if (iap_id) {
 		if (!con_ic_connection_disconnect_by_id (priv->cnx, iap_id)) {
@@ -664,9 +668,11 @@ tny_maemo_conic_device_force_online (TnyDevice *device)
 	
 	already_online = tny_maemo_conic_device_is_online (device);
 
+#ifdef DEBUG
 	g_message (__FUNCTION__);
 	g_message ("force online, current status is: %s", already_online ? "online" : "offline");
-	
+#endif
+
 	priv->forced = TRUE;
 
 	/* Signal if it changed: */
