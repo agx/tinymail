@@ -34,6 +34,21 @@
 
 #ifdef MAEMO_CONIC_DUMMY
 
+
+static gboolean
+dnsmasq_has_resolv (void)
+{
+	/* This is because silly Conic does not have a blocking API that tells
+	 * us immediately when the device is online. */
+
+	if (!g_file_test ("/var/run/resolv.conf", G_FILE_TEST_EXISTS))
+		if (!g_file_test ("/tmp/resolv.conf.wlan0", G_FILE_TEST_EXISTS))
+			if (!g_file_test ("/tmp/resolv.conf.ppp0", G_FILE_TEST_EXISTS))
+				return FALSE;
+
+	return TRUE;
+}
+
 /* #include "coniciap-private.h"
  * This is not installed, so we predeclare the struct instead. Of course, this 
  * is a hack and could break if the private API changes. It would be better for 
@@ -122,9 +137,15 @@ conic_emit_status (TnyDevice *self, gboolean status)
 	{
 		/* Emit it in an idle handler: */
 		EmitStatusInfo *info = g_slice_new (EmitStatusInfo);
+		guint time = 1;
+
 		info->self = g_object_ref (self);
 		info->status = status;
-		g_timeout_add_full (G_PRIORITY_DEFAULT, 5000, conic_emit_status_idle,
+
+		if (!dnsmasq_has_resolv())
+			time = 5000;
+
+		g_timeout_add_full (G_PRIORITY_DEFAULT, time, conic_emit_status_idle,
 			info, conic_emit_status_destroy);
 
 	} else {
@@ -267,7 +288,7 @@ static gboolean
 dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
 	int response = 0;
-	
+
 	/* Show a dialog, because libconic would show a dialog here,
 	 * and give the user a chance to refuse a new connection, because libconic would allow that too.
 	 * This allows us to see roughly similar behaviour in scratchbox as on the device. */
@@ -702,16 +723,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	/* We should not have a real is_online, based on what libconic has told us: */
 	priv->forced = FALSE;
 	priv->iap = NULL;
-	/* priv->is_online = FALSE; */
-
-	/* TODO: This is a hack that fixes a problem: Our signal is not emitted 
-	 * before the gtk mainloop is started, because we use an idle handler 
-	 * for that and we don't know how to detect when the mainloop has not 
-	 * yet started. The downside is that we now don't know that we are really 
-	 * offline, so we can't ask the user to go online. This must be fixed 
-	 * properly. */
-
-	priv->is_online = TRUE; 
+	priv->is_online = dnsmasq_has_resolv ();
 
 
 #ifndef MAEMO_CONIC_DUMMY
