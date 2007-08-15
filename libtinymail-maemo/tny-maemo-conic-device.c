@@ -33,13 +33,12 @@
 #endif
 
 #ifdef MAEMO_CONIC_DUMMY
+
 /* #include "coniciap-private.h"
- * This is not installed, so we predeclare 
- * the struct instead.
- * Of course, this is a hack and could break if the private API 
- * changes.
- * It would be better for libconic to support scratchbox.
- */
+ * This is not installed, so we predeclare the struct instead. Of course, this 
+ * is a hack and could break if the private API changes. It would be better for 
+ * libconic to support scratchbox. */
+
 struct _ConIcIap 
 {
 	GObject parent_instance;
@@ -60,21 +59,18 @@ static GObjectClass *parent_class = NULL;
 
 typedef struct {
 	ConIcConnection *cnx;
-	gboolean        is_online;
-	gchar     *iap;
-	gboolean 	forced; /* Whether the is_online value is forced rather than real. */
-	
+	gboolean is_online;
+	gchar *iap;
+	gboolean forced; /* Whether the is_online value is forced rather than real. */
 	/* When non-NULL, we are waiting for the success or failure signal. */
 	GMainLoop *loop;
-	
-#ifdef MAEMO_CONIC_DUMMY	
+#ifdef MAEMO_CONIC_DUMMY
 	gint dummy_env_check_timeout;
 #endif /* MAEMO_CONIC_DUMMY */
 } TnyMaemoConicDevicePriv;
 
 #define TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_MAEMO_CONIC_DEVICE, TnyMaemoConicDevicePriv))
-
 
 typedef struct {
 	GObject *self;
@@ -88,8 +84,8 @@ conic_emit_status_idle (gpointer user_data)
 
 	/* We lock the gdk thread because tinymail wants implementations to do this 
 	 * before emitting _any_ signals.
-	 * See http://www.tinymail.org/trac/tinymail/wiki/HowTnyLockable
-	 */
+	 * See http://www.tinymail.org/trac/tinymail/wiki/HowTnyLockable */
+
 	gdk_threads_enter ();
 	g_signal_emit (info->self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		0, info->status);
@@ -116,29 +112,28 @@ conic_emit_status (TnyDevice *self, gboolean status)
 	 * (libconic does not give any guarantee 
 	 * about this - it would be nice if libconic documented that).
 	 * But if there is no mainloop, then just emit it, as tinymail 
-	 * requires when there is no mainloop:
-	 */
+	 * requires when there is no mainloop: */
+
 	 /* TODO: We have no way to check for this now, and 
 	  * at this time it's not even clear whether tinymail should/can really 
-	  * demand this. murrayc. 15th Aug. 2007.
-	  */
+	  * demand this. murrayc. 15th Aug. 2007. */
+
 	if (TRUE) /* TODO: But NULL is not allowed here: g_main_loop_is_running (NULL)) */
 	{
 		/* Emit it in an idle handler: */
 		EmitStatusInfo *info = g_slice_new (EmitStatusInfo);
-	
 		info->self = g_object_ref (self);
 		info->status = status;
-	
 		g_idle_add_full (G_PRIORITY_DEFAULT, conic_emit_status_idle,
 			info, conic_emit_status_destroy);
+
 	} else {
 		/* Emit it directly: */
-		
-		/* We lock the gdk thread because tinymail wants implementations to do this 
-		 * before emitting _any_ signals.
-		 * See http://www.tinymail.org/trac/tinymail/wiki/HowTnyLockable
-		 */
+
+		/* We lock the gdk thread because tinymail wants implementations
+		 *  to do this before emitting _any_ signals.
+		 * See http://www.tinymail.org/trac/tinymail/wiki/HowTnyLockable */
+
 		gdk_threads_enter ();
 		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 			0, status);
@@ -154,99 +149,105 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 	TnyMaemoConicDevice *self;
 	TnyMaemoConicDevicePriv *priv;
 	gboolean status_before = FALSE;
-	
+
 	g_return_if_fail (TNY_IS_DEVICE(device));
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 	status_before = tny_maemo_conic_device_is_online (device);
-
 	priv->forced = FALSE;
 
 	if (status_before != tny_maemo_conic_device_is_online (device))
 		conic_emit_status (device, !status_before);
+
+	return;
 }
 
 #ifndef MAEMO_CONIC_DUMMY
 
 static void 
-stop_loop(TnyMaemoConicDevice *self)
+stop_loop (TnyMaemoConicDevice *self)
 {
-	TnyMaemoConicDevicePriv *priv
-		= TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-
-	if (priv->loop) {
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	if (priv->loop)
 		g_main_loop_quit (priv->loop);
-	}
+	return;
 }
 
 static void
 on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer user_data)
 {
-	TnyMaemoConicDevice *device; 
-	TnyMaemoConicDevicePriv *priv;
+	TnyMaemoConicDevice *device = TNY_MAEMO_CONIC_DEVICE (user_data);
+	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
 	gboolean is_online = FALSE;
+	gboolean emit = FALSE;
+
+	/* Don't emit nor make any changes in case of forced state */
+	if (priv->forced)
+		return;
 
 	g_return_if_fail (CON_IC_IS_CONNECTION(cnx));
-	g_return_if_fail (user_data);
 
-	device = TNY_MAEMO_CONIC_DEVICE(user_data);
-	priv   = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
-
+#ifdef DEBUG
 	g_message (__FUNCTION__);
+#endif
 
-	switch (con_ic_connection_event_get_error(event)) {
-	case CON_IC_CONNECTION_ERROR_NONE:
-		break;
-	case CON_IC_CONNECTION_ERROR_INVALID_IAP:
-		g_warning ("conic: IAP is invalid");
-		break;
-	case CON_IC_CONNECTION_ERROR_CONNECTION_FAILED:
-		g_warning ("conic: connection failed");
-		break;
-	case CON_IC_CONNECTION_ERROR_USER_CANCELED:
-		g_warning ("conic: user cancelled");
-		break;
-	default:
-		g_return_if_reached ();
+	switch (con_ic_connection_event_get_error(event)) 
+	{
+		case CON_IC_CONNECTION_ERROR_NONE:
+			break;
+		case CON_IC_CONNECTION_ERROR_INVALID_IAP:
+			g_warning ("conic: IAP is invalid");
+			break;
+		case CON_IC_CONNECTION_ERROR_CONNECTION_FAILED:
+			g_warning ("conic: connection failed");
+			break;
+		case CON_IC_CONNECTION_ERROR_USER_CANCELED:
+			g_warning ("conic: user cancelled");
+			break;
+		default:
+			g_return_if_reached ();
 	}
-	
-	switch (con_ic_connection_event_get_status(event)) {
-	case CON_IC_STATUS_CONNECTED:
-		priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
-		is_online = TRUE;
-		
-		/* Stop blocking 
-		 * tny_maemo_conic_device_connect(), if we are: */
-		stop_loop (device);
-			
-		/* g_message ("new status: CONNECTED (%s)", priv->iap); */
-		break;
-	case CON_IC_STATUS_DISCONNECTED:
-		priv->iap = NULL;
-		is_online = FALSE;
-		
-		/* Stop blocking 
-		 * tny_maemo_conic_device_connect(), if we are: */
-		stop_loop (device);
-			
-		/* g_message ("new status: DISCONNECTED"); */
-		break;
-	case CON_IC_STATUS_DISCONNECTING:
-		is_online = FALSE;
-		/* g_message ("new status: DISCONNECTING"); */
-		break;
-	default:
-		g_return_if_reached (); 
+
+	switch (con_ic_connection_event_get_status(event)) 
+	{
+		case CON_IC_STATUS_CONNECTED:
+			if (priv->iap)
+				g_free (priv->iap);
+			priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
+			if (!priv->is_online)
+				emit = TRUE;
+			is_online = TRUE;
+			/* Stop blocking tny_maemo_conic_device_connect(), if we are: */
+			stop_loop (device);
+			break;
+
+		case CON_IC_STATUS_DISCONNECTED:
+			priv->iap = NULL;
+			if (priv->is_online)
+				emit = TRUE;
+			is_online = FALSE;
+			/* Stop blocking tny_maemo_conic_device_connect(), if we are: */
+			stop_loop (device);
+			break;
+
+		case CON_IC_STATUS_DISCONNECTING:
+			break;
+		default:
+			g_return_if_reached (); 
 	}
 
 	priv->is_online = is_online;
-	priv->forced = FALSE; /* is_online is now accurate. */
+
+#ifdef DEBUG
 	g_message ("DEBUG: %s: emitting signal CONNECTION_CHANGED: %s", 
 		   __FUNCTION__, is_online ? "online" : "offline");
+#endif
 
-	conic_emit_status (TNY_DEVICE (device), is_online);
+	if (emit)
+		conic_emit_status (TNY_DEVICE (device), is_online);
 
+	return;
 }
 #endif /* MAEMO_CONIC_DUMMY */
 
@@ -283,16 +284,16 @@ dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self, const gchar* i
 		/* Make a connection, by setting a name in our dummy text file,
 		 * which will be read later: */
 		gchar *filename = get_dummy_filename ();
-		
+
 		g_file_set_contents (filename, "debug id0", -1, &error);
 		if(error) {
 			g_warning("%s: error from g_file_set_contents(): %s\n", __FUNCTION__, error->message);
 			g_error_free (error);
 			error = NULL;
 		}
-		
+
 		g_free (filename);
-		
+
 		return TRUE;
 	}
 	else
@@ -318,9 +319,9 @@ dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self, const gchar* i
 gboolean
 tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 {
-	#ifdef MAEMO_CONIC_DUMMY 
+#ifdef MAEMO_CONIC_DUMMY 
 	return dummy_con_ic_connection_connect_by_id (self, iap_id);
-	#else
+#else
 	TnyMaemoConicDevicePriv *priv = NULL;
 	gboolean request_failed = FALSE;
 
@@ -364,7 +365,7 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 	priv->loop = NULL;
 
 	return priv->is_online;
-	#endif /* MAEMO_CONIC_DUMMY */
+#endif /* MAEMO_CONIC_DUMMY */
 }
 
 
@@ -412,7 +413,6 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 
 
 #ifdef MAEMO_CONIC_DUMMY
-
 static gboolean
 on_dummy_connection_check (gpointer user_data)
 {
@@ -497,12 +497,12 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
-	#ifdef MAEMO_CONIC_DUMMY
+#ifdef MAEMO_CONIC_DUMMY
 	on_dummy_connection_check (self);
 	/* Handle the special "none" text: */
 	if (priv->iap && (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0))
 		return NULL;
-	#endif
+#endif
 
 	return priv->iap;
 }
@@ -524,23 +524,23 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 ConIcIap*
 tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 {
-	#ifdef MAEMO_CONIC_DUMMY
+#ifdef MAEMO_CONIC_DUMMY
 	ConIcIap *iap = NULL;
-	#else
+#else
 	TnyMaemoConicDevicePriv *priv = NULL;
-	#endif
-	
+#endif
+
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (iap_id, NULL);
 
-	#ifdef MAEMO_CONIC_DUMMY 
+#ifdef MAEMO_CONIC_DUMMY 
 	/* Note that we have re-declared the private struct so that we 
 	 * can do this, which is very bad and fragile: */
- 	iap = g_object_new (CON_IC_TYPE_IAP, NULL);
- 	iap->id = g_strdup(iap_id);
- 	iap->name = g_strdup_printf("%s name", iap->id);
- 	return iap;
-	#else
+	iap = g_object_new (CON_IC_TYPE_IAP, NULL);
+	iap->id = g_strdup(iap_id);
+	iap->name = g_strdup_printf("%s name", iap->id);
+	return iap;
+#else
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
@@ -550,7 +550,7 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 	 * If we just unref immediately then libconic might destroy the object.
 	 */
 	return con_ic_connection_get_iap (priv->cnx, iap_id);
-	#endif
+#endif
 }
 
 
@@ -577,30 +577,31 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 
 #ifdef MAEMO_CONIC_DUMMY
+
 	/* libconic does not return a list of connections when running 
 	 * in scratchbox, though it might do this in future when 
 	 * "ethernet support" is implemented.
 	 * So we return a fake list so we can exercise funcationality 
 	 * that uses connections: */
-	 for (i = 0; i < 10; ++i) {
-	 	/* con_ic_iap_new (id) would checkc for a gconf dir and 
-	 	 * fails, though _new() functions should just call g_object_new().
-	 	 *
-	 	gchar *id = g_strdup_printf("debug id%d", i);
-	 	ConIcIap *iap = con_ic_iap_new (id);
-	 	g_free (id);
-	 	*/
-	 	
-	 	/* Note that we have re-declared the private struct so that we 
-	 	 * can do this, which is very bad and fragile: */
-	 	ConIcIap *iap = g_object_new (CON_IC_TYPE_IAP, NULL);
-	 	iap->id = g_strdup_printf("debug id%d", i);
-	 	iap->name = g_strdup_printf("%s name", iap->id);
+	for (i = 0; i < 10; ++i) {
+		/* con_ic_iap_new (id) would checkc for a gconf dir and 
+		 * fails, though _new() functions should just call g_object_new().
+		 *
+		gchar *id = g_strdup_printf("debug id%d", i);
+		ConIcIap *iap = con_ic_iap_new (id);
+		g_free (id);
+		*/
+		
+		/* Note that we have re-declared the private struct so that we 
+		 * can do this, which is very bad and fragile: */
+		ConIcIap *iap = g_object_new (CON_IC_TYPE_IAP, NULL);
+		iap->id = g_strdup_printf("debug id%d", i);
+		iap->name = g_strdup_printf("%s name", iap->id);
 
-	 	result = g_slist_append (result, iap);	
-	 }
-	 
-	 return result;
+		result = g_slist_append (result, iap);	
+	}
+	
+	return result;
 #else
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
@@ -666,15 +667,14 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 
 #ifdef MAEMO_CONIC_DUMMY
 	return;
-#endif /*MAEMO_CONIC_DUMMY*/
-
+#else
 	already_offline = !tny_maemo_conic_device_is_online (device);
-
 	priv->forced = TRUE;
-
 	/* Signal if it changed: */
 	if (!already_offline)
 		conic_emit_status (device, FALSE);
+	return;
+#endif
 }
 
 static gboolean
@@ -682,10 +682,10 @@ tny_maemo_conic_device_is_online (TnyDevice *self)
 {
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
 
-	#ifdef MAEMO_CONIC_DUMMY
+#ifdef MAEMO_CONIC_DUMMY
 	on_dummy_connection_check (self);
-	#endif /* MAEMO_CONIC_DUMMY */
-	
+#endif /* MAEMO_CONIC_DUMMY */
+
 	return TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self)->is_online;
 }
 
@@ -694,59 +694,57 @@ static void
 tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyMaemoConicDevice *self = (TnyMaemoConicDevice *)instance;
-
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+
+	/* We should not have a real is_online, based on what libconic has told us: */
+	priv->forced = FALSE;
 	priv->iap = NULL;
 	/* priv->is_online = FALSE; */
-	
-	/* TODO: This is a hack that fixes a problem
-	 * (Our signal is not emitted before the gtk mainloop is started, 
-	 * because we use an idle handler for that and we don't know how to 
-	 * detect when the mainloop has not yet started.
-	 * The downside is that we now don't know that we are really offline,
-	 * so we can't ask the user to go online.
-	 * This must be fixed properly.
-	 */
+
+	/* TODO: This is a hack that fixes a problem: Our signal is not emitted 
+	 * before the gtk mainloop is started, because we use an idle handler 
+	 * for that and we don't know how to detect when the mainloop has not 
+	 * yet started. The downside is that we now don't know that we are really 
+	 * offline, so we can't ask the user to go online. This must be fixed 
+	 * properly. */
+
 	priv->is_online = TRUE; 
-	
-	#ifndef MAEMO_CONIC_DUMMY
+
+
+#ifndef MAEMO_CONIC_DUMMY
 	priv->cnx = con_ic_connection_new ();
 	if (!priv->cnx) {
 		g_warning ("con_ic_connection_new failed. The TnyMaemoConicDevice will be useless.");
 	}
 
-	/* This might be necessary to make the connection object 
-	 * actually emit the signal, though the documentation says 
-	 * that they should be sent even when this is not set, 
-	 * when we explicitly try to connect. 
-	 * The signal still does not seem to be emitted.
-	 */
+	/* This might be necessary to make the connection object actually emit 
+	 * the signal, though the documentation says that they should be sent 
+	 * even when this is not set, when we explicitly try to connect. The 
+	 * signal still does not seem to be emitted. */
+
 	g_object_set (priv->cnx, "automatic-connection-events", TRUE, NULL);
 
 	g_signal_connect (priv->cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), self);
 	
-	/*
-	 * This will get us in connected state only if there is already a connection.
-	 * thus, this will setup our state correctly when we receive the signals.
-	 */
+	/* This will get us in connected state only if there is already a connection.
+	 * thus, this will setup our state correctly when we receive the signals. */
+
 	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
 		g_warning ("could not send connect dbus message");
 		
-	#endif /* MAEMO_CONIC_DUMMY */
-	
-	/* We should not have a real is_online, based on what libconic has told us: */
-	priv->forced = FALSE;
-	
-	#ifdef MAEMO_CONIC_DUMMY
+#endif /* MAEMO_CONIC_DUMMY */
+
+
+#ifdef MAEMO_CONIC_DUMMY
+
 	/* Allow debuggers to fake a connection change by setting an environment 
-	 * variable, which we check ever 1 second.
-	 * This should match one of the fake iap IDs that we created in 
-	 * tny_maemo_conic_device_get_iap_list().
-	 */
+	 * variable, which we check ever 1 second. This should match one of the 
+	 * fake iap IDs that we created in tny_maemo_conic_device_get_iap_list().*/
+
 	priv->dummy_env_check_timeout = 
 		g_timeout_add (1000, on_dummy_connection_check, self);
-	#endif /* MAEMO_CONIC_DUMMY */
+#endif /* MAEMO_CONIC_DUMMY */
 }
 
 
@@ -766,23 +764,21 @@ static void
 tny_maemo_conic_device_finalize (GObject *obj)
 {
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
-	
-	#ifndef MAEMO_CONIC_DUMMY
+
+#ifndef MAEMO_CONIC_DUMMY
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
 		if (!tny_maemo_conic_device_disconnect (TNY_MAEMO_CONIC_DEVICE(obj),priv->iap))
 			g_warning ("failed to disconnect dbus message");
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
 	}
-	#endif /* MAEMO_CONIC_DUMMY */
-
-	#ifdef MAEMO_CONIC_DUMMY
+#else
 	if (priv->dummy_env_check_timeout) {
 		g_source_remove (priv->dummy_env_check_timeout);
 		priv->dummy_env_check_timeout = 0;
 	}
-	#endif /* MAEMO_CONIC_DUMMY */
-	
+#endif /* MAEMO_CONIC_DUMMY */
+
 	if (priv->iap) {
 		g_free (priv->iap);
 		priv->iap = NULL;

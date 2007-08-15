@@ -1,3 +1,7 @@
+2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Improved the TnyMaemoConicDevice a bit
+
 2007-08-15  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
