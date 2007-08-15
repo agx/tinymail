@@ -660,7 +660,10 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 {
 	TnyMaemoConicDevice *self;
 	TnyMaemoConicDevicePriv *priv;
+#ifndef MAEMO_CONIC_DUMMY
 	gboolean already_offline = FALSE;
+#endif
+
 	g_return_if_fail (TNY_IS_DEVICE(device));
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
