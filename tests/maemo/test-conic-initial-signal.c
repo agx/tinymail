@@ -23,6 +23,22 @@ static gboolean is_online = FALSE;
 
 static GtkWidget *label = NULL, *label2 = NULL;
 
+
+static gboolean on_emitted (gpointer user_data)
+{
+	gboolean onli = (gboolean) user_data;
+	static gboolean first=TRUE;
+	
+	if (first)
+		gtk_label_set_text (GTK_LABEL (label2), onli?"1st online onemi":"1st offline onemi");
+	else
+		gtk_label_set_text (GTK_LABEL (label2), onli?"2e online onemi":"2e offline onemi");
+	
+	first=FALSE;
+	
+	return FALSE;
+}
+
 static void
 on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer user_data)
 {
@@ -51,12 +67,17 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	case CON_IC_STATUS_CONNECTED:
 		printf ("DEBUG: %s: Connected.\n", __FUNCTION__);
 		is_online = TRUE;
-		gtk_label_set_text (GTK_LABEL (label2), "online");
+
+	g_idle_add (on_emitted, (gpointer)is_online);
+	
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
 		printf ("DEBUG: %s: Disconnected.\n", __FUNCTION__);
 		is_online = FALSE;
-		gtk_label_set_text (GTK_LABEL (label2), "offline");
+
+
+	g_idle_add (on_emitted, (gpointer)is_online);
+	
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
 		printf ("DEBUG: %s: new status: DISCONNECTING.\n", __FUNCTION__);
@@ -147,7 +168,7 @@ int main(int argc, char *argv[])
 	gtk_box_pack_start (GTK_BOX (box), GTK_WIDGET (label), FALSE, FALSE, 0);
 	gtk_widget_show (label);
 
-	label2 = gtk_label_new (NULL);
+	label2 = gtk_label_new ("before");
 	gtk_box_pack_start (GTK_BOX (box), GTK_WIDGET (label2), FALSE, FALSE, 0);
 	gtk_widget_show (label2);
 
