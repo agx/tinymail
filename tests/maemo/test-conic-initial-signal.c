@@ -51,12 +51,12 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	case CON_IC_STATUS_CONNECTED:
 		printf ("DEBUG: %s: Connected.\n", __FUNCTION__);
 		is_online = TRUE;
-		gtk_label_set_text (GTK_LABEL (label), "online");
+		//gtk_label_set_text (GTK_LABEL (label), "online");
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
 		printf ("DEBUG: %s: Disconnected.\n", __FUNCTION__);
 		is_online = FALSE;
-		gtk_label_set_text (GTK_LABEL (label), "online");
+		//gtk_label_set_text (GTK_LABEL (label), "offline");
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
 		printf ("DEBUG: %s: new status: DISCONNECTING.\n", __FUNCTION__);
