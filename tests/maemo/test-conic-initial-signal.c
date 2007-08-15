@@ -21,7 +21,7 @@
 static ConIcConnection *cnx = NULL;
 static gboolean is_online = FALSE;
 
-static GtkWidget *label = NULL;
+static GtkWidget *label = NULL, *label2 = NULL;
 
 static void
 on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer user_data)
@@ -51,12 +51,12 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	case CON_IC_STATUS_CONNECTED:
 		printf ("DEBUG: %s: Connected.\n", __FUNCTION__);
 		is_online = TRUE;
-		//gtk_label_set_text (GTK_LABEL (label), "online");
+		gtk_label_set_text (GTK_LABEL (label2), "online");
 		break;
 	case CON_IC_STATUS_DISCONNECTED:
 		printf ("DEBUG: %s: Disconnected.\n", __FUNCTION__);
 		is_online = FALSE;
-		//gtk_label_set_text (GTK_LABEL (label), "offline");
+		gtk_label_set_text (GTK_LABEL (label2), "offline");
 		break;
 	case CON_IC_STATUS_DISCONNECTING:
 		printf ("DEBUG: %s: new status: DISCONNECTING.\n", __FUNCTION__);
@@ -147,6 +147,9 @@ int main(int argc, char *argv[])
 	gtk_box_pack_start (GTK_BOX (box), GTK_WIDGET (label), FALSE, FALSE, 0);
 	gtk_widget_show (label);
 
+	label2 = gtk_label_new (NULL);
+	gtk_box_pack_start (GTK_BOX (box), GTK_WIDGET (label2), FALSE, FALSE, 0);
+	gtk_widget_show (label2);
 
  	g_signal_connect (G_OBJECT (window), "delete_event",
 		G_CALLBACK (on_window_delete_event), NULL);
