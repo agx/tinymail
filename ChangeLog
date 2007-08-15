@@ -1,6 +1,15 @@
 2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improved the TnyMaemoConicDevice a bit
+	* Making TnyMaemoConicDevice wait five seconds before proxing the
+	emission of a connection-change as a Tinymail signal. It seems that
+	there are various states if being "online" for Conic. You are quite
+	early notified of being online: sometimes before the dhcp client
+	managed to fill-in resolv.conf, causing hostname lookup failures as
+	Tinymail as soon as possible tried to go online. With the five seconds
+	delay we are hoping that the device will have setup all right by the
+	time Tinymail attempts to go online. Please monitor this behaviour in
+	future and review carefully.
 
 2007-08-15  Murray Cumming  <murrayc@murrayc.com>
 

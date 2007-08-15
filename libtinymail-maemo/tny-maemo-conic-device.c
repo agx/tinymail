@@ -124,7 +124,7 @@ conic_emit_status (TnyDevice *self, gboolean status)
 		EmitStatusInfo *info = g_slice_new (EmitStatusInfo);
 		info->self = g_object_ref (self);
 		info->status = status;
-		g_idle_add_full (G_PRIORITY_DEFAULT, conic_emit_status_idle,
+		g_timeout_add_full (G_PRIORITY_DEFAULT, 5000, conic_emit_status_idle,
 			info, conic_emit_status_destroy);
 
 	} else {
