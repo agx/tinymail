@@ -697,7 +697,17 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	priv->iap = NULL;
-	priv->is_online = FALSE; 
+	/* priv->is_online = FALSE; */
+	
+	/* TODO: This is a hack that fixes a problem
+	 * (Our signal is not emitted before the gtk mainloop is started, 
+	 * because we use an idle handler for that and we don't know how to 
+	 * detect when the mainloop has not yet started.
+	 * The downside is that we now don't know that we are really offline,
+	 * so we can't ask the user to go online.
+	 * This must be fixed properly.
+	 */
+	priv->is_online = TRUE; 
 	
 	#ifndef MAEMO_CONIC_DUMMY
 	priv->cnx = con_ic_connection_new ();
