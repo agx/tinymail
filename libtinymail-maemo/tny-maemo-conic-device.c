@@ -32,7 +32,6 @@
 #include <gtk/gtkmessagedialog.h>
 #endif
 
-#ifdef MAEMO_CONIC_DUMMY
 
 
 static gboolean
@@ -49,6 +48,7 @@ dnsmasq_has_resolv (void)
 	return TRUE;
 }
 
+#ifdef MAEMO_CONIC_DUMMY
 /* #include "coniciap-private.h"
  * This is not installed, so we predeclare the struct instead. Of course, this 
  * is a hack and could break if the private API changes. It would be better for 
