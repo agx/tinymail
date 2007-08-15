@@ -872,9 +872,6 @@ tny_session_camel_connection_changed (TnyDevice *device, gboolean online, gpoint
 	/* Maybe we can remove this check after Rob is finished with throwing  
 	 * the questions in the GMainLoop. I'm leaving it here for now ... */
 
-	if (priv->in_auth_function)
-		return;
-
 	info = g_slice_new (ConChangedForEachInfo);
 
 	info->online = online;
