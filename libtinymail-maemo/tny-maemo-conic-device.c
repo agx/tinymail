@@ -118,7 +118,11 @@ conic_emit_status (TnyDevice *self, gboolean status)
 	 * But if there is no mainloop, then just emit it, as tinymail 
 	 * requires when there is no mainloop:
 	 */
-	if (g_main_loop_is_running (NULL))
+	 /* TODO: We have no way to check for this now, and 
+	  * at this time it's not even clear whether tinymail should/can really 
+	  * demand this. murrayc. 15th Aug. 2007.
+	  */
+	if (TRUE) /* TODO: But NULL is not allowed here: g_main_loop_is_running (NULL)) */
 	{
 		/* Emit it in an idle handler: */
 		EmitStatusInfo *info = g_slice_new (EmitStatusInfo);

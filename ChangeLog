@@ -1,3 +1,10 @@
+2007-08-15  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c: (conic_emit_status):
+	Do not check for a running mainloop, because we know of no working 
+	way to do this, and it causes hangs if we never use the idle handler.
+	See the comments in the code.
+
 2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Moved the conic tests to a subdirectory
