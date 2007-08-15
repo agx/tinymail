@@ -86,6 +86,10 @@ conic_emit_status_idle (gpointer user_data)
 {
 	EmitStatusInfo *info = (EmitStatusInfo *) user_data;
 
+	/* We lock the gdk thread because tinymail wants implementations to do this 
+	 * before emitting _any_ signals.
+	 * See http://www.tinymail.org/trac/tinymail/wiki/HowTnyLockable
+	 */
 	gdk_threads_enter ();
 	g_signal_emit (info->self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		0, info->status);
@@ -106,13 +110,36 @@ conic_emit_status_destroy (gpointer user_data)
 static void 
 conic_emit_status (TnyDevice *self, gboolean status)
 {
-	EmitStatusInfo *info = g_slice_new (EmitStatusInfo);
-
-	info->self = g_object_ref (self);
-	info->status = status;
-
-	g_idle_add_full (G_PRIORITY_DEFAULT, conic_emit_status_idle,
-		info, conic_emit_status_destroy);
+	/* If there is a mainloop (if gtk_main() has been run, for instance),
+	 * then emit the signal via an idle callback, so that it is 
+	 * always emitted in the main context as required by tinymail
+	 * (libconic does not give any guarantee 
+	 * about this - it would be nice if libconic documented that).
+	 * But if there is no mainloop, then just emit it, as tinymail 
+	 * requires when there is no mainloop:
+	 */
+	if (g_main_loop_is_running (NULL))
+	{
+		/* Emit it in an idle handler: */
+		EmitStatusInfo *info = g_slice_new (EmitStatusInfo);
+	
+		info->self = g_object_ref (self);
+		info->status = status;
+	
+		g_idle_add_full (G_PRIORITY_DEFAULT, conic_emit_status_idle,
+			info, conic_emit_status_destroy);
+	} else {
+		/* Emit it directly: */
+		
+		/* We lock the gdk thread because tinymail wants implementations to do this 
+		 * before emitting _any_ signals.
+		 * See http://www.tinymail.org/trac/tinymail/wiki/HowTnyLockable
+		 */
+		gdk_threads_enter ();
+		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
+			0, status);
+		gdk_threads_leave ();
+	}
 
 	return;
 }
@@ -571,8 +598,7 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	 
 	 return result;
 #else
-	priv 
-		= TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
 	return con_ic_connection_get_all_iaps (priv->cnx);

@@ -1,3 +1,12 @@
+2007-08-15  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(conic_emit_status_idle), (conic_emit_status):
+	If no mainloop is running (for instance, before gtk_main_run()), 
+	just emit without using g_idle_add(). Hopefully this will cause the signal 
+	to be emitted early enough - when tinymail needs is_online() to be correct. 
+	See the comments to see why this is OK for tinymail.
+
 2007-08-14  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
