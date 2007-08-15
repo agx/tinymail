@@ -141,7 +141,9 @@ int main(int argc, char *argv[])
 	g_signal_connect (G_OBJECT (button), "clicked",
 		      G_CALLBACK (on_button_clicked), NULL);
 
-	label = gtk_label_new (NULL);
+ 	use_conic();
+	
+	label = gtk_label_new (is_online?"initial online":"initial offline");
 	gtk_box_pack_start (GTK_BOX (box), GTK_WIDGET (label), FALSE, FALSE, 0);
 	gtk_widget_show (label);
 
@@ -152,7 +154,6 @@ int main(int argc, char *argv[])
 		G_CALLBACK (on_window_destroy), NULL);
 	gtk_widget_show  (window);   
 
- 	use_conic();	
 
 	gtk_main ();
     
