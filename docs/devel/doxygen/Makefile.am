@@ -10,5 +10,7 @@ clean:
 	rm -rf out/libtinymailui-gtk libtinymailui-gtk
 	rm -rf out/libtinymail-camel libtinymail-camel
 
+EXTRA_DIST=Makefile.in
+
 distclean: clean
-	rm -rf Makefile Makefile.in
+	rm -rf Makefile
