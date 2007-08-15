@@ -137,7 +137,7 @@ conic_emit_status (TnyDevice *self, gboolean status)
 	{
 		/* Emit it in an idle handler: */
 		EmitStatusInfo *info = g_slice_new (EmitStatusInfo);
-		guint time = 1;
+		guint time = 5000;
 
 		info->self = g_object_ref (self);
 		info->status = status;
