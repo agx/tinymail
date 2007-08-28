@@ -69,6 +69,7 @@ tny_error_get_type (void)
       { TNY_ERROR_UNSPEC, "TNY_ERROR_UNSPEC", "error_unspec" },
       { TNY_FOLDER_ERROR_SYNC, "TNY_FOLDER_ERROR_SYNC", "folder_error_sync" },
       { TNY_FOLDER_ERROR_REMOVE_MSG, "TNY_FOLDER_ERROR_REMOVE_MSG", "folder_error_remove_msg" },
+      { TNY_FOLDER_ERROR_REMOVE_MSGS, "TNY_FOLDER_ERROR_REMOVE_MSGS", "folder_error_remove_msgs" },
       { TNY_FOLDER_ERROR_ADD_MSG, "TNY_FOLDER_ERROR_ADD_MSG", "folder_error_add_msg" },
       { TNY_FOLDER_ERROR_REFRESH, "TNY_FOLDER_ERROR_REFRESH", "folder_error_refresh" },
       { TNY_FOLDER_ERROR_GET_MSG, "TNY_FOLDER_ERROR_GET_MSG", "folder_error_get_msg" },

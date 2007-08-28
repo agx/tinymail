@@ -127,6 +127,7 @@ enum _TnyError
 
 	TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT = 18,
 
+	TNY_FOLDER_ERROR_REMOVE_MSGS = 19,
 };
 
 GType tny_error_domain_get_type (void);

@@ -1102,6 +1102,76 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 	return;
 }
 
+static void 
+tny_camel_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_msgs_func (self, headers, err);
+	return;
+}
+
+static void 
+tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError **err)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyFolderChange *change = NULL;
+	TnyIterator *iter = NULL;
+	TnyHeader *header = NULL;
+
+	g_assert (TNY_IS_LIST (headers));
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
+			priv->account, err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REMOVE_MSGS))
+		return;
+
+	if (!priv->remove_strat) {
+		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+		return;
+	}
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
+		{
+			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+			g_static_rec_mutex_unlock (priv->folder_lock);
+			return;
+		}
+
+	change = tny_folder_change_new (self);
+	iter = tny_list_create_iterator (headers);
+	while (!tny_iterator_is_done (iter)) {
+		header = TNY_HEADER(tny_iterator_get_current (iter));
+		g_assert(TNY_IS_HEADER(header));
+
+		/* Performs remove */
+		tny_msg_remove_strategy_perform_remove (priv->remove_strat, self, header, err);
+
+		/* Add expunged headers to change event */
+		tny_folder_change_add_expunged_header (change, header);
+
+		g_object_unref (header);
+		tny_iterator_next (iter);
+	}
+
+	/* Notify about unread count */
+	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
+
+	/* Notify header has been removed */
+	notify_folder_observers_about_in_idle (self, change);
+
+	/* Free */
+	g_object_unref (change);
+	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
+
+	return;
+}
+
 
 CamelFolder*
 _tny_camel_folder_get_camel_folder (TnyCamelFolder *self)
@@ -5285,6 +5355,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->refresh_async_func = tny_camel_folder_refresh_async;
 	klass->refresh_func = tny_camel_folder_refresh;
 	klass->remove_msg_func = tny_camel_folder_remove_msg;
+	klass->remove_msgs_func = tny_camel_folder_remove_msgs;
 	klass->sync_func = tny_camel_folder_sync;
 	klass->sync_async_func = tny_camel_folder_sync_async;
 	klass->add_msg_func = tny_camel_folder_add_msg;
@@ -5348,6 +5419,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->refresh_async_func = tny_camel_folder_refresh_async_default;
 	class->refresh_func = tny_camel_folder_refresh_default;
 	class->remove_msg_func = tny_camel_folder_remove_msg_default;
+	class->remove_msgs_func = tny_camel_folder_remove_msgs_default;
 	class->add_msg_func = tny_camel_folder_add_msg_default;
 	class->sync_func = tny_camel_folder_sync_default;
 	class->sync_async_func = tny_camel_folder_sync_async_default;

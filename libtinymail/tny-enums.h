@@ -96,6 +96,8 @@ typedef enum {
 	TNY_SEND_QUEUE_ERROR_ADD = 17,
 
 	TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT = 18,
+
+	TNY_FOLDER_ERROR_REMOVE_MSGS = 19,
 } TnyError;
 
 typedef enum  {

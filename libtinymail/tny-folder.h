@@ -89,6 +89,7 @@ struct _TnyFolderIface
 	
 	/* Methods */
 	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*remove_msgs_func) (TnyFolder *self, TnyList *headers, GError **err);
 	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
 	void (*add_msg_async_func) (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*sync_func) (TnyFolder *self, gboolean expunge, GError **err);
@@ -133,6 +134,7 @@ void tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *
 TnyMsgReceiveStrategy* tny_folder_get_msg_receive_strategy (TnyFolder *self);
 void tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st);
 void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err);
+void tny_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err);
 void tny_folder_remove_msg_async (TnyFolder *self, TnyHeader *header, GError **err);
 void tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err);
 void tny_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);

@@ -1,3 +1,9 @@
+2007-08-28  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+
+	* Added a new API function in TnyFolder class: tny_folder_remove_msgs. 
+  	This function allows to remove several messages in a single camel operation, 
+	avoiding to call excesive times to folder observer notification. 
+
 2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Reading dnsmasq's resolv.conf files to know whether or not we are

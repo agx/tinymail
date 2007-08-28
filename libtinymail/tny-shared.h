@@ -123,6 +123,7 @@ typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean cancelled, 
 typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
 typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError *err, gpointer user_data);
 typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
+typedef void (*TnySendQueueAddCallback) (TnySendQueue *self, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
 
 G_END_DECLS
 

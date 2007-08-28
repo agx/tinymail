@@ -54,6 +54,7 @@ struct _TnyCamelFolderClass
 
 	/* virtual methods */
 	void (*remove_msg_func) (TnyFolder *self, TnyHeader *header, GError **err);
+	void (*remove_msgs_func) (TnyFolder *self, TnyList *headers, GError **err);
 	void (*add_msg_func) (TnyFolder *self, TnyMsg *msg, GError **err);
 	void (*add_msg_async_func) (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*sync_func) (TnyFolder *self, gboolean expunge, GError **err);
