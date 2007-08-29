@@ -2034,13 +2034,17 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
 		else if (strchr (prio, '1') != NULL)
 			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
+		else if (strchr (prio, '2') != NULL)
+			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
 		else if (strcasestr (prio, "normal") != NULL)
 			mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;
-		else if (strchr (prio, '2') != NULL)
+		else if (strchr (prio, '3') != NULL)
 			mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;
 		else if (strcasestr (prio, "low") != NULL)
 			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
-		else if (strchr (prio, '3') != NULL)
+		else if (strchr (prio, '4') != NULL)
+			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
+		else if (strchr (prio, '5') != NULL)
 			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
 	} else 
 		mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;

@@ -1,3 +1,8 @@
+2007-08-29 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* Set the correct X-Priority: header values, and parse the correct
+	  as well (1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest))
+
 2007-08-28  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
 	* Added a new API function in TnyFolder class: tny_folder_remove_msgs. 

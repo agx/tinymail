@@ -232,11 +232,11 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 		break;
 	case TNY_HEADER_FLAG_LOW_PRIORITY:
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "Low");
-		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "3");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "5");
 		break;
 	case TNY_HEADER_FLAG_NORMAL_PRIORITY:
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "Normal");
-		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "2");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "3");
 		break;
 	};
 
