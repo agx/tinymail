@@ -28,6 +28,7 @@
 #include <gdk/gdk.h> /* For GDK_THREAD_ENTER/LEAVE */
 #include <string.h> /* For strcmp() */
 
+
 #ifdef MAEMO_CONIC_DUMMY 
 #include <gtk/gtkmessagedialog.h>
 #endif
@@ -426,11 +427,11 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 			g_warning ("could not send disconnect_by_id dbus message");
 			return FALSE;
 		}
-	} else
-		if (!con_ic_connection_disconnect (priv->cnx)) {
-			g_warning ("could not send disconnect dbus message");
-			return FALSE;
-		}
+	} else {
+		/* don't try to disconnect if iap_id==NULL, or conic will crash... */
+		g_warning ("could not send disconnect dbus message");
+		return FALSE;
+	}
 #endif /* MAEMO_CONIC_DUMMY*/
 
 	return TRUE;

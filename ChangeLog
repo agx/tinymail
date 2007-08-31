@@ -3,6 +3,8 @@
 	* Fix tny_camel_msg_header_date_(sent|received):
 		- don't try to normalize to GMT (camel already does that)
 		- only use Date: for received if not received date is found
+	* don't try to disconnect from conic if the IAP == NULL, as that
+	  causes a segfault
 
 2007-08-29 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
