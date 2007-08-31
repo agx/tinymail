@@ -276,20 +276,22 @@ tny_camel_msg_header_get_date_received (TnyHeader *self)
 	time_t retval = 0;
 	int tzone;
 
-	retval = camel_mime_message_get_date (me->msg, &tzone);
-
+	/* first try _received, if that doesn't work, use the Date: header
+	 * however, Date: is set by the *sender* so will not be totally
+	 * accurate
+	 *
+	 * NOTE: we ignore the timezone, as the camel function already
+	 * returns a UTC-normalized time_t
+	 * */
+	retval = camel_mime_message_get_date_received (me->msg, &tzone);
 	if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-		retval = camel_mime_message_get_date_received (me->msg, &tzone);
+		retval = camel_mime_message_get_date (me->msg, &tzone);
+
+	/* return 0 if we really cannot find a date */
 	if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-	{
-		time (&retval);
-		tzone = 0;
-	}
-
-	retval += (tzone / 100) * 60 * 60;
-	retval += (tzone % 100) * 60;
-
-	return retval;
+		return 0;
+	else
+		return retval;
 }
 
 static time_t
@@ -299,20 +301,21 @@ tny_camel_msg_header_get_date_sent (TnyHeader *self)
 	time_t retval = 0;
 	int tzone;
 
+	/* first try _date, if that doesn't work, use received instead
+	 * however, that is set by the *receiver* so will not be totally
+	 * accurate
+	 *
+	 * NOTE: we ignore the timezone, as the camel function already
+	 * returns a UTC-normalized time_t
+	 * */
 	retval = camel_mime_message_get_date (me->msg, &tzone);
 
 	if (retval == CAMEL_MESSAGE_DATE_CURRENT)
 		retval = camel_mime_message_get_date_received (me->msg, &tzone);
 	if (retval == CAMEL_MESSAGE_DATE_CURRENT)
-	{
-		time (&retval);
-		tzone = 0;
-	}
-
-	retval += (tzone / 100) * 60 * 60;
-	retval += (tzone % 100) * 60;
-
-	return retval;
+		return 0;
+	else
+		return retval;
 }
 
 static const gchar*

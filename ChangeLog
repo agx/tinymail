@@ -1,3 +1,9 @@
+2007-08-31 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+	
+	* Fix tny_camel_msg_header_date_(sent|received):
+		- don't try to normalize to GMT (camel already does that)
+		- only use Date: for received if not received date is found
+
 2007-08-29 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* Set the correct X-Priority: header values, and parse the correct
