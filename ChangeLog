@@ -1,3 +1,10 @@
+2007-08-29  Armin Burgmeier  <armin@openismus.com>
+
+	* libtinymail-camel/tny-camel-account.c
+	(tny_camel_account_get_supported_secure_authentication_async_thread):
+	Call the prepare_func vfunc before asking camel to ask the server for
+	auth types so priv->service is set.
+
 2007-08-31 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	
 	* Fix tny_camel_msg_header_date_(sent|received):

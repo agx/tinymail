@@ -1779,6 +1779,9 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 		TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH, 0, 1,
 		"Get secure authentication methods");
 
+	/* Prepare, so service is set for query_auth_types */
+	TNY_CAMEL_ACCOUNT_GET_CLASS(self)->prepare_func(self, FALSE, TRUE);
+
 	authtypes = camel_service_query_auth_types (priv->service, &ex);
 	/* Result reference */
 	result = tny_simple_list_new ();
