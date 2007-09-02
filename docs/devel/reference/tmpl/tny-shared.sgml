@@ -46,7 +46,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -132,7 +132,9 @@ Shared include file with forward typedefs
 
 @parent: 
 @remove_msg_func: 
+@remove_msgs_func: 
 @add_msg_func: 
+@add_msg_async_func: 
 @sync_func: 
 @sync_async_func: 
 @get_msg_remove_strategy_func: 
@@ -247,7 +249,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
+@tnyaccount: the object which received the signal.
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -304,8 +306,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnydevice: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -379,98 +381,6 @@ Shared include file with forward typedefs
 @reset_func: 
 @write_to_stream_func: 
 
-<!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
-<para>
-This method happens whenever the password must be requested from the user. You must return the password for #TnyAccount self.
-</para>
-
-@self: The #TnyAccount instance for which the password is needed
-@prompt: A prompt that you can display to the user. This is a human-readable password question, possibly 
-containing an untranslated error message directly from the server. This should be ignored by most 
-implementations, so NULL is an acceptable value.
-@cancel: A by-ref boolean for if the user wants to cancel the connection request
-@Returns: Return the password for #TnyAccount self entered by the user.
-
-
-<!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
-<para>
-This method happens in case the password was wrong. Also take a look at tny_account_set_forget_pass_func
-</para>
-
-@self: the #TnyAccount instance of which the password was wrong
-
-
-<!-- ##### USER_FUNCTION TnyRefreshFolderCallback ##### -->
-<para>
-A method that gets called after tny_folder_refresh_async is finished
-refreshing the folder, in case there was an error or in case the 
-refreshing of the folder got cancelled.
-</para>
-
-@self: the #TnyFolder instance that got refreshed
-@cancelled: whether or not the operation got cancelled
-@err: in case there was an error, this !GError instance is not NULL
-@user_data: user data passed at the caller
-
-
-<!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
-<para>
-
-</para>
-
-@self: 
-@cancelled: 
-@headers: 
-@err: 
-@user_data: 
-
-
-<!-- ##### USER_FUNCTION TnyGetMsgCallback ##### -->
-<para>
-A method that gets called after tny_folder_get_msg_async is finished
-getting the message or in case there was an error.
-</para>
-
-@folder: the #TnyFolder instance from which the message was requested
-@cancelled: 
-@msg: the #TnyMsg instance that was requested
-@err: in case there was an error, this !GError instance is not NULL
-@user_data: user data passed at the caller
-
-
-<!-- ##### USER_FUNCTION TnySyncFolderCallback ##### -->
-<para>
-
-</para>
-
-@folder: 
-@cancelled: 
-@err: 
-@user_data: 
-
-
-<!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
-<para>
-A method that gets called after tny_folder_transfer_msgs_async is finished
-transferring the messages.
-</para>
-
-@folder: the #TnyFolder instance from which the messages where transferred
-@cancelled: 
-@err: in case there was an error, this !GError instance is not NULL
-@user_data: user data passed at the caller
-
-
-<!-- ##### USER_FUNCTION TnyStatusCallback ##### -->
-<para>
-A method that gets called whenever there's a status event
-</para>
-
-@self: The sender of the status
-@status: a #TnyStatus object
-@user_data: user data passed by the caller
-
-
 <!-- ##### STRUCT TnySimpleList ##### -->
 <para>
 
@@ -542,31 +452,6 @@ A method that gets called whenever there's a status event
 
 @parent: 
 
-<!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
-<para>
-A method that happens after tny_folder_store_get_folders_async is finished
-</para>
-
-@self: the #TnyFolderStore from which the child folders where requested
-@cancelled: 
-@list: a #TnyList with #TnyFolder instances (the requested children of @self)
-@err: in case there was an error, this !GError instance is not NULL
-@user_data: user data passed at the caller
-
-
-<!-- ##### USER_FUNCTION TnyCopyFolderCallback ##### -->
-<para>
-
-</para>
-
-@self: 
-@cancelled: 
-@into: 
-@new_folder: 
-@err: 
-@user_data: 
-
-
 <!-- ##### STRUCT TnyMsgRemoveStrategy ##### -->
 <para>
 
@@ -592,32 +477,32 @@ A method that happens after tny_folder_store_get_folders_async is finished
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -801,4 +686,120 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @parent: 
+
+<!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
+<para>
+This method happens whenever the password must be requested from the user. You must return the password for #TnyAccount self.
+</para>
+
+@self: The #TnyAccount instance for which the password is needed
+@prompt: A prompt that you can display to the user. This is a human-readable password question, possibly 
+containing an untranslated error message directly from the server. This should be ignored by most 
+implementations, so NULL is an acceptable value.
+@cancel: A by-ref boolean for if the user wants to cancel the connection request
+@Returns: Return the password for #TnyAccount self entered by the user.
+
+
+<!-- ##### USER_FUNCTION TnyForgetPassFunc ##### -->
+<para>
+This method happens in case the password was wrong. Also take a look at tny_account_set_forget_pass_func
+</para>
+
+@self: the #TnyAccount instance of which the password was wrong
+
+
+<!-- ##### USER_FUNCTION TnyFolderCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@err: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyGetHeadersCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@headers: 
+@err: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyGetMsgCallback ##### -->
+<para>
+A method that gets called after tny_folder_get_msg_async is finished
+getting the message or in case there was an error.
+</para>
+
+@folder: the #TnyFolder instance from which the message was requested
+@cancelled: 
+@msg: the #TnyMsg instance that was requested
+@err: in case there was an error, this !GError instance is not NULL
+@user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
+<para>
+A method that gets called after tny_folder_transfer_msgs_async is finished
+transferring the messages.
+</para>
+
+@folder: the #TnyFolder instance from which the messages where transferred
+@cancelled: 
+@err: in case there was an error, this !GError instance is not NULL
+@user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnyStatusCallback ##### -->
+<para>
+A method that gets called whenever there's a status event
+</para>
+
+@self: The sender of the status
+@status: a #TnyStatus object
+@user_data: user data passed by the caller
+
+
+<!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
+<para>
+A method that happens after tny_folder_store_get_folders_async is finished
+</para>
+
+@self: the #TnyFolderStore from which the child folders where requested
+@cancelled: 
+@list: a #TnyList with #TnyFolder instances (the requested children of @self)
+@err: in case there was an error, this !GError instance is not NULL
+@user_data: user data passed at the caller
+
+
+<!-- ##### USER_FUNCTION TnyCopyFolderCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@into: 
+@new_folder: 
+@err: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnySendQueueAddCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@msg: 
+@err: 
+@user_data: 
+
 

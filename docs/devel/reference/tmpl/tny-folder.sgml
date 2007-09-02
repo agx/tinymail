@@ -30,7 +30,9 @@ A abstract type that defines a folder
 
 @parent: 
 @remove_msg_func: 
+@remove_msgs_func: 
 @add_msg_func: 
+@add_msg_async_func: 
 @sync_func: 
 @sync_async_func: 
 @get_msg_remove_strategy_func: 
@@ -139,6 +141,26 @@ A abstract type that defines a folder
 @err: 
 
 
+<!-- ##### FUNCTION tny_folder_remove_msgs ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+@err: 
+
+
+<!-- ##### FUNCTION tny_folder_remove_msg_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@err: 
+
+
 <!-- ##### FUNCTION tny_folder_add_msg ##### -->
 <para>
 
@@ -147,6 +169,18 @@ A abstract type that defines a folder
 @self: 
 @msg: 
 @err: 
+
+
+<!-- ##### FUNCTION tny_folder_add_msg_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 
 <!-- ##### FUNCTION tny_folder_sync ##### -->
