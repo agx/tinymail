@@ -1359,6 +1359,70 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 }
 
 /**
+ * tny_merge_folder_remove_folder:
+ * @self: a #TnyMergeFolder object
+ * @folder: a #TnyFolder object 
+ *
+ * Removes @folder from the list of folders that will be merged by
+ * @self.
+ **/
+void 
+tny_merge_folder_remove_folder (TnyMergeFolder *self, TnyFolder *folder)
+{
+	TnyMergeFolderPriv *priv;
+
+	g_return_if_fail (TNY_IS_MERGE_FOLDER (self));
+	g_return_if_fail (TNY_IS_FOLDER (folder));
+
+	priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	
+	g_static_rec_mutex_lock (priv->lock);
+
+	tny_folder_remove_observer (folder, TNY_FOLDER_OBSERVER (self));
+
+	tny_list_remove (priv->mothers, G_OBJECT (folder));
+
+	g_static_rec_mutex_unlock (priv->lock);
+
+	return;
+}
+
+/**
+ * tny_merge_folder_get_folders:
+ * @self: a #TnyMergeFolder object
+ * @list: a #TnyList to fillup
+ *
+ * Returns the folders that are merged in the @self merge folder.
+ **/
+void 
+tny_merge_folder_get_folders (TnyMergeFolder *self, TnyList *list)
+{
+	TnyMergeFolderPriv *priv;
+	TnyIterator *iter;
+
+	g_return_if_fail (TNY_IS_MERGE_FOLDER (self));
+	g_return_if_fail (TNY_IS_LIST (list));
+
+	priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
+	
+	g_static_rec_mutex_lock (priv->lock);
+
+	iter = tny_list_create_iterator (priv->mothers);
+	while (!tny_iterator_is_done (iter)) {
+		GObject *folder;
+
+		folder = tny_iterator_get_current (iter);
+		tny_list_append (list, folder);
+		g_object_unref (folder);
+
+		tny_iterator_next (iter);
+	}
+	g_object_unref (iter);
+
+	g_static_rec_mutex_unlock (priv->lock);
+}
+
+/**
  * tny_merge_folder_new:
  * @folder_name: the name of the merged folder
  *

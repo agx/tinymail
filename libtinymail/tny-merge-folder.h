@@ -58,7 +58,9 @@ GType tny_merge_folder_get_type (void);
 
 TnyFolder* tny_merge_folder_new (const gchar *folder_name);
 void tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder);
+void tny_merge_folder_remove_folder (TnyMergeFolder *self, TnyFolder *folder);
 void tny_merge_folder_set_folder_type (TnyMergeFolder *self, TnyFolderType folder_type);
+void tny_merge_folder_get_folders (TnyMergeFolder *self, TnyList *list);
 
 G_END_DECLS
 

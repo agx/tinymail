@@ -1,3 +1,11 @@
+2007-09-03  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail/tny-merge-folder.[ch]: added two new functions
+	tny_merge_folder_remove_folder
+	tny_merge_folder_get_folders
+
+	This is a major API change
+
 2007-08-29  Armin Burgmeier  <armin@openismus.com>
 
 	* libtinymail-camel/tny-camel-account.c
