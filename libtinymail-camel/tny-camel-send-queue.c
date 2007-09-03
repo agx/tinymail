@@ -587,7 +587,7 @@ tny_camel_send_queue_add_async (TnyCamelSendQueue *self, TnyMsg *msg, TnySendQue
 
 
 static void
-tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_camel_send_queue_add_async_default (TnyCamelSendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	GError *err = NULL;
@@ -600,7 +600,7 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 		TnyList *headers = tny_simple_list_new ();
 		OnAddedInfo *info = NULL;
 
-		outbox = tny_send_queue_get_outbox (self);
+		outbox = tny_send_queue_get_outbox (TNY_SEND_QUEUE (self));
 
 		if (!outbox || !TNY_IS_FOLDER (outbox))
 		{

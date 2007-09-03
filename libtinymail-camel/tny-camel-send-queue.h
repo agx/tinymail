@@ -50,10 +50,11 @@ struct _TnyCamelSendQueueClass
 
 	/* virtual methods */
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);
-	void (*add_async_func) (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
 	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
 	void (*cancel_func) (TnySendQueue *self, gboolean remove, GError **err);
+
+	void (*add_async_func) (TnyCamelSendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 };
 
 GType tny_camel_send_queue_get_type (void);
