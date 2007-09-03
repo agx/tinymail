@@ -126,19 +126,8 @@ emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, i
 static void
 emit_error_on_added (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, int i, int total)
 {
-	ErrorInfo *info = g_slice_new0 (ErrorInfo);
-	if (error != NULL)
-		info->error = g_error_copy ((const GError *) error);
-	if (self)
-		info->self = TNY_SEND_QUEUE (g_object_ref (self));
-	if (msg)
-		info->msg = TNY_MSG (g_object_ref (msg));
-	if (header)
-		info->header = TNY_HEADER (g_object_ref (header));
-	info->i = i;
-	info->total = total;
-	emit_error_on_mainloop (info);
-	destroy_error_info (info);
+	g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
+				0, header, msg, error);
 }
 
 static gboolean 
