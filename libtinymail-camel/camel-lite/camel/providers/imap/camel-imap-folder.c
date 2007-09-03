@@ -2887,6 +2887,13 @@ message_from_data (CamelFolder *folder, GData *data)
 		((CamelMessageInfoBase *)mi)->flags |= CAMEL_MESSAGE_ATTACHMENTS;
 	/* ... it does */
 
+	/* This overrides Received: (although it wont be found by the messages
+	 * fed to message_info_new_from_header, as this header is not in the
+	 * query. Leaving them out makes retrieving summary consume a lot less
+	 * bandwidth, of course. The INTERNALDATE seems to be the date when the
+	 * message got written to the store. It's often not the same as the date
+	 * in the "Received" headers. */
+
 	if ((idate = g_datalist_get_data (&data, "INTERNALDATE"))) 
 		mi->info.date_received = decode_internaldate ((const unsigned char *) idate);
 
