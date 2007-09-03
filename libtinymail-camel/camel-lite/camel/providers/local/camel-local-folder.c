@@ -154,11 +154,10 @@ local_finalize(CamelObject * object)
 		folder->summary = NULL;
 	}
 
-	if (local_folder->search && CAMEL_IS_OBJECT (local_folder->search)) {
+	if (local_folder->search)
 		camel_object_unref((CamelObject *)local_folder->search);
-	}
 
-	if (local_folder->index && CAMEL_IS_OBJECT (local_folder->index))
+	if (local_folder->index)
 		camel_object_unref((CamelObject *)local_folder->index);
 
 	while (local_folder->locked> 0)
@@ -170,9 +169,9 @@ local_finalize(CamelObject * object)
 	g_free(local_folder->index_path);
 
 	camel_folder_change_info_free(local_folder->changes);
-	
+
 	g_mutex_free(local_folder->priv->search_lock);
-	
+
 	g_free(local_folder->priv);
 }
 
@@ -278,8 +277,20 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 
 	/* FIXME: Need to run indexing off of the setv method */
 
+	/* TNY: Ignore indexing (for Tinymail) */
+	lf->flags &= ~CAMEL_STORE_FOLDER_BODY_INDEX;
+	/* TNY: Ignore indexing (for Tinymail) */
+	lf->index = NULL;
+
+#if 0
 	/* if we have no/invalid index file, force it */
 	forceindex = camel_text_index_check(lf->index_path) == -1;
+#endif 
+
+	/* TNY: Ignore indexing (for Tinymail) 
+	foceindex = FALSE; */
+
+#if 0
 	if (lf->flags & CAMEL_STORE_FOLDER_BODY_INDEX) {
 		int flag = O_RDWR|O_CREAT;
 
@@ -300,6 +311,8 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 			camel_text_index_remove(lf->index_path);
 		forceindex = FALSE;
 	}
+#endif
+
 
 	folder->summary = (CamelFolderSummary *)CLOCALF_CLASS(lf)->create_summary(lf, lf->summary_path, lf->folder_path, lf->index);
 	if (camel_local_summary_load((CamelLocalSummary *)folder->summary, forceindex, NULL) == -1) {

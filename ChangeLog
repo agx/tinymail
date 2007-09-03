@@ -6,6 +6,7 @@
 	really recognizable anymore so it shouldn't copy the copyright of the
 	original as this is not a copy anymore.
 	* Date, Received, INTERNALDATE: fixes 
+	* Fixed filedescriptor leaks with local folders
 
 2007-09-03  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
