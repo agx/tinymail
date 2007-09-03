@@ -68,6 +68,7 @@ void tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
 						 TnyCamelTransportAccount *trans_account);
 
 void tny_camel_send_queue_join_worker (TnyCamelSendQueue *self);
+void tny_camel_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 
 G_END_DECLS
 

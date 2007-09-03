@@ -902,7 +902,6 @@ tny_camel_folder_add_msg_async_thread (gpointer thr_user_data)
 		tny_camel_folder_add_msg_async_callback, info, 
 		tny_camel_folder_add_msg_async_destroyer);
 
-
 	/* Wait on the queue for the mainloop callback to be finished */
 	g_mutex_lock (info->mutex);
 	if (!info->had_callback)

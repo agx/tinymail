@@ -123,13 +123,6 @@ emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, i
 	return;
 }
 
-static void
-emit_error_on_added (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, int i, int total)
-{
-	g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_ERROR_HAPPENED], 
-				0, header, msg, error);
-}
-
 static gboolean 
 emit_control_signals_on_mainloop (gpointer data)
 {
@@ -512,9 +505,6 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 	if (info->callback)
 		info->callback (info->self, info->cancelled, info->msg, info->user_data, err);
 
-	if (err)
-		emit_error_on_added (info->self, NULL, info->msg, err, priv->total, priv->total+1); 
-
 	priv->total++;
 	if (priv->total >= 1 && !priv->is_running)
 		create_worker (info->self);
@@ -571,6 +561,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		info = g_slice_new (OnAddedInfo);
 		info->msg = TNY_MSG (g_object_ref (msg));
 		info->self = TNY_SEND_QUEUE (g_object_ref (self));
+		info->callback = NULL;
 
 		tny_folder_add_msg_async (outbox, msg, on_added, NULL, info);
 
@@ -582,7 +573,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 }
 
 
-static void
+void
 tny_camel_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_async_func (self, msg, callback, status_callback, user_data);
@@ -631,6 +622,7 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 		g_object_unref (headers);
 
 		info = g_slice_new (OnAddedInfo);
+
 		info->msg = TNY_MSG (g_object_ref (msg));
 		info->self = TNY_SEND_QUEUE (g_object_ref (self));
 		info->callback = callback;
@@ -913,7 +905,6 @@ tny_send_queue_init (gpointer g, gpointer iface_data)
 	TnySendQueueIface *klass = (TnySendQueueIface *)g;
 
 	klass->add_func = tny_camel_send_queue_add;
-	klass->add_async_func = tny_camel_send_queue_add_async;
 	klass->get_outbox_func = tny_camel_send_queue_get_outbox;
 	klass->get_sentbox_func = tny_camel_send_queue_get_sentbox;
 	klass->cancel_func = tny_camel_send_queue_cancel;
