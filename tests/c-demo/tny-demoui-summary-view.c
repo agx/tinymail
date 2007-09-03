@@ -93,7 +93,8 @@ struct _TnyDemouiSummaryViewPriv
  	GtkComboBox *account_view;
 	GtkTreeView *mailbox_view, *header_view;
 	TnyMsgView *msg_view;
-	GtkWidget *status, *progress, *online_button, *poke_button, *sync_button;
+	GtkWidget *status, *progress, *online_button, *poke_button, 
+		  *sync_button, *killacc_button;
 	guint status_id;
 	gulong mailbox_select_sid;
 	GtkTreeSelection *mailbox_select;
@@ -437,6 +438,36 @@ poke_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 
 	g_object_unref (a_iter);
 	g_object_unref (accounts);
+}
+
+
+
+static void 
+killacc_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
+{
+	TnySummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	TnyList *accounts = tny_simple_list_new ();
+	TnyIterator *a_iter;
+
+	tny_account_store_get_accounts (priv->account_store, accounts, 
+		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+
+	a_iter = tny_list_create_iterator (accounts);
+
+	GObject *a_cur = TNY_ACCOUNT (tny_iterator_get_current (a_iter));
+
+	g_object_unref (a_iter);
+	g_object_unref (accounts);
+
+	printf ("%d\n", a_cur->ref_count);
+
+	g_object_unref (a_cur);
+	g_object_unref (a_cur);
+	g_object_unref (a_cur);
+	g_object_unref (a_cur);
+	g_object_unref (a_cur);
+
 }
 
 static void
@@ -1668,6 +1699,8 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->online_button = gtk_toggle_button_new_with_label (GO_ONLINE_TXT);
 	priv->poke_button = gtk_button_new_with_label ("Poke status");
 	priv->sync_button = gtk_button_new_with_label ("Sync");
+	priv->killacc_button = gtk_button_new_with_label ("Kill account");
+
 	priv->current_accounts = NULL;
 
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
@@ -1678,6 +1711,9 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	g_signal_connect (G_OBJECT (priv->sync_button), "clicked", 
 		G_CALLBACK (sync_button_clicked), self);
+
+	g_signal_connect (G_OBJECT (priv->killacc_button), "clicked", 
+		G_CALLBACK (killacc_button_toggled), self);
 
 #if PLATFORM==1
 	platfact = tny_gnome_platform_factory_get_instance ();
@@ -1707,9 +1743,11 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->online_button, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->poke_button, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->sync_button, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (priv->status), priv->killacc_button, FALSE, FALSE, 0);
 
 	gtk_widget_show (priv->online_button);
 	gtk_widget_show (priv->poke_button);
+	gtk_widget_show (priv->killacc_button);
 	gtk_widget_show (priv->sync_button);
 	gtk_widget_show (priv->status);
 	gtk_widget_show (GTK_WIDGET (vbox));

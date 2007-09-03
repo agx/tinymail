@@ -2087,24 +2087,15 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	else 
 		mi->cc = camel_pstring_add (g_strdup (""), TRUE);
 
-	mi->date_sent = camel_header_decode_date(camel_header_raw_find(&h, "date", NULL), &tzone);
-	mi->date_sent += (tzone / 100) * 60 * 60;
-	mi->date_sent += (tzone % 100) * 60;
-
+	mi->date_sent = camel_header_decode_date(camel_header_raw_find(&h, "date", NULL), NULL);
 	received = camel_header_raw_find(&h, "received", NULL);
 
 	if (received)
-		r = strrchr(received, ';');
-	if (r) {
-		mi->date_received = camel_header_decode_date(r + 1, &tzone);
-		mi->date_received += (tzone / 100) * 60 * 60;
-		mi->date_received += (tzone % 100) * 60;
-	} else if (received) {
-		mi->date_received = camel_header_decode_date(received, &tzone);
-		mi->date_received += (tzone / 100) * 60 * 60;
-		mi->date_received += (tzone % 100) * 60;
-	} else 
-		mi->date_received = mi->date_sent;
+		received = strrchr(received, ';');
+	if (received)
+		mi->date_received = camel_header_decode_date(received + 1, NULL);
+	else 
+		mi->date_received = time (&mi->date_received);
 
 	msgid = camel_header_msgid_decode(camel_header_raw_find(&h, "message-id", NULL));
 	if (msgid) 
