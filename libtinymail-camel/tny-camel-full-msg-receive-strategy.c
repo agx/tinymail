@@ -88,9 +88,14 @@ tny_camel_full_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrate
 	{
 		if (camel_message && CAMEL_IS_OBJECT (camel_message))
 		{
-			TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (camel_message), folder);
+			TnyHeader *nheader = NULL;
+
+			nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (camel_message), 
+				folder, tny_header_get_date_received (header));
 
 			message = tny_camel_msg_new ();
+			_tny_camel_msg_set_received (TNY_CAMEL_MSG (message), 
+				tny_header_get_date_received (header));
 			_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), folder);
 			TNY_CAMEL_MSG_HEADER (nheader)->old_uid = g_strdup (tny_header_get_uid (header));
 			_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);

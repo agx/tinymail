@@ -150,12 +150,16 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 			type = camel_mime_part_get_content_type (tpart);
 			if (CAMEL_IS_MIME_MESSAGE (tpart))
 			{
-				TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (tpart), NULL);
+				TnyHeader *nheader = NULL;
 
 				newpart = TNY_MIME_PART (tny_camel_msg_new ());
-				_tny_camel_msg_set_header (TNY_CAMEL_MSG (newpart), nheader);
 				_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (newpart), CAMEL_MIME_PART (tpart));
-				g_object_unref (G_OBJECT (nheader));
+
+				nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (tpart), NULL, 
+					camel_mime_message_get_date_received (CAMEL_MIME_MESSAGE (tpart), NULL));
+				_tny_camel_msg_set_header (TNY_CAMEL_MSG (newpart), nheader);
+
+				g_object_unref (nheader);
 			}
 			else if (camel_content_type_is (type, "message", "rfc822"))
 			{
@@ -163,11 +167,15 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 
 				if (c && CAMEL_IS_MIME_PART (c) && CAMEL_IS_MIME_MESSAGE (c)) 
 				{
-					TnyHeader *nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (c), NULL);
+					TnyHeader *nheader = NULL;
+
 					newpart = TNY_MIME_PART (tny_camel_msg_new ());
-					_tny_camel_msg_set_header (TNY_CAMEL_MSG (newpart), nheader);
 					_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (newpart), CAMEL_MIME_PART (c));
-					g_object_unref (G_OBJECT (nheader));
+					nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (c), NULL, 
+						camel_mime_message_get_date_received (CAMEL_MIME_MESSAGE (c), NULL));
+					_tny_camel_msg_set_header (TNY_CAMEL_MSG (newpart), nheader);
+
+					g_object_unref (nheader);
 				}
 
 			} else {

@@ -276,13 +276,9 @@ tny_camel_msg_header_get_date_received (TnyHeader *self)
 	time_t retval = 0;
 	int tzone;
 
-	/* first try _received, if that doesn't work, use the Date: header
-	 * however, Date: is set by the *sender* so will not be totally
-	 * accurate
-	 *
-	 * NOTE: we ignore the timezone, as the camel function already
-	 * returns a UTC-normalized time_t
-	 * */
+	if (me->has_received)
+		return me->received;
+
 	retval = camel_mime_message_get_date_received (me->msg, &tzone);
 	if (retval == CAMEL_MESSAGE_DATE_CURRENT)
 		retval = camel_mime_message_get_date (me->msg, &tzone);
@@ -290,8 +286,8 @@ tny_camel_msg_header_get_date_received (TnyHeader *self)
 	/* return 0 if we really cannot find a date */
 	if (retval == CAMEL_MESSAGE_DATE_CURRENT)
 		return 0;
-	else
-		return retval;
+
+	return retval;
 }
 
 static time_t
@@ -429,7 +425,7 @@ tny_camel_msg_header_get_folder (TnyHeader *self)
 }
 
 TnyHeader*
-_tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder)
+_tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t received)
 {
 	TnyCamelMsgHeader *self = g_object_new (TNY_TYPE_CAMEL_MSG_HEADER, NULL);
 
@@ -437,9 +433,13 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder)
 		owns this msg. If this ever changes then we need to add a reference here, 
 		and remove it in the finalize. Same for folder. */
 
+	if (received == -1)
+		self->has_received = FALSE;
+	self->received = received;
 	self->old_uid = NULL;
 	self->msg = msg; 
 	self->folder = folder;
+	self->has_received = FALSE;
 
 	return (TnyHeader*) self;
 }

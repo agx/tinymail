@@ -455,19 +455,21 @@ killacc_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 
 	a_iter = tny_list_create_iterator (accounts);
 
-	GObject *a_cur = TNY_ACCOUNT (tny_iterator_get_current (a_iter));
+	GObject *a_cur = tny_iterator_get_current (a_iter);
 
 	g_object_unref (a_iter);
 	g_object_unref (accounts);
 
 	printf ("%d\n", a_cur->ref_count);
 
+	/* This is indeed incorrect, don't use this */
 	g_object_unref (a_cur);
 	g_object_unref (a_cur);
 	g_object_unref (a_cur);
 	g_object_unref (a_cur);
 	g_object_unref (a_cur);
 
+	return;
 }
 
 static void
@@ -1873,8 +1875,8 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 
 	renderer = gtk_cell_renderer_text_new ();
-	column = gtk_tree_view_column_new_with_attributes (_("Date"), renderer,
-		"text", TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN, NULL);
+	column = gtk_tree_view_column_new_with_attributes (_("Date sent"), renderer,
+		"text", TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN);
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
 	gtk_tree_view_column_set_fixed_width (column, 100);

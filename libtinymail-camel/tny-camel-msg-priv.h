@@ -33,10 +33,12 @@ struct _TnyCamelMsgPriv
 	GMutex *folder_lock;
 	TnyFolder *folder;
 	TnyHeader *header;
+	time_t received;
 };
 
 CamelMimeMessage* _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self);
 void _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder *folder);
 void _tny_camel_msg_set_header (TnyCamelMsg *self, TnyHeader *header);
+void _tny_camel_msg_set_received (TnyCamelMsg *self, time_t received);
 
 #endif

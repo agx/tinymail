@@ -84,11 +84,6 @@ static GObjectClass *parent_class = NULL;
 #define TNY_CAMEL_MSG_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_MSG, TnyCamelMsgPriv))
 
-/*
-	new = ppriv->part 
-	camel_medium_add_header (CAMEL_MEDIUM (new), "Disposition-Notification-To", mdn_address);
-	camel_medium_add_header (CAMEL_MEDIUM (new), "X-Priority", "1");
-*/
 
 CamelMimeMessage* 
 _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self)
@@ -120,6 +115,14 @@ tny_camel_msg_get_folder_default (TnyMsg *self)
 	return retval;
 }
 
+
+
+void 
+_tny_camel_msg_set_received (TnyCamelMsg *self, time_t received)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+	priv->received = received;
+}
 
 void
 _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder* folder)
@@ -236,7 +239,7 @@ tny_camel_msg_get_header_default (TnyMsg *self)
 		CamelMimeMessage *msg;
 		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
 		/* Read _tny_camel_msg_header_new too! */
-		priv->header = _tny_camel_msg_header_new (msg, priv->folder);
+		priv->header = _tny_camel_msg_header_new (msg, priv->folder, priv->received);
 		if (priv->folder)
 			((TnyCamelMsgHeader *)priv->header)->folder = priv->folder;
 	}
@@ -386,6 +389,7 @@ tny_camel_msg_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->parts_lock = g_mutex_new ();
 	priv->header_lock = g_mutex_new ();
 	priv->folder_lock = g_mutex_new ();
+	priv->received = -1;
 
 	return;
 }

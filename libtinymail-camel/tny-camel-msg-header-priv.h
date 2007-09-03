@@ -49,6 +49,8 @@ struct _TnyCamelMsgHeader
 	TnyFolder *folder;
 	CamelMimeMessage *msg;
 	gchar *mime_from, *old_uid;
+	gboolean has_received;
+	time_t received;
 };
 
 struct _TnyCamelMsgHeaderClass 
@@ -57,7 +59,7 @@ struct _TnyCamelMsgHeaderClass
 };
 
 GType tny_camel_msg_header_get_type (void);
-TnyHeader* _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder);
+TnyHeader* _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t received);
 
 G_END_DECLS
 
