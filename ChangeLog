@@ -1,3 +1,8 @@
+2007-09-03  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+	* Add a new API function, tny_send_queue_add_async to define
+	user and status callbacks for messages transfer to outbox 
+	folder. 
+
 2007-09-03  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail/tny-merge-folder.[ch]: added two new functions

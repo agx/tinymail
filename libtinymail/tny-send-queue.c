@@ -133,6 +133,29 @@ tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 }
 
 
+/**
+ * tny_send_queue_add_async:
+ * @self: A #TnySendQueue instance
+ * @msg: a #TnyMsg instance
+ * @err: a #GError instance or NULL
+ *
+ * Add a message to the send queue.
+ *
+ **/
+void 
+tny_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_SEND_QUEUE (self));
+	g_assert (msg);
+	g_assert (TNY_IS_MSG (msg));
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->add_async_func != NULL);
+#endif
+
+	TNY_SEND_QUEUE_GET_IFACE (self)->add_async_func (self, msg, callback, status_callback, user_data);
+	return;
+}
+
 
 
 static void

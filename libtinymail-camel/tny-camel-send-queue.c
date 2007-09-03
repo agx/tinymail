@@ -28,6 +28,7 @@
 #include <tny-folder.h>
 #include <tny-error.h>
 
+#include <tny-camel-queue-priv.h>
 #include <tny-camel-folder.h>
 #include <tny-transport-account.h>
 #include <tny-store-account.h>
@@ -63,6 +64,8 @@ typedef struct {
 	gint i, total;
 	guint signal_id;
 } ControlInfo;
+
+
 
 static gboolean 
 emit_error_on_mainloop (gpointer data)
@@ -173,8 +176,8 @@ emit_control (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint signal_i
 	info->total = total;
 
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
-			emit_control_signals_on_mainloop, info, destroy_control_info);
-
+			 emit_control_signals_on_mainloop, info, destroy_control_info);
+	
 	return;
 }
 
@@ -480,7 +483,18 @@ tny_camel_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 typedef struct {
 	TnyMsg *msg;
 	TnySendQueue *self;
+	TnySendQueueAddCallback callback;
+	TnyStatusCallback status_callback;
+	TnyIdleStopper* stopper;
+	gboolean cancelled;
+	guint depth;
+	TnySessionCamel *session;
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+	gpointer user_data;
 } OnAddedInfo;
+
 
 static void
 on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
@@ -488,15 +502,24 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 	OnAddedInfo *info = (OnAddedInfo *) user_data;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
 
-	if (err)
-		emit_error (info->self, NULL, info->msg, err, priv->total, priv->total+1);
+	/* Call user callback after msg has beed added to OUTBOX, waiting to be sent*/
+	if (info->callback) {
+		info->callback (info->self, info->cancelled, info->msg, info->user_data, err);		
+	}
 
+	if (err) {
+		emit_error (info->self, NULL, info->msg, err, priv->total, priv->total+1); 
+	}
+	
 	priv->total++;
 	if (priv->total >= 1 && !priv->is_running)
 		create_worker (info->self);
 
-	g_object_unref (info->self);
-	g_object_unref (info->msg);
+
+	if (info->self)
+		g_object_unref (info->self);
+	if (info->msg)
+		g_object_unref (info->msg);
 	g_slice_free (OnAddedInfo, info);
 
 	return;
@@ -545,6 +568,70 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		info = g_slice_new (OnAddedInfo);
 		info->msg = TNY_MSG (g_object_ref (msg));
 		info->self = TNY_SEND_QUEUE (g_object_ref (self));
+
+		tny_folder_add_msg_async (outbox, msg, on_added, NULL, info);
+
+		g_object_unref (outbox);
+	}
+	g_mutex_unlock (priv->todo_lock);
+
+	return;
+}
+
+
+static void
+tny_camel_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_async_func (self, msg, callback, status_callback, user_data);
+}
+
+
+static void
+tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+	GError *err = NULL;
+
+	g_assert (TNY_IS_CAMEL_MSG (msg));
+
+	g_mutex_lock (priv->todo_lock);
+	{
+		TnyFolder *outbox;
+		TnyList *headers = tny_simple_list_new ();
+		OnAddedInfo *info = NULL;
+
+		outbox = tny_send_queue_get_outbox (self);
+
+		if (!outbox || !TNY_IS_FOLDER (outbox))
+		{
+			g_set_error (&err, TNY_SEND_QUEUE_ERROR, 
+				TNY_SEND_QUEUE_ERROR_ADD,
+				"Operating can't continue: send queue not ready "
+				"because it does not have a valid outbox. "
+				"This problem indicates a bug in the software.");
+			g_object_unref (headers);
+			g_mutex_unlock (priv->todo_lock);
+			return;
+		}
+
+		tny_folder_get_headers (outbox, headers, TRUE, &err);
+
+		if (err!= NULL)
+		{
+			g_object_unref (headers);
+			g_object_unref (outbox);
+			g_mutex_unlock (priv->todo_lock);
+			return;
+		}
+
+		priv->total = tny_list_get_length (headers);
+		g_object_unref (headers);
+
+		info = g_slice_new (OnAddedInfo);
+		info->msg = TNY_MSG (g_object_ref (msg));
+		info->self = TNY_SEND_QUEUE (g_object_ref (self));
+		info->callback = callback;
+		info->user_data = user_data;
 
 		tny_folder_add_msg_async (outbox, msg, on_added, NULL, info);
 
@@ -823,6 +910,7 @@ tny_send_queue_init (gpointer g, gpointer iface_data)
 	TnySendQueueIface *klass = (TnySendQueueIface *)g;
 
 	klass->add_func = tny_camel_send_queue_add;
+	klass->add_async_func = tny_camel_send_queue_add_async;
 	klass->get_outbox_func = tny_camel_send_queue_get_outbox;
 	klass->get_sentbox_func = tny_camel_send_queue_get_sentbox;
 	klass->cancel_func = tny_camel_send_queue_cancel;
@@ -839,6 +927,7 @@ tny_camel_send_queue_class_init (TnyCamelSendQueueClass *class)
 	object_class = (GObjectClass*) class;
 
 	class->add_func = tny_camel_send_queue_add_default;
+	class->add_async_func = tny_camel_send_queue_add_async_default;
 	class->get_outbox_func = tny_camel_send_queue_get_outbox_default;
 	class->get_sentbox_func = tny_camel_send_queue_get_sentbox_default;
 	class->cancel_func = tny_camel_send_queue_cancel_default;
