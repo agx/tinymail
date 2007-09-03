@@ -494,6 +494,11 @@ typedef struct {
 	gpointer user_data;
 } OnAddedInfo;
 
+static void 
+on_status (GObject *sender, TnyStatus *status, gpointer user_data)
+{
+	return;
+}
 
 static void
 on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
@@ -513,6 +518,7 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 		g_object_unref (info->self);
 	if (info->msg)
 		g_object_unref (info->msg);
+
 	g_slice_free (OnAddedInfo, info);
 
 	return;
@@ -558,12 +564,12 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		priv->total = tny_list_get_length (headers);
 		g_object_unref (headers);
 
-		info = g_slice_new (OnAddedInfo);
+		info = g_slice_new0 (OnAddedInfo);
 		info->msg = TNY_MSG (g_object_ref (msg));
 		info->self = TNY_SEND_QUEUE (g_object_ref (self));
 		info->callback = NULL;
 
-		tny_folder_add_msg_async (outbox, msg, on_added, NULL, info);
+		tny_folder_add_msg_async (outbox, msg, on_added, on_status, info);
 
 		g_object_unref (outbox);
 	}
@@ -621,14 +627,14 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 		priv->total = tny_list_get_length (headers);
 		g_object_unref (headers);
 
-		info = g_slice_new (OnAddedInfo);
+		info = g_slice_new0 (OnAddedInfo);
 
 		info->msg = TNY_MSG (g_object_ref (msg));
 		info->self = TNY_SEND_QUEUE (g_object_ref (self));
 		info->callback = callback;
 		info->user_data = user_data;
 
-		tny_folder_add_msg_async (outbox, msg, on_added, NULL, info);
+		tny_folder_add_msg_async (outbox, msg, on_added, on_status, info);
 
 		g_object_unref (outbox);
 	}
