@@ -2,6 +2,9 @@
 
 	* Fixed a filedescriptor leak when there are no items in a folder, on
 	summary.mmap
+	* Changed the Copyright of tny-vfs-stream.c: the original is not
+	really recognizable anymore so it shouldn't copy the copyright of the
+	original as this is not a copy anymore.
 
 2007-09-03  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
