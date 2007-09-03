@@ -784,6 +784,10 @@ camel_folder_summary_load(CamelFolderSummary *s)
 			camel_folder_summary_mmap_add(s, mi);
 	}
 
+	if (s->saved_count <= 0) {
+		g_mapped_file_free (s->file);
+		s->file = NULL;
+	}
 
 	CAMEL_SUMMARY_UNLOCK(s, io_lock);
 
