@@ -210,12 +210,17 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 
 	if (cancel || retval == NULL) 
 	{
-		GError *err = NULL;
-		/*_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), FALSE, &err);*/
-		if (err)
-			g_error_free (err);
+		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+
+		if (CAMEL_IS_DISCO_STORE (apriv->service)) {
+			CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+			camel_disco_store_set_status (CAMEL_DISCO_STORE (apriv->service),
+					CAMEL_DISCO_STORE_OFFLINE, &tex);
+		}
+
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 			_("You cancelled when you had to enter a password"));
+
 		if (retval)
 			g_free (retval);
 		retval = NULL;

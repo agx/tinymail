@@ -7,6 +7,7 @@
 	original as this is not a copy anymore.
 	* Date, Received, INTERNALDATE: fixes 
 	* Fixed filedescriptor leaks with local folders
+	* Fixed online command attempts when password got cancelled
 
 2007-09-03  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 

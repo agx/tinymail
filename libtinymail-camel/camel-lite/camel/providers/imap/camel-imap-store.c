@@ -1701,6 +1701,10 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 						    "to IMAP server.\n%s\n\n"),
 						  camel_exception_get_description (ex));
 			camel_exception_clear (ex);
+
+			/* Disconnect */
+			camel_service_disconnect (service, FALSE, NULL);
+
 		} else
 			if (!imap_get_capability (service, ex))
 			{
