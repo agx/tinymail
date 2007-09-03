@@ -123,6 +123,23 @@ emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, i
 	return;
 }
 
+static void
+emit_error_on_added (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, int i, int total)
+{
+	ErrorInfo *info = g_slice_new0 (ErrorInfo);
+	if (error != NULL)
+		info->error = g_error_copy ((const GError *) error);
+	if (self)
+		info->self = TNY_SEND_QUEUE (g_object_ref (self));
+	if (msg)
+		info->msg = TNY_MSG (g_object_ref (msg));
+	if (header)
+		info->header = TNY_HEADER (g_object_ref (header));
+	info->i = i;
+	info->total = total;
+	emit_error_on_mainloop (info);
+	destroy_error_info (info);
+}
 
 static gboolean 
 emit_control_signals_on_mainloop (gpointer data)
@@ -503,18 +520,15 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
 
 	/* Call user callback after msg has beed added to OUTBOX, waiting to be sent*/
-	if (info->callback) {
-		info->callback (info->self, info->cancelled, info->msg, info->user_data, err);		
-	}
+	if (info->callback)
+		info->callback (info->self, info->cancelled, info->msg, info->user_data, err);
 
-	if (err) {
-		emit_error (info->self, NULL, info->msg, err, priv->total, priv->total+1); 
-	}
-	
+	if (err)
+		emit_error_on_added (info->self, NULL, info->msg, err, priv->total, priv->total+1); 
+
 	priv->total++;
 	if (priv->total >= 1 && !priv->is_running)
 		create_worker (info->self);
-
 
 	if (info->self)
 		g_object_unref (info->self);
