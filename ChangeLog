@@ -1,3 +1,9 @@
+2007-09-04  Vivek Sekar  <viveksekar@gmail.com>
+
+	* Added AC_CONFIG_AUX_DIR(.) to
+	libtinymail-camel/camel-lite/configure.ac : fixes a maemo integration
+	build error.
+	
 2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed a possible race condition in CamelMultiPart
