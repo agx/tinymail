@@ -9,6 +9,7 @@ Philip Van Hoof <pvanhoof@gnome.org>
 	* Wiki/Trac documentation and maintenance
 	* Build environment implementer
 	* Marketing website
+	* ...
 
 Sergio Villar Senin <svillar@igalia.com>
 
@@ -17,12 +18,24 @@ Sergio Villar Senin <svillar@igalia.com>
 	* Moving messages around between folders
 	* Unit tests
 	* Various bugfixes
+	* ...
 
 Tinne Hannes <tinne.hannes@gmail.com>
 
 	* Wiki/Trac documentation and maintenance
 	* Marketing website
 	* Mascot and project name reason :) (tinne's mail client or tinymail)
+
+Mark Doffman <mark.doffman@codethink.co.uk>
+
+	* Author of the Python bindings since September '07
+	* Maintainer of the Python bindings
+
+Rob Taylor <rob.taylor@codethink.co.uk>
+
+	* Co architect of the TnyCamelQueue infrastructure
+	  this is the architecture of all of the standard 
+	  _async methods
 
 Raphael Slinckx <raphael@slinckx.net>
 
@@ -49,10 +62,14 @@ Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	* Implementer of many TnyList types
 	* Co-designer of the TnySendQueue type
 	* Maintainer of the maemo-specific library
+	* Author of the maemo-specific library
+	* ...
 
 Murray Cumming <murrayc@murrayc.com>
 
 	* Implementations in libtinymail-maemo
+	* Various fixes
+	* ...
 
 Chris Lord <chris@openedhand.com>
 
@@ -85,7 +102,19 @@ Javier Fernandez <jfernandez@igalia.com>
 	* Various contributions
 	* Transfering of messages
 	* Unread and total count of folders
+	* ...
+
+Jose Dapena Paz <jdapena@igalia.com>
+
+	* Various contributions
+	* Mimepart handling
+	* ...
 
 Armin Burgmeier <armin@openismus.com>
 
 	* Various bug fixes regarding folder handling
+
+Alberto Garcia <agarcia@igalia.com>
+
+	* Various bug fixes
+
