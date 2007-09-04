@@ -369,8 +369,13 @@ signed_get_part(CamelMultipart *multipart, guint index)
 			camel_object_ref(stream);
 		} else {
 
-			if (mps->start1 == -1 || mps->end1 == -1)
-				return NULL;
+			if (mps->start1 == -1 || mps->end1 == -1) {
+				if (parse_content(mps) == -1)
+					return NULL;
+				if (mps->start1 == -1 || mps->end1 == -1) 
+					return NULL;
+			}
+
 			stream = camel_seekable_substream_new((CamelSeekableStream *)dw->stream, mps->start1, mps->end1);
 		}
 
