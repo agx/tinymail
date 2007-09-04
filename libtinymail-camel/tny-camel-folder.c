@@ -823,10 +823,13 @@ tny_camel_folder_add_msg_async_callback (gpointer thr_user_data)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyFolderChange *change = info->change;
 
+	/* Dot not add a ADDED_HEADERS change, because its already added */
+	/* by 'folder_change' event. */
 	if (change)
 	{
 		tny_folder_change_set_new_all_count (change, priv->cached_length);
 		tny_folder_change_set_new_unread_count (change, priv->unread_length);
+
 		notify_folder_observers_about (self, change);
 		g_object_unref (change);
 	}

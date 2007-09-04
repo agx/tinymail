@@ -1297,7 +1297,7 @@ tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 		while (!tny_iterator_is_done (iter))
 		{
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-			tny_folder_change_add_added_header (change, header);
+			tny_folder_change_add_added_header (new_change, header);
 			g_object_unref (header);
 			tny_iterator_next (iter);
 		}

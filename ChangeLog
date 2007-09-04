@@ -1,3 +1,8 @@
+2007-09-04  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
+
+	* Fixed bug in update folder observers call, creating 
+	the new change object to propagate it to observers.
+ 
 2007-09-04  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: fixed the default function
