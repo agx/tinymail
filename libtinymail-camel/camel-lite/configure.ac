@@ -1,4 +1,5 @@
 AC_INIT([camel-lite],[1.0],[http://tinymail.org/])
+AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_SRCDIR(camel/camel-object.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
