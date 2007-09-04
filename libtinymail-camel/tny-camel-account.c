@@ -496,11 +496,29 @@ tny_camel_account_set_url_string (TnyAccount *self, const gchar *url_string)
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_url_string_func (self, url_string);
 }
 
+/* Simplify checks for NULLs: */
+static gboolean
+strings_are_equal (const gchar *a, const gchar *b)
+{
+	if (!a && !b)
+		return TRUE;
+	if (a && b)
+	{
+		return (strcmp (a, b) == 0);
+	}
+	else
+		return FALSE;
+}
+
 static void
 tny_camel_account_set_url_string_default (TnyAccount *self, const gchar *url_string)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean changed = FALSE;
+
+	/* Ignore this if it is not a change: */
+	if (strings_are_equal (priv->url_string, url_string))
+		return;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
@@ -556,6 +574,10 @@ static void
 tny_camel_account_set_name_default (TnyAccount *self, const gchar *name)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	/* Ignore this if it is not a change: */
+	if (strings_are_equal (priv->name, name))
+		return;
 
 	if (priv->name)
 		g_free (priv->name);
@@ -799,6 +821,10 @@ tny_camel_account_set_id_default (TnyAccount *self, const gchar *id)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	/* Ignore this if it is not a change: */
+	if (strings_are_equal (priv->id, id))
+		return;
+
 	if (priv->id)
 		g_free (priv->id);
 	priv->id = g_strdup (id);
@@ -819,6 +845,10 @@ tny_camel_account_set_secure_auth_mech_default (TnyAccount *self, const gchar *m
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean changed = FALSE;
+
+	/* Ignore this if it is not a change: */
+	if (strings_are_equal (priv->mech, mech))
+		return;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
@@ -861,6 +891,10 @@ tny_camel_account_set_proto_default (TnyAccount *self, const gchar *proto)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean changed = FALSE;
 
+	/* Ignore this if it is not a change: */
+	if (strings_are_equal (priv->proto, proto))
+		return;
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->custom_url_string = FALSE;
@@ -901,6 +935,10 @@ tny_camel_account_set_user_default (TnyAccount *self, const gchar *user)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean changed = FALSE;
+
+	/* Ignore this if it is not a change: */
+	if (strings_are_equal (priv->user, user))
+		return;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
@@ -943,6 +981,10 @@ tny_camel_account_set_hostname_default (TnyAccount *self, const gchar *host)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean changed = FALSE;
+
+	/* Ignore this if it is not a change: */
+	if (strings_are_equal (priv->host, host))
+		return;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
@@ -988,6 +1030,10 @@ tny_camel_account_set_port_default (TnyAccount *self, guint port)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean changed = FALSE;
 
+	/* Ignore this if it is not a change: */
+	if (port == priv->port)
+		return;
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	priv->custom_url_string = FALSE;
@@ -1023,6 +1069,10 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 	gboolean reconf_if = FALSE;
 	gboolean changed = FALSE;
 
+	/* Ignore this if it is not a change: */
+	if (get_pass_func == priv->get_pass_func)
+		return;
+
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	if (priv->get_pass_func != get_pass_func)
@@ -1055,6 +1105,10 @@ tny_camel_account_set_forget_pass_func_default (TnyAccount *self, TnyForgetPassF
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	gboolean reconf_if = FALSE;
 	gboolean changed = FALSE;
+
+	/* Ignore this if it is not a change: */
+	if (get_forget_pass_func == priv->forget_pass_func)
+		return;
 
 	g_static_rec_mutex_lock (priv->service_lock);
 

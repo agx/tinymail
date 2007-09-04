@@ -1,3 +1,19 @@
+2007-09-04  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-account.c:
+	(tny_camel_account_set_url_string_default),
+	(tny_camel_account_set_name_default),
+	(tny_camel_account_set_id_default),
+	(tny_camel_account_set_secure_auth_mech_default),
+	(tny_camel_account_set_proto_default),
+	(tny_camel_account_set_user_default),
+	(tny_camel_account_set_hostname_default),
+	(tny_camel_account_set_port_default),
+	(tny_camel_account_set_pass_func_default),
+	(tny_camel_account_set_forget_pass_func_default): Check that the input 
+	is differnt to the existing value, to avoid unnecessarily signalling that 
+	the account has changed.
+
 2007-09-04  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
 	* Fixed bug in update folder observers call, creating 
