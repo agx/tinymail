@@ -350,6 +350,9 @@ signed_get_part(CamelMultipart *multipart, guint index)
 	CamelDataWrapper *dw = (CamelDataWrapper *)multipart;
 	CamelStream *stream;
 
+	if (parse_content (mps) == -1)
+		return NULL;
+
 	switch (index) {
 	case CAMEL_MULTIPART_SIGNED_CONTENT:
 		if (mps->content)
