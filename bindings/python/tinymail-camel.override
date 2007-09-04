@@ -48,6 +48,8 @@ headers
 #include <tny-camel-mem-stream.h>
 #include <tny-camel-pop-remote-msg-remove-strategy.h>
 
+#include "pytny-session-camel.h"
+
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
 
@@ -69,7 +71,3 @@ import tinymail.Folder as PyTnyFolder_Type
 import tinymail.FolderStore as PyTnyFolderStore_Type
 import tinymail.StoreAccount as PyTnyStoreAccount_Type
 import tinymail.Lockable as PyTnyLockable_Type
-import tinymail.camel.CamelSession as PyCamelSession_Type
-import tinymail.camel.CamelStream as PyCamelStream_Type
-
-

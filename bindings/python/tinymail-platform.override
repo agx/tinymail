@@ -29,6 +29,7 @@ headers
 #include <tny-summary-view.h>
 
 #include "platform_include.h"
+#include "pytny-session-camel.h"
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"

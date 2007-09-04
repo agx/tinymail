@@ -18,6 +18,6 @@ initcamel(void)
 /*    pycamel_add_constants (m, "TNY_"); */
        
     if (PyErr_Occurred ()) {
-        Py_FatalError ("can't initialise module camel");
+	PyErr_Print();
     }
 }

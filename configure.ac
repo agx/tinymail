@@ -504,6 +504,7 @@ docs/devel/doxygen/libtinymailui
 docs/devel/doxygen/libtinymailui-gtk
 bindings/Makefile
 bindings/python/Makefile
+bindings/python/gendefs/Makefile
 bindings/python/tinymail.pth
 libtinymail/Makefile
 libtinymail/libtinymail.pc

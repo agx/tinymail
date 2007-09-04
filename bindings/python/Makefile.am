@@ -24,7 +24,7 @@ _tinymail_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_tinymail
 _tinymail_la_LIBADD = $(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 
 _tinymail_la_SOURCES = tinymailmodule.c
-nodist__tinymail_la_SOURCES = tinymail-glue.c
+nodist__tinymail_la_SOURCES = tinymail-glue.c pytny-status.c
 
 ui_la_LDFLAGS = $(common_ldflags) -export-symbols-regex initui
 ui_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(TINYMAIL_PYTHON_LIBS) \
@@ -58,13 +58,14 @@ camel_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
         $(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
         $(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la \
         $(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
-camel_la_SOURCES = tinymail-camelmodule.c
+camel_la_SOURCES = tinymail-camelmodule.c pytny-session-camel.c
 nodist_camel_la_SOURCES = tinymail-camel-glue.c
 
+CREATEDEFS = $(PYTHON) $(top_srcdir)/bindings/python/createdefs.py
 
 CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c \
 	tinymail-platform-glue.c platform_include.h tinymail.defs \
-	tinymailui.defs tinymailui-gtk.defs tinymail-platform.defs \
+	tinymailui.defs tinymailui-gtk.defs \
 	tinymail-camel.defs tinymail-camel-glue.c
 
 EXTRA_DIST = \
@@ -76,138 +77,20 @@ EXTRA_DIST = \
 	tinymail-platform.override \
 	tinymail-camel.override
 
-# To update:
-# ls libtinymail/*h | grep -v \\-priv | sed s/^/\\t\$\(top_srcdir\)\\//g | sed s/$/\\\ \\\\/g
-# ls libtinymail/*h | grep -v \\-priv | sed s/^/\\$\(top_srcdir\)\\//g | sed s/$/\\\ \\\\/g
+TINYMAIL_DEFS = tinymail-base.defs tinymail-extra.defs
 
-tinymail_h_files = \
-	$(top_srcdir)/libtinymail/tny-account.h \
-	$(top_srcdir)/libtinymail/tny-account-store.h \
-	$(top_srcdir)/libtinymail/tny-combined-account.h \
-	$(top_srcdir)/libtinymail/tny-device.h \
-	$(top_srcdir)/libtinymail/tny-error.h \
-	$(top_srcdir)/libtinymail/tny-folder-change.h \
-	$(top_srcdir)/libtinymail/tny-folder.h \
-	$(top_srcdir)/libtinymail/tny-folder-monitor.h \
-	$(top_srcdir)/libtinymail/tny-folder-observer.h \
-	$(top_srcdir)/libtinymail/tny-folder-stats.h \
-	$(top_srcdir)/libtinymail/tny-folder-store-change.h \
-	$(top_srcdir)/libtinymail/tny-folder-store.h \
-	$(top_srcdir)/libtinymail/tny-folder-store-observer.h \
-	$(top_srcdir)/libtinymail/tny-folder-store-query.h \
-	$(top_srcdir)/libtinymail/tny-fs-stream.h \
-	$(top_srcdir)/libtinymail/tny-header.h \
-	$(top_srcdir)/libtinymail/tny-iterator.h \
-	$(top_srcdir)/libtinymail/tny-list.h \
-	$(top_srcdir)/libtinymail/tny-lockable.h \
-	$(top_srcdir)/libtinymail/tny-merge-folder.h \
-	$(top_srcdir)/libtinymail/tny-mime-part.h \
-	$(top_srcdir)/libtinymail/tny-msg.h \
-	$(top_srcdir)/libtinymail/tny-msg-receive-strategy.h \
-	$(top_srcdir)/libtinymail/tny-msg-remove-strategy.h \
-	$(top_srcdir)/libtinymail/tny-noop-lockable.h \
-	$(top_srcdir)/libtinymail/tny-pair.h \
-	$(top_srcdir)/libtinymail/tny-password-getter.h \
-	$(top_srcdir)/libtinymail/tny-send-queue.h \
-	$(top_srcdir)/libtinymail/tny-shared.h \
-	$(top_srcdir)/libtinymail/tny-signals-marshal.h \
-	$(top_srcdir)/libtinymail/tny-simple-list.h \
-	$(top_srcdir)/libtinymail/tny-status.h \
-	$(top_srcdir)/libtinymail/tny-store-account.h \
-	$(top_srcdir)/libtinymail/tny-stream.h \
-	$(top_srcdir)/libtinymail/tny-transport-account.h
-
-
-tinymail.defs: $(tinymail_h_files) 
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_h_files) > $@
-
-#	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
-#	$(tinymail_h_files) >> $@
-
-tinymailui_h_files = \
-	$(top_srcdir)/libtinymailui/tny-account-store-view.h \
-	$(top_srcdir)/libtinymailui/tny-header-view.h \
-	$(top_srcdir)/libtinymailui/tny-mime-part-saver.h \
-	$(top_srcdir)/libtinymailui/tny-mime-part-save-strategy.h \
-	$(top_srcdir)/libtinymailui/tny-mime-part-view.h \
-	$(top_srcdir)/libtinymailui/tny-msg-view.h \
-	$(top_srcdir)/libtinymailui/tny-msg-window.h \
-	$(top_srcdir)/libtinymailui/tny-platform-factory.h \
-	$(top_srcdir)/libtinymailui/tny-summary-view.h
-
-tinymailui.defs: $(tinymailui_h_files)
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_h_files) > $@
-
-#	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
-#	$(tinymailui_h_files) >> $@
-
-
-tinymailui_gtk_h_files = \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-list-model.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attach-list-model.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-attachment-mime-part-view.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-folder-store-tree-model.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-list-model.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-header-view.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-lockable.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-mime-part-save-strategy.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-view.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-msg-window.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-password-dialog.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h \
-	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h
-
-tinymailui-gtk.defs: $(tinymailui_gtk_h_files) 
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymailui_gtk_h_files) > $@
-
-#	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
-#	$(tinymailui_gtk_h_files) >> $@
-
-# tinymail_platform_h_files = `ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs`
-
-tinymail-platform.defs : $(tinymail_platform_h_files) 
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py \
-	`ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\\-priv | xargs`	> $@
-
-#	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
-#	$(tinymail_platform_h_files) >> $@
-
-tinymail_camel_h_files = \
-	$(top_srcdir)/libtinymail-camel/tny-camel-account.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-folder.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-full-msg-receive-strategy.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-header.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-imap-folder.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-imap-store-account.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-mem-stream.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-mime-part.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-msg.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-msg-remove-strategy.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-folder.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-nntp-store-account.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-partial-msg-receive-strategy.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-pop-folder.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-pop-remote-msg-remove-strategy.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-pop-store-account.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-send-queue.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-shared.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-store-account.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-stream.h \
-	$(top_srcdir)/libtinymail-camel/tny-camel-transport-account.h \
-	$(top_srcdir)/libtinymail-camel/tny-session-camel.h \
-	$(top_srcdir)/libtinymail-camel/tny-stream-camel.h
-
-
-tinymail-camel.defs : $(tinymail_camel_h_files)
-	$(PYTHON) $(PYGTK_CODEGENDIR)/h2def.py $(tinymail_camel_h_files) > $@
-
-#	$(PYTHON) $(top_srcdir)/bindings/python/scanvirtuals.py
-#	$(tinymail_platform_h_files) >> $@
+tinymail.defs: $(TINYMAIL_DEFS)
+	$(CREATEDEFS) $@ $(TINYMAIL_DEFS)
 
 tinymail-glue.c: tinymail.defs tinymail.override
 	$(PYGTK_CODEGEN) --prefix pytinymail \
 	--override $(top_srcdir)/bindings/python/tinymail.override \
 	tinymail.defs > $@
+
+TINYMAILUI_DEFS = tinymailui-base.defs
+
+tinymailui.defs: $(TINYMAILUI_DEFS)
+	$(CREATEDEFS) $@ $(TINYMAILUI_DEFS)
 
 tinymailui-glue.c: tinymailui.defs tinymailui.override
 	$(PYGTK_CODEGEN) --prefix pyui \
@@ -215,14 +98,24 @@ tinymailui-glue.c: tinymailui.defs tinymailui.override
 	--override $(top_srcdir)/bindings/python/tinymailui.override \
 	tinymailui.defs > $@
 
+TINYMAILUI_GTK_DEFS = tinymailui-gtk-base.defs
+
+tinymailui-gtk.defs: $(TINYMAILUI_GTK_DEFS)
+	$(CREATEDEFS) $@ $(TINYMAILUI_GTK_DEFS)
+
 tinymailui-gtk-glue.c: tinymail.defs $(PYGTK_DEFSDIR)/gdk-types.defs $(PYGTK_DEFSDIR)/gtk-types.defs tinymailui-gtk.defs tinymailui-gtk.override
 	$(PYGTK_CODEGEN) --prefix pyuigtk --register $(PYGTK_DEFSDIR)/gdk-types.defs \
 	--register $(PYGTK_DEFSDIR)/gtk-types.defs --register tinymail.defs \
 	--register tinymailui.defs --override $(top_srcdir)/bindings/python/tinymailui-gtk.override \
 	tinymailui-gtk.defs > $@
 
+TINYMAIL_PLATFORM_DEFS = tinymail-platform-base.defs
+
+tinymail-platform.defs: $(TINYMAIL_PLATFORM_DEFS)
+	$(CREATEDEFS) $@ $(TINYMAIL_PLATFORM_DEFS)
+
 platform_include.h:
-	ls $(top_srcdir)/$(PLATFORMDIR)/*h | grep -v \\-priv | sed 's/^/\#include\ \"/g' | sed 's/\.h/\.h\"/g' > $@
+	ls $(top_srcdir)/libtinymail-gnome-desktop/*h | grep -v \\-priv | sed 's/^/\#include\ \"/g' | sed 's/\.h/\.h\"/g' > $@
 
 tinymail-platform-glue.c: tinymail-platform.defs tinymail-platform.override platform_include.h
 	$(PYGTK_CODEGEN) --prefix pyplatform \
@@ -231,6 +124,11 @@ tinymail-platform-glue.c: tinymail-platform.defs tinymail-platform.override plat
 	--register tinymail-camel.defs \
 	--override $(top_srcdir)/bindings/python/tinymail-platform.override \
 	tinymail-platform.defs > $@
+
+TINYMAIL_CAMEL_DEFS = tinymail-camel-base.defs tinymail-camel-extra.defs
+
+tinymail-camel.defs: $(TINYMAIL_CAMEL_DEFS)
+	$(CREATEDEFS) $@ $(TINYMAIL_CAMEL_DEFS)
 
 tinymail-camel-glue.c: tinymail-camel.defs tinymail-camel.override
 	$(PYGTK_CODEGEN) --prefix pycamel \

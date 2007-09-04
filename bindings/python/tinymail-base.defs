@@ -1,0 +1,2656 @@
+;; -*- scheme -*-
+; object definitions ...
+(define-interface Account
+  (in-module "Tny")
+  (c-name "TnyAccount")
+  (gtype-id "TNY_TYPE_ACCOUNT")
+)
+
+(define-interface AccountStore
+  (in-module "Tny")
+  (c-name "TnyAccountStore")
+  (gtype-id "TNY_TYPE_ACCOUNT_STORE")
+)
+
+(define-object CombinedAccount
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyCombinedAccount")
+  (gtype-id "TNY_TYPE_COMBINED_ACCOUNT")
+)
+
+(define-interface Device
+  (in-module "Tny")
+  (c-name "TnyDevice")
+  (gtype-id "TNY_TYPE_DEVICE")
+)
+
+(define-interface Folder
+  (in-module "Tny")
+  (c-name "TnyFolder")
+  (gtype-id "TNY_TYPE_FOLDER")
+)
+
+(define-object FolderChange
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyFolderChange")
+  (gtype-id "TNY_TYPE_FOLDER_CHANGE")
+)
+
+(define-object FolderMonitor
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyFolderMonitor")
+  (gtype-id "TNY_TYPE_FOLDER_MONITOR")
+)
+
+(define-interface FolderObserver
+  (in-module "Tny")
+  (c-name "TnyFolderObserver")
+  (gtype-id "TNY_TYPE_FOLDER_OBSERVER")
+)
+
+(define-object FolderStats
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyFolderStats")
+  (gtype-id "TNY_TYPE_FOLDER_STATS")
+)
+
+(define-interface FolderStore
+  (in-module "Tny")
+  (c-name "TnyFolderStore")
+  (gtype-id "TNY_TYPE_FOLDER_STORE")
+)
+
+(define-object FolderStoreChange
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyFolderStoreChange")
+  (gtype-id "TNY_TYPE_FOLDER_STORE_CHANGE")
+)
+
+(define-interface FolderStoreObserver
+  (in-module "Tny")
+  (c-name "TnyFolderStoreObserver")
+  (gtype-id "TNY_TYPE_FOLDER_STORE_OBSERVER")
+)
+
+(define-object FolderStoreQuery
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyFolderStoreQuery")
+  (gtype-id "TNY_TYPE_FOLDER_STORE_QUERY")
+)
+
+(define-object FolderStoreQueryItem
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyFolderStoreQueryItem")
+  (gtype-id "TNY_TYPE_FOLDER_STORE_QUERY_ITEM")
+)
+
+(define-object FsStream
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyFsStream")
+  (gtype-id "TNY_TYPE_FS_STREAM")
+)
+
+(define-interface Header
+  (in-module "Tny")
+  (c-name "TnyHeader")
+  (gtype-id "TNY_TYPE_HEADER")
+)
+
+(define-interface Iterator
+  (in-module "Tny")
+  (c-name "TnyIterator")
+  (gtype-id "TNY_TYPE_ITERATOR")
+)
+
+(define-interface List
+  (in-module "Tny")
+  (c-name "TnyList")
+  (gtype-id "TNY_TYPE_LIST")
+)
+
+(define-interface Lockable
+  (in-module "Tny")
+  (c-name "TnyLockable")
+  (gtype-id "TNY_TYPE_LOCKABLE")
+)
+
+(define-object MergeFolder
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyMergeFolder")
+  (gtype-id "TNY_TYPE_MERGE_FOLDER")
+)
+
+(define-interface MimePart
+  (in-module "Tny")
+  (c-name "TnyMimePart")
+  (gtype-id "TNY_TYPE_MIME_PART")
+)
+
+(define-interface Msg
+  (in-module "Tny")
+  (c-name "TnyMsg")
+  (gtype-id "TNY_TYPE_MSG")
+)
+
+(define-interface MsgReceiveStrategy
+  (in-module "Tny")
+  (c-name "TnyMsgReceiveStrategy")
+  (gtype-id "TNY_TYPE_MSG_RECEIVE_STRATEGY")
+)
+
+(define-interface MsgRemoveStrategy
+  (in-module "Tny")
+  (c-name "TnyMsgRemoveStrategy")
+  (gtype-id "TNY_TYPE_MSG_REMOVE_STRATEGY")
+)
+
+(define-object NoopLockable
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyNoopLockable")
+  (gtype-id "TNY_TYPE_NOOP_LOCKABLE")
+)
+
+(define-object Pair
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyPair")
+  (gtype-id "TNY_TYPE_PAIR")
+)
+
+(define-interface PasswordGetter
+  (in-module "Tny")
+  (c-name "TnyPasswordGetter")
+  (gtype-id "TNY_TYPE_PASSWORD_GETTER")
+)
+
+(define-interface SendQueue
+  (in-module "Tny")
+  (c-name "TnySendQueue")
+  (gtype-id "TNY_TYPE_SEND_QUEUE")
+)
+
+(define-object SimpleList
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnySimpleList")
+  (gtype-id "TNY_TYPE_SIMPLE_LIST")
+)
+
+(define-interface StoreAccount
+  (in-module "Tny")
+  (c-name "TnyStoreAccount")
+  (gtype-id "TNY_TYPE_STORE_ACCOUNT")
+)
+
+(define-interface Stream
+  (in-module "Tny")
+  (c-name "TnyStream")
+  (gtype-id "TNY_TYPE_STREAM")
+)
+
+(define-interface TransportAccount
+  (in-module "Tny")
+  (c-name "TnyTransportAccount")
+  (gtype-id "TNY_TYPE_TRANSPORT_ACCOUNT")
+)
+
+;; Enumerations and flags ...
+
+(define-enum StatusCode
+  (in-module "Tny")
+  (c-name "TnyStatusCode")
+  (gtype-id "TNY_TYPE_STATUS_CODE")
+  (values
+    '("folder-status-code-refresh" "TNY_FOLDER_STATUS_CODE_REFRESH")
+    '("folder-status-code-get-msg" "TNY_FOLDER_STATUS_CODE_GET_MSG")
+    '("get-msg-queue-status-get-msg" "TNY_GET_MSG_QUEUE_STATUS_GET_MSG")
+    '("folder-status-code-xfer-msgs" "TNY_FOLDER_STATUS_CODE_XFER_MSGS")
+    '("folder-status-code-copy-folder" "TNY_FOLDER_STATUS_CODE_COPY_FOLDER")
+    '("get-supported-secure-auth-status-get-secure-auth" "TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH")
+    '("folder-status-code-sync" "TNY_FOLDER_STATUS_CODE_SYNC")
+  )
+)
+
+(define-enum StatusDomain
+  (in-module "Tny")
+  (c-name "TnyStatusDomain")
+  (gtype-id "TNY_TYPE_STATUS_DOMAIN")
+  (values
+    '("folder-status" "TNY_FOLDER_STATUS")
+    '("get-msg-queue-status" "TNY_GET_MSG_QUEUE_STATUS")
+    '("get-supported-secure-auth-status" "TNY_GET_SUPPORTED_SECURE_AUTH_STATUS")
+  )
+)
+
+(define-flags FolderCaps
+  (in-module "Tny")
+  (c-name "TnyFolderCaps")
+  (gtype-id "TNY_TYPE_FOLDER_CAPS")
+  (values
+    '("writable" "TNY_FOLDER_CAPS_WRITABLE")
+    '("pushemail" "TNY_FOLDER_CAPS_PUSHEMAIL")
+  )
+)
+
+(define-flags FolderChangeChanged
+  (in-module "Tny")
+  (c-name "TnyFolderChangeChanged")
+  (gtype-id "TNY_TYPE_FOLDER_CHANGE_CHANGED")
+  (values
+    '("all-count" "TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT")
+    '("unread-count" "TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT")
+    '("added-headers" "TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS")
+    '("expunged-headers" "TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS")
+    '("folder-rename" "TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME")
+    '("msg-received" "TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED")
+  )
+)
+
+(define-flags FolderStoreChangeChanged
+  (in-module "Tny")
+  (c-name "TnyFolderStoreChangeChanged")
+  (gtype-id "TNY_TYPE_FOLDER_STORE_CHANGE_CHANGED")
+  (values
+    '("created-folders" "TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS")
+    '("removed-folders" "TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS")
+  )
+)
+
+(define-enum ErrorDomain
+  (in-module "Tny")
+  (c-name "TnyErrorDomain")
+  (gtype-id "TNY_TYPE_ERROR_DOMAIN")
+  (values
+    '("folder-error" "TNY_FOLDER_ERROR")
+    '("folder-store-error" "TNY_FOLDER_STORE_ERROR")
+    '("transport-account-error" "TNY_TRANSPORT_ACCOUNT_ERROR")
+    '("account-error" "TNY_ACCOUNT_ERROR")
+    '("account-store-error" "TNY_ACCOUNT_STORE_ERROR")
+    '("send-queue-error" "TNY_SEND_QUEUE_ERROR")
+  )
+)
+
+(define-enum Error
+  (in-module "Tny")
+  (c-name "TnyError")
+  (gtype-id "TNY_TYPE_ERROR")
+  (values
+    '("error-unspec" "TNY_ERROR_UNSPEC")
+    '("folder-error-sync" "TNY_FOLDER_ERROR_SYNC")
+    '("folder-error-remove-msg" "TNY_FOLDER_ERROR_REMOVE_MSG")
+    '("folder-error-add-msg" "TNY_FOLDER_ERROR_ADD_MSG")
+    '("folder-error-refresh" "TNY_FOLDER_ERROR_REFRESH")
+    '("folder-error-get-msg" "TNY_FOLDER_ERROR_GET_MSG")
+    '("folder-error-transfer-msgs" "TNY_FOLDER_ERROR_TRANSFER_MSGS")
+    '("folder-error-set-name" "TNY_FOLDER_ERROR_SET_NAME")
+    '("folder-error-copy" "TNY_FOLDER_ERROR_COPY")
+    '("folder-store-error-remove-folder" "TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER")
+    '("folder-store-error-get-folders" "TNY_FOLDER_STORE_ERROR_GET_FOLDERS")
+    '("folder-store-error-create-folder" "TNY_FOLDER_STORE_ERROR_CREATE_FOLDER")
+    '("transport-account-error-send" "TNY_TRANSPORT_ACCOUNT_ERROR_SEND")
+    '("transport-account-error-send-host-lookup-failed" "TNY_TRANSPORT_ACCOUNT_ERROR_SEND_HOST_LOOKUP_FAILED")
+    '("transport-account-error-send-service-unavailable" "TNY_TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE")
+    '("transport-account-error-send-authentication-not-supported" "TNY_TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED")
+    '("transport-account-error-send-user-cancel" "TNY_TRANSPORT_ACCOUNT_ERROR_SEND_USER_CANCEL")
+    '("account-error-try-connect" "TNY_ACCOUNT_ERROR_TRY_CONNECT")
+    '("account-error-try-connect-host-lookup-failed" "TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED")
+    '("account-error-try-connect-service-unavailable" "TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE")
+    '("account-error-try-connect-authentication-not-supported" "TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED")
+    '("account-error-try-connect-certificate" "TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE")
+    '("account-error-try-connect-user-cancel" "TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL")
+    '("account-store-error-unknown-alert" "TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT")
+    '("account-error-get-supported-auth" "TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH")
+    '("send-queue-error-add" "TNY_SEND_QUEUE_ERROR_ADD")
+    '("account-store-error-cancel-alert" "TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT")
+  )
+)
+
+(define-enum AccountType
+  (in-module "Tny")
+  (c-name "TnyAccountType")
+  (gtype-id "TNY_TYPE_ACCOUNT_TYPE")
+  (values
+    '("store" "TNY_ACCOUNT_TYPE_STORE")
+    '("transport" "TNY_ACCOUNT_TYPE_TRANSPORT")
+    '("combined" "TNY_ACCOUNT_TYPE_COMBINED")
+  )
+)
+
+(define-enum AccountSignal
+  (in-module "Tny")
+  (c-name "TnyAccountSignal")
+  (gtype-id "TNY_TYPE_ACCOUNT_SIGNAL")
+  (values
+    '("connection-status-changed" "TNY_ACCOUNT_CONNECTION_STATUS_CHANGED")
+    '("last-signal" "TNY_ACCOUNT_LAST_SIGNAL")
+  )
+)
+
+(define-enum ConnectionStatus
+  (in-module "Tny")
+  (c-name "TnyConnectionStatus")
+  (gtype-id "TNY_TYPE_CONNECTION_STATUS")
+  (values
+    '("disconnected" "TNY_CONNECTION_STATUS_DISCONNECTED")
+    '("disconnected-broken" "TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN")
+    '("connected-broken" "TNY_CONNECTION_STATUS_CONNECTED_BROKEN")
+    '("connected" "TNY_CONNECTION_STATUS_CONNECTED")
+    '("reconnecting" "TNY_CONNECTION_STATUS_RECONNECTING")
+    '("init" "TNY_CONNECTION_STATUS_INIT")
+  )
+)
+
+(define-enum AccountStoreSignal
+  (in-module "Tny")
+  (c-name "TnyAccountStoreSignal")
+  (gtype-id "TNY_TYPE_ACCOUNT_STORE_SIGNAL")
+  (values
+    '("account-changed" "TNY_ACCOUNT_STORE_ACCOUNT_CHANGED")
+    '("account-inserted" "TNY_ACCOUNT_STORE_ACCOUNT_INSERTED")
+    '("account-removed" "TNY_ACCOUNT_STORE_ACCOUNT_REMOVED")
+    '("accounts-reloaded" "TNY_ACCOUNT_STORE_ACCOUNTS_RELOADED")
+    '("connecting-started" "TNY_ACCOUNT_STORE_CONNECTING_STARTED")
+    '("connecting-finished" "TNY_ACCOUNT_STORE_CONNECTING_FINISHED")
+    '("last-signal" "TNY_ACCOUNT_STORE_LAST_SIGNAL")
+  )
+)
+
+(define-enum AlertType
+  (in-module "Tny")
+  (c-name "TnyAlertType")
+  (gtype-id "TNY_TYPE_ALERT_TYPE")
+  (values
+    '("info" "TNY_ALERT_TYPE_INFO")
+    '("warning" "TNY_ALERT_TYPE_WARNING")
+    '("error" "TNY_ALERT_TYPE_ERROR")
+  )
+)
+
+(define-enum GetAccountsRequestType
+  (in-module "Tny")
+  (c-name "TnyGetAccountsRequestType")
+  (gtype-id "TNY_TYPE_GET_ACCOUNTS_REQUEST_TYPE")
+  (values
+    '("transport-accounts" "TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS")
+    '("store-accounts" "TNY_ACCOUNT_STORE_STORE_ACCOUNTS")
+    '("both" "TNY_ACCOUNT_STORE_BOTH")
+  )
+)
+
+(define-enum DeviceSignal
+  (in-module "Tny")
+  (c-name "TnyDeviceSignal")
+  (gtype-id "TNY_TYPE_DEVICE_SIGNAL")
+  (values
+    '("connection-changed" "TNY_DEVICE_CONNECTION_CHANGED")
+    '("last-signal" "TNY_DEVICE_LAST_SIGNAL")
+  )
+)
+
+(define-enum FolderSignal
+  (in-module "Tny")
+  (c-name "TnyFolderSignal")
+  (gtype-id "TNY_TYPE_FOLDER_SIGNAL")
+  (values
+    '("folder-inserted" "TNY_FOLDER_FOLDER_INSERTED")
+    '("folders-reloaded" "TNY_FOLDER_FOLDERS_RELOADED")
+    '("last-signal" "TNY_FOLDER_LAST_SIGNAL")
+  )
+)
+
+(define-flags FolderStoreQueryOption
+  (in-module "Tny")
+  (c-name "TnyFolderStoreQueryOption")
+  (gtype-id "TNY_TYPE_FOLDER_STORE_QUERY_OPTION")
+  (values
+    '("subscribed" "TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED")
+    '("match-on-name" "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME")
+    '("match-on-id" "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID")
+  )
+)
+
+(define-flags HeaderFlags
+  (in-module "Tny")
+  (c-name "TnyHeaderFlags")
+  (gtype-id "TNY_TYPE_HEADER_FLAGS")
+  (values
+    '("answered" "TNY_HEADER_FLAG_ANSWERED")
+    '("deleted" "TNY_HEADER_FLAG_DELETED")
+    '("draft" "TNY_HEADER_FLAG_DRAFT")
+    '("flagged" "TNY_HEADER_FLAG_FLAGGED")
+    '("seen" "TNY_HEADER_FLAG_SEEN")
+    '("attachments" "TNY_HEADER_FLAG_ATTACHMENTS")
+    '("cached" "TNY_HEADER_FLAG_CACHED")
+    '("partial" "TNY_HEADER_FLAG_PARTIAL")
+    '("expunged" "TNY_HEADER_FLAG_EXPUNGED")
+    '("priority" "TNY_HEADER_FLAG_PRIORITY")
+  )
+)
+
+(define-flags HeaderPriorityFlags
+  (in-module "Tny")
+  (c-name "TnyHeaderPriorityFlags")
+  (gtype-id "TNY_TYPE_HEADER_PRIORITY_FLAGS")
+  (values
+    '("high-priority" "TNY_HEADER_FLAG_HIGH_PRIORITY")
+    '("normal-priority" "TNY_HEADER_FLAG_NORMAL_PRIORITY")
+    '("low-priority" "TNY_HEADER_FLAG_LOW_PRIORITY")
+    '("suspended-priority" "TNY_HEADER_FLAG_SUSPENDED_PRIORITY")
+  )
+)
+
+(define-enum FolderType
+  (in-module "Tny")
+  (c-name "TnyFolderType")
+  (gtype-id "TNY_TYPE_FOLDER_TYPE")
+  (values
+    '("unknown" "TNY_FOLDER_TYPE_UNKNOWN")
+    '("normal" "TNY_FOLDER_TYPE_NORMAL")
+    '("inbox" "TNY_FOLDER_TYPE_INBOX")
+    '("outbox" "TNY_FOLDER_TYPE_OUTBOX")
+    '("trash" "TNY_FOLDER_TYPE_TRASH")
+    '("junk" "TNY_FOLDER_TYPE_JUNK")
+    '("sent" "TNY_FOLDER_TYPE_SENT")
+    '("root" "TNY_FOLDER_TYPE_ROOT")
+    '("notes" "TNY_FOLDER_TYPE_NOTES")
+    '("drafts" "TNY_FOLDER_TYPE_DRAFTS")
+    '("contacts" "TNY_FOLDER_TYPE_CONTACTS")
+    '("calendar" "TNY_FOLDER_TYPE_CALENDAR")
+    '("archive" "TNY_FOLDER_TYPE_ARCHIVE")
+    '("merge" "TNY_FOLDER_TYPE_MERGE")
+    '("num" "TNY_FOLDER_TYPE_NUM")
+  )
+)
+
+(define-enum SendQueueSignal
+  (in-module "Tny")
+  (c-name "TnySendQueueSignal")
+  (gtype-id "TNY_TYPE_SEND_QUEUE_SIGNAL")
+  (values
+    '("msg-sending" "TNY_SEND_QUEUE_MSG_SENDING")
+    '("msg-sent" "TNY_SEND_QUEUE_MSG_SENT")
+    '("error-happened" "TNY_SEND_QUEUE_ERROR_HAPPENED")
+    '("last-signal" "TNY_SEND_QUEUE_LAST_SIGNAL")
+  )
+)
+
+(define-enum StoreAccountSignal
+  (in-module "Tny")
+  (c-name "TnyStoreAccountSignal")
+  (gtype-id "TNY_TYPE_STORE_ACCOUNT_SIGNAL")
+  (values
+    '("subscription-changed" "TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED")
+    '("last-signal" "TNY_STORE_ACCOUNT_LAST_SIGNAL")
+  )
+)
+
+
+;; From tny-account.h
+
+(define-function tny_account_get_type
+  (c-name "tny_account_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_account_type_get_type
+  (c-name "tny_account_type_get_type")
+  (return-type "GType")
+)
+
+(define-method get_connection_status
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_connection_status")
+  (return-type "TnyConnectionStatus")
+)
+
+(define-method set_id
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_id")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-method set_name
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method set_secure_auth_mech
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_secure_auth_mech")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "mech")
+  )
+)
+
+(define-method set_proto
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_proto")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "proto")
+  )
+)
+
+(define-method set_user
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_user")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "user")
+  )
+)
+
+(define-method set_hostname
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_hostname")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "host")
+  )
+)
+
+(define-method set_port
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_port")
+  (return-type "none")
+  (parameters
+    '("guint" "port")
+  )
+)
+
+(define-method set_pass_func
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_pass_func")
+  (return-type "none")
+  (parameters
+    '("TnyGetPassFunc" "get_pass_func")
+  )
+)
+
+(define-method set_url_string
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_url_string")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "url_string")
+  )
+)
+
+(define-method get_account_type
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_account_type")
+  (return-type "TnyAccountType")
+)
+
+(define-method get_id
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_id")
+  (return-type "const-gchar*")
+)
+
+(define-method get_name
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_secure_auth_mech
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_secure_auth_mech")
+  (return-type "const-gchar*")
+)
+
+(define-method get_proto
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_proto")
+  (return-type "const-gchar*")
+)
+
+(define-method get_user
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_user")
+  (return-type "const-gchar*")
+)
+
+(define-method get_hostname
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_hostname")
+  (return-type "const-gchar*")
+)
+
+(define-method get_port
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_port")
+  (return-type "guint")
+)
+
+(define-method get_url_string
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_url_string")
+  (return-type "gchar*")
+)
+
+(define-method get_pass_func
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_pass_func")
+  (return-type "TnyGetPassFunc")
+)
+
+(define-method set_forget_pass_func
+  (of-object "TnyAccount")
+  (c-name "tny_account_set_forget_pass_func")
+  (return-type "none")
+  (parameters
+    '("TnyForgetPassFunc" "forget_pass_func")
+  )
+)
+
+(define-method get_forget_pass_func
+  (of-object "TnyAccount")
+  (c-name "tny_account_get_forget_pass_func")
+  (return-type "TnyForgetPassFunc")
+)
+
+(define-method cancel
+  (of-object "TnyAccount")
+  (c-name "tny_account_cancel")
+  (return-type "none")
+)
+
+(define-method matches_url_string
+  (of-object "TnyAccount")
+  (c-name "tny_account_matches_url_string")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "url_string")
+  )
+)
+
+(define-method start_operation
+  (of-object "TnyAccount")
+  (c-name "tny_account_start_operation")
+  (return-type "none")
+  (parameters
+    '("TnyStatusDomain" "domain")
+    '("TnyStatusCode" "code")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "status_user_data")
+  )
+)
+
+(define-method stop_operation
+  (of-object "TnyAccount")
+  (c-name "tny_account_stop_operation")
+  (return-type "none")
+  (parameters
+    '("gboolean*" "canceled")
+  )
+)
+
+(define-method is_ready
+  (of-object "TnyAccount")
+  (c-name "tny_account_is_ready")
+  (return-type "gboolean")
+)
+
+
+
+;; From tny-account-store.h
+
+(define-function tny_account_store_get_type
+  (c-name "tny_account_store_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_get_accounts_request_type_get_type
+  (c-name "tny_get_accounts_request_type_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_alert_type_get_type
+  (c-name "tny_alert_type_get_type")
+  (return-type "GType")
+)
+
+(define-method get_accounts
+  (of-object "TnyAccountStore")
+  (c-name "tny_account_store_get_accounts")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
+    '("TnyGetAccountsRequestType" "types")
+  )
+)
+
+(define-method get_cache_dir
+  (of-object "TnyAccountStore")
+  (c-name "tny_account_store_get_cache_dir")
+  (return-type "const-gchar*")
+)
+
+(define-method get_device
+  (of-object "TnyAccountStore")
+  (c-name "tny_account_store_get_device")
+  (return-type "TnyDevice*")
+)
+
+(define-method alert
+  (of-object "TnyAccountStore")
+  (c-name "tny_account_store_alert")
+  (return-type "gboolean")
+  (parameters
+    '("TnyAccount*" "account")
+    '("TnyAlertType" "type")
+    '("gboolean" "question")
+    '("const-GError*" "error")
+  )
+)
+
+(define-method find_account
+  (of-object "TnyAccountStore")
+  (c-name "tny_account_store_find_account")
+  (return-type "TnyAccount*")
+  (parameters
+    '("const-gchar*" "url_string")
+  )
+)
+
+
+
+;; From tny-combined-account.h
+
+(define-function tny_combined_account_get_type
+  (c-name "tny_combined_account_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_combined_account_new
+  (c-name "tny_combined_account_new")
+  (is-constructor-of "TnyCombinedAccount")
+  (return-type "TnyAccount*")
+  (parameters
+    '("TnyTransportAccount*" "ta")
+    '("TnyStoreAccount*" "sa")
+  )
+)
+
+(define-method get_transport_account
+  (of-object "TnyCombinedAccount")
+  (c-name "tny_combined_account_get_transport_account")
+  (return-type "TnyTransportAccount*")
+)
+
+(define-method get_store_account
+  (of-object "TnyCombinedAccount")
+  (c-name "tny_combined_account_get_store_account")
+  (return-type "TnyStoreAccount*")
+)
+
+
+
+;; From tny-device.h
+
+(define-function tny_device_get_type
+  (c-name "tny_device_get_type")
+  (return-type "GType")
+)
+
+(define-method is_online
+  (of-object "TnyDevice")
+  (c-name "tny_device_is_online")
+  (return-type "gboolean")
+)
+
+(define-method force_online
+  (of-object "TnyDevice")
+  (c-name "tny_device_force_online")
+  (return-type "none")
+)
+
+(define-method force_offline
+  (of-object "TnyDevice")
+  (c-name "tny_device_force_offline")
+  (return-type "none")
+)
+
+(define-method reset
+  (of-object "TnyDevice")
+  (c-name "tny_device_reset")
+  (return-type "none")
+)
+
+
+
+;; From tny-enums.h
+
+
+
+;; From tny-error.h
+
+(define-function tny_error_domain_get_type
+  (c-name "tny_error_domain_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_error_get_type
+  (c-name "tny_error_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From tny-folder-change.h
+
+(define-function tny_folder_change_get_type
+  (c-name "tny_folder_change_get_type")
+  (return-type "GType")
+)
+
+(define-method change_new
+  (of-object "TnyFolder")
+  (c-name "tny_folder_change_new")
+  (return-type "TnyFolderChange*")
+)
+
+(define-method get_rename
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_rename")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar**" "oldname")
+  )
+)
+
+(define-method set_rename
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_set_rename")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "newname")
+  )
+)
+
+(define-method set_received_msg
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_set_received_msg")
+  (return-type "none")
+  (parameters
+    '("TnyMsg*" "msg")
+  )
+)
+
+(define-method get_received_msg
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_received_msg")
+  (return-type "TnyMsg*")
+)
+
+(define-method set_new_all_count
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_set_new_all_count")
+  (return-type "none")
+  (parameters
+    '("guint" "new_all_count")
+  )
+)
+
+(define-method set_new_unread_count
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_set_new_unread_count")
+  (return-type "none")
+  (parameters
+    '("guint" "new_unread_count")
+  )
+)
+
+(define-method get_new_unread_count
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_new_unread_count")
+  (return-type "guint")
+)
+
+(define-method get_new_all_count
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_new_all_count")
+  (return-type "guint")
+)
+
+(define-method add_added_header
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_add_added_header")
+  (return-type "none")
+  (parameters
+    '("TnyHeader*" "header")
+  )
+)
+
+(define-method add_expunged_header
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_add_expunged_header")
+  (return-type "none")
+  (parameters
+    '("TnyHeader*" "header")
+  )
+)
+
+(define-method get_added_headers
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_added_headers")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "headers")
+  )
+)
+
+(define-method get_expunged_headers
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_expunged_headers")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "headers")
+  )
+)
+
+(define-method reset
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_reset")
+  (return-type "none")
+)
+
+(define-method get_folder
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_folder")
+  (return-type "TnyFolder*")
+)
+
+(define-method get_changed
+  (of-object "TnyFolderChange")
+  (c-name "tny_folder_change_get_changed")
+  (return-type "TnyFolderChangeChanged")
+)
+
+
+
+;; From tny-folder.h
+
+(define-function tny_folder_get_type
+  (c-name "tny_folder_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_folder_type_get_type
+  (c-name "tny_folder_type_get_type")
+  (return-type "GType")
+)
+
+(define-method get_msg_remove_strategy
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_msg_remove_strategy")
+  (return-type "TnyMsgRemoveStrategy*")
+)
+
+(define-method set_msg_remove_strategy
+  (of-object "TnyFolder")
+  (c-name "tny_folder_set_msg_remove_strategy")
+  (return-type "none")
+  (parameters
+    '("TnyMsgRemoveStrategy*" "st")
+  )
+)
+
+(define-method get_msg_receive_strategy
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_msg_receive_strategy")
+  (return-type "TnyMsgReceiveStrategy*")
+)
+
+(define-method set_msg_receive_strategy
+  (of-object "TnyFolder")
+  (c-name "tny_folder_set_msg_receive_strategy")
+  (return-type "none")
+  (parameters
+    '("TnyMsgReceiveStrategy*" "st")
+  )
+)
+
+(define-method remove_msg
+  (of-object "TnyFolder")
+  (c-name "tny_folder_remove_msg")
+  (return-type "none")
+  (parameters
+    '("TnyHeader*" "header")
+    '("GError**" "err")
+  )
+)
+
+(define-method add_msg
+  (of-object "TnyFolder")
+  (c-name "tny_folder_add_msg")
+  (return-type "none")
+  (parameters
+    '("TnyMsg*" "msg")
+    '("GError**" "err")
+  )
+)
+
+(define-method add_msg_async
+  (of-object "TnyFolder")
+  (c-name "tny_folder_add_msg_async")
+  (return-type "none")
+  (parameters
+    '("TnyMsg*" "msg")
+    '("TnyFolderCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method sync
+  (of-object "TnyFolder")
+  (c-name "tny_folder_sync")
+  (return-type "none")
+  (parameters
+    '("gboolean" "expunge")
+    '("GError**" "err")
+  )
+)
+
+(define-method sync_async
+  (of-object "TnyFolder")
+  (c-name "tny_folder_sync_async")
+  (return-type "none")
+  (parameters
+    '("gboolean" "expunge")
+    '("TnyFolderCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method get_msg
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_msg")
+  (return-type "TnyMsg*")
+  (parameters
+    '("TnyHeader*" "header")
+    '("GError**" "err")
+  )
+)
+
+(define-method find_msg
+  (of-object "TnyFolder")
+  (c-name "tny_folder_find_msg")
+  (return-type "TnyMsg*")
+  (parameters
+    '("const-gchar*" "url_string")
+    '("GError**" "err")
+  )
+)
+
+(define-method get_msg_async
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_msg_async")
+  (return-type "none")
+  (parameters
+    '("TnyHeader*" "header")
+    '("TnyGetMsgCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method get_headers
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_headers")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "headers")
+    '("gboolean" "refresh")
+    '("GError**" "err")
+  )
+)
+
+(define-method get_headers_async
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_headers_async")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "headers")
+    '("gboolean" "refresh")
+    '("TnyGetHeadersCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method get_account
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_account")
+  (return-type "TnyAccount*")
+)
+
+(define-method get_id
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_id")
+  (return-type "const-gchar*")
+)
+
+(define-method get_name
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_folder_type
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_folder_type")
+  (return-type "TnyFolderType")
+)
+
+(define-method get_all_count
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_all_count")
+  (return-type "guint")
+)
+
+(define-method get_unread_count
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_unread_count")
+  (return-type "guint")
+)
+
+(define-method get_local_size
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_local_size")
+  (return-type "guint")
+)
+
+(define-method is_subscribed
+  (of-object "TnyFolder")
+  (c-name "tny_folder_is_subscribed")
+  (return-type "gboolean")
+)
+
+(define-method refresh_async
+  (of-object "TnyFolder")
+  (c-name "tny_folder_refresh_async")
+  (return-type "none")
+  (parameters
+    '("TnyFolderCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method refresh
+  (of-object "TnyFolder")
+  (c-name "tny_folder_refresh")
+  (return-type "none")
+  (parameters
+    '("GError**" "err")
+  )
+)
+
+(define-method transfer_msgs
+  (of-object "TnyFolder")
+  (c-name "tny_folder_transfer_msgs")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "header_list")
+    '("TnyFolder*" "folder_dst")
+    '("gboolean" "delete_originals")
+    '("GError**" "err")
+  )
+)
+
+(define-method transfer_msgs_async
+  (of-object "TnyFolder")
+  (c-name "tny_folder_transfer_msgs_async")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "header_list")
+    '("TnyFolder*" "folder_dst")
+    '("gboolean" "delete_originals")
+    '("TnyTransferMsgsCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method copy
+  (of-object "TnyFolder")
+  (c-name "tny_folder_copy")
+  (return-type "TnyFolder*")
+  (parameters
+    '("TnyFolderStore*" "into")
+    '("const-gchar*" "new_name")
+    '("gboolean" "del")
+    '("GError**" "err")
+  )
+)
+
+(define-method copy_async
+  (of-object "TnyFolder")
+  (c-name "tny_folder_copy_async")
+  (return-type "none")
+  (parameters
+    '("TnyFolderStore*" "into")
+    '("const-gchar*" "new_name")
+    '("gboolean" "del")
+    '("TnyCopyFolderCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method poke_status
+  (of-object "TnyFolder")
+  (c-name "tny_folder_poke_status")
+  (return-type "none")
+)
+
+(define-method add_observer
+  (of-object "TnyFolder")
+  (c-name "tny_folder_add_observer")
+  (return-type "none")
+  (parameters
+    '("TnyFolderObserver*" "observer")
+  )
+)
+
+(define-method remove_observer
+  (of-object "TnyFolder")
+  (c-name "tny_folder_remove_observer")
+  (return-type "none")
+  (parameters
+    '("TnyFolderObserver*" "observer")
+  )
+)
+
+(define-method get_folder_store
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_folder_store")
+  (return-type "TnyFolderStore*")
+)
+
+(define-method get_stats
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_stats")
+  (return-type "TnyFolderStats*")
+)
+
+(define-method get_caps
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_caps")
+  (return-type "TnyFolderCaps")
+)
+
+(define-method get_url_string
+  (of-object "TnyFolder")
+  (c-name "tny_folder_get_url_string")
+  (return-type "gchar*")
+)
+
+
+
+;; From tny-folder-monitor.h
+
+(define-function tny_folder_monitor_get_type
+  (c-name "tny_folder_monitor_get_type")
+  (return-type "GType")
+)
+
+(define-method monitor_new
+  (of-object "TnyFolder")
+  (c-name "tny_folder_monitor_new")
+  (return-type "TnyFolderObserver*")
+)
+
+(define-method poke_status
+  (of-object "TnyFolderMonitor")
+  (c-name "tny_folder_monitor_poke_status")
+  (return-type "none")
+)
+
+(define-method add_list
+  (of-object "TnyFolderMonitor")
+  (c-name "tny_folder_monitor_add_list")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
+  )
+)
+
+(define-method remove_list
+  (of-object "TnyFolderMonitor")
+  (c-name "tny_folder_monitor_remove_list")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
+  )
+)
+
+(define-method stop
+  (of-object "TnyFolderMonitor")
+  (c-name "tny_folder_monitor_stop")
+  (return-type "none")
+)
+
+(define-method start
+  (of-object "TnyFolderMonitor")
+  (c-name "tny_folder_monitor_start")
+  (return-type "none")
+)
+
+
+
+;; From tny-folder-observer.h
+
+(define-function tny_folder_observer_get_type
+  (c-name "tny_folder_observer_get_type")
+  (return-type "GType")
+)
+
+(define-method update
+  (of-object "TnyFolderObserver")
+  (c-name "tny_folder_observer_update")
+  (return-type "none")
+  (parameters
+    '("TnyFolderChange*" "change")
+  )
+)
+
+
+
+;; From tny-folder-stats.h
+
+(define-function tny_folder_stats_get_type
+  (c-name "tny_folder_stats_get_type")
+  (return-type "GType")
+)
+
+(define-method stats_new
+  (of-object "TnyFolder")
+  (c-name "tny_folder_stats_new")
+  (return-type "TnyFolderStats*")
+)
+
+(define-method get_unread_count
+  (of-object "TnyFolderStats")
+  (c-name "tny_folder_stats_get_unread_count")
+  (return-type "guint")
+)
+
+(define-method get_all_count
+  (of-object "TnyFolderStats")
+  (c-name "tny_folder_stats_get_all_count")
+  (return-type "guint")
+)
+
+(define-method get_local_size
+  (of-object "TnyFolderStats")
+  (c-name "tny_folder_stats_get_local_size")
+  (return-type "gsize")
+)
+
+(define-method set_local_size
+  (of-object "TnyFolderStats")
+  (c-name "tny_folder_stats_set_local_size")
+  (return-type "none")
+  (parameters
+    '("gsize" "local_size")
+  )
+)
+
+(define-method get_folder
+  (of-object "TnyFolderStats")
+  (c-name "tny_folder_stats_get_folder")
+  (return-type "TnyFolder*")
+)
+
+
+
+;; From tny-folder-store-change.h
+
+(define-function tny_folder_store_change_get_type
+  (c-name "tny_folder_store_change_get_type")
+  (return-type "GType")
+)
+
+(define-method change_new
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_change_new")
+  (return-type "TnyFolderStoreChange*")
+)
+
+(define-method add_created_folder
+  (of-object "TnyFolderStoreChange")
+  (c-name "tny_folder_store_change_add_created_folder")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+  )
+)
+
+(define-method add_removed_folder
+  (of-object "TnyFolderStoreChange")
+  (c-name "tny_folder_store_change_add_removed_folder")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+  )
+)
+
+(define-method get_created_folders
+  (of-object "TnyFolderStoreChange")
+  (c-name "tny_folder_store_change_get_created_folders")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "folders")
+  )
+)
+
+(define-method get_removed_folders
+  (of-object "TnyFolderStoreChange")
+  (c-name "tny_folder_store_change_get_removed_folders")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "folders")
+  )
+)
+
+(define-method reset
+  (of-object "TnyFolderStoreChange")
+  (c-name "tny_folder_store_change_reset")
+  (return-type "none")
+)
+
+(define-method get_folder_store
+  (of-object "TnyFolderStoreChange")
+  (c-name "tny_folder_store_change_get_folder_store")
+  (return-type "TnyFolderStore*")
+)
+
+(define-method get_changed
+  (of-object "TnyFolderStoreChange")
+  (c-name "tny_folder_store_change_get_changed")
+  (return-type "TnyFolderStoreChangeChanged")
+)
+
+
+
+;; From tny-folder-store.h
+
+(define-function tny_folder_store_get_type
+  (c-name "tny_folder_store_get_type")
+  (return-type "GType")
+)
+
+(define-method remove_folder
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_remove_folder")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+    '("GError**" "err")
+  )
+)
+
+(define-method create_folder
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_create_folder")
+  (return-type "TnyFolder*")
+  (parameters
+    '("const-gchar*" "name")
+    '("GError**" "err")
+  )
+)
+
+(define-method get_folders
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_get_folders")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
+    '("TnyFolderStoreQuery*" "query")
+    '("GError**" "err")
+  )
+)
+
+(define-method get_folders_async
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_get_folders_async")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
+    '("TnyGetFoldersCallback" "callback")
+    '("TnyFolderStoreQuery*" "query")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method add_observer
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_add_observer")
+  (return-type "none")
+  (parameters
+    '("TnyFolderStoreObserver*" "observer")
+  )
+)
+
+(define-method remove_observer
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_remove_observer")
+  (return-type "none")
+  (parameters
+    '("TnyFolderStoreObserver*" "observer")
+  )
+)
+
+
+
+;; From tny-folder-store-observer.h
+
+(define-function tny_folder_store_observer_get_type
+  (c-name "tny_folder_store_observer_get_type")
+  (return-type "GType")
+)
+
+(define-method update
+  (of-object "TnyFolderStoreObserver")
+  (c-name "tny_folder_store_observer_update")
+  (return-type "none")
+  (parameters
+    '("TnyFolderStoreChange*" "change")
+  )
+)
+
+
+
+;; From tny-folder-store-query.h
+
+(define-function tny_folder_store_query_get_type
+  (c-name "tny_folder_store_query_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_folder_store_query_item_get_type
+  (c-name "tny_folder_store_query_item_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_folder_store_query_option_get_type
+  (c-name "tny_folder_store_query_option_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_folder_store_query_new
+  (c-name "tny_folder_store_query_new")
+  (is-constructor-of "TnyFolderStoreQuery")
+  (return-type "TnyFolderStoreQuery*")
+)
+
+(define-method add_item
+  (of-object "TnyFolderStoreQuery")
+  (c-name "tny_folder_store_query_add_item")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "pattern")
+    '("TnyFolderStoreQueryOption" "options")
+  )
+)
+
+(define-method get_items
+  (of-object "TnyFolderStoreQuery")
+  (c-name "tny_folder_store_query_get_items")
+  (return-type "TnyList*")
+)
+
+(define-method get_options
+  (of-object "TnyFolderStoreQueryItem")
+  (c-name "tny_folder_store_query_item_get_options")
+  (return-type "TnyFolderStoreQueryOption")
+)
+
+(define-method get_regex
+  (of-object "TnyFolderStoreQueryItem")
+  (c-name "tny_folder_store_query_item_get_regex")
+  (return-type "regex_t*")
+)
+
+
+
+;; From tny-fs-stream.h
+
+(define-function tny_fs_stream_get_type
+  (c-name "tny_fs_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_fs_stream_new
+  (c-name "tny_fs_stream_new")
+  (is-constructor-of "TnyFsStream")
+  (return-type "TnyStream*")
+  (parameters
+    '("int" "fd")
+  )
+)
+
+(define-method set_fd
+  (of-object "TnyFsStream")
+  (c-name "tny_fs_stream_set_fd")
+  (return-type "none")
+  (parameters
+    '("int" "fd")
+  )
+)
+
+
+
+;; From tny-header.h
+
+(define-function tny_header_get_type
+  (c-name "tny_header_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_header_flags_get_type
+  (c-name "tny_header_flags_get_type")
+  (return-type "GType")
+)
+
+(define-method get_uid
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_uid")
+  (return-type "const-gchar*")
+)
+
+(define-method get_bcc
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_bcc")
+  (return-type "const-gchar*")
+)
+
+(define-method get_cc
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_cc")
+  (return-type "const-gchar*")
+)
+
+(define-method get_date_received
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_date_received")
+  (return-type "time_t")
+)
+
+(define-method get_date_sent
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_date_sent")
+  (return-type "time_t")
+)
+
+(define-method get_message_id
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_message_id")
+  (return-type "const-gchar*")
+)
+
+(define-method get_message_size
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_message_size")
+  (return-type "guint")
+)
+
+(define-method get_from
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_from")
+  (return-type "const-gchar*")
+)
+
+(define-method get_to
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_to")
+  (return-type "const-gchar*")
+)
+
+(define-method get_subject
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_subject")
+  (return-type "const-gchar*")
+)
+
+(define-method get_replyto
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_replyto")
+  (return-type "const-gchar*")
+)
+
+(define-method set_bcc
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_bcc")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "bcc")
+  )
+)
+
+(define-method set_cc
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_cc")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "cc")
+  )
+)
+
+(define-method set_from
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_from")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "from")
+  )
+)
+
+(define-method set_subject
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_subject")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "subject")
+  )
+)
+
+(define-method set_to
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_to")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "to")
+  )
+)
+
+(define-method set_replyto
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_replyto")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "to")
+  )
+)
+
+(define-method get_folder
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_folder")
+  (return-type "TnyFolder*")
+)
+
+(define-method get_flags
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_flags")
+  (return-type "TnyHeaderFlags")
+)
+
+(define-method set_flags
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_flags")
+  (return-type "none")
+  (parameters
+    '("TnyHeaderFlags" "mask")
+  )
+)
+
+(define-method unset_flags
+  (of-object "TnyHeader")
+  (c-name "tny_header_unset_flags")
+  (return-type "none")
+  (parameters
+    '("TnyHeaderFlags" "mask")
+  )
+)
+
+
+
+;; From tny-iterator.h
+
+(define-function tny_iterator_get_type
+  (c-name "tny_iterator_get_type")
+  (return-type "GType")
+)
+
+(define-method next
+  (of-object "TnyIterator")
+  (c-name "tny_iterator_next")
+  (return-type "none")
+)
+
+(define-method prev
+  (of-object "TnyIterator")
+  (c-name "tny_iterator_prev")
+  (return-type "none")
+)
+
+(define-method first
+  (of-object "TnyIterator")
+  (c-name "tny_iterator_first")
+  (return-type "none")
+)
+
+(define-method nth
+  (of-object "TnyIterator")
+  (c-name "tny_iterator_nth")
+  (return-type "none")
+  (parameters
+    '("guint" "nth")
+  )
+)
+
+(define-method get_current
+  (of-object "TnyIterator")
+  (c-name "tny_iterator_get_current")
+  (return-type "GObject*")
+)
+
+(define-method is_done
+  (of-object "TnyIterator")
+  (c-name "tny_iterator_is_done")
+  (return-type "gboolean")
+)
+
+(define-method get_list
+  (of-object "TnyIterator")
+  (c-name "tny_iterator_get_list")
+  (return-type "TnyList*")
+)
+
+
+
+;; From tny-list.h
+
+(define-function tny_list_get_type
+  (c-name "tny_list_get_type")
+  (return-type "GType")
+)
+
+(define-method get_length
+  (of-object "TnyList")
+  (c-name "tny_list_get_length")
+  (return-type "guint")
+)
+
+(define-method prepend
+  (of-object "TnyList")
+  (c-name "tny_list_prepend")
+  (return-type "none")
+  (parameters
+    '("GObject*" "item")
+  )
+)
+
+(define-method append
+  (of-object "TnyList")
+  (c-name "tny_list_append")
+  (return-type "none")
+  (parameters
+    '("GObject*" "item")
+  )
+)
+
+(define-method remove
+  (of-object "TnyList")
+  (c-name "tny_list_remove")
+  (return-type "none")
+  (parameters
+    '("GObject*" "item")
+  )
+)
+
+(define-method foreach
+  (of-object "TnyList")
+  (c-name "tny_list_foreach")
+  (return-type "none")
+  (parameters
+    '("GFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method create_iterator
+  (of-object "TnyList")
+  (c-name "tny_list_create_iterator")
+  (return-type "TnyIterator*")
+)
+
+(define-method copy
+  (of-object "TnyList")
+  (c-name "tny_list_copy")
+  (return-type "TnyList*")
+)
+
+
+
+;; From tny-lockable.h
+
+(define-function tny_lockable_get_type
+  (c-name "tny_lockable_get_type")
+  (return-type "GType")
+)
+
+(define-method lock
+  (of-object "TnyLockable")
+  (c-name "tny_lockable_lock")
+  (return-type "none")
+)
+
+(define-method unlock
+  (of-object "TnyLockable")
+  (c-name "tny_lockable_unlock")
+  (return-type "none")
+)
+
+
+
+;; From tny-merge-folder.h
+
+(define-function tny_merge_folder_get_type
+  (c-name "tny_merge_folder_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_merge_folder_new
+  (c-name "tny_merge_folder_new")
+  (is-constructor-of "TnyMergeFolder")
+  (return-type "TnyFolder*")
+  (parameters
+    '("const-gchar*" "folder_name")
+  )
+)
+
+(define-method add_folder
+  (of-object "TnyMergeFolder")
+  (c-name "tny_merge_folder_add_folder")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+  )
+)
+
+(define-method set_folder_type
+  (of-object "TnyMergeFolder")
+  (c-name "tny_merge_folder_set_folder_type")
+  (return-type "none")
+  (parameters
+    '("TnyFolderType" "folder_type")
+  )
+)
+
+
+
+;; From tny-mime-part.h
+
+(define-function tny_mime_part_get_type
+  (c-name "tny_mime_part_get_type")
+  (return-type "GType")
+)
+
+(define-method get_content_type
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_content_type")
+  (return-type "const-gchar*")
+)
+
+(define-method content_type_is
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_content_type_is")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "type")
+  )
+)
+
+(define-method get_stream
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_stream")
+  (return-type "TnyStream*")
+)
+
+(define-method write_to_stream
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_write_to_stream")
+  (return-type "none")
+  (parameters
+    '("TnyStream*" "stream")
+  )
+)
+
+(define-method construct_from_stream
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_construct_from_stream")
+  (return-type "gint")
+  (parameters
+    '("TnyStream*" "stream")
+    '("const-gchar*" "type")
+  )
+)
+
+(define-method get_filename
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_filename")
+  (return-type "const-gchar*")
+)
+
+(define-method get_content_id
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_content_id")
+  (return-type "const-gchar*")
+)
+
+(define-method get_description
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_description")
+  (return-type "const-gchar*")
+)
+
+(define-method get_content_location
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_content_location")
+  (return-type "const-gchar*")
+)
+
+(define-method is_purged
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_is_purged")
+  (return-type "gboolean")
+)
+
+(define-method set_content_location
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_set_content_location")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "content_location")
+  )
+)
+
+(define-method set_description
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_set_description")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "description")
+  )
+)
+
+(define-method set_content_id
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_set_content_id")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "content_id")
+  )
+)
+
+(define-method set_filename
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_set_filename")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "filename")
+  )
+)
+
+(define-method set_content_type
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_set_content_type")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "contenttype")
+  )
+)
+
+(define-method set_purged
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_set_purged")
+  (return-type "none")
+)
+
+(define-method is_attachment
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_is_attachment")
+  (return-type "gboolean")
+)
+
+(define-method decode_to_stream
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_decode_to_stream")
+  (return-type "none")
+  (parameters
+    '("TnyStream*" "stream")
+  )
+)
+
+(define-method get_parts
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_parts")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
+  )
+)
+
+(define-method add_part
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_add_part")
+  (return-type "gint")
+  (parameters
+    '("TnyMimePart*" "part")
+  )
+)
+
+(define-method del_part
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_del_part")
+  (return-type "none")
+  (parameters
+    '("TnyMimePart*" "part")
+  )
+)
+
+(define-method get_header_pairs
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_get_header_pairs")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
+  )
+)
+
+(define-method set_header_pair
+  (of-object "TnyMimePart")
+  (c-name "tny_mime_part_set_header_pair")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-gchar*" "value")
+  )
+)
+
+
+
+;; From tny-msg.h
+
+(define-function tny_msg_get_type
+  (c-name "tny_msg_get_type")
+  (return-type "GType")
+)
+
+(define-method get_header
+  (of-object "TnyMsg")
+  (c-name "tny_msg_get_header")
+  (return-type "TnyHeader*")
+)
+
+(define-method get_folder
+  (of-object "TnyMsg")
+  (c-name "tny_msg_get_folder")
+  (return-type "TnyFolder*")
+)
+
+(define-method get_url_string
+  (of-object "TnyMsg")
+  (c-name "tny_msg_get_url_string")
+  (return-type "gchar*")
+)
+
+(define-method uncache_attachments
+  (of-object "TnyMsg")
+  (c-name "tny_msg_uncache_attachments")
+  (return-type "none")
+)
+
+(define-method rewrite_cache
+  (of-object "TnyMsg")
+  (c-name "tny_msg_rewrite_cache")
+  (return-type "none")
+)
+
+
+
+;; From tny-msg-receive-strategy.h
+
+(define-function tny_msg_receive_strategy_get_type
+  (c-name "tny_msg_receive_strategy_get_type")
+  (return-type "GType")
+)
+
+(define-method perform_get_msg
+  (of-object "TnyMsgReceiveStrategy")
+  (c-name "tny_msg_receive_strategy_perform_get_msg")
+  (return-type "TnyMsg*")
+  (parameters
+    '("TnyFolder*" "folder")
+    '("TnyHeader*" "header")
+    '("GError**" "err")
+  )
+)
+
+
+
+;; From tny-msg-remove-strategy.h
+
+(define-function tny_msg_remove_strategy_get_type
+  (c-name "tny_msg_remove_strategy_get_type")
+  (return-type "GType")
+)
+
+(define-method perform_remove
+  (of-object "TnyMsgRemoveStrategy")
+  (c-name "tny_msg_remove_strategy_perform_remove")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+    '("TnyHeader*" "header")
+    '("GError**" "err")
+  )
+)
+
+
+
+;; From tny-noop-lockable.h
+
+(define-function tny_noop_lockable_get_type
+  (c-name "tny_noop_lockable_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_noop_lockable_new
+  (c-name "tny_noop_lockable_new")
+  (is-constructor-of "TnyNoopLockable")
+  (return-type "TnyLockable*")
+)
+
+
+
+;; From tny-pair.h
+
+(define-function tny_pair_get_type
+  (c-name "tny_pair_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_pair_new
+  (c-name "tny_pair_new")
+  (is-constructor-of "TnyPair")
+  (return-type "TnyPair*")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method set_name
+  (of-object "TnyPair")
+  (c-name "tny_pair_set_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method get_name
+  (of-object "TnyPair")
+  (c-name "tny_pair_get_name")
+  (return-type "const-gchar*")
+)
+
+(define-method set_value
+  (of-object "TnyPair")
+  (c-name "tny_pair_set_value")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_value
+  (of-object "TnyPair")
+  (c-name "tny_pair_get_value")
+  (return-type "const-gchar*")
+)
+
+
+
+;; From tny-password-getter.h
+
+(define-function tny_password_getter_get_type
+  (c-name "tny_password_getter_get_type")
+  (return-type "GType")
+)
+
+(define-method get_password
+  (of-object "TnyPasswordGetter")
+  (c-name "tny_password_getter_get_password")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "aid")
+    '("const-gchar*" "prompt")
+    '("gboolean*" "cancel")
+  )
+)
+
+(define-method forget_password
+  (of-object "TnyPasswordGetter")
+  (c-name "tny_password_getter_forget_password")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "aid")
+  )
+)
+
+
+
+;; From tny-send-queue.h
+
+(define-function tny_send_queue_get_type
+  (c-name "tny_send_queue_get_type")
+  (return-type "GType")
+)
+
+(define-method add
+  (of-object "TnySendQueue")
+  (c-name "tny_send_queue_add")
+  (return-type "none")
+  (parameters
+    '("TnyMsg*" "msg")
+    '("GError**" "err")
+  )
+)
+
+(define-method get_sentbox
+  (of-object "TnySendQueue")
+  (c-name "tny_send_queue_get_sentbox")
+  (return-type "TnyFolder*")
+)
+
+(define-method get_outbox
+  (of-object "TnySendQueue")
+  (c-name "tny_send_queue_get_outbox")
+  (return-type "TnyFolder*")
+)
+
+(define-method cancel
+  (of-object "TnySendQueue")
+  (c-name "tny_send_queue_cancel")
+  (return-type "none")
+  (parameters
+    '("gboolean" "remove")
+    '("GError**" "err")
+  )
+)
+
+
+
+;; From tny-shared.h
+
+
+
+;; From tny-signals-marshal.h
+
+
+
+;; From tny-simple-list.h
+
+(define-function tny_simple_list_get_type
+  (c-name "tny_simple_list_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_simple_list_new
+  (c-name "tny_simple_list_new")
+  (is-constructor-of "TnySimpleList")
+  (return-type "TnyList*")
+)
+
+
+
+;; From tny-status.h
+
+(define-function tny_status_domain_get_type
+  (c-name "tny_status_domain_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_status_code_get_type
+  (c-name "tny_status_code_get_type")
+  (return-type "GType")
+)
+
+(define-function tny_status_new
+  (c-name "tny_status_new")
+  (is-constructor-of "TnyStatus")
+  (return-type "TnyStatus*")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("guint" "position")
+    '("guint" "of_total")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function tny_status_new_literal
+  (c-name "tny_status_new_literal")
+  (return-type "TnyStatus*")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("guint" "position")
+    '("guint" "of_total")
+    '("const-gchar*" "message")
+  )
+)
+
+(define-method free
+  (of-object "TnyStatus")
+  (c-name "tny_status_free")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "TnyStatus")
+  (c-name "tny_status_copy")
+  (return-type "TnyStatus*")
+)
+
+(define-method matches
+  (of-object "TnyStatus")
+  (c-name "tny_status_matches")
+  (return-type "gboolean")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+  )
+)
+
+(define-function tny_set_status
+  (c-name "tny_set_status")
+  (return-type "none")
+  (parameters
+    '("TnyStatus**" "status")
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("guint" "position")
+    '("guint" "of_total")
+    '("gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function tny_clear_status
+  (c-name "tny_clear_status")
+  (return-type "none")
+  (parameters
+    '("TnyStatus**" "status")
+  )
+)
+
+(define-method set_fraction
+  (of-object "TnyStatus")
+  (c-name "tny_status_set_fraction")
+  (return-type "none")
+  (parameters
+    '("gdouble" "fraction")
+  )
+)
+
+(define-method get_fraction
+  (of-object "TnyStatus")
+  (c-name "tny_status_get_fraction")
+  (return-type "gdouble")
+)
+
+
+
+;; From tny-store-account.h
+
+(define-function tny_store_account_get_type
+  (c-name "tny_store_account_get_type")
+  (return-type "GType")
+)
+
+(define-method subscribe
+  (of-object "TnyStoreAccount")
+  (c-name "tny_store_account_subscribe")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+  )
+)
+
+(define-method unsubscribe
+  (of-object "TnyStoreAccount")
+  (c-name "tny_store_account_unsubscribe")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+  )
+)
+
+(define-method find_folder
+  (of-object "TnyStoreAccount")
+  (c-name "tny_store_account_find_folder")
+  (return-type "TnyFolder*")
+  (parameters
+    '("const-gchar*" "url_string")
+    '("GError**" "err")
+  )
+)
+
+(define-method delete_cache
+  (of-object "TnyStoreAccount")
+  (c-name "tny_store_account_delete_cache")
+  (return-type "none")
+)
+
+
+
+;; From tny-stream.h
+
+(define-function tny_stream_get_type
+  (c-name "tny_stream_get_type")
+  (return-type "GType")
+)
+
+(define-method read
+  (of-object "TnyStream")
+  (c-name "tny_stream_read")
+  (return-type "gssize")
+  (parameters
+    '("char*" "buffer")
+    '("gsize" "n")
+  )
+)
+
+(define-method write
+  (of-object "TnyStream")
+  (c-name "tny_stream_write")
+  (return-type "gssize")
+  (parameters
+    '("const-char*" "buffer")
+    '("gsize" "n")
+  )
+)
+
+(define-method flush
+  (of-object "TnyStream")
+  (c-name "tny_stream_flush")
+  (return-type "gint")
+)
+
+(define-method close
+  (of-object "TnyStream")
+  (c-name "tny_stream_close")
+  (return-type "gint")
+)
+
+(define-method is_eos
+  (of-object "TnyStream")
+  (c-name "tny_stream_is_eos")
+  (return-type "gboolean")
+)
+
+(define-method reset
+  (of-object "TnyStream")
+  (c-name "tny_stream_reset")
+  (return-type "gint")
+)
+
+(define-method write_to_stream
+  (of-object "TnyStream")
+  (c-name "tny_stream_write_to_stream")
+  (return-type "gssize")
+  (parameters
+    '("TnyStream*" "output")
+  )
+)
+
+
+
+;; From tny-transport-account.h
+
+(define-function tny_transport_account_get_type
+  (c-name "tny_transport_account_get_type")
+  (return-type "GType")
+)
+
+(define-method send
+  (of-object "TnyTransportAccount")
+  (c-name "tny_transport_account_send")
+  (return-type "none")
+  (parameters
+    '("TnyMsg*" "msg")
+    '("GError**" "err")
+  )
+)
+
+

@@ -45,6 +45,7 @@ headers
 #include <tny-account-store.h>
 #include <tny-device.h>
 
+#include "pytny-status.h"
 
 #define NO_IMPORT_PYGOBJECT
 #include "pygobject.h"
@@ -55,9 +56,144 @@ modulename tinymail
 %%
 ignore-glob
   *_get_type
-
+%%
+ignore
+ tny_status_new_literal 
+ tny_clear_status
+ tny_set_status
 %%
 import gobject.GObject as PyGObject_Type
+%%
+override tny_account_stop_operation noargs
+static PyObject *
+_wrap_tny_account_stop_operation(PyGObject *self)
+{
+    gboolean result;
+
+    tny_account_stop_operation(TNY_ACCOUNT(self->obj), &result);
+    if(result)
+      Py_RETURN_TRUE;
+    else
+      Py_RETURN_FALSE;
+}
+%%
+override tny_password_getter_get_password args
+static PyObject *
+_wrap_tny_password_getter_get_password(PyGObject *self, PyObject *args)
+{
+    const gchar *aid;
+    const gchar *prompt;
+    const gchar *password;
+    gboolean     cancel; 
+
+    PyObject*    password_object;
+
+    if (!PyArg_ParseTuple(args, "ss", &aid, &prompt))
+        return NULL;
+    password = tny_password_getter_get_password(TNY_PASSWORD_GETTER(self->obj),
+				              aid, prompt, &cancel);
+    if(cancel)
+    {
+	if(!password)
+	  g_free((gchar*)password);
+        Py_RETURN_NONE;	
+    }
+    else
+    {
+        if(!(password_object = Py_BuildValue("s", password)))
+	{
+	    if(!password)
+	        g_free((gchar*)password);
+	    return NULL;
+	}
+	else
+	{
+	    g_free((gchar*)password);
+	    return password_object;
+	}
+    }
+}
+%%
+override tny_status_new kwargs
+static int
+_wrap_tny_status_new(PyGBoxed *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = { "domain", "code", "position", "of_total", "message", NULL };
+    TnyStatus status;
+    const gchar *domain_string;
+    GQuark domain_quark;
+
+    status.domain = 0;
+    status.code = 0;
+    status.position = 0;
+    status.of_total = 0;
+    status.message = "";
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "s|iiis:TnyStatus.__init__", kwlist,
+				     domain_string, &status.code, &status.position,
+				     &status.of_total, status.message))
+    {
+	return -1;
+    }
+
+    if (!(domain_quark = g_quark_try_string((const gchar*) status.message)))
+    {
+        PyErr_SetString(PyExc_ValueError, "Domain must match a registered GQuark");
+        return -1;
+    }
+
+    status.domain = domain_quark;
+
+    self->boxed =  g_boxed_copy(PYTNY_TYPE_STATUS, &status);
+    self->free_on_dealloc = TRUE;
+    self->gtype = PYTNY_TYPE_STATUS;
+    
+    return 0;
+}
+%%
+override tny_status_matches args
+static PyObject *
+_wrap_tny_status_matches(PyObject *self, PyObject *args)
+{
+    const gchar *domain;
+    gint         code;
+    GQuark       domain_quark;
+
+    if (!PyArg_ParseTuple(args, "si", domain, &code))
+        return NULL;
+
+    domain_quark = g_quark_try_string(domain);
+
+    if(tny_status_matches(pyg_boxed_get(self, TnyStatus), domain_quark, code))
+      Py_RETURN_TRUE;
+    else
+      Py_RETURN_FALSE;
+}
+%%
+override tny_folder_change_get_rename noargs
+_wrap_tny_folder_change_get_rename (PyGObject *self)
+{
+    const gchar *rename, *oldname;
+
+    rename = tny_folder_change_get_rename(TNY_FOLDER(self->obj), &oldname);
+
+    return Py_BuildValue("ss", rename, oldname);
+}
+
+    
+
+    
+
+    
+    
+
+
+
+
+
+
+
+
 %%
 override tny_folder_get_msg_async kwargs
 
