@@ -1311,7 +1311,9 @@ camel_folder_summary_info_new_from_message(CamelFolderSummary *s, CamelMimeMessa
 	} else
 		info = message_info_new_from_message(s, msg);
 
+	((CamelMessageInfoBase *)info)->content = NULL;
 
+/*
 	if (s!=NULL)
 		CAMEL_SUMMARY_LOCK(s, filter_lock);
 
@@ -1320,6 +1322,7 @@ camel_folder_summary_info_new_from_message(CamelFolderSummary *s, CamelMimeMessa
 
 	if (s!=NULL)
 		CAMEL_SUMMARY_UNLOCK(s, filter_lock);
+*/
 
 	return info;
 }
