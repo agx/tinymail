@@ -143,7 +143,6 @@ static gboolean
 parent_reset (CamelSeekableSubstream *seekable_substream, CamelSeekableStream *parent)
 {
 	CamelSeekableStream *seekable_stream = CAMEL_SEEKABLE_STREAM (seekable_substream);
-	gchar some_stack[1000];
 
 	if (camel_seekable_stream_tell (parent) == seekable_stream->position)
 		return TRUE;

@@ -51,6 +51,7 @@ struct _CamelSeekableStream {
 	off_t position;		/* current postion in the stream */
 	off_t bound_start;	/* first valid position */
 	off_t bound_end;	/* first invalid position */
+	char some_stack[50];
 };
 
 typedef struct {

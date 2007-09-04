@@ -307,7 +307,7 @@ stream_seek (CamelSeekableStream *stream, off_t offset,
 	     CamelStreamSeekPolicy policy)
 {
 	off_t position;
-	CamelStreamMem *stream_mem = CAMEL_STREAM_MEM (stream);
+	CamelStreamMem *stream_mem = (CamelStreamMem *) (stream);
 
 	switch  (policy) {
 	case CAMEL_STREAM_SET:
@@ -333,6 +333,8 @@ stream_seek (CamelSeekableStream *stream, off_t offset,
 
 	if (position > stream_mem->buffer->len) {
 		int oldlen = stream_mem->buffer->len;
+
+		/* TNY Observation: Can corrupt the stack if large */
 		g_byte_array_set_size (stream_mem->buffer, position);
 		memset (stream_mem->buffer->data + oldlen, 0,
 			position - oldlen);
