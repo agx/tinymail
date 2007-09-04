@@ -73,6 +73,13 @@ camel_seekable_substream_finalize (CamelObject *object)
 		camel_object_unref (seekable_substream->parent_stream);
 }
 
+static void
+camel_seekable_substream_init (gpointer object, gpointer klass)
+{
+	CamelSeekableSubstream *seekable_substream = (CamelSeekableSubstream *) object;
+	seekable_substream->parent_stream = NULL;
+	return;
+}
 
 CamelType
 camel_seekable_substream_get_type (void)
@@ -85,12 +92,13 @@ camel_seekable_substream_get_type (void)
 								     sizeof (CamelSeekableSubstreamClass),
 								     (CamelObjectClassInitFunc) camel_seekable_substream_class_init,
 								     NULL,
-								     NULL,
+								     (CamelObjectInitFunc) camel_seekable_substream_init,
 								     (CamelObjectFinalizeFunc) camel_seekable_substream_finalize);
 	}
 
 	return camel_seekable_substream_type;
 }
+
 
 /**
  * camel_seekable_substream_new:
