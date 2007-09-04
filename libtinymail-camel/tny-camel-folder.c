@@ -2956,7 +2956,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyFolder *retval = NULL;
-	gboolean succeeded = FALSE, tried=FALSE;
+	gboolean succeeded = FALSE, tried=FALSE, did_rename=FALSE;
 	TnyAccount *a, *b = NULL;
 	GError *nerr = NULL;
 	GError *terr = NULL;
@@ -3021,6 +3021,8 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			/* This does a g_rename on the mmap()ed file! */
 			camel_store_rename_folder (CAMEL_STORE (apriv->service), from, to, &ex);
 
+			did_rename = TRUE;
+
 			if (!camel_exception_is_set (&ex))
 			{
 				CamelFolderInfo *iter;
@@ -3084,7 +3086,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			g_object_unref (b);
 	}
 
-	if (!succeeded)
+	if (!succeeded && !did_rename)
 	{
 		CpyRecRet *cpyr;
 

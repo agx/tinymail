@@ -1,3 +1,8 @@
+2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed a problem when folder creation failed: observers where
+	nevertheless notified about a folder creation in this case
+
 2007-09-04  Mark Doffman  <mark.doffman@codethink.co.uk>
 
 	* bindigs/python/*: restructuring the Python language bindings
