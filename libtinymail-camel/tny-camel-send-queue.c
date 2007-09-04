@@ -371,7 +371,6 @@ errorhandler:
 
 	priv->thread = NULL;
 
-	g_thread_exit (NULL);
 	return NULL;
 }
 
@@ -383,28 +382,12 @@ create_worker (TnySendQueue *self)
 	if (!priv->is_running)
 	{
 		g_object_ref (self); /* Before creation reference */
-		priv->thread = g_thread_create (thread_main, self, TRUE, NULL);
+		priv->thread = g_thread_create (thread_main, self, FALSE, NULL);
 	}
 
 	return;
 }
 
-/**
- * tny_camel_send_queue_join_worker:
- * @self: A #TnyCamelSendQueue instance
- *
- * Join the worker thread of @self if it's running.
- **/
-void 
-tny_camel_send_queue_join_worker (TnyCamelSendQueue *self)
-{
-	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-
-	if (priv->thread && priv->is_running)
-		g_thread_join (priv->thread);
-
-	return;
-}
 
 static void
 tny_camel_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)

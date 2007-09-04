@@ -52,9 +52,6 @@ tny_camel_queue_finalize (GObject *object)
 	self->list = NULL;
 	g_static_rec_mutex_unlock (self->lock);
 
-	if (self->thread)
-		g_thread_join (self->thread);
-
 	g_static_rec_mutex_free (self->lock);
 	self->lock = NULL;
 
@@ -144,7 +141,6 @@ thread_main_func (gpointer user_data)
 	queue->stopped = TRUE;
 	g_object_unref (queue);
 
-	g_thread_exit (NULL);
 	return NULL;
 }
 
@@ -299,7 +295,7 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 		queue->stopped = FALSE;
 		g_object_ref (queue);
 		queue->thread = g_thread_create (thread_main_func, 
-			queue, TRUE, &err);
+			queue, FALSE, &err);
 		if (err) {
 			queue->stopped = TRUE;
 		}

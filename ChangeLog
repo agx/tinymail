@@ -1,6 +1,8 @@
 2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed a possible race condition in CamelMultiPart
+	* Fixed thread stack leakage on threads that are joinable but never
+	joined
 
 2007-09-03  Philip Van Hoof  <pvanhoof@gnome.org>
 
