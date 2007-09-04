@@ -1,3 +1,8 @@
+2007-09-04  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c: fixed the default function
+	used to implement the get_local_size interface
+
 2007-09-04  Vivek Sekar  <viveksekar@gmail.com>
 
 	* Added AC_CONFIG_AUX_DIR(.) to

@@ -1236,7 +1236,7 @@ _tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed)
 static guint
 tny_camel_folder_get_local_size (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_unread_count_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_local_size_func (self);
 }
 
 static guint
