@@ -1,3 +1,7 @@
+2007-09-04  Mark Doffman  <mark.doffman@codethink.co.uk>
+
+	* bindigs/python/*: restructuring the Python language bindings
+
 2007-09-04  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-account.c:
