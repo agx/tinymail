@@ -219,6 +219,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	g_static_rec_mutex_lock (apriv->service_lock);
 	/* camel_service_connect can launch GUI things */
 
+	apriv->service->data = self;
+
 	if (!apriv->service || !camel_service_connect (apriv->service, &ex))
 	{
 		if (camel_exception_is_set (&ex))

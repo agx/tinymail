@@ -456,15 +456,21 @@ tny_session_camel_do_an_error (TnySessionCamel *self, TnyAccount *account, TnyAl
 static gboolean
 tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type, CamelException *ex, gboolean cancel, CamelService *service)
 {
-	TnySessionCamel *self = (TnySessionCamel *)session;
-	TnySessionCamelPriv *priv = self->priv;
+	TnySessionCamel *self = (TnySessionCamel *) session;
+	TnySessionCamelPriv *priv = NULL;
 	gboolean retval = FALSE;
 	GError *err = NULL;
 	TnyAccount *account = NULL;
 
 	if (service && service->data)
-		account = TNY_ACCOUNT (service->data);
+		account = (TnyAccount *) service->data;
 
+	if (!TNY_IS_SESSION_CAMEL (self)) {
+		g_critical ("Internal problem in tny_session_camel_alert_user");
+		return FALSE;
+	}
+
+	priv = self->priv;
 	if (priv->account_store)
 	{
 		TnyAlertType tnytype;
