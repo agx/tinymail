@@ -46,10 +46,12 @@ G_BEGIN_DECLS
 
 enum _TnyFolderStoreQueryOption
 {
-   TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED = 1<<0,
-   TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED = 1<<1,
-   TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME = 1<<2,
-   TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID = 1<<3
+	TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED = 1<<1,
+	TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED = 1<<2,
+	TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME = 1<<3,
+	TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID = 1<<4,
+	TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE = 1<<5,
+	TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX = 1<<6,
 };
 
 #ifndef TNY_SHARED_H
@@ -62,20 +64,21 @@ typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
 
 struct _TnyFolderStoreQueryItem 
 {
-    	GObject parent;
-    	TnyFolderStoreQueryOption options;
-    	regex_t *regex;
+	GObject parent;
+	TnyFolderStoreQueryOption options;
+	regex_t *regex;
+	gchar *pattern;
 };
 
 struct _TnyFolderStoreQueryItemClass
 {
-    	GObjectClass parent;
+	GObjectClass parent;
 };
 
 struct _TnyFolderStoreQuery 
 {
 	GObject parent;
-    	TnyList *items;
+	TnyList *items;
 };
 
 struct _TnyFolderStoreQueryClass 
@@ -91,7 +94,8 @@ TnyFolderStoreQuery* tny_folder_store_query_new (void);
 void tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *pattern, TnyFolderStoreQueryOption options);
 TnyList* tny_folder_store_query_get_items (TnyFolderStoreQuery *query);
 TnyFolderStoreQueryOption tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item);
-regex_t* tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item);
+const regex_t* tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item);
+const gchar* tny_folder_store_query_item_get_pattern (TnyFolderStoreQueryItem *item);
 
 G_END_DECLS
 

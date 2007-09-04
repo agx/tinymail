@@ -17,6 +17,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* TNY TODO: Make this cope with AND constructs. Also take a look at 
+ * tny-camel-common.c:_tny_folder_store_query_passes */
+
 #include <config.h>
 
 #include <glib.h>
@@ -52,6 +55,9 @@ tny_folder_store_query_item_finalize (GObject *object)
 		regfree (self->regex);
 		g_free (self->regex);
 	}
+
+	if (self->pattern)
+		g_free (self->pattern);
 
 	item_parent_class->finalize (object);
 }
@@ -90,6 +96,8 @@ tny_folder_store_query_item_init (TnyFolderStoreQueryItem *self)
 {
 	self->options = 0;
 	self->regex = NULL;
+	self->pattern = NULL;
+
 	return;
 }
 
@@ -172,6 +180,7 @@ get_regerror (int errcode, regex_t *compiled)
 	return buffer;
 }
 
+
 /**
  * tny_folder_store_query_add_item:
  * @query: a #TnyFolderStoreQuery object
@@ -198,12 +207,12 @@ get_regerror (int errcode, regex_t *compiled)
  * {
  *      TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
  *      g_print ("%s\n", tny_folder_get_name (folder));
- *      g_object_unref (G_OBJECT (folder));
+ *      g_object_unref (folder);
  *      tny_iterator_next (iter);
  * }
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (folders)); 
- * g_object_unref (G_OBJECT (query)); 
+ * g_object_unref (iter);
+ * g_object_unref (folders); 
+ * g_object_unref (query); 
  * </programlisting></informalexample>
  *
  * For the options TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED and 
@@ -222,12 +231,12 @@ get_regerror (int errcode, regex_t *compiled)
  * {
  *      TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
  *      g_print ("%s\n", tny_folder_get_name (folder));
- *      g_object_unref (G_OBJECT (folder));
+ *      g_object_unref (folder);
  *      tny_iterator_next (iter);
  * }
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (folders)); 
- * g_object_unref (G_OBJECT (query)); 
+ * g_object_unref (iter);
+ * g_object_unref (folders);
+ * g_object_unref (query);
  * </programlisting></informalexample>
  *
  **/
@@ -236,34 +245,41 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
 {
 	gint er=0;
 	gboolean addit=pattern?TRUE:FALSE;
-	regex_t *regex = g_new0 (regex_t, 1);
+	regex_t *regex = NULL;
 	gboolean has_regex = FALSE;
 
-	if (addit)
-		er = regcomp (regex, (const char*)pattern, 0);
-	if (addit && er != 0)
+	if (addit && (options & TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX)) 
 	{
-		gchar *erstr = get_regerror (er, regex);
-		g_warning (erstr);
-		g_free (erstr);
-		regfree (regex);
-		addit = FALSE;
-		regex = NULL;
-	} else {
-		has_regex = TRUE;
-		addit = TRUE;
+		regex = g_new0 (regex_t, 1);
+		er = regcomp (regex, (const char*)pattern, 0);
+		if (er != 0) {
+			gchar *erstr = get_regerror (er, regex);
+			g_warning (erstr);
+			g_free (erstr);
+			regfree (regex);
+			addit = FALSE;
+			regex = NULL;
+		} else
+			has_regex = TRUE;
 	}
 
 	if (addit)
 	{
 		TnyFolderStoreQueryItem *add = g_object_new (TNY_TYPE_FOLDER_STORE_QUERY_ITEM, NULL);
+
 		add->options = options;
+		add->pattern = g_strdup (pattern);
+
 		if (has_regex)
 			add->regex = regex;
-		else add->regex = NULL;
-		tny_list_prepend (query->items, G_OBJECT (add));
-		g_object_unref (G_OBJECT (add));
+		else 
+			add->regex = NULL;
+
+		tny_list_prepend (query->items, (GObject *) add);
+		g_object_unref (add);
 	}
+
+	return;
 }
 
 /**
@@ -307,10 +323,17 @@ tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
  * Return value: the compiled regular expression of a query item
  *
  **/
-regex_t*
+const regex_t*
 tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item)
 {
-	return item->regex;
+	return (const regex_t*) item->regex;
+}
+
+
+const gchar* 
+tny_folder_store_query_item_get_pattern (TnyFolderStoreQueryItem *item)
+{
+	return (const gchar*) item->pattern;
 }
 
 /**
@@ -329,7 +352,9 @@ tny_folder_store_query_option_get_type (void)
       { TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED, "TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED", "subscribed" },
       { TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED, "TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED", "unsubscribed" },
       { TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME, "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME", "match_on_name" },
-      { TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID, "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID", "match_on_id" },	
+      { TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID, "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID", "match_on_id" },
+      { TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE, "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE", "pattern_is_case_insensitive" },
+      { TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX, "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX", "pattern_is_regex" },
       { 0, NULL, NULL }
     };
     etype = g_flags_register_static ("TnyFolderStoreQueryOption", values);

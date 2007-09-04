@@ -9,6 +9,11 @@
 	* Fixed a possible race condition in CamelMultiPart
 	* Fixed thread stack leakage on threads that are joinable but never
 	joined
+	* Major changes in TnyFolderStoreQuery and TnyFolderStoreQueryItem.
+	Support for non-regular expression matches and case insensitive
+	matching added.
+
+	* This was a major API change
 
 2007-09-03  Philip Van Hoof  <pvanhoof@gnome.org>
 
