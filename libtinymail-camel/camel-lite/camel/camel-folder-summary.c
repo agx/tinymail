@@ -2681,6 +2681,8 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 	if (containee == NULL)
 		return info;
 
+	camel_object_ref (containee);
+
 	/* TODO: I find it odd that get_part and get_content_object do not
 	   add a reference, probably need fixing for multithreading */
 
@@ -2704,15 +2706,19 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 	/* using the object types is more accurate than using the mime/types */
 	if (CAMEL_IS_MULTIPART(containee)) {
 		parts = camel_multipart_get_number(CAMEL_MULTIPART(containee));
-		for (i=0;i<parts;i++) {
-			CamelMimePart *part = camel_multipart_get_part(CAMEL_MULTIPART(containee), i);
+
+		for (i=0;i<parts;i++) 
+		{
+			CamelMimePart *part = camel_multipart_get_part_wref (CAMEL_MULTIPART(containee), i);
 			g_assert(part);
 			child = summary_build_content_info_message(s, msginfo, part);
 			if (child) {
 				child->parent = info;
 				my_list_append((struct _node **)&info->childs, (struct _node *)child);
 			}
+			camel_object_unref (part);
 		}
+
 	} else if (CAMEL_IS_MIME_MESSAGE(containee)) {
 		/* for messages we only look at its contents */
 		child = summary_build_content_info_message(s, msginfo, (CamelMimePart *)containee);
@@ -2740,6 +2746,8 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 		camel_stream_filter_remove(p->filter_stream, idx_id);
 		camel_stream_filter_remove(p->filter_stream, html_id);
 	}
+
+	camel_object_unref (containee);
 
 	return info;
 }

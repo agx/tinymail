@@ -1,3 +1,7 @@
+2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed a possible race condition in CamelMultiPart
+
 2007-09-03  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed a filedescriptor leak when there are no items in a folder, on

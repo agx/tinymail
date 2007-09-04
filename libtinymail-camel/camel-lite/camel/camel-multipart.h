@@ -92,6 +92,9 @@ void		    camel_multipart_set_postface   (CamelMultipart *multipart, const char 
 
 int		    camel_multipart_construct_from_parser(CamelMultipart *multipart, struct _CamelMimeParser *parser);
 
+
+CamelMimePart * camel_multipart_get_part_wref (CamelMultipart *multipart, guint index);
+
 G_END_DECLS
 
 #endif /* CAMEL_MULTIPART_H */

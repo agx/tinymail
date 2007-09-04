@@ -327,6 +327,20 @@ camel_multipart_get_part (CamelMultipart *multipart, guint index)
 	return CMP_CLASS (multipart)->get_part (multipart, index);
 }
 
+CamelMimePart *
+camel_multipart_get_part_wref (CamelMultipart *multipart, guint index)
+{
+	CamelObject *retval = NULL;
+
+	g_return_val_if_fail (CAMEL_IS_MULTIPART (multipart), NULL);
+
+	retval = (CamelObject *) CMP_CLASS (multipart)->get_part (multipart, index);
+
+	if (retval)
+		camel_object_ref (retval);
+
+	return (CamelMimePart *) retval;
+}
 
 static guint
 get_number (CamelMultipart *multipart)
