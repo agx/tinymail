@@ -1841,7 +1841,7 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyFolderCallback callb
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
-	g_object_ref (G_OBJECT (self));
+	g_object_ref (self);
 	_tny_camel_folder_reason (priv);
 
 	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
