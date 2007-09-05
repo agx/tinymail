@@ -1000,11 +1000,11 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		goto exception;
 	}
 
-
 	if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED ) { 
+		clean_quit = TRUE;
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				_("Failed to connect to IMAP server %s in secure mode: %s"), 
-				service->url->host, _("Unknown error, LOGINDISABLED with SSL"));
+				service->url->host, _("Unknown error"));
 		goto exception;
 	}
 
