@@ -382,6 +382,7 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 	g_print ("local rename folder '%s' '%s' '%s'\n", old, new, path);
 #endif
 
+#if 0
 	folder = camel_object_bag_get(store->folders, old);
 	if (folder && folder->index) {
 		if (camel_index_rename(folder->index, newibex) == -1)
@@ -391,16 +392,19 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 		if (camel_text_index_rename(oldibex, newibex) == -1)
 			goto ibex_failed;
 	}
+#endif
 
 	xrename(old, new, path, ".ev-summary.mmap", TRUE, &nex);
 	xrename(old, new, path, ".cmeta", TRUE, &nex);
 	xrename(old, new, path, "", FALSE, &nex);
 
+#if 0
 	g_free(newibex);
 	g_free(oldibex);
 
 	if (folder)
 		camel_object_unref(folder);
+#endif
 
 	return;
 
@@ -413,21 +417,29 @@ cmeta_failed:
 	xrename(new, old, path, ".ev-summary.mmap", TRUE, ex);
 
 summary_failed:
+
+#if 0
 	if (folder) {
 		if (folder->index)
 			camel_index_rename(folder->index, oldibex);
 	} else
 		camel_text_index_rename(newibex, oldibex);
+
+
 ibex_failed:
-	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-			      _("Could not rename '%s': %s"),
-			      old, g_strerror (errno));
 
 	g_free(newibex);
 	g_free(oldibex);
 
 	if (folder)
 		camel_object_unref(folder);
+#endif
+
+
+	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			      _("Could not rename '%s': %s"),
+			      old, g_strerror (errno));
+
 }
 
 /* default implementation, only delete metadata */
@@ -452,6 +464,8 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 		return;
 	}
 	g_free(str);
+
+#if 0
 	str = g_strdup_printf("%s.ibex", name);
 	if (camel_text_index_remove(str) == -1 && errno != ENOENT) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
@@ -462,6 +476,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 		return;
 	}
 	g_free(str);
+#endif
 
 	str = NULL;
 	camel_exception_init (&lex);

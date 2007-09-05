@@ -1,3 +1,7 @@
+2007-09-05  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed folder renames for local folders
+
 2007-09-04  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-account.h: Change the 
