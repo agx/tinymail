@@ -160,13 +160,18 @@ camel_local_summary_load(CamelLocalSummary *cls, int forceindex, CamelException 
 
 	d(printf("Loading summary ...\n"));
 
-	if (forceindex
+ 	if (((CamelLocalSummaryClass *)(CAMEL_OBJECT_GET_CLASS(cls)))->load(cls, forceindex, ex) == -1) {
+		w(g_warning("Could not load summary: flags may be reset"));
+		return -1;
+	}
+
+/*	if (forceindex
 	    || g_stat(s->summary_path, &st) == -1
 	    || ((CamelLocalSummaryClass *)(CAMEL_OBJECT_GET_CLASS(cls)))->load(cls, forceindex, ex) == -1) {
 		w(g_warning("Could not load summary: flags may be reset"));
 		camel_folder_summary_clear((CamelFolderSummary *)cls);
 		return -1;
-	}
+	}*/
 
 	return 0;
 }
