@@ -199,6 +199,7 @@ camel_folder_init (gpointer object, gpointer klass)
 {
 	CamelFolder *folder = object;
 
+	folder->folder_flags = 0;
 	folder->priv = g_malloc0(sizeof(*folder->priv));
 	folder->priv->frozen = 0;
 	folder->priv->changed_frozen = camel_folder_change_info_new();
