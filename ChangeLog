@@ -1,6 +1,7 @@
 2007-09-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed folder renames for local folders
+	* Fixed a bug about keeping folders open
 
 2007-09-04  Murray Cumming  <murrayc@murrayc.com>
 

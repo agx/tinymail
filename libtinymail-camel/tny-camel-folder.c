@@ -4157,18 +4157,21 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 	{
 		/* The special case is for when the amount of items is ZERO
 		 * while we are listening for Push E-mail events. That's a
-		 * reason by itself not to destroy priv->folder */
+		 * reason by itself not to destroy priv->folder
+		 *
+		 * For any other folder that has no more reason to live,
+		 * we'll uncache (this means destroying the CamelFolder
+		 * instance and freeing up memory */
 
-		if (!(priv->push && priv->folder && priv->folder->summary && 
+		/* If we can't do Push E-mail, we don't need to keep the folder
+		 * alive, because nothing will happen. */
+		if (!(priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY))
+			tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+		/* Else we should only close if there are not zero messages */
+		else if (!( priv->folder && priv->folder->summary && 
 			priv->folder->summary->messages && 
 			priv->folder->summary->messages->len == 0)) {
-
-			/* For any other folder that has no more reason to live,
-			 * we'll uncache (this means destroying the CamelFolder
-			 * instance and freeing up memory */
-
 			tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
-
 		}
 	}
 	g_mutex_unlock (priv->reason_lock);
