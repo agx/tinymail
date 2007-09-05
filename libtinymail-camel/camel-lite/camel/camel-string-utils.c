@@ -85,6 +85,8 @@ void camel_du (char *name, int *my_size)
 	}
 
 	closedir (dir);
+	chdir ("/");
+
 }
 
 static char *ignored_dnames[] = { ".", "..", NULL };
@@ -123,8 +125,8 @@ camel_rm (char *name)
 	}
 
 	closedir (dir);
-
 	remove (name);
+	chdir ("/");
 }
 
 int

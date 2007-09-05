@@ -252,6 +252,8 @@ static int rem_dir (const gchar *tmp)
 	if (rmdir(tmp) == -1)
 		err = errno;
 
+	chdir ("/");
+
 	return err;
 }
 
@@ -525,6 +527,8 @@ scan_dirs(CamelStore *store, guint32 flags, CamelFolderInfo *topfi, CamelURL *ur
 fail:
 	g_hash_table_foreach(visited, scan_free, NULL);
 	g_hash_table_destroy(visited);
+
+	chdir ("/");
 
 	return res;
 }
