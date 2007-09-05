@@ -107,7 +107,7 @@ void tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *sess
 void tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback);
 
 
-typedef void (*TnyCamelGetSupportedSecureAuthCallback) (TnyCamelAccount *self, gboolean cancelled, TnyList *auth_types, GError **err, gpointer user_data);
+typedef void (*TnyCamelGetSupportedSecureAuthCallback) (TnyCamelAccount *self, gboolean cancelled, TnyList *auth_types, GError *err, gpointer user_data);
 void tny_camel_account_get_supported_secure_authentication(TnyCamelAccount *self, TnyCamelGetSupportedSecureAuthCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 
 G_END_DECLS

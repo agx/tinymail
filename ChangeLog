@@ -1,3 +1,13 @@
+2007-09-04  Murray Cumming  <murrayc@murrayc.com>
+
+	* libtinymail-camel/tny-camel-account.h: Change the 
+	TnyCamelGetSupportedSecureAuthCallback callback to provide a
+	GError* instead of a GError**, because it is not an output parameter.
+	* libtinymail-camel/tny-camel-account.c: (on_supauth_idle_func),
+	(tny_camel_account_get_supported_secure_authentication_async_thread
+	), (tny_camel_account_get_supported_secure_authentication):
+	Adapt to the change, propagating GErrors up to the callback.
+
 2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed a problem when folder creation failed: observers where

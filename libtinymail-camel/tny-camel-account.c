@@ -1772,7 +1772,7 @@ on_supauth_idle_func (gpointer user_data)
 
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (info->self, info->cancelled, info->result, &info->err, info->user_data);
+		info->callback (info->self, info->cancelled, info->result, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
@@ -1837,6 +1837,7 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	TNY_CAMEL_ACCOUNT_GET_CLASS(self)->prepare_func(self, FALSE, TRUE);
 
 	authtypes = camel_service_query_auth_types (priv->service, &ex);
+	
 	/* Result reference */
 	result = tny_simple_list_new ();
 	iter = authtypes;
@@ -1883,6 +1884,11 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	g_mutex_free (info->mutex);
 	g_cond_free (info->condition);
 
+	if (info->err) {
+		g_error_free (info->err);
+		info->err = NULL;
+	}
+
 	g_slice_free (GetSupportedAuthInfo, info);
 
 	tny_status_free(status);
@@ -1896,7 +1902,7 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
  * @self: The TnyCamelAccount on which tny_camel_account_get_supported_secure_authentication() was called.
  * @cancelled: Whether the operation was cancelled.
  * @auth_types: A TnyList of TnyPair objects. Each TnyPair in the list has a supported secure authentication method name as its name. This list must be freed with g_object_unref().
- * @err: A GError if an error occurred, or NULL. This must be freed with g_error_free().
+ * @err: A GError if an error occurred, or NULL.
  * @user_data: The user data that was provided to tny_camel_account_get_supported_secure_authentication().
  * 
  * The callback for tny_camel_account_get_supported_secure_authentication().
@@ -1925,10 +1931,19 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 	if (!_tny_session_check_operation (priv->session, TNY_ACCOUNT (self), &err, 
 			TNY_ACCOUNT_ERROR, TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH))
 	{
-		if (callback)
-			callback (self, TRUE /* cancelled */, NULL, &err, user_data);
-		g_error_free (err);
+		if (callback) {
+			callback (self, TRUE /* cancelled */, NULL, err, user_data);
+		}
+
+		if (err)
+			g_error_free (err);
+		
 		return;
+	}
+
+	if (err) {
+		g_error_free (err);
+		err = NULL;
 	}
 
 	info = g_slice_new (GetSupportedAuthInfo);
