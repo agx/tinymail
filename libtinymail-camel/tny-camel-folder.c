@@ -4170,7 +4170,7 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 			if (!(priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY))
 				tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
 			/* Else we should only close if there are not zero messages */
-			else if (!(priv->folder->summary && 
+			else if (!(priv->push && priv->folder->summary && 
 				priv->folder->summary->messages && 
 				priv->folder->summary->messages->len == 0)) {
 				tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
