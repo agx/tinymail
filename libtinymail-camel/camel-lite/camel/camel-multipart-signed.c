@@ -291,6 +291,12 @@ parse_content(CamelMultipartSigned *mps)
 
 	camel_object_unref(cmp);
 
+	if (mps->start1 == -1)
+		mps->start1 = 0;
+
+	if (mps->end1 == -1)
+		mps->end1 = 0;
+
 	if (mps->end2 == -1 || mps->start2 == -1) {
 		return -1;
 	}

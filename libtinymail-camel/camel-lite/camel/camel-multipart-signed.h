@@ -68,13 +68,13 @@ struct _CamelMultipartSigned
 
 	/*int state;*/
 
+	/* offset pointers of start of boundary in content object */
+	int start1, end1;
+	int start2, end2;
+
 	/* just cache some info we use */
 	char *protocol;
 	char *micalg;
-
-	/* offset pointers of start of boundary in content object */
-	off_t start1, end1;
-	off_t start2, end2;
 };
 
 typedef struct {
