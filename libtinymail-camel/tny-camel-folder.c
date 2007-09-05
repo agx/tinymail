@@ -4165,13 +4165,16 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 
 		/* If we can't do Push E-mail, we don't need to keep the folder
 		 * alive, because nothing will happen. */
-		if (!(priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY))
-			tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
-		/* Else we should only close if there are not zero messages */
-		else if (!( priv->folder && priv->folder->summary && 
-			priv->folder->summary->messages && 
-			priv->folder->summary->messages->len == 0)) {
-			tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+		if (priv->folder)
+		{
+			if (!(priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY))
+				tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+			/* Else we should only close if there are not zero messages */
+			else if (!(priv->folder->summary && 
+				priv->folder->summary->messages && 
+				priv->folder->summary->messages->len == 0)) {
+				tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+			}
 		}
 	}
 	g_mutex_unlock (priv->reason_lock);
