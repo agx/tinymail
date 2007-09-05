@@ -226,6 +226,8 @@ skip_content(CamelMimeParser *cmp)
 	return 0;
 }
 
+static GStaticRecMutex global_plock = G_STATIC_REC_MUTEX_INIT;
+
 static int
 parse_content(CamelMultipartSigned *mps)
 {
@@ -263,6 +265,7 @@ parse_content(CamelMultipartSigned *mps)
 	mps->start2 = -1;
 	mps->end2 = -1;
 
+g_static_rec_mutex_lock (&global_plock);
 	while ((state = camel_mime_parser_step(cmp, &buf, &len)) != CAMEL_MIME_PARSER_STATE_MULTIPART_END) {
 		if (mps->start1 == -1) {
 			mps->start1 = camel_mime_parser_tell_start_headers(cmp);
@@ -281,6 +284,7 @@ parse_content(CamelMultipartSigned *mps)
 		if (skip_content(cmp) == -1)
 			break;
 	}
+g_static_rec_mutex_unlock (&global_plock);
 
 	if (state == CAMEL_MIME_PARSER_STATE_MULTIPART_END) {
 		mps->end2 = camel_mime_parser_tell_start_boundary(cmp);
