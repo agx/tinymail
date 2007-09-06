@@ -334,7 +334,7 @@ vee_get_folder_info(CamelStore *store, const char *top, guint32 flags, CamelExce
 
 	/* and always add UNMATCHED, if scanning from top/etc */
 	if (top == NULL || top[0] == 0 || strncmp(top, CAMEL_UNMATCHED_NAME, strlen(CAMEL_UNMATCHED_NAME)) == 0) {
-		info = g_malloc0(sizeof(*info));
+		info = camel_folder_info_new ();
 		url = camel_url_new("vfolder:", NULL);
 		camel_url_set_path(url, ((CamelService *)store)->url->path);
 		camel_url_set_fragment(url, CAMEL_UNMATCHED_NAME);
@@ -343,7 +343,8 @@ vee_get_folder_info(CamelStore *store, const char *top, guint32 flags, CamelExce
 		/*info->url = g_strdup_printf("vfolder:%s#%s", ((CamelService *)store)->url->path, CAMEL_UNMATCHED_NAME);*/
 		info->full_name = g_strdup(CAMEL_UNMATCHED_NAME);
 		info->name = g_strdup(_("Unmatched"));
-		info->unread = -1;
+		info->unread = 0;
+		info->total = 0;
 		info->flags = CAMEL_FOLDER_NOCHILDREN|CAMEL_FOLDER_NOINFERIORS|CAMEL_FOLDER_SYSTEM|CAMEL_FOLDER_VIRTUAL;
 
 		if (res == NULL)

@@ -3668,11 +3668,14 @@ get_folder_info_offline (CamelStore *store, const char *top,
 			
 			if (si->flags & CAMEL_FOLDER_NOSELECT) {
 				CamelURL *url = camel_url_new(fi->uri, NULL);
-				
+
 				camel_url_set_param (url, "noselect", "yes");
 				g_free(fi->uri);
 				fi->uri = camel_url_to_string (url, 0);
 				camel_url_free (url);
+
+				fi->unread = 0;
+				fi->total = 0;
 			} else {
 				fill_fi((CamelStore *)imap_store, fi, 0);
 				if (fi->unread == -1)

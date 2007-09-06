@@ -264,6 +264,9 @@ spool_fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		fi->unread = camel_folder_get_unread_message_count(folder);
 		fi->total = camel_folder_get_message_count(folder);
 		camel_object_unref(folder);
+	} else {
+		fi->unread = 0;
+		fi->total = 0;
 	}
 
 	/*TNY TODO:

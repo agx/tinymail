@@ -101,6 +101,9 @@ camel_file_util_read_counts (const gchar *spath, CamelFolderInfo *fi)
 		}
 		g_free (buffer);
 		fclose (f);
+	} else {
+		fi->unread = 0;
+		fi->total = 0;
 	}
 }
 
