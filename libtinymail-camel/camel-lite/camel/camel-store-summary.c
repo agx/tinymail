@@ -429,7 +429,7 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 	gchar *tmp_path;
 	g_assert(s->summary_path);
 
-	tmp_path = g_strdup_printf ("%s.tmp", s->summary_path);
+	tmp_path = g_strdup_printf ("%s~", s->summary_path);
 
 	io(printf("** saving summary\n"));
 
