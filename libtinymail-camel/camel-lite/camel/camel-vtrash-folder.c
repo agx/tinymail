@@ -140,6 +140,10 @@ vtrash_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 					if ((info = camel_folder_summary_index(folder->summary, j))) {
 						guint32 flags = camel_message_info_flags(info);
 
+						/* TNY Observation: We DO NOT assume that 
+						 * deleted messages are seen too, in case
+						 * of a Trash folder (this case). */
+
 						if ((flags & (CAMEL_MESSAGE_SEEN)) == 0)
 							unread++;
 						if (flags & CAMEL_MESSAGE_DELETED)
