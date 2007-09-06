@@ -2777,7 +2777,7 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 			CamelStore *store = NULL;
 
-			cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (retval));
+			cfolder = _tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (retval));
 			folder_full_name = camel_folder_get_full_name (cfolder);
 			store = CAMEL_STORE (apriv->service);
 
@@ -2845,7 +2845,7 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 			CamelStore *store = NULL;
 
-			cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
+			cfolder = _tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
 			folder_full_name = camel_folder_get_full_name (cfolder);
 			store = CAMEL_STORE (apriv->service);
 
@@ -2860,7 +2860,7 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 			CamelStore *store = NULL;
 
-			cfolder = tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
+			cfolder = _tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
 			folder_full_name = camel_folder_get_full_name (cfolder);
 			store = CAMEL_STORE (apriv->service);
 
@@ -4858,15 +4858,24 @@ _tny_camel_folder_set_folder (TnyCamelFolder *self, CamelFolder *camel_folder)
 }
 
 /**
- * tny_camel_folder_get_folder:
+ * tny_camel_folder_get_full_name:
  * @self: A #TnyCamelFolder object
  *
- * You must unreference the returned value
+ * Get a camel-lite specific full name of the folder
  *
- * Return value: The CamelFolder instance to play proxy for
+ * Return value: The full name of the folder
  **/
+const gchar*
+tny_camel_folder_get_full_name (TnyCamelFolder *self)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	return priv->folder_name;
+}
+
+
 CamelFolder*
-tny_camel_folder_get_folder (TnyCamelFolder *self)
+_tny_camel_folder_get_folder (TnyCamelFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelFolder *retval = NULL;

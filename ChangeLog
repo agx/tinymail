@@ -4,6 +4,10 @@
 	crashers)
 	* Error handling and reporting when the filesystem is full
 	* Counting unread items was wrong, fixed
+	* Introduction of tny_camel_folder_get_full_name
+	* Removal of tny_camel_folder_get_folder
+
+	* This was a minor API change
 
 2007-09-06  Sergio Villar Senin  <svillar@igalia.com>
 

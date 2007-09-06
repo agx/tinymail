@@ -102,7 +102,7 @@ struct _TnyCamelFolderClass
 GType tny_camel_folder_get_type (void);
 
 
-CamelFolder* tny_camel_folder_get_folder (TnyCamelFolder *self);
+const gchar* tny_camel_folder_get_full_name (TnyCamelFolder *self);
 
 G_END_DECLS
 
