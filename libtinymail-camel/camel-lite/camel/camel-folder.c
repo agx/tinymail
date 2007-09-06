@@ -212,6 +212,7 @@ camel_folder_finalize (CamelObject *object)
 {
 	CamelFolder *camel_folder = CAMEL_FOLDER (object);
 	struct _CamelFolderPrivate *p = camel_folder->priv;
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	g_free(camel_folder->name);
 	g_free(camel_folder->full_name);
@@ -221,7 +222,7 @@ camel_folder_finalize (CamelObject *object)
 		camel_object_unref (camel_folder->parent_store);
 
 	if (camel_folder->summary) {
-		camel_folder_summary_save (camel_folder->summary);
+		camel_folder_summary_save (camel_folder->summary, &nex);
 		camel_object_unref (camel_folder->summary);
 	}
 

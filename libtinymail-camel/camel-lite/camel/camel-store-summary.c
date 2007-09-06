@@ -115,10 +115,11 @@ camel_store_summary_finalise (CamelObject *obj)
 {
 	struct _CamelStoreSummaryPrivate *p;
 	CamelStoreSummary *s = (CamelStoreSummary *)obj;
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	p = _PRIVATE(obj);
 
-	camel_store_summary_save (s);
+	camel_store_summary_save (s, &nex);
 
 	camel_store_summary_clear(s);
 	g_ptr_array_free(s->folders, TRUE);
@@ -418,15 +419,17 @@ error:
  * Returns %0 on succes or %-1 on fail
  **/
 int
-camel_store_summary_save(CamelStoreSummary *s)
+camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 {
 	FILE *out;
 	int fd;
 	int i;
 	guint32 count;
 	CamelStoreInfo *info;
-
+	gchar *tmp_path;
 	g_assert(s->summary_path);
+
+	tmp_path = g_strdup_printf ("%s.tmp", s->summary_path);
 
 	io(printf("** saving summary\n"));
 
@@ -435,22 +438,31 @@ camel_store_summary_save(CamelStoreSummary *s)
 	if ((s->flags & CAMEL_STORE_SUMMARY_DIRTY) == 0) {
 		io(printf("**  summary clean no save\n"));
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		g_free (tmp_path);
 		return 0;
 	}
 
-	fd = g_open(s->summary_path, O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0600);
+	fd = g_open(tmp_path, O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0600);
+
 	if (fd == -1) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the store summary");
 		io(printf("**  open error: %s\n", strerror (errno)));
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		g_free (tmp_path);
 		return -1;
 	}
+
 	out = fdopen(fd, "wb");
 	if ( out == NULL ) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the store summary");
 		i = errno;
 		printf("**  fdopen error: %s\n", strerror (errno));
 		close(fd);
 		errno = i;
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		g_free (tmp_path);
 		return -1;
 	}
 
@@ -458,10 +470,13 @@ camel_store_summary_save(CamelStoreSummary *s)
 
 
 	if ( ((CamelStoreSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_save(s, out) == -1) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the store summary");
 		i = errno;
 		fclose(out);
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		errno = i;
+		g_free (tmp_path);
 		return -1;
 	}
 
@@ -472,19 +487,35 @@ camel_store_summary_save(CamelStoreSummary *s)
 	}
 
 	if (fflush (out) != 0 || fsync (fileno (out)) == -1) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the store summary");
 		i = errno;
 		fclose (out);
 		errno = i;
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		g_free (tmp_path);
 		return -1;
 	}
 	
 	if (fclose (out) != 0) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the store summary");
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		g_free (tmp_path);
 		return -1;
 	}
 
 	s->flags &= ~CAMEL_STORE_SUMMARY_DIRTY;
+
+	if (g_rename(tmp_path, s->summary_path) == -1) {
+		i = errno;
+		g_unlink(tmp_path);
+		errno = i;
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the store summary");
+		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		return -1;
+	}
 
 	CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 

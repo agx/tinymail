@@ -286,7 +286,7 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 			if (mi == NULL) {
 
 				if (acnt > 1000) {
-					camel_folder_summary_save (s);
+					camel_folder_summary_save (s, ex);
 					acnt = 0;
 				}
 				acnt++;
@@ -366,7 +366,7 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 				if (camel_mime_parser_init_with_stream(mp, (CamelStream *)store->stream) == -1)
 					goto error;
 				if (acnt > 1000) {
-					camel_folder_summary_save (s);
+					camel_folder_summary_save (s, ex);
 					acnt = 0;
 				}
 				acnt++;
@@ -494,7 +494,7 @@ camel_nntp_summary_check(CamelNNTPSummary *cns, CamelNNTPStore *store, char *lin
 
 	/* TODO: not from here */
 	camel_folder_summary_touch(s);
-	camel_folder_summary_save(s);
+	camel_folder_summary_save(s, ex);
 update:
 	/* update store summary if we have it */
 	if (folder
@@ -521,7 +521,7 @@ update:
 			si->first = f;
 			si->last = l;
 			camel_store_summary_touch((CamelStoreSummary *)store->summary);
-			camel_store_summary_save((CamelStoreSummary *)store->summary);
+			camel_store_summary_save((CamelStoreSummary *)store->summary, ex);
 		}
 		camel_store_summary_info_free ((CamelStoreSummary *)store->summary, (CamelStoreInfo *)si);
 	} else {

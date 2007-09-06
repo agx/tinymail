@@ -131,7 +131,7 @@ void camel_store_summary_set_uri_base(CamelStoreSummary *summary, CamelURL *base
 
 /* load/save the summary in its entirety */
 int camel_store_summary_load(CamelStoreSummary *summary);
-int camel_store_summary_save(CamelStoreSummary *summary);
+int camel_store_summary_save(CamelStoreSummary *summary, CamelException *ex);
 
 /* only load the header */
 int camel_store_summary_header_load(CamelStoreSummary *summary);

@@ -345,6 +345,7 @@ camel_imap_store_finalize (CamelObject *object)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 	CamelDiscoStore *disco = CAMEL_DISCO_STORE (object);
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	let_idle_die (imap_store, TRUE);
 
@@ -358,7 +359,7 @@ camel_imap_store_finalize (CamelObject *object)
 
 	g_static_rec_mutex_lock (imap_store->sum_lock);
 	if (imap_store->summary) {
-		camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+		camel_store_summary_save((CamelStoreSummary *)imap_store->summary, &nex);
 		camel_object_unref(imap_store->summary);
 	}
 	g_static_rec_mutex_unlock (imap_store->sum_lock);
@@ -746,7 +747,7 @@ imap_get_capability (CamelService *service, CamelException *ex)
 	if (store->summary->capabilities != store->capabilities) {
 		store->summary->capabilities = store->capabilities;
 		camel_store_summary_touch((CamelStoreSummary *)store->summary);
-		camel_store_summary_save((CamelStoreSummary *)store->summary);
+		camel_store_summary_save((CamelStoreSummary *)store->summary, ex);
 	}
 	g_static_rec_mutex_unlock (store->sum_lock);
 
@@ -1360,7 +1361,7 @@ imap_folder_effectively_unsubscribed(CamelImapStore *imap_store,
 		if (si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) {
 			si->flags &= ~CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
 			camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
-			camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+			camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 		}
 		camel_store_summary_info_free((CamelStoreSummary *)imap_store->summary, si);
 	}
@@ -1441,7 +1442,7 @@ imap_forget_folder (CamelImapStore *imap_store, const char *folder_name, CamelEx
 
 	g_static_rec_mutex_lock (imap_store->sum_lock);
 	camel_store_summary_remove_path((CamelStoreSummary *)imap_store->summary, folder_name);
-	camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+	camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 	g_static_rec_mutex_unlock (imap_store->sum_lock);
 
 	fi = imap_build_folder_info(imap_store, folder_name);
@@ -1886,7 +1887,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
  done:
 
 	/* save any changes we had */
-	camel_store_summary_save((CamelStoreSummary *)store->summary);
+	camel_store_summary_save((CamelStoreSummary *)store->summary, ex);
 
 	g_static_rec_mutex_unlock (store->sum_lock);
 
@@ -3106,7 +3107,7 @@ create_folder (CamelStore *store, const char *parent_name,
 		camel_imap_response_free (imap_store, response);
 
 		si = camel_imap_store_summary_add_from_full(imap_store->summary, full_name, imap_store->dir_sep);
-		camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+		camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 		fi = imap_build_folder_info(imap_store, camel_store_info_path(imap_store->summary, si));
 		fi->flags |= CAMEL_FOLDER_NOCHILDREN;
 		if (root) {
@@ -3345,10 +3346,10 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 				si->unread = fi->unread;
 				si->total = fi->total;
 				camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
-				camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+				camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 			} else {
 				camel_store_summary_remove((CamelStoreSummary *)imap_store->summary, si);
-				camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+				camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 				count--;
 				i--;
 			}
@@ -3430,6 +3431,7 @@ refresh_refresh(CamelSession *session, CamelSessionThreadMsg *msg)
 {
 	struct _refresh_msg *m = (struct _refresh_msg *)msg;
 	CamelImapStore *store = (CamelImapStore *)m->store;
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	CAMEL_SERVICE_REC_LOCK(m->store, connect_lock);
 
@@ -3452,7 +3454,7 @@ refresh_refresh(CamelSession *session, CamelSessionThreadMsg *msg)
 		get_folders_sync((CamelImapStore *)m->store, "*", &m->ex);
 	}
 	camel_store_summary_touch((CamelStoreSummary *)((CamelImapStore *)m->store)->summary);
-	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)m->store)->summary);
+	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)m->store)->summary, &nex);
 done:
 	CAMEL_SERVICE_REC_UNLOCK(m->store, connect_lock);
 }
@@ -3565,7 +3567,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 			get_folders_sync(imap_store, pattern, ex);
 		}
 		camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
-		camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+		camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 
 		CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 	}
@@ -3743,7 +3745,7 @@ subscribe_folder (CamelStore *store, const char *folder_name,
 		if ((si->flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) == 0) {
 			si->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
 			camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
-			camel_store_summary_save((CamelStoreSummary *)imap_store->summary);
+			camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 		}
 		camel_store_summary_info_free((CamelStoreSummary *)imap_store->summary, si);
 	}

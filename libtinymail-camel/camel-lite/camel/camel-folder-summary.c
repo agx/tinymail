@@ -846,7 +846,7 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
  * Returns %0 on success or %-1 on fail
  **/
 int
-camel_folder_summary_save(CamelFolderSummary *s)
+camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
 {
 	FILE *out;
 	int fd, i;
@@ -873,6 +873,8 @@ camel_folder_summary_save(CamelFolderSummary *s)
 
 	if (fd == -1) { 
 	  g_mutex_unlock (s->dump_lock);
+	  camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		"Error storing the summary");
 	  return -1; 
 	}
 
@@ -883,6 +885,8 @@ camel_folder_summary_save(CamelFolderSummary *s)
 		g_unlink(path);
 		close(fd);
 		errno = i;
+ 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the summary");
 		g_mutex_unlock (s->dump_lock);
 		return -1;
 	}
@@ -951,14 +955,19 @@ haerror:
 #ifdef G_OS_WIN32
 	g_unlink(s->summary_path);
 #endif
+
 	if (g_rename(path, s->summary_path) == -1) {
 		i = errno;
 		g_unlink(path);
 		errno = i;
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the summary");
 		g_static_mutex_unlock (&global_lock2);
 		g_static_rec_mutex_unlock (&global_lock);
+		g_mutex_unlock (s->dump_lock);
 		return -1;
 	}
+
 	camel_folder_summary_load (s);
 
 	g_static_mutex_unlock (&global_lock2);
@@ -976,6 +985,8 @@ haerror:
 
 exception:
 
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		"Error storing the summary");
 	i = errno;
 	fclose (out);
 	g_unlink (path);

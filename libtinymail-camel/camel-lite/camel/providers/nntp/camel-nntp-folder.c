@@ -105,7 +105,7 @@ static void
 nntp_folder_sync_online (CamelFolder *folder, CamelException *ex)
 {
 	CAMEL_SERVICE_REC_LOCK(folder->parent_store, connect_lock);
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 	CAMEL_SERVICE_REC_UNLOCK(folder->parent_store, connect_lock);
 }
 
@@ -113,7 +113,7 @@ static void
 nntp_folder_sync_offline (CamelFolder *folder, CamelException *ex)
 {
 	CAMEL_SERVICE_REC_LOCK(folder->parent_store, connect_lock);
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 	CAMEL_SERVICE_REC_UNLOCK(folder->parent_store, connect_lock);
 }
 
@@ -406,7 +406,7 @@ nntp_folder_transfer_message (CamelFolder *source, GPtrArray *uids, CamelFolder 
 	                      _("You cannot copy messages from a NNTP folder!"));
 }
 
-static void           
+static void
 nntp_folder_init (CamelNNTPFolder *nntp_folder, CamelNNTPFolderClass *klass)
 {
 	struct _CamelNNTPFolderPrivate *p;
@@ -417,13 +417,14 @@ nntp_folder_init (CamelNNTPFolder *nntp_folder, CamelNNTPFolderClass *klass)
 	p->cache_lock = g_mutex_new ();
 }
 
-static void           
+static void
 nntp_folder_finalise (CamelNNTPFolder *nntp_folder)
 {
 	struct _CamelNNTPFolderPrivate *p;
-	
-	camel_folder_summary_save (((CamelFolder*) nntp_folder)->summary);
-	
+	CamelException nex  = CAMEL_EXCEPTION_INITIALISER;
+
+	camel_folder_summary_save (((CamelFolder*) nntp_folder)->summary, &nex);
+
 	p = nntp_folder->priv;
 	g_mutex_free (p->search_lock);
 	g_mutex_free (p->cache_lock);

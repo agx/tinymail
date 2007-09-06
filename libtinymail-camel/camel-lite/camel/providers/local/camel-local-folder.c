@@ -534,7 +534,7 @@ local_sync(CamelFolder *folder, gboolean expunge, CamelException *ex)
 		camel_object_trigger_event(CAMEL_OBJECT(folder), "folder_changed", changes);
 	camel_folder_change_info_free(changes);
 
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 }
 
 static void

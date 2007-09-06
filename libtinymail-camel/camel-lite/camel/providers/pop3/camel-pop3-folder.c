@@ -164,7 +164,7 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 	if (camel_folder_summary_load (folder->summary) == -1) {
 		camel_folder_summary_clear (folder->summary);
 		camel_folder_summary_touch (folder->summary);
-		camel_folder_summary_save (folder->summary);
+		camel_folder_summary_save (folder->summary, ex);
 		camel_folder_summary_load (folder->summary);
 	}
 
@@ -429,7 +429,13 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 				{
 					/* Periodically save the summary (this reduces 
 					   memory usage too) */
-					camel_folder_summary_save (folder->summary);
+
+					if (camel_folder_summary_save (folder->summary, ex) == -1)
+					{
+						camel_service_disconnect (CAMEL_SERVICE (pop3_store), FALSE, NULL);
+						break;
+					}
+
 					hcnt = 0;
 				}
 
@@ -453,7 +459,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	camel_pop3_logbook_close (pop3_store->book);
 
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 
 	camel_folder_summary_kill_hash (folder->summary);
 
@@ -635,7 +641,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	camel_operation_end(NULL);
 
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 
 	camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
 
@@ -1390,7 +1396,7 @@ pop3_get_uids (CamelFolder *folder)
 static void
 pop3_sync_offline (CamelFolder *folder, CamelException *ex)
 {
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 }
 
 static void
@@ -1444,7 +1450,7 @@ pop3_expunge_uids_offline (CamelFolder *folder, GPtrArray *uids, CamelException 
 		/* We intentionally don't remove it from the cache because
 		 * the cached data may be useful in replaying a COPY later. */
 	}
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 
 	camel_disco_diary_log (CAMEL_DISCO_STORE (folder->parent_store)->diary,
 			       CAMEL_DISCO_DIARY_FOLDER_EXPUNGE, folder, uids);

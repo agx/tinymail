@@ -822,7 +822,7 @@ nntp_store_get_folder_info_all(CamelNNTPStore *nntp_store, const char *top, guin
 		if (ret < 0)
 			goto error;
 		
-		camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary);
+		camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary, ex);
 	}
 	
 	fi = nntp_store_get_cached_folder_info (nntp_store, top, flags, ex);
@@ -902,7 +902,7 @@ nntp_store_subscribe_folder (CamelStore *store, const char *folder_name,
 			fi = nntp_folder_info_from_store_info(nntp_store, nntp_store->do_short_folder_notation, si);
 			fi->flags |= CAMEL_FOLDER_NOINFERIORS | CAMEL_FOLDER_NOCHILDREN;
 			camel_store_summary_touch ((CamelStoreSummary *) nntp_store->summary);
-			camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary);
+			camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary, ex);
 			CAMEL_SERVICE_REC_UNLOCK(nntp_store, connect_lock);
 			camel_object_trigger_event ((CamelObject *) nntp_store, "folder_subscribed", fi);
 			camel_folder_info_free (fi);
@@ -933,7 +933,7 @@ nntp_store_unsubscribe_folder (CamelStore *store, const char *folder_name,
 			fitem->flags &= ~CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
 			fi = nntp_folder_info_from_store_info (nntp_store, nntp_store->do_short_folder_notation, fitem);
 			camel_store_summary_touch ((CamelStoreSummary *) nntp_store->summary);
-			camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary);
+			camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary, ex);
 			CAMEL_SERVICE_REC_UNLOCK(nntp_store, connect_lock);
 			camel_object_trigger_event ((CamelObject *) nntp_store, "folder_unsubscribed", fi);
 			camel_folder_info_free (fi);
@@ -978,11 +978,12 @@ nntp_store_finalize (CamelObject *object)
 	CamelNNTPStore *nntp_store = CAMEL_NNTP_STORE (object);
 	struct _CamelNNTPStorePrivate *p = nntp_store->priv;
 	struct _xover_header *xover, *xn;
-	
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
+
 	camel_service_disconnect ((CamelService *)object, TRUE, NULL);
 	
 	if (nntp_store->summary) {
-		camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary);
+		camel_store_summary_save ((CamelStoreSummary *) nntp_store->summary, &nex);
 		camel_object_unref (nntp_store->summary);
 	}	
 

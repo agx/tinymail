@@ -863,9 +863,9 @@ done:
 	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 	CAMEL_FOLDER_REC_UNLOCK(folder, lock);
 
-	camel_folder_summary_save(folder->summary);
+	camel_folder_summary_save(folder->summary, ex);
 
-	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary);
+	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary, ex);
 }
 
 #if 0
@@ -1343,8 +1343,8 @@ get_matching (CamelFolder *folder, guint32 flags, guint32 mask, char **set)
 static void
 imap_sync_offline (CamelFolder *folder, CamelException *ex)
 {
-	camel_folder_summary_save (folder->summary);
-	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary);
+	camel_folder_summary_save (folder->summary, ex);
+	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary, ex);
 }
 
 static void
@@ -1483,7 +1483,7 @@ imap_expunge_uids_offline (CamelFolder *folder, GPtrArray *uids, CamelException 
 		/* We intentionally don't remove it from the cache because
 		 * the cached data may be useful in replaying a COPY later. */
 	}
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 
 	camel_disco_diary_log (CAMEL_DISCO_STORE (folder->parent_store)->diary,
 			       CAMEL_DISCO_DIARY_FOLDER_EXPUNGE, folder, uids);
@@ -3063,7 +3063,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	CamelFolderChangeInfo *mchanges;
 
 	imap_folder->need_rescan = TRUE;
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 	seq = camel_folder_summary_count (folder->summary);
 
 	if (!camel_imap_command_start (store, folder, ex,
@@ -3185,6 +3185,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 				more = FALSE;
 				camel_folder_summary_kill_hash (folder->summary);
 				store->dontdistridlehack = FALSE;
+
+				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+
 				return;
 			}
 			g_free (uidset);
@@ -3271,7 +3274,20 @@ imap_update_summary (CamelFolder *folder, int exists,
 				if (did_hack) {
 					hcnt++;
 					if (hcnt > 1000) {
-						camel_folder_summary_save (folder->summary);
+						if (camel_folder_summary_save (folder->summary, ex) == -1) 
+						{
+							g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
+							g_ptr_array_free (needheaders, TRUE);
+							camel_operation_end (NULL);
+							g_free (uidset);
+							more = FALSE;
+							camel_folder_summary_kill_hash (folder->summary);
+							store->dontdistridlehack = FALSE;
+
+							camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+
+							return;
+						}
 						camel_folder_summary_prepare_hash (folder->summary);
 						hcnt = 0;
 					}
@@ -3293,6 +3309,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 				more = FALSE;
 				camel_folder_summary_kill_hash (folder->summary);
 				store->dontdistridlehack = FALSE;
+
+				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+
 				return;
 			}
 
@@ -3320,7 +3339,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    if (oosync)
 	imap_folder->need_rescan = TRUE;
 
-   camel_folder_summary_save (folder->summary);
+   camel_folder_summary_save (folder->summary, ex);
    camel_folder_summary_kill_hash (folder->summary);
    camel_operation_end (NULL);
 
@@ -3388,10 +3407,11 @@ process_idle_response (IdleResponse *idle_resp)
 
 		if (changes)
 		{
+			CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 			if (camel_folder_change_info_changed (changes))
 				camel_object_trigger_event (CAMEL_OBJECT (idle_resp->folder), "folder_changed", changes);
 			camel_folder_change_info_free (changes);
-			camel_folder_summary_save (idle_resp->folder->summary);
+			camel_folder_summary_save (idle_resp->folder->summary, &nex);
 		}
 
 	}
@@ -3868,7 +3888,7 @@ camel_imap_folder_changed (CamelFolder *folder, int exists,
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
 
 	camel_folder_change_info_free (changes);
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 }
 
 
@@ -3923,7 +3943,7 @@ camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
 
 	camel_folder_change_info_free (changes);
-	camel_folder_summary_save (folder->summary);
+	camel_folder_summary_save (folder->summary, ex);
 }
 
 static void
@@ -4071,9 +4091,18 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		if (!amcon || camel_exception_is_set (ex) || !camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex)) 
 		{
 			camel_object_unref (store);
-			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			if (!camel_exception_is_set (ex))
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 						_("This message is not currently available"
 						" (can't let a new connection go online)"));
+			else if (strstr (camel_exception_get_description (ex), "summary") != NULL)
+			{
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+						_("This message is not currently available"
+						" and can't be retrieved due to insufficient "
+						" storage space resources."));
+			}
+
 			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 			g_static_mutex_unlock (&gmsgstore_lock);
 			return NULL;

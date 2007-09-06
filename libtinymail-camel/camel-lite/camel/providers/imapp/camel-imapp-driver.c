@@ -156,6 +156,7 @@ camel_imapp_driver_select(CamelIMAPPDriver *id, struct _CamelIMAPPFolder *folder
 	CamelIMAPPCommand * volatile ic2 = NULL;
 	guint32 count;
 	CamelFolderSummary *summary;
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (id->folder) {
 		if (folder == id->folder)
@@ -213,7 +214,7 @@ camel_imapp_driver_select(CamelIMAPPDriver *id, struct _CamelIMAPPFolder *folder
 	folder->uidvalidity = id->uidvalidity;
 
 	printf("saving summary '%s'\n", summary->summary_path);
-	camel_folder_summary_save(summary);
+	camel_folder_summary_save(summary, &nex);
 
 	if (camel_folder_change_info_changed(id->folder->changes)) {
 		camel_object_trigger_event(id->folder, "folder_changed", id->folder->changes);
@@ -369,6 +370,7 @@ camel_imapp_driver_sync(CamelIMAPPDriver *id, gboolean expunge, CamelIMAPPFolder
 	guint i, count, on_orset, off_orset;
 	CamelIMAPPMessageInfo *info;
 	CamelIMAPPCommand *ic;
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	/* FIXME: exception handling */
 
@@ -421,7 +423,7 @@ camel_imapp_driver_sync(CamelIMAPPDriver *id, gboolean expunge, CamelIMAPPFolder
 	}
 
 	printf("saving summary '%s'\n", summary->summary_path);
-	camel_folder_summary_save(summary);
+	camel_folder_summary_save(summary, &nex);
 
 	if (camel_folder_change_info_changed(id->folder->changes)) {
 		camel_object_trigger_event(id->folder, "folder_changed", id->folder->changes);

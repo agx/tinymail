@@ -417,7 +417,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 
   /* search for IN TNY */
   /*if (info->uid_removed && info->uid_removed->len > 0)
-  	camel_folder_summary_save (camel_folder->summary);*/
+  	camel_folder_summary_save (camel_folder->summary, &ex);*/
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
   } else

@@ -416,7 +416,7 @@ local_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChangeIn
 {
 	int ret = 0;
 
-	ret = camel_folder_summary_save((CamelFolderSummary *)cls);
+	ret = camel_folder_summary_save((CamelFolderSummary *)cls, ex);
 	if (ret == -1) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Could not save summary: %s: %s"),
