@@ -1,3 +1,8 @@
+2007-09-06  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Bugfix for POP folders (content building not needed and causes some
+	crashers)
+
 2007-09-06  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-store-account.c: fixed a problem in the

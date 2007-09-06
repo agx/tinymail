@@ -158,7 +158,7 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 	summary_file = g_strdup_printf ("%s/summary.mmap", p3store->storage_path);
 	folder->summary = camel_folder_summary_new (folder);
 	folder->summary->set_extra_flags_func = camel_pop3_summary_set_extra_flags;
-	camel_folder_summary_set_build_content (folder->summary, TRUE);
+	camel_folder_summary_set_build_content (folder->summary, FALSE);
 	camel_folder_summary_set_filename (folder->summary, summary_file);
 
 	if (camel_folder_summary_load (folder->summary) == -1) {
