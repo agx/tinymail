@@ -2514,12 +2514,14 @@ content_info_load(CamelFolderSummary *s)
 static int
 content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentInfo *ci)
 {
-	CamelContentType *ct=NULL;
-	struct _camel_header_param *hp;
+	CamelContentType *ct = NULL;
+	struct _camel_header_param *hp = NULL;
+	int retval = 0;
 
 	io(printf("Saving content info\n"));
 
-	ct = ci->type;
+	if (ci)
+		ct = ci->type;
 
 	if (ct) {
 		camel_folder_summary_encode_token(out, ct->type);
@@ -2536,10 +2538,20 @@ content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentInfo *ci)
 		camel_folder_summary_encode_token(out, NULL);
 		camel_file_util_encode_uint32(out, 0);
 	}
-	camel_folder_summary_encode_token(out, ci->id);
-	camel_folder_summary_encode_token(out, ci->description);
-	camel_folder_summary_encode_token(out, ci->encoding);
-	return camel_file_util_encode_uint32(out, ci->size);
+
+	if (ci) {
+		camel_folder_summary_encode_token(out, ci->id);
+		camel_folder_summary_encode_token(out, ci->description);
+		camel_folder_summary_encode_token(out, ci->encoding);
+		retval = camel_file_util_encode_uint32(out, ci->size);
+	} else {
+		camel_folder_summary_encode_token(out, "invalid");
+		camel_folder_summary_encode_token(out, "invalid");
+		camel_folder_summary_encode_token(out, "text/plain");
+		retval = camel_file_util_encode_uint32(out, 0);
+	}
+
+	return retval;
 }
 
 
