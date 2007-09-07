@@ -422,6 +422,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->last_folder = NULL;
 	imap_store->connected = FALSE;
 	imap_store->preauthed = FALSE;
+	imap_store->clean_exit = TRUE;
 
 	imap_store->addrinfo = NULL;
 	((CamelStore *)imap_store)->flags |= CAMEL_STORE_SUBSCRIPTIONS;

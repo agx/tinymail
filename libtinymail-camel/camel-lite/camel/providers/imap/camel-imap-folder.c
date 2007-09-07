@@ -3996,7 +3996,8 @@ check_gmsgstore_die (gpointer user_data)
 		{
 			if (imap_folder->gmsgstore) {
 				imap_debug ("Get-Message service dies\n");
-				camel_service_disconnect (CAMEL_SERVICE (imap_folder->gmsgstore), TRUE, NULL);
+				camel_service_disconnect (CAMEL_SERVICE (imap_folder->gmsgstore), 
+					imap_folder->gmsgstore->clean_exit, NULL);
 				camel_object_unref (CAMEL_OBJECT (imap_folder->gmsgstore));
 				imap_folder->gmsgstore = NULL; 
 				camel_object_unref (imap_folder);
@@ -4652,10 +4653,11 @@ errorhander:
 	if (store)
 	{
   CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+		imap_folder->gmsgstore->clean_exit = FALSE;
 		imap_folder->gmsgstore_ticks = 0;
 		if (ctchecker) {
 			camel_object_ref (imap_folder);
-			imap_folder->gmsgstore_signal = g_timeout_add (1000, 
+			imap_folder->gmsgstore_signal = g_timeout_add (1, 
 				check_gmsgstore_die, imap_folder);
 		}
 	}
