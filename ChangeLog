@@ -1,3 +1,7 @@
+2007-09-10  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Bugfix when deleting a local folder
+
 2007-09-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Error reporting and retrying when there are problems while getting
