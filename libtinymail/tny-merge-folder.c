@@ -87,6 +87,22 @@ tny_merge_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 }
 
 static void
+tny_merge_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	g_warning ("tny_merge_folder_add_msg_async not implemented: "
+		   "add it to the mother folder instead\n");
+
+	if (callback) {
+		GError *err = NULL;
+		g_set_error (&err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_ADD_MSG,
+			"tny_merge_folder_add_msg not implemented: add it to the mother "
+			"folder instead. This problem indicates a bug in the software.");
+		callback (self, TRUE, err, user_data);
+	}
+}
+
+static void
 tny_merge_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 {
 	g_warning ("tny_merge_folder_add_msg not implemented: "
@@ -1510,6 +1526,7 @@ tny_folder_init (TnyFolderIface *klass)
 {
 	klass->remove_msg_func = tny_merge_folder_remove_msg;
 	klass->add_msg_func = tny_merge_folder_add_msg;
+	klass->add_msg_async_func = tny_merge_folder_add_msg_async;
 	klass->sync_func = tny_merge_folder_sync;
 	klass->get_msg_remove_strategy_func = tny_merge_folder_get_msg_remove_strategy;
 	klass->set_msg_remove_strategy_func = tny_merge_folder_set_msg_remove_strategy;

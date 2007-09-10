@@ -3,6 +3,7 @@
 	* Bugfix when deleting a local folder
 	* Cyclic reference adding, fixed in TnyCamelFolder and
 	TnyCamelStoreAccount
+	* Added add_msg_async for TnyMergeFolder
 
 2007-09-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
