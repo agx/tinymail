@@ -99,6 +99,8 @@ tny_merge_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback 
 			"tny_merge_folder_add_msg not implemented: add it to the mother "
 			"folder instead. This problem indicates a bug in the software.");
 		callback (self, TRUE, err, user_data);
+		if (err)
+			g_error_free (err);
 	}
 }
 
