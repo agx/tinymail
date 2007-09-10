@@ -4558,9 +4558,7 @@ void
 _tny_camel_folder_set_parent (TnyCamelFolder *self, TnyFolderStore *parent)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	if (priv->parent)
-		g_object_unref (G_OBJECT (priv->parent));
-	priv->parent = g_object_ref (G_OBJECT (parent));
+	priv->parent = parent;
 	return;
 }
 
@@ -5326,8 +5324,6 @@ tny_camel_folder_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->receive_strat));
 	priv->receive_strat = NULL;
 
-	if (G_LIKELY (priv->parent))
-		g_object_unref (G_OBJECT (priv->parent));
 	priv->parent = NULL;
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
@@ -5495,6 +5491,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelFolder *self = (TnyCamelFolder *)instance;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	priv->parent = NULL;
 	priv->strict_retrieval = FALSE;
 	priv->self = (TnyFolder *) self;
 	priv->want_changes = TRUE;

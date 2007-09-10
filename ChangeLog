@@ -1,6 +1,8 @@
 2007-09-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix when deleting a local folder
+	* Cyclic reference adding, fixed in TnyCamelFolder and
+	TnyCamelStoreAccount
 
 2007-09-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
