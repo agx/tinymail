@@ -2006,7 +2006,7 @@ static gpointer
 tny_camel_folder_get_headers_async_thread (gpointer thr_user_data)
 {
 	GetHeadersInfo *info = (GetHeadersInfo*) thr_user_data;
-
+	info->err = NULL;
 	tny_folder_get_headers (info->self, info->headers, info->refresh, &info->err);
 	info->cancelled = FALSE;
 
