@@ -308,8 +308,9 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
 	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *) folder;
 	CamelPOP3Command *pcl, *pcu = NULL;
-	int i, hcnt = 0;
+	int i, hcnt = 0, lcnt = 0;
 	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
+	CamelFolderChangeInfo *changes = NULL;
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
@@ -387,7 +388,6 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	{
 		CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
 		CamelMessageInfoBase *mi = NULL;
-		CamelFolderChangeInfo *changes;
 
 		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
 
@@ -424,6 +424,20 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 				camel_object_unref (CAMEL_OBJECT (msg));
 
+				if (!changes)
+					changes = camel_folder_change_info_new ();
+				camel_folder_change_info_add_uid (changes, fi->uid);
+
+				lcnt++;
+				if (lcnt > 100)
+				{
+					if (camel_folder_change_info_changed (changes))
+						camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+					camel_folder_change_info_free (changes);
+					changes = NULL;
+					lcnt = 0;
+				}
+
 				hcnt++;
 				if (hcnt > 1000)
 				{
@@ -439,22 +453,23 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 					hcnt = 0;
 				}
 
-				changes = camel_folder_change_info_new ();
-				camel_folder_change_info_add_uid (changes, fi->uid);
-				if (camel_folder_change_info_changed (changes))
-					camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
-				camel_folder_change_info_free (changes);
-
 				camel_pop3_logbook_register (pop3_store->book, fi->uid);
 
 			} if (!pop3_store->engine)
 				break;
+
 
 		} else if (mi)
 			camel_message_info_free (mi);
 
 		camel_operation_progress (NULL, i , pop3_folder->uids->len);
 
+	}
+
+	if (changes && camel_folder_change_info_changed (changes)) {
+		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+		camel_folder_change_info_free (changes);
+		changes = NULL;
 	}
 
 	camel_pop3_logbook_close (pop3_store->book);

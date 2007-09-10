@@ -5,6 +5,8 @@
 	TnyCamelStoreAccount
 	* Added add_msg_async for TnyMergeFolder
 	* Coping with Maildir folders that miss subfolders
+	* Bugfix when deleting last E-mail of a POP folder
+	* Coping with large POP folders
 
 2007-09-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
