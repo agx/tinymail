@@ -627,6 +627,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		if (!changes)
 			changes = camel_folder_change_info_new ();
 		camel_folder_change_info_remove_uid (changes, info->uid);
+		((CamelMessageInfoBase*)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
 		camel_folder_summary_remove (folder->summary, info);
 		camel_message_info_free(info);
 		deleted = g_list_next (deleted);
