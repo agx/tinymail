@@ -620,13 +620,10 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 			if (!found) {
 				/* Removed remotely (only if not cached locally) */
-				CamelObject *o = (CamelObject *) camel_data_cache_get (pop3_store->cache, "cache", fi->uid, NULL);
-
-				if (!o) {
+				if (camel_data_cache_exists (pop3_store->cache, "cache", fi->uid, NULL)) {
 					camel_message_info_ref (info);
 					deleted = g_list_prepend (deleted, info);
-				} else 
-					camel_object_unref (o);
+				} 
 			}
 		}
 

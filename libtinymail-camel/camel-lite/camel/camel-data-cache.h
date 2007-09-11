@@ -80,6 +80,9 @@ CamelStream    *camel_data_cache_add(CamelDataCache *cache,
 				     const char *path, const char *key, CamelException *ex);
 CamelStream    *camel_data_cache_get(CamelDataCache *cache,
 				     const char *path, const char *key, CamelException *ex);
+gboolean       camel_data_cache_exists (CamelDataCache *cache,
+				     const char *path, const char *key, CamelException *ex);
+
 int             camel_data_cache_remove(CamelDataCache *cache,
 					const char *path, const char *key, CamelException *ex);
 

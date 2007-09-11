@@ -406,6 +406,18 @@ camel_data_cache_add(CamelDataCache *cdc, const char *path, const char *key, Cam
 	return stream;
 }
 
+gboolean 
+camel_data_cache_exists (CamelDataCache *cache, const char *path, const char *key, CamelException *ex)
+{
+	char *real = data_cache_path(cache, FALSE, path, key);
+	gboolean retval = FALSE;
+
+	retval = g_file_test (real, G_FILE_TEST_IS_REGULAR);
+
+	g_free(real);
+	return retval;
+}
+
 /**
  * camel_data_cache_get:
  * @cdc: A #CamelDataCache
