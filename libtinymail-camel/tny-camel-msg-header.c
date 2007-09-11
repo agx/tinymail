@@ -264,13 +264,18 @@ tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
 	priority_flags = mask & TNY_HEADER_FLAG_PRIORITY;
+
 	if (priority_flags) {
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
 	}
-	if (mask & TNY_HEADER_FLAG_ATTACHMENTS) {
+
+	if (mask & TNY_HEADER_FLAG_ATTACHMENTS)
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
-	}
+
+	if (mask & TNY_HEADER_FLAG_PARTIAL)
+		me->partial = FALSE;
+
 	return;
 }
 
