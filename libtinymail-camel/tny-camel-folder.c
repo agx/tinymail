@@ -3694,8 +3694,11 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 
 	camel_folder_thaw (cfol_src);
 	camel_folder_thaw (cfol_dst);
-	camel_folder_sync (cfol_dst, FALSE, NULL);
 
+	if (camel_exception_is_set (&ex))
+		goto err_goto_lbl;
+
+	camel_folder_sync (cfol_dst, FALSE, NULL);
 
 	if (new_headers && transferred_uids)
 	{
@@ -3816,6 +3819,8 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 		}
 	}
 
+
+err_goto_lbl:
 
 	if (camel_exception_is_set (&ex)) 
 	{
