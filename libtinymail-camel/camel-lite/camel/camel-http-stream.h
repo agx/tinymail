@@ -60,6 +60,7 @@ struct _CamelHttpStream {
 	
 	CamelHttpMethod method;
 	struct _CamelSession *session;
+	CamelService *service;
 	CamelURL *url;
 	
 	char *user_agent;
@@ -85,7 +86,7 @@ struct _CamelHttpStreamClass {
 CamelType camel_http_stream_get_type (void);
 
 /* public methods */
-CamelStream *camel_http_stream_new (CamelHttpMethod method, struct _CamelSession *session, CamelURL *url);
+CamelStream *camel_http_stream_new (CamelHttpMethod method, CamelService *service, CamelURL *url);
 
 void camel_http_stream_set_user_agent (CamelHttpStream *http_stream, const char *user_agent);
 

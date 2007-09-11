@@ -217,13 +217,13 @@ connect_to_server (CamelService *service, int ssl_mode, int try_starttls)
 #ifdef HAVE_SSL	
 		if (camel_url_get_param (service->url, "use_ssl")) {
 			if (try_starttls)
-				tcp_stream = camel_tcp_stream_ssl_new_raw (service->session, service->url->host, STARTTLS_FLAGS);
+				tcp_stream = camel_tcp_stream_ssl_new_raw (service, service->url->host, STARTTLS_FLAGS);
 			else {
 				if (service->url->port == 0) {
 					serv = "imaps";
 					port = "993";
 				}
-				tcp_stream = camel_tcp_stream_ssl_new (service->session, service->url->host, SSL_PORT_FLAGS);
+				tcp_stream = camel_tcp_stream_ssl_new (service, service->url->host, SSL_PORT_FLAGS);
 			}
 		} else {
 			tcp_stream = camel_tcp_stream_raw_new ();

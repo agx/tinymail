@@ -146,20 +146,21 @@ camel_http_stream_get_type (void)
  * Return value: a http stream
  **/
 CamelStream *
-camel_http_stream_new (CamelHttpMethod method, struct _CamelSession *session, CamelURL *url)
+camel_http_stream_new (CamelHttpMethod method, CamelService *service, CamelURL *url)
 {
 	CamelHttpStream *stream;
 	char *str;
 	
-	g_return_val_if_fail(CAMEL_IS_SESSION(session), NULL);
+	g_return_val_if_fail(CAMEL_IS_SESSION(service->session), NULL);
 	g_return_val_if_fail(url != NULL, NULL);
 	
 	stream = CAMEL_HTTP_STREAM (camel_object_new (camel_http_stream_get_type ()));
 	
 	stream->method = method;
-	stream->session = session;
-	camel_object_ref(session);
-	
+	stream->session = service->session;
+	camel_object_ref(service->session);
+	stream->service = service;
+
 	str = camel_url_to_string (url, 0);
 	stream->url = camel_url_new (str, NULL);
 	g_free (str);
@@ -181,7 +182,7 @@ http_connect (CamelHttpStream *http, CamelURL *url)
 
 	if (!g_ascii_strcasecmp (url->protocol, "https")) {
 #ifdef HAVE_SSL
-		stream = camel_tcp_stream_ssl_new (http->session, url->host, SSL_FLAGS);
+		stream = camel_tcp_stream_ssl_new (http->service, url->host, SSL_FLAGS);
 #endif
 	} else {
 		stream = camel_tcp_stream_raw_new ();

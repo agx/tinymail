@@ -183,27 +183,28 @@ camel_tcp_stream_ssl_get_type (void)
  * Returns a new #CamelTcpStreamSSL stream preset in SSL mode
  **/
 CamelStream *
-camel_tcp_stream_ssl_new (CamelSession *session, const char *expected_host, guint32 flags)
+camel_tcp_stream_ssl_new (CamelService *service, const char *expected_host, guint32 flags)
 {
 	CamelTcpStreamSSL *stream;
 
 	g_assert(CAMEL_IS_SESSION(session));
 
 	stream = CAMEL_TCP_STREAM_SSL (camel_object_new (camel_tcp_stream_ssl_get_type ()));
-	
-	stream->priv->session = session;
-	camel_object_ref(session);
+
+	stream->priv->session = service->session;
+	camel_object_ref(service->session);
 	stream->priv->expected_host = g_strdup (expected_host);
 	stream->priv->ssl_mode = TRUE;
 	stream->priv->flags = flags;
-	
+	stream->priv->service = service;
+
 	return CAMEL_STREAM (stream);
 }
 
 
 /**
  * camel_tcp_stream_ssl_new_raw:
- * @session: an active #CamelSession object
+ * @service: an active #CamelService object
  * @expected_host: host that the stream is expected to connect with
  * @flags: a bitwise combination of any of
  * #CAMEL_TCP_STREAM_SSL_ENABLE_SSL2,
@@ -217,7 +218,7 @@ camel_tcp_stream_ssl_new (CamelSession *session, const char *expected_host, guin
  * Returns a new #CamelTcpStreamSSL stream not yet toggled into SSL mode
  **/
 CamelStream *
-camel_tcp_stream_ssl_new_raw (CamelSession *session, const char *expected_host, guint32 flags)
+camel_tcp_stream_ssl_new_raw (CamelService *service, const char *expected_host, guint32 flags)
 {
 	CamelTcpStreamSSL *stream;
 
@@ -225,12 +226,13 @@ camel_tcp_stream_ssl_new_raw (CamelSession *session, const char *expected_host, 
 	
 	stream = CAMEL_TCP_STREAM_SSL (camel_object_new (camel_tcp_stream_ssl_get_type ()));
 	
-	stream->priv->session = session;
-	camel_object_ref(session);
+	stream->priv->session = service->session;
+	camel_object_ref(service->session);
 	stream->priv->expected_host = g_strdup (expected_host);
 	stream->priv->ssl_mode = FALSE;
 	stream->priv->flags = flags;
-	
+	stream->priv->service = service;
+
 	return CAMEL_STREAM (stream);
 }
 

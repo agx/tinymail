@@ -84,6 +84,7 @@ struct _CamelTcpStreamSSLPrivate {
 	char *expected_host;
 	gboolean ssl_mode;
 	guint32 flags;
+	CamelService *service;
 };
 
 
@@ -176,7 +177,7 @@ camel_tcp_stream_ssl_get_type (void)
 
 /**
  * camel_tcp_stream_ssl_new:
- * @session: camel session
+ * @service: camel service
  * @expected_host: host that the stream is expecting to connect with.
  * @flags: flags
  *
@@ -187,24 +188,25 @@ camel_tcp_stream_ssl_get_type (void)
  * Return value: a ssl stream (in ssl mode)
  **/
 CamelStream *
-camel_tcp_stream_ssl_new (struct _CamelSession *session, const char *expected_host, guint32 flags)
+camel_tcp_stream_ssl_new (CamelService *service, const char *expected_host, guint32 flags)
 {
 	CamelTcpStreamSSL *stream;
 	
 	stream = CAMEL_TCP_STREAM_SSL (camel_object_new (camel_tcp_stream_ssl_get_type ()));
 	
-	stream->priv->session = session;
+	stream->priv->session = service->session;
 	stream->priv->expected_host = g_strdup (expected_host);
 	stream->priv->ssl_mode = TRUE;
 	stream->priv->flags = flags;
-	
+	stream->priv->service = service;
+
 	return CAMEL_STREAM (stream);
 }
 
 
 /**
  * camel_tcp_stream_ssl_new_raw:
- * @session: camel session
+ * @service: camel service
  * @expected_host: host that the stream is expecting to connect with.
  * @flags: flags
  *
@@ -215,17 +217,18 @@ camel_tcp_stream_ssl_new (struct _CamelSession *session, const char *expected_ho
  * Return value: a ssl-capable stream (in non ssl mode)
  **/
 CamelStream *
-camel_tcp_stream_ssl_new_raw (struct _CamelSession *session, const char *expected_host, guint32 flags)
+camel_tcp_stream_ssl_new_raw (CamelService *service, const char *expected_host, guint32 flags)
 {
 	CamelTcpStreamSSL *stream;
 	
 	stream = CAMEL_TCP_STREAM_SSL (camel_object_new (camel_tcp_stream_ssl_get_type ()));
 	
-	stream->priv->session = session;
+	stream->priv->session = service->session;
 	stream->priv->expected_host = g_strdup (expected_host);
 	stream->priv->ssl_mode = FALSE;
 	stream->priv->flags = flags;
-	
+	stream->priv->service = service;
+
 	return CAMEL_STREAM (stream);
 }
 
@@ -859,10 +862,9 @@ ssl_verify (int ok, X509_STORE_CTX *ctx)
 	prompt = g_strdup_printf (_("Bad certificate\n\n%s\n\n%s\n\n"
 				    "Do you wish to accept anyway?"), 
 				    cert_str, x509_strerror (err));
-	
-	CamelService *service = NULL; /* TODO: Is there a CamelService that we can use? */
+
 	ok = camel_session_alert_user_with_id (session, CAMEL_SESSION_ALERT_WARNING, 
-		CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE, service);
+		CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE, stream->priv->service);
 	g_free (prompt);
 	
 	if (ok && ccert) {

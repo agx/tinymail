@@ -1,6 +1,8 @@
 2007-09-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix when determining Push E-mail capabilities
+	* The service pointer of the OpenSSL stream implementation is now
+	available in the alert functions
 
 2007-09-10  Philip Van Hoof  <pvanhoof@gnome.org>
 
