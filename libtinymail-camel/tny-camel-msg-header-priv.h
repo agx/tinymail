@@ -51,6 +51,7 @@ struct _TnyCamelMsgHeader
 	gchar *mime_from, *old_uid;
 	gboolean has_received;
 	time_t received;
+	gboolean partial;
 };
 
 struct _TnyCamelMsgHeaderClass 

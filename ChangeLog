@@ -4,6 +4,7 @@
 	* The service pointer of the OpenSSL stream implementation is now
 	available in the alert functions
 	* Performance improvement in POP3's sync operation
+	* The CACHED and PARTIAL flags of received messages
 
 2007-09-10  Philip Van Hoof  <pvanhoof@gnome.org>
 

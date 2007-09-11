@@ -189,6 +189,8 @@ tny_camel_msg_header_get_flags (TnyHeader *self)
 	const gchar *attachments_string = NULL;
 	TnyHeaderFlags result = 0;
 
+	result |= TNY_HEADER_FLAG_CACHED;
+
 	priority_string = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "X-Priority");
 	attachments_string = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
 	if (priority_string != NULL) {
@@ -199,9 +201,13 @@ tny_camel_msg_header_get_flags (TnyHeader *self)
 		else 
 			result |= TNY_HEADER_FLAG_NORMAL_PRIORITY;
 	}
-	if (attachments_string != NULL) {
+
+	if (attachments_string != NULL)
 		result |= TNY_HEADER_FLAG_ATTACHMENTS;
-	}
+
+	if (me->partial)
+		result |= TNY_HEADER_FLAG_PARTIAL;
+
 	return result;
 }
 
@@ -211,10 +217,13 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
-	if (mask & (~(TNY_HEADER_FLAG_PRIORITY|TNY_HEADER_FLAG_ATTACHMENTS))) {
-		g_warning ("tny_header_set_flags: This is a header instance for a new message. Only priority and attachment flags are supported.\n");
-		return;
+	if (mask & TNY_HEADER_FLAG_CACHED || mask & TNY_HEADER_FLAG_PARTIAL) {
+		if (mask & TNY_HEADER_FLAG_PARTIAL)
+			me->partial = TRUE;
+		else
+			me->partial = FALSE;
 	}
+
 	priority_flags = mask & TNY_HEADER_FLAG_PRIORITY;
 
 	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
@@ -244,8 +253,8 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach", "Yes");
 	}
-	  
-	
+
+	return;
 }
 
 static void
@@ -254,10 +263,6 @@ tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
-	if (mask & (~(TNY_HEADER_FLAG_PRIORITY|TNY_HEADER_FLAG_ATTACHMENTS))) {
-		g_warning ("tny_header_set_flags: This is a header instance for a new message. Non-priority flags are not supported.\n");
-		return;
-	}
 	priority_flags = mask & TNY_HEADER_FLAG_PRIORITY;
 	if (priority_flags) {
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
@@ -440,6 +445,7 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t rece
 	self->msg = msg; 
 	self->folder = folder;
 	self->has_received = FALSE;
+	self->partial = FALSE;
 
 	return (TnyHeader*) self;
 }
