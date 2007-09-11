@@ -544,6 +544,12 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		guint newlen = 0;
 		CamelStore *store = priv->store;
 
+		if (store == NULL) {
+			camel_exception_set (&priv->load_ex, CAMEL_EXCEPTION_SYSTEM, 
+				"No store loaded yet");
+			return FALSE;
+		}
+
 		priv->load_ex.id = 0;
 		priv->load_ex.desc = NULL;
 
