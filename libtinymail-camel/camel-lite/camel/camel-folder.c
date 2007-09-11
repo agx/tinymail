@@ -136,6 +136,9 @@ folder_set_push_email (CamelFolder *folder, gboolean setting)
 void 
 camel_folder_set_push_email (CamelFolder *folder, gboolean setting)
 {
+	if (!folder)
+		return;
+
 	CF_CLASS (folder)->set_push_email (folder, setting);
 }
 
