@@ -485,8 +485,12 @@ unload_folder (TnyCamelFolderPriv *priv, gboolean destroy)
 static void
 determine_push_email (TnyCamelFolderPriv *priv)
 {
+	g_static_rec_mutex_lock (priv->folder_lock);
 	if (!priv->folder || (((CamelObject *)priv->folder)->ref_count <= 0) || !CAMEL_IS_FOLDER (priv->folder))
+	{
+		g_static_rec_mutex_unlock (priv->folder_lock);
 		return;
+	}
 
 	if (priv->observers && tny_list_get_length (priv->observers) > 0) {
 		camel_folder_set_push_email (priv->folder, TRUE);
@@ -495,7 +499,7 @@ determine_push_email (TnyCamelFolderPriv *priv)
 		camel_folder_set_push_email (priv->folder, FALSE);
 		priv->push = FALSE;
 	}
-
+	g_static_rec_mutex_unlock (priv->folder_lock);
 	return;
 }
 
