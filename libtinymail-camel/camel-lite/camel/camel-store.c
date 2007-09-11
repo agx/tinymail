@@ -267,7 +267,8 @@ camel_store_get_folder (CamelStore *store, const char *folder_name, guint32 flag
 	CamelFolder *folder = NULL;
 	
 	g_return_val_if_fail (folder_name != NULL, NULL);
-	
+	g_return_val_if_fail (store != NULL, NULL);
+
 	/* O_EXCL doesn't make sense if we aren't requesting to also create the folder if it doesn't exist */
 	if (!(flags & CAMEL_STORE_FOLDER_CREATE))
 		flags &= ~CAMEL_STORE_FOLDER_EXCL;
