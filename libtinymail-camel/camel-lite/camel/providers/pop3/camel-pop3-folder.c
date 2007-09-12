@@ -609,8 +609,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			gint t=0;
 			for (t=0; t < pop3_folder->uids->len; t++)
 			{
-				CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[t];
-				if (fi && fi->uid && !strcmp (fi->uid, info->uid)) {
+				CamelPOP3FolderInfo *fi2 = pop3_folder->uids->pdata[t];
+				if (fi2 && fi2->uid && !strcmp (fi2->uid, info->uid)) {
 					found = TRUE;
 					break;
 				}
