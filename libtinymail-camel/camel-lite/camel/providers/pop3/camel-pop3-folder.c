@@ -618,7 +618,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 			if (!found) {
 				/* Removed remotely (only if not cached locally) */
-				if (camel_data_cache_exists (pop3_store->cache, "cache", fi->uid, NULL)) {
+				if (camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
 					camel_message_info_ref (info);
 					deleted = g_list_prepend (deleted, info);
 				} 
