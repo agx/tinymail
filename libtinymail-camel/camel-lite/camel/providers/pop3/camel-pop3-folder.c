@@ -525,7 +525,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 {
 	CamelPOP3Folder *pop3_folder;
 	CamelPOP3Store *pop3_store;
-	int i, max; CamelPOP3FolderInfo *fi;
+	int i, max;
 	CamelMessageInfoBase *info;
 	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 	GList *deleted = NULL;
