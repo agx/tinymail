@@ -291,6 +291,7 @@ cmd_uidl(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 				if (fi) {
 					camel_operation_progress(NULL, (fi->index+1) , folder->uids->len);
 					fi->uid = g_strdup(uid);
+					pop3_debug ("%s added\n", fi->uid);
 					g_hash_table_insert(folder->uids_uid, fi->uid, fi);
 				} else {
 					g_warning("ID %u (uid: %s) not in previous LIST output", id, uid);
@@ -326,7 +327,6 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 			return;
 		}
 	}
-	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	destroy_lists (pop3_folder);
 
@@ -337,8 +337,6 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
 
-
-	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	if (pop3_store->engine == NULL) {
 		pop3_store->is_refreshing = FALSE;
@@ -924,6 +922,9 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
 	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
+	gint retry = 0;
+
+	pop3_debug ("%s requested\n", uid);
 
 	stream = camel_data_cache_get(pop3_store->cache, "cache", uid, NULL);
 	if (stream)
@@ -952,9 +953,46 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		fi = NULL;
 
 	if (fi == NULL) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
-				      _("No message with UID %s"), uid);
-		return NULL;
+		CamelPOP3Command *pcl, *pcu = NULL;
+
+		g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+		if (pop3_store->engine == NULL) {
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			goto rfail;
+		}
+
+		destroy_lists (pop3_folder);
+		pop3_folder->uids = g_ptr_array_new ();
+		pop3_folder->uids_uid = g_hash_table_new(g_str_hash, g_str_equal);
+		/* only used during setup */
+		pop3_folder->uids_id = g_hash_table_new(NULL, NULL);
+		pop3_store->is_refreshing = TRUE;
+		pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
+		if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
+			pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
+		while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
+			;
+		pop3_store->is_refreshing = FALSE;
+
+		fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
+
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+rfail:
+		if (fi == NULL) {
+
+			camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
+			  "Message with UID %s is not currently available on the POP server. "
+			  "If you have a web E-mail account with POP access, make sure "
+			  "that you select to export all E-mails over POP for mail, "
+			  "the ones that have already been downloaded too. Also verify "
+			  "whether other E-mail clients that use the account are not "
+			  "configured to automatically delete E-mails from the POP server." , 
+			  uid);
+
+			return NULL;
+		}
 	}
 
 	/* Sigh, most of the crap in this function is so that the cancel button
@@ -966,6 +1004,9 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 				      _("No message with UID %s and not online"), uid);
 		return NULL;
 	}
+
+   while (retry < 2) 
+   {
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL)
@@ -1139,6 +1180,10 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		}
+
+		/* No more retry */
+		retry=3;
+
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
@@ -1160,6 +1205,9 @@ fail:
 	if (pop3_store->is_refreshing == FALSE)
 		camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, &dex);
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+    retry++;
+  }
 
 	return message;
 }

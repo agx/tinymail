@@ -5093,8 +5093,6 @@ tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *obser
 	tny_list_prepend (priv->observers, G_OBJECT (observer));
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	determine_push_email (priv);
-
 	return;
 }
 
@@ -5121,8 +5119,6 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 
 	tny_list_remove (priv->observers, G_OBJECT (observer));
 	g_static_rec_mutex_unlock (priv->obs_lock);
-
-	determine_push_email (priv);
 
 	return;
 }
