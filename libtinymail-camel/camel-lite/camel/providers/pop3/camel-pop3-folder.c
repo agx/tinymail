@@ -606,10 +606,10 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			deleted = g_list_prepend (deleted, info);
 		} else {
 			gboolean found = FALSE;
-
-			for (i=0; i < pop3_folder->uids->len; i++)
+			gint t=0;
+			for (t=0; t < pop3_folder->uids->len; t++)
 			{
-				CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[i];
+				CamelPOP3FolderInfo *fi = pop3_folder->uids->pdata[t];
 				if (!strcmp (fi->uid, info->uid)) {
 					found = TRUE;
 					break;
