@@ -373,8 +373,10 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		camel_file_util_read_counts (path, fi);
 	}
 
-	if (folderpath)
+	if (folderpath) {
+		fi->local_size = 0;
 		camel_du (folderpath, (int *) &fi->local_size);
+	}
 
 	g_free(folderpath);
 	g_free(path);
