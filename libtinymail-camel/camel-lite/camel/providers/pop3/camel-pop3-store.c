@@ -926,6 +926,25 @@ pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 	StatInfo *info = NULL;
 	int i = -1;
 
+	gchar *spath = g_strdup_printf ("%s/summary.mmap", pop3_store->storage_path);
+	guint32 mversion=-1; guint32 mflags=-1;
+	guint32 mnextuid=-1; time_t mtime=-1; guint32 msaved_count=-1;
+	guint32 munread_count=-1; guint32 mdeleted_count=-1;
+	guint32 mjunk_count=-1;
+
+	camel_file_util_read_counts_2 (spath, &mversion, &mflags, &mnextuid,
+		&mtime, &msaved_count, &munread_count, &mdeleted_count,
+		&mjunk_count);
+
+	if (munread_count != -1)
+		*unseen = munread_count;
+	if (msaved_count != -1)
+		*messages = msaved_count;
+	if (mnextuid != -1)
+		*uidnext = mnextuid;
+
+	g_free (spath);
+
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
 
@@ -949,7 +968,7 @@ pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 
 	if (info->items != -1) {
 		*messages = info->items;
-		if (*unseen == -1) {
+		if (munread_count == -1) {
 			CamelFolderInfo *inf = pop3_build_folder_info (
 				CAMEL_POP3_STORE (store), "INBOX");
 			*unseen = inf->unread;
