@@ -2469,7 +2469,7 @@ imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 		*uidnext = mnextuid;
 
 	g_free (spath);
-	g_free(storage_path);
+	g_free (storage_path);
 	g_free (folder_dir);
 
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (imap_store), &ex))
