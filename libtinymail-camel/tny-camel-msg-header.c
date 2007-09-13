@@ -480,14 +480,12 @@ void
 _tny_camel_msg_header_set_decorated (TnyCamelMsgHeader *header, 
 				     TnyHeader *decorated)
 {
-	TnyHeader *dec;
-
 	g_assert (TNY_IS_HEADER (decorated));
 	if (header->decorated) {
 		g_object_unref (header->decorated);
 	}
 
-	header->decorated = g_object_ref (G_OBJECT (decorated));
+	header->decorated = TNY_HEADER (g_object_ref (decorated));
 
 }
 
