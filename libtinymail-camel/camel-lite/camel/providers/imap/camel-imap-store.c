@@ -2449,7 +2449,28 @@ imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (store);
 	struct imap_status_item *items, *item;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	char *storage_path = g_strdup_printf("%s/folders", imap_store->storage_path);
+	char *folder_dir = imap_path_to_physical (storage_path, folder_name);
+	gchar *spath = g_strdup_printf ("%s/summary.mmap", folder_dir);
+	guint32 mversion=-1; guint32 mflags=-1;
+	guint32 mnextuid=-1; time_t mtime=-1; guint32 msaved_count=-1;
+	guint32 munread_count=-1; guint32 mdeleted_count=-1;
+	guint32 mjunk_count=-1;
 
+	camel_file_util_read_counts_2 (spath, &mversion, &mflags, &mnextuid,
+		&mtime, &msaved_count, &munread_count, &mdeleted_count,
+		&mjunk_count);
+
+	if (munread_count != -1)
+		*unseen = munread_count;
+	if (msaved_count != -1)
+		*messages = msaved_count;
+	if (mnextuid != -1)
+		*uidnext = mnextuid;
+
+	g_free (spath);
+	g_free(storage_path);
+	g_free (folder_dir);
 
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (imap_store), &ex))
 		return;
@@ -2465,14 +2486,19 @@ imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 
 	if (item == NULL) /* Fallback situation for bizare servers */ {
 		item = items = get_folder_status (imap_store, folder_name, "MESSAGES", FALSE);
-		*unseen = 0; *uidnext = 0;
+		if (munread_count == -1)
+			*unseen = 0; 
+		if (mnextuid == -1)
+			*uidnext = 0;
 	}
 
 	while (item != NULL) {
 		if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
 			*messages = item->value;
-		if (!g_ascii_strcasecmp (item->name, "UNSEEN"))
-			*unseen = item->value;
+		if (!g_ascii_strcasecmp (item->name, "UNSEEN")) {
+			if (munread_count == -1)
+				*unseen = item->value;
+		}
 		if (!g_ascii_strcasecmp (item->name, "UIDNEXT"))
 			*uidnext = item->value;
 		item = item->next;

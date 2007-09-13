@@ -1,3 +1,7 @@
+2007-09-13  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Unread count improvements for IMAP folders
+
 2007-09-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* POP improvements, retrying when failed

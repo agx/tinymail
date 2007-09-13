@@ -107,6 +107,59 @@ camel_file_util_read_counts (const gchar *spath, CamelFolderInfo *fi)
 	}
 }
 
+
+void 
+camel_file_util_read_counts_2 (const gchar *spath, 
+	guint32 *version, guint32 *flags, 
+	guint32 *nextuid, time_t *time, guint32 *saved_count,
+	guint32 *unread_count, guint32 *deleted_count,
+	guint32 *junk_count)
+{
+	/* This code reads the beginning of the summary.mmap file for
+	 * the length and unread-count of the folder. It makes it 
+	 * possible to read the total and unread values of the 
+	 * CamelFolderInfo structure without having to read the entire
+	 * folder in (mmap it) 
+	 * It's called by get_folder_info_offline and therefore also by 
+	 * get_folder_info_online for each node in the tree. */
+
+	FILE *f = fopen (spath, "r");
+	if (f) {
+
+		gint tsize = ((sizeof (guint32) * 7) + sizeof (time_t));
+		char *buffer = malloc (tsize), *ptr;
+		guint32 a;
+
+		a = fread (buffer, 1, tsize, f);
+		if (a == tsize) 
+		{
+			guint32 v = 0;
+			ptr = buffer;
+			v = g_ntohl(get_unaligned_u32(ptr));
+			*version = v;
+			ptr += 4;
+			*flags = g_ntohl(get_unaligned_u32(ptr));
+			ptr += 4;
+			*nextuid = g_ntohl(get_unaligned_u32(ptr));
+			ptr += 4;
+			*time = g_ntohl(get_unaligned_u32(ptr));
+			ptr += 4;
+			*saved_count = g_ntohl(get_unaligned_u32(ptr));
+
+			if (v < 0x100 && v >= 13) {
+				ptr += 4;
+				*unread_count = g_ntohl(get_unaligned_u32(ptr));
+				ptr += 4;
+				*deleted_count = g_ntohl(get_unaligned_u32(ptr));
+				ptr += 4;
+				*junk_count = g_ntohl(get_unaligned_u32(ptr));
+			}
+		}
+		g_free (buffer);
+		fclose (f);
+	}
+}
+
 /**
  * camel_file_util_decode_fixed_int32:
  * @in: file to read from

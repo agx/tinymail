@@ -97,6 +97,12 @@ ssize_t camel_read_socket_nb (int fd, char *buf, size_t n);
 char *camel_file_util_savename(const char *filename);
 void camel_file_util_read_counts (const gchar *spath, CamelFolderInfo *fi);
 
+void camel_file_util_read_counts_2 (const gchar *spath, 
+	guint32 *version, guint32 *flags, 
+	guint32 *nextuid, time_t *time, guint32 *saved_count,
+	guint32 *unread_count, guint32 *deleted_count,
+	guint32 *junk_count);
+
 #define get_unaligned_u32(p) ((((unsigned char*)(p))[0]) | \
 	(((unsigned char*)(p))[1] << 8) | \
 	(((unsigned char*)(p))[2] << 16) | \
