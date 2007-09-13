@@ -94,6 +94,7 @@ struct _CamelTcpStreamSSLPrivate {
 	gboolean ssl_mode;
 	guint32 flags;
 	gboolean accepted;
+	CamelService *service;
 };
 
 static void
