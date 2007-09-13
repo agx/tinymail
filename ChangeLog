@@ -1,3 +1,25 @@
+2007-09-13  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail/tny-folder.c: Remove assertion that expects folder 
+	names to have 1 character at least (at least in my IMAP server 
+	we've got empty strings as valid imap folders).
+
+	* libtinymail-camel/tny-camel-msg-header-priv.h: Add internal API
+	to set a decorated header (at least for updating flag values).
+	
+	* libtinymail-camel/tny-camel-msg-header.c: Now we can set an 
+	internal decorated TnyHeader instance. For flags operations, 
+	we'll set/unset/get also the decorated header.
+	
+	* libtinymail-camel/tny-camel-partial-msg-receive-strategy.c: Now
+	we set the folder header as decorated by the msg header. This way 
+	the flags are set correctly in folder when we set a flag from the 
+	header obtained from the message.
+	
+	* libtinymail-camel/tny-camel-full-msg-receive-strategy.c: Now we 
+	set the folder header as decorated by the msg header.
+
+
 2007-09-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Unread count improvements for IMAP folders

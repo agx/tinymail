@@ -188,6 +188,7 @@ tny_camel_msg_header_get_flags (TnyHeader *self)
 	const gchar *priority_string = NULL;
 	const gchar *attachments_string = NULL;
 	TnyHeaderFlags result = 0;
+	TnyHeaderFlags decorated_flags;
 
 	result |= TNY_HEADER_FLAG_CACHED;
 
@@ -208,6 +209,11 @@ tny_camel_msg_header_get_flags (TnyHeader *self)
 	if (me->partial)
 		result |= TNY_HEADER_FLAG_PARTIAL;
 
+	if (me->decorated) {
+		decorated_flags = tny_header_get_flags (me->decorated);
+		result |= decorated_flags;
+	}
+
 	return result;
 }
 
@@ -216,6 +222,10 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (me->decorated) {
+		tny_header_set_flags (me->decorated, mask);
+	}
 
 	if (mask & TNY_HEADER_FLAG_CACHED || mask & TNY_HEADER_FLAG_PARTIAL) {
 		if (mask & TNY_HEADER_FLAG_PARTIAL)
@@ -262,6 +272,10 @@ tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyHeaderPriorityFlags priority_flags;
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (me->decorated) {
+		tny_header_set_flags (me->decorated, mask);
+	}
 
 	priority_flags = mask & TNY_HEADER_FLAG_PRIORITY;
 
@@ -418,6 +432,12 @@ tny_camel_msg_header_finalize (GObject *object)
 	if (me->old_uid)
 		g_free (me->old_uid);
 
+	if (me->decorated) {
+		g_object_unref (me->decorated);
+		me->decorated = NULL;
+	}
+
+
 	(*parent_class->finalize) (object);
 
 	return;
@@ -451,10 +471,25 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t rece
 	self->folder = folder;
 	self->has_received = FALSE;
 	self->partial = FALSE;
+	self->decorated = NULL;
 
 	return (TnyHeader*) self;
 }
 
+void 
+_tny_camel_msg_header_set_decorated (TnyCamelMsgHeader *header, 
+				     TnyHeader *decorated)
+{
+	TnyHeader *dec;
+
+	g_assert (TNY_IS_HEADER (decorated));
+	if (header->decorated) {
+		g_object_unref (header->decorated);
+	}
+
+	header->decorated = g_object_ref (G_OBJECT (decorated));
+
+}
 
 
 static void

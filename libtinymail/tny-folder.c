@@ -1335,7 +1335,6 @@ tny_folder_get_name (TnyFolder *self)
 
 #ifdef DBC /* ensure */
 	g_assert (retval);
-	g_assert (strlen (retval) > 0);
 #endif
 
 	return retval;
