@@ -2,6 +2,7 @@
 
 	* Unread count improvements for IMAP folders
 	* Unread count improvements for POP folders
+	* Marking messages that can't be found anymore as expunged on POP
 
 2007-09-12  Philip Van Hoof  <pvanhoof@gnome.org>
 

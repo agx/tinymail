@@ -981,6 +981,13 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 rfail:
 		if (fi == NULL) {
+			CamelFolder *folder = (CamelFolder *) pop3_folder;
+			CamelMessageInfo *mi = camel_folder_summary_uid (folder->summary, uid);
+			if (mi) {
+				((CamelMessageInfoBase*)mi)->flags |= CAMEL_MESSAGE_EXPUNGED;
+				camel_folder_summary_remove (folder->summary, mi);
+				camel_message_info_free (mi);
+			}
 
 			camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
 			  "Message with UID %s is not currently available on the POP server. "
