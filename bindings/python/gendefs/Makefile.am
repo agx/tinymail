@@ -49,8 +49,8 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-stream.h \
 	$(top_srcdir)/libtinymail/tny-transport-account.h
 
-tinymail-base.defs: $(tinymail_h_files)
-	$(PYTHON) defsgen.py -m tny -l $(top_srcdir)/libtinymail/.libs/libtinymail-1.0.so $(tinymail_h_files) > $@
+tinymail-base.defs: $(tinymail_h_files) $(top_srcdir)/bindings/python/gendefs/defsgen.py
+	$(PYTHON) $(top_srcdir)/bindings/python/gendefs/defsgen.py -m tny -l $(top_srcdir)/libtinymail/.libs/libtinymail-1.0.so $(tinymail_h_files) > $@
 
 tinymailui_h_files = \
 	$(top_srcdir)/libtinymailui/tny-account-store-view.h \
@@ -63,8 +63,8 @@ tinymailui_h_files = \
 	$(top_srcdir)/libtinymailui/tny-platform-factory.h \
 	$(top_srcdir)/libtinymailui/tny-summary-view.h
 
-tinymailui-base.defs: $(tinymailui_h_files)
-	$(PYTHON) defsgen.py -m tny -l $(top_srcdir)/libtinymailui/.libs/libtinymailui-1.0.so $(tinymailui_h_files) > $@
+tinymailui-base.defs: $(tinymailui_h_files) $(top_srcdir)/bindings/python/gendefs/defsgen.py
+	$(PYTHON) $(top_srcdir)/bindings/python/gendefs/defsgen.py -m tny -l $(top_srcdir)/libtinymailui/.libs/libtinymailui-1.0.so $(tinymailui_h_files) > $@
 
 tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-account-list-model.h \
@@ -82,8 +82,8 @@ tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-buffer-stream.h \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h
 
-tinymailui-gtk-base.defs: $(tinymailui_gtk_h_files) 
-	$(PYTHON) defsgen.py -m tny -l $(top_srcdir)/libtinymailui-gtk/.libs/libtinymailui-gtk-1.0.so $(tinymailui_gtk_h_files) > $@
+tinymailui-gtk-base.defs: $(tinymailui_gtk_h_files) $(top_srcdir)/bindings/python/gendefs/defsgen.py
+	$(PYTHON) $(top_srcdir)/bindings/python/gendefs/defsgen.py -m tny -l $(top_srcdir)/libtinymailui-gtk/.libs/libtinymailui-gtk-1.0.so $(tinymailui_gtk_h_files) > $@
 
 tinymail_camel_h_files = \
 	$(top_srcdir)/libtinymail-camel/tny-camel-account.h \
@@ -109,5 +109,5 @@ tinymail_camel_h_files = \
 	$(top_srcdir)/libtinymail-camel/tny-camel-transport-account.h \
         $(top_srcdir)/libtinymail-camel/tny-session-camel.h	
 
-tinymail-camel-base.defs : $(tinymail_camel_h_files)
-	$(PYTHON) defsgen.py -m tny -l $(top_srcdir)/libtinymail-camel/.libs/libtinymail-camel-1.0.so $(tinymail_camel_h_files) > $@
+tinymail-camel-base.defs : $(tinymail_camel_h_files) $(top_srcdir)/bindings/python/gendefs/defsgen.py
+	$(PYTHON) $(top_srcdir)/bindings/python/gendefs/defsgen.py -m tny -l $(top_srcdir)/libtinymail-camel/.libs/libtinymail-camel-1.0.so $(tinymail_camel_h_files) > $@

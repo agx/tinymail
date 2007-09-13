@@ -2,3 +2,11 @@
 .defs
 Makefile
 Makefile.in
+defsparser.pyc
+tinymail-camel-base.defs
+tinymailui-gtk-base.defs
+definitions.pyc
+scmexpr.pyc
+tinymailui-base.defs
+tinymail-base.defs
+
