@@ -187,7 +187,7 @@ camel_tcp_stream_ssl_new (CamelService *service, const char *expected_host, guin
 {
 	CamelTcpStreamSSL *stream;
 
-	g_assert(CAMEL_IS_SESSION(session));
+	g_assert(CAMEL_IS_SESSION(service->session));
 
 	stream = CAMEL_TCP_STREAM_SSL (camel_object_new (camel_tcp_stream_ssl_get_type ()));
 
@@ -222,7 +222,7 @@ camel_tcp_stream_ssl_new_raw (CamelService *service, const char *expected_host, 
 {
 	CamelTcpStreamSSL *stream;
 
-	g_assert(CAMEL_IS_SESSION(session));
+	g_assert(CAMEL_IS_SESSION(service->session));
 	
 	stream = CAMEL_TCP_STREAM_SSL (camel_object_new (camel_tcp_stream_ssl_get_type ()));
 	
