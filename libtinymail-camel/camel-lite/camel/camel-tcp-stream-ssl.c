@@ -1202,8 +1202,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 		g_free (cert_str);
 	
 		/* query the user to find out if we want to accept this certificate */
-		CamelService *service = NULL; /* TODO: Is there a CamelService that we can use? */
-		accept = camel_session_alert_user_with_id (ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE, service);
+		accept = camel_session_alert_user_with_id (ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE, priv->service);
 		g_free(prompt);
 		if (accept) {
 			camel_certdb_nss_cert_set(certdb, ccert, cert);
