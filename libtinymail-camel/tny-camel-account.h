@@ -47,7 +47,7 @@ enum _TnyCamelAccountSignal
 
 extern guint tny_camel_account_signals [TNY_CAMEL_ACCOUNT_LAST_SIGNAL];
 
-typedef void (*TnyCamelSetOnlineCallback) (TnyCamelAccount *account, GError *err);
+typedef void (*TnyCamelSetOnlineCallback) (TnyCamelAccount *account, GError *err, gpointer user_data);
 
 
 struct _TnyCamelAccount
@@ -90,7 +90,7 @@ struct _TnyCamelAccountClass
 
 
 	void (*add_option_func) (TnyCamelAccount *self, const gchar *option);
-	void (*set_online_func) (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback);
+	void (*set_online_func) (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
 
 	/* Abstract methods */
 	void (*prepare_func) (TnyCamelAccount *self, gboolean recon_if, gboolean reservice);
@@ -104,7 +104,7 @@ GType tny_camel_account_get_type (void);
 
 void tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option);
 void tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session);
-void tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback);
+void tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
 
 
 typedef void (*TnyCamelGetSupportedSecureAuthCallback) (TnyCamelAccount *self, gboolean cancelled, TnyList *auth_types, GError *err, gpointer user_data);

@@ -4,6 +4,9 @@
 	* Unread count improvements for POP folders
 	* Marking messages that can't be found anymore as expunged on POP
 	* Fixed compilation errors in NSS support
+	* Added user_data parameter to tny_camel_account_set_online
+
+
 
 2007-09-12  Philip Van Hoof  <pvanhoof@gnome.org>
 

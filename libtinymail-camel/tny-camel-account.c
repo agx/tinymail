@@ -1588,6 +1588,7 @@ done:
  * @self: a #TnyCamelAccount object
  * @online: whether or not the account is online
  * @callback: a callback when the account went online
+ * @user_data: user data for the callback
  *
  * Set the connectivity status of an account. Setting this to FALSE means that 
  * the account will not attempt to use the network, and will use only the cache.
@@ -1599,9 +1600,9 @@ done:
  *
  **/
 void 
-tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback)
+tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data)
 {
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_online_func (self, online, callback);
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->set_online_func (self, online, callback, user_data);
 }
 
 typedef struct
@@ -1609,6 +1610,7 @@ typedef struct
 	TnyCamelAccount *account;
 	GError *err;
 	TnyCamelSetOnlineCallback callback;
+	gpointer user_data;
 
 	GCond* condition;
 	gboolean had_callback;
@@ -1625,7 +1627,7 @@ on_set_online_done_idle_func (gpointer data)
 
 	if (info->callback) {
 		tny_lockable_lock (session->priv->ui_lock);
-		info->callback (info->account, info->err);
+		info->callback (info->account, info->err, info->user_data);
 		tny_lockable_unlock (session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1674,10 +1676,16 @@ execute_callback (gint depth,
 	}
 }
 
+typedef struct {
+	TnyCamelSetOnlineCallback callback;
+	gpointer user_data;
+} OnSetOnlineDoneInfo;
+
 static void 
 on_set_online_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err, gpointer user_data)
 {
 	OnSetOnlineInfo *info = g_slice_new (OnSetOnlineInfo);
+	OnSetOnlineDoneInfo *i = (OnSetOnlineDoneInfo *) user_data;
 
 	/* Thread reference */
 	info->account = TNY_CAMEL_ACCOUNT (g_object_ref (account));
@@ -1688,7 +1696,10 @@ on_set_online_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err
 	else
 		info->err = NULL;
 
-	info->callback = (TnyCamelSetOnlineCallback) user_data;
+	info->callback = i->callback;
+	info->user_data = i->user_data;
+
+	g_slice_free (OnSetOnlineDoneInfo, i);
 
 	info->mutex = g_mutex_new ();
 	info->condition = g_cond_new ();
@@ -1713,7 +1724,7 @@ on_set_online_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err
 }
 
 void 
-tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback)
+tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnySessionCamel *session = priv->session;
@@ -1721,10 +1732,14 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 	/* In case we  are a store account, this means that we need to throw the 
 	 * request to go online to the account's queue. */
 
-	if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
+	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
+		OnSetOnlineDoneInfo *i = g_slice_new0 (OnSetOnlineDoneInfo);
+		i->callback = callback;
+		i->user_data = user_data;
 		_tny_camel_store_account_queue_going_online (
 			TNY_CAMEL_STORE_ACCOUNT (self), session, online, 
-			on_set_online_done, (gpointer) callback);
+			on_set_online_done, i);
+	}
 
 
 	/* Else, if it's a transport account, we don't have any transport 
