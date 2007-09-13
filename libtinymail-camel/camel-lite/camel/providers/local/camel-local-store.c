@@ -512,8 +512,10 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 	fi->total = -1;
 #if 0
 	/* TNY Question: Why was this needed in the first place? */
-	if (((CamelLocalFolder *)lf)->folder_path)
+	if (((CamelLocalFolder *)lf)->folder_path) {
+		fi->local_size = 0;
 		camel_du (((CamelLocalFolder *)lf)->folder_path, (int *) &fi->local_size);
+	}
 #endif
 
 	if (fi->unread == -1)

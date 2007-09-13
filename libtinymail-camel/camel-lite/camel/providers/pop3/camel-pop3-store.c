@@ -186,7 +186,7 @@ pop3_build_folder_info (CamelPOP3Store *store, const char *folder_name)
 {
 	const char *name;
 	CamelFolderInfo *fi;
-	gint msize;
+	gint msize = 0;
 	gchar *folder_dir = store->storage_path;
 	gchar *spath;
 	FILE *f;

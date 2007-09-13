@@ -341,9 +341,11 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 		fi->uri = camel_url_to_string (url, 0);
 		fi->unread = camel_folder_get_unread_message_count(folder);
 		fi->flags = CAMEL_FOLDER_NOCHILDREN;
-	
-		if (lf->folder_path)
+
+		if (lf->folder_path) {
+			fi->local_size = 0;
 			camel_du (lf->folder_path, (int *) &fi->local_size);
+		}
 
 		camel_url_free (url);
 	

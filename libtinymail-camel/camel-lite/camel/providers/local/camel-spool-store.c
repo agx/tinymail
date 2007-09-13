@@ -270,8 +270,10 @@ spool_fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 	}
 
 	/*TNY TODO:
-	if (fi->path)
+	if (fi->path) {
+		fi->local_size = 0;
 		camel_du (fi->path, &fi->local_size);
+	}
 	*/
 
 }
