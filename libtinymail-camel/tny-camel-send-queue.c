@@ -204,10 +204,14 @@ on_msg_sent_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError 
 
 	if (!err && !cancelled) {
 		TnyHeader *header = tny_msg_get_header (msg);
-		emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, 
-			priv->cur_i, priv->total);
+
+		g_signal_emit (self, tny_send_queue_signals [TNY_SEND_QUEUE_MSG_SENT], 
+			0, header, msg, priv->cur_i, priv->total);
+
 		g_object_unref (header);
 	}
+
+	g_object_unref (self);
 }
 
 static void 
@@ -238,7 +242,8 @@ tny_camel_send_queue_update (TnyFolderObserver *self, TnyFolderChange *change)
 			{
 				TnyHeader *cur = TNY_HEADER (tny_iterator_get_current (iter));
 				tny_folder_get_msg_async (sentbox, cur, 
-					on_msg_sent_get_msg, on_status, self);
+					on_msg_sent_get_msg, on_status, 
+					g_object_ref (self));
 				g_object_unref (cur);
 				tny_iterator_next (iter);
 			}
