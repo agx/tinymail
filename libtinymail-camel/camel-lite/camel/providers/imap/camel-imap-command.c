@@ -445,7 +445,7 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 			msg = g_strdup_printf(_("Alert from IMAP server %s@%s:\n%s"),
 					      ((CamelService *)store)->url->user, ((CamelService *)store)->url->host, respbuf+12);
 			camel_session_alert_user_generic(((CamelService *)store)->session, 
-				CAMEL_SESSION_ALERT_WARNING, msg, FALSE, ((CamelService *)store)->data);
+				CAMEL_SESSION_ALERT_WARNING, msg, FALSE, ((CamelService *)store));
 			g_free(msg);
 		}
 		
@@ -507,7 +507,7 @@ camel_imap_command_response_idle (CamelImapStore *store, char **response,
 			msg = g_strdup_printf(_("Alert from IMAP server %s@%s:\n%s"),
 					      ((CamelService *)store)->url->user, ((CamelService *)store)->url->host, respbuf+12);
 			camel_session_alert_user_generic(((CamelService *)store)->session, 
-				CAMEL_SESSION_ALERT_WARNING, msg, FALSE, ((CamelService *)store)->data);
+				CAMEL_SESSION_ALERT_WARNING, msg, FALSE, ((CamelService *)store));
 			g_free(msg);
 		} else if (!g_ascii_strncasecmp (respbuf, "* BAD Invalid tag",17))
 			type = CAMEL_IMAP_RESPONSE_ERROR;

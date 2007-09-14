@@ -5,6 +5,7 @@
 	TnyCamelFolder
 	* Disconnecting the old settings if new settings are set and
 	tny_camel_account_set_online is issued (experimental)
+	* Crash fixes when alerting 
 
 2007-09-13  Jose Dapena Paz  <jdapena@igalia.com>
 

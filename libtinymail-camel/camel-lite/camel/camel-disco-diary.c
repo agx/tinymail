@@ -202,7 +202,7 @@ camel_disco_diary_log (CamelDiscoDiary *diary, CamelDiscoDiaryAction action,
 				       g_strerror (errno));
 		camel_session_alert_user_generic (camel_service_get_session (CAMEL_SERVICE (diary->store)),
 					  CAMEL_SESSION_ALERT_ERROR,
-					  msg, FALSE, CAMEL_SERVICE (diary->store)->data);
+					  msg, FALSE, CAMEL_SERVICE (diary->store));
 		g_free (msg);
 
 		fclose (diary->file);
@@ -263,7 +263,7 @@ diary_decode_folder (CamelDiscoDiary *diary)
 			camel_exception_clear (&ex);
 			camel_session_alert_user_generic (camel_service_get_session (CAMEL_SERVICE (diary->store)),
 						  CAMEL_SESSION_ALERT_WARNING,
-						  msg, FALSE, CAMEL_SERVICE (diary->store)->data);
+						  msg, FALSE, CAMEL_SERVICE (diary->store));
 			g_free (msg);
 			g_free (name);
 		}
