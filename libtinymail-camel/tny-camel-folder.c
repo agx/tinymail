@@ -1270,7 +1270,8 @@ tny_camel_folder_get_unread_count_default (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	if (priv->unread_length == 0) {
+	if (priv->unread_length == 0 && !priv->unread_read) {
+		priv->unread_read = TRUE;
 		g_static_rec_mutex_lock (priv->folder_lock);
 		if (priv->folder) {
 			priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
@@ -5504,6 +5505,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelFolder *self = (TnyCamelFolder *)instance;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	priv->unread_read = FALSE;
 	priv->parent = NULL;
 	priv->strict_retrieval = FALSE;
 	priv->self = (TnyFolder *) self;
