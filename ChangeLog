@@ -1,3 +1,9 @@
+2007-09-14  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* TnyCamelSendQueue's sent-msg signal emission (some corrections)
+	* Small locking problem when requesting the unread-count of a
+	TnyCamelFolder
+
 2007-09-13  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail/tny-folder.c: Remove assertion that expects folder 

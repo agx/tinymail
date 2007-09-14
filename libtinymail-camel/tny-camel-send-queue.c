@@ -33,6 +33,7 @@
 #include <tny-transport-account.h>
 #include <tny-store-account.h>
 #include <tny-camel-store-account.h>
+#include <tny-folder-observer.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -66,6 +67,21 @@ typedef struct {
 } ControlInfo;
 
 
+static TnyFolder*
+get_sentbox (TnySendQueue *self)
+{
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+	TnyFolder *retval = tny_send_queue_get_sentbox (self);
+
+	if (retval) {
+		if (!priv->observer_attached) {
+			tny_folder_add_observer (retval, TNY_FOLDER_OBSERVER (self));
+			priv->observer_attached = TRUE;
+		}
+	}
+
+	return retval;
+}
 
 static gboolean 
 emit_error_on_mainloop (gpointer data)
@@ -180,6 +196,62 @@ emit_control (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint signal_i
 	return;
 }
 
+static void
+on_msg_sent_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data)
+{
+	TnySendQueue *self = (TnySendQueue *) user_data;
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+
+	if (!err && !cancelled) {
+		TnyHeader *header = tny_msg_get_header (msg);
+		emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, 
+			priv->cur_i, priv->total);
+		g_object_unref (header);
+	}
+}
+
+static void 
+on_status (GObject *self, TnyStatus *status, gpointer user_data) 
+{
+	return;
+}
+
+static void
+tny_camel_send_queue_update (TnyFolderObserver *self, TnyFolderChange *change)
+{
+	TnyFolderChangeChanged changed;
+	TnyFolder *folder = NULL;
+	TnyFolder *sentbox = tny_send_queue_get_sentbox (TNY_SEND_QUEUE (self));
+
+	changed = tny_folder_change_get_changed (change);
+	folder = tny_folder_change_get_folder (change);
+
+	if (folder == sentbox)
+	{
+		if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS)
+		{
+			TnyList *list = tny_simple_list_new ();
+			TnyIterator *iter = NULL;
+			tny_folder_change_get_added_headers (change, list);
+			iter = tny_list_create_iterator (list);
+			while (!tny_iterator_is_done (iter))
+			{
+				TnyHeader *cur = TNY_HEADER (tny_iterator_get_current (iter));
+				tny_folder_get_msg_async (sentbox, cur, 
+					on_msg_sent_get_msg, on_status, self);
+				g_object_unref (cur);
+				tny_iterator_next (iter);
+			}
+			g_object_unref (iter);
+			g_object_unref (list);
+		}
+	}
+
+	g_object_unref (folder);
+	g_object_unref (sentbox);
+
+	return;
+}
 
 static gpointer
 thread_main (gpointer data)
@@ -197,7 +269,7 @@ thread_main (gpointer data)
 	g_mutex_lock (priv->todo_lock);
 	{
 		GError *terror = NULL;
-		sentbox = tny_send_queue_get_sentbox (self);
+		sentbox = get_sentbox (self);
 		outbox = tny_send_queue_get_outbox (self);
 
 		tny_folder_get_headers (outbox, list, TRUE, &terror);
@@ -319,6 +391,7 @@ thread_main (gpointer data)
 				if (err == NULL)
 				{
 					GError *newerr = NULL;
+					priv->cur_i = i;
 					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
 					if (newerr != NULL) 
 					{
@@ -331,8 +404,10 @@ thread_main (gpointer data)
 			}
 
 			/* Emits msg-sent signal to inform msg has been sent */
+			/* This now happens in on_msg_sent_get_msg! 
+
 			if (priv->do_continue)
-				emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, i, priv->total);
+				emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, i, priv->total); */
 
 			g_mutex_unlock (priv->todo_lock);
 
@@ -477,11 +552,6 @@ typedef struct {
 	gpointer user_data;
 } OnAddedInfo;
 
-static void 
-on_status (GObject *sender, TnyStatus *status, gpointer user_data)
-{
-	return;
-}
 
 static void
 on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
@@ -749,14 +819,23 @@ tny_camel_send_queue_get_outbox_default (TnySendQueue *self)
 static void
 tny_camel_send_queue_finalize (GObject *object)
 {
-	TnyCamelSendQueue *self = (TnyCamelSendQueue*) object;
+	TnySendQueue *self = (TnySendQueue*) object;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = NULL;
+	TnyFolder *sentbox = NULL;
+
+	sentbox = tny_send_queue_get_sentbox (self);
+
+	if (sentbox) {
+		if (priv->observer_attached)
+			tny_folder_remove_observer (sentbox, TNY_FOLDER_OBSERVER (self));
+		g_object_unref (sentbox);
+	}
 
 	if (priv->trans_account)
 	{
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
-		_tny_session_camel_unreg_queue (apriv->session, self);
+		_tny_session_camel_unreg_queue (apriv->session, (TnyCamelSendQueue *) self);
 	}
 
 	g_mutex_lock (priv->todo_lock);
@@ -929,6 +1008,7 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelSendQueue *self = (TnyCamelSendQueue*)instance;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
+	priv->observer_attached = FALSE;
 	priv->signal = -1;
 	priv->sentbox_cache = NULL;
 	priv->outbox_cache = NULL;
@@ -939,6 +1019,12 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->thread = NULL;
 
 	return;
+}
+
+static void
+tny_folder_observer_init (TnyFolderObserverIface *klass)
+{
+	klass->update_func = tny_camel_send_queue_update;
 }
 
 /**
@@ -977,6 +1063,12 @@ tny_camel_send_queue_get_type (void)
 		  NULL
 		};
 
+		static const GInterfaceInfo tny_folder_observer_info = {
+			(GInterfaceInitFunc) tny_folder_observer_init,
+			NULL,
+			NULL
+		};
+
 		static const GInterfaceInfo tny_send_queue_info = 
 		{
 		  (GInterfaceInitFunc) tny_send_queue_init, /* interface_init */
@@ -987,6 +1079,9 @@ tny_camel_send_queue_get_type (void)
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyCamelSendQueue",
 			&info, 0);
+
+		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
+			&tny_folder_observer_info);
 
 		g_type_add_interface_static (type, TNY_TYPE_SEND_QUEUE,
 			&tny_send_queue_info);

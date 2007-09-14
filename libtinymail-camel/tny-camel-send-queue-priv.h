@@ -29,11 +29,12 @@ struct _TnyCamelSendQueuePriv
 {
 	TnyTransportAccount *trans_account;
 	TnyFolder *sentbox_cache, *outbox_cache;
-	guint total;
+	guint total, cur_i;
 	gint signal;
 	GThread *thread;
 	GMutex *todo_lock, *sending_lock; 
 	gboolean do_continue, is_running;
+	gboolean observer_attached;
 };
 
 #endif
