@@ -1683,6 +1683,13 @@ tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
 	 * refactor/rename to something that does make sense :-). Isn't that
 	 * true Rob? */
 
+	g_static_rec_mutex_lock (apriv->service_lock);
+	if (apriv->service) {
+		CamelException mex = CAMEL_EXCEPTION_INITIALISER;
+		camel_service_disconnect (apriv->service, FALSE, &mex);
+	}
+	g_static_rec_mutex_unlock (apriv->service_lock);
+
 	_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (info->self), 
 			FALSE, &err);
 

@@ -3,6 +3,8 @@
 	* TnyCamelSendQueue's sent-msg signal emission (some corrections)
 	* Small locking problem when requesting the unread-count of a
 	TnyCamelFolder
+	* Disconnecting the old settings if new settings are set and
+	tny_camel_account_set_online is issued (experimental)
 
 2007-09-13  Jose Dapena Paz  <jdapena@igalia.com>
 
