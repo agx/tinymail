@@ -1,5 +1,5 @@
-.pyc
-.defs
+*.pyc
+*.defs
 Makefile
 Makefile.in
 defsparser.pyc

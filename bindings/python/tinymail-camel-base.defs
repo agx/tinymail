@@ -1,5 +1,10 @@
 ;; -*- scheme -*-
+; boxed definitions ...
+
+; interface definitions ...
+
 ; object definitions ...
+
 (define-object CamelAccount
   (in-module "Tny")
   (parent "GObject")
@@ -26,6 +31,20 @@
   (parent "TnyCamelFolder")
   (c-name "TnyCamelIMAPFolder")
   (gtype-id "TNY_TYPE_CAMEL_IMAP_FOLDER")
+)
+
+(define-object CamelIMAPStoreAccount
+  (in-module "Tny")
+  (parent "TnyCamelStoreAccount")
+  (c-name "TnyCamelIMAPStoreAccount")
+  (gtype-id "TNY_TYPE_CAMEL_IMAP_STORE_ACCOUNT")
+)
+
+(define-object CamelMemStream
+  (in-module "Tny")
+  (parent "TnyCamelStream")
+  (c-name "TnyCamelMemStream")
+  (gtype-id "TNY_TYPE_CAMEL_MEM_STREAM")
 )
 
 (define-object CamelMimePart
@@ -56,11 +75,25 @@
   (gtype-id "TNY_TYPE_CAMEL_NNTP_FOLDER")
 )
 
+(define-object CamelNNTPStoreAccount
+  (in-module "Tny")
+  (parent "TnyCamelStoreAccount")
+  (c-name "TnyCamelNNTPStoreAccount")
+  (gtype-id "TNY_TYPE_CAMEL_NNTP_STORE_ACCOUNT")
+)
+
 (define-object CamelPOPFolder
   (in-module "Tny")
   (parent "TnyCamelFolder")
   (c-name "TnyCamelPOPFolder")
   (gtype-id "TNY_TYPE_CAMEL_POP_FOLDER")
+)
+
+(define-object CamelPOPStoreAccount
+  (in-module "Tny")
+  (parent "TnyCamelStoreAccount")
+  (c-name "TnyCamelPOPStoreAccount")
+  (gtype-id "TNY_TYPE_CAMEL_POP_STORE_ACCOUNT")
 )
 
 (define-object CamelPartialMsgReceiveStrategy
@@ -91,39 +124,11 @@
   (gtype-id "TNY_TYPE_CAMEL_STORE_ACCOUNT")
 )
 
-(define-object CamelPOPStoreAccount
-  (in-module "Tny")
-  (parent "TnyCamelStoreAccount")
-  (c-name "TnyCamelPOPStoreAccount")
-  (gtype-id "TNY_TYPE_CAMEL_POP_STORE_ACCOUNT")
-)
-
-(define-object CamelNNTPStoreAccount
-  (in-module "Tny")
-  (parent "TnyCamelStoreAccount")
-  (c-name "TnyCamelNNTPStoreAccount")
-  (gtype-id "TNY_TYPE_CAMEL_NNTP_STORE_ACCOUNT")
-)
-
-(define-object CamelIMAPStoreAccount
-  (in-module "Tny")
-  (parent "TnyCamelStoreAccount")
-  (c-name "TnyCamelIMAPStoreAccount")
-  (gtype-id "TNY_TYPE_CAMEL_IMAP_STORE_ACCOUNT")
-)
-
 (define-object CamelStream
   (in-module "Tny")
   (parent "GObject")
   (c-name "TnyCamelStream")
   (gtype-id "TNY_TYPE_CAMEL_STREAM")
-)
-
-(define-object CamelMemStream
-  (in-module "Tny")
-  (parent "TnyCamelStream")
-  (c-name "TnyCamelMemStream")
-  (gtype-id "TNY_TYPE_CAMEL_MEM_STREAM")
 )
 
 (define-object CamelTransportAccount
@@ -133,12 +138,14 @@
   (gtype-id "TNY_TYPE_CAMEL_TRANSPORT_ACCOUNT")
 )
 
-;; Enumerations and flags ...
+; pointer definitions ...
+
+;; Enumerations and Flags ...
 
 
 ;; From tny-camel-account.h
 
-(define-function tny_camel_account_get_type
+(define-function camel_account_get_type
   (c-name "tny_camel_account_get_type")
   (return-type "GType")
 )
@@ -186,7 +193,7 @@
 
 ;; From tny-camel-folder.h
 
-(define-function tny_camel_folder_get_type
+(define-function camel_folder_get_type
   (c-name "tny_camel_folder_get_type")
   (return-type "GType")
 )
@@ -201,12 +208,12 @@
 
 ;; From tny-camel-full-msg-receive-strategy.h
 
-(define-function tny_camel_full_msg_receive_strategy_get_type
+(define-function camel_full_msg_receive_strategy_get_type
   (c-name "tny_camel_full_msg_receive_strategy_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_full_msg_receive_strategy_new
+(define-function camel_full_msg_receive_strategy_new
   (c-name "tny_camel_full_msg_receive_strategy_new")
   (is-constructor-of "TnyCamelFullMsgReceiveStrategy")
   (return-type "TnyMsgReceiveStrategy*")
@@ -220,7 +227,7 @@
 
 ;; From tny-camel-imap-folder.h
 
-(define-function tny_camel_imap_folder_get_type
+(define-function camel_imap_folder_get_type
   (c-name "tny_camel_imap_folder_get_type")
   (return-type "GType")
 )
@@ -229,14 +236,14 @@
 
 ;; From tny-camel-imap-store-account.h
 
-(define-function tny_camel_imap_store_account_get_type
+(define-function camel_imap_store_account_get_type
   (c-name "tny_camel_imap_store_account_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_imap_store_account_new
+(define-function camel_imap_store_account_new
   (c-name "tny_camel_imap_store_account_new")
-  (is-constructor-of "TnyCamelImapStoreAccount")
+  (is-constructor-of "TnyCamelIMAPStoreAccount")
   (return-type "TnyStoreAccount*")
 )
 
@@ -244,12 +251,12 @@
 
 ;; From tny-camel-mem-stream.h
 
-(define-function tny_camel_mem_stream_get_type
+(define-function camel_mem_stream_get_type
   (c-name "tny_camel_mem_stream_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_mem_stream_new
+(define-function camel_mem_stream_new
   (c-name "tny_camel_mem_stream_new")
   (is-constructor-of "TnyCamelMemStream")
   (return-type "TnyStream*")
@@ -259,12 +266,12 @@
 
 ;; From tny-camel-mime-part.h
 
-(define-function tny_camel_mime_part_get_type
+(define-function camel_mime_part_get_type
   (c-name "tny_camel_mime_part_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_mime_part_new_with_part
+(define-function camel_mime_part_new_with_part
   (c-name "tny_camel_mime_part_new_with_part")
   (return-type "TnyMimePart*")
   (parameters
@@ -272,7 +279,7 @@
   )
 )
 
-(define-function tny_camel_mime_part_new
+(define-function camel_mime_part_new
   (c-name "tny_camel_mime_part_new")
   (is-constructor-of "TnyCamelMimePart")
   (return-type "TnyMimePart*")
@@ -286,20 +293,35 @@
 
 
 
+;; From tny-camel-msg-remove-strategy.h
+
+(define-function camel_msg_remove_strategy_get_type
+  (c-name "tny_camel_msg_remove_strategy_get_type")
+  (return-type "GType")
+)
+
+(define-function camel_msg_remove_strategy_new
+  (c-name "tny_camel_msg_remove_strategy_new")
+  (is-constructor-of "TnyCamelMsgRemoveStrategy")
+  (return-type "TnyMsgRemoveStrategy*")
+)
+
+
+
 ;; From tny-camel-msg.h
 
-(define-function tny_camel_msg_get_type
+(define-function camel_msg_get_type
   (c-name "tny_camel_msg_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_msg_new
+(define-function camel_msg_new
   (c-name "tny_camel_msg_new")
   (is-constructor-of "TnyCamelMsg")
   (return-type "TnyMsg*")
 )
 
-(define-function tny_camel_msg_new_with_part
+(define-function camel_msg_new_with_part
   (c-name "tny_camel_msg_new_with_part")
   (return-type "TnyMsg*")
   (parameters
@@ -309,24 +331,9 @@
 
 
 
-;; From tny-camel-msg-remove-strategy.h
-
-(define-function tny_camel_msg_remove_strategy_get_type
-  (c-name "tny_camel_msg_remove_strategy_get_type")
-  (return-type "GType")
-)
-
-(define-function tny_camel_msg_remove_strategy_new
-  (c-name "tny_camel_msg_remove_strategy_new")
-  (is-constructor-of "TnyCamelMsgRemoveStrategy")
-  (return-type "TnyMsgRemoveStrategy*")
-)
-
-
-
 ;; From tny-camel-nntp-folder.h
 
-(define-function tny_camel_nntp_folder_get_type
+(define-function camel_nntp_folder_get_type
   (c-name "tny_camel_nntp_folder_get_type")
   (return-type "GType")
 )
@@ -335,14 +342,14 @@
 
 ;; From tny-camel-nntp-store-account.h
 
-(define-function tny_camel_nntp_store_account_get_type
+(define-function camel_nntp_store_account_get_type
   (c-name "tny_camel_nntp_store_account_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_nntp_store_account_new
+(define-function camel_nntp_store_account_new
   (c-name "tny_camel_nntp_store_account_new")
-  (is-constructor-of "TnyCamelNntpStoreAccount")
+  (is-constructor-of "TnyCamelNNTPStoreAccount")
   (return-type "TnyStoreAccount*")
 )
 
@@ -350,12 +357,12 @@
 
 ;; From tny-camel-partial-msg-receive-strategy.h
 
-(define-function tny_camel_partial_msg_receive_strategy_get_type
+(define-function camel_partial_msg_receive_strategy_get_type
   (c-name "tny_camel_partial_msg_receive_strategy_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_partial_msg_receive_strategy_new
+(define-function camel_partial_msg_receive_strategy_new
   (c-name "tny_camel_partial_msg_receive_strategy_new")
   (is-constructor-of "TnyCamelPartialMsgReceiveStrategy")
   (return-type "TnyMsgReceiveStrategy*")
@@ -365,7 +372,7 @@
 
 ;; From tny-camel-pop-folder.h
 
-(define-function tny_camel_pop_folder_get_type
+(define-function camel_pop_folder_get_type
   (c-name "tny_camel_pop_folder_get_type")
   (return-type "GType")
 )
@@ -374,12 +381,12 @@
 
 ;; From tny-camel-pop-remote-msg-remove-strategy.h
 
-(define-function tny_camel_pop_remote_msg_remove_strategy_get_type
+(define-function camel_pop_remote_msg_remove_strategy_get_type
   (c-name "tny_camel_pop_remote_msg_remove_strategy_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_pop_remote_msg_remove_strategy_new
+(define-function camel_pop_remote_msg_remove_strategy_new
   (c-name "tny_camel_pop_remote_msg_remove_strategy_new")
   (is-constructor-of "TnyCamelPopRemoteMsgRemoveStrategy")
   (return-type "TnyMsgRemoveStrategy*")
@@ -389,14 +396,14 @@
 
 ;; From tny-camel-pop-store-account.h
 
-(define-function tny_camel_pop_store_account_get_type
+(define-function camel_pop_store_account_get_type
   (c-name "tny_camel_pop_store_account_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_pop_store_account_new
+(define-function camel_pop_store_account_new
   (c-name "tny_camel_pop_store_account_new")
-  (is-constructor-of "TnyCamelPopStoreAccount")
+  (is-constructor-of "TnyCamelPOPStoreAccount")
   (return-type "TnyStoreAccount*")
 )
 
@@ -419,12 +426,12 @@
 
 ;; From tny-camel-send-queue.h
 
-(define-function tny_camel_send_queue_get_type
+(define-function camel_send_queue_get_type
   (c-name "tny_camel_send_queue_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_send_queue_new
+(define-function camel_send_queue_new
   (c-name "tny_camel_send_queue_new")
   (is-constructor-of "TnyCamelSendQueue")
   (return-type "TnySendQueue*")
@@ -454,35 +461,20 @@
   )
 )
 
-(define-method join_worker
-  (of-object "TnyCamelSendQueue")
-  (c-name "tny_camel_send_queue_join_worker")
-  (return-type "none")
-)
-
 
 
 ;; From tny-camel-shared.h
-
-(define-function tny_session_camel_new
-  (c-name "tny_session_camel_new")
-  (is-constructor-of "TnySessionCamel")
-  (return-type "TnySessionCamel*")
-  (parameters
-    '("TnyAccountStore*" "account_store")
-  )
-)
 
 
 
 ;; From tny-camel-store-account.h
 
-(define-function tny_camel_store_account_get_type
+(define-function camel_store_account_get_type
   (c-name "tny_camel_store_account_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_store_account_new
+(define-function camel_store_account_new
   (c-name "tny_camel_store_account_new")
   (is-constructor-of "TnyCamelStoreAccount")
   (return-type "TnyStoreAccount*")
@@ -502,12 +494,12 @@
 
 ;; From tny-camel-stream.h
 
-(define-function tny_camel_stream_get_type
+(define-function camel_stream_get_type
   (c-name "tny_camel_stream_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_stream_new
+(define-function camel_stream_new
   (c-name "tny_camel_stream_new")
   (is-constructor-of "TnyCamelStream")
   (return-type "TnyStream*")
@@ -526,12 +518,12 @@
 
 ;; From tny-camel-transport-account.h
 
-(define-function tny_camel_transport_account_get_type
+(define-function camel_transport_account_get_type
   (c-name "tny_camel_transport_account_get_type")
   (return-type "GType")
 )
 
-(define-function tny_camel_transport_account_new
+(define-function camel_transport_account_new
   (c-name "tny_camel_transport_account_new")
   (is-constructor-of "TnyCamelTransportAccount")
   (return-type "TnyTransportAccount*")
@@ -541,7 +533,7 @@
 
 ;; From tny-session-camel.h
 
-(define-function tny_session_camel_get_type
+(define-function session_camel_get_type
   (c-name "tny_session_camel_get_type")
   (return-type "CamelType")
 )

@@ -1,5 +1,10 @@
 ;; -*- scheme -*-
+; boxed definitions ...
+
+; interface definitions ...
+
 ; object definitions ...
+
 (define-object GtkAccountListModel
   (in-module "Tny")
   (parent "GtkListStore")
@@ -91,24 +96,18 @@
   (gtype-id "TNY_TYPE_GTK_TEXT_MIME_PART_VIEW")
 )
 
-;; Enumerations and flags ...
+; pointer definitions ...
 
-(define-enum GtkHeaderListModelColumn
+;; Enumerations and Flags ...
+
+(define-enum GtkAccountListModelColumn
   (in-module "Tny")
-  (c-name "TnyGtkHeaderListModelColumn")
-  (gtype-id "TNY_TYPE_GTK_HEADER_LIST_MODEL_COLUMN")
+  (c-name "TnyGtkAccountListModelColumn")
+  (gtype-id "TNY_TYPE_GTK_ACCOUNT_LIST_MODEL_COLUMN")
   (values
-    '("from-column" "TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN")
-    '("to-column" "TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN")
-    '("subject-column" "TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN")
-    '("cc-column" "TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN")
-    '("date-sent-column" "TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN")
-    '("date-received-time-t-column" "TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN")
-    '("date-sent-time-t-column" "TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN")
-    '("date-received-column" "TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN")
-    '("instance-column" "TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN")
-    '("flags-column" "TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN")
-    '("n-columns" "TNY_GTK_HEADER_LIST_MODEL_N_COLUMNS")
+    '("name" "TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN")
+    '("instance" "TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN")
+    '("n" "TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS")
   )
 )
 
@@ -117,10 +116,10 @@
   (c-name "TnyGtkAttachListModelColumn")
   (gtype-id "TNY_TYPE_GTK_ATTACH_LIST_MODEL_COLUMN")
   (values
-    '("pixbuf-column" "TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN")
-    '("filename-column" "TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN")
-    '("instance-column" "TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN")
-    '("n-columns" "TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS")
+    '("pixbuf" "TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN")
+    '("filename" "TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN")
+    '("instance" "TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN")
+    '("n" "TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS")
   )
 )
 
@@ -129,39 +128,49 @@
   (c-name "TnyGtkFolderStoreTreeModelColumn")
   (gtype-id "TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL_COLUMN")
   (values
-    '("name-column" "TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN")
-    '("unread-column" "TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN")
-    '("type-column" "TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN")
-    '("instance-column" "TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN")
-    '("n-columns" "TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS")
+    '("name" "TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN")
+    '("unread" "TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN")
+    '("all" "TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN")
+    '("type" "TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN")
+    '("instance" "TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN")
+    '("n" "TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS")
   )
 )
 
-(define-enum GtkAccountListModelColumn
+(define-enum GtkHeaderListModelColumn
   (in-module "Tny")
-  (c-name "TnyGtkAccountListModelColumn")
-  (gtype-id "TNY_TYPE_GTK_ACCOUNT_LIST_MODEL_COLUMN")
+  (c-name "TnyGtkHeaderListModelColumn")
+  (gtype-id "TNY_TYPE_GTK_HEADER_LIST_MODEL_COLUMN")
   (values
-    '("name-column" "TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN")
-    '("instance-column" "TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN")
-    '("n-columns" "TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS")
+    '("from" "TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN")
+    '("to" "TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN")
+    '("subject" "TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN")
+    '("cc" "TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN")
+    '("date_sent" "TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN")
+    '("date_received_t" "TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN")
+    '("date_sent_t" "TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN")
+    '("message_size" "TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN")
+    '("date_received" "TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN")
+    '("instance" "TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN")
+    '("flags" "TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN")
+    '("n" "TNY_GTK_HEADER_LIST_MODEL_N_COLUMNS")
   )
 )
 
 
 ;; From tny-gtk-account-list-model.h
 
-(define-function tny_gtk_account_list_model_get_type
+(define-function gtk_account_list_model_get_type
   (c-name "tny_gtk_account_list_model_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_account_list_model_column_get_type
+(define-function gtk_account_list_model_column_get_type
   (c-name "tny_gtk_account_list_model_column_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_account_list_model_new
+(define-function gtk_account_list_model_new
   (c-name "tny_gtk_account_list_model_new")
   (is-constructor-of "TnyGtkAccountListModel")
   (return-type "GtkTreeModel*")
@@ -171,17 +180,17 @@
 
 ;; From tny-gtk-attach-list-model.h
 
-(define-function tny_gtk_attach_list_model_get_type
+(define-function gtk_attach_list_model_get_type
   (c-name "tny_gtk_attach_list_model_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_attach_list_model_column_get_type
+(define-function gtk_attach_list_model_column_get_type
   (c-name "tny_gtk_attach_list_model_column_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_attach_list_model_new
+(define-function gtk_attach_list_model_new
   (c-name "tny_gtk_attach_list_model_new")
   (is-constructor-of "TnyGtkAttachListModel")
   (return-type "GtkTreeModel*")
@@ -191,12 +200,12 @@
 
 ;; From tny-gtk-attachment-mime-part-view.h
 
-(define-function tny_gtk_attachment_mime_part_view_get_type
+(define-function gtk_attachment_mime_part_view_get_type
   (c-name "tny_gtk_attachment_mime_part_view_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_attachment_mime_part_view_new
+(define-function gtk_attachment_mime_part_view_new
   (c-name "tny_gtk_attachment_mime_part_view_new")
   (is-constructor-of "TnyGtkAttachmentMimePartView")
   (return-type "TnyMimePartView*")
@@ -213,17 +222,17 @@
 
 ;; From tny-gtk-folder-store-tree-model.h
 
-(define-function tny_gtk_folder_store_tree_model_get_type
+(define-function gtk_folder_store_tree_model_get_type
   (c-name "tny_gtk_folder_store_tree_model_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_folder_store_tree_model_column_get_type
+(define-function gtk_folder_store_tree_model_column_get_type
   (c-name "tny_gtk_folder_store_tree_model_column_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_folder_store_tree_model_new
+(define-function gtk_folder_store_tree_model_new
   (c-name "tny_gtk_folder_store_tree_model_new")
   (is-constructor-of "TnyGtkFolderStoreTreeModel")
   (return-type "GtkTreeModel*")
@@ -256,17 +265,17 @@
 
 ;; From tny-gtk-header-list-model.h
 
-(define-function tny_gtk_header_list_model_get_type
+(define-function gtk_header_list_model_get_type
   (c-name "tny_gtk_header_list_model_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_header_list_model_column_get_type
+(define-function gtk_header_list_model_column_get_type
   (c-name "tny_gtk_header_list_model_column_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_header_list_model_new
+(define-function gtk_header_list_model_new
   (c-name "tny_gtk_header_list_model_new")
   (is-constructor-of "TnyGtkHeaderListModel")
   (return-type "GtkTreeModel*")
@@ -282,7 +291,7 @@
   )
 )
 
-(define-function tny_gtk_header_list_model_received_date_sort_func
+(define-function gtk_header_list_model_received_date_sort_func
   (c-name "tny_gtk_header_list_model_received_date_sort_func")
   (return-type "gint")
   (parameters
@@ -293,7 +302,7 @@
   )
 )
 
-(define-function tny_gtk_header_list_model_sent_date_sort_func
+(define-function gtk_header_list_model_sent_date_sort_func
   (c-name "tny_gtk_header_list_model_sent_date_sort_func")
   (return-type "gint")
   (parameters
@@ -308,12 +317,12 @@
 
 ;; From tny-gtk-header-view.h
 
-(define-function tny_gtk_header_view_get_type
+(define-function gtk_header_view_get_type
   (c-name "tny_gtk_header_view_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_header_view_new
+(define-function gtk_header_view_new
   (c-name "tny_gtk_header_view_new")
   (is-constructor-of "TnyGtkHeaderView")
   (return-type "TnyHeaderView*")
@@ -323,12 +332,12 @@
 
 ;; From tny-gtk-lockable.h
 
-(define-function tny_gtk_lockable_get_type
+(define-function gtk_lockable_get_type
   (c-name "tny_gtk_lockable_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_lockable_new
+(define-function gtk_lockable_new
   (c-name "tny_gtk_lockable_new")
   (is-constructor-of "TnyGtkLockable")
   (return-type "TnyLockable*")
@@ -338,12 +347,12 @@
 
 ;; From tny-gtk-mime-part-save-strategy.h
 
-(define-function tny_gtk_mime_part_save_strategy_get_type
+(define-function gtk_mime_part_save_strategy_get_type
   (c-name "tny_gtk_mime_part_save_strategy_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_mime_part_save_strategy_new
+(define-function gtk_mime_part_save_strategy_new
   (c-name "tny_gtk_mime_part_save_strategy_new")
   (is-constructor-of "TnyGtkMimePartSaveStrategy")
   (return-type "TnyMimePartSaveStrategy*")
@@ -353,12 +362,12 @@
 
 ;; From tny-gtk-msg-view.h
 
-(define-function tny_gtk_msg_view_get_type
+(define-function gtk_msg_view_get_type
   (c-name "tny_gtk_msg_view_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_msg_view_new
+(define-function gtk_msg_view_new
   (c-name "tny_gtk_msg_view_new")
   (is-constructor-of "TnyGtkMsgView")
   (return-type "TnyMsgView*")
@@ -428,12 +437,12 @@
 
 ;; From tny-gtk-msg-window.h
 
-(define-function tny_gtk_msg_window_get_type
+(define-function gtk_msg_window_get_type
   (c-name "tny_gtk_msg_window_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_msg_window_new
+(define-function gtk_msg_window_new
   (c-name "tny_gtk_msg_window_new")
   (is-constructor-of "TnyGtkMsgWindow")
   (return-type "TnyMsgWindow*")
@@ -446,12 +455,12 @@
 
 ;; From tny-gtk-password-dialog.h
 
-(define-function tny_gtk_password_dialog_get_type
+(define-function gtk_password_dialog_get_type
   (c-name "tny_gtk_password_dialog_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_password_dialog_new
+(define-function gtk_password_dialog_new
   (c-name "tny_gtk_password_dialog_new")
   (is-constructor-of "TnyGtkPasswordDialog")
   (return-type "TnyPasswordGetter*")
@@ -461,12 +470,12 @@
 
 ;; From tny-gtk-text-buffer-stream.h
 
-(define-function tny_gtk_text_buffer_stream_get_type
+(define-function gtk_text_buffer_stream_get_type
   (c-name "tny_gtk_text_buffer_stream_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_text_buffer_stream_new
+(define-function gtk_text_buffer_stream_new
   (c-name "tny_gtk_text_buffer_stream_new")
   (is-constructor-of "TnyGtkTextBufferStream")
   (return-type "TnyStream*")
@@ -488,12 +497,12 @@
 
 ;; From tny-gtk-text-mime-part-view.h
 
-(define-function tny_gtk_text_mime_part_view_get_type
+(define-function gtk_text_mime_part_view_get_type
   (c-name "tny_gtk_text_mime_part_view_get_type")
   (return-type "GType")
 )
 
-(define-function tny_gtk_text_mime_part_view_new
+(define-function gtk_text_mime_part_view_new
   (c-name "tny_gtk_text_mime_part_view_new")
   (is-constructor-of "TnyGtkTextMimePartView")
   (return-type "TnyMimePartView*")

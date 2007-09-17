@@ -50,7 +50,7 @@ tinymail_h_files = \
 	$(top_srcdir)/libtinymail/tny-transport-account.h
 
 tinymail-base.defs: $(tinymail_h_files) $(top_srcdir)/bindings/python/gendefs/defsgen.py
-	$(PYTHON) $(top_srcdir)/bindings/python/gendefs/defsgen.py -m tny -l $(top_srcdir)/libtinymail/.libs/libtinymail-1.0.so $(tinymail_h_files) > $@
+	$(PYTHON) defsgen.py -m tny -f $(top_srcdir)/bindings/python/tinymail-extra.defs -l $(top_srcdir)/libtinymail/.libs/libtinymail-1.0.so $(tinymail_h_files) > $@
 
 tinymailui_h_files = \
 	$(top_srcdir)/libtinymailui/tny-account-store-view.h \
@@ -83,7 +83,7 @@ tinymailui_gtk_h_files = \
 	$(top_srcdir)/libtinymailui-gtk/tny-gtk-text-mime-part-view.h
 
 tinymailui-gtk-base.defs: $(tinymailui_gtk_h_files) $(top_srcdir)/bindings/python/gendefs/defsgen.py
-	$(PYTHON) $(top_srcdir)/bindings/python/gendefs/defsgen.py -m tny -l $(top_srcdir)/libtinymailui-gtk/.libs/libtinymailui-gtk-1.0.so $(tinymailui_gtk_h_files) > $@
+	$(PYTHON) defsgen.py -m tny --novirtuals -l $(top_srcdir)/libtinymailui-gtk/.libs/libtinymailui-gtk-1.0.so $(tinymailui_gtk_h_files) > $@
 
 tinymail_camel_h_files = \
 	$(top_srcdir)/libtinymail-camel/tny-camel-account.h \
@@ -110,4 +110,4 @@ tinymail_camel_h_files = \
         $(top_srcdir)/libtinymail-camel/tny-session-camel.h	
 
 tinymail-camel-base.defs : $(tinymail_camel_h_files) $(top_srcdir)/bindings/python/gendefs/defsgen.py
-	$(PYTHON) $(top_srcdir)/bindings/python/gendefs/defsgen.py -m tny -l $(top_srcdir)/libtinymail-camel/.libs/libtinymail-camel-1.0.so $(tinymail_camel_h_files) > $@
+	$(PYTHON) defsgen.py -m tny -f $(top_srcdir)/bindings/python/tinymail-camel-extra.defs --novirtuals -l $(top_srcdir)/libtinymail-camel/.libs/libtinymail-camel-1.0.so $(tinymail_camel_h_files) > $@

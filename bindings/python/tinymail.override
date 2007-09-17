@@ -180,6 +180,9 @@ _wrap_tny_folder_change_get_rename (PyGObject *self)
     return Py_BuildValue("ss", rename, oldname);
 }
 
+
+
+
     
 
     
@@ -346,57 +349,3 @@ _wrap_tny_folder_refresh_async (PyGObject *self, PyObject *args, PyObject *kwarg
 				      data);
     return Py_None;
 }
-%%
-override-slot TnyList.tp_as_sequence
-
-static int
-_wrap_tny_list_tp_length(PyGObject *self)
-{
-    return tny_list_get_length(TNY_LIST(self->obj));
-}
-
-static PyObject *
-_wrap_tny_list_tp_getitem(PyGObject *self, PyObject *key)
-{
-    GObject *ret = NULL;
-
-    if (PyInt_Check (key)) {
-        int index;
-        TnyIterator *iter;
-
-        index = PyInt_AsLong (key);
-        if (index < 0)
-            index += _wrap_tny_list_tp_length (self);
-
-        iter = tny_list_create_iterator (TNY_LIST (self->obj));
-        /* TODO: check for failure? */
-		
-	tny_iterator_nth (iter, index);
-        ret = tny_iterator_get_current (iter);
-
-        g_object_unref (G_OBJECT (ret)); /* IM Not sure about this one */
-        g_object_unref (G_OBJECT (iter));
-        
-    } else {
-        /* TODO: handle other keys */
-	PyErr_SetString(PyExc_TypeError, "key must be valid index");
-	return NULL;
-    }
-
-    return pygobject_new (ret);
-}
-
-
-static PySequenceMethods _wrap_tny_list_tp_as_sequence = {
-    (inquiry) _wrap_tny_list_tp_length,
-    (binaryfunc) NULL, /* concatenate (PyGObject, PyObject) -> new PyGObject */
-    (intargfunc) NULL, /* repeat (PyGObject, int) ->new PyGObject */
-    (intargfunc) _wrap_tny_list_tp_getitem,
-    (intintargfunc) NULL, /* getslice (PyGObject, int, int) -> PyObject[tuple] */
-    (intobjargproc) NULL, /* setitem (PyGObject, int, PyObject) -> int */
-    (intintobjargproc) NULL, /* setslice (PyGObject, int, int, PyObject[tuple]) -> int */
-    (objobjproc) NULL, /* contains (PyGObject, PyObject) -> int */
-    (binaryfunc) NULL, /* sq_inplace_concat;*/
-    (intargfunc) NULL /* sq_inplace_repeat */
-};
-

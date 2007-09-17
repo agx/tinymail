@@ -5,3 +5,12 @@
   (copy-func "pytny_session_camel_copy")
   (release-func "pytny_session_camel_free")
 )
+
+(define-function session_camel_new
+  (c-name "tny_session_camel_new")
+  (is-constructor-of "TnySessionCamel")
+  (return-type "TnySessionCamel*")
+  (parameters
+    '("TnyAccountStore*" "account_store")
+  )
+)

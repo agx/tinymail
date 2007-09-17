@@ -71,3 +71,11 @@ import tinymail.Folder as PyTnyFolder_Type
 import tinymail.FolderStore as PyTnyFolderStore_Type
 import tinymail.StoreAccount as PyTnyStoreAccount_Type
 import tinymail.Lockable as PyTnyLockable_Type
+import tinymail.List as PyTnyList_Type
+import tinymail.Msg as PyTnyMsg_Type
+import tinymail.MsgReceiveStrategy as PyTnyMsgReceiveStrategy_Type
+import tinymail.FolderStoreObserver as PyTnyFolderStoreObserver_Type
+import tinymail.FolderObserver as PyTnyFolderObserver_Type
+import tinymail.MsgRemoveStrategy as PyTnyMsgRemoveStrategy_Type
+import tinymail.MimePart as PyTnyMimePart_Type
+import tinymail.FolderStoreQuery as PyTnyFolderStoreQuery_Type

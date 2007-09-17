@@ -47,6 +47,9 @@
 #   --onlyenums      Only produce defs for enums and flags
 #   --onlyobjdefs    Only produce defs for objects
 #   --onlyvirtuals   Only produce defs for virtuals
+#
+#   --novirtuals     Do not produce virtual definitions
+#
 #   --genpropgetsets Experimental option to generate prop-getset annotations.
 #                    Not supported by codegen.py and friends.
 # 
@@ -310,7 +313,7 @@ class DefsWriter:
                 self._c_names[vdef.of_object + '.' + vdef.name] = None
         return
 
-    def write_func_defs(self, deffiles, onlyvirts=False):
+    def write_func_defs(self, deffiles, onlyvirts=False, novirts=False):
         filter = self._c_names
         for deffile in deffiles:
             self.fp.write('\n;; From %s\n\n' % os.path.basename(deffile))
@@ -318,9 +321,10 @@ class DefsWriter:
                 for func, ret, args in self.defs['funcs'][deffile]:
                     if not func in filter:
                         self._write_func(func, ret, args)
-            for virt, ret, args, objname in self.defs['virts'][deffile]:
-                if not objname + '.' + virt in filter:
-                    self._write_virt(objname, virt, ret, args)
+	    if not novirts:
+                for virt, ret, args, objname in self.defs['virts'][deffile]:
+                    if not objname + '.' + virt in filter:
+                        self._write_virt(objname, virt, ret, args)
             self.fp.write('\n')
         return
 
@@ -539,6 +543,7 @@ def main(args):
     onlyenums = False
     onlyobjdefs = False
     onlyvirtuals = False
+    novirtuals = False
     separate = False
     modulename = None
     defsfiles = []
@@ -548,6 +553,7 @@ def main(args):
     genpropgetsets = False
     opts, args = getopt.getopt(args[1:], 'vs:m:f:D:L:l:',
                                ['onlyenums', 'onlyobjdefs', 'onlyvirtuals',
+				'novirtuals',
                                 'modulename=', 'separate=',
                                 'defsfile=', 'defines=', 'genpropgetsets',
                                 'libgobject-', 'modulelib='])
@@ -563,6 +569,8 @@ def main(args):
         if o == '--onlyobjdefs':
             onlyobjdefs = True
             all = False
+	if o == '--novirtuals':
+	    novirtuals = True
         if o == '--genpropgetsets':
             genpropgetsets = True
         if o in ('-s', '--separate'):
@@ -649,7 +657,7 @@ def main(args):
         if separate:
             print "Wrote enum and flags defs to %s-types.defs" % separate
     if onlyvirtuals or all:
-        dw.write_func_defs(args, onlyvirtuals)
+        dw.write_func_defs(args, onlyvirtuals, novirtuals)
         if separate:
             print "Wrote function and virtual defs to %s.defs" % separate
 

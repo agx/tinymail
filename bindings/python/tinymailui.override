@@ -25,6 +25,7 @@ ignore-glob
   *_get_type
 
 %%
+import gobject.GObject as PyGObject_Type
 import tinymail.Header as PyTnyHeader_Type
 import tinymail.Msg as PyTnyMsg_Type
 import tinymail.MimePart as PyTnyMimePart_Type
