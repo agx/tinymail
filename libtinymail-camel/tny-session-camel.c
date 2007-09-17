@@ -723,9 +723,12 @@ on_account_connect_done (TnySessionCamel *self, TnyCamelAccount *account, GError
 
 	apriv->is_ready = TRUE;
 
-	if (err)
-		tny_session_camel_do_an_error (self, TNY_ACCOUNT (account), 
-			TNY_ALERT_TYPE_ERROR, FALSE, err);
+	if (err) {
+		if (strcmp (err->message, "cancel")) {
+			tny_session_camel_do_an_error (self, TNY_ACCOUNT (account), 
+				TNY_ALERT_TYPE_ERROR, FALSE, err);
+		}
+	}
 
 	return;
 }
