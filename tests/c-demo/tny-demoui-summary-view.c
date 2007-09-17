@@ -908,7 +908,8 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			/* gtk_widget_set_sensitive (GTK_WIDGET (priv->header_view), FALSE); */
 
 			hmodel = tny_gtk_header_list_model_new ();
-			tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), folder, FALSE);
+			tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), 
+				folder, FALSE, NULL, status_update, self);
 
 			g_mutex_lock (priv->monitor_lock);
 			{
@@ -973,7 +974,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 		hmodel = tny_gtk_header_list_model_new ();
 		tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), 
-			merge, FALSE);
+			merge, FALSE, NULL, status_update, self);
 
 		g_mutex_lock (priv->monitor_lock);
 		{

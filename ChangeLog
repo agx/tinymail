@@ -1,3 +1,10 @@
+2007-09-17  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Added callback, status_callback and user_data to
+	tny_gtk_header_list_model_set_folder
+
+	* This was a major API change
+
 2007-09-17  Mark Doffman  <mark.doffman@codethink.co.uk>
 
 	* /bindings/python/gendefs/defsgen.py:

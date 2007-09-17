@@ -728,6 +728,8 @@ camel_folder_summary_load(CamelFolderSummary *s)
 
 	CAMEL_SUMMARY_LOCK(s, io_lock);
 
+	camel_operation_start (NULL, "Opening summary of folder");
+
 	if (!s->file)
 	{
 		s->file = g_mapped_file_new (s->summary_path, FALSE, &err);
@@ -765,6 +767,8 @@ camel_folder_summary_load(CamelFolderSummary *s)
 		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_load(s, &must_add);
 		g_static_rec_mutex_unlock (&global_lock);
 
+		camel_operation_progress (NULL, i , s->saved_count);
+
 		if (mi == NULL)
 			goto error;
 
@@ -789,6 +793,8 @@ camel_folder_summary_load(CamelFolderSummary *s)
 		s->file = NULL;
 	}
 
+	camel_operation_end (NULL);
+
 	CAMEL_SUMMARY_UNLOCK(s, io_lock);
 
 	s->flags &= ~CAMEL_SUMMARY_DIRTY;
@@ -797,6 +803,8 @@ camel_folder_summary_load(CamelFolderSummary *s)
 	return 0;
 
 error:
+	camel_operation_end (NULL);
+
 	if (errno != EINVAL)
 		g_warning ("Cannot load summary file: `%s': %s", s->summary_path, g_strerror (errno));
 	

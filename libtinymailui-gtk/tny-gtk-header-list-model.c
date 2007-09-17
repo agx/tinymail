@@ -913,29 +913,21 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	return;
 }
 
-static void
-get_hdrs_callback (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data)
-{
-	return;
-}
-
-static void 
-get_hdrs_status_callback (GObject *self, TnyStatus *status, gpointer user_data)
-{
-	return;
-}
 
 /**
  * tny_gtk_header_list_model_set_folder:
  * @self: A #TnyGtkHeaderListModel instance
  * @folder: a #TnyFolder instance
  * @refresh: refresh first
+ * @callback: a #TnyGetHeadersCallback
+ * @status_callback: a #TnyStatusCallback
+ * @user_data: user data for the callbacks
  *
  * Set the folder where the #TnyHeader instances are located
  * 
  **/
 void
-tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *folder, gboolean refresh)
+tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *folder, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	GtkTreeIter iter;
@@ -967,7 +959,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 
 	/* Get a new list of headers */
 	/* TODO add error handling and reporting here */
-	tny_folder_get_headers_async (folder, TNY_LIST (self), refresh, get_hdrs_callback, get_hdrs_status_callback, NULL);
+	tny_folder_get_headers_async (folder, TNY_LIST (self), refresh, callback, status_callback, user_data);
 
 	iter.stamp = priv->stamp;
 	iter.user_data = (gpointer) 0;
