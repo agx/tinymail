@@ -1,3 +1,9 @@
+2007-09-17  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/local/camel-maildir-folder.c:
+	Add implementation of method rewrite_cache for maildir,
+	so that we can implement also purge in maildir.
+
 2007-09-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Added callback, status_callback and user_data to

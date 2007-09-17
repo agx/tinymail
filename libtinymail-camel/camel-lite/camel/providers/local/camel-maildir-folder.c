@@ -56,6 +56,7 @@ static CamelLocalSummary *maildir_create_summary(CamelLocalFolder *lf, const cha
 
 static void maildir_append_message(CamelFolder * folder, CamelMimeMessage * message, const CamelMessageInfo *info, char **appended_uid, CamelException * ex);
 static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveType type, gint param, CamelException * ex);
+static void maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
 static void maildir_finalize(CamelObject * object);
 
@@ -102,6 +103,7 @@ static void camel_maildir_folder_class_init(CamelObjectClass * camel_maildir_fol
 
 	camel_folder_class->append_message = maildir_append_message;
 	camel_folder_class->get_message = maildir_get_message;
+	camel_folder_class->rewrite_cache = maildir_rewrite_cache;
 
 	lclass->create_summary = maildir_create_summary;
 }
@@ -281,4 +283,40 @@ static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar *
 	g_free(name);
 
 	return message;
+}
+
+static void
+maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg)
+{
+	CamelLocalFolder *lf = (CamelLocalFolder *) folder;
+	char *name = NULL;
+	CamelStream *output_stream = NULL;
+
+	CamelMessageInfo *mi;
+	CamelMaildirMessageInfo *mdi;
+	char *dest = NULL;
+
+	/* write it out to tmp, use the uid we got from the summary */
+	name = g_strdup_printf ("%s/tmp/%s", lf->folder_path, uid);
+	output_stream = camel_stream_fs_new_with_name (name, O_WRONLY|O_CREAT, 0600);
+	if (output_stream == NULL)
+		goto fail_write;
+	
+	if (camel_data_wrapper_write_to_stream ((CamelDataWrapper *)msg, output_stream) == -1
+	    || camel_stream_close (output_stream) == -1)
+		goto fail_write;
+	
+	/* now move from tmp to cur (bypass new, does it matter?) */
+	dest = g_strdup_printf("%s/cur/%s", lf->folder_path, uid);
+	if (rename (name, dest) == -1)
+		goto fail_write;
+
+	g_free (dest);
+	g_free (name);
+	
+	return;
+	
+ fail_write:
+	g_free (name);
+	g_free (dest);
 }
