@@ -2,6 +2,7 @@
 
 	* Added callback, status_callback and user_data to
 	tny_gtk_header_list_model_set_folder
+	* Added a canceled parameter to the TnyCamelSetOnlineCallback
 
 	* This was a major API change
 

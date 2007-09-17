@@ -116,14 +116,14 @@ typedef enum _TnyConnectionStatus TnyConnectionStatus;
 
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);
-typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean cancelled, GError *err, gpointer user_data);
-typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data);
-typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
-typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data);
+typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean canceled, GError *err, gpointer user_data);
+typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean canceled, TnyList *headers, GError *err, gpointer user_data);
+typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean canceled, TnyMsg *msg, GError *err, gpointer user_data);
+typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean canceled, GError *err, gpointer user_data);
 typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
-typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError *err, gpointer user_data);
-typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
-typedef void (*TnySendQueueAddCallback) (TnySendQueue *self, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
+typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, gboolean canceled, TnyList *list, GError *err, gpointer user_data);
+typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean canceled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
+typedef void (*TnySendQueueAddCallback) (TnySendQueue *self, gboolean canceled, TnyMsg *msg, GError *err, gpointer user_data);
 
 G_END_DECLS
 

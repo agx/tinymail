@@ -47,7 +47,7 @@ enum _TnyCamelAccountSignal
 
 extern guint tny_camel_account_signals [TNY_CAMEL_ACCOUNT_LAST_SIGNAL];
 
-typedef void (*TnyCamelSetOnlineCallback) (TnyCamelAccount *account, GError *err, gpointer user_data);
+typedef void (*TnyCamelSetOnlineCallback) (TnyCamelAccount *account, gboolean canceled, GError *err, gpointer user_data);
 
 
 struct _TnyCamelAccount

@@ -1611,6 +1611,7 @@ typedef struct
 	GError *err;
 	TnyCamelSetOnlineCallback callback;
 	gpointer user_data;
+	gboolean cancel;
 
 	GCond* condition;
 	gboolean had_callback;
@@ -1627,7 +1628,7 @@ on_set_online_done_idle_func (gpointer data)
 
 	if (info->callback) {
 		tny_lockable_lock (session->priv->ui_lock);
-		info->callback (info->account, info->err, info->user_data);
+		info->callback (info->account, info->cancel, info->err, info->user_data);
 		tny_lockable_unlock (session->priv->ui_lock);
 	}
 	return FALSE;
@@ -1691,9 +1692,14 @@ on_set_online_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err
 	info->account = TNY_CAMEL_ACCOUNT (g_object_ref (account));
 
 	/* We must copy the err because this context will destroy it! */
-	if (err)
-		info->err = g_error_copy (err); 
-	else
+
+	info->cancel = FALSE;
+	if (err) {
+		if (!strcmp (err->message, "cancel"))
+			info->cancel = TRUE;
+		else
+			info->err = g_error_copy (err); 
+	} else
 		info->err = NULL;
 
 	info->callback = i->callback;

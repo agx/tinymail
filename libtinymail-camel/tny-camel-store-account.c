@@ -1733,6 +1733,17 @@ tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
 static gboolean 
 cancelled_conn (gpointer user_data)
 {
+	GoingOnlineInfo *info = (GoingOnlineInfo *) user_data;
+	GError *err = NULL;
+
+	g_set_error (&err, TNY_ACCOUNT_ERROR, TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL, 
+		"cancel");
+
+	info->done_func (info->session, 
+		TNY_CAMEL_ACCOUNT (info->self), err, info->user_data);
+	if (err)
+		g_error_free (err);
+
 	return FALSE;
 }
 
