@@ -4,6 +4,8 @@ INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) $(PYGTK_CFLAGS) \
 	-I$(top_srcdir)/libtinymailui-gtk -I$(top_srcdir)/libtinymail-camel \
 	-I$(top_srcdir)/$(PLATFORMDIR) -I$(top_srcdir)/libtinymail-camel/camel-lite
 
+DIST_SUBDIRS=gendefs
+
 common_ldflags = -module -avoid-version
 
 pthdir = $(pythondir)
