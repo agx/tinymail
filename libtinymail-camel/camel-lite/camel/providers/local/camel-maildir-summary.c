@@ -736,9 +736,11 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 	g_free(cur);
 
 	/* sort the summary based on receive time, since the directory order is not useful */
+	/* This is unneeded, the sorting order is irrelevant
+
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 	qsort(s->messages->pdata, s->messages->len, sizeof(CamelMessageInfo *), sort_receive_cmp);
-	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+	CAMEL_SUMMARY_UNLOCK(s, summary_lock); */
 
 	return 0;
 }
