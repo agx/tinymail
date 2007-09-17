@@ -1,3 +1,21 @@
+2007-09-17  Mark Doffman  <mark.doffman@codethink.co.uk>
+
+	* /bindings/python/gendefs/defsgen.py:
+	Modify so that only non-virtual methods can be 
+	generated.
+
+	* /bindings/python/gendefs/Makefile.am:
+	Generate virtual method definitions for Tinymail
+	and Tinymailui libraries.
+
+	* /bindings/python/*.defs: Include virtual method
+	definitions. All Tinymail and Tinymailui interfaces
+	are implementable. 
+
+	* /bindings/python/*.override: I add type definitions
+	to fix bindings compilation problems when used with    
+	updated .defs files.
+
 2007-09-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* TnyCamelSendQueue's sent-msg signal emission (some corrections)
