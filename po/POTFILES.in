@@ -274,9 +274,6 @@ tests/shared/platfact.c
 tests/shared/device.c
 tests/shared/account-store.c
 tests/memory/memory-test.c
-tests/test-conic.c
-tests/test-conic-from-button.c
-tests/test-device-conic.c
 libtinymail-maemo/tny-maemo-device.c
 libtinymail-maemo/tny-maemo-platform-factory.c
 libtinymail-maemo/tny-maemo-account-store.c
