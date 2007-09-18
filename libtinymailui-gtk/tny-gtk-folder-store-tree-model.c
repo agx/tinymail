@@ -948,7 +948,7 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 			g_object_unref (miter);
 			g_object_unref (created);
 		}
-		g_object_unref (G_OBJECT (parentstore));
+		g_object_unref (parentstore);
 	}
 
 	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
