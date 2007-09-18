@@ -1,3 +1,12 @@
+2007-09-18  Mark Doffman <mark.doffman@codethink.co.uk>
+
+	* bindings/python/*defs: Updated to reflect changes
+	in tny_gtk_header_list_model_set_folder and additions
+	to the tinymail library.
+
+	* bindings/python/Makefile.am: Added a generated file to 
+	the CLEANFILES to fix release problems.
+
 2007-09-18  Sergio Villar Senín  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: fixed an issue when
