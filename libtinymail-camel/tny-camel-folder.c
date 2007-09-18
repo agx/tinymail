@@ -3145,6 +3145,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			 *
 			 * unload_folder_no_lock (priv, FALSE); 
 			 **/
+			succeeded = TRUE;
 
 			g_static_rec_mutex_unlock (priv->folder_lock);
 		}
@@ -3154,6 +3155,19 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 		rems = cpyr->rems;
 
 		g_slice_free (CpyRecRet, cpyr);
+	}
+
+	if (succeeded) {
+		TnyFolderStore *folder_store = tny_folder_get_folder_store (self);
+
+		if (TNY_IS_ACCOUNT (folder_store)) {
+			TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (folder_store);
+			apriv->iter = NULL;
+		} else if (TNY_IS_FOLDER (folder_store)) {
+			TnyCamelFolderPriv *ppriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder_store);
+			ppriv->iter = NULL;
+		}
+		g_object_unref (folder_store);
 	}
 
 	if (tried && terr)

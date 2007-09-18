@@ -1,3 +1,9 @@
+2007-09-18  Sergio Villar Senín  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c: fixed an issue when
+	transferring folders, the CamelFolderInfo of the parent of the folder
+	that is moved is now NULLized.
+
 2007-09-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed a possible crash when renaming folders
