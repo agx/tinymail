@@ -127,6 +127,19 @@ do_notify_in_idle_destroy (gpointer user_data)
 	g_slice_free (NotFolObInIdleInfo, info);
 }
 
+
+
+static void 
+do_notify_in_idle_destroy_for_acc (gpointer user_data)
+{
+	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) user_data;
+
+	g_object_unref (info->change);
+	g_object_unref (info->self);
+
+	g_slice_free (NotFolObInIdleInfo, info);
+}
+
 static void
 notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange *change)
 {
@@ -283,13 +296,11 @@ static void
 notify_folder_store_observers_about_for_store_acc_in_idle (TnyFolderStore *self, TnyFolderStoreChange *change)
 {
 	NotFolObInIdleInfo *info = g_slice_new (NotFolObInIdleInfo);
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	_tny_camel_folder_reason (priv);
 	info->self = g_object_ref (self);
 	info->change = g_object_ref (change);
 	g_idle_add_full (G_PRIORITY_HIGH, notify_folder_store_observers_about_for_store_acc_idle,
-		info, do_notify_in_idle_destroy);
+		info, do_notify_in_idle_destroy_for_acc);
 }
 
 
@@ -3044,6 +3055,8 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 				retval = tny_camel_store_account_factor_folder 
 					(TNY_CAMEL_STORE_ACCOUNT (a), to, &was_new);
+				_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (retval), 
+					into);
 
 				if (priv->folder_name)
 					g_free (priv->folder_name);
