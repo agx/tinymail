@@ -571,6 +571,8 @@ local_rename(CamelFolder *folder, const char *newname)
 
 	/* Sync? */
 
+	camel_object_unref (folder->summary);
+
 	g_free(lf->folder_path);
 	g_free(lf->summary_path);
 	g_free(lf->index_path);
@@ -582,12 +584,19 @@ local_rename(CamelFolder *folder, const char *newname)
 	camel_object_set(lf, NULL, CAMEL_OBJECT_STATE_FILE, statepath, NULL);
 	g_free(statepath);
 
+	parent_class->rename(folder, newname);
+
+	folder->summary = (CamelFolderSummary *)CLOCALF_CLASS(lf)->create_summary(lf, lf->summary_path, lf->folder_path, lf->index);
+
 	/* FIXME: Poke some internals, sigh */
 	camel_folder_summary_set_filename(folder->summary, lf->summary_path);
 	g_free(((CamelLocalSummary *)folder->summary)->folder_path);
 	((CamelLocalSummary *)folder->summary)->folder_path = g_strdup(lf->folder_path);
 
-	parent_class->rename(folder, newname);
+	if (camel_local_summary_load((CamelLocalSummary *)folder->summary, 0, NULL) == -1) {
+		/* ? */
+	}
+
 }
 
 static GPtrArray *
