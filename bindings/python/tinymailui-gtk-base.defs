@@ -288,6 +288,9 @@
   (parameters
     '("TnyFolder*" "folder")
     '("gboolean" "refresh")
+    '("TnyGetHeadersCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
   )
 )
 

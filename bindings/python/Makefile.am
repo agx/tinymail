@@ -64,7 +64,7 @@ nodist_camel_la_SOURCES = tinymail-camel-glue.c
 CREATEDEFS = $(PYTHON) $(top_srcdir)/bindings/python/createdefs.py
 
 CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c \
-	tinymail-platform-glue.c platform_include.h tinymail.defs \
+	tinymail-platform.defs tinymail-platform-glue.c platform_include.h tinymail.defs \
 	tinymailui.defs tinymailui-gtk.defs \
 	tinymail-camel.defs tinymail-camel-glue.c
 

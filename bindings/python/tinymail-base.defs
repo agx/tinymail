@@ -265,6 +265,7 @@
     '("error_unspec" "TNY_ERROR_UNSPEC")
     '("folder_error_sync" "TNY_FOLDER_ERROR_SYNC")
     '("folder_error_remove_msg" "TNY_FOLDER_ERROR_REMOVE_MSG")
+    '("folder_error_remove_msgs" "TNY_FOLDER_ERROR_REMOVE_MSGS")
     '("folder_error_add_msg" "TNY_FOLDER_ERROR_ADD_MSG")
     '("folder_error_refresh" "TNY_FOLDER_ERROR_REFRESH")
     '("folder_error_get_msg" "TNY_FOLDER_ERROR_GET_MSG")
@@ -374,6 +375,8 @@
     '("unsubscribed" "TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED")
     '("match_on_name" "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME")
     '("match_on_id" "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID")
+    '("pattern_is_case_insensitive" "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE")
+    '("pattern_is_regex" "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX")
   )
 )
 
@@ -1461,6 +1464,12 @@
   (return-type "const-regex_t*")
 )
 
+(define-method get_pattern
+  (of-object "TnyFolderStoreQueryItem")
+  (c-name "tny_folder_store_query_item_get_pattern")
+  (return-type "const-gchar*")
+)
+
 
 
 ;; From tny-folder-store.h
@@ -1638,6 +1647,16 @@
   (return-type "none")
   (parameters
     '("TnyHeader*" "header")
+    '("GError**" "err")
+  )
+)
+
+(define-method remove_msgs
+  (of-object "TnyFolder")
+  (c-name "tny_folder_remove_msgs")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "headers")
     '("GError**" "err")
   )
 )
@@ -2774,12 +2793,30 @@
   )
 )
 
+(define-method remove_folder
+  (of-object "TnyMergeFolder")
+  (c-name "tny_merge_folder_remove_folder")
+  (return-type "none")
+  (parameters
+    '("TnyFolder*" "folder")
+  )
+)
+
 (define-method set_folder_type
   (of-object "TnyMergeFolder")
   (c-name "tny_merge_folder_set_folder_type")
   (return-type "none")
   (parameters
     '("TnyFolderType" "folder_type")
+  )
+)
+
+(define-method get_folders
+  (of-object "TnyMergeFolder")
+  (c-name "tny_merge_folder_get_folders")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "list")
   )
 )
 
