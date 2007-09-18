@@ -135,7 +135,7 @@ EXTRA_DIST = filter.py tinymail.override \
 	tinymail-camel-base.defs tinymail-camel-extra.defs \
 	tinymail-base.defs tinymail-extra.defs \
 	tinymailui-gtk-base.defs tinymail-platform-base.defs \
-	tinymailui-base.defs $(CREATEDEFS) pytny-status.h \
+	tinymailui-base.defs createdefs.py pytny-status.h \
 	platform_include.h pytny-session-camel.h
 
 #
