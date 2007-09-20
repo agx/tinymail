@@ -164,13 +164,15 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 
 	g_static_rec_mutex_lock (queue->lock);
 	copy = queue->list;
-	while (copy) {
+
+	while (copy) 
+	{
 		QueueItem *item = copy->data;
 		if (queue->current != item)
 		{
 			if (item && (item->flags & flags)) 
 			{
-				tny_debug ("TnyCamelQueue: %s 's performance is cancelled\n", item->name);
+				tny_debug ("TnyCamelQueue: %s 's performance is removed\n", item->name);
 
 				if (item->cancel_field)
 					*item->cancel_field = TRUE;
