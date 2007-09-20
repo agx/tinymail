@@ -118,7 +118,7 @@ tny_camel_header_set_to (TnyHeader *self, const gchar *to)
 static void
 tny_camel_header_set_replyto (TnyHeader *self, const gchar *replyto)
 {
-	g_warning ("tny_header_set_bcc: This is a summary header instance. You can't modify it.\n");
+	g_warning ("tny_header_set_replyto: This is a summary header instance. You can't modify it.\n");
 	return;
 }
 

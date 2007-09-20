@@ -1,6 +1,7 @@
 2007-09-20  Dirk-Jan C. BInnema <dirk-jan.binnema@nokia.com>
 
 	* depend on / use NSS for debian builds for maemo
+	* fix some tny mem leaks
 
 2007-09-20  Philip Van Hoof  <pvanhoof@gnome.org>
 

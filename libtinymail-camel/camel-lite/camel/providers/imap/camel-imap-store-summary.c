@@ -344,6 +344,9 @@ camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *ful
 	} else
 		d(printf("  failed\n"));
 
+	if (pathu8)
+		g_free (pathu8);
+	
 	return info;
 }
 

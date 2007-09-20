@@ -514,11 +514,15 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 			"Error storing the store summary");
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
+		g_free (tmp_path);
 		return -1;
 	}
 
 	CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 
+	if (tmp_path)
+		g_free (tmp_path);
+	
 	return 0;
 }
 
