@@ -1,3 +1,7 @@
+2007-09-20  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed a possible too-early cleanup of the account
+
 2007-09-18  Mark Doffman <mark.doffman@codethink.co.uk>
 
 	* bindings/python/*defs: Updated to reflect changes

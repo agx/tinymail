@@ -139,6 +139,8 @@ thread_main_func (gpointer user_data)
 
 	queue->thread = NULL;
 	queue->stopped = TRUE;
+
+	g_object_unref (queue->account);
 	g_object_unref (queue);
 
 	return NULL;
@@ -294,6 +296,7 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 		GError *err = NULL;
 		queue->stopped = FALSE;
 		g_object_ref (queue);
+		g_object_ref (queue->account);
 		queue->thread = g_thread_create (thread_main_func, 
 			queue, FALSE, &err);
 		if (err) {
