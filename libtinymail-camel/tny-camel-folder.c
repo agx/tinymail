@@ -567,8 +567,6 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 		priv->folder = camel_store_get_folder 
 			(store, priv->folder_name, 0, &priv->load_ex);
 
-		do_try_on_success (store, priv, &priv->load_ex);
-
 		if (!priv->folder || camel_exception_is_set (&priv->load_ex) || !CAMEL_IS_FOLDER (priv->folder))
 		{
 			/* TNY TODO: Leak it? (this is "gash" anyway) */
@@ -586,7 +584,8 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 			} else {
 				do_try_on_success (store, priv, &priv->load_ex);
 			}
-		}
+		} else 
+			do_try_on_success (store, priv, &priv->load_ex);
 
 		determine_push_email (priv);
 
