@@ -98,6 +98,14 @@ static CamelFolder *get_trash  (CamelStore *store, CamelException *ex);
 static void pop3_get_folder_status (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext);
 
 
+static int 
+pop3store_get_local_size (CamelStore *store, const gchar *folder_name)
+{
+	CamelPOP3Store *p3store = (CamelPOP3Store *) store;
+	int msize = 0;
+	camel_du (p3store->storage_path , &msize);
+	return msize;
+}
 
 static void 
 pop3_delete_cache  (CamelStore *store)
@@ -1040,6 +1048,7 @@ camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
 	/* camel_service_class->connect = pop3_connect; */
 	/* camel_service_class->disconnect = pop3_disconnect; */
 
+	camel_store_class->get_local_size = pop3store_get_local_size;
 	camel_store_class->get_folder = get_folder;
 	camel_store_class->get_trash = get_trash;
 	camel_store_class->get_folder_status = pop3_get_folder_status;

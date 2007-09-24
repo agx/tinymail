@@ -144,6 +144,20 @@ static void imap_set_server_level (CamelImapStore *store);
 
 static void imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext);
 
+static int 
+imapstore_get_local_size (CamelStore *store, const gchar *folder_name)
+{
+	CamelImapStore *imap_store = (CamelImapStore *) store; 
+	gchar *storage_path = g_strdup_printf ("%s/folders", imap_store->storage_path);
+	gchar *folder_dir = imap_path_to_physical (storage_path, folder_name);
+	int msize = 0;
+
+	g_free (storage_path);
+	camel_du (folder_dir, &msize);
+	g_free (folder_dir);
+	return msize;
+}
+
 void
 camel_imap_recon (CamelImapStore *store, CamelException *mex)
 {
@@ -305,6 +319,7 @@ camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 	camel_service_class->query_auth_types = query_auth_types;
 	camel_service_class->get_name = imap_get_name;
 
+	camel_store_class->get_local_size = imapstore_get_local_size;
 	camel_store_class->delete_cache = imap_delete_cache;
 	camel_store_class->hash_folder_name = hash_folder_name;
 	camel_store_class->compare_folder_name = compare_folder_name;

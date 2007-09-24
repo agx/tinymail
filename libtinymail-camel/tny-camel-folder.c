@@ -128,7 +128,6 @@ do_notify_in_idle_destroy (gpointer user_data)
 }
 
 
-
 static void 
 do_notify_in_idle_destroy_for_acc (gpointer user_data)
 {
@@ -301,6 +300,15 @@ notify_folder_store_observers_about_for_store_acc_in_idle (TnyFolderStore *self,
 	info->change = g_object_ref (change);
 	g_idle_add_full (G_PRIORITY_HIGH, notify_folder_store_observers_about_for_store_acc_idle,
 		info, do_notify_in_idle_destroy_for_acc);
+}
+
+static void 
+reset_local_size (TnyCamelFolderPriv *priv)
+{
+	if (priv->folder)
+		priv->local_size = camel_folder_get_local_size (priv->folder);
+	else if (priv->store)
+		priv->local_size = camel_store_get_local_size (priv->store, priv->folder_name);
 }
 
 
@@ -849,7 +857,6 @@ tny_camel_folder_add_msg_async_callback (gpointer thr_user_data)
 	{
 		tny_folder_change_set_new_all_count (change, priv->cached_length);
 		tny_folder_change_set_new_unread_count (change, priv->unread_length);
-
 		notify_folder_observers_about (self, change);
 		g_object_unref (change);
 	}
@@ -912,6 +919,7 @@ tny_camel_folder_add_msg_async_thread (gpointer thr_user_data)
 	priv->cached_length = camel_folder_get_message_count (priv->folder);
 	priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 	update_iter_counts (priv);
+	reset_local_size (priv);
 
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
@@ -1058,6 +1066,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 
 		tny_folder_change_set_new_all_count (change, priv->cached_length);
 		tny_folder_change_set_new_unread_count (change, priv->unread_length);
+		reset_local_size (priv);
 		notify_folder_observers_about_in_idle (self, change);
 	}
 
@@ -1390,8 +1399,8 @@ tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
 		}
 
 	camel_folder_sync (priv->folder, expunge, &ex);
-
 	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
+	reset_local_size (priv);
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
@@ -1528,6 +1537,8 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 		priv->cached_length = camel_folder_get_message_count (priv->folder);
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
 		update_iter_counts (priv);
+		reset_local_size (priv);
+
 	} else
 		camel_exception_setv (&ex, CAMEL_EXCEPTION_SYSTEM, 
 			"Can't load folder %s\n", 

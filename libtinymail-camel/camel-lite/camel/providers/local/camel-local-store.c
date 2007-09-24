@@ -68,6 +68,25 @@ static char *local_get_meta_path(CamelLocalStore *lf, const char *full_name, con
 
 static CamelStoreClass *parent_class = NULL;
 
+
+static void 
+local_delete_cache  (CamelStore *store)
+{
+	CamelLocalStore *local_store = (CamelLocalStore *) store;
+	camel_rm (local_store->toplevel_dir);
+}
+
+static int 
+localstore_get_local_size (CamelStore *store, const gchar *folder_name)
+{
+	CamelLocalStore *local_store = (CamelLocalStore *) store;
+	gchar *folder_dir = g_strdup_printf ("%s/%s", local_store->toplevel_dir, folder_name);
+	int msize = 0;
+	camel_du (folder_dir, &msize);
+	g_free (folder_dir);
+	return msize;
+}
+
 static void
 camel_local_store_class_init (CamelLocalStoreClass *camel_local_store_class)
 {
@@ -79,6 +98,9 @@ camel_local_store_class_init (CamelLocalStoreClass *camel_local_store_class)
 	/* virtual method overload */
 	camel_service_class->construct = construct;
 	camel_service_class->get_name = get_name;
+
+	camel_store_class->delete_cache = local_delete_cache;
+	camel_store_class->get_local_size = localstore_get_local_size;
 	camel_store_class->get_folder = get_folder;
 	camel_store_class->get_inbox = local_get_inbox;
 	camel_store_class->get_trash = local_get_trash;

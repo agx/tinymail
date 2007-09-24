@@ -1,3 +1,8 @@
+2007-09-24  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Local-size updates after sync, sync_async and add_msg and
+	add_msg_async
+
 2007-09-20  Dirk-Jan C. BInnema <dirk-jan.binnema@nokia.com>
 
 	* depend on / use NSS for debian builds for maemo

@@ -191,7 +191,9 @@ typedef struct {
 						     const char *folder_name, 
 						     int *unseen, int *messages, 
 						     int *uidnext);
-	void             (*delete_cache)              (CamelStore *store);
+	void             (*delete_cache)            (CamelStore *store);
+
+	int              (*get_local_size)          (CamelStore *store, const gchar *folder_name);
 
 } CamelStoreClass;
 
@@ -269,6 +271,8 @@ void            camel_store_get_folder_status        (CamelStore *store,
 						      int *uidnext);
 
 void             camel_store_delete_cache            (CamelStore *store);
+int              camel_store_get_local_size          (CamelStore *store, const gchar *folder_name);
+
 
 
 typedef struct _CamelISubscribe CamelISubscribe;

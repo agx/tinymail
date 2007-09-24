@@ -87,6 +87,11 @@ static int store_getv (CamelObject *object, CamelException *ex, CamelArgGetV *ar
 
 static void get_folder_status_impl (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext);
 
+static int get_local_size (CamelStore *store, const gchar *folder_name)
+{
+	return 0;
+}
+
 static void
 camel_store_class_init (CamelStoreClass *camel_store_class)
 {
@@ -96,6 +101,7 @@ camel_store_class_init (CamelStoreClass *camel_store_class)
 	parent_class = CAMEL_SERVICE_CLASS (camel_type_get_global_classfuncs (camel_service_get_type ()));
 	
 	/* virtual method definition */
+	camel_store_class->get_local_size = get_local_size;
 	camel_store_class->hash_folder_name = g_str_hash;
 	camel_store_class->compare_folder_name = g_str_equal;
 	camel_store_class->get_folder = get_folder;
@@ -182,10 +188,16 @@ camel_store_get_type (void)
 	return camel_store_type;
 }
 
+int
+camel_store_get_local_size (CamelStore *store, const gchar *folder_name)
+{
+	return CS_CLASS (store)->get_local_size (store, folder_name);
+}
 
 static void 
 delete_cache (CamelStore *store)
 {
+	return;
 }
 
 void 
