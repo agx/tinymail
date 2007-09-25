@@ -4,9 +4,10 @@ import gnome
 import tinymail
 import tinymail.ui
 import tinymail.uigtk
-import tinymail.platform
 import tinymail.camel
 import gc
+
+from pyplatformfactory import PyPlatformFactory
 
 def on_refresh_folder (folder, cancelled, headerstree):
 	listm = tinymail.uigtk.GtkHeaderListModel ()
@@ -69,7 +70,7 @@ column = gtk.TreeViewColumn ("Received", renderer, text=7)
 column.set_fixed_width (100)
 column.set_sizing (gtk.TREE_VIEW_COLUMN_FIXED)
 headerstree.append_column (column)
-platfact = tinymail.platform.tny_gnome_platform_factory_get_instance ()
+platfact = PyPlatformFactory()
 msgview = platfact.new_msg_view ()
 msgview.show ()
 vpaned.pack2 (msgview, True, True)

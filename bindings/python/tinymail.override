@@ -171,6 +171,7 @@ _wrap_tny_status_matches(PyObject *self, PyObject *args)
 }
 %%
 override tny_folder_change_get_rename noargs
+static PyObject*
 _wrap_tny_folder_change_get_rename (PyGObject *self)
 {
     const gchar *rename, *oldname;
@@ -179,12 +180,137 @@ _wrap_tny_folder_change_get_rename (PyGObject *self)
 
     return Py_BuildValue("ss", rename, oldname);
 }
+%%
+override tny_list_foreach args 
 
+typedef struct {
+    PyObject* func;
+    PyObject* data;
+} PyTnyListForeachCaller;
 
+static void
+pytny_list_foreach_marshal(GObject* obj, gpointer data)
+{
+    PyGILState_STATE state;
+    PyTnyListForeachCaller *call =  (PyTnyListForeachCaller*) data;
+    PyObject *pyobj, *retobj;
+
+    g_assert(call->func);
+
+    state = pyg_gil_state_ensure();
+
+    pyobj = pygobject_new(obj);
+    if (call->data)
+        retobj = PyEval_CallFunction(call->func, "(NO)",
+                                     pyobj, call->data);
+    else
+        retobj = PyEval_CallFunction(call->func, "(N)",
+                                     pyobj);
+
+    if (retobj == NULL) {
+        PyErr_Print();
+    }
+
+    Py_XDECREF(retobj);
+
+    pyg_gil_state_release(state);
+}
+    
+
+static PyObject *
+_wrap_tny_list_foreach(PyGObject* self, PyObject* args)
+{
+    PyTnyListForeachCaller call;
+    call.data = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|O", 
+                          &call.func, &call.data))
+         return NULL;
+
+    tny_list_foreach(TNY_LIST(self->obj), (GFunc) pytny_list_foreach_marshal, &call);
+    Py_RETURN_NONE;
+}
+
+%%
+override TnyList__do_foreach_func args
+
+static PyObject *
+_wrap_TnyList__do_foreach_func(PyGObject *self, PyObject *args)
+{
+    TnyListIface *iface;
+    PyTnyListForeachCaller call;
+
+    if (!PyArg_ParseTuple(args, "O|O", 
+                          &call.func, &call.data))
+         return NULL;
+
+    iface = g_type_interface_peek(g_type_class_peek(pyg_type_from_object((PyObject*)self)), TNY_TYPE_LIST);
+    if (iface->foreach_func)
+        iface->foreach_func(TNY_LIST(self->obj), (GFunc) pytny_list_foreach_marshal, (gpointer) &call);
+    else {
+        PyErr_SetString(PyExc_NotImplementedError, "interface method TnyList.foreach not implemented");
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+%%
+override TnyList__proxy_do_foreach_func
+
+typedef struct {
+    GFunc func;
+    gpointer data;
+} PyTnyListFuncData;
+
+static PyObject *
+pytny_list_forall_proxy_func(PyObject *self, PyObject *args)
+{
+    PyObject *py_obj;
+    PyObject *py_data;
+    PyTnyListFuncData *data; 
+    if (!PyArg_ParseTuple(args, "O!O!",
+			  &PyGObject_Type, &py_obj,
+                          &PyCObject_Type, &py_data))
+        return NULL;
+    
+    data = PyCObject_AsVoidPtr(py_data);
+    data->func(G_OBJECT(pygobject_get(py_obj)), data->data);
+    
+    Py_RETURN_NONE;
+}
+
+static void
+_wrap_TnyList__proxy_do_foreach_func (TnyList* self,
+                                      GFunc func,
+                                      gpointer user_data)
+{
+    PyGILState_STATE state;
+    PyObject *py_obj, *py_func, *py_data;
+    PyMethodDef py_func_def = { "TnyList.do_foreach callback",
+                                (PyCFunction) pytny_list_forall_proxy_func,
+                                METH_VARARGS };
+    PyTnyListFuncData *data; 
+
+    state = pyg_gil_state_ensure();
+    py_obj = pygobject_new((GObject*) self);
+    py_func = PyCFunction_NewEx(&py_func_def, NULL, NULL);
+
+    data = g_new(PyTnyListFuncData, 1);
+    data->func = func;
+    data->data = user_data;
+    py_data = PyCObject_FromVoidPtr(data, g_free); 
+    if (!PyObject_CallMethod(py_obj, "do_foreach_func", "NN", 
+			     py_func,
+			     py_data))
+	PyErr_Print();
+    
+    pyg_gil_state_release(state);
+}
 
 
     
 
+    
     
 
     

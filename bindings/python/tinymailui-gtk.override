@@ -41,10 +41,10 @@ import gtk.TreeModel as PyGtkTreeModel_Type
 import gtk.ListStore as PyGtkListStore_Type
 import gtk.TextView as PyGtkTextView_Type
 
-import tinymai.Header as PyTnyHeader_Type
+import tinymail.Header as PyTnyHeader_Type
 import tinymail.Folder as PyTnyFolder_Type
 import tinymail.MimePart as PyTnyMimePart_Type
-import tinymai.Msg as PyTnyMsg_Type
+import tinymail.Msg as PyTnyMsg_Type
 import tinymail.List as PyTnyList_Type
 import tinymail.FolderStore as PyTnyFolderStore_Type
 import tinymail.FolderStoreQuery as PyTnyFolderStoreQuery_Type

@@ -1,3 +1,18 @@
+2007-09-25  Mark Doffman <mark.doffman@codethink.co.uk>
+	
+	* /bindings/python/*: Remove the platform generation
+	from the automatically generated bindings. 
+
+	* /bindings/python/README: Update for changes to the way
+	the python bindings are generated.
+	
+	* /tests/python-demo/*: Add implementations of a tny-list
+	iterator, platform factory, and account store. Update the 
+	svn ignore to ignore the compiled python files. 
+
+	* /tests/python-demo/tinymail-python-test.py: Modify to use
+	the python implementation of the platform factory.
+	
 2007-09-24  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Local-size updates after sync, sync_async and add_msg and
