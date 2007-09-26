@@ -3500,6 +3500,8 @@ idle_real_start (CamelImapStore *store)
 
 	if (store->ostream && store->istream && CAMEL_IS_STREAM (store->ostream))
 	{
+		if (store->idle_prefix)
+			g_free (store->idle_prefix);
 		store->idle_prefix = g_strdup_printf ("%c%.5u", 
 			store->tag_prefix, store->command++);
 
@@ -3689,7 +3691,8 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 			store->idle_thread = NULL;
 		}
 
-		g_free (store->idle_prefix);
+		if (store->idle_prefix)
+			g_free (store->idle_prefix);
 		store->idle_prefix = NULL;
 
 		idle_resp = idle_deal_with_stuff (folder, store, &had_err, &had_lock);

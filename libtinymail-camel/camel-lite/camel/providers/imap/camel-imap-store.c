@@ -219,6 +219,7 @@ let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 
 		g_free (imap_store->idle_prefix); 
 		imap_store->idle_prefix=NULL;
+
 		idle_debug ("Sending DONE in let_idle_die\n");
 		nwritten = camel_stream_printf (imap_store->ostream, "DONE\r\n");
 		if (nwritten != -1) 
@@ -280,6 +281,7 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 			}
 
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+
 			g_free (store->idle_prefix);
 			store->idle_prefix = NULL;
 		}
