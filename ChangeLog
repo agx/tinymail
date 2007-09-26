@@ -13,6 +13,7 @@
 2007-09-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed (avoided) a memory leak in saving CamelObject's states
+	* Sending messages, some fixes for the CC and BCC fields
 
 2007-09-25  Mark Doffman <mark.doffman@codethink.co.uk>
 	

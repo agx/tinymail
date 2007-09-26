@@ -188,6 +188,18 @@ get_tny_error_code_for_camel_exception_id (CamelException* ex)
 	}
 }
 
+static char *normal_recs[] = {
+	CAMEL_RECIPIENT_TYPE_TO,
+	CAMEL_RECIPIENT_TYPE_CC,
+	CAMEL_RECIPIENT_TYPE_BCC
+};
+
+static char *resent_recs[] = {
+	CAMEL_RECIPIENT_TYPE_RESENT_TO,
+	CAMEL_RECIPIENT_TYPE_RESENT_CC,
+	CAMEL_RECIPIENT_TYPE_RESENT_BCC
+};
+
 static void
 tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
@@ -197,6 +209,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	CamelTransport *transport;
 	CamelAddress *from, *recipients;
 	gboolean reperr = TRUE, suc = FALSE;
+	const CamelInternetAddress *miaddr;
+	const char *resentfrom; int i = 0;
 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 	g_assert (TNY_IS_CAMEL_MSG (msg));
@@ -236,11 +250,29 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
-	from = (CamelAddress *) camel_mime_message_get_from (message);
-	recipients = (CamelAddress *) camel_mime_message_get_recipients (message, CAMEL_RECIPIENT_TYPE_TO);
 
-	suc = camel_transport_send_to (transport, message, from, 
+	from = (CamelAddress *) camel_internet_address_new ();
+	resentfrom = camel_medium_get_header (CAMEL_MEDIUM (message), "Resent-From");
+	if (resentfrom) {
+		camel_address_decode (from, resentfrom);
+	} else {
+		miaddr = camel_mime_message_get_from (message);
+		camel_address_copy (from, CAMEL_ADDRESS (miaddr));
+	}
+
+	recipients = (CamelAddress *) camel_internet_address_new ();
+	for (i = 0; i < 3; i++) {
+		const char *mtype;
+		mtype = resentfrom ? resent_recs[i] : normal_recs[i];
+		miaddr = camel_mime_message_get_recipients (message, mtype);
+		camel_address_cat (recipients, CAMEL_ADDRESS (miaddr));
+	}
+
+	if (camel_address_length(recipients) > 0) {
+		suc = camel_transport_send_to (transport, message, from, 
 			recipients, &ex);
+	} else 
+		suc = TRUE;
 
 	if (camel_exception_is_set (&ex) || !suc)
 	{
@@ -256,9 +288,13 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 				"Unknown error");
 
 		reperr = FALSE;
-	}
+	} else 
+		camel_mime_message_set_date(message, CAMEL_MESSAGE_DATE_CURRENT, 0);
 
 	camel_service_disconnect (apriv->service, TRUE, &ex);
+
+	camel_object_unref (recipients);
+	camel_object_unref (from);
 
 	if (reperr && camel_exception_is_set (&ex))
 	{
@@ -267,8 +303,6 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 			camel_exception_get_description (&ex));
 		camel_exception_clear (&ex);
 	}
-
-	/*g_object_unref (G_OBJECT (header));*/
 
 	return;
 }
