@@ -313,8 +313,12 @@ static CamelMessageInfo *message_info_new_from_header(CamelFolderSummary * s, st
 			mdi = (CamelMaildirMessageInfo *)(mi = info);
 		}
 
-		/* with maildir we know the real received date, from the filename */
+		/* with maildir we know the real received date, from the filename 
+
+		Bulls. We just use what we have in the header of the message!
+
 		mdi->info.info.date_received = strtoul(camel_message_info_uid(mi), NULL, 10);
+		*/
 
 		if (mds->priv->current_file) {
 #if 0
