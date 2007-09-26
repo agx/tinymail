@@ -1,3 +1,15 @@
+2007-09-26  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-common.c,
+	(_foreach_email_add_to_inet_addr): now we don't use
+	strtok_r() to split the string to addresses, as we
+	weren't taking into account the quotes. I implemented
+	a new _split_recipients() method that takes quotes
+	into account.
+	(_string_to_camel_inet_addr): now we remove the quotes
+	in the name part of an address, as they are added by
+	camel part automatically.
+
 2007-09-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed (avoided) a memory leak in saving CamelObject's states

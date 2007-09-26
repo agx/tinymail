@@ -30,6 +30,10 @@
 
 #include <tny-folder-store-query.h>
 
+static void remove_quotes (gchar *buffer);
+static gchar **split_recipients (gchar *buffer);
+
+
 /* TODOL Rename to tny_camel_session_check_operation. */
 /** _tny_session_check_operation:
  * @session: A camel session.
@@ -163,6 +167,67 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 	return retval;
 }
 
+static void
+remove_quotes (gchar *buffer)
+{
+	gchar *tmp = buffer;
+	gboolean first_is_quote = FALSE;
+
+	if (buffer == NULL)
+		return;
+
+	/* First we remove the first quote */
+	first_is_quote = (buffer[0] == '\"');
+	while (*tmp != '\0') {
+		if ((tmp[1] == '\"') && (tmp[2] == '\0'))
+			tmp[1] = '\0';
+		if (first_is_quote)
+			tmp[0] = tmp[1];
+		tmp++;
+	}
+
+	if ((tmp > buffer) && (*(tmp-1) == '\"'))
+		*(tmp-1) = '\0';
+
+}
+
+static gchar **
+split_recipients (gchar *buffer)
+{
+	gchar *tmp, *start;
+	gboolean is_quoted = FALSE;
+	GPtrArray *array = g_ptr_array_new ();
+
+	start = tmp = buffer;
+
+	if (buffer == NULL) {
+		g_ptr_array_add (array, NULL);
+		return (gchar **) g_ptr_array_free (array, FALSE);
+	}
+
+	while (*tmp != '\0') {
+		if (*tmp == '\"')
+			is_quoted = !is_quoted;
+		if (*tmp == '\\')
+			tmp++;
+		if ((!is_quoted) && ((*tmp == ',') || (*tmp == ';'))) {
+			gchar *part;
+			part = g_strndup (start, tmp - start);
+			g_ptr_array_add (array, part);
+			start = tmp+1;
+		}
+		
+		tmp++;
+	}
+
+	if (start != tmp)
+		g_ptr_array_add (array, g_strdup (start));
+	
+	g_ptr_array_add (array, NULL);
+	return (gchar **) g_ptr_array_free (array, FALSE);
+}
+
+
 void
 _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 {
@@ -193,6 +258,7 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 	
 		if (G_LIKELY (*lname == ' '))
 			*lname-- = '\0';
+		remove_quotes (name);
 		camel_internet_address_add (target, name, email);
 	} else {
 		
@@ -215,21 +281,23 @@ void
 _foreach_email_add_to_inet_addr (const gchar *emails, CamelInternetAddress *target)
 {
 	char *dup = g_strdup (emails);
-	char *tok, *save;
+	gchar **parts, **current;
 
 	if (!emails)
 		return;
 
-	tok = strtok_r (dup, ",;", &save);
+	parts = split_recipients (dup);
+	current = parts;
 
-	while (G_LIKELY (tok != NULL))
+	while (G_LIKELY (*current != NULL))
 	{
 		
-		_string_to_camel_inet_addr (tok, target);
+		_string_to_camel_inet_addr (*current, target);
 
-		tok = strtok_r (NULL, ",;", &save);
+		current++;
 	}
 
+	g_strfreev (parts);
 	g_free (dup);
 
 	return;
