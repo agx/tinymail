@@ -259,7 +259,7 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 	if (camel_object_state_read(lf) == -1) {
 		/* No metadata - load defaults and persitify */
 		camel_object_set(lf, NULL, CAMEL_LOCAL_FOLDER_INDEX_BODY, TRUE, 0);
-		camel_object_state_write(lf);
+		/* camel_object_state_write(lf); */
 	}
 #ifndef G_OS_WIN32
 	/* follow any symlinks to the mailbox */
@@ -525,7 +525,7 @@ local_sync(CamelFolder *folder, gboolean expunge, CamelException *ex)
 	if (camel_local_folder_lock(lf, CAMEL_LOCK_WRITE, ex) == -1)
 		return;
 
-	camel_object_state_write(lf);
+	/* camel_object_state_write(lf); */
 
 	changes = camel_folder_change_info_new ();
 	/* if sync fails, we'll pass it up on exit through ex */

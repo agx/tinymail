@@ -248,8 +248,8 @@ disco_setv(CamelObject *object, CamelException *ex, CamelArgV *args)
 		arg->tag = (tag & CAMEL_ARG_TYPE) | CAMEL_ARG_IGNORE;
 	}
 
-	if (save)
-		camel_object_state_write(object);
+	/* if (save)
+		camel_object_state_write(object); */
 
 	return ((CamelObjectClass *)parent_class)->setv(object, ex, args);
 }
@@ -279,7 +279,7 @@ disco_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			return;
 	}
 
-	camel_object_state_write(folder);
+	/* camel_object_state_write(folder); */
 
 	switch (camel_disco_store_status (CAMEL_DISCO_STORE (folder->parent_store))) {
 	case CAMEL_DISCO_STORE_ONLINE:

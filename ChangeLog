@@ -1,3 +1,7 @@
+2007-09-26  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed (avoided) a memory leak in saving CamelObject's states
+
 2007-09-25  Mark Doffman <mark.doffman@codethink.co.uk>
 	
 	* /bindings/python/*: Remove the platform generation

@@ -238,9 +238,9 @@ offline_folder_setv (CamelObject *object, CamelException *ex, CamelArgV *args)
 		arg->tag = (tag & CAMEL_ARG_TYPE) | CAMEL_ARG_IGNORE;
 	}
 	
-	if (save)
-		camel_object_state_write (object);
-	
+	/* if (save)
+		camel_object_state_write (object); */
+
 	return ((CamelObjectClass *) parent_class)->setv (object, ex, args);
 }
 

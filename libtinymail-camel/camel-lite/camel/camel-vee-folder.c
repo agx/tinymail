@@ -499,7 +499,7 @@ vee_sync(CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	CAMEL_VEE_FOLDER_UNLOCK(vf, subfolder_lock);
 
-	camel_object_state_write(vf);
+	/* camel_object_state_write(vf); */
 }
 
 static void
