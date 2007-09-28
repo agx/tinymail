@@ -142,7 +142,7 @@ _tny_gtk_header_list_iterator_is_done_nl (TnyGtkHeaderListIterator *me)
 
 	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
 
-	return (me->current < 0 || me->current >= mpriv->items->len);
+	return (/*me->current < 0 || */me->current >= mpriv->items->len);
 }
 
 static gboolean 
@@ -157,7 +157,7 @@ tny_gtk_header_list_iterator_is_done (TnyIterator *self)
 
 	mpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (me->model);
 	g_static_rec_mutex_lock (mpriv->iterator_lock);
-	retval = (me->current < 0 || me->current >= mpriv->items->len);
+	retval = (/* me->current < 0 || */me->current >= mpriv->items->len);
 	g_static_rec_mutex_unlock (mpriv->iterator_lock);
 
 	return retval;

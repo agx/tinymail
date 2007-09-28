@@ -997,7 +997,7 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 		 * int, but it's just for security-clarity here. Let it be, it 
 		 * doesn't hurt either) */
 		
-		if (!uid || seq < 0 || seq-1 > summary_len) {
+		if (!uid /*|| seq < 0 */|| seq-1 > summary_len) {
 			imap_folder->need_rescan = TRUE;
 			retval = FALSE;
 			g_datalist_clear (&data);
