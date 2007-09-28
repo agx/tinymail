@@ -1057,8 +1057,10 @@ stream_get_local_address (CamelTcpStream *stream, socklen_t *len)
 {
 	struct sockaddr *saddr = (struct sockaddr *) (malloc (*len));
 
-	if (getsockname (CAMEL_TCP_STREAM_SSL (stream)->priv->sockfd, saddr, len) == -1)
+	if (getsockname (CAMEL_TCP_STREAM_SSL (stream)->priv->sockfd, saddr, len) == -1) {
+		free (saddr);
 		return NULL;
+	}
 
 	return saddr;
 }
@@ -1068,8 +1070,10 @@ stream_get_remote_address (CamelTcpStream *stream, socklen_t *len)
 {
 	struct sockaddr *saddr = (struct sockaddr *) (malloc (*len));
 
-	if (getpeername (CAMEL_TCP_STREAM_SSL (stream)->priv->sockfd, saddr, len) == -1)
+	if (getpeername (CAMEL_TCP_STREAM_SSL (stream)->priv->sockfd, saddr, len) == -1) {
+		free (saddr);
 		return NULL;
+	}
 
 	return saddr;
 }
