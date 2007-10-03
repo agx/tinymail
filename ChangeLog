@@ -1,3 +1,16 @@
+2007-10-03  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail/tny-merge-folder.c:
+	(tny_merge_folder_get_id): fixed id generation. We
+	were setting this with a fixed value always due to
+	an error in initialisation. Now we calculate an
+	id with the merged folder id's and their account
+	id's.
+	(tny_merge_folder_get_url_string): created 
+	implementation. Now it gets the merge folder id
+	as part of the url string with this format:
+	"merge://ID"
+
 2007-09-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Unsigned integers can't be < 0

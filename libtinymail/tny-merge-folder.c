@@ -650,8 +650,13 @@ tny_merge_folder_get_id (TnyFolder *self)
 		while (!tny_iterator_is_done (iter))
 		{
 			TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+			TnyAccount *account = tny_folder_get_account (cur);
 			if (!first)
 				g_string_append_c (ids, '&');
+			if (TNY_IS_ACCOUNT (account)) {
+				g_string_append (ids, tny_account_get_id (account));
+				g_string_append_c (ids, '+');
+			}
 			g_string_append (ids, tny_folder_get_id (cur));
 			g_object_unref (cur);
 			first = FALSE;
@@ -1271,10 +1276,7 @@ tny_merge_folder_get_stats (TnyFolder *self)
 static gchar*
 tny_merge_folder_get_url_string (TnyFolder *self)
 {
-	g_warning ("tny_merge_folder_get_url_string not reliable. "
-		   "Please don't use this functionality\n");
-
-	return "not://implemented";
+	return g_strdup_printf ("merge://%s", tny_folder_get_id (self));
 }
 
 static TnyFolderCaps
@@ -1467,9 +1469,7 @@ tny_merge_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyMergeFolder *self = (TnyMergeFolder *) instance;
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
-	/* The get_id_func() DBC contract does not allow this to be NULL or "": */
-	priv->id = g_strdup ("unknown_mergefolder");
-	
+	priv->id = NULL;
 	priv->mothers = tny_simple_list_new ();
 	priv->lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->lock);
