@@ -2026,13 +2026,12 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	CamelMessageInfoBase *mi;
 	const char *received;
 	guchar digest[16];
-	char *msgid, *r=NULL;
+	char *msgid = NULL;
 	char *subject, *from, *to, *cc;
 	CamelContentType *ct = NULL;
 	const char *content, *charset = NULL;
 	const char *prio = NULL;
 	const char *attach = NULL;
-	int tzone = 0;
 
 	mi = (CamelMessageInfoBase *)camel_message_info_new(s);
 	mi->flags |= CAMEL_MESSAGE_INFO_NEEDS_FREE;

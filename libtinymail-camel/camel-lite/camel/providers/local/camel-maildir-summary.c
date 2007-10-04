@@ -535,20 +535,6 @@ remove_summary(char *key, CamelMessageInfo *info, struct _remove_data *rd)
 	camel_message_info_free(info);
 }
 
-static int
-sort_receive_cmp(const void *ap, const void *bp)
-{
-	const CamelMaildirMessageInfo
-		*a = *((CamelMaildirMessageInfo **)ap),
-		*b = *((CamelMaildirMessageInfo **)bp);
-
-	if (a->info.info.date_received < b->info.info.date_received)
-		return -1;
-	else if (a->info.info.date_received > b->info.info.date_received)
-		return 1;
-
-	return 0;
-}
 
 static int
 maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, CamelException *ex)

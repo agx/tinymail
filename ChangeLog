@@ -1,3 +1,7 @@
+2007-10-04  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	- -Wall warnings
+
 2007-10-03  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail/tny-merge-folder.c:

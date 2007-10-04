@@ -94,8 +94,9 @@ loop:
    A small issue is that case-insenstivity wont work entirely correct for utf8 strings. */
 int
 camel_search_build_match_regex (regex_t *pattern, camel_search_flags_t type, int argc,
-				struct _ESExpResult **argv, CamelException *ex)
+				void *argv_in, CamelException *ex)
 {
+	struct _ESExpResult **argv = argv_in;
 	GString *match = g_string_new("");
 	int c, i, count=0, err;
 	char *word;

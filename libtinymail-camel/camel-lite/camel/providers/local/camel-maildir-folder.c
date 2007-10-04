@@ -291,9 +291,6 @@ maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *m
 	CamelLocalFolder *lf = (CamelLocalFolder *) folder;
 	char *name = NULL;
 	CamelStream *output_stream = NULL;
-
-	CamelMessageInfo *mi;
-	CamelMaildirMessageInfo *mdi;
 	char *dest = NULL;
 
 	/* write it out to tmp, use the uid we got from the summary */

@@ -155,9 +155,6 @@ local_summary_load(CamelLocalSummary *cls, int forceindex, CamelException *ex)
 int
 camel_local_summary_load(CamelLocalSummary *cls, int forceindex, CamelException *ex)
 {
-	struct stat st;
-	CamelFolderSummary *s = (CamelFolderSummary *)cls;
-
 	d(printf("Loading summary ...\n"));
 
  	if (((CamelLocalSummaryClass *)(CAMEL_OBJECT_GET_CLASS(cls)))->load(cls, forceindex, ex) == -1) {

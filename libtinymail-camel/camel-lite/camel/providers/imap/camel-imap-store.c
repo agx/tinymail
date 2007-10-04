@@ -1223,7 +1223,7 @@ static gboolean
 connect_to_server_wrapper (CamelService *service, CamelException *ex)
 {
 	const char *ssl_mode, *idle_sleep, *getsrv_sleep;
-	struct addrinfo hints, *ai;
+	struct addrinfo hints;
 	int mode = -1, ret, i, must_tls = 0;
 	char *serv;
 	const char *port;

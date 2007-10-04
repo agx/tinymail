@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <iconv.h>
+#include <unistd.h>
 
 enum {
 	ISO_UNSUPPORTED          = 0,
@@ -91,7 +92,7 @@ static int num_iso10646_tests = sizeof (iso10646_tests) / sizeof (CharInfo);
 
 int main (int argc, char **argv)
 {
-	unsigned int bits, iso8859, iso2022, iso10646;
+	unsigned int iso8859, iso2022, iso10646;
 	CharInfo *info;
 	iconv_t cd;
 	FILE *fp;
@@ -99,7 +100,7 @@ int main (int argc, char **argv)
 	
 	fp = fopen ("iconv-detect.h", "w");
 	if (fp == NULL)
-		exit (255);
+		return (255);
 	
 	fprintf (fp, "/* This is an auto-generated header, DO NOT EDIT! */\n\n");
 	
@@ -181,5 +182,5 @@ int main (int argc, char **argv)
 	
 	fclose (fp);
 	
-	exit (0);
+	return (0);
 }

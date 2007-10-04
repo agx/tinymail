@@ -393,9 +393,6 @@ static void
 rename_folder(CamelStore *store, const char *old, const char *new, CamelException *ex)
 {
 	char *path = CAMEL_LOCAL_STORE (store)->toplevel_dir;
-	CamelLocalFolder *folder = NULL;
-	char *newibex = g_strdup_printf("%s%s.ibex", path, new);
-	char *oldibex = g_strdup_printf("%s%s.ibex", path, old);
 	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	/* try to rollback failures, has obvious races */
@@ -432,13 +429,9 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 
 	/* The (f)utility of this recovery effort is quesitonable */
 
-base_failed:
 	xrename(new, old, path, ".cmeta", TRUE, ex);
-
-cmeta_failed:
 	xrename(new, old, path, ".ev-summary.mmap", TRUE, ex);
 
-summary_failed:
 
 #if 0
 	if (folder) {

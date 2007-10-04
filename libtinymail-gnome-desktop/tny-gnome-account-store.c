@@ -447,7 +447,7 @@ or
 	gconftool-2 -s /apps/tinymail/accounts/0/url_string -t string url_string
 
 */
-
+#if 0
 static void
 tny_gnome_account_store_add_account (TnyAccountStore *self, TnyAccount *account, const gchar *type)
 {
@@ -483,6 +483,7 @@ tny_gnome_account_store_add_account (TnyAccountStore *self, TnyAccount *account,
 
 	return;
 }
+#endif
 
 
 static TnyDevice*

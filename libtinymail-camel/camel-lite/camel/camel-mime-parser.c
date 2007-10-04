@@ -1573,14 +1573,14 @@ tail_recurse:
 
 		h = s->parts;
 		do {
-			hb = folder_scan_content(s, &state, databuffer, datalength);
+			hb = (struct _header_scan_stack **)folder_scan_content(s, &state, databuffer, datalength);
 			if (s->scan_pre_from && *datalength > 0) {
 				d(printf("got pre-from content %d bytes\n", *datalength));
 				return;
 			}
-		} while (hb==h && *datalength>0);
+		} while (hb == ((struct _header_scan_stack **)h) && *datalength>0);
 
-		if (*datalength==0 && hb==h) {
+		if (*datalength==0 && hb== ((struct _header_scan_stack **)h)) {
 			d(printf("found 'From '\n"));
 			s->start_of_from = folder_tell(s);
 			folder_scan_skip_line(s, h->from_line);
@@ -1663,7 +1663,7 @@ tail_recurse:
 		f = s->filters;
 		
 		do {
-			hb = folder_scan_content (s, &state, databuffer, datalength);
+			hb = (struct _header_scan_stack **) folder_scan_content (s, &state, databuffer, datalength);
 
 			d(printf ("\n\nOriginal content: '"));
 			d(fwrite(*databuffer, sizeof(char), *datalength, stdout));
@@ -1680,7 +1680,7 @@ tail_recurse:
 				}
 				return;
 			}
-		} while (hb == h && *datalength > 0);
+		} while (hb == ((struct _header_scan_stack **)h) && *datalength > 0);
 		
 		/* check for any filter completion data */
 		while (f) {
@@ -1707,7 +1707,7 @@ tail_recurse:
 		seenlast = FALSE;
 		do {
 			do {
-				hb = folder_scan_content(s, &state, databuffer, datalength);
+				hb = (struct _header_scan_stack **) folder_scan_content(s, &state, databuffer, datalength);
 				if (*datalength>0) {
 					/* instead of a new state, we'll just store it locally and provide
 					   an accessor function */
@@ -1723,9 +1723,9 @@ tail_recurse:
 						g_byte_array_append(h->pretext, (guchar*) *databuffer, *datalength);
 					}
 				}
-			} while (hb==h && *datalength>0);
+			} while (hb== ((struct _header_scan_stack **)h) && *datalength>0);
 			h->prestage++;
-			if (*datalength==0 && hb==h && !seenlast) {
+			if (*datalength==0 && hb== ((struct _header_scan_stack **)h) && !seenlast) {
 				d(printf("got boundary: %s last=%d\n", hb->boundary, state));
 				s->start_of_boundary = folder_tell(s);
 				folder_scan_skip_line(s, NULL);

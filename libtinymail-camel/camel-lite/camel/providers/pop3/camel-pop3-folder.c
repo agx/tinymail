@@ -674,7 +674,7 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 	temp = time(&temp);
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
-		return;
+		return -1;
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL)
@@ -682,7 +682,7 @@ camel_pop3_delete_old(CamelFolder *folder, int days_to_delete, CamelException *e
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
 		if (camel_exception_is_set (ex)) {
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
-			return;
+			return -1;
 		}
 	}
 

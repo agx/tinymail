@@ -45,7 +45,7 @@ int main (int argc, char **argv)
 {
 	const char *from = "Some Text \xA4";
 	const char *utf8 = "Some Text \xC2\xA4";
-	char *transbuf = malloc (20), *trans = transbuf;
+	char *transbuf = (char *) malloc (20), *trans = transbuf;
 	iconv_t cd;
 	size_t from_len = strlen (from), utf8_len = 20;
 	size_t utf8_real_len = strlen (utf8);
@@ -53,18 +53,18 @@ int main (int argc, char **argv)
 #ifdef HAVE_GNU_GET_LIBC_VERSION
 	/* glibc 2.1.2's iconv is broken in hard to test ways. */
 	if (!strcmp (gnu_get_libc_version (), "2.1.2"))
-		exit (1);
+		return (1);
 #endif
 
 	cd = iconv_open ("UTF-8", "ISO-8859-1");
 	if (cd == (iconv_t) -1)
-		exit (1);
+		return (1);
 	if (iconv (cd, &from, &from_len, &trans, &utf8_len) == -1 || from_len != 0)
-		exit (1);
+		return (1);
 	if (memcmp (utf8, transbuf, utf8_real_len) != 0)
-		exit (1);
+		return (1);
 
-	exit (0);
+	return (0);
 }]])],[ac_cv_libiconv_utf8=yes],[ac_cv_libiconv_utf8=no; have_iconv=no],[ac_cv_libiconv_utf8=no; have_iconv=no]))
 fi
 

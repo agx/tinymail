@@ -550,6 +550,7 @@ camel_imap_message_cache_get (CamelImapMessageCache *cache, const char *uid,
 	return stream;
 }
 
+char *strcasestr(const char *haystack, const char *needle);
 
 static int 
 recursive_insanity (CamelStreamBuffer *stream, CamelStream *to, gchar *boundary_in, gchar *root_boundary)
