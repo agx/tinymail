@@ -104,8 +104,11 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			while (!tny_iterator_is_done (niter))
 			{
 				TnyFolder *ifound = TNY_FOLDER (tny_iterator_get_current (niter));
-				if (citem == (GObject *) ifound)
+				if (citem == (GObject *) ifound) {
+					if (mark_for_removal)
+						g_object_unref (mark_for_removal);
 					mark_for_removal = g_object_ref (ifound);
+				}
 				g_object_unref (ifound);
 				tny_iterator_next (niter);
 			}
