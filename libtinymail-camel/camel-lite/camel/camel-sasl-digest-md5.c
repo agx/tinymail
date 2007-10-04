@@ -648,7 +648,7 @@ generate_response (struct _DigestChallenge *challenge, const char *host,
 	resp->nonce = g_strdup (challenge->nonce);
 	
 	/* generate the cnonce */
-	bgen = g_strdup_printf ("%p:%lu:%lu", resp,
+	bgen = g_strdup_printf ("%p:%lu:%lu", (void *) resp,
 				(unsigned long) getpid (),
 				(unsigned long) time (0));
 	md5_get_digest (bgen, strlen (bgen), (guchar*) digest);

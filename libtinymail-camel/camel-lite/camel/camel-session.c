@@ -443,12 +443,15 @@ gboolean
 camel_session_alert_user_with_id (CamelSession *session, CamelSessionAlertType type,
 			  ExceptionId id, const gchar* message, gboolean cancel, CamelService *service)
 {
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	gboolean result;
+
 	g_return_val_if_fail (message, FALSE);
 
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	camel_exception_set (&ex, id, message);
-	gboolean result = camel_session_alert_user (session, type, &ex, cancel, service);
+	result = camel_session_alert_user (session, type, &ex, cancel, service);
 	camel_exception_clear (&ex);
+
 	return result;
 }
 

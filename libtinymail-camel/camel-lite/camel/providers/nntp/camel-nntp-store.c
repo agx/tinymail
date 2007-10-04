@@ -159,7 +159,7 @@ xover_setup(CamelNNTPStore *store, CamelException *ex)
 enum {
 	MODE_CLEAR,
 	MODE_SSL,
-	MODE_TLS,
+	MODE_TLS
 };
 
 #ifdef HAVE_SSL

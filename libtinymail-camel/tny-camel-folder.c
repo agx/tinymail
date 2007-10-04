@@ -2413,7 +2413,8 @@ tny_camel_folder_get_msg_async_cancelled_callback (gpointer thr_user_data)
 static void
 tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async_func (self, header, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async_func (self, header, callback, status_callback, user_data);
+	return;
 }
 
 

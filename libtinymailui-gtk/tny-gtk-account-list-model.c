@@ -230,9 +230,10 @@ tny_gtk_account_list_model_copy_the_list (TnyList *self)
 {
 	TnyGtkAccountListModel *me = (TnyGtkAccountListModel*)self;
 	TnyGtkAccountListModel *copy = g_object_new (TNY_TYPE_GTK_ACCOUNT_LIST_MODEL, NULL);
+	GList *list_copy = NULL;
 
 	g_mutex_lock (me->iterator_lock);
-	GList *list_copy = g_list_copy (me->first);
+	list_copy = g_list_copy (me->first);
 	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
 	copy->first = list_copy;
 	g_mutex_unlock (me->iterator_lock);    
@@ -275,18 +276,18 @@ tny_gtk_account_list_model_get_type (void)
 		  NULL
 		};
 
-		type = g_type_register_static (GTK_TYPE_LIST_STORE, "TnyGtkAccountListModel",
-					    &info, 0);
-
-
 		static const GInterfaceInfo tny_list_info = {
 			(GInterfaceInitFunc) tny_list_init,
 			NULL,
 			NULL
 		};
 
+		type = g_type_register_static (GTK_TYPE_LIST_STORE, "TnyGtkAccountListModel",
+					    &info, 0);
+
 		g_type_add_interface_static (type, TNY_TYPE_LIST,
 					     &tny_list_info);
+
 
 	}
 

@@ -687,6 +687,7 @@ tny_gtk_folder_store_tree_model_copy_the_list (TnyList *self)
 {
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*)self;
 	TnyGtkFolderStoreTreeModel *copy = g_object_new (TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL, NULL);
+	GList *list_copy = NULL;
 
 	/* This only copies the TnyList pieces. The result is not a correct or good
 	   TnyHeaderListModel. But it will be a correct TnyList instance. It's the 
@@ -696,7 +697,7 @@ tny_gtk_folder_store_tree_model_copy_the_list (TnyList *self)
 	   copy of the list-nodes of course. */
 
 	g_mutex_lock (me->iterator_lock);
-	GList *list_copy = g_list_copy (me->first);
+	list_copy = g_list_copy (me->first);
 	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
 	copy->first = list_copy;
 	g_mutex_unlock (me->iterator_lock);
@@ -1027,9 +1028,6 @@ tny_gtk_folder_store_tree_model_get_type (void)
 		  tny_gtk_folder_store_tree_model_instance_init    /* instance_init */
 		};
 
-		type = g_type_register_static (GTK_TYPE_TREE_STORE, "TnyGtkFolderStoreTreeModel",
-					    &info, 0);
-
 		static const GInterfaceInfo tny_list_info = {
 			(GInterfaceInitFunc) tny_list_init,
 			NULL,
@@ -1047,6 +1045,9 @@ tny_gtk_folder_store_tree_model_get_type (void)
 			NULL,
 			NULL
 		};
+
+		type = g_type_register_static (GTK_TYPE_TREE_STORE, "TnyGtkFolderStoreTreeModel",
+					    &info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_LIST,
 					     &tny_list_info);

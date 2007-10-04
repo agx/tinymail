@@ -341,7 +341,9 @@ camel_folder_delete_attachments (CamelFolder *folder, const char *uid)
 {
 	g_return_if_fail (CAMEL_IS_FOLDER (folder));
 
-	return CF_CLASS (folder)->delete_attachments (folder, uid);
+	CF_CLASS (folder)->delete_attachments (folder, uid);
+
+	return;
 }
 
 void 
@@ -349,7 +351,9 @@ camel_folder_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessa
 {
 	g_return_if_fail (CAMEL_IS_FOLDER (folder));
 
-	return CF_CLASS (folder)->rewrite_cache (folder, uid, msg);
+	CF_CLASS (folder)->rewrite_cache (folder, uid, msg);
+
+	return;
 }
 
 static int

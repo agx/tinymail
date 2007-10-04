@@ -37,7 +37,7 @@
 static CamelStreamClass *parent_class = NULL;
 
 enum {
-	BUF_USER = 1<<0,	/* user-supplied buffer, do not free */
+	BUF_USER = 1<<0	/* user-supplied buffer, do not free */
 };
 
 #define BUF_SIZE 1024

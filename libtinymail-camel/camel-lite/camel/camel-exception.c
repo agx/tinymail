@@ -135,7 +135,7 @@ void
 camel_exception_set (CamelException *ex, ExceptionId id, const char *desc)
 {
 	if (camel_debug("exception"))
-		printf("CamelException.set(%p, %u, '%s')\n", ex, id, desc);
+		printf("CamelException.set(%p, %u, '%s')\n", (void *) ex, id, desc);
 	if (!ex)
 		return;
 	ex->id = id;
@@ -176,7 +176,7 @@ camel_exception_setv (CamelException *ex, ExceptionId id, const char *format, ..
 	va_end (args);
 
 	if (camel_debug("exception"))
-		printf("CamelException.setv(%p, %u, '%s')\n", ex, id, desc);
+		printf("CamelException.setv(%p, %u, '%s')\n", (void *) ex, id, desc);
 	
 	if (!ex) {
 		g_free(desc);
@@ -202,7 +202,7 @@ camel_exception_xfer (CamelException *ex_dst,
 		      CamelException *ex_src)
 {
 	if (ex_src == NULL) {
-		w(g_warning ("camel_exception_xfer: trying to transfer NULL exception to %p\n", ex_dst));
+		/* w(g_warning ("camel_exception_xfer: trying to transfer NULL exception to %p\n", ex_dst)); */
 		return;
 	}
 

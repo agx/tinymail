@@ -374,7 +374,7 @@ set_boundary (CamelMultipart *multipart, const char *boundary)
 
 	if (!boundary) {
 		/* Generate a fairly random boundary string. */
-		bgen = g_strdup_printf ("%p:%lu:%lu", multipart,
+		bgen = g_strdup_printf ("%p:%lu:%lu", (void *) multipart,
 					(unsigned long) getpid(),
 					(unsigned long) time(0));
 		md5_get_digest (bgen, strlen ((char*)bgen), (guchar*) digest);

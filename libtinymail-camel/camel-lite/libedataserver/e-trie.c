@@ -209,10 +209,10 @@ dump_trie (struct _trie_state *s, int depth)
 	p[depth * 2] = '\0';
 	
 	fprintf (stderr, "%s[state] %p: final=%d; pattern-id=%d; fail=%p\n",
-		 p, s, s->final, s->id, s->fail);
+		 p, (void *) s, s->final, s->id, (void *) s->fail);
 	m = s->match;
 	while (m) {
-		fprintf (stderr, " %s'%c' -> %p\n", p, m->c, m->state);
+		fprintf (stderr, " %s'%c' -> %p\n", p, m->c, (void *) m->state);
 		if (m->state)
 			dump_trie (m->state, depth + 1);
 		

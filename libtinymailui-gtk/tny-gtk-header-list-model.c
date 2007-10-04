@@ -769,6 +769,7 @@ tny_gtk_header_list_model_copy_the_list (TnyList *self)
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	TnyGtkHeaderListModel *copy = g_object_new (TNY_TYPE_GTK_HEADER_LIST_MODEL, NULL);
 	TnyGtkHeaderListModelPriv *cpriv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (copy);
+	GPtrArray *items_copy = NULL;
 
 	/* This only copies the TnyList pieces. The result is not a
 	   correct or good TnyGtkHeaderListModel. But it will be a correct
@@ -779,8 +780,7 @@ tny_gtk_header_list_model_copy_the_list (TnyList *self)
 	   only a copy of the list-nodes of course. */
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
-
-	GPtrArray *items_copy = g_ptr_array_sized_new (priv->items->len);
+	items_copy = g_ptr_array_sized_new (priv->items->len);
 	g_ptr_array_foreach (priv->items, copy_it, items_copy);
 	cpriv->items = items_copy;
 	g_static_rec_mutex_unlock (priv->iterator_lock);

@@ -48,9 +48,8 @@ G_BEGIN_DECLS
 #ifndef TNY_SHARED_H
 typedef struct _TnyHeader TnyHeader;
 typedef struct _TnyHeaderIface TnyHeaderIface;
-typedef enum _TnyHeaderFlags TnyHeaderFlags;
-typedef enum _TnyHeaderPriorityFlags TnyHeaderPriorityFlags;
 #endif
+
 
 enum _TnyHeaderFlags 
 {
@@ -63,9 +62,11 @@ enum _TnyHeaderFlags
 	TNY_HEADER_FLAG_CACHED = 1<<6,
 	TNY_HEADER_FLAG_PARTIAL = 1<<7,
 	TNY_HEADER_FLAG_EXPUNGED = 1<<8,
-	TNY_HEADER_FLAG_PRIORITY = 1<<9|1<<10,
+	TNY_HEADER_FLAG_PRIORITY = 1<<9|1<<10
 	/* Keep below 1<<12 (internally used bits) */
 };
+
+typedef enum _TnyHeaderFlags TnyHeaderFlags;
 
 #define TNY_TYPE_HEADER_PRIORITY_FLAGS (tny_header_priority_flags_get_type())
 
@@ -76,6 +77,8 @@ enum _TnyHeaderPriorityFlags
 	TNY_HEADER_FLAG_LOW_PRIORITY = 0<<9|1<<10,
 	TNY_HEADER_FLAG_SUSPENDED_PRIORITY = 1<<9|0<<10
 };
+
+typedef enum _TnyHeaderPriorityFlags TnyHeaderPriorityFlags;
 
 struct _TnyHeaderIface
 {
@@ -98,7 +101,7 @@ struct _TnyHeaderIface
 	void (*set_subject_func) (TnyHeader *self, const gchar *subject);
 	void (*set_to_func) (TnyHeader *self, const gchar *to);
 	void (*set_replyto_func) (TnyHeader *self, const gchar *to);
-        TnyFolder* (*get_folder_func) (TnyHeader *self);
+	TnyFolder* (*get_folder_func) (TnyHeader *self);
 	TnyHeaderFlags (*get_flags_func) (TnyHeader *self);
 	void (*set_flags_func) (TnyHeader *self, TnyHeaderFlags mask);
 	void (*unset_flags_func) (TnyHeader *self, TnyHeaderFlags mask);

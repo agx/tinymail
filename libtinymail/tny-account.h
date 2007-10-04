@@ -33,12 +33,10 @@ G_BEGIN_DECLS
 #define TNY_ACCOUNT_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_ACCOUNT, TnyAccountIface))
 
 #ifndef TNY_SHARED_H
-typedef enum _TnyAccountType TnyAccountType;
 typedef struct _TnyAccount TnyAccount;
 typedef struct _TnyAccountIface TnyAccountIface;
-typedef enum _TnyAccountSignal TnyAccountSignal;
-typedef enum _TnyConnectionStatus TnyConnectionStatus;
 #endif
+
 
 #define TNY_TYPE_CONNECTION_STATUS (tny_connection_status_get_type())
 
@@ -52,6 +50,8 @@ enum _TnyConnectionStatus
 	TNY_CONNECTION_STATUS_INIT
 };
 
+typedef enum _TnyConnectionStatus TnyConnectionStatus;
+
 #define TNY_TYPE_ACCOUNT_TYPE (tny_account_type_get_type())
 
 enum _TnyAccountType
@@ -61,6 +61,8 @@ enum _TnyAccountType
 	TNY_ACCOUNT_TYPE_COMBINED
 };
 
+typedef enum _TnyAccountType TnyAccountType;
+
 #define TNY_TYPE_ACCOUNT_SIGNAL (tny_account_signal_type_get_type())
 
 enum _TnyAccountSignal
@@ -69,6 +71,8 @@ enum _TnyAccountSignal
 	TNY_ACCOUNT_CHANGED,
 	TNY_ACCOUNT_LAST_SIGNAL
 };
+
+typedef enum _TnyAccountSignal TnyAccountSignal;
 
 extern guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
 

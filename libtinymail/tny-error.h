@@ -26,6 +26,7 @@
 
 #define TNY_TYPE_ERROR_DOMAIN (tny_error_domain_get_type())
 
+
 enum _TnyErrorDomain
 {
 	TNY_FOLDER_ERROR = 1,
@@ -35,6 +36,8 @@ enum _TnyErrorDomain
 	TNY_ACCOUNT_STORE_ERROR = 5,
 	TNY_SEND_QUEUE_ERROR = 6
 };
+
+typedef enum _TnyErrorDomain TnyErrorDomain;
 
 #define TNY_TYPE_ERROR (tny_error_get_type())
 
@@ -127,8 +130,10 @@ enum _TnyError
 
 	TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT = 18,
 
-	TNY_FOLDER_ERROR_REMOVE_MSGS = 19,
+	TNY_FOLDER_ERROR_REMOVE_MSGS = 19
 };
+
+typedef enum _TnyError TnyError;
 
 GType tny_error_domain_get_type (void);
 GType tny_error_get_type (void);

@@ -48,6 +48,9 @@ enum _TnyFolderStoreChangeChanged
 	TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS = 1<<1
 };
 
+typedef enum _TnyFolderStoreChangeChanged TnyFolderStoreChangeChanged;
+
+
 struct _TnyFolderStoreChange
 {
 	GObject parent;

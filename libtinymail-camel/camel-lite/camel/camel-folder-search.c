@@ -142,7 +142,7 @@ free_mempool(void *key, void *value, void *data)
 	GPtrArray *uids = key;
 	EMemPool *pool = value;
 
-	g_warning("Search closed with outstanding result unfreed: %p", uids);
+	g_warning("Search closed with outstanding result unfreed: %p", (void *) uids);
 
 	g_ptr_array_free(uids, TRUE);
 	e_mempool_destroy(pool);

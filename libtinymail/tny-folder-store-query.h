@@ -51,16 +51,17 @@ enum _TnyFolderStoreQueryOption
 	TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME = 1<<3,
 	TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID = 1<<4,
 	TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE = 1<<5,
-	TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX = 1<<6,
+	TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX = 1<<6
 };
 
 #ifndef TNY_SHARED_H
 typedef struct _TnyFolderStoreQuery TnyFolderStoreQuery;
 typedef struct _TnyFolderStoreQueryClass TnyFolderStoreQueryClass;
-typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
 #endif
+
+typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 
 struct _TnyFolderStoreQueryItem 
 {

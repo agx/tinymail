@@ -95,8 +95,9 @@ tny_gtk_msg_window_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 
 	if (msg)
 	{
-		g_assert (TNY_IS_MSG (msg));
 		const gchar *subject;
+
+		g_assert (TNY_IS_MSG (msg));
 
 		header = TNY_HEADER (tny_msg_get_header (msg));
 		subject = tny_header_get_subject (header);
@@ -115,7 +116,8 @@ tny_gtk_msg_window_set_msg_default (TnyMsgView *self, TnyMsg *msg)
 static void 
 tny_gtk_msg_window_clear (TnyMsgView *self)
 {
-	return TNY_GTK_MSG_WINDOW_GET_CLASS (self)->clear_func (self);
+	TNY_GTK_MSG_WINDOW_GET_CLASS (self)->clear_func (self);
+	return;
 }
 
 static void 

@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <tny-folder.h>
 #include <tny-msg.h>
 #include <tny-header.h>
 

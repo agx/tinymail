@@ -102,9 +102,10 @@ tny_simple_list_copy_the_simple_list (TnyList *self)
 	TnySimpleList *copy = g_object_new (TNY_TYPE_SIMPLE_LIST, NULL);
 	TnySimpleListPriv *priv = TNY_SIMPLE_LIST_GET_PRIVATE (self);
 	TnySimpleListPriv *cpriv = TNY_SIMPLE_LIST_GET_PRIVATE (copy);
+	GList *list_copy = NULL;
 
 	g_mutex_lock (priv->iterator_lock);
-	GList *list_copy = g_list_copy (priv->first);
+	list_copy = g_list_copy (priv->first);
 	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
 	cpriv->first = list_copy;
 	g_mutex_unlock (priv->iterator_lock);

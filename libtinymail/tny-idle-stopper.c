@@ -106,10 +106,12 @@ tny_idle_stopper_new (void)
  **/
 TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper)
 {
+	TnyIdleStopper *result = NULL;
+
 	g_return_val_if_fail (stopper, NULL);
 	g_return_val_if_fail (stopper->refcount, NULL);
 
-	TnyIdleStopper *result = g_slice_new0 (TnyIdleStopper);
+	result = g_slice_new0 (TnyIdleStopper);
 
 	/* Share the gboolean: */
 	result->stopped = stopper->stopped;

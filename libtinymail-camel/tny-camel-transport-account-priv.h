@@ -24,7 +24,7 @@ typedef struct _TnyCamelTransportAccountPriv TnyCamelTransportAccountPriv;
 
 struct _TnyCamelTransportAccountPriv
 {
-
+	int i;
 };
 
 

@@ -413,7 +413,7 @@ camel_file_util_decode_string (FILE *in, char **str)
 int
 camel_file_util_encode_fixed_string (FILE *out, const char *str, size_t len)
 {
-	char buf[len];
+	char *buff = (char *) alloca (len);
 
 	/* Don't allow empty strings to be written */
 	if (len < 1)
@@ -423,10 +423,10 @@ camel_file_util_encode_fixed_string (FILE *out, const char *str, size_t len)
 	if (len > 65536)
 		len = 65536;
 		
-	memset(buf, 0x00, len);
-	g_strlcpy(buf, str, len);
+	memset(buff, 0x00, len);
+	g_strlcpy(buff, str, len);
 
-	if (fwrite (buf, len, 1, out) == len)
+	if (fwrite (buff, len, 1, out) == len)
 		return 0;
 
 	return -1;

@@ -187,16 +187,15 @@ tny_gtk_password_dialog_get_type (void)
 		  tny_gtk_password_dialog_instance_init    /* instance_init */
 		};
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyGtkPasswordDialog",
-			&info, 0);
-
 		static const GInterfaceInfo tny_password_getter_info = 
 		{
 		  (GInterfaceInitFunc) tny_password_getter_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
+
+		type = g_type_register_static (G_TYPE_OBJECT,
+			"TnyGtkPasswordDialog", &info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_PASSWORD_GETTER, 
 			&tny_password_getter_info);

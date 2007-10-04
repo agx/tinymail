@@ -110,7 +110,7 @@ enum {
 	UPDATE_NONE,
 	UPDATE_ADD,
 	UPDATE_REMOVE,
-	UPDATE_RENAME,
+	UPDATE_RENAME
 };
 
 /* update the .folders file if it exists, or create it if it doesn't */

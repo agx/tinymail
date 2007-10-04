@@ -279,7 +279,7 @@ pop3_get_folder_info_online (CamelStore *store, const char *top, guint32 flags, 
 enum {
 	MODE_CLEAR,
 	MODE_SSL,
-	MODE_TLS,
+	MODE_TLS
 };
 
 #ifdef HAVE_SSL
@@ -921,7 +921,7 @@ cmd_stat (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	if (!line)
 		return 0;
 
-	sscanf((char *) line, "+OK %d %d", &info->items, &info->bytes);
+	sscanf((char *) line, "+OK %d %d", (int *) &info->items, (int *) &info->bytes);
 
 	return 1;
 }

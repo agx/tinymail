@@ -775,7 +775,7 @@ imap_get_capability (CamelService *service, CamelException *ex)
 enum {
 	MODE_CLEAR,
 	MODE_SSL,
-	MODE_TLS,
+	MODE_TLS
 };
 
 #ifdef HAVE_SSL

@@ -142,9 +142,10 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 		{
 			if (!gtk_save_to_file (uri, part))
 			{
+				GtkWidget *errd;
+
 				gtk_widget_destroy (GTK_WIDGET (dialog));
 				destr = TRUE;
-				GtkWidget *errd;
 				errd = gtk_message_dialog_new (NULL,
 					GTK_DIALOG_DESTROY_WITH_PARENT,
 					GTK_MESSAGE_ERROR,

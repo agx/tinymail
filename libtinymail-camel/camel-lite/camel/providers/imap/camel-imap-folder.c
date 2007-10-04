@@ -461,7 +461,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 
 	for (i = 0; i < response->untagged->len; i++) 
 	{
-		resp = response->untagged->pdata[i] + 2;
+		resp = ((char*)response->untagged->pdata[i]) + 2;
 
 		if (!g_ascii_strncasecmp (resp, "FLAGS ", 6) && !perm_flags) {
 			resp += 6;
@@ -1024,8 +1024,9 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 			{
 			  if (flags != iinfo->server_flags) 
 			  {
-				camel_folder_summary_touch (folder->summary);
 				guint32 server_set, server_cleared;
+
+				camel_folder_summary_touch (folder->summary);
 				server_set = flags & ~iinfo->server_flags;
 				server_cleared = iinfo->server_flags & ~flags;
 				iinfo->info.flags = (iinfo->info.flags | server_set) & ~server_cleared;
@@ -3240,8 +3241,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 					{
 						for (r = curlen-1; r >= sequence -1; r--)
 						{ 
+							CamelMessageInfo *ri;
 							g_warning ("Problem with your local summary store (too much), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
-							CamelMessageInfo *ri = g_ptr_array_index (folder->summary->messages, r);
+							ri = g_ptr_array_index (folder->summary->messages, r);
 							if (ri) {
 								/* camel_folder_change_info_remove_uid (mchange, camel_message_info_uid (mi)); */
 								((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
@@ -3389,8 +3391,9 @@ process_idle_response (IdleResponse *idle_resp)
 			{
 				if (fid->flags != iinfo->server_flags) 
 				{
-					camel_folder_summary_touch (idle_resp->folder->summary);
 					guint32 server_set, server_cleared;
+
+					camel_folder_summary_touch (idle_resp->folder->summary);
 					server_set = fid->flags & ~iinfo->server_flags;
 					server_cleared = iinfo->server_flags & ~fid->flags;
 					iinfo->info.flags = (iinfo->info.flags | server_set) & ~server_cleared;
@@ -3473,9 +3476,9 @@ idle_response_new (CamelFolder *folder)
 static void
 idle_response_free (IdleResponse *idle_resp)
 {
-	idle_debug ("idle_response_free\n");
-
 	guint i=0;
+
+	idle_debug ("idle_response_free\n");
 
 	if (idle_resp->expunged)
 		g_array_free (idle_resp->expunged, TRUE);

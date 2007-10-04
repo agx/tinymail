@@ -48,6 +48,9 @@ enum _TnyAlertType
 	TNY_ALERT_TYPE_ERROR
 };
 
+typedef enum _TnyAlertType TnyAlertType;
+
+
 #define TNY_TYPE_GET_ACCOUNTS_REQUEST_TYPE (tny_get_accounts_request_type_get_type())
 
 enum _TnyGetAccountsRequestType
@@ -56,6 +59,9 @@ enum _TnyGetAccountsRequestType
 	TNY_ACCOUNT_STORE_STORE_ACCOUNTS,
 	TNY_ACCOUNT_STORE_BOTH
 };
+
+typedef enum _TnyGetAccountsRequestType TnyGetAccountsRequestType;
+
 
 extern guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 

@@ -1023,7 +1023,7 @@ camel_object_cast(CamelObject *o, CamelType ctype)
 		k = k->parent;
 	}
 
-	g_warning("Object %p (class '%s') doesn't have '%s' in its hierarchy", o, o->klass->name, ctype->name);
+	g_warning("Object %p (class '%s') doesn't have '%s' in its hierarchy", (void *) o, o->klass->name, ctype->name);
 
 	return NULL;
 }
@@ -1394,7 +1394,7 @@ camel_object_unhook_event(void *vo, const char * name, CamelObjectEventHookFunc 
 	camel_object_unget_hooks(obj);
 
 	g_warning("camel_object_unhook_event: cannot find hook/data pair %p/%p in an instance of `%s' attached to `%s'",
-		  func, data, obj->klass->name, name);
+		  (void *) func, data, obj->klass->name, name);
 	g_static_rec_mutex_unlock (&hooks_lock);
 }
 
@@ -1891,7 +1891,7 @@ object_class_dump_tree_rec(CamelType root, int depth)
 			CamelHookPair *pair = root->hooks;
 
 			while (pair) {
-				printf("%s  event '%s' prep %p\n", p, pair->name, pair->func.prep);
+				printf("%s  event '%s' prep %p\n", p, pair->name, (void *) pair->func.prep);
 				pair = pair->next;
 			}
 		}

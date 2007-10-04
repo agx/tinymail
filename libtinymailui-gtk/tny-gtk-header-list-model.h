@@ -38,7 +38,6 @@ G_BEGIN_DECLS
 
 typedef struct _TnyGtkHeaderListModel TnyGtkHeaderListModel;
 typedef struct _TnyGtkHeaderListModelClass TnyGtkHeaderListModelClass;
-typedef enum _TnyGtkHeaderListModelColumn TnyGtkHeaderListModelColumn;
 
 #define TNY_TYPE_GTK_HEADER_LIST_MODEL_COLUMN (tny_gtk_header_list_model_column_get_type())
 
@@ -58,6 +57,7 @@ enum _TnyGtkHeaderListModelColumn
 	TNY_GTK_HEADER_LIST_MODEL_N_COLUMNS
 };
 
+typedef enum _TnyGtkHeaderListModelColumn TnyGtkHeaderListModelColumn;
 
 struct _TnyGtkHeaderListModel 
 {

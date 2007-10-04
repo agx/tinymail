@@ -282,6 +282,8 @@ load_accounts (TnySummaryView *self, gboolean first_time)
 	TnyAccountStore *account_store = priv->account_store;
 	GtkTreeModel *sortable, *maccounts, *mailbox_model;
 	TnyFolderStoreQuery *query;
+	TnyList *accounts;
+	TnyList *saccounts;
 
 	/* Show only subscribed folders */
 	query = tny_folder_store_query_new ();
@@ -292,10 +294,10 @@ load_accounts (TnySummaryView *self, gboolean first_time)
 	   TnyList and the GtkTreeModel interfaces) */
 	mailbox_model = tny_gtk_folder_store_tree_model_new (NULL);
 
-	g_object_unref (G_OBJECT (query));
+	g_object_unref (query);
 
-	TnyList *accounts = TNY_LIST (mailbox_model);
-	TnyList *saccounts = tny_simple_list_new ();
+	accounts = TNY_LIST (mailbox_model);
+	saccounts = tny_simple_list_new ();
 
 	maccounts = tny_gtk_account_list_model_new ();
 
@@ -449,20 +451,21 @@ killacc_button_toggled (GtkToggleButton *togglebutton, gpointer user_data)
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyList *accounts = tny_simple_list_new ();
 	TnyIterator *a_iter;
+	GObject *a_cur;
 
 	tny_account_store_get_accounts (priv->account_store, accounts, 
 		TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
 
 	a_iter = tny_list_create_iterator (accounts);
 
-	GObject *a_cur = tny_iterator_get_current (a_iter);
+	a_cur = tny_iterator_get_current (a_iter);
 
 	g_object_unref (a_iter);
 	g_object_unref (accounts);
 
 	printf ("%d\n", a_cur->ref_count);
 
-	/* This is indeed incorrect, don't use this */
+	/* This is indeed incorrect, don't do this (it's a test) */
 	g_object_unref (a_cur);
 	g_object_unref (a_cur);
 	g_object_unref (a_cur);
