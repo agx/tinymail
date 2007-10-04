@@ -180,6 +180,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			if (mark_for_removal) {
 				printf ("We need to remove %s\n", 
 					tny_folder_get_id (TNY_FOLDER (mark_for_removal)));
+				g_object_unref (mark_for_removal);
 			}
 		}
 
