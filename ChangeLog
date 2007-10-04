@@ -3,6 +3,7 @@
 	- -Wall warnings
 	- -pedantic warnings
 	- TnyCamelSendQueue should not error if the TnyDevice went offline
+	- Bugfixes in TnyGtkFolderStoreTreeModel
 
 2007-10-03  Jose Dapena Paz  <jdapena@igalia.com>
 

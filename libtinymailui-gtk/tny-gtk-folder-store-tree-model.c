@@ -28,6 +28,7 @@
 #include <tny-folder.h>
 #include <tny-folder-store.h>
 #include <tny-simple-list.h>
+#include <tny-merge-folder.h>
 
 #include <tny-store-account.h>
 #include <tny-folder-store-change.h>
@@ -66,11 +67,11 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 		gboolean found = FALSE;
 		GObject *mark_for_removal = NULL;
 
-		if (TNY_IS_FOLDER (instance))
+		if (instance && (TNY_IS_FOLDER (instance) || TNY_IS_MERGE_FOLDER (instance)))
 			folder = TNY_FOLDER (instance);
 
-		if (TNY_IS_FOLDER_STORE (folder))
-			folder_store =  TNY_FOLDER_STORE (instance);
+		if (instance && (TNY_IS_FOLDER_STORE (instance) || TNY_IS_MERGE_FOLDER (instance)))
+			folder_store = TNY_FOLDER_STORE (instance);
 
 		/* We check whether we have this folder already in the tree, or 
 		 * whether it's a brand new one. If it's a new one, we'll add
@@ -123,16 +124,14 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			 * both a removal and a creation happens. Also when a 
 			 * rename happens: that's a removal and a creation. */
 
-			if (folder)
-			{
+			if (folder) {
 				tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
 				me->folder_observables = g_list_prepend (me->folder_observables, folder);
 			}
 
-			if (folder_store)
-			{
+			if (folder_store) {
 				tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
-				me->store_observables = g_list_prepend (me->store_observables, folder);
+				me->store_observables = g_list_prepend (me->store_observables, folder_store);
 			}
 
 
@@ -178,8 +177,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			if (folder)
 				tny_folder_poke_status (TNY_FOLDER (folder));
 		} else {
-			if (mark_for_removal)
-			{
+			if (mark_for_removal) {
 				printf ("We need to remove %s\n", 
 					tny_folder_get_id (TNY_FOLDER (mark_for_removal)));
 			}
