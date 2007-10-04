@@ -114,7 +114,7 @@ init_header_name_table (void)
 	g_hash_table_insert (header_name_table, "Content-Location", (gpointer)HEADER_CONTENT_LOCATION);
 	g_hash_table_insert (header_name_table, "Content-Type", (gpointer)HEADER_CONTENT_TYPE);
 
-	header_formatted_table = g_hash_table_new (camel_strcase_hash, (gpointer)camel_strcase_equal);
+	header_formatted_table = g_hash_table_new (camel_strcase_hash, camel_strcase_equal);
 	g_hash_table_insert(header_formatted_table, "Content-Type", (gpointer)write_raw);
 	g_hash_table_insert(header_formatted_table, "Content-Disposition", (gpointer)write_raw);
 	g_hash_table_insert(header_formatted_table, "To", (gpointer)write_raw);

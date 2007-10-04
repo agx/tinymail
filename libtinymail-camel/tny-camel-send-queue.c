@@ -24,6 +24,7 @@
 #include <tny-camel-send-queue.h>
 #include <tny-camel-shared.h>
 #include <tny-camel-msg.h>
+#include <tny-device.h>
 #include <tny-simple-list.h>
 #include <tny-folder.h>
 #include <tny-error.h>
@@ -266,6 +267,9 @@ thread_main (gpointer data)
 	TnyFolder *sentbox = NULL, *outbox = NULL;
 	guint i = 0, length = 0;
 	TnyList *list = NULL;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+	TnySessionCamelPriv *spriv = TNY_SESSION_CAMEL (apriv->session)->priv;
+	TnyDevice *device = g_object_ref (spriv->device);
 
 	g_object_ref (self); /* My own reference */
 	priv->is_running = TRUE;
@@ -297,7 +301,7 @@ thread_main (gpointer data)
 
 	priv->do_continue = TRUE;
 
-	while (length > 0 && priv->do_continue)
+	while (length > 0 && priv->do_continue && tny_device_is_online (device))
 	{
 		TnyHeader *header = NULL;
 		TnyMsg *msg = NULL;
@@ -312,7 +316,14 @@ thread_main (gpointer data)
 			GList *to_remove = NULL;
 			TnyIterator *giter = NULL;
 
-			tny_folder_get_headers (outbox, headers, TRUE, &ferror);
+			if (tny_device_is_online (device))
+				tny_folder_get_headers (outbox, headers, TRUE, &ferror);
+			else {
+				priv->is_running = FALSE;
+				g_mutex_unlock (priv->todo_lock);
+				g_mutex_unlock (priv->sending_lock);
+				goto errorhandler;
+			}
 
 			if (ferror != NULL)
 			{
@@ -367,7 +378,7 @@ thread_main (gpointer data)
 		}
 		g_mutex_unlock (priv->todo_lock);
 
-		if (header && TNY_IS_HEADER (header))
+		if (header && TNY_IS_HEADER (header) && tny_device_is_online (device))
 		{
 			TnyList *hassent = tny_simple_list_new ();
 			GError *err = NULL;
@@ -386,7 +397,7 @@ thread_main (gpointer data)
 					emit_error (self, header, msg, err, i, priv->total);
 					priv->do_continue = FALSE;
 				}
-			} else  {
+			} else {
 				emit_error (self, header, msg, err, i, priv->total);
 				priv->do_continue = FALSE;
 			}
@@ -407,14 +418,10 @@ thread_main (gpointer data)
 					priv->total--;
 				}
 			}
+			g_mutex_unlock (priv->todo_lock);
 
 			/* Emits msg-sent signal to inform msg has been sent */
-			/* This now happens in on_msg_sent_get_msg! 
-
-			if (priv->do_continue)
-				emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENT, i, priv->total); */
-
-			g_mutex_unlock (priv->todo_lock);
+			/* This now happens in on_msg_sent_get_msg! */
 
 			g_object_unref (hassent);
 
@@ -428,10 +435,12 @@ thread_main (gpointer data)
 		} else 
 		{
 			priv->is_running = FALSE;
-			/* Not good, let's just kill this thread */ 
+			/* Not good, or we just went offline, let's just kill this thread */ 
 			length = 0;
 			if (header && G_IS_OBJECT (header))
 				g_object_unref (header);
+			g_mutex_unlock (priv->sending_lock);
+			break;
 		}
 
 		g_mutex_unlock (priv->sending_lock);
@@ -444,6 +453,7 @@ errorhandler:
 
 	priv->is_running = FALSE;
 
+	g_object_unref (device);
 	g_object_unref (sentbox);
 	g_object_unref (outbox);
 	g_object_unref (self); /* The one added here (My own reference) */
@@ -571,7 +581,6 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 	priv->total++;
 	if (priv->total >= 1 && !priv->is_running)
 		create_worker (info->self);
-
 	if (info->self)
 		g_object_unref (info->self);
 	if (info->msg)
@@ -724,8 +733,6 @@ create_maildir (TnySendQueue *self, const gchar *name)
 
 	mdstore = camel_session_get_store(session, full_path, &ex);
 
-	/*	mdstore = _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->trans_account)); */
-
 	if (!camel_exception_is_set (&ex) && mdstore)
 	{
 		CamelFolder *cfolder = NULL;
@@ -734,8 +741,6 @@ create_maildir (TnySendQueue *self, const gchar *name)
 		if (!camel_exception_is_set (&ex) && cfolder)
 		{
 			CamelFolderInfo *iter;
-
-			/* camel_object_unref (CAMEL_OBJECT (cfolder)); */
 
 			iter = camel_store_get_folder_info (mdstore, name, 
 					CAMEL_STORE_FOLDER_INFO_FAST|CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL,&ex);
@@ -912,11 +917,13 @@ tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
 	g_return_if_fail (TNY_IS_CAMEL_TRANSPORT_ACCOUNT(trans_account));
 
 	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	if (priv->trans_account) {
+
+	if (priv->trans_account) 
+	{
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 		_tny_session_camel_unreg_queue (apriv->session, self);
 
-		g_object_unref (G_OBJECT(priv->trans_account));
+		g_object_unref (priv->trans_account);
 
 		if (priv->signal != -1)
 			g_signal_handler_disconnect (G_OBJECT (priv->trans_account), 
@@ -925,7 +932,7 @@ tny_camel_send_queue_set_transport_account (TnyCamelSendQueue *self,
 
 	priv->signal = (gint) g_signal_connect (G_OBJECT (trans_account),
 		"set-online-happened", G_CALLBACK (on_setonline_happened), self);
-	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(G_OBJECT(trans_account)));
+	priv->trans_account = TNY_TRANSPORT_ACCOUNT (g_object_ref(trans_account));
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 	_tny_session_camel_reg_queue (apriv->session, self);
 	tny_camel_send_queue_flush (TNY_CAMEL_SEND_QUEUE (self));
@@ -952,7 +959,7 @@ tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
 	priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	if (!priv->trans_account)
 		return NULL;
-	g_object_ref (G_OBJECT(priv->trans_account));
+	g_object_ref (priv->trans_account);
 
 	return TNY_CAMEL_TRANSPORT_ACCOUNT(priv->trans_account);
 }
