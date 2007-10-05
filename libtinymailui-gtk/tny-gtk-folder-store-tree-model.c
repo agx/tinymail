@@ -70,7 +70,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 		if (instance && (TNY_IS_FOLDER (instance) || TNY_IS_MERGE_FOLDER (instance)))
 			folder = TNY_FOLDER (instance);
 
-		if (instance && (TNY_IS_FOLDER_STORE (instance) || TNY_IS_MERGE_FOLDER (instance)))
+		if (instance && (TNY_IS_FOLDER_STORE (instance)))
 			folder_store = TNY_FOLDER_STORE (instance);
 
 		/* We check whether we have this folder already in the tree, or 
