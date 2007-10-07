@@ -6,6 +6,7 @@
 	* Merged camel-lite with upstream Camel revision 8099
 	* Merged bugfix from Matthew Barnes. More information here:
 	http://bugzilla.gnome.org/show_bug.cgi?id=437331
+	* Changed the address of FSF in the copyright notes
 
 2007-10-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
