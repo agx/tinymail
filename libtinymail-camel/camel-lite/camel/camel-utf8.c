@@ -16,7 +16,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
 
@@ -352,11 +352,12 @@ camel_utf8_utf7(const char *ptr)
  * Return value: 
  **/
 char *
-camel_utf8_ucs2(const char *ptr)
+camel_utf8_ucs2(const char *pptr)
 {
 	GByteArray *work = g_byte_array_new();
 	guint32 c;
 	char *out;
+	const unsigned char *ptr = (const unsigned char *) pptr;
 
 	/* what if c is > 0xffff ? */
 

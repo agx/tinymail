@@ -16,7 +16,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
 
@@ -55,7 +55,6 @@ extern gss_OID gss_nt_service_name;
 #define GSS_C_OID_KRBV5_DES GSS_C_NO_OID
 #endif
 
-#include <glib/gi18n.h>
 #include <glib/gi18n-lib.h>
 
 #include "camel-net-utils.h"

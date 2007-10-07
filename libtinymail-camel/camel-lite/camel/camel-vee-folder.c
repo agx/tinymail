@@ -16,8 +16,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -390,7 +390,8 @@ camel_vee_folder_hash_folder(CamelFolder *folder, char buffer[8])
 	md5_update(&ctx, (unsigned char*)folder->full_name, strlen(folder->full_name));
 	md5_final(&ctx, digest);
 
-	camel_base64_encode_close(digest, 6, FALSE, (unsigned char *) buffer, (int*) &state, (int*) &save);
+	g_base64_encode_step(digest, 6, FALSE, buffer, &state, &save);
+	g_base64_encode_close(FALSE, buffer, &state, &save);
 
 	for (i=0;i<8;i++) {
 		if (buffer[i] == '+')

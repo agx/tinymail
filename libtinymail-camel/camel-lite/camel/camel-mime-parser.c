@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /* What should hopefully be a fast mail parser */
@@ -275,7 +275,7 @@ camel_mime_parser_filter_add(CamelMimeParser *m, CamelMimeFilter *mf)
 	new->id = s->filterid++;
 	if (s->filterid == -1)
 		s->filterid++;
-	new->next = 0;
+	new->next = NULL;
 	camel_object_ref((CamelObject *)mf);
 
 	/* yes, this is correct, since 'next' is the first element of the struct */

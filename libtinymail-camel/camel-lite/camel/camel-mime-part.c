@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  */
 
@@ -103,7 +103,7 @@ static ssize_t write_raw(CamelStream *stream, struct _camel_header_raw *h);
 /* recognize and associate them with a unique enum  */
 /* identifier (see CamelHeaderType above)           */
 static void
-init_header_name_table (void)
+init_header_name_table(void)
 {
 	header_name_table = g_hash_table_new (camel_strcase_hash, camel_strcase_equal);
 	g_hash_table_insert (header_name_table, "Content-Description", (gpointer)HEADER_DESCRIPTION);

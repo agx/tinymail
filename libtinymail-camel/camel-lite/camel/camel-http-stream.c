@@ -16,7 +16,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
 
@@ -584,7 +584,7 @@ camel_http_stream_set_proxy (CamelHttpStream *http_stream, const char *proxy_url
 
 		basic = g_strdup_printf("%s:%s", http_stream->proxy->user?http_stream->proxy->user:"",
 					http_stream->proxy->passwd?http_stream->proxy->passwd:"");
-		basic64 = camel_base64_encode_simple(basic, strlen(basic));
+		basic64 = g_base64_encode(basic, strlen(basic));
 		memset(basic, 0, strlen(basic));
 		g_free(basic);
 		camel_http_stream_set_proxy_authpass(http_stream, basic64);

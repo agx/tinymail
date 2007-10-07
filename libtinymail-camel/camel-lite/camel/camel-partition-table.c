@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 
@@ -852,7 +852,7 @@ camel_key_table_lookup(CamelKeyTable *ki, camel_key_t keyid, char **keyp, unsign
 	CamelKeyBlock *kb;
 
 	if (keyp)
-		*keyp = 0;
+		*keyp = NULL;
 	if (flags)
 		*flags = 0;
 	if (keyid == 0)
@@ -867,7 +867,7 @@ camel_key_table_lookup(CamelKeyTable *ki, camel_key_t keyid, char **keyp, unsign
 
 	kb = (CamelKeyBlock *)&bl->data;
 
-#if 1
+#if 0
 	g_assert(kb->used < 127); /* this should be more accurate */
 	g_assert(index < kb->used);
 #else
@@ -911,7 +911,7 @@ camel_key_table_next(CamelKeyTable *ki, camel_key_t next, char **keyp, unsigned 
 	int index;
 
 	if (keyp)
-		*keyp = 0;
+		*keyp = NULL;
 	if (flagsp)
 		*flagsp = 0;
 	if (datap)

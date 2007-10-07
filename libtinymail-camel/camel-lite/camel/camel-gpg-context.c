@@ -16,7 +16,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
 
@@ -1540,6 +1540,8 @@ gpg_verify (CamelCipherContext *context, CamelMimePart *ipart, CamelException *e
 			validity->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_GOOD;
 		else
 			validity->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_BAD;
+	} else if (gpg->nopubkey) {
+		validity->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_NEED_PUBLIC_KEY;
 	} else {
 		validity->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_BAD;
 	}
@@ -1770,7 +1772,7 @@ gpg_decrypt(CamelCipherContext *context, CamelMimePart *ipart, CamelMimePart *op
 				else
 					valid->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_BAD;
 			} else if (gpg->nopubkey) {
-				valid->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_UNKNOWN;
+				valid->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_NEED_PUBLIC_KEY;
 			} else {
 				valid->sign.status = CAMEL_CIPHER_VALIDITY_SIGN_BAD;
 			}

@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  *
  */
 
@@ -56,7 +56,8 @@ typedef enum _camel_cipher_validity_sign_t {
 	CAMEL_CIPHER_VALIDITY_SIGN_NONE,
 	CAMEL_CIPHER_VALIDITY_SIGN_GOOD,
 	CAMEL_CIPHER_VALIDITY_SIGN_BAD,
-	CAMEL_CIPHER_VALIDITY_SIGN_UNKNOWN
+	CAMEL_CIPHER_VALIDITY_SIGN_UNKNOWN,
+	CAMEL_CIPHER_VALIDITY_SIGN_NEED_PUBLIC_KEY
 } camel_cipher_validity_sign_t;
 
 typedef enum _camel_cipher_validity_encrypt_t {

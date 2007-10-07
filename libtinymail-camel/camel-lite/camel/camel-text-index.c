@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -197,7 +197,7 @@ text_index_add_name_to_word(CamelIndex *idx, const char *word, camel_key_t namei
 			rb->words++;
 			camel_block_file_touch_block(p->blocks, p->blocks->root_block);
 		} else {
-			data = camel_key_table_lookup(p->word_index, wordid, NULL, 0);
+			data = camel_key_table_lookup(p->word_index, wordid, NULL, NULL);
 			if (data == 0) {
 				g_warning ("Could not find key entry for word '%s': %s\n",
 					   word, strerror (errno));

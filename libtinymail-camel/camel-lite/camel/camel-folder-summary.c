@@ -21,8 +21,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -348,7 +348,7 @@ camel_folder_summary_finalize (CamelObject *obj)
 	g_mutex_unlock (s->dump_lock);
 	g_mutex_free (s->dump_lock);
 
-	g_hash_table_foreach(p->filter_charset, free_o_name, 0);
+	g_hash_table_foreach(p->filter_charset, free_o_name, NULL);
 	g_hash_table_destroy(p->filter_charset);
 
 	if (p->filter_index && CAMEL_IS_OBJECT (p->filter_index))
@@ -1763,7 +1763,7 @@ my_list_append(struct _node **list, struct _node *n)
 	struct _node *ln = (struct _node *)list;
 	while (ln->next)
 		ln = ln->next;
-	n->next = 0;
+	n->next = NULL;
 	ln->next = n;
 	return n;
 }
@@ -2841,7 +2841,7 @@ camel_flag_set(CamelFlag **list, const char *name, gboolean value)
 	if (value) {
 		tmp = g_malloc(sizeof(*tmp) + strlen(name));
 		strcpy(tmp->name, name);
-		tmp->next = 0;
+		tmp->next = NULL;
 		flag->next = tmp;
 	}
 	return value;
@@ -2996,7 +2996,7 @@ camel_tag_set(CamelTag **list, const char *name, const char *value)
 		tmp = g_malloc(sizeof(*tmp)+strlen(name));
 		strcpy(tmp->name, name);
 		tmp->value = g_strdup(value);
-		tmp->next = 0;
+		tmp->next = NULL;
 		tag->next = tmp;
 		return TRUE;
 	}

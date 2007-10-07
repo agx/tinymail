@@ -19,8 +19,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  *
  */
 
@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include <libedataserver/md5-utils.h>	/* md5 hash building */
+#include <libedataserver/e-sexp.h>
 
 #include "camel-mime-utils.h"	/* base64 encoding */
 #include "camel-search-private.h"
@@ -189,7 +190,8 @@ hash_match(char hash[17], int argc, struct _ESExpResult **argv)
 	}
 	md5_final(&ctx, digest);
 
-	camel_base64_encode_close(digest, 12, FALSE, (unsigned char *) hash, (int *) &state, (int *) &save);
+	g_base64_encode_step(digest, 12, FALSE, hash, &state, &save);
+	g_base64_encode_close(FALSE, hash, &state, &save);
 
 	for (i=0;i<16;i++) {
 		if (hash[i] == '+')

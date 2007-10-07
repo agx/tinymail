@@ -3,6 +3,7 @@
 	* Backported a patch from Niels Christens on Camel to Camel-Lite. The
 	patch fixed the behaviour when the server expects a TLS HELLO, while
 	SSL version 2 is used.
+	* Merged camel-lite with upstream Camel revision 8099
 
 2007-10-04  Philip Van Hoof  <pvanhoof@gnome.org>
 

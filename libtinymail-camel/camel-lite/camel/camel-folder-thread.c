@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 /* TODO: This could probably be made a camel object, but it isn't really required */
@@ -123,7 +123,7 @@ prune_empty(CamelFolderThread *thread, CamelFolderThreadNode **cp)
 				lastc->next = c->next;
 				continue;
 			}
-			if (c->parent || c->child->next==0) {
+			if (c->parent || c->child->next == NULL) {
 				d(printf("promoting child\n"));
 				lastc->next = c->next; /* remove us */
 				child = c->child;
@@ -481,7 +481,7 @@ thread_summary(CamelFolderThread *thread, GPtrArray *summary)
 		if (references) {
 			int j;
 
-			d(printf("references:\n"));
+			d(printf("%s (%s) references:\n", G_STRLOC, G_STRFUNC); )
 			for (j=0;j<references->size;j++) {
 				/* should never be empty, but just incase */
 				if (references->references[j].id.id == 0)

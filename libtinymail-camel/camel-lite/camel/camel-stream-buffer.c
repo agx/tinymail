@@ -17,7 +17,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  */
 
@@ -81,7 +81,7 @@ camel_stream_buffer_init (gpointer object, gpointer klass)
 	sbf->ptr = sbf->buf;
 	sbf->end = sbf->buf;
 	sbf->mode = CAMEL_STREAM_BUFFER_READ | CAMEL_STREAM_BUFFER_BUFFER;
-	sbf->stream = 0;
+	sbf->stream = NULL;
 	sbf->linesize = 80;
 	sbf->linebuf = g_malloc(sbf->linesize);
 }

@@ -16,7 +16,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Street #330, Boston, MA 02111-1307, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
 
@@ -77,30 +77,31 @@ camel_url_scanner_add (CamelUrlScanner *scanner, urlpattern_t *pattern)
 gboolean
 camel_url_scanner_scan (CamelUrlScanner *scanner, const char *in, size_t inlen, urlmatch_t *match)
 {
-	const char *pos, *inptr, *inend;
+	const char *pos;
+	const unsigned char *inptr, *inend;
 	urlpattern_t *pat;
 	int pattern;
 	
 	g_return_val_if_fail (scanner != NULL, FALSE);
 	g_return_val_if_fail (in != NULL, FALSE);
 	
-	inptr = in;
-	inend = in + inlen;
+	inptr = (const unsigned char *) in;
+	inend = inptr + inlen;
 	
 	do {
-		if (!(pos = e_trie_search (scanner->trie, inptr, inlen, &pattern)))
+		if (!(pos = e_trie_search (scanner->trie, (const char *)inptr, inlen, &pattern)))
 			return FALSE;
 		
 		pat = g_ptr_array_index (scanner->patterns, pattern);
 		
 		match->pattern = pat->pattern;
 		match->prefix = pat->prefix;
-		
-		if (pat->start (in, pos, inend, match) && pat->end (in, pos, inend, match))
+	
+		if (pat->start (in, pos, (const char *)inend, match) && pat->end (in, pos, (const char *)inend, match))	
 			return TRUE;
 		
-		inptr = pos;
-		if (camel_utf8_getc_limit ((const unsigned char **) &inptr, (const unsigned char *) inend) == 0xffff)
+		inptr = (const unsigned char *) pos;
+		if (camel_utf8_getc_limit (&inptr, inend) == 0xffff)
 			break;
 		
 		inlen = inend - inptr;

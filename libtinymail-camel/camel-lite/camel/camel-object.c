@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  */
 
@@ -314,8 +314,8 @@ cobject_meta_get(CamelObject *obj, const char * name)
 	CamelObjectMeta *meta;
 	char *res = NULL;
 
-	g_return_val_if_fail(CAMEL_IS_OBJECT (obj), 0);
-	g_return_val_if_fail(name != NULL, 0);
+	g_return_val_if_fail(CAMEL_IS_OBJECT (obj), NULL);
+	g_return_val_if_fail(name != NULL, NULL);
 
 	pair = co_metadata_pair(obj, FALSE);
 	if (pair) {
@@ -1589,7 +1589,7 @@ void *camel_object_get_ptr(void *vo, CamelException *ex, int tag)
 	g_return_val_if_fail(CAMEL_IS_OBJECT(o), NULL);
 	g_return_val_if_fail((tag & CAMEL_ARG_TYPE) == CAMEL_ARG_OBJ
 			     || (tag & CAMEL_ARG_TYPE) == CAMEL_ARG_STR
-			     || (tag & CAMEL_ARG_TYPE) == CAMEL_ARG_PTR, 0);
+			     || (tag & CAMEL_ARG_TYPE) == CAMEL_ARG_PTR, NULL);
 
 	/* woefully inefficient, *shrug */
 	args.argc = 1;
@@ -1733,8 +1733,8 @@ camel_object_meta_get(void *vo, const char * name)
 {
 	CamelObject *obj = vo;
 
-	g_return_val_if_fail(CAMEL_IS_OBJECT (obj), 0);
-	g_return_val_if_fail(name != NULL, 0);
+	g_return_val_if_fail(CAMEL_IS_OBJECT (obj), NULL);
+	g_return_val_if_fail(name != NULL, NULL);
 
 	return obj->klass->meta_get(obj, name);
 }

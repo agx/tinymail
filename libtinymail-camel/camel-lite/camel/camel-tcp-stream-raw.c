@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  *
  */
 
@@ -241,7 +241,7 @@ flaky_tcp_read (int fd, char *buffer, size_t buflen)
  * Returns a new #CamelTcpStream object
  **/
 CamelStream *
-camel_tcp_stream_raw_new ()
+camel_tcp_stream_raw_new (void)
 {
 	CamelTcpStreamRaw *stream;
 	
@@ -382,7 +382,7 @@ socket_connect(struct addrinfo *h)
 			tv.tv_sec = CONNECT_TIMEOUT;
 			tv.tv_usec = 0;
 			
-			status = select (fdmax, &rdset, &wrset, 0, &tv);
+			status = select (fdmax, &rdset, &wrset, NULL, &tv);
 		} while (status == -1 && SOCKET_ERROR_IS_EINTR ());
 		
 		if (status <= 0) {

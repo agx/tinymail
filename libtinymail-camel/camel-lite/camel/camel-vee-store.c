@@ -14,8 +14,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -155,7 +155,7 @@ change_folder(CamelStore *store, const char *name, guint32 flags, int count)
 	else
 		tmp++;
 	fi->name = g_strdup(tmp);
-	url = camel_url_new("vfolder:", 0);
+	url = camel_url_new("vfolder:", NULL);
 	camel_url_set_path(url, ((CamelService *)store)->url->path);
 	if (flags & CHANGE_NOSELECT)
 		camel_url_set_param(url, "noselect", "yes");

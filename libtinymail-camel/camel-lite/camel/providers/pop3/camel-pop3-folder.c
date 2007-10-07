@@ -25,7 +25,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  */
 
@@ -234,7 +234,7 @@ cmd_builduid(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	}
 	camel_object_unref(mp);
 	md5_final(&md5, digest);
-	fi->uid = camel_base64_encode_simple((const char*) digest, 16);
+	fi->uid = g_base64_encode(digest, 16);
 
 	d(printf("building uid for id '%d' = '%s'\n", fi->id, fi->uid));
 

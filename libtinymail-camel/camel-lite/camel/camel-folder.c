@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  */
 
@@ -949,7 +949,7 @@ camel_folder_get_message_user_tag (CamelFolder *folder, const char *uid,  const 
 {
 	const char *ret;
 
-	g_return_val_if_fail (CAMEL_IS_FOLDER (folder), 0);
+	g_return_val_if_fail (CAMEL_IS_FOLDER (folder), NULL);
 
 	/* FIXME: should duplicate string */
 	ret = CF_CLASS (folder)->get_message_user_tag (folder, uid, name);

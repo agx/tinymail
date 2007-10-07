@@ -15,8 +15,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301, USA.
  *
  */
 
@@ -650,11 +650,11 @@ generate_response (struct _DigestChallenge *challenge, const char *host,
 	/* generate the cnonce */
 	bgen = g_strdup_printf ("%p:%lu:%lu", (void *) resp,
 				(unsigned long) getpid (),
-				(unsigned long) time (0));
+				(unsigned long) time (NULL));
 	md5_get_digest (bgen, strlen (bgen), (guchar*) digest);
 	g_free (bgen);
 	/* take our recommended 64 bits of entropy */
-	resp->cnonce = camel_base64_encode_simple (digest, 8);
+	resp->cnonce = g_base64_encode (digest, 8);
 	
 	/* we don't support re-auth so the nonce count is always 1 */
 	strcpy (resp->nc, "00000001");

@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
  */
 
@@ -376,13 +376,13 @@ set_boundary (CamelMultipart *multipart, const char *boundary)
 		/* Generate a fairly random boundary string. */
 		bgen = g_strdup_printf ("%p:%lu:%lu", (void *) multipart,
 					(unsigned long) getpid(),
-					(unsigned long) time(0));
+					(unsigned long) time(NULL));
 		md5_get_digest (bgen, strlen ((char*)bgen), (guchar*) digest);
 		g_free (bgen);
 		strcpy (bbuf, "=-");
 		p = bbuf + 2;
 		state = save = 0;
-		p += camel_base64_encode_step ((unsigned char *)digest, 16, FALSE, (unsigned char *)p, &state, &save);
+		p += g_base64_encode_step (digest, 16, FALSE, p, &state, &save);
 		*p = '\0';
 
 		boundary = bbuf;
