@@ -84,8 +84,9 @@ stripit (char *buffer)
 void 
 camel_pop3_logbook_register (CamelPOP3Logbook *book, const gchar *uid)
 {
-	g_static_rec_mutex_lock (book->lock);
 	FILE *f = NULL;
+
+	g_static_rec_mutex_lock (book->lock);
 
 	if (book->registered) {
 		book->registered = g_list_prepend (book->registered, 

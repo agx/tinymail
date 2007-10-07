@@ -674,10 +674,13 @@ scan_dir(CamelStore *store, CamelURL *url, GHashTable *visited, CamelFolderInfo 
 			g_free(path);
 			continue;
 		}
-#ifndef G_OS_WIN32		
+#ifndef G_OS_WIN32
 		if (S_ISDIR(st.st_mode)) {
-			struct _inode in = { st.st_dev, st.st_ino };
-			
+			struct _inode in;
+
+			in.dnode = st.st_dev;
+			in.inode = st.st_ino;
+
 			if (g_hash_table_lookup(visited, &in)) {
 				g_free(path);
 				continue;
@@ -732,8 +735,11 @@ scan_dir(CamelStore *store, CamelURL *url, GHashTable *visited, CamelFolderInfo 
 		if (!S_ISDIR(st.st_mode)) {
 			fill_fi(store, fi, flags);
 		} else if ((flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)) {
-			struct _inode in = { st.st_dev, st.st_ino };
-			
+			struct _inode in;
+
+			in.dnode = st.st_dev;
+			in.inode = st.st_ino;
+
 			if (g_hash_table_lookup(visited, &in) == NULL) {
 #ifndef G_OS_WIN32
 				struct _inode *inew = g_new(struct _inode, 1);

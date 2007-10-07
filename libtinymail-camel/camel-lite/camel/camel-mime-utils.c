@@ -113,9 +113,9 @@ camel_base64_encode_close(unsigned char *in, size_t inlen, gboolean break_lines,
 	gsize bytes = 0;
 
 	if (inlen > 0)
-		bytes += g_base64_encode_step (in, inlen, break_lines, out, state, save);
+		bytes += g_base64_encode_step (in, inlen, break_lines,(gchar *) out, state, save);
 
-	bytes += g_base64_encode_close (break_lines, out, state, save);
+	bytes += g_base64_encode_close (break_lines, (gchar *) out, state, save);
 
 	return bytes;
 }
@@ -140,7 +140,7 @@ camel_base64_encode_close(unsigned char *in, size_t inlen, gboolean break_lines,
 size_t
 camel_base64_encode_step(unsigned char *in, size_t len, gboolean break_lines, unsigned char *out, int *state, int *save)
 {
-	return g_base64_encode_step (in, len, break_lines, out, state, save);
+	return g_base64_encode_step (in, len, break_lines, (gchar *) out, state, save);
 }
 
 
@@ -159,7 +159,7 @@ camel_base64_encode_step(unsigned char *in, size_t len, gboolean break_lines, un
 size_t
 camel_base64_decode_step(unsigned char *in, size_t len, unsigned char *out, int *state, unsigned int *save)
 {
-	return g_base64_decode_step (in, len, out, state, save);
+	return g_base64_decode_step ((const gchar *) in, len, out, state, save);
 }
 
 
@@ -175,7 +175,7 @@ camel_base64_decode_step(unsigned char *in, size_t len, unsigned char *out, int 
 char *
 camel_base64_encode_simple (const char *data, size_t len)
 {
-	return g_base64_encode (data, len);
+	return g_base64_encode ((const guchar *) data, len);
 }
 
 

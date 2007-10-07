@@ -390,8 +390,8 @@ camel_vee_folder_hash_folder(CamelFolder *folder, char buffer[8])
 	md5_update(&ctx, (unsigned char*)folder->full_name, strlen(folder->full_name));
 	md5_final(&ctx, digest);
 
-	g_base64_encode_step(digest, 6, FALSE, buffer, &state, &save);
-	g_base64_encode_close(FALSE, buffer, &state, &save);
+	g_base64_encode_step(digest, 6, FALSE, buffer, (gint *) &state, (gint *) &save);
+	g_base64_encode_close(FALSE, buffer, (gint *) &state, (gint *) &save);
 
 	for (i=0;i<8;i++) {
 		if (buffer[i] == '+')

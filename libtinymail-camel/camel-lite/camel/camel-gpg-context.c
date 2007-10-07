@@ -747,9 +747,9 @@ gpg_ctx_parse_status (struct _GpgCtx *gpg, CamelException *ex)
 	if (camel_debug("gpg:status"))
 		printf ("status: %s\n", status);
 	
-	if (strncmp (status, "[GNUPG:] ", 9) != 0) {
+	if (strncmp ((const char *) status, "[GNUPG:] ", 9) != 0) {
 		char *message;
-		message = g_locale_to_utf8(status, -1, NULL, NULL, NULL);
+		message = g_locale_to_utf8((const gchar *) status, -1, NULL, NULL, NULL);
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Unexpected GnuPG status message encountered:\n\n%s"),
 				      message);
@@ -873,10 +873,10 @@ gpg_ctx_parse_status (struct _GpgCtx *gpg, CamelException *ex)
 					     _("Failed to unlock secret key: 3 bad passphrases given."));
 			return -1;
 		}
-	} else if (!strncmp (status, "UNEXPECTED ", 11)) {
+	} else if (!strncmp ((const char *) status, "UNEXPECTED ", 11)) {
 		/* this is an error */
 		char *message;
-		message = g_locale_to_utf8(status+11, -1, NULL, NULL, NULL);
+		message = g_locale_to_utf8(((const gchar *) status+11), -1, NULL, NULL, NULL);
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Unexpected response from GnuPG: %s"),
 				      message);

@@ -377,12 +377,12 @@ set_boundary (CamelMultipart *multipart, const char *boundary)
 		bgen = g_strdup_printf ("%p:%lu:%lu", (void *) multipart,
 					(unsigned long) getpid(),
 					(unsigned long) time(NULL));
-		md5_get_digest (bgen, strlen (bgen), digest);
+		md5_get_digest (bgen, strlen (bgen), (unsigned char *) digest);
 		g_free (bgen);
 		strcpy (bbuf, "=-");
 		p = bbuf + 2;
 		state = save = 0;
-		p += g_base64_encode_step (digest, 16, FALSE, p, &state, &save);
+		p += g_base64_encode_step ((const guchar *) digest, 16, FALSE, p, &state, &save);
 		*p = '\0';
 
 		boundary = bbuf;
