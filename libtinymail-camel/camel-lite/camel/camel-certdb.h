@@ -79,6 +79,8 @@ struct _CamelCertDB {
 	
 	guint32 cert_size;
 	
+	struct _EMemChunk *cert_chunks;
+	
 	GPtrArray *certs;
 	GHashTable *cert_hash;
 };

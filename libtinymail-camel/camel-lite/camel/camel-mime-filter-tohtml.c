@@ -166,13 +166,13 @@ static char *
 writeln (CamelMimeFilter *filter, const unsigned char *in, const unsigned char *inend, char *outptr, char **outend)
 {
 	CamelMimeFilterToHTML *html = (CamelMimeFilterToHTML *) filter;
-	const char *inptr = in;
+	const unsigned char *inptr = in;
 	
 	while (inptr < inend) {
 		guint32 u;
 		
 		outptr = check_size (filter, outptr, outend, 16);
-		
+
 		u = camel_utf8_getc_limit (&inptr, inend);
 		switch (u) {
 		case 0xffff:

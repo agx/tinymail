@@ -377,7 +377,7 @@ set_boundary (CamelMultipart *multipart, const char *boundary)
 		bgen = g_strdup_printf ("%p:%lu:%lu", (void *) multipart,
 					(unsigned long) getpid(),
 					(unsigned long) time(NULL));
-		md5_get_digest (bgen, strlen ((char*)bgen), (guchar*) digest);
+		md5_get_digest (bgen, strlen (bgen), digest);
 		g_free (bgen);
 		strcpy (bbuf, "=-");
 		p = bbuf + 2;
