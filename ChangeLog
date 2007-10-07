@@ -4,6 +4,8 @@
 	patch fixed the behaviour when the server expects a TLS HELLO, while
 	SSL version 2 is used.
 	* Merged camel-lite with upstream Camel revision 8099
+	* Merged bugfix from Matthew Barnes. More information here:
+	http://bugzilla.gnome.org/show_bug.cgi?id=437331
 
 2007-10-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
