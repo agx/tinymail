@@ -1,3 +1,9 @@
+2007-10-07  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Backported a patch from Niels Christens on Camel to Camel-Lite. The
+	patch fixed the behaviour when the server expects a TLS HELLO, while
+	SSL version 2 is used.
+
 2007-10-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	- -Wall warnings
