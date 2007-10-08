@@ -1,3 +1,7 @@
+2007-10-08  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Merged camel-mime-utils.c with uptream Camel
+
 2007-10-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Backported a patch from Niels Christens on Camel to Camel-Lite. The

@@ -792,8 +792,8 @@ header_decode_lwsp(const char **in)
 
 	d2(printf("is ws: '%s'\n", *in));
 
-	while (camel_mime_is_lwsp(*inptr) || (*inptr =='(' && *inptr != '\0')) {
-		while (camel_mime_is_lwsp(*inptr) && inptr != '\0') {
+	while ((camel_mime_is_lwsp(*inptr) || *inptr =='(') && *inptr != '\0') {
+		while (camel_mime_is_lwsp(*inptr) && *inptr != '\0') {
 			d2(printf("(%c)", *inptr));
 			inptr++;
 		}
@@ -2094,7 +2094,7 @@ header_decode_domain(const char **in)
 			domain = g_string_append_c(domain, '[');
 			inptr++;
 			header_decode_lwsp(&inptr);
-			while (camel_mime_is_dtext(*inptr)) {
+			while (*inptr && camel_mime_is_dtext(*inptr)) {
 				domain = g_string_append_c(domain, *inptr);
 				inptr++;
 			}
