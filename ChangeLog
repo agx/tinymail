@@ -1,6 +1,7 @@
 2007-10-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* iconv error situation handler
+	* Bugfix when the summary file was not yet created for a Maildir
 
 2007-10-10  Jose Dapena Paz  <jdapena@igalia.com>
 

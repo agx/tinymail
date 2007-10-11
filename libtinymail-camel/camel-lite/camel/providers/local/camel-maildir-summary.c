@@ -159,13 +159,18 @@ camel_maildir_summary_finalise(CamelObject *obj)
  * 
  * Return value: A new #CamelMaildirSummary object.
  **/
-CamelMaildirSummary	*camel_maildir_summary_new(struct _CamelFolder *folder, const char *filename, const char *maildirdir, CamelIndex *index)
+CamelMaildirSummary
+*camel_maildir_summary_new(struct _CamelFolder *folder, const char *filename, const char *maildirdir, CamelIndex *index)
 {
 	CamelMaildirSummary *o = (CamelMaildirSummary *)camel_object_new(camel_maildir_summary_get_type ());
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	((CamelFolderSummary *)o)->folder = folder;
 
 	camel_local_summary_construct((CamelLocalSummary *)o, filename, maildirdir, index);
+
+	maildir_summary_check ((CamelLocalSummary *) o, NULL, &ex);
+
 	return o;
 }
 
