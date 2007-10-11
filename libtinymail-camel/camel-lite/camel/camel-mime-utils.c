@@ -842,7 +842,7 @@ rfc2047_decode_word(const char *in, size_t len)
 	/* quick check to see if this could possibly be a real encoded word */
 	if (len < 8 || !(in[0] == '=' && in[1] == '?' && in[len-1] == '=' && in[len-2] == '?')) {
 		d(printf("invalid\n"));
-		return NULL;
+		/* return NULL; */
 	}
 	
 	/* skip past the charset to the encoding type */
