@@ -1,3 +1,7 @@
+2007-10-11  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* iconv error situation handler
+
 2007-10-10  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* m4/moz.m4: add support for gtkmozembed library using gtkembedmoz.pc.

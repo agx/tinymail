@@ -904,7 +904,14 @@ rfc2047_decode_word(const char *in, size_t len)
 					e_iconv (ic, NULL, 0, &outbuf, &outlen);
 					*outbuf = 0;
 					decoded = g_strdup (outbase);
+				} else {
+					perror ("iconv");
+					e_iconv (ic, NULL, 0, &outbuf, &outlen);
+					*outbuf = 0;
+					decoded = g_strdup (outbase);
+					/* decoded = g_strdup (inbuf); */
 				}
+
 				e_iconv_close (ic);
 			} else {
 				w(g_warning ("Cannot decode charset, header display may be corrupt: %s: %s",
