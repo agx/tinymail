@@ -60,7 +60,7 @@ build_acap=false
 build_gnome=true
 build_uigtk=true
 build_demoui=true
-build_mozembed=true
+build_mozembed=false
 build_webkit=false
 build_gtkhtml=false
 build_doxygen=false
@@ -87,7 +87,6 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
         build_mozembed=false
         build_gnome=false
 	build_maemo=true
-        with_html_component=none
 	build_uigtk=true
 	build_demoui=true
 	PLATFORM=2
@@ -375,26 +374,25 @@ if test x$build_mozembed = xtrue; then
 
   AC_TNY_MOZ_CHECK
 
-  if test x$mozilla_nspr = xno; then
-    AC_MSG_ERROR("You need Mozilla's NSPR") 
-  fi
-  if test x$mozilla_nss = xno; then
-    AC_MSG_ERROR("You need Mozilla's NSS")
-  fi
   if test x$mozilla_xpcom = xno; then
-    AC_MSG_ERROR("You need Mozilla's XPCOM")
+   AC_MSG_ERROR("You need Mozilla's XPCOM")
   fi
+
   if test x$mozilla_gtkmozembed = xno; then
    AC_MSG_ERROR("You need Mozilla's GtkMozEmbed")
   fi
 
-  extraplatpkgs="$mozilla_nspr $mozilla_nss $mozilla_xpcom $mozilla_gtkmozembed"
+  extraplatpkgs="$mozilla_xpcom $mozilla_gtkmozembed"
   extratnypkgs="$extratnypkgs $extraplatpkgs"
   PKG_CHECK_MODULES(LIBTINYMAILUI_MOZEMBED, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
+  MOZILLA_HOME="$mozilla_home"
+  AC_DEFINE_UNQUOTED(MOZILLA_HOME,"$mozilla_home",["The path of the mozilla engine"])
 else
   LIBTINYMAILUI_MOZEMBED_CFLAGS=
   LIBTINYMAILUI_MOZEMBED_LIBS=
+  MOZILLA_HOME=
 fi
+AC_SUBST([MOZILLA_HOME])
 
 dnl ### libtinymail-gnome-desktop, a GNOME platform library implementation ##
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then

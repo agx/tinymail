@@ -1,3 +1,22 @@
+2007-10-10  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* m4/moz.m4: add support for gtkmozembed library using gtkembedmoz.pc.
+	Also export mozilla_home.
+	* debian/rules.maemo: compile with mozembed support.
+	* debian/control.maemo1: compile with mozembed support.
+	* tests/c-demo/tny-main.c: remove mozilla calls in main.
+	* configure.ac: some fixes for html module detection. Use mozilla home.
+	Now we only use detection of xpcom for being sure we've got an engine
+	path.
+	* Removed libtinymailui-mozembed/mozilla-preferences.{cpp,h}, as we now
+	use gtk moz embed api to set preferences.
+	* libtinymalui-mozembed/Makefile.am: removed mozilla preferences from
+	build.
+	* libtinymailui-mozembed/tny-moz-embed-html-mime-part-view.c:
+	Now we use gtk moz embed to set preferences. We also set properly the
+	component path (mozilla home from used engine), and the profile path
+	(using the progname). We set a default chrome without scrollbars.
+
 2007-10-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merged camel-mime-utils.c with uptream Camel

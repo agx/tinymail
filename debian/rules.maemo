@@ -31,7 +31,7 @@ config.status:
 	if [ ! -x configure ]; then ./autogen.sh --with-platform=maemo --with-ssl=nss; fi
 	dh_testdir
 	# Add here commands to configure the package.
-	CFLAGS="$(CFLAGS) -fPIC" ./configure --with-platform=maemo --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --with-ssl=nss --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	CFLAGS="$(CFLAGS) -fPIC" ./configure --with-platform=maemo --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --with-ssl=nss --sysconfdir=/etc --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --with-html-component=mozembed
 
 
 build: build-stamp
@@ -94,7 +94,7 @@ binary-arch: build install
 #	dh_installinfo
 #	dh_installman
 	dh_link
-	dh_strip --keep-debug --dbg-package=libtinymail-1.0-0 --dbg-package=libtinymail-camel-1.0-0 --dbg-package=libtinymailui-1.0-0 --dbg-package=libtinymailui-gtk-1.0-0 --dbg-package=libtinymail-maemo-1.0-0 --dbg-package=libtinymail-gnomevfs-1.0-0
+	dh_strip --keep-debug --dbg-package=libtinymail-1.0-0 --dbg-package=libtinymail-camel-1.0-0 --dbg-package=libtinymailui-1.0-0 --dbg-package=libtinymailui-gtk-1.0-0 --dbg-package=libtinymail-maemo-1.0-0 --dbg-package=libtinymail-gnomevfs-1.0-0 --dbg-package=libtinymail-mozembed-1.0-0
 	dh_compress
 	dh_fixperms
 #	dh_perl

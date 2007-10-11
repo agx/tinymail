@@ -46,11 +46,6 @@
 #include <libgnomevfs/gnome-vfs-utils.h>
 #endif
 
-#ifdef MOZEMBED
-#include <nspr.h>
-#include <prthread.h>
-#endif
-
 /**
  * main:
  * @argc: Amount of arguments
@@ -136,10 +131,6 @@ main (int argc, char **argv)
 	gtk_main();
 
 	gdk_threads_leave ();
-
-#ifdef MOZEMBED
-	PR_ProcessExit ((PRIntn)(long)0);
-#endif
 
 	return 0;
 }

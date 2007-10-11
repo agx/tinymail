@@ -24,19 +24,22 @@ done
 AC_MSG_RESULT($mozilla_nss)
 
 mozilla_xpcom="no"
+mozilla_home="no"
 AC_MSG_CHECKING(Mozilla XPCOM pkg-config module name)
 mozilla_xpcom_pcs="xpcom mozilla-xpcom firefox-xpcom xulrunner-xpcom microb-engine-xpcom"
 for pc in $mozilla_xpcom_pcs; do
         if $PKG_CONFIG --exists $pc; then
                 mozilla_xpcom=$pc
+		mozilla_home="`$PKG_CONFIG --variable=libdir $pc`"
                 break;
         fi
 done
 AC_MSG_RESULT($mozilla_xpcom)
+AC_MSG_RESULT($mozilla_home)
 
 mozilla_gtkmozembed="no"
 AC_MSG_CHECKING(Mozilla gtkmozembed pkg-config module name)
-mozilla_gtkmozembed_pcs="gtkmozembed mozilla-gtkmozembed firefox-gtkmozembed xulrunner-gtkmozembed microb-engine-gtkmozembed"
+mozilla_gtkmozembed_pcs="gtkmozembed mozilla-gtkmozembed firefox-gtkmozembed xulrunner-gtkmozembed microb-engine-gtkembedmoz gtkembedmoz"
 for pc in $mozilla_gtkmozembed_pcs; do
         if $PKG_CONFIG --exists $pc; then
                 mozilla_gtkmozembed=$pc
