@@ -315,9 +315,8 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 
 
 	folder->summary = (CamelFolderSummary *)CLOCALF_CLASS(lf)->create_summary(lf, lf->summary_path, lf->folder_path, lf->index);
-	if (camel_local_summary_load((CamelLocalSummary *)folder->summary, forceindex, NULL) == -1) {
-		/* ? */
-	}
+	
+	/* camel_local_summary_load((CamelLocalSummary *)folder->summary, forceindex, NULL); */
 
 	/* We don't need to sync here ..., it can sync later on when it calls refresh info */
 #if 0

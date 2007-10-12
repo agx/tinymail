@@ -1,6 +1,7 @@
 2007-10-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
-	* Regression bugfix of something that I changed yesterday
+	* Regression on yesterday's summary related patch. Fixed
+	* Regression on yesterday's mime part parser patch. Fixed
 
 2007-10-11  Philip Van Hoof  <pvanhoof@gnome.org>
 
