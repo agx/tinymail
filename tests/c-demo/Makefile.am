@@ -21,7 +21,7 @@ INCLUDES += -DASYNCWORKER -I$(top_srcdir)/libtinymail-asyncworker $(LIBTINYMAIL_
 endif
 
 if BUILD_MOZEMBED
-INCLUDES += -DMOZEMBED
+INCLUDES += -DMOZEMBED -I$(top_srcdir)/libtinymailui-mozembed $(LIBTINYMAILUI_MOZEMBED_CFLAGS)
 endif
 
 bin_PROGRAMS = tny-demoui
@@ -47,5 +47,10 @@ endif
 if BUILD_ASYNCWORKER
 tny_demoui_LDADD +=  $(top_builddir)/libtinymail-asyncworker/libtinymail-asyncworker-$(API_VERSION).la \
 	$(LIBTINYMAIL_ASYNCWORKER_LIBS)
+endif
+
+if BUILD_MOZEMBED
+tny_demoui_LDADD +=  $(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la \
+	$(LIBTINYMAILUI_MOZEMBED_LIBS)
 endif
 

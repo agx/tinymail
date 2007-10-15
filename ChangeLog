@@ -1,3 +1,8 @@
+2007-10-15  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Some fixes to mozembed build.
+	* Disable mozembed packages build in maemo.
+
 2007-10-12  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Regression on yesterday's summary related patch. Fixed
