@@ -147,10 +147,10 @@ AC_HELP_STRING([--with-html-component],
 	build_webkit=false
   ;;
   *) AC_MSG_ERROR(bad value ${with_html_component} for --with-html-component) ;;
-esac], [build_mozembed=true
+esac], [build_mozembed=false
 	build_webkit=false 
 	build_gtkhtml=false
-	with_html_component=mozembed])
+	with_html_component=none])
 
 AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
 AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
@@ -399,6 +399,8 @@ else
   LIBTINYMAILUI_MOZEMBED_CFLAGS=
   LIBTINYMAILUI_MOZEMBED_LIBS=
   MOZILLA_HOME=
+  AM_CONDITIONAL([HAVE_MOZILLA_1_8],[test "0" = "1"])
+  AM_CONDITIONAL([HAVE_MOZILLA_1_9],[test "0" = "1"])
 fi
 AC_SUBST([MOZILLA_HOME])
 

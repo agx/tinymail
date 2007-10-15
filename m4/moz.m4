@@ -78,7 +78,7 @@ if test x$mozilla_xpcom != x; then
 fi
 
 
-AM_CONDITIONAL([HAVE_MOZILLA_1_8],[test "mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "8"])
+AM_CONDITIONAL([HAVE_MOZILLA_1_8],[test "$mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "8"])
 AM_CONDITIONAL([HAVE_MOZILLA_1_9],[test "$mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "9"])
 AC_DEFINE([MOZEMBED_MOZILLA_VERSION],["$mozilla_version"],[Detected mozilla engine version for mozembed])
 
