@@ -20,7 +20,9 @@ libtinymailui_mozembed_1_0_la_SOURCES = \
 	$(libtinymailui_mozembed_1_0_headers) \
 	tny-moz-embed-html-mime-part-view.c \
 	tny-moz-embed-msg-view.c \
-	tny-moz-embed-stream.c
+	tny-moz-embed-stream.c \
+	mozilla-preferences.cpp \
+	mozilla-preferences.h
 
 libtinymailui_mozembed_1_0_la_LIBADD = 	\
 	$(LIBTINYMAILUI_MOZEMBED_LIBS)	\

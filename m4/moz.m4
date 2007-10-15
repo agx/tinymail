@@ -48,5 +48,39 @@ for pc in $mozilla_gtkmozembed_pcs; do
 done
 AC_MSG_RESULT($mozilla_gtkmozembed)
 
+#Detect Mozilla XPCom version
+if test x$mozilla_xpcom != x; then
+
+   AC_MSG_CHECKING(Mozilla xpcom engine version)
+   #The only real way to detect the MOZILLA engine version is using the version in mozilla-config.h
+   #of the engine we use.
+   mozilla_xpcom_includedir="`$PKG_CONFIG --variable=includedir $mozilla_xpcom`"
+   mozilla_version=`cat $mozilla_xpcom_includedir/mozilla-config.h | grep MOZILLA_VERSION_U | sed "s/.*_VERSION_U\ //"|tr ".abpre+" " "`
+   mozilla_major_version=`echo $mozilla_version | awk ' { print $[1]; } '`
+   mozilla_minor_version=`echo $mozilla_version | awk ' { print $[2]; } '`
+
+   if test "$mozilla_major_version" != "1"; then
+      AC_DEFINE([HAVE_MOZILLA_1_9],[1],[Define if we have mozilla api 1.9])
+      AC_DEFINE([HAVE_MOZILLA_1_8],[1],[Define if we have mozilla api 1.8])
+   fi
+
+   if test "$mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "8"; then
+      AC_DEFINE([HAVE_MOZILLA_1_8],[1],[Define if we have mozilla api 1.8])
+   fi
+      
+   if test "$mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "9"; then
+      AC_DEFINE([HAVE_MOZILLA_1_9],[1],[Define if we have mozilla api 1.9])
+   fi
+
+   AC_MSG_RESULT($mozilla_version)
+
+
+fi
+
+
+AM_CONDITIONAL([HAVE_MOZILLA_1_8],[test "mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "8"])
+AM_CONDITIONAL([HAVE_MOZILLA_1_9],[test "$mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "9"])
+AC_DEFINE([MOZEMBED_MOZILLA_VERSION],["$mozilla_version"],[Detected mozilla engine version for mozembed])
+
 ])
 

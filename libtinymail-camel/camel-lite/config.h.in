@@ -94,6 +94,12 @@
 /* Define to 1 if you have the `mkstemp' function. */
 #undef HAVE_MKSTEMP
 
+/* Define if we have mozilla api 1.8 */
+#undef HAVE_MOZILLA_1_8
+
+/* Define if we have mozilla api 1.9 */
+#undef HAVE_MOZILLA_1_9
+
 /* Define if you have NSS */
 #undef HAVE_NSS
 
@@ -162,6 +168,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Detected mozilla engine version for mozembed */
+#undef MOZEMBED_MOZILLA_VERSION
 
 /* Enable getaddrinfo emulation */
 #undef NEED_ADDRINFO

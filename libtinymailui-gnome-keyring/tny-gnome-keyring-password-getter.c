@@ -40,7 +40,7 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 		"password", aid /* proto */, 
 		"PLAIN", 0, &list);
 
-	if (keyringret != GNOME_KEYRING_RESULT_OK)
+	if ((keyringret != GNOME_KEYRING_RESULT_OK) || (list == NULL))
 	{
 		gboolean canc = FALSE;
 

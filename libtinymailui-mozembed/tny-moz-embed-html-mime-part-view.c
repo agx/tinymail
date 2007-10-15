@@ -31,7 +31,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
-#include <gtkmozembed_common.h>
+#include "mozilla-preferences.h"
 
 #include <tny-moz-embed-html-mime-part-view.h>
 #include <tny-moz-embed-stream.h>
@@ -183,13 +183,6 @@ static void
 tny_moz_embed_html_mime_part_view_class_init (TnyMozEmbedHtmlMimePartViewClass *class)
 {
 	GObjectClass *object_class;
-	gint int_value;
-	gboolean bool_value;
-	const gchar *home_path;
-	const gchar *full_path;
-	const gchar *prgname;
-	gchar *profile_path;
-	gchar *useragent;
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
@@ -198,32 +191,7 @@ tny_moz_embed_html_mime_part_view_class_init (TnyMozEmbedHtmlMimePartViewClass *
 
 	g_type_class_add_private (object_class, sizeof (TnyMozEmbedHtmlMimePartViewPriv));
 
-	gtk_moz_embed_set_path (MOZILLA_HOME);
-
-	home_path = getenv ("HOME");
-	if (!home_path)
-		home_path = g_get_home_dir ();
-	prgname = g_get_prgname ();
-	if (!prgname)
-		prgname = "tinymail";
-	full_path = g_strdup_printf("%s/%s", home_path, ".tinymail");
-	profile_path = g_strconcat ("mozembed-", prgname, NULL);
-	gtk_moz_embed_set_profile_path (full_path, profile_path);
-	g_free (profile_path);
-
-	gtk_moz_embed_push_startup ();
-
-	int_value = 2;
-	gtk_moz_embed_common_set_pref (GTK_TYPE_INT, "permissions.default.image", &int_value);
-	gtk_moz_embed_common_set_pref (GTK_TYPE_INT, "permissions.default.script", &int_value);
-
-	bool_value = FALSE;
-	gtk_moz_embed_common_set_pref (GTK_TYPE_BOOL, "security.checkloaduri", &bool_value);
-
-	useragent = g_strconcat (prgname, "/", VERSION, NULL);
-	gtk_moz_embed_common_set_pref (GTK_TYPE_STRING, "general.useragent.misc", useragent);
-	g_free (useragent);
-	gtk_moz_embed_common_set_pref (GTK_TYPE_STRING, "network.proxy.no_proxies_on", "localhost");
+	_mozilla_preference_init ();
 
 	return;
 }
