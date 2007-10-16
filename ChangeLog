@@ -1,6 +1,8 @@
 2007-10-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed regression on the regression fix of a few days ago :)
+	* Renamed Maildir filenames to have '!' in stead of '_' or ':' in
+	their filenames
 
 2007-10-15  Jose Dapena Paz  <jdapena@igalia.com>
 

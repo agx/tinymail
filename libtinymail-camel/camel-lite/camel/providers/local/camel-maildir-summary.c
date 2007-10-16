@@ -67,6 +67,7 @@ static void camel_maildir_summary_finalise	(CamelObject *obj);
 
 #define _PRIVATE(x) (((CamelMaildirSummary *)(x))->priv)
 
+
 struct _CamelMaildirSummaryPrivate {
 	char *current_file;
 	char *hostname;
@@ -205,8 +206,8 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 
 	uid = camel_message_info_uid (info);
 	/* TNY CHANGE: This used to he ":2,", but VFAT does not allow those characters */
-	buf = g_alloca (strlen (uid) + strlen ("_2_") +  (sizeof (flagbits) / sizeof (flagbits[0])) + 1);
-	p = buf + sprintf (buf, "%s_2_", uid);
+	buf = g_alloca (strlen (uid) + strlen ("!2,") +  (sizeof (flagbits) / sizeof (flagbits[0])) + 1);
+	p = buf + sprintf (buf, "%s!2,", uid);
 	for (i = 0; i < sizeof (flagbits) / sizeof (flagbits[0]); i++) {
 		/* Priority flags */
 		if ((info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY) != 0) {
@@ -215,7 +216,7 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 				*p++ = flagbits[i].flag;
 		}
 		/* Standard flags*/
-		else if (info->info.info.flags & flagbits[i].flagbit)		
+		else if (info->info.info.flags & flagbits[i].flagbit)
 			*p++ = flagbits[i].flag;
 	}
 	*p = 0;
@@ -232,7 +233,7 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 	/*guint32 all = 0;*/	/* all flags */
 	int i;
 
-	p = strstr(name, "_2_");
+	p = strstr (name, "!2,");
 	if (p) {
 		p+=3;
 		while ((c = *p++)) {
@@ -363,7 +364,8 @@ static char *maildir_summary_next_uid_string(CamelFolderSummary *s)
 	if (mds->priv->current_file) {
 		char *cln;
 
-		cln = strchr(mds->priv->current_file, '_');
+		cln = strchr(mds->priv->current_file, '!');
+
 		if (cln)
 			return g_strndup(mds->priv->current_file, cln-mds->priv->current_file);
 		else
@@ -382,7 +384,7 @@ static char *maildir_summary_next_uid_string(CamelFolderSummary *s)
 				g_free(uid);
 				sleep(2);
 			}
-			uid = g_strdup_printf("%ld.%d_%u.%s", time(0), getpid(), nextuid, mds->priv->hostname);
+			uid = g_strdup_printf("%ld.%d_%u.%s", time(NULL), getpid(), nextuid, mds->priv->hostname);
 			name = g_strdup_printf("%s/tmp/%s", cls->folder_path, uid);
 			retry++;
 		} while (stat(name, &st) == 0 && retry<3);
@@ -432,8 +434,8 @@ static int maildir_summary_load(CamelLocalSummary *cls, int forceindex, CamelExc
 	dir = opendir(cur);
 	if (dir == NULL) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				      _("Cannot open maildir directory path: %s: %s"),
-				      cls->folder_path, g_strerror (errno));
+			"Cannot open maildir directory path: %s: %s",
+			cls->folder_path, g_strerror (errno));
 		g_free(cur);
 		return -1;
 	}
@@ -448,8 +450,7 @@ static int maildir_summary_load(CamelLocalSummary *cls, int forceindex, CamelExc
 		if (!strcmp (d->d_name, "core"))
 			continue;
 
-		/* map the filename -> uid */
-		uid = strchr(d->d_name, '_');
+		uid = strchr(d->d_name, '!');
 		if (uid) {
 			int len = uid-d->d_name;
 			uid = e_mempool_alloc(pool, len+1);
@@ -460,6 +461,7 @@ static int maildir_summary_load(CamelLocalSummary *cls, int forceindex, CamelExc
 			uid = e_mempool_strdup(pool, d->d_name);
 			g_hash_table_insert(mds->priv->load_map, uid, uid);
 		}
+
 	}
 	closedir(dir);
 	g_free(cur);
@@ -524,8 +526,8 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 	dir = opendir(cur);
 	if (dir == NULL) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				      _("Cannot open maildir directory path: %s: %s"),
-				      cls->folder_path, g_strerror (errno));
+			"Cannot open maildir directory path: %s: %s",
+			cls->folder_path, g_strerror (errno));
 		g_free(cur);
 		g_free(new);
 		camel_operation_end(NULL);
@@ -553,9 +555,9 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 			continue;
 
 		/* map the filename -> uid */
-		uid = strchr(d->d_name, '_');
+		uid = strchr(d->d_name, '!');
 		if (uid)
-			uid = g_strndup(d->d_name, uid-d->d_name);
+			uid = g_strndup(d->d_name, uid - d->d_name);
 		else
 			uid = g_strdup(d->d_name);
 
@@ -631,7 +633,7 @@ printf ("%s\n", info->uid);
 
 			/* copy this to the destination folder, use 'standard' semantics for maildir info field */
 			src = g_strdup_printf("%s/%s", new, name);
-			destfilename = g_strdup_printf("%s_2_", destname);
+			destfilename = g_strdup_printf("%s!2,", destname);
 			dest = g_strdup_printf("%s/%s", cur, destfilename);
 
 			/* FIXME: This should probably use link/unlink */
@@ -682,7 +684,7 @@ maildir_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChange
 	if (camel_local_summary_check(cls, changes, ex) == -1)
 		return -1;
 
-	camel_operation_start(NULL, _("Storing folder"));
+	camel_operation_start(NULL, "Storing folder");
 
 	count = camel_folder_summary_count((CamelFolderSummary *)cls);
 	for (i=count-1;i>=0;i--) {
