@@ -1,3 +1,7 @@
+2007-10-16  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed regression on the regression fix of a few days ago :)
+
 2007-10-15  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Some fixes to mozembed build.

@@ -296,14 +296,34 @@ static CamelMessageInfo *maildir_summary_add(CamelLocalSummary *cls, CamelMimeMe
 
 static CamelMessageInfo *message_info_new_from_header(CamelFolderSummary * s, struct _camel_header_raw *h)
 {
-	CamelMessageInfo *mi;
+	CamelMessageInfo *mi, *info;
 	CamelMaildirSummary *mds = (CamelMaildirSummary *)s;
 
 	mi = ((CamelFolderSummaryClass *) parent_class)->message_info_new_from_header(s, h);
 
+	/* assign the uid and new filename */ 
+
+	/* with maildir we know the real received date, from the filename  
+	   Bulls. We just use what we have in the header of the message! 
+	mdi->info.info.date_received = strtoul(camel_message_info_uid(mi), NULL, 10);  */ 
+
 	if (mi) 
 	{
 		CamelMaildirMessageInfo *mdi = (CamelMaildirMessageInfo *)mi;
+		const gchar *uid;
+
+		uid = camel_message_info_uid(mi); 
+		if (uid == NULL || uid[0] == 0) 
+			mdi->info.info.uid = camel_folder_summary_next_uid_string (s); 
+
+		/* handle 'duplicates' */ 
+		info = camel_folder_summary_uid(s, uid); 
+		if (info) { 
+			d(printf("already seen uid '%s', just summarising instead\n", uid)); 
+			camel_message_info_free(mi); 
+			mdi = (CamelMaildirMessageInfo *)(mi = info); 
+		} 
+
 
 		if (mds->priv->current_file) {
 			/* if setting from a file, grab the flags from it */
