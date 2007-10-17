@@ -234,6 +234,10 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 	int i;
 
 	p = strstr (name, "!2,");
+
+	if (!p)
+		p = strstr (name, ":2,");
+
 	if (p) {
 		p+=3;
 		while ((c = *p++)) {
@@ -365,6 +369,9 @@ static char *maildir_summary_next_uid_string(CamelFolderSummary *s)
 		char *cln;
 
 		cln = strchr(mds->priv->current_file, '!');
+	
+		if (!cln)
+			cln = strchr(mds->priv->current_file, ':');
 
 		if (cln)
 			return g_strndup(mds->priv->current_file, cln-mds->priv->current_file);
@@ -451,6 +458,10 @@ static int maildir_summary_load(CamelLocalSummary *cls, int forceindex, CamelExc
 			continue;
 
 		uid = strchr(d->d_name, '!');
+
+		if (!uid)
+			uid = strchr(d->d_name, ':');
+
 		if (uid) {
 			int len = uid-d->d_name;
 			uid = e_mempool_alloc(pool, len+1);
@@ -556,6 +567,10 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 
 		/* map the filename -> uid */
 		uid = strchr(d->d_name, '!');
+
+		if (!uid)
+			uid = strchr(d->d_name, ':');
+
 		if (uid)
 			uid = g_strndup(d->d_name, uid - d->d_name);
 		else
@@ -563,21 +578,6 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 
 		info = camel_folder_summary_uid ((CamelFolderSummary *)cls, uid);
 		if (info == NULL) {
-
-/*
-		printf ("(%s) new in cur?![---\n", uid);
-
-int y=0,i=0;
-
-i=camel_folder_summary_count (cls);
-for (y=0; y<i; y++)
-{
-	CamelMessageInfo *info = ((CamelFolderSummary*)cls)->messages->pdata[y];
-printf ("%s\n", info->uid);
-}
-
-		printf ("]--- (%s) new in cur?!\n", uid);
-*/
 
 			/* must be a message incorporated by another client, this is not a 'recent' uid */
 			if (camel_maildir_summary_add (cls, d->d_name, uid) == 0)

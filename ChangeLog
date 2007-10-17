@@ -1,3 +1,9 @@
+2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Made sure that the standard Maildir format also works (with the ':'
+	as flag separator character). The standard for Tinymail, though, is to
+	use the '!' character (fallback when reading is ':').
+
 2007-10-17  Vivek Sekar  <viveksekar@gmail.com>
 
 	* Added microb-engine-dev and changed the debug architecture to 'any'
