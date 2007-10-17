@@ -284,15 +284,88 @@ static char *maildir_summary_encode_x_evolution(CamelLocalSummary *cls, const Ca
 /* FIXME:
    both 'new' and 'add' will try and set the filename, this is not ideal ...
 */
+
+
+static CamelMessageInfo *
+adapted_local_summary_add (CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMessageInfo *info, CamelFolderChangeInfo *ci, CamelException *ex)
+{
+	CamelLocalMessageInfo *mi;
+	char *xev;
+
+	d(printf("Adding message to summary\n"));
+	
+	mi = (CamelLocalMessageInfo *)camel_folder_summary_add_from_message((CamelFolderSummary *)cls, msg);
+	if (mi) {
+		d(printf("Added, uid = %s\n", mi->uid));
+		if (info) {
+#ifdef NON_TINYMAIL_FEATURES
+
+			const CamelTag *tag = camel_message_info_user_tags(info);
+			const CamelFlag *flag = camel_message_info_user_flags(info);
+
+			while (flag) {
+				camel_message_info_set_user_flag((CamelMessageInfo *)mi, flag->name, TRUE);
+				flag = flag->next;
+			}
+			
+			while (tag) {
+				camel_message_info_set_user_tag((CamelMessageInfo *)mi, tag->name, tag->value);
+				tag = tag->next;
+			}
+#endif
+			mi->info.flags = camel_message_info_flags(info);
+			/*mi->info.flags |= (camel_message_info_flags(info) & 0xffff);*/
+			mi->info.size = ((CamelMessageInfoBase*)info)->size;
+		}
+
+		/* we need to calculate the size ourselves */
+
+		/* this is terribly slow, of course!
+
+		if (mi->info.size == 0) {
+			CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
+			camel_data_wrapper_write_to_stream((CamelDataWrapper *)msg, (CamelStream *)sn);
+			mi->info.size = (sn->written);
+			camel_object_unref((CamelObject *)sn);
+		} */
+
+		mi->info.flags &= ~(CAMEL_MESSAGE_FOLDER_NOXEV|CAMEL_MESSAGE_FOLDER_FLAGGED);
+		xev = camel_local_summary_encode_x_evolution(cls, mi);
+		camel_medium_set_header((CamelMedium *)msg, "X-Evolution", xev);
+		g_free(xev);
+		if (camel_message_info_uid(mi))
+			camel_folder_change_info_add_uid(ci, camel_message_info_uid(mi));
+	} else {
+		d(printf("Failed!\n"));
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+				     _("Unable to add message to summary: unknown reason"));
+	}
+	return (CamelMessageInfo *)mi;
+}
+
 static CamelMessageInfo *maildir_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMessageInfo *info, CamelFolderChangeInfo *changes, CamelException *ex)
 {
 	CamelMaildirMessageInfo *mi;
 
-	mi = (CamelMaildirMessageInfo *)((CamelLocalSummaryClass *) parent_class)->add(cls, msg, info, changes, ex);
+	/* mi = (CamelMaildirMessageInfo *)((CamelLocalSummaryClass *) parent_class)->add(cls, msg, info, changes, ex); */
+
+	mi = (CamelMaildirMessageInfo *) adapted_local_summary_add  (cls, msg, info, changes, ex);
+
 	if (mi) {
-		if (info) {
+		if (camel_message_info_uid(mi)) 
+		{
+			struct stat sbuf;
+			CamelMessageInfoBase *mii = (CamelMessageInfoBase *)mi;
+			gchar *name = NULL;
+
 			camel_maildir_info_set_filename(mi, camel_maildir_summary_info_to_name(mi));
 			d(printf("Setting filename to %s\n", camel_maildir_info_filename(mi)));
+
+			name = g_strdup_printf("%s/cur/%s", cls->folder_path, camel_maildir_info_filename (mi));
+			if (stat (name, &sbuf) == 0)
+				mii->size = sbuf.st_size;
+			g_free (name);
+
 		}
 	}
 
@@ -493,6 +566,7 @@ static int camel_maildir_summary_add (CamelLocalSummary *cls, const char *name, 
 	int fd;
 	CamelMimeParser *mp;
 	CamelMessageInfo *info;
+	struct stat sbuf;
 
 	d(printf("summarising: %s\n", name));
 
@@ -508,6 +582,10 @@ static int camel_maildir_summary_add (CamelLocalSummary *cls, const char *name, 
 	maildirs->priv->current_file = (char *)name;
 	info = camel_folder_summary_add_from_parser((CamelFolderSummary *)maildirs, mp);
 	info->uid = g_strdup (uid);
+
+	if (stat (filename, &sbuf) == 0)
+		((CamelMessageInfoBase *)info)->size = sbuf.st_size;
+
 	camel_object_unref((CamelObject *)mp);
 	maildirs->priv->current_file = NULL;
 	g_free(filename);

@@ -3,6 +3,7 @@
 	* Made sure that the standard Maildir format also works (with the ':'
 	as flag separator character). The standard for Tinymail, though, is to
 	use the '!' character (fallback when reading is ':').
+	* Made the sizes of Maildir E-mails more accurate (using stat())
 
 2007-10-17  Vivek Sekar  <viveksekar@gmail.com>
 

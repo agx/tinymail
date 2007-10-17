@@ -455,7 +455,6 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 				tag = tag->next;
 			}
 #endif
-
 			mi->info.flags = camel_message_info_flags(info);
 			/*mi->info.flags |= (camel_message_info_flags(info) & 0xffff);*/
 			mi->info.size = ((CamelMessageInfoBase*)info)->size;
@@ -464,7 +463,6 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 		/* we need to calculate the size ourselves */
 		if (mi->info.size == 0) {
 			CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
-
 			camel_data_wrapper_write_to_stream((CamelDataWrapper *)msg, (CamelStream *)sn);
 			mi->info.size = (sn->written);
 			camel_object_unref((CamelObject *)sn);
