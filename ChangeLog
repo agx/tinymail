@@ -1,3 +1,8 @@
+2007-10-17  Vivek Sekar  <viveksekar@gmail.com>
+
+	* Added microb-engine-dev and changed the debug architecture to 'any'
+	in debian/control.maemo1.
+
 2007-10-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed regression on the regression fix of a few days ago :)

@@ -2,7 +2,7 @@ Source: tinymail
 Section: libs 
 Priority: optional
 Maintainer: Oystein Gisnas <oystein@gisnas.net>
-Build-Depends: debhelper (>=4), cdbs, dpkg-dev (>= 1.13.18), libglib2.0-dev (>= 2.6), libgtk2.0-dev, libosso-gnomevfs2-dev, libgconf2-dev, libosso-dev, libconic0-dev, gnome-common, gtk-doc-tools
+Build-Depends: debhelper (>=4), cdbs, dpkg-dev (>= 1.13.18), libglib2.0-dev (>= 2.6), libgtk2.0-dev, libosso-gnomevfs2-dev, libgconf2-dev, libosso-dev, libconic0-dev, gnome-common, gtk-doc-tools, microb-engine-dev
 Standards-Version: 3.7.2
 
 Package: libtinymail-1.0-0
@@ -30,7 +30,7 @@ Description: memory-effective framework for accessing e-mail - development files
  This package contains the development files.
 
 Package: libtinymail-1.0-0-dbg
-Architecture: all
+Architecture: any
 Depends: libtinymail-1.0-0 (=${Source-Version})
 Description: memory-effective framework for accessing e-mail - debug symbol files
  Tinymail is a development framework for accessing E-mail services using
@@ -68,7 +68,7 @@ Description: memory-effective framework for accessing e-mail - development files
  This package contains the development files for camel-lite.
 
 Package: libtinymail-camel-1.0-0-dbg
-Architecture: all
+Architecture: any
 Depends: libtinymail-camel-1.0-0 (=${Source-Version})
 Description: memory-effective framework for accessing e-mail - debug symbol files
  Tinymail is a development framework for accessing E-mail services using
@@ -104,7 +104,7 @@ Description: memory-effective framework for accessing e-mail - development files
  This package contains the development files for libtinymailui.
 
 Package: libtinymailui-1.0-0-dbg
-Architecture: all
+Architecture: any
 Depends: libtinymailui-1.0-0 (=${Source-Version})
 Description: memory-effective framework for accessing e-mail - debug symbol files
  Tinymail is a development framework for accessing E-mail services using
@@ -140,7 +140,7 @@ Description: memory-effective framework for accessing e-mail - development files
  This package contains the development files for libtinymailui-gtk.
 
 Package: libtinymailui-gtk-1.0-0-dbg
-Architecture: all
+Architecture: any
 Depends: libtinymailui-gtk-1.0-0 (=${Source-Version})
 Description: memory-effective framework for accessing e-mail - debug symbol files
  Tinymail is a development framework for accessing E-mail services using
@@ -176,7 +176,7 @@ Description: memory-effective framework for accessing e-mail - development files
  This package contains the development files for libtinymail-maemo.
 
 Package: libtinymail-maemo-1.0-0-dbg
-Architecture: all
+Architecture: any
 Depends: libtinymail-maemo-1.0-0 (=${Source-Version})
 Description: memory-effective framework for accessing e-mail - debug symbol files
  Tinymail is a development framework for accessing E-mail services using
@@ -212,7 +212,7 @@ Description: memory-effective framework for accessing e-mail - development files
  This package contains the development files for libtinymail-gnomevfs.
 
 Package: libtinymail-gnomevfs-1.0-0-dbg
-Architecture: all
+Architecture: any
 Depends: libtinymail-gnomevfs-1.0-0 (=${Source-Version})
 Description: memory-effective framework for accessing e-mail - debug symbol files
  Tinymail is a development framework for accessing E-mail services using
