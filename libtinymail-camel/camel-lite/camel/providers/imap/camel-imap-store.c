@@ -1610,7 +1610,7 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 	CamelServiceAuthType *authtype = NULL;
 	CamelImapResponse *response;
 	char *errbuf = NULL;
-	gboolean authenticated = FALSE;
+	gboolean authenticated = FALSE, have_second_capa = FALSE;
 	const char *auth_domain;
 
 	/* Bugfix for #432234 */
@@ -1631,8 +1631,8 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 	{
 		if (!g_hash_table_lookup (store->authtypes, service->url->authmech)) {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
-					_("IMAP server %s does not support requested "
-					"authentication type %s"),
+					"IMAP server %s does not support requested "
+					"authentication type %s",
 					service->url->host,
 					service->url->authmech);
 			return FALSE;
@@ -1659,7 +1659,8 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 		if (errbuf) 
 		{
 			/* We need to un-cache the password before prompting again */
-			camel_session_forget_password (session, service, auth_domain, "password", ex);
+			camel_session_forget_password (session, service, 
+				auth_domain, "password", ex);
 			g_free (service->url->passwd);
 			service->url->passwd = NULL;
 		}
@@ -1667,12 +1668,13 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 		if (!service->url->passwd) 
 		{
 			char *prompt;
-			
-			prompt = g_strdup_printf (_("%sPlease enter the IMAP "
-						  "password for %s@%s"),
-						errbuf ? errbuf : "",
-						service->url->user,
-						service->url->host);
+
+			prompt = g_strdup_printf ("%sPlease enter the IMAP "
+					"password for %s@%s",
+					errbuf ? errbuf : "",
+					service->url->user,
+					service->url->host);
+
 			service->url->passwd =
 				camel_session_get_password (session, service, auth_domain,
 					prompt, "password", CAMEL_SESSION_PASSWORD_SECRET, ex);
@@ -1682,7 +1684,7 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 
 			if (!service->url->passwd) {
 				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
-						_("You did not enter a password."));
+					"You did not enter a password.");
 				return FALSE;
 			}
 		}
@@ -1702,7 +1704,7 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 			if (!service->url->passwd)
 			{
 				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
-						     _("You did not enter a password."));
+						"You did not enter a password.");
 				return FALSE;
 			}
 
@@ -1711,6 +1713,19 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 						       service->url->user,
 						       service->url->passwd);
 			if (response) {
+
+				char *ptr = strchr (response->status, '[');
+
+				if (ptr)
+					ptr = camel_strstrcase (ptr, "CAPABILITY");
+
+				if (ptr) {
+					char *ending = strchr (ptr, ']');
+					*ending = '\0';
+					parse_capability (store, ptr+11);
+					have_second_capa = TRUE;
+				}
+
 				camel_imap_response_free (store, response);
 				authenticated = TRUE;
 			}
@@ -1719,19 +1734,19 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 			if (camel_exception_get_id(ex) == CAMEL_EXCEPTION_USER_CANCEL)
 				return FALSE;
 			
-			errbuf = g_strdup_printf (_("Unable to authenticate "
-						    "to IMAP server.\n%s\n\n"),
-						  camel_exception_get_description (ex));
+			errbuf = g_strdup_printf ("Unable to authenticate "
+						"to IMAP server.\n%s\n\n",
+						camel_exception_get_description (ex));
 			camel_exception_clear (ex);
 
 			/* Disconnect */
 			camel_service_disconnect (service, FALSE, NULL);
 
 		} else
-			if (!imap_get_capability (service, ex))
+			if (!have_second_capa && !imap_get_capability (service, ex))
 			{
-				errbuf = g_strdup_printf (_("Unable to authenticate "
-							"to IMAP server.\n%s\n\n"),
+				errbuf = g_strdup_printf ("Unable to authenticate "
+							"to IMAP server.\n%s\n\n",
 							camel_exception_get_description (ex));
 				camel_exception_clear (ex);
 				return FALSE;

@@ -1,3 +1,11 @@
+2007-10-19  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Avoiding the second capability request, eliminating roundtrips when
+	connecting. If LOGIN returns a capability response, we assume this one
+	is complete enough to continue. The AUTH= ones are not relevant
+	anymore as we've authenticated anyway (most IMAP servers don't include
+	the AUTH= capabilities in the LOGIN's response).
+
 2007-10-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Operation notifactions no longer wait for 4 seconds to group them
