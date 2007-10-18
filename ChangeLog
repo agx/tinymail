@@ -11,6 +11,7 @@
 	* Unread count upon IDLE events
 	* Implemented QRESYNC for IMAP4 servers that already implement it:
 	http://tools.ietf.org/html/draft-ietf-lemonade-reconnect-client-06
+	* Unread count problems with TnyMergeFolder
 
 2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 

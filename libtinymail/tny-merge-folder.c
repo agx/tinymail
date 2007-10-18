@@ -1299,15 +1299,30 @@ tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 	 * in the actual underlaying folder she should rather observe that
 	 * particular folder). We also do not propagate folder renames
 	 * because these do not rename the merge folder. */
+
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyFolderChange* new_change = tny_folder_change_new (TNY_FOLDER (self));
 	TnyList *list;
 	TnyIterator *iter;
 
-	if (tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT)
-		tny_folder_change_set_new_all_count (new_change, tny_folder_change_get_new_all_count (change));
+	gint total = 0, unread = 0;
 
-	if (tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT)
-		tny_folder_change_set_new_unread_count (new_change, tny_folder_change_get_new_unread_count (change));
+	g_static_rec_mutex_lock (priv->lock);
+
+	iter = tny_list_create_iterator (priv->mothers);
+	while (!tny_iterator_is_done (iter))
+	{
+		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
+		total += tny_folder_get_all_count (cur);
+		unread += tny_folder_get_unread_count (cur);
+		g_object_unref (cur);
+		tny_iterator_next (iter);
+	}
+	g_object_unref (iter);
+	g_static_rec_mutex_unlock (priv->lock);
+
+	tny_folder_change_set_new_all_count (new_change, total);
+	tny_folder_change_set_new_unread_count (new_change, unread);
 
 	if (tny_folder_change_get_changed (change) & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS)
 	{

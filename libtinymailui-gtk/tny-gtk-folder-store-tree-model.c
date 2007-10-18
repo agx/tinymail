@@ -738,6 +738,25 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	 * the changed_folder pointer, and if there's a match it will update
 	 * the values of the model with the values from the folder. */
 
+/*
+	For your debugging advertures:
+
+	print ((TnyCamelFolderPriv *) g_type_instance_get_private \
+		(tny_iterator_get_current (tny_list_create_iterator \
+		(((TnyMergeFolderPriv *) g_type_instance_get_private \
+		(folder, tny_merge_folder_get_type()))->mothers)), \
+		tny_camel_folder_get_type()))->folder->summary->messages->len
+
+	print * (CamelLocalFolder *) ((TnyCamelFolderPriv *) \
+		g_type_instance_get_private (tny_iterator_get_current \
+		(tny_list_create_iterator (((TnyMergeFolderPriv *) \
+		g_type_instance_get_private (folder, \
+		tny_merge_folder_get_type()))->mothers)), \
+		tny_camel_folder_get_type()))->folder
+
+*/
+
+
 	gtk_tree_model_get (model, iter, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
 		&type, -1);
