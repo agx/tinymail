@@ -27,8 +27,6 @@
 
 #include <string.h>
 
-char *strcasestr(const char *haystack, const char *needle);
-
 
 #include <tny-status.h>
 #include <tny-folder-store.h>
@@ -897,7 +895,7 @@ tny_camel_folder_add_msg_async_thread (gpointer thr_user_data)
 
 	info->cancelled = FALSE;
 	if (info->err != NULL) {
-		if (strcasestr (info->err->message, "cancel") != NULL)
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 	}
 
@@ -2030,7 +2028,7 @@ tny_camel_folder_get_headers_async_thread (gpointer thr_user_data)
 	info->cancelled = FALSE;
 
 	if (info->err != NULL) {
-		if (strcasestr (info->err->message, "cancel") != NULL)
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 	}
 
@@ -2333,7 +2331,7 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	info->cancelled = FALSE;
 	if (info->err != NULL)
 	{
-		if (strcasestr (info->err->message, "cancel") != NULL)
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 		if (info->msg && G_IS_OBJECT (info->msg))
 			g_object_unref (info->msg);
@@ -4813,7 +4811,7 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 
 	info->cancelled = FALSE;
 	if (info->err != NULL) {
-		if (strcasestr (info->err->message, "cancel") != NULL)
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 	}
 

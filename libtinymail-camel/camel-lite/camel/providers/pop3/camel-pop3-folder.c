@@ -81,7 +81,6 @@ static int pop3_get_local_size (CamelFolder *folder);
 
 static void pop3_delete_attachments (CamelFolder *folder, const char *uid);
 
-char *strcasestr(const char *haystack, const char *needle);
 
 static void 
 destroy_lists (CamelPOP3Folder *pop3_folder)
@@ -824,7 +823,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		{
 			   CamelContentType *ct = NULL;
 			   const char *bound=NULL;
-			   char *pstr = (char*)strcasestr ((const char *) buffer, "Content-Type:");
+			   char *pstr = (char*)camel_strstrcase ((const char *) buffer, "Content-Type:");
 
 			   if (pstr) 
 			   {

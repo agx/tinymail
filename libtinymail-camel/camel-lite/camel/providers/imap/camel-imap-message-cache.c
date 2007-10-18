@@ -42,6 +42,7 @@
 #include "camel-exception.h"
 #include "camel-stream-fs.h"
 
+#include "camel-string-utils.h"
 #include "camel-imap-message-cache.h"
 #include "camel-stream-buffer.h"
 
@@ -550,7 +551,6 @@ camel_imap_message_cache_get (CamelImapMessageCache *cache, const char *uid,
 	return stream;
 }
 
-char *strcasestr(const char *haystack, const char *needle);
 
 static int 
 recursive_insanity (CamelStreamBuffer *stream, CamelStream *to, gchar *boundary_in, gchar *root_boundary)
@@ -577,7 +577,7 @@ recursive_insanity (CamelStreamBuffer *stream, CamelStream *to, gchar *boundary_
 
 		if (boundary == NULL)
 		{
-			   char *pstr = (char*)strcasestr ((const char *) buffer, "boundary");
+			   char *pstr = (char*) camel_strstrcase ((const char *) buffer, "boundary");
 
 			   if (pstr) 
 			   {
@@ -611,12 +611,12 @@ recursive_insanity (CamelStreamBuffer *stream, CamelStream *to, gchar *boundary_
 
 		if (open)
 		{
-			if (strstr ((const char*) buffer, (const char*) "Content-Type") &&
-					strstr ((const char*) buffer, (const char*) "multipart/alternative") &&
-					strcasestr ((const char*) buffer, (const char*) "boundary"))
+			if (camel_strstrcase ((const char*) buffer, (const char*) "Content-Type") &&
+					camel_strstrcase ((const char*) buffer, (const char*) "multipart/alternative") &&
+					camel_strstrcase ((const char*) buffer, (const char*) "boundary"))
 			{
 				char *nboundary = NULL;
-				char *pstr = (char*)strcasestr ((const char *) buffer, "boundary");
+				char *pstr = (char*)camel_strstrcase ((const char *) buffer, "boundary");
 
 				if (pstr) 
 				{

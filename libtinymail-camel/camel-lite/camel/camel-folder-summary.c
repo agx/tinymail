@@ -1965,42 +1965,6 @@ summary_format_string (struct _camel_header_raw *h, const char *name, const char
 	}
 }
 
-#ifndef _GNU_SOURCE
-/* Non static so other users can link with it too */
-char *strcasestr(const char *haystack, const char *needle)
-{
-      const gchar *p = haystack;
-      gsize needle_len = strlen (needle);
-      gsize haystack_len;
-      const gchar *end;
-      gsize i;
-
-      if (needle_len == 0)
-	return (gchar *)haystack;
-
-      haystack_len = strlen (haystack);
-
-      if (haystack_len < needle_len)
-	return NULL;
-
-      end = haystack + haystack_len - needle_len;
-      while (*p && p <= end)
-	{
-	  for (i = 0; i < needle_len; i++)
-	    if (tolower (p[i]) != tolower (needle[i]))
-	      goto next;
-	  
-	  return (gchar *)p;
-	  
-	next:
-	  p++;
-	}
-      
-      return NULL;
-}
-#else
-char *strcasestr(const char *haystack, const char *needle);
-#endif
 
 /**
  * 
@@ -2055,17 +2019,17 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 
 	if (prio) 
 	{ 
-		if (strcasestr (prio, "high") != NULL)
+		if (camel_strstrcase (prio, "high") != NULL)
 			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
 		else if (strchr (prio, '1') != NULL)
 			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
 		else if (strchr (prio, '2') != NULL)
 			mi->flags |= CAMEL_MESSAGE_HIGH_PRIORITY;
-		else if (strcasestr (prio, "normal") != NULL)
+		else if (camel_strstrcase (prio, "normal") != NULL)
 			mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;
 		else if (strchr (prio, '3') != NULL)
 			mi->flags |= CAMEL_MESSAGE_NORMAL_PRIORITY;
-		else if (strcasestr (prio, "low") != NULL)
+		else if (camel_strstrcase (prio, "low") != NULL)
 			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
 		else if (strchr (prio, '4') != NULL)
 			mi->flags |= CAMEL_MESSAGE_LOW_PRIORITY;
@@ -2076,11 +2040,11 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 
 	attach = camel_header_raw_find(&h, "X-MS-Has-Attach", NULL);
 	if (attach)
-		if (strcasestr (attach, "yes") != NULL)
+		if (camel_strstrcase (attach, "yes") != NULL)
 			mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
 	/* else {
 		attach = camel_header_raw_find(&h, "Content-Type", NULL);
-		if (strcasestr (attach, "multi") != NULL)
+		if (camel_strstrcase (attach, "multi") != NULL)
 			mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
 	} */
 

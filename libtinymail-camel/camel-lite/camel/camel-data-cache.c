@@ -49,7 +49,7 @@
 #include "camel-stream-fs.h"
 #include "camel-stream-mem.h"
 #include "camel-file-utils.h"
-
+#include "camel-string-utils.h"
 #include "camel-stream-buffer.h"
 
 
@@ -453,7 +453,6 @@ camel_data_cache_get(CamelDataCache *cdc, const char *path, const char *key, Cam
 }
 
 
-char *strcasestr(const char *haystack, const char *needle);
 
 void
 camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, const char *key)
@@ -491,7 +490,7 @@ camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, cons
 		{
 			   CamelContentType *ct = NULL;
 			   const char *bound=NULL;
-			   char *pstr = (char*)strcasestr ((const char *) buffer, "boundary");
+			   char *pstr = (char*)camel_strstrcase ((const char *) buffer, "boundary");
 
 			   if (pstr) 
 			   {

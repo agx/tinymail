@@ -101,7 +101,6 @@
  * octets) */
 #define UID_SET_LIMIT  (768)
 
-
 #define CF_CLASS(o) (CAMEL_FOLDER_CLASS (CAMEL_OBJECT_GET_CLASS(o)))
 static CamelDiscoFolderClass *disco_folder_class = NULL;
 
@@ -3615,7 +3614,6 @@ idle_response_free (IdleResponse *idle_resp)
 	g_slice_free (IdleResponse, idle_resp);
 }
 
-char *strcasestr(const char *haystack, const char *needle);
 
 static void
 idle_real_start (CamelImapStore *store)
@@ -3658,9 +3656,9 @@ idle_real_start (CamelImapStore *store)
 		gboolean tbreak = FALSE;
 		if (!strncmp (resp, "+ ", 2))
 			tbreak = TRUE;
-		if (strcasestr (resp, "NO") != NULL)
+		if (camel_strstrcase (resp, "NO") != NULL)
 			tbreak = TRUE;
-		if (strcasestr (resp, "BAD") != NULL)
+		if (camel_strstrcase (resp, "BAD") != NULL)
 			tbreak = TRUE;
 		idle_debug ("(.., ..) <- %s | in idle_real_start\n", resp);
 		g_free (resp); resp=NULL;
@@ -4690,7 +4688,7 @@ Received: from nic.funet.fi
 				{
 					CamelContentType *ct = NULL;
 					const char *bound=NULL;
-					char *pstr = (char*)strcasestr (line, "Content-Type:");
+					char *pstr = (char*)camel_strstrcase (line, "Content-Type:");
 
 					/* If it's the Content-Type line (TODO: use BODYSTRUCTURE for this) */
 

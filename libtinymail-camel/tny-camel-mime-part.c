@@ -326,7 +326,6 @@ tny_camel_mime_part_is_attachment (TnyMimePart *self)
 	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->is_attachment_func (self);
 }
 
-char *strcasestr(const char *haystack, const char *needle);
 
 static gboolean 
 tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
@@ -342,9 +341,9 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 
 	if (contdisp)
 	{
-		if (strcasestr (contdisp, "inline"))
+		if (camel_strstrcase (contdisp, "inline"))
 			return FALSE;
-		if (strcasestr (contdisp, "attachment"))
+		if (camel_strstrcase (contdisp, "attachment"))
 			return TRUE;
 	}
 

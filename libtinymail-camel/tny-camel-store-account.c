@@ -67,7 +67,6 @@
 
 static GObjectClass *parent_class = NULL;
 
-char *strcasestr(const char *haystack, const char *needle);
 
 
 typedef struct { 
@@ -1283,7 +1282,7 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 
 	info->cancelled = FALSE;
 	if (info->err != NULL) {
-		if (strcasestr (info->err->message, "cancel") != NULL)
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 	}
 
@@ -1548,7 +1547,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	url_string = g_strdup (url_string_in);
 
-	if (strcasestr (url_string, "maildir"))
+	if (camel_strstrcase (url_string, "maildir"))
 	{
 		str = strchr (url_string, '#');
 		if (str && strlen (str) > 1)
