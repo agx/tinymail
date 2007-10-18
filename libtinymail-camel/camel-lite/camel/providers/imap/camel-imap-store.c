@@ -1721,7 +1721,8 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 
 				if (ptr) {
 					char *ending = strchr (ptr, ']');
-					*ending = '\0';
+					if (ending)
+						*ending = '\0';
 					parse_capability (store, ptr+11);
 					have_second_capa = TRUE;
 				}
