@@ -616,8 +616,8 @@ camel_operation_progress (CamelOperation *cc, int sofar, int oftotal)
 	/* Transient messages dont start updating till 4 seconds after
 	   they started, then they update every second */
 	now = stamp();
-	if (cc->status_update == now) {
-		/* cc = NULL; */
+	if (FALSE && cc->status_update == now) {
+		cc = NULL;
 	} else if (s->flags & CAMEL_OPERATION_TRANSIENT) {
 		if (s->stamp + CAMEL_OPERATION_TRANSIENT_DELAY > now) {
 			cc = NULL;
