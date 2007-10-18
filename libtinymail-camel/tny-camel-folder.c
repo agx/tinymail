@@ -4738,14 +4738,14 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 		TnyIterator *iter = tny_list_create_iterator (list);
 		g_warning ("CREATING MERGE TEST (%d)\n", tny_list_get_length (list) );
 		while (!tny_iterator_is_done (iter) && i < 2) {
-			GObject *obj = tny_iterator_get_current (iter)
+			GObject *obj = tny_iterator_get_current (iter);
 			tny_merge_folder_add_folder (TNY_MERGE_FOLDER (merge), 
 				TNY_FOLDER (obj));
 			g_object_unref (obj);
 			i++; tny_iterator_next (iter);
 		}
 		g_object_unref (iter);
-		tny_list_prepend (list, (Gobject *) merge);
+		tny_list_prepend (list, (GObject *) merge);
 	}
 #endif
 
