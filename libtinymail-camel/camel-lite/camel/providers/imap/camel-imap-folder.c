@@ -3489,7 +3489,10 @@ process_idle_response (IdleResponse *idle_resp)
 		for (i=0; i < idle_resp->fetch->len; i++)
 		{
 			FetchIdleResponse *fid = idle_resp->fetch->pdata[i];
-			
+
+			if (fid->id <= 0 || fid->id > idle_resp->folder->summary->messages->len)
+				continue;
+
 			info = camel_folder_summary_index (idle_resp->folder->summary, fid->id-1);
 			/* printf ("%d = %s\n", fid->id, ((CamelMessageInfoBase *)info)->subject); */
 
