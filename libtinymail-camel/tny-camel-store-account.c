@@ -37,6 +37,7 @@
 
 #include <tny-folder.h>
 #include <tny-folder-store.h>
+#include <tny-merge-folder.h>
 #include <tny-camel-folder.h>
 #include <tny-error.h>
 

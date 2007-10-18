@@ -129,9 +129,22 @@ Read requirements.txt
 
 For debugging
 -------------
+
+-DDEBUG
+
+The DEBUG define will enable IMAP, POP, NNTP and SMTP debugging. If you compile
+with this define you'll see some of the traffic on your stdout.
+
 CFLAGS="-DDEBUG -DDBC -D_GNU_SOURCE -O0 -Wall -g -ggdb" PKG_CONFIG_PATH=/opt/asyncworker/lib/pkgconfig \
 	./autogen.sh --prefix=/opt/tinymail --enable-asyncworker --enable-tests --enable-unit-tests && \
 	 make && sudo make install
+
+-DMERGEFOLDERTEST
+
+The mergefolder test will add a merge folder to each parent folder that has 
+more than two subfolders, it takes the first and the second folder and 
+creates a subfolder called MERGE TESTER that merges these two folders together.
+
 
 Other commonly used CFLAGS
 --------------------------

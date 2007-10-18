@@ -48,6 +48,8 @@ char *strcasestr(const char *haystack, const char *needle);
 #include <tny-folder-store-change.h>
 #include <tny-folder-store-observer.h>
 #include <tny-simple-list.h>
+#include <tny-merge-folder.h>
+
 
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
@@ -4727,6 +4729,25 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 		iter = iter->next;
 	  }
 	}
+
+#ifdef MERGEFOLDERTEST
+	if (tny_list_get_length (list) > 1)
+	{
+		int i=0;
+		TnyFolder *merge = tny_merge_folder_new ("MERGE TESTER");
+		TnyIterator *iter = tny_list_create_iterator (list);
+		g_warning ("CREATING MERGE TEST (%d)\n", tny_list_get_length (list) );
+		while (!tny_iterator_is_done (iter) && i < 2) {
+			GObject *obj = tny_iterator_get_current (iter)
+			tny_merge_folder_add_folder (TNY_MERGE_FOLDER (merge), 
+				TNY_FOLDER (obj));
+			g_object_unref (obj);
+			i++; tny_iterator_next (iter);
+		}
+		g_object_unref (iter);
+		tny_list_prepend (list, (Gobject *) merge);
+	}
+#endif
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
