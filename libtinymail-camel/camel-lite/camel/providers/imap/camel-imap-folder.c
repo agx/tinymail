@@ -3602,6 +3602,7 @@ idle_response_free (IdleResponse *idle_resp)
 	if (idle_resp->vanished) {
 		g_list_foreach (idle_resp->vanished, (GFunc)g_free, NULL);
 		g_list_free (idle_resp->vanished);
+		idle_resp->vanished = NULL;
 	}
 
 	if (idle_resp->fetch) 

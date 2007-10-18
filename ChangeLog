@@ -14,6 +14,7 @@
 	* Unread count problems with TnyMergeFolder
 	* Removed use of strcasestr, replaced with own implementation
 	* non-case sensitivity of IMAP responses
+	* Various memory problem fixes
 
 2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 

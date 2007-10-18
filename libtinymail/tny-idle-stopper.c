@@ -60,6 +60,7 @@ struct _TnyIdleStopper
 	 * stopped. */
 
 	gint* refcount;
+	int new_sizer;
 };
 
 /** 

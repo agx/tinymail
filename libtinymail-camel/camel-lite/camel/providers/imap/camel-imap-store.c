@@ -883,15 +883,15 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (camel_imap_store_readline (store, &buf, ex) < 0) 
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-			_("Failed to connect to IMAP server %s"),
-			service->url->host, _("Reading IMAP greeting failed"));
+			"Failed to connect to IMAP server %s: %s",
+			service->url->host, "Reading IMAP greeting failed");
 		goto exception;
 	}
 
-	if (!strncmp(buf, "* PREAUTH", 9))
+	if (!g_ascii_strncasecmp (buf, "* PREAUTH", 9))
 		store->preauthed = TRUE;
 
-	if (strstr (buf, "Courier-IMAP"))
+	if (camel_strstrcase (buf, "Courier-IMAP"))
 		store->courier_crap = TRUE;
 
 	if (store->courier_crap || getenv("CAMEL_IMAP_BRAINDAMAGED")) 
@@ -903,7 +903,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		 * them so we always have to request the full messages
 		 * rather than getting individual parts. */
 		store->braindamaged = TRUE;
-	} else if (strstr (buf, "WEB.DE") || strstr (buf, "Mail2World")) 
+	} else if (camel_strstrcase (buf, "WEB.DE") || camel_strstrcase (buf, "Mail2World")) 
 	{
 		/* This is a workaround for servers which advertise
 		 * IMAP4rev1 but which can sometimes subtly break in
@@ -928,7 +928,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	 * interpretation of BINARY imo, so we just ignore its BINARY support. 
 	 * The server also claims to support UIDPLUS, but doesn't */
 
-	/* Tinymail hack: always use IMAP4, not IMAP4rev1 (sorry) */
+	/* Tinymail hack: always use the hack, sorry */
 	/* force_imap4 = TRUE; */
 	store->braindamaged = TRUE;
 	/* end of hack :) */
@@ -939,16 +939,16 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (!imap_get_capability (service, ex)) 
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-			_("Failed to connect to IMAP server %s"),
-			service->url->host, _("Reading first CAPABILITY failed"));
+			"Failed to connect to IMAP server %s: %s",
+			service->url->host, "Reading first CAPABILITY failed");
 		goto exception;
 	}
 
 	if (must_tls && !(store->capabilities & IMAP_CAPABILITY_STARTTLS))
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-			_("Failed to connect to IMAP server %s"),
-			service->url->host, _("STARTTLS not announced as supported on this server"));
+			"Failed to connect to IMAP server %s: %s",
+			service->url->host, "STARTTLS not announced as supported on this server");
 		goto exception;
 	}
 
@@ -970,8 +970,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (!(store->capabilities & IMAP_CAPABILITY_STARTTLS)) 
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				      _("Failed to connect to IMAP server %s in secure mode: %s"),
-				      service->url->host, _("STARTTLS not supported"));
+				"Failed to connect to IMAP server %s in secure mode: %s",
+				service->url->host, "STARTTLS not supported");
 		goto exception;
 	}
 
@@ -987,8 +987,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		store->ostream = NULL;
 		clean_quit = FALSE;
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				_("Failed to connect to IMAP server %s in secure mode: %s"),
-				service->url->host, _("STARTTLS not supported"));
+				"Failed to connect to IMAP server %s in secure mode: %s",
+				service->url->host, "STARTTLS not supported");
 		goto exception;
 	}
 
@@ -998,15 +998,15 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (camel_tcp_stream_ssl_enable_ssl (CAMEL_TCP_STREAM_SSL (tcp_stream)) == -1) 
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				_("Failed to connect to IMAP server %s in secure mode: %s (%s)"),
-				service->url->host, _("SSL negotiations failed"), strerror (errno));
+				"Failed to connect to IMAP server %s in secure mode: %s (%s)",
+				service->url->host, "SSL negotiations failed", strerror (errno));
 		goto exception;
 	}
 
 #else
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-			      _("Failed to connect to IMAP server %s in secure mode: %s"),
-			      service->url->host, _("SSL is not available in this build"));
+			"Failed to connect to IMAP server %s in secure mode: %s",
+			service->url->host, "SSL is not available in this build");
 	goto exception;
 #endif /* HAVE_SSL */
 
@@ -1017,16 +1017,16 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (!imap_get_capability (service, ex)) 
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-			_("Failed to connect to IMAP server %s (%s)"),
-			service->url->host, _("Reading second CAPABILITY failed"));
+			"Failed to connect to IMAP server %s: %s",
+			service->url->host, "Reading second CAPABILITY failed");
 		goto exception;
 	}
 
 	if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED ) { 
 		clean_quit = TRUE;
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
-				_("Failed to connect to IMAP server %s in secure mode: %s"), 
-				service->url->host, _("Unknown error"));
+				"Failed to connect to IMAP server %s in secure mode: %s", 
+				service->url->host, "Unknown error");
 		goto exception;
 	}
 
