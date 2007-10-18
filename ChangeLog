@@ -5,6 +5,9 @@
 	camel-operation.c to undo this.
 	* Added a -DMERGEFOLDERTEST that will perform a test for
 	TnyMergeFolder
+	* Implemented a small test that makes it possible to transfer messages
+	from one folder to another using the demoui
+	* Removed a few invalid assertions
 
 2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 

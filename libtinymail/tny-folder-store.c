@@ -307,7 +307,6 @@ tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetF
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER_STORE (self));
 	g_assert (list);
-	g_assert (callback);
 	g_assert (TNY_IS_LIST (list));
 	if (query)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));

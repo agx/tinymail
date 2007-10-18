@@ -1520,16 +1520,104 @@ on_merge_view_activate (GtkMenuItem *mitem, gpointer user_data)
 
 }
 
+
+typedef struct {
+	TnyHeader *header;
+	TnyFolder *to_folder;
+} OnMoveToFolderInfo;
+
+static void 
+on_move_to_folder_activate (GtkMenuItem *mitem, gpointer user_data)
+{
+	OnMoveToFolderInfo *info = user_data;
+	TnyFolder *folder = tny_header_get_folder (info->header);
+
+	if (folder) 
+	{
+		TnyList *headers = tny_simple_list_new ();
+
+		g_print ("Transfering: %s to %s\n",
+			tny_header_get_subject (info->header), 
+			tny_folder_get_name (info->to_folder));
+
+		tny_list_prepend (headers, (GObject *) info->header);
+		tny_folder_transfer_msgs_async (folder, headers, info->to_folder, 
+			FALSE, NULL, NULL, user_data);
+		g_object_unref (headers);
+	}
+
+	return;
+}
+
+static void
+recursive_all_folders (GtkWidget *my_widget, GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data, GtkWidget *menu)
+{
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
+	do {
+		GtkTreeIter niter;
+		GObject *citem;
+		gchar *line;
+
+		gtk_tree_model_get (model, iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			&citem, TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, &line, -1);
+
+		if (TNY_IS_FOLDER (citem))
+		{
+			GtkTreeIter hiter;
+			GtkTreeModel *hmodel = gtk_tree_view_get_model (priv->header_view);
+			GtkTreeSelection *sel = gtk_tree_view_get_selection (priv->header_view);
+
+			if (gtk_tree_selection_get_selected (sel, &hmodel, &hiter))
+			{
+				/* Small leak, indeed */
+				OnMoveToFolderInfo *info = g_new0 (OnMoveToFolderInfo, 1);
+				GtkWidget *menuitem = NULL;
+
+				info->to_folder = (TnyFolder *) citem;
+				gtk_tree_model_get (hmodel, &hiter, 
+					TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN, 
+					&info->header, -1);
+
+				menuitem = gtk_menu_item_new_with_label (tny_folder_get_name ((TnyFolder *)citem));
+
+				g_signal_connect (G_OBJECT (menuitem), "activate",
+					G_CALLBACK (on_move_to_folder_activate), info);
+
+				gtk_widget_show (menuitem);
+				gtk_menu_prepend (menu, menuitem);
+			}
+		}
+
+		g_object_unref (citem);
+
+		if (gtk_tree_model_iter_children (model, &niter, iter)) {
+			recursive_all_folders (my_widget, model, &niter, user_data, menu);
+		}
+
+	} while (gtk_tree_model_iter_next (model, iter));
+}
+
 static void
 header_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointer user_data)
 {
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+
 	GtkWidget *menu;
 	int button, event_time;
+	GtkTreeView *view = priv->mailbox_view;
+	GtkTreeModel *model = gtk_tree_view_get_model (view);
 
 	menu = gtk_menu_new ();
-	g_signal_connect (menu, "deactivate", G_CALLBACK (gtk_widget_destroy), NULL);
 
-	/* ... add menu items ... */
+	if (model) {
+		GtkTreeIter iter;
+		gtk_tree_model_get_iter_first (model, &iter);
+		recursive_all_folders (my_widget, model, &iter, user_data, menu);
+	}
 
 	if (event)
 	{

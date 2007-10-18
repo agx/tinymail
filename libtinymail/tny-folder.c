@@ -807,8 +807,6 @@ tny_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatus
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (callback);
-	g_assert (status_callback);
 	g_assert (TNY_FOLDER_GET_IFACE (self)->refresh_async_func != NULL);
 #endif
 
@@ -1031,7 +1029,6 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
 	g_assert (TNY_IS_LIST (header_list));
 	g_assert (folder_dst);
 	g_assert (TNY_IS_FOLDER (folder_dst));
-	g_assert (callback);
 	g_assert (TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func != NULL);
 #endif
 
@@ -1189,8 +1186,6 @@ tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback 
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (header);
 	g_assert (TNY_IS_HEADER (header));
-	g_assert (callback);
-	g_assert (status_callback);
 	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_async_func != NULL);
 #endif
 

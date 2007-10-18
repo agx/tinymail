@@ -306,7 +306,7 @@ tny_gtk_folder_store_tree_model_on_changed (TnyAccount *account, TnyGtkFolderSto
 			found = TRUE;
 			break;
 		}
-		g_object_unref (G_OBJECT (citem));
+		g_object_unref (citem);
 
 	  } while (gtk_tree_model_iter_next (model, &iter));
 
