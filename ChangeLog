@@ -1,3 +1,9 @@
+2007-10-18  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Operation notifactions no longer wait for 4 seconds to group them
+	together. This is experimental. Uncomment line 620 of
+	camel-operation.c to undo this.
+
 2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Made sure that the standard Maildir format also works (with the ':'

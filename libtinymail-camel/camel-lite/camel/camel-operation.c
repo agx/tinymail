@@ -617,7 +617,7 @@ camel_operation_progress (CamelOperation *cc, int sofar, int oftotal)
 	   they started, then they update every second */
 	now = stamp();
 	if (cc->status_update == now) {
-		cc = NULL;
+		/* cc = NULL; */
 	} else if (s->flags & CAMEL_OPERATION_TRANSIENT) {
 		if (s->stamp + CAMEL_OPERATION_TRANSIENT_DELAY > now) {
 			cc = NULL;
