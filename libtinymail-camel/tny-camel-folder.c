@@ -342,120 +342,103 @@ _tny_camel_folder_check_unread_count (TnyCamelFolder *self)
 static void 
 folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer user_data)
 {
-  TnyCamelFolderPriv *priv = (TnyCamelFolderPriv *) user_data;
-  TnyFolder *self = priv->self;
-  TnyFolderChange *change = NULL;
-  CamelFolderSummary *summary;
-  gboolean old = priv->dont_fkill, has_chg = FALSE;
-  gint i = 0;
+	TnyCamelFolderPriv *priv = (TnyCamelFolderPriv *) user_data;
+	TnyFolder *self = priv->self;
+	TnyFolderChange *change = NULL;
+	CamelFolderSummary *summary;
+	gboolean old = priv->dont_fkill;
+	gint i = 0;
 
-  if (!priv->handle_changes)
-  	return;
-
-  if (g_static_rec_mutex_trylock (priv->folder_lock))
-  {
-	if (!priv->folder) 
-	{
-		g_static_rec_mutex_unlock (priv->folder_lock);
+	if (!priv->handle_changes)
 		return;
-	}
 
-	summary = priv->folder->summary;
-
-	for (i = 0; i< info->uid_added->len; i++)
+	if (g_static_rec_mutex_trylock (priv->folder_lock))
 	{
-		const char *uid = info->uid_added->pdata[i];
-
-		CamelMessageInfo *minfo = camel_folder_summary_uid (summary, uid);
-		if (info)
+		if (!priv->folder) 
 		{
-			TnyHeader *hdr = _tny_camel_header_new ();
-			guint32 flags = camel_message_info_flags (minfo);
-
-			if (info->push_email_event) 
-			{
-				if (flags & CAMEL_MESSAGE_SEEN)
-					priv->unread_length++;
-				priv->cached_length++;
-				has_chg = TRUE;
-			}
-
-			if (!change)
-				change = tny_folder_change_new (TNY_FOLDER (self));
-
-			/* This adds a reason to live to self */
-			_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
-				TNY_CAMEL_FOLDER (self), priv);
-			/* hdr will take care of the freeup*/
-			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-			tny_folder_change_add_added_header (change, hdr);
-			g_object_unref (G_OBJECT (hdr));
+			g_static_rec_mutex_unlock (priv->folder_lock);
+			return;
 		}
-	}
 
-	for (i = 0; i< info->uid_removed->len; i++)
-	{
-		const char *uid = info->uid_removed->pdata[i];
+		summary = priv->folder->summary;
 
-		CamelMessageInfo *minfo = camel_message_info_new_uid (NULL, uid);
-		if (minfo)
+		if (!change && info->uid_changed != NULL && info->uid_changed->len > 0) {
+			priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+			change = tny_folder_change_new (TNY_FOLDER (self));
+		}
+
+		for (i = 0; i< info->uid_added->len; i++)
 		{
-			TnyHeader *hdr = _tny_camel_header_new ();
+			const char *uid = info->uid_added->pdata[i];
 
-			if (info->push_email_event) 
+			CamelMessageInfo *minfo = camel_folder_summary_uid (summary, uid);
+			if (info)
 			{
-				priv->cached_length--;
-				priv->unread_sync++;
-				has_chg = TRUE;
+				TnyHeader *hdr = _tny_camel_header_new ();
+
+				if (info->push_email_event) 
+					priv->cached_length++;
+
+				if (!change)
+					change = tny_folder_change_new (TNY_FOLDER (self));
+
+				/* This adds a reason to live to self */
+				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+					TNY_CAMEL_FOLDER (self), priv);
+				/* hdr will take care of the freeup*/
+				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+				tny_folder_change_add_added_header (change, hdr);
+				g_object_unref (hdr);
 			}
-
-			if (!change)
-				change = tny_folder_change_new (self);
-
-			/* This adds a reason to live to self */
-			_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
-				TNY_CAMEL_FOLDER (self), priv);
-			/* hdr will take care of the freeup */
-			_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-			tny_folder_change_add_expunged_header (change, hdr);
-			g_object_unref (hdr);
 		}
-	}
 
-	update_iter_counts (priv);
+		for (i = 0; i< info->uid_removed->len; i++)
+		{
+			const char *uid = info->uid_removed->pdata[i];
 
-	if (change && priv->unread_sync > 10)
+			CamelMessageInfo *minfo = camel_message_info_new_uid (NULL, uid);
+			if (minfo)
+			{
+				TnyHeader *hdr = _tny_camel_header_new ();
+
+				if (info->push_email_event) 
+					priv->cached_length--;
+
+				if (!change)
+					change = tny_folder_change_new (self);
+
+				/* This adds a reason to live to self */
+				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+					TNY_CAMEL_FOLDER (self), priv);
+				/* hdr will take care of the freeup */
+				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+				tny_folder_change_add_expunged_header (change, hdr);
+				g_object_unref (hdr);
+			}
+		}
+
+		update_iter_counts (priv);
+
+		/* search for IN TNY */
+		/*if (info->uid_removed && info->uid_removed->len > 0)
+			camel_folder_summary_save (camel_folder->summary, &ex);*/
+
+		g_static_rec_mutex_unlock (priv->folder_lock);
+	} else
+		g_warning ("Tinymail Oeps: Failed to lock during a notification\n");
+
+
+	if (change)
 	{
-		/* The unread-sync is to avoid the expensive counting of unread
-		 * unread messages (yes I know it sucks, but get_unread_msg_cnt
-		 * walks the entire summary to count the unread ones).
-		 * TNY TODO: a better solution for this */
-
-		priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
-		priv->unread_sync = 0;
-		has_chg = TRUE;
+		tny_folder_change_set_new_unread_count (change, priv->unread_length);
+		tny_folder_change_set_new_all_count (change, priv->cached_length);
+		priv->dont_fkill = TRUE;
+		notify_folder_observers_about_in_idle (TNY_FOLDER (self), change);
+		g_object_unref (change);
+		priv->dont_fkill = old;
 	}
 
-  /* search for IN TNY */
-  /*if (info->uid_removed && info->uid_removed->len > 0)
-  	camel_folder_summary_save (camel_folder->summary, &ex);*/
-
-	g_static_rec_mutex_unlock (priv->folder_lock);
-  } else
-	g_warning ("Tinymail Oeps: Failed to lock during a notification\n");
-
-
-  if (change)
-  {
-  	tny_folder_change_set_new_unread_count (change, priv->unread_length);
-  	if (has_chg) 
-  		tny_folder_change_set_new_all_count (change, priv->cached_length);
-  	priv->dont_fkill = TRUE;
-  	notify_folder_observers_about_in_idle (TNY_FOLDER (self), change);
-  	g_object_unref (change);
-  	priv->dont_fkill = old;
-  }
-
+	return;
 }
 
 

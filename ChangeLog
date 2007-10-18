@@ -8,6 +8,7 @@
 	* Implemented a small test that makes it possible to transfer messages
 	from one folder to another using the demoui
 	* Removed a few invalid assertions
+	* Unread count upon IDLE events
 
 2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 
