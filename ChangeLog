@@ -13,6 +13,7 @@
 	http://tools.ietf.org/html/draft-ietf-lemonade-reconnect-client-06
 	* Unread count problems with TnyMergeFolder
 	* Removed use of strcasestr, replaced with own implementation
+	* non-case sensitivity of IMAP responses
 
 2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
 

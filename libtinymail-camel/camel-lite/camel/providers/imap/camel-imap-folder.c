@@ -3061,7 +3061,7 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 	while ((type = camel_imap_command_response (store, &resp, ex)) ==
 			CAMEL_IMAP_RESPONSE_UNTAGGED) 
 	{
-		str = strstr (resp, "SEARCH");
+		str = camel_strstrcase (resp, "SEARCH");
 
 		if (str)
 		{
@@ -3529,17 +3529,17 @@ read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 
 	idle_debug ("read_idle_response (%s)\n", resp);
 
-	if (ptr && strstr (resp, "EXISTS") != NULL)
+	if (ptr && camel_strstrcase (resp, "EXISTS") != NULL)
 		idle_resp->exists = strtoul (resp + 1, NULL, 10);
 
-	if (ptr && strstr (resp, "RECENT") != NULL)
+	if (ptr && camel_strstrcase (resp, "RECENT") != NULL)
 		idle_resp->recent = strtoul (resp + 1, NULL, 10);
 
-	if (ptr && strstr (resp, "FETCH") != NULL)
+	if (ptr && camel_strstrcase (resp, "FETCH") != NULL)
 	{
 		char *fptr = resp;
 		guint id = strtoul (resp + 1, &fptr, 10);
-		fptr = strstr (fptr, "FLAGS");
+		fptr = camel_strstrcase (fptr, "FLAGS");
 		if (fptr)
 			fptr = strchr (fptr, '(');
 		if (fptr) {
@@ -3556,14 +3556,14 @@ read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 	if (imap_store->capabilities & IMAP_CAPABILITY_QRESYNC)
 	{
 		if (ptr) 
-			ptr2 = strstr (resp, "VANISHED");
+			ptr2 = camel_strstrcase (resp, "VANISHED");
 		if (ptr && ptr2 != NULL)  {
 			idle_debug ("VANISHED line (%s)\n", ptr2);
 			idle_resp->vanished = g_list_append (idle_resp->vanished, g_strdup (ptr2));
 		}
 	} else {
 		if (ptr)
-			ptr2 = strstr (resp, "EXPUNGE");
+			ptr2 = camel_strstrcase (resp, "EXPUNGE");
 		if (ptr && ptr2 != NULL) 
 		{
 			guint32 id = strtoul (resp + 1, NULL, 10);
@@ -3698,9 +3698,9 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 		resp = NULL;
 		while (camel_imap_store_readline_nb (store, &resp, &ex) > 0)
 		{
-			if (strchr (resp, '*') != NULL && (strstr (resp, "EXISTS") || 
-				strstr (resp, "FETCH")|| strstr (resp, "EXPUNGE") || 
-				strstr (resp, "VANISHED") || strstr (resp, "RECENT")))
+			if (strchr (resp, '*') != NULL && (camel_strstrcase (resp, "EXISTS") || 
+				camel_strstrcase (resp, "FETCH")|| camel_strstrcase (resp, "EXPUNGE") || 
+				camel_strstrcase (resp, "VANISHED") || camel_strstrcase (resp, "RECENT")))
 			{
 				if (!idle_resp) 
 					idle_resp = idle_response_new (folder);
@@ -3736,9 +3736,9 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 		while ((type = camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
 		{
 			/* printf ("D resp: %s\n", resp); */
-			if (strchr (resp, '*') != NULL && (strstr (resp, "EXISTS") ||
-				strstr (resp, "FETCH") || strstr (resp, "EXPUNGE") || 
-				strstr (resp, "RECENT")))
+			if (strchr (resp, '*') != NULL && (camel_strstrcase (resp, "EXISTS") ||
+				camel_strstrcase (resp, "FETCH") || camel_strstrcase (resp, "EXPUNGE") || 
+				camel_strstrcase (resp, "RECENT")))
 			{
 				if (!idle_resp)
 					idle_resp = idle_response_new (folder);
@@ -4253,7 +4253,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 						_("This message is not currently available"
 						" (can't let a new connection go online)"));
-			else if (strstr (camel_exception_get_description (ex), "summary") != NULL)
+			else if (camel_strstrcase (camel_exception_get_description (ex), "summary") != NULL)
 			{
 				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 						_("This message is not currently available"
@@ -4349,7 +4349,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 				/* If the line doesn't start with "* " */
 
-				if (strstr (line, "BAD")) {
+				if (camel_strstrcase (line, "BAD")) {
 					g_warning ("Read from service failed: Server does not like how "
 						" we use BINARY (%s)\n", line);
 					store->capabilities &= ~IMAP_CAPABILITY_BINARY;
