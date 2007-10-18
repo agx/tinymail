@@ -120,6 +120,9 @@ static void imap_cache_message (CamelDiscoFolder *disco_folder, const char *uid,
 static void imap_rename (CamelFolder *folder, const char *new);
 static void imap_set_push_email (CamelFolder *folder, gboolean setting);
 
+static int process_condstore_line (CamelImapFolder *imap_folder, char *resp, CamelFolderChangeInfo *changes);
+
+
 /* message manipulation */
 static CamelMimeMessage *imap_get_message (CamelFolder *folder, const gchar *uid,
 					   CamelFolderReceiveType type, gint param, CamelException *ex);
@@ -151,8 +154,9 @@ static GPtrArray *imap_search_by_expression (CamelFolder *folder, const char *ex
 static GPtrArray *imap_search_by_uids	    (CamelFolder *folder, const char *expression, GPtrArray *uids, CamelException *ex);
 static void       imap_search_free          (CamelFolder *folder, GPtrArray *uids);
 static int imap_get_local_size (CamelFolder *folder);
-
 static void imap_thaw (CamelFolder *folder);
+
+static void camel_imap_folder_changed_for_uids (CamelFolder *folder, GPtrArray *expunged, CamelFolderChangeInfo *changes);
 
 static CamelObjectClass *parent_class;
 
@@ -406,6 +410,32 @@ get_highestmodseq (CamelImapFolder *imap_folder)
 	return retval;
 }
 
+char*
+camel_imap_folder_get_highestmodseq (CamelImapFolder *imap_folder)
+{
+	return get_highestmodseq (imap_folder);
+}
+
+static void
+handle_vanished (CamelFolder *folder, char *resp, CamelFolderChangeInfo *changes)
+{
+	char *str = strchr (resp+8, ')');
+	char *uidset, *lasts = NULL;
+
+	if (str) {
+		str++;
+		if (*str == ' ')
+			str++;
+	} else 
+		str = resp+9;
+
+	for (uidset = strtok_r (str, ",", &lasts); uidset; uidset = strtok_r (NULL, ",", &lasts)) {
+		GPtrArray *parray = imap_uid_set_to_array (folder->summary, uidset);
+		camel_imap_folder_changed_for_uids (folder, parray, changes);
+		imap_uid_array_free (parray);
+	}
+}
+
 /* Called with the store's connect_lock locked */
 
 
@@ -444,6 +474,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	char *resp, *phighestmodseq = NULL, *highestmodseq = NULL;
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
 	gboolean removals = FALSE, condstore = FALSE, needtoput=FALSE, suc=FALSE;
+	CamelFolderChangeInfo *changes = NULL;
 
 	count = camel_folder_summary_count (folder->summary);
 
@@ -522,7 +553,25 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 				 * else tries to interpret it. */
 				g_free (response->untagged->pdata[i]);
 				g_ptr_array_remove_index (response->untagged, i--);
+			} else if (!g_ascii_strncasecmp (resp, " FETCH", 6)) {
+				/* QRESYNC! Sanity! 
+				 * Making the copy sucks a little bit, but I'd
+				 * having to rewrite the parsing thing of this
+				 * Camel IMAP crap :-) */
+				char *nresp = g_strdup_printf ("* %d%s", (int)num, resp);
+				if (changes == NULL)
+					changes = camel_folder_change_info_new();
+				if (process_condstore_line (imap_folder, nresp, changes) == -1)
+					g_warning ("Invalid QRESYNC response: (%s)", nresp);
+				g_free (nresp);
 			}
+
+		} else if (!g_ascii_strncasecmp (resp, "VANISHED", 8)) 
+		{
+			/* QRESYNC! Sanity! */
+			if (changes == NULL)
+				changes = camel_folder_change_info_new();
+			handle_vanished (folder, resp, changes);
 		}
 	}
 
@@ -552,7 +601,9 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	/* If there's no match on VALIDITY, we are dealing with a different 
 	 * folder. For example the folder got removed and re-created. We'll
 	 * simply clear everyting and do things from scratch. */
-	
+
+	/* TODO: With QRESYNC we can also let the IMAP server do this check */
+
 	if (!imap_summary->validity)
 		imap_summary->validity = validity;
 	else if (validity != imap_summary->validity) {
@@ -574,12 +625,17 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 
 	/* If we already had stuff locally, get the last one's UID . Store it in
 	 * what we will start calling VAL */
-	
+
+	count = camel_folder_summary_count (folder->summary);
+
 	if (count > 0)
 	{
 		info = camel_folder_summary_index (folder->summary, count - 1);
-		val = strtoul (camel_message_info_uid (info), NULL, 10);
-		camel_message_info_free(info);
+		if (info) {
+			val = strtoul (camel_message_info_uid (info), NULL, 10);
+			camel_message_info_free(info);
+		} else 
+			val = -1;
 	} else 
 		val = -1;
 
@@ -588,102 +644,122 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 	 * happened. This CONDSTORE code does not yet support expunges. 
 	 * Therefore we will simply use the old code. */
 
-	if (phighestmodseq != NULL && (val != uidnext-1))
+	if (count > exists || (!(store->capabilities & IMAP_CAPABILITY_QRESYNC)))
 	{
-		g_free (phighestmodseq); 
-		phighestmodseq = NULL;
-		removals = TRUE;
-	}
+		/* If we still have more local than remote, something in the
+		 * VANISHED line didn't work :-\, if count is < exist then
+		 * well handle that in the else-case for QRESYNC (look lower) */
 
-	/* If our local count isn't the same as the EXISTS, then our CONDSTORE 
-	 * implementation can't be used. Period. */
-	
-	if (exists != count)
-	{
-		if (phighestmodseq != NULL)
-			g_free (phighestmodseq); 
-		phighestmodseq = NULL;
-		removals = TRUE;
-	}
-
-	if (removals)
-		imap_folder->need_rescan = TRUE;
-	else if (condstore && (store->capabilities & IMAP_CAPABILITY_CONDSTORE))
-		imap_folder->need_rescan = FALSE;
-
-	/* We still aren't certain. For example if at the end of the mailbox 
-	 * both an add and an expunge happened, then all of above figured out
-	 * nothing meaningful. So we will compare the last local uid with the
-	 * remote uid at the same sequence number (that's count, as the count
-	 * is the index + 1). This is where we need the VAL thingy of above. */
-	
-	if (!imap_folder->need_rescan) 
-	{
-		int mval = 0;
-
-		/* If the UID of the highest message we know about has changed, 
-		 * then that indicates that messages have been both added and 
-		 * removed, so we have to rescan to find the removed ones */
-
-		if (count != 0)
+		if (phighestmodseq != NULL && (val != uidnext-1))
 		{
-			response = camel_imap_command (store, NULL, ex, "FETCH %d UID", count);
-			if (response) {
-				uid = 0;
-				for (i = 0; i < response->untagged->len; i++) 
-				{
-					resp = response->untagged->pdata[i];
-					mval = strtoul (resp + 2, &resp, 10);
-					if (mval == 0)
-						continue;
-					if (!g_ascii_strcasecmp (resp, " EXISTS")) 
-					{
-						/* Another one?? */
-						exists = mval;
-						continue;
-					}
-					if (uid != 0 || mval != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
-						continue;
-					
-					fetch_data = parse_fetch_response (imap_folder, resp + 7);
-					uid = strtoul (g_datalist_get_data (&fetch_data, "UID"), NULL, 10);
-					g_datalist_clear (&fetch_data);
-				}
-				camel_imap_response_free_without_processing (store, response);
-				if (uid == 0 || uid != val)
-					imap_folder->need_rescan = TRUE;
-			} else 
-				imap_folder->need_rescan = TRUE;
-		} else
+			g_free (phighestmodseq); 
+			phighestmodseq = NULL;
+			removals = TRUE;
+		}
+
+		/* If our local count isn't the same as the EXISTS, then our CONDSTORE 
+		 * implementation can't be used. Period. */
+
+		if (exists != count)
+		{
+			if (phighestmodseq != NULL)
+				g_free (phighestmodseq); 
+			phighestmodseq = NULL;
+			removals = TRUE;
+		}
+
+		if (removals)
 			imap_folder->need_rescan = TRUE;
-	}
+		else if (condstore && (store->capabilities & IMAP_CAPABILITY_CONDSTORE))
+			imap_folder->need_rescan = FALSE;
 
-	/* Okay, it survived ALL checks and CONDSTORE is available too. Lucky we 
-	 * are, aren't we? So we use CONDSTORE. Note, however, that if condstore 
-	 * still finds removals (sequences don't match) or if anything goes wrong
-	 * during the CONDSTORE code, that it'll set need_rescan TRUE and that 
-	 * as a result the lines below this if{} block will still happen. This is
-	 * indeed on purpose and as a fall-back situation (our detection got it
-	 * wrong) */
-	
-	if (phighestmodseq)
-	{
-		if (!imap_folder->need_rescan)
-			suc = imap_rescan_condstore (folder, exists, phighestmodseq, ex);
-		g_free (phighestmodseq);
-		phighestmodseq = NULL;
-	}
+		/* We still aren't certain. For example if at the end of the mailbox 
+		 * both an add and an expunge happened, then all of above figured out
+		 * nothing meaningful. So we will compare the last local uid with the
+		 * remote uid at the same sequence number (that's count, as the count
+		 * is the index + 1). This is where we need the VAL thingy of above. */
+		
+		if (!imap_folder->need_rescan) 
+		{
+			int mval = 0;
 
-	if (imap_folder->need_rescan)
-		suc = imap_rescan (folder, exists, ex);
-	else if (exists > count)
-		camel_imap_folder_changed (folder, exists, NULL, ex);
+			/* If the UID of the highest message we know about has changed, 
+			 * then that indicates that messages have been both added and 
+			 * removed, so we have to rescan to find the removed ones */
+
+			if (count != 0)
+			{
+				response = camel_imap_command (store, NULL, ex, "FETCH %d UID", count);
+				if (response) {
+					uid = 0;
+					for (i = 0; i < response->untagged->len; i++) 
+					{
+						resp = response->untagged->pdata[i];
+						mval = strtoul (resp + 2, &resp, 10);
+						if (mval == 0)
+							continue;
+						if (!g_ascii_strcasecmp (resp, " EXISTS")) 
+						{
+							/* Another one?? */
+							exists = mval;
+							continue;
+						}
+						if (uid != 0 || mval != count || g_ascii_strncasecmp (resp, " FETCH (", 8) != 0)
+							continue;
+						
+						fetch_data = parse_fetch_response (imap_folder, resp + 7);
+						uid = strtoul (g_datalist_get_data (&fetch_data, "UID"), NULL, 10);
+						g_datalist_clear (&fetch_data);
+					}
+					camel_imap_response_free_without_processing (store, response);
+					if (uid == 0 || uid != val)
+						imap_folder->need_rescan = TRUE;
+				} else 
+					imap_folder->need_rescan = TRUE;
+			} else
+				imap_folder->need_rescan = TRUE;
+		}
+
+
+		/* Okay, it survived ALL checks and CONDSTORE is available too. Lucky we 
+		 * are, aren't we? So we use CONDSTORE. Note, however, that if condstore 
+		 * still finds removals (sequences don't match) or if anything goes wrong
+		 * during the CONDSTORE code, that it'll set need_rescan TRUE and that 
+		 * as a result the lines below this if{} block will still happen. This is
+		 * indeed on purpose and as a fall-back situation (our detection got it
+		 * wrong) */
+		
+		if (phighestmodseq)
+		{
+			if (!imap_folder->need_rescan)
+				suc = imap_rescan_condstore (folder, exists, phighestmodseq, ex);
+			g_free (phighestmodseq);
+			phighestmodseq = NULL;
+		}
+
+		if (imap_folder->need_rescan)
+			suc = imap_rescan (folder, exists, ex);
+		else if (exists > count)
+			camel_imap_folder_changed (folder, exists, NULL, ex);
+	} else {
+		/* Wow, this IMAP server rocks! it has QRESYNC! Hi there Isode!*/
+		suc = TRUE;
+		needtoput = TRUE;
+
+		if (exists > count)
+			camel_imap_folder_changed (folder, exists, NULL, ex);
+	}
 
 	if (highestmodseq != NULL && suc && needtoput)
 		put_highestmodseq (imap_folder, (const char *) highestmodseq);
 
 	if (highestmodseq != NULL)
 		g_free (highestmodseq);
+
+	if (changes) {
+		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
+		camel_folder_change_info_free(changes);
+	}
 
 	if (idle)
 		camel_imap_folder_start_idle (folder);
@@ -906,6 +982,89 @@ flags_to_label(CamelFolder *folder, CamelImapMessageInfo *mi)
 
 #endif
 
+
+static int
+process_condstore_line (CamelImapFolder *imap_folder, char *resp, CamelFolderChangeInfo *changes) 
+{
+	gint retval = 0, summary_len;
+	GData *data;
+	char *uid;
+	guint32 flags, seq;
+	CamelMessageInfo *info;
+	CamelImapMessageInfo *iinfo;
+	CamelFolder *folder = (CamelFolder *) imap_folder;
+
+	summary_len = camel_folder_summary_count (folder->summary);
+	data = parse_fetch_response (imap_folder, resp);
+
+	if (!data)
+		return -1;
+
+	uid = g_datalist_get_data (&data, "UID");
+	flags = GPOINTER_TO_UINT (g_datalist_get_data (&data, "FLAGS"));
+	seq = GPOINTER_TO_UINT (g_datalist_get_data (&data, "SEQUENCE"));
+
+	/* So basically: if the UID is not found locally, we have flags
+	 * for a new message. That's cool, but not an error as the 
+	 * camel_imap_folder_changed will launch imap_update_summary 
+	 * who will deal with that.
+	 * 
+	 * See, we wont find it if it's larger than the count of the
+	 * local summary list. We don't even have to check that, right? 
+	 * 
+	 * We also check for negative sequences. No reason for that, 
+	 * it's just wrong (actually impossible since it's a unsigned 
+	 * int, but it's just for security-clarity here. Let it be, it 
+	 * doesn't hurt either) */
+	
+	if (!uid /*|| seq < 0 */|| seq-1 > summary_len) {
+		g_datalist_clear (&data);
+		return -1;
+	}
+
+	info = camel_folder_summary_index (folder->summary, seq-1);
+	iinfo = (CamelImapMessageInfo *) info;
+
+	/* However, if we do find the message-info at that index then we 
+	 * we should also check whether the UID matches. If not, well ..
+	 * that's not good eh. That means that we shouldn't have been 
+	 * using this CONDSTORE code in the first place! Bad luck, we 
+	 * just set need_rescan TRUE and let the selected metod launch
+	 * the conventional imap_rescan later-on. Since we are receiving 
+	 * stuff anyway, and we need to read that away nonetheless, we
+	 * just continue doing our stuff. */
+	
+	if (info) 
+	{
+		/* printf ("%s vs %s on %d\n", info->uid, uid, seq-1); */
+		if (!strcmp (info->uid, uid))
+		{
+		  if (flags != iinfo->server_flags) 
+		  {
+			guint32 server_set, server_cleared;
+
+			camel_folder_summary_touch (folder->summary);
+			server_set = flags & ~iinfo->server_flags;
+			server_cleared = iinfo->server_flags & ~flags;
+			iinfo->info.flags = (iinfo->info.flags | server_set) & ~server_cleared;
+			iinfo->server_flags = flags;
+			if (changes)
+				camel_folder_change_info_change_uid(changes, uid);
+			/* flags_to_label(folder, (CamelImapMessageInfo *)info); */
+		  }
+		  camel_message_info_free (info);
+		} else {
+			imap_folder->need_rescan = TRUE;
+			retval = FALSE;
+		}
+	} else 
+		retval = -1;
+
+	g_datalist_clear (&data);
+
+	return retval;
+}
+
 static gboolean 
 imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodseq, CamelException *ex)
 {
@@ -922,8 +1081,6 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 	char *resp;
 	CamelImapResponseType type;
 	int summary_len, summary_got;
-	CamelMessageInfo *info;
-	CamelImapMessageInfo *iinfo;
 	gboolean ok, retval = TRUE;
 	CamelFolderChangeInfo *changes = NULL;
 
@@ -970,83 +1127,17 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 	summary_got = 0;
 	while ((type = camel_imap_command_response (store, &resp, ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
 	{
-		GData *data;
-		char *uid;
-		guint32 flags, seq;
+		if (changes == NULL)
+			changes = camel_folder_change_info_new();
 
-		data = parse_fetch_response (imap_folder, resp);
-		g_free (resp);
-
-		if (!data)
-			continue;
-
-		uid = g_datalist_get_data (&data, "UID");
-		flags = GPOINTER_TO_UINT (g_datalist_get_data (&data, "FLAGS"));
-		seq = GPOINTER_TO_UINT (g_datalist_get_data (&data, "SEQUENCE"));
-
-		/* So basically: if the UID is not found locally, we have flags
-		 * for a new message. That's cool, but not an error as the 
-		 * camel_imap_folder_changed will launch imap_update_summary 
-		 * who will deal with that.
-		 * 
-		 * See, we wont find it if it's larger than the count of the
-		 * local summary list. We don't even have to check that, right? 
-		 * 
-		 * We also check for negative sequences. No reason for that, 
-		 * it's just wrong (actually impossible since it's a unsigned 
-		 * int, but it's just for security-clarity here. Let it be, it 
-		 * doesn't hurt either) */
-		
-		if (!uid /*|| seq < 0 */|| seq-1 > summary_len) {
+		if (process_condstore_line (imap_folder, resp, changes) == -1) {
 			imap_folder->need_rescan = TRUE;
-			retval = FALSE;
-			g_datalist_clear (&data);
+			g_free (resp);
 			continue;
 		}
 
-		info = camel_folder_summary_index (folder->summary, seq-1);
-		iinfo = (CamelImapMessageInfo *) info;
-		
-		
-		/* However, if we do find the message-info at that index then we 
-		 * we should also check whether the UID matches. If not, well ..
-		 * that's not good eh. That means that we shouldn't have been 
-		 * using this CONDSTORE code in the first place! Bad luck, we 
-		 * just set need_rescan TRUE and let the selected metod launch
-		 * the conventional imap_rescan later-on. Since we are receiving 
-		 * stuff anyway, and we need to read that away nonetheless, we
-		 * just continue doing our stuff. */
-		
-		if (info) 
-		{
-			/* printf ("%s vs %s on %d\n", info->uid, uid, seq-1); */
-			if (!strcmp (info->uid, uid))
-			{
-			  if (flags != iinfo->server_flags) 
-			  {
-				guint32 server_set, server_cleared;
-
-				camel_folder_summary_touch (folder->summary);
-				server_set = flags & ~iinfo->server_flags;
-				server_cleared = iinfo->server_flags & ~flags;
-				iinfo->info.flags = (iinfo->info.flags | server_set) & ~server_cleared;
-				iinfo->server_flags = flags;
-
-				if (changes == NULL)
-					changes = camel_folder_change_info_new();
-				camel_folder_change_info_change_uid(changes, uid);
-				/* flags_to_label(folder, (CamelImapMessageInfo *)info); */
-			  }
-			  camel_message_info_free (info);
-			} else {
-				imap_folder->need_rescan = TRUE;
-				retval = FALSE;
-			}
-		} else 
-			retval = FALSE;
-
+		g_free (resp);
 		camel_operation_progress (NULL, ++summary_got , summary_len);
-		g_datalist_clear (&data);
 	}
 
 	camel_operation_end (NULL);
@@ -1058,8 +1149,7 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 	if (resp)
 		g_free (resp);
 
-	if (changes) 
-	{
+	if (changes) {
 		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
 		camel_folder_change_info_free(changes);
 	}
@@ -1075,7 +1165,7 @@ imap_rescan_condstore (CamelFolder *folder, int exists, const char *highestmodse
 	
 	if (!imap_folder->need_rescan)
 		camel_imap_folder_changed (folder, exists, NULL, ex);
-	
+
 	return retval;
 }
 
@@ -3360,6 +3450,7 @@ typedef struct {
 	guint32 exists;
 	guint32 recent;
 	GArray *expunged;
+	GList *vanished;
 	GPtrArray *fetch;
 	gboolean fetch_happened;
 	CamelFolder *folder;
@@ -3371,17 +3462,30 @@ process_idle_response (IdleResponse *idle_resp)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	CamelFolderChangeInfo *changes = NULL;
 
-	idle_debug ("process_idle_response\n");
-
 	if (!idle_resp)
 		return;
+
+	idle_debug ("process_idle_response (exists=%d, recent=%d)\n",
+		idle_resp->exists, idle_resp->recent);
+
+	if (idle_resp->vanished && idle_resp->folder) {
+		GList *copy = idle_resp->vanished;
+		while (copy) {
+			if (changes == NULL) {
+				changes = camel_folder_change_info_new();
+				changes->push_email_event = TRUE;
+			}
+			handle_vanished (idle_resp->folder, (char*) copy->data, changes);
+			copy = g_list_next (copy);
+		}
+	}
 
 	if (idle_resp->fetch && idle_resp->folder)
 	{
 		CamelMessageInfo *info;
 		CamelImapMessageInfo *iinfo;
-
 		guint i=0;
+
 		for (i=0; i < idle_resp->fetch->len; i++)
 		{
 			FetchIdleResponse *fid = idle_resp->fetch->pdata[i];
@@ -3415,9 +3519,10 @@ process_idle_response (IdleResponse *idle_resp)
 static void
 read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 {
-	char *ptr = strchr (resp, '*');
+	char *ptr = strchr (resp, '*'), *ptr2 = NULL;
+	CamelImapStore *imap_store = CAMEL_IMAP_STORE (folder->parent_store);
 
-	idle_debug ("read_idle_response\n");
+	idle_debug ("read_idle_response (%s)\n", resp);
 
 	if (ptr && strstr (resp, "EXISTS") != NULL)
 		idle_resp->exists = strtoul (resp + 1, NULL, 10);
@@ -3442,13 +3547,26 @@ read_idle_response (CamelFolder *folder, char *resp, IdleResponse *idle_resp)
 		} 
 	}
 
-	if (ptr && strstr (resp, "EXPUNGE") != NULL) 
-	{
-		guint32 id = strtoul (resp + 1, NULL, 10);
 
-		if (idle_resp->expunged == NULL)
-			idle_resp->expunged = g_array_new (FALSE, FALSE, sizeof (int));
-		g_array_append_val (idle_resp->expunged, id);
+	if (imap_store->capabilities & IMAP_CAPABILITY_QRESYNC)
+	{
+		if (ptr) 
+			ptr2 = strstr (resp, "VANISHED");
+		if (ptr && ptr2 != NULL)  {
+			idle_debug ("VANISHED line (%s)\n", ptr2);
+			idle_resp->vanished = g_list_append (idle_resp->vanished, g_strdup (ptr2));
+		}
+	} else {
+		if (ptr)
+			ptr2 = strstr (resp, "EXPUNGE");
+		if (ptr && ptr2 != NULL) 
+		{
+			guint32 id = strtoul (resp + 1, NULL, 10);
+			idle_debug ("EXPUNGE line (%s)\n", ptr2);
+			if (idle_resp->expunged == NULL)
+				idle_resp->expunged = g_array_new (FALSE, FALSE, sizeof (int));
+			g_array_append_val (idle_resp->expunged, id);
+		}
 	}
 }
 
@@ -3456,6 +3574,8 @@ static IdleResponse*
 idle_response_new (CamelFolder *folder)
 {
 	IdleResponse *idle_resp = g_slice_new0 (IdleResponse);
+
+	idle_resp->vanished = NULL;
 
 	idle_debug ("idle_response_new\n");
 
@@ -3473,6 +3593,11 @@ idle_response_free (IdleResponse *idle_resp)
 
 	if (idle_resp->expunged)
 		g_array_free (idle_resp->expunged, TRUE);
+
+	if (idle_resp->vanished) {
+		g_list_foreach (idle_resp->vanished, (GFunc)g_free, NULL);
+		g_list_free (idle_resp->vanished);
+	}
 
 	if (idle_resp->fetch) 
 		for (i=0 ;i < idle_resp->fetch->len; i++)
@@ -3571,7 +3696,7 @@ idle_deal_with_stuff (CamelFolder *folder, CamelImapStore *store, gboolean *had_
 		{
 			if (strchr (resp, '*') != NULL && (strstr (resp, "EXISTS") || 
 				strstr (resp, "FETCH")|| strstr (resp, "EXPUNGE") || 
-				strstr (resp, "RECENT")))
+				strstr (resp, "VANISHED") || strstr (resp, "RECENT")))
 			{
 				if (!idle_resp) 
 					idle_resp = idle_response_new (folder);
@@ -3940,6 +4065,37 @@ camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 
 	camel_folder_change_info_free (changes);
 	camel_folder_summary_save (folder->summary, ex);
+}
+
+
+static void
+camel_imap_folder_changed_for_uids (CamelFolder *folder, GPtrArray *expunged, CamelFolderChangeInfo *changes)
+{
+
+	if (expunged) 
+	{
+		CamelMessageInfo *info = NULL;
+		CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+		int i = 0;
+
+		for (i = 0; i < expunged->len; i++) 
+		{
+			char *uid = g_ptr_array_index (expunged, i);
+			info = camel_folder_summary_uid (folder->summary, uid);
+			if (info == NULL)
+				continue;
+			if (changes)
+				camel_folder_change_info_remove_uid (changes, camel_message_info_uid (info));
+			CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
+			camel_imap_message_cache_remove (imap_folder->cache, camel_message_info_uid (info));
+			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
+			((CamelMessageInfoBase *)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
+			camel_folder_summary_remove (folder->summary, info);
+			camel_message_info_free(info);
+		}
+	}
+
+	return;
 }
 
 static void

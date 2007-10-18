@@ -46,6 +46,7 @@
 #include "camel-imap-store-summary.h"
 #include "camel-imap-store.h"
 #include "camel-imap-utils.h"
+#include "camel-imap-summary.h"
 
 extern int camel_verbose_debug;
 
@@ -63,6 +64,21 @@ static char *imap_command_strdup_printf (CamelImapStore *store,
 static char * imap_read_untagged_idle (CamelImapStore *store, char *line, CamelException *ex);
 
 
+static int
+uid_compar (const void *va, const void *vb)
+{
+	const char **sa = (const char **)va, **sb = (const char **)vb;
+	unsigned long a, b;
+
+	a = strtoul (*sa, NULL, 10);
+	b = strtoul (*sb, NULL, 10);
+	if (a < b)
+		return -1;
+	else if (a == b)
+		return 0;
+	else
+		return 1;
+}
 
 /**
  * camel_imap_command:
@@ -91,6 +107,8 @@ static char * imap_read_untagged_idle (CamelImapStore *store, char *line, CamelE
  * be set). Otherwise, a CamelImapResponse describing the server's
  * response, which the caller must free with camel_imap_response_free().
  **/
+#define UID_SET_LIMIT  (768)
+
 CamelImapResponse *
 camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		    CamelException *ex, const char *fmt, ...)
@@ -106,6 +124,8 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		va_end (ap);
 	} else {
 
+		char *modseq = camel_imap_folder_get_highestmodseq (CAMEL_IMAP_FOLDER (folder));
+
 		/* camel_object_ref(folder); 
 		if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder))
 			camel_object_unref(store->current_folder); */
@@ -117,10 +137,52 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 
 		store->current_folder = folder;
 
-		if (store->capabilities & IMAP_CAPABILITY_CONDSTORE) 
-			cmd = imap_command_strdup_printf (store, "SELECT %F (CONDSTORE)", folder->full_name);
-		else 
-			cmd = imap_command_strdup_printf (store, "SELECT %F", folder->full_name);
+		if (modseq && (store->capabilities & IMAP_CAPABILITY_QRESYNC))
+		{ 
+			CamelImapSummary *imap_summary = CAMEL_IMAP_SUMMARY (folder->summary);
+			
+
+			if (folder->summary->messages->len > 0) 
+			{
+				GPtrArray *alluids = g_ptr_array_sized_new (folder->summary->messages->len);
+				gchar *uidset = NULL;
+				gint i;
+				gint lastuid;
+
+				for (i=0; i<folder->summary->messages->len; i++) {
+					CamelMessageInfo *info = folder->summary->messages->pdata[i];
+					g_ptr_array_add (alluids, g_strdup (info->uid));
+				}
+
+				qsort (alluids->pdata, alluids->len, sizeof (void *), uid_compar);
+				uidset = imap_uid_array_to_set (folder->summary, alluids, 0, UID_SET_LIMIT, &lastuid);
+
+				g_ptr_array_foreach (alluids, (GFunc)g_free, NULL);
+				g_ptr_array_free (alluids, TRUE);
+
+				cmd = imap_command_strdup_printf (store, 
+					"SELECT %F (QRESYNC (%d %s %s))",
+					folder->full_name, 
+					imap_summary->validity, modseq, uidset);
+
+				g_free (uidset);
+
+			} else {
+				cmd = imap_command_strdup_printf (store, 
+					"SELECT %F (QRESYNC (%d %s))", 
+					folder->full_name, 
+					imap_summary->validity, modseq);
+			}
+
+		} else {
+			if (store->capabilities & IMAP_CAPABILITY_CONDSTORE) 
+				cmd = imap_command_strdup_printf (store, "SELECT %F (CONDSTORE)", folder->full_name);
+			else 
+				cmd = imap_command_strdup_printf (store, "SELECT %F", folder->full_name);
+		}
+
+		if (modseq)
+			g_free (modseq);
 	}
 	
 	if (!imap_command_start (store, folder, cmd, ex)) {
@@ -945,6 +1007,9 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 			number = strtoul (resp + 2, &p, 10);
 			if (!g_ascii_strcasecmp (p, " EXISTS")) {
 				exists = number;
+
+			/* TNY TODO, QRESYNC TODO: add VANISHED HERE */
+
 			} else if (!g_ascii_strcasecmp (p, " EXPUNGE")
 				   || !g_ascii_strcasecmp(p, " XGWMOVE")) {
 				/* XGWMOVE response is the same as an EXPUNGE response */

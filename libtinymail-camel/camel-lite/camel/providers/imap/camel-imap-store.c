@@ -702,6 +702,9 @@ static struct {
 	{ "CONDSTORE",          IMAP_CAPABILITY_CONDSTORE },
 	{ "IDLE",         	IMAP_CAPABILITY_IDLE },	
 	{ "BINARY",         	IMAP_CAPABILITY_BINARY },
+	{ "QRESYNC",         	IMAP_CAPABILITY_QRESYNC },
+	{ "ENABLE",         	IMAP_CAPABILITY_ENABLE },
+
 	{ NULL, 0 }
 };
 
@@ -1733,6 +1736,30 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 				camel_exception_clear (ex);
 				return FALSE;
 			}
+
+
+			if (store->capabilities & IMAP_CAPABILITY_ENABLE)
+			{
+				GString *enable_line = g_string_new ("");
+				gboolean add_chr = FALSE;
+
+				if (store->capabilities & IMAP_CAPABILITY_QRESYNC) {
+					enable_line = g_string_append (enable_line, "QRESYNC");
+					add_chr = TRUE;
+				}
+
+				if (store->capabilities & IMAP_CAPABILITY_CONDSTORE) {
+					if (add_chr)
+						enable_line = g_string_append_c (enable_line, ' ');
+					enable_line = g_string_append (enable_line, "CONDSTORE");
+				}
+
+				response = camel_imap_command (store, NULL, ex, "ENABLE %s", enable_line->str);
+				if (response)
+					camel_imap_response_free_without_processing (store, response);
+				g_string_free (enable_line, TRUE);
+			}
+
 	}
 
 	return TRUE;
