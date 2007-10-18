@@ -3883,6 +3883,13 @@ err_goto_lbl:
 	g_ptr_array_foreach (uids, (GFunc) g_free, NULL);
 	g_ptr_array_free (uids, TRUE);
 
+	priv_src->unread_length = camel_folder_get_unread_message_count (cfol_src);
+	priv_src->cached_length = camel_folder_get_message_count (cfol_src);
+	update_iter_counts (priv_src);
+	priv_dst->unread_length = camel_folder_get_unread_message_count (cfol_dst);
+	priv_dst->cached_length = camel_folder_get_message_count (cfol_dst);
+	update_iter_counts (priv_dst);
+
 	g_static_rec_mutex_unlock (priv_dst->folder_lock);
 	g_static_rec_mutex_unlock (priv_src->folder_lock);
 
