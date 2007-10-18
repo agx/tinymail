@@ -3121,6 +3121,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    GData *data;
    gboolean more = TRUE, oosync = FALSE, oldrescval = imap_folder->need_rescan;
    unsigned int nextn, cnt=0, tcnt=0, ucnt=0, ineed = 0, allhdrs = 0;
+   gboolean do_the_save = TRUE;
 
    if (!store->ostream || !store->istream)
 	return;
@@ -3154,7 +3155,13 @@ imap_update_summary (CamelFolder *folder, int exists,
 	CamelFolderChangeInfo *mchanges;
 
 	imap_folder->need_rescan = TRUE;
-	camel_folder_summary_save (folder->summary, ex);
+
+	if (do_the_save) {
+		camel_folder_summary_save (folder->summary, ex);
+		do_the_save = FALSE;
+	} else 
+		do_the_save = TRUE;
+
 	seq = camel_folder_summary_count (folder->summary);
 
 	if (!camel_imap_command_start (store, folder, ex,
@@ -3246,7 +3253,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 		did_hack = TRUE;
 	}
 
-	nextn = (nextn < 1000) ? nextn+nextn+25 : 1000;
+	nextn = (nextn < 1000) ? nextn+nextn+25 : 5000;
 
 	if (needheaders->len) 
 	{
