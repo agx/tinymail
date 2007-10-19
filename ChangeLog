@@ -6,6 +6,7 @@
 	anymore as we've authenticated anyway (most IMAP servers don't include
 	the AUTH= capabilities in the LOGIN's response).
 	* Restarting IDLE when needed
+	* Restoring the selected folder if possible after a reconnect
 
 2007-10-18  Philip Van Hoof  <pvanhoof@gnome.org>
 

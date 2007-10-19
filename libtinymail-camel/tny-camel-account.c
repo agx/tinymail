@@ -1487,8 +1487,11 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 				_tny_camel_store_account_emit_conchg_signal (TNY_CAMEL_STORE_ACCOUNT (self));
 			}
 
-			if (!camel_exception_is_set (&ex))
+			if (!camel_exception_is_set (&ex)) {
+				if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
+					camel_store_restore (CAMEL_STORE (priv->service)); 
 				set_online_happened (priv->session, self, TRUE);
+			}
 
 			goto done;
 

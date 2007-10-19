@@ -150,7 +150,7 @@ struct _CamelImapStore {
 
 	char tag_prefix;
 	guint32 command;
-	CamelFolder *current_folder, *last_folder;
+	CamelFolder *current_folder, *last_folder, *old_folder;
 	
 	/* Information about the server */
 	CamelImapServerLevel server_level;

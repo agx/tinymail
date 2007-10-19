@@ -260,7 +260,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, Cam
 	
 	path = g_build_filename (store->storage_path, ".ev-journal", NULL);
 	disco_store->diary = camel_disco_diary_new (disco_store, path, ex);
-	g_free (path);	
+	g_free (path);
 	
 	retval = TRUE;
 

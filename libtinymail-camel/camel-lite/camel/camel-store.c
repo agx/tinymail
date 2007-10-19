@@ -92,6 +92,19 @@ static int get_local_size (CamelStore *store, const gchar *folder_name)
 	return 0;
 }
 
+static void 
+restore (CamelStore *store)
+{
+	return;
+}
+
+void
+camel_store_restore (CamelStore *store)
+{
+	CS_CLASS (store)->restore (store);
+}
+
+
 static void
 camel_store_class_init (CamelStoreClass *camel_store_class)
 {
@@ -120,6 +133,7 @@ camel_store_class_init (CamelStoreClass *camel_store_class)
 	camel_store_class->noop = noop;
 	camel_store_class->get_folder_status = get_folder_status_impl;
 	camel_store_class->delete_cache = delete_cache;
+	camel_store_class->restore = restore;
 
 	/* virtual method overload */
 	camel_service_class->construct = construct;

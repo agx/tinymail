@@ -300,6 +300,24 @@ camel_imap_store_start_idle (CamelImapStore *store)
 }
 
 static void
+imap_restore (CamelStore *store)
+{
+	CamelImapStore *imap_store = (CamelImapStore *) store;
+	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
+
+	if (imap_store->old_folder && CAMEL_IS_FOLDER (imap_store->old_folder)) {
+		CamelFolder *folder = imap_store->old_folder;
+		CamelImapResponse *response2 = camel_imap_command (imap_store, folder, &nex, NULL);
+		if (response2) {
+			camel_imap_folder_selected (folder, response2, &nex, TRUE);
+			camel_imap_response_free (imap_store, response2);
+		}
+	}
+
+	return;
+}
+
+static void
 camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 {
 	CamelObjectClass *camel_object_class =
@@ -336,6 +354,7 @@ camel_imap_store_class_init (CamelImapStoreClass *camel_imap_store_class)
 	camel_store_class->get_trash = imap_get_trash;
 	camel_store_class->get_junk = imap_get_junk;
 	camel_store_class->get_folder_status = imap_get_folder_status;
+	camel_store_class->restore = imap_restore;
 
 	camel_disco_store_class->can_work_offline = can_work_offline;
 	camel_disco_store_class->connect_online = imap_connect_online;
@@ -436,6 +455,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 
 	imap_store->dir_sep = '\0';
 	imap_store->current_folder = NULL;
+	imap_store->old_folder = NULL;
 	imap_store->last_folder = NULL;
 	imap_store->connected = FALSE;
 	imap_store->preauthed = FALSE;
@@ -2007,6 +2027,7 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 	store->connected = FALSE;
 	/* if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder)) 
 		camel_object_unref (store->current_folder); */
+	store->old_folder = store->current_folder;
 	store->current_folder = NULL;
 
 	if (store->authtypes) {

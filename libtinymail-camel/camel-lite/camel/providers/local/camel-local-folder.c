@@ -226,7 +226,7 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 	char folder_path[PATH_MAX];
 	struct stat st;
 #endif
-	int forceindex, len;
+	int len;
 	CamelURL *url;
 	CamelLocalStore *ls = (CamelLocalStore *)parent_store;
 	
