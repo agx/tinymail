@@ -124,7 +124,7 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		va_end (ap);
 	} else {
 
-		char *modseq = camel_imap_folder_get_highestmodseq (CAMEL_IMAP_FOLDER (folder));
+		char *modseq = NULL;
 
 		/* camel_object_ref(folder); 
 		if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder))
@@ -132,8 +132,10 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 
 		if (!folder)
 			store->last_folder = store->current_folder;
-		else 
+		else {
+			modseq = camel_imap_folder_get_highestmodseq (CAMEL_IMAP_FOLDER (folder));
 			store->last_folder = NULL;
+		}
 
 		store->current_folder = folder;
 

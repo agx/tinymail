@@ -704,6 +704,7 @@ static struct {
 	{ "BINARY",         	IMAP_CAPABILITY_BINARY },
 	{ "QRESYNC",         	IMAP_CAPABILITY_QRESYNC },
 	{ "ENABLE",         	IMAP_CAPABILITY_ENABLE },
+	{ "ESEARCH",         	IMAP_CAPABILITY_ESEARCH },
 
 	{ NULL, 0 }
 };
@@ -2192,9 +2193,10 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 		return NULL;
 	}
 	
-	if (!(status = camel_imap_response_extract (imap_store, response, "STATUS", NULL)))
+	if (!(status = camel_imap_response_extract (imap_store, response, "STATUS", NULL))) {
 		return NULL;
-	
+	}
+
 	p = status + strlen ("* STATUS ");
 	while (*p == ' ')
 		p++;
@@ -2252,8 +2254,6 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	} while (*p != ')');
 	
 	g_free (status);
-
-	camel_imap_store_start_idle (imap_store);
 
 	return items;
 }
@@ -2500,6 +2500,8 @@ done:
 
 	camel_imap_store_set_status_for (imap_store, folder_name, *messages, *unseen, uidnext);
 
+	camel_imap_store_start_idle (imap_store);
+
 	return retval;
 }
 
@@ -2565,6 +2567,7 @@ imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 	}
 	imap_status_item_free (items);
 
+	camel_imap_store_start_idle (imap_store);
 	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 
 	return;
@@ -2606,6 +2609,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		const char *c;
 		
 		if (camel_exception_get_id(ex) == CAMEL_EXCEPTION_USER_CANCEL) {
+			camel_imap_store_start_idle (imap_store);
 			CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 			return NULL;
 		}
@@ -2613,6 +2617,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		camel_exception_clear (ex);
 		
 		if (!(flags & CAMEL_STORE_FOLDER_CREATE)) {
+			camel_imap_store_start_idle (imap_store);
 			CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 			camel_exception_setv (ex, CAMEL_EXCEPTION_STORE_NO_FOLDER,
 					      _("No such folder %s"), folder_name);
@@ -2625,6 +2630,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 			c++;
 		
 		if (*c != '\0') {
+			camel_imap_store_start_idle (imap_store);
 			CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 			camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_PATH,
 					      _("The folder name \"%s\" is invalid because it contains the character \"%c\""),
@@ -2646,6 +2652,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 			int i;
 			
 			if (!(response = camel_imap_command (imap_store, NULL, ex, "LIST \"\" %G", parent_real))) {
+				camel_imap_store_start_idle (imap_store);
 				CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 				g_free (parent_name);
 				g_free (parent_real);
@@ -2689,6 +2696,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 				imap_status_item_free (items);
 				
 				if (messages > 0) {
+					camel_imap_store_start_idle (imap_store);
 					camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_INVALID_STATE,
 							     _("The parent folder is not allowed to contain subfolders"));
 					CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
@@ -2701,6 +2709,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 				camel_exception_init (&lex);
 				delete_folder (store, parent_name, &lex);
 				if (camel_exception_is_set (&lex)) {
+					camel_imap_store_start_idle (imap_store);
 					CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 					camel_exception_xfer (ex, &lex);
 					g_free (parent_name);
@@ -2715,6 +2724,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 				g_free (name);
 				
 				if (!response) {
+					camel_imap_store_start_idle (imap_store);
 					CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 					g_free (parent_name);
 					g_free (parent_real);
@@ -2739,6 +2749,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		}
 		g_free(folder_real);
 		if (!response) {
+			camel_imap_store_start_idle (imap_store);
 			CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 			return NULL;
 		}
@@ -2748,7 +2759,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 				      folder_name);
 		
 		camel_imap_response_free_without_processing (imap_store, response);
-		
+		camel_imap_store_start_idle (imap_store);
 		CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 		
 		return NULL;
@@ -2776,7 +2787,8 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		}
 	}
 	camel_imap_response_free_without_processing (imap_store, response);
-	
+
+	camel_imap_store_start_idle (imap_store);
 	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
 	
 	return new_folder;
@@ -2817,8 +2829,12 @@ delete_folder (CamelStore *store, const char *folder_name, CamelException *ex)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (store);
 	CamelImapResponse *response;
+	gboolean did_start_idle = FALSE;
+	CamelFolder *old_in_case;
 
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
+
+	old_in_case = imap_store->current_folder;
 
 	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto fail;
@@ -2837,11 +2853,24 @@ delete_folder (CamelStore *store, const char *folder_name, CamelException *ex)
 	imap_store->current_folder = NULL;
 
 	response = camel_imap_command(imap_store, NULL, ex, "DELETE %F", folder_name);
+
+	if (camel_exception_is_set (ex) && old_in_case) {
+		CamelException nex = CAMEL_EXCEPTION_INITIALISER;
+		CamelImapResponse *response2 = camel_imap_command (imap_store, old_in_case, &nex, NULL);
+		if (response2) {
+			camel_imap_folder_selected (old_in_case, response2, &nex, TRUE);
+			camel_imap_response_free (imap_store, response2);
+			did_start_idle = TRUE;
+		}
+	}
+
 	if (response) {
 		camel_imap_response_free (imap_store, response);
 		imap_forget_folder (imap_store, folder_name, ex);
 	}
 fail:
+	if (!did_start_idle)
+		camel_imap_store_start_idle (imap_store);
 	CAMEL_SERVICE_REC_UNLOCK(imap_store, connect_lock);
 }
 
@@ -2982,8 +3011,12 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 	CamelImapResponse *response;
 	char *oldpath, *newpath, *storage_path;
 	char *tpath, *lslash;
+	CamelFolder *old_in_case = NULL;
+	gboolean did_start_idle = FALSE;
 
 	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
+
+	old_in_case = imap_store->current_folder;
 
 	camel_operation_start (NULL, "Renaming folder");
 
@@ -3017,12 +3050,23 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 		manage_subscriptions(store, old_name, FALSE);
 
 	response = camel_imap_command (imap_store, NULL, ex, "RENAME %F %F", old_name, new_name_in);
+
+	if (camel_exception_is_set (ex) && old_in_case) {
+		CamelException nex = CAMEL_EXCEPTION_INITIALISER;
+		CamelImapResponse *response2 = camel_imap_command (imap_store, old_in_case, &nex, NULL);
+		if (response2) {
+			camel_imap_folder_selected (old_in_case, response2, &nex, TRUE);
+			camel_imap_response_free (imap_store, response2);
+			did_start_idle = TRUE;
+		}
+	}
+
 	if (!response) {
 		if (imap_store->parameters & IMAP_PARAM_SUBSCRIPTIONS)
 			manage_subscriptions(store, old_name, TRUE);
 		goto fail;
 	}
-	
+
 	/* Undefined progress */
 	camel_operation_progress(NULL, 0, 0);
 
@@ -3061,6 +3105,8 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 	g_free (newpath);
 fail:
 	imap_store->renaming = FALSE;
+	if (!did_start_idle)
+		camel_imap_store_start_idle (imap_store);
 	CAMEL_SERVICE_REC_UNLOCK(imap_store, connect_lock);
 	camel_operation_end (NULL);
 }
@@ -3110,6 +3156,7 @@ create_folder (CamelStore *store, const char *parent_name,
 				       parent_real);
 	if (!response) /* whoa, this is bad */ {
 		g_free(parent_real);
+		camel_imap_store_start_idle (imap_store);
 		return NULL;
 	}
 	
@@ -3154,6 +3201,7 @@ create_folder (CamelStore *store, const char *parent_name,
 			camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_INVALID_STATE,
 					     _("The parent folder is not allowed to contain subfolders"));
 			g_free(parent_real);
+			camel_imap_store_start_idle (imap_store);
 			return NULL;
 		}
 		
@@ -3161,6 +3209,7 @@ create_folder (CamelStore *store, const char *parent_name,
 		delete_folder (store, parent_name, &internal_ex);
 		if (camel_exception_is_set (&internal_ex)) {
 			camel_exception_xfer (ex, &internal_ex);
+			camel_imap_store_start_idle (imap_store);
 			return NULL;
 		}
 		
@@ -3172,6 +3221,7 @@ create_folder (CamelStore *store, const char *parent_name,
 		
 		if (!response) {
 			g_free(parent_real);
+			camel_imap_store_start_idle (imap_store);
 			return NULL;
 		} else
 			camel_imap_response_free (imap_store, response);
@@ -3213,7 +3263,9 @@ create_folder (CamelStore *store, const char *parent_name,
 
 	g_free (full_name);
 	g_free(parent_real);
-	
+
+	camel_imap_store_start_idle (imap_store);
+
 	return root;
 }
 
@@ -3446,6 +3498,8 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 fail:
 	g_hash_table_foreach(present, get_folders_free, NULL);
 	g_hash_table_destroy(present);
+
+	camel_imap_store_start_idle (imap_store);
 }
 
 #if 0
@@ -3855,6 +3909,7 @@ subscribe_folder (CamelStore *store, const char *folder_name,
 	camel_object_trigger_event (CAMEL_OBJECT (store), "folder_subscribed", fi);
 	camel_folder_info_free (fi);
 done:
+	camel_imap_store_start_idle (imap_store);
 	CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 }
 
@@ -3879,6 +3934,7 @@ unsubscribe_folder (CamelStore *store, const char *folder_name,
 
 	imap_folder_effectively_unsubscribed (imap_store, folder_name, ex);
 done:
+	camel_imap_store_start_idle (imap_store);
 	CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 }
 

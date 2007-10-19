@@ -1521,12 +1521,16 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 			camel_message_info_free(&info->info);
 		}
 		g_ptr_array_free (matches, TRUE);
-		
+
+		if (camel_exception_is_set (&local_ex))
+			camel_imap_folder_start_idle (folder);
+
 		/* We unlock here so that other threads can have a chance to grab the connect_lock */
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		
 		/* check for an exception */
 		if (camel_exception_is_set (&local_ex)) {
+			/* Look up */
 			camel_exception_xfer (ex, &local_ex);
 			return;
 		}
@@ -1537,7 +1541,8 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 	
 	/* Save the summary */
 	imap_sync_offline (folder, ex);
-	
+
+	camel_imap_folder_start_idle (folder);
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 	/* camel_imap_folder_start_idle (folder); */
 }

@@ -5,6 +5,7 @@
 	is complete enough to continue. The AUTH= ones are not relevant
 	anymore as we've authenticated anyway (most IMAP servers don't include
 	the AUTH= capabilities in the LOGIN's response).
+	* Restarting IDLE when needed
 
 2007-10-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
