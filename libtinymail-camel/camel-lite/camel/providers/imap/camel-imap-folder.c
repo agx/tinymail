@@ -649,12 +649,12 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		 * VANISHED line didn't work :-\, if count is < exist then
 		 * well handle that in the else-case for QRESYNC (look lower) */
 
-		if (phighestmodseq != NULL && (val != uidnext-1))
+		/*if (phighestmodseq != NULL && (val != uidnext-1))
 		{
 			g_free (phighestmodseq); 
 			phighestmodseq = NULL;
 			removals = TRUE;
-		}
+		}*/
 
 		/* If our local count isn't the same as the EXISTS, then our CONDSTORE 
 		 * implementation can't be used. Period. */
