@@ -7,6 +7,7 @@
 	the AUTH= capabilities in the LOGIN's response).
 	* Restarting IDLE when needed
 	* Restoring the selected folder if possible after a reconnect
+	* Reverted camel-operation.c to rev 2823 for my good friend Sergio
 
 2007-10-18  Philip Van Hoof  <pvanhoof@gnome.org>
 
