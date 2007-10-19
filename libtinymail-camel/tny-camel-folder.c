@@ -2186,8 +2186,8 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	g_object_unref (headers);
 
-	g_static_rec_mutex_unlock (priv->folder_lock);
 	_tny_camel_folder_unreason (priv);
+	g_static_rec_mutex_unlock (priv->folder_lock);
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
@@ -4187,6 +4187,16 @@ tny_camel_folder_uncache (TnyCamelFolder *self)
 	return;
 }
 
+static void
+tny_camel_folder_uncache_nl (TnyCamelFolder *self)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (G_LIKELY (priv->folder != NULL))
+		unload_folder_no_lock (priv, FALSE);
+
+	return;
+}
 void 
 _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 {
@@ -4214,7 +4224,7 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 		if (priv->folder)
 		{
 			if (!(priv->folder->folder_flags & CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY))
-				tny_camel_folder_uncache ((TnyCamelFolder *)priv->self);
+				tny_camel_folder_uncache_nl ((TnyCamelFolder *)priv->self);
 			/* Else we should only close if there are not zero messages */
 			else if (!(priv->push && priv->folder->summary && 
 				priv->folder->summary->messages && 
