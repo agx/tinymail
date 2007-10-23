@@ -1,6 +1,8 @@
 2007-10-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Reference count problem in TnyCamelHeader
+	* priv->folder_name in TnyCamelFolder sometimes is NULL, which doesn't
+	seem right (and is racy).
 
 2007-10-19  Philip Van Hoof  <pvanhoof@gnome.org>
 
