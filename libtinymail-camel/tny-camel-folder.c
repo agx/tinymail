@@ -521,16 +521,19 @@ do_try_on_success (CamelStore *store, TnyCamelFolderPriv *priv, CamelException *
 		else
 			priv->caps &= ~TNY_FOLDER_CAPS_PUSHEMAIL;
 
-		if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
+		if (priv->folder_name) 
 		{
-			guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
-				CAMEL_STORE_FOLDER_INFO_RECURSIVE;
+			if (!priv->iter || !priv->iter->name || strcmp (priv->iter->full_name, priv->folder_name) != 0)
+			{
+				guint32 flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
+					CAMEL_STORE_FOLDER_INFO_RECURSIVE;
 
-			if (priv->iter && !priv->iter_parented)
-				camel_folder_info_free  (priv->iter);
+				if (priv->iter && !priv->iter_parented)
+					camel_folder_info_free  (priv->iter);
 
-			priv->iter = camel_store_get_folder_info (store, priv->folder_name, flags, ex);
-			priv->iter_parented = TRUE;
+				priv->iter = camel_store_get_folder_info (store, priv->folder_name, flags, ex);
+				priv->iter_parented = TRUE;
+			}
 		}
 	}
 }
@@ -4353,8 +4356,9 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 					camel_store_unsubscribe_folder (store, cfolname, &subex);
 
 				changed = TRUE;
-				g_free (cpriv->folder_name); 
-				cpriv->folder_name = NULL;
+
+				/* g_free (cpriv->folder_name); 
+				   cpriv->folder_name = NULL; */
 
 				apriv->managed_folders = 
 					g_list_remove (apriv->managed_folders, cfol);
@@ -5409,6 +5413,7 @@ tny_camel_folder_finalize (GObject *object)
 
 	if (priv->folder_name)
 		g_free (priv->folder_name);
+	priv->folder_name = NULL;
 
 	(*parent_class->finalize) (object);
 
