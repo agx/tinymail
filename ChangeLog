@@ -1,7 +1,3 @@
-2007-10-23  Philip Van Hoof  <pvanhoof@gnome.org>
-
-	* Corrected the implementation for IDLE support
-
 2007-10-19  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Avoiding the second capability request, eliminating roundtrips when

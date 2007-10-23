@@ -227,7 +227,7 @@ let_idle_die (CamelImapStore *imap_store, gboolean connect_buz)
 			resp = NULL;
 			while ((camel_imap_command_response_idle (imap_store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) 
 			{
-				idle_debug ("(.., ..) <- %s | in let_idle_die\n", resp); 
+				idle_debug ("(.., ..) <- %s | in idle_deal_with_stuff in let_idle_die\n", resp); 
 				g_free (resp); resp=NULL; 
 			}
 			if (resp)
@@ -441,7 +441,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 
 	imap_store->dontdistridlehack = FALSE;
 
-	imap_store->idle_sleep = 600; /* default of 10m */
+	imap_store->idle_sleep = 20; /* default of 20s */
 	imap_store->getsrv_sleep = 100; /* default of 100s */
 
 	imap_store->in_idle = FALSE;
