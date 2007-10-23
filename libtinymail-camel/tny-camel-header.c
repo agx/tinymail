@@ -303,10 +303,10 @@ tny_camel_header_finalize (GObject *object)
 	if (self->info)
 		camel_message_info_free (self->info);
 
-	if (self->folder)
-	{
+	if (self->folder) {
 		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self->folder);
 		_tny_camel_folder_unreason (fpriv);
+		g_object_unref (self->folder);
 	}
 
 	(*parent_class->finalize) (object);
@@ -330,7 +330,10 @@ _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyC
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	_tny_camel_folder_reason (fpriv);
-	me->folder = (TnyCamelFolder*) folder;
+
+	if (me->folder)
+		g_object_unref (me->folder);
+	me->folder = (TnyCamelFolder*) g_object_ref (folder);
 
 	return;
 }
