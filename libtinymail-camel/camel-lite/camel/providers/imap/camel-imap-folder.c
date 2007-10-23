@@ -3828,8 +3828,6 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
 		return;
 
-	g_static_rec_mutex_lock (store->idle_lock);
-	g_static_rec_mutex_lock (store->idle_prefix_lock);
 	if ((store->capabilities & IMAP_CAPABILITY_IDLE))
 	{
 		if (store->in_idle && store->idle_thread) {
@@ -3842,8 +3840,6 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 			g_free (store->idle_prefix);
 		store->idle_prefix = NULL;
 	}
-	g_static_rec_mutex_unlock (store->idle_prefix_lock);
-	g_static_rec_mutex_unlock (store->idle_lock);
 
 	return;
 }
