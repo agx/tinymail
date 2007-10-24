@@ -209,14 +209,14 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 	buf = g_alloca (strlen (uid) + strlen ("!2,") +  (sizeof (flagbits) / sizeof (flagbits[0])) + 1);
 	p = buf + sprintf (buf, "%s!2,", uid);
 	for (i = 0; i < sizeof (flagbits) / sizeof (flagbits[0]); i++) {
+
 		/* Priority flags */
-		if ((info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY) != 0) {
-			priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
-			if (priority_flag == flagbits[i].flagbit)
-				*p++ = flagbits[i].flag;
-		}
+		priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
+		if (priority_flag == flagbits[i].flagbit)
+			*p++ = flagbits[i].flag;
+
 		/* Standard flags*/
-		else if (info->info.info.flags & flagbits[i].flagbit)
+		if (info->info.info.flags & flagbits[i].flagbit)
 			*p++ = flagbits[i].flag;
 	}
 	*p = 0;
@@ -244,16 +244,13 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 			/* we could assume that the flags are in order, but its just as easy not to require */
 			for (i=0;i<sizeof(flagbits)/sizeof(flagbits[0]);i++) {
 				/* Priority flags */
-				if (info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY) {
-					priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
-					if (flagbits[i].flag == c && (priority_flag != flagbits[i].flagbit))
-						set |= flagbits[i].flagbit;
-				}
-				/* Standard flags */
-				else if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0) {
+				priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
+				if (flagbits[i].flag == c && (priority_flag != flagbits[i].flagbit))
 					set |= flagbits[i].flagbit;
-				}
-				/*all |= flagbits[i].flagbit;*/
+
+				/* Standard flags */
+				if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0)
+					set |= flagbits[i].flagbit;
 			}
 		}
 

@@ -7,6 +7,7 @@
 	required. This to reduce the complexity of the IDLE patch so that we
 	can later, perhaps, more easily bring this feature to upstream Camel.
 	* Updating unread and total count if necessary (due to IDLE events)
+	* Fixed the normal-priority flag ni Maildir
 
 2007-10-23  Philip Van Hoof  <pvanhoof@gnome.org>
 
