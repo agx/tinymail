@@ -245,7 +245,7 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 				/* Priority flags */
 				if (i >= 7) {
 					priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
-					if (flagbits[i].flag == c && (priority_flag & flagbits[i].flagbit) == flagbits[i].flagbit)
+					if (flagbits[i].flag == c && (priority_flag & flagbits[i].flagbit) != flagbits[i].flagbit)
 						set |= flagbits[i].flagbit;
 				} else if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0)
 					set |= flagbits[i].flagbit;
