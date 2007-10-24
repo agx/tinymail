@@ -214,7 +214,7 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 		priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
 		if (priority_flag == flagbits[i].flagbit)
 			*p++ = flagbits[i].flag;
-
+		else
 		/* Standard flags*/
 		if (info->info.info.flags & flagbits[i].flagbit)
 			*p++ = flagbits[i].flag;
@@ -247,7 +247,7 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 				priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
 				if (flagbits[i].flag == c && (priority_flag != flagbits[i].flagbit))
 					set |= flagbits[i].flagbit;
-
+				else
 				/* Standard flags */
 				if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0)
 					set |= flagbits[i].flagbit;
