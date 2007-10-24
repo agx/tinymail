@@ -65,7 +65,6 @@ static int stream_setsockopt (CamelTcpStream *stream, const CamelSockOptData *da
 static struct sockaddr *stream_get_local_address (CamelTcpStream *stream, socklen_t *len);
 static struct sockaddr *stream_get_remote_address (CamelTcpStream *stream, socklen_t *len);
 static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
-static ssize_t stream_read_idle (CamelStream *stream, char *buffer, size_t n);
 
 
 static void
@@ -79,7 +78,6 @@ camel_tcp_stream_raw_class_init (CamelTcpStreamRawClass *camel_tcp_stream_raw_cl
 	parent_class = CAMEL_TCP_STREAM_CLASS (camel_type_get_global_classfuncs (camel_tcp_stream_get_type ()));
 
 	/* virtual method overload */
-	camel_stream_class->read_idle = stream_read_idle;
 	camel_stream_class->read = stream_read;
 	camel_stream_class->write = stream_write;
 	camel_stream_class->flush = stream_flush;
@@ -256,15 +254,6 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 	CamelTcpStreamRaw *raw = CAMEL_TCP_STREAM_RAW (stream);
 	
 	return camel_read_socket (raw->sockfd, buffer, n);
-}
-
-
-static ssize_t 
-stream_read_idle (CamelStream *stream, char *buffer, size_t n)
-{
-	CamelTcpStreamRaw *raw = CAMEL_TCP_STREAM_RAW (stream);
-	
-	return camel_read_socket_idle (raw->sockfd, buffer, n);
 }
 
 static ssize_t

@@ -940,11 +940,15 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			set_header_view_model (header_view, sortable);
 
+#ifndef NONASYNC_TEST
 			tny_folder_refresh_async (folder, 
 				refresh_current_folder, 
 				status_update, self);
-
-			g_object_unref (G_OBJECT (folder));
+#else
+			tny_folder_refresh (folder, NULL);
+			refresh_current_folder (folder, FALSE, NULL, self);
+#endif
+			g_object_unref (folder);
 		}
 	  }
 	} else {

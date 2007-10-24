@@ -345,7 +345,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 	TnyFolderChange *change = NULL;
 	CamelFolderSummary *summary;
 	gboolean old = priv->dont_fkill;
-	gint i = 0;
+	gint i = 0; gboolean urcnted = FALSE;
 
 	if (!priv->handle_changes)
 		return;
@@ -362,64 +362,77 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 
 		if (!change && info->uid_changed != NULL && info->uid_changed->len > 0) {
 			priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+			urcnted = TRUE;
 			change = tny_folder_change_new (TNY_FOLDER (self));
 		}
 
-		for (i = 0; i< info->uid_added->len; i++)
+		if (info->uid_added && info->uid_added->len > 0) 
 		{
-			const char *uid = info->uid_added->pdata[i];
+			if (!urcnted) {
+				priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+				urcnted = TRUE;
+			}
 
-			CamelMessageInfo *minfo = camel_folder_summary_uid (summary, uid);
-			if (info)
+			for (i = 0; i< info->uid_added->len; i++)
 			{
-				TnyHeader *hdr = _tny_camel_header_new ();
+				const char *uid = info->uid_added->pdata[i];
 
-				if (info->push_email_event) 
-					priv->cached_length++;
+				CamelMessageInfo *minfo = camel_folder_summary_uid (summary, uid);
+				if (info)
+				{
+					TnyHeader *hdr = _tny_camel_header_new ();
 
-				if (!change)
-					change = tny_folder_change_new (TNY_FOLDER (self));
+					if (info->push_email_event) 
+						priv->cached_length++;
 
-				/* This adds a reason to live to self */
-				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
-					TNY_CAMEL_FOLDER (self), priv);
-				/* hdr will take care of the freeup*/
-				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-				tny_folder_change_add_added_header (change, hdr);
-				g_object_unref (hdr);
+					if (!change)
+						change = tny_folder_change_new (TNY_FOLDER (self));
+
+					/* This adds a reason to live to self */
+					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+						TNY_CAMEL_FOLDER (self), priv);
+					/* hdr will take care of the freeup*/
+					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+					tny_folder_change_add_added_header (change, hdr);
+					g_object_unref (hdr);
+				}
 			}
 		}
 
-		for (i = 0; i< info->uid_removed->len; i++)
+		if (info->uid_removed && info->uid_removed->len > 0) 
 		{
-			const char *uid = info->uid_removed->pdata[i];
+			if (!urcnted) {
+				priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
+				urcnted = TRUE;
+			}
 
-			CamelMessageInfo *minfo = camel_message_info_new_uid (NULL, uid);
-			if (minfo)
+			for (i = 0; i< info->uid_removed->len; i++)
 			{
-				TnyHeader *hdr = _tny_camel_header_new ();
+				const char *uid = info->uid_removed->pdata[i];
 
-				if (info->push_email_event) 
-					priv->cached_length--;
+				CamelMessageInfo *minfo = camel_message_info_new_uid (NULL, uid);
+				if (minfo)
+				{
+					TnyHeader *hdr = _tny_camel_header_new ();
 
-				if (!change)
-					change = tny_folder_change_new (self);
+					if (info->push_email_event) 
+						priv->cached_length--;
 
-				/* This adds a reason to live to self */
-				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
-					TNY_CAMEL_FOLDER (self), priv);
-				/* hdr will take care of the freeup */
-				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
-				tny_folder_change_add_expunged_header (change, hdr);
-				g_object_unref (hdr);
+					if (!change)
+						change = tny_folder_change_new (self);
+
+					/* This adds a reason to live to self */
+					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
+						TNY_CAMEL_FOLDER (self), priv);
+					/* hdr will take care of the freeup */
+					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+					tny_folder_change_add_expunged_header (change, hdr);
+					g_object_unref (hdr);
+				}
 			}
 		}
 
 		update_iter_counts (priv);
-
-		/* search for IN TNY */
-		/*if (info->uid_removed && info->uid_removed->len > 0)
-			camel_folder_summary_save (camel_folder->summary, &ex);*/
 
 		g_static_rec_mutex_unlock (priv->folder_lock);
 	} else

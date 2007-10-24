@@ -61,7 +61,6 @@ static CamelTcpStreamClass *parent_class = NULL;
 /* Returns the class for a CamelTcpStreamSSL */
 #define CTSR_CLASS(so) CAMEL_TCP_STREAM_SSL_CLASS (CAMEL_OBJECT_GET_CLASS (so))
 
-static ssize_t stream_read_idle (CamelStream *stream, char *buffer, size_t n);
 static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
 static ssize_t stream_read (CamelStream *stream, char *buffer, size_t n);
 static ssize_t stream_write (CamelStream *stream, const char *buffer, size_t n);
@@ -100,9 +99,6 @@ camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_cl
 
 
 	parent_class = CAMEL_TCP_STREAM_CLASS (camel_type_get_global_classfuncs (camel_tcp_stream_get_type ()));
-	
-	/* virtual method overload */
-	camel_stream_class->read_idle = stream_read_idle;
 
 	camel_stream_class->read = stream_read;
 	camel_stream_class->write = stream_write;
@@ -288,57 +284,6 @@ camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *stream)
 	stream->priv->ssl_mode = TRUE;
 	
 	return 0;
-}
-
-static ssize_t 
-stream_read_idle (CamelStream *stream, char *buffer, size_t n)
-{
-	CamelTcpStreamSSL *openssl = CAMEL_TCP_STREAM_SSL (stream);
-	SSL *ssl = openssl->priv->ssl;
-	ssize_t nread;
-
-	int error, flags, fdmax;
-	struct timeval timeout;
-	fd_set rdset;
-	int res;
-
-	flags = fcntl (openssl->priv->sockfd, F_GETFL);
-	fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
-	
-	fdmax = openssl->priv->sockfd + 1;
-	
-	do {
-		FD_ZERO (&rdset);
-		FD_SET (openssl->priv->sockfd, &rdset);
-		nread = -1;
-		timeout.tv_sec = IDLE_READ_TIMEOUT;
-		timeout.tv_usec = 0;
-		res = select (fdmax, &rdset, 0, 0, &timeout);
-		
-		if (res == -1)
-			;
-		else if (res == 0)
-			errno = ETIMEDOUT;
-		else {
-
-		  do {
-			if (ssl) {
-				nread = SSL_read (ssl, buffer, n);
-				if (nread < 0)
-					errno = ssl_errno (ssl, nread);
-			} else {
-				nread = read (openssl->priv->sockfd, buffer, n);
-			}
-		  } while (0 && (nread < 0 && errno == EINTR));
-		}
-	} while (0 && (nread < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)));
-	
-	error = errno;
-	fcntl (openssl->priv->sockfd, F_SETFL, flags);
-	errno = error;
-
-
-	return nread;
 }
 
 

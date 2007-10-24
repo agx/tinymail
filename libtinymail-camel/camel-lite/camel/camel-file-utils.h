@@ -88,7 +88,6 @@ char *camel_file_util_safe_filename (const char *name);
 ssize_t camel_read (int fd, char *buf, size_t n);
 ssize_t camel_write (int fd, const char *buf, size_t n);
 
-ssize_t camel_read_socket_idle (int fd, char *buf, size_t n);
 ssize_t camel_write_socket (int fd, const char *buf, size_t n);
 
 ssize_t camel_read_socket (int fd, char *buf, size_t n);
