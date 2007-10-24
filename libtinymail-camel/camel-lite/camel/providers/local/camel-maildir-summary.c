@@ -190,7 +190,7 @@ static struct {
 	/* Non-standard flags */
 	{ 'A', CAMEL_MESSAGE_ATTACHMENTS },
 	{ 'I', CAMEL_MESSAGE_PARTIAL },
-	{ 'H', CAMEL_MESSAGE_HIGH_PRIORITY },
+/* 7 */	{ 'H', CAMEL_MESSAGE_HIGH_PRIORITY },
 	{ 'N', CAMEL_MESSAGE_NORMAL_PRIORITY },
 	{ 'L', CAMEL_MESSAGE_LOW_PRIORITY },
 	{ 'O', CAMEL_MESSAGE_SUSPENDED_PRIORITY },
@@ -210,15 +210,16 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 	p = buf + sprintf (buf, "%s!2,", uid);
 	for (i = 0; i < sizeof (flagbits) / sizeof (flagbits[0]); i++) {
 
-		/* Priority flags */
-		priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
-		if ((priority_flag & flagbits[i].flagbit) == flagbits[i].flagbit)
-			*p++ = flagbits[i].flag;
-		else if (info->info.info.flags & flagbits[i].flagbit)
-			*p++ = flagbits[i].flag;
+		if (i >= 7) {
+			/* Priority flags */
+			priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
+			if ((priority_flag & flagbits[i].flagbit) == flagbits[i].flagbit)
+				*p++ = flagbits[i].flag;
+		} else if (info->info.info.flags & flagbits[i].flagbit)
+				*p++ = flagbits[i].flag;
 	}
 	*p = 0;
-	
+
 	return g_strdup(buf);
 }
 
@@ -240,12 +241,13 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 		p+=3;
 		while ((c = *p++)) {
 			/* we could assume that the flags are in order, but its just as easy not to require */
-			for (i=0;i<sizeof(flagbits)/sizeof(flagbits[0]);i++) {
+			for (i=0; i < sizeof(flagbits)/sizeof(flagbits[0]);i++) {
 				/* Priority flags */
-				priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
-				if (flagbits[i].flag == c && (priority_flag & flagbits[i].flagbit) == flagbits[i].flagbit)
-					set |= flagbits[i].flagbit;
-				else if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0)
+				if (i >= 7) {
+					priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
+					if (flagbits[i].flag == c && (priority_flag & flagbits[i].flagbit) == flagbits[i].flagbit)
+						set |= flagbits[i].flagbit;
+				} else if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0)
 					set |= flagbits[i].flagbit;
 			}
 		}
