@@ -1,3 +1,9 @@
+2007-10-25  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Corrections for the priority flags
+
+	* This was a major API change
+
 2007-10-24  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Improvements for the IDLE support. The Nonblocking read is now

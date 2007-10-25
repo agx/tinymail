@@ -62,23 +62,16 @@ enum _TnyHeaderFlags
 	TNY_HEADER_FLAG_CACHED = 1<<6,
 	TNY_HEADER_FLAG_PARTIAL = 1<<7,
 	TNY_HEADER_FLAG_EXPUNGED = 1<<8,
-	TNY_HEADER_FLAG_PRIORITY = 1<<9|1<<10
-	/* Keep below 1<<12 (internally used bits) */
+	TNY_HEADER_FLAG_HIGH_PRIORITY = 0<<9|1<<10,
+	TNY_HEADER_FLAG_NORMAL_PRIORITY = 0<<9|0<<10,
+	TNY_HEADER_FLAG_LOW_PRIORITY = 1<<9|0<<10,
+	TNY_HEADER_FLAG_SUSPENDED = 1<<11
 };
+
+#define TNY_HEADER_FLAG_PRIORITY_MASK (1<<9|1<<10)
 
 typedef enum _TnyHeaderFlags TnyHeaderFlags;
 
-#define TNY_TYPE_HEADER_PRIORITY_FLAGS (tny_header_priority_flags_get_type())
-
-enum _TnyHeaderPriorityFlags 
-{
-	TNY_HEADER_FLAG_HIGH_PRIORITY = 1<<9|1<<10,
-	TNY_HEADER_FLAG_NORMAL_PRIORITY = 0<<9|0<<10,
-	TNY_HEADER_FLAG_LOW_PRIORITY = 0<<9|1<<10,
-	TNY_HEADER_FLAG_SUSPENDED_PRIORITY = 1<<9|0<<10
-};
-
-typedef enum _TnyHeaderPriorityFlags TnyHeaderPriorityFlags;
 
 struct _TnyHeaderIface
 {
@@ -132,6 +125,8 @@ TnyHeaderFlags tny_header_get_flags (TnyHeader *self);
 void tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask);
 void tny_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask);
 
+TnyHeaderFlags tny_header_get_priority (TnyHeader *self);
+void tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority);
 
 G_END_DECLS
 

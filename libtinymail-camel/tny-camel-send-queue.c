@@ -343,9 +343,9 @@ thread_main (gpointer data)
 				TnyHeader *curhdr = TNY_HEADER (tny_iterator_get_current (giter));
 				TnyHeaderFlags flags = tny_header_get_flags (curhdr);
 
-				flags &= TNY_HEADER_FLAG_PRIORITY;
-				if (flags & TNY_HEADER_FLAG_SUSPENDED_PRIORITY)
+				if (flags & TNY_HEADER_FLAG_SUSPENDED)
 					to_remove = g_list_prepend (to_remove, curhdr);
+
 				g_object_unref (curhdr);
 				tny_iterator_next (giter);
 			}

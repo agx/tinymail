@@ -180,20 +180,22 @@ static struct {
 	char flag;
 	guint32 flagbit;
 } flagbits[] = {
-	{ 'D', CAMEL_MESSAGE_DRAFT },
-	{ 'F', CAMEL_MESSAGE_FLAGGED },
-	/*{ 'P', CAMEL_MESSAGE_FORWARDED },*/
-	{ 'R', CAMEL_MESSAGE_ANSWERED },
-	{ 'S', CAMEL_MESSAGE_SEEN },
-	{ 'T', CAMEL_MESSAGE_DELETED },
+/* 0 */ { 'D', CAMEL_MESSAGE_DRAFT },
+/* 1 */ { 'F', CAMEL_MESSAGE_FLAGGED },
+/* -    { 'P', CAMEL_MESSAGE_FORWARDED },*/
+/* 2 */ { 'R', CAMEL_MESSAGE_ANSWERED },
+/* 3 */ { 'S', CAMEL_MESSAGE_SEEN },
+/* 4 */ { 'T', CAMEL_MESSAGE_DELETED },
 
 	/* Non-standard flags */
-	{ 'A', CAMEL_MESSAGE_ATTACHMENTS },
-	{ 'I', CAMEL_MESSAGE_PARTIAL },
-/* 7 */	{ 'H', CAMEL_MESSAGE_HIGH_PRIORITY },
-	{ 'N', CAMEL_MESSAGE_NORMAL_PRIORITY },
-	{ 'L', CAMEL_MESSAGE_LOW_PRIORITY },
-	{ 'O', CAMEL_MESSAGE_SUSPENDED_PRIORITY },
+/* 5 */ { 'A', CAMEL_MESSAGE_ATTACHMENTS },
+/* 6 */ { 'I', CAMEL_MESSAGE_PARTIAL },
+/* 7 */ { 'O', CAMEL_MESSAGE_SUSPENDED },
+
+	/* Non-standard priority flags */
+/* 8 */ { 'H', CAMEL_MESSAGE_HIGH_PRIORITY },
+/* 9 */ { 'N', CAMEL_MESSAGE_NORMAL_PRIORITY },
+/* 10*/ { 'L', CAMEL_MESSAGE_LOW_PRIORITY }
 };
 
 /* convert the uid + flags into a unique:info maildir format */
@@ -208,16 +210,17 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 	/* TNY CHANGE: This used to he ":2,", but VFAT does not allow those characters */
 	buf = g_alloca (strlen (uid) + strlen ("!2,") +  (sizeof (flagbits) / sizeof (flagbits[0])) + 1);
 	p = buf + sprintf (buf, "%s!2,", uid);
-	for (i = 0; i < sizeof (flagbits) / sizeof (flagbits[0]); i++) {
 
-		if (i >= 7) {
-			/* Priority flags */
-			priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
-			if ((priority_flag & flagbits[i].flagbit) == flagbits[i].flagbit)
+	for (i = 0; i < sizeof (flagbits) / sizeof (flagbits[0]); i++) {
+		if (i > 7) {
+			int flags = info->info.info.flags;
+			flags &= CAMEL_MESSAGE_PRIORITY_MASK;
+			if (flags == flagbits[i].flagbit)
 				*p++ = flagbits[i].flag;
 		} else if (info->info.info.flags & flagbits[i].flagbit)
-				*p++ = flagbits[i].flag;
+			*p++ = flagbits[i].flag;
 	}
+
 	*p = 0;
 
 	return g_strdup(buf);
@@ -229,8 +232,9 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 	char *p, c;
 	guint32 priority_flag = 0;	/* 2 bits flags */
 	guint32 set = 0;	/* what we set */
-	/*guint32 all = 0;*/	/* all flags */
 	int i;
+
+printf ("camel_maildir_summary_name_to_info\n");
 
 	p = strstr (name, "!2,");
 
@@ -242,14 +246,19 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 		while ((c = *p++)) {
 			/* we could assume that the flags are in order, but its just as easy not to require */
 			for (i=0; i < sizeof(flagbits)/sizeof(flagbits[0]);i++) {
-				/* Priority flags */
-				if (i >= 7) {
-					priority_flag = info->info.info.flags & CAMEL_MESSAGE_HIGH_PRIORITY;
-					if (flagbits[i].flag == c && (priority_flag & flagbits[i].flagbit) != flagbits[i].flagbit)
+
+				if (i > 7) {
+					if (c == flagbits[i].flag) {
+						set &= ~CAMEL_MESSAGE_PRIORITY_MASK;
 						set |= flagbits[i].flagbit;
-				} else if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0)
-					set |= flagbits[i].flagbit;
+					}
+				} else {
+					if (flagbits[i].flag == c && (info->info.info.flags & flagbits[i].flagbit) == 0)
+						set |= flagbits[i].flagbit;
+				}
+
 			}
+
 		}
 
 		/* changed? */

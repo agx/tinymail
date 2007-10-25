@@ -491,6 +491,26 @@ tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	return;
 }
 
+TnyHeaderFlags 
+tny_header_get_priority (TnyHeader *self)
+{
+	TnyHeaderFlags flags = tny_header_get_flags (self);
+	flags &= TNY_HEADER_FLAG_PRIORITY_MASK;
+	return flags;
+}
+
+void
+tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority)
+{
+	TnyHeaderFlags flags;
+	g_return_if_fail  (priority & TNY_HEADER_FLAG_PRIORITY_MASK != priority);
+	flags = tny_header_get_flags (self);
+	flags &= ~TNY_HEADER_FLAG_PRIORITY_MASK;
+	flags |= priority;
+	tny_header_set_flags (self, flags);
+	return;
+}
+
 /**
  * tny_header_unset_flags:
  * @self: a #TnyHeader object
@@ -581,7 +601,10 @@ tny_header_flags_get_type (void)
       { TNY_HEADER_FLAG_CACHED, "TNY_HEADER_FLAG_CACHED", "cached" },
       { TNY_HEADER_FLAG_PARTIAL, "TNY_HEADER_FLAG_PARTIAL", "partial" },
       { TNY_HEADER_FLAG_EXPUNGED, "TNY_HEADER_FLAG_EXPUNGED", "expunged" },
-      { TNY_HEADER_FLAG_PRIORITY, "TNY_HEADER_FLAG_PRIORITY", "priority" },
+      { TNY_HEADER_FLAG_HIGH_PRIORITY, "TNY_HEADER_FLAG_HIGH_PRIORITY", "high-priority" },
+      { TNY_HEADER_FLAG_NORMAL_PRIORITY, "TNY_HEADER_FLAG_NORMAL_PRIORITY", "normal-priority" },
+      { TNY_HEADER_FLAG_LOW_PRIORITY, "TNY_HEADER_FLAG_LOW_PRIORITY", "low-priority" },
+      { TNY_HEADER_FLAG_SUSPENDED, "TNY_HEADER_FLAG_SUSPENDED", "suspended" },
       { 0, NULL, NULL }
     };
     etype = g_flags_register_static ("TnyHeaderFlags", values);
@@ -590,26 +613,3 @@ tny_header_flags_get_type (void)
 }
 
 
-/**
- * tny_header_priority_flags_get_type:
- *
- * GType system helper function
- *
- * Return value: a GType
- **/
-GType
-tny_header_priority_flags_get_type (void)
-{
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GFlagsValue values[] = {
-      { TNY_HEADER_FLAG_HIGH_PRIORITY, "TNY_HEADER_FLAG_HIGH_PRIORITY", "high-priority" },
-      { TNY_HEADER_FLAG_NORMAL_PRIORITY, "TNY_HEADER_FLAG_NORMAL_PRIORITY", "normal-priority" },
-      { TNY_HEADER_FLAG_LOW_PRIORITY, "TNY_HEADER_FLAG_LOW_PRIORITY", "low-priority" },
-      { TNY_HEADER_FLAG_SUSPENDED_PRIORITY, "TNY_HEADER_FLAG_SUSPENDED_PRIORITY", "suspended-priority" },
-      { 0, NULL, NULL }
-    };
-    etype = g_flags_register_static ("TnyHeaderPriorityFlags", values);
-  }
-  return etype;
-}
