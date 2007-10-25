@@ -2029,7 +2029,9 @@ tny_camel_account_finalize (GObject *object)
 		camel_operation_unref (priv->cancel);
 	g_static_rec_mutex_unlock (priv->cancel_lock);
 
-	g_static_rec_mutex_free (priv->cancel_lock);
+	/* g_static_rec_mutex_free (priv->cancel_lock); */
+	g_free (priv->cancel_lock);
+	priv->cancel_lock = NULL;
 
 	priv->inuse_spin = FALSE;
 
@@ -2072,8 +2074,13 @@ tny_camel_account_finalize (GObject *object)
 
 	camel_exception_free (priv->ex);
 
-	g_static_rec_mutex_free (priv->service_lock);
-	g_static_rec_mutex_free (priv->account_lock);
+	/* g_static_rec_mutex_free (priv->service_lock); */
+	g_free (priv->service_lock);
+	priv->service_lock = NULL;
+
+	/* g_static_rec_mutex_free (priv->account_lock); */
+	g_free (priv->account_lock);
+	priv->account_lock = NULL;
 
 	(*parent_class->finalize) (object);
 

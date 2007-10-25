@@ -901,8 +901,10 @@ finalize (CamelObject *object)
 		g_free (pop3_store->storage_path);
 	pop3_store->storage_path = NULL;
 
-	g_static_rec_mutex_free (pop3_store->eng_lock);
+	/* g_static_rec_mutex_free (pop3_store->eng_lock); */
+	g_free (pop3_store->eng_lock);
 	pop3_store->eng_lock = NULL;
+
 	camel_object_unref (pop3_store->book);
 	pop3_store->book = NULL;
 	return;

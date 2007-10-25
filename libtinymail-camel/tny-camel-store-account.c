@@ -687,9 +687,12 @@ tny_camel_store_account_finalize (GObject *object)
 		camel_object_unref (CAMEL_OBJECT (priv->iter_store));
 	}
 
-	g_static_rec_mutex_free (priv->factory_lock);
+	/* g_static_rec_mutex_free (priv->factory_lock); */
+	g_free (priv->factory_lock);
 	priv->factory_lock = NULL;
-	g_static_rec_mutex_free (priv->obs_lock);
+
+	/* g_static_rec_mutex_free (priv->obs_lock); */
+	g_free (priv->obs_lock);
 	priv->obs_lock = NULL;
 
 	g_object_unref (priv->queue);

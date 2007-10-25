@@ -85,8 +85,11 @@ camel_pop3_engine_finalise(CamelPOP3Engine *pe)
 
 	g_static_rec_mutex_unlock (pe->lock);
 
-	g_static_rec_mutex_free (pe->lock);
+	/* g_static_rec_mutex_free (pe->lock); */
+	g_free (pe->lock);
 	pe->lock = NULL;
+
+	return;
 }
 
 CamelType

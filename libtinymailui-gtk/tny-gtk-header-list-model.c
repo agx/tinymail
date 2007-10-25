@@ -857,7 +857,8 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	g_static_rec_mutex_unlock (priv->iterator_lock);
 
-	g_static_rec_mutex_free (priv->iterator_lock);
+	/* g_static_rec_mutex_free (priv->iterator_lock); */
+	g_free (priv->iterator_lock);
 	priv->iterator_lock = NULL;
 
 	g_mutex_free (priv->ra_lock);

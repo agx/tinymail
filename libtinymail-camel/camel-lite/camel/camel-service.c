@@ -135,7 +135,7 @@ camel_service_finalize (CamelObject *object)
 
 	g_static_rec_mutex_free (&service->priv->connect_lock);
 	g_static_mutex_free (&service->priv->connect_op_lock);
-	
+
 	g_free (service->priv);
 }
 

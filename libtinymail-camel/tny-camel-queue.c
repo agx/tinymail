@@ -52,7 +52,8 @@ tny_camel_queue_finalize (GObject *object)
 	self->list = NULL;
 	g_static_rec_mutex_unlock (self->lock);
 
-	g_static_rec_mutex_free (self->lock);
+	/* g_static_rec_mutex_free (self->lock); */
+	g_free (self->lock);
 	self->lock = NULL;
 
 	(*parent_class->finalize) (object);

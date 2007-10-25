@@ -2,6 +2,8 @@
 
 	* Corrections for the priority flags
 	* Memory leak fix in CamelImapCommand, found by Dirk-Jan
+	* Freeing of recursive locks, especially the ones that we allocated
+	ourselves
 
 	* This was a major API change
 

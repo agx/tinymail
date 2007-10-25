@@ -777,7 +777,8 @@ imap_finalize (CamelObject *object)
 
 	if (!imap_folder->in_idle || imap_folder->idle_lock != NULL)
 	{
-		g_static_rec_mutex_free (imap_folder->idle_lock);
+		/* g_static_rec_mutex_free (imap_folder->idle_lock); */
+		g_free (imap_folder->idle_lock);
 		imap_folder->idle_lock = NULL;
 	}
 

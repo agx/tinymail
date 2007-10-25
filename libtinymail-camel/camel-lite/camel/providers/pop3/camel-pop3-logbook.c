@@ -216,7 +216,9 @@ finalize (CamelObject *object)
 	if (book->path)
 		g_free (book->path);
 	book->path = NULL;
-	g_static_rec_mutex_free (book->lock);
+
+	/* g_static_rec_mutex_free (book->lock); */
+	g_free (book->lock);
 	book->lock = NULL;
 
 	return;

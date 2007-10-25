@@ -1526,7 +1526,8 @@ tny_merge_folder_finalize (GObject *object)
 
 	g_static_rec_mutex_unlock (priv->lock);
 
-	g_static_rec_mutex_free (priv->lock);
+	/* g_static_rec_mutex_free (priv->lock); */
+	g_free (priv->lock);
 	priv->lock = NULL;
 
 	parent_class->finalize (object);

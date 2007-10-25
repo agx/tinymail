@@ -5416,10 +5416,12 @@ tny_camel_folder_finalize (GObject *object)
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
-	g_static_rec_mutex_free (priv->folder_lock);
+	/* g_static_rec_mutex_free (priv->folder_lock); */
+	g_free (priv->folder_lock);
 	priv->folder_lock = NULL;
 
-	g_static_rec_mutex_free (priv->obs_lock);
+	/* g_static_rec_mutex_free (priv->obs_lock); */
+	g_free (priv->obs_lock);
 	priv->obs_lock = NULL;
 
 	g_mutex_free (priv->reason_lock);

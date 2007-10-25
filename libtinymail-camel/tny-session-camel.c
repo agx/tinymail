@@ -1095,7 +1095,10 @@ tny_session_camel_finalise (CamelObject *object)
 		g_free (priv->camel_dir);
 
 	g_mutex_free (priv->queue_lock);
-	g_static_rec_mutex_free (priv->current_accounts_lock);
+
+	/* g_static_rec_mutex_free (priv->current_accounts_lock); */
+	g_free (priv->current_accounts_lock);
+	priv->current_accounts_lock = NULL;
 
 	g_slice_free (TnySessionCamelPriv, self->priv);
 

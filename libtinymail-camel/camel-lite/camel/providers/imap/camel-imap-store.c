@@ -403,13 +403,16 @@ camel_imap_store_finalize (CamelObject *object)
 		disco->diary = NULL;
 	}
 
-	g_static_rec_mutex_free (imap_store->idle_prefix_lock);
+	/* g_static_rec_mutex_free (imap_store->idle_prefix_lock); */
+	g_free (imap_store->idle_prefix_lock);
 	imap_store->idle_prefix_lock = NULL;
 
-	g_static_rec_mutex_free (imap_store->idle_lock);
+	/* g_static_rec_mutex_free (imap_store->idle_lock); */
+	g_free (imap_store->idle_lock);
 	imap_store->idle_lock = NULL;
 
-	g_static_rec_mutex_free (imap_store->sum_lock);
+	/* g_static_rec_mutex_free (imap_store->sum_lock); */
+	g_free (imap_store->sum_lock);
 	imap_store->sum_lock = NULL;
 
 }
