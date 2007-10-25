@@ -1,6 +1,7 @@
 2007-10-25  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Corrections for the priority flags
+	* Memory leak fix in CamelImapCommand, found by Dirk-Jan
 
 	* This was a major API change
 
