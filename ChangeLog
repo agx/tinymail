@@ -1,3 +1,7 @@
+2007-10-26  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* X-Priority flag writing fixed
+
 2007-10-25  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Corrections for the priority flags

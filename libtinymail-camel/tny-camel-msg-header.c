@@ -223,24 +223,15 @@ set_prio_mask (TnyCamelMsgHeader *me, TnyHeaderFlags mask)
 	TnyHeaderFlags prio_mask = mask;
 	prio_mask &= TNY_HEADER_FLAG_PRIORITY_MASK;
 
-	if (prio_mask & TNY_HEADER_FLAG_HIGH_PRIORITY) {
+	if (prio_mask == TNY_HEADER_FLAG_HIGH_PRIORITY) {
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "High");
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "1");
-	}
-
-	if (prio_mask & TNY_HEADER_FLAG_LOW_PRIORITY) {
+	} else if (prio_mask == TNY_HEADER_FLAG_LOW_PRIORITY) {
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "Low");
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "5");
-	}
-
-	if (prio_mask & TNY_HEADER_FLAG_NORMAL_PRIORITY) {
+	} else if (prio_mask == TNY_HEADER_FLAG_NORMAL_PRIORITY) {
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "Normal");
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "3");
-	}
-
-	if (prio_mask & TNY_HEADER_FLAG_ATTACHMENTS) {
-		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
-		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach", "Yes");
 	}
 
 	return;
@@ -266,6 +257,11 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
 
 	set_prio_mask (me, mask);
+
+	if (mask & TNY_HEADER_FLAG_ATTACHMENTS) {
+		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
+		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach", "Yes");
+	}
 
 	return;
 }
