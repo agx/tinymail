@@ -1,3 +1,7 @@
+2007-10-26  Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* Parse the X-Priority flag correctly, and allow values of 2 and 4
+
 2007-10-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* X-Priority flag writing fixed

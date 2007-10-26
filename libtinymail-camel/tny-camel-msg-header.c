@@ -195,9 +195,11 @@ tny_camel_msg_header_get_flags (TnyHeader *self)
 	priority_string = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "X-Priority");
 	attachments_string = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
 	if (priority_string != NULL) {
-		if (g_strrstr (priority_string, "1") != NULL)
+		if (g_strrstr (priority_string, "1") != NULL ||
+		    g_strrstr (priority_string, "2") != NULL)
 			result |= TNY_HEADER_FLAG_HIGH_PRIORITY;
-		else if (g_strrstr (priority_string, "3") != NULL)
+		else if (g_strrstr (priority_string, "4") != NULL ||
+			 g_strrstr (priority_string, "5") != NULL)
 			result |= TNY_HEADER_FLAG_LOW_PRIORITY;
 		else 
 			result |= TNY_HEADER_FLAG_NORMAL_PRIORITY;
