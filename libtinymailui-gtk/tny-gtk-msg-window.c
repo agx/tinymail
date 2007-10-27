@@ -206,6 +206,32 @@ tny_gtk_msg_window_mp_get_part_default (TnyMimePartView *self)
 	return tny_mime_part_view_get_part (TNY_MIME_PART_VIEW (priv->msg_view));
 }
 
+/**
+ * tny_gtk_msg_window_set_view:
+ * @self: a #TnyGtkMsgView instance
+ * @view: a #TnyMsgView to decorate
+ *
+ * Set the @view to decorate with @self
+ **/
+void 
+tny_gtk_msg_window_set_view (TnyGtkMsgWindow *self, TnyMsgView *view)
+{
+	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
+
+	if (G_UNLIKELY (priv->msg_view))
+		gtk_container_remove (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
+
+	priv->msg_view = view;
+
+	/* This adds a reference to msgview (it's a gtkwidget) */
+	gtk_scrolled_window_add_with_viewport (priv->widget, 
+			GTK_WIDGET (view));
+
+	gtk_widget_show (GTK_WIDGET (priv->msg_view));
+
+	return;
+}
+
 
 /**
  * tny_gtk_msg_window_new:
@@ -219,18 +245,8 @@ TnyMsgWindow*
 tny_gtk_msg_window_new (TnyMsgView *msgview)
 {
 	TnyGtkMsgWindow *self = g_object_new (TNY_TYPE_GTK_MSG_WINDOW, NULL);
-	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
 
-	if (G_UNLIKELY (priv->msg_view))
-		gtk_container_remove (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
-
-	priv->msg_view = msgview;
-
-	/* This adds a reference to msgview (it's a gtkwidget) */
-	gtk_scrolled_window_add_with_viewport (priv->widget, 
-			GTK_WIDGET (msgview));
-
-	gtk_widget_show (GTK_WIDGET (priv->msg_view));
+	tny_gtk_msg_window_set_view (self, msgview);
 
 	return TNY_MSG_WINDOW (self);
 }

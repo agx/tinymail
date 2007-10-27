@@ -66,6 +66,7 @@ struct _TnyGtkMsgWindowClass
 
 GType tny_gtk_msg_window_get_type (void);
 TnyMsgWindow* tny_gtk_msg_window_new (TnyMsgView *msgview);
+void tny_gtk_msg_window_set_view (TnyGtkMsgWindow *self, TnyMsgView *view);
 
 G_END_DECLS
 

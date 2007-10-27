@@ -1,3 +1,9 @@
+2007-10-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Introduction of tny_gtk_msg_window_set_view
+
+	* This was a minor API change
+
 2007-10-26  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* Parse the X-Priority flag correctly, and allow values of 2 and 4
