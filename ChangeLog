@@ -1,3 +1,8 @@
+2007-10-29  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Fix: now we don't unset the priority flag on setting or
+	  unsetting other flags.
+
 2007-10-27  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Introduction of tny_gtk_msg_window_set_view

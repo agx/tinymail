@@ -255,10 +255,12 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 			me->partial = FALSE;
 	}
 
-	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
-	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
+	if ((mask & TNY_HEADER_FLAG_PRIORITY_MASK)|| (mask == 0)) {
+		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
+		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
 
-	set_prio_mask (me, mask);
+		set_prio_mask (me, mask);
+	}
 
 	if (mask & TNY_HEADER_FLAG_ATTACHMENTS) {
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
@@ -277,7 +279,10 @@ tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
 		tny_header_set_flags (me->decorated, mask);
 	}
 
-	set_prio_mask (me, mask);
+	/* we only need to detect unsets of low and high priority, as unsetting normal
+	 * priority should lead to set again normal priority */
+	if (mask & TNY_HEADER_FLAG_PRIORITY_MASK)
+		set_prio_mask (me, TNY_HEADER_FLAG_NORMAL_PRIORITY);
 
 	if (mask & TNY_HEADER_FLAG_ATTACHMENTS)
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");
