@@ -84,6 +84,8 @@ static int stream_setsockopt (CamelTcpStream *stream, const CamelSockOptData *da
 static struct sockaddr *stream_get_local_address (CamelTcpStream *stream, socklen_t *len);
 static struct sockaddr *stream_get_remote_address (CamelTcpStream *stream, socklen_t *len);
 static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
+static int stream_gettimeout (CamelTcpStream *stream);
+
 
 struct _CamelTcpStreamSSLPrivate {
 	PRFileDesc *sockfd;
@@ -111,12 +113,19 @@ camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_cl
 	camel_stream_class->flush = stream_flush;
 	camel_stream_class->close = stream_close;
 
+	camel_tcp_stream_class->gettimeout = stream_gettimeout;
 	camel_tcp_stream_class->read_nb = stream_read_nb;
 	camel_tcp_stream_class->connect = stream_connect;
 	camel_tcp_stream_class->getsockopt = stream_getsockopt;
 	camel_tcp_stream_class->setsockopt = stream_setsockopt;
 	camel_tcp_stream_class->get_local_address  = stream_get_local_address;
 	camel_tcp_stream_class->get_remote_address = stream_get_remote_address;
+}
+
+static int 
+stream_gettimeout (CamelTcpStream *stream)
+{
+	return 330;
 }
 
 static void

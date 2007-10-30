@@ -41,6 +41,7 @@ static int tcp_setsockopt (CamelTcpStream *stream, const CamelSockOptData *data)
 static struct sockaddr *tcp_get_local_address (CamelTcpStream *stream, socklen_t *len);
 static struct sockaddr *tcp_get_remote_address (CamelTcpStream *stream, socklen_t *len);
 static ssize_t tcp_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
+static int tcp_gettimeout (CamelTcpStream *stream);
 
 static void
 camel_tcp_stream_class_init (CamelTcpStreamClass *camel_tcp_stream_class)
@@ -50,6 +51,7 @@ camel_tcp_stream_class_init (CamelTcpStreamClass *camel_tcp_stream_class)
 	parent_class = CAMEL_STREAM_CLASS (camel_type_get_global_classfuncs (CAMEL_STREAM_TYPE));
 	
 	/* tcp stream methods */
+	camel_tcp_stream_class->gettimeout         = tcp_gettimeout;
 	camel_tcp_stream_class->read_nb            = tcp_read_nb;
 	camel_tcp_stream_class->connect            = tcp_connect;
 	camel_tcp_stream_class->getsockopt         = tcp_getsockopt;
@@ -139,6 +141,21 @@ camel_tcp_stream_getsockopt (CamelTcpStream *stream, CamelSockOptData *data)
 	g_return_val_if_fail (CAMEL_IS_TCP_STREAM (stream), -1);
 	
 	return CTS_CLASS (stream)->getsockopt (stream, data);
+}
+
+static int
+tcp_gettimeout (CamelTcpStream *stream)
+{
+	w(g_warning ("CamelTcpStream::gettimeout called on default implementation"));
+	return 330;
+}
+
+int
+camel_tcp_stream_gettimeout (CamelTcpStream *stream)
+{
+	g_return_val_if_fail (CAMEL_IS_TCP_STREAM (stream), -1);
+	
+	return CTS_CLASS (stream)->gettimeout (stream);
 }
 
 static int

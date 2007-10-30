@@ -381,7 +381,7 @@ camel_imap_store_finalize (CamelObject *object)
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
 
 	if (imap_store->addrinfo) {
-		freeaddrinfo (imap_store->addrinfo);
+		freeaidle_sleepddrinfo (imap_store->addrinfo);
 		imap_store->addrinfo = NULL;
 	}
 
@@ -436,6 +436,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 
 	imap_store->dontdistridlehack = FALSE;
 
+	imap_store->idle_sleep_set = FALSE;
 	imap_store->idle_sleep = 600; /* default of 10m */
 	imap_store->getsrv_sleep = 100; /* default of 100s */
 
@@ -1019,6 +1020,9 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		goto exception;
 	}
 
+	if (!store->idle_sleep_set) /* We subtract 30 seconds from the timeout before we recycle the IDLE */
+		store->idle_sleep = camel_tcp_stream_gettimeout ((CamelTcpStream *) tcp_stream) - 30;
+
 #else
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 			"Failed to connect to IMAP server %s in secure mode: %s",
@@ -1262,8 +1266,10 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	if ((idle_sleep = camel_url_get_param (service->url, "idle_delay")))
 	{
 		int tmp = atoi (idle_sleep);
-		if (tmp != -1)
+		if (tmp != -1) {
 			CAMEL_IMAP_STORE (service)->idle_sleep = tmp;
+			CAMEL_IMAP_STORE (service)->idle_sleep_set = TRUE;
+		}
 	} 
 
 	if ((getsrv_sleep = camel_url_get_param (service->url, "getsrv_delay")))

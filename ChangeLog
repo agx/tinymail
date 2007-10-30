@@ -2,6 +2,7 @@
 
 	* Improvements to the AUTHORS file. Authors can obviously notify
 	me if they want their description improven or removed.
+	* Using the SSL negotiated timeout time for IDLE's recycle
 	
 2007-10-29  Jose Dapena Paz  <jdapena@igalia.com>
 

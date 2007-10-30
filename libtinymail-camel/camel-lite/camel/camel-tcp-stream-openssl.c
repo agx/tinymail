@@ -72,6 +72,7 @@ static int stream_getsockopt (CamelTcpStream *stream, CamelSockOptData *data);
 static int stream_setsockopt (CamelTcpStream *stream, const CamelSockOptData *data);
 static struct sockaddr *stream_get_local_address (CamelTcpStream *stream, socklen_t *len);
 static struct sockaddr *stream_get_remote_address (CamelTcpStream *stream, socklen_t *len);
+static int stream_gettimeout (CamelTcpStream *stream);
 
 static SSL *open_ssl_connection (CamelSession *session, int sockfd, CamelTcpStreamSSL *openssl);
 
@@ -104,7 +105,8 @@ camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_cl
 	camel_stream_class->write = stream_write;
 	camel_stream_class->flush = stream_flush;
 	camel_stream_class->close = stream_close;
-	
+
+	camel_tcp_stream_class->gettimeout = stream_gettimeout;
 	camel_tcp_stream_class->read_nb = stream_read_nb;
 	camel_tcp_stream_class->connect = stream_connect;
 	camel_tcp_stream_class->getsockopt = stream_getsockopt;
@@ -286,6 +288,14 @@ camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *stream)
 	return 0;
 }
 
+static int 
+stream_gettimeout (CamelTcpStream *stream)
+{
+	CamelTcpStreamSSL *openssl = CAMEL_TCP_STREAM_SSL (stream);
+	SSL *ssl = openssl->priv->ssl;
+
+	return SSL_get_default_timeout ((const SSL*) ssl);
+}
 
 static ssize_t
 stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
