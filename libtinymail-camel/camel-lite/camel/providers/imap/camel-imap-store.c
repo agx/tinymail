@@ -437,7 +437,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->dontdistridlehack = FALSE;
 
 	imap_store->idle_sleep_set = FALSE;
-	imap_store->idle_sleep = 600; /* default of 10m */
+	imap_store->idle_sleep = 810; /* default of 27m */
 	imap_store->getsrv_sleep = 100; /* default of 100s */
 
 	imap_store->in_idle = FALSE;
@@ -1019,9 +1019,6 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 				service->url->host, "SSL negotiations failed", strerror (errno));
 		goto exception;
 	}
-
-	if (!store->idle_sleep_set) /* We subtract 30 seconds from the timeout before we recycle the IDLE */
-		store->idle_sleep = camel_tcp_stream_gettimeout ((CamelTcpStream *) tcp_stream) - 30;
 
 #else
 	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
