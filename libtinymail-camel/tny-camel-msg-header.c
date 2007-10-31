@@ -225,6 +225,9 @@ set_prio_mask (TnyCamelMsgHeader *me, TnyHeaderFlags mask)
 	TnyHeaderFlags prio_mask = mask;
 	prio_mask &= TNY_HEADER_FLAG_PRIORITY_MASK;
 
+	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
+	camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
+
 	if (prio_mask == TNY_HEADER_FLAG_HIGH_PRIORITY) {
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority", "High");
 		camel_medium_add_header (CAMEL_MEDIUM (me->msg), "X-Priority", "1");
@@ -255,10 +258,9 @@ tny_camel_msg_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
 			me->partial = FALSE;
 	}
 
-	if ((mask & TNY_HEADER_FLAG_PRIORITY_MASK)|| (mask == 0)) {
-		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MSMail-Priority");
-		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-Priority");
-
+	/* Set priority only if no other flags are found.
+	   Normal priority is 00 so there's no other way to detect it */
+	if (!(mask & ~TNY_HEADER_FLAG_PRIORITY_MASK)) {
 		set_prio_mask (me, mask);
 	}
 
@@ -278,11 +280,6 @@ tny_camel_msg_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 	if (me->decorated) {
 		tny_header_set_flag (me->decorated, mask);
 	}
-
-	/* we only need to detect unsets of low and high priority, as unsetting normal
-	 * priority should lead to set again normal priority */
-	if (mask & TNY_HEADER_FLAG_PRIORITY_MASK)
-		set_prio_mask (me, TNY_HEADER_FLAG_NORMAL_PRIORITY);
 
 	if (mask & TNY_HEADER_FLAG_ATTACHMENTS)
 		camel_medium_remove_header (CAMEL_MEDIUM (me->msg), "X-MS-Has-Attach");

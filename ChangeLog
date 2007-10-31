@@ -1,3 +1,9 @@
+2007-10-31  Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* Ignore priority flags in tny_camel_msg_header_unset_flag()
+	* Remove the X-Priority header in set_prio_mask() instead of
+	tny_camel_msg_header_set_flag()
+
 2007-10-31  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* \NoSelect folders should never get a STATUS request, fixed
