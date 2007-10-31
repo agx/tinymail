@@ -3,13 +3,11 @@ Philip Van Hoof <pvanhoof@gnome.org>
 	Freelance software developer at Codeminded bvba
 
 	* Overall project maintainer and decision making
-	* Design, implementation and analysis of the abstraction
+	* Design, implementation and analysis
 	* Main developer of the core implementation
-	* Main developer of the unit tests
-	* Main implementer of the Python bindings
-	* API GTK-DOC Documentation writer
-	* Wiki/Trac documentation and maintenance
-	* Build environment implementer
+	* Main developer of camel-lite
+	* Wrote most of the documentation
+	* Build environment
 	* Marketing website
 	* ...
 
