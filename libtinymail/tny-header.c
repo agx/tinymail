@@ -452,6 +452,9 @@ tny_header_get_folder (TnyHeader *self)
  * 
  * Get message information flags.
  * 
+ * No not use this method to get priority settings. Use tny_header_get_priority
+ * in stead.
+ *
  * Return value: flag bitmask
  **/
 TnyHeaderFlags
@@ -472,7 +475,9 @@ tny_header_get_flags (TnyHeader *self)
  * 
  * Modify message flags. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
  * notification of folder observers if @self was originated from a folder.
- * 
+ *
+ * No not use this method to set priority settings. Use tny_header_set_priority
+ * in stead.
  **/
 void 
 tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
@@ -491,6 +496,14 @@ tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 	return;
 }
 
+/**
+ * tny_header_get_priority:
+ * @self: a #TnyHeader object
+ * 
+ * Get message priority
+ *
+ * Return value: priority
+ **/
 TnyHeaderFlags 
 tny_header_get_priority (TnyHeader *self)
 {
@@ -499,6 +512,13 @@ tny_header_get_priority (TnyHeader *self)
 	return flags;
 }
 
+/**
+ * tny_header_set_priority:
+ * @self: a #TnyHeader object
+ * @priority: A priority setting (high, low or normal)
+ * 
+ * Set the priority of the message.
+ **/
 void
 tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority)
 {
