@@ -381,7 +381,7 @@ camel_imap_store_finalize (CamelObject *object)
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
 
 	if (imap_store->addrinfo) {
-		freeaidle_sleepddrinfo (imap_store->addrinfo);
+		camel_freeaddrinfo  (imap_store->addrinfo);
 		imap_store->addrinfo = NULL;
 	}
 
