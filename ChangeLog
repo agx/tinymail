@@ -3,6 +3,8 @@
 	* \NoSelect folders should never get a STATUS request, fixed
 	* Documentation clarification about priority and flags
 	* Renamed tny_header_set_flags to set_flag, same for unset
+	* Lowered the number of TOPs before incrementally filling up of the
+	headers model happens for POP
 
 	* This was a major API change
 

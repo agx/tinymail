@@ -426,7 +426,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 				camel_folder_change_info_add_uid (changes, fi->uid);
 
 				lcnt++;
-				if (lcnt > 100)
+				if (lcnt > 20)
 				{
 					if (camel_folder_change_info_changed (changes))
 						camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
