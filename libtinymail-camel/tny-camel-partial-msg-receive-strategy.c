@@ -102,11 +102,11 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 			_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
 			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
 						CAMEL_MIME_PART (camel_message)); 
-			tny_header_set_flags (nheader, TNY_HEADER_FLAG_CACHED);
-			tny_header_set_flags (nheader, TNY_HEADER_FLAG_PARTIAL);
+			tny_header_set_flag (nheader, TNY_HEADER_FLAG_CACHED);
+			tny_header_set_flag (nheader, TNY_HEADER_FLAG_PARTIAL);
 			g_object_unref (nheader);
-			tny_header_set_flags (header, TNY_HEADER_FLAG_CACHED);
-			tny_header_set_flags (header, TNY_HEADER_FLAG_PARTIAL);
+			tny_header_set_flag (header, TNY_HEADER_FLAG_CACHED);
+			tny_header_set_flag (header, TNY_HEADER_FLAG_PARTIAL);
 		}
 	}
 

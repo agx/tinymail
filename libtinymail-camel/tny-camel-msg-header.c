@@ -240,12 +240,12 @@ set_prio_mask (TnyCamelMsgHeader *me, TnyHeaderFlags mask)
 }
 
 static void
-tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
+tny_camel_msg_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
 	if (me->decorated) {
-		tny_header_set_flags (me->decorated, mask);
+		tny_header_set_flag (me->decorated, mask);
 	}
 
 	if (mask & TNY_HEADER_FLAG_CACHED || mask & TNY_HEADER_FLAG_PARTIAL) {
@@ -271,12 +271,12 @@ tny_camel_msg_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 }
 
 static void
-tny_camel_msg_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
+tny_camel_msg_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
 	if (me->decorated) {
-		tny_header_set_flags (me->decorated, mask);
+		tny_header_set_flag (me->decorated, mask);
 	}
 
 	/* we only need to detect unsets of low and high priority, as unsetting normal
@@ -513,8 +513,8 @@ tny_header_init (gpointer g, gpointer iface_data)
 	klass->set_from_func = tny_camel_msg_header_set_from;
 	klass->set_subject_func = tny_camel_msg_header_set_subject;
 	klass->set_replyto_func = tny_camel_msg_header_set_replyto;
-	klass->set_flags_func = tny_camel_msg_header_set_flags;
-	klass->unset_flags_func = tny_camel_msg_header_unset_flags;
+	klass->set_flag_func = tny_camel_msg_header_set_flag;
+	klass->unset_flag_func = tny_camel_msg_header_unset_flag;
 	klass->get_flags_func = tny_camel_msg_header_get_flags;
 
 	return;

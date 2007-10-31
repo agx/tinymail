@@ -154,7 +154,7 @@ tny_camel_header_get_flags (TnyHeader *self)
 }
 
 static void
-tny_camel_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
+tny_camel_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	CamelMessageInfoBase *info = (CamelMessageInfoBase *) me->info;
@@ -184,7 +184,7 @@ tny_camel_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
 }
 
 static void
-tny_camel_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
+tny_camel_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
 	CamelMessageInfoBase *info = (CamelMessageInfoBase *) me->info;
@@ -372,8 +372,8 @@ tny_header_init (gpointer g, gpointer iface_data)
 	klass->set_from_func = tny_camel_header_set_from;
 	klass->set_subject_func = tny_camel_header_set_subject;
 	klass->set_replyto_func = tny_camel_header_set_replyto;
-	klass->set_flags_func = tny_camel_header_set_flags;
-	klass->unset_flags_func = tny_camel_header_unset_flags;
+	klass->set_flag_func = tny_camel_header_set_flag;
+	klass->unset_flag_func = tny_camel_header_unset_flag;
 	klass->get_flags_func = tny_camel_header_get_flags;
 
 	return;

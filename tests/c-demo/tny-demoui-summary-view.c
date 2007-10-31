@@ -749,7 +749,7 @@ on_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *merr, gp
 	if (msg) {
 		TnyHeaderFlags flags = tny_header_get_flags (header);
 		if (!(flags & TNY_HEADER_FLAG_SEEN))
-			tny_header_set_flags (header, TNY_HEADER_FLAG_SEEN);
+			tny_header_set_flag (header, TNY_HEADER_FLAG_SEEN);
 		tny_msg_view_set_msg (info->msg_view, msg);
 	} else 
 		tny_msg_view_set_unavailable (info->msg_view);

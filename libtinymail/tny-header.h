@@ -96,8 +96,8 @@ struct _TnyHeaderIface
 	void (*set_replyto_func) (TnyHeader *self, const gchar *to);
 	TnyFolder* (*get_folder_func) (TnyHeader *self);
 	TnyHeaderFlags (*get_flags_func) (TnyHeader *self);
-	void (*set_flags_func) (TnyHeader *self, TnyHeaderFlags mask);
-	void (*unset_flags_func) (TnyHeader *self, TnyHeaderFlags mask);
+	void (*set_flag_func) (TnyHeader *self, TnyHeaderFlags mask);
+	void (*unset_flag_func) (TnyHeader *self, TnyHeaderFlags mask);
 };
 
 GType tny_header_get_type (void);
@@ -122,8 +122,8 @@ void tny_header_set_to (TnyHeader *self, const gchar *to);
 void tny_header_set_replyto (TnyHeader *self, const gchar *to);
 TnyFolder* tny_header_get_folder (TnyHeader *self);
 TnyHeaderFlags tny_header_get_flags (TnyHeader *self);
-void tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask);
-void tny_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask);
+void tny_header_set_flag (TnyHeader *self, TnyHeaderFlags mask);
+void tny_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask);
 
 TnyHeaderFlags tny_header_get_priority (TnyHeader *self);
 void tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority);

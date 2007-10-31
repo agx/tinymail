@@ -469,25 +469,26 @@ tny_header_get_flags (TnyHeader *self)
 }
 
 /**
- * tny_header_set_flags:
+ * tny_header_set_flag:
  * @self: a #TnyHeader object
- * @mask: A #TnyHeaderFlags bitmask of flags to set.
+ * @mask: A #TnyHeaderFlags bitmask flag to set.
  * 
- * Modify message flags. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
+ * Modify message flag @mask. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
  * notification of folder observers if @self was originated from a folder.
  *
- * No not use this method to set priority settings. Use tny_header_set_priority
- * in stead.
+ * Do not use this method to set priority settings. Use tny_header_set_priority
+ * in stead. Don't set more than one flag. Use the labels of the TnyHeaderFlags
+ * as an enum.
  **/
 void 
-tny_header_set_flags (TnyHeader *self, TnyHeaderFlags mask)
+tny_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_flags_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_flag_func != NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_flags_func (self, mask);
+	TNY_HEADER_GET_IFACE (self)->set_flag_func (self, mask);
 
 #ifdef DBC /* ensure */
 	/* TNY TODO: A check that ensures that all bits in mask are set */
@@ -517,38 +518,48 @@ tny_header_get_priority (TnyHeader *self)
  * @self: a #TnyHeader object
  * @priority: A priority setting (high, low or normal)
  * 
- * Set the priority of the message.
+ * Set the priority of the message. To unset the priority, you can use 
+ * TNY_HEADER_FLAG_NORMAL_PRIORITY as @priority. Don't combine @priority with
+ * other flags. Use additional tny_header_set_flag calls if you want to do 
+ * that.
  **/
 void
 tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority)
 {
 	TnyHeaderFlags flags;
 	g_return_if_fail  (priority & TNY_HEADER_FLAG_PRIORITY_MASK != priority);
+
+	/* Is this necessary? */
 	flags = tny_header_get_flags (self);
 	flags &= ~TNY_HEADER_FLAG_PRIORITY_MASK;
 	flags |= priority;
-	tny_header_set_flags (self, flags);
+	/* -- */
+
+	tny_header_set_flag (self, flags);
 	return;
 }
 
 /**
- * tny_header_unset_flags:
+ * tny_header_unset_flag:
  * @self: a #TnyHeader object
- * @mask: A #TnyHeaderFlags bitmask of flags to clear.
+ * @mask: A #TnyHeaderFlags flag to clear.
  * 
- * Reset message flags. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
+ * Reset message flag @mask. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
  * notification of folder observers if @self was originated from a folder.
  * 
+ * Don't attempt to unset the priority. Use tny_header_set_priority (header, 
+ * TNY_HEADER_FLAG_NORMAL_PRIORITY) to set the priority of a message to normal 
+ * (which is the same as unsetting it). Don't unset multiple flags.
  **/
 void 
-tny_header_unset_flags (TnyHeader *self, TnyHeaderFlags mask)
+tny_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->unset_flags_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->unset_flag_func != NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->unset_flags_func (self, mask);
+	TNY_HEADER_GET_IFACE (self)->unset_flag_func (self, mask);
 
 #ifdef DBC /* ensure */
 	/* TNY TODO: A check that ensures that all bits in mask are unset */

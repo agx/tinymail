@@ -146,16 +146,16 @@ START_TEST (tny_header_test_set_priority_flags)
 {
 	TnyHeaderFlags flags;
 
-	tny_header_set_flags (iface, TNY_HEADER_FLAG_HIGH_PRIORITY);
-	flags = tny_header_get_flags (iface);
+	tny_header_set_priority (iface, TNY_HEADER_FLAG_HIGH_PRIORITY);
+	flags = tny_header_get_priority (iface);
 	fail_unless (flags == TNY_HEADER_FLAG_HIGH_PRIORITY, "Unable to set high priority.\n");
 
-	tny_header_unset_flags (iface, TNY_HEADER_FLAG_PRIORITY);
-	flags = tny_header_get_flags (iface);
-	fail_unless (flags == 0, "Unable to unset priority");
+	tny_header_set_priority (iface, TNY_HEADER_FLAG_NORMAL_PRIORITY);
+	flags = tny_header_get_priority (iface);
+	fail_unless (flags == TNY_HEADER_FLAG_NORMAL_PRIORITY, "Unable to set normal priority.\n");
 
-	tny_header_set_flags (iface, TNY_HEADER_FLAG_LOW_PRIORITY);
-	flags = tny_header_get_flags (iface);
+	tny_header_set_priority (iface, TNY_HEADER_FLAG_LOW_PRIORITY);
+	flags = tny_header_get_priority (iface);
 	fail_unless (flags == TNY_HEADER_FLAG_LOW_PRIORITY, "Unable to set low priority.\n");
 
 	return;

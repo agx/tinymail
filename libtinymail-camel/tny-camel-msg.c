@@ -268,7 +268,7 @@ tny_camel_msg_uncache_attachments_default (TnyMsg *self)
 		_tny_camel_folder_uncache_attachments (
 			TNY_CAMEL_FOLDER (priv->folder),
 			tny_header_get_uid (priv->header));
-		/* tny_header_set_flags (priv->header, TNY_HEADER_FLAG_PARTIAL); */
+		/* tny_header_set_flag (priv->header, TNY_HEADER_FLAG_PARTIAL); */
 	}
 }
 
