@@ -258,7 +258,7 @@ camel_gethostbyname_r (const char *name, struct hostent *host,
 	((char **) buf)[1] = NULL;
 	host->h_addr_list = (char **) buf;
 	
-	freeaddrinfo (res);
+	camel_freeaddrinfo (res);
 	
 	return 0;
 #else /* No support for IPv6 addresses */
