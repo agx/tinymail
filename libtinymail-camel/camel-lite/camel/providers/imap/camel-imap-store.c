@@ -2189,14 +2189,23 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	CamelImapResponse *response;
 	char *status, *name, *p;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	CamelStoreSummary *s = (CamelStoreSummary *) imap_store->summary;
+	gboolean noselect = FALSE;
 
-	if (!(imap_store->capabilities & IMAP_CAPABILITY_STATUS))
+	if (s) {
+		CamelStoreInfo *i = camel_store_summary_path (s, folder_name);
+		if (i) {
+			if (i->flags & CAMEL_FOLDER_NOSELECT)
+				noselect = TRUE;
+			camel_store_summary_info_free (s, i);
+		}
+	}
+
+	if (noselect || !(imap_store->capabilities & IMAP_CAPABILITY_STATUS))
 		return NULL;
 
 	response = camel_imap_command (imap_store, NULL, &ex,
-				       "STATUS %F (%s)",
-				       folder_name,
-				       type);
+			"STATUS %F (%s)", folder_name, type);
 
 	if (!response) {
 		if (err_handle_on_fail) {
