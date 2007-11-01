@@ -1,6 +1,8 @@
 2007-11-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* GHost items when renaming a local folder, fixed
+	* Date-Received date = Date header for messages that never got
+	received (like newly created messages in a Draft folder)
 
 2007-10-31  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
