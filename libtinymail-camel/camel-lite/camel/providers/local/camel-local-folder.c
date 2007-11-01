@@ -592,9 +592,6 @@ local_rename(CamelFolder *folder, const char *newname)
 	g_free(((CamelLocalSummary *)folder->summary)->folder_path);
 	((CamelLocalSummary *)folder->summary)->folder_path = g_strdup(lf->folder_path);
 
-	if (camel_local_summary_load((CamelLocalSummary *)folder->summary, 0, NULL) == -1) {
-		/* ? */
-	}
 
 }
 

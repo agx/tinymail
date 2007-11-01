@@ -388,6 +388,8 @@ static int xrename(const char *oldp, const char *newp, const char *prefix, const
 	return ret;
 }
 
+#define CLOCALF_CLASS(so) CAMEL_LOCAL_FOLDER_CLASS (CAMEL_OBJECT_GET_CLASS(so))
+
 /* default implementation, rename all */
 static void
 rename_folder(CamelStore *store, const char *old, const char *new, CamelException *ex)
@@ -400,6 +402,7 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 #ifdef DEBUG
 	g_print ("local rename folder '%s' '%s' '%s'\n", old, new, path);
 #endif
+
 
 #if 0
 	folder = camel_object_bag_get(store->folders, old);
@@ -417,13 +420,15 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 	xrename(old, new, path, ".cmeta", TRUE, &nex);
 	xrename(old, new, path, "", FALSE, &nex);
 
+
 #if 0
 	g_free(newibex);
 	g_free(oldibex);
-
 	if (folder)
-		camel_object_unref(folder);
+		camel_object_unref (folder);
+
 #endif
+
 
 	return;
 

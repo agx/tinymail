@@ -1,3 +1,7 @@
+2007-11-01  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* GHost items when renaming a local folder, fixed
+
 2007-10-31  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* Ignore priority flags in tny_camel_msg_header_unset_flag()

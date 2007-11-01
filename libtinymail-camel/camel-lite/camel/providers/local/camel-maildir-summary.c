@@ -234,8 +234,6 @@ int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char
 	guint32 set = 0;	/* what we set */
 	int i;
 
-printf ("camel_maildir_summary_name_to_info\n");
-
 	p = strstr (name, "!2,");
 
 	if (!p)
