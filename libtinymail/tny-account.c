@@ -602,7 +602,6 @@ tny_account_set_port (TnyAccount *self, guint port)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (port <= 65536);
 	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_port_func != NULL);
 #endif
 
@@ -876,7 +875,6 @@ tny_account_get_port (TnyAccount *self)
 	retval = TNY_ACCOUNT_GET_IFACE (self)->get_port_func (self);
 
 #ifdef DBC /* ensure */
-	g_assert (retval <= 65536);
 #endif
 
 	return retval;
