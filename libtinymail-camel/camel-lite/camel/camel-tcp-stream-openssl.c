@@ -215,8 +215,6 @@ camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_cl
 	/* init OpenSSL stuff */
 
 	tls_init ();
-	SSLeay_add_ssl_algorithms ();
-	SSL_load_error_strings ();
 }
 
 static void
