@@ -3138,8 +3138,8 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 		if (nerr != NULL) {
 			if (!tried)
 				g_propagate_error (err, nerr);
-			else
-				g_error_free (nerr);
+			/* else
+				g_error_free (nerr); */
 		} else {
 			/* Unload the folder. This way we'll get the
 			   right CamelFolderInfo objects for the

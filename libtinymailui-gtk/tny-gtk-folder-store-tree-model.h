@@ -75,6 +75,8 @@ GtkTreeModel* tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query);
 void tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);
 void tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);
 
+void tny_gtk_folder_store_tree_model_stop_observing (TnyGtkFolderStoreTreeModel *self);
+
 G_END_DECLS
 
 #endif

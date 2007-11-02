@@ -3,6 +3,10 @@
 	* GHost items when renaming a local folder, fixed
 	* Date-Received date = Date header for messages that never got
 	received (like newly created messages in a Draft folder)
+	* Introduction of tny_gtk_folder_store_tree_model_stop_observing
+	* Introduced locking for OpenSSL
+
+	* This was a minor API change
 
 2007-10-31  Alberto Garcia Gonzalez <agarcia@igalia.com>
 

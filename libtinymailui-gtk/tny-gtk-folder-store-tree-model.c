@@ -459,14 +459,43 @@ static void
 unregister_folder_observerable (gpointer item, gpointer user_data)
 {
 	TnyFolder *f = (TnyFolder *) item;
-	tny_folder_remove_observer (f, TNY_FOLDER_OBSERVER (user_data));
+	if (f && TNY_IS_FOLDER (f))
+		tny_folder_remove_observer (f, TNY_FOLDER_OBSERVER (user_data));
 }
 
 static void 
 unregister_store_observerable (gpointer item, gpointer user_data)
 {
 	TnyFolderStore *fstore = (TnyFolderStore *) item;
-	tny_folder_store_remove_observer (fstore, TNY_FOLDER_STORE_OBSERVER (user_data));
+	if (fstore && TNY_IS_FOLDER_STORE (fstore))
+		tny_folder_store_remove_observer (fstore, TNY_FOLDER_STORE_OBSERVER (user_data));
+}
+
+/*
+ * tny_gtk_folder_store_tree_model_stop_observing:
+ * @self: a #TnyGtkFolderStoreTreeModel instance
+ *
+ * Stop observing the folders in @self. You must use this function before 
+ * finalization of @self. For example just before setting a new model to a
+ * #GtkTreeView using gtk_tree_view_set_model, or just before the treeview's
+ * instance gets either unferencered or detached from its container.
+ **/
+void
+tny_gtk_folder_store_tree_model_stop_observing (TnyGtkFolderStoreTreeModel *self)
+{
+	if (self->folder_observables)
+	{
+		g_list_foreach (self->folder_observables, unregister_folder_observerable, self);
+		g_list_free (self->store_observables);
+		self->store_observables = NULL;
+	}
+
+	if (self->store_observables)
+	{
+		g_list_foreach (self->store_observables, unregister_store_observerable, self);
+		g_list_free (self->store_observables);
+		self->store_observables = NULL;
+	}
 }
 
 static void
@@ -482,17 +511,6 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 	}
 	g_mutex_unlock (me->iterator_lock);
 
-	if (me->folder_observables)
-	{
-		g_list_foreach (me->folder_observables, unregister_folder_observerable, me);
-		g_list_free (me->store_observables);
-	}
-
-	if (me->store_observables)
-	{
-		g_list_foreach (me->store_observables, unregister_store_observerable, me);
-		g_list_free (me->store_observables);
-	}
 
 	g_mutex_free (me->iterator_lock);
 	me->iterator_lock = NULL;
