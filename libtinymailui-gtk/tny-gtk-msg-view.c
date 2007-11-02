@@ -684,6 +684,12 @@ tny_gtk_msg_view_new (void)
 }
 
 
+static TnyHeaderView * 
+tny_gtk_msg_view_create_header_view_default (TnyGtkMsgView *self)
+{
+	return tny_gtk_header_view_new ();
+}
+
 static void
 tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -705,7 +711,9 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->unattached_views = NULL;
 	priv->part = NULL;
 
-	priv->headerview = tny_gtk_header_view_new ();
+
+	priv->headerview = TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_header_view_func (self);
+
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
 
 	TNY_GTK_MSG_VIEW (self)->viewers = GTK_CONTAINER (gtk_vbox_new (FALSE, 0));
@@ -826,6 +834,8 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 	class->clear_func = tny_gtk_msg_view_clear_default;
 	class->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for_default;
 	class->create_new_inline_viewer_func = tny_gtk_msg_view_create_new_inline_viewer_default;
+
+	class->create_header_view_func = tny_gtk_msg_view_create_header_view_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyGtkMsgViewPriv));
 

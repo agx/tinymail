@@ -5,6 +5,7 @@
 	received (like newly created messages in a Draft folder)
 	* Introduction of tny_gtk_folder_store_tree_model_stop_observing
 	* Introduced locking for OpenSSL
+	* Added a virtual create_header_view_func to TnyGtkMsgView
 
 	* This was a minor API change
 

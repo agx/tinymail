@@ -25,6 +25,7 @@
 #include <tny-shared.h>
 
 #include <tny-msg-view.h>
+#include <tny-header-view.h>
 #include <tny-header.h>
 #include <tny-msg.h>
 #include <tny-stream.h>
@@ -62,6 +63,7 @@ struct _TnyGtkMsgViewClass
 	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
 	TnyMsgView* (*create_new_inline_viewer_func) (TnyMsgView *self);
 
+	TnyHeaderView* (*create_header_view_func) (TnyGtkMsgView *self);
 };
 
 GType tny_gtk_msg_view_get_type (void);
