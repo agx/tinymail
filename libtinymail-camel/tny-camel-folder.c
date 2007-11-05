@@ -3079,8 +3079,9 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 				{
 					CamelStore *store = priv->store;
 					CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+					int flags = CAMEL_STORE_FOLDER_INFO_RECURSIVE|CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
 
-					iter = camel_store_get_folder_info (store, to, 0, &ex);
+					iter = camel_store_get_folder_info (store, to, flags, &ex);
 					if (camel_exception_is_set (&ex))
 					{
 						g_set_error (&terr, TNY_FOLDER_ERROR, 

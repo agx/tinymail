@@ -1,3 +1,12 @@
+2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Bugfix when renaming or moving a local folder. Not all of its sub-
+	folders where recreated (if the flags where 0, CamelStore's 
+	camel_store_get_folder_info returned an iter with only one child in it.
+	Either it should return no childs or all childs. I adapted Tinymail to
+	request all childs. This is tny-camel-folder.c:3084 (under the was_new
+	if). Please keep an eye on this one!
+
 2007-11-01  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* GHost items when renaming a local folder, fixed
