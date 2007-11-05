@@ -352,4 +352,6 @@ md5_get_digest_from_file (const gchar *filename, guchar digest[16])
 	}
 
 	md5_final (&ctx, digest);
+
+	fclose (fp);
 }

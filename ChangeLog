@@ -1,3 +1,7 @@
+2007-11-05  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+	
+	* Don't leak an fp in md5_get_digest_from_file
+
 2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merged with upstream Camel revision 8186
@@ -23,6 +27,7 @@
 
 	* This was a minor API change
 
+>>>>>>> .r2908
 2007-10-31  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* Ignore priority flags in tny_camel_msg_header_unset_flag()
