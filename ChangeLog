@@ -6,6 +6,8 @@
 
 	* Merged with upstream Camel revision 8186
 	* Merged bugfix http://bugzilla.gnome.org/show_bug.cgi?id=430420
+	* Fixed a warning during the build procedure, detecting Mozilla
+	version
 
 2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
 

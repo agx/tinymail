@@ -55,25 +55,32 @@ if test x$mozilla_xpcom != x; then
    #The only real way to detect the MOZILLA engine version is using the version in mozilla-config.h
    #of the engine we use.
    mozilla_xpcom_includedir="`$PKG_CONFIG --variable=includedir $mozilla_xpcom`"
-   mozilla_version=`cat $mozilla_xpcom_includedir/mozilla-config.h | grep MOZILLA_VERSION_U | sed "s/.*_VERSION_U\ //"|tr ".abpre+" " "`
-   mozilla_major_version=`echo $mozilla_version | awk ' { print $[1]; } '`
-   mozilla_minor_version=`echo $mozilla_version | awk ' { print $[2]; } '`
+
+   if test -f $mozilla_xpcom_includedir/mozilla-config.h
+   then
+    mozilla_version=`cat $mozilla_xpcom_includedir/mozilla-config.h | grep MOZILLA_VERSION_U | sed "s/.*_VERSION_U\ //"|tr ".abpre+" " "`
+    mozilla_major_version=`echo $mozilla_version | awk ' { print $[1]; } '`
+    mozilla_minor_version=`echo $mozilla_version | awk ' { print $[2]; } '`
+   else
+     mozilla_version=1.8
+     mozilla_major_version=1
+     mozilla_minor_version=8
+   fi
 
    if test "$mozilla_major_version" != "1"; then
-      AC_DEFINE([HAVE_MOZILLA_1_9],[1],[Define if we have mozilla api 1.9])
-      AC_DEFINE([HAVE_MOZILLA_1_8],[1],[Define if we have mozilla api 1.8])
+     AC_DEFINE([HAVE_MOZILLA_1_9],[1],[Define if we have mozilla api 1.9])
+     AC_DEFINE([HAVE_MOZILLA_1_8],[1],[Define if we have mozilla api 1.8])
    fi
 
    if test "$mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "8"; then
-      AC_DEFINE([HAVE_MOZILLA_1_8],[1],[Define if we have mozilla api 1.8])
+     AC_DEFINE([HAVE_MOZILLA_1_8],[1],[Define if we have mozilla api 1.8])
    fi
       
    if test "$mozilla_major_version" = "1" -a "$mozilla_minor_version" -ge "9"; then
-      AC_DEFINE([HAVE_MOZILLA_1_9],[1],[Define if we have mozilla api 1.9])
+     AC_DEFINE([HAVE_MOZILLA_1_9],[1],[Define if we have mozilla api 1.9])
    fi
 
    AC_MSG_RESULT($mozilla_version)
-
 
 fi
 
