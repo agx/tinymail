@@ -41,6 +41,7 @@ struct _TnyFolderMonitorPriv
 #define TNY_FOLDER_MONITOR_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER_MONITOR, TnyFolderMonitorPriv))
 
+
 /**
  * tny_folder_monitor_add_list:
  * @self: a #TnyFolderChange instance
@@ -136,33 +137,38 @@ tny_folder_monitor_update (TnyFolderObserver *self, TnyFolderChange *change)
 	return;
 }
 
+static gboolean 
+uid_matcher (TnyList *list, GObject *item, gpointer match_data)
+{
+	const char *uid = tny_header_get_uid ((TnyHeader *) item);
+
+	if (uid && !strcmp (uid, (const char*) match_data))
+ 		return TRUE;
+
+	return FALSE;
+}
+
+
 static void
-foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header)
+foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header, gint length)
 {
 	TnyIterator *iter;
-	/* const gchar *uid = tny_header_get_uid (header); */
+	const gchar *uid = (length<100)?tny_header_get_uid (header):NULL;
 
 	iter = tny_list_create_iterator (priv->lists);
 	while (!tny_iterator_is_done (iter))
 	{
-		/*gboolean found = FALSE;*/
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
 
-		/*TnyIterator *liter = tny_list_create_iterator (list);
-		while (!tny_iterator_is_done (liter))
-		{
-			TnyHeader *hdr = (TnyHeader *) tny_iterator_get_current (liter);
-			if (!strcmp (uid, tny_header_get_uid (hdr)))
-				found = TRUE;
-			g_object_unref (hdr);
-			tny_iterator_next (liter);
-			if (found)
-				break;
-		}
-		g_object_unref (liter);
+		/* If the length is larger than 100, we're bulk receiving
+		 * a lot of headers. It's probably not an IDLE situation and
+		 * we can therefore assume that we'll for sure wont have 
+		 * duplicates. */
 
-		if (!found)*/
-			tny_list_prepend (list, (GObject *) header);
+		if (uid)
+			tny_list_remove_matches (list, uid_matcher, (gpointer) uid); 
+
+		tny_list_prepend (list, (GObject *) header);
 
 		g_object_unref (list);
 		tny_iterator_next (iter);
@@ -180,38 +186,16 @@ is_in_my_array (GPtrArray *array, const gchar *uid)
 	return FALSE;
 }
 
+
 static void 
 remove_headers_from_list (TnyList *list, GPtrArray *array)
 {
 	TnyIterator *iter;
 	TnyHeader *header = NULL;
-	GList *to_remove = NULL;
+	gint i=0;
 
-	iter = tny_list_create_iterator (list);
-	while (G_LIKELY (!tny_iterator_is_done (iter)))
-	{
-		const gchar *id;
-		header = TNY_HEADER (tny_iterator_get_current (iter));
-		id = tny_header_get_uid (header);
-
-		if (is_in_my_array (array, id)) {
-			to_remove = g_list_prepend (to_remove, 
-				g_object_ref (header));
-		}
-
-		g_object_unref (header);
-		tny_iterator_next (iter);
-	}
-	g_object_unref (iter);
-
-	while (to_remove)
-	{
-		GObject *mheader = to_remove->data;
-		g_object_unref (mheader); /* from the loop */
-		tny_list_remove (list, mheader);
-		to_remove = g_list_next (to_remove);
-	}
-	g_list_free (to_remove);
+	for (i=0; i<array->len; i++)
+		tny_list_remove_matches (list, uid_matcher, array->pdata[i]);
 
 	return;
 }
@@ -253,14 +237,16 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 
 	if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS)
 	{
+		gint length;
 		/* The added headers */
 		list = tny_simple_list_new ();
 		tny_folder_change_get_added_headers (change, list);
+		length = tny_list_get_length (list);
 		iter = tny_list_create_iterator (list);
 		while (!tny_iterator_is_done (iter))
 		{
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-			foreach_list_add_header (priv, header);
+			foreach_list_add_header (priv, header, length);
 			g_object_unref (header);
 			tny_iterator_next (iter);
 		}

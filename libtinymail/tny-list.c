@@ -200,7 +200,7 @@ tny_list_append (TnyList *self, GObject* item)
  * valid after this method returned. 
  *
  * Note that if you didn't remove the initial reference when putting the item
- * in the list, this remove will not take of that initial reference either. 
+ * in the list, this remove will not take care of that initial reference either. 
  *
  **/
 void 
@@ -214,6 +214,78 @@ tny_list_remove (TnyList *self, GObject* item)
 #endif
 
 	TNY_LIST_GET_IFACE (self)->remove_func (self, item);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return;
+}
+
+
+/**
+ * tny_list_remove_matches:
+ * @self: A #TnyList instance
+ * @matcher: a #TnyListMatcher to match @match_data against items
+ * @match_data: data used by the comparer to remove items
+ *
+ * Removes items from a list.  Removing a item might invalidate all existing
+ * iterators or put them in an unknown and unspecified state. You'll need to 
+ * recreate the iterator(s) if you removed an item.
+ *
+ * Example (items that match):
+ * <informalexample><programlisting>
+ * static void 
+ * matcher (TnyList *list, GObject *item, gpointer match_data) {
+ *     if (!strcmp (tny_header_get_subject ((TnyHeader *) item), match_data))
+ *          return TRUE;
+ *     return FALSE;
+ * }
+ * TnyList *headers = ...
+ * tny_list_remove_matches (headers, matcher, "Remove subject");
+ * </programlisting></informalexample>
+ *
+ * There's no guarantee whatsoever that existing iterators of @self will be
+ * valid after this method returned. 
+ *
+ * Note that if you didn't remove the initial reference when putting the item
+ * in the list, this remove will not take care of that initial reference either. 
+ *
+ **/
+void 
+tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_LIST (self));
+	g_assert (matcher);
+#endif
+
+	if (TNY_LIST_GET_IFACE (self)->remove_matches_func)
+		TNY_LIST_GET_IFACE (self)->remove_matches_func (self, matcher, match_data);
+	else {
+		GList *to_remove = NULL;
+		TnyIterator *iter = tny_list_create_iterator (self);
+
+		while (!tny_iterator_is_done (iter)) {
+			GObject *item = tny_iterator_get_current (iter);
+			if (matcher (self, item, match_data)) {
+				to_remove = g_list_prepend (to_remove, 
+					g_object_ref (item));
+			}
+			g_object_unref (item);
+			tny_iterator_next (iter);
+		}
+		g_object_unref (iter);
+
+		while (to_remove) {
+			GObject *item = to_remove->data;
+			tny_list_remove (self, item);
+			g_object_unref (item);
+			to_remove = g_list_next (to_remove);
+		}
+
+		if (to_remove)
+			g_list_free (to_remove);
+	}
 
 #ifdef DBC /* ensure */
 #endif

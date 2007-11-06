@@ -479,11 +479,11 @@ tny_gtk_header_list_model_iter_nth_child (GtkTreeModel *self, GtkTreeIter *iter,
 	return retval;
 }
 
-static gboolean                                                                                                                                                             
+static gboolean
 tny_gtk_header_list_model_iter_children (GtkTreeModel *tree_model,
 					 GtkTreeIter  *iter,
 					 GtkTreeIter  *parent) 
-{                                                                                                                                                                           
+{
 	gboolean retval = FALSE;
 
 	retval = tny_gtk_header_list_model_iter_nth_child (tree_model, iter, parent, 0);
@@ -644,6 +644,14 @@ typedef struct
 	gint src;
 } notify_views_data_t;
 
+typedef struct
+{
+	TnyGtkHeaderListModel *self;
+	GList *items;
+	/* GMainLoop *loop; */
+	gint src;
+} notify_views_data_list_t;
+
 
 static void 
 notify_views_delete_destroy (gpointer data)
@@ -736,6 +744,114 @@ tny_gtk_header_list_model_remove (TnyList *self, GObject* item)
 	return;
 }
 
+
+static void 
+notify_views_delete_destroy_list (gpointer data)
+{
+	notify_views_data_list_t *stuff = data;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (stuff->self);
+
+	g_mutex_lock (priv->to_lock);
+	if (stuff->src != -1 && stuff->src < priv->del_timeouts->len)
+		g_array_index (priv->del_timeouts, guint, (guint) stuff->src) = 0;
+	g_mutex_unlock (priv->to_lock);
+
+	while (stuff->items) {
+		g_object_unref (stuff->items->data);
+		stuff->items = g_list_next (stuff->items);
+	}
+
+	if (stuff->items)
+		g_list_free (stuff->items);
+
+	g_object_unref (stuff->self);
+	/* g_main_loop_unref (stuff->loop); */
+
+	g_slice_free (notify_views_data_list_t, data);
+	return;
+}
+
+
+static gboolean
+notify_views_delete_list (gpointer data)
+{
+	notify_views_data_list_t *stuff = data;
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (stuff->self);
+	GList *copy = stuff->items;
+
+	g_static_rec_mutex_lock (priv->iterator_lock);
+
+	while (copy) 
+	{
+		gint i; gboolean found = FALSE;
+		GtkTreePath *path;
+		GtkTreeIter iter;
+		GObject *mitem, *item = copy->data;
+
+		for (i=0; i < priv->items->len; i++)
+			if (priv->items->pdata[i] == item)
+			{
+				found = TRUE;
+				break;
+			}
+
+		if (found)
+		{
+			iter.stamp = priv->stamp;
+			iter.user_data = (gpointer) i;
+			path = gtk_tree_path_new ();
+			gtk_tree_path_append_index (path, i);
+			gtk_tree_model_row_deleted ((GtkTreeModel *) stuff->self, path);
+			priv->stamp++;
+			g_mutex_lock (priv->ra_lock);
+			priv->cur_len--;
+			priv->registered--;
+			g_mutex_unlock (priv->ra_lock);
+			gtk_tree_path_free (path);
+
+			mitem = g_ptr_array_remove_index (priv->items, i);
+			if (mitem)
+				g_object_unref (mitem);
+		}
+
+		copy = g_list_next (copy);
+	}
+
+	g_static_rec_mutex_unlock (priv->iterator_lock);
+
+
+	return FALSE;
+}
+
+
+static void
+tny_gtk_header_list_model_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_data)
+{
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+	int i; GList *items = NULL;
+
+	for (i=0; i < priv->items->len; i++) {
+		if (matcher (self, priv->items->pdata[i], match_data))
+			items = g_list_append (items, g_object_ref (priv->items->pdata[i]));
+	}
+
+
+	if (items) 
+	{
+		notify_views_data_list_t *stuff;
+		guint src;
+
+		stuff = g_slice_new (notify_views_data_list_t);
+		stuff->src = -1;
+		stuff->self = g_object_ref (self);
+		stuff->items = items;
+		src = g_timeout_add_full (G_PRIORITY_HIGH_IDLE, 0,
+			notify_views_delete_list, stuff, notify_views_delete_destroy_list);
+		stuff->src = (gint) add_del_timeout ((TnyGtkHeaderListModel *) self, src);
+	}
+}
+
+
 static guint
 tny_gtk_header_list_model_get_length (TnyList *self)
 {
@@ -810,6 +926,7 @@ tny_list_init (TnyListIface *klass)
 	klass->create_iterator_func = tny_gtk_header_list_model_create_iterator;
 	klass->copy_func = tny_gtk_header_list_model_copy_the_list;
 	klass->foreach_func = tny_gtk_header_list_model_foreach_in_the_list;
+	klass->remove_matches_func = tny_gtk_header_list_model_remove_matches;
 
 	return;
 }

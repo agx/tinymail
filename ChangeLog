@@ -4,6 +4,14 @@
 	marked the sections as critical by locking them.
 	* Check for folder==NULL in imap-command
 	* Rare but possible race condition when refreshing POP folders
+	* Introduction of tny_list_remove_matches. This is automatically
+	implemented if absent.
+	* Usage of tny_list_remove_matches to avoid duplicates in the
+	TnyFolderMonitor
+	* USage of tny_list_remove_matches to implement expunge removals in
+	the TnyFolderMonitor
+
+	* This was a minor API change
 
 2007-11-05  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	

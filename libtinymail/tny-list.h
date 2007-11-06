@@ -38,6 +38,8 @@ typedef struct _TnyList TnyList;
 typedef struct _TnyListIface TnyListIface;
 #endif
 
+typedef gboolean (*TnyListMatcher) (TnyList *list, GObject *item, gpointer match_data);
+
 struct _TnyListIface
 {
 	GTypeInterface parent;
@@ -49,7 +51,9 @@ struct _TnyListIface
 	void (*foreach_func) (TnyList *self, GFunc func, gpointer user_data);
 	TnyList* (*copy_func) (TnyList *self);
 	TnyIterator* (*create_iterator_func) (TnyList *self);
+	void (*remove_matches_func) (TnyList *self, TnyListMatcher matcher, gpointer match_data);
 };
+
 
 GType tny_list_get_type (void);
 
@@ -60,6 +64,7 @@ void tny_list_remove (TnyList *self, GObject* item);
 void tny_list_foreach (TnyList *self, GFunc func, gpointer user_data);
 TnyIterator* tny_list_create_iterator (TnyList *self);
 TnyList *tny_list_copy (TnyList *self);
+void tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_data);
 
 G_END_DECLS
 
