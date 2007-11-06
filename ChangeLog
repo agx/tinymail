@@ -3,6 +3,7 @@
 	* Rare but possible race condition when creating the IDLE thread,
 	marked the sections as critical by locking them.
 	* Check for folder==NULL in imap-command
+	* Rare but possible race condition when refreshing POP folders
 
 2007-11-05  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	

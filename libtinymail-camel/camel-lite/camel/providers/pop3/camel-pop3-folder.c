@@ -85,17 +85,17 @@ static void pop3_delete_attachments (CamelFolder *folder, const char *uid);
 static void 
 destroy_lists (CamelPOP3Folder *pop3_folder)
 {
+	CamelPOP3Store *pop3_store = (CamelPOP3Store *)((CamelFolder *)pop3_folder)->parent_store;
+
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	if (pop3_folder->uids != NULL) 
 	{
 		CamelPOP3FolderInfo **fi = (CamelPOP3FolderInfo **)pop3_folder->uids->pdata;
-		CamelPOP3Store *pop3_store = (CamelPOP3Store *)((CamelFolder *)pop3_folder)->parent_store;
 		int i;
 
 		for (i=0;i<pop3_folder->uids->len;i++,fi++) {
 			if (fi[0]->cmd) {
-
-				g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 				if (pop3_store->engine == NULL) {
 					g_ptr_array_free(pop3_folder->uids, TRUE);
@@ -110,7 +110,6 @@ destroy_lists (CamelPOP3Folder *pop3_folder)
 					;
 				camel_pop3_engine_command_free(pop3_store->engine, fi[0]->cmd);
 
-				g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			}
 			
 			g_free(fi[0]->uid);
@@ -118,8 +117,12 @@ destroy_lists (CamelPOP3Folder *pop3_folder)
 		}
 		
 		g_ptr_array_free(pop3_folder->uids, TRUE);
+		pop3_folder->uids = NULL;
 		g_hash_table_destroy(pop3_folder->uids_uid);
 	}
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
 }
 
 static void
