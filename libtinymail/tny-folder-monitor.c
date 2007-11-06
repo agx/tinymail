@@ -176,16 +176,6 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header, gint len
 	g_object_unref (iter);
 }
 
-static gboolean
-is_in_my_array (GPtrArray *array, const gchar *uid)
-{
-	gint i=0;
-	for (i=0; i<array->len; i++)
-		if (!strcmp (array->pdata[i], uid))
-			return TRUE;
-	return FALSE;
-}
-
 
 static void 
 remove_headers_from_list (TnyList *list, GPtrArray *array)
