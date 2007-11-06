@@ -163,7 +163,7 @@ struct _CamelImapStore {
 	gchar *idle_prefix;
 	gboolean dontdistridlehack, has_login;
 
-	GStaticRecMutex *idle_prefix_lock, *idle_lock, *sum_lock;
+	GStaticRecMutex *idle_prefix_lock, *idle_lock, *sum_lock, *idle_t_lock;
 	GThread *idle_thread;
 	gboolean idle_cont, in_idle, idle_kill;
 	guint idle_sleep, getsrv_sleep;

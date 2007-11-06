@@ -1,3 +1,9 @@
+2007-11-06  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Rare but possible race condition when creating the IDLE thread,
+	marked the sections as critical by locking them.
+	* Check for folder==NULL in imap-command
+
 2007-11-05  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	
 	* Don't leak an fp in md5_get_digest_from_file

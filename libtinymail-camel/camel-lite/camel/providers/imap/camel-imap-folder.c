@@ -233,6 +233,7 @@ camel_imap_folder_init (gpointer object, gpointer klass)
 
 	imap_folder->idle_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (imap_folder->idle_lock);
+
 	imap_folder->stopping = FALSE;
 	imap_folder->in_idle = FALSE;
 
@@ -4007,6 +4008,7 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 
 	if ((store->capabilities & IMAP_CAPABILITY_IDLE))
 	{
+		g_static_rec_mutex_lock (store->idle_t_lock);
 		if (store->in_idle && store->idle_thread) {
 			IdleResponse *idle_resp = NULL;
 			store->idle_cont = FALSE;
@@ -4031,6 +4033,8 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 
 		}
 		store->idle_prefix = NULL;
+		g_static_rec_mutex_unlock (store->idle_t_lock);
+
 	}
 
 	return;
@@ -4058,10 +4062,13 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 
 	if (store->capabilities & IMAP_CAPABILITY_IDLE)
 	{
+
 		g_static_rec_mutex_lock (store->idle_prefix_lock);
 		if (store->current_folder && !store->idle_prefix)
 		{
 			folder->folder_flags |= CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY;
+
+			g_static_rec_mutex_lock (store->idle_t_lock);
 
 			if (!store->in_idle && store->idle_thread) {
 				IdleResponse *idle_resp = NULL;
@@ -4106,6 +4113,8 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 				g_slice_free (IdleThreadInfo, info);
 
 			}
+
+			g_static_rec_mutex_unlock (store->idle_t_lock);
 
 		}
 		g_static_rec_mutex_unlock (store->idle_prefix_lock);

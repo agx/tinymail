@@ -411,6 +411,10 @@ camel_imap_store_finalize (CamelObject *object)
 	g_free (imap_store->idle_lock);
 	imap_store->idle_lock = NULL;
 
+	/* g_static_rec_mutex_free (imap_store->idle_lock); */
+	g_free (imap_store->idle_t_lock);
+	imap_store->idle_t_lock = NULL;
+
 	/* g_static_rec_mutex_free (imap_store->sum_lock); */
 	g_free (imap_store->sum_lock);
 	imap_store->sum_lock = NULL;
@@ -431,6 +435,9 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->idle_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (imap_store->idle_lock);
 
+	imap_store->idle_t_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (imap_store->idle_t_lock);
+
 	imap_store->sum_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (imap_store->sum_lock);
 
@@ -442,7 +449,11 @@ camel_imap_store_init (gpointer object, gpointer klass)
 
 	imap_store->in_idle = FALSE;
 	imap_store->idle_cont = FALSE;
+
+	g_static_rec_mutex_lock (imap_store->idle_t_lock);
 	imap_store->idle_thread = NULL;
+	g_static_rec_mutex_unlock (imap_store->idle_t_lock);
+
 	imap_store->idle_prefix = NULL;
 
 	imap_store->istream = NULL;

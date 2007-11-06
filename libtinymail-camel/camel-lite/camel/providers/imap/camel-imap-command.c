@@ -176,7 +176,7 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 					imap_summary->validity, modseq);
 			}
 
-		} else {
+		} else if (folder) {
 			if (store->capabilities & IMAP_CAPABILITY_CONDSTORE) 
 				cmd = imap_command_strdup_printf (store, "SELECT %F (CONDSTORE)", folder->full_name);
 			else 
