@@ -3313,9 +3313,10 @@ tny_camel_folder_copy_async_callback (gpointer thr_user_data)
 {
 	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
 
-	if (info->err == NULL)
+	if (info->err == NULL) {
 		notify_folder_observers_about_copy (info->adds, info->rems, 
 			info->delete_originals, FALSE);
+	}
 
 	if (info->callback) {
 		tny_lockable_lock (info->session->priv->ui_lock);
