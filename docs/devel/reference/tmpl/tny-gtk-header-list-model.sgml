@@ -65,6 +65,9 @@ The column is indeed a G_TYPE_OBJECT column and getting it from the #GtkTreeMode
 @self: 
 @folder: 
 @refresh: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 
 <!-- ##### FUNCTION tny_gtk_header_list_model_received_date_sort_func ##### -->

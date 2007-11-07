@@ -62,7 +62,9 @@ A abstract account type implemented for Camel
 </para>
 
 @account: 
+@canceled: 
 @err: 
+@user_data: 
 
 
 <!-- ##### STRUCT TnyCamelAccount ##### -->
@@ -105,6 +107,7 @@ A abstract account type implemented for Camel
 @self: 
 @online: 
 @callback: 
+@user_data: 
 
 
 <!-- ##### USER_FUNCTION TnyCamelGetSupportedSecureAuthCallback ##### -->

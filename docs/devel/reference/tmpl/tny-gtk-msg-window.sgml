@@ -39,3 +39,12 @@ type with this type.
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_gtk_msg_window_set_view ##### -->
+<para>
+
+</para>
+
+@self: 
+@view: 
+
+

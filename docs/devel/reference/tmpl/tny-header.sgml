@@ -60,10 +60,10 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @set_replyto_func: 
 @get_folder_func: 
 @get_flags_func: 
-@set_flags_func: 
-@unset_flags_func: 
+@set_flag_func: 
+@unset_flag_func: 
 
-<!-- ##### MACRO TNY_TYPE_HEADER_PRIORITY_FLAGS ##### -->
+<!-- ##### MACRO TNY_HEADER_FLAG_PRIORITY_MASK ##### -->
 <para>
 
 </para>
@@ -249,7 +249,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_set_flags ##### -->
+<!-- ##### FUNCTION tny_header_set_flag ##### -->
 <para>
 
 </para>
@@ -258,12 +258,30 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @mask: 
 
 
-<!-- ##### FUNCTION tny_header_unset_flags ##### -->
+<!-- ##### FUNCTION tny_header_unset_flag ##### -->
 <para>
 
 </para>
 
 @self: 
 @mask: 
+
+
+<!-- ##### FUNCTION tny_header_get_priority ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_header_set_priority ##### -->
+<para>
+
+</para>
+
+@self: 
+@priority: 
 
 

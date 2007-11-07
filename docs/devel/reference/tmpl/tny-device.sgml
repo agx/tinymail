@@ -36,6 +36,9 @@ online/offline status.
 
 </para>
 
+@: 
+@:
+
 @tnydevice: the object which received the signal.
 @arg1: 
 

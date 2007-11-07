@@ -119,3 +119,11 @@ if (type != TNY_FOLDER_TYPE_ROOT)
 @root_name: 
 
 
+<!-- ##### FUNCTION tny_gtk_folder_store_tree_model_stop_observing ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

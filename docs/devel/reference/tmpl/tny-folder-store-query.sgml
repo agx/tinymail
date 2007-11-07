@@ -144,3 +144,12 @@ A query for when you want to get a list of folders from a #TnyFolderStore implem
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_folder_store_query_item_get_pattern ##### -->
+<para>
+
+</para>
+
+@item: 
+@Returns: 
+
+

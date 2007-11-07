@@ -36,6 +36,18 @@ An iteratable list type
 @foreach_func: 
 @copy_func: 
 @create_iterator_func: 
+@remove_matches_func: 
+
+<!-- ##### USER_FUNCTION TnyListMatcher ##### -->
+<para>
+
+</para>
+
+@list: 
+@item: 
+@match_data: 
+@Returns: 
+
 
 <!-- ##### FUNCTION tny_list_get_length ##### -->
 <para>
@@ -99,5 +111,15 @@ An iteratable list type
 
 @self: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_list_remove_matches ##### -->
+<para>
+
+</para>
+
+@self: 
+@matcher: 
+@match_data: 
 
 

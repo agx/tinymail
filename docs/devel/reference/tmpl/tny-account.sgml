@@ -28,8 +28,6 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 
 </para>
 
-@:
-
 @tnyaccount: the object which received the signal.
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->

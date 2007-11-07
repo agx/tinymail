@@ -41,6 +41,15 @@ A type that can merge multiple other folders together
 @folder: 
 
 
+<!-- ##### FUNCTION tny_merge_folder_remove_folder ##### -->
+<para>
+
+</para>
+
+@self: 
+@folder: 
+
+
 <!-- ##### FUNCTION tny_merge_folder_set_folder_type ##### -->
 <para>
 
@@ -48,5 +57,14 @@ A type that can merge multiple other folders together
 
 @self: 
 @folder_type: 
+
+
+<!-- ##### FUNCTION tny_merge_folder_get_folders ##### -->
+<para>
+
+</para>
+
+@self: 
+@list: 
 
 

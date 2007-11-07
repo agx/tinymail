@@ -46,7 +46,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
+@tnyaccountstore: the object which received the signal.
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -86,6 +86,7 @@ Shared include file with forward typedefs
 @foreach_func: 
 @copy_func: 
 @create_iterator_func: 
+@remove_matches_func: 
 
 <!-- ##### STRUCT TnyIteratorIface ##### -->
 <para>
@@ -199,8 +200,8 @@ Shared include file with forward typedefs
 @set_replyto_func: 
 @get_folder_func: 
 @get_flags_func: 
-@set_flags_func: 
-@unset_flags_func: 
+@set_flag_func: 
+@unset_flag_func: 
 
 <!-- ##### STRUCT TnyMimePart ##### -->
 <para>
@@ -249,7 +250,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccount: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -306,8 +307,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
+@tnydevice: the object which received the signal.
+@arg1: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -477,32 +478,32 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+@: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+@: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -714,7 +715,7 @@ This method happens in case the password was wrong. Also take a look at tny_acco
 </para>
 
 @self: 
-@cancelled: 
+@canceled: 
 @err: 
 @user_data: 
 
@@ -725,7 +726,7 @@ This method happens in case the password was wrong. Also take a look at tny_acco
 </para>
 
 @self: 
-@cancelled: 
+@canceled: 
 @headers: 
 @err: 
 @user_data: 
@@ -738,7 +739,7 @@ getting the message or in case there was an error.
 </para>
 
 @folder: the #TnyFolder instance from which the message was requested
-@cancelled: 
+@canceled: 
 @msg: the #TnyMsg instance that was requested
 @err: in case there was an error, this !GError instance is not NULL
 @user_data: user data passed at the caller
@@ -751,7 +752,7 @@ transferring the messages.
 </para>
 
 @folder: the #TnyFolder instance from which the messages where transferred
-@cancelled: 
+@canceled: 
 @err: in case there was an error, this !GError instance is not NULL
 @user_data: user data passed at the caller
 
@@ -772,7 +773,7 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @self: the #TnyFolderStore from which the child folders where requested
-@cancelled: 
+@canceled: 
 @list: a #TnyList with #TnyFolder instances (the requested children of @self)
 @err: in case there was an error, this !GError instance is not NULL
 @user_data: user data passed at the caller
@@ -784,7 +785,7 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @self: 
-@cancelled: 
+@canceled: 
 @into: 
 @new_folder: 
 @err: 
@@ -797,7 +798,7 @@ A method that happens after tny_folder_store_get_folders_async is finished
 </para>
 
 @self: 
-@cancelled: 
+@canceled: 
 @msg: 
 @err: 
 @user_data: 
