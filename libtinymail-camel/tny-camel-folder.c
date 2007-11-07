@@ -2926,38 +2926,6 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 static void
 notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboolean in_idle)
 {
- if (rems) 
- {
-	rems = g_list_first (rems);
-	while (rems)
-	{
-		CpyEvent *evt = rems->data;
-		if (del) {
-			TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
-
-			tny_folder_store_change_add_removed_folder (change, evt->fol);
-
-			if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
-				if (in_idle)
-					notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change);
-				else
-					notify_folder_store_observers_about_for_store_acc (evt->str, change);
-			} else {
-				if (in_idle)
-					notify_folder_store_observers_about_in_idle (evt->str, change);
-				else
-					notify_folder_store_observers_about (evt->str, change);
-			}
-
-			g_object_unref (change);
-
-		}
-		cpy_event_free (evt);
-		rems = g_list_next (rems);
-	}
-	g_list_free (rems);
- }
-
  if (adds)
  {
 	adds = g_list_first (adds);
@@ -2988,6 +2956,38 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboo
 		adds = g_list_next (adds);
 	}
 	g_list_free (adds);
+ }
+
+ if (rems) 
+ {
+	rems = g_list_first (rems);
+	while (rems)
+	{
+		CpyEvent *evt = rems->data;
+		if (del) {
+			TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
+
+			tny_folder_store_change_add_removed_folder (change, evt->fol);
+
+			if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
+				if (in_idle)
+					notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change);
+				else
+					notify_folder_store_observers_about_for_store_acc (evt->str, change);
+			} else {
+				if (in_idle)
+					notify_folder_store_observers_about_in_idle (evt->str, change);
+				else
+					notify_folder_store_observers_about (evt->str, change);
+			}
+
+			g_object_unref (change);
+
+		}
+		cpy_event_free (evt);
+		rems = g_list_next (rems);
+	}
+	g_list_free (rems);
  }
 
  return;

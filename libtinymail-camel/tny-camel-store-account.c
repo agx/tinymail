@@ -779,12 +779,15 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 		if (camel_store_supports_subscriptions (store))
 			camel_store_unsubscribe_folder (store, cpriv->folder_name, &subex);
 		tny_folder_store_change_add_removed_folder (change, folder);
+
+		/* g_free (cpriv->folder_name); 
+		cpriv->folder_name = NULL; */
+
+		aspriv->managed_folders = 
+			g_list_remove (aspriv->managed_folders, cfol);
+
 	}
 
-	g_free (cpriv->folder_name); 
-	cpriv->folder_name = NULL;
-	aspriv->managed_folders = 
-		g_list_remove (aspriv->managed_folders, cfol);
 
 	g_static_rec_mutex_unlock (aspriv->factory_lock);
 

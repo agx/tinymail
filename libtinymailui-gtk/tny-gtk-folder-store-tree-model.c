@@ -821,6 +821,41 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	return FALSE;
 }
 
+static gboolean 
+do_nothinger (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data)
+{
+	TnyFolderStoreChange *change = (TnyFolderStoreChange *) user_data;
+	TnyFolderStore *parent_store = tny_folder_store_change_get_folder_store (change);
+	TnyFolderStore *folder = NULL;
+
+	gtk_tree_model_get (model, iter, 
+		TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+		&folder, -1);
+
+	if (folder && folder == parent_store && TNY_IS_FOLDER (folder)) 
+	{
+
+		gtk_tree_store_set (GTK_TREE_STORE (model), iter,
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+				tny_folder_get_name (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
+				tny_folder_get_unread_count (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
+				tny_folder_get_all_count (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
+				tny_folder_get_folder_type (TNY_FOLDER (folder)),
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
+				folder, -1);
+	}
+
+	if (parent_store)
+		g_object_unref (parent_store);
+
+	if (folder)
+		g_object_unref (folder);
+
+	return FALSE;
+}
 
 static gboolean 
 deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
@@ -986,8 +1021,11 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 		g_object_unref (created);
 	}
 
-	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS) {
+		gtk_tree_model_foreach (model, do_nothinger, change);
 		gtk_tree_model_foreach (model, foreach_if_store_add_created, change);
+		gtk_tree_model_foreach (model, do_nothinger, change);
+	}
 
 	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
 	{
