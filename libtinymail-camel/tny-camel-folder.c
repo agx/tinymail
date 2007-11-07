@@ -4589,6 +4589,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	TnyFolder *folder; CamelFolderInfo *info;
 	TnyFolderStoreChange *change;
 	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
+	TnyCamelFolderPriv *rpriv = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
 			priv->account, err, TNY_FOLDER_STORE_ERROR, 
@@ -4646,6 +4647,11 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 
 	folder = _tny_camel_folder_new ();
 	_tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
+	rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+	_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (folder), TNY_FOLDER_STORE (self));
+	rpriv->folder = NULL; /* This might be a leak */
+	rpriv->loaded = 0;
+	load_folder_no_lock (rpriv);
 
 	/* So that the next call to get_folders includes the newly
 	 * created folder */
