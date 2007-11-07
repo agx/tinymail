@@ -2926,6 +2926,8 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 static void
 notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboolean in_idle)
 {
+ if (rems) 
+ {
 	rems = g_list_first (rems);
 	while (rems)
 	{
@@ -2954,8 +2956,12 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboo
 		rems = g_list_next (rems);
 	}
 	g_list_free (rems);
+ }
 
+ if (adds)
+ {
 	adds = g_list_first (adds);
+
 	while (adds)
 	{
 		CpyEvent *evt = adds->data;
@@ -2964,15 +2970,17 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboo
 		tny_folder_store_change_add_created_folder (change, evt->fol);
 
 		if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
-			if (in_idle)
+			if (in_idle) {
 				notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change);
-			else
+			} else {
 				notify_folder_store_observers_about_for_store_acc (evt->str, change);
+			}
 		} else {
-			if (in_idle)
+			if (in_idle) {
 				notify_folder_store_observers_about_in_idle (evt->str, change);
-			else
+			} else {
 				notify_folder_store_observers_about (evt->str, change);
+			}
 		}
 		g_object_unref (change);
 
@@ -2980,9 +2988,9 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboo
 		adds = g_list_next (adds);
 	}
 	g_list_free (adds);
+ }
 
-
-	return;
+ return;
 }
 
 static CpyRecRet*
@@ -3075,7 +3083,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 				succeeded = TRUE;
 
-				if (was_new)
+				if (TRUE || was_new)
 				{
 					CamelStore *store = priv->store;
 					CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -3092,6 +3100,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 					}
 					if (succeeded) {
 						TnyCamelFolderPriv *rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (retval);
+						rpriv->loaded = 0;
 						_tny_camel_folder_set_folder_info (TNY_FOLDER_STORE (a), 
 							TNY_CAMEL_FOLDER (retval), iter);
 						if (!rpriv->folder_name || strlen (rpriv->folder_name) <= 0)
@@ -3204,11 +3213,25 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	TnyFolder *retval = NULL;
 	GError *nerr = NULL;
 	CpyRecRet *cpyr;
+	TnyFolderStore *orig_store;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
 			priv->account, err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_COPY))
 		return NULL;
+
+	orig_store = tny_folder_get_folder_store (self);
+
+	/* If the caller is trying to move the folder to the location where it
+	 * already is, we'll just return self ... */
+
+	if (orig_store && orig_store == into && !camel_strstrcase (new_name, tny_folder_get_name (self))) {
+		g_object_unref (orig_store);
+		return TNY_FOLDER (g_object_ref (self));
+	}
+
+	if (orig_store)
+		g_object_unref (orig_store);
 
 	cpyr = tny_camel_folder_copy_shared (self, into, new_name, del, &nerr, rems, adds);
 
@@ -3343,6 +3366,7 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 	GError *nerr = NULL;
 	CpyRecRet *cpyr;
+	TnyFolderStore *orig_store = NULL;
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -3352,18 +3376,30 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 						  tny_camel_folder_copy_async_status, 
 						  info, "Copying folder");
 
+
 	info->adds = NULL; 
 	info->rems = NULL;
+	info->new_folder = NULL;
 
-	cpyr = tny_camel_folder_copy_shared (info->self, info->into, 
-			info->new_name, info->delete_originals, &nerr, 
-			info->rems, info->adds);
+	/* If the caller is trying to move the folder to the location where it
+	 * already is, we'll just do nothing  ... */
 
-	info->new_folder = cpyr->created;
-	info->rems = cpyr->rems;
-	info->adds = cpyr->adds;
+	orig_store = tny_folder_get_folder_store (self);
+	if (!(orig_store && orig_store == info->into && !camel_strstrcase (info->new_name, tny_folder_get_name (self))))
+	{
+		cpyr = tny_camel_folder_copy_shared (info->self, info->into, 
+				info->new_name, info->delete_originals, &nerr, 
+				info->rems, info->adds);
 
-	g_slice_free (CpyRecRet, cpyr);
+		info->new_folder = cpyr->created;
+		info->rems = cpyr->rems;
+		info->adds = cpyr->adds;
+
+		g_slice_free (CpyRecRet, cpyr);
+	}
+
+	if (orig_store)
+		g_object_unref (orig_store);
 
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 

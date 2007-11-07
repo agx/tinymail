@@ -1,3 +1,8 @@
+2007-11-07  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Some problems fixed in TnyGtkFolderStoreTreeModel when moving
+	folders around into newly created folders
+
 2007-11-06  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Rare but possible race condition when creating the IDLE thread,
