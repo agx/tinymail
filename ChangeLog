@@ -3,6 +3,7 @@
 	* Some problems fixed in TnyGtkFolderStoreTreeModel when moving
 	folders around into newly created folders
 	* Minor corrections when creating and moving folders
+	* Bugfix when copying a folder into its own store under another name
 
 2007-11-06  Philip Van Hoof  <pvanhoof@gnome.org>
 

@@ -3225,7 +3225,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	/* If the caller is trying to move the folder to the location where it
 	 * already is, we'll just return self ... */
 
-	if (orig_store && orig_store == into && !camel_strstrcase (new_name, tny_folder_get_name (self))) {
+	if (orig_store && orig_store == into && (!strcmp (new_name, tny_folder_get_name (self)))) {
 		g_object_unref (orig_store);
 		return TNY_FOLDER (g_object_ref (self));
 	}
@@ -3386,7 +3386,7 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 	 * already is, we'll just do nothing  ... */
 
 	orig_store = tny_folder_get_folder_store (self);
-	if (!(orig_store && orig_store == info->into && !camel_strstrcase (info->new_name, tny_folder_get_name (self))))
+	if (!(orig_store && orig_store == info->into && (!strcmp (info->new_name, tny_folder_get_name (self)))))
 	{
 		cpyr = tny_camel_folder_copy_shared (info->self, info->into, 
 				info->new_name, info->delete_originals, &nerr, 
