@@ -481,21 +481,6 @@ destroy_folder_stores (gpointer item, gpointer user_data)
 	return;
 }
 
-static void 
-unregister_folder_observerable (gpointer item, gpointer user_data)
-{
-	TnyFolder *f = (TnyFolder *) item;
-	if (f && TNY_IS_FOLDER (f))
-		tny_folder_remove_observer (f, TNY_FOLDER_OBSERVER (user_data));
-}
-
-static void 
-unregister_store_observerable (gpointer item, gpointer user_data)
-{
-	TnyFolderStore *fstore = (TnyFolderStore *) item;
-	if (fstore && TNY_IS_FOLDER_STORE (fstore))
-		tny_folder_store_remove_observer (fstore, TNY_FOLDER_STORE_OBSERVER (user_data));
-}
 
 static void
 tny_gtk_folder_store_tree_model_finalize (GObject *object)
