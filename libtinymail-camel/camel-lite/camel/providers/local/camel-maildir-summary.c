@@ -583,6 +583,8 @@ static int camel_maildir_summary_add (CamelLocalSummary *cls, const char *name, 
 	camel_mime_parser_init_with_fd(mp, fd);
 	maildirs->priv->current_file = (char *)name;
 	info = camel_folder_summary_add_from_parser((CamelFolderSummary *)maildirs, mp);
+	if (info->uid)
+		g_free (info->uid);
 	info->uid = g_strdup (uid);
 
 	if (stat (filename, &sbuf) == 0)
