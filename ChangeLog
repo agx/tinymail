@@ -9,6 +9,11 @@
 	* Backported changes from Pre release 0.0.4 preparations
 	* Simulated weak references in TnyGtkFolderStoreTreeModel for the
 	observers
+	* Cyclic references fix. tny_folder_store_add_observer and
+	tny_folder_add_observer no longer add strong references, in stead they
+	add weak references
+
+	* This is a major API change
 
 2007-11-07  Philip Van Hoof  <pvanhoof@gnome.org>
 

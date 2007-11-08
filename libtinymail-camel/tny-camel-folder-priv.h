@@ -47,11 +47,12 @@ struct _TnyCamelFolderPriv
 	TnyFolderType cached_folder_type;
 	TnyMsgRemoveStrategy *remove_strat;
 	TnyMsgReceiveStrategy *receive_strat;
-	TnyList *observers, *sobservers; TnyFolder *self;
+	TnyFolder *self;
 	gboolean want_changes, handle_changes, dont_fkill;
 	TnyFolderStore *parent;
 	TnyFolderCaps caps; 
 	CamelException load_ex;
+	GList *obs, *sobs;
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);

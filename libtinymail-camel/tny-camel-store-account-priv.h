@@ -33,7 +33,7 @@ struct _TnyCamelStoreAccountPriv
 	CamelStore *iter_store;
 	CamelFolderInfo *iter;
 	GList *managed_folders;
-	TnyList *sobservers;
+	GList *sobs;
 	gboolean cant_reuse_iter;
 	GStaticRecMutex *factory_lock, *obs_lock;
 	TnyCamelQueue *queue, *msg_queue;

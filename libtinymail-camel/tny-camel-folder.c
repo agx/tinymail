@@ -144,29 +144,25 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-	TnyIterator *iter;
-	TnyList *list;
+	GList *list;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	if (!priv->sobservers) {
+	if (!priv->sobs) {
 		g_static_rec_mutex_unlock (priv->obs_lock);
 		return;
 	}
-	list = tny_list_copy (priv->sobservers);
+	list = g_list_copy (priv->sobs);
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	iter = tny_list_create_iterator (list);
-	while (!tny_iterator_is_done (iter))
+	while (list)
 	{
-		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
+		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list->data);
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_store_observer_update (observer, change);
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
-		g_object_unref (observer);
-		tny_iterator_next (iter);
+		list = g_list_next (list);
 	}
-	g_object_unref (iter);
-	g_object_unref (list);
+	g_list_free (list);
 
 	return;
 }
@@ -200,28 +196,25 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 	TnyIterator *iter;
-	TnyList *list;
+	GList *list;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	if (!priv->observers) {
+	if (!priv->obs) {
 		g_static_rec_mutex_unlock (priv->obs_lock);
 		return;
 	}
-	list = tny_list_copy (priv->observers);
+	list = g_list_copy (priv->obs);
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	iter = tny_list_create_iterator (list);
-	while (!tny_iterator_is_done (iter))
+	while (list)
 	{
-		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (tny_iterator_get_current (iter));
+		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (list->data);
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_observer_update (observer, change);
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
-		g_object_unref (observer);
-		tny_iterator_next (iter);
+		list = g_list_next (list);
 	}
-	g_object_unref (iter);
-	g_object_unref (list);
+	g_list_free (list);
 
 	return;
 }
@@ -255,29 +248,25 @@ notify_folder_store_observers_about_for_store_acc (TnyFolderStore *self, TnyFold
 {
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	TnyIterator *iter;
-	TnyList *list = NULL;
+	GList *list = NULL;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	if (!priv->sobservers) {
+	if (!priv->sobs) {
 		g_static_rec_mutex_unlock (priv->obs_lock);
 		return;
 	}
-	list = tny_list_copy (priv->sobservers);
+	list = g_list_copy (priv->sobs);
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	iter = tny_list_create_iterator (list);
-	while (!tny_iterator_is_done (iter))
+	while (list)
 	{
-		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (tny_iterator_get_current (iter));
+		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list->data);
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_store_observer_update (observer, change);
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
-		g_object_unref (observer);
-		tny_iterator_next (iter);
+		list = g_list_next (list);
 	}
-	g_object_unref (iter);
-	g_object_unref (list);
+	g_list_free (list);
 
 	return;
 }
@@ -507,7 +496,7 @@ determine_push_email (TnyCamelFolderPriv *priv)
 		return;
 	}
 
-	if (priv->observers && tny_list_get_length (priv->observers) > 0) {
+	if (priv->obs && g_list_length (priv->obs) > 0) {
 		camel_folder_set_push_email (priv->folder, TRUE);
 		priv->push = TRUE;
 	} else {
@@ -4379,13 +4368,13 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 			CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
 			g_static_rec_mutex_lock (cpriv->obs_lock);
-			if (cpriv->observers) {
-				g_object_unref (G_OBJECT (cpriv->observers));
-				cpriv->observers = NULL;
+			if (cpriv->obs) {
+				g_list_free (cpriv->obs);
+				cpriv->obs = NULL;
 			}
-			if (cpriv->sobservers) {
-				g_object_unref (G_OBJECT (cpriv->sobservers));
-				cpriv->sobservers = NULL;
+			if (cpriv->sobs) {
+				g_list_free (cpriv->sobs);
+				cpriv->sobs = NULL;
 			}
 			g_static_rec_mutex_unlock (priv->obs_lock);
 
@@ -5201,6 +5190,15 @@ tny_camel_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_observer_func (self, observer);
 }
 
+static void 
+notify_observer_del (gpointer user_data, GObject *observer)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (user_data);
+	g_static_rec_mutex_lock (priv->obs_lock);
+	priv->obs = g_list_remove (priv->obs, observer);
+	g_static_rec_mutex_unlock (priv->obs_lock);
+}
+
 static void
 tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *observer)
 {
@@ -5209,9 +5207,8 @@ tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *obser
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	if (!priv->observers)
-		priv->observers = tny_simple_list_new ();
-	tny_list_prepend (priv->observers, G_OBJECT (observer));
+	priv->obs = g_list_prepend (priv->obs, observer);
+	g_object_weak_ref (G_OBJECT (observer), notify_observer_del, self);
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;
@@ -5228,17 +5225,24 @@ static void
 tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *observer)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	GList *found = NULL;
 
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
 	g_static_rec_mutex_lock (priv->obs_lock);
 
-	if (!priv->observers) {
+	if (!priv->obs) {
 		g_static_rec_mutex_unlock (priv->obs_lock);
 		return;
 	}
 
-	tny_list_remove (priv->observers, G_OBJECT (observer));
+	found = g_list_find (priv->obs, observer);
+	if (found) {
+		priv->obs = g_list_remove_link (priv->obs, found);
+		g_object_weak_unref (found->data, notify_observer_del, self);
+		g_list_free (found);
+	}
+
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;
@@ -5277,6 +5281,16 @@ tny_camel_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserve
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_store_observer_func (self, observer);
 }
 
+
+static void 
+notify_store_observer_del (gpointer user_data, GObject *observer)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (user_data);
+	g_static_rec_mutex_lock (priv->obs_lock);
+	priv->sobs = g_list_remove (priv->sobs, observer);
+	g_static_rec_mutex_unlock (priv->obs_lock);
+}
+
 static void
 tny_camel_folder_store_add_observer_default (TnyFolderStore *self, TnyFolderStoreObserver *observer)
 {
@@ -5285,9 +5299,8 @@ tny_camel_folder_store_add_observer_default (TnyFolderStore *self, TnyFolderStor
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	if (!priv->sobservers)
-		priv->sobservers = tny_simple_list_new ();
-	tny_list_prepend (priv->sobservers, G_OBJECT (observer));
+	priv->sobs = g_list_prepend (priv->sobs, observer);
+	g_object_weak_ref (G_OBJECT (observer), notify_store_observer_del, self);
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;
@@ -5304,15 +5317,24 @@ static void
 tny_camel_folder_store_remove_observer_default (TnyFolderStore *self, TnyFolderStoreObserver *observer)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	GList *found = NULL;
 
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	if (!priv->sobservers) {
+
+	if (!priv->sobs) {
 		g_static_rec_mutex_unlock (priv->obs_lock);
 		return;
 	}
-	tny_list_remove (priv->sobservers, G_OBJECT (observer));
+
+	found = g_list_find (priv->sobs, observer);
+	if (found) {
+		priv->sobs = g_list_remove_link (priv->sobs, found);
+		g_object_weak_unref (found->data, notify_store_observer_del, self);
+		g_list_free (found);
+	}
+
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;
@@ -5413,10 +5435,23 @@ tny_camel_folder_finalize (GObject *object)
 	   source of this behaviour */
 
 	/* g_static_rec_mutex_lock (priv->obs_lock); */
-	if (priv->observers)
-		g_object_unref (G_OBJECT (priv->observers));
-	if (priv->sobservers)
-		g_object_unref (G_OBJECT (priv->sobservers));
+	if (priv->obs) {
+		GList *copy = priv->obs;
+		while (copy) {
+			g_object_weak_unref ((GObject *) copy->data, notify_observer_del, self);
+			copy = g_list_next (copy);
+		}
+		g_list_free (priv->obs);
+	}
+
+	if (priv->sobs) {
+		GList *copy = priv->sobs;
+		while (copy) {
+			g_object_weak_unref ((GObject *) copy->data, notify_store_observer_del, self);
+			copy = g_list_next (copy);
+		}
+		g_list_free (priv->sobs);
+	}
 	/* g_static_rec_mutex_unlock (priv->obs_lock); */
 
 	g_static_rec_mutex_lock (priv->folder_lock);
@@ -5636,8 +5671,8 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->local_size = 0;
 	priv->unread_sync = 0;
 	priv->dont_fkill = FALSE;
-	priv->observers = NULL;
-	priv->sobservers = NULL;
+	priv->obs = NULL;
+	priv->sobs = NULL;
 	priv->iter = NULL;
 	priv->iter_parented = FALSE;
 	priv->reason_to_live = 0;

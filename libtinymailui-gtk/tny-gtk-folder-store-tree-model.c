@@ -50,7 +50,7 @@ add_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder)
 	if (TNY_IS_FOLDER (folder)) {
 		tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
 		self->fol_obs = g_list_prepend (self->fol_obs, folder);
-		g_object_unref (self);
+		//g_object_unref (self);
 	}
 }
 
@@ -60,7 +60,7 @@ add_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderStore
 	if (TNY_IS_FOLDER_STORE (store)) {
 		tny_folder_store_add_observer (store, TNY_FOLDER_STORE_OBSERVER (self));
 		self->store_obs = g_list_prepend (self->store_obs, store);
-		g_object_unref (self);
+		//g_object_unref (self);
 	}
 }
 
@@ -68,7 +68,7 @@ static void
 remove_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder, gboolean final)
 {
 	if (TNY_IS_FOLDER (folder)) {
-		g_object_ref (self);
+		//g_object_ref (self);
 		if (!final)
 			self->fol_obs = g_list_remove (self->fol_obs, folder);
 		tny_folder_remove_observer (folder, TNY_FOLDER_OBSERVER (self));
@@ -79,7 +79,7 @@ static void
 remove_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, gboolean final)
 {
 	if (TNY_IS_FOLDER_STORE (store)) {
-		g_object_ref (self);
+		//g_object_ref (self);
 		if (!final)
 			self->store_obs = g_list_remove (self->store_obs, store);
 		tny_folder_store_remove_observer (store, TNY_FOLDER_STORE_OBSERVER (self));
@@ -188,6 +188,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 					tny_folder_get_folder_type (TNY_FOLDER (folder)),
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 					folder, -1);
+
 			}
 
 			/* it's a store by itself, so keep on recursing */

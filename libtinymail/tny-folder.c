@@ -132,11 +132,10 @@ tny_folder_get_stats (TnyFolder *self)
  *
  * After this, @observer will start receiving notification of changes about @self. 
  * 
- * You must use tny_folder_remove_observer in for example the finalization of 
- * your type if you used this method. Adding an observer to @self, changes
- * reference counting of the objects involved. Removing the observer will undo
- * those reference counting changes. Therefore if you don't, you will introduce
- * memory leaks.
+ * A weak reference is added to @observer. When @observer finalizes will @self
+ * automatically update itself by unregistering @observer. It's recommended to
+ * use tny_folder_remove_observer yourself to unregister @observer as observer for
+ * @self, though.
  **/
 void 
 tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
@@ -164,11 +163,6 @@ tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
  *
  * After this, @observer will no longer receive notification of changes about @self. 
  * 
- * You must use this method in for example the finalization of your type if you
- * used tny_folder_add_observer. Adding an observer to @self, changes reference 
- * counting of the objects involved. Removing the observer will undo those 
- * reference counting changes. Therefore if you don't, you will introduce memory
- * leaks.
  **/
 void 
 tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
