@@ -688,6 +688,7 @@ tny_camel_store_account_finalize (GObject *object)
 			copy = g_list_next (copy);
 		}
 		g_list_free (priv->sobs);
+		priv->sobs = NULL;
 	}
 
 	g_list_foreach (priv->managed_folders, foreach_managed_folder, self);
