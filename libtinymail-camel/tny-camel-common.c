@@ -213,6 +213,7 @@ split_recipients (gchar *buffer)
 		if ((!is_quoted) && ((*tmp == ',') || (*tmp == ';'))) {
 			gchar *part;
 			part = g_strndup (start, tmp - start);
+			part = g_strstrip (part);
 			g_ptr_array_add (array, part);
 			start = tmp+1;
 		}
@@ -221,7 +222,7 @@ split_recipients (gchar *buffer)
 	}
 
 	if (start != tmp)
-		g_ptr_array_add (array, g_strdup (start));
+		g_ptr_array_add (array, g_strstrip (g_strdup (start)));
 	
 	g_ptr_array_add (array, NULL);
 	return (gchar **) g_ptr_array_free (array, FALSE);
