@@ -79,6 +79,8 @@ void _tny_camel_folder_rewrite_cache (TnyCamelFolder *self, const gchar *uid, Ca
 
 void _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, TnyFolderStoreChange *change, GError **err);
 
+void _tny_camel_folder_freeup_observers (TnyCamelFolder *self, TnyCamelFolderPriv *priv);
+
 CamelFolder* _tny_camel_folder_get_folder (TnyCamelFolder *self);
 
 #define TNY_CAMEL_FOLDER_GET_PRIVATE(o)	\

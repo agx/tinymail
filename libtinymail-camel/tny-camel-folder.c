@@ -4368,14 +4368,7 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 			CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
 			g_static_rec_mutex_lock (cpriv->obs_lock);
-			if (cpriv->obs) {
-				g_list_free (cpriv->obs);
-				cpriv->obs = NULL;
-			}
-			if (cpriv->sobs) {
-				g_list_free (cpriv->sobs);
-				cpriv->sobs = NULL;
-			}
+			_tny_camel_folder_freeup_observers (cfol, cpriv);
 			g_static_rec_mutex_unlock (priv->obs_lock);
 
 			if (camel_store_supports_subscriptions (store))
@@ -5414,6 +5407,35 @@ _tny_camel_folder_new (void)
 	return TNY_FOLDER (self);
 }
 
+void 
+_tny_camel_folder_freeup_observers (TnyCamelFolder *self, TnyCamelFolderPriv *priv)
+{
+	/* Commented because they should not be really needed but some
+	   times they're causing locking problems. TODO: review the
+	   source of this behaviour */
+
+	/* g_static_rec_mutex_lock (priv->obs_lock); */
+	if (priv->obs) {
+		GList *copy = priv->obs;
+		while (copy) {
+			g_object_weak_unref ((GObject *) copy->data, notify_observer_del, self);
+			copy = g_list_next (copy);
+		}
+		g_list_free (priv->obs);
+		priv->obs = NULL;
+	}
+
+	if (priv->sobs) {
+		GList *copy = priv->sobs;
+		while (copy) {
+			g_object_weak_unref ((GObject *) copy->data, notify_store_observer_del, self);
+			copy = g_list_next (copy);
+		}
+		g_list_free (priv->sobs);
+		priv->sobs = NULL;
+	}
+	/* g_static_rec_mutex_unlock (priv->obs_lock); */
+}
 
 static void
 tny_camel_folder_finalize (GObject *object)
@@ -5430,29 +5452,7 @@ tny_camel_folder_finalize (GObject *object)
 		"are still alive: %d\n", priv->reason_to_live);
 #endif
 
-	/* Commented because they should not be really needed but some
-	   times they're causing locking problems. TODO: review the
-	   source of this behaviour */
-
-	/* g_static_rec_mutex_lock (priv->obs_lock); */
-	if (priv->obs) {
-		GList *copy = priv->obs;
-		while (copy) {
-			g_object_weak_unref ((GObject *) copy->data, notify_observer_del, self);
-			copy = g_list_next (copy);
-		}
-		g_list_free (priv->obs);
-	}
-
-	if (priv->sobs) {
-		GList *copy = priv->sobs;
-		while (copy) {
-			g_object_weak_unref ((GObject *) copy->data, notify_store_observer_del, self);
-			copy = g_list_next (copy);
-		}
-		g_list_free (priv->sobs);
-	}
-	/* g_static_rec_mutex_unlock (priv->obs_lock); */
+	_tny_camel_folder_freeup_observers (self, priv);
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 	priv->dont_fkill = FALSE;

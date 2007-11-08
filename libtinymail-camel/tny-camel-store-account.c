@@ -759,14 +759,7 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 	}
 
 	g_static_rec_mutex_lock (cpriv->obs_lock);
-	if (cpriv->obs) {
-		g_list_free (cpriv->obs);
-		cpriv->obs = NULL;
-	}
-	if (cpriv->sobs) {
-		g_list_free (cpriv->sobs);
-		cpriv->sobs = NULL;
-	}
+	_tny_camel_folder_freeup_observers (cfol, cpriv);
 	g_static_rec_mutex_unlock (cpriv->obs_lock);
 
 	if (camel_store_supports_subscriptions (store))
