@@ -7,6 +7,8 @@
 2007-11-08  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Backported changes from Pre release 0.0.4 preparations
+	* Simulated weak references in TnyGtkFolderStoreTreeModel for the
+	observers
 
 2007-11-07  Philip Van Hoof  <pvanhoof@gnome.org>
 

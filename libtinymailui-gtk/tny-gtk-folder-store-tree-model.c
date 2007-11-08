@@ -44,6 +44,42 @@ static GObjectClass *parent_class = NULL;
 
 typedef void (*treeaddfunc) (GtkTreeStore *tree_store, GtkTreeIter *iter, GtkTreeIter *parent);
 
+static void 
+add_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder)
+{
+	if (TNY_IS_FOLDER (folder)) {
+		tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
+		g_object_unref (self);
+	}
+}
+
+static void 
+add_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store)
+{
+	if (TNY_IS_FOLDER_STORE (store)) {
+		tny_folder_store_add_observer (store, TNY_FOLDER_STORE_OBSERVER (self));
+		g_object_unref (self);
+	}
+}
+
+static void 
+remove_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder)
+{
+	if (TNY_IS_FOLDER (folder)) {
+		g_object_ref (self);
+		tny_folder_remove_observer (folder, TNY_FOLDER_OBSERVER (self));
+	}
+}
+
+static void 
+remove_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store)
+{
+	if (TNY_IS_FOLDER_STORE (store)) {
+		g_object_ref (self);
+		tny_folder_store_remove_observer (store, TNY_FOLDER_STORE_OBSERVER (self));
+	}
+}
+
 static void
 recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, GtkTreeIter *parent_tree_iter)
 {
@@ -127,24 +163,13 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			 * both a removal and a creation happens. Also when a 
 			 * rename happens: that's a removal and a creation. */
 
-			if (folder) {
-				tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
-				me->folder_observables = g_list_prepend (me->folder_observables, folder);
-			}
-
-			if (folder_store) {
-				tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
-				me->store_observables = g_list_prepend (me->store_observables, folder_store);
-			}
-
-
-			/* This adds a reference count to folder too. When it gets removed, that
-			   reference count is decreased automatically by the gtktreestore infra-
-			   structure. */
-
 			if (folder)
 			{
-				TnyFolder *folder = TNY_FOLDER (instance);
+				/* This adds a reference count to folder too. When it gets removed, that
+				   reference count is decreased automatically by the gtktreestore infra-
+				   structure. */
+
+				add_folder_observer_weak (self, folder);
 
 				gtk_tree_store_set  (model, &tree_iter,
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
@@ -160,8 +185,10 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			}
 
 			/* it's a store by itself, so keep on recursing */
-			if (folder_store)
+			if (folder_store) {
+				add_folder_store_observer_weak (self, folder_store);
 				recurse_folders_sync (self, folder_store, &tree_iter);
+			}
 
 			/* We're a folder, we'll request a status, since we've
 			 * set self to be a folder observers of folder, we'll 
@@ -417,8 +444,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 	/* Add an observer for the root folder store, so that we can observe 
 	 * the actual account too. */
 
-	tny_folder_store_add_observer (folder_store, TNY_FOLDER_STORE_OBSERVER (self));
-	self->store_observables = g_list_prepend (self->store_observables, folder_store);
+	add_folder_store_observer_weak (self, folder_store);
 
 	/* g_object_unref (G_OBJECT (folders)); */
 
@@ -471,33 +497,6 @@ unregister_store_observerable (gpointer item, gpointer user_data)
 		tny_folder_store_remove_observer (fstore, TNY_FOLDER_STORE_OBSERVER (user_data));
 }
 
-/*
- * tny_gtk_folder_store_tree_model_stop_observing:
- * @self: a #TnyGtkFolderStoreTreeModel instance
- *
- * Stop observing the folders in @self. You must use this function before 
- * finalization of @self. For example just before setting a new model to a
- * #GtkTreeView using gtk_tree_view_set_model, or just before the treeview's
- * instance gets either unferencered or detached from its container.
- **/
-void
-tny_gtk_folder_store_tree_model_stop_observing (TnyGtkFolderStoreTreeModel *self)
-{
-	if (self->folder_observables)
-	{
-		g_list_foreach (self->folder_observables, unregister_folder_observerable, self);
-		g_list_free (self->store_observables);
-		self->store_observables = NULL;
-	}
-
-	if (self->store_observables)
-	{
-		g_list_foreach (self->store_observables, unregister_store_observerable, self);
-		g_list_free (self->store_observables);
-		self->store_observables = NULL;
-	}
-}
-
 static void
 tny_gtk_folder_store_tree_model_finalize (GObject *object)
 {
@@ -542,8 +541,6 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
 
 	me->iterator_lock = g_mutex_new ();
-	me->folder_observables = NULL;
-	me->store_observables = NULL;
 
 	gtk_tree_store_set_column_types (store, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS, types);
@@ -827,6 +824,7 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	gboolean retval = FALSE;
 	TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
 	GObject *folder = user_data1;
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) model;
 
 	/* The deleter will compare all folders in the model with the deleted 
 	 * folder @folder, and if there's a match it will delete the folder's
@@ -845,6 +843,10 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 			&fol, -1);
 
 		if (fol == folder) {
+
+			remove_folder_observer_weak (me, TNY_FOLDER (folder));
+			remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (folder));
+
 			gtk_tree_store_remove (GTK_TREE_STORE (model), iter);
 			retval = TRUE;
 		}
@@ -907,12 +909,13 @@ creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer 
 			GtkTreeIter newiter;
 			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
 
-			me->folder_observables = g_list_prepend (me->folder_observables, folder);
-			me->store_observables = g_list_prepend (me->store_observables, folder);
+			add_folder_observer_weak (self, folder);
+			add_folder_store_observer_weak (self, TNY_FOLDER_STORE (folder));
 
 			/* This adds a reference count to folder_store too. When it gets 
 			   removed, that reference count is decreased automatically by 
 			   the gtktreestore infrastructure. */
+
 
 			gtk_tree_store_prepend (GTK_TREE_STORE (model), &newiter, in_iter);
 
@@ -927,9 +930,6 @@ creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer 
 				tny_folder_get_folder_type (TNY_FOLDER (folder)),
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 				folder, -1);
-
-				tny_folder_add_observer (TNY_FOLDER (folder), TNY_FOLDER_OBSERVER (self));
-				tny_folder_store_add_observer (TNY_FOLDER_STORE (folder), TNY_FOLDER_STORE_OBSERVER (self));
 
 			g_object_unref (folder);
 			tny_iterator_next (miter);
