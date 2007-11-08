@@ -952,6 +952,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	TnyFolder *folder; CamelFolderInfo *info; CamelStore *store;
 	TnyFolderStoreChange *change;
 	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
+	gboolean was_new = FALSE;
 
 	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err,
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
@@ -1016,8 +1017,11 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	if (camel_store_supports_subscriptions (store))
 		camel_store_subscribe_folder (store, info->full_name, &subex);
 
-	folder = _tny_camel_folder_new ();
+	folder = tny_camel_store_account_factor_folder  
+		(TNY_CAMEL_STORE_ACCOUNT (self), info->full_name, &was_new);
+
 	_tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
+	_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (folder), self);
 
 	/* So that the next call to get_folders() includes the newly-created
 	 * folder. */

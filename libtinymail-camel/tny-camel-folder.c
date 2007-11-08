@@ -162,6 +162,7 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
 		list = g_list_next (list);
 	}
+
 	g_list_free (list);
 
 	return;
@@ -2915,37 +2916,6 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 static void
 notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboolean in_idle)
 {
- if (adds)
- {
-	adds = g_list_first (adds);
-
-	while (adds)
-	{
-		CpyEvent *evt = adds->data;
-		TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
-
-		tny_folder_store_change_add_created_folder (change, evt->fol);
-
-		if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
-			if (in_idle) {
-				notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change);
-			} else {
-				notify_folder_store_observers_about_for_store_acc (evt->str, change);
-			}
-		} else {
-			if (in_idle) {
-				notify_folder_store_observers_about_in_idle (evt->str, change);
-			} else {
-				notify_folder_store_observers_about (evt->str, change);
-			}
-		}
-		g_object_unref (change);
-
-		cpy_event_free (evt);
-		adds = g_list_next (adds);
-	}
-	g_list_free (adds);
- }
 
  if (rems) 
  {
@@ -2977,6 +2947,38 @@ notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboo
 		rems = g_list_next (rems);
 	}
 	g_list_free (rems);
+ }
+
+ if (adds)
+ {
+	adds = g_list_first (adds);
+
+	while (adds)
+	{
+		CpyEvent *evt = adds->data;
+		TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
+
+		tny_folder_store_change_add_created_folder (change, evt->fol);
+
+		if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
+			if (in_idle) {
+				notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change);
+			} else {
+				notify_folder_store_observers_about_for_store_acc (evt->str, change);
+			}
+		} else {
+			if (in_idle) {
+				notify_folder_store_observers_about_in_idle (evt->str, change);
+			} else {
+				notify_folder_store_observers_about (evt->str, change);
+			}
+		}
+		g_object_unref (change);
+
+		cpy_event_free (evt);
+		adds = g_list_next (adds);
+	}
+	g_list_free (adds);
  }
 
  return;
@@ -4572,6 +4574,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	TnyFolderStoreChange *change;
 	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 	TnyCamelFolderPriv *rpriv = NULL;
+	gboolean was_new = FALSE;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
 			priv->account, err, TNY_FOLDER_STORE_ERROR, 
@@ -4627,13 +4630,12 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	if (camel_store_supports_subscriptions (store))
 		camel_store_subscribe_folder (store, info->full_name, &subex);
 
-	folder = _tny_camel_folder_new ();
+	folder = tny_camel_store_account_factor_folder  
+		(TNY_CAMEL_STORE_ACCOUNT (priv->account), info->full_name, &was_new);
+
 	_tny_camel_folder_set_folder_info (self, TNY_CAMEL_FOLDER (folder), info);
-	rpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (folder), TNY_FOLDER_STORE (self));
-	rpriv->folder = NULL; /* This might be a leak */
-	rpriv->loaded = 0;
-	load_folder_no_lock (rpriv);
+
 
 	/* So that the next call to get_folders includes the newly
 	 * created folder */

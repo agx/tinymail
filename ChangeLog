@@ -12,7 +12,20 @@
 	* Cyclic references fix. tny_folder_store_add_observer and
 	tny_folder_add_observer no longer add strong references, in stead they
 	add weak references
-	* Bugfix for last patch
+
+	* Fixed longstanding bug that when you create two folders A and B in a
+	root folder C, and then move A into B, that A would only become a
+	subfolder of B after you restart the application. The problem was that
+	A and B got created with _tny_camel_folder_new in stead of the
+	tny_camel_store_account_factor_folder. This made the observers
+	infrastructure of the model confuse when a new list of folder was
+	requested (this new list would use the tny_camel_store_account_factor_folder
+	function and therefore another (new) instance would get created in
+	stead of the one created during _tny_camel_folder_new being reused.
+
+	For future, let's be extremely careful not to use
+	_tny_camel_folder_new but in stead to make sure that the factory is
+	always used.
 
 	* This is a major API change
 
