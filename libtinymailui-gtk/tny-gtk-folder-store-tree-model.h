@@ -57,7 +57,7 @@ typedef enum _TnyGtkFolderStoreTreeModelColumn TnyGtkFolderStoreTreeModelColumn;
 struct _TnyGtkFolderStoreTreeModel
 {
 	GtkTreeStore parent;
-	GList *first;
+	GList *first, *store_obs, *fol_obs;
 	GMutex *iterator_lock;
 	TnyFolderStoreQuery *query;
 };

@@ -49,6 +49,7 @@ add_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder)
 {
 	if (TNY_IS_FOLDER (folder)) {
 		tny_folder_add_observer (folder, TNY_FOLDER_OBSERVER (self));
+		self->fol_obs = g_list_prepend (self->fol_obs, folder);
 		g_object_unref (self);
 	}
 }
@@ -58,24 +59,29 @@ add_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderStore
 {
 	if (TNY_IS_FOLDER_STORE (store)) {
 		tny_folder_store_add_observer (store, TNY_FOLDER_STORE_OBSERVER (self));
+		self->store_obs = g_list_prepend (self->store_obs, store);
 		g_object_unref (self);
 	}
 }
 
 static void 
-remove_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder)
+remove_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder, gboolean final)
 {
 	if (TNY_IS_FOLDER (folder)) {
 		g_object_ref (self);
+		if (!final)
+			self->fol_obs = g_list_remove (self->fol_obs, folder);
 		tny_folder_remove_observer (folder, TNY_FOLDER_OBSERVER (self));
 	}
 }
 
 static void 
-remove_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store)
+remove_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, gboolean final)
 {
 	if (TNY_IS_FOLDER_STORE (store)) {
 		g_object_ref (self);
+		if (!final)
+			self->store_obs = g_list_remove (self->store_obs, store);
 		tny_folder_store_remove_observer (store, TNY_FOLDER_STORE_OBSERVER (self));
 	}
 }
@@ -486,6 +492,26 @@ static void
 tny_gtk_folder_store_tree_model_finalize (GObject *object)
 {
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) object;
+	GList *copy = me->fol_obs;
+
+	while (copy) {
+		remove_folder_observer_weak (me, (TnyFolder *) copy->data, TRUE);
+		copy = g_list_next (copy);
+	}
+
+	copy = me->store_obs;
+	while (copy) {
+		remove_folder_store_observer_weak (me, (TnyFolderStore *) copy->data, TRUE);
+		copy = g_list_next (copy);
+	}
+
+	if (me->fol_obs)
+		g_list_free (me->fol_obs);
+	me->fol_obs = NULL;
+
+	if (me->store_obs)
+		g_list_free (me->store_obs);
+	me->store_obs = NULL;
 
 	g_mutex_lock (me->iterator_lock);
 	if (me->first)
@@ -525,6 +551,8 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) instance;
 	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
 
+	me->fol_obs = NULL;
+	me->store_obs = NULL;
 	me->iterator_lock = g_mutex_new ();
 
 	gtk_tree_store_set_column_types (store, 
@@ -829,8 +857,8 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 
 		if (fol == folder) {
 
-			remove_folder_observer_weak (me, TNY_FOLDER (folder));
-			remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (folder));
+			remove_folder_observer_weak (me, TNY_FOLDER (folder), FALSE);
+			remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (folder), FALSE);
 
 			gtk_tree_store_remove (GTK_TREE_STORE (model), iter);
 			retval = TRUE;
