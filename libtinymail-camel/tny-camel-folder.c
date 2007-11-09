@@ -4369,9 +4369,9 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 		{
 			CamelException subex = CAMEL_EXCEPTION_INITIALISER;
 
-			g_static_rec_mutex_lock (cpriv->obs_lock);
+			//g_static_rec_mutex_lock (cpriv->obs_lock);
 			_tny_camel_folder_freeup_observers (cfol, cpriv);
-			g_static_rec_mutex_unlock (priv->obs_lock);
+			//g_static_rec_mutex_unlock (priv->obs_lock);
 
 			if (camel_store_supports_subscriptions (store))
 				camel_store_subscribe_folder (store, cfolname, &subex);
