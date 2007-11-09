@@ -438,12 +438,12 @@ if test x$PLATFORMDIR = xlibtinymail-maemo; then
 			use_conic_device_dummy=1
  			AC_DEFINE_UNQUOTED(MAEMO_CONIC_DUMMY,1,["Whether to hack the TnyMaemoConicDevice to somewhat work in sbox"])
  		fi
-		AM_CONDITIONAL(MAEMO_CONIC_DEVICE_DUMMY, test -n "$use_conic_device_dummy")
 	fi
 	AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 	AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
 fi
 
+AM_CONDITIONAL(MAEMO_CONIC_DEVICE_DUMMY, test -n "$use_conic_device_dummy")
 AM_CONDITIONAL(BUILD_MAEMO, test x$build_maemo = xtrue)
 
 dnl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
