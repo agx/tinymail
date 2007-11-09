@@ -67,6 +67,7 @@ build_doxygen=false
 build_tests=false
 build_unittests=false
 build_tp=false
+have_conic=false
 PLATFORMDIR=libtinymail-gnome-desktop
 PLATFORM=1
 
@@ -428,25 +429,22 @@ if test x$PLATFORMDIR = xlibtinymail-maemo; then
 	if $PKG_CONFIG --exists conic; then
 		PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO_CONIC,conic,HAVE_CONIC=yes,HAVE_CONIC=no)
 		AC_MSG_RESULT(conic)
-     		MAEMO_DEVICE='tny-maemo-conic-device.$(OBJEXT)'
 		AC_SUBST(LIBYINYMAIL_MAEMO_CONIC_CFLAGS)
 		AC_SUBST(LIBTINYMAIL_MAEMO_CONIC_LIBS)
-dnl HACK: unless we are building for arm, make the device a 'dummy' assuming it is always online
-dnl this is because scratcbhox-Conic does not support ethernet, and will therefore never consider
-dnl itself 'online'
+		dnl HACK: unless we are building for arm, make the device a 'dummy' assuming it is always online
+		dnl this is because scratcbhox-Conic does not support ethernet, and will therefore never consider
+		dnl itself 'online'
  		if test -z "`sb-conf show -c | grep arm`"; then
+			use_conic_device_dummy=1
  			AC_DEFINE_UNQUOTED(MAEMO_CONIC_DUMMY,1,["Whether to hack the TnyMaemoConicDevice to somewhat work in sbox"])
  		fi
+		AM_CONDITIONAL(MAEMO_CONIC_DEVICE_DUMMY, test -n "$use_conic_device_dummy")
 	fi
-	AC_SUBST([MAEMO_DEVICE])
 	AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 	AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
 fi
 
-
 AM_CONDITIONAL(BUILD_MAEMO, test x$build_maemo = xtrue)
-
-
 
 dnl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
 if test x$PLATFORMDIR = xlibtinymail-gpe; then
