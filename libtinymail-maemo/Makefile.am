@@ -10,7 +10,6 @@ INCLUDES = -I. -I$(top_srcdir) \
 	-I$(top_srcdir)/libtinymail-gnomevfs \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
-
 lib_LTLIBRARIES = libtinymail-maemo-1.0.la
 
 libtinymail_maemo_1_0_headers = \
@@ -25,20 +24,19 @@ libtinymail_maemo_1_0_la_SOURCES =  \
 	tny-maemo-device.c \
 	tny-maemo-platform-factory.c
 
-EXTRA_libtinymail_maemo_1_0_la_SOURCES = \
-	tny-maemo-conic-device.c				 
-					
+if MAEMO_CONIC_DEVICE_DUMMY
+libtinymail_maemo_1_0_la_SOURCES += tny-maemo-conic-dummy-device.c
+else
+libtinymail_maemo_1_0_la_SOURCES += tny-maemo-conic-device.c
+endif
+
 libtinymail_maemo_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_MAEMO_LIBS) \
 	$(LIBTINYMAIL_MAEMO_CONIC_LIBS) \
-	@MAEMO_DEVICE@ \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
-
-libtinymail_maemo_1_0_la_DEPENDENCIES=\
-	@MAEMO_DEVICE@
 
 libtinymail_maemo_1_0_la_LDFLAGS = -export-dynamic \
 	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

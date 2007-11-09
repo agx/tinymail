@@ -1,3 +1,13 @@
+2007-11-09  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c: 
+	Added a new API to allow asynchronous connections
+	in the Maemo conic device. This patch is a new version of an initial
+	patch developed by pvanhoof with some changes.
+	Splitted the Maemo connic device in two files, one for the actual
+	device and the other one for a dummy device (useful for sbox devel)
+	Fixed a problem when linking the maemo conic device 
+							
 2007-11-08  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-common.c:
@@ -149,6 +159,12 @@
 	* Reference count problem in TnyCamelHeader
 	* priv->folder_name in TnyCamelFolder sometimes is NULL, which
 	doesn't seem right (and is racy).
+	* Improvements for the IDLE support. The Nonblocking read is now
+	actually used correctly, various racy situations should be fixed now
+	and instant event throwing is put in place (during IDLE state).
+	* Removed the (*read_idle) funcptr from CamelTcpStream, as this is no longer
+	required. This to reduce the complexity of the IDLE patch so that we
+	can later, perhaps, more easily bring this feature to upstream Camel.
 
 2007-10-19  Philip Van Hoof  <pvanhoof@gnome.org>
 

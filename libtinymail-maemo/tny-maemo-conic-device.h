@@ -55,6 +55,11 @@ GType tny_maemo_conic_device_get_type (void);
 TnyDevice* tny_maemo_conic_device_new (void);
 
 gboolean tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id);
+typedef void (*TnyMaemoConicDeviceConnectCallback) (TnyMaemoConicDevice *self, const gchar* iap_id, gboolean canceled, GError *err, gpointer user_data);
+void tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self, 
+					   const gchar* iap_id, 
+					   TnyMaemoConicDeviceConnectCallback callback, 
+					   gpointer user_data);
 gboolean tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_id);
 const gchar* tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self);
 ConIcIap* tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id);
