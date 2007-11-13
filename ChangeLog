@@ -1,6 +1,7 @@
 2007-11-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Weak references for TnyHeader instances in TnyCamelMsgHeader
+	* Reference counting mistakes in TnyGtkFolderStoreTreeModel
 
 2007-11-12  Vivek Sekar  <viveksekar@gmail.com>
 

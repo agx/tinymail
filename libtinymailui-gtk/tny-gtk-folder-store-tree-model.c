@@ -128,10 +128,10 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			if (citem == instance)
 			{
 				found = TRUE;
+				if (citem)
+					g_object_unref (citem);
 				break;
 			}
-			if (citem)
-				g_object_unref (citem);
 
 			/* We search whether this folder that we have in the 
 			 * model, still exists in the actual list. Because if
@@ -151,6 +151,9 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 				tny_iterator_next (niter);
 			}
 			g_object_unref (niter);
+
+			if (citem)
+				g_object_unref (citem);
 
 		  } while (gtk_tree_model_iter_next (mmodel, &miter));
 
@@ -210,14 +213,17 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 			if (folder)
 				tny_folder_poke_status (TNY_FOLDER (folder));
 
-			if (mark_for_removal)
+			if (mark_for_removal) {
 				g_object_unref (mark_for_removal);
+				mark_for_removal = NULL;
+			}
 
 		} else {
 			if (mark_for_removal) {
 				printf ("We need to remove %s\n", 
 					tny_folder_get_id (TNY_FOLDER (mark_for_removal)));
 				g_object_unref (mark_for_removal);
+				mark_for_removal = NULL;
 			}
 		}
 
@@ -270,13 +276,17 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 			&citem, -1);
+
 		if (citem == (GObject *) fstore)
 		{
 			name_iter = iter;
 			found = TRUE;
+			if (citem)
+				g_object_unref (citem);
 			break;
 		}
-		g_object_unref (G_OBJECT (citem));
+
+		g_object_unref (citem);
 
 	  } while (gtk_tree_model_iter_next (model, &iter));
 
@@ -325,18 +335,23 @@ tny_gtk_folder_store_tree_model_on_changed (TnyAccount *account, TnyGtkFolderSto
 	if (gtk_tree_model_get_iter_first (model, &iter))
 	  do 
 	  {
-		GObject *citem;
+		GObject *citem = NULL;
 
 		gtk_tree_model_get (model, &iter, 
 			TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
 			&citem, -1);
+
 		if (citem == (GObject *) account)
 		{
 			name_iter = iter;
 			found = TRUE;
+			if (citem)
+				g_object_unref (citem);
 			break;
 		}
-		g_object_unref (citem);
+
+		if (citem)
+			g_object_unref (citem);
 
 	  } while (gtk_tree_model_iter_next (model, &iter));
 
@@ -701,11 +716,12 @@ tny_gtk_folder_store_tree_model_remove (TnyList *self, GObject* item)
 		{
 			/* This removes a reference count */
 			gtk_tree_store_remove (GTK_TREE_STORE (me), &iter);
-			g_object_unref (G_OBJECT (item));
+			if (citem)
+				g_object_unref (citem);
 			break;
 		}
 		if (citem)
-			g_object_unref (G_OBJECT (citem));
+			g_object_unref (citem);
 
 	  } while (gtk_tree_model_iter_next (model, &iter));
 
