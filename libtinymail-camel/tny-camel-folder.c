@@ -1350,9 +1350,9 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 
 	g_assert (TNY_IS_CAMEL_ACCOUNT (account));
 
-	/* TODO, these need a real hard reference afaik! Not even a weak one */
-	priv->account = account;
+	priv->account = TNY_ACCOUNT (g_object_ref (account));
 	priv->store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
+	camel_object_ref (priv->store);
 
 	return;
 }
@@ -5471,6 +5471,11 @@ tny_camel_folder_finalize (GObject *object)
 		"are still alive: %d\n", priv->reason_to_live);
 #endif
 
+	if (priv->account)
+		g_object_unref (priv->account);
+	if (priv->store)
+		camel_object_unref (priv->store);
+
 	if (priv->parent)
 		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
 
@@ -5684,6 +5689,8 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	priv->unread_read = FALSE;
+	priv->account = NULL;
+	priv->store = NULL;
 	priv->parent = NULL;
 	priv->strict_retrieval = FALSE;
 	priv->self = (TnyFolder *) self;
