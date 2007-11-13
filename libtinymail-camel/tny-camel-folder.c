@@ -4252,7 +4252,10 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 	g_print ("_tny_camel_folder_unreason (%s) : %d\n", 
 		priv->folder_name?priv->folder_name:"(cleared)", 
 			priv->reason_to_live);
+
+	g_print ("Folder's reason to live -> %d\n", priv->reason_to_live);
 #endif
+
 
 	if (priv->reason_to_live == 0) 
 	{
