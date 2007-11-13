@@ -1,3 +1,7 @@
+2007-11-13  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Weak references for TnyHeader instances in TnyCamelMsgHeader
+
 2007-11-12  Vivek Sekar  <viveksekar@gmail.com>
 
 	* Renamed the control files with respect to the new maemo versions.

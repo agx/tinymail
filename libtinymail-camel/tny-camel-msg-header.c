@@ -421,6 +421,13 @@ tny_camel_msg_header_get_uid (TnyHeader *self)
 	return me->old_uid;
 }
 
+static void 
+notify_decorated_del (gpointer user_data, GObject *decorated)
+{
+	TnyCamelMsgHeader *me = (TnyCamelMsgHeader *) user_data;
+	me->decorated = NULL;
+}
+
 static void
 tny_camel_msg_header_finalize (GObject *object)
 {
@@ -430,7 +437,7 @@ tny_camel_msg_header_finalize (GObject *object)
 		g_free (me->old_uid);
 
 	if (me->decorated) {
-		g_object_unref (me->decorated);
+		g_object_weak_unref (G_OBJECT (me->decorated), notify_decorated_del, me);
 		me->decorated = NULL;
 	}
 
@@ -473,16 +480,19 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t rece
 	return (TnyHeader*) self;
 }
 
+
 void 
 _tny_camel_msg_header_set_decorated (TnyCamelMsgHeader *header, 
 				     TnyHeader *decorated)
 {
 	g_assert (TNY_IS_HEADER (decorated));
 	if (header->decorated) {
-		g_object_unref (header->decorated);
+		g_object_weak_unref (G_OBJECT (decorated), notify_decorated_del, header);
 	}
 
-	header->decorated = TNY_HEADER (g_object_ref (decorated));
+	g_object_weak_ref (G_OBJECT (decorated), notify_decorated_del, header);
+
+	header->decorated = decorated;
 
 }
 
