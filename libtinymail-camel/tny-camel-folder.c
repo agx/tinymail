@@ -1350,6 +1350,7 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 
 	g_assert (TNY_IS_CAMEL_ACCOUNT (account));
 
+	/* TODO, these need a real hard reference afaik! Not even a weak one */
 	priv->account = account;
 	priv->store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
 
@@ -4658,10 +4659,23 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
  * this code could cause a cross-reference situation, if the parent
  * was used to create the child. */
 
+static void 
+notify_parent_del (gpointer user_data, GObject *parent)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (user_data);
+	priv->parent = NULL;
+}
+
+
 void
 _tny_camel_folder_set_parent (TnyCamelFolder *self, TnyFolderStore *parent)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (priv->parent)
+		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
+	g_object_weak_ref (G_OBJECT (parent), notify_parent_del, self);
+
 	priv->parent = parent;
 	return;
 }
@@ -5456,6 +5470,9 @@ tny_camel_folder_finalize (GObject *object)
 		g_print ("Finalizing TnyCamelFolder, yet TnyHeader instances "
 		"are still alive: %d\n", priv->reason_to_live);
 #endif
+
+	if (priv->parent)
+		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
 
 	_tny_camel_folder_freeup_observers (self, priv);
 
