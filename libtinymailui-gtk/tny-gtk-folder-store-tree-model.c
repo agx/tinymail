@@ -491,13 +491,6 @@ tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query)
 	return GTK_TREE_MODEL (self);
 }
 
-static void 
-destroy_folder_stores (gpointer item, gpointer user_data)
-{
-	if (item && G_IS_OBJECT (item))
-		g_object_unref (G_OBJECT (item));
-	return;
-}
 
 
 static void
@@ -527,10 +520,8 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 
 	g_mutex_lock (me->iterator_lock);
 	if (me->first)
-	{
-		g_list_foreach (me->first, destroy_folder_stores, NULL);
-		g_list_free (me->first); me->first = NULL;
-	}
+		g_list_free (me->first); 
+	me->first = NULL;
 	g_mutex_unlock (me->iterator_lock);
 
 
@@ -602,7 +593,6 @@ tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFo
 	g_mutex_lock (me->iterator_lock);
 
 	/* Prepend something to the list */
-	g_object_ref (item);
 	me->first = g_list_prepend (me->first, item);
 
 	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
@@ -620,7 +610,6 @@ tny_gtk_folder_store_tree_model_prepend_i (TnyList *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Prepend something to the list */
-	g_object_ref (item);
 	me->first = g_list_prepend (me->first, item);
 
 	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
@@ -645,7 +634,6 @@ tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFol
 	g_mutex_lock (me->iterator_lock);
 
 	/* Append something to the list */
-	g_object_ref (item);
 	me->first = g_list_append (me->first, item);
 
 	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 
@@ -662,7 +650,6 @@ tny_gtk_folder_store_tree_model_append_i (TnyList *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Append something to the list */
-	g_object_ref (item);
 	me->first = g_list_append (me->first, item);
 
 	tny_gtk_folder_store_tree_model_add_i (me, TNY_FOLDER_STORE (item), 

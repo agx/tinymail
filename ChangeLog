@@ -2,6 +2,7 @@
 
 	* Weak references for TnyHeader instances in TnyCamelMsgHeader
 	* Reference counting mistakes in TnyGtkFolderStoreTreeModel
+	* Reference counting mistakes in TnyGtkAccountListModel
 
 2007-11-12  Vivek Sekar  <viveksekar@gmail.com>
 
