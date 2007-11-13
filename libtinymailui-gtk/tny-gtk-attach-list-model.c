@@ -122,14 +122,6 @@ tny_gtk_attach_list_model_new (void)
 	return GTK_TREE_MODEL (self);
 }
 
-static void 
-destroy_parts (gpointer item, gpointer user_data)
-{
-    	if (item && G_IS_OBJECT (item))
-		g_object_unref (G_OBJECT (item));
-    	return;
-}
-
 static void
 tny_gtk_attach_list_model_finalize (GObject *object)
 {
@@ -137,11 +129,13 @@ tny_gtk_attach_list_model_finalize (GObject *object)
 	TnyGtkAttachListModel *me = (TnyGtkAttachListModel*) object;
 
 	g_mutex_lock (me->iterator_lock);
-    	if (me->first)
-	{
-		g_list_foreach (me->first, destroy_parts, NULL);
-		g_list_free (me->first); me->first = NULL;
+	if (me->first) {
+		if (me->first_needs_unref)
+			g_list_foreach (me->first, (GFunc)g_object_unref, NULL);
+		me->first_needs_unref = FALSE;
+		g_list_free (me->first);
 	}
+	me->first = NULL;
 	g_mutex_unlock (me->iterator_lock);
 
 	g_mutex_free (me->iterator_lock);
@@ -176,11 +170,13 @@ tny_gtk_attach_list_model_instance_init (GTypeInstance *instance, gpointer g_cla
 	TnyGtkAttachListModelPriv *priv = TNY_GTK_ATTACH_LIST_MODEL_GET_PRIVATE (instance);
 	static GType types[] = { G_TYPE_POINTER, G_TYPE_STRING, G_TYPE_OBJECT };
 
+
 	priv->theme = NULL;
 	types[0] = GDK_TYPE_PIXBUF;
 	me->iterator_lock = g_mutex_new ();
 	me->first = NULL;
-    
+	me->first_needs_unref = FALSE;
+
 	gtk_list_store_set_column_types (store, 
 		TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS, types);
 
@@ -207,12 +203,11 @@ tny_gtk_attach_list_model_prepend (TnyList *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Prepend something to the list */
-	g_object_ref (G_OBJECT (item));
-
-	me->first = g_list_prepend (me->first, item);
 
 	tny_gtk_attach_list_model_add (me, TNY_MIME_PART (item), 
 		gtk_list_store_prepend);
+
+	me->first = g_list_prepend (me->first, item);
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -225,11 +220,10 @@ tny_gtk_attach_list_model_append (TnyList *self, GObject* item)
 	g_mutex_lock (me->iterator_lock);
 
 	/* Append something to the list */
-	g_object_ref (G_OBJECT (item));
-    
-	me->first = g_list_append (me->first, item);
+
 	tny_gtk_attach_list_model_add (me, TNY_MIME_PART (item), 
 		gtk_list_store_append);
+	me->first = g_list_append (me->first, item);
 
 	g_mutex_unlock (me->iterator_lock);
 }
@@ -277,10 +271,10 @@ tny_gtk_attach_list_model_remove (TnyList *self, GObject* item)
 		if (citem == item)
 		{
 			gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
-		    	g_object_unref (G_OBJECT (item));
+			g_object_unref (item);
 			break;
 		}
-		g_object_unref (G_OBJECT (citem));
+		g_object_unref (citem);
 	  }
     
 	g_mutex_unlock (me->iterator_lock);
@@ -305,6 +299,7 @@ tny_gtk_attach_list_model_copy_the_list (TnyList *self)
 	g_mutex_lock (me->iterator_lock);
 	list_copy = g_list_copy (me->first);
 	g_list_foreach (list_copy, (GFunc)g_object_ref, NULL);
+	copy->first_needs_unref = TRUE;
 	copy->first = list_copy;
 	g_mutex_unlock (me->iterator_lock);
 

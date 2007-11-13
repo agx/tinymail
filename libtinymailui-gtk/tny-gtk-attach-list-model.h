@@ -55,6 +55,7 @@ struct _TnyGtkAttachListModel
 	GtkListStore parent;
 	GList *first;
 	GMutex *iterator_lock;
+	gboolean first_needs_unref;
 };
 
 struct _TnyGtkAttachListModelClass

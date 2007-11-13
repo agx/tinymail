@@ -52,6 +52,7 @@ struct _TnyGtkAccountListModel
 	GtkListStore parent;
 	GMutex *iterator_lock;
  	GList *first;
+	gboolean first_needs_unref;
 };
 
 struct _TnyGtkAccountListModelClass
