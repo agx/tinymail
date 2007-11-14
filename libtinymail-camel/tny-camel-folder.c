@@ -1365,7 +1365,8 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 	if (priv->store)
 		camel_object_unref (priv->store);
 	priv->store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
-	camel_object_ref (priv->store);
+	if (priv->store)
+		camel_object_ref (priv->store);
 
 	return;
 }

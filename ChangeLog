@@ -2,6 +2,10 @@
 
 	* Changed a hard reference into a weak reference, although I'm not
 	sure that this was necessary.
+	* Fixed two bugs: first that for transport-account the
+	tny_camel_account_set_online's callback was never called for, second
+	that the TnyCamelSendQueue was making TnyCamelFolder crash since
+	yesterday's reference count fixes
 
 2007-11-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
