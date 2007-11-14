@@ -1,3 +1,8 @@
+2007-11-14  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Changed a hard reference into a weak reference, although I'm not
+	sure that this was necessary.
+
 2007-11-13  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Weak references for TnyHeader instances in TnyCamelMsgHeader
