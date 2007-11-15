@@ -168,7 +168,9 @@ get_dummy_filename ()
 
 
 static void 
-dummy_con_ic_connection_connect_by_id_async_cb (GtkWidget *dialog,  gint response, gpointer user_data)
+dummy_con_ic_connection_connect_by_id_async_cb (GtkWidget *dialog,  
+						gint response, 
+						gpointer user_data)
 {
 	ConnectInfo *info = (ConnectInfo *) user_data;
 	GError *error = NULL;
@@ -209,7 +211,10 @@ dummy_con_ic_connection_connect_by_id_async_cb (GtkWidget *dialog,  gint respons
 }
 
 static void 
-dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self, const gchar* iap_id, TnyMaemoConicDeviceConnectCallback callback, gpointer user_data)
+dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self, 
+					     const gchar* iap_id, 
+					     TnyMaemoConicDeviceConnectCallback callback, 
+					     gpointer user_data)
 {
 	ConnectInfo *info = g_slice_new0 (ConnectInfo);
 	GtkDialog *dialog;
@@ -240,6 +245,7 @@ dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self, const gc
  * tny_maemo_conic_device_connect:
  * @self: a #TnyDevice object
  * @iap_id: the id of the Internet Access Point (IAP), or NULL for 'any;
+ * @user_requested: whether or not the connection was automatically requested or by an user action
  * @callback: a #TnyMaemoConicDeviceConnectCallback
  * @user_data: user data for @callback
  * 
@@ -249,7 +255,11 @@ dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self, const gc
  * may otherwise take a significant amount of time. 
  **/
 void  
-tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self, const gchar* iap_id, TnyMaemoConicDeviceConnectCallback callback, gpointer user_data)
+tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self, 
+				      const gchar* iap_id, 
+				      gboolean user_requested,
+				      TnyMaemoConicDeviceConnectCallback callback, 
+				      gpointer user_data)
 {
 	dummy_con_ic_connection_connect_by_id_async (self, iap_id, callback, user_data);
 	return;
@@ -673,7 +683,7 @@ dummy_con_ic_connection_connect_by_id (TnyMaemoConicDevice *self, const gchar* i
 }
 
 gboolean
-tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
+tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id, gboolean user_requested)
 {
 	return dummy_con_ic_connection_connect_by_id (self, iap_id);
 }

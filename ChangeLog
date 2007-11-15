@@ -1,3 +1,12 @@
+2007-11-15  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	(tny_maemo_conic_device_connect):
+	(tny_maemo_conic_device_connect_async): added a new parametter called
+	user_requested that specifies whether or not the connection was
+	requested by an user or by an automatic system (like a daemon). This
+	allows the connection not to succed when the device is sleeping.
+
 2007-11-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Updating attachment flags after downloading of message

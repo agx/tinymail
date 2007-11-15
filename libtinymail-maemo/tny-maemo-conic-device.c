@@ -306,6 +306,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
  * tny_maemo_conic_device_connect:
  * @self: a #TnyDevice object
  * @iap_id: the id of the Internet Access Point (IAP), or NULL for 'any;
+ * @user_requested: whether or not the connection was automatically requested or by an user action
  * @callback: a #TnyMaemoConicDeviceConnectCallback
  * @user_data: user data for @callback
  * 
@@ -317,6 +318,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 void 
 tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self, 
 				      const gchar* iap_id, 
+				      gboolean user_requested,
 				      TnyMaemoConicDeviceConnectCallback callback, 
 				      gpointer user_data)
 {
@@ -324,6 +326,7 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 	gboolean request_failed = FALSE;
 	ConnectInfo *info;
 	GError *err = NULL;
+	ConIcConnectFlags flags;
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
@@ -335,14 +338,20 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 
 	priv->connect_slot = info;
 
+	/* Set the flags */
+	if (user_requested)
+		flags = CON_IC_CONNECT_FLAG_NONE;
+	else
+		flags = CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED;
+
 	if (iap_id) {
-		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, CON_IC_CONNECT_FLAG_NONE)) {
+		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, flags)) {
 			g_set_error (&err, TNY_ACCOUNT_ERROR, TNY_ERROR_UNSPEC,
 				"Could not send connect_by_id dbus message");
 			request_failed = TRUE;
 		}
 	} else {
-		if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE)) {
+		if (!con_ic_connection_connect (priv->cnx, flags)) {
 			g_set_error (&err, TNY_ACCOUNT_ERROR, TNY_ERROR_UNSPEC,
 				"Could not send connect dbus message");
 			request_failed = TRUE;
@@ -701,10 +710,13 @@ stop_loop (TnyMaemoConicDevice *self)
  * Returns TRUE if a connection was made, FALSE otherwise.
  **/
 gboolean
-tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
+tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, 
+				const gchar* iap_id,
+				gboolean user_requested)
 {
 	TnyMaemoConicDevicePriv *priv = NULL;
 	gboolean request_failed = FALSE;
+	ConIcConnectFlags flags;
 
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
@@ -712,13 +724,19 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id)
 	g_return_val_if_fail (priv->cnx, FALSE);
 	priv->loop = g_main_loop_new(NULL, FALSE /* not running immediately. */);
 
+	/* Set the flags */
+	if (user_requested)
+		flags = CON_IC_CONNECT_FLAG_NONE;
+	else
+		flags = CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED;
+
 	if (iap_id) {
-		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, CON_IC_CONNECT_FLAG_NONE)) {
+		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, flags)) {
 			g_warning ("could not send connect_by_id dbus message");
 			request_failed = TRUE;
 		}
 	} else {
-		if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_NONE)) {
+		if (!con_ic_connection_connect (priv->cnx, flags)) {
 			g_warning ("could not send connect dbus message");
 			request_failed = TRUE;
 		}
