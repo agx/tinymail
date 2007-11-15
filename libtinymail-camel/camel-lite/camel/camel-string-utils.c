@@ -61,7 +61,6 @@ void camel_du (char *name, int *my_size)
 	DIR *dir;
 	struct dirent *ent;
 
-	chdir (name);
 	dir = opendir (name);
 
 	if (!dir)
@@ -85,7 +84,6 @@ void camel_du (char *name, int *my_size)
 	}
 
 	closedir (dir);
-	chdir ("/");
 
 }
 
@@ -105,7 +103,6 @@ camel_rm (char *name)
 	DIR *dir;
 	struct dirent *ent;
 
-	chdir (name);
 	dir = opendir (name);
 
 	if (!dir)
@@ -126,7 +123,6 @@ camel_rm (char *name)
 
 	closedir (dir);
 	remove (name);
-	chdir ("/");
 }
 
 int
