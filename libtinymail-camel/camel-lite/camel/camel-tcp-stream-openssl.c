@@ -29,6 +29,8 @@
 #ifndef HAVE_NSS
 #ifdef HAVE_OPENSSL
 
+#include <glib/gi18n-lib.h>
+
 #include "camel-tcp-stream-ssl.h"
 
 #include <errno.h>
