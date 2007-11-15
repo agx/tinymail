@@ -2,6 +2,7 @@
 
 	* Updating attachment flags after downloading of message
 	* Bugfix, bug detected by Milan Crha (alloc must be a alloc0)
+	* Fixed a crasher
 
 2007-11-15  Matthew Barnes  <mbarnes@redhat.com>
 

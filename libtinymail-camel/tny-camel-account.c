@@ -1769,6 +1769,7 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 		info->mutex = NULL;
 		info->condition = NULL;
 		info->had_callback = FALSE;
+		info->account = TNY_CAMEL_ACCOUNT (g_object_ref (self));
 
 		execute_callback (/* info->depth */ 10, G_PRIORITY_HIGH, 
 			on_set_online_done_idle_func, 
